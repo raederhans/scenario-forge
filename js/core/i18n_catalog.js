@@ -2,6 +2,18 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Save project": { zh: "保存项目", en: "Save project" },
+  "Export image": { zh: "导出图片", en: "Export image" },
+  "Not saved yet": { zh: "尚未保存", en: "Not saved yet" },
+  "Unsaved changes": { zh: "有未保存的修改", en: "Unsaved changes" },
+  "Project downloaded": { zh: "项目已下载", en: "Project downloaded" },
+  "Advanced settings": { zh: "高级设置", en: "Advanced settings" },
+  "Paint mode color": { zh: "着色", en: "Color" },
+  "Ownership": { zh: "归属", en: "Ownership" },
+  "Close panels": { zh: "关闭面板", en: "Close panels" },
+  "4. Set the active owner": { zh: "4. 设置当前归属方", en: "4. Set the active owner" },
+  "4. Edit, style, then save": { zh: "4. 编辑、调整样式并保存", en: "4. Edit, style, then save" },
+  "5. Edit, style, then save": { zh: "5. 编辑、调整样式并保存", en: "5. Edit, style, then save" },
   Guide: { zh: "\u6307\u5357", en: "Guide" },
   Road: { zh: "\u9053\u8def", en: "Road" },
   Rail: { zh: "\u94c1\u8def", en: "Rail" },

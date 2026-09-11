@@ -29,6 +29,31 @@ def _sha256_path(path: Path) -> str:
 
 
 class StartupBootstrapAssetsTest(unittest.TestCase):
+    def test_bootstrap_preserves_dedicated_coastline_arcs_and_transform(self) -> None:
+        full = {
+            "objects": {
+                "political": {"type": "GeometryCollection", "geometries": [
+                    {"type": "Polygon", "properties": {"id": "RU_ARCTIC_FB_1"}, "arcs": [[2]]}
+                ]},
+                "scenario_coastline": {"type": "GeometryCollection", "geometries": [
+                    {"type": "MultiPolygon", "arcs": [[[3], [-2]], [[3]]]}
+                ]},
+            },
+            "arcs": [[[99, 99]], [[1, 1]], [[2, 2]], [[3, 3]]],
+            "transform": {"scale": [0.1, 0.1], "translate": [1, 2]},
+        }
+        shell = build_startup_bootstrap_assets.build_bootstrap_runtime_topology(full)
+        self.assertEqual(shell["arcs"], [[[2, 2]], [[3, 3]], [[1, 1]]])
+        self.assertEqual(shell["objects"]["scenario_coastline"]["geometries"][0]["arcs"], [[[1], [-3]], [[1]]])
+        self.assertEqual(shell["transform"], full["transform"])
+        self.assertEqual(shell["objects"]["land_mask"]["geometries"], [])
+        # The localized startup bundle compacts the bootstrap once more.
+        # It must keep the same coast through that second loading path.
+        bundle_shell = build_startup_bundle.build_startup_runtime_shell(shell)
+        self.assertEqual(bundle_shell["objects"]["scenario_coastline"], shell["objects"]["scenario_coastline"])
+        self.assertEqual(bundle_shell["arcs"], shell["arcs"])
+        self.assertEqual(bundle_shell["transform"], shell["transform"])
+
     def test_build_bootstrap_runtime_topology_keeps_runtime_shell_only(self) -> None:
         full_topology = {
             "type": "Topology",

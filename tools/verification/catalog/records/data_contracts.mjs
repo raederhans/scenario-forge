@@ -13,14 +13,29 @@ export const DATA_CONTRACTS_RECORDS = [
       "data/global_contours.mid.major.topo.json",
       "data/global_contours.mid.minor.topo.json"
     ],
-    "ownerHints": ["geo-contract"],
-    "domains": ["geo-contract"],
-    "tiers": ["heavy"],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
     "cost": "heavy",
-    "resourceLocks": ["heavy-geo", ".runtime-output"],
-    "executionOwners": ["main-thread"],
-    "profiles": ["full"],
-    "platforms": ["all"],
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 0,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -735,7 +750,8 @@ export const DATA_CONTRACTS_RECORDS = [
       "data/city_aliases.json",
       "data/geo_aliases.json",
       "data/hgo_catalogs/hgo_place_names.json",
-      "data/hgo_catalogs/hgo_identity_aliases.json"
+      "data/hgo_catalogs/hgo_identity_aliases.json",
+      "data/i18n/manual_ui.json"
     ],
     "ownerHints": [
       "i18n-runtime"
@@ -802,6 +818,865 @@ export const DATA_CONTRACTS_RECORDS = [
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": 353,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_water_geometry",
+    "commandRef": "python -m unittest tests.test_water_geometry -q",
+    "sourceRefs": [
+      "tests/test_water_geometry.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1021,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_water_region_authority",
+    "commandRef": "python -m unittest tests.test_water_region_authority -q",
+    "sourceRefs": [
+      "tests/test_water_region_authority.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1022,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_water_validation",
+    "commandRef": "python -m pytest tests/test_water_validation.py -q",
+    "sourceRefs": [
+      "tests/test_water_validation.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1023,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_water_topology_winding",
+    "commandRef": "python -m unittest tests.test_water_topology_winding -q",
+    "sourceRefs": [
+      "tests/test_water_topology_winding.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1024,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_physical_water_mask",
+    "commandRef": "python -m unittest tests.test_physical_water_mask -q",
+    "sourceRefs": [
+      "tests/test_physical_water_mask.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1025,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_polar_water_spherical_safety",
+    "commandRef": "python -m unittest tests.test_polar_water_spherical_safety -q",
+    "sourceRefs": [
+      "tests/test_polar_water_spherical_safety.py",
+      "map_builder/geo/water_geometry.py",
+      "map_builder/geo/water_region_authority.py",
+      "map_builder/geo/water_validation.py",
+      "map_builder/geo/physical_water_mask.py",
+      "map_builder/primary_topology_stage.py",
+      "map_builder/detail_topology_stage.py",
+      "tools/rebuild_water_geometry.py",
+      "tools/build_na_detail_topology.py",
+      "data/europe_topology.na_v2.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1026,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_coastline",
+    "commandRef": "python -m unittest tests.test_atlantropa_coastline -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_coastline.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1027,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_geometry_quality",
+    "commandRef": "python -m unittest tests.test_atlantropa_geometry_quality -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_geometry_quality.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1028,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_identity",
+    "commandRef": "python -m unittest tests.test_atlantropa_identity -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_identity.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1029,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_island_alignment",
+    "commandRef": "python -m unittest tests.test_atlantropa_island_alignment -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_island_alignment.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1030,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_island_groups",
+    "commandRef": "python -m unittest tests.test_atlantropa_island_groups -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_island_groups.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1031,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_land_join",
+    "commandRef": "python -m unittest tests.test_atlantropa_land_join -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_land_join.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1032,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_atlantropa_precision",
+    "commandRef": "python -m unittest tests.test_atlantropa_precision -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_precision.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1033,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_check_atlantropa_geometry",
+    "commandRef": "python -m unittest tests.test_check_atlantropa_geometry -q",
+    "sourceRefs": [
+      "tests/test_check_atlantropa_geometry.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1034,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_rebuild_atlantropa_stage",
+    "commandRef": "python -m unittest tests.test_rebuild_atlantropa_stage -q",
+    "sourceRefs": [
+      "tests/test_rebuild_atlantropa_stage.py",
+      "tools/atlantropa_coastline.py",
+      "tools/atlantropa_geometry_quality.py",
+      "tools/atlantropa_identity.py",
+      "tools/atlantropa_island_alignment.py",
+      "tools/atlantropa_precision.py",
+      "tools/check_atlantropa_geometry.py",
+      "tools/rebuild_atlantropa_stage.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1035,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_world_urban_lights_asset",
+    "commandRef": "python -m unittest tests.test_world_urban_lights_asset -q",
+    "sourceRefs": [
+      "tests/test_world_urban_lights_asset.py",
+      "tools/build_world_urban_lights_asset.py",
+      "data/world_urban_lights.geojson"
+    ],
+    "ownerHints": [
+      "city-runtime"
+    ],
+    "domains": [
+      "city-runtime"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1036,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:test_startup_bootstrap_assets",
+    "commandRef": "python -m unittest tests.test_startup_bootstrap_assets -q",
+    "sourceRefs": [
+      "tests/test_startup_bootstrap_assets.py",
+      "tools/build_startup_bootstrap_assets.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1037,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "e2e:tests/e2e/ocean_geometry_contract.spec.js",
+    "commandRef": "node tools/e2e_layering.mjs run-spec tests/e2e/ocean_geometry_contract.spec.js",
+    "sourceRefs": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
+    "ownerHints": [
+      "water-runtime"
+    ],
+    "domains": [
+      "water-runtime"
+    ],
+    "tiers": [
+      "regression"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "browser-dev-server",
+      "playwright-browser",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 905,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "e2e:tests/e2e/tno_atlantropa_coastline.spec.js",
+    "commandRef": "node tools/e2e_layering.mjs run-spec tests/e2e/tno_atlantropa_coastline.spec.js",
+    "sourceRefs": [
+      "tests/e2e/tno_atlantropa_coastline.spec.js"
+    ],
+    "ownerHints": [
+      "tno-water"
+    ],
+    "domains": [
+      "tno-water"
+    ],
+    "tiers": [
+      "regression"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "browser-dev-server",
+      "playwright-browser",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 906,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "dev:atlantropa-refinement-perf",
+    "commandRef": "node node_modules/@playwright/test/cli.js test tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js --workers=1 --retries=0",
+    "sourceRefs": [
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js"
+    ],
+    "ownerHints": [
+      "tno-water"
+    ],
+    "domains": [
+      "tno-water"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "browser-dev-server",
+      "playwright-browser",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 907,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "water:geometry-runtime-contract",
+    "commandRef": "node --test tests/water_geometry_runtime.test.mjs",
+    "sourceRefs": [
+      "tools/check_water_geometry.mjs",
+      "tests/water_geometry_runtime.test.mjs"
+    ],
+    "ownerHints": [
+      "water-runtime"
+    ],
+    "domains": [
+      "water-runtime"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 1500,
     "verification": null,
     "selector": {}
   }

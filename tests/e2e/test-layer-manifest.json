@@ -94,6 +94,13 @@
       "ownerHint": "scenario-runtime"
     },
     {
+      "specPath": "tests/e2e/ocean_geometry_contract.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "water-runtime",
+      "ownerHint": "water-runtime"
+    },
+    {
       "specPath": "tests/e2e/physical_layer_regression.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",
@@ -250,6 +257,13 @@
       "ownerHint": "scenario-tno"
     },
     {
+      "specPath": "tests/e2e/tno_atlantropa_coastline.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "tno-water",
+      "ownerHint": "tno-water"
+    },
+    {
       "specPath": "tests/e2e/tno_named_water_rendering.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",
@@ -269,6 +283,13 @@
       "executionMode": "hybrid",
       "domain": "tno-startup",
       "ownerHint": "scenario-tno"
+    },
+    {
+      "specPath": "tests/e2e/transport_phase_b_main_map_smoke.spec.js",
+      "primaryLayer": "feature",
+      "executionMode": "browser",
+      "domain": "transport-workbench",
+      "ownerHint": "transport-workbench"
     },
     {
       "specPath": "tests/e2e/transport_workbench_country_pack_loading.spec.js",
@@ -295,13 +316,6 @@
       "specPath": "tests/e2e/transport_workbench_port_coverage_tiers.spec.js",
       "primaryLayer": "feature",
       "executionMode": "hybrid",
-      "domain": "transport-workbench",
-      "ownerHint": "transport-workbench"
-    },
-    {
-      "specPath": "tests/e2e/transport_phase_b_main_map_smoke.spec.js",
-      "primaryLayer": "feature",
-      "executionMode": "browser",
       "domain": "transport-workbench",
       "ownerHint": "transport-workbench"
     },

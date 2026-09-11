@@ -3,6 +3,10 @@ name: pr-verify
 on:
   pull_request:
 
+concurrency:
+  group: pr-verify-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   pr-verify-fast:
     uses: ./.github/workflows/verify-shared.yml
@@ -15,18 +19,12 @@ jobs:
     with:
       profile: pr-smoke
       run-e2e-smoke: true
-
-  pr-verify-demo:
-    needs: ["pr-verify-smoke"]
-    uses: ./.github/workflows/verify-shared.yml
-    with:
-      profile: demo
-      run-e2e-smoke: false
+      run-golden-demo: true
 
   pr-verify-required:
     name: PR Verify Required
     if: always()
-    needs: ["pr-verify-fast", "pr-verify-smoke", "pr-verify-demo"]
+    needs: ["pr-verify-fast", "pr-verify-smoke"]
     runs-on: ubuntu-latest
     steps:
       - name: Require successful PR verification results
@@ -34,7 +32,7 @@ jobs:
           REQUIRED_RESULTS: ${{ toJSON(needs) }}
         run: |
           node <<'NODE'
-          const expectedJobs = ["pr-verify-fast", "pr-verify-smoke", "pr-verify-demo"];
+          const expectedJobs = ["pr-verify-fast", "pr-verify-smoke"];
           const allowedResults = new Set(["success"]);
           const needs = JSON.parse(process.env.REQUIRED_RESULTS);
           const actualJobs = Object.keys(needs).sort();

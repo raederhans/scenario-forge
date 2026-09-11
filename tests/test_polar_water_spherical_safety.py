@@ -24,6 +24,35 @@ def _empty_gdf() -> gpd.GeoDataFrame:
     return gpd.GeoDataFrame(columns=["geometry"], geometry="geometry", crs="EPSG:4326")
 
 
+def test_topology_builder_inherits_physical_authority_before_clipping_water(tmp_path):
+    authority = {
+        "type": "Topology",
+        "arcs": [
+            [[-10, -10], [-10, 10], [10, 10], [10, -10], [-10, -10]],
+            [[30, 0], [30, 5], [35, 5], [35, 0], [30, 0]],
+        ],
+        "objects": {
+            "ocean": {"type": "Polygon", "arcs": [[0]]},
+            "land": {"type": "Polygon", "arcs": [[1]]},
+        },
+    }
+    water = gpd.GeoDataFrame([{
+        "id": "test_ocean", "water_type": "ocean", "region_group": "ocean_macro",
+        "geometry": Polygon([[-5, -5], [-5, 5], [5, 5], [5, -5], [-5, -5]]),
+    }], crs="EPSG:4326")
+    output = tmp_path / "detail.json"
+    source_path = tmp_path / "water_regions.geojson"
+    source_path.write_text('{"owner":"primary"}', encoding="utf-8")
+    build_topology(political=_political_gdf(), ocean=_empty_gdf(), land=_empty_gdf(),
+                   urban=_empty_gdf(), physical=_empty_gdf(), rivers=_empty_gdf(),
+                   water_regions=water, output_path=output, physical_authority_topology=authority)
+    actual = json.loads(output.read_text(encoding="utf-8"))
+    assert json.loads(source_path.read_text(encoding="utf-8")) == {"owner": "primary"}
+    for name in ("land", "ocean"):
+        assert spherical_safety._topology_feature_collection(actual, name, "test.actual") == \
+            spherical_safety._topology_feature_collection(authority, name, "test.authority")
+
+
 def _ring(min_x: float, min_y: float, max_x: float, max_y: float) -> Polygon:
     return Polygon([
         (min_x, min_y),
@@ -176,7 +205,10 @@ def test_prepare_primary_polar_caps_closes_at_poles_and_antimeridian() -> None:
     prepared = prepare_primary_polar_water_regions(_polar_cap_gdf())
 
     assert all(geometry.is_valid for geometry in prepared.geometry)
-    assert all(len(geometry.geoms) == 3 for geometry in prepared.geometry)
+    # Continuous caps stay valid polygons; artificial longitude bands used to
+    # require epsilon gaps to avoid touching MultiPolygon components.
+    assert all(geometry.geom_type == "Polygon" for geometry in prepared.geometry)
+    assert all(original.equals(compiled) for original, compiled in zip(_polar_cap_gdf().geometry, prepared.geometry))
     validate_primary_polar_water_feature_collection(
         json.loads(prepared.to_json(drop_id=True)),
         require_all=True,

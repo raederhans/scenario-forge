@@ -85,7 +85,19 @@ export const CATALOG_POLICIES = {
           "tests/test_pages_dist_startup_shell_heavy.py",
           "tests/test_political_topology_gap_contract.py",
           "tests/test_polar_water_spherical_safety.py",
-          "tests/test_transport_country_source_contracts.py"
+          "tests/test_transport_country_source_contracts.py",
+          "tests/test_physical_water_mask.py",
+          "tests/test_water_geometry.py",
+          "tests/test_water_region_authority.py",
+          "tests/test_atlantropa_coastline.py",
+          "tests/test_atlantropa_geometry_quality.py",
+          "tests/test_atlantropa_identity.py",
+          "tests/test_atlantropa_island_alignment.py",
+          "tests/test_atlantropa_island_groups.py",
+          "tests/test_atlantropa_land_join.py",
+          "tests/test_atlantropa_precision.py",
+          "tests/test_check_atlantropa_geometry.py",
+          "tests/test_world_urban_lights_asset.py"
         ]
       }
     ],
@@ -389,7 +401,7 @@ export const CATALOG_POLICIES = {
       {
         "id": "demo",
         "commandRef": "verify:demo",
-        "consumer": "pr-verify-demo"
+        "consumer": "pr-verify-smoke"
       }
     ]
   },

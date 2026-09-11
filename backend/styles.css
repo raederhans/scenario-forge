@@ -30,6 +30,11 @@ body {
 
 button, input, textarea, select { font: inherit; }
 
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 3px solid var(--cyan);
+  outline-offset: 3px;
+}
+
 button, .plain {
   min-height: 38px;
   border: 1px solid var(--ink);
@@ -271,6 +276,8 @@ textarea { min-height: 112px; resize: vertical; }
 
 dialog {
   width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
   padding: 0;
   box-shadow: var(--shadow);
 }

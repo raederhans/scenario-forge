@@ -238,6 +238,22 @@ def build_bootstrap_runtime_topology(full_topology: dict) -> dict:
             "geometries": [],
         }
 
+    # The coastline is a dedicated dissolved surface, independent of political
+    # detail chunks. Preserve only its referenced arcs in the startup shell.
+    coastline_object = full_topology.get("objects", {}).get("scenario_coastline")
+    if isinstance(coastline_object, dict):
+        def collect_arc_indexes(geometry):
+            yield from _iter_topology_arc_indexes(geometry.get("arcs"))
+            for child in geometry.get("geometries", []):
+                yield from collect_arc_indexes(child)
+
+        used_indexes = list(dict.fromkeys(collect_arc_indexes(coastline_object)))
+        index_map = {index: len(bootstrap_arcs) + offset for offset, index in enumerate(used_indexes)}
+        selected_objects["scenario_coastline"] = _copy_bootstrap_geometry(
+            coastline_object, index_map, BOOTSTRAP_POLITICAL_PROPERTY_WHITELIST
+        )
+        bootstrap_arcs.extend(copy.deepcopy(full_topology["arcs"][index]) for index in used_indexes)
+
     bootstrap_topology = {
         "type": "Topology",
         "objects": selected_objects,

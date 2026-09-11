@@ -122,6 +122,7 @@ DATA_RUNTIME_FILES = (
     "global_rivers.geojson",
     "europe_physical.geojson",
     "europe_urban.geojson",
+    "world_urban_lights.geojson",
     "global_physical_semantics.topo.json",
     "global_contours.major.topo.json",
     "global_contours.minor.topo.json",

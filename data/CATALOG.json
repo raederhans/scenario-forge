@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generated_at": "2026-08-14T20:52:35.840939+00:00",
+  "generated_at": "2026-09-11T02:47:14.044292+00:00",
   "counts": {
-    "entries": 662,
+    "entries": 663,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -57,18 +57,19 @@
       "transport_provenance_payload": 8,
       "transport_subtype_catalog": 1,
       "unit_counter_manifest": 1,
-      "world_cities": 1
+      "world_cities": 1,
+      "world_urban_lights": 1
     },
     "by_format": {
       "bmp": 1,
-      "geojson": 147,
+      "geojson": 148,
       "javascript": 2,
       "json": 341,
       "topojson": 171
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 659,
+      "json": 660,
       "module": 2
     }
   },
@@ -10470,6 +10471,21 @@
       "aliases": [
         "city_lights:historical_1930:source",
         "manifest_output:world_cities.geojson"
+      ]
+    },
+    {
+      "key": "world_urban_lights",
+      "url": "data/world_urban_lights.geojson",
+      "role": "world_urban_lights",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::world_urban_lights_natural_earth::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "world_urban_lights_natural_earth",
+      "readMode": "json",
+      "aliases": [
+        "source:world_urban_lights_natural_earth"
       ]
     },
     {

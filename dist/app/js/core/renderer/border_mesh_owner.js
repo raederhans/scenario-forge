@@ -372,7 +372,16 @@ export function createBorderMeshOwner({
     const primaryTopology = state.topologyPrimary || state.topology || null;
     const runtimeTopology = state.runtimePoliticalTopology || null;
     const scenarioId = String(state.activeScenarioId || "").trim();
-    const scenarioSurfaceVersionSignal = String(getScenarioSurfaceVersionSignal() || "");
+    const hasDedicatedCoastline = !!runtimeTopology?.objects?.scenario_coastline;
+    const atlantropaLandVisible = !!state.showWaterRegions && state.showScenarioAtlantropa !== false
+      && (state.scenarioAtlantropaData?.features || []).some(
+        (feature) => feature?.properties?.atl_render_layer === "land"
+      );
+    const scenarioSurfaceVersionSignal = [
+      String(getScenarioSurfaceVersionSignal() || ""),
+      `coastline-land:${atlantropaLandVisible}`,
+      `topology:${Number(state.topologyRevision || 0)}`,
+    ].join("|");
 
     const cacheMatches =
       scenarioCoastlineSourceCache.primaryRef === primaryTopology &&
@@ -384,8 +393,9 @@ export function createBorderMeshOwner({
     }
     const { decision } = evaluateCoastlineTopologySource({
       primaryTopology,
-      runtimeTopology,
+      runtimeTopology: hasDedicatedCoastline && !atlantropaLandVisible ? null : runtimeTopology,
       scenarioId,
+      ...(hasDedicatedCoastline ? { runtimeObjectNames: ["scenario_coastline"] } : {}),
       scenarioCoastlineMaxAreaDeltaRatio,
       scenarioCoastlineMaxInteriorRingCount,
       scenarioCoastlineMaxInteriorRingRatio,
@@ -436,6 +446,45 @@ export function createBorderMeshOwner({
       getLineLength,
     });
 
+  let coastlineMeshCache = null;
+  function ensureCoastlineMeshes({ mid = {}, low = {} } = {}) {
+    const decision = resolveCoastlineTopologySource();
+    const topology = decision?.topology;
+    const objectName = decision?.source === "scenario" ? decision.runtimeObjectName : decision?.primaryObjectName;
+    const object = topology?.objects?.[objectName];
+    const lodKey = [mid.epsilon || 0, mid.minLength || 0, low.epsilon || 0, low.minLength || 0].join("|");
+    if (object && coastlineMeshCache?.topology === topology
+      && coastlineMeshCache.object === object && coastlineMeshCache.arcs === topology.arcs
+      && coastlineMeshCache.transform === topology.transform && coastlineMeshCache.lodKey === lodKey
+      && coastlineMeshCache.meshFunction === globalThis.topojson?.mesh) {
+      // A static-mesh reset clears the arrays, but does not invalidate unchanged
+      // coastline geometry. Restore its LODs without decoding/simplifying again.
+      state.cachedCoastlines = coastlineMeshCache.collections.cachedCoastlines;
+      state.cachedCoastlinesHigh = coastlineMeshCache.collections.cachedCoastlinesHigh;
+      state.cachedCoastlinesMid = coastlineMeshCache.collections.cachedCoastlinesMid;
+      state.cachedCoastlinesLow = coastlineMeshCache.collections.cachedCoastlinesLow;
+      return;
+    }
+    const mesh = buildGlobalCoastlineMesh(decision);
+    const high = isUsableMesh(mesh) ? [mesh] : [];
+    const midMesh = high.length ? simplifyCoastlineMesh(mesh, mid) : null;
+    const lowMesh = high.length ? simplifyCoastlineMesh(mesh, low) : null;
+    state.cachedCoastlines = high;
+    state.cachedCoastlinesHigh = high;
+    state.cachedCoastlinesMid = isUsableMesh(midMesh) ? [midMesh] : high;
+    state.cachedCoastlinesLow = isUsableMesh(lowMesh) ? [lowMesh] : state.cachedCoastlinesMid;
+    coastlineMeshCache = {
+      topology, object, arcs: topology?.arcs, transform: topology?.transform, lodKey,
+      meshFunction: globalThis.topojson?.mesh,
+      collections: {
+        cachedCoastlines: state.cachedCoastlines,
+        cachedCoastlinesHigh: state.cachedCoastlinesHigh,
+        cachedCoastlinesMid: state.cachedCoastlinesMid,
+        cachedCoastlinesLow: state.cachedCoastlinesLow,
+      },
+    };
+  }
+
   return {
     clearPendingDynamicBorderTimer,
     markDynamicBordersDirty,
@@ -458,5 +507,6 @@ export function createBorderMeshOwner({
     resolveCoastlineTopologySource,
     buildGlobalCoastlineMesh,
     simplifyCoastlineMesh,
+    ensureCoastlineMeshes,
   };
 }

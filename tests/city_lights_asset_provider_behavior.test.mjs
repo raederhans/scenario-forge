@@ -99,3 +99,114 @@ test("provider rejects malformed modern grid dimensions", async () => {
   await assert.rejects(provider.ensureModernAssets(), /dimensions do not match/);
   assert.equal(provider.isModernAssetsReady(), false);
 });
+
+function createUrbanShapes() {
+  return {
+    type: "FeatureCollection",
+    features: [{
+      type: "Feature", id: "ne_urban_1", properties: { anchor: [0.5, 0.5] },
+      geometry: { type: "Polygon", coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]] },
+    }],
+  };
+}
+
+test("urban shapes stay lazy for historical access and modern grid loading", async () => {
+  let fetches = 0;
+  let resolutions = 0;
+  const provider = createCityLightsAssetProvider({
+    importModernAsset: async () => createModernAsset(),
+    resolveUrbanShapeAssetUrl: () => { resolutions += 1; return "urban.geojson"; },
+    fetchUrbanShapeAsset: async () => { fetches += 1; throw new Error("not requested"); },
+  });
+  assert.ok(provider.getAssets().HISTORICAL_1930_CITY_LIGHTS_ENTRIES.length);
+  assert.equal(provider.getAssets().MODERN_CITY_LIGHTS_URBAN_AREAS, null);
+  assert.equal(provider.isUrbanShapeAssetsReady(), false);
+  await provider.ensureModernAssets();
+  assert.equal(provider.isModernAssetsReady(), true);
+  assert.equal(fetches, 0);
+  assert.equal(resolutions, 0);
+});
+
+test("urban shape requests coalesce and retain their independent published collection", async () => {
+  const collection = createUrbanShapes();
+  let finish;
+  let fetches = 0;
+  const provider = createCityLightsAssetProvider({
+    importModernAsset: async () => { throw new Error("grid must remain lazy"); },
+    resolveUrbanShapeAssetUrl: () => "urban.geojson",
+    fetchUrbanShapeAsset: (url) => {
+      assert.equal(url, "urban.geojson");
+      fetches += 1;
+      return new Promise((resolve) => { finish = resolve; });
+    },
+  });
+  const first = provider.ensureUrbanShapeAssets();
+  assert.equal(provider.ensureUrbanShapeAssets(), first);
+  assert.equal(fetches, 0);
+  await Promise.resolve();
+  assert.equal(fetches, 1);
+  assert.equal(provider.getAssets().MODERN_CITY_LIGHTS_URBAN_AREAS, null);
+  finish({ ok: true, json: async () => collection });
+  assert.equal(await first, collection);
+  assert.equal(await provider.ensureUrbanShapeAssets(), collection);
+  assert.equal(provider.getAssets().MODERN_CITY_LIGHTS_URBAN_AREAS, collection);
+  assert.equal(provider.isUrbanShapeAssetsReady(), true);
+  assert.equal(provider.isModernAssetsReady(), false);
+  assert.equal(fetches, 1);
+});
+
+test("urban shape failures preserve modern grid and retry only on an explicit request", async () => {
+  const failures = [
+    () => { throw new Error("network unavailable"); },
+    () => ({ ok: false, status: 503, json: async () => createUrbanShapes() }),
+    () => ({ ok: true, json: async () => { throw new SyntaxError("invalid JSON"); } }),
+    () => ({ ok: true, json: async () => ({ type: "FeatureCollection", features: [] }) }),
+  ];
+  for (const fail of failures) {
+    let attempts = 0;
+    const provider = createCityLightsAssetProvider({
+      importModernAsset: async () => createModernAsset(),
+      resolveUrbanShapeAssetUrl: () => "urban.geojson",
+      fetchUrbanShapeAsset: () => {
+        attempts += 1;
+        return attempts === 1 ? fail() : { ok: true, json: async () => createUrbanShapes() };
+      },
+    });
+    const grid = await provider.ensureModernAssets();
+    await assert.rejects(provider.ensureUrbanShapeAssets());
+    await Promise.resolve();
+    assert.equal(attempts, 1);
+    assert.equal(provider.isUrbanShapeAssetsReady(), false);
+    assert.equal(provider.getAssets().MODERN_CITY_LIGHTS_URBAN_AREAS, null);
+    assert.equal(provider.getAssets().MODERN_CITY_LIGHTS_GRID, grid.MODERN_CITY_LIGHTS_GRID);
+    await provider.ensureUrbanShapeAssets();
+    assert.equal(attempts, 2);
+    assert.equal(provider.isUrbanShapeAssetsReady(), true);
+  }
+});
+
+test("urban shape validation rejects invalid geometry and preserves multipolygon holes", async () => {
+  const ring = createUrbanShapes().features[0].geometry.coordinates[0];
+  for (const geometry of [
+    null, { type: "Point", coordinates: [0, 0] },
+    { type: "Polygon", coordinates: [] },
+    { type: "Polygon", coordinates: [[[0, 0], [1, 1], [1, 2], [2, 3]]] },
+    { type: "Polygon", coordinates: [[[0, 0], [NaN, 1], [1, 2], [0, 0]]] },
+    { type: "MultiPolygon", coordinates: [] },
+  ]) {
+    const collection = createUrbanShapes();
+    collection.features[0].geometry = geometry;
+    const provider = createCityLightsAssetProvider({
+      resolveUrbanShapeAssetUrl: () => "urban.geojson",
+      fetchUrbanShapeAsset: async () => ({ ok: true, json: async () => collection }),
+    });
+    await assert.rejects(provider.ensureUrbanShapeAssets(), /polygon features/);
+  }
+  const collection = createUrbanShapes();
+  collection.features[0].geometry = { type: "MultiPolygon", coordinates: [[ring, ring], [ring]] };
+  const provider = createCityLightsAssetProvider({
+    resolveUrbanShapeAssetUrl: () => "urban.geojson",
+    fetchUrbanShapeAsset: async () => ({ ok: true, json: async () => collection }),
+  });
+  assert.equal(await provider.ensureUrbanShapeAssets(), collection);
+});

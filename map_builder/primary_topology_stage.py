@@ -11,6 +11,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from map_builder.geo.water_region_authority import WATER_SOURCE_SIMPLIFY_DEGREES
+
 
 def run_primary_topology_bundle(
     script_dir: Path,
@@ -147,7 +149,7 @@ def _clean_background_sources(stage_ops: Any, downloaded: dict[str, Any]) -> dic
     )
     water_regions = stage_ops.build_water_regions(downloaded["marine_polys"], downloaded["lakes"])
     water_regions["geometry"] = water_regions.geometry.simplify(
-        tolerance=cfg.SIMPLIFY_BACKGROUND, preserve_topology=True
+        tolerance=WATER_SOURCE_SIMPLIFY_DEGREES, preserve_topology=True
     )
     urban_clipped = stage_ops.load_urban()
     urban_clipped = urban_clipped.copy()

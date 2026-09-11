@@ -11,6 +11,7 @@ import topojson as tp
 
 from map_builder import config as cfg
 from map_builder.geo.spherical_safety import (
+    _topology_feature_collection,
     PRIMARY_POLAR_WATER_IDS,
     prepare_primary_polar_water_regions,
     repair_primary_polar_water_topology_orientation,
@@ -18,6 +19,10 @@ from map_builder.geo.spherical_safety import (
     validate_primary_polar_water_topology,
 )
 from map_builder.geo.utils import round_geometries
+from map_builder.geo.water_region_authority import compile_named_water_regions
+from map_builder.geo.water_geometry import replace_water_topology_object
+from map_builder.geo.water_validation import validate_water_runtime
+from map_builder.geo.physical_water_mask import inherit_physical_water_masks
 
 URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
 URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
@@ -260,6 +265,7 @@ def build_topology(
     special_zones: gpd.GeoDataFrame | None = None,
     water_regions: gpd.GeoDataFrame | None = None,
     quantization: int = cfg.TOPOLOGY_QUANTIZATION,
+    physical_authority_topology: dict | None = None,
 ) -> None:
     print("Building TopoJSON topology...")
     output_path = output_path
@@ -433,18 +439,20 @@ def build_topology(
         gdf = gdf.to_crs("EPSG:4326")
         gdf = prune_columns(gdf, name)
         gdf = scrub_geometry(gdf)
-        gdf = round_geometries(gdf)
+        if name != "water_regions":
+            gdf = round_geometries(gdf)
         # Rounding can create self-intersections on tight rings; scrub again.
         gdf = scrub_geometry(gdf)
         if name == "water_regions":
-            gdf = prepare_primary_polar_water_regions(gdf)
+            source_water = json.loads(gdf.to_json(drop_id=True))
+            compiled_water = compile_named_water_regions(source_water)
+            gdf = gpd.GeoDataFrame.from_features(compiled_water["features"], crs="EPSG:4326")
             present_ids = set(gdf["id"].fillna("").astype(str).str.strip())
             validate_primary_polar_water_gdf(
                 gdf,
                 require_all=bool(PRIMARY_POLAR_WATER_IDS.intersection(present_ids)),
                 stage_label="primary_topology.pre_encode",
             )
-            write_layer_geojson(gdf, "water_regions")
         if name == "urban":
             _validate_urban_layer_input(gdf)
         if not has_valid_bounds(gdf):
@@ -590,8 +598,24 @@ def build_topology(
             f"id mismatches={mismatch_id_count}"
         )
     _validate_urban_topology_output(topo_dict)
+    if physical_authority_topology is not None:
+        topo_dict = inherit_physical_water_masks(topo_dict, physical_authority_topology)
     water_object = topo_dict.get("objects", {}).get("water_regions")
     if isinstance(water_object, dict):
+        # Physical masks are authoritative at their final published precision.
+        # Reclip from source, since clipping against pre-quantized masks can
+        # otherwise permanently remove coast pixels or leave water on land.
+        compiled_water = compile_named_water_regions(
+            source_water,
+            ocean_mask=_topology_feature_collection(topo_dict, "ocean", "water.ocean_mask")
+                if "ocean" in topo_dict["objects"] else None,
+            land_mask=_topology_feature_collection(topo_dict, "land", "water.land_mask")
+                if "land" in topo_dict["objects"] else None,
+        )
+        # Use the same precise compiled water in source and final runtime. Other
+        # objects retain their decoded coordinates and properties unchanged.
+        topo_dict = replace_water_topology_object(topo_dict, compiled_water)
+        water_object = topo_dict["objects"]["water_regions"]
         water_geometries = water_object.get("geometries", [])
         water_ids = {
             str((geometry.get("properties") or {}).get("id") or geometry.get("id") or "").strip()
@@ -614,6 +638,16 @@ def build_topology(
                 require_all=require_all_polar_ids,
                 stage_label="primary_topology.round_trip_repaired",
             )
+        validate_water_runtime(topo_dict, land_object="land", ocean_object="ocean")
+        final_water = _topology_feature_collection(topo_dict, "water_regions", "water.sidecar")
+        for key in ("water_geometry_precision", "water_geometry_quantization"):
+            if key in topo_dict:
+                final_water[key] = topo_dict[key]
+        # Only the primary builder owns the shared source used by scenarios.
+        # Detail re-encoding must not replace that source as a side effect.
+        if physical_authority_topology is None:
+            output_path.with_name("water_regions.geojson").write_text(
+                json.dumps(final_water, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
     # Verify top-level IDs are strings, not numeric indices
     sample_ids = [g.get("id") for g in geometries[:5]]

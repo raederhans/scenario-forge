@@ -338,6 +338,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "tools/check_test_timeout_guardrails.mjs",
       "tools/test_timing_summary.mjs",
       ".github/workflows/pr-verify.yml",
+      ".github/workflows/transport-contract-required.yml",
       ".github/workflows/verify-shared.yml"
     ],
     "ownerHints": [
@@ -677,6 +678,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "id": "node:test:node:backend-console-helpers",
     "commandRef": "test:node:backend-console-helpers",
     "sourceRefs": [
+      "backend/app.js", "backend/index.html", "backend/styles.css",
       "tests/backend_console_helpers.test.mjs",
       "backend/backend_console_helpers.js"
     ],

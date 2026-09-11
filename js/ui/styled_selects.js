@@ -1,3 +1,5 @@
+import { t } from "./i18n.js";
+
 const ENHANCED_SELECT_SELECTOR = [
   "select.select-input",
   "select.legend-generator-select",
@@ -55,6 +57,21 @@ function getSelectLabel(select) {
     if (text) return text;
   }
   return String(select.title || select.name || select.id || "Select").trim();
+}
+
+function getSelectLabelTranslationKey(select) {
+  const explicitKey = select.getAttribute("data-i18n-aria-label");
+  if (explicitKey) return explicitKey;
+  // An explicit accessible name takes precedence over a separate visual label.
+  if (select.getAttribute("aria-label")) return "";
+  const labelledBy = String(select.getAttribute("aria-labelledby") || "").trim();
+  const labels = labelledBy
+    ? labelledBy.split(/\s+/).map((id) => select.ownerDocument.getElementById(id)).filter(Boolean)
+    : Array.from(select.labels || []);
+  if (labels.length !== 1) return "";
+  const label = labels[0];
+  return label.getAttribute("data-i18n")
+    || label.querySelector("[data-i18n]")?.getAttribute("data-i18n") || "";
 }
 
 function closeSurface(surface, { restoreFocus = false } = {}) {
@@ -166,7 +183,10 @@ function syncSurface(select) {
   surface.text.textContent = selectedOption?.textContent?.trim() || "";
   surface.button.disabled = !!select.disabled;
   surface.button.title = select.title || "";
-  surface.button.setAttribute("aria-label", getSelectLabel(select));
+  const labelKey = getSelectLabelTranslationKey(select);
+  if (labelKey) surface.button.setAttribute("data-i18n-aria-label", labelKey);
+  else surface.button.removeAttribute("data-i18n-aria-label");
+  surface.button.setAttribute("aria-label", labelKey ? t(labelKey, "ui") : getSelectLabel(select));
   // option 节点数量和禁用态可能由面板重新渲染，整表重建比增量补丁更贴近原生 select 真相源。
   surface.menu.replaceChildren();
   Array.from(select.options || []).forEach((option, index) => {

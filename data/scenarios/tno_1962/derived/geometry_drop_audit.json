@@ -33,168 +33,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLISL_adriatica_CRO_1",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_2",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLISL_adriatica_CRO_3",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_4",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_5",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_6",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_7",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_adriatica_CRO_8",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -286,7 +125,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLISL_aegean_GRE_1",
+      "feature_id": "ATLISL_adriatica_source_1af38019baedda5939dd391c62a69c3e4687fd812f5f841ddea7617a27cd5329",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -309,7 +148,168 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLISL_aegean_GRE_10",
+      "feature_id": "ATLISL_adriatica_source_2a2735a8da215a73e7769a0d17706f1b8ac1647c615b5c382e4f2dbc91cad806",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_6a9986e29faf7cb22d4301d7445f86e4fa61560d2751849c61dbc37751fb30d9",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_6f08765428359e34bbe6ee4bd2408e4f873f99f1d1af174794864a959e53d944",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_7fba784b3f440f9c3fe16eb804d519630d6c42c1c3fe5d3be9b862186315907f",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_a0eedb2a11dd70d7457c077c692b02548258e559ccc58cf8ab19b2c7144dc7cf",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_a282019b69d82d874a525940168b347a2dc3c6b6a7b41a7c5c332b0b8e21d09d",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_adriatica_source_d902aaac9565fba9dd07ecbcf069a2b6fdfb7a48adb44638f6e13bd6630dc971",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_GRE_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -356,29 +356,6 @@
         "owner_core"
       ],
       "feature_id": "ATLISL_aegean_GRE_12",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_13",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -471,29 +448,6 @@
         "owner_core"
       ],
       "feature_id": "ATLISL_aegean_GRE_17",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_18",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -746,145 +700,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLISL_aegean_GRE_28",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_3",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_4",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLISL_aegean_GRE_5",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_6",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_7",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLISL_aegean_GRE_8",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -999,29 +815,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLISL_aegean_imbros",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLISL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLISL_aegean_lesvos",
       "final_area": null,
       "missing_stages": [],
@@ -1069,6 +862,190 @@
         "owner_core"
       ],
       "feature_id": "ATLISL_aegean_rhodes",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_139ccca6887f70a92ce4de3a38f8356a49b67e4fc6d67889011385a45aa9c76b",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_2efc11d76fa75115aa5d752976a1688549d79a4a6e009e59719cc5bcf57abd9f",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_3d305c15511d75f8c4c2981e57b4d4f1252e8b56ef737f48c5f4b97a86d30968",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_760fd1a6b6168360a5d277f9b5c81226189651a497eb6f8625a63af13278f0fc",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_8719fffd33125dc78a0b635b9b3aea7cc98729c9b908ab4c137b42e3c6d2ca72",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_a91b3ea3d1ce93dee5899d23455ad3aee7fe8dbc8fd703f2d67b0285de3a3db8",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_source_ba49bc29ea1452a88da7cfe76e7750e9de3c6b41f7876dcce6906169382307cb",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -1321,6 +1298,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLISL_sicily_tunis_source_9121c5f0c8e4d86db5484c1ea966ad438d2c930bcec2af28c2c28a2fb80d104c",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLISL_tyrrhenian_ITA_1",
       "final_area": null,
       "missing_stages": [],
@@ -1368,6 +1368,167 @@
         "owner_core"
       ],
       "feature_id": "ATLISL_tyrrhenian_sardinia",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_452dd59ec13ab609e013c63d3cf684e91e2f8020d71297cd9434453fde98352c",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_47d68e14ebfd9c0bd4e3bd7586ce8b63fb1bdd6d26ad6f25a6aec1441939617d",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_563cb45377b6dc55202afe8dcdc4915ec0a12ec704a0368b1f9d7d6a03982ea5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_6a8559bccd21710e738866a4c78b1dce15843aa7f268951d8152fc38f43e183b",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_94f4a06c5021a8103287fc93fd5929a51c737789f31113757fd136dfe689cf68",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_9cff0332183bf73893620477e0751c96ce497f75e54c3e00ef8347a07a37c0f1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_tyrrhenian_source_c580264411ccf2977efa07c4c4af19a3fdcc6696002750c751f153ca6676435a",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -1460,6 +1621,29 @@
         "owner_core"
       ],
       "feature_id": "ATLPRV_11856",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_11905",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -2264,52 +2448,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLPRV_18193",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLPRV_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLPRV_18195",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLPRV_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLPRV_18199",
       "final_area": null,
       "missing_stages": [],
@@ -2334,29 +2472,6 @@
         "owner_core"
       ],
       "feature_id": "ATLPRV_18201",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLPRV_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLPRV_18204",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -3184,7 +3299,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLPRV_18341",
+      "feature_id": "ATLPRV_18345",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -3277,6 +3392,29 @@
         "owner_core"
       ],
       "feature_id": "ATLPRV_18380",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_18960",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -4863,7 +5001,191 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_adriatica_66",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_67",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_68",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_69",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_adriatica_7",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_70",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_71",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_72",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_adriatica_73",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -6174,145 +6496,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_FILL_aegean_59",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_FILL_aegean_6",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_60",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_61",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_62",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_63",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_64",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -6428,29 +6612,6 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_FILL_gabes_10",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_gabes_11",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -6750,6 +6911,98 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_FILL_levant_13",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_levant_14",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_levant_15",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_levant_16",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_levant_17",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -7784,6 +8037,98 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_libya_suez_42",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_libya_suez_43",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_libya_suez_44",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_libya_suez_45",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_libya_suez_5",
       "final_area": null,
       "missing_stages": [],
@@ -8382,122 +8727,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_28",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_29",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_FILL_sicily_tunis_3",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_30",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_31",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_32",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -9578,7 +9808,260 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_46",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_47",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_48",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_49",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_tyrrhenian_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_50",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_51",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_52",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_53",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_54",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_55",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_tyrrhenian_56",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -11602,6 +12085,98 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_west_med_85",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_86",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_87",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_88",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_west_med_9",
       "final_area": null,
       "missing_stages": [],
@@ -11740,29 +12315,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_adriatica_8602_5864_3",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_adriatica_8604_5890_0",
       "final_area": null,
       "missing_stages": [],
@@ -11878,75 +12430,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_adriatica_8604_5890_5",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_adriatica_8604_5890_6",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_adriatica_8604_5890_7",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_aegean_8608_6608_0",
       "final_area": null,
       "missing_stages": [],
@@ -12039,7 +12522,122 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_aegean_8610_225_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_aegean_8610_225_2",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_aegean_8619_428_0",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_aegean_8619_428_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_aegean_8619_428_2",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_aegean_8619_428_3",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12407,7 +13005,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_libya_suez_8615_5985_0",
+      "feature_id": "ATLSEA_libya_suez_8615_5985_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12476,7 +13074,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_sicily_tunis_8591_8965_1",
+      "feature_id": "ATLSEA_sicily_tunis_8592_5605_0",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12499,7 +13097,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_sicily_tunis_8592_5605_0",
+      "feature_id": "ATLSEA_sicily_tunis_8592_5605_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12660,6 +13258,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_sicily_tunis_8600_5733_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_sicily_tunis_8603_5707_0",
       "final_area": null,
       "missing_stages": [],
@@ -12729,6 +13350,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_tyrrhenian_8579_5555_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_tyrrhenian_8588_5681_0",
       "final_area": null,
       "missing_stages": [],
@@ -12775,6 +13419,420 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_10",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_11",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_12",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_13",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_14",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_15",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_16",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_17",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_18",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_19",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_2",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_3",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_4",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_6",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_7",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_8",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8588_5681_9",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_tyrrhenian_8589_1452_0",
       "final_area": null,
       "missing_stages": [],
@@ -12799,6 +13857,75 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_tyrrhenian_8589_1452_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_10",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_11",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_12",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12891,6 +14018,98 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_tyrrhenian_8589_1452_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_6",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_7",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_8",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_tyrrhenian_8589_1452_9",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -13028,6 +14247,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_tyrrhenian_8590_5656_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_tyrrhenian_8593_8895_0",
       "final_area": null,
       "missing_stages": [],
@@ -13052,29 +14294,6 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_west_med_8577_5407_0",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_west_med_8577_5407_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -13189,6 +14408,52 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_west_med_8580_8918_4",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_west_med_8580_8918_5",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_west_med_8581_5505_0",
       "final_area": null,
       "missing_stages": [],
@@ -13236,6 +14501,75 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_west_med_8582_5454_1",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_west_med_8582_5454_2",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_west_med_8582_5454_3",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_west_med_8582_5454_4",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -13351,6 +14685,29 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_west_med_8586_8871_0",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_west_med_8586_8871_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -13534,53 +14891,7 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_west_med_8596_8941_3",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_west_med_9040_18325_0",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_west_med_9040_18325_1",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -14782,24 +16093,24 @@
   "stages": {
     "detail_chunk": {
       "AQ": 1,
-      "ATLISL_": 62,
-      "ATLPRV_": 86,
-      "ATLSEA_": 86,
-      "ATLSEA_FILL_": 356,
+      "ATLISL_": 69,
+      "ATLPRV_": 85,
+      "ATLSEA_": 118,
+      "ATLSEA_FILL_": 375,
       "RU_ARCTIC_FB_": 51
     },
     "owner_core": {
       "AQ": 1,
-      "ATLISL_": 62,
-      "ATLPRV_": 86,
-      "ATLSEA_": 86,
-      "ATLSEA_FILL_": 356
+      "ATLISL_": 69,
+      "ATLPRV_": 85,
+      "ATLSEA_": 118,
+      "ATLSEA_FILL_": 375
     },
     "runtime_atlantropa": {
-      "ATLISL_": 62,
-      "ATLPRV_": 86,
-      "ATLSEA_": 86,
-      "ATLSEA_FILL_": 356
+      "ATLISL_": 69,
+      "ATLPRV_": 85,
+      "ATLSEA_": 118,
+      "ATLSEA_FILL_": 375
     },
     "runtime_political": {
       "AQ": 1,
@@ -14811,7 +16122,7 @@
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 642,
+    "protected_feature_count": 699,
     "protected_prefix_drop_count": 0,
     "runtime_only_shell_count": 51
   },

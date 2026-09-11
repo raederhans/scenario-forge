@@ -15,6 +15,11 @@
       "url": "data/world_cities.geojson",
       "role": "world_cities"
     },
+    "world_urban_lights": {
+      "url": "data/world_urban_lights.geojson",
+      "role": "world_urban_lights",
+      "description": "Deferred global Natural Earth built-up footprints for city night lights; independent of the daytime urban layer."
+    },
     "city_aliases": {
       "url": "data/city_aliases.json",
       "role": "city_aliases"

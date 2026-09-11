@@ -999,7 +999,7 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
             self.assertIn("manifest.runtime_topology_url", str(context.exception))
             self.assertIn("data/scenarios/tno_1962", str(context.exception))
 
-    def test_water_coarse_is_minified_without_trimming_runtime_fields(self) -> None:
+    def test_water_chunks_are_minified_without_trimming_runtime_fields(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             scenario_dir = Path(tmp_dir) / "tno_1962"
             scenario_dir.mkdir(parents=True, exist_ok=True)
@@ -1104,6 +1104,19 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
             )
             expected_text = json.dumps(coarse_payload, ensure_ascii=False, separators=(",", ":")) + "\n"
             self.assertEqual(coarse_text, expected_text)
+            source_by_id = {feature["properties"]["id"]: feature for feature in water_payload["features"]}
+            water_chunks = [chunk for chunk in result["detail_chunk_manifest"]["chunks"] if chunk["layer"] == "water"]
+            self.assertTrue(any(chunk["lod"] == "detail" for chunk in water_chunks))
+            for chunk in water_chunks:
+                chunk_path = scenario_dir / "chunks" / f"{chunk['id']}.json"
+                chunk_text = chunk_path.read_text(encoding="utf-8")
+                payload = json.loads(chunk_text)
+                self.assertEqual(chunk_text, json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n")
+                self.assertEqual(chunk["byte_size"], len(chunk_path.read_bytes()))
+                for feature in payload["features"]:
+                    original = source_by_id[feature["properties"]["id"]]
+                    self.assertEqual(feature["geometry"], original["geometry"])
+                    self.assertEqual(feature["properties"], original["properties"])
 
 
 if __name__ == "__main__":

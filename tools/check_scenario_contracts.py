@@ -506,7 +506,15 @@ def _collect_snapshot_inputs(
         raw_url = str(manifest.get(field_name) or "").strip()
         if not raw_url:
             continue
-        candidate_path = PROJECT_ROOT.joinpath(*PurePosixPath(raw_url).parts)
+        public_path = PurePosixPath(raw_url)
+        try:
+            local_path = public_path.relative_to(PurePosixPath("data/scenarios") / scenario_dir.name)
+        except ValueError:
+            candidate_path = PROJECT_ROOT.joinpath(*public_path.parts)
+        else:
+            candidate_path = scenario_dir.joinpath(*local_path.parts).resolve()
+            if not candidate_path.is_relative_to(scenario_dir.resolve()):
+                raise ValueError(f"Scenario snapshot asset escapes its bundle: {raw_url}")
         paths[label] = candidate_path
     input_sha: dict[str, str] = {}
     for name, path in paths.items():
@@ -641,7 +649,16 @@ def _load_chunk_feature_index(
         if layer_name and chunk_layer != layer_name:
             continue
         chunk_url = str(chunk.get("url") or "").strip()
-        chunk_path = scenario_relative_url_to_path(chunk_url)
+        # A staged bundle keeps public URLs, but its ledgers must inspect the
+        # staged chunks rather than similarly named checked-in assets.
+        chunk_prefix = PurePosixPath("data/scenarios") / scenario_dir.name
+        try:
+            chunk_relative = PurePosixPath(chunk_url).relative_to(chunk_prefix)
+        except ValueError:
+            continue
+        chunk_path = scenario_dir.joinpath(*chunk_relative.parts).resolve()
+        if not chunk_path.is_relative_to(scenario_dir.resolve()):
+            continue
         if chunk_path is None or not chunk_path.exists():
             continue
         chunk_payload = _load_optional_json(chunk_path) or {}
@@ -692,13 +709,24 @@ def _atlantropa_feature_row(
         str(chunk_id) for chunk_id in (chunk_entry or {}).get("detail_chunk_ids", []) if str(chunk_id).strip()
     )
     prefix = _coverage_prefix_for_feature_id(feature_id)
+    donor_provinces = props.get("donor_province_ids")
+    donor_states = props.get("donor_state_ids")
+    donor_provinces = list(donor_provinces) if isinstance(donor_provinces, (list, tuple)) else []
+    donor_states = list(donor_states) if isinstance(donor_states, (list, tuple)) else []
+    provenance = "donor_metadata" if donor_provinces else "unknown"
+    if not donor_provinces and feature_id.startswith("ATLPRV_") and feature_id[7:].isdigit():
+        donor_provinces = [int(feature_id[7:])]
+        provenance = "stable_province_id"
     return {
         "feature_id": feature_id,
         "prefix": prefix,
         "source_kind": str(props.get("__source") or "").strip(),
         "donor_basin": str(props.get("admin1_group") or props.get("region_group") or "").strip(),
-        "donor_state": str(props.get("cntr_code") or "").strip(),
-        "donor_province": feature_id.rsplit("_", 1)[-1] if "_" in feature_id else feature_id,
+        "donor_state": ",".join(map(str, donor_states)),
+        "donor_province": ",".join(map(str, donor_provinces)),
+        "donor_state_ids": donor_states,
+        "donor_province_ids": donor_provinces,
+        "donor_provenance": provenance,
         "role": str(props.get("atl_geometry_role") or "").strip(),
         "join_mode": str(props.get("atl_join_mode") or "").strip(),
         "surface_kind": str(props.get("atl_surface_kind") or "").strip(),

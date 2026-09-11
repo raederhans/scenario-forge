@@ -298,6 +298,14 @@ export function buildGlobalCoastlineMesh({
   const topology = topologyInput?.topology || topologyInput;
   const meshMode = String(topologyInput?.meshMode || "mask");
   if (!topology?.objects || !globalThis.topojson) return null;
+  // Use the object that passed diagnostics, rather than a different mask that
+  // merely exists (bootstrap masks may intentionally be empty).
+  const selectedObjectName = topologyInput?.source === "scenario"
+    ? topologyInput.runtimeObjectName
+    : topologyInput?.primaryObjectName;
+  if (selectedObjectName && topology.objects[selectedObjectName]) {
+    return globalThis.topojson.mesh(topology, topology.objects[selectedObjectName]);
+  }
   if (meshMode === "political_outline" && topology.objects.political) {
     return globalThis.topojson.mesh(
       topology,

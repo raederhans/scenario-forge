@@ -168,9 +168,9 @@
     },
     "XIK": {
       "mode": "create",
-      "display_name": "XiKang",
-      "display_name_en": "XiKang",
-      "display_name_zh": "国民革命第24军",
+      "display_name": "24th Army of the National Revolutionary Army",
+      "display_name_en": "24th Army of the National Revolutionary Army",
+      "display_name_zh": "国民革命军第二十四军",
       "color_hex": "#6873a0",
       "parent_owner_tag": "",
       "subject_kind": "",
@@ -216,6 +216,534 @@
       "scenario_only": true,
       "source_type": "scenario_extension",
       "historical_fidelity": "extended"
+    },
+    "AST": {
+      "mode": "override",
+      "display_name": "Australia",
+      "display_name_en": "Australia",
+      "display_name_zh": "澳大利亚联邦",
+      "parent_owner_tag": ""
+    },
+    "BHU": {
+      "mode": "override",
+      "display_name": "Bhutan",
+      "display_name_en": "Bhutan",
+      "display_name_zh": "不丹王国",
+      "parent_owner_tag": ""
+    },
+    "BOL": {
+      "mode": "override",
+      "display_name": "Bolivia",
+      "display_name_en": "Bolivia",
+      "display_name_zh": "玻利维亚共和国",
+      "parent_owner_tag": ""
+    },
+    "BUL": {
+      "mode": "override",
+      "display_name": "Bulgaria",
+      "display_name_en": "Bulgaria",
+      "display_name_zh": "保加利亚沙皇国",
+      "parent_owner_tag": ""
+    },
+    "CAN": {
+      "mode": "override",
+      "display_name": "Canada",
+      "display_name_en": "Canada",
+      "display_name_zh": "加拿大自治领",
+      "parent_owner_tag": ""
+    },
+    "CHL": {
+      "mode": "override",
+      "display_name": "Chile",
+      "display_name_en": "Chile",
+      "display_name_zh": "智利共和国",
+      "parent_owner_tag": ""
+    },
+    "COL": {
+      "mode": "override",
+      "display_name": "Colombia",
+      "display_name_en": "Colombia",
+      "display_name_zh": "哥伦比亚共和国",
+      "parent_owner_tag": ""
+    },
+    "COS": {
+      "mode": "override",
+      "display_name": "Costa Rica",
+      "display_name_en": "Costa Rica",
+      "display_name_zh": "哥斯达黎加共和国",
+      "parent_owner_tag": ""
+    },
+    "CUB": {
+      "mode": "override",
+      "display_name": "Cuba",
+      "display_name_en": "Cuba",
+      "display_name_zh": "古巴共和国",
+      "parent_owner_tag": ""
+    },
+    "ECU": {
+      "mode": "override",
+      "display_name": "Ecuador",
+      "display_name_en": "Ecuador",
+      "display_name_zh": "厄瓜多尔共和国",
+      "parent_owner_tag": ""
+    },
+    "ELS": {
+      "mode": "override",
+      "display_name": "El Salvador",
+      "display_name_en": "El Salvador",
+      "display_name_zh": "萨尔瓦多共和国",
+      "parent_owner_tag": ""
+    },
+    "GUA": {
+      "mode": "override",
+      "display_name": "Guatemala",
+      "display_name_en": "Guatemala",
+      "display_name_zh": "危地马拉共和国",
+      "parent_owner_tag": ""
+    },
+    "HAI": {
+      "mode": "override",
+      "display_name": "Haiti",
+      "display_name_en": "Haiti",
+      "display_name_zh": "海地共和国",
+      "parent_owner_tag": ""
+    },
+    "HON": {
+      "mode": "override",
+      "display_name": "Honduras",
+      "display_name_en": "Honduras",
+      "display_name_zh": "洪都拉斯共和国",
+      "parent_owner_tag": ""
+    },
+    "INS": {
+      "mode": "override",
+      "display_name": "Indonesia",
+      "display_name_en": "Indonesia",
+      "display_name_zh": "印度尼西亚共和国",
+      "parent_owner_tag": "JAP"
+    },
+    "IRE": {
+      "mode": "override",
+      "display_name": "Ireland",
+      "display_name_en": "Ireland",
+      "display_name_zh": "爱尔兰共和国",
+      "parent_owner_tag": ""
+    },
+    "JAP": {
+      "mode": "override",
+      "display_name": "Japan",
+      "display_name_en": "Japan",
+      "display_name_zh": "大日本帝国",
+      "parent_owner_tag": ""
+    },
+    "LIB": {
+      "mode": "override",
+      "display_name": "Liberia",
+      "display_name_en": "Liberia",
+      "display_name_zh": "利比里亚共和国",
+      "parent_owner_tag": ""
+    },
+    "MAD": {
+      "mode": "override",
+      "display_name": "Madagascar",
+      "display_name_en": "Madagascar",
+      "display_name_zh": "法属马达加斯加",
+      "parent_owner_tag": "FRA"
+    },
+    "MAN": {
+      "mode": "override",
+      "display_name": "Manchukuo",
+      "display_name_en": "Manchukuo",
+      "display_name_zh": "大满洲帝国",
+      "parent_owner_tag": "JAP"
+    },
+    "MEN": {
+      "mode": "override",
+      "display_name": "Mengjiang",
+      "display_name_en": "Mengjiang",
+      "display_name_zh": "蒙疆联合自治政府",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "MEX": {
+      "mode": "override",
+      "display_name": "Mexico",
+      "display_name_en": "Mexico",
+      "display_name_zh": "墨西哥合众国",
+      "parent_owner_tag": ""
+    },
+    "NEP": {
+      "mode": "override",
+      "display_name": "Nepal",
+      "display_name_en": "Nepal",
+      "display_name_zh": "尼泊尔王国",
+      "parent_owner_tag": ""
+    },
+    "NIC": {
+      "mode": "override",
+      "display_name": "Nicaragua",
+      "display_name_en": "Nicaragua",
+      "display_name_zh": "尼加拉瓜共和国",
+      "parent_owner_tag": ""
+    },
+    "NZL": {
+      "mode": "override",
+      "display_name": "New Zealand",
+      "display_name_en": "New Zealand",
+      "display_name_zh": "新西兰",
+      "parent_owner_tag": ""
+    },
+    "PAN": {
+      "mode": "override",
+      "display_name": "Panama",
+      "display_name_en": "Panama",
+      "display_name_zh": "巴拿马共和国",
+      "parent_owner_tag": ""
+    },
+    "PHI": {
+      "mode": "override",
+      "display_name": "Philippines",
+      "display_name_en": "Philippines",
+      "display_name_zh": "菲律宾第二共和国",
+      "parent_owner_tag": "JAP"
+    },
+    "PRU": {
+      "mode": "override",
+      "display_name": "Peru",
+      "display_name_en": "Peru",
+      "display_name_zh": "秘鲁共和国",
+      "parent_owner_tag": ""
+    },
+    "SAF": {
+      "mode": "override",
+      "display_name": "South Africa",
+      "display_name_en": "South Africa",
+      "display_name_zh": "南非联邦",
+      "parent_owner_tag": ""
+    },
+    "SWE": {
+      "mode": "override",
+      "display_name": "Sweden",
+      "display_name_en": "Sweden",
+      "display_name_zh": "瑞典王国",
+      "parent_owner_tag": ""
+    },
+    "SWI": {
+      "mode": "override",
+      "display_name": "Switzerland",
+      "display_name_en": "Switzerland",
+      "display_name_zh": "瑞士联邦",
+      "parent_owner_tag": ""
+    },
+    "URG": {
+      "mode": "override",
+      "display_name": "Uruguay",
+      "display_name_en": "Uruguay",
+      "display_name_zh": "乌拉圭东岸共和国",
+      "parent_owner_tag": ""
+    },
+    "VEN": {
+      "mode": "override",
+      "display_name": "Venezuela",
+      "display_name_en": "Venezuela",
+      "display_name_zh": "委内瑞拉共和国",
+      "parent_owner_tag": ""
+    },
+    "VIN": {
+      "mode": "override",
+      "display_name": "Vietnam",
+      "display_name_en": "Vietnam",
+      "display_name_zh": "越南帝国",
+      "parent_owner_tag": "JAP"
+    },
+    "SHX": {
+      "mode": "override",
+      "display_name": "Shanxi",
+      "display_name_en": "Shanxi",
+      "display_name_zh": "晋陕行政公署",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "XIN": {
+      "mode": "override",
+      "display_name": "Xinjiang",
+      "display_name_en": "Xinjiang",
+      "display_name_zh": "新疆边防督办公署",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "LAO": {
+      "mode": "override",
+      "display_name": "Laos",
+      "display_name_en": "Laos",
+      "display_name_zh": "老挝王国",
+      "parent_owner_tag": "JAP"
+    },
+    "CAM": {
+      "mode": "override",
+      "display_name": "Cambodia",
+      "display_name_en": "Cambodia",
+      "display_name_zh": "柬埔寨共和国",
+      "parent_owner_tag": "JAP"
+    },
+    "SCO": {
+      "mode": "override",
+      "display_name": "Scotland",
+      "display_name_en": "Scotland",
+      "display_name_zh": "苏格兰共和国",
+      "parent_owner_tag": ""
+    },
+    "ARM": {
+      "mode": "override",
+      "display_name": "Armenia",
+      "display_name_en": "Armenia",
+      "display_name_zh": "亚美尼亚共和国",
+      "parent_owner_tag": ""
+    },
+    "BKR": {
+      "mode": "override",
+      "display_name": "Bashkir",
+      "display_name_en": "Bashkir",
+      "display_name_zh": "巴什科尔托斯坦共和国",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "PRM": {
+      "mode": "override",
+      "display_name": "Perm",
+      "display_name_en": "Perm",
+      "display_name_zh": "彼尔姆",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "ALT": {
+      "mode": "override",
+      "display_name": "Oirotia",
+      "display_name_en": "Oirotia",
+      "display_name_zh": "奥伊罗特",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "BRY": {
+      "mode": "override",
+      "display_name": "Buryat Soviet Socialist Republic",
+      "display_name_en": "Buryat Soviet Socialist Republic",
+      "display_name_zh": "布里亚特苏维埃社会主义自治共和国",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "VOL": {
+      "mode": "override",
+      "display_name": "Vologda Neutral Zone",
+      "display_name_en": "Vologda Neutral Zone",
+      "display_name_zh": "沃洛格达中立国",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "BRM": {
+      "mode": "override",
+      "display_name": "Burma",
+      "display_name_en": "Burma",
+      "display_name_zh": "缅甸联邦",
+      "parent_owner_tag": "JAP"
+    },
+    "CEY": {
+      "mode": "override",
+      "display_name": "Ceylon",
+      "display_name_en": "Ceylon",
+      "display_name_zh": "锡兰共和国",
+      "parent_owner_tag": ""
+    },
+    "FRI": {
+      "mode": "override",
+      "display_name": "Azad Hind",
+      "display_name_en": "Azad Hind",
+      "display_name_zh": "自由印度政府",
+      "parent_owner_tag": "JAP"
+    },
+    "WLS": {
+      "mode": "override",
+      "display_name": "Wales",
+      "display_name_en": "Wales",
+      "display_name_zh": "威尔士共和国",
+      "parent_owner_tag": ""
+    },
+    "ALC": {
+      "mode": "override",
+      "display_name": "Algerian Military Command",
+      "display_name_en": "Algerian Military Command",
+      "display_name_zh": "阿尔及利亚军事指挥部",
+      "parent_owner_tag": "IBR"
+    },
+    "TJK": {
+      "mode": "override",
+      "display_name": "Tajikistan",
+      "display_name_en": "Tajikistan",
+      "display_name_zh": "塔吉克苏维埃社会主义共和国",
+      "parent_owner_tag": ""
+    },
+    "AOF": {
+      "mode": "override",
+      "display_name": "French West Africa",
+      "display_name_en": "French West Africa",
+      "display_name_zh": "法属西非联邦",
+      "parent_owner_tag": "FRA"
+    },
+    "BWA": {
+      "mode": "override",
+      "display_name": "British West Africa",
+      "display_name_en": "British West Africa",
+      "display_name_zh": "英属西非领地",
+      "parent_owner_tag": ""
+    },
+    "GMA": {
+      "mode": "override",
+      "display_name": "Northwest Pacification Government",
+      "display_name_en": "Northwest Pacification Government",
+      "display_name_zh": "西北绥靖公署",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "QMA": {
+      "mode": "override",
+      "display_name": "13th Army of the National Revolutionary Army",
+      "display_name_en": "13th Army of the National Revolutionary Army",
+      "display_name_zh": "国民革命军第十三军",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "SIA": {
+      "mode": "override",
+      "display_name": "Siam",
+      "display_name_en": "Siam",
+      "display_name_zh": "暹罗",
+      "parent_owner_tag": ""
+    },
+    "RKP": {
+      "mode": "override",
+      "display_name": "General Government of Poland",
+      "display_name_en": "General Government of Poland",
+      "display_name_zh": "波兰总督府",
+      "parent_owner_tag": "GER"
+    },
+    "RGC": {
+      "mode": "override",
+      "display_name": "Sichuan Clique",
+      "display_name_en": "Sichuan Clique",
+      "display_name_zh": "四川军政监",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "URA": {
+      "mode": "override",
+      "display_name": "Ural Military District Red Air Force",
+      "display_name_en": "Ural Military District Red Air Force",
+      "display_name_zh": "乌拉尔军区红军航空兵",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "ENG": {
+      "mode": "override",
+      "display_name": "Britain",
+      "display_name_en": "Britain",
+      "display_name_zh": "英格兰王国",
+      "parent_owner_tag": ""
+    },
+    "KAZ": {
+      "mode": "override",
+      "display_name": "Kazakhstan",
+      "display_name_en": "Kazakhstan",
+      "display_name_zh": "哈萨克斯坦苏维埃社会主义共和国",
+      "parent_owner_tag": ""
+    },
+    "RKM": {
+      "mode": "override",
+      "display_name": "Reichskommissariat Moskowien",
+      "display_name_en": "Reichskommissariat Moskowien",
+      "display_name_zh": "莫斯科维恩专员辖区",
+      "parent_owner_tag": "GER"
+    },
+    "MAL": {
+      "mode": "override",
+      "display_name": "Malaya",
+      "display_name_en": "Malaya",
+      "display_name_zh": "马来亚联邦",
+      "parent_owner_tag": "JAP"
+    },
+    "GEA": {
+      "mode": "override",
+      "display_name": "German East Africa",
+      "display_name_en": "German East Africa",
+      "display_name_zh": "东非专员辖区",
+      "parent_owner_tag": "GER"
+    },
+    "GCO": {
+      "mode": "override",
+      "display_name": "German Central Africa",
+      "display_name_en": "German Central Africa",
+      "display_name_zh": "中非专员辖区",
+      "parent_owner_tag": "GER"
+    },
+    "GSW": {
+      "mode": "override",
+      "display_name": "German Southwest Africa",
+      "display_name_en": "German Southwest Africa",
+      "display_name_zh": "西南非专员辖区",
+      "parent_owner_tag": "GER"
+    },
+    "TAN": {
+      "mode": "override",
+      "display_name": "People's Revolutionary Council",
+      "display_name_en": "People's Revolutionary Council",
+      "display_name_zh": "人民革命委员会",
+      "parent_owner_tag": "",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe"
+    },
+    "NCP": {
+      "mode": "override",
+      "display_name": "North China Political Council",
+      "display_name_en": "North China Political Council",
+      "display_name_zh": "华北政务委员会",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
+    },
+    "GNG": {
+      "mode": "override",
+      "display_name": "Guangdong State",
+      "display_name_en": "Guangdong State",
+      "display_name_zh": "广东国",
+      "parent_owner_tag": "JAP",
+      "inspector_group_id": "scenario_group_china_region",
+      "inspector_group_label": "China Region",
+      "inspector_group_anchor_id": "continent_asia"
     }
   },
   "assignments_by_feature_id": {

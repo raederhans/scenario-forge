@@ -2,8 +2,9 @@ name: perf-pr-gate
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  schedule:
+    - cron: '17 18 * * *'
+  workflow_dispatch:
 
 concurrency:
   group: perf-pr-gate-${{ github.event.pull_request.number || github.ref }}
@@ -41,12 +42,14 @@ jobs:
           }
 
           $eventPayload = Get-Content -Raw -Path $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+          $forceMeasurement = $env:GITHUB_EVENT_NAME -in @('schedule', 'workflow_dispatch')
           if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
             $baseSha = $eventPayload.pull_request.base.sha
             $diffHeadSha = $eventPayload.pull_request.head.sha
           } else {
-            $baseSha = $eventPayload.before
-            $diffHeadSha = if ($eventPayload.after) { $eventPayload.after } else { $env:GITHUB_SHA }
+            $diffHeadSha = (git rev-parse HEAD).Trim()
+            $baseSha = git rev-parse 'HEAD^'
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve parent for scheduled/manual perf baseline' }
           }
           $candidateSha = (git rev-parse HEAD).Trim()
 
@@ -69,12 +72,39 @@ jobs:
               ForEach-Object { $_.Trim().Replace('\', '/') } |
               Where-Object { $_ }
           )
-          if ($LASTEXITCODE -ne 0) {
-            $changedFiles = @(
-              git diff --name-only HEAD^ HEAD 2>$null |
-                ForEach-Object { $_.Trim().Replace('\', '/') } |
-                Where-Object { $_ }
-            )
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to resolve perf classifier diff' }
+
+          # Only isolated test/verification script edits are exempt. Unknown manifest
+          # fields, lifecycle scripts, referenced scripts and parse failures still measure.
+          $packageRequiresPerf = $true
+          if ('package.json' -in $changedFiles) {
+            try {
+              $basePackageText = git show "${baseSha}:package.json"
+              if ($LASTEXITCODE -ne 0) { throw 'Unable to read base package.json' }
+              $headPackageText = git show "${diffHeadSha}:package.json"
+              if ($LASTEXITCODE -ne 0) { throw 'Unable to read head package.json' }
+              $basePackage = ($basePackageText -join "`n") | ConvertFrom-Json -AsHashtable -ErrorAction Stop
+              $headPackage = ($headPackageText -join "`n") | ConvertFrom-Json -AsHashtable -ErrorAction Stop
+              $baseScripts = $basePackage.scripts
+              $headScripts = $headPackage.scripts
+              if ($baseScripts -isnot [System.Collections.IDictionary] -or $headScripts -isnot [System.Collections.IDictionary]) {
+                throw 'Missing scripts object'
+              }
+              $basePackage.Remove('scripts')
+              $headPackage.Remove('scripts')
+              $packageRequiresPerf = ($basePackage | ConvertTo-Json -Depth 100 -Compress) -cne ($headPackage | ConvertTo-Json -Depth 100 -Compress)
+              foreach ($scriptName in @(@($baseScripts.Keys) + @($headScripts.Keys) | Sort-Object -Unique)) {
+                if ($baseScripts[$scriptName] -ceq $headScripts[$scriptName]) { continue }
+                if ($scriptName -notmatch '^(test:|verify:)' -or "$scriptName $($baseScripts[$scriptName]) $($headScripts[$scriptName])" -match 'perf|benchmark') {
+                  $packageRequiresPerf = $true
+                }
+                foreach ($command in @($baseScripts.Values) + @($headScripts.Values)) {
+                  if ($command -match [Regex]::Escape($scriptName)) { $packageRequiresPerf = $true }
+                }
+              }
+            } catch {
+              $packageRequiresPerf = $true
+            }
           }
 
           $rules = @(
@@ -86,7 +116,7 @@ jobs:
             },
             @{
               name = 'perf-baseline-docs'
-              reason = 'perf baseline or perf docs changed'
+              reason = 'perf baseline or non-Markdown perf asset changed'
               regression_policy = 'diagnostic'
               patterns = @('docs/perf/**')
             },
@@ -147,7 +177,9 @@ jobs:
               $changedFiles |
                 Where-Object {
                   $file = $_
-                  ($regexes | Where-Object { $file -match $_ } | Select-Object -First 1)
+                  ($regexes | Where-Object { $file -match $_ } | Select-Object -First 1) -and
+                    -not ($rule.name -eq 'perf-baseline-docs' -and $file -match '\.md$') -and
+                    -not ($file -eq 'package.json' -and -not $packageRequiresPerf)
                 } |
                 Sort-Object -Unique
             )
@@ -169,9 +201,11 @@ jobs:
               Where-Object { $_.regression_policy -eq 'enforce' } |
               ForEach-Object { $_.name }
           )
-          $shouldEnforceRegressions = $regressionEnforcementRuleHits.Count -gt 0
-          $shouldRunPerf = $ruleHits.Count -gt 0
-          if ($shouldRunPerf) {
+          $shouldEnforceRegressions = $forceMeasurement -or $regressionEnforcementRuleHits.Count -gt 0
+          $shouldRunPerf = $forceMeasurement -or $ruleHits.Count -gt 0
+          if ($forceMeasurement) {
+            $reason = "run npm run perf:gate for $($env:GITHUB_EVENT_NAME), regardless of changed paths"
+          } elseif ($shouldRunPerf) {
             $reason = "run npm run perf:gate because matched rules: $($matchedRuleNames -join ', ')"
           } elseif ($changedFiles.Count -eq 0) {
             $reason = 'skip npm run perf:gate because no changed files were detected in the PR diff'
@@ -187,6 +221,7 @@ jobs:
             changed_files = $changedFiles
             matched_rules = $ruleHits
             should_run_perf = $shouldRunPerf
+            forced_measurement = $forceMeasurement
             should_enforce_regressions = $shouldEnforceRegressions
             regression_enforcement_rules = $regressionEnforcementRuleHits
             reason = $reason

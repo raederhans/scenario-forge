@@ -3,11 +3,62 @@ import assert from "node:assert/strict";
 
 import {
   buildPaletteLibraryGroups,
+  createPaletteLibraryPanelController,
   normalizePaletteLibraryGroupingMode,
   resolveAdaptivePaletteLibraryHeight,
   resolvePaletteLibraryEntryRegion,
   selectPalettePaintColor,
 } from "../js/ui/toolbar/palette_library_panel.js";
+import { state } from "../js/core/state.js";
+
+test("source select replaces startup fallback options when palette catalog arrives without rebuilding unchanged options", () => {
+  const snapshot = { paletteRegistry: state.paletteRegistry, activePaletteId: state.activePaletteId,
+    currentPaletteTheme: state.currentPaletteTheme };
+  let selected = "";
+  let replacements = 0;
+  const select = {
+    options: [{ value: "TNO (The New Order)", textContent: "TNO (The New Order)" }],
+    ownerDocument: { createElement: () => ({ value: "", textContent: "" }) },
+    replaceChildren(...options) { this.options = options; replacements += 1; selected = ""; },
+    // Match a native select: assigning an absent option clears its value.
+    get value() { return selected; },
+    set value(value) { selected = this.options.some((option) => option.value === value) ? value : ""; },
+  };
+  try {
+    state.paletteRegistry = null;
+    state.activePaletteId = "";
+    state.currentPaletteTheme = "TNO (The New Order)";
+    const controller = createPaletteLibraryPanelController({ themeSelect: select });
+    controller.syncPaletteSourceControls();
+    assert.equal(select.value, "TNO (The New Order)");
+    assert.equal(replacements, 0);
+    state.currentPaletteTheme = "Unavailable theme";
+    controller.syncPaletteSourceControls();
+    assert.equal(select.value, "TNO (The New Order)");
+    state.paletteRegistry = { palettes: [
+      { palette_id: "tno", display_name: "TNO palette" },
+      { palette_id: "hgo", display_name: "HGO palette" },
+    ] };
+    state.activePaletteId = "hgo";
+    controller.syncPaletteSourceControls();
+    assert.equal(select.value, "hgo");
+    assert.deepEqual(select.options.map((option) => option.textContent), ["TNO palette", "HGO palette"]);
+    assert.equal(replacements, 1);
+    const firstOption = select.options[0];
+    state.activePaletteId = "tno";
+    controller.syncPaletteSourceControls();
+    assert.equal(select.value, "tno");
+    assert.equal(select.options[0], firstOption);
+    assert.equal(replacements, 1);
+    state.paletteRegistry.palettes[0].display_name = "Updated TNO palette";
+    controller.syncPaletteSourceControls();
+    assert.equal(select.options[0].textContent, "Updated TNO palette");
+    assert.equal(select.value, "tno");
+    assert.equal(replacements, 2);
+  } finally {
+    Object.assign(state, snapshot);
+  }
+});
 
 test("choosing a palette color switches ownership editing to visual without changing owners", () => {
   const owners = { milan: "ITA" };

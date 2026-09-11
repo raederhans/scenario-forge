@@ -540,7 +540,8 @@ class UiReworkPlan03SupportTransportContractTest(unittest.TestCase):
         self.assertIn('paletteLibraryList.style.height = "auto";', palette_content)
         self.assertIn("resolveAdaptivePaletteLibraryHeight(scrollHeight, maximumHeight)", palette_content)
         self.assertIn('title.className = "palette-library-title u-truncate";', palette_content)
-        self.assertIn('fileName.className = "project-file-name u-truncate";', sidebar_content)
+        self.assertIn('fileName.className = "project-file-name u-truncate";',
+                      (REPO_ROOT / "js" / "ui" / "sidebar" / "project_support_diagnostics_controller.js").read_text(encoding="utf-8"))
 
         for token in [
             "#projectLegendSection,",

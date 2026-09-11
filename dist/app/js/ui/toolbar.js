@@ -698,10 +698,43 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "restoreSupportSurfaceFromUrlFn", restoreSupportSurfaceFromUrl);
   registerRuntimeHook(state, "closeDockPopoverFn", closeDockPopover);
 
+  const drawerMedia = globalThis.matchMedia("(max-width: 1023px)");
+  const drawerBackdrop = document.getElementById("sidebarDrawerBackdrop");
+  const getDrawerFocusTargets = (side) => Array.from(
+    document.getElementById(`${side}Sidebar`)?.querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]'
+    ) || []
+  ).filter((element) => element.tabIndex >= 0
+    && !element.closest('[inert], [aria-hidden="true"]')
+    && element.getClientRects().length > 0
+    && getComputedStyle(element).visibility !== "hidden"
+    && (() => {
+      // Closed details may retain layout boxes, but only their summary is focusable.
+      for (let details = element.closest("details"); details; details = details.parentElement?.closest("details")) {
+        if (!details.open && !details.querySelector("summary")?.contains(element)) return false;
+      }
+      return true;
+    })());
   const syncPanelToggleButtons = () => {
     leftPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("left-drawer-open")));
     rightPanelToggle?.setAttribute("aria-expanded", String(document.body.classList.contains("right-drawer-open")));
+    let openDrawer = false;
+    for (const side of ["left", "right"]) {
+      const sidebar = document.getElementById(`${side}Sidebar`);
+      const open = document.body.classList.contains(`${side}-drawer-open`);
+      if (sidebar) sidebar.inert = drawerMedia.matches && !open;
+      openDrawer ||= open;
+    }
+    drawerBackdrop?.classList.toggle("hidden", !drawerMedia.matches || !openDrawer);
   };
+  const focusDrawer = (side, open) => {
+    if (!drawerMedia.matches) return;
+    const sidebar = document.getElementById(`${side}Sidebar`);
+    const toggle = side === "left" ? leftPanelToggle : rightPanelToggle;
+    if (open) getDrawerFocusTargets(side)[0]?.focus({ preventScroll: true });
+    else if (sidebar?.contains(document.activeElement)) toggle?.focus({ preventScroll: true });
+  };
+  drawerMedia.addEventListener("change", syncPanelToggleButtons);
 
   const toggleLeftPanel = (force) => {
     // transport workbench 打开时，左右抽屉继续展开会和 workbench 抢同一块侧边布局。
@@ -714,6 +747,7 @@ function initToolbar({ render } = {}) {
     document.body.classList.toggle("left-drawer-open", next);
     document.body.classList.toggle("right-drawer-open", false);
     syncPanelToggleButtons();
+    focusDrawer("left", next);
     refreshScenarioContextBar();
     return next;
   };
@@ -727,6 +761,7 @@ function initToolbar({ render } = {}) {
     document.body.classList.toggle("right-drawer-open", next);
     document.body.classList.toggle("left-drawer-open", false);
     syncPanelToggleButtons();
+    focusDrawer("right", next);
     refreshScenarioContextBar();
     return next;
   };
@@ -2010,7 +2045,7 @@ function initToolbar({ render } = {}) {
       colorModeSelect.value = runtimeState.colorMode || "political";
     }
     if (themeSelect) {
-      themeSelect.value = String(runtimeState.activePaletteId || themeSelect.value || "");
+      syncPaletteSourceControls();
     }
     renderReferenceOverlayUi();
     syncExportWorkbenchControlsFromState();
@@ -2120,6 +2155,49 @@ function initToolbar({ render } = {}) {
     });
     rightPanelToggle.dataset.bound = "true";
   }
+
+  const closeDrawers = () => {
+    const side = document.body.classList.contains("left-drawer-open") ? "left" : "right";
+    if (side === "left") toggleLeftPanel(false);
+    else toggleRightPanel(false);
+    (side === "left" ? leftPanelToggle : rightPanelToggle)?.focus({ preventScroll: true });
+  };
+  drawerBackdrop?.addEventListener("click", closeDrawers);
+  document.querySelectorAll("[data-close-drawer]").forEach((button) => {
+    button.addEventListener("click", closeDrawers);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (!drawerMedia.matches || drawerBackdrop?.classList.contains("hidden")) return;
+    // An open dialog owns Escape and focus until it closes.
+    if (document.activeElement?.closest('[role="dialog"], dialog')) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeDrawers();
+    } else if (event.key === "Tab") {
+      const side = document.body.classList.contains("left-drawer-open") ? "left" : "right";
+      const elements = getDrawerFocusTargets(side);
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+  });
+
+  const workspaceExportBtn = document.getElementById("workspaceExportBtn");
+  workspaceExportBtn?.addEventListener("click", () => runtimeState.openExportWorkbenchFn?.(workspaceExportBtn));
+  const advancedExportBtn = document.getElementById("exportWorkbenchAdvancedBtn");
+  const setAdvancedExport = (expanded) => {
+    advancedExportBtn?.setAttribute("aria-expanded", String(expanded));
+    document.getElementById("exportWorkbenchPanel")?.classList.toggle("is-advanced", expanded);
+    for (const id of ["exportWorkbenchParams", "exportWorkbenchLayers"]) {
+      const section = document.getElementById(id);
+      if (section) section.hidden = !expanded;
+    }
+  };
+  advancedExportBtn?.addEventListener("click", () => setAdvancedExport(advancedExportBtn.getAttribute("aria-expanded") !== "true"));
+  exportTarget?.addEventListener("change", () => {
+    if (exportTarget.value !== "composite") setAdvancedExport(true);
+  });
 
   bindTransportWorkbenchEvents();
 

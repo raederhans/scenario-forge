@@ -4,6 +4,7 @@ import itertools
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -77,7 +78,7 @@ def parse_workflow_job_blocks(workflow: str) -> dict[str, str]:
 
 def parse_required_pr_workflow_jobs(workflow: str) -> dict[str, str]:
     jobs = parse_workflow_job_blocks(workflow)
-    expected_jobs = {"pr-verify-fast", "pr-verify-smoke", "pr-verify-demo", "pr-verify-required"}
+    expected_jobs = {"pr-verify-fast", "pr-verify-smoke", "pr-verify-required"}
     if set(jobs) != expected_jobs:
         raise AssertionError(f"workflow job set mismatch: expected {sorted(expected_jobs)}, found {sorted(jobs)}")
     return jobs
@@ -1262,6 +1263,12 @@ const { buildRecommendation } = await import('./tools/select_verification_target
 
 const cases = [
   {
+    name: 'transport workflow routes to its structural contract',
+    changedFiles: ['.github/workflows/transport-contract-required.yml'],
+    expectedCommands: ['python -m unittest tests.test_e2e_structural_tooling -q'],
+    expectedUnmatched: [],
+  },
+  {
     name: 'selector tooling routes to structural contract and selector check',
     changedFiles: ['tools/select_verification_targets.mjs'],
     expectedCommands: [
@@ -1827,16 +1834,16 @@ const page = {
 
         self.assertIsNone(parse_job_scalar(jobs["pr-verify-fast"], "needs"))
         self.assertIsNone(parse_job_scalar(jobs["pr-verify-smoke"], "needs"))
-        self.assertEqual(parse_job_scalar(jobs["pr-verify-demo"], "needs"), ["pr-verify-smoke"])
-        self.assertEqual(parse_job_scalar(jobs["pr-verify-demo"], "uses"), "./.github/workflows/verify-shared.yml")
-        self.assertRegex(jobs["pr-verify-demo"], r"(?m)^      profile: demo$")
+        self.assertEqual(parse_job_scalar(jobs["pr-verify-smoke"], "uses"), "./.github/workflows/verify-shared.yml")
+        self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^      profile: pr-smoke$")
+        self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^      run-golden-demo: true$")
 
         required_job = jobs["pr-verify-required"]
         self.assertEqual(parse_job_scalar(required_job, "name"), "PR Verify Required")
         self.assertEqual(parse_job_scalar(required_job, "if"), "always()")
         self.assertEqual(
             parse_job_scalar(required_job, "needs"),
-            ["pr-verify-fast", "pr-verify-smoke", "pr-verify-demo"],
+            ["pr-verify-fast", "pr-verify-smoke"],
         )
         self.assertEqual(parse_job_scalar(required_job, "runs-on"), "ubuntu-latest")
         self.assertIsNone(parse_job_scalar(required_job, "uses"))
@@ -1851,7 +1858,11 @@ const page = {
         demo_browser_condition = "(inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo'"
         self.assertGreaterEqual(shared_workflow.count(demo_node_condition), 2)
         self.assertGreaterEqual(shared_workflow.count(demo_browser_condition), 2)
-        self.assertIn("- name: Run Golden Demo E2E\n        if: inputs.profile == 'demo'\n        run: npm run verify:demo", shared_workflow)
+        demo_step = shared_workflow.split("- name: Run Golden Demo E2E\n", 1)[1].split("\n      - name:", 1)[0]
+        self.assertIn("if: inputs.profile == 'demo' || inputs.run-golden-demo", demo_step)
+        self.assertIn("run: npm run verify:demo", demo_step)
+        self.assertRegex(demo_step, r"(?m)^          MAPCREATOR_DEV_PORT: '8811'$")
+        self.assertIn("run-golden-demo requires the pr-smoke profile", shared_workflow)
         demo_spec = (REPO_ROOT / "tests/e2e/sample_guide_deeplink.spec.js").read_text(encoding="utf-8")
         self.assertEqual(demo_spec.count("@golden-demo"), 1)
         self.assertIn("name: demo-timing-and-failure-context", shared_workflow)
@@ -1914,7 +1925,7 @@ jobs:
         workflow = (REPO_ROOT / ".github" / "workflows" / "pr-verify.yml").read_text(encoding="utf-8")
         required_job = parse_workflow_job_blocks(workflow)["pr-verify-required"]
         script = extract_required_aggregator_script(required_job)
-        job_names = ["pr-verify-fast", "pr-verify-smoke", "pr-verify-demo"]
+        job_names = ["pr-verify-fast", "pr-verify-smoke"]
         result_states = ["success", "failure", "cancelled", "skipped"]
 
         for result_matrix in itertools.product(result_states, repeat=len(job_names)):
@@ -1938,10 +1949,10 @@ jobs:
         script = extract_required_aggregator_script(required_job)
         valid_needs = {
             job: {"result": "success", "outputs": {}}
-            for job in ("pr-verify-fast", "pr-verify-smoke", "pr-verify-demo")
+            for job in ("pr-verify-fast", "pr-verify-smoke")
         }
         cases = {
-            "missing": json.dumps({job: result for job, result in valid_needs.items() if job != "pr-verify-demo"}),
+            "missing": json.dumps({job: result for job, result in valid_needs.items() if job != "pr-verify-smoke"}),
             "extra": json.dumps({**valid_needs, "SecurityScan": {"result": "success", "outputs": {}}}),
             "unknown-result": json.dumps({
                 **valid_needs,
@@ -2557,6 +2568,92 @@ if (lines[0].specPath !== 'tests/e2e/ui_contract_foundation.spec.js') {
 """
         result = run_command("node", "-e", script)
         self.assert_command_ok(result)
+
+
+class ScenarioContractMatrixRoutingTests(unittest.TestCase):
+    def classify(self, paths, scenario, event="pull_request", diff_status=0, base="base"):
+        workflow = (REPO_ROOT / ".github/workflows/scenario-contract-matrix.yml").read_text(encoding="utf-8")
+        block = workflow.split("        run: |\n", 1)[1].split("\n      - name:", 1)[0]
+        script = "\n".join(line[10:] for line in block.splitlines())
+        # Intercept only external change discovery; run the actual branching and routing.
+        script = """git() {
+          if [ "$1" = "fetch" ]; then return 0; fi
+          if [ "$1" = "diff" ]; then
+            printf '%s' "$TEST_PATHS" | tr '\\n' '\\0'
+            return "$TEST_DIFF_STATUS"
+          fi
+          return 1
+        }
+        python() { cat >/dev/null; printf '%s head\\n' "$TEST_BASE"; }
+        """ + script
+        bash = shutil.which("bash")
+        if not bash and os.name == "nt":
+            bash = str(Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe")
+        self.assertTrue(bash and Path(bash).exists(), "Bash is required to test the workflow classifier")
+        temp_root = REPO_ROOT / ".runtime/tmp"
+        temp_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=temp_root) as directory:
+            env = dict(os.environ, GITHUB_EVENT_NAME=event, GITHUB_OUTPUT="output.txt",
+                       GITHUB_STEP_SUMMARY="summary.txt", SCENARIO_ID=scenario,
+                       TEST_PATHS="".join(path + "\n" for path in paths), TEST_DIFF_STATUS=str(diff_status), TEST_BASE=base)
+            result = subprocess.run([bash, "--noprofile", "--norc", "-s"], input=script,
+                                    cwd=directory, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stderr, "")
+            output = (Path(directory) / "output.txt").read_text(encoding="utf-8")
+            return dict(line.split("=", 1) for line in output.splitlines())["should_run"] == "true"
+
+    def test_scenario_changes_run_only_their_owner(self):
+        for changed in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+            for candidate in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+                with self.subTest(changed=changed, candidate=candidate):
+                    self.assertEqual(self.classify([f"data/scenarios/{changed}/manifest.json"], candidate),
+                                     changed == candidate)
+
+    def test_shared_dependencies_and_unknown_scenarios_run_all(self):
+        paths = ["data/scenarios/index.json", "data/scenarios/new_scenario/manifest.json",
+                 "data/locales.json", "data/europe_topology.json", "map_builder/io/readers.py",
+                 "tools/check_scenario_contracts.py", "tools/build_startup_bundle.py",
+                 "requirements-dev.lock.txt", ".github/workflows/scenario-contract-matrix.yml"]
+        for path in paths:
+            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+                with self.subTest(path=path, scenario=scenario):
+                    self.assertTrue(self.classify([path], scenario))
+
+    def test_unrelated_or_empty_changes_skip(self):
+        for paths in ([], ["README.md", "js/ui/menu.js"]):
+            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+                self.assertFalse(self.classify(paths, scenario))
+
+    def test_mixed_changes_select_each_affected_scenario(self):
+        paths = ["data/scenarios/hoi4_1936/owners.json", "data/scenarios/tno_1962/manifest.json"]
+        for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+            self.assertEqual(self.classify(paths, scenario), scenario != "hoi4_1939")
+
+    def test_non_ascii_and_space_paths_keep_their_scenario_owner(self):
+        path = "data/scenarios/tno_1962/城市 names.json"
+        self.assertTrue(self.classify([path], "tno_1962"))
+        self.assertFalse(self.classify([path], "hoi4_1939"))
+
+    def test_unknown_change_set_never_skips(self):
+        for event in ("pull_request", "push"):
+            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+                self.assertTrue(self.classify(["README.md"], scenario, event=event, diff_status=128))
+        for event in ("workflow_dispatch", "unknown_event"):
+            self.assertTrue(self.classify([], ("tno_1962", "hoi4_1936", "hoi4_1939")[0], event=event))
+        self.assertTrue(self.classify([], ("tno_1962", "hoi4_1936", "hoi4_1939")[0], event="push", base="0" * 40))
+
+    def test_successful_push_uses_scenario_routing(self):
+        self.assertTrue(self.classify(["data/scenarios/tno_1962/manifest.json"], "tno_1962", event="push"))
+        self.assertFalse(self.classify(["README.md"], "tno_1962", event="push"))
+
+    def test_required_matrix_and_pr_cancellation_remain_stable(self):
+        workflow = (REPO_ROOT / ".github/workflows/scenario-contract-matrix.yml").read_text(encoding="utf-8")
+        self.assertIn("  strict-scenario-contract-review:", workflow)
+        for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+            self.assertIn(f"          - {scenario}\n", workflow)
+        self.assertIn("group: scenario-contract-${{ github.event_name }}-${{ github.ref }}", workflow)
+        self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", workflow)
 
 
 if __name__ == "__main__":

@@ -141,11 +141,11 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         self.assertIn("Math.min(strokeOpacity, 0.18) : strokeOpacity", urban_layer_body)
         self.assertIn("clamp(fillAlpha * glowMultiplier, 0, 1)", urban_layer_body)
         self.assertIn("clamp(strokeAlpha * glowMultiplier, 0, 1)", urban_layer_body)
-        self.assertGreaterEqual(
-            renderer_content.count("getUrbanGlowMultiplierAt(")
-            + city_lights_content.count("getUrbanGlowMultiplierAt("),
-            8,
-        )
+        # Modern city sprites and historical layers share the field sampler;
+        # the number of call sites changes when draw loops are consolidated.
+        self.assertIn("* getUrbanGlowMultiplierAt(entry.lon, entry.lat)", city_lights_content)
+        self.assertIn("const glowMultiplier = getUrbanGlowMultiplierAt(entry.lon, entry.lat);", city_lights_content)
+        self.assertIn("entry.weight * glowMultiplier", city_lights_content)
         self.assertIn("const urbanGlowRevision = Number(intensityFields?.channels?.urbanGlow?.revision || 0);", modern_static_key_body)
         self.assertIn('`field:urbanGlow:${urbanGlowRevision}`', modern_static_key_body)
 

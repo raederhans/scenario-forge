@@ -430,6 +430,9 @@ export function createProjectSupportDiagnosticsController({
   }
 
   const downloadProjectBtn = documentRef.getElementById("downloadProjectBtn");
+  const workspaceSaveBtn = documentRef.getElementById("workspaceSaveBtn");
+  const workspaceSaveStatus = documentRef.getElementById("workspaceSaveStatus");
+  let projectExportBusy = false;
   const uploadProjectBtn = documentRef.getElementById("uploadProjectBtn");
   const projectDownloadFormat = documentRef.getElementById("projectDownloadFormat");
   const projectDownloadDestination = documentRef.getElementById("projectDownloadDestination");
@@ -904,8 +907,16 @@ export function createProjectSupportDiagnosticsController({
   };
   const refreshProjectSaveStatus = (message = "") => {
     // 保存状态只读 dirty contract 与最近一次项目事务，避免各按钮各自拼接状态文案。
-    if (!projectSaveStatus) return;
     const lastChange = String(state.lastDirtyReason || "").trim();
+    if (workspaceSaveStatus) {
+      const key = state.isDirty ? "Unsaved changes"
+        : lastChange === "project-export" ? "Project downloaded"
+        : lastChange === "project-import" ? "Project imported" : "Not saved yet";
+      if (message) delete workspaceSaveStatus.dataset.i18n;
+      else workspaceSaveStatus.dataset.i18n = key;
+      workspaceSaveStatus.textContent = message || t(key, "ui");
+    }
+    if (!projectSaveStatus) return;
     const setStatusMessage = (text) => {
       projectSaveStatus.textContent = text;
       projectSaveStatus.classList.toggle("hidden", !String(text || "").trim());
@@ -1637,22 +1648,32 @@ export function createProjectSupportDiagnosticsController({
       projectDownloadFormat.addEventListener?.("change", syncProjectPackageContentAvailability);
       projectDownloadFormat.dataset.packageContentsBound = "true";
     }
-    if (downloadProjectBtn && !downloadProjectBtn.dataset.bound) {
-      downloadProjectBtn.addEventListener("click", async () => {
-        refreshProjectSaveStatus(t("Exporting project file with appearance and transport settings.", "ui"));
-        try {
-          const exported = await fileManager.exportProject(state, {
-            format: projectDownloadFormat?.value || "json",
-            destination: projectDownloadDestination?.value || "picker",
-            packageContents: projectPackageContents?.value || "recommended",
-          });
-          refreshProjectSaveStatus(exported === false ? t("Project export cancelled.", "ui") : "");
-        } catch (error) {
-          refreshProjectSaveStatus(String(error?.message || error || ""));
-        }
-      });
-      downloadProjectBtn.dataset.bound = "true";
-    }
+    const exportProject = async () => {
+      if (projectExportBusy) return;
+      projectExportBusy = true;
+      const buttons = [downloadProjectBtn, workspaceSaveBtn].filter(Boolean);
+      const disabledStates = buttons.map((button) => button.disabled);
+      buttons.forEach((button) => { button.disabled = true; });
+      refreshProjectSaveStatus(t("Exporting project file with appearance and transport settings.", "ui"));
+      try {
+        const exported = await fileManager.exportProject(state, {
+          format: projectDownloadFormat?.value || "json",
+          destination: projectDownloadDestination?.value || "picker",
+          packageContents: projectPackageContents?.value || "recommended",
+        });
+        refreshProjectSaveStatus(exported === false ? t("Project export cancelled.", "ui") : "");
+      } catch (error) {
+        refreshProjectSaveStatus(String(error?.message || error || ""));
+      } finally {
+        projectExportBusy = false;
+        buttons.forEach((button, index) => { button.disabled = disabledStates[index]; });
+      }
+    };
+    [downloadProjectBtn, workspaceSaveBtn].forEach((button) => {
+      if (!button || button.dataset.bound) return;
+      button.addEventListener("click", exportProject);
+      button.dataset.bound = "true";
+    });
 
     if (uploadProjectBtn && projectFileInput && !uploadProjectBtn.dataset.bound) {
       uploadProjectBtn.addEventListener("click", async () => {

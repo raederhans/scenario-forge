@@ -193,7 +193,7 @@ TRACKED_COVERAGE_PROBES = [
     {"label": "st_brides_bay", "point": (-5.12, 51.79), "allowed_ids": {"tno_st_brides_bay"}},
     {"label": "bay_of_brest", "point": (-4.496007, 48.334829), "allowed_ids": {"tno_bay_of_brest"}},
     {"label": "bay_of_biscay", "point": (-4.65, 45.2), "allowed_ids": {"tno_bay_of_biscay"}},
-    {"label": "swansea_bay", "point": (-3.99, 51.58), "allowed_ids": {"tno_swansea_bay"}},
+    {"label": "swansea_bay", "point": (-3.88, 51.54), "allowed_ids": {"tno_swansea_bay"}},
     {"label": "carmarthen_bay", "point": (-4.41, 51.68), "allowed_ids": {"tno_carmarthen_bay"}},
     {"label": "bridgwater_bay", "point": (-3.18, 51.25), "allowed_ids": {"tno_bridgwater_bay"}},
     {"label": "barnstaple_bideford_bay", "point": (-4.312879, 51.065519), "allowed_ids": {"tno_barnstaple_bideford_bay"}},
@@ -201,7 +201,7 @@ TRACKED_COVERAGE_PROBES = [
     {"label": "thames_estuary", "point": (1.002599, 51.430599), "allowed_ids": {"tno_thames_estuary"}},
     {"label": "blackwater_estuary", "point": (0.970901, 51.769569), "allowed_ids": {"tno_blackwater_estuary"}},
     {"label": "the_wash", "point": (0.31, 52.95), "allowed_ids": {"tno_the_wash"}},
-    {"label": "humber_estuary", "point": (-0.18, 53.63), "allowed_ids": {"tno_humber_estuary"}},
+    {"label": "humber_estuary", "point": (0.02, 53.60), "allowed_ids": {"tno_humber_estuary"}},
     {"label": "firth_of_forth", "point": (-3.05, 56.0), "allowed_ids": {"tno_firth_of_forth"}},
     {"label": "moray_firth", "point": (-3.44, 57.75), "allowed_ids": {"tno_moray_firth"}},
     {"label": "pentland_firth", "point": (-3.02, 58.75), "allowed_ids": {"tno_pentland_firth"}},
@@ -212,7 +212,7 @@ TRACKED_COVERAGE_PROBES = [
     {"label": "plymouth_sound", "point": (-4.149958, 50.34827), "allowed_ids": {"tno_plymouth_sound"}},
     {"label": "mounts_bay", "point": (-5.452821, 50.046406), "allowed_ids": {"tno_mounts_bay"}},
     {"label": "rye_bay", "point": (0.82, 50.90), "allowed_ids": {"tno_rye_bay"}},
-    {"label": "cardigan_bay", "point": (-4.63, 52.12), "allowed_ids": {"tno_cardigan_bay"}},
+    {"label": "cardigan_bay", "point": (-4.50, 52.43), "allowed_ids": {"tno_cardigan_bay"}},
     {"label": "caernarfon_bay", "point": (-4.45, 53.08), "allowed_ids": {"tno_caernarfon_bay"}},
     {"label": "menai_strait", "point": (-4.03, 53.26), "allowed_ids": {"tno_menai_strait"}},
     {"label": "irish_sea", "point": (-5.0, 53.4), "allowed_ids": {"tno_irish_sea"}},
@@ -485,6 +485,21 @@ def _polygonal_vertex_count(geometry):
     return total
 
 
+def _maximum_polygonal_coordinate_step(geometry):
+    maximum = 0.0
+    for part in _iter_polygon_parts(geometry):
+        for ring in (part.exterior, *part.interiors):
+            coordinates = list(ring.coords)
+            for start, end in zip(coordinates, coordinates[1:]):
+                longitude_step = min(
+                    abs(end[0] - start[0]),
+                    abs(end[0] - start[0] - 360.0),
+                    abs(end[0] - start[0] + 360.0),
+                )
+                maximum = max(maximum, longitude_step, abs(end[1] - start[1]))
+    return maximum
+
+
 def _load_runtime_land_union():
     geometries = [
         shape(feature["geometry"])
@@ -649,20 +664,36 @@ def test_tno_north_channel_uses_source_backed_refinement_precision():
 
 def test_tno_scotia_sea_uses_source_backed_refinement_precision():
     feature_map = _feature_map(_load_scenario_water_features())
+    snapshot_feature_map = _feature_map(_load_named_water_snapshot_features())
     feature = feature_map["tno_scotia_sea"]
+    snapshot_feature = snapshot_feature_map["tno_scotia_sea"]
     props = feature.get("properties", {})
+    snapshot_props = snapshot_feature.get("properties", {})
     geometry = shape(feature["geometry"])
+    snapshot_geometry = shape(snapshot_feature["geometry"])
     assert props.get("source_standard") == "marine_regions_seavox_v19"
-    assert 300 <= _polygonal_vertex_count(geometry) <= 700
+    assert snapshot_props.get("source_query") == "mrgid_sr='24034'"
+    assert snapshot_props.get("source_record_ids") == ["mrgid_r:23624", "mrgid_sr:24034"]
+    assert _polygonal_vertex_count(geometry) >= 300
+    assert _maximum_polygonal_coordinate_step(geometry) <= 0.25 + 1e-9
+    assert geometry.symmetric_difference(snapshot_geometry).area / snapshot_geometry.area <= 0.005
 
 
 def test_tno_weddell_sea_uses_source_backed_refinement_precision():
     feature_map = _feature_map(_load_scenario_water_features())
+    snapshot_feature_map = _feature_map(_load_named_water_snapshot_features())
     feature = feature_map["tno_weddell_sea"]
+    snapshot_feature = snapshot_feature_map["tno_weddell_sea"]
     props = feature.get("properties", {})
+    snapshot_props = snapshot_feature.get("properties", {})
     geometry = shape(feature["geometry"])
+    snapshot_geometry = shape(snapshot_feature["geometry"])
     assert props.get("source_standard") == "marine_regions_seavox_v19"
-    assert 400 <= _polygonal_vertex_count(geometry) <= 700
+    assert snapshot_props.get("source_query") == "mrgid_sr='24035'"
+    assert snapshot_props.get("source_record_ids") == ["mrgid_r:23624", "mrgid_sr:24035"]
+    assert _polygonal_vertex_count(geometry) >= 400
+    assert _maximum_polygonal_coordinate_step(geometry) <= 0.25 + 1e-9
+    assert geometry.symmetric_difference(snapshot_geometry).area / snapshot_geometry.area <= 0.005
 
 
 def test_tno_north_sea_uses_iho_source_backed_refinement_precision():

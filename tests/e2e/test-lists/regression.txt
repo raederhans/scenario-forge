@@ -5,10 +5,12 @@ city_urban_rendering_regression.spec.js
 dev_workspace_render_boundary.spec.js
 hoi4_rk_russia_regression.spec.js
 non_1962_runtime_matrix.spec.js
+ocean_geometry_contract.spec.js
 physical_layer_regression.spec.js
 review_regressions.spec.js
 river_layer_regression.spec.js
 scenario_boundary_regression.spec.js
 shortcut_history_render_boundary.spec.js
 texture_overlay_regression.spec.js
+tno_atlantropa_coastline.spec.js
 water_cache_strategy_regression.spec.js

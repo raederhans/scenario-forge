@@ -6,6 +6,7 @@ data/manifest.json text eol=lf
 data/CATALOG.json text eol=lf
 data/CATALOG.md text eol=lf
 data/runtime_asset_registry.json text eol=lf
+data/world_urban_lights.geojson text eol=lf
 data/country_feature_policies.json text eol=lf
 data/locales.json text eol=lf
 data/palette-maps/*.json text eol=lf

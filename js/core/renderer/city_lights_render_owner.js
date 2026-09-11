@@ -19,6 +19,7 @@ export function createCityLightsRenderOwner({
     MODERN_CITY_LIGHTS_STATS = null,
     MODERN_CITY_LIGHTS_STEP_LAT_DEG = 1,
     MODERN_CITY_LIGHTS_STEP_LON_DEG = 1,
+    MODERN_CITY_LIGHTS_URBAN_AREAS = null,
   } = assets;
   const {
     getContext = () => null,
@@ -39,6 +40,8 @@ export function createCityLightsRenderOwner({
     getDefaultZoomTransform = () => ({ x: 0, y: 0, k: 1 }),
     getEffectiveCityCollection = () => ({ type: 'FeatureCollection', features: [] }),
     getFeatureGeoCentroid = () => null,
+    getProjectedFeatureBounds = () => null,
+    getProjectedGeographicPath = () => null,
     getRenderPassLayout = () => null,
     getSafeBlendMode = (preferred, fallback) => preferred || fallback,
     getTransformSignature = () => '',
@@ -47,6 +50,7 @@ export function createCityLightsRenderOwner({
     normalizeDayNightStyleConfig = (config) => config || {},
     normalizeIntensityFieldsState = (fields) => fields || {},
     normalizeLongitude = (value) => value,
+    now = () => globalThis.performance?.now?.() ?? Date.now(),
     pathBoundsInScreen = () => false,
     prepareTargetContext = () => null,
     recordRenderPerfMetric = () => {},
@@ -69,9 +73,21 @@ export function createCityLightsRenderOwner({
     ? effects.onModernAssetsError
     : () => {};
   let modernAssetLoadPromise = null;
+  let urbanShapeLoadAttempted = false;
+  let urbanShapeCanvas = null;
+  let modernCityLightsCells = null;
+  const lightBlobSpriteCache = new Map();
+  const LIGHT_BLOB_SPRITE_SIZE = 96;
+  const LIGHT_BLOB_SPRITE_LIMIT = 48;
+  let modernCityLightsDrawStats = null;
+  const globalUrbanByCityId = new Map();
+  for (const feature of MODERN_CITY_LIGHTS_URBAN_AREAS?.features || []) {
+    for (const cityId of feature.properties?.city_ids || []) globalUrbanByCityId.set(cityId, feature);
+  }
 
   const modernCityLightsGeometryCache = {
     projectionKey: '',
+    initialized: false,
     baseEntries: [],
     corridorEntries: [],
   };
@@ -82,6 +98,8 @@ export function createCityLightsRenderOwner({
     scenarioId: '',
     urbanEntries: [],
     cityEntries: [],
+    urbanByFeature: new Map(),
+    cityByFeature: new Map(),
   };
   const modernCityLightsStaticLayerCache = {
     key: '',
@@ -170,17 +188,56 @@ export function createCityLightsRenderOwner({
   function getModernCityLightsNormalizationDenominator() {
     const p90 = Number(MODERN_CITY_LIGHTS_STATS?.p90 ?? MODERN_CITY_LIGHTS_STATS?.p90_nonzero ?? 0);
     if (Number.isFinite(p90) && p90 > 0) {
-      return Math.max(20, p90 * 0.82);
+      return Math.max(20, p90 * 0.35);
     }
     const maxValue = Number(MODERN_CITY_LIGHTS_STATS?.max ?? 255);
     if (Number.isFinite(maxValue) && maxValue > 0) {
-      return Math.max(20, maxValue * 0.72);
+      return Math.max(20, maxValue * 0.25);
     }
     return 255;
   }
   
   function normalizeModernCityLightsValue(value) {
-    return clamp(Number(value || 0) / Math.max(getModernCityLightsNormalizationDenominator(), 0.0001), 0, 1);
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) return 0;
+    const maximum = Number(MODERN_CITY_LIGHTS_STATS?.max);
+    const maxValue = Number.isFinite(maximum) && maximum > 0 ? maximum : 255;
+    const exposure = getModernCityLightsNormalizationDenominator();
+    // Preserve the bright end instead of clipping every value above p90 * 0.82.
+    return Math.log1p(Math.min(parsed, maxValue) / exposure) / Math.log1p(maxValue / exposure);
+  }
+
+  function getModernCityLightsCells() {
+    if (modernCityLightsCells) return modernCityLightsCells;
+    const cells = [];
+    for (let y = 0; y < MODERN_CITY_LIGHTS_GRID_HEIGHT; y += 1) {
+      for (let x = 0; x < MODERN_CITY_LIGHTS_GRID_WIDTH; x += 1) {
+        const index = y * MODERN_CITY_LIGHTS_GRID_WIDTH + x;
+        const value = MODERN_CITY_LIGHTS_GRID[index] || 0;
+        if (value <= 0 || value < MODERN_CITY_LIGHTS_BASE_THRESHOLD) continue;
+        const neighbors = new Set();
+        for (let dy = -1; dy <= 1; dy += 1) {
+          for (let dx = -1; dx <= 1; dx += 1) {
+            const nx = (x + dx + MODERN_CITY_LIGHTS_GRID_WIDTH) % MODERN_CITY_LIGHTS_GRID_WIDTH;
+            const ny = clamp(y + dy, 0, MODERN_CITY_LIGHTS_GRID_HEIGHT - 1);
+            const neighborIndex = ny * MODERN_CITY_LIGHTS_GRID_WIDTH + nx;
+            const neighborValue = MODERN_CITY_LIGHTS_GRID[neighborIndex] || 0;
+            if (neighborIndex !== index && neighborValue > 0 && neighborValue >= MODERN_CITY_LIGHTS_BASE_THRESHOLD) {
+              neighbors.add(neighborIndex);
+            }
+          }
+        }
+        cells.push({
+          gridX: x, gridY: y, value,
+          lon: -180 + ((x + 0.5) * MODERN_CITY_LIGHTS_STEP_LON_DEG),
+          lat: 90 - ((y + 0.5) * MODERN_CITY_LIGHTS_STEP_LAT_DEG),
+          normalized: normalizeModernCityLightsValue(value),
+          neighborCount: neighbors.size,
+        });
+      }
+    }
+    modernCityLightsCells = cells;
+    return cells;
   }
   
   function sampleModernCityLightsGridNormalized(lon, lat) {
@@ -213,7 +270,7 @@ export function createCityLightsRenderOwner({
     if (
       modernCityLightsGeometryCache.projectionKey === projectionKey &&
       Array.isArray(modernCityLightsGeometryCache.baseEntries) &&
-      modernCityLightsGeometryCache.baseEntries.length
+      modernCityLightsGeometryCache.initialized
     ) {
       return modernCityLightsGeometryCache;
     }
@@ -223,86 +280,58 @@ export function createCityLightsRenderOwner({
     const halfLon = MODERN_CITY_LIGHTS_STEP_LON_DEG * 0.5;
     const halfLat = MODERN_CITY_LIGHTS_STEP_LAT_DEG * 0.5;
   
-    for (let y = 0; y < MODERN_CITY_LIGHTS_GRID_HEIGHT; y += 1) {
-      const lat = 90 - ((y + 0.5) * MODERN_CITY_LIGHTS_STEP_LAT_DEG);
-      for (let x = 0; x < MODERN_CITY_LIGHTS_GRID_WIDTH; x += 1) {
-        const value = MODERN_CITY_LIGHTS_GRID[(y * MODERN_CITY_LIGHTS_GRID_WIDTH) + x] || 0;
-        if (value < MODERN_CITY_LIGHTS_BASE_THRESHOLD) continue;
+    for (const cell of getModernCityLightsCells()) {
+      const { lon, lat, value } = cell;
+      const center = projection ? projection([lon, lat]) : null;
+      const east = projection ? projection([normalizeLongitude(lon + halfLon), lat]) : null;
+      const west = projection ? projection([normalizeLongitude(lon - halfLon), lat]) : null;
+      const north = projection ? projection([lon, clamp(lat + halfLat, -89.999, 89.999)]) : null;
+      const south = projection ? projection([lon, clamp(lat - halfLat, -89.999, 89.999)]) : null;
+      if (
+        !Array.isArray(center) ||
+        !Array.isArray(east) ||
+        !Array.isArray(west) ||
+        !Array.isArray(north) ||
+        !Array.isArray(south)
+      ) {
+        continue;
+      }
+      const values = [...center, ...east, ...west, ...north, ...south];
+      if (!values.every((entry) => Number.isFinite(Number(entry)))) continue;
   
-        const lon = -180 + ((x + 0.5) * MODERN_CITY_LIGHTS_STEP_LON_DEG);
-        const center = projection ? projection([lon, lat]) : null;
-        const east = projection ? projection([normalizeLongitude(lon + halfLon), lat]) : null;
-        const west = projection ? projection([normalizeLongitude(lon - halfLon), lat]) : null;
-        const north = projection ? projection([lon, clamp(lat + halfLat, -89.999, 89.999)]) : null;
-        const south = projection ? projection([lon, clamp(lat - halfLat, -89.999, 89.999)]) : null;
-        if (
-          !Array.isArray(center) ||
-          !Array.isArray(east) ||
-          !Array.isArray(west) ||
-          !Array.isArray(north) ||
-          !Array.isArray(south)
-        ) {
-          continue;
-        }
-        const values = [...center, ...east, ...west, ...north, ...south];
-        if (!values.every((entry) => Number.isFinite(Number(entry)))) continue;
+      const ewDx = east[0] - west[0];
+      const ewDy = east[1] - west[1];
+      const nsDx = north[0] - south[0];
+      const nsDy = north[1] - south[1];
+      const rx = Math.hypot(ewDx, ewDy) * 0.5;
+      const ry = Math.hypot(nsDx, nsDy) * 0.5;
+      if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx <= 0.02 || ry <= 0.02 || rx > 12 || ry > 12) {
+        continue;
+      }
+      const aspectRatio = Math.max(rx, ry) / Math.max(Math.min(rx, ry), 0.01);
+      if (aspectRatio > 3.5) continue;
+      const maxRadius = Math.min(rx, ry) * 2.2;
+      const clampedRx = Math.min(rx, maxRadius);
+      const clampedRy = Math.min(ry, maxRadius);
   
-        const ewDx = east[0] - west[0];
-        const ewDy = east[1] - west[1];
-        const nsDx = north[0] - south[0];
-        const nsDy = north[1] - south[1];
-        const rx = Math.hypot(ewDx, ewDy) * 0.5;
-        const ry = Math.hypot(nsDx, nsDy) * 0.5;
-        if (!Number.isFinite(rx) || !Number.isFinite(ry) || rx <= 0.02 || ry <= 0.02 || rx > 12 || ry > 12) {
-          continue;
-        }
-        const aspectRatio = Math.max(rx, ry) / Math.max(Math.min(rx, ry), 0.01);
-        if (aspectRatio > 3.5) continue;
-        const maxRadius = Math.min(rx, ry) * 2.2;
-        const clampedRx = Math.min(rx, maxRadius);
-        const clampedRy = Math.min(ry, maxRadius);
-  
-        let neighborCount = 0;
-        const visitedNeighborIndices = new Set();
-        const currentIndex = (y * MODERN_CITY_LIGHTS_GRID_WIDTH) + x;
-        for (let dy = -1; dy <= 1; dy += 1) {
-          for (let dx = -1; dx <= 1; dx += 1) {
-            if (dx === 0 && dy === 0) continue;
-            const nx = ((x + dx) % MODERN_CITY_LIGHTS_GRID_WIDTH + MODERN_CITY_LIGHTS_GRID_WIDTH) % MODERN_CITY_LIGHTS_GRID_WIDTH;
-            const ny = clamp(y + dy, 0, MODERN_CITY_LIGHTS_GRID_HEIGHT - 1);
-            const neighborIndex = (ny * MODERN_CITY_LIGHTS_GRID_WIDTH) + nx;
-            if (neighborIndex === currentIndex) continue;
-            if (visitedNeighborIndices.has(neighborIndex)) continue;
-            visitedNeighborIndices.add(neighborIndex);
-            if (MODERN_CITY_LIGHTS_GRID[neighborIndex] >= MODERN_CITY_LIGHTS_BASE_THRESHOLD) {
-              neighborCount += 1;
-            }
-          }
-        }
-  
-        const entry = {
-          lon,
-          lat,
-          x: center[0],
-          y: center[1],
-          rx: clampedRx,
-          ry: clampedRy,
-          rotation: Math.atan2(ewDy, ewDx),
-          gridX: x,
-          gridY: y,
-          value,
-          neighborCount,
-        };
-        baseEntries.push(entry);
-        if (value >= MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD) {
-          corridorEntries.push(entry);
-        }
+      const entry = {
+        ...cell,
+        x: center[0],
+        y: center[1],
+        rx: clampedRx,
+        ry: clampedRy,
+        rotation: Math.atan2(ewDy, ewDx),
+      };
+      baseEntries.push(entry);
+      if (value >= MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD) {
+        corridorEntries.push(entry);
       }
     }
   
     modernCityLightsGeometryCache.projectionKey = projectionKey;
     modernCityLightsGeometryCache.baseEntries = baseEntries;
     modernCityLightsGeometryCache.corridorEntries = corridorEntries;
+    modernCityLightsGeometryCache.initialized = true;
     return modernCityLightsGeometryCache;
   }
   
@@ -348,6 +377,33 @@ export function createCityLightsRenderOwner({
     const resolvedAlpha = clamp(Number(alpha) || 0, 0, 1);
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${resolvedAlpha})`;
   }
+
+  function getLightBlobSprite(rgb, innerStop, midStop, innerAlphaScale, midAlphaScale) {
+    // Position, radius and opacity are intentionally absent: all lights sharing a
+    // profile reuse one bitmap, including after a pan or a brightness adjustment.
+    const key = [rgb.r, rgb.g, rgb.b, innerStop, midStop, innerAlphaScale, midAlphaScale].join(":");
+    const cached = lightBlobSpriteCache.get(key);
+    if (cached) return cached;
+    const canvas = createCanvas(LIGHT_BLOB_SPRITE_SIZE, LIGHT_BLOB_SPRITE_SIZE, getContext());
+    const spriteContext = canvas?.getContext?.("2d");
+    if (!spriteContext) return null;
+    canvas.width = LIGHT_BLOB_SPRITE_SIZE;
+    canvas.height = LIGHT_BLOB_SPRITE_SIZE;
+    const radius = LIGHT_BLOB_SPRITE_SIZE / 2;
+    const gradient = spriteContext.createRadialGradient(radius, radius, 0, radius, radius, radius);
+    gradient.addColorStop(0, toRgbaString(rgb, innerAlphaScale));
+    gradient.addColorStop(innerStop, toRgbaString(rgb, Math.max(innerAlphaScale, midAlphaScale)));
+    gradient.addColorStop(midStop, toRgbaString(rgb, midAlphaScale));
+    gradient.addColorStop(1, toRgbaString(rgb, 0));
+    spriteContext.fillStyle = gradient;
+    spriteContext.fillRect(0, 0, canvas.width, canvas.height);
+    if (lightBlobSpriteCache.size >= LIGHT_BLOB_SPRITE_LIMIT) {
+      lightBlobSpriteCache.delete(lightBlobSpriteCache.keys().next().value);
+    }
+    lightBlobSpriteCache.set(key, canvas);
+    if (modernCityLightsDrawStats) modernCityLightsDrawStats.spriteBuilds += 1;
+    return canvas;
+  }
   
   function drawSoftLightBlob(
     x,
@@ -371,6 +427,31 @@ export function createCityLightsRenderOwner({
     const resolvedRy = Math.max(Number(ry) || 0, 0.0001);
     const resolvedAlpha = clamp(Number(alpha) || 0, 0, 1);
     if (resolvedAlpha <= 0.0001) return;
+    if (modernCityLightsDrawStats) modernCityLightsDrawStats.blobs += 1;
+
+    const sprite = getLightBlobSprite(
+      rgb,
+      clamp(Number(innerStop) || 0.1, 0.01, 0.92),
+      clamp(Number(midStop) || 0.5, 0.08, 0.97),
+      innerAlphaScale,
+      midAlphaScale,
+    );
+    if (sprite) {
+      context.save();
+      try {
+        context.globalAlpha *= resolvedAlpha;
+        if (rotation) {
+          context.translate(x, y);
+          context.rotate(rotation);
+          context.drawImage(sprite, -resolvedRx, -resolvedRy, resolvedRx * 2, resolvedRy * 2);
+        } else {
+          context.drawImage(sprite, x - resolvedRx, y - resolvedRy, resolvedRx * 2, resolvedRy * 2);
+        }
+      } finally {
+        context.restore();
+      }
+      return;
+    }
   
     context.save();
     context.translate(x, y);
@@ -402,14 +483,11 @@ export function createCityLightsRenderOwner({
       zoomScale,
       fadeT,
       detailT,
-      textureAlphaScale: 1.05 + (fadeT * 0.44),
-      corridorAlphaScale: 1.08 + (fadeT * 0.46),
-      textureRadiusScale: 0.98 + (detailT * 0.22),
-      corridorRadiusScale: 0.96 + (detailT * 0.18),
-      textureJitterStrength: 0.2 + (detailT * 0.06),
-      corridorJitterStrength: 0.12 + (detailT * 0.04),
-      coreAlphaScale: 1.02 + (fadeT * 0.62),
-      coreRadiusScale: 0.96 + (detailT * 0.3),
+      // Zoom reveals the same illumination; it must not act as extra exposure.
+      textureAlphaScale: 1 - (fadeT * 0.18),
+      textureRadiusScale: 1,
+      coreAlphaScale: 1,
+      coreRadiusScale: 1,
     };
   }
   
@@ -433,7 +511,7 @@ export function createCityLightsRenderOwner({
   
   function getModernCityLightsPopulationBoostData() {
     const cityCollection = getEffectiveCityCollection();
-    const urbanCollection = runtimeState.urbanData;
+    const urbanCollection = MODERN_CITY_LIGHTS_URBAN_AREAS || runtimeState.urbanData;
     const cityLayerRevision = Number(runtimeState.cityLayerRevision || 0);
     const scenarioId = String(runtimeState.activeScenarioId || "");
     if (
@@ -453,7 +531,10 @@ export function createCityLightsRenderOwner({
         const props = feature?.properties || {};
         const population = Math.max(0, Number(props.__city_population || 0));
         const capitalScore = getCityCapitalScore(feature);
-        const urbanInfo = getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex);
+        const globalUrbanFeature = globalUrbanByCityId.get(getCityCanonicalId(feature));
+        const urbanInfo = MODERN_CITY_LIGHTS_URBAN_AREAS
+          ? { hasUrbanMatch: !!globalUrbanFeature, urbanMatchId: globalUrbanFeature?.properties?.id, urbanFeature: globalUrbanFeature }
+          : getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex);
         if (urbanInfo.hasUrbanMatch) {
           const current = urbanEntriesById.get(urbanInfo.urbanMatchId) || {
             urbanId: urbanInfo.urbanMatchId,
@@ -507,22 +588,30 @@ export function createCityLightsRenderOwner({
     modernCityLightsPopulationBoostCache.scenarioId = scenarioId;
     modernCityLightsPopulationBoostCache.urbanEntries = urbanEntries;
     modernCityLightsPopulationBoostCache.cityEntries = unmatchedCityEntries;
+    modernCityLightsPopulationBoostCache.urbanByFeature = new Map(urbanEntries.map((entry) => [entry.urbanFeature, entry]));
+    modernCityLightsPopulationBoostCache.cityByFeature = new Map(unmatchedCityEntries.map((entry) => [entry.feature, entry]));
     return modernCityLightsPopulationBoostCache;
+  }
+
+  function getModernPopulationCoreGain(feature, config, urban = false) {
+    const strength = getModernPopulationBoostStrength(config);
+    if (strength <= 0) return 1;
+    const data = getModernCityLightsPopulationBoostData();
+    const entry = (urban ? data.urbanByFeature : data.cityByFeature).get(feature);
+    if (!entry) return 1;
+    const population = urban ? entry.populationSum : entry.population;
+    const populationScore = clamp(Math.log10(population + 1) / 7.35, 0, 1);
+    const densityScore = urban ? clamp(Math.log10(entry.density + 1) / 4.4, 0, 1) : 0;
+    return 1 + strength * (populationScore * 0.3 + densityScore * 0.15 + Math.min(3, entry.capitalScore) * 0.025);
+  }
+
+  function getSoftLightAlpha(value, maximum) {
+    // Leave headroom for population/exposure controls even in the brightest cities.
+    return maximum * -Math.expm1(-Math.max(0, value) / maximum);
   }
   
   function getSignedHashUnit(seed) {
     return (((stringHash(seed) >>> 0) % 2001) / 1000) - 1;
-  }
-  
-  function getModernGridEntryJitter(entry, strength = 0.18) {
-    const resolvedStrength = clamp(Number(strength) || 0, 0, 0.4);
-    const dx = getSignedHashUnit(`${entry?.gridX ?? 0}:${entry?.gridY ?? 0}:x`)
-      * Math.max(Number(entry?.rx) || 0, 0.0001)
-      * resolvedStrength;
-    const dy = getSignedHashUnit(`${entry?.gridX ?? 0}:${entry?.gridY ?? 0}:y`)
-      * Math.max(Number(entry?.ry) || 0, 0.0001)
-      * resolvedStrength;
-    return { dx, dy };
   }
   
   function getModernCityLightLatitudeFade(gridY) {
@@ -534,131 +623,51 @@ export function createCityLightsRenderOwner({
   
   function drawModernCityLightsTexture(config, intensity) {
     const textureOpacity = clamp(getModernDayNightNumber(config, "cityLightsTextureOpacity"), 0, 1);
-    if (textureOpacity <= 0) return;
-    const palette = getNightLightPalette("modern");
+    const corridorStrength = clamp(getModernDayNightNumber(config, "cityLightsCorridorStrength"), 0, 1);
+    if (textureOpacity <= 0 && corridorStrength <= 0) return;
     const geometry = getModernCityLightsGeometry();
     const zoomProfile = getModernCityLightsZoomProfile();
-    const textureRgb = getLightBlobRgb(palette.texture);
-    const coreSharpness = clamp(getModernDayNightNumber(config, "cityLightsCoreSharpness"), 0, 1);
-    const corridorStrength = clamp(getModernDayNightNumber(config, "cityLightsCorridorStrength"), 0, 1);
-    const populationBoostStrength = getModernPopulationBoostStrength(config);
+    const textureRgb = getLightBlobRgb(getNightLightPalette("modern").texture);
     const overscan = Math.max(32, Math.min(runtimeState.width, runtimeState.height) * 0.06);
-  
+
     geometry.baseEntries.forEach((entry) => {
-      if (shouldCullModernLightEntry(entry, overscan)) return;
-      const glowMultiplier = getUrbanGlowMultiplierAt(entry.lon, entry.lat);
-      const normalized = normalizeModernCityLightsValue(entry.value);
-      const lumaWeight = Math.pow(normalized, 0.78);
-      const populationBoostAlpha = 1 + (populationBoostStrength * Math.pow(normalized, 0.68) * 0.28);
-      const textureOpacityScale = 0.18 + (textureOpacity * 0.82);
-      const corridorBandAlpha = 1 + (corridorStrength * clamp(entry.neighborCount / 8, 0, 1) * 0.3);
-      const densityDampen = entry.neighborCount >= 7 ? 0.94
-        : entry.neighborCount >= 5 ? 0.98
-          : entry.neighborCount >= 3 ? 1.02
-        : 1.0;
-      const isolationAlphaBoost = entry.neighborCount <= 1 ? 0.06 : 0;
-      const latFade = getModernCityLightLatitudeFade(entry.gridY);
-      const baseAlpha = clamp(
-        intensity
-        * textureOpacityScale
-        * (0.12 + (lumaWeight * 0.5))
-        * zoomProfile.textureAlphaScale
-        * densityDampen
-        * populationBoostAlpha
-        * corridorBandAlpha
-        * latFade,
-        0,
-        0.38
+      // Include the footprint when culling broad splats near a viewport edge.
+      const radiusScale = 2.1 * zoomProfile.textureRadiusScale;
+      const footprint = Math.max(entry.rx, entry.ry) * radiusScale * zoomProfile.zoomScale;
+      if (shouldCullModernLightEntry(entry, Math.max(overscan, footprint))) return;
+      const normalized = entry.normalized;
+      const connected = clamp((entry.neighborCount - 1) / 5, 0, 1);
+      const corridorWeight = entry.value >= MODERN_CITY_LIGHTS_CORRIDOR_THRESHOLD
+        ? connected * Math.pow(normalized, 2)
+        : 0;
+      // Overlapping, geographically fixed kernels reconstruct a continuous field.
+      // Corridor contrast belongs to that field, not a second grid of bright dots.
+      const fieldAlpha = textureOpacity * Math.pow(normalized, 1.15) * 0.3
+        + corridorStrength * corridorWeight * 0.1;
+      const alpha = clamp(
+        intensity * fieldAlpha * zoomProfile.textureAlphaScale
+          * getModernCityLightLatitudeFade(entry.gridY)
+          * getUrbanGlowMultiplierAt(entry.lon, entry.lat),
+        0, 0.42,
       );
-      const alpha = clamp(baseAlpha * glowMultiplier, 0, 0.34);
       if (alpha <= 0.002) return;
-      const jitter = getModernGridEntryJitter(entry, zoomProfile.textureJitterStrength);
-      const isolationSpread = entry.neighborCount <= 1 ? 1.38
-        : entry.neighborCount <= 3 ? 1.08
-        : 1.0;
-      const sharpnessSpread = 1.08 - (coreSharpness * 0.22);
-      const radiusScale = (zoomProfile.textureRadiusScale + (lumaWeight * (0.1 + (corridorStrength * 0.08))))
-        * isolationSpread
-        * sharpnessSpread;
-      const blobRx = entry.rx * radiusScale;
-      const blobRy = entry.ry * radiusScale;
-      drawSoftLightBlob(
-        entry.x + jitter.dx,
-        entry.y + jitter.dy,
-        blobRx,
-        blobRy,
-        {
-          rotation: entry.rotation,
-          rgb: textureRgb,
-          alpha,
-          innerStop: 0.06,
-          midStop: 0.7,
-          innerAlphaScale: clamp(0.9 + (coreSharpness * 0.18) + isolationAlphaBoost, 0, 1.12),
-          midAlphaScale: 0.18 + ((1 - coreSharpness) * 0.14),
-        }
-      );
+      drawSoftLightBlob(entry.x, entry.y, entry.rx * radiusScale, entry.ry * radiusScale, {
+        rotation: entry.rotation,
+        rgb: textureRgb,
+        alpha,
+        innerStop: 0.04,
+        midStop: 0.5,
+        innerAlphaScale: 1,
+        midAlphaScale: 0.28,
+      });
     });
   }
-  
-  function drawModernCityLightsCorridors(config, intensity) {
-    const corridorStrength = clamp(getModernDayNightNumber(config, "cityLightsCorridorStrength"), 0, 1);
-    if (corridorStrength <= 0) return;
-    const palette = getNightLightPalette("modern");
-    const geometry = getModernCityLightsGeometry();
-    const zoomProfile = getModernCityLightsZoomProfile();
-    const corridorRgb = getLightBlobRgb(palette.corridor);
-    const coreSharpness = clamp(getModernDayNightNumber(config, "cityLightsCoreSharpness"), 0, 1);
-    const populationBoostStrength = getModernPopulationBoostStrength(config);
-    const overscan = Math.max(40, Math.min(runtimeState.width, runtimeState.height) * 0.08);
-  
-    geometry.corridorEntries.forEach((entry) => {
-      if (shouldCullModernLightEntry(entry, overscan)) return;
-      const glowMultiplier = getUrbanGlowMultiplierAt(entry.lon, entry.lat);
-      const normalized = normalizeModernCityLightsValue(entry.value);
-      const corridorWeight = Math.pow(normalized, 0.82);
-      const populationBoostAlpha = 1 + (populationBoostStrength * Math.pow(normalized, 0.72) * 0.18);
-      const corridorStrengthScale = 0.18 + (corridorStrength * 0.82);
-      const latFade = getModernCityLightLatitudeFade(entry.gridY);
-      const baseAlpha = clamp(
-        intensity
-        * corridorStrengthScale
-        * (0.1 + (corridorWeight * 0.52))
-        * zoomProfile.corridorAlphaScale
-        * populationBoostAlpha
-        * latFade,
-        0,
-        0.34
-      );
-      const alpha = clamp(baseAlpha * glowMultiplier, 0, 0.32);
-      if (alpha <= 0.003) return;
-      const jitter = getModernGridEntryJitter(entry, zoomProfile.corridorJitterStrength);
-      const baseRadius = Math.max((entry.rx + entry.ry) * 0.5, 0.0001);
-      const sharpnessSpread = 1.05 - (coreSharpness * 0.14);
-      const majorRadius = baseRadius
-        * (zoomProfile.corridorRadiusScale + 0.04 + (corridorStrength * 0.24) + (corridorWeight * 0.16))
-        * sharpnessSpread;
-      drawSoftLightBlob(
-        entry.x + jitter.dx,
-        entry.y + jitter.dy,
-        majorRadius,
-        majorRadius * 1.02,
-        {
-          rotation: entry.rotation * 0.18,
-          rgb: corridorRgb,
-          alpha,
-          innerStop: 0.05,
-          midStop: 0.56,
-          innerAlphaScale: 0.94,
-          midAlphaScale: 0.16 + ((1 - coreSharpness) * 0.1),
-        }
-      );
-    });
-  }
-  
+
   function collectModernUrbanCoreEntries(k, config, intensity) {
     const pathCanvas = getPathCanvas();
     if (!pathCanvas) return [];
-    if (!Array.isArray(runtimeState.urbanData?.features) || !runtimeState.urbanData.features.length) return [];
+    const urbanCollection = MODERN_CITY_LIGHTS_URBAN_AREAS || runtimeState.urbanData;
+    if (!Array.isArray(urbanCollection?.features) || !urbanCollection.features.length) return [];
     const textureOpacity = clamp(getModernDayNightNumber(config, "cityLightsTextureOpacity"), 0, 1);
     const coreSharpness = clamp(getModernDayNightNumber(config, "cityLightsCoreSharpness"), 0, 1);
     const textureOpacityScale = 0.32 + (textureOpacity * 0.68);
@@ -669,15 +678,19 @@ export function createCityLightsRenderOwner({
     const overscan = Math.max(32, Math.min(runtimeState.width, runtimeState.height) * 0.06);
     const entries = [];
   
-    runtimeState.urbanData.features.forEach((feature) => {
+    urbanCollection.features.forEach((feature) => {
       if (!pathBoundsInScreen(feature)) return;
-      if (estimateProjectedAreaPx(feature, k) < minProjectedAreaPx) return;
+      const projectedArea = estimateProjectedAreaPx(feature, k);
+      if (projectedArea < minProjectedAreaPx) return;
+      // The global asset restores resolvable shapes; existing city points already
+      // represent subpixel settlements without another layer of bright speckles.
+      if (MODERN_CITY_LIGHTS_URBAN_AREAS && projectedArea <= 16) return;
   
       const heuristicWeight = getUrbanLightWeight(feature, "modern");
       if (heuristicWeight <= 0) return;
       if (zoomScale <= 1.15 && heuristicWeight < 0.72) return;
   
-      const geographicCentroid = getFeatureGeoCentroid(feature);
+      const geographicCentroid = feature.properties?.anchor || getFeatureGeoCentroid(feature);
       const sample = geographicCentroid
         ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
         : 0;
@@ -690,19 +703,25 @@ export function createCityLightsRenderOwner({
       if (weight < 0.16) return;
       if (zoomScale <= 1.35 && weight < 0.44) return;
   
-      const centroid = pathCanvas.centroid(feature);
+      const centroid = feature.properties?.anchor
+        ? getProjection()?.(feature.properties.anchors?.[0] || feature.properties.anchor)
+        : pathCanvas.centroid(feature);
       const cx = Number(centroid?.[0]);
       const cy = Number(centroid?.[1]);
       if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
   
       const screenX = (cx * transform.k) + transform.x;
       const screenY = (cy * transform.k) + transform.y;
-      if (
+      const shapeT = clamp((Math.sqrt(projectedArea) - 4) / 8, 0, 1);
+      const shapePath = shapeT > 0 ? getProjectedGeographicPath(feature) : null;
+      const shapeBlend = shapePath ? shapeT * shapeT * (3 - 2 * shapeT) : 0;
+      // A visible arm of a large city remains visible even when its anchor is offscreen.
+      if (!shapeBlend && (
         screenX < -overscan ||
         screenX > runtimeState.width + overscan ||
         screenY < -overscan ||
         screenY > runtimeState.height + overscan
-      ) {
+      )) {
         return;
       }
   
@@ -716,15 +735,14 @@ export function createCityLightsRenderOwner({
       const orientation = getSignedHashUnit(`${identitySeed}:rotation`) * (Math.PI / 60);
       const baseRadiusPx = 0.88 + (weight * (1.1 + (coreSharpness * 0.82)));
       const aspectRatio = clamp(1.04 + (coreSharpness * 0.06) + (sample * 0.06), 1.04, 1.18);
-      const haloAlpha = clamp(
-        intensity * weight * (0.14 + (textureOpacity * 0.18) + (sample * 0.22) + ((1 - coreSharpness) * 0.06)) * zoomProfile.coreAlphaScale,
-        0,
-        0.32
+      const populationGain = getModernPopulationCoreGain(feature, config, true);
+      const haloAlpha = getSoftLightAlpha(
+        intensity * weight * populationGain * (0.10 + (textureOpacity * 0.12) + (sample * 0.16) + ((1 - coreSharpness) * 0.04)) * zoomProfile.coreAlphaScale,
+        0.4
       );
-      const coreAlpha = clamp(
-        intensity * weight * textureOpacityScale * (0.34 + (coreSharpness * 0.48) + (sample * 0.34)) * zoomProfile.coreAlphaScale,
-        0,
-        0.48
+      const coreAlpha = getSoftLightAlpha(
+        intensity * weight * populationGain * textureOpacityScale * (0.22 + (coreSharpness * 0.32) + (sample * 0.24)) * zoomProfile.coreAlphaScale,
+        0.7
       );
       entries.push({
         feature,
@@ -739,9 +757,78 @@ export function createCityLightsRenderOwner({
         aspectRatio,
         haloAlpha,
         coreAlpha,
+        shapePath,
+        shapeBlend,
       });
     });
     return entries;
+  }
+
+  function drawModernUrbanShapes(entries, palette) {
+    const shapedEntries = entries.filter((entry) => entry.shapeBlend > 0);
+    if (!shapedEntries.length) return;
+    const context = getContext();
+    const width = context.canvas.width;
+    const height = context.canvas.height;
+    // One shared, CSS-resolution surface softens the boundary during upsampling.
+    // No per-city blur, readback, or bitmap allocation on the cached frame path.
+    const ratio = Math.min(1, 0.75 / Math.max(1, Number(runtimeState.dpr || 1)));
+    const maskWidth = Math.max(1, Math.ceil(width * ratio));
+    const maskHeight = Math.max(1, Math.ceil(height * ratio));
+    urbanShapeCanvas ||= createCanvas(maskWidth, maskHeight, context);
+    const maskContext = urbanShapeCanvas?.getContext?.("2d");
+    if (!maskContext) return;
+    if (urbanShapeCanvas.width !== maskWidth) urbanShapeCanvas.width = maskWidth;
+    if (urbanShapeCanvas.height !== maskHeight) urbanShapeCanvas.height = maskHeight;
+    maskContext.setTransform(1, 0, 0, 1, 0, 0);
+    maskContext.clearRect(0, 0, maskWidth, maskHeight);
+    const transform = getZoomTransform();
+    const scaleX = maskWidth / Math.max(1, runtimeState.width);
+    const scaleY = maskHeight / Math.max(1, runtimeState.height);
+    maskContext.setTransform(scaleX * transform.k, 0, 0, scaleY * transform.k, scaleX * transform.x, scaleY * transform.y);
+    const coreRgb = getLightBlobRgb(palette.core);
+    withRenderTarget(maskContext, () => {
+      shapedEntries.forEach((entry) => {
+        const bounds = getProjectedFeatureBounds(entry.feature);
+        const fallbackBounds = !bounds ? getPathCanvas()?.bounds?.(entry.feature) : null;
+        const minX = bounds?.minX ?? fallbackBounds?.[0]?.[0];
+        const minY = bounds?.minY ?? fallbackBounds?.[0]?.[1];
+        const maxX = bounds?.maxX ?? fallbackBounds?.[1]?.[0];
+        const maxY = bounds?.maxY ?? fallbackBounds?.[1]?.[1];
+        if (![minX, minY, maxX, maxY].every(Number.isFinite)) return;
+        maskContext.save();
+        try {
+          maskContext.globalCompositeOperation = "source-over";
+          maskContext.globalAlpha = entry.coreAlpha * entry.shapeBlend * 0.06;
+          maskContext.fillStyle = palette.halo;
+          maskContext.fill(entry.shapePath, "evenodd");
+          maskContext.clip(entry.shapePath, "evenodd");
+          maskContext.globalAlpha = 1;
+          const anchors = entry.feature.properties?.anchors;
+          const points = Array.isArray(anchors) && anchors.length
+            ? anchors.slice(0, 3).map((point) => getProjection()?.(point)).filter(Boolean)
+            : [[entry.cx, entry.cy]];
+          points.forEach((point) => drawSoftLightBlob(point[0], point[1],
+            Math.max(2 / transform.k, (maxX - minX) * 0.65),
+            Math.max(2 / transform.k, (maxY - minY) * 0.65), {
+              rgb: coreRgb, alpha: entry.coreAlpha * entry.shapeBlend * 0.55 / Math.sqrt(points.length),
+              innerStop: 0.04, midStop: 0.48, innerAlphaScale: 1, midAlphaScale: 0.30,
+            }));
+        } finally {
+          maskContext.restore();
+        }
+        if (modernCityLightsDrawStats) modernCityLightsDrawStats.urbanShapes += 1;
+      });
+    });
+    context.save();
+    try {
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.globalAlpha = 1;
+      context.imageSmoothingEnabled = true;
+      context.drawImage(urbanShapeCanvas, 0, 0, width, height);
+    } finally {
+      context.restore();
+    }
   }
   
   function drawModernCityLightsCores(k, config, _intensity, coreEntries = null) {
@@ -757,7 +844,9 @@ export function createCityLightsRenderOwner({
     const coreInnerStop = 0.04 + ((1 - coreSharpness) * 0.06);
     const coreMidStop = 0.36 + ((1 - coreSharpness) * 0.18);
     const entries = Array.isArray(coreEntries) ? coreEntries : [];
+    drawModernUrbanShapes(entries, palette);
     entries.forEach((entry) => {
+      const pointAlpha = 1 - entry.shapeBlend * 0.7;
       drawSoftLightBlob(
         entry.cx,
         entry.cy,
@@ -766,7 +855,7 @@ export function createCityLightsRenderOwner({
         {
           rotation: entry.orientation,
           rgb: haloRgb,
-          alpha: entry.haloAlpha * haloAlphaScale,
+          alpha: entry.haloAlpha * haloAlphaScale * pointAlpha,
           innerStop: 0.06 + ((1 - coreSharpness) * 0.04),
           midStop: 0.5 + ((1 - coreSharpness) * 0.16),
           innerAlphaScale: 0.94,
@@ -782,7 +871,7 @@ export function createCityLightsRenderOwner({
         {
           rotation: entry.orientation,
           rgb: coreRgb,
-          alpha: entry.coreAlpha * coreAlphaScale,
+          alpha: entry.coreAlpha * coreAlphaScale * pointAlpha,
           innerStop: coreInnerStop,
           midStop: coreMidStop,
           innerAlphaScale: 1,
@@ -806,13 +895,15 @@ export function createCityLightsRenderOwner({
     const overscan = Math.max(28, Math.min(runtimeState.width, runtimeState.height) * 0.05);
     const urbanIndex = getUrbanCityPolicyOwner().getUrbanFeatureIndex();
     const minPopulation = zoomScale <= 1.1 ? 60000 : zoomScale <= 1.8 ? 30000 : 15000;
+    const visibleUrbanCityIds = new Set(urbanCoreEntries.flatMap((entry) => entry.feature.properties?.city_ids || []));
   
     cityCollection.features.forEach((feature) => {
       const props = feature?.properties || {};
       const population = Math.max(0, Number(props.__city_population || 0));
       const isCapital = !!props.__city_is_country_capital;
       if (!isCapital && population < minPopulation) return;
-      if (getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) return;
+      if (visibleUrbanCityIds.has(getCityCanonicalId(feature))) return;
+      if (!MODERN_CITY_LIGHTS_URBAN_AREAS && getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) return;
       const anchor = getCityAnchor(feature);
       const screenPoint = getCityScreenPoint(anchor);
       if (!anchor || !screenPoint) return;
@@ -860,14 +951,13 @@ export function createCityLightsRenderOwner({
       const coreAlphaScale = 0.9 + (coreSharpness * 0.48);
       const coreInnerStop = 0.04 + ((1 - coreSharpness) * 0.05);
       const coreMidStop = 0.36 + ((1 - coreSharpness) * 0.16);
-      const haloAlpha = clamp(
-        intensity * weight * (0.08 + (sample * 0.14) + ((1 - coreSharpness) * 0.04)) * zoomProfile.coreAlphaScale,
-        0,
+      const populationGain = getModernPopulationCoreGain(feature, config);
+      const haloAlpha = getSoftLightAlpha(
+        intensity * weight * populationGain * (0.08 + (sample * 0.14) + ((1 - coreSharpness) * 0.04)) * zoomProfile.coreAlphaScale,
         0.30
       );
-      const coreAlpha = clamp(
-        intensity * weight * textureOpacityScale * (0.18 + (coreSharpness * 0.3) + (sample * 0.24)) * zoomProfile.coreAlphaScale,
-        0,
+      const coreAlpha = getSoftLightAlpha(
+        intensity * weight * populationGain * textureOpacityScale * (0.18 + (coreSharpness * 0.3) + (sample * 0.24)) * zoomProfile.coreAlphaScale,
         0.48
       );
   
@@ -900,167 +990,6 @@ export function createCityLightsRenderOwner({
           midStop: coreMidStop,
           innerAlphaScale: 1,
           midAlphaScale: 0.34 + (coreSharpness * 0.18),
-        }
-      );
-    });
-  }
-  
-  function drawModernCityLightsPopulationBoostLayer(k, config, intensity) {
-    const pathCanvas = getPathCanvas();
-    if (!pathCanvas) return;
-    const boostStrength = getModernPopulationBoostStrength(config);
-    if (boostStrength <= 0) return;
-    const palette = getNightLightPalette("modern");
-    const zoomProfile = getModernCityLightsZoomProfile();
-    const textureOpacity = clamp(getModernDayNightNumber(config, "cityLightsTextureOpacity"), 0, 1);
-    const corridorStrength = clamp(getModernDayNightNumber(config, "cityLightsCorridorStrength"), 0, 1);
-    const textureOpacityScale = 0.32 + (textureOpacity * 0.68);
-    const corridorHaloScale = 0.72 + (corridorStrength * 0.28);
-    const haloRgb = getLightBlobRgb(palette.corridor);
-    const coreRgb = getLightBlobRgb(palette.glint);
-    const data = getModernCityLightsPopulationBoostData();
-    const transform = getZoomTransform();
-    const overscan = Math.max(32, Math.min(runtimeState.width, runtimeState.height) * 0.06);
-  
-    data.urbanEntries.forEach((entry) => {
-      const feature = entry.urbanFeature;
-      if (!feature || !pathBoundsInScreen(feature)) return;
-      const centroid = pathCanvas.centroid(feature);
-      const cx = Number(centroid?.[0]);
-      const cy = Number(centroid?.[1]);
-      if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
-      const screenX = (cx * transform.k) + transform.x;
-      const screenY = (cy * transform.k) + transform.y;
-      if (
-        screenX < -overscan
-        || screenX > runtimeState.width + overscan
-        || screenY < -overscan
-        || screenY > runtimeState.height + overscan
-      ) {
-        return;
-      }
-  
-      const geographicCentroid = getFeatureGeoCentroid(feature);
-      const sampled = geographicCentroid
-        ? sampleModernCityLightsGridNormalized(geographicCentroid[0], geographicCentroid[1])
-        : 0;
-      const glowMultiplier = geographicCentroid
-        ? getUrbanGlowMultiplierAt(geographicCentroid[0], geographicCentroid[1])
-        : 1;
-      const populationScore = clamp(Math.log10(entry.populationSum + 1) / 7.35, 0.12, 1.28);
-      const densityScore = clamp(Math.log10(entry.density + 1) / 4.4, 0.08, 1.24);
-      const capitalBoost = entry.capitalScore >= 3 ? 0.18 : entry.capitalScore >= 2 ? 0.1 : 0;
-      const boostWeight = clamp(
-        ((populationScore * 0.78) + (densityScore * 0.78) + (sampled * 0.16) + capitalBoost) * glowMultiplier,
-        0.16,
-        1.55
-      );
-      const areaRadiusBoost = clamp(Math.log10(entry.areaSqKm + 1) * 0.14, 0.06, 0.5);
-      const baseRadiusPx = 0.7 + (boostWeight * 0.78) + areaRadiusBoost;
-      const haloAlpha = clamp(
-        intensity * boostStrength * textureOpacityScale * corridorHaloScale * (0.13 + (boostWeight * 0.24)) * zoomProfile.coreAlphaScale,
-        0,
-        0.36
-      );
-      const coreAlpha = clamp(
-        intensity * boostStrength * textureOpacityScale * (0.25 + (boostWeight * 0.38)) * zoomProfile.coreAlphaScale,
-        0,
-        0.60
-      );
-      const aspectRatio = clamp(1.05 + (sampled * 0.08), 1.05, 1.16);
-      drawSoftLightBlob(
-        cx,
-        cy,
-        (baseRadiusPx * aspectRatio * 1.14 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        (baseRadiusPx * 1.02 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        {
-          rotation: 0,
-          rgb: haloRgb,
-          alpha: haloAlpha,
-          innerStop: 0.05,
-          midStop: 0.56,
-          innerAlphaScale: 0.82,
-          midAlphaScale: 0.2,
-        }
-      );
-      drawSoftLightBlob(
-        cx,
-        cy,
-        (baseRadiusPx * aspectRatio * 0.88 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        (baseRadiusPx * 0.82 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        {
-          rotation: 0,
-          rgb: coreRgb,
-          alpha: coreAlpha,
-          innerStop: 0.04,
-          midStop: 0.46,
-          innerAlphaScale: 0.94,
-          midAlphaScale: 0.36,
-        }
-      );
-    });
-  
-    data.cityEntries.forEach((entry) => {
-      const anchor = getCityAnchor(entry.feature);
-      const screenPoint = getCityScreenPoint(anchor);
-      if (!anchor || !screenPoint) return;
-      if (
-        screenPoint[0] < -overscan
-        || screenPoint[0] > runtimeState.width + overscan
-        || screenPoint[1] < -overscan
-        || screenPoint[1] > runtimeState.height + overscan
-      ) {
-        return;
-      }
-      const geographicCoords = getCityGeoCoordinates(entry.feature);
-      const sampled = geographicCoords
-        ? sampleModernCityLightsGridNormalized(geographicCoords[0], geographicCoords[1])
-        : 0;
-      const glowMultiplier = geographicCoords
-        ? getUrbanGlowMultiplierAt(geographicCoords[0], geographicCoords[1])
-        : 1;
-      const populationScore = clamp(Math.log10(entry.population + 1) / 6.8, 0.12, 1.08);
-      const capitalBoost = entry.capitalScore >= 3 ? 0.24 : entry.capitalScore >= 2 ? 0.14 : 0;
-      const boostWeight = clamp(((populationScore * 0.92) + (sampled * 0.16) + capitalBoost) * glowMultiplier, 0.18, 1.24);
-      const baseRadiusPx = 0.48 + (boostWeight * 0.58);
-      const haloAlpha = clamp(
-        intensity * boostStrength * textureOpacityScale * corridorHaloScale * (0.12 + (boostWeight * 0.18)) * zoomProfile.coreAlphaScale,
-        0,
-        0.28
-      );
-      const coreAlpha = clamp(
-        intensity * boostStrength * textureOpacityScale * (0.22 + (boostWeight * 0.28)) * zoomProfile.coreAlphaScale,
-        0,
-        0.46
-      );
-      drawSoftLightBlob(
-        anchor[0],
-        anchor[1],
-        (baseRadiusPx * 1.22 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        (baseRadiusPx * 1.08 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        {
-          rotation: 0,
-          rgb: haloRgb,
-          alpha: haloAlpha,
-          innerStop: 0.05,
-          midStop: 0.5,
-          innerAlphaScale: 0.82,
-          midAlphaScale: 0.2,
-        }
-      );
-      drawSoftLightBlob(
-        anchor[0],
-        anchor[1],
-        (baseRadiusPx * 0.98 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        (baseRadiusPx * 0.94 * zoomProfile.coreRadiusScale) / Math.max(0.0001, k),
-        {
-          rotation: 0,
-          rgb: coreRgb,
-          alpha: coreAlpha,
-          innerStop: 0.04,
-          midStop: 0.4,
-          innerAlphaScale: 0.94,
-          midAlphaScale: 0.36,
         }
       );
     });
@@ -1111,14 +1040,15 @@ export function createCityLightsRenderOwner({
     const context = getContext();
     if (!context) return;
     context.save();
-    context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
-    drawModernCityLightsTexture(config, intensity);
-    drawModernCityLightsCorridors(config, intensity);
-    const urbanCoreEntries = collectModernUrbanCoreEntries(k, config, intensity);
-    drawModernCityLightsCores(k, config, intensity, urbanCoreEntries);
-    drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries);
-    drawModernCityLightsPopulationBoostLayer(k, config, intensity);
-    context.restore();
+    try {
+      context.globalCompositeOperation = getSafeBlendMode("screen", "lighter");
+      drawModernCityLightsTexture(config, intensity);
+      const urbanCoreEntries = collectModernUrbanCoreEntries(k, config, intensity);
+      drawModernCityLightsCores(k, config, intensity, urbanCoreEntries);
+      drawModernCityFallbackLights(k, config, intensity, urbanCoreEntries);
+    } finally {
+      context.restore();
+    }
   }
   
   function getModernCityLightsStaticLayerCanvas(k, config, intensity) {
@@ -1133,10 +1063,11 @@ export function createCityLightsRenderOwner({
       && modernCityLightsStaticLayerCache.width === width
       && modernCityLightsStaticLayerCache.height === height
     ) {
-      recordRenderPerfMetric("modernCityLightsStaticLayerCache", 0, { hit: true });
+      recordRenderPerfMetric("modernCityLightsStaticLayerCache", 0, { hit: true, globalUrbanReady: !!MODERN_CITY_LIGHTS_URBAN_AREAS });
       return modernCityLightsStaticLayerCache.canvas;
     }
   
+    const started = now();
     const canvas = modernCityLightsStaticLayerCache.canvas || createModernCityLightsStaticLayerCanvas(width, height);
     if (!canvas) return null;
     if (canvas.width !== width) canvas.width = width;
@@ -1145,15 +1076,24 @@ export function createCityLightsRenderOwner({
     if (!layerContext) return null;
   
     const layout = getRenderPassLayout("dayNight");
-    withRenderTarget(layerContext, () => {
-      const layerK = prepareTargetContext(layerContext, runtimeState.zoomTransform, layout);
-      drawModernCityLightsStaticLayer(layerK || k, config, intensity);
-    });
+    const drawStats = { blobs: 0, spriteBuilds: 0, urbanShapes: 0 };
+    modernCityLightsDrawStats = drawStats;
+    try {
+      withRenderTarget(layerContext, () => {
+        const layerK = prepareTargetContext(layerContext, runtimeState.zoomTransform, layout);
+        drawModernCityLightsStaticLayer(layerK || k, config, intensity);
+      });
+    } finally {
+      modernCityLightsDrawStats = null;
+    }
     modernCityLightsStaticLayerCache.key = key;
     modernCityLightsStaticLayerCache.canvas = canvas;
     modernCityLightsStaticLayerCache.width = width;
     modernCityLightsStaticLayerCache.height = height;
-    recordRenderPerfMetric("modernCityLightsStaticLayerCache", 0, { hit: false });
+    recordRenderPerfMetric("modernCityLightsStaticLayerCache", Math.max(0, now() - started), {
+      hit: false, ...drawStats, spriteCacheSize: lightBlobSpriteCache.size, width, height,
+      globalUrbanReady: !!MODERN_CITY_LIGHTS_URBAN_AREAS,
+    });
     return canvas;
   }
   
@@ -1501,6 +1441,7 @@ export function createCityLightsRenderOwner({
 
   function drawNightLightsLayer(k, config, solarState) {
     if (!config?.cityLightsEnabled) {
+      urbanShapeLoadAttempted = false;
       return;
     }
     const variant = String(config.cityLightsStyle || "modern").trim().toLowerCase();
@@ -1516,9 +1457,16 @@ export function createCityLightsRenderOwner({
         }
         return;
       }
+      if (assetProvider?.ensureUrbanShapeAssets && !assetProvider.isUrbanShapeAssetsReady() && !urbanShapeLoadAttempted) {
+        urbanShapeLoadAttempted = true;
+        assetProvider.ensureUrbanShapeAssets()
+          .then(() => onModernAssetsReady())
+          .catch((error) => onModernAssetsError(error));
+      }
       drawModernNightLightsLayer(k, config, solarState);
       return;
     }
+    urbanShapeLoadAttempted = false;
     drawHistoricalNightLightsLayer(k, config, solarState);
   }
 

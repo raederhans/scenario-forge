@@ -11,7 +11,7 @@
   "scenario_id": "hgo_1936",
   "snapshot_fingerprint": "50e4549461533a3d7bf6c4b4e400a69252e9a37d0b040d20be9cdc594bc03b3a",
   "source": {
-    "base_topology_sha256": "fb14c9f83cc27fd9884ecffbb3624debea5f5f86fc2be269e2c0bc645f5bacd9",
+    "base_topology_sha256": "8159bc03c9321a2e7d26a7e08526fe6fbc0973f2f7aad779e868bcd5adb6a005",
     "build_snapshot_sha256": "ddb1ea544caf573736c10037254d8d75022146bc23fbe99300b795dfa74aef3e",
     "hgo_provinces_bmp_sha256": "d353ea3b41ca98fd1029eae290b5a43cacce12e5d5603cd970d47f87398c49a2",
     "hgo_seed_sha256": "7bbf8cf338a4b9961f9c5f19217cc4b8df457463685e47cb051f77a475ff6e69",

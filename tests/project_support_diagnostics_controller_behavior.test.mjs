@@ -466,6 +466,69 @@ test("project download defaults to save dialog destination", async () => {
   assert.deepEqual(calls, [{ format: "json", destination: "picker", packageContents: "recommended" }]);
 });
 
+test("workspace save shares export options, guards both buttons, and reports cancellation and errors", async () => {
+  const downloadProjectBtn = createButtonNode();
+  const workspaceSaveBtn = createButtonNode();
+  const workspaceSaveStatus = createStatusNode();
+  workspaceSaveStatus.dataset.i18n = "Not saved yet";
+  const projectState = { isDirty: true, lastDirtyReason: "edit" };
+  let settle;
+  let calls = 0;
+  const controller = createController(createStatusNode(), {
+    state: projectState,
+    elements: { downloadProjectBtn, workspaceSaveBtn, workspaceSaveStatus },
+    helpers: {
+      fileManager: {
+        exportProject: async (receivedState, options) => {
+          calls += 1;
+          assert.equal(receivedState, projectState);
+          assert.deepEqual(options, { format: "json", destination: "picker", packageContents: "recommended" });
+          return new Promise((resolve, reject) => { settle = { resolve, reject }; });
+        },
+      },
+    },
+  });
+  controller.bindEvents();
+  controller.bindEvents();
+  assert.equal(workspaceSaveStatus.textContent, "Unsaved changes");
+  const pending = workspaceSaveBtn.listeners.click();
+  assert.equal(downloadProjectBtn.disabled, true);
+  assert.equal(workspaceSaveBtn.disabled, true);
+  assert.match(workspaceSaveStatus.textContent, /Exporting project/);
+  assert.equal(workspaceSaveStatus.dataset.i18n, undefined);
+  await downloadProjectBtn.listeners.click();
+  assert.equal(calls, 1);
+  settle.resolve(false);
+  await pending;
+  assert.equal(workspaceSaveStatus.textContent, "Project export cancelled.");
+  assert.equal(projectState.isDirty, true);
+  assert.equal(downloadProjectBtn.disabled, false);
+  assert.equal(workspaceSaveBtn.disabled, false);
+  const failing = downloadProjectBtn.listeners.click();
+  settle.reject(new Error("Save dialog failed"));
+  await failing;
+  assert.equal(workspaceSaveStatus.textContent, "Save dialog failed");
+  assert.equal(workspaceSaveBtn.disabled, false);
+});
+
+test("workspace save status follows dirty contract without requiring the detailed status node", () => {
+  const workspaceSaveStatus = createStatusNode();
+  const projectState = { isDirty: false, lastDirtyReason: "" };
+  const controller = createController(null, { state: projectState, elements: { workspaceSaveStatus } });
+  for (const [reason, dirty, expected] of [
+    ["", false, "Not saved yet"],
+    ["project-export", false, "Project downloaded"],
+    ["project-import", false, "Project imported"],
+    ["project-export", true, "Unsaved changes"],
+  ]) {
+    projectState.lastDirtyReason = reason;
+    projectState.isDirty = dirty;
+    controller.refreshProjectSaveStatus();
+    assert.equal(workspaceSaveStatus.textContent, expected);
+    assert.equal(workspaceSaveStatus.dataset.i18n, expected);
+  }
+});
+
 test("scenario audit panel renders special zone runtime diagnostics in the right diagnostics area", () => {
   const previousDocument = globalThis.document;
   const previousActiveScenarioId = state.activeScenarioId;

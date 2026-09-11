@@ -181,9 +181,14 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         const featureId = getFeatureId(feature);
         const props = feature?.properties || {};
         if (!featureId.startsWith("ATLISL_")) continue;
-        if (props.atl_geometry_role !== "donor_island" || props.atl_join_mode !== "boolean_weld") continue;
-        if (requiredIslandIds.has(featureId)) visitedRequiredIds.add(featureId);
-        visitedBooleanWeldIds.add(featureId);
+        if (props.atl_geometry_role !== "donor_island") continue;
+        const isRequired = requiredIslandIds.has(featureId);
+        if (isRequired) {
+          visitedRequiredIds.add(featureId);
+          assert.equal(props.atl_join_mode, featureId === "ATLISL_aegean_crete" ? "boolean_weld" : "none");
+        }
+        if (props.atl_join_mode === "boolean_weld") visitedBooleanWeldIds.add(featureId);
+        else if (!isRequired) continue;
         for (const polygonCoordinates of getPolygonCoordinateSets(feature.geometry)) {
           polygonCoordinates.slice(1).forEach((ring, ringIndex) => {
             interiorRingSamples.push({

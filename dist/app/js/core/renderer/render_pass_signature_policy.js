@@ -272,6 +272,9 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "borders") {
       return [
         transformSignature,
+        runtimeState.showWaterRegions ? "water:on" : "water:off",
+        runtimeState.showScenarioAtlantropa !== false ? "atlantropa:on" : "atlantropa:off",
+        getScenarioOverlaySignatureToken(),
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.topologyRevision || 0,
         getBorderAppearanceRevision(),

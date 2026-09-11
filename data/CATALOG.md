@@ -1,8 +1,8 @@
 # Data Catalog
 
-- generated_at: 2026-08-14T20:52:35.840939+00:00
+- generated_at: 2026-09-11T02:47:14.044292+00:00
 - version: 1
-- entries: 662
+- entries: 663
 
 ## Counts by role
 
@@ -62,6 +62,7 @@
 | transport_subtype_catalog | 1 |
 | unit_counter_manifest | 1 |
 | world_cities | 1 |
+| world_urban_lights | 1 |
 
 ## Entries
 
@@ -727,5 +728,6 @@
 | transport:usa_road:full:roads | data/transport_layers/usa_road/roads.topo.json | transport_pack | topojson | json | schema://topojson/line_collection/roads_v1 |  | default | python tools/build_transport_country_real_packs.py --pack usa_road |  |
 | unit_counter_manifest:hoi4 | data/unit_counter_libraries/hoi4/manifest.json | unit_counter_manifest | json | json | schema://json/object/v1 |  | no-cache | runtime_asset_registry.assets.unit_counter_manifest:hoi4 |  |
 | world_cities | data/world_cities.geojson | world_cities | geojson | json | schema://geojson/feature_collection/v1 | data/manifest.json::outputs::world_cities.geojson::sha256 | default | init_map_data.world_cities |  |
+| world_urban_lights | data/world_urban_lights.geojson | world_urban_lights | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::world_urban_lights_natural_earth::current_local_sha256 | default | source_ledger | world_urban_lights_natural_earth |
 | manifest_output:js/core/city_lights_historical_1930_asset.js | js/core/city_lights_historical_1930_asset.js | historical_1930_city_lights_asset | javascript | module | schema://javascript/module/v1 | data/manifest.json::outputs::js/core/city_lights_historical_1930_asset.js::sha256 | module | init_map_data.city_lights_assets |  |
 | manifest_output:js/core/city_lights_modern_asset.js | js/core/city_lights_modern_asset.js | modern_city_lights_asset | javascript | module | schema://javascript/module/v1 | data/manifest.json::outputs::js/core/city_lights_modern_asset.js::sha256 | module | init_map_data.city_lights_assets |  |
