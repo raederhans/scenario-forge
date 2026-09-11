@@ -11,6 +11,10 @@ on:
         required: false
         type: boolean
         default: true
+      run-golden-demo:
+        required: false
+        type: boolean
+        default: false
       pages-artifact-only:
         required: false
         type: boolean
@@ -41,6 +45,10 @@ jobs:
             full|pr-fast|pr-smoke|demo|deploy-minimal) ;;
             *) echo "::error::unknown verification profile: $VERIFY_PROFILE"; exit 2 ;;
           esac
+          if [ "${{ inputs.run-golden-demo }}" = "true" ] && [ "$VERIFY_PROFILE" != "pr-smoke" ]; then
+            echo "::error::run-golden-demo requires the pr-smoke profile"
+            exit 2
+          fi
 
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -239,7 +247,8 @@ jobs:
         run: python -m unittest tests.test_e2e_structural_tooling -q
 
       - name: Run strict TNO scenario contract gate
-        if: inputs.profile == 'full' || inputs.profile == 'pr-fast'
+        # PR scenario contracts are owned by Scenario Contract Matrix.
+        if: inputs.profile == 'full'
         run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
@@ -263,15 +272,15 @@ jobs:
             .runtime/tests/playwright/**/failure-context.json
 
       - name: Run Golden Demo E2E
-        if: inputs.profile == 'demo'
+        if: inputs.profile == 'demo' || inputs.run-golden-demo
         run: npm run verify:demo
 
       - name: Write Demo timing summary
-        if: always() && inputs.profile == 'demo'
+        if: always() && (inputs.profile == 'demo' || inputs.run-golden-demo)
         run: npm run verify:test-timing-summary
 
       - name: Upload Demo timing and failure-context artifacts
-        if: always() && inputs.profile == 'demo'
+        if: always() && (inputs.profile == 'demo' || inputs.run-golden-demo)
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: demo-timing-and-failure-context

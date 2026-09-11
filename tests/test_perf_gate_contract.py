@@ -2,6 +2,11 @@ import importlib.util
 import hashlib
 import json
 import re
+import os
+import shutil
+import subprocess
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -42,6 +47,94 @@ def canonical_json_sha256(payload):
         separators=(",", ":"),
     ).encode("utf-8")
     return hashlib.sha256(canonical_bytes).hexdigest()
+
+
+@unittest.skipUnless(shutil.which("pwsh"), "workflow classifier requires PowerShell 7")
+class PerfWorkflowClassifierTest(unittest.TestCase):
+    def classify(self, files, *, event="pull_request", base=None, head=None, diff_failure=False):
+        workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
+        script = textwrap.dedent(workflow.split("        run: |\n", 1)[1].split("\n      - name:", 1)[0])
+        runtime = REPO_ROOT / ".runtime" / "tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="perf-classifier-", dir=runtime) as directory:
+            root = Path(directory)
+            fixture = {
+                "files": files, "diffFailure": diff_failure,
+                "base": json.dumps(base or {"scripts": {"test:isolated": "node test.mjs"}}),
+                "head": head if isinstance(head, str) else json.dumps(head or base or {"scripts": {"test:isolated": "node test.mjs"}}),
+            }
+            (root / "fixture.json").write_text(json.dumps(fixture), encoding="utf-8")
+            (root / "event.json").write_text(json.dumps({"pull_request": {"base": {"sha": "base"}, "head": {"sha": "head"}}}), encoding="utf-8")
+            stub = r'''
+$ErrorActionPreference = 'Stop'
+$fixture = Get-Content -Raw fixture.json | ConvertFrom-Json
+function git {
+  $global:LASTEXITCODE = 0
+  switch ($args[0]) {
+    'rev-parse' { if ($args[1] -eq 'HEAD^') { 'parent' } else { 'candidate' } }
+    'cat-file' { }
+    'show' { if ($args[1] -eq 'base:package.json') { $fixture.base } else { $fixture.head } }
+    'diff' { if ($fixture.diffFailure) { $global:LASTEXITCODE = 1 } else { $fixture.files } }
+    default { throw "Unexpected git call: $args" }
+  }
+}
+'''
+            (root / "classify.ps1").write_text(stub + script, encoding="utf-8")
+            result = subprocess.run(
+                [shutil.which("pwsh"), "-NoProfile", "-File", str(root / "classify.ps1")],
+                cwd=root, env={**os.environ, "GITHUB_EVENT_PATH": str(root / "event.json"),
+                               "GITHUB_EVENT_NAME": event, "GITHUB_OUTPUT": str(root / "output"),
+                               "GITHUB_STEP_SUMMARY": str(root / "summary")},
+                capture_output=True, text=True, encoding="utf-8", timeout=30,
+            )
+            if diff_failure:
+                self.assertNotEqual(result.returncode, 0)
+                return None
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            return json.loads((root / ".runtime/reports/generated/perf-pr-gate-classifier.json").read_text(encoding="utf-8-sig"))
+
+    def test_scheduled_and_manual_runs_force_measurement_with_parent_baseline(self):
+        workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
+        self.assertIn("  schedule:", workflow)
+        self.assertIn("  workflow_dispatch:", workflow)
+        self.assertNotIn("  push:", workflow)
+        for event in ("schedule", "workflow_dispatch"):
+            with self.subTest(event=event):
+                audit = self.classify([], event=event)
+                self.assertTrue(audit["should_run_perf"])
+                self.assertTrue(audit["should_enforce_regressions"])
+                self.assertEqual(audit["base_sha"], "parent")
+
+    def test_path_classification_preserves_runtime_and_baseline_coverage(self):
+        for path, runs, enforces in (
+            ("docs/perf/notes.md", False, False),
+            ("docs/perf/baseline.json", True, False),
+            ("js/any_module.js", True, True),
+            ("package-lock.json", True, False),
+        ):
+            with self.subTest(path=path):
+                audit = self.classify([path])
+                self.assertEqual(audit["should_run_perf"], runs)
+                self.assertEqual(audit["should_enforce_regressions"], enforces)
+
+    def test_manifest_exempts_only_isolated_nonperf_test_scripts(self):
+        base = {"scripts": {"test:isolated": "node test.mjs", "perf:gate": "node tools/perf/run.mjs"}, "engines": {"node": ">=18"}}
+        for head, runs in (
+            ({**base, "scripts": {**base["scripts"], "test:isolated": "node other.mjs"}}, False),
+            ({**base, "engines": {"node": ">=22"}}, True),
+            ({**base, "dependencies": {"example": "1"}}, True),
+            ({**base, "scripts": {**base["scripts"], "perf:gate": "node changed.mjs"}}, True),
+            ({**base, "scripts": {**base["scripts"], "preinstall": "node setup.mjs"}}, True),
+            ("{invalid", True),
+        ):
+            with self.subTest(head=head):
+                self.assertEqual(self.classify(["package.json"], base=base, head=head)["should_run_perf"], runs)
+        referenced = {"scripts": {"test:isolated": "node test.mjs", "perf:gate": "npm run test:isolated"}}
+        changed = {"scripts": {**referenced["scripts"], "test:isolated": "node changed.mjs"}}
+        self.assertTrue(self.classify(["package.json"], base=referenced, head=changed)["should_run_perf"])
+
+    def test_diff_failure_does_not_become_successful_skip(self):
+        self.classify([], diff_failure=True)
 
 
 class PerfGateContractTest(unittest.TestCase):

@@ -401,7 +401,7 @@ export const CATALOG_POLICIES = {
       {
         "id": "demo",
         "commandRef": "verify:demo",
-        "consumer": "pr-verify-demo"
+        "consumer": "pr-verify-smoke"
       }
     ]
   },
