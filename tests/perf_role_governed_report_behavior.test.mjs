@@ -30,6 +30,7 @@ import {
   shouldBlockOnPerfRegressions,
   summarizeSnapshot,
   validateGateBaselineReport,
+  validateGateBaselinePreflight,
   validateBaselineOutputSelection,
   validateGateCurrentReport,
   validateGateScenarioSelection,
@@ -1019,6 +1020,46 @@ test("baseline admission rejects predecessor schemas and requires the current sc
       /schema mismatch/,
     );
   }
+});
+
+test("baseline preflight rejects static mismatches without candidate measurements", async () => {
+  const baselineJson = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-07-30.json");
+  const baseline = JSON.parse(await fs.readFile(baselineJson, "utf8"));
+  const options = { ...baseline.config, baselineJson, scenarioShard: null,
+    renderSampleRunProfileId: baseline.renderSampleRolePolicy.runProfile.id };
+  assert.doesNotThrow(() => validateGateBaselinePreflight(baseline, options));
+  for (const [key, value] of [["runs", 6], ["warmups", 4], ["urlQuery", { perf: 1, extra: 1 }]]) {
+    assert.throws(() => validateGateBaselinePreflight(baseline, { ...options, [key]: value }), new RegExp(`${key} mismatch`));
+  }
+  const wrongScope = structuredClone(baseline);
+  wrongScope.scope = "scenario-shard";
+  wrongScope.scenarioShard = "tno_1962";
+  assert.throws(() => validateGateBaselinePreflight(wrongScope, options), /scope mismatch/);
+  assert.throws(() => validateGateBaselinePreflight(baseline, { ...options, scenarios: ["tno_1962"], scenarioShard: "tno_1962" }), /scenario sequence mismatch/);
+  const shard = structuredClone(baseline);
+  shard.scope = "scenario-shard";
+  shard.scenarioShard = "tno_1962";
+  shard.config.scenarios = ["tno_1962"];
+  shard.workloadIdentity.scenarioIds = ["tno_1962"];
+  delete shard.scenarios.hoi4_1939;
+  delete shard.workloadIdentity.scenarios.hoi4_1939;
+  bindReportRawEvidenceHashes(shard);
+  const shardOptions = { ...options, scenarioShard: "tno_1962", scenarios: ["tno_1962"] };
+  assert.doesNotThrow(() => validateGateBaselinePreflight(shard, shardOptions));
+  shard.workloadIdentity.scenarioIds.push("hoi4_1939");
+  assert.throws(() => validateGateBaselinePreflight(shard, shardOptions), /scenario shard workload/);
+  const missingRaw = structuredClone(baseline);
+  delete missingRaw.scenarios.tno_1962.runs[0].snapshot;
+  assert.throws(() => validateGateBaselinePreflight(missingRaw, options), /SHA256 does not match embedded evidence/);
+  const wrongPolicy = structuredClone(baseline);
+  wrongPolicy.renderSampleRolePolicy.extraProtocol = "drift";
+  assert.throws(() => validateGateBaselinePreflight(wrongPolicy, options), /role policy mismatch/);
+});
+
+test("performance dependency lock changes invalidate clean measurement admission", () => {
+  const classified = classifyPerfDirtyPaths(parseGitPorcelainZ(" M requirements-perf.lock.txt\0"));
+  assert.deepEqual(classified.harnessPaths, ["requirements-perf.lock.txt"]);
+  assert.deepEqual(classified.allowedPaths, []);
 });
 
 test("baseline admission requires the exact gate scenario sequence", () => {

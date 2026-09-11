@@ -980,36 +980,44 @@ function hasValidStandardPerfQuiescence(settlement, snapshot, scenarioId) {
 }
 
 export async function readStandardPerfObservation(page, targetUrl) {
-  return page.evaluate(async (url) => {
-    const root = new URL("./", url);
-    const [{ state }, boundary, renderer] = await Promise.all([
-      import(new URL("js/core/state.js", root).href),
-      import(new URL("js/core/render_boundary.js", root).href),
-      import(new URL("js/core/map_renderer.js", root).href),
-    ]);
-    // Read the real queues and the sample snapshot in the same task, after all
-    // imports resolve. Cached postReady reasonStateHint is not a live queue.
-    const main = globalThis.__mapcreator__?.snapshot?.()?.loadStatus?.providers?.main_runtime;
-    const asyncSupported = typeof renderer.getRendererAsyncWorkStatus === "function";
-    const asyncWork = asyncSupported ? renderer.getRendererAsyncWorkStatus() : null;
-    const status = {
-      activeScenarioId: state.activeScenarioId, bootPhase: state.bootPhase, bootBlocking: !!state.bootBlocking,
-      startupReadonly: !!state.startupReadonly, startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
-      scenarioApplyInFlight: !!state.scenarioApplyInFlight, bootError: String(state.bootError || ""), renderPhase: state.renderPhase,
-      isInteracting: !!state.isInteracting, deferExactAfterSettle: !!state.deferExactAfterSettle,
-      zoomRenderScheduled: !!state.zoomRenderScheduled, pendingZoomTransform: !!state.pendingZoomTransform,
-      activeInteractionRecoveryTaskKey: state.activeInteractionRecoveryTaskKey || "",
-      interactionInfrastructureReady: !!state.interactionInfrastructureReady,
-      interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
-      hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
-      detailDeferred: !!state.detailDeferred, detailPromotionCompleted: !!state.detailPromotionCompleted,
-      chunkRuntime: main?.chunkRuntime, postReadyScheduler: main?.postReadyScheduler,
-      renderBoundary: boundary.getRenderBoundaryDebugState(),
-      asyncWork: { supported: asyncSupported, ...(asyncWork || {}) },
-      capabilityMode: asyncSupported ? "renderer-async-status" : "legacy-renderer-without-async-status",
-    };
-    return { status, snapshot: globalThis.__mc_perf__?.snapshot?.() ?? null, observedAt: Date.now() };
-  }, targetUrl);
+  return page.evaluate(observeStandardPerfPage, targetUrl);
+}
+
+export async function observeStandardPerfPage(url, loadModule = (href) => import(href)) {
+  const root = new URL("./", url);
+  const cacheKey = Symbol.for("mapcreator.standard-perf-observation-modules");
+  let cached = globalThis[cacheKey];
+  if (!cached || cached.root !== root.href) {
+    cached = { root: root.href, modules: Promise.all([
+      loadModule(new URL("js/core/state.js", root).href),
+      loadModule(new URL("js/core/render_boundary.js", root).href),
+      loadModule(new URL("js/core/map_renderer.js", root).href),
+    ]) };
+    globalThis[cacheKey] = cached;
+  }
+  const [{ state }, boundary, renderer] = await cached.modules;
+  // Read the real queues and the sample snapshot in the same task, after all
+  // imports resolve. Cached postReady reasonStateHint is not a live queue.
+  const main = globalThis.__mapcreator__?.snapshot?.()?.loadStatus?.providers?.main_runtime;
+  const asyncSupported = typeof renderer.getRendererAsyncWorkStatus === "function";
+  const asyncWork = asyncSupported ? renderer.getRendererAsyncWorkStatus() : null;
+  const status = {
+    activeScenarioId: state.activeScenarioId, bootPhase: state.bootPhase, bootBlocking: !!state.bootBlocking,
+    startupReadonly: !!state.startupReadonly, startupReadonlyUnlockInFlight: !!state.startupReadonlyUnlockInFlight,
+    scenarioApplyInFlight: !!state.scenarioApplyInFlight, bootError: String(state.bootError || ""), renderPhase: state.renderPhase,
+    isInteracting: !!state.isInteracting, deferExactAfterSettle: !!state.deferExactAfterSettle,
+    zoomRenderScheduled: !!state.zoomRenderScheduled, pendingZoomTransform: !!state.pendingZoomTransform,
+    activeInteractionRecoveryTaskKey: state.activeInteractionRecoveryTaskKey || "",
+    interactionInfrastructureReady: !!state.interactionInfrastructureReady,
+    interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
+    hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
+    detailDeferred: !!state.detailDeferred, detailPromotionCompleted: !!state.detailPromotionCompleted,
+    chunkRuntime: main?.chunkRuntime, postReadyScheduler: main?.postReadyScheduler,
+    renderBoundary: boundary.getRenderBoundaryDebugState(),
+    asyncWork: { supported: asyncSupported, ...(asyncWork || {}) },
+    capabilityMode: asyncSupported ? "renderer-async-status" : "legacy-renderer-without-async-status",
+  };
+  return { status, snapshot: globalThis.__mc_perf__?.snapshot?.() ?? null, observedAt: Date.now() };
 }
 
 export async function waitForStandardPerfSettlement(readObservation, scenarioId, {
@@ -1230,7 +1238,9 @@ async function measureOneRun(browser, baseUrl, scenarioId, options = {}) {
     if (!snapshot) {
       throw new Error("window.__mc_perf__.snapshot() returned null.");
     }
-    const activeScenarioId = String((await readPerfRuntimeState(page)).activeScenarioId || "").trim();
+    const activeScenarioId = String((options.renderSampleRunProfileId === SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID
+      ? snapshot.standardPerfSettlement.status
+      : await readPerfRuntimeState(page)).activeScenarioId || "").trim();
     if (activeScenarioId !== normalizeScenarioId(scenarioId)) {
       throw new Error(
         `[perf-baseline] Scenario activation mismatch for ${scenarioId}: activeScenarioId=${activeScenarioId || "<empty>"}`
@@ -2088,30 +2098,54 @@ export function collectGovernedRenderSampleRoleMismatches(
   return mismatches;
 }
 
-export function collectBaselineContractMismatches(currentReport, baselineReport, options = {}) {
-  const mismatches = [
-    ...getPerfReportContractMismatches(currentReport, "current", "gate"),
-    ...getPerfReportContractMismatches(baselineReport, "baseline", "baseline"),
-  ];
+function collectReportScopeMismatches(report, label, options = {}) {
+  const mismatches = [];
   const scenarioShard = options.scenarioShard ?? null;
   const expectedScenarioIds = scenarioShard === null ? DEFAULT_GATE_SCENARIOS : [scenarioShard];
   if (scenarioShard !== null && !DEFAULT_GATE_SCENARIOS.includes(scenarioShard)) {
     mismatches.push(`unsupported scenario shard: ${JSON.stringify(scenarioShard)}`);
   }
-  for (const [label, report] of [["baseline", baselineReport], ["current", currentReport]]) {
-    const expectedScope = scenarioShard === null ? "full" : "scenario-shard";
-    if ((report?.scope ?? "full") !== expectedScope
-      || (report?.scenarioShard ?? null) !== scenarioShard) {
-      mismatches.push(`${label}.scope mismatch: expected=${expectedScope} scenarioShard=${JSON.stringify(scenarioShard)}`);
-    }
-    if (scenarioShard !== null && (
-      JSON.stringify(Object.keys(report?.scenarios || {})) !== JSON.stringify(expectedScenarioIds)
-      || JSON.stringify(Object.keys(report?.workloadIdentity?.scenarios || {})) !== JSON.stringify(expectedScenarioIds)
-      || JSON.stringify(report?.workloadIdentity?.scenarioIds) !== JSON.stringify(expectedScenarioIds)
-    )) {
-      mismatches.push(`${label}.scenario shard workload must exactly match ${JSON.stringify(expectedScenarioIds)}`);
+  const expectedScope = scenarioShard === null ? "full" : "scenario-shard";
+  if ((report?.scope ?? "full") !== expectedScope
+    || (report?.scenarioShard ?? null) !== scenarioShard) {
+    mismatches.push(`${label}.scope mismatch: expected=${expectedScope} scenarioShard=${JSON.stringify(scenarioShard)}`);
+  }
+  if (scenarioShard !== null && (
+    JSON.stringify(Object.keys(report?.scenarios || {})) !== JSON.stringify(expectedScenarioIds)
+    || JSON.stringify(Object.keys(report?.workloadIdentity?.scenarios || {})) !== JSON.stringify(expectedScenarioIds)
+    || JSON.stringify(report?.workloadIdentity?.scenarioIds) !== JSON.stringify(expectedScenarioIds)
+  )) {
+    mismatches.push(`${label}.scenario shard workload must exactly match ${JSON.stringify(expectedScenarioIds)}`);
+  }
+  return mismatches;
+}
+
+export function validateGateBaselinePreflight(baselineReport, options) {
+  validateGateScenarioSelection(options.scenarios, options);
+  validateGateBaselineReport(baselineReport, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);
+  const mismatches = collectReportScopeMismatches(baselineReport, "baseline", options);
+  for (const key of ["runs", "warmups", "urlQuery"]) {
+    if (!isDeepStrictEqual(baselineReport.config?.[key], options[key])) {
+      mismatches.push(`${key} mismatch: baseline=${JSON.stringify(baselineReport.config?.[key])} requested=${JSON.stringify(options[key])}`);
     }
   }
+  if (!isDeepStrictEqual(baselineReport.renderSampleRolePolicy, buildRenderSampleRolePolicyIdentity(options.renderSampleRunProfileId))) {
+    mismatches.push("render sample role policy mismatch: baseline must use the requested measurement contract");
+  }
+  if (mismatches.length) {
+    throw new Error(`[perf-baseline] Baseline preflight mismatch:\n${mismatches.map((item) => `- ${item}`).join("\n")}`);
+  }
+}
+
+export function collectBaselineContractMismatches(currentReport, baselineReport, options = {}) {
+  const mismatches = [
+    ...getPerfReportContractMismatches(currentReport, "current", "gate"),
+    ...getPerfReportContractMismatches(baselineReport, "baseline", "baseline"),
+    ...collectReportScopeMismatches(baselineReport, "baseline", options),
+    ...collectReportScopeMismatches(currentReport, "current", options),
+  ];
+  const scenarioShard = options.scenarioShard ?? null;
+  const expectedScenarioIds = scenarioShard === null ? DEFAULT_GATE_SCENARIOS : [scenarioShard];
   if (!isDeepStrictEqual(currentReport?.renderSampleRolePolicy, baselineReport?.renderSampleRolePolicy)) {
     mismatches.push("render sample role policy mismatch: baseline and current must use the same measurement contract");
   }
@@ -2350,7 +2384,7 @@ async function main() {
     }
     const baselineOracle = await readJsonAndSha256Strict(options.baselineJson, "baseline report");
     baselineReportForGate = baselineOracle.payload;
-    validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);
+    validateGateBaselinePreflight(baselineReportForGate, options);
     baselineOracleBeforeSha256 = baselineOracle.sha256;
   }
   const environmentAdmission = await runStandardPerfAdmission(options);

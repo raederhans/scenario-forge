@@ -28,6 +28,7 @@ export const STANDARD_PERF_DIRTY_RULES = Object.freeze({
     "tools/dev_server.py",
     "package.json",
     "package-lock.json",
+    "requirements-perf.lock.txt",
     "playwright.config.cjs",
   ]),
 });

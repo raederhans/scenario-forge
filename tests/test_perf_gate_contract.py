@@ -74,7 +74,10 @@ function git {
     'rev-parse' { if ($args[1] -eq 'HEAD^') { 'parent' } else { 'candidate' } }
     'cat-file' { }
     'show' { if ($args[1] -eq 'base:package.json') { $fixture.base } else { $fixture.head } }
-    'diff' { if ($fixture.diffFailure) { $global:LASTEXITCODE = 1 } else { $fixture.files } }
+    'diff' { if ($fixture.diffFailure) { $global:LASTEXITCODE = 1 } else {
+      $outputArg = $args | Where-Object { $_ -like '--output=*' } | Select-Object -First 1
+      [IO.File]::WriteAllText($outputArg.Substring(9), ($fixture.files -join [char]0))
+    } }
     default { throw "Unexpected git call: $args" }
   }
 }
@@ -110,6 +113,7 @@ function git {
             ("docs/perf/notes.md", False, False),
             ("docs/perf/baseline.json", True, False),
             ("js/any_module.js", True, True),
+            ("js/地图\nwith newline.js", True, True),
             ("package-lock.json", True, False),
         ):
             with self.subTest(path=path):
@@ -133,40 +137,113 @@ function git {
         changed = {"scripts": {**referenced["scripts"], "test:isolated": "node changed.mjs"}}
         self.assertTrue(self.classify(["package.json"], base=referenced, head=changed)["should_run_perf"])
 
+    def test_native_git_preserves_renamed_unicode_paths_and_both_sides(self):
+        workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
+        script = textwrap.dedent(workflow.split("        run: |\n", 1)[1].split("\n      - name:", 1)[0])
+        runtime = REPO_ROOT / ".runtime" / "tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="perf-native-classifier-", dir=runtime) as directory:
+            root = Path(directory)
+
+            def git(*args):
+                return subprocess.run(["git", *args], cwd=root, check=True,
+                                      capture_output=True, text=True, encoding="utf-8").stdout.strip()
+
+            git("init")
+            git("config", "user.name", "test")
+            git("config", "user.email", "test@example.invalid")
+            old_path = "js/\u5730\u56fe module.js"
+            new_path = "docs/moved module.md"
+            (root / "js").mkdir()
+            (root / old_path).write_text("unchanged content", encoding="utf-8")
+            git("add", ".")
+            git("commit", "-m", "base")
+            base_sha = git("rev-parse", "HEAD")
+            (root / "docs").mkdir()
+            git("mv", old_path, new_path)
+            git("commit", "-m", "rename")
+            head_sha = git("rev-parse", "HEAD")
+            (root / "event.json").write_text(json.dumps({"pull_request": {
+                "base": {"sha": base_sha}, "head": {"sha": head_sha}}}), encoding="utf-8")
+            (root / "classify.ps1").write_text("$ErrorActionPreference = 'Stop'\n" + script, encoding="utf-8")
+            completed = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-File", "classify.ps1"],
+                cwd=root, capture_output=True, text=True, encoding="utf-8", timeout=30,
+                env={**os.environ, "GITHUB_EVENT_PATH": str(root / "event.json"),
+                     "GITHUB_EVENT_NAME": "pull_request", "GITHUB_OUTPUT": str(root / "output"),
+                     "GITHUB_STEP_SUMMARY": str(root / "summary")})
+            self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+            audit = json.loads((root / ".runtime/reports/generated/perf-pr-gate-classifier.json").read_text(encoding="utf-8-sig"))
+            self.assertCountEqual(audit["changed_files"], [old_path, new_path])
+            self.assertTrue(audit["should_run_perf"])
+            self.assertTrue(audit["should_enforce_regressions"])
+            self.assertEqual(audit["candidate_sha"], head_sha)
+
     def test_diff_failure_does_not_become_successful_skip(self):
         self.classify([], diff_failure=True)
 
 
 class PerfGateContractTest(unittest.TestCase):
+    def test_performance_lock_is_pinned_and_aligned_with_development_environment(self):
+        def read_lock(name):
+            return {line.strip() for line in (REPO_ROOT / name).read_text(encoding="utf-8").splitlines()
+                    if line.strip() and not line.lstrip().startswith("#")}
+        perf = read_lock("requirements-perf.lock.txt")
+        dev = read_lock("requirements-dev.lock.txt")
+        self.assertTrue(perf)
+        self.assertTrue(perf < dev, perf - dev)
+        self.assertTrue(all(re.fullmatch(r"[A-Za-z0-9_.-]+==[A-Za-z0-9_.+-]+", item) for item in perf))
+        names = {item.split("==")[0] for item in perf}
+        self.assertTrue({"geopandas", "numpy", "pandas", "pyogrio", "pyproj", "shapely", "topojson", "requests", "six"} <= names)
+        self.assertFalse({"matplotlib", "rasterio", "scikit-learn", "pytest"} & names)
+
     def test_workflow_runs_complete_scenarios_on_independent_runners(self):
         from tests.test_e2e_structural_tooling import parse_workflow_job_blocks
 
         workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
         jobs = parse_workflow_job_blocks(workflow)
-        self.assertEqual(set(jobs), {"perf-scenarios", "perf-gate"})
+        self.assertEqual(set(jobs), {"classify", "perf-scenarios", "perf-gate"})
         scenario_job = jobs["perf-scenarios"]
         self.assertIn("runs-on: windows-latest", scenario_job)
         self.assertIn("fail-fast: false", scenario_job)
         self.assertIn("scenario: [tno_1962, hoi4_1939]", scenario_job)
         self.assertNotIn("max-parallel: 1", scenario_job)
         self.assertNotIn("continue-on-error", scenario_job)
-        self.assertNotRegex(scenario_job, r"(?m)^    if:")
+        self.assertIn("    needs: [classify]", scenario_job)
+        self.assertIn("    if: needs.classify.outputs.should_run_perf == 'true'", scenario_job)
+        self.assertIn("ref: ${{ needs.classify.outputs.candidate_sha }}", scenario_job)
+        classifier_job = jobs["classify"]
+        self.assertIn("runs-on: ubuntu-latest", classifier_job)
+        self.assertIn("fetch-depth: 0", classifier_job)
+        self.assertIn("sparse-checkout-cone-mode: false", classifier_job)
+        self.assertIn("            /package.json", classifier_job)
+        self.assertIn("            /package-lock.json", classifier_job)
+        self.assertNotIn("npm ci", classifier_job)
+        self.assertIn("git diff --name-only --no-renames -z", classifier_job)
         self.assertEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 2)
         self.assertIn("--runs 5 --warmups 3", scenario_job)
-        for artifact in ("perf-pr-gate-classifier-audit", "perf-pr-gate-evidence"):
+        for artifact in ("perf-pr-gate-evidence",):
             self.assertIn(f"name: {artifact}-${{{{ matrix.scenario }}}}", scenario_job)
         aggregator = jobs["perf-gate"]
         self.assertIn("    name: perf-gate", aggregator)
         self.assertIn("    if: always()", aggregator)
-        self.assertIn("    needs: [perf-scenarios]", aggregator)
+        self.assertIn("    needs: [classify, perf-scenarios]", aggregator)
 
     def test_perf_aggregator_rejects_failed_cancelled_skipped_or_missing_matrix(self):
         workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
         script = textwrap.dedent(workflow.rsplit("          node <<'NODE'\n", 1)[1].split("          NODE", 1)[0])
-        cases = [( {"perf-scenarios": {"result": state}}, state == "success")
-                 for state in ("success", "failure", "cancelled", "skipped", "unknown")]
-        cases.extend([({}, False), ({"other": {"result": "success"}}, False),
-                      ({"perf-scenarios": {"result": "success"}, "extra": {}}, False)])
+        cases = []
+        for classification in ("success", "failure", "cancelled", "skipped", "unknown"):
+            for decision in ("true", "false", "", "unknown", None):
+                for state in ("success", "failure", "cancelled", "skipped", "unknown"):
+                    cases.append(({
+                        "classify": {"result": classification, "outputs": {"should_run_perf": decision}},
+                        "perf-scenarios": {"result": state},
+                    }, classification == "success" and ((decision == "true" and state == "success") or
+                                                        (decision == "false" and state == "skipped"))))
+        cases.extend([({}, False), ({"perf-scenarios": {"result": "success"}}, False),
+                      ({"classify": {"result": "success"}, "perf-scenarios": {"result": "success"}}, False),
+                      ({"classify": {"result": "success", "outputs": {"should_run_perf": "true"}},
+                        "perf-scenarios": {"result": "success"}, "extra": {}}, False)])
         for results, expected in cases:
             with self.subTest(results=results):
                 completed = subprocess.run(["node", "-e", script], capture_output=True, text=True,
@@ -207,7 +284,9 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertRegex(workflow_content, r'node-version:\s*[\"\']22[\"\']')
         self.assertRegex(workflow_content, r'python-version:\s*[\"\']3\.12[\"\']')
         self.assertIn("cache: 'pip'", workflow_content)
-        self.assertIn("python -m pip install -r requirements-dev.lock.txt", workflow_content)
+        self.assertIn("python -m pip install --no-deps -r requirements-perf.lock.txt", workflow_content)
+        self.assertIn("python -m pip check", workflow_content)
+        self.assertIn('python -c "import tools.dev_server"', workflow_content)
         self.assertIn("npx playwright install chromium", workflow_content)
         self.assertIn("npm run perf:gate", workflow_content)
         self.assertIn(
@@ -247,12 +326,12 @@ class PerfGateContractTest(unittest.TestCase):
             workflow_content,
         )
         self.assertIn(
-            "$regressionMode = if ('${{ steps.classify.outputs.should_enforce_regressions }}' -eq 'true')",
+            "$regressionMode = if ('${{ needs.classify.outputs.should_enforce_regressions }}' -eq 'true')",
             workflow_content,
         )
         self.assertIn("--regression-mode $regressionMode", workflow_content)
         self.assertLess(
-            workflow_content.index("python -m pip install -r requirements-dev.lock.txt"),
+            workflow_content.index("python -m pip install --no-deps -r requirements-perf.lock.txt"),
             workflow_content.index("      - name: Run perf gate"),
         )
 
@@ -263,7 +342,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('"candidate_sha=$candidateSha"', workflow_content)
         self.assertIn("$candidateSha = (git rev-parse HEAD).Trim()", workflow_content)
         self.assertIn(
-            '$diffRange = if ($baseSha) { "$baseSha...$diffHeadSha" } else { $diffHeadSha }',
+            '$diffRange = "$baseSha...$diffHeadSha"',
             workflow_content,
         )
         self.assertIn("Generate same-runner base baseline", workflow_content)
@@ -279,7 +358,7 @@ class PerfGateContractTest(unittest.TestCase):
             workflow_content.index("      - name: Run perf gate")
         ]
         self.assertIn(
-            "$candidateSha = '${{ steps.classify.outputs.candidate_sha }}'",
+            "$candidateSha = '${{ needs.classify.outputs.candidate_sha }}'",
             same_runner_step,
         )
         self.assertIn("$governedHeadInputs = @(", same_runner_step)
@@ -341,7 +420,7 @@ class PerfGateContractTest(unittest.TestCase):
         workflow_content = WORKFLOW_FILE.read_text(encoding="utf-8")
         self.assertIn("- name: Upload perf evidence", workflow_content)
         self.assertIn(
-            "if: always() && steps.classify.outputs.should_run_perf == 'true'",
+            "if: always() && needs.classify.outputs.should_run_perf == 'true'",
             workflow_content,
         )
         self.assertIn("name: perf-pr-gate-evidence", workflow_content)
@@ -541,12 +620,14 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('path.join(options.rawDir, "perf-admission.json")', runner)
         self.assertLess(
             runner.index('const baselineOracle = await readJsonAndSha256Strict(options.baselineJson, "baseline report");'),
-            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);"),
+            runner.index("validateGateBaselinePreflight(baselineReportForGate, options);"),
         )
         self.assertLess(
-            runner.index("validateGateBaselineReport(baselineReportForGate, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);"),
+            runner.index("validateGateBaselinePreflight(baselineReportForGate, options);"),
             runner.index("const environmentAdmission = await runStandardPerfAdmission(options);"),
         )
+        preflight = runner.split("export function validateGateBaselinePreflight(baselineReport, options) {", 1)[1].split("\n}", 1)[0]
+        self.assertIn("validateGateBaselineReport(baselineReport, options.scenarios, options.baselineJson, options.renderSampleRunProfileId);", preflight)
         self.assertIn("baselineReportForGate = baselineOracle.payload;", runner)
         self.assertIn("baselineOracleBeforeSha256 = baselineOracle.sha256;", runner)
         self.assertLess(
