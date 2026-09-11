@@ -58,8 +58,10 @@ const BOOT_COPY = {
       message: "The default scenario is loaded.",
     },
     error: {
-      title: "Startup blocked",
-      message: "The default scenario could not be prepared. Retry or continue with the base map.",
+      title: "The map could not be opened",
+      message: "Reload the page to try again.",
+      continueMessage: "Try again, or open the base map without a scenario.",
+      details: "Technical details",
     },
   },
   zh: {
@@ -98,8 +100,10 @@ const BOOT_COPY = {
       message: "默认剧本已经就绪。",
     },
     error: {
-      title: "启动被阻断",
-      message: "默认剧本未能完成启动。你可以重试，或先进入基础地图。",
+      title: "地图未能打开",
+      message: "请重新加载页面，再试一次。",
+      continueMessage: "你可以重试，或不加载剧本，先进入基础地图。",
+      details: "技术详情",
     },
   },
 };
@@ -133,6 +137,9 @@ function getBootDom() {
     overlay: document.getElementById("bootOverlay"),
     title: document.getElementById("bootOverlayTitle"),
     message: document.getElementById("bootOverlayMessage"),
+    errorDetails: document.getElementById("bootOverlayErrorDetails"),
+    errorSummary: document.getElementById("bootOverlayErrorSummary"),
+    errorText: document.getElementById("bootOverlayErrorText"),
     progressTrack: document.getElementById("bootOverlayProgress"),
     progressBar: document.getElementById("bootOverlayProgressBar"),
     progressText: document.getElementById("bootOverlayProgressText"),
@@ -216,6 +223,8 @@ export function createStartupBootOverlayController() {
     }
     const dom = getBootDom();
     const copy = getBootCopy(runtimeState.bootPhase);
+    const shellCopy = getBootCopy("shell");
+    const failed = runtimeState.bootPhase === "error";
     const blocking = runtimeState.bootBlocking !== false;
     document.body?.classList.toggle("app-booting", blocking);
     document.body?.classList.toggle("app-startup-readonly", !!runtimeState.startupReadonly);
@@ -226,34 +235,55 @@ export function createStartupBootOverlayController() {
       // so we must toggle the `.hidden` class — not the HTML attribute, and
       // not a `--visible` modifier class that doesn't exist in the stylesheet.
       dom.overlay.classList.toggle("hidden", !blocking);
+      dom.overlay.setAttribute("aria-busy", String(blocking && !failed));
     }
     if (dom.appShell) {
       dom.appShell.classList.toggle("boot-preview-visible", !!runtimeState.bootPreviewVisible);
     }
     if (dom.title) {
-      dom.title.textContent = String(runtimeState.bootError ? copy.title : copy.title || "");
+      dom.title.textContent = String(copy.title || "");
     }
     if (dom.message) {
-      dom.message.textContent = String(runtimeState.bootError || runtimeState.bootMessage || copy.message || "");
+      dom.message.textContent = failed
+        ? (runtimeState.bootCanContinueWithoutScenario ? copy.continueMessage : copy.message)
+        : String(runtimeState.bootMessage || copy.message || "");
+    }
+    if (dom.errorDetails) {
+      const showDetails = failed && !!runtimeState.bootError;
+      dom.errorDetails.hidden = !showDetails;
+      dom.errorDetails.classList.toggle("hidden", !showDetails);
+      if (!showDetails) dom.errorDetails.open = false;
+    }
+    if (dom.errorSummary) {
+      dom.errorSummary.textContent = getBootCopy("error").details;
+    }
+    if (dom.errorText) {
+      dom.errorText.textContent = failed ? runtimeState.bootError : "";
     }
     if (dom.progressTrack) {
-      dom.progressTrack.hidden = !blocking;
+      dom.progressTrack.hidden = !blocking || failed;
+      dom.progressTrack.classList.toggle("hidden", !blocking || failed);
     }
     if (dom.progressBar) {
       dom.progressBar.style.width = `${Math.max(0, Math.min(100, Number(runtimeState.bootProgress || 0)))}%`;
     }
     if (dom.progressText) {
+      dom.progressText.hidden = !blocking || failed;
+      dom.progressText.classList.toggle("hidden", !blocking || failed);
       dom.progressText.textContent = `${Math.round(Math.max(0, Math.min(100, Number(runtimeState.bootProgress || 0))))}%`;
     }
     if (dom.actions) {
-      dom.actions.hidden = runtimeState.bootPhase !== "error";
+      dom.actions.hidden = !failed;
+      dom.actions.classList.toggle("hidden", !failed);
     }
     if (dom.retryBtn) {
-      dom.retryBtn.textContent = copy.retry || BOOT_COPY.en.shell.retry;
+      dom.retryBtn.textContent = shellCopy.retry;
     }
     if (dom.continueBtn) {
-      dom.continueBtn.textContent = copy.continue || BOOT_COPY.en.shell.continue;
-      dom.continueBtn.hidden = !runtimeState.bootCanContinueWithoutScenario;
+      dom.continueBtn.textContent = shellCopy.continue;
+      const showContinue = failed && runtimeState.bootCanContinueWithoutScenario;
+      dom.continueBtn.hidden = !showContinue;
+      dom.continueBtn.classList.toggle("hidden", !showContinue);
     }
     if (dom.readonlyBanner) {
       const readonlyVisible = !!runtimeState.startupReadonly && !blocking;

@@ -1043,6 +1043,10 @@ a.button {
   outline-offset: 3px;
 }
 
+.sample-run-card__actions a:first-child {
+  font-weight: 800;
+}
+
 .sample-run-card__recipe {
   margin-top: 12px;
   padding: 13px;

@@ -2,6 +2,14 @@
   "geo_stack": {
     "description": "Tests that import geospatial/scientific packages (geopandas/shapely/rasterio/numpy family).",
     "patterns": [
+      "tests/test_atlantropa_coastline.py",
+      "tests/test_atlantropa_geometry_quality.py",
+      "tests/test_atlantropa_identity.py",
+      "tests/test_atlantropa_island_alignment.py",
+      "tests/test_atlantropa_island_groups.py",
+      "tests/test_atlantropa_land_join.py",
+      "tests/test_atlantropa_precision.py",
+      "tests/test_check_atlantropa_geometry.py",
       "tests/test_city_assets.py",
       "tests/test_city_data_contract.py",
       "tests/test_global_transport_builder_contracts.py",
@@ -10,6 +18,7 @@
       "tests/test_pages_dist_startup_shell_heavy.py",
       "tests/test_patch_checked_in_urban_artifacts.py",
       "tests/test_physical_context_contours.py",
+      "tests/test_physical_water_mask.py",
       "tests/test_polar_water_spherical_safety.py",
       "tests/test_political_topology_gap_contract.py",
       "tests/test_reviewed_place_names.py",
@@ -18,7 +27,10 @@
       "tests/test_tno_named_marginal_water_contract.py",
       "tests/test_tno_water_geometries.py",
       "tests/test_transport_country_source_contracts.py",
-      "tests/test_urban_topology_contract.py"
+      "tests/test_urban_topology_contract.py",
+      "tests/test_water_geometry.py",
+      "tests/test_water_region_authority.py",
+      "tests/test_world_urban_lights_asset.py"
     ]
   }
 }

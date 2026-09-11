@@ -372,7 +372,16 @@ export function createBorderMeshOwner({
     const primaryTopology = state.topologyPrimary || state.topology || null;
     const runtimeTopology = state.runtimePoliticalTopology || null;
     const scenarioId = String(state.activeScenarioId || "").trim();
-    const scenarioSurfaceVersionSignal = String(getScenarioSurfaceVersionSignal() || "");
+    const hasDedicatedCoastline = !!runtimeTopology?.objects?.scenario_coastline;
+    const atlantropaLandVisible = !!state.showWaterRegions && state.showScenarioAtlantropa !== false
+      && (state.scenarioAtlantropaData?.features || []).some(
+        (feature) => feature?.properties?.atl_render_layer === "land"
+      );
+    const scenarioSurfaceVersionSignal = [
+      String(getScenarioSurfaceVersionSignal() || ""),
+      `coastline-land:${atlantropaLandVisible}`,
+      `topology:${Number(state.topologyRevision || 0)}`,
+    ].join("|");
 
     const cacheMatches =
       scenarioCoastlineSourceCache.primaryRef === primaryTopology &&
@@ -384,8 +393,9 @@ export function createBorderMeshOwner({
     }
     const { decision } = evaluateCoastlineTopologySource({
       primaryTopology,
-      runtimeTopology,
+      runtimeTopology: hasDedicatedCoastline && !atlantropaLandVisible ? null : runtimeTopology,
       scenarioId,
+      ...(hasDedicatedCoastline ? { runtimeObjectNames: ["scenario_coastline"] } : {}),
       scenarioCoastlineMaxAreaDeltaRatio,
       scenarioCoastlineMaxInteriorRingCount,
       scenarioCoastlineMaxInteriorRingRatio,
@@ -436,6 +446,22 @@ export function createBorderMeshOwner({
       getLineLength,
     });
 
+  let coastlineMeshCache = null;
+  function ensureCoastlineMeshes({ mid = {}, low = {} } = {}) {
+    const decision = resolveCoastlineTopologySource();
+    if (coastlineMeshCache?.decision === decision
+      && coastlineMeshCache.collection === state.cachedCoastlines) return;
+    const mesh = buildGlobalCoastlineMesh(decision);
+    const high = isUsableMesh(mesh) ? [mesh] : [];
+    const midMesh = high.length ? simplifyCoastlineMesh(mesh, mid) : null;
+    const lowMesh = high.length ? simplifyCoastlineMesh(mesh, low) : null;
+    state.cachedCoastlines = high;
+    state.cachedCoastlinesHigh = high;
+    state.cachedCoastlinesMid = isUsableMesh(midMesh) ? [midMesh] : high;
+    state.cachedCoastlinesLow = isUsableMesh(lowMesh) ? [lowMesh] : state.cachedCoastlinesMid;
+    coastlineMeshCache = { decision, collection: high };
+  }
+
   return {
     clearPendingDynamicBorderTimer,
     markDynamicBordersDirty,
@@ -458,5 +484,6 @@ export function createBorderMeshOwner({
     resolveCoastlineTopologySource,
     buildGlobalCoastlineMesh,
     simplifyCoastlineMesh,
+    ensureCoastlineMeshes,
   };
 }

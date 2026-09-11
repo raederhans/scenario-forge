@@ -1,11 +1,12 @@
 # Worktree Registry
 
-## 当前导航（2026-09-10）
+## 当前导航（2026-09-11）
 
 这里只维护当前工作入口。分支、远端、进程和验收状态的历史快照统一见下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
+| [9 月 11 日整批改动整合](daily-integration-20260911/task.md) | 用户授权合并当天全部产品改动；分支 `codex/daily-integration-20260911`，基于已合并 PR #131 的 `d25da73a`。覆盖城市灯光、海洋几何、亚特兰托帕、UI 与国家名称；远端检查和合并回执以关联 PR 为准。保留 contours 工作树及历史诊断文件。 |
 | [近期地图改动整合](cartography-integration-20260910/task.md) | 整合等值线P1–P4、城区渲染、TNO地名及地中海补缝；本地目标测试、三剧本严格契约、dist及两组地图检查通过。交付分支codex/cartography-integration-20260910，main与远端检查状态以任务回执为准；原工作区和contours证据工作区保留。 |
 | [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) / [PR #127](https://github.com/raederhans/scenario-forge/pull/127) | 本轮导入事务、调度生命周期、城市身份及发布产物改进已完成本地验证。用户已授权远端合并推送和工作树清理；必需检查、合并与清理结果以该任务及下方回执为准。完整 P4 未准入。 |
 | [恢复后续 R0 / T1 / U1 / P1](recovery-followup-20260908/task.md) | PR #123 已合并，但自动部署因 tracked dist 漂移失败。当前先闭合产物与夹具，再开展导入反馈和单热点性能改进；状态以任务记录为准。 |

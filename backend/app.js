@@ -102,25 +102,58 @@ function renderStaticText() {
     node.textContent = t(node.dataset.i18n);
   });
   el.languageToggle.textContent = t("languageButton");
+  document.querySelectorAll(".dialog-close").forEach((button) => {
+    button.setAttribute("aria-label", state.locale === "zh" ? "关闭" : "Close");
+  });
 }
 
 function setView(view) {
   state.view = view;
   document.querySelectorAll("[data-view]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.view === view);
+    const active = button.dataset.view === view;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    button.tabIndex = active ? 0 : -1;
   });
   document.querySelectorAll("[data-view-panel]").forEach((panel) => {
-    panel.classList.toggle("active", panel.dataset.viewPanel === view);
+    const active = panel.dataset.viewPanel === view;
+    panel.classList.toggle("active", active);
+    panel.hidden = !active;
   });
   renderGates();
 }
 
 function setAdminTab(tab) {
   document.querySelectorAll("[data-admin-tab]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.adminTab === tab);
+    const active = button.dataset.adminTab === tab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    button.tabIndex = active ? 0 : -1;
   });
   document.querySelectorAll("[data-admin-panel]").forEach((panel) => {
-    panel.classList.toggle("active", panel.dataset.adminPanel === tab);
+    const active = panel.dataset.adminPanel === tab;
+    panel.classList.toggle("active", active);
+    panel.hidden = !active;
+  });
+}
+
+function bindTablistKeyboard(selector, attribute, onSelect) {
+  const buttons = Array.from(document.querySelectorAll(selector));
+  buttons.forEach((button) => {
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const candidates = buttons.filter((item) => !item.hidden && !item.disabled);
+      const index = candidates.indexOf(button);
+      if (index < 0 || !candidates.length) return;
+      const nextIndex = event.key === "Home"
+        ? 0
+        : event.key === "End" ? candidates.length - 1
+          : (index + (event.key === "ArrowRight" ? 1 : -1) + candidates.length) % candidates.length;
+      const next = candidates[nextIndex];
+      next.focus();
+      onSelect(next.getAttribute(attribute));
+    });
   });
 }
 
@@ -498,6 +531,8 @@ function bindEvents() {
     const target = event.target.closest("[data-admin-tab]");
     if (target) setAdminTab(target.dataset.adminTab);
   });
+  bindTablistKeyboard("[data-view]", "data-view", setView);
+  bindTablistKeyboard("[data-admin-tab]", "data-admin-tab", setAdminTab);
   el.openLogin.addEventListener("click", () => openAuth("login"));
   el.openRegister.addEventListener("click", () => openAuth("register"));
   el.authSubmit.addEventListener("click", async (event) => {
@@ -565,6 +600,8 @@ function showToast(message) {
 
 async function boot() {
   renderStaticText();
+  setView(state.view);
+  setAdminTab("activity");
   bindEvents();
   if (!isLocalBackendRuntimeAvailable()) {
     showToast(t("backendUnavailable"));

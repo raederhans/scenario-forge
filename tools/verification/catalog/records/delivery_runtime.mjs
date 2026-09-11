@@ -677,6 +677,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "id": "node:test:node:backend-console-helpers",
     "commandRef": "test:node:backend-console-helpers",
     "sourceRefs": [
+      "backend/app.js", "backend/index.html", "backend/styles.css",
       "tests/backend_console_helpers.test.mjs",
       "backend/backend_console_helpers.js"
     ],

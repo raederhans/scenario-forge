@@ -477,5 +477,38 @@
     "provenance_sidecar": "data/hgo_catalogs/hgo_descriptor.provenance.json",
     "status": "frozen_local_only",
     "local_presence": "optional_cache"
+  },
+  {
+    "source_id": "natural_earth_10m_urban_areas_zip",
+    "local_path": ".runtime/tmp/world-urban/ne_10m_urban_areas.zip",
+    "origin_kind": "download",
+    "upstream_url": "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip",
+    "immutable_ref": "sha256:2c593114e954ce1adb297ddee5465f05d9e81fa0a26deb13f8500d58a00d7051",
+    "current_local_sha256": "2c593114e954ce1adb297ddee5465f05d9e81fa0a26deb13f8500d58a00d7051",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-urban-area/",
+    "consumers": [
+      "tools/build_world_urban_lights_asset.py",
+      "data/world_urban_lights.geojson"
+    ],
+    "rebuild_command": "python tools/build_world_urban_lights_asset.py --download",
+    "status": "frozen_verified",
+    "local_presence": "optional_cache"
+  },
+  {
+    "source_id": "world_urban_lights_natural_earth",
+    "local_path": "data/world_urban_lights.geojson",
+    "origin_kind": "generated",
+    "upstream_url": "https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_urban_areas.zip",
+    "immutable_ref": "source ZIP sha256:2c593114e954ce1adb297ddee5465f05d9e81fa0a26deb13f8500d58a00d7051; output embeds city input digest",
+    "current_local_sha256": "ac77a0a2ed2710b74ca8cd6f5fd76150897545dd92b4d19c718bce0d06acb4b7",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/10m-urban-area/",
+    "consumers": [
+      "data/runtime_asset_registry.json"
+    ],
+    "rebuild_command": "python tools/build_world_urban_lights_asset.py",
+    "status": "frozen_verified",
+    "local_presence": "required"
   }
 ]

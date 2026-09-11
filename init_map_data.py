@@ -1508,7 +1508,7 @@ def build_water_regions(
     excluded_marine_targets = mediterranean_targets | inland_marine_targets
 
     selected_marine = _select_named_water_features(marine_polys, MAJOR_MARINE_WATER_NAMES)
-    seen_ids: set[str] = set()
+    records_by_id: dict[str, dict] = {}
     for row in selected_marine.itertuples(index=False):
         row_series = pd.Series(row._asdict())
         name = _resolve_feature_name(row_series)
@@ -1521,9 +1521,12 @@ def build_water_regions(
         if geometry is None or geometry.is_empty:
             continue
         feature_id = _slugify_water_id("marine", name)
-        if feature_id in seen_ids:
+        if feature_id in records_by_id:
+            # Translated names can intentionally share an ID (North/South
+            # Atlantic/Pacific). Preserve both geographic parts.
+            previous = records_by_id[feature_id]
+            previous["geometry"] = _repair_geometry(unary_union([previous["geometry"], geometry]))
             continue
-        seen_ids.add(feature_id)
         water_type = _infer_water_type(name)
         is_open_ocean = water_type == "ocean"
         records.append(
@@ -1541,6 +1544,7 @@ def build_water_regions(
                 "geometry": geometry,
             }
         )
+        records_by_id[feature_id] = records[-1]
 
     for spec in SEEDED_LAKE_REGION_SPECS:
         source_layer = str(spec.get("source_layer", "lakes")).strip().lower()

@@ -50,6 +50,20 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("coastline border pixels invalidate on overlay visibility and geometry arrival", () => {
+  let overlay = "pending";
+  const { state, policy } = createHarness({ getScenarioOverlaySignatureToken: () => overlay });
+  const initial = policy.getRenderPassSignature("borders");
+  state.showWaterRegions = true;
+  const water = policy.getRenderPassSignature("borders");
+  assert.notEqual(water, initial);
+  state.showScenarioAtlantropa = false;
+  const hidden = policy.getRenderPassSignature("borders");
+  assert.notEqual(hidden, water);
+  overlay = "land-loaded";
+  assert.notEqual(policy.getRenderPassSignature("borders"), hidden);
+});
+
 test("border pixels depend on country appearance rather than unrelated individual color edits", () => {
   let appearanceRevision = 1;
   const { state, policy } = createHarness({ getBorderAppearanceRevision: () => appearanceRevision });

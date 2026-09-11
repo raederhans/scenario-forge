@@ -2058,6 +2058,8 @@ function getCityLightsRenderOwner() {
       getDefaultZoomTransform: () => globalThis.d3?.zoomIdentity || { x: 0, y: 0, k: 1 },
       getEffectiveCityCollection,
       getFeatureGeoCentroid,
+      getProjectedFeatureBounds,
+      getProjectedGeographicPath,
       getRenderPassLayout,
       getSafeBlendMode,
       getTransformSignature,
@@ -7969,33 +7971,7 @@ function rebuildStaticMeshes({
     runtimeState.cachedCountryBorders.push(countryMesh);
   }
 
-  const coastlineMesh = buildGlobalCoastlineMesh(coastlineSourceDecision || primaryTopology);
-  if (isUsableMesh(coastlineMesh)) {
-    runtimeState.cachedCoastlines.push(coastlineMesh);
-    runtimeState.cachedCoastlinesHigh.push(coastlineMesh);
-
-    const coastlineMid = simplifyCoastlineMesh(coastlineMesh, {
-      epsilon: COASTLINE_SIMPLIFY_MID_EPSILON,
-      minLength: COASTLINE_SIMPLIFY_MID_MIN_LENGTH,
-    });
-    const coastlineLow = simplifyCoastlineMesh(coastlineMesh, {
-      epsilon: COASTLINE_SIMPLIFY_LOW_EPSILON,
-      minLength: COASTLINE_SIMPLIFY_LOW_MIN_LENGTH,
-    });
-
-    if (isUsableMesh(coastlineMid)) {
-      runtimeState.cachedCoastlinesMid.push(coastlineMid);
-    } else {
-      runtimeState.cachedCoastlinesMid.push(coastlineMesh);
-    }
-    if (isUsableMesh(coastlineLow)) {
-      runtimeState.cachedCoastlinesLow.push(coastlineLow);
-    } else if (isUsableMesh(coastlineMid)) {
-      runtimeState.cachedCoastlinesLow.push(coastlineMid);
-    } else {
-      runtimeState.cachedCoastlinesLow.push(coastlineMesh);
-    }
-  }
+  ensureCoastlineMeshes();
 
   // Province/local border meshes are viewport- and zoom-dependent. Building them
   // synchronously here turns startup and chunk promotion into a per-country
@@ -10146,7 +10122,17 @@ function getBathymetryCollectionBySource(collection, source) {
   return getBathymetryStylePolicy().getBathymetryCollectionBySource(collection, source);
 }
 
+function ensureCoastlineMeshes() {
+  getBorderMeshOwner().ensureCoastlineMeshes({
+    mid: { epsilon: COASTLINE_SIMPLIFY_MID_EPSILON, minLength: COASTLINE_SIMPLIFY_MID_MIN_LENGTH },
+    low: { epsilon: COASTLINE_SIMPLIFY_LOW_EPSILON, minLength: COASTLINE_SIMPLIFY_LOW_MIN_LENGTH },
+  });
+}
+
 function getCoastlineCollectionForZoom(k) {
+  // Visibility toggles may only invalidate a render pass. Refresh coastline LOD
+  // independently so they do not require rebuilding every political border.
+  ensureCoastlineMeshes();
   if (k < COASTLINE_LOD_LOW_ZOOM_MAX) {
     return runtimeState.cachedCoastlinesLow?.length ? runtimeState.cachedCoastlinesLow : runtimeState.cachedCoastlines;
   }

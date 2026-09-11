@@ -13,9 +13,17 @@ LEGACY_MODERN_CITY_LIGHTS_RENDER_OWNER_JS = (
 
 CITY_LIGHTS_RESPONSIBILITIES = {
     "owner_state_and_caches": (
+        "modernCityLightsCells",
         "modernCityLightsGeometryCache",
         "modernCityLightsPopulationBoostCache",
         "modernCityLightsStaticLayerCache",
+        "lightBlobSpriteCache",
+        "LIGHT_BLOB_SPRITE_SIZE",
+        "LIGHT_BLOB_SPRITE_LIMIT",
+        "modernCityLightsDrawStats",
+        "urbanShapeCanvas",
+        "urbanShapeLoadAttempted",
+        "globalUrbanByCityId",
         "historicalCityLightsDerivedGlowCache",
         "historicalCityLightsFallbackCache",
         "DEFAULT_MODERN_DAY_NIGHT_CONFIG",
@@ -26,7 +34,9 @@ CITY_LIGHTS_RESPONSIBILITIES = {
         "drawLightEllipse",
         "getLightBlobRgb",
         "toRgbaString",
+        "getLightBlobSprite",
         "drawSoftLightBlob",
+        "getSoftLightAlpha",
         "getSignedHashUnit",
     ),
     "modern_geometry_and_sampling": (
@@ -34,11 +44,11 @@ CITY_LIGHTS_RESPONSIBILITIES = {
         "getModernCityLightsGridValue",
         "getModernCityLightsNormalizationDenominator",
         "normalizeModernCityLightsValue",
+        "getModernCityLightsCells",
         "sampleModernCityLightsGridNormalized",
         "getModernCityLightsGeometry",
         "shouldCullModernLightEntry",
         "getModernCityLightsZoomProfile",
-        "getModernGridEntryJitter",
         "getModernCityLightLatitudeFade",
     ),
     "modern_population_and_static_canvas": (
@@ -46,6 +56,7 @@ CITY_LIGHTS_RESPONSIBILITIES = {
         "isModernPopulationBoostEnabled",
         "getModernPopulationBoostStrength",
         "getModernCityLightsPopulationBoostData",
+        "getModernPopulationCoreGain",
         "getModernCityLightsStaticConfigSignature",
         "getModernCityLightsStaticLayerKey",
         "createModernCityLightsStaticLayerCanvas",
@@ -53,11 +64,10 @@ CITY_LIGHTS_RESPONSIBILITIES = {
     ),
     "modern_draw_bodies": (
         "drawModernCityLightsTexture",
-        "drawModernCityLightsCorridors",
         "collectModernUrbanCoreEntries",
+        "drawModernUrbanShapes",
         "drawModernCityLightsCores",
         "drawModernCityFallbackLights",
-        "drawModernCityLightsPopulationBoostLayer",
         "drawModernCityLightsStaticLayer",
         "drawModernNightLightsLayer",
     ),
@@ -397,18 +407,13 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIsNotNone(texture_match)
         texture_body = texture_match.group("body")
         self.assertIn('getModernDayNightNumber(config, "cityLightsTextureOpacity")', texture_body)
-        self.assertIn("textureOpacity <= 0", texture_body)
+        self.assertIn('getModernDayNightNumber(config, "cityLightsCorridorStrength")', texture_body)
+        self.assertIn("textureOpacity <= 0 && corridorStrength <= 0", texture_body)
         self.assertIn("textureOpacity *", texture_body)
-
-        corridor_match = re.search(
-            r"function drawModernCityLightsCorridors\(config, intensity\) \{(?P<body>[\s\S]*?)\n  \}",
-            owner_content,
-        )
-        self.assertIsNotNone(corridor_match)
-        corridor_body = corridor_match.group("body")
-        self.assertIn('getModernDayNightNumber(config, "cityLightsCorridorStrength")', corridor_body)
-        self.assertIn("corridorStrength <= 0", corridor_body)
-        self.assertIn("corridorStrength *", corridor_body)
+        self.assertIn("corridorStrength *", texture_body)
+        self.assertNotIn("function drawModernCityLightsCorridors(", owner_content)
+        self.assertNotIn("function drawModernCityLightsPopulationBoostLayer(", owner_content)
+        self.assertNotIn("function getModernGridEntryJitter(", owner_content)
 
         core_match = re.search(
             r"function drawModernCityLightsCores\(k, config, _intensity, coreEntries = null\) \{(?P<body>[\s\S]*?)\n  \}",

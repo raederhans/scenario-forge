@@ -11,6 +11,7 @@ hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 non_1962_runtime_matrix.spec.js
+ocean_geometry_contract.spec.js
 physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js
@@ -33,6 +34,7 @@ strategic_overlay_sidebar_entry_smoke.spec.js
 strategic_overlay_smoke.spec.js
 texture_overlay_regression.spec.js
 tno_1962_ui_smoke.spec.js
+tno_atlantropa_coastline.spec.js
 tno_named_water_rendering.spec.js
 tno_open_ocean_rendering.spec.js
 tno_startup_visible_context_layers_contract.spec.js

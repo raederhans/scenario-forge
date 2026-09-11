@@ -122,7 +122,7 @@ class DataCatalogContractTest(unittest.TestCase):
         payload = self._load_catalog()
         expected_count = payload.get("counts", {}).get("entries")
         self.assertIsInstance(expected_count, int)
-        english_copy = "cataloged assets · checked-in data surface"
+        english_copy = "cataloged assets · public project data"
         chinese_copy = "已编目资产 · 签入数据范围"
 
         landing_index = LANDING_INDEX.read_text(encoding="utf-8")

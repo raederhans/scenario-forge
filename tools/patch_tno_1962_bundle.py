@@ -39,6 +39,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from map_builder.geo.topology import compute_neighbor_graph
+from map_builder.geo.water_geometry import compile_water_feature_collection, replace_water_topology_object
+from map_builder.geo.water_region_authority import compile_named_water_regions
+from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.utils import build_named_topology
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
@@ -98,6 +101,13 @@ from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
 from tools.build_startup_bundle import build_startup_bundles
+from tools.atlantropa_coastline import build_scenario_coastline_geometry, build_atlantropa_land_reference
+from tools.atlantropa_geometry_quality import (
+    GeometryConflictError, normalize_land_features, exclude_land_from_sea, remove_processing_encroachments,
+)
+from tools.atlantropa_precision import simplify_atlantropa_geometry, snap_atlantropa_geometry
+from tools.atlantropa_island_alignment import fit_bbox_alignment
+from tools.atlantropa_identity import reconcile_island_identity, IslandIdentityError
 from tools import check_scenario_contracts as scenario_contracts
 from tools.check_scenario_contracts import apply_safe_scenario_contract_repairs, write_tno_coverage_ledgers
 from tools.check_scenario_contracts import validate_publish_bundle_dir
@@ -848,7 +858,6 @@ TNO_OPEN_OCEAN_SPLIT_SPECS = (
                 "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[1],
                 "name": "South Indian Antarctic Ocean",
                 "bbox": TNO_SOUTHERN_OPEN_OCEAN_CHILD_BBOXES[TNO_SOUTHERN_OPEN_OCEAN_IDS[1]],
-                "d3_reverse_orientation": True,
             },
             {
                 "id": TNO_SOUTHERN_OPEN_OCEAN_IDS[2],
@@ -881,7 +890,6 @@ D3_SPHERICAL_PRUNE_COMPONENT_MIN_AREA_BY_ID = {
 }
 TNO_NAMED_WATER_EXCLUSION_AREA_RATIO_MIN = 0.001
 D3_SPHERICAL_REVERSE_ORIENTATION_FEATURE_IDS: set[str] = set()
-D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS = {"tno_south_indian_antarctic_ocean"}
 TOPOLOGY_D3_SAFE_MAX_ARC_POINTS = 512
 MARINE_REGIONS_DATASET_META = {
     "seavox_v19": {
@@ -4801,7 +4809,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8487, 8488, 8489,
             8491, 8492, 8493, 8494, 8495, 8496, 8497,
             8501, 8502, 8503, 8504, 8505, 8506, 8507, 8508, 8509,
-            9072, 9073, 9074, 9075, 9076, 9077,
+            9071, 9072, 9073, 9074, 9075, 9076, 9077,
             9888, 10340, 10458, 10459, 10460, 10461, 10462,
         ],
         "water_state_ids": [8597, 8601, 8602, 8604],
@@ -4824,6 +4832,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8507: "ITA",
             8508: "GRE",
             8509: "GRE",
+            9071: "ITA",
             9074: "GRE",
             9075: "ITA",
             9076: "CRO",
@@ -5044,12 +5053,16 @@ ATLANTROPA_REGION_CONFIGS = {
                 "owner_tag": "TUR",
                 "donor_state_ids": [8551, 8552, 8553, 8554, 8555, 8556],
                 "baseline_feature_ids": ["CY000"],
-                "group_bbox": (32.20, 34.45, 34.55, 35.70),
-                "search_margin": 0.26,
-                "gap_fill_buffer": 0.12,
-                "boolean_weld_distance": 0.16,
-                "boolean_weld_width": 0.03,
-                "max_baseline_area_ratio": 1.08,
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["CY000"],
+                    # 14138 is a Cyprus land province in the unnamed template state;
+                    # omitting it leaves two artificial holes along the south coast.
+                    "source_province_ids": [7193, 11984, 13332, 13333, 14138, 17019],
+                    "donor_state_ids": [8551, 8552, 8553, 8554, 8555, 8556],
+                }],
+                # Source-aligned core + reclamation is 1.777x the current island.
+                # Exceeding this budget fails generation instead of clipping land.
+                "max_baseline_area_ratio": 1.80,
             },
         ],
     },
@@ -5205,11 +5218,14 @@ ATLANTROPA_REGION_CONFIGS = {
                 "owner_tag": "SPR",
                 "donor_state_ids": [8459, 8460, 8461],
                 "baseline_feature_ids": ["ES531", "ES532", "ES533"],
-                "search_margin": 0.3,
-                "gap_fill_buffer": 0.12,
-                "boolean_weld_distance": 0.16,
-                "boolean_weld_width": 0.03,
-                "max_baseline_area_ratio": 1.08,
+                "source_island_anchors": [
+                    {"baseline_feature_ids": ["ES531"], "source_province_ids": [7114], "donor_state_ids": [8459]},
+                    {"baseline_feature_ids": ["ES532"], "source_province_ids": [9793], "donor_state_ids": [8460]},
+                    {"baseline_feature_ids": ["ES533"], "source_province_ids": [9845], "donor_state_ids": [8461]},
+                ],
+                # HGO contains broad shelves around these small original islands.
+                # Keep their source-relative extent, with a fail-fast area guard.
+                "max_baseline_area_ratio": 4.30,
             },
         ],
     },
@@ -5223,7 +5239,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
             8533, 8534, 8535, 8536, 8537, 8538, 8539, 8540, 8541, 8542,
             8543,
-            8653,
+            8653, 9097,
         ],
         "water_state_ids": [8445, 8607, 8608, 8610, 8619, 8620, 8621, 8622],
         "state_owner_overrides": {
@@ -5259,6 +5275,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8542: "GRE",
             8543: "TUR",
             8653: "GRE",
+            9097: "TUR",
         },
         "control_points": {
             8516: (22.1, 37.35),
@@ -5386,7 +5403,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "group_label": "Libya, Cyrenaica and Suez Chain",
         "aoi_bbox": (12.5, 28.0, 35.2, 34.2),
         "sea_completion_bbox": (11.8, 27.8, 35.9, 35.2),
-        "land_state_ids": [8563, 8564, 8565, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576],
+        "land_state_ids": [8563, 8564, 8565, 8567, 8568, 8569, 8570, 8572, 8574, 8575, 8576, 9783],
         "water_state_ids": [8599, 8605, 8613, 8614, 8615, 8616, 8617, 8618],
         "state_owner_overrides": {
             8563: "LBA",
@@ -5398,6 +5415,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8570: "EGY",
             8575: "EGY",
             8576: "EGY",
+            9783: "EGY",
         },
         "control_points": {
             8563: (12.45, 31.95),
@@ -5714,8 +5732,10 @@ def build_tno_open_ocean_split_features(
     land_mask_geom=None,
     *,
     supplement_subtract_geometries_by_source_id: dict[str, list] | None = None,
+    base_water_regions: dict | None = None,
 ) -> list[dict]:
-    feature_index = load_global_water_regions_feature_index()
+    feature_index = ({str(f["properties"]["id"]): f for f in base_water_regions["features"]}
+                     if base_water_regions is not None else load_global_water_regions_feature_index())
     land_mask_geom = normalize_polygonal(land_mask_geom)
     supplement_subtract_geometries_by_source_id = supplement_subtract_geometries_by_source_id or {}
     split_features: list[dict] = []
@@ -6332,6 +6352,7 @@ def rebuild_checkpoint_water_runtime_from_scenario(scenario_dir: Path, checkpoin
     runtime_topology_payload = load_json(scenario_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME)
     replace_topology_object_from_gdf_for_d3(runtime_topology_payload, "scenario_water", water_gdf)
     compact_topology_arcs(runtime_topology_payload)
+    checkpoint_water_payload = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
     named_water_snapshot_path = scenario_dir / MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME
     named_water_snapshot_payload = (
         load_json(named_water_snapshot_path)
@@ -8651,10 +8672,6 @@ def split_full_width_polygonal_parts_preserve_orientation_for_d3(geom):
 
 def make_geometry_d3_spherical_safe(feature_id: str, geom):
     feature_id_text = str(feature_id).strip()
-    if feature_id_text in D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS:
-        candidate = split_full_width_polygonal_parts_preserve_orientation_for_d3(geom)
-        if candidate is not None:
-            return candidate
     candidate = normalize_polygonal(geom)
     if candidate is None:
         return None
@@ -8702,19 +8719,21 @@ def apply_d3_spherical_safe_split_to_gdf(
 def apply_d3_spherical_safe_source_split_to_gdf(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
     if gdf is None or gdf.empty or "geometry" not in gdf.columns:
         return gdf
-    out = gdf.copy()
-
-    def _repair_geometry(geom):
-        repaired = split_full_width_polygonal_parts_for_d3(geom)
-        if repaired is None:
-            raise ValueError("D3 source split collapsed an unnamed geometry.")
-        return repaired
-
-    out["geometry"] = out["geometry"].apply(_repair_geometry)
-    return out
+    compiled = compile_water_feature_collection(gdf_to_feature_collection(gdf))
+    return gpd.GeoDataFrame.from_features(compiled["features"], crs="EPSG:4326")
 
 
 def replace_topology_object_from_gdf_for_d3(topo_dict: dict, object_name: str, gdf: gpd.GeoDataFrame) -> None:
+    if object_name == "scenario_water":
+        compiled = compile_named_water_regions(
+            gdf_to_feature_collection(gdf),
+            land_mask=topology_object_to_feature_collection(topo_dict, "land_mask")
+                if "land_mask" in topo_dict.get("objects", {}) else None,
+        )
+        updated = replace_water_topology_object(topo_dict, compiled, object_name=object_name)
+        topo_dict.clear()
+        topo_dict.update(updated)
+        return
     geometries = []
     for index, row in gdf.reset_index(drop=True).iterrows():
         geom = make_geometry_d3_spherical_safe(str(row.get("id") or ""), row.geometry)
@@ -8858,6 +8877,8 @@ def smooth_polygonal(geom, *, buffer_radius: float = 0.0, simplify_tolerance: fl
         raise ValueError("Expected polygonal geometry.")
     if buffer_radius > 0:
         candidate = normalize_polygonal(candidate.buffer(buffer_radius).buffer(-buffer_radius))
+        if candidate is None:
+            raise ValueError("Geometry smoothing collapsed geometry during buffer closing.")
     if simplify_tolerance > 0:
         candidate = normalize_polygonal(candidate.simplify(simplify_tolerance, preserve_topology=True))
     if candidate is None:
@@ -9016,7 +9037,12 @@ def geopandas_from_features(features: list[dict]) -> gpd.GeoDataFrame:
 
 
 def topology_object_to_feature_collection(topo_dict: dict, object_name: str) -> dict:
-    return serialize_as_geojson(topo_dict, objectname=object_name)
+    collection = serialize_as_geojson(topo_dict, objectname=object_name)
+    if object_name == "scenario_water":
+        for key in ("water_geometry_precision", "water_geometry_quantization"):
+            if key in topo_dict:
+                collection[key] = copy.deepcopy(topo_dict[key])
+    return collection
 
 
 def topology_object_to_gdf(topo_dict: dict, object_name: str) -> gpd.GeoDataFrame:
@@ -9239,9 +9265,6 @@ def sanitize_feature_collection_polygonal_geometries(feature_collection: dict) -
             continue
         props = dict(feature.get("properties", {}))
         feature_id = str(props.get("id") or feature.get("id") or "").strip()
-        if feature_id in D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS:
-            sanitized_features.append(feature)
-            continue
         normalized_geom = normalize_polygonal(shape(geometry_payload))
         if normalized_geom is None:
             sanitized_features.append(feature)
@@ -9255,57 +9278,7 @@ def sanitize_feature_collection_polygonal_geometries(feature_collection: dict) -
 
 
 def orient_source_water_features_for_d3(feature_collection: dict) -> dict:
-    if not isinstance(feature_collection, dict):
-        return feature_collection
-    metrics = collect_d3_spherical_metrics({"source": feature_collection}).get("source", {})
-    invalid_ids = {
-        str(entry.get("id") or "").strip()
-        for entry in metrics.get("invalidFeatures", []) or []
-        if str(entry.get("id") or "").strip()
-    }
-    invalid_ids.update(
-        str(entry.get("id") or "").strip()
-        for entry in metrics.get("invalidParts", []) or []
-        if str(entry.get("id") or "").strip()
-    )
-    if not invalid_ids:
-        return feature_collection
-    oriented_features: list[dict] = []
-    for feature in feature_collection.get("features", []):
-        if not isinstance(feature, dict):
-            continue
-        props = dict(feature.get("properties", {}))
-        feature_id = str(props.get("id") or feature.get("id") or "").strip()
-        if (
-            feature_id not in invalid_ids
-            and feature_id not in D3_SPHERICAL_SOURCE_POSITIVE_ORIENTATION_FEATURE_IDS
-        ):
-            oriented_features.append(feature)
-            continue
-        geom = normalize_polygonal(shape(feature.get("geometry")))
-        if geom is None:
-            oriented_features.append(feature)
-            continue
-        reversed_geom = reverse_polygonal_orientation_for_d3(geom)
-        candidate_geom = reversed_geom or geom
-        candidate_feature = {
-            "type": "Feature",
-            "properties": props,
-            "geometry": mapping(candidate_geom),
-        }
-        candidate_metrics = collect_d3_spherical_metrics({
-            "source": feature_collection_from_features([candidate_feature]),
-        }).get("source", {})
-        if candidate_metrics.get("invalidFeatureCount") or candidate_metrics.get("invalidPartCount"):
-            oriented_features.append(feature)
-            continue
-        parts = iter_polygon_parts(candidate_geom)
-        oriented_features.append({
-            "type": "Feature",
-            "properties": props,
-            "geometry": mapping(parts[0] if len(parts) == 1 else MultiPolygon(parts)),
-        })
-    return feature_collection_from_features(oriented_features)
+    return compile_water_feature_collection(feature_collection)
 
 
 def load_state_path_index(states_dir: Path) -> tuple[dict[int, Path], dict[int, str]]:
@@ -9573,12 +9546,87 @@ def make_atl_row(
     }
 
 
+def prepare_source_aligned_island_groups(config, donor_context, baseline_land_full_gdf):
+    """Register each island against its original HGO core, never a regional centroid."""
+    state_coefficients = {}
+    prepared = {}
+    region_aoi = box(*config["aoi_bbox"])
+    for group in config.get("major_island_groups", []):
+        anchors = group.get("source_island_anchors")
+        if not anchors:
+            continue
+        source_parts, target_parts, anchor_parts, diagnostics = [], [], [], []
+        donor_province_ids = set()
+        anchored_states = set()
+        for anchor in anchors:
+            target_ids = set(anchor["baseline_feature_ids"])
+            target_rows = baseline_land_full_gdf.loc[baseline_land_full_gdf["id"].isin(target_ids)]
+            if set(target_rows["id"]) != target_ids:
+                raise ValueError(f"Missing island alignment baseline: {sorted(target_ids)}")
+            target = safe_unary_union(target_rows.geometry)
+            source = safe_unary_union([
+                extract_province_geometry_raw(donor_context, int(province_id))
+                for province_id in anchor["source_province_ids"]
+            ])
+            alignment = fit_bbox_alignment(source, target)
+            coefficients = alignment["coefficients"]
+            source_parts.append(alignment["geometry"])
+            anchor_parts.append(alignment["geometry"])
+            target_parts.append(target)
+            for state_id in anchor["donor_state_ids"]:
+                state_id = int(state_id)
+                if state_id in state_coefficients:
+                    raise ValueError(f"Duplicate island alignment state: {state_id}")
+                state_coefficients[state_id] = coefficients
+                anchored_states.add(state_id)
+                province_ids = get_state_province_ids(donor_context, state_id)
+                donor_province_ids.update(province_ids)
+                source_parts.extend(
+                    apply_affine_to_geometry(extract_province_geometry_raw(donor_context, province_id), coefficients)
+                    for province_id in province_ids
+                )
+            diagnostics.append({**anchor, **alignment["diagnostics"]})
+        if anchored_states != set(group["donor_state_ids"]):
+            raise ValueError(f"Incomplete island alignment states: {group['id']}")
+        target = safe_unary_union(target_parts)
+        # Both the original source island and its reclaimed provinces are evidence.
+        # A direct union preserves every target core without inventing bridges or
+        # filling holes that neither source contains.
+        combined = safe_unary_union([target, *source_parts])
+        anchors = safe_unary_union([target, *anchor_parts])
+        retained_parts, deferred_parts = [], []
+        for part in iter_polygon_parts(combined):
+            if part.intersection(anchors).area > 0:
+                retained_parts.append(part)
+            else:
+                # A detached reclamation pixel has no original-island anchor.
+                # Keep it in the audit, pending a separate island admission.
+                deferred_parts.append({"area": float(part.area), "bounds": list(part.bounds)})
+        combined = safe_unary_union(retained_parts)
+        if combined.difference(region_aoi).area > 1e-12:
+            raise ValueError(f"Aligned island exceeds region AOI: {group['id']}")
+        area_ratio = float(combined.area / target.area)
+        if area_ratio > float(group["max_baseline_area_ratio"]):
+            raise ValueError(f"Aligned island area budget exceeded: {group['id']} ({area_ratio:.6f})")
+        prepared[group["id"]] = {
+            "geometry": combined,
+            "donor_province_ids": sorted(donor_province_ids),
+            "donor_state_names": sorted({get_state_name(donor_context, state_id) for state_id in anchored_states}),
+            "diagnostics": {"anchors": diagnostics, "area_ratio": area_ratio,
+                            "baseline_missing_area": float(target.difference(combined).area),
+                            "deferred_unanchored_components": deferred_parts,
+                            "parts": len(iter_polygon_parts(combined))},
+        }
+    return state_coefficients, prepared
+
+
 def build_major_island_rows(
     region_id: str,
     config: dict,
     island_rows: list[dict],
     baseline_land_full_gdf: gpd.GeoDataFrame,
     mainland_union,
+    *, aligned_groups: dict | None = None,
 ) -> tuple[list[dict], list[dict]]:
     groups = list(config.get("major_island_groups", []) or [])
     if not groups or not island_rows:
@@ -9600,6 +9648,25 @@ def build_major_island_rows(
             and donor_state_ids.intersection({int(value) for value in row.get("donor_state_ids", [])})
         ]
         if not matched_rows:
+            continue
+
+        aligned = (aligned_groups or {}).get(group.get("id"))
+        if aligned is not None:
+            combined = aligned["geometry"]
+            if mainland_union is not None and combined.intersects(mainland_union):
+                raise ValueError(f"Aligned island overlaps mainland: {region_id}/{group['id']}")
+            rebuilt_rows.append(make_atl_row(
+                feature_id=f"ATLISL_{region_id}_{group['id']}",
+                name=f"{group['label']} Rebuilt Island", geometry=combined,
+                region_id=region_id, config=config,
+                assigned_owner_tag=normalize_tag(group["owner_tag"]),
+                geometry_role=ATL_GEOMETRY_ROLE_DONOR_ISLAND,
+                donor_state_ids=sorted(donor_state_ids),
+                donor_state_names=aligned["donor_state_names"],
+                donor_province_ids=aligned["donor_province_ids"],
+                join_mode=ATL_JOIN_MODE_NONE,
+            ))
+            used_row_ids.update(row["id"] for row in matched_rows)
             continue
 
         donor_union = safe_unary_union([row["geometry"] for row in matched_rows])
@@ -9778,7 +9845,60 @@ def merge_island_rows(region_id: str, config: dict, island_rows: list[dict]) -> 
     return merged_rows
 
 
-def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union) -> list[dict]:
+def verify_atl_final_coast_contact(required_parts, final_land, reference):
+    """Check only source-proven coastal parts, across all final land owners."""
+    final_parts = list(iter_polygon_parts(final_land))
+    connected = [part for part in final_parts if part.boundary.intersection(reference.boundary).length > 0
+                 or part.intersection(reference).area > 0]
+    for feature_id, required in required_parts:
+        retained = normalize_polygonal(required.intersection(final_land))
+        if retained is None:
+            raise ValueError(f"Atlantropa coastal component disappeared after normalization: {feature_id}")
+        for part in iter_polygon_parts(retained):
+            if not any(part.intersection(candidate).area > 0 for candidate in connected):
+                raise ValueError(f"Atlantropa coastal component disconnected after normalization: {feature_id}")
+    return len(required_parts)
+
+
+def restore_atl_source_coast_contact(geometry, source_geometry, local_land, *, collar_width: float, feature_id: str):
+    """Restore only source-supported coast contact removed by clipping/simplification.
+
+    The buffer selects a coastal band; it never supplies new land. Detached source
+    islands and source straits remain detached. Contact must have positive length,
+    rather than merely falling inside a distance tolerance.
+    """
+    clipped = normalize_polygonal(geometry.difference(local_land))
+    source_sea = normalize_polygonal(source_geometry.difference(local_land))
+    if clipped is None or source_sea is None:
+        return geometry, 0
+    coast = local_land.boundary
+    restored = clipped
+    restored_count = 0
+    for source_part in iter_polygon_parts(source_sea):
+        if source_part.boundary.intersection(coast).length <= 0:
+            continue
+        for retained_part in iter_polygon_parts(clipped):
+            retained = source_part.intersection(retained_part)
+            if retained.area <= 0:
+                continue
+            if any(part.intersection(retained).area > 0 and part.boundary.intersection(coast).length > 0
+                   for part in iter_polygon_parts(restored)):
+                continue
+            band = source_part.intersection(local_land.buffer(collar_width))
+            patches = [part for part in iter_polygon_parts(band)
+                       if part.intersection(retained).area > 0
+                       and part.boundary.intersection(coast).length > 0]
+            if not patches:
+                raise ValueError(f"Atlantropa coast join failed for {feature_id}: source contact cannot reach retained land")
+            restored = safe_unary_union([restored, *patches])
+            if not any(part.intersection(retained).area > 0 and part.boundary.intersection(coast).length > 0
+                       for part in iter_polygon_parts(restored)):
+                raise ValueError(f"Atlantropa coast join failed for {feature_id}: final land is disconnected")
+            restored_count += 1
+    return restored, restored_count
+
+
+def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union, *, source_support=None) -> list[dict]:
     seal_width = float(config.get("gap_fill_width", config.get("shore_seal_width", 0.0)))
     if seal_width <= 0 or mainland_union is None:
         return []
@@ -9799,6 +9919,7 @@ def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], 
     donor_union = safe_unary_union([row["geometry"] for row in seal_source_rows])
     if donor_union is None:
         return []
+    occupied_land = safe_unary_union([mainland_union, *[row["geometry"] for row in donor_rows]])
     aoi = box(*config["aoi_bbox"])
     seal_candidate = normalize_polygonal(
         donor_union.buffer(seal_width).intersection(mainland_union.buffer(seal_width))
@@ -9806,8 +9927,11 @@ def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], 
     if seal_candidate is None:
         return []
     seal_candidate = normalize_polygonal(
-        seal_candidate.intersection(aoi).difference(donor_union).difference(mainland_union)
+        seal_candidate.intersection(aoi).difference(occupied_land)
     )
+    source_support = source_support if source_support is not None else donor_union
+    if seal_candidate is not None:
+        seal_candidate = normalize_polygonal(seal_candidate.intersection(source_support))
     if seal_candidate is None:
         return []
 
@@ -9817,10 +9941,9 @@ def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], 
     for index, part in enumerate(iter_polygon_parts(seal_candidate), start=1):
         if float(part.area) < min_area or float(part.area) > max_area:
             continue
-        try:
-            smoothed = smooth_polygonal(part, buffer_radius=0.0035, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
-        except ValueError:
-            smoothed = normalize_polygonal(part)
+        smoothed, precision_result = simplify_atlantropa_geometry(
+            part, tolerance=float(config.get("simplify_tolerance", 0.01)), forbidden=occupied_land,
+        )
         if smoothed is None:
             continue
         owner_tag = assign_owner_from_nearest_rows(smoothed, seal_source_rows)
@@ -9840,10 +9963,11 @@ def build_shore_seal_rows(region_id: str, config: dict, donor_rows: list[dict], 
             donor_province_ids=donor_province_ids,
             join_mode=ATL_JOIN_MODE_GAP_FILL,
         ))
+        seal_rows[-1]["postprocess_precision"] = precision_result
     return seal_rows
 
 
-def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union) -> list[dict]:
+def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict], mainland_union, *, source_support=None) -> list[dict]:
     weld_width = float(config.get("boolean_weld_width", 0.0))
     if weld_width <= 0 or mainland_union is None:
         return []
@@ -9864,19 +9988,22 @@ def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict]
     donor_union = safe_unary_union([row["geometry"] for row in weld_source_rows])
     if donor_union is None:
         return []
+    occupied_land = safe_unary_union([mainland_union, *[row["geometry"] for row in donor_rows]])
     aoi = box(*config["aoi_bbox"])
     try:
-        closed = smooth_polygonal(
-            safe_unary_union([donor_union, mainland_union]).buffer(weld_width).buffer(-weld_width),
-            simplify_tolerance=float(config.get("simplify_tolerance", 0.01)),
+        closed = normalize_polygonal(
+            safe_unary_union([donor_union, mainland_union]).buffer(weld_width).buffer(-weld_width)
         )
     except ValueError:
         closed = normalize_polygonal(safe_unary_union([donor_union, mainland_union]))
     if closed is None:
         return []
     weld_candidate = normalize_polygonal(
-        closed.intersection(aoi).difference(donor_union).difference(mainland_union)
+        closed.intersection(aoi).difference(occupied_land)
     )
+    source_support = source_support if source_support is not None else donor_union
+    if weld_candidate is not None:
+        weld_candidate = normalize_polygonal(weld_candidate.intersection(source_support))
     if weld_candidate is None:
         return []
 
@@ -9888,10 +10015,9 @@ def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict]
             continue
         if not part.intersects(donor_union.buffer(weld_width)) or not part.intersects(mainland_union.buffer(weld_width)):
             continue
-        try:
-            smoothed = smooth_polygonal(part, buffer_radius=0.0025, simplify_tolerance=float(config.get("simplify_tolerance", 0.01)))
-        except ValueError:
-            smoothed = normalize_polygonal(part)
+        smoothed, precision_result = simplify_atlantropa_geometry(
+            part, tolerance=float(config.get("simplify_tolerance", 0.01)), forbidden=occupied_land,
+        )
         if smoothed is None:
             continue
         owner_tag = assign_owner_from_nearest_rows(smoothed, weld_source_rows)
@@ -9911,6 +10037,7 @@ def build_boolean_weld_rows(region_id: str, config: dict, donor_rows: list[dict]
             donor_province_ids=donor_province_ids,
             join_mode=ATL_JOIN_MODE_BOOLEAN_WELD,
         ))
+        weld_rows[-1]["postprocess_precision"] = precision_result
     return weld_rows
 
 
@@ -11352,17 +11479,95 @@ def build_region_affine_coeffs(config: dict, donor_context: dict) -> tuple[tuple
             "target_coord": [round(target_lon, 6), round(target_lat, 6)],
         })
     coeffs = solve_affine_from_control_points(control_pairs)
+    ax, bx, cx, ay, by, cy = coeffs
+    for diagnostic, ((raw_x, raw_y), (target_x, target_y)) in zip(diagnostics, control_pairs):
+        fitted_x, fitted_y = ax * raw_x + bx * raw_y + cx, ay * raw_x + by * raw_y + cy
+        dx, dy = fitted_x - target_x, fitted_y - target_y
+        diagnostic["fitted_centroid"] = [fitted_x, fitted_y]
+        diagnostic["control_residual_degrees"] = math.hypot(dx, dy)
+        diagnostic["control_residual_approx_km"] = 111.195 * math.hypot(dx * math.cos(math.radians(target_y)), dy)
+        diagnostic["residual_interpretation"] = "state_centroid_control_fit_not_coastline_displacement"
     return coeffs, diagnostics
+
+
+def load_atlantropa_land_reference(baseline_land_full_gdf: gpd.GeoDataFrame):
+    canonical_gdf = topology_object_to_gdf(load_json(ROOT / "data/europe_topology.json"), "land")
+    return build_atlantropa_land_reference(
+        safe_unary_union(canonical_gdf.geometry.tolist()), baseline_land_full_gdf.geometry,
+        [config["aoi_bbox"] for config in ATLANTROPA_REGION_CONFIGS.values()],
+    )
+
+
+def atl_local_reference(land_reference, bounds, padding=2.5):
+    minx, miny, maxx, maxy = bounds
+    # This is only a computational window outside the donor AOI; published
+    # coastline geometry keeps complete selected baseline features.
+    return normalize_polygonal(land_reference.intersection(box(minx - padding, miny - padding, maxx + padding, maxy + padding)))
+
+
+def match_atl_island_lineage(row, published_islands_by_donors):
+    donor_ids = tuple(sorted(row.get("donor_province_ids") or []))
+    return [feature for feature in published_islands_by_donors.get(donor_ids, [])
+            if shape(feature["geometry"]).intersection(row["geometry"]).area > 0]
+
+
+def hydrate_atl_island_lineage(published_features, lineage_features):
+    """Recover compacted provenance only from an exactly matching old geometry."""
+    lineage_by_id = {feature.get("properties", {}).get("id"): feature for feature in lineage_features}
+    hydrated = copy.deepcopy(published_features)
+    for feature in hydrated:
+        props = feature.get("properties", {})
+        feature_id = str(props.get("id") or "")
+        if not feature_id.startswith("ATLISL_") or props.get("donor_province_ids"):
+            continue
+        lineage = lineage_by_id.get(feature_id)
+        if lineage is None or not shape(feature["geometry"]).equals(shape(lineage["geometry"])):
+            raise GeometryConflictError("Published island lineage source geometry does not match", {"feature_id": feature_id})
+        source_props = lineage.get("properties", {})
+        if not source_props.get("donor_province_ids"):
+            raise GeometryConflictError("Published island lineage source lacks donor IDs", {"feature_id": feature_id})
+        for key in ("donor_province_ids", "donor_state_ids", "donor_state_names"):
+            if key in source_props:
+                props[key] = copy.deepcopy(source_props[key])
+    return hydrated
 
 
 def build_atlantropa_from_hgo(
     donor_context: dict,
     baseline_land_full_gdf: gpd.GeoDataFrame,
+    *, owner_by_feature_id: dict | None = None, land_reference=None,
+    overlap_priority=None, overlap_priority_source=None, pre_normalize_callback=None, published_features=None,
 ) -> tuple[list[dict], dict[str, object], dict, dict[str, dict]]:
+    published_owner_map = dict(owner_by_feature_id or {})
+    published_priority = dict(overlap_priority) if overlap_priority is not None else None
+    named_island_ids = {f"ATLISL_{region}_{str(group.get('id') or 'island').strip().lower()}"
+                        for region, config in ATLANTROPA_REGION_CONFIGS.items()
+                        for group in config.get("major_island_groups", [])}
+    overlap_priority = ({key: value for key, value in published_priority.items()
+                         if str(key).startswith("ATLPRV_") or key in named_island_ids}
+                        if published_priority is not None else None)
+    if owner_by_feature_id is not None:
+        # Helper IDs enumerate current components, so an old same-ID helper
+        # cannot provide ownership for a newly generated geometry.
+        owner_by_feature_id = {key: value for key, value in owner_by_feature_id.items()
+                               if str(key).startswith("ATLPRV_") or key in named_island_ids}
+    published_islands_by_donors = {}
+    for feature in published_features or []:
+        props = feature.get("properties", {})
+        if str(props.get("id", "")).startswith("ATLISL_"):
+            donor_ids = tuple(sorted(props.get("donor_province_ids") or []))
+            if donor_ids:
+                published_islands_by_donors.setdefault(donor_ids, []).append(feature)
+    identity_issues = []
+    source_parts_by_owner = {}
+    required_coast_parts = {}
+    coast_references = {}
     atl_features: list[dict] = []
     region_unions: dict[str, object] = {}
     diagnostics: dict[str, dict] = {}
     replacement_specs: dict[str, dict] = {}
+    if land_reference is None:
+        land_reference = load_atlantropa_land_reference(baseline_land_full_gdf)
 
     seen_province_ids: set[int] = set()
 
@@ -11372,7 +11577,7 @@ def build_atlantropa_from_hgo(
             config.get("precision_simplify_tolerance", config.get("simplify_tolerance", 0.01))
         )
         pixel_fragment_area_threshold = float(config.get("pixel_fragment_area_threshold", 0.0025))
-        local_land = local_land_union(baseline_land_full_gdf, config["aoi_bbox"], padding=2.5)
+        local_land = atl_local_reference(land_reference, config["aoi_bbox"])
         if local_land is None:
             raise ValueError(f"Unable to compute local shoreline context for Atlantropa region {region_id}.")
         local_boundary = local_land.boundary
@@ -11383,7 +11588,14 @@ def build_atlantropa_from_hgo(
         )
         coeffs, control_diagnostics = build_region_affine_coeffs(config, donor_context)
 
+        island_coefficients, aligned_groups = prepare_source_aligned_island_groups(
+            config, donor_context, baseline_land_full_gdf,
+        )
+
         region_feature_rows: list[dict] = []
+        source_coast_geometries: dict[str, object] = {}
+        original_source_by_province: dict[int, object] = {}
+        precision_diagnostics: list[dict] = []
         donor_land_state_ids = [int(value) for value in config.get("land_state_ids", [])]
         state_owner_overrides = {
             int(state_id): normalize_tag(tag)
@@ -11398,16 +11610,21 @@ def build_atlantropa_from_hgo(
                 if province_id in seen_province_ids:
                     continue
                 raw_geom = extract_province_geometry_raw(donor_context, province_id)
-                fitted = apply_affine_to_geometry(raw_geom, coeffs)
+                fitted = apply_affine_to_geometry(raw_geom, island_coefficients.get(state_id, coeffs))
                 if fitted is None:
                     continue
                 fitted = normalize_polygonal(fitted.intersection(aoi))
                 if fitted is None:
                     continue
+                original_source_by_province[province_id] = fitted
+                snap_result = {}
                 if local_boundary is not None and config.get("snap_tolerance", 0) > 0:
-                    fitted = normalize_polygonal(snap(fitted, local_boundary, float(config["snap_tolerance"])))
+                    fitted, snap_result = snap_atlantropa_geometry(
+                        fitted, local_boundary, tolerance=float(config["snap_tolerance"]),
+                    )
                 if fitted is None:
                     continue
+                source_coast_geometry = fitted
                 fitted = normalize_polygonal(fitted.difference(local_land.buffer(float(config.get("preserve_margin", 0.03)))))
                 if fitted is None:
                     continue
@@ -11416,7 +11633,10 @@ def build_atlantropa_from_hgo(
                     fitted = normalize_polygonal(fitted.intersection(aoi).intersection(local_land.buffer(trim_width)))
                     if fitted is None:
                         continue
-                fitted = smooth_polygonal(fitted, simplify_tolerance=precision_simplify_tolerance)
+                fitted, precision_result = simplify_atlantropa_geometry(
+                    fitted, tolerance=precision_simplify_tolerance, forbidden=local_land,
+                )
+                precision_diagnostics.append({"province_id": province_id, **snap_result, **precision_result})
                 if fitted is None:
                     continue
                 geometry_role = classify_atl_geometry_role(
@@ -11430,6 +11650,7 @@ def build_atlantropa_from_hgo(
                     continue
                 assigned_owner_tag = state_owner_overrides.get(int(state_id)) or ATL_TAG
                 feature_prefix = "ATLISRC" if geometry_role == ATL_GEOMETRY_ROLE_DONOR_ISLAND else "ATLPRV"
+                source_coast_geometries[f"{feature_prefix}_{province_id}"] = source_coast_geometry
                 region_feature_rows.append(make_atl_row(
                     feature_id=f"{feature_prefix}_{province_id}",
                     name=f"{config['group_label']} Province {province_id}",
@@ -11468,20 +11689,104 @@ def build_atlantropa_from_hgo(
             for row in region_feature_rows
             if str(row.get("id") or "").strip() not in donor_island_row_ids
         ]
+        restored_coast_contact_count = 0
+        for row in non_island_rows:
+            if row.get("atl_geometry_role") not in {ATL_GEOMETRY_ROLE_DONOR_LAND, ATL_GEOMETRY_ROLE_CAUSEWAY}:
+                continue
+            row["geometry"], restored_count = restore_atl_source_coast_contact(
+                row["geometry"], source_coast_geometries[row["id"]], local_land,
+                collar_width=float(config.get("preserve_margin", 0.03)) + 2 * precision_simplify_tolerance,
+                feature_id=row["id"],
+            )
+            restored_coast_contact_count += restored_count
+            required_coast_parts.setdefault(region_id, []).extend(
+                (row["id"], part) for part in iter_polygon_parts(row["geometry"])
+                if part.boundary.intersection(local_land.boundary).length > 0
+            )
+        coast_references[region_id] = local_land
         rebuilt_island_rows, residual_island_rows = build_major_island_rows(
             region_id,
             config,
             donor_island_rows,
             baseline_land_full_gdf,
             mainland_union,
+            aligned_groups=aligned_groups,
         )
         merged_island_rows = merge_island_rows(region_id, config, residual_island_rows)
+        island_identity_map = {}
+        island_identity_diagnostics = {}
+        if merged_island_rows and published_owner_map:
+            envelopes = {}
+            identity_raw_sources = {}
+            unsupported = []
+            envelope_width = float(config.get("snap_tolerance", 0)) + float(config.get("island_merge_distance", 0)) + 0.0025
+            for row in merged_island_rows:
+                raw_source = safe_unary_union([original_source_by_province[province_id]
+                                              for province_id in row["donor_province_ids"]
+                                              if province_id in original_source_by_province])
+                if raw_source is None or any(part.intersection(raw_source).area <= 0 for part in iter_polygon_parts(row["geometry"])):
+                    unsupported.append({"feature_id": row["id"], "donor_province_ids": row["donor_province_ids"],
+                                        "reason": "component_has_no_raw_source_intersection"})
+                    continue
+                envelope = raw_source.buffer(envelope_width)
+                if row["geometry"].difference(envelope).area > 1e-14:
+                    unsupported.append({"feature_id": row["id"], "reason": "component_exceeds_processing_envelope",
+                                        "envelope_degrees": envelope_width})
+                    continue
+                envelopes[row["id"]] = envelope
+                identity_raw_sources[row["id"]] = raw_source
+            if unsupported:
+                identity_issues.extend(unsupported)
+            else:
+                published_region_islands = [feature for feature in published_features or []
+                    if str(feature.get("properties", {}).get("id", "")).startswith(f"ATLISL_{region_id}_")
+                    and feature["properties"]["id"] not in named_island_ids]
+                try:
+                    merged_island_rows, island_identity_diagnostics = reconcile_island_identity(
+                        merged_island_rows, published_region_islands, published_owner_map,
+                        source_support_by_row_id=envelopes,
+                        raw_source_by_row_id=identity_raw_sources,
+                    )
+                except IslandIdentityError as error:
+                    identity_issues.append({"region_id": region_id, "reason": str(error)})
+                for entry in island_identity_diagnostics.get("lineage", []):
+                    new_id = entry["feature_id"]
+                    if entry["old_feature_ids"]:
+                        old_id = min(entry["old_feature_ids"], key=lambda value: (-entry["overlap_areas"][value], value))
+                        island_identity_map[new_id] = old_id
+                        if published_priority is not None and old_id in published_priority:
+                            overlap_priority[new_id] = published_priority[old_id]
+                    if owner_by_feature_id is not None:
+                        owner_by_feature_id[new_id] = entry["owner"]
         region_feature_rows = [*non_island_rows, *rebuilt_island_rows, *merged_island_rows]
+        for row in region_feature_rows:
+            published_owner = normalize_tag((owner_by_feature_id or {}).get(row["id"]))
+            if published_owner:
+                row["assigned_owner_tag"] = published_owner
+            owner = normalize_tag(row["assigned_owner_tag"])
+            if owner:
+                source_parts_by_owner.setdefault(owner, []).extend(
+                    original_source_by_province[province_id].intersection(row["geometry"])
+                    for province_id in row.get("donor_province_ids", [])
+                    if province_id in original_source_by_province
+                )
 
-        shore_seal_rows = build_shore_seal_rows(region_id, config, region_feature_rows, mainland_union)
+        source_support = safe_unary_union([
+            *[source_coast_geometries[row["id"]] for row in non_island_rows],
+            *[row["geometry"] for row in [*rebuilt_island_rows, *merged_island_rows]],
+        ])
+        shore_seal_rows = build_shore_seal_rows(
+            region_id, config, region_feature_rows, mainland_union, source_support=source_support,
+        )
         region_feature_rows = [*region_feature_rows, *shore_seal_rows]
-        boolean_weld_rows = build_boolean_weld_rows(region_id, config, region_feature_rows, mainland_union)
+        boolean_weld_rows = build_boolean_weld_rows(
+            region_id, config, region_feature_rows, mainland_union, source_support=source_support,
+        )
         region_feature_rows = [*region_feature_rows, *boolean_weld_rows]
+        precision_diagnostics.extend(
+            {"feature_id": row["id"], **row["postprocess_precision"]}
+            for row in [*shore_seal_rows, *boolean_weld_rows]
+        )
 
         region_geom = safe_unary_union([row["geometry"] for row in region_feature_rows])
         if region_geom is None:
@@ -11524,6 +11829,18 @@ def build_atlantropa_from_hgo(
                 if str(row.get("atl_join_mode") or "").strip()
             ).items())),
             "overlap_with_baseline_land_area": round(overlap_area, 6),
+            "restored_source_coast_contact_count": restored_coast_contact_count,
+            "postprocess_precision": precision_diagnostics,
+            "helper_id_assignment": "region_component_enumeration_not_stable_across_geometry_rebuilds",
+            "island_identity_map": island_identity_map,
+            "island_identity": island_identity_diagnostics,
+            "helper_lineage": [{"id": row["id"], "donor_province_ids": row["donor_province_ids"],
+                                "bounds": list(row["geometry"].bounds)}
+                               for row in [*shore_seal_rows, *boolean_weld_rows]],
+            "donor_source_pixel_size_degrees": [
+                math.hypot(donor_context["raw_transform"].a, donor_context["raw_transform"].d),
+                math.hypot(donor_context["raw_transform"].b, donor_context["raw_transform"].e),
+            ],
             "post_clip_area": round(float(region_geom.area), 6),
             "pixel_fragment_area_threshold": round(pixel_fragment_area_threshold, 6),
             "pixel_fragment_count": count_small_polygon_parts(
@@ -11531,6 +11848,7 @@ def build_atlantropa_from_hgo(
                 max_area=pixel_fragment_area_threshold,
             ),
             "control_points": control_diagnostics,
+            "island_alignment": {group_id: value["diagnostics"] for group_id, value in aligned_groups.items()},
             "affine_coeffs": [round(value, 9) for value in coeffs],
         }
 
@@ -11563,7 +11881,55 @@ def build_atlantropa_from_hgo(
                 "source_standard": "hgo_donor_province_georef",
             }))
 
+    if identity_issues:
+        if pre_normalize_callback is not None:
+            pre_normalize_callback(atl_features, diagnostics)
+        raise GeometryConflictError("Atlantropa enumerated island identity requires review", {"island_identity_issues": identity_issues})
+    source_surfaces_by_owner = {}
+    for owner, parts in source_parts_by_owner.items():
+        source_surface = safe_unary_union(parts)
+        if source_surface is not None:
+            source_surfaces_by_owner[owner] = source_surface
+    atl_features, processing_diagnostics = remove_processing_encroachments(
+        atl_features, source_surfaces_by_owner, allow_retire_helper=True,
+    )
+    diagnostics["processing_encroachments"] = processing_diagnostics
+    if pre_normalize_callback is not None:
+        pre_normalize_callback(atl_features, diagnostics)
+    atl_features, quality_diagnostics = normalize_land_features(
+        atl_features, owner_by_feature_id=owner_by_feature_id, allow_retire_helper=True,
+        priority=overlap_priority, priority_source=overlap_priority_source,
+    )
+    diagnostics["geometry_quality"] = quality_diagnostics
+    for region_id in region_unions:
+        region_features = [feature for feature in atl_features if feature["properties"].get("region_id") == region_id]
+        region_geometries = [shape(feature["geometry"]) for feature in region_features]
+        final_land = safe_unary_union([
+            shape(feature["geometry"]) for feature in region_features
+            if (classify_atlantropa_feature_id(feature["properties"]["id"]) or (None,))[0] == "land"
+        ])
+        diagnostics[region_id]["verified_final_coastal_components"] = verify_atl_final_coast_contact(
+            required_coast_parts.get(region_id, []), final_land, coast_references[region_id],
+        )
+        region_unions[region_id] = safe_unary_union(region_geometries)
+        diagnostics[region_id]["province_feature_count"] = len(region_features)
+        diagnostics[region_id]["geometry_role_counts"] = dict(sorted(Counter(
+            feature["properties"]["atl_geometry_role"] for feature in region_features
+        ).items()))
+        diagnostics[region_id]["assigned_owner_counts"] = dict(sorted(Counter(
+            feature["properties"]["owner_tag"] for feature in region_features
+        ).items()))
+        diagnostics[region_id]["pixel_fragment_count"] = count_small_polygon_parts(
+            region_geometries, max_area=diagnostics[region_id]["pixel_fragment_area_threshold"],
+        )
     return atl_features, region_unions, diagnostics, replacement_specs
+
+
+def atl_sea_land_reference(land_reference, replaced_geometry):
+    """Exclude retired island footprints before sea completion reserves coast."""
+    if replaced_geometry is None or replaced_geometry.is_empty:
+        return land_reference
+    return normalize_polygonal(land_reference.difference(replaced_geometry))
 
 
 def build_atl_sea_from_hgo(
@@ -11572,10 +11938,20 @@ def build_atl_sea_from_hgo(
     atlantropa_region_unions: dict[str, object],
     *,
     other_water_geom,
+    land_reference=None,
+    replacement_specs=None,
 ) -> tuple[list[dict], object | None, dict]:
     sea_features: list[dict] = []
     sea_geoms: list[object] = []
     diagnostics: dict[str, dict] = {}
+    if land_reference is None:
+        land_reference = load_atlantropa_land_reference(baseline_land_full_gdf)
+    if replacement_specs:
+        replaced_ids, _ = collect_baseline_island_drop_ids(baseline_land_full_gdf, replacement_specs)
+        replaced_geometry = safe_unary_union(
+            baseline_land_full_gdf.loc[baseline_land_full_gdf["id"].isin(replaced_ids)].geometry.tolist()
+        )
+        land_reference = atl_sea_land_reference(land_reference, replaced_geometry)
     atlantropa_union = safe_unary_union(list(atlantropa_region_unions.values()))
     mediterranean_template_gdf = load_mediterranean_template_water_gdf()
     accumulated_sea_union = None
@@ -11583,7 +11959,7 @@ def build_atl_sea_from_hgo(
     for region_id, config in ATLANTROPA_REGION_CONFIGS.items():
         completion_bbox = tuple(config.get("sea_completion_bbox") or config["aoi_bbox"])
         aoi = box(*completion_bbox)
-        local_land = local_land_union(baseline_land_full_gdf, completion_bbox, padding=2.5)
+        local_land = atl_local_reference(land_reference, completion_bbox)
         if local_land is None:
             continue
         coeffs, _control = build_region_affine_coeffs(config, donor_context)
@@ -11726,7 +12102,7 @@ def build_atl_sea_from_hgo(
     template_union = safe_unary_union(mediterranean_template_gdf.geometry.tolist())
     unmanaged_template = build_mediterranean_unmanaged_template_geom(template_union)
     closure_land = (
-        local_land_union(baseline_land_full_gdf, unmanaged_template.bounds, padding=2.5)
+        atl_local_reference(land_reference, unmanaged_template.bounds)
         if unmanaged_template is not None else None
     )
     closure_rows, closure_union, closure_diagnostics = build_mediterranean_sea_closure_rows(
@@ -12237,6 +12613,7 @@ def build_runtime_topology_payload(
     water_gdf: gpd.GeoDataFrame,
     land_mask_gdf: gpd.GeoDataFrame,
     context_land_mask_gdf: gpd.GeoDataFrame,
+    scenario_coastline_gdf: gpd.GeoDataFrame | None = None,
 ) -> dict:
     keep_columns = [
         "id",
@@ -12253,6 +12630,10 @@ def build_runtime_topology_payload(
         "source_fragment_area",
         "retained_fragment_area",
         "region_group",
+        "region_id",
+        "donor_province_ids",
+        "donor_state_ids",
+        "donor_state_names",
         "atl_surface_kind",
         "atl_geometry_role",
         "atl_join_mode",
@@ -12292,6 +12673,10 @@ def build_runtime_topology_payload(
     replace_topology_object_from_gdf_for_d3(topo_dict, "political", runtime_political_gdf)
     replace_topology_object_from_gdf_for_d3(topo_dict, "land_mask", land_mask_gdf)
     replace_topology_object_from_gdf_for_d3(topo_dict, "context_land_mask", context_land_mask_gdf)
+    if scenario_coastline_gdf is not None:
+        replace_topology_object_from_gdf_for_d3(
+            topo_dict, "scenario_coastline", apply_d3_spherical_safe_split_to_gdf(scenario_coastline_gdf)
+        )
     replace_topology_object_from_gdf_for_d3(topo_dict, "scenario_water", water_gdf)
     replace_topology_object_from_gdf_for_d3(topo_dict, SCENARIO_ATLANTROPA_OBJECT_NAME, runtime_atlantropa_gdf)
     compact_topology_arcs(topo_dict)
@@ -12315,6 +12700,8 @@ def validate_runtime_topology_water_outputs(
     water_feature_collection: dict,
     named_water_snapshot_payload: dict,
 ) -> dict:
+    validate_water_runtime(runtime_topology_payload, object_name="scenario_water",
+                           land_object="land_mask", stage_label="tno.runtime_topology")
     report = build_tno_water_geometry_report(
         scenario_id=SCENARIO_ID,
         source_water=water_feature_collection,
@@ -12335,6 +12722,7 @@ def build_countries_stage_state(
 ) -> dict[str, object]:
     countries_payload = load_json(scenario_dir / "countries.json")
     owners_payload = load_json(scenario_dir / "owners.by_feature.json")
+    atlantropa_source_owners = dict(owners_payload.get("owners") or {})
     controllers_payload = derive_controller_payload_from_owners(owners_payload)
     cores_payload = load_json(scenario_dir / "cores.by_feature.json")
     manual_overrides_payload = load_scenario_manual_overrides_payload(scenario_dir)
@@ -12425,6 +12813,11 @@ def build_countries_stage_state(
     atl_feature_collection, atlantropa_region_unions, atlantropa_diagnostics, atl_replacement_specs = build_atlantropa_from_hgo(
         donor_context,
         runtime_political_full_gdf,
+        owner_by_feature_id=atlantropa_source_owners,
+        published_features=topology_object_to_feature_collection(
+            load_json(scenario_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME), SCENARIO_ATLANTROPA_OBJECT_NAME,
+        )["features"],
+        land_reference=(atlantropa_land_reference := load_atlantropa_land_reference(runtime_political_full_gdf)),
     )
     atl_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_feature_collection]
     atl_political_gdf = geopandas_from_features(atl_feature_collection)
@@ -12456,7 +12849,12 @@ def build_countries_stage_state(
         runtime_political_full_gdf,
         atlantropa_region_unions,
         other_water_geom=build_mediterranean_other_water_geom(named_water_snapshot_payload),
+        land_reference=atlantropa_land_reference,
+        replacement_specs=atl_replacement_specs,
     )
+    atl_sea_collection, sea_quality_diagnostics = exclude_land_from_sea(atl_sea_collection, atl_feature_collection)
+    atl_sea_union = safe_unary_union([shape(feature["geometry"]) for feature in atl_sea_collection])
+    med_water_diagnostics["geometry_quality"] = sea_quality_diagnostics
     atl_sea_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_sea_collection]
     atl_sea_gdf = geopandas_from_features(atl_sea_collection)
 
@@ -12626,6 +13024,11 @@ def build_water_stage_state_from_countries_state(
     atl_feature_collection, atlantropa_region_unions, atlantropa_diagnostics, atl_replacement_specs = build_atlantropa_from_hgo(
         donor_context,
         runtime_political_full_gdf,
+        owner_by_feature_id=(countries_state["owners_payload"].get("owners") or {}),
+        published_features=topology_object_to_feature_collection(
+            load_json(scenario_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME), SCENARIO_ATLANTROPA_OBJECT_NAME,
+        )["features"],
+        land_reference=(atlantropa_land_reference := load_atlantropa_land_reference(runtime_political_full_gdf)),
     )
     atl_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_feature_collection]
     atl_political_gdf = geopandas_from_features(atl_feature_collection)
@@ -12638,9 +13041,15 @@ def build_water_stage_state_from_countries_state(
         runtime_political_full_gdf,
         atlantropa_region_unions,
         other_water_geom=build_mediterranean_other_water_geom(named_water_snapshot_payload),
+        land_reference=atlantropa_land_reference,
+        replacement_specs=atl_replacement_specs,
     )
+    atl_sea_collection, sea_quality_diagnostics = exclude_land_from_sea(atl_sea_collection, atl_feature_collection)
+    atl_sea_union = safe_unary_union([shape(feature["geometry"]) for feature in atl_sea_collection])
+    med_water_diagnostics["geometry_quality"] = sea_quality_diagnostics
+    coastline_replaced_base_ids, _ = collect_baseline_island_drop_ids(runtime_political_full_gdf, atl_replacement_specs)
     atl_sea_feature_ids = [str(feature["properties"]["id"]).strip() for feature in atl_sea_collection]
-    base_land_union = safe_unary_union(runtime_political_full_gdf.geometry.tolist())
+    base_land_union = atlantropa_land_reference
     atl_land_union = safe_unary_union(atl_political_gdf.geometry.tolist())
     if base_land_union is None or atl_land_union is None:
         raise ValueError("Unable to assemble land unions for runtime topology.")
@@ -12727,7 +13136,9 @@ def build_water_stage_state_from_countries_state(
         scenario_water_features,
         stage_label="scenario_water_seed_final",
     )
-    water_feature_collection = feature_collection_from_features(scenario_water_features)
+    water_feature_collection = compile_named_water_regions(
+        feature_collection_from_features(scenario_water_features), land_mask=ocean_land_mask_geom,
+    )
     water_gdf = geopandas_from_features(water_feature_collection["features"])
     water_gdf = apply_d3_spherical_safe_source_split_to_gdf(water_gdf)
     # Keep checkpoint seed and published water_regions.geojson on the same D3-safe geometry contract.
@@ -12796,9 +13207,11 @@ def build_water_stage_state_from_countries_state(
         "context_land_mask_fallback_used": context_land_mask_fallback_used,
         "context_land_mask_arc_refs": context_land_mask_arc_refs,
         "island_drop_ids": sorted(island_drop_ids),
+        "coastline_replaced_base_ids": sorted(coastline_replaced_base_ids),
     }
     return {
         "water_stage_metadata": water_stage_metadata,
+        "atlantropa_land_reference": atlantropa_land_reference,
         "water_gdf": water_gdf,
         "land_mask_gdf": land_mask_gdf,
         "context_land_mask_gdf": context_land_mask_gdf,
@@ -12849,16 +13262,43 @@ def build_runtime_topology_state(
         orient_source_water_features_for_d3(gdf_to_feature_collection(water_gdf))
     )
     water_gdf = geopandas_from_features(water_feature_collection.get("features", []))
+    land_reference = water_state.get("atlantropa_land_reference")
+    base_political_gdf = None
+    if land_reference is None:
+        base_political_gdf = load_runtime_political_gdf()
+        land_reference = load_atlantropa_land_reference(base_political_gdf)
+    # Only explicit scenario land removals cut the canonical coastline. Ocean
+    # tiles fitted against political fragments must not reintroduce their seams.
+    coastline_cut_geometries = water_gdf.loc[water_gdf["id"] == "congo_lake"].geometry.tolist()
+    replaced_base_ids = set(stage_metadata.get("coastline_replaced_base_ids") or [])
+    if replaced_base_ids:
+        if base_political_gdf is None:
+            base_political_gdf = load_runtime_political_gdf()
+        coastline_cut_geometries.extend(
+            base_political_gdf.loc[base_political_gdf["id"].isin(replaced_base_ids)].geometry.tolist()
+        )
+    classified_atlantropa = apply_atlantropa_runtime_fields(scenario_political_gdf)
+    coastline_geometry = build_scenario_coastline_geometry(
+        land_reference,
+        gdf_to_feature_collection(classified_atlantropa).get("features", []),
+        removed_land_geometry=safe_unary_union(coastline_cut_geometries),
+    )
+    scenario_coastline_gdf = gpd.GeoDataFrame([{
+        "id": "tno_1962_scenario_coastline", "name": "TNO 1962 Coastline",
+        "geometry": split_full_width_polygonal_parts_for_d3(coastline_geometry),
+    }], geometry="geometry", crs="EPSG:4326")
     runtime_topology_payload = build_runtime_topology_payload(
         scenario_political_gdf,
         water_gdf,
         land_mask_gdf,
         context_land_mask_gdf,
+        scenario_coastline_gdf,
     )
     context_land_mask_arc_refs = estimate_topology_object_arc_refs(runtime_topology_payload, "context_land_mask")
-    # Publish the source water asset from the D3-safe seed. The runtime topology
-    # object is validated below as a separate render contract.
-    runtime_water_regions = sanitize_feature_collection_polygonal_geometries(water_feature_collection)
+    # Use the final decoded surface for source exports as well: final-mask
+    # clipping and grid normalization must survive reloads and later rebuilds.
+    water_feature_collection = topology_object_to_feature_collection(runtime_topology_payload, "scenario_water")
+    runtime_water_regions = water_feature_collection
     scenario_atlantropa_features = sanitize_feature_collection_polygonal_geometries(
         topology_object_to_feature_collection(runtime_topology_payload, SCENARIO_ATLANTROPA_OBJECT_NAME)
     )
@@ -13063,6 +13503,7 @@ def build_runtime_topology_state(
             "scenario_special_land",
             "land_mask",
             "context_land_mask",
+            "scenario_coastline",
         ],
         "context_land_mask_tolerance": context_land_mask_tolerance,
         "context_land_mask_area_delta_ratio": context_land_mask_area_delta_ratio,

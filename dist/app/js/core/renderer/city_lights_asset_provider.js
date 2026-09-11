@@ -1,6 +1,7 @@
 import {
   HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
 } from "../city_lights_historical_1930_asset.js";
+import { resolveDataAssetUrl } from "../runtime_asset_registry.js";
 
 const MODERN_CITY_LIGHTS_ASSET_SPECIFIER = "../city_lights_modern_asset.js";
 
@@ -38,12 +39,36 @@ function normalizeModernAssets(moduleNamespace) {
   });
 }
 
+function normalizeUrbanShapeAssets(collection) {
+  const validRing = (ring) => Array.isArray(ring) && ring.length >= 4
+    && ring.every((point) => Array.isArray(point) && point.length >= 2
+      && Number.isFinite(point[0]) && Number.isFinite(point[1]))
+    && ring[0][0] === ring.at(-1)[0] && ring[0][1] === ring.at(-1)[1];
+  const validPolygon = (polygon) => Array.isArray(polygon) && polygon.length > 0
+    && polygon.every(validRing);
+  if (collection?.type !== "FeatureCollection" || !Array.isArray(collection.features)
+      || collection.features.length === 0 || !collection.features.every((feature) => {
+        const geometry = feature?.geometry;
+        return feature?.type === "Feature" && (geometry?.type === "Polygon"
+          ? validPolygon(geometry.coordinates)
+          : geometry?.type === "MultiPolygon" && Array.isArray(geometry.coordinates)
+            && geometry.coordinates.length > 0 && geometry.coordinates.every(validPolygon));
+      })) {
+    throw new TypeError("Modern City Lights urban shapes must contain polygon features.");
+  }
+  return collection;
+}
+
 export function createCityLightsAssetProvider({
   importModernAsset = () => import("../city_lights_modern_asset.js"),
   historicalEntries = HISTORICAL_1930_CITY_LIGHTS_ENTRIES,
+  fetchUrbanShapeAsset = (url) => globalThis.fetch(url),
+  resolveUrbanShapeAssetUrl = () => resolveDataAssetUrl("world_urban_lights"),
 } = {}) {
   let modernAssets = null;
   let modernAssetPromise = null;
+  let urbanShapeAssets = null;
+  let urbanShapeAssetPromise = null;
 
   function getAssets() {
     return {
@@ -51,7 +76,34 @@ export function createCityLightsAssetProvider({
       HISTORICAL_DERIVED_GLOW_MAX_ENTRIES: 520,
       HISTORICAL_DERIVED_GLOW_MIN_WEIGHT: 0.62,
       ...(modernAssets || EMPTY_MODERN_CITY_LIGHTS_ASSETS),
+      MODERN_CITY_LIGHTS_URBAN_AREAS: urbanShapeAssets,
     };
+  }
+
+  function ensureUrbanShapeAssets() {
+    if (urbanShapeAssets) {
+      return Promise.resolve(urbanShapeAssets);
+    }
+    if (urbanShapeAssetPromise) {
+      return urbanShapeAssetPromise;
+    }
+    urbanShapeAssetPromise = Promise.resolve()
+      .then(() => fetchUrbanShapeAsset(resolveUrbanShapeAssetUrl()))
+      .then((response) => {
+        if (!response?.ok || typeof response.json !== "function") {
+          throw new Error(`Modern City Lights urban shapes request failed (${response?.status ?? "invalid response"}).`);
+        }
+        return response.json();
+      })
+      .then((collection) => {
+        urbanShapeAssets = normalizeUrbanShapeAssets(collection);
+        return urbanShapeAssets;
+      })
+      .catch((error) => {
+        urbanShapeAssetPromise = null;
+        throw error;
+      });
+    return urbanShapeAssetPromise;
   }
 
   function ensureModernAssets() {
@@ -76,8 +128,10 @@ export function createCityLightsAssetProvider({
 
   return Object.freeze({
     ensureModernAssets,
+    ensureUrbanShapeAssets,
     getAssets,
     isModernAssetsReady: () => !!modernAssets,
+    isUrbanShapeAssetsReady: () => !!urbanShapeAssets,
   });
 }
 

@@ -468,6 +468,14 @@ def build_startup_runtime_shell(runtime_bootstrap_topology: dict) -> dict:
             "type": "GeometryCollection",
             "geometries": [],
         }
+    coastline_object = source_objects.get("scenario_coastline")
+    if isinstance(coastline_object, dict):
+        used_arc_indexes = _collect_topology_object_arc_indexes(coastline_object)
+        index_map = {source_index: len(next_arcs) + offset for offset, source_index in enumerate(used_arc_indexes)}
+        next_objects["scenario_coastline"] = _remap_topology_geometry_arcs(
+            copy.deepcopy(coastline_object), index_map
+        )
+        next_arcs.extend(copy.deepcopy(source_arcs[index]) for index in used_arc_indexes)
     return {
         "type": "Topology",
         "objects": next_objects,

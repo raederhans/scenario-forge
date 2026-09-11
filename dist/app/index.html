@@ -22,7 +22,9 @@
   </head>
   <body class="app-booting">
     <div id="appShell" class="app-layout">
+      <a class="skip-link" href="#mapContainer" data-i18n="Skip to map workspace">Skip to map workspace</a>
       <aside id="leftSidebar" class="sidebar sidebar-left">
+        <button type="button" class="sidebar-drawer-close" data-close-drawer="left" aria-label="Close panels" data-i18n-aria-label="Close panels">×</button>
         <button
           id="leftSidebarCollapseBtn"
           class="left-sidebar-collapse-btn"
@@ -42,6 +44,11 @@
                 <h1 class="app-title" data-i18n="Scenario Forge">Scenario Forge</h1>
               </div>
             </div>
+            <div class="workspace-file-actions">
+              <button id="workspaceSaveBtn" type="button" class="btn-primary" data-i18n="Save project">Save project</button>
+              <button id="workspaceExportBtn" type="button" class="btn-secondary" data-i18n="Export image">Export image</button>
+            </div>
+            <p id="workspaceSaveStatus" class="workspace-save-status" role="status" aria-live="polite" data-i18n="Not saved yet">Not saved yet</p>
           </div>
 
           <details class="card sidebar-details-card" aria-labelledby="lblScenario">
@@ -2099,11 +2106,11 @@
             </div>
             <div id="paletteLibraryPanel" class="palette-library mt-3">
               <div class="palette-library-toolbar">
-                <label id="lblPaletteSource" class="visually-hidden" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
-                <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select" aria-hidden="true" tabindex="-1">
+                <label id="lblPaletteSource" class="sidebar-field-label" for="themeSelect" data-i18n="Palette Source">Palette Source</label>
+                <select id="themeSelect" name="quick-palette-source" autocomplete="off" class="select-input palette-library-source-select">
                   <option value="HOI4 Vanilla" data-i18n="HOI4 Vanilla">HOI4 Vanilla</option>
                 </select>
-                <div id="paletteLibrarySources" class="palette-library-sources" role="tablist" aria-label="Palette Source" data-i18n-aria-label="Palette Source"></div>
+                <div id="paletteLibrarySources" class="palette-library-sources hidden" hidden role="tablist" aria-label="Palette Source" data-i18n-aria-label="Palette Source"></div>
               </div>
               <label id="lblPaletteSearch" class="section-header-block" for="paletteLibrarySearch">Search Colors</label>
               <div class="palette-library-search-row mt-2">
@@ -2117,7 +2124,6 @@
         </div>
       </aside>
 
-      <a class="skip-link" href="#mapContainer" data-i18n="Skip to map workspace">Skip to map workspace</a>
       <main class="map-main">
         <div class="map-stage">
           <div id="mapContainer" role="region" tabindex="-1" aria-label="Map workspace" aria-describedby="mapOnboardingHint" data-i18n-aria-label="Map workspace">
@@ -2126,6 +2132,7 @@
             <canvas id="lineCanvas" class="map-layer map-layer-top" data-i18n="Interactive map line layer.">Interactive map line layer.</canvas>
           </div>
 
+          <button id="sidebarDrawerBackdrop" type="button" class="sidebar-drawer-backdrop hidden" tabindex="-1" aria-label="Close panels" data-i18n-aria-label="Close panels"></button>
           <div class="map-overlay-controls">
             <button id="leftPanelToggle" class="panel-toggle panel-toggle-left" type="button" aria-controls="leftSidebar" aria-label="Panels toggle left panel" data-i18n="Panels" data-i18n-aria-label="Panels toggle left panel">
               Panels
@@ -2242,14 +2249,14 @@
                       <path d="M4.5 12c2.2-4 4.9-6 7.5-6s5.3 2 7.5 6c-2.2 4-4.9 6-7.5 6s-5.3-2-7.5-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                       <circle cx="12" cy="12" r="2.4" fill="currentColor"></circle>
                     </svg>
-                    <span class="visually-hidden" data-i18n="Visual Color">Visual Color</span>
+                    <span data-i18n="Paint mode color">Color</span>
                   </button>
                   <button id="paintModePoliticalBtn" type="button" class="dock-segment-btn dock-segment-icon-btn" data-paint-mode="sovereignty" aria-label="Political Ownership" data-i18n-aria-label="Political Ownership" title="Political Ownership" data-i18n-title="Political Ownership">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M6 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
                       <path d="M7 5.5h10l-1.8 3L17 11H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
                     </svg>
-                    <span class="visually-hidden" data-i18n="Political Ownership">Political Ownership</span>
+                    <span data-i18n="Ownership">Ownership</span>
                   </button>
                 </div>
               </div>
@@ -2330,6 +2337,7 @@
       </main>
 
       <aside id="rightSidebar" class="sidebar-right">
+        <button type="button" class="sidebar-drawer-close" data-close-drawer="right" aria-label="Close panels" data-i18n-aria-label="Close panels">×</button>
         <button
           id="rightSidebarCollapseBtn"
           class="right-sidebar-collapse-btn"
@@ -2375,18 +2383,13 @@
           >
           <div class="sidebar-shell-heading sidebar-shell-heading-right sidebar-shell-anchor" data-i18n="Inspector">Inspector</div>
 
-          <h2 id="countryInspectorHeading" class="visually-hidden">Country Inspector</h2>
+          <h2 id="countryInspectorHeading" class="visually-hidden" data-i18n="Country Inspector">Country Inspector</h2>
           <details id="countryInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="countryInspectorHeading lblCountryInspector">
             <summary id="lblCountryInspector" class="sidebar-section-head">
               <span class="sidebar-section-title">Country Inspector</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Inspect countries, active owners, and direct color overrides.">Inspect countries, active owners, and direct color overrides.</span>
-              </span>
+
             </summary>
+              <p class="sidebar-section-description" data-i18n="Inspect countries, active owners, and direct color overrides.">Inspect countries, active owners, and direct color overrides.</p>
             <div class="inspector-panel-body">
               <div class="inspector-search-shell">
                 <div class="card-flat inspector-search-block">
@@ -2436,31 +2439,21 @@
           <details id="selectedCountryActionsSection" class="card inspector-section sidebar-section-shell" aria-labelledby="selectedCountryActionsHeading lblPresetsHierarchy">
             <summary id="lblPresetsHierarchy" class="sidebar-section-head">
               <span class="sidebar-section-title">Territories &amp; Presets</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Inspect territories, presets, releasables, and scenario ownership actions for the selected country.">Inspect territories, presets, releasables, and scenario ownership actions for the selected country.</span>
-              </span>
+
             </summary>
+              <p class="sidebar-section-description" data-i18n="Inspect territories, presets, releasables, and scenario ownership actions for the selected country.">Inspect territories, presets, releasables, and scenario ownership actions for the selected country.</p>
             <div class="inspector-panel-body">
               <div id="presetTree" class="inspector-scroll preset-tree mt-3"></div>
             </div>
           </details>
 
-          <h2 id="specialRegionInspectorHeading" class="visually-hidden">Special Regions</h2>
+          <h2 id="specialRegionInspectorHeading" class="visually-hidden" data-i18n="Special Regions">Special Regions</h2>
           <details id="specialRegionInspectorSection" class="card inspector-section hidden sidebar-section-shell is-conditional" aria-labelledby="specialRegionInspectorHeading lblSpecialRegionInspector">
             <summary id="lblSpecialRegionInspector" class="sidebar-section-head">
               <span class="sidebar-section-title is-conditional">Special Regions</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.">Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.</span>
-              </span>
+
             </summary>
+              <p class="sidebar-section-description" data-i18n="Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.">Inspect scenario-only basins and exposure zones. Use Special Zones layers for editable narrative regions.</p>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblScenarioSpecialRegionVisibility" class="sidebar-group-label">Visibility</h3>
@@ -2537,14 +2530,9 @@
           <details id="waterInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="waterInspectorHeading lblWaterInspector">
             <summary id="lblWaterInspector" class="sidebar-section-head">
               <span class="sidebar-section-title">Water Regions</span>
-              <span class="summary-info-trigger info-trigger" aria-hidden="true">
-                <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                  <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                </svg>
-                <span class="info-tooltip" data-i18n="Inspect seas, lakes, straits, and direct water color overrides.">Inspect seas, lakes, straits, and direct water color overrides.</span>
-              </span>
+
             </summary>
+              <p class="sidebar-section-description" data-i18n="Inspect seas, lakes, straits, and direct water color overrides.">Inspect seas, lakes, straits, and direct water color overrides.</p>
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblWaterInteraction" class="sidebar-group-label">Interaction</h3>
@@ -2698,14 +2686,9 @@
             <details id="projectLegendSection" class="card inspector-section sidebar-section-shell" aria-labelledby="projectLegendHeading lblProjectLegend">
               <summary id="lblProjectLegend" class="sidebar-section-head">
                 <span class="sidebar-anchor-title" data-i18n="Project Management">Project Management</span>
-                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
-                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                  </svg>
-                  <span class="info-tooltip" data-i18n="Manage project files, loading choices, and account-backed saves.">Manage project files, loading choices, and account-backed saves.</span>
-                </span>
+
               </summary>
+              <p class="sidebar-section-description" data-i18n="Manage project files, loading choices, and account-backed saves.">Manage project files, loading choices, and account-backed saves.</p>
               <div id="projectManagementStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
@@ -2754,14 +2737,9 @@
             <details id="legendProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="legendProjectHeading lblLegendProject">
               <summary id="lblLegendProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Legend">Legend</span>
-                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
-                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                  </svg>
-                  <span class="info-tooltip" data-i18n="Edit the small project legend list for the current working map.">Edit the small project legend list for the current working map.</span>
-                </span>
+
               </summary>
+              <p class="sidebar-section-description" data-i18n="Edit the small project legend list for the current working map.">Edit the small project legend list for the current working map.</p>
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
@@ -2769,14 +2747,9 @@
             <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
               <summary id="lblFrontlineProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Frontlines & Annotations">Frontlines & Annotations</span>
-                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
-                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                  </svg>
-                  <span class="info-tooltip" data-i18n="Review derived frontlines and project-local strategic annotations for publishable maps.">Review derived frontlines and project-local strategic annotations for publishable maps.</span>
-                </span>
+
               </summary>
+              <p class="sidebar-section-description" data-i18n="Review derived frontlines and project-local strategic annotations for publishable maps.">Review derived frontlines and project-local strategic annotations for publishable maps.</p>
               <div class="inspector-panel-body">
                 <p class="sidebar-tool-hint inspector-frontline-intro hidden sidebar-help-copy" data-i18n="Frontlines and strategic annotations workspace.">
                   Frontlines and strategic annotations workspace.
@@ -2789,14 +2762,9 @@
             <details id="transportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="transportProjectHeading lblTransportProject">
               <summary id="lblTransportProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Transport workbench">Transport workbench</span>
-                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
-                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                  </svg>
-                  <span class="info-tooltip" data-i18n="Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.">Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.</span>
-                </span>
+
               </summary>
+              <p class="sidebar-section-description" data-i18n="Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.">Open the transport workbench for transport preview, layer order, diagnostics, and apply-to-map controls.</p>
               <div class="inspector-panel-body">
                 <div class="sidebar-support-actions" role="group" aria-label="Transport actions" data-i18n-aria-label="Transport actions">
                   <button
@@ -2819,14 +2787,9 @@
             <details id="exportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="exportProjectHeading lblExportProject" open>
               <summary id="lblExportProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Export">Export</span>
-                <span class="summary-info-trigger info-trigger sidebar-section-info-trigger" aria-hidden="true">
-                  <svg class="info-icon summary-info-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M12 7.5v.01M11.2 10.5h.8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                  </svg>
-                  <span class="info-tooltip" data-i18n="Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.">Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.</span>
-                </span>
+
               </summary>
+              <p class="sidebar-section-description" data-i18n="Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.">Open the export workbench for preview, layer order, image adjustments, target selection, and final resolution.</p>
               <div class="inspector-panel-body">
                 <div class="sidebar-support-summary-row" aria-label="Export summary" data-i18n-aria-label="Export summary">
                   <div class="sidebar-support-summary-pill">
@@ -3072,6 +3035,7 @@
               <div class="export-workbench-topbar-kicker" data-i18n="Export">Export</div>
               <h3 class="export-workbench-topbar-title" data-i18n="Export workbench">Export workbench</h3>
             </div>
+            <button id="exportWorkbenchAdvancedBtn" type="button" class="btn-secondary export-workbench-advanced-btn" aria-expanded="false" aria-controls="exportWorkbenchParams exportWorkbenchLayers" data-i18n="Advanced settings">Advanced settings</button>
             <button
               id="exportWorkbenchCloseBtn"
               type="button"
@@ -3096,7 +3060,7 @@
             <span id="exportWorkbenchSampleRecommendation" data-export-workbench-sample-recommendation></span>
           </div>
           <div class="export-workbench-grid">
-            <section class="export-workbench-column export-workbench-column-params" aria-labelledby="exportWorkbenchParamsTitle">
+            <section id="exportWorkbenchParams" hidden class="export-workbench-column export-workbench-column-params" aria-labelledby="exportWorkbenchParamsTitle">
               <div class="export-workbench-column-kicker" data-i18n="Base image">Base image</div>
               <h4 id="exportWorkbenchParamsTitle" class="export-workbench-column-title" data-i18n="Base frame tuning">Base frame tuning</h4>
               <div class="export-workbench-control-list">
@@ -3162,7 +3126,7 @@
               </div>
             </section>
 
-            <section class="export-workbench-column export-workbench-column-layers" aria-labelledby="exportWorkbenchLayersTitle">
+            <section id="exportWorkbenchLayers" hidden class="export-workbench-column export-workbench-column-layers" aria-labelledby="exportWorkbenchLayersTitle">
               <h4 id="exportWorkbenchLayersTitle" class="export-workbench-column-title" data-i18n="Layer and text stacks">Layer and text stacks</h4>
               <div class="export-workbench-layer-groups">
                 <div class="export-workbench-layer-group">
@@ -3183,17 +3147,22 @@
             </section>
           </div>
           <div class="export-workbench-footer">
+            <div class="export-workbench-field">
             <label id="lblExportWorkbenchTarget" class="sidebar-field-label" for="exportWorkbenchTarget" data-i18n="Target">Target</label>
             <select id="exportWorkbenchTarget" name="export-workbench-target" autocomplete="off" class="select-input export-workbench-format-select">
               <option value="composite" data-i18n="Composite image">Composite image</option>
               <option value="per-layer" data-i18n="Per-layer PNG">Per-layer PNG</option>
               <option value="bake-pack" data-i18n="Bake pack (v1.1)">Bake pack (v1.1)</option>
             </select>
+            </div>
+            <div class="export-workbench-field">
             <label id="lblExportWorkbenchFormat" class="sidebar-field-label" for="exportWorkbenchFormat" data-i18n="Format">Format</label>
             <select id="exportWorkbenchFormat" name="export-workbench-format" autocomplete="off" class="select-input export-workbench-format-select">
               <option value="png">PNG</option>
               <option value="jpg">JPG</option>
             </select>
+            </div>
+            <div class="export-workbench-field">
             <label id="lblExportWorkbenchScale" class="sidebar-field-label" for="exportWorkbenchScale" data-i18n="Export Resolution">Export Resolution</label>
             <select id="exportWorkbenchScale" name="export-workbench-scale" autocomplete="off" class="select-input export-workbench-format-select">
               <option value="1" data-i18n="Current preview (1×)">Current preview (1×)</option>
@@ -3201,6 +3170,7 @@
               <option value="2" selected data-i18n="Ultra (2×)">Ultra (2×)</option>
               <option value="4" data-i18n="Maximum detail (4×)">Maximum detail (4×)</option>
             </select>
+            </div>
             <p id="exportWorkbenchResolutionHint" class="sidebar-help-copy" data-i18n="Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).">Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).</p>
             <button id="exportWorkbenchSnapshotBtn" class="btn-primary export-workbench-snapshot-btn" type="button" data-i18n="Download Snapshot">
               Download Snapshot
@@ -3597,6 +3567,10 @@
         <div class="boot-overlay__eyebrow" data-i18n="Scenario Boot">Scenario Boot</div>
         <h2 id="bootOverlayTitle" class="boot-overlay__title" data-i18n="Preparing default scenario">Preparing default scenario</h2>
         <p id="bootOverlayMessage" class="boot-overlay__message" data-i18n="Loading the base map and TNO 1962 assets before interaction unlocks.">Loading the base map and TNO 1962 assets before interaction unlocks.</p>
+        <details id="bootOverlayErrorDetails" class="boot-overlay__error-details hidden" hidden>
+          <summary id="bootOverlayErrorSummary">Technical details</summary>
+          <pre id="bootOverlayErrorText"></pre>
+        </details>
         <div
           id="bootOverlayProgress"
           class="boot-overlay__progress"

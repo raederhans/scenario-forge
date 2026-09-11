@@ -1,6 +1,105 @@
 const { test, expect } = require("@playwright/test");
 const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
 
+async function expectDockCommandsToFit(page, width) {
+  const ids = ["toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
+    "undoBtn", "redoBtn", "presetPolitical", "paintModeVisualBtn", "paintModePoliticalBtn", "selectedColorPreview"];
+  const boxes = [];
+  for (const id of ids) {
+    const control = page.locator(`#${id}`);
+    await expect(control).toBeVisible();
+    const box = await control.boundingBox();
+    expect(box.x, id).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, id).toBeLessThanOrEqual(width);
+    boxes.push({ id, ...box });
+  }
+  for (let i = 0; i < boxes.length; i += 1) {
+    for (const other of boxes.slice(i + 1)) {
+      const box = boxes[i];
+      const overlaps = box.x < other.x + other.width - 1 && box.x + box.width > other.x + 1
+        && box.y < other.y + other.height - 1 && box.y + box.height > other.y + 1;
+      expect(overlaps, `${box.id} overlaps ${other.id} at ${width}px`).toBe(false);
+    }
+  }
+}
+
+test("desktop commands and tablet drawers remain usable", async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await gotoApp(page, "/?ui_shell=1", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#workspaceExportBtn")).toBeEnabled({ timeout: 30_000 });
+  await expect(page.locator("#bootOverlay")).toBeHidden();
+  for (const width of [1366, 1440, 1920, 1024]) {
+    await page.setViewportSize({ width, height: 768 });
+    await expectDockCommandsToFit(page, width);
+  }
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.locator("#workspaceExportBtn").click();
+  await expect(page.locator("#exportWorkbenchParams")).toBeHidden();
+  const fields = await page.locator(".export-workbench-field").evaluateAll((nodes) => nodes.map((node) => ({
+    width: node.clientWidth, scrollWidth: node.scrollWidth,
+    labelHeight: node.querySelector("label").getBoundingClientRect().height,
+  })));
+  for (const field of fields) {
+    expect(field.width).toBeGreaterThan(100);
+    expect(field.scrollWidth).toBeLessThanOrEqual(field.width + 1);
+    expect(field.labelHeight).toBeLessThan(36);
+  }
+  await page.locator("#exportWorkbenchAdvancedBtn").click();
+  await expect(page.locator("#exportWorkbenchParams")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#workspaceExportBtn")).toBeFocused();
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expectDockCommandsToFit(page, 768);
+  await expect(page.locator("#leftSidebar")).toHaveJSProperty("inert", true);
+  await expect(page.locator("#rightSidebar")).toHaveJSProperty("inert", true);
+  await page.locator("#leftPanelToggle").click();
+  const close = page.locator('[data-close-drawer="left"]');
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  expect(await page.evaluate(() => document.getElementById("leftSidebar").contains(document.activeElement))).toBe(true);
+  await expect(close).not.toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#leftPanelToggle")).toBeFocused();
+  await expect(page.locator("#leftSidebar")).toHaveJSProperty("inert", true);
+  await page.locator("#rightPanelToggle").click();
+  await expect(page.locator('[data-close-drawer="right"]')).toBeFocused();
+  await page.locator('[data-close-drawer="right"]').click();
+  await expect(page.locator("#rightPanelToggle")).toBeFocused();
+});
+
+test("desktop export preview opens with the real scenario", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await expect(page.locator("#workspaceExportBtn")).toBeEnabled();
+  await expect(page.locator("#themeSelect")).not.toHaveValue("");
+  await expect(page.locator("#paletteLibrarySources")).toBeHidden();
+  await expectDockCommandsToFit(page, 1440);
+  const closedSections = await page.locator("#rightSidebar details.card:not([open])").evaluateAll((nodes) =>
+    nodes.filter((node) => node.getClientRects().length).map((node) => node.getBoundingClientRect().height));
+  for (const height of closedSections) expect(height).toBeLessThanOrEqual(58);
+  await page.screenshot({ path: testInfo.outputPath("editor-desktop.png") });
+  await page.locator("#workspaceExportBtn").click();
+  await expect(page.locator("#exportWorkbenchPanel")).toBeVisible();
+  await expect(page.locator("#exportWorkbenchParams")).toBeHidden();
+  await expect(page.locator("#exportWorkbenchSnapshotBtn")).toBeEnabled({ timeout: 30_000 });
+  await expect(page.locator("#exportWorkbenchPreviewStage canvas")).toBeVisible();
+  await expect(page.locator("#exportWorkbenchPreviewLayerSelect")).toHaveCSS("opacity", "0");
+  await page.screenshot({ path: testInfo.outputPath("export-desktop.png") });
+  await page.locator("#exportWorkbenchAdvancedBtn").focus();
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.locator("#exportWorkbenchSnapshotBtn")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#exportWorkbenchAdvancedBtn")).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#workspaceExportBtn")).toBeFocused();
+});
+
 
 test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page }) => {
   test.setTimeout(90_000);

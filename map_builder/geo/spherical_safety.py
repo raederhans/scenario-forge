@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import Iterable
 
 import geopandas as gpd
-from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, box, mapping
-from shapely.geometry.polygon import orient
+from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, mapping
+from map_builder.geo.water_geometry import compile_water_feature_collection
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -19,14 +19,8 @@ PRIMARY_POLAR_WATER_IDS = frozenset({
     "marine_arctic_ocean",
     "marine_southern_ocean",
 })
-POLAR_LONGITUDE_SPLIT_EPSILON = 0.005
 POLAR_COVERAGE_LOSS_RATIO_MAX = 0.0001
 NODE_VALIDATION_TIMEOUT_SECONDS = 15
-POLAR_LONGITUDE_SPLIT_BBOXES = (
-    (-180.0 + POLAR_LONGITUDE_SPLIT_EPSILON, -90.0, -60.0 - POLAR_LONGITUDE_SPLIT_EPSILON, 90.0),
-    (-60.0 + POLAR_LONGITUDE_SPLIT_EPSILON, -90.0, 60.0 - POLAR_LONGITUDE_SPLIT_EPSILON, 90.0),
-    (60.0 + POLAR_LONGITUDE_SPLIT_EPSILON, -90.0, 180.0 - POLAR_LONGITUDE_SPLIT_EPSILON, 90.0),
-)
 
 
 def _iter_polygon_parts(geometry):
@@ -40,45 +34,15 @@ def _iter_polygon_parts(geometry):
 
 
 def _split_polar_longitude_bands(geometry):
-    parts = []
-    for source_part in _iter_polygon_parts(geometry):
-        for split_bbox in POLAR_LONGITUDE_SPLIT_BBOXES:
-            parts.extend(_iter_polygon_parts(source_part.intersection(box(*split_bbox))))
-    oriented_parts = [orient(part, sign=-1.0) for part in parts if not part.is_empty and part.area > 0]
-    if not oriented_parts:
-        return None
-    probe_collection = {
+    # Retain the valid source surface, including its pole and antimeridian.
+    # Linear samples avoid great-circle shortcuts without epsilon gaps or
+    # mutually touching MultiPolygons created by artificial longitude bands.
+    from shapely.geometry import shape
+    compiled = compile_water_feature_collection({
         "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "properties": {"id": str(index)},
-                "geometry": mapping(part),
-            }
-            for index, part in enumerate(oriented_parts)
-        ],
-    }
-    diagnostics = {
-        str(row.get("id")): row
-        for row in _collect_d3_spherical_diagnostics(
-            probe_collection,
-            stage_label="primary_polar_water.prepare_parts",
-        )
-        if row.get("partIndex") is None
-    }
-    for index, part in enumerate(oriented_parts):
-        row = diagnostics.get(str(index), {})
-        area = row.get("area")
-        if (
-            row.get("worldBounds")
-            or row.get("error")
-            or not isinstance(area, (int, float))
-            or not math.isfinite(float(area))
-            or float(area) <= 0
-            or float(area) > math.pi * 2
-        ):
-            oriented_parts[index] = orient(part, sign=1.0)
-    return oriented_parts[0] if len(oriented_parts) == 1 else MultiPolygon(oriented_parts)
+        "features": [{"type": "Feature", "properties": {}, "geometry": mapping(geometry)}],
+    })
+    return shape(compiled["features"][0]["geometry"])
 
 
 def prepare_primary_polar_water_regions(

@@ -20,10 +20,10 @@
       </div>
     </header>
 
-    <nav class="mode-nav" aria-label="平台视角">
-      <button class="active" data-view="community" data-i18n="communityView">公开社区</button>
-      <button data-view="account" data-i18n="accountView">用户中心</button>
-      <button data-view="admin" data-i18n="adminView">管理员后台</button>
+    <nav class="mode-nav" role="tablist" aria-label="平台视角">
+      <button class="active" id="communityTab" role="tab" aria-selected="true" aria-controls="communityView" data-view="community" data-i18n="communityView">公开社区</button>
+      <button id="accountTab" role="tab" aria-selected="false" aria-controls="accountView" data-view="account" data-i18n="accountView">用户中心</button>
+      <button id="adminTab" role="tab" aria-selected="false" aria-controls="adminView" data-view="admin" data-i18n="adminView">管理员后台</button>
     </nav>
 
     <section class="session-strip" id="sessionStrip">
@@ -34,7 +34,7 @@
       <button id="logoutBtn" data-i18n="logout">登出</button>
     </section>
 
-    <section class="view active" id="communityView" data-view-panel="community">
+    <section class="view active" id="communityView" role="tabpanel" aria-labelledby="communityTab" data-view-panel="community">
       <div class="section-head">
         <div>
           <p class="eyebrow" data-i18n="communityKicker">玩家视角</p>
@@ -44,10 +44,10 @@
           <button id="refreshCommunityBtn" data-i18n="refreshCommunity">刷新社区</button>
         </div>
       </div>
-      <div id="communityFeed" class="post-grid"></div>
+      <div id="communityFeed" class="post-grid" aria-live="polite"></div>
     </section>
 
-    <section class="view" id="accountView" data-view-panel="account">
+    <section class="view" id="accountView" role="tabpanel" aria-labelledby="accountTab" data-view-panel="account">
       <div class="gate" id="accountGate">
         <h2 data-i18n="accountGateTitle">登录后查看用户中心</h2>
         <p data-i18n="accountGateCopy">用户中心只展示当前用户自己的存档、发布状态和导出操作。</p>
@@ -61,7 +61,7 @@
             </div>
             <button id="createSampleBtn" class="primary" data-i18n="createSample">创建示例存档</button>
           </div>
-          <div id="mySavesList" class="stack-list"></div>
+          <div id="mySavesList" class="stack-list" aria-live="polite"></div>
         </section>
         <form id="manualSaveForm" class="panel editor-panel">
           <h3 data-i18n="newPost">发布前草稿</h3>
@@ -82,7 +82,7 @@
       </div>
     </section>
 
-    <section class="view" id="adminView" data-view-panel="admin">
+    <section class="view" id="adminView" role="tabpanel" aria-labelledby="adminTab" data-view-panel="admin">
       <div class="gate" id="adminGate">
         <h2 data-i18n="adminGateTitle">管理员权限后进入后台</h2>
         <p data-i18n="adminGateCopy">后台入口只给 admin 或 moderator 显示，所有管理动作都经过后端权限校验。</p>
@@ -101,41 +101,41 @@
           <button id="seedDemoBtn" class="wide primary" data-admin-only data-i18n="seedDemo">生成样例帖子</button>
         </aside>
         <section class="admin-main">
-          <div class="admin-tabs">
-            <button class="active" data-admin-tab="activity" data-i18n="activityTab">动态</button>
-            <button data-admin-tab="content" data-i18n="contentTab">内容</button>
-            <button data-admin-tab="comments" data-i18n="commentsTab">评论</button>
-            <button data-admin-tab="users" data-admin-only data-i18n="usersTab">用户</button>
-            <button data-admin-tab="reports" data-i18n="reportsTab">举报</button>
+          <div class="admin-tabs" role="tablist" aria-label="管理员栏目">
+            <button class="active" id="adminActivityTab" role="tab" aria-selected="true" aria-controls="adminActivityPanel" data-admin-tab="activity" data-i18n="activityTab">动态</button>
+            <button id="adminContentTab" role="tab" aria-selected="false" aria-controls="adminContentPanel" data-admin-tab="content" data-i18n="contentTab">内容</button>
+            <button id="adminCommentsTab" role="tab" aria-selected="false" aria-controls="adminCommentsPanel" data-admin-tab="comments" data-i18n="commentsTab">评论</button>
+            <button id="adminUsersTab" role="tab" aria-selected="false" aria-controls="adminUsersPanel" data-admin-tab="users" data-admin-only data-i18n="usersTab">用户</button>
+            <button id="adminReportsTab" role="tab" aria-selected="false" aria-controls="adminReportsPanel" data-admin-tab="reports" data-i18n="reportsTab">举报</button>
           </div>
-          <div class="admin-panel active" data-admin-panel="activity">
+          <div class="admin-panel active" id="adminActivityPanel" role="tabpanel" aria-labelledby="adminActivityTab" data-admin-panel="activity">
             <h3 data-i18n="activityTitle">社区动态</h3>
-            <div id="activityList" class="stack-list"></div>
+            <div id="activityList" class="stack-list" aria-live="polite"></div>
           </div>
-          <div class="admin-panel" data-admin-panel="content">
+          <div class="admin-panel" id="adminContentPanel" role="tabpanel" aria-labelledby="adminContentTab" data-admin-panel="content">
             <h3 data-i18n="contentTitle">内容与图片管理</h3>
-            <div id="adminSavesList" class="stack-list"></div>
+            <div id="adminSavesList" class="stack-list" aria-live="polite"></div>
           </div>
-          <div class="admin-panel" data-admin-panel="comments">
+          <div class="admin-panel" id="adminCommentsPanel" role="tabpanel" aria-labelledby="adminCommentsTab" data-admin-panel="comments">
             <h3 data-i18n="commentsTitle">评论管理</h3>
-            <div id="commentsList" class="stack-list"></div>
+            <div id="commentsList" class="stack-list" aria-live="polite"></div>
           </div>
-          <div class="admin-panel" data-admin-panel="users" data-admin-only>
+          <div class="admin-panel" id="adminUsersPanel" role="tabpanel" aria-labelledby="adminUsersTab" data-admin-panel="users" data-admin-only>
             <h3 data-i18n="usersTitle">用户与权限</h3>
-            <div id="usersList" class="stack-list"></div>
+            <div id="usersList" class="stack-list" aria-live="polite"></div>
           </div>
-          <div class="admin-panel" data-admin-panel="reports">
+          <div class="admin-panel" id="adminReportsPanel" role="tabpanel" aria-labelledby="adminReportsTab" data-admin-panel="reports">
             <h3 data-i18n="reportsTitle">举报审核</h3>
-            <div id="reportsList" class="stack-list"></div>
+            <div id="reportsList" class="stack-list" aria-live="polite"></div>
           </div>
         </section>
       </div>
     </section>
   </main>
 
-  <dialog id="authDialog">
+  <dialog id="authDialog" aria-labelledby="authTitle">
     <form method="dialog" class="auth-card">
-      <button class="dialog-close" value="cancel">×</button>
+      <button class="dialog-close" id="authCloseBtn" value="cancel" aria-label="关闭">×</button>
       <h2 id="authTitle">登录</h2>
       <label>
         <span data-i18n="username">用户名</span>
@@ -153,9 +153,9 @@
     </form>
   </dialog>
 
-  <dialog id="detailDialog">
+  <dialog id="detailDialog" aria-labelledby="detailTitle" aria-describedby="detailMeta">
     <article class="detail-card">
-      <button class="dialog-close" id="closeDetailBtn">×</button>
+      <button class="dialog-close" id="closeDetailBtn" aria-label="关闭">×</button>
       <div id="detailImage" class="detail-image"></div>
       <h2 id="detailTitle">内容详情</h2>
       <p id="detailMeta"></p>

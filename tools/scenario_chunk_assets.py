@@ -1019,7 +1019,7 @@ def _build_chunk_payloads_for_feature_collection(
                         optimized_lod_summary,
                     )
                     _write_minified_json(chunk_path, chunk_payload)
-                elif layer_key == "water" and spec["lod"] == "coarse":
+                elif layer_key == "water":
                     _write_minified_json(chunk_path, chunk_payload)
                 else:
                     _write_json(chunk_path, chunk_payload)

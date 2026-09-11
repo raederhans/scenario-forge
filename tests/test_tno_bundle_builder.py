@@ -2609,9 +2609,13 @@ class TnoBundleBuilderTest(unittest.TestCase):
         west_cover_ratio = rebuilt.intersection(west_baseline).area / west_baseline.area
 
         self.assertGreaterEqual(west_cover_ratio, 0.95)
-        self.assertLessEqual(rebuilt.area, baseline.area * 1.08)
+        self.assertGreaterEqual(rebuilt.intersection(baseline).area / baseline.area, 0.999)
+        self.assertGreater(rebuilt.area, baseline.area * 1.60)
+        self.assertLessEqual(rebuilt.area, baseline.area * 1.80)
+        for point in (Point(33.4706127281, 34.7775520332), Point(33.5503970424, 34.8129702208)):
+            self.assertTrue(rebuilt.covers(point), "Cyprus source land province 14138 must remain land")
 
-    def test_tno_1962_cyprus_island_rebuild_keeps_baseline_area_clamp_contract(self) -> None:
+    def test_tno_1962_cyprus_island_rebuild_uses_original_island_alignment(self) -> None:
         levant_config = tno_bundle.ATLANTROPA_REGION_CONFIGS["levant"]
         cyprus_group = next(
             group
@@ -2620,7 +2624,23 @@ class TnoBundleBuilderTest(unittest.TestCase):
         )
 
         self.assertEqual(cyprus_group["baseline_feature_ids"], ["CY000"])
-        self.assertEqual(cyprus_group["max_baseline_area_ratio"], 1.08)
+        self.assertEqual(cyprus_group["max_baseline_area_ratio"], 1.80)
+        self.assertEqual(cyprus_group["source_island_anchors"][0]["source_province_ids"],
+                         [7193, 11984, 13332, 13333, 14138, 17019])
+        self.assertNotIn("group_bbox", cyprus_group)
+
+    def test_checked_in_balearics_preserves_all_three_island_cores_and_reclamation(self) -> None:
+        topology = json.loads((Path(tno_bundle.SCENARIO_DIR) / "scenario_atlantropa.topo.json").read_text(encoding="utf-8"))
+        baseline_topology = json.loads((Path(tno_bundle.ROOT) / "data/europe_topology.runtime_political_v1.json").read_text(encoding="utf-8"))
+        rebuilt = _feature_geometry_from_topology(topology, "scenario_atlantropa", "ATLISL_west_med_balearics")
+        baseline_area = 0.0
+        for feature_id in ("ES531", "ES532", "ES533"):
+            baseline = _feature_geometry_from_topology(baseline_topology, "political", feature_id)
+            baseline_area += baseline.area
+            self.assertGreaterEqual(rebuilt.intersection(baseline).area / baseline.area, 0.999, feature_id)
+        self.assertGreater(rebuilt.area, baseline_area * 3.0)
+        self.assertLessEqual(rebuilt.area, baseline_area * 4.30)
+        self.assertEqual(len(list(tno_bundle.iter_polygon_parts(rebuilt))), 3)
 
     def test_mediterranean_closure_fills_gap_without_flooding_land_or_other_water(self) -> None:
         template = box(0, 0, 10, 10)

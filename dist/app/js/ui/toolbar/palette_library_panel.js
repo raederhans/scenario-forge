@@ -596,8 +596,30 @@ function createPaletteLibraryPanelController({
   };
 
   const syncPaletteSourceControls = () => {
-    const activeValue = String(runtimeState.activePaletteId || "");
-    if (themeSelect && themeSelect.value !== activeValue) {
+    if (!themeSelect) return;
+    const sourceOptions = getPaletteSourceOptions();
+    const currentOptions = Array.from(themeSelect.options || []);
+    if (sourceOptions.length && (
+      currentOptions.length !== sourceOptions.length
+      || sourceOptions.some((option, index) => (
+        currentOptions[index]?.value !== option.value
+        || currentOptions[index]?.textContent !== option.label
+      ))
+    )) {
+      const options = sourceOptions.map(({ value, label }) => {
+        const option = themeSelect.ownerDocument.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        return option;
+      });
+      themeSelect.replaceChildren(...options);
+    }
+    const requestedValue = String(sourceOptions.length
+      ? (runtimeState.activePaletteId || sourceOptions[0].value)
+      : runtimeState.currentPaletteTheme || "");
+    const activeValue = Array.from(themeSelect.options || []).some((option) => option.value === requestedValue)
+      ? requestedValue : (themeSelect.options?.[0]?.value || "");
+    if (themeSelect.value !== activeValue) {
       themeSelect.value = activeValue;
     }
   };

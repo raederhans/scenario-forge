@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 57,
-    "nodeCount": 71,
-    "reverseIndexKeyCount": 100,
+    "specCount": 60,
+    "nodeCount": 74,
+    "reverseIndexKeyCount": 103,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 56
+        "specCount": 59
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -535,6 +535,33 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js": {
+      "directDependencies": [
+        "js/core/map_renderer.js",
+        "js/core/state.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
     "tests/e2e/dev/tno_ready_state_contract.dev.spec.js": {
       "directDependencies": [
         "js/core/map_renderer.js",
@@ -783,6 +810,37 @@
         "tests/e2e/support/startup-paths.js"
       ],
       "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/ocean_geometry_contract.spec.js": {
+      "directDependencies": [
+        "js/core/history_manager.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/history_manager.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/history_manager.js",
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
@@ -1454,6 +1512,32 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/tno_atlantropa_coastline.spec.js": {
+      "directDependencies": [
+        "js/core/map_renderer.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
     "tests/e2e/tno_named_water_rendering.spec.js": {
       "directDependencies": [
         "js/core/scenario_dispatcher.js",
@@ -1825,6 +1909,7 @@
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js"
     ],
     "js/core/history_manager.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/shortcut_history_render_boundary.spec.js"
     ],
     "js/core/interaction_funnel.js": [
@@ -1841,6 +1926,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1849,6 +1935,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -1872,6 +1959,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -1899,6 +1987,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1907,6 +1996,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -1930,6 +2020,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -1981,6 +2072,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -1989,6 +2081,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2012,6 +2105,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2068,6 +2162,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2076,6 +2171,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2099,6 +2195,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2144,6 +2241,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2152,6 +2250,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2175,6 +2274,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2248,6 +2348,9 @@
     "tests/e2e/dev/shared_labels_runtime.dev.spec.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js": [
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js"
+    ],
     "tests/e2e/dev/tno_ready_state_contract.dev.spec.js": [
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js"
     ],
@@ -2268,6 +2371,9 @@
     ],
     "tests/e2e/non_1962_runtime_matrix.spec.js": [
       "tests/e2e/non_1962_runtime_matrix.spec.js"
+    ],
+    "tests/e2e/ocean_geometry_contract.spec.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
     ],
     "tests/e2e/physical_layer_regression.spec.js": [
       "tests/e2e/physical_layer_regression.spec.js"
@@ -2367,6 +2473,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2375,6 +2482,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2398,6 +2506,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2425,6 +2534,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2433,6 +2543,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2456,6 +2567,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2483,6 +2595,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2491,6 +2604,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2514,6 +2628,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2541,6 +2656,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2549,6 +2665,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2572,6 +2689,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2610,6 +2728,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2618,6 +2737,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2641,6 +2761,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2675,6 +2796,7 @@
       "tests/e2e/dev/scenario_deferred_infra_lifecycle.dev.spec.js",
       "tests/e2e/dev/scenario_runtime_input_latency.dev.spec.js",
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/dev/tno_atlantropa_refinement_perf.dev.spec.js",
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
@@ -2683,6 +2805,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2706,6 +2829,7 @@
       "tests/e2e/strategic_overlay_smoke.spec.js",
       "tests/e2e/texture_overlay_regression.spec.js",
       "tests/e2e/tno_1962_ui_smoke.spec.js",
+      "tests/e2e/tno_atlantropa_coastline.spec.js",
       "tests/e2e/tno_named_water_rendering.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js",
       "tests/e2e/tno_startup_visible_context_layers_contract.spec.js",
@@ -2724,6 +2848,9 @@
     ],
     "tests/e2e/tno_1962_ui_smoke.spec.js": [
       "tests/e2e/tno_1962_ui_smoke.spec.js"
+    ],
+    "tests/e2e/tno_atlantropa_coastline.spec.js": [
+      "tests/e2e/tno_atlantropa_coastline.spec.js"
     ],
     "tests/e2e/tno_named_water_rendering.spec.js": [
       "tests/e2e/tno_named_water_rendering.spec.js"

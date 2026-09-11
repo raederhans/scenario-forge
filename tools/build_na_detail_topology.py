@@ -893,6 +893,7 @@ def _write_output_topology(
     output_path: Path,
     political: gpd.GeoDataFrame,
     layers: dict[str, gpd.GeoDataFrame],
+    physical_authority_topology: dict | None = None,
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
@@ -914,6 +915,7 @@ def _write_output_topology(
             water_regions=layers.get("water_regions"),
             output_path=temp_path,
             quantization=cfg.DETAIL_OUTPUT_TOPOLOGY_QUANTIZATION,
+            physical_authority_topology=physical_authority_topology,
         )
         temp_path.replace(output_path)
     finally:
@@ -983,15 +985,17 @@ def main() -> None:
     print(f"[Detail patch] Source political features: {len(layers['political'])}")
     primary_topology_path = source_path.with_name("europe_topology.json")
     primary_layers = None
+    primary_topology_payload = None
     source_urban_issue = _describe_urban_layer_contract(layers.get("urban"))
     primary_urban_issue = ""
     if primary_topology_path.exists():
         print(f"[Detail patch] Loading primary topology shell: {primary_topology_path}")
-        primary_layers = _load_layers_from_topology(_load_topology(primary_topology_path))
+        primary_topology_payload = _load_topology(primary_topology_path)
+        primary_layers = _load_layers_from_topology(primary_topology_payload)
         for layer_name in LAYER_NAMES:
             if layer_name == "political":
                 continue
-            if layers.get(layer_name) is None or layers[layer_name].empty:
+            if layer_name in {"land", "ocean", "water_regions"} or layers.get(layer_name) is None or layers[layer_name].empty:
                 primary_layer = primary_layers.get(layer_name)
                 if primary_layer is not None and not primary_layer.empty:
                     layers[layer_name] = primary_layer.copy()
@@ -1108,6 +1112,7 @@ def main() -> None:
         output_path=output_path,
         political=roundtrip_political,
         layers=layers,
+        physical_authority_topology=primary_topology_payload,
     )
     _record_timing(
         stage_timings,
@@ -1153,6 +1158,7 @@ def main() -> None:
                 output_path=output_path,
                 political=roundtrip_political,
                 layers=layers,
+                physical_authority_topology=primary_topology_payload,
             )
         _record_timing(
             stage_timings,

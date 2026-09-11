@@ -163,12 +163,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "9041ecabdc8a6074c8bd511a35ad380e7af2c0098b4555d7134fc34180d18bf5",
+  "snapshot_fingerprint": "75b20de4ad8937c9944beaddb50612250c94d48a3b2b73ff756b9fbfed85dc1d",
   "source": {
-    "base_topology_sha256": "fb14c9f83cc27fd9884ecffbb3624debea5f5f86fc2be269e2c0bc645f5bacd9",
-    "detail_chunk_manifest_sha256": "9f4b1158fe02b5b319d84a9fb3f629578415e0a40c1fb04e600b3a887c1135cc",
-    "runtime_bootstrap_topology_sha256": "0537fc1bcb1eadc28d9bc450d8d1b7630b84fbb7388c9dd3240340887badb405",
-    "runtime_topology_sha256": "f66e57b22529c510f790f7b2310b87ae701918db20331917c598df363c2f6d24"
+    "base_topology_sha256": "8159bc03c9321a2e7d26a7e08526fe6fbc0973f2f7aad779e868bcd5adb6a005",
+    "detail_chunk_manifest_sha256": "f65f1e3bb17b6cbaff824c331b7366965ba0380577c05c9eaaa8f76da33c6f88",
+    "runtime_bootstrap_topology_sha256": "a0c553ec39a14c4196d80e64f522ecbf6816b62e724f5ab1b7fcdce1e4d727b9",
+    "runtime_topology_sha256": "ad765b6c9ead93cc8dca3bd09fc7a426282d374516dddd3aec7dc126531eff8b"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -205,7 +205,7 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12866,
+    "feature_count": 12693,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
@@ -216,9 +216,9 @@
       "direct_country_copy": 2578,
       "manual_reviewed": 9369
     },
-    "scenario_atlantropa_feature_count": 898,
+    "scenario_atlantropa_feature_count": 725,
     "scenario_rule_blocker_count": 0,
-    "scenario_runtime_topology_object_count": 6,
+    "scenario_runtime_topology_object_count": 7,
     "source_counts": {
       "controller_rule": 0,
       "direct_active_owner": 4354,
@@ -227,8 +227,8 @@
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1828
     },
-    "synthetic_count": 447,
-    "synthetic_owner_feature_count": 447,
+    "synthetic_count": 499,
+    "synthetic_owner_feature_count": 499,
     "tno_bathymetry_band_count": 94,
     "tno_bathymetry_contour_count": 77,
     "tno_named_marginal_water_count": 113,

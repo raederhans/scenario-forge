@@ -571,6 +571,8 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   const lightsOffRural = await samplePointGroup(page, RURAL_SAMPLE_POINTS);
 
   await configureCityLights(page, 'modern', true);
+  await page.waitForFunction(() => globalThis.__renderPerfMetrics?.modernCityLightsStaticLayerCache?.globalUrbanReady === true,
+    null, { timeout: 30000 });
   await waitForCanvasLuminanceDelta(page, lightsOff, 65000);
   const modernLights = await captureCanvasSample(page);
   const modernUrban = await samplePointGroup(page, URBAN_SAMPLE_POINTS);
@@ -676,13 +678,17 @@ test('city lights default scene and intensity regression', async ({ page }) => {
   expect(offToModernLuminance).toBeGreaterThan(65000);
   expect(highZoomOffToModernChanged).toBeGreaterThan(6500);
   expect(highZoomOffToModernLuminance).toBeGreaterThan(500000);
-  expect(boostChanged).toBeGreaterThan(2000);
-  expect(boostLuminance).toBeGreaterThan(60000);
+  // Population now adjusts existing cores. It must visibly brighten them without
+  // recreating the broad footprint of the base illumination layer.
+  expect(boostChanged).toBeGreaterThan(0);
+  expect(boostChanged).toBeLessThan(highZoomOffToModernChanged);
+  expect(boostLuminance).toBeGreaterThan(0);
+  expect(boostLuminance).toBeLessThan(highZoomOffToModernLuminance);
   expect(modernBrightPixelRatio).toBeLessThan(0.02);
   expect(modernMeanLuminance).toBeGreaterThan(lightsOffMeanLuminance);
   // 低缩放下 40px 采样窗会覆盖过大的地理范围，局部 urban/rural bright-ratio 在这个层级容易被邻近海岸和城市群污染。
   // 这里保留整画布变化合同，把局部亮度判定收敛到后面的高缩放和分区采样上。
-  expect(boostOnUrban.average).toBeGreaterThanOrEqual(boostOffUrban.average - 0.25);
+  expect(boostOnUrban.average).toBeGreaterThan(boostOffUrban.average);
   expect(boostOnUrban.maxBrightRatio).toBeLessThan(0.42);
   expect(Math.abs(boostOnRural.average - boostOffRural.average)).toBeLessThan(1.5);
   expect(ruralBoostAverageDelta).toBeLessThan(2);

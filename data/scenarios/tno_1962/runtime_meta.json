@@ -1,7 +1,7 @@
 {
   "coverage_ledger_hashes": {
-    "atlantropa_donor_ledger": "46003f33bd9157a7a55096b31ec6814c66a8fcfafe65dd441d4ecf728df529e3",
-    "geometry_drop_audit": "d3dcb3fc5056e5f0df0bc5d24592e06de0f62f965914d964e7a15beaaa9ac765"
+    "atlantropa_donor_ledger": "c6f6611d7ee23b548bb6b141709f45b31b66633d4377c5684cded79f551269c6",
+    "geometry_drop_audit": "a934c3a7194fcfda25acc8b8ff00e0927fae3c1bcc575253b38ac9c9d98a638e"
   },
   "coverage_ledger_paths": {
     "atlantropa_donor_ledger": "data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
@@ -21,12 +21,13 @@
     "water": 9
   },
   "political_chunk_count": 173,
-  "runtime_topology_object_count": 6,
+  "runtime_topology_object_count": 7,
   "runtime_topology_object_names": [
     "context_land_mask",
     "land_mask",
     "political",
     "scenario_atlantropa",
+    "scenario_coastline",
     "scenario_special_land",
     "scenario_water"
   ],

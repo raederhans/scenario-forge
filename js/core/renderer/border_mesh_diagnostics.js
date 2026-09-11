@@ -98,6 +98,7 @@ export function evaluateCoastlineTopologySource({
   primaryTopology,
   runtimeTopology,
   scenarioId = "",
+  runtimeObjectNames = ["context_land_mask", "land_mask", "land"],
   scenarioCoastlineMaxAreaDeltaRatio = 0.02,
   scenarioCoastlineMaxInteriorRingCount = 500,
   scenarioCoastlineMaxInteriorRingRatio = 0.25,
@@ -111,7 +112,7 @@ export function evaluateCoastlineTopologySource({
   const runtimeMaskMetrics = scenarioId
     ? getCoastlineTopologyMetrics({
       topology: runtimeTopology,
-      objectNames: ["context_land_mask", "land_mask", "land"],
+      objectNames: runtimeObjectNames,
       isWorldBounds,
     })
     : null;

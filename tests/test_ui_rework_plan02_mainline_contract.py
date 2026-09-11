@@ -25,7 +25,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         self.assertIn('aria-hidden="true"', zoom_controls)
 
         project_panel_start = content.index('id="projectSidebarPanel"')
-        project_panel_end = content.index("</section>", project_panel_start)
+        project_panel_end = content.index("</aside>", project_panel_start)
         project_panel = content[project_panel_start:project_panel_end]
         transport_start = project_panel.index('id="transportProjectSection"')
         transport_end = project_panel.index('id="exportProjectSection"', transport_start)
@@ -49,7 +49,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
     def test_project_sidebar_order_matches_phase_02_contract(self):
         content = (REPO_ROOT / "index.html").read_text(encoding="utf-8")
         project_panel_start = content.index('id="projectSidebarPanel"')
-        project_panel_end = content.index("</section>", project_panel_start)
+        project_panel_end = content.index("</aside>", project_panel_start)
         project_panel = content[project_panel_start:project_panel_end]
         order = [
             'id="projectLegendSection"',
@@ -64,7 +64,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         self.assertEqual(positions, sorted(positions))
 
     def test_legend_editor_uses_outer_section_heading_only(self):
-        sidebar = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
+        sidebar = (REPO_ROOT / "js" / "ui" / "sidebar" / "project_support_diagnostics_controller.js").read_text(encoding="utf-8")
 
         self.assertIn('list.id = "legendEditorList";', sidebar)
         self.assertNotIn('title.id = "lblLegendEditor";', sidebar)
@@ -307,14 +307,14 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
         self.assertIn("#leftSidebar .physical-atlas-group-start {", css_content)
         self.assertIn("border-top: 1px solid rgba(37, 54, 73, 0.1);", css_content)
 
-    def test_bottom_dock_adaptive_owner_uses_grid_and_container_queries(self):
+    def test_bottom_dock_adaptive_owner_wraps_groups_and_uses_container_queries(self):
         content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
         required_tokens = [
             "container-type: inline-size;",
             "--layout-dock-inline: min(860px, calc(100% - 2 * var(--layout-edge)));",
             "width: var(--layout-dock-inline);",
             "flex-direction: row;",
-            "grid-template-columns: auto auto auto minmax(220px, 1fr);",
+            ".bottom-dock-primary {\n  width: 100%;\n  display: flex;\n  flex-wrap: wrap;",
             "@container (max-width: 720px)",
             "grid-template-columns: repeat(2, minmax(0, 1fr));",
             "@container (max-width: 420px)",
@@ -346,6 +346,7 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
     def test_country_inspector_hierarchy_uses_polished_compact_stack(self):
         css_content = (REPO_ROOT / "css" / "style.css").read_text(encoding="utf-8")
         sidebar_content = (REPO_ROOT / "js" / "ui" / "sidebar.js").read_text(encoding="utf-8")
+        sidebar_content += (REPO_ROOT / "js" / "ui" / "sidebar" / "scenario_inspector_controller.js").read_text(encoding="utf-8")
         water_special_content = (REPO_ROOT / "js" / "ui" / "sidebar" / "water_special_region_controller.js").read_text(encoding="utf-8")
 
         for token in [
@@ -455,8 +456,10 @@ class UiReworkPlan02MainlineContractTest(unittest.TestCase):
             sidebar_content.index('element.style.height = "";'),
             sidebar_content.index("const scrollHeight = Number(element.scrollHeight || 0);"),
         )
-        self.assertIn("if (filteredPresetEntries.length > 0) {", sidebar_content)
-        self.assertNotIn('presetSection.appendChild(createEmptyNote(t("No regional presets", "ui")));', sidebar_content)
+        preset_controller = (REPO_ROOT / "js" / "ui" / "sidebar" / "regional_preset_controller.js").read_text(encoding="utf-8")
+        self.assertLess(preset_controller.index("if (!entries.length) return;"),
+                        preset_controller.index('appendActionSection(container, t("Regional Presets (Visual Color)"'))
+        self.assertNotIn('createEmptyNote(t("No regional presets", "ui"))', preset_controller)
         for token in [
             "buildPaletteColorSuggestionsForCountry,",
             "ensurePaletteAssetsLoaded,",
