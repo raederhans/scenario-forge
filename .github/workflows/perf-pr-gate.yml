@@ -14,10 +14,16 @@ permissions:
   contents: read
 
 jobs:
-  perf-gate:
+  perf-scenarios:
+    name: perf-scenario (${{ matrix.scenario }})
     runs-on: windows-latest
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [tno_1962, hoi4_1939]
     env:
+      PERF_SCENARIO: ${{ matrix.scenario }}
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.runtime/browser/ms-playwright
       PERF_DEV_SERVER_READY_TIMEOUT_MS: "90000"
     steps:
@@ -273,7 +279,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: perf-pr-gate-classifier-audit
+          name: perf-pr-gate-classifier-audit-${{ matrix.scenario }}
           path: .runtime/reports/generated/perf-pr-gate-classifier.*
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -408,7 +414,7 @@ jobs:
               $maxAdmissionAttempts = 3
               $perfExitCode = 1
               for ($attempt = 1; $attempt -le $maxAdmissionAttempts; $attempt += 1) {
-                node $candidateHarness --measured-repo-root $baseWorktree --mode baseline --scenarios tno_1962,hoi4_1939 --runs 5 --warmups 3 --write-markdown false --baseline-json $baselineJson --raw-dir $baselineRawDir
+                node $candidateHarness --measured-repo-root $baseWorktree --mode baseline --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --runs 5 --warmups 3 --write-markdown false --baseline-json $baselineJson --raw-dir $baselineRawDir
                 $perfExitCode = $LASTEXITCODE
                 if ($perfExitCode -eq 0) {
                   break
@@ -452,7 +458,7 @@ jobs:
           $maxAdmissionAttempts = 3
           $perfExitCode = 1
           for ($attempt = 1; $attempt -le $maxAdmissionAttempts; $attempt += 1) {
-            npm run perf:gate -- --regression-mode $regressionMode --baseline-json .runtime/output/perf/perf-pr-gate-base.json --raw-dir .runtime/output/perf/perf-pr-gate-current
+            npm run perf:gate -- --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --regression-mode $regressionMode --baseline-json .runtime/output/perf/perf-pr-gate-base.json --raw-dir .runtime/output/perf/perf-pr-gate-current
             $perfExitCode = $LASTEXITCODE
             if ($perfExitCode -eq 0) {
               break
@@ -471,7 +477,7 @@ jobs:
         if: always() && steps.classify.outputs.should_run_perf == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: perf-pr-gate-evidence
+          name: perf-pr-gate-evidence-${{ matrix.scenario }}
           if-no-files-found: ignore
           path: |
             .runtime/output/perf/**
@@ -482,3 +488,23 @@ jobs:
         if: steps.classify.outputs.should_run_perf != 'true'
         run: |
           Write-Host "Perf gate skipped after classifier decision: ${{ steps.classify.outputs.reason }}"
+
+  perf-gate:
+    name: perf-gate
+    if: always()
+    needs: [perf-scenarios]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require both scenario comparisons
+        env:
+          PERF_SCENARIO_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node <<'NODE'
+          const results = JSON.parse(process.env.PERF_SCENARIO_RESULTS);
+          // GitHub's matrix result succeeds only when every scenario job succeeds.
+          if (Object.keys(results).length !== 1 || results['perf-scenarios']?.result !== 'success') {
+            console.error('Both complete scenario comparisons are required.', results);
+            process.exit(1);
+          }
+          console.log('Both scenario jobs succeeded; unrelated changes retain explicit classifier skip decisions.');
+          NODE

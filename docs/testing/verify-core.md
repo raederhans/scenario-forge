@@ -7,7 +7,8 @@
 - 日常修改运行相关目标检查或 `verify:edit` / `verify:impact`，不把 `verify:core`、`verify:pr` 和完整性能测量逐一叠加为每次推送的固定前置步骤。
 - PR 的 `pr-verify-fast` 运行受影响契约；`pr-verify-smoke` 在同一环境中依次运行 smoke 与 Golden Demo。`PR Verify Required` 仅在两条执行通道都成功时通过，失败、取消、跳过或缺失结果均阻断。
 - Scenario Contract Matrix 负责各剧本的 strict 检查；`pr-fast` 不再额外固定重跑 TNO strict。修改单个受支持剧本只运行该剧本，公共依赖或无法可靠确定改动范围时检查全部剧本。
-- `perf-gate` 继续作为 PR 必需检查。运行时 JS、应用外壳和相关性能输入仍使用同一 runner 的基线与候选版本，保留两个剧本、5 次测量和 3 次预热。纯性能 Markdown 说明和符合分类器条件的独立非性能测试脚本修改可以跳过测量。
+- `perf-gate` 继续作为 PR 必需检查。TNO 1962 与 HOI4 1939 在两台独立 Windows runner 上并行；每个剧本仍在同一台 runner 内顺序测量基线和候选版本，各保留 5 次测量、3 次预热以及原始证据校验。最终 `perf-gate` 要求整个双剧本矩阵成功，失败、取消、跳过的 job 或缺失结果均阻断。纯性能 Markdown 说明和符合分类器条件的独立非性能测试脚本修改，仍可由分类器明确决定不执行测量。
+- 单剧本执行必须同时声明 `--scenario-shard <id> --scenarios <id>`，并使用自定义输出路径。分片报告显式标记作用域，不能作为默认双剧本门禁的完整通过证据；普通 `npm run perf:gate` 仍检查两个剧本。CI artifact 按剧本命名为 `perf-pr-gate-evidence-<id>` 和 `perf-pr-gate-classifier-audit-<id>`。并行减少墙钟等待，不减少样本总数，且会增加一份 runner 环境准备开销。
 - 完整性能任务不再由每次 main push 触发，改为每日定期与手动运行；这些运行强制测量当前提交与其父提交，不是对全天所有提交的累计回归比较。合并后的 Pages 产物检查和线上 smoke 继续由部署工作流执行。
 - PR 更新自动取消同一 PR 的过时验证。现有必需检查名称保持不变，无需修改分支保护设置。
 

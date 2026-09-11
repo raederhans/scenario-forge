@@ -138,6 +138,41 @@ function git {
 
 
 class PerfGateContractTest(unittest.TestCase):
+    def test_workflow_runs_complete_scenarios_on_independent_runners(self):
+        from tests.test_e2e_structural_tooling import parse_workflow_job_blocks
+
+        workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
+        jobs = parse_workflow_job_blocks(workflow)
+        self.assertEqual(set(jobs), {"perf-scenarios", "perf-gate"})
+        scenario_job = jobs["perf-scenarios"]
+        self.assertIn("runs-on: windows-latest", scenario_job)
+        self.assertIn("fail-fast: false", scenario_job)
+        self.assertIn("scenario: [tno_1962, hoi4_1939]", scenario_job)
+        self.assertNotIn("max-parallel: 1", scenario_job)
+        self.assertNotIn("continue-on-error", scenario_job)
+        self.assertNotRegex(scenario_job, r"(?m)^    if:")
+        self.assertEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 2)
+        self.assertIn("--runs 5 --warmups 3", scenario_job)
+        for artifact in ("perf-pr-gate-classifier-audit", "perf-pr-gate-evidence"):
+            self.assertIn(f"name: {artifact}-${{{{ matrix.scenario }}}}", scenario_job)
+        aggregator = jobs["perf-gate"]
+        self.assertIn("    name: perf-gate", aggregator)
+        self.assertIn("    if: always()", aggregator)
+        self.assertIn("    needs: [perf-scenarios]", aggregator)
+
+    def test_perf_aggregator_rejects_failed_cancelled_skipped_or_missing_matrix(self):
+        workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
+        script = textwrap.dedent(workflow.rsplit("          node <<'NODE'\n", 1)[1].split("          NODE", 1)[0])
+        cases = [( {"perf-scenarios": {"result": state}}, state == "success")
+                 for state in ("success", "failure", "cancelled", "skipped", "unknown")]
+        cases.extend([({}, False), ({"other": {"result": "success"}}, False),
+                      ({"perf-scenarios": {"result": "success"}, "extra": {}}, False)])
+        for results, expected in cases:
+            with self.subTest(results=results):
+                completed = subprocess.run(["node", "-e", script], capture_output=True, text=True,
+                                           env={**os.environ, "PERF_SCENARIO_RESULTS": json.dumps(results)})
+                self.assertEqual(completed.returncode == 0, expected, completed.stdout + completed.stderr)
+
     def test_package_perf_gate_uses_real_gate_scenarios(self):
         package_payload = json.loads(PACKAGE_JSON.read_text(encoding="utf-8"))
         perf_baseline_script = package_payload["scripts"]["perf:baseline"]
@@ -235,7 +270,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("git worktree add --detach", workflow_content)
         self.assertIn("perf-pr-gate-base.json", workflow_content)
         self.assertIn("--mode baseline", workflow_content)
-        self.assertIn("--scenarios tno_1962,hoi4_1939", workflow_content)
+        self.assertIn("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO", workflow_content)
         self.assertIn("--runs 5", workflow_content)
         self.assertNotIn("--scenarios blank_base", workflow_content)
         self.assertIn("--baseline-json", workflow_content)
@@ -367,7 +402,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn('`- Runner: ${JSON.stringify(report.environment.runnerIdentity)}`', script)
         self.assertIn('const PERF_REPORT_CONTRACT_FIELDS = [', script)
         self.assertIn(
-            "collectBaselineContractMismatches(report, baselineReportForGate)",
+            "collectBaselineContractMismatches(report, baselineReportForGate, options)",
             script,
         )
         self.assertIn('getPerfReportContractMismatches(baselineReport, "baseline", "baseline")', script)
