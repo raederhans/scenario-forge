@@ -14,6 +14,9 @@ const testIgnore = [
 ];
 
 module.exports = {
+  // Large map-data PRs can exceed Node's string limit before Playwright truncates
+  // its report attachment. GitHub retains the diff; keep default commit metadata.
+  captureGitInfo: { diff: false },
   testDir: path.join(__dirname, "tests", "e2e"),
   outputDir: path.join(__dirname, ".runtime", "tests", "playwright"),
   reporter: [
