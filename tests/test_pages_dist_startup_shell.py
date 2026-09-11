@@ -2451,6 +2451,23 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertNotIn('href="data/locales.startup.json"', html)
         self.assertNotIn('href="data/geo_aliases.startup.json"', html)
 
+    def test_dist_size_warning_is_advisory_until_the_hard_limit(self) -> None:
+        warning = build_pages_dist.PAGES_DIST_WARNING_BYTES
+        hard_limit = build_pages_dist.MAX_PAGES_DIST_BYTES
+        for total_bytes, warning_status in (
+            (warning, "within_warning"),
+            (warning + 1, "over_warning"),
+            (hard_limit, "over_warning"),
+        ):
+            with self.subTest(total_bytes=total_bytes):
+                gate = build_pages_dist.get_dist_size_gate(total_bytes)
+                self.assertEqual(gate["status"], "within_limit")
+                self.assertEqual(gate["warning_status"], warning_status)
+                build_pages_dist.enforce_dist_size(total_bytes)
+        self.assertEqual(build_pages_dist.get_dist_size_gate(hard_limit + 1)["status"], "over_limit")
+        with self.assertRaisesRegex(SystemExit, "exceeds"):
+            build_pages_dist.enforce_dist_size(hard_limit + 1)
+
     def test_dist_manifest_keeps_pages_size_and_required_files_contract(self) -> None:
         if not DIST_MANIFEST.exists():
             self.skipTest("dist/pages-dist-manifest.json is only available after build_pages_dist runs")
@@ -2494,8 +2511,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(size_gate.get("warning_over_by_bytes"), expected_warning_over_by_bytes)
         self.assertEqual(size_gate.get("status"), "within_limit")
         self.assertLessEqual(payload["total_bytes"], payload["max_allowed_bytes"])
-        self.assertEqual(size_gate.get("warning_status"), "within_warning")
-        self.assertLess(payload["total_bytes"], build_pages_dist.PAGES_DIST_WARNING_BYTES)
+        # The warning remains visible in the manifest; only the hard limit blocks publication.
         self.assertEqual(
             records_by_path["pages-dist-manifest.json"]["size_bytes"],
             DIST_MANIFEST.stat().st_size,
