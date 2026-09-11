@@ -1,3 +1,7 @@
+// Published topology geometry is immutable. Visibility and overlay revisions
+// can change the source decision without changing these geometric measurements.
+const coastlineMetricsCache = new WeakMap();
+
 function getTopologyObjectFeatureCollection(topology, objectNames = []) {
   if (!topology?.objects || typeof globalThis.topojson?.feature !== "function") {
     return { objectName: "", collection: null };
@@ -51,6 +55,17 @@ export function getCoastlineTopologyMetrics({
   objectNames = [],
   isWorldBounds = () => false,
 } = {}) {
+  const cacheKey = JSON.stringify(objectNames);
+  const objectRefs = objectNames.map((name) => topology?.objects?.[name]);
+  const cache = topology && typeof topology === "object" ? coastlineMetricsCache.get(topology) : null;
+  const cached = cache?.get(cacheKey);
+  if (cached && cached.arcs === topology.arcs && cached.transform === topology.transform
+      && cached.decode === globalThis.topojson?.feature
+      && cached.geoArea === globalThis.d3?.geoArea && cached.geoBounds === globalThis.d3?.geoBounds
+      && objectRefs.every((object, index) => object === cached.objectRefs[index])) {
+    const bounds = cached.metrics.bounds?.map((point) => [...point]) || null;
+    return { ...cached.metrics, bounds, worldBounds: isWorldBounds(bounds) };
+  }
   const { objectName, collection } = getTopologyObjectFeatureCollection(topology, objectNames);
   if (!collection?.features?.length) {
     return {
@@ -83,15 +98,23 @@ export function getCoastlineTopologyMetrics({
   } catch (_error) {
     bounds = null;
   }
-  return {
+  const metrics = {
     objectName,
     featureCount: collection.features.length,
     polygonPartCount: counts.polygonPartCount,
     interiorRingCount: counts.interiorRingCount,
     totalArea,
     bounds,
-    worldBounds: isWorldBounds(bounds),
   };
+  const nextCache = cache || new Map();
+  nextCache.set(cacheKey, {
+    objectRefs, arcs: topology.arcs, transform: topology.transform,
+    decode: globalThis.topojson?.feature,
+    geoArea: globalThis.d3?.geoArea, geoBounds: globalThis.d3?.geoBounds,
+    metrics: { ...metrics, bounds: bounds?.map((point) => [...point]) || null },
+  });
+  coastlineMetricsCache.set(topology, nextCache);
+  return { ...metrics, worldBounds: isWorldBounds(bounds) };
 }
 
 export function evaluateCoastlineTopologySource({

@@ -449,8 +449,22 @@ export function createBorderMeshOwner({
   let coastlineMeshCache = null;
   function ensureCoastlineMeshes({ mid = {}, low = {} } = {}) {
     const decision = resolveCoastlineTopologySource();
-    if (coastlineMeshCache?.decision === decision
-      && coastlineMeshCache.collection === state.cachedCoastlines) return;
+    const topology = decision?.topology;
+    const objectName = decision?.source === "scenario" ? decision.runtimeObjectName : decision?.primaryObjectName;
+    const object = topology?.objects?.[objectName];
+    const lodKey = [mid.epsilon || 0, mid.minLength || 0, low.epsilon || 0, low.minLength || 0].join("|");
+    if (object && coastlineMeshCache?.topology === topology
+      && coastlineMeshCache.object === object && coastlineMeshCache.arcs === topology.arcs
+      && coastlineMeshCache.transform === topology.transform && coastlineMeshCache.lodKey === lodKey
+      && coastlineMeshCache.meshFunction === globalThis.topojson?.mesh) {
+      // A static-mesh reset clears the arrays, but does not invalidate unchanged
+      // coastline geometry. Restore its LODs without decoding/simplifying again.
+      state.cachedCoastlines = coastlineMeshCache.collections.cachedCoastlines;
+      state.cachedCoastlinesHigh = coastlineMeshCache.collections.cachedCoastlinesHigh;
+      state.cachedCoastlinesMid = coastlineMeshCache.collections.cachedCoastlinesMid;
+      state.cachedCoastlinesLow = coastlineMeshCache.collections.cachedCoastlinesLow;
+      return;
+    }
     const mesh = buildGlobalCoastlineMesh(decision);
     const high = isUsableMesh(mesh) ? [mesh] : [];
     const midMesh = high.length ? simplifyCoastlineMesh(mesh, mid) : null;
@@ -459,7 +473,16 @@ export function createBorderMeshOwner({
     state.cachedCoastlinesHigh = high;
     state.cachedCoastlinesMid = isUsableMesh(midMesh) ? [midMesh] : high;
     state.cachedCoastlinesLow = isUsableMesh(lowMesh) ? [lowMesh] : state.cachedCoastlinesMid;
-    coastlineMeshCache = { decision, collection: high };
+    coastlineMeshCache = {
+      topology, object, arcs: topology?.arcs, transform: topology?.transform, lodKey,
+      meshFunction: globalThis.topojson?.mesh,
+      collections: {
+        cachedCoastlines: state.cachedCoastlines,
+        cachedCoastlinesHigh: state.cachedCoastlinesHigh,
+        cachedCoastlinesMid: state.cachedCoastlinesMid,
+        cachedCoastlinesLow: state.cachedCoastlinesLow,
+      },
+    };
   }
 
   return {

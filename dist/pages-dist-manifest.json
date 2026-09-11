@@ -46037,7 +46037,7 @@
     },
     {
       "path": "app/js/core/renderer/border_mesh_diagnostics.js",
-      "size_bytes": 6119,
+      "size_bytes": 7498,
       "source_kind": "dist"
     },
     {
@@ -46047,7 +46047,7 @@
     },
     {
       "path": "app/js/core/renderer/border_mesh_owner.js",
-      "size_bytes": 19119,
+      "size_bytes": 20519,
       "source_kind": "dist"
     },
     {
@@ -48087,7 +48087,7 @@
       {
         "file_count": 264,
         "id": "startup-critical",
-        "size_bytes": 5439489
+        "size_bytes": 5442268
       },
       {
         "file_count": 96,
@@ -65266,11 +65266,11 @@
         "deferred_graph_file_count": 126,
         "deferred_module_count": 124,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5424917,
+        "initial_graph_bytes": 5427696,
         "initial_graph_file_count": 298,
         "initial_module_count": 285,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4153488,
+        "initial_script_bytes": 4156267,
         "initial_script_count": 287,
         "module_count": 416,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65587,7 +65587,7 @@
           },
           {
             "path": "app/js/core/renderer/border_mesh_diagnostics.js",
-            "size_bytes": 6119
+            "size_bytes": 7498
           },
           {
             "path": "app/js/core/renderer/border_mesh_dynamic_runtime.js",
@@ -65595,7 +65595,7 @@
           },
           {
             "path": "app/js/core/renderer/border_mesh_owner.js",
-            "size_bytes": 19119
+            "size_bytes": 20519
           },
           {
             "path": "app/js/core/renderer/border_mesh_source_selection.js",
@@ -66247,7 +66247,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3100869
+        "size_bytes": 3103648
       },
       {
         "basis": "startup-resource-graph",
@@ -67986,14 +67986,14 @@
     "over_by_bytes": 0,
     "status": "within_limit",
     "warning_bytes": 996147200,
-    "warning_over_by_bytes": 10077811,
+    "warning_over_by_bytes": 10080590,
     "warning_status": "over_warning"
   },
   "top_level_directories": [
     {
       "file_count": 9532,
       "path": "app",
-      "size_bytes": 999228850
+      "size_bytes": 999231629
     },
     {
       "file_count": 57,
@@ -68026,5 +68026,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1006225011
+  "total_bytes": 1006227790
 }
