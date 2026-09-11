@@ -17,7 +17,7 @@
     },
     {
       "path": "app/data/CATALOG.json",
-      "size_bytes": 402603,
+      "size_bytes": 301416,
       "source_kind": "generated_ignored"
     },
     {
@@ -48087,7 +48087,7 @@
       {
         "file_count": 264,
         "id": "startup-critical",
-        "size_bytes": 5540676
+        "size_bytes": 5439489
       },
       {
         "file_count": 96,
@@ -65266,7 +65266,7 @@
         "deferred_graph_file_count": 126,
         "deferred_module_count": 124,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5526104,
+        "initial_graph_bytes": 5424917,
         "initial_graph_file_count": 298,
         "initial_module_count": 285,
         "initial_resource_count": 13,
@@ -65291,7 +65291,7 @@
         "path_exceptions": [
           {
             "path": "app/data/CATALOG.json",
-            "size_bytes": 402603
+            "size_bytes": 301416
           },
           {
             "path": "app/data/city_lights/historical_1930_entries.json",
@@ -65307,7 +65307,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 772130
+        "size_bytes": 670943
       },
       {
         "basis": "html-entrypoint",
@@ -67986,14 +67986,14 @@
     "over_by_bytes": 0,
     "status": "within_limit",
     "warning_bytes": 996147200,
-    "warning_over_by_bytes": 10178998,
+    "warning_over_by_bytes": 10077811,
     "warning_status": "over_warning"
   },
   "top_level_directories": [
     {
       "file_count": 9532,
       "path": "app",
-      "size_bytes": 999330037
+      "size_bytes": 999228850
     },
     {
       "file_count": 57,
@@ -68026,5 +68026,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1006326198
+  "total_bytes": 1006225011
 }
