@@ -20,6 +20,7 @@ import {
   getBaselineArtifactDate,
   isTransientPerfNetworkFailure,
   normalizePerfRegressionMode,
+  parseArgs,
   readJsonAndSha256Strict,
   runStandardPerfAdmission,
   runStandardPerfGenerationFence,
@@ -29,6 +30,7 @@ import {
   shouldBlockOnPerfRegressions,
   summarizeSnapshot,
   validateGateBaselineReport,
+  validateGateBaselinePreflight,
   validateBaselineOutputSelection,
   validateGateCurrentReport,
   validateGateScenarioSelection,
@@ -1020,6 +1022,46 @@ test("baseline admission rejects predecessor schemas and requires the current sc
   }
 });
 
+test("baseline preflight rejects static mismatches without candidate measurements", async () => {
+  const baselineJson = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-07-30.json");
+  const baseline = JSON.parse(await fs.readFile(baselineJson, "utf8"));
+  const options = { ...baseline.config, baselineJson, scenarioShard: null,
+    renderSampleRunProfileId: baseline.renderSampleRolePolicy.runProfile.id };
+  assert.doesNotThrow(() => validateGateBaselinePreflight(baseline, options));
+  for (const [key, value] of [["runs", 6], ["warmups", 4], ["urlQuery", { perf: 1, extra: 1 }]]) {
+    assert.throws(() => validateGateBaselinePreflight(baseline, { ...options, [key]: value }), new RegExp(`${key} mismatch`));
+  }
+  const wrongScope = structuredClone(baseline);
+  wrongScope.scope = "scenario-shard";
+  wrongScope.scenarioShard = "tno_1962";
+  assert.throws(() => validateGateBaselinePreflight(wrongScope, options), /scope mismatch/);
+  assert.throws(() => validateGateBaselinePreflight(baseline, { ...options, scenarios: ["tno_1962"], scenarioShard: "tno_1962" }), /scenario sequence mismatch/);
+  const shard = structuredClone(baseline);
+  shard.scope = "scenario-shard";
+  shard.scenarioShard = "tno_1962";
+  shard.config.scenarios = ["tno_1962"];
+  shard.workloadIdentity.scenarioIds = ["tno_1962"];
+  delete shard.scenarios.hoi4_1939;
+  delete shard.workloadIdentity.scenarios.hoi4_1939;
+  bindReportRawEvidenceHashes(shard);
+  const shardOptions = { ...options, scenarioShard: "tno_1962", scenarios: ["tno_1962"] };
+  assert.doesNotThrow(() => validateGateBaselinePreflight(shard, shardOptions));
+  shard.workloadIdentity.scenarioIds.push("hoi4_1939");
+  assert.throws(() => validateGateBaselinePreflight(shard, shardOptions), /scenario shard workload/);
+  const missingRaw = structuredClone(baseline);
+  delete missingRaw.scenarios.tno_1962.runs[0].snapshot;
+  assert.throws(() => validateGateBaselinePreflight(missingRaw, options), /SHA256 does not match embedded evidence/);
+  const wrongPolicy = structuredClone(baseline);
+  wrongPolicy.renderSampleRolePolicy.extraProtocol = "drift";
+  assert.throws(() => validateGateBaselinePreflight(wrongPolicy, options), /role policy mismatch/);
+});
+
+test("performance dependency lock changes invalidate clean measurement admission", () => {
+  const classified = classifyPerfDirtyPaths(parseGitPorcelainZ(" M requirements-perf.lock.txt\0"));
+  assert.deepEqual(classified.harnessPaths, ["requirements-perf.lock.txt"]);
+  assert.deepEqual(classified.allowedPaths, []);
+});
+
 test("baseline admission requires the exact gate scenario sequence", () => {
   const report = makeSchema3IdentityReport();
   report.config.scenarios = ["blank_base", "tno_1962", "hoi4_1939"];
@@ -1716,6 +1758,76 @@ test("baseline artifact date follows the selected oracle filename", () => {
     "2026-07-30",
   );
   assert.equal(getBaselineArtifactDate(path.join(REPO_ROOT, "custom.json")), "2026-07-30");
+});
+
+test("scenario shards require explicit matching selection and isolated output paths", () => {
+  for (const scenarioShard of SCENARIOS) {
+    const options = parseArgs([
+      "--mode", "gate", "--scenario-shard", scenarioShard, "--scenarios", scenarioShard,
+      "--baseline-json", `.runtime/tmp/${scenarioShard}/baseline.json`,
+      "--raw-dir", `.runtime/tmp/${scenarioShard}/gate`, "--write-markdown", "false",
+    ]);
+    assert.equal(options.scenarioShard, scenarioShard);
+    assert.doesNotThrow(() => validateGateScenarioSelection(options.scenarios, options));
+    assert.doesNotThrow(() => validateBaselineOutputSelection(options));
+    assert.throws(() => validateGateScenarioSelection(options.scenarios), /must exactly match/);
+    assert.throws(() => validateGateScenarioSelection(SCENARIOS, options), /must exactly match/);
+    assert.throws(() => validateGateScenarioSelection([scenarioShard, scenarioShard], options), /must exactly match/);
+    assert.throws(() => validateGateScenarioSelection([SCENARIOS.find((id) => id !== scenarioShard)], options), /must exactly match/);
+    for (const mode of ["baseline", "gate"]) {
+      const defaults = parseArgs(["--mode", mode]);
+      for (const field of ["baselineJson", "rawDir"]) {
+        assert.throws(() => validateBaselineOutputSelection({ ...options, mode, [field]: defaults[field] }), /scenario shards require custom output paths/);
+      }
+      assert.throws(() => validateBaselineOutputSelection({ ...options, mode, rawDir: parseArgs(["--mode", mode === "gate" ? "baseline" : "gate"]).rawDir }), /scenario shards require custom output paths/);
+    }
+    assert.throws(() => validateBaselineOutputSelection({ ...options, mode: "baseline", writeMarkdown: true }), /scenario shards require custom output paths/);
+  }
+  assert.throws(() => parseArgs(["--scenario-shard"]), /requires a scenario ID/);
+  assert.throws(() => validateGateScenarioSelection(["blank_base"], { scenarioShard: "blank_base" }), /Unsupported scenario shard/);
+  const missingSelection = parseArgs(["--scenario-shard", "tno_1962"]);
+  assert.throws(() => validateGateScenarioSelection(missingSelection.scenarios, missingSelection), /must exactly match/);
+});
+
+test("shard report comparisons require explicit matching scope and preserve identity checks", () => {
+  const makeShard = (mode, scenarioShard) => {
+    const report = makeSchema3IdentityReport(mode);
+    report.scope = "scenario-shard";
+    report.scenarioShard = scenarioShard;
+    report.config.scenarios = [scenarioShard];
+    report.workloadIdentity.scenarioIds = [scenarioShard];
+    report.workloadIdentity.scenarios = { [scenarioShard]: report.workloadIdentity.scenarios[scenarioShard] };
+    report.scenarios = { [scenarioShard]: report.scenarios[scenarioShard] };
+    return bindReportRawEvidenceHashes(report);
+  };
+  for (const scenarioShard of SCENARIOS) {
+    const options = { scenarioShard };
+    const baseline = makeShard("baseline", scenarioShard);
+    const current = makeShard("gate", scenarioShard);
+    assert.deepEqual(collectBaselineContractMismatches(current, baseline, options), []);
+    assert.ok(collectBaselineContractMismatches(current, baseline).some((message) => /scope mismatch/.test(message)));
+    for (const mutate of [
+      (report) => { delete report.scope; },
+      (report) => { delete report.scenarioShard; },
+      (report) => { report.scenarioShard = SCENARIOS.find((id) => id !== scenarioShard); },
+      (report) => { report.config.scenarios = [...SCENARIOS]; },
+      (report) => { report.scenarios.extra = { runs: [] }; },
+      (report) => { report.workloadIdentity.scenarioIds = [...SCENARIOS]; },
+      (report) => { report.environment.runnerIdentity.imageVersion = "other-runner"; },
+      (report) => { report.config.runs = 4; },
+      (report) => { report.config.warmups = 2; },
+      (report) => { report.rawEvidence.generationFence.rawSha256 = "0".repeat(64); },
+    ]) {
+      for (const target of ["baseline", "current"]) {
+        const changedBaseline = structuredClone(baseline);
+        const changedCurrent = structuredClone(current);
+        mutate(target === "baseline" ? changedBaseline : changedCurrent);
+        assert.ok(collectBaselineContractMismatches(changedCurrent, changedBaseline, options).length > 0);
+      }
+    }
+    assert.ok(collectBaselineContractMismatches(makeSchema3IdentityReport("gate"), makeSchema3IdentityReport("baseline"), options).length > 0);
+    assert.ok(collectBaselineContractMismatches(current, baseline, { scenarioShard: "blank_base" }).length > 0);
+  }
 });
 
 test("baseline identity comparison rejects an incomplete canonical gate scenario set", () => {

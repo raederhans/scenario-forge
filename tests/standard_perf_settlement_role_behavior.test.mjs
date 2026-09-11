@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import vm from "node:vm";
+import { observeStandardPerfPage, readStandardPerfObservation } from "../tools/perf/run_baseline.mjs";
 import {
   analyzeRenderSampleRole, summarizeRenderSampleRoleAnalyses,
   SETTLED_STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID as profile,
@@ -8,6 +10,54 @@ import {
 import { summarizeSnapshot, buildRenderSampleRolePolicyIdentity, collectGovernedRenderSampleRoleMismatches, collectBaselineContractMismatches, inspectStandardPerfSettlement, waitForStandardPerfSettlement, compareAgainstBaseline, resolvePerfGateMetrics } from "../tools/perf/run_baseline.mjs";
 
 const scenarioId = "tno_1962";
+test("page probe reuses only module imports while observing fresh live state and complete snapshots", async (t) => {
+  let imports = 0;
+  let snapshots = 0;
+  const state = { activeScenarioId: scenarioId, bootPhase: "loading" };
+  let queued = true;
+  const loadModule = async (href) => {
+    imports++;
+    if (href.endsWith("/state.js")) return { state };
+    if (href.endsWith("/render_boundary.js")) return { getRenderBoundaryDebugState: () => ({ queued }) };
+    return { getRendererAsyncWorkStatus: () => ({ pending: queued }) };
+  };
+  const context = vm.createContext({ URL, loadModule,
+    __mapcreator__: { snapshot: () => ({ loadStatus: { providers: { main_runtime: { chunkRuntime: { queued } } } } }) },
+    __mc_perf__: { snapshot: () => ({ sequence: ++snapshots, fullPayload: { queued, bootPhase: state.bootPhase } }) },
+  });
+  const observe = vm.runInContext(`(${observeStandardPerfPage.toString()})`, context);
+  const page = { evaluate: (callback, url) => {
+    assert.equal(callback, observeStandardPerfPage);
+    return observe(url, loadModule);
+  } };
+  for (let index = 0; index < 18; index++) {
+    queued = index === 0;
+    state.bootPhase = queued ? "loading" : "ready";
+    const observed = await readStandardPerfObservation(page, "http://localhost/index.html");
+    assert.equal(observed.status.bootPhase, state.bootPhase);
+    assert.equal(observed.status.renderBoundary.queued, queued);
+    assert.equal(observed.status.asyncWork.pending, queued);
+    assert.equal(observed.snapshot.fullPayload.queued, queued);
+    assert.equal(observed.snapshot.sequence, index + 1);
+  }
+  assert.equal(imports, 3);
+  assert.equal(snapshots, 18);
+  const cachedImports = imports;
+  for (let index = 0; index < 18; index++) {
+    vm.runInContext('delete globalThis[Symbol.for("mapcreator.standard-perf-observation-modules")]', context);
+    await readStandardPerfObservation(page, "http://localhost/index.html");
+  }
+  assert.equal(imports - cachedImports, 54, "uncached module resolution performs three loads per observation");
+  assert.equal(snapshots, 36, "both variants collect every complete snapshot");
+  t.diagnostic("18-observation deterministic overhead comparison: imports 54 -> 3; evaluations and full live snapshots remain 18. No wall-clock speedup is claimed.");
+  const importsBeforeIsolation = imports;
+  await readStandardPerfObservation(page, "http://localhost/other/index.html");
+  assert.equal(imports, importsBeforeIsolation + 3, "another module root must reload dependencies");
+  const nextPage = vm.runInNewContext(`(${observeStandardPerfPage.toString()})`, { URL });
+  await nextPage("http://localhost/index.html", loadModule);
+  assert.equal(imports, importsBeforeIsolation + 6, "a new document realm must not inherit cached modules");
+});
+
 function fixture() {
   const snapshot = {
     renderPerfMetrics: { scenarioChunkPromotionVisualStage: { recordedAt: 100, activeScenarioId: scenarioId, reason: "startup-initial-visual", sequence: 5 } },
