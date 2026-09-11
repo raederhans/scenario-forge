@@ -338,6 +338,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "tools/check_test_timeout_guardrails.mjs",
       "tools/test_timing_summary.mjs",
       ".github/workflows/pr-verify.yml",
+      ".github/workflows/transport-contract-required.yml",
       ".github/workflows/verify-shared.yml"
     ],
     "ownerHints": [

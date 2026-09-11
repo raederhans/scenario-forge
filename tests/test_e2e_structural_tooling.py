@@ -1263,6 +1263,12 @@ const { buildRecommendation } = await import('./tools/select_verification_target
 
 const cases = [
   {
+    name: 'transport workflow routes to its structural contract',
+    changedFiles: ['.github/workflows/transport-contract-required.yml'],
+    expectedCommands: ['python -m unittest tests.test_e2e_structural_tooling -q'],
+    expectedUnmatched: [],
+  },
+  {
     name: 'selector tooling routes to structural contract and selector check',
     changedFiles: ['tools/select_verification_targets.mjs'],
     expectedCommands: [
@@ -1852,7 +1858,10 @@ const page = {
         demo_browser_condition = "(inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo'"
         self.assertGreaterEqual(shared_workflow.count(demo_node_condition), 2)
         self.assertGreaterEqual(shared_workflow.count(demo_browser_condition), 2)
-        self.assertIn("- name: Run Golden Demo E2E\n        if: inputs.profile == 'demo' || inputs.run-golden-demo\n        run: npm run verify:demo", shared_workflow)
+        demo_step = shared_workflow.split("- name: Run Golden Demo E2E\n", 1)[1].split("\n      - name:", 1)[0]
+        self.assertIn("if: inputs.profile == 'demo' || inputs.run-golden-demo", demo_step)
+        self.assertIn("run: npm run verify:demo", demo_step)
+        self.assertRegex(demo_step, r"(?m)^          MAPCREATOR_DEV_PORT: '8811'$")
         self.assertIn("run-golden-demo requires the pr-smoke profile", shared_workflow)
         demo_spec = (REPO_ROOT / "tests/e2e/sample_guide_deeplink.spec.js").read_text(encoding="utf-8")
         self.assertEqual(demo_spec.count("@golden-demo"), 1)

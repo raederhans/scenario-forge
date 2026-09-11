@@ -273,6 +273,9 @@ jobs:
 
       - name: Run Golden Demo E2E
         if: inputs.profile == 'demo' || inputs.run-golden-demo
+        env:
+          # The preceding smoke server can leave its non-reusable socket in TIME_WAIT.
+          MAPCREATOR_DEV_PORT: '8811'
         run: npm run verify:demo
 
       - name: Write Demo timing summary
