@@ -1,6 +1,33 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    "id": "python:contour-lod-assets",
+    "commandRef": "python -m unittest tests.test_build_contour_lod_assets -q",
+    "sourceRefs": [
+      "tests/test_build_contour_lod_assets.py",
+      "map_builder/processors/physical_context.py",
+      "map_builder/processors/contour_lod.py",
+      "tools/build_contour_lod_assets.py",
+      "data/global_contours.lod.provenance.json",
+      "data/global_contours.low.major.topo.json",
+      "data/global_contours.mid.major.topo.json",
+      "data/global_contours.mid.minor.topo.json"
+    ],
+    "ownerHints": ["geo-contract"],
+    "domains": ["geo-contract"],
+    "tiers": ["heavy"],
+    "cost": "heavy",
+    "resourceLocks": ["heavy-geo", ".runtime-output"],
+    "executionOwners": ["main-thread"],
+    "profiles": ["full"],
+    "platforms": ["all"],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "e2e:tests/e2e/tno_named_water_rendering.spec.js",
     "commandRef": "node tools/e2e_layering.mjs run-spec tests/e2e/tno_named_water_rendering.spec.js",
     "sourceRefs": [
@@ -378,7 +405,8 @@ export const DATA_CONTRACTS_RECORDS = [
     "id": "python-heavy:geo_stack:tests/test_physical_context_contours.py",
     "commandRef": "python -m unittest tests.test_physical_context_contours -q",
     "sourceRefs": [
-      "tests/test_physical_context_contours.py"
+      "tests/test_physical_context_contours.py",
+      "map_builder/processors/physical_context.py"
     ],
     "ownerHints": [
       "geo-contract"
