@@ -43,9 +43,10 @@ function createCanvasContext() {
     save() {
       calls.push({ type: "save" });
     },
-    stroke() {
+    stroke(path) {
       calls.push({
         type: "stroke",
+        path,
         alpha: this.globalAlpha,
         composite: this.globalCompositeOperation,
         lineWidth: this.lineWidth,
@@ -81,6 +82,8 @@ function createOwner({
   contourMinorFeatures = [],
   intensityPoints = [],
   showPhysical = true,
+  getterOverrides = {},
+  helperOverrides = {},
 } = {}) {
   const metrics = [];
   const pathCalls = [];
@@ -130,6 +133,7 @@ function createOwner({
       getContext: () => context,
       getPathCanvas: () => (feature) => pathCalls.push(feature),
       getProjection: () => ([lon, lat]) => [lon * 10, lat * 10],
+      ...getterOverrides,
     },
     helpers: {
       applyPhysicalLandClipMask: () => helperCalls.push("clip"),
@@ -183,6 +187,7 @@ function createOwner({
       pathBoundsInScreen: () => true,
       shouldReportDeferredContextLayerGap: () => true,
       warnMissingPhysicalContextOnce: (key) => helperCalls.push(`warn:${key}`),
+      ...helperOverrides,
     },
   });
   return { context, helperCalls, metrics, owner, pathCalls, state };
@@ -293,4 +298,142 @@ test("physical contour layer uses source-over and reports major and minor counts
   assert.equal(harness.metrics.at(-1).name, "drawPhysicalContourLayer");
   assert.equal(harness.metrics.at(-1).details.majorFeatureCount, 1);
   assert.equal(harness.metrics.at(-1).details.minorFeatureCount, 1);
+});
+
+class AggregatePath {
+  constructor() { this.paths = []; }
+  addPath(path) { this.paths.push(path); }
+}
+
+function withPathConstructor(constructor, run) {
+  const previous = Object.getOwnPropertyDescriptor(globalThis, "Path2D");
+  Object.defineProperty(globalThis, "Path2D", { configurable: true, writable: true, value: constructor });
+  try { return run(); }
+  finally {
+    if (previous) Object.defineProperty(globalThis, "Path2D", previous);
+    else delete globalThis.Path2D;
+  }
+}
+
+const batchStyle = { cacheSlot: "major", color: "#776655", opacity: 0.8, width: 2, k: 4 };
+
+test("same-style cached contours merge two paths into exactly one stroke", () => withPathConstructor(AggregatePath, () => {
+  const features = [createContourFeature("a"), createContourFeature("b")];
+  const paths = features.map((feature) => ({ id: feature.id }));
+  const requests = [];
+  const harness = createOwner({ getterOverrides: { getContourPath2D: (feature, options) => {
+    requests.push({ feature, options });
+    return paths[features.indexOf(feature)];
+  } } });
+  const result = harness.owner.drawContourCollection({ features }, batchStyle);
+  const strokes = harness.context.calls.filter((call) => call.type === "stroke");
+  assert.equal(strokes.length, 1);
+  assert.deepEqual(strokes[0].path.paths, paths);
+  assert.deepEqual(harness.pathCalls, []);
+  assert.deepEqual(requests.map((request) => request.options), [{ cacheSlot: "major", k: 4 }, { cacheSlot: "major", k: 4 }]);
+  assert.deepEqual(result, { drewAny: true, selectedCount: 2, renderedCount: 2 });
+}));
+
+for (const mode of ["missing-constructor", "missing-addPath", "partial-cache"]) {
+  test(`contour batching fully falls back without missed or double strokes: ${mode}`, () => {
+    const Constructor = mode === "missing-constructor" ? undefined : mode === "missing-addPath" ? class {} : AggregatePath;
+    withPathConstructor(Constructor, () => {
+      const features = [createContourFeature("a"), createContourFeature("b")];
+      let reads = 0;
+      const harness = createOwner({ getterOverrides: { getContourPath2D: (feature) => {
+        reads++;
+        return feature.id === "a" ? { id: "cached-a" } : null;
+      } } });
+      const result = harness.owner.drawContourCollection({ features }, batchStyle);
+      const strokes = harness.context.calls.filter((call) => call.type === "stroke");
+      assert.equal(strokes.length, 1);
+      assert.equal(strokes[0].path, undefined);
+      assert.deepEqual(harness.pathCalls, features);
+      assert.equal(reads, mode === "partial-cache" ? 2 : 0);
+      assert.deepEqual(result, { drewAny: true, selectedCount: 2, renderedCount: 2 });
+    });
+  });
+}
+
+test("zero contour field intensity never becomes a visible full-strength stroke", () => {
+  const harness = createOwner();
+  const result = harness.owner.drawContourCollection({ features: [createContourFeature("zero")] }, {
+    ...batchStyle, opacityMultiplierResolver: () => 0,
+  });
+  const strokes = harness.context.calls.filter((call) => call.type === "stroke");
+  assert.equal(strokes.length, 0);
+  assert.deepEqual(result, { drewAny: false, selectedCount: 1, renderedCount: 0 });
+});
+
+test("major and minor selected metrics count chosen features rather than whole assets or stroke batches", () => {
+  const harness = createOwner({
+    contourMajorFeatures: [createContourFeature("major-a"), createContourFeature("major-b"), createContourFeature("excluded-major")],
+    contourMinorFeatures: [createContourFeature("minor-a"), createContourFeature("excluded-minor")],
+    helperOverrides: { getContourVisibleFeatures: (collection) => collection.features.filter((feature) => !feature.id.startsWith("excluded")) },
+  });
+  harness.owner.drawPhysicalContourLayer(2);
+  const metrics = harness.metrics.at(-1).details;
+  assert.equal(metrics.majorFeatureCount, 3);
+  assert.equal(metrics.minorFeatureCount, 2);
+  assert.equal(metrics.majorSelectedCount, 2);
+  assert.equal(metrics.majorRenderedCount, 2);
+  assert.equal(metrics.minorSelectedCount, 1);
+  assert.equal(metrics.minorRenderedCount, 1);
+  assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 2);
+});
+
+test("selected contours with no resolved stroke color do not inflate rendered count", () => {
+  const harness = createOwner();
+  const features = [createContourFeature("paint"), createContourFeature("skip")];
+  const result = harness.owner.drawContourCollection({ features }, {
+    ...batchStyle, color: null, colorResolver: (feature) => feature.id === "paint" ? "#123456" : null,
+  });
+  assert.equal(result.selectedCount, 2);
+  assert.equal(result.renderedCount, 1);
+  assert.deepEqual(harness.pathCalls, [features[0]]);
+});
+
+for (const cached of [false, true]) {
+  test(`contour phase metrics distinguish selection, styles, path build and stroke: ${cached ? "cached" : "fallback"}`, () => withPathConstructor(AggregatePath, () => {
+    let clock = 0;
+    const feature = createContourFeature("timed");
+    const context = createCanvasContext();
+    const originalStroke = context.stroke;
+    context.stroke = function(path) { clock += 7; originalStroke.call(this, path); };
+    const harness = createOwner({
+      context,
+      getterOverrides: {
+        getContourPath2D: cached ? () => { clock += 5; return { id: "cached" }; } : null,
+        getPathCanvas: () => () => { clock += 5; },
+      },
+      helperOverrides: {
+        nowMs: () => clock,
+        getContourVisibleFeatures: (collection) => { clock += 2; return collection.features; },
+      },
+    });
+    harness.owner.drawContourCollection({ features: [feature] }, {
+      ...batchStyle,
+      colorResolver: () => { clock += 3; return "#123456"; },
+    });
+    const metric = harness.metrics.at(-1);
+    assert.equal(metric.name, "drawContourCollection:major");
+    assert.equal(metric.durationMs, 17);
+    assert.deepEqual(metric.details, {
+      cacheSlot: "major", selectionMs: 2, styleMs: 3, pathBuildMs: 5, strokeMs: 7,
+      selectedCount: 1, renderedCount: 1,
+    });
+  }));
+}
+
+test("empty contour selection still reports its selection cost without path or stroke cost", () => {
+  let clock = 0;
+  const harness = createOwner({ helperOverrides: {
+    nowMs: () => clock,
+    getContourVisibleFeatures: () => { clock += 11; return []; },
+  } });
+  harness.owner.drawContourCollection({ features: [createContourFeature("outside")] }, batchStyle);
+  assert.deepEqual(harness.metrics.at(-1).details, {
+    cacheSlot: "major", selectionMs: 11, styleMs: 0, pathBuildMs: 0, strokeMs: 0,
+    selectedCount: 0, renderedCount: 0,
+  });
 });

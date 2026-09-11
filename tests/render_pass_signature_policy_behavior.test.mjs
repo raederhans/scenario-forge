@@ -63,6 +63,25 @@ test("border pixels depend on country appearance rather than unrelated individua
   assert.notEqual(policy.getRenderPassSignature("borders"), recolored);
 });
 
+test("urban screen paint invalidates on zoom within a reuse bucket but not on pan or inactive urban data", () => {
+  const { state, live, policy } = createHarness({ getContextBaseZoomBucketId: () => "high" });
+  live.reuse = true;
+  state.showUrban = true;
+  state.urbanData = { features: [{}] };
+  state.zoomTransform = { k: 10, x: 0, y: 0 };
+  const atTen = policy.getRenderPassSignature("contextBase");
+  state.zoomTransform.x = 20;
+  assert.equal(policy.getRenderPassSignature("contextBase"), atTen);
+  state.zoomTransform.k = 20;
+  assert.notEqual(policy.getRenderPassSignature("contextBase"), atTen);
+  for (const deactivate of [() => { state.showUrban = false; }, () => { state.showUrban = true; state.urbanData = null; }]) {
+    deactivate();
+    const inactive = policy.getRenderPassSignature("contextBase");
+    state.zoomTransform.k += 1;
+    assert.equal(policy.getRenderPassSignature("contextBase"), inactive);
+  }
+});
+
 test("transport presentation changes invalidate shared labels without invalidating political pixels", () => {
   for (const change of [
     (state) => { state.showAirports = true; },
@@ -184,3 +203,62 @@ test("entrypoint delegates default transform resolution once to the signature po
     assert.equal(reads, directReads, name);
   }
 });
+
+for (const [field, value] of Object.entries({
+  contourColor: "#123456", contourOpacity: 0.2, contourMajorWidth: 2, contourMinorWidth: 1,
+  contourMajorIntervalM: 1500, contourMinorIntervalM: 500, contourMinorVisible: false,
+  contourMajorLowReliefCutoffM: 700, contourMinorLowReliefCutoffM: 900,
+})) {
+  test(`contour-only ${field} invalidates context without repainting physical base`, () => {
+    const { state, policy } = createHarness();
+    state.styleConfig.physical = { preset: "balanced", mode: "atlas_and_contours" };
+    const base = policy.getRenderPassSignature("physicalBase");
+    const contours = policy.getRenderPassSignature("contextBase");
+    state.styleConfig.physical[field] = value;
+    assert.equal(policy.getRenderPassSignature("physicalBase"), base);
+    assert.notEqual(policy.getRenderPassSignature("contextBase"), contours);
+  });
+}
+
+for (const [field, value] of Object.entries({
+  atlasOpacity: 0.1, atlasIntensity: 1.4, atlasClassVisibility: { forest_temperate: false },
+  rainforestEmphasis: 0.1, blendMode: "multiply",
+})) {
+  test(`atlas-only ${field} invalidates physical base without repainting context`, () => {
+    const { state, policy } = createHarness();
+    state.styleConfig.physical = { preset: "balanced", mode: "atlas_and_contours" };
+    const base = policy.getRenderPassSignature("physicalBase");
+    const contours = policy.getRenderPassSignature("contextBase");
+    state.styleConfig.physical[field] = value;
+    assert.notEqual(policy.getRenderPassSignature("physicalBase"), base);
+    assert.equal(policy.getRenderPassSignature("contextBase"), contours);
+  });
+}
+
+for (const [field, value] of Object.entries({ preset: "terrain_rich", mode: "atlas_only", opacity: 0.1 })) {
+  test(`shared physical ${field} invalidates both dependent passes`, () => {
+    const { state, policy } = createHarness();
+    state.styleConfig.physical = { preset: "balanced", mode: "atlas_and_contours" };
+    const before = ["physicalBase", "contextBase"].map((pass) => policy.getRenderPassSignature(pass));
+    state.styleConfig.physical[field] = value;
+    ["physicalBase", "contextBase"].forEach((pass, index) => assert.notEqual(policy.getRenderPassSignature(pass), before[index]));
+  });
+}
+
+for (const [preset, beforeZoom, afterZoom] of [["balanced", 3.1, 3.3], ["terrain_rich", 3.9, 4.1]]) {
+  test(`contour LOD threshold invalidates context even inside a reused bucket: ${preset}`, () => {
+    const { state, live, policy } = createHarness({
+      getTransformSignature: () => "same-transform",
+      getContextBaseZoomBucketId: () => "same-bucket",
+    });
+    live.reuse = true;
+    state.showPhysical = true;
+    state.styleConfig.physical = { preset, mode: "atlas_and_contours", contourMinorVisible: true };
+    state.zoomTransform.k = beforeZoom;
+    const before = Object.fromEntries(["contextBase", "physicalBase", "political"].map((pass) => [pass, policy.getRenderPassSignature(pass)]));
+    state.zoomTransform.k = afterZoom;
+    assert.notEqual(policy.getRenderPassSignature("contextBase"), before.contextBase);
+    assert.equal(policy.getRenderPassSignature("physicalBase"), before.physicalBase);
+    assert.equal(policy.getRenderPassSignature("political"), before.political);
+  });
+}

@@ -118,10 +118,7 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
             '\n  }',
             1,
         )[0]
-        urban_layer_body = renderer_content.split("function drawUrbanLayer(k, { interactive = false } = {}) {", 1)[1].split(
-            "\nfunction recordDeferredRiversLayerMetric",
-            1,
-        )[0]
+        urban_layer_body = (URBAN_CITY_POLICY_JS.parent / "urban_layer_render_owner.js").read_text(encoding="utf-8")
         modern_static_key_body = city_lights_content.split("function getModernCityLightsStaticLayerKey(config) {", 1)[1].split(
             "\n}",
             1,
@@ -139,8 +136,11 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         self.assertIn('`field:urbanGlow:${Number(urbanGlowRevision || 0)}`', day_night_signature_body)
         self.assertIn('getFieldFeatureMultiplier("urbanGlow", feature)', renderer_content)
         self.assertIn("const glowMultiplier = getUrbanGlowFeatureMultiplier(feature);", urban_layer_body)
-        self.assertIn("Math.min(fillOpacity, 0.15) : fillOpacity) * glowMultiplier", urban_layer_body)
-        self.assertIn("Math.min(strokeOpacity, 0.18) : strokeOpacity) * glowMultiplier", urban_layer_body)
+        self.assertIn("urbanLayerRenderOwner.drawUrbanLayer(k, { interactive })", renderer_content)
+        self.assertIn("Math.min(fillOpacity, 0.15) : fillOpacity", urban_layer_body)
+        self.assertIn("Math.min(strokeOpacity, 0.18) : strokeOpacity", urban_layer_body)
+        self.assertIn("clamp(fillAlpha * glowMultiplier, 0, 1)", urban_layer_body)
+        self.assertIn("clamp(strokeAlpha * glowMultiplier, 0, 1)", urban_layer_body)
         self.assertGreaterEqual(
             renderer_content.count("getUrbanGlowMultiplierAt(")
             + city_lights_content.count("getUrbanGlowMultiplierAt("),

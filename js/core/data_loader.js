@@ -75,6 +75,21 @@ const CONTEXT_LAYER_PACKS = {
     format: "topology",
     objectName: "contours",
   },
+  physical_contours_low_major: {
+    url: resolveDataAssetUrl("context_layer:physical_contours_low_major"),
+    format: "topology",
+    objectName: "contours",
+  },
+  physical_contours_mid_major: {
+    url: resolveDataAssetUrl("context_layer:physical_contours_mid_major"),
+    format: "topology",
+    objectName: "contours",
+  },
+  physical_contours_mid_minor: {
+    url: resolveDataAssetUrl("context_layer:physical_contours_mid_minor"),
+    format: "topology",
+    objectName: "contours",
+  },
 };
 const EXPLICIT_CONTEXT_CATALOG_LAYER_NAMES = new Set(
   listTransportOverviewCapabilityFamilyIds()

@@ -21,6 +21,7 @@ from map_builder import config as cfg
 from map_builder.geo.topology import build_named_layer_topology
 from map_builder.geo.utils import pick_column
 from map_builder.io.fetch import fetch_or_cache_binary
+from map_builder.processors.contour_lod import build_lod_assets
 
 
 EQUAL_AREA_CRS = "EPSG:6933"
@@ -501,5 +502,8 @@ def build_and_save_physical_context_layers(
         output_dir / cfg.PHYSICAL_CONTOUR_MINOR_TOPO_FILENAME,
         object_name="contours",
     )
+    # Keep normal physical-context builds reproducible with the runtime LOD
+    # assets; the LOD builder reuses the just-written detail topology.
+    build_lod_assets(output_dir)
 
     return semantics, contour_major, contour_minor

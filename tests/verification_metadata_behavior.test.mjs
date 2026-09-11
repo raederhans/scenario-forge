@@ -136,6 +136,9 @@ test("selector explicitly classifies task prose and agent config without inventi
       .flatMap((task) => ["plan", "context", "task"].map((name) => `docs/active/${task}/${name}.md`)),
     "docs/active/business-efficiency-20260908/editing-analysis.md",
     "docs/active/business-efficiency-20260908/render-reuse-analysis.md",
+    ...["contour-optimization-20260910", "tno-mediterranean-sea-closure"]
+      .flatMap((task) => ["plan", "context", "task"].map((name) => `docs/archive/${task}/${name}.md`)),
+    ...["land", "lod", "ocean"].map((name) => `docs/archive/contour-optimization-20260910/${name}-handoff.md`),
   ];
   const report = buildRepositoryRecommendation(files);
   assert.deepEqual(report.unmatchedChangedFiles, []);
@@ -148,6 +151,22 @@ test("selector explicitly classifies task prose and agent config without inventi
   assert.equal(report.nonBehavioralChangedFiles.find((entry) => entry.changedFile === ".codex/config.toml").classification,
     "agent-tool-config");
   assert.deepEqual(buildAdaptiveEntrypointRecommendation(files).unmatchedChangedFiles, []);
+});
+
+test("contour generation and LOD assets select executable geography coverage", () => {
+  const files = [
+    "map_builder/processors/physical_context.py", "map_builder/processors/contour_lod.py",
+    "tools/build_contour_lod_assets.py", "data/global_contours.lod.provenance.json",
+    "data/global_contours.low.major.topo.json", "data/global_contours.mid.major.topo.json",
+    "data/global_contours.mid.minor.topo.json",
+  ];
+  for (const file of files) {
+    const report = buildRepositoryRecommendation([file]);
+    assert.deepEqual(report.unmatchedChangedFiles, [], file);
+    assert.deepEqual(report.nonBehavioralChangedFiles, [], file);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef ===
+      "python -m unittest tests.test_build_contour_lod_assets -q"), file);
+  }
 });
 
 test("nonbehavioral classification preserves unknown-file rejection and actual runtime routes", () => {

@@ -2,7 +2,7 @@
 
 - generated_at: 2026-08-14T20:52:35.840939+00:00
 - version: 1
-- entries: 659
+- entries: 662
 
 ## Counts by role
 
@@ -14,7 +14,7 @@
 | city_lights_entries | 1 |
 | city_lights_source | 1 |
 | city_overrides | 1 |
-| context_layer | 3 |
+| context_layer | 6 |
 | country_feature_policies | 1 |
 | detail_topology_na_v1 | 1 |
 | detail_topology_na_v2 | 1 |
@@ -82,7 +82,10 @@
 | source:fr_arr | data/france_arrondissements.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::fr_arr::current_local_sha256 | default | source_ledger | fr_arr |
 | geo_aliases | data/geo_aliases.json | geo_aliases | json | json | schema://json/object/v1 | data/manifest.json::outputs::geo_aliases.json::sha256 | default | init_map_data.hierarchy_locales |  |
 | bathymetry:global_topology | data/global_bathymetry.topo.json | bathymetry_topology | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.bathymetry:global_topology |  |
+| context_layer:physical_contours_low_major | data/global_contours.low.major.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_low_major |  |
 | manifest_output:global_contours.major.topo.json | data/global_contours.major.topo.json | terrain_contours_major_topology | topojson | json | schema://topology/terrain_contours_major_v1 | data/manifest.json::outputs::global_contours.major.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
+| context_layer:physical_contours_mid_major | data/global_contours.mid.major.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_major |  |
+| context_layer:physical_contours_mid_minor | data/global_contours.mid.minor.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_minor |  |
 | manifest_output:global_contours.minor.topo.json | data/global_contours.minor.topo.json | terrain_contours_minor_topology | topojson | json | schema://topology/terrain_contours_minor_v1 | data/manifest.json::outputs::global_contours.minor.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | manifest_output:global_physical_semantics.topo.json | data/global_physical_semantics.topo.json | physical_semantics_topology | topojson | json | schema://topology/physical_semantics_v1 | data/manifest.json::outputs::global_physical_semantics.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | context_layer:rivers | data/global_rivers.geojson | context_layer | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.context_layer:rivers |  |

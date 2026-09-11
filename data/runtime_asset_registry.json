@@ -79,6 +79,21 @@
       "role": "context_layer",
       "family_id": "physical_contours_minor"
     },
+    "context_layer:physical_contours_low_major": {
+      "url": "data/global_contours.low.major.topo.json",
+      "role": "context_layer",
+      "family_id": "physical_contours_low_major"
+    },
+    "context_layer:physical_contours_mid_major": {
+      "url": "data/global_contours.mid.major.topo.json",
+      "role": "context_layer",
+      "family_id": "physical_contours_mid_major"
+    },
+    "context_layer:physical_contours_mid_minor": {
+      "url": "data/global_contours.mid.minor.topo.json",
+      "role": "context_layer",
+      "family_id": "physical_contours_mid_minor"
+    },
     "transport_catalog:rail": {
       "url": "data/transport_layers/global_rail/catalog.json",
       "role": "transport_catalog",

@@ -149348,12 +149348,12 @@
         90.0
       ],
       "priority": 1,
-      "feature_count": 897,
-      "byte_size": 3150175,
-      "sha256": "e43d3bbdb39381f83f6a2b43e42b2c76f7d8992f3b7cfcb3d265067258c32544",
-      "coord_count": 24464,
-      "part_count": 1158,
-      "estimated_path_cost": 36419,
+      "feature_count": 898,
+      "byte_size": 3346350,
+      "sha256": "1ba20e81ecdee22d49e53a1de2c03aa85fe14a66435e1ccc72c5da8eb677f28a",
+      "coord_count": 26475,
+      "part_count": 1181,
+      "estimated_path_cost": 38617,
       "data_format": "geojson",
       "global_coverage": true,
       "country_codes": [
@@ -149763,12 +149763,12 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 843,
-      "byte_size": 2999673,
-      "sha256": "94ea0ab7e50850b7ce080dc81ae811f1ade1fe1cf5130fcdb658138481b85050",
-      "coord_count": 23403,
-      "part_count": 1098,
-      "estimated_path_cost": 34716,
+      "feature_count": 844,
+      "byte_size": 3195848,
+      "sha256": "46ab637033a48280af2730f9398fd16d42e223d200fe27149bddac87441dd967",
+      "coord_count": 25414,
+      "part_count": 1121,
+      "estimated_path_cost": 36914,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -154838,6 +154838,12 @@
           32.23708285443016,
           15.627248100422287,
           32.26843277364248
+        ],
+        [
+          16.5,
+          35.2,
+          22.0,
+          38.8
         ]
       ]
     },

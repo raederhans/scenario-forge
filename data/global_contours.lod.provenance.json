@@ -1,0 +1,26 @@
+{
+  "source": {
+    "major": "global_contours.major.topo.json",
+    "minor": "global_contours.minor.topo.json"
+  },
+  "assets": {
+    "low_major": {
+      "features": 4525,
+      "bytes": 780190,
+      "tolerance_degrees": 0.1,
+      "elevation_step_m": 1000
+    },
+    "mid_major": {
+      "features": 13828,
+      "bytes": 2730247,
+      "tolerance_degrees": 0.045,
+      "elevation_step_m": 500
+    },
+    "mid_minor": {
+      "features": 35664,
+      "bytes": 6949647,
+      "tolerance_degrees": 0.045,
+      "elevation_step_m": 200
+    }
+  }
+}

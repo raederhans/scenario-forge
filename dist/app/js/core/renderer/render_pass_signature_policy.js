@@ -5,6 +5,46 @@ import {
 } from '../state.js';
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
 import { VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
+import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
+
+// Keep pass identities tied to the fields that the pass actually paints.  The
+// physical style object also contains atlas-only controls; including all of it
+// invalidates the shared context pass when an unrelated control changes.
+function getPhysicalBaseStyleSignature(styleConfig) {
+  const cfg = normalizePhysicalStyleConfig(styleConfig || {});
+  return {
+    mode: cfg.mode,
+    opacity: cfg.opacity,
+    atlasOpacity: cfg.atlasOpacity,
+    atlasIntensity: cfg.atlasIntensity,
+    atlasClassVisibility: cfg.atlasClassVisibility,
+    rainforestEmphasis: cfg.rainforestEmphasis,
+    preset: cfg.preset,
+    blendMode: cfg.blendMode,
+  };
+}
+
+function getPhysicalContourStyleSignature(styleConfig) {
+  const cfg = normalizePhysicalStyleConfig(styleConfig || {});
+  return {
+    mode: cfg.mode,
+    opacity: cfg.opacity,
+    contourColor: cfg.contourColor,
+    contourOpacity: cfg.contourOpacity,
+    contourMajorWidth: cfg.contourMajorWidth,
+    contourMinorWidth: cfg.contourMinorWidth,
+    contourMajorIntervalM: cfg.contourMajorIntervalM,
+    contourMinorIntervalM: cfg.contourMinorIntervalM,
+    contourMinorVisible: cfg.contourMinorVisible,
+    contourMajorLowReliefCutoffM: cfg.contourMajorLowReliefCutoffM,
+    contourMinorLowReliefCutoffM: cfg.contourMinorLowReliefCutoffM,
+    preset: cfg.preset,
+  };
+}
+
+function getPhysicalContextStyleSignature(styleConfig) {
+  return getPhysicalContourStyleSignature(styleConfig);
+}
 
 // Cache identity reads current state and live renderer dependencies on every call.
 export function createRenderPassSignaturePolicy(runtimeState, {
@@ -90,7 +130,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `field:${Number(intensityFields.channels.physicalAtlas?.revision || 0)}`,
-        stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
+        stableJson(getPhysicalBaseStyleSignature(runtimeState.styleConfig?.physical || {})),
       ].join("::");
     }
     if (passName === "political") {
@@ -141,15 +181,21 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `bucket:${zoomBucket}`,
         runtimeState.showPhysical ? "physical:on" : "physical:off",
         runtimeState.showUrban ? "urban:on" : "urban:off",
+        runtimeState.showUrban && runtimeState.urbanData?.features?.length
+          ? `urban-scale:${Number(transform?.k || runtimeState.zoomTransform?.k || 1).toFixed(4)}`
+          : "urban-scale:inactive",
         runtimeState.showRivers ? "rivers:on" : "rivers:off",
         `context:${Number(runtimeState.contextLayerRevision || 0)}`,
         `context-colors:${shouldRefreshContextBaseForColorChanges() ? Number(runtimeState.colorRevision || 0) : 0}`,
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `field:physicalContour:${Number(intensityFields.channels.physicalContour?.revision || 0)}`,
+        runtimeState.showPhysical && runtimeState.styleConfig?.physical?.mode !== "atlas_only"
+          ? `contour-lod:${resolveContourLodRequest({ styleConfig: runtimeState.styleConfig, zoomTransform: transform }).join("|")}`
+          : "contour-lod:inactive",
         `field:urbanGlow:${Number(intensityFields.channels.urbanGlow?.revision || 0)}`,
         String(runtimeState.renderProfile || "auto"),
-        stableJson(normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {})),
+        stableJson(getPhysicalContextStyleSignature(runtimeState.styleConfig?.physical || {})),
         stableJson(normalizeUrbanStyleConfig(runtimeState.styleConfig?.urban || {})),
         stableJson(runtimeState.styleConfig?.rivers || {}),
       ];

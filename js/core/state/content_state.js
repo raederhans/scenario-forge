@@ -331,7 +331,7 @@ export function commitContextLayerCollection(
   target,
   layerName,
   collection,
-  { bumpRevision = false } = {},
+  { bumpRevision = false, publish = true } = {},
 ) {
   if (!target || typeof target !== "object") {
     return null;
@@ -341,7 +341,7 @@ export function commitContextLayerCollection(
     [layerName]: collection,
   };
   const targetField = CONTEXT_LAYER_DATA_FIELD_BY_NAME[layerName];
-  if (targetField) {
+  if (publish && targetField) {
     target[targetField] = collection;
   }
   if (bumpRevision) {
@@ -597,4 +597,19 @@ export function decodeStartupPrimaryCollectionsIntoState(
     target.physicalData = target.contextLayerExternalDataByName.physical;
   }
   return target.landData;
+}
+
+// Publish display aliases separately from immutable per-pack cache entries.
+export function commitPhysicalContourDisplay(target, { major, minor } = {}) {
+  const changed = [];
+  for (const [value, field, name] of [
+    [major, "physicalContourMajorData", "physical_contours_major"],
+    [minor, "physicalContourMinorData", "physical_contours_minor"],
+  ]) {
+    if (value === undefined || target[field] === value || (value === null && target[field] == null)) continue;
+    target[field] = value;
+    changed.push(name);
+  }
+  if (changed.length) target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+  return changed;
 }

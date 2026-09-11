@@ -176,8 +176,8 @@ test("physical layer source contracts stay wired to the expected renderer and st
     physicalSetDefersContours:
       /const PHYSICAL_CONTEXT_LAYER_SET = \[\s*"physical",\s*"physical_semantics",\s*\];/.test(startupDataPipelineSource),
     hasSeparateContourWarmupSet:
-      /const PHYSICAL_CONTOUR_LAYER_SET = \[[\s\S]*?"physical_contours_major",[\s\S]*?"physical_contours_minor",[\s\S]*?\];/.test(startupDataPipelineSource)
-      && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return PHYSICAL_CONTOUR_LAYER_SET;/.test(startupDataPipelineSource),
+      /import \{ resolveContourLodRequest \} from "\.\.\/core\/renderer\/physical_contour_lod_policy\.js";/.test(startupDataPipelineSource)
+      && /if \(normalized === "physical-contours-set"\) \{[\s\S]*?return resolveContourLodRequest\(state\);/.test(startupDataPipelineSource),
     schedulesDeferredContourWarmup:
       /if \(targetRuntime\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(startupReadyHandoffSource)
       && /postReadyScheduler\.scheduleTask\("post-ready-contour-warmup", async \(task\) => \{[\s\S]*?task\.throwIfStale\(\);[\s\S]*?await task\.yield\(\);[\s\S]*?await task\.waitFor\(ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",[\s\S]*?renderNow: false,[\s\S]*?task\.commit\(\(\) => requestMainRender\("post-ready-contours"\)\);[\s\S]*?\}, scopedTaskOptions\(\{/.test(startupReadyHandoffSource),

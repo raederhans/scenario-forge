@@ -21,7 +21,7 @@
     "context_lod.manifest.json": "f50891fede3dfba6dec0866b4ed43aea71e3003ce0ccc40571b7e1048ea63ce9",
     "detail_chunks.manifest.json": "e75d1f481b4880fbb95c11bb22b4bf7c2a3bcbdc8e7e3cf0b585c779c2458726",
     "geo_aliases.startup.json": "fb6d88ce15016c44207d1b0ac03a8b32fe5148000742bf946bfc2004b3ba1c36",
-    "locales.startup.json": "eedb33a0b0450684864bb2698d2791340eaffcd72811d2a7a01d16b46db0c98d",
+    "locales.startup.json": "c34a09fae3116a8e92b82555831c2f3438df4de589c39cfdcbdceee00b05d65c",
     "mesh_pack.json": "56dff82e8815be4b7e9dce0bfafc2a84ae74f163c31525b96883c72cbd5a542b",
     "runtime_meta.json": "b8652a58c0740db80f101c734cbfa35fd61c4aabc364ee96c571f85727453686",
     "runtime_topology.bootstrap.topo.json": "74d6f39ab2280fa524109d9bd35e15149df48681688deb22ecfac60911527115",
@@ -33,6 +33,6 @@
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "281f309e3f80523ad4b48505a12063d1234f0ab8510893613a57a677ff131df5",
+  "snapshot_fingerprint": "e4b5e259442d3f4dbeaaf79336d25863ae0d5abbbb0afcb279df5111d1179592",
   "water_count": 0
 }

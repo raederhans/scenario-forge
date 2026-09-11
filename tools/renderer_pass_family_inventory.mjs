@@ -166,6 +166,7 @@ export const RENDER_PASS_FAMILY_INVENTORY = Object.freeze([
       "js/core/renderer/context_pass_orchestrator_owner.js",
       "js/core/renderer/physical_layer_render_owner.js",
       "js/core/renderer/river_layer_render_owner.js",
+      "js/core/renderer/urban_layer_render_owner.js",
       "js/core/renderer/color_resolution_strategy.js",
     ],
     browserLanes: ["test:e2e:physical-layer-runtime-contract", "test:e2e:water-rendering"],
