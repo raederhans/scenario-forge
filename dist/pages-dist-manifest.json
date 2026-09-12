@@ -46107,7 +46107,7 @@
     },
     {
       "path": "app/js/core/renderer/city_label_text_model.js",
-      "size_bytes": 11403,
+      "size_bytes": 11394,
       "source_kind": "dist"
     },
     {
@@ -48127,7 +48127,7 @@
       {
         "file_count": 268,
         "id": "startup-critical",
-        "size_bytes": 5461360
+        "size_bytes": 5461351
       },
       {
         "file_count": 100,
@@ -65630,11 +65630,11 @@
         "deferred_graph_file_count": 130,
         "deferred_module_count": 128,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5448132,
+        "initial_graph_bytes": 5448123,
         "initial_graph_file_count": 302,
         "initial_module_count": 289,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4176703,
+        "initial_script_bytes": 4176694,
         "initial_script_count": 291,
         "module_count": 424,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65995,7 +65995,7 @@
           },
           {
             "path": "app/js/core/renderer/city_label_text_model.js",
-            "size_bytes": 11403
+            "size_bytes": 11394
           },
           {
             "path": "app/js/core/renderer/city_lights_asset_provider.js",
@@ -66627,7 +66627,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3122740
+        "size_bytes": 3122731
       },
       {
         "basis": "startup-resource-graph",
@@ -68382,14 +68382,14 @@
     "over_by_bytes": 0,
     "status": "within_limit",
     "warning_bytes": 996147200,
-    "warning_over_by_bytes": 10119906,
+    "warning_over_by_bytes": 10119897,
     "warning_status": "over_warning"
   },
   "top_level_directories": [
     {
       "file_count": 9540,
       "path": "app",
-      "size_bytes": 999256473
+      "size_bytes": 999256464
     },
     {
       "file_count": 57,
@@ -68422,5 +68422,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 1006267106
+  "total_bytes": 1006267097
 }

@@ -6,7 +6,7 @@ const CITY_LABEL_MAX_WIDTH_PX = {
 
 // Remove administrative descriptors only; parentheses can identify the river or
 // region of a city (Frankfurt (Oder), Halle (Saale), Kempten (Allgäu)).
-const CITY_ADMIN_DESCRIPTOR = String.raw`(?:独立城市|非县辖城市|非县辖市|城市区|克莱斯自由城|\b(?:kreisfreie\s+stadt|stadtkreis|independent\s+city|county|district|oblast|okrug|raion|municipality|governorate)\b|городской округ|район|область)`;
+const CITY_ADMIN_DESCRIPTOR = String.raw`(?:独立城市|非县辖城市|非县辖市|城市区|克莱斯自由城|\b(?:kreisfreie\s+stadt|stadtkreis|independent\s+city|county|oblast|okrug|raion|municipality|governorate)\b|городской округ|район|область)`;
 const CITY_ADMIN_PARENTHETICAL = new RegExp(String.raw`\s*[（(]\s*${CITY_ADMIN_DESCRIPTOR}\s*[）)]`, "giu");
 const CITY_ADMIN_SUFFIX = new RegExp(String.raw`[\s,，、;；:-]*${CITY_ADMIN_DESCRIPTOR}(?=\s*(?:[（(\[].*?[）)\]]\s*)*$)`, "giu");
 const CITY_ADMIN_PREFIX = /^(?:kreisfreie\s+stadt|stadtkreis|independent\s+city\s+of)\s+/iu;

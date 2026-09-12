@@ -2,6 +2,8 @@
 
 ## Current truth
 
+- PR整合回归：远端fast发现Wilshire District被通用district后缀清理误截。移除该模糊词的清理（行政host候选拒绝规则和德国明确后缀规则保持），补既有显示名保护用例。城市文本与所有TNO地区城市名称组合31/31通过，reader源码证明无漂移；同步重建dist。旧提交的三个scenario/transport/smoke已通过，最终远端结果仍以PR #135当前head为准。
+
 - Git交付：整合提交3fd7478已推送codex/palette-operation-boundary，远端受保护main交付入口为[PR #135](https://github.com/raederhans/scenario-forge/pull/135)，以其必需检查和合并回执为准。城市最终49/49、暂存diff check及新dist构建通过；唯一EOF清理不影响6个reader来源证明。另一contours工作树干净且tip 5d656c9c已在origin/main历史内，保留证据用途，不重复合并或删除。下面未推送/未合并描述为对应阶段的历史快照。
 
 - 新授权整合：root为唯一Git/CI owner，使用integrate-worktrees、write-lore-commits及本组manage-task-records。当前HEAD与origin/main均fbf2d39a；另一contours工作树干净，保留证据用途。架构与点位修改共享renderer和policy，因此作为同一已验证提交整合。排除.playwright-mcp和.runtime试点输出。main必需PR Verify Required/perf-gate/transport及三个scenario严格检查，禁止绕过。root运行城市5文件目标组合，日志.runtime/reports/generated/architecture-city-integration-tests.log，exit0为成功；之后提交推送并由root独占远端CI观察，失败按具体日志修复。

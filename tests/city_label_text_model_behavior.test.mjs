@@ -117,7 +117,7 @@ test('cleanup preserves actual city names, punctuation and geographic disambigua
   const context = { measureText: value => ({ width: Array.from(value).length * 3 }) };
   for (const label of [
     '盐湖城', '墨西哥城', '纽约市', '市川', 'City of London', 'Salt Lake City',
-    'Mexico City', 'District of Columbia', 'County Durham', 'Frankfurt (Oder)',
+    'Mexico City', 'District of Columbia', 'Wilshire District', 'County Durham', 'Frankfurt (Oder)',
     'Frankfurt am Main', 'Halle (Saale)', '法兰克福（奥德）', '肯普滕（阿尔高）',
     'Portland, Maine', 'Oldenburg (Oldenburg)',
   ]) {
