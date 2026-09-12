@@ -136,7 +136,17 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
         self.assertIn('`field:urbanGlow:${Number(urbanGlowRevision || 0)}`', day_night_signature_body)
         self.assertIn('getFieldFeatureMultiplier("urbanGlow", feature)', renderer_content)
         self.assertIn("const glowMultiplier = getUrbanGlowFeatureMultiplier(feature);", urban_layer_body)
-        self.assertIn("urbanLayerRenderOwner.drawUrbanLayer(k, { interactive })", renderer_content)
+        self.assertIn("const { drawUrbanLayer: drawUrbanLayerFromOwner } = composeUrbanLayerRenderOwner();", renderer_content)
+        self.assertRegex(
+            renderer_content,
+            r"function drawUrbanLayer\(k, \{ interactive = false \} = \{\}\) \{\s*"
+            r"return drawUrbanLayerFromOwner\(k, \{ interactive \}\);\s*\}",
+        )
+        urban_composition = renderer_content.split("function composeUrbanLayerRenderOwner() {", 1)[1].split("\n}\n", 1)[0]
+        self.assertIn("const owner = createUrbanLayerRenderOwner({", urban_composition)
+        self.assertIn("state: runtimeState,", urban_composition)
+        self.assertIn("getUrbanGlowFeatureMultiplier,", urban_composition)
+        self.assertIn("return owner;", urban_composition)
         self.assertIn("Math.min(fillOpacity, 0.15) : fillOpacity", urban_layer_body)
         self.assertIn("Math.min(strokeOpacity, 0.18) : strokeOpacity", urban_layer_body)
         self.assertIn("clamp(fillAlpha * glowMultiplier, 0, 1)", urban_layer_body)

@@ -2264,9 +2264,11 @@ test(`local projection preserves exact test routes with renderer scope ${include
   }), "edit", { preparedCatalog: binding.preparedCatalog });
   const expectedCommands = [
     ...(includeRenderer ? [
+      "node --test tests/country_source_border_meshes_behavior.test.mjs",
       "node --test tests/exact_composite_reuse_behavior.test.mjs",
       "node --test tests/history_feature_color_refresh_behavior.test.mjs",
       "node --test tests/legend_color_revision_behavior.test.mjs",
+      "node --test tests/physical_contour_visible_set_owner_behavior.test.mjs",
       "node --test tests/render_pass_signature_policy_behavior.test.mjs",
     ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
@@ -2287,9 +2289,11 @@ test(`local projection preserves exact test routes with renderer scope ${include
     "adaptive-edit-cost-budget-exceeded",
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
+    ...(includeRenderer ? ["node-test:tests/country_source_border_meshes_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/exact_composite_reuse_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/history_feature_color_refresh_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/legend_color_revision_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/physical_contour_visible_set_owner_behavior.test.mjs"] : []),
     "node-test:tests/render_change_set_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
@@ -3734,10 +3738,15 @@ test("local action and border feedback uses existing behavior leaves without pha
     const preparedCatalog = prepareRepositoryVerificationCatalog();
     const local = constrainAdaptiveEntrypointSelection(recommendation, "edit", { preparedCatalog });
     assert.deepEqual(local.localEntrypointRouteGaps, [], file);
-    assert.equal(local.recommendedCommands.length, 1, file);
-    assert.match(local.recommendedCommands[0].commandRef, /^node --test tests\/.*_behavior.test.mjs$/);
-    assert.equal(local.recommendedCommands[0].executionOwner, "child-safe");
-    assert.deepEqual(local.recommendedCommands[0].resourceLocks, []);
+    const hasBorrowedStorageRoute = file === "js/core/renderer/border_mesh_owner.js";
+    assert.equal(local.recommendedCommands.length, hasBorrowedStorageRoute ? 2 : 1, file);
+    assert.equal(local.recommendedCommands.some((command) => command.commandRef ===
+      "node --test tests/state_owner_borrowed_storage_behavior.test.mjs"), hasBorrowedStorageRoute, file);
+    for (const command of local.recommendedCommands) {
+      assert.match(command.commandRef, /^node --test tests\/.*_behavior.test.mjs$/);
+      assert.equal(command.executionOwner, "child-safe");
+      assert.deepEqual(command.resourceLocks, []);
+    }
   }
   assert.doesNotThrow(() => assertAdaptiveEntrypointAuthority(parseAdaptiveArgs([
     "--entrypoint", "edit", "--defer-main-thread", "--changed-file", "js/core/state/actions/appearance_actions.js",

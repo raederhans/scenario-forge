@@ -2,6 +2,8 @@
 
 ## Current truth
 
+- PR测试闭合：第二轮fast暴露chunk currentness提取后的旧源码位置断言；继续本地执行CI余下45组，41组通过并定位另外4组旧路由/owner装配预期。修复仅涉及6个测试文件，保留精确命令、叶节点、身份与权限负例；scenario组合23/23、metadata/core组合145/145、commit runner16/16、Python边界10/10通过。生产源码、catalog、policy与dist不变；最终CI与合并状态以PR #135当前head为准。
+
 - PR整合回归：远端fast发现Wilshire District被通用district后缀清理误截。移除该模糊词的清理（行政host候选拒绝规则和德国明确后缀规则保持），补既有显示名保护用例。城市文本与所有TNO地区城市名称组合31/31通过，reader源码证明无漂移；同步重建dist。旧提交的三个scenario/transport/smoke已通过，最终远端结果仍以PR #135当前head为准。
 
 - Git交付：整合提交3fd7478已推送codex/palette-operation-boundary，远端受保护main交付入口为[PR #135](https://github.com/raederhans/scenario-forge/pull/135)，以其必需检查和合并回执为准。城市最终49/49、暂存diff check及新dist构建通过；唯一EOF清理不影响6个reader来源证明。另一contours工作树干净且tip 5d656c9c已在origin/main历史内，保留证据用途，不重复合并或删除。下面未推送/未合并描述为对应阶段的历史快照。
