@@ -8,6 +8,7 @@
  * projection/context helpers, and render-only shared helpers.
  */
 import { isScenarioStrategicValuesUsable } from "../scenario/strategic_values.js";
+import { getCityDetailProgress } from "./city_reveal_policy.js";
 
 export function getUrbanCityRenderPassSignatureParts(state, passName) {
   const cities = `cities:${Number(state?.cityLayerRevision || 0)}`;
@@ -258,9 +259,8 @@ export function createUrbanCityPolicyOwner({
       cityRefs.has(normalizeStrategicCityReference(entry.city_id || entry.cityId))
       || cityRefs.has(normalizeStrategicCityReference(entry.stable_key || entry.stableKey))
     ));
-    return exactMatch || candidates
-      .slice()
-      .sort((left, right) => Math.max(0, Number(right?.value || 0)) - Math.max(0, Number(left?.value || 0)))[0] || null;
+    // A host polygon can contain several cities. Never borrow another city's VP.
+    return exactMatch || null;
   }
 
   function applyStrategicVictoryPointRank(feature) {
@@ -286,7 +286,7 @@ export function createUrbanCityPolicyOwner({
     const markerDensity = getCityMarkerDensityMultiplier(config);
     const markerBudget = getCityInterpolatedMarkerBudget(scale, markerDensity);
     const priorityReserveBudget = getCityPriorityCountryReserveBudget(scale, markerBudget);
-    const labelBudget = getCityLabelBudget(phase, config);
+    const labelBudget = getCityLabelBudget(phase, config, scale);
     const labelEntries = [];
 
     const candidateEntries = cityCollection.features
@@ -378,6 +378,18 @@ export function createUrbanCityPolicyOwner({
       }
     });
     const acceptedCityIds = new Set();
+    const detailProgress = getCityDetailProgress(scale);
+    const acceptMarker = (entry) => {
+      entry.markerSizePx = getCityMarkerSizePx(entry, config);
+      if (detailProgress > 0 && markerEntries.some((other) => {
+        const minimumDistance = Math.max(36, (entry.markerSizePx + other.markerSizePx) * 1.2 + 8);
+        return Math.hypot(entry.screenPoint[0] - other.screenPoint[0], entry.screenPoint[1] - other.screenPoint[1]) < minimumDistance;
+      })) return false;
+      markerEntries.push(entry);
+      countsByCountry.set(entry.countryKey, (countsByCountry.get(entry.countryKey) || 0) + 1);
+      acceptedCityIds.add(entry.cityId);
+      return true;
+    };
     Array.from(priorityCapitalEntriesByCountry.values())
       .sort((left, right) => {
         const leftRank = getCityPriorityCountryReserveRank(left);
@@ -392,10 +404,7 @@ export function createUrbanCityPolicyOwner({
         }
         const currentCount = countsByCountry.get(entry.countryKey) || 0;
         if (currentCount >= 1) return false;
-        entry.markerSizePx = getCityMarkerSizePx(entry, config);
-        markerEntries.push(entry);
-        countsByCountry.set(entry.countryKey, currentCount + 1);
-        acceptedCityIds.add(entry.cityId);
+        acceptMarker(entry);
         return false;
       });
 
@@ -405,22 +414,18 @@ export function createUrbanCityPolicyOwner({
       const currentCount = countsByCountry.get(entry.countryKey) || 0;
       const quota = getCityInterpolatedMarkerQuota(entry, scale, markerDensity);
       if (currentCount >= quota) continue;
-      entry.markerSizePx = getCityMarkerSizePx(entry, config);
-      markerEntries.push(entry);
-      countsByCountry.set(entry.countryKey, currentCount + 1);
-      acceptedCityIds.add(entry.cityId);
+      acceptMarker(entry);
     }
 
     if (config.showLabels && !state?.deferExactAfterSettle && labelBudget > 0 && scale >= Number(config.labelMinZoom || 0)) {
       markerEntries
         .filter((entry) => isCityLabelEligibleForPhase(entry, phase.id))
         .sort((left, right) => compareCityRevealEntries(left, right, phase.id))
-        .some((entry) => {
+        .forEach((entry) => {
           if (scale < getCityLabelMinZoom(entry, config)) {
             return false;
           }
           labelEntries.push(entry);
-          return labelEntries.length >= labelBudget;
         });
     }
 
@@ -428,6 +433,7 @@ export function createUrbanCityPolicyOwner({
       phase,
       markerBudget,
       priorityReserveBudget,
+      labelBudget,
       markerEntries,
       labelEntries,
       candidateEntries,

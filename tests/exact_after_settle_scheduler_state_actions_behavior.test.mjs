@@ -3,7 +3,7 @@ import test from "node:test";
 
 import { createExactAfterSettleScheduler } from "../js/core/map_renderer/exact_after_settle_scheduler.js";
 
-function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false } = {}) {
+function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync = () => null, includeContextPasses = false, getRenderPassSignature } = {}) {
   const events = [];
   const metrics = [];
   const frameTasks = [];
@@ -101,7 +101,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     shouldDeferContextBaseEnhancementsForExactRefresh: () => false,
     scheduleDeferredContextBaseEnhancements: () => events.push("schedule-context-base"),
     getRenderPassCacheState: () => cache,
-    getRenderPassSignature: cameraSignatureMismatch ? () => "new-camera" : undefined,
+    getRenderPassSignature: getRenderPassSignature ?? (cameraSignatureMismatch ? () => "new-camera" : undefined),
     getRenderPipelinePassesOwner: () => pipelineOwner,
     getPhysicalExactRefreshPasses: () => includeContextPasses ? ["physicalBase", "contextBase"] : [],
     invalidateRenderPasses: (passes, reason) => {
@@ -319,6 +319,29 @@ test("late preparation cannot draw an old generation or an interrupted gesture",
       assert.equal(h.events.includes("request-render:exact-after-settle:true"), false);
       if (interruption === "new-generation") assert.equal(h.runtimeState.exactAfterSettleController.phase, "scheduled");
     } finally { h.restore(); }
+  }
+});
+
+test("signature callbacks receive camera values without borrowing the live transform", () => {
+  const received = [];
+  const harness = createHarness({ getRenderPassSignature: (_pass, transform) => {
+    received.push(transform);
+    return "current-camera";
+  } });
+  try {
+    const transform = harness.runtimeState.zoomTransform;
+    harness.scheduler.scheduleExactAfterSettleRefresh(harness.profile);
+    harness.runTimer();
+    harness.runNextFrame("exact-after-settle-Prepare");
+    harness.runNextFrame("exact-after-settle-Apply");
+    assert.ok(received.length > 0);
+    assert.notEqual(received[0], transform);
+    assert.deepEqual(received[0], transform);
+    received[0].x = 99;
+    assert.equal(transform.x, 0);
+    harness.scheduler.cancelExactAfterSettleRefresh();
+  } finally {
+    harness.restore();
   }
 });
 

@@ -3,10 +3,18 @@ import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import { createStrategicOverlayRuntimeOwner } from "../js/core/renderer/strategic_overlay_runtime_owner.js";
-import { commitStrategicOverlayCollectionsState } from "../js/core/state/actions/strategic_overlay_actions.js";
+import {
+  commitStrategicOverlayCollectionsState,
+  patchStrategicOverlayEditorState,
+} from "../js/core/state/actions/strategic_overlay_actions.js";
 
 function harness(t) {
   const original = captureHistoryState({ strategicOverlay: true });
+  const editorSelections = {
+    operationGraphicsEditor: state.operationGraphicsEditor?.selectedId,
+    operationalLineEditor: state.operationalLineEditor?.selectedId,
+    unitCounterEditor: state.unitCounterEditor?.selectedId,
+  };
   const document = globalThis.document;
   globalThis.document = { getElementById: () => null };
   clearHistory();
@@ -15,6 +23,9 @@ function harness(t) {
       operationalLines: original.operationalLines, operationGraphics: original.operationGraphics,
       unitCounters: original.unitCounters,
     });
+    for (const [editorKey, selectedId] of Object.entries(editorSelections)) {
+      patchStrategicOverlayEditorState(state, editorKey, { selectedId });
+    }
     clearHistory();
     if (document === undefined) delete globalThis.document; else globalThis.document = document;
   });
@@ -32,7 +43,7 @@ test("graphic vertex history clones one collection and undo/redo preserves unrel
     operationalLines: [{ id: "line", points: [[0, 0], [1, 1]] }],
     unitCounters: [{ id: "counter" }],
   });
-  state.operationGraphicsEditor = { selectedId: "g" };
+  patchStrategicOverlayEditorState(state, "operationGraphicsEditor", { selectedId: "g" });
   const lineReference = state.operationalLines;
   const counterReference = state.unitCounters;
   const legacy = captureHistoryState({ strategicOverlay: true });
@@ -56,7 +67,7 @@ test("deleting a line captures counters too and restores both attachment directi
     operationalLines: [{ id: "line", points: [[0, 0], [1, 1]], attachedCounterIds: ["counter"] }],
     unitCounters: [{ id: "counter", attachment: { lineId: "line" }, anchor: { featureId: "A" } }],
   });
-  state.operationalLineEditor = { selectedId: "line" };
+  patchStrategicOverlayEditorState(state, "operationalLineEditor", { selectedId: "line" });
   assert.equal(owner.deleteSelectedOperationalLine(), true);
   assert.deepEqual(Object.keys(state.historyPast.at(-1).before), ["operationalLines", "unitCounters"]);
   assert.equal(state.unitCounters[0].attachment, null);
@@ -75,7 +86,7 @@ test("deleting a counter preserves unrelated graphics and restores its line memb
     operationalLines: [{ id: "line", attachedCounterIds: ["counter"] }],
     unitCounters: [{ id: "counter", attachment: { lineId: "line" } }],
   });
-  state.unitCounterEditor = { selectedId: "counter" };
+  patchStrategicOverlayEditorState(state, "unitCounterEditor", { selectedId: "counter" });
   const graphics = state.operationGraphics;
   assert.equal(owner.deleteSelectedUnitCounter(), true);
   assert.deepEqual(Object.keys(state.historyPast.at(-1).before), ["unitCounters", "operationalLines"]);

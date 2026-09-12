@@ -18,10 +18,21 @@ import {
   getTransportFacilityDensityStrategy,
   getTransportFacilityEntryStableSortKey,
   getTransportFacilityLabelCandidates,
+  getTransportFacilityLabelBatchIdentity,
   getTransportOverviewAirportLabelText,
   getTransportOverviewPortLabelText,
 } from "../js/core/renderer/transport_facility_display_policy.js";
 import { createTransportOverviewRenderOwner } from "../js/core/renderer/transport_overview_render_owner.js";
+
+test("facility label identity snapshots preserve exact missing, null and generation values", () => {
+  for (const value of [undefined, null, "", 0, "0", 1]) {
+    const state = Object.freeze({ activeScenarioId: value, sceneGeneration: value, scenarioDataGeneration: value });
+    const identity = getTransportFacilityLabelBatchIdentity(state);
+    assert.deepEqual(identity, { scenarioId: value, sceneGeneration: value, scenarioDataGeneration: value });
+    identity.sceneGeneration = "changed";
+    assert.equal(state.sceneGeneration, value);
+  }
+});
 
 const globalAirportsUrl = new URL("../data/transport_layers/global_airport/airports.geojson", import.meta.url);
 const globalPortsUrl = new URL("../data/transport_layers/global_port/ports.geojson", import.meta.url);

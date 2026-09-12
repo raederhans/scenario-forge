@@ -124,7 +124,7 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
       runtimeState.activeScenarioId, runtimeState.scenarioApplyEpoch,
       runtimeState.sceneGeneration, runtimeState.scenarioDataGeneration,
       runtimeState.scenarioShellOverlayRevision, runtimeState.mapSemanticMode,
-      runtimeState.scenarioViewMode, runtimeState.showScenarioAtlantropa,
+      runtimeState.showScenarioAtlantropa,
       runtimeState.topologyRevision, runtimeState.sovereigntyRevision,
       runtimeState.topologyPrimary, runtimeState.topology, runtimeState.topologyDetail, runtimeState.runtimePoliticalTopology,
       runtimeState.spatialItems, runtimeState.spatialItems?.length,
@@ -146,13 +146,23 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
     cancelDeferredHeavyBorderMeshes();
     const runId = deferredHeavyBorderRunId;
     const taskKey = "deferred-heavy-border-meshes";
+    // Borrowed topology/spatial identities stay separate from mutable progress.
+    // Compare references without cloning or modifying the captured collections.
+    let executionIdentity = null;
     let work = null;
     const enqueue = () => {
       if (runId !== deferredHeavyBorderRunId) return;
       deferredHeavyBorderMeshHandle = scheduleDeferredWork(runSlice, { timeout: 360 });
     };
-    const isCurrent = () => runId === deferredHeavyBorderRunId
-      && (!work || readWorkIdentity().every((value, index) => value === work.identity[index]));
+    const isCurrent = () => {
+      if (runId !== deferredHeavyBorderRunId) return false;
+      if (!executionIdentity) return true;
+      const currentIdentity = readWorkIdentity();
+      for (let index = 0; index < currentIdentity.length; index += 1) {
+        if (currentIdentity[index] !== executionIdentity[index]) return false;
+      }
+      return true;
+    };
     const restartIfStale = () => {
       if (isCurrent()) return false;
       if (runId === deferredHeavyBorderRunId) scheduleDeferredHeavyBorderMeshes();
@@ -175,8 +185,9 @@ export function createStaticBorderMeshLifecycle(runtimeState, {
           const detailAdmMeta = currentZoom >= DETAIL_ADM_BORDERS_MIN_ZOOM
             ? buildDetailAdmMeshSignature(visibleCountryCodes, currentZoom)
             : { detailCountries: [], signature: "" };
+          executionIdentity = readWorkIdentity();
           work = {
-            identity: readWorkIdentity(), countries: [...visibleCountryCodes], index: 0,
+            countries: [...visibleCountryCodes], index: 0,
             includeProvince: currentZoom >= PROVINCE_BORDERS_TRANSITION_END_ZOOM,
             includeLocal: currentZoom >= LOCAL_BORDERS_MIN_ZOOM,
             includeDetailAdm: detailAdmMeta.detailCountries.length > 0

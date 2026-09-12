@@ -3,7 +3,9 @@
 // toolbar.js 继续保留主初始化、快捷色板、主题选择和其他面板编排。
 
 import { PALETTE_THEMES, state as runtimeState } from "../../core/state.js";
-import { setSelectedColorState } from "../../core/state/actions/appearance_selection_actions.js";
+import { selectPalettePaintColorState } from "../../core/state/actions/palette_library_actions.js";
+import { callCompatRuntimeHook } from "../../core/state/index.js";
+import { patchUiChromeState } from "../../core/state/actions/ui_chrome_actions.js";
 import {
   buildPaletteLibraryEntries,
   getPaletteSourceOptions,
@@ -15,16 +17,14 @@ import {
 import { t } from "../i18n.js";
 const state = runtimeState;
 
-// Choosing a paint color is an explicit visual-edit intent, including in scenarios.
 function selectPalettePaintColor(appState, rawColor) {
   const color = normalizeHexColor(rawColor);
   if (!color) return false;
-  setSelectedColorState(appState, color);
-  appState.paintMode = "visual";
+  selectPalettePaintColorState(appState, color);
   if (appState.ui && typeof appState.ui === "object") {
-    appState.ui.politicalEditingExpanded = false;
+    patchUiChromeState(appState, { politicalEditingExpanded: false }, { normalizeExisting: false });
   }
-  appState.updatePaintModeUIFn?.();
+  callCompatRuntimeHook(appState, "updatePaintModeUIFn");
   return true;
 }
 

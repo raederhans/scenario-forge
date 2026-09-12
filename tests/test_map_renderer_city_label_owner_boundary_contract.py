@@ -32,7 +32,8 @@ class MapRendererCityLabelOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {", city_points_owner_content)
 
         self.assertIn("export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {} } = {}) {", owner_content)
-        self.assertIn("function drawCityLabelsFromEntries(labelEntries, { config, scale, occupiedBoxes = [] } = {}) {", owner_content)
+        self.assertIn("function drawCityLabelsFromEntries(labelEntries, {", owner_content)
+        self.assertIn("layoutOnly = false, reusePlacement = false", owner_content)
         self.assertIn("claimScreenLabelPlacement", owner_content)
         self.assertIn("./screen_label_placement.js", owner_content)
         self.assertIn("function buildCityLabelPlacementCandidates(entry, {", owner_content)

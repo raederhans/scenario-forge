@@ -527,7 +527,10 @@ export function createCityLightsRenderOwner({
     const urbanEntriesById = new Map();
     const unmatchedCityEntries = [];
     if (Array.isArray(cityCollection?.features)) {
-      cityCollection.features.forEach((feature) => {
+      const features = cityCollection.features;
+      for (let featureIndex = 0, featureCount = features.length; featureIndex < featureCount; featureIndex += 1) {
+        if (!(featureIndex in features)) continue;
+        const feature = features[featureIndex];
         const props = feature?.properties || {};
         const population = Math.max(0, Number(props.__city_population || 0));
         const capitalScore = getCityCapitalScore(feature);
@@ -547,7 +550,7 @@ export function createCityLightsRenderOwner({
           current.cityCount += 1;
           current.capitalScore = Math.max(current.capitalScore, capitalScore);
           urbanEntriesById.set(urbanInfo.urbanMatchId, current);
-          return;
+          continue;
         }
         if (capitalScore > 0 || population >= 150000) {
           unmatchedCityEntries.push({
@@ -556,7 +559,7 @@ export function createCityLightsRenderOwner({
             capitalScore,
           });
         }
-      });
+      }
     }
   
     const urbanEntries = Array.from(urbanEntriesById.values())
@@ -678,17 +681,20 @@ export function createCityLightsRenderOwner({
     const overscan = Math.max(32, Math.min(runtimeState.width, runtimeState.height) * 0.06);
     const entries = [];
   
-    urbanCollection.features.forEach((feature) => {
-      if (!pathBoundsInScreen(feature)) return;
+    const features = urbanCollection.features;
+    for (let featureIndex = 0, featureCount = features.length; featureIndex < featureCount; featureIndex += 1) {
+      if (!(featureIndex in features)) continue;
+      const feature = features[featureIndex];
+      if (!pathBoundsInScreen(feature)) continue;
       const projectedArea = estimateProjectedAreaPx(feature, k);
-      if (projectedArea < minProjectedAreaPx) return;
+      if (projectedArea < minProjectedAreaPx) continue;
       // The global asset restores resolvable shapes; existing city points already
       // represent subpixel settlements without another layer of bright speckles.
-      if (MODERN_CITY_LIGHTS_URBAN_AREAS && projectedArea <= 16) return;
+      if (MODERN_CITY_LIGHTS_URBAN_AREAS && projectedArea <= 16) continue;
   
       const heuristicWeight = getUrbanLightWeight(feature, "modern");
-      if (heuristicWeight <= 0) return;
-      if (zoomScale <= 1.15 && heuristicWeight < 0.72) return;
+      if (heuristicWeight <= 0) continue;
+      if (zoomScale <= 1.15 && heuristicWeight < 0.72) continue;
   
       const geographicCentroid = feature.properties?.anchor || getFeatureGeoCentroid(feature);
       const sample = geographicCentroid
@@ -699,16 +705,16 @@ export function createCityLightsRenderOwner({
         : 1;
       const sampledBoost = clamp(0.56 + (Math.pow(sample, 0.52) * 1.4), 0.8, 1.8);
       const weight = clamp(heuristicWeight * sampledBoost * glowMultiplier, 0.06, 1.4);
-      if (sample <= 0.01 && heuristicWeight < 0.34) return;
-      if (weight < 0.16) return;
-      if (zoomScale <= 1.35 && weight < 0.44) return;
+      if (sample <= 0.01 && heuristicWeight < 0.34) continue;
+      if (weight < 0.16) continue;
+      if (zoomScale <= 1.35 && weight < 0.44) continue;
   
       const centroid = feature.properties?.anchor
         ? getProjection()?.(feature.properties.anchors?.[0] || feature.properties.anchor)
         : pathCanvas.centroid(feature);
       const cx = Number(centroid?.[0]);
       const cy = Number(centroid?.[1]);
-      if (!Number.isFinite(cx) || !Number.isFinite(cy)) return;
+      if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
   
       const screenX = (cx * transform.k) + transform.x;
       const screenY = (cy * transform.k) + transform.y;
@@ -722,7 +728,7 @@ export function createCityLightsRenderOwner({
         screenY < -overscan ||
         screenY > runtimeState.height + overscan
       )) {
-        return;
+        continue;
       }
   
       const identitySeed = String(
@@ -760,7 +766,7 @@ export function createCityLightsRenderOwner({
         shapePath,
         shapeBlend,
       });
-    });
+    }
     return entries;
   }
 
@@ -897,28 +903,31 @@ export function createCityLightsRenderOwner({
     const minPopulation = zoomScale <= 1.1 ? 60000 : zoomScale <= 1.8 ? 30000 : 15000;
     const visibleUrbanCityIds = new Set(urbanCoreEntries.flatMap((entry) => entry.feature.properties?.city_ids || []));
   
-    cityCollection.features.forEach((feature) => {
+    const features = cityCollection.features;
+    for (let featureIndex = 0, featureCount = features.length; featureIndex < featureCount; featureIndex += 1) {
+      if (!(featureIndex in features)) continue;
+      const feature = features[featureIndex];
       const props = feature?.properties || {};
       const population = Math.max(0, Number(props.__city_population || 0));
       const isCapital = !!props.__city_is_country_capital;
-      if (!isCapital && population < minPopulation) return;
-      if (visibleUrbanCityIds.has(getCityCanonicalId(feature))) return;
-      if (!MODERN_CITY_LIGHTS_URBAN_AREAS && getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) return;
+      if (!isCapital && population < minPopulation) continue;
+      if (visibleUrbanCityIds.has(getCityCanonicalId(feature))) continue;
+      if (!MODERN_CITY_LIGHTS_URBAN_AREAS && getUrbanCityPolicyOwner().getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) continue;
       const anchor = getCityAnchor(feature);
       const screenPoint = getCityScreenPoint(anchor);
-      if (!anchor || !screenPoint) return;
+      if (!anchor || !screenPoint) continue;
       if (
         screenPoint[0] < -overscan ||
         screenPoint[0] > runtimeState.width + overscan ||
         screenPoint[1] < -overscan ||
         screenPoint[1] > runtimeState.height + overscan
       ) {
-        return;
+        continue;
       }
       const overlapsUrbanCore = urbanCoreEntries.some((entry) => (
         Math.hypot(entry.screenX - screenPoint[0], entry.screenY - screenPoint[1]) <= Math.max(18, entry.baseRadiusPx * 10)
       ));
-      if (overlapsUrbanCore) return;
+      if (overlapsUrbanCore) continue;
   
       const populationScore = clamp(Math.log10(population + 1) / 6.5, 0.18, 1);
       const geographicCoords = getCityGeoCoordinates(feature);
@@ -933,7 +942,7 @@ export function createCityLightsRenderOwner({
         0.2,
         1.12
       );
-      if (zoomScale <= 1.1 && weight < 0.45) return;
+      if (zoomScale <= 1.1 && weight < 0.45) continue;
   
       const identitySeed = String(
         getCityCanonicalId(feature) ||
@@ -992,7 +1001,7 @@ export function createCityLightsRenderOwner({
           midAlphaScale: 0.34 + (coreSharpness * 0.18),
         }
       );
-    });
+    }
   }
   
   function getModernCityLightsStaticConfigSignature(config) {
@@ -1076,8 +1085,8 @@ export function createCityLightsRenderOwner({
     if (!layerContext) return null;
   
     const layout = getRenderPassLayout("dayNight");
-    const drawStats = { blobs: 0, spriteBuilds: 0, urbanShapes: 0 };
-    modernCityLightsDrawStats = drawStats;
+    modernCityLightsDrawStats = { blobs: 0, spriteBuilds: 0, urbanShapes: 0 };
+    const drawStats = modernCityLightsDrawStats;
     try {
       withRenderTarget(layerContext, () => {
         const layerK = prepareTargetContext(layerContext, runtimeState.zoomTransform, layout);
@@ -1495,7 +1504,7 @@ export function createCityLightsRenderOwner({
     context.restore();
   }
 
-  return {
+  return Object.freeze({
     collectModernUrbanCoreEntries,
     drawLightEllipse,
     drawHistoricalNightLightsLayer,
@@ -1518,5 +1527,5 @@ export function createCityLightsRenderOwner({
     shouldCullModernLightEntry,
     shouldRenderHistoricalCityLightEntry,
     toRgbaString,
-  };
+  });
 }

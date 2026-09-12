@@ -16,6 +16,10 @@ import {
 } from "./ui_chrome_actions.js";
 import { commitUiVisibilityState } from "./ui_visibility_actions.js";
 
+export function selectPaletteVisualPaintModeState(target) {
+  target.paintMode = "visual";
+}
+
 export const SCENARIO_PRESENTATION_STATE_KEYS = Object.freeze([
   "scenarioParentBorderEnabledBeforeActivate",
   "scenarioDisplaySettingsBeforeActivate",

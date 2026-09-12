@@ -306,6 +306,25 @@ function shapeHelpers(overrides = {}) {
   };
 }
 
+test("urban core collection retains frozen feature identity without changing borrowed geometry", () => {
+  const feature = createShapeFeature();
+  const freeze = (value) => {
+    if (!value || typeof value !== "object") return value;
+    Object.values(value).forEach(freeze);
+    return Object.freeze(value);
+  };
+  freeze(feature);
+  const features = Object.freeze([feature]);
+  const harness = createModernDrawHarness({ urbanFeatures: features, helpers: shapeHelpers() });
+  assert.equal(Object.isFrozen(harness.owner), true);
+  Object.freeze(harness.state.urbanData);
+  const entries = harness.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({}), 1);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].feature, feature);
+  assert.equal(entries[0].shapePath, feature.geometry);
+  assert.equal(harness.state.urbanData.features, features);
+});
+
 test("visible urban polygons survive offscreen anchors and take precedence over local urban data", () => {
   const globalFeature = createShapeFeature("global", { anchor: [0, 0] });
   const harness = createModernDrawHarness({
@@ -1004,4 +1023,50 @@ test("city lights owner invalidates historical derived glow entries by projectio
   state.width = 900;
   const afterProjectionKeyChange = owner.getHistoricalDerivedGlowEntries(entries, { historicalCityLightsSecondaryRetention: 0.9 });
   assert.notEqual(afterProjectionKeyChange, afterRetentionChange);
+});
+
+test("urban iteration skips sparse slots and invokes projection effects once per surviving borrowed feature", () => {
+  const first = createShapeFeature("first");
+  const culled = createShapeFeature("culled");
+  const last = createShapeFeature("last");
+  const freeze = value => {
+    if (!value || typeof value !== "object") return value;
+    Object.values(value).forEach(freeze);
+    return Object.freeze(value);
+  };
+  const features = freeze([first, , culled, last]);
+  const visited = [];
+  const projected = [];
+  const harness = createModernDrawHarness({
+    urbanFeatures: features,
+    helpers: shapeHelpers({
+      pathBoundsInScreen: feature => { visited.push(feature); return feature !== culled; },
+      getProjectedGeographicPath: feature => { projected.push(feature); return feature.geometry; },
+    }),
+  });
+  Object.freeze(harness.state.urbanData);
+  const entries = harness.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({}), 1);
+  assert.deepEqual(visited, [first, culled, last]);
+  assert.deepEqual(projected, [first, last]);
+  assert.deepEqual(entries.map(entry => entry.feature), [first, last]);
+  assert.equal(entries[0].shapePath, first.geometry);
+  assert.equal(entries[1].shapePath, last.geometry);
+  assert.equal(harness.state.urbanData.features, features);
+});
+
+test("urban iteration preserves initial length when projection callbacks append source features", () => {
+  const first = createShapeFeature("first");
+  const appended = createShapeFeature("appended");
+  const features = [first];
+  const visited = [];
+  const harness = createModernDrawHarness({
+    urbanFeatures: features,
+    helpers: shapeHelpers({
+      pathBoundsInScreen: feature => { visited.push(feature); features.push(appended); return true; },
+    }),
+  });
+  const entries = harness.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({}), 1);
+  assert.deepEqual(visited, [first]);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].feature, first);
 });

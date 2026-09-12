@@ -43,9 +43,9 @@ export function createProjectedGeographicPathCache({
     return path;
   }
 
-  return {
+  return Object.freeze({
     getPath,
     reset,
     getStats: () => ({ hits, builds, generation }),
-  };
+  });
 }

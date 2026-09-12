@@ -137,5 +137,5 @@ export function createUrbanLayerRenderOwner({ state, helpers }) {
     });
   }
 
-  return { drawUrbanLayer };
+  return Object.freeze({ drawUrbanLayer });
 }

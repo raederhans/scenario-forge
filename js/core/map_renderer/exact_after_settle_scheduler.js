@@ -354,6 +354,10 @@ function createExactAfterSettleScheduler({
     const cache = getRenderPassCacheState();
     const idleRenderPassNames = getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()
       .map(([passName]) => passName);
+    // Signature callbacks consume a value snapshot, never the live camera object.
+    const signatureTransform = typeof getRenderPassSignature === "function" && runtimeState.zoomTransform != null
+      ? cloneRenderZoomTransform(runtimeState.zoomTransform)
+      : runtimeState.zoomTransform === undefined ? undefined : null;
     const targetPassPlan = resolveExactAfterSettleTargetPasses({
       renderPassNames,
       idleRenderPassNames,
@@ -362,7 +366,7 @@ function createExactAfterSettleScheduler({
       // synchronous geometry work after the cancellable slices have completed.
       dirtyPassNames: getActiveRenderPassNames().filter((passName) => cache.dirty[passName]
         || (typeof getRenderPassSignature === "function"
-          && cache.signatures?.[passName] !== getRenderPassSignature(passName, runtimeState.zoomTransform))),
+          && cache.signatures?.[passName] !== getRenderPassSignature(passName, signatureTransform))),
       physicalExactRefreshPasses: getPhysicalExactRefreshPasses(),
       forceExactContextBaseRefresh: plan.forceExactContextBaseRefresh,
       exactRefreshApplied: plan.exactRefreshApplied,
@@ -735,3 +739,4 @@ function createExactAfterSettleScheduler({
 }
 
 export { createExactAfterSettleScheduler };
+import { cloneRenderZoomTransform } from "../renderer/render_transform_reuse_policy_owner.js";

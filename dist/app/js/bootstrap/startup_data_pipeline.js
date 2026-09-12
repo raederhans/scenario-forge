@@ -42,7 +42,6 @@ import {
   beginFullLocalizationLoad,
   commitBaseCitySupportData,
   commitContextLayerCollection,
-  commitPhysicalContourDisplay,
   commitFullLocalizationData,
   decodeStartupPrimaryCollectionsIntoState,
   failBaseCitySupportLoad,
@@ -55,6 +54,7 @@ import {
 } from "../core/state/content_state.js";
 import { hydrateStartupPaletteState } from "../core/state/color_state.js";
 import {
+  commitPhysicalContourDisplayState,
   finishBaseCitySupportLoad,
   finishFullLocalizationLoad,
   finishContextLayerLoad,
@@ -376,7 +376,7 @@ export function createStartupDataPipelineOwner({
     const major = state.contextLayerExternalDataByName?.[names.find((name) => name.endsWith("_major"))];
     const minorName = names.find((name) => name.endsWith("_minor"));
     const minor = minorName ? state.contextLayerExternalDataByName?.[minorName] : null;
-    return commitPhysicalContourDisplay(state, {
+    return commitPhysicalContourDisplayState(state, {
       major: Array.isArray(major?.features) ? major : undefined,
       minor: !minorName ? null : Array.isArray(minor?.features) ? minor : undefined,
     });

@@ -26,6 +26,7 @@ export const STATE_WRITER_REPOSITORY_ANALYSIS_AUTHORITY_PATHS = Object.freeze({
     "tools/build_state_writer_policy.mjs",
     "tools/state_writer_inventory.mjs",
     "tools/state_action_delegation_contract.mjs",
+    "tools/state_borrowed_effect_contract.mjs",
     "tools/state_writer_policy.mjs",
     "tools/p4_state_action_phases.mjs",
   ]),

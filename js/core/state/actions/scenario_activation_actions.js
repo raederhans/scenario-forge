@@ -4,6 +4,24 @@
 import { commitSpecialZoneLayersState } from "./special_zone_actions.js";
 import { SCENARIO_BUNDLE_CACHE_LIMIT, getScenarioChunkPayloadEvictionIds } from "../../scenario/bundle_cache_policy.js";
 
+export function applyPaletteFeatureColorState(target, featureIds, color) {
+  target.visualOverrides = target.visualOverrides || {};
+  target.featureOverrides = target.featureOverrides || {};
+  for (let index = 0; index < featureIds.length; index += 1) {
+    if (!(index in featureIds)) continue;
+    const featureId = featureIds[index];
+    target.visualOverrides[featureId] = color;
+    target.featureOverrides[featureId] = color;
+  }
+}
+
+export function applyPaletteOwnerColorState(target, ownerCode, color) {
+  target.sovereignBaseColors = target.sovereignBaseColors || {};
+  target.countryBaseColors = target.countryBaseColors || {};
+  target.sovereignBaseColors[ownerCode] = color;
+  target.countryBaseColors[ownerCode] = color;
+}
+
 export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
   // The caller retains its Map identity; only a short string-ID order crosses
   // this write boundary. Published bundles are never copied.

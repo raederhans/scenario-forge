@@ -3,10 +3,16 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  patchBorderMeshCacheState,
   clearSphericalFeatureDiagnosticsCacheState,
   commitProjectedBoundsCacheState,
+  clearProjectedBoundsCacheEntriesState,
+  setProjectedBoundsCacheEntryState,
+  syncProjectedBoundsCacheEntryState,
   commitRenderPassCacheState,
   getSphericalFeatureDiagnosticsCacheEntryState,
+  appendPreparedCountryBorderMeshesState,
+  replaceCachedCoastlineMeshesState,
   replaceCachedDetailAdmBordersState,
   setDynamicBordersDirtyState,
   setPendingDynamicBorderTimerState,
@@ -29,6 +35,7 @@ test("renderer cache actions stay import-free with target-first exports", async 
     "clearSphericalFeatureDiagnosticsCacheState",
     "getSphericalFeatureDiagnosticsCacheEntryState",
     "replaceCachedDetailAdmBordersState",
+    "replaceCachedCoastlineMeshesState",
     "setDynamicBordersDirtyState",
     "setPendingDynamicBorderTimerState",
     "setSphericalFeatureDiagnosticsCacheEntryState",
@@ -36,6 +43,41 @@ test("renderer cache actions stay import-free with target-first exports", async 
     assert.match(source, new RegExp(`export function ${name}\\(\\s*target[,)]`));
   }
   assert.doesNotMatch(source, /ensureRenderPassCacheState/);
+});
+
+test("coastline publication retains all prepared containers and geometry identities", () => {
+  const geometry = Object.freeze({ type: "MultiLineString", coordinates: Object.freeze([]) });
+  const high = Object.freeze([geometry]);
+  const mid = Object.freeze([geometry]);
+  const collections = Object.freeze({
+    cachedCoastlines: high, cachedCoastlinesHigh: high,
+    cachedCoastlinesMid: mid, cachedCoastlinesLow: mid,
+  });
+  const unrelated = {};
+  const state = { unrelated };
+  replaceCachedCoastlineMeshesState(state, collections);
+  for (const key of Object.keys(collections)) assert.equal(state[key], collections[key]);
+  assert.equal(state.cachedCoastlines[0], geometry);
+  assert.equal(state.unrelated, unrelated);
+  assert.deepEqual(Object.keys(state).sort(), ["unrelated", ...Object.keys(collections)].sort());
+});
+
+test("border cache patch publishes only explicit owned fields without copying values", () => {
+  const mesh = Object.freeze({ coordinates: Object.freeze([]) });
+  const target = { unrelated: "keep", cachedFrontlineMeshHash: "old" };
+  const patch = Object.assign(Object.create({ cachedBorders: "inherited" }), {
+    cachedDynamicOwnerBorders: mesh, cachedDynamicBordersHash: undefined,
+    cachedScenarioOpeningOwnerBorders: null, cachedFrontlineMesh: mesh,
+    unrelated: "replace",
+  });
+  patchBorderMeshCacheState(target, patch);
+  assert.deepEqual(target, {
+    unrelated: "keep", cachedFrontlineMeshHash: "old",
+    cachedDynamicOwnerBorders: mesh, cachedDynamicBordersHash: undefined,
+    cachedScenarioOpeningOwnerBorders: null, cachedFrontlineMesh: mesh,
+  });
+  assert.equal(target.cachedDynamicOwnerBorders, mesh);
+  assert.equal(Object.hasOwn(target, "cachedBorders"), false);
 });
 
 test("border lifecycle actions preserve prepared values and cache identity", () => {
@@ -56,6 +98,40 @@ test("border lifecycle actions preserve prepared values and cache identity", () 
 
   assert.equal(replaceCachedDetailAdmBordersState(target, meshes), meshes);
   assert.equal(target.cachedDetailAdmBorders, meshes);
+});
+
+test("prepared country border batches preserve cache identity and publish empty countries", () => {
+  const provinceMap = new Map();
+  const localMap = new Map();
+  const provinces = [];
+  const locals = [];
+  const target = {
+    cachedProvinceBordersByCountry: provinceMap,
+    cachedLocalBordersByCountry: localMap,
+    cachedProvinceBorders: provinces,
+    cachedLocalBorders: locals,
+  };
+  const mesh = Object.freeze({ coordinates: Object.freeze([[0, 0], [1, 1]]) });
+  const provinceEntries = Object.freeze([
+    Object.freeze({ country: "AA", meshes: Object.freeze([mesh]) }),
+    Object.freeze({ country: "EMPTY", meshes: Object.freeze([]) }),
+  ]);
+  const localEntries = Object.freeze([Object.freeze({ country: "AA", meshes: Object.freeze([mesh]) })]);
+  assert.equal(appendPreparedCountryBorderMeshesState(target, provinceEntries, localEntries, { syncGridLines: true }), true);
+  assert.equal(target.cachedProvinceBordersByCountry, provinceMap);
+  assert.equal(target.cachedLocalBordersByCountry, localMap);
+  assert.equal(target.cachedProvinceBorders, provinces);
+  assert.equal(target.cachedLocalBorders, locals);
+  assert.deepEqual(provinceMap.get("EMPTY"), []);
+  assert.notEqual(provinceMap.get("AA"), provinceEntries[0].meshes);
+  assert.notEqual(localMap.get("AA"), localEntries[0].meshes);
+  assert.equal(provinceMap.get("AA")[0], mesh);
+  assert.equal(localMap.get("AA")[0], mesh);
+  assert.deepEqual(target.cachedGridLines, locals);
+  assert.notEqual(target.cachedGridLines, locals);
+  assert.equal(appendPreparedCountryBorderMeshesState(target, [], []), false);
+  assert.deepEqual(provinces, [mesh]);
+  assert.deepEqual(locals, [mesh]);
 });
 
 test("cache actions reject invalid targets", () => {
@@ -132,6 +208,50 @@ test("projected bounds cache commit validates both holders before writing", () =
   );
   assert.equal(target.projectedBoundsById, originalProjectedBounds);
   assert.equal(target.sphericalFeatureDiagnosticsById, originalDiagnostics);
+});
+
+test("projected bounds entry actions mutate only the current shared Map and preserve bounds identity", () => {
+  const oldCache = new Map();
+  const target = { projectedBoundsById: oldCache, sphericalFeatureDiagnosticsById: new Map([["diagnostic", 1]]) };
+  const bounds = Object.freeze({ minX: 3 });
+  setProjectedBoundsCacheEntryState(target, "A", bounds);
+  assert.equal(oldCache.get("A"), bounds);
+  const nextCache = new Map([["B", bounds]]);
+  target.projectedBoundsById = nextCache;
+  setProjectedBoundsCacheEntryState(target, "C", bounds);
+  syncProjectedBoundsCacheEntryState(target, "B", null);
+  assert.deepEqual([...nextCache.keys()], ["C"]);
+  clearProjectedBoundsCacheEntriesState(target);
+  assert.equal(target.projectedBoundsById, nextCache);
+  assert.equal(nextCache.size, 0);
+  assert.equal(oldCache.get("A"), bounds);
+  assert.equal(target.sphericalFeatureDiagnosticsById.get("diagnostic"), 1);
+});
+
+test("projected bounds entry actions reject missing holders without initializing or replacing them", () => {
+  for (const mutate of [setProjectedBoundsCacheEntryState, syncProjectedBoundsCacheEntryState, clearProjectedBoundsCacheEntriesState]) {
+    assert.throws(() => mutate(null, "A", {}), /target must be an object/);
+    const target = {};
+    assert.throws(() => mutate(target, "A", {}), /projectedBoundsById must be a Map/);
+    assert.equal(Object.hasOwn(target, "projectedBoundsById"), false);
+  }
+});
+
+test("projected bounds synchronization avoids redundant publication but rebuild setters remain unconditional", () => {
+  const operations = [];
+  class RecordingMap extends Map {
+    set(key, value) { operations.push(["set", key]); return super.set(key, value); }
+    delete(key) { operations.push(["delete", key]); return super.delete(key); }
+  }
+  const bounds = Object.freeze({ minX: 1 });
+  const target = { projectedBoundsById: new RecordingMap() };
+  syncProjectedBoundsCacheEntryState(target, "A", bounds);
+  syncProjectedBoundsCacheEntryState(target, "A", bounds);
+  assert.deepEqual(operations, [["set", "A"]]);
+  setProjectedBoundsCacheEntryState(target, "A", bounds);
+  syncProjectedBoundsCacheEntryState(target, "A", null);
+  assert.deepEqual(operations, [["set", "A"], ["set", "A"], ["delete", "A"]]);
+  assert.equal(target.projectedBoundsById.has("A"), false);
 });
 
 test("cache commits preserve existing own property descriptors", () => {

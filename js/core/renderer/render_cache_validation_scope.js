@@ -36,5 +36,5 @@ export function createRenderCacheValidationScope({ ensure, getRoot }) {
     }
   }
 
-  return { getRenderPassCacheState, withValidatedCache };
+  return Object.freeze({ getRenderPassCacheState, withValidatedCache });
 }

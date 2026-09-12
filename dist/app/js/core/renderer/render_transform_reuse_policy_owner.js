@@ -12,7 +12,7 @@ const EXACT_AFTER_SETTLE_FAST_PATH_REQUIRED_PASS_NAMES = Object.freeze([
   "contextMarkers", "dayNight", "textureLabels",
 ]);
 
-function defaultCloneZoomTransform(transform = null) {
+export function cloneRenderZoomTransform(transform = null) {
   return {
     x: Number(transform?.x || 0),
     y: Number(transform?.y || 0),
@@ -43,7 +43,7 @@ export function createRenderTransformReusePolicyOwner({
     getActiveRenderPassNames = () => null,
   } = getters;
   const {
-    cloneZoomTransform = defaultCloneZoomTransform,
+    cloneZoomTransform = cloneRenderZoomTransform,
     isHeavyScenarioStagedApplyCandidate = () => false,
   } = helpers;
 

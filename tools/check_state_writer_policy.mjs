@@ -57,6 +57,7 @@ const POLICY_CONFIG_PATHS = Object.freeze([
   "package-lock.json",
   "tools/eslint-rules/state-writer-allowlist.json",
   "tools/state_action_delegation_contract.mjs",
+  "tools/state_borrowed_effect_contract.mjs",
   "tools/state_writer_inventory.mjs",
   "tools/state_writer_policy.mjs",
   "tools/build_state_writer_policy.mjs",

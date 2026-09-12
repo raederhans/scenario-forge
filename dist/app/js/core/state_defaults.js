@@ -213,7 +213,7 @@ function normalizePhysicalBlendMode(value, fallback = "source-over") {
   return VALID_PHYSICAL_BLEND_MODES.has(mode) ? mode : safeFallback;
 }
 
-function normalizePhysicalStyleConfig(rawConfig) {
+export function normalizePhysicalStyleConfig(rawConfig) {
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
   const normalizedPreset = normalizePhysicalPreset(raw.preset || "balanced");
   const defaults = createPhysicalPresetConfig(normalizedPreset);
@@ -426,7 +426,7 @@ function createDefaultCityLayerStyleConfig() {
     markerScale: 1,
     showLabels: true,
     labelSize: 11,
-    labelMinZoom: 1.9,
+    labelMinZoom: 1.45,
     showCapitalOverlay: true,
     capitalScale: 1.6,
   };
@@ -1476,7 +1476,6 @@ export {
   normalizePhysicalPreset,
   normalizePhysicalMode,
   normalizePhysicalBlendMode,
-  normalizePhysicalStyleConfig,
   createDefaultLakeStyleConfig,
   normalizeLakeStyleConfig,
   createDefaultTransportWorkbenchPointDeltas,

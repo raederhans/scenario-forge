@@ -1041,6 +1041,59 @@ test("runtime hook registration accepts only the exact imported compat target", 
   assert.ok(wrongSource.some(({ reason }) => reason === "state-alias-escape"));
 });
 
+test("compat runtime hook calls require the exact canonical imported helper and root target", () => {
+  const binding = {
+    id: "module:runtimeState",
+    kind: "module",
+    name: "runtimeState",
+  };
+  const accepted = scanStateMutations(`
+    import { state as runtimeState } from "../core/state.js";
+    import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
+    invokeCompat(runtimeState, "updatePaletteLibraryUIFn", "palette");
+  `, {
+    filePath: "js/ui/runtime_hook_fixture.js",
+    bindings: [binding],
+  });
+  assert.deepEqual(accepted, []);
+
+  const rejectedSources = [
+    `
+      import { state as runtimeState } from "../core/state.js";
+      import { callCompatRuntimeHook as invokeCompat } from "../core/other_helper.js";
+      invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+    `,
+    `
+      import { state as runtimeState } from "../core/state.js";
+      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
+      function run(invokeCompat) {
+        invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+      }
+    `,
+    `
+      import { state as runtimeState } from "../core/state.js";
+      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
+      invokeCompat = () => undefined;
+      invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+    `,
+    `
+      import { state as runtimeState } from "../core/state.js";
+      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
+      invokeCompat(runtimeState.ui, "updatePaletteLibraryUIFn");
+    `,
+  ];
+  for (const source of rejectedSources) {
+    const findings = scanStateMutations(source, {
+      filePath: "js/ui/runtime_hook_fixture.js",
+      bindings: [binding],
+    });
+    assert.ok(
+      findings.some(({ reason }) => reason === "state-alias-escape"),
+      JSON.stringify(findings),
+    );
+  }
+});
+
 test("local helper return aliases retain state identity through direct, wrapped, and container results", () => {
   const source = `
     function getState() {

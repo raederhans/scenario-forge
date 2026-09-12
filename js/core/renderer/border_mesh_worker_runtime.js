@@ -1,13 +1,17 @@
 import { createBorderMeshWorkerClient } from "../border_mesh_worker_client.js";
+import {
+  appendPreparedCountryBorderMeshesState,
+  replaceCachedDetailAdmBordersState,
+} from "../state/actions/renderer_cache_actions.js";
+
+import { getBorderWorkerIdentity, getDefaultBorderWorkerSources,
+  hasCachedProvinceBorders, hasCachedLocalBorders } from "./border_mesh_queries.js";
 
 export function createBorderMeshWorkerRuntime({
   state, getGeometrySourceSignature, asFeatureLike = (value) => value,
   getFeatureCountryCodeNormalized, shouldExcludePoliticalInteractionFeature,
   getAdmin1Group, isAdmDetailTier, canonicalCountryCode = (value) => value,
-  getSourceTopologies = () => [
-    { key: "detail", topology: state.topologyDetail },
-    { key: "primary", topology: state.topologyPrimary || state.topology },
-  ],
+  getSourceTopologies = () => getDefaultBorderWorkerSources(state),
   getStaticMeshSourceCountries,
   getDetailAdmMeshBuildState, setDetailAdmMeshBuildState,
   client = createBorderMeshWorkerClient(),
@@ -15,10 +19,7 @@ export function createBorderMeshWorkerRuntime({
   let sceneKey = "";
   let policies = new Map();
   function identity() {
-    return [state.activeScenarioId, state.scenarioApplyEpoch, state.sceneGeneration,
-      state.scenarioDataGeneration, state.topologyRevision, state.sovereigntyRevision,
-      state.scenarioShellOverlayRevision, state.scenarioViewMode, state.mapSemanticMode,
-      state.showScenarioAtlantropa].join("|");
+    return getBorderWorkerIdentity(state);
   }
   function readSources() {
     return getSourceTopologies().filter(({ topology }) => topology?.objects?.political)
@@ -52,8 +53,8 @@ export function createBorderMeshWorkerRuntime({
     const sources = readSources();
     const sourceIdentity = sources.map((source) => ({ ...source, signature: signature(source) }));
     const codes = [...new Set(countries.map(canonicalCountryCode).filter(Boolean))];
-    const provinceCountries = includeProvince ? codes.filter((code) => !state.cachedProvinceBordersByCountry?.has(code)) : [];
-    const localCountries = includeLocal ? codes.filter((code) => !state.cachedLocalBordersByCountry?.has(code)) : [];
+    const provinceCountries = includeProvince ? codes.filter((code) => !hasCachedProvinceBorders(state, code)) : [];
+    const localCountries = includeLocal ? codes.filter((code) => !hasCachedLocalBorders(state, code)) : [];
     const parts = [];
     for (const source of sources) {
       const allowed = getStaticMeshSourceCountries?.()[source.key];
@@ -80,29 +81,33 @@ export function createBorderMeshWorkerRuntime({
     const sources = readSources();
     if (sources.length !== result.sourceIdentity.length || result.sourceIdentity.some((prior, index) =>
       prior.key !== sources[index].key || prior.topology !== sources[index].topology || prior.signature !== signature(sources[index]))) return false;
-    let changed = false;
-    for (const [kind, countries] of [["Province", result.provinceCountries], ["Local", result.localCountries]]) {
-      const mapKey = `cached${kind}BordersByCountry`;
-      const arrayKey = `cached${kind}Borders`;
-      state[mapKey] ||= new Map(); state[arrayKey] ||= [];
-      for (const country of countries) {
-        if (state[mapKey].has(country)) continue;
-        const meshes = result.parts.flatMap((part) => part[`${kind.toLowerCase()}MeshesByCountry`]?.get(country) || [])
-          .filter((mesh) => mesh?.coordinates?.length);
-        state[mapKey].set(country, meshes); state[arrayKey].push(...meshes); changed = true;
-      }
+    const provinceEntries = [];
+    const localEntries = [];
+    for (const country of result.provinceCountries) {
+      if (hasCachedProvinceBorders(state, country)) continue;
+      const meshes = result.parts.flatMap((part) => part.provinceMeshesByCountry?.get(country) || [])
+        .filter((mesh) => mesh?.coordinates?.length);
+      provinceEntries.push({ country, meshes });
     }
-    if (result.localCountries.length) state.cachedGridLines = [...(state.cachedLocalBorders || [])];
+    for (const country of result.localCountries) {
+      if (hasCachedLocalBorders(state, country)) continue;
+      const meshes = result.parts.flatMap((part) => part.localMeshesByCountry?.get(country) || [])
+        .filter((mesh) => mesh?.coordinates?.length);
+      localEntries.push({ country, meshes });
+    }
+    let changed = appendPreparedCountryBorderMeshesState(state, provinceEntries, localEntries, {
+      syncGridLines: result.localCountries.length > 0,
+    });
     if (result.detail) {
       const meshes = result.detail.mesh?.coordinates?.length ? [result.detail.mesh] : [];
       const status = meshes.length ? "ready" : "empty";
       if (getDetailAdmMeshBuildState().signature !== result.detailSignature || getDetailAdmMeshBuildState().status !== status) {
-        state.cachedDetailAdmBorders = meshes;
+        replaceCachedDetailAdmBordersState(state, meshes);
         setDetailAdmMeshBuildState({ signature: result.detailSignature, status }); changed = true;
       }
     }
     return changed;
   }
-  return { buildDeferredBorderMeshesAsync, commitDeferredBorderMeshes,
-    dispose: () => { policies.clear(); client.dispose(); } };
+  return Object.freeze({ buildDeferredBorderMeshesAsync, commitDeferredBorderMeshes,
+    dispose: () => { policies.clear(); client.dispose(); } });
 }

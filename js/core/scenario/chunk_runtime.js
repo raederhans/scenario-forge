@@ -7,6 +7,7 @@ import {
   buildScenarioChunkLayerSelectionSignatures,
   buildMergedScenarioChunkLayerPayloads,
 } from "./chunk_layer_payloads.js";
+import { getScenarioChunkActiveMergeIds, isPendingScenarioChunkPromotionCurrent } from "./chunk_promotion_queries.js";
 import { createScenarioChunkPayloadLoader } from "./chunk_payload_loader.js";
 
 function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile) {
@@ -526,21 +527,6 @@ function createScenarioChunkRuntimeController({
     }, loadState);
   }
 
-  function getScenarioChunkActiveMergeIds(chunkState, selection) {
-    const cacheOnlyChunkIdSet = new Set((Array.isArray(selection?.cacheOnlyChunkIds) ? selection.cacheOnlyChunkIds : [])
-      .map((chunkId) => String(chunkId || "").trim())
-      .filter(Boolean));
-    // retainedActiveChunkIds keeps zoom-end protected detail chunks in the render/hit input
-    // while cacheOnlyChunkIds remains reserved for chunks that only stay warm in memory.
-    const retainedActiveChunkIdSet = new Set((Array.isArray(selection?.retainedActiveChunkIds) ? selection.retainedActiveChunkIds : [])
-      .map((chunkId) => String(chunkId || "").trim())
-      .filter(Boolean));
-    return (Array.isArray(chunkState?.loadedChunkIds) ? chunkState.loadedChunkIds : [])
-      .map((chunkId) => String(chunkId || "").trim())
-      .filter(Boolean)
-      .filter((chunkId) => !cacheOnlyChunkIdSet.has(chunkId) || retainedActiveChunkIdSet.has(chunkId));
-  }
-
   function isScenarioChunkLoadStateContinuationCurrent(
     continuationState,
     {
@@ -991,7 +977,7 @@ function createScenarioChunkRuntimeController({
     return !!(
       mergedLayerPayloads
       && typeof mergedLayerPayloads === "object"
-      && Object.prototype.hasOwnProperty.call(mergedLayerPayloads, layerKey)
+      && Object.hasOwn(mergedLayerPayloads, layerKey)
     );
   }
 
@@ -1354,44 +1340,6 @@ function createScenarioChunkRuntimeController({
     });
   }
 
-  function resolvePendingScenarioChunkPromotionOwnedScenarioId(
-    pendingPromotion,
-    loadState,
-    { scenarioId = "", runId = 0 } = {},
-  ) {
-    if (!pendingPromotion || typeof pendingPromotion !== "object") return false;
-    if (runtimeState.runtimeChunkLoadState !== loadState) return false;
-    if (
-      runId > 0
-      && (
-        promotionCommitRunId !== runId
-        || Math.max(0, Number(loadState.promotionCommitRunId || 0))
-          !== runId
-      )
-    ) return false;
-    const normalizedScenarioId = normalizeScenarioId(scenarioId || pendingPromotion.scenarioId || runtimeState.activeScenarioId);
-    if (!normalizedScenarioId || normalizedScenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)) return false;
-    if (loadState.pendingPromotion && loadState.pendingPromotion !== pendingPromotion) return false;
-    const pendingSelectionVersion = Math.max(0, Number(pendingPromotion.selectionVersion || 0));
-    const currentSelectionVersion = Math.max(0, Number(loadState.selectionVersion || 0));
-    if (pendingSelectionVersion > 0 && currentSelectionVersion > 0 && pendingSelectionVersion !== currentSelectionVersion) return false;
-    return normalizedScenarioId;
-  }
-
-  function isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId = "", runId = 0 } = {}) {
-    const ownedScenarioId = resolvePendingScenarioChunkPromotionOwnedScenarioId(
-      pendingPromotion,
-      loadState,
-      { scenarioId, runId },
-    );
-    if (!ownedScenarioId) return false;
-    if (!isScenarioApplyRequestCurrentForScenario({
-      scenarioId: ownedScenarioId,
-      scenarioApplyRequestId: pendingPromotion.scenarioApplyRequestId,
-    })) return false;
-    return true;
-  }
-
   async function applyPendingScenarioChunkPromotion(bundle, pendingPromotion, loadState = ensureRuntimeChunkLoadState(), {
     renderNowOverride = null,
     runId = 0,
@@ -1426,7 +1374,15 @@ function createScenarioChunkRuntimeController({
     if (identifiedPendingPromotion) {
       pendingPromotion = identifiedPendingPromotion;
     }
-    if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+    if (!isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      })) {
       if (loadState.pendingPromotion === pendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
@@ -1568,7 +1524,15 @@ function createScenarioChunkRuntimeController({
       // 先把 merged layer / localization / runtime payload 写稳，再让出一帧给渲染系统消化，
       // 返回后还要重新验证 current，防止旧 run 在新 selection 之后继续落地。
       await yieldToFrame();
-      if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+      if (!isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      })) {
         if (canRollbackPromotionContinuation()) {
           restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
           restoreScenarioDataGenerationSnapshot();
@@ -1672,7 +1636,15 @@ function createScenarioChunkRuntimeController({
       // Keep the render lock across this frame break so a half-applied visual payload
       // cannot be flushed while a newer promotion run is taking ownership.
       await yieldToFrame();
-      if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+      if (!isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      })) {
         if (canRollbackPromotionContinuation()) {
           restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
           restoreScenarioChunkPromotionRootState(runtimeState, promotionRootSnapshot);
@@ -1714,7 +1686,15 @@ function createScenarioChunkRuntimeController({
       if (deferredOptionalVisibleRefresh) {
         refreshScenarioRenderVisibleOptionalChunkPayloadChange(deferredOptionalVisibleRefresh);
       }
-      if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+      if (!isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      })) {
         return false;
       }
       // Publish the completed payload before scheduling its frame. A synchronous
@@ -1725,7 +1705,15 @@ function createScenarioChunkRuntimeController({
         // The dispatcher registers its RAF before this continuation. Keep the
         // visible/commit metrics after that draw, with the same ownership guard.
         await yieldToFrame();
-        if (!isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })) {
+        if (!isPendingScenarioChunkPromotionCurrent({
+        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
+        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+        runId, promotionCommitRunId,
+        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+      })) {
           return false;
         }
       }
@@ -2581,7 +2569,11 @@ function createScenarioChunkRuntimeController({
       && (!runtimeState.scenarioPoliticalVisibleChunkData
         || runtimeState.scenarioPoliticalVisibleChunkData === runtimeState.scenarioPoliticalChunkData);
     const currentPayloadSignatures = buildScenarioChunkLayerSelectionSignatures(
-      bundle, chunkState, getScenarioChunkActiveMergeIds(chunkState, selection),
+      bundle, chunkState, getScenarioChunkActiveMergeIds({
+        loadedChunkIds: chunkState?.loadedChunkIds,
+        cacheOnlyChunkIds: selection?.cacheOnlyChunkIds,
+        retainedActiveChunkIds: selection?.retainedActiveChunkIds,
+      }),
     );
     const payloadSelectionUnchanged = Object.keys(currentPayloadSignatures).every(
       (layer) => currentPayloadSignatures[layer] === loadState.layerSelectionSignatures?.[layer],
@@ -2785,7 +2777,11 @@ function createScenarioChunkRuntimeController({
       });
     }
     const previousLayerSignatures = loadState.layerSelectionSignatures || {};
-    const activeMergeChunkIds = getScenarioChunkActiveMergeIds(chunkState, selection);
+    const activeMergeChunkIds = getScenarioChunkActiveMergeIds({
+      loadedChunkIds: chunkState?.loadedChunkIds,
+      cacheOnlyChunkIds: selection?.cacheOnlyChunkIds,
+      retainedActiveChunkIds: selection?.retainedActiveChunkIds,
+    });
     const nextLayerSignatures = buildScenarioChunkLayerSelectionSignatures(bundle, ensureActiveScenarioChunkState(), activeMergeChunkIds);
     const chunkMergeStartedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
     const mergedResult = buildMergedScenarioChunkLayerPayloads(bundle, ensureActiveScenarioChunkState(), {
@@ -2808,7 +2804,7 @@ function createScenarioChunkRuntimeController({
     const primaryMergedLayerPayloads = mergedResult.primaryMergedLayerPayloads || {};
     const primaryLayerStats = mergedResult.primaryLayerStats || {};
     const primaryVisibleFeatureCount = Array.isArray(primaryMergedLayerPayloads?.political?.features)
-      ? primaryMergedLayerPayloads.political.features.length
+      ? Number(primaryMergedLayerPayloads.political.features.length)
       : Math.max(0, Number(primaryLayerStats?.political?.visibleFeatureCount || 0));
     const primaryTotalFeatureCount = Math.max(0, Number(primaryLayerStats?.political?.totalFeatureCount || 0));
     patchScenarioChunkLoadState(runtimeState, {

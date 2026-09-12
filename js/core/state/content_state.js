@@ -2,6 +2,7 @@ import {
   createDefaultTransportCountryOverlayState,
 } from "../transport_country_overlay.js";
 import { replaceStartupBootCacheState } from "./actions/boot_actions.js";
+import { commitPhysicalContourDisplayState } from "./actions/content_load_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "./actions/scenario_chunk_promotion_actions.js";
 
 // Content/data state defaults.
@@ -601,15 +602,5 @@ export function decodeStartupPrimaryCollectionsIntoState(
 
 // Publish display aliases separately from immutable per-pack cache entries.
 export function commitPhysicalContourDisplay(target, { major, minor } = {}) {
-  const changed = [];
-  for (const [value, field, name] of [
-    [major, "physicalContourMajorData", "physical_contours_major"],
-    [minor, "physicalContourMinorData", "physical_contours_minor"],
-  ]) {
-    if (value === undefined || target[field] === value || (value === null && target[field] == null)) continue;
-    target[field] = value;
-    changed.push(name);
-  }
-  if (changed.length) target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
-  return changed;
+  return commitPhysicalContourDisplayState(target, { major, minor });
 }

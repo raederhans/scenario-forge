@@ -1,5 +1,5 @@
 import {
-  evaluateCoastlineTopologySource,
+  evaluateCoastlineTopologyDiagnostics,
 } from "./border_mesh_diagnostics.js";
 import {
   buildCountryParentBorderMeshes as buildCountryParentBorderMeshesFromSources,
@@ -19,10 +19,14 @@ import {
   simplifyCoastlineMesh as simplifyCoastlineMeshRuntime,
 } from "./border_mesh_dynamic_runtime.js";
 import {
+  patchBorderMeshCacheState,
+  replaceCachedCoastlineMeshesState,
   replaceCachedDetailAdmBordersState,
   setDynamicBordersDirtyState,
   setPendingDynamicBorderTimerState,
 } from "../state/actions/renderer_cache_actions.js";
+
+import { getBorderCountryAssignmentRevision, isAtlantropaCoastlineLandVisible } from "./border_mesh_queries.js";
 
 export function createBorderMeshOwner({
   state,
@@ -189,10 +193,10 @@ export function createBorderMeshOwner({
   function rebuildDynamicBorders() {
     const startedAt = nowMs();
     incrementPerfCounter("dynamicBorderRebuilds");
-    state.cachedBorders = null;
+    patchBorderMeshCacheState(state, { cachedBorders: null });
     if (!isDynamicBordersEnabled()) {
-      state.cachedDynamicOwnerBorders = null;
-      state.cachedDynamicBordersHash = null;
+      patchBorderMeshCacheState(state, { cachedDynamicOwnerBorders: null });
+      patchBorderMeshCacheState(state, { cachedDynamicBordersHash: null });
       setDynamicBordersDirtyState(state, false, "");
       clearPendingDynamicBorderTimer();
       updateDynamicBorderStatusUI();
@@ -223,9 +227,9 @@ export function createBorderMeshOwner({
     }
 
     const ownershipContext = getDynamicBorderOwnershipContext(state);
-    state.cachedDynamicOwnerBorders = buildDynamicOwnerBorderMesh(state.runtimePoliticalTopology, ownershipContext);
+    patchBorderMeshCacheState(state, { cachedDynamicOwnerBorders: buildDynamicOwnerBorderMesh(state.runtimePoliticalTopology, ownershipContext) });
     const unresolvedEntityCount = countUnresolvedOwnerBorderEntities(state.runtimePoliticalTopology, ownershipContext);
-    state.cachedDynamicBordersHash = nextHash;
+    patchBorderMeshCacheState(state, { cachedDynamicBordersHash: nextHash });
     setDynamicBordersDirtyState(state, false, "");
     updateDynamicBorderStatusUI();
     invalidateRenderPasses("borders", "dynamic-borders");
@@ -264,13 +268,13 @@ export function createBorderMeshOwner({
           : scenarioOpeningOwnerBorderCache.runtimeRef === selection.runtimeRef)
         && isUsableMesh(scenarioOpeningOwnerBorderCache.mesh);
 
-      state.cachedScenarioOpeningOwnerBorders = cacheMatches
+      patchBorderMeshCacheState(state, { cachedScenarioOpeningOwnerBorders: cacheMatches
         ? scenarioOpeningOwnerBorderCache.mesh
         : (
           selection.hasMeshPackMesh
             ? selection.meshPackMesh
             : buildOwnerBorderMesh(selection.runtimeRef, selection.fallbackOwnershipContext, { excludeSea: true })
-        );
+        ) });
 
       scenarioOpeningOwnerBorderCache = {
         runtimeRef: selection.runtimeRef,
@@ -283,7 +287,7 @@ export function createBorderMeshOwner({
         mesh: state.cachedScenarioOpeningOwnerBorders,
       };
     } else {
-      state.cachedScenarioOpeningOwnerBorders = null;
+      patchBorderMeshCacheState(state, { cachedScenarioOpeningOwnerBorders: null });
     }
 
     invalidateRenderPasses("borders", reason || "scenario-opening-borders");
@@ -299,8 +303,8 @@ export function createBorderMeshOwner({
   }
 
   function getFrontlineMesh() {
-    state.cachedFrontlineMesh = null;
-    state.cachedFrontlineMeshHash = "";
+    patchBorderMeshCacheState(state, { cachedFrontlineMesh: null });
+    patchBorderMeshCacheState(state, { cachedFrontlineMeshHash: "" });
     return null;
   }
 
@@ -345,8 +349,7 @@ export function createBorderMeshOwner({
       includedCountries,
       includeProvince,
       includeLocal,
-      countryAssignmentRevision: [state.activeScenarioId, state.topologyRevision, state.sovereigntyRevision,
-        state.scenarioShellOverlayRevision, state.scenarioViewMode, state.mapSemanticMode].join("|"),
+      countryAssignmentRevision: getBorderCountryAssignmentRevision(state),
       canonicalCountryCode,
       asFeatureLike,
       shouldExcludePoliticalInteractionFeature,
@@ -373,10 +376,7 @@ export function createBorderMeshOwner({
     const runtimeTopology = state.runtimePoliticalTopology || null;
     const scenarioId = String(state.activeScenarioId || "").trim();
     const hasDedicatedCoastline = !!runtimeTopology?.objects?.scenario_coastline;
-    const atlantropaLandVisible = !!state.showWaterRegions && state.showScenarioAtlantropa !== false
-      && (state.scenarioAtlantropaData?.features || []).some(
-        (feature) => feature?.properties?.atl_render_layer === "land"
-      );
+    const atlantropaLandVisible = isAtlantropaCoastlineLandVisible(state);
     const scenarioSurfaceVersionSignal = [
       String(getScenarioSurfaceVersionSignal() || ""),
       `coastline-land:${atlantropaLandVisible}`,
@@ -391,20 +391,24 @@ export function createBorderMeshOwner({
     if (cacheMatches && scenarioCoastlineSourceCache.decision) {
       return scenarioCoastlineSourceCache.decision;
     }
-    const { decision } = evaluateCoastlineTopologySource({
+    const { decision } = evaluateCoastlineTopologyDiagnostics({
       primaryTopology,
       runtimeTopology: hasDedicatedCoastline && !atlantropaLandVisible ? null : runtimeTopology,
       scenarioId,
-      ...(hasDedicatedCoastline ? { runtimeObjectNames: ["scenario_coastline"] } : {}),
+      runtimeObjectNames: hasDedicatedCoastline ? ["scenario_coastline"] : undefined,
       scenarioCoastlineMaxAreaDeltaRatio,
       scenarioCoastlineMaxInteriorRingCount,
       scenarioCoastlineMaxInteriorRingRatio,
       isWorldBounds,
     });
-    const publishedDecision = publishScenarioCoastlineDecision({
+    const publishedDiagnostics = publishScenarioCoastlineDecision({
       ...decision,
       scenarioSurfaceVersionSignal,
     });
+    const publishedDecision = {
+      ...publishedDiagnostics,
+      topology: decision.source === "scenario" ? runtimeTopology : primaryTopology,
+    };
 
     if (scenarioId) {
       const logKey = `${scenarioId}::${publishedDecision.source}::${publishedDecision.reason}`;
@@ -459,33 +463,29 @@ export function createBorderMeshOwner({
       && coastlineMeshCache.meshFunction === globalThis.topojson?.mesh) {
       // A static-mesh reset clears the arrays, but does not invalidate unchanged
       // coastline geometry. Restore its LODs without decoding/simplifying again.
-      state.cachedCoastlines = coastlineMeshCache.collections.cachedCoastlines;
-      state.cachedCoastlinesHigh = coastlineMeshCache.collections.cachedCoastlinesHigh;
-      state.cachedCoastlinesMid = coastlineMeshCache.collections.cachedCoastlinesMid;
-      state.cachedCoastlinesLow = coastlineMeshCache.collections.cachedCoastlinesLow;
+      replaceCachedCoastlineMeshesState(state, coastlineMeshCache.collections);
       return;
     }
     const mesh = buildGlobalCoastlineMesh(decision);
     const high = isUsableMesh(mesh) ? [mesh] : [];
     const midMesh = high.length ? simplifyCoastlineMesh(mesh, mid) : null;
     const lowMesh = high.length ? simplifyCoastlineMesh(mesh, low) : null;
-    state.cachedCoastlines = high;
-    state.cachedCoastlinesHigh = high;
-    state.cachedCoastlinesMid = isUsableMesh(midMesh) ? [midMesh] : high;
-    state.cachedCoastlinesLow = isUsableMesh(lowMesh) ? [lowMesh] : state.cachedCoastlinesMid;
+    const midCollection = isUsableMesh(midMesh) ? [midMesh] : high;
+    const collections = {
+      cachedCoastlines: high,
+      cachedCoastlinesHigh: high,
+      cachedCoastlinesMid: midCollection,
+      cachedCoastlinesLow: isUsableMesh(lowMesh) ? [lowMesh] : midCollection,
+    };
+    replaceCachedCoastlineMeshesState(state, collections);
     coastlineMeshCache = {
       topology, object, arcs: topology?.arcs, transform: topology?.transform, lodKey,
       meshFunction: globalThis.topojson?.mesh,
-      collections: {
-        cachedCoastlines: state.cachedCoastlines,
-        cachedCoastlinesHigh: state.cachedCoastlinesHigh,
-        cachedCoastlinesMid: state.cachedCoastlinesMid,
-        cachedCoastlinesLow: state.cachedCoastlinesLow,
-      },
+      collections,
     };
   }
 
-  return {
+  return Object.freeze({
     clearPendingDynamicBorderTimer,
     markDynamicBordersDirty,
     recomputeDynamicBordersNow,
@@ -508,5 +508,5 @@ export function createBorderMeshOwner({
     buildGlobalCoastlineMesh,
     simplifyCoastlineMesh,
     ensureCoastlineMeshes,
-  };
+  });
 }

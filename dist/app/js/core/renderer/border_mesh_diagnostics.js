@@ -117,6 +117,14 @@ export function getCoastlineTopologyMetrics({
   return { ...metrics, worldBounds: isWorldBounds(bounds) };
 }
 
+// The owner keeps topology references; this query publishes only diagnostics.
+// Geometric memoization remains private to this module.
+export function evaluateCoastlineTopologyDiagnostics(inputs) {
+  const { decision, primaryMetrics, runtimeMaskMetrics } = evaluateCoastlineTopologySource(inputs);
+  const { topology: _topology, ...diagnostics } = decision;
+  return { decision: diagnostics, primaryMetrics, runtimeMaskMetrics };
+}
+
 export function evaluateCoastlineTopologySource({
   primaryTopology,
   runtimeTopology,

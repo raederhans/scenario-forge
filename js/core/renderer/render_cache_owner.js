@@ -7,12 +7,19 @@
  */
 import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASS_NAMES = new Set([
-  "political",
-  "contextBase",
+  "political", "contextBase",
   "contextScenario",
   "effects",
 ]);
 const RENDER_CACHE_OWNER_SUMMARY_VERSION = 1;
+
+function composeRenderCacheValidationScope(state, ensureRenderPassCacheState, cloneZoomTransform, renderPassNames) {
+  const owner = createRenderCacheValidationScope({
+    getRoot: () => state.renderPassCache,
+    ensure: () => ensureRenderPassCacheState(state, { cloneZoomTransform, renderPassNames }),
+  });
+  return owner;
+}
 
 export function createRenderCacheOwner({
   state = {},
@@ -67,19 +74,12 @@ export function createRenderCacheOwner({
   }
 
   function createMutationSummary({
-    operation,
-    reason,
-    requestedPassNames = [],
-    normalizedPassNames = [],
-    droppedPassNames = [],
-    changed = false,
-    effects = {},
-    legacy = {},
+    operation, reason, changed = false,
+    requestedPassNames = [], normalizedPassNames = [], droppedPassNames = [],
+    effects = {}, legacy = {},
   }) {
     const referenceTransforms = effects.referenceTransforms || {
-      clearedAll: false,
-      sharedReferenceTransformCleared: false,
-      passNames: [],
+      clearedAll: false, sharedReferenceTransformCleared: false, passNames: [],
     };
     const lastGoodFrame = effects.lastGoodFrame || { invalidated: false, reason };
     const interactionComposite = effects.interactionComposite || { invalidated: false, reason };
@@ -115,10 +115,10 @@ export function createRenderCacheOwner({
     };
   }
 
-  const { getRenderPassCacheState, withValidatedCache } = createRenderCacheValidationScope({
-    getRoot: () => state.renderPassCache,
-    ensure: () => ensureRenderPassCacheState(state, { cloneZoomTransform, renderPassNames }),
-  });
+  const { getRenderPassCacheState, withValidatedCache } = composeRenderCacheValidationScope(
+    state,
+    ensureRenderPassCacheState, cloneZoomTransform, renderPassNames,
+  );
 
   function invalidateLastGoodFrame(reason = "visual-invalidation") {
     const cache = getRenderPassCacheState();

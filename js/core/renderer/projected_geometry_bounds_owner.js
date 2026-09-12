@@ -1,4 +1,10 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import { ensureProjectedBoundsCacheState } from "../state/renderer_runtime_state.js";
+import {
+  clearProjectedBoundsCacheEntriesState,
+  setProjectedBoundsCacheEntryState,
+  syncProjectedBoundsCacheEntryState,
+} from "../state/actions/renderer_cache_actions.js";
 
 const DEFAULT_SPHERICAL_GEOMETRY_MAX_AREA = Math.PI * 2;
 
@@ -28,6 +34,7 @@ function isWorldBounds(bounds) {
 }
 
 export function createProjectedGeometryBoundsOwner({
+  state = {},
   constants = {},
   getters = {},
   helpers = {},
@@ -39,7 +46,6 @@ export function createProjectedGeometryBoundsOwner({
     getProjection = () => null,
     getPathCanvas = () => null,
     getPathSvg = () => null,
-    getProjectedBoundsCache = () => null,
     getLandFeatures = () => [],
     getRiverFeatures = () => [],
     getActiveScenarioId = () => "",
@@ -68,7 +74,8 @@ export function createProjectedGeometryBoundsOwner({
     if (generation !== boundsProjectionGeneration || scenarioId !== boundsScenarioId) {
       projectedBoundsByGeometry = new WeakMap();
       if (boundsProjectionGeneration !== -1) {
-        getCache()?.clear();
+        ensureCache();
+        clearProjectedBoundsCacheEntriesState(state);
         resetHostWaterPathCaches();
       }
       boundsProjectionGeneration = generation;
@@ -76,9 +83,10 @@ export function createProjectedGeometryBoundsOwner({
     }
   }
 
-  function getCache() {
-    const cache = getProjectedBoundsCache();
-    return cache instanceof Map ? cache : null;
+  function ensureCache() {
+    // Runtime resets may replace the public ID map; never retain its holder.
+    // Geometry identity remains private, while ID publication uses state actions.
+    if (!(state.projectedBoundsById instanceof Map)) ensureProjectedBoundsCacheState(state);
   }
 
   function computeProjectedCoordinateBounds(geoObject) {
@@ -152,28 +160,27 @@ export function createProjectedGeometryBoundsOwner({
     if (!cached && !allowCompute) return null;
     const bounds = cached ? projectedBoundsByGeometry.get(geometry) : computeProjectedFeatureBounds(feature);
     if (resolvedFeatureId) {
-      const cache = getCache();
-      if (bounds && cache?.get(resolvedFeatureId) !== bounds) cache?.set(resolvedFeatureId, bounds);
-      else if (!bounds) cache?.delete(resolvedFeatureId);
+      ensureCache();
+      syncProjectedBoundsCacheEntryState(state, resolvedFeatureId, bounds);
     }
     return bounds;
   }
 
   function rebuildProjectedBoundsCache() {
     clearProjectedBoundsCache();
-    const cache = getCache();
-    if (!cache) return;
+    ensureCache();
     for (const feature of [...(getLandFeatures() || []), ...(getRiverFeatures() || [])]) {
       const featureId = getFeatureId(feature);
       if (!featureId) continue;
       const bounds = computeProjectedFeatureBounds(feature);
-      if (bounds) cache.set(featureId, bounds);
+      if (bounds) setProjectedBoundsCacheEntryState(state, featureId, bounds);
     }
   }
 
   function clearProjectedBoundsCache() {
     projectedBoundsByGeometry = new WeakMap();
-    getCache()?.clear();
+    ensureCache();
+    clearProjectedBoundsCacheEntriesState(state);
     resetHostWaterPathCaches();
   }
 
@@ -345,7 +352,7 @@ export function createProjectedGeometryBoundsOwner({
     return sanitizedFeatures;
   }
 
-  return {
+  return Object.freeze({
     computeProjectedCoordinateBounds,
     computeProjectedGeoBounds,
     computeProjectedFeatureBounds,
@@ -365,5 +372,5 @@ export function createProjectedGeometryBoundsOwner({
     shouldExcludeWaterHitGeometry,
     sanitizeWaterRegionFeature,
     sanitizeWaterRegionFeatures,
-  };
+  });
 }

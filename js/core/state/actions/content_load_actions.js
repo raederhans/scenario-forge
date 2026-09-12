@@ -1,3 +1,20 @@
+// Publish display aliases without mutating the immutable per-pack cache entries.
+export function commitPhysicalContourDisplayState(target, { major, minor } = {}) {
+  const changed = [];
+  if (major !== undefined && target.physicalContourMajorData !== major
+    && !(major === null && target.physicalContourMajorData == null)) {
+    target.physicalContourMajorData = major;
+    changed.push("physical_contours_major");
+  }
+  if (minor !== undefined && target.physicalContourMinorData !== minor
+    && !(minor === null && target.physicalContourMinorData == null)) {
+    target.physicalContourMinorData = minor;
+    changed.push("physical_contours_minor");
+  }
+  if (changed.length) target.contextLayerRevision = (Number(target.contextLayerRevision) || 0) + 1;
+  return changed;
+}
+
 // Finish only the resource request that still owns the pending slot.
 export function finishBaseCitySupportLoad(target, { expectedPromise, cancelled = false } = {}) {
   if (!target || typeof target !== "object" || !expectedPromise

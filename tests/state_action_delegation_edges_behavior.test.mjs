@@ -60,6 +60,26 @@ function fingerprintDirectExportedFunction(source, exportName) {
     .digest("hex");
 }
 
+test("active chunk ID reader proves its three scalar map callbacks without accepting callback writes", async () => {
+  const modulePath = "js/core/scenario/chunk_promotion_queries.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath
+    && candidate.functionName === "getScenarioChunkActiveMergeIds");
+  assert.equal(entry.reviewedReadSiteFingerprints.length, 3);
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry).violations, []);
+  await discoverStateWriterBindingsForSource(modulePath, source, "production", { includeInventories: true });
+  for (const replacement of [
+    '(chunkId) => (inputs.loadedChunkIds.push("bad"), String(chunkId || "").trim())',
+    '(chunkId) => (chunkId.name = "bad", String(chunkId || "").trim())',
+    '(chunkId) => chunkId',
+  ]) {
+    const changed = source.replace('(chunkId) => String(chunkId || "").trim()', replacement);
+    assert.notEqual(changed, source);
+    assert.ok(inspectStateTargetPureReaderFunctionSource(changed, entry).violations.length);
+    await assert.rejects(() => discoverStateWriterBindingsForSource(modulePath, changed, "production", { includeInventories: true }));
+  }
+});
+
 test("bundle retention reader rejects source mutation against its registered proof", async () => {
   const modulePath = "js/core/scenario/bundle_cache_policy.js";
   const source = fs.readFileSync(modulePath, "utf8");
@@ -109,6 +129,53 @@ test("import preflight readers exclude only proven reads and retain the live res
           includeInventories: true, scanAllParameters: true,
         }),
         { code: "state-target-pure-reader-contract-violation" },
+      );
+    }
+  }
+});
+
+test("border mesh factory readers preserve canonical renderer-cache action delegation edges", async () => {
+  const expectedActionsByFactory = new Map([
+    ["js/core/renderer/border_mesh_worker_runtime.js", {
+      factoryName: "createBorderMeshWorkerRuntime",
+      actionNames: [
+        "appendPreparedCountryBorderMeshesState",
+        "replaceCachedDetailAdmBordersState",
+      ],
+    }],
+    ["js/core/renderer/border_mesh_owner.js", {
+      factoryName: "createBorderMeshOwner",
+      actionNames: [
+        "patchBorderMeshCacheState",
+        "replaceCachedCoastlineMeshesState",
+      ],
+    }],
+  ]);
+
+  for (const [modulePath, { factoryName, actionNames }] of expectedActionsByFactory) {
+    const discovery = await discoverStateWriterBindingsForSource(
+      modulePath,
+      fs.readFileSync(modulePath, "utf8"),
+      "production",
+      { scanAllParameters: true, includeInventories: true },
+    );
+    const factoryInventory = discovery.bindingInventories.find(({ binding }) => (
+      binding.kind === "function-parameter"
+      && binding.functionName === factoryName
+      && binding.parameterPath === "$/property:state"
+    ));
+    assert.ok(factoryInventory, `${factoryName} state binding must remain discoverable`);
+
+    const canonicalEdges = normalizeStateActionDelegations(factoryInventory.actionDelegations);
+    const canonicalGrants = new Set(canonicalEdges.map((edge) => [
+      edge.actionModulePath,
+      edge.actionExportName,
+      edge.targetArgumentIndex,
+    ].join("|")));
+    for (const actionName of actionNames) {
+      assert.ok(
+        canonicalGrants.has(`js/core/state/actions/renderer_cache_actions.js|${actionName}|0`),
+        `${factoryName} must retain canonical delegation for ${actionName}`,
       );
     }
   }
@@ -785,7 +852,12 @@ test("P4.3 renderer cross-boundary proofs lock retired evidence and exact replac
       ["js/core/map_renderer.js", "projectedBoundsDiagnostics", "setProjectedBoundsDiagnosticsState", 2],
       ["js/core/map_renderer.js", "renderPerfMetrics", "ensureRenderPerfMetricsState", 1],
       ["js/core/map_renderer.js", "renderPerfMetricSequence", "commitRenderPerfMetricState", 1],
+      ["js/core/map_renderer.js", "cachedCoastlines", "replaceCachedCoastlineMeshesState", 1],
+      ["js/core/map_renderer.js", "cachedCoastlinesHigh", "replaceCachedCoastlineMeshesState", 1],
+      ["js/core/map_renderer.js", "cachedCoastlinesLow", "replaceCachedCoastlineMeshesState", 3],
+      ["js/core/map_renderer.js", "cachedCoastlinesMid", "replaceCachedCoastlineMeshesState", 2],
       ["js/core/map_renderer.js", "cachedDetailAdmBorders", "replaceCachedDetailAdmBordersState", 1],
+      ["js/core/map_renderer/exact_after_settle_scheduler.js", "deferExactAfterSettle", "setDeferExactAfterSettleState", 4],
       ["js/core/renderer/border_draw_owner.js", "cachedDetailAdmBorders", "replaceCachedDetailAdmBordersState", 1],
       ["js/core/state/renderer_runtime_state.js", "exactAfterSettleController", "ensureExactAfterSettleControllerState", 2],
       ["js/core/state/renderer_runtime_state.js", "renderPassCache", "commitRenderPassCacheState", 49],
@@ -1137,7 +1209,8 @@ test("borrowed chunk reader proofs cover transitive local helper source", async 
     await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutated, "production", {
       scanAllParameters: true,
     }), (error) => error.violations?.some(({ code }) => (
-      code === "state-target-pure-reader-dependency-source-drift"
+      code === "borrowed-effect-source-mismatch"
+      || code === "state-target-pure-reader-dependency-source-drift"
     )));
   }
   for (const entry of STATE_TARGET_PURE_READER_CONTRACT.filter((entry) => entry.modulePath === modulePath)) {
@@ -1154,7 +1227,8 @@ test("borrowed chunk reader proofs cover transitive local helper source", async 
   await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutatedPayload, "production", {
     scanAllParameters: true,
   }), (error) => error.violations?.some(({ code, dependencyName }) => (
-    code === "state-target-pure-reader-dependency-source-drift" && dependencyName === "getPayloadIdentity"
+    code === "borrowed-effect-source-mismatch"
+    || (code === "state-target-pure-reader-dependency-source-drift" && dependencyName === "getPayloadIdentity")
   )));
 });
 
@@ -2749,12 +2823,16 @@ test("reviewed read sites reject mutators and mutating callbacks even with a fre
   };
   assert.deepEqual(inspect('target.landIndex.get("id")'), []);
   assert.deepEqual(inspect("target.items.map((item) => ({ value: item.value }))"), []);
+  assert.deepEqual(inspect("target.items.some((item) => item.value === 2)"), []);
   assert.ok(inspect('target.landIndex.set("id", {})').some(v => v.code === "state-target-pure-reader-read-method-invalid"));
   for (const expression of [
     "target.items.forEach((item) => { item.value = 2; })",
     "target.items.forEach((item) => { const alias = item; alias.value++; })",
     "target.items.map((item) => mutateUnknown(item))",
     "target.items.forEach((item, index, items) => { items.push(item); })",
+    "target.items.some((item) => { item.value = 2; return true; })",
+    "target.items.some((item, index, items) => { items[index] = item; return false; })",
+    "target.items.some((item) => leak(item))",
   ]) {
     assert.ok(inspect(expression).some(v => v.code === "state-target-pure-reader-read-callback-mutation"), expression);
   }
@@ -2776,4 +2854,222 @@ test("canonical actions borrow only through an exact registered borrowed reader"
     const findings = bindingInventories.flatMap(row => row.findings);
     assert.equal(findings.some(row => row.unsupported), rejected, expression + " " + importLine);
   }
+});
+
+test("borrowed reader projections preserve construction effects and reject unproven calls", () => {
+  const importLine = 'import { resolvePaletteLibraryApplyTarget as read } from "../core/palette_library_queries.js";';
+  const scan = (expression, prefix = importLine) => scanStateMutations(
+    `import { state } from "../core/state.js";\n${prefix}\n${expression};`,
+    { filePath: "js/ui/reader_projection_fixture.js", bindings: [{ ...MODULE_BINDING, id: "module:state", name: "state" }] },
+  );
+  assert.deepEqual(scan("read({ landIndex: state.landIndex, devSelectedHit: state.devSelectedHit })"), []);
+  assert.ok(scan("read({ landIndex: (state.landIndex = new Map()) })").some(row => row.key === "landIndex" && !row.unsupported));
+  assert.ok(scan("read({ landIndex: leak(state.landIndex) })").some(row => row.reason === "state-alias-escape"));
+  assert.ok(scan("read({ ...state })").some(row => row.unsupported));
+  assert.ok(scan("read({ landIndex: state.landIndex }, {})").some(row => row.unsupported));
+  assert.ok(scan("read({ landIndex: state.landIndex })", 'import { resolvePaletteLibraryApplyTarget as read } from "./fake.js";').some(row => row.unsupported));
+  assert.ok(scan("read = unknown; read({ landIndex: state.landIndex })").some(row => row.unsupported));
+});
+
+test("registered validation scopes retain callback writes and borrowed cache escapes", () => {
+  const source = fs.readFileSync("js/core/map_renderer.js", "utf8").replaceAll("\r\n", "\n");
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+  const getter = ast.body.find(node => node.type === "FunctionDeclaration" && node.id.name === "getRenderCacheOwner");
+  assert.ok(getter);
+  const scanScope = expression => scanStateMutationInventory([
+    'import { state as runtimeState } from "./state.js";',
+    'import { createRenderCacheOwner } from "./renderer/render_cache_owner.js";',
+    'import { setBootStateFields } from "./state/actions/boot_actions.js";',
+    "let renderCacheOwner = null;",
+    source.slice(getter.start, getter.end),
+    expression,
+  ].join("\n"), {
+    filePath: "js/core/map_renderer.js",
+    bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+    derivedAliasTaintMode: "strict",
+  });
+  assert.equal(scanScope("getRenderCacheOwner().withValidatedCache(() => 1);").findings.some(row => row.reason === "unsupported-call-mutation"), false);
+  assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(() => { runtimeState.bootPhase = 'bad'; });").findings.some(row => row.key === "bootPhase"));
+  assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => { cache.dirty = {}; });").findings.some(row => row.unsupported));
+  assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => leak(cache));").findings.some(row => row.reason === "state-alias-escape"));
+  const action = scanScope("getRenderCacheOwner().withValidatedCache(() => setBootStateFields(runtimeState, { bootPhase: 'ready' }));");
+  assert.ok(action.actionDelegations.some(edge => edge.actionExportName === "setBootStateFields"));
+});
+
+test("borrowed effects track only borrowed output paths and reject unproven call shapes", () => {
+  const build = (tail, { options = "previousMergedLayerPayloads: runtimeState.payloads, mergeScenarioChunkPayloads: mergePayloads", prefix = "const mergePayloads = () => null;", module = "./scenario/chunk_layer_payloads.js" } = {}) => [
+    'import { state as runtimeState } from "./state.js";',
+    `import { buildMergedScenarioChunkLayerPayloads as merge } from "${module}";`,
+    prefix,
+    `const result = merge(runtimeState.bundle, runtimeState.chunk, { ${options} });`, tail,
+  ].join("\n");
+  const findings = (tail, options) => scanStateMutations(build(tail, options), {
+    filePath: "js/core/effect_fixture.js", bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }], derivedAliasTaintMode: "strict",
+  });
+  assert.deepEqual(findings("result.changedLayerKeys.push('local');"), []);
+  assert.deepEqual(findings("if (condition) local(); metrics({ count: result.changedLayerKeys.length });"), []);
+  assert.deepEqual(findings("function read(payload) { return Boolean(payload.political); } read(result.mergedLayerPayloads);"), []);
+  assert.deepEqual(findings("function read(options) { return Boolean(options.payload.political); } read({payload: result.mergedLayerPayloads || null});"), []);
+  assert.ok(findings("function write(options) { options.payload.political.features.push({}); } write({payload: result.mergedLayerPayloads || null});").length);
+  assert.ok(findings("function read(options) { return Boolean(options.payload); } read({payload: leak(result.mergedLayerPayloads)});").length);
+  for (const body of [
+    "payload.political = {};",
+    "payload.political.features.push({});",
+    "leak(payload.political);",
+    "return payload.political;",
+  ]) assert.ok(findings(`function consume(payload) { ${body} } consume(result.mergedLayerPayloads);`).length, body);
+  assert.ok(findings("if (condition) local(); result.mergedLayerPayloads.political = {};").length);
+
+  const publishPrefix = 'import { setScenarioChunkMergedLayerPayloadsState as publish } from "./state/actions/scenario_chunk_runtime_actions.js"; const mergePayloads = () => null;';
+  assert.deepEqual(findings("publish(runtimeState, result.mergedLayerPayloads);", { prefix: publishPrefix }), []);
+  assert.ok(findings("publish(runtimeState, result.mergedLayerPayloads); result.mergedLayerPayloads.political = {};", { prefix: publishPrefix }).length);
+  const queuePrefix = 'import { queueScenarioChunkPromotionState as queue } from "./state/actions/scenario_chunk_runtime_actions.js"; const mergePayloads = () => null;';
+  assert.deepEqual(findings("queue(runtimeState, {promotion: {mergedLayerPayloads: result.mergedLayerPayloads}});", { prefix: queuePrefix }), []);
+  assert.ok(findings("queue(runtimeState, {promotion: {root: runtimeState}});", { prefix: queuePrefix }).length);
+  assert.ok(findings("queue(runtimeState, {promotion: leak(result.mergedLayerPayloads)});", { prefix: queuePrefix }).length);
+
+  for (const tail of [
+    "result.mergedLayerPayloads.political = {};",
+    "result.primaryMergedLayerPayloads.political.features.push({});",
+    "result.primaryLayerStats.political.visibleFeatureCount = 0;",
+    "const { mergedLayerPayloads: borrowed } = result; borrowed.political = {};",
+    "leak(result.mergedLayerPayloads);",
+    "result[unknown].political = {};",
+  ]) assert.ok(findings(tail).length, tail);
+  assert.ok(findings("", { options: "previousMergedLayerPayloads: runtimeState.payloads, unknownCallback: mergePayloads" }).length);
+  assert.ok(findings("", { prefix: "let mergePayloads = () => null; mergePayloads = unknown;" }).length);
+  assert.ok(findings("", { module: "./fake.js" }).length);
+  for (const prefix of [
+    "const mergePayloads = (_layer, payloads) => { payloads[0].features.push({}); return payloads[0]; };",
+    "const writer = (_layer, payloads) => { payloads[0].features.push({}); }; const mergePayloads = writer;",
+    "const mergePayloads = writer.bind(null);",
+    "const mergePayloads = handlers.writer;",
+    'import { mergePayloads } from "./unknown.js";',
+  ]) assert.ok(findings("", { prefix }).length, prefix);
+});
+
+test("trusted owner methods preserve borrowed handle and geometry result taint", () => {
+  const source = fs.readFileSync("js/core/map_renderer.js", "utf8").replaceAll("\r\n", "\n");
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+  const getter = ast.body.find(node => node.type === "FunctionDeclaration" && node.id.name === "composePoliticalPathCacheOwner");
+  const scanOwner = tail => scanStateMutations([
+    'import { state as runtimeState } from "./state.js";',
+    'import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";',
+    source.slice(getter.start, getter.end),
+    "const { getPoliticalPathCacheHandle, getPoliticalFeaturePathEntry } = composePoliticalPathCacheOwner();",
+    tail,
+  ].join("\n"), { filePath: "js/core/map_renderer.js", bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }], derivedAliasTaintMode: "strict" });
+  assert.deepEqual(scanOwner("const handle = getPoliticalPathCacheHandle(); handle.valid = false;"), []);
+  assert.ok(scanOwner("const handle = getPoliticalPathCacheHandle(); handle.map.clear();").length);
+  assert.ok(scanOwner("const { cache } = getPoliticalPathCacheHandle(); cache.politicalPathCache = new Map();").length);
+  assert.ok(scanOwner("const entry = getPoliticalFeaturePathEntry(feature); entry.geometryRef.coordinates.push([]);").length);
+  assert.ok(scanOwner("leak(getPoliticalPathCacheHandle().map);").length);
+  for (const tail of [
+    "const handle = getPoliticalPathCacheHandle; handle().map.clear();",
+    "const owner = composePoliticalPathCacheOwner(); const handle = owner.getPoliticalPathCacheHandle; handle().map.clear();",
+    "const {getPoliticalPathCacheHandle: handle = () => null} = composePoliticalPathCacheOwner(); handle().map.clear();",
+  ]) assert.ok(scanOwner(tail).length, tail);
+
+});
+
+
+test("projected Map storage effects reject changed borrowed-input behavior", async () => {
+  const modulePath = "js/core/state/actions/renderer_cache_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  for (const extra of ["bounds.push(0);", "unknown(bounds);", "featureId.name = 0;"]) {
+    const mutated = source.replace("export function setProjectedBoundsCacheEntryState(target, featureId, bounds) {", `export function setProjectedBoundsCacheEntryState(target, featureId, bounds) { ${extra}`);
+    assert.ok((await validateStateActionNonTargetParameterMutations(modulePath, mutated)).length, extra);
+  }
+});
+
+test("effectful cache initializer delegation preserves source proof and internal action", async () => {
+  const modulePath = "js/core/state/renderer_runtime_state.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  await assert.rejects(discoverStateWriterBindingsForSource(modulePath, source.replace("export function ensureProjectedBoundsCacheState(target) {", "export function ensureProjectedBoundsCacheState(target) { target.unreviewed = 1;"), "production"), error => error.code === "state-effectful-delegator-source-mismatch");
+  const fixture = module => `import { state as runtimeState } from "./state.js"; import { ensureProjectedBoundsCacheState as ensure } from "${module}"; ensure(runtimeState);`;
+  const scan = module => scanStateMutations(fixture(module), {filePath: "js/core/test_initializer.js", bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }], derivedAliasTaintMode: "strict"});
+  assert.deepEqual(scan("./state/renderer_runtime_state.js"), []);
+  assert.ok(scan("./fake.js").length);
+  const discovered = await discoverStateWriterBindingsForSource(modulePath, source, "production", { includeInventories: true });
+  assert.ok(JSON.stringify(discovered).includes("commitProjectedBoundsCacheState"));
+});
+
+
+test("projected cache synchronization proves its read while retaining both Map writes", async () => {
+  const modulePath = "js/core/state/actions/renderer_cache_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const result = await discoverStateWriterBindingsForSource(modulePath, source, "production", { includeInventories: true });
+  const inventory = result.bindingInventories.find(entry => entry.binding.functionName === "syncProjectedBoundsCacheEntryState");
+  assert.ok(inventory);
+  assert.equal(inventory.findings.filter(finding => finding.unsupported).length, 0);
+  assert.equal(inventory.findings.filter(finding => finding.operation === "collection-mutate" && finding.key === "projectedBoundsById").length, 2);
+  const changed = source.replace("target.projectedBoundsById.get(featureId) !== bounds", "target.projectedBoundsById.get(featureId).secret !== bounds");
+  const altered = await discoverStateWriterBindingsForSource(modulePath, changed, "production", { enforceCurrentContracts: false, includeInventories: true });
+  assert.ok(altered.bindingInventories.flatMap(entry => entry.findings).some(finding => finding.unsupported));
+});
+
+
+test("architecture closeout migrations preserve retired sites and exact current action edges", async () => {
+  const proofs = STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT.filter(entry =>
+    entry.actionExportName === "replaceCachedCoastlineMeshesState"
+    || (entry.retiredCallerPath === "js/core/map_renderer/exact_after_settle_scheduler.js" && entry.key === "deferExactAfterSettle")
+    || (entry.retiredCallerPath === "js/ui/toolbar/palette_library_panel.js" && entry.key === "selectedColor"));
+  assert.equal(proofs.length, 6);
+  for (const [key, expected] of [
+    ["deferExactAfterSettle", "fbbf92c8f1eeae964fc8dea97d4f5e4abc78c2875669d9efeeacd9cef5fc1004"],
+    ["selectedColor", "f14469572673beeeb55c9bf721bf3e0ccd1d302a62f44e1b05b68711c1d698be"],
+  ]) {
+    const proof = proofs.find(entry => entry.key === key);
+    assert.equal(createHash("sha256").update(JSON.stringify(proof.retiredMutationSites)).digest("hex"), expected);
+  }
+  const edges = [];
+  for (const path of new Set(proofs.map(entry => entry.replacementCallerPath))) {
+    const inventory = await discoverStateWriterBindingsForSource(path, fs.readFileSync(path, "utf8"), "production", { includeInventories: true });
+    edges.push(...normalizeStateActionDelegations(inventory.bindingInventories.flatMap(entry => entry.actionDelegations)));
+  }
+  for (const proof of proofs) assert.equal(edges.filter(edge =>
+    edge.callerPath === proof.replacementCallerPath && edge.callerBindingIdentity === proof.replacementCallerBindingIdentity
+    && edge.enclosingFunctionIdentity === proof.replacementEnclosingFunctionIdentity && edge.actionModulePath === proof.actionModulePath
+    && edge.actionExportName === proof.actionExportName && edge.targetArgumentIndex === proof.targetArgumentIndex
+    && edge.sourceFingerprint === proof.replacementActionSourceFingerprint).length, 1, proof.key);
+});
+
+test("positional state owner factories accept only the exact source-bound target capability", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(entry => entry.factoryExportName === "createPaletteLibraryStateAccess");
+  const source = fs.readFileSync(entry.compositionModulePath, "utf8").replaceAll("\r\n", "\n");
+  const node = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body.find(node => node.id?.name === entry.compositionExportName);
+  const composition = source.slice(node.start, node.end);
+  const scan = (body = composition, importPath = "../core/palette_library_state_access.js") => scanStateMutationInventory([
+    'import { state as runtimeState } from "../core/state.js";',
+    `import { createPaletteLibraryStateAccess } from "${importPath}";`,
+    body,
+  ].join("\n"), { filePath: entry.compositionModulePath, bindings: [{ ...MODULE_BINDING, importSource: "../core/state.js" }], derivedAliasTaintMode: "strict" }).findings;
+  assert.equal(scan().some(f => f.reason === "state-alias-escape" && f.line === 4), false);
+  for (const findings of [scan(composition, "./fake.js"), scan(composition.replace("createPaletteLibraryStateAccess(runtimeState)", "createPaletteLibraryStateAccess(runtimeState, leak)"))]) {
+    assert.ok(findings.some(f => f.reason === "state-alias-escape"));
+  }
+});
+
+test("runtime hook presence reads retain borrowed callable invocation boundaries", () => {
+  const prefix = 'import { state as runtimeState } from "./state.js"; import { readRuntimeHook } from "./state/index.js";';
+  const scan = tail => scanStateMutations(prefix + tail, { filePath: "js/core/hook_read_fixture.js", bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }] });
+  assert.deepEqual(scan('if (!readRuntimeHook(runtimeState, "fn")) throw Error();'), []);
+  for (const tail of ['readRuntimeHook(runtimeState, "fn")();', 'const hook = readRuntimeHook(runtimeState, "fn"); hook();', 'const hook = readRuntimeHook(runtimeState, "fn"); leak(hook);']) assert.ok(scan(tail).length, tail);
+});
+
+test("chunk publication actions accept borrowed payloads and retain external-effect result aliases", async () => {
+  const prefix = 'import { state as runtimeState } from "./state.js"; import { applyScenarioChunkOptionalLayerState as apply } from "./state/actions/scenario_activation_actions.js"; import { commitScenarioPoliticalChunkPayloadState as commit } from "./state/actions/scenario_chunk_promotion_actions.js";';
+  const scan = tail => scanStateMutations(prefix + tail, { filePath: "js/core/chunk_action_fixture.js", bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }] });
+  assert.deepEqual(scan('const result = apply(runtimeState, "cities", runtimeState.scenarioCityOverridesData); Boolean(result.changed); commit(runtimeState, {payload: runtimeState.scenarioPoliticalChunkData, visiblePayload: runtimeState.scenarioPoliticalVisibleChunkData});'), []);
+  for (const tail of [
+    'const result = apply(runtimeState,"cities",runtimeState.scenarioCityOverridesData); result.externalEffect.payload.features.push({});',
+    'const result = apply(runtimeState,"cities",runtimeState.scenarioCityOverridesData); const {payload} = result.externalEffect; leak(payload);',
+  ]) assert.ok(scan(tail).length, tail);
+  const modulePath = "js/core/state/actions/scenario_activation_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  assert.deepEqual(await validateStateActionNonTargetParameterMutations(modulePath, source), []);
+  const changed = source.replace('export function applyScenarioChunkOptionalLayerState(target, layerKey, payload) {', 'export function applyScenarioChunkOptionalLayerState(target, layerKey, payload) { payload.features.push({});');
+  assert.ok((await validateStateActionNonTargetParameterMutations(modulePath, changed)).length);
+  const entry = STATE_ACTION_DELEGATION_CONTRACT.find(entry => entry.exportName === "applyScenarioChunkOptionalLayerState");
+  assert.ok(validateStateActionDelegationContract([{...entry, borrowedResultPaths: []}]).length);
 });

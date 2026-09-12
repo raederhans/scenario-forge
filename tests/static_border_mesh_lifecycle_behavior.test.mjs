@@ -226,6 +226,57 @@ test("country work yields at the CPU budget, isolates detail ADM, and publishes 
   assert.equal(metrics.at(-1)[3].complete, true);
 });
 
+test("mutable slice progress leaves borrowed topology and spatial identities untouched", () => {
+  const h = harness(); useThreeCountries(h);
+  const borrowed = {
+    topologyPrimary: Object.freeze({ id: "primary" }),
+    topology: Object.freeze({ id: "topology" }),
+    topologyDetail: Object.freeze({ id: "detail" }),
+    runtimePoliticalTopology: Object.freeze({ id: "political" }),
+    spatialItems: Object.freeze(h.state.spatialItems.map((item) => Object.freeze(item))),
+    zoomTransform: Object.freeze({ k: 5, x: 0, y: 0 }),
+  };
+  Object.assign(h.state, borrowed);
+  const before = JSON.stringify(borrowed);
+  h.owner.scheduleDeferredHeavyBorderMeshes(); h.drain();
+  for (const [key, value] of Object.entries(borrowed)) assert.equal(h.state[key], value, key);
+  assert.equal(JSON.stringify(borrowed), before);
+  assert.equal(h.events.filter(([name]) => name === "country").length, 3);
+  assert.equal(h.events.filter(([name]) => name === "snapshot").length, 1);
+  assert.equal(h.events.filter(([name]) => name === "render").length, 1);
+});
+
+for (const identityKey of ["topologyPrimary", "topology", "topologyDetail", "runtimePoliticalTopology", "spatialItems"]) {
+  test(`replacement ${identityKey} rejects a stale worker result without a revision change`, async () => {
+    const requests = [];
+    const commits = [];
+    const h = harness({
+      buildDeferredBorderMeshesAsync: (request) => new Promise((resolve) => requests.push({ request, resolve })),
+      commitDeferredBorderMeshes: (result) => { commits.push(result); return true; },
+    });
+    const initial = identityKey === "spatialItems"
+      ? Object.freeze(h.state.spatialItems.map((item) => Object.freeze(item)))
+      : Object.freeze({ id: "same-content" });
+    h.state[identityKey] = initial;
+    h.owner.scheduleDeferredHeavyBorderMeshes(); h.run(); await Promise.resolve();
+    const revision = h.state.topologyRevision;
+    h.state[identityKey] = identityKey === "spatialItems" ? [...initial] : { ...initial };
+    requests[0].resolve({ id: "stale" });
+    for (let index = 0; index < 8; index += 1) await Promise.resolve();
+    assert.equal(h.state.topologyRevision, revision);
+    assert.deepEqual(commits, []);
+    assert.equal(h.events.some(([name]) => name === "snapshot" || name === "render"), false);
+    assert.equal(h.pending.size, 1);
+    h.run(); await Promise.resolve();
+    requests[1].resolve({ id: "current" });
+    for (let index = 0; index < 8; index += 1) await Promise.resolve();
+    h.drain();
+    assert.deepEqual(commits, [{ id: "current" }]);
+    assert.equal(h.events.filter(([name]) => name === "snapshot").length, 1);
+    assert.equal(h.events.filter(([name]) => name === "render").length, 1);
+  });
+}
+
 test("canceled callbacks cannot clear or execute the replacement queue", () => {
   const h = harness(); useThreeCountries(h);
   h.owner.scheduleDeferredHeavyBorderMeshes(); h.run();

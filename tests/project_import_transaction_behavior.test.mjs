@@ -7,6 +7,7 @@ import { state } from '../js/core/state.js';
 import { getPhysicalContextLayerRequests } from '../js/core/state_defaults.js';
 import { clearHistory, pushHistoryEntry, undoHistory, redoHistory } from '../js/core/history_manager.js';
 import { prepareImportedProjectState, commitImportedProjectPatch as applyProjectImportPatch } from '../js/core/interaction_funnel/import_apply_orchestration.js';
+import { getScenarioImportValidFeatureIds } from '../js/core/interaction_funnel/import_trust_projection.js';
 import { importProjectTextThroughFunnel, importProjectThroughFunnel, getInteractionFunnelDebugState } from '../js/core/interaction_funnel.js';
 import { registerRuntimeHook } from '../js/core/state/index.js';
 import { markDirty } from '../js/core/dirty_state.js';
@@ -180,32 +181,23 @@ test('preflight preserves unloaded trusted owners without selecting its target s
   assert.equal(prepared.importSummary.scenarioId, 'target');
 });
 
-test('plain project preflight preserves base detail regions while leaving an active scenario', async () => {
-  const fields = ['activeScenarioId', 'activeScenarioManifest', 'topologyPrimary', 'topologyDetail',
-    'defaultRuntimePoliticalTopology', 'runtimePoliticalTopology', 'runtimeFeatureIds', 'landData'];
-  const saved = Object.fromEntries(fields.map(key => [key, state[key]]));
+test('plain project trust projection preserves base detail regions and excludes outgoing scenario identities', () => {
   const topology = id => ({ objects: { political: { geometries: [{ id }] } } });
-  try {
-    state.activeScenarioId = 'tno_1962';
-    state.activeScenarioManifest = { display_name: 'TNO 1962' };
-    state.topologyPrimary = topology('AF');
-    state.topologyDetail = topology('AFG-1741');
-    state.defaultRuntimePoliticalTopology = null;
-    state.runtimePoliticalTopology = topology('ATLPRV_18225');
-    state.runtimeFeatureIds = ['ATLPRV_18225'];
-    state.landData = { features: [{ id: 'ATLPRV_18225' }] };
-    const prepared = await prepareImportedProjectState({
-      data: { scenario: null, visualOverrides: { 'AFG-1741': '#123456', ATLPRV_18225: '#ffffff' },
-        sovereigntyByFeatureId: { 'AFG-1741': 'AFG' } },
-      ui, debugState: {}, getScenarioResourcesModule: async () => ({}),
-      getScenarioManagerModule: async () => ({ prepareScenarioForProjectImport: async () => null }),
-    });
-    assert.deepEqual(prepared.data.visualOverrides, { 'AFG-1741': '#123456' });
-    assert.deepEqual(prepared.data.sovereigntyByFeatureId, { 'AFG-1741': 'AFG' });
-    assert.equal(prepared.importSummary.scenarioId, '');
-    assert.equal(prepared.importSummary.scenarioName, '');
-    assert.equal(state.activeScenarioId, 'tno_1962');
-  } finally { Object.assign(state, saved); }
+  const outgoingRuntimeIds = ['ATLPRV_18225'];
+  const target = Object.freeze({
+    activeScenarioId: 'tno_1962',
+    topologyPrimary: topology('AF'),
+    topologyDetail: topology('AFG-1741'),
+    defaultRuntimePoliticalTopology: null,
+    runtimePoliticalTopology: topology(outgoingRuntimeIds[0]),
+    runtimeFeatureIds: outgoingRuntimeIds,
+    landData: { features: [{ id: outgoingRuntimeIds[0] }] },
+  });
+  const validIds = getScenarioImportValidFeatureIds(target, null);
+  assert.deepEqual([...validIds].sort(), ['AF', 'AFG-1741']);
+  assert.equal(validIds.has(outgoingRuntimeIds[0]), false);
+  assert.equal(target.activeScenarioId, 'tno_1962');
+  assert.deepEqual(target.runtimeFeatureIds, outgoingRuntimeIds);
 });
 
 test('stale palette completion cannot commit or restore over a newer selection', async () => {

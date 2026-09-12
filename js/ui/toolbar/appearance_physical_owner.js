@@ -221,7 +221,7 @@ export function createAppearancePhysicalOwner({
       }
       if (reason === "physical-mode" && runtimeState.showPhysical
         && typeof runtimeState.ensureContextLayerDataFn === "function") {
-        void runtimeState.ensureContextLayerDataFn(getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason, renderNow: true });
+        void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason, renderNow: true });
       }
       renderDirty(reason);
     });
@@ -234,7 +234,7 @@ export function createAppearancePhysicalOwner({
       nodes.togglePhysical.addEventListener("change", (event) => {
         setAppearanceVisibilityState(runtimeState, "showPhysical", event.target.checked);
         if (runtimeState.showPhysical && typeof runtimeState.ensureContextLayerDataFn === "function") {
-          void runtimeState.ensureContextLayerDataFn(getPhysicalContextLayerRequests(runtimeState.styleConfig?.physical), { reason: "toolbar-toggle", renderNow: true });
+          void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", getPhysicalContextLayerRequests(runtimeState.styleConfig?.physical), { reason: "toolbar-toggle", renderNow: true });
         }
         renderDirty("toggle-physical");
       });
@@ -343,3 +343,4 @@ export function createAppearancePhysicalOwner({
     syncPhysicalConfig,
   };
 }
+import { callCompatRuntimeHook } from "../../core/state/index.js";

@@ -116,9 +116,9 @@ function getScenarioChunkSelectionDiagnostics(runtimeState) {
     : {};
   return {
     selectionVersion: Math.max(0, Number(loadState.selectionVersion || lastSelection.selectionVersion || 0)),
-    requiredChunkIds: Array.isArray(lastSelection.requiredChunkIds) ? [...lastSelection.requiredChunkIds] : [],
-    cacheOnlyChunkIds: Array.isArray(lastSelection.cacheOnlyChunkIds) ? [...lastSelection.cacheOnlyChunkIds] : [],
-    retainedActiveChunkIds: Array.isArray(lastSelection.retainedActiveChunkIds) ? [...lastSelection.retainedActiveChunkIds] : [],
+    requiredChunkIds: Array.isArray(lastSelection.requiredChunkIds) ? Array.from(lastSelection.requiredChunkIds) : [],
+    cacheOnlyChunkIds: Array.isArray(lastSelection.cacheOnlyChunkIds) ? Array.from(lastSelection.cacheOnlyChunkIds) : [],
+    retainedActiveChunkIds: Array.isArray(lastSelection.retainedActiveChunkIds) ? Array.from(lastSelection.retainedActiveChunkIds) : [],
   };
 }
 

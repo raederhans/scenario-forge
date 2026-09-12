@@ -123,13 +123,8 @@ test("physical layer source contracts stay wired to the expected renderer and st
     contourUsesAdaptiveColor:
       /drawContourCollection[\s\S]*?colorResolver = null/.test(physicalLayerOwnerSource)
       && /drawPhysicalContourLayer[\s\S]*?colorResolver: resolveContourColor/.test(physicalLayerOwnerSource),
-    contourUsesVisibleSetCache:
-      /function getContourVisibleFeatures\(/.test(rendererSource)
-      && /contourVisibleSetCache\[cacheSlot\] = \{[\s\S]*?collectionRef: collection,[\s\S]*?features: visibleFeatures,/.test(rendererSource),
-    contourMergesBoundsAndFilter:
-      /function getContourVisibleFeatures[\s\S]*?const screenBounds = getFeatureScreenBounds\(feature, \{ allowCompute: false \}\) \|\| getFeatureScreenBounds\(feature\);/.test(rendererSource)
-      && /function getContourVisibleFeatures[\s\S]*?rectsIntersect\(screenBounds, viewportBounds\)/.test(rendererSource)
-      && /function drawContourCollection[\s\S]*?const visibleFeatures = getContourVisibleFeatures\(collection, \{/.test(physicalLayerOwnerSource),
+    // Selection, cache identity and reset behavior are covered by
+    // physical_contour_visible_set_owner_behavior.test.mjs.
     contourUsesStrokeBatching:
       /function drawContourCollection[\s\S]*?const strokeBatches = new Map\(\);/.test(physicalLayerOwnerSource)
       && /const batchKey = `\$\{strokeColor\}\|\$\{multiplier\.toFixed\(2\)\}`;/.test(physicalLayerOwnerSource)
@@ -181,9 +176,10 @@ test("physical layer source contracts stay wired to the expected renderer and st
     schedulesDeferredContourWarmup:
       /if \(targetRuntime\.showPhysical\) \{[\s\S]*?requestedLayerNames\.push\("physical-set"\);[\s\S]*?requestedContourLayerNames\.push\("physical-contours-set"\);/.test(startupReadyHandoffSource)
       && /postReadyScheduler\.scheduleTask\("post-ready-contour-warmup", async \(task\) => \{[\s\S]*?task\.throwIfStale\(\);[\s\S]*?await task\.yield\(\);[\s\S]*?await task\.waitFor\(ensureContextLayerDataReady\(requestedContourLayerNames, \{[\s\S]*?reason: "post-ready-contours",[\s\S]*?renderNow: false,[\s\S]*?task\.commit\(\(\) => requestMainRender\("post-ready-contours"\)\);[\s\S]*?\}, scopedTaskOptions\(\{/.test(startupReadyHandoffSource),
-    toolbarToggleLoadsRequestedPhysicalSet:
-      /ensureContextLayerDataFn\(getPhysicalContextLayerRequests\(runtimeState\.styleConfig\?\.physical\), \{ reason: "toolbar-toggle", renderNow: true \}\)/.test(physicalOwnerSource)
-      && /physicalOwner\.bindEvents\(\);/.test(appearanceControllerSource),
+    // The requested layers and load options are exercised through actual toggle
+    // events in appearance_physical_owner_behavior.test.mjs.
+    toolbarBindsPhysicalOwner:
+      /physicalOwner\.bindEvents\(\);/.test(appearanceControllerSource),
     projectImportLoadsRequestedPhysicalSet:
       /for \(const \[visible, name, layer\] of \[[\s\S]*?\[state\.showPhysical, "physical", getPhysicalContextLayerRequests\(state\.styleConfig\?\.physical\)\],[\s\S]*?\]\) if \(visible\) complete\(name, async \(\{ isCurrent: valid, signal \}\) => \{\s*const result = await callRuntimeHook\(state, "ensureContextLayerDataFn", layer, \{ reason: "project-import", renderNow: false, isCurrent: valid, signal \}\);\s*if \(valid\(\)\) validateImportedContextLayerResult\(result\);/.test(interactionFunnelSource)
       && /job = createProjectImportCompletion\(\{ required, optional, isCurrent,/.test(interactionFunnelSource)

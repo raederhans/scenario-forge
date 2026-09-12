@@ -1,9 +1,23 @@
+import { parse as parseJavaScript } from "acorn";
+import * as astWalk from "acorn-walk";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
+import {
+  STATE_BORROWED_EFFECT_CONTRACT,
+  STATE_BORROWED_CALLBACK_INJECTION_CONTRACT,
+  STATE_BORROWED_RUNTIME_CONTRACT,
+  STATE_BORROWED_OWNER_EFFECT_CONTRACT,
+  inspectStateBorrowedOwnerEffectSources,
+  STATE_BORROWED_SCOPED_OPERATION_CONTRACT,
+  inspectStateBorrowedScopedOperationSources,
+  inspectStateBorrowedRuntimeSources,
+  inspectStateBorrowedCallbackInjectionSources,
+  inspectStateBorrowedEffectSource,
+} from "./state_borrowed_effect_contract.mjs";
 
 import {
   DERIVED_ALIAS_TAINT_MODES,
@@ -26,6 +40,8 @@ import {
   inspectStateTargetPureReaderFunctionSource,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
   STATE_ACTION_DELEGATION_CONTRACT,
+  STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT,
+  STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT,
   STATE_DETACHED_CAPTURE_CONTRACT,
   STATE_TARGET_PURE_READER_CONTRACT,
   validateStateActionCrossFileMigrationContract,
@@ -3769,6 +3785,29 @@ function isCompatFacadePath(relativePath) {
   return normalizeRelativePath(relativePath) === "js/core/state/index.js";
 }
 
+function borrowedMapStorageArgumentSites(relativePath, source, entry) {
+  const contract = STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT.find(candidate =>
+    candidate.modulePath === relativePath && candidate.exportName === entry.exportName);
+  if (!contract) return new Set();
+  const normalized = normalizeJavaScriptSource(source);
+  if (createHash("sha256").update(normalized).digest("hex") !== contract.moduleSourceFingerprint) return new Set();
+  const ast = parseJavaScript(normalized, { ecmaVersion: "latest", sourceType: "module", locations: true });
+  const fn = ast.body.map(node => node.declaration).find(node => node?.id?.name === entry.exportName);
+  if (!fn || createHash("sha256").update(normalized.slice(fn.start, fn.end).trim()).digest("hex") !== contract.sourceFingerprint) return new Set();
+  const sites = new Set();
+  astWalk.simple(fn.body, { CallExpression(node) {
+    const method = node.callee;
+    const receiver = method?.object;
+    if (method?.type !== "MemberExpression" || method.computed || !["get", "set", "delete"].includes(method.property.name)
+      || receiver?.type !== "MemberExpression" || receiver.computed || receiver.property.name !== contract.containerField
+      || receiver.object?.type !== "Identifier" || receiver.object.name !== contract.targetParameterName) return;
+    for (const argument of node.arguments) {
+      if (argument.type === "Identifier") sites.add(`${argument.loc.start.line}:${argument.loc.start.column + 1}:${argument.name}`);
+    }
+  }});
+  return sites;
+}
+
 export async function validateStateActionNonTargetParameterMutations(
   relativePath,
   source,
@@ -3784,6 +3823,7 @@ export async function validateStateActionNonTargetParameterMutations(
   }
   const violations = [];
   for (const entry of contractEntries || []) {
+    const storageSites = borrowedMapStorageArgumentSites(relativePath, source, entry);
     for (
       const candidate of discovery.bindings.filter(
         ({ functionName }) => functionName === entry.exportName,
@@ -3802,6 +3842,8 @@ export async function validateStateActionNonTargetParameterMutations(
         binding,
       );
       for (const finding of mutationFindings) {
+        if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
+          && storageSites.has(`${finding.line}:${finding.column}:${candidate.parameterName}`)) continue;
         const conservativeMutationEvidence = Boolean(
           !finding?.unsupported
           || finding.reason !== "state-alias-escape"
@@ -4190,6 +4232,20 @@ export async function discoverStateWriterBindingsForSource(
     includeInventories = false,
   } = {},
 ) {
+  if (enforceCurrentContracts) {
+    for (const entry of STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT.filter(entry => entry.modulePath === relativePath)) {
+      validateEffectfulDelegatorSource(source, entry);
+    }
+    for (const entry of STATE_BORROWED_EFFECT_CONTRACT.filter(entry => entry.modulePath === relativePath)) {
+      const { violations } = inspectStateBorrowedEffectSource(source, entry);
+      if (violations.length) {
+        const error = new Error(`Borrowed effect source proof failed: ${relativePath}`);
+        error.code = "state-borrowed-effect-contract-violation";
+        error.violations = violations;
+        throw error;
+      }
+    }
+  }
   const normalizedDerivedAliasTaintMode =
     normalizeDerivedAliasTaintMode(derivedAliasTaintMode);
   if (surface === "test") {
@@ -5576,7 +5632,65 @@ function summarizeWriterClassification(bindings) {
 
 // P4.0 冻结基线后，各阶段只能基于 previousPolicy 递进生成；显式刷新
 // 被限制在 P4.0，防止维护命令悄悄重定义历史允许面。
+function validateEffectfulDelegatorSource(source, entry) {
+  if (createHash("sha256").update(normalizeJavaScriptSource(source)).digest("hex") !== entry.sourceFingerprint) {
+    const error = new Error(`Effectful delegator source proof failed: ${entry.modulePath}`);
+    error.code = "state-effectful-delegator-source-mismatch";
+    throw error;
+  }
+}
+
 export async function validateImportedBorrowedProjectionSources() {
+  for (const entry of STATE_BORROWED_SCOPED_OPERATION_CONTRACT) {
+    const { violations } = inspectStateBorrowedScopedOperationSources(entry);
+    if (violations.length) {
+      const error = new Error(`Borrowed scoped operation proof failed: ${entry.factoryModulePath}`);
+      error.code = "state-borrowed-scoped-operation-source-mismatch";
+      error.violations = violations;
+      throw error;
+    }
+  }
+  for (const entry of STATE_BORROWED_OWNER_EFFECT_CONTRACT) {
+    const { violations } = inspectStateBorrowedOwnerEffectSources(entry);
+    if (violations.length) {
+      const error = new Error(`Borrowed owner effect proof failed: ${entry.factoryModulePath}`);
+      error.code = "state-borrowed-owner-effect-source-mismatch";
+      error.violations = violations;
+      throw error;
+    }
+  }
+  for (const entry of STATE_BORROWED_RUNTIME_CONTRACT) {
+    const { violations } = inspectStateBorrowedRuntimeSources(entry);
+    if (violations.length) {
+      const error = new Error(`Borrowed runtime source proof failed: ${entry.factoryModulePath}`);
+      error.code = "state-borrowed-runtime-source-mismatch";
+      error.violations = violations;
+      throw error;
+    }
+  }
+  for (const entry of STATE_BORROWED_CALLBACK_INJECTION_CONTRACT) {
+    const { violations } = inspectStateBorrowedCallbackInjectionSources(entry);
+    if (violations.length) {
+      const error = new Error(`Callback injection source proof failed: ${entry.modulePath}#${entry.parameterName}`);
+      error.code = "state-callback-injection-source-mismatch";
+      error.violations = violations;
+      throw error;
+    }
+  }
+
+  for (const entry of STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT) {
+    validateEffectfulDelegatorSource(await fs.readFile(path.join(PROJECT_ROOT, entry.modulePath), "utf8"), entry);
+  }
+  for (const entry of STATE_BORROWED_EFFECT_CONTRACT) {
+    const source = await fs.readFile(path.join(PROJECT_ROOT, entry.modulePath), "utf8");
+    const { violations } = inspectStateBorrowedEffectSource(source, entry);
+    if (violations.length) {
+      const error = new Error(`Borrowed effect source proof failed: ${entry.modulePath}#${entry.exportName}`);
+      error.code = "state-borrowed-effect-contract-violation";
+      error.violations = violations;
+      throw error;
+    }
+  }
   const seen = new Set();
   for (const entry of STATE_IMPORTED_BORROWED_PROJECTION_CONTRACT) {
     const id = `${entry.modulePath}#${entry.exportName}`;

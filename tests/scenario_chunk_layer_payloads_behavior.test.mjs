@@ -184,3 +184,40 @@ test("persistent political coverage shares the complete payload across viewport 
   assert.equal(withoutProjector.primaryMergedLayerPayloads.political.features, merged.features);
   assert.equal(withoutProjector.primaryMergedLayerPayloads.political, withoutProjector.mergedLayerPayloads.political);
 });
+
+test("merge preserves frozen input and borrowed output identities while private viewport cache stays effective", () => {
+  const { bundle, state, oldPolitical } = fixture();
+  const freeze = value => {
+    if (!value || typeof value !== "object") return value;
+    Object.values(value).forEach(freeze);
+    return Object.freeze(value);
+  };
+  freeze(bundle);
+  freeze(state);
+  const calls = [];
+  const primary = Object.freeze({ features: Object.freeze(["visible"]) });
+  const stats = Object.freeze({ visibleFeatureCount: 1 });
+  const options = freeze({
+    activeChunkIds: ["a"], viewportBbox: [0, 1, 2, 3],
+    previousSignatures: { political: "same", removed: "removed" },
+    nextSignatures: { political: "same" },
+    previousMergedLayerPayloads: state.mergedLayerPayloads,
+    mergeScenarioChunkPayloads() { throw new Error("unchanged layer must reuse its payload"); },
+    mergeScenarioChunkPayloadsForViewport(layerKey, entries, viewport) {
+      calls.push(layerKey);
+      assert.equal(entries[0].payload, state.payloadByChunkId.a.payload);
+      assert.equal(entries[0].chunk, bundle.chunkRegistry.byLayer.political[0]);
+      assert.equal(viewport, options.viewportBbox);
+      return { payload: primary, stats };
+    },
+  });
+  const first = buildMergedScenarioChunkLayerPayloads(bundle, state, options);
+  const second = buildMergedScenarioChunkLayerPayloads(bundle, state, options);
+  assert.equal(first.mergedLayerPayloads.political, oldPolitical);
+  assert.equal(second.mergedLayerPayloads.political, oldPolitical);
+  assert.equal(first.primaryMergedLayerPayloads.political, primary);
+  assert.equal(second.primaryMergedLayerPayloads.political, primary);
+  assert.equal(second.primaryLayerStats.political, stats);
+  assert.deepEqual(calls, ["political"]);
+  assert.deepEqual(first.changedLayerKeys, ["city", "removed"]);
+});

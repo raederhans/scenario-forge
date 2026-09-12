@@ -20,6 +20,7 @@ const geometry = () => ({ type: "LineString", coordinates: [[10.123456789, 20], 
 test("cached paths preserve direct geoPath coordinates and survive feature wrappers", () => {
   const projection = d3.geoMercator();
   const cache = createProjectedGeographicPathCache({ getProjection: () => projection, geoPath: d3.geoPath, Path2DClass: RecordingPath });
+  assert.equal(Object.isFrozen(cache), true);
   const feature = { type: "Feature", properties: {}, geometry: geometry() };
   const path = cache.getPath(feature);
   const direct = new RecordingPath();
