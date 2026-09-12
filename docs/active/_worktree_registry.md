@@ -6,7 +6,7 @@
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| [架构与城市点位整合](global-state-boundaries-20260912/task.md) | 用户授权整合本轮全部正式改动；codex/palette-operation-boundary基于fbf2d39a。状态策略真实checker、目标测试与dist已通过；PR必需检查和合并待完成。法德地块为未发布隔离试点，保留候选与证据；保留干净contours证据工作树及.playwright-mcp。 |
+| [架构与城市点位整合](global-state-boundaries-20260912/task.md) / [PR #135](https://github.com/raederhans/scenario-forge/pull/135) | 整合提交3fd7478，状态策略真实checker、城市49项目标测试与dist已通过；远端必需检查和合并回执以PR为准。法德地块为未发布隔离试点，保留候选与证据；保留干净contours证据工作树及.playwright-mcp。 |
 | [9 月 11 日整批改动整合](daily-integration-20260911/task.md) | 用户授权合并当天全部产品改动；分支 `codex/daily-integration-20260911`，基于已合并 PR #131 的 `d25da73a`。覆盖城市灯光、海洋几何、亚特兰托帕、UI 与国家名称；远端检查和合并回执以关联 PR 为准。保留 contours 工作树及历史诊断文件。 |
 | [近期地图改动整合](cartography-integration-20260910/task.md) | 整合等值线P1–P4、城区渲染、TNO地名及地中海补缝；本地目标测试、三剧本严格契约、dist及两组地图检查通过。交付分支codex/cartography-integration-20260910，main与远端检查状态以任务回执为准；原工作区和contours证据工作区保留。 |
 | [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) / [PR #127](https://github.com/raederhans/scenario-forge/pull/127) | 本轮导入事务、调度生命周期、城市身份及发布产物改进已完成本地验证。用户已授权远端合并推送和工作树清理；必需检查、合并与清理结果以该任务及下方回执为准。完整 P4 未准入。 |

@@ -2,7 +2,7 @@
 
 ## Current status
 
-用户追加授权：将本轮架构与点位改动一起完成合并推送。当前进入受保护main的PR整合，远端检查与合并待完成。地块对话仅交付法德隔离试点，明确未修改生产代码/data/dist且未达到完整数据修复发布标准；本次保留其.runtime候选和证据，不将其替换为生产数据。点位正式改动已包含在本工作区。
+用户追加授权：将本轮架构与点位改动一起完成合并推送。整合提交3fd7478已推送，交付与远端必需检查、合并回执统一见[PR #135](https://github.com/raederhans/scenario-forge/pull/135)。最终城市组合49/49通过；EOF格式清理后6个reader来源证明通过、dist重建成功。地块对话仅交付法德隔离试点，明确未修改生产代码/data/dist且未达到完整数据修复发布标准；本次保留其.runtime候选和证据，不将其替换为生产数据。点位正式改动已包含在整合提交中。
 
 本次continuation已完成：原计划的Palette能力边界、真实UI owner生命周期、等高线可见集职责和全局策略均已闭合。最终builder和真实checker均exit0，215 writers、610 bindings，violations/unknown/stale均0；allowlist通过。数据升级试点目录和服务未操作，未提交、推送或发布。下列旧轮验证保留为历史证据，最新结果以本节和最新验证条目为准。
 
