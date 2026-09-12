@@ -4,18 +4,12 @@ const CITY_LABEL_MAX_WIDTH_PX = {
   dense: { capital: 166, major: 148, regional: 132, minor: 120 },
 };
 
-const CITY_ADMIN_LABEL_PATTERNS = [
-  /\bcounty\b/giu,
-  /\bdistrict\b/giu,
-  /\boblast\b/giu,
-  /\bokrug\b/giu,
-  /\braion\b/giu,
-  /\bmunicipality\b/giu,
-  /\bgovernorate\b/giu,
-  /городской округ/giu,
-  /район/giu,
-  /область/giu,
-];
+// Remove administrative descriptors only; parentheses can identify the river or
+// region of a city (Frankfurt (Oder), Halle (Saale), Kempten (Allgäu)).
+const CITY_ADMIN_DESCRIPTOR = String.raw`(?:独立城市|非县辖城市|非县辖市|城市区|克莱斯自由城|\b(?:kreisfreie\s+stadt|stadtkreis|independent\s+city|county|oblast|okrug|raion|municipality|governorate)\b|городской округ|район|область)`;
+const CITY_ADMIN_PARENTHETICAL = new RegExp(String.raw`\s*[（(]\s*${CITY_ADMIN_DESCRIPTOR}\s*[）)]`, "giu");
+const CITY_ADMIN_SUFFIX = new RegExp(String.raw`[\s,，、;；:-]*${CITY_ADMIN_DESCRIPTOR}(?=\s*(?:[（(\[].*?[）)\]]\s*)*$)`, "giu");
+const CITY_ADMIN_PREFIX = /^(?:kreisfreie\s+stadt|stadtkreis|independent\s+city\s+of)\s+/iu;
 
 const CITY_ADMIN_LABEL_REJECT_PATTERNS = [
   /\bcounty\b/iu,
@@ -151,7 +145,7 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     ).trim();
   }
 
-  function getCityDisplayLabel(feature) {
+  function resolveCityDisplayLabel(feature) {
     const props = feature?.properties || {};
     const overrideLabel = getCityOverrideDisplayLabel(feature);
     if (overrideLabel) {
@@ -201,19 +195,25 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     return rawFallback;
   }
 
-  function cleanCityMapLabelText(label = "") {
+  function cleanCityMapLabelText(label = "", feature = null) {
     const rawLabel = String(label || "").trim();
     if (!rawLabel) return "";
     let cleaned = rawLabel
-      .replace(/\s*\(([^)]*)\)\s*/g, " ")
-      .replace(/\s*,\s*/g, " ")
+      .replace(CITY_ADMIN_PARENTHETICAL, "")
+      .replace(CITY_ADMIN_SUFFIX, "")
+      .replace(CITY_ADMIN_PREFIX, "")
       .replace(/\s+/g, " ")
       .trim();
-    CITY_ADMIN_LABEL_PATTERNS.forEach((pattern) => {
-      cleaned = cleaned.replace(pattern, " ").replace(/\s+/g, " ").trim();
-    });
-    cleaned = cleaned.replace(/^[\s,;:-]+|[\s,;:-]+$/g, "").trim();
-    return cleaned.length >= 3 ? cleaned : rawLabel;
+    const props = feature?.properties || {};
+    const countryCode = String(props.__city_country_code || props.country_code || "").trim().toUpperCase();
+    if (countryCode === "DE") {
+      cleaned = cleaned.replace(/[\s,，、]*(?:无区城市|无区市|自由城|城市地区|市区)$/u, "").trim();
+    }
+    return cleaned || rawLabel;
+  }
+
+  function getCityDisplayLabel(feature) {
+    return cleanCityMapLabelText(resolveCityDisplayLabel(feature), feature);
   }
 
   function isCjkText(value = "") {
@@ -269,7 +269,7 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
   }
 
   function formatCityMapLabel(fullLabel, { entry = null, context: labelContext = null, config = {}, scale = 1 } = {}) {
-    const rawLabel = String(fullLabel || "").trim();
+    const rawLabel = cleanCityMapLabelText(fullLabel, entry?.feature);
     if (!rawLabel || !labelContext?.measureText) {
       return rawLabel;
     }

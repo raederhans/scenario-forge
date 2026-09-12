@@ -99,7 +99,10 @@ test("commit runner CLI takes explicit changed files and fails closed for malfor
     runner: (bin, args) => { calls.push([bin, args]); return { status: 0 }; },
   }), 0);
   assert.equal(calls.some(([bin]) => bin === "git"), false);
-  assert.ok(calls.at(-1)[1].includes("tests/border_mesh_owner_behavior.test.mjs"));
+  assert.deepEqual(
+    calls.filter(([bin, args]) => bin === "node" && args[0] === "--test").flatMap(([, args]) => args.slice(1)),
+    ["tests/border_mesh_owner_behavior.test.mjs", "tests/state_owner_borrowed_storage_behavior.test.mjs"],
+  );
 });
 
 test("commit executes canonical controls once through platform preflight and shared executor", () => {
@@ -135,7 +138,10 @@ test("registered product edits retain import integrity and focused behavior only
   assert.deepEqual(plan.requiredCanonicalCommandRefs, []);
   const result = executionFor([PRODUCT_FILE]);
   assert.equal(result.exitCode, 0);
-  assert.deepEqual(result.executionPlan.selectedLeaves.map((leaf) => leaf.target), ["tests/border_mesh_owner_behavior.test.mjs"]);
+  assert.deepEqual(result.executionPlan.selectedLeaves.map((leaf) => leaf.target), [
+    "tests/border_mesh_owner_behavior.test.mjs",
+    "tests/state_owner_borrowed_storage_behavior.test.mjs",
+  ]);
   for (const extra of ["js/new_unregistered_module.js", "package.json", "tests/example.test.mjs", "data/example.json"]) {
     const escalated = buildCommitVerificationPlan([PRODUCT_FILE, extra]);
     assert.ok(escalated.commands.some(([, args]) => args.includes("verify:script-portfolio")), extra);

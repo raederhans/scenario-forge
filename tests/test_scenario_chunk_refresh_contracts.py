@@ -792,7 +792,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
 
         self.assertIn("applyScenarioPoliticalChunkPayload(", visual_slice)
         self.assertIn("await yieldToFrame();", visual_slice)
-        self.assertIn("isPendingScenarioChunkPromotionCurrent(pendingPromotion, loadState, { scenarioId, runId })", visual_slice)
+        self.assertIn("isPendingScenarioChunkPromotionCurrent({", visual_slice)
         self.assertIn("canRollbackPromotionContinuation()", visual_slice)
         self.assertIn("restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);", visual_slice)
         self.assertIn(
@@ -842,23 +842,13 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             ),
             4,
         )
-        ownership_start = self.scenario_chunk_runtime_source.index(
-            "function resolvePendingScenarioChunkPromotionOwnedScenarioId("
-        )
-        ownership_end = self.scenario_chunk_runtime_source.index(
-            "async function applyPendingScenarioChunkPromotion",
-            ownership_start,
-        )
-        ownership_slice = self.scenario_chunk_runtime_source[ownership_start:ownership_end]
-        self.assertIn("runtimeState.runtimeChunkLoadState !== loadState", ownership_slice)
-        self.assertIn("promotionCommitRunId !== runId", ownership_slice)
-        self.assertIn("loadState.promotionCommitRunId", ownership_slice)
-        self.assertIn(
-            "normalizedScenarioId !== normalizeScenarioId(runtimeState.activeScenarioId)",
-            ownership_slice,
-        )
+        query_source = (ROOT / "js/core/scenario/chunk_promotion_queries.js").read_text(encoding="utf-8")
+        self.assertIn("currentLoadState !== loadState", query_source)
+        self.assertIn("promotionCommitRunId !== runId", query_source)
+        self.assertIn("loadState.promotionCommitRunId", query_source)
+        self.assertIn("scenarioId !== activeScenarioId", query_source)
         restore_start = self.scenario_chunk_runtime_source.index("function restoreMergedLayerRuntimeSnapshot")
-        restore_end = self.scenario_chunk_runtime_source.index("function isPendingScenarioChunkPromotionCurrent", restore_start)
+        restore_end = self.scenario_chunk_runtime_source.index("async function applyPendingScenarioChunkPromotion", restore_start)
         restore_slice = self.scenario_chunk_runtime_source[restore_start:restore_end]
         self.assertIn("restoreScenarioChunkPromotionState(runtimeState, [entry])", restore_slice)
         self.assertIn("if (!Array.isArray(restoreResult?.externalEffects))", restore_slice)

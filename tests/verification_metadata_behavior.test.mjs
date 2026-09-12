@@ -263,7 +263,7 @@ test("local owner feedback selects existing behavior without admitting broader r
     ["js/core/renderer/ocean_render_owner.js", "tests/ocean_render_owner_behavior.test.mjs"],
     ["js/core/renderer/renderer_viewport_update_owner.js", "tests/renderer_viewport_update_owner_behavior.test.mjs"],
     ["js/core/map_renderer/map_hover_interaction_owner.js", "tests/map_hover_interaction_owner_behavior.test.mjs"],
-    ["js/core/renderer/city_lights_render_owner.js", "tests/city_lights_render_owner_behavior.test.mjs"],
+    ["js/core/renderer/city_lights_render_owner.js", "tests/city_lights_render_owner_behavior.test.mjs", ["tests/state_owner_borrowed_storage_behavior.test.mjs"]],
     ["js/ui/sidebar/project_support_diagnostics_controller.js", "tests/project_support_diagnostics_controller_behavior.test.mjs"],
     ["tools/run_commit_verification.mjs", "tests/verify_commit_runner_behavior.test.mjs"],
     ["js/ui/sidebar/strategic_overlay/unit_counter_catalog_helper.js", "tests/unit_counter_catalog_behavior.test.mjs"],
@@ -280,13 +280,16 @@ test("local owner feedback selects existing behavior without admitting broader r
     buildAdaptiveEntrypointRecommendation(files, routes, { entrypoint }), entrypoint, { preparedCatalog },
   );
   for (const entrypoint of ["edit", "impact"]) {
-    for (const [source, testFile] of cases) {
+    for (const [source, testFile, additionalTests = []] of cases) {
       const local = select([source, testFile], entrypoint);
       assert.deepEqual(local.unmatchedChangedFiles, [], source);
       assert.deepEqual(local.localEntrypointRouteGaps, [], source);
-      assert.deepEqual(local.recommendedCommands.map((entry) => entry.commandRef), ["node --test " + testFile], source);
-      assert.equal(local.recommendedCommands[0].executionOwner, "child-safe");
-      assert.deepEqual(local.recommendedCommands[0].resourceLocks, []);
+      assert.deepEqual(local.recommendedCommands.map((entry) => entry.commandRef),
+        [testFile, ...additionalTests].map((file) => "node --test " + file), source);
+      for (const command of local.recommendedCommands) {
+        assert.equal(command.executionOwner, "child-safe");
+        assert.deepEqual(command.resourceLocks, []);
+      }
       if (source.startsWith("js/") && !source.includes("unit_counter_catalog_helper")) {
         assert.ok(local.matchedByFile[0].deferredByTier.length > 0, source);
       }
@@ -632,6 +635,7 @@ test("gate policy authored arrays normalize stably and reject duplicate policy v
 const P4_POLICY_SOURCE_REFS = Object.freeze([
   "tools/state_writer_inventory.mjs",
   "tools/state_action_delegation_contract.mjs",
+  "tools/state_borrowed_effect_contract.mjs",
   "tools/state_writer_policy.mjs",
   "tools/state_writer_policy.json",
   "tools/build_state_writer_policy.mjs",

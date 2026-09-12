@@ -182,6 +182,40 @@ export function registerRuntimeHook(target, hookName, hook) {
   return getHandlerDispatcher(normalizedHookName);
 }
 
+// The registry is application-wide; target is only the legacy compatibility surface.
+// Each owner registration has its own identity, even when callbacks are reused.
+export function registerOwnedRuntimeHook(target, hookName, hook) {
+  const name = String(hookName || "").trim();
+  if (!isRuntimeHookBusEventName(name) && !isRuntimeHookHandlerName(name)) {
+    throw new TypeError(`Unknown runtime hook: ${name}`);
+  }
+  if (typeof hook !== "function") {
+    throw new TypeError(`Runtime hook requires a function: ${name}`);
+  }
+  registerRuntimeHook(target, name, (...args) => hook(...args));
+  const registered = readRegisteredRuntimeHookSource(target, name);
+  let disposed = false;
+  return () => {
+    if (disposed) return;
+    disposed = true;
+    if (readRegisteredRuntimeHookSource(target, name) === registered) {
+      registerRuntimeHook(target, name, null);
+    }
+  };
+}
+
+// Use at required command call sites. Optional notifications keep callRuntimeHook.
+export function callRequiredRuntimeHook(target, hookName, ...args) {
+  const name = String(hookName || "").trim();
+  if (!isRuntimeHookHandlerName(name)) {
+    throw new TypeError(`Required runtime hook must be a handler: ${name}`);
+  }
+  bindStateCompatSurface(target);
+  const hook = handlerFnsByHookName.get(name);
+  if (!hook) throw new Error(`Required runtime hook is not registered: ${name}`);
+  return hook(...args);
+}
+
 export function callRuntimeHook(target, hookName, ...args) {
   const normalizedHookName = String(hookName || "").trim();
   if (!normalizedHookName) {
@@ -196,6 +230,29 @@ export function callRuntimeHook(target, hookName, ...args) {
     return undefined;
   }
   return hook(...args);
+}
+
+// Invoke the existing compatibility surface without binding or replacing it.
+// Legacy callers may supply a plain target whose hook depends on its receiver.
+export function callCompatRuntimeHook(target, hookName, ...args) {
+  const normalizedHookName = String(hookName || "").trim();
+  if (!isRuntimeHookBusEventName(normalizedHookName) && !isRuntimeHookHandlerName(normalizedHookName)) {
+    throw new TypeError(`Unknown runtime hook: ${normalizedHookName}`);
+  }
+  return target[normalizedHookName]?.(...args);
+}
+
+// Deferred work can capture the current callback without retaining the state root.
+// Preserve the bare-call receiver of legacy captured hooks, including strict mode.
+export function captureCompatRuntimeHook(target, hookName) {
+  const name = String(hookName || "").trim();
+  if (!isRuntimeHookBusEventName(name) && !isRuntimeHookHandlerName(name)) {
+    throw new TypeError(`Unknown runtime hook: ${name}`);
+  }
+  const callback = target?.[name];
+  return typeof callback === "function"
+    ? (...args) => Reflect.apply(callback, undefined, args)
+    : undefined;
 }
 
 export function callRuntimeHooks(target, hookNames, ...args) {

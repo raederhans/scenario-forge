@@ -20,6 +20,8 @@ const EXPECTED_DEFAULT_SUITES = Object.freeze([
   "tests/day_night_runtime_owner_behavior.test.mjs",
   "tests/political_background_render_owner_behavior.test.mjs",
   "tests/state_action_delegation_edges_behavior.test.mjs",
+  "tests/state_borrowed_effect_contract_behavior.test.mjs",
+  "tests/state_owner_borrowed_storage_behavior.test.mjs",
   "tests/state_writer_policy_behavior.test.mjs",
   "tests/state_writer_policy_batch_scan_behavior.test.mjs",
   "tests/state_writer_policy_soundness_behavior.test.mjs",

@@ -2,6 +2,23 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createBorderMeshOwner } from "../js/core/renderer/border_mesh_owner.js";
+import { getBorderCountryAssignmentRevision, isAtlantropaCoastlineLandVisible } from "../js/core/renderer/border_mesh_queries.js";
+
+test("border readers preserve field order and short-circuit without mutating borrowed land", () => {
+  assert.equal(getBorderCountryAssignmentRevision(Object.freeze({
+    activeScenarioId: "scenario", topologyRevision: 2, sovereigntyRevision: 3,
+    scenarioShellOverlayRevision: 4, mapSemanticMode: "visual",
+  })), "scenario|2|3|4|visual");
+  const land = Object.freeze({ properties: Object.freeze({ atl_render_layer: "land" }) });
+  assert.equal(isAtlantropaCoastlineLandVisible(Object.freeze({
+    showWaterRegions: true, scenarioAtlantropaData: Object.freeze({ features: Object.freeze([land]) }),
+  })), true);
+  for (const flags of [{ showWaterRegions: false }, { showWaterRegions: true, showScenarioAtlantropa: false }]) {
+    assert.equal(isAtlantropaCoastlineLandVisible({ ...flags,
+      get scenarioAtlantropaData() { throw new Error("must short-circuit"); },
+    }), false);
+  }
+});
 
 function createTestOwner(state = {}) {
   const perfMetrics = [];
@@ -19,6 +36,32 @@ function createTestOwner(state = {}) {
   });
   return { owner, invalidations, perfMetrics };
 }
+
+test("dynamic mesh publication precedes unresolved-count callbacks and preserves partial commits on throw", (t) => {
+  const oldTopojson = globalThis.topojson;
+  t.after(() => { globalThis.topojson = oldTopojson; });
+  const mesh = { type: "MultiLineString", coordinates: [] };
+  globalThis.topojson = { mesh: () => mesh };
+  const state = {
+    cachedBorders: {}, cachedDynamicOwnerBorders: {}, cachedDynamicBordersHash: "old",
+    runtimePoliticalTopology: { objects: { political: { geometries: [{}] } } },
+    dynamicBordersDirty: true,
+  };
+  const failure = new Error("count failed");
+  const owner = createBorderMeshOwner({ state, helpers: {
+    isDynamicBordersEnabled: () => true,
+    resolveOwnerBorderCode: () => {
+      assert.equal(state.cachedBorders, null);
+      assert.equal(state.cachedDynamicOwnerBorders, mesh);
+      assert.equal(state.cachedDynamicBordersHash, "old");
+      throw failure;
+    },
+  } });
+  assert.throws(() => owner.rebuildDynamicBorders(), error => error === failure);
+  assert.equal(state.cachedDynamicOwnerBorders, mesh);
+  assert.equal(state.cachedDynamicBordersHash, "old");
+  assert.equal(state.dynamicBordersDirty, true);
+});
 
 function createLifecycleOwner() {
   const state = { cachedDetailAdmBorders: [], dynamicBordersEnabled: true };

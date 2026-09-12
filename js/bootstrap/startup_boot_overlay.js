@@ -258,7 +258,7 @@ export function createStartupBootOverlayController() {
       dom.errorSummary.textContent = getBootCopy("error").details;
     }
     if (dom.errorText) {
-      dom.errorText.textContent = failed ? runtimeState.bootError : "";
+      dom.errorText.textContent = String(failed ? runtimeState.bootError ?? "" : "");
     }
     if (dom.progressTrack) {
       dom.progressTrack.hidden = !blocking || failed;

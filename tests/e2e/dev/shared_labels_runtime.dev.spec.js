@@ -63,17 +63,13 @@ async function captureFrame(page, action) {
     const { state, renderer } = probe;
     probe.assertFixtureData();
     const invalidateFixturePasses = () => {
-      for (const pass of ["contextMarkers", "labels"]) {
-        state.renderPassCache.dirty[pass] = true;
-        state.renderPassCache.reasons[pass] = "shared-labels-fixture";
-      }
+      probe.actions.invalidateRenderPasses(["contextMarkers", "labels"], "shared-labels-fixture");
     };
     if (operation === "labels-only") {
       // Exercise the real cache consumer without rebuilding contextMarkers candidates.
-      state.renderPassCache.dirty.labels = true;
-      state.renderPassCache.reasons.labels = "shared-labels-fixture-labels-only";
+      probe.actions.invalidateRenderPasses("labels", "shared-labels-fixture-labels-only");
     } else if (operation === "city-off" || operation === "city-on") {
-      state.showCityPoints = operation === "city-on";
+      probe.actions.commitUiVisibilityState(state, { showCityPoints: operation === "city-on" });
       invalidateFixturePasses();
     } else {
       const projected = renderer.projectGeoToScreen(0, 0);
@@ -83,7 +79,7 @@ async function captureFrame(page, action) {
       const next = globalThis.d3.zoomIdentity
         .translate(state.width * 0.5 - worldX * 4, state.height * 0.5 - worldY * 4).scale(4);
       if (Math.abs(next.x - previous.x) > 0.001 || Math.abs(next.y - previous.y) > 0.001 || next.k !== previous.k) {
-        state.zoomTransform = next;
+        probe.actions.setZoomTransformState(state, next);
         renderer.invalidateAllRenderPasses("shared-labels-fixture-viewport");
       } else {
         invalidateFixturePasses();
@@ -218,7 +214,17 @@ async function runSharedLabelsFixture({ page }, testInfo, density) {
       const { state } = await import("/js/core/state.js");
       const renderer = await import("/js/core/map_renderer.js");
       const { normalizeCityFeatureCollection } = await import("/js/core/data_loader.js");
-      const { ensureTransportOverviewStyleConfigState } = await import("/js/core/state/ui_state.js");
+      const {
+        commitBaseCitySupportData,
+        commitContextLayerCollection,
+        setCurrentLanguage,
+      } = await import("/js/core/state/content_state.js");
+      const { applyScenarioChunkCityExternalEffectState } = await import("/js/core/state/actions/scenario_presentation_actions.js");
+      const { commitUiVisibilityState } = await import("/js/core/state/actions/ui_visibility_actions.js");
+      const { setZoomTransformState } = await import("/js/core/state/actions/renderer_interaction_actions.js");
+      const { patchAppearanceStyleGroupState } = await import("/js/core/state/actions/appearance_actions.js");
+      const { applyTransportWorkbenchOverviewState } = await import("/js/core/state/actions/transport_actions.js");
+      const { createRenderCacheOwner } = await import("/js/core/renderer/render_cache_owner.js");
       const icons = await import("/js/core/renderer/transport_facility_icons.js");
       const { createPixelRatioPolicy } = await import("/js/core/renderer/pixel_ratio_policy.js");
       await Promise.all([
@@ -233,30 +239,51 @@ async function runSharedLabelsFixture({ page }, testInfo, density) {
           .filter(([name]) => /^(?:airports?|ports?|cities)$/i.test(name))
           .map(([, promise]) => promise),
       ].filter(Boolean));
-      const feature = (id, name, extra = {}) => ({
-        type: "Feature", id, geometry: { type: "Point", coordinates: [0, 0] },
+      const feature = (id, name, coordinates, extra = {}) => ({
+        type: "Feature", id, geometry: { type: "Point", coordinates },
         properties: { id, name, ...extra },
       });
       const collection = (...features) => ({ type: "FeatureCollection", features });
-      // All three anchors deliberately coincide, forcing inter-family avoidance.
-      const city = feature("CITY::shared-label-fixture", labels[0], {
+      // This fixture verifies the shared label pass; keep collision policy out of its acceptance surface.
+      const city = feature("CITY::shared-label-fixture", labels[0], [-12, 0], {
         name_en: labels[0], name_zh: labels[0], country_code: "ZZ", population: 5_000_000,
         is_country_capital: true, is_capital: true, base_tier: "major", min_zoom: 0.5,
       });
-      state.worldCitiesData = normalizeCityFeatureCollection(collection(city), { sourceLabel: "shared-label-fixture" });
-      state.scenarioCityOverridesData = null;
-      state.cityLayerRevision = Number(state.cityLayerRevision || 0) + 1;
-      state.airportsData = collection(feature("shared-air", labels[1], { importance_rank: 3, iata: "FXA" }));
-      state.portsData = collection(feature("shared-port", labels[2], { importance_rank: 3 }));
-      state.currentLanguage = "en";
-      state.showCityPoints = state.showTransport = state.showAirports = state.showPorts = true;
-      state.showRoad = state.showRail = false;
-      state.styleConfig.cityPoints = { ...state.styleConfig.cityPoints, showLabels: true, labelSize: 13, labelMinZoom: 0.5, labelDensity: "dense" };
-      const transport = ensureTransportOverviewStyleConfigState(state);
-      transport.visualMode = "distribution";
-      for (const family of ["airport", "port"]) Object.assign(transport[family], { labelsEnabled: true, labelMode: "name", labelDensity: "dense", labelSize: 10 });
+      commitBaseCitySupportData(state, {
+        worldCities: normalizeCityFeatureCollection(collection(city), { sourceLabel: "shared-label-fixture" }),
+      }, { scenarioActive: true });
+      applyScenarioChunkCityExternalEffectState(state, null);
+      commitContextLayerCollection(state, "airports", collection(feature("shared-air", labels[1], [0, 0], { importance_rank: 3, iata: "FXA" })));
+      commitContextLayerCollection(state, "ports", collection(feature("shared-port", labels[2], [12, 0], { importance_rank: 3 })));
+      setCurrentLanguage(state, "en");
+      commitUiVisibilityState(state, {
+        showCityPoints: true, showTransport: true, showAirports: true, showPorts: true,
+        showRoad: false, showRail: false,
+      });
+      patchAppearanceStyleGroupState(state, "cityPoints", {
+        showLabels: true, labelSize: 13, labelMinZoom: 0.5, labelDensity: "dense",
+      });
+      applyTransportWorkbenchOverviewState(state, { visualMode: "distribution" });
+      for (const familyId of ["airport", "port"]) {
+        applyTransportWorkbenchOverviewState(state, {
+          familyId,
+          familyConfig: { labelsEnabled: true, labelMode: "name", labelDensity: "dense", labelSize: 10 },
+        });
+      }
       icons.getTransportFacilityIconAtlasImage();
-      const probe = { state, renderer, icons, draws: [], markerClears: 0, labelClears: 0 };
+      const fixtureRenderCacheOwner = createRenderCacheOwner({
+        state,
+        constants: { renderPassNames: Object.keys(state.renderPassCache.dirty || {}) },
+        helpers: { ensureRenderPassCacheState: () => state.renderPassCache },
+      });
+      const probe = {
+        state, renderer, icons, draws: [], markerClears: 0, labelClears: 0,
+        actions: {
+          commitUiVisibilityState,
+          invalidateRenderPasses: fixtureRenderCacheOwner.invalidateRenderPasses,
+          setZoomTransformState,
+        },
+      };
       probe.pixelRatioPolicy = createPixelRatioPolicy({ runtimeState: state, nowMs: () => performance.now(), getDevicePixelRatio: () => devicePixelRatio });
       const fixtureData = { worldCitiesData: state.worldCitiesData, airportsData: state.airportsData, portsData: state.portsData };
       probe.assertFixtureData = () => {
@@ -324,7 +351,8 @@ async function runSharedLabelsFixture({ page }, testInfo, density) {
     const hidden = await captureFrame(page, "city-off");
     report.frames.push(hidden);
     expectSharedFrame(hidden, { city: false });
-    expect(hidden.draws.map((row) => row.box)).not.toEqual(initial.draws.filter((row) => row.family === "facility").map((row) => row.box));
+    expect(hidden.draws.map((row) => row.box), "separated facility anchors remain stable when city labels are hidden")
+      .toEqual(initial.draws.filter((row) => row.family === "facility").map((row) => row.box));
     const restored = await captureFrame(page, "city-on");
     report.frames.push(restored);
     expectSharedFrame(restored);

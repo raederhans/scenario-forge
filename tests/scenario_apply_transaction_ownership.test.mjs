@@ -375,6 +375,7 @@ test("stale scenario apply callbacks are fenced at post-apply, optional layer, a
   assert.ok(resources.includes("applyScenarioOptionalLayerState("));
   assert.ok(resources.includes("optional-layer-state-apply"));
   const chunkRuntime = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
+  const chunkQueries = readRepoFile("js", "core", "scenario", "chunk_promotion_queries.js");
   const pipeline = readRepoFile("js", "core", "scenario_apply_pipeline.js");
 
   [
@@ -391,11 +392,17 @@ test("stale scenario apply callbacks are fenced at post-apply, optional layer, a
 
   [
     "scenarioApplyRequestIdBySelectionVersion",
-    "pendingPromotion.scenarioApplyRequestId",
     "political-chunk-payload-write",
     "chunk-refresh-timer",
     "post-commit-refresh-replay",
   ].forEach((token) => assert.ok(chunkRuntime.includes(token), `chunk_runtime should include ${token}`));
+
+  assert.match(chunkRuntime, /import\s*\{[^}]*isPendingScenarioChunkPromotionCurrent[^}]*\}\s*from\s*"\.\/chunk_promotion_queries\.js"/);
+  assert.ok(chunkRuntime.includes("if (!isPendingScenarioChunkPromotionCurrent({"));
+  assert.ok(
+    extractFunctionBody(chunkQueries, "isPendingScenarioChunkPromotionCurrent").includes("pendingPromotion.scenarioApplyRequestId"),
+    "the delegated chunk continuation fence must check the pending scenario request",
+  );
 
   assert.ok(pipeline.includes("scenarioApplyRequestId: Math.max(0, Number(scenarioApplyRequestId || 0))"));
   assert.ok(pipeline.includes("scenarioApplyRequestId: Math.max(0, Number(staged?.scenarioApplyRequestId || 0))"));

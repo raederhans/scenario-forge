@@ -43,11 +43,11 @@ function createHarness({
     },
   };
   const owner = createProjectedGeometryBoundsOwner({
+    state: harnessStore,
     getters: {
       getProjection: () => projection,
       getPathCanvas: () => (pathCanvasEnabled ? path : null),
       getPathSvg: () => (pathSvgBounds ? svgPath : null),
-      getProjectedBoundsCache: () => harnessStore.projectedBoundsById,
       getLandFeatures: () => features.land || [],
       getRiverFeatures: () => features.rivers || [],
       getActiveScenarioId: () => harnessStore.activeScenarioId,
@@ -147,6 +147,46 @@ test("getProjectedFeatureBounds caches computed bounds by feature id", () => {
   assert.equal(owner.getProjectedFeatureBounds(feature), harnessStore.projectedBoundsById.get("A"));
   assert.equal(calls.pathBounds, 1);
   assert.equal(owner.getProjectedFeatureBounds(createFeature("B", createPolygon([0, 0])), { allowCompute: false }), null);
+});
+
+test("public cache initialization stays lazy and preserves the spherical diagnostics holder", () => {
+  const { owner, harnessStore } = createHarness();
+  delete harnessStore.projectedBoundsById;
+  const diagnostics = new Map([["existing", {}]]);
+  harnessStore.sphericalFeatureDiagnosticsById = diagnostics;
+  const feature = createFeature("A", createPolygon([0, 0]));
+  const computed = owner.computeProjectedFeatureBounds(feature);
+  assert.equal(Object.hasOwn(harnessStore, "projectedBoundsById"), false);
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), computed);
+  assert.equal(harnessStore.projectedBoundsById.get("A"), computed);
+  assert.equal(harnessStore.sphericalFeatureDiagnosticsById, diagnostics);
+});
+
+test("external public Map replacement is honored without recomputing or retaining the old Map", () => {
+  const { owner, calls, harnessStore } = createHarness();
+  const feature = createFeature("A", createPolygon([0, 0]));
+  const bounds = owner.getProjectedFeatureBounds(feature);
+  const oldMap = harnessStore.projectedBoundsById;
+  const replacement = new Map([["external", {}]]);
+  harnessStore.projectedBoundsById = replacement;
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), bounds);
+  assert.equal(replacement.get("A"), bounds);
+  assert.equal(calls.pathBounds, 1);
+  owner.clearProjectedBoundsCache();
+  assert.equal(replacement.size, 0);
+  assert.equal(oldMap.get("A"), bounds);
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), null);
+});
+
+test("null bounds delete stale IDs and a failed clear does not run later host cleanup", () => {
+  const { owner, calls, harnessStore } = createHarness({ projection: null, pathBounds: () => null });
+  harnessStore.projectedBoundsById.set("A", {});
+  assert.equal(owner.getProjectedFeatureBounds(createFeature("A", createPolygon([0, 0]))), null);
+  assert.equal(harnessStore.projectedBoundsById.has("A"), false);
+  class FailingMap extends Map { clear() { throw new Error("clear failed"); } }
+  harnessStore.projectedBoundsById = new FailingMap();
+  assert.throws(() => owner.clearProjectedBoundsCache(), /clear failed/);
+  assert.equal(calls.resetHostWaterPathCaches, 0);
 });
 
 test("projected geometry cache reuses spatial precomputation but rejects replaced geometry and projection", () => {

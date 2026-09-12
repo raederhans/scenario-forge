@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { resolveContourLodRequest } from "../js/core/renderer/physical_contour_lod_policy.js";
+import { getObjectIdentityToken } from "../js/core/renderer/object_identity.js";
+import { captureCompatRuntimeHook } from "../js/core/state/index.js";
 
 const state = (k, patch = {}) => ({ zoomTransform: { k }, styleConfig: { physical: { preset: "balanced", contourMinorVisible: true, ...patch } } });
 const legacyContourState = (k, patch = {}) => ({
@@ -63,9 +65,9 @@ function gateHarness() {
   let renders = 0;
   const major = { features: [] };
   runtime.ensureContextLayerDataFn = async () => { calls += 1; runtime.physicalContourMajorData = major; };
-  const ensure = new Function("runtimeState", "resolveContourLodRequest", "requestRendererRender", "console",
+  const ensure = new Function("runtimeState", "resolveContourLodRequest", "requestRendererRender", "console", "getObjectIdentityToken", "captureCompatRuntimeHook",
     `let lastContourLodRequest = null; ${gateSource}; return ensureContourLodForView;`
-  )(runtime, resolveContourLodRequest, () => { renders += 1; }, { warn() {} });
+  )(runtime, resolveContourLodRequest, () => { renders += 1; }, { warn() {} }, getObjectIdentityToken, captureCompatRuntimeHook);
   return { runtime, ensure, major, calls: () => calls, renders: () => renders };
 }
 
@@ -90,6 +92,47 @@ test("failed contour pack can retry on a later frame without scheduling a render
   h.ensure(); await flush();
   assert.equal(h.calls(), 2);
   assert.equal(h.renders(), 1);
+});
+
+test("LOD identities distinguish missing collections and replacement loaders without retaining borrowed records", async () => {
+  const h = gateHarness();
+  const invoked = [];
+  h.runtime.ensureContextLayerDataFn = () => invoked.push("old");
+  h.ensure();
+  h.runtime.ensureContextLayerDataFn = () => invoked.push("new");
+  await flush();
+  assert.deepEqual(invoked, ["old"]);
+  h.ensure(); await flush();
+  assert.deepEqual(invoked, ["old", "new"]);
+  h.ensure(); await flush();
+  assert.equal(invoked.length, 2);
+  h.runtime.physicalContourMajorData = null;
+  h.ensure(); await flush();
+  assert.equal(invoked.length, 3, "null differs from undefined");
+  h.runtime.physicalContourMajorData = { features: [] };
+  h.ensure(); await flush();
+  assert.equal(invoked.length, 4);
+  h.runtime.physicalContourMajorData = { features: [] };
+  h.ensure(); await flush();
+  assert.equal(invoked.length, 5, "equal contents do not collapse object identity");
+});
+
+test("an older LOD completion cannot release or replace a newer pending request", async () => {
+  const h = gateHarness();
+  const completions = [];
+  h.runtime.ensureContextLayerDataFn = () => new Promise((resolve) => completions.push(resolve));
+  h.ensure(); await flush();
+  h.runtime.activeScenarioId = "B";
+  h.ensure(); await flush();
+  assert.equal(completions.length, 2);
+  completions[0](); await flush();
+  assert.equal(h.renders(), 0);
+  h.ensure(); await flush();
+  assert.equal(completions.length, 2);
+  completions[1](); await flush();
+  assert.equal(h.renders(), 1);
+  h.ensure(); await flush();
+  assert.equal(completions.length, 2);
 });
 
 test("cached frame preparation selects LOD during settle while deferring active gestures", () => {

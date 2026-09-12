@@ -18,6 +18,7 @@ import {
   getTransportFacilityDensityStrategy,
   getTransportFacilityEntryStableSortKey,
   getTransportFacilityLabelCandidates,
+  getTransportFacilityLabelBatchIdentity,
   getTransportOverviewAirportLabelText,
   getTransportOverviewPortLabelText,
 } from "./transport_facility_display_policy.js";
@@ -562,9 +563,7 @@ function drawContextFacilityPointLayer(
   pendingLabelBatches.push({
     entries: renderState.entries,
     metricName,
-    scenarioId: runtimeState.activeScenarioId,
-    sceneGeneration: runtimeState.sceneGeneration,
-    scenarioDataGeneration: runtimeState.scenarioDataGeneration,
+    ...getTransportFacilityLabelBatchIdentity(runtimeState),
     options: {
       familyId: normalizedFamilyId,
       labelColor,

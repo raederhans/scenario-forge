@@ -25,7 +25,7 @@ import {
   renderExportPassesToCanvas,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
 import {
   buildPaletteQuickSwatches,
@@ -85,6 +85,8 @@ import {
   resolveExportPassSequence,
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
+import { createPaletteLibraryOperation } from "../core/palette_library_operation.js";
+import { createPaletteLibraryStateAccess } from "../core/palette_library_state_access.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
 import { createScenarioGuidePopoverController } from "./toolbar/scenario_guide_popover.js";
@@ -102,6 +104,24 @@ import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspa
 import { createHgoRuntimePreviewLoaders } from "../core/hgo_runtime_asset_loader.js";
 import { createHgoRuntimePreviewToolbarController } from "./toolbar/hgo_runtime_preview_controller.js";
 const state = runtimeState;
+
+function composePaletteLibraryOperation() {
+  const stateAccess = createPaletteLibraryStateAccess(runtimeState);
+  const owner = createPaletteLibraryOperation({
+    getApplyTarget: stateAccess.getApplyTarget,
+    getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
+    applyFeatureColor: stateAccess.applyFeatureColor,
+    applyOwnerColor: stateAccess.applyOwnerColor,
+    captureHistoryState,
+    pushHistoryEntry,
+    markLegacyColorStateDirty,
+    refreshResolvedColorsForFeatures,
+    refreshColorState,
+    markDirty,
+    selectPaintColor: (color) => selectPalettePaintColor(runtimeState, color),
+  });
+  return owner;
+}
 
 // Quick Colors 优先反映当前 palette pack，未启用 pack 时再退回静态主题色。
 // 这样 toolbar 的快速选色和 Palette Library 会共享同一份颜色来源语义。
@@ -942,8 +962,7 @@ function initToolbar({ render } = {}) {
     runAfterFrame();
   };
 
-  const sampleProjectBannerController = createSampleProjectBannerController({
-    runtimeState,
+  const sampleProjectBannerController = createSampleProjectBannerController(runtimeState, {
     root: sampleProjectBanner,
     titleNode: sampleProjectBannerTitle,
     bodyNode: sampleProjectBannerBody,
@@ -955,8 +974,7 @@ function initToolbar({ render } = {}) {
       runtimeState.openExportWorkbenchFn?.(resolveExportWorkbenchFocusReturnTrigger(trigger))
     ),
   });
-  const sampleProjectGuideCardController = createSampleProjectGuideCardController({
-    runtimeState,
+  const sampleProjectGuideCardController = createSampleProjectGuideCardController(runtimeState, {
     root: scenarioGuideSampleProjectCard,
     titleNode: scenarioGuideSampleProjectTitle,
     bodyNode: scenarioGuideSampleProjectBody,
@@ -1327,107 +1345,19 @@ function initToolbar({ render } = {}) {
     callRuntimeHook(state, "updateRecentUI");
   };
 
-  const getFeatureIdsForOwnerColorRefresh = (ownerCode) => {
-    // owner 着色的命中集合来自多条索引链：
-    // sovereignty 映射、ownerToFeatureIds、countryToFeatureIds 可能在不同生命周期下先后可用。
-    // 这里做并集是为了让 palette apply 在运行态、导入后和场景切换后都能落到完整集合。
-    const normalizedOwner = normalizeCountryCode(ownerCode);
-    if (!normalizedOwner) return [];
-    const ids = new Set();
-    if (runtimeState.sovereigntyByFeatureId && typeof runtimeState.sovereigntyByFeatureId === "object") {
-      Object.entries(runtimeState.sovereigntyByFeatureId).forEach(([featureId, rawOwner]) => {
-        if (normalizeCountryCode(rawOwner) === normalizedOwner) ids.add(featureId);
-      });
-    }
-    const ownerIds = runtimeState.ownerToFeatureIds instanceof Map
-      ? runtimeState.ownerToFeatureIds.get(normalizedOwner)
-      : null;
-    const ownerIdList = Array.isArray(ownerIds) || ownerIds instanceof Set ? Array.from(ownerIds) : [];
-    ownerIdList.forEach((featureId) => ids.add(featureId));
-    const countryIds = runtimeState.countryToFeatureIds instanceof Map
-      ? runtimeState.countryToFeatureIds.get(normalizedOwner)
-      : null;
-    const countryIdList = Array.isArray(countryIds) || countryIds instanceof Set ? Array.from(countryIds) : [];
-    countryIdList.forEach((featureId) => ids.add(featureId));
-    return Array.from(ids)
-      .map((featureId) => String(featureId || "").trim())
-      .filter((featureId) => featureId && runtimeState.landIndex?.has(featureId));
-  };
-
-  const resolvePaletteLibraryApplyTarget = () => {
-    // Palette Library 采用“显式选中 > 当前 hover > inspector 主权对象”的优先级。
-    // 这样用户在没有重新切工具的情况下也能把颜色准确落到当前最直观的目标上。
-    const selectedHitId = String(runtimeState.devSelectedHit?.id || "").trim();
-    if (selectedHitId && runtimeState.landIndex?.has(selectedHitId)) {
-      return { type: "feature", featureIds: [selectedHitId] };
-    }
-    const hoveredId = String(runtimeState.hoveredId || "").trim();
-    if (hoveredId && runtimeState.landIndex?.has(hoveredId)) {
-      return { type: "feature", featureIds: [hoveredId] };
-    }
-    const ownerCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
-    return ownerCode ? { type: "owner", ownerCode } : null;
-  };
+  const { applyColor: applyPaletteLibraryOperation } = composePaletteLibraryOperation();
 
   const applyPaletteLibraryColor = (rawColor) => {
-    const color = normalizeHexColor(rawColor);
-    if (!color) return false;
-    const target = resolvePaletteLibraryApplyTarget();
-    if (!target) {
+    const result = applyPaletteLibraryOperation(rawColor);
+    if (result.status === "no-target") {
       showToast(t("Select or hover a land feature first.", "ui"), {
         title: t("Color Library", "ui"),
         tone: "info",
         duration: 2400,
       });
-      return false;
     }
-
-    selectPalettePaintColor(runtimeState, color);
-    if (target.type === "feature") {
-      const featureIds = target.featureIds;
-      const before = captureHistoryState({ featureIds });
-      runtimeState.visualOverrides = runtimeState.visualOverrides || {};
-      runtimeState.featureOverrides = runtimeState.featureOverrides || {};
-      featureIds.forEach((featureId) => {
-        runtimeState.visualOverrides[featureId] = color;
-        runtimeState.featureOverrides[featureId] = color;
-      });
-      markLegacyColorStateDirty();
-      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
-      markDirty("palette-library-apply-color");
-      pushHistoryEntry({
-        kind: "palette-library-apply-color",
-        before,
-        after: captureHistoryState({ featureIds }),
-        meta: { affectsSovereignty: false },
-      });
-      addRecentColor(color);
-      updateSwatchUI();
-      if (render) render();
-      return true;
-    }
-
-    const ownerCode = target.ownerCode;
-    const featureIds = getFeatureIdsForOwnerColorRefresh(ownerCode);
-    const before = captureHistoryState({ ownerCodes: [ownerCode] });
-    runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
-    runtimeState.countryBaseColors = runtimeState.countryBaseColors || {};
-    runtimeState.sovereignBaseColors[ownerCode] = color;
-    runtimeState.countryBaseColors[ownerCode] = color;
-    markLegacyColorStateDirty();
-    if (featureIds.length) {
-      refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
-    } else {
-      refreshColorState({ renderNow: false });
-    }
-    markDirty("palette-library-apply-owner-color");
-    pushHistoryEntry({
-      kind: "palette-library-apply-owner-color",
-      before,
-      after: captureHistoryState({ ownerCodes: [ownerCode] }),
-      meta: { affectsSovereignty: false },
-    });
-    addRecentColor(color);
+    if (result.status !== "applied") return false;
+    addRecentColor(result.color);
     updateSwatchUI();
     if (render) render();
     return true;
@@ -2184,7 +2114,7 @@ function initToolbar({ render } = {}) {
   });
 
   const workspaceExportBtn = document.getElementById("workspaceExportBtn");
-  workspaceExportBtn?.addEventListener("click", () => runtimeState.openExportWorkbenchFn?.(workspaceExportBtn));
+  workspaceExportBtn?.addEventListener("click", () => callCompatRuntimeHook(runtimeState, "openExportWorkbenchFn", workspaceExportBtn));
   const advancedExportBtn = document.getElementById("exportWorkbenchAdvancedBtn");
   const setAdvancedExport = (expanded) => {
     advancedExportBtn?.setAttribute("aria-expanded", String(expanded));

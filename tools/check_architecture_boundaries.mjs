@@ -1,9 +1,73 @@
 import fs from "node:fs";
+import { parse } from "acorn";
+import { fullAncestor } from "acorn-walk";
 import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 const REPO_ROOT = process.cwd();
+
+// The bounds owner checks public ID cache readiness without borrowing the map.
+// Mutations remain in named state authorities; reject aliases and dynamic access.
+export function inspectProjectedBoundsStateBoundary(source) {
+  const failures = [];
+  let ast;
+  try { ast = parse(source, { ecmaVersion: "latest", sourceType: "module" }); }
+  catch (error) { return [`invalid projected bounds module: ${error.message}`]; }
+  const authorities = new Map([
+    ["ensureProjectedBoundsCacheState", "../state/renderer_runtime_state.js"],
+    ["clearProjectedBoundsCacheEntriesState", "../state/actions/renderer_cache_actions.js"],
+    ["setProjectedBoundsCacheEntryState", "../state/actions/renderer_cache_actions.js"],
+    ["syncProjectedBoundsCacheEntryState", "../state/actions/renderer_cache_actions.js"],
+  ]);
+  const imported = new Set();
+  for (const node of ast.body) {
+    if (node.type !== "ImportDeclaration") continue;
+    for (const spec of node.specifiers) {
+      if (spec.type === "ImportSpecifier"
+        && spec.local.name === spec.imported.name
+        && authorities.get(spec.local.name) === node.source.value) imported.add(spec.local.name);
+    }
+  }
+  const owner = ast.body.find(node => node.type === "ExportNamedDeclaration"
+    && node.declaration?.id?.name === "createProjectedGeometryBoundsOwner")?.declaration;
+  const pattern = owner?.params[0]?.left || owner?.params[0];
+  const stateProperty = pattern?.properties?.find(property => property.key?.name === "state");
+  const stateParameter = stateProperty?.value?.left || stateProperty?.value;
+  if (stateParameter?.name !== "state") failures.push("bounds owner must declare its explicit state input");
+  const reject = reason => failures.push(`projected bounds state boundary: ${reason}`);
+  fullAncestor(ast, (node, _state, ancestors) => {
+    const parent = ancestors.at(-2);
+    const grandparent = ancestors.at(-3);
+    if (node.type !== "Identifier") return;
+    if (node.name === "Map") {
+      if ((parent?.type === "BinaryExpression" && parent.operator === "instanceof" && parent.right === node)
+        || (parent?.type === "NewExpression" && parent.callee === node)) return;
+      reject("Map must remain the unshadowed global constructor");
+      return;
+    }
+    if (authorities.has(node.name)) {
+      if (parent?.type === "ImportSpecifier") return;
+      if (parent?.type !== "CallExpression" || parent.callee !== node || !imported.has(node.name)) {
+        reject("state authority must remain a direct, unshadowed import");
+      }
+      return;
+    }
+    if (node.name === "state") {
+      if (node === stateParameter || (parent === stateProperty && parent.key === node)) return;
+      if (parent?.type === "CallExpression" && parent.arguments[0] === node
+        && imported.has(parent.callee?.name)) return;
+      if (parent?.type === "MemberExpression" && parent.object === node && !parent.computed
+        && parent.property.name === "projectedBoundsById") {
+        if (grandparent?.type === "BinaryExpression" && grandparent.operator === "instanceof"
+          && grandparent.right?.name === "Map") return;
+      }
+      reject("only the projectedBoundsById readiness check and imported state authorities may use state");
+    }
+  });
+  return failures;
+}
+
 
 const FILES = Object.freeze({
   packageJson: "package.json",
@@ -4672,9 +4736,9 @@ function collectFailures() {
   if (/runtimeState\s*\./.test(renderTransformReusePolicyOwner)) {
     failures.push(`${FILES.renderTransformReusePolicyOwner} must not write or read runtimeState directly.`);
   }
+  failures.push(...inspectProjectedBoundsStateBoundary(projectedGeometryBoundsOwner));
   for (const token of [
     "runtimeState",
-    "state.",
     "globalThis.d3",
     "Path2D",
     "document.",

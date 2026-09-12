@@ -37,6 +37,23 @@ test("shadowed bindings and readonly uses do not become direct writes", () => {
   `, testPath), false);
 });
 
+test("canonical action delegation does not count as a direct singleton write", () => {
+  const actionImport = 'import { setCurrentLanguage } from "../js/core/state/content_state.js";';
+  assert.equal(hasDirectStateWrites(stateImport + actionImport + `
+    setCurrentLanguage(app, "zh");
+    function updateLocal(app) { app.foo = 1; }
+    updateLocal({});
+  `, testPath), false);
+});
+
+test("an action call cannot hide a direct singleton write in the same fixture", () => {
+  const actionImport = 'import { setCurrentLanguage } from "../js/core/state/content_state.js";';
+  assert.equal(hasDirectStateWrites(stateImport + actionImport + `
+    setCurrentLanguage(app, "zh");
+    app.currentLanguage = "en";
+  `, testPath), true);
+});
+
 test("unsupported dynamic imports keep conservative legacy detection", () => {
   assert.equal(hasDirectStateWrites(`
     const { state } = await import("/js/core/state.js");
@@ -66,6 +83,12 @@ test("reported real test fixtures pass semantic classification without file exce
     "state_writer_policy_soundness_behavior.test.mjs",
     "day_night_runtime_owner_behavior.test.mjs",
     "political_background_render_owner_behavior.test.mjs",
+    "e2e/dev/shared_labels_runtime.dev.spec.js",
+    "palette_library_panel_grouping.test.mjs",
+    "project_import_transaction_behavior.test.mjs",
+    "scenario_import_trust_projection_behavior.test.mjs",
+    "startup_boot_overlay_behavior.test.mjs",
+    "strategic_history_scope_behavior.test.mjs",
   ]) {
     const relativePath = `tests/${file}`;
     assert.equal(hasDirectStateWrites(fs.readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8"), relativePath), false, file);

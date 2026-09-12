@@ -234,8 +234,15 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("export function createRenderCacheOwner({", owner_content)
         self.assertIn("const RENDER_CACHE_OWNER_SUMMARY_VERSION = 1;", owner_content)
         self.assertIn('import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";', owner_content)
-        self.assertIn("const { getRenderPassCacheState, withValidatedCache } = createRenderCacheValidationScope({", owner_content)
+        self.assertIn("function composeRenderCacheValidationScope(state, ensureRenderPassCacheState, cloneZoomTransform, renderPassNames)", owner_content)
+        self.assertIn("const owner = createRenderCacheValidationScope({", owner_content)
+        self.assertIn("const { getRenderPassCacheState, withValidatedCache } = composeRenderCacheValidationScope(", owner_content)
         self.assertIn("ensure: () => ensureRenderPassCacheState(state, { cloneZoomTransform, renderPassNames }),", owner_content)
+        self.assertRegex(
+            owner_content,
+            r"const \{ getRenderPassCacheState, withValidatedCache \} = composeRenderCacheValidationScope\(\s*"
+            r"state,\s*ensureRenderPassCacheState, cloneZoomTransform, renderPassNames,\s*\);",
+        )
         self.assertIn("getRoot: () => state.renderPassCache,", owner_content)
         self.assertIn("function normalizeRenderPassRequest(passNames, { filterKnown = true } = {}) {", owner_content)
         self.assertIn("function createMutationSummary({", owner_content)

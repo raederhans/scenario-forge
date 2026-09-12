@@ -5,12 +5,14 @@ import vm from "node:vm";
 import { parse } from "acorn";
 
 const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+const identitySource = readFileSync(new URL("../js/core/renderer/object_identity.js", import.meta.url), "utf8")
+  .replace("export function", "function");
 const names = [
   "getScenarioAtlantropaRevisionToken", "getScenarioSurfaceVersionParts", "getScenarioSurfaceVersionSignal", "getScenarioWaterVisualRevisionToken",
   "getEffectiveWaterRegionFeatures", "getEffectiveAtlantropaFeatures", "getAtlantropaRenderLayer",
   "isScenarioAtlantropaVisible", "getScenarioWaterRegionsMode", "isScenarioWaterTopologyExclusiveMode",
   "getScenarioExcludedWaterRegionIds", "getScenarioExcludedWaterRegionGroups", "isScenarioWaterRegion",
-  "isWaterRegionExcludedByScenario", "getObjectIdentityToken", "getScenarioDetailPhaseSignatureToken",
+  "isWaterRegionExcludedByScenario", "getScenarioDetailPhaseSignatureToken",
   "getScenarioRuntimeTopologySignatureToken", "estimateTopologyObjectArcRefs", "countTopologyArcRefs",
   "getPhysicalLandMaskInfo", "getFirstUsablePhysicalLandMaskInfo", "getPhysicalLandMaskCandidateQuality",
   "createPhysicalLandMaskInfo", "getScenarioOverlaySignatureToken",
@@ -32,7 +34,7 @@ export function createHarness(source = rendererSource) {
   };
   const calls = { water: 0, buckets: 0, mask: 0, revision: 0 };
   const context = vm.createContext({
-    runtimeState: state, objectIdentityTokenCache: new WeakMap(), nextObjectIdentityToken: 1,
+    runtimeState: state,
     SCENARIO_PRESENTATION_FEATURES: { ATLANTROPA_RELIEF: "atlantropa" },
     scenarioHasPresentationFeature: (manifest) => !!manifest.legacyAtlantropa,
     sanitizeWaterRegionFeatures: (features) => features.filter((entry) => !entry.properties.unsafe),
@@ -43,7 +45,7 @@ export function createHarness(source = rendererSource) {
     getScenarioSpecialVisualRevisionToken: () => "special",
     getScenarioReliefVisualRevisionToken: () => "relief",
   });
-  vm.runInContext(functions.map((node) => source.slice(node.start, node.end)).join("\n"), context);
+  vm.runInContext(identitySource + "\n" + functions.map((node) => source.slice(node.start, node.end)).join("\n"), context);
   for (const [name, key] of [["getEffectiveWaterRegionFeatures", "water"], ["getEffectiveAtlantropaFeatures", "buckets"],
     ["getPhysicalLandMaskInfo", "mask"], ["getScenarioAtlantropaRevisionToken", "revision"]]) {
     const original = context[name];

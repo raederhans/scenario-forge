@@ -3,9 +3,12 @@ import path from "node:path";
 
 import { parse } from "acorn";
 import * as walk from "acorn-walk";
+import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
 import {
   STATE_MUTATION_DELEGATING_OWNER_CONTRACT,
+  STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT,
+  STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT,
   findStateActionDelegationContractEntry,
   findStateImportedBorrowedProjectionContractEntry,
   findStateImportedPureReaderContractEntry,
@@ -145,10 +148,15 @@ const STRUCTURAL_TARGET_MUTATION_OPERATIONS = new Set([
 ]);
 
 const IMPORTED_COMPAT_TARGET_HELPERS = new Map([
+  ["readRuntimeHook", 0],
   ["bindStateCompatSurface", 0],
   ["callRuntimeHook", 0],
+  ["callCompatRuntimeHook", 0],
+  ["captureCompatRuntimeHook", 0],
+  ["callRequiredRuntimeHook", 0],
   ["callRuntimeHooks", 0],
   ["registerRuntimeHook", 0],
+  ["registerOwnedRuntimeHook", 0],
 ]);
 
 const LOGICAL_ASSIGNMENT_OPERATORS = new Set(["||=", "&&=", "??="]);
@@ -2215,6 +2223,9 @@ function analyzeBindingMutations(
     });
   }
   const resolvingLocalCallResultNodes = new Set();
+  const provenOwnerBorrowedStorageByRecord = new WeakMap();
+  const provenBorrowedOwnerByNode = new WeakMap();
+  const consumedBorrowedReturnFunctions = new WeakSet();
   const functionIdentityContext =
     bindingMutationAnalysisContext.functionIdentityContext;
   const functionRecordForNode =
@@ -2257,12 +2268,13 @@ function analyzeBindingMutations(
     };
   }
 
-  function maybeTrackedState() {
+  function maybeTrackedState(borrowedPaths = null) {
     return {
       active: false,
       ambiguous: true,
       baseSegments: [],
       aliasChain: [],
+      borrowedPaths,
     };
   }
 
@@ -2274,6 +2286,7 @@ function analyzeBindingMutations(
         ...segment,
       })),
       aliasChain: [...(state?.aliasChain || [])],
+      borrowedPaths: state?.borrowedPaths || null,
     };
   }
 
@@ -2346,6 +2359,10 @@ function analyzeBindingMutations(
     ) {
       return cloneTrackedState(normalized[0]);
     }
+    if (normalized.every((state) => trackedStateStatus(state) === "none" || Array.isArray(state.borrowedPaths))) {
+      const paths = normalized.flatMap(state => state.borrowedPaths || []);
+      return maybeTrackedState([...new Map(paths.map(path => [JSON.stringify(path), path])).values()]);
+    }
     return maybeTrackedState();
   }
 
@@ -2374,6 +2391,47 @@ function analyzeBindingMutations(
     const node = unwrapChain(expression);
     if (!node) {
       return { status: "none", reference: null };
+    }
+    const scopedOperation = provenScopedBorrowedOperation(node);
+    if (scopedOperation) return scopedOperation.borrowedResultPaths.length
+      ? { status: "maybe", reference: null, borrowedPaths: scopedOperation.borrowedResultPaths }
+      : { status: "none", reference: null };
+    if (provenScopedMembershipCall(node)) return { status: "none", reference: null };
+    if (node.type === "Identifier") {
+      const storage = provenOwnerBorrowedStorage(analysis.resolveIdentifier(node));
+      if (storage) return { status: "maybe", reference: null, borrowedPaths: storage.paths };
+    }
+    if (node.type === "CallExpression") {
+      const actionResultPaths = importedTargetDelegation(node)?.actionContract?.borrowedResultPaths;
+      if (actionResultPaths?.length) return { status: "maybe", reference: null, borrowedPaths: actionResultPaths };
+      const capabilityCall = provenBorrowedCapabilityCall(node);
+      if (capabilityCall) return capabilityCall.returnsBorrowedState
+        ? { status: "maybe", reference: null } : { status: "none", reference: null };
+      const mapReadPaths = provenOwnerBorrowedMapRead(node);
+      if (mapReadPaths) return { status: "maybe", reference: null, borrowedPaths: mapReadPaths };
+      const iteration = provenOwnerBorrowedArrayIteration(node, aliasRecords);
+      if (iteration) return iteration.result;
+      const localOwnerMethod = immutableBorrowedLocalHelperNode(node);
+      const localOwnerPaths = localOwnerMethod && !hasProvenInjectedOwnerResultOrigin(localOwnerMethod)
+        && provenOwnerBorrowedReturnPaths(localOwnerMethod);
+      if (localOwnerPaths) return { status: "maybe", reference: null, borrowedPaths: localOwnerPaths };
+      const directInjection = provenDirectBorrowedCallbackInvocation(node);
+      if (directInjection) {
+        return directInjection.callbackReturnsBorrowed
+          ? { status: "maybe", reference: null,
+            ...(Array.isArray(directInjection.invocationBorrowedResultPaths)
+              ? { borrowedPaths: directInjection.invocationBorrowedResultPaths } : {}) }
+          : { status: "none", reference: null };
+      }
+      const borrowedPaths = borrowedOwnerMethodResultPaths(node);
+      if (borrowedPaths) return { status: "maybe", reference: null, borrowedPaths };
+    }
+    if (node.type === "MemberExpression") {
+      const parent = referenceClassification(node.object, aliasRecords);
+      if (parent.borrowedPaths) {
+        return projectBorrowedClassification(parent.borrowedPaths,
+          [staticPropertyName(node.property, node.computed) || "*"]);
+      }
     }
     if (isSanctionedMutationDelegatingOwnerBindingRead(node)) {
       return { status: "none", reference: null };
@@ -2410,6 +2468,16 @@ function analyzeBindingMutations(
     }
     if (node.type === "CallExpression") {
       const importedDelegation = importedTargetDelegation(node);
+      if (importedDelegation?.borrowedRuntimeHookResult) return { status: "maybe", reference: null };
+      if (importedDelegation?.borrowedEffectContract) {
+        const contract = importedDelegation.borrowedEffectContract;
+        const borrowed = contract.borrowedArgumentIndexes.some((index) =>
+          referenceClassification(node.arguments[index], aliasRecords).status !== "none"
+          || containerExpressionContainsTrackedReference(node.arguments[index], aliasRecords));
+        return borrowed && contract.borrowedResultPaths.length
+          ? { status: "maybe", reference: null, borrowedPaths: contract.borrowedResultPaths }
+          : { status: "none", reference: null };
+      }
       const borrowedProjectionResult =
         importedBorrowedProjectionResultClassification(
           node,
@@ -2449,6 +2517,9 @@ function analyzeBindingMutations(
       if (isSanctionedMutationDelegatingOwnerGetterCall(node)) {
         return { status: "none", reference: null };
       }
+      if (isProvenActionMapReadCall(node)) {
+        return childReferenceClassification(referenceClassification(node.callee.object, aliasRecords), "*", true);
+      }
       const mapReadResult = mapPrototypeGetCallResultClassification(
         node,
         aliasRecords,
@@ -2477,6 +2548,23 @@ function analyzeBindingMutations(
       )
       && containerExpressionContainsTrackedReference(node, aliasRecords)
     ) {
+      if (node.type === "ObjectExpression" && node.properties.every(property => property.type === "Property"
+        && !property.computed && !property.method && property.kind === "init")) {
+        const paths = [];
+        let hasProvenBorrowedInput = false;
+        for (const property of node.properties) {
+          const value = referenceClassification(property.value, aliasRecords);
+          if (value.status === "none") continue;
+          hasProvenBorrowedInput ||= Array.isArray(value.borrowedPaths);
+          if (value.status === "exact" && !(value.reference?.segments || []).length) {
+            return { status: "maybe", reference: null };
+          }
+          const key = staticPropertyName(property.key, false);
+          if (key === null || key === undefined) return { status: "maybe", reference: null };
+          for (const path of value.borrowedPaths || [[]]) paths.push([String(key), ...path]);
+        }
+        if (paths.length && hasProvenBorrowedInput) return { status: "maybe", reference: null, borrowedPaths: paths };
+      }
       return { status: "maybe", reference: null };
     }
     const rootIdentifier = rawRootIdentifier(node);
@@ -2489,6 +2577,16 @@ function analyzeBindingMutations(
       && trackedStateStatus(effectiveRecordState(aliasRecords, rootRecord))
         === "maybe"
     ) {
+      const tracked = effectiveRecordState(aliasRecords, rootRecord);
+      if (tracked.borrowedPaths) {
+        let member = node;
+        const path = [];
+        while (member?.type === "MemberExpression") {
+          path.unshift(staticPropertyName(member.property, member.computed) || "*");
+          member = unwrapChain(member.object);
+        }
+        return projectBorrowedClassification(tracked.borrowedPaths, path);
+      }
       return { status: "maybe", reference: null };
     }
     const resolver = createReferenceResolver(
@@ -2508,6 +2606,11 @@ function analyzeBindingMutations(
     const statuses = classifications.map(({ status }) => status);
     if (statuses.every((status) => status === "none")) {
       return { status: "none", reference: null };
+    }
+    if (classifications.every(classification => classification.status === "none"
+      || Array.isArray(classification.borrowedPaths))) {
+      return { status: "maybe", reference: null,
+        borrowedPaths: classifications.flatMap(classification => classification.borrowedPaths || []) };
     }
     if (
       statuses.every((status) => status === "exact")
@@ -2720,7 +2823,7 @@ function analyzeBindingMutations(
     aliasRecords.set(
       record,
       classification.status === "maybe"
-        ? maybeTrackedState()
+        ? maybeTrackedState(classification.borrowedPaths || null)
         : noneTrackedState(),
     );
   }
@@ -2945,7 +3048,21 @@ function analyzeBindingMutations(
     };
   }
 
+  function isProvenActionMapReadCall(node) {
+    if (!recognizeCurrentContracts || node?.type !== "CallExpression" || node.optional || node.arguments.length !== 1) return false;
+    const method = node.callee;
+    const receiver = method?.object;
+    const action = currentActionDelegationContract();
+    const contract = action && STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT.find(entry =>
+      entry.modulePath === filePath && entry.exportName === action.exportName);
+    return Boolean(contract && method?.type === "MemberExpression" && !method.computed && method.property.name === "get"
+      && receiver?.type === "MemberExpression" && !receiver.computed && receiver.property.name === contract.containerField
+      && receiver.object?.type === "Identifier" && receiver.object.name === contract.targetParameterName
+      && createHash("sha256").update(normalizeJavaScriptSource(source)).digest("hex") === contract.moduleSourceFingerprint);
+  }
+
   function isKnownPureReadCall(node) {
+    if (isProvenActionMapReadCall(node)) return true;
     const name = unshadowedStaticCallName(node);
     if (PURE_STATIC_STATE_READ_CALLS.has(name)) {
       return true;
@@ -3090,6 +3207,12 @@ function analyzeBindingMutations(
   }
 
   function processEvent(event, aliasRecords) {
+    if (event.type === "AssignmentExpression" && event.operator === "="
+      && isProvenOwnerBorrowedStorageSlot(event.left)) return;
+    if (event.type === "CallExpression" && isProvenOwnerBorrowedArrayAppend(event)) return;
+    if (event.type === "CallExpression" && (provenScopedBorrowedOperation(event) || provenScopedMembershipCall(event)
+      || provenBorrowedCapabilityCall(event) || provenOwnerBorrowedMapRead(event)
+      || provenOwnerBorrowedArrayIteration(event, aliasRecords))) return;
     const resolveReference = (expression) =>
       resolveMutationReference(expression, aliasRecords, expression);
 
@@ -3367,7 +3490,7 @@ function analyzeBindingMutations(
         && node.body?.type !== "BlockStatement"
       ) {
         processExpression(node.body, functionState);
-        recordClassificationDiagnostic(
+        if (!consumedBorrowedReturnFunctions.has(node)) recordClassificationDiagnostic(
           referenceClassification(node.body, functionState),
           node.body,
           "state-alias-escape",
@@ -3453,6 +3576,14 @@ function analyzeBindingMutations(
       return null;
     }
     const source = resolveProjectLocalImportPath(record.importSource);
+    const effectfulDelegator = STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT.find(entry =>
+      entry.modulePath === source && entry.exportName === record.importedName);
+    if (effectfulDelegator) {
+      return callNode.arguments.length === effectfulDelegator.argumentCount
+        && !callNode.arguments.some(argument => argument.type === "SpreadElement")
+        ? { targetArgumentIndex: effectfulDelegator.targetArgumentIndex, actionContract: null }
+        : null;
+    }
     const actionContract =
       findStateActionDelegationContractEntry(
         source,
@@ -3513,6 +3644,12 @@ function analyzeBindingMutations(
         pureNormalizerContract,
       };
     }
+    const borrowedEffectContract = findStateBorrowedEffectContractEntry(source, record.importedName);
+    if (borrowedEffectContract && (callNode.arguments || []).length !== 1) {
+      return isSanctionedBorrowedEffectCall(callNode, borrowedEffectContract)
+        ? { targetArgumentIndex: -1, actionContract: null, borrowedEffectContract }
+        : null;
+    }
     const importedPureReaderContract =
       findStateImportedPureReaderContractEntry(
         source,
@@ -3537,7 +3674,7 @@ function analyzeBindingMutations(
       const targetArgumentIndex =
         IMPORTED_COMPAT_TARGET_HELPERS.get(record.importedName);
       return Number.isInteger(targetArgumentIndex)
-        ? { targetArgumentIndex, actionContract: null }
+        ? { targetArgumentIndex, actionContract: null, borrowedRuntimeHookResult: record.importedName === "readRuntimeHook" }
         : null;
     }
     return null;
@@ -3555,6 +3692,22 @@ function analyzeBindingMutations(
 
     const importedDelegation = importedTargetDelegation(node);
     if (importedDelegation) {
+      if (importedDelegation.borrowedEffectContract) {
+        const entry = importedDelegation.borrowedEffectContract;
+        const options = node.arguments[entry.optionsArgumentIndex];
+        for (const property of options.properties) {
+          const indexes = entry.callbackBorrowedParameterIndexes?.[staticPropertyName(property.key, false)];
+          if (!indexes) continue;
+          const callback = directImmutableLocalHelperNode({
+            type: "CallExpression", callee: property.value, start: node.start,
+          });
+          if (!callback || executionFunctionStack.includes(callback)) continue;
+          const parameterClassifications = [];
+          for (const index of indexes) parameterClassifications[index] = { status: "maybe", reference: null };
+          processFunction(callback, aliasRecords, { parameterClassifications });
+        }
+        return new Set(entry.borrowedArgumentIndexes);
+      }
       const importedTargetIndex = importedDelegation.targetArgumentIndex;
       const targetClassification =
         argumentClassifications[importedTargetIndex];
@@ -3722,6 +3875,17 @@ function analyzeBindingMutations(
       index += 1
     ) {
       const classification = argumentClassifications[index];
+      const localOwnerBorrowedIndexes = provenBorrowedOwnerEntry(helperNode)?.borrowedLocalParameterIndexes?.[helperNode.id?.name] || [];
+      if (((classification.status === "maybe" && Array.isArray(classification.borrowedPaths))
+        || (classification.status !== "none" && localOwnerBorrowedIndexes.includes(index)))
+        && helperNode.params?.[index]) {
+        // A known local callee can consume a borrowed result only while its
+        // body is analyzed with the same path mask. Writes, unknown callees and
+        // escaping returns remain findings in that body.
+        delegatedArgumentIndexes.add(index);
+        parameterClassifications[index] = classification;
+        continue;
+      }
       if (
         isSourceBoundMutationDelegatingOwnerGetter
         && classification.status === "maybe"
@@ -4094,7 +4258,7 @@ function analyzeBindingMutations(
   }
 
   function isSanctionedMutationDelegatingOwnerMethodRead(node) {
-    const identifier = node?.type === "CallExpression" ? node.callee : node;
+    const identifier = node;
     if (identifier?.type !== "Identifier") return false;
     const record = analysis.resolveIdentifier(identifier);
     return record?.kind === "variable"
@@ -4103,6 +4267,331 @@ function analyzeBindingMutations(
       && record.ownerNode?.id?.type === "ObjectPattern"
       && record.init?.type === "CallExpression"
       && isSanctionedMutationDelegatingOwnerGetterCall(record.init);
+  }
+
+  function borrowedOwnerMethodResultPaths(node) {
+    function ownerContracts(value, seen) {
+      value = unwrapChain(value);
+      const direct = mutationDelegatingOwnerGetterContracts(value);
+      if (direct.length || value?.type !== "Identifier") return direct;
+      const record = analysis.resolveIdentifier(value);
+      if (!record || seen.has(record) || record.declarationKind !== "const" || isIdentityTransitionRecord(record)) return [];
+      return ownerContracts(record.init, new Set([...seen, record]));
+    }
+    function resolve(value, seen = new Set()) {
+      value = unwrapChain(value);
+      if (value?.type === "MemberExpression" && !value.computed) {
+        const entry = ownerContracts(value.object, seen).find(entry => entry.borrowedResultPathsByMethod[value.property.name]);
+        return entry?.borrowedResultPathsByMethod[value.property.name] || null;
+      }
+      if (value?.type !== "Identifier") return null;
+      const record = analysis.resolveIdentifier(value);
+      if (record?.kind === "import" && record.importKind === "ImportSpecifier" && !isIdentityTransitionRecord(record)) {
+        return STATE_BORROWED_RUNTIME_CONTRACT.flatMap(entry => entry.borrowedPublicExports).find(entry =>
+          entry.modulePath === resolveProjectLocalImportPath(record.importSource)
+          && entry.exportName === record.importedName)?.paths || null;
+      }
+      if (!record || seen.has(record) || record.declarationKind !== "const" || isIdentityTransitionRecord(record)) return null;
+      const next = new Set([...seen, record]);
+      if (record.ownerNode?.id?.type === "ObjectPattern") {
+        const property = record.ownerNode.id.properties.find(property =>
+          (property.value?.type === "AssignmentPattern" ? property.value.left : property.value)?.name === value.name);
+        const method = staticPropertyName(property?.key, Boolean(property?.computed));
+        const entry = ownerContracts(record.init, next).find(entry => entry.borrowedResultPathsByMethod[method]);
+        return entry?.borrowedResultPathsByMethod[method] || null;
+      }
+      return resolve(record.init, next);
+    }
+    return resolve(node.callee);
+  }
+
+  function projectBorrowedClassification(borrowedPaths, path) {
+    const remaining = [];
+    for (const borrowed of borrowedPaths) {
+      if (!path.every((key, index) => index >= borrowed.length || key === "*" || borrowed[index] === "*" || borrowed[index] === key)) continue;
+      remaining.push(borrowed.slice(path.length));
+    }
+    return remaining.length
+      ? { status: "maybe", reference: null, borrowedPaths: remaining }
+      : { status: "none", reference: null };
+  }
+
+  function hasBorrowedOwnerCallback(callNode) {
+    const member = unwrapChain(callNode.callee);
+    if (member?.type !== "MemberExpression" || member.computed) return false;
+    return mutationDelegatingOwnerGetterContracts(unwrapChain(member.object)).some((entry) =>
+      entry.borrowedCallbackMethods.includes(member.property.name));
+  }
+
+  function isSanctionedBorrowedEffectCall(node, entry) {
+    if (node.optional || node.arguments.length !== entry.argumentCount
+      || node.arguments.some(argument => argument.type === "SpreadElement")) return false;
+    const options = unwrapChain(node.arguments[entry.optionsArgumentIndex]);
+    if (options?.type !== "ObjectExpression") return false;
+    return options.properties.every(property => {
+      if (property.type !== "Property" || property.computed || property.method || property.kind !== "init") return false;
+      const name = staticPropertyName(property.key, false);
+      if (!entry.allowedOptionNames.includes(name)) return false;
+      if (!entry.callbackOptionNames.includes(name)) return true;
+      const value = unwrapChain(property.value);
+      if (value?.type === "Literal" && value.value === null) return true;
+      if (value?.type !== "Identifier") return false;
+      const record = analysis.resolveIdentifier(value);
+      let parameterRecord = record;
+      let propertyPath = record?.parameterPath;
+      if (record?.kind === "variable" && record.declarationKind === "const"
+        && record.ownerNode?.id?.type === "ObjectPattern" && record.init?.type === "Identifier") {
+        const property = record.ownerNode.id.properties.find(property => property.value?.name === value.name);
+        parameterRecord = analysis.resolveIdentifier(record.init);
+        propertyPath = property && !property.computed ? `$/property:${staticPropertyName(property.key, false)}` : "";
+      }
+      const injection = parameterRecord?.kind === "parameter" ? findStateBorrowedCallbackInjectionEntry(
+        filePath, parameterRecord.ownerNode?.id?.name, record.name,
+      ) : null;
+      const provenInjection = injection && injection.parameterPath === propertyPath
+        && injection.parameterIndex === parameterRecord.parameterIndex && injection.callbackName === name
+        && (!injection.rootParameterName || injection.rootParameterName === parameterRecord.name)
+        && !isIdentityTransitionRecord(parameterRecord)
+        && createHash("sha256").update(normalizeJavaScriptSource(source)).digest("hex") === injection.sourceFingerprints[filePath];
+      return Boolean(record && !isIdentityTransitionRecord(record)
+        && (directImmutableLocalHelperNode({ type: "CallExpression", callee: value, start: node.start }) || provenInjection));
+
+    });
+  }
+
+  function immutableBorrowedLocalHelperNode(callNode) {
+    let callee = unwrapChain(callNode?.callee);
+    const seen = new Set();
+    while (callee?.type === "Identifier") {
+      const direct = directImmutableLocalHelperNode({ ...callNode, callee });
+      if (direct) return direct;
+      const record = analysis.resolveIdentifier(callee);
+      if (!record || seen.has(record) || record.kind !== "variable" || record.declarationKind !== "const"
+        || isIdentityTransitionRecord(record) || record.ownerNode.end > callNode.start) return null;
+      seen.add(record);
+      callee = unwrapChain(record.init);
+    }
+    return null;
+  }
+
+  function provenScopedBorrowedOperation(node) {
+    if (!recognizeCurrentContracts || !["CallExpression", "NewExpression"].includes(node?.type)) return null;
+    if (!STATE_BORROWED_SCOPED_OPERATION_CONTRACT.some(entry => entry.factoryModulePath === filePath)) return null;
+    const owner = provenBorrowedOwnerEntry(node);
+    if (!owner) return null;
+    return STATE_BORROWED_SCOPED_OPERATION_CONTRACT.find(entry =>
+      entry.factoryModulePath === filePath && entry.factoryExportName === owner.factoryExportName
+      && entry.factorySourceFingerprint === owner.factorySourceFingerprint
+      && createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex") === entry.operationSourceFingerprint) || null;
+  }
+
+  function provenScopedMembershipCall(node) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || callee?.type !== "MemberExpression" || callee.computed
+      || callee.object?.type !== "Identifier") return null;
+    const record = analysis.resolveIdentifier(callee.object);
+    if (!record || record.kind !== "variable" || record.declarationKind !== "const" || isIdentityTransitionRecord(record)) return null;
+    const entry = provenScopedBorrowedOperation(record.init);
+    if (entry?.bindingName !== record.name) return null;
+    return entry.resultCalls?.find(call => call.method === callee.property.name && call.argumentCount === node.arguments.length) || null;
+  }
+
+  function provenDirectBorrowedCallbackInvocation(node) {
+    if (!recognizeCurrentContracts || node?.type !== "CallExpression"
+      || node.optional || node.callee?.type !== "Identifier"
+      || node.arguments.some(argument => argument.type === "SpreadElement")) return null;
+    const record = analysis.resolveIdentifier(node.callee);
+    if (!record || isIdentityTransitionRecord(record)) return null;
+    let parameterRecord = record;
+    let parameterPath = record.parameterPath;
+    if (record.kind === "variable" && record.declarationKind === "const"
+      && record.ownerNode?.id?.type === "ObjectPattern" && record.init?.type === "Identifier") {
+      const property = record.ownerNode.id.properties.find(property =>
+        (property.value?.type === "AssignmentPattern" ? property.value.left?.name : property.value?.name) === record.name);
+      parameterRecord = analysis.resolveIdentifier(record.init);
+      parameterPath = property && !property.computed
+        ? `${parameterRecord?.parameterPath || "$"}/property:${staticPropertyName(property.key, false)}` : "";
+    }
+    if (parameterRecord?.kind !== "parameter" || isIdentityTransitionRecord(parameterRecord)) return null;
+    const entry = findStateBorrowedCallbackInjectionEntry(
+      filePath, parameterRecord.ownerNode?.id?.name, record.name,
+    );
+    if (!entry || !Number.isInteger(entry.invocationArgumentCount)
+      || entry.invocationArgumentCount !== node.arguments.length
+      || entry.parameterPath !== parameterPath
+      || entry.parameterIndex !== parameterRecord.parameterIndex
+      || (entry.rootParameterName && entry.rootParameterName !== parameterRecord.name)
+      || !Array.isArray(entry.invocationBorrowedArgumentIndexes)
+      || createHash("sha256").update(normalizeJavaScriptSource(source)).digest("hex")
+        !== entry.sourceFingerprints[filePath]) return null;
+    return entry;
+  }
+
+  function provenOwnerBorrowedStorage(record) {
+    if (!recognizeCurrentContracts || record?.kind !== "variable") return null;
+    if (provenOwnerBorrowedStorageByRecord.has(record)) return provenOwnerBorrowedStorageByRecord.get(record);
+    const scope = nearestFunctionOrProgramScope(record.scope);
+    let factory = scope?.node;
+    for (let parent = scope?.parent; parent; parent = parent.parent) {
+      if (isFunctionNode(parent.node)) factory = parent.node;
+    }
+    if (!isFunctionNode(factory)) return null;
+    const entry = [...STATE_MUTATION_DELEGATING_OWNER_CONTRACT, ...STATE_BORROWED_RUNTIME_CONTRACT].find(entry =>
+      entry.factoryModulePath === filePath && entry.factoryExportName === factory.id?.name
+      && entry.borrowedLocalStorage.length
+      && createHash("sha256").update(source.slice(factory.start, factory.end).trim()).digest("hex") === entry.factorySourceFingerprint);
+    const storage = entry?.borrowedLocalStorage.find(storage => storage.functionName === scope.node.id?.name
+      && storage.bindingName === record.name) || null;
+    provenOwnerBorrowedStorageByRecord.set(record, storage);
+    return storage;
+  }
+
+  function provenBorrowedCapabilityCall(node) {
+    if (node?.type !== "CallExpression" || node.arguments.some(argument => argument.type === "SpreadElement")) return null;
+    let capability = unwrapChain(node.callee);
+    let method = null;
+    if (capability?.type === "MemberExpression") {
+      if (capability.computed) return null;
+      method = capability.property.name;
+      capability = unwrapChain(capability.object);
+    }
+    const seen = new Set();
+    while (capability?.type === "Identifier") {
+      const record = analysis.resolveIdentifier(capability);
+      if (!record || seen.has(record) || record.kind !== "variable" || record.declarationKind !== "const"
+        || isIdentityTransitionRecord(record)) return null;
+      seen.add(record);
+      capability = unwrapChain(record.init);
+    }
+    const entry = provenDirectBorrowedCallbackInvocation(capability);
+    return entry?.invocationResultCalls?.find(call => call.method === method
+      && call.argumentCount === node.arguments.length) || null;
+  }
+
+  function isBorrowedRuntimeHookValue(value, seen = new Set()) {
+    const node = unwrapChain(value);
+    if (node?.type === "CallExpression") return Boolean(importedTargetDelegation(node)?.borrowedRuntimeHookResult);
+    if (node?.type !== "Identifier") return false;
+    const record = analysis.resolveIdentifier(node);
+    if (!record || seen.has(record)) return false;
+    return isBorrowedRuntimeHookValue(record.init, new Set([...seen, record]));
+  }
+
+  function provenOwnerBorrowedReturnPaths(node) {
+    if (!recognizeCurrentContracts || !node?.id?.name) return null;
+    const local = provenBorrowedOwnerEntry(node)?.borrowedResultPathsByMethod[node.id.name];
+    if (local) return local;
+    for (const entry of STATE_MUTATION_DELEGATING_OWNER_CONTRACT) {
+      if (entry.compositionModulePath !== filePath) continue;
+      const forwarder = entry.borrowedForwarders.find(forwarder => forwarder.functionName === node.id.name
+        && createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex") === forwarder.sourceFingerprint);
+      if (forwarder) return entry.borrowedResultPathsByMethod[forwarder.methodName] || null;
+    }
+    return null;
+  }
+
+  function hasProvenInjectedOwnerResultOrigin(node) {
+    const owner = provenBorrowedOwnerEntry(node);
+    // Public capabilities conservatively expose shared references. Within the
+    // factory, an injected cache is not dataflow from every unrelated parameter.
+    // Its shared writes are retained in the separately validated effect receipt;
+    // actual parameter reads, writes and local helper arguments are still scanned.
+    return Boolean(owner && STATE_BORROWED_OWNER_EFFECT_CONTRACT.some(entry =>
+      entry.factoryModulePath === owner.factoryModulePath
+      && entry.factoryExportName === owner.factoryExportName
+      && entry.factorySourceFingerprint === owner.factorySourceFingerprint
+      && entry.localResultOrigin === "injected-shared-cache"
+      && entry.localMethodNames.includes(node.id?.name)));
+  }
+
+  function provenBorrowedOwnerEntry(node) {
+    if (!recognizeCurrentContracts || !node) return null;
+    if (provenBorrowedOwnerByNode.has(node)) return provenBorrowedOwnerByNode.get(node);
+    let factory = node;
+    for (let parent = analysis.parentNodeForNode(node); parent; parent = analysis.parentNodeForNode(parent)) {
+      if (isFunctionNode(parent)) factory = parent;
+    }
+    const entry = [...STATE_MUTATION_DELEGATING_OWNER_CONTRACT, ...STATE_BORROWED_RUNTIME_CONTRACT].find(entry =>
+      entry.factoryModulePath === filePath && entry.factoryExportName === factory.id?.name
+      && createHash("sha256").update(source.slice(factory.start, factory.end).trim()).digest("hex") === entry.factorySourceFingerprint);
+    provenBorrowedOwnerByNode.set(node, entry || null);
+    return entry || null;
+  }
+
+  function isProvenOwnerBorrowedReturn(expression, aliasRecords) {
+    if (consumedBorrowedReturnFunctions.has(currentExecutionFunction())) return true;
+    const allowed = provenOwnerBorrowedReturnPaths(currentExecutionFunction());
+    const classification = referenceClassification(expression, aliasRecords);
+    return Boolean(allowed && classification.borrowedPaths?.length
+      && classification.borrowedPaths.every(path => allowed.some(expected =>
+        expected.length <= path.length && expected.every((key, index) => key === path[index]))));
+  }
+
+  function isProvenOwnerBorrowedStorageSlot(expression) {
+    let node = unwrapChain(expression);
+    const path = [];
+    while (node?.type === "MemberExpression") {
+      const key = staticPropertyName(node.property, node.computed);
+      if (key === null || key === undefined) return false;
+      path.unshift(String(key));
+      node = unwrapChain(node.object);
+    }
+    if (node?.type !== "Identifier") return false;
+    const storage = provenOwnerBorrowedStorage(analysis.resolveIdentifier(node));
+    return Boolean(storage && path.length && storage.paths.some(expected => expected.length >= path.length
+      && path.every((key, index) => expected[index] === "*" || expected[index] === key)));
+  }
+
+  function isProvenOwnerBorrowedArrayAppend(node) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || callee?.type !== "MemberExpression"
+      || callee.computed || callee.property.name !== "push" || callee.object.type !== "Identifier") return false;
+    const storage = provenOwnerBorrowedStorage(analysis.resolveIdentifier(callee.object));
+    return Boolean(storage && storage.paths.every(path => path[0] === "*")
+      && node.arguments.every(argument => argument.type === "ObjectExpression"
+        && argument.properties.every(property => property.type === "Property" && !property.computed
+          && property.kind === "init" && !property.method)));
+  }
+
+  function provenOwnerBorrowedMapRead(node) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || node.arguments.length !== 1
+      || node.arguments[0].type === "SpreadElement" || callee?.type !== "MemberExpression"
+      || callee.computed || callee.property.name !== "get") return null;
+    const owner = currentExecutionFunction();
+    return provenBorrowedOwnerEntry(owner)?.borrowedMapReadResultPaths?.[owner?.id?.name] || null;
+  }
+
+  function provenOwnerBorrowedArrayIteration(node, aliasRecords) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || node.arguments.length !== 1
+      || callee?.type !== "MemberExpression" || callee.computed
+      || !["filter", "some", "forEach", "map", "flatMap"].includes(callee.property.name)
+      || !provenBorrowedOwnerEntry(currentExecutionFunction())) return null;
+    const receiver = referenceClassification(callee.object, aliasRecords);
+    const slicedArray = provenScopedBorrowedOperation(unwrapChain(callee.object))?.operationKind === "borrowed-slice";
+    if (!receiver.borrowedPaths?.length || (!receiver.borrowedPaths.every(path => path[0] === "*") && !slicedArray)) return null;
+    const argument = unwrapChain(node.arguments[0]);
+    const callback = isFunctionNode(argument) ? argument : directImmutableLocalHelperNode({
+      type: "CallExpression", callee: argument, start: node.start,
+    });
+    if (!callback || executionFunctionStack.includes(callback)) return null;
+    const method = callee.property.name;
+    const resultCapability = callback.body?.type !== "BlockStatement"
+      ? provenBorrowedCapabilityCall(unwrapChain(callback.body)) : null;
+    return { callback, element: projectBorrowedClassification(receiver.borrowedPaths, ["*"]),
+      result: ["some", "forEach"].includes(method) || (method === "map" && resultCapability?.returnsBorrowedState === false)
+        ? { status: "none", reference: null }
+        : { status: "maybe", reference: null, borrowedPaths: method === "filter" ? receiver.borrowedPaths : [["*"]] } };
+  }
+
+  function borrowedOwnerMethodArgumentIndexes(node) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || node.arguments.some(argument => argument.type === "SpreadElement")
+      || callee?.type !== "MemberExpression" || callee.computed
+      || !isSanctionedMutationDelegatingOwnerGetterCall(unwrapChain(callee.object))) return [];
+    return mutationDelegatingOwnerGetterContracts(unwrapChain(callee.object)).find(entry =>
+      entry.borrowedMethodArgumentIndexes[callee.property.name])?.borrowedMethodArgumentIndexes[callee.property.name] || [];
   }
 
   function isSanctionedImportedBorrowedProjectionArgument(
@@ -4224,6 +4713,8 @@ function analyzeBindingMutations(
     if (!actionContract?.readOnlyArgumentIndexes?.includes(argumentIndex)) {
       return false;
     }
+    // Path masks originate only from proven borrowed-result contracts.
+    if (classification?.status === "maybe" && Array.isArray(classification.borrowedPaths)) return true;
     if (classification?.status === "exact") {
       const segments = classification.reference?.segments || [];
       return Boolean(
@@ -4731,7 +5222,9 @@ function analyzeBindingMutations(
     }
     if (node.type === "AssignmentExpression") {
       if (node.left.type === "Identifier") {
-        processExpression(node.right, aliasRecords);
+        processExpression(node.right, aliasRecords, {
+          suppressContainerEscape: Boolean(provenOwnerBorrowedStorage(analysis.resolveIdentifier(node.left))),
+        });
         if (
           node.operator !== "="
           && !LOGICAL_ASSIGNMENT_OPERATORS.has(node.operator)
@@ -4786,7 +5279,14 @@ function analyzeBindingMutations(
       return aliasRecords;
     }
     if (node.type === "CallExpression" || node.type === "NewExpression") {
-      processExpression(node.callee, aliasRecords);
+      const scopedOperation = provenScopedBorrowedOperation(node);
+      const scopedMembershipCall = provenScopedMembershipCall(node);
+      if (scopedOperation && node.callee.type === "MemberExpression") {
+        processExpression(node.callee.object, aliasRecords, { suppressContainerEscape: true });
+      } else processExpression(node.callee, aliasRecords);
+      if (node.type === "CallExpression" && isBorrowedRuntimeHookValue(node.callee)) {
+        recordClassificationDiagnostic({ status: "maybe", reference: null }, node, "unsupported-call-mutation");
+      }
       const callee = unwrapChain(node.callee);
       const receiverClassification = callee?.type === "MemberExpression"
         ? referenceClassification(callee.object, aliasRecords)
@@ -4800,6 +5300,11 @@ function analyzeBindingMutations(
       const sanctionedMutationDelegatingOwnerFactoryCall =
         node.type === "CallExpression"
         && isSanctionedMutationDelegatingOwnerFactoryCall(node);
+      const provenBorrowedArrayAppend = isProvenOwnerBorrowedArrayAppend(node);
+      const provenCapabilityCall = provenBorrowedCapabilityCall(node);
+      const provenBorrowedMapRead = provenOwnerBorrowedMapRead(node);
+      const borrowedArrayIteration = provenOwnerBorrowedArrayIteration(node, aliasRecords);
+      const localBorrowedHelper = directImmutableLocalHelperNode(node);
       let sanctionedImportedActionTarget = false;
       const argumentClassifications = [];
       for (
@@ -4820,15 +5325,44 @@ function analyzeBindingMutations(
         );
         const isSafeImportedActionPayloadContainer = Boolean(
           isImportedActionPayloadContainer
-          && isSafeRegisteredActionPayloadContainer(
-            payloadNode,
-            aliasRecords,
-          ),
+          && (isSafeRegisteredActionPayloadContainer(payloadNode, aliasRecords)
+            || isSanctionedImportedStateActionReadOnlyArgument(argument, argumentIndex,
+              referenceClassification(argument, aliasRecords), importedDelegation.actionContract, aliasRecords)),
         );
-        processExpression(argument, aliasRecords, {
+        if (argumentIndex === 0 && borrowedArrayIteration) {
+          consumedBorrowedReturnFunctions.add(borrowedArrayIteration.callback);
+          try {
+            processFunction(borrowedArrayIteration.callback, aliasRecords, {
+              parameterClassifications: [borrowedArrayIteration.element],
+            });
+          } finally { consumedBorrowedReturnFunctions.delete(borrowedArrayIteration.callback); }
+        } else if (argumentIndex === 0 && isFunctionNode(payloadNode) && hasBorrowedOwnerCallback(node)) {
+          // The callback receives an owner-held cache. Keep writes and escapes
+          // visible even though the owner's method capability itself is trusted.
+          processFunction(payloadNode, aliasRecords, {
+            parameterClassifications: [{ status: "maybe", reference: null }],
+          });
+        } else processExpression(argument, aliasRecords, {
           suppressContainerEscape: Boolean(
-            importedDelegation?.actionContract
-            && sanctionedImportedActionTarget,
+            scopedOperation || provenBorrowedArrayAppend
+            || provenDirectBorrowedCallbackInvocation(node)?.invocationBorrowedArgumentIndexes.includes(argumentIndex)
+            || (localBorrowedHelper && !executionFunctionStack.includes(localBorrowedHelper)
+              && localBorrowedHelper.params?.[argumentIndex]
+              && Array.isArray(referenceClassification(argument, aliasRecords).borrowedPaths))
+            ||
+            (importedDelegation?.actionContract
+              && sanctionedImportedActionTarget)
+            || (importedDelegation?.importedPureReaderContract?.allowBorrowedTarget
+              && argumentIndex === importedDelegation.targetArgumentIndex
+              && payloadNode?.type === "ObjectExpression"
+              && payloadNode.properties.every((property) => (
+                property.type === "Property"
+                && property.kind === "init"
+                && !property.method
+                && !property.computed
+              )))
+            || Boolean(importedDelegation?.borrowedEffectContract
+              && importedDelegation.borrowedEffectContract.borrowedArgumentIndexes.includes(argumentIndex)),
           ),
           sanctionedMutationDelegatingOwnerFactoryStateObject: Boolean(
             sanctionedMutationDelegatingOwnerFactoryCall
@@ -4882,13 +5416,32 @@ function analyzeBindingMutations(
         argumentClassifications,
         aliasRecords,
       );
+      const directBorrowedInjection = provenDirectBorrowedCallbackInvocation(node);
+      if (directBorrowedInjection) {
+        for (const index of directBorrowedInjection.invocationBorrowedArgumentIndexes) {
+          delegatedArgumentIndexes.add(index);
+        }
+      }
+      if (provenBorrowedArrayAppend) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
+      if (scopedOperation) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
+      if (scopedMembershipCall) for (const index of scopedMembershipCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (provenCapabilityCall) for (const index of provenCapabilityCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (provenBorrowedMapRead) delegatedArgumentIndexes.add(0);
+      if (borrowedArrayIteration) delegatedArgumentIndexes.add(0);
+      for (const index of borrowedOwnerMethodArgumentIndexes(node)) delegatedArgumentIndexes.add(index);
       if (
         sanctionedMutationDelegatingOwnerFactoryCall
-        && unwrapChain(node.arguments?.[0])?.type === "ObjectExpression"
+        && (
+          unwrapChain(node.arguments?.[0])?.type === "ObjectExpression"
+          || (mutationDelegatingOwnerFactoryContractForCall(node)?.factoryStateArgumentShape === "target"
+            && node.arguments.length === 1
+            && isSanctionedImportedStateActionTargetArgument(
+              node.arguments[0], argumentClassifications[0], aliasRecords))
+        )
       ) {
         delegatedArgumentIndexes.add(0);
       }
-      if (node.type === "CallExpression") {
+      if (node.type === "CallExpression" && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !borrowedArrayIteration) {
         recordUnknownCallMutation(
           node,
           receiverClassification,
@@ -5080,6 +5633,9 @@ function analyzeBindingMutations(
   }
 
   function childReferenceClassification(classification, key, dynamic = false) {
+    if (classification.borrowedPaths) {
+      return projectBorrowedClassification(classification.borrowedPaths, [dynamic ? "*" : String(key)]);
+    }
     if (classification.status !== "exact") {
       return {
         status: classification.status,
@@ -5427,7 +5983,8 @@ function analyzeBindingMutations(
     for (const declarator of node.declarations || []) {
       processPatternExpressions(declarator.id, aliasRecords);
       processExpression(declarator.init, aliasRecords, {
-        suppressContainerEscape: declarator.id.type !== "Identifier",
+        suppressContainerEscape: declarator.id.type !== "Identifier"
+          || Boolean(provenOwnerBorrowedStorage(analysis.resolveIdentifier(declarator.id))),
         actionProofReachable:
           isFunctionNode(declarator.init)
             ? exportedFunctionNodes.has(declarator.init)
@@ -6000,7 +6557,7 @@ function analyzeBindingMutations(
       processExpression(statement.argument, aliasRecords);
       if (!borrowedProjectionCallsWithReportedBorrowedArgument.has(
         unwrapChain(statement.argument),
-      )) {
+      ) && !isProvenOwnerBorrowedReturn(statement.argument, aliasRecords)) {
         recordClassificationDiagnostic(
           referenceClassification(statement.argument, aliasRecords),
           statement.argument || statement,

@@ -1,3 +1,12 @@
+// Preserve exact scene values so cached label batches reject any identity change.
+export function getTransportFacilityLabelBatchIdentity(state) {
+  return {
+    scenarioId: state.activeScenarioId,
+    sceneGeneration: state.sceneGeneration,
+    scenarioDataGeneration: state.scenarioDataGeneration,
+  };
+}
+
 export function getTransportFacilityDensityStrategy(k) {
   const scale = Math.max(0.0001, Number(k || 1));
   if (scale >= 5) {

@@ -10,10 +10,23 @@ import {
   selectPalettePaintColor,
 } from "../js/ui/toolbar/palette_library_panel.js";
 import { state } from "../js/core/state.js";
+import { hydrateStartupPaletteState } from "../js/core/state/color_state.js";
+import {
+  captureScenarioPaletteState,
+  commitScenarioPaletteState,
+  restoreScenarioPaletteState,
+} from "../js/core/state/actions/scenario_palette_actions.js";
+
+function patchPaletteFixture(patch) {
+  commitScenarioPaletteState(state, {
+    ...captureScenarioPaletteState(state).values,
+    ...patch,
+  });
+}
 
 test("source select replaces startup fallback options when palette catalog arrives without rebuilding unchanged options", () => {
-  const snapshot = { paletteRegistry: state.paletteRegistry, activePaletteId: state.activePaletteId,
-    currentPaletteTheme: state.currentPaletteTheme };
+  const paletteSnapshot = captureScenarioPaletteState(state);
+  const paletteRegistry = state.paletteRegistry;
   let selected = "";
   let replacements = 0;
   const select = {
@@ -25,38 +38,47 @@ test("source select replaces startup fallback options when palette catalog arriv
     set value(value) { selected = this.options.some((option) => option.value === value) ? value : ""; },
   };
   try {
-    state.paletteRegistry = null;
-    state.activePaletteId = "";
-    state.currentPaletteTheme = "TNO (The New Order)";
+    hydrateStartupPaletteState(state, { paletteRegistry: null });
+    patchPaletteFixture({ activePaletteId: "", currentPaletteTheme: "TNO (The New Order)" });
     const controller = createPaletteLibraryPanelController({ themeSelect: select });
     controller.syncPaletteSourceControls();
     assert.equal(select.value, "TNO (The New Order)");
     assert.equal(replacements, 0);
-    state.currentPaletteTheme = "Unavailable theme";
+    patchPaletteFixture({ currentPaletteTheme: "Unavailable theme" });
     controller.syncPaletteSourceControls();
     assert.equal(select.value, "TNO (The New Order)");
-    state.paletteRegistry = { palettes: [
+    hydrateStartupPaletteState(state, { paletteRegistry: { palettes: [
       { palette_id: "tno", display_name: "TNO palette" },
       { palette_id: "hgo", display_name: "HGO palette" },
-    ] };
-    state.activePaletteId = "hgo";
+    ] } });
+    patchPaletteFixture({ activePaletteId: "hgo" });
     controller.syncPaletteSourceControls();
     assert.equal(select.value, "hgo");
     assert.deepEqual(select.options.map((option) => option.textContent), ["TNO palette", "HGO palette"]);
     assert.equal(replacements, 1);
     const firstOption = select.options[0];
-    state.activePaletteId = "tno";
+    patchPaletteFixture({ activePaletteId: "tno" });
     controller.syncPaletteSourceControls();
     assert.equal(select.value, "tno");
     assert.equal(select.options[0], firstOption);
     assert.equal(replacements, 1);
-    state.paletteRegistry.palettes[0].display_name = "Updated TNO palette";
+    hydrateStartupPaletteState(state, { paletteRegistry: { palettes: [
+      { palette_id: "tno", display_name: "Updated TNO palette" },
+      { palette_id: "hgo", display_name: "HGO palette" },
+    ] } });
+    patchPaletteFixture({ activePaletteId: "tno" });
     controller.syncPaletteSourceControls();
     assert.equal(select.options[0].textContent, "Updated TNO palette");
     assert.equal(select.value, "tno");
     assert.equal(replacements, 2);
   } finally {
-    Object.assign(state, snapshot);
+    hydrateStartupPaletteState(state, {
+      paletteRegistry,
+      activePaletteMeta: paletteSnapshot.values.activePaletteMeta,
+      activePalettePack: paletteSnapshot.values.activePalettePack,
+      activePaletteMap: paletteSnapshot.values.activePaletteMap,
+    });
+    restoreScenarioPaletteState(state, paletteSnapshot);
   }
 });
 
@@ -69,7 +91,7 @@ test("choosing a palette color switches ownership editing to visual without chan
     activeSovereignCode: "GER",
     sovereigntyByFeatureId: owners,
     ui: { politicalEditingExpanded: true },
-    updatePaintModeUIFn: () => modeUpdates.push(paintState.paintMode),
+    updatePaintModeUIFn() { assert.equal(this, paintState); modeUpdates.push(this.paintMode); },
   };
   assert.equal(selectPalettePaintColor(paintState, "#00FF00"), true);
   assert.equal(paintState.selectedColor, "#00ff00");

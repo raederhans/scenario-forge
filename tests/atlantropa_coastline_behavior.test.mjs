@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createBorderMeshOwner } from "../js/core/renderer/border_mesh_owner.js";
-import { evaluateCoastlineTopologySource, getCoastlineTopologyMetrics } from "../js/core/renderer/border_mesh_diagnostics.js";
+import { evaluateCoastlineTopologyDiagnostics, evaluateCoastlineTopologySource, getCoastlineTopologyMetrics } from "../js/core/renderer/border_mesh_diagnostics.js";
 import { buildGlobalCoastlineMesh } from "../js/core/renderer/border_mesh_source_selection.js";
 
 const mask = (rings = 1) => ({ features: [{ geometry: { type: "Polygon", coordinates: Array.from({ length: rings }, () => []) } }] });
@@ -57,9 +57,14 @@ test("dedicated coastline follows overlay arrival, visibility and topology revis
   assert.equal(owner.resolveCoastlineTopologySource().source, "scenario");
   owner.ensureCoastlineMeshes();
   assert.equal(state.cachedCoastlinesHigh[0], dedicated);
-  state.cachedCoastlines = [];
+  const cachedCollections = Object.fromEntries(
+    ["cachedCoastlines", "cachedCoastlinesHigh", "cachedCoastlinesMid", "cachedCoastlinesLow"]
+      .map(key => [key, state[key]]),
+  );
+  for (const key of Object.keys(cachedCollections)) state[key] = [];
   const beforeRestore = meshes;
   owner.ensureCoastlineMeshes();
+  for (const key of Object.keys(cachedCollections)) assert.equal(state[key], cachedCollections[key]);
   assert.equal(state.cachedCoastlinesHigh[0], dedicated);
   assert.equal(meshes, beforeRestore, "clearing mesh arrays must reuse unchanged geometry");
   surface = "water-chunk-version";
@@ -115,4 +120,25 @@ test("ordinary scenario masks and their gates retain existing behavior", (t) => 
   assert.equal(evaluateCoastlineTopologySource({ primaryTopology, runtimeTopology }).decision.reason, "no_active_scenario");
   runtimeTopology.objects.context_land_mask = mask(601);
   assert.equal(evaluateCoastlineTopologySource({ primaryTopology, runtimeTopology, scenarioId: "hoi4" }).decision.reason, "interior_ring_count_exceeded");
+});
+
+test("coastline diagnostics exclude topology identities and isolate predicate bounds", (t) => {
+  const priorTopojson = globalThis.topojson;
+  const priorD3 = globalThis.d3;
+  t.after(() => { globalThis.topojson = priorTopojson; globalThis.d3 = priorD3; });
+  globalThis.topojson = { feature: (_topology, object) => object };
+  globalThis.d3 = { geoArea: () => 1, geoBounds: () => [[0, 0], [1, 1]] };
+  const primaryTopology = Object.freeze({ objects: Object.freeze({ land: mask() }) });
+  const runtimeTopology = Object.freeze({ objects: Object.freeze({ context_land_mask: mask() }) });
+  for (const scenarioId of ["", "hoi4"]) {
+    const inputs = { primaryTopology, runtimeTopology, scenarioId };
+    const original = evaluateCoastlineTopologySource(inputs);
+    const { topology, ...expected } = original.decision;
+    const projected = evaluateCoastlineTopologyDiagnostics(inputs);
+    assert.deepEqual(projected.decision, expected);
+    assert.equal(Object.hasOwn(projected.decision, "topology"), false);
+    assert.equal(topology, scenarioId ? runtimeTopology : primaryTopology);
+    projected.primaryMetrics.bounds[0][0] = 42;
+    assert.deepEqual(evaluateCoastlineTopologyDiagnostics(inputs).primaryMetrics.bounds, [[0, 0], [1, 1]]);
+  }
 });

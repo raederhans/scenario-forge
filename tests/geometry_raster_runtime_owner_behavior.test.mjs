@@ -100,6 +100,34 @@ test("hit requires current mapping, geometry, camera and dirty state; every resu
   const f = fixture(); f.owner.requestHit(); const bitmap = f.finish(0); await tick();
   assert.equal(f.commits.length, 1); assert.equal(bitmap.closes, 1);
 });
+for (const [field, before, after] of [
+  ["mapSemanticMode", "political", "visual"],
+  ["scenarioShellOverlayRevision", 1, 2],
+]) {
+  test(`hit identity rejects obsolete ${field} and does not reuse its pending request`, async () => {
+    for (const redispatch of [false, true]) {
+      const f = fixture();
+      f.state[field] = before;
+      assert.equal(f.owner.requestHit(), true);
+      f.state[field] = after;
+      if (redispatch) {
+        assert.equal(f.owner.requestHit(), true);
+        assert.equal(f.requests.length, 2, "changed semantics require a new worker identity");
+        assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
+      }
+      const obsoleteBitmap = f.finish(0); await tick();
+      assert.equal(obsoleteBitmap.closes, 1);
+      assert.equal(f.commits.length, 0, "a result must be revalidated even without a replacement request");
+      assert.equal(f.owner.requestHit(), true);
+      assert.equal(f.requests.length, 2, "obsolete completion must preserve the current pending request");
+      const currentBitmap = f.finish(1); await tick();
+      assert.equal(f.commits.length, 1);
+      assert.equal(currentBitmap.closes, 1);
+      f.owner.dispose();
+    }
+  });
+}
+
 test("disposed success, fallback and rejection cannot commit or schedule another render", async () => {
   for (const kind of ["political", "hit"]) for (const outcome of ["success", "null", "reject"]) {
     const f = fixture();

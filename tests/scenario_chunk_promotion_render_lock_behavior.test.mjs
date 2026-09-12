@@ -48,6 +48,7 @@ function createFixture({ renderNow = true, previousRenderLock = false, rollbackC
     recordRenderTransactionSnapshot: noop, getSearchParams: () => new URLSearchParams(),
     applyMergedScenarioChunkLayerPayloads: () => ({ changed: true, changedLayerKeys: ["political"] }),
     yieldToFrame: () => new Promise((resolve) => frames.push(resolve)),
+    normalizeScenarioId: value => String(value || "").trim(),
     isPendingScenarioChunkPromotionCurrent: () => current,
     canRollbackPromotionContinuation: () => rollbackCurrent,
     restoreMergedLayerRuntimeSnapshot: () => mutations.push(["restore-infra"]),

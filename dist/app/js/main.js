@@ -37,7 +37,7 @@ import {
   setMapData,
 } from "./core/map_renderer/public.js";
 import { flushRenderBoundary, requestRender } from "./core/render_boundary.js";
-import { callRuntimeHook, registerRuntimeHook } from "./core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "./core/state/index.js";
 import { runPostScenarioUiReplay } from "./core/scenario_post_apply_effects.js";
 import { t } from "./core/i18n.js";
 import {
@@ -292,7 +292,7 @@ async function ensureStartupInitialScenarioChunkVisualReady({
   if (typeof runtimeState.awaitInitialScenarioChunkVisualPromotionFn !== "function") {
     return null;
   }
-  const result = await runtimeState.awaitInitialScenarioChunkVisualPromotionFn({
+  const result = await callCompatRuntimeHook(runtimeState, "awaitInitialScenarioChunkVisualPromotionFn", {
     reason,
     d3Client,
     // Bootstrap owns the first visible frame after promotion readiness. Rendering

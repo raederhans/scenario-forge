@@ -262,8 +262,7 @@ function setActionHidden(element, hidden) {
   element.classList.toggle("hidden", !!hidden);
 }
 
-export function createSampleProjectBannerController({
-  runtimeState,
+export function createSampleProjectBannerController(runtimeState, {
   root,
   titleNode,
   bodyNode,
@@ -338,8 +337,7 @@ export function createSampleProjectBannerController({
   return controller;
 }
 
-export function createSampleProjectGuideCardController({
-  runtimeState,
+export function createSampleProjectGuideCardController(runtimeState, {
   root,
   titleNode,
   bodyNode,

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 import { createStartupBootOverlayController } from "../js/bootstrap/startup_boot_overlay.js";
 import { state as runtimeState } from "../js/core/state.js";
+import { setCurrentLanguage } from "../js/core/state/content_state.js";
 import {
   clearStartupReadonlyStateFields,
   commitStartupReadonlyStateFields,
@@ -107,7 +108,7 @@ test("shipping boot shell exposes recovery actions and separates error details i
     let reloads = 0;
     globalThis.location = { reload() { reloads += 1; } };
     for (const language of ["en", "zh"]) {
-      runtimeState.currentLanguage = language;
+      setCurrentLanguage(runtimeState, language);
       globalThis.document = createBootShellDocument();
       const node = (id) => {
         const element = document.getElementById(id);
@@ -147,7 +148,7 @@ test("shipping boot shell exposes recovery actions and separates error details i
     assert.equal(reloads, 2);
   } finally {
     setBootStateFields(runtimeState, bootFields);
-    runtimeState.currentLanguage = originalLanguage;
+    setCurrentLanguage(runtimeState, originalLanguage);
     for (const key of ["document", "location"]) {
       if (globals[key]) Object.defineProperty(globalThis, key, globals[key]);
       else delete globalThis[key];

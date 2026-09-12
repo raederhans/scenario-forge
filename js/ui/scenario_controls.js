@@ -1,5 +1,5 @@
 import { state as runtimeState } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callRequiredRuntimeHook, callRuntimeHook, readRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
 import {
   clearActiveScenarioCommand,
   applyScenarioByIdCommand,
@@ -37,7 +37,19 @@ const buildHgoRuntimePreviewOptionPayload = () => ({
   label: t("HGO Preview", "ui"),
 });
 
+let disposeActiveScenarioControls = null;
+
 export function initScenarioControls() {
+  disposeActiveScenarioControls?.();
+  const events = new AbortController();
+  const eventOptions = { signal: events.signal };
+  let releaseHook = () => {};
+  const dispose = () => {
+    events.abort();
+    releaseHook();
+    if (disposeActiveScenarioControls === dispose) disposeActiveScenarioControls = null;
+  };
+  disposeActiveScenarioControls = dispose;
   const scenarioSelect = document.getElementById("scenarioSelect");
   const scenarioSelectButton = document.getElementById("scenarioSelectButton");
   const scenarioSelectButtonText = document.getElementById("scenarioSelectButtonText");
@@ -85,7 +97,7 @@ export function initScenarioControls() {
       optionButton.dataset.value = value;
       optionButton.textContent = label;
       optionButton.addEventListener("click", () => {
-        if (!scenarioSelect || scenarioSelect.disabled) return;
+        if (events.signal.aborted || !scenarioSelect || scenarioSelect.disabled) return;
         scenarioSelect.value = value;
         scenarioSelect.dispatchEvent(new Event("change", { bubbles: true }));
         closeScenarioSelectMenu();
@@ -96,6 +108,7 @@ export function initScenarioControls() {
   };
 
   const renderScenarioControls = () => {
+    if (events.signal.aborted) return;
     const entries = getScenarioRegistryEntries();
     const isApplyInFlight = !!runtimeState.scenarioApplyInFlight;
     const isBootBlocking = runtimeState.bootBlocking !== false;
@@ -182,47 +195,44 @@ export function initScenarioControls() {
     }
   };
 
-  registerRuntimeHook(state, "updateScenarioUIFn", renderScenarioControls);
+  releaseHook = registerOwnedRuntimeHook(state, "updateScenarioUIFn", renderScenarioControls);
 
-  if (scenarioSelect && !scenarioSelect.dataset.bound) {
+  if (scenarioSelect) {
     scenarioSelect.addEventListener("change", () => {
       pendingScenarioId = normalizeScenarioSelectionValue(scenarioSelect.value);
       renderScenarioControls();
-    });
-    scenarioSelect.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (scenarioSelectButton && !scenarioSelectButton.dataset.bound) {
+  if (scenarioSelectButton) {
     scenarioSelectButton.addEventListener("click", () => {
       if (!scenarioSelectMenu || scenarioSelectButton.disabled) return;
       const isOpen = !scenarioSelectMenu.classList.contains("hidden");
       scenarioSelectMenu.classList.toggle("hidden", isOpen);
       scenarioSelectButton.setAttribute("aria-expanded", isOpen ? "false" : "true");
-    });
+    }, eventOptions);
     scenarioSelectButton.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeScenarioSelectMenu();
       }
-    });
-    scenarioSelectButton.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (scenarioSelectMenu && !scenarioSelectMenu.dataset.bound) {
+  if (scenarioSelectMenu) {
     scenarioSelectMenu.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeScenarioSelectMenu();
         scenarioSelectButton?.focus();
       }
-    });
+    }, eventOptions);
     document.addEventListener("click", (event) => {
       if (!scenarioSelectMenu || !scenarioSelectButton) return;
       if (scenarioSelectMenu.contains(event.target) || scenarioSelectButton.contains(event.target)) return;
       closeScenarioSelectMenu();
-    });
-    scenarioSelectMenu.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (applyScenarioBtn && !applyScenarioBtn.dataset.bound) {
+  if (applyScenarioBtn) {
     applyScenarioBtn.addEventListener("click", async () => {
       const scenarioId = pendingScenarioId || normalizeScenarioSelectionValue(scenarioSelect?.value);
       if (!scenarioId) return;
@@ -238,6 +248,9 @@ export function initScenarioControls() {
             renderScenarioControls();
             return;
           }
+          if (!readRuntimeHook(state, "setHgoRuntimePreviewEnabledFn")) {
+            throw new Error("Required runtime hook is not registered: setHgoRuntimePreviewEnabledFn");
+          }
           if (runtimeState.activeScenarioId) {
             clearActiveScenarioCommand({
               renderMode: "request",
@@ -245,7 +258,8 @@ export function initScenarioControls() {
               showToastOnComplete: false,
             });
           }
-          await callRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", true);
+          await callRequiredRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", true);
+          if (events.signal.aborted) return;
           resetZoomToFit({
             centerContent: true,
             centerX: true,
@@ -256,7 +270,8 @@ export function initScenarioControls() {
           return;
         }
         if (isHgoRuntimePreviewActive()) {
-          await callRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", false);
+          await callRequiredRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", false);
+          if (events.signal.aborted) return;
         }
         await applyScenarioByIdCommand(scenarioId, {
           renderMode: "request",
@@ -266,6 +281,7 @@ export function initScenarioControls() {
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       } catch (error) {
+        if (events.signal.aborted) return;
         console.error("Failed to apply scenario:", error);
         const message = String(error?.message || "").trim() || t("Unable to apply scenario.", "ui");
         showToast(message, {
@@ -274,11 +290,10 @@ export function initScenarioControls() {
           duration: 5200,
         });
       }
-    });
-    applyScenarioBtn.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (resetScenarioBtn && !resetScenarioBtn.dataset.bound) {
+  if (resetScenarioBtn) {
     resetScenarioBtn.addEventListener("click", () => {
       if (!runtimeState.activeScenarioId || runtimeState.scenarioApplyInFlight) return;
       const changed = resetScenarioToBaselineCommand({
@@ -290,36 +305,45 @@ export function initScenarioControls() {
         pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
         renderScenarioControls();
       }
-    });
-    resetScenarioBtn.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (clearScenarioBtn && !clearScenarioBtn.dataset.bound) {
+  if (clearScenarioBtn) {
     clearScenarioBtn.addEventListener("click", async () => {
-      if ((!runtimeState.activeScenarioId && !isHgoRuntimePreviewActive()) || runtimeState.scenarioApplyInFlight) return;
-      if (isHgoRuntimePreviewActive()) {
-        await callRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", false);
-      }
-      if (runtimeState.activeScenarioId) {
-        clearActiveScenarioCommand({
-          renderMode: "request",
-          markDirtyReason: "scenario-clear",
-          showToastOnComplete: true,
+      try {
+        if ((!runtimeState.activeScenarioId && !isHgoRuntimePreviewActive()) || runtimeState.scenarioApplyInFlight) return;
+        if (isHgoRuntimePreviewActive()) {
+          await callRequiredRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", false);
+          if (events.signal.aborted) return;
+        }
+        if (runtimeState.activeScenarioId) {
+          clearActiveScenarioCommand({
+            renderMode: "request",
+            markDirtyReason: "scenario-clear",
+            showToastOnComplete: true,
+          });
+        }
+        pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+        renderScenarioControls();
+      } catch (error) {
+        if (events.signal.aborted) return;
+        console.error("Failed to exit scenario:", error);
+        const message = String(error?.message || "").trim() || t("Unable to exit scenario.", "ui");
+        showToast(message, {
+          title: t("Scenario failed", "ui"),
+          tone: "error",
+          duration: 5200,
         });
       }
-      pendingScenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
-      renderScenarioControls();
-    });
-    clearScenarioBtn.dataset.bound = "true";
+    }, eventOptions);
   }
 
-  if (toggleBlankFeatureLabels && !toggleBlankFeatureLabels.dataset.bound) {
+  if (toggleBlankFeatureLabels) {
     toggleBlankFeatureLabels.addEventListener("change", () => {
       runtimeState.showBlankFeatureLabels = !!toggleBlankFeatureLabels.checked;
       callRuntimeHook(state, "renderNowFn", "blank-feature-labels-toggle");
       renderScenarioControls();
-    });
-    toggleBlankFeatureLabels.dataset.bound = "true";
+    }, eventOptions);
   }
 
   loadScenarioRegistry()
@@ -327,8 +351,9 @@ export function initScenarioControls() {
       renderScenarioControls();
     })
     .catch((error) => {
+      if (events.signal.aborted) return;
       console.warn("Unable to load scenario registry:", error);
       renderScenarioControls();
     });
+  return dispose;
 }
-

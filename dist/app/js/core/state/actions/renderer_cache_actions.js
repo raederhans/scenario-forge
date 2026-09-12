@@ -150,6 +150,30 @@ export function commitProjectedBoundsCacheState(
   return true;
 }
 
+// The public feature-ID map is shared with spatial-index preparation. Preserve
+// its identity and always address the current holder after a runtime reset.
+export function setProjectedBoundsCacheEntryState(target, featureId, bounds) {
+  assertStateTarget(target);
+  assertMap(target.projectedBoundsById, "projectedBoundsById");
+  target.projectedBoundsById.set(featureId, bounds);
+}
+
+export function syncProjectedBoundsCacheEntryState(target, featureId, bounds) {
+  assertStateTarget(target);
+  assertMap(target.projectedBoundsById, "projectedBoundsById");
+  if (bounds && target.projectedBoundsById.get(featureId) !== bounds) {
+    target.projectedBoundsById.set(featureId, bounds);
+  } else if (!bounds) {
+    target.projectedBoundsById.delete(featureId);
+  }
+}
+
+export function clearProjectedBoundsCacheEntriesState(target) {
+  assertStateTarget(target);
+  assertMap(target.projectedBoundsById, "projectedBoundsById");
+  target.projectedBoundsById.clear();
+}
+
 export function setDynamicBordersDirtyState(target, dirty, reason) {
   assertStateTarget(target);
   target.dynamicBordersDirty = dirty;
@@ -167,6 +191,55 @@ export function replaceCachedDetailAdmBordersState(target, meshes) {
   assertStateTarget(target);
   target.cachedDetailAdmBorders = meshes;
   return meshes;
+}
+
+// Publish the prepared LOD containers without copying their mesh references.
+export function replaceCachedCoastlineMeshesState(target, collections) {
+  assertStateTarget(target);
+  target.cachedCoastlines = collections.cachedCoastlines;
+  target.cachedCoastlinesHigh = collections.cachedCoastlinesHigh;
+  target.cachedCoastlinesMid = collections.cachedCoastlinesMid;
+  target.cachedCoastlinesLow = collections.cachedCoastlinesLow;
+}
+
+export function patchBorderMeshCacheState(target, patch) {
+  assertStateTarget(target);
+  if (Object.hasOwn(patch, "cachedBorders")) target.cachedBorders = patch.cachedBorders;
+  if (Object.hasOwn(patch, "cachedDynamicOwnerBorders")) target.cachedDynamicOwnerBorders = patch.cachedDynamicOwnerBorders;
+  if (Object.hasOwn(patch, "cachedDynamicBordersHash")) target.cachedDynamicBordersHash = patch.cachedDynamicBordersHash;
+  if (Object.hasOwn(patch, "cachedScenarioOpeningOwnerBorders")) target.cachedScenarioOpeningOwnerBorders = patch.cachedScenarioOpeningOwnerBorders;
+  if (Object.hasOwn(patch, "cachedFrontlineMesh")) target.cachedFrontlineMesh = patch.cachedFrontlineMesh;
+  if (Object.hasOwn(patch, "cachedFrontlineMeshHash")) target.cachedFrontlineMeshHash = patch.cachedFrontlineMeshHash;
+}
+
+// Publish unique, uncached country entries prepared by the synchronous runtime commit.
+// Empty entries are cached too, so a country with no mesh is not rebuilt.
+// Own the per-country arrays while retaining the mesh/geometry references.
+export function appendPreparedCountryBorderMeshesState(target, provinceEntries, localEntries, { syncGridLines = false } = {}) {
+  assertStateTarget(target);
+  target.cachedProvinceBordersByCountry ||= new Map();
+  target.cachedProvinceBorders ||= [];
+  target.cachedLocalBordersByCountry ||= new Map();
+  target.cachedLocalBorders ||= [];
+  let changed = false;
+  for (const entry of provinceEntries) {
+    const country = String(entry.country);
+    const meshes = [];
+    for (let index = 0; index < entry.meshes.length; index += 1) meshes[index] = entry.meshes[index];
+    target.cachedProvinceBordersByCountry.set(country, meshes);
+    target.cachedProvinceBorders.push(...meshes);
+    changed = true;
+  }
+  for (const entry of localEntries) {
+    const country = String(entry.country);
+    const meshes = [];
+    for (let index = 0; index < entry.meshes.length; index += 1) meshes[index] = entry.meshes[index];
+    target.cachedLocalBordersByCountry.set(country, meshes);
+    target.cachedLocalBorders.push(...meshes);
+    changed = true;
+  }
+  if (syncGridLines) target.cachedGridLines = Array.from(target.cachedLocalBorders);
+  return changed;
 }
 
 export function clearSphericalFeatureDiagnosticsCacheState(target) {

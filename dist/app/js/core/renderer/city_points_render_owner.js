@@ -321,6 +321,7 @@ export function createCityPointsRenderOwner({
       featureCount,
       markerEntries,
       labelEntries: !interactive && config.showLabels ? plan.labelEntries || [] : [],
+      labelBudget: plan.labelBudget,
       skipped: false,
       reason: "",
       config,
@@ -329,19 +330,22 @@ export function createCityPointsRenderOwner({
     };
   }
 
-  function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false } = {}) {
+  function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false, occupiedBoxes, layoutOnly = false } = {}) {
     syncRenderTargets();
-    if (!context || !Array.isArray(markerEntries) || !markerEntries.length) return;
+    if (!context || !Array.isArray(markerEntries) || !markerEntries.length) return [];
+    const drawnEntries = [];
     const transform = context.getTransform?.();
     const targetDensity = transform
       ? Math.max(Math.hypot(transform.a, transform.b), Math.hypot(transform.c, transform.d)) / scale
       : 1;
     const pixelDensity = Number.isFinite(targetDensity) && targetDensity > 0 ? targetDensity : 1;
-    context.save();
-    context.globalCompositeOperation = "source-over";
-    context.lineJoin = "round";
-    context.lineCap = "round";
-    context.globalAlpha = interactive ? Math.min(opacity, 0.8) : opacity;
+    if (!layoutOnly) {
+      context.save();
+      context.globalCompositeOperation = "source-over";
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.globalAlpha = interactive ? Math.min(opacity, 0.8) : opacity;
+    }
 
     markerEntries.forEach((entry) => {
       const spriteEntry = getCityVisualCapitalState(entry, config)
@@ -357,14 +361,51 @@ export function createCityPointsRenderOwner({
       const drawHeight = sprite.height / scale;
       const drawX = entry.anchor[0] - (sprite.anchorX / scale);
       const drawY = entry.anchor[1] - (sprite.anchorY / scale);
-      context.drawImage(sprite.canvas, drawX, drawY, drawWidth, drawHeight);
+      if (!layoutOnly) context.drawImage(sprite.canvas, drawX, drawY, drawWidth, drawHeight);
+      drawnEntries.push(entry);
+      if (occupiedBoxes && opacity > 0 && entry.screenPoint) {
+        occupiedBoxes.push({
+          x: entry.screenPoint[0] - sprite.anchorX,
+          y: entry.screenPoint[1] - sprite.anchorY,
+          w: sprite.width,
+          h: sprite.height,
+        });
+      }
     });
-    context.restore();
+    if (!layoutOnly) context.restore();
+    return drawnEntries;
+  }
+
+  function selectLabelledNearCities(renderState, occupiedBoxes = [], interactive = false) {
+    if (interactive || runtimeState.deferExactAfterSettle
+      || !renderState.config.showLabels || renderState.scale < 3.05) return renderState;
+    // Trial layout uses real sprite bounds, but never reserves space in the final pass.
+    const trialBoxes = [...occupiedBoxes];
+    drawCityMarkersFromEntries(renderState.markerEntries, {
+      ...renderState,
+      occupiedBoxes: trialBoxes,
+      layoutOnly: true,
+    });
+    drawCityLabelsFromEntries(renderState.labelEntries, {
+      ...renderState,
+      occupiedBoxes: trialBoxes,
+      layoutOnly: true,
+    });
+    const labelEntries = renderState.labelEntries.filter((entry) => entry.acceptedLabelPlacement);
+    const labelledEntries = new Set(labelEntries);
+    return {
+      ...renderState,
+      markerEntries: renderState.markerEntries.filter((entry) => (
+        entry.isCapital || entry.cityTier === "major" || labelledEntries.has(entry)
+      )),
+      labelEntries,
+      reusePlacement: true,
+    };
   }
 
   function drawCityPointsLayer(k, { interactive = false } = {}) {
     const startedAt = nowMs();
-    const renderState = getCityLayerRenderState(k, {
+    let renderState = getCityLayerRenderState(k, {
       interactive,
       cacheHoverEntries: true,
     });
@@ -379,15 +420,17 @@ export function createCityPointsRenderOwner({
       });
       return;
     }
-    drawCityMarkersFromEntries(renderState.markerEntries, {
+    renderState = selectLabelledNearCities(renderState, [], interactive);
+    const drawnEntries = drawCityMarkersFromEntries(renderState.markerEntries, {
       config: renderState.config,
       scale: renderState.scale,
       opacity: renderState.opacity,
       interactive,
     });
+    cacheVisibleCityHoverEntries(drawnEntries);
     collectContextMetric("drawCityPointsLayer", nowMs() - startedAt, {
       featureCount: renderState.featureCount,
-      visibleFeatureCount: renderState.markerEntries.length,
+      visibleFeatureCount: drawnEntries.length,
       labelCount: 0,
       interactive: !!interactive,
       skipped: false,
@@ -414,7 +457,7 @@ export function createCityPointsRenderOwner({
       });
       return;
     }
-    const renderState = getCityLayerRenderState(k, {
+    let renderState = getCityLayerRenderState(k, {
       interactive: false,
       cacheHoverEntries: true,
     });
@@ -429,22 +472,27 @@ export function createCityPointsRenderOwner({
       });
       return;
     }
-    drawCityMarkersFromEntries(renderState.markerEntries, {
+    renderState = selectLabelledNearCities(renderState, occupiedBoxes);
+    const drawnEntries = drawCityMarkersFromEntries(renderState.markerEntries, {
       config: renderState.config,
       scale: renderState.scale,
       opacity: renderState.opacity,
       interactive: false,
+      occupiedBoxes,
     });
+    cacheVisibleCityHoverEntries(drawnEntries);
     const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {
       config: renderState.config,
       scale: renderState.scale,
       occupiedBoxes,
+      labelBudget: renderState.labelBudget,
+      reusePlacement: renderState.reusePlacement,
     });
     recordRenderPerfMetric("drawLabelsPass", nowMs() - startedAt, {
       interactive: false,
       skipped: false,
       featureCount: renderState.featureCount,
-      visibleFeatureCount: renderState.markerEntries.length,
+      visibleFeatureCount: drawnEntries.length,
       labelCount,
     });
   }

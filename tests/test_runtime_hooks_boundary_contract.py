@@ -1,5 +1,6 @@
 from pathlib import Path
 import unittest
+import subprocess
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -20,14 +21,13 @@ SAMPLE_PROJECT_IMPORT_WORKFLOW_JS = REPO_ROOT / "js" / "core" / "sample_project_
 
 class RuntimeHooksBoundaryContractTest(unittest.TestCase):
     def test_state_index_keeps_runtime_hook_compat_surface(self):
-        content = STATE_INDEX_JS.read_text(encoding="utf-8")
-
-        self.assertIn("export function registerRuntimeHook(target, hookName, hook) {", content)
-        self.assertIn("export function readRuntimeHook(target, hookName) {", content)
-        self.assertIn("export function callRuntimeHook(target, hookName, ...args) {", content)
-        self.assertIn("export function callRuntimeHooks(target, hookNames, ...args) {", content)
-        self.assertIn("export function bindStateCompatSurface(target) {", content)
-        self.assertIn("export function registerRuntimeHookBusListener(target, hookName, listener) {", content)
+        # Exercise the exported contract instead of pinning function declaration strings.
+        result = subprocess.run(
+            ["node", "--test", "tests/runtime_hook_compat_behavior.test.mjs",
+             "tests/runtime_hook_lifecycle_behavior.test.mjs"],
+            cwd=REPO_ROOT, capture_output=True, text=True, timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_main_toolbar_sidebar_and_dev_workspace_keep_hook_wiring(self):
         main_content = MAIN_JS.read_text(encoding="utf-8")
@@ -75,7 +75,7 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         self.assertIn("export function emit(eventName, payload) {", bus_content)
         self.assertIn("export function once(eventName, listener) {", bus_content)
         self.assertIn('callRuntimeHook(state, "updateHistoryUIFn");', history_content)
-        self.assertIn('callRuntimeHooks(state, [', history_content)
+        self.assertIn('callRuntimeHooks(state, uiHooks);', history_content)
         self.assertIn('await callRuntimeHook(state, "ensureFullLocalizationDataReadyFn", {', i18n_content)
         self.assertIn('callRuntimeHooks(state, [', i18n_content)
 

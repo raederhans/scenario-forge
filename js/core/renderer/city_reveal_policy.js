@@ -67,10 +67,10 @@ const CITY_LABEL_DENSITY_BUDGETS = {
 const CITY_REVEAL_PHASES = [
   { id: "P0", minScale: 0, maxScale: 1.15, markerBudget: 18, labelBudget: 0 },
   { id: "P1", minScale: 1.15, maxScale: 1.45, markerBudget: 28, labelBudget: 0 },
-  { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 0 },
+  { id: "P2", minScale: 1.45, maxScale: 1.9, markerBudget: 42, labelBudget: 6 },
   { id: "P3", minScale: 1.9, maxScale: 2.45, markerBudget: 72, labelBudget: 8 },
-  { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 110, labelBudget: 24 },
-  { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 170, labelBudget: 48 },
+  { id: "P4", minScale: 2.45, maxScale: 3.05, markerBudget: 80, labelBudget: 24 },
+  { id: "P5", minScale: 3.05, maxScale: Infinity, markerBudget: 100, labelBudget: 48 },
 ];
 
 const CITY_MARKER_QUOTAS_BY_PHASE = Object.freeze({
@@ -364,7 +364,7 @@ export function getCityRevealBucket(entry, phaseId) {
       if (countryTier === "E" && isCapital) return 2;
       if (cityTier === "major") return 3;
       if (cityTier === "regional") return 4;
-      if (countryTier !== "E" && cityTier === "minor") return 5;
+      if (cityTier === "minor") return 5;
       return Number.POSITIVE_INFINITY;
   }
 }
@@ -393,13 +393,20 @@ function scaleCityMarkerQuota(baseQuota, markerDensity) {
   return Math.ceil(scaledQuota);
 }
 
-export function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1, viewportStats = null) {
+// At local scales, screen space gradually replaces country coverage quotas.
+export function getCityDetailProgress(scale) {
+  return clamp((Number(scale || 1) - 3.05) / (12 - 3.05), 0, 1);
+}
+
+export function getCityInterpolatedMarkerQuota(entry, scale, markerDensity = 1) {
   const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
   const countryTier = String(entry?.countryTier || "D").trim().toUpperCase();
   const fromQuota = Number(getCityMarkerQuotaForTier(currentPhase.id, countryTier) || 0);
-  const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) || fromQuota);
+  const toQuota = Number(getCityMarkerQuotaForTier(nextPhase.id, countryTier) ?? fromQuota);
   const interpolated = fromQuota + ((toQuota - fromQuota) * t);
-  return scaleCityMarkerQuota(interpolated, markerDensity);
+  const baseQuota = scaleCityMarkerQuota(interpolated, markerDensity);
+  const detailProgress = getCityDetailProgress(scale);
+  return Math.ceil(baseQuota + (getCityInterpolatedMarkerBudget(scale, markerDensity) - baseQuota) * detailProgress);
 }
 
 export function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
@@ -407,7 +414,7 @@ export function getCityInterpolatedMarkerBudget(scale, markerDensity = 1) {
   const fromBudget = Math.max(0, Number(currentPhase?.markerBudget || 0));
   const toBudget = Math.max(0, Number(nextPhase?.markerBudget || fromBudget));
   const interpolated = fromBudget + ((toBudget - fromBudget) * t);
-  return Math.max(0, Math.round(interpolated * clamp(Number(markerDensity) || 1, 0.5, 2)));
+  return Math.max(0, Math.round((interpolated + 20 * getCityDetailProgress(scale)) * clamp(Number(markerDensity) || 1, 0.5, 2)));
 }
 
 function getCityRevealCompetitionBand(phaseId = "") {
@@ -428,7 +435,7 @@ export function getCityPriorityCountryReserveBudget(scale, markerBudget) {
   if (normalizedBudget <= 0) return 0;
   const { currentPhase, nextPhase, t } = getCityRevealPhaseInterpolation(scale);
   const fromShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[currentPhase.id] || 0);
-  const toShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[nextPhase.id] || fromShare);
+  const toShare = Number(CITY_PRIORITY_COUNTRY_RESERVE_SHARE_BY_PHASE[nextPhase.id] ?? fromShare);
   const share = clamp(fromShare + ((toShare - fromShare) * t), 0, 0.5);
   return Math.min(normalizedBudget, Math.max(0, Math.round(normalizedBudget * share)));
 }
@@ -467,6 +474,9 @@ export function compareCityRevealEntries(left, right, phaseId = "P0") {
     if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
   } else {
     if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+    // Respect scenario strategic value within each reveal tier before population.
+    const strategicWeightDifference = Number(right?.sortWeight || 0) - Number(left?.sortWeight || 0);
+    if (strategicWeightDifference) return strategicWeightDifference;
     if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
     if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
     if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
@@ -487,20 +497,23 @@ export function compareCityRevealEntries(left, right, phaseId = "P0") {
   return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
 }
 
-export function getCityLabelBudget(phase, config = {}) {
+export function getCityLabelBudget(phase, config = {}, scale = phase?.minScale) {
   const densityKey = String(config.labelDensity || "balanced").trim().toLowerCase();
   const budgetTable = CITY_LABEL_DENSITY_BUDGETS[densityKey] || CITY_LABEL_DENSITY_BUDGETS.balanced;
   const phaseId = String(phase?.id || "");
   if (Object.prototype.hasOwnProperty.call(budgetTable, phaseId)) {
-    return Math.max(0, Number(budgetTable[phaseId] || 0));
+    return Math.max(0, Math.round(Number(budgetTable[phaseId] || 0) * (1 + 0.5 * getCityDetailProgress(scale))));
   }
   return Math.max(0, Number(phase?.labelBudget || 0));
 }
 
 export function isCityLabelEligibleForPhase(entry, phaseId) {
   const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
-  if (String(phaseId || "P0") === "P3") {
+  if (String(phaseId || "P0") === "P2") {
     return !!entry?.isCapital;
+  }
+  if (String(phaseId || "P0") === "P3") {
+    return !!entry?.isCapital || cityTier === "major";
   }
   if (String(phaseId || "P0") === "P4") {
     return !!entry?.isCapital || cityTier === "major";
@@ -512,7 +525,7 @@ export function isCityLabelEligibleForPhase(entry, phaseId) {
 }
 
 export function getCityLabelMinZoom(entry, config = {}) {
-  const configuredMinZoom = Number(config?.labelMinZoom || 1.9);
+  const configuredMinZoom = Number(config?.labelMinZoom || 1.45);
   if (entry?.isCapital) {
     return configuredMinZoom;
   }

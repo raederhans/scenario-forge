@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 60,
     "nodeCount": 74,
-    "reverseIndexKeyCount": 103,
+    "reverseIndexKeyCount": 110,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -59,11 +59,11 @@
         "specCount": 9
       },
       {
-        "dependency": "js/core/state/ui_state.js",
-        "specCount": 6
+        "dependency": "js/bootstrap/startup_bootstrap_support.js",
+        "specCount": 5
       },
       {
-        "dependency": "js/bootstrap/startup_bootstrap_support.js",
+        "dependency": "js/core/state/ui_state.js",
         "specCount": 5
       },
       {
@@ -497,10 +497,16 @@
         "js/core/data_loader.js",
         "js/core/map_renderer.js",
         "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/render_cache_owner.js",
         "js/core/renderer/transport_facility_icons.js",
         "js/core/scenario/presentation_display_restore.js",
         "js/core/state.js",
-        "js/core/state/ui_state.js",
+        "js/core/state/actions/appearance_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/core/state/actions/transport_actions.js",
+        "js/core/state/actions/ui_visibility_actions.js",
+        "js/core/state/content_state.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/startup-paths.js"
       ],
@@ -509,11 +515,17 @@
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
         "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/render_cache_owner.js",
         "js/core/renderer/transport_facility_icons.js",
         "js/core/scenario/presentation_display_restore.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
-        "js/core/state/ui_state.js",
+        "js/core/state/actions/appearance_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/core/state/actions/transport_actions.js",
+        "js/core/state/actions/ui_visibility_actions.js",
+        "js/core/state/content_state.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
@@ -527,11 +539,17 @@
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
         "js/core/renderer/pixel_ratio_policy.js",
+        "js/core/renderer/render_cache_owner.js",
         "js/core/renderer/transport_facility_icons.js",
         "js/core/scenario/presentation_display_restore.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
-        "js/core/state/ui_state.js",
+        "js/core/state/actions/appearance_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/core/state/actions/transport_actions.js",
+        "js/core/state/actions/ui_visibility_actions.js",
+        "js/core/state/content_state.js",
         "js/ui/sidebar.js"
       ]
     },
@@ -2048,6 +2066,9 @@
     "js/core/renderer/pixel_ratio_policy.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "js/core/renderer/render_cache_owner.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
     "js/core/renderer/render_transaction_diagnostics.js": [
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js",
       "tests/e2e/dev/normal_visual_paths.dev.spec.js"
@@ -2209,6 +2230,24 @@
       "tests/e2e/ui_rework_support_transport_hardening.spec.js",
       "tests/e2e/water_cache_strategy_regression.spec.js"
     ],
+    "js/core/state/actions/appearance_actions.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/actions/renderer_interaction_actions.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/actions/scenario_presentation_actions.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/actions/transport_actions.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/actions/ui_visibility_actions.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/content_state.js": [
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
     "js/core/state/index.js": [
       "tests/e2e/tno_open_ocean_rendering.spec.js"
     ],
@@ -2217,8 +2256,7 @@
       "tests/e2e/city_lights_layer_regression.spec.js",
       "tests/e2e/city_points_urban_runtime.spec.js",
       "tests/e2e/city_reveal_plan_regression.spec.js",
-      "tests/e2e/city_urban_rendering_regression.spec.js",
-      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+      "tests/e2e/city_urban_rendering_regression.spec.js"
     ],
     "js/ui/dev_workspace.js": [
       "tests/e2e/dev_workspace_i18n.spec.js"

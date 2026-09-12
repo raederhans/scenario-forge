@@ -9,6 +9,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     "appearance_selection_actions", "appearance_visibility_actions", "export_workbench_actions",
     "intensity_field_actions", "special_zone_actions", "strategic_overlay_actions",
     "transport_actions", "ui_chrome_actions", "ui_dirty_actions", "ui_visibility_actions",
+    "content_load_actions",
   ];
 
   const localActionOrder = Math.max(...baseRecords.map((record) => record.selectorOrder || 0)) + 1;
@@ -19,6 +20,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     sourceRefs: [
       "js/core/state/actions/" + name + ".js", "tests/" + name + "_behavior.test.mjs",
       ...(name === "special_zone_actions" ? ["js/core/special_zone_layers.js"] : []),
+      ...(name === "content_load_actions" ? ["js/core/state/content_state.js"] : []),
     ],
     ownerHints: ["state-ownership"], domains: ["state-ownership"], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
@@ -30,7 +32,8 @@ export function createLocalFeedbackRecords(baseRecords) {
   const borderRecords = ["border_mesh_owner", "border_draw_owner"].map((name, index) => ({
     id: "local:renderer:" + name,
     commandRef: "node --test tests/" + name + "_behavior.test.mjs",
-    sourceRefs: ["js/core/renderer/" + name + ".js", "tests/" + name + "_behavior.test.mjs"],
+    sourceRefs: ["js/core/renderer/" + name + ".js", "tests/" + name + "_behavior.test.mjs",
+      ...(name === "border_mesh_owner" ? ["js/core/renderer/border_mesh_queries.js"] : [])],
     ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
     platforms: ["all"], entrypointPolicyIndex: 5,
@@ -76,6 +79,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["city-paint-style", "renderer-runtime", "js/core/renderer/city_paint_style_model.js", "tests/city_paint_style_model_behavior.test.mjs"],
     ["scenario-chunk-payload-loader", "scenario-runtime", "js/core/scenario/chunk_payload_loader.js", "tests/scenario_chunk_payload_loader_behavior.test.mjs"],
     ["scenario-chunk-layer-payloads", "scenario-runtime", "js/core/scenario/chunk_layer_payloads.js", "tests/scenario_chunk_layer_payloads_behavior.test.mjs"],
+    ["scenario-chunk-promotion-queries", "scenario-runtime", "js/core/scenario/chunk_promotion_queries.js", "tests/scenario_chunk_promotion_queries_behavior.test.mjs", ["js/core/scenario/chunk_runtime.js"]],
     ["scenario-optional-layer-runtime", "scenario-runtime", "js/core/scenario/optional_layer_runtime.js", "tests/scenario_optional_layers_behavior.test.mjs", ["js/core/scenario_resources.js"]],
     ["state-write-allowlist", "state-ownership", "tools/check_state_write_allowlist.mjs", "tests/state_write_allowlist_behavior.test.mjs"],
     ["viewport-read-model", "renderer-runtime", "js/core/renderer/viewport_read_model_owner.js", "tests/viewport_read_model_owner_behavior.test.mjs"],
@@ -104,7 +108,18 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["workspace-chrome-support", "ui-shell", "js/ui/toolbar/workspace_chrome_support_surface_controller.js", "tests/workspace_chrome_support_surface_controller_behavior.test.mjs"],
     ["command-supersession-contracts", "test-routing", "tests/contracts/command_supersession_contracts.mjs", "tests/command_supersession_contracts.test.mjs"],
     ["state-action-source-contracts", "state-ownership", "tests/contracts/state_action_source_boundary_contracts.mjs", "tests/state_action_source_boundary_contracts.test.mjs"],
+    ["state-borrowed-effect-contract", "state-ownership", "tools/state_borrowed_effect_contract.mjs", "tests/state_borrowed_effect_contract_behavior.test.mjs", ["tools/state_writer_inventory.mjs"]],
+    ["state-owner-borrowed-storage", "state-ownership", "tools/state_action_delegation_contract.mjs", "tests/state_owner_borrowed_storage_behavior.test.mjs", ["tools/state_writer_inventory.mjs", "tools/state_borrowed_effect_contract.mjs", "js/core/renderer/border_mesh_owner.js", "js/core/renderer/city_lights_render_owner.js", "js/core/renderer/political_path_cache_owner.js", "js/core/scenario/chunk_runtime.js", "js/core/scenario_resources.js"]],
     ["worker-task-client", "renderer-runtime", "js/core/worker_task_client.js", "tests/worker_task_client_behavior.test.mjs"],
+    ["border-mesh-worker-runtime", "renderer-runtime", "js/core/renderer/border_mesh_worker_runtime.js", "tests/border_mesh_worker_runtime_behavior.test.mjs", ["js/core/state/actions/renderer_cache_actions.js"]],
+    ["renderer-cache-actions", "state-ownership", "js/core/state/actions/renderer_cache_actions.js", "tests/renderer_cache_actions_behavior.test.mjs"],
+    ["runtime-hook-compat", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_compat_behavior.test.mjs"],
+    ["runtime-hook-lifecycle", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_lifecycle_behavior.test.mjs", ["js/ui/scenario_controls.js"]],
+    ["physical-contour-visible-set", "renderer-runtime", "js/core/renderer/physical_contour_visible_set_owner.js", "tests/physical_contour_visible_set_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["projected-bounds-state-boundary", "state-ownership", "tools/check_architecture_boundaries.mjs", "tests/projected_bounds_state_boundary_behavior.test.mjs", ["js/core/renderer/projected_geometry_bounds_owner.js"]],
+    ["renderer-object-identity", "renderer-runtime", "js/core/renderer/object_identity.js", "tests/scenario_water_signature_behavior.test.mjs", ["tests/physical_contour_lod_policy_behavior.test.mjs"]],
+    ["country-source-border-meshes", "renderer-runtime", "js/core/map_renderer.js", "tests/country_source_border_meshes_behavior.test.mjs"],
+    ["transport-facility-render", "renderer-runtime", "js/core/renderer/transport_overview_render_owner.js", "tests/transport_facility_render_owner_behavior.test.mjs", ["js/core/renderer/transport_facility_display_policy.js"]],
     ["regional-presets", "sidebar-shell", "js/ui/sidebar/regional_preset_controller.js", "tests/regional_preset_controller_behavior.test.mjs"],
     ["scenario-transfers", "sidebar-shell", "js/ui/sidebar/scenario_transfer_controller.js", "tests/scenario_transfer_controller_behavior.test.mjs"],
     ["scenario-territory", "sidebar-shell", "js/ui/sidebar/scenario_territory_controller.js", "tests/scenario_territory_controller_behavior.test.mjs"],
@@ -118,7 +133,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
     // Shared-cache changes run the actual region/relief/cache assembly suite.
     ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs", [
-      "js/core/renderer/render_cache_owner.js", "js/core/renderer/scenario_relief_overlay_render_owner.js",
+      "js/core/renderer/render_cache_owner.js", "js/core/renderer/render_cache_validation_scope.js",
+      "js/core/renderer/scenario_relief_overlay_render_owner.js",
       "tests/scenario_relief_overlay_render_owner_behavior.test.mjs", "tests/render_cache_owner_invalidation_behavior.test.mjs",
       "docs/active/development-recovery-m4-20260908/plan.md",
       "docs/active/development-recovery-m4-20260908/context.md",
@@ -250,8 +266,24 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 6,
   };
 
+  const paletteLibraryOperationRecord = {
+    ...editorCheckoutRecord,
+    id: "local:palette-library-operation",
+    commandRef: "node --test tests/palette_library_operation_behavior.test.mjs tests/palette_library_operation_boundary.test.mjs tests/palette_library_panel_grouping.test.mjs",
+    sourceRefs: ["js/core/palette_library_operation.js", "js/core/palette_library_queries.js",
+      "js/core/palette_library_state_access.js",
+      "js/core/state/actions/palette_library_actions.js",
+      "js/core/state/actions/scenario_activation_actions.js",
+      "js/core/state/actions/scenario_presentation_actions.js", "js/ui/toolbar.js",
+      "js/ui/toolbar/palette_library_panel.js", "tests/palette_library_operation_behavior.test.mjs",
+      "tests/palette_library_operation_boundary.test.mjs", "tests/palette_library_panel_grouping.test.mjs"],
+    ownerHints: ["ui-shell"], domains: ["ui-shell"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 7,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
-    startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord];
+    startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
+    paletteLibraryOperationRecord];
 }

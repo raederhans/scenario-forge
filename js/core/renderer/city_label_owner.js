@@ -93,19 +93,33 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
     ? getters.getViewportSize
     : () => ({ width: 0, height: 0 });
 
-  function drawCityLabelsFromEntries(labelEntries, { config, scale, occupiedBoxes = [] } = {}) {
+  function drawCityLabelsFromEntries(labelEntries, {
+    config, scale, occupiedBoxes = [], labelBudget, layoutOnly = false, reusePlacement = false,
+  } = {}) {
+    const preferredPlacements = new Map();
+    if (Array.isArray(labelEntries)) {
+      for (const entry of labelEntries) {
+        if (reusePlacement) preferredPlacements.set(entry, entry.acceptedLabelPlacement);
+        delete entry.acceptedLabelPlacement;
+        delete entry.labelContrastMode;
+      }
+    }
     const context = getContext();
     if (!Array.isArray(labelEntries) || !labelEntries.length || !context) return 0;
     let labelCount = 0;
-    const fontPx = helpers.clamp((Number(config?.labelSize) || 11) - 1, 7, 23);
+    const baseFontPx = Number(config?.labelSize) || 11;
+    const maxLabels = Number.isFinite(labelBudget) ? Math.max(0, Math.floor(labelBudget)) : Infinity;
     context.save();
     context.globalAlpha = 1;
     context.textBaseline = "middle";
     context.lineJoin = "round";
-    labelEntries.forEach((entry) => {
+    for (const entry of labelEntries) {
+      if (labelCount >= maxLabels) break;
       const visualEntry = helpers.getCityVisualCapitalState(entry, config)
         ? entry
         : { ...entry, isCapital: false, markerSizePx: null };
+      const tierOffset = visualEntry.isCapital ? 1 : visualEntry.cityTier === "major" ? 0 : -1;
+      const fontPx = helpers.clamp(baseFontPx + tierOffset, 7, 23);
       context.font = `${visualEntry.isCapital ? 600 : 400} ${fontPx / scale}px ${serifStack}`;
       const fullText = helpers.getCityDisplayLabel(visualEntry.feature);
       const text = helpers.formatCityMapLabel(fullText, {
@@ -115,9 +129,10 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
         scale,
       });
       const labelMinZoom = helpers.getCityLabelMinZoom(visualEntry, config);
-      if (!text || !entry.screenPoint || scale < labelMinZoom) return;
+      if (!text || !entry.screenPoint || scale < labelMinZoom) continue;
       const markerSizePx = Number(visualEntry.markerSizePx || helpers.getCityMarkerSizePx(visualEntry, config));
-      const offsetPx = Math.max(7, markerSizePx + 4);
+      // Even the smallest sprite is 18px wide; keep its own label clear of it.
+      const offsetPx = Math.max(12, markerSizePx + 4);
       const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
       const metrics = context.measureText(text);
       const candidates = buildCityLabelPlacementCandidates(visualEntry, {
@@ -127,6 +142,8 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
         offsetPx,
         verticalOffsetPx,
       });
+      const preferredIndex = candidates.findIndex((candidate) => candidate.id === preferredPlacements.get(entry));
+      if (preferredIndex > 0) candidates.unshift(candidates.splice(preferredIndex, 1)[0]);
       const viewportSize = getViewportSize();
       const acceptedPlacement = claimScreenLabelPlacement(candidates, occupiedBoxes, (box) => (
         !(box.x > viewportSize.width + 24
@@ -135,10 +152,11 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
         || (box.y + box.h) < -24)
       ));
       if (!acceptedPlacement) {
-        return;
+        continue;
       }
       entry.acceptedLabelPlacement = acceptedPlacement.id;
       labelCount += 1;
+      if (layoutOnly) continue;
       const labelStyle = helpers.getCityLabelRenderStyle(visualEntry, config);
       context.textAlign = acceptedPlacement.textAlign;
       context.shadowColor = labelStyle.shadowColor;
@@ -151,7 +169,7 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       context.fillStyle = labelStyle.fillStyle;
       context.fillText(text, acceptedPlacement.drawX, acceptedPlacement.drawY);
       entry.labelContrastMode = labelStyle.usesLightLabel ? "light" : "default";
-    });
+    }
     context.restore();
     return labelCount;
   }

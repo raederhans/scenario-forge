@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { hydrateStartupBaseContentState } from "../js/core/state/content_state.js";
+import { callCompatRuntimeHook } from "../js/core/state/index.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -153,7 +154,7 @@ test("main import list no longer carries the proven unused startup support helpe
 test("main commits initial chunk promotion through the canonical boot action before inspecting result", () => {
   const mainSource = readRepoFile("js", "main.js");
   const awaitIndex = mainSource.indexOf(
-    "const result = await runtimeState.awaitInitialScenarioChunkVisualPromotionFn({",
+    'const result = await callCompatRuntimeHook(runtimeState, "awaitInitialScenarioChunkVisualPromotionFn", {',
   );
   const commitIndex = mainSource.indexOf(
     "setStartupInitialScenarioChunkVisualPromotion(runtimeState, result);",
@@ -206,7 +207,7 @@ test("bootstrap draws one complete frame after promotion, and none after failed 
       ready = true;
     }
     const dependencies = {
-      runtimeState, d3Client: {},
+      runtimeState, d3Client: {}, callCompatRuntimeHook,
       setStartupInitialScenarioChunkVisualPromotion: (_state, result) => events.push(result.status),
       setBootState: () => events.push("warmup"),
       invalidateAllRenderPasses: () => { dirty = true; },

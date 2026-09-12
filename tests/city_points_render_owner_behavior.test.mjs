@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createCityPointsRenderOwner } from "../js/core/renderer/city_points_render_owner.js";
+import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
 
 const markerTokens = {
@@ -87,6 +88,7 @@ function createRecordingContext(events = []) {
 
 function createCityPointsHarness({
   buildCityRevealPlan = null,
+  drawLabels = null,
   getCityMarkerRenderStyle = () => ({ backgroundColor: "", tokens: markerTokens }),
   markerEntries = [],
   labelEntries = [],
@@ -140,7 +142,7 @@ function createCityPointsHarness({
       drawCityLabelsFromEntries: (entries, options) => {
         events.push("labels");
         labelCalls.push({ entries, options });
-        return entries.length;
+        return drawLabels ? drawLabels(entries, options, context) : entries.length;
       },
       getCityMarkerRenderStyle,
       getCityMarkerSizePx: (entry) => Number(entry?.markerSizePx || 12),
@@ -244,6 +246,41 @@ test("city labels pass draws markers before delegating labels", () => {
   }
 });
 
+test("labels pass shares actual marker bounds and forwards the successful-label budget", (t) => {
+  t.after(installCanvasFactory());
+  const entries = [
+    { anchor: [40, 50], screenPoint: [80, 100], cityTier: "major", isCapital: true, markerSizePx: 16 },
+    { anchor: [100, 50], screenPoint: [200, 100], cityTier: "minor", markerSizePx: 6 },
+  ];
+  const harness = createCityPointsHarness({
+    markerEntries: entries,
+    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: [entries[0]], labelBudget: 1 }),
+  });
+  const existingBox = { x: 0, y: 0, w: 5, h: 5 };
+  const occupiedBoxes = [existingBox];
+  harness.owner.drawLabelsPass(2, { occupiedBoxes });
+  assert.equal(harness.labelCalls[0].options.labelBudget, 1);
+  assert.equal(harness.labelCalls[0].options.occupiedBoxes, occupiedBoxes);
+  assert.equal(occupiedBoxes[0], existingBox);
+  assert.equal(occupiedBoxes.length, 3, "all markers reserve space, including those without a label");
+  const draws = harness.context.calls.filter((call) => call.type === "drawImage");
+  draws.forEach(({ args: [, x, y, width, height] }, index) => {
+    const box = occupiedBoxes[index + 1];
+    const entry = entries[index];
+    assert.deepEqual(box, {
+      x: entry.screenPoint[0] + (x - entry.anchor[0]) * 2,
+      y: entry.screenPoint[1] + (y - entry.anchor[1]) * 2,
+      w: width * 2,
+      h: height * 2,
+    });
+    assert.ok(box.y < entry.screenPoint[1] - box.h / 2, "sprite extends above its geographic anchor");
+  });
+  harness.state.styleConfig.cityPoints.showLabels = false;
+  const markersOnly = [];
+  harness.owner.drawLabelsPass(2, { occupiedBoxes: markersOnly });
+  assert.equal(markersOnly.length, 2, "transport labels still avoid markers when city names are hidden");
+});
+
 test("city hover prefers higher-priority scenario entries without bestPriority errors", () => {
   const globalEntry = {
     id: "global-city",
@@ -284,6 +321,63 @@ test("city hover prefers higher-priority scenario entries without bestPriority e
       hit: true,
     },
   });
+});
+
+test("near cities keep named ordinary markers, capitals and majors without ghost hover or occupancy", (t) => {
+  t.after(installCanvasFactory());
+  const entries = [
+    { id: "named", cityTier: "regional" },
+    { id: "blocked", cityTier: "minor" },
+    { id: "capital", cityTier: "regional", isCapital: true },
+    { id: "major", cityTier: "major" },
+    { id: "not-candidate", cityTier: "regional" },
+  ].map((entry, index) => ({
+    ...entry, markerSizePx: 6, anchor: [20 + index * 50, 25], screenPoint: [80 + index * 200, 100],
+  }));
+  let pointer = entries[1].screenPoint;
+  const harness = createCityPointsHarness({
+    markerEntries: entries,
+    pointer: () => pointer,
+    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: entries.slice(0, 4), labelBudget: 4 }),
+    drawLabels: (candidates, options, context) => {
+      context.measureText = () => ({ width: 8 });
+      context.strokeText = () => {};
+      context.fillText = () => {};
+      return createCityLabelOwner({
+        getters: { getContext: () => context, getViewportSize: () => ({ width: 1100, height: 300 }) },
+        helpers: {
+          clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+          getCityVisualCapitalState: (entry) => !!entry.isCapital,
+          getCityDisplayLabel: () => "City", formatCityMapLabel: (text) => text,
+          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: () => 6,
+          getCityLabelRenderStyle: () => ({}),
+        },
+      }).drawCityLabelsFromEntries(candidates, options);
+    },
+  });
+  harness.state.zoomTransform.k = 4;
+  const blocker = { x: 200, y: 0, w: 550, h: 250 };
+  const occupiedBoxes = [blocker];
+  harness.owner.drawLabelsPass(4, { occupiedBoxes });
+  assert.equal(harness.renderMetrics.at(-1).detail.visibleFeatureCount, 3);
+  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1);
+  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 3);
+  assert.deepEqual(harness.labelCalls.at(-1).entries.map((entry) => entry.id), ["named"]);
+  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }), null);
+  pointer = entries[2].screenPoint;
+  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }).id, "capital");
+  assert.equal(occupiedBoxes.length, 5, "only existing blocker, three visible markers and one name remain");
+  assert.ok(!occupiedBoxes.slice(1).some((box) => box.x <= 280 && box.x + box.w >= 280));
+
+  for (const mode of ["labels-off", "distant", "deferred", "interactive"]) {
+    harness.state.styleConfig.cityPoints.showLabels = mode !== "labels-off";
+    harness.state.zoomTransform.k = mode === "distant" ? 2 : 4;
+    harness.state.deferExactAfterSettle = mode === "deferred";
+    harness.context.calls.length = 0;
+    if (mode === "interactive") harness.owner.drawCityPointsLayer(4, { interactive: true });
+    else harness.owner.drawLabelsPass(harness.state.zoomTransform.k, { occupiedBoxes: [blocker] });
+    assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 5, mode);
+  }
 });
 
 test("city layer render state uses injected zoom identity when runtime transform is absent", () => {

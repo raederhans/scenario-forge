@@ -63,13 +63,6 @@ export function createCountryFillPaletteOwner({
     return bestColor;
   }
 
-  function publish(next) {
-    if (next.size === dominantColors.size
-      && [...next].every(([country, color]) => dominantColors.get(country) === color)) return;
-    dominantColors = next;
-    appearanceRevision += 1;
-  }
-
   function rebuild(features, nextIdentity) {
     recordsById = new Map();
     recordsByCountry = new Map();
@@ -84,7 +77,11 @@ export function createCountryFillPaletteOwner({
       const color = resolveDominant(country);
       if (color) next.set(country, color);
     }
-    publish(next);
+    if (next.size !== dominantColors.size
+      || ![...next].every(([country, color]) => dominantColors.get(country) === color)) {
+      dominantColors = next;
+      appearanceRevision += 1;
+    }
     identity = nextIdentity;
     colorRevision = Number(state.colorRevision || 0);
   }

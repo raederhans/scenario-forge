@@ -23,7 +23,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     const width = kind === "political" ? (layout.pixelWidth ?? Math.floor(layout.paddedWidth * state.dpr)) : surface.getHitCanvas().width;
     const height = kind === "political" ? (layout.pixelHeight ?? Math.floor(layout.paddedHeight * state.dpr)) : surface.getHitCanvas().height;
     const semanticKey = kind === "political" ? h.getPoliticalSignature()
-      : [identityOf(state.idToKey), state.scenarioViewMode, state.scenarioShellRevision, state.sovereigntyRevision].join(":");
+      : [identityOf(state.idToKey), state.mapSemanticMode, state.scenarioShellOverlayRevision, state.sovereigntyRevision].join(":");
     const contentKey = entries.map(({ id, feature, fillColor, strokeColor, lineWidth }) =>
       [id, identityOf(feature.geometry), fillColor, strokeColor, lineWidth]);
     const identity = JSON.stringify([kind, sceneKey, projectionKey, transform, width, height, state.dpr, layout, semanticKey, contentKey]);
@@ -70,7 +70,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
       pending.set("political", existing);
       return existing.promise;
     }
-    const task = { identity: description.identity };
+    const task = { identity: String(description.identity) };
     let receivedResult = null;
     task.promise = worker.request({ ...description, projectionOptions: projectionOptions(), entries }).then((result) => {
       receivedResult = result;
@@ -142,7 +142,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
       pending.set("hit", existing);
       return true;
     }
-    const task = { identity: description.identity };
+    const task = { identity: String(description.identity) };
     task.promise = worker.request({ ...description, projectionOptions: projectionOptions(), entries }).then((result) => {
       if (!result) {
         if (!disposed && pending.get("hit") === task) e.requestRender("geometry-worker-hit-fallback");
@@ -171,7 +171,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     return !!preparePolitical();
   }
 
-  return { prepareFrame, preparePolitical, drawPolitical, requestHit,
+  return Object.freeze({ prepareFrame, preparePolitical, drawPolitical, requestHit,
     getPendingWorkCount: () => inFlight.size,
-    dispose() { disposed = true; worker.dispose(); close(politicalFrame?.result); politicalFrame = null; pending.clear(); inFlight.clear(); } };
+    dispose() { disposed = true; worker.dispose(); close(politicalFrame?.result); politicalFrame = null; pending.clear(); inFlight.clear(); } });
 }

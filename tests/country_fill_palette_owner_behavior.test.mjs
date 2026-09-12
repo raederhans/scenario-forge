@@ -92,6 +92,24 @@ test("replacement collections and removal cannot retain vanished country colors"
   assert.equal(h.owner.getDominantFillColorMap().size, 0);
 });
 
+test("equal rebuilds preserve the published Map and still advance identity and color revision", () => {
+  const h = harness();
+  const first = h.owner.getDominantFillColorMap();
+  h.state.sceneGeneration = 1;
+  h.state.colorRevision += 1;
+  assert.equal(h.owner.getDominantFillColorMap(), first);
+  assert.equal(h.owner.getAppearanceRevision(), 1);
+  h.reads.length = 0;
+  assert.equal(h.owner.getDominantFillColorMap(), first);
+  assert.deepEqual(h.reads, []);
+  h.features[3].color = "white";
+  h.edit(["d"]);
+  assert.equal(h.owner.getDominantFillColorMap(), first);
+  assert.equal(first.get("BB"), "white");
+  assert.deepEqual(h.reads, ["d"]);
+  assert.equal(h.owner.getAppearanceRevision(), 2);
+});
+
 test("duplicate IDs update all matching records without changing feature-order ties", () => {
   const h = harness(); h.features[2].id = "a"; h.owner.getDominantFillColorMap();
   h.features[0].color = "yellow"; h.features[2].color = "yellow"; h.reads.length = 0; h.edit(["a"]);

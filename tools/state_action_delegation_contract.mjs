@@ -247,6 +247,9 @@ const RENDERER_CACHE_ACTION_EXPORT_NAMES = Object.freeze([
   "replaceCachedDetailAdmBordersState",
   "commitRenderPassCacheState",
   "commitProjectedBoundsCacheState",
+  "setProjectedBoundsCacheEntryState",
+  "syncProjectedBoundsCacheEntryState",
+  "clearProjectedBoundsCacheEntriesState",
   "clearSphericalFeatureDiagnosticsCacheState",
   "setSphericalFeatureDiagnosticsCacheEntryState",
 ]);
@@ -376,8 +379,32 @@ const SPECIAL_ZONE_ACTION_EXPORT_NAMES = Object.freeze([
 
 const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
   Object.freeze({
+    modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
+    exportNames: Object.freeze(["applyPaletteFeatureColorState", "applyPaletteOwnerColorState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: SCENARIO_PRESENTATION_ACTION_MODULE_PATH,
+    exportNames: Object.freeze(["selectPaletteVisualPaintModeState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: RENDERER_CACHE_ACTION_MODULE_PATH,
+    exportNames: Object.freeze(["appendPreparedCountryBorderMeshesState", "replaceCachedCoastlineMeshesState", "patchBorderMeshCacheState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: "js/core/state/actions/palette_library_actions.js",
+    exportNames: Object.freeze([
+      "selectPalettePaintColorState",
+      "applyPaletteFeatureColorState",
+      "applyPaletteOwnerColorState",
+    ]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
     modulePath: "js/core/state/actions/content_load_actions.js",
-    exportNames: Object.freeze(["finishBaseCitySupportLoad", "finishFullLocalizationLoad", "finishContextLayerLoad"]),
+    exportNames: Object.freeze(["finishBaseCitySupportLoad", "finishFullLocalizationLoad", "finishContextLayerLoad", "commitPhysicalContourDisplayState"]),
     introducedInPhase: "P4.4",
   }),
   Object.freeze({
@@ -820,6 +847,1360 @@ function scenarioDetailConservativeFinding(
 }
 
 export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
+  "functionName": "getCoastlineDecisionSignature",
+  "targetParameterName": "decision",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "20546fa676da4944227e0120f7d3d4b53d897a64cff4c836cf7c89275f002e8e",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/scenario/chunk_promotion_queries.js",
+  "functionName": "getScenarioChunkActiveMergeIds",
+  "targetParameterName": "inputs",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "1daaa0230fb682abe8914dda80ec078b372f6b4422e77c1411521e832ae80d6d",
+  "localFunctionFingerprints": {},
+  // Each call maps a guarded input array to normalized strings; all later
+  // filtering and Set membership operate on those newly allocated values.
+  "conservativeFindings": [
+    ...["370958b7d9b4b0418e27967a963bbbedb0bfc1e9235bdd35283b5fca0b1b9abc", "5bd6487301ff34cde6793aa15bb82454f11b6c6e5904876c3106701de9d65c2f", "1f535992434006ca42a13a53f7937fe4f7bf51e8538b7b08f8aa0cfefbc4df9e"].map(sourceFingerprint => ({
+      enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getScenarioChunkActiveMergeIds","ordinal":0}]}',
+      reason: "unsupported-call-mutation", operation: "unsupported", key: "*", sourceFingerprint, count: 1,
+    })),
+  ],
+  "reviewedReadSiteFingerprints": ["370958b7d9b4b0418e27967a963bbbedb0bfc1e9235bdd35283b5fca0b1b9abc", "5bd6487301ff34cde6793aa15bb82454f11b6c6e5904876c3106701de9d65c2f", "1f535992434006ca42a13a53f7937fe4f7bf51e8538b7b08f8aa0cfefbc4df9e"]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/object_identity.js",
+  "functionName": "getObjectIdentityToken",
+  "targetParameterName": "value",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "d0c50ce02846b31de308e5a3f5f83580381e33bde90aca8332b8f5de3108bcc3",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getObjectIdentityToken\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "cd42404d52ad55ccfa9aca4adc828aa5800ad9d385a0671fbcbf724118320619",
+      "count": 2
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/scenario/chunk_promotion_queries.js",
+  "functionName": "isPendingScenarioChunkPromotionCurrent",
+  "targetParameterName": "inputs",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "28d66435360fbaad576c47cce030f1f2ba0940aec65ad1210878d55bbd4ba288",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_diagnostics.js",
+  "functionName": "evaluateCoastlineTopologyDiagnostics",
+  "targetParameterName": "inputs",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "7e0841b1e6556213ce98a66cd416c217f0d5e5a8d8fdadfb29940844f4641092",
+  "localFunctionFingerprints": {
+    "countGeometryPolygonParts": "6253ca05f39fac9c317781bd7298124151c98310826185e2efdcfcb93bde6736",
+    "evaluateCoastlineTopologySource": "1b4ef48525f3bca40b8bc684404b59013b4134700d96db2762263da246015436",
+    "getCoastlineTopologyMetrics": "66a5a3300ea6ce469fb361390e3fc96c9108da84d92f6cba5062399ead109ec0",
+    "getTopologyObjectFeatureCollection": "25cda633fb1c438c44e3b1fbf5e580f726fece5f1372d681211379d1b1239b99"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"evaluateCoastlineTopologyDiagnostics\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "32381523e63197c929b67f793a8098bed0ae3a6fa902634fdbcc6fa4567f3346",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/render_transform_reuse_policy_owner.js",
+  "functionName": "cloneRenderZoomTransform",
+  "targetParameterName": "transform",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "83315a29a6d5ef70eb07fffbe2b9a10c3b1b06f741b3bd846f16da69e084a42e",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/transport_facility_display_policy.js",
+  "functionName": "getTransportFacilityLabelBatchIdentity",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "82212c650ae124ceda9740acc3365372d8190e8228b768925aaef30d93f35f3c",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getTransportFacilityLabelBatchIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1963e2239e88e913f81d59bcb1b4f614fe3116c7bf999e4640baad346a0315b9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getTransportFacilityLabelBatchIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getTransportFacilityLabelBatchIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getTransportFacilityLabelBatchIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDataGeneration",
+      "sourceFingerprint": "8f1b09cd983b0fb42fd041070c997fbe3ead44b1a19ef8b37e0c10d5bfdeeea3",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "getBorderCountryAssignmentRevision",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "632e2b0e5fe5a86b523ffcec8bad394c1e4c05b7b46a157652e7ff7c52839b1a",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c154041e8d097872bcee89f351d4694bb2d53d7a020aba954760dbfef84d3d07",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyRevision",
+      "sourceFingerprint": "5ac7948b3391086275c22999645ef3a38ce4a6c475436f3f3aa6525bb96ca2f9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereigntyRevision",
+      "sourceFingerprint": "d10e5da8df7d08ca9843b5bf610dcd72af447440847ae7e67f992b77de1d615b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioShellOverlayRevision",
+      "sourceFingerprint": "0343e90c550cb86abb4f8c05eacf9e00ee1e54f7a58f81706a91d8ba321c6449",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderCountryAssignmentRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "mapSemanticMode",
+      "sourceFingerprint": "4b51e045be255cd00941075d6dfbe93c85f713e84a806e97ecd2718268eb0bb5",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "c154041e8d097872bcee89f351d4694bb2d53d7a020aba954760dbfef84d3d07"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "isAtlantropaCoastlineLandVisible",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "464ad88996954cebee184949ada793ddc7f2163919dcf6951474e05c19bc052c",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"isAtlantropaCoastlineLandVisible\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "740c3bdb760b3576f9506f085009089882be56f987405d158407b7ebc70d37e9",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": ["740c3bdb760b3576f9506f085009089882be56f987405d158407b7ebc70d37e9"]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "getBorderWorkerIdentity",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "c2412889af3d8eb6c37fe63ed14f1cd329a723fb681ea819e803d5622a833d80",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "8643511457c4d95c7517427b6ca4355f2619fc19e01edfd99e6048e1bf12a70a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioApplyEpoch",
+      "sourceFingerprint": "f8cbe1227b1934f432e828aa48c5a2f1aea0b3407391456e5ec71506466f0cd4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDataGeneration",
+      "sourceFingerprint": "8f1b09cd983b0fb42fd041070c997fbe3ead44b1a19ef8b37e0c10d5bfdeeea3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyRevision",
+      "sourceFingerprint": "5ac7948b3391086275c22999645ef3a38ce4a6c475436f3f3aa6525bb96ca2f9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereigntyRevision",
+      "sourceFingerprint": "d10e5da8df7d08ca9843b5bf610dcd72af447440847ae7e67f992b77de1d615b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioShellOverlayRevision",
+      "sourceFingerprint": "0343e90c550cb86abb4f8c05eacf9e00ee1e54f7a58f81706a91d8ba321c6449",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "mapSemanticMode",
+      "sourceFingerprint": "4b51e045be255cd00941075d6dfbe93c85f713e84a806e97ecd2718268eb0bb5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getBorderWorkerIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "showScenarioAtlantropa",
+      "sourceFingerprint": "c3f599b03f57f55ed17eeb19192cfbf35bd20a62351befbac2d8ddfa13c86b87",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "8643511457c4d95c7517427b6ca4355f2619fc19e01edfd99e6048e1bf12a70a"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "getDefaultBorderWorkerSources",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "0b955ef5cc7f60835bbb0b08ea1f45f0824e4247373d8a601c72afa238c2d066",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getDefaultBorderWorkerSources\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "047504b160b11ac9faa61d6834137c744160667991a9df2047148921248e4f39",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getDefaultBorderWorkerSources\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "3ad112ec3c3300bede71306cda536c5e278f777ed70e4bbb9e4c91efaf5529ee",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getDefaultBorderWorkerSources\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyDetail",
+      "sourceFingerprint": "72890bc3b5215447c442de899ff4e183237410e382a9ba58c716d8b87520d1e9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getDefaultBorderWorkerSources\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f26b1bc9d00172731e23a182832b39e0c4fa8b03d2533bedca776a9ecdd01340",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getDefaultBorderWorkerSources\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "6ea232e62cc8a7938c8a6ec39371d2c876838a6603b92d99740d501586cecda7",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "hasCachedProvinceBorders",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "efbd2d657aef5a2716c20e7137af050610c0c3d975a63fb29e10efa1cba797f9",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"hasCachedProvinceBorders\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "cachedProvinceBordersByCountry",
+      "sourceFingerprint": "ac30c92b38bd8d38c699d77052e40ad908c83ae9b09a9053013886052d8e53e0",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "ac30c92b38bd8d38c699d77052e40ad908c83ae9b09a9053013886052d8e53e0"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/border_mesh_queries.js",
+  "functionName": "hasCachedLocalBorders",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "6029e26aab5d172c92f4b63e144bd3247a0454cadc0825532b01a269ef50fc8b",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"hasCachedLocalBorders\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "cachedLocalBordersByCountry",
+      "sourceFingerprint": "d4a0bd07bdff80251b2e5d16a49b7ba6be4cae9cae9f74bd5c0233703dbcc3c6",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "d4a0bd07bdff80251b2e5d16a49b7ba6be4cae9cae9f74bd5c0233703dbcc3c6"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/geometry_raster_runtime_owner.js",
+  "functionName": "createGeometryRasterRuntimeOwner",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$/property:state",
+  "sourceFingerprint": "7f01b321f177d5d2c97c138b26d4f6ad0d0360e309c96a03b6ac434170fa40b2",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"enabled\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "95cdde82a67b80d4b4f23da121859d458dc869fcdea5f01ea8c1d30127acda29",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "zoomTransform",
+      "sourceFingerprint": "4cbd24c0282cefff40fce25d52c3b981ed0dfe212a8af6fba9cf4aba8f0279c5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "zoomTransform",
+      "sourceFingerprint": "003197902061c394b0f395e7363c3bcafc7590f368c44b3b99e78ddff5a19de3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "zoomTransform",
+      "sourceFingerprint": "2248d279c3e9ddd6cc090128d1c2db9e45bc941a49496626b13b7317525d8b53",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c0228f42f38187f090c02f2625926ec33dd894010fb38b43eee780a5fc5d1fa0",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDataGeneration",
+      "sourceFingerprint": "8f1b09cd983b0fb42fd041070c997fbe3ead44b1a19ef8b37e0c10d5bfdeeea3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyRevision",
+      "sourceFingerprint": "5ac7948b3391086275c22999645ef3a38ce4a6c475436f3f3aa6525bb96ca2f9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "landData",
+      "sourceFingerprint": "1ae491827e958b2ccdb4f9244f5fc7ef5f32a0c28e0504d25997c2893c00a5e8",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c0e2d48cb6b6106a229099f2947b5f16cd804da811362eecdd5f037e8853b974",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "idToKey",
+      "sourceFingerprint": "eb2fd3e7370071a887e3e02fcd99f698f42602d6409a62726bf11a725a0de618",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "mapSemanticMode",
+      "sourceFingerprint": "4b51e045be255cd00941075d6dfbe93c85f713e84a806e97ecd2718268eb0bb5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioShellOverlayRevision",
+      "sourceFingerprint": "0343e90c550cb86abb4f8c05eacf9e00ee1e54f7a58f81706a91d8ba321c6449",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereigntyRevision",
+      "sourceFingerprint": "d10e5da8df7d08ca9843b5bf610dcd72af447440847ae7e67f992b77de1d615b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "dpr",
+      "sourceFingerprint": "a55fe7fe3cf392958f033ecbb15a4073e2c96918d91aa09f7a3e8b7d23a44425",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"describe\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "7f5e9b277fa1ccc09fb19cf1b85a63b17bed65b5df5ccc5815a90a03af1ecbab",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"getPoliticalEntries\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "zoomTransform",
+      "sourceFingerprint": "2248d279c3e9ddd6cc090128d1c2db9e45bc941a49496626b13b7317525d8b53",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"preparePolitical\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c63b7f28ec400f4a62844dfef8ab9473b3846b46b920d52b0971386c6e361906",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"preparePolitical\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c9046f7a37ad0ea7cee73355984fa5428982f8b37c8f7bcec91f7ac71a7cd104",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"preparePolitical\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "867dc564fcf177cc3def6501e74c47ea127a02ec323594b2f6d75bdfe4fbf72b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"getHitEntries\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "idToKey",
+      "sourceFingerprint": "b1e64a324cdaa5531ef88d34e9fb2f43fc2aaf91ef0c432e5259a1bad5dc7e5f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"requestHit\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c63b7f28ec400f4a62844dfef8ab9473b3846b46b920d52b0971386c6e361906",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"requestHit\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c9046f7a37ad0ea7cee73355984fa5428982f8b37c8f7bcec91f7ac71a7cd104",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": [
+    "c0228f42f38187f090c02f2625926ec33dd894010fb38b43eee780a5fc5d1fa0",
+    "c0e2d48cb6b6106a229099f2947b5f16cd804da811362eecdd5f037e8853b974",
+    "b1e64a324cdaa5531ef88d34e9fb2f43fc2aaf91ef0c432e5259a1bad5dc7e5f"
+  ]
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/country_fill_palette_owner.js",
+  "functionName": "createCountryFillPaletteOwner",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$/property:state",
+  "sourceFingerprint": "d5454207020ed553ab9f1b4c3f50b976a7200d3e09c886a9124a60b537608d78",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "cd5de2d7e5daf0edec6bf4f32bef49592e3e7cb9d2bd1b8220c6e15f0bd5952e",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDataGeneration",
+      "sourceFingerprint": "8f1b09cd983b0fb42fd041070c997fbe3ead44b1a19ef8b37e0c10d5bfdeeea3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyRevision",
+      "sourceFingerprint": "5ac7948b3391086275c22999645ef3a38ce4a6c475436f3f3aa6525bb96ca2f9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereigntyRevision",
+      "sourceFingerprint": "d10e5da8df7d08ca9843b5bf610dcd72af447440847ae7e67f992b77de1d615b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioShellOverlayRevision",
+      "sourceFingerprint": "0343e90c550cb86abb4f8c05eacf9e00ee1e54f7a58f81706a91d8ba321c6449",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "mapSemanticMode",
+      "sourceFingerprint": "4b51e045be255cd00941075d6dfbe93c85f713e84a806e97ecd2718268eb0bb5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"readIdentity\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "showScenarioAtlantropa",
+      "sourceFingerprint": "c3f599b03f57f55ed17eeb19192cfbf35bd20a62351befbac2d8ddfa13c86b87",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"identityMatches\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "08e24ae48b260f88d6a790c80b1192afc9d46c6884beb7be75657d9d42352c2c",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"getDominantFillColorMap\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d85c754ba44529c90600f49d0663e923f40b2b44732ccffb8e460f67c4041114",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCountryFillPaletteOwner\",\"ordinal\":0},{\"name\":\"notifyColorsChanged\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d85c754ba44529c90600f49d0663e923f40b2b44732ccffb8e460f67c4041114",
+      "count": 3
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/urban_layer_render_owner.js",
+  "functionName": "createUrbanLayerRenderOwner",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$/property:state",
+  "sourceFingerprint": "6388b3a7cefe0a8f0c704d9ad4f61a79e8875dc3f6bad3c53e15e131a9fd9259",
+  "localFunctionFingerprints": {
+    "getUrbanZoomPaint": "c228b476cacc0dfed832111462af10f3a27c5aaa974aed7a1e9c1a8b5c49f7fb"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "003e415ba97c56f192fcb8962b6a1d8fca31212905724c498d335d24417d59e5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "5cb59c728dace418e3294c93690d291142f895658a906a8a3016133109869b26",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "3605f7137c829da98cf5ca7ddfdd1103da195d15cfd933390b4257f16e594aeb",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "urbanData",
+      "sourceFingerprint": "d37807ae72c92f2fbaf903c2090d3579f3f706f67012b654184be7a0b6a35ef1",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "38a5be91af79d7e5ba9809bf383c699b6864ee50446239fe56a45e32b84638fe",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2ad562319767157087dda0dec6391f4479f8a04869ab0cc8d3a9c3637dae73b5",
+      "count": 6
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanLayerRenderOwner\",\"ordinal\":0},{\"name\":\"drawUrbanLayer\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "09913deda591f446156d7284075806d4b03e2a1c16842ffd437fb9664667d803",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/state_defaults.js",
+  "functionName": "normalizePhysicalStyleConfig",
+  "targetParameterName": "rawConfig",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "ec93978c54619f491a794489730af217d47f315a7f7754921660a35809bd5ec1",
+  "localFunctionFingerprints": {
+    "clamp": "22a84881618ba6f57419b23947227aaf6be0d57194034e009aa8be75cf232ec4",
+    "createDefaultPhysicalAtlasVisibility": "1a40f77423b50a9b57c2d4c1fd7cf113fd35c61c2aaa33b326609ac35cee113d",
+    "createPhysicalPresetConfig": "3bba439f92100f3c5f22b4a01b133dd294b4901c3dfdd52c882ba79a5b032fce",
+    "normalizePhysicalBlendMode": "0f7d78c780e41ae9d2f4fb7f895a6bee33c86f0407f89edd0fb57b4db158bdab",
+    "normalizePhysicalMode": "13e3621c619aa439d1089607a54626df3d243e9769025792698ca26b230ff01b",
+    "normalizePhysicalPreset": "17816c812359011d62ca7e042f9c31b339c61f03ed7643d88f82d70d63419a1c",
+    "toFiniteNumber": "6039f7255116524fbaff35f7b5865fbf349d6654e45e0677ddc1195c73064423"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "e62abb84f4d252e6d6fc48974aafbbdea1bdc80fa44e493f8cef0efa77aa9935",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d7439bee24773bcbfa2d0a97947ee36227b10d1022b1a55847e928965bb6bfde",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "26069fd47ad5ab29d37c9293e6e8e685004f0176a6d8d3329a9c68c83f351775",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "75ca59f6bc72bb1266557e47eaf68e4703a65f1492198b4a0ca39a2f71647de2",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "895cc5a9b5b0fa97214c92582abeada42451d4d9a239d117b3e186fe9397ed71",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "50c7c902a24a9c465e272ba234ecb355265d097df742d3c1c3e0f7bf20da7588",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b205b3b72e3655381173849d50e838b79cd1c04af9c63cf3de34b1cdfde7aa71",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "ea9de34e28bc8ded73d3d12384e79126e071f85aeb34288c5211a627a16ef7f7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a0aad4da3231aa83017279fd38f77b05710fad1d5321ce40131db88a36e55891",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a21229e5d2bb941818caa8a3cdeaf947aae9558867444c7d5bd61c8d34ed47e4",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "9c36e90d71ce1a795dcb62f90fb45685956ea275818cfe52f5066b7c9997e16d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d1cbcce512c9a2b63f5d1865b8f7e7538daa08ce1398b69cf3b808c2ca82a83d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "90050f0316d5e6cae86f743b4cac8ef0d3c2285ec80e4e8eab25e2ec8913b3af",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "64694f4f67772e26d96b8f31273b14f7f9f2bedfc6d237d021303d46a83424ea",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "6424f773975ef286283cbe62a3a7a7e6d4e93715eaeedfe36c2c328ff0e49d86",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "44242c103d78192cfca9da82d1e324b75382119ea04c688114dc511731685678",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "58291100238a64531307478a0212fe3f62d0cf43c3208c2c7f2ca79f18ff7098",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePhysicalStyleConfig\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "7fd5e804796f2d501dd11940da12c4ce3ccde86e000e6cf54f2fb45dcd4566a7",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/state_defaults.js",
+  "functionName": "getPhysicalContextLayerRequests",
+  "targetParameterName": "rawConfig",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "cffb8021ace9cac3c855d4ac6aac888cae348896f9150443c89cf1eadae056c4",
+  "localFunctionFingerprints": {
+    "clamp": "22a84881618ba6f57419b23947227aaf6be0d57194034e009aa8be75cf232ec4",
+    "createDefaultPhysicalAtlasVisibility": "1a40f77423b50a9b57c2d4c1fd7cf113fd35c61c2aaa33b326609ac35cee113d",
+    "createPhysicalPresetConfig": "3bba439f92100f3c5f22b4a01b133dd294b4901c3dfdd52c882ba79a5b032fce",
+    "normalizePhysicalBlendMode": "0f7d78c780e41ae9d2f4fb7f895a6bee33c86f0407f89edd0fb57b4db158bdab",
+    "normalizePhysicalMode": "13e3621c619aa439d1089607a54626df3d243e9769025792698ca26b230ff01b",
+    "normalizePhysicalPreset": "17816c812359011d62ca7e042f9c31b339c61f03ed7643d88f82d70d63419a1c",
+    "normalizePhysicalStyleConfig": "ec93978c54619f491a794489730af217d47f315a7f7754921660a35809bd5ec1",
+    "toFiniteNumber": "6039f7255116524fbaff35f7b5865fbf349d6654e45e0677ddc1195c73064423"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getPhysicalContextLayerRequests\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c35ea2094353121654b138cf3e28961417fbbb52d91228707ab4e998a3c98771",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/renderer/physical_contour_lod_policy.js",
+  "functionName": "resolveContourLodRequest",
+  "targetParameterName": "state",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "6c0d00dd467485039dc839321ca406e633e4b6d12ad02e73571acd925d175c17",
+  "localFunctionFingerprints": {},
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveContourLodRequest\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "cc3d88e8eae650f35cd52bec25bcc82673a273349f609639ca92c172de19c269",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/sample_export_recommendation.js",
+  "functionName": "resolveSampleExportRecommendationContext",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "9bb082411a06615748e6158316d39bc40903310afdcd87c6294906797342d0b4",
+  "localFunctionFingerprints": {
+    "collectListIssues": "bdc9cb87feeb5fe6ac398f31efb56e3b0d7db5ff34207daeade7c8f18a96a2a3",
+    "collectSampleExportRecommendationIssues": "93afce7a68995ca957b52d818d95a48e777843ce72020b5a01a7c33155ee2755",
+    "getCommittedSampleProjectId": "4afbbb0ae296f3c1d9b1f46a25f876773bd9d372addf7f8938455fb5ec9d3944",
+    "getCommittedSampleProjectTitle": "faa2879cc233481c20c2a38dc9ef4d01dd9af21cf48a10c44aa29eb8304d13d8",
+    "getSampleExportRecommendationSummary": "06097a3d7fee98a7dac40388dc1cdd539cd30cd562ffcc00b72f39a975bcac9d",
+    "getSampleExportTargetLabel": "e99cc22545b0dedf4cb7a1e53037d5a95a2ada26eed855e3e9db7556a664ed7f",
+    "getScaleLabel": "8d9f6519049ba823555480096657152bb67e07584c985a85409550692ecbf6e5",
+    "isPlainObject": "cf2888bcc65fb6ec99eedfc930d575f86ca60fbdbe20d771988fdf98c2b14f5b",
+    "normalizeSampleExportRecommendation": "01cb3729a9e21076b7c3b75d38ef9099314bec5ea6092ca433a911a0190a6114",
+    "normalizeSampleProjectEntry": "bf66220b500e7ba26144e2c5c77efee2ba56548030602d0d4996864684424868",
+    "normalizeText": "2e1915d9ad51ae8032a7dfb0db8cb760ef8d770542bc9078ad0aaea127c6ec1a",
+    "normalizeToken": "156470195260dc738c8a0b09b35601746b7e41b49bf10fd644dc77c3d3696667",
+    "normalizeUniqueList": "d3d772cf37935e3e00555077517852b5d3d4df855d9a45ce946831dd7cb41aed",
+    "resolveSampleStateRecommendation": "92730e6a0df6a809a7ae95b8cbfd85308539c2f24ea318e149364d7a4b44b86b"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleExportRecommendationContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "f15e663dd80038db3b78cdb4f950128ee3a3a5998ef5b37eb084bcebd2a7926b",
+      "count": 3
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/ui/toolbar/sample_project_banner_controller.js",
+  "functionName": "resolveSampleProjectGuideContext",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "8152219c3f2bed1e8d89e287490abe97e18e33bb0f5d8dc029d9ce9fe62ed1c6",
+  "localFunctionFingerprints": {
+    "createStarterSampleProjectGuideContext": "f0c501f03d3f8ae9994c8a55ff94b3559732d5ee09844b15689eb4a5c7cde067",
+    "localize": "d2b27b3f2bf673fb323c2fa1fd7d1d3fba017a40e058fff25932850f4650c16c",
+    "normalizeSampleProjectEntries": "89cb89d6b331730e285f7b165b397fe73084854cc19a621b0b1f21dc79f9692c",
+    "normalizeText": "2e1915d9ad51ae8032a7dfb0db8cb760ef8d770542bc9078ad0aaea127c6ec1a",
+    "resolveCommittedSampleId": "4e3681fc3f5bb966b264fa5c3a6ad80ff44f9c098fe11b1397fe2f172c1c99de",
+    "resolveErrorMessage": "94ab0db5184fbcaf728d458924363d25ef6a856a19e69d128ae01bdc10bcfa9f",
+    "resolveOriginalDownloadUrl": "813d1102df46bbd6b64a5c7638a3a3432ea3c37c48a55d459755890efbb7ae29"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "8aa7bece7359f33be953e16f3df9c427b6d06ec014fc62b24c2bb043aebd3e0d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "a6c48e0403c0aa64e65a49778f88ed4cab00eadda1ba8648056cc64d6870c62a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "f15e663dd80038db3b78cdb4f950128ee3a3a5998ef5b37eb084bcebd2a7926b",
+      "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "d9fe06a233341626360c0a4ec7d7aec9a7caf5de7f6bd2fc7d43c879ded040a1",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "557449fc6a63a5438061a6cc87a39f5fcba90594c73ed01e74d264cf4a9dcdc0",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "5887e543b689a30f2f94ec0bc8479877c3e28f936c2e70232fef2f4613fd108b",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "cfdc776f3a61fbd0fdf884d076051f5261c40f9ce11eb3f087017b6b42bbb547",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveSampleProjectGuideContext\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "85580c0f74b47d539ca0c3c86bb7a1f16cf7672646bf93b24d0d91efbf00927c",
+      "count": 3
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/ui/toolbar/sample_project_banner_controller.js",
+  "functionName": "createSampleProjectBannerController",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "473bfddfe923ba630022d6bfea378b7aeff9b2c734b5363d9844ee61e3ee88a8",
+  "localFunctionFingerprints": {
+    "createDismissKey": "3370187f424f78ab2fe7c9b6d412e01e4fb89caec4dca5a7f359333879941b32",
+    "localize": "d2b27b3f2bf673fb323c2fa1fd7d1d3fba017a40e058fff25932850f4650c16c",
+    "normalizeText": "2e1915d9ad51ae8032a7dfb0db8cb760ef8d770542bc9078ad0aaea127c6ec1a",
+    "resolveErrorMessage": "94ab0db5184fbcaf728d458924363d25ef6a856a19e69d128ae01bdc10bcfa9f",
+    "resolveOriginalDownloadUrl": "813d1102df46bbd6b64a5c7638a3a3432ea3c37c48a55d459755890efbb7ae29",
+    "resolveSampleProjectBannerView": "2cf0dde96c475677958c85ea7357240cfbb6da6b1d2a30b9dc2ae99cfa727527",
+    "setActionHidden": "a6c62cdc36487662bc38504cdf08a73188657ec76745eda12c808ca7df52085e",
+    "setElementHidden": "30fc6e216e18d2f98aec523d34c67051564ef2c3aea6b22b5ddd83a3eb977f59"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createSampleProjectBannerController\",\"ordinal\":0},{\"name\":\"render\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "17f522213930a65c71f5d67a6e80610943eb89fe72f4e00e8f413b8b0a9dbc44",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createSampleProjectBannerController\",\"ordinal\":0},{\"name\":\"bindEvents\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sampleProjectDeeplink",
+      "sourceFingerprint": "17f522213930a65c71f5d67a6e80610943eb89fe72f4e00e8f413b8b0a9dbc44",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/ui/toolbar/sample_project_banner_controller.js",
+  "functionName": "createSampleProjectGuideCardController",
+  "targetParameterName": "runtimeState",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 2,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "40c5ecd5f66fc125434ce9415921602d7e5a936a4884e6bba1cca37ba9eaa778",
+  "localFunctionFingerprints": {
+    "createStarterSampleProjectGuideContext": "f0c501f03d3f8ae9994c8a55ff94b3559732d5ee09844b15689eb4a5c7cde067",
+    "localize": "d2b27b3f2bf673fb323c2fa1fd7d1d3fba017a40e058fff25932850f4650c16c",
+    "normalizeSampleProjectEntries": "89cb89d6b331730e285f7b165b397fe73084854cc19a621b0b1f21dc79f9692c",
+    "normalizeText": "2e1915d9ad51ae8032a7dfb0db8cb760ef8d770542bc9078ad0aaea127c6ec1a",
+    "resolveCommittedSampleId": "4e3681fc3f5bb966b264fa5c3a6ad80ff44f9c098fe11b1397fe2f172c1c99de",
+    "resolveErrorMessage": "94ab0db5184fbcaf728d458924363d25ef6a856a19e69d128ae01bdc10bcfa9f",
+    "resolveOriginalDownloadUrl": "813d1102df46bbd6b64a5c7638a3a3432ea3c37c48a55d459755890efbb7ae29",
+    "resolveSampleProjectGuideContext": "8152219c3f2bed1e8d89e287490abe97e18e33bb0f5d8dc029d9ce9fe62ed1c6",
+    "setActionHidden": "a6c62cdc36487662bc38504cdf08a73188657ec76745eda12c808ca7df52085e",
+    "setElementHidden": "30fc6e216e18d2f98aec523d34c67051564ef2c3aea6b22b5ddd83a3eb977f59"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createSampleProjectGuideCardController\",\"ordinal\":0},{\"name\":\"renderSampleChoices\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "312152ea23e8c305213eeef543a6537c1af7a7750e047edeb24ecaacc836a1c7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createSampleProjectGuideCardController\",\"ordinal\":0},{\"name\":\"renderSampleChoices\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "11c47534c1d322ba1904b2f566a7ce9ca256ad7dda35cdba9ebe0139e6d6a2c5",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createSampleProjectGuideCardController\",\"ordinal\":0},{\"name\":\"render\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 1
+    }
+  ],
+  "reviewedReadSiteFingerprints": []
+}),
+
+  freezeStateTargetPureReaderEntry({
+    modulePath: "js/core/palette_library_queries.js",
+    functionName: "resolvePaletteLibraryApplyTarget",
+    reviewedReadSiteFingerprints: [
+      "44d10f7bf5779044bf2aa9691cb015f14af1551f5df17b09d393890404d668e1",
+      "52a7f9d5ba55d506b477123b44a1dbad68f8496518035e6add6597dbd6717b2f"
+    ],
+    conservativeFindings: [
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolvePaletteLibraryApplyTarget\",\"ordinal\":0}]}",
+        "reason": "unsupported-call-mutation",
+        "operation": "unsupported",
+        "key": "landIndex",
+        "sourceFingerprint": "44d10f7bf5779044bf2aa9691cb015f14af1551f5df17b09d393890404d668e1",
+        "count": 1
+      },
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolvePaletteLibraryApplyTarget\",\"ordinal\":0}]}",
+        "reason": "unsupported-call-mutation",
+        "operation": "unsupported",
+        "key": "landIndex",
+        "sourceFingerprint": "52a7f9d5ba55d506b477123b44a1dbad68f8496518035e6add6597dbd6717b2f",
+        "count": 1
+      },
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolvePaletteLibraryApplyTarget\",\"ordinal\":0}]}",
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "selectedInspectorCountryCode",
+        "sourceFingerprint": "6ed811ca402195e0741f5a12679dcb843c8c3792df32b9c8898ad9bb20084e14",
+        "count": 1
+      }
+    ],
+    targetParameterName: "inputs",
+    importedArgumentCount: 1,
+    allowBorrowedTarget: true,
+    sourceFingerprint: "583a013d04428233674fd42f92996a2a66d32a7a7ec2cac302fb0d989f215353",
+    localFunctionFingerprints: {
+      normalizeOwnerCode: "280ec1d37c97a49faf9323e8b09a152aa8d9d010f79c6c6954f562f26ecc10b6",
+    },
+  }),
+  freezeStateTargetPureReaderEntry({
+    modulePath: "js/core/palette_library_queries.js",
+    functionName: "getFeatureIdsForOwnerColorRefresh",
+    reviewedReadSiteFingerprints: [
+      "ef08ab7ac1ed169d99a912713225734c008503bddcad9ac0dab3fa00175aaf86",
+      "30d03d5ab7e7c97dfd01e7de1e44250c6081041fb3bb1877d2d4f4f3c0815f03",
+      "1f9634b4c7ebe9e64e3a8a2aaf756d6b16d39d04e2ba6ac04b01d165d1a79782"
+    ],
+    conservativeFindings: [
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getFeatureIdsForOwnerColorRefresh\",\"ordinal\":0}]}",
+        "reason": "ambiguous-alias-flow",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "ef08ab7ac1ed169d99a912713225734c008503bddcad9ac0dab3fa00175aaf86",
+        "count": 1
+      },
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getFeatureIdsForOwnerColorRefresh\",\"ordinal\":0}]}",
+        "reason": "unsupported-call-mutation",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "30d03d5ab7e7c97dfd01e7de1e44250c6081041fb3bb1877d2d4f4f3c0815f03",
+        "count": 1
+      },
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getFeatureIdsForOwnerColorRefresh\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":3}]}",
+        "reason": "unsupported-call-mutation",
+        "operation": "unsupported",
+        "key": "landIndex",
+        "sourceFingerprint": "1f9634b4c7ebe9e64e3a8a2aaf756d6b16d39d04e2ba6ac04b01d165d1a79782",
+        "count": 1
+      }
+    ],
+    targetParameterName: "inputs",
+    importedArgumentCount: 2,
+    allowBorrowedTarget: true,
+    sourceFingerprint: "656df18fd3d1ef004f2bacf016e2235898ec05eae36141f86e8d7599e4d70bec",
+    localFunctionFingerprints: {
+      normalizeOwnerCode: "280ec1d37c97a49faf9323e8b09a152aa8d9d010f79c6c6954f562f26ecc10b6",
+    },
+  }),
 freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/legend_state_normalizers.js",
   "functionName": "normalizeLabels",
@@ -966,7 +2347,7 @@ freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/renderer/scenario_chunk_promotion_helpers.js",
   "functionName": "analyzeScenarioPoliticalDerivedStateCoverage",
   "targetParameterName": "runtimeState",
-  "sourceFingerprint": "9630df7917a5e7b3509fc089734917818d5ddd8317903b421b98c367570ff4c8",
+  "sourceFingerprint": "8a9f8ee3e441816b0a12df62d574990906b092d4449f6eaee068d99c50eed695",
   "importedArgumentCount": 1,
   "localFunctionFingerprints": {
     "getFeatureCollectionFeatures": "e1a8a6c9a1bb7968a52e0ae8aed7f1c1862a45f8a5cc5f6b00cc3675e20b21b6",
@@ -997,6 +2378,14 @@ freezeStateTargetPureReaderEntry({
       "key": "landData",
       "sourceFingerprint": "0fd4d335198763a982ae64517b274530ce4975db4efbf1fef68c70e3a3385e3b",
       "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"analyzeScenarioPoliticalDerivedStateCoverage\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "d747561f4df0ac246270df0626fa8c1a629025ac056aa51736406aac82433ffc",
+      "count": 2
     }
   ]
 }),
@@ -1410,22 +2799,38 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "b1f9d5450a30f26b32ff8cd5741027c0c86b329edc0d5bf5f62219fd909c4a89",
+  "sourceFingerprint": "889441dec930853ac97ae1df88d87436902e637208f4225e79606b06e2f53a18",
   "reviewedReadSiteFingerprints": [
     "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
     "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
-    "c9d026f60b7716cd3896264465741cca7bcbd32575de5255b357408f1c7733fb",
+    "50318e66ee60ec90f6eece379c41bed532dfb651fcc17e80c921a3923e4d477c",
     "649a631808e219f64f8c15f28dd2e05b159de8621abeaedf4ae517eb36dd7840",
     "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
     "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
     "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
+    "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
+    "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
     "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
     "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
-    "e03c9d6798f08d8092629c97836f33a9b660fefbf049728c3b9fe4d759dc709d",
-    "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
-    "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf"
+    "325e65d190d5441e5d865b40695e0eee9aad90ca206dde06bd211516b15c9ec9"
   ],
   "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getBorderAppearanceRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "80251709a36cf44e189abc1e5226764f9b0ce854f927627da901911f68c6774d",
+      "count": 1
+    },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
       "reason": "unsupported-call-mutation",
@@ -1472,7 +2877,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
-      "count": 2
+      "count": 3
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -1519,7 +2924,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "c9d026f60b7716cd3896264465741cca7bcbd32575de5255b357408f1c7733fb",
+      "sourceFingerprint": "50318e66ee60ec90f6eece379c41bed532dfb651fcc17e80c921a3923e4d477c",
       "count": 1
     },
     {
@@ -1583,6 +2988,22 @@ freezeStateTargetPureReaderEntry({
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
+      "sourceFingerprint": "364110161ea7b1708b7c391d5c2158174df92d4942a5bb89987150b84bede648",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "styleConfig",
+      "sourceFingerprint": "810d1a71db52ce4a5fc0b87587329bbd4caecd73786ec81a414b946247b875bb",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
       "sourceFingerprint": "fb966f56bb34229459f83628f83d5f91f8e71a63b56b21b78872cdf363f10763",
       "count": 1
     },
@@ -1620,6 +3041,14 @@ freezeStateTargetPureReaderEntry({
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
@@ -1635,11 +3064,11 @@ freezeStateTargetPureReaderEntry({
       "count": 2
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "80251709a36cf44e189abc1e5226764f9b0ce854f927627da901911f68c6774d",
+      "sourceFingerprint": "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
       "count": 1
     },
     {
@@ -1671,7 +3100,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "e03c9d6798f08d8092629c97836f33a9b660fefbf049728c3b9fe4d759dc709d",
+      "sourceFingerprint": "325e65d190d5441e5d865b40695e0eee9aad90ca206dde06bd211516b15c9ec9",
       "count": 1
     },
     {
@@ -1737,30 +3166,6 @@ freezeStateTargetPureReaderEntry({
       "key": "*",
       "sourceFingerprint": "814a638b718c74404bf36981e5d2704cf8405dddee63fb90dec6992979ba42bc",
       "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getBorderAppearanceRevision\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
-      "count": 1
     }
   ]
 }),
@@ -1778,6 +3183,14 @@ freezeStateTargetPureReaderEntry({
   "sourceFingerprint": "41838c0e0a1f663e76858ea9096a4b21a88de35ffd3bd18857433a83fd925dc3",
   "importedArgumentCount": 3,
   "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"buildScenarioChunkLayerSelectionSignatures\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "payloadByChunkId",
+      "sourceFingerprint": "ed5703b81f6d6868198e8c1fcdb7da5500178359be0a32e6500f4d9b0049434d",
+      "count": 1
+    },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"buildScenarioChunkLayerSelectionSignatures\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
       "reason": "state-alias-escape",
@@ -1819,7 +3232,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "0fe76ded2890283e1c6dcac426c372b22e5a6716b734e1b9741a2534b7f4a65a",
+  "sourceFingerprint": "453d6c8856513622143f405f0317fc1dffdf101cf53367a1cfb52f20fe8ea3ce",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"getCityRawFallbackLabel\",\"ordinal\":0}]}",
@@ -1830,7 +3243,23 @@ freezeStateTargetPureReaderEntry({
       "count": 1
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"getCityDisplayLabel\",\"ordinal\":0}]}",
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"resolveCityDisplayLabel\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a8f428ae15ee30a87d4a1acd7ffe4e48adbcd2f400facf488ddaface38376bbc",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"resolveCityDisplayLabel\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioGeoLocalePatchData",
+      "sourceFingerprint": "088349b3e0ed36d76cd63d4f3faaf7826ca6e4116b4346371370b63cf64996e8",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"resolveCityDisplayLabel\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "currentLanguage",
@@ -1895,14 +3324,30 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "2373a82ad02daa02f3a9cf8a78192c13e8e6008e2a81d69089440e7b9c05be3e",
+  "sourceFingerprint": "c451d541f0d567309f5f0f71f97c5274f5052cd92c4cf28996446f2e17972891",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
+      "sourceFingerprint": "ea0b830832854d9deb1bc25226c9685324b53c6a01a87e8dd288d23c82383323",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyDetail",
+      "sourceFingerprint": "8edd070d7210a8201b16b65ba20c261acc7c4fe661a79b5e1245731ef6c9bc39",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b5ef4f9b225eff3ed07c3c91829be497ac51b41abb3eacfe304acd3957336ee7",
       "count": 1
     },
     {
@@ -1911,7 +3356,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
-      "count": 3
+      "count": 2
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalFeaturePathEntry\",\"ordinal\":0}]}",
@@ -1935,7 +3380,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
-      "count": 3
+      "count": 4
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"runPoliticalPathWarmupSlice\",\"ordinal\":0}]}",
@@ -1951,7 +3396,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
-      "count": 3
+      "count": 4
     }
   ],
   "reviewedReadSiteFingerprints": []
@@ -2039,7 +3484,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "8cfcb05b28d27745fa135a08fd0ea2936a158fd35eab514edf42059cddde3a8b",
+  "sourceFingerprint": "fe268dcce895261da021e818431ea2ba166d5750fbc2162296a1b65f806137ce",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createUrbanAdaptivePaintModel\",\"ordinal\":0},{\"name\":\"getUrbanHostFillColor\",\"ordinal\":0}]}",
@@ -2283,278 +3728,430 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "173c45652e3d9686bd647eb194658d19e6886accba3d4b452480e3577ecc8b7c",
+  "sourceFingerprint": "676eb69ead980e86e9fabc6c9a71b517050bfa8f5c80e639266210148097619b",
   "conservativeFindings": [
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"buildDetailAdmMeshSignature\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "6ee3ea5be0fff658a0d31bd14d8fea0c11d9d6eb03b5aaf391978880971cc963",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "bcaf5eab79242d6df3d77d118c98aed908da502e5a60b25bb6af8e9eed7661d2",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "cachedProvinceBordersByCountry",
-      "sourceFingerprint": "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
-      "count": 2
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "cachedLocalBordersByCountry",
-      "sourceFingerprint": "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e",
-      "count": 2
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "topologyDetail",
-      "sourceFingerprint": "8edd070d7210a8201b16b65ba20c261acc7c4fe661a79b5e1245731ef6c9bc39",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "e2d15361c9fc9967183d139951c46a7376f5ab0eb4c7fb900c3c6aad23915c16",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "fae5b0a220e1ba8551c1e62eb6840b5ae0fa94ee63e20fbb95ad4a2bdc421176",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "a6fb3c0d19791619021b29305034932a534f8d31e53b165838a0c4453bfab844",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "63f218ce93822be3aaab058ab7c076f099b73b4b9f95e128aee4c6b365a8af8a",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "825ba80f85d4297065e09046bc0384a76354a8cfeaa61a26cabbadaa5451a741",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "2c40a63d04e06d704264f58fe99aa72ce9e0de5e06354ba48d8f67c894c6ace6",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "0d7697173cbabc5239d99627f46b960710b15ae826a843fae7c14ea264963a5f",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "1e31289410bd9b1203c6097d9fcbdc39ae1df7bd54a39c53c4741c3a6c01a168",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "baf43bcd52a6d4a2c95551551241cea3c144cd6761681076247fed92ad5b0427",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "e2545b6887e7a64ddcceee36b8287c5addb100225c3b38bbb14f9195b8aff28b",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "5b86385e6a9bd09851b294c0848c9df6b6d09ae86a04231a45a7af4d752d12a1",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "4562e6a3c7edb21eb3a6f0ca43d50c3ea7db9245e02f96021a5e4a1f8ce7226c",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "f7f6b3760014f41fca0f05c69c6afab091f64627401e7e862336d6bc7aca0705",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "be50eed3ca51bfb92932742e45d2b50002d0d255b75ad690163318ebbea67ea5",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "eac58d75a6a0129a3d7115573b618b9f8ce6e57b4d2808af83ea744a770c5708",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "15c766f8f3292c6614d208ceb318a9665520e65078c55aa9f2a37e4c32a319c9",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "81c6ad98f8c0a688fab87b97e8b84090d38c7bea3697cffe1608de89ac407750",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "91add48bde0eea8752a95375e776f975d2ebb3f5efedbea7e32e557d7e3882ea",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "72454a3cc82de994e177033a54550509466ca6bd1d434acf90257f18437735ca",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "89c06705d47e1d0b3974e4570e71ac9dc0dee46e07abc7c8fddf24ae80d8570a",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "d5bdad7afb5df8a724d6aa1887dffb6ffbe5e6fde4c044a448f908e5a56ad7f2",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b0b72d636adba43bb381e746caa1bc0ed2419ebe88c347c3178a34c661df1e15",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "bea38f6b4dc48e1a4aa8e427534a9c7c6a9f21c108f219b77d81dec03465b226",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b5feceb5a7ac93a98242080a915c121048555e3f6e6f1ecd73166679c84eb0f4",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "9d717940f9d071e66573cf3e6c6bbdbf2d9e96682bf0e0e2ae3a391c7f6a0f21",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "ee3344eb18c023daf909ce520e9faa321ce12f1acc572addf5c3bbfd82e8ff32",
-      "count": 1
-    }
-  ],
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"buildDetailAdmMeshSignature\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "8254c329a92850f6d539dd376f4816ee2764517da5e0235514af433164480d7a",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+    "reason": "unsupported-call-mutation",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "6ee3ea5be0fff658a0d31bd14d8fea0c11d9d6eb03b5aaf391978880971cc963",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"getVisibleCountryCodesForBorderMeshes\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "bcaf5eab79242d6df3d77d118c98aed908da502e5a60b25bb6af8e9eed7661d2",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "c729633a42c5dd7d4dd2035e3c63ab13ec706bca4681dd5e1c2b4a1a9f3dc8d9",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "activeScenarioId",
+    "sourceFingerprint": "fb0d7fc4691d8ae31834ef075e360c8702375dfc26c1c87f465de52a728a4899",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "scenarioApplyEpoch",
+    "sourceFingerprint": "af6a8af6201c2fe61ba7e567822d262335bef36e755686cf1f328bf549329c1b",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "sceneGeneration",
+    "sourceFingerprint": "2bf235c9b5f840ba9ecec2ace67c0ed9d69ae82c2259d97c0a22323723adde52",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "scenarioDataGeneration",
+    "sourceFingerprint": "3dca862c4f2c44b73ff0bf58d3a1071ea9dc7a302e4e2057b721dc5cc99855a4",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "scenarioShellOverlayRevision",
+    "sourceFingerprint": "9bae72d5b8e860b7837bc62904f3cc52000c63ad11abff9431a20674b9918e5f",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "mapSemanticMode",
+    "sourceFingerprint": "dedba2284c1c09f618491258ae375117c28f211233d4173844e317ac0873db51",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "showScenarioAtlantropa",
+    "sourceFingerprint": "16c3ef3c3c0c75816f5f53100e41964df06a5aafd5bb506446b2f67e116f5fce",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "topologyRevision",
+    "sourceFingerprint": "0ecf14fee7ec0b685d10d0eeaf49e86ad5bcf2d299ef20d8f83ce8863e46ce83",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "sovereigntyRevision",
+    "sourceFingerprint": "9ab5eaf06b9ffe957267fc012c1e33a69719d60b981571dfbd490192356e531b",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "topologyPrimary",
+    "sourceFingerprint": "7b62fcab92f25972c8a580c92365065965a9b4e87c4fd016f058604eafbda003",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "topology",
+    "sourceFingerprint": "3117660ebdefea088741158c7088c4dc4456ca02f1921b890792200869f9b228",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "topologyDetail",
+    "sourceFingerprint": "8edd070d7210a8201b16b65ba20c261acc7c4fe661a79b5e1245731ef6c9bc39",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "runtimePoliticalTopology",
+    "sourceFingerprint": "1f83bd9f1169e37079140e94347a0f2c8a6bd12ff6c78be4f0fe800933b4dedc",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "spatialItems",
+    "sourceFingerprint": "73faf5a0a54b05c91aee55dd7104e1a525e8b717e460ae87aeccf3cb80e073d6",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "spatialItems",
+    "sourceFingerprint": "8ddd54d0a44ca097a6c6999cce2b5f895883973a25f216fc248048beee0a5b72",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "zoomTransform",
+    "sourceFingerprint": "9c2442d3802414d857a242eeeea3173b8dafb50b28718c35289ec2f8e6fbc44e",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "zoomTransform",
+    "sourceFingerprint": "1038c4b6b76a9fdf9857c95d28c0b694b595422a82a89b80e6f6f1d8eead0182",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"readWorkIdentity\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "zoomTransform",
+    "sourceFingerprint": "2aae1e1c9a9ce9151840e62dcb60bafaeabe7bebe305c419ee7457980987c02f",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"runSlice\",\"ordinal\":0}]}",
+    "reason": "unsupported-call-mutation",
+    "operation": "unsupported",
+    "key": "cachedProvinceBordersByCountry",
+    "sourceFingerprint": "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
+    "count": 2
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"runSlice\",\"ordinal\":0}]}",
+    "reason": "unsupported-call-mutation",
+    "operation": "unsupported",
+    "key": "cachedLocalBordersByCountry",
+    "sourceFingerprint": "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e",
+    "count": 2
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"scheduleDeferredHeavyBorderMeshes\",\"ordinal\":0},{\"name\":\"runSlice\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "topologyDetail",
+    "sourceFingerprint": "8edd070d7210a8201b16b65ba20c261acc7c4fe661a79b5e1245731ef6c9bc39",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "e2d15361c9fc9967183d139951c46a7376f5ab0eb4c7fb900c3c6aad23915c16",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "fae5b0a220e1ba8551c1e62eb6840b5ae0fa94ee63e20fbb95ad4a2bdc421176",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "a6fb3c0d19791619021b29305034932a534f8d31e53b165838a0c4453bfab844",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "63f218ce93822be3aaab058ab7c076f099b73b4b9f95e128aee4c6b365a8af8a",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "825ba80f85d4297065e09046bc0384a76354a8cfeaa61a26cabbadaa5451a741",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "2c40a63d04e06d704264f58fe99aa72ce9e0de5e06354ba48d8f67c894c6ace6",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "0d7697173cbabc5239d99627f46b960710b15ae826a843fae7c14ea264963a5f",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "1e31289410bd9b1203c6097d9fcbdc39ae1df7bd54a39c53c4741c3a6c01a168",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "baf43bcd52a6d4a2c95551551241cea3c144cd6761681076247fed92ad5b0427",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "e2545b6887e7a64ddcceee36b8287c5addb100225c3b38bbb14f9195b8aff28b",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "5b86385e6a9bd09851b294c0848c9df6b6d09ae86a04231a45a7af4d752d12a1",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "4562e6a3c7edb21eb3a6f0ca43d50c3ea7db9245e02f96021a5e4a1f8ce7226c",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "f7f6b3760014f41fca0f05c69c6afab091f64627401e7e862336d6bc7aca0705",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "be50eed3ca51bfb92932742e45d2b50002d0d255b75ad690163318ebbea67ea5",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "eac58d75a6a0129a3d7115573b618b9f8ce6e57b4d2808af83ea744a770c5708",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "15c766f8f3292c6614d208ceb318a9665520e65078c55aa9f2a37e4c32a319c9",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "81c6ad98f8c0a688fab87b97e8b84090d38c7bea3697cffe1608de89ac407750",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "91add48bde0eea8752a95375e776f975d2ebb3f5efedbea7e32e557d7e3882ea",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "72454a3cc82de994e177033a54550509466ca6bd1d434acf90257f18437735ca",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "89c06705d47e1d0b3974e4570e71ac9dc0dee46e07abc7c8fddf24ae80d8570a",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "d5bdad7afb5df8a724d6aa1887dffb6ffbe5e6fde4c044a448f908e5a56ad7f2",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "b0b72d636adba43bb381e746caa1bc0ed2419ebe88c347c3178a34c661df1e15",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "bea38f6b4dc48e1a4aa8e427534a9c7c6a9f21c108f219b77d81dec03465b226",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "b5feceb5a7ac93a98242080a915c121048555e3f6e6f1ecd73166679c84eb0f4",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "9d717940f9d071e66573cf3e6c6bbdbf2d9e96682bf0e0e2ae3a391c7f6a0f21",
+    "count": 1
+  },
+  {
+    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createStaticBorderMeshLifecycle\",\"ordinal\":0},{\"name\":\"captureStaticMeshSnapshot\",\"ordinal\":0}]}",
+    "reason": "state-alias-escape",
+    "operation": "unsupported",
+    "key": "*",
+    "sourceFingerprint": "ee3344eb18c023daf909ce520e9faa321ce12f1acc572addf5c3bbfd82e8ff32",
+    "count": 1
+  }
+],
   "reviewedReadSiteFingerprints": [
-    "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
-    "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
-    "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e"
-  ]
+  "4748641712fb9fd6252f78436ca751283b64ab94f9782d067277c8470567e601",
+  "eb13c25ac01d1e044eced1c8217f03514e15c5cf9dc8cd6b68ca5d1e8580b5f8",
+  "1bb6ba3601e9f59c00d02b34c5c73ce99d6b996d33cb4ecd62f6117e35b8321e"
+]
 }),
   freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/renderer/transient_overlay_render_owner.js",
@@ -3352,7 +4949,27 @@ function freezeMutationDelegatingOwnerEntry(entry = {}) {
     factoryExportName: String(entry.factoryExportName || ""),
     factorySourceFingerprint: String(entry.factorySourceFingerprint || ""),
     ownerBindingName: String(entry.ownerBindingName || ""),
+    factoryStateArgumentShape: String(entry.factoryStateArgumentShape || "object"),
     methods: Object.freeze([...(entry.methods || [])].map(String)),
+    borrowedCallbackMethods: Object.freeze([...(entry.borrowedCallbackMethods || [])].map(String)),
+    borrowedForwarders: Object.freeze((entry.borrowedForwarders || []).map(forwarder => Object.freeze({ ...forwarder }))),
+    borrowedLocalStorage: Object.freeze((entry.borrowedLocalStorage || []).map(storage => Object.freeze({
+      functionName: String(storage.functionName), bindingName: String(storage.bindingName),
+      paths: Object.freeze(storage.paths.map(path => Object.freeze([...path]))),
+    }))),
+    borrowedLocalParameterIndexes: Object.freeze(Object.fromEntries(
+      Object.entries(entry.borrowedLocalParameterIndexes || {}).map(([name, indexes]) => [name, Object.freeze([...indexes])]),
+    )),
+    borrowedMapReadResultPaths: Object.freeze(Object.fromEntries(
+      Object.entries(entry.borrowedMapReadResultPaths || {}).map(([name, paths]) => [name, Object.freeze(paths.map(path => Object.freeze([...path])))]),
+    )),
+    borrowedMethodArgumentIndexes: Object.freeze(Object.fromEntries(
+      Object.entries(entry.borrowedMethodArgumentIndexes || {}).map(([name, indexes]) => [name, Object.freeze([...indexes])]),
+    )),
+    borrowedResultPathsByMethod: Object.freeze(Object.fromEntries(
+      Object.entries(entry.borrowedResultPathsByMethod || {}).map(([method, paths]) =>
+        [method, Object.freeze(paths.map(path => Object.freeze([...path])))]),
+    )),
     actionModulePath: normalizeModulePath(entry.actionModulePath),
     actionExports: Object.freeze([...(entry.actionExports || [])].map(String)),
     actionModulePathsByExport: Object.freeze(Object.fromEntries(
@@ -3364,6 +4981,280 @@ function freezeMutationDelegatingOwnerEntry(entry = {}) {
 }
 
 export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getCityLightsRenderOwner",
+  "compositionSourceFingerprint": "ece72a38a9c38c2ad7221d89d793996bd228eb78da01fa80770196fc4f2e0709",
+  "factoryModulePath": "js/core/renderer/city_lights_render_owner.js",
+  "factoryExportName": "createCityLightsRenderOwner",
+  "borrowedLocalParameterIndexes": { "getUrbanLightWeight": [0], "sampleModernCityLightsGridNormalized": [0, 1], "getModernPopulationCoreGain": [0] },
+  "borrowedMapReadResultPaths": { "getModernPopulationCoreGain": [["feature"], ["urbanFeature"]] },
+  "factorySourceFingerprint": "fd86667f1243909ec3db5cecb4a4d2abbd0ccc88fa85613d0278eac1c0a4a512",
+  "ownerBindingName": "cityLightsRenderOwner",
+  "methods": [
+    "toRgbaString",
+    "getSignedHashUnit",
+    "drawNightLightsLayer",
+    "collectModernUrbanCoreEntries",
+    "getModernCityLightsPopulationBoostData"
+  ],
+  "borrowedResultPathsByMethod": {
+    "collectModernUrbanCoreEntries": [
+      [
+        "*",
+        "feature"
+      ]
+    ],
+    "getModernCityLightsPopulationBoostData": [
+      [
+        "cityCollection"
+      ],
+      [
+        "urbanCollection"
+      ],
+      [
+        "urbanEntries",
+        "*",
+        "urbanFeature"
+      ],
+      [
+        "cityEntries",
+        "*",
+        "feature"
+      ],
+      [
+        "urbanByFeature"
+      ],
+      [
+        "cityByFeature"
+      ]
+    ]
+  },
+  "borrowedLocalStorage": [
+    {
+      "functionName": "createCityLightsRenderOwner",
+      "bindingName": "modernCityLightsPopulationBoostCache",
+      "paths": [
+        [
+          "cityCollection"
+        ],
+        [
+          "urbanCollection"
+        ],
+        [
+          "urbanEntries",
+          "*",
+          "urbanFeature"
+        ],
+        [
+          "cityEntries",
+          "*",
+          "feature"
+        ],
+        [
+          "urbanByFeature"
+        ],
+        [
+          "cityByFeature"
+        ]
+      ]
+    },
+    {
+      "functionName": "collectModernUrbanCoreEntries",
+      "bindingName": "entries",
+      "paths": [
+        [
+          "*",
+          "feature"
+        ]
+      ]
+    }
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getProjectedGeographicPathCache",
+  "compositionSourceFingerprint": "f167e4ade4c631ca23d0af8a7c0ac5ccc6ccc4216884f284dd339027591a94b3",
+  "factoryModulePath": "js/core/renderer/projected_geographic_path_cache.js",
+  "factoryExportName": "createProjectedGeographicPathCache",
+  "borrowedMethodArgumentIndexes": { "getPath": [0] },
+  "factorySourceFingerprint": "5b27591435f382eabd0914b628c7673afb3a1df896a1be9fa767a2dbde4f5d36",
+  "ownerBindingName": "geographicPathCache",
+  "methods": [
+    "getPath",
+    "reset",
+    "getStats"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getProjectedGeometryBoundsOwner",
+  "compositionSourceFingerprint": "be3626f7615bac4bd30a6cca1405f2200326a8e06c3e74c5ce3f4f5e4b49d18d",
+  "factoryModulePath": "js/core/renderer/projected_geometry_bounds_owner.js",
+  "factoryExportName": "createProjectedGeometryBoundsOwner",
+  "factorySourceFingerprint": "1388d77514bd2874a9650ca936c567fdab494f70db243a3de34298a312c9cabf",
+  "ownerBindingName": "projectedGeometryBoundsOwner",
+  "methods": [
+    "computeProjectedCoordinateBounds",
+    "computeProjectedGeoBounds",
+    "computeProjectedFeatureBounds",
+    "getProjectedFeatureBounds",
+    "rebuildProjectedBoundsCache",
+    "clearProjectedBoundsCache",
+    "recordProjectedBoundsDiagnostic",
+    "mergeProjectedBounds",
+    "normalizeGeoObjectForSphericalDiagnostics",
+    "getSphericalGeometryDiagnostics",
+    "isSphericalGeometryUnsafe",
+    "collectPolygonalGeometryParts",
+    "collectFeatureHitGeometries",
+    "buildWaterRegionFeatureFromParts",
+    "collectSafeWaterRegionGeometryPartsInfo",
+    "collectSafeWaterRegionGeometryParts",
+    "shouldExcludeWaterHitGeometry",
+    "sanitizeWaterRegionFeature",
+    "sanitizeWaterRegionFeatures"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getBorderMeshOwner",
+  "compositionSourceFingerprint": "b360c481d93c118b5ac7d3f022711429915cd3926bd8e01f7b719f0c3bd0eb56",
+  "factoryModulePath": "js/core/renderer/border_mesh_owner.js",
+  "factoryExportName": "createBorderMeshOwner",
+  "borrowedMethodArgumentIndexes": { "buildSourceBorderMeshes": [0] },
+  "factorySourceFingerprint": "4f6b2d8b9dd8cd03c4f37f3d328100b603dbd2d721f8f9c34bbf2ab8bab73189",
+  "ownerBindingName": "borderMeshOwner",
+  "borrowedLocalStorage": [
+    { "functionName": "resolveCoastlineTopologySource", "bindingName": "publishedDecision", "paths": [["topology"]] },
+    { "functionName": "createBorderMeshOwner", "bindingName": "scenarioCoastlineSourceCache", "paths": [["primaryRef"], ["runtimeRef"], ["decision", "topology"]] },
+    { "functionName": "createBorderMeshOwner", "bindingName": "coastlineMeshCache", "paths": [["topology"], ["object"], ["arcs"], ["transform"]] }
+  ],
+  "borrowedResultPathsByMethod": { "resolveCoastlineTopologySource": [["topology"]] },
+  "borrowedForwarders": [{ "functionName": "resolveCoastlineTopologySource", "methodName": "resolveCoastlineTopologySource", "restParameterName": "args", "sourceFingerprint": "cf319f3867f517341d11096caca2b85c53d47e43ecd3a5cb8e442dd842f312b1" }],
+  "methods": [
+    "clearPendingDynamicBorderTimer",
+    "markDynamicBordersDirty",
+    "recomputeDynamicBordersNow",
+    "scheduleDynamicBorderRecompute",
+    "replaceDetailAdmBorders",
+    "reconcileDetailAdmBorders",
+    "buildOwnerBorderMesh",
+    "buildDynamicOwnerBorderMesh",
+    "countUnresolvedOwnerBorderEntities",
+    "rebuildDynamicBorders",
+    "refreshScenarioOpeningOwnerBorders",
+    "getFrontlineOwnershipContext",
+    "getFrontlineMesh",
+    "buildDetailAdmBorderMesh",
+    "getSourceCountrySets",
+    "buildCountryParentBorderMeshes",
+    "buildSourceBorderMeshes",
+    "buildGlobalCountryBorderMesh",
+    "resolveCoastlineTopologySource",
+    "buildGlobalCoastlineMesh",
+    "simplifyCoastlineMesh",
+    "ensureCoastlineMeshes"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/renderer/render_cache_owner.js",
+  "compositionExportName": "composeRenderCacheValidationScope",
+  "compositionSourceFingerprint": "2d626d537dfb0e7299edc0bc01fd5a8e58a3a6fa547186acb993b3bd6bf8117d",
+  "factoryModulePath": "js/core/renderer/render_cache_validation_scope.js",
+  "factoryExportName": "createRenderCacheValidationScope",
+  "factorySourceFingerprint": "95d9df40a1173007d44b1028949687e33f8bb90c3e7a79ba6ac195be3e9b1374",
+  "ownerBindingName": "owner",
+  "methods": [
+    "getRenderPassCacheState",
+    "withValidatedCache"
+  ],
+  "borrowedCallbackMethods": ["withValidatedCache"],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "composeUrbanLayerRenderOwner",
+  "compositionSourceFingerprint": "971ae110867c1a3eeec5f3abeef0dfc9a57f9736cf8f63e45b1a240963054273",
+  "factoryModulePath": "js/core/renderer/urban_layer_render_owner.js",
+  "factoryExportName": "createUrbanLayerRenderOwner",
+  "factorySourceFingerprint": "6388b3a7cefe0a8f0c704d9ad4f61a79e8875dc3f6bad3c53e15e131a9fd9259",
+  "ownerBindingName": "owner",
+  "methods": [
+    "drawUrbanLayer"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getGeometryRasterRuntimeOwner",
+  "compositionSourceFingerprint": "271dbebae1d8548034ad5500028658f5323b7f9384a1151f2e981f8b582181bb",
+  "factoryModulePath": "js/core/renderer/geometry_raster_runtime_owner.js",
+  "factoryExportName": "createGeometryRasterRuntimeOwner",
+  "factorySourceFingerprint": "7f01b321f177d5d2c97c138b26d4f6ad0d0360e309c96a03b6ac434170fa40b2",
+  "ownerBindingName": "geometryRasterRuntimeOwner",
+  "methods": [
+    "prepareFrame",
+    "preparePolitical",
+    "drawPolitical",
+    "requestHit",
+    "getPendingWorkCount",
+    "dispose"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getCountryFillPaletteOwner",
+  "compositionSourceFingerprint": "c1edcf2c21d37a2ac060117ce87da725133f55970f699bf0184377624ecb642b",
+  "factoryModulePath": "js/core/renderer/country_fill_palette_owner.js",
+  "factoryExportName": "createCountryFillPaletteOwner",
+  "factorySourceFingerprint": "d5454207020ed553ab9f1b4c3f50b976a7200d3e09c886a9124a60b537608d78",
+  "ownerBindingName": "countryFillPaletteOwner",
+  "methods": [
+    "getDominantFillColorMap",
+    "notifyColorsChanged",
+    "getAppearanceRevision",
+    "invalidate"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/ui/toolbar.js",
+  "compositionExportName": "composePaletteLibraryOperation",
+  "compositionSourceFingerprint": "e8b7d5c5849ad686a3418987f1ec670bcef127375172f10c847cae87013f6a70",
+  "factoryModulePath": "js/core/palette_library_state_access.js",
+  "factoryExportName": "createPaletteLibraryStateAccess",
+  "factoryStateArgumentShape": "target",
+  "factorySourceFingerprint": "b07ddf91f7ebbc6d39c1f425a1710dfad82bf859a61abcbd158356b3fc7a8374",
+  "ownerBindingName": "stateAccess",
+  "methods": [
+    "getApplyTarget",
+    "getOwnerFeatureIds",
+    "applyFeatureColor",
+    "applyOwnerColor"
+  ],
+  "actionExports": []
+}),
+  freezeMutationDelegatingOwnerEntry({
+  "compositionModulePath": "js/core/map_renderer.js",
+  "compositionExportName": "getBorderMeshWorkerRuntime",
+  "compositionSourceFingerprint": "8117f1ddc2f82c4ec3b744f6db069a537749df9679e0e163f4e4365ca7f2845d",
+  "factoryModulePath": "js/core/renderer/border_mesh_worker_runtime.js",
+  "factoryExportName": "createBorderMeshWorkerRuntime",
+  "factorySourceFingerprint": "80f665798376a2a4d6becace1f5092f602a59a0177990900095b7c618ac0b436",
+  "ownerBindingName": "borderMeshWorkerRuntime",
+  "methods": [
+    "buildDeferredBorderMeshesAsync",
+    "commitDeferredBorderMeshes",
+    "dispose"
+  ],
+  "actionExports": []
+}),
 freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getVisibleFrameDiagnosticsOwner",
@@ -3444,7 +5335,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "bc6d83e78976b4dae096897ab3c09bddd93c44c8830eed2c1153d415ab13a2bd",
   "factoryModulePath": "js/core/renderer/city_label_text_model.js",
   "factoryExportName": "createCityLabelTextModel",
-  "factorySourceFingerprint": "648b253aec69b442f7098185f7a7db9fb4586210a2e6f0d49d454ec29983994d",
+  "factorySourceFingerprint": "453d6c8856513622143f405f0317fc1dffdf101cf53367a1cfb52f20fe8ea3ce",
   "ownerBindingName": "owner",
   "methods": [
     "getCityFeatureKey",
@@ -3508,8 +5399,13 @@ freezeMutationDelegatingOwnerEntry({
     "invalidatePoliticalPathCache",
     "getPoliticalPathCacheHandle",
     "getPoliticalFeaturePathEntry",
+    "isPoliticalFeaturePathEntryCurrent",
     "schedulePoliticalPathWarmup"
   ],
+  "borrowedResultPathsByMethod": {
+    "getPoliticalPathCacheHandle": [["cache"], ["map"]],
+    "getPoliticalFeaturePathEntry": [["geometryRef"]]
+  },
   "actionExports": []
 }),
   freezeMutationDelegatingOwnerEntry({
@@ -3548,12 +5444,13 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "d61dcb9e056c84418d3ae71e864add8ca2bb05d9d6fc66f3c6ae551b0507a088",
   "factoryModulePath": "js/core/renderer/urban_adaptive_paint_model.js",
   "factoryExportName": "createUrbanAdaptivePaintModel",
-  "factorySourceFingerprint": "8cfcb05b28d27745fa135a08fd0ea2936a158fd35eab514edf42059cddde3a8b",
+  "factorySourceFingerprint": "fe268dcce895261da021e818431ea2ba166d5750fbc2162296a1b65f806137ce",
   "ownerBindingName": "owner",
   "methods": [
     "computeUrbanAdaptivePaintFromHostColor",
     "getUrbanAdaptivePaint",
-    "getEffectiveUrbanMode"
+    "getEffectiveUrbanMode",
+    "createDrawPaintResolver"
   ],
   "actionExports": []
 }),
@@ -3593,7 +5490,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "ea3ea276be7d700ec93c23d12555eb1bc7173739271917c2d598cec594f4f549",
   "factoryModulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
   "factoryExportName": "createStaticBorderMeshLifecycle",
-  "factorySourceFingerprint": "0f2123e3978bb1c08fc9a16dce754e4a8f41d566720a5071a0c087e05a9a9aa7",
+  "factorySourceFingerprint": "676eb69ead980e86e9fabc6c9a71b517050bfa8f5c80e639266210148097619b",
   "ownerBindingName": "staticBorderMeshLifecycle",
   "methods": [
     "buildDetailAdmMeshSignature",
@@ -3664,7 +5561,7 @@ freezeMutationDelegatingOwnerEntry({
     "compositionSourceFingerprint": "f9e6134fee02281e43d48d388d37bcdb3b6767d7fd5f228f76d8e2b91cbacfe0",
     "factoryModulePath": "js/core/renderer/render_cache_owner.js",
     "factoryExportName": "createRenderCacheOwner",
-    "factorySourceFingerprint": "a3c05d63a34af542451f31681e92d836973a8f473ebdfb5696da14a621eabfa6",
+    "factorySourceFingerprint": "f49984ba8bc21bbbe80626863ede1c04e7409ec07a632add7f638fb76cfbedb7",
     "ownerBindingName": "renderCacheOwner",
     "methods": [
       "canDrawInteractionComposite",
@@ -3680,6 +5577,7 @@ freezeMutationDelegatingOwnerEntry({
       "getPassFullReferenceTransform",
       "getPassReferenceTransform",
       "getRenderPassCacheState",
+      "withValidatedCache",
       "getRenderPassLayout",
       "hasPassFullReferenceTransform",
       "invalidateAllRenderPasses",
@@ -3689,6 +5587,7 @@ freezeMutationDelegatingOwnerEntry({
       "setPassFullReferenceTransform",
       "setPassReferenceTransform"
     ],
+    "borrowedCallbackMethods": ["withValidatedCache"],
     "actionExports": []
   }),
   freezeMutationDelegatingOwnerEntry({
@@ -4058,9 +5957,26 @@ export function validateStateMutationDelegatingOwnerContract(
       || !isValidExportName(entry.factoryExportName)
       || !/^[a-f0-9]{64}$/.test(entry.factorySourceFingerprint)
       || !isValidExportName(entry.ownerBindingName)
+      || !["object", "target"].includes(entry.factoryStateArgumentShape)
       || !entry.methods?.length
+      || !(entry.borrowedLocalStorage || []).every(storage => isValidExportName(storage.functionName)
+        && isValidExportName(storage.bindingName) && Array.isArray(storage.paths) && storage.paths.length
+        && storage.paths.every(path => Array.isArray(path) && path.length && path.every(segment => segment === "*" || isValidExportName(segment))))
+      || !Object.entries(entry.borrowedLocalParameterIndexes || {}).every(([name, indexes]) =>
+        isValidExportName(name) && Array.isArray(indexes) && indexes.every(index => Number.isInteger(index) && index >= 0))
+      || !Object.entries(entry.borrowedMapReadResultPaths || {}).every(([name, paths]) =>
+        isValidExportName(name) && Array.isArray(paths) && paths.length
+        && paths.every(path => Array.isArray(path) && path.every(segment => segment === "*" || isValidExportName(segment))))
+      || !Object.entries(entry.borrowedMethodArgumentIndexes || {}).every(([name, indexes]) =>
+        entry.methods.includes(name) && Array.isArray(indexes) && indexes.every(index => Number.isInteger(index) && index >= 0))
       || !entry.methods.every(isValidExportName)
       || new Set(entry.methods).size !== entry.methods.length
+      || !Array.isArray(entry.borrowedCallbackMethods || [])
+      || !(entry.borrowedCallbackMethods || []).every((method) => entry.methods.includes(method))
+      || new Set(entry.borrowedCallbackMethods || []).size !== (entry.borrowedCallbackMethods || []).length
+      || !Object.entries(entry.borrowedResultPathsByMethod || {}).every(([method, paths]) =>
+        entry.methods.includes(method) && Array.isArray(paths) && paths.length
+          && paths.every(path => Array.isArray(path) && path.every(segment => segment === "*" || isValidExportName(segment))))
       || !Array.isArray(entry.actionExports)
       || !entry.actionExports.every(isValidExportName)
       || new Set(entry.actionExports).size !== entry.actionExports.length
@@ -5169,6 +7085,30 @@ export function inspectStateMutationDelegatingOwnerSources({
   const factoryFunctions = topLevelFunctionDeclarations(factoryAst);
   const composition = compositionFunctions.get(entry.compositionExportName);
   const factory = factoryFunctions.get(entry.factoryExportName);
+  for (const forwarder of entry.borrowedForwarders || []) {
+    const fn = compositionFunctions.get(forwarder.functionName);
+    const call = fn?.body?.body?.[0]?.argument;
+    const callee = call?.callee;
+    const exported = compositionAst.body.some(statement => statement.type === "ExportNamedDeclaration"
+      && (statement.declaration?.id?.name === forwarder.functionName
+        || statement.specifiers?.some(specifier => specifier.local?.name === forwarder.functionName)));
+    if (!fn || exported || fingerprintFunctionSource(normalizedComposition, fn) !== forwarder.sourceFingerprint
+      || fn.params.length !== 1 || fn.params[0].type !== "RestElement"
+      || fn.params[0].argument.name !== forwarder.restParameterName
+      || fn.body.body.length !== 1 || fn.body.body[0].type !== "ReturnStatement"
+      || call?.type !== "CallExpression" || call.optional
+      || callee?.type !== "MemberExpression" || callee.computed || callee.optional
+      || callee.property.name !== forwarder.methodName
+      || !entry.borrowedResultPathsByMethod[forwarder.methodName]
+      || callee.object?.type !== "CallExpression" || callee.object.optional
+      || callee.object.callee?.type !== "Identifier" || callee.object.callee.name !== entry.compositionExportName
+      || callee.object.arguments.length !== 0 || call.arguments.length !== 1
+      || call.arguments[0].type !== "SpreadElement" || call.arguments[0].argument.name !== forwarder.restParameterName) {
+      violations.push(createViolation("state-mutation-owner-borrowed-forwarder-invalid", {
+        modulePath: entry.compositionModulePath, functionName: forwarder.functionName,
+      }));
+    }
+  }
   if (!composition || fingerprintFunctionSource(normalizedComposition, composition)
     !== entry.compositionSourceFingerprint) {
     violations.push(createViolation("state-mutation-owner-composition-source-drift", {
@@ -5317,6 +7257,11 @@ function normalizeModulePath(value = "") {
 }
 
 const STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID = new Map([
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([1])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyScenarioChunkOptionalLayerState`, Object.freeze([2])],
+  [`${SCENARIO_CHUNK_PROMOTION_ACTION_MODULE_PATH}#commitScenarioPoliticalChunkPayloadState`, Object.freeze([1])],
+  [`${SCENARIO_CHUNK_RUNTIME_ACTION_MODULE_PATH}#queueScenarioChunkPromotionState`, Object.freeze([1])],
+  [`${SCENARIO_CHUNK_RUNTIME_ACTION_MODULE_PATH}#setScenarioChunkMergedLayerPayloadsState`, Object.freeze([1])],
   [
     `${SCENARIO_CHUNK_RUNTIME_ACTION_MODULE_PATH}#replaceScenarioChunkPendingPromotionIdentityState`,
     Object.freeze([1]),
@@ -5324,6 +7269,8 @@ const STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID = new Map([
 ]);
 
 const STATE_ACTION_REFERENCE_IDENTITY_ARGUMENT_INDEXES_BY_ID = new Map([
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([1, 2])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteOwnerColorState`, Object.freeze([1, 2])],
   [`${APPEARANCE_ACTION_MODULE_PATH}#setAppearanceStyleConfigState`, Object.freeze([1])],
   [`${APPEARANCE_ACTION_MODULE_PATH}#setAppearanceStyleGroupState`, Object.freeze([2])],
   [`${APPEARANCE_ACTION_MODULE_PATH}#setAppearanceParentBorderEnabledMapState`, Object.freeze([1])],
@@ -5360,6 +7307,14 @@ const RENDER_PERF_METRIC_DYNAMIC_SITES = Object.freeze([
 ]);
 
 const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "visualOverrides", pathPattern: "visualOverrides.*" }),
+    freezeAllowedDynamicSite({ operation: "assign", key: "featureOverrides", pathPattern: "featureOverrides.*" }),
+  ])],
+  [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteOwnerColorState`, Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "sovereignBaseColors", pathPattern: "sovereignBaseColors.*" }),
+    freezeAllowedDynamicSite({ operation: "assign", key: "countryBaseColors", pathPattern: "countryBaseColors.*" }),
+  ])],
   ["js/core/state/actions/content_load_actions.js#finishContextLayerLoad", Object.freeze([
     freezeAllowedDynamicSite({ operation: "delete", key: "contextLayerLoadPromiseByName", pathPattern: "contextLayerLoadPromiseByName.*" }),
     freezeAllowedDynamicSite({ operation: "assign", key: "contextLayerLoadStateByName", pathPattern: "contextLayerLoadStateByName.*" }),
@@ -5431,6 +7386,11 @@ function freezeDelegationEntry({
     modulePath: normalizedModulePath,
     exportName: normalizedExportName,
     targetArgumentIndex: Number(targetArgumentIndex),
+    borrowedResultPaths: Object.freeze(
+      normalizedModulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
+        && normalizedExportName === "applyScenarioChunkOptionalLayerState"
+        ? [Object.freeze(["externalEffect", "payload"])] : [],
+    ),
     readOnlyArgumentIndexes:
       STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID.get(
         `${normalizedModulePath}#${normalizedExportName}`,
@@ -5799,8 +7759,42 @@ freezeActionSuccessorProofEntry({
 })
 );
 
+successorEntries.push(freezeActionSuccessorProofEntry({
+  "modulePath": "js/core/state/actions/palette_library_actions.js",
+  "exportName": "selectPalettePaintColorState",
+  "replacementMembership": "color|P4.4|assign|selectedColor",
+  "carrierFunctions": [
+    {
+      "functionName": "selectPalettePaintColorState",
+      "sourceFingerprint": "d613a3e5fe2d7121ba0afe0fa6b1a9fc447119466d4ca9ca66b72f4e6b71294a"
+    }
+  ],
+  "successorEdges": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"selectPalettePaintColorState\",\"ordinal\":0}]}",
+      "actionModulePath": "js/core/state/actions/appearance_selection_actions.js",
+      "actionExportName": "setSelectedColorState",
+      "targetArgumentIndex": 0,
+      "sourceFingerprint": "4e3b5bf002f14c1caf299322dceae4409ad330194cbcc86669f51775ebd18a33",
+      "occurrenceIndex": 0
+    }
+  ]
+}));
+
 export const STATE_ACTION_SUCCESSOR_PROOF_CONTRACT = Object.freeze(
-  successorEntries.sort((left, right) =>
+  [...successorEntries, ...[
+    ["selectPalettePaintColorState", "paintMode", SCENARIO_PRESENTATION_ACTION_MODULE_PATH, "selectPaletteVisualPaintModeState", "d613a3e5fe2d7121ba0afe0fa6b1a9fc447119466d4ca9ca66b72f4e6b71294a", "7a7bbfe18788c2f9e4584cd5317fc05edebf88a4a57068baebfabba382ffc1d6"],
+    ...["visualOverrides", "featureOverrides"].map(key => ["applyPaletteFeatureColorState", key, SCENARIO_ACTIVATION_ACTION_MODULE_PATH, "applyPaletteFeatureColorState", "db7322b0783e1a37f7bf3ee0f43eae75bc475cfdcfe80a69dd4c5fc23d61e050", "dc0631e18de280577898d15f0a9346c83916dd8689456d2d7068bb9bdfca0bba"]),
+    ...["sovereignBaseColors", "countryBaseColors"].map(key => ["applyPaletteOwnerColorState", key, SCENARIO_ACTIVATION_ACTION_MODULE_PATH, "applyPaletteOwnerColorState", "48f69348d1e6d08339aad7ce802ba753998ee44e2f54672fde72287f058c840b", "8f77ade5c6934e8e87f7228b4f705430a2023bab3fe9c116b17cd24569ed87cf"]),
+  ].map(([exportName, key, actionModulePath, actionExportName, sourceFingerprint, edgeFingerprint]) => freezeActionSuccessorProofEntry({
+    modulePath: "js/core/state/actions/palette_library_actions.js", exportName,
+    replacementMembership: `color|P4.4|assign|${key}`,
+    carrierFunctions: [{ functionName: exportName, sourceFingerprint }],
+    successorEdges: [{
+      enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: exportName, ordinal: 0 }] }),
+      actionModulePath, actionExportName, targetArgumentIndex: 0, sourceFingerprint: edgeFingerprint, occurrenceIndex: 0,
+    }],
+  }))].sort((left, right) =>
     `${left.modulePath}#${left.exportName}#${left.replacementMembership}`.localeCompare(
       `${right.modulePath}#${right.exportName}#${right.replacementMembership}`,
     )
@@ -5888,6 +7882,10 @@ const SCENARIO_CHUNK_OPTIONAL_LAYER_ASSIGN_MEMBERSHIPS = Object.freeze([
 
 export const STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT =
   Object.freeze([
+    ...["cachedCoastlines", "cachedCoastlinesHigh", "cachedCoastlinesLow", "cachedCoastlinesMid"].map(key => ({
+      modulePath: RENDERER_CACHE_ACTION_MODULE_PATH, exportName: "replaceCachedCoastlineMeshesState",
+      retiredMembership: `renderer|P4.3|collection-mutate|${key}`, requiredConcreteMemberships: [`renderer|P4.3|assign|${key}`],
+    })),
     // Import replaces the cleared inspector Sets with staged Set instances.
     ...["expandedInspectorContinents", "expandedInspectorReleaseParents"].map((key) => ({
       modulePath: SCENARIO_PRESENTATION_ACTION_MODULE_PATH,
@@ -7236,6 +9234,168 @@ const PROJECT_IMPORT_CROSS_FILE_MIGRATIONS = Object.freeze([
 })));
 
 const P44_STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT = Object.freeze([
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/map_renderer/exact_after_settle_scheduler.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createExactAfterSettleScheduler\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "renderer",
+  "migrationPhase": "P4.3",
+  "operation": "assign",
+  "key": "deferExactAfterSettle",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createExactAfterSettleScheduler\",\"ordinal\":0},{\"name\":\"abortInterruptedExactAfterSettleRefresh\",\"ordinal\":0}]}",
+      "sourceFingerprint": "8be8ff5d1e5e3387ffe359256e797603d09c1eb4713f24a3af377cc1228b3e8d",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createExactAfterSettleScheduler\",\"ordinal\":0},{\"name\":\"abortPendingExactAfterSettleRefreshAfterPaint\",\"ordinal\":0}]}",
+      "sourceFingerprint": "8be8ff5d1e5e3387ffe359256e797603d09c1eb4713f24a3af377cc1228b3e8d",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createExactAfterSettleScheduler\",\"ordinal\":0},{\"name\":\"applyExactAfterSettleRefreshPlan\",\"ordinal\":0}]}",
+      "sourceFingerprint": "8be8ff5d1e5e3387ffe359256e797603d09c1eb4713f24a3af377cc1228b3e8d",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createExactAfterSettleScheduler\",\"ordinal\":0},{\"name\":\"cancelExactAfterSettleRefresh\",\"ordinal\":0}]}",
+      "sourceFingerprint": "8be8ff5d1e5e3387ffe359256e797603d09c1eb4713f24a3af377cc1228b3e8d",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/map_renderer/exact_after_settle_scheduler.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createExactAfterSettleScheduler\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createExactAfterSettleScheduler\",\"ordinal\":0},{\"name\":\"completeScheduledExactAfterSettleRefreshPlan\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/renderer_exact_refresh_actions.js",
+  "actionExportName": "setDeferExactAfterSettleState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "7e7ef84a5382566d17cb8a9715c0a42581da7ecf5a9e5c425a17f3b595fdb425"
+}),
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/ui/toolbar/palette_library_panel.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"../../core/state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "color",
+  "migrationPhase": "P4.4",
+  "operation": "assign",
+  "key": "selectedColor",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPaletteLibraryPanelController\",\"ordinal\":0},{\"name\":\"selectPaletteLibraryEntry\",\"ordinal\":0}]}",
+      "sourceFingerprint": "44f205f7b042beac7faa6d0be234297e11f83fddafd1ad9e1fb29daedca94437",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/ui/toolbar/palette_library_panel.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"../../core/state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"selectPalettePaintColor\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/palette_library_actions.js",
+  "actionExportName": "selectPalettePaintColorState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "3789682e921f8f8d954e73d51fde93ec102f9ceec32c4623accdec27ceca9387"
+}),
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/map_renderer.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "renderer",
+  "migrationPhase": "P4.3",
+  "operation": "collection-mutate",
+  "key": "cachedCoastlines",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "611fcc7f87581c5a3db45e588a18a9ae6ed945ef97b6293fd51df5f7de370052",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/renderer/border_mesh_owner.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createBorderMeshOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBorderMeshOwner\",\"ordinal\":0},{\"name\":\"ensureCoastlineMeshes\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/renderer_cache_actions.js",
+  "actionExportName": "replaceCachedCoastlineMeshesState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "0020990e5c184be2f706d2e24cae42453cc38f2b3b0e27f0668c055ac6fd8833"
+}),
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/map_renderer.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "renderer",
+  "migrationPhase": "P4.3",
+  "operation": "collection-mutate",
+  "key": "cachedCoastlinesHigh",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "91282517c517e91cec5cb796358e6a04dd1ade1d60921860e4d619b332c6b5f9",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/renderer/border_mesh_owner.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createBorderMeshOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBorderMeshOwner\",\"ordinal\":0},{\"name\":\"ensureCoastlineMeshes\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/renderer_cache_actions.js",
+  "actionExportName": "replaceCachedCoastlineMeshesState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "0020990e5c184be2f706d2e24cae42453cc38f2b3b0e27f0668c055ac6fd8833"
+}),
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/map_renderer.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "renderer",
+  "migrationPhase": "P4.3",
+  "operation": "collection-mutate",
+  "key": "cachedCoastlinesLow",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "0b7d14d37c235f60bb0ba3cfe3ea32dfe6986eb38447c204ee86333d8dfa5945",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "55da8beadf7f014680a5347c9092103a4fe78ee55cb8828506abda831aa735fd",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "9d402cbd63c62572ae2024b7a74680c0fdedd3eb66c2cae3a46c539710c0b1a5",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/renderer/border_mesh_owner.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createBorderMeshOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBorderMeshOwner\",\"ordinal\":0},{\"name\":\"ensureCoastlineMeshes\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/renderer_cache_actions.js",
+  "actionExportName": "replaceCachedCoastlineMeshesState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "0020990e5c184be2f706d2e24cae42453cc38f2b3b0e27f0668c055ac6fd8833"
+}),
+  freezeCrossFileMigrationEntry({
+  "retiredCallerPath": "js/core/map_renderer.js",
+  "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "domain": "renderer",
+  "migrationPhase": "P4.3",
+  "operation": "collection-mutate",
+  "key": "cachedCoastlinesMid",
+  "retiredMutationSites": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "8319521b0fd126243a85d1630c4a4ae6ba8a3d4b9f6380c7ecffa8d8a33c7079",
+      "occurrenceIndex": 0
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"rebuildStaticMeshes\",\"ordinal\":0}]}",
+      "sourceFingerprint": "ec1f108a6ca112335b73147b03ea9e75d380c0cd3e1f472a04b57f3890295004",
+      "occurrenceIndex": 0
+    }
+  ],
+  "replacementCallerPath": "js/core/renderer/border_mesh_owner.js",
+  "replacementCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createBorderMeshOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+  "replacementEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBorderMeshOwner\",\"ordinal\":0},{\"name\":\"ensureCoastlineMeshes\",\"ordinal\":0}]}",
+  "actionModulePath": "js/core/state/actions/renderer_cache_actions.js",
+  "actionExportName": "replaceCachedCoastlineMeshesState",
+  "targetArgumentIndex": 0,
+  "replacementActionSourceFingerprint": "0020990e5c184be2f706d2e24cae42453cc38f2b3b0e27f0668c055ac6fd8833"
+}),
   ...PROJECT_IMPORT_CROSS_FILE_MIGRATIONS,
   freezeCrossFileMigrationEntry({
     retiredCallerPath:
@@ -9589,7 +11749,7 @@ function findTopLevelFunctionDeclarations(ast, functionName) {
 function validateReviewedStateReadSites(source, ast, functionNode, fingerprints = []) {
   const pending = new Set(fingerprints);
   const violations = [];
-  const readMethods = new Set(["get", "has", "keys", "join", "map", "forEach"]);
+  const readMethods = new Set(["get", "has", "keys", "join", "map", "forEach", "some"]);
   const fingerprint = (node) => createHash("sha256")
     .update(source.slice(node.start, node.end).trim().replaceAll("\r\n", "\n"))
     .digest("hex");
@@ -9607,7 +11767,7 @@ function validateReviewedStateReadSites(source, ast, functionNode, fingerprints 
       violations.push(createViolation("state-target-pure-reader-read-method-invalid", { method }));
       return;
     }
-    if (["map", "forEach"].includes(method)) {
+    if (["map", "forEach", "some"].includes(method)) {
       const callback = node.arguments[0];
       if (!["ArrowFunctionExpression", "FunctionExpression"].includes(callback?.type)) {
         violations.push(createViolation("state-target-pure-reader-read-callback-invalid", { method }));
@@ -9882,6 +12042,11 @@ export function validateStateActionDelegationContract(
         }
         seenReadOnlyIndexes.add(readOnlyArgumentIndex);
       }
+    }
+    const expectedBorrowedResultPaths = modulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
+      && exportName === "applyScenarioChunkOptionalLayerState" ? [["externalEffect", "payload"]] : [];
+    if (JSON.stringify(entry.borrowedResultPaths || []) !== JSON.stringify(expectedBorrowedResultPaths)) {
+      violations.push(createViolation("state-action-contract-borrowed-result-paths-invalid", { index, modulePath, exportName }));
     }
     if (
       entry.referenceIdentityArgumentIndexes !== undefined
@@ -10496,3 +12661,9 @@ export function validateStateActionPolicyBindings(
   }
   return violations;
 }
+
+// Effectful target delegation: the imported implementation is scanned separately, including its commit action edge.
+export const STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT = Object.freeze([Object.freeze({"modulePath":"js/core/state/renderer_runtime_state.js","exportName":"ensureProjectedBoundsCacheState","targetArgumentIndex":0,"argumentCount":1,"sourceFingerprint":"86c16c937cd2d3a28ef05dc3c42b47630f70b32355caab99394e6a835783abb8"})]);
+
+// Exact Map storage effects borrow keys/values without mutating them. Function drift invalidates this proof.
+export const STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT = Object.freeze([{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"setProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"139d116c8614556880da2a440519ec83bc1ebcd7fd9ca072d808473f573e7ae7"},{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"syncProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"d399d0e2920a555fc9041ecef290bcd9c0d899017ef47acfb471f20d496f36da"}].map(Object.freeze));

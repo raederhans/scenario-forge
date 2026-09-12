@@ -1,4 +1,5 @@
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
+import { getObjectIdentityToken } from "./renderer/object_identity.js";
 import { createVisibleFrameIdentityPolicy } from './renderer/visible_frame_identity_policy.js';
 import { createParentBorderGroupingPolicy } from './renderer/parent_border_grouping_policy.js';
 import { COASTLINE_ACCENT_DENSITY_THRESHOLD_LOW, COASTLINE_ACCENT_DENSITY_THRESHOLD_MID, COASTLINE_LOD_LOW_ZOOM_MAX, COASTLINE_LOD_MID_ZOOM_MAX } from './renderer/bathymetry_style_policy.js';
@@ -217,7 +218,7 @@ import {
 } from "./unit_counter_presets.js";
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
-import { callRuntimeHook, callRuntimeHooks, registerRuntimeHook } from "./state/index.js";
+import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook } from "./state/index.js";
 import {
   bindInteractionFunnel,
   dispatchMapClick,
@@ -246,6 +247,7 @@ import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geom
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
 import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
 import { createPhysicalLayerRenderOwner } from "./renderer/physical_layer_render_owner.js";
+import { createPhysicalContourVisibleSetOwner } from "./renderer/physical_contour_visible_set_owner.js";
 import { createScenarioReliefOverlayRenderOwner } from "./renderer/scenario_relief_overlay_render_owner.js";
 import { createCityLightsRenderOwner } from "./renderer/city_lights_render_owner.js";
 import { createCityLightsAssetProvider } from "./renderer/city_lights_asset_provider.js";
@@ -654,8 +656,6 @@ const layerResolverCache = {
   contextRevision: 0,
   waterRegionsDataToken: "",
 };
-const objectIdentityTokenCache = new WeakMap();
-let nextObjectIdentityToken = 1;
 let staticMeshCache = {
   primaryRef: null,
   detailRef: null,
@@ -1852,11 +1852,15 @@ let geographicPathCache = null;
 const oceanSphereGeometry = Object.freeze({ type: "Sphere" });
 const oceanExclusionPaths = new WeakMap();
 
-function getProjectedGeographicPath(object) {
+function getProjectedGeographicPathCache() {
   geographicPathCache ||= createProjectedGeographicPathCache({
     getProjection: () => rendererSurfaceHost.getProjection(),
   });
-  return geographicPathCache.getPath(object);
+  return geographicPathCache;
+}
+
+function getProjectedGeographicPath(object) {
+  return getProjectedGeographicPathCache().getPath(object);
 }
 
 function getOceanExclusionPath(collection) {
@@ -2546,12 +2550,11 @@ function getProjectedGeometryBoundsOwner() {
     return projectedGeometryBoundsOwner;
   }
   projectedGeometryBoundsOwner = createProjectedGeometryBoundsOwner({
+    state: runtimeState,
     getters: {
       getProjection: () => rendererSurfaceHost.getProjection(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getPathSvg: () => rendererSurfaceHost.getPathSvg(),
-      getProjectedBoundsCache: () => runtimeState.projectedBoundsById instanceof Map
-        ? runtimeState.projectedBoundsById : ensureProjectedBoundsCache(),
       getLandFeatures: () => runtimeState.landData?.features || [],
       getRiverFeatures: () => runtimeState.riversData?.features || [],
       getActiveScenarioId: () => runtimeState.activeScenarioId || "",
@@ -3546,10 +3549,10 @@ let detailAdmMeshBuildState = {
   status: "idle",
 };
 let visibleInternalBorderMeshSignature = "";
-let contourVisibleSetCache = {
-  major: { collectionRef: null, key: "", features: [] },
-  minor: { collectionRef: null, key: "", features: [] },
-};
+const contourVisibleSetOwner = createPhysicalContourVisibleSetOwner({
+  getFeatureScreenBounds,
+  overscanPx: VIEWPORT_CULL_OVERSCAN_PX,
+});
 
 function readSearchParam(name) {
   const search = globalThis?.location?.search || "";
@@ -3677,7 +3680,6 @@ function buildCountryParentBorderMeshes(...args) { return getBorderMeshOwner().b
 function buildDetailAdmBorderMesh(...args) { return getBorderMeshOwner().buildDetailAdmBorderMesh(...args); }
 function buildGlobalCoastlineMesh(...args) { return getBorderMeshOwner().buildGlobalCoastlineMesh(...args); }
 function buildGlobalCountryBorderMesh(...args) { return getBorderMeshOwner().buildGlobalCountryBorderMesh(...args); }
-function buildSourceBorderMeshes(...args) { return getBorderMeshOwner().buildSourceBorderMeshes(...args); }
 function getSourceCountrySets(...args) { return getBorderMeshOwner().getSourceCountrySets(...args); }
 function resolveCoastlineTopologySource(...args) { return getBorderMeshOwner().resolveCoastlineTopologySource(...args); }
 function simplifyCoastlineMesh(...args) { return getBorderMeshOwner().simplifyCoastlineMesh(...args); }
@@ -7108,125 +7110,16 @@ function projectedGeoBoundsInScreen(bounds) {
   );
 }
 
-function getContourViewportScreenBounds() {
-  const overscan = Math.max(
-    VIEWPORT_CULL_OVERSCAN_PX,
-    Math.min(runtimeState.width, runtimeState.height) * 0.08
-  );
-  const minX = -overscan;
-  const minY = -overscan;
-  const maxX = Number(runtimeState.width || 0) + overscan;
-  const maxY = Number(runtimeState.height || 0) + overscan;
-  return {
-    x: minX,
-    y: minY,
-    minX,
-    minY,
-    maxX,
-    maxY,
-    width: Math.max(0, maxX - minX),
-    height: Math.max(0, maxY - minY),
-  };
-}
-
-function getContourVisibleSetCacheKey(collection, {
-  k = runtimeState.zoomTransform?.k || 1,
-  lowReliefCutoff = 0,
-  intervalM = 0,
-  excludeIntervalM = 0,
-  minScreenSpanPx = 0,
-  maxFeatures = 0,
-} = {}) {
-  return [
-    Number(runtimeState.topologyRevision || 0),
-    getContextBaseZoomBucketId(k),
-    getTransformSignature(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity),
-    getViewportRenderSignature(),
-    Array.isArray(collection?.features) ? collection.features.length : 0,
-    Number(lowReliefCutoff || 0).toFixed(2),
-    Number(intervalM || 0).toFixed(2),
-    Number(excludeIntervalM || 0).toFixed(2),
-    Number(minScreenSpanPx || 0).toFixed(2),
-    Number(maxFeatures || 0),
-  ].join("|");
-}
-
-function getContourVisibleFeatures(
-  collection,
-  {
-    cacheSlot = "major",
-    k = runtimeState.zoomTransform?.k || 1,
-    lowReliefCutoff = 0,
-    intervalM = 0,
-    excludeIntervalM = 0,
-    minScreenSpanPx = 0,
-    maxFeatures = 0,
-  } = {},
-) {
+function getContourVisibleFeatures(collection, options = {}) {
   if (!Array.isArray(collection?.features) || collection.features.length === 0) return [];
-  const cacheKey = getContourVisibleSetCacheKey(collection, {
-    k,
-    lowReliefCutoff,
-    intervalM,
-    excludeIntervalM,
-    minScreenSpanPx,
-    maxFeatures,
+  return contourVisibleSetOwner.select(collection, options, {
+    width: Number(runtimeState.width),
+    height: Number(runtimeState.height),
+    topologyRevision: Number(runtimeState.topologyRevision || 0),
+    zoomBucket: getContextBaseZoomBucketId(Number(options.k === undefined ? (runtimeState.zoomTransform?.k || 1) : options.k)),
+    transformSignature: getTransformSignature(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity),
+    viewportSignature: getViewportRenderSignature(),
   });
-  const cacheEntry = contourVisibleSetCache[cacheSlot];
-  if (
-    cacheEntry?.collectionRef === collection
-    && cacheEntry.key === cacheKey
-    && Array.isArray(cacheEntry.features)
-  ) {
-    return cacheEntry.features;
-  }
-
-  const viewportBounds = getContourViewportScreenBounds();
-  const visibleRecords = [];
-  collection.features.forEach((feature) => {
-    const elevation = Number(feature?.properties?.elevation_m);
-    if (Number.isFinite(elevation) && elevation < lowReliefCutoff) return;
-    if (intervalM > 0 && Number.isFinite(elevation) && elevation % intervalM !== 0) return;
-    if (excludeIntervalM > 0 && Number.isFinite(elevation) && elevation % excludeIntervalM === 0) return;
-
-    const screenBounds = getFeatureScreenBounds(feature, { allowCompute: false }) || getFeatureScreenBounds(feature);
-    if (!screenBounds) {
-      if (minScreenSpanPx <= 0 && isLineGeometryType(String(feature?.geometry?.type || "").trim())) {
-        visibleRecords.push({ feature, elevation, span: 0 });
-      }
-      return;
-    }
-    if (!rectsIntersect(screenBounds, viewportBounds)) return;
-    const span = Math.max(Number(screenBounds.width || 0), Number(screenBounds.height || 0));
-    if (minScreenSpanPx > 0 && !(span >= minScreenSpanPx)) return;
-    visibleRecords.push({ feature, elevation, span });
-  });
-
-  if (maxFeatures > 0 && visibleRecords.length > maxFeatures) {
-    const scored = visibleRecords.map(({ feature, elevation, span }) => {
-      const elevationScore = Number.isFinite(elevation) ? elevation : 0;
-      return {
-        feature,
-        score: elevationScore * 1.15 + span * 34,
-      };
-    });
-    scored.sort((a, b) => b.score - a.score);
-    const visibleFeatures = scored.slice(0, maxFeatures).map((entry) => entry.feature);
-    contourVisibleSetCache[cacheSlot] = {
-      collectionRef: collection,
-      key: cacheKey,
-      features: visibleFeatures,
-    };
-    return visibleFeatures;
-  }
-
-  const visibleFeatures = visibleRecords.map((entry) => entry.feature);
-  contourVisibleSetCache[cacheSlot] = {
-    collectionRef: collection,
-    key: cacheKey,
-    features: visibleFeatures,
-  };
-  return visibleFeatures;
 }
 
 const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
@@ -7340,9 +7233,9 @@ function setCanvasSize({
   }
 
   resizeCanvasLayers(rendererSurfaceHost.getCanvasLayers(), {
-    width: runtimeState.width,
-    height: runtimeState.height,
-    dpr: runtimeState.dpr,
+    width: Number(runtimeState.width),
+    height: Number(runtimeState.height),
+    dpr: Number(runtimeState.dpr),
     preserveComposite: !!runtimeState.firstVisibleFramePainted,
   });
   if (rendererSurfaceHost.getHitCanvas()) {
@@ -7547,18 +7440,11 @@ function resetContourHostFillColorCache() {
 }
 function resetExactRefreshOptimizationState() {
   resetContourHostFillColorCache();
-  resetContourVisibleSetCache();
+  contourVisibleSetOwner.reset();
   cancelDeferredContextBaseEnhancement({ resetFlag: true });
   detailAdmMeshBuildState = {
     signature: "",
     status: "idle",
-  };
-}
-
-function resetContourVisibleSetCache() {
-  contourVisibleSetCache = {
-    major: { collectionRef: null, key: "", features: [] },
-    minor: { collectionRef: null, key: "", features: [] },
   };
 }
 
@@ -7730,14 +7616,14 @@ function ensureCountrySourceBorderMeshes(countryCode, {
     { key: "detail", topology: runtimeState.topologyDetail },
     { key: "primary", topology: runtimeState.topologyPrimary || runtimeState.topology },
   ];
-  sources.forEach(({ key, topology }) => {
-    if (!topology?.objects?.political) return;
-    if (!staticMeshSourceCountries[key]?.has(normalizedCode)) return;
-    const meshes = buildSourceBorderMeshes(topology, new Set([normalizedCode]), {
+  for (const { key, topology } of sources) {
+    if (!topology?.objects?.political) continue;
+    if (!staticMeshSourceCountries[key]?.has(normalizedCode)) continue;
+    const meshes = getBorderMeshOwner().buildSourceBorderMeshes(topology, new Set([normalizedCode]), {
       includeProvince: needsProvince,
       includeLocal: needsLocal,
     });
-    if (!meshes) return;
+    if (!meshes) continue;
     if (needsProvince) {
       const provinceMeshes = meshes.provinceMeshesByCountry?.get(normalizedCode) || [];
       provinceMeshes.forEach((mesh) => {
@@ -7756,7 +7642,7 @@ function ensureCountrySourceBorderMeshes(countryCode, {
         }
       });
     }
-  });
+  }
   if (needsProvince) {
     runtimeState.cachedProvinceBordersByCountry.set(normalizedCode, nextProvinceMeshes);
   }
@@ -10523,16 +10409,6 @@ function getFeatureCollectionFeatureCount(collection) {
   return Array.isArray(collection?.features) ? collection.features.length : 0;
 }
 
-function getObjectIdentityToken(value, prefix = "obj") {
-  if (!value || (typeof value !== "object" && typeof value !== "function")) return `${prefix}:none`;
-  let token = objectIdentityTokenCache.get(value);
-  if (!token) {
-    token = `${prefix}:${nextObjectIdentityToken++}`;
-    objectIdentityTokenCache.set(value, token);
-  }
-  return token;
-}
-
 function getContextLayerStableSourceToken(layerName, collection, {
   primaryTopology = null,
   detailTopology = null,
@@ -10879,27 +10755,37 @@ function ensureContourLodForView() {
     || typeof runtimeState.ensureContextLayerDataFn !== "function") return;
   const requested = resolveContourLodRequest(runtimeState);
   const key = `${runtimeState.activeScenarioId || ""}:${requested.join("|")}`;
-  const ensure = runtimeState.ensureContextLayerDataFn;
-  const cache = runtimeState.contextLayerExternalDataByName;
-  const major = runtimeState.physicalContourMajorData;
-  const minor = runtimeState.physicalContourMinorData;
+  const ensureIdentity = getObjectIdentityToken(runtimeState.ensureContextLayerDataFn, "contour-loader");
+  const cache = getObjectIdentityToken(runtimeState.contextLayerExternalDataByName,
+    `contour-cache:${typeof runtimeState.contextLayerExternalDataByName}`);
+  const major = getObjectIdentityToken(runtimeState.physicalContourMajorData,
+    `contour-major:${typeof runtimeState.physicalContourMajorData}`);
+  const minor = getObjectIdentityToken(runtimeState.physicalContourMinorData,
+    `contour-minor:${typeof runtimeState.physicalContourMinorData}`);
   const previous = lastContourLodRequest;
-  if (previous?.key === key && previous.ensure === ensure && previous.cache === cache
+  if (previous?.key === key && previous.ensureIdentity === ensureIdentity && previous.cache === cache
     && (previous.pending || (previous.major === major && previous.minor === minor))) return;
-  const request = { key, ensure, cache, major, minor, pending: true };
+  const ensure = captureCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn");
+  let request = { key, ensureIdentity, cache, major, minor, pending: true };
   lastContourLodRequest = request;
   Promise.resolve().then(() => ensure(["physical-contours-set"], {
     reason: "contour-lod",
     renderNow: false,
   })).then(() => {
     if (lastContourLodRequest !== request) return;
-    request.pending = false;
     if (requested.some((name) => runtimeState.contextLayerLoadStateByName?.[name] === "error")) {
       lastContourLodRequest = null;
       return; // Retry on the next user frame, without a failed-load render loop.
     }
-    request.major = runtimeState.physicalContourMajorData;
-    request.minor = runtimeState.physicalContourMinorData;
+    request = {
+      key, ensureIdentity, cache,
+      major: getObjectIdentityToken(runtimeState.physicalContourMajorData,
+        `contour-major:${typeof runtimeState.physicalContourMajorData}`),
+      minor: getObjectIdentityToken(runtimeState.physicalContourMinorData,
+        `contour-minor:${typeof runtimeState.physicalContourMinorData}`),
+      pending: false,
+    };
+    lastContourLodRequest = request;
     requestRendererRender("contour-lod-ready");
   }).catch((error) => {
     if (lastContourLodRequest === request) lastContourLodRequest = null;
@@ -10950,21 +10836,26 @@ const {
   createDrawPaintResolver,
 } = composeUrbanAdaptivePaintModel();
 
-const urbanLayerRenderOwner = createUrbanLayerRenderOwner({
-  state: runtimeState,
-  helpers: {
-    clamp, collectContextMetric, createDrawPaintResolver, getEffectiveUrbanMode,
-    getContext: () => rendererSurfaceHost.getContext(),
-    getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
-    getProjection: () => rendererSurfaceHost.getProjection(),
-    getSafeBlendMode, getSafeCanvasColor, getUrbanGlowFeatureMultiplier,
-    getUrbanLayerCapability, normalizeUrbanStyleConfig, nowMs,
-    estimateProjectedAreaPx, pathBoundsInScreen,
-  },
-});
+function composeUrbanLayerRenderOwner() {
+  const owner = createUrbanLayerRenderOwner({
+    state: runtimeState,
+    helpers: {
+      clamp, collectContextMetric, createDrawPaintResolver, getEffectiveUrbanMode,
+      getContext: () => rendererSurfaceHost.getContext(),
+      getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+      getProjection: () => rendererSurfaceHost.getProjection(),
+      getSafeBlendMode, getSafeCanvasColor, getUrbanGlowFeatureMultiplier,
+      getUrbanLayerCapability, normalizeUrbanStyleConfig, nowMs,
+      estimateProjectedAreaPx, pathBoundsInScreen,
+    },
+  });
+  return owner;
+}
+
+const { drawUrbanLayer: drawUrbanLayerFromOwner } = composeUrbanLayerRenderOwner();
 
 function drawUrbanLayer(k, { interactive = false } = {}) {
-  return urbanLayerRenderOwner.drawUrbanLayer(k, { interactive });
+  return drawUrbanLayerFromOwner(k, { interactive });
 }
 
 function recordDeferredRiversLayerMetric({ interactive = false, reason = "staged-apply" } = {}) {

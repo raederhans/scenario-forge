@@ -10,6 +10,7 @@ import {
   createScenarioChunkPromotionDelta,
   createDrawSubsetIndex,
   isDrawSubsetIndexCurrent,
+  recordScenarioPoliticalDerivedStateCoverage,
   resolveScenarioChunkPromotionChangeSet,
 } from "../js/core/renderer/scenario_chunk_promotion_helpers.js";
 
@@ -98,6 +99,51 @@ test("political coverage borrows frozen scene collections and returns detached d
   assert.deepEqual(again.missingLandFeatureIdsSample, ["B"]);
   assert.deepEqual(again.missingColorFeatureIdsSample, ["B"]);
   assert.equal(state.scenarioPoliticalChunkData.features[1], second);
+});
+
+test("selection diagnostics shallow-copy all chunk-id arrays without exposing source arrays", () => {
+  const sharedEntry = { id: "shared-entry" };
+  const requiredChunkIds = new Array(3);
+  requiredChunkIds[1] = sharedEntry;
+  const cacheOnlyChunkIds = ["cache-a"];
+  const retainedActiveChunkIds = ["active-a"];
+  const runtimeState = {
+    renderDiagnostics: { enabled: true },
+    runtimeChunkLoadState: {
+      selectionVersion: 8,
+      lastSelection: { requiredChunkIds, cacheOnlyChunkIds, retainedActiveChunkIds },
+    },
+  };
+
+  const details = recordScenarioPoliticalDerivedStateCoverage({
+    runtimeState,
+    coverage: {},
+    recordRenderPerfMetric(_name, _duration, metricDetails) {
+      return metricDetails;
+    },
+  });
+
+  assert.notEqual(details.requiredChunkIds, requiredChunkIds);
+  assert.notEqual(details.cacheOnlyChunkIds, cacheOnlyChunkIds);
+  assert.notEqual(details.retainedActiveChunkIds, retainedActiveChunkIds);
+  assert.equal(details.requiredChunkIds.length, 3);
+  assert.equal(Object.hasOwn(details.requiredChunkIds, 0), true, "sparse positions become detached undefined entries");
+  assert.equal(details.requiredChunkIds[0], undefined);
+  assert.equal(details.requiredChunkIds[1], sharedEntry, "copy remains shallow");
+
+  details.requiredChunkIds[1] = "result-only";
+  details.cacheOnlyChunkIds.push("result-only");
+  details.retainedActiveChunkIds[0] = "result-only";
+  assert.equal(requiredChunkIds[1], sharedEntry);
+  assert.deepEqual(cacheOnlyChunkIds, ["cache-a"]);
+  assert.deepEqual(retainedActiveChunkIds, ["active-a"]);
+
+  requiredChunkIds[1] = "source-only";
+  cacheOnlyChunkIds[0] = "source-only";
+  retainedActiveChunkIds.push("source-only");
+  assert.equal(details.requiredChunkIds[1], "result-only");
+  assert.deepEqual(details.cacheOnlyChunkIds, ["cache-a", "result-only"]);
+  assert.deepEqual(details.retainedActiveChunkIds, ["result-only"]);
 });
 
 test("scenario chunk promotion change set treats atlantropa as water and political change", () => {

@@ -813,8 +813,7 @@ test("sample project banner controller opens export and dismisses current messag
   const downloadOriginalLink = new SampleBannerTestElement();
   const dismissButton = new SampleBannerTestElement();
   const exportTriggers = [];
-  const controller = createSampleProjectBannerController({
-    runtimeState: sampleRuntime,
+  const controller = createSampleProjectBannerController(sampleRuntime, {
     root,
     titleNode,
     bodyNode,
@@ -874,8 +873,7 @@ test("sample guide card controller opens export and keeps error path usable", ()
   const continueButton = new SampleBannerTestElement();
   const exportTriggers = [];
   const continueTriggers = [];
-  const controller = createSampleProjectGuideCardController({
-    runtimeState: sampleRuntime,
+  const controller = createSampleProjectGuideCardController(sampleRuntime, {
     root,
     titleNode,
     bodyNode,
@@ -953,8 +951,7 @@ test("sample guide card renders public sample choices with selected and loading 
     const sampleListNode = new SampleBannerTestElement();
     const sampleListStatusNode = new SampleBannerTestElement();
     const choices = [];
-    const controller = createSampleProjectGuideCardController({
-      runtimeState: sampleRuntime,
+    const controller = createSampleProjectGuideCardController(sampleRuntime, {
       root,
       titleNode,
       bodyNode,
@@ -1014,8 +1011,7 @@ test("sample guide card keeps public sample list load errors visible without cho
   const continueButton = new SampleBannerTestElement();
   const sampleListNode = new SampleBannerTestElement();
   const sampleListStatusNode = new SampleBannerTestElement();
-  const controller = createSampleProjectGuideCardController({
-    runtimeState: sampleRuntime,
+  const controller = createSampleProjectGuideCardController(sampleRuntime, {
     root,
     titleNode,
     bodyNode,
