@@ -184,6 +184,17 @@ export function createProjectedGeometryBoundsOwner({
     resetHostWaterPathCaches();
   }
 
+  // Narrow operation: reset only the published ID map while retaining the
+  // private geometry WeakMap when projection and scenario identity are stable.
+  // Call this when the runtime primary index is rebuilt and IDs need to be
+  // re-published, but geometry bounds are still valid for the same projection.
+  // Water paths survive unchanged identity; a scene/projection change still resets them.
+  function resetPublishedBoundsCache() {
+    ensureGeometryBoundsIdentity();
+    ensureCache();
+    clearProjectedBoundsCacheEntriesState(state);
+  }
+
   function recordProjectedBoundsDiagnostic(feature, reason = "unknown") {
     return recordProjectedBoundsDiagnosticsState(feature, reason);
   }
@@ -359,6 +370,7 @@ export function createProjectedGeometryBoundsOwner({
     getProjectedFeatureBounds,
     rebuildProjectedBoundsCache,
     clearProjectedBoundsCache,
+    resetPublishedBoundsCache,
     recordProjectedBoundsDiagnostic,
     mergeProjectedBounds,
     normalizeGeoObjectForSphericalDiagnostics,

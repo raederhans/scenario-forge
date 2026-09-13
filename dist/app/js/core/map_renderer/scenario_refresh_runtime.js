@@ -25,6 +25,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     resetFirstVisibleFramePainted, clearRenderPassReferenceTransforms,
     rebuildStaticMeshes, getEffectiveAtlantropaFeatures,
     rebuildAuxiliaryRegionIndexes, getSpatialIndexRuntimeOwner, queueIndexUiRefresh,
+    recordScopedTopologyChange = () => {},
   } = deps;
 
   let deferredScenarioChunkPromotionInfraHandle = null;
@@ -229,6 +230,7 @@ function createScenarioRefreshRuntime(deps = {}) {
             scheduleUiMode: "deferred",
             buildSpatial: true,
             includeSecondarySpatial: false,
+            reuseGeometry: true,
           });
           runtimeState.hitCanvasDirty = true;
           runtimeState.hitCanvasTopologyRevision = 0;
@@ -411,9 +413,11 @@ function createScenarioRefreshRuntime(deps = {}) {
         scheduleUiMode: "deferred",
         buildSpatial: true,
         includeSecondarySpatial: false,
+        incremental: true,
       });
     }
     scenarioChunkPromotionVersion = Number(scenarioChunkPromotionVersion || 0) + 1;
+    const previousTopologyRevision = Number(runtimeState.topologyRevision || 0);
     markRendererTopologyChanged({ hitCanvasDirty: true });
     if (runtimeState.runtimeChunkLoadState && typeof runtimeState.runtimeChunkLoadState === "object") {
       queueScenarioChunkPromotionState(runtimeState, {
@@ -448,6 +452,7 @@ function createScenarioRefreshRuntime(deps = {}) {
       changedLayerKeys: effectiveChangedLayerKeys,
       hasPoliticalChange,
     });
+    recordScopedTopologyChange({ previousRevision: previousTopologyRevision, targetPasses: invalidationTargetPasses });
     const selectionVersion = Math.max(0, Number(runtimeState.runtimeChunkLoadState?.selectionVersion || 0));
     const promotedTotalFeatureCount = Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
       ? runtimeState.scenarioPoliticalChunkData.features.length

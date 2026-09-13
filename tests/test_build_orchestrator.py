@@ -696,6 +696,7 @@ class BuildOrchestratorTest(unittest.TestCase):
         self.assertEqual(
             [name for name, _processor in build_na_detail_topology.DETAIL_POLITICAL_PROCESSOR_CHAIN],
             [
+                "france_master_precision",
                 "north_america",
                 "africa_admin1",
                 "global_basic_admin1",

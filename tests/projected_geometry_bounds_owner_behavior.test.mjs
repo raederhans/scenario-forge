@@ -506,3 +506,120 @@ test("clearProjectedBoundsCache clears projected bounds and triggers host water 
   assert.equal(calls.resetHostWaterPathCaches, 1);
   assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
 });
+
+// ---------------------------------------------------------------------------
+// resetPublishedBoundsCache: narrow ID map reset retaining geometry WeakMap
+// ---------------------------------------------------------------------------
+
+test("resetPublishedBoundsCache clears published ID map but retains geometry cache", () => {
+  let offset = 0;
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({
+    projection,
+    pathBounds: (feature) => [[firstLon(feature) + offset, 0], [firstLon(feature) + offset + 1, 1]],
+  });
+  const feature = createFeature("A", createPolygon([5, 0]));
+
+  // Populate geometry cache and ID map.
+  owner.computeProjectedFeatureBounds(feature);
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(harnessStore.projectedBoundsById.has("A"), true);
+  assert.equal(calls.pathBounds, 1);
+
+  // resetPublishedBoundsCache: clears ID map, geometry cache intact.
+  owner.resetPublishedBoundsCache();
+  assert.equal(harnessStore.projectedBoundsById.has("A"), false);
+  assert.equal(harnessStore.projectedBoundsById.size, 0);
+
+  // Geometry still cached: getProjectedFeatureBounds with allowCompute:false returns cached.
+  const cached = owner.getProjectedFeatureBounds(feature, { allowCompute: false });
+  assert.ok(cached !== null, "Geometry cache should still hold the result");
+  // No additional pathBounds call needed
+  assert.equal(calls.pathBounds, 1);
+
+  // resetPublishedBoundsCache must NOT call resetHostWaterPathCaches.
+  assert.equal(calls.resetHostWaterPathCaches, 0);
+});
+
+test("resetPublishedBoundsCache with unchanged projection repopulates ID map via getProjectedFeatureBounds", () => {
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({ projection });
+  const feature = createFeature("B", createPolygon([3, 0]));
+
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(calls.pathBounds, 1);
+
+  owner.resetPublishedBoundsCache();
+  assert.equal(harnessStore.projectedBoundsById.has("B"), false);
+
+  // After reset, getting bounds again uses geometry cache (no new pathBounds call)
+  // and repopulates the ID map.
+  const bounds = owner.getProjectedFeatureBounds(feature);
+  assert.ok(bounds !== null);
+  assert.equal(calls.pathBounds, 1); // geometry WeakMap hit, no recompute
+  assert.equal(harnessStore.projectedBoundsById.has("B"), true);
+});
+
+test("resetPublishedBoundsCache after projection generation change drops geometry cache", () => {
+  let offset = 0;
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({
+    projection,
+    pathBounds: (feature) => [[firstLon(feature) + offset, 0], [firstLon(feature) + offset + 1, 1]],
+  });
+  const feature = createFeature("C", createPolygon([7, 0]));
+
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(calls.pathBounds, 1);
+
+  // Advance projection generation.
+  offset = 5;
+  markProjectionGeometryChanged(projection);
+
+  // resetPublishedBoundsCache calls ensureGeometryBoundsIdentity which detects
+  // the generation change and replaces the geometry WeakMap.
+  owner.resetPublishedBoundsCache();
+
+  // Geometry cache is gone: allowCompute:false returns null.
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), null);
+
+  // Full recompute happens with new projection.
+  const newBounds = owner.getProjectedFeatureBounds(feature);
+  assert.ok(newBounds !== null);
+  assert.equal(calls.pathBounds, 2);
+});
+
+test("resetPublishedBoundsCache after scenario change drops geometry cache", () => {
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({ projection });
+  const feature = createFeature("D", createPolygon([2, 0]));
+
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(calls.pathBounds, 1);
+
+  // Change scenario ID.
+  harnessStore.activeScenarioId = "new_scenario";
+
+  owner.resetPublishedBoundsCache();
+
+  // Geometry cache dropped due to scenario change inside ensureGeometryBoundsIdentity.
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), null);
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(calls.pathBounds, 2);
+});
+
+test("clearProjectedBoundsCache remains full reset and calls resetHostWaterPathCaches", () => {
+  const projection = (point) => point;
+  const { owner, calls, harnessStore } = createHarness({ projection });
+  const feature = createFeature("E", createPolygon([4, 0]));
+
+  owner.getProjectedFeatureBounds(feature);
+  assert.equal(calls.pathBounds, 1);
+
+  owner.clearProjectedBoundsCache();
+
+  // Full reset: geometry WeakMap gone, ID map cleared, water cache flushed.
+  assert.equal(owner.getProjectedFeatureBounds(feature, { allowCompute: false }), null);
+  assert.equal(harnessStore.projectedBoundsById.size, 0);
+  assert.equal(calls.resetHostWaterPathCaches, 1);
+});

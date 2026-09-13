@@ -11,6 +11,7 @@ import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_int
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
+import { createPoliticalDerivedStateCache } from "./renderer/political_derived_state_cache.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
@@ -9280,23 +9281,40 @@ function syncScenarioSecondaryRegionIndexes({
   return true;
 }
 
+const politicalDerivedStateCache = createPoliticalDerivedStateCache({ getFeatureId });
+
+function getPoliticalDerivedStateIdentity() {
+  return [runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+    getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+    getProjectionGeometryGeneration(runtimeState.runtimePoliticalTopology),
+    runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
+    runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
+    runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
+    runtimeState.strategicChoroplethMetric, getOceanBaseFillColor(),
+    runtimeState.colorRevision, runtimeState.landIndex,
+    runtimeState.width, runtimeState.height];
+}
+
 function rebuildRuntimeDerivedState({
   includeRuntimePoliticalMeta = false,
   scheduleUiMode = "immediate",
   buildSpatial = true,
   includeSecondarySpatial = true,
+  incrementalDelta = null,
+  reuseGeometry = false,
 } = {}) {
-  if (includeRuntimePoliticalMeta) {
+  if (includeRuntimePoliticalMeta && !incrementalDelta) {
     buildRuntimePoliticalMeta();
   }
 
-  clearProjectedBoundsCache();
+  if (incrementalDelta || reuseGeometry) getProjectedGeometryBoundsOwner().resetPublishedBoundsCache();
+  else clearProjectedBoundsCache();
   const projectedBoundsCache = ensureProjectedBoundsCache();
-  getSpatialIndexRuntimeOwner().rebuildRuntimePrimaryIndex({
-    projectedBoundsCache,
-  });
+  const spatialOwner = getSpatialIndexRuntimeOwner();
+  if (incrementalDelta) spatialOwner.reconcileRuntimePrimaryIndex({ projectedBoundsCache });
+  else spatialOwner.rebuildRuntimePrimaryIndex({ projectedBoundsCache });
 
-  const nextColors = rebuildResolvedColors();
+  const nextColors = incrementalDelta ? reconcilePoliticalDerivedColors(incrementalDelta) : rebuildResolvedColors();
   queueIndexUiRefresh({
     renderCountryList: true,
     renderWaterRegionList: true,
@@ -9308,9 +9326,40 @@ function rebuildRuntimeDerivedState({
     buildSpatialIndex({
       includeSecondary: includeSecondarySpatial,
       allowComputeMissingBounds: false,
+      reuseExisting: !!incrementalDelta,
     });
   }
+  if (buildSpatial) {
+    politicalDerivedStateCache.commit({ identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull, colors: runtimeState.colors });
+  } else {
+    politicalDerivedStateCache.reset();
+  }
   return nextColors;
+}
+
+function reconcilePoliticalDerivedColors(delta) {
+  const startedAt = nowMs();
+  const previousColorRevision = Number(runtimeState.colorRevision || 0);
+  let changed = false;
+  for (const id of delta.removedIds) {
+    if (Object.hasOwn(runtimeState.colors, id)) changed = true;
+    setResolvedColorForFeature(state, id, null);
+  }
+  for (const id of delta.changedIds) {
+    const color = getResolvedFeatureColor(delta.features.get(id), id);
+    if (runtimeState.colors[id] !== color) changed = true;
+    setResolvedColorForFeature(state, id, color);
+  }
+  if (changed) {
+    bumpColorRevision(state);
+    retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
+  }
+  getCountryFillPaletteOwner().invalidate();
+  recordRenderPerfMetric("reconcilePoliticalColors", nowMs() - startedAt, {
+    resolvedFeatureCount: delta.changedIds.length, removedFeatureCount: delta.removedIds.length,
+    sourceFeatureCount: delta.features.size, colorChanged: changed,
+  });
+  return runtimeState.colors;
 }
 
 async function buildHitCanvasAfterStartup({ keepReady = false, reason = "startup-deferred-hit-canvas" } = {}) {
@@ -14520,13 +14569,21 @@ function rebuildPrimaryPoliticalDerivedState({
   scheduleUiMode = "deferred",
   buildSpatial = true,
   includeSecondarySpatial = false,
+  incremental = false,
 } = {}) {
+  const previousCollection = runtimeState.landDataFull;
   rebuildPrimaryPoliticalCollections();
+  const incrementalDelta = incremental ? politicalDerivedStateCache.describe({
+    identity: getPoliticalDerivedStateIdentity(), previousCollection,
+    collection: runtimeState.landDataFull, colors: runtimeState.colors,
+  }) : null;
   rebuildRuntimeDerivedState({
     includeRuntimePoliticalMeta: true,
     scheduleUiMode,
     buildSpatial,
     includeSecondarySpatial,
+    incrementalDelta,
+    reuseGeometry: incremental,
   });
 }
 
@@ -14558,6 +14615,7 @@ function resetRendererRefreshTransactionState({
 
 scenarioRefreshRuntime = createScenarioRefreshRuntime({
   runtimeState,
+  recordScopedTopologyChange: (change) => getRenderPassSignaturePolicy().recordScopedTopologyChange(change),
   buildIndex,
   buildSpatialIndexChunked,
   buildInteractiveLandData,

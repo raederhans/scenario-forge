@@ -59,6 +59,21 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["test:py:tno-water-repair-contracts", ["tests/test_tno_water_owners_consistency.py", "tests/test_tno_bundle_builder.py"]],
     ["test:py:hgo-runtime-seed", ["tests/test_hgo_runtime_seed_builder.py"]],
     ["test:py:hgo-runtime-assets-contract", ["tests/test_data_manifest_contract.py", "tests/test_data_catalog_contract.py"]],
+    ...[
+      ["test_france_lod_contract", ["tools/scenario_chunk_assets.py"]],
+      ["test_france_precision", ["map_builder/processors/france.py"]],
+      ["test_france_topology_precision", ["map_builder/geo/france_topology_precision.py", "map_builder/geo/topology.py", "tools/pilot_tno_france_precision.py"]],
+      ["test_regional_basic_processors", ["map_builder/processors/africa_admin1.py", "map_builder/processors/global_basic_admin1.py"]],
+      ["test_regional_boundary_alignment", ["map_builder/geo/regional_boundary_alignment.py"]],
+      ["test_regional_geometry", ["map_builder/regional_geometry.py", "tools/build_regional_topology.py"]],
+      ["test_regional_precision_lod", ["tools/scenario_chunk_assets.py", "requirements.txt"]],
+      ["test_regional_processors", ["map_builder/regional_processors.py"]],
+      ["test_regional_rebuild_plan", ["map_builder/regional_rebuild_plan.py", "tools/plan_regional_rebuild.py"]],
+      ["test_regional_scenario_assets", ["tools/regional_scenario_assets.py"]],
+      ["test_scenario_spatial_chunk_assets", ["tools/scenario_chunk_assets.py", "tools/political_detail_partition.py", "tools/check_scenario_contracts.py"]],
+      ["test_scenario_surface_constraints", ["map_builder/geo/scenario_surface_constraints.py"]],
+      ["test_tno_regional_precision", ["tools/pilot_tno_regional_precision.py"]],
+    ].map(([name, sources]) => ["python -m unittest tests." + name + " -q", ["tests/" + name + ".py", ...sources]]),
   ];
 
   const pythonCoverageOrder = localActionOrder + actionRecords.length + borderRecords.length + 1;
@@ -71,10 +86,25 @@ export function createLocalFeedbackRecords(baseRecords) {
     verificationOrder: null, selectorOrder: pythonCoverageOrder + index,
     verification: null, selector: {},
   }));
+  for (const [name, sources] of [
+    ["test_runtime_json_packing", ["tools/runtime_json_packing.py", "tools/political_detail_partition.py", "tools/build_pages_dist.py"]],
+    ["test_incremental_build_cache", ["map_builder/base_stage.py", "map_builder/build_dependencies.py", "map_builder/scenario_rebuild_planner.py"]],
+    ["test_regional_shard_cache", ["tools/regional_scenario_assets.py"]],
+  ]) {
+    pythonRecords.push({
+      ...pythonRecords[0], id: "local:python:" + name,
+      commandRef: "python -m unittest tests." + name + " -q",
+      sourceRefs: ["tests/" + name + ".py", ...sources],
+      selectorOrder: pythonCoverageOrder + pythonRecords.length,
+    });
+  }
 
   // Each local leaf covers this owner only; broader roots and data retain their
   // existing PR/nightly/release requirements.
   const localOwnerCoverage = [
+    ["json-resource-decoder", "startup", "js/core/json_resource_decoder_shared.js", "tests/json_resource_decoder_behavior.test.mjs", ["js/core/data_loader.js", "js/workers/startup_boot.worker.js"]],
+    ["regional-precision-chunk-budget", "scenario-runtime", "tools/scenario_chunk_assets.py", "tests/regional_precision_chunk_budget.test.mjs", ["js/core/scenario_chunk_manager.js"]],
+    ["scenario-spatial-chunk-selection", "scenario-runtime", "tools/political_detail_partition.py", "tests/scenario_spatial_chunk_selection_behavior.test.mjs", ["js/core/scenario_chunk_manager.js", "js/core/scenario/bundle_cache_policy.js", "js/core/scenario/chunk_runtime.js"]],
     ["city-label", "renderer-runtime", "js/core/renderer/city_label_owner.js", "tests/city_label_owner_behavior.test.mjs"],
     ["city-paint-style", "renderer-runtime", "js/core/renderer/city_paint_style_model.js", "tests/city_paint_style_model_behavior.test.mjs"],
     ["scenario-chunk-payload-loader", "scenario-runtime", "js/core/scenario/chunk_payload_loader.js", "tests/scenario_chunk_payload_loader_behavior.test.mjs"],
@@ -85,6 +115,11 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["viewport-read-model", "renderer-runtime", "js/core/renderer/viewport_read_model_owner.js", "tests/viewport_read_model_owner_behavior.test.mjs"],
     ["selection-overlay", "renderer-runtime", "js/core/renderer/selection_overlay_owner.js", "tests/selection_overlay_owner_behavior.test.mjs"],
     ["projected-geometry-bounds", "renderer-runtime", "js/core/renderer/projected_geometry_bounds_owner.js", "tests/projected_geometry_bounds_owner_behavior.test.mjs"],
+    ["political-collection-geometry-cache", "renderer-runtime", "js/core/renderer/political_collection_owner.js", "tests/political_collection_geometry_cache_behavior.test.mjs"],
+    ["political-derived-state-cache", "renderer-runtime", "js/core/renderer/political_derived_state_cache.js", "tests/political_derived_state_cache_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["geometry-raster-runtime", "renderer-runtime", "js/core/renderer/geometry_raster_runtime_owner.js", "tests/geometry_raster_runtime_owner_behavior.test.mjs"],
+    ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],
+    ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
     ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
     ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
     ["bathymetry-geometry", "renderer-runtime", "js/core/renderer/bathymetry_geometry.js", "tests/bathymetry_geometry_behavior.test.mjs"],

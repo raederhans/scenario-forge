@@ -448,8 +448,10 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
   }
 
   const heavy = buildCanonicalHeavyDependencyGroups();
+  const authoredHeavyPatterns = VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns;
+  const authoredHeavyCount = authoredHeavyPatterns.length;
   assert.equal(heavy.heavyDependencyGroups[0].id, "geo_stack");
-  assert.equal(heavy.heavyDependencyGroups[0].patterns.length, 29);
+  assert.deepEqual([...heavy.heavyDependencyGroups[0].patterns].sort(), [...authoredHeavyPatterns].sort());
   assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_city_data_contract.py"));
   assert.ok(heavy.heavyDependencyGroups[0].patterns.includes("tests/test_reviewed_place_names.py"));
   const cityRoute = buildRouteIndex().find((route) => route.id === "city:data-contract-python");
@@ -457,7 +459,8 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
   assert.equal(cityRoute.cost, "heavy");
   assert.ok(cityRoute.resourceLocks.includes("heavy-geo"));
   heavy.heavyDependencyGroups[0].patterns.push("detached-only.py");
-  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, 29);
+  assert.equal(VERIFICATION_METADATA_SOURCE.projectionAuthority.heavyDependencyGroups[0].patterns.length, authoredHeavyCount);
+  assert.ok(!authoredHeavyPatterns.includes("detached-only.py"));
 
   const aliases = buildCanonicalPackageAliases().packageAliases;
   assert.deepEqual(

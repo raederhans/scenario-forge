@@ -14,6 +14,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable
 
+from map_builder.build_dependencies import merge_dependencies
+
 try:
     import resource
 except Exception:  # pragma: no cover - unavailable on some platforms
@@ -69,12 +71,20 @@ def describe_path_state(path: Path) -> dict[str, object]:
             "path": str(path),
             "exists": False,
         }
+    if path.is_dir():
+        children = [describe_path_state(child) for child in sorted(path.rglob("*")) if child.is_file()]
+        return {"path": str(path), "exists": True, "kind": "dir", "children": children}
     stat = path.stat()
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
     return {
         "path": str(path),
         "exists": True,
+        "kind": "file",
         "size": int(stat.st_size),
-        "mtime_ns": int(stat.st_mtime_ns),
+        "sha256": digest.hexdigest(),
     }
 
 
@@ -106,9 +116,11 @@ def compute_stage_signature(
     inputs: Iterable[Path] = (),
     extra: dict[str, object] | None = None,
 ) -> str:
+    project_root = Path(__file__).resolve().parents[1]
+    merged_inputs = merge_dependencies(inputs, stage_name=stage_name, project_root=project_root)
     payload = {
         "stage": stage_name,
-        "inputs": [describe_path_state(Path(path)) for path in inputs],
+        "inputs": [describe_path_state(path) for path in merged_inputs],
         "extra": extra or {},
     }
     return hashlib.sha256(
@@ -127,7 +139,15 @@ def should_skip_stage(
     output_paths = [Path(path) for path in outputs]
     if not output_paths or any(not path.exists() for path in output_paths):
         return False
-    return isinstance(record, dict) and record.get("signature") == signature
+    if not isinstance(record, dict) or record.get("signature") != signature:
+        return False
+    recorded_outputs = record.get("outputs")
+    if not isinstance(recorded_outputs, list) or len(recorded_outputs) != len(output_paths):
+        return False
+    return all(
+        isinstance(item, dict) and item == describe_path_state(path)
+        for item, path in zip(recorded_outputs, output_paths)
+    )
 
 
 def update_stage_cache(

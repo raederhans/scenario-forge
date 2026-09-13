@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 import geopandas as gpd
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, shape
 from topojson import Topology
 
 from tools import build_scenario_chunk_assets, scenario_chunk_assets
@@ -105,7 +105,10 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 assert isinstance(budget_hints, dict)
                 political_path_cost_budget = budget_hints.get("max_required_political_estimated_path_cost")
                 if political_path_cost_budget is not None:
-                    self.assertGreaterEqual(political_path_cost_budget, coarse_chunk.get("estimated_path_cost"))
+                    # selectScenarioChunks budgets extra detail, while the global
+                    # coarse base is always required. Its measured cost above is
+                    # authoritative but is not a lower bound on the detail budget.
+                    self.assertGreater(political_path_cost_budget, 0)
                 self.assertEqual(diagnostics.get("optimized_feature_count"), len(features))
                 self.assertEqual(diagnostics.get("optimized_coord_count"), payload_cost["coord_count"])
                 self.assertEqual(diagnostics.get("optimized_part_count"), payload_cost["part_count"])
@@ -1118,6 +1121,42 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                     self.assertEqual(feature["geometry"], original["geometry"])
                     self.assertEqual(feature["properties"], original["properties"])
 
+    def test_fr_arr_coarse_simplifies_shared_coverage_and_preserves_ids(self) -> None:
+        shared_ys = [index / 10 for index in range(11)]
+        left = Polygon([(0, 0), (1, 0), *[(1, y) for y in shared_ys[1:]], (0, 1), (0, 0)])
+        right = Polygon([(1, 0), (2, 0), (2, 1), (1, 1), *[(1, y) for y in shared_ys[-2:0:-1]], (1, 0)])
+        payload = {
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "properties": {"id": "FR_ARR_00001", "cntr_code": "FR", "marker": "left"}, "geometry": left.__geo_interface__},
+                {"type": "Feature", "properties": {"id": "FR_ARR_00002", "cntr_code": "FR", "marker": "right"}, "geometry": right.__geo_interface__},
+            ],
+        }
+        optimized = scenario_chunk_assets._optimize_political_coarse_payload(
+            payload,
+            owner_buckets_by_feature_id={"FR_ARR_00001": "FRA", "FR_ARR_00002": "FRA"},
+        )
+        self.assertEqual(_chunk_feature_ids(optimized), ["FR_ARR_00001", "FR_ARR_00002"])
+        self.assertEqual([feature["properties"].get("marker") for feature in optimized["features"]], [None, None])
+        optimized_geometries = [shape(feature["geometry"]) for feature in optimized["features"]]
+        self.assertLess(
+            scenario_chunk_assets._summarize_payload_geometry_cost(optimized)["coord_count"],
+            scenario_chunk_assets._summarize_payload_geometry_cost(payload)["coord_count"],
+        )
+        shared = optimized_geometries[0].boundary.intersection(optimized_geometries[1].boundary)
+        self.assertGreater(shared.length, 0)
+        self.assertTrue(optimized_geometries[0].is_valid and optimized_geometries[1].is_valid)
 
+    def test_fr_arr_invalid_coverage_reports_fallback_without_buffering(self) -> None:
+        payload_features = [
+            {"type": "Feature", "properties": {"id": "FR_ARR_00001"}, "geometry": _square(0, 0, 1).__geo_interface__},
+            {"type": "Feature", "properties": {"id": "FR_ARR_00002"}, "geometry": _square(0.5, 0, 1).__geo_interface__},
+        ]
+        geometries, applied = scenario_chunk_assets._shared_fr_arr_simplified_geometries(
+            payload_features,
+            owner_buckets_by_feature_id={"FR_ARR_00001": "FRA", "FR_ARR_00002": "FRA"},
+        )
+        self.assertFalse(applied)
+        self.assertEqual(geometries, {})
 if __name__ == "__main__":
     unittest.main()

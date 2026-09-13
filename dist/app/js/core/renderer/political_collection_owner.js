@@ -27,6 +27,26 @@ export function createPoliticalCollectionOwner({
   };
   const rewoundFeatureLogKeys = new Set();
 
+  // Cache normalized geometry per geometry-object identity.
+  // Value is the rewound geometry object when rewind improved area, or the
+  // sentinel GEOM_UNCHANGED when geoArea confirmed no rewind needed.
+  // A thrown / non-finite geoArea result is never stored, so a retry with a
+  // corrected globalThis.d3 can still succeed.
+  const GEOM_UNCHANGED = Symbol("geom_unchanged");
+  const normalizedGeometryByGeometry = new WeakMap();
+
+  // Cache detail feature wrapper per original feature reference.
+  // Value is {…feature, properties:{…, __source:"detail"}}.
+  // The cached entry is only reused when it still matches the original
+  // feature's current properties, so property mutations remain visible.
+  const normalizedDetailWrapperByFeature = new WeakMap();
+
+  function matchesSnapshot(value, snapshot) {
+    const keys = Object.keys(value || {});
+    return keys.length === Object.keys(snapshot).length
+      && keys.every((key) => Object.hasOwn(snapshot, key) && Object.is(value[key], snapshot[key]));
+  }
+
   function normalizeFragmentCamouflageRules(rawRules) {
     if (!Array.isArray(rawRules)) return [];
     return rawRules
@@ -210,18 +230,35 @@ export function createPoliticalCollectionOwner({
       return feature;
     }
 
+    // Check geometry cache before calling geoArea.
+    const geometry = feature.geometry;
+    if (normalizedGeometryByGeometry.has(geometry)) {
+      const cachedGeom = normalizedGeometryByGeometry.get(geometry);
+      if (cachedGeom === GEOM_UNCHANGED) return feature;
+      // cachedGeom is the rewound geometry object; spread a new feature to
+      // carry current properties while returning the pre-computed geometry.
+      return { ...feature, geometry: cachedGeom };
+    }
+
     let area = null;
     try {
       area = globalThis.d3.geoArea(feature);
     } catch (_error) {
+      // Do not cache: geoArea may succeed after d3 is initialised correctly.
       return feature;
     }
-    if (!Number.isFinite(area) || area <= Math.PI * 2) {
+    if (!Number.isFinite(area)) return feature;
+    if (area <= Math.PI * 2) {
+      // Geometry passes orientation check; record that no rewind is needed.
+      normalizedGeometryByGeometry.set(geometry, GEOM_UNCHANGED);
       return feature;
     }
 
-    const rewoundGeometry = rewindGeometryRings(feature.geometry);
-    if (!rewoundGeometry) return feature;
+    const rewoundGeometry = rewindGeometryRings(geometry);
+    if (!rewoundGeometry) {
+      // rewindGeometryRings returned null (unsupported type); do not cache.
+      return feature;
+    }
     const rewoundFeature = {
       ...feature,
       geometry: rewoundGeometry,
@@ -229,7 +266,8 @@ export function createPoliticalCollectionOwner({
 
     try {
       const rewoundArea = globalThis.d3.geoArea(rewoundFeature);
-      if (Number.isFinite(rewoundArea) && rewoundArea < area) {
+      if (!Number.isFinite(rewoundArea)) return feature;
+      if (rewoundArea < area) {
         const featureId = getFeatureId(feature) || "(unknown)";
         const logKey = `${sourceLabel}::${featureId}`;
         if (isRenderDiagEnabled() && !rewoundFeatureLogKeys.has(logKey)) {
@@ -238,11 +276,16 @@ export function createPoliticalCollectionOwner({
             `[map_renderer] Rewound ${sourceLabel} feature orientation for ${featureId}. area=${area.toFixed(5)} -> ${rewoundArea.toFixed(5)}`
           );
         }
+        // Store the rewound geometry for reuse; do not re-run geoArea next time.
+        normalizedGeometryByGeometry.set(geometry, rewoundGeometry);
         return rewoundFeature;
       }
     } catch (_error) {
+      // Do not cache: second geoArea call failed; return original feature.
       return feature;
     }
+    // Rewind made no improvement; record that no rewind is needed.
+    normalizedGeometryByGeometry.set(geometry, GEOM_UNCHANGED);
     return feature;
   }
 
@@ -392,14 +435,30 @@ export function createPoliticalCollectionOwner({
       ? {
         type: "FeatureCollection",
         features: detailCollection.features.map((feature) => {
+          // Geometry and metadata can be replaced independently on a feature.
+          // Compare shallow snapshots so scalar metadata edits stay visible.
+          const cached = normalizedDetailWrapperByFeature.get(feature);
+          if (cached && matchesSnapshot(feature, cached.featureSnapshot)
+            && matchesSnapshot(feature.properties, cached.propertiesSnapshot)) {
+            return cached.wrapped;
+          }
           const normalizedFeature = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
-          return {
+          const wrapped = {
             ...normalizedFeature,
             properties: {
               ...(normalizedFeature?.properties || {}),
               __source: "detail",
             },
           };
+          // A failed normalization must be retried on the next composition.
+          if (normalizedGeometryByGeometry.has(feature?.geometry)) {
+            normalizedDetailWrapperByFeature.set(feature, {
+              featureSnapshot: { ...feature },
+              propertiesSnapshot: { ...(feature.properties || {}) },
+              wrapped,
+            });
+          }
+          return wrapped;
         }),
       }
       : null;

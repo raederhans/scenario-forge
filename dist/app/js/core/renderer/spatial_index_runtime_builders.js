@@ -248,3 +248,42 @@ export function captureSpatialGridBuild({
     hitMaxCellsPerItem,
   });
 }
+
+// Reconcile only cells touched by replacement/removal. Item order remains the
+// full-build draw order, including world-spanning items in the globals list.
+export function reconcileSpatialGridSnapshot(previous, options) {
+  const layout = captureSpatialGridBuild({ ...options, items: [] });
+  const meta = previous?.gridMeta;
+  if (!(previous?.grid instanceof Map) || !(previous?.itemsById instanceof Map)
+    || !meta || ["cellSize", "cols", "rows", "width", "height"].some((key) => meta[key] !== layout.gridMeta[key])) {
+    return captureSpatialGridBuild(options);
+  }
+  const items = options.items || [];
+  const nextById = new Map(items.map((item) => [item.id, item]));
+  const removed = [];
+  const added = [];
+  for (const [id, item] of previous.itemsById) if (nextById.get(id) !== item) removed.push(item);
+  for (const item of items) if (previous.itemsById.get(item.id) !== item) added.push(item);
+  if (!removed.length && !added.length) return previous;
+  const oldCells = captureSpatialGridBuild({ ...options, items: removed });
+  const newCells = captureSpatialGridBuild({ ...options, items: added });
+  const removedIds = new Set(removed.map((item) => item.id));
+  const grid = new Map(previous.grid);
+  const sort = (values) => values.sort((a, b) => a.drawOrder - b.drawOrder);
+  for (const key of new Set([...oldCells.grid.keys(), ...newCells.grid.keys()])) {
+    const bucket = sort([
+      ...(grid.get(key) || []).filter((item) => !removedIds.has(item.id)),
+      ...(newCells.grid.get(key) || []),
+    ]);
+    if (bucket.length) grid.set(key, bucket);
+    else grid.delete(key);
+  }
+  return {
+    grid,
+    gridMeta: { ...meta, globals: sort([
+      ...(meta.globals || []).filter((item) => !removedIds.has(item.id)),
+      ...newCells.gridMeta.globals,
+    ]) },
+    itemsById: nextById,
+  };
+}

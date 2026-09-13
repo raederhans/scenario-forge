@@ -25,6 +25,14 @@ import {
 import {
   resolveDataAssetUrl,
 } from "./runtime_asset_registry.js";
+import "./json_resource_decoder_shared.js";
+
+const JSON_RESOURCE_DECODER = globalThis.__scenarioForgeJsonResourceDecoderShared;
+
+if (!JSON_RESOURCE_DECODER) {
+  throw new Error("[data_loader] Shared JSON resource decoder failed to initialize.");
+}
+
 export {
   resolveDataAssetUrl,
   resolveScenarioRegistryUrl,
@@ -919,11 +927,17 @@ async function loadTopologyUrlWithMetrics(d3Client, url, label) {
   };
 }
 
-async function loadTopologyUrl(d3Client, url, label) {
-  const result = await loadTopologyUrlWithMetrics(d3Client, url, label);
-  return result.topology;
-}
-
+/**
+ * Load and parse a JSON resource with execution metrics.
+ *
+ * Metrics semantics:
+ * - encodedBytes: Byte length of HTTP response body received by JS (before client-side gzip decompression).
+ *   When transport-level Content-Encoding: gzip was applied, this reflects delivered response body bytes,
+ *   which may differ from network wire transfer bytes.
+ * - decodedBytes: Byte length of decoded UTF-8 string payload (accurate for multi-byte non-ASCII).
+ * - decompressMs: Elapsed milliseconds spent on client-side gzip decompression (0 if plain or transport-decoded).
+ * - jsonParseMs: Elapsed milliseconds spent on JSON.parse.
+ */
 export async function loadMeasuredJsonResource(
   url,
   {
@@ -973,27 +987,43 @@ export async function loadMeasuredJsonResource(
         },
       );
     }
-    const rawText = await response.text();
     signal?.throwIfAborted();
-    const fetchCompletedAt = nowMs();
-    const parseStartedAt = fetchCompletedAt;
+    let decoded;
     try {
-      const payload = rawText ? JSON.parse(rawText) : null;
-      const parsedAt = nowMs();
-      return {
-        payload,
-        metrics: {
-          url,
-          label,
-          cache,
-          fetchMs: fetchCompletedAt - startedAt,
-          jsonParseMs: parsedAt - parseStartedAt,
-          totalMs: parsedAt - startedAt,
-          transferMs: textLoadedAt - startedAt,
-        },
-      };
+      decoded = await JSON_RESOURCE_DECODER.decodeResponsePayload(response, {
+        url,
+        label,
+        signal,
+      });
     } catch (error) {
       if (error?.name === "AbortError") throw error;
+      if (signal?.aborted) {
+        const abortErr = new Error("Aborted");
+        abortErr.name = "AbortError";
+        throw abortErr;
+      }
+      if (error?.code === "unsupported-decompressor") {
+        throw createDataLoaderError(
+          "unsupported-decompressor",
+          `[data_loader] Unsupported decompressor for ${label} at ${url}: ${error.message}`,
+          {
+            label,
+            url,
+            cause: error,
+          },
+        );
+      }
+      if (error?.code === "decompress-failed" || error?.name === "DecompressError") {
+        throw createDataLoaderError(
+          "decompress-failed",
+          `[data_loader] Failed to decompress ${label} at ${url}: ${error.message}`,
+          {
+            label,
+            url,
+            cause: error,
+          },
+        );
+      }
       throw createDataLoaderError(
         "invalid-json",
         `[data_loader] Invalid JSON for ${label} at ${url}: ${error?.message || error}`,
@@ -1004,6 +1034,26 @@ export async function loadMeasuredJsonResource(
         },
       );
     }
+    signal?.throwIfAborted();
+    const parsedAt = nowMs();
+    return {
+      payload: decoded.payload,
+      metrics: {
+        url,
+        label,
+        cache,
+        transferMs: textLoadedAt - startedAt,
+        fetchMs: decoded.bodyReadAt - startedAt,
+        decompressMs: decoded.decompressMs,
+        jsonParseMs: decoded.jsonParseMs,
+        totalMs: parsedAt - startedAt,
+        bytes: decoded.decodedBytes,
+        encodedBytes: decoded.encodedBytes,
+        decodedBytes: decoded.decodedBytes,
+        compressedBytes: decoded.compressedBytes,
+        compressed: decoded.compressed,
+      },
+    };
   }
   if (!d3Client || typeof d3Client.json !== "function") {
     throw createDataLoaderError("missing-loader", `[data_loader] No JSON loader available for ${label}.`, {
@@ -1023,9 +1073,15 @@ export async function loadMeasuredJsonResource(
       label,
       cache,
       fetchMs: finishedAt - startedAt,
+      decompressMs: 0,
       jsonParseMs: 0,
       totalMs: finishedAt - startedAt,
       transferMs: finishedAt - startedAt,
+      bytes: 0,
+      encodedBytes: 0,
+      decodedBytes: 0,
+      compressedBytes: 0,
+      compressed: false,
     },
   };
 }

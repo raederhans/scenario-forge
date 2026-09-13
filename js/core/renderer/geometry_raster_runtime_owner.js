@@ -13,10 +13,20 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   const enabled = () => !disposed && worker.available() && h.isEnabled() && state.firstVisibleFramePainted
     && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
 
+  // workerSceneKey: only scenario identity — drives worker-side geometry reset.
+  // Excludes topologyRevision, scenarioDataGeneration, landData identity so
+  // that unrelated revisions and new chunk promotions do NOT flush the worker's
+  // incremental geometry / path cache.
+  function workerSceneKey() {
+    return [state.activeScenarioId, state.sceneGeneration].join(":");
+  }
+
   function describe(kind, entries) {
     const projection = surface.getProjection();
     const transform = { x: state.zoomTransform.x, y: state.zoomTransform.y, k: state.zoomTransform.k };
     const projectionKey = String(identityOf(projection));
+    // Full sceneKey used only in the frame identity (staleness guard); it must
+    // remain strict so stale results from any revision are never displayed.
     const sceneKey = [state.activeScenarioId, state.sceneGeneration, state.scenarioDataGeneration,
       state.topologyRevision, identityOf(state.landData)].join(":");
     const layout = kind === "political" ? h.getPoliticalLayout() : null;
@@ -27,7 +37,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     const contentKey = entries.map(({ id, feature, fillColor, strokeColor, lineWidth }) =>
       [id, identityOf(feature.geometry), fillColor, strokeColor, lineWidth]);
     const identity = JSON.stringify([kind, sceneKey, projectionKey, transform, width, height, state.dpr, layout, semanticKey, contentKey]);
-    return { kind, sceneKey, projectionKey, identity, transform, width, height,
+    return { kind, sceneKey: workerSceneKey(), projectionKey, identity, transform, width, height,
       dpr: state.dpr, offsetX: layout?.offsetX || 0, offsetY: layout?.offsetY || 0 };
   }
 

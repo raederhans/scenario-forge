@@ -9,6 +9,7 @@ import {
 } from "./chunk_layer_payloads.js";
 import { getScenarioChunkActiveMergeIds, isPendingScenarioChunkPromotionCurrent } from "./chunk_promotion_queries.js";
 import { createScenarioChunkPayloadLoader } from "./chunk_payload_loader.js";
+import { selectScenarioFocusPrewarmChunks } from "../scenario_chunk_manager.js";
 
 function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile) {
   const owner = createScenarioChunkPayloadLoader({
@@ -2411,13 +2412,15 @@ function createScenarioChunkRuntimeController({
     const politicalChunks = Array.isArray(bundle?.chunkRegistry?.byLayer?.political)
       ? bundle.chunkRegistry.byLayer.political
       : [];
-    const targetChunk = politicalChunks.find((chunk) =>
-      chunk?.lod === "detail"
-      && Array.isArray(chunk.countryCodes)
-      && chunk.countryCodes.includes(focusCountry)
-    ) || null;
-    if (!targetChunk) return null;
-    return loadScenarioChunkPayload(bundle, targetChunk, { d3Client });
+    const targetChunks = selectScenarioFocusPrewarmChunks({
+      chunks: politicalChunks,
+      focusCountry,
+      viewportBbox: getCurrentScenarioChunkViewportBbox(),
+      renderBudgetHints: bundle?.runtimeShell?.renderBudgetHints || bundle?.manifest?.render_budget_hints || {},
+    });
+    if (!targetChunks.length) return null;
+    const payloads = await Promise.all(targetChunks.map((chunk) => loadScenarioChunkPayload(bundle, chunk, { d3Client })));
+    return payloads[0];
   }
 
   async function refreshActiveScenarioChunks({

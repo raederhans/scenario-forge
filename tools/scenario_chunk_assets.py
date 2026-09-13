@@ -9,7 +9,8 @@ from typing import Any
 
 from map_builder.contracts import normalize_scenario_contract_tag, sha256_path
 from map_builder.io.writers import write_json_atomic
-from shapely import make_valid
+from shapely import coverage_is_valid, coverage_simplify, make_valid, orient_polygons
+from shapely.errors import GEOSException
 from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
@@ -44,6 +45,16 @@ POLITICAL_COARSE_LOD_DIAGNOSTIC_TIER = "political-coarse-simplified-v1"
 POLITICAL_COARSE_SIMPLIFY_TOLERANCE = 0.01
 POLITICAL_COARSE_ROUND_DECIMALS = 4
 POLITICAL_COARSE_SIMPLIFY_GEOMETRY_TYPES = {"Polygon", "MultiPolygon"}
+FR_SHARED_COVERAGE_TIER = "fr-arr-shared-coverage-v1"
+
+# Whole-feature spatial splitting is shared with the dependency-light Pages build.
+from tools.political_detail_partition import (
+    POLITICAL_DETAIL_SHARD_MAX_COMPACT_BYTES,
+    POLITICAL_DETAIL_SHARD_MAX_PATH_COST,
+    partition_political_detail_features,
+    political_detail_chunk_ids,
+)
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -511,6 +522,8 @@ def _build_chunk_cost_summary(payload: dict[str, Any], chunk_path: Path) -> dict
     return {
         "byte_size": byte_size,
         "sha256": sha256_path(chunk_path) if chunk_path.exists() else "",
+        # This source URL is plain JSON; the publisher records its compact decode size.
+        "decoded_byte_size": byte_size,
         "coord_count": geometry_cost["coord_count"],
         "part_count": geometry_cost["part_count"],
         "estimated_path_cost": geometry_cost["estimated_path_cost"],
@@ -737,7 +750,81 @@ def _simplify_political_coarse_geometry(geometry: dict[str, Any] | None) -> dict
     return mapping(simplified)
 
 
-def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any]:
+def _shared_fr_arr_simplified_geometries(
+    features: list[dict[str, Any]],
+    *,
+    owner_buckets_by_feature_id: dict[str, str] | None = None,
+) -> tuple[dict[int, dict[str, Any]], bool]:
+    """Simplify FR_ARR polygons together, preserving their shared edges.
+
+    The operation is deliberately gated on a valid Shapely coverage.  Invalid
+    input retains its original geometry and is reported as ``False``; no
+    buffer or independent per-feature simplification is introduced for France.
+    """
+    candidates = [
+        (index, feature)
+        for index, feature in enumerate(features)
+        if isinstance(feature, dict)
+        and _feature_id(feature, index).startswith("FR_ARR_")
+    ]
+    return _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_id)
+
+
+def _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_id):
+    """Keep owner boundaries exact so independently loaded LODs still meet."""
+    if not owner_buckets_by_feature_id:
+        return {}, False
+    if not candidates:
+        return {}, False
+    if any(not isinstance(feature.get("geometry"), dict)
+           or feature["geometry"].get("type") not in POLITICAL_COARSE_SIMPLIFY_GEOMETRY_TYPES
+           for _, feature in candidates):
+        return {}, False
+    candidate_groups: dict[str, list[tuple[int, dict[str, Any]]]] = defaultdict(list)
+    for index, feature in candidates:
+        feature_id = _feature_id(feature, index)
+        owner_bucket = str(owner_buckets_by_feature_id.get(feature_id) or "").strip().upper()
+        if not owner_bucket:
+            return {}, False
+        candidate_groups[owner_bucket].append((index, feature))
+    try:
+        all_geometries = [shape(feature["geometry"]) for _, feature in candidates]
+        if any(geometry.is_empty or not geometry.is_valid for geometry in all_geometries):
+            return {}, False
+        if not bool(coverage_is_valid(all_geometries)):
+            return {}, False
+        simplified_by_index: dict[int, dict[str, Any]] = {}
+        for group in candidate_groups.values():
+            geometries = [shape(feature["geometry"]) for _, feature in group]
+            simplified = coverage_simplify(
+                geometries,
+                POLITICAL_COARSE_SIMPLIFY_TOLERANCE,
+                simplify_boundary=False,
+            )
+            if len(simplified) != len(group):
+                return {}, False
+            if not bool(coverage_is_valid(simplified)) or not unary_union(simplified).equals(unary_union(geometries)):
+                return {}, False
+            for (index, _), geometry in zip(group, simplified):
+                if geometry.is_empty or not geometry.is_valid:
+                    return {}, False
+                # GEOS coverage_simplify may reverse rings. D3 polygon fills
+                # require clockwise exteriors even when planar coverage is valid.
+                simplified_by_index[index] = mapping(orient_polygons(geometry, exterior_cw=True))
+        if len(simplified_by_index) != len(candidates):
+            return {}, False
+        return simplified_by_index, True
+    except (GEOSException, AttributeError, TypeError, ValueError, RuntimeError):
+        return {}, False
+
+
+def _optimize_political_coarse_payload(
+    payload: dict[str, Any],
+    *,
+    owner_buckets_by_feature_id: dict[str, str] | None = None,
+    diagnostics: dict[str, Any] | None = None,
+    precision_source_countries: set[str] | None = None,
+) -> dict[str, Any]:
     if not isinstance(payload, dict) or not isinstance(payload.get("features"), list):
         return payload
     property_whitelist = (
@@ -755,8 +842,32 @@ def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any
         "atl_geometry_role",
         "atl_join_mode",
     )
+    source_features = payload.get("features") or []
+    shared_fr_geometries, shared_fr_applied = _shared_fr_arr_simplified_geometries(
+        source_features,
+        owner_buckets_by_feature_id=owner_buckets_by_feature_id,
+    )
+    if diagnostics is not None:
+        diagnostics["fr_shared_coverage_applied"] = shared_fr_applied
+    fr_feature_indexes = {
+        index
+        for index, feature in enumerate(source_features)
+        if isinstance(feature, dict) and _feature_id(feature, index).startswith("FR_ARR_")
+    }
+    regional_candidates = [
+        (index, feature) for index, feature in enumerate(source_features)
+        if isinstance(feature, dict) and index not in fr_feature_indexes
+        and str((feature.get("properties") or {}).get("cntr_code", "")).upper()
+        in (precision_source_countries or set())
+    ]
+    regional_geometries, regional_applied = _shared_coverage_simplified_geometries(
+        regional_candidates, owner_buckets_by_feature_id,
+    )
+    regional_indexes = {index for index, _ in regional_candidates}
+    if diagnostics is not None:
+        diagnostics["regional_shared_coverage_applied"] = regional_applied
     optimized_features: list[dict[str, Any]] = []
-    for feature in payload.get("features") or []:
+    for index, feature in enumerate(source_features):
         if not isinstance(feature, dict):
             continue
         properties = feature.get("properties") if isinstance(feature.get("properties"), dict) else {}
@@ -765,18 +876,23 @@ def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any
             for key in property_whitelist
             if key in properties and properties[key] not in (None, "")
         }
+        original_geometry = feature.get("geometry")
+        if index in fr_feature_indexes:
+            geometry = shared_fr_geometries.get(index, original_geometry)
+        elif index in regional_indexes:
+            # Never independently simplify or round a declared precision region,
+            # even when shared simplification cannot safely reduce its vertices.
+            geometry = regional_geometries.get(index, original_geometry)
+        else:
+            geometry = _round_feature_geometry(
+                {"geometry": _simplify_political_coarse_geometry(original_geometry)},
+                decimals=POLITICAL_COARSE_ROUND_DECIMALS,
+            )
         optimized_features.append(
             {
                 "type": "Feature",
                 "properties": optimized_properties,
-                "geometry": _round_feature_geometry(
-                    {
-                        "geometry": _simplify_political_coarse_geometry(
-                            feature.get("geometry") if isinstance(feature.get("geometry"), dict) else None
-                        )
-                    },
-                    decimals=POLITICAL_COARSE_ROUND_DECIMALS,
-                ),
+                "geometry": geometry,
             }
         )
     return {
@@ -788,12 +904,16 @@ def _optimize_political_coarse_payload(payload: dict[str, Any]) -> dict[str, Any
 def _build_political_coarse_lod_diagnostics(
     source_summary: dict[str, int],
     optimized_summary: dict[str, int],
+    *,
+    fr_shared_coverage_applied: bool = False,
 ) -> dict[str, Any]:
     return {
         "tier": POLITICAL_COARSE_LOD_DIAGNOSTIC_TIER,
         "simplify_tolerance": POLITICAL_COARSE_SIMPLIFY_TOLERANCE,
         "round_decimals": POLITICAL_COARSE_ROUND_DECIMALS,
         "preserve_topology": True,
+        "fr_shared_coverage_tier": FR_SHARED_COVERAGE_TIER,
+        "fr_shared_coverage_applied": fr_shared_coverage_applied,
         "source_feature_count": source_summary["feature_count"],
         "optimized_feature_count": optimized_summary["feature_count"],
         "source_coord_count": source_summary["coord_count"],
@@ -956,6 +1076,8 @@ def _build_chunk_payloads_for_feature_collection(
     feature_collection: dict[str, Any] | None,
     payload_factory,
     chunk_specs: tuple[dict[str, Any], ...] = LOD_SPECS,
+    owner_buckets_by_feature_id: dict[str, str] | None = None,
+    precision_source_countries: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     if not feature_collection or not isinstance(feature_collection.get("features"), list) or not feature_collection["features"]:
         return [], {}
@@ -1010,14 +1132,24 @@ def _build_chunk_payloads_for_feature_collection(
                     # 的 byte/hash/coord 预算和浏览器真实读取的 coarse 文件一致。
                     source_lod_summary = _summarize_payload_geometry_cost(chunk_payload)
                     source_lod_summary["byte_size"] = _minified_json_byte_size(chunk_payload)
-                    chunk_payload = _optimize_political_coarse_payload(chunk_payload)
+                    optimization_diagnostics: dict[str, Any] = {}
+                    chunk_payload = _optimize_political_coarse_payload(
+                        chunk_payload,
+                        owner_buckets_by_feature_id=owner_buckets_by_feature_id,
+                        diagnostics=optimization_diagnostics,
+                        precision_source_countries=precision_source_countries,
+                    )
                     chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
                     optimized_lod_summary = _summarize_payload_geometry_cost(chunk_payload)
                     optimized_lod_summary["byte_size"] = _minified_json_byte_size(chunk_payload)
                     lod_diagnostics = _build_political_coarse_lod_diagnostics(
                         source_lod_summary,
                         optimized_lod_summary,
+                        fr_shared_coverage_applied=optimization_diagnostics["fr_shared_coverage_applied"],
                     )
+                    if precision_source_countries:
+                        lod_diagnostics["precision_source_countries"] = sorted(precision_source_countries)
+                        lod_diagnostics["regional_shared_coverage_applied"] = optimization_diagnostics["regional_shared_coverage_applied"]
                     _write_minified_json(chunk_path, chunk_payload)
                 elif layer_key == "water":
                     _write_minified_json(chunk_path, chunk_payload)
@@ -1084,12 +1216,64 @@ def _build_chunk_payloads_for_layer(
     )
 
 
+def _reusable_detail_entries_match_owner(
+    scenario_dir: Path,
+    reusable_entries: list[dict[str, Any]],
+    expected_feature_ids: set[str],
+) -> bool:
+    """A reusable set matches only when its chunk files together carry each of
+    the owner's current whole features exactly once.
+
+    This is what makes shard reuse safe: a stale pre-split whole-owner chunk, a
+    partial shard set, or shards from a different partition fail the check and
+    the owner is rebuilt from the live runtime features instead.
+    """
+    seen_feature_ids: set[str] = set()
+    for reusable in reusable_entries:
+        raw_url = _normalize_relative_url(reusable.get("url"))
+        if not raw_url:
+            return False
+        chunk_path = scenario_dir / "chunks" / Path(raw_url).name
+        if not chunk_path.exists():
+            return False
+        if "byte_size" in reusable:
+            try:
+                if int(reusable["byte_size"]) != chunk_path.stat().st_size:
+                    return False
+            except (TypeError, ValueError):
+                return False
+        if "sha256" in reusable and str(reusable["sha256"]).strip():
+            if str(reusable["sha256"]).strip().lower() != sha256_path(chunk_path).lower():
+                return False
+        try:
+            payload = json.loads(chunk_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return False
+        features = payload.get("features") if isinstance(payload, dict) else None
+        if not isinstance(features, list):
+            return False
+        chunk_feature_ids = [
+            _feature_id(feature, index)
+            for index, feature in enumerate(features)
+            if isinstance(feature, dict)
+        ]
+        if len(chunk_feature_ids) != len(set(chunk_feature_ids)):
+            return False
+        if seen_feature_ids.intersection(chunk_feature_ids):
+            return False
+        seen_feature_ids.update(chunk_feature_ids)
+    return seen_feature_ids == expected_feature_ids
+
+
 def _build_political_chunk_payloads(
     *,
     scenario_id: str,
     scenario_dir: Path,
     startup_topology_payload: dict[str, Any] | None,
     runtime_topology_payload: dict[str, Any] | None,
+    reusable_political_chunks: dict[str, dict[str, Any]] | None = None,
+    detail_shard_max_compact_bytes: int | None = None,
+    detail_shard_max_path_cost: int | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     all_chunks: list[dict[str, Any]] = []
     lod_layers: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -1103,6 +1287,13 @@ def _build_political_chunk_payloads(
         startup_feature_collection=startup_feature_collection,
         runtime_feature_collection=runtime_feature_collection,
     )
+    precision_codes = (runtime_topology_payload or {}).get("political_precision_source_countries", [])
+    if not isinstance(precision_codes, list) or any(
+        not isinstance(code, str) or len(code) != 2 or not code.isascii() or not code.isalpha() or code != code.upper()
+        for code in precision_codes
+    ):
+        raise ValueError("political_precision_source_countries must be a list of uppercase ISO2 codes")
+    precision_source_countries = set(precision_codes)
     if coarse_feature_collection:
         chunks, lod_entries = _build_chunk_payloads_for_feature_collection(
             scenario_id=scenario_id,
@@ -1111,6 +1302,19 @@ def _build_political_chunk_payloads(
             feature_collection=coarse_feature_collection,
             payload_factory=lambda selected_feature_ids: _slice_feature_collection(coarse_feature_collection, selected_feature_ids),
             chunk_specs=POLITICAL_COARSE_LOD_SPECS,
+            precision_source_countries=precision_source_countries,
+            owner_buckets_by_feature_id={
+                feature_id: _resolve_feature_owner_bucket(
+                    feature,
+                    scenario_dir=scenario_dir,
+                    owners_by_feature_id=owners_by_feature_id,
+                    fallback_index=index,
+                )
+                for index, feature in enumerate(coarse_feature_collection.get("features") or [])
+                for feature_id in [_feature_id(feature, index)]
+                if feature_id.startswith("FR_ARR_")
+                or str((feature.get("properties") or {}).get("cntr_code", "")).upper() in precision_source_countries
+            },
         )
         all_chunks.extend(chunks)
         for lod_layer_key, entries in lod_entries.items():
@@ -1132,46 +1336,79 @@ def _build_political_chunk_payloads(
         for owner_bucket, entries in sorted(feature_groups.items()):
             if not entries:
                 continue
-            selected_feature_ids = {feature_id for feature_id, _feature, _bounds in entries}
-            bounds = [
-                min(entry_bounds[0] for _feature_id, _feature, entry_bounds in entries),
-                min(entry_bounds[1] for _feature_id, _feature, entry_bounds in entries),
-                max(entry_bounds[2] for _feature_id, _feature, entry_bounds in entries),
-                max(entry_bounds[3] for _feature_id, _feature, entry_bounds in entries),
+            shards = partition_political_detail_features(
+                entries,
+                max_compact_bytes=detail_shard_max_compact_bytes,
+                max_path_cost=detail_shard_max_path_cost,
+            )
+            expected_chunk_ids = political_detail_chunk_ids(owner_bucket, len(shards))
+            expected_feature_ids = {entry[0] for entry in entries}
+            reusable_entries = [
+                reusable_political_chunks[cid]
+                for cid in expected_chunk_ids
+                if reusable_political_chunks and cid in reusable_political_chunks
             ]
-            chunk_payload = _slice_feature_collection(runtime_feature_collection, selected_feature_ids)
-            payload_features = chunk_payload.get("features") if isinstance(chunk_payload, dict) else None
-            payload_feature_count = len(payload_features) if isinstance(payload_features, list) else 0
-            chunk_id = f"political.detail.country.{owner_bucket.lower()}"
-            chunk_filename = f"{chunk_id}.json"
-            chunk_path = chunks_dir / chunk_filename
-            chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
-            _write_json(chunk_path, chunk_payload)
-            chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
-            selected_features = [feature for _feature_id_value, feature, _bounds in entries]
-            feature_bounds_summary = _build_feature_bounds_summary(selected_features)
-            all_chunks.append({
-                "id": chunk_id,
-                "layer": "political",
-                "lod": "detail",
-                "url": f"data/scenarios/{scenario_id}/chunks/{chunk_filename}",
-                "min_zoom": 1.35,
-                "max_zoom": 99.0,
-                "bounds": bounds,
-                "priority": 95,
-                "feature_count": payload_feature_count,
-                **chunk_cost_summary,
-                "data_format": "geojson",
-                "global_coverage": False,
-                "country_codes": [owner_bucket],
-                **({"feature_bounds": feature_bounds_summary} if feature_bounds_summary else {}),
-            })
-            lod_layers["political"].append({
-                "lod": "detail",
-                "min_zoom": 1.35,
-                "max_zoom": 99.0,
-                "chunk_ids": [chunk_id],
-            })
+            if (
+                len(reusable_entries) == len(expected_chunk_ids)
+                and _reusable_detail_entries_match_owner(
+                    scenario_dir,
+                    reusable_entries,
+                    expected_feature_ids,
+                )
+            ):
+                for reusable_chunk in reusable_entries:
+                    reused = dict(reusable_chunk)
+                    reused.setdefault("owner_code", owner_bucket)
+                    all_chunks.append(reused)
+                    lod_layers["political"].append({
+                        "lod": "detail",
+                        "min_zoom": reusable_chunk["min_zoom"],
+                        "max_zoom": reusable_chunk["max_zoom"],
+                        "chunk_ids": [reusable_chunk["id"]],
+                    })
+                continue
+
+            for shard_index, shard_entries in enumerate(shards):
+                chunk_id = expected_chunk_ids[shard_index]
+                selected_feature_ids = {feature_id for feature_id, _feature, _bounds in shard_entries}
+                bounds = [
+                    min(entry_bounds[0] for _feature_id, _feature, entry_bounds in shard_entries),
+                    min(entry_bounds[1] for _feature_id, _feature, entry_bounds in shard_entries),
+                    max(entry_bounds[2] for _feature_id, _feature, entry_bounds in shard_entries),
+                    max(entry_bounds[3] for _feature_id, _feature, entry_bounds in shard_entries),
+                ]
+                chunk_payload = _slice_feature_collection(runtime_feature_collection, selected_feature_ids)
+                payload_features = chunk_payload.get("features") if isinstance(chunk_payload, dict) else None
+                payload_feature_count = len(payload_features) if isinstance(payload_features, list) else 0
+                chunk_filename = f"{chunk_id}.json"
+                chunk_path = chunks_dir / chunk_filename
+                chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
+                _write_json(chunk_path, chunk_payload)
+                chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
+                feature_bounds_summary = _build_feature_bounds_summary(payload_features or [], include_zero_area=True)
+                all_chunks.append({
+                    "id": chunk_id,
+                    "layer": "political",
+                    "lod": "detail",
+                    "url": f"data/scenarios/{scenario_id}/chunks/{chunk_filename}",
+                    "min_zoom": 1.35,
+                    "max_zoom": 99.0,
+                    "bounds": bounds,
+                    "priority": 95,
+                    "feature_count": payload_feature_count,
+                    **chunk_cost_summary,
+                    "data_format": "geojson",
+                    "global_coverage": False,
+                    "owner_code": owner_bucket,
+                    "country_codes": [owner_bucket],
+                    **({"feature_bounds": feature_bounds_summary} if feature_bounds_summary else {}),
+                })
+                lod_layers["political"].append({
+                    "lod": "detail",
+                    "min_zoom": 1.35,
+                    "max_zoom": 99.0,
+                    "chunk_ids": [chunk_id],
+                })
 
     return all_chunks, lod_layers
 
@@ -1208,6 +1445,10 @@ def build_and_write_scenario_chunk_assets(
     generated_at: str = "",
     default_startup_topology_url: str = "",
     water_validation_feature_ids: set[str] | None = None,
+    reusable_political_chunks: dict[str, dict[str, Any]] | None = None,
+    reusable_context_assets: dict[str, Any] | None = None,
+    detail_shard_max_compact_bytes: int | None = None,
+    detail_shard_max_path_cost: int | None = None,
 ) -> dict[str, Any]:
     scenario_dir = scenario_dir.resolve()
     scenario_id = str(manifest_payload.get("scenario_id") or scenario_dir.name).strip()
@@ -1225,6 +1466,9 @@ def build_and_write_scenario_chunk_assets(
         scenario_dir=scenario_dir,
         startup_topology_payload=startup_topology_payload,
         runtime_topology_payload=runtime_topology_payload,
+        reusable_political_chunks=reusable_political_chunks,
+        detail_shard_max_compact_bytes=detail_shard_max_compact_bytes,
+        detail_shard_max_path_cost=detail_shard_max_path_cost,
     )
     all_chunks.extend(political_chunks)
     for lod_layer_key, entries in political_lod_entries.items():
@@ -1233,11 +1477,15 @@ def build_and_write_scenario_chunk_assets(
         scenario_id=scenario_id,
         scenario_dir=scenario_dir,
         runtime_topology_payload=runtime_topology_payload,
-    )
+    ) if reusable_context_assets is None else ([], {})
     all_chunks.extend(atlantropa_chunks)
     for lod_layer_key, entries in atlantropa_lod_entries.items():
         lod_layers[lod_layer_key].extend(entries)
-    for layer_key, payload in (layer_payloads or {}).items():
+    if reusable_context_assets is not None:
+        all_chunks.extend(reusable_context_assets["chunks"])
+        for layer_key, entries in reusable_context_assets["layers"].items():
+            lod_layers[layer_key].extend(entries)
+    for layer_key, payload in ((layer_payloads or {}) if reusable_context_assets is None else {}).items():
         if str(layer_key).strip().lower() == SCENARIO_ATLANTROPA_LAYER_KEY:
             continue
         chunks, lod_entries = _build_chunk_payloads_for_layer(

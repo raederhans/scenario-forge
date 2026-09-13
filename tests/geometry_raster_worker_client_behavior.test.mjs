@@ -129,3 +129,128 @@ test("dispose before dispatch and after response delivery releases requests and 
   assert.equal(bitmap.closes, 1);
   assert.equal(late.client.getQueueSize(), 0);
 });
+
+// ── Acceptance criteria: removal tracking and bounded geometry retention ──
+
+test("departed entry IDs receive null geometry updates to release worker kernel storage", async () => {
+  const featureA = { geometry: { type: "Point", coordinates: [1, 2] } };
+  const featureB = { geometry: { type: "Point", coordinates: [3, 4] } };
+  const { client, sent, reply } = fixture();
+
+  // First request: entries [a, b]
+  const first = client.request({
+    identity: "one", kind: "political", sceneKey: "tno", projectionKey: 1,
+    entries: [{ id: "a", feature: featureA, fillColor: "#111" }, { id: "b", feature: featureB, fillColor: "#222" }],
+  });
+  await tick();
+  assert.equal(sent[0].packet.resetGeometry, true);
+  assert.equal(sent[0].packet.geometryUpdates.length, 2, "both entries uploaded on first request");
+  reply(0); await first; await tick();
+
+  // Second request: only entry [a] — b is removed
+  const second = client.request({
+    identity: "two", kind: "political", sceneKey: "tno", projectionKey: 1,
+    entries: [{ id: "a", feature: featureA, fillColor: "#111" }],
+  });
+  await tick();
+  assert.equal(sent[1].packet.resetGeometry, false, "same scene: no full reset");
+  // geometry for 'a' unchanged → no upload; 'b' removed → null update
+  const updates1 = sent[1].packet.geometryUpdates;
+  assert.equal(updates1.length, 1, "exactly one removal update");
+  assert.equal(updates1[0].id, "b");
+  assert.equal(updates1[0].feature, null, "null signals kernel to release b");
+  reply(1); await second;
+  client.dispose();
+});
+
+test("same-scene topology revision does not reset geometry store; only changed geometry is re-uploaded", async () => {
+  const featureA = { geometry: { type: "Point", coordinates: [1, 2] } };
+  const featureAv2 = { geometry: { type: "Point", coordinates: [9, 9] } };
+  const { client, sent, reply } = fixture();
+
+  // First dispatch with sceneKey "tno:1" (workerSceneKey format from runtime owner)
+  const first = client.request({
+    identity: "one", kind: "political", sceneKey: "tno:1", projectionKey: 1,
+    entries: [{ id: "a", feature: featureA, fillColor: "#111" }],
+  });
+  await tick();
+  assert.equal(sent[0].packet.resetGeometry, true, "first ever dispatch resets");
+  reply(0); await first; await tick();
+
+  // Simulate topology revision (scenarioDataGeneration bump): sceneKey unchanged
+  const second = client.request({
+    identity: "two", kind: "political", sceneKey: "tno:1", projectionKey: 1,
+    entries: [{ id: "a", feature: featureA, fillColor: "#111" }],
+  });
+  await tick();
+  assert.equal(sent[1].packet.resetGeometry, false, "same sceneKey: incremental, no reset");
+  assert.equal(sent[1].packet.geometryUpdates.length, 0, "unchanged geometry: no re-upload");
+  reply(1); await second; await tick();
+
+  // Now geometry for 'a' changed (e.g. new chunk promoted same ID)
+  const third = client.request({
+    identity: "three", kind: "political", sceneKey: "tno:1", projectionKey: 1,
+    entries: [{ id: "a", feature: featureAv2, fillColor: "#111" }],
+  });
+  await tick();
+  assert.equal(sent[2].packet.resetGeometry, false, "still same scene");
+  assert.equal(sent[2].packet.geometryUpdates.length, 1, "changed geometry uploads only that ID");
+  assert.equal(sent[2].packet.geometryUpdates[0].id, "a");
+  assert.equal(sent[2].packet.geometryUpdates[0].feature, featureAv2);
+  reply(2); await third;
+  client.dispose();
+});
+
+test("geometry refs are bounded to current active IDs after each successful round-trip", async () => {
+  // This validates that departed IDs don't accumulate across many round-trips.
+  const features = Array.from({ length: 5 }, (_, i) => ({ geometry: { type: "Point", coordinates: [i, i] } }));
+  const { client, sent, reply } = fixture();
+
+  // Round 1: IDs 0-4
+  const first = client.request({
+    identity: "r1", kind: "political", sceneKey: "s", projectionKey: 1,
+    entries: features.map((feature, i) => ({ id: String(i), feature, fillColor: "#aaa" })),
+  });
+  await tick();
+  reply(0); await first; await tick();
+
+  // Round 2: only ID 0
+  const second = client.request({
+    identity: "r2", kind: "political", sceneKey: "s", projectionKey: 1,
+    entries: [{ id: "0", feature: features[0], fillColor: "#aaa" }],
+  });
+  await tick();
+  const updates = sent[1].packet.geometryUpdates;
+  // IDs 1-4 departed → 4 null removals
+  const removals = updates.filter((u) => u.feature === null);
+  assert.equal(removals.length, 4, "4 null removals for 4 departed IDs");
+  assert.ok(removals.every((u) => u.id !== "0"), "active ID not removed");
+  reply(1); await second; await tick();
+
+  // Round 3: only ID 0 again — no removals, no uploads
+  const third = client.request({
+    identity: "r3", kind: "political", sceneKey: "s", projectionKey: 1,
+    entries: [{ id: "0", feature: features[0], fillColor: "#aaa" }],
+  });
+  await tick();
+  assert.equal(sent[2].packet.geometryUpdates.length, 0, "no spurious re-removal of already-gone IDs");
+  reply(2); await third;
+  client.dispose();
+});
+
+test("alternating hit and political requests retain their active union then release departed IDs", async () => {
+  const { client, sent, reply } = fixture();
+  const a = { geometry: { type: "Point", coordinates: [0, 0] } };
+  const b = { geometry: { type: "Point", coordinates: [1, 1] } };
+  const entries = [{ id: "a", feature: a }, { id: "b", feature: b }];
+  const requests = [["political", entries], ["hit", entries.slice(0, 1)], ["political", entries], ["political", entries.slice(0, 1)]];
+  for (let index = 0; index < requests.length; index += 1) {
+    const [kind, selected] = requests[index];
+    const promise = client.request({ identity: String(index), sceneKey: "same", kind, entries: selected });
+    await tick();
+    if (index === 1 || index === 2) assert.deepEqual(sent[index].packet.geometryUpdates, []);
+    if (index === 3) assert.deepEqual(sent[index].packet.geometryUpdates, [{ id: "b", feature: null }]);
+    reply(index); await promise; await tick();
+  }
+  client.dispose();
+});

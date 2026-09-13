@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from tools.runtime_json_packing import pack_published_runtime_data
 from tools.app_entry_resolver import (
     repo_display_path,
     resolve_editor_entry_path,
@@ -201,6 +202,12 @@ BYTE_EXACT_APP_DATA_PATHS = {
     for file_name in PAGES_HGO_RUNTIME_FILES
     if file_name.endswith(".json")
 }
+# Runtime coverage metadata and provenance snapshots share these ledger hashes.
+# Keep their source bytes intact when compacting the rest of the delivery data.
+BYTE_EXACT_APP_DATA_PATHS.update({
+    Path("app/data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json"),
+    Path("app/data/scenarios/tno_1962/derived/geometry_drop_audit.json"),
+})
 GENERATED_IGNORED_DIST_DIRS = (
     Path("app") / "data",
 )
@@ -1711,6 +1718,10 @@ def copy_runtime_data() -> None:
     copy_transport_runtime_data()
     prune_dist_data_manifest_to_published_files()
     prune_dist_runtime_asset_registry_to_published_files()
+    pack_published_runtime_data(
+        APP_DIST_ROOT,
+        byte_exact_paths=[path.relative_to("app") for path in BYTE_EXACT_APP_DATA_PATHS],
+    )
     validate_dist_scenario_startup_urls()
 
 

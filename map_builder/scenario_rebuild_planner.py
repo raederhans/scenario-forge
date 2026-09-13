@@ -270,6 +270,7 @@ def compute_tno_stage_signature_payload(
             scenario_dir / "special_regions.geojson",
             scenario_dir / "relief_overlays.geojson",
             scenario_dir / "city_overrides.json",
+            scenario_dir / "owners.by_feature.json",
             ROOT / "tools" / "build_scenario_chunk_assets.py",
             ROOT / "tools" / "scenario_chunk_assets.py",
         ],

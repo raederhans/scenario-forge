@@ -7,7 +7,7 @@ mapclassify
 numpy
 pillow
 requests
-shapely
+shapely>=2.1
 topojson
 pandas
 scipy
