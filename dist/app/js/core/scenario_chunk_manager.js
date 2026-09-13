@@ -198,6 +198,12 @@ function normalizeChunkEntry(rawChunk = {}) {
     priority: clampNumber(rawChunk.priority, -999, 999, 0),
     featureCount,
     byteSize,
+    decodedByteSize: Math.floor(clampNonNegativeNumber(rawChunk.decoded_byte_size ?? rawChunk.decodedByteSize, byteSize)),
+    cacheByteSize: Math.floor(clampNonNegativeNumber(
+      rawChunk.cache_byte_size ?? rawChunk.cacheByteSize,
+      rawChunk.decoded_byte_size ?? rawChunk.decodedByteSize ?? byteSize,
+    )),
+    ownerCode: String(rawChunk.owner_code || rawChunk.ownerCode || "").trim().toUpperCase(),
     coordCount,
     partCount,
     estimatedPathCost,
@@ -337,7 +343,7 @@ function takeRequiredChunksWithinCostBudget(orderedChunks = [], {
   orderedChunks.forEach((chunk) => {
     if (selected.length >= countLimit) return;
     const nextCost = Math.max(0, Number(chunk?.estimatedPathCost || chunk?.featureCount || 0));
-    const nextBytes = Math.max(0, Number(chunk?.byteSize || 0));
+    const nextBytes = Math.max(0, Number(chunk?.cacheByteSize || chunk?.decodedByteSize || chunk?.byteSize || 0));
     const overCostBudget = costLimit > 0 && selected.length >= minimum && selectedCost + nextCost > costLimit;
     const overByteBudget = byteLimit > 0 && selected.length >= minimum && selectedBytes + nextBytes > byteLimit;
     if (overCostBudget || overByteBudget) return;
@@ -351,10 +357,27 @@ function takeRequiredChunksWithinCostBudget(orderedChunks = [], {
     if (selected.some((entry) => entry.id === chunk.id)) return;
     selected.push(chunk);
     selectedCost += Math.max(0, Number(chunk?.estimatedPathCost || chunk?.featureCount || 0));
-    selectedBytes += Math.max(0, Number(chunk?.byteSize || 0));
+    selectedBytes += Math.max(0, Number(chunk?.cacheByteSize || chunk?.decodedByteSize || chunk?.byteSize || 0));
   });
 
   return selected;
+}
+
+export function selectScenarioFocusPrewarmChunks({ chunks = [], focusCountry = "", viewportBbox, renderBudgetHints = {} } = {}) {
+  const country = String(focusCountry || "").trim().toUpperCase();
+  if (!country) return [];
+  const bounds = normalizeBounds(viewportBbox);
+  const candidates = chunks.filter((chunk) => chunk?.lod === "detail" && chunk.countryCodes?.includes(country));
+  const visible = candidates.filter((chunk) => chunkIntersectsViewport(chunk, bounds));
+  const hints = normalizeScenarioRenderBudgetHints(renderBudgetHints);
+  // Prewarming is speculative. Warm at most two nearby shards, then leave the
+  // authoritative viewport selection to request any other necessary details.
+  return takeRequiredChunksWithinCostBudget(sortChunksForSelection(visible.length ? visible : candidates, country, bounds), {
+    countBudget: Math.min(visible.length ? 2 : 1, hints.max_required_political_chunks),
+    minCount: 1,
+    estimatedPathCostBudget: hints.max_required_political_estimated_path_cost,
+    byteSizeBudget: hints.max_required_political_byte_size,
+  });
 }
 
 export function normalizeScenarioChunkManifest(payload = {}) {
@@ -618,6 +641,7 @@ export function selectScenarioChunks({
   const selectedPoliticalVisibleFeatureCountSum = selectedPoliticalChunks
     .reduce((sum, chunk) => sum + getChunkVisibleFeatureCount(chunk, viewportBbox), 0);
   const selectedByteCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.byteSize || 0)), 0);
+  const selectedDecodedByteCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.decodedByteSize || chunk.byteSize || 0)), 0);
   const selectedCoordCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.coordCount || 0)), 0);
   const selectedPartCountSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.partCount || 0)), 0);
   const selectedEstimatedPathCostSum = uniqueRequired.reduce((sum, chunk) => sum + Math.max(0, Number(chunk.estimatedPathCost || 0)), 0);
@@ -640,6 +664,7 @@ export function selectScenarioChunks({
     selectedPoliticalFeatureCountSum,
     selectedPoliticalVisibleFeatureCountSum,
     selectedByteCountSum,
+    selectedDecodedByteCountSum,
     selectedCoordCountSum,
     selectedPartCountSum,
     selectedEstimatedPathCostSum,

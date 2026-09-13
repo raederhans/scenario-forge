@@ -4,7 +4,7 @@ import {
   normalizeCityLayerStyleConfig, normalizeTransportOverviewStyleConfig,
 } from '../state.js';
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
-import { VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
+import { RENDER_PASS_NAMES, VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
 import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
 
 // Keep pass identities tied to the fields that the pass actually paints.  The
@@ -68,6 +68,35 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getDayNightRuntimeOwner,
   getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
 }) {
+  let observedTopologyRevision = Number(runtimeState.topologyRevision || 0);
+  const topologyRevisionByPass = new Map();
+
+  function getPassTopologyRevision(passName) {
+    const current = Number(runtimeState.topologyRevision || 0);
+    // Unscoped topology changes (apply, resize/reset) retain full invalidation.
+    if (current !== observedTopologyRevision) {
+      topologyRevisionByPass.clear();
+      observedTopologyRevision = current;
+    }
+    if (!topologyRevisionByPass.has(passName)) topologyRevisionByPass.set(passName, current);
+    return topologyRevisionByPass.get(passName);
+  }
+
+  function recordScopedTopologyChange({ previousRevision, targetPasses = [] }) {
+    const current = Number(runtimeState.topologyRevision || 0);
+    if (Number(previousRevision) !== observedTopologyRevision || current !== Number(previousRevision) + 1) {
+      topologyRevisionByPass.clear();
+      observedTopologyRevision = current;
+      return;
+    }
+    // Seed also passes not yet painted so first use has a deterministic revision.
+    for (const passName of RENDER_PASS_NAMES) {
+      if (!topologyRevisionByPass.has(passName)) topologyRevisionByPass.set(passName, observedTopologyRevision);
+    }
+    for (const passName of targetPasses) topologyRevisionByPass.set(passName, current);
+    observedTopologyRevision = current;
+  }
+
   function getTransportPresentationSignatureParts() {
     return [
       runtimeState.showTransport ? "transport:on" : "transport:off",
@@ -86,7 +115,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   function getPoliticalPassStaticSignature(transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
     return [
       getTransformSignature(transform),
-      runtimeState.topologyRevision || 0,
+      getPassTopologyRevision("political"),
       `ocean-fill:${getOceanBaseFillColor()}`,
       getDebugMode(),
       runtimeState.topologyBundleMode || "single",
@@ -113,7 +142,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "background") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.oceanMaskMode || "topology_ocean",
         Number(runtimeState.oceanMaskQuality || 1).toFixed(3),
         `field:oceanDepth:${Number(intensityFields.channels.oceanDepth?.revision || 0)}`,
@@ -124,7 +153,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       const maskInfo = getPhysicalLandMaskInfo();
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         runtimeState.showPhysical ? "physical:on" : "physical:off",
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
@@ -159,14 +188,14 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "effects") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
       ].join("::");
     }
     if (passName === "lineEffects") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
       ].join("::");
     }
@@ -174,7 +203,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       const maskInfo = getPhysicalLandMaskInfo();
       const zoomBucket = getContextBaseZoomBucketId(transform?.k || runtimeState.zoomTransform?.k || 1);
       const baseSignatureParts = [
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
@@ -214,7 +243,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "contextMarkers") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
@@ -228,7 +257,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "labels") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.showBlankFeatureLabels ? "blank-feature-labels:on" : "blank-feature-labels:off",
@@ -241,7 +270,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "contextScenario") {
       return [
         transformSignature,
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.scenarioReliefOverlayRevision || 0,
@@ -260,13 +289,13 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       return [
         transformSignature,
         getHgoRuntimePreviewVisibilitySignature(),
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
       ].join("::");
     }
     if (passName === "dayNight") {
       return getDayNightRuntimeOwner().buildDayNightPassSignature(
-        transformSignature, intensityFields.channels.urbanGlow?.revision, Number(runtimeState.topologyRevision || 0),
+        transformSignature, intensityFields.channels.urbanGlow?.revision, Number(getPassTopologyRevision(passName)),
       );
     }
     if (passName === "borders") {
@@ -276,7 +305,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.showScenarioAtlantropa !== false ? "atlantropa:on" : "atlantropa:off",
         getScenarioOverlaySignatureToken(),
         getHgoRuntimePreviewVisibilitySignature(),
-        runtimeState.topologyRevision || 0,
+        getPassTopologyRevision(passName),
         getBorderAppearanceRevision(),
         runtimeState.cachedDynamicBordersHash || "",
         runtimeState.sovereigntyRevision || 0,
@@ -294,5 +323,5 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     return transformSignature;
   }
 
-  return Object.freeze({ getPoliticalPassStaticSignature, getRenderPassTransformSignature, getRenderPassSignature });
+  return Object.freeze({ getPoliticalPassStaticSignature, getRenderPassTransformSignature, getRenderPassSignature, recordScopedTopologyChange });
 }

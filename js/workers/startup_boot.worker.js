@@ -2,6 +2,7 @@
 
 importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
+  new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
 
@@ -29,6 +30,52 @@ const FEATURE_IDENTITY = globalThis.__scenarioForgeFeatureIdentityShared;
 if (!FEATURE_IDENTITY) {
   throw new Error("[startup_worker] Feature identity shared helper failed to initialize.");
 }
+
+const JSON_RESOURCE_DECODER = globalThis.__scenarioForgeJsonResourceDecoderShared || {
+  isExplicitGzipJsonUrl(url) {
+    const clean = String(url || "").split(/[?#]/)[0].toLowerCase();
+    return clean.endsWith(".json.gz") || clean.endsWith(".geojson.gz") || clean.endsWith(".topojson.gz");
+  },
+  hasGzipMagicBytes(bytes) {
+    if (!bytes) return false;
+    const view = bytes instanceof Uint8Array ? bytes : (ArrayBuffer.isView(bytes) ? new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength) : (bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : null));
+    return Boolean(view && view.byteLength >= 2 && view[0] === 0x1f && view[1] === 0x8b);
+  },
+  isDecompressionStreamSupported() {
+    return typeof globalThis.DecompressionStream === "function";
+  },
+  async decompressGzip(bytes, { signal = null } = {}) {
+    if (signal?.aborted) throw signal.reason || new Error("Aborted");
+    if (typeof globalThis.DecompressionStream !== "function") throw new Error("DecompressionStream is not available.");
+    const stream = new Response(bytes).body.pipeThrough(new globalThis.DecompressionStream("gzip"));
+    return new Response(stream).arrayBuffer();
+  },
+  decodeUtf8Bytes(buffer) {
+    return new TextDecoder("utf-8").decode(buffer);
+  },
+  async decodeResponsePayload(response, { url = "", label = "resource", signal = null } = {}) {
+    if (signal?.aborted) throw signal.reason || new Error("Aborted");
+    const isGz = this.isExplicitGzipJsonUrl(url);
+    if (!isGz) {
+      const rawText = typeof response.text === "function" ? await response.text() : new TextDecoder("utf-8").decode(await response.arrayBuffer());
+      if (signal?.aborted) throw signal.reason || new Error("Aborted");
+      const decodedBytes = typeof TextEncoder === "function" ? new TextEncoder().encode(rawText).byteLength : rawText.length;
+      const payload = rawText ? JSON.parse(rawText) : null;
+      return { payload, rawText, decompressMs: 0, jsonParseMs: 0, encodedBytes: decodedBytes, decodedBytes, compressedBytes: 0, compressed: false };
+    }
+    const buffer = typeof response.arrayBuffer === "function" ? await response.arrayBuffer() : new TextEncoder().encode(await response.text()).buffer;
+    if (signal?.aborted) throw signal.reason || new Error("Aborted");
+    if (this.hasGzipMagicBytes(buffer)) {
+      const decompressed = await this.decompressGzip(buffer, { signal, label });
+      const rawText = this.decodeUtf8Bytes(decompressed);
+      const payload = rawText ? JSON.parse(rawText) : null;
+      return { payload, rawText, decompressMs: 0, jsonParseMs: 0, encodedBytes: buffer.byteLength, decodedBytes: decompressed.byteLength, compressedBytes: buffer.byteLength, compressed: true };
+    }
+    const rawText = this.decodeUtf8Bytes(buffer);
+    const payload = rawText ? JSON.parse(rawText) : null;
+    return { payload, rawText, decompressMs: 0, jsonParseMs: 0, encodedBytes: buffer.byteLength, decodedBytes: buffer.byteLength, compressedBytes: 0, compressed: false };
+  },
+};
 
 function normalizeWorkerCountryCodeAlias(rawCode) {
   const code = FEATURE_IDENTITY.defaultCountryCodeNormalizer(rawCode);
@@ -108,37 +155,53 @@ async function fetchJsonResource(url, label, { signal = null } = {}) {
   if (!response.ok) {
     throw new Error(`[startup_worker] Failed to fetch ${label} at ${url} (${response.status} ${response.statusText}).`);
   }
-  const rawText = await response.text();
   throwIfAborted(signal);
-  const fetchCompletedAt = nowMs();
-  let payload = null;
+  let decoded;
   try {
-    payload = rawText ? JSON.parse(rawText) : null;
+    decoded = await JSON_RESOURCE_DECODER.decodeResponsePayload(response, {
+      url: resolvedUrl,
+      label,
+      signal,
+    });
   } catch (error) {
-    throw new Error(`[startup_worker] Invalid JSON for ${label} at ${resolvedUrl}: ${error?.message || error}`);
+    if (isAbortError(error) || signal?.aborted) {
+      throw createWorkerAbortError(signal?.reason || error);
+    }
+    if (error?.code === "invalid-json" || error instanceof SyntaxError) {
+      throw new Error(`[startup_worker] Invalid JSON for ${label} at ${resolvedUrl}: ${error?.message || error}`);
+    }
+    if (error?.code === "unsupported-decompressor") {
+      throw new Error(`[startup_worker] DecompressionStream is not available to decode ${label} at ${resolvedUrl}.`);
+    }
+    if (error?.code === "decompress-failed" || error?.name === "DecompressError") {
+      throw new Error(`[startup_worker] Failed to decompress ${label} at ${resolvedUrl}: ${error?.message || error}`);
+    }
+    throw error;
   }
+  throwIfAborted(signal);
   const parsedAt = nowMs();
   return {
-    payload,
+    payload: decoded.payload,
     metrics: {
       url: resolvedUrl,
       label,
       transferMs: headersReceivedAt - startedAt,
-      fetchMs: fetchCompletedAt - startedAt,
-      jsonParseMs: parsedAt - fetchCompletedAt,
+      fetchMs: decoded.bodyReadAt - startedAt,
+      decompressMs: decoded.decompressMs,
+      jsonParseMs: decoded.jsonParseMs,
       totalMs: parsedAt - startedAt,
-      bytes: rawText.length,
+      bytes: decoded.decodedBytes,
+      encodedBytes: decoded.encodedBytes,
+      decodedBytes: decoded.decodedBytes,
+      compressedBytes: decoded.compressedBytes,
+      compressed: decoded.compressed,
     },
   };
 }
 
-async function decompressGzipBytes(bytes) {
-  if (typeof DecompressionStream !== "function") {
-    throw new Error("DecompressionStream is not available.");
-  }
-  const blob = new Blob([bytes], { type: "application/gzip" });
-  const stream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
-  return new Response(stream).text();
+async function decompressGzipBytes(bytes, options = {}) {
+  const buffer = await JSON_RESOURCE_DECODER.decompressGzip(bytes, options);
+  return JSON_RESOURCE_DECODER.decodeUtf8Bytes(buffer);
 }
 
 function buildGzipCandidateUrl(url) {
@@ -163,26 +226,28 @@ async function fetchJsonResourceWithOptionalGzip(url, label, { signal = null } =
       });
       const headersReceivedAt = nowMs();
       if (response.ok) {
-        const compressedBytes = await response.arrayBuffer();
         throwIfAborted(signal);
-        const fetchCompletedAt = nowMs();
-        const rawText = await decompressGzipBytes(compressedBytes);
-        const decompressedAt = nowMs();
-        const payload = rawText ? JSON.parse(rawText) : null;
+        const decoded = await JSON_RESOURCE_DECODER.decodeResponsePayload(response, {
+          url: resolvedUrl,
+          label,
+          signal,
+        });
         const parsedAt = nowMs();
         return {
-          payload,
+          payload: decoded.payload,
           metrics: {
             url: resolvedUrl,
             label,
             transferMs: headersReceivedAt - startedAt,
-            fetchMs: fetchCompletedAt - startedAt,
-            decompressMs: decompressedAt - fetchCompletedAt,
-            jsonParseMs: parsedAt - decompressedAt,
+            fetchMs: decoded.bodyReadAt - startedAt,
+            decompressMs: decoded.decompressMs,
+            jsonParseMs: decoded.jsonParseMs,
             totalMs: parsedAt - startedAt,
-            bytes: rawText.length,
-            compressedBytes: compressedBytes.byteLength,
-            compressed: true,
+            bytes: decoded.decodedBytes,
+            encodedBytes: decoded.encodedBytes,
+            decodedBytes: decoded.decodedBytes,
+            compressedBytes: decoded.compressedBytes,
+            compressed: decoded.compressed,
           },
         };
       }
@@ -193,7 +258,7 @@ async function fetchJsonResourceWithOptionalGzip(url, label, { signal = null } =
       if (signal?.aborted) {
         throw createWorkerAbortError(signal.reason);
       }
-      // Fall back to plain JSON below.
+      // Fall back to plain JSON on any non-abort error for optional candidate.
     }
   }
   const plainResult = await fetchJsonResource(url, label, { signal });

@@ -4,6 +4,7 @@ import {
   buildSpecialSpatialItems,
   buildWaterSpatialItems,
   captureSpatialGridBuild,
+  reconcileSpatialGridSnapshot,
 } from "./spatial_index_runtime_builders.js";
 import {
   applyPrimarySpatialSnapshot,
@@ -133,6 +134,54 @@ export function createSpatialIndexRuntimeOwner({
     }
   }
 
+  function reconcileRuntimePrimaryIndex({ projectedBoundsCache = null } = {}) {
+    if (![state.landIndex, state.countryToFeatureIds, state.idToKey, state.keyToId].every((map) => map instanceof Map)) {
+      rebuildRuntimePrimaryIndex({ projectedBoundsCache });
+      return;
+    }
+    const features = Array.isArray(state.landData?.features) ? state.landData.features : [];
+    const nextIds = new Set();
+    const nextKeys = new Map();
+    const countries = new Map();
+    for (let index = 0; index < features.length; index += 1) {
+      const feature = features[index];
+      const id = getFeatureId(feature) || `feature-${index}`;
+      nextIds.add(id);
+      if (state.landIndex.get(id) !== feature) state.landIndex.set(id, feature);
+      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: true });
+      if (bounds) projectedBoundsCache?.set(id, bounds);
+      if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
+      const country = getFeatureCountryCodeNormalized(feature);
+      if (country) {
+        if (!countries.has(country)) countries.set(country, []);
+        countries.get(country).push(id);
+      }
+      nextKeys.set(id, index + 1);
+    }
+    for (const id of state.landIndex.keys()) if (!nextIds.has(id)) state.landIndex.delete(id);
+    for (const id of state.idToKey.keys()) if (!nextKeys.has(id)) state.idToKey.delete(id);
+    const keyIds = new Map();
+    for (const [id, key] of nextKeys) {
+      if (state.idToKey.get(id) !== key) state.idToKey.set(id, key);
+      keyIds.set(key, id);
+      if (state.keyToId.get(key) !== id) state.keyToId.set(key, id);
+    }
+    for (const key of state.keyToId.keys()) if (!keyIds.has(key)) state.keyToId.delete(key);
+    for (const country of state.countryToFeatureIds.keys()) if (!countries.has(country)) state.countryToFeatureIds.delete(country);
+    for (const [country, ids] of countries) {
+      const previous = state.countryToFeatureIds.get(country);
+      if (!previous || previous.length !== ids.length || previous.some((id, index) => id !== ids[index])) {
+        state.countryToFeatureIds.set(country, ids);
+      }
+    }
+    for (const feature of state.riversData?.features || []) {
+      const id = getFeatureId(feature);
+      if (!id) continue;
+      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: true });
+      if (bounds) projectedBoundsCache?.set(id, bounds);
+    }
+  }
+
   function buildSecondarySpatialIndexes({
     allowComputeMissingBounds = true,
   } = {}) {
@@ -191,14 +240,17 @@ export function createSpatialIndexRuntimeOwner({
   function buildSpatialIndex({
     includeSecondary = true,
     allowComputeMissingBounds = true,
+    reuseExisting = false,
   } = {}) {
     const startedAt = nowMs();
-    resetPrimarySpatialState(state);
+    const previous = reuseExisting ? { grid: state.spatialGrid, gridMeta: state.spatialGridMeta, itemsById: state.spatialItemsById } : null;
+    if (!reuseExisting) resetPrimarySpatialState(state);
     markSecondarySpatialBuildPending(state, {
       reason: "primary-spatial-rebuild",
       preserveCurrent: true,
     });
     if (!state.landData || !state.landData.features || !getPathSvg()) {
+      if (reuseExisting) resetPrimarySpatialState(state);
       recordRenderPerfMetric(
         "buildSpatialIndex",
         nowMs() - startedAt,
@@ -212,7 +264,7 @@ export function createSpatialIndexRuntimeOwner({
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
 
     const nextSpatialItems = [];
-    appendLandSpatialItemsRange({
+    const appendOptions = {
       targetItems: nextSpatialItems,
       features: state.landData.features,
       canvasWidth,
@@ -225,8 +277,23 @@ export function createSpatialIndexRuntimeOwner({
       getProjectedFeatureBounds,
       getFeatureCountryCodeNormalized,
       getFeatureBorderMeshCountryCodeNormalized,
-    });
-    const nextGridSnapshot = captureSpatialGridBuild({
+    };
+    const sameLayout = previous?.gridMeta?.width === Math.max(1, canvasWidth || 1)
+      && previous?.gridMeta?.height === Math.max(1, canvasHeight || 1);
+    let reusedItems = 0;
+    if (!sameLayout) appendLandSpatialItemsRange(appendOptions);
+    for (let index = 0; sameLayout && index < state.landData.features.length; index += 1) {
+      const feature = state.landData.features[index];
+      const item = sameLayout ? previous?.itemsById?.get(getFeatureId(feature)) : null;
+      if (item && item.feature === feature) {
+        // Inserting an earlier chunk shifts draw order without changing bounds.
+        nextSpatialItems.push(item.drawOrder === index ? item : { ...item, drawOrder: index });
+        reusedItems += 1;
+      } else {
+        appendLandSpatialItemsRange({ ...appendOptions, start: index, end: index + 1 });
+      }
+    }
+    const gridOptions = {
       items: nextSpatialItems,
       canvasWidth,
       canvasHeight,
@@ -234,7 +301,10 @@ export function createSpatialIndexRuntimeOwner({
       hitGridMinCellPx,
       hitGridMaxCellPx,
       hitMaxCellsPerItem,
-    });
+    };
+    const nextGridSnapshot = reuseExisting
+      ? reconcileSpatialGridSnapshot(previous, gridOptions)
+      : captureSpatialGridBuild(gridOptions);
     applyPrimarySpatialSnapshot(state, {
       items: nextSpatialItems,
       grid: nextGridSnapshot.grid,
@@ -247,6 +317,9 @@ export function createSpatialIndexRuntimeOwner({
       });
     }
     state.hitCanvasDirty = true;
+    if (reuseExisting) recordRenderPerfMetric("reconcileSpatialIndex", nowMs() - startedAt, {
+      reusedItems, rebuiltItems: nextSpatialItems.length - reusedItems,
+    });
     recordRenderPerfMetric(
       "buildSpatialIndex",
       nowMs() - startedAt,
@@ -425,6 +498,7 @@ export function createSpatialIndexRuntimeOwner({
   return {
     buildIndex,
     rebuildRuntimePrimaryIndex,
+    reconcileRuntimePrimaryIndex,
     resetSecondarySpatialIndexState,
     buildSecondarySpatialIndexes,
     buildSpatialIndex,

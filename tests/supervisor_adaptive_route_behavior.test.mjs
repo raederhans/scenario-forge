@@ -188,3 +188,24 @@ test("SF-ATS docs route stays scoped to registry and work package docs", () => {
   assert.deepEqual(unrelatedTestingDocReport.recommendedCommands, []);
   assert.deepEqual(unrelatedTestingDocReport.unmatchedChangedFiles, ["docs/testing/unrelated.md"]);
 });
+
+test("regional integration routes executable changes and classifies only named prose", () => {
+  for (const [source, command] of [
+    ["js/core/json_resource_decoder_shared.js", "node --test tests/json_resource_decoder_behavior.test.mjs"],
+    ["tools/political_detail_partition.py", "node --test tests/scenario_spatial_chunk_selection_behavior.test.mjs"],
+    ["map_builder/regional_geometry.py", "python -m unittest tests.test_regional_geometry -q"],
+    ["map_builder/build_dependencies.py", "python -m unittest tests.test_incremental_build_cache -q"],
+    ["tools/runtime_json_packing.py", "python -m unittest tests.test_runtime_json_packing -q"],
+  ]) {
+    const report = recommendationFor(source);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.ok(commandRefs(report).includes(command), source);
+  }
+  for (const source of ["docs/active/data-packing-20260913/results.md", "docs/france_political_precision.md", "docs/regional_incremental_build.md", "docs/tno_regional_precision.md"]) {
+    const report = recommendationFor(source);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.equal(report.nonBehavioralChangedFiles[0].classification, "task-documentation");
+  }
+  assert.deepEqual(recommendationFor("docs/active/unrelated-task/results.md").unmatchedChangedFiles,
+    ["docs/active/unrelated-task/results.md"]);
+});

@@ -27,6 +27,7 @@ from map_builder.geo.local_canonicalization import (
     canonicalize_country_boundaries,
 )
 from map_builder.geo.topology import build_topology, compute_neighbor_graph
+from map_builder.geo.france_topology_precision import preserve_france_topology_precision
 from map_builder.io.readers import read_json_optional, read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.processors.detail_shell_coverage import (
@@ -42,6 +43,7 @@ from map_builder.processors.denmark_border_detail import apply_denmark_border_de
 from map_builder.processors.global_basic_admin1 import apply_global_basic_admin1_replacement
 from map_builder.processors.north_america import apply_north_america_replacement
 from map_builder.processors.russia_ukraine import apply_russia_ukraine_replacement
+from map_builder.processors.france import apply_france_master_precision
 
 from map_builder.processors.config_subdivisions import apply_config_subdivisions
 
@@ -63,6 +65,7 @@ URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
 URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
 
 DETAIL_POLITICAL_PROCESSOR_CHAIN = (
+    ("france_master_precision", apply_france_master_precision),
     ("north_america", apply_north_america_replacement),
     ("africa_admin1", apply_africa_admin1_replacement),
     ("global_basic_admin1", apply_global_basic_admin1_replacement),
@@ -717,7 +720,7 @@ def _build_topology_dict_from_layers(layers: dict[str, gpd.GeoDataFrame]) -> dic
         toposimplify=False,
         shared_coords=True,
     ).to_dict()
-    return topology
+    return preserve_france_topology_precision(topology, layers["political"])
 
 
 def _promote_geometry_ids(topology_dict: dict) -> None:

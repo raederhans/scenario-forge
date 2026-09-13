@@ -1040,7 +1040,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertEqual(
             nodes_by_path["app/js/workers/startup_boot.worker.js"]["resource_references"],
-            ["app/js/core/feature_identity_shared.js", "app/vendor/topojson-client.min.js"],
+            ["app/js/core/feature_identity_shared.js", "app/js/core/json_resource_decoder_shared.js", "app/vendor/topojson-client.min.js"],
         )
 
     def test_pages_module_graph_uses_acorn_for_imports_exports_templates_comments_and_regex(self) -> None:
@@ -2625,7 +2625,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/scenarios/tno_1962/startup.bundle.en.json",
             "app/data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
             "app/data/scenarios/tno_1962/derived/geometry_drop_audit.json",
-            "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json",
+            "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json.gz",
             "app/data/europe_topology.na_v2.json",
             "app/data/transport_layers/global_road/catalog.json",
             "app/data/transport_layers/global_rail/catalog.json",

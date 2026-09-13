@@ -602,7 +602,10 @@ def _build_passthrough_feature(primary_shell_source: gpd.GeoDataFrame, iso_code:
     return out
 
 
-def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+def apply_global_basic_admin1_replacement(
+    detail_gdf: gpd.GeoDataFrame,
+    country_codes: set[str] | list[str] | tuple[str, ...] | None = None,
+) -> gpd.GeoDataFrame:
     if detail_gdf.empty:
         return detail_gdf
     if "cntr_code" not in detail_gdf.columns:
@@ -614,13 +617,22 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
         | set(cfg.GLOBAL_BASIC_SPECIAL_SOURCES.keys())
         | set(cfg.GLOBAL_BASIC_PASSTHROUGH_COUNTRIES)
     )
+    if country_codes is None:
+        selected_codes = set(target_codes)
+    else:
+        selected_codes = {str(code).strip().upper() for code in country_codes}
+        unknown = selected_codes - target_codes
+        if unknown:
+            raise ValueError(f"[Global Basic] Unknown country_codes: {sorted(unknown)}")
+    if not selected_codes:
+        return detail_gdf
     normalized_codes = detail_gdf["cntr_code"].fillna("").astype(str).str.upper().str.strip()
-    base = detail_gdf[~normalized_codes.isin(target_codes)].copy()
+    base = detail_gdf[~normalized_codes.isin(selected_codes)].copy()
     base = ensure_crs(base)
 
     primary_shell_source = _load_primary_political_shells()
     shells: dict[str, object] = {}
-    for code in sorted(target_codes):
+    for code in sorted(selected_codes):
         if code in cfg.GLOBAL_BASIC_PASSTHROUGH_COUNTRIES:
             continue
         shell = _get_country_shell(detail_gdf, code, label="detail")
@@ -634,6 +646,8 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
     outputs: list[gpd.GeoDataFrame] = [base]
 
     for iso_code, rule in cfg.GLOBAL_BASIC_NE_COUNTRY_RULES.items():
+        if iso_code not in selected_codes:
+            continue
         print(f"[Global Basic] Building Natural Earth admin1 detail for {iso_code}...")
         country_gdf = _build_ne_country_features(
             ne_admin1,
@@ -646,6 +660,8 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
         outputs.append(country_gdf)
 
     for iso_code, spec in cfg.GLOBAL_BASIC_SPECIAL_SOURCES.items():
+        if iso_code not in selected_codes:
+            continue
         source_type = str(spec.get("source_type", "")).strip()
         print(f"[Global Basic] Building special-source detail for {iso_code} ({source_type})...")
         if source_type == "gisco_nuts1":
@@ -657,7 +673,7 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
         print(f"[Global Basic] {iso_code} features: {len(country_gdf)}")
         outputs.append(country_gdf)
 
-    for iso_code in sorted(cfg.GLOBAL_BASIC_PASSTHROUGH_COUNTRIES):
+    for iso_code in sorted(cfg.GLOBAL_BASIC_PASSTHROUGH_COUNTRIES & selected_codes):
         print(f"[Global Basic] Building admin0 passthrough detail for {iso_code}...")
         country_gdf = _build_passthrough_feature(primary_shell_source, iso_code)
         outputs.append(country_gdf)
@@ -668,6 +684,6 @@ def apply_global_basic_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.G
         raise SystemExit(f"[Global Basic] Duplicate IDs detected after replacement: {dupes}")
     print(
         "[Global Basic] Replacement complete: "
-        f"countries={len(target_codes)}, total={len(combined)}"
+        f"countries={len(selected_codes)}, total={len(combined)}"
     )
     return combined

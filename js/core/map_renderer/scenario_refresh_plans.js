@@ -245,6 +245,7 @@ function getScenarioChunkPromotionTargetResources({
   };
   if (hasPoliticalChange) {
     addResources([
+      "physicalBaseBuffer",
       "politicalBaseBuffer",
       "hitIndex",
       "contextBaseBuffer",
@@ -257,15 +258,17 @@ function getScenarioChunkPromotionTargetResources({
   (Array.isArray(changedLayerKeys) ? changedLayerKeys : []).forEach((layerKey) => {
     const normalized = String(layerKey || "").trim().toLowerCase();
     if (normalized === "cities") {
-      addResources(["contextBaseBuffer", "labelBuffer", "dayNightBuffer"]);
+      addResources(["contextBaseBuffer", "contextMarkersBuffer", "labelBuffer", "dayNightBuffer"]);
       return;
     }
     if (normalized === "water" || normalized === "special" || normalized === "relief") {
-      addResources(["contextScenarioBuffer"]);
+      addResources(["contextScenarioBuffer", "borderBuffer"]);
       return;
     }
     if (normalized === "scenario_atlantropa") {
       addResources([
+        "physicalBaseBuffer",
+        "contextBaseBuffer",
         "politicalBaseBuffer",
         "hitIndex",
         "contextScenarioBuffer",

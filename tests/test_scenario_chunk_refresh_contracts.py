@@ -919,7 +919,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             promotion_source,
             re.compile(
                 r'if \(hasPoliticalChange\) \{[\s\S]*?'
-                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*\}\);\s*\}'
+                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\);\s*\}'
                 r'[\s\S]*?if \(hasPoliticalChange\) \{\s*clearDeferredInternalBorderMeshCaches\(\);\s*scheduleDeferredHeavyBorderMeshes\(\);\s*\}',
                 re.S,
             ),

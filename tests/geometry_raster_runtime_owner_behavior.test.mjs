@@ -200,3 +200,70 @@ test("A to B to A reuses one result consumer when the real client merges the act
     assert.equal(bitmap.closes, 1);
   }
 });
+
+// ── Acceptance criteria: incremental geometry reuse across same-scene revisions ──
+
+test("workerSceneKey excludes topology/data revisions so uploads survive same-scene chunk arrivals", () => {
+  // The sceneKey sent to the worker must only encode scenario-switch identity.
+  // Any non-geometric revision must NOT force a resetGeometry on the worker.
+  const f = fixture();
+  f.owner.preparePolitical({ force: true });
+  const req0 = f.requests[0].input;
+  // sceneKey in the worker input is workerSceneKey = activeScenarioId:sceneGeneration
+  assert.equal(req0.sceneKey, "tno:1", "worker sceneKey is narrow: id+generation only");
+  // Now simulate a topology revision (incremental chunk promotion)
+  f.state.topologyRevision = 99;
+  f.state.scenarioDataGeneration = 5;
+  f.requests[0].resolve(null); // first request done
+  f.owner.preparePolitical({ force: true });
+  const req1 = f.requests[1].input;
+  assert.equal(req1.sceneKey, "tno:1", "topology/data revision does not change worker sceneKey");
+  // Frame identity must be different (strict fence)
+  assert.notEqual(req0.identity, req1.identity, "frame identity still detects revision change");
+  f.owner.dispose();
+  f.requests[1].resolve(null);
+});
+
+test("actual scenario switch changes workerSceneKey and full frame identity", () => {
+  const f = fixture();
+  f.owner.preparePolitical({ force: true });
+  const req0 = f.requests[0].input;
+  f.requests[0].resolve(null);
+  // Switch to a different scenario
+  f.state.activeScenarioId = "hoi4";
+  f.owner.preparePolitical({ force: true });
+  const req1 = f.requests[1].input;
+  assert.notEqual(req0.sceneKey, req1.sceneKey, "scenario switch changes worker sceneKey");
+  assert.notEqual(req0.identity, req1.identity, "scenario switch changes frame identity");
+  f.owner.dispose();
+  f.requests[1].resolve(null);
+});
+
+test("sceneGeneration bump changes workerSceneKey (full reset, not mere revision)", () => {
+  const f = fixture();
+  f.owner.preparePolitical({ force: true });
+  const req0 = f.requests[0].input;
+  f.requests[0].resolve(null);
+  // Bump sceneGeneration — same as a full reset path
+  f.state.sceneGeneration = 2;
+  f.owner.preparePolitical({ force: true });
+  const req1 = f.requests[1].input;
+  assert.notEqual(req0.sceneKey, req1.sceneKey, "sceneGeneration bump changes worker sceneKey");
+  f.owner.dispose();
+  f.requests[1].resolve(null);
+});
+
+test("projection mutation changes projectionKey and frame identity; worker sceneKey unchanged", () => {
+  const f = fixture();
+  f.owner.preparePolitical({ force: true });
+  const req0 = f.requests[0].input;
+  f.requests[0].resolve(null);
+  markProjectionGeometryChanged(f.projection);
+  f.owner.preparePolitical({ force: true });
+  const req1 = f.requests[1].input;
+  assert.equal(req0.sceneKey, req1.sceneKey, "projection mutation does not change worker sceneKey");
+  assert.notEqual(req0.projectionKey, req1.projectionKey, "projection mutation changes projectionKey");
+  assert.notEqual(req0.identity, req1.identity, "projection mutation invalidates frame identity");
+  f.owner.dispose();
+  f.requests[1].resolve(null);
+});

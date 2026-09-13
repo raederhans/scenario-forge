@@ -71,14 +71,14 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             helper_body,
             re.compile(
                 r'rebuildPrimaryPoliticalCollections\(\);[\s\S]*?'
-                r'rebuildRuntimeDerivedState\(\{\s*includeRuntimePoliticalMeta: true,\s*scheduleUiMode,\s*buildSpatial,\s*includeSecondarySpatial,\s*\}\);',
+                r'rebuildRuntimeDerivedState\(\{\s*includeRuntimePoliticalMeta: true,\s*scheduleUiMode,\s*buildSpatial,\s*includeSecondarySpatial,\s*incrementalDelta,\s*reuseGeometry: incremental,\s*\}\);',
                 re.S,
             ),
         )
         self.assertRegex(
             self.refresh_plan_content,
             re.compile(
-                r'function getScenarioChunkPromotionTargetPasses\(\{[\s\S]*?return getTargetPassesForResources\(getScenarioChunkPromotionTargetResources\(\{[\s\S]*?function getScenarioChunkPromotionTargetResources\(\{[\s\S]*?if \(hasPoliticalChange\) \{\s*addResources\(\[\s*"politicalBaseBuffer",\s*"hitIndex",\s*"contextBaseBuffer",\s*"contextMarkersBuffer",\s*"borderBuffer",\s*"interactionOverlay",\s*"labelBuffer",',
+                r'function getScenarioChunkPromotionTargetPasses\(\{[\s\S]*?return getTargetPassesForResources\(getScenarioChunkPromotionTargetResources\(\{[\s\S]*?function getScenarioChunkPromotionTargetResources\(\{[\s\S]*?if \(hasPoliticalChange\) \{\s*addResources\(\[\s*"physicalBaseBuffer",\s*"politicalBaseBuffer",\s*"hitIndex",\s*"contextBaseBuffer",\s*"contextMarkersBuffer",\s*"borderBuffer",\s*"interactionOverlay",\s*"labelBuffer",',
                 re.S,
             ),
         )
@@ -86,7 +86,7 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             self.refresh_runtime_content,
             re.compile(
                 r'if \(hasPoliticalChange\) \{[\s\S]*?'
-                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*\}\);',
+                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\);',
                 re.S,
             ),
         )

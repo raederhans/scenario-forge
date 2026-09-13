@@ -145,6 +145,7 @@ test("chunk promotion plan normalizes layer keys and carries opening border poli
   assert.equal(plan.renderer.refreshOpeningOwnerBorders, true);
   assert.equal(plan.renderer.resetWaterCacheReason, "");
   assert.deepEqual(plan.renderer.frameGraphInvalidation.targetResources, [
+    "physicalBaseBuffer",
     "politicalBaseBuffer",
     "hitIndex",
     "contextBaseBuffer",
@@ -158,6 +159,7 @@ test("chunk promotion plan normalizes layer keys and carries opening border poli
   assert.equal(Object.hasOwn(plan.renderer.frameGraphInvalidation, "legacyTargetPasses"), false);
   assert.equal(Object.hasOwn(plan.renderer.frameGraphInvalidation, "targetPasses"), false);
   assert.deepEqual(resolveFrameGraphInvalidationExecutionPlan(plan.renderer.frameGraphInvalidation).invalidationTargetPasses, [
+    "physicalBase",
     "political",
     "contextBase",
     "contextMarkers",
@@ -266,7 +268,7 @@ test("chunk promotion target passes stay unique across political and layer chang
       hasPoliticalChange: true,
       changedLayerKeys: ["cities", "water", "special", "relief", "scenario_atlantropa"],
     }),
-    ["political", "contextBase", "contextMarkers", "borders", "labels", "dayNight", "contextScenario"],
+    ["physicalBase", "political", "contextBase", "contextMarkers", "borders", "labels", "dayNight", "contextScenario"],
   );
 });
 
@@ -285,6 +287,16 @@ test("strategic values chunk promotion refreshes political and marker passes", (
     }),
     ["political", "contextMarkers", "labels"],
   );
+});
+
+test("scoped layer promotion includes mask, city marker and coastline consumers", () => {
+  const passes = (layer) => getScenarioChunkPromotionTargetPasses({ changedLayerKeys: [layer] });
+  assert.deepEqual(passes("cities"), ["contextBase", "contextMarkers", "labels", "dayNight"]);
+  for (const layer of ["water", "special", "relief"]) {
+    assert.deepEqual(passes(layer), ["contextScenario", "borders"]);
+  }
+  assert.deepEqual(passes("scenario_atlantropa"), ["physicalBase", "contextBase", "political", "contextScenario", "borders", "labels"]);
+  assert.equal(getScenarioChunkPromotionTargetPasses({ hasPoliticalChange: true }).includes("background"), false);
 });
 
 test("first-frame resource allowlist keeps startup visual work to the baseline", () => {
@@ -436,6 +448,7 @@ test("startup hydration plan layer keys still drive chunk promotion resource fan
 
   assert.deepEqual(startupPlan.changedLayerKeys, ["political", "water", "cities"]);
   assert.deepEqual(descriptor.targetResources, [
+    "physicalBaseBuffer",
     "politicalBaseBuffer",
     "hitIndex",
     "contextBaseBuffer",
@@ -447,6 +460,7 @@ test("startup hydration plan layer keys still drive chunk promotion resource fan
     "dayNightBuffer",
   ]);
   assert.deepEqual(descriptor.invalidationTargetPasses, [
+    "physicalBase",
     "political",
     "contextBase",
     "contextMarkers",

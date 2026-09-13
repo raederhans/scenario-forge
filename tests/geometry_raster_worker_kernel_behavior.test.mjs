@@ -74,6 +74,23 @@ test("camera, DPR, color and hit reuse geometry; replacement, projection and sce
   await assert.rejects(kernel.render(packet({ sceneKey: "hoi4", geometryUpdates: [] })), /Missing raster geometry/);
   assert.equal((await kernel.render(packet({ sceneKey: "hoi4" }))).pathBuildCount, 1);
 });
+test("null geometry update releases geometry and path so a subsequent render requires re-upload", async () => {
+  const { kernel } = harness();
+  // Upload and render "region"
+  await kernel.render(packet());
+  // Release "region" via null update in a packet that does NOT include "region" in entries.
+  // This simulates the client sending a null removal for a departed ID.
+  await kernel.render(packet({ geometryUpdates: [{ id: "region", feature: null }], entries: [] }));
+  // Next render that tries to use "region" without re-uploading must fail.
+  await assert.rejects(
+    kernel.render(packet({ geometryUpdates: [] })),
+    /Missing raster geometry/,
+    "released geometry is no longer available",
+  );
+  // Re-uploading restores it.
+  const restored = await kernel.render(packet());
+  assert.equal(restored.pathBuildCount, 1, "path rebuilt after re-upload");
+});
 test("unsupported projection fields reject; default point radius is two", async () => {
   assert.throws(() => createGeometryRasterProjection(d3, { preclip: "custom" }), /Unsupported projection field/);
   assert.throws(() => createGeometryRasterProjection(d3, { factory: "mercator" }), /Unsupported projection factory/);

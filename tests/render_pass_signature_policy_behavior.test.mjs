@@ -50,6 +50,23 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("scoped topology promotion changes only dependent signatures, while unknown resets invalidate all", () => {
+  const { state, policy } = createHarness();
+  const names = ["background", "physicalBase", "political", "effects", "lineEffects", "labels"];
+  const before = Object.fromEntries(names.map((name) => [name, policy.getRenderPassSignature(name)]));
+  state.topologyRevision = 2;
+  policy.recordScopedTopologyChange({ previousRevision: 1, targetPasses: ["political", "labels"] });
+  for (const name of names) {
+    assert.equal(policy.getRenderPassSignature(name) !== before[name], ["political", "labels"].includes(name), name);
+  }
+  const scoped = Object.fromEntries(names.map((name) => [name, policy.getRenderPassSignature(name)]));
+  state.topologyRevision = 3;
+  for (const name of names) assert.notEqual(policy.getRenderPassSignature(name), scoped[name], name);
+  state.topologyRevision = 5;
+  policy.recordScopedTopologyChange({ previousRevision: 4, targetPasses: [] });
+  assert.match(policy.getRenderPassSignature("background"), /::5::/);
+});
+
 test("coastline border pixels invalidate on overlay visibility and geometry arrival", () => {
   let overlay = "pending";
   const { state, policy } = createHarness({ getScenarioOverlaySignatureToken: () => overlay });

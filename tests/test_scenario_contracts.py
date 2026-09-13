@@ -269,7 +269,23 @@ class ScenarioContractTest(unittest.TestCase):
         expected_report_paths = dict(check_scenario_contracts.TNO_COVERAGE_REPORT_PATHS)
 
         self.assertEqual(ledger["scenario_id"], "tno_1962")
-        self.assertGreater(ledger["summary"]["runtime_feature_count"], 800)
+        ledger_summary = ledger["summary"]
+        # The ledger is derived from ``scenario_atlantropa`` in the checked-in
+        # runtime topology.  Its population may legitimately change when that
+        # geometry changes, so verify the machine-readable accounting instead
+        # of preserving an unrelated historical floor.
+        self.assertEqual(ledger_summary["runtime_feature_count"], len(ledger["features"]))
+        self.assertEqual(ledger_summary["chunk_feature_count"], ledger_summary["runtime_feature_count"])
+        self.assertEqual(ledger_summary["interactive_feature_count"], ledger_summary["runtime_feature_count"])
+        self.assertEqual(sum(ledger_summary["metadata_prefix_counts"].values()), ledger_summary["runtime_feature_count"])
+        self.assertEqual(
+            sum(ledger_summary["prefix_counts"].values()),
+            sum(
+                count
+                for prefix, count in ledger_summary["metadata_prefix_counts"].items()
+                if prefix in ledger["protected_prefixes"]
+            ),
+        )
         self.assertEqual(ledger["summary"]["missing_chunk_count"], 0)
         self.assertEqual(ledger["summary"]["basin_probe_failure_count"], 0)
         self.assertEqual(drop_audit["summary"]["protected_prefix_drop_count"], 0)

@@ -25,6 +25,10 @@ export function nonBehavioralClassification(changedFile) {
     || /^docs\/archive\/(?:contour-optimization-20260910|tno-mediterranean-sea-closure)\/(?:plan|context|task|land-handoff|lod-handoff|ocean-handoff)\.md$/u.test(changedFile)
     || /^docs\/active\/atlantropa-repair-20260911\/(?:result|refinement-result|spain-cyprus-result)\.md$/u.test(changedFile)
     || /^docs\/active\/ocean-geometry-20260911\/(?:geometry-contract|results)\.md$/u.test(changedFile)
+    || changedFile === "docs/active/data-packing-20260913/results.md"
+    || changedFile === "docs/france_political_precision.md"
+    || changedFile === "docs/regional_incremental_build.md"
+    || changedFile === "docs/tno_regional_precision.md"
     || changedFile === "docs/active/business-efficiency-20260908/editing-analysis.md"
     || changedFile === "docs/active/business-efficiency-20260908/render-reuse-analysis.md") {
     return "task-documentation";

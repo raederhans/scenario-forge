@@ -1768,15 +1768,25 @@ def _resolve_scenario_url(target_dir: Path, url: object, errors: list[str], fiel
     if not value:
         errors.append(f"manifest.{field_name} is required in strict mode.")
         return None
+    expected_prefix = f"data/scenarios/{target_dir.name}/"
+    if not PurePosixPath(value).as_posix().startswith(expected_prefix):
+        errors.append(f"manifest.{field_name} must point inside {expected_prefix}. Found {value!r}.")
+        return None
+    try:
+        rel_parts = PurePosixPath(value).relative_to(PurePosixPath(expected_prefix)).parts
+        local_path = target_dir.joinpath(*rel_parts).resolve()
+        if not local_path.is_relative_to(target_dir.resolve()):
+            errors.append(f"manifest.{field_name} must stay inside its scenario directory. Found {value!r}.")
+            return None
+        if local_path.is_file():
+            return local_path
+    except ValueError:
+        pass
     path = (PROJECT_ROOT / value).resolve()
     try:
         path.relative_to(PROJECT_ROOT.resolve())
     except ValueError:
         errors.append(f"manifest.{field_name} must stay under the repository root. Found {value!r}.")
-        return None
-    expected_prefix = f"data/scenarios/{target_dir.name}/"
-    if not PurePosixPath(value).as_posix().startswith(expected_prefix):
-        errors.append(f"manifest.{field_name} must point inside {expected_prefix}. Found {value!r}.")
         return None
     if not path.is_file():
         errors.append(f"manifest.{field_name} points to a missing file: {value}")
@@ -1817,11 +1827,24 @@ def _required_profile_filenames(profile_id: str, manifest: dict[str, Any]) -> li
     return sorted(dict.fromkeys(required))
 
 
-def _parse_detail_chunk_bucket(chunk_id: str) -> str:
+def _parse_detail_chunk_shard_info(chunk_id: str) -> tuple[str, int | None]:
     prefix = "political.detail.country."
     if not str(chunk_id or "").startswith(prefix):
-        return ""
-    return normalize_scenario_contract_tag(str(chunk_id)[len(prefix):])
+        return "", None
+    remainder = str(chunk_id)[len(prefix):]
+    if ".part." in remainder:
+        owner_part, _, shard_str = remainder.partition(".part.")
+        try:
+            shard_index = int(shard_str)
+        except ValueError:
+            shard_index = None
+        return normalize_scenario_contract_tag(owner_part), shard_index
+    return normalize_scenario_contract_tag(remainder), None
+
+
+def _parse_detail_chunk_bucket(chunk_id: str) -> str:
+    owner, _shard_index = _parse_detail_chunk_shard_info(chunk_id)
+    return owner
 
 
 def _resolve_detail_feature_owner_bucket(
@@ -2165,6 +2188,7 @@ def _validate_detail_chunk_manifest(
     seen_ids: set[str] = set()
     duplicate_ids: list[str] = []
     political_ids: set[str] = set()
+    political_shards_by_owner: dict[str, list[tuple[int | None, str]]] = defaultdict(list)
     atlantropa_all_ids: set[str] = set()
     atlantropa_detail_ids: set[str] = set()
     feature_to_chunk: dict[str, str] = {}
@@ -2292,15 +2316,60 @@ def _validate_detail_chunk_manifest(
                 errors,
                 required=require_precise_chunk_manifest,
             )
-            chunk_bucket = _parse_detail_chunk_bucket(chunk_id)
+            chunk_bounds = chunk.get("bounds")
+            if isinstance(chunk_bounds, list) and len(chunk_bounds) == 4:
+                try:
+                    cb = [float(v) for v in chunk_bounds]
+                    for feature in features:
+                        if not isinstance(feature, dict):
+                            continue
+                        fb = _feature_bounds_for_contract(feature)
+                        if _bounds_area_for_contract(fb) > 0:
+                            if (
+                                fb[0] < cb[0] - 1e-6
+                                or fb[1] < cb[1] - 1e-6
+                                or fb[2] > cb[2] + 1e-6
+                                or fb[3] > cb[3] + 1e-6
+                            ):
+                                errors.append(
+                                    f"detail chunk {chunk_id} bounds {cb} do not enclose feature "
+                                    f"{feature.get('id') or (feature.get('properties') or {}).get('id')} bounds {fb}."
+                                )
+                                break
+                except (TypeError, ValueError):
+                    errors.append(f"detail chunk {chunk_id} bounds must contain numeric coordinates.")
+
+            chunk_bucket, shard_index = _parse_detail_chunk_shard_info(chunk_id)
+            if ".part." in str(chunk_id):
+                if shard_index is None or shard_index < 0:
+                    errors.append(
+                        f"detail chunk {chunk_id} shard identifier must use .part.<non-negative-index>."
+                    )
+            explicit_owner_code = chunk.get("owner_code")
+            if explicit_owner_code is not None:
+                if not isinstance(explicit_owner_code, str) or not explicit_owner_code.strip():
+                    errors.append(f"detail chunk {chunk_id} owner_code must be a non-empty string.")
+                else:
+                    norm_owner_code = normalize_scenario_contract_tag(explicit_owner_code)
+                    if chunk_bucket and norm_owner_code != chunk_bucket:
+                        errors.append(
+                            f"detail chunk {chunk_id} owner_code {norm_owner_code} must match chunk owner bucket {chunk_bucket}."
+                        )
+            effective_owner = (
+                normalize_scenario_contract_tag(explicit_owner_code)
+                if explicit_owner_code
+                else chunk_bucket
+            )
+            if effective_owner:
+                political_shards_by_owner[effective_owner].append((shard_index, chunk_id))
             manifest_country_codes = [
                 normalize_scenario_contract_tag(code)
                 for code in (chunk.get("country_codes") or [])
                 if normalize_scenario_contract_tag(code)
             ]
-            if chunk_bucket and manifest_country_codes and chunk_bucket not in manifest_country_codes:
+            if effective_owner and manifest_country_codes and effective_owner not in manifest_country_codes:
                 errors.append(
-                    f"detail chunk {chunk_id} country_codes must include the chunk owner bucket {chunk_bucket}."
+                    f"detail chunk {chunk_id} country_codes must include the chunk owner bucket {effective_owner}."
                 )
             for feature in features:
                 if not isinstance(feature, dict):
@@ -2313,7 +2382,7 @@ def _validate_detail_chunk_manifest(
                 )
                 if not feature_id:
                     continue
-                if chunk_bucket and owner_bucket and owner_bucket != chunk_bucket:
+                if effective_owner and owner_bucket and owner_bucket != effective_owner:
                     owner_bucket_mismatch_count += 1
                     errors.append(
                         f"detail chunk {chunk_id} feature {feature_id} must stay in owner bucket {owner_bucket}."
@@ -2331,6 +2400,21 @@ def _validate_detail_chunk_manifest(
                     )
                 feature_to_chunk[feature_id] = chunk_id
                 political_ids.add(feature_id)
+    for owner_code, shard_entries in political_shards_by_owner.items():
+        has_shards = any(s_idx is not None for s_idx, _cid in shard_entries)
+        if has_shards:
+            if any(s_idx is None for s_idx, _cid in shard_entries):
+                errors.append(
+                    f"owner {owner_code} mixes sharded and un-sharded detail chunks: "
+                    f"{[cid for _s, cid in shard_entries]}."
+                )
+            indices = sorted(s_idx for s_idx, _cid in shard_entries if s_idx is not None)
+            expected_indices = list(range(len(shard_entries)))
+            if indices != expected_indices:
+                errors.append(
+                    f"owner {owner_code} detail shards must have contiguous 0-indexed parts. "
+                    f"actual={indices} expected={expected_indices}."
+                )
     if duplicate_ids:
         errors.append(f"detail chunk ids must be unique. Duplicates: {sorted(set(duplicate_ids))[:10]}.")
     illegal_chunk_ids = sorted(political_ids - runtime_feature_ids)

@@ -53,7 +53,8 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         derived_start = renderer_content.index("function rebuildRuntimeDerivedState({")
         derived_end = renderer_content.index("async function buildHitCanvasAfterStartup(", derived_start)
         derived_body = renderer_content[derived_start:derived_end]
-        self.assertIn("const nextColors = rebuildResolvedColors();", derived_body)
+        self.assertIn("const nextColors = incrementalDelta ? reconcilePoliticalDerivedColors(incrementalDelta) : rebuildResolvedColors();", derived_body)
+        self.assertIn("getResolvedFeatureColor(delta.features.get(id), id)", derived_body)
         self.assertNotIn("collectResolvedColor", derived_body)
         self.assertIn("function applyFeatureVisualOverrideTransaction(", renderer_content)
         override_transaction_body = renderer_content.split(
@@ -70,7 +71,8 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         self.assertEqual(renderer_content.count("delete runtimeState.featureOverrides[targetId];"), 1)
         self.assertIn("applyFeatureVisualOverrideTransaction(resolvedIds, color,", renderer_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(freshIds, selectedColor,", renderer_content)
-        self.assertIn("applyFeatureVisualOverrideTransaction(targetIds, null,", renderer_content)
+        click_owner_content = (REPO_ROOT / "js/core/map_renderer/click_selection_transaction_owner.js").read_text(encoding="utf-8")
+        self.assertIn("applyFeatureVisualOverrideTransaction(targetIds, null,", click_owner_content)
 
         self.assertIn('import { resolveFeatureColor } from "../color_resolver.js";', owner_content)
         self.assertIn("export function createColorResolutionStrategyOwner({", owner_content)

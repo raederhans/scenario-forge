@@ -15,6 +15,14 @@ from typing import Callable
 from map_builder import config as cfg
 
 
+def _configured_source_paths(output_dir: Path) -> list[Path]:
+    return [
+        output_dir / value
+        for name, value in vars(cfg).items()
+        if name.endswith("_FILENAME") and isinstance(value, str)
+    ]
+
+
 ComputeStageSignature = Callable[..., str]
 ShouldSkipStage = Callable[..., bool]
 UpdateStageCache = Callable[..., None]
@@ -74,6 +82,7 @@ def run_ru_city_detail_topology(
             patch_script,
             source_topology,
             ru_adm2_path,
+            *_configured_source_paths(output_dir),
             project_root / "map_builder" / "config.py",
             project_root / "map_builder" / "geo" / "topology.py",
         ],
@@ -113,6 +122,8 @@ def run_ru_city_detail_topology(
             record_stage_timing_func(stage_timings, stage_name, stage_start, failed=True)
         return
     if build_stage_cache is not None:
+        # Keep the pre-build identity: concurrent input changes must invalidate
+        # the result. Newly downloaded sources can cause one conservative miss.
         update_stage_cache_func(
             cache_payload=build_stage_cache,
             stage_name=stage_name,
@@ -174,6 +185,7 @@ def run_na_detail_topology(
             patch_script,
             source_topology,
             primary_topology,
+            *_configured_source_paths(output_dir),
             project_root / "map_builder" / "config.py",
             project_root / "map_builder" / "geo" / "topology.py",
             project_root / "map_builder" / "geo" / "spherical_safety.py",

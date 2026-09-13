@@ -14,8 +14,15 @@ export function createGeometryRasterWorkerClient({
 } = {}) {
   let disabled = false;
   let active = null;
-  let sceneKey = null;
+  // geometryStoreKey: tracks which scene the worker's geometry store belongs to.
+  // This is the sceneKey supplied by the runtime owner (activeScenarioId +
+  // sceneGeneration only), NOT the full frame identity, so that topology/data
+  // generation changes and same-scene chunk arrivals do NOT reset uploads.
+  let geometryStoreKey = null;
+  // geometryRefs: tracks the geometry object last uploaded per id. Used to
+  // compute incremental diffs and to release departed entry ids.
   let geometryRefs = new Map();
+  let geometryIdsByKind = new Map();
   const queued = new Map();
   const liveTaskIds = new Set();
   const metric = (...args) => {
@@ -47,18 +54,35 @@ export function createGeometryRasterWorkerClient({
     const startedAt = performance.now();
     let result = null;
     try {
-      const resetGeometry = sceneKey !== task.input.sceneKey;
+      const resetGeometry = geometryStoreKey !== task.input.sceneKey;
       const savedRefs = resetGeometry ? new Map() : geometryRefs;
       const updates = [];
       const nextRefs = new Map(savedRefs);
+      const nextIdsByKind = resetGeometry ? new Map() : new Map(geometryIdsByKind);
+      nextIdsByKind.set(task.input.kind, new Set(task.input.entries.map((entry) => entry.id)));
+      const retainedIds = new Set([...nextIdsByKind.values()].flatMap((ids) => [...ids]));
+
+      // Build geometry updates for entries that changed or are new.
       const entries = task.input.entries.map(({ feature, ...entry }) => {
         if (!feature?.geometry) throw new TypeError(`Missing raster geometry: ${entry.id}`);
         if (savedRefs.get(entry.id) !== feature.geometry) {
           updates.push({ id: entry.id, feature });
-          nextRefs.set(entry.id, feature.geometry);
         }
+        nextRefs.set(entry.id, feature.geometry);
         return entry;
       });
+
+      // Political overscan and hit candidates differ. Retain their active union
+      // so alternating surfaces does not evict and re-upload each other's paths.
+      if (!resetGeometry) {
+        for (const [id] of savedRefs) {
+          if (!retainedIds.has(id)) {
+            updates.push({ id, feature: null });
+            nextRefs.delete(id);
+          }
+        }
+      }
+
       const { identity: _identity, ...input } = task.input;
       result = await client.dispatchTask("RENDER_GEOMETRY", {
         packet: { ...input, entries, geometryUpdates: updates, resetGeometry },
@@ -69,10 +93,12 @@ export function createGeometryRasterWorkerClient({
         return;
       }
       if (!result?.bitmap) throw new Error("Missing geometry raster bitmap.");
-      sceneKey = task.input.sceneKey;
+      geometryStoreKey = task.input.sceneKey;
       geometryRefs = nextRefs;
+      geometryIdsByKind = nextIdsByKind;
       metric("geometryWorkerRoundTrip", performance.now() - startedAt, {
-        kind: task.input.kind, geometryUploads: updates.length, entries: entries.length,
+        kind: task.input.kind, geometryUploads: updates.filter((update) => update.feature).length,
+        geometryRemovals: updates.filter((update) => !update.feature).length, retainedGeometryCount: nextRefs.size, entries: entries.length,
         workerMs: result?.renderMs || 0, pathBuildCount: result?.pathBuildCount || 0,
         yieldCount: result?.yieldCount || 0,
       });
@@ -81,8 +107,9 @@ export function createGeometryRasterWorkerClient({
       closeResult(result);
       // A failed worker may have only applied part of an upload. Do not reuse
       // that acknowledgement, or retry endlessly on an unsupported browser.
-      sceneKey = null;
+      geometryStoreKey = null;
       geometryRefs.clear();
+      geometryIdsByKind.clear();
       disabled = true;
       metric("geometryWorkerFallback", 0, { reason: String(error?.message || error), kind: task.input?.kind });
       task.resolve(null);
@@ -127,7 +154,8 @@ export function createGeometryRasterWorkerClient({
     queued.clear();
     client.terminate();
     geometryRefs.clear();
-    sceneKey = null;
+    geometryIdsByKind.clear();
+    geometryStoreKey = null;
   }
 
   return { available, request, dispose, getQueueSize: () => queued.size + Number(!!active) };

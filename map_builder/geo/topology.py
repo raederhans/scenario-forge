@@ -19,6 +19,7 @@ from map_builder.geo.spherical_safety import (
     validate_primary_polar_water_topology,
 )
 from map_builder.geo.utils import round_geometries
+from map_builder.geo.france_topology_precision import preserve_france_topology_precision
 from map_builder.geo.water_region_authority import compile_named_water_regions
 from map_builder.geo.water_geometry import replace_water_topology_object
 from map_builder.geo.water_validation import validate_water_runtime
@@ -440,7 +441,16 @@ def build_topology(
         gdf = prune_columns(gdf, name)
         gdf = scrub_geometry(gdf)
         if name != "water_regions":
+            # French coverage is encoded losslessly after the global grid pass.
+            # Per-feature rounding here would already destroy that coverage.
+            fr_mask = (
+                gdf["id"].astype(str).str.startswith("FR_ARR_")
+                if name == "political" and "id" in gdf.columns else None
+            )
+            original_fr = gdf.loc[fr_mask, "geometry"].copy() if fr_mask is not None else None
             gdf = round_geometries(gdf)
+            if original_fr is not None:
+                gdf.loc[fr_mask, "geometry"] = original_fr
         # Rounding can create self-intersections on tight rings; scrub again.
         gdf = scrub_geometry(gdf)
         if name == "water_regions":
@@ -654,6 +664,7 @@ def build_topology(
     print(f"  - Sample geometry IDs: {sample_ids}")
 
     # ── Write final output ───────────────────────────────────────
+    topo_dict = preserve_france_topology_precision(topo_dict, cleaned_political)
     topo_json = json.dumps(topo_dict, separators=(",", ":"))
     output_path.write_text(topo_json, encoding="utf-8")
 

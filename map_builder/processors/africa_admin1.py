@@ -290,7 +290,10 @@ def _build_geo_boundaries_features(
     )
 
 
-def apply_africa_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+def apply_africa_admin1_replacement(
+    detail_gdf: gpd.GeoDataFrame,
+    country_codes: set[str] | list[str] | tuple[str, ...] | None = None,
+) -> gpd.GeoDataFrame:
     if detail_gdf.empty:
         return detail_gdf
     if "cntr_code" not in detail_gdf.columns:
@@ -298,13 +301,22 @@ def apply_africa_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoData
         return detail_gdf
 
     target_codes = set(cfg.AFRICA_BASIC_NE_COUNTRIES.keys()) | set(cfg.AFRICA_BASIC_GB_OVERRIDES.keys())
+    if country_codes is None:
+        selected_codes = set(target_codes)
+    else:
+        selected_codes = {str(code).strip().upper() for code in country_codes}
+        unknown = selected_codes - target_codes
+        if unknown:
+            raise ValueError(f"[Africa] Unknown country_codes: {sorted(unknown)}")
+    if not selected_codes:
+        return detail_gdf
     normalized_codes = detail_gdf["cntr_code"].fillna("").astype(str).str.upper().str.strip()
-    base = detail_gdf[~normalized_codes.isin(target_codes)].copy()
+    base = detail_gdf[~normalized_codes.isin(selected_codes)].copy()
     base = ensure_crs(base)
 
     primary_shell_source = _load_primary_political_shells()
     shells: dict[str, object] = {}
-    for code in sorted(cfg.AFRICA_BASIC_NE_COUNTRIES):
+    for code in sorted(selected_codes & set(cfg.AFRICA_BASIC_NE_COUNTRIES)):
         shell = _get_country_shell(detail_gdf, code, label="detail")
         if shell is None and not primary_shell_source.empty:
             shell = _get_country_shell(primary_shell_source, code, label="primary")
@@ -315,6 +327,8 @@ def apply_africa_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoData
 
     outputs: list[gpd.GeoDataFrame] = [base]
     for iso_code, expected_count in cfg.AFRICA_BASIC_NE_COUNTRIES.items():
+        if iso_code not in selected_codes:
+            continue
         print(f"[Africa] Building Natural Earth admin1 detail for {iso_code}...")
         country_gdf = _build_ne_country_features(
             ne_admin1,
@@ -326,6 +340,8 @@ def apply_africa_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoData
         outputs.append(country_gdf)
 
     for iso_code, spec in cfg.AFRICA_BASIC_GB_OVERRIDES.items():
+        if iso_code not in selected_codes:
+            continue
         print(f"[Africa] Building geoBoundaries admin1 detail for {iso_code}...")
         country_gdf = _build_geo_boundaries_features(
             iso_code,
@@ -340,6 +356,6 @@ def apply_africa_admin1_replacement(detail_gdf: gpd.GeoDataFrame) -> gpd.GeoData
         raise SystemExit(f"[Africa] Duplicate IDs detected after replacement: {dupes}")
     print(
         "[Africa] Replacement complete: "
-        f"countries={len(target_codes)}, total={len(combined)}"
+        f"countries={len(selected_codes)}, total={len(combined)}"
     )
     return combined
