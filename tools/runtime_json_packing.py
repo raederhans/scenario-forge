@@ -21,6 +21,14 @@ def compact_json_bytes(raw: bytes) -> bytes:
     return _JSON_TOKEN_OR_SPACE.sub(lambda match: match[1] or b"", raw)
 
 
+def portable_gzip_bytes(raw: bytes) -> bytes:
+    encoded = gzip.compress(raw, compresslevel=6, mtime=0)
+    # Python 3.11/3.12 delegates mtime=0 to zlib, leaking its platform OS byte.
+    # Match Python 3.13's portable header so chunk digests and startup manifests
+    # do not change between Windows and Linux. Deflate data and CRC stay intact.
+    return encoded[:9] + b"\xff" + encoded[10:]
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_bytes(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
@@ -203,7 +211,7 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
             if path.suffix not in _JSON_SUFFIXES or not path.is_file():
                 raise ValueError(f"Missing or unsupported published chunk: {url}")
             decoded = path.read_bytes()
-            encoded = gzip.compress(decoded, compresslevel=6, mtime=0)
+            encoded = portable_gzip_bytes(decoded)
             encoded_path = path.with_name(path.name + ".gz")
             encoded_path.write_bytes(encoded)
             chunk.update(
@@ -232,7 +240,7 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
     for path in sorted(data_root.rglob("*.json.gz")):
         plain = path.with_suffix("")
         if plain.is_file() and plain.resolve() not in excluded:
-            path.write_bytes(gzip.compress(plain.read_bytes(), compresslevel=6, mtime=0))
+            path.write_bytes(portable_gzip_bytes(plain.read_bytes()))
 
     manifest_path = data_root / "manifest.json"
     if manifest_path.is_file():

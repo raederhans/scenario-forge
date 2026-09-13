@@ -8,11 +8,82 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from tools.runtime_json_packing import compact_json_bytes, pack_published_runtime_data
+from tools.runtime_json_packing import compact_json_bytes, pack_published_runtime_data, portable_gzip_bytes
 from tools.political_detail_partition import partition_political_detail_features
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_portable_gzip_has_fixed_mtime_and_os_header(self):
+        raw = b'{"geometry":{"type":"Point","coordinates":[1.25,-0.0]}}'
+        native_compress = gzip.compress
+        outputs = []
+        for native_os in (3, 10):
+            def native_header(data, *args, **kwargs):
+                encoded = bytearray(native_compress(data, *args, **kwargs))
+                encoded[9] = native_os
+                return bytes(encoded)
+
+            with self.subTest(native_os=native_os), patch('tools.runtime_json_packing.gzip.compress', side_effect=native_header):
+                encoded = portable_gzip_bytes(raw)
+                self.assertEqual(encoded[4:8], b'\x00' * 4)
+                self.assertEqual(encoded[9], 255)
+                self.assertEqual(gzip.decompress(encoded), raw)
+                self.assertEqual(portable_gzip_bytes(raw), encoded)
+                outputs.append(encoded)
+        self.assertEqual(outputs[0], outputs[1])
+
+    def test_packed_artifacts_identical_across_native_gzip_os_headers(self):
+        runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp/integration-20260913'
+        runtime.mkdir(parents=True, exist_ok=True)
+        native_compress = gzip.compress
+        raw = b'{ "type": "FeatureCollection", "features": [{"id":"a","properties":{"name":"A"},"geometry":{"type":"Point","coordinates":[1.234567890123456789,-0.0]}}] }'
+        old_digest = 'a' * 64
+        packed_files = []
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            for native_os in (3, 10):
+                app = Path(temporary) / str(native_os)
+                scenario = app / 'data/scenarios/test'
+                chunks = scenario / 'chunks'
+                chunks.mkdir(parents=True)
+                chunk = chunks / 'political.detail.country.a.json'
+                chunk.write_bytes(raw)
+                detail_manifest = scenario / 'detail_chunks.manifest.json'
+                detail_manifest.write_text(json.dumps({'chunks': [{'id': 'a', 'url': 'data/scenarios/test/chunks/' + chunk.name, 'byte_size': len(raw)}]}), encoding='utf-8')
+                (scenario / 'manifest.json').write_text(json.dumps({'source': {'detail_chunk_manifest_sha256': old_digest}}), encoding='utf-8')
+                startup = scenario / 'startup.bundle.en.json'
+                startup.write_text(json.dumps({'source': {'detail_chunk_manifest_sha256': old_digest}, 'geometry': json.loads(raw)}), encoding='utf-8')
+                startup_gzip = startup.with_suffix('.json.gz')
+                startup_gzip.write_bytes(native_compress(startup.read_bytes(), mtime=0))
+                output_names = ['scenarios/test/' + name for name in ('detail_chunks.manifest.json', 'manifest.json', 'startup.bundle.en.json', 'startup.bundle.en.json.gz')]
+                delivery_manifest = app / 'data/manifest.json'
+                delivery_manifest.write_text(json.dumps({'outputs': {name: {'size_bytes': 0, 'sha256': 'old'} for name in output_names}}), encoding='utf-8')
+
+                def native_header(data, *args, **kwargs):
+                    encoded = bytearray(native_compress(data, *args, **kwargs))
+                    encoded[9] = native_os
+                    return bytes(encoded)
+
+                with self.subTest(native_os=native_os), patch('tools.runtime_json_packing.gzip.compress', side_effect=native_header) as compress:
+                    result = pack_published_runtime_data(app)
+                    self.assertEqual(result['gzip_chunk_count'], 1)
+                    self.assertGreaterEqual(compress.call_count, 2)
+                metadata = json.loads(detail_manifest.read_bytes())['chunks'][0]
+                encoded_chunk = (app / metadata['url']).read_bytes()
+                self.assertEqual(gzip.decompress(encoded_chunk), compact_json_bytes(raw))
+                self.assertEqual(json.loads(gzip.decompress(encoded_chunk)), json.loads(raw))
+                self.assertEqual(metadata['sha256'], hashlib.sha256(encoded_chunk).hexdigest())
+                self.assertEqual(gzip.decompress(startup_gzip.read_bytes()), startup.read_bytes())
+                bundle = json.loads(startup.read_bytes())
+                self.assertEqual(bundle['geometry'], json.loads(raw))
+                self.assertEqual(bundle['source']['detail_chunk_manifest_sha256'], hashlib.sha256(detail_manifest.read_bytes()).hexdigest())
+                for name, record in json.loads(delivery_manifest.read_bytes())['outputs'].items():
+                    artifact = (app / 'data' / name).read_bytes()
+                    self.assertEqual(record['size_bytes'], len(artifact))
+                    self.assertEqual(record['sha256'], hashlib.sha256(artifact).hexdigest())
+                packed_files.append({path.relative_to(app).as_posix(): path.read_bytes() for path in app.rglob('*') if path.is_file()})
+        # Compare every file, including chunk gzip, startup gzip and dependent manifests.
+        self.assertEqual(packed_files[0], packed_files[1])
+
     def test_partition_uses_exact_token_cost_for_preserved_escapes_and_numbers(self):
         features = [{'type': 'Feature', 'properties': {'id': str(i), 'name': '中' * 20},
                      'geometry': {'type': 'Point', 'coordinates': [i, 0]}} for i in range(2)]
