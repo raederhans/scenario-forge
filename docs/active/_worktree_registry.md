@@ -1,21 +1,37 @@
 # Worktree Registry
 
-## 当前导航（2026-09-11）
+## 当前拓扑（2026-09-17）
 
-这里只维护当前工作入口。分支、远端、进程和验收状态的历史快照统一见下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
+这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| [区域数据、渲染与分块整合](data-performance-integration-20260913/task.md) / [PR #136](https://github.com/raederhans/scenario-forge/pull/136) | 2026-09-13 用户授权合并推送全部待交付产品改动；分支 `codex/data-performance-integration-20260913`，基于 `main@29988776`。含 FR/DE/BE/NL 精度、增量构建与渲染、无损发布打包及同步 dist。contours 工作树作为干净历史证据保留；最终远端合并和 CI 状态直接以 PR 回执为准，表内提交基线不是当前 main 的声明。 |
-| [架构与城市点位整合](global-state-boundaries-20260912/task.md) / [PR #135](https://github.com/raederhans/scenario-forge/pull/135) | 整合提交3fd7478，状态策略真实checker、城市49项目标测试与dist已通过；远端必需检查和合并回执以PR为准。法德地块为未发布隔离试点，保留候选与证据；保留干净contours证据工作树及.playwright-mcp。 |
-| [9 月 11 日整批改动整合](daily-integration-20260911/task.md) | 用户授权合并当天全部产品改动；分支 `codex/daily-integration-20260911`，基于已合并 PR #131 的 `d25da73a`。覆盖城市灯光、海洋几何、亚特兰托帕、UI 与国家名称；远端检查和合并回执以关联 PR 为准。保留 contours 工作树及历史诊断文件。 |
-| [近期地图改动整合](cartography-integration-20260910/task.md) | 整合等值线P1–P4、城区渲染、TNO地名及地中海补缝；本地目标测试、三剧本严格契约、dist及两组地图检查通过。交付分支codex/cartography-integration-20260910，main与远端检查状态以任务回执为准；原工作区和contours证据工作区保留。 |
-| [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) / [PR #127](https://github.com/raederhans/scenario-forge/pull/127) | 本轮导入事务、调度生命周期、城市身份及发布产物改进已完成本地验证。用户已授权远端合并推送和工作树清理；必需检查、合并与清理结果以该任务及下方回执为准。完整 P4 未准入。 |
-| [恢复后续 R0 / T1 / U1 / P1](recovery-followup-20260908/task.md) | PR #123 已合并，但自动部署因 tracked dist 漂移失败。当前先闭合产物与夹具，再开展导入反馈和单热点性能改进；状态以任务记录为准。 |
-| [M4 完成记录](development-recovery-m4-20260908/task.md) / [整合 PR #123](https://github.com/raederhans/scenario-forge/pull/123) | 本地实现与验收完成，功能提交 `1decb144` 已推送集成分支；远端检查和合并状态以 PR 为准。保留其他证据工作树和未归属 WIP。 |
-| [快速治理任务](development-loop-simplification-20260905/task.md) / [交接与所有权](development-loop-simplification-20260905/context.md) | 维护已集成的 deeper stages 1–4 和新一轮 1–4 项的进度；新一轮并行任务尚未完成，不在这里提前验收。 |
-| [P4 当前状态](state-action-ownership-p4-20260719/task.md#current-status) | 区分 P4.4 本地实现、正式 admission 与发布；这里不复制第二份阶段结论。 |
-| [历史 registry 正文](../archive/worktree-registry-history-through-20260831.md) | 完整保留原登记、提交、验收、恢复与清理证据；下方保留原标题锚点并指向对应历史段落。 |
+| `C:/Users/raede/Desktop/dev/mapcreator` / `main` | 唯一注册工作树；本轮清理前后均以 `origin/main` 为上游。除本次 registry 收尾外，不含待整合代码。 |
+| `.playwright-mcp/` | 主工作区中的未跟踪、未归属内容；本轮按 WIP 保护规则保留，不把它当作可清理缓存。 |
+| `.runtime/tmp/worktree-cleanup-20260917/recovery.md` | 本轮删除前的精确 branch/tip 恢复清单；属于忽略的本地运行证据，不参与产品提交。 |
+
+## 2026-09-17 分支与工作树清理回执
+
+清理前，12 个非 `main` 本地分支均经 `git merge-base --is-ancestor <branch> main` 证明为主线祖先，且 `git cherry main <branch>` 没有 `+` 提交，因此无需再次合并。对应的 9 个远端分支均有已合并 PR（#128–#136 中的相关交付）；本轮已删除这些本地和远端分支。
+
+额外工作树 `C:/Users/raede/Desktop/dev/mapcreator-contours` 在 tip `5d656c9ce61085170b28427dde19e7295e897250` 上无已跟踪或未跟踪改动，也无占用进程；该 tip 已通过 PR #131 进入 `main`。本轮删除此工作树及其中可再生成的 dist 数据、运行证据、Python 缓存和 `node_modules` junction。主工作区的 `.playwright-mcp/` 未动。
+
+另有手工 remote-tracking ref `recovery/auditfix` 指向不在 `main` 祖先链上的提交 `872e4a50bb1d03a5850e37545ef7e999f19f1215`，但仓库并无名为 `recovery` 的远端。为避免把唯一恢复点误删，本轮将它改存为已推送标签 `archive/worktree-cleanup-20260917/auditfix`，再删除旧的伪远端引用。
+
+## 近期已合并交付索引
+
+下列入口仅用于查阅交付历史，不表示仍有活跃工作树或分支。
+
+| 任务记录 | 已合并回执 |
+| --- | --- |
+| [区域数据、渲染与分块整合](data-performance-integration-20260913/task.md) | [PR #136](https://github.com/raederhans/scenario-forge/pull/136) |
+| [架构与城市点位整合](global-state-boundaries-20260912/task.md) | [PR #135](https://github.com/raederhans/scenario-forge/pull/135) |
+| [9 月 11 日整批改动整合](daily-integration-20260911/task.md) | [PR #132](https://github.com/raederhans/scenario-forge/pull/132) |
+| [近期地图改动整合](cartography-integration-20260910/task.md) | [PR #131](https://github.com/raederhans/scenario-forge/pull/131) |
+| [编辑器改进与远端整合清理](editor-kernel-renewal-20260909/task.md) | [PR #127](https://github.com/raederhans/scenario-forge/pull/127) |
+| [恢复后续 R0 / T1 / U1 / P1](recovery-followup-20260908/task.md) / [M4 完成记录](development-recovery-m4-20260908/task.md) | [PR #123](https://github.com/raederhans/scenario-forge/pull/123)–[PR #126](https://github.com/raederhans/scenario-forge/pull/126) |
+| [快速治理任务](development-loop-simplification-20260905/task.md) / [P4 当前状态](state-action-ownership-p4-20260719/task.md#current-status) | 长期治理与 admission 参考，不声明分支或发布状态。 |
+| [历史 registry 正文](../archive/worktree-registry-history-through-20260831.md) | 完整保留原登记、提交、验收、恢复与清理证据。 |
 
 2026-09-06 收尾核对：功能整合提交 `a2adc4b627b0f0b6ad88c5ed04d68eae3f1ad15c`，包含此前治理、scenario 和 renderer 工作。本地 core74、官方策略生成与标准 checker（零违规）、Pages 构建和相关目标测试已通过；主分支接收以该分支 PR 的远端必需检查及合并回执为准，不代表正式 P4 B admission。个人 `.codex/config.toml` 修改保留在主工作区。
 
