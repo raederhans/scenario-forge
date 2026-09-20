@@ -24,6 +24,7 @@
       "tests/test_physical_context_contours.py",
       "tests/test_physical_water_mask.py",
       "tests/test_polar_water_spherical_safety.py",
+      "tests/test_political_display_lods.py",
       "tests/test_political_topology_gap_contract.py",
       "tests/test_regional_basic_processors.py",
       "tests/test_regional_boundary_alignment.py",

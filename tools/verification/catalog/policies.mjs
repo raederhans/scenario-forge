@@ -97,6 +97,7 @@ export const CATALOG_POLICIES = {
           "tests/test_local_canonicalization.py",
           "tests/test_pages_dist_startup_shell_heavy.py",
           "tests/test_political_topology_gap_contract.py",
+          "tests/test_political_display_lods.py",
           "tests/test_polar_water_spherical_safety.py",
           "tests/test_transport_country_source_contracts.py",
           "tests/test_physical_water_mask.py",

@@ -18,7 +18,7 @@ export function createPrecisionScalingRecords(existingRecords) {
       "tools/build_political_display_lods.py", "tests/test_political_display_lods.py",
     ]],
     ["routes", "test-routing", "node --test tests/precision_scaling_verification_records.test.mjs", [
-      "tools/verification/catalog/records/precision_scaling.mjs", "tools/verification/verification_catalog_source.mjs", "tests/precision_scaling_verification_records.test.mjs",
+      "tools/verification/catalog/records/precision_scaling.mjs", "tests/precision_scaling_verification_records.test.mjs",
       "docs/active/precision-scaling-implementation-20260920/results.md",
     ]],
   ];
