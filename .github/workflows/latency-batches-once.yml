@@ -17,7 +17,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Apply verified owner extraction and precise superseded-contract repairs
+      - name: Install locked Node dependencies before the architecture checker
+        run: npm ci
+      - name: Apply verified extraction and preserve all relevant contracts
         shell: bash
         run: |
           python - <<'PY'
@@ -51,15 +53,13 @@ jobs:
           assert s.count(old)==2,s.count(old)
           s=s.replace(old,new)
           p.write_text(s)
-          # The existing negative FrameGraph contract remains intact; extracting
-          # the new owner removes its accidental cross-function regex match.
           assert 'self.assertNotRegex(promotion_source, r"executionPlan:' in s
           (out/'verified-followup.json').write_text(json.dumps(checks,indent=2))
           PY
           git diff --check
-          node --test tests/latency_*_behavior.test.mjs > .runtime/tmp/latency-batches-ci/focused-node.log
-          python -m unittest tests.test_scenario_chunk_refresh_contracts tests.test_map_renderer_render_pipeline_passes_boundary_contract tests.test_main_deferred_detail_promotion_boundary_contract -q > .runtime/tmp/latency-batches-ci/existing-python.log 2>&1
-          npm run verify:architecture-boundaries > .runtime/tmp/latency-batches-ci/architecture.log 2>&1
+          node --test tests/latency_*_behavior.test.mjs | tee .runtime/tmp/latency-batches-ci/focused-node.log
+          python -m unittest tests.test_scenario_chunk_refresh_contracts tests.test_map_renderer_render_pipeline_passes_boundary_contract tests.test_main_deferred_detail_promotion_boundary_contract -q 2>&1 | tee .runtime/tmp/latency-batches-ci/existing-python.log
+          npm run verify:architecture-boundaries 2>&1 | tee .runtime/tmp/latency-batches-ci/architecture.log
           node tools/build_test_import_graph.mjs
       - name: Commit only reviewed owner extraction and generated graph
         shell: bash
@@ -67,13 +67,12 @@ jobs:
           git add -- js/core/map_renderer/scenario_refresh_runtime.js js/core/map_renderer/scenario_deferred_refresh_owner.js tools/verification/catalog/records/precision_scaling.mjs tests/test_scenario_chunk_refresh_contracts.py tests/e2e/test-import-graph.json
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Separate scoped refresh owner and retain intent-aware boundary contracts'
           git push origin HEAD:refs/heads/codex/latency-batches-1-2-20260920
-      - name: Install locked test dependencies
+      - name: Install existing Python and browser verification dependencies
         shell: bash
         run: |
-          npm ci
           python -m pip install -r requirements-perf.lock.txt
           npx playwright install --with-deps chromium
-      - name: Verify remaining runtime and application behavior
+      - name: Verify runtime and application behavior
         shell: bash
         run: |
           python - <<'PY'
@@ -110,7 +109,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: latency-batches-validation-followup
+          name: latency-batches-validation-final
           path: |
             .runtime/tmp/latency-batches-ci/**
             .runtime/tests/playwright/**
