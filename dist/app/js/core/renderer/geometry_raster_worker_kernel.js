@@ -117,8 +117,21 @@ export function createGeometryRasterWorkerKernel({
     let renderedCount = 0;
     let pathBuildCount = 0;
     let yieldCount = 0;
-    let sliceStartedAt = now();
+    let pathAdmissionSkips = 0;
     const entries = packet.entries || [];
+    const frameGeometryIds = new Set(entries.map((entry) => entry.id));
+    // Reserve the paths this frame can already reuse, once per ID. Touching
+    // them first leaves inactive paths at the LRU front. Only admit misses
+    // into the remaining byte budget, so an early miss cannot evict a later
+    // hit and turn every over-budget, same-order frame into a full rebuild.
+    // This retains references only in the existing cache, never a second
+    // frame-sized Path2D store, and never changes painter order or geometry.
+    let framePathWeight = 0;
+    for (const id of frameGeometryIds) {
+      const cached = paths.get(id);
+      if (cached) framePathWeight += cached.estimatedBytes;
+    }
+    let sliceStartedAt = now();
     for (let index = 0; index < entries.length; index += 1) {
       if (index % Math.max(1, batchSize) === 0) {
         // Cached paths are cheap: yielding for every 64 features added hundreds
@@ -141,7 +154,16 @@ export function createGeometryRasterWorkerKernel({
         } finally {
           pathGenerator.context(null);
         }
-        paths.set(entry.id, { path, estimatedBytes: getGeometryRetentionWeights(feature).path });
+        const estimatedBytes = getGeometryRetentionWeights(feature).path;
+        if (estimatedBytes > paths.budget) {
+          // Preserve the cache's oversized-skip accounting; draw transiently.
+          paths.set(entry.id, { path, estimatedBytes });
+        } else if (framePathWeight + estimatedBytes <= paths.budget) {
+          paths.set(entry.id, { path, estimatedBytes });
+          framePathWeight += estimatedBytes;
+        } else {
+          pathAdmissionSkips += 1;
+        }
         pathBuildCount += 1;
       }
       context.fillStyle = entry.fillColor;
@@ -162,10 +184,11 @@ export function createGeometryRasterWorkerKernel({
     // Current-frame geometry is pinned; a genuinely huge visible frame may
     // exceed the target. Retire inactive geometry and acknowledge it so the
     // client can re-upload it on a later view without disabling the worker.
-    const evictedGeometryIds = geometries.trim(new Set(entries.map((entry) => entry.id)));
+    const evictedGeometryIds = geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
     return { bitmap, kind: packet.kind, width, height, renderedCount, pathBuildCount, yieldCount, unpackingMs,
-      evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(), paths: paths.getStats() }, renderMs: now() - startedAt };
+      evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),
+        paths: { ...paths.getStats(), frameAdmissionSkips: pathAdmissionSkips } }, renderMs: now() - startedAt };
   }
 
   return { render };
