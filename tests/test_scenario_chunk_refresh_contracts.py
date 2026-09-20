@@ -561,7 +561,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         self.assertNotIn("forcePoliticalFullRepaint", self.map_renderer_source)
         self.assertNotIn("detail-promotion-force", self.map_renderer_source)
         self.assertIn(
-            "refreshMapDataForScenarioApply({ suppressRender: true });",
+            'suppressRender: true, refreshKind: "deferred-detail", previousRefreshState,',
             self.deferred_detail_promotion_source,
         )
         detail_refresh_source = self.deferred_detail_promotion_source[
@@ -573,7 +573,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             detail_refresh_source.index("setMapData({", detail_refresh_source.index("if (hasActiveScenario) {"))
         ]
         self.assertIn(
-            "refreshMapDataForScenarioApply({ suppressRender: true });",
+            'suppressRender: true, refreshKind: "deferred-detail", previousRefreshState,',
             active_scenario_refresh_source,
         )
         self.assertNotIn("setMapData(", active_scenario_refresh_source)
@@ -593,7 +593,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
                 r"let mapDataRefreshed = false;[\s\S]*?"
                 r"if \(applyMapData\) \{[\s\S]*?"
                 r"applyDetailPromotionMapRefresh\([\s\S]*?"
-                r"mapDataRefreshed = true;[\s\S]*?"
+                r'mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";[\s\S]*?'
                 r"runtimeState\.detailPromotionCompleted = true;[\s\S]*?"
                 r"if \(mapDataRefreshed\) \{[\s\S]*?"
                 r"schedulePostReadyPoliticalReconcile\?\.\(\"detail-topology-ready\"\);",
@@ -604,7 +604,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.deferred_detail_promotion_source,
             re.compile(
                 r"const refreshMode = applyDetailPromotionMapRefresh\([\s\S]*?"
-                r"mapDataRefreshed = true;[\s\S]*?"
+                r'mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";[\s\S]*?'
                 r"if \(mapDataRefreshed\) \{\s*"
                 r"schedulePostReadyPoliticalReconcile\?\.\(\"detail-topology-promoted\"\);",
                 re.S,

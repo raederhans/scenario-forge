@@ -49,7 +49,7 @@ export function createPrecisionScalingRecords(existingRecords) {
       "js/core/renderer/geometry_raster_runtime_owner.js", "tests/latency_bulk_worker_behavior.test.mjs",
     ]],
     ["refresh-scope", "node --test tests/latency_scoped_refresh_behavior.test.mjs", [
-      "js/core/map_renderer/scenario_refresh_scope.js", "js/core/map_renderer/scenario_refresh_runtime.js",
+      "js/core/map_renderer/scenario_refresh_scope.js", "js/core/map_renderer/scenario_deferred_refresh_owner.js", "js/core/map_renderer/scenario_refresh_runtime.js",
       "js/core/scenario/scenario_renderer_bridge.js", "js/bootstrap/deferred_detail_promotion.js",
       "tests/latency_scoped_refresh_behavior.test.mjs",
     ]],
