@@ -44492,7 +44492,7 @@
     },
     {
       "path": "app/js/core/renderer/geometry_raster_worker_kernel.js",
-      "size_bytes": 7211,
+      "size_bytes": 8369,
       "source_kind": "dist"
     },
     {
@@ -46437,7 +46437,7 @@
       {
         "file_count": 273,
         "id": "startup-critical",
-        "size_bytes": 5340942
+        "size_bytes": 5342100
       },
       {
         "file_count": 100,
@@ -64190,11 +64190,11 @@
         "deferred_graph_file_count": 130,
         "deferred_module_count": 128,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5329926,
+        "initial_graph_bytes": 5331084,
         "initial_graph_file_count": 307,
         "initial_module_count": 294,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4238965,
+        "initial_script_bytes": 4240123,
         "initial_script_count": 296,
         "module_count": 429,
         "registry_resolved_dynamic_expression_count": 2,
@@ -64635,7 +64635,7 @@
           },
           {
             "path": "app/js/core/renderer/geometry_raster_worker_kernel.js",
-            "size_bytes": 7211
+            "size_bytes": 8369
           },
           {
             "path": "app/js/core/renderer/intensity_field_mask_owner.js",
@@ -65207,7 +65207,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3182534
+        "size_bytes": 3183692
       },
       {
         "basis": "startup-resource-graph",
@@ -66969,7 +66969,7 @@
     {
       "file_count": 9202,
       "path": "app",
-      "size_bytes": 568427256
+      "size_bytes": 568428414
     },
     {
       "file_count": 57,
@@ -67002,5 +67002,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 575412094
+  "total_bytes": 575413252
 }
