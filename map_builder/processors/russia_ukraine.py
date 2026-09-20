@@ -2,12 +2,32 @@
 from __future__ import annotations
 
 import geopandas as gpd
+import numpy as np
 import pandas as pd
-from shapely.geometry import box
 from shapely.ops import unary_union
 
 from map_builder import config as cfg
 from map_builder.io.fetch import fetch_or_load_geojson
+
+
+def _validate_russia_longitudes(gdf: gpd.GeoDataFrame) -> None:
+    """Accept source polygons on either side of the dateline without dropping land.
+
+    The pinned source already splits dateline parts. A crossing edge requires
+    explicit normalization upstream; clipping away the western part is not repair.
+    """
+    for index, geometry in gdf.geometry.items():
+        if geometry is None or geometry.is_empty or geometry.geom_type not in {"Polygon", "MultiPolygon"}:
+            raise ValueError(f"Russia ADM2 row {index} is not a nonempty polygon")
+        parts = [geometry] if geometry.geom_type == "Polygon" else geometry.geoms
+        for part in parts:
+            for ring in (part.exterior, *part.interiors):
+                coords = np.asarray(ring.coords)
+                if (not np.isfinite(coords).all() or np.any(np.abs(coords[:, 0]) > 180)
+                        or np.any(np.abs(coords[:, 1]) > 90)):
+                    raise ValueError(f"Russia ADM2 row {index} has invalid WGS84 coordinates")
+                if np.any(np.abs(np.diff(coords[:, 0])) > 180):
+                    raise ValueError(f"Russia ADM2 row {index} has an unsplit dateline edge")
 
 
 def _ensure_epsg4326(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -169,12 +189,7 @@ def apply_russia_ukraine_replacement(main_gdf: gpd.GeoDataFrame) -> gpd.GeoDataF
         ru_gdf = ru_gdf.set_crs("EPSG:4326", allow_override=True)
     if ru_gdf.crs.to_epsg() != 4326:
         ru_gdf = ru_gdf.to_crs("EPSG:4326")
-    # Clip to prevent dateline wrapping artifacts (keep Russia in Eastern Hemisphere)
-    clip_box = box(-20.0, 0.0, 179.99, 90.0)
-    try:
-        ru_gdf = gpd.clip(ru_gdf, clip_box)
-    except Exception as exc:
-        print(f"RU ADM2 clip failed; continuing without clip: {exc}")
+    _validate_russia_longitudes(ru_gdf)
     if "shapeID" not in ru_gdf.columns or "shapeName" not in ru_gdf.columns:
         raise ValueError(
             "Russia ADM2 dataset missing expected columns: shapeID/shapeName. "

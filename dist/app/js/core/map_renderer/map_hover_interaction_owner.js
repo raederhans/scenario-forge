@@ -86,6 +86,8 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
   let lastHoverOverlaySignature = "";
   let overlayFrame = null;
   let tooltipFrame = null;
+  let hoverHitFrame = null;
+  let pendingPointer = null;
   const getGlobal = getters.getGlobal || (() => globalThis);
 
   function scheduleFrame(callback) {
@@ -179,8 +181,25 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     applyTooltipState();
   }
   function cancelPendingHoverWork() {
+    hoverHitFrame?.cancel();
+    hoverHitFrame = null;
+    pendingPointer = null;
     cancelScheduledHoverOverlayRender();
     resetTooltipState();
+  }
+
+  function scheduleMouseMove(event) {
+    // DOM currentTarget is cleared after dispatch. The hit path supplies its
+    // own SVG target to d3.pointer, so retain only stable event coordinates.
+    pendingPointer = { clientX: event.clientX, clientY: event.clientY,
+      pageX: event.pageX, pageY: event.pageY };
+    if (hoverHitFrame) return;
+    hoverHitFrame = scheduleFrame(() => {
+      hoverHitFrame = null;
+      const pointer = pendingPointer;
+      pendingPointer = null;
+      if (pointer) handleMouseMove(pointer, { frameCoalesced: true });
+    });
   }
   function setMapInteractionCursor(nextCursor = "") {
     surfaceHost.getInteractionRect()?.style("cursor", nextCursor || null);
@@ -259,11 +278,11 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     return createSummary({ branch, hit, cursor, tooltipVisible: true });
   }
 
-  function handleMouseMove(event) {
+  function handleMouseMove(event, { frameCoalesced = false } = {}) {
     const now = getterApi.nowMs();
     const throttleMs = Number(state.MOUSE_THROTTLE_MS || 0);
     const lastMouseMoveTime = Number(state.lastMouseMoveTime || 0);
-    if (now - lastMouseMoveTime < throttleMs) {
+    if (!frameCoalesced && now - lastMouseMoveTime < throttleMs) {
       return createSummary({ branch: "throttled", skipped: true });
     }
     setLastMouseMoveTimeState(state, now);
@@ -340,6 +359,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
 
   return Object.freeze({
     handleMouseMove,
+    scheduleMouseMove,
     handleMapMouseLeave,
     getHoveredFacilityEntry,
     setHoveredFacilityEntry,

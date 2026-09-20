@@ -46,7 +46,8 @@ def _stored_edges(topology):
     return result
 
 
-def _assemble_candidate(baseline, replacements, source_countries):
+def _assemble_candidate(baseline, replacements, source_countries, *, boundary_tolerance=0.0,
+                        retained_enclave_countries=()):
     countries = {str(code).strip().upper() for code in source_countries}
     if not countries or any(len(code) != 2 or not code.isascii() or not code.isalpha() for code in countries):
         raise ValueError("Source countries must be explicit ISO2 source codes.")
@@ -85,7 +86,15 @@ def _assemble_candidate(baseline, replacements, source_countries):
                            for item in current.values()], crs="EPSG:4326")
     selected = old.copy()
     selected["geometry"] = [source_by_id[fid] for fid in old["id"].astype(str)]
-    selected, alignment = align_regional_boundaries(old, selected)
+    enclave_codes = set(retained_enclave_countries)
+    if enclave_codes & countries:
+        raise ValueError("Reviewed enclaves must be non-target source countries")
+    anchors = [item for item in rows if item["properties"].get("cntr_code") in enclave_codes]
+    if {item["properties"].get("cntr_code") for item in anchors} != enclave_codes:
+        raise ValueError("Every reviewed enclave must exist in the baseline")
+    selected, alignment = align_regional_boundaries(
+        old, selected, retained_hole_anchors=[_decode_geometry(absolute, item) for item in anchors])
+    alignment["retained_enclave_countries"] = sorted(enclave_codes)
     extent = box(*selected.total_bounds)
     protected = []
     for name in ("political", "scenario_water", "scenario_atlantropa"):
@@ -105,7 +114,8 @@ def _assemble_candidate(baseline, replacements, source_countries):
     if not land or any(g is None or not g.is_valid for g in land):
         raise ValueError("Published land mask must contain valid geometry.")
     protected.append(extent.difference(shapely.union_all(land)))
-    selected, constraints = constrain_candidate_surface_geometry(old, selected, shapely.union_all(protected))
+    selected, constraints = constrain_candidate_surface_geometry(
+        old, selected, shapely.union_all(protected), boundary_tolerance=boundary_tolerance)
     candidate, diagnostics = replace_regional_geometry(baseline, selected, source_countries=sorted(countries))
     precision_countries = baseline.get("political_precision_source_countries", [])
     if not isinstance(precision_countries, list) or any(
@@ -146,7 +156,8 @@ def _assemble_candidate(baseline, replacements, source_countries):
     return candidate, report
 
 
-def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Path, *, source_countries):
+def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Path, *, source_countries,
+                      boundary_tolerance=0.0, retained_enclave_countries=()):
     scenario_dir, replacement_geojson, output = scenario_dir.resolve(), replacement_geojson.resolve(), output.resolve()
     baseline_path = scenario_dir / "runtime_topology.topo.json"
     report_path = output.with_suffix(".report.json")
@@ -170,7 +181,9 @@ def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Pat
     }:
         raise ValueError("Replacement GeoJSON must use WGS84 / EPSG:4326.")
     replacements = gpd.GeoDataFrame.from_features(collection["features"], crs="EPSG:4326")
-    candidate, report = _assemble_candidate(read_json_strict(baseline_path), replacements, source_countries)
+    candidate, report = _assemble_candidate(read_json_strict(baseline_path), replacements, source_countries,
+                                          boundary_tolerance=boundary_tolerance,
+                                          retained_enclave_countries=retained_enclave_countries)
     report.update({"source_file": str(replacement_geojson), "baseline_runtime": str(baseline_path), "output": str(output)})
     write_json_atomic(output, candidate, indent=None, separators=(",", ":"), allow_nan=False)
     write_json_atomic(report_path, report, indent=2, allow_nan=False)
@@ -183,9 +196,14 @@ def main(argv=None):
     parser.add_argument("--replacement-geojson", required=True, type=Path)
     parser.add_argument("--source-countries", required=True, nargs="+")
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--boundary-tolerance", type=float, default=0.0,
+                        help="Explicit EPSG:4326 overlay residual band, at most 1e-9 degrees; never moves coordinates.")
+    parser.add_argument("--retain-enclave-countries", nargs="*", default=[],
+                        help="Reviewed non-target enclaves whose surrounding baseline coverage must survive source holes.")
     args = parser.parse_args(argv)
     report = prepare_candidate(args.scenario_dir, args.replacement_geojson, args.output,
-                               source_countries=args.source_countries)
+                               source_countries=args.source_countries, boundary_tolerance=args.boundary_tolerance,
+                               retained_enclave_countries=args.retain_enclave_countries)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

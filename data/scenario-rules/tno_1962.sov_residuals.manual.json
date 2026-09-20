@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "scenario_id": "tno_1962",
+  "notes": "User-authorized retirement of default SOV residuals on 2026-09-20. Reviewed neighboring scenario owners; preserve geometry and all non-SOV ownership.",
+  "apply_to_controllers": true,
+  "apply_to_cores": true,
+  "retired_tags": [
+    "SOV"
+  ],
+  "country_rules": [
+    {
+      "rule_id": "tno_1962_sov_residual_alt",
+      "tag": "ALT",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B57393083089327"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_bry",
+      "tag": "BRY",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B66496080811175"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_cht",
+      "tag": "CHT",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B26230494769673",
+        "RU_RAY_50074027B92507175778930"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_irk",
+      "tag": "IRK",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B5650924989435",
+        "RU_RAY_50074027B61637716128052",
+        "RU_RAY_50074027B96751570188026"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_pfc",
+      "tag": "PFC",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B679557218720"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_rkk",
+      "tag": "RKK",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B83535390579003"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_rkm",
+      "tag": "RKM",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B3226583010199",
+        "RU_RAY_50074027B50737742198919",
+        "RU_RAY_50074027B61241799946425",
+        "RU_RAY_50074027B75699624456558"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_rsf",
+      "tag": "RSF",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B87273501478717"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_rur",
+      "tag": "RUR",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B27848812268076",
+        "RU_RAY_50074027B64035112017093"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_svr",
+      "tag": "SVR",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B36818181528757"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_tom",
+      "tag": "TOM",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B87665702460834"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_wrs",
+      "tag": "WRS",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B62563831900502"
+      ]
+    },
+    {
+      "rule_id": "tno_1962_sov_residual_yak",
+      "tag": "YAK",
+      "preserve_existing_country_entry": true,
+      "include_feature_ids": [
+        "RU_RAY_50074027B15083426907231"
+      ]
+    }
+  ],
+  "helper_assignments": {
+    "RU_ARCTIC_FB_SOV_038": "RKK"
+  }
+}

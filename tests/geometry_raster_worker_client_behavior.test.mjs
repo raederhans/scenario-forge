@@ -3,6 +3,43 @@ import test from "node:test";
 import { createGeometryRasterWorkerClient } from "../js/core/geometry_raster_worker_client.js";
 
 const tick = () => new Promise(setImmediate);
+
+test("worker eviction acknowledgement causes the next use to re-upload even after a stale frame", async () => {
+  const { client, sent, reply } = fixture();
+  const first = client.request(input("old"));
+  const second = client.request(input("new"));
+  await tick();
+  reply(0, { result: { bitmap: { close() {} }, evictedGeometryIds: ["a"] } });
+  await first; await tick();
+  assert.equal(sent[1].packet.geometryUpdates.length, 1);
+  assert.equal(sent[1].packet.geometryUpdates[0].id, "a");
+  reply(1); await second; client.dispose();
+});
+
+test("large geometry dispatch transfers fresh buffers while source and acknowledged reuse remain usable", async () => {
+  const sent = [];
+  const worker = { postMessage(message, transfer) {
+    sent.push(structuredClone(message, { transfer }));
+    assert.ok(transfer.every((buffer) => buffer.byteLength === 0));
+  }, terminate() {} };
+  const client = createGeometryRasterWorkerClient({ createWorker: () => worker, isSupported: () => true });
+  const large = { type: "Feature", geometry: { type: "LineString", coordinates: Array.from({ length: 10_000 }, (_, i) => [i, -i]) } };
+  const entries = [{ id: "large", feature: large }];
+  const first = client.request(input("large-one", "political", { entries }));
+  await tick();
+  assert.equal(sent[0].packet.geometryUpdates, null);
+  assert.deepEqual(globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(sent[0].packet.geometryTransport), [{ id: "large", feature: large }]);
+  worker.onmessage({ data: { taskId: sent[0].taskId, result: { bitmap: { close() {} } } } });
+  await first;
+  const second = client.request(input("large-two", "hit", { entries }));
+  await tick();
+  assert.deepEqual(sent[1].packet.geometryUpdates, []);
+  assert.equal(sent[1].packet.geometryTransport, null);
+  assert.equal(large.geometry.coordinates.length, 10_000);
+  worker.onmessage({ data: { taskId: sent[1].taskId, result: { bitmap: { close() {} } } } });
+  await second;
+  client.dispose();
+});
 const feature = { geometry: { type: "Point", coordinates: [1, 2] } };
 const input = (identity, kind = "political", extra = {}) => ({
   identity, kind, sceneKey: "tno", projectionKey: 1,

@@ -475,7 +475,10 @@ export function reconcileVerificationRouteAuthority(routes = buildRouteIndex()) 
         && ciProfiles.length > 0,
       contributors,
     };
-  }).sort((left, right) => left.commandRef.localeCompare(right.commandRef));
+  // Match catalog sealing and the cross-language selector artifact contract.
+  // Locale collation orders punctuation differently (e.g. precision.py vs
+  // precision_validation.py), which would change the prepared identity.
+  }).sort((left, right) => left.commandRef < right.commandRef ? -1 : left.commandRef > right.commandRef ? 1 : 0);
 }
 
 function e2eCost(primaryLayer) {

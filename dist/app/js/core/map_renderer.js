@@ -12,6 +12,7 @@ import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_g
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
 import { createPoliticalDerivedStateCache } from "./renderer/political_derived_state_cache.js";
+import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
@@ -4992,21 +4993,35 @@ function buildAtlantropaLandLikeFeatureCollection() {
   return features.length ? { type: "FeatureCollection", features } : null;
 }
 
+let previousPoliticalExtraIds = [];
 function appendUniqueFeatureCollections(primaryCollection, extraCollection) {
   const primaryFeatures = Array.isArray(primaryCollection?.features) ? primaryCollection.features : [];
   const extraFeatures = Array.isArray(extraCollection?.features) ? extraCollection.features : [];
-  if (!extraFeatures.length) {
+  const snapshot = getPoliticalGeometrySnapshot(primaryCollection);
+  if (!extraFeatures.length && !snapshot) {
+    previousPoliticalExtraIds = [];
     return primaryCollection;
   }
-  const seen = new Set(primaryFeatures.map((feature) => getFeatureId(feature)).filter(Boolean));
+  const featureMap = snapshot ? new Map(snapshot.featuresById) : null;
+  const seen = featureMap || new Set(primaryFeatures.map((feature) => getFeatureId(feature)).filter(Boolean));
   const features = primaryFeatures.slice();
+  const extraIds = [];
   extraFeatures.forEach((feature) => {
     const featureId = getFeatureId(feature);
     if (!featureId || seen.has(featureId)) return;
-    seen.add(featureId);
+    if (featureMap) featureMap.set(featureId, feature);
+    else seen.add(featureId);
     features.push(feature);
+    extraIds.push(featureId);
   });
-  return { type: "FeatureCollection", features };
+  const result = { type: "FeatureCollection", features };
+  if (snapshot) registerPoliticalGeometrySnapshot(result, {
+    ...snapshot, featuresById: featureMap,
+    changedIds: [...new Set([...snapshot.changedIds, ...extraIds, ...previousPoliticalExtraIds])],
+    removedIds: [...new Set([...snapshot.removedIds, ...previousPoliticalExtraIds.filter((id) => !featureMap.has(id))])],
+  });
+  previousPoliticalExtraIds = extraIds;
+  return result;
 }
 
 function getEffectiveWaterRegionFeatures() {
@@ -7948,6 +7963,22 @@ function keyToHitColor(key) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+function fillHitFeature(feature, id, key) {
+  const context = rendererSurfaceHost.getHitContext();
+  const polygon = feature?.geometry?.type === "Polygon" || feature?.geometry?.type === "MultiPolygon";
+  const entry = polygon ? getPoliticalFeaturePathEntry(feature, {
+    featureId: id, allowBuild: true, countBuild: true,
+  }) : null;
+  context.fillStyle = keyToHitColor(key);
+  if (entry?.path) {
+    context.fill(entry.path);
+  } else {
+    context.beginPath();
+    rendererSurfaceHost.getPathHitCanvas()(feature);
+    context.fill();
+  }
+}
+
 function hitColorToKey(pixel) {
   if (!pixel || pixel.length < 3) return 0;
   return (pixel[0] || 0) | ((pixel[1] || 0) << 8) | ((pixel[2] || 0) << 16);
@@ -8003,10 +8034,7 @@ function drawHitCanvas() {
     const key = runtimeState.idToKey.get(item.id);
     if (!key || !item?.feature) return;
     if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
-    rendererSurfaceHost.getHitContext().beginPath();
-    rendererSurfaceHost.getPathHitCanvas()(item.feature);
-    rendererSurfaceHost.getHitContext().fillStyle = keyToHitColor(key);
-    rendererSurfaceHost.getHitContext().fill();
+    fillHitFeature(item.feature, item.id, key);
     drawnItemCount += 1;
   });
 
@@ -8201,10 +8229,7 @@ function getDirtyHitCanvasPointProbeHit(event) {
       const key = runtimeState.idToKey.get(item?.id);
       if (!key || !item?.feature) return;
       if (shouldExcludePoliticalInteractionFeature(item.feature, item.id)) return;
-      rendererSurfaceHost.getHitContext().beginPath();
-      rendererSurfaceHost.getPathHitCanvas()(item.feature);
-      rendererSurfaceHost.getHitContext().fillStyle = keyToHitColor(key);
-      rendererSurfaceHost.getHitContext().fill();
+      fillHitFeature(item.feature, item.id, key);
       drawnItemCount += 1;
     });
     rendererSurfaceHost.getHitContext().restore();
@@ -9303,18 +9328,28 @@ function rebuildRuntimeDerivedState({
   incrementalDelta = null,
   reuseGeometry = false,
 } = {}) {
+  const startedAt = nowMs();
+  let phaseStartedAt = startedAt;
   if (includeRuntimePoliticalMeta && !incrementalDelta) {
     buildRuntimePoliticalMeta();
   }
+  const metadataMs = nowMs() - phaseStartedAt;
 
-  if (incrementalDelta || reuseGeometry) getProjectedGeometryBoundsOwner().resetPublishedBoundsCache();
-  else clearProjectedBoundsCache();
+  // Validated deltas retain published bounds for unchanged IDs.
+  if (!incrementalDelta) {
+    if (reuseGeometry) getProjectedGeometryBoundsOwner().resetPublishedBoundsCache();
+    else clearProjectedBoundsCache();
+  }
   const projectedBoundsCache = ensureProjectedBoundsCache();
   const spatialOwner = getSpatialIndexRuntimeOwner();
-  if (incrementalDelta) spatialOwner.reconcileRuntimePrimaryIndex({ projectedBoundsCache });
+  phaseStartedAt = nowMs();
+  if (incrementalDelta) spatialOwner.reconcileRuntimePrimaryIndex({ projectedBoundsCache, incrementalDelta });
   else spatialOwner.rebuildRuntimePrimaryIndex({ projectedBoundsCache });
+  const primaryIndexMs = nowMs() - phaseStartedAt;
 
+  phaseStartedAt = nowMs();
   const nextColors = incrementalDelta ? reconcilePoliticalDerivedColors(incrementalDelta) : rebuildResolvedColors();
+  const colorsMs = nowMs() - phaseStartedAt;
   queueIndexUiRefresh({
     renderCountryList: true,
     renderWaterRegionList: true,
@@ -9322,6 +9357,7 @@ function rebuildRuntimeDerivedState({
   }, scheduleUiMode);
   finalizeIndexBuildEffects();
 
+  phaseStartedAt = nowMs();
   if (buildSpatial) {
     buildSpatialIndex({
       includeSecondary: includeSecondarySpatial,
@@ -9334,6 +9370,11 @@ function rebuildRuntimeDerivedState({
   } else {
     politicalDerivedStateCache.reset();
   }
+  recordRenderPerfMetric("politicalDerivedStateBreakdown", nowMs() - startedAt, {
+    metadataMs, primaryIndexMs, colorsMs, spatialAndCommitMs: nowMs() - phaseStartedAt,
+    incremental: !!incrementalDelta, changedFeatureCount: incrementalDelta?.changedIds.length || 0,
+    removedFeatureCount: incrementalDelta?.removedIds.length || 0,
+  });
   return nextColors;
 }
 
@@ -13214,7 +13255,7 @@ function ensureUnitCounterCounter() {
 }
 
 function handleMouseMove(event) {
-  getMapHoverInteractionOwner().handleMouseMove(event);
+  getMapHoverInteractionOwner().scheduleMouseMove(event);
 }
 
 function addRecentColor(color) {

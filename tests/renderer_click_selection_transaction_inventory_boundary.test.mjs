@@ -621,7 +621,7 @@ test("hit candidates stay pure and hover owner does not own click selection", ()
     assertExcludes(hitCandidatesSource, token, "interaction_hit_candidates must remain pure");
   }
   for (const token of [
-    "function handleMouseMove(event)",
+    "function handleMouseMove(event, { frameCoalesced = false } = {})",
     "\"getHitFromEvent\"",
     "\"updateDevHoverHit\"",
     "function queueTooltipUpdate(nextState = null)",

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
+import "../js/core/geometry_transfer_codec_shared.js";
 
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 
@@ -32,6 +33,7 @@ function createWorkerHarness({ feature = () => null, fetchResource = null } = {}
     self,
     globalThis: null,
     importScripts() {
+      context.__scenarioForgeGeometryTransferCodecShared = globalThis.__scenarioForgeGeometryTransferCodecShared;
       context.__scenarioForgeFeatureIdentityShared = {
         defaultCountryCodeNormalizer: (value) => String(value || "").toUpperCase(),
         getFeatureId: (feature) => feature?.id || null,

@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 189,
-    "feature_count": 12693,
+    "chunk_count": 208,
+    "feature_count": 12696,
     "water_count": 141
   },
   "controller_changes": [
@@ -103771,7 +103771,7 @@
       "base_iso2": "DZ",
       "continent_label": "Africa",
       "controller_feature_count": 17,
-      "display_name": "Algerian Command",
+      "display_name": "Algerian Military Command",
       "entry_kind": "scenario_subject",
       "feature_count": 17,
       "hidden_from_country_list": false,
@@ -103805,10 +103805,10 @@
     "ALT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 20,
-      "display_name": "Altai",
+      "controller_feature_count": 21,
+      "display_name": "Oirotia",
       "entry_kind": "scenario_country",
-      "feature_count": 20,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -103821,7 +103821,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 20
+        "approx_existing_geometry": 21
       },
       "rule_sources": [
         "tno_1962_russia_alt"
@@ -104104,7 +104104,7 @@
     "ATL": {
       "base_iso2": "ZZ",
       "continent_label": "Special",
-      "controller_feature_count": 444,
+      "controller_feature_count": 496,
       "display_name": "Atlantropa Reclamation Zone",
       "entry_kind": "",
       "feature_count": 496,
@@ -104461,10 +104461,10 @@
     "BRY": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 27,
+      "controller_feature_count": 28,
       "display_name": "Buryat Soviet Socialist Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 27,
+      "feature_count": 28,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -104477,7 +104477,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 27
+        "manual_reviewed": 28
       },
       "rule_sources": [
         "tno_1962_bry_manual_override"
@@ -104494,7 +104494,7 @@
     "BUL": {
       "base_iso2": "BG",
       "continent_label": "Europe",
-      "controller_feature_count": 47,
+      "controller_feature_count": 48,
       "display_name": "Bulgaria",
       "entry_kind": "",
       "feature_count": 48,
@@ -104756,10 +104756,10 @@
     "CHT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 30,
+      "controller_feature_count": 32,
       "display_name": "Far Eastern Tsardom",
       "entry_kind": "scenario_country",
-      "feature_count": 30,
+      "feature_count": 32,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -104772,7 +104772,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 30
+        "manual_reviewed": 32
       },
       "rule_sources": [
         "tno_1962_cht_manual_override"
@@ -104851,7 +104851,7 @@
     "CRO": {
       "base_iso2": "HR",
       "continent_label": "Europe",
-      "controller_feature_count": 35,
+      "controller_feature_count": 19,
       "display_name": "Independent State of Croatia",
       "entry_kind": "scenario_subject",
       "feature_count": 19,
@@ -105010,7 +105010,7 @@
     "EGY": {
       "base_iso2": "EG",
       "continent_label": "Africa",
-      "controller_feature_count": 73,
+      "controller_feature_count": 59,
       "display_name": "Italian Egypt",
       "entry_kind": "scenario_subject",
       "feature_count": 59,
@@ -105210,7 +105210,7 @@
     "FRA": {
       "base_iso2": "FR",
       "continent_label": "Europe",
-      "controller_feature_count": 294,
+      "controller_feature_count": 257,
       "display_name": "France",
       "entry_kind": "",
       "feature_count": 257,
@@ -105554,7 +105554,7 @@
     "GRE": {
       "base_iso2": "GR",
       "continent_label": "Europe",
-      "controller_feature_count": 169,
+      "controller_feature_count": 105,
       "display_name": "Greek Protectorate",
       "entry_kind": "scenario_subject",
       "feature_count": 105,
@@ -105918,7 +105918,7 @@
     "IAL": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 29,
+      "controller_feature_count": 30,
       "display_name": "Italian Algeria",
       "entry_kind": "scenario_subject",
       "feature_count": 30,
@@ -105953,7 +105953,7 @@
     "IBR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 154,
+      "controller_feature_count": 151,
       "display_name": "Iberian Union",
       "entry_kind": "scenario_country",
       "feature_count": 151,
@@ -106083,10 +106083,10 @@
     "IRK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 15,
+      "controller_feature_count": 18,
       "display_name": "Far Eastern Presidium",
       "entry_kind": "scenario_country",
-      "feature_count": 15,
+      "feature_count": 18,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -106099,7 +106099,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 15
+        "manual_reviewed": 18
       },
       "rule_sources": [
         "tno_1962_irk_manual_override"
@@ -106147,7 +106147,7 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 246,
+      "controller_feature_count": 223,
       "display_name": "Italy",
       "entry_kind": "",
       "feature_count": 223,
@@ -106514,7 +106514,7 @@
     "LBA": {
       "base_iso2": "LY",
       "continent_label": "Africa",
-      "controller_feature_count": 26,
+      "controller_feature_count": 25,
       "display_name": "Libya",
       "entry_kind": "scenario_subject",
       "feature_count": 25,
@@ -106549,7 +106549,7 @@
     "LEB": {
       "base_iso2": "LB",
       "continent_label": "Asia",
-      "controller_feature_count": 10,
+      "controller_feature_count": 8,
       "display_name": "Lebanese Protectorate",
       "entry_kind": "scenario_subject",
       "feature_count": 8,
@@ -107504,7 +107504,7 @@
     "PAL": {
       "base_iso2": "IL",
       "continent_label": "Asia",
-      "controller_feature_count": 16,
+      "controller_feature_count": 13,
       "display_name": "Italian Palestine",
       "entry_kind": "scenario_subject",
       "feature_count": 13,
@@ -107632,10 +107632,10 @@
     "PFC": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 16,
+      "controller_feature_count": 19,
       "display_name": "Far Eastern Pacific Fleet Command",
       "entry_kind": "scenario_country",
-      "feature_count": 16,
+      "feature_count": 19,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -107648,7 +107648,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 16
+        "manual_reviewed": 19
       },
       "rule_sources": [
         "tno_1962_pfc_far_east_split"
@@ -107893,7 +107893,7 @@
       "base_iso2": "CN",
       "continent_label": "Asia",
       "controller_feature_count": 33,
-      "display_name": "13th National Revolutionary Army",
+      "display_name": "13th Army of the National Revolutionary Army",
       "entry_kind": "scenario_subject",
       "feature_count": 33,
       "hidden_from_country_list": false,
@@ -108028,10 +108028,10 @@
     "RKK": {
       "base_iso2": "GE",
       "continent_label": "Asia",
-      "controller_feature_count": 336,
+      "controller_feature_count": 338,
       "display_name": "Reichskommissariat Kaukasien",
       "entry_kind": "scenario_country",
-      "feature_count": 336,
+      "feature_count": 338,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108046,7 +108046,7 @@
       "provenance_iso2": "GE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 336
+        "manual_reviewed": 338
       },
       "rule_sources": [
         "tno_baseline_rkk"
@@ -108063,10 +108063,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 770,
+      "controller_feature_count": 774,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 770,
+      "feature_count": 774,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108081,7 +108081,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 770
+        "manual_reviewed": 774
       },
       "rule_sources": [
         "tno_baseline_rkm"
@@ -108204,7 +108204,7 @@
       "base_iso2": "PL",
       "continent_label": "Europe",
       "controller_feature_count": 180,
-      "display_name": "Reichskommissariat Polen",
+      "display_name": "General Government of Poland",
       "entry_kind": "scenario_country",
       "feature_count": 180,
       "hidden_from_country_list": false,
@@ -108306,10 +108306,10 @@
     "RSF": {
       "base_iso2": "RU",
       "continent_label": "Asia",
-      "controller_feature_count": 5,
+      "controller_feature_count": 6,
       "display_name": "Russian Salvation Front",
       "entry_kind": "scenario_country",
-      "feature_count": 5,
+      "feature_count": 6,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108322,7 +108322,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 5
+        "manual_reviewed": 6
       },
       "rule_sources": [
         "tno_1962_rsf_far_east_split"
@@ -108339,10 +108339,10 @@
     "RUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 40,
+      "controller_feature_count": 42,
       "display_name": "Rurik Kingdom",
       "entry_kind": "scenario_country",
-      "feature_count": 40,
+      "feature_count": 42,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108355,7 +108355,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 40
+        "manual_reviewed": 42
       },
       "rule_sources": [
         "tno_1962_rur_manual_override"
@@ -108798,43 +108798,10 @@
       "subregion_label": "Eastern Europe",
       "synthetic_owner": false
     },
-    "SOV": {
-      "base_iso2": "RU",
-      "continent_label": "Europe",
-      "controller_feature_count": 20,
-      "display_name": "Soviet Union",
-      "entry_kind": "",
-      "feature_count": 20,
-      "hidden_from_country_list": false,
-      "historical_fidelity": "tno_baseline",
-      "historical_fidelity_summary": [
-        "tno_baseline"
-      ],
-      "lookup_iso2": "RU",
-      "parent_owner_tag": "",
-      "parent_owner_tags": [],
-      "primary_rule_source": "soviet_union",
-      "provenance_iso2": "RU",
-      "quality": "manual_reviewed",
-      "quality_breakdown": {
-        "manual_reviewed": 20
-      },
-      "rule_sources": [
-        "soviet_union"
-      ],
-      "scenario_only": true,
-      "source_type": "tno_baseline",
-      "source_types": [
-        "tno_baseline"
-      ],
-      "subject_kind": "",
-      "subregion_label": "Eastern Europe",
-      "synthetic_owner": false
-    },
     "SPR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 4,
       "display_name": "Spain",
       "entry_kind": "",
       "feature_count": 4,
@@ -108869,10 +108836,10 @@
     "SVR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 105,
+      "controller_feature_count": 106,
       "display_name": "Ural Military District",
       "entry_kind": "scenario_country",
-      "feature_count": 105,
+      "feature_count": 106,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108885,7 +108852,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 105
+        "approx_existing_geometry": 106
       },
       "rule_sources": [
         "tno_1962_svr_manual_override"
@@ -108966,7 +108933,7 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 14,
+      "controller_feature_count": 9,
       "display_name": "Syrian Protectorate",
       "entry_kind": "scenario_subject",
       "feature_count": 9,
@@ -109168,10 +109135,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 22,
+      "controller_feature_count": 23,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 22,
+      "feature_count": 23,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -109184,7 +109151,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 22
+        "approx_existing_geometry": 23
       },
       "rule_sources": [
         "tno_1962_russia_tom"
@@ -109201,7 +109168,7 @@
     "TUN": {
       "base_iso2": "TN",
       "continent_label": "Africa",
-      "controller_feature_count": 49,
+      "controller_feature_count": 35,
       "display_name": "Tunisian Protectorate",
       "entry_kind": "scenario_subject",
       "feature_count": 35,
@@ -109236,7 +109203,7 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 134,
+      "controller_feature_count": 111,
       "display_name": "Turkey",
       "entry_kind": "",
       "feature_count": 111,
@@ -109789,10 +109756,10 @@
     "WRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 27,
+      "controller_feature_count": 28,
       "display_name": "West Russian Revolutionary Front",
       "entry_kind": "scenario_country",
-      "feature_count": 27,
+      "feature_count": 28,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -109805,7 +109772,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 27
+        "manual_reviewed": 28
       },
       "rule_sources": [
         "tno_1962_wrs_manual_override"
@@ -109823,7 +109790,7 @@
       "base_iso2": "XIK",
       "continent_label": "Asia",
       "controller_feature_count": 18,
-      "display_name": "XiKang",
+      "display_name": "24th Army of the National Revolutionary Army",
       "entry_kind": "scenario_country",
       "feature_count": 18,
       "hidden_from_country_list": false,
@@ -109921,10 +109888,10 @@
     "YAK": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 13,
+      "controller_feature_count": 14,
       "display_name": "Sakha Republic",
       "entry_kind": "scenario_country",
-      "feature_count": 13,
+      "feature_count": 14,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -109937,7 +109904,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 13
+        "manual_reviewed": 14
       },
       "rule_sources": [
         "tno_1962_yak_manual_override"
@@ -110122,16 +110089,16 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "c4d7fdce6aa8ccdce3853ede2f42021ac9ad13a5d1f86e03443547c1ab6ef327",
+  "snapshot_fingerprint": "6b17c65a8fa53b8bdbae8473edb7ce289ce8e194acb608bfbbd2d812289263de",
   "source": {
     "base_topology_sha256": "8159bc03c9321a2e7d26a7e08526fe6fbc0973f2f7aad779e868bcd5adb6a005",
-    "build_snapshot_sha256": "c92b4725aede16ab515a02ee8d51c3ad8839cc8005c5073ddb502c9f2865f0d7",
-    "detail_chunk_manifest_sha256": "c5403486911f3d1aba12c506adef429c3013488580bb497c00cc6a8f130c7f55",
-    "runtime_bootstrap_topology_sha256": "72767489deeae88947934d8f75525e44a66be1e618192ef789147e7c8598530a",
-    "runtime_topology_sha256": "b20e60ef0634d826792132adae0c7287edbe5860bd7cfca0c569033fef8b9138"
+    "build_snapshot_sha256": "7b1aa8ad8f7a6c55ca26044435e7b7d7c1816d31a45baea5bfb1a89d9cec93ac",
+    "detail_chunk_manifest_sha256": "12a51ff94fb30eda17a624bc7f4f72da5581f60c998dba3d8501a3e5b0837b2a",
+    "runtime_bootstrap_topology_sha256": "e56805c31f92feae16a65fc947d93323915b9a80d47bac45e6c34734892975a1",
+    "runtime_topology_sha256": "48076202e516572af0e62d9c549ced152e8fed045855f04378bec620736d1122"
   },
   "summary": {
-    "approximate_count": 919,
+    "approximate_count": 859,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -110139,17 +110106,17 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 174,
+    "controller_count": 173,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12693,
+    "feature_count": 12696,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 174,
+    "owner_count": 173,
     "quality_counts": {
       "approx_existing_geometry": 919,
       "direct_country_copy": 2578,

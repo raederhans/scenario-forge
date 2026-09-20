@@ -134,7 +134,7 @@ export function createSpatialIndexRuntimeOwner({
     }
   }
 
-  function reconcileRuntimePrimaryIndex({ projectedBoundsCache = null } = {}) {
+  function reconcileRuntimePrimaryIndex({ projectedBoundsCache = null, incrementalDelta = null } = {}) {
     if (![state.landIndex, state.countryToFeatureIds, state.idToKey, state.keyToId].every((map) => map instanceof Map)) {
       rebuildRuntimePrimaryIndex({ projectedBoundsCache });
       return;
@@ -143,22 +143,41 @@ export function createSpatialIndexRuntimeOwner({
     const nextIds = new Set();
     const nextKeys = new Map();
     const countries = new Map();
+    const changedIds = incrementalDelta ? new Set(incrementalDelta.changedIds) : null;
+    let nextPickingKey = 1;
+    if (incrementalDelta) {
+      for (const key of state.keyToId.keys()) nextPickingKey = Math.max(nextPickingKey, key + 1);
+      // RGB picking has a finite key space. A full rebuild safely compacts it;
+      // the caller invalidates the hit surface before any next interaction.
+      const addedCount = features.reduce((count, feature) => count + Number(!state.idToKey.has(getFeatureId(feature))), 0);
+      if (nextPickingKey + addedCount > 0x1000000) {
+        rebuildRuntimePrimaryIndex({ projectedBoundsCache });
+        return;
+      }
+    }
     for (let index = 0; index < features.length; index += 1) {
       const feature = features[index];
       const id = getFeatureId(feature) || `feature-${index}`;
       nextIds.add(id);
-      if (state.landIndex.get(id) !== feature) state.landIndex.set(id, feature);
-      const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: true });
-      if (bounds) projectedBoundsCache?.set(id, bounds);
+      const featureChanged = state.landIndex.get(id) !== feature;
+      if (featureChanged) state.landIndex.set(id, feature);
+      if (!changedIds || changedIds.has(id) || featureChanged) {
+        projectedBoundsCache?.delete(id);
+        const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: true });
+        if (bounds) projectedBoundsCache?.set(id, bounds);
+      }
       if (shouldExcludePoliticalInteractionFeature(feature, id)) continue;
       const country = getFeatureCountryCodeNormalized(feature);
       if (country) {
         if (!countries.has(country)) countries.set(country, []);
         countries.get(country).push(id);
       }
-      nextKeys.set(id, index + 1);
+      nextKeys.set(id, incrementalDelta ? (state.idToKey.get(id) || nextPickingKey++) : index + 1);
     }
-    for (const id of state.landIndex.keys()) if (!nextIds.has(id)) state.landIndex.delete(id);
+    for (const id of state.landIndex.keys()) if (!nextIds.has(id)) {
+      state.landIndex.delete(id);
+      projectedBoundsCache?.delete(id);
+    }
     for (const id of state.idToKey.keys()) if (!nextKeys.has(id)) state.idToKey.delete(id);
     const keyIds = new Map();
     for (const [id, key] of nextKeys) {

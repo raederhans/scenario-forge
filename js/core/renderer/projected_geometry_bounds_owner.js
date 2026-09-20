@@ -65,6 +65,8 @@ export function createProjectedGeometryBoundsOwner({
   const sanitizedWaterRegionFeatureByFeature = new WeakMap();
   const waterSphericalSanitizationWarnings = new Set();
   let projectedBoundsByGeometry = new WeakMap();
+  let projectedPartBounds = new WeakMap();
+  const polygonPartsByGeometry = new WeakMap();
   let boundsProjectionGeneration = -1;
   let boundsScenarioId = "";
 
@@ -73,6 +75,7 @@ export function createProjectedGeometryBoundsOwner({
     const scenarioId = String(getActiveScenarioId() || "");
     if (generation !== boundsProjectionGeneration || scenarioId !== boundsScenarioId) {
       projectedBoundsByGeometry = new WeakMap();
+      projectedPartBounds = new WeakMap();
       if (boundsProjectionGeneration !== -1) {
         ensureCache();
         clearProjectedBoundsCacheEntriesState(state);
@@ -129,6 +132,10 @@ export function createProjectedGeometryBoundsOwner({
   function computeProjectedGeoBounds(geoObject) {
     const pathRef = getPathCanvas() || getPathSvg();
     if (!pathRef || !geoObject) return null;
+    ensureGeometryBoundsIdentity();
+    const geometry = geoObject.type === "Feature" ? geoObject.geometry : geoObject;
+    const cached = geometry && projectedPartBounds.get(geometry);
+    if (cached?.pathRef === pathRef) return cached.bounds;
     let bounds = null;
     try {
       bounds = pathRef.bounds(geoObject);
@@ -137,6 +144,7 @@ export function createProjectedGeometryBoundsOwner({
     }
     if (!bounds || bounds.length !== 2) return computeProjectedCoordinateBounds(geoObject);
     const projectedBounds = buildProjectedBounds(bounds[0]?.[0], bounds[0]?.[1], bounds[1]?.[0], bounds[1]?.[1]);
+    if (projectedBounds && geometry && typeof geometry === "object") projectedPartBounds.set(geometry, { pathRef, bounds: projectedBounds });
     return projectedBounds || computeProjectedCoordinateBounds(geoObject);
   }
 
@@ -179,6 +187,7 @@ export function createProjectedGeometryBoundsOwner({
 
   function clearProjectedBoundsCache() {
     projectedBoundsByGeometry = new WeakMap();
+    projectedPartBounds = new WeakMap();
     ensureCache();
     clearProjectedBoundsCacheEntriesState(state);
     resetHostWaterPathCaches();
@@ -274,8 +283,12 @@ export function createProjectedGeometryBoundsOwner({
 
   function collectFeatureHitGeometries(feature) {
     const geometry = feature?.geometry;
+    if (!geometry || typeof geometry !== "object") return [];
+    if (polygonPartsByGeometry.has(geometry)) return polygonPartsByGeometry.get(geometry);
     const polygonParts = collectPolygonalGeometryParts(geometry);
-    return polygonParts.length ? polygonParts : (geometry ? [geometry] : []);
+    const parts = polygonParts.length ? polygonParts : [geometry];
+    polygonPartsByGeometry.set(geometry, parts);
+    return parts;
   }
 
   function buildWaterRegionFeatureFromParts(feature, parts) {

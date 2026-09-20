@@ -1,3 +1,5 @@
+import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "../political_geometry_store.js";
+
 export function createPoliticalCollectionOwner({
   state,
   constants = {},
@@ -40,6 +42,7 @@ export function createPoliticalCollectionOwner({
   // The cached entry is only reused when it still matches the original
   // feature's current properties, so property mutations remain visible.
   const normalizedDetailWrapperByFeature = new WeakMap();
+  const indexedDetailWrappers = new WeakMap();
 
   function matchesSnapshot(value, snapshot) {
     const keys = Object.keys(value || {});
@@ -426,6 +429,32 @@ export function createPoliticalCollectionOwner({
   }
 
   function composePoliticalFeatureCollections(primaryCollection, detailCollection = null, overrideCollection = null) {
+    const geometrySnapshot = getPoliticalGeometrySnapshot(detailCollection);
+    if (geometrySnapshot && detailCollection.globalCoverage === true && !overrideCollection) {
+      const featuresById = new Map();
+      const changedIds = new Set(geometrySnapshot.changedIds);
+      let complete = true;
+      // Source membership is indexed by the chunk store. Metadata remains
+      // editable: retain shallow snapshot checks and propagate wrapper changes.
+      for (const [id, feature] of geometrySnapshot.featuresById) {
+        if (!getFeatureId(feature)) continue;
+        const cached = indexedDetailWrappers.get(feature);
+        let wrapped = cached && matchesSnapshot(feature, cached.featureSnapshot)
+          && matchesSnapshot(feature.properties, cached.propertiesSnapshot) ? cached.wrapped : null;
+        if (!wrapped) {
+          const normalized = normalizeFeatureGeometry(feature, { sourceLabel: "detail" });
+          wrapped = { ...normalized, properties: { ...(normalized?.properties || {}), __source: "detail" } };
+          changedIds.add(id);
+          if (normalizedGeometryByGeometry.has(feature?.geometry)) indexedDetailWrappers.set(feature, {
+            featureSnapshot: { ...feature }, propertiesSnapshot: { ...(feature.properties || {}) }, wrapped,
+          });
+          else complete = false;
+        }
+        featuresById.set(id, wrapped);
+      }
+      const result = { type: "FeatureCollection", features: [...featuresById.values()] };
+      return complete ? registerPoliticalGeometrySnapshot(result, { ...geometrySnapshot, featuresById, changedIds: [...changedIds] }) : result;
+    }
     // A complete scenario collection owns every region, including its shell
     // underlays. Modern primary geometry must not be promoted over that source.
     const normalizedPrimaryCollection = detailCollection?.globalCoverage !== true && Array.isArray(primaryCollection?.features)

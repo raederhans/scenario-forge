@@ -2587,8 +2587,10 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
         python() { cat >/dev/null; printf '%s head\\n' "$TEST_BASE"; }
         """ + script
         bash = shutil.which("bash")
-        if not bash and os.name == "nt":
-            bash = str(Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe")
+        if os.name == "nt":
+            git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe"
+            if git_bash.exists():
+                bash = str(git_bash)
         self.assertTrue(bash and Path(bash).exists(), "Bash is required to test the workflow classifier")
         temp_root = REPO_ROOT / ".runtime/tmp"
         temp_root.mkdir(parents=True, exist_ok=True)
@@ -2596,10 +2598,11 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
             env = dict(os.environ, GITHUB_EVENT_NAME=event, GITHUB_OUTPUT="output.txt",
                        GITHUB_STEP_SUMMARY="summary.txt", SCENARIO_ID=scenario,
                        TEST_PATHS="".join(path + "\n" for path in paths), TEST_DIFF_STATUS=str(diff_status), TEST_BASE=base)
-            result = subprocess.run([bash, "--noprofile", "--norc", "-s"], input=script,
-                                    cwd=directory, env=env, capture_output=True, text=True)
+            # Keep Bash input LF-only; text pipes translate it to CRLF on Windows.
+            result = subprocess.run([bash, "--noprofile", "--norc", "-s"], input=script.encode("utf-8"),
+                                    cwd=directory, env=env, capture_output=True)
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stderr, "")
+            self.assertEqual(result.stderr, b"")
             output = (Path(directory) / "output.txt").read_text(encoding="utf-8")
             return dict(line.split("=", 1) for line in output.splitlines())["should_run"] == "true"
 

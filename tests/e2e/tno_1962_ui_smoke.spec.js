@@ -130,7 +130,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
     const missingFeaturedTags = (payload.manifest.featured_tags || []).filter(
       (tag) => !payload.countries[tag] && !catalogTags.has(tag)
     );
-    const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL'];
+    const retiredCountryTags = ['BEL', 'EST', 'LAT', 'LIT', 'LUX', 'NOR', 'POL', 'SOV'];
     const requiredControllerOnlyTags = ['POR', 'PRC', 'SIC', 'SIK', 'XSM'];
     const lingeringHoi4Owners = Object.values(payload.countries)
       .filter((entry) => entry && entry.source_type === 'hoi4_owner')
@@ -150,7 +150,7 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
       expect(payload.countries[tag]?.entry_kind).toBe('controller_only');
     });
     expect(payload.countries.POR?.hidden_from_country_list).toBeTruthy();
-    expect(payload.countries.SOV?.inspector_group_id).toBe('scenario_group_russia_region');
+    expect(payload.manifest.featured_tags || []).not.toContain('SOV');
     expect(payload.countries.WRS?.inspector_group_id).toBe('scenario_group_russia_region');
     expect(payload.countries.CHI?.inspector_group_id).toBe('scenario_group_china_region');
     expect(payload.countries.PRC?.inspector_group_id).toBe('scenario_group_china_region');

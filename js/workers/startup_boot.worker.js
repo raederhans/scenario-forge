@@ -3,6 +3,7 @@
 importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
+  new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
 
@@ -366,6 +367,18 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
 }
 
 function postWorkerMessage(type, payload) {
+  if (type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
+    const field = payload.chunkPayload ? "chunkPayload" : "decodedCollections";
+    const startedAt = nowMs();
+    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(payload[field]);
+    if (transport.transferables.length) {
+      self.postMessage({ type, ...payload, [field]: null,
+        geometryTransport: { field, payload: transport.payload },
+        metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
+      }, transport.transferables);
+      return;
+    }
+  }
   self.postMessage({
     type,
     ...payload,

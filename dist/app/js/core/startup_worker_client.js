@@ -1,4 +1,5 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
+import "./geometry_transfer_codec_shared.js";
 
 const STARTUP_WORKER_URL = new URL("../workers/startup_boot.worker.js", import.meta.url);
 const STARTUP_WORKER_TIMEOUT_MS = 20_000;
@@ -26,6 +27,14 @@ const startupWorkerTaskClient = createWorkerTaskClient({
   createWorker: () => new Worker(STARTUP_WORKER_URL),
   createTaskId: (type) => `${type}:${Date.now()}:${++taskCounter}`,
   resolveTimeoutMs: resolveTaskTimeoutMs,
+  resolveMessage: (message) => {
+    if (!message.geometryTransport) return message;
+    const startedAt = performance.now();
+    const { field, payload } = message.geometryTransport;
+    const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
+    return { ...message, [field]: value, geometryTransport: undefined,
+      metrics: { ...message.metrics, geometryUnpackingMs: performance.now() - startedAt } };
+  },
   createMessageError: (message) => {
     const error = new Error(message.message || `Startup worker failed during ${message.stage || "unknown"}.`);
     if (message?.name) {

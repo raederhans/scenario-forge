@@ -1072,8 +1072,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource),
       waterFillUsesProjectionPathCacheBeforeCanvasFallback:
-        /let scenarioWaterPartPathCache = new WeakMap\(\);[\s\S]*?let scenarioWaterFeaturePathCache = new WeakMap\(\);/.test(scenarioRegionOverlayOwnerSource)
-        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?scenarioWaterFeaturePathCache\.has\(feature\)[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterFeaturePathCache\.set\(feature, path\);/.test(scenarioRegionOverlayOwnerSource)
+        /const scenarioWaterPathCache = new GeometryBudgetMap\(/.test(scenarioRegionOverlayOwnerSource)
+        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?cached\?\.parts === parts[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterPathCache\.set\(feature, \{ path, parts, estimatedBytes \}\);/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\] \} = \{\}\) \{[\s\S]*?const waterPath = visibleParts\.length === parts\.length[\s\S]*?getScenarioWaterFeaturePath\(feature, parts\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?rendererSurfaceHost\.getContext\(\)\.fill\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
       waterCoverageUsesSafeParts:
         /function getScreenBounds\(part\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)

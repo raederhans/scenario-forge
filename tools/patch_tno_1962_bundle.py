@@ -8430,6 +8430,48 @@ def resolve_rule_feature_ids(
     return sorted(include_feature_ids)
 
 
+def retire_sov_helper_properties(properties, rule_payload):
+    if not any(properties.get(key) == "SOV" for key in ("scenario_shell_owner_hint", "scenario_shell_controller_hint")):
+        return False
+    fid = properties.get("id")
+    tag = rule_payload.get("helper_assignments", {}).get(fid)
+    if not tag or tag == "SOV":
+        raise ValueError(f"Unreviewed SOV helper: {fid}")
+    for key in ("scenario_shell_owner_hint", "scenario_shell_controller_hint"):
+        if properties.get(key) == "SOV":
+            properties[key] = tag
+    if properties.get("name") == "Russia Shell Fallback SOV":
+        properties["name"] = f"Russia Shell Fallback {tag}"
+    return True
+
+
+def apply_sov_residual_rules(rule_payload, countries_payload, owners_payload, controllers_payload, cores_payload):
+    """Retire reviewed SOV defaults without overriding later non-SOV edits."""
+    assignments = {}
+    for rule in rule_payload["country_rules"]:
+        tag = normalize_tag(rule["tag"])
+        if tag == "SOV" or tag not in countries_payload["countries"]:
+            raise ValueError(f"Invalid SOV residual destination: {tag}")
+        for feature_id in rule["include_feature_ids"]:
+            if feature_id in assignments:
+                raise ValueError(f"Duplicate SOV residual assignment: {feature_id}")
+            assignments[feature_id] = tag
+    owners = owners_payload["owners"]
+    residuals = {fid for fid, tag in owners.items() if tag == "SOV"}
+    if residuals - assignments.keys():
+        raise ValueError(f"Unreviewed SOV residual IDs: {sorted(residuals - assignments.keys())}")
+    for fid in sorted(residuals):
+        owners[fid] = assignments[fid]
+        controllers_payload["controllers"][fid] = assignments[fid]
+        retained_cores = [tag for tag in normalize_core_tags(cores_payload["cores"].get(fid)) if tag != "SOV"]
+        set_feature_core_tags(cores_payload["cores"], fid, retained_cores or [assignments[fid]])
+    for fid, tag in list(controllers_payload["controllers"].items()):
+        if tag == "SOV":
+            controllers_payload["controllers"][fid] = owners[fid]
+    countries_payload["countries"].pop("SOV", None)
+    return sorted(residuals)
+
+
 def apply_regional_rules(
     rule_pack_name: str,
     rule_path: Path,
@@ -12965,6 +13007,16 @@ def build_countries_stage_state(
         manual_overrides_payload,
         audit_payload,
     )
+    sov_residual_rules = load_json(ROOT / "data/scenario-rules/tno_1962.sov_residuals.manual.json")
+    sov_residual_ids = apply_sov_residual_rules(
+        sov_residual_rules,
+        countries_payload, owners_payload, controllers_payload, cores_payload,
+    )
+    for index, row in scenario_political_gdf.iterrows():
+        properties = row.to_dict()
+        if retire_sov_helper_properties(properties, sov_residual_rules):
+            for key in ("name", "scenario_shell_owner_hint", "scenario_shell_controller_hint"):
+                scenario_political_gdf.at[index, key] = properties[key]
     controllers_payload = derive_controller_payload_from_owners(owners_payload)
     apply_tno_country_color_policy_backfill(countries_payload)
     palette_audit_color_sync_summary = sync_tno_country_colors_from_palette_audit(countries_payload)
@@ -12984,6 +13036,7 @@ def build_countries_stage_state(
         "owner_only_backfill_diagnostics": owner_only_backfill_diagnostics,
         "greece_coarse_owner_backfill_diagnostics": greece_coarse_owner_backfill_diagnostics,
         "dev_manual_override_diagnostics": dev_manual_override_diagnostics,
+        "sov_residual_ids": sov_residual_ids,
         "palette_audit_color_sync_tags": palette_audit_color_sync_summary.get("synced_tags", []),
         "palette_audit_color_sync_skipped_explicit_tags": palette_audit_color_sync_summary.get("skipped_explicit_tags", []),
     }

@@ -163,7 +163,7 @@ test("persistent political coverage shares the complete payload across viewport 
   const first = buildMergedScenarioChunkLayerPayloads(bundle, state, options);
   assert.equal(first.primaryMergedLayerPayloads.political, first.mergedLayerPayloads.political);
   assert.equal(first.mergedLayerPayloads.political.globalCoverage, true);
-  assert.equal(first.mergedLayerPayloads.political.features, merged.features);
+  assert.deepEqual(first.mergedLayerPayloads.political.features, merged.features);
   assert.equal(merged.globalCoverage, undefined, "coverage metadata must not mutate a borrowed payload");
   assert.deepEqual(first.primaryLayerStats.political, {
     coverageMode: "full", visibleFeatureCount: 2, totalFeatureCount: 2,
@@ -173,7 +173,7 @@ test("persistent political coverage shares the complete payload across viewport 
     ...options, viewportBbox: [50, 0, 60, 10], previousSignatures: options.nextSignatures,
     previousMergedLayerPayloads: first.mergedLayerPayloads,
   });
-  assert.equal(merges, 1);
+  assert.equal(merges, 0, "persistent base/detail store owns political composition");
   assert.equal(panned.primaryMergedLayerPayloads.political, first.mergedLayerPayloads.political);
   assert.equal(panned.primaryMergedLayerPayloads.political, panned.mergedLayerPayloads.political);
   assert.deepEqual(panned.primaryLayerStats.political, first.primaryLayerStats.political);
@@ -181,7 +181,7 @@ test("persistent political coverage shares the complete payload across viewport 
     ...options, mergeScenarioChunkPayloadsForViewport: null,
   });
   assert.equal(withoutProjector.primaryMergedLayerPayloads.political.globalCoverage, true);
-  assert.equal(withoutProjector.primaryMergedLayerPayloads.political.features, merged.features);
+  assert.deepEqual(withoutProjector.primaryMergedLayerPayloads.political.features, merged.features);
   assert.equal(withoutProjector.primaryMergedLayerPayloads.political, withoutProjector.mergedLayerPayloads.political);
 });
 

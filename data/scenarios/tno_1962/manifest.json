@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "8bc3944a1541906667240bb56570c13ed1db1206efae92afaf989282c5c4a556",
+  "baseline_hash": "36915186ad106d80be94476f4809f92b3ad8e3e4b7c9ebedfee4fe1e5c38c5a0",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -85,7 +85,6 @@
     "ENG",
     "ITA",
     "JAP",
-    "SOV",
     "CAN",
     "AST",
     "NZL",
@@ -163,12 +162,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "c4d7fdce6aa8ccdce3853ede2f42021ac9ad13a5d1f86e03443547c1ab6ef327",
+  "snapshot_fingerprint": "6b17c65a8fa53b8bdbae8473edb7ce289ce8e194acb608bfbbd2d812289263de",
   "source": {
     "base_topology_sha256": "8159bc03c9321a2e7d26a7e08526fe6fbc0973f2f7aad779e868bcd5adb6a005",
-    "detail_chunk_manifest_sha256": "c5403486911f3d1aba12c506adef429c3013488580bb497c00cc6a8f130c7f55",
-    "runtime_bootstrap_topology_sha256": "72767489deeae88947934d8f75525e44a66be1e618192ef789147e7c8598530a",
-    "runtime_topology_sha256": "b20e60ef0634d826792132adae0c7287edbe5860bd7cfca0c569033fef8b9138"
+    "detail_chunk_manifest_sha256": "12a51ff94fb30eda17a624bc7f4f72da5581f60c998dba3d8501a3e5b0837b2a",
+    "runtime_bootstrap_topology_sha256": "e56805c31f92feae16a65fc947d93323915b9a80d47bac45e6c34734892975a1",
+    "runtime_topology_sha256": "48076202e516572af0e62d9c549ced152e8fed045855f04378bec620736d1122"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -192,7 +191,7 @@
     }
   },
   "summary": {
-    "approximate_count": 919,
+    "approximate_count": 859,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -200,17 +199,17 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 174,
+    "controller_count": 173,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12693,
+    "feature_count": 12696,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 174,
+    "owner_count": 173,
     "quality_counts": {
       "approx_existing_geometry": 919,
       "direct_country_copy": 2578,

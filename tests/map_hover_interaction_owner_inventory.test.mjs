@@ -107,7 +107,7 @@ test("map_renderer keeps handleMouseMove wrapper and delegates to P48 owner", ()
   );
   assertIncludes(
     wrapperSource,
-    "getMapHoverInteractionOwner().handleMouseMove(event);",
+    "getMapHoverInteractionOwner().scheduleMouseMove(event);",
     "handleMouseMove wrapper must delegate to P48 owner",
   );
   for (const token of [
@@ -130,7 +130,7 @@ test("P48 owner declares hover dependencies and avoids forbidden migrations", ()
     "function queueTooltipUpdate(",
     "function setMapInteractionCursor(",
     "function clearUnderlyingHoverForFacilityEntry(",
-    "function handleMouseMove(event)",
+    "function handleMouseMove(event,",
     "eventType: \"hover\"",
     "\"facility-tooltip\"",
     "\"feature-tooltip\"",

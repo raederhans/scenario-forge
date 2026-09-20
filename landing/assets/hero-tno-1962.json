@@ -36,7 +36,7 @@
     "data/europe_land_bg.geojson"
   ],
   "feature_counts": {
-    "territories": 34,
+    "territories": 33,
     "political_features": 3438,
     "capitals": 8,
     "base_land_features_inspected": 23426,
@@ -57,7 +57,7 @@
     "base_coastline_paths_dropped": 728
   },
   "counts": {
-    "territories": 34,
+    "territories": 33,
     "political_features": 3438,
     "capitals": 8,
     "base_land_features_inspected": 23426,
@@ -105,7 +105,6 @@
     "SCO",
     "SER",
     "SLO",
-    "SOV",
     "SWE",
     "SWI",
     "TUR",

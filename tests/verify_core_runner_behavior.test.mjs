@@ -2347,7 +2347,10 @@ test("local projection selects the Stage C startup support sentinels without pro
     preparedCatalog: binding.preparedCatalog,
   }), "edit", { preparedCatalog: binding.preparedCatalog });
 
-  assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), [expectedCommand]);
+  assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), [
+    "python -m pytest tests/test_tno_sov_residuals.py -q",
+    expectedCommand,
+  ]);
   assert.deepEqual(projected.localEntrypointRouteGaps, []);
   assert.equal(projected.localLeafEquivalence.status, "equivalent");
   assert.ok(projected.deferredByTier.some((entry) => (
@@ -2360,13 +2363,16 @@ test("local projection selects the Stage C startup support sentinels without pro
   assert.deepEqual(plan.routeGaps, []);
   assert.deepEqual(
     plan.selectedLeaves.map((entry) => entry.leafId).sort(),
-    methods.map((method) => `python-unittest:${process.platform === "win32" ? method.toLowerCase() : method}`).sort(),
+    [
+      ...methods.map((method) => `python-unittest:${process.platform === "win32" ? method.toLowerCase() : method}`),
+      "python-pytest:tests/test_tno_sov_residuals.py",
+    ].sort(),
   );
-  assert.equal(plan.executionCommands.length, 1);
+  assert.equal(plan.executionCommands.length, 2);
   assert.equal(adaptivePlanningExitCode(projected, plan), 0);
 });
 
-test("local projection keeps the combined Stage C change set inside the edit budget", () => {
+test("local projection preserves SOV coverage and rejects the expanded Stage C edit budget", () => {
   const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8")).scripts;
   const selectorRoutes = buildRouteIndex();
   const binding = prepareRepositoryVerificationCatalogBinding({
@@ -2403,13 +2409,21 @@ test("local projection keeps the combined Stage C change set inside the edit bud
   assert.equal(projected.localLeafEquivalence.status, "equivalent");
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef).sort(), [
     "node --test tests/transport_capability_maturity_projection_behavior.test.mjs",
+    "python -m pytest tests/test_tno_sov_residuals.py -q",
     "python -m unittest tests.test_content_addressed_artifact_cache tests.test_scenario_build_session -q",
     "python -m unittest tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_build_startup_support_stage_admits_and_records_content_addressed_identity tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_startup_support_stage_restores_matching_content_addressed_artifact tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_startup_support_rollback_failure_preserves_backup_and_raises_fatal_error -q",
   ].sort());
-  assert.deepEqual(plan.routeGaps, []);
-  assert.equal(plan.selectedLeaves.length, 6);
-  assert.equal(plan.executionCommands.length, 3);
-  assert.equal(adaptivePlanningExitCode(projected, plan), 0);
+  // The bundle patcher now also owns SOV retirement. Keep that behavior coverage
+  // and reject an oversized edit lane rather than silently dropping the leaf.
+  assert.deepEqual(plan.routeGaps.map((entry) => entry.code).sort(), [
+    "adaptive-edit-command-budget-exceeded",
+    "adaptive-edit-process-group-budget-exceeded",
+    "adaptive-edit-runtime-budget-exceeded",
+    "adaptive-edit-cost-budget-exceeded",
+  ].sort());
+  assert.equal(plan.selectedLeaves.length, 7);
+  assert.equal(plan.executionCommands.length, 0);
+  assert.equal(adaptivePlanningExitCode(projected, plan), 2);
 });
 
 test("local-eligible source mismatch creates a route gap and blocks execution", () => {
