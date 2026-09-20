@@ -4,6 +4,7 @@ import test from "node:test";
 import fs from "node:fs";
 import vm from "node:vm";
 import { createGeometryRasterProjection, createGeometryRasterWorkerKernel } from "../js/core/renderer/geometry_raster_worker_kernel.js";
+import "./geometry_raster_worker_cache_pressure_behavior.test.mjs";
 
 const d3 = createRequire(import.meta.url)("../vendor/d3.v7.min.js");
 
