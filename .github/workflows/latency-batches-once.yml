@@ -17,58 +17,63 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Verify and apply exactly the locally tested patch
+      - name: Apply verified owner extraction and precise superseded-contract repairs
         shell: bash
         run: |
           python - <<'PY'
           import gzip,hashlib,json,subprocess
           from pathlib import Path
-          root=Path('.automation/latency-batches')
-          manifest=json.loads((root/'manifest.json').read_text())
-          patch=gzip.decompress((root/'patch.part0').read_bytes()+(root/'patch.part1').read_bytes())
-          assert hashlib.sha256(patch).hexdigest()=='c3427a7cd3aecaa23442c0146db15f61881e1898bd1e1fb305aeda64f239b994'
-          def blob(path):
-              return subprocess.check_output(['git','hash-object',path],text=True).strip()
-          for path,item in manifest.items():
-              if item['before'] is None: assert not Path(path).exists(),path
-              else: assert blob(path)==item['before'],path
           out=Path('.runtime/tmp/latency-batches-ci');out.mkdir(parents=True,exist_ok=True)
-          patch_path=out/'changes.patch';patch_path.write_bytes(patch)
-          subprocess.run(['git','apply','--check',str(patch_path)],check=True)
-          subprocess.run(['git','apply',str(patch_path)],check=True)
-          for path,item in manifest.items(): assert blob(path)==item['after'],path
-          (out/'verified-authored-blobs.json').write_text(json.dumps(manifest,indent=2))
-          print('All 16 authored file hashes verified against the locally tested patch.')
+          patch=gzip.decompress(Path('.automation/latency-batches/followup.patch.gz').read_bytes())
+          assert hashlib.sha256(patch).hexdigest()=='43cd485b9a9bab266af24d1fc63759aa4359a62161cecb39d241d80bbbc6e202'
+          checks={
+            'js/core/map_renderer/scenario_refresh_runtime.js':('63646de0bbb9ae046c9cce066d58c967db95bf57','7bbb1d95956b907c81d2a70c057681b3b641db5a'),
+            'tools/verification/catalog/records/precision_scaling.mjs':('ee7a12c7855978fd09731ef98d2b2acda43ecc2f','561e08e48e4a232a15895f6cfdf1b053fa4512ca'),
+            'js/core/map_renderer/scenario_deferred_refresh_owner.js':(None,'5ec6ec1567c5172ad132810a818685dc4f37cd2d'),
+          }
+          def blob(p):return subprocess.check_output(['git','hash-object',p],text=True).strip()
+          for p,(before,after) in checks.items():
+              if before is None:assert not Path(p).exists(),p
+              else:assert blob(p)==before,p
+          p=out/'followup.patch';p.write_bytes(patch)
+          subprocess.run(['git','apply','--check',str(p)],check=True)
+          subprocess.run(['git','apply',str(p)],check=True)
+          for p,(_,after) in checks.items():assert blob(p)==after,p
+          p=Path('tests/test_scenario_chunk_refresh_contracts.py')
+          assert blob(str(p))=='fb7259976ee7edf30f5811992402bed77712629f'
+          s=p.read_text()
+          old='"refreshMapDataForScenarioApply({ suppressRender: true });"'
+          new="'suppressRender: true, refreshKind: \"deferred-detail\", previousRefreshState,'"
+          assert s.count(old)==2,s.count(old)
+          s=s.replace(old,new)
+          old='r"mapDataRefreshed = true;[\\s\\S]*?"'
+          new="r'mapDataRefreshed = refreshMode !== \"none\" && refreshMode !== \"background\" && refreshMode !== \"style\";[\\s\\S]*?'"
+          assert s.count(old)==2,s.count(old)
+          s=s.replace(old,new)
+          p.write_text(s)
+          # The existing negative FrameGraph contract remains intact; extracting
+          # the new owner removes its accidental cross-function regex match.
+          assert 'self.assertNotRegex(promotion_source, r"executionPlan:' in s
+          (out/'verified-followup.json').write_text(json.dumps(checks,indent=2))
           PY
           git diff --check
-      - name: Run focused behavior and retained deferred-detail boundary checks
-        shell: bash
-        run: |
-          set -o pipefail
-          node --test tests/latency_*_behavior.test.mjs | tee .runtime/tmp/latency-batches-ci/focused-node.log
-          python -m unittest tests.test_main_deferred_detail_promotion_boundary_contract -q 2>&1 | tee .runtime/tmp/latency-batches-ci/deferred-boundary.log
+          node --test tests/latency_*_behavior.test.mjs > .runtime/tmp/latency-batches-ci/focused-node.log
+          python -m unittest tests.test_scenario_chunk_refresh_contracts tests.test_map_renderer_render_pipeline_passes_boundary_contract tests.test_main_deferred_detail_promotion_boundary_contract -q > .runtime/tmp/latency-batches-ci/existing-python.log 2>&1
+          npm run verify:architecture-boundaries > .runtime/tmp/latency-batches-ci/architecture.log 2>&1
           node tools/build_test_import_graph.mjs
-      - name: Commit only authored changes and canonical import graph on this branch
+      - name: Commit only reviewed owner extraction and generated graph
         shell: bash
         run: |
-          python - <<'PY'
-          import json,subprocess
-          from pathlib import Path
-          paths=list(json.loads(Path('.automation/latency-batches/manifest.json').read_text()))
-          paths.append('tests/e2e/test-import-graph.json')
-          subprocess.run(['git','add','--',*paths],check=True)
-          staged=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
-          assert set(staged)<=set(paths),staged
-          subprocess.run(['git','-c','user.name=github-actions[bot]','-c','user.email=41898282+github-actions[bot]@users.noreply.github.com','commit','-m','Bound edit previews and layer presentation; scope same-scene detail refresh'],check=True)
-          subprocess.run(['git','push','origin','HEAD:refs/heads/codex/latency-batches-1-2-20260920'],check=True)
-          PY
-      - name: Install existing locked verification dependencies
+          git add -- js/core/map_renderer/scenario_refresh_runtime.js js/core/map_renderer/scenario_deferred_refresh_owner.js tools/verification/catalog/records/precision_scaling.mjs tests/test_scenario_chunk_refresh_contracts.py tests/e2e/test-import-graph.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Separate scoped refresh owner and retain intent-aware boundary contracts'
+          git push origin HEAD:refs/heads/codex/latency-batches-1-2-20260920
+      - name: Install locked test dependencies
         shell: bash
         run: |
           npm ci
           python -m pip install -r requirements-perf.lock.txt
           npx playwright install --with-deps chromium
-      - name: Run existing suites, architecture, routing, native worker and artifact build
+      - name: Verify remaining runtime and application behavior
         shell: bash
         run: |
           python - <<'PY'
@@ -77,43 +82,37 @@ jobs:
           out=Path('.runtime/tmp/latency-batches-ci')
           checks={
             'existing-node':['node','--test','tests/geometry_raster_runtime_owner_behavior.test.mjs','tests/geometry_raster_worker_client_behavior.test.mjs','tests/geometry_raster_worker_kernel_behavior.test.mjs','tests/political_geometry_store_behavior.test.mjs','tests/scenario_refresh_plans_behavior.test.mjs','tests/appearance_presets_owner_behavior.test.mjs','tests/toolbar_render_scheduler_behavior.test.mjs','tests/precision_scaling_verification_records.test.mjs'],
-            'existing-python':['python','-m','unittest','tests.test_scenario_chunk_refresh_contracts','tests.test_map_renderer_render_pipeline_passes_boundary_contract','tests.test_main_deferred_detail_promotion_boundary_contract','-q'],
-            'architecture':['npm','run','verify:architecture-boundaries'],
             'import-graph':['node','tools/check_test_import_graph.mjs'],
             'native-browser':['npx','playwright','test','--config=playwright.config.cjs','tests/e2e/dev/latency_batches.dev.spec.js','--workers=1'],
+            'tno-post-edit':['npx','playwright','test','--config=playwright.config.cjs','tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js','--grep','tno post-edit','--workers=1'],
             'artifact-build':['python','tools/build_pages_dist.py','--output-root','.runtime/reports/generated/latency-batches-pages'],
           }
-          scripts=json.loads(Path('package.json').read_text())['scripts']
-          for name in scripts:
-              if name.startswith('verify:') and 'route' in name and 'schema' in name:
-                  checks[name]=['npm','run',name]
           manifest=json.loads(Path('.automation/latency-batches/manifest.json').read_text())
-          checks['changed-file-routing']=['node','tools/select_verification_targets.mjs',*[arg for path in manifest for arg in ('--changed-file',path)],'--json']
+          paths=list(manifest)+['js/core/map_renderer/scenario_deferred_refresh_owner.js','tests/test_scenario_chunk_refresh_contracts.py']
+          checks['changed-file-routing']=['node','tools/select_verification_targets.mjs',*[a for p in paths for a in ('--changed-file',p)],'--json']
           results={}
           for name,cmd in checks.items():
               env=dict(os.environ)
-              if name=='native-browser':
+              if name in ('native-browser','tno-post-edit'):
                   env.pop('CI',None)
-                  env['PLAYWRIGHT_TEST_SERVER_PORT']='8003'
-                  env['MAPCREATOR_OPEN_BROWSER']='0'
-              log=out/(name.replace(':','-')+'.log')
+                  env['PLAYWRIGHT_TEST_SERVER_PORT']='8003';env['MAPCREATOR_OPEN_BROWSER']='0'
+              log=out/(name+'.log')
               with log.open('w') as f:
-                  try: result=subprocess.run(cmd,stdout=f,stderr=subprocess.STDOUT,env=env,timeout=240); code=result.returncode
-                  except subprocess.TimeoutExpired: code=124
+                  try:code=subprocess.run(cmd,stdout=f,stderr=subprocess.STDOUT,env=env,timeout=240).returncode
+                  except subprocess.TimeoutExpired:code=124
               results[name]={'command':cmd,'exitCode':code,'log':str(log)}
               print(name,'exit',code,flush=True)
-              if code: print(log.read_text(errors='replace')[-10000:],flush=True)
+              if code:print(log.read_text(errors='replace')[-8000:],flush=True)
               (out/'results.json').write_text(json.dumps(results,indent=2))
-          raise SystemExit(1 if any(item['exitCode'] for item in results.values()) else 0)
+          raise SystemExit(1 if any(v['exitCode'] for v in results.values()) else 0)
           PY
-      - name: Preserve validation evidence even on failure
+      - name: Preserve exact test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: latency-batches-validation
+          name: latency-batches-validation-followup
           path: |
-            .runtime/tmp/latency-batches-ci/*.log
-            .runtime/tmp/latency-batches-ci/*.json
+            .runtime/tmp/latency-batches-ci/**
             .runtime/tests/playwright/**
           include-hidden-files: true
           retention-days: 7
