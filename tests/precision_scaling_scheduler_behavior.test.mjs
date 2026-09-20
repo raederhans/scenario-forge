@@ -110,5 +110,7 @@ test("real loader scene switch cancels queued fetches and rejects late outgoing 
   h.pending.get("a").resolve({ payload: { features: [] } }); await failures;
   assert.deepEqual(h.starts, ["a"]);
   assert.equal(h.bundle.chunkPayloadCacheById.a, undefined);
+  assert.equal(h.state.runtimeChunkLoadState.inFlightByChunkId.a, undefined);
+  assert.equal(h.state.runtimeChunkLoadState.inFlightByChunkId.b, undefined);
   assert.equal(h.loader.getLoadSchedulerStats().active, 0);
 });

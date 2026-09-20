@@ -112,15 +112,18 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     }
     const request = { controller: new AbortController(), promise: null };
     chunkRequestsByRequest.set(request, { bundle, chunkId });
-    const loadPromise = (async () => {
+    let loadStarted = false;
+    // Keep cache publication and generation settlement in the fetch continuation,
+    // inside admission; the scheduler must not add an observer-visible gap.
+    const loadPromise = scheduler.schedule(async () => {
+      loadStarted = true;
       try {
-        const result = await scheduler.schedule(() => loadScenarioChunkFile(chunkMeta.url, {
+        const result = await loadScenarioChunkFile(chunkMeta.url, {
           d3Client,
           scenarioId: getScenarioBundleId(bundle),
           resourceLabel: `chunk:${chunkMeta.layer}:${chunkId}`,
           signal: request.controller.signal,
-        }), { key: request, bytes: estimateChunkLoadBytes(chunkMeta), priority,
-          signal: request.controller.signal });
+        });
         request.controller.signal.throwIfAborted();
         const payload = { layerKey: chunkMeta.layer, payload: result?.payload || null };
         recordScenarioChunkPayloadSourceBytes(payload, chunkMeta);
@@ -135,7 +138,17 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       } finally {
         finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
       }
-    })();
+    }, { key: request, bytes: estimateChunkLoadBytes(chunkMeta), priority,
+      signal: request.controller.signal }).catch((error) => {
+      // Queued cancellation never enters the operation's try/finally.
+      if (!loadStarted) {
+        failScenarioChunkLoadState(runtimeState, chunkId,
+          String(error?.message || error || "Unknown chunk load error."),
+          { expectedLoadStateGeneration: generation });
+        finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
+      }
+      throw error;
+    });
     request.promise = loadPromise;
     promiseCache[chunkId] = loadPromise;
     const clearCachedLoadPromise = () => {

@@ -6,18 +6,19 @@ import { resetScenarioChunkRuntimeState } from "../js/core/state/actions/scenari
 function fixture() {
   const state = { activeScenarioId: "a" };
   resetScenarioChunkRuntimeState(state, { scenarioId: "a" });
-  let resolve, reject;
+  let resolve, reject, markStarted;
+  const started = new Promise((yes) => { markStarted = yes; });
   let loadCount = 0;
   const pending = new Promise((yes, no) => { resolve = yes; reject = no; });
   const loader = createScenarioChunkPayloadLoader({
     runtimeState: state,
     normalizeScenarioId: (id) => String(id || "").trim(),
     getScenarioBundleId: (bundle) => bundle.id,
-    loadScenarioChunkFile: () => { loadCount += 1; return pending; },
+    loadScenarioChunkFile: () => { loadCount += 1; markStarted(); return pending; },
   });
   const bundle = { id: "a" };
   const meta = { id: "political.detail.a", layer: "political", url: "a.json" };
-  return { state, loader, bundle, meta, resolve, reject, loadCount: () => loadCount };
+  return { state, loader, bundle, meta, resolve, reject, started, loadCount: () => loadCount };
 }
 
 for (const failed of [false, true]) {
@@ -25,6 +26,8 @@ for (const failed of [false, true]) {
     const f = fixture();
     const original = f.loader.loadScenarioChunkPayload(f.bundle, f.meta);
     const originalResult = failed ? assert.rejects(original, /network/) : original;
+    // Admission is queued; the generation contract starts once fetch runs.
+    await f.started;
     const cached = f.bundle.chunkPayloadPromisesById[f.meta.id];
     f.loader.resetScenarioChunkRequests("a");
     resetScenarioChunkRuntimeState(f.state, { scenarioId: "a" });
@@ -48,6 +51,7 @@ for (const failed of [false, true]) {
 test("new request completes its generation in the fetch continuation without an added await", async () => {
   const f = fixture();
   const result = f.loader.loadScenarioChunkPayload(f.bundle, f.meta);
+  await f.started;
   f.resolve({ payload: { type: "FeatureCollection", features: [] } });
   await Promise.resolve();
   assert.equal(f.state.runtimeChunkLoadState.inFlightByChunkId[f.meta.id], undefined);
