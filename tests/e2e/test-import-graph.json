@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 62,
-    "nodeCount": 77,
-    "reverseIndexKeyCount": 117,
+    "specCount": 63,
+    "nodeCount": 78,
+    "reverseIndexKeyCount": 121,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -335,6 +335,26 @@
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/dev/latency_batches.dev.spec.js": {
+      "directDependencies": [
+        "js/core/renderer/context_layer_render_scheduler.js",
+        "js/core/renderer/geometry_raster_runtime_owner.js",
+        "js/core/renderer/political_patch_preview_budget.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/renderer/context_layer_render_scheduler.js",
+        "js/core/renderer/geometry_raster_runtime_owner.js",
+        "js/core/renderer/political_patch_preview_budget.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "repoImpact": [
+        "js/core/renderer/context_layer_render_scheduler.js",
+        "js/core/renderer/geometry_raster_runtime_owner.js",
+        "js/core/renderer/political_patch_preview_budget.js",
+        "vendor/d3.v7.min.js"
       ]
     },
     "tests/e2e/dev/normal_visual_paths.dev.spec.js": {
@@ -2103,12 +2123,21 @@
     "js/core/renderer/city_points_render_owner.js": [
       "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
     ],
+    "js/core/renderer/context_layer_render_scheduler.js": [
+      "tests/e2e/dev/latency_batches.dev.spec.js"
+    ],
+    "js/core/renderer/geometry_raster_runtime_owner.js": [
+      "tests/e2e/dev/latency_batches.dev.spec.js"
+    ],
     "js/core/renderer/geometry_raster_worker_kernel.js": [
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
       "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
     ],
     "js/core/renderer/pixel_ratio_policy.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/renderer/political_patch_preview_budget.js": [
+      "tests/e2e/dev/latency_batches.dev.spec.js"
     ],
     "js/core/renderer/render_cache_owner.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
@@ -2414,6 +2443,9 @@
     ],
     "tests/e2e/dev/full_visual_acceptance.dev.spec.js": [
       "tests/e2e/dev/full_visual_acceptance.dev.spec.js"
+    ],
+    "tests/e2e/dev/latency_batches.dev.spec.js": [
+      "tests/e2e/dev/latency_batches.dev.spec.js"
     ],
     "tests/e2e/dev/normal_visual_paths.dev.spec.js": [
       "tests/e2e/dev/normal_visual_paths.dev.spec.js"
@@ -2983,6 +3015,7 @@
       "tests/e2e/water_cache_strategy_regression.spec.js"
     ],
     "vendor/d3.v7.min.js": [
+      "tests/e2e/dev/latency_batches.dev.spec.js",
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
       "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
     ]

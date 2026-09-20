@@ -285,12 +285,15 @@ export function createAppearanceControlsController({
         if (layerRequest) requests.push(layerRequest);
       });
     }
-    requests.forEach((layerRequest) => {
-      void runtimeState.ensureContextLayerDataFn(layerRequest, {
+    // One preset is one context-load batch, including nested physical/transport
+    // request groups. The loader already settles and invalidates a batch once.
+    const layerNames = [...new Set(requests.flat(Infinity).filter(Boolean))];
+    if (layerNames.length) {
+      void runtimeState.ensureContextLayerDataFn(layerNames, {
         reason: "appearance-preset-apply",
         renderNow: true,
       });
-    });
+    }
   };
   const appearancePresetsOwner = createAppearancePresetsOwner({
     runtimeState,

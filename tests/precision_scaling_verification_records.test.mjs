@@ -6,18 +6,20 @@ import { createPrecisionScalingRecords } from "../tools/verification/catalog/rec
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 7);
+  assert.equal(routes.length, 11);
+  assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
     assert.equal(record.selectorOrder, 2001 + i);
     assert.ok(record.commandRef.length > 0);
     for (const source of record.sourceRefs) assert.ok(fs.existsSync(source), source);
   }
-  const browser = routes.at(-1);
+  for (const browser of [routes[6], routes[10]]) {
   assert.deepEqual(browser.executionOwners, ["main-thread"]);
   assert.ok(browser.resourceLocks.includes("playwright-browser"));
   assert.deepEqual(browser.profiles, ["full"]);
-  assert.ok(routes.slice(0, -1).every((r) => r.resourceLocks.length === 0));
+  }
+  assert.ok(routes.filter((r) => !r.id.endsWith(":native-browser")).every((r) => r.resourceLocks.length === 0));
 });
 
 test("the public authority includes new records after all existing local records", () => {

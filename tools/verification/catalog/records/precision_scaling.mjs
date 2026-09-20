@@ -37,5 +37,30 @@ export function createPrecisionScalingRecords(existingRecords) {
     resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"], executionOwners: ["main-thread"],
     profiles: ["full"], entrypointPolicyIndex: 0, selectorOrder: start + records.length,
   });
+  // Latency follow-up targets append after all seven precision records, so
+  // prior selectors, browser ownership and local-infrastructure budgets stay fixed.
+  const latencyRoutes = [
+    ["preview-layers", "node --test tests/latency_preview_and_layers_behavior.test.mjs", [
+      "js/core/map_renderer.js", "js/core/renderer/political_patch_preview_budget.js",
+      "js/core/renderer/context_layer_render_scheduler.js", "js/ui/toolbar/appearance_controls_controller.js",
+      "tests/latency_preview_and_layers_behavior.test.mjs",
+    ]],
+    ["bulk-worker", "node --test tests/latency_bulk_worker_behavior.test.mjs", [
+      "js/core/renderer/geometry_raster_runtime_owner.js", "tests/latency_bulk_worker_behavior.test.mjs",
+    ]],
+    ["refresh-scope", "node --test tests/latency_scoped_refresh_behavior.test.mjs", [
+      "js/core/map_renderer/scenario_refresh_scope.js", "js/core/map_renderer/scenario_refresh_runtime.js",
+      "js/core/scenario/scenario_renderer_bridge.js", "js/bootstrap/deferred_detail_promotion.js",
+      "tests/latency_scoped_refresh_behavior.test.mjs",
+    ]],
+  ];
+  for (const [id, commandRef, sourceRefs] of latencyRoutes) records.push({
+    ...records[0], id: "local:latency-batches:" + id, commandRef, sourceRefs,
+    ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[6], id: "local:latency-batches:native-browser",
+    commandRef: "npx playwright test --config=playwright.config.cjs tests/e2e/dev/latency_batches.dev.spec.js --workers=1",
+    sourceRefs: ["tests/e2e/dev/latency_batches.dev.spec.js"], selectorOrder: start + records.length,
+  });
   return records;
 }
