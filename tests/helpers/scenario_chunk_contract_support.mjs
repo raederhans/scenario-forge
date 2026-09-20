@@ -874,9 +874,9 @@ async function runOptionalChunkPromotionScenario({
       }
     } else {
       assert.equal(controller.scheduleScenarioChunkRefresh({ reason, delayMs: 0 }), "scheduled");
-      for (let i = 0; i < 10; i += 1) {
-        await Promise.resolve();
-      }
+      // Admission adds continuations; wait for the complete microtask queue,
+      // not a guessed number of Promise hops. All promotion assertions remain.
+      await new Promise((resolve) => setImmediate(resolve));
     }
 
     return {

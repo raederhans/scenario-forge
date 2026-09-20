@@ -1,4 +1,5 @@
-import { createPoliticalGeometryStore } from "../political_geometry_store.js";
+import { getPoliticalLodRank } from "./political_lod_policy.js";
+import { createPoliticalGeometryStore, getPoliticalGeometrySnapshot } from "../political_geometry_store.js";
 
 // Derives layer payloads from a captured chunk state. The controller owns state commits.
 const politicalGeometryStores = new WeakMap();
@@ -103,8 +104,8 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
       chunkMetaById ||= buildScenarioChunkMetaIndex(bundle);
       // mergeScenarioChunkPayloads keeps the first feature with each ID.
       layerChunkPayloadEntries.sort((left, right) => (
-        Number(chunkMetaById.get(right.chunkId)?.lod === "detail")
-        - Number(chunkMetaById.get(left.chunkId)?.lod === "detail")
+        getPoliticalLodRank(chunkMetaById.get(right.chunkId))
+        - getPoliticalLodRank(chunkMetaById.get(left.chunkId))
       ));
     }
     const previousSignature = String(previousSignatures?.[layerKey] || "");
@@ -150,7 +151,8 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
       const payload = mergedPayload?.globalCoverage === true
         ? mergedPayload : { ...mergedPayload, globalCoverage: true };
       mergedLayerPayloads[layerKey] = payload;
-      const featureCount = Array.isArray(payload?.features) ? payload.features.length : 0;
+      const featureCount = getPoliticalGeometrySnapshot(payload)?.featureCount
+        ?? (Array.isArray(payload?.features) ? payload.features.length : 0);
       primaryMergedLayerPayloads[layerKey] = payload;
       primaryLayerStats[layerKey] = {
         coverageMode: "full",

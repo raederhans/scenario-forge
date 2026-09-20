@@ -1,3 +1,4 @@
+import { getPoliticalLodRank, selectPoliticalLodFamilies } from "./scenario/political_lod_policy.js";
 import { getFeatureId } from "./feature_identity.js";
 
 const DEFAULT_RENDER_BUDGET_HINTS = Object.freeze({
@@ -192,6 +193,7 @@ function normalizeChunkEntry(rawChunk = {}) {
     url: chunkUrl,
     layer: layerKey,
     lod: String(rawChunk.lod || "detail").trim().toLowerCase(),
+    lodGroupId: String(rawChunk.lod_group_id || rawChunk.lodGroupId || "").trim(),
     bounds: normalizeBounds(rawChunk.bounds),
     minZoom: clampNumber(rawChunk.min_zoom ?? rawChunk.minZoom, 0, 99, 0),
     maxZoom: clampNumber(rawChunk.max_zoom ?? rawChunk.maxZoom, 0, 99, 99),
@@ -589,13 +591,14 @@ export function selectScenarioChunks({
       ? hints.max_required_political_chunks
       : hints.max_required_chunks;
     const optionalBudget = layerKey === "political" ? 0 : hints.max_optional_chunks;
-    const candidates = resolveLayerChunksForZoom({
+    let candidates = resolveLayerChunksForZoom({
       chunkRegistry,
       contextLodManifest,
       layerKey,
       zoom,
     }).filter((chunk) => !isScenarioPoliticalBaseChunk(chunk)
       && (chunk.globalCoverage || chunkIntersectsViewport(chunk, viewportBbox)));
+    if (layerKey === "political") candidates = selectPoliticalLodFamilies(candidates, loadedChunkIds);
     const ordered = sortChunksForSelection(candidates, focusCountry, viewportBbox, loadedChunkIds);
     const focusDetailChunks = normalizedFocusCountry
       ? ordered.filter((chunk) => chunk.lod === "detail" && chunk.countryCodes.includes(normalizedFocusCountry))
@@ -750,7 +753,7 @@ export function mergeScenarioChunkPayloadsForViewport(layerKey, chunkPayloadEntr
   if (normalizedLayerKey === "political") {
     // The feature merger keeps the first ID. Precision must win independently
     // of network completion order, with the base filling every remaining ID.
-    entries.sort((left, right) => Number(right.chunk?.lod === "detail") - Number(left.chunk?.lod === "detail"));
+    entries.sort((left, right) => getPoliticalLodRank(right.chunk) - getPoliticalLodRank(left.chunk));
   }
   if (!entries.length || normalizedLayerKey !== "political") {
     const fullPayload = mergeScenarioChunkPayloads(

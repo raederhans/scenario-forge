@@ -58,17 +58,19 @@ for (const mode of ["refresh", "prewarm"]) {
 test("overlapping selections keep caller-owned results even when the newest selection replaces cache pins", async () => {
   const runtimeState = { activeScenarioId: "a" };
   const bundle = { id: "a" };
-  const resolvers = new Map();
+  const completed = [];
   const loader = createScenarioChunkPayloadLoader({ runtimeState, normalizeScenarioId: String,
     getScenarioBundleId: (value) => value.id,
-    loadScenarioChunkFile: (url) => new Promise((resolve) => resolvers.set(url, resolve)),
+    loadScenarioChunkFile: async (url) => ({ payload: { features: [url] } }),
   });
   const chunks = (prefix) => Array.from({ length: 40 }, (_, id) => ({ id: `${prefix}-${id}`, url: `${prefix}-${id}`, layer: "political" }));
   const firstChunks = chunks("first"), nextChunks = chunks("next");
   const first = loader.loadScenarioChunkPayloadEntries(bundle, firstChunks);
   const next = loader.loadScenarioChunkPayloadEntries(bundle, nextChunks);
-  for (const chunk of [...nextChunks, ...firstChunks]) resolvers.get(chunk.id)({ payload: { features: [chunk.id] } });
+  void first.then(() => completed.push("first"));
+  void next.then(() => completed.push("next"));
   const [firstEntries, nextEntries] = await Promise.all([first, next]);
+  assert.deepEqual(completed, ["next", "first"], "new selection is admitted ahead of queued old work");
   assert.equal(firstEntries.length, 40);
   assert.equal(nextEntries.length, 40);
   assert.ok(firstEntries.every((entry) => entry.payload.payload.features[0] === entry.chunkId));

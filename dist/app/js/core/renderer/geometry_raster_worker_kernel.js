@@ -1,3 +1,4 @@
+import { decodePackedRasterUpdates, drawPackedRasterGeometry, isPackedRasterGeometry, getRasterGeometryWeights } from "./packed_geometry.js";
 import "../geometry_transfer_codec_shared.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET, WORKER_GEOMETRY_CACHE_BUDGET } from "./geometry_cache_budget.js";
 
@@ -43,7 +44,9 @@ export function createGeometryRasterWorkerKernel({
   let projectionKey = null;
   let projectionOptionsSignature = "";
   let pathGenerator = null;
-  const geometries = new GeometryBudgetMap({ budget: geometryCacheBudget, weigh: (feature) => getGeometryRetentionWeights(feature).decoded, autoTrim: false });
+  let projection = null;
+  const weights = (feature) => getRasterGeometryWeights(feature, getGeometryRetentionWeights);
+  const geometries = new GeometryBudgetMap({ budget: geometryCacheBudget, weigh: (feature) => weights(feature).decoded, autoTrim: false });
   const paths = new GeometryBudgetMap({ budget: pathCacheBudget, weigh: (entry) => entry.estimatedBytes });
   // The worker entry serializes render tasks; each kind owns one reusable surface.
   const surfaces = new Map();
@@ -66,7 +69,7 @@ export function createGeometryRasterWorkerKernel({
       sceneKey = packet.sceneKey;
     }
     if (!pathGenerator || projectionKey !== packet.projectionKey || projectionOptionsSignature !== optionsSignature) {
-      const projection = createGeometryRasterProjection(d3, options);
+      projection = createGeometryRasterProjection(d3, options);
       pathGenerator = d3.geoPath(projection).pointRadius(options.pointRadius ?? 2);
       projectionKey = packet.projectionKey;
       projectionOptionsSignature = optionsSignature;
@@ -74,7 +77,7 @@ export function createGeometryRasterWorkerKernel({
     }
     const unpackingStartedAt = now();
     const updates = packet.geometryTransport
-      ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(packet.geometryTransport)
+      ? decodePackedRasterUpdates(packet.geometryTransport)
       : packet.geometryUpdates || [];
     const unpackingMs = now() - unpackingStartedAt;
     for (const { id, feature } of updates) {
@@ -150,11 +153,12 @@ export function createGeometryRasterWorkerKernel({
       if (!path) {
         path = createPath();
         try {
-          pathGenerator.context(path)(feature);
+          if (isPackedRasterGeometry(feature)) drawPackedRasterGeometry(feature, projection, path, options.pointRadius ?? 2);
+          else pathGenerator.context(path)(feature);
         } finally {
           pathGenerator.context(null);
         }
-        const estimatedBytes = getGeometryRetentionWeights(feature).path;
+        const estimatedBytes = weights(feature).path;
         if (estimatedBytes > paths.budget) {
           // Preserve the cache's oversized-skip accounting; draw transiently.
           paths.set(entry.id, { path, estimatedBytes });
@@ -187,6 +191,7 @@ export function createGeometryRasterWorkerKernel({
     const evictedGeometryIds = geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
     return { bitmap, kind: packet.kind, width, height, renderedCount, pathBuildCount, yieldCount, unpackingMs,
+      geometryTransportMode: packet.geometryTransport ? "packed-f64" : "geojson",
       evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),
         paths: { ...paths.getStats(), frameAdmissionSkips: pathAdmissionSkips } }, renderMs: now() - startedAt };
   }

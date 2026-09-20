@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createRequire } from "node:module";
 import { createGeometryRasterWorkerKernel } from "../js/core/renderer/geometry_raster_worker_kernel.js";
 import { getGeometryRetentionWeights } from "../js/core/renderer/geometry_cache_budget.js";
 
@@ -158,7 +159,12 @@ test("cache pressure: geometry eviction acknowledgement and re-upload remain int
 });
 
 test("cache pressure: real lossless transport remains compatible with admission", async () => {
-  const h = harness(weight(feature(0)) * 2);
+  // Packed geometry streams through projection.stream rather than geoPath.
+  // Exercise that boundary with the real projection, not the GeoJSON-only fake.
+  const h = harness(weight(feature(0)) * 2, {
+    d3: createRequire(import.meta.url)("../vendor/d3.v7.min.js"),
+    createPath: () => ({ moveTo() {}, lineTo() {}, closePath() {}, arc() {} }),
+  });
   const source = updates("a", "b", "c");
   const original = structuredClone(source);
   const encoded = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(source, { minCoordinateCount: 0 });

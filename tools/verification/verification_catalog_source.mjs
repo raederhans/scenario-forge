@@ -18,6 +18,7 @@ import { RENDERER_CACHE_PIPELINE_RECORDS } from "./catalog/records/renderer_cach
 import { STATE_OWNERSHIP_RECORDS } from "./catalog/records/state_ownership.mjs";
 import { RENDERER_PROJECTION_VIEWPORT_RECORDS } from "./catalog/records/renderer_projection_viewport.mjs";
 import { createLocalFeedbackRecords } from "./catalog/records/local_feedback.mjs";
+import { createPrecisionScalingRecords } from "./catalog/records/precision_scaling.mjs";
 
 export { normalizeVerificationMetadataSource, verificationMetadataSourceDigest, verificationGatePolicySignalsDigest } from "./catalog/normalization.mjs";
 
@@ -40,10 +41,11 @@ const baseRecords = [
   ...STATE_OWNERSHIP_RECORDS,
   ...RENDERER_PROJECTION_VIEWPORT_RECORDS,
 ];
+const existingRecords = [...baseRecords, ...createLocalFeedbackRecords(baseRecords)];
 const AUTHORED_VERIFICATION_METADATA = {
   ...CATALOG_POLICIES,
   packageScripts: PACKAGE_SCRIPTS,
-  records: [...baseRecords, ...createLocalFeedbackRecords(baseRecords)],
+  records: [...existingRecords, ...createPrecisionScalingRecords(existingRecords)],
 };
 
 export const VERIFICATION_METADATA_SOURCE = deepFreeze(

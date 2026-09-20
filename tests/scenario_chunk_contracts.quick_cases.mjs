@@ -1509,9 +1509,8 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
       });
 
       assert.equal(controller.scheduleScenarioChunkRefresh({ reason: "scenario-apply", delayMs: 0 }), "scheduled");
-      for (let i = 0; i < 6; i += 1) {
-        await Promise.resolve();
-      }
+      // Drain admitted fetch/decode and promotion continuations before inspecting the result.
+      await new Promise((resolve) => setImmediate(resolve));
 
       assert.deepEqual(runtimeState.runtimeChunkLoadState.lastSelection.cacheOnlyChunkIds, []);
       assert.deepEqual(runtimeState.runtimeChunkLoadState.lastSelection.retainedActiveChunkIds, [previousChunk.id]);
@@ -1646,9 +1645,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
       });
 
       assert.equal(controller.scheduleScenarioChunkRefresh({ reason: "viewport-primary", delayMs: 0 }), "scheduled");
-      for (let i = 0; i < 8; i += 1) {
-        await Promise.resolve();
-      }
+      await new Promise((resolve) => setImmediate(resolve));
 
       assert.deepEqual(
         runtimeState.scenarioPoliticalChunkData.features.map((feature) => feature.id),
