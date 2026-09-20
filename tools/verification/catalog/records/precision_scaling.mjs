@@ -19,6 +19,7 @@ export function createPrecisionScalingRecords(existingRecords) {
     ]],
     ["routes", "test-routing", "node --test tests/precision_scaling_verification_records.test.mjs", [
       "tools/verification/catalog/records/precision_scaling.mjs", "tools/verification/verification_catalog_source.mjs", "tests/precision_scaling_verification_records.test.mjs",
+      "docs/active/precision-scaling-implementation-20260920/results.md",
     ]],
   ];
   const records = routes.map(([id, domain, commandRef, sourceRefs], index) => ({
