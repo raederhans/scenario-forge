@@ -8,14 +8,20 @@ let nextRevision = 1;
 export const getPoliticalGeometrySnapshot = (collection) => snapshots.get(collection) || null;
 
 export function registerPoliticalGeometrySnapshot(collection, snapshot) {
-  snapshots.set(collection, snapshot);
+  // Normalizers can replace the index with wrapped features. Do not retain a
+  // lookup bound to the unnormalized source view in that derived snapshot.
+  const index = Object.getOwnPropertyDescriptor(snapshot, "featuresById")?.value;
+  snapshots.set(collection, index instanceof Map
+    ? { ...snapshot, getFeature: (id) => index.get(id), featureCount: index.size }
+    : snapshot);
   return collection;
 }
 
 export function createPoliticalGeometryStore() {
   const sources = new WeakMap();
   let previousSources = [];
-  let winners = new Map();
+  const winners = new Map();
+  let previousView = null;
   let previousRevision = 0;
   function index(payload) {
     if (sources.has(payload)) return sources.get(payload);
@@ -42,7 +48,7 @@ export function createPoliticalGeometryStore() {
           for (const id of source.byId.keys()) touched.add(id);
         }
       }
-      const nextWinners = new Map(winners);
+
       const changedIds = [];
       const removedIds = [];
       for (const id of touched) {
@@ -50,37 +56,48 @@ export function createPoliticalGeometryStore() {
         const feature = source?.byId.get(id);
         const previous = winners.get(id);
         if (source) {
-          nextWinners.set(id, { source, feature });
+          winners.set(id, { source, feature });
           if (previous?.feature !== feature) changedIds.push(id);
         } else {
-          nextWinners.delete(id);
+          winners.delete(id);
           if (previous) removedIds.push(id);
         }
       }
-      // Legacy draw order remains detail-first, then unmasked coarse features.
-      // Only the compatibility array is materialized; base IDs and geometry are
-      // indexed once and unchanged detail sources keep their own indexed view.
-      const features = [];
-      const featuresById = new Map();
-      const emittedSources = new Set();
-      for (const source of orderedSources) {
-        if (emittedSources.has(source)) continue;
-        emittedSources.add(source);
-        for (const [id, feature] of source.byId) {
-          if (nextWinners.get(id)?.source !== source) continue;
-          features.push(feature);
-          featuresById.set(id, feature);
-        }
+      // A view owns immutable source indexes, not a link to an earlier view.
+      // The live winner table is updated only for touched IDs. Consumers of
+      // the delta do not pay for a full Map copy or a compatibility array.
+      const sameOrder = orderedSources.length === previousSources.length
+        && orderedSources.every((source, i) => source === previousSources[i]);
+      const viewSources = [...orderedSources];
+      let view = sameOrder ? previousView : null;
+      if (!view) {
+        let byId = null, features = null;
+        view = {
+          get featuresById() {
+            if (!byId) {
+              byId = new Map();
+              for (const source of viewSources) {
+                for (const [id, feature] of source.byId) if (!byId.has(id)) byId.set(id, feature);
+              }
+            }
+            return byId;
+          },
+          get features() { return features ||= [...this.featuresById.values()]; },
+          getFeature(id) {
+            for (const source of viewSources) if (source.byId.has(id)) return source.byId.get(id);
+            return undefined;
+          },
+        };
       }
       const revision = nextRevision++;
-      const collection = { type: "FeatureCollection", features, globalCoverage: true };
+      const collection = { type: "FeatureCollection", get features() { return view.features; }, globalCoverage: true };
       registerPoliticalGeometrySnapshot(collection, {
-        revision, previousRevision, featuresById, changedIds, removedIds,
-        sourceCount: orderedSources.length,
+        revision, previousRevision, get featuresById() { return view.featuresById; }, changedIds, removedIds,
+        getFeature: view.getFeature, featureCount: winners.size, sourceCount: orderedSources.length,
       });
+      previousView = view;
       previousSources = orderedSources;
       previousRevision = revision;
-      winners = nextWinners;
       return collection;
     },
   };
