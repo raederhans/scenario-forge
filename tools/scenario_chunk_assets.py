@@ -824,6 +824,7 @@ def _optimize_political_coarse_payload(
     owner_buckets_by_feature_id: dict[str, str] | None = None,
     diagnostics: dict[str, Any] | None = None,
     precision_source_countries: set[str] | None = None,
+    political_precision_feature_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     if not isinstance(payload, dict) or not isinstance(payload.get("features"), list):
         return payload
@@ -857,8 +858,10 @@ def _optimize_political_coarse_payload(
     regional_candidates = [
         (index, feature) for index, feature in enumerate(source_features)
         if isinstance(feature, dict) and index not in fr_feature_indexes
-        and str((feature.get("properties") or {}).get("cntr_code", "")).upper()
-        in (precision_source_countries or set())
+        and (
+            str((feature.get("properties") or {}).get("cntr_code", "")).upper() in (precision_source_countries or set())
+            or _feature_id(feature, index) in (political_precision_feature_ids or set())
+        )
     ]
     regional_geometries, regional_applied = _shared_coverage_simplified_geometries(
         regional_candidates, owner_buckets_by_feature_id,
@@ -1078,6 +1081,7 @@ def _build_chunk_payloads_for_feature_collection(
     chunk_specs: tuple[dict[str, Any], ...] = LOD_SPECS,
     owner_buckets_by_feature_id: dict[str, str] | None = None,
     precision_source_countries: set[str] | None = None,
+    political_precision_feature_ids: set[str] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     if not feature_collection or not isinstance(feature_collection.get("features"), list) or not feature_collection["features"]:
         return [], {}
@@ -1138,6 +1142,7 @@ def _build_chunk_payloads_for_feature_collection(
                         owner_buckets_by_feature_id=owner_buckets_by_feature_id,
                         diagnostics=optimization_diagnostics,
                         precision_source_countries=precision_source_countries,
+                        political_precision_feature_ids=political_precision_feature_ids,
                     )
                     chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
                     optimized_lod_summary = _summarize_payload_geometry_cost(chunk_payload)
@@ -1147,8 +1152,11 @@ def _build_chunk_payloads_for_feature_collection(
                         optimized_lod_summary,
                         fr_shared_coverage_applied=optimization_diagnostics["fr_shared_coverage_applied"],
                     )
-                    if precision_source_countries:
-                        lod_diagnostics["precision_source_countries"] = sorted(precision_source_countries)
+                    if precision_source_countries or political_precision_feature_ids:
+                        if precision_source_countries:
+                            lod_diagnostics["precision_source_countries"] = sorted(precision_source_countries)
+                        if political_precision_feature_ids:
+                            lod_diagnostics["political_precision_feature_ids"] = sorted(political_precision_feature_ids)
                         lod_diagnostics["regional_shared_coverage_applied"] = optimization_diagnostics["regional_shared_coverage_applied"]
                     _write_minified_json(chunk_path, chunk_payload)
                 elif layer_key == "water":
@@ -1294,6 +1302,23 @@ def _build_political_chunk_payloads(
     ):
         raise ValueError("political_precision_source_countries must be a list of uppercase ISO2 codes")
     precision_source_countries = set(precision_codes)
+
+    explicit_ids_payload = (runtime_topology_payload or {}).get("political_precision_feature_ids", [])
+    if "political_precision_feature_ids" in (runtime_topology_payload or {}):
+        if not isinstance(explicit_ids_payload, list) or any(
+            not isinstance(val, str) or not val.strip() or val != val.strip() for val in explicit_ids_payload
+        ) or len(set(explicit_ids_payload)) != len(explicit_ids_payload):
+            raise ValueError("political_precision_feature_ids must be a list of nonempty unique strings")
+        political_precision_feature_ids = set(explicit_ids_payload)
+        existing_ids = set()
+        if runtime_feature_collection:
+            existing_ids.update(_feature_id(f, i) for i, f in enumerate(runtime_feature_collection.get("features") or []))
+        unknown_ids = political_precision_feature_ids - existing_ids
+        if unknown_ids:
+            raise ValueError(f"political_precision_feature_ids contains unknown IDs: {sorted(unknown_ids)}")
+    else:
+        political_precision_feature_ids = set()
+
     if coarse_feature_collection:
         chunks, lod_entries = _build_chunk_payloads_for_feature_collection(
             scenario_id=scenario_id,
@@ -1303,6 +1328,7 @@ def _build_political_chunk_payloads(
             payload_factory=lambda selected_feature_ids: _slice_feature_collection(coarse_feature_collection, selected_feature_ids),
             chunk_specs=POLITICAL_COARSE_LOD_SPECS,
             precision_source_countries=precision_source_countries,
+            political_precision_feature_ids=political_precision_feature_ids,
             owner_buckets_by_feature_id={
                 feature_id: _resolve_feature_owner_bucket(
                     feature,
@@ -1314,6 +1340,7 @@ def _build_political_chunk_payloads(
                 for feature_id in [_feature_id(feature, index)]
                 if feature_id.startswith("FR_ARR_")
                 or str((feature.get("properties") or {}).get("cntr_code", "")).upper() in precision_source_countries
+                or feature_id in political_precision_feature_ids
             },
         )
         all_chunks.extend(chunks)

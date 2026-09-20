@@ -32,6 +32,7 @@ function createOwnerHarness({
   landFeatures = [],
   riverFeatures = [],
   computeProjectedFeatureBounds = () => null,
+  getProjectedFeatureBounds = (feature) => feature?.bounds || null,
   shouldSkipFeature = () => false,
   getLogicalCanvasDimensions = () => [800, 600],
   yieldToMain = async () => {},
@@ -59,11 +60,41 @@ function createOwnerHarness({
       computeProjectedFeatureBounds,
       shouldSkipFeature,
       getLogicalCanvasDimensions,
-      getProjectedFeatureBounds: (feature) => feature?.bounds || null,
+      getProjectedFeatureBounds,
     },
   });
   return { owner, state };
 }
+
+test("explicit geometry delta preserves picking keys and published bounds while order changes", () => {
+  const a = { id: "a", countryCode: "AA", bounds: bounds(10) };
+  const b = { id: "b", countryCode: "BB", bounds: bounds(30) };
+  const reads = [];
+  const { owner, state } = createOwnerHarness({ landFeatures: [a, b],
+    computeProjectedFeatureBounds: (f) => f.bounds,
+    getProjectedFeatureBounds: (f) => { reads.push(f.id); return f.bounds; },
+  });
+  const cache = new Map();
+  owner.rebuildRuntimePrimaryIndex({ projectedBoundsCache: cache });
+  const aKey = state.idToKey.get("a"), bKey = state.idToKey.get("b");
+  const next = { id: "new", countryCode: "AA", bounds: bounds(60) };
+  state.landData = { features: [next, b, a] };
+  owner.reconcileRuntimePrimaryIndex({ projectedBoundsCache: cache, incrementalDelta: { changedIds: ["new"], removedIds: [] } });
+  assert.deepEqual(reads, ["new"]);
+  assert.equal(state.idToKey.get("a"), aKey);
+  assert.equal(state.idToKey.get("b"), bKey);
+  assert.equal(state.keyToId.get(state.idToKey.get("new")), "new");
+  assert.deepEqual(cache.get("a"), a.bounds);
+  assert.deepEqual(state.countryToFeatureIds.get("AA"), ["new", "a"]);
+  owner.buildSpatialIndex({ includeSecondary: false });
+  assert.equal(state.spatialItemsById.get("a").drawOrder, 2);
+  const replacement = { ...b, bounds: null, excludedInteraction: true };
+  state.landData = { features: [replacement, a] };
+  owner.reconcileRuntimePrimaryIndex({ projectedBoundsCache: cache, incrementalDelta: { changedIds: ["b"], removedIds: ["new"] } });
+  assert.ok(!cache.has("b") && !cache.has("new"));
+  assert.ok(!state.idToKey.has("b") && !state.landIndex.has("new"));
+  assert.equal(state.idToKey.get("a"), aKey);
+});
 
 test("incremental primary indexes and queried grid match a full rebuild after replacements, reorder, removal and exclusion", () => {
   const a = { id: "a", countryCode: "AA", bounds: bounds(10) };

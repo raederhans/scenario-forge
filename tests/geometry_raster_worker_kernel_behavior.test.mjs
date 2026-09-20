@@ -6,6 +6,31 @@ import vm from "node:vm";
 import { createGeometryRasterProjection, createGeometryRasterWorkerKernel } from "../js/core/renderer/geometry_raster_worker_kernel.js";
 
 const d3 = createRequire(import.meta.url)("../vendor/d3.v7.min.js");
+
+test("worker cache budgets preserve pinned geometry, evict inactive uploads and rebuild evicted paths", async () => {
+  const { kernel } = harness({ pathCacheBudget: 1, geometryCacheBudget: 1 });
+  const first = await kernel.render(packet());
+  assert.equal(first.cacheBudget.paths.entries, 0);
+  assert.ok(first.cacheBudget.geometry.overBudgetBytes > 0);
+  assert.equal((await kernel.render(packet({ geometryUpdates: [] }))).pathBuildCount, 1);
+  const released = await kernel.render(packet({ geometryUpdates: [], entries: [], kind: "hit" }));
+  assert.deepEqual(released.evictedGeometryIds, ["region"]);
+  assert.equal(released.cacheBudget.geometry.entries, 0);
+  await assert.rejects(kernel.render(packet({ geometryUpdates: [] })), /Missing raster geometry/);
+  assert.equal((await kernel.render(packet())).pathBuildCount, 1);
+});
+
+test("transferred raster geometry has identical D3 drawing commands and supports later removal", async () => {
+  const baseline = harness(), transported = harness();
+  const input = packet();
+  const encoded = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(input.geometryUpdates, { minCoordinateCount: 0 });
+  await baseline.kernel.render(input);
+  await transported.kernel.render({ ...input, geometryUpdates: null,
+    geometryTransport: structuredClone(encoded.payload, { transfer: encoded.transferables }) });
+  assert.deepEqual(transported.draws, baseline.draws);
+  await transported.kernel.render(packet({ geometryUpdates: [{ id: "region", feature: null }], entries: [] }));
+  await assert.rejects(transported.kernel.render(packet({ geometryUpdates: [] })), /Missing raster geometry/);
+});
 class RecordedPath {
   commands = [];
   moveTo(...args) { this.commands.push(["moveTo", ...args]); }

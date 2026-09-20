@@ -917,7 +917,7 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B1688129398280": {
@@ -959,14 +959,14 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B24150612748554": {
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B28606060123578": {
@@ -1036,7 +1036,6 @@
       "owner": "ONG",
       "controller": "ONG",
       "cores": [
-        "SOV",
         "RKM"
       ]
     },
@@ -1093,7 +1092,6 @@
       "owner": "ONG",
       "controller": "ONG",
       "cores": [
-        "SOV",
         "RKM"
       ]
     },
@@ -1122,7 +1120,7 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B5291843877359": {
@@ -1157,14 +1155,14 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B60413300894613": {
       "owner": "MAG",
       "controller": "MAG",
       "cores": [
-        "SOV"
+        "MAG"
       ]
     },
     "RU_RAY_50074027B62555187301125": {
@@ -1199,7 +1197,7 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B78297177563949": {
@@ -1234,7 +1232,7 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B86150609365879": {
@@ -1276,14 +1274,14 @@
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "RU_RAY_50074027B99663793376292": {
       "owner": "ORN",
       "controller": "ORN",
       "cores": [
-        "SOV"
+        "ORN"
       ]
     },
     "UKN0C": {
@@ -1347,6 +1345,27 @@
       "controller": "NIE",
       "cores": [
         "NIE"
+      ]
+    },
+    "RU_RAY_50074027B3022028163112": {
+      "owner": "PFC",
+      "controller": "PFC",
+      "cores": [
+        "PFC"
+      ]
+    },
+    "RU_RAY_50074027B2401368915177": {
+      "owner": "PFC",
+      "controller": "PFC",
+      "cores": [
+        "PFC"
+      ]
+    },
+    "RU_RAY_50074027B30798664015080": {
+      "owner": "RKK",
+      "controller": "RKK",
+      "cores": [
+        "RKK"
       ]
     }
   }

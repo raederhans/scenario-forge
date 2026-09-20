@@ -2427,6 +2427,15 @@ test("Williams crossover tooling routes to child-safe governance plus an explici
   }
 });
 
+test("canonical authority uses ordinal command order across punctuation", () => {
+  const commands = reconcileVerificationRouteAuthority(buildRouteIndex()).map((entry) => entry.commandRef);
+  assert.deepEqual(commands, [...commands].sort());
+  const precision = "python -m pytest tests/test_tno_russia_precision.py -q";
+  const validation = "python -m pytest tests/test_tno_russia_precision_validation.py -q";
+  assert.ok(commands.includes(precision) && commands.includes(validation));
+  assert.ok(commands.indexOf(precision) < commands.indexOf(validation));
+});
+
 test("selector and catalog authority share contributor owner, lock, and CI reconciliation", () => {
   const authority = reconcileVerificationRouteAuthority(buildRouteIndex());
   const byCommand = new Map(authority.map((entry) => [entry.commandRef, entry]));

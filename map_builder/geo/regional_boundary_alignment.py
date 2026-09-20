@@ -59,6 +59,7 @@ def align_regional_boundaries(
     candidate: gpd.GeoDataFrame,
     *,
     area_epsilon: float = 1e-12,
+    retained_hole_anchors=(),
 ) -> tuple[gpd.GeoDataFrame, dict[str, object]]:
     """Extend candidate into baseline-only outer coverage without filling holes.
 
@@ -87,6 +88,16 @@ def align_regional_boundaries(
     baseline_union = unary_union(list(baseline_by_id.values()))
     candidate_union = unary_union(candidate_geometries)
     holes = _hole_union(candidate_union)
+    # A reviewed foreign enclave can have a coarser outline than the source
+    # hole enclosing it. Retain baseline coverage around that enclave only;
+    # unanchored lake/island holes keep the existing preservation policy.
+    anchors = list(retained_hole_anchors)
+    if any(g is None or g.is_empty or not g.is_valid
+           or g.geom_type not in {"Polygon", "MultiPolygon"} for g in anchors):
+        raise ValueError("Retained-hole anchors must be valid nonempty polygons")
+    retained_holes = unary_union([hole for hole in _polygons(holes)
+                                 if any(hole.intersects(anchor) for anchor in anchors)])
+    holes = holes.difference(retained_holes)
     extension = baseline_union.difference(candidate_union).difference(holes)
     extension = extension if not extension.is_empty else GeometryCollection()
 
@@ -164,6 +175,7 @@ def align_regional_boundaries(
         "affected_ids": sorted(affected),
         "ambiguous_face_count": ambiguous,
         "candidate_hole_area_excluded": float(holes.area),
+        "reviewed_enclave_hole_area": float(retained_holes.area),
         "face_count": len(faces),
         "union_residual": union_residual,
         "area_epsilon": area_epsilon,

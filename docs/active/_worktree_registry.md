@@ -1,14 +1,21 @@
 # Worktree Registry
 
-## 当前拓扑（2026-09-17）
+## 当前拓扑（2026-09-20）
 
 这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| `C:/Users/raede/Desktop/dev/mapcreator` / `main` | 唯一注册工作树；本轮清理前后均以 `origin/main` 为上游。除本次 registry 收尾外，不含待整合代码。 |
+| `C:/Users/raede/Desktop/dev/mapcreator` | 唯一注册工作树。俄罗斯、欧洲精度与性能改动由 `codex/precision-integration-20260920` 统一交付至受保护的 `origin/main`；合并/分支清理状态以 PR 回执和 Git 实时记录为准。 |
 | `.playwright-mcp/` | 主工作区中的未跟踪、未归属内容；本轮按 WIP 保护规则保留，不把它当作可清理缓存。 |
 | `.runtime/tmp/worktree-cleanup-20260917/recovery.md` | 本轮删除前的精确 branch/tip 恢复清单；属于忽略的本地运行证据，不参与产品提交。 |
+| `.runtime/worktree-archives/russia-full-replacement-20260920/` | 俄罗斯工作树的文件保全清单、与主目录不同的 942 个文件副本及完整 `.runtime` 证据。 |
+
+## 2026-09-20 精度与性能整合
+
+俄罗斯工作树原 tip 为 `39098f4b7218e5d16085808564072224c72e287f`，没有独立提交。其全部交付改动已按文件与继承基线核对并迁入主目录；删除前核对 16,456 个文件，主目录不相同或缺失者保存至上述恢复归档，完整运行证据也已迁入归档。原任务停止 localhost:8000 服务并确认构建及 CLI 均结束后，已删除该工作树并核实目标目录不存在。未归属 `.playwright-mcp/` 在主目录保留。
+
+交付范围与验收记录见 [整合任务](precision-integration-20260920/task.md)。本条工作树覆盖证明不替代受保护分支的远端检查及合并回执。
 
 ## 2026-09-17 分支与工作树清理回执
 

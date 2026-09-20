@@ -1,5 +1,6 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
+import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
 
 export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
@@ -38,9 +39,9 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   getScenarioWaterCacheComplexitySignals,
   shouldEnableContextScenarioTransformReuse,
   shouldUseDirectScenarioWaterDraw,
+  waterPathCacheBudget = PROJECTED_PATH_CACHE_BUDGET,
 }) {
-  let scenarioWaterPartPathCache = new WeakMap();
-  let scenarioWaterFeaturePathCache = new WeakMap();
+  const scenarioWaterPathCache = new GeometryBudgetMap({ budget: waterPathCacheBudget, weigh: (entry) => entry.estimatedBytes });
   let scenarioWaterPartBoundsCache = new WeakMap();
   let lastScenarioWaterRenderedCount = 0;
 
@@ -119,6 +120,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       renderedCount: renderedWaterCount,
       skipped: renderedWaterCount === 0,
       reason: renderedWaterCount === 0 ? "culled" : "",
+      pathCacheBudget: scenarioWaterPathCache.getStats(),
     });
     return renderedWaterCount;
   }
@@ -192,8 +194,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     if (!part || typeof part !== "object" || !globalThis.Path2D || typeof rendererSurfaceHost.getPathSvg() !== "function") {
       return null;
     }
-    if (scenarioWaterPartPathCache.has(part)) {
-      return scenarioWaterPartPathCache.get(part) || null;
+    if (scenarioWaterPathCache.has(part)) {
+      return scenarioWaterPathCache.get(part).path || null;
     }
     let path = null;
     try {
@@ -202,7 +204,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     } catch (_error) {
       path = null;
     }
-    scenarioWaterPartPathCache.set(part, path);
+    scenarioWaterPathCache.set(part, { path, estimatedBytes: getGeometryRetentionWeights(part).path });
     return path;
   }
 
@@ -210,8 +212,9 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     if (!feature || typeof feature !== "object" || !globalThis.Path2D) {
       return null;
     }
-    if (scenarioWaterFeaturePathCache.has(feature)) {
-      return scenarioWaterFeaturePathCache.get(feature) || null;
+    const cached = scenarioWaterPathCache.get(feature);
+    if (cached?.parts === parts) {
+      return cached.path || null;
     }
     const combinedPath = new globalThis.Path2D();
     let added = false;
@@ -222,7 +225,12 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       added = true;
     });
     const path = added ? combinedPath : null;
-    scenarioWaterFeaturePathCache.set(feature, path);
+    const estimatedBytes = 256 + parts.reduce((sum, part) => sum + getGeometryRetentionWeights(part).path - 256 + 8, 0);
+    // A whole-feature path contains the same commands as its component paths.
+    // When retaining the combined path, release those duplicate native paths
+    // before admission so they cannot evict unrelated visible-water entries.
+    if (estimatedBytes <= waterPathCacheBudget) for (const part of parts) scenarioWaterPathCache.delete(part);
+    scenarioWaterPathCache.set(feature, { path, parts, estimatedBytes });
     return path;
   }
 
@@ -506,8 +514,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   function resetWaterPathCaches() {
-    scenarioWaterPartPathCache = new WeakMap();
-    scenarioWaterFeaturePathCache = new WeakMap();
+    scenarioWaterPathCache.clear();
     scenarioWaterPartBoundsCache = new WeakMap();
   }
 

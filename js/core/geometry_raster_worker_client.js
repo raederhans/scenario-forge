@@ -1,4 +1,5 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
+import "./geometry_transfer_codec_shared.js";
 
 const WORKER_URL = new URL("../workers/geometry_raster.worker.js", import.meta.url);
 const closeResult = (result) => result?.bitmap?.close?.();
@@ -84,15 +85,20 @@ export function createGeometryRasterWorkerClient({
       }
 
       const { identity: _identity, ...input } = task.input;
+      const packingStartedAt = performance.now();
+      const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(updates);
+      const packingMs = performance.now() - packingStartedAt;
       result = await client.dispatchTask("RENDER_GEOMETRY", {
-        packet: { ...input, entries, geometryUpdates: updates, resetGeometry },
-      }, { signal: task.controller.signal });
+        packet: { ...input, entries, geometryUpdates: transport.transferables.length ? null : updates,
+          geometryTransport: transport.transferables.length ? transport.payload : null, resetGeometry },
+      }, { signal: task.controller.signal, transfer: transport.transferables });
       if (disabled) {
         closeResult(result);
         task.resolve(null);
         return;
       }
       if (!result?.bitmap) throw new Error("Missing geometry raster bitmap.");
+      for (const id of result.evictedGeometryIds || []) nextRefs.delete(id);
       geometryStoreKey = task.input.sceneKey;
       geometryRefs = nextRefs;
       geometryIdsByKind = nextIdsByKind;
@@ -101,6 +107,8 @@ export function createGeometryRasterWorkerClient({
         geometryRemovals: updates.filter((update) => !update.feature).length, retainedGeometryCount: nextRefs.size, entries: entries.length,
         workerMs: result?.renderMs || 0, pathBuildCount: result?.pathBuildCount || 0,
         yieldCount: result?.yieldCount || 0,
+        packingMs, unpackingMs: result?.unpackingMs || 0,
+        cacheBudget: result?.cacheBudget || null, geometryEvictions: result?.evictedGeometryIds?.length || 0,
       });
       task.resolve(result);
     } catch (error) {

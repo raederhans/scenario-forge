@@ -1,12 +1,29 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createPoliticalCollectionOwner } from "../js/core/renderer/political_collection_owner.js";
+import { createPoliticalGeometryStore, getPoliticalGeometrySnapshot } from "../js/core/political_geometry_store.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 const previousD3 = globalThis.d3;
+
+test("indexed global composition preserves metadata edits and declares wrapper changes in its delta", () => {
+  const owner = makeOwner({ geoAreaImpl: () => 1 });
+  const store = createPoliticalGeometryStore();
+  const feature = makeFeature("a", makeGeometry(0), { name: "before" });
+  const base = makeDetailCollection([feature]);
+  const first = owner.composePoliticalFeatureCollections(null, store.compose([base]));
+  feature.properties.name = "after";
+  const second = owner.composePoliticalFeatureCollections(null, store.compose([base]));
+  assert.equal(first.features[0].properties.name, "before");
+  assert.equal(second.features[0].properties.name, "after");
+  assert.deepEqual(getPoliticalGeometrySnapshot(second).changedIds, ["a"]);
+  const third = owner.composePoliticalFeatureCollections(null, store.compose([base]));
+  assert.equal(third.features[0], second.features[0]);
+  assert.deepEqual(getPoliticalGeometrySnapshot(third).changedIds, []);
+});
 
 test.after(() => {
   globalThis.d3 = previousD3;

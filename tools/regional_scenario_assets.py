@@ -97,7 +97,9 @@ def _verify_gzip(path: Path) -> None:
 
 
 def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtime_path: Path | str,
-                                   output_dir: Path | str, candidate_owners_path: Path | str | None = None) -> dict[str, Any]:
+                                   output_dir: Path | str, candidate_owners_path: Path | str | None = None,
+                                   added_feature_ids: tuple[str, ...] = (),
+                                   removed_helper_ids: tuple[str, ...] = ()) -> dict[str, Any]:
     baseline = Path(baseline_dir).resolve()
     output = Path(output_dir).resolve()
     candidate_runtime = Path(candidate_runtime_path).resolve()
@@ -112,9 +114,45 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
     old_runtime_path = _local_path(baseline, runtime_url, scenario_id)
     old = _features(old_runtime_path)
     new = _features(candidate_runtime)
-    if set(old) != set(new):
-        raise ValueError("candidate political IDs differ: split/merge is not supported")
-    changed = {fid for fid in old if old[fid].get("properties", {}) != new[fid].get("properties", {}) or
+    old_ids = set(old)
+    new_ids = set(new)
+    for declaration in (added_feature_ids, removed_helper_ids):
+        if not isinstance(declaration, (tuple, list)) or any(
+                not isinstance(fid, str) or not fid or fid != fid.strip() for fid in declaration):
+            raise ValueError('Membership declarations must be lists/tuples of nonempty IDs')
+    if added_feature_ids or removed_helper_ids:
+        added_set = set(added_feature_ids)
+        removed_set = set(removed_helper_ids)
+        if len(added_set) != len(added_feature_ids):
+            raise ValueError("Duplicate added_feature_ids declared")
+        if len(removed_set) != len(removed_helper_ids):
+            raise ValueError("Duplicate removed_helper_ids declared")
+        if new_ids - old_ids != added_set:
+            raise ValueError("Runtime new minus old does not equal explicitly declared additions")
+        if old_ids - new_ids != removed_set:
+            raise ValueError("Runtime old minus new does not equal explicitly declared removals")
+        for fid in added_set:
+            feature = new[fid]
+            if not fid.startswith("RU_RAY_"):
+                raise ValueError(f"Addition {fid} is not a valid RU_RAY_* id")
+            if str(feature.get("properties", {}).get("id")) != fid:
+                raise ValueError(f"Addition {fid} properties.id mismatch")
+            if feature.get("properties", {}).get("interactive") is False:
+                raise ValueError(f"Addition {fid} has interactive=False")
+        for fid in removed_set:
+            feature = old[fid]
+            if not fid.startswith("RU_ARCTIC_FB_"):
+                raise ValueError(f"Removal {fid} is not a valid RU_ARCTIC_FB_* id")
+            props = feature.get("properties", {})
+            if props.get("interactive") is not False:
+                raise ValueError(f"Removal {fid} is not interactive=False")
+            if props.get("scenario_helper_kind") != "shell_fallback":
+                raise ValueError(f"Removal {fid} is not shell_fallback")
+    else:
+        if old_ids != new_ids:
+            raise ValueError("candidate political IDs differ: split/merge is not supported")
+    common_ids = old_ids.intersection(new_ids)
+    changed = {fid for fid in common_ids if old[fid].get("properties", {}) != new[fid].get("properties", {}) or
                not _same_geometry(old[fid]["geometry"], new[fid]["geometry"])}
     nonpolitical_old = {k: v for k, v in _objects(old_runtime_path).items() if k != "political"}
     nonpolitical_new = {k: v for k, v in _objects(candidate_runtime).items() if k != "political"}
@@ -135,18 +173,25 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
         for owners in (old_owners, new_owners):
             if not isinstance(owners, dict) or any(not isinstance(v, str) or not v.strip() for v in owners.values()):
                 raise ValueError("Owner map is invalid")
+        if added_feature_ids:
+            registered = _read(staging / 'countries.json').get('countries', {})
+            for fid in added_feature_ids:
+                owner = new_owners.get(fid)
+                if not owner or owner == "SOV" or owner not in registered:
+                    raise ValueError(f"Addition {fid} must have registered country non-SOV owner")
         # TNO also keeps owner records for auxiliary Atlantropa objects. Those
         # records belong to the context pipeline and must be preserved verbatim.
-        if ({k: v for k, v in old_owners.items() if k not in old}
-                != {k: v for k, v in new_owners.items() if k not in old}):
+        if ({k: v for k, v in old_owners.items() if k not in old_ids}
+                != {k: v for k, v in new_owners.items() if k not in new_ids}):
             raise ValueError("Non-political owner records changed; full context rebuild required")
-        owner_changed = {fid for fid in old if old_owners.get(fid) != new_owners.get(fid)}
+        owner_changed = {fid for fid in common_ids if old_owners.get(fid) != new_owners.get(fid)}
         def buckets(features, owners):
             return {fid: _resolve_feature_owner_bucket(f, scenario_dir=baseline,
                     owners_by_feature_id=owners, fallback_index=i)
                     for i, (fid, f) in enumerate(features.items())}
         old_buckets, new_buckets = buckets(old, old_owners), buckets(new, new_owners)
-        affected_owners = {b[fid] for fid in changed | owner_changed for b in (old_buckets, new_buckets)}
+        affected_ids = changed | owner_changed | set(added_feature_ids) | set(removed_helper_ids)
+        affected_owners = {b[fid] for fid in affected_ids for b in (old_buckets, new_buckets) if fid in b}
         old_manifest = _read(baseline / "detail_chunks.manifest.json") if (baseline / "detail_chunks.manifest.json").exists() else {"chunks": []}
         reusable = {}
         cached_ids_by_owner = {}
@@ -206,7 +251,8 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
             if not source.exists() or _digest(source) != entry.get("sha256") or source.stat().st_size != entry.get("byte_size"):
                 raise ValueError(f"Context chunk cache failed validation: {entry['id']}")
             _verify_gzip(source)
-        report = {"scenario_id": scenario_id, "changed_ids": sorted(changed), "owner_changed_ids": sorted(owner_changed), "reused_baseline": True,
+        report = {"scenario_id": scenario_id, "changed_ids": sorted(changed), "owner_changed_ids": sorted(owner_changed),
+                  "added_ids": sorted(added_feature_ids), "removed_ids": sorted(removed_helper_ids), "reused_baseline": True,
                   "reused_political_detail_chunks": sorted(reusable), "reused_context_chunks": len(context_chunks),
                   "old_runtime_sha256": _digest(old_runtime_path), "candidate_runtime_sha256": _digest(candidate_runtime),
                   "directly_affected_owner_chunks": sorted(affected_owners - {""}), "status": "staged",

@@ -15,6 +15,17 @@ def _frame(geometries):
 
 
 class RegionalBoundaryAlignmentTests(unittest.TestCase):
+    def test_reviewed_enclave_retains_old_coverage_without_filling_other_holes(self):
+        enclave = box(1.5, 1.5, 2.5, 2.5)
+        lake = box(4, 1, 5, 2)
+        shell = box(0, 0, 6, 4)
+        baseline = _frame({"A": shell.difference(enclave)})
+        candidate = _frame({"A": shell.difference(box(1, 1, 3, 3)).difference(lake)})
+        result, report = align_regional_boundaries(baseline, candidate, retained_hole_anchors=[enclave])
+        self.assertTrue(result.geometry.iloc[0].equals(shell.difference(enclave).difference(lake)))
+        self.assertEqual(report["reviewed_enclave_hole_area"], 4)
+        self.assertEqual(report["candidate_hole_area_excluded"], 1)
+
     def test_candidate_retreat_is_extended_to_baseline_ids(self):
         baseline = _frame({"A": box(0, 0, 2, 1), "B": box(2, 0, 4, 1)})
         candidate = _frame({"A": box(0, 0, 1.8, 1), "B": box(1.8, 0, 3.8, 1)})

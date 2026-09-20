@@ -1040,7 +1040,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertEqual(
             nodes_by_path["app/js/workers/startup_boot.worker.js"]["resource_references"],
-            ["app/js/core/feature_identity_shared.js", "app/js/core/json_resource_decoder_shared.js", "app/vendor/topojson-client.min.js"],
+            ["app/js/core/feature_identity_shared.js", "app/js/core/geometry_transfer_codec_shared.js", "app/js/core/json_resource_decoder_shared.js", "app/vendor/topojson-client.min.js"],
         )
 
     def test_pages_module_graph_uses_acorn_for_imports_exports_templates_comments_and_regex(self) -> None:

@@ -97,7 +97,11 @@ export function createWorkerTaskClient({
       pending.reject(createMessageError(message, pending));
       return;
     }
-    pending.resolve(resolveMessage(message, pending));
+    try {
+      pending.resolve(resolveMessage(message, pending));
+    } catch (error) {
+      pending.reject(error);
+    }
   }
 
   function handleWorkerError(event) {
@@ -123,7 +127,7 @@ export function createWorkerTaskClient({
     return workerLoadPromise;
   }
 
-  function dispatchTask(type, payload = {}, { timeoutMs = null, signal = null } = {}) {
+  function dispatchTask(type, payload = {}, { timeoutMs = null, signal = null, transfer = [] } = {}) {
     if (signal?.aborted) {
       return Promise.reject(createAbortError(signal.reason));
     }
@@ -174,7 +178,7 @@ export function createWorkerTaskClient({
           type,
           taskId,
           ...payload,
-        });
+        }, transfer);
       } catch (error) {
         const activePending = cleanupPendingTask(taskId);
         if (activePending) {

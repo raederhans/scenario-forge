@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
 
-function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
+function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget } = {}) {
   const events = [];
   const metrics = [];
   const context = (name) => Object.fromEntries(
@@ -66,6 +66,7 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
     },
   });
   const owner = createScenarioRegionOverlayRenderOwner(state, {
+    waterPathCacheBudget,
     rendererSurfaceHost: {
       getContext: () => target,
       getPathCanvas: () => (feature) => events.push(["pathCanvas", feature.id]),
@@ -116,6 +117,28 @@ function harness(t, { mode = "reuse", noLayerContext = false } = {}) {
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
   };
 }
+
+test("water path eviction preserves fill and live highlight, including oversized transient paths", (t) => {
+  const h = harness(t, { mode: "direct", waterPathCacheBudget: 1 });
+  h.state.selectedWaterRegionId = "water";
+  h.draw(); h.draw();
+  assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
+  assert.equal(h.events.filter((event) => event[0] === "pathSvg").length, 2, "uncached paths rebuild for each frame");
+  assert.ok(h.events.some((event) => event[1] === "stroke"), "selection highlight remains visible");
+  const metric = h.metrics.filter((metric) => metric.name === "drawScenarioWaterFillLayer").at(-1);
+  assert.equal(metric.pathCacheBudget.estimatedBytes, 0);
+  assert.ok(metric.pathCacheBudget.oversizedSkips > 0);
+});
+
+test("whole water paths replace duplicate component retention without eviction", (t) => {
+  const h = harness(t, { mode: "direct", waterPathCacheBudget: 264 });
+  h.draw(); h.draw();
+  const metric = h.metrics.filter((metric) => metric.name === "drawScenarioWaterFillLayer").at(-1);
+  assert.equal(metric.pathCacheBudget.entries, 1);
+  assert.equal(metric.pathCacheBudget.estimatedBytes, 264);
+  assert.equal(metric.pathCacheBudget.evictions, 0);
+  assert.equal(h.events.filter((event) => event[0] === "pathSvg").length, 1);
+});
 
 test("water cache draws into the live target then reuses with DPR and overscan translation", (t) => {
   const h = harness(t);

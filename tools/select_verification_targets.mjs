@@ -30,7 +30,9 @@ export function nonBehavioralClassification(changedFile) {
     || changedFile === "docs/regional_incremental_build.md"
     || changedFile === "docs/tno_regional_precision.md"
     || changedFile === "docs/active/business-efficiency-20260908/editing-analysis.md"
-    || changedFile === "docs/active/business-efficiency-20260908/render-reuse-analysis.md") {
+    || changedFile === "docs/active/business-efficiency-20260908/render-reuse-analysis.md"
+    || /^docs\/active\/europe-precision-20260920\/(?:seam-findings\.md|sources\.json)$/u.test(changedFile)
+    || /^docs\/active\/russia-precision-20260920\/(?:full-results|next-results|results|sov-and-tat-results)\.md$/u.test(changedFile)) {
     return "task-documentation";
   }
   // This is an agent setting, not an application state writer. Classification

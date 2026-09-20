@@ -15481,7 +15481,7 @@
       "visual_only": true
     },
     {
-      "area_delta": -1.126937,
+      "area_delta": -23.852523,
       "controller_hint_present": true,
       "drop_reason": "",
       "expected_stages": [
@@ -15490,7 +15490,7 @@
         "startup_bootstrap"
       ],
       "feature_id": "RU_ARCTIC_FB_PFC_026",
-      "final_area": 22.942706,
+      "final_area": 0.21712,
       "missing_stages": [],
       "owner_hint_present": true,
       "prefix": "RU_ARCTIC_FB_",
@@ -15895,7 +15895,7 @@
       "visual_only": true
     },
     {
-      "area_delta": -0.057379,
+      "area_delta": -0.067805,
       "controller_hint_present": true,
       "drop_reason": "",
       "expected_stages": [
@@ -15904,7 +15904,7 @@
         "startup_bootstrap"
       ],
       "feature_id": "RU_ARCTIC_FB_USA_044",
-      "final_area": 0.036401,
+      "final_area": 0.025975,
       "missing_stages": [],
       "owner_hint_present": true,
       "prefix": "RU_ARCTIC_FB_",

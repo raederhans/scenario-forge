@@ -73,6 +73,10 @@ export function createLocalFeedbackRecords(baseRecords) {
       ["test_scenario_spatial_chunk_assets", ["tools/scenario_chunk_assets.py", "tools/political_detail_partition.py", "tools/check_scenario_contracts.py"]],
       ["test_scenario_surface_constraints", ["map_builder/geo/scenario_surface_constraints.py"]],
       ["test_tno_regional_precision", ["tools/pilot_tno_regional_precision.py"]],
+      ["test_explicit_precision_lod", ["tools/scenario_chunk_assets.py"]],
+      ["test_regional_scenario_asset_membership", ["tools/regional_scenario_assets.py"]],
+      ["test_tno_russia_precision", ["tools/pilot_tno_russia_precision.py", "tools/prepare_tno_russia_precision.py"]],
+      ["test_tno_western_precision_sources", ["tools/prepare_tno_western_precision_sources.py"]],
     ].map(([name, sources]) => ["python -m unittest tests." + name + " -q", ["tests/" + name + ".py", ...sources]]),
   ];
 
@@ -99,6 +103,84 @@ export function createLocalFeedbackRecords(baseRecords) {
     });
   }
 
+  // Precision and Russia coverage helpers are exercised by pytest suites. Most
+  // cases build temporary geometries and have no shared output, so they remain
+  // child-safe. The eastern-source suite intentionally reads the local raw
+  // geographic inputs and keeps the heavy-geo/main-thread policy.
+  const precisionPytestRoutes = [
+    ["reviewed-seam", "python -m pytest tests/test_reviewed_seam.py -q", [
+      "tests/test_reviewed_seam.py", "map_builder/geo/reviewed_seam.py", "tools/repair_tno_poland_ukraine_seams.py",
+    ]],
+    ["russia-coverage", "python -m pytest tests/test_russia_coverage.py -q", [
+      "tests/test_russia_coverage.py", "map_builder/coverage_validation.py",
+    ]],
+    ["russia-source-dateline", "python -m pytest tests/test_russia_source_dateline.py -q", [
+      "tests/test_russia_source_dateline.py", "map_builder/processors/russia_ukraine.py",
+    ]],
+    ["russia-coverage-normalization", "python -m pytest tests/test_tno_russia_coverage_normalization.py -q", [
+      "tests/test_tno_russia_coverage_normalization.py", "tools/normalize_tno_russia_coverage.py",
+    ]],
+    ["russia-full-conservation", "python -m pytest tests/test_tno_russia_full_conservation.py -q", [
+      "tests/test_tno_russia_full_conservation.py", "tools/build_tno_russia_full_candidate.py",
+    ]],
+    ["russia-geometry-triage", "python -m pytest tests/test_tno_russia_geometry_triage.py -q", [
+      "tests/test_tno_russia_geometry_triage.py", "tools/audit_tno_russia_geometry.py", "tools/triage_tno_russia_geometry.py",
+    ]],
+    ["russia-interface-noding", "python -m pytest tests/test_tno_russia_interface_noding.py -q", [
+      "tests/test_tno_russia_interface_noding.py", "tests/fixtures/tno_russia_tat_junction.json", "tools/pilot_tno_russia_precision.py",
+    ]],
+    ["russia-lod-identity", "python -m pytest tests/test_tno_russia_lod_identity.py -q", [
+      "tests/test_tno_russia_lod_identity.py", "tools/validate_tno_russia_precision.py",
+    ]],
+    ["russia-missing-recovery", "python -m pytest tests/test_tno_russia_missing_recovery.py -q", [
+      "tests/test_tno_russia_missing_recovery.py", "map_builder/regional_geometry.py", "tools/build_tno_russia_recovered_assets.py",
+      "tools/recover_tno_russia_missing.py", "tools/validate_tno_russia_recovery.py",
+    ]],
+    ["russia-precision", "python -m pytest tests/test_tno_russia_precision.py -q", [
+      "tests/test_tno_russia_precision.py", "tools/build_tno_russia_precision_assets.py", "tools/prepare_tno_russia_precision.py",
+      "tools/repair_tno_poland_ukraine_seams.py", "tools/pilot_tno_russia_precision.py",
+    ]],
+    ["russia-precision-validation", "python -m pytest tests/test_tno_russia_precision_validation.py -q", [
+      "tests/test_tno_russia_precision_validation.py", "tools/validate_tno_russia_precision.py",
+    ]],
+    ["precision-expansion-validation", "python -m pytest tests/test_tno_precision_expansion_validation.py -q", [
+      "tests/test_tno_precision_expansion_validation.py", "tools/validate_tno_precision_expansion.py",
+    ]],
+    ["sov-residuals", "python -m pytest tests/test_tno_sov_residuals.py -q", [
+      "tests/test_tno_sov_residuals.py", "data/scenario-rules/tno_1962.sov_residuals.manual.json", "tools/patch_tno_1962_bundle.py",
+      "tools/retire_tno_sov.py", "tools/validate_tno_sov_retirement.py",
+    ]],
+    ["western-precision-sources", "python -m pytest tests/test_tno_western_precision_sources.py -q", [
+      "tests/test_tno_western_precision_sources.py", "tools/prepare_tno_western_precision_sources.py",
+    ]],
+  ];
+  const precisionPytestOrder = pythonCoverageOrder + pythonRecords.length;
+  const precisionPytestRecords = precisionPytestRoutes.map(([name, commandRef, sourceRefs], index) => ({
+    id: "python-precision:" + name,
+    commandRef,
+    sourceRefs,
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 5,
+    verificationOrder: null, selectorOrder: precisionPytestOrder + index,
+    verification: null, selector: {},
+  }));
+
+  precisionPytestRecords.push({
+    id: "python-precision:eastern-raw-sources",
+    commandRef: "python -m pytest tests/test_tno_eastern_precision_sources.py -q",
+    sourceRefs: [
+      "tests/test_tno_eastern_precision_sources.py", "tools/prepare_tno_eastern_precision_sources.py",
+      "data/scenarios/tno_1962/runtime_topology.topo.json", "data/poland_powiaty.geojson",
+      "data/geoBoundaries-UKR-ADM2.geojson", "data/geoBoundaries-BLR-ADM2.geojson", "data/europe_topology.highres.json",
+    ],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo", ".runtime-output"], executionOwners: ["main-thread"], profiles: ["full"],
+    platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: precisionPytestOrder + precisionPytestRoutes.length,
+    verification: null, selector: {},
+  });
+
   // Each local leaf covers this owner only; broader roots and data retain their
   // existing PR/nightly/release requirements.
   const localOwnerCoverage = [
@@ -117,9 +199,12 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["projected-geometry-bounds", "renderer-runtime", "js/core/renderer/projected_geometry_bounds_owner.js", "tests/projected_geometry_bounds_owner_behavior.test.mjs"],
     ["political-collection-geometry-cache", "renderer-runtime", "js/core/renderer/political_collection_owner.js", "tests/political_collection_geometry_cache_behavior.test.mjs"],
     ["political-derived-state-cache", "renderer-runtime", "js/core/renderer/political_derived_state_cache.js", "tests/political_derived_state_cache_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["political-geometry-store", "renderer-runtime", "js/core/political_geometry_store.js", "tests/political_geometry_store_behavior.test.mjs", ["js/core/scenario/chunk_layer_payloads.js", "js/core/renderer/political_collection_owner.js", "js/core/renderer/political_derived_state_cache.js"]],
     ["geometry-raster-runtime", "renderer-runtime", "js/core/renderer/geometry_raster_runtime_owner.js", "tests/geometry_raster_runtime_owner_behavior.test.mjs"],
     ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],
+    ["geometry-transfer-codec", "renderer-runtime", "js/core/geometry_transfer_codec_shared.js", "tests/geometry_transfer_codec_behavior.test.mjs", ["js/core/startup_worker_client.js", "js/workers/startup_boot.worker.js", "js/core/geometry_raster_worker_client.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
+    ["geometry-cache-budget", "renderer-runtime", "js/core/renderer/geometry_cache_budget.js", "tests/geometry_cache_budget_behavior.test.mjs", ["js/core/renderer/political_path_cache_owner.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
     ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
     ["bathymetry-geometry", "renderer-runtime", "js/core/renderer/bathymetry_geometry.js", "tests/bathymetry_geometry_behavior.test.mjs"],
@@ -183,7 +268,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
   ];
 
-  const localOwnerOrder = pythonCoverageOrder + pythonRecords.length;
+  const localOwnerOrder = precisionPytestOrder + precisionPytestRecords.length;
 
   const ownerRecords = localOwnerCoverage.map(([id, domain, source, testFile, extraSources = []], index) => ({
     id: "local:owner:" + id, commandRef: "node --test " + testFile
@@ -317,7 +402,7 @@ export function createLocalFeedbackRecords(baseRecords) {
   };
 
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
-    ...pythonRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
+    ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
     paletteLibraryOperationRecord];

@@ -10,7 +10,7 @@ const item = (id, x = 50, drawOrder = 0) => ({
   feature: { id, geometry: { type: "Polygon", coordinates: [] } },
 });
 
-function fixture(t) {
+function fixture(t, options = {}) {
   const originalPath = globalThis.Path2D;
   globalThis.Path2D = class { constructor(path) { this.value = path; } };
   t.after(() => { globalThis.Path2D = originalPath; });
@@ -54,6 +54,7 @@ function fixture(t) {
     collectLandSpatialItemsForProjectedRects: () => h.candidates,
     nowMs: () => h.time,
     RENDER_PHASE_IDLE: "idle",
+    ...options,
   });
   h.tick = (deadline = null) => {
     const [handle, timer] = h.timers.entries().next().value;
@@ -62,6 +63,22 @@ function fixture(t) {
   };
   return h;
 }
+
+test("path budget evicts least-recent paths while returning usable transient oversized paths", (t) => {
+  const h = fixture(t, { pathCacheBudget: 512 });
+  const options = { allowBuild: true };
+  const a = item("a").feature, b = item("b").feature, c = item("c").feature;
+  h.owner.getPoliticalFeaturePathEntry(a, options);
+  h.owner.getPoliticalFeaturePathEntry(b, options);
+  h.owner.getPoliticalFeaturePathEntry(a, options);
+  h.owner.getPoliticalFeaturePathEntry(c, options);
+  assert.deepEqual([...h.cache.politicalPathCache.keys()], ["a", "c"]);
+  const giant = { id: "giant", geometry: { type: "LineString", coordinates: Array.from({ length: 100 }, (_, i) => [i, 0]) } };
+  assert.ok(h.owner.getPoliticalFeaturePathEntry(giant, options)?.path);
+  assert.equal(h.cache.politicalPathCache.has("giant"), false);
+  assert.equal(h.cache.politicalPathCache.getStats().estimatedBytes, 512);
+  assert.ok(h.owner.getPoliticalFeaturePathEntry(b, options)?.path, "evicted geometry rebuilds on demand");
+});
 
 test("cache mismatch reads are non-destructive; preparation preserves map identity and snapshots transforms", (t) => {
   const h = fixture(t);

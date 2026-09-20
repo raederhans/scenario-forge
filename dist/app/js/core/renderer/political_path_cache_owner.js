@@ -1,4 +1,5 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
 
 // Owns projected political paths and cancellable idle warmup; cache state remains shared.
 const POLITICAL_PATH_WARMUP_OVERSCAN_PX = 96;
@@ -26,6 +27,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
   collectLandSpatialItemsForProjectedRects,
   nowMs,
   RENDER_PHASE_IDLE,
+  pathCacheBudget = PROJECTED_PATH_CACHE_BUDGET,
 }) {
   let warmupTransform = null;
   let warmupViewportSignature = "";
@@ -112,8 +114,8 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       const previousTransform = cache.politicalPathCacheTransform
         ? cloneZoomTransform(cache.politicalPathCacheTransform)
         : null;
-      if (!(cache.politicalPathCache instanceof Map)) {
-        cache.politicalPathCache = new Map();
+      if (!(cache.politicalPathCache instanceof GeometryBudgetMap)) {
+        cache.politicalPathCache = new GeometryBudgetMap({ budget: pathCacheBudget, weigh: (entry) => entry.estimatedBytes || 256 });
       } else {
         cache.politicalPathCache.clear();
       }
@@ -154,7 +156,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       const path = new globalThis.Path2D();
       pathCanvas.context(path);
       pathCanvas(feature);
-      return { path, geometryRef: feature.geometry };
+      return { path, geometryRef: feature.geometry, estimatedBytes: getGeometryRetentionWeights(feature).path };
     } catch (_error) {
       return null;
     } finally {
@@ -194,6 +196,9 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       return null;
     }
     handle.map.set(resolvedId, builtEntry);
+    if (handle.map instanceof GeometryBudgetMap) {
+      recordRenderPerfMetric("politicalPathCacheBudget", 0, handle.map.getStats());
+    }
     if (countBuild) incrementPerfCounter("politicalPathCacheBuild");
     return builtEntry;
   }
@@ -288,6 +293,7 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       const nextItem = cache.politicalPathWarmupQueue.shift();
       if (!nextItem?.id || !nextItem?.feature) continue;
       processedCount += 1;
+      if (getGeometryRetentionWeights(nextItem.feature).path > pathCacheBudget) continue;
       if (isPoliticalFeaturePathEntryCurrent(handle.map.get(nextItem.id), nextItem.feature)) continue;
       const pathEntry = getPoliticalFeaturePathEntry(nextItem.feature, {
         featureId: nextItem.id,

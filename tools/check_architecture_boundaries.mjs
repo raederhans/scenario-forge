@@ -4412,7 +4412,7 @@ function collectFailures() {
     "function queueTooltipUpdate(",
     "function setMapInteractionCursor(",
     "function clearUnderlyingHoverForFacilityEntry(",
-    "function handleMouseMove(event)",
+    "function handleMouseMove(event,",
     "eventType: \"hover\"",
     "\"facility-tooltip\"",
     "\"feature-tooltip\"",
@@ -4458,7 +4458,7 @@ function collectFailures() {
     "function handleMouseMove(event) {",
     "function addRecentColor(color) {",
   );
-  if (!hoverWrapperSource.includes("getMapHoverInteractionOwner().handleMouseMove(event);")) {
+  if (!hoverWrapperSource.includes("getMapHoverInteractionOwner().scheduleMouseMove(event);")) {
     failures.push(`${FILES.renderer} handleMouseMove wrapper must delegate to P48 owner.`);
   }
   for (const token of [
@@ -5739,8 +5739,8 @@ function collectFailures() {
   ownershipRules.push({
     ownerPath: scenarioRegionOwnerPath,
     ownerTokens: [
-      "let scenarioWaterPartPathCache = new WeakMap();",
-      "let scenarioWaterFeaturePathCache = new WeakMap();",
+      "const scenarioWaterPathCache = new GeometryBudgetMap(",
+      "scenarioWaterPathCache.clear();",
       "function resetWaterPathCaches()",
       "function drawScenarioRegionOverlaysPass(k)",
     ],
@@ -5752,6 +5752,7 @@ function collectFailures() {
     rendererForbiddenTokens: [
       "let scenarioWaterPartPathCache = new WeakMap();",
       "let scenarioWaterFeaturePathCache = new WeakMap();",
+      "const scenarioWaterPathCache = new GeometryBudgetMap(",
     ],
   });
 

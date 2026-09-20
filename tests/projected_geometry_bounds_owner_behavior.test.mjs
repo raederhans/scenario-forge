@@ -4,6 +4,30 @@ import test from "node:test";
 import { createProjectedGeometryBoundsOwner } from "../js/core/renderer/projected_geometry_bounds_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
+test("multipart islands keep component identity and projected bounds across refreshes, but reset on projection or geometry change", () => {
+  const projection = (p) => p;
+  const { owner, calls } = createHarness({ projection });
+  const feature = { type: "Feature", id: "islands", geometry: { type: "MultiPolygon", coordinates: [
+    [[[1, 2], [2, 3], [3, 2], [1, 2]]], [[[10, 20], [20, 30], [30, 20], [10, 20]]],
+  ] } };
+  const first = owner.collectFeatureHitGeometries(feature);
+  first.forEach(owner.computeProjectedGeoBounds);
+  const before = calls.pathBounds;
+  assert.equal(owner.collectFeatureHitGeometries({ ...feature }), first);
+  first.forEach(owner.computeProjectedGeoBounds);
+  assert.equal(calls.pathBounds, before);
+  markProjectionGeometryChanged(projection);
+  first.forEach(owner.computeProjectedGeoBounds);
+  assert.equal(calls.pathBounds, before + 2);
+  const replacement = owner.collectFeatureHitGeometries({ ...feature, geometry: structuredClone(feature.geometry) });
+  assert.notEqual(replacement[0], first[0]);
+  replacement.forEach(owner.computeProjectedGeoBounds);
+  assert.equal(calls.pathBounds, before + 4);
+  owner.clearProjectedBoundsCache();
+  replacement.forEach(owner.computeProjectedGeoBounds);
+  assert.equal(calls.pathBounds, before + 6);
+});
+
 function firstLon(geoObject) {
   const geometry = geoObject?.type === "Feature" ? geoObject.geometry : geoObject;
   return Number(geometry?.coordinates?.[0]?.[0]?.[0]);

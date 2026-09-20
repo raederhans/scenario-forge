@@ -1,3 +1,6 @@
+import "../geometry_transfer_codec_shared.js";
+import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET, WORKER_GEOMETRY_CACHE_BUDGET } from "./geometry_cache_budget.js";
+
 const PROJECTION_FIELDS = new Set([
   "scale", "translate", "center", "rotate", "angle", "reflectX", "reflectY",
   "precision", "clipAngle", "clipExtent",
@@ -33,13 +36,15 @@ export function createGeometryRasterWorkerKernel({
   batchSize = 64,
   sliceBudgetMs = 8,
   now = () => performance.now(),
+  pathCacheBudget = PROJECTED_PATH_CACHE_BUDGET,
+  geometryCacheBudget = WORKER_GEOMETRY_CACHE_BUDGET,
 } = {}) {
   let sceneKey = null;
   let projectionKey = null;
   let projectionOptionsSignature = "";
   let pathGenerator = null;
-  const geometries = new Map();
-  const paths = new Map();
+  const geometries = new GeometryBudgetMap({ budget: geometryCacheBudget, weigh: (feature) => getGeometryRetentionWeights(feature).decoded, autoTrim: false });
+  const paths = new GeometryBudgetMap({ budget: pathCacheBudget, weigh: (entry) => entry.estimatedBytes });
   // The worker entry serializes render tasks; each kind owns one reusable surface.
   const surfaces = new Map();
 
@@ -67,7 +72,12 @@ export function createGeometryRasterWorkerKernel({
       projectionOptionsSignature = optionsSignature;
       paths.clear();
     }
-    for (const { id, feature } of packet.geometryUpdates || []) {
+    const unpackingStartedAt = now();
+    const updates = packet.geometryTransport
+      ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(packet.geometryTransport)
+      : packet.geometryUpdates || [];
+    const unpackingMs = now() - unpackingStartedAt;
+    for (const { id, feature } of updates) {
       paths.delete(id);
       if (feature) geometries.set(id, feature);
       else geometries.delete(id);
@@ -123,7 +133,7 @@ export function createGeometryRasterWorkerKernel({
       const entry = entries[index];
       const feature = geometries.get(entry.id);
       if (!feature) throw new Error(`Missing raster geometry: ${entry.id}`);
-      let path = paths.get(entry.id);
+      let path = paths.get(entry.id)?.path;
       if (!path) {
         path = createPath();
         try {
@@ -131,7 +141,7 @@ export function createGeometryRasterWorkerKernel({
         } finally {
           pathGenerator.context(null);
         }
-        paths.set(entry.id, path);
+        paths.set(entry.id, { path, estimatedBytes: getGeometryRetentionWeights(feature).path });
         pathBuildCount += 1;
       }
       context.fillStyle = entry.fillColor;
@@ -149,7 +159,13 @@ export function createGeometryRasterWorkerKernel({
       bitmap.close();
       abortIfNeeded(isCancelled);
     }
-    return { bitmap, kind: packet.kind, width, height, renderedCount, pathBuildCount, yieldCount, renderMs: now() - startedAt };
+    // Current-frame geometry is pinned; a genuinely huge visible frame may
+    // exceed the target. Retire inactive geometry and acknowledge it so the
+    // client can re-upload it on a later view without disabling the worker.
+    const evictedGeometryIds = geometries.trim(new Set(entries.map((entry) => entry.id)));
+    for (const id of evictedGeometryIds) paths.delete(id);
+    return { bitmap, kind: packet.kind, width, height, renderedCount, pathBuildCount, yieldCount, unpackingMs,
+      evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(), paths: paths.getStats() }, renderMs: now() - startedAt };
   }
 
   return { render };

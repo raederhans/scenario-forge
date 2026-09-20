@@ -1,4 +1,7 @@
+import { createPoliticalGeometryStore } from "../political_geometry_store.js";
+
 // Derives layer payloads from a captured chunk state. The controller owns state commits.
+const politicalGeometryStores = new WeakMap();
 
 // Viewport merge is more expensive than selecting the already merged layer. Keep
 // a one-entry cache per bundle, keyed by the viewport and the exact payload
@@ -105,6 +108,10 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
       ));
     }
     const previousSignature = String(previousSignatures?.[layerKey] || "");
+    const hasPersistentPoliticalBase = layerKey === "political" && layerChunkPayloadEntries.some(({ chunkId, entry }) => {
+      const chunk = chunkMetaById.get(chunkId);
+      return entry?.payload && chunk?.globalCoverage === true && chunk.lod === "coarse";
+    });
     const nextSignature = String(nextSignatures?.[layerKey] || "");
     const canReuse = previousSignature === nextSignature
       && Object.prototype.hasOwnProperty.call(previousMergedLayerPayloads || {}, layerKey);
@@ -116,18 +123,24 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
         .filter(Boolean);
       changedLayerKeys.push(layerKey);
       if (!layerChunkPayloads.length) {
-        if (layerKey === "political") primaryViewportMergeCacheByBundle.delete(bundle);
+        if (layerKey === "political") {
+          primaryViewportMergeCacheByBundle.delete(bundle);
+          politicalGeometryStores.delete(bundle);
+        }
         mergedLayerPayloads[layerKey] = null;
         primaryMergedLayerPayloads[layerKey] = null;
         primaryLayerStats[layerKey] = null;
         return;
       }
-      mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
+      if (hasPersistentPoliticalBase && layerChunkPayloads.every((payload) => Array.isArray(payload.features))) {
+        let store = politicalGeometryStores.get(bundle);
+        if (!store) politicalGeometryStores.set(bundle, store = createPoliticalGeometryStore());
+        mergedLayerPayloads[layerKey] = store.compose(layerChunkPayloads);
+      } else {
+        if (layerKey === "political") politicalGeometryStores.delete(bundle);
+        mergedLayerPayloads[layerKey] = mergeScenarioChunkPayloads(layerKey, layerChunkPayloads);
+      }
     }
-    const hasPersistentPoliticalBase = layerKey === "political" && layerChunkPayloadEntries.some(({ chunkId, entry }) => {
-      const chunk = chunkMetaById.get(chunkId);
-      return entry?.payload && chunk?.globalCoverage === true && chunk.lod === "coarse";
-    });
     if (hasPersistentPoliticalBase) {
       // Complete coverage already exists. Keep one geometry collection for
       // rendering and hit testing; their spatial indexes own viewport culling.

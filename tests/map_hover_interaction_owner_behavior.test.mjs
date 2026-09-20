@@ -36,7 +36,7 @@ function createHarness(overrides = {}) {
     getters: {
       getGlobal: () => globalHost, nowMs: () => data.now,
       inspectHgoRuntimePreviewFromEvent: () => data.hgo,
-      getHitFromEvent: (_event, options) => { calls.push(["hit", options]); return data.hit; },
+      getHitFromEvent: (event, options) => { calls.push(["hit", options, event]); data.onHit?.(); return data.hit; },
       getFeatureForHit: createFeatureLookup(state),
       getHoveredFacilityEntryFromEvent: () => data.facility,
       isFacilityDetailsSurfaceActive: () => data.detailsActive,
@@ -64,6 +64,51 @@ test("mousemove is throttled before writing hover state", () => {
   assert.equal(h.move().branch, "throttled");
   assert.equal(h.state.lastMouseMoveTime, 95);
   assert.equal(h.pending.size, 0); assert.deepEqual(h.calls, []);
+});
+
+test("scheduled moves query only the latest stable coordinates, once per frame", () => {
+  const h = createHarness();
+  const event = { clientX: 1, clientY: 2 };
+  h.owner.scheduleMouseMove(event);
+  event.clientX = 99;
+  h.owner.scheduleMouseMove({ clientX: 50, clientY: 60 });
+  assert.equal(h.pending.size, 1);
+  assert.equal(h.calls.length, 0);
+  h.flush();
+  const hits = h.calls.filter(([name]) => name === "hit");
+  assert.equal(hits.length, 1);
+  assert.equal(hits[0][2].clientX, 50);
+  assert.equal(hits[0][2].clientY, 60);
+  // A final move on a high-refresh display must not disappear into the
+  // legacy 16ms event throttle after its animation-frame slot was consumed.
+  h.data.now += 8;
+  h.owner.scheduleMouseMove({ clientX: 70, clientY: 80 });
+  h.flush();
+  assert.equal(h.calls.filter(([name]) => name === "hit").length, 2);
+});
+
+test("mouseleave and reset invalidate late hover-hit callbacks", () => {
+  for (const cancel of ["handleMapMouseLeave", "cancelPendingHoverWork"]) {
+    const h = createHarness();
+    h.owner.scheduleMouseMove({ clientX: 10, clientY: 20 });
+    const stale = [...h.pending.values()];
+    h.owner[cancel]();
+    const count = h.calls.length;
+    stale.forEach((callback) => callback());
+    assert.equal(h.calls.length, count);
+    assert.equal(h.pending.size, 0);
+  }
+});
+
+test("hover can queue a new frame during a hit callback and rechecks exclusive modes", () => {
+  const h = createHarness();
+  h.data.onHit = () => { h.data.onHit = null; h.owner.scheduleMouseMove({ clientX: 30, clientY: 40 }); };
+  h.owner.scheduleMouseMove({ clientX: 10, clientY: 20 });
+  h.flush();
+  h.state.specialZoneEditor = { active: true };
+  h.flush();
+  assert.equal(h.calls.filter(([name]) => name === "hit").length, 1);
+  assert.equal(h.state.hoveredId, null);
 });
 
 test("no hover data stops before event resolution", () => {

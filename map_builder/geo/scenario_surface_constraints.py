@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any
+import math
 
 import geopandas as gpd
 import shapely
@@ -22,6 +23,8 @@ def constrain_candidate_surface_geometry(
     baseline: gpd.GeoDataFrame,
     candidate: gpd.GeoDataFrame,
     protected_geometry: Any,
+    *,
+    boundary_tolerance: float = 0.0,
 ) -> tuple[gpd.GeoDataFrame, dict[str, Any]]:
     """Remove only newly introduced protected-surface overlap.
 
@@ -33,6 +36,10 @@ def constrain_candidate_surface_geometry(
         raise TypeError("baseline and candidate must be GeoDataFrame instances")
     if baseline.crs is None or candidate.crs is None or baseline.crs != candidate.crs:
         raise ValueError("baseline and candidate must have the same explicit CRS")
+    if not math.isfinite(boundary_tolerance) or boundary_tolerance < 0:
+        raise ValueError("boundary_tolerance must be finite and nonnegative")
+    if boundary_tolerance and (candidate.crs.to_epsg() != 4326 or boundary_tolerance > 1e-9):
+        raise ValueError("Explicit numerical boundary tolerance is limited to 1e-9 degrees in EPSG:4326")
     if baseline.empty or candidate.empty or baseline.geometry.isna().any() or candidate.geometry.isna().any():
         raise ValueError("baseline and candidate must contain non-empty geometries")
     if not bool(baseline.geometry.geom_type.isin(["Polygon", "MultiPolygon"]).all()) or not bool(candidate.geometry.geom_type.isin(["Polygon", "MultiPolygon"]).all()):
@@ -87,14 +94,19 @@ def constrain_candidate_surface_geometry(
     geometries = []
     removed_area = 0.0
     conservation_errors = []
+    boundary_residuals = []
     for index, geometry in enumerate(candidate_geometries):
         clipped = unary_union(rebuilt[index])
         if clipped.is_empty or not clipped.is_valid:
             raise ValueError("surface constraint produced empty or invalid geometry")
-        error = geometry.difference(forbidden).symmetric_difference(clipped).area
+        expected = geometry.difference(forbidden)
+        residual = expected.symmetric_difference(clipped)
+        error = residual.area
         conservation_errors.append(float(error))
         if error > 1e-12:
-            raise ValueError(f"surface constraint changed geometry outside permitted clipping: {new_ids[index]}: {error}")
+            if not boundary_tolerance or not expected.boundary.buffer(boundary_tolerance).covers(residual):
+                raise ValueError(f"surface constraint changed geometry outside permitted clipping: {new_ids[index]}: {error}")
+            boundary_residuals.append({"id": new_ids[index], "area": float(error)})
         removed_area += max(0.0, geometry.difference(clipped).area)
         geometries.append(clipped)
     result = candidate.copy()
@@ -103,9 +115,12 @@ def constrain_candidate_surface_geometry(
         raise ValueError("surface constraint output must remain Polygon or MultiPolygon")
     if not bool(shapely.coverage_is_valid(list(result.geometry))):
         raise ValueError("surface constraint produced invalid polygon coverage")
-    residual_new_overlap = unary_union(list(result.geometry)).intersection(forbidden).area
+    residual_geometry = unary_union(list(result.geometry)).intersection(forbidden)
+    residual_new_overlap = residual_geometry.area
     if residual_new_overlap > 1e-12:
-        raise ValueError(f"surface constraint left new protected overlap: {residual_new_overlap}")
+        boundary = unary_union(list(_polygon_boundaries(forbidden)))
+        if not boundary_tolerance or not boundary.buffer(boundary_tolerance).covers(residual_geometry):
+            raise ValueError(f"surface constraint left new protected overlap: {residual_new_overlap}")
     return result, {
         "feature_count": len(result),
         "newly_forbidden_area": float(newly_forbidden.area),
@@ -114,6 +129,8 @@ def constrain_candidate_surface_geometry(
         "max_per_feature_conservation_error": max(conservation_errors),
         "area_epsilon": 1e-12,
         "area_units": "squared CRS coordinate units",
+        "boundary_tolerance_degrees": boundary_tolerance,
+        "boundary_only_conservation_residuals": boundary_residuals,
         "baseline_overlap_allowed": True,
         "coverage_valid": True,
     }

@@ -5,6 +5,7 @@ import json
 
 import geopandas as gpd
 import shapely
+from map_builder.coverage_validation import coverage_is_valid_exact
 from shapely.geometry import shape
 from shapely.geometry.polygon import orient
 
@@ -140,7 +141,7 @@ def _decode_geometry(topology, geometry):
 def _valid_coverage(geometries):
     return (all(geom is not None and not geom.is_empty and geom.is_valid
                 and geom.geom_type in {"Polygon", "MultiPolygon"} for geom in geometries)
-            and bool(shapely.coverage_is_valid(geometries)))
+            and bool(coverage_is_valid_exact(geometries)))
 
 
 def _encode_exact_coverage(feature_ids, geometries):

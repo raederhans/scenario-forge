@@ -341,7 +341,7 @@ test("worker task client cleans pending state when postMessage throws", async ()
   }
 });
 
-test("startup worker client preserves serialized AbortError names", async () => {
+test("startup worker client restores transferred geometry and preserves serialized AbortError names", async () => {
   const originalWorker = globalThis.Worker;
   const postedMessages = [];
   let startupWorkerClient = null;
@@ -367,6 +367,13 @@ test("startup worker client preserves serialized AbortError names", async () => 
     startupWorkerClient = await import(
       new URL(`../js/core/startup_worker_client.js?abort-error=${Date.now()}`, import.meta.url),
     );
+    const geometryResult = startupWorkerClient.decodeRuntimeChunkViaWorker({ chunkUrl: "/geometry.json", chunkType: "political" });
+    await new Promise((resolve) => setImmediate(resolve));
+    const original = { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Point", coordinates: [-0, 2, 3] } }] };
+    const packed = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(original, { minCoordinateCount: 0 });
+    FakeWorker.instance.onmessage({ data: { type: "RUNTIME_CHUNK_READY", taskId: postedMessages[0].taskId,
+      geometryTransport: { field: "chunkPayload", payload: structuredClone(packed.payload, { transfer: packed.transferables }) } } });
+    assert.deepEqual((await geometryResult).chunkPayload, original);
     const resultPromise = startupWorkerClient.decodeRuntimeChunkViaWorker({
       runtimeTopologyUrl: "/runtime.json",
       chunkUrl: "/chunk.json",
@@ -375,7 +382,7 @@ test("startup worker client preserves serialized AbortError names", async () => 
     FakeWorker.instance.onmessage({
       data: {
         type: "ERROR",
-        taskId: postedMessages[0].taskId,
+        taskId: postedMessages[1].taskId,
         message: "cancelled",
         name: "AbortError",
       },

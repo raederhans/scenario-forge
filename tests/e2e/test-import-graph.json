@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 60,
-    "nodeCount": 74,
-    "reverseIndexKeyCount": 110,
+    "specCount": 61,
+    "nodeCount": 75,
+    "reverseIndexKeyCount": 115,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -376,6 +376,26 @@
         "js/core/sovereignty_manager.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/dev/precision_geometry_transfer.dev.spec.js": {
+      "directDependencies": [
+        "js/core/geometry_raster_worker_client.js",
+        "js/core/renderer/geometry_raster_worker_kernel.js",
+        "js/core/startup_worker_client.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/geometry_raster_worker_client.js",
+        "js/core/renderer/geometry_raster_worker_kernel.js",
+        "js/core/startup_worker_client.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "repoImpact": [
+        "js/core/geometry_raster_worker_client.js",
+        "js/core/renderer/geometry_raster_worker_kernel.js",
+        "js/core/startup_worker_client.js",
+        "vendor/d3.v7.min.js"
       ]
     },
     "tests/e2e/dev/project_import_recovery_round2.dev.spec.js": {
@@ -1926,6 +1946,9 @@
       "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js"
     ],
+    "js/core/geometry_raster_worker_client.js": [
+      "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
+    ],
     "js/core/history_manager.js": [
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/shortcut_history_render_boundary.spec.js"
@@ -2063,6 +2086,9 @@
     "js/core/renderer/city_points_render_owner.js": [
       "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
     ],
+    "js/core/renderer/geometry_raster_worker_kernel.js": [
+      "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
+    ],
     "js/core/renderer/pixel_ratio_policy.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
@@ -2165,6 +2191,9 @@
     ],
     "js/core/startup_cache.js": [
       "tests/e2e/review_regressions.spec.js"
+    ],
+    "js/core/startup_worker_client.js": [
+      "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
     ],
     "js/core/state_defaults.js": [
       "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
@@ -2370,6 +2399,9 @@
     ],
     "tests/e2e/dev/normal_visual_paths.dev.spec.js": [
       "tests/e2e/dev/normal_visual_paths.dev.spec.js"
+    ],
+    "tests/e2e/dev/precision_geometry_transfer.dev.spec.js": [
+      "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
     ],
     "tests/e2e/dev/project_import_recovery_round2.dev.spec.js": [
       "tests/e2e/dev/project_import_recovery_round2.dev.spec.js"
@@ -2925,6 +2957,9 @@
     ],
     "tests/e2e/water_cache_strategy_regression.spec.js": [
       "tests/e2e/water_cache_strategy_regression.spec.js"
+    ],
+    "vendor/d3.v7.min.js": [
+      "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
     ]
   },
   "unresolved": []
