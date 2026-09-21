@@ -10,6 +10,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
 
   const matches = (patterns) => files.some((file) => patterns.some((pattern) => (
     pattern.endsWith("/**") ? file.startsWith(pattern.slice(0, -3)) :
+    pattern.endsWith("*") ? file.startsWith(pattern.slice(0, -1)) :
     pattern.endsWith("/") ? file.startsWith(pattern) :
     pattern.startsWith("*.") ? file.endsWith(pattern.slice(1)) :
     file === pattern
@@ -17,7 +18,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
 
   const runtimeRelevant = matches(["js/**", "css/**", "index.html", "vendor/**", "landing/**"]);
   const browserRelevant = runtimeRelevant || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
-  const pagesRelevant = runtimeRelevant || matches(["data/**", "tools/build_pages_dist.py", "tools/pages_", ".github/workflows/verify-shared.yml"]);
+  const pagesRelevant = runtimeRelevant || matches(["data/**", "tools/build_pages_dist.py", "tools/pages_*", ".github/workflows/verify-shared.yml"]);
   const publicSampleRelevant = matches([
     "js/bootstrap/startup_sample_project_deeplink.js",
     "js/core/sample_project_import_workflow.js",
@@ -41,8 +42,8 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
 
   const transportRelevant = matches([
     "data/transport_layers/**", "tools/check_transport_workbench_manifests.py",
-    "tools/build_transport_workbench_", "tools/build_global_transport_",
-    "tests/test_transport_", "tests/test_global_transport_builder_contracts.py",
+    "tools/build_transport_workbench_*", "tools/build_global_transport_*",
+    "tests/test_transport_*", "tests/test_global_transport_builder_contracts.py",
     ".github/workflows/transport-contract-required.yml",
   ]);
 
