@@ -78,7 +78,7 @@ def parse_workflow_job_blocks(workflow: str) -> dict[str, str]:
 
 def parse_required_pr_workflow_jobs(workflow: str) -> dict[str, str]:
     jobs = parse_workflow_job_blocks(workflow)
-    expected_jobs = {"pr-verify-fast", "pr-verify-smoke", "pr-verify-required"}
+    expected_jobs = {"pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-required"}
     if set(jobs) != expected_jobs:
         raise AssertionError(f"workflow job set mismatch: expected {sorted(expected_jobs)}, found {sorted(jobs)}")
     return jobs
@@ -514,25 +514,24 @@ process.stdout.write(JSON.stringify(ignores));
         self.assertIn("PLAYWRIGHT_TEST_BASE_URL: ${{ steps.deployment.outputs.page_url }}", workflow)
         self.assertIn("npm run test:e2e:pages-public-release-gate", workflow)
 
-    def test_scenario_contract_matrix_pushes_create_a_real_skip_job(self) -> None:
+    def test_scenario_and_transport_contracts_plan_before_full_checkout(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "scenario-contract-matrix.yml").read_text(encoding="utf-8")
         transport_workflow = (REPO_ROOT / ".github" / "workflows" / "transport-contract-required.yml").read_text(encoding="utf-8")
 
         self.assertIn("  push:", workflow)
         self.assertIn("      - main", workflow)
-        self.assertIn('event_name="$GITHUB_EVENT_NAME"', workflow)
-        self.assertNotIn("github.event.pull_request", workflow)
-        self.assertNotIn("github.event.pull_request", transport_workflow)
-        self.assertIn("GITHUB_EVENT_PATH", workflow)
-        self.assertIn("GITHUB_EVENT_PATH", transport_workflow)
-        self.assertIn('if [ "$event_name" = "workflow_dispatch" ]; then', workflow)
-        self.assertIn('elif [ "$event_name" = "push" ]; then', workflow)
-        self.assertIn('payload.get("before")', workflow)
-        self.assertIn('git diff --name-only "$base_sha..$head_sha"', workflow)
+        self.assertIn("Scenario Contract Plan", workflow)
+        self.assertIn("Transport Contract Plan", transport_workflow)
+        self.assertIn("sparse-checkout:", workflow)
+        self.assertIn("tools/ci/pr_plan.mjs", workflow)
+        self.assertIn("tools/ci/pr_plan.mjs", transport_workflow)
+        self.assertIn("gh api --paginate", workflow)
+        self.assertIn("gh api --paginate", transport_workflow)
+        self.assertIn("scenario_id: ${{ fromJSON(needs.plan.outputs.scenario_ids) }}", workflow)
+        self.assertIn("if: needs.plan.outputs.scenario_ids != '[]'", workflow)
+        self.assertIn("if: needs.plan.outputs.run_transport == 'true'", transport_workflow)
         self.assertIn('cache: "pip"', workflow)
         self.assertIn("python -m pip install -r requirements-dev.lock.txt", workflow)
-        self.assertIn('run: |\n          echo "Scenario contract matrix skipped:', workflow)
-        self.assertIn('run: |\n          echo "Transport contract skipped:', transport_workflow)
 
     def test_gitignore_policy_keeps_local_state_ignored_and_templates_trackable(self) -> None:
         expectations = {
@@ -1832,18 +1831,20 @@ const page = {
         pr_workflow = (REPO_ROOT / ".github" / "workflows" / "pr-verify.yml").read_text(encoding="utf-8")
         jobs = parse_required_pr_workflow_jobs(pr_workflow)
 
-        self.assertIsNone(parse_job_scalar(jobs["pr-verify-fast"], "needs"))
-        self.assertIsNone(parse_job_scalar(jobs["pr-verify-smoke"], "needs"))
+        self.assertEqual(parse_job_scalar(jobs["pr-verify-fast"], "needs"), ["pr-plan"])
+        self.assertEqual(parse_job_scalar(jobs["pr-verify-smoke"], "needs"), ["pr-plan"])
         self.assertEqual(parse_job_scalar(jobs["pr-verify-smoke"], "uses"), "./.github/workflows/verify-shared.yml")
+        self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^    if: needs\.pr-plan\.outputs\.run_smoke == 'true'$")
         self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^      profile: pr-smoke$")
-        self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^      run-golden-demo: true$")
+        self.assertIn("run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}", jobs["pr-verify-smoke"])
+        self.assertIn("run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}", jobs["pr-verify-fast"])
 
         required_job = jobs["pr-verify-required"]
         self.assertEqual(parse_job_scalar(required_job, "name"), "PR Verify Required")
         self.assertEqual(parse_job_scalar(required_job, "if"), "always()")
         self.assertEqual(
             parse_job_scalar(required_job, "needs"),
-            ["pr-verify-fast", "pr-verify-smoke"],
+            ["pr-plan", "pr-verify-fast", "pr-verify-smoke"],
         )
         self.assertEqual(parse_job_scalar(required_job, "runs-on"), "ubuntu-latest")
         self.assertIsNone(parse_job_scalar(required_job, "uses"))
