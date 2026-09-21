@@ -5,6 +5,15 @@ import { createQuickFillRecords } from "../tools/verification/catalog/records/qu
 import { VERIFICATION_METADATA_SOURCE } from "../tools/verification/verification_catalog_source.mjs";
 import { buildRouteIndex } from "../tools/test_route_registry.mjs";
 
+test("quick-fill command supplies concrete test files to shell-free CI runners", () => {
+  const command = JSON.parse(fs.readFileSync("package.json", "utf8")).scripts["test:node:quick-fill"];
+  const [runtime, flag, ...files] = command.split(/\s+/);
+  assert.deepEqual([runtime, flag], ["node", "--test"]);
+  for (const file of files) assert.ok(fs.existsSync(file), `literal test argument must exist: ${file}`);
+  const expected = fs.readdirSync("tests").filter(file => /^quick_fill.*\.test\.mjs$/.test(file)).map(file => `tests/${file}`);
+  assert.deepEqual(files.filter(file => file.startsWith("tests/quick_fill")).sort(), expected.sort());
+});
+
 test("quick-fill routes append after existing routes without modifying their policies", () => {
   const old = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const records = createQuickFillRecords(old);

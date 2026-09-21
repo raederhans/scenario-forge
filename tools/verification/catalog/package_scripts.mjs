@@ -344,7 +344,7 @@ export const PACKAGE_SCRIPTS = {
     "bench:special-zones-members": "node tools/perf/special_zone_members_benchmark.mjs --members 240 --iterations 40 --out .runtime/output/perf/special-zone-members-benchmark.json",
     "bench:polyline-simplification": "node tools/perf/polyline_simplification_benchmark.mjs --iterations 40 --out .runtime/reports/generated/geometry-simplification-benchmark.json",
     "test:node:polyline-simplification-benchmark": "node --test tests/polyline_simplification_benchmark_contract.test.mjs",
-    "test:node:quick-fill": "node --test tests/quick_fill*.test.mjs tests/fill_target_policy_behavior.test.mjs tests/parent_border_grouping_policy_behavior.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs tests/history_feature_color_refresh_behavior.test.mjs",
+    "test:node:quick-fill": "node --test tests/quick_fill_hierarchy.test.mjs tests/quick_fill_history.test.mjs tests/quick_fill_level_controls.test.mjs tests/quick_fill_project_roundtrip.test.mjs tests/quick_fill_verification.test.mjs tests/fill_target_policy_behavior.test.mjs tests/parent_border_grouping_policy_behavior.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs tests/history_feature_color_refresh_behavior.test.mjs",
     "test:python:quick-fill": "python -m unittest tests.test_quick_fill_hierarchy -v",
     "audit:quick-fill": "node tools/audit_quick_fill.mjs",
     "build:quick-fill": "python tools/build_quick_fill_hierarchy.py && python tools/register_quick_fill_assets.py && python tools/build_data_catalog.py",
