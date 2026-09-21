@@ -294,7 +294,8 @@ jobs:
           "should_run_perf=$($shouldRunPerf.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "should_enforce_regressions=$($shouldEnforceRegressions.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "perf_mode=$perfMode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          "scenario_matrix=$($scenarioMatrix | ConvertTo-Json -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $scenarioMatrixJson = ConvertTo-Json -InputObject @($scenarioMatrix) -Compress
+          "scenario_matrix=$scenarioMatrixJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "base_sha=$baseSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "diff_head_sha=$diffHeadSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "candidate_sha=$candidateSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
