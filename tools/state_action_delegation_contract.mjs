@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { parse } from "acorn";
@@ -797,6 +798,7 @@ function freezeStateTargetPureReaderEntry({
   importedArgumentCount = 0,
   allowBorrowedTarget = false,
   localFunctionFingerprints = {},
+  dependencyFingerprints = {},
   acceptedEscapes = [],
   conservativeFindings = [],
   reviewedReadSiteFingerprints = [],
@@ -811,6 +813,7 @@ function freezeStateTargetPureReaderEntry({
     importedArgumentCount: Number(importedArgumentCount),
     allowBorrowedTarget,
     localFunctionFingerprints: Object.freeze({ ...localFunctionFingerprints }),
+    dependencyFingerprints: Object.freeze({ ...dependencyFingerprints }),
     reviewedReadSiteFingerprints: Object.freeze([...reviewedReadSiteFingerprints].map(String)),
     acceptedEscapes: Object.freeze(
       acceptedEscapes.map(freezePureReaderEscape),
@@ -1291,7 +1294,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   "targetParameterName": "state",
   "targetParameterIndex": 0,
   "targetParameterPath": "$/property:state",
-  "sourceFingerprint": "7f01b321f177d5d2c97c138b26d4f6ad0d0360e309c96a03b6ac434170fa40b2",
+  "sourceFingerprint": "32eb3bddeff451348cde466d6563a33050e740a87dd07479778324e7cade219d",
   "localFunctionFingerprints": {},
   "conservativeFindings": [
     {
@@ -1300,6 +1303,30 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "95cdde82a67b80d4b4f23da121859d458dc869fcdea5f01ea8c1d30127acda29",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"workerSceneKey\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "b05c9743c7f2c05a63ccb22667612906577a59892af0cf08988441f774515e3d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"workerSceneKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createGeometryRasterRuntimeOwner\",\"ordinal\":0},{\"name\":\"workerSceneKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
       "count": 1
     },
     {
@@ -1435,7 +1462,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "7f5e9b277fa1ccc09fb19cf1b85a63b17bed65b5df5ccc5815a90a03af1ecbab",
+      "sourceFingerprint": "e0140d9cddd419ea7ca4ee8f31dbd14dcfe27dd367b6bb9b6a1bbc1fadbda208",
       "count": 1
     },
     {
@@ -1496,6 +1523,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
     }
   ],
   "reviewedReadSiteFingerprints": [
+    "b05c9743c7f2c05a63ccb22667612906577a59892af0cf08988441f774515e3d",
     "c0228f42f38187f090c02f2625926ec33dd894010fb38b43eee780a5fc5d1fa0",
     "c0e2d48cb6b6106a229099f2947b5f16cd804da811362eecdd5f037e8853b974",
     "b1e64a324cdaa5531ef88d34e9fb2f43fc2aaf91ef0c432e5259a1bad5dc7e5f"
@@ -2536,24 +2564,38 @@ freezeStateTargetPureReaderEntry({
 ]
 }),
   freezeStateTargetPureReaderEntry({
+  // The hierarchy resolver reads the supplied state and keeps only private
+  // membership indexes. The root escape below is this exact factory handoff;
+  // scope escapes are scalar inputs, never publication or mutation authority.
   "modulePath": "js/core/renderer/fill_target_policy.js",
+  "dependencyFingerprints": {
+    "js/core/quick_fill_hierarchy.js": "1e9e14753df7320233a3035239036d5e1f3fb90644308bec1e5a28ba31693531",
+    "js/core/scenario_districts.js": "bb1a7059d3f2a211377972a734ecd78cd953bd0444c5df25672b650805759eab",
+    "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
+    "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
+    "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5"
+  },
   "functionName": "createFillTargetPolicy",
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "bfbb22703f23ad405387f8d0a849bf4df23e155bcd166d7d995e7b44d34de9c6",
+  "sourceFingerprint": "dfea968ab2952248c263ba9e32ac135a584a6063e4174e398b99fc70950d7b91",
   "reviewedReadSiteFingerprints": [
     "7b885591dab7ab6d93797f0a408ad1d4fa33e4982e7674e8da5392f59be17215",
     "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
     "90ba4e4c01486eea5e532bed52d65d1d41517445f540787567990b3290ad4b61",
-    "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
-    "8e68207ab45cddfcd9f15925f3e1b9f8c77b10c3ce354c7adbc857e8bb09d327",
-    "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
-    "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
     "44afb93474315315a086f168cd8ba61f10b7601ee62389e0ada7c85c47f2d02e"
   ],
   "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 1
+    },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0}]}",
       "reason": "unsupported-call-mutation",
@@ -2587,46 +2629,6 @@ freezeStateTargetPureReaderEntry({
       "count": 1
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupKey\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "scenarioDistrictGroupByFeatureId",
-      "sourceFingerprint": "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupKey\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "parentGroupByFeatureId",
-      "sourceFingerprint": "8e68207ab45cddfcd9f15925f3e1b9f8c77b10c3ce354c7adbc857e8bb09d327",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "scenarioDistrictGroupByFeatureId",
-      "sourceFingerprint": "b152d083bc3ad04468cdaf98d9c6bcf2fe65fd34bada469669710235e2703a42",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveParentGroupTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
-      "count": 1
-    },
-    {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveSpecialZoneParentGroupTargetIds\",\"ordinal\":0}]}",
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
@@ -2635,27 +2637,19 @@ freezeStateTargetPureReaderEntry({
       "count": 1
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveQuickFillPlan\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
       "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "7cdf2dee7c9b23c3df8250d8c4c543b264fb855a1b9afcf524b75f7a9e3d6e27",
+      "key": "*",
+      "sourceFingerprint": "5f161c9149882e0e10124bc5dd5c11f0fbe8ec452edd52bcec76b01e9252cb33",
       "count": 1
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"buildDoubleClickBatchPlan\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
       "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"resolveCountryFillTargetIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "46b1013615cb35c0b1e6a8b49a57b1852dbed645528e27628d6cb68e3c4bf5ca",
+      "key": "batchFillScope",
+      "sourceFingerprint": "c4cf4cee341d6695166a50fcab4bcaa94ff2600c8aafc4006436564789054c3a",
       "count": 1
     }
   ]
@@ -2737,13 +2731,21 @@ freezeStateTargetPureReaderEntry({
   ]
 }),
   freezeStateTargetPureReaderEntry({
+  // The district adapter normalizes into fresh records and builds a fresh Map;
+  // it only reads district membership and current sovereignty from the caller.
   "modulePath": "js/core/renderer/parent_border_grouping_policy.js",
+  "dependencyFingerprints": {
+    "js/core/scenario_districts.js": "bb1a7059d3f2a211377972a734ecd78cd953bd0444c5df25672b650805759eab",
+    "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
+    "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
+    "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5"
+  },
   "functionName": "createParentBorderGroupingPolicy",
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "5670f3a4632551c5bc5f87ead6ec7f6d09b05e1fe747c3069d62613ddb63116b",
+  "sourceFingerprint": "5b3d1a3286ecdb406a3fc86931d68291a63bd0643b81fee006ca95d3421ec8d9",
   "reviewedReadSiteFingerprints": [],
   "conservativeFindings": [
     {
@@ -2777,6 +2779,22 @@ freezeStateTargetPureReaderEntry({
       "key": "*",
       "sourceFingerprint": "7a753bfb25faa0d4209caee0c6618e0477b90d9c79ce81a283bfd81bf8b296dc",
       "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"buildScenarioDistrictGroupingCandidate\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDistrictGroupsData",
+      "sourceFingerprint": "4aaa6e37f46948c8651a650888511f722d43b4af4c5d77863c1406a197639c55",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"buildScenarioDistrictGroupingCandidate\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sovereigntyByFeatureId",
+      "sourceFingerprint": "5393292088f52d2cd1220f67245b2e6770f349d43bba94162c2c5b56cf2fee7f",
+      "count": 1
     }
   ]
 }),
@@ -2799,20 +2817,18 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "889441dec930853ac97ae1df88d87436902e637208f4225e79606b06e2f53a18",
+  "sourceFingerprint": "3623f290e40bb2bb3788fb3604cc2c60f368cafdf790e5a22eaf3904ceacc9ab",
   "reviewedReadSiteFingerprints": [
-    "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
-    "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
-    "50318e66ee60ec90f6eece379c41bed532dfb651fcc17e80c921a3923e4d477c",
+    "f9479d90b41cd744a43c54e87170687aeb305a82cf09b4e42ca52f4ea25a0b03",
+    "c6bbb29d1a3bb2321007ce1b62a30086a381878e1e8cac83eb7bde9edfafa6a2",
+    "f0eba484fb95ebb50f5c7f8f442b04ba3205a3107a462dfdf01bb792e99cd65e",
     "649a631808e219f64f8c15f28dd2e05b159de8621abeaedf4ae517eb36dd7840",
-    "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
     "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
     "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
-    "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
-    "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
-    "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
-    "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
-    "325e65d190d5441e5d865b40695e0eee9aad90ca206dde06bd211516b15c9ec9"
+    "6a3c161830879d0ed697bfabd6d3bd8bcbf5a5e916870722c80a09bcec3e6c90",
+    "1196a33ac663fb9b6a0d2d7c89f29733e2978b3b7f41f1cee5960284d8c1bb1d",
+    "713d9ad0482a9dc81c4873c99f2af571f7de9d6d1cc8c9c004ce3e9ef578eb2c",
+    "3e5b42740b51f880848d5abc86cf0daeecd3edac0404f7e56eecb863990c3567"
   ],
   "conservativeFindings": [
     {
@@ -2836,7 +2852,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "f647030132722ae3af9f66521c4f809bd251525e4d8e2c07af71cecb2139b068",
+      "sourceFingerprint": "f9479d90b41cd744a43c54e87170687aeb305a82cf09b4e42ca52f4ea25a0b03",
       "count": 1
     },
     {
@@ -2845,14 +2861,6 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b0993135d395f1d11c7b028f8e69efb916c608b6955251b21aa613a8e6f13faf",
       "count": 1
     },
     {
@@ -2892,16 +2900,8 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "227888b0de31384b3ff91e6afb1953a231655869c0f1f1ca7714bd381800324e",
+      "sourceFingerprint": "c6bbb29d1a3bb2321007ce1b62a30086a381878e1e8cac83eb7bde9edfafa6a2",
       "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "b0993135d395f1d11c7b028f8e69efb916c608b6955251b21aa613a8e6f13faf",
-      "count": 10
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -2924,7 +2924,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "50318e66ee60ec90f6eece379c41bed532dfb651fcc17e80c921a3923e4d477c",
+      "sourceFingerprint": "f0eba484fb95ebb50f5c7f8f442b04ba3205a3107a462dfdf01bb792e99cd65e",
       "count": 1
     },
     {
@@ -2958,14 +2958,6 @@ freezeStateTargetPureReaderEntry({
       "key": "*",
       "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
       "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "f34bd27f826ee018f400ea83fe87155c90d615cce04f74a4608e5fa4c1c532f3",
-      "count": 2
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -3044,7 +3036,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "1d6a2bbee82de8d2cab8a5b74bcd6d3e2774b2d3cddf91f0da44317e27884e41",
+      "sourceFingerprint": "6a3c161830879d0ed697bfabd6d3bd8bcbf5a5e916870722c80a09bcec3e6c90",
       "count": 1
     },
     {
@@ -3068,7 +3060,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "af4f4c56fd6d5a8dced359fb303462ff7534472eae5b6ea9e0b83093a9919dcf",
+      "sourceFingerprint": "1196a33ac663fb9b6a0d2d7c89f29733e2978b3b7f41f1cee5960284d8c1bb1d",
       "count": 1
     },
     {
@@ -3076,7 +3068,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "803959b42b14c1ec474c33b39749838dde40d9cac8231365d999a0ca7f76bf26",
+      "sourceFingerprint": "713d9ad0482a9dc81c4873c99f2af571f7de9d6d1cc8c9c004ce3e9ef578eb2c",
       "count": 1
     },
     {
@@ -3092,15 +3084,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "ea0622ecd4ec27121ed69a45d621dff76e90e94f35ba3ab470eb52750ece3346",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "325e65d190d5441e5d865b40695e0eee9aad90ca206dde06bd211516b15c9ec9",
+      "sourceFingerprint": "3e5b42740b51f880848d5abc86cf0daeecd3edac0404f7e56eecb863990c3567",
       "count": 1
     },
     {
@@ -3212,7 +3196,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "chunkState",
   "targetParameterIndex": 1,
   "targetParameterPath": "$",
-  "sourceFingerprint": "47dc1cc4395b44564e669f0a7cb8142e190d1000fad0c87a97687dcc31685ca4",
+  "sourceFingerprint": "cc023636af2b04563cb2fb5718b5d873d322ed109e3229059a2a4247437657b0",
   "importedArgumentCount": 3,
   "conservativeFindings": [
     {
@@ -3324,7 +3308,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "c451d541f0d567309f5f0f71f97c5274f5052cd92c4cf28996446f2e17972891",
+  "sourceFingerprint": "ec998abb9330acce9f4a73e034398fcc1ef2033c4b760c770e09c6db12e08f80",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
@@ -3657,7 +3641,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "f9e236ec7300fb094535764db2eea2efa6fe2514d0fffed94fce8ba530d01387",
+  "sourceFingerprint": "1ecf2722446509ae04c1fb70208d6a9a3be7748e475e8bd97c1829ba7800801c",
   "conservativeFindings": [
 
     {
@@ -5094,7 +5078,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "compositionSourceFingerprint": "be3626f7615bac4bd30a6cca1405f2200326a8e06c3e74c5ce3f4f5e4b49d18d",
   "factoryModulePath": "js/core/renderer/projected_geometry_bounds_owner.js",
   "factoryExportName": "createProjectedGeometryBoundsOwner",
-  "factorySourceFingerprint": "1388d77514bd2874a9650ca936c567fdab494f70db243a3de34298a312c9cabf",
+  "factorySourceFingerprint": "8448ba60da9088180bad98503be917d40a5eaf1f649ddd66b99929197604855d",
   "ownerBindingName": "projectedGeometryBoundsOwner",
   "methods": [
     "computeProjectedCoordinateBounds",
@@ -5192,10 +5176,10 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getGeometryRasterRuntimeOwner",
-  "compositionSourceFingerprint": "271dbebae1d8548034ad5500028658f5323b7f9384a1151f2e981f8b582181bb",
+  "compositionSourceFingerprint": "870afbb22ec90ed1506f4faa56a8d6224837c34cc304e9178041b2dbce488f49",
   "factoryModulePath": "js/core/renderer/geometry_raster_runtime_owner.js",
   "factoryExportName": "createGeometryRasterRuntimeOwner",
-  "factorySourceFingerprint": "7f01b321f177d5d2c97c138b26d4f6ad0d0360e309c96a03b6ac434170fa40b2",
+  "factorySourceFingerprint": "32eb3bddeff451348cde466d6563a33050e740a87dd07479778324e7cade219d",
   "ownerBindingName": "geometryRasterRuntimeOwner",
   "methods": [
     "prepareFrame",
@@ -5319,7 +5303,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "506a3145b37deb016c6193c09371f6fc0dadc6c146234ee57fa19ac3eb39c7f4",
   "factoryModulePath": "js/core/scenario/chunk_payload_loader.js",
   "factoryExportName": "createScenarioChunkPayloadLoader",
-  "factorySourceFingerprint": "872d1eca77a7db583222abf4a316c630141372121c7a19ecfb49fd58792fbeef",
+  "factorySourceFingerprint": "0d6fdaf11225065b0c2b585a119d0783d874fa4d807650c576980849ff473ab0",
   "ownerBindingName": "owner",
   "methods": [
     "loadScenarioChunkPayload",
@@ -5391,7 +5375,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "cf4648c87226489ac0cbd8d94197dba295482737cd2ba535ef1d75aad98948b1",
   "factoryModulePath": "js/core/renderer/political_path_cache_owner.js",
   "factoryExportName": "createPoliticalPathCacheOwner",
-  "factorySourceFingerprint": "c451d541f0d567309f5f0f71f97c5274f5052cd92c4cf28996446f2e17972891",
+  "factorySourceFingerprint": "ec998abb9330acce9f4a73e034398fcc1ef2033c4b760c770e09c6db12e08f80",
   "ownerBindingName": "owner",
   "methods": [
     "getPoliticalPathCacheSignature",
@@ -5473,7 +5457,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "7e65d0dbae48519b822d257b396121ee0cb5194ecd403b77237f8a43cc66bc7b",
   "factoryModulePath": "js/core/renderer/scenario_region_overlay_render_owner.js",
   "factoryExportName": "createScenarioRegionOverlayRenderOwner",
-  "factorySourceFingerprint": "f9e236ec7300fb094535764db2eea2efa6fe2514d0fffed94fce8ba530d01387",
+  "factorySourceFingerprint": "1ecf2722446509ae04c1fb70208d6a9a3be7748e475e8bd97c1829ba7800801c",
   "ownerBindingName": "scenarioRegionOverlayRenderOwner",
   "methods": [
     "drawScenarioRegionOverlaysPass",
@@ -5719,7 +5703,7 @@ freezeMutationDelegatingOwnerEntry({
     compositionSourceFingerprint: "42a7b223db4cf7aea6be2737e9dce4bfb5fe201f68eb87b5cad02735029bcc90",
     factoryModulePath: "js/core/map_renderer/map_hover_interaction_owner.js",
     factoryExportName: "createMapHoverInteractionOwner",
-    factorySourceFingerprint: "74c9802dbc4ef697bdba765346940b91d41040c4b57c6d0ddeebcaf8488e6635",
+    factorySourceFingerprint: "7da9a021908aa9bedb67c26b3018bc06ba56e8507442b280ded6d85422ff72c8",
     ownerBindingName: "mapHoverInteractionOwner",
     methods: ["handleMouseMove", "handleMapMouseLeave", "getHoveredFacilityEntry", "setHoveredFacilityEntry", "setHoverOverlayDirty", "renderHoverOverlayIfNeeded", "cancelScheduledHoverOverlayRender", "cancelPendingHoverWork", "queueTooltipUpdate", "resetTooltipState", "setMapInteractionCursor"],
     actionExports: [],
@@ -5882,7 +5866,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/core/map_renderer/click_selection_transaction_owner.js",
     factoryExportName: "createClickSelectionTransactionOwner",
     factorySourceFingerprint:
-      "b4dfc67b04a28a3b3707ea2dffaaa1a27a02d7600ee9a178411e5f51ba844c47",
+      "7f3ffe2878ff950345b5916e91f5576d53d4bfbb6b19d0a8c89675bd669b43c9",
     ownerBindingName: "clickSelectionTransactionOwner",
     methods: ["handleClick"],
     actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH,
@@ -11506,6 +11490,15 @@ export function validateStateTargetPureReaderContract(
     seenEntryIds.add(entryId);
     const readSites = entry.reviewedReadSiteFingerprints || [];
     const localFunctions = entry.localFunctionFingerprints || {};
+    const dependencies = entry.dependencyFingerprints || {};
+    if (typeof dependencies !== "object" || Array.isArray(dependencies)
+      || Object.entries(dependencies).some(([modulePath, fingerprint]) => (
+        !/^js\/[^/].*\.js$/.test(modulePath) || normalizeModulePath(modulePath) !== modulePath
+        || path.posix.normalize(modulePath) !== modulePath
+        || !/^[a-f0-9]{64}$/.test(String(fingerprint))
+      ))) {
+      violations.push(createViolation("state-target-pure-reader-dependencies-invalid", { index, entryId }));
+    }
     if (!localFunctions || typeof localFunctions !== "object" || Array.isArray(localFunctions)
       || Object.entries(localFunctions).some(([name, fingerprint]) => (
         !isValidExportName(name) || !/^[a-f0-9]{64}$/.test(String(fingerprint))
@@ -11796,6 +11789,7 @@ function validateReviewedStateReadSites(source, ast, functionNode, fingerprints 
 export function inspectStateTargetPureReaderFunctionSource(
   source,
   entry,
+  { readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8") } = {},
 ) {
   const violations = validateStateTargetPureReaderContract([entry]);
   if (violations.length) {
@@ -11806,6 +11800,20 @@ export function inspectStateTargetPureReaderFunctionSource(
     };
   }
   let ast;
+  // Bind audited imported readers and their transitive helpers, just as local
+  // helpers are bound below. Any changed dependency requires renewed review.
+  for (const [dependencyName, expected] of Object.entries(entry.dependencyFingerprints || {})) {
+    try {
+      const actual = createHash("sha256").update(String(readSource(dependencyName)).replace(/\r\n?/g, "\n")).digest("hex");
+      if (actual !== expected) violations.push(createViolation("state-target-pure-reader-dependency-source-drift", {
+        modulePath: entry.modulePath, functionName: entry.functionName, dependencyName,
+      }));
+    } catch (error) {
+      violations.push(createViolation("state-target-pure-reader-dependency-source-unavailable", {
+        modulePath: entry.modulePath, functionName: entry.functionName, dependencyName, message: error.message,
+      }));
+    }
+  }
   try {
     ast = parseModuleSource(source);
   } catch (error) {

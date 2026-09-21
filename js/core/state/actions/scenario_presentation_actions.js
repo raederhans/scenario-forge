@@ -1,3 +1,4 @@
+import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";
 // Canonical scenario presentation state authority.
 // UI publication, DOM work, rendering, and persistence remain in composition roots.
 
@@ -168,7 +169,7 @@ export function setInspectorContinentExpandedState(target, groupKey, expanded) {
 
 export function setBatchFillScopeState(target, scope) {
   assertStateTarget(target);
-  const nextScope = scope === "country" ? "country" : "parent";
+  const nextScope = normalizeQuickFillScope(scope);
   if (target.batchFillScope === nextScope) return false;
   target.batchFillScope = nextScope;
   return true;

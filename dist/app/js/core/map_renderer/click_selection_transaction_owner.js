@@ -552,6 +552,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       applyVisualSubdivisionFill(targetIds, selectedColor, {
         kind: "fill-feature-color",
         dirtyReason: "fill-feature-color",
+        gesture: { type: "leaf-click", featureId: landId, timeStamp: Number(event?.timeStamp) },
       });
       return;
     }

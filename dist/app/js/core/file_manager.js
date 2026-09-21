@@ -1,3 +1,4 @@
+import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {
   normalizeAnnotationView,
@@ -250,7 +251,7 @@ function normalizeInteractionGranularity(value) {
 }
 
 function normalizeBatchFillScope(value) {
-  return String(value || "").trim().toLowerCase() === "country" ? "country" : "parent";
+  return normalizeQuickFillScope(String(value || "").trim().toLowerCase());
 }
 
 function normalizeActivePaletteId(value) {

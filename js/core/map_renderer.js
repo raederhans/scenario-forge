@@ -13279,13 +13279,14 @@ function addRecentColor(color) {
   }
 }
 
-function commitHistoryEntry({ kind, before, after, affectsSovereignty = false } = {}) {
+function commitHistoryEntry({ kind, before, after, affectsSovereignty = false, gesture = null } = {}) {
   pushHistoryEntry({
     kind: String(kind || "interaction"),
     before: before || {},
     after: after || {},
     meta: {
       affectsSovereignty: !!affectsSovereignty,
+      ...(gesture ? { quickFillGesture: gesture } : {}),
     },
   });
 }
@@ -14030,11 +14031,14 @@ function isDoubleClickBatchEligible(hit, feature) {
   return getFillTargetPolicy().isDoubleClickBatchEligible(hit, feature);
 }
 
-function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind } = {}) {
+let lastQuickFillLeafClick = null;
+function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-feature-color", dirtyReason = kind, gesture = null } = {}) {
   const actionStart = nowMs();
   const resolvedIds = normalizeFeatureOverrideTargetIds(targetIds);
   if (!resolvedIds.length) return false;
   const color = getSafeCanvasColor(selectedColor, LAND_FILL_COLOR);
+  const historyGesture = gesture ? { ...gesture, color, scenarioId: String(runtimeState.activeScenarioId || "") } : null;
+  if (historyGesture?.type === "leaf-click") lastQuickFillLeafClick = historyGesture;
   const historyBefore = captureHistoryState({
     featureIds: resolvedIds,
   });
@@ -14045,6 +14049,7 @@ function applyVisualSubdivisionFill(targetIds, selectedColor, { kind = "fill-fea
   markDirty(dirtyReason);
   commitHistoryEntry({
     kind,
+    gesture: historyGesture,
     before: historyBefore,
     after: captureHistoryState({
       featureIds: resolvedIds,
@@ -14098,10 +14103,25 @@ function executeSingleSubdivisionFill(action) {
   });
 }
 
-function executeDoubleClickBatchFill(feature, featureId) {
+function executeDoubleClickBatchFill(feature, featureId, event = null) {
   if (!feature || !featureId) return false;
+  const leadingClick = lastQuickFillLeafClick;
+  lastQuickFillLeafClick = null;
   const plan = buildDoubleClickBatchPlan(feature, featureId);
-  if (!plan?.targetIds?.length) return false;
+  if (!plan?.targetIds?.length) {
+    if (runtimeState.currentTool === "fill" && !isSovereigntyModeActive()
+        && runtimeState.interactionGranularity === "subdivision" && !runtimeState.brushModeEnabled) {
+      const resolution = getFillTargetPolicy().resolveQuickFillPlan(feature, featureId);
+      const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
+      const message = resolution.status === "loading"
+        ? (zh ? "分组成员尚未完整加载，批量填色未执行。请启用细节层后重试。" : "Group members are not fully loaded. Batch fill was not applied; enable the detail layer and retry.")
+        : resolution.status === "incomplete_group" || resolution.status === "unmapped"
+          ? (zh ? "该区域的此级归属尚待核验，批量填色未执行。可改选省级或单块填色。" : "This level is awaiting membership verification here. Batch fill was not applied; choose the province level or paint individual leaves.")
+          : (zh ? "此级分组不可用或归属存在冲突，批量填色未执行。请明确选择其他层级。" : "This level is unavailable or has conflicting membership. Batch fill was not applied; explicitly choose another level.");
+      showDetailPromotionToast(message, { title: zh ? "快速填色范围" : "Quick fill scope", tone: "warning", duration: 3600 });
+    }
+    return false;
+  }
   if (plan.fallbackToCountry) {
     showDetailPromotionToast("No parent group was available here. Double-click fell back to country fill.", {
       title: "Quick fill scope",
@@ -14112,6 +14132,7 @@ function executeDoubleClickBatchFill(feature, featureId) {
   return applyVisualSubdivisionFill(plan.targetIds, runtimeState.selectedColor, {
     kind: plan.kind,
     dirtyReason: plan.dirtyReason,
+    gesture: { type: "double-click", featureId, timeStamp: Number(event?.timeStamp), leadingClickTimeStamp: leadingClick?.timeStamp },
   });
 }
 
@@ -14341,7 +14362,7 @@ async function handleDoubleClick(event, _interactionContext = null) {
       countryCode = refreshedHit.countryCode || getFeatureCountryCodeNormalized(feature);
     }
   }
-  executeDoubleClickBatchFill(feature, featureId);
+  executeDoubleClickBatchFill(feature, featureId, event);
   noteRenderAction("double-click-fill", actionStart);
 }
 

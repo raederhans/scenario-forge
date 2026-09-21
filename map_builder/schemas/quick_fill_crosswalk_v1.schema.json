@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://quick_fill/prefecture_crosswalk/v1",
+  "type": "object",
+  "required": [
+    "version",
+    "reference_year",
+    "source_commit",
+    "source_url",
+    "reference_sha256",
+    "input_feature_signature",
+    "input_parent_signature",
+    "provinces",
+    "groups",
+    "unresolved"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "reference_year": {
+      "const": 2017
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "source_url": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference_sha256": {
+      "const": "3da1a40dd9395ac8a55673a41d2308b56f3e4fe3a6e55cc93fc55fefb1fba561"
+    },
+    "input_feature_signature": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "input_parent_signature": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "provinces": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "total",
+          "matched",
+          "unresolved",
+          "release_enabled"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "matched": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unresolved": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "release_enabled": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "province_id",
+          "label",
+          "kind",
+          "complete",
+          "feature_ids"
+        ],
+        "properties": {
+          "province_id": {
+            "type": "string",
+            "pattern": "^CN_"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "prefecture",
+              "municipality",
+              "direct_county"
+            ]
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "feature_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^CN_CITY_"
+            }
+          }
+        }
+      }
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "feature_id",
+          "name",
+          "province_id",
+          "candidates"
+        ],
+        "properties": {
+          "feature_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "province_id": {
+            "type": "string"
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ function fixture() {
     { id: "hidden", country: "AA", group: "north", excluded: true },
   ];
   const state = {
+    hierarchyData: { groups: { AA_north: ["a", "b", "hidden"], AA_south: ["c"], BB_north: ["d"] } },
     landIndex: new Map(features.map(feature => [feature.id, feature])),
     countryToFeatureIds: new Map([["AA", ["a", "b", "c", "hidden", "missing"]], ["BB", ["d"]]]),
     ownerToFeatureIds: new Map(), sovereigntyByFeatureId: {},
@@ -65,29 +66,34 @@ test("interaction targets prefer owner scope then runtime country then interacti
 test("parent targets use scenario district and normalized owner before direct grouping", () => {
   const { state, policy, a } = fixture();
   assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a", "b"]);
+  state.activeScenarioId = "fixture";
+  state.scenarioDistrictGroupsData = { scenario_id: "fixture", tags: { ZZ: { districts: { district: { feature_ids: ["a", "d"] } } } } };
   state.scenarioDistrictGroupByFeatureId = new Map([["a", "district"], ["d", "district"]]);
   state.sovereigntyByFeatureId = { a: " zz ", d: "ZZ" };
   state.ownerToFeatureIds = new Map([["ZZ", ["a", "d", "d", "hidden", "missing"]]]);
   assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a", "d"]);
   assert.deepEqual(policy.resolveSpecialZoneParentGroupTargetIds(" a "), ["a", "d"]);
-  state.scenarioDistrictGroupByFeatureId.delete("d");
-  assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), []);
+  state.scenarioDistrictGroupsData = { scenario_id: "fixture", tags: { ZZ: { districts: { district: { feature_ids: ["a"] } } } } };
+  assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a"]);
   assert.deepEqual(policy.resolveSpecialZoneParentGroupTargetIds("missing"), []);
 });
 
-test("batch plans preserve parent preference, explicit country scope and fallback metadata", () => {
+test("batch plans ignore border caches, preserve singleton parents and explicit country scope", () => {
   const { state, policy, a, hidden } = fixture();
   assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
     targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false,
   });
   state.parentGroupByFeatureId.set("a", "only-a");
   assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a"), {
-    targetIds: ["a", "b", "c"], kind: "fill-country-batch", dirtyReason: "fill-country-batch", fallbackToCountry: true,
+    targetIds: ["a", "b"], kind: "fill-parent-group", dirtyReason: "fill-parent-group", fallbackToCountry: false,
   });
+  state.hierarchyData = { groups: { AA_singleton: ["a"] } };
+  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a").targetIds, ["a"]);
+  state.countryToFeatureIds.set("AA", ["a", "b", "c", "hidden"]);
   state.batchFillScope = "country";
   assert.equal(policy.buildDoubleClickBatchPlan(a, "a").fallbackToCountry, false);
   state.countryToFeatureIds.set("AA", ["a"]);
-  assert.equal(policy.buildDoubleClickBatchPlan(a, "a"), null);
+  assert.deepEqual(policy.buildDoubleClickBatchPlan(a, "a").targetIds, ["a"]);
   assert.equal(policy.buildDoubleClickBatchPlan(hidden, "hidden"), null);
 });
 

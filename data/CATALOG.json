@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-09-11T02:47:14.044292+00:00",
   "counts": {
-    "entries": 663,
+    "entries": 665,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -35,6 +35,8 @@
       "palette_registry": 1,
       "physical_semantics_topology": 1,
       "primary_topology": 1,
+      "quick_fill_china_reference": 1,
+      "quick_fill_prefecture_crosswalk": 1,
       "releasable_catalog": 1,
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
@@ -64,12 +66,12 @@
       "bmp": 1,
       "geojson": 148,
       "javascript": 2,
-      "json": 341,
+      "json": 343,
       "topojson": 171
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 660,
+      "json": 662,
       "module": 2
     }
   },
@@ -772,6 +774,34 @@
       "sourceId": "pl_powiaty",
       "readMode": "json",
       "aliases": []
+    },
+    {
+      "key": "manifest_output:quick_fill/china_prefecture_crosswalk.v1.json",
+      "url": "data/quick_fill/china_prefecture_crosswalk.v1.json",
+      "role": "quick_fill_prefecture_crosswalk",
+      "format": "json",
+      "schemaRef": "schema://quick_fill/prefecture_crosswalk/v1",
+      "hashRef": "data/manifest.json::outputs::quick_fill/china_prefecture_crosswalk.v1.json::sha256",
+      "owner": "quick_fill_hierarchy",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "manifest_output:quick_fill/reference/china-pca-2017.json",
+      "url": "data/quick_fill/reference/china-pca-2017.json",
+      "role": "quick_fill_china_reference",
+      "format": "json",
+      "schemaRef": "schema://quick_fill/china_reference/v1",
+      "hashRef": "data/manifest.json::outputs::quick_fill/reference/china-pca-2017.json::sha256",
+      "owner": "quick_fill_hierarchy",
+      "cachePolicy": "default",
+      "sourceId": "china_pca_2017_quick_fill_reference",
+      "readMode": "json",
+      "aliases": [
+        "source:china_pca_2017_quick_fill_reference"
+      ]
     },
     {
       "key": "releasable_catalog",

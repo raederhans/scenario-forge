@@ -654,7 +654,7 @@ test("history dirty and render refresh calls remain in current paths", () => {
   for (const token of [
     "import { captureHistoryState, pushHistoryEntry } from \"./history_manager.js\";",
     "import { markDirty } from \"./dirty_state.js\";",
-    "function commitHistoryEntry({ kind, before, after, affectsSovereignty = false } = {})",
+    "function commitHistoryEntry({ kind, before, after, affectsSovereignty = false, gesture = null } = {})",
     "pushHistoryEntry({",
     "function requestInteractionRender(reason = \"interaction\")",
     "getRenderRequestBoundaryOwner().requestInteractionRenderBoundary(reason).completed;",
