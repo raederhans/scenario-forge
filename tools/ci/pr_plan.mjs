@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import path from "node:path";
 
 const normalize = (value) => String(value || "").replaceAll("\\", "/").trim();
 
@@ -91,7 +92,7 @@ function main() {
   const plan = planPullRequest({ changedFiles, labels });
   const json = `${JSON.stringify(plan, null, 2)}\n`;
   if (args.jsonOut) {
-    fs.mkdirSync(new URL(".", `file://${process.cwd()}/${args.jsonOut}`).pathname, { recursive: true });
+    fs.mkdirSync(path.dirname(args.jsonOut), { recursive: true });
     fs.writeFileSync(args.jsonOut, json, "utf8");
   } else {
     process.stdout.write(json);
