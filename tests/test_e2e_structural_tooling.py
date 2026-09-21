@@ -822,7 +822,7 @@ if (!mainThreadPlan.commandsToRun.includes(tnoWaterCommand) || mainThreadPlan.bl
             "--changed-file",
             "tools/ai_test_supervisor/supervise_adaptive_verification.mjs",
             "--changed-file",
-            "docs/active/unrelated-task/unregistered-runtime.js",
+            "tools/unregistered-runtime.js",
             "--json-out",
             str(self.tmp_root / "test-adaptive-unmatched-execute.json"),
             "--md-out",
@@ -831,7 +831,7 @@ if (!mainThreadPlan.commandsToRun.includes(tnoWaterCommand) || mainThreadPlan.bl
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("unmatched changed files", result.stderr)
         payload = json.loads((self.tmp_root / "test-adaptive-unmatched-execute.json").read_text(encoding="utf-8"))
-        self.assertIn("docs/active/unrelated-task/unregistered-runtime.js", payload["unmatchedChangedFiles"])
+        self.assertIn("tools/unregistered-runtime.js", payload["unmatchedChangedFiles"])
         self.assertEqual(payload["executionStatus"], "blocked")
         self.assertEqual(payload["executionResults"], [])
         self.assertEqual(payload["executionPlan"]["executionCommands"], [])
@@ -1928,7 +1928,7 @@ jobs:
         workflow = (REPO_ROOT / ".github" / "workflows" / "pr-verify.yml").read_text(encoding="utf-8")
         required_job = parse_workflow_job_blocks(workflow)["pr-verify-required"]
         script = extract_required_aggregator_script(required_job)
-        job_names = ["pr-verify-fast", "pr-verify-smoke"]
+        job_names = ["pr-plan", "pr-verify-fast", "pr-verify-smoke"]
         result_states = ["success", "failure", "cancelled", "skipped"]
 
         for result_matrix in itertools.product(result_states, repeat=len(job_names)):
@@ -1943,7 +1943,12 @@ jobs:
                     script,
                     env={"REQUIRED_RESULTS": json.dumps(needs)},
                 )
-                should_pass = all(result == "success" for result in result_matrix)
+                result_by_job = dict(zip(job_names, result_matrix, strict=True))
+                should_pass = (
+                    result_by_job["pr-plan"] == "success"
+                    and result_by_job["pr-verify-fast"] == "success"
+                    and result_by_job["pr-verify-smoke"] in {"success", "skipped"}
+                )
                 self.assertEqual(completed.returncode == 0, should_pass, completed.stdout + completed.stderr)
 
     def test_pr_required_aggregator_rejects_dependency_set_drift(self) -> None:
@@ -1952,7 +1957,7 @@ jobs:
         script = extract_required_aggregator_script(required_job)
         valid_needs = {
             job: {"result": "success", "outputs": {}}
-            for job in ("pr-verify-fast", "pr-verify-smoke")
+            for job in ("pr-plan", "pr-verify-fast", "pr-verify-smoke")
         }
         cases = {
             "missing": json.dumps({job: result for job, result in valid_needs.items() if job != "pr-verify-smoke"}),

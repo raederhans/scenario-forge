@@ -30,7 +30,7 @@ test("new UI files inherit shell ownership", () => {
 });
 
 test("verification control-plane files remain fail-closed when unregistered", () => {
-  const report = buildRepositoryRecommendation(["tools/verification/unregistered_control_plane.mjs"]);
+  const report = buildRepositoryRecommendation([".github/workflows/unregistered.yml"]);
   assert.deepEqual(report.autoOwnedChangedFiles, []);
-  assert.deepEqual(report.unmatchedChangedFiles, ["tools/verification/unregistered_control_plane.mjs"]);
+  assert.deepEqual(report.unmatchedChangedFiles, [".github/workflows/unregistered.yml"]);
 });

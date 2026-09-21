@@ -62,7 +62,7 @@ jobs:
           path: .runtime/reports/generated/pr-plan.json
 
   pr-verify-fast:
-    needs: [pr-plan]
+    needs: ["pr-plan"]
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-fast
@@ -70,7 +70,7 @@ jobs:
       run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}
 
   pr-verify-smoke:
-    needs: [pr-plan]
+    needs: ["pr-plan"]
     if: needs.pr-plan.outputs.run_smoke == 'true'
     uses: ./.github/workflows/verify-shared.yml
     with:

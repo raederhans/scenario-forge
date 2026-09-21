@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const normalize = (value) => String(value || "").replaceAll("\\", "/").trim();
 
@@ -115,4 +116,7 @@ function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]?.replaceAll("\\", "/")}`) main();
+const runningAsCli = process.argv[1]
+  && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (runningAsCli) main();
