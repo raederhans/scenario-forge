@@ -527,8 +527,10 @@ process.stdout.write(JSON.stringify(ignores));
         self.assertIn("tools/ci/pr_plan.mjs", transport_workflow)
         self.assertIn("gh api --paginate", workflow)
         self.assertIn("gh api --paginate", transport_workflow)
-        self.assertIn("scenario_id: ${{ fromJSON(needs.plan.outputs.scenario_ids) }}", workflow)
-        self.assertIn("if: needs.plan.outputs.scenario_ids != '[]'", workflow)
+        self.assertIn("scenario_id:", workflow)
+        self.assertIn("Resolve this scenario lane", workflow)
+        self.assertIn("Fast success for scenario-unrelated changes", workflow)
+        self.assertIn("Fast success for transport-unrelated changes", transport_workflow)
         self.assertIn("if: needs.plan.outputs.run_transport == 'true'", transport_workflow)
         self.assertIn('cache: "pip"', workflow)
         self.assertIn("python -m pip install -r requirements-dev.lock.txt", workflow)
@@ -2572,90 +2574,59 @@ if (lines[0].specPath !== 'tests/e2e/ui_contract_foundation.spec.js') {
 
 
 class ScenarioContractMatrixRoutingTests(unittest.TestCase):
-    def classify(self, paths, scenario, event="pull_request", diff_status=0, base="base"):
-        workflow = (REPO_ROOT / ".github/workflows/scenario-contract-matrix.yml").read_text(encoding="utf-8")
-        block = workflow.split("        run: |\n", 1)[1].split("\n      - name:", 1)[0]
-        script = "\n".join(line[10:] for line in block.splitlines())
-        # Intercept only external change discovery; run the actual branching and routing.
-        script = """git() {
-          if [ "$1" = "fetch" ]; then return 0; fi
-          if [ "$1" = "diff" ]; then
-            printf '%s' "$TEST_PATHS" | tr '\\n' '\\0'
-            return "$TEST_DIFF_STATUS"
-          fi
-          return 1
-        }
-        python() { cat >/dev/null; printf '%s head\\n' "$TEST_BASE"; }
-        """ + script
-        bash = shutil.which("bash")
-        if os.name == "nt":
-            git_bash = Path(os.environ.get("ProgramFiles", "C:/Program Files")) / "Git/bin/bash.exe"
-            if git_bash.exists():
-                bash = str(git_bash)
-        self.assertTrue(bash and Path(bash).exists(), "Bash is required to test the workflow classifier")
-        temp_root = REPO_ROOT / ".runtime/tmp"
-        temp_root.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=temp_root) as directory:
-            env = dict(os.environ, GITHUB_EVENT_NAME=event, GITHUB_OUTPUT="output.txt",
-                       GITHUB_STEP_SUMMARY="summary.txt", SCENARIO_ID=scenario,
-                       TEST_PATHS="".join(path + "\n" for path in paths), TEST_DIFF_STATUS=str(diff_status), TEST_BASE=base)
-            # Keep Bash input LF-only; text pipes translate it to CRLF on Windows.
-            result = subprocess.run([bash, "--noprofile", "--norc", "-s"], input=script.encode("utf-8"),
-                                    cwd=directory, env=env, capture_output=True)
-            self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(result.stderr, b"")
-            output = (Path(directory) / "output.txt").read_text(encoding="utf-8")
-            return dict(line.split("=", 1) for line in output.splitlines())["should_run"] == "true"
+    def plan(self, paths, labels=None):
+        changed_files = TMP_BASE / "scenario-plan-changed-files.txt"
+        plan_json = TMP_BASE / "scenario-plan.json"
+        changed_files.parent.mkdir(parents=True, exist_ok=True)
+        changed_files.write_text("\n".join(paths) + ("\n" if paths else ""), encoding="utf-8")
+        result = run_command(
+            "node",
+            "tools/ci/pr_plan.mjs",
+            "--changed-files",
+            str(changed_files),
+            "--labels",
+            ",".join(labels or []),
+            "--json-out",
+            str(plan_json),
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(plan_json.read_text(encoding="utf-8"))
 
     def test_scenario_changes_run_only_their_owner(self):
         for changed in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-            for candidate in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-                with self.subTest(changed=changed, candidate=candidate):
-                    self.assertEqual(self.classify([f"data/scenarios/{changed}/manifest.json"], candidate),
-                                     changed == candidate)
+            with self.subTest(changed=changed):
+                plan = self.plan([f"data/scenarios/{changed}/manifest.json"])
+                self.assertEqual(plan["scenarioIds"], [changed])
 
-    def test_shared_dependencies_and_unknown_scenarios_run_all(self):
-        paths = ["data/scenarios/index.json", "data/scenarios/new_scenario/manifest.json",
-                 "data/locales.json", "data/europe_topology.json", "map_builder/io/readers.py",
-                 "tools/check_scenario_contracts.py", "tools/build_startup_bundle.py",
-                 "requirements-dev.lock.txt", ".github/workflows/scenario-contract-matrix.yml"]
-        for path in paths:
-            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-                with self.subTest(path=path, scenario=scenario):
-                    self.assertTrue(self.classify([path], scenario))
+    def test_shared_scenario_dependencies_run_all_supported_scenarios(self):
+        for path in ("data/manifest.json", "data/source_ledger.json", "map_builder/contracts.py",
+                     "tools/check_scenario_contracts.py", ".github/workflows/scenario-contract-matrix.yml"):
+            with self.subTest(path=path):
+                plan = self.plan([path])
+                self.assertEqual(plan["scenarioIds"], ["hoi4_1936", "hoi4_1939", "tno_1962"])
 
-    def test_unrelated_or_empty_changes_skip(self):
-        for paths in ([], ["README.md", "js/ui/menu.js"]):
-            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-                self.assertFalse(self.classify(paths, scenario))
+    def test_unrelated_changes_allocate_no_heavy_scenario_work(self):
+        for paths in ([], ["README.md"], ["js/ui/menu.js"]):
+            with self.subTest(paths=paths):
+                self.assertEqual(self.plan(paths)["scenarioIds"], [])
 
     def test_mixed_changes_select_each_affected_scenario(self):
-        paths = ["data/scenarios/hoi4_1936/owners.json", "data/scenarios/tno_1962/manifest.json"]
-        for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-            self.assertEqual(self.classify(paths, scenario), scenario != "hoi4_1939")
+        plan = self.plan([
+            "data/scenarios/hoi4_1936/owners.json",
+            "data/scenarios/tno_1962/manifest.json",
+        ])
+        self.assertEqual(plan["scenarioIds"], ["hoi4_1936", "tno_1962"])
 
-    def test_non_ascii_and_space_paths_keep_their_scenario_owner(self):
-        path = "data/scenarios/tno_1962/城市 names.json"
-        self.assertTrue(self.classify([path], "tno_1962"))
-        self.assertFalse(self.classify([path], "hoi4_1939"))
+    def test_full_label_expands_scenario_contracts(self):
+        plan = self.plan(["README.md"], labels=["ci:full"])
+        self.assertEqual(plan["scenarioIds"], ["hoi4_1936", "hoi4_1939", "tno_1962"])
 
-    def test_unknown_change_set_never_skips(self):
-        for event in ("pull_request", "push"):
-            for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
-                self.assertTrue(self.classify(["README.md"], scenario, event=event, diff_status=128))
-        for event in ("workflow_dispatch", "unknown_event"):
-            self.assertTrue(self.classify([], ("tno_1962", "hoi4_1936", "hoi4_1939")[0], event=event))
-        self.assertTrue(self.classify([], ("tno_1962", "hoi4_1936", "hoi4_1939")[0], event="push", base="0" * 40))
-
-    def test_successful_push_uses_scenario_routing(self):
-        self.assertTrue(self.classify(["data/scenarios/tno_1962/manifest.json"], "tno_1962", event="push"))
-        self.assertFalse(self.classify(["README.md"], "tno_1962", event="push"))
-
-    def test_required_matrix_and_pr_cancellation_remain_stable(self):
+    def test_required_matrix_names_and_pr_cancellation_remain_stable(self):
         workflow = (REPO_ROOT / ".github/workflows/scenario-contract-matrix.yml").read_text(encoding="utf-8")
         self.assertIn("  strict-scenario-contract-review:", workflow)
         for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
             self.assertIn(f"          - {scenario}\n", workflow)
+        self.assertIn("Fast success for scenario-unrelated changes", workflow)
         self.assertIn("group: scenario-contract-${{ github.event_name }}-${{ github.ref }}", workflow)
         self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", workflow)
 
