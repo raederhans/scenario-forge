@@ -12,6 +12,8 @@ A valid singleton remains a singleton. Missing, conflicting, stale, unverified, 
 
 TNO's default scenario-only parent policy is preserved. Named `level:*` geographic editing groups are an explicit user choice, intersected with current ownership; they do not assert historical administration. The dropdown is available in scenario visual/subdivision mode, not sovereignty mode. Selected levels survive snapshot restoration and are never silently rewritten because another inspected country lacks the level.
 
+Project JSON export/import also preserves named levels. The existing case-insensitive legacy scope normalization remains supported. `tests/quick_fill_project_roundtrip.test.mjs` first reproduced the former reset-to-parent bug, then passed with the shared scope normalizer.
+
 Immediate first-click feedback is retained. A recognized double-click coalesces its leading leaf-color history entry into the batch for one-step undo/redo. Gesture identity, timestamp, color, scenario and before/after continuity prevent unrelated/no-op leading clicks from absorbing older edits.
 
 ### Phase 2: inspectable support audit
@@ -32,12 +34,42 @@ The published intermediate subset has 12 groups / 97 leaves across Beijing, Tian
 
 Normal builds use the checked-in crosswalk, not the transliteration dependency. `generate_hierarchy.py` regenerates the new metadata after the existing hierarchy transaction. `npm run build:quick-fill` refreshes just metadata and catalog governance. The source and derived crosswalk have explicit schemas, manifest entries, a pinned source ledger and license file.
 
-## Verification
+## Verification and recorded evidence
 
-- `npm run test:node:quick-fill`: targeted policy, UI, district and history tests.
-- `npm run verify:quick-fill-data`: deterministic metadata, hashes, partitions, partial-release and stale-crosswalk checks.
-- `npm run audit:quick-fill`: all published scenario metadata inventories.
-- `python tools/build_data_catalog.py`, `python tools/data_health.py`, `python -m unittest tests.test_data_catalog_contract`.
-- `node tools/check_quick_fill_browser.mjs`: live-app dropdown smoke on localhost; seeds the inspected feature, does not pretend to be a full map-pointer regression.
+Core implementation commit: `e00299a29286edd644e8cf3a32812e3594629ac3`.
+Project-persistence follow-up commit: `872119284659077dbce09bc388ac0b8b4e614064`.
+
+Full-checkout verification runs:
+- https://github.com/raederhans/scenario-forge/actions/runs/35555018768
+- https://github.com/raederhans/scenario-forge/actions/runs/35555404374
+
+Recorded passing checks across these runs:
+
+| Check | Result |
+| --- | --- |
+| Focused quick-fill Node contracts, including the persistence regression | 47 passed |
+| Existing project file roundtrip suite | 41 passed |
+| Hierarchy Python contracts | 6 passed |
+| Catalog governance contracts | 19 passed |
+| Existing precision and verification-routing contracts | 60 passed |
+| Scenario lifecycle runtime suite | 39 passed |
+| Architecture, state-writer and test-import boundaries | Passed |
+| Canonical Pages build | Passed |
+| Live Chromium toolbar smoke | Passed, no captured page exceptions |
+
+The browser smoke starts the real app, seeds an existing French inspected feature, opens the native Quick Fill popover, verifies the region/department/current-owner options, selects `level:department`, checks the actual shared state and saves a screenshot. It does not claim a full map-pointer or country-by-country regression.
+
+Useful rerun commands:
+
+```sh
+npm run test:node:quick-fill
+npm run verify:quick-fill-data
+npm run audit:quick-fill
+python tools/data_health.py
+python -m unittest tests.test_data_catalog_contract
+node tools/check_quick_fill_browser.mjs
+```
 
 Browser startup, catalog, full-topology lifecycle tests and build checks require a complete repository checkout. A published-only artifact omits full scenario topology/transport source files. Do not weaken their tests to make a partial workspace look complete.
+
+The temporary implementation transfer files were removed. The final Quick Fill Contract workflow is read-only, uses pinned Actions, and does not commit to any branch. Repository-required PR checks remain separate; no main-branch merge is performed by this work.
