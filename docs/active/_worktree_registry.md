@@ -1,12 +1,12 @@
 # Worktree Registry
 
-## 当前拓扑（2026-09-20）
+## 当前拓扑（2026-09-21）
 
 这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| `C:/Users/raede/Desktop/dev/mapcreator` | 唯一注册工作树。俄罗斯、欧洲精度与性能改动由 `codex/precision-integration-20260920` 统一交付至受保护的 `origin/main`；合并/分支清理状态以 PR 回执和 Git 实时记录为准。 |
+| `C:/Users/raede/Desktop/dev/mapcreator` | 唯一注册工作树。本轮从远端 `codex/quick-fill-hierarchy-phases-1-3-20260921` 接手 Auto Fill 层级功能，经 PR #142 交付至受保护的 `origin/main`；最终分支与本地同步状态以 PR 回执和 Git 实时记录为准。 |
 | `.playwright-mcp/` | 主工作区中的未跟踪、未归属内容；本轮按 WIP 保护规则保留，不把它当作可清理缓存。 |
 | `.runtime/tmp/worktree-cleanup-20260917/recovery.md` | 本轮删除前的精确 branch/tip 恢复清单；属于忽略的本地运行证据，不参与产品提交。 |
 | `.runtime/worktree-archives/russia-full-replacement-20260920/` | 俄罗斯工作树的文件保全清单、与主目录不同的 942 个文件副本及完整 `.runtime` 证据。 |

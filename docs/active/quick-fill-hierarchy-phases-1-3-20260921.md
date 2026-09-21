@@ -57,7 +57,7 @@ Recorded passing checks across these runs:
 | Canonical Pages build | Passed |
 | Live Chromium toolbar smoke | Passed, no captured page exceptions |
 
-The browser smoke starts the real app, seeds an existing French inspected feature, opens the native Quick Fill popover, verifies the region/department/current-owner options, selects `level:department`, checks the actual shared state and saves a screenshot. It does not claim a full map-pointer or country-by-country regression.
+The browser smoke starts the real app, seeds an existing French inspected feature, opens the native Quick Fill popover, verifies the region/department/current-owner options, selects `level:department`, checks the actual shared state and saves a screenshot. It then zooms to an existing Gironde arrondissement and replays a native mouse double-click. The six owner-scoped department members must change in exactly one history entry, one undo must restore their original overrides, and one redo must restore the fill. This is a focused pointer regression, not a country-by-country replay.
 
 Useful rerun commands:
 
@@ -72,4 +72,14 @@ node tools/check_quick_fill_browser.mjs
 
 Browser startup, catalog, full-topology lifecycle tests and build checks require a complete repository checkout. A published-only artifact omits full scenario topology/transport source files. Do not weaken their tests to make a partial workspace look complete.
 
-The temporary implementation transfer files were removed. The final Quick Fill Contract workflow is read-only, uses pinned Actions, and does not commit to any branch. Repository-required PR checks remain separate; no main-branch merge is performed by this work.
+The temporary implementation transfer files were removed. The Quick Fill Contract workflow is read-only, uses pinned Actions, and does not commit to any branch. Repository-required PR checks remain separate. Merge authorization was subsequently provided for the local takeover; the authoritative receipt is [PR #142](https://github.com/raederhans/scenario-forge/pull/142).
+
+## Local takeover and merge follow-up (2026-09-21)
+
+The initial required PR gate stopped before adaptive execution because five delivery files lacked verification routes. Commit `364be49ded7d4dd1107523647592b85913c91c09` registers those files, preserves existing route order, and keeps browser/report execution under main-thread resource locks. The complete PR file selection now has no unmatched files. Local verification passed 48 focused Node tests, the 598-route schema check, script portfolio validation, metadata rebuild validation and six Python contracts. The live TNO/Gironde pointer test passed with exactly six targets, one undo/redo entry and no page exceptions. The localhost server was stopped after the check.
+
+Local source inspection confirmed that unresolved records include old names and province-scoped ambiguity (for example, `Weixian` has three prefecture candidates in Hebei), as well as questionable inherited parent membership (`Siping` under `CN_Liaoning`, `Taibeixian` under `CN_Fujian`, and `Xianggang` under `CN_Guangdong`). These are evidence of why the current reference does not resolve the leaves, not authorization to infer replacement geography. Existing province groups and geometry remain unchanged; nationwide prefecture completion requires a separately validated source crosswalk. Municipalities deliberately reuse their existing province membership and do not claim independent county-name validation. The importer-compatible removal of `shi` is retained because changing only the reference normalization would break alignment with the existing source names.
+
+The publication validator now proves that every province is partitioned exactly once into matched and unresolved leaves, checks nonempty groups and identity/parent membership, and verifies the counts and completion flags before publishing any intermediate group. A mutation regression reproduced seven previously accepted invalid payloads (missing or duplicate leaves, duplicate groups, unresolved overlaps, absent province records, stale totals and inconsistent completion); all are now rejected. The unchanged committed metadata still rebuilds exactly and all seven Python contracts pass.
+
+Runtime evidence for this takeover is under `.runtime/reports/generated/quick-fill-local-*`, `.runtime/reports/generated/quick-fill-validator-before.log` and `.runtime/browser/quick-fill/result.json`. The parent owns local checks and integration. The delegated CLI completed read-only analysis but could not edit or execute in its resumed session; the parent implemented and tested the publication fix. No CLI commit, push, or merge was performed.

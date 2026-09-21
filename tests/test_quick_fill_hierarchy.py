@@ -80,4 +80,24 @@ class QuickFillBuildContractTest(unittest.TestCase):
             Draft202012Validator.check_schema(schema)
             Draft202012Validator(schema).validate(payload)
 
+    def test_china_publication_requires_a_complete_unique_partition(self):
+        released = next(key for key, value in self.crosswalk["provinces"].items() if value["release_enabled"])
+        group_key = next(key for key, value in self.crosswalk["groups"].items() if value["province_id"] == released)
+        leaf = self.crosswalk["groups"][group_key]["feature_ids"][0]
+        mutations = {
+            "missing member": lambda c: c["groups"][group_key]["feature_ids"].pop(),
+            "duplicate member": lambda c: c["groups"][group_key]["feature_ids"].append(leaf),
+            "duplicate group": lambda c: c["groups"].update({"CN_PREF_duplicate": copy.deepcopy(c["groups"][group_key])}),
+            "unresolved overlap": lambda c: c["unresolved"].append({"feature_id": leaf, "province_id": released, "name": "duplicate", "candidates": []}),
+            "missing province": lambda c: c["provinces"].pop(released),
+            "stale count": lambda c: c["provinces"][released].update({"matched": 0}),
+            "incomplete group": lambda c: c["groups"][group_key].update({"complete": False}),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                crosswalk = copy.deepcopy(self.crosswalk)
+                mutate(crosswalk)
+                with self.assertRaises(ValueError):
+                    build_quick_fill_metadata(self.hierarchy, self.properties, crosswalk)
+
 if __name__ == "__main__": unittest.main()
