@@ -38,7 +38,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
     "map_builder/**", "tools/check_scenario_contracts.py", "requirements-dev.lock.txt",
     ".github/workflows/scenario-contract-matrix.yml",
   ]);
-  if (sharedScenarioRelevant) {
+  if (sharedScenarioRelevant || full) {
     for (const id of ["tno_1962", "hoi4_1936", "hoi4_1939"]) scenarioIds.add(id);
   }
 
