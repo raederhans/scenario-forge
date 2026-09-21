@@ -19,6 +19,10 @@ on:
         required: false
         type: boolean
         default: false
+      run-pages-check:
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -106,7 +110,7 @@ jobs:
           node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
 
       - name: Check tracked Pages mirrors for relevant PR changes
-        if: inputs.profile == 'pr-fast'
+        if: inputs.profile == 'pr-fast' && inputs.run-pages-check
         shell: bash
         run: |
           changed_files=.runtime/tmp/verification-selector-changed-files.txt
