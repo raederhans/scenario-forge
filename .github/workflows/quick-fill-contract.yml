@@ -27,7 +27,7 @@ jobs:
           cache: npm
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - name: Verify and apply exact implementation patches
         shell: bash
         run: |
@@ -55,6 +55,12 @@ jobs:
                   raise SystemExit('Unexpected patch write set')
               subprocess.run(['git', 'apply', str(path)], check=True)
               paths.extend(batch)
+          source = pathlib.Path('tools/verification/verification_catalog_source.mjs')
+          text = source.read_text()
+          text = text.replace('const precisionRecords = [...existingRecords, ...createPrecisionScalingRecords(existingRecords)];\n', '')
+          text = text.replace('records: [...precisionRecords, ...createQuickFillRecords(precisionRecords)],', 'records: [...existingRecords, ...createPrecisionScalingRecords(existingRecords)],')
+          text = text.replace('export const VERIFICATION_METADATA_SOURCE = deepFreeze(', 'AUTHORED_VERIFICATION_METADATA.records.push(...createQuickFillRecords(AUTHORED_VERIFICATION_METADATA.records));\n\nexport const VERIFICATION_METADATA_SOURCE = deepFreeze(')
+          source.write_text(text)
           pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json').write_text(json.dumps(paths))
           PY
       - name: Prepare pinned source and deterministic data outputs
@@ -80,6 +86,7 @@ jobs:
           python -m unittest tests.test_data_catalog_contract -v 2>&1 | tee .runtime/reports/generated/quick-fill-catalog-tests.log
           npm run verify:script-portfolio
           node tools/select_verification_targets.mjs --check
+          node --test tests/precision_scaling_verification_records.test.mjs tests/verification_script_portfolio_behavior.test.mjs > .runtime/reports/generated/quick-fill-routing-tests.log
           git diff --check
       - name: Build canonical Pages mirrors
         shell: bash
