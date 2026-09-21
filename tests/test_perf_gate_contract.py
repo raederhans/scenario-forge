@@ -186,7 +186,9 @@ function git {
             audit = json.loads((root / ".runtime/reports/generated/perf-pr-gate-classifier.json").read_text(encoding="utf-8-sig"))
             self.assertCountEqual(audit["changed_files"], [old_path, new_path])
             self.assertTrue(audit["should_run_perf"])
-            self.assertTrue(audit["should_enforce_regressions"])
+            self.assertEqual(audit["perf_mode"], "sample")
+            self.assertFalse(audit["should_enforce_regressions"])
+            self.assertEqual(audit["scenario_matrix"], ["hoi4_1939"])
             self.assertEqual(audit["candidate_sha"], head_sha)
 
     def test_diff_failure_does_not_become_successful_skip(self):
@@ -216,7 +218,7 @@ class PerfGateContractTest(unittest.TestCase):
         scenario_job = jobs["perf-scenarios"]
         self.assertIn("runs-on: windows-latest", scenario_job)
         self.assertIn("fail-fast: false", scenario_job)
-        self.assertIn("scenario: [tno_1962, hoi4_1939]", scenario_job)
+        self.assertIn("scenario: ${{ fromJSON(needs.classify.outputs.scenario_matrix) }}", scenario_job)
         self.assertNotIn("max-parallel: 1", scenario_job)
         self.assertNotIn("continue-on-error", scenario_job)
         self.assertIn("    needs: [classify]", scenario_job)
@@ -230,7 +232,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("            /package-lock.json", classifier_job)
         self.assertNotIn("npm ci", classifier_job)
         self.assertIn("git diff --name-only --no-renames -z", classifier_job)
-        self.assertEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 2)
+        self.assertGreaterEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 3)
         self.assertIn("--runs 5 --warmups 3", scenario_job)
         for artifact in ("perf-pr-gate-evidence",):
             self.assertIn(f"name: {artifact}-${{{{ matrix.scenario }}}}", scenario_job)
