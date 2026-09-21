@@ -1,0 +1,89 @@
+diff --git a/tools/verification/catalog/package_scripts.mjs b/tools/verification/catalog/package_scripts.mjs
+index 43d516b..5fa7c4d 100644
+--- a/tools/verification/catalog/package_scripts.mjs
++++ b/tools/verification/catalog/package_scripts.mjs
+@@ -343,5 +343,10 @@ export const PACKAGE_SCRIPTS = {
+     "bench:editor-performance": "npm run python -- ops/browser-mcp/editor-performance-benchmark.py --out .runtime/output/perf/editor-performance-benchmark.json --screenshot-dir .runtime/browser/mcp-artifacts/perf",
+     "bench:special-zones-members": "node tools/perf/special_zone_members_benchmark.mjs --members 240 --iterations 40 --out .runtime/output/perf/special-zone-members-benchmark.json",
+     "bench:polyline-simplification": "node tools/perf/polyline_simplification_benchmark.mjs --iterations 40 --out .runtime/reports/generated/geometry-simplification-benchmark.json",
+-    "test:node:polyline-simplification-benchmark": "node --test tests/polyline_simplification_benchmark_contract.test.mjs"
++    "test:node:polyline-simplification-benchmark": "node --test tests/polyline_simplification_benchmark_contract.test.mjs",
++    "test:node:quick-fill": "node --test tests/quick_fill*.test.mjs tests/fill_target_policy_behavior.test.mjs tests/parent_border_grouping_policy_behavior.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs tests/history_feature_color_refresh_behavior.test.mjs",
++    "test:python:quick-fill": "python -m unittest tests.test_quick_fill_hierarchy -v",
++    "audit:quick-fill": "node tools/audit_quick_fill.mjs",
++    "build:quick-fill": "python tools/build_quick_fill_hierarchy.py && python tools/register_quick_fill_assets.py && python tools/build_data_catalog.py",
++    "verify:quick-fill-data": "python tools/build_quick_fill_hierarchy.py --check && python -m unittest tests.test_quick_fill_hierarchy"
+   };
+diff --git a/tools/verification/catalog/records/quick_fill.mjs b/tools/verification/catalog/records/quick_fill.mjs
+new file mode 100644
+index 0000000..3d220d0
+--- /dev/null
++++ b/tools/verification/catalog/records/quick_fill.mjs
+@@ -0,0 +1,30 @@
++// Additive semantic-fill contracts. Never change existing selector order or policies.
++export function createQuickFillRecords(existingRecords) {
++  const start = Math.max(0, ...existingRecords.map((record) => record.selectorOrder || 0)) + 1;
++  const routes = [
++    ["policy", "renderer-runtime", "test:node:quick-fill", [
++      "js/core/quick_fill_hierarchy.js", "js/core/renderer/fill_target_policy.js", "js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_districts.js",
++      "tests/quick_fill_hierarchy.test.mjs", "tests/fill_target_policy_behavior.test.mjs", "tests/parent_border_grouping_policy_behavior.test.mjs",
++    ]],
++    ["history", "renderer-runtime", "node --test tests/quick_fill_history.test.mjs tests/history_feature_color_refresh_behavior.test.mjs", [
++      "js/core/history_manager.js", "js/core/history_quick_fill_gesture.js", "js/core/map_renderer.js", "js/core/map_renderer/click_selection_transaction_owner.js",
++      "tests/quick_fill_history.test.mjs", "tests/history_feature_color_refresh_behavior.test.mjs",
++    ]],
++    ["controls", "dev-workspace", "node --test tests/quick_fill_level_controls.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs", [
++      "js/ui/toolbar/quick_fill_level_controls.js", "js/ui/toolbar/workspace_chrome_support_surface_controller.js", "js/core/state/actions/scenario_presentation_actions.js", "js/core/scenario/lifecycle_runtime.js",
++      "tests/quick_fill_level_controls.test.mjs", "tests/workspace_chrome_support_surface_controller_behavior.test.mjs",
++    ]],
++    ["data", "geo-contract", "test:python:quick-fill", [
++      "map_builder/quick_fill_hierarchy.py", "tools/build_quick_fill_hierarchy.py", "tools/build_china_prefecture_crosswalk.py", "tools/register_quick_fill_assets.py", "tools/generate_hierarchy.py",
++      "data/hierarchy.json", "data/quick_fill/china_prefecture_crosswalk.v1.json", "data/quick_fill/reference/china-pca-2017.json",
++      "map_builder/schemas/quick_fill_china_reference_v1.schema.json", "map_builder/schemas/quick_fill_crosswalk_v1.schema.json", "tests/test_quick_fill_hierarchy.py",
++    ]],
++  ];
++  return routes.map(([id, domain, commandRef, sourceRefs], index) => ({
++    id: "local:quick-fill:" + id, commandRef, sourceRefs,
++    ownerHints: [domain], domains: [domain], tiers: ["contract"], cost: "fast",
++    resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"], platforms: ["all"],
++    entrypointPolicyIndex: 5, verificationOrder: null, selectorOrder: start + index,
++    verification: null, selector: {},
++  }));
++}
+diff --git a/tools/verification/catalog/source_files.mjs b/tools/verification/catalog/source_files.mjs
+index e763b25..34f0921 100644
+--- a/tools/verification/catalog/source_files.mjs
++++ b/tools/verification/catalog/source_files.mjs
+@@ -10,6 +10,7 @@ export const VERIFICATION_CATALOG_SOURCE_FILES = Object.freeze([
+   "tools/verification/catalog/records/delivery_runtime.mjs",
+   "tools/verification/catalog/records/local_feedback.mjs",
+   "tools/verification/catalog/records/precision_scaling.mjs",
++  "tools/verification/catalog/records/quick_fill.mjs",
+   "tools/verification/catalog/records/renderer_cache_pipeline.mjs",
+   "tools/verification/catalog/records/renderer_frame_orchestration.mjs",
+   "tools/verification/catalog/records/renderer_interaction.mjs",
+diff --git a/tools/verification/verification_catalog_source.mjs b/tools/verification/verification_catalog_source.mjs
+index f801fe3..b8f11df 100644
+--- a/tools/verification/verification_catalog_source.mjs
++++ b/tools/verification/verification_catalog_source.mjs
+@@ -18,6 +18,7 @@ import { RENDERER_CACHE_PIPELINE_RECORDS } from "./catalog/records/renderer_cach
+ import { STATE_OWNERSHIP_RECORDS } from "./catalog/records/state_ownership.mjs";
+ import { RENDERER_PROJECTION_VIEWPORT_RECORDS } from "./catalog/records/renderer_projection_viewport.mjs";
+ import { createLocalFeedbackRecords } from "./catalog/records/local_feedback.mjs";
++import { createQuickFillRecords } from "./catalog/records/quick_fill.mjs";
+ import { createPrecisionScalingRecords } from "./catalog/records/precision_scaling.mjs";
+ 
+ export { normalizeVerificationMetadataSource, verificationMetadataSourceDigest, verificationGatePolicySignalsDigest } from "./catalog/normalization.mjs";
+@@ -42,10 +43,11 @@ const baseRecords = [
+   ...RENDERER_PROJECTION_VIEWPORT_RECORDS,
+ ];
+ const existingRecords = [...baseRecords, ...createLocalFeedbackRecords(baseRecords)];
++const precisionRecords = [...existingRecords, ...createPrecisionScalingRecords(existingRecords)];
+ const AUTHORED_VERIFICATION_METADATA = {
+   ...CATALOG_POLICIES,
+   packageScripts: PACKAGE_SCRIPTS,
+-  records: [...existingRecords, ...createPrecisionScalingRecords(existingRecords)],
++  records: [...precisionRecords, ...createQuickFillRecords(precisionRecords)],
+ };
+ 
+ export const VERIFICATION_METADATA_SOURCE = deepFreeze(
