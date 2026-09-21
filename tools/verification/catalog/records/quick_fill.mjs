@@ -27,7 +27,7 @@ export function createQuickFillRecords(existingRecords) {
     ]],
   ];
   const records = routes.map(([id, domain, commandRef, sourceRefs], index) => ({
-    id: "local:quick-fill:" + id, commandRef, sourceRefs,
+    id: id === "policy" ? "node:test:node:quick-fill" : "local:quick-fill:" + id, commandRef, sourceRefs,
     ownerHints: [domain], domains: [domain], tiers: ["contract"], cost: "fast",
     resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"], platforms: ["all"],
     entrypointPolicyIndex: 5, verificationOrder: null, selectorOrder: start + index,

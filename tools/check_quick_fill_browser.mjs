@@ -70,13 +70,14 @@ try {
     const state = globalThis.__qfState;
     const history = await import("./js/core/history_manager.js");
     const count = state.historyPast.length;
+    const entries = state.historyPast.map((entry) => ({ kind: entry.kind, meta: entry.meta }));
     const entry = state.historyPast.at(-1);
     const after = history.captureHistoryState({ featureIds: ids });
     const undo = history.undoHistory();
     const restored = history.captureHistoryState({ featureIds: ids });
     const redo = history.redoHistory();
     const replayed = history.captureHistoryState({ featureIds: ids });
-    return { count, kind: entry?.kind, targetIds: Object.keys(entry?.after?.visualOverrides || {}), after, undo, restored, redo, replayed };
+    return { count, entries, kind: entry?.kind, targetIds: Object.keys(entry?.after?.visualOverrides || {}), after, undo, restored, redo, replayed };
   }, evidence.before.ids);
   assert.equal(evidence.gesture.count, 1, "one pointer double-click must create one undo entry");
   assert.deepEqual(evidence.gesture.targetIds.sort(), [...evidence.before.ids].sort());

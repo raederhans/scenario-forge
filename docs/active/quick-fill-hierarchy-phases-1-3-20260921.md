@@ -14,7 +14,7 @@ TNO's default scenario-only parent policy is preserved. Named `level:*` geograph
 
 Project JSON export/import also preserves named levels. The existing case-insensitive legacy scope normalization remains supported. `tests/quick_fill_project_roundtrip.test.mjs` first reproduced the former reset-to-parent bug, then passed with the shared scope normalizer.
 
-Immediate first-click feedback is retained. A recognized double-click coalesces its leading leaf-color history entry into the batch for one-step undo/redo. Gesture identity, timestamp, color, scenario and before/after continuity prevent unrelated/no-op leading clicks from absorbing older edits.
+Immediate first-click feedback is retained. A recognized double-click coalesces its leading leaf-color history entry into the batch for one-step undo/redo. Exact leading-click timestamp, color, scenario and before/after continuity prevent unrelated/no-op leading clicks from absorbing older edits. The browser's recognized gesture remains atomic even when rendering delays event dispatch; a separate wall-clock cutoff must not split it.
 
 ### Phase 2: inspectable support audit
 
@@ -83,3 +83,5 @@ Local source inspection confirmed that unresolved records include old names and 
 The publication validator now proves that every province is partitioned exactly once into matched and unresolved leaves, checks nonempty groups and identity/parent membership, and verifies the counts and completion flags before publishing any intermediate group. A mutation regression reproduced seven previously accepted invalid payloads (missing or duplicate leaves, duplicate groups, unresolved overlaps, absent province records, stale totals and inconsistent completion); all are now rejected. The unchanged committed metadata still rebuilds exactly and all seven Python contracts pass.
 
 Runtime evidence for this takeover is under `.runtime/reports/generated/quick-fill-local-*`, `.runtime/reports/generated/quick-fill-validator-before.log` and `.runtime/browser/quick-fill/result.json`. The parent owns local checks and integration. The delegated CLI completed read-only analysis but could not edit or execute in its resumed session; the parent implemented and tested the publication fix. No CLI commit, push, or merge was performed.
+
+The expanded CI run exposed a second route registration contract: package `test:node:*` commands require a canonical `node:` route ID. The Quick Fill route now follows that contract; the entire 72-test structural tooling suite passes. The new pointer smoke also caught a real undo regression on slower runners. A local sixfold CPU-throttled replay reproduced two history entries with the same exact leading-click identity but about 14 seconds of dispatch delay. Removing the redundant two-second history cutoff preserves the browser-recognized gesture while retaining identity and snapshot checks. The focused Node suite now passes 49 tests, including a delayed-gesture regression.

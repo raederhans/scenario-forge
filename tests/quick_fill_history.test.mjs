@@ -16,15 +16,25 @@ test("one batch undo restores the first click as well as all siblings", () => {
   assert.deepEqual(merged.after, next.after);
   assert.equal(next.before.visualOverrides.a, "red", "inputs remain unchanged");
 });
-test("unrelated history, no-op first clicks, late gestures and scenario changes cannot coalesce", () => {
+test("unrelated history, no-op first clicks, reversed events and scenario changes cannot coalesce", () => {
   for (const patch of [
-    { leadingClickTimeStamp: 150 }, { timeStamp: 3000 }, { featureId: "b" },
+    { leadingClickTimeStamp: 150 }, { timeStamp: 50 }, { featureId: "b" },
     { color: "blue" }, { scenarioId: "new" }, { timeStamp: NaN },
   ]) {
     const [previous, next] = entries(); Object.assign(next.meta.quickFillGesture, patch);
     assert.equal(coalesceQuickFillGesture(previous, next), null);
   }
   const [previous, next] = entries(); previous.before.styleConfig = {};
+  assert.equal(coalesceQuickFillGesture(previous, next), null);
+});
+
+test("a recognized double-click delayed by rendering still undoes its exact leading click", () => {
+  const [previous, next] = entries();
+  next.meta.quickFillGesture.timeStamp = 14000;
+  const merged = coalesceQuickFillGesture(previous, next);
+  assert.deepEqual(merged.before.visualOverrides, { a: null, b: "blue" });
+  assert.deepEqual(merged.before.featureOverrides, { a: "old", b: "blue" });
+  next.meta.quickFillGesture.leadingClickTimeStamp = 200;
   assert.equal(coalesceQuickFillGesture(previous, next), null);
 });
 

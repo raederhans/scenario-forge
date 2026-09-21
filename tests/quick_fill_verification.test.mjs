@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createQuickFillRecords } from "../tools/verification/catalog/records/quick_fill.mjs";
 import { VERIFICATION_METADATA_SOURCE } from "../tools/verification/verification_catalog_source.mjs";
+import { buildRouteIndex } from "../tools/test_route_registry.mjs";
 
 test("quick-fill routes append after existing routes without modifying their policies", () => {
   const old = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
@@ -27,11 +28,12 @@ test("quick-fill routes append after existing routes without modifying their pol
 test("public authority owns the new commands after all earlier precision routes", () => {
   const records = VERIFICATION_METADATA_SOURCE.records;
   const precision = records.filter((record) => record.id.startsWith("local:precision-scaling:") || record.id.startsWith("local:latency-batches:"));
-  const quickFill = records.filter((record) => record.id.startsWith("local:quick-fill:"));
+  const quickFill = records.filter((record) => record.id.startsWith("local:quick-fill:") || record.id === "node:test:node:quick-fill");
   assert.equal(quickFill.length, 7);
   assert.ok(Math.min(...quickFill.map((record) => record.selectorOrder)) > Math.max(...precision.map((record) => record.selectorOrder)));
   assert.ok(quickFill.some((record) => record.commandRef === "test:node:quick-fill"));
   assert.ok(quickFill.some((record) => record.commandRef === "test:python:quick-fill"));
+  assert.ok(buildRouteIndex().some((route) => route.id === "node:test:node:quick-fill" && route.commandRef === "test:node:quick-fill"));
 });
 
 test("quick-fill delivery assets have routes and browser work retains resource ownership", () => {

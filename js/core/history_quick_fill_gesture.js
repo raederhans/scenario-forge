@@ -8,7 +8,10 @@ export function coalesceQuickFillGesture(previous, next) {
   if (first.featureId !== batch.featureId || first.color !== batch.color || first.scenarioId !== batch.scenarioId) return null;
   if (!Number.isFinite(first.timeStamp) || first.timeStamp <= 0 || batch.leadingClickTimeStamp !== first.timeStamp) return null;
   const elapsed = batch.timeStamp - first.timeStamp;
-  if (!Number.isFinite(elapsed) || elapsed < 0 || elapsed > 2000) return null;
+  // The browser already recognized dblclick and the caller binds its exact
+  // leading click. Rendering can delay dispatch; elapsed wall time must not
+  // split that gesture into two undo entries on slower machines.
+  if (!Number.isFinite(elapsed) || elapsed < 0) return null;
   if (previous.meta?.affectsSovereignty || next.meta?.affectsSovereignty) return null;
   const id = first.featureId;
   const before = { ...next.before };
