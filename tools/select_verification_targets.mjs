@@ -38,7 +38,39 @@ export function nonBehavioralClassification(changedFile) {
   // This is an agent setting, not an application state writer. Classification
   // here does not validate TOML syntax or authorize its configuration values.
   if (changedFile === ".codex/config.toml") return "agent-tool-config";
+  if (changedFile.startsWith("docs/") && !changedFile.startsWith("docs/perf/") && !changedFile.startsWith("docs/testing/")) {
+    return "documentation-advisory";
+  }
+  if (/^(?:screenshots|artwork|references)\//u.test(changedFile)) return "non-runtime-asset";
   return null;
+}
+
+export function automaticOwnershipClassification(changedFile) {
+  const file = String(changedFile || "").replaceAll("\\", "/");
+  if (file.startsWith("js/core/renderer/") || file.startsWith("js/core/map_renderer/")) {
+    return { disposition: "auto-owned", domains: ["renderer-runtime"] };
+  }
+  if (file.startsWith("js/ui/")) {
+    return { disposition: "auto-owned", domains: ["main-shell", "dev-workspace"] };
+  }
+  if (file.startsWith("map_builder/")) {
+    return { disposition: "auto-owned", domains: ["geo-contract", "scenario-contracts"] };
+  }
+  if (file.startsWith("data/scenarios/")) {
+    return { disposition: "auto-owned", domains: ["scenario-contracts", "scenario-runtime"] };
+  }
+  return null;
+}
+
+function automaticFallbackRoutes(allRoutes, changedFile) {
+  const ownership = automaticOwnershipClassification(changedFile);
+  if (!ownership) return [];
+  return allRoutes.filter((route) => (
+    ownership.domains.includes(route.domain)
+    && route.cost !== "heavy"
+    && route.executionOwner === "child-safe"
+    && (route.ciProfile === "pr-fast" || route.ciProfile === "full")
+  ));
 }
 
 
@@ -165,7 +197,8 @@ function resolveP4ExactPhaseSelection(routes) {
 }
 
 function currentPhaseRoutesForChangedFile(routes, changedFile, importGraph, p4ExactPhaseSelection) {
-  const matchedRoutes = routes.filter((route) => routeMatchesChangedFile(route, changedFile, importGraph));
+  const directMatches = routes.filter((route) => routeMatchesChangedFile(route, changedFile, importGraph));
+  const matchedRoutes = directMatches.length ? directMatches : automaticFallbackRoutes(routes, changedFile);
   const matchedExactPhase = matchedRoutes.some((route) => p4ExactPhaseSelection.exactPhaseRoutes.has(route));
   if (!matchedExactPhase) return matchedRoutes;
   return [
@@ -649,8 +682,16 @@ function buildRecommendation(changedFiles, allRoutes = buildRouteIndex(), {
       disposition: "no-app-behavior-validation",
       behaviorTestsRun: false,
     }));
+  const autoOwnedChangedFiles = normalizedChangedFiles
+    .filter((file) => automaticOwnershipClassification(file))
+    .map((changedFile) => ({
+      changedFile,
+      ...automaticOwnershipClassification(changedFile),
+      routed: !unroutedChangedFiles.includes(changedFile),
+    }));
   const unmatchedChangedFiles = unroutedChangedFiles
-    .filter((file) => !nonBehavioralClassification(file));
+    .filter((file) => !nonBehavioralClassification(file))
+    .filter((file) => !automaticOwnershipClassification(file));
 
   return {
     schemaVersion: 1,
@@ -711,6 +752,7 @@ function buildRecommendation(changedFiles, allRoutes = buildRouteIndex(), {
     advisoryNotes: buildAdvisoryNotes(commandEntries),
     unroutedChangedFiles,
     nonBehavioralChangedFiles,
+    autoOwnedChangedFiles,
     unmatchedChangedFiles,
     skippedHeavyTests: skippedHeavyRoutes(allRoutes, matchedRoutes),
   };
@@ -737,6 +779,10 @@ function renderMarkdown(report) {
       }
     }
   }
+  lines.push("", "## Auto-owned changed files");
+  lines.push(...((report.autoOwnedChangedFiles || []).length
+    ? report.autoOwnedChangedFiles.map((entry) => `- ${entry.changedFile}: ${entry.domains.join("+")}`)
+    : ["- none"]));
   lines.push("", "## Unmatched changed files");
   lines.push(...(report.unmatchedChangedFiles.length ? report.unmatchedChangedFiles.map((file) => `- ${file}`) : ["- none"]));
   lines.push("", "## Impacted domains");
