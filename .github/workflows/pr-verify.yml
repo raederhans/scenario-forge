@@ -7,44 +7,99 @@ concurrency:
   group: pr-verify-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
+  pr-plan:
+    name: PR Plan
+    runs-on: ubuntu-latest
+    outputs:
+      run_fast: ${{ steps.plan.outputs.run_fast }}
+      run_smoke: ${{ steps.plan.outputs.run_smoke }}
+      run_demo: ${{ steps.plan.outputs.run_demo }}
+      run_pages: ${{ steps.plan.outputs.run_pages }}
+      scenario_ids: ${{ steps.plan.outputs.scenario_ids }}
+      run_transport: ${{ steps.plan.outputs.run_transport }}
+      perf_mode: ${{ steps.plan.outputs.perf_mode }}
+      expected_performance_change: ${{ steps.plan.outputs.expected_performance_change }}
+    steps:
+      - name: Checkout PR planner only
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout: |
+            tools/ci/pr_plan.mjs
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Read changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p .runtime/tmp .runtime/reports/generated
+          gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files?per_page=100" --jq '.[].filename' > .runtime/tmp/pr-changed-files.txt
+          test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::PR planner received an empty changed-file set"; exit 1; }
+
+      - name: Plan PR verification
+        id: plan
+        env:
+          PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          node tools/ci/pr_plan.mjs \
+            --changed-files .runtime/tmp/pr-changed-files.txt \
+            --labels "$PR_LABELS" \
+            --json-out .runtime/reports/generated/pr-plan.json \
+            --github-output "$GITHUB_OUTPUT"
+          cat .runtime/reports/generated/pr-plan.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload PR plan
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pr-plan
+          path: .runtime/reports/generated/pr-plan.json
+
   pr-verify-fast:
+    needs: [pr-plan]
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-fast
       run-e2e-smoke: false
+      run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}
 
   pr-verify-smoke:
+    needs: [pr-plan]
+    if: needs.pr-plan.outputs.run_smoke == 'true'
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-smoke
       run-e2e-smoke: true
-      run-golden-demo: true
+      run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}
 
   pr-verify-required:
     name: PR Verify Required
     if: always()
-    needs: ["pr-verify-fast", "pr-verify-smoke"]
+    needs: ["pr-plan", "pr-verify-fast", "pr-verify-smoke"]
     runs-on: ubuntu-latest
     steps:
-      - name: Require successful PR verification results
+      - name: Require planned PR verification results
         env:
           REQUIRED_RESULTS: ${{ toJSON(needs) }}
         run: |
           node <<'NODE'
-          const expectedJobs = ["pr-verify-fast", "pr-verify-smoke"];
-          const allowedResults = new Set(["success"]);
           const needs = JSON.parse(process.env.REQUIRED_RESULTS);
+          const expectedJobs = ["pr-plan", "pr-verify-fast", "pr-verify-smoke"];
           const actualJobs = Object.keys(needs).sort();
-          const expectedJobsSorted = [...expectedJobs].sort();
-          const dependencySetMatches = JSON.stringify(actualJobs) === JSON.stringify(expectedJobsSorted);
-          const rejected = expectedJobs.filter((job) => !allowedResults.has(needs[job]?.result));
-
-          for (const job of expectedJobs) {
-            console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
-          }
-          if (!dependencySetMatches || rejected.length > 0) {
-            console.error(`Required PR verification failed: ${rejected.join(", ") || "dependency set mismatch"}`);
+          const dependencySetMatches = JSON.stringify(actualJobs) === JSON.stringify([...expectedJobs].sort());
+          const planPassed = needs["pr-plan"]?.result === "success";
+          const fastPassed = needs["pr-verify-fast"]?.result === "success";
+          const smokeResult = needs["pr-verify-smoke"]?.result;
+          const smokeAccepted = smokeResult === "success" || smokeResult === "skipped";
+          for (const job of expectedJobs) console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
+          if (!dependencySetMatches || !planPassed || !fastPassed || !smokeAccepted) {
+            console.error("Required PR verification failed.");
             process.exit(1);
           }
           NODE
