@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
-      - name: Verify and apply exact implementation patch
+      - name: Verify and apply exact implementation patches
         shell: bash
         run: |
           set -euo pipefail
@@ -43,19 +43,25 @@ jobs:
               raise SystemExit('Implementation patch checksum mismatch')
           target = pathlib.Path('.runtime/tmp/quick-fill/implementation.patch')
           target.write_bytes(patch)
-          subprocess.run(['git', 'apply', '--check', str(target)], check=True)
-          stat = subprocess.check_output(['git', 'apply', '--numstat', str(target)], text=True)
-          paths = [line.split('\t', 2)[2] for line in stat.splitlines()]
-          if len(paths) != 33 or any(p.startswith(('.github/', 'data/', 'dist/')) or '..' in p.split('/') for p in paths):
-              raise SystemExit('Unexpected patch write set')
+          integration = pathlib.Path('tools/.quick-fill-delivery/integration.patch')
+          if hashlib.sha256(integration.read_bytes()).hexdigest() != '2c25dc65dd132136037e027e2cc690807003671a25126495a87bee588ccd17f9':
+              raise SystemExit('Integration patch checksum mismatch')
+          paths = []
+          for path, count in [(target, 33), (integration, 4)]:
+              subprocess.run(['git', 'apply', '--check', str(path)], check=True)
+              stat = subprocess.check_output(['git', 'apply', '--numstat', str(path)], text=True)
+              batch = [line.split('\t', 2)[2] for line in stat.splitlines()]
+              if len(batch) != count or any(p.startswith(('.github/', 'data/', 'dist/')) or '..' in p.split('/') for p in batch):
+                  raise SystemExit('Unexpected patch write set')
+              subprocess.run(['git', 'apply', str(path)], check=True)
+              paths.extend(batch)
           pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json').write_text(json.dumps(paths))
-          subprocess.run(['git', 'apply', str(target)], check=True)
           PY
       - name: Prepare pinned source and deterministic data outputs
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install -r requirements-ci-min.lock.txt 'pypinyin==0.55.0'
+          python -m pip install -r requirements-dev.lock.txt 'pypinyin==0.55.0'
           npm ci
           mkdir -p data/quick_fill/reference
           base=https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/e01c078c68e044242bfcc4d26a970b2314b098cd
@@ -72,6 +78,14 @@ jobs:
           npm run audit:quick-fill
           python tools/data_health.py 2>&1 | tee .runtime/reports/generated/quick-fill-data-health.log
           python -m unittest tests.test_data_catalog_contract -v 2>&1 | tee .runtime/reports/generated/quick-fill-catalog-tests.log
+          npm run verify:script-portfolio
+          node tools/select_verification_targets.mjs --check
+          git diff --check
+      - name: Build canonical Pages mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/build_pages_dist.py 2>&1 | tee .runtime/reports/generated/quick-fill-pages-build.log
           git diff --check
       - name: Commit validated source changes to this feature branch only
         shell: bash
@@ -83,6 +97,13 @@ jobs:
           paths = json.loads(pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json').read_text())
           paths += ['data/quick_fill/reference/china-pca-2017.json', 'data/quick_fill/reference/LICENSE.china-pca.txt', 'data/quick_fill/china_prefecture_crosswalk.v1.json', 'data/hierarchy.json', 'data/manifest.json', 'data/source_ledger.json', 'data/CATALOG.json', 'data/CATALOG.md']
           subprocess.run(['git', 'add', '--', *paths], check=True)
+          tracked = subprocess.check_output(['git', 'ls-files', '-z', '--', 'dist'], text=True).split('\0')
+          tracked = [p for p in tracked if p]
+          if tracked:
+              subprocess.run(['git', 'add', '-u', '--', *tracked], check=True)
+          for path in ['dist/app/js/core/quick_fill_hierarchy.js', 'dist/app/js/core/history_quick_fill_gesture.js', 'dist/app/js/ui/toolbar/quick_fill_level_controls.js']:
+              if pathlib.Path(path).is_file():
+                  subprocess.run(['git', 'add', '-f', '--', path], check=True)
           subprocess.run(['git', 'rm', '-r', '--', 'tools/.quick-fill-delivery'], check=True)
           PY
           git config user.name 'github-actions[bot]'
@@ -98,11 +119,10 @@ jobs:
           npm run verify:state-write-allowlist 2>&1 | tee .runtime/reports/generated/quick-fill-state-writes.log
           npm run verify:test-import-graph
           npm run test:node:scenario-lifecycle-runtime-behavior 2>&1 | tee .runtime/reports/generated/quick-fill-lifecycle-tests.log
-      - name: Build and inspect live toolbar on localhost
+      - name: Inspect live toolbar on localhost
         shell: bash
         run: |
           set -euo pipefail
-          python tools/build_pages_dist.py 2>&1 | tee .runtime/reports/generated/quick-fill-pages-build.log
           npx playwright install --with-deps chromium
           python tools/dev_server.py --port 8810 > .runtime/reports/generated/quick-fill-server.log 2>&1 &
           server_pid=$!
