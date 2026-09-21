@@ -1,0 +1,37 @@
+name: Quick Fill Contract
+
+on:
+  push:
+    branches: [codex/quick-fill-hierarchy-phases-1-3-20260921]
+    paths: ['.github/workflows/quick-fill-contract.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare pinned hierarchy reference and tracked test context
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/tmp/quick-fill-reference
+          base=https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/e01c078c68e044242bfcc4d26a970b2314b098cd
+          curl --fail --location --retry 2 "$base/dist/pca-code.json" -o .runtime/tmp/quick-fill-reference/china-pca-2017.json
+          curl --fail --location --retry 2 "$base/LICENSE" -o .runtime/tmp/quick-fill-reference/china-pca-LICENSE.txt
+          python -m pip download --no-deps 'pypinyin==0.55.0' --dest .runtime/tmp/quick-fill-reference
+          git archive HEAD AGENTS.md package.json package-lock.json pyproject.toml tools tests map_builder schemas .github data/AGENTS.md data/manifest.json data/source_ledger.json data/CATALOG.json data/CATALOG.md data/runtime_asset_registry.json > .runtime/tmp/quick-fill-reference/tracked-context.tar
+          sha256sum .runtime/tmp/quick-fill-reference/china-pca-2017.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quick-fill-reference-workspace
+          path: .runtime/tmp/quick-fill-reference/
+          retention-days: 3
