@@ -11,7 +11,7 @@
 - Scenario Contract Matrix 继续保留三个既有 required check 名称。每个 matrix job 先读取 planner 结果，只有被选中的剧本才 checkout 完整仓库、安装依赖并运行 strict contract。未受影响的剧本在 checkout 前快速成功，从而兼容现有 branch protection。
 - Transport required check 同样保留原检查名。Transport 无关 PR 在完整 checkout 前快速成功；相关 PR 才进入 manifest 和 unit contract。
 - Adaptive selector 仍对 verification/workflow 等控制平面保持 fail-closed。普通未注册文档与非 runtime reference assets 作为 advisory；新增 renderer、UI、map-builder、scenario-data 和 CI planner 文件可先由目录 ownership 映射到已有 domain routes。自动 ownership 如果无法解析出任何真实 route，仍保持 unmatched 并阻断，不会静默放行。
-- PR 性能验证分为 `skip`、`sample`、`strict` 三档。无性能相关改动为 `skip`；普通 runtime/data PR 默认 `sample`，只测 HOI4 1939 candidate 并使用 diagnostic regression mode，不再生成同-runner base；`ci:perf-strict`、`ci:full`、定时和手动性能运行使用 `strict`，继续测 TNO 1962 与 HOI4 1939，并保留 same-runner base/candidate 对照与 enforced regressions。
+- PR 性能验证分为 `skip`、`sample`、`strict` 三档。无性能相关改动为 `skip`；普通 runtime/data PR 默认 `sample`，只对 HOI4 1939 candidate 生成独立 measurement-only evidence，不做 regression verdict，也不再生成同-runner base；`ci:perf-strict`、`ci:full`、定时和手动性能运行使用 `strict`，继续测 TNO 1962 与 HOI4 1939，并保留 same-runner base/candidate 对照与 enforced regressions。
 - `ci:perf-expected` 表示本次改动预期改变性能特征。普通 PR 仍保留 sampled evidence，但不因性能 delta 阻断。若同时显式添加 `ci:perf-strict`，strict 优先。
 - 当前标准性能 role contract 仍固定为每个被测剧本 3 次预热、5 次 measured runs。因此 `sample` 的主要降本来自只运行一个代表剧本和移除同-runner base measurement，而不是降低样本协议。Nightly/manual strict 保持完整可比较性。
 - PR 更新继续自动取消同一 PR 的过时验证。现有 required check 名称保持稳定，P1-P3 本身不要求放松 branch protection。
