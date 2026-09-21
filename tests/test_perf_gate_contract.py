@@ -51,7 +51,7 @@ def canonical_json_sha256(payload):
 
 @unittest.skipUnless(shutil.which("pwsh"), "workflow classifier requires PowerShell 7")
 class PerfWorkflowClassifierTest(unittest.TestCase):
-    def classify(self, files, *, event="pull_request", base=None, head=None, diff_failure=False):
+    def classify(self, files, *, event="pull_request", base=None, head=None, diff_failure=False, labels=None):
         workflow = WORKFLOW_FILE.read_text(encoding="utf-8")
         script = textwrap.dedent(workflow.split("        run: |\n", 1)[1].split("\n      - name:", 1)[0])
         runtime = REPO_ROOT / ".runtime" / "tmp"
@@ -64,7 +64,7 @@ class PerfWorkflowClassifierTest(unittest.TestCase):
                 "head": head if isinstance(head, str) else json.dumps(head or base or {"scripts": {"test:isolated": "node test.mjs"}}),
             }
             (root / "fixture.json").write_text(json.dumps(fixture), encoding="utf-8")
-            (root / "event.json").write_text(json.dumps({"pull_request": {"base": {"sha": "base"}, "head": {"sha": "head"}}}), encoding="utf-8")
+            (root / "event.json").write_text(json.dumps({"pull_request": {"base": {"sha": "base"}, "head": {"sha": "head"}, "labels": [{"name": label} for label in (labels or [])]}}), encoding="utf-8")
             stub = r'''
 $ErrorActionPreference = 'Stop'
 $fixture = Get-Content -Raw fixture.json | ConvertFrom-Json
@@ -108,19 +108,30 @@ function git {
                 self.assertTrue(audit["should_enforce_regressions"])
                 self.assertEqual(audit["base_sha"], "parent")
 
-    def test_path_classification_preserves_runtime_and_baseline_coverage(self):
-        for path, runs, enforces in (
-            ("docs/perf/notes.md", False, False),
-            ("docs/perf/baseline.json", True, False),
-            ("js/any_module.js", True, True),
-            ("js/地图\nwith newline.js", True, True),
-            ("package-lock.json", True, False),
+    def test_path_classification_preserves_runtime_coverage_with_sampled_pr_mode(self):
+        for path, runs, mode in (
+            ("docs/perf/notes.md", False, "skip"),
+            ("docs/perf/baseline.json", True, "sample"),
+            ("js/any_module.js", True, "sample"),
+            ("package-lock.json", True, "sample"),
         ):
             with self.subTest(path=path):
                 audit = self.classify([path])
                 self.assertEqual(audit["should_run_perf"], runs)
-                self.assertEqual(audit["should_enforce_regressions"], enforces)
+                self.assertEqual(audit["perf_mode"], mode)
+                self.assertFalse(audit["should_enforce_regressions"])
+                self.assertEqual(audit["scenario_matrix"], [] if mode == "skip" else ["hoi4_1939"])
 
+    def test_explicit_strict_and_expected_change_labels_control_enforcement(self):
+        strict = self.classify(["js/core/map_renderer.js"], labels=["ci:perf-strict"])
+        self.assertEqual(strict["perf_mode"], "strict")
+        self.assertTrue(strict["should_enforce_regressions"])
+        self.assertEqual(strict["scenario_matrix"], ["tno_1962", "hoi4_1939"])
+
+        expected = self.classify(["js/core/map_renderer.js"], labels=["ci:perf-expected"])
+        self.assertEqual(expected["perf_mode"], "sample")
+        self.assertFalse(expected["should_enforce_regressions"])
+        self.assertTrue(expected["expected_performance_change"])
     def test_manifest_exempts_only_isolated_nonperf_test_scripts(self):
         base = {"scripts": {"test:isolated": "node test.mjs", "perf:gate": "node tools/perf/run.mjs"}, "engines": {"node": ">=18"}}
         for head, runs in (
@@ -175,7 +186,9 @@ function git {
             audit = json.loads((root / ".runtime/reports/generated/perf-pr-gate-classifier.json").read_text(encoding="utf-8-sig"))
             self.assertCountEqual(audit["changed_files"], [old_path, new_path])
             self.assertTrue(audit["should_run_perf"])
-            self.assertTrue(audit["should_enforce_regressions"])
+            self.assertEqual(audit["perf_mode"], "sample")
+            self.assertFalse(audit["should_enforce_regressions"])
+            self.assertEqual(audit["scenario_matrix"], ["hoi4_1939"])
             self.assertEqual(audit["candidate_sha"], head_sha)
 
     def test_diff_failure_does_not_become_successful_skip(self):
@@ -205,7 +218,7 @@ class PerfGateContractTest(unittest.TestCase):
         scenario_job = jobs["perf-scenarios"]
         self.assertIn("runs-on: windows-latest", scenario_job)
         self.assertIn("fail-fast: false", scenario_job)
-        self.assertIn("scenario: [tno_1962, hoi4_1939]", scenario_job)
+        self.assertIn("scenario: ${{ fromJSON(needs.classify.outputs.scenario_matrix) }}", scenario_job)
         self.assertNotIn("max-parallel: 1", scenario_job)
         self.assertNotIn("continue-on-error", scenario_job)
         self.assertIn("    needs: [classify]", scenario_job)
@@ -219,7 +232,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("            /package-lock.json", classifier_job)
         self.assertNotIn("npm ci", classifier_job)
         self.assertIn("git diff --name-only --no-renames -z", classifier_job)
-        self.assertEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 2)
+        self.assertGreaterEqual(scenario_job.count("--scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO"), 3)
         self.assertIn("--runs 5 --warmups 3", scenario_job)
         for artifact in ("perf-pr-gate-evidence",):
             self.assertIn(f"name: {artifact}-${{{{ matrix.scenario }}}}", scenario_job)

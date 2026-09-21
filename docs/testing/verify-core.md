@@ -4,16 +4,23 @@
 
 ## PR 与合并后验证
 
-- 日常修改运行相关目标检查或 `verify:edit` / `verify:impact`，不把 `verify:core`、`verify:pr` 和完整性能测量逐一叠加为每次推送的固定前置步骤。
-- PR 的 `pr-verify-fast` 运行受影响契约；`pr-verify-smoke` 在同一环境中依次运行 smoke 与 Golden Demo。`PR Verify Required` 仅在两条执行通道都成功时通过，失败、取消、跳过或缺失结果均阻断。
-- Scenario Contract Matrix 负责各剧本的 strict 检查；`pr-fast` 不再额外固定重跑 TNO strict。修改单个受支持剧本只运行该剧本，公共依赖或无法可靠确定改动范围时检查全部剧本。
-- `perf-gate` 继续作为 PR 必需检查。Ubuntu `classify` 仅检出两个 Node 清单文件，通过完整提交历史与 NUL 分隔的改动路径判断是否需要测量，保留重命名前后路径；无法可靠获取完整 diff 时阻断。分类明确无关时不启动 Windows runner；分类要求测量时，TNO 1962 与 HOI4 1939 在两台独立 Windows runner 上并行。每个剧本仍在同一台 runner 内顺序测量基线和候选版本，各保留 5 次测量、3 次预热以及原始证据校验。
-- 最终 `perf-gate` 仅接受分类成功且明确无需测量、矩阵被跳过，或分类成功且明确需要测量、整个矩阵成功。分类失败、未知决策、应测却跳过、分片失败或缺失结果均阻断。分片 checkout 绑定分类器确认的候选 SHA。
-- 单剧本执行必须同时声明 `--scenario-shard <id> --scenarios <id>`，并使用自定义输出路径。分片报告显式标记作用域，不能作为默认双剧本门禁的完整通过证据；普通 `npm run perf:gate` 仍检查两个剧本。测量 artifact 按剧本命名为 `perf-pr-gate-evidence-<id>`，分类审计仅一份 `perf-pr-gate-classifier-audit`。并行减少墙钟等待，不减少样本总数，且会增加一份 runner 环境准备开销。
-- 候选测量前先验证基线内嵌证据、作用域、剧本、采样配置、URL query 和角色协议；测量后的环境与回归比较继续保留。页面探测仅复用当前 document 的模块导入，每次仍读取实时队列和完整快照；50 ms 轮询与 850 ms 稳定窗口不变。
-- 性能 runner 使用 `requirements-perf.lock.txt`，版本与开发锁对齐，并执行 `pip check` 和实际服务模块导入检查。此锁仅用于性能服务，不用于地图构建或完整测试。两个测量版本共享该 Python 环境，基线投影包含此锁；未提交的锁变更会阻断正式测量。Windows 测量仍保留完整运行时数据，不复用 Public Editor 的裁剪配置。
-- 完整性能任务不再由每次 main push 触发，改为每日定期与手动运行；这些运行强制测量当前提交与其父提交，不是对全天所有提交的累计回归比较。合并后的 Pages 产物检查和线上 smoke 继续由部署工作流执行。
-- PR 更新自动取消同一 PR 的过时验证。现有必需检查名称保持不变，无需修改分支保护设置。
+- 日常修改仍优先运行相关目标检查或 `verify:edit` / `verify:impact`。PR 不再默认把所有浏览器、Pages、剧本和完整性能验证叠加到同一条阻塞路径。
+- `pr-verify` 先运行轻量 `PR Plan`。Planner 只读取 PR changed-files 和 CI intent labels，然后决定是否需要 smoke、Golden Demo、Pages mirror、剧本合同、Transport 与性能测量。Planner 本身不下载完整仓库数据。
+- `pr-verify-fast` 始终保留，负责 affected child-safe contracts 和 verification control-plane guardrails。Pages mirror rebuild 仅在 planner 判定 delivery surface 相关时运行。
+- `pr-verify-smoke` 只在 runtime/UI/E2E 相关改动或 `ci:full` 时启动。Golden Demo 进一步只在 public-sample 相关改动或 `ci:full` 时运行。计划性跳过 smoke 是成功状态，不再被 `PR Verify Required` 当作失败。
+- Scenario Contract Matrix 继续保留三个既有 required check 名称。每个 matrix job 先读取 planner 结果，只有被选中的剧本才 checkout 完整仓库、安装依赖并运行 strict contract。未受影响的剧本在 checkout 前快速成功，从而兼容现有 branch protection。
+- Transport required check 同样保留原检查名。Transport 无关 PR 在完整 checkout 前快速成功；相关 PR 才进入 manifest 和 unit contract。
+- Adaptive selector 仍对 verification/workflow 等控制平面保持 fail-closed。普通未注册文档与非 runtime reference assets 作为 advisory；新增 renderer、UI、map-builder、scenario-data 和 CI planner 文件可先由目录 ownership 映射到已有 domain routes。自动 ownership 如果无法解析出任何真实 route，仍保持 unmatched 并阻断，不会静默放行。
+- PR 性能验证分为 `skip`、`sample`、`strict` 三档。无性能相关改动为 `skip`；普通 runtime/data PR 默认 `sample`，只对 HOI4 1939 candidate 生成独立 measurement-only evidence，不做 regression verdict，也不再生成同-runner base；`ci:perf-strict`、`ci:full`、定时和手动性能运行使用 `strict`，继续测 TNO 1962 与 HOI4 1939，并保留 same-runner base/candidate 对照与 enforced regressions。
+- `ci:perf-expected` 表示本次改动预期改变性能特征。普通 PR 仍保留 sampled evidence，但不因性能 delta 阻断。若同时显式添加 `ci:perf-strict`，strict 优先。
+- 当前标准性能 role contract 仍固定为每个被测剧本 3 次预热、5 次 measured runs。因此 `sample` 的主要降本来自只运行一个代表剧本和移除同-runner base measurement，而不是降低样本协议。Nightly/manual strict 保持完整可比较性。
+- PR 更新继续自动取消同一 PR 的过时验证。现有 required check 名称保持稳定，P1-P3 本身不要求放松 branch protection。
+
+### CI intent labels
+
+- `ci:full`：强制 smoke、Golden Demo、Pages、所有受支持剧本、Transport 与 strict performance。
+- `ci:perf-strict`：强制完整双剧本 same-runner 性能门禁。
+- `ci:perf-expected`：记录预期性能变化，普通 PR 使用 sampled diagnostic evidence。
 
 ## 命令
 

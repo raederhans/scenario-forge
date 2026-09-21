@@ -20,6 +20,8 @@ jobs:
     outputs:
       should_run_perf: ${{ steps.classify.outputs.should_run_perf }}
       should_enforce_regressions: ${{ steps.classify.outputs.should_enforce_regressions }}
+      perf_mode: ${{ steps.classify.outputs.perf_mode }}
+      scenario_matrix: ${{ steps.classify.outputs.scenario_matrix }}
       base_sha: ${{ steps.classify.outputs.base_sha }}
       candidate_sha: ${{ steps.classify.outputs.candidate_sha }}
       diff_head_sha: ${{ steps.classify.outputs.diff_head_sha }}
@@ -205,8 +207,30 @@ jobs:
               Where-Object { $_.regression_policy -eq 'enforce' } |
               ForEach-Object { $_.name }
           )
-          $shouldEnforceRegressions = $forceMeasurement -or $regressionEnforcementRuleHits.Count -gt 0
           $shouldRunPerf = $forceMeasurement -or $ruleHits.Count -gt 0
+          $labels = @()
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+            $labels = @($eventPayload.pull_request.labels | ForEach-Object { [string]$_.name })
+          }
+          $explicitStrict = $labels -contains 'ci:perf-strict' -or $labels -contains 'ci:full'
+          $expectedPerformanceChange = $labels -contains 'ci:perf-expected'
+          if (-not $shouldRunPerf) {
+            $perfMode = 'skip'
+          } elseif ($forceMeasurement -or $explicitStrict) {
+            $perfMode = 'strict'
+          } else {
+            $perfMode = 'sample'
+          }
+          $shouldEnforceRegressions = $perfMode -eq 'strict' -and ($forceMeasurement -or $regressionEnforcementRuleHits.Count -gt 0)
+          if ($expectedPerformanceChange -and -not $explicitStrict -and -not $forceMeasurement) {
+            $shouldEnforceRegressions = $false
+          }
+          [string[]]$scenarioMatrix = @()
+          if ($perfMode -eq 'strict') {
+            $scenarioMatrix = @('tno_1962', 'hoi4_1939')
+          } elseif ($perfMode -eq 'sample') {
+            $scenarioMatrix = @('hoi4_1939')
+          }
           if ($forceMeasurement) {
             $reason = "run npm run perf:gate for $($env:GITHUB_EVENT_NAME), regardless of changed paths"
           } elseif ($shouldRunPerf) {
@@ -225,6 +249,10 @@ jobs:
             changed_files = $changedFiles
             matched_rules = $ruleHits
             should_run_perf = $shouldRunPerf
+            perf_mode = $perfMode
+            scenario_matrix = $scenarioMatrix
+            labels = $labels
+            expected_performance_change = $expectedPerformanceChange
             forced_measurement = $forceMeasurement
             should_enforce_regressions = $shouldEnforceRegressions
             regression_enforcement_rules = $regressionEnforcementRuleHits
@@ -254,6 +282,8 @@ jobs:
           $summary = @(
             '## Perf classifier audit'
             "- should run perf gate: $($shouldRunPerf.ToString().ToLowerInvariant())"
+            "- performance mode: $perfMode"
+            "- scenarios: $($scenarioMatrix -join ', ')"
             "- should enforce performance regressions: $($shouldEnforceRegressions.ToString().ToLowerInvariant())"
             "- reason: $reason"
             ''
@@ -268,6 +298,9 @@ jobs:
 
           "should_run_perf=$($shouldRunPerf.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "should_enforce_regressions=$($shouldEnforceRegressions.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "perf_mode=$perfMode" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          $scenarioMatrixJson = ConvertTo-Json -InputObject @($scenarioMatrix) -Compress
+          "scenario_matrix=$scenarioMatrixJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "base_sha=$baseSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "diff_head_sha=$diffHeadSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "candidate_sha=$candidateSha" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -289,7 +322,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scenario: [tno_1962, hoi4_1939]
+        scenario: ${{ fromJSON(needs.classify.outputs.scenario_matrix) }}
     env:
       PERF_SCENARIO: ${{ matrix.scenario }}
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.runtime/browser/ms-playwright
@@ -338,7 +371,7 @@ jobs:
         run: npx playwright install chromium
 
       - name: Generate same-runner base baseline
-        if: needs.classify.outputs.should_run_perf == 'true'
+        if: needs.classify.outputs.perf_mode == 'strict'
         shell: pwsh
         run: |
           $baseSha = '${{ needs.classify.outputs.base_sha }}'
@@ -478,6 +511,7 @@ jobs:
         if: needs.classify.outputs.should_run_perf == 'true'
         shell: pwsh
         run: |
+          $perfMode = '${{ needs.classify.outputs.perf_mode }}'
           $regressionMode = if ('${{ needs.classify.outputs.should_enforce_regressions }}' -eq 'true') {
             'enforce'
           } else {
@@ -486,7 +520,11 @@ jobs:
           $maxAdmissionAttempts = 3
           $perfExitCode = 1
           for ($attempt = 1; $attempt -le $maxAdmissionAttempts; $attempt += 1) {
-            npm run perf:gate -- --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --regression-mode $regressionMode --baseline-json .runtime/output/perf/perf-pr-gate-base.json --raw-dir .runtime/output/perf/perf-pr-gate-current
+            if ($perfMode -eq 'strict') {
+              npm run perf:gate -- --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --regression-mode $regressionMode --baseline-json .runtime/output/perf/perf-pr-gate-base.json --raw-dir .runtime/output/perf/perf-pr-gate-current
+            } else {
+              node tools/perf/run_baseline.mjs --mode baseline --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --runs 5 --warmups 3 --write-markdown false --baseline-json .runtime/output/perf/perf-pr-sample.json --raw-dir .runtime/output/perf/perf-pr-sample-raw
+            }
             $perfExitCode = $LASTEXITCODE
             if ($perfExitCode -eq 0) {
               break

@@ -169,18 +169,22 @@ test("contour generation and LOD assets select executable geography coverage", (
   }
 });
 
-test("nonbehavioral classification preserves unknown-file rejection and actual runtime routes", () => {
-  const unknown = [
+test("documentation advisory classification preserves unknown-file rejection and actual runtime routes", () => {
+  const advisoryDocs = [
     "docs/active/editor-kernel-renewal-20260909/new-runtime.js",
     "docs/active/editor-kernel-renewal-20260909/unknown-analysis.md",
     "docs/archive/unregistered/plan.md",
-    ".codex/unknown.toml",
   ];
+  const unknown = [".codex/unknown.toml"];
   const report = buildRepositoryRecommendation([
-    "docs/active/editor-kernel-renewal-20260909/plan.md", ...unknown,
+    "docs/active/editor-kernel-renewal-20260909/plan.md", ...advisoryDocs, ...unknown,
     "js/core/state/actions/project_import_actions.js", "docs/active/_worktree_registry.md",
   ]);
   assert.deepEqual(report.unmatchedChangedFiles, [...unknown].sort());
+  for (const changedFile of advisoryDocs) {
+    assert.equal(report.nonBehavioralChangedFiles.find((entry) => entry.changedFile === changedFile).classification,
+      "documentation-advisory");
+  }
   assert.ok(report.recommendedCommands.some((entry) =>
     entry.commandRef === "node --test tests/project_import_transaction_behavior.test.mjs"));
   assert.ok(report.matchedByFile.find((entry) => entry.changedFile === "docs/active/_worktree_registry.md")

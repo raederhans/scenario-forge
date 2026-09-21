@@ -206,6 +206,8 @@ test("regional integration routes executable changes and classifies only named p
     assert.deepEqual(report.unmatchedChangedFiles, []);
     assert.equal(report.nonBehavioralChangedFiles[0].classification, "task-documentation");
   }
-  assert.deepEqual(recommendationFor("docs/active/unrelated-task/results.md").unmatchedChangedFiles,
-    ["docs/active/unrelated-task/results.md"]);
+  const advisoryDocReport = recommendationFor("docs/active/unrelated-task/results.md");
+  assert.deepEqual(advisoryDocReport.unmatchedChangedFiles, []);
+  assert.deepEqual(advisoryDocReport.unroutedChangedFiles, ["docs/active/unrelated-task/results.md"]);
+  assert.equal(advisoryDocReport.nonBehavioralChangedFiles[0].classification, "documentation-advisory");
 });
