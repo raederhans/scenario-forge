@@ -518,7 +518,7 @@ jobs:
             if ($perfMode -eq 'strict') {
               npm run perf:gate -- --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --regression-mode $regressionMode --baseline-json .runtime/output/perf/perf-pr-gate-base.json --raw-dir .runtime/output/perf/perf-pr-gate-current
             } else {
-              npm run perf:gate -- --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --regression-mode diagnostic --raw-dir .runtime/output/perf/perf-pr-gate-current
+              node tools/perf/run_baseline.mjs --mode baseline --scenarios $env:PERF_SCENARIO --scenario-shard $env:PERF_SCENARIO --runs 5 --warmups 3 --write-markdown false --baseline-json .runtime/output/perf/perf-pr-sample.json --raw-dir .runtime/output/perf/perf-pr-sample-raw
             }
             $perfExitCode = $LASTEXITCODE
             if ($perfExitCode -eq 0) {
