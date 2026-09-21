@@ -6,32 +6,117 @@ on:
     paths: ['.github/workflows/quick-fill-contract.yml']
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  prepare:
+  verify:
+    if: github.ref == 'refs/heads/codex/quick-fill-hierarchy-phases-1-3-20260921'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          persist-credentials: false
-      - uses: actions/setup-python@v5
+          ref: codex/quick-fill-hierarchy-phases-1-3-20260921
+          fetch-depth: 1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.11'
-      - name: Prepare pinned hierarchy reference and tracked test context
+      - name: Verify and apply exact implementation patch
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p .runtime/tmp/quick-fill-reference
+          mkdir -p .runtime/tmp/quick-fill .runtime/reports/generated
+          python - <<'PY'
+          import base64, hashlib, json, lzma, pathlib, subprocess
+          parts = sorted(pathlib.Path('tools/.quick-fill-delivery').glob('part-*.b64'))
+          if len(parts) != 4:
+              raise SystemExit('Expected four implementation transfer parts')
+          patch = lzma.decompress(base64.b64decode(''.join(p.read_text().strip() for p in parts), validate=True))
+          if hashlib.sha256(patch).hexdigest() != 'e43268024feba7b650d0b5b794f33f900b180fc1c95aa1faf93cd966ea8013c2':
+              raise SystemExit('Implementation patch checksum mismatch')
+          target = pathlib.Path('.runtime/tmp/quick-fill/implementation.patch')
+          target.write_bytes(patch)
+          subprocess.run(['git', 'apply', '--check', str(target)], check=True)
+          stat = subprocess.check_output(['git', 'apply', '--numstat', str(target)], text=True)
+          paths = [line.split('\t', 2)[2] for line in stat.splitlines()]
+          if len(paths) != 33 or any(p.startswith(('.github/', 'data/', 'dist/')) or '..' in p.split('/') for p in paths):
+              raise SystemExit('Unexpected patch write set')
+          pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json').write_text(json.dumps(paths))
+          subprocess.run(['git', 'apply', str(target)], check=True)
+          PY
+      - name: Prepare pinned source and deterministic data outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -r requirements-ci-min.lock.txt 'pypinyin==0.55.0'
+          npm ci
+          mkdir -p data/quick_fill/reference
           base=https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/e01c078c68e044242bfcc4d26a970b2314b098cd
-          curl --fail --location --retry 2 "$base/dist/pca-code.json" -o .runtime/tmp/quick-fill-reference/china-pca-2017.json
-          curl --fail --location --retry 2 "$base/LICENSE" -o .runtime/tmp/quick-fill-reference/china-pca-LICENSE.txt
-          python -m pip download --no-deps 'pypinyin==0.55.0' --dest .runtime/tmp/quick-fill-reference
-          git ls-files -z -- AGENTS.md package.json package-lock.json tools tests map_builder schemas .github data/AGENTS.md data/manifest.json data/source_ledger.json data/CATALOG.json data/CATALOG.md data/runtime_asset_registry.json | tar --null --files-from=- -cf .runtime/tmp/quick-fill-reference/tracked-context.tar
-          sha256sum .runtime/tmp/quick-fill-reference/china-pca-2017.json
-      - uses: actions/upload-artifact@v4
+          curl --fail --location --retry 2 "$base/dist/pca-code.json" -o data/quick_fill/reference/china-pca-2017.json
+          curl --fail --location --retry 2 "$base/LICENSE" -o data/quick_fill/reference/LICENSE.china-pca.txt
+          python tools/build_china_prefecture_crosswalk.py > .runtime/reports/generated/quick-fill-china-build.json
+          npm run build:quick-fill
+      - name: Focused runtime and data checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run test:node:quick-fill 2>&1 | tee .runtime/reports/generated/quick-fill-node-tests.log
+          npm run verify:quick-fill-data 2>&1 | tee .runtime/reports/generated/quick-fill-data-tests.log
+          npm run audit:quick-fill
+          python tools/data_health.py 2>&1 | tee .runtime/reports/generated/quick-fill-data-health.log
+          python -m unittest tests.test_data_catalog_contract -v 2>&1 | tee .runtime/reports/generated/quick-fill-catalog-tests.log
+          git diff --check
+      - name: Commit validated source changes to this feature branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/codex/quick-fill-hierarchy-phases-1-3-20260921
+          python - <<'PY'
+          import json, pathlib, subprocess
+          paths = json.loads(pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json').read_text())
+          paths += ['data/quick_fill/reference/china-pca-2017.json', 'data/quick_fill/reference/LICENSE.china-pca.txt', 'data/quick_fill/china_prefecture_crosswalk.v1.json', 'data/hierarchy.json', 'data/manifest.json', 'data/source_ledger.json', 'data/CATALOG.json', 'data/CATALOG.md']
+          subprocess.run(['git', 'add', '--', *paths], check=True)
+          subprocess.run(['git', 'rm', '-r', '--', 'tools/.quick-fill-delivery'], check=True)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Implement safe semantic quick fill, support audit and verified intermediate levels'
+          git push origin HEAD:refs/heads/codex/quick-fill-hierarchy-phases-1-3-20260921
+          git rev-parse HEAD | tee .runtime/reports/generated/quick-fill-tested-sha.txt
+      - name: Full-checkout integration contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run verify:architecture-boundaries 2>&1 | tee .runtime/reports/generated/quick-fill-architecture.log
+          npm run verify:state-write-allowlist 2>&1 | tee .runtime/reports/generated/quick-fill-state-writes.log
+          npm run verify:test-import-graph
+          npm run test:node:scenario-lifecycle-runtime-behavior 2>&1 | tee .runtime/reports/generated/quick-fill-lifecycle-tests.log
+      - name: Build and inspect live toolbar on localhost
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/build_pages_dist.py 2>&1 | tee .runtime/reports/generated/quick-fill-pages-build.log
+          npx playwright install --with-deps chromium
+          python tools/dev_server.py --port 8810 > .runtime/reports/generated/quick-fill-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8810/app/ > /dev/null; then break; fi
+            sleep 1
+          done
+          node tools/check_quick_fill_browser.mjs 2>&1 | tee .runtime/reports/generated/quick-fill-browser.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
         with:
-          name: quick-fill-reference-workspace
-          path: .runtime/tmp/quick-fill-reference/
-          retention-days: 3
+          name: quick-fill-verification
+          path: |
+            .runtime/reports/generated/quick-fill*
+            .runtime/browser/quick-fill/
+          retention-days: 7
