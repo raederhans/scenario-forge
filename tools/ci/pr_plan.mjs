@@ -17,7 +17,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
   )));
 
   const runtimeRelevant = matches(["js/**", "css/**", "index.html", "vendor/**", "landing/**"]);
-  const browserRelevant = runtimeRelevant || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
+  const browserRelevant = runtimeRelevant || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
   const pagesRelevant = runtimeRelevant || matches(["data/**", "tools/build_pages_dist.py", "tools/pages_*", ".github/workflows/verify-shared.yml"]);
   const publicSampleRelevant = matches([
     "js/bootstrap/startup_sample_project_deeplink.js",
@@ -25,6 +25,8 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
     "js/core/sample_project_registry.js",
     "landing/**",
     "tests/e2e/sample_guide_deeplink.spec.js",
+    ".github/workflows/pr-verify.yml",
+    ".github/workflows/verify-shared.yml",
   ]);
 
   const scenarioIds = new Set();
