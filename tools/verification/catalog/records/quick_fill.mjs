@@ -5,6 +5,7 @@ export function createQuickFillRecords(existingRecords) {
     ["policy", "renderer-runtime", "test:node:quick-fill", [
       "js/core/quick_fill_hierarchy.js", "js/core/renderer/fill_target_policy.js", "js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_districts.js",
       "tests/quick_fill_hierarchy.test.mjs", "tests/fill_target_policy_behavior.test.mjs", "tests/parent_border_grouping_policy_behavior.test.mjs",
+      "js/core/file_manager.js", "tests/quick_fill_project_roundtrip.test.mjs",
     ]],
     ["history", "renderer-runtime", "node --test tests/quick_fill_history.test.mjs tests/history_feature_color_refresh_behavior.test.mjs", [
       "js/core/history_manager.js", "js/core/history_quick_fill_gesture.js", "js/core/map_renderer.js", "js/core/map_renderer/click_selection_transaction_owner.js",

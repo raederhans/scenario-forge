@@ -44007,7 +44007,7 @@
     },
     {
       "path": "app/js/core/file_manager.js",
-      "size_bytes": 47745,
+      "size_bytes": 47802,
       "source_kind": "dist"
     },
     {
@@ -46362,7 +46362,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2189287,
+      "size_bytes": 2189633,
       "source_kind": "dist"
     },
     {
@@ -46492,12 +46492,12 @@
       {
         "file_count": 101,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3582474
+        "size_bytes": 3582531
       },
       {
         "file_count": 826,
         "id": "on-demand-product",
-        "size_bytes": 283250843
+        "size_bytes": 283251189
       },
       {
         "file_count": 8048,
@@ -48111,7 +48111,15 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 2,
+                "line": 1,
+                "local": true,
+                "reference": "./quick_fill_hierarchy.js",
+                "resolved_path": "app/js/core/quick_fill_hierarchy.js"
+              },
+              {
+                "column": 1,
+                "kind": "import-declaration",
+                "line": 3,
                 "local": true,
                 "reference": "./state.js",
                 "resolved_path": "app/js/core/state.js"
@@ -48119,7 +48127,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 25,
+                "line": 26,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/core/i18n.js"
@@ -48127,7 +48135,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 26,
+                "line": 27,
                 "local": true,
                 "reference": "./state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -48135,7 +48143,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 27,
+                "line": 28,
                 "local": true,
                 "reference": "./sovereignty_manager.js",
                 "resolved_path": "app/js/core/sovereignty_manager.js"
@@ -48143,7 +48151,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 28,
+                "line": 29,
                 "local": true,
                 "reference": "./transport_pack_resolver.js",
                 "resolved_path": "app/js/core/transport_pack_resolver.js"
@@ -48151,7 +48159,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 29,
+                "line": 30,
                 "local": true,
                 "reference": "./transport_capability_registry.js",
                 "resolved_path": "app/js/core/transport_capability_registry.js"
@@ -48159,7 +48167,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 33,
+                "line": 34,
                 "local": true,
                 "reference": "./dirty_state.js",
                 "resolved_path": "app/js/core/dirty_state.js"
@@ -48167,7 +48175,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 34,
+                "line": 35,
                 "local": true,
                 "reference": "./export_artifact_package.js",
                 "resolved_path": "app/js/core/export_artifact_package.js"
@@ -48175,7 +48183,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 35,
+                "line": 36,
                 "local": true,
                 "reference": "./legend_manager.js",
                 "resolved_path": "app/js/core/legend_manager.js"
@@ -48183,7 +48191,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 36,
+                "line": 37,
                 "local": true,
                 "reference": "./project_package_io.js",
                 "resolved_path": "app/js/core/project_package_io.js"
@@ -48191,7 +48199,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 40,
+                "line": 41,
                 "local": true,
                 "reference": "./special_zone_layers.js",
                 "resolved_path": "app/js/core/special_zone_layers.js"
@@ -48199,7 +48207,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 46,
+                "line": 47,
                 "local": true,
                 "reference": "./state/ui_state.js",
                 "resolved_path": "app/js/core/state/ui_state.js"
@@ -48207,7 +48215,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 47,
+                "line": 48,
                 "local": true,
                 "reference": "./state/actions/ui_visibility_actions.js",
                 "resolved_path": "app/js/core/state/actions/ui_visibility_actions.js"
@@ -48222,6 +48230,7 @@
             "app/js/core/i18n.js",
             "app/js/core/legend_manager.js",
             "app/js/core/project_package_io.js",
+            "app/js/core/quick_fill_hierarchy.js",
             "app/js/core/sovereignty_manager.js",
             "app/js/core/special_zone_layers.js",
             "app/js/core/state.js",
@@ -64567,7 +64576,7 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3252266,
+        "deferred_graph_bytes": 3252323,
         "deferred_graph_file_count": 131,
         "deferred_module_count": 129,
         "deferred_resource_count": 2,
@@ -64581,7 +64590,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 566106481,
+        "untraversed_dist_bytes": 566106827,
         "untraversed_dist_file_count": 8814,
         "untraversed_module_count": 7
       },
@@ -65776,7 +65785,7 @@
           },
           {
             "path": "app/js/core/file_manager.js",
-            "size_bytes": 47745
+            "size_bytes": 47802
           },
           {
             "path": "app/js/core/logic.js",
@@ -66110,7 +66119,7 @@
             "size_bytes": 367931
           }
         ],
-        "size_bytes": 2627016
+        "size_bytes": 2627073
       },
       {
         "basis": "deferred-resource-graph",
@@ -66535,11 +66544,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2189287
+            "size_bytes": 2189633
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2189287
+        "size_bytes": 2189633
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -67347,7 +67356,7 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2189287
+          "size_bytes": 2189633
         }
       ],
       "status": "complete",
@@ -67390,7 +67399,7 @@
     {
       "file_count": 9212,
       "path": "app",
-      "size_bytes": 568518163
+      "size_bytes": 568518220
     },
     {
       "file_count": 57,
@@ -67400,7 +67409,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2189287
+      "size_bytes": 2189633
     },
     {
       "file_count": 1,
@@ -67423,5 +67432,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 575517734
+  "total_bytes": 575518137
 }
