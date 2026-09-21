@@ -225,7 +225,12 @@ jobs:
           if ($expectedPerformanceChange -and -not $explicitStrict -and -not $forceMeasurement) {
             $shouldEnforceRegressions = $false
           }
-          $scenarioMatrix = if ($perfMode -eq 'strict') { @('tno_1962', 'hoi4_1939') } elseif ($perfMode -eq 'sample') { @('hoi4_1939') } else { @() }
+          [string[]]$scenarioMatrix = @()
+          if ($perfMode -eq 'strict') {
+            $scenarioMatrix = @('tno_1962', 'hoi4_1939')
+          } elseif ($perfMode -eq 'sample') {
+            $scenarioMatrix = @('hoi4_1939')
+          }
           if ($forceMeasurement) {
             $reason = "run npm run perf:gate for $($env:GITHUB_EVENT_NAME), regardless of changed paths"
           } elseif ($shouldRunPerf) {
