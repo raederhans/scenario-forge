@@ -1,3 +1,5 @@
+import { createQuickFillHierarchyResolver, normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
+
 // Owns fill target policy decisions; inputs remain live.
 export function createFillTargetPolicy(runtimeState, {
   getAdmin1Group,
@@ -6,6 +8,11 @@ export function createFillTargetPolicy(runtimeState, {
   isSovereigntyModeActive,
   shouldExcludePoliticalInteractionFeature,
 }) {
+  const hierarchy = createQuickFillHierarchyResolver(runtimeState, {
+    getAdmin1Group, getFeatureCountryCodeNormalized,
+    getFeatureInteractionCountryCodeNormalized, shouldExcludePoliticalInteractionFeature,
+  });
+
   function getCountryFeatureIds(countryCode) {
     if (!countryCode || !(runtimeState.countryToFeatureIds instanceof Map)) return [];
     const ids = runtimeState.countryToFeatureIds.get(countryCode);
@@ -57,37 +64,9 @@ export function createFillTargetPolicy(runtimeState, {
     return ids.length ? ids : [id];
   }
 
-  function resolveParentGroupKey(feature, featureId) {
-    const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
-    const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-    const scopeCode = scenarioDistrictGroup && scenarioOwnerTag
-      ? scenarioOwnerTag
-      : getFeatureInteractionCountryCodeNormalized(feature, featureId);
-    if (!scopeCode) return "";
-    const directGroup = getAdmin1Group(feature);
-    const groupName = String(scenarioDistrictGroup || runtimeState.parentGroupByFeatureId?.get(featureId) || directGroup || "").trim();
-    if (!groupName) return "";
-    return `${scopeCode}::${groupName}`;
-  }
-
   function resolveParentGroupTargetIds(feature, featureId) {
-    if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
-    if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-    const scenarioDistrictGroup = String(runtimeState.scenarioDistrictGroupByFeatureId?.get(featureId) || "").trim();
-    const scenarioOwnerTag = String(runtimeState.sovereigntyByFeatureId?.[featureId] || "").trim().toUpperCase();
-    const parentGroupKey = resolveParentGroupKey(feature, featureId);
-    const ids = scenarioDistrictGroup && scenarioOwnerTag
-      ? getScenarioOwnerFeatureIds(scenarioOwnerTag)
-      : getInteractionCountryFeatureIds(feature, featureId);
-    if (!parentGroupKey || !ids.length) return [];
-    const targetIds = ids.filter((candidateId) => {
-      const candidateFeature = runtimeState.landIndex.get(candidateId);
-      if (!candidateFeature) return false;
-      if (shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId)) return false;
-      return resolveParentGroupKey(candidateFeature, candidateId) === parentGroupKey;
-    });
-    if (targetIds.length < 2) return [];
-    return Array.from(new Set(targetIds));
+    const resolution = hierarchy.resolve(feature, featureId, "parent");
+    return resolution.status === "ready" ? resolution.targetIds : [];
   }
 
   function resolveSpecialZoneParentGroupTargetIds(featureId) {
@@ -95,29 +74,6 @@ export function createFillTargetPolicy(runtimeState, {
     const feature = id ? runtimeState.landIndex?.get(id) : null;
     if (!feature) return [];
     return resolveParentGroupTargetIds(feature, id);
-  }
-
-  function resolveCountryFillTargetIds(feature, featureId, { allowWhenParentGrouping = false } = {}) {
-    if (!featureId || !runtimeState.landIndex?.has(featureId)) return [];
-    if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return [];
-    const countryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
-    if (!countryCode) return [];
-    const ids = getInteractionCountryFeatureIds(feature, featureId).filter((candidateId) => {
-      const candidateFeature = runtimeState.landIndex.get(candidateId);
-      return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
-    });
-    if (ids.length < 2) return [];
-
-    if (!allowWhenParentGrouping) {
-      const hasParentGrouping = ids.some((candidateId) => {
-        const candidateFeature = runtimeState.landIndex.get(candidateId);
-        if (!candidateFeature) return false;
-        return !!resolveParentGroupKey(candidateFeature, candidateId);
-      });
-      if (hasParentGrouping) return [];
-    }
-
-    return ids;
   }
 
   function isBatchFillDoubleClickBaseEligible(hit, feature) {
@@ -130,34 +86,27 @@ export function createFillTargetPolicy(runtimeState, {
     return true;
   }
 
-  function buildDoubleClickBatchPlan(feature, featureId) {
-    if (!feature || !featureId) return null;
-    if (shouldExcludePoliticalInteractionFeature(feature, featureId)) return null;
-    const requestedScope = String(runtimeState.batchFillScope || "parent") === "country" ? "country" : "parent";
-    if (requestedScope === "parent") {
-      const parentTargetIds = resolveParentGroupTargetIds(feature, featureId);
-      if (parentTargetIds.length >= 2) {
-        return {
-          targetIds: parentTargetIds,
-          kind: "fill-parent-group",
-          dirtyReason: "fill-parent-group",
-          fallbackToCountry: false,
-        };
-      }
-    }
+  function resolveQuickFillPlan(feature, featureId, scope = runtimeState.batchFillScope) {
+    return hierarchy.resolve(feature, featureId, scope);
+  }
 
-    const countryTargetIds = resolveCountryFillTargetIds(feature, featureId, {
-      allowWhenParentGrouping: true,
-    });
-    if (countryTargetIds.length >= 2) {
-      return {
-        targetIds: countryTargetIds,
-        kind: "fill-country-batch",
-        dirtyReason: "fill-country-batch",
-        fallbackToCountry: requestedScope === "parent",
-      };
+  function buildDoubleClickBatchPlan(feature, featureId) {
+    if (!isBatchFillDoubleClickBaseEligible({ id: featureId }, feature)) return null;
+    const requestedScope = normalizeQuickFillScope(runtimeState.batchFillScope);
+    let resolution = resolveQuickFillPlan(feature, featureId, requestedScope);
+    let fallbackToCountry = false;
+    if (requestedScope === "parent" && resolution.status === "no_parent_level") {
+      resolution = resolveQuickFillPlan(feature, featureId, "country");
+      fallbackToCountry = true;
     }
-    return null;
+    if (resolution.status !== "ready" || !resolution.targetIds.length) return null;
+    const country = requestedScope === "country" || fallbackToCountry;
+    return {
+      targetIds: resolution.targetIds,
+      kind: country ? "fill-country-batch" : "fill-parent-group",
+      dirtyReason: country ? "fill-country-batch" : "fill-parent-group",
+      fallbackToCountry,
+    };
   }
 
   function isDoubleClickBatchEligible(hit, feature) {
@@ -165,5 +114,5 @@ export function createFillTargetPolicy(runtimeState, {
     return !!buildDoubleClickBatchPlan(feature, hit.id);
   }
 
-  return Object.freeze({ getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isDoubleClickBatchEligible });
+  return Object.freeze({ resolveQuickFillPlan, getCountryFeatureIds, resolveInteractionTargetIds, resolveParentGroupTargetIds, resolveSpecialZoneParentGroupTargetIds, buildDoubleClickBatchPlan, isDoubleClickBatchEligible });
 }

@@ -140,6 +140,22 @@ DATA_ARTIFACT_SPECS: tuple[DataArtifactSpec, ...] = (
         description="Hierarchy and grouping data consumed by scenario and inspector flows.",
     ),
     DataArtifactSpec(
+        path="quick_fill/reference/china-pca-2017.json",
+        role="quick_fill_china_reference",
+        artifact_class=ARTIFACT_CLASS_SOURCE,
+        owner="quick_fill_hierarchy",
+        description="Pinned administrative code reference, not boundary geometry.",
+        schema_ref="schema://quick_fill/china_reference/v1",
+    ),
+    DataArtifactSpec(
+        path="quick_fill/china_prefecture_crosswalk.v1.json",
+        role="quick_fill_prefecture_crosswalk",
+        artifact_class=ARTIFACT_CLASS_DERIVED,
+        owner="quick_fill_hierarchy",
+        description="Versioned candidates and unresolved cases for conservative prefecture fill.",
+        schema_ref="schema://quick_fill/prefecture_crosswalk/v1",
+    ),
+    DataArtifactSpec(
         path="geo_aliases.json",
         role="geo_aliases",
         artifact_class=ARTIFACT_CLASS_PUBLISH,

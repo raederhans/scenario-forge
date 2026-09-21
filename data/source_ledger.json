@@ -510,5 +510,23 @@
     "rebuild_command": "python tools/build_world_urban_lights_asset.py",
     "status": "frozen_verified",
     "local_presence": "required"
+  },
+  {
+    "source_id": "china_pca_2017_quick_fill_reference",
+    "local_path": "data/quick_fill/reference/china-pca-2017.json",
+    "origin_kind": "download",
+    "upstream_url": "https://raw.githubusercontent.com/modood/Administrative-divisions-of-China/e01c078c68e044242bfcc4d26a970b2314b098cd/dist/pca-code.json",
+    "immutable_ref": "e01c078c68e044242bfcc4d26a970b2314b098cd / 2017-10-31 code reference",
+    "current_local_sha256": "3da1a40dd9395ac8a55673a41d2308b56f3e4fe3a6e55cc93fc55fefb1fba561",
+    "license": "WTFPL-2.0; see data/quick_fill/reference/LICENSE.china-pca.txt",
+    "citation": "modood/Administrative-divisions-of-China, pinned NBS code reference; not a boundary accuracy assertion",
+    "consumers": [
+      "tools/build_china_prefecture_crosswalk.py",
+      "data/quick_fill/china_prefecture_crosswalk.v1.json"
+    ],
+    "rebuild_command": "python tools/build_china_prefecture_crosswalk.py",
+    "provenance_sidecar": "data/quick_fill/china_prefecture_crosswalk.v1.json",
+    "status": "frozen_verified",
+    "local_presence": "required"
   }
 ]

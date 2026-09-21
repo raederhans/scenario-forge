@@ -195,8 +195,8 @@
       "artifact_class": "publish",
       "owner": "init_map_data.hierarchy_locales",
       "description": "Hierarchy and grouping data consumed by scenario and inspector flows.",
-      "size_bytes": 497225,
-      "sha256": "ecb65c7c2ccb711ba8399a4871a0bcefd532eaca12df58fbc66e9aac8a3fa603",
+      "size_bytes": 553825,
+      "sha256": "0361ae3adaffce99b3ceb3f02add63b9e8f41caca7bd653f08e90343b3ce433d",
       "type": "hierarchy",
       "group_count": 1521,
       "child_count": 10085
@@ -812,6 +812,26 @@
       "type": "thematic_build_audit",
       "layer_id": "political_wgi_state_capacity_v1",
       "warning_count": 1
+    },
+    "quick_fill/reference/china-pca-2017.json": {
+      "role": "quick_fill_china_reference",
+      "artifact_class": "source",
+      "owner": "quick_fill_hierarchy",
+      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
+      "size_bytes": 138639,
+      "sha256": "3da1a40dd9395ac8a55673a41d2308b56f3e4fe3a6e55cc93fc55fefb1fba561",
+      "schema_ref": "schema://quick_fill/china_reference/v1",
+      "type": "json"
+    },
+    "quick_fill/china_prefecture_crosswalk.v1.json": {
+      "role": "quick_fill_prefecture_crosswalk",
+      "artifact_class": "derived",
+      "owner": "quick_fill_hierarchy",
+      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
+      "size_bytes": 154413,
+      "sha256": "0d1e3ddced1a878d122ef638d960df1c04c60d82789e5be5c87754f0e24eeacb",
+      "schema_ref": "schema://quick_fill/prefecture_crosswalk/v1",
+      "type": "json"
     }
   },
   "runtime_asset_registry": {

@@ -1,3 +1,4 @@
+import { createQuickFillLevelControls, getQuickFillUiCountry } from "./quick_fill_level_controls.js";
 // Workspace chrome support-surface controller.
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
 // toolbar.js 继续保留 export workbench facade、special zone facade、drawer 切换和更高层的页面编排。
@@ -56,6 +57,13 @@ export function createWorkspaceChromeSupportSurfaceController({
   closeExportWorkbench = () => {},
 } = {}) {
   let dockPopoverCloseBound = false;
+  const quickFillLevels = createQuickFillLevelControls({
+    state, container: dockQuickFillRow,
+    onChange: (scope) => {
+      setBatchFillScopeState(state, scope);
+      refreshPaintModeUi();
+    },
+  });
 
   const isFocusableGuideTriggerVisible = (element) => {
     if (!(element instanceof HTMLElement)) return false;
@@ -179,8 +187,7 @@ export function createWorkspaceChromeSupportSurfaceController({
   };
 
   const getActiveQuickFillPolicy = () => {
-    const selectedCode = String(state.selectedInspectorCountryCode || state.inspectorHighlightCountryCode || "")
-      .trim().toUpperCase().replace(/[^A-Z]/g, "");
+    const selectedCode = getQuickFillUiCountry(state);
     if (!selectedCode || !(state.countryInteractionPoliciesByCode instanceof Map)) {
       return null;
     }
@@ -219,7 +226,8 @@ export function createWorkspaceChromeSupportSurfaceController({
     const activePolicy = getActiveQuickFillPolicy();
     const parentEnabled = !activePolicy || activePolicy.parentEnabled;
     const countryEnabled = !activePolicy || activePolicy.countryEnabled;
-    const isVisible = !isScenarioMode && !isOwnershipMode && isSubdivisionMode;
+    const isVisible = !isOwnershipMode && isSubdivisionMode;
+    const levelModel = quickFillLevels.refresh();
 
     if (dockQuickFillBtn) {
       dockQuickFillBtn.classList.toggle("hidden", !isVisible);
@@ -239,11 +247,13 @@ export function createWorkspaceChromeSupportSurfaceController({
       quickFillParentBtn.disabled = !parentEnabled;
       quickFillParentBtn.classList.toggle(
         "is-active",
-        parentEnabled && String(state.batchFillScope || "parent") !== "country"
+        parentEnabled && String(state.batchFillScope || "parent") === "parent"
       );
     }
     if (quickFillCountryBtn) {
-      quickFillCountryBtn.textContent = t("By Country", "ui");
+      quickFillCountryBtn.textContent = isScenarioMode
+        ? (String(state.currentLanguage || "en").startsWith("zh") ? "当前剧本国家" : "Current scenario owner")
+        : t("By Country", "ui");
       quickFillCountryBtn.disabled = !countryEnabled;
       quickFillCountryBtn.classList.toggle(
         "is-active",
@@ -251,7 +261,7 @@ export function createWorkspaceChromeSupportSurfaceController({
       );
     }
     if (dockQuickFillHint) {
-      dockQuickFillHint.textContent = getQuickFillHint(activePolicy);
+      dockQuickFillHint.textContent = levelModel.explicitLevel || isScenarioMode ? levelModel.hint : getQuickFillHint(activePolicy);
     }
   };
 

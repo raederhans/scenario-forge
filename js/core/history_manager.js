@@ -1,3 +1,4 @@
+import { coalesceQuickFillGesture } from "./history_quick_fill_gesture.js";
 import { state as runtimeState } from "./state.js";
 import {
   normalizeIntensityFieldsState,
@@ -201,7 +202,9 @@ function pushHistoryEntry(entry) {
   // 这和常规编辑器 undo/redo 的分叉语义保持一致。
   runtimeState.historyPast = Array.isArray(runtimeState.historyPast) ? runtimeState.historyPast : [];
   runtimeState.historyFuture = [];
-  runtimeState.historyPast.push(nextEntry);
+  const merged = coalesceQuickFillGesture(runtimeState.historyPast.at(-1), nextEntry);
+  if (merged) runtimeState.historyPast.pop();
+  runtimeState.historyPast.push(merged || nextEntry);
 
   const max = Math.max(1, Number(runtimeState.historyMax) || 80);
   if (runtimeState.historyPast.length > max) {
