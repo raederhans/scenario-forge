@@ -248,7 +248,9 @@ jobs:
 
       - name: Run test infra structural contracts
         if: inputs.profile == 'pr-fast'
-        run: python -m unittest tests.test_e2e_structural_tooling -q
+        run: |
+          node --test tests/pr_ci_plan_behavior.test.mjs tests/adaptive_routing_policy_behavior.test.mjs
+          python -m unittest tests.test_e2e_structural_tooling -q
 
       - name: Run strict TNO scenario contract gate
         # PR scenario contracts are owned by Scenario Contract Matrix.
