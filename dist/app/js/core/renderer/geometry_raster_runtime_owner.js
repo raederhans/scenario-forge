@@ -9,6 +9,8 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   const inFlight = new Map();
   let politicalFrame = null;
   let disposed = false;
+  let failedPoliticalIdentity = null;
+  const pendingEditBlocksWorker = () => h.hasPendingColorEdit() && !h.allowPendingColorEdit?.();
   const close = (result) => result?.bitmap?.close?.();
   const enabled = () => !disposed && worker.available() && h.isEnabled() && state.firstVisibleFramePainted
     && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
@@ -66,11 +68,12 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   }
 
   function preparePolitical({ force = false } = {}) {
-    if (!enabled() || h.hasPendingColorEdit()) return null;
+    if (!enabled() || pendingEditBlocksWorker()) return null;
     if (!force && !h.needsPoliticalRender()) return null;
     const entries = getPoliticalEntries();
     if (!entries) return null;
     const description = describe("political", entries);
+    if (failedPoliticalIdentity === description.identity) return null;
     if (politicalFrame?.identity === description.identity) return null;
     if (pending.get("political")?.identity === description.identity) return pending.get("political").promise;
     close(politicalFrame?.result);
@@ -85,20 +88,23 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     task.promise = worker.request({ ...description, projectionOptions: projectionOptions(), entries }).then((result) => {
       receivedResult = result;
       if (!result) {
+        failedPoliticalIdentity = task.identity;
         if (!disposed && pending.get("political") === task) e.requestRender("geometry-worker-fallback");
         return;
       }
-      const currentEntries = enabled() && !h.hasPendingColorEdit() ? getPoliticalEntries() : null;
+      const currentEntries = enabled() && !pendingEditBlocksWorker() ? getPoliticalEntries() : null;
       if (pending.get("political") !== task || !currentEntries
         || describe("political", currentEntries).identity !== task.identity) {
         close(result);
         e.recordMetric("geometryWorkerStaleResult", 0, { kind: "political" });
         return;
       }
+      failedPoliticalIdentity = null;
       close(politicalFrame?.result);
       politicalFrame = { identity: task.identity, result, ids: new Set(entries.map((entry) => entry.id)) };
       e.requestRender("geometry-worker-political-ready");
     }).catch(() => {
+      failedPoliticalIdentity = task.identity;
       if (receivedResult !== politicalFrame?.result) close(receivedResult);
       if (!disposed && pending.get("political") === task) e.requestRender("geometry-worker-fallback");
     }).finally(() => {
@@ -111,7 +117,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   }
 
   function drawPolitical() {
-    if (!enabled() || h.hasPendingColorEdit() || !politicalFrame) return null;
+    if (!enabled() || pendingEditBlocksWorker() || !politicalFrame) return null;
     const entries = getPoliticalEntries();
     if (!entries || politicalFrame.identity !== describe("political", entries).identity) return null;
     const context = surface.getContext();

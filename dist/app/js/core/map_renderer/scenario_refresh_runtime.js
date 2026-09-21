@@ -1,3 +1,4 @@
+import { createScenarioDeferredRefreshOwner } from "./scenario_deferred_refresh_owner.js";
 import { normalizeRendererRefreshPlan, resolveScenarioChunkPromotionRendererRefreshDescriptor } from "./scenario_refresh_plans.js";
 import { createScenarioVisualInvalidationExecutor } from "./scenario_visual_invalidation_executor.js";
 import { recordScenarioPoliticalDerivedStateCoverage, analyzeScenarioPoliticalDerivedStateCoverage, buildScenarioChunkPromotionVisualMetricDetails, createScenarioChunkPromotionDelta, readFirstNonNegativeCount, resolveScenarioChunkPromotionChangeSet } from "../renderer/scenario_chunk_promotion_helpers.js";
@@ -26,7 +27,22 @@ function createScenarioRefreshRuntime(deps = {}) {
     rebuildStaticMeshes, getEffectiveAtlantropaFeatures,
     rebuildAuxiliaryRegionIndexes, getSpatialIndexRuntimeOwner, queueIndexUiRefresh,
     recordScopedTopologyChange = () => {},
+    ensureLayerDataFromTopology = () => {},
+    getProjectionIdentity = () => 0,
+    requestScopedRender = () => render(),
   } = deps;
+
+  const { captureRefreshState, refreshDeferredDetail } = createScenarioDeferredRefreshOwner({
+    runtimeState, nowMs, rebuildPrimaryPoliticalDerivedState, markRendererTopologyChanged,
+    clearDeferredInternalBorderMeshCaches, scheduleDeferredHeavyBorderMeshes,
+    invalidateInteractionComposite, rebuildStaticMeshes, invalidateBorderCache,
+    updateDynamicBorderStatusUI, syncScenarioSecondaryRegionIndexes,
+    scheduleSecondarySpatialIndexBuild, resetScenarioWaterCacheAdaptiveState,
+    updateSpecialZonesPaths, renderSpecialZoneEditorOverlay, recordScopedTopologyChange,
+    invalidateRenderPasses, clearRenderPassReferenceTransforms, markAllOverlaysDirty,
+    updateZoomTranslateExtent, requestScopedRender, recordRenderPerfMetric,
+    ensureLayerDataFromTopology, getProjectionIdentity,
+  });
 
   let deferredScenarioChunkPromotionInfraHandle = null;
   let scenarioChunkPromotionVersion = 0;
@@ -607,7 +623,15 @@ function createScenarioRefreshRuntime(deps = {}) {
   function refreshMapDataForScenarioApply({
     suppressRender = false,
     refreshPlan = null,
+    refreshKind = "scenario-apply",
+    previousRefreshState = null,
   } = {}) {
+    if (refreshKind === "deferred-detail") {
+      const scoped = refreshDeferredDetail({ previousRefreshState, suppressRender });
+      if (scoped) return scoped;
+    } else if (refreshKind !== "scenario-apply") {
+      throw new Error(`Unsupported scenario refresh kind: ${refreshKind}`);
+    }
     const startedAt = nowMs();
     const rendererRefreshPlan = normalizeRendererRefreshPlan(refreshPlan, {
       source: "scenario-apply",
@@ -672,10 +696,13 @@ function createScenarioRefreshRuntime(deps = {}) {
       atlantropaWaterFeatureCount,
       atlantropaWaterIndexCount,
       atlantropaWaterSpatialCount,
+      refreshKind,
     });
+    return { mode: "full", reason: refreshKind === "deferred-detail" ? "scope-fallback" : "scenario-apply" };
   }
 
   return {
+    captureRefreshState,
     cancelDeferredScenarioChunkPromotionInfraRefresh,
     resetDeferredScenarioChunkPromotionState,
     runDeferredScenarioChunkPromotionInfraRefresh,

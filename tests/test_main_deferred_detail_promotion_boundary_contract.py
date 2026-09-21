@@ -56,19 +56,24 @@ class MainDeferredDetailPromotionBoundaryContractTest(unittest.TestCase):
         startup_ready_handoff_content = STARTUP_READY_HANDOFF_JS.read_text(encoding="utf-8")
 
         self.assertIn(
-            "refreshMapDataForScenarioApply({ suppressRender: true });",
+            'refreshKind: "deferred-detail", previousRefreshState,',
             owner_content,
         )
         self.assertRegex(
             owner_content,
             re.compile(
                 r"if \(hasActiveScenario\) \{\s*"
-                r"refreshMapDataForScenarioApply\(\{ suppressRender: true \}\);\s*"
-                r"return \"light\";\s*"
+                r"const result = refreshMapDataForScenarioApply\(\{\s*"
+                r'suppressRender: true, refreshKind: "deferred-detail", previousRefreshState,\s*'
+                r"\}\);\s*"
+                r'return result\?\.mode \|\| "full";\s*'
                 r"\}",
                 re.S,
             ),
         )
+        self.assertIn("const previousRefreshState = captureScenarioRefreshState();", owner_content)
+        self.assertIn("isScenarioRefreshSceneCurrent(previousRefreshState, captureScenarioRefreshState())", owner_content)
+        self.assertNotIn('return "light";', owner_content)
         self.assertNotIn("setMapData-fallback", owner_content)
         self.assertNotIn("falling back to setMapData", owner_content)
         self.assertIn(
@@ -105,7 +110,7 @@ class MainDeferredDetailPromotionBoundaryContractTest(unittest.TestCase):
             owner_content,
             re.compile(
                 r"const refreshMode = applyDetailPromotionMapRefresh\([\s\S]*?"
-                r"mapDataRefreshed = true;[\s\S]*?"
+                r'mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";[\s\S]*?'
                 r"schedulePostReadyPoliticalReconcile\?\.\(\"detail-topology-promoted\"\);",
                 re.S,
             ),
@@ -168,7 +173,7 @@ class MainDeferredDetailPromotionBoundaryContractTest(unittest.TestCase):
             re.compile(
                 r"function applyDetailPromotionMapRefresh\([\s\S]*?"
                 r"if \(hasActiveScenario\) \{[\s\S]*?"
-                r"refreshMapDataForScenarioApply\(\{ suppressRender: true \}\);",
+                r'refreshMapDataForScenarioApply\(\{\s*suppressRender: true, refreshKind: "deferred-detail", previousRefreshState,',
                 re.S,
             ),
         )

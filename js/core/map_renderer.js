@@ -1,3 +1,5 @@
+import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
+import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
 import { getObjectIdentityToken } from "./renderer/object_identity.js";
 import { createVisibleFrameIdentityPolicy } from './renderer/visible_frame_identity_policy.js';
@@ -3158,6 +3160,7 @@ function getGeometryRasterRuntimeOwner() {
         return cache.dirty?.political || cache.signatures?.political !== getRenderPassSignature("political", runtimeState.zoomTransform);
       },
       hasPendingColorEdit: hasPendingPoliticalColorEdit,
+      allowPendingColorEdit: () => politicalPatchPreviewBudget.isDeferred(),
       collectPoliticalItems: () => collectVisibleLandSpatialItemsWithStats({ overscanPx: getPoliticalPassViewportOverscanPx() })?.items || null,
       collectHitItems: () => collectVisibleLandSpatialItemsWithStats({ overscanPx: HIT_CANVAS_VIEWPORT_OVERSCAN_PX }),
       orderPoliticalItems: orderPoliticalShellUnderlayFirst,
@@ -6801,71 +6804,72 @@ function clearPoliticalPatchOverlayIfStale(reason = "stale-overlay") {
   return clearPoliticalPatchOverlay(reason);
 }
 
+const politicalPatchPreviewBudget = createPoliticalPatchPreviewBudget({ now: nowMs });
+
 function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-colors" } = {}) {
-  if (!rendererSurfaceHost.getPoliticalPatchContext()?.canvas || !rendererSurfaceHost.getProjection() || !rendererSurfaceHost.getPathCanvas()) return false;
   const ids = normalizePoliticalColorEditIds(featureIds);
+  const startedAt = nowMs();
+  const deferPreview = (reason, candidateFeatureCount = 0) => {
+    politicalPatchPreviewBudget.defer();
+    // Do not leave a previous color/undo preview visible over the old frame.
+    clearPoliticalPatchOverlay("pending-edit-deferred");
+    recordRenderPerfMetric("politicalPatchOverlayDeferred", nowMs() - startedAt, {
+      inputLabel, reason, requestedFeatureCount: ids.length, candidateFeatureCount,
+    });
+    return false;
+  };
   if (!ids.length) {
+    politicalPatchPreviewBudget.reset();
     clearPoliticalPatchOverlay("empty-pending-edit");
     return false;
   }
-  const features = ids
-    .map((id) => ({ id, feature: findResolvedColorFeatureById(id) }))
-    .filter((entry) => entry.feature?.geometry);
-  if (!features.length) {
-    clearPoliticalPatchOverlay("pending-edit-no-features");
-    return false;
-  }
+  // Reject large transactions before resolving IDs or traversing coordinates.
+  if (politicalPatchPreviewBudget.exceedsFeatureLimit(ids.length)) return deferPreview("feature-budget");
+  if (!rendererSurfaceHost.getPoliticalPatchContext()?.canvas || !rendererSurfaceHost.getProjection() || !rendererSurfaceHost.getPathCanvas()) return deferPreview("preview-surface-unavailable");
+  const features = ids.map((id) => ({ id, feature: findResolvedColorFeatureById(id) })).filter((entry) => entry.feature?.geometry);
+  if (!features.length) return deferPreview("no-preview-features");
+  const decision = politicalPatchPreviewBudget.inspect(features, ({ id, feature }) => !!getPoliticalFeaturePathEntry(feature, {
+    featureId: id, allowBuild: false,
+  }));
+  if (!decision.allowed) return deferPreview(decision.reason, features.length);
   clearPoliticalPatchOverlay("pending-edit-repaint");
-  const startedAt = nowMs();
   const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
   const transformSignature = getTransformSignature(transform);
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
-  const metricsCollector = {
-    fillMs: 0,
-    strokeMs: 0,
-    renderedCount: 0,
-    renderedIds: new Set(),
-  };
-  rendererSurfaceHost.getPoliticalPatchContext().save();
-  const k = prepareTargetContext(rendererSurfaceHost.getPoliticalPatchContext(), transform);
-  withRenderTarget(rendererSurfaceHost.getPoliticalPatchContext(), () => {
-    orderPoliticalShellUnderlayFirst(features).forEach(({ feature, id }, index) => {
-      drawPoliticalFeature(feature, index, {
-        k,
-        canvasWidth,
-        canvasHeight,
-        transform,
-        skipScreenCheck: false,
-        useCachedPath: true,
-        allowBuildPath: true,
-        countPathBuild: false,
-        metricsCollector,
-      });
-      if (metricsCollector.renderedIds instanceof Set && id) {
-        metricsCollector.renderedIds.add(id);
+  const metricsCollector = { fillMs: 0, strokeMs: 0, renderedCount: 0, renderedIds: new Set() };
+  const context = rendererSurfaceHost.getPoliticalPatchContext();
+  let processedCount = 0;
+  context.save();
+  try {
+    const k = prepareTargetContext(context, transform);
+    withRenderTarget(context, () => {
+      for (const { feature } of orderPoliticalShellUnderlayFirst(features)) {
+        // Path2D streaming itself is synchronous; preflight bounds cold work,
+        // and this limit stops the next feature rather than claiming preemption.
+        if (!politicalPatchPreviewBudget.timeRemaining(startedAt)) {
+          politicalPatchPreviewBudget.defer();
+          break;
+        }
+        drawPoliticalFeature(feature, processedCount++, {
+          k, canvasWidth, canvasHeight, transform, skipScreenCheck: false,
+          useCachedPath: true, allowBuildPath: true, countPathBuild: false, metricsCollector,
+        });
       }
     });
-  });
-  rendererSurfaceHost.getPoliticalPatchContext().restore();
+  } finally { context.restore(); }
   const renderedCount = Number(metricsCollector.renderedCount || 0);
   recordRenderPerfMetric("politicalPatchOverlayPaint", nowMs() - startedAt, {
-    inputLabel: String(inputLabel || "refresh-colors"),
-    requestedFeatureCount: ids.length,
-    candidateFeatureCount: features.length,
-    renderedCount,
-    activeScenarioId: String(runtimeState.activeScenarioId || ""),
-    colorRevision: Number(runtimeState.colorRevision || 0),
+    inputLabel: String(inputLabel || "refresh-colors"), requestedFeatureCount: ids.length,
+    candidateFeatureCount: features.length, processedCount, renderedCount,
+    deferred: politicalPatchPreviewBudget.isDeferred(),
+    activeScenarioId: String(runtimeState.activeScenarioId || ""), colorRevision: Number(runtimeState.colorRevision || 0),
   });
   recordPoliticalPatchOverlayPaintDiagnostics(runtimeState, {
     inputLabel, requestedFeatureCount: ids.length, candidateFeatureCount: features.length, renderedCount,
   });
   if (renderedCount > 0) {
     getRenderPassCacheState().pendingPoliticalPatchOverlayTransformSignature = transformSignature;
-    recordFillPatchFirstPixelMetric({
-      renderedCount,
-      renderedIds: metricsCollector.renderedIds,
-      paintSource: "political-patch-overlay",
-    });
+    recordFillPatchFirstPixelMetric({ renderedCount, renderedIds: metricsCollector.renderedIds, paintSource: "political-patch-overlay" });
   }
   return renderedCount > 0;
 }
@@ -6891,6 +6895,7 @@ function clearPendingPoliticalColorEdit({
       pendingPoliticalColorEditScenarioId: "", pendingPoliticalColorEditReason: "", pendingPoliticalColorEditStartedAt: 0,
       pendingPoliticalColorEditInputLabel: "", pendingPoliticalColorEditFirstPixelRecorded: false, pendingPoliticalColorEditFirstPixelPaintSource: "",
     });
+    politicalPatchPreviewBudget.reset();
     clearPoliticalPatchOverlay("pending-edit-cleared");
     recordPendingPoliticalColorEditClearDiagnostics(runtimeState, {
       resetReason, pendingFeatureCount: preClearPendingFeatureCount, pendingReason: preClearPendingReason, inputLabel: preClearInputLabel, firstPixelRecorded: preClearFirstPixelRecorded, renderedCount, renderedIdCount, force, paintSource,
@@ -6987,10 +6992,10 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
     requestedFeatureCount: ids.length, pendingRenderFeatureCount: pendingRenderIds.size, renderNow, inputLabel,
   });
 
-  if (renderNow && rendererSurfaceHost.getContext()) {
+  if ((renderNow || politicalPatchPreviewBudget.isDeferred()) && rendererSurfaceHost.getContext()) {
     requestRendererRender("refresh-colors", {
       flush: false,
-      fallback: () => render(),
+      fallback: () => scheduleDeferredWork(() => render(), { timeout: 32 }),
     });
   }
 }
@@ -7141,12 +7146,16 @@ function getContourVisibleFeatures(collection, options = {}) {
 const URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300;
 const URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150;
 
+const contextLayerRenderScheduler = createContextLayerRenderScheduler({
+  getIdentity: () => [runtimeState.activeScenarioId, runtimeState.sceneGeneration, runtimeState.currentScenarioApplyRequestId],
+  requestRender: requestRendererRender, recordMetric: recordRenderPerfMetric, now: nowMs,
+});
+
 function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-layer-loaded", { renderNow = true } = {}) {
   layerResolverCache.primaryRef = null;
   layerResolverCache.detailRef = null;
   layerResolverCache.bundleMode = null;
   layerResolverCache.contextRevision = Number.NaN;
-  layerResolverCache.waterRegionsDataToken = "";
   const targetPasses = new Set(["contextBase"]);
   const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
   normalizedLayerNames.forEach((layerName) => {
@@ -7163,7 +7172,7 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   invalidateRenderPasses(resolvedPasses, reason);
   clearRenderPassReferenceTransforms(resolvedPasses);
   if (renderNow) {
-    requestRendererRender(`context-layer-visual:${reason}`, { flush: true });
+    contextLayerRenderScheduler.request(normalizedLayerNames, reason);
   }
 }
 
@@ -14594,6 +14603,7 @@ function resetRendererTransactionState({
   cancelHoverOverlayRender = false,
   hitCanvasDirty = false,
 } = {}) {
+  contextLayerRenderScheduler.reset();
   return getRendererTransactionResetOwner().resetRendererTransactionState({
     cancelSecondarySpatialBuild,
     cancelHoverOverlayRender,
@@ -14626,6 +14636,8 @@ function rebuildPrimaryPoliticalDerivedState({
     incrementalDelta,
     reuseGeometry: incremental,
   });
+  return { incremental: !!incrementalDelta, changedFeatureCount: incrementalDelta?.changedIds.length || 0,
+    removedFeatureCount: incrementalDelta?.removedIds.length || 0 };
 }
 
 function setMapData({
@@ -14656,6 +14668,9 @@ function resetRendererRefreshTransactionState({
 
 scenarioRefreshRuntime = createScenarioRefreshRuntime({
   runtimeState,
+  ensureLayerDataFromTopology,
+  getProjectionIdentity: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+  requestScopedRender: (reason) => requestRendererRender(reason, { flush: false }),
   recordScopedTopologyChange: (change) => getRenderPassSignaturePolicy().recordScopedTopologyChange(change),
   buildIndex,
   buildSpatialIndexChunked,
@@ -14739,6 +14754,10 @@ function reconcileDetailPromotionPoliticalPass(reason = "detail-promotion-politi
     requested: !!requested,
   });
   return requested;
+}
+
+export function captureScenarioRefreshState() {
+  return scenarioRefreshRuntime.captureRefreshState();
 }
 
 function refreshMapDataForScenarioApply(options = {}) {

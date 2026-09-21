@@ -14,6 +14,7 @@ import {
 } from "../map_renderer/scenario_refresh_plans.js";
 
 export {
+  captureScenarioRefreshState,
   invalidateContextLayerVisualStateBatch,
   invalidateOceanBackgroundVisualState,
   invalidateOceanWaterInteractionVisualState,
