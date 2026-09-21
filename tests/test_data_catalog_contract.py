@@ -21,7 +21,7 @@ CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP = REPO_ROOT / "landing" / "app.js"
-EXPECTED_SCHEMA_REF_COUNT = 29
+EXPECTED_SCHEMA_REF_COUNT = 31
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -36,6 +36,17 @@ class DataCatalogContractTest(unittest.TestCase):
 
         self.assertEqual(checked_in_payload, rebuilt_payload)
         self.assertEqual(checked_in_markdown, rebuilt_markdown)
+
+    def test_quick_fill_inputs_have_explicit_schemas_and_hashes(self) -> None:
+        entries = {row["url"]: row for row in self._load_catalog()["entries"]}
+        for url, schema in [
+            ("data/quick_fill/reference/china-pca-2017.json", "schema://quick_fill/china_reference/v1"),
+            ("data/quick_fill/china_prefecture_crosswalk.v1.json", "schema://quick_fill/prefecture_crosswalk/v1"),
+        ]:
+            with self.subTest(url=url):
+                self.assertEqual(entries[url]["schemaRef"], schema)
+                self.assertTrue(entries[url]["hashRef"])
+                self.assertEqual(entries[url]["owner"], "quick_fill_hierarchy")
 
     def test_catalog_markdown_exposes_governance_columns(self) -> None:
         checked_in_markdown = CATALOG_MD.read_text(encoding="utf-8")

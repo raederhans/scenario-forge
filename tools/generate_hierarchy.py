@@ -1123,6 +1123,11 @@ def main():
         "interaction_policies": interaction_policies,
         "country_groups": country_groups,
     }
+    from map_builder.quick_fill_hierarchy import build_quick_fill_metadata, load_crosswalk
+    if authoritative_path is not None:
+        authoritative_topology = json.loads(authoritative_path.read_text(encoding="utf-8"))
+        properties = [row.get("properties", {}) for row in authoritative_topology.get("objects", {}).get("political", {}).get("geometries", [])]
+        output["quick_fill"] = build_quick_fill_metadata(output, properties, load_crosswalk(DATA_DIR))
     output_path = DATA_DIR / "hierarchy.json"
     output_path.write_text(json.dumps(output, indent=2, ensure_ascii=True), encoding="utf-8")
 

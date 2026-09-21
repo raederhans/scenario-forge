@@ -92,9 +92,9 @@ function createHarness(context, initial = {}) {
   return { controller, state, nodes, calls, doc, get refreshCount() { return refreshCount; } };
 }
 
-test("scenario ownership and country granularity hide Quick Fill and close its active popover", context => {
+test("ownership and country granularity hide Quick Fill and close its active popover", context => {
   const h = createHarness(context);
-  for (const patch of [{ activeScenarioId: "scenario" }, { paintMode: "sovereignty" }, { interactionGranularity: "country" }]) {
+  for (const patch of [{ paintMode: "sovereignty" }, { interactionGranularity: "country" }]) {
     Object.assign(h.state, { activeScenarioId: "", paintMode: "visual", interactionGranularity: "subdivision" });
     h.controller.refreshQuickFillControls();
     h.nodes.dockQuickFillBtn.click();
@@ -184,4 +184,11 @@ test("repeated binding keeps one listener per control and one document dismiss p
   assert.equal(h.doc.listeners.get("click").length, 1); assert.equal(h.doc.listeners.get("keydown").length, 1);
   h.nodes.dockQuickFillBtn.click(); assert.equal(h.state.activeDockPopover, "quickfill");
   h.nodes.quickFillCountryBtn.click(); assert.equal(h.refreshCount, 1);
+});
+
+
+test("scenario visual mode exposes explicit quick-fill scopes", context => {
+  const h = createHarness(context, { activeScenarioId: "tno_1962" });
+  assert.equal(h.nodes.dockQuickFillBtn.classList.contains("hidden"), false);
+  assert.equal(h.nodes.quickFillCountryBtn.textContent, "Current scenario owner");
 });

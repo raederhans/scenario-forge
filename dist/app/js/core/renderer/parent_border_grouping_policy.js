@@ -1,3 +1,5 @@
+import { getScenarioDistrictCountryGrouping } from "../scenario_districts.js";
+
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
 const PARENT_BORDER_MAX_DOMINANT_SHARE = 0.90;
 const PARENT_BORDER_MIN_RENDERABLE_GROUPS = 2;
@@ -111,23 +113,11 @@ export function createParentBorderGroupingPolicy(runtimeState, {
   }
 
   function buildScenarioDistrictGroupingCandidate(countryCode, featureEntries) {
-    const districtCountry = runtimeState.scenarioDistrictGroupsData?.countries?.[countryCode];
-    if (!districtCountry || typeof districtCountry !== "object") return null;
-    const idSet = new Set(featureEntries.map((entry) => entry.id));
-    const featureToGroup = new Map();
-    Object.entries(districtCountry.districts && typeof districtCountry.districts === "object" ? districtCountry.districts : {})
-      .forEach(([districtId, rawDistrict]) => {
-        const normalizedDistrictId = String(rawDistrict?.id || rawDistrict?.district_id || districtId || "").trim();
-        if (!normalizedDistrictId) return;
-        const featureIds = Array.isArray(rawDistrict?.feature_ids) ? rawDistrict.feature_ids : [];
-        featureIds.forEach((featureId) => {
-          const normalizedFeatureId = String(featureId || "").trim();
-          if (!normalizedFeatureId || !idSet.has(normalizedFeatureId)) return;
-          if (!featureToGroup.has(normalizedFeatureId)) {
-            featureToGroup.set(normalizedFeatureId, normalizedDistrictId);
-          }
-        });
-      });
+    const featureToGroup = getScenarioDistrictCountryGrouping(
+      runtimeState.scenarioDistrictGroupsData, countryCode, featureEntries,
+      runtimeState.sovereigntyByFeatureId,
+    );
+    if (!featureToGroup) return null;
     if (!featureToGroup.size) {
       return {
         countryCode,

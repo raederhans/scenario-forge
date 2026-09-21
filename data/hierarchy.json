@@ -16235,5 +16235,2103 @@
         "subregion_label": "Eastern Africa"
       }
     }
+  },
+  "quick_fill": {
+    "version": 1,
+    "semantics": "geographic_editing_groups_not_historical_administration",
+    "countries": {
+      "CN": {
+        "default_level": "province",
+        "levels": {
+          "province": {
+            "label": "Province",
+            "alias": "parent"
+          },
+          "prefecture": {
+            "label": "Prefecture / city",
+            "status": "partial",
+            "reference_year": 2017,
+            "reference_source": "https://github.com/modood/Administrative-divisions-of-China/tree/e01c078c68e044242bfcc4d26a970b2314b098cd",
+            "blocked_parent_groups": [
+              "CN_Anhui",
+              "CN_Fujian",
+              "CN_Gansu",
+              "CN_Guangdong",
+              "CN_Guangxi",
+              "CN_Guizhou",
+              "CN_Hainan",
+              "CN_Hebei",
+              "CN_Heilongjiang",
+              "CN_Henan",
+              "CN_Hubei",
+              "CN_Hunan",
+              "CN_Inner_Mongolia",
+              "CN_Jiangsu",
+              "CN_Jiangxi",
+              "CN_Jilin",
+              "CN_Liaoning",
+              "CN_Ningxia",
+              "CN_Shaanxi",
+              "CN_Shandong",
+              "CN_Shanxi",
+              "CN_Sichuan",
+              "CN_Tibet",
+              "CN_Xinjiang",
+              "CN_Yunnan",
+              "CN_Zhejiang"
+            ],
+            "groups": {
+              "CN_PREF_1100": {
+                "label": "\u5317\u4eac\u5e02",
+                "kind": "municipality",
+                "province_id": "CN_Beijing",
+                "feature_ids": [
+                  "CN_CITY_17275852B24643771294108",
+                  "CN_CITY_17275852B40522342172572",
+                  "CN_CITY_17275852B41788529093737",
+                  "CN_CITY_17275852B53922912898325",
+                  "CN_CITY_17275852B7080321063595",
+                  "CN_CITY_17275852B72792517073116",
+                  "CN_CITY_17275852B72922623961147",
+                  "CN_CITY_17275852B84580276321378",
+                  "CN_CITY_17275852B95574356023337"
+                ],
+                "complete": true
+              },
+              "CN_PREF_1200": {
+                "label": "\u5929\u6d25\u5e02",
+                "kind": "municipality",
+                "province_id": "CN_Tianjin",
+                "feature_ids": [
+                  "CN_CITY_17275852B23021356422447",
+                  "CN_CITY_17275852B35450332359336",
+                  "CN_CITY_17275852B53166682632414",
+                  "CN_CITY_17275852B84296108244083",
+                  "CN_CITY_17275852B90394685615550",
+                  "CN_CITY_17275852B9474953962086"
+                ],
+                "complete": true
+              },
+              "CN_PREF_3100": {
+                "label": "\u4e0a\u6d77\u5e02",
+                "kind": "municipality",
+                "province_id": "CN_Shanghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B1408079528399",
+                  "CN_CITY_17275852B24439099777247",
+                  "CN_CITY_17275852B28043359135044",
+                  "CN_CITY_17275852B42279115337630",
+                  "CN_CITY_17275852B59692497706789",
+                  "CN_CITY_17275852B62674344705560",
+                  "CN_CITY_17275852B82708605205805",
+                  "CN_CITY_17275852B97102685179742"
+                ],
+                "complete": true
+              },
+              "CN_PREF_5000": {
+                "label": "\u91cd\u5e86\u5e02",
+                "kind": "municipality",
+                "province_id": "CN_Chongqing",
+                "feature_ids": [
+                  "CN_CITY_17275852B12784406241328",
+                  "CN_CITY_17275852B16005710189594",
+                  "CN_CITY_17275852B164157278498",
+                  "CN_CITY_17275852B1694066732521",
+                  "CN_CITY_17275852B17642144241844",
+                  "CN_CITY_17275852B20178605301884",
+                  "CN_CITY_17275852B2280889616396",
+                  "CN_CITY_17275852B26027313782231",
+                  "CN_CITY_17275852B28870905079762",
+                  "CN_CITY_17275852B29390740137661",
+                  "CN_CITY_17275852B34161226584930",
+                  "CN_CITY_17275852B41039470029518",
+                  "CN_CITY_17275852B4851709447471",
+                  "CN_CITY_17275852B52904942013516",
+                  "CN_CITY_17275852B58072138884557",
+                  "CN_CITY_17275852B58286340999894",
+                  "CN_CITY_17275852B61145215456285",
+                  "CN_CITY_17275852B65163116968784",
+                  "CN_CITY_17275852B67293994279376",
+                  "CN_CITY_17275852B70395773762989",
+                  "CN_CITY_17275852B74051544695436",
+                  "CN_CITY_17275852B75311953663492",
+                  "CN_CITY_17275852B75915877381439",
+                  "CN_CITY_17275852B81470372710272",
+                  "CN_CITY_17275852B81616373786388",
+                  "CN_CITY_17275852B84087342889910",
+                  "CN_CITY_17275852B86211507455330",
+                  "CN_CITY_17275852B87295171942618",
+                  "CN_CITY_17275852B88397337248145",
+                  "CN_CITY_17275852B88857247163357",
+                  "CN_CITY_17275852B96755659764231",
+                  "CN_CITY_17275852B97051310016142",
+                  "CN_CITY_17275852B99042359000457"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6301": {
+                "label": "\u897f\u5b81\u5e02",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B10439048942215",
+                  "CN_CITY_17275852B12680287585482",
+                  "CN_CITY_17275852B4088951121354",
+                  "CN_CITY_17275852B75021358121292"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6302": {
+                "label": "\u6d77\u4e1c\u5e02",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B19378290916588",
+                  "CN_CITY_17275852B36383935837338",
+                  "CN_CITY_17275852B39024209153888",
+                  "CN_CITY_17275852B41190012362593",
+                  "CN_CITY_17275852B64856383532767",
+                  "CN_CITY_17275852B74412727274506"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6322": {
+                "label": "\u6d77\u5317\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B50621998812160",
+                  "CN_CITY_17275852B58564753780047",
+                  "CN_CITY_17275852B65042092306901",
+                  "CN_CITY_17275852B88619993156988"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6323": {
+                "label": "\u9ec4\u5357\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B20463865371353",
+                  "CN_CITY_17275852B71786988816730",
+                  "CN_CITY_17275852B98267999500175"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6325": {
+                "label": "\u6d77\u5357\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B54009314236158",
+                  "CN_CITY_17275852B58957248362912",
+                  "CN_CITY_17275852B73285144447377",
+                  "CN_CITY_17275852B81098989654744",
+                  "CN_CITY_17275852B8640595389907"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6326": {
+                "label": "\u679c\u6d1b\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B1787117911325",
+                  "CN_CITY_17275852B2182407224263",
+                  "CN_CITY_17275852B28481452848090",
+                  "CN_CITY_17275852B52151949988531",
+                  "CN_CITY_17275852B66695118162266",
+                  "CN_CITY_17275852B82919928587081",
+                  "CN_CITY_17275852B99290886399570"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6327": {
+                "label": "\u7389\u6811\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B13951895453383",
+                  "CN_CITY_17275852B19636254999944",
+                  "CN_CITY_17275852B24277287807877",
+                  "CN_CITY_17275852B27939254726366",
+                  "CN_CITY_17275852B66736115774382",
+                  "CN_CITY_17275852B94078824919955"
+                ],
+                "complete": true
+              },
+              "CN_PREF_6328": {
+                "label": "\u6d77\u897f\u8499\u53e4\u65cf\u85cf\u65cf\u81ea\u6cbb\u5dde",
+                "kind": "prefecture",
+                "province_id": "CN_Qinghai",
+                "feature_ids": [
+                  "CN_CITY_17275852B14401300973090",
+                  "CN_CITY_17275852B26523048151757",
+                  "CN_CITY_17275852B26921956360688",
+                  "CN_CITY_17275852B37048929444654",
+                  "CN_CITY_17275852B96460038154485",
+                  "CN_CITY_17275852B98939713320160"
+                ],
+                "complete": true
+              }
+            },
+            "unmapped_feature_ids": [
+              "CN_CITY_17275852B10243812034258",
+              "CN_CITY_17275852B10280834953954",
+              "CN_CITY_17275852B10359009799739",
+              "CN_CITY_17275852B10474076998029",
+              "CN_CITY_17275852B1065790622928",
+              "CN_CITY_17275852B10920492354283",
+              "CN_CITY_17275852B11008710047549",
+              "CN_CITY_17275852B11052099771689",
+              "CN_CITY_17275852B12316325556277",
+              "CN_CITY_17275852B1239940213034",
+              "CN_CITY_17275852B1257312703969",
+              "CN_CITY_17275852B13491036968650",
+              "CN_CITY_17275852B13666567623021",
+              "CN_CITY_17275852B13766311075127",
+              "CN_CITY_17275852B1379721554141",
+              "CN_CITY_17275852B14080596373630",
+              "CN_CITY_17275852B14323409203108",
+              "CN_CITY_17275852B1464685470526",
+              "CN_CITY_17275852B14733597733322",
+              "CN_CITY_17275852B1480822694432",
+              "CN_CITY_17275852B15400645542385",
+              "CN_CITY_17275852B15476422276109",
+              "CN_CITY_17275852B1554261680821",
+              "CN_CITY_17275852B16095129082560",
+              "CN_CITY_17275852B16521843045020",
+              "CN_CITY_17275852B16549058596986",
+              "CN_CITY_17275852B16822718993810",
+              "CN_CITY_17275852B17352235722767",
+              "CN_CITY_17275852B17657499533405",
+              "CN_CITY_17275852B17798637547952",
+              "CN_CITY_17275852B17983837223036",
+              "CN_CITY_17275852B1814371633063",
+              "CN_CITY_17275852B18322727061238",
+              "CN_CITY_17275852B19931241701115",
+              "CN_CITY_17275852B20040471591761",
+              "CN_CITY_17275852B20147297357411",
+              "CN_CITY_17275852B20617662043886",
+              "CN_CITY_17275852B20799087712877",
+              "CN_CITY_17275852B21494165623103",
+              "CN_CITY_17275852B21680261908241",
+              "CN_CITY_17275852B21786836503840",
+              "CN_CITY_17275852B21927061590758",
+              "CN_CITY_17275852B22517944121367",
+              "CN_CITY_17275852B22813364881676",
+              "CN_CITY_17275852B22927786689358",
+              "CN_CITY_17275852B23195685677374",
+              "CN_CITY_17275852B23370591957325",
+              "CN_CITY_17275852B24732894609656",
+              "CN_CITY_17275852B25230716975612",
+              "CN_CITY_17275852B25629298081957",
+              "CN_CITY_17275852B26033440645013",
+              "CN_CITY_17275852B26344796891704",
+              "CN_CITY_17275852B26406952133326",
+              "CN_CITY_17275852B26763632681669",
+              "CN_CITY_17275852B27218734116347",
+              "CN_CITY_17275852B27242410268573",
+              "CN_CITY_17275852B27542222545947",
+              "CN_CITY_17275852B27614191229008",
+              "CN_CITY_17275852B27690331557972",
+              "CN_CITY_17275852B28001364673929",
+              "CN_CITY_17275852B28778137217024",
+              "CN_CITY_17275852B28786375442580",
+              "CN_CITY_17275852B29164896560898",
+              "CN_CITY_17275852B29331893920720",
+              "CN_CITY_17275852B29384927995689",
+              "CN_CITY_17275852B2946822917904",
+              "CN_CITY_17275852B29818702279352",
+              "CN_CITY_17275852B29929254137559",
+              "CN_CITY_17275852B30057579778613",
+              "CN_CITY_17275852B30245146594841",
+              "CN_CITY_17275852B30366160357330",
+              "CN_CITY_17275852B30373565857678",
+              "CN_CITY_17275852B30377041544199",
+              "CN_CITY_17275852B30892899597118",
+              "CN_CITY_17275852B31261080204331",
+              "CN_CITY_17275852B31367125179867",
+              "CN_CITY_17275852B31393010637863",
+              "CN_CITY_17275852B31491185089163",
+              "CN_CITY_17275852B32624511377382",
+              "CN_CITY_17275852B32740825868376",
+              "CN_CITY_17275852B32909465051494",
+              "CN_CITY_17275852B329525942101",
+              "CN_CITY_17275852B32989531796686",
+              "CN_CITY_17275852B33290626310023",
+              "CN_CITY_17275852B33335326571793",
+              "CN_CITY_17275852B34248105319299",
+              "CN_CITY_17275852B34485301798783",
+              "CN_CITY_17275852B34966799109471",
+              "CN_CITY_17275852B35258595662952",
+              "CN_CITY_17275852B35332790186482",
+              "CN_CITY_17275852B35541552724196",
+              "CN_CITY_17275852B35957304691865",
+              "CN_CITY_17275852B36068725262944",
+              "CN_CITY_17275852B36174894779493",
+              "CN_CITY_17275852B36302754926191",
+              "CN_CITY_17275852B36390701523517",
+              "CN_CITY_17275852B36499134265956",
+              "CN_CITY_17275852B3652301711772",
+              "CN_CITY_17275852B36655604222163",
+              "CN_CITY_17275852B36819394991823",
+              "CN_CITY_17275852B37123487699753",
+              "CN_CITY_17275852B37240019282451",
+              "CN_CITY_17275852B37350063092030",
+              "CN_CITY_17275852B37388992508665",
+              "CN_CITY_17275852B37493799025038",
+              "CN_CITY_17275852B37558107040134",
+              "CN_CITY_17275852B37578058694758",
+              "CN_CITY_17275852B37600232739643",
+              "CN_CITY_17275852B37957954635738",
+              "CN_CITY_17275852B38336781870813",
+              "CN_CITY_17275852B38552083710936",
+              "CN_CITY_17275852B38939963469829",
+              "CN_CITY_17275852B40415823663758",
+              "CN_CITY_17275852B404444017551",
+              "CN_CITY_17275852B40480604852636",
+              "CN_CITY_17275852B40485497211548",
+              "CN_CITY_17275852B40827597599959",
+              "CN_CITY_17275852B41153803332766",
+              "CN_CITY_17275852B41550697085290",
+              "CN_CITY_17275852B41775887521063",
+              "CN_CITY_17275852B41805227755069",
+              "CN_CITY_17275852B41932351427715",
+              "CN_CITY_17275852B42043031438117",
+              "CN_CITY_17275852B42065564755438",
+              "CN_CITY_17275852B42139031443937",
+              "CN_CITY_17275852B42582924567207",
+              "CN_CITY_17275852B42869172782924",
+              "CN_CITY_17275852B42882991072386",
+              "CN_CITY_17275852B43163945505607",
+              "CN_CITY_17275852B43166713994651",
+              "CN_CITY_17275852B44333012315851",
+              "CN_CITY_17275852B44537959548587",
+              "CN_CITY_17275852B44701305331015",
+              "CN_CITY_17275852B45394941151938",
+              "CN_CITY_17275852B45416000286574",
+              "CN_CITY_17275852B45551980478134",
+              "CN_CITY_17275852B46177532075867",
+              "CN_CITY_17275852B4626184751480",
+              "CN_CITY_17275852B46371387056770",
+              "CN_CITY_17275852B46407226040623",
+              "CN_CITY_17275852B46408721575403",
+              "CN_CITY_17275852B46506533649147",
+              "CN_CITY_17275852B46541486927830",
+              "CN_CITY_17275852B46756156758774",
+              "CN_CITY_17275852B4676676622807",
+              "CN_CITY_17275852B46788818510645",
+              "CN_CITY_17275852B46998996515844",
+              "CN_CITY_17275852B4700388750567",
+              "CN_CITY_17275852B47269106522129",
+              "CN_CITY_17275852B47775830384450",
+              "CN_CITY_17275852B48164327857967",
+              "CN_CITY_17275852B48545263880555",
+              "CN_CITY_17275852B48691500457709",
+              "CN_CITY_17275852B49228373536251",
+              "CN_CITY_17275852B49400958252995",
+              "CN_CITY_17275852B49621178916950",
+              "CN_CITY_17275852B49878870319406",
+              "CN_CITY_17275852B50193055851288",
+              "CN_CITY_17275852B50201707862643",
+              "CN_CITY_17275852B50435667373766",
+              "CN_CITY_17275852B50524833382886",
+              "CN_CITY_17275852B51175072856676",
+              "CN_CITY_17275852B51799179526286",
+              "CN_CITY_17275852B52110803550281",
+              "CN_CITY_17275852B52145815753311",
+              "CN_CITY_17275852B5244686228582",
+              "CN_CITY_17275852B52714554825867",
+              "CN_CITY_17275852B52963426746769",
+              "CN_CITY_17275852B53595443021236",
+              "CN_CITY_17275852B53613184067027",
+              "CN_CITY_17275852B53672972261894",
+              "CN_CITY_17275852B53933530490343",
+              "CN_CITY_17275852B54543288924677",
+              "CN_CITY_17275852B54721890479732",
+              "CN_CITY_17275852B5478772681433",
+              "CN_CITY_17275852B54886532312122",
+              "CN_CITY_17275852B5530362994921",
+              "CN_CITY_17275852B55464189255182",
+              "CN_CITY_17275852B55564857079783",
+              "CN_CITY_17275852B55803803315704",
+              "CN_CITY_17275852B55840349463324",
+              "CN_CITY_17275852B5638517994669",
+              "CN_CITY_17275852B5674127157826",
+              "CN_CITY_17275852B56784937332062",
+              "CN_CITY_17275852B56850756381420",
+              "CN_CITY_17275852B57047696875398",
+              "CN_CITY_17275852B57882995260260",
+              "CN_CITY_17275852B58322354790029",
+              "CN_CITY_17275852B58588105655352",
+              "CN_CITY_17275852B58723971712159",
+              "CN_CITY_17275852B59149587384429",
+              "CN_CITY_17275852B59300404294395",
+              "CN_CITY_17275852B60036374298215",
+              "CN_CITY_17275852B60414806889849",
+              "CN_CITY_17275852B60620518951028",
+              "CN_CITY_17275852B60640643165285",
+              "CN_CITY_17275852B60762833036568",
+              "CN_CITY_17275852B61069988090989",
+              "CN_CITY_17275852B61074449125496",
+              "CN_CITY_17275852B61638108171693",
+              "CN_CITY_17275852B61772244043024",
+              "CN_CITY_17275852B61899141263472",
+              "CN_CITY_17275852B62103868434319",
+              "CN_CITY_17275852B62165589707618",
+              "CN_CITY_17275852B62534367670886",
+              "CN_CITY_17275852B62569588401205",
+              "CN_CITY_17275852B63077243364371",
+              "CN_CITY_17275852B63094907784605",
+              "CN_CITY_17275852B63199438380671",
+              "CN_CITY_17275852B63272164318035",
+              "CN_CITY_17275852B63320654095461",
+              "CN_CITY_17275852B64817974651819",
+              "CN_CITY_17275852B6515985392133",
+              "CN_CITY_17275852B65388914557323",
+              "CN_CITY_17275852B65550927062733",
+              "CN_CITY_17275852B65587507291468",
+              "CN_CITY_17275852B65652308253010",
+              "CN_CITY_17275852B65840661251357",
+              "CN_CITY_17275852B65862674662541",
+              "CN_CITY_17275852B65931377787385",
+              "CN_CITY_17275852B66083683669745",
+              "CN_CITY_17275852B66113099800997",
+              "CN_CITY_17275852B66176667563352",
+              "CN_CITY_17275852B66204891178522",
+              "CN_CITY_17275852B6630334434734",
+              "CN_CITY_17275852B66641637059539",
+              "CN_CITY_17275852B66735617717919",
+              "CN_CITY_17275852B66923472507746",
+              "CN_CITY_17275852B66983384026241",
+              "CN_CITY_17275852B6704893339132",
+              "CN_CITY_17275852B67197169551607",
+              "CN_CITY_17275852B67338721103818",
+              "CN_CITY_17275852B67564907021397",
+              "CN_CITY_17275852B67660611492152",
+              "CN_CITY_17275852B68084346150299",
+              "CN_CITY_17275852B68411434909480",
+              "CN_CITY_17275852B68447300329810",
+              "CN_CITY_17275852B68988219011029",
+              "CN_CITY_17275852B69224732604429",
+              "CN_CITY_17275852B69233894766016",
+              "CN_CITY_17275852B69259623848725",
+              "CN_CITY_17275852B69310239774277",
+              "CN_CITY_17275852B69395570489772",
+              "CN_CITY_17275852B69453353693019",
+              "CN_CITY_17275852B69887483986817",
+              "CN_CITY_17275852B70108594636400",
+              "CN_CITY_17275852B70255924310381",
+              "CN_CITY_17275852B70958466386582",
+              "CN_CITY_17275852B72190836262784",
+              "CN_CITY_17275852B72317130625563",
+              "CN_CITY_17275852B72333986242367",
+              "CN_CITY_17275852B72472413631255",
+              "CN_CITY_17275852B72819681774342",
+              "CN_CITY_17275852B73469440437176",
+              "CN_CITY_17275852B73549839123919",
+              "CN_CITY_17275852B74677024847014",
+              "CN_CITY_17275852B74769488565977",
+              "CN_CITY_17275852B7483411794752",
+              "CN_CITY_17275852B74953697630233",
+              "CN_CITY_17275852B75036083307954",
+              "CN_CITY_17275852B75472310835240",
+              "CN_CITY_17275852B75499036549183",
+              "CN_CITY_17275852B75567917484769",
+              "CN_CITY_17275852B75763620561947",
+              "CN_CITY_17275852B75890737929332",
+              "CN_CITY_17275852B76519295903131",
+              "CN_CITY_17275852B766173731702",
+              "CN_CITY_17275852B76913133241906",
+              "CN_CITY_17275852B77159644478443",
+              "CN_CITY_17275852B77859179845033",
+              "CN_CITY_17275852B77945295007031",
+              "CN_CITY_17275852B78831071059765",
+              "CN_CITY_17275852B78838385533977",
+              "CN_CITY_17275852B79135697753229",
+              "CN_CITY_17275852B79149802712659",
+              "CN_CITY_17275852B79222988236433",
+              "CN_CITY_17275852B79805983057899",
+              "CN_CITY_17275852B79917267034965",
+              "CN_CITY_17275852B79971137199373",
+              "CN_CITY_17275852B80086875950659",
+              "CN_CITY_17275852B80219081988604",
+              "CN_CITY_17275852B80309702523612",
+              "CN_CITY_17275852B80797002792061",
+              "CN_CITY_17275852B8079983127742",
+              "CN_CITY_17275852B81187977004604",
+              "CN_CITY_17275852B81372791356325",
+              "CN_CITY_17275852B81663654183510",
+              "CN_CITY_17275852B81916485203474",
+              "CN_CITY_17275852B81990157756951",
+              "CN_CITY_17275852B82057698871174",
+              "CN_CITY_17275852B82327711064596",
+              "CN_CITY_17275852B82537963815987",
+              "CN_CITY_17275852B82922987483495",
+              "CN_CITY_17275852B83812560805647",
+              "CN_CITY_17275852B84212901325884",
+              "CN_CITY_17275852B84401922274795",
+              "CN_CITY_17275852B84419043562143",
+              "CN_CITY_17275852B8449177634457",
+              "CN_CITY_17275852B84530901473191",
+              "CN_CITY_17275852B84565810607959",
+              "CN_CITY_17275852B84847687531311",
+              "CN_CITY_17275852B85014187933164",
+              "CN_CITY_17275852B85360434089813",
+              "CN_CITY_17275852B85468107399147",
+              "CN_CITY_17275852B85726473757330",
+              "CN_CITY_17275852B85844962073852",
+              "CN_CITY_17275852B85927339818688",
+              "CN_CITY_17275852B85962848339274",
+              "CN_CITY_17275852B86000242921086",
+              "CN_CITY_17275852B86053611706040",
+              "CN_CITY_17275852B86114589403662",
+              "CN_CITY_17275852B86211815132253",
+              "CN_CITY_17275852B86781974302279",
+              "CN_CITY_17275852B86904299217845",
+              "CN_CITY_17275852B87098676832129",
+              "CN_CITY_17275852B87279583116216",
+              "CN_CITY_17275852B88503935537678",
+              "CN_CITY_17275852B8889121757377",
+              "CN_CITY_17275852B90070093330668",
+              "CN_CITY_17275852B90218051569792",
+              "CN_CITY_17275852B90369139050224",
+              "CN_CITY_17275852B9046707294983",
+              "CN_CITY_17275852B9048397080076",
+              "CN_CITY_17275852B90651431132420",
+              "CN_CITY_17275852B91173560245297",
+              "CN_CITY_17275852B9137854287113",
+              "CN_CITY_17275852B91559349232276",
+              "CN_CITY_17275852B9202448033967",
+              "CN_CITY_17275852B92176345134366",
+              "CN_CITY_17275852B92506097004923",
+              "CN_CITY_17275852B93418989751134",
+              "CN_CITY_17275852B93743910489906",
+              "CN_CITY_17275852B94478932575643",
+              "CN_CITY_17275852B94628873791223",
+              "CN_CITY_17275852B95102809901298",
+              "CN_CITY_17275852B95583475247133",
+              "CN_CITY_17275852B95587527560922",
+              "CN_CITY_17275852B95606207132602",
+              "CN_CITY_17275852B95874414124304",
+              "CN_CITY_17275852B95898451929539",
+              "CN_CITY_17275852B96391823506125",
+              "CN_CITY_17275852B96869681587114",
+              "CN_CITY_17275852B9687470539084",
+              "CN_CITY_17275852B97207939179574",
+              "CN_CITY_17275852B97874259231937",
+              "CN_CITY_17275852B97923044022234",
+              "CN_CITY_17275852B9838053353656",
+              "CN_CITY_17275852B98384028469199",
+              "CN_CITY_17275852B98393646664938",
+              "CN_CITY_17275852B98747059027351",
+              "CN_CITY_17275852B99235497139571",
+              "CN_CITY_17275852B99352197075157",
+              "CN_CITY_17275852B99867509318297"
+            ]
+          }
+        }
+      },
+      "FR": {
+        "default_level": "region",
+        "levels": {
+          "region": {
+            "label": "Region",
+            "alias": "parent"
+          },
+          "department": {
+            "label": "Department",
+            "status": "complete",
+            "groups": {
+              "FR_DEPT_01": {
+                "label": "D\u00e9partement 01",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_01001",
+                  "FR_ARR_01002",
+                  "FR_ARR_01003",
+                  "FR_ARR_01004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_03": {
+                "label": "D\u00e9partement 03",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_03001",
+                  "FR_ARR_03002",
+                  "FR_ARR_03003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_07": {
+                "label": "D\u00e9partement 07",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_07001",
+                  "FR_ARR_07002",
+                  "FR_ARR_07003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_15": {
+                "label": "D\u00e9partement 15",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_15001",
+                  "FR_ARR_15002",
+                  "FR_ARR_15003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_26": {
+                "label": "D\u00e9partement 26",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_26001",
+                  "FR_ARR_26002",
+                  "FR_ARR_26003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_38": {
+                "label": "D\u00e9partement 38",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_38001",
+                  "FR_ARR_38002",
+                  "FR_ARR_38003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_42": {
+                "label": "D\u00e9partement 42",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_42001",
+                  "FR_ARR_42002",
+                  "FR_ARR_42003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_43": {
+                "label": "D\u00e9partement 43",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_43001",
+                  "FR_ARR_43002",
+                  "FR_ARR_43003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_63": {
+                "label": "D\u00e9partement 63",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_63001",
+                  "FR_ARR_63002",
+                  "FR_ARR_63003",
+                  "FR_ARR_63004",
+                  "FR_ARR_63005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_69": {
+                "label": "D\u00e9partement 69",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_69001",
+                  "FR_ARR_69002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_73": {
+                "label": "D\u00e9partement 73",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_73001",
+                  "FR_ARR_73002",
+                  "FR_ARR_73003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_74": {
+                "label": "D\u00e9partement 74",
+                "parent_group": "FR_Auvergne_Rhone_Alpes",
+                "feature_ids": [
+                  "FR_ARR_74001",
+                  "FR_ARR_74002",
+                  "FR_ARR_74003",
+                  "FR_ARR_74004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_02": {
+                "label": "D\u00e9partement 02",
+                "parent_group": "FR_Hauts_de_France",
+                "feature_ids": [
+                  "FR_ARR_02001",
+                  "FR_ARR_02002",
+                  "FR_ARR_02003",
+                  "FR_ARR_02004",
+                  "FR_ARR_02005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_59": {
+                "label": "D\u00e9partement 59",
+                "parent_group": "FR_Hauts_de_France",
+                "feature_ids": [
+                  "FR_ARR_59001",
+                  "FR_ARR_59002",
+                  "FR_ARR_59003",
+                  "FR_ARR_59004",
+                  "FR_ARR_59005",
+                  "FR_ARR_59006"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_60": {
+                "label": "D\u00e9partement 60",
+                "parent_group": "FR_Hauts_de_France",
+                "feature_ids": [
+                  "FR_ARR_60001",
+                  "FR_ARR_60002",
+                  "FR_ARR_60003",
+                  "FR_ARR_60004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_62": {
+                "label": "D\u00e9partement 62",
+                "parent_group": "FR_Hauts_de_France",
+                "feature_ids": [
+                  "FR_ARR_62001",
+                  "FR_ARR_62002",
+                  "FR_ARR_62003",
+                  "FR_ARR_62004",
+                  "FR_ARR_62005",
+                  "FR_ARR_62006",
+                  "FR_ARR_62007"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_80": {
+                "label": "D\u00e9partement 80",
+                "parent_group": "FR_Hauts_de_France",
+                "feature_ids": [
+                  "FR_ARR_80001",
+                  "FR_ARR_80002",
+                  "FR_ARR_80003",
+                  "FR_ARR_80004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_2A": {
+                "label": "D\u00e9partement 2A",
+                "parent_group": "FR_Corse",
+                "feature_ids": [
+                  "FR_ARR_2A001",
+                  "FR_ARR_2A004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_2B": {
+                "label": "D\u00e9partement 2B",
+                "parent_group": "FR_Corse",
+                "feature_ids": [
+                  "FR_ARR_2B002",
+                  "FR_ARR_2B003",
+                  "FR_ARR_2B005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_04": {
+                "label": "D\u00e9partement 04",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_04001",
+                  "FR_ARR_04002",
+                  "FR_ARR_04003",
+                  "FR_ARR_04004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_05": {
+                "label": "D\u00e9partement 05",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_05001",
+                  "FR_ARR_05002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_06": {
+                "label": "D\u00e9partement 06",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_06001",
+                  "FR_ARR_06002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_13": {
+                "label": "D\u00e9partement 13",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_13001",
+                  "FR_ARR_13002",
+                  "FR_ARR_13003",
+                  "FR_ARR_13004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_83": {
+                "label": "D\u00e9partement 83",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_83001",
+                  "FR_ARR_83002",
+                  "FR_ARR_83003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_84": {
+                "label": "D\u00e9partement 84",
+                "parent_group": "FR_Provence_Alpes_Cote_d_Azur",
+                "feature_ids": [
+                  "FR_ARR_84001",
+                  "FR_ARR_84002",
+                  "FR_ARR_84003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_08": {
+                "label": "D\u00e9partement 08",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_08001",
+                  "FR_ARR_08002",
+                  "FR_ARR_08003",
+                  "FR_ARR_08004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_10": {
+                "label": "D\u00e9partement 10",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_10001",
+                  "FR_ARR_10002",
+                  "FR_ARR_10003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_51": {
+                "label": "D\u00e9partement 51",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_51001",
+                  "FR_ARR_51002",
+                  "FR_ARR_51003",
+                  "FR_ARR_51004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_52": {
+                "label": "D\u00e9partement 52",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_52001",
+                  "FR_ARR_52002",
+                  "FR_ARR_52003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_54": {
+                "label": "D\u00e9partement 54",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_54001",
+                  "FR_ARR_54002",
+                  "FR_ARR_54003",
+                  "FR_ARR_54004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_55": {
+                "label": "D\u00e9partement 55",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_55001",
+                  "FR_ARR_55002",
+                  "FR_ARR_55003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_57": {
+                "label": "D\u00e9partement 57",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_57003",
+                  "FR_ARR_57005",
+                  "FR_ARR_57006",
+                  "FR_ARR_57007",
+                  "FR_ARR_57009"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_67": {
+                "label": "D\u00e9partement 67",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_67002",
+                  "FR_ARR_67003",
+                  "FR_ARR_67004",
+                  "FR_ARR_67005",
+                  "FR_ARR_67008"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_68": {
+                "label": "D\u00e9partement 68",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_68001",
+                  "FR_ARR_68002",
+                  "FR_ARR_68004",
+                  "FR_ARR_68006"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_88": {
+                "label": "D\u00e9partement 88",
+                "parent_group": "FR_Grand_Est",
+                "feature_ids": [
+                  "FR_ARR_88001",
+                  "FR_ARR_88002",
+                  "FR_ARR_88003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_09": {
+                "label": "D\u00e9partement 09",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_09001",
+                  "FR_ARR_09002",
+                  "FR_ARR_09003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_11": {
+                "label": "D\u00e9partement 11",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_11001",
+                  "FR_ARR_11002",
+                  "FR_ARR_11003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_12": {
+                "label": "D\u00e9partement 12",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_12001",
+                  "FR_ARR_12002",
+                  "FR_ARR_12003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_30": {
+                "label": "D\u00e9partement 30",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_30001",
+                  "FR_ARR_30002",
+                  "FR_ARR_30003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_31": {
+                "label": "D\u00e9partement 31",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_31001",
+                  "FR_ARR_31002",
+                  "FR_ARR_31003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_32": {
+                "label": "D\u00e9partement 32",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_32001",
+                  "FR_ARR_32002",
+                  "FR_ARR_32003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_34": {
+                "label": "D\u00e9partement 34",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_34001",
+                  "FR_ARR_34002",
+                  "FR_ARR_34003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_46": {
+                "label": "D\u00e9partement 46",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_46001",
+                  "FR_ARR_46002",
+                  "FR_ARR_46003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_48": {
+                "label": "D\u00e9partement 48",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_48001",
+                  "FR_ARR_48002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_65": {
+                "label": "D\u00e9partement 65",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_65001",
+                  "FR_ARR_65002",
+                  "FR_ARR_65003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_66": {
+                "label": "D\u00e9partement 66",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_66001",
+                  "FR_ARR_66002",
+                  "FR_ARR_66003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_81": {
+                "label": "D\u00e9partement 81",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_81001",
+                  "FR_ARR_81002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_82": {
+                "label": "D\u00e9partement 82",
+                "parent_group": "FR_Occitanie",
+                "feature_ids": [
+                  "FR_ARR_82001",
+                  "FR_ARR_82002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_14": {
+                "label": "D\u00e9partement 14",
+                "parent_group": "FR_Normandie",
+                "feature_ids": [
+                  "FR_ARR_14001",
+                  "FR_ARR_14002",
+                  "FR_ARR_14003",
+                  "FR_ARR_14004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_27": {
+                "label": "D\u00e9partement 27",
+                "parent_group": "FR_Normandie",
+                "feature_ids": [
+                  "FR_ARR_27001",
+                  "FR_ARR_27002",
+                  "FR_ARR_27003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_50": {
+                "label": "D\u00e9partement 50",
+                "parent_group": "FR_Normandie",
+                "feature_ids": [
+                  "FR_ARR_50001",
+                  "FR_ARR_50002",
+                  "FR_ARR_50003",
+                  "FR_ARR_50004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_61": {
+                "label": "D\u00e9partement 61",
+                "parent_group": "FR_Normandie",
+                "feature_ids": [
+                  "FR_ARR_61001",
+                  "FR_ARR_61002",
+                  "FR_ARR_61003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_76": {
+                "label": "D\u00e9partement 76",
+                "parent_group": "FR_Normandie",
+                "feature_ids": [
+                  "FR_ARR_76001",
+                  "FR_ARR_76002",
+                  "FR_ARR_76003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_16": {
+                "label": "D\u00e9partement 16",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_16001",
+                  "FR_ARR_16002",
+                  "FR_ARR_16003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_17": {
+                "label": "D\u00e9partement 17",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_17001",
+                  "FR_ARR_17002",
+                  "FR_ARR_17003",
+                  "FR_ARR_17004",
+                  "FR_ARR_17005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_19": {
+                "label": "D\u00e9partement 19",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_19001",
+                  "FR_ARR_19002",
+                  "FR_ARR_19003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_23": {
+                "label": "D\u00e9partement 23",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_23001",
+                  "FR_ARR_23002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_24": {
+                "label": "D\u00e9partement 24",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_24001",
+                  "FR_ARR_24002",
+                  "FR_ARR_24003",
+                  "FR_ARR_24004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_33": {
+                "label": "D\u00e9partement 33",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_33001",
+                  "FR_ARR_33002",
+                  "FR_ARR_33003",
+                  "FR_ARR_33004",
+                  "FR_ARR_33005",
+                  "FR_ARR_33006"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_40": {
+                "label": "D\u00e9partement 40",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_40001",
+                  "FR_ARR_40002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_47": {
+                "label": "D\u00e9partement 47",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_47001",
+                  "FR_ARR_47002",
+                  "FR_ARR_47003",
+                  "FR_ARR_47004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_64": {
+                "label": "D\u00e9partement 64",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_64001",
+                  "FR_ARR_64002",
+                  "FR_ARR_64003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_79": {
+                "label": "D\u00e9partement 79",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_79001",
+                  "FR_ARR_79002",
+                  "FR_ARR_79003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_86": {
+                "label": "D\u00e9partement 86",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_86001",
+                  "FR_ARR_86002",
+                  "FR_ARR_86003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_87": {
+                "label": "D\u00e9partement 87",
+                "parent_group": "FR_Nouvelle_Aquitaine",
+                "feature_ids": [
+                  "FR_ARR_87001",
+                  "FR_ARR_87002",
+                  "FR_ARR_87003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_18": {
+                "label": "D\u00e9partement 18",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_18001",
+                  "FR_ARR_18002",
+                  "FR_ARR_18003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_28": {
+                "label": "D\u00e9partement 28",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_28001",
+                  "FR_ARR_28002",
+                  "FR_ARR_28003",
+                  "FR_ARR_28004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_36": {
+                "label": "D\u00e9partement 36",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_36001",
+                  "FR_ARR_36002",
+                  "FR_ARR_36003",
+                  "FR_ARR_36004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_37": {
+                "label": "D\u00e9partement 37",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_37001",
+                  "FR_ARR_37002",
+                  "FR_ARR_37003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_41": {
+                "label": "D\u00e9partement 41",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_41001",
+                  "FR_ARR_41002",
+                  "FR_ARR_41003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_45": {
+                "label": "D\u00e9partement 45",
+                "parent_group": "FR_Centre_Val_de_Loire",
+                "feature_ids": [
+                  "FR_ARR_45001",
+                  "FR_ARR_45002",
+                  "FR_ARR_45003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_21": {
+                "label": "D\u00e9partement 21",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_21001",
+                  "FR_ARR_21002",
+                  "FR_ARR_21003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_25": {
+                "label": "D\u00e9partement 25",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_25001",
+                  "FR_ARR_25002",
+                  "FR_ARR_25003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_39": {
+                "label": "D\u00e9partement 39",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_39001",
+                  "FR_ARR_39002",
+                  "FR_ARR_39003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_58": {
+                "label": "D\u00e9partement 58",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_58001",
+                  "FR_ARR_58002",
+                  "FR_ARR_58003",
+                  "FR_ARR_58004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_70": {
+                "label": "D\u00e9partement 70",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_70001",
+                  "FR_ARR_70002"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_71": {
+                "label": "D\u00e9partement 71",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_71001",
+                  "FR_ARR_71002",
+                  "FR_ARR_71003",
+                  "FR_ARR_71004",
+                  "FR_ARR_71005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_89": {
+                "label": "D\u00e9partement 89",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_89001",
+                  "FR_ARR_89002",
+                  "FR_ARR_89003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_90": {
+                "label": "D\u00e9partement 90",
+                "parent_group": "FR_Bourgogne_Franche_Comte",
+                "feature_ids": [
+                  "FR_ARR_90001"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_22": {
+                "label": "D\u00e9partement 22",
+                "parent_group": "FR_Bretagne",
+                "feature_ids": [
+                  "FR_ARR_22001",
+                  "FR_ARR_22002",
+                  "FR_ARR_22003",
+                  "FR_ARR_22004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_29": {
+                "label": "D\u00e9partement 29",
+                "parent_group": "FR_Bretagne",
+                "feature_ids": [
+                  "FR_ARR_29001",
+                  "FR_ARR_29002",
+                  "FR_ARR_29003",
+                  "FR_ARR_29004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_35": {
+                "label": "D\u00e9partement 35",
+                "parent_group": "FR_Bretagne",
+                "feature_ids": [
+                  "FR_ARR_35001",
+                  "FR_ARR_35002",
+                  "FR_ARR_35003",
+                  "FR_ARR_35004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_56": {
+                "label": "D\u00e9partement 56",
+                "parent_group": "FR_Bretagne",
+                "feature_ids": [
+                  "FR_ARR_56001",
+                  "FR_ARR_56002",
+                  "FR_ARR_56003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_44": {
+                "label": "D\u00e9partement 44",
+                "parent_group": "FR_Pays_de_la_Loire",
+                "feature_ids": [
+                  "FR_ARR_44002",
+                  "FR_ARR_44003",
+                  "FR_ARR_44005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_49": {
+                "label": "D\u00e9partement 49",
+                "parent_group": "FR_Pays_de_la_Loire",
+                "feature_ids": [
+                  "FR_ARR_49001",
+                  "FR_ARR_49002",
+                  "FR_ARR_49003",
+                  "FR_ARR_49004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_53": {
+                "label": "D\u00e9partement 53",
+                "parent_group": "FR_Pays_de_la_Loire",
+                "feature_ids": [
+                  "FR_ARR_53001",
+                  "FR_ARR_53002",
+                  "FR_ARR_53003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_72": {
+                "label": "D\u00e9partement 72",
+                "parent_group": "FR_Pays_de_la_Loire",
+                "feature_ids": [
+                  "FR_ARR_72001",
+                  "FR_ARR_72002",
+                  "FR_ARR_72003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_85": {
+                "label": "D\u00e9partement 85",
+                "parent_group": "FR_Pays_de_la_Loire",
+                "feature_ids": [
+                  "FR_ARR_85001",
+                  "FR_ARR_85002",
+                  "FR_ARR_85003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_75": {
+                "label": "D\u00e9partement 75",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_75001"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_77": {
+                "label": "D\u00e9partement 77",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_77001",
+                  "FR_ARR_77002",
+                  "FR_ARR_77003",
+                  "FR_ARR_77004",
+                  "FR_ARR_77005"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_78": {
+                "label": "D\u00e9partement 78",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_78001",
+                  "FR_ARR_78002",
+                  "FR_ARR_78003",
+                  "FR_ARR_78004"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_91": {
+                "label": "D\u00e9partement 91",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_91001",
+                  "FR_ARR_91002",
+                  "FR_ARR_91003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_92": {
+                "label": "D\u00e9partement 92",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_92001",
+                  "FR_ARR_92002",
+                  "FR_ARR_92003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_93": {
+                "label": "D\u00e9partement 93",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_93001",
+                  "FR_ARR_93002",
+                  "FR_ARR_93003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_94": {
+                "label": "D\u00e9partement 94",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_94001",
+                  "FR_ARR_94002",
+                  "FR_ARR_94003"
+                ],
+                "complete": true
+              },
+              "FR_DEPT_95": {
+                "label": "D\u00e9partement 95",
+                "parent_group": "FR_Ile_de_France",
+                "feature_ids": [
+                  "FR_ARR_95001",
+                  "FR_ARR_95002",
+                  "FR_ARR_95003"
+                ],
+                "complete": true
+              }
+            }
+          }
+        }
+      },
+      "DE": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State",
+            "alias": "parent"
+          }
+        }
+      },
+      "US": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State",
+            "alias": "parent"
+          }
+        }
+      },
+      "CA": {
+        "default_level": "province",
+        "levels": {
+          "province": {
+            "label": "Province / territory",
+            "alias": "parent"
+          }
+        }
+      },
+      "MX": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State",
+            "alias": "parent"
+          }
+        }
+      },
+      "IN": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State / union territory",
+            "alias": "parent"
+          }
+        }
+      },
+      "RU": {
+        "default_level": "subject",
+        "levels": {
+          "subject": {
+            "label": "Federal subject",
+            "alias": "parent"
+          }
+        }
+      },
+      "PL": {
+        "default_level": "voivodeship",
+        "levels": {
+          "voivodeship": {
+            "label": "Voivodeship",
+            "alias": "parent"
+          }
+        }
+      },
+      "UA": {
+        "default_level": "oblast",
+        "levels": {
+          "oblast": {
+            "label": "Oblast",
+            "alias": "parent"
+          }
+        }
+      },
+      "JP": {
+        "default_level": "prefecture",
+        "levels": {
+          "prefecture": {
+            "label": "Prefecture",
+            "alias": "parent"
+          }
+        }
+      },
+      "BR": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State",
+            "alias": "parent"
+          }
+        }
+      },
+      "AU": {
+        "default_level": "state",
+        "levels": {
+          "state": {
+            "label": "State / territory",
+            "alias": "parent"
+          }
+        }
+      },
+      "GB": {
+        "default_level": "region",
+        "levels": {
+          "region": {
+            "label": "Region / constituent country",
+            "groups": {
+              "GB_REGION_UKC": {
+                "label": "North East England",
+                "feature_ids": [
+                  "UKC11",
+                  "UKC12",
+                  "UKC13",
+                  "UKC14",
+                  "UKC21",
+                  "UKC22",
+                  "UKC23",
+                  "GB_NUTS1_UKC"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKD": {
+                "label": "North West England",
+                "feature_ids": [
+                  "UKD11",
+                  "UKD12",
+                  "UKD33",
+                  "UKD34",
+                  "UKD35",
+                  "UKD36",
+                  "UKD37",
+                  "UKD41",
+                  "UKD42",
+                  "UKD44",
+                  "UKD45",
+                  "UKD46",
+                  "UKD47",
+                  "UKD61",
+                  "UKD62",
+                  "UKD63",
+                  "UKD71",
+                  "UKD72",
+                  "UKD73",
+                  "UKD74",
+                  "GB_NUTS1_UKD"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKE": {
+                "label": "Yorkshire and the Humber",
+                "feature_ids": [
+                  "UKE11",
+                  "UKE12",
+                  "UKE13",
+                  "UKE21",
+                  "UKE22",
+                  "UKE31",
+                  "UKE32",
+                  "UKE41",
+                  "UKE42",
+                  "UKE44",
+                  "UKE45",
+                  "GB_NUTS1_UKE"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKF": {
+                "label": "East Midlands",
+                "feature_ids": [
+                  "UKF11",
+                  "UKF12",
+                  "UKF13",
+                  "UKF14",
+                  "UKF15",
+                  "UKF16",
+                  "UKF21",
+                  "UKF22",
+                  "UKF24",
+                  "UKF25",
+                  "UKF30",
+                  "GB_NUTS1_UKF"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKG": {
+                "label": "West Midlands",
+                "feature_ids": [
+                  "UKG11",
+                  "UKG12",
+                  "UKG13",
+                  "UKG21",
+                  "UKG22",
+                  "UKG23",
+                  "UKG24",
+                  "UKG31",
+                  "UKG32",
+                  "UKG33",
+                  "UKG36",
+                  "UKG37",
+                  "UKG38",
+                  "UKG39",
+                  "GB_NUTS1_UKG"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKH": {
+                "label": "East of England",
+                "feature_ids": [
+                  "UKH11",
+                  "UKH12",
+                  "UKH14",
+                  "UKH15",
+                  "UKH16",
+                  "UKH17",
+                  "UKH21",
+                  "UKH23",
+                  "UKH24",
+                  "UKH25",
+                  "UKH31",
+                  "UKH32",
+                  "UKH34",
+                  "UKH35",
+                  "UKH36",
+                  "UKH37",
+                  "GB_NUTS1_UKH"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKI": {
+                "label": "London",
+                "feature_ids": [
+                  "UKI31",
+                  "UKI32",
+                  "UKI33",
+                  "UKI34",
+                  "UKI41",
+                  "UKI42",
+                  "UKI43",
+                  "UKI44",
+                  "UKI45",
+                  "UKI51",
+                  "UKI52",
+                  "UKI53",
+                  "UKI54",
+                  "UKI61",
+                  "UKI62",
+                  "UKI63",
+                  "UKI71",
+                  "UKI72",
+                  "UKI73",
+                  "UKI74",
+                  "UKI75",
+                  "GB_NUTS1_UKI"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKJ": {
+                "label": "South East England",
+                "feature_ids": [
+                  "UKJ11",
+                  "UKJ12",
+                  "UKJ13",
+                  "UKJ14",
+                  "UKJ21",
+                  "UKJ22",
+                  "UKJ25",
+                  "UKJ26",
+                  "UKJ27",
+                  "UKJ28",
+                  "UKJ31",
+                  "UKJ32",
+                  "UKJ34",
+                  "UKJ35",
+                  "UKJ36",
+                  "UKJ37",
+                  "UKJ41",
+                  "UKJ43",
+                  "UKJ44",
+                  "UKJ45",
+                  "UKJ46",
+                  "GB_NUTS1_UKJ"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKK": {
+                "label": "South West England",
+                "feature_ids": [
+                  "UKK11",
+                  "UKK12",
+                  "UKK13",
+                  "UKK14",
+                  "UKK15",
+                  "UKK23",
+                  "UKK24",
+                  "UKK25",
+                  "UKK30",
+                  "UKK41",
+                  "UKK42",
+                  "UKK43",
+                  "GB_NUTS1_UKK"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKL": {
+                "label": "Wales",
+                "feature_ids": [
+                  "UKL11",
+                  "UKL12",
+                  "UKL13",
+                  "UKL14",
+                  "UKL15",
+                  "UKL16",
+                  "UKL17",
+                  "UKL18",
+                  "UKL21",
+                  "UKL22",
+                  "UKL23",
+                  "UKL24",
+                  "GB_NUTS1_UKL"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKM": {
+                "label": "Scotland",
+                "feature_ids": [
+                  "UKM50",
+                  "UKM61",
+                  "UKM62",
+                  "UKM63",
+                  "UKM64",
+                  "UKM65",
+                  "UKM66",
+                  "UKM71",
+                  "UKM72",
+                  "UKM73",
+                  "UKM75",
+                  "UKM76",
+                  "UKM77",
+                  "UKM78",
+                  "UKM81",
+                  "UKM82",
+                  "UKM83",
+                  "UKM84",
+                  "UKM91",
+                  "UKM92",
+                  "UKM93",
+                  "UKM94",
+                  "UKM95",
+                  "GB_NUTS1_UKM"
+                ],
+                "complete": true
+              },
+              "GB_REGION_UKN": {
+                "label": "Northern Ireland",
+                "feature_ids": [
+                  "UKN06",
+                  "UKN07",
+                  "UKN08",
+                  "UKN09",
+                  "UKN0A",
+                  "UKN0B",
+                  "UKN0C",
+                  "UKN0D",
+                  "UKN0E",
+                  "UKN0F",
+                  "UKN0G",
+                  "GB_NUTS1_UKN"
+                ],
+                "complete": true
+              }
+            }
+          }
+        }
+      },
+      "CY": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "EH": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "MC": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "MO": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "AX": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "BS": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "CU": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "FK": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "FO": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "RE": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "YT": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "GF": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "MQ": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "GP": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "GG": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "GL": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "GS": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "HM": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "IM": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "IO": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "JE": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "JM": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "MU": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "MV": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "PM": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "PR": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "SC": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "SH": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "TF": {
+        "parent_available": false,
+        "levels": {}
+      },
+      "TT": {
+        "parent_available": false,
+        "levels": {}
+      }
+    }
   }
 }

@@ -10,6 +10,7 @@ export const VERIFICATION_CATALOG_SOURCE_FILES = Object.freeze([
   "tools/verification/catalog/records/delivery_runtime.mjs",
   "tools/verification/catalog/records/local_feedback.mjs",
   "tools/verification/catalog/records/precision_scaling.mjs",
+  "tools/verification/catalog/records/quick_fill.mjs",
   "tools/verification/catalog/records/renderer_cache_pipeline.mjs",
   "tools/verification/catalog/records/renderer_frame_orchestration.mjs",
   "tools/verification/catalog/records/renderer_interaction.mjs",

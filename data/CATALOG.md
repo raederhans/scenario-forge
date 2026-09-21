@@ -2,7 +2,7 @@
 
 - generated_at: 2026-09-11T02:47:14.044292+00:00
 - version: 1
-- entries: 663
+- entries: 665
 
 ## Counts by role
 
@@ -39,6 +39,8 @@
 | palette_registry | 1 |
 | physical_semantics_topology | 1 |
 | primary_topology | 1 |
+| quick_fill_china_reference | 1 |
+| quick_fill_prefecture_crosswalk | 1 |
 | releasable_catalog | 1 |
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
@@ -119,6 +121,8 @@
 | manifest_output:palettes/red_flood.palette.json | data/palettes/red_flood.palette.json | palette_pack | json | json | schema://json/object/v1 | data/manifest.json::outputs::palettes/red_flood.palette.json::sha256 | default | init_map_data.palette_assets |  |
 | manifest_output:palettes/tno.palette.json | data/palettes/tno.palette.json | palette_pack | json | json | schema://json/object/v1 | data/manifest.json::outputs::palettes/tno.palette.json::sha256 | default | init_map_data.palette_assets |  |
 | source:pl_powiaty | data/poland_powiaty.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::pl_powiaty::current_local_sha256 | default | source_ledger | pl_powiaty |
+| manifest_output:quick_fill/china_prefecture_crosswalk.v1.json | data/quick_fill/china_prefecture_crosswalk.v1.json | quick_fill_prefecture_crosswalk | json | json | schema://quick_fill/prefecture_crosswalk/v1 | data/manifest.json::outputs::quick_fill/china_prefecture_crosswalk.v1.json::sha256 | default | quick_fill_hierarchy |  |
+| manifest_output:quick_fill/reference/china-pca-2017.json | data/quick_fill/reference/china-pca-2017.json | quick_fill_china_reference | json | json | schema://quick_fill/china_reference/v1 | data/manifest.json::outputs::quick_fill/reference/china-pca-2017.json::sha256 | default | quick_fill_hierarchy | china_pca_2017_quick_fill_reference |
 | releasable_catalog | data/releasables/hoi4_vanilla.internal.phase1.catalog.json | releasable_catalog | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.releasable_catalog |  |
 | ru_city_overrides | data/ru_city_overrides.geojson | city_overrides | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.ru_city_overrides |  |
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |

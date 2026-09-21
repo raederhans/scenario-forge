@@ -1,3 +1,4 @@
+import { normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 import {
   createDefaultScenarioDataHealth,
   createDefaultScenarioHydrationHealthGate,
@@ -82,7 +83,7 @@ function createScenarioLifecycleRuntime({
         interactionGranularity: String(runtimeState.interactionGranularity || "subdivision") === "country"
           ? "country"
           : "subdivision",
-        batchFillScope: String(runtimeState.batchFillScope || "parent") === "country" ? "country" : "parent",
+        batchFillScope: normalizeQuickFillScope(runtimeState.batchFillScope),
         politicalEditingExpanded: !!runtimeState.ui?.politicalEditingExpanded,
       };
     }
@@ -104,7 +105,7 @@ function createScenarioLifecycleRuntime({
       runtimeState.interactionGranularity = previous.interactionGranularity === "country"
         ? "country"
         : "subdivision";
-      runtimeState.batchFillScope = previous.batchFillScope === "country" ? "country" : "parent";
+      runtimeState.batchFillScope = normalizeQuickFillScope(previous.batchFillScope);
       if (runtimeState.ui && typeof runtimeState.ui === "object") {
         runtimeState.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
         runtimeState.ui.scenarioVisualAdjustmentsOpen = false;

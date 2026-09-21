@@ -60,10 +60,10 @@ test("district definitions take precedence, including empty districts, and TNO d
   assert.equal(empty.accepted, false);
   state.scenarioDistrictGroupsData.countries.FR.districts = { A: { feature_ids: ["1", "2"] }, B: { feature_ids: ["2", "3", "4"] } };
   const result = policy.resolveCountryParentGroupingCandidate("FR", entries);
-  assert.equal(result.accepted, true);
-  assert.equal(result.featureToGroup.get("2"), "A", "first assignment wins");
+  assert.equal(result.accepted, false);
+  assert.equal(result.featureToGroup.has("2"), false, "conflicting assignments must not be guessed");
   result.featureToGroup.clear();
-  assert.equal(policy.resolveCountryParentGroupingCandidate("FR", entries).featureToGroup.size, 4);
+  assert.equal(policy.resolveCountryParentGroupingCandidate("FR", entries).featureToGroup.size, 3);
 });
 
 test("German state override requires all city states and the bounded state count", () => {

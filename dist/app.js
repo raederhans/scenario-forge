@@ -273,7 +273,7 @@ const translations = {
     dataCardOneTag: "TNO 1962 output",
     dataCardOneTitle: "Atlantropa Mediterranean",
     dataCardOneBody:
-      "896 rendered Atlantropa features and 47 dissolved country owners · Mediterranean extent · scenario output · record schema 1 · sample manifest updated 2026-06-30.",
+      "724 rendered Atlantropa features and 47 dissolved country owners · Mediterranean extent · scenario output · record schema 1 · sample manifest updated 2026-06-30.",
     dataCardTwoTag: "HOI4 comparison output",
     dataCardTwoTitle: "1936 / 1939 Central–Eastern Europe",
     dataCardTwoBody:
@@ -573,7 +573,7 @@ const translations = {
     dataBody: "三个可见输出都链接到公开输出详情、来源记录，以及代码、数据与衍生资产各自适用的许可边界。",
     dataCardOneTag: "TNO 1962 输出",
     dataCardOneTitle: "Atlantropa 地中海",
-    dataCardOneBody: "896 个已渲染 Atlantropa 要素与 47 个已融合国家归属 · 地中海范围 · 场景输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
+    dataCardOneBody: "724 个已渲染 Atlantropa 要素与 47 个已融合国家归属 · 地中海范围 · 场景输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
     dataCardTwoTag: "HOI4 对比输出",
     dataCardTwoTitle: "1936 / 1939 中东欧",
     dataCardTwoBody: "每个场景 90 个已渲染政治要素 · 共享中东欧范围 · 对比输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
