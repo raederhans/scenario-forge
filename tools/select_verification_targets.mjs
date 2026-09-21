@@ -56,6 +56,9 @@ export function automaticOwnershipClassification(changedFile) {
   if (file.startsWith("map_builder/")) {
     return { disposition: "auto-owned", domains: ["geo-contract", "scenario-contracts"] };
   }
+  if (file.startsWith("tools/ci/")) {
+    return { disposition: "auto-owned", domains: ["test-routing"] };
+  }
   if (file.startsWith("data/scenarios/")) {
     return { disposition: "auto-owned", domains: ["scenario-contracts", "scenario-runtime"] };
   }
@@ -690,8 +693,7 @@ function buildRecommendation(changedFiles, allRoutes = buildRouteIndex(), {
       routed: !unroutedChangedFiles.includes(changedFile),
     }));
   const unmatchedChangedFiles = unroutedChangedFiles
-    .filter((file) => !nonBehavioralClassification(file))
-    .filter((file) => !automaticOwnershipClassification(file));
+    .filter((file) => !nonBehavioralClassification(file));
 
   return {
     schemaVersion: 1,
