@@ -28,7 +28,7 @@ jobs:
           curl --fail --location --retry 2 "$base/dist/pca-code.json" -o .runtime/tmp/quick-fill-reference/china-pca-2017.json
           curl --fail --location --retry 2 "$base/LICENSE" -o .runtime/tmp/quick-fill-reference/china-pca-LICENSE.txt
           python -m pip download --no-deps 'pypinyin==0.55.0' --dest .runtime/tmp/quick-fill-reference
-          git archive HEAD AGENTS.md package.json package-lock.json pyproject.toml tools tests map_builder schemas .github data/AGENTS.md data/manifest.json data/source_ledger.json data/CATALOG.json data/CATALOG.md data/runtime_asset_registry.json > .runtime/tmp/quick-fill-reference/tracked-context.tar
+          git ls-files -z -- AGENTS.md package.json package-lock.json tools tests map_builder schemas .github data/AGENTS.md data/manifest.json data/source_ledger.json data/CATALOG.json data/CATALOG.md data/runtime_asset_registry.json | tar --null --files-from=- -cf .runtime/tmp/quick-fill-reference/tracked-context.tar
           sha256sum .runtime/tmp/quick-fill-reference/china-pca-2017.json
       - uses: actions/upload-artifact@v4
         with:
