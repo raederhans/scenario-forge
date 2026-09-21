@@ -46307,17 +46307,17 @@
     },
     {
       "path": "assets/work-alt-history-med.json",
-      "size_bytes": 3660,
+      "size_bytes": 3939,
       "source_kind": "dist"
     },
     {
       "path": "assets/work-alt-history-med.svg",
-      "size_bytes": 106271,
+      "size_bytes": 136868,
       "source_kind": "dist"
     },
     {
       "path": "assets/work-alt-history-med.webp",
-      "size_bytes": 46012,
+      "size_bytes": 45678,
       "source_kind": "dist"
     },
     {
@@ -46487,7 +46487,7 @@
       {
         "file_count": 282,
         "id": "startup-critical",
-        "size_bytes": 5384030
+        "size_bytes": 5383696
       },
       {
         "file_count": 101,
@@ -46497,7 +46497,7 @@
       {
         "file_count": 826,
         "id": "on-demand-product",
-        "size_bytes": 283251189
+        "size_bytes": 283282065
       },
       {
         "file_count": 8048,
@@ -64590,7 +64590,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 566106827,
+        "untraversed_dist_bytes": 566137703,
         "untraversed_dist_file_count": 8814,
         "untraversed_module_count": 7
       },
@@ -65715,7 +65715,7 @@
           },
           {
             "path": "assets/work-alt-history-med.webp",
-            "size_bytes": 46012
+            "size_bytes": 45678
           },
           {
             "path": "assets/work-atlas-japan-corridor.webp",
@@ -65731,7 +65731,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 720890
+        "size_bytes": 720556
       },
       {
         "basis": "html-entrypoint",
@@ -66487,11 +66487,11 @@
           },
           {
             "path": "assets/work-alt-history-med.json",
-            "size_bytes": 3660
+            "size_bytes": 3939
           },
           {
             "path": "assets/work-alt-history-med.svg",
-            "size_bytes": 106271
+            "size_bytes": 136868
           },
           {
             "path": "assets/work-atlas-japan-corridor.json",
@@ -66515,7 +66515,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 4020267
+        "size_bytes": 4051143
       },
       {
         "basis": "product-registry:landing-sample-projects",
@@ -67296,7 +67296,7 @@
             ]
           },
           "owner": "landing-assets",
-          "size_bytes": 4020267
+          "size_bytes": 4051143
         },
         {
           "category": "startup-deferred-runtime",
@@ -67404,7 +67404,7 @@
     {
       "file_count": 57,
       "path": "assets",
-      "size_bytes": 4608772
+      "size_bytes": 4639314
     },
     {
       "file_count": 1,
@@ -67432,5 +67432,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 575518338
+  "total_bytes": 575548880
 }

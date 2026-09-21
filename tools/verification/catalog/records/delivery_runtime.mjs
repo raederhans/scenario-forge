@@ -739,6 +739,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "landing/assets/japan-preview-transport.svg",
       "landing/assets/work-alt-history-med.json",
       "landing/assets/work-alt-history-med.svg",
+      "landing/assets/work-alt-history-med.webp",
       "landing/assets/work-atlas-japan-corridor.json",
       "landing/assets/work-atlas-japan-corridor.svg",
       "landing/assets/work-scenario-switch-europe.json",

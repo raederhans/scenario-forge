@@ -2745,6 +2745,35 @@ test("rollback snapshot composition has no state-alias escape from returned capt
   );
 });
 
+test("quick fill readers reject mutations in imported hierarchy and district dependencies", () => {
+  const readSource = modulePath => fs.readFileSync(modulePath, "utf8");
+  for (const [modulePath, dependencyPath, marker, mutation] of [
+    ["js/core/renderer/fill_target_policy.js", "js/core/quick_fill_hierarchy.js", "let ownershipSnapshot = null;", "state.batchFillScope = 'country';"],
+    ["js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_districts.js", "const normalized = normalizeScenarioDistrictGroupsPayload(payload);", "owners.changed = 'OTHER';"],
+    ["js/core/renderer/fill_target_policy.js", "js/core/feature_identity_shared.js", "function getFeatureId(featureOrId, options = {}) {", "featureOrId.id = 'OTHER';"],
+  ]) {
+    const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath);
+    assert.deepEqual(inspectStateTargetPureReaderFunctionSource(readSource(modulePath), entry, { readSource }).violations, []);
+    const result = inspectStateTargetPureReaderFunctionSource(readSource(modulePath), entry, {
+      readSource: path => path === dependencyPath
+        ? readSource(path).replace(marker, `${marker}\n${mutation}`) : readSource(path),
+    });
+    assert.ok(result.violations.some(({ code, dependencyName }) =>
+      code === "state-target-pure-reader-dependency-source-drift" && dependencyName === dependencyPath), dependencyPath);
+  }
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.functionName === "createFillTargetPolicy");
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(readSource(entry.modulePath), entry, {
+    readSource: path => readSource(path).replace(/\r?\n/g, "\r\n"),
+  }).violations, [], "dependency receipts are portable across checkout line endings");
+  assert.ok(inspectStateTargetPureReaderFunctionSource(readSource(entry.modulePath), entry, {
+    readSource: () => { throw new Error("dependency unavailable"); },
+  }).violations.some(({ code }) => code === "state-target-pure-reader-dependency-source-unavailable"));
+  for (const dependencyFingerprints of [[], { "../outside.js": "0".repeat(64) }, { "js/core/quick_fill_hierarchy.js": "invalid" }]) {
+    assert.ok(validateStateTargetPureReaderContract([{ ...entry, dependencyFingerprints }]).some(({ code }) =>
+      code === "state-target-pure-reader-dependencies-invalid"));
+  }
+});
+
 test("renderer policy readers bind exact source and reject injected state writes", async () => {
   for (const module of ["bathymetry_style_policy", "parent_border_grouping_policy", "visible_frame_identity_policy", "fill_target_policy"]) {
     const modulePath = `js/core/renderer/${module}.js`;

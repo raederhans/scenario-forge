@@ -285,7 +285,9 @@ test("local owner feedback selects existing behavior without admitting broader r
       assert.deepEqual(local.unmatchedChangedFiles, [], source);
       assert.deepEqual(local.localEntrypointRouteGaps, [], source);
       assert.deepEqual(local.recommendedCommands.map((entry) => entry.commandRef),
-        [testFile, ...additionalTests].map((file) => "node --test " + file), source);
+        [...((source === "js/ui/toolbar/workspace_chrome_support_surface_controller.js")
+          ? ["node --test tests/quick_fill_level_controls.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs"] : []),
+          ...[testFile, ...additionalTests].map((file) => "node --test " + file)], source);
       for (const command of local.recommendedCommands) {
         assert.equal(command.executionOwner, "child-safe");
         assert.deepEqual(command.resourceLocks, []);
@@ -353,7 +355,7 @@ test("authored catalog source covers command authority, policies, and every proj
   assert.equal(summary.packageAliasCount, 17);
   assert.equal(summary.prProfileCount, 4);
   assert.equal(summary.nightlyRoleCount, 12);
-  assert.equal(summary.documentationProjectionCount, 60);
+  assert.equal(summary.documentationProjectionCount, 61);
 });
 
 test("renderer split delivery records route to assembly verification", () => {
