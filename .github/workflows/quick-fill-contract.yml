@@ -75,6 +75,23 @@ jobs:
           curl --fail --location --retry 2 "$base/LICENSE" -o data/quick_fill/reference/LICENSE.china-pca.txt
           python tools/build_china_prefecture_crosswalk.py > .runtime/reports/generated/quick-fill-china-build.json
           npm run build:quick-fill
+          python - <<'PY'
+          import json, pathlib, re
+          count = json.loads(pathlib.Path('data/CATALOG.json').read_text())['counts']['entries']
+          path = pathlib.Path('landing/index.html')
+          text = path.read_text()
+          old = re.findall(r'data-stat-id="catalog-assets"[^>]*data-stat-value="(\d+)"', text)
+          if len(old) != 1:
+              raise SystemExit('Expected one catalog statistic')
+          old = old[0]
+          for before, after in [(f'data-stat-value="{old}">{old}</span>', f'data-stat-value="{count}">{count}</span>'), (f'data-story-evidence-value="{old}">{old}</dd>', f'data-story-evidence-value="{count}">{count}</dd>')]:
+              if text.count(before) != 1:
+                  raise SystemExit('Unexpected landing catalog counter structure')
+              text = text.replace(before, after, 1)
+          path.write_text(text)
+          write_set = pathlib.Path('.runtime/tmp/quick-fill/implementation-files.json')
+          write_set.write_text(json.dumps(json.loads(write_set.read_text()) + ['landing/index.html']))
+          PY
       - name: Focused runtime and data checks
         shell: bash
         run: |
