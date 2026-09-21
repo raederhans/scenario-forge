@@ -4,12 +4,14 @@ import {
   buildInteractionInfrastructureAfterStartup as buildInteractionInfrastructureAfterStartupDefault,
 } from "../core/map_renderer/public.js";
 import {
+  captureScenarioRefreshState,
   refreshMapDataForScenarioApply,
   setMapData,
 } from "../core/scenario/scenario_renderer_bridge.js";
 import { refreshScenarioShellOverlays } from "../core/scenario_shell_overlay.js";
 import { patchScenarioChunkLoadState } from "../core/state/actions/scenario_chunk_runtime_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "../core/state/actions/scenario_chunk_promotion_actions.js";
+import { isScenarioRefreshSceneCurrent } from "../core/map_renderer/scenario_refresh_scope.js";
 import { getDeferredPromotionDelay } from "./startup_bootstrap_support.js";
 
 const MAX_FORCED_STARTUP_INFRA_RETRIES = 2;
@@ -93,11 +95,14 @@ export function createDeferredDetailPromotionOwner({
   function applyDetailPromotionMapRefresh({
     interactionLevel = "full",
     deferInteractionInfrastructure = false,
+    previousRefreshState = null,
   } = {}) {
     const hasActiveScenario = !!String(runtimeState.activeScenarioId || "").trim();
     if (hasActiveScenario) {
-      refreshMapDataForScenarioApply({ suppressRender: true });
-      return "light";
+      const result = refreshMapDataForScenarioApply({
+        suppressRender: true, refreshKind: "deferred-detail", previousRefreshState,
+      });
+      return result?.mode || "full";
     }
     setMapData({
       refitProjection: false,
@@ -134,16 +139,16 @@ export function createDeferredDetailPromotionOwner({
       reason: "detail-promotion-focus",
       flushPending: flushPendingFocusRefresh,
     });
+    const previousRefreshState = captureScenarioRefreshState();
     let mapDataRefreshed = false;
     if (hasDetailTopologyLoaded()) {
       if (runtimeState.topologyBundleMode !== "composite") {
         runtimeState.topologyBundleMode = "composite";
         if (applyMapData) {
-          applyDetailPromotionMapRefresh({
-            interactionLevel,
-            deferInteractionInfrastructure,
+          const refreshMode = applyDetailPromotionMapRefresh({
+            interactionLevel, deferInteractionInfrastructure, previousRefreshState,
           });
-          mapDataRefreshed = true;
+          mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";
           if (!suppressRender) {
             if (renderDispatcher?.schedule) {
               renderDispatcher.schedule();
@@ -168,6 +173,7 @@ export function createDeferredDetailPromotionOwner({
     }
 
     runtimeState.detailPromotionInFlight = true;
+    let staleScene = false;
     try {
       const {
         topologyDetail,
@@ -184,6 +190,11 @@ export function createDeferredDetailPromotionOwner({
         return false;
       }
 
+      if (!isScenarioRefreshSceneCurrent(previousRefreshState, captureScenarioRefreshState())) {
+        staleScene = true;
+        return false;
+      }
+      const previousRuntimePoliticalTopology = runtimeState.runtimePoliticalTopology;
       runtimeState.topologyDetail = topologyDetail;
       if (shouldAdoptDeferredRuntimePoliticalTopology()) {
         runtimeState.runtimePoliticalTopology = runtimePoliticalTopology || runtimeState.runtimePoliticalTopology;
@@ -196,20 +207,19 @@ export function createDeferredDetailPromotionOwner({
       runtimeState.detailPromotionCompleted = true;
       runtimeState.detailSourceRequested = detailSourceUsed || runtimeState.detailSourceRequested;
 
-      refreshScenarioShellOverlays({
-        renderNow: false,
-        borderReason: "detail-promotion",
-        refreshOpeningOwnerBorders: false,
-      });
+      if (previousRuntimePoliticalTopology !== runtimeState.runtimePoliticalTopology) {
+        refreshScenarioShellOverlays({
+          renderNow: false, borderReason: "detail-promotion", refreshOpeningOwnerBorders: false,
+        });
+      }
       console.info(
         `[main] Detail promotion applied. source=${runtimeState.detailSourceRequested}, mode=${runtimeState.topologyBundleMode}.`
       );
       if (applyMapData) {
         const refreshMode = applyDetailPromotionMapRefresh({
-          interactionLevel,
-          deferInteractionInfrastructure,
+          interactionLevel, deferInteractionInfrastructure, previousRefreshState,
         });
-        mapDataRefreshed = true;
+        mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";
         if (!suppressRender) {
           if (renderDispatcher?.schedule) {
             renderDispatcher.schedule();
@@ -229,6 +239,7 @@ export function createDeferredDetailPromotionOwner({
       return false;
     } finally {
       runtimeState.detailPromotionInFlight = false;
+      if (staleScene && !runtimeState.startupReadonly) scheduleDeferredDetailPromotion(renderDispatcher);
     }
   }
 

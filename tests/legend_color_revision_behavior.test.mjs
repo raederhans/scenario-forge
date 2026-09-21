@@ -39,6 +39,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
   for (let index = 0; index < 20; index++) read(state);
   assert.equal(scans, 1);
   let visibleColors;
+  const deferredRenders = [];
   const refresh = rendererFunction("refreshResolvedColorsForFeatures", {
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
     getCountryFillPaletteOwner: () => palette,
@@ -51,17 +52,23 @@ test("visible legend avoids feature scans until actual renderer color transactio
     invalidateRenderPasses() {}, shouldRefreshContextBaseForColorChanges: () => false,
     recordPartialColorRefreshDiagnostics() {}, rendererSurfaceHost: { getContext: () => ({}) },
     requestRendererRender: (_reason, { fallback }) => fallback(),
+    scheduleDeferredWork: (callback) => deferredRenders.push(callback),
+    politicalPatchPreviewBudget: { isDeferred: () => false },
     render: () => {
       assert.equal(state.colorRevision, 1);
-      assert.equal(dominantColors.get("AA"), "#abcdef", "palette notification commits before synchronous render");
+      assert.equal(dominantColors.get("AA"), "#abcdef", "palette notification commits before deferred render");
       assert.equal(dominantColors.get("BB"), "#445566", "unpainted country's palette is preserved");
       visibleColors = read(state);
     },
   });
   refresh(["A"], { renderNow: true });
   assert.equal(state.colors, colors, "transaction mutates the existing table");
+  assert.equal(state.colorRevision, 1, "color transaction commits before deferred presentation");
+  assert.equal(visibleColors, undefined, "fallback does not render synchronously");
+  assert.equal(deferredRenders.length, 1);
+  deferredRenders.shift()();
   assert.deepEqual(visibleColors, ["#abcdef", "#445566"]);
-  assert.equal(scans, 2, "revision already changed before synchronous render fallback");
+  assert.equal(scans, 2, "revision already changed before deferred render fallback");
   refresh(["B"], { renderNow: false });
   assert.equal(state.colorRevision, 2);
   assert.equal(dominantColors.get("BB"), "#abcdef", "non-rendering color transactions also update palette");
