@@ -21,6 +21,13 @@ test("runtime changes select smoke, Pages and sampled performance", () => {
   assert.equal(plan.perfMode, "sample");
 });
 
+test("PR control-plane changes force browser smoke and Golden Demo", () => {
+  const plan = planPullRequest({ changedFiles: [".github/workflows/pr-verify.yml"] });
+  assert.equal(plan.runSmoke, true);
+  assert.equal(plan.runDemo, true);
+  assert.equal(plan.runPages, false);
+});
+
 test("one scenario change selects only its strict contract job", () => {
   const plan = planPullRequest({ changedFiles: ["data/scenarios/tno_1962/manifest.json"] });
   assert.deepEqual(plan.scenarioIds, ["tno_1962"]);
