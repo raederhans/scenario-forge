@@ -671,7 +671,16 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         )
         boundary_call_sites = re.findall(r'\b(?:void|await)\s+commitPendingScenarioChunkPromotionWithErrorBoundary\s*\(', self.scenario_chunk_runtime_source)
         self.assertEqual(len(commit_call_sites), 1)
-        self.assertEqual(len(boundary_call_sites), 3)
+        self.assertEqual(len(boundary_call_sites), 4)
+        export_detail = self._slice_between(
+            self.scenario_chunk_runtime_source,
+            "async function ensureScenarioPoliticalDetailForExport(",
+            "function scheduleScenarioChunkRefresh(",
+        )
+        self.assertIn(
+            "await commitPendingScenarioChunkPromotionWithErrorBoundary({ bundle, renderNow: true, rethrow: true });",
+            export_detail,
+        )
         error_boundary = self._slice_between(
             self.scenario_chunk_runtime_source,
             "async function commitPendingScenarioChunkPromotionWithErrorBoundary(",

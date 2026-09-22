@@ -26,6 +26,23 @@ const STARTUP_SUPPORT_AUDIT_REPORT_URL = "/__dev/startup-support/key-usage-repor
 const DEFAULT_SCENARIO_DISABLED_OVERRIDE = "none";
 const VIEW_SETTINGS_STORAGE_KEY = "map_view_settings_v1";
 
+export async function waitForStartupRenderSettle(targetState, {
+  waitForFrame = () => new Promise((resolve) => globalThis.requestAnimationFrame(resolve)),
+  now = () => globalThis.performance.now(),
+  timeoutMs = 2000,
+} = {}) {
+  const deadline = now() + timeoutMs;
+  // Restoring sidebar layout can briefly mark a data-ready startup as
+  // interacting. Let its existing idle transition run before the strict
+  // first-frame assertion; never manufacture a painted frame or idle state.
+  while (!targetState.firstVisibleFramePainted
+    && (targetState.renderPhase === "interacting" || targetState.renderPhase === "settling")) {
+    if (now() >= deadline) return false;
+    await waitForFrame();
+  }
+  return true;
+}
+
 /**
  * Startup bootstrap support helpers.
  * 这里统一放启动期的纯辅助逻辑、默认场景解析、startup bundle URL 组装和启动审计辅助。

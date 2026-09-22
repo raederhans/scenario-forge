@@ -1,5 +1,6 @@
 // Semantic quick-fill membership. No rendering thresholds, DOM, or state writes.
 // Hierarchy payloads are immutable snapshots; replacing a snapshot invalidates the index.
+import { getEffectiveScenarioHierarchy } from "./scenario_hierarchy.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import { normalizeScenarioDistrictGroupsPayload } from "./scenario_districts.js";
 
@@ -182,7 +183,8 @@ export function createQuickFillHierarchyResolver(state, {
       // Preserve TNO's opt-out. Geographic levels remain an explicit user choice.
       if (scenario.toLowerCase() === "tno_1962") return result("scenario_level_unavailable", metadata);
     }
-    const country = getQuickFillHierarchyIndex(state.hierarchyData).countries.get(countryCode);
+    const hierarchy = getEffectiveScenarioHierarchy(state);
+    const country = getQuickFillHierarchyIndex(hierarchy).countries.get(countryCode);
     const levelId = scope.startsWith("level:") ? scope.slice(6) : country?.defaultLevel || "parent";
     const level = country?.levels.get(levelId);
     if (level) {
@@ -192,7 +194,7 @@ export function createQuickFillHierarchyResolver(state, {
     }
     if (scope.startsWith("level:")) return result("unsupported_level", { ...metadata, level: levelId });
     if (country?.noParent) return result("no_parent_level", metadata);
-    if (state.hierarchyData == null) return result("loading", metadata);
+    if (hierarchy == null) return result("loading", metadata);
 
     // Legacy direct attributes remain supported, independently of border visibility.
     const direct = text(getAdmin1Group(feature));

@@ -2416,6 +2416,8 @@ function createScenarioChunkRuntimeController({
       chunks: politicalChunks,
       focusCountry,
       viewportBbox: getCurrentScenarioChunkViewportBbox(),
+      zoom: Number(runtimeState.zoomTransform?.k || 1),
+      loadedChunkIds: runtimeState.activeScenarioChunks?.loadedChunkIds || [],
       renderBudgetHints: bundle?.runtimeShell?.renderBudgetHints || bundle?.manifest?.render_budget_hints || {},
     });
     if (!targetChunks.length) return null;
@@ -2429,6 +2431,7 @@ function createScenarioChunkRuntimeController({
     renderNow = true,
     allowStartupInitialVisual = false,
     startupInitialPoliticalOnly = false,
+    requireDetail = false,
   } = {}) {
     const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
     if (!scenarioId) return null;
@@ -2509,6 +2512,7 @@ function createScenarioChunkRuntimeController({
       renderBudgetHints: bundle.runtimeShell?.renderBudgetHints || bundle.manifest?.render_budget_hints || {},
       visibleLayers,
       loadedChunkIds: chunkState.loadedChunkIds,
+      requireDetail,
     });
     const previousSelection = loadState.lastSelection;
     const normalizedReason = String(reason || "refresh").trim().toLowerCase();
@@ -3168,6 +3172,56 @@ function createScenarioChunkRuntimeController({
     return result;
   }
 
+  async function ensureScenarioPoliticalDetailForExport({ d3Client = globalThis.d3 } = {}) {
+    const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    const bundle = getCachedScenarioBundle(scenarioId);
+    if (!bundle) return;
+    const continuation = captureScenarioChunkLoadStateContinuation(runtimeState);
+    const transform = runtimeState.zoomTransform;
+    const view = [transform?.k, transform?.x, transform?.y];
+    const assertCurrent = () => {
+      if (!isScenarioChunkLoadStateContinuationCurrent(continuation, {
+        scenarioId,
+        scenarioApplyRequestId: continuation.continuationScenarioApplyRequestId,
+      }) || runtimeState.scenarioApplyInFlight
+        || view.some((value, index) => value !== [runtimeState.zoomTransform?.k,
+          runtimeState.zoomTransform?.x, runtimeState.zoomTransform?.y][index])) {
+        throw new Error("The map changed while preparing detailed export geometry. Try exporting again.");
+      }
+    };
+    assertCurrent();
+    if (!bundle.chunkRegistry && scenarioSupportsChunkedRuntime(bundle.manifest)) {
+      await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+      assertCurrent();
+      if (!bundle.chunkRegistry) throw new Error("The export geometry registry is not ready.");
+    }
+    // Legacy assets have no display variants to upgrade.
+    if (!bundle.chunkRegistry?.byLayer?.political?.some((chunk) => chunk.lodGroupId)) return;
+    const selection = await refreshActiveScenarioChunks({
+      reason: "export-detail", d3Client, renderNow: true, requireDetail: true,
+    });
+    assertCurrent();
+    if (!selection) throw new Error("Detailed export geometry is not ready. Wait for the map to settle.");
+    const loadState = ensureRuntimeChunkLoadState();
+    const selectionVersion = loadState.selectionVersion;
+    await commitPendingScenarioChunkPromotionWithErrorBoundary({ bundle, renderNow: true, rethrow: true });
+    assertCurrent();
+    if (loadState !== runtimeState.runtimeChunkLoadState || selectionVersion !== loadState.selectionVersion
+      || loadState.pendingPromotion || loadState.promotionCommitInFlight) {
+      throw new Error("Detailed export geometry has not finished rendering. Try exporting again.");
+    }
+    // Read the committed geometry, not the prewarm cache or the pending merge.
+    const committedGeometries = new Set((runtimeState.scenarioPoliticalChunkData?.features || [])
+      .map((feature) => feature.geometry));
+    for (const chunk of selection.requiredChunks.filter((entry) => entry.lodGroupId)) {
+      const payload = runtimeState.activeScenarioChunks?.payloadByChunkId?.[chunk.id]?.payload;
+      if (chunk.lod !== "detail" || !payload?.features?.length
+        || payload.features.some((feature) => !committedGeometries.has(feature.geometry))) {
+        throw new Error("Detailed export geometry could not be committed. Try exporting again.");
+      }
+    }
+  }
+
   function scheduleScenarioChunkRefresh({
     reason = "refresh",
     delayMs = null,
@@ -3419,6 +3473,7 @@ function createScenarioChunkRuntimeController({
     preloadScenarioCoarseChunks,
     preloadScenarioFocusCountryPoliticalDetailChunk,
     awaitInitialScenarioChunkVisualPromotion,
+    ensureScenarioPoliticalDetailForExport,
     scheduleScenarioChunkRefresh,
   };
 }

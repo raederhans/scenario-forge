@@ -33,7 +33,7 @@ import {
   normalizeHexColor,
 } from "../core/palette_manager.js";
 import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
-import { ensureActiveScenarioOptionalLayerLoaded } from "../core/scenario_resources.js";
+import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
 import { resetScenarioToBaselineCommand } from "../core/scenario_dispatcher.js";
 import { toggleLanguage, updateUIText, t } from "./i18n.js";
 import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
@@ -2440,6 +2440,7 @@ function initToolbar({ render } = {}) {
   };
 
   const bakeLayer = async (layerId, exportUiOverride = null) => {
+    await ensureScenarioPoliticalDetailForExport();
     const exportUi = exportUiOverride && typeof exportUiOverride === "object"
       ? exportUiOverride
       : ensureExportWorkbenchUiState();
@@ -2560,6 +2561,7 @@ function initToolbar({ render } = {}) {
   });
 
   const buildCompositeSourceCanvas = async (exportUi) => {
+    await ensureScenarioPoliticalDetailForExport();
     const passNames = resolveExportPassSequence({
       ...exportUi,
       visibility: exportUi.visibility,
@@ -2589,6 +2591,7 @@ function initToolbar({ render } = {}) {
   };
 
   const buildSingleExportSourceCanvas = async (exportUi, sourceId) => {
+    await ensureScenarioPoliticalDetailForExport();
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);

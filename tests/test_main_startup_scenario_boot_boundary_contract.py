@@ -95,7 +95,7 @@ class MainStartupScenarioBootBoundaryContractTest(unittest.TestCase):
         self.assertIn("await finalizeReadyState(renderDispatcher);", donor_content)
         self.assertRegex(
             donor_content,
-            r"setBootState\(\"warmup\"\);\s*invalidateAllRenderPasses\(\"bootstrap-first-political-frame\"\);\s*renderDispatcher\.flush\(\);\s*assertStartupFirstVisibleFrameAccepted\(\"bootstrap-first-political-frame\"\);",
+            r"setBootState\(\"warmup\"\);\s*invalidateAllRenderPasses\(\"bootstrap-first-political-frame\"\);\s*await waitForStartupRenderSettle\(runtimeState\);\s*renderDispatcher\.flush\(\);\s*assertStartupFirstVisibleFrameAccepted\(\"bootstrap-first-political-frame\"\);",
         )
         self.assertIsNone(re.search(r"await applyScenarioBundleCommand\s*\(", donor_content))
         self.assertIsNone(re.search(r"defaultScenarioBundle\s*=\s*await loadScenarioBundle\s*\(", donor_content))

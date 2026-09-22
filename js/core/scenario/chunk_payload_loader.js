@@ -95,7 +95,9 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
     beginScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
     if (promiseCache[chunkId]) {
       for (const [request, entry] of chunkRequestsByRequest) {
-        if (entry.bundle === bundle && entry.chunkId === chunkId) scheduler.reprioritize(request, priority);
+        // Joining a visible request from speculative prewarm must not demote it.
+        // Only a new selection above may explicitly lower obsolete priorities.
+        if (entry.bundle === bundle && entry.chunkId === chunkId) scheduler.promote(request, priority);
       }
       try {
         const payload = await promiseCache[chunkId];

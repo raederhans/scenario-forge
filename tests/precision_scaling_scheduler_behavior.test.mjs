@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createChunkLoadScheduler, estimateChunkLoadBytes } from "../js/core/scenario/chunk_load_scheduler.js";
 import { createScenarioChunkPayloadLoader } from "../js/core/scenario/chunk_payload_loader.js";
 const flush = () => new Promise(setImmediate);
@@ -113,4 +114,61 @@ test("real loader scene switch cancels queued fetches and rejects late outgoing 
   assert.equal(h.state.runtimeChunkLoadState.inFlightByChunkId.a, undefined);
   assert.equal(h.state.runtimeChunkLoadState.inFlightByChunkId.b, undefined);
   assert.equal(h.loader.getLoadSchedulerStats().active, 0);
+});
+
+test("joining visible work from prewarm cannot lower its priority", async () => {
+  const h = loaderHarness();
+  const blocker = h.loader.loadScenarioChunkPayload(h.bundle, h.meta("blocker"));
+  await flush();
+  const older = h.loader.loadScenarioChunkPayload(h.bundle, h.meta("older"));
+  const visible = h.loader.loadScenarioChunkPayload(h.bundle, h.meta("visible"), { priority: 1 });
+  const prewarm = h.loader.loadScenarioChunkPayload(h.bundle, h.meta("visible"));
+  assert.equal(h.loader.getLoadSchedulerStats().queuedEstimatedBytes, 12);
+  h.pending.get("blocker").resolve({ payload: { features: [] } });
+  await blocker; await flush();
+  assert.deepEqual(h.starts, ["blocker", "visible"]);
+  h.pending.get("visible").resolve({ payload: { features: [] } });
+  assert.equal(await visible, await prewarm);
+  await flush(); h.pending.get("older").resolve({ payload: { features: [] } }); await older;
+  assert.equal(h.loader.getLoadSchedulerStats().queuedEstimatedBytes, 0);
+  assert.equal(h.loader.getLoadSchedulerStats().completed, 3);
+});
+
+test("queued cancellation removes its cost without releasing running reservations", async () => {
+  const scheduler = createChunkLoadScheduler({ maxConcurrent: 1 });
+  const g = gate(), controller = new AbortController();
+  const active = scheduler.schedule(() => g.promise, { bytes: 20 });
+  await flush();
+  const queued = scheduler.schedule(() => assert.fail("cancelled decode started"), { bytes: 30, signal: controller.signal });
+  const rejected = assert.rejects(queued, { name: "AbortError" });
+  assert.equal(scheduler.getStats().queuedEstimatedBytes, 30);
+  controller.abort(); await rejected;
+  assert.equal(scheduler.getStats().queuedEstimatedBytes, 0);
+  assert.equal(scheduler.getStats().inFlightEstimatedBytes, 20);
+  assert.equal(scheduler.getStats().cancelledBeforeStart, 1);
+  g.resolve(); await active;
+});
+
+test("real TNO cost distribution remains admitted within limits under repeated country expansion", async () => {
+  const manifest = JSON.parse(readFileSync(new URL("../data/scenarios/tno_1962/detail_chunks.manifest.json", import.meta.url)));
+  const chunks = manifest.chunks.filter((chunk) => chunk.layer === "political");
+  assert.ok(chunks.length > 100);
+  let observations = 0;
+  const violations = [];
+  const scheduler = createChunkLoadScheduler({ onMetric(stats) {
+    // An indivisible oversized base is permitted, but must execute alone.
+    if (stats.active > 2) violations.push("concurrency");
+    if (stats.inFlightEstimatedBytes > stats.maxInFlightBytes && stats.active !== 1) violations.push("byte budget");
+    observations++;
+  } });
+  // Use actual declared costs while avoiding a network/decode benchmark claim.
+  const tasks = Array.from({ length: 3 }, () => chunks.map((meta) => scheduler.schedule(async () => {
+    await flush(); return meta.id;
+  }, { bytes: estimateChunkLoadBytes(meta) }))).flat();
+  await Promise.all(tasks);
+  assert.deepEqual(violations, []);
+  assert.ok(observations > tasks.length);
+  assert.equal(scheduler.getStats().completed, tasks.length);
+  assert.equal(scheduler.getStats().queuedEstimatedBytes, 0);
+  assert.equal(scheduler.getStats().inFlightEstimatedBytes, 0);
 });

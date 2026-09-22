@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { initLongAnimationFrameObserver } from "../js/bootstrap/startup_bootstrap_support.js";
+import { initLongAnimationFrameObserver, waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 import { state as runtimeState } from "../js/core/state.js";
 import {
   setLongAnimationFrameObserver,
@@ -17,6 +17,42 @@ function restoreGlobalProperty(name, hadProperty, value) {
   }
   delete globalThis[name];
 }
+
+test("startup waits for layout interaction to settle without accepting a frame itself", async () => {
+  const state = { renderPhase: "interacting", firstVisibleFramePainted: false };
+  let frames = 0;
+  assert.equal(await waitForStartupRenderSettle(state, {
+    now: () => frames * 16,
+    waitForFrame: async () => {
+      frames += 1;
+      state.renderPhase = frames === 1 ? "settling" : "idle";
+    },
+  }), true);
+  assert.equal(frames, 2);
+  assert.equal(state.firstVisibleFramePainted, false);
+});
+
+test("startup does not wait when the render phase or accepted frame is already ready", async () => {
+  for (const state of [
+    { renderPhase: "idle", firstVisibleFramePainted: false },
+    { renderPhase: "interacting", firstVisibleFramePainted: true },
+  ]) {
+    assert.equal(await waitForStartupRenderSettle(state, {
+      waitForFrame: async () => assert.fail("unexpected frame wait"),
+    }), true);
+  }
+});
+
+test("startup's layout wait is bounded and preserves the failed-frame gate", async () => {
+  const state = { renderPhase: "interacting", firstVisibleFramePainted: false };
+  let elapsed = 0;
+  assert.equal(await waitForStartupRenderSettle(state, {
+    now: () => elapsed,
+    timeoutMs: 32,
+    waitForFrame: async () => { elapsed += 16; },
+  }), false);
+  assert.deepEqual(state, { renderPhase: "interacting", firstVisibleFramePainted: false });
+});
 
 test("long animation frame observer is committed only after observe succeeds", () => {
   const hadObserverApi = Object.hasOwn(globalThis, "PerformanceObserver");

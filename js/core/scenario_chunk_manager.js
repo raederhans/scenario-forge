@@ -365,11 +365,20 @@ function takeRequiredChunksWithinCostBudget(orderedChunks = [], {
   return selected;
 }
 
-export function selectScenarioFocusPrewarmChunks({ chunks = [], focusCountry = "", viewportBbox, renderBudgetHints = {} } = {}) {
+export function selectScenarioFocusPrewarmChunks({ chunks = [], focusCountry = "", viewportBbox, renderBudgetHints = {},
+  zoom, loadedChunkIds = [], requireDetail = false } = {}) {
   const country = String(focusCountry || "").trim().toUpperCase();
   if (!country) return [];
   const bounds = normalizeBounds(viewportBbox);
-  const candidates = chunks.filter((chunk) => chunk?.lod === "detail" && chunk.countryCodes?.includes(country));
+  const countryChunks = chunks.filter((chunk) => chunk?.countryCodes?.includes(country));
+  // Legacy callers and shards retain their existing detail prewarm. Declared
+  // families consume the current display precision; explicit exact consumers
+  // can request detail without mutating the resident hysteresis state.
+  const candidates = requireDetail || !Number.isFinite(zoom)
+    ? countryChunks.filter((chunk) => chunk.lod === "detail")
+    : selectPoliticalLodFamilies(countryChunks.filter((chunk) => chunk.lodGroupId
+      ? zoom >= chunk.minZoom && zoom < chunk.maxZoom
+      : chunk.lod === "detail"), loadedChunkIds);
   const visible = candidates.filter((chunk) => chunkIntersectsViewport(chunk, bounds));
   const hints = normalizeScenarioRenderBudgetHints(renderBudgetHints);
   // Prewarming is speculative. Warm at most two nearby shards, then leave the
@@ -577,6 +586,7 @@ export function selectScenarioChunks({
   renderBudgetHints = {},
   visibleLayers = [],
   loadedChunkIds = [],
+  requireDetail = false,
 } = {}) {
   const hints = normalizeScenarioRenderBudgetHints(renderBudgetHints);
   const normalizedFocusCountry = String(focusCountry || "").trim().toUpperCase();
@@ -627,6 +637,19 @@ export function selectScenarioChunks({
         ? hints.max_required_political_byte_size
         : hints.max_required_byte_size,
     });
+    // Exact consumers upgrade the display selection after admission. Preserve
+    // its footprint and legacy chunks; a family must never silently fall back.
+    if (requireDetail && layerKey === "political") {
+      const registryChunks = chunkRegistry?.byLayer?.political || [];
+      for (let index = 0; index < requiredForLayer.length; index += 1) {
+        const chunk = requiredForLayer[index];
+        if (!chunk.lodGroupId) continue;
+        const detail = registryChunks.find((candidate) =>
+          candidate.lodGroupId === chunk.lodGroupId && candidate.lod === "detail");
+        if (!detail) throw new Error(`Missing detail geometry for LOD family ${chunk.lodGroupId}.`);
+        requiredForLayer[index] = detail;
+      }
+    }
     required.push(...requiredForLayer);
     if (optionalBudget > 0) {
       const requiredIdSet = new Set(requiredForLayer.map((chunk) => chunk.id));

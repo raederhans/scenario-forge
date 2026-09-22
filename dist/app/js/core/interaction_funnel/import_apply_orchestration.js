@@ -60,6 +60,7 @@ export async function prepareImportedProjectState({
   const scenarioState = preparedScenario ? {
     activeScenarioId: preparedScenario.staged.scenarioId,
     activeScenarioManifest: preparedScenario.bundle.manifest,
+    scenarioBaselineHash: preparedScenario.bundle.manifest.baseline_hash || "",
     scenarioBaselineOwnersByFeatureId: preparedScenario.staged.resolvedOwners,
     mapSemanticMode: preparedScenario.staged.mapSemanticMode,
     scenarioCountriesByTag: preparedScenario.staged.countryMap,
@@ -71,6 +72,7 @@ export async function prepareImportedProjectState({
   data = await migrateFeatureScopedProjectDataToCurrentTopology(data, {
     landData: scenarioImportValidFeatureIds ? null : state.landData,
     validFeatureIds: scenarioImportValidFeatureIds,
+    scenarioManifest: preparedScenario?.bundle?.manifest || null,
     onMigration: (summary) => { migrationSummary = summary; },
   });
   debugState.importPhase = "migration-done";

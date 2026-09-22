@@ -1,3 +1,4 @@
+import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
 // Sidebar UI (Phase 13)
 import {
   state as runtimeState,
@@ -375,16 +376,17 @@ function ensureCountryPaletteColor(code, fallbackIndex = 0) {
   return generated;
 }
 
-function getHierarchyGroupsForCode(code) {
+export function getHierarchyGroupsForCode(code) {
   const normalizedCode = normalizeCountryCode(code);
   if (!normalizedCode) return [];
-  if (runtimeState.hierarchyGroupsByCode.size > 0) {
+  const hierarchy = getEffectiveScenarioHierarchy(runtimeState);
+  if (hierarchy === runtimeState.hierarchyData && runtimeState.hierarchyGroupsByCode.size > 0) {
     return runtimeState.hierarchyGroupsByCode.get(normalizedCode) || [];
   }
-  if (!runtimeState.hierarchyData || !runtimeState.hierarchyData.groups) return [];
-  const labels = runtimeState.hierarchyData.labels || {};
+  if (!hierarchy?.groups) return [];
+  const labels = hierarchy.labels || {};
   const groups = [];
-  Object.entries(runtimeState.hierarchyData.groups).forEach(([groupId, children]) => {
+  Object.entries(hierarchy.groups).forEach(([groupId, children]) => {
     if (!groupId.startsWith(`${normalizedCode}_`)) return;
     const label = labels[groupId] || groupId.replace(`${normalizedCode}_`, "").replace(/_/g, " ");
     groups.push({
