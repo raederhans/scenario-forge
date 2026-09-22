@@ -38,6 +38,7 @@ export function nonBehavioralClassification(changedFile) {
   // This is an agent setting, not an application state writer. Classification
   // here does not validate TOML syntax or authorize its configuration values.
   if (changedFile === ".codex/config.toml") return "agent-tool-config";
+  if (changedFile === "README.zh-CN.md") return "documentation-advisory";
   if (changedFile.startsWith("docs/") && !changedFile.startsWith("docs/perf/") && !changedFile.startsWith("docs/testing/")) {
     return "documentation-advisory";
   }

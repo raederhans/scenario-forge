@@ -10,7 +10,7 @@
       38.5,
       47.8
     ],
-    "projection": "local_equirectangular"
+    "projection": "regional_mercator_uniform_fit"
   },
   "sources": [
     "data/scenarios/tno_1962/detail_chunks.manifest.json",

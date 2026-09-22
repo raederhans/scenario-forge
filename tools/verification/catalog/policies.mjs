@@ -494,6 +494,7 @@ export const CATALOG_POLICIES = {
       "test:node:scenario-chunk-contracts"
     ],
     "verify:pages-dist-and-drift": [
+      "python -m unittest tests.test_landing_map_asset_contracts -q",
       "test:py:landing-map-asset-contracts",
       "verify:pages-dist",
       "verify:dist-drift"

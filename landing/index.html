@@ -13,7 +13,7 @@
       content="Scenario Forge, alternate history maps, political map workbench, strategy modding, HOI4, TNO, Kaiserreich, geopolitical storytelling"
     />
     <meta name="robots" content="index,follow" />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="theme-color" content="#f6f3eb" />
     <link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />
 
     <meta property="og:type" content="website" />
@@ -52,10 +52,9 @@
         </a>
 
         <nav class="topnav" aria-label="Primary" data-i18n-aria-label="primaryNavLabel">
-          <a href="#sample-runs" data-i18n="navWorks">Outputs</a>
-          <a href="#story" data-i18n="navWorkflow">Workflow</a>
-          <a href="#features" data-i18n="navFeatures">Capabilities</a>
-          <a href="#data" data-i18n="navData">Evidence</a>
+          <a href="#sample-runs" data-i18n="navWorks">Maps</a>
+          <a href="#story" data-i18n="navWorkflow">How it works</a>
+          <a href="#features" data-i18n="navFeatures">Features</a>
           <a href="#faq" data-i18n="navFaq">FAQ</a>
         </nav>
 
@@ -64,56 +63,37 @@
           <button type="button" class="lang-switch__btn" data-lang="zh">中文</button>
         </div>
 
-        <a class="button button--primary topbar__cta" href="./app/?view=guide" data-i18n="headerOpenApp">Open demo</a>
+        <a class="button button--primary topbar__cta" href="./app/?view=guide" data-i18n="headerOpenApp">Open editor</a>
       </header>
 
       <main id="main">
-        <section id="hero" class="hero section section--dark">
+        <section id="hero" class="hero section">
           <div class="hero__copy" data-reveal>
-            <p class="eyebrow eyebrow--dark" data-i18n="heroEyebrow">Scenario-first political map workbench</p>
+            <p class="eyebrow eyebrow--dark" data-i18n="heroEyebrow">A mapmaking studio for imagined worlds</p>
             <h1>
-              <span data-i18n="heroTitle">Shape a world state.</span>
-              <span class="hero__title-accent" data-i18n="heroTitleAccent">Export the map that tells it.</span>
+              <span data-i18n="heroTitle">Every world</span>
+              <span class="hero__title-accent" data-i18n="heroTitleAccent">starts with a map.</span>
             </h1>
-            <p class="lede" data-i18n="heroBody">
-              Start with a public world state, shape political ownership, add geographic context, and export a presentation-ready map.
-            </p>
+            <p class="lede" data-i18n="heroBody">Build alternate histories, redraw borders, and bring your world into focus. A political map editor, right in your browser.</p>
             <div class="hero__actions">
-              <a class="button button--light" href="./app/?view=guide" data-i18n="heroPrimaryCta">Open demo</a>
-              <a class="button button--dark-ghost" href="#sample-runs" data-i18n="heroSecondaryCta">View three real outputs</a>
+              <a class="button button--primary" href="./app/?view=guide" data-i18n="heroPrimaryCta">Start creating</a>
+              <a class="button button--ghost" href="#sample-runs" data-i18n="heroSecondaryCta">Explore the maps ↓</a>
             </div>
           </div>
 
-          <div class="hero__visual" data-reveal>
-            <div class="product-stage" aria-label="Scenario Forge generated cartography preview" data-i18n-aria-label="productPreviewLabel" data-hero-map data-hero-mode="hoi4-1936">
-              <div class="product-stage__bar" aria-hidden="true">
-                <span></span><span></span><span></span>
-                <strong data-i18n="productStageLabel">Scenario Forge / Generated atlas</strong>
-              </div>
-              <div class="product-stage__viewport">
-                <img class="hero-cartography" src="./assets/hero-hoi4-1936.webp" alt="Generated Scenario Forge HOI4 1936 political map with borders and capital labels." data-i18n-alt="productPreviewAlt" data-hero-image loading="eager" fetchpriority="high" width="980" height="680" />
-                <div class="hero-map__hud" aria-hidden="true">
-                  <span data-i18n="heroMapHudOne">Political baseline</span>
-                  <span data-i18n="heroMapHudTwo">Routes + lights</span>
-                </div>
-              </div>
+          <figure class="hero__visual" data-reveal>
+            <div class="workspace-frame">
+              <img src="./assets/product-workspace.webp" alt="Scenario Forge map editor with its map canvas and editing controls." data-i18n-alt="productPreviewAlt" loading="eager" fetchpriority="high" width="1280" height="720" />
             </div>
-            <div class="hero__chips" role="group" aria-label="Hero scenario style" data-i18n-aria-label="heroChipsLabel">
-              <button type="button" data-hero-chip="blank" aria-pressed="false" data-i18n="chipBlank">Blank</button>
-              <button type="button" data-hero-chip="hoi4-1936" aria-pressed="true" data-i18n="chipHoi41936">HOI4 1936</button>
-              <button type="button" data-hero-chip="hoi4-1939" aria-pressed="false" data-i18n="chipHoi41939">HOI4 1939</button>
-              <button type="button" data-hero-chip="tno-1962" aria-pressed="false" data-i18n="chipTno1962">TNO 1962 · political crop</button>
-            </div>
-          </div>
+            <figcaption><span data-i18n="workspaceCaption">The map. The tools. Your next world.</span><span>SCENARIO FORGE / 01</span></figcaption>
+          </figure>
         </section>
 
         <section id="sample-runs" class="section sample-runs" data-sample-runs-root data-sample-runs-manifest="./assets/sample-runs.json" data-sample-filter="all">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow" data-i18n="worksEyebrow">Sample runs</p>
-            <h2 data-i18n="worksTitle">Three traceable outputs, paired with editable samples.</h2>
-            <p data-i18n="worksBody">
-              Each checked-in map pairs a visible result with an editable sample, project JSON, metadata evidence, and an explicit scope.
-            </p>
+            <p class="eyebrow" data-i18n="worksEyebrow">Selected maps</p>
+            <h2 data-i18n="worksTitle">One canvas. Different worlds.</h2>
+            <p data-i18n="worksBody">Explore scenario and transport maps, then open an editable sample to make it your own.</p>
           </div>
 
           <div class="sample-runs__filters" role="toolbar" aria-label="Sample run filters" data-i18n-aria-label="sampleFiltersLabel" data-reveal>
@@ -124,12 +104,102 @@
             <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="evidence" aria-controls="sample-runs-panel" data-i18n="sampleFilterEvidence">Evidence-backed</button>
           </div>
 
+
+
+          <div id="sample-runs-panel" class="works-grid works-grid--bento sample-runs__panel" role="region" aria-label="Sample run gallery" data-i18n-aria-label="sampleRunsPanelLabel">
+            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="tno-atlantropa-mediterranean" data-sample-scenario="tno_1962" data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-alt-history-med.json">
+              <div class="work-card__media work-card__media--workspace">
+                <img src="./assets/work-alt-history-med.webp" alt="Generated TNO 1962 Atlantropa Mediterranean map with political context, salt basins, shoals, and water regions." data-i18n-alt="workOneAlt" loading="lazy" width="560" height="360" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workOneLabel">TNO 1962 briefing map</p>
+                <h3 data-i18n="workOneTitle">An altered Mediterranean</h3>
+                <p data-i18n="workOneBody">TNO 1962: political borders meet the reshaped coastline of Atlantropa.</p>
+                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
+                  <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
+                  <a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
+                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
+                </div>
+                <details class="sample-run-card__proof">
+                  <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <dl>
+                    <div data-sample-evidence="tno-atlantropa-features" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features">
+                      <dt data-i18n="workOneEvidenceOne">rendered Atlantropa features · Mediterranean extent · scenario output</dt>
+                      <dd data-sample-evidence-value="724">724</dd>
+                    </div>
+                    <div data-sample-evidence="tno-owner-count" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.dissolved_country_owners">
+                      <dt data-i18n="workOneEvidenceTwo">dissolved country owners · Mediterranean extent</dt>
+                      <dd data-sample-evidence-value="47">47</dd>
+                    </div>
+                  </dl>
+                </details>
+              </div>
+            </article>
+
+            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="hoi4-europe-comparison" data-sample-scenario="hoi4_1936" data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-scenario-switch-europe.json">
+              <div class="work-card__media">
+                <img src="./assets/work-scenario-switch-europe.webp" alt="Generated HOI4 1936 and 1939 Central Europe comparison map." data-i18n-alt="workTwoAlt" loading="lazy" width="680" height="440" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workTwoLabel">HOI4 comparison run</p>
+                <h3 data-i18n="workTwoTitle">Europe, between two dates</h3>
+                <p data-i18n="workTwoBody">Compare the HOI4 1936 and 1939 baselines in the same geographic frame.</p>
+                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
+                  <a href="./app/?sample=hoi4-1936-europe-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
+                  <a href="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
+                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
+                </div>
+                <details class="sample-run-card__proof">
+                  <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <dl>
+                    <div data-sample-evidence="hoi4-1936-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features">
+                      <dt data-i18n="workTwoEvidenceOne">rendered political features · 1936 · shared Central/Eastern Europe extent</dt>
+                      <dd data-sample-evidence-value="2626">2626</dd>
+                    </div>
+                    <div data-sample-evidence="hoi4-1939-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1939_political_features">
+                      <dt data-i18n="workTwoEvidenceTwo">rendered political features · 1939 · shared Central/Eastern Europe extent</dt>
+                      <dd data-sample-evidence-value="2626">2626</dd>
+                    </div>
+                  </dl>
+                </details>
+              </div>
+            </article>
+
+            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="japan-tokaido-corridor" data-sample-scenario="modern_world" data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json" data-sample-tags="transport atlas evidence" data-sample-metadata="./assets/work-atlas-japan-corridor.json">
+              <div class="work-card__media">
+                <img src="./assets/work-atlas-japan-corridor.webp" alt="Generated Central Japan local transport atlas with roads, rail, urban anchors, stations, terrain, and rivers." data-i18n-alt="workThreeAlt" loading="lazy" width="680" height="440" />
+              </div>
+              <div class="work-card__copy">
+                <p class="work-card__label" data-i18n="workThreeLabel">Central Japan local transport atlas</p>
+                <h3 data-i18n="workThreeTitle">Connections across Central Japan</h3>
+                <p data-i18n="workThreeBody">Roads, rail, and stations set against rivers and terrain.</p>
+                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
+                  <a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
+                  <a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
+                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
+                </div>
+                <details class="sample-run-card__proof">
+                  <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <dl>
+                    <div data-sample-evidence="japan-transport-lines" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines">
+                      <dt data-i18n="workThreeEvidenceOne">rendered road + rail routes · Central Japan local transport atlas</dt>
+                      <dd data-sample-evidence-value="165">165</dd>
+                    </div>
+                    <div data-sample-evidence="japan-stations" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.major_stations">
+                      <dt data-i18n="workThreeEvidenceTwo">major stations · Central Japan local transport atlas</dt>
+                      <dd data-sample-evidence-value="18">18</dd>
+                    </div>
+                  </dl>
+                </details>
+              </div>
+            </article>
+          </div>
           <details class="sample-project-downloads" data-sample-project-downloads data-reveal>
             <summary class="sample-project-downloads__header">
-              <h3 data-i18n="sampleProjectDownloadsTitle">All sample project downloads</h3>
+              <h3 data-i18n="sampleProjectDownloadsTitle">Browse all five starting points</h3>
             </summary>
             <div class="sample-project-downloads__header">
-              <p data-i18n="sampleProjectDownloadsBody">Open any public baseline in the editor with the Guide panel, or download the JSON for local import.</p>
+              <p data-i18n="sampleProjectDownloadsBody">Start from a sample in the editor, or download its project file.</p>
               <p class="sample-project-downloads__note" data-i18n="sampleProjectGuideNote">Editor links open the sample with the Guide panel so you can edit, export, or download the original JSON.</p>
             </div>
             <div class="sample-project-downloads__grid" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
@@ -175,172 +245,13 @@
               </article>
             </div>
           </details>
-
-          <div id="sample-runs-panel" class="works-grid works-grid--bento sample-runs__panel" role="region" aria-label="Sample run gallery" data-i18n-aria-label="sampleRunsPanelLabel">
-            <article class="work-card work-card--tall sample-run-card" data-reveal data-sample-run-card data-sample-run-id="tno-atlantropa-mediterranean" data-sample-scenario="tno_1962" data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-alt-history-med.json">
-              <div class="work-card__media work-card__media--workspace">
-                <img src="./assets/work-alt-history-med.webp" alt="Generated TNO 1962 Atlantropa Mediterranean map with political context, salt basins, shoals, and water regions." data-i18n-alt="workOneAlt" loading="lazy" width="560" height="360" />
-              </div>
-              <div class="work-card__copy">
-                <p class="work-card__label" data-i18n="workOneLabel">TNO 1962 briefing map</p>
-                <h3 data-i18n="workOneTitle">Atlantropa Mediterranean, with political and physical context.</h3>
-                <p data-i18n="workOneBody">A generated briefing map for the TNO 1962 Mediterranean: ownership, clipped coastline detail, salt basins, shoals, and water regions share one frame.</p>
-                <div class="sample-run-card__meta">
-                  <div>
-                    <span data-i18n="sampleScenarioLabel">Scenario / baseline</span>
-                    <strong data-i18n="workOneScenario">TNO 1962 Europe</strong>
-                  </div>
-                  <div>
-                    <span data-i18n="samplePathLabel">Demo path</span>
-                    <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleDemoPath">Open demo guide</a>
-                  </div>
-                  <div>
-                    <span data-i18n="sampleExportLabel">Export target</span>
-                    <strong data-i18n="sampleSnapshotTarget">Checked-in WebP snapshot + SVG source</strong>
-                  </div>
-                </div>
-                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
-                  <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
-                  <a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
-                </div>
-                <div class="sample-run-card__recipe" aria-label="Layer recipe" data-i18n-aria-label="sampleRecipeAriaLabel">
-                  <span data-i18n="sampleRecipeLabel">Layer recipe</span>
-                  <ul>
-                    <li data-i18n="workOneRecipeOne">TNO political owners</li>
-                    <li data-i18n="workOneRecipeTwo">Atlantropa basins</li>
-                    <li data-i18n="workOneRecipeThree">Coastline detail</li>
-                    <li data-i18n="workOneRecipeFour">Mediterranean labels</li>
-                  </ul>
-                </div>
-                <details class="sample-run-card__proof" open>
-                  <summary data-i18n="sampleEvidenceLabel">Source-backed evidence</summary>
-                  <dl>
-                    <div data-sample-evidence="tno-atlantropa-features" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features">
-                      <dt data-i18n="workOneEvidenceOne">rendered Atlantropa features · Mediterranean extent · scenario output</dt>
-                      <dd data-sample-evidence-value="724">724</dd>
-                    </div>
-                    <div data-sample-evidence="tno-owner-count" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.dissolved_country_owners">
-                      <dt data-i18n="workOneEvidenceTwo">dissolved country owners · Mediterranean extent</dt>
-                      <dd data-sample-evidence-value="47">47</dd>
-                    </div>
-                  </dl>
-                </details>
-              </div>
-            </article>
-
-            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="hoi4-europe-comparison" data-sample-scenario="hoi4_1936" data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-scenario-switch-europe.json">
-              <div class="work-card__media">
-                <img src="./assets/work-scenario-switch-europe.webp" alt="Generated HOI4 1936 and 1939 Central Europe comparison map." data-i18n-alt="workTwoAlt" loading="lazy" width="680" height="440" />
-              </div>
-              <div class="work-card__copy">
-                <p class="work-card__label" data-i18n="workTwoLabel">HOI4 comparison run</p>
-                <h3 data-i18n="workTwoTitle">1936 and 1939 Europe, aligned as one scenario switch.</h3>
-                <p data-i18n="workTwoBody">The same Central Europe frame shows two HOI4 baselines side by side, so political change reads as a map comparison.</p>
-                <div class="sample-run-card__meta">
-                  <div>
-                    <span data-i18n="sampleScenarioLabel">Scenario / baseline</span>
-                    <strong data-i18n="workTwoScenario">HOI4 1936 / HOI4 1939</strong>
-                  </div>
-                  <div>
-                    <span data-i18n="samplePathLabel">Demo path</span>
-                    <a href="./app/?sample=hoi4-1936-europe-briefing&view=guide" data-sample-project-open-link data-i18n="sampleDemoPath">Open demo guide</a>
-                  </div>
-                  <div>
-                    <span data-i18n="sampleExportLabel">Export target</span>
-                    <strong data-i18n="sampleSnapshotTarget">Checked-in WebP snapshot + SVG source</strong>
-                  </div>
-                </div>
-                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
-                  <a href="./app/?sample=hoi4-1936-europe-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
-                  <a href="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
-                </div>
-                <div class="sample-run-card__recipe" aria-label="Layer recipe" data-i18n-aria-label="sampleRecipeAriaLabel">
-                  <span data-i18n="sampleRecipeLabel">Layer recipe</span>
-                  <ul>
-                    <li data-i18n="workTwoRecipeOne">1936 ownership layer</li>
-                    <li data-i18n="workTwoRecipeTwo">1939 ownership layer</li>
-                    <li data-i18n="workTwoRecipeThree">Shared comparison viewport</li>
-                  </ul>
-                </div>
-                <details class="sample-run-card__proof" open>
-                  <summary data-i18n="sampleEvidenceLabel">Source-backed evidence</summary>
-                  <dl>
-                    <div data-sample-evidence="hoi4-1936-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features">
-                      <dt data-i18n="workTwoEvidenceOne">rendered political features · 1936 · shared Central/Eastern Europe extent</dt>
-                      <dd data-sample-evidence-value="90">90</dd>
-                    </div>
-                    <div data-sample-evidence="hoi4-1939-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1939_political_features">
-                      <dt data-i18n="workTwoEvidenceTwo">rendered political features · 1939 · shared Central/Eastern Europe extent</dt>
-                      <dd data-sample-evidence-value="90">90</dd>
-                    </div>
-                  </dl>
-                </details>
-              </div>
-            </article>
-
-            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="japan-tokaido-corridor" data-sample-scenario="modern_world" data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json" data-sample-tags="transport atlas evidence" data-sample-metadata="./assets/work-atlas-japan-corridor.json">
-              <div class="work-card__media">
-                <img src="./assets/work-atlas-japan-corridor.webp" alt="Generated Central Japan local transport atlas with roads, rail, urban anchors, stations, terrain, and rivers." data-i18n-alt="workThreeAlt" loading="lazy" width="680" height="440" />
-              </div>
-              <div class="work-card__copy">
-                <p class="work-card__label" data-i18n="workThreeLabel">Central Japan local transport atlas</p>
-                <h3 data-i18n="workThreeTitle">Central Japan transport context as a local atlas output.</h3>
-                <p data-i18n="workThreeBody">Roads, rail, stations, urban anchors, rivers, and terrain are composed into a compact local atlas output.</p>
-                <div class="sample-run-card__meta">
-                  <div>
-                    <span data-i18n="sampleScenarioLabel">Scenario / baseline</span>
-                    <strong data-i18n="workThreeScenario">Central Japan local transport atlas</strong>
-                  </div>
-                  <div>
-                    <span data-i18n="samplePathLabel">Demo path</span>
-                    <a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="sampleDemoPath">Open demo guide</a>
-                  </div>
-                  <div>
-                    <span data-i18n="sampleExportLabel">Export target</span>
-                    <strong data-i18n="sampleSnapshotTarget">Checked-in WebP snapshot + SVG source</strong>
-                  </div>
-                </div>
-                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
-                  <a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
-                  <a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
-                </div>
-                <div class="sample-run-card__recipe" aria-label="Layer recipe" data-i18n-aria-label="sampleRecipeAriaLabel">
-                  <span data-i18n="sampleRecipeLabel">Layer recipe</span>
-                  <ul>
-                    <li data-i18n="workThreeRecipeOne">Road lines</li>
-                    <li data-i18n="workThreeRecipeTwo">Rail lines</li>
-                    <li data-i18n="workThreeRecipeThree">Major stations</li>
-                    <li data-i18n="workThreeRecipeFour">Urban anchors, terrain, and rivers</li>
-                  </ul>
-                </div>
-                <details class="sample-run-card__proof" open>
-                  <summary data-i18n="sampleEvidenceLabel">Source-backed evidence</summary>
-                  <dl>
-                    <div data-sample-evidence="japan-transport-lines" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines">
-                      <dt data-i18n="workThreeEvidenceOne">rendered road + rail routes · Central Japan local transport atlas</dt>
-                      <dd data-sample-evidence-value="165">165</dd>
-                    </div>
-                    <div data-sample-evidence="japan-stations" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.major_stations">
-                      <dt data-i18n="workThreeEvidenceTwo">major stations · Central Japan local transport atlas</dt>
-                      <dd data-sample-evidence-value="18">18</dd>
-                    </div>
-                  </dl>
-                </details>
-              </div>
-            </article>
-          </div>
         </section>
 
         <section id="story" class="section product-story" data-story-root data-story-step="baseline" data-story-comparison="hoi4-1936">
           <div class="section-heading" data-reveal>
-            <p class="eyebrow" data-i18n="storyEyebrow">One workflow</p>
-            <h2 data-i18n="storyTitle">Move from a public baseline to a finished map.</h2>
-            <p data-i18n="storyBody">
-              Choose a baseline, shape political state, add geographic context, inspect the evidence, and export the result.
-            </p>
+            <p class="eyebrow" data-i18n="storyEyebrow">From idea to map</p>
+            <h2 data-i18n="storyTitle">Make the world your own.</h2>
+            <p data-i18n="storyBody">Choose a starting point, shape the details, and take your map with you.</p>
           </div>
 
           <div class="product-story__grid">
@@ -364,7 +275,7 @@
                   <button type="button" data-story-compare="hoi4-1939" aria-pressed="false" data-i18n="storyCompare1939">1939</button>
                   <button type="button" data-story-compare="tno-1962" aria-pressed="false" data-i18n="storyCompareTno">TNO 1962</button>
                 </div>
-                <details class="story-evidence" open>
+                <details class="story-evidence">
                   <summary data-i18n="storyEvidenceSummary">Source-backed evidence</summary>
                   <dl>
                     <div data-story-evidence="baseline" data-story-evidence-source="data/scenarios/index.json:public_baseline_ids.length">
@@ -398,8 +309,7 @@
                   <span class="story-step__index">01</span>
                   <span class="story-step__copy">
                     <strong data-i18n="storyStepBaselineTitle">Choose baseline</strong>
-                    <span data-i18n="storyStepBaselineBody">Begin with a named public world state before opening the design surface.</span>
-                    <em data-i18n="storyStepBaselineProof">5 public baselines are registered.</em>
+                    <span data-i18n="storyStepBaselineBody">Start with a blank map or a ready-made scenario.</span>
                   </span>
                 </button>
               </li>
@@ -408,8 +318,7 @@
                   <span class="story-step__index">02</span>
                   <span class="story-step__copy">
                     <strong data-i18n="storyStepScenarioTitle">Shape political state</strong>
-                    <span data-i18n="storyStepScenarioBody">Compare checked-in world states, then open the sample to edit ownership and control.</span>
-                    <em data-i18n="storyStepScenarioProof">1936, 1939, and TNO views share the same map-reading frame.</em>
+                    <span data-i18n="storyStepScenarioBody">Edit ownership and control to tell a different history.</span>
                   </span>
                 </button>
               </li>
@@ -418,8 +327,7 @@
                   <span class="story-step__index">03</span>
                   <span class="story-step__copy">
                     <strong data-i18n="storyStepTransportTitle">Add transport/context</strong>
-                    <span data-i18n="storyStepTransportBody">Layer roads, rail, cities, terrain, rivers, and night context onto the same map story.</span>
-                    <em data-i18n="storyStepTransportProof">Japan preview metadata keeps the transport counts visible.</em>
+                    <span data-i18n="storyStepTransportBody">Bring roads, rail, cities, and terrain into the picture.</span>
                   </span>
                 </button>
               </li>
@@ -428,8 +336,7 @@
                   <span class="story-step__index">04</span>
                   <span class="story-step__copy">
                     <strong data-i18n="storyStepEvidenceTitle">Check scope and sources</strong>
-                    <span data-i18n="storyStepEvidenceBody">Read each count with its object, geographic extent, and processing stage.</span>
-                    <em data-i18n="storyStepEvidenceProof">Checked-in metadata and the source ledger define the evidence boundary.</em>
+                    <span data-i18n="storyStepEvidenceBody">Check the map’s coverage and original sources.</span>
                   </span>
                 </button>
               </li>
@@ -438,8 +345,7 @@
                   <span class="story-step__index">05</span>
                   <span class="story-step__copy">
                     <strong data-i18n="storyStepExportTitle">Export the result</strong>
-                    <span data-i18n="storyStepExportBody">Turn the layered workbench view into a compact presentation map.</span>
-                    <em data-i18n="storyStepExportProof">The Central Japan local transport atlas combines roads, rail, stations, city anchors, terrain, and rivers.</em>
+                    <span data-i18n="storyStepExportBody">Export an image. Keep the project for your next edit.</span>
                   </span>
                 </button>
               </li>
@@ -450,8 +356,8 @@
         <section id="features" class="section section--muted">
           <div class="section-heading" data-reveal>
             <p class="eyebrow" data-i18n="featuresEyebrow">Product capabilities</p>
-            <h2 data-i18n="featuresTitle">Edit political state, compose context, and keep the result editable.</h2>
-            <p data-i18n="featuresBody">The current public workbench centers on four outcomes: scenario editing, cartographic control, geographic context, and local export.</p>
+            <h2 data-i18n="featuresTitle">A complete mapmaking workspace.</h2>
+            <p data-i18n="featuresBody">Political boundaries, geographic detail, and the finishing touches.</p>
           </div>
 
           <div class="feature-groups">
@@ -460,7 +366,7 @@
                 <svg viewBox="0 0 24 24"><path d="M4 7.5 10 4l10 3.5v9L14 20l-10-3.5z"/><path d="M10 4v16M14 6v14"/></svg>
               </span>
               <h3 data-i18n="featureGroupOneTitle">Political state</h3>
-              <p data-i18n="featureGroupOneBody">Start from Blank Map, Modern World, HOI4 1936, HOI4 1939, or TNO 1962, then edit ownership, controller, frontlines, and special regions.</p>
+              <p data-i18n="featureGroupOneBody">Edit ownership, control, frontlines, and special regions across five public baselines.</p>
               <ul class="feature-points">
                 <li data-i18n="featurePointPalettes">Five named baselines are available in the public demo.</li>
                 <li data-i18n="featurePointExport">HGO 1936 remains a developer/local preview.</li>
@@ -471,7 +377,7 @@
                 <svg viewBox="0 0 24 24"><path d="M6 18 9 6l4 9 5-7"/><path d="M5 19h14"/></svg>
               </span>
               <h3 data-i18n="featureGroupTwoTitle">Cartographic control</h3>
-              <p data-i18n="featureGroupTwoBody">Tune layer order, palettes, borders, labels, legends, city points, water regions, terrain, and presentation effects in one workspace.</p>
+              <p data-i18n="featureGroupTwoBody">Set palettes, borders, labels, and legends. Arrange layers to bring the right details forward.</p>
               <ul class="feature-points">
                 <li data-i18n="featurePointUndo">Editing sessions include 80-step undo and redo.</li>
                 <li data-i18n="featurePointDistricts">Administrative districts and hierarchy data support detailed scenario work.</li>
@@ -482,14 +388,14 @@
                 <svg viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h14"/><path d="M8 5v14M16 5v14"/></svg>
               </span>
               <h3 data-i18n="featureGroupThreeTitle">Geographic context</h3>
-              <p data-i18n="featureGroupThreeBody">Add roads, rail, settlements, relief, contours, rivers, night lights, urban areas, and source links around the political story.</p>
+              <p data-i18n="featureGroupThreeBody">Add roads, rail, cities, terrain, rivers, and night lights.</p>
             </article>
             <article class="feature-group" data-reveal>
               <span class="feature-icon feature-icon--violet" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m8 11 4 4 4-4"/><path d="M5 19h14"/></svg>
               </span>
               <h3 data-i18n="featureGroupFourTitle">Local projects and export</h3>
-              <p data-i18n="featureGroupFourBody">Save editable project JSON and export PNG or JPG presentation snapshots at 1x–4x scale.</p>
+              <p data-i18n="featureGroupFourBody">Export PNG or JPG at 1×–4×. Save an editable JSON project to pick up where you left off.</p>
               <ul class="feature-points">
                 <li data-i18n="featurePointTransport">Roads and rail are the strongest current public transport paths.</li>
                 <li data-i18n="featurePointAudits">Project files keep the map editable after export.</li>
@@ -497,6 +403,7 @@
             </article>
           </div>
 
+          <details class="technical-details"><summary data-i18n="advancedSummary">Availability and layer previews</summary>
           <div class="section-heading" data-reveal>
             <p class="eyebrow" data-i18n="editionsEyebrow">Current boundaries</p>
             <h2 data-i18n="editionsTitle">Public demo, local preview, and future direction are separate surfaces.</h2>
@@ -580,9 +487,11 @@
               </article>
             </div>
           </div>
+          </details>
         </section>
 
         <section id="data" class="section section--muted data-section">
+          <details class="technical-details"><summary data-i18n="sourcesSummary">Sources, map data, and licensing</summary>
           <div class="section-heading" data-reveal>
             <p class="eyebrow" data-i18n="dataEyebrow">Evidence and provenance</p>
             <h2 data-i18n="dataTitle">Every public number names its object, extent, and processing stage.</h2>
@@ -625,7 +534,7 @@
             <article class="data-card" data-reveal>
               <span class="data-card__tag" data-i18n="dataCardTwoTag">HOI4 comparison output</span>
               <h3 data-i18n="dataCardTwoTitle">1936 / 1939 Central–Eastern Europe</h3>
-              <p data-i18n="dataCardTwoBody">90 rendered political features per scenario · shared Central/Eastern Europe bbox · comparison output · metadata schema 1 · sample manifest updated 2026-06-30.</p>
+              <p data-i18n="dataCardTwoBody">2,626 source political features per scenario · shared Central/Eastern Europe bbox · comparison output · metadata schema 1 · sample manifest updated 2026-06-30.</p>
               <div class="sample-run-card__actions">
                 <a href="./assets/work-scenario-switch-europe.json" data-i18n="evidenceMetadataLink">View output metadata</a>
                 <a href="https://github.com/raederhans/scenario-forge/blob/f118a101d30373c507075da32267969b22197338/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="evidenceSourceLedgerLink">Review source ledger</a>
@@ -681,6 +590,7 @@
               </figcaption>
             </figure>
           </div>
+          </details>
         </section>
 
         <section id="faq" class="section faq-section">
@@ -723,11 +633,11 @@
           <div class="cta-panel" data-reveal>
             <div>
               <p class="eyebrow eyebrow--dark" data-i18n="ctaEyebrow">Open the workbench</p>
-              <h2 data-i18n="ctaTitle">Start from a public baseline and make the next map editable.</h2>
-              <p data-i18n="ctaBody">The demo opens with a guide; the repository contains the source, project samples, metadata, and provenance records.</p>
+              <h2 data-i18n="ctaTitle">Your next world is waiting.</h2>
+              <p data-i18n="ctaBody">Open the editor and start with a map.</p>
             </div>
             <div class="cta-panel__actions">
-              <a class="button button--light" href="./app/?view=guide" data-i18n="ctaPrimary">Open demo</a>
+              <a class="button button--light" href="./app/?view=guide" data-i18n="ctaPrimary">Start creating</a>
               <a class="button button--dark-ghost" href="https://github.com/raederhans/scenario-forge" target="_blank" rel="noreferrer" data-i18n="ctaSecondary">Browse the repository</a>
             </div>
           </div>
@@ -738,9 +648,7 @@
       <footer class="footer">
         <div class="footer__brand">
           <strong>Scenario Forge</strong>
-          <p data-i18n="footerNote">
-            Built from scenario-aware map data, political state editing, and presentation-focused context layers.
-          </p>
+          <p data-i18n="footerNote">A political map studio for alternate history and worldbuilding.</p>
         </div>
         <div class="footer__sources">
           <p data-i18n="footerSources">Major data families include Natural Earth, geoBoundaries, GeoNames, NOAA ETOPO, NASA Black Marble, OpenStreetMap, and Geofabrik.</p>
