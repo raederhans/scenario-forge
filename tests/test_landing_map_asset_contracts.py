@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest import mock
 
-from shapely.geometry import Point, shape
+from shapely.geometry import GeometryCollection, LineString, Point, Polygon, shape
 from shapely.ops import unary_union
 from shapely.validation import make_valid
 
@@ -273,6 +273,47 @@ class EuropePoliticalAndLabelContractTests(unittest.TestCase):
         self.assertEqual(runtime_sources, [expected_runtime])
 
 
+class WorkMapProjectionTests(unittest.TestCase):
+    def test_regional_projection_preserves_local_shape_and_fits_extent(self) -> None:
+        import math
+
+        for output in work_maps.WORK_OUTPUTS.values():
+            canvas = work_maps.Canvas(output["width"], output["height"], output["bbox"])
+            west, south, east, north = canvas.bbox
+            lon, lat = (west + east) / 2, (south + north) / 2
+            x, y = canvas.project(lon, lat)
+            east_x, _ = canvas.project(lon + .001 / math.cos(math.radians(lat)), lat)
+            _, north_y = canvas.project(lon, lat + .001)
+            self.assertAlmostEqual((east_x - x) / (y - north_y), 1, places=4)
+            for corner_lon in (west, east):
+                for corner_lat in (south, north):
+                    x, y = canvas.project(corner_lon, corner_lat)
+                    self.assertGreaterEqual(x + 1e-8, canvas.padding)
+                    self.assertLessEqual(x, canvas.width - canvas.padding + 1e-8)
+                    self.assertGreaterEqual(y + 1e-8, canvas.padding)
+                    self.assertLessEqual(y, canvas.height - canvas.padding + 1e-8)
+
+    def test_polygon_holes_are_retained(self) -> None:
+        geometry = Polygon([(0, 0), (4, 0), (4, 4), (0, 4)], [[(1, 1), (2, 1), (2, 2), (1, 2)]])
+        path = work_maps.polygon_paths(geometry, work_maps.Canvas(400, 400, (0, 0, 4, 4)))[0]
+        self.assertEqual(path.count("M"), 2)
+        self.assertEqual(path.count("Z"), 2)
+        boundary = work_maps.polygon_paths(
+            geometry, work_maps.Canvas(400, 400, (0, 0, 4, 4)), include_interiors=False,
+        )[0]
+        self.assertEqual(boundary.count("M"), 1)
+
+    def test_scenario_comparison_has_no_decorative_route(self) -> None:
+        svg = (ASSETS / "work-scenario-switch-europe.svg").read_text(encoding="utf-8")
+        self.assertNotIn("M72 344", svg)
+        self.assertNotIn("C156 286", svg)
+
+    def test_country_border_ignores_nonpolygon_remnants(self) -> None:
+        polygon = Polygon([(0, 0), (4, 0), (4, 4), (0, 4)])
+        geometry = GeometryCollection([polygon, LineString([(5, 5), (6, 6)])])
+        self.assertTrue(work_maps.polygon_boundary(geometry).equals(polygon.boundary))
+
+
 class JapanWorkMapSemanticsTests(unittest.TestCase):
     def test_local_atlas_has_no_undisclosed_corridor_path(self) -> None:
         svg = (ASSETS / "work-atlas-japan-corridor.svg").read_text(encoding="utf-8")
@@ -292,6 +333,8 @@ class JapanWorkMapSemanticsTests(unittest.TestCase):
         self.assertNotIn("city_light_points", metadata["counts"])
         self.assertIn("data/world_cities.geojson", metadata["sources"])
         self.assertIn('class="urban-anchors"', svg)
+        self.assertIn('class="land"', svg)
+        self.assertIn("data/transport_layers/japan_corridor/carrier.json", metadata["sources"])
         self.assertNotIn('class="night-lights"', svg)
         self.assertIn(">CENTRAL JAPAN TRANSPORT ATLAS</text>", svg)
 

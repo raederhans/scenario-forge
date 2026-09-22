@@ -977,7 +977,7 @@ test("landing sample runs bilingual keys exist", () => {
     const occurrences = source.match(new RegExp(`\\b${key}:`, "g")) || [];
     assert.equal(occurrences.length, 2, `missing English/Chinese translation pair for ${key}`);
   }
-  assert.ok(source.includes('worksEyebrow: "示例运行"'), "missing Simplified Chinese sample-runs copy");
+  assert.ok(source.includes('worksEyebrow: "精选地图"'), "missing Simplified Chinese sample-runs copy");
 });
 
 test("landing work-card maps expose source-backed metadata", () => {
@@ -996,7 +996,7 @@ test("landing work-card maps expose source-backed metadata", () => {
       assert.equal(metadata.asset_type, "landing_work_card_map");
       assert.ok(metadata.asset_id, `missing asset id for ${assetRoot}/${fileName}`);
       assert.ok(metadata.title, `missing title for ${assetRoot}/${fileName}`);
-      assert.equal(metadata.scope?.projection, "local_equirectangular");
+      assert.equal(metadata.scope?.projection, "regional_mercator_uniform_fit");
       assert.equal(metadata.scope?.bbox?.length, 4);
       assert.ok(Array.isArray(metadata.sources), `missing sources for ${assetRoot}/${fileName}`);
       assert.ok(metadata.sources.length >= 3, `expected source list for ${assetRoot}/${fileName}`);

@@ -10,7 +10,7 @@
       33.0,
       57.5
     ],
-    "projection": "local_equirectangular"
+    "projection": "regional_mercator_uniform_fit"
   },
   "sources": [
     "data/scenarios/hoi4_1936/runtime_topology.topo.json",
@@ -21,8 +21,8 @@
     "data/scenarios/hoi4_1939/countries.json"
   ],
   "counts": {
-    "hoi4_1936_political_features": 90,
-    "hoi4_1939_political_features": 90
+    "hoi4_1936_political_features": 2626,
+    "hoi4_1939_political_features": 2626
   },
   "selection_policy": {
     "note": "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership.",

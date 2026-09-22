@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import base64
 import re
 import subprocess
 import unittest
@@ -55,6 +56,33 @@ def assert_css_block_avoids_viewport_font_scaling(
     test_case.assertIn("font-size:", body)
     test_case.assertNotIn("clamp(", body)
     test_case.assertNotIn("vw", body)
+
+
+def assert_landing_workspace_hero(test_case: unittest.TestCase, html: str) -> None:
+    hero_match = re.search(r'<section id="hero"[^>]*>(.*?)</section>', html, re.S)
+    test_case.assertIsNotNone(hero_match, "landing must include a hero section")
+    hero = hero_match.group(1)
+    images = re.findall(r'<img\b([^>]*)>', hero)
+    test_case.assertEqual(len(images), 1, "hero must show one static editor screenshot")
+    attributes = dict(re.findall(r'([\w-]+)="([^"]*)"', images[0]))
+    for name, expected in {
+        "src": "./assets/product-workspace.webp",
+        "width": "1280",
+        "height": "720",
+        "loading": "eager",
+        "fetchpriority": "high",
+        "data-i18n-alt": "productPreviewAlt",
+    }.items():
+        test_case.assertEqual(attributes.get(name), expected, f"hero image {name}")
+    test_case.assertTrue(attributes.get("alt", "").strip(), "editor screenshot needs descriptive alt text")
+    test_case.assertNotIn("data-hero-map", hero)
+    test_case.assertNotIn("data-hero-chip", hero)
+    test_case.assertRegex(hero, r'href="\./app/\?view=guide"[^>]*data-i18n="heroPrimaryCta">Start creating</a>')
+    test_case.assertRegex(hero, r'href="#sample-runs"[^>]*data-i18n="heroSecondaryCta">Explore the maps ↓</a>')
+    test_case.assertIn('data-i18n="workspaceCaption"', hero)
+    test_case.assertIn('class="skip-link" href="#main"', html)
+    for key in ("advancedSummary", "sourcesSummary"):
+        test_case.assertRegex(html, rf'<details class="technical-details"><summary data-i18n="{key}">')
 
 
 def import_landing_builder(module_name: str):
@@ -252,9 +280,17 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(svg_root.attrib.get("viewBox"), "0 0 1200 630")
         self.assertEqual(svg_root.attrib.get("data-social-preview"), "scenario-forge")
         self.assertIn("Scenario Forge", " ".join(svg_root.itertext()))
-        for brand_color in ("#07111f", "#147f77", "#d99a45"):
+        for brand_color in ("#f6f3eb", "#232b29", "#47654b"):
             with self.subTest(brand_color=brand_color):
                 self.assertIn(brand_color, svg_text)
+
+        workspace_image = svg_root.find("{http://www.w3.org/2000/svg}image")
+        self.assertIsNotNone(workspace_image)
+        image_uri = workspace_image.attrib["{http://www.w3.org/1999/xlink}href"]
+        self.assertTrue(image_uri.startswith("data:image/png;base64,"))
+        embedded_image = base64.b64decode(image_uri.split(",", 1)[1], validate=True)
+        self.assertEqual(embedded_image[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual(struct.unpack(">II", embedded_image[16:24]), (1280, 720))
 
         png_bytes = png_path.read_bytes()
         self.assertEqual(png_bytes[:8], b"\x89PNG\r\n\x1a\n")
@@ -1680,16 +1716,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
             './app/?view=guide',
             'data-i18n="heroTitle"',
             'data-i18n="heroTitleAccent"',
-            'data-i18n="productStageLabel"',
             'class="brandmark__logo"',
             './assets/favicon.svg',
-            '<a href="#sample-runs" data-i18n="navWorks">Outputs</a>',
+            '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
             './assets/hero-hoi4-1936.webp',
-            'data-hero-map',
-            'data-hero-chip="blank"',
-            'data-hero-chip="hoi4-1936"',
-            'data-hero-chip="hoi4-1939"',
-            'data-hero-chip="tno-1962"',
             'data-stat-value="21338"',
             '<meta name="robots" content="index,follow" />',
             '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
@@ -1729,7 +1759,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'class="footer__brand"',
             'class="footer__sources"',
             'class="footer__actions"',
-            'data-i18n-aria-label="productPreviewLabel"',
             'data-i18n-aria-label="brandHomeLabel"',
             'data-i18n-aria-label="primaryNavLabel"',
             'data-i18n-aria-label="languageSwitcherLabel"',
@@ -1759,7 +1788,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features"',
             'data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"',
             'data-i18n="sampleFilterScenario"',
-            'data-i18n="sampleRecipeLabel"',
             'data-i18n="sampleEvidenceLabel"',
             'data-sample-project-downloads',
             'data-sample-project-list-link',
@@ -1807,10 +1835,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-showcase-status role="status" aria-live="polite" hidden',
             'data-i18n="storyEyebrow"',
             'data-i18n-aria-label="storyStageLabel"',
-            'data-i18n="chipBlank"',
-            'data-i18n="chipHoi41936"',
-            'data-i18n="chipHoi41939"',
-            'data-i18n="chipTno1962"',
             'data-reveal',
             'footer',
             'data-lang="zh"',
@@ -1818,6 +1842,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             with self.subTest(expected_fragment=expected_fragment):
                 self.assertIn(expected_fragment, html)
 
+        assert_landing_workspace_hero(self, html)
         self.assertNotIn('class="hero__metrics"', html)
         self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
 
@@ -2044,6 +2069,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
         zh_table = app_js[zh_start:]
 
         for expected_fragment in (
+            "workspaceCaption:",
+            "advancedSummary:",
+            "sourcesSummary:",
+            "productPreviewAlt:",
             "navWorks:",
             "worksTitle:",
             "sampleProjectDownloadsTitle:",
@@ -2089,6 +2118,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 self.assertIn(expected_fragment, en_table)
 
         for expected_fragment in (
+            "workspaceCaption:",
+            "advancedSummary:",
+            "sourcesSummary:",
+            "productPreviewAlt:",
             "navWorks:",
             "worksTitle:",
             "sampleProjectDownloadsTitle:",
@@ -2188,15 +2221,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "./app/?view=guide",
             'data-i18n="heroTitle"',
             'data-i18n="heroTitleAccent"',
-            'data-i18n="productStageLabel"',
             'class="brandmark__logo"',
             './assets/favicon.svg',
             './assets/hero-hoi4-1936.webp',
-            'data-hero-map',
-            'data-hero-chip="blank"',
-            'data-hero-chip="hoi4-1936"',
-            'data-hero-chip="hoi4-1939"',
-            'data-hero-chip="tno-1962"',
             'data-stat-value="21338"',
             '<meta name="robots" content="index,follow" />',
             '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
@@ -2228,14 +2255,13 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n="editionsEyebrow"',
             'data-i18n="faqEyebrow"',
             'data-showcase-status role="status" aria-live="polite" hidden',
-            'data-i18n-aria-label="productPreviewLabel"',
             'data-i18n-aria-label="brandHomeLabel"',
             'data-i18n-aria-label="primaryNavLabel"',
             'data-i18n-aria-label="languageSwitcherLabel"',
             'data-i18n-alt="productPreviewAlt"',
             'data-i18n-alt="workOneAlt"',
             'data-i18n="workOneTitle"',
-            '<a href="#sample-runs" data-i18n="navWorks">Outputs</a>',
+            '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
             'id="sample-runs"',
             'data-sample-runs-root',
             'data-sample-runs-manifest="./assets/sample-runs.json"',
@@ -2274,6 +2300,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             with self.subTest(expected_fragment=expected_fragment):
                 self.assertIn(expected_fragment, html)
 
+        assert_landing_workspace_hero(self, html)
         self.assertNotIn('class="hero__metrics"', html)
         self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
         self.assertNotIn('data-showcase-layer-tab="scenario"', html)
@@ -2548,6 +2575,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             f"app/data/hgo_runtime/{file_name}" for file_name in build_pages_dist.PAGES_HGO_RUNTIME_FILES
         )
         expected_landing_asset_paths = (
+            "assets/product-workspace.webp",
             "assets/hero-cartography.svg",
             "assets/hero-blank.svg",
             "assets/hero-blank.webp",

@@ -10,9 +10,10 @@
       141.5,
       36.8
     ],
-    "projection": "local_equirectangular"
+    "projection": "regional_mercator_uniform_fit"
   },
   "sources": [
+    "data/transport_layers/japan_corridor/carrier.json",
     "data/transport_layers/japan_road/roads.preview.topo.json",
     "data/transport_layers/japan_rail/railways.preview.topo.json",
     "data/transport_layers/japan_rail/rail_stations_major.preview.geojson",
