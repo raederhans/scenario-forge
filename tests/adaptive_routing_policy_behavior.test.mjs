@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { buildExecutionPlan } from "../tools/run_adaptive_tests.mjs";
 
 import {
   automaticOwnershipClassification,
@@ -27,6 +28,17 @@ test("published showcase images keep their Pages and map contract routes", () =>
     assert.deepEqual(report.unmatchedChangedFiles, [], file);
     assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === command), file);
   }
+});
+
+test("Pages verification absorbs both map contract entrypoints without a leaf conflict", () => {
+  const report = buildRepositoryRecommendation([
+    "landing/assets/product-workspace.webp",
+    "landing/assets/work-atlas-japan-corridor.webp",
+    "tests/test_landing_map_asset_contracts.py",
+  ]);
+  const plan = buildExecutionPlan(report);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(plan.routeGaps, []);
 });
 
 test("new renderer files inherit renderer ownership without exact registration", () => {

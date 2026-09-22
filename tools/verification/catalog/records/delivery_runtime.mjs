@@ -761,7 +761,8 @@ export const DELIVERY_RUNTIME_RECORDS = [
     ],
     "cost": "heavy",
     "resourceLocks": [
-      "heavy-geo"
+      "heavy-geo",
+      ".runtime-output"
     ],
     "executionOwners": [
       "main-thread"
