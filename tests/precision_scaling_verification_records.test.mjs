@@ -6,7 +6,7 @@ import { createPrecisionScalingRecords } from "../tools/verification/catalog/rec
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 11);
+  assert.equal(routes.length, 24);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -28,4 +28,22 @@ test("the public authority includes new records after all existing local records
   assert.ok(closure.includes("tools/verification/catalog/records/precision_scaling.mjs"));
   assert.match(source, /const existingRecords = \[\.\.\.baseRecords, \.\.\.createLocalFeedbackRecords\(baseRecords\)\]/);
   assert.match(source, /records: \[\.\.\.existingRecords, \.\.\.createPrecisionScalingRecords\(existingRecords\)\]/);
+});
+
+
+test("precision expansion tools route to executable source-specific regressions", () => {
+  const routes = createPrecisionScalingRecords([]);
+  for (const [source, testFile] of [
+    ["tools/adapt_us_county_scenarios.py", "tests/test_us_county_adaptation.py"],
+    ["tools/prepare_us_county_adaptation_sidecars.py", "tests/test_us_county_adaptation_sidecars.py"],
+    ["tools/scenario_topology_decode.py", "tests/test_scenario_topology_decode.py"],
+    ["js/core/project_feature_migration.js", "tests/project_feature_migration_behavior.test.mjs"],
+    ["js/core/scenario_hierarchy.js", "tests/scenario_hierarchy_behavior.test.mjs"],
+  ]) {
+    const route = routes.find((record) => record.sourceRefs.includes(source));
+    assert.ok(route?.commandRef.includes(testFile)
+      || route?.commandRef.includes(testFile.replace("/", ".").replace(/\.py$/, "")), source);
+    assert.deepEqual(route.executionOwners, ["child-safe"]);
+    assert.deepEqual(route.profiles, ["pr-fast"]);
+  }
 });

@@ -45,8 +45,8 @@ def create_valid_env(d):
     topo = create_mock_topojson()
     (base / 'runtime_topology.topo.json').write_text(json.dumps(topo))
     (cand / 'runtime_topology.topo.json').write_text(json.dumps(topo))
-    (base / 'owners.by_feature.json').write_text(json.dumps({'owners': {'GB1': 'GB'}}))
-    (cand / 'owners.by_feature.json').write_text(json.dumps({'owners': {'GB1': 'GB'}}))
+    (base / 'owners.by_feature.json').write_text(json.dumps({'owners': {'GB1': 'GB', 'FR1': 'FR'}}))
+    (cand / 'owners.by_feature.json').write_text(json.dumps({'owners': {'GB1': 'GB', 'FR1': 'FR'}}))
     (base / 'cores.by_feature.json').write_bytes(b'{}')
     (cand / 'cores.by_feature.json').write_bytes(b'{}')
     (base / 'countries.json').write_bytes(b'{}')
@@ -253,4 +253,59 @@ def test_stale_compressed_startup_rejected(tmp_path):
     (cand / 'startup.bundle.en.json').write_bytes(b'{"generation":2}')
     (cand / 'startup.bundle.en.json.gz').write_bytes(gzip.compress(b'{"generation":1}'))
     with pytest.raises(ValueError, match='stale compressed stage artifact'):
+        validate(base, cand / 'runtime_topology.topo.json', ['GB'], cand)
+
+
+def test_explicit_stable_ids_include_reassigned_features(tmp_path):
+    base, cand = create_valid_env(tmp_path)
+    # A geographic target can have a different present-day scenario allegiance.
+    result = validate(base, cand / 'runtime_topology.topo.json', ['GB'], cand,
+                      target_feature_ids=['GB1', 'FR1'])
+    assert result['target_count'] == 2
+    assert result['target_selection'] == 'explicit_stable_ids'
+    assert set(result['percountry_coverage_candidate']) == {'GB', 'FR'}
+    assert result['surface_delta_deg2'] == 0
+
+
+@pytest.mark.parametrize('targets', [[], ['GB1', 'GB1'], ['missing'], [' GB1'], 'GB1'])
+def test_explicit_stable_ids_reject_invalid_snapshots(tmp_path, targets):
+    base, cand = create_valid_env(tmp_path)
+    with pytest.raises(ValueError, match='unique existing baseline IDs'):
+        validate(base, cand / 'runtime_topology.topo.json', ['GB'],
+                 target_feature_ids=targets)
+
+
+def test_target_surface_loss_fails_even_with_valid_coverage(tmp_path):
+    base, cand = create_valid_env(tmp_path)
+    topo = create_mock_topojson()
+    # Give political GB1 its own arc so protected auxiliary geometry stays exact.
+    topo['arcs'].append([[0, 0], [0, 1], [0.9, 0], [0, -1], [-0.9, 0]])
+    topo['objects']['political']['geometries'][0]['arcs'] = [[2]]
+    (cand / 'runtime_topology.topo.json').write_text(json.dumps(topo))
+    with pytest.raises(ValueError, match='target surface changed'):
+        validate(base, cand / 'runtime_topology.topo.json', ['GB'])
+
+
+def test_owner_domain_drift_fails_when_total_surface_is_unchanged(tmp_path):
+    base, cand = create_valid_env(tmp_path)
+    owners = {'owners': {'GB1': 'A', 'FR1': 'B'}}
+    (base / 'owners.by_feature.json').write_text(json.dumps(owners))
+    topo = create_mock_topojson()
+    # Swapping two geometries preserves the overall surface and IDs, but moves owners.
+    political = topo['objects']['political']['geometries']
+    political[0]['arcs'], political[1]['arcs'] = [[1]], [[0]]
+    (cand / 'runtime_topology.topo.json').write_text(json.dumps(topo))
+    with pytest.raises(ValueError, match='baseline owner domain changed'):
+        validate(base, cand / 'runtime_topology.topo.json', ['GB', 'FR'])
+
+
+def test_missing_target_owner_and_changed_manual_sidecar_fail(tmp_path):
+    base, cand = create_valid_env(tmp_path)
+    (base / 'owners.by_feature.json').write_text(json.dumps({'owners': {}}))
+    with pytest.raises(ValueError, match='missing owner mapping'):
+        validate(base, cand / 'runtime_topology.topo.json', ['GB'])
+    (base / 'owners.by_feature.json').write_bytes((cand / 'owners.by_feature.json').read_bytes())
+    (base / 'scenario_manual_overrides.json').write_text('{}')
+    (cand / 'scenario_manual_overrides.json').write_text('{"changed":true}')
+    with pytest.raises(ValueError, match='scenario_manual_overrides.json changed'):
         validate(base, cand / 'runtime_topology.topo.json', ['GB'], cand)

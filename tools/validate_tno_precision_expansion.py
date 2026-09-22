@@ -18,7 +18,8 @@ def meta(g):
         r['geometries'] = [meta(c) for c in g['geometries']]
     return r
 
-def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=None):
+def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=None, *,
+             target_feature_ids=None):
     if candidate_dir:
         candidate_runtime_expected = candidate_dir / 'runtime_topology.topo.json'
         if not candidate_runtime_expected.exists():
@@ -49,12 +50,24 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
     b = {fid(g): _decode_geometry(new, g) for g in ng}
 
     target_countries = set(source_countries)
-    targets = {fid(g) for g in og if g['properties'].get('cntr_code') in target_countries}
-
-    for country in target_countries:
-        c_targets = {fid(g) for g in og if g['properties'].get('cntr_code') == country}
-        if not c_targets:
-            raise ValueError(f'target country {country} has no features')
+    if target_feature_ids is None:
+        targets = {fid(g) for g in og if g['properties'].get('cntr_code') in target_countries}
+        for country in target_countries:
+            if not any(g['properties'].get('cntr_code') == country for g in og):
+                raise ValueError(f'target country {country} has no features')
+    else:
+        # Historical allegiance is mutable. Validate the builder's explicit
+        # stable-ID snapshot, including source-country features reassigned in TNO.
+        if (not isinstance(target_feature_ids, (list, tuple)) or not target_feature_ids
+                or any(not isinstance(i, str) or not i.strip() or i != i.strip()
+                       for i in target_feature_ids)
+                or len(set(target_feature_ids)) != len(target_feature_ids)
+                or set(target_feature_ids) - set(ids)):
+            raise ValueError('target_feature_ids must be unique existing baseline IDs')
+        targets = set(target_feature_ids)
+    if not targets:
+        raise ValueError('precision validation requires nonempty targets')
+    target_buckets = {g['properties'].get('cntr_code') for g in og if fid(g) in targets}
 
     untouched = [i for i in ids if i not in targets]
 
@@ -82,8 +95,9 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
 
     percountry_coverage_baseline = {}
     percountry_coverage_candidate = {}
-    for country in sorted(target_countries):
-        c_targets = {fid(g) for g in og if g['properties'].get('cntr_code') == country}
+    for country in sorted(target_buckets):
+        c_targets = {fid(g) for g in og if fid(g) in targets
+                     and g['properties'].get('cntr_code') == country}
 
         c_geoms_old = [a[i] for i in sorted(c_targets)]
         percountry_coverage_baseline[country] = bool(shapely.coverage_is_valid(c_geoms_old))
@@ -94,6 +108,19 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
     visual_metrics = []
     owners_file = baseline_dir / 'owners.by_feature.json'
     owners = read(owners_file)['owners'] if owners_file.exists() else {}
+    if any(not owners.get(i) for i in targets):
+        raise ValueError('missing owner mapping for target IDs')
+    if not shapely.coverage_is_valid([b[i] for i in sorted(targets)]):
+        raise ValueError('invalid joint target coverage')
+    old_union = shapely.union_all([a[i] for i in sorted(targets)])
+    new_union = shapely.union_all([b[i] for i in sorted(targets)])
+    surface_delta = old_union.symmetric_difference(new_union).area
+    if surface_delta > 1e-10:
+        raise ValueError(f'target surface changed: {surface_delta}')
+    old_excess = sum(a[i].area for i in targets) - old_union.area
+    new_excess = sum(b[i].area for i in targets) - new_union.area
+    if new_excess - old_excess > 1e-10:
+        raise ValueError('target overlap increased')
     for i in sorted(targets):
         sym_diff = a[i].symmetric_difference(b[i])
         orig_area = a[i].area
@@ -123,6 +150,12 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
             if not base_file.exists() or not cand_file.exists():
                 raise ValueError(f'missing required stage file {name}')
             if base_file.read_bytes() != cand_file.read_bytes():
+                raise ValueError(f'{name} changed')
+        for name in ['controllers.by_feature.json', 'scenario_manual_overrides.json', 'scenario_mutations.json']:
+            base_file, cand_file = baseline_dir / name, candidate_dir / name
+            if base_file.exists() != cand_file.exists():
+                raise ValueError(f'{name} presence changed')
+            if base_file.exists() and base_file.read_bytes() != cand_file.read_bytes():
                 raise ValueError(f'{name} changed')
 
         chunks_file = candidate_dir / 'detail_chunks.manifest.json'
@@ -257,6 +290,8 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
                 'bbox': list(o_sym.bounds),
                 'summed_perfeature_area': summed_perfeature
             }
+            if o_sym.area > 1e-10:
+                raise ValueError(f'baseline owner domain changed for {single_tag}')
 
     sizes = {
         'baseline_raw': len((baseline_dir / 'runtime_topology.topo.json').read_bytes()) if (baseline_dir / 'runtime_topology.topo.json').exists() else None,
@@ -269,6 +304,11 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
         'status': 'invariants_pass_visual_review_required' if visual_metrics else 'PASS',
         'visual_accepted': False,
         'target_count': len(targets),
+        'target_feature_ids': sorted(targets),
+        'target_selection': 'explicit_stable_ids' if target_feature_ids is not None else 'cntr_code',
+        'coverage_bucket_scope': 'baseline cntr_code within selected target IDs',
+        'surface_delta_deg2': surface_delta,
+        'overlap_excess_increase_deg2': new_excess - old_excess,
         'total_coords_old': total_coords_old,
         'total_coords_new': total_coords_new,
         'sizes': sizes,
@@ -290,10 +330,13 @@ if __name__ == '__main__':
     p.add_argument('--source-countries', type=str, nargs='+', required=True)
     p.add_argument('--output', type=Path, required=False)
     p.add_argument('--candidate-dir', type=Path, required=False, default=None)
+    p.add_argument('--target-feature-ids', type=Path,
+                   help='JSON array of the explicit stable IDs selected by the candidate builder')
     args = p.parse_args()
 
     try:
-        r = validate(args.baseline_dir, args.candidate_runtime, args.source_countries, args.candidate_dir)
+        r = validate(args.baseline_dir, args.candidate_runtime, args.source_countries, args.candidate_dir,
+                     target_feature_ids=read(args.target_feature_ids) if args.target_feature_ids else None)
     except Exception as e:
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -47,7 +47,7 @@ def _stored_edges(topology):
 
 
 def _assemble_candidate(baseline, replacements, source_countries, *, boundary_tolerance=0.0,
-                        retained_enclave_countries=()):
+                        retained_enclave_countries=(), target_feature_ids=None):
     countries = {str(code).strip().upper() for code in source_countries}
     if not countries or any(len(code) != 2 or not code.isascii() or not code.isalpha() for code in countries):
         raise ValueError("Source countries must be explicit ISO2 source codes.")
@@ -56,11 +56,18 @@ def _assemble_candidate(baseline, replacements, source_countries, *, boundary_to
     by_id = {str(item["properties"]["id"]): item for item in rows}
     if len(by_id) != len(rows):
         raise ValueError("Baseline political IDs must be unique.")
-    current = {fid: item for fid, item in by_id.items()
-               if str(item["properties"].get("cntr_code", "")).strip().upper() in countries}
-    selected_countries = {str(item["properties"]["cntr_code"]).strip().upper() for item in current.values()}
-    if selected_countries != countries:
-        raise ValueError("Every selected source country must exist in the baseline.")
+    if target_feature_ids is None:
+        current = {fid: item for fid, item in by_id.items()
+                   if str(item["properties"].get("cntr_code", "")).strip().upper() in countries}
+        selected_countries = {str(item["properties"]["cntr_code"]).strip().upper() for item in current.values()}
+        if selected_countries != countries:
+            raise ValueError("Every selected source country must exist in the baseline.")
+    else:
+        target_feature_ids = [str(fid) for fid in target_feature_ids]
+        if (not target_feature_ids or len(set(target_feature_ids)) != len(target_feature_ids)
+                or set(target_feature_ids) - set(by_id)):
+            raise ValueError("Explicit target_feature_ids must be unique existing baseline IDs.")
+        current = {fid: by_id[fid] for fid in target_feature_ids}
     if replacements.empty or not {"id", "cntr_code"}.issubset(replacements.columns):
         raise ValueError("Replacement must contain nonempty id, cntr_code and geometry columns.")
     if replacements.crs is None or replacements.crs.to_epsg() != 4326:
@@ -116,14 +123,31 @@ def _assemble_candidate(baseline, replacements, source_countries, *, boundary_to
     protected.append(extent.difference(shapely.union_all(land)))
     selected, constraints = constrain_candidate_surface_geometry(
         old, selected, shapely.union_all(protected), boundary_tolerance=boundary_tolerance)
-    candidate, diagnostics = replace_regional_geometry(baseline, selected, source_countries=sorted(countries))
+    candidate, diagnostics = replace_regional_geometry(
+        baseline, selected,
+        source_countries=sorted(countries) if target_feature_ids is None else None,
+    )
     precision_countries = baseline.get("political_precision_source_countries", [])
     if not isinstance(precision_countries, list) or any(
         not isinstance(code, str) or len(code) != 2 or not code.isascii() or not code.isupper()
         or not code.isalpha() for code in precision_countries
     ):
         raise ValueError("Baseline political_precision_source_countries must be an ISO2 list.")
-    candidate["political_precision_source_countries"] = sorted(set(precision_countries) | countries)
+    if target_feature_ids is None:
+        candidate["political_precision_source_countries"] = sorted(set(precision_countries) | countries)
+    else:
+        # Partial/stable-ID upgrades may cross mutable scenario allegiances.
+        # Declare exactly their IDs: country flags both omit reassigned targets
+        # and unnecessarily expand coarse precision to untouched country units.
+        precision_ids = baseline.get("political_precision_feature_ids", [])
+        if (not isinstance(precision_ids, list)
+                or any(not isinstance(value, str) or not value.strip() or value != value.strip()
+                       for value in precision_ids)
+                or len(set(precision_ids)) != len(precision_ids)
+                or set(precision_ids) - set(by_id)):
+            raise ValueError("Baseline political_precision_feature_ids must contain unique existing IDs.")
+        candidate["political_precision_source_countries"] = sorted(precision_countries)
+        candidate["political_precision_feature_ids"] = sorted(set(precision_ids) | set(current))
     if set(candidate["objects"]) != set(absolute["objects"]):
         raise ValueError("Candidate changed runtime object membership.")
     auxiliary = []
@@ -143,6 +167,7 @@ def _assemble_candidate(baseline, replacements, source_countries, *, boundary_to
     cross = lambda edge: sum(fid in current for fid in edge) == 1
     report = {**diagnostics, "scenario_id": "tno_1962", "source_countries": sorted(countries),
         "political_precision_source_countries": candidate["political_precision_source_countries"],
+        "political_precision_feature_ids": candidate.get("political_precision_feature_ids", []),
         "source_feature_counts": dict(Counter(str(item["properties"]["cntr_code"]) for item in current.values())),
         "source_coordinates": int(shapely.get_num_coordinates(replacements.geometry.values).sum()),
         "baseline_target_coordinates": int(shapely.get_num_coordinates(old.geometry.values).sum()),
