@@ -12948,6 +12948,7 @@ function updatePerfOverlay() {
     })
     .join(", ");
   const coverageDebug = runtimeState.debugCountryCoverage || {};
+  const backgroundBuild = renderPerf.scenarioPoliticalBackgroundCacheBuild || {};
   overlay.textContent = [
     `phase=${frame.phase || runtimeState.renderPhase} total=${Number(frame.totalMs || 0).toFixed(1)}ms`,
     `action=${cache.lastAction || "-"} ${Number(cache.lastActionDurationMs || 0).toFixed(1)}ms`,
@@ -12959,6 +12960,9 @@ function updatePerfOverlay() {
     `ctxScenario reuse=${cache.counters.contextScenarioReuseCount || 0} exact=${cache.counters.contextScenarioExactRefreshCount || 0} reason=${contextScenarioReasonSnapshot.displayReason} cacheReason=${contextScenarioReasonSnapshot.cacheReason} perfReason=${contextScenarioReasonSnapshot.perfReason} mismatchWarn=${cache.counters.contextScenarioReasonMismatchWarnings || 0}`,
     `coverage countries=${Number(coverageDebug.totalCountries || 0)} detail=${Number(coverageDebug.detailCountries || 0)} primary=${Number(coverageDebug.primaryCountries || 0)} priorityGap=${Array.isArray(coverageDebug.priorityCountryGaps) ? coverageDebug.priorityCountryGaps.length : 0}`,
     `projBounds total=${Number(renderPerf.projectedBoundsDiagnostics?.total || 0)} reasons=${JSON.stringify(renderPerf.projectedBoundsDiagnostics?.byReason || {})}`,
+    `partial applied=${!!renderPerf.politicalPartialRepaint?.applied} reason=${renderPerf.politicalPartialRepaint?.fallbackReason || "-"} dirty=${Number(renderPerf.politicalPartialRepaint?.dirtyFeatureCount || 0)} candidates=${Number(renderPerf.politicalPartialRepaint?.candidateCount || 0)} misses=${Number(renderPerf.politicalPartialRepaint?.pathCacheMisses || 0)} coverage=${Number(renderPerf.politicalPartialRepaint?.viewportCoverage || 0).toFixed(4)}`,
+    `bgPaths entries=${Number(backgroundBuild.entryCount || 0)} built=${Number(backgroundBuild.builtPathCount || 0)} reused=${Number(backgroundBuild.reusedPathCount || 0)} previous=${Number(backgroundBuild.reusedPreviousPathCount || 0)} cache=${Number(backgroundBuild.pathCacheSizeBefore || 0)}->${Number(backgroundBuild.pathCacheSizeAfter || 0)} reset=${backgroundBuild.pathCacheResetReason || "-"}`,
+    `bgGroups built=${Number(backgroundBuild.builtGroupMergeCount || 0)} reused=${Number(backgroundBuild.reusedGroupMergeCount || 0)}`,
     `invalidations ${invalidations}`,
     `render draw=${cache.counters.drawCanvas || 0} frame=${cache.counters.frames || 0} ctxBase=${cache.counters.contextBasePassRenders || 0} labels=${cache.counters.labelPassRenders || 0} ctxScenario=${cache.counters.contextScenarioPassRenders || 0} dayNight=${cache.counters.dayNightPassRenders || 0} hit=${cache.counters.hitCanvasRenders || 0} dynBorder=${cache.counters.dynamicBorderRebuilds || 0}`,
     `sidebar list=${sidebarPerf.counters.fullListRenders || 0} rows=${sidebarPerf.counters.rowRefreshes || 0} detail=${sidebarPerf.counters.inspectorRenders || 0} preset=${sidebarPerf.counters.presetTreeRenders || 0} legend=${sidebarPerf.counters.legendRenders || 0}`,

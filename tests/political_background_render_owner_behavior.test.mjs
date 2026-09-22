@@ -11,10 +11,13 @@ class FakePath2D {
 
   addPath(path) {
     this.paths.push(path);
+    FakePath2D.addPathCallCount = (FakePath2D.addPathCallCount || 0) + 1;
   }
 }
+FakePath2D.addPathCallCount = 0;
 
-function createFixture({ progressiveLimit = 2400 } = {}) {
+
+function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
   const calls = [];
   const pending = [];
   const cancelled = [];
@@ -84,6 +87,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     },
     getPoliticalFeaturePathEntry: (feature, { featureId, allowBuild, countBuild }) => {
       calls.push(`lookup:${featureId}`);
+      if (!withPath2D) return null;
       assert.equal(allowBuild, true);
       assert.equal(countBuild, true);
       if (!isPoliticalFeaturePathEntryCurrent(pathCache.get(featureId), feature)) {
@@ -94,7 +98,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
     },
     isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
-    getPoliticalPathCacheSignature: (transform) => `path:${transform.k}:${transform.x}:${transform.y}`,
+    getPoliticalPathCacheSignature: (transform) => `path:${transform.k}:${transform.x}:${transform.y}:${state.projectionRevision || 0}`,
     getVisibleFrameIdentity: () => ({
       scenarioId: state.activeScenarioId,
       sceneGeneration: state.sceneGeneration,
@@ -162,7 +166,7 @@ function createFixture({ progressiveLimit = 2400 } = {}) {
         geoBounds: () => [[0, 0], [1, 1]],
       },
       topojson: { merge: (_topology, geometries) => ({ type: "MultiPolygon", geometries }) },
-      Path2D: FakePath2D,
+      Path2D: withPath2D ? FakePath2D : null,
     },
     constants: {
       landFillColor: "#d8d2c4",
@@ -524,3 +528,210 @@ test("suspicious merge diagnostics use the injected warning port once", () => {
   });
   assert.equal(fixture.calls.filter((entry) => entry.startsWith("warn:")).length, 1);
 });
+
+
+test("outer full-land recolor and undo reuse retained paths after LRU eviction without repopulating it", () => {
+  const fixture = createFixture();
+  fixture.state.landDataFull = { features: [feature("a"), feature("b")] };
+  const draw = () => fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+  assert.equal(draw().builtPathCount, 2);
+  const oldPaths = [...fixture.pathCache.values()].map(entry => entry.path);
+  for (const color of ["#ff0000", null]) {
+    fixture.pathCache.clear();
+    fixture.calls.length = 0;
+    fixture.filledPaths.length = 0;
+    if (color) fixture.state.colors.a = color;
+    else delete fixture.state.colors.a;
+    fixture.state.colorRevision += 1;
+    const summary = draw();
+    assert.equal(summary.cacheHit, false);
+    assert.equal(summary.builtPathCount, 0);
+    assert.equal(summary.reusedPreviousPathCount, 2);
+    assert.equal(fixture.pathCache.size, 0);
+    assert.equal(summary.groupCount, color ? 2 : 1);
+    assert.ok(fixture.calls.includes(`fillStyle:${color || "#778899"}`));
+    const paths = fixture.filledPaths.flatMap(path => path.paths || [path]);
+    assert.deepEqual(new Set(paths), new Set(oldPaths));
+    assert.equal(fixture.metrics.at(-1).reusedPreviousPathCount, 2);
+    assert.equal(draw().cacheHit, true);
+  }
+});
+
+for (const [label, change] of [
+  ["same-ID replacement", fixture => { fixture.state.landDataFull.features[0] = feature("a"); }],
+  ["geometry replacement on the same feature", fixture => { fixture.state.landDataFull.features[0].geometry = { type: "Polygon" }; }],
+  ["transform", fixture => { fixture.state.zoomTransform = { k: 2, x: 0, y: 0 }; }],
+  ["projection", fixture => { fixture.state.projectionRevision = 1; }],
+  ["scene", fixture => { fixture.state.sceneGeneration += 1; }],
+  ["data", fixture => { fixture.state.scenarioDataGeneration += 1; }],
+  ["scenario", fixture => { fixture.state.activeScenarioId = "scenario-b"; }],
+]) {
+  test(`outer recolor rejects retained paths after ${label}`, () => {
+    const fixture = createFixture();
+    fixture.state.landDataFull = { features: [feature("a")] };
+    const draw = () => fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+    draw();
+    fixture.pathCache.clear();
+    change(fixture);
+    fixture.state.colorRevision += 1;
+    const summary = draw();
+    assert.equal(summary.cacheHit, false);
+    assert.equal(summary.reusedPreviousPathCount, 0);
+    assert.equal(summary.builtPathCount, 1);
+  });
+}
+
+test("pathless full-pass recoloring preserves canvas fallback", () => {
+  const fixture = createFixture({ withPath2D: false });
+  fixture.state.landDataFull = { features: [feature("a")] };
+  const draw = () => fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+  draw();
+  fixture.calls.length = 0;
+  fixture.state.colors.a = "#ff0000";
+  fixture.state.colorRevision += 1;
+  const summary = draw();
+  assert.equal(summary.pathlessEntryCount, 1);
+  assert.equal(summary.reusedPreviousPathCount, 0);
+  assert.equal(summary.builtPathCount, 0);
+  assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
+  assert.ok(fixture.calls.includes("path:a"));
+  assert.ok(fixture.calls.includes("fill"));
+});
+
+
+for (const replaceFeature of [false, true]) {
+  test(`full-pass replay rejects ${replaceFeature ? "feature" : "geometry"} replacement without a color revision`, () => {
+    const fixture = createFixture();
+    const entries = [{ id: "a", feature: feature("a") }];
+    fixture.state.landData = { features: [entries[0].feature] };
+    const draw = () => fixture.owner.drawPoliticalBackgroundFillsForEntries(entries, {
+      useFullPassCache: true, returnSummary: true,
+    });
+    draw();
+    fixture.pathCache.clear();
+    if (replaceFeature) entries[0].feature = feature("a");
+    else entries[0].feature.geometry = { type: "Polygon" };
+    const summary = draw();
+    assert.equal(summary.cacheHit, false);
+    assert.equal(summary.reusedPreviousPathCount, 0);
+    assert.equal(summary.builtPathCount, 1);
+  });
+}
+
+test("merged group Path2D reuse requires exact ordered paths and invalidates on scene fences or reorder", () => {
+  const fixture = createFixture();
+  const a1 = feature("a1", "O1");
+  const a2 = feature("a2", "O1");
+  const b1 = feature("b1", "O2");
+  const b2 = feature("b2", "O2");
+  const b3 = feature("b3", "O2");
+
+  fixture.state.landDataFull = { features: [a1, a2, b1, b2, b3] };
+
+  const draw = () => {
+    fixture.filledPaths.length = 0;
+    const summary = fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+    return { summary, paths: [...fixture.filledPaths] };
+  };
+
+  FakePath2D.addPathCallCount = 0;
+  const first = draw();
+  assert.equal(first.summary.builtGroupMergeCount, 2);
+  assert.equal(first.summary.reusedGroupMergeCount, 0);
+  assert.equal(first.paths.length, 2); // One path2d for O1, one for O2
+  const pathO1 = first.paths[0];
+  const pathO2 = first.paths[1];
+  assert.equal(pathO1.paths.length, 2);
+  assert.equal(pathO2.paths.length, 3);
+  assert.equal(FakePath2D.addPathCallCount, 5); // 2 + 3 paths added
+
+  // 1. Unchanged group merges reused
+  fixture.state.colors.a1 = "#ff0000";
+  fixture.state.colors.a2 = "#ff0000"; // O1 color changed
+  fixture.state.colorRevision += 1;
+
+  FakePath2D.addPathCallCount = 0;
+  const recolored = draw();
+  assert.equal(recolored.summary.builtGroupMergeCount, 1);
+  assert.equal(recolored.summary.reusedGroupMergeCount, 1);
+  // O1 was rebuilt
+  assert.notEqual(recolored.paths[0], pathO1);
+  assert.equal(recolored.paths[0].paths.length, 2);
+  // O2 was untouched, object identity MUST exactly match
+  assert.equal(recolored.paths[1], pathO2);
+  assert.equal(FakePath2D.addPathCallCount, 2); // only O1 rebuilt
+  const pathO1Recolored = recolored.paths[0];
+
+  // 2. Reordered members do not reuse
+  fixture.state.landDataFull = { features: [a1, a2, b1, b3, b2] }; // b2 and b3 swapped in O2
+  fixture.state.colorRevision += 1;
+  FakePath2D.addPathCallCount = 0;
+  const reordered = draw();
+  assert.equal(reordered.summary.builtGroupMergeCount, 1); // O2 built
+  assert.equal(reordered.summary.reusedGroupMergeCount, 1); // O1 reused
+  assert.notEqual(reordered.paths[1], pathO2);
+  assert.equal(reordered.paths[0], pathO1Recolored);
+  assert.equal(FakePath2D.addPathCallCount, 3); // O2 paths
+  const pathO2Reordered = reordered.paths[1];
+
+  // 3. Missing/partial/pathless member does not inherit
+  const b3StaleGeometry = b3.geometry;
+  b3.geometry = null; // Pathless
+  fixture.state.colorRevision += 1;
+  FakePath2D.addPathCallCount = 0;
+  const pathless = draw();
+  assert.equal(pathless.summary.builtGroupMergeCount, 1); // O2 built without b3
+  assert.equal(pathless.summary.reusedGroupMergeCount, 1); // O1 reused
+  assert.notEqual(pathless.paths[1], pathO2Reordered);
+  assert.equal(pathless.paths[1].paths.length, 2); // Only b1 and b2
+  assert.equal(FakePath2D.addPathCallCount, 2); // 2 paths for new O2
+
+  // 4. Transform invalidation (global scene fence)
+  b3.geometry = b3StaleGeometry; // Restore
+  fixture.state.colorRevision += 1; // Invalidate entries cache so b3 is picked up again
+  fixture.state.zoomTransform = { k: 2, x: 0, y: 0 };
+  FakePath2D.addPathCallCount = 0;
+  const transformed = draw();
+  assert.equal(transformed.summary.builtGroupMergeCount, 2);
+  assert.equal(transformed.summary.reusedGroupMergeCount, 0);
+  assert.notEqual(transformed.paths[0], pathO1Recolored);
+  assert.equal(FakePath2D.addPathCallCount, 5);
+
+  // 5. Scenario ID invalidation
+  fixture.state.activeScenarioId = "scenario-b";
+  FakePath2D.addPathCallCount = 0;
+  const scenarioChanged = draw();
+  assert.equal(scenarioChanged.summary.builtGroupMergeCount, 2);
+  assert.equal(scenarioChanged.summary.reusedGroupMergeCount, 0);
+  assert.equal(FakePath2D.addPathCallCount, 5);
+
+  // 6. Data Generation invalidation
+  fixture.state.scenarioDataGeneration += 1;
+  FakePath2D.addPathCallCount = 0;
+  const dataChanged = draw();
+  assert.equal(dataChanged.summary.builtGroupMergeCount, 2);
+  assert.equal(dataChanged.summary.reusedGroupMergeCount, 0);
+  assert.equal(FakePath2D.addPathCallCount, 5);
+});
+
+for (const [label, change] of [
+  ["projection", fixture => { fixture.state.projectionRevision = 1; }],
+  ["scene generation", fixture => { fixture.state.sceneGeneration += 1; }],
+  ["member geometry", fixture => { fixture.state.landDataFull.features[0].geometry = { type: "Polygon" }; }],
+]) {
+  test(`merged group rejects stale paths after ${label}`, () => {
+    const fixture = createFixture();
+    fixture.state.landDataFull = { features: [feature("a"), feature("b")] };
+    const draw = () => fixture.owner.drawPoliticalBackgroundFills({ visibleItems: [], returnSummary: true });
+    draw();
+    const previous = fixture.filledPaths.at(-1);
+    change(fixture);
+    fixture.state.colorRevision += 1;
+    FakePath2D.addPathCallCount = 0;
+    const result = draw();
+    assert.equal(result.reusedGroupMergeCount, 0);
+    assert.equal(result.builtGroupMergeCount, 1);
+    assert.notEqual(fixture.filledPaths.at(-1), previous);
+    assert.equal(FakePath2D.addPathCallCount, 2);
+  });
+}

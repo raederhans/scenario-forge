@@ -62,5 +62,42 @@ export function createPrecisionScalingRecords(existingRecords) {
     commandRef: "npx playwright test --config=playwright.config.cjs tests/e2e/dev/latency_batches.dev.spec.js --workers=1",
     sourceRefs: ["tests/e2e/dev/latency_batches.dev.spec.js"], selectorOrder: start + records.length,
   });
+  // New precision tools execute their focused regressions in PR checks as well.
+  const expansionRoutes = [
+    ["export-detail", "scenario-runtime", "node --test tests/precision_scaling_export_detail_behavior.test.mjs", [
+      "js/core/scenario/chunk_runtime.js", "js/core/scenario_resources.js", "js/ui/toolbar.js",
+      "tests/precision_scaling_export_detail_behavior.test.mjs",
+    ]],
+    ["project-migration", "scenario-runtime", "node --test tests/project_feature_migration_behavior.test.mjs", [
+      "js/core/project_feature_migration.js", "js/core/sovereignty_manager.js",
+      "js/core/interaction_funnel/import_apply_orchestration.js", "tests/project_feature_migration_behavior.test.mjs",
+    ]],
+    ["scenario-hierarchy", "scenario-runtime", "node --test tests/scenario_hierarchy_behavior.test.mjs", [
+      "js/core/scenario_hierarchy.js", "js/core/quick_fill_hierarchy.js", "js/core/releasable_manager.js",
+      "js/core/renderer/parent_border_grouping_policy.js", "js/ui/sidebar.js",
+      "js/ui/toolbar/quick_fill_level_controls.js", "tests/scenario_hierarchy_behavior.test.mjs",
+    ]],
+    ...[
+      ["precision_shard_lod", "tools/scenario_chunk_assets.py"],
+      ["scenario_topology_decode", "tools/scenario_topology_decode.py", "tools/regional_scenario_assets.py", "tools/scenario_chunk_assets.py"],
+      ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py"],
+      ["tno_major_country_precision", "tools/prepare_tno_major_country_precision.py"],
+      ["us_county_source", "tools/prepare_us_county_source.py"],
+      ["us_county_seams", "tools/prepare_us_county_seams.py"],
+      ["us_county_scenario", "tools/stage_us_county_scenario.py"],
+      ["us_county_lod", "tools/validate_us_county_lod.py", "tools/scenario_chunk_assets.py"],
+      ["us_county_adaptation", "tools/adapt_us_county_scenarios.py", "tools/stage_us_county_scenario.py"],
+      ["us_county_adaptation_sidecars", "tools/prepare_us_county_adaptation_sidecars.py"],
+    ].map(([name, ...sources]) => [name, "geo-contract",
+      ["precision_shard_lod", "tno_east_europe_gaps"].includes(name)
+        ? `python -m pytest tests/test_${name}.py -q`
+        : `python -m unittest tests.test_${name} -q`,
+      [...sources, `tests/test_${name}.py`],
+    ]),
+  ];
+  for (const [id, domain, commandRef, sourceRefs] of expansionRoutes) records.push({
+    ...records[0], id: "local:precision-expansion:" + id, commandRef, sourceRefs,
+    ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
+  });
   return records;
 }

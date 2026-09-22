@@ -89,6 +89,16 @@ class TnoRegionalPrecisionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     _assemble_candidate(baseline, variant, ["DE", "BE", "NL"])
 
+    def test_explicit_targets_declare_precision_ids_without_expanding_country_scope(self):
+        baseline, replacements = self.fixture()
+        baseline['political_precision_feature_ids'] = ['FR_KEEP']
+        candidate, report = _assemble_candidate(baseline, replacements, ['CN'],
+            target_feature_ids=['DE_A', 'BE_A', 'NL_A'])
+        self.assertEqual(candidate['political_precision_source_countries'], ['JP'])
+        self.assertEqual(candidate['political_precision_feature_ids'], ['BE_A', 'DE_A', 'FR_KEEP', 'NL_A'])
+        self.assertEqual(report['political_precision_feature_ids'], candidate['political_precision_feature_ids'])
+        self.assertNotIn('FR_OTHER', candidate['political_precision_feature_ids'])
+
     def test_file_candidate_and_no_overwrite_guards(self):
         baseline, replacements = self.fixture()
         runtime = Path(__file__).resolve().parents[1] / ".runtime" / "tmp"

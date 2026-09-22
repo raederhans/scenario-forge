@@ -1,3 +1,4 @@
+import { getEffectiveScenarioHierarchy } from "../../core/scenario_hierarchy.js";
 import { getQuickFillLevels, normalizeQuickFillScope } from "../../core/quick_fill_hierarchy.js";
 import { getCountryCode } from "../../core/feature_identity.js";
 
@@ -21,7 +22,7 @@ export function getQuickFillUiCountry(state) {
 export function getQuickFillLevelModel(state) {
   const zh = String(state.currentLanguage || "en").startsWith("zh");
   const countryCode = getQuickFillUiCountry(state);
-  const levels = getQuickFillLevels(state.hierarchyData, countryCode);
+  const levels = getQuickFillLevels(getEffectiveScenarioHierarchy(state), countryCode);
   const options = [{ value: "parent", label: zh ? "默认上级" : "Default parent" }];
   for (const level of levels) {
     let label = zh ? ZH[level.label] || level.label : level.label;

@@ -16,10 +16,11 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
   const byteLimit = positive(maxInFlightBytes, 32 * MIB);
   const queue = [];
   let active = 0, activeBytes = 0, sequence = 0, pumpQueued = false;
-  let peakActive = 0, peakBytes = 0;
+  let peakActive = 0, peakBytes = 0, queuedBytes = 0, completed = 0, cancelledBeforeStart = 0;
   const getStats = () => ({ active, queued: queue.length, inFlightEstimatedBytes: activeBytes,
     maxConcurrent: concurrency, maxInFlightBytes: byteLimit, peakActive, peakEstimatedBytes: peakBytes,
-    overBudgetBytes: Math.max(0, activeBytes - byteLimit) });
+    overBudgetBytes: Math.max(0, activeBytes - byteLimit), queuedEstimatedBytes: queuedBytes,
+    completed, cancelledBeforeStart });
   const report = () => { try { onMetric(getStats()); } catch { /* Diagnostics cannot strand loads. */ } };
   function requestPump() {
     if (pumpQueued) return;
@@ -34,6 +35,7 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
       // of smaller tasks leapfrog the head and starve it indefinitely.
       if (active && activeBytes + task.bytes > byteLimit) break;
       queue.shift();
+      queuedBytes -= task.bytes;
       if (task.signal?.aborted) { task.cancel(); continue; }
       task.running = true;
       active++;
@@ -42,6 +44,7 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
       peakBytes = Math.max(peakBytes, activeBytes);
       report();
       const finish = () => {
+        completed++;
         active--;
         activeBytes -= task.bytes;
         task.signal?.removeEventListener("abort", task.cancel);
@@ -69,7 +72,8 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
       task.cancel = () => {
         if (task.running) return;
         const index = queue.indexOf(task);
-        if (index >= 0) queue.splice(index, 1);
+        if (index >= 0) { queue.splice(index, 1); queuedBytes -= task.bytes; }
+        cancelledBeforeStart++;
         signal?.removeEventListener("abort", task.cancel);
         reject(aborted(signal));
         report();
@@ -77,6 +81,7 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
       };
       signal?.addEventListener("abort", task.cancel, { once: true });
       queue.push(task);
+      queuedBytes += task.bytes;
       report();
       requestPump();
     });
@@ -86,5 +91,10 @@ export function createChunkLoadScheduler({ maxConcurrent = 2, maxInFlightBytes =
     for (const task of queue) if (task.key === key) task.priority = priority;
     requestPump();
   }
-  return Object.freeze({ schedule, reprioritize, getStats });
+  function promote(key, priority) {
+    if (!Number.isFinite(priority)) return;
+    for (const task of queue) if (task.key === key) task.priority = Math.max(task.priority, priority);
+    requestPump();
+  }
+  return Object.freeze({ schedule, reprioritize, promote, getStats });
 }

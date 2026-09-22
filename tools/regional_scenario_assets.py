@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
 
 import geopandas as gpd
 from shapely.geometry import shape
-from topojson.utils import serialize_as_geojson
+from tools.scenario_topology_decode import topology_object_to_geojson
 
 from map_builder.geo.topology import compute_neighbor_graph
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets, _resolve_feature_owner_bucket
@@ -31,7 +31,7 @@ def _features(path: Path) -> dict[str, dict[str, Any]]:
     payload = _read(path)
     if payload.get("type") != "Topology" or "political" not in payload.get("objects", {}):
         raise ValueError(f"Expected political Topology: {path}")
-    payload = serialize_as_geojson(payload, objectname="political")
+    payload = topology_object_to_geojson(payload, "political")
     result = {}
     for feature in payload.get("features", []):
         props = feature.get("properties") or {}
@@ -55,7 +55,7 @@ def _objects(path: Path) -> dict[str, Any]:
             continue
         if obj.get("type") != "GeometryCollection":
             payload["objects"][name] = {"type": "GeometryCollection", "geometries": [obj]}
-        decoded[name] = serialize_as_geojson(payload, objectname=name)
+        decoded[name] = topology_object_to_geojson(payload, name)
     return decoded
 
 

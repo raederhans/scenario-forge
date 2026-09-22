@@ -10,6 +10,7 @@ import {
   getFeatureId as getSharedFeatureId,
 } from "./feature_identity.js";
 import { resolveDataAssetUrl } from "./runtime_asset_registry.js";
+import { planProjectFeatureMigration } from "./project_feature_migration.js";
 const state = runtimeState;
 
 const FEATURE_MIGRATION_URLS = [resolveDataAssetUrl("feature_migrations:by_hybrid_v1")];
@@ -399,9 +400,9 @@ function partitionFeatureScopedEntries(entries, validFeatureIds) {
 
 async function migrateFeatureScopedProjectDataToCurrentTopology(
   data,
-  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null } = {}
+  { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, scenarioManifest = null } = {}
 ) {
-  const payload = data && typeof data === "object" ? { ...data } : {};
+  let payload = data && typeof data === "object" ? { ...data } : {};
   delete payload.scenarioControllersByFeatureId;
   const normalizedValidFeatureIds = (() => {
     if (validFeatureIds instanceof Set) {
@@ -416,6 +417,11 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     }
     return new Set(features.map((feature) => getFeatureId(feature)).filter(Boolean));
   })();
+  const explicitMigration = planProjectFeatureMigration(payload, {
+    manifest: scenarioManifest,
+    validFeatureIds: normalizedValidFeatureIds,
+  });
+  if (explicitMigration) payload = explicitMigration.data;
   if (!normalizedValidFeatureIds?.size) {
     return payload;
   }
@@ -433,7 +439,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     const retainedCount = Object.keys(sovereigntyPartition.retained).length
       + Object.keys(visualPartition.retained).length;
     onMigration({
-      migratedEntries,
+      migratedEntries: migratedEntries + (explicitMigration?.summary.migratedEntries || 0),
       ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries),
     });
   };

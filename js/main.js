@@ -27,6 +27,7 @@ import {
   persistViewSettings,
   postStartupSupportKeyUsageReport,
   warnOnStartupBundleIntegrity,
+  waitForStartupRenderSettle,
 } from "./bootstrap/startup_bootstrap_support.js";
 import {
   buildInteractionInfrastructureAfterStartup,
@@ -603,6 +604,7 @@ async function bootstrap() {
 
     setBootState("warmup");
     invalidateAllRenderPasses("bootstrap-first-political-frame");
+    await waitForStartupRenderSettle(runtimeState);
     renderDispatcher.flush();
     assertStartupFirstVisibleFrameAccepted("bootstrap-first-political-frame");
 

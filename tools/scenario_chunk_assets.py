@@ -14,7 +14,7 @@ from shapely.errors import GEOSException
 from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
-from topojson.utils import serialize_as_geojson
+from tools.scenario_topology_decode import topology_object_to_geojson
 
 DEFAULT_RENDER_BUDGET_HINTS = {
     "max_required_chunks": 6,
@@ -599,7 +599,7 @@ def _topology_object_to_feature_collection(topology_payload: dict[str, Any] | No
     objects = topology_payload.get("objects")
     if not isinstance(objects, dict) or object_name not in objects:
         return None
-    feature_collection = serialize_as_geojson(topology_payload, objectname=object_name)
+    feature_collection = topology_object_to_geojson(topology_payload, object_name)
     if not isinstance(feature_collection, dict) or not isinstance(feature_collection.get("features"), list):
         return None
     return {
@@ -1228,6 +1228,7 @@ def _reusable_detail_entries_match_owner(
     scenario_dir: Path,
     reusable_entries: list[dict[str, Any]],
     expected_feature_ids: set[str],
+    expected_ids_by_chunk: dict[str, set[str]] | None = None,
 ) -> bool:
     """A reusable set matches only when its chunk files together carry each of
     the owner's current whole features exactly once.
@@ -1266,6 +1267,8 @@ def _reusable_detail_entries_match_owner(
             if isinstance(feature, dict)
         ]
         if len(chunk_feature_ids) != len(set(chunk_feature_ids)):
+            return False
+        if expected_ids_by_chunk is not None and set(chunk_feature_ids) != expected_ids_by_chunk.get(reusable.get("id")):
             return False
         if seen_feature_ids.intersection(chunk_feature_ids):
             return False
@@ -1319,6 +1322,29 @@ def _build_political_chunk_payloads(
     else:
         political_precision_feature_ids = set()
 
+    # Coarse/detail may coexist for different shards of the same owner. Plan
+    # the actual load units once, before simplification, and retain their edges.
+    feature_groups: dict[str, list[tuple[str, dict[str, Any], list[float]]]] = defaultdict(list)
+    for index, feature in enumerate((runtime_feature_collection or {}).get("features") or []):
+        feature_id = _feature_id(feature, index)
+        owner_bucket = _resolve_feature_owner_bucket(
+            feature, scenario_dir=scenario_dir,
+            owners_by_feature_id=owners_by_feature_id, fallback_index=index,
+        )
+        feature_groups[owner_bucket].append((feature_id, feature, _feature_bounds(feature)))
+    detail_plans = []
+    feature_shard_buckets = {}
+    for owner_bucket, entries in sorted(feature_groups.items()):
+        shards = partition_political_detail_features(
+            entries, max_compact_bytes=detail_shard_max_compact_bytes,
+            max_path_cost=detail_shard_max_path_cost,
+        )
+        chunk_ids = political_detail_chunk_ids(owner_bucket, len(shards))
+        detail_plans.append((owner_bucket, entries, shards, chunk_ids))
+        for chunk_id, shard in zip(chunk_ids, shards):
+            for feature_id, _feature, _bounds in shard:
+                feature_shard_buckets[feature_id] = chunk_id
+
     if coarse_feature_collection:
         chunks, lod_entries = _build_chunk_payloads_for_feature_collection(
             scenario_id=scenario_id,
@@ -1330,12 +1356,8 @@ def _build_political_chunk_payloads(
             precision_source_countries=precision_source_countries,
             political_precision_feature_ids=political_precision_feature_ids,
             owner_buckets_by_feature_id={
-                feature_id: _resolve_feature_owner_bucket(
-                    feature,
-                    scenario_dir=scenario_dir,
-                    owners_by_feature_id=owners_by_feature_id,
-                    fallback_index=index,
-                )
+                # A coarse-only feature has no proven shared detail load unit.
+                feature_id: feature_shard_buckets.get(feature_id, f"feature:{feature_id}")
                 for index, feature in enumerate(coarse_feature_collection.get("features") or [])
                 for feature_id in [_feature_id(feature, index)]
                 if feature_id.startswith("FR_ARR_")
@@ -1350,25 +1372,7 @@ def _build_political_chunk_payloads(
     if runtime_feature_collection:
         chunks_dir = scenario_dir / "chunks"
         chunks_dir.mkdir(parents=True, exist_ok=True)
-        feature_groups: dict[str, list[tuple[str, dict[str, Any], list[float]]]] = defaultdict(list)
-        for index, feature in enumerate(runtime_feature_collection.get("features") or []):
-            feature_id = _feature_id(feature, index)
-            owner_bucket = _resolve_feature_owner_bucket(
-                feature,
-                scenario_dir=scenario_dir,
-                owners_by_feature_id=owners_by_feature_id,
-                fallback_index=index,
-            )
-            feature_groups[owner_bucket].append((feature_id, feature, _feature_bounds(feature)))
-        for owner_bucket, entries in sorted(feature_groups.items()):
-            if not entries:
-                continue
-            shards = partition_political_detail_features(
-                entries,
-                max_compact_bytes=detail_shard_max_compact_bytes,
-                max_path_cost=detail_shard_max_path_cost,
-            )
-            expected_chunk_ids = political_detail_chunk_ids(owner_bucket, len(shards))
+        for owner_bucket, entries, shards, expected_chunk_ids in detail_plans:
             expected_feature_ids = {entry[0] for entry in entries}
             reusable_entries = [
                 reusable_political_chunks[cid]
@@ -1381,6 +1385,8 @@ def _build_political_chunk_payloads(
                     scenario_dir,
                     reusable_entries,
                     expected_feature_ids,
+                    {chunk_id: {entry[0] for entry in shard}
+                     for chunk_id, shard in zip(expected_chunk_ids, shards)},
                 )
             ):
                 for reusable_chunk in reusable_entries:

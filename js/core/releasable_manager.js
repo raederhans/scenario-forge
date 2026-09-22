@@ -1,3 +1,4 @@
+import { getEffectiveScenarioHierarchy } from "./scenario_hierarchy.js";
 import { countryPresets, state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 const state = runtimeState;
@@ -134,6 +135,7 @@ function resolveCatalogEntriesForScenario(scenarioId = runtimeState.activeScenar
 
 function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   const normalizedPresetSource = normalizePresetSource(presetSource);
+  const hierarchy = getEffectiveScenarioHierarchy(runtimeState);
   const sourceType = String(normalizedPresetSource.type || "").trim();
   const tag = normalizeCountryCode(entry.tag);
 
@@ -163,8 +165,8 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   }
 
   if (sourceType === "hierarchy_group_ids" || sourceType === "feature_selection") {
-    const groups = runtimeState.hierarchyData?.groups && typeof runtimeState.hierarchyData.groups === "object"
-      ? runtimeState.hierarchyData.groups
+    const groups = hierarchy?.groups && typeof hierarchy.groups === "object"
+      ? hierarchy.groups
       : {};
     const featureIds = new Set();
     normalizedPresetSource.feature_ids.forEach((featureId) => {
@@ -203,8 +205,8 @@ function resolveFeatureIdsFromPresetSource(presetSource = {}, entry = {}) {
   if (sourceType === "feature_ids") {
     const ids = Array.from(new Set(normalizedPresetSource.feature_ids));
     normalizedPresetSource.group_ids.forEach((groupId) => {
-      const idsForGroup = Array.isArray(runtimeState.hierarchyData?.groups?.[groupId])
-        ? runtimeState.hierarchyData.groups[groupId]
+      const idsForGroup = Array.isArray(hierarchy?.groups?.[groupId])
+        ? hierarchy.groups[groupId]
         : [];
       idsForGroup.forEach((featureId) => {
         const normalized = String(featureId || "").trim();
