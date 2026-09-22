@@ -9,8 +9,24 @@ import {
 
 test("ordinary project documentation is advisory instead of a hard route gap", () => {
   assert.equal(nonBehavioralClassification("docs/active/new-feature/notes.md"), "documentation-advisory");
+  assert.equal(nonBehavioralClassification("README.zh-CN.md"), "documentation-advisory");
+  assert.equal(nonBehavioralClassification("README.zh-CN.mjs"), null);
   assert.equal(nonBehavioralClassification("docs/perf/baseline.json"), null);
   assert.equal(nonBehavioralClassification("docs/testing/verification-metadata.md"), null);
+});
+
+test("published showcase images keep their Pages and map contract routes", () => {
+  for (const [file, command] of [
+    ["product-workspace.webp", "verify:pages-dist-and-drift"],
+    ["social-preview.png", "verify:pages-dist-and-drift"],
+    ["social-preview.svg", "verify:pages-dist-and-drift"],
+    ["work-atlas-japan-corridor.webp", "test:py:landing-map-asset-contracts"],
+    ["work-scenario-switch-europe.webp", "test:py:landing-map-asset-contracts"],
+  ]) {
+    const report = buildRepositoryRecommendation([`landing/assets/${file}`]);
+    assert.deepEqual(report.unmatchedChangedFiles, [], file);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === command), file);
+  }
 });
 
 test("new renderer files inherit renderer ownership without exact registration", () => {

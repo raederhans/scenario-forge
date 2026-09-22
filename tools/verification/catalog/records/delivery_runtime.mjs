@@ -193,6 +193,9 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "tools/pages_artifact_shadow.py",
       "tests/test_pages_artifact_admission.py",
       "tests/test_pages_dist_startup_shell.py",
+      "landing/assets/product-workspace.webp",
+      "landing/assets/social-preview.png",
+      "landing/assets/social-preview.svg",
       "tests/test_pages_artifact_shadow.py",
       "dist/pages-dist-manifest.json",
       "dist/app",
@@ -742,8 +745,10 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "landing/assets/work-alt-history-med.webp",
       "landing/assets/work-atlas-japan-corridor.json",
       "landing/assets/work-atlas-japan-corridor.svg",
+      "landing/assets/work-atlas-japan-corridor.webp",
       "landing/assets/work-scenario-switch-europe.json",
-      "landing/assets/work-scenario-switch-europe.svg"
+      "landing/assets/work-scenario-switch-europe.svg",
+      "landing/assets/work-scenario-switch-europe.webp"
     ],
     "ownerHints": [
       "public-demo"
