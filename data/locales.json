@@ -294742,6 +294742,32 @@
     }
   },
   "ui": {
+    "Capital": { "zh": "首都", "en": "Capital" },
+    "Loaded": { "zh": "已加载", "en": "Loaded" },
+    "visible": { "zh": "个可见", "en": "visible" },
+    "Enabled · waiting for data": { "zh": "已启用 · 等待数据", "en": "Enabled · waiting for data" },
+    "Find source region": { "zh": "查找来源区域", "en": "Find source region" },
+    "Experimental layer catalog": { "zh": "实验图层目录", "en": "Experimental layer catalog" },
+    "City hierarchy": {"en": "City hierarchy", "zh": "城市层级"},
+    "Metropolis": {"en": "Metropolis", "zh": "大都会"},
+    "Large city": {"en": "Large city", "zh": "大型城市"},
+    "Medium city": {"en": "Medium city", "zh": "中型城市"},
+    "Small city": {"en": "Small city", "zh": "小城"},
+    "Town": {"en": "Town", "zh": "小镇"},
+    "Map detail": {"en": "Map detail", "zh": "地图详细程度"},
+    "Compact": {"en": "Compact", "zh": "简洁"},
+    "Standard": {"en": "Standard", "zh": "标准"},
+    "Detailed": {"en": "Detailed", "zh": "详细"},
+    "Smallest settlements shown": {"en": "Smallest settlements shown", "zh": "最低显示等级"},
+    "Scenario strategic data": {"en": "Scenario strategic data", "zh": "剧本战略数据"},
+    "Load data": {"en": "Load data", "zh": "加载数据"},
+    "Region shading": {"en": "Region shading", "zh": "区域着色"},
+    "Resource type": {"en": "Resource type", "zh": "资源种类"},
+    "Color scale": {"en": "Color scale", "zh": "色带"},
+    "Shading opacity": {"en": "Shading opacity", "zh": "着色透明度"},
+    "Inspect region values": {"en": "Inspect region values", "zh": "查看区域数值"},
+    "Source region": {"en": "Source region", "zh": "来源区域"},
+
     "--- Presets ---": {
       "en": "--- Presets ---",
       "zh": "--- 预设 ---"

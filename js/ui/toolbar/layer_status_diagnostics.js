@@ -42,6 +42,7 @@ function translateUi(translate, key) {
 }
 
 function normalizeFiniteCount(value) {
+  if (value == null || value === "") return null;
   const count = Number(value);
   if (!Number.isFinite(count)) return null;
   return Math.max(0, Math.round(count));
@@ -75,6 +76,26 @@ function getMetric(metrics, metricNames = []) {
     if (metric && typeof metric === "object") return metric;
   }
   return null;
+}
+
+function getCityVisibilityMetric(metrics) {
+  const source = metrics && typeof metrics === "object" ? metrics : {};
+  const breakdown = source.contextBreakdown && typeof source.contextBreakdown === "object"
+    ? source.contextBreakdown : {};
+  const candidates = [source.drawLabelsPass, source.drawCityPointsLayer,
+    breakdown.drawLabelsPass, breakdown.drawCityPointsLayer]
+    .filter((metric) => metric && typeof metric === "object"
+      && metric.visibleFeatureCount != null
+      && normalizeFiniteCount(metric.visibleFeatureCount) != null);
+  return candidates.reduce((latest, metric) => {
+    if (!latest) return metric;
+    const sequence = Number(metric.sequence || 0);
+    const latestSequence = Number(latest.sequence || 0);
+    if (sequence && latestSequence && sequence !== latestSequence) {
+      return sequence > latestSequence ? metric : latest;
+    }
+    return Number(metric.recordedAt || 0) > Number(latest.recordedAt || 0) ? metric : latest;
+  }, null);
 }
 
 function getLoadStatus(state, loadKeys = []) {
@@ -146,12 +167,13 @@ function buildEnabledSummary({
       loaded != null ? formatCount(loaded, "loaded", translate) : "",
     );
   }
-  if (loaded != null && loaded > 0) {
+  if (loaded != null && loaded > 0 && visible === 0) {
     return joinStatusParts(
       translateUi(translate, "Loaded · 0 visible"),
       formatCount(loaded, "loaded", translate),
     );
   }
+  if (loaded != null && loaded > 0) return joinStatusParts(translateUi(translate, "Loaded"), formatCount(loaded, "loaded", translate));
   return translateUi(translate, "Enabled · waiting for data");
 }
 
@@ -159,7 +181,9 @@ function createLayerDiagnostic(definition, state, translate) {
   const enabled = typeof definition.enabled === "function"
     ? !!definition.enabled(state || {})
     : true;
-  const metric = getMetric(state?.renderPerfMetrics, definition.metricNames);
+  const metric = definition.id === "city-points"
+    ? getCityVisibilityMetric(state?.renderPerfMetrics)
+    : getMetric(state?.renderPerfMetrics, definition.metricNames);
   const metricFeatureCount = normalizeFiniteCount(metric?.featureCount);
   const dataFeatureCount = sumFeatureCounts(state || {}, definition.dataKeys);
   const loadedCount = metricFeatureCount ?? dataFeatureCount;

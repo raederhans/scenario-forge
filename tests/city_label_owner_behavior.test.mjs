@@ -81,6 +81,16 @@ test("labels avoid a nearby marker and remain clear of their own minimum-size sp
   assert.equal(occupiedBoxes.length, 3);
 });
 
+test("five settlement ranks have ordered label sizes independently of legacy tier", () => {
+  const { owner, fonts, setViewport } = fixture();
+  setViewport({ width: 1400, height: 200 });
+  const entries = ["metropolis", "large", "medium", "small", "town"].map((settlementRank, index) => ({
+    settlementRank, cityTier: "minor", anchor: [50 + index * 100, 50], screenPoint: [100 + index * 220, 100],
+  }));
+  assert.equal(owner.drawCityLabelsFromEntries(entries, { config: { labelSize: 12 }, scale: 2 }), 5);
+  assert.deepEqual(fonts.map((font) => font.split(' "')[0]), ["600 6.5px", "400 6px", "400 5.75px", "400 5.5px", "400 5.25px"]);
+});
+
 test("label owner skips missing anchors, offscreen labels, and detached context", () => {
   const { owner, calls, setContext } = fixture();
   const entries = [{ screenPoint: [50, 50] }, { anchor: [1000, 1000], screenPoint: [1000, 1000] }];

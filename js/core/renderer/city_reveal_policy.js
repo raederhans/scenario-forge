@@ -52,6 +52,32 @@ export const CITY_MARKER_SIZE_LIMITS_PX = {
   capital: 22,
 };
 
+export const CITY_SETTLEMENT_RANKS = Object.freeze(["town", "small", "medium", "large", "metropolis"]);
+const CITY_SETTLEMENT_BASE_SIZES_PX = Object.freeze({ town: 3, small: 4.5, medium: 6, large: 8, metropolis: 10 });
+
+export function getCitySettlementRank(feature, activeScenarioId = "") {
+  const props = feature?.properties || {};
+  const rendererRank = String(props.__city_settlement_rank || "").trim().toLowerCase();
+  if (CITY_SETTLEMENT_RANKS.includes(rendererRank)) return rendererRank;
+  const sourceRank = String(props.settlement_rank || "").trim().toLowerCase();
+  if (CITY_SETTLEMENT_RANKS.includes(sourceRank)) return sourceRank;
+  if (!activeScenarioId || activeScenarioId === "modern_world") {
+    const population = Number(props.__city_population ?? props.population);
+    if (Number.isFinite(population) && population > 0) {
+      if (population >= 5_000_000) return "metropolis";
+      if (population >= 1_000_000) return "large";
+      if (population >= 100_000) return "medium";
+      if (population >= 20_000) return "small";
+      return "town";
+    }
+  }
+  return { major: "large", regional: "medium", minor: "small" }[getCityTier(feature)];
+}
+
+export function getCitySettlementRankWeight(rank) {
+  return CITY_SETTLEMENT_RANKS.indexOf(String(rank || "").trim().toLowerCase());
+}
+
 const CITY_MARKER_BASE_SIZES_PX = {
   minor: 5.8,
   regional: 7.7,
@@ -130,8 +156,15 @@ export function getDefaultCityMinZoomForTier(tier) {
 export function getCityEffectiveMinZoom(feature) {
   const props = feature?.properties || {};
   const explicit = Number(props.__city_min_zoom ?? props.min_zoom ?? props.minZoom);
-  if (Number.isFinite(explicit)) return explicit;
-  return getDefaultCityMinZoomForTier(getCityTier(feature));
+  const legacyDefault = getDefaultCityMinZoomForTier(getCityTier(feature));
+  const hasExplicitRank = getCitySettlementRankWeight(props.__city_settlement_rank) >= 0
+    || getCitySettlementRankWeight(props.settlement_rank) >= 0;
+  if (hasExplicitRank && getCitySettlementRankWeight(getCitySettlementRank(feature)) >= getCitySettlementRankWeight("large")
+    && props.__city_min_zoom === undefined && props.minZoom === undefined
+    && (!Number.isFinite(explicit) || explicit === legacyDefault)) {
+    return Math.min(legacyDefault, 2.45);
+  }
+  return Number.isFinite(explicit) ? explicit : legacyDefault;
 }
 
 export function getUrbanFeatureStableId(feature) {
@@ -351,6 +384,7 @@ export function getCityRevealBucket(entry, phaseId) {
       if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
       if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
       if (countryTier === "E" && isCapital) return 2;
+      if (getCitySettlementRankWeight(entry?.settlementRank) >= getCitySettlementRankWeight("large")) return 3;
       if (countryTier === "A" && cityTier === "major") return 3;
       if (countryTier === "B" && cityTier === "major") return 4;
       if ((countryTier === "A" || countryTier === "B" || countryTier === "C") && (cityTier === "regional" || cityTier === "major")) {
@@ -362,9 +396,7 @@ export function getCityRevealBucket(entry, phaseId) {
       if ((countryTier === "A" || countryTier === "B") && isCapital) return 0;
       if ((countryTier === "C" || countryTier === "D") && isCapital) return 1;
       if (countryTier === "E" && isCapital) return 2;
-      if (cityTier === "major") return 3;
-      if (cityTier === "regional") return 4;
-      if (cityTier === "minor") return 5;
+      if (getCitySettlementRankWeight(entry?.settlementRank) >= 0 || ["major", "regional", "minor"].includes(cityTier)) return 3;
       return Number.POSITIVE_INFINITY;
   }
 }
@@ -474,12 +506,16 @@ export function compareCityRevealEntries(left, right, phaseId = "P0") {
     if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
   } else {
     if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
+    const rankDifference = getCitySettlementRankWeight(right?.settlementRank) - getCitySettlementRankWeight(left?.settlementRank);
+    if (rankDifference) return rankDifference;
+    const victoryPointDifference = Number(right?.feature?.properties?.__city_scenario_victory_points || 0)
+      - Number(left?.feature?.properties?.__city_scenario_victory_points || 0);
+    if (victoryPointDifference) return victoryPointDifference;
     // Respect scenario strategic value within each reveal tier before population.
     const strategicWeightDifference = Number(right?.sortWeight || 0) - Number(left?.sortWeight || 0);
     if (strategicWeightDifference) return strategicWeightDifference;
     if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
     if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
-    if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
     if (competitionBand === "mid") {
       if (leftCountryRank !== rightCountryRank) return rightCountryRank - leftCountryRank;
       if (leftCountryClassScore !== rightCountryClassScore) return rightCountryClassScore - leftCountryClassScore;
@@ -493,7 +529,7 @@ export function compareCityRevealEntries(left, right, phaseId = "P0") {
   if (!!left?.isCapital !== !!right?.isCapital) return left?.isCapital ? -1 : 1;
   if (leftTierWeight !== rightTierWeight) return rightTierWeight - leftTierWeight;
   if (leftPopulation !== rightPopulation) return rightPopulation - leftPopulation;
-  if (leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
+  if (competitionBand === "low" && leftCenterDistance !== rightCenterDistance) return leftCenterDistance - rightCenterDistance;
   return String(left?.cityId || "").localeCompare(String(right?.cityId || ""));
 }
 
@@ -533,6 +569,10 @@ export function getCityLabelMinZoom(entry, config = {}) {
 }
 
 export function getCityMarkerSizePx(entry, config = {}) {
+  if (CITY_SETTLEMENT_RANKS.includes(entry?.settlementRank)) {
+    const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 2.5);
+    return Math.min(entry?.isCapital ? 12 : 10, (entry?.isCapital ? 11 : CITY_SETTLEMENT_BASE_SIZES_PX[entry.settlementRank]) * markerScale);
+  }
   const cityTier = String(entry?.cityTier || "minor").trim().toLowerCase();
   const markerScale = clamp(Number(config.markerScale) || 1, 0.75, 2.5);
   const baseSize = CITY_MARKER_BASE_SIZES_PX[cityTier] || CITY_MARKER_BASE_SIZES_PX.minor;

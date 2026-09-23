@@ -1,3 +1,4 @@
+import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
 import { createFillTargetPolicy } from './renderer/fill_target_policy.js';
@@ -9327,7 +9328,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
     runtimeState.colorRevision, runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -11641,7 +11642,9 @@ function getStrategicResourceMarkerLayerState(k) {
 
   const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
   const scale = Math.max(0.0001, Number(transform?.k || k || 1));
+  const resourceFilter = normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues).resourceFilter;
   const entries = buildStrategicResourceMarkerEntries(payload, {
+    resources: resourceFilter === "all" ? [] : [resourceFilter],
     showResourceMarkers: true,
     zoom: scale,
   }).map((entry) => {

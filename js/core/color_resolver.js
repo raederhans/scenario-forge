@@ -1,3 +1,4 @@
+import { normalizeStrategicValuesStyle, getStrategicValuesColorStops } from "./strategic_values_view_model.js";
 import {
   buildStrategicChoroplethColorInput,
   isStrategicChoroplethMetric,
@@ -36,17 +37,6 @@ function mixHexColor(left, right, amount) {
   return `#${channel(leftRgb.r, rightRgb.r)}${channel(leftRgb.g, rightRgb.g)}${channel(leftRgb.b, rightRgb.b)}`;
 }
 
-function getStrategicChoroplethStops(metricFamily) {
-  const family = String(metricFamily || "").trim().toLowerCase();
-  if (family === "resource") {
-    return ["#e0f2fe", "#0369a1"];
-  }
-  if (family === "building") {
-    return ["#f1f5f9", "#be123c"];
-  }
-  return ["#ecfdf5", "#047857"];
-}
-
 function resolveStrategicChoroplethColor(id, ctx, getSafeColor) {
   const runtimeState = ctx.state && typeof ctx.state === "object" ? ctx.state : {};
   const metricId = String(runtimeState.strategicChoroplethMetric || "").trim().toLowerCase();
@@ -54,15 +44,19 @@ function resolveStrategicChoroplethColor(id, ctx, getSafeColor) {
   if (!metricId || !isStrategicChoroplethMetric(metricId) || !isScenarioStrategicValuesUsable(payload)) {
     return null;
   }
+  if (runtimeState.activeScenarioId && payload.scenarioId !== runtimeState.activeScenarioId) return null;
   const input = buildStrategicChoroplethColorInput(payload, ctx.feature || id, metricId);
-  if (!input.bucketId) {
+  const rawValue = payload.buckets?.[input.bucketId]?.[metricId];
+  if (!input.bucketId || rawValue == null || rawValue === "" || !Number.isFinite(Number(rawValue))) {
     return null;
   }
-  const [lowColor, highColor] = getStrategicChoroplethStops(input.metric?.family);
+  const style = normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues);
+  if (style.opacity === 0) return null;
+  const [lowColor, highColor] = getStrategicValuesColorStops(style.palette, input.metric?.family);
   const color = getSafeColor(mixHexColor(lowColor, highColor, input.t), "");
   return color
     ? {
-      color,
+      color: style.opacity < 1 ? mixHexColor(resolveBaseLandColor(id, ctx, getSafeColor).color || "#e5e7eb", color, style.opacity) : color,
       source: `strategic:${input.metricId}`,
       featureId: id,
       ownerCode: "",
@@ -109,6 +103,12 @@ function resolveFeatureColor(featureId, ctx = {}) {
     return strategicColor;
   }
 
+  return resolveBaseLandColor(id, ctx, getSafeColor);
+}
+
+function resolveBaseLandColor(id, ctx, getSafeColor) {
+  const runtimeState = ctx.state || {};
+  const feature = ctx.feature || null;
   const visualColor = readSafeColor(runtimeState.visualOverrides, id, getSafeColor);
   if (visualColor) {
     return { color: visualColor, source: "visualOverrides", featureId: id, ownerCode: "" };

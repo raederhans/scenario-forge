@@ -75,3 +75,16 @@ test("dark host adaptation shares contrast but retains marker fill and capital c
   assert.equal(dark.adapted, true);
   assert.equal(light.adapted, false);
 });
+
+test("city paint style provides flat fill, stroke, and capital accent across all themes with dark/light adaptation", () => {
+  const model = createModel();
+  for (const theme of ["classic_graphite", "atlas_ink", "parchment_sepia", "slate_blue", "ivory_outline"]) {
+    const style = model.getCityMarkerRenderStyle({}, { theme });
+    assert.ok(style.tokens.fill, "flat fill token is defined");
+    assert.ok(style.tokens.capitalFill, "flat capitalFill token is defined");
+    assert.ok(style.tokens.stroke, "stroke token is defined");
+    assert.ok(style.tokens.capitalAccent, "capitalAccent token is defined");
+    assert.equal(style.tokens.fill, style.tokens.fillMid);
+    assert.equal(style.tokens.capitalFill, style.tokens.capitalAccent);
+  }
+});

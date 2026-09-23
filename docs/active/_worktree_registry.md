@@ -6,7 +6,7 @@
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| `C:/Users/raede/Desktop/dev/mapcreator` | 主工作区，分支 `codex/global-data-migration-20260923`，交付位于草稿 PR #146；已同步主线展示与导出更新，未将本轮候选数据发布到生产。当前 SHA、CI 与部署状态以 Git / GitHub 回执为准；保留既有未跟踪 `.playwright-mcp/`。 |
+| `C:/Users/raede/Desktop/dev/mapcreator` | 主工作区，本次城市／战略面板与剧本颜色整合使用 `codex/city-strategic-colors-20260923`，基于已合并 PR #149 的 `origin/main`。交付通过受保护主分支 PR；当前 SHA、CI、合并与自动部署状态以 Git / GitHub 回执为准。保留既有未跟踪 `.playwright-mcp/`。 |
 | `C:/Users/raede/.codex/worktrees/precision-expansion-20260922/mapcreator` | 保留工作树与分支 `codex/global-precision-scaling-20260922`，保存忽略的精度/县级候选和历史边界验收证据；这些 `.runtime` 产物未进入正式数据，后续适配仍需要它们，因此合并后不清理。代码交付基线 `382ce56744d3942a9097e1352c312a23bab0dbf9`，任务记录见 [global-precision-scaling-20260922](global-precision-scaling-20260922/task.md)。 |
 | `C:/Users/raede/.codex/worktrees/showcase-map-quality/mapcreator` | 分支 `codex/showcase-release-contracts`；展示与导出交付已经通过 PR #147/#148 进入主线。本轮仅核对状态并通过 `origin/main` 整合，保留该工作树，不接管或清理其他任务的文件。 |
 | `.playwright-mcp/` | 主工作区中的未跟踪、未归属内容；本轮按 WIP 保护规则保留，不把它当作可清理缓存。 |

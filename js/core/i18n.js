@@ -1,3 +1,4 @@
+import { getStrategicFeatureInspection, STRATEGIC_METRIC_NAMES } from "./strategic_values_view_model.js";
 // Translation helpers (Phase 13)
 import { state as runtimeState } from "./state.js";
 import { UI_COPY_CATALOG } from "./i18n_catalog.js";
@@ -402,7 +403,15 @@ function renderTooltipText(model) {
 }
 
 function getTooltipText(feature) {
-  return renderTooltipText(buildTooltipModel(feature));
+  const base = renderTooltipText(buildTooltipModel(feature));
+  if (!feature || feature.properties?.water_type || feature.properties?.special_type) return base;
+  const strategic = getStrategicFeatureInspection(runtimeState, getSharedFeatureId(feature));
+  if (!strategic) return base;
+  const zh = runtimeState.currentLanguage === "zh";
+  const label = STRATEGIC_METRIC_NAMES[strategic.metricId]?.[zh ? 1 : 0] || strategic.metricId;
+  const value = strategic.hasValue ? strategic.value.toLocaleString() : (zh ? "无数据" : "No data");
+  const source = strategic.mapped ? ` · ${zh ? "来源区域" : "source region"} ${strategic.id}` : "";
+  return `${base}\n${label}: ${value}${source}\n${zh ? "剧本游戏数值" : "Scenario game values"}`;
 }
 
 function consumeStartupSupportKeyUsageAuditReport() {

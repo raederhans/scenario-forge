@@ -8,7 +8,7 @@
  * projection/context helpers, and render-only shared helpers.
  */
 import { isScenarioStrategicValuesUsable } from "../scenario/strategic_values.js";
-import { getCityDetailProgress } from "./city_reveal_policy.js";
+import { getCityDetailProgress, getCitySettlementRank, getCitySettlementRankWeight } from "./city_reveal_policy.js";
 
 export function getUrbanCityRenderPassSignatureParts(state, passName) {
   const cities = `cities:${Number(state?.cityLayerRevision || 0)}`;
@@ -192,6 +192,7 @@ export function createUrbanCityPolicyOwner({
     }
     const props = feature.properties || {};
     const overrideTier = String(overrideEntry.tier || "").trim().toLowerCase();
+    const overrideRank = String(overrideEntry.settlement_rank || overrideEntry.settlementRank || "").trim().toLowerCase();
     const nextTier = ["major", "regional", "minor"].includes(overrideTier)
       ? overrideTier
       : getCityTier(feature);
@@ -214,7 +215,12 @@ export function createUrbanCityPolicyOwner({
       __city_display_name_override: hasDisplayNameOverride ? { ...displayName } : null,
       __city_hidden: overrideEntry.hidden === undefined ? !!props.__city_hidden : !!overrideEntry.hidden,
       __city_base_tier: nextTier,
-      __city_min_zoom: Number.isFinite(overrideMinZoom) ? overrideMinZoom : getDefaultCityMinZoomForTier(nextTier),
+      ...(getCitySettlementRankWeight(overrideRank) >= 0 ? { __city_settlement_rank: overrideRank } : {}),
+      __city_min_zoom: Number.isFinite(overrideMinZoom) ? overrideMinZoom : (
+        getCitySettlementRankWeight(overrideRank) >= getCitySettlementRankWeight("large")
+          ? Math.min(getDefaultCityMinZoomForTier(nextTier), 2.45)
+          : getDefaultCityMinZoomForTier(nextTier)
+      ),
       name_en: String(displayName.en || overrideEntry.name_en || props.name_en || props.name || "").trim(),
       label_en: String(displayName.en || overrideEntry.name_en || props.label_en || props.name_en || props.name || "").trim(),
       name_zh: String(displayName.zh || overrideEntry.name_zh || props.name_zh || "").trim(),
@@ -284,10 +290,20 @@ export function createUrbanCityPolicyOwner({
     const markerEntries = [];
     const countsByCountry = new Map();
     const markerDensity = getCityMarkerDensityMultiplier(config);
-    const markerBudget = getCityInterpolatedMarkerBudget(scale, markerDensity);
+    const densityPreset = ["compact", "balanced", "detailed"].includes(config.densityPreset)
+      ? config.densityPreset : "balanced";
+    const localSeparationPx = { compact: 64, balanced: 48, detailed: 36 }[densityPreset];
+    const viewportWidth = Number(config.viewportWidth || state?.width || 0);
+    const viewportHeight = Number(config.viewportHeight || state?.height || 0);
+    const viewportBudget = viewportWidth > 0 && viewportHeight > 0
+      ? Math.max(1, Math.ceil((viewportWidth * viewportHeight) / (localSeparationPx ** 2) * 1.5))
+      : Infinity;
+    const markerBudget = Math.min(getCityInterpolatedMarkerBudget(scale, markerDensity),
+      getCityDetailProgress(scale) > 0 ? viewportBudget : Infinity);
     const priorityReserveBudget = getCityPriorityCountryReserveBudget(scale, markerBudget);
     const labelBudget = getCityLabelBudget(phase, config, scale);
     const labelEntries = [];
+    const minimumRankWeight = Math.max(0, getCitySettlementRankWeight(config.minSettlementRank || "town"));
 
     const candidateEntries = cityCollection.features
       .map((feature) => {
@@ -317,6 +333,8 @@ export function createUrbanCityPolicyOwner({
           return null;
         }
         const isCapital = !!feature?.properties?.__city_is_capital;
+        const settlementRank = getCitySettlementRank(feature, state?.activeScenarioId);
+        if (!isCapital && getCitySettlementRankWeight(settlementRank) < minimumRankWeight) return null;
         const minZoom = getCityEffectiveMinZoom(feature);
         if (!isCapital && scale < minZoom) {
           return null;
@@ -331,6 +349,7 @@ export function createUrbanCityPolicyOwner({
           isCapital,
           minZoom,
           cityTier,
+          settlementRank,
           cityTierWeight: getCityTierWeight(feature),
           countryKey: profile.groupKey || getCityCountryGroupKey(feature),
           scenarioTag,
@@ -379,12 +398,28 @@ export function createUrbanCityPolicyOwner({
     });
     const acceptedCityIds = new Set();
     const detailProgress = getCityDetailProgress(scale);
+    const markerGrid = new Map();
+    const gridKey = (x, y) => `${x}:${y}`;
     const acceptMarker = (entry) => {
       entry.markerSizePx = getCityMarkerSizePx(entry, config);
-      if (detailProgress > 0 && markerEntries.some((other) => {
-        const minimumDistance = Math.max(36, (entry.markerSizePx + other.markerSizePx) * 1.2 + 8);
-        return Math.hypot(entry.screenPoint[0] - other.screenPoint[0], entry.screenPoint[1] - other.screenPoint[1]) < minimumDistance;
-      })) return false;
+      const screenX = Number(entry.screenPoint?.[0]);
+      const screenY = Number(entry.screenPoint?.[1]);
+      if (detailProgress > 0 && Number.isFinite(screenX) && Number.isFinite(screenY)) {
+        const cellX = Math.floor(screenX / localSeparationPx);
+        const cellY = Math.floor(screenY / localSeparationPx);
+        for (let dx = -1; dx <= 1; dx += 1) {
+          for (let dy = -1; dy <= 1; dy += 1) {
+            for (const other of markerGrid.get(gridKey(cellX + dx, cellY + dy)) || []) {
+              const boundsDistance = (entry.markerSizePx + other.markerSizePx) / 2 + 8;
+              const minimumDistance = Math.max(localSeparationPx, boundsDistance);
+              if (Math.hypot(screenX - other.screenPoint[0], screenY - other.screenPoint[1]) < minimumDistance) return false;
+            }
+          }
+        }
+        const key = gridKey(cellX, cellY);
+        if (!markerGrid.has(key)) markerGrid.set(key, []);
+        markerGrid.get(key).push(entry);
+      }
       markerEntries.push(entry);
       countsByCountry.set(entry.countryKey, (countsByCountry.get(entry.countryKey) || 0) + 1);
       acceptedCityIds.add(entry.cityId);
