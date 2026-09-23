@@ -19,35 +19,49 @@ const markerTokens = {
 };
 
 function createSpriteContext() {
+  const gradientCalls = [];
+  const compositeCalls = [];
+  const pathOps = [];
   const gradient = { addColorStop: () => {} };
   return {
     scaleCalls: [],
     scale(x, y) { this.scaleCalls.push([x, y]); },
-    beginPath: () => {},
-    createLinearGradient: () => gradient,
-    ellipse: () => {},
-    fill: () => {},
-    lineTo: () => {},
-    moveTo: () => {},
+    beginPath() { pathOps.push("beginPath"); },
+    closePath() { pathOps.push("closePath"); },
+    createLinearGradient(...args) {
+      gradientCalls.push(args);
+      return gradient;
+    },
+    arc(...args) { pathOps.push(["arc", ...args]); },
+    ellipse(...args) { pathOps.push(["ellipse", ...args]); },
+    fill() { pathOps.push("fill"); },
+    lineTo(...args) { pathOps.push(["lineTo", ...args]); },
+    moveTo(...args) { pathOps.push(["moveTo", ...args]); },
     restore: () => {},
     save: () => {},
-    stroke: () => {},
+    stroke() { pathOps.push("stroke"); },
     set fillStyle(_value) {},
-    set globalCompositeOperation(_value) {},
+    set globalCompositeOperation(value) { compositeCalls.push(value); },
     set lineCap(_value) {},
     set lineJoin(_value) {},
     set lineWidth(_value) {},
     set strokeStyle(_value) {},
+    get gradientCalls() { return gradientCalls; },
+    get compositeCalls() { return compositeCalls; },
+    get pathOps() { return pathOps; },
   };
 }
 
-function installCanvasFactory() {
+function installCanvasFactory(onContextCreated = null) {
   const previousDocument = globalThis.document;
   const previousOffscreenCanvas = globalThis.OffscreenCanvas;
   globalThis.OffscreenCanvas = undefined;
   globalThis.document = {
     createElement: () => {
       const spriteContext = createSpriteContext();
+      if (typeof onContextCreated === "function") {
+        onContextCreated(spriteContext);
+      }
       return {
         height: 0,
         width: 0,
@@ -273,7 +287,8 @@ test("labels pass shares actual marker bounds and forwards the successful-label 
       w: width * 2,
       h: height * 2,
     });
-    assert.ok(box.y < entry.screenPoint[1] - box.h / 2, "sprite extends above its geographic anchor");
+    assert.equal(box.y, entry.screenPoint[1] - box.h / 2, "flat sprite bounds are centered on its geographic anchor");
+    assert.equal(box.x, entry.screenPoint[0] - box.w / 2, "flat sprite bounds are centered on its geographic anchor");
   });
   harness.state.styleConfig.cityPoints.showLabels = false;
   const markersOnly = [];
@@ -323,7 +338,7 @@ test("city hover prefers higher-priority scenario entries without bestPriority e
   });
 });
 
-test("near cities keep named ordinary markers, capitals and majors without ghost hover or occupancy", (t) => {
+test("markers depend on policy with consistent interactive and settled density without pop on pan", (t) => {
   t.after(installCanvasFactory());
   const entries = [
     { id: "named", cityTier: "regional" },
@@ -359,15 +374,16 @@ test("near cities keep named ordinary markers, capitals and majors without ghost
   const blocker = { x: 200, y: 0, w: 550, h: 250 };
   const occupiedBoxes = [blocker];
   harness.owner.drawLabelsPass(4, { occupiedBoxes });
-  assert.equal(harness.renderMetrics.at(-1).detail.visibleFeatureCount, 3);
-  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1);
-  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 3);
-  assert.deepEqual(harness.labelCalls.at(-1).entries.map((entry) => entry.id), ["named"]);
-  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }), null);
+  assert.equal(harness.renderMetrics.at(-1).detail.visibleFeatureCount, 5, "policy markers preserved in settled pass");
+  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1, "labels collision only culls labels");
+  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 5);
+  assert.deepEqual(harness.labelCalls.at(-1).entries.map((entry) => entry.id), ["named", "blocked", "capital", "major"]);
+  assert.deepEqual(entries.filter((entry) => entry.acceptedLabelPlacement).map((entry) => entry.id), ["named"]);
+  pointer = entries[1].screenPoint;
+  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "blocked");
   pointer = entries[2].screenPoint;
-  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" }).id, "capital");
-  assert.equal(occupiedBoxes.length, 5, "only existing blocker, three visible markers and one name remain");
-  assert.ok(!occupiedBoxes.slice(1).some((box) => box.x <= 280 && box.x + box.w >= 280));
+  assert.equal(harness.owner.getHoveredCityEntryFromEvent({ type: "mousemove" })?.id, "capital");
+  assert.equal(occupiedBoxes.length, 7, "existing blocker + 5 markers + 1 placed label");
 
   for (const mode of ["labels-off", "distant", "deferred", "interactive"]) {
     harness.state.styleConfig.cityPoints.showLabels = mode !== "labels-off";
@@ -574,4 +590,163 @@ test("city marker draws use target density while preserving logical geometry and
   harness.owner.drawCityPointsLayer(zoom);
   const fallbackCanvas = harness.context.calls.filter((call) => call.type === "drawImage").at(-1).args[0];
   assert.equal(fallbackCanvas, byDensity.get(1), "missing target transform uses density one");
+});
+
+test("city marker renders flat atlas symbols without glossy gradients, rim blend, or crowns", (t) => {
+  let createdContext = null;
+  t.after(installCanvasFactory((ctx) => { createdContext = ctx; }));
+  const harness = createCityPointsHarness();
+
+  // 1. Regular city marker
+  const regularEntry = {
+    id: "flat-regular",
+    settlementRank: "large",
+    markerSizePx: 14,
+    isCapital: false,
+  };
+  const regularSprite = harness.owner.getCityMarkerSprite(regularEntry, {});
+  assert.ok(regularSprite, "sprite should be returned");
+  assert.ok(createdContext, "canvas context should have been created");
+  assert.equal(createdContext.gradientCalls.length, 0, "no gradients should be created for flat markers");
+  assert.equal(createdContext.compositeCalls.length, 0, "no blend modes (screen/multiply) should be used");
+
+  // 2. Capital city marker
+  createdContext = null;
+  const capitalEntry = {
+    id: "flat-capital",
+    settlementRank: "metropolis",
+    markerSizePx: 16,
+    isCapital: true,
+  };
+  const capitalSprite = harness.owner.getCityMarkerSprite(capitalEntry, {});
+  assert.ok(capitalSprite, "capital sprite should be returned");
+  assert.ok(createdContext, "capital canvas context should have been created");
+  assert.equal(createdContext.gradientCalls.length, 0, "no gradients should be created for capital markers");
+  assert.equal(createdContext.compositeCalls.length, 0, "no blend modes should be used for capital markers");
+
+  // Verify anchors are centered
+  assert.equal(regularSprite.anchorX, regularSprite.width / 2);
+  assert.equal(regularSprite.anchorY, regularSprite.height / 2);
+  assert.equal(capitalSprite.anchorX, capitalSprite.width / 2);
+  assert.equal(capitalSprite.anchorY, capitalSprite.height / 2);
+});
+
+test("five settlement ranks render progressively smaller flat circles with cityTier fallback", () => {
+  const harness = createCityPointsHarness();
+  const rankDiameters = {
+    metropolis: 10,
+    large: 8,
+    medium: 6,
+    small: 4.5,
+    town: 3,
+  };
+  const ranks = ["metropolis", "large", "medium", "small", "town"];
+  const specs = ranks.map((rank) => (
+    harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: rankDiameters[rank] })
+  ));
+
+  // Assert radii are strictly progressively smaller matching policy sizePx/2 >= 1.5
+  for (let i = 0; i < specs.length - 1; i++) {
+    assert.ok(
+      specs[i].rankRadius > specs[i + 1].rankRadius,
+      `rank ${ranks[i]} radius (${specs[i].rankRadius}) > ${ranks[i + 1]} radius (${specs[i + 1].rankRadius})`
+    );
+  }
+  assert.equal(specs[0].rankRadius, 5);
+  assert.equal(specs[1].rankRadius, 4);
+  assert.equal(specs[2].rankRadius, 3);
+  assert.equal(specs[3].rankRadius, 2.25);
+  assert.equal(specs[4].rankRadius, 1.5);
+
+  // Assert distinct structure types matching approved legend
+  assert.equal(specs[0].settlementRank, "metropolis");
+  assert.equal(specs[0].isBullseye, true, "metropolis is bullseye with inner dot");
+  assert.ok(specs[0].innerRadius > 0, "metropolis has inner dot radius");
+
+  assert.equal(specs[1].settlementRank, "large");
+  assert.equal(specs[1].isHollow, false, "large city is solid filled circle");
+  assert.equal(specs[1].isBullseye, false);
+
+  assert.equal(specs[2].settlementRank, "medium");
+  assert.equal(specs[2].isHollow, false, "medium city is solid filled circle to match approved legend");
+
+  assert.equal(specs[3].settlementRank, "small");
+  assert.equal(specs[3].isHollow, true, "small city is hollow circle to match approved legend");
+
+  assert.equal(specs[4].settlementRank, "town");
+  assert.equal(specs[4].isHollow, true, "town is smallest hollow circle to match approved legend");
+
+  // Assert fallback from legacy cityTier
+  const majorSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "major", markerSizePx: 8 });
+  assert.equal(majorSpec.settlementRank, "large", "cityTier major falls back to rank large");
+  assert.equal(majorSpec.rankRadius, 4);
+  assert.equal(majorSpec.isHollow, false);
+
+  const regionalSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "regional", markerSizePx: 6 });
+  assert.equal(regionalSpec.settlementRank, "medium", "cityTier regional falls back to rank medium");
+  assert.equal(regionalSpec.rankRadius, 3);
+  assert.equal(regionalSpec.isHollow, false);
+
+  const minorSpec = harness.owner.getCityMarkerVisualSpec({ cityTier: "minor", markerSizePx: 4.5 });
+  assert.equal(minorSpec.settlementRank, "small", "cityTier minor falls back to rank small");
+  assert.equal(minorSpec.rankRadius, 2.25);
+  assert.equal(minorSpec.isHollow, true);
+});
+
+test("capital identity is independent from settlement ranks with single restrained star", (t) => {
+  t.after(installCanvasFactory());
+  const harness = createCityPointsHarness();
+  const rankDiameters = {
+    metropolis: 10,
+    large: 8,
+    medium: 6,
+    small: 4.5,
+    town: 3,
+  };
+  const ranks = ["metropolis", "large", "medium", "small", "town"];
+
+  for (const rank of ranks) {
+    const size = rankDiameters[rank];
+    const regularSpec = harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: size, isCapital: false });
+    const capitalSpec = harness.owner.getCityMarkerVisualSpec({ settlementRank: rank, markerSizePx: size, isCapital: true });
+
+    // Settlement rank geometry and legend type are preserved identically across capital states
+    assert.equal(capitalSpec.rankRadius, regularSpec.rankRadius, `rank ${rank} preserved with capital`);
+    assert.equal(capitalSpec.isBullseye, regularSpec.isBullseye);
+    assert.equal(capitalSpec.isHollow, regularSpec.isHollow);
+
+    // Single restrained star identity with starOuter matching capital rank radius (no 25% expansion)
+    assert.equal(capitalSpec.starOuter, capitalSpec.rankRadius, "star outer radius matches capital size without 25% expansion");
+    assert.ok(capitalSpec.starInner < capitalSpec.starOuter, "star inner radius is restrained within star outer");
+
+    // Cache distinction
+    const regularSprite = harness.owner.getCityMarkerSprite({ settlementRank: rank, markerSizePx: size });
+    const capitalSprite = harness.owner.getCityMarkerSprite({ settlementRank: rank, markerSizePx: size, isCapital: true });
+
+    assert.notEqual(regularSprite, capitalSprite, "capital has distinct cache entry from regular");
+  }
+});
+
+test("sprite bounds and caches remain valid and compact across scale and rank changes", (t) => {
+  t.after(installCanvasFactory());
+  const harness = createCityPointsHarness();
+  const ranks = ["metropolis", "large", "medium", "small", "town"];
+  const rankDiameters = { metropolis: 10, large: 8, medium: 6, small: 4.5, town: 3 };
+
+  for (const rank of ranks) {
+    for (const isCapital of [false, true]) {
+      const entry = { settlementRank: rank, markerSizePx: rankDiameters[rank], isCapital };
+      const sprite = harness.owner.getCityMarkerSprite(entry);
+      assert.ok(sprite.width > 0 && Number.isInteger(sprite.width), "sprite width must be positive integer");
+      assert.ok(sprite.height > 0 && Number.isInteger(sprite.height), "sprite height must be positive integer");
+      // Compact bounds: town (d=3) has width <= 6, small (d=4.5) width <= 8, no wide halo
+      assert.ok(sprite.width <= Math.ceil(rankDiameters[rank] + 3), "symbols stay compact without wide halo");
+      assert.equal(sprite.anchorX, sprite.width / 2, "sprite anchorX must be centered");
+      assert.equal(sprite.anchorY, sprite.height / 2, "sprite anchorY must be centered");
+
+      // Verify cache hit
+      const cached = harness.owner.getCityMarkerSprite(entry);
+      assert.equal(cached, sprite, "unchanged visual must hit sprite cache");
+    }
+  }
 });

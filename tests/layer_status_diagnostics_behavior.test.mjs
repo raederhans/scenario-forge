@@ -59,6 +59,55 @@ test("layer diagnostics report loaded and visible counts from existing metrics",
   assert.equal(urban.severity, "active");
 });
 
+test("city status uses the latest settled marker count over a stale interactive zero", () => {
+  const state = createState({
+    worldCitiesData: { type: "FeatureCollection", features: [{}, {}, {}] },
+    renderPerfMetrics: {
+      drawLabelsPass: { recordedAt: 200, interactive: false, featureCount: 3, visibleFeatureCount: 2 },
+      drawCityPointsLayer: { recordedAt: 100, interactive: true, featureCount: 3, visibleFeatureCount: 0 },
+      contextBreakdown: {
+        drawCityPointsLayer: { recordedAt: 100, interactive: true, featureCount: 3, visibleFeatureCount: 0 },
+      },
+    },
+  });
+  const city = buildLayerStatusDiagnostics(state, { translate: (key) => key })
+    .find((entry) => entry.id === "city-points");
+  assert.equal(city.visibleCount, 2);
+  assert.equal(city.summary, "Visible · 2 visible · 3 loaded");
+});
+
+test("city status respects a newer interactive zero and does not invent zero without a measurement", () => {
+  const state = createState({
+    worldCitiesData: { type: "FeatureCollection", features: [{}, {}, {}] },
+    renderPerfMetrics: {
+      drawLabelsPass: { recordedAt: 100, visibleFeatureCount: 2 },
+      drawCityPointsLayer: { recordedAt: 200, visibleFeatureCount: 0 },
+    },
+  });
+  const status = () => buildLayerStatusDiagnostics(state, { translate: (key) => key })
+    .find((entry) => entry.id === "city-points");
+  assert.equal(status().summary, "Loaded · 0 visible · 3 loaded");
+
+  state.renderPerfMetrics = { drawLabelsPass: { recordedAt: 300, skipped: true, reason: "staged-apply" } };
+  assert.equal(status().visibleCount, null);
+  assert.equal(status().summary, "Loaded · 3 loaded");
+});
+
+test("city status uses metric sequence when settled and interactive draws share a timestamp", () => {
+  const state = createState({
+    worldCitiesData: { type: "FeatureCollection", features: [{}, {}, {}] },
+    renderPerfMetrics: {
+      drawLabelsPass: { recordedAt: 500, sequence: 12, visibleFeatureCount: 2 },
+      drawCityPointsLayer: { recordedAt: 500, sequence: 13, visibleFeatureCount: 0 },
+    },
+  });
+  const status = () => buildLayerStatusDiagnostics(state, { translate: (key) => key })
+    .find((entry) => entry.id === "city-points");
+  assert.equal(status().visibleCount, 0);
+  state.renderPerfMetrics.drawLabelsPass.sequence = 14;
+  assert.equal(status().visibleCount, 2);
+});
+
 test("transport master diagnostic exposes enabled state with zero selected families", () => {
   const state = createState({
     showTransport: true,

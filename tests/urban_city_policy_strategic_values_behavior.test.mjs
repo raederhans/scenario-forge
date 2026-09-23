@@ -64,7 +64,9 @@ function createOwner(state) {
       || fallback
     ).trim(),
     getCityCapitalScore: () => 0,
+    getCityTier: cityPolicy.getCityTier,
     getCityTierWeight: () => 1,
+    getDefaultCityMinZoomForTier: cityPolicy.getDefaultCityMinZoomForTier,
   };
   return createUrbanCityPolicyOwner({
     state,
@@ -140,6 +142,19 @@ test("urban city policy copies matching strategic victory points onto city featu
   assert.equal(collection.features[0].properties.__city_scenario_vp_name, "Berlin");
   assert.equal(collection.features[0].properties.__city_scenario_vp_province_id, 6521);
   assert.equal(collection.features[0].properties.__city_scenario_vp_match_method, "city_exact");
+});
+
+test("scenario city override propagates an explicit settlement rank", () => {
+  const state = {
+    activeScenarioId: "hoi4_city_test",
+    worldCitiesData: { type: "FeatureCollection", features: [createCityFeature("berlin", "GER-1")] },
+    scenarioCityOverridesData: { cities: { berlin: { city_id: "berlin", tier: "minor", settlement_rank: "metropolis" } } },
+    scenarioCountriesByTag: {},
+    sovereigntyByFeatureId: {},
+  };
+  const feature = createOwner(state).getEffectiveCityCollection().features[0];
+  assert.equal(feature.properties.__city_settlement_rank, "metropolis");
+  assert.equal(feature.properties.__city_base_tier, "minor");
 });
 
 test("urban city policy invalidates one owner cache when strategic values revision changes", () => {
@@ -344,16 +359,16 @@ test("reveal plan exposes local minor cities, rejects overlapping markers and re
   const planAt = createRevealFixture(features);
   assert.equal(planAt(3.05).markerEntries.length, 8);
   const detail = planAt(12);
-  assert.equal(detail.markerEntries.length, 120);
+  assert.equal(detail.markerEntries.length, 50);
   assert.ok(detail.markerEntries.some((entry) => entry.cityTier === "minor"));
-  assert.equal(detail.labelEntries.length, 120);
+  assert.equal(detail.labelEntries.length, 50);
   assert.equal(detail.labelBudget, 72);
 });
 
 test("actual reveal plan ranks a matching strategic city ahead of a larger same-tier city", () => {
   const features = [
     { ...createCityFeature("large", "host", { __city_base_tier: "major", __city_population: 1000000 }), geometry: { type: "Point", coordinates: [0, 0] } },
-    { ...createCityFeature("strategic", "host", { __city_base_tier: "major", __city_population: 100000, __city_scenario_victory_points: 50 }), geometry: { type: "Point", coordinates: [40, 0] } },
+    { ...createCityFeature("strategic", "host", { __city_base_tier: "major", __city_settlement_rank: "large", __city_population: 100000, __city_scenario_victory_points: 50 }), geometry: { type: "Point", coordinates: [60, 0] } },
   ];
   assert.deepEqual(createRevealFixture(features)(5).markerEntries.map((entry) => entry.cityId), ["strategic", "large"]);
 });
@@ -364,8 +379,8 @@ test("dense local city clusters keep breathing room instead of filling every gap
     geometry: { type: "Point", coordinates: [index * 20, 0] },
   }));
   const plan = createRevealFixture(features)(50);
-  assert.equal(plan.markerEntries.length, 20);
+  assert.equal(plan.markerEntries.length, 14);
   for (let index = 1; index < plan.markerEntries.length; index += 1) {
-    assert.ok(plan.markerEntries[index].screenPoint[0] - plan.markerEntries[index - 1].screenPoint[0] >= 36);
+    assert.ok(plan.markerEntries[index].screenPoint[0] - plan.markerEntries[index - 1].screenPoint[0] >= 48);
   }
 });

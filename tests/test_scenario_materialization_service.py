@@ -12,6 +12,8 @@ from map_builder import scenario_district_groups_service
 from map_builder import scenario_geo_locale_materializer
 from map_builder import scenario_materialization_service as service
 from map_builder.scenario_build_session import SCENARIO_BUILD_STATE_FILENAME
+from map_builder.scenario_political_materialization_support import build_country_entry_from_mutation
+from map_builder.scenario_service_errors import ScenarioServiceError
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -126,6 +128,68 @@ def _create_scenario_fixture(root: Path, scenario_id: str = "test_scenario") -> 
 
 
 class ScenarioMaterializationServiceTest(unittest.TestCase):
+    def test_color_only_country_mutation_preserves_existing_metadata_without_bilingual_names(self) -> None:
+        existing_entry = {
+            "tag": "TUN",
+            "display_name": "Protectorate of Tunisia",
+            "parent_owner_tag": "ITA",
+            "parent_owner_tags": ["ITA"],
+            "ownership_metadata": {"source": "scenario"},
+            "color_hex": "#111111",
+            "color_policy": "palette",
+        }
+
+        updated = build_country_entry_from_mutation(
+            {"scenarioId": "test_scenario"},
+            "TUN",
+            {"mode": "override", "color_hex": "#AABBCC"},
+            existing_entry=existing_entry,
+        )
+
+        self.assertEqual(updated["color_hex"], "#aabbcc")
+        self.assertEqual(updated["color_policy"], "locked")
+        self.assertEqual(updated["parent_owner_tag"], "ITA")
+        self.assertEqual(updated["parent_owner_tags"], ["ITA"])
+        self.assertEqual(updated["ownership_metadata"], {"source": "scenario"})
+        self.assertEqual(updated["display_name"], "Protectorate of Tunisia")
+
+    def test_color_only_country_mutation_rejects_invalid_hex(self) -> None:
+        with self.assertRaises(ScenarioServiceError) as raised:
+            build_country_entry_from_mutation(
+                {"scenarioId": "test_scenario"},
+                "TUN",
+                {"mode": "override", "color_hex": "red"},
+                existing_entry={"tag": "TUN", "color_hex": "#111111"},
+            )
+
+        self.assertEqual(raised.exception.code, "invalid_color_hex")
+
+    def test_country_create_keeps_create_mode_requirement_and_full_entry_path(self) -> None:
+        with self.assertRaises(ScenarioServiceError) as raised:
+            build_country_entry_from_mutation(
+                {"scenarioId": "test_scenario"},
+                "NEW",
+                {"color_hex": "#123456"},
+                existing_entry=None,
+            )
+        self.assertEqual(raised.exception.code, "unknown_scenario_tag")
+
+        created = build_country_entry_from_mutation(
+            {"scenarioId": "test_scenario"},
+            "NEW",
+            {
+                "mode": "create",
+                "display_name_en": "New Country",
+                "display_name_zh": "新国家",
+                "color_hex": "#123456",
+                "parent_owner_tag": "AAA",
+            },
+            existing_entry=None,
+        )
+        self.assertEqual(created["display_name_en"], "New Country")
+        self.assertEqual(created["display_name_zh"], "新国家")
+        self.assertEqual(created["parent_owner_tag"], "AAA")
+
     def test_geo_locale_materializer_no_longer_imports_dev_server_registry(self) -> None:
         source = Path(scenario_geo_locale_materializer.__file__).read_text(encoding="utf-8")
         self.assertNotIn("from tools import dev_server", source)

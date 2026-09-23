@@ -153,7 +153,7 @@ const BASE_LAYER_PANEL_CONTRACTS = Object.freeze([
     defaultVisibilityField: "showCityPoints",
     requiredRuntimeKeys: ["showCityPoints", "worldCitiesData"],
     dataKeys: ["worldCitiesData"],
-    metricNames: ["drawCityPointsLayer"],
+    metricNames: ["drawLabelsPass", "drawCityPointsLayer"],
     enabled: (state) => state.showCityPoints !== false,
   }),
   createLayerPanelContract({

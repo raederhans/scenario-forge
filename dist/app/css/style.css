@@ -2886,6 +2886,31 @@ details.appearance-subsection > *:not(summary),
   opacity: 1;
 }
 
+.city-symbol-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 12px;
+  margin: 12px 0 16px;
+  font-size: 12px;
+}
+.city-symbol-legend > span { display: flex; align-items: center; gap: 8px; }
+.city-key { display: inline-block; flex: 0 0 auto; border: 1.5px solid currentColor; border-radius: 50%; background: currentColor; }
+.city-key.metropolis { width: 10px; height: 10px; }
+.city-key.large { width: 8px; height: 8px; }
+.city-key.medium { width: 6px; height: 6px; }
+.city-key.small { width: 5px; height: 5px; background: transparent; }
+.city-key.town { width: 3px; height: 3px; background: transparent; border-width: 1px; }
+.city-key-capital { font-style: normal; font-size: 17px; line-height: 1; }
+.strategic-values-panel { margin-bottom: 16px; }
+.strategic-values-panel [hidden] { display: none !important; }
+.strategic-values-panel .btn-secondary { min-width: 0; padding: 6px 8px; font-size: 11px; }
+.strategic-values-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.strategic-values-heading h3 { margin: 0; font-size: 14px; }
+.strategic-values-heading button { flex-shrink: 0; }
+.strategic-values-ramp { height: 10px; border-radius: 3px; border: 1px solid rgba(128,128,128,.25); }
+.strategic-values-scale { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.strategic-values-inspection { display: block; white-space: pre-line; overflow-wrap: anywhere; font-size: 12px; line-height: 1.6; }
+.strategic-values-panel .select-input { width: 100%; min-width: 0; }
 .city-points-toggle-stack {
   display: flex;
   flex-direction: column;

@@ -1885,8 +1885,8 @@ class TnoBundleBuilderTest(unittest.TestCase):
             if rule.get("rule_id") == "japan_guangdong_client_1962"
         )
         self.assertEqual(gng_rule["color_hex"], "#7A2E41")
-        self.assertEqual(manual_overrides["countries"]["MAG"]["color_hex"], "#415638")
-        self.assertEqual(manual_overrides["countries"]["ONG"]["color_hex"], "#0d4510")
+        self.assertEqual(manual_overrides["countries"]["MAG"]["color_hex"], "#3c4551")
+        self.assertEqual(manual_overrides["countries"]["ONG"]["color_hex"], "#51875b")
         self.assertEqual(manual_overrides["countries"]["GAY"]["color_hex"], "#4f4f4f")
 
     def test_second_wave_runtime_colors_keep_manual_sources_locked(self) -> None:
@@ -1919,12 +1919,16 @@ class TnoBundleBuilderTest(unittest.TestCase):
             Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
         )["entries"]
 
-        expected_tags = ["PRC", "SIC", "SIK", "TIB", "XIK"]
+        expected_tags = ["PRC", "SIK", "TIB", "XIK"]
         for tag in expected_tags:
             self.assertEqual(
                 countries_payload[tag]["color_hex"],
                 audit_entries[tag]["map_hex"],
             )
+        self.assertEqual(countries_payload["SIC"]["color_hex"], "#6873a0")
+        self.assertEqual(countries_payload["RGC"]["color_hex"], "#c15a7d")
+        self.assertEqual(countries_payload["SIC"]["color_hex"], audit_entries["XIK"]["map_hex"])
+        self.assertEqual(countries_payload["RGC"]["color_hex"], audit_entries["SIC"]["map_hex"])
 
     def test_single_object_topology_prunes_unused_arcs(self) -> None:
         source_topology = {
@@ -1991,7 +1995,10 @@ class TnoBundleBuilderTest(unittest.TestCase):
             Path("data/palette-maps/tno.audit.json").read_text(encoding="utf-8")
         )["entries"]
 
-        explicit_scenario_color_tags = {}
+        explicit_scenario_color_tags = {
+            "EGY": "#7c9a70",
+            "TUN": "#70825d",
+        }
         palette_priority_tags = {
             "KAZ": "#aa233c",
             "UZB": "#9b2b40",
@@ -2000,8 +2007,6 @@ class TnoBundleBuilderTest(unittest.TestCase):
             "RWA": "#438f00",
             "ZAM": "#9666a7",
             "ZIM": "#004a00",
-            "EGY": "#89bb78",
-            "TUN": "#b54613",
             "LBA": "#bcc2a3",
             "MAD": "#3d5069",
             "MOR": "#ac8b6c",
@@ -2015,6 +2020,7 @@ class TnoBundleBuilderTest(unittest.TestCase):
 
             if tag in explicit_scenario_color_tags:
                 self.assertEqual(country_hex, explicit_scenario_color_tags[tag])
+                self.assertEqual(country_entry.get("color_policy"), "locked")
                 continue
             if tag in palette_priority_tags:
                 self.assertEqual(country_hex, palette_priority_tags[tag])
@@ -2028,6 +2034,63 @@ class TnoBundleBuilderTest(unittest.TestCase):
                 mismatches.append((tag, country_hex, audit_hex))
 
         self.assertEqual(mismatches, [])
+
+    def test_corrected_country_color_mappings_survive_manual_override_and_palette_sync(self) -> None:
+        countries = json.loads(
+            Path("data/scenarios/tno_1962/countries.json").read_text(encoding="utf-8")
+        )["countries"]
+        manual_overrides = json.loads(
+            Path("data/scenarios/tno_1962/scenario_manual_overrides.json").read_text(encoding="utf-8")
+        )["countries"]
+        mutations = json.loads(
+            Path("data/scenarios/tno_1962/scenario_mutations.json").read_text(encoding="utf-8")
+        )["countries"]
+        # MOD identities: FRI -> AZH, BRM -> BUR; NCC and TUN use the
+        # startup CHI_JAP_PUP and TUN_ITA cosmetic colors respectively.
+        expected_colors = {
+            "FRI": "#388a33", "BRM": "#a05361", "NCP": "#9f2349", "TUN": "#70825d",
+        }
+
+        for tag, color_hex in expected_colors.items():
+            self.assertEqual(manual_overrides[tag]["color_hex"], color_hex)
+            self.assertEqual(countries[tag]["color_hex"], color_hex)
+            self.assertEqual(mutations[tag]["color_hex"], color_hex)
+            self.assertEqual(mutations[tag]["color_policy"], "locked")
+
+        target_tags = set(expected_colors)
+        rebuilt_countries = {tag: dict(countries[tag]) for tag in target_tags}
+        original_identity = {
+            tag: (entry.get("display_name"), entry.get("display_name_en"), entry.get("display_name_zh"), entry.get("parent_owner_tag"))
+            for tag, entry in rebuilt_countries.items()
+        }
+        for entry in rebuilt_countries.values():
+            entry["color_hex"] = "#112233"
+            entry["color_policy"] = "palette"
+        manual_payload = {
+            "countries": {tag: manual_overrides[tag] for tag in target_tags},
+            "assignments": {},
+        }
+        apply_dev_manual_overrides(
+            {"countries": rebuilt_countries},
+            {"owners": {}},
+            {"controllers": {}},
+            {"cores": {}},
+            manual_payload,
+            {},
+        )
+        sync_summary = tno_bundle.sync_tno_country_colors_from_palette_audit(
+            {"countries": rebuilt_countries}
+        )
+
+        for tag, expected_color in expected_colors.items():
+            entry = rebuilt_countries[tag]
+            self.assertEqual(entry["color_hex"], expected_color)
+            self.assertEqual(entry["color_policy"], "locked")
+            self.assertEqual(
+                (entry.get("display_name"), entry.get("display_name_en"), entry.get("display_name_zh"), entry.get("parent_owner_tag")),
+                original_identity[tag],
+            )
+        self.assertEqual(set(sync_summary["skipped_explicit_tags"]), target_tags)
 
     def test_tno_palette_audit_sync_uses_color_policy_not_static_override_list(self) -> None:
         source = Path("tools/patch_tno_1962_bundle.py").read_text(encoding="utf-8")

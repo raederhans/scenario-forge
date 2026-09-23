@@ -118,9 +118,10 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       const visualEntry = helpers.getCityVisualCapitalState(entry, config)
         ? entry
         : { ...entry, isCapital: false, markerSizePx: null };
-      const tierOffset = visualEntry.isCapital ? 1 : visualEntry.cityTier === "major" ? 0 : -1;
+      const rankOffset = { metropolis: 1, large: 0, medium: -0.5, small: -1, town: -1.5 }[visualEntry.settlementRank];
+      const tierOffset = visualEntry.isCapital ? 1 : (rankOffset ?? (visualEntry.cityTier === "major" ? 0 : -1));
       const fontPx = helpers.clamp(baseFontPx + tierOffset, 7, 23);
-      context.font = `${visualEntry.isCapital ? 600 : 400} ${fontPx / scale}px ${serifStack}`;
+      context.font = `${visualEntry.isCapital || visualEntry.settlementRank === "metropolis" ? 600 : 400} ${fontPx / scale}px ${serifStack}`;
       const fullText = helpers.getCityDisplayLabel(visualEntry.feature);
       const text = helpers.formatCityMapLabel(fullText, {
         entry: visualEntry,

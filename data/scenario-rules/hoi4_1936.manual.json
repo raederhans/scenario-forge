@@ -125,6 +125,7 @@
     },
     {
       "rule_id": "british_raj",
+      "color_hex_override": "#aa0a0a",
       "owner_tag": "RAJ",
       "priority": 107,
       "quality": "manual_reviewed",
@@ -418,7 +419,7 @@
       "include_hierarchy_group_ids": ["CN_Sichuan", "CN_Chongqing"],
       "base_iso2": "CN",
       "display_name_override": "Chuan Clique",
-      "color_hex_override": "#8d5f3f",
+      "color_hex_override": "#006080",
       "source_type": "scenario_extension",
       "historical_fidelity": "extended"
     },
@@ -512,6 +513,7 @@
     },
     {
       "rule_id": "burma",
+      "color_hex_override": "#c9385d",
       "owner_tag": "BRM",
       "priority": 170,
       "quality": "manual_reviewed",
@@ -526,6 +528,7 @@
     },
     {
       "rule_id": "palestine_mandate",
+      "color_hex_override": "#c9385d",
       "owner_tag": "PAL",
       "priority": 171,
       "quality": "approx_existing_geometry",
@@ -716,6 +719,7 @@
     },
     {
       "rule_id": "malaya_singapore_brunei",
+      "color_hex_override": "#c9385d",
       "owner_tag": "MAL",
       "priority": 213,
       "quality": "approx_existing_geometry",
@@ -841,6 +845,7 @@
     },
     {
       "rule_id": "dutch_east_indies",
+      "color_hex_override": "#b05a46",
       "owner_tag": "INS",
       "priority": 221,
       "quality": "manual_reviewed",
@@ -959,6 +964,7 @@
     },
     {
       "rule_id": "french_mandate_syria",
+      "color_hex_override": "#3971e4",
       "owner_tag": "SYR",
       "priority": 229,
       "quality": "manual_reviewed",
@@ -974,6 +980,7 @@
     },
     {
       "rule_id": "french_mandate_lebanon",
+      "color_hex_override": "#3971e4",
       "owner_tag": "LEB",
       "priority": 230,
       "quality": "manual_reviewed",

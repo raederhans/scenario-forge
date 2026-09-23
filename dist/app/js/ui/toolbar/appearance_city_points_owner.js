@@ -5,10 +5,6 @@ import {
 } from "../../core/state/actions/appearance_actions.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import {
-  STRATEGIC_CHOROPLETH_METRIC_IDS,
-  isStrategicChoroplethMetric,
-} from "../../core/renderer/strategic_choropleth.js";
-import {
   CITY_POINTS_THEME_OPTIONS,
   formatCityPointsDensityValue,
   getCityPointsLabelDensityHint,
@@ -22,29 +18,17 @@ function clampNumber(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
 
-function buildCityPointsThemePatch(themeStyle, clamp) {
-  const patch = {
-    color: themeStyle.color,
-    capitalColor: themeStyle.capitalColor,
-  };
-  const markerScale = Number(themeStyle.markerScale);
-  const markerDensity = Number(themeStyle.markerDensity);
-  const opacity = Number(themeStyle.opacity);
-  const labelSize = Number(themeStyle.labelSize);
-  const labelDensity = String(themeStyle.labelDensity || "").trim().toLowerCase();
-  if (Number.isFinite(markerScale)) patch.markerScale = clamp(markerScale, 0.75, 2.5);
-  if (Number.isFinite(markerDensity)) patch.markerDensity = clamp(markerDensity, 0.5, 2);
-  if (Number.isFinite(opacity)) patch.opacity = clamp(opacity, 0, 1);
-  if (["sparse", "balanced", "dense"].includes(labelDensity)) patch.labelDensity = labelDensity;
-  if (Number.isFinite(labelSize)) patch.labelSize = clamp(Math.round(labelSize), 8, 24);
-  return patch;
+function buildCityPointsThemePatch(themeStyle) {
+  // Palette changes preserve the user's density, label and size choices.
+  return { color: themeStyle.color, capitalColor: themeStyle.capitalColor };
 }
 
 function collectCityPointsNodes(documentRef) {
   return {
     toggleCityPoints: documentRef.getElementById("toggleCityPoints"),
-    toggleStrategicResourceMarkers: documentRef.getElementById("toggleStrategicResourceMarkers"),
-    strategicChoroplethMetric: documentRef.getElementById("strategicChoroplethMetric"),
+    cityPointsDensityPreset: documentRef.getElementById("cityPointsDensityPreset"),
+    cityPointsMinRank: documentRef.getElementById("cityPointsMinRank"),
+    cityPointsHierarchyHint: documentRef.getElementById("cityPointsHierarchyHint"),
     cityPointsTheme: documentRef.getElementById("cityPointsTheme"),
     cityPointsThemeHint: documentRef.getElementById("cityPointsThemeHint"),
     cityPointsMarkerScale: documentRef.getElementById("cityPointsMarkerScale"),
@@ -64,21 +48,6 @@ function collectCityPointsNodes(documentRef) {
     cityPointsLabelSizeValue: documentRef.getElementById("cityPointsLabelSizeValue"),
   };
 }
-
-const STRATEGIC_CHOROPLETH_METRIC_LABELS = Object.freeze({
-  manpower: "Manpower",
-  steel: "Steel",
-  oil: "Oil",
-  aluminium: "Aluminium",
-  rubber: "Rubber",
-  tungsten: "Tungsten",
-  chromium: "Chromium",
-  coal: "Coal",
-  infrastructure: "Infrastructure",
-  military_factories: "Military Factories",
-  civilian_factories: "Civilian Factories",
-  factories_total: "Total Factories",
-});
 
 export function createAppearanceCityPointsOwner({
   runtimeState,
@@ -132,43 +101,14 @@ export function createAppearanceCityPointsOwner({
     nodes.cityPointsTheme.replaceChildren(fragment);
   };
 
-  const ensureStrategicChoroplethMetricOptions = () => {
-    if (!nodes.strategicChoroplethMetric) return;
-    const expectedValues = ["", ...STRATEGIC_CHOROPLETH_METRIC_IDS];
-    const currentValues = Array.from(nodes.strategicChoroplethMetric.options || [])
-      .map((option) => String(option.value || ""));
-    const matchesExisting =
-      currentValues.length === expectedValues.length
-      && currentValues.every((value, index) => value === expectedValues[index]);
-    if (!matchesExisting) {
-      const fragment = documentRef.createDocumentFragment();
-      expectedValues.forEach((metricId) => {
-        const option = documentRef.createElement("option");
-        option.value = metricId;
-        fragment.appendChild(option);
-      });
-      nodes.strategicChoroplethMetric.replaceChildren(fragment);
-    }
-    Array.from(nodes.strategicChoroplethMetric.options || []).forEach((option) => {
-      const metricId = String(option.value || "");
-      const label = metricId
-        ? (STRATEGIC_CHOROPLETH_METRIC_LABELS[metricId] || metricId)
-        : "None";
-      option.textContent = t(label, "ui");
-    });
-  };
-
   const renderCityPointsUi = () => {
     if (nodes.toggleCityPoints) nodes.toggleCityPoints.checked = !!runtimeState.showCityPoints;
-    if (nodes.toggleStrategicResourceMarkers) {
-      nodes.toggleStrategicResourceMarkers.checked = !!runtimeState.showStrategicResourceMarkers;
-    }
-    ensureStrategicChoroplethMetricOptions();
-    if (nodes.strategicChoroplethMetric) {
-      const metricId = String(runtimeState.strategicChoroplethMetric || "").trim();
-      nodes.strategicChoroplethMetric.value = isStrategicChoroplethMetric(metricId) ? metricId : "";
-    }
     const cityPointsConfig = syncCityPointsConfig();
+    if (nodes.cityPointsDensityPreset) nodes.cityPointsDensityPreset.value = cityPointsConfig.densityPreset;
+    if (nodes.cityPointsMinRank) nodes.cityPointsMinRank.value = cityPointsConfig.minSettlementRank;
+    if (nodes.cityPointsHierarchyHint) nodes.cityPointsHierarchyHint.textContent = runtimeState.currentLanguage === "zh"
+      ? "首都是独立标记。历史剧本沿用已知等级，可由剧本单独覆盖。"
+      : "Capitals have a separate symbol. Historical scenarios retain known ranks and can override them.";
     ensureCityPointsThemeOptions();
     if (nodes.cityPointsTheme) nodes.cityPointsTheme.value = String(cityPointsConfig.theme || "classic_graphite");
     if (nodes.cityPointsThemeHint) {
@@ -251,36 +191,13 @@ export function createAppearanceCityPointsOwner({
       nodes.toggleCityPoints.dataset.bound = "true";
     }
 
-    if (nodes.toggleStrategicResourceMarkers && nodes.toggleStrategicResourceMarkers.dataset.bound !== "true") {
-      nodes.toggleStrategicResourceMarkers.checked = !!runtimeState.showStrategicResourceMarkers;
-      nodes.toggleStrategicResourceMarkers.addEventListener("change", (event) => {
-        setAppearanceVisibilityState(runtimeState, "showStrategicResourceMarkers", event.target.checked);
-        if (runtimeState.showStrategicResourceMarkers) {
-          void ensureActiveScenarioOptionalLayerLoaded("strategicvalues", {
-            reason: "toolbar-toggle",
-            renderNow: true,
-          });
-        }
-        persistCityViewSettings();
-        renderDirty("toggle-strategic-resource-markers");
-      });
-      nodes.toggleStrategicResourceMarkers.dataset.bound = "true";
-    }
-
-    bindCityPointsChange(nodes.strategicChoroplethMetric, (_cfg, event) => {
-      const metricId = String(event.target.value || "").trim();
-      setAppearanceVisibilityState(
-        runtimeState,
-        "strategicChoroplethMetric",
-        isStrategicChoroplethMetric(metricId) ? metricId : "",
-      );
-      if (runtimeState.strategicChoroplethMetric) {
-        void ensureActiveScenarioOptionalLayerLoaded("strategicvalues", {
-          reason: "toolbar-strategic-choropleth",
-          renderNow: true,
-        });
-      }
-    }, "strategic-choropleth-metric");
+    bindCityPointsChange(nodes.cityPointsDensityPreset, (_cfg, event) => {
+      const densityPreset = event.target.value;
+      return { densityPreset, labelDensity: { compact: "sparse", balanced: "balanced", detailed: "dense" }[densityPreset] || "balanced" };
+    }, "city-points-density-preset", () => renderCityPointsUi());
+    bindCityPointsChange(nodes.cityPointsMinRank, (_cfg, event) => ({
+      minSettlementRank: event.target.value,
+    }), "city-points-min-rank");
 
     bindCityPointsInput(nodes.cityPointsColor, (_cfg, event) => ({
       color: normalizeOceanFillColor(event.target.value),
@@ -289,8 +206,7 @@ export function createAppearanceCityPointsOwner({
     bindCityPointsChange(nodes.cityPointsTheme, (cfg, event) => {
       const theme = getCityPointsThemeMeta(event.target.value || "classic_graphite").value;
       const themeStyle = getCityPointsThemeStyle(theme);
-      // theme 只是一组可继续编辑的起点；应用后仍写入 cityPointsConfig，
-      // 保证保存/撤销/后续滑杆调整都读同一个 runtimeState.styleConfig。
+      // 颜色主题与密度、符号大小和文字设置相互独立。
       return { theme, ...buildCityPointsThemePatch(themeStyle, clamp) };
     }, "city-points-theme", () => renderCityPointsUi());
 

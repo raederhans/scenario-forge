@@ -50,6 +50,19 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("strategic lens and resource filter changes invalidate their rendered passes", () => {
+  const { state, policy } = createHarness();
+  const before = policy.getRenderPassSignature("political");
+  state.strategicChoroplethMetric = "steel";
+  assert.notEqual(policy.getRenderPassSignature("political"), before);
+  const metric = policy.getRenderPassSignature("political");
+  state.styleConfig.strategicValues = { opacity: 0.2, palette: "rose", resourceFilter: "all" };
+  assert.notEqual(policy.getRenderPassSignature("political"), metric);
+  const resources = policy.getRenderPassSignature("contextMarkers");
+  state.styleConfig.strategicValues.resourceFilter = "oil";
+  assert.notEqual(policy.getRenderPassSignature("contextMarkers"), resources);
+});
+
 test("scoped topology promotion changes only dependent signatures, while unknown resets invalidate all", () => {
   const { state, policy } = createHarness();
   const names = ["background", "physicalBase", "political", "effects", "lineEffects", "labels"];

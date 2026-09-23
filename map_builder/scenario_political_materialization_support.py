@@ -279,6 +279,33 @@ def build_country_entry_from_mutation(
     mode = str(mutation.get("mode") or "override").strip().lower() or "override"
     normalized_tag = validate_tag_code(tag, error_cls=error_cls)
     parent_owner_tag = normalize_code(mutation.get("parent_owner_tag"))
+    color_only_fields = {"mode", "color_hex", "color_policy"}
+    if (
+        existing_entry is not None
+        and mode == "override"
+        and set(mutation).issubset(color_only_fields)
+        and ("color_hex" in mutation or "color_policy" in mutation)
+    ):
+        entry = copy.deepcopy(existing_entry)
+        if "color_hex" in mutation:
+            entry["color_hex"] = validate_color_hex(mutation["color_hex"], error_cls=error_cls)
+        resolved_color_policy = normalize_color_policy(
+            mutation.get("color_policy"),
+            default=normalize_color_policy(
+                entry.get("color_policy"),
+                default=COLOR_POLICY_PALETTE,
+            ),
+        )
+        if (
+            "color_hex" in mutation
+            and normalize_text(mutation.get("color_hex"))
+            and not normalize_color_policy(mutation.get("color_policy"))
+        ):
+            resolved_color_policy = COLOR_POLICY_LOCKED
+        if "color_policy" in mutation or "color_hex" in mutation:
+            entry["color_policy"] = resolved_color_policy or COLOR_POLICY_PALETTE
+        return entry
+
     if existing_entry is None:
         if mode != "create":
             raise error_cls(

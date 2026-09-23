@@ -1,3 +1,4 @@
+import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {
@@ -645,6 +646,7 @@ class FileManager {
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
+        strategicValues: normalizeStrategicValuesStyle(appState.styleConfig?.strategicValues),
         urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         transportOverview: normalizeTransportOverviewStyleConfig(appState.styleConfig?.transportOverview),
@@ -852,6 +854,7 @@ class FileManager {
     }
     data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
     data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
+    data.styleConfig.strategicValues = normalizeStrategicValuesStyle(data.styleConfig.strategicValues);
     data.styleConfig.urban = normalizeUrbanStyleConfig(data.styleConfig.urban);
     data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);
     data.intensityFields = migrateLegacyPhysicalIntensityField(

@@ -98,13 +98,17 @@ export function createCityPaintStyleModel(runtimeState, {
     const baseTokens = CITY_MARKER_THEME_TOKENS[themeKey] || CITY_MARKER_THEME_TOKENS.classic_graphite;
     const pointColor = getSafeCanvasColor(config.color, baseTokens.fillMid);
     const capitalColor = getSafeCanvasColor(config.capitalColor, baseTokens.capitalAccent);
+    const fillMid = mixCanvasColors(baseTokens.fillMid, pointColor, 0.84) || pointColor;
+    const capitalAccent = mixCanvasColors(baseTokens.capitalAccent, capitalColor, 0.92) || capitalColor;
     return {
       ...baseTokens,
+      fill: fillMid,
+      capitalFill: capitalAccent,
       fillTop: mixCanvasColors(baseTokens.fillTop, pointColor, 0.34) || pointColor,
-      fillMid: mixCanvasColors(baseTokens.fillMid, pointColor, 0.84) || pointColor,
+      fillMid,
       fillBottom: mixCanvasColors(baseTokens.fillBottom, pointColor, 0.9) || pointColor,
       stroke: mixCanvasColors(baseTokens.stroke, pointColor, 0.2) || baseTokens.stroke,
-      capitalAccent: mixCanvasColors(baseTokens.capitalAccent, capitalColor, 0.92) || capitalColor,
+      capitalAccent,
       capitalHighlight: mixCanvasColors(baseTokens.capitalHighlight, capitalColor, 0.32) || baseTokens.capitalHighlight,
       capitalLabel: mixCanvasColors(baseTokens.capitalLabel, capitalColor, 0.18) || baseTokens.capitalLabel,
     };

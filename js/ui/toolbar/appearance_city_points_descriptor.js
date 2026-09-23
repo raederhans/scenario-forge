@@ -26,8 +26,8 @@ export const CITY_POINTS_THEME_DEFAULT_STYLES = Object.freeze({
     opacity: 0.94,
     labelDensity: "dense",
     labelSize: 12,
-    hintEn: "Bright cyan markers with denser labels for quick city debugging on busy maps.",
-    hintZh: "明亮青蓝点位配更密标签，适合在复杂地图上快速调试城市。",
+    hintEn: "Cyan symbols with warm capital accents. Density and labels stay unchanged.",
+    hintZh: "青蓝符号配暖色首都标记，不改变密度和名称设置。",
   }),
   parchment_sepia: Object.freeze({
     color: "#9b3f2f",
@@ -37,8 +37,8 @@ export const CITY_POINTS_THEME_DEFAULT_STYLES = Object.freeze({
     opacity: 0.92,
     labelDensity: "balanced",
     labelSize: 11,
-    hintEn: "Warm vermilion points with lower density for paper and historical palettes.",
-    hintZh: "暖朱红点位配较低密度，适合纸面感和历史色系地图。",
+    hintEn: "Warm vermilion symbols for paper and historical palettes.",
+    hintZh: "暖朱红符号，适合纸面感和历史色系地图。",
   }),
   slate_blue: Object.freeze({
     color: "#5b42a6",
@@ -48,8 +48,8 @@ export const CITY_POINTS_THEME_DEFAULT_STYLES = Object.freeze({
     opacity: 0.95,
     labelDensity: "sparse",
     labelSize: 12,
-    hintEn: "Large violet markers with sparse labels for high-contrast modern inspection.",
-    hintZh: "较大的紫色点位配稀疏标签，适合高对比的现代调试视图。",
+    hintEn: "Violet symbols with pale capital accents.",
+    hintZh: "紫色符号配浅色首都标记。",
   }),
   ivory_outline: Object.freeze({
     color: "#f3ead2",
@@ -59,8 +59,8 @@ export const CITY_POINTS_THEME_DEFAULT_STYLES = Object.freeze({
     opacity: 0.98,
     labelDensity: "sparse",
     labelSize: 13,
-    hintEn: "Pale ivory markers with strong dark rims for night and dark-land inspection.",
-    hintZh: "浅象牙点位配强深色轮廓，适合夜色和深色国土检查。",
+    hintEn: "Ivory symbols with dark outlines for dark maps.",
+    hintZh: "象牙色符号配深色轮廓，适合深色底图。",
   }),
 });
 

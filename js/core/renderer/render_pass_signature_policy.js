@@ -119,6 +119,9 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       `ocean-fill:${getOceanBaseFillColor()}`,
       getDebugMode(),
       runtimeState.topologyBundleMode || "single",
+      runtimeState.strategicChoroplethMetric || "",
+      runtimeState.scenarioStrategicValuesRevision || 0,
+      stableJson(runtimeState.styleConfig?.strategicValues || {}),
     ].join("::");
   }
 
@@ -249,6 +252,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
+        stableJson(runtimeState.styleConfig?.strategicValues || {}),
         ...getTransportPresentationSignatureParts(),
         ...getUrbanCityRenderPassSignatureParts(runtimeState, "contextMarkers"),
         stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {})),

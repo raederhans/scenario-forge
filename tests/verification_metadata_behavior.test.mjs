@@ -5,6 +5,7 @@ import test from "node:test";
 import { VERIFICATION_CATALOG_SOURCE_FILES } from "../tools/verification/catalog/source_files.mjs";
 import {
   buildAdaptiveEntrypointRecommendation,
+  buildExecutionPlan,
   constrainAdaptiveEntrypointSelection,
 } from "../tools/run_adaptive_tests.mjs";
 import { buildVerificationSelectionPlan, prepareRepositoryVerificationCatalog } from "../tools/verification/script_portfolio.mjs";
@@ -51,6 +52,15 @@ import {
 } from "../tools/verification/verification_metadata_helpers.mjs";
 
 const REPO_ROOT = process.cwd();
+
+test("HOI4 manual rules select the existing scenario checks without a route gap", () => {
+  const report = buildRepositoryRecommendation(["data/scenario-rules/hoi4_1936.manual.json"]);
+  const plan = buildExecutionPlan(report);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(plan.routeGaps, []);
+  assert.ok(report.recommendedCommands.some((entry) =>
+    entry.commandRef === "python -m unittest tests.test_build_hoi4_scenario tests.test_check_hoi4_scenario_bundle -q"));
+});
 
 test("reviewed city names select executable Python and Node regression routes", () => {
   const routes = buildRouteIndex();
