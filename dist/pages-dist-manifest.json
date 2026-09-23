@@ -44327,7 +44327,7 @@
     },
     {
       "path": "app/js/core/project_feature_migration.js",
-      "size_bytes": 7613,
+      "size_bytes": 7702,
       "source_kind": "dist"
     },
     {
@@ -46502,7 +46502,7 @@
       {
         "file_count": 285,
         "id": "startup-critical",
-        "size_bytes": 5564058
+        "size_bytes": 5564147
       },
       {
         "file_count": 101,
@@ -64680,11 +64680,11 @@
         "deferred_graph_file_count": 131,
         "deferred_module_count": 129,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5398748,
+        "initial_graph_bytes": 5398837,
         "initial_graph_file_count": 318,
         "initial_module_count": 305,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4307445,
+        "initial_script_bytes": 4307534,
         "initial_script_count": 307,
         "module_count": 441,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65001,7 +65001,7 @@
           },
           {
             "path": "app/js/core/project_feature_migration.js",
-            "size_bytes": 7613
+            "size_bytes": 7702
           },
           {
             "path": "app/js/core/quick_fill_hierarchy.js",
@@ -65741,7 +65741,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3241666
+        "size_bytes": 3241755
       },
       {
         "basis": "startup-resource-graph",
@@ -67511,7 +67511,7 @@
     {
       "file_count": 9214,
       "path": "app",
-      "size_bytes": 568539773
+      "size_bytes": 568539862
     },
     {
       "file_count": 58,
@@ -67544,5 +67544,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 577100919
+  "total_bytes": 577101008
 }
