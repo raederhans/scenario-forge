@@ -1,8 +1,10 @@
 """Append major Nordic lakes to base and TNO water without changing existing arcs.
 
 Stage under .runtime first. Existing marine, Congo, Aral and Atlantropa
-geometries are preserved; scenario startup/chunk assets are refreshed after
-these staged water files are promoted.
+geometries are preserved. The staged global data manifest records the actual
+topology bytes and arc statistics. After promotion, rebuild the data catalog,
+then refresh scenario startup bundles and contract snapshots against those
+published inputs.
 
 Run from the repository root with ``python -m tools.append_nordic_water
 --stage-root .runtime/tmp/nordic-water-stage``.
@@ -26,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 INPUT_PATHS = (
     "data/europe_topology.json", "data/ne_10m_lakes.zip",
     "data/europe_topology.na_v2.json", "data/water_regions.geojson",
+    "data/manifest.json",
     "data/scenarios/tno_1962/runtime_topology.topo.json",
     "data/scenarios/tno_1962/water_regions.geojson",
     "data/scenarios/tno_1962/manifest.json",
@@ -112,6 +115,26 @@ def appended_water_features(replacement, object_name, added_count):
         return []
     return decode(replacement, object_name)["features"][-added_count:]
 
+
+def stage_global_manifest(stage_root):
+    from init_map_data import _topology_summary
+
+    manifest = read(ROOT / "data/manifest.json")
+    outputs = manifest["outputs"]
+    for relative in ("europe_topology.json", "europe_topology.na_v2.json"):
+        path = stage_root / "data" / relative
+        record = outputs[relative]
+        record.update({
+            "size_bytes": path.stat().st_size,
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            **_topology_summary(path),
+        })
+    path = stage_root / "data/manifest.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    return "data/manifest.json"
+
 def rebuild(stage_root):
     stage_root = stage_root.resolve()
     if not stage_root.is_relative_to(ROOT / ".runtime") or stage_root.exists():
@@ -164,6 +187,7 @@ def rebuild(stage_root):
                 appended_water_features(replacement, "water_regions", len(compiled_new_lakes)))
     write(stage_root / "data/water_regions.geojson", canonical_water)
     paths.append("data/water_regions.geojson")
+    paths.append(stage_global_manifest(stage_root))
 
     from tools import patch_tno_1962_bundle as b
     relative = "data/scenarios/tno_1962/runtime_topology.topo.json"

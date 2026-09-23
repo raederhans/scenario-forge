@@ -2,7 +2,7 @@
   "artifact_counts": {
     "chunk_count": 208,
     "feature_count": 12696,
-    "water_count": 141
+    "water_count": 149
   },
   "controller_changes": [
     {
@@ -110089,13 +110089,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "2d1274a18c1a8387ea8ec9b36c79413cb6805750c4a9db3ab1702f4b962d2c77",
+  "snapshot_fingerprint": "10130c6e07bb2d9eef49df28179f01bc3eb575261b166675a3917ddcf9c86c83",
   "source": {
-    "base_topology_sha256": "8159bc03c9321a2e7d26a7e08526fe6fbc0973f2f7aad779e868bcd5adb6a005",
-    "build_snapshot_sha256": "9787e042bc7ec6fe06f2591b0e2821fdc45f49566a9ece6f1eb9e0f84f5a59b6",
-    "detail_chunk_manifest_sha256": "12a51ff94fb30eda17a624bc7f4f72da5581f60c998dba3d8501a3e5b0837b2a",
+    "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
+    "build_snapshot_sha256": "2424c833f3a5438b0357bcd89bf4a55ae2441af8707538770085d438ec7539eb",
+    "detail_chunk_manifest_sha256": "9249ccf3b4a3952fba9ad5b0a24918e62577fd8bdb02078a6562dcd88bb27ddd",
     "runtime_bootstrap_topology_sha256": "e56805c31f92feae16a65fc947d93323915b9a80d47bac45e6c34734892975a1",
-    "runtime_topology_sha256": "48076202e516572af0e62d9c549ced152e8fed045855f04378bec620736d1122"
+    "runtime_topology_sha256": "908541ca1dc046cbaca3246dea44375331912fc06bf7964c355309891a48d698"
   },
   "summary": {
     "approximate_count": 859,

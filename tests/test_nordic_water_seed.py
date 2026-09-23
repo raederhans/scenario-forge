@@ -1,11 +1,15 @@
+import hashlib
+import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import geopandas as gpd
 from shapely.geometry import shape
 
 from init_map_data import SEEDED_LAKE_REGION_SPECS, _select_named_water_features, _union_named_water_geometries
-from tools.append_nordic_water import append_water_features, appended_water_features
+from tools.append_nordic_water import append_water_features, appended_water_features, stage_global_manifest
 from tools.patch_tno_1962_bundle import TNO_BASE_GEOGRAPHY_WATER_CLONE_IDS
 
 
@@ -71,6 +75,44 @@ class NordicWaterSeedTest(unittest.TestCase):
             "water_regions": {"type": "GeometryCollection", "geometries": []}}}
         self.assertEqual(append_water_features(topology, "water_regions", []), topology)
         self.assertEqual(appended_water_features(topology, "water_regions", 0), [])
+
+    def test_staged_manifest_refreshes_actual_topology_metadata_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            stage = root / "stage"
+            (root / "data").mkdir()
+            (stage / "data").mkdir(parents=True)
+            outputs = {
+                name: {"role": name, "size_bytes": 1, "sha256": "old", "arc_count": 0}
+                for name in ("europe_topology.json", "europe_topology.na_v2.json")
+            }
+            outputs["unrelated.json"] = {"size_bytes": 9, "sha256": "untouched"}
+            source_manifest = {"version": 1, "generated_at": "fixed", "outputs": outputs}
+            (root / "data/manifest.json").write_text(json.dumps(source_manifest), encoding="utf-8")
+            for index, name in enumerate(("europe_topology.json", "europe_topology.na_v2.json"), start=1):
+                payload = {"type": "Topology", "arcs": [[[index, 0]]] * index, "objects": {}}
+                (stage / "data" / name).write_text(json.dumps(payload), encoding="utf-8")
+
+            def summarize(path):
+                arcs = json.loads(path.read_text(encoding="utf-8"))["arcs"]
+                return {"arc_count": len(arcs), "arc_point_count": sum(map(len, arcs))}
+
+            with patch("tools.append_nordic_water.ROOT", root), patch(
+                "init_map_data._topology_summary", side_effect=summarize
+            ):
+                self.assertEqual(stage_global_manifest(stage), "data/manifest.json")
+
+            refreshed = json.loads((stage / "data/manifest.json").read_text(encoding="utf-8"))
+            for index, name in enumerate(("europe_topology.json", "europe_topology.na_v2.json"), start=1):
+                path = stage / "data" / name
+                record = refreshed["outputs"][name]
+                self.assertEqual(record["size_bytes"], path.stat().st_size)
+                self.assertEqual(record["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+                self.assertEqual(record["arc_count"], index)
+                self.assertEqual(record["arc_point_count"], index)
+                self.assertEqual(record["role"], name)
+            self.assertEqual(refreshed["outputs"]["unrelated.json"], outputs["unrelated.json"])
+            self.assertEqual(refreshed["generated_at"], "fixed")
 
 
 if __name__ == "__main__":

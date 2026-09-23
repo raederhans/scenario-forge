@@ -13,7 +13,10 @@
 - [x] Pages 构建和64项启动壳检查通过；数据目录 health 和19项目录契约通过。
 - [x] 分块清单统一LF，入库字节与哈希引用一致，双语startup/gzip已刷新。
 - [x] 最终 Pages 镜像生成（570.74 MiB），源文件与已跟踪镜像同步。
-- [ ] PR、远端检查、合并回执。
+- [x] 已推送并创建 [PR #151](https://github.com/raederhans/scenario-forge/pull/151)。
+- [x] 同步全局拓扑清单、TNO及两个HOI4场景的启动引用与快照；三个 strict 场景检查通过，六场景快照匹配。
+- [x] 新增 manifest 回归后生成器5/5通过；heavy dependency分组修复后69项分类、58项元数据测试通过。
+- 首轮远端 smoke、perf-gate、transport及quick-fill通过；修正元数据后追加提交，最新必需检查与合并回执以 PR 页面为准。
 
 用户补充范围：只接入较大的湖泊，小湖泊不批量接入。
 

@@ -38142,22 +38142,22 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json.gz",
-      "size_bytes": 2587622,
+      "size_bytes": 2600235,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json.gz",
-      "size_bytes": 2587623,
+      "size_bytes": 2600236,
       "source_kind": "generated_ignored"
     },
     {
@@ -38902,22 +38902,22 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json.gz",
-      "size_bytes": 2585466,
+      "size_bytes": 2598921,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json.gz",
-      "size_bytes": 2585467,
+      "size_bytes": 2598922,
       "source_kind": "generated_ignored"
     },
     {
@@ -46438,6 +46438,26 @@
       "source_kind": "generated_ignored"
     },
     {
+      "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json",
+      "size_bytes": 12178105,
+      "source_kind": "generated_ignored"
+    },
+    {
+      "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json",
+      "size_bytes": 12178105,
+      "source_kind": "generated_ignored"
+    },
+    {
+      "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json",
+      "size_bytes": 12172965,
+      "source_kind": "generated_ignored"
+    },
+    {
+      "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json",
+      "size_bytes": 12172965,
+      "source_kind": "generated_ignored"
+    },
+    {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json",
       "size_bytes": 12146054,
       "source_kind": "generated_ignored"
@@ -46445,26 +46465,6 @@
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json",
       "size_bytes": 12146054,
-      "source_kind": "generated_ignored"
-    },
-    {
-      "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json",
-      "size_bytes": 12141379,
-      "source_kind": "generated_ignored"
-    },
-    {
-      "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json",
-      "size_bytes": 12141379,
-      "source_kind": "generated_ignored"
-    },
-    {
-      "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json",
-      "size_bytes": 12136239,
-      "source_kind": "generated_ignored"
-    },
-    {
-      "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json",
-      "size_bytes": 12136239,
       "source_kind": "generated_ignored"
     },
     {
@@ -46537,7 +46537,7 @@
       {
         "file_count": 8048,
         "id": "scenario-specific",
-        "size_bytes": 283345017
+        "size_bytes": 283544057
       },
       {
         "file_count": 5,
@@ -64880,7 +64880,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 566694422,
+        "untraversed_dist_bytes": 566893462,
         "untraversed_dist_file_count": 8813,
         "untraversed_module_count": 7
       },
@@ -67221,7 +67221,7 @@
           {
             "file_count": 584,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 272445786
+            "size_bytes": 272644826
           },
           {
             "file_count": 10,
@@ -67229,7 +67229,7 @@
             "size_bytes": 94013
           }
         ],
-        "size_bytes": 272539799
+        "size_bytes": 272738839
       },
       {
         "basis": "product-registry:export-modules",
@@ -67430,7 +67430,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 272539799
+          "size_bytes": 272738839
         },
         {
           "category": "scenario-specific",
@@ -67718,7 +67718,7 @@
     {
       "file_count": 9217,
       "path": "app",
-      "size_bytes": 569102734
+      "size_bytes": 569301774
     },
     {
       "file_count": 59,
@@ -67751,5 +67751,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 598462703
+  "total_bytes": 598661743
 }
