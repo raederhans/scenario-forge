@@ -1,4 +1,4 @@
-import { getEffectiveScenarioHierarchy } from "../scenario_hierarchy.js";
+import { getEffectiveScenarioHierarchyFromInputs } from "../scenario_hierarchy.js";
 import { getScenarioDistrictCountryGrouping } from "../scenario_districts.js";
 
 const PARENT_BORDER_MIN_COVERAGE = 0.70;
@@ -82,7 +82,10 @@ export function createParentBorderGroupingPolicy(runtimeState, {
   }
 
   function buildHierarchyGroupingCandidate(countryCode, featureEntries) {
-    const groups = getEffectiveScenarioHierarchy(runtimeState)?.groups;
+    const groups = getEffectiveScenarioHierarchyFromInputs(
+      runtimeState.hierarchyData,
+      runtimeState.activeScenarioManifest?.hierarchy_overrides,
+    )?.groups;
     if (!groups || typeof groups !== "object") return null;
 
     const idSet = new Set(featureEntries.map((entry) => entry.id));

@@ -44572,7 +44572,7 @@
     },
     {
       "path": "app/js/core/renderer/parent_border_grouping_policy.js",
-      "size_bytes": 10153,
+      "size_bytes": 10264,
       "source_kind": "dist"
     },
     {
@@ -45132,7 +45132,7 @@
     },
     {
       "path": "app/js/core/scenario_hierarchy.js",
-      "size_bytes": 2281,
+      "size_bytes": 2424,
       "source_kind": "dist"
     },
     {
@@ -46502,7 +46502,7 @@
       {
         "file_count": 285,
         "id": "startup-critical",
-        "size_bytes": 5563804
+        "size_bytes": 5564058
       },
       {
         "file_count": 101,
@@ -64680,11 +64680,11 @@
         "deferred_graph_file_count": 131,
         "deferred_module_count": 129,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5398494,
+        "initial_graph_bytes": 5398748,
         "initial_graph_file_count": 318,
         "initial_module_count": 305,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4307191,
+        "initial_script_bytes": 4307445,
         "initial_script_count": 307,
         "module_count": 441,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65189,7 +65189,7 @@
           },
           {
             "path": "app/js/core/renderer/parent_border_grouping_policy.js",
-            "size_bytes": 10153
+            "size_bytes": 10264
           },
           {
             "path": "app/js/core/renderer/physical_contour_lod_policy.js",
@@ -65505,7 +65505,7 @@
           },
           {
             "path": "app/js/core/scenario_hierarchy.js",
-            "size_bytes": 2281
+            "size_bytes": 2424
           },
           {
             "path": "app/js/core/sovereignty_manager.js",
@@ -65741,7 +65741,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3241412
+        "size_bytes": 3241666
       },
       {
         "basis": "startup-resource-graph",
@@ -67511,7 +67511,7 @@
     {
       "file_count": 9214,
       "path": "app",
-      "size_bytes": 568539519
+      "size_bytes": 568539773
     },
     {
       "file_count": 58,
@@ -67544,5 +67544,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 577100665
+  "total_bytes": 577100919
 }

@@ -2569,7 +2569,8 @@ freezeStateTargetPureReaderEntry({
   // scope escapes are scalar inputs, never publication or mutation authority.
   "modulePath": "js/core/renderer/fill_target_policy.js",
   "dependencyFingerprints": {
-    "js/core/quick_fill_hierarchy.js": "1e9e14753df7320233a3035239036d5e1f3fb90644308bec1e5a28ba31693531",
+    "js/core/quick_fill_hierarchy.js": "8538c360f3d4083f258240eac02c778278aff8a3d085f90a9eff69084bac9bff",
+    "js/core/scenario_hierarchy.js": "dc144761d44906a21c1638bbe25729e23c869164a798b3bf98635391e863e7c9",
     "js/core/scenario_districts.js": "bb1a7059d3f2a211377972a734ecd78cd953bd0444c5df25672b650805759eab",
     "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
     "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
@@ -2735,6 +2736,7 @@ freezeStateTargetPureReaderEntry({
   // it only reads district membership and current sovereignty from the caller.
   "modulePath": "js/core/renderer/parent_border_grouping_policy.js",
   "dependencyFingerprints": {
+    "js/core/scenario_hierarchy.js": "dc144761d44906a21c1638bbe25729e23c869164a798b3bf98635391e863e7c9",
     "js/core/scenario_districts.js": "bb1a7059d3f2a211377972a734ecd78cd953bd0444c5df25672b650805759eab",
     "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
     "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
@@ -2745,9 +2747,25 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "5b3d1a3286ecdb406a3fc86931d68291a63bd0643b81fee006ca95d3421ec8d9",
+  "sourceFingerprint": "afc0803f73123b844156b250c7db3ad4e46ecd56065c6c296f4472df8c14fbbe",
   "reviewedReadSiteFingerprints": [],
   "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"buildHierarchyGroupingCandidate\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "hierarchyData",
+      "sourceFingerprint": "cd8515d3e838706a72c289f1952f6919b56eb4c04ca658ae5ac2f2614f104870",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"buildHierarchyGroupingCandidate\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioManifest",
+      "sourceFingerprint": "0830e9ef8120111c43253d40a1c02f9cbefe2b1935a4c8de6a0f6aa0d4ee3480",
+      "count": 1
+    },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"getFullLandDataFeatures\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
@@ -5303,7 +5321,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "506a3145b37deb016c6193c09371f6fc0dadc6c146234ee57fa19ac3eb39c7f4",
   "factoryModulePath": "js/core/scenario/chunk_payload_loader.js",
   "factoryExportName": "createScenarioChunkPayloadLoader",
-  "factorySourceFingerprint": "0d6fdaf11225065b0c2b585a119d0783d874fa4d807650c576980849ff473ab0",
+  "factorySourceFingerprint": "e493936217dfc3332bb60ce91b69c86c7eb2ea6cfbfc924cf75cf5deffe1ba4e",
   "ownerBindingName": "owner",
   "methods": [
     "loadScenarioChunkPayload",
@@ -5788,7 +5806,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "7fc2e64b8f974b6d30774a7c40ce8ce567bbb1aee38b3f8920f13bb340f3dada",
+      "3efcc6177715eaedf7f4e2ea3a00e90b803ee4b022297af8c6d59cc896b473e7",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",

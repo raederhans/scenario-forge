@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { hydrateStartupBaseContentState } from "../js/core/state/content_state.js";
 import { callCompatRuntimeHook } from "../js/core/state/index.js";
+import { waitForStartupRenderSettle } from "../js/bootstrap/startup_bootstrap_support.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -211,6 +212,7 @@ test("bootstrap draws one complete frame after promotion, and none after failed 
       setStartupInitialScenarioChunkVisualPromotion: (_state, result) => events.push(result.status),
       setBootState: () => events.push("warmup"),
       invalidateAllRenderPasses: () => { dirty = true; },
+      waitForStartupRenderSettle,
       renderDispatcher: { flush: render },
       assertStartupFirstVisibleFrameAccepted: () => {
         assert.equal(dirty, false);

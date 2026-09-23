@@ -14,7 +14,15 @@ import {
   evaluateGovernedDecision,
 } from "../tools/perf/analyze_render_sample_roles.mjs";
 import {
+  DEFAULT_GATE_SCENARIOS,
+  SCENARIO_MANIFEST_MAP,
+  SUPPORTED_SCENARIOS,
   annotatePerfErrorWithDiagnostics,
+  buildMarkdown as buildBaselineMarkdown,
+  buildReportWorkloadIdentity,
+  buildScenarioWorkloadIdentity,
+  getScenarioSampleRole,
+  readScenarioManifestIdentity,
   collectBaselineContractMismatches,
   collectGovernedRenderSampleRoleMismatches,
   getBaselineArtifactDate,
@@ -2008,4 +2016,138 @@ test("companion report fails closed when the injected source report identity cha
   assert.equal(report.decision.status, "blocked-rerun-required");
   assert.equal(report.decision.admitted, false);
   assert.ok(report.decision.failedChecks.includes("source_report_sha"));
+});
+
+test("modern_world is recognized as supported observation while preserving governed gate scenarios", () => {
+  assert.ok(SUPPORTED_SCENARIOS.includes("modern_world"));
+  assert.deepEqual(DEFAULT_GATE_SCENARIOS, ["tno_1962", "hoi4_1939"]);
+  assert.equal(getScenarioSampleRole("modern_world"), "observation");
+  assert.equal(getScenarioSampleRole("blank_base"), "observation");
+  assert.equal(getScenarioSampleRole("tno_1962"), "gate");
+  assert.equal(getScenarioSampleRole("hoi4_1939"), "gate");
+
+  const singleModern = parseArgs(["--scenarios", "modern_world"]);
+  assert.deepEqual(singleModern.scenarios, ["modern_world"]);
+
+  const multiWithModern = parseArgs(["--scenarios", "tno_1962,hoi4_1939,modern_world"]);
+  assert.deepEqual(multiWithModern.scenarios, ["tno_1962", "hoi4_1939", "modern_world"]);
+});
+
+test("modern_world resolves real manifest path and workload identity with observation designation", async () => {
+  const manifestPath = SCENARIO_MANIFEST_MAP.modern_world;
+  assert.equal(manifestPath, path.join(REPO_ROOT, "data", "scenarios", "modern_world", "manifest.json"));
+
+  const manifestIdentity = await readScenarioManifestIdentity("modern_world");
+  const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+  assert.equal(manifestIdentity.scenarioId, "modern_world");
+  assert.equal(manifestIdentity.manifestPath, "data/scenarios/modern_world/manifest.json");
+  assert.equal(manifestIdentity.sampleRole, "observation");
+  assert.equal(manifestIdentity.featureCount, manifest.summary.feature_count);
+  const expectedSha256 = await sha256CanonicalTextFile(manifestPath);
+  assert.equal(manifestIdentity.manifestSha256, expectedSha256);
+
+  const options = parseArgs([
+    "--scenarios", "modern_world",
+    "--runs", "5",
+    "--warmups", "3",
+    "--baseline-json", ".runtime/output/perf/modern_world/baseline.json",
+    "--baseline-md", ".runtime/output/perf/modern_world/baseline.md",
+    "--raw-dir", ".runtime/output/perf/modern_world/raw",
+  ]);
+  const scenarioWorkload = buildScenarioWorkloadIdentity(manifestIdentity, options, "http://127.0.0.1:8000");
+  assert.equal(scenarioWorkload.scenarioId, "modern_world");
+  assert.equal(scenarioWorkload.manifestPath, "data/scenarios/modern_world/manifest.json");
+  assert.equal(scenarioWorkload.manifestSha256, expectedSha256);
+  assert.equal(scenarioWorkload.sampleRole, "observation");
+  assert.equal(scenarioWorkload.featureCount, manifest.summary.feature_count);
+  assert.equal(scenarioWorkload.baseUrl, "http://127.0.0.1:8000");
+  assert.equal(scenarioWorkload.runs, 5);
+  assert.equal(scenarioWorkload.warmups, 3);
+
+  const reportWorkload = buildReportWorkloadIdentity(options, {
+    baseUrl: "http://127.0.0.1:8000",
+    scenarios: { modern_world: { workloadIdentity: scenarioWorkload } },
+  });
+  assert.deepEqual(reportWorkload.scenarioIds, ["modern_world"]);
+  assert.deepEqual(reportWorkload.scenarios.modern_world, scenarioWorkload);
+});
+
+test("modern_world observation requires custom output paths and succeeds with .runtime paths", () => {
+  const defaultPaths = parseArgs(["--scenarios", "modern_world"]);
+  assert.throws(
+    () => validateBaselineOutputSelection(defaultPaths),
+    /custom scenarios require custom output paths/,
+  );
+
+  const combinedDefaultPaths = parseArgs(["--scenarios", "tno_1962,hoi4_1939,modern_world"]);
+  assert.throws(
+    () => validateBaselineOutputSelection(combinedDefaultPaths),
+    /custom scenarios require custom output paths/,
+  );
+
+  const customRuntimeOptions = parseArgs([
+    "--scenarios", "modern_world",
+    "--baseline-json", ".runtime/output/perf/modern_world/baseline.json",
+    "--baseline-md", ".runtime/output/perf/modern_world/baseline.md",
+    "--raw-dir", ".runtime/output/perf/modern_world/raw",
+  ]);
+  assert.doesNotThrow(() => validateBaselineOutputSelection(customRuntimeOptions));
+
+  const combinedCustomRuntimeOptions = parseArgs([
+    "--scenarios", "tno_1962,hoi4_1939,modern_world",
+    "--baseline-json", ".runtime/output/perf/all/baseline.json",
+    "--baseline-md", ".runtime/output/perf/all/baseline.md",
+    "--raw-dir", ".runtime/output/perf/all/raw",
+  ]);
+  assert.doesNotThrow(() => validateBaselineOutputSelection(combinedCustomRuntimeOptions));
+});
+
+test("modern_world is strictly rejected as a gate shard and excluded from governed gate execution", () => {
+  assert.throws(
+    () => validateGateScenarioSelection(["modern_world"]),
+    /Gate scenarios must exactly match/,
+  );
+  assert.throws(
+    () => validateGateScenarioSelection(["tno_1962", "hoi4_1939", "modern_world"]),
+    /Gate scenarios must exactly match/,
+  );
+  assert.throws(
+    () => validateGateScenarioSelection(["modern_world"], { scenarioShard: "modern_world" }),
+    /Unsupported scenario shard: "modern_world"/,
+  );
+
+  const current = makeSchema3IdentityReport("gate");
+  const baseline = makeSchema3IdentityReport();
+  const shardMismatches = collectBaselineContractMismatches(current, baseline, { scenarioShard: "modern_world" });
+  assert.ok(shardMismatches.some((entry) => entry.includes('unsupported scenario shard: "modern_world"')));
+
+  const baselineWithModern = makeSchema3IdentityReport();
+  baselineWithModern.config.scenarios = ["tno_1962", "hoi4_1939", "modern_world"];
+  const gateMismatches = collectBaselineContractMismatches(current, baselineWithModern);
+  assert.ok(gateMismatches.some((entry) => /scenarios mismatch/.test(entry)));
+});
+
+test("modern_world observation is exempted from governed render-role checks and formatted in markdown", async () => {
+  const baselinePath = path.join(REPO_ROOT, "docs", "perf", "baseline_2026-07-30.json");
+  const canonical = JSON.parse(await fs.readFile(baselinePath, "utf8"));
+  const reportWithModern = structuredClone(canonical);
+  reportWithModern.config.scenarios = ["tno_1962", "hoi4_1939", "modern_world"];
+  reportWithModern.scenarios.modern_world = {
+    sampleRole: "observation",
+    runs: [],
+    summary: { totalStartupMs: 500, canonicalRenderSampleMs: 120 },
+  };
+
+  const roleMismatches = collectGovernedRenderSampleRoleMismatches(
+    reportWithModern,
+    ["tno_1962", "hoi4_1939", "modern_world"],
+    STANDARD_PERF_RENDER_SAMPLE_RUN_PROFILE_ID,
+  );
+  assert.deepEqual(roleMismatches, []);
+
+  const md = buildBaselineMarkdown(reportWithModern);
+  assert.ok(md.includes("- Gate scenarios: tno_1962, hoi4_1939"));
+  assert.ok(md.includes("- Observation samples: modern_world"));
+  assert.ok(md.includes("## Scenario: modern_world"));
+  assert.ok(md.includes("- sample_role: observation"));
 });

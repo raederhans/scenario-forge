@@ -2749,6 +2749,8 @@ test("quick fill readers reject mutations in imported hierarchy and district dep
   const readSource = modulePath => fs.readFileSync(modulePath, "utf8");
   for (const [modulePath, dependencyPath, marker, mutation] of [
     ["js/core/renderer/fill_target_policy.js", "js/core/quick_fill_hierarchy.js", "let ownershipSnapshot = null;", "state.batchFillScope = 'country';"],
+    ["js/core/renderer/fill_target_policy.js", "js/core/scenario_hierarchy.js", "export function getEffectiveScenarioHierarchyFromInputs(base, override) {", "base.groups = {};"],
+    ["js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_hierarchy.js", "export function getEffectiveScenarioHierarchyFromInputs(base, override) {", "base.groups = {};"],
     ["js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_districts.js", "const normalized = normalizeScenarioDistrictGroupsPayload(payload);", "owners.changed = 'OTHER';"],
     ["js/core/renderer/fill_target_policy.js", "js/core/feature_identity_shared.js", "function getFeatureId(featureOrId, options = {}) {", "featureOrId.id = 'OTHER';"],
   ]) {
@@ -2775,6 +2777,11 @@ test("quick fill readers reject mutations in imported hierarchy and district dep
 });
 
 test("renderer policy readers bind exact source and reject injected state writes", async () => {
+  const borderEntry = STATE_TARGET_PURE_READER_CONTRACT.find(entry =>
+    entry.modulePath === "js/core/renderer/parent_border_grouping_policy.js");
+  assert.deepEqual(borderEntry.conservativeFindings
+    .filter(finding => finding.enclosingFunctionIdentity.includes("buildHierarchyGroupingCandidate"))
+    .map(finding => finding.key).sort(), ["activeScenarioManifest", "hierarchyData"]);
   for (const module of ["bathymetry_style_policy", "parent_border_grouping_policy", "visible_frame_identity_policy", "fill_target_policy"]) {
     const modulePath = `js/core/renderer/${module}.js`;
     const source = fs.readFileSync(modulePath, "utf8");
