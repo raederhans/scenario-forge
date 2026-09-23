@@ -8,7 +8,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-from shapely.geometry import box, mapping
+from shapely.geometry import box, mapping, Polygon
 from map_builder.regional_geometry import _encode_exact_coverage, _decode_geometry
 from tools.adapt_us_county_scenarios import partition_feature
 from tools import stage_us_county_adapted_bundle as bundle
@@ -135,6 +135,26 @@ class HistoricalBundleTests(unittest.TestCase):
                 crosswalk = {'RU_ARCTIC_FB_001': ['RU_ARCTIC_FB_001']}
             with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, 'Missing political ownership'):
                 bundle.validate_political_ownership(sid, test_baseline, test_candidate, original_owners, {}, crosswalk)
+
+    def test_neighbor_decoder_retains_short_rings_and_invalid_nonzero_surfaces(self):
+        invalid = Polygon([(0, 0), (3, 3), (0, 3), (2, 0), (0, 0)])
+        self.assertFalse(invalid.is_valid)
+        self.assertGreater(invalid.area, 0)
+        topology = _encode_exact_coverage(['INVALID', 'VALID'], [invalid, box(4, 0, 5, 1)])
+        topology['arcs'].append([[8, 8], [8, 8]])
+        short = {'type': 'Polygon', 'arcs': [[len(topology['arcs']) - 1]], 'properties': {'id': 'SHORT'}}
+        topology['objects']['political']['geometries'].append(short)
+        original = deepcopy(topology)
+        frame, diagnostics = bundle.neighbor_frame(topology, {'INVALID', 'SHORT'})
+        self.assertEqual(topology, original)
+        self.assertEqual(list(frame['id']), ['INVALID', 'VALID', 'SHORT'])
+        self.assertFalse(frame.geometry.iloc[0].is_valid)
+        self.assertEqual(frame.geometry.iloc[0].area, invalid.area)
+        self.assertEqual(diagnostics['retained_invalid_nonzero_area_ids'], ['INVALID'])
+        self.assertEqual(diagnostics['retained_zero_area_ids'], ['SHORT'])
+        self.assertEqual(len(bundle.compute_neighbor_graph(frame)), 3)
+        with self.assertRaisesRegex(ValueError, 'Invalid new neighbor geometry'):
+            bundle.neighbor_frame(topology, {'SHORT'})
 
     def test_stale_and_malformed_evidence_never_publishes(self):
         path = self.adaptation / 'owners.by_feature.json'

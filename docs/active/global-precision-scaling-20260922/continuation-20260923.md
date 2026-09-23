@@ -8,8 +8,8 @@ unchanged. No merge, production deployment, or performance acceptance is implied
 | Area | Fresh evidence | Remaining gate |
 | --- | --- | --- |
 | United States, Modern World | Rebuilt 3,144 counties against current checkout bytes; strict scenario and 20 whole-shard mixed-LOD checks pass | Device/performance acceptance and old-project unresolved IDs |
-| United States, historical scenarios | Full assembler now covers blank, HGO, HOI4 and TNO while retaining historical domains, assignment lineage, authoring assets and scenario hierarchy | Each complete bundle must pass its own strict and runtime checks |
-| Albania / North Macedonia | 20 targets; frozen owner-domain geometry gate passes with zero surface delta | Full combined stage and visual acceptance |
+| United States, historical scenarios | Complete blank, HGO and TNO bundles pass strict contracts; HOI4 builds are being validated with the existing runtime short-ring decoder | Per-scenario runtime/performance acceptance and retained unresolved IDs |
+| Albania / North Macedonia | 20 targets included in the combined TNO candidate; frozen owner-domain gate passes with zero surface delta | Detailed visual acceptance |
 | CH/HU/RO/BG/SE/NO/FI/SI/HR/RS | Cached source preflight available; first 241-target batch rejected for 1.4231851947029341 deg² surface drift | 22 inherited overlap pairs across the original batch require explicit handling; do not assign nearest-source ownership |
 | Czechia / Slovakia | 77 / 79 source IDs match governed cache provenance | Joint source seams and constrained baseline staging |
 | Montenegro / Moldova | 21 / 40 source targets prepared | Joint neighboring-source seams and staged owner-domain validation |
@@ -34,6 +34,26 @@ built zero new paths, and fell back on the existing dirty-feature threshold.
 Background regrouping/rebuild remains material. These are not controlled A/B,
 FPS, or statistical performance-gate results; thresholds remain unchanged.
 
+The combined TNO candidate includes the historical US county partition and 279
+additional targets (China 254, Japan 5, Albania/North Macedonia 20). Strict
+contracts and 38 mixed-LOD checks pass, with zero target surface delta. Its
+localhost browser smoke reached the unlocked editor and idle rendering with no
+preview HTTP 4xx/5xx. This does not establish detailed visual acceptance.
+
+The performance cost remains a release blocker: TNO coarse raw JSON grows from
+63,856,324 bytes to 122,365,460 after historical US adaptation, then 123,051,048
+in the combined stage (37,034,214 gzip bytes). Combined construction took
+329.062 seconds and peaked at 3,836,313,600 working-set bytes. Browser startup
+component timings are not total load-time measurements.
+
+A read-only Gemini CLI analysis identified the shared simplifier's global
+all-or-nothing fallback; parent inspection confirmed the code path and both
+manifests report `regional_shared_coverage_applied: false`. Precision features
+retain original unrounded geometry on fallback. The exact failing geometry and
+the achievable savings remain unmeasured. Per-shard simplification is a proposed
+experiment only: it must preserve historical owner domains and all mixed-LOD
+seams. No rounding, tolerance, or coverage gate was relaxed.
+
 ## Reproduction and evidence
 
 All run products are ignored under `.runtime/reports/generated/global-migration-20260923/`
@@ -44,6 +64,7 @@ patched to bypass digest checks.
 
 - Modern candidate: `modern/modern_world`; gates `modern-current.strict.json`, `modern-lod.json`.
 - Historical candidates: `historical/<scenario_id>`; HGO and blank strict reports pass.
+- Combined candidate: `combined/tno_1962`; `combined.strict.json`, `combined-validation.json`, `combined-browser.txt`.
 - Rejected Europe stage: `europe/tno_1962`, `europe-validation.json`; never publish it.
 - Safe geometry: `europe-al-mk-geometry-validation.json`.
 - Fresh country reports: `jp-cn-candidates-v1/{jp,cn}.report.json`, `japan-full-v1/jp.report.json`.

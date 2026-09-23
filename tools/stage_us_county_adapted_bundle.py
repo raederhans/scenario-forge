@@ -22,7 +22,7 @@ import shapely
 from map_builder.geo.topology import compute_neighbor_graph
 from map_builder.io.writers import write_json_atomic
 from map_builder.regional_geometry import (
-    _absolute_topology, _decode_geometry, _encode_exact_coverage, _offset_arcs, _update_bbox,
+    _absolute_topology, _encode_exact_coverage, _offset_arcs, _update_bbox,
 )
 from tools.adapt_us_county_scenarios import check_domain_preservation, source_counties, AREA_ROUNDOFF_LIMIT
 from tools.prepare_us_county_adaptation_sidecars import (
@@ -34,6 +34,7 @@ from tools.build_startup_bootstrap_assets import (
     build_bootstrap_runtime_topology, build_startup_locales_payload, build_startup_geo_aliases_payload,
 )
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
+from tools.scenario_topology_decode import topology_object_to_geojson
 from tools.build_tno_russia_precision_assets import finalize_stage, peak_memory
 from tools.regional_scenario_assets import _copy_gzip
 
@@ -154,6 +155,31 @@ def adapt_authoring_asset(name, payload, crosswalk, geometries):
     if remaining_references(refs, removed):
         raise ValueError(f'Unsupported replaced-feature references: {name}')
     return value
+
+
+def neighbor_frame(topology, retained_ids):
+    """Use the runtime/chunk decoder's short-ring semantics only for adjacency.
+
+    It closes degenerate rings without repairing or discarding polygon surfaces.
+    The original topology is never modified. Existing invalid surfaces remain in
+    the graph input and are explicitly reported rather than silently repaired.
+    """
+    collection = topology_object_to_geojson(topology, 'political')
+    frame = gpd.GeoDataFrame.from_features(collection['features'], crs='EPSG:4326')
+    invalid, zero_area, empty = [], [], []
+    for fid, geometry in zip(frame['id'], frame.geometry):
+        if geometry is None or geometry.is_empty:
+            empty.append(fid)
+        elif geometry.area == 0:
+            zero_area.append(fid)
+        if geometry is None or geometry.is_empty or not geometry.is_valid:
+            if fid not in retained_ids:
+                raise ValueError(f'Invalid new neighbor geometry: {fid}')
+            if geometry is not None and not geometry.is_empty and geometry.area != 0:
+                invalid.append(fid)
+    return frame, {'decoder': 'scenario_topology_decode.topology_object_to_geojson',
+                   'retained_invalid_nonzero_area_ids': invalid, 'retained_zero_area_ids': zero_area,
+                   'retained_empty_ids': empty, 'feature_count': len(frame)}
 
 
 def assemble(topology, overlay, report, assignments):
@@ -340,7 +366,7 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
         staged = Path(temp) / sid
         shutil.copytree(baseline, staged)
         rows = candidate['objects']['political']['geometries']
-        frame = gpd.GeoDataFrame([dict(row['properties'], geometry=_decode_geometry(candidate, row)) for row in rows], crs='EPSG:4326')
+        frame, neighbor_diagnostics = neighbor_frame(candidate, {fid for fid, children in crosswalk.items() if children == [fid]})
         candidate['objects']['political']['computed_neighbors'] = compute_neighbor_graph(frame)
         write(staged / 'runtime_topology.topo.json', candidate)
         candidate_hash = digest(staged / 'runtime_topology.topo.json')
@@ -424,6 +450,7 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
             raise ValueError('Input changed during build')
         result = {'scenario_id': sid, 'release_ready': False, 'complete_runtime_bundle': True,
                   'chunked': chunked, 'performance_accepted': False,
+                  'derived_neighbor_geometry': neighbor_diagnostics,
                   'elapsed_seconds': time.monotonic() - started, 'peak_working_set_bytes': peak_memory(),
                   'input_sha256': bindings, 'replaced_old_ids': sorted(removed),
                   'unresolved_ids_retained_in_baseline': report['unresolved_ids_retained_in_baseline'],

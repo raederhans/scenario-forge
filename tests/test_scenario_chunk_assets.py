@@ -531,6 +531,38 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
 
         self.assertEqual(aligned_bounds, [[0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 2.0, 2.0]])
 
+    def test_political_detail_bounds_omit_zero_extent_without_dropping_payload(self) -> None:
+        from tools.check_scenario_contracts import _validate_detail_chunk_feature_bounds
+        topology = {'type': 'Topology', 'arcs': [
+            [[0, 0], [0, 1], [0, 2], [0, 0]],
+            [[2, 0], [3, 0], [3, 1], [2, 1], [2, 0]],
+        ], 'objects': {'political': {'type': 'GeometryCollection', 'geometries': [
+            {'type': 'Polygon', 'arcs': [[0]], 'properties': {'id': 'FLAT', 'cntr_code': 'US'}},
+            {'type': 'Polygon', 'arcs': [[1]], 'properties': {'id': 'AREA', 'cntr_code': 'US'}},
+        ]}}}
+        temporary_root = REPO_ROOT / '.runtime' / 'tmp'
+        temporary_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=temporary_root) as temporary:
+            scenario_dir = Path(temporary)
+            (scenario_dir / 'owners.by_feature.json').write_text(
+                json.dumps({'owners': {'FLAT': 'USA', 'AREA': 'USA'}}), encoding='utf-8')
+            result = scenario_chunk_assets.build_and_write_scenario_chunk_assets(
+                scenario_dir=scenario_dir, manifest_payload={'scenario_id': 'test_bounds'},
+                runtime_topology_payload=topology, startup_topology_payload=topology)
+            chunks = result['detail_chunk_manifest']['chunks']
+            detail = next(chunk for chunk in chunks if chunk['layer'] == 'political' and chunk['lod'] == 'detail')
+            payload = json.loads((scenario_dir / 'chunks' / Path(detail['url']).name).read_text(encoding='utf-8'))
+            self.assertEqual(_chunk_feature_ids(payload), ['FLAT', 'AREA'])
+            self.assertEqual(detail['feature_count'], 2)
+            self.assertEqual(detail['feature_bounds'], [[2.0, 0.0, 3.0, 1.0]])
+            expected = scenario_chunk_assets._topology_object_to_feature_collection(topology, 'political')
+            self.assertEqual(payload['features'][0]['geometry'], json.loads(json.dumps(expected['features'][0]['geometry'])))
+            errors = []
+            _validate_detail_chunk_feature_bounds(detail['id'], detail, payload['features'], errors, required=True)
+            self.assertEqual(errors, [])
+            coarse = next(chunk for chunk in chunks if chunk['layer'] == 'political' and chunk['lod'] == 'coarse')
+            self.assertEqual(len(coarse['feature_bounds']), coarse['feature_count'])
+
     def test_feature_bounds_summary_reads_geometry_collection_children(self) -> None:
         features = [
             {

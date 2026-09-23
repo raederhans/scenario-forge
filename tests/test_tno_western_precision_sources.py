@@ -1,4 +1,9 @@
+import hashlib
+import json
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
 
 import geopandas as gpd
 from shapely.geometry import box
@@ -16,13 +21,45 @@ class WesternPrecisionSourceTests(unittest.TestCase):
                 parse_countries(countries)
 
     def test_governed_adm2_sources_have_exact_country_ids(self):
-        for code, count in (("CZ", 77), ("SK", 79)):
-            with self.subTest(code=code):
-                frame, _, url = load_governed_adm2(code)
-                self.assertEqual(len(frame), count)
-                self.assertTrue(frame.id.is_unique)
-                self.assertTrue(frame.id.str.startswith(f"{code}_ADM2_").all())
-                self.assertTrue(url.startswith("https://github.com/wmgeolab/geoBoundaries/raw/9469f09/"))
+        runtime = Path(__file__).resolve().parents[1] / ".runtime" / "tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as directory:
+            root = Path(directory)
+            data = root / "data"
+            data.mkdir()
+            ledger = []
+            for code, iso3 in (("CZ", "CZE"), ("SK", "SVK")):
+                frame = gpd.GeoDataFrame([
+                    {"shapeID": "A", "shapeGroup": iso3, "shapeType": "ADM2", "geometry": box(0, 0, 1, 1)},
+                    {"shapeID": "B", "shapeGroup": iso3, "shapeType": "ADM2", "geometry": box(1, 0, 2, 1)},
+                ], crs=4326)
+                path = data / f"geoBoundaries-{iso3}-ADM2.geojson"
+                path.write_text(frame.to_json(), encoding="utf-8")
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                url = f"https://example.test/{iso3}/ADM2.geojson"
+                sidecar = path.with_suffix(".provenance.json")
+                sidecar.write_text(json.dumps({"filename": path.name,
+                    "configured_source_url": url, "content_length": path.stat().st_size,
+                    "sha256": digest}), encoding="utf-8")
+                ledger.append({"source_id": f"gb_{iso3.lower()}_adm2",
+                    "local_path": path.relative_to(root).as_posix(),
+                    "provenance_sidecar": sidecar.relative_to(root).as_posix(),
+                    "upstream_url": url, "current_local_sha256": digest})
+            (data / "source_ledger.json").write_text(json.dumps(ledger), encoding="utf-8")
+            with patch("tools.prepare_tno_western_precision_sources.ROOT", root):
+                for code, iso3 in (("CZ", "CZE"), ("SK", "SVK")):
+                    with self.subTest(code=code):
+                        source, path, url = load_governed_adm2(code)
+                        expected = [{"id": f"{code}_ADM2_{suffix}", "cntr_code": code}
+                                    for suffix in ("A", "B")]
+                        selected, excluded = select_same_ids(source, expected, {code})
+                        self.assertEqual(set(selected.id), {row["id"] for row in expected})
+                        self.assertTrue(selected.cntr_code.eq(code).all())
+                        self.assertEqual(excluded, [])
+                        self.assertEqual(url, f"https://example.test/{iso3}/ADM2.geojson")
+                        path.write_bytes(path.read_bytes() + b"\n")
+                        with self.assertRaisesRegex(ValueError, "does not match provenance and ledger"):
+                            load_governed_adm2(code)
 
     def fixture(self):
         return gpd.GeoDataFrame([

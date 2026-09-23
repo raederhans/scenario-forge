@@ -1418,7 +1418,9 @@ def _build_political_chunk_payloads(
                 chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
                 _write_json(chunk_path, chunk_payload)
                 chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
-                feature_bounds_summary = _build_feature_bounds_summary(payload_features or [], include_zero_area=True)
+                # Detail bounds are a non-empty spatial summary, not a positional
+                # index. Retain degenerate features in the payload itself.
+                feature_bounds_summary = _build_feature_bounds_summary(payload_features or [])
                 all_chunks.append({
                     "id": chunk_id,
                     "layer": "political",
