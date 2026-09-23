@@ -5588,7 +5588,7 @@ function collectFailures() {
         "function buildPoliticalPassWorkerPacket({ identity, viewport }) {",
         "function requestPoliticalPassWorker({ identity, packetState }) {",
         "function drawPoliticalFineFeatureLoop({ k, identity, viewport }) {",
-        "resolvePoliticalRecoveryQuality: getPoliticalRecoveryQuality,",
+        "resolvePoliticalRecoveryQuality: () => exportRenderInProgress ? POLITICAL_RECOVERY_QUALITY_EXACT : getPoliticalRecoveryQuality(),",
         "return getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);",
         "tryPartialPoliticalPassRepaint,",
       ],

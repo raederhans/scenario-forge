@@ -2361,7 +2361,7 @@ function initToolbar({ render } = {}) {
       await new Promise((resolve, reject) => {
         const image = new Image();
         image.onload = () => {
-          targetCtx.drawImage(image, 0, 0);
+          targetCtx.drawImage(image, 0, 0, targetCanvas.width, targetCanvas.height);
           resolve();
         };
         image.onerror = () => reject(new Error("SVG overlay export failed."));
@@ -2539,9 +2539,9 @@ function initToolbar({ render } = {}) {
     return canvas;
   };
 
-  const buildSvgAnnotationCanvas = async (options = {}) => {
-    const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
-    const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
+  const buildSvgAnnotationCanvas = async (options = {}, dimensions = null) => {
+    const width = dimensions?.width || runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
+    const height = dimensions?.height || runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     if (!(width > 0) || !(height > 0)) {
       throw createExportError("invalid-params", "SVG annotation canvas unavailable.");
     }
@@ -2556,17 +2556,17 @@ function initToolbar({ render } = {}) {
     return canvas;
   };
 
-  const buildSpecialZonesExportCanvas = async () => buildSvgAnnotationCanvas({
+  const buildSpecialZonesExportCanvas = async (dimensions = null) => buildSvgAnnotationCanvas({
     onlyViewportSelector: ".special-zones-layer",
-  });
+  }, dimensions);
 
-  const buildCompositeSourceCanvas = async (exportUi) => {
+  const buildCompositeSourceCanvas = async (exportUi, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
     const passNames = resolveExportPassSequence({
       ...exportUi,
       visibility: exportUi.visibility,
     }, RENDER_PASS_NAMES).filter((passName) => exportUi.textVisibility?.["render-labels"] || passName !== "labels");
-    const compositeCanvas = renderExportPassesToCanvas(passNames);
+    const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
     }
@@ -2590,29 +2590,29 @@ function initToolbar({ render } = {}) {
     return workingCanvas;
   };
 
-  const buildSingleExportSourceCanvas = async (exportUi, sourceId) => {
+  const buildSingleExportSourceCanvas = async (exportUi, sourceId, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);
-      const canvas = renderExportPassesToCanvas(model?.passNames || []);
+      const canvas = renderExportPassesToCanvas(model?.passNames || [], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);
       }
       return canvas;
     }
     if (normalizedSourceId === "render-labels") {
-      const canvas = renderExportPassesToCanvas(["labels"]);
+      const canvas = renderExportPassesToCanvas(["labels"], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", "Render-pass label canvas unavailable.");
       }
       return canvas;
     }
     if (normalizedSourceId === "svg-annotations") {
-      return buildSvgAnnotationCanvas({ onlyViewportSelector: SVG_ANNOTATION_VIEWPORT_SELECTOR });
+      return buildSvgAnnotationCanvas({ onlyViewportSelector: SVG_ANNOTATION_VIEWPORT_SELECTOR }, dimensions);
     }
     if (normalizedSourceId === "special-zones") {
-      return buildSpecialZonesExportCanvas();
+      return buildSpecialZonesExportCanvas(dimensions);
     }
     throw createExportError("invalid-params", `Unsupported preview source: ${normalizedSourceId}`);
   };
@@ -2622,10 +2622,7 @@ function initToolbar({ render } = {}) {
     return ["1", "1.5", "2", "4"].includes(rawValue) ? Number(rawValue) : 2;
   };
 
-  const scaleCanvasForExport = (sourceCanvas, scaleMultiplier, exportUi) => {
-    if (!sourceCanvas) {
-      throw createExportError("invalid-params", "Missing export source canvas.");
-    }
+  const getExportDimensions = (scaleMultiplier) => {
     const { width: baseWidth, height: baseHeight } = resolveExportBaseDimensions(
       Number(runtimeState.dpr || 0),
       Number(runtimeState.width || 0),
@@ -2644,21 +2641,28 @@ function initToolbar({ render } = {}) {
     if (targetWidth * targetHeight > EXPORT_MAX_PIXELS) {
       throw createExportError("invalid-params", `Export pixel budget exceeded (${targetWidth}x${targetHeight}).`);
     }
-    return applyExportAdjustmentsToCanvas(sourceCanvas, exportUi, {
-      width: targetWidth,
-      height: targetHeight,
-    });
+    return { width: targetWidth, height: targetHeight, pixelRatio: scaleMultiplier };
+  };
+
+  const scaleCanvasForExport = (sourceCanvas, scaleMultiplier, exportUi) => {
+    if (!sourceCanvas) {
+      throw createExportError("invalid-params", "Missing export source canvas.");
+    }
+    const dimensions = getExportDimensions(scaleMultiplier);
+    return applyExportAdjustmentsToCanvas(sourceCanvas, exportUi, dimensions);
   };
 
   const buildCompositeExportCanvas = async (exportUi, scaleMultiplier) => {
-    const compositeCanvas = await buildCompositeSourceCanvas(exportUi);
+    const dimensions = getExportDimensions(scaleMultiplier);
+    const compositeCanvas = await buildCompositeSourceCanvas(exportUi, dimensions);
     return scaleCanvasForExport(compositeCanvas, scaleMultiplier, exportUi);
   };
 
   const buildPerLayerExportOutputs = async (exportUi, scaleMultiplier) => {
+    const dimensions = getExportDimensions(scaleMultiplier);
     const outputs = buildPerLayerExportPlan(exportUi);
     for (const output of outputs) {
-      const layerCanvas = await buildSingleExportSourceCanvas(exportUi, output.id);
+      const layerCanvas = await buildSingleExportSourceCanvas(exportUi, output.id, dimensions);
       output.canvas = scaleCanvasForExport(layerCanvas, scaleMultiplier, exportUi);
     }
     if (!outputs.length) {

@@ -18,14 +18,15 @@
     "data/scenarios/hoi4_1936/countries.json",
     "data/scenarios/hoi4_1939/runtime_topology.topo.json",
     "data/scenarios/hoi4_1939/owners.by_feature.json",
-    "data/scenarios/hoi4_1939/countries.json"
+    "data/scenarios/hoi4_1939/countries.json",
+    "data/europe_land_bg.geojson"
   ],
   "counts": {
     "hoi4_1936_political_features": 2626,
     "hoi4_1939_political_features": 2626
   },
   "selection_policy": {
-    "note": "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership.",
+    "note": "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership; source land geometry underlays any unassigned topology gaps without inventing ownership.",
     "ranking": "intersect bbox, clip, sort by area or length, keep top visible features"
   }
 }

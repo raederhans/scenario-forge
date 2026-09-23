@@ -249,6 +249,11 @@ class TestNode {
     this.attributes[name] = String(value);
   }
 
+  get src() { return this.getAttribute("src"); }
+  set src(value) { this.setAttribute("src", value); }
+
+  click() { this.dispatchEvent("click"); }
+
   removeAttribute(name) {
     delete this.attributes[name];
   }
@@ -318,7 +323,7 @@ class PreviewRoot extends TestNode {
 }
 
 class ProductStoryRoot extends TestNode {
-  constructor({ stageImage, badge, title, body, stepButtons, compareButtons, evidenceItems }) {
+  constructor({ stageImage, badge, title, body, stepButtons, compareButtons, comparisonControls, evidenceItems, sourceTree, exportAction }) {
     super();
     this.stageImage = stageImage;
     this.badge = badge;
@@ -326,7 +331,10 @@ class ProductStoryRoot extends TestNode {
     this.body = body;
     this.stepButtons = stepButtons;
     this.compareButtons = compareButtons;
+    this.comparisonControls = comparisonControls;
     this.evidenceItems = evidenceItems;
+    this.sourceTree = sourceTree;
+    this.exportAction = exportAction;
   }
 
   querySelector(selector) {
@@ -334,6 +342,9 @@ class ProductStoryRoot extends TestNode {
     if (selector === "[data-story-stage-badge]") return this.badge;
     if (selector === "[data-story-stage-title]") return this.title;
     if (selector === "[data-story-stage-body]") return this.body;
+    if (selector === "[data-story-comparison-controls]") return this.comparisonControls;
+    if (selector === "[data-story-source-tree]") return this.sourceTree;
+    if (selector === "[data-story-export-action]") return this.exportAction;
     return null;
   }
 
@@ -346,15 +357,34 @@ class ProductStoryRoot extends TestNode {
 }
 
 class SampleRunsRoot extends TestNode {
-  constructor(filterButtons, cards) {
+  constructor(filterButtons, cards, viewTitle, viewBody, library, transport) {
     super();
     this.filterButtons = filterButtons;
     this.cards = cards;
+    this.viewTitle = viewTitle;
+    this.viewBody = viewBody;
+    this.library = library;
+    this.transport = transport;
+  }
+
+  querySelector(selector) {
+    if (selector === "[data-gallery-view-title]") return this.viewTitle;
+    if (selector === "[data-gallery-view-body]") return this.viewBody;
+    if (selector === "[data-output-library]") return this.library;
+    if (selector === "[data-transport-image]") return this.transport.image;
+    if (selector === "[data-transport-title]") return this.transport.title;
+    if (selector === "[data-transport-body]") return this.transport.body;
+    if (selector === "[data-transport-download]") return this.transport.download;
+    if (selector === "[data-transport-source]") return this.transport.source;
+    if (selector === "[data-transport-scope]") return this.transport.scope;
+    if (selector === "[data-transport-regional-evidence]") return this.transport.regionalEvidence;
+    return null;
   }
 
   querySelectorAll(selector) {
     if (selector === "[data-sample-run-filter]") return this.filterButtons;
     if (selector === "[data-sample-run-card]") return this.cards;
+    if (selector === "[data-transport-page]") return this.transport.buttons;
     return [];
   }
 }
@@ -378,7 +408,7 @@ function createPreviewHarness({ preFailedMode } = {}) {
   const images = ["transport", "cities", "terrain", "night"].map((mode) => {
     const image = new TestNode();
     image.setAttribute("data-preview-image", mode);
-    image.setAttribute("src", `./assets/japan-preview-${mode}.webp`);
+    image.setAttribute("src", `./assets/japan-preview-${mode}.svg`);
     if (mode === preFailedMode) {
       image.complete = true;
       image.naturalWidth = 0;
@@ -508,8 +538,12 @@ function createShowcaseHarness({ reducedMotion = true, fetchImpl } = {}) {
   };
 }
 
-function createProductStoryHarness({ reducedMotion = true } = {}) {
+function createProductStoryHarness({ reducedMotion = true, withScrollSpy = false } = {}) {
   const domContentLoaded = [];
+  const observerCallbacks = [];
+  const navLink = new TestNode();
+  navLink.setAttribute("href", "#story");
+  const storySection = { id: "story" };
   const stageImage = new TestNode();
   const badge = new TestNode();
   const title = new TestNode();
@@ -526,12 +560,18 @@ function createProductStoryHarness({ reducedMotion = true } = {}) {
     button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
     return button;
   });
+  const comparisonControls = new TestNode();
+  comparisonControls.hidden = true;
+  const sourceTree = new TestNode();
+  sourceTree.hidden = true;
+  const exportAction = new TestNode();
+  exportAction.hidden = true;
   const evidenceItems = ["baseline", "scenario", "transport", "evidence", "export"].map((stepId) => {
     const item = new TestNode();
     item.setAttribute("data-story-evidence", stepId);
     return item;
   });
-  const root = new ProductStoryRoot({ stageImage, badge, title, body, stepButtons, compareButtons, evidenceItems });
+  const root = new ProductStoryRoot({ stageImage, badge, title, body, stepButtons, compareButtons, comparisonControls, evidenceItems, sourceTree, exportAction });
   root.dataset.storyStep = "baseline";
   root.dataset.storyComparison = "hoi4-1936";
 
@@ -545,8 +585,12 @@ function createProductStoryHarness({ reducedMotion = true } = {}) {
       if (selector === "[data-story-root]") return root;
       return null;
     },
-    querySelectorAll() {
+    querySelectorAll(selector) {
+      if (withScrollSpy && selector === ".topnav a[href^='#']") return [navLink];
       return [];
+    },
+    getElementById(id) {
+      return id === "story" ? storySection : null;
     },
   };
 
@@ -560,11 +604,22 @@ function createProductStoryHarness({ reducedMotion = true } = {}) {
         setItem: () => {},
       },
       matchMedia: () => ({ matches: reducedMotion }),
+      ...(withScrollSpy ? {
+        IntersectionObserver: class {
+          constructor(callback) { observerCallbacks.push(callback); }
+          observe() {}
+        },
+      } : {}),
     },
     badge,
     body,
     compareButtons,
+    comparisonControls,
+    sourceTree,
+    exportAction,
     domContentLoaded,
+    observerCallbacks,
+    storySection,
     evidenceItems,
     root,
     stageImage,
@@ -575,23 +630,46 @@ function createProductStoryHarness({ reducedMotion = true } = {}) {
 
 function createSampleRunsGalleryHarness({ reducedMotion = true } = {}) {
   const domContentLoaded = [];
-  const filterButtons = ["all", "scenario", "transport", "atlas", "evidence"].map((filter, index) => {
+  const filterButtons = ["all", "transport", "evidence"].map((filter, index) => {
     const button = new TestNode();
     button.setAttribute("data-sample-run-filter", filter);
     button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
     return button;
   });
   const cards = [
-    ["tno-atlantropa-mediterranean", "scenario evidence"],
-    ["hoi4-europe-comparison", "scenario evidence"],
-    ["japan-tokaido-corridor", "transport atlas evidence"],
+    ["hoi4-1936-europe", "scenario"],
+    ["hoi4-1939-europe", "scenario"],
+    ["tno-1962-europe", "scenario"],
+    ["japan-tokaido-corridor", "transport"],
   ].map(([id, tags]) => {
     const card = new TestNode();
     card.setAttribute("data-sample-run-id", id);
     card.setAttribute("data-sample-tags", tags);
+    const proof = new TestNode();
+    proof.open = false;
+    card.querySelector = (selector) => selector === ".sample-run-card__proof" ? proof : null;
+    card.proof = proof;
     return card;
   });
-  const root = new SampleRunsRoot(filterButtons, cards);
+  const viewTitle = new TestNode();
+  const viewBody = new TestNode();
+  const library = new TestNode();
+  library.hidden = true;
+  const transport = {
+    image: new TestNode(),
+    title: new TestNode(),
+    body: new TestNode(),
+    download: new TestNode(),
+    source: new TestNode(),
+    scope: new TestNode(),
+    regionalEvidence: new TestNode(),
+    buttons: ["regional", "national"].map((page) => {
+      const button = new TestNode();
+      button.setAttribute("data-transport-page", page);
+      return button;
+    }),
+  };
+  const root = new SampleRunsRoot(filterButtons, cards, viewTitle, viewBody, library, transport);
   root.dataset.sampleFilter = "all";
 
   const document = {
@@ -623,7 +701,11 @@ function createSampleRunsGalleryHarness({ reducedMotion = true } = {}) {
     },
     domContentLoaded,
     filterButtons,
+    library,
     root,
+    transport,
+    viewTitle,
+    viewBody,
   };
 }
 
@@ -635,7 +717,7 @@ test("landing local asset references exist", () => {
 
   for (const source of [html, app]) {
     for (const match of source.matchAll(assetPattern)) {
-      referencedAssets.add(match[0]);
+      if (!match[0].includes("${")) referencedAssets.add(match[0]);
     }
   }
 
@@ -668,7 +750,6 @@ test("landing product story evidence markers resolve to checked-in metadata", ()
     ["scenario", "landing/assets/europe-1936-showcase.json:counts.political_features"],
     ["transport", "landing/assets/japan-preview.json:counts.road_source_features+counts.rail_source_features"],
     ["evidence", "data/CATALOG.json:counts.entries"],
-    ["export", "landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines+counts.major_stations"],
   ]);
 
   for (const assetRoot of ["landing", "dist"]) {
@@ -697,23 +778,36 @@ test("landing product story controls initialize and change stage state", () => {
 
   assert.equal(harness.root.dataset.storyStep, "baseline");
   assert.equal(harness.root.dataset.storyComparison, "hoi4-1936");
-  assert.equal(harness.stageImage.attributes.src, "./assets/hero-hoi4-1936.webp");
-  assert.equal(harness.stageImage.alt, "Generated HOI4 1936 baseline map.");
+  assert.equal(harness.stageImage.attributes.src, "./assets/hero-blank.svg");
+  assert.equal(harness.comparisonControls.hidden, true);
+  assert.equal(harness.stageImage.alt, "Neutral map with editable administrative subdivisions.");
+  assert.equal(harness.stageImage.hidden, false);
+  assert.equal(harness.sourceTree.hidden, true);
+  assert.equal(harness.exportAction.hidden, true);
   assert.equal(harness.evidenceItems[0].dataset.storyEvidenceActive, "true");
 
   harness.stepButtons.find((button) => button.getAttribute("data-story-step-button") === "transport").dispatchEvent("click");
   assert.equal(harness.root.dataset.storyStep, "transport");
-  assert.equal(harness.stageImage.attributes.src, "./assets/japan-preview-transport.webp");
-  assert.equal(harness.title.textContent, "Transport and geography turn the map into a readable place.");
+  assert.equal(harness.stageImage.attributes.src, "./assets/japan-preview-transport.svg");
+  assert.equal(harness.comparisonControls.hidden, true);
+  assert.equal(harness.title.textContent, "Japan, from network to place.");
   assert.equal(harness.evidenceItems[2].dataset.storyEvidenceActive, "true");
+
+  harness.stepButtons.find((button) => button.getAttribute("data-story-step-button") === "evidence").dispatchEvent("click");
+  assert.equal(harness.stageImage.hidden, true);
+  assert.equal(harness.sourceTree.hidden, false);
+  assert.equal(harness.exportAction.hidden, true);
 
   harness.compareButtons.find((button) => button.getAttribute("data-story-compare") === "hoi4-1939").dispatchEvent("click");
   assert.equal(harness.root.dataset.storyStep, "scenario");
   assert.equal(harness.root.dataset.storyComparison, "hoi4-1939");
-  assert.equal(harness.stageImage.attributes.src, "./assets/hero-hoi4-1939.webp");
+  assert.equal(harness.stageImage.attributes.src, "./assets/hero-hoi4-1939.svg");
+  assert.equal(harness.comparisonControls.hidden, false);
   assert.equal(harness.stepButtons[1].attributes["aria-current"], "step");
   assert.equal(harness.compareButtons[1].attributes["aria-pressed"], "true");
   assert.equal(harness.evidenceItems[1].dataset.storyEvidenceActive, "true");
+  assert.equal(harness.stageImage.hidden, false);
+  assert.equal(harness.sourceTree.hidden, true);
 });
 
 test("landing product story keyboard navigation works", () => {
@@ -732,7 +826,9 @@ test("landing product story keyboard navigation works", () => {
   harness.stepButtons[1].dispatchEvent("keydown", createEvent({ key: "End" }));
   assert.equal(harness.root.dataset.storyStep, "export");
   assert.equal(harness.stepButtons[4].focused, true);
-  assert.equal(harness.stageImage.attributes.src, "./assets/work-atlas-japan-corridor.webp");
+  assert.equal(harness.stageImage.attributes.src, "./assets/export-workbench.webp");
+  assert.equal(harness.comparisonControls.hidden, true);
+  assert.equal(harness.exportAction.hidden, false);
 
   const nextComparisonEvent = createEvent({ key: "ArrowRight" });
   harness.compareButtons[0].dispatchEvent("keydown", nextComparisonEvent);
@@ -740,7 +836,8 @@ test("landing product story keyboard navigation works", () => {
   assert.equal(harness.root.dataset.storyStep, "scenario");
   assert.equal(harness.root.dataset.storyComparison, "hoi4-1939");
   assert.equal(harness.compareButtons[1].focused, true);
-  assert.equal(harness.stageImage.attributes.src, "./assets/hero-hoi4-1939.webp");
+  assert.equal(harness.stageImage.attributes.src, "./assets/hero-hoi4-1939.svg");
+  assert.equal(harness.comparisonControls.hidden, false);
 });
 
 test("landing product story reduced-motion path does not require observer animation", () => {
@@ -752,51 +849,79 @@ test("landing product story reduced-motion path does not require observer animat
 
   harness.stepButtons.find((button) => button.getAttribute("data-story-step-button") === "export").dispatchEvent("click");
   assert.equal(harness.root.dataset.storyStep, "export");
-  assert.equal(harness.stageImage.attributes.src, "./assets/work-atlas-japan-corridor.webp");
+  assert.equal(harness.stageImage.attributes.src, "./assets/export-workbench.webp");
+  assert.equal(harness.comparisonControls.hidden, true);
+  assert.equal(harness.exportAction.hidden, false);
   assert.equal(harness.evidenceItems[4].dataset.storyEvidenceActive, "true");
+});
+
+test("landing scroll observer keeps the user's selected story step", () => {
+  const source = readFileSync(new URL("../landing/app.js", import.meta.url), "utf8");
+  const harness = createProductStoryHarness({ withScrollSpy: true });
+  vm.createContext(harness.context);
+  vm.runInContext(source, harness.context);
+  harness.domContentLoaded[0]();
+  harness.stepButtons[2].dispatchEvent("click");
+  assert.equal(harness.root.dataset.storyStep, "transport");
+  assert.equal(harness.observerCallbacks.length, 1);
+  harness.observerCallbacks[0]([{ target: harness.storySection, isIntersecting: true, intersectionRatio: 0.58 }]);
+  assert.equal(harness.root.dataset.storyStep, "transport");
+  assert.equal(harness.stageImage.attributes.src, "./assets/japan-preview-transport.svg");
 });
 
 test("landing sample runs resolve checked-in assets and evidence markers", () => {
   const expectedRuns = new Map([
     [
-      "tno-atlantropa-mediterranean",
+      "hoi4-1936-europe",
       {
-        image: "./assets/work-alt-history-med.webp",
-        metadata: "./assets/work-alt-history-med.json",
-        open: "./app/?sample=tno-1962-atlantropa-briefing&view=guide",
-        project: "./assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
-        scenario: "tno_1962",
-        tags: ["scenario", "evidence"],
+        image: "./assets/hero-hoi4-1936.svg",
+        metadata: "./assets/hero-hoi4-1936.json",
+        open: "./app/?sample=hoi4-1936-europe-briefing&view=guide",
+        project: "./assets/sample-projects/hoi4-1936-europe-briefing.project.json",
+        scenario: "hoi4_1936",
+        tags: ["scenario"],
         evidence: new Map([
-          ["tno-atlantropa-features", "landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features"],
-          ["tno-owner-count", "landing/assets/work-alt-history-med.json:counts.dissolved_country_owners"],
+          ["hoi4-1936-europe-features", "landing/assets/hero-hoi4-1936.json:counts.political_features"],
         ]),
       },
     ],
     [
-      "hoi4-europe-comparison",
+      "hoi4-1939-europe",
       {
-        image: "./assets/work-scenario-switch-europe.webp",
-        metadata: "./assets/work-scenario-switch-europe.json",
-        open: "./app/?sample=hoi4-1936-europe-briefing&view=guide",
-        project: "./assets/sample-projects/hoi4-1936-europe-briefing.project.json",
-        scenario: "hoi4_1936",
-        tags: ["scenario", "evidence"],
+        image: "./assets/hero-hoi4-1939.svg",
+        metadata: "./assets/hero-hoi4-1939.json",
+        open: "./app/?sample=hoi4-1939-europe-switch&view=guide",
+        project: "./assets/sample-projects/hoi4-1939-europe-switch.project.json",
+        scenario: "hoi4_1939",
+        tags: ["scenario"],
         evidence: new Map([
-          ["hoi4-1936-features", "landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features"],
-          ["hoi4-1939-features", "landing/assets/work-scenario-switch-europe.json:counts.hoi4_1939_political_features"],
+          ["hoi4-1939-europe-features", "landing/assets/hero-hoi4-1939.json:counts.political_features"],
+        ]),
+      },
+    ],
+    [
+      "tno-1962-europe",
+      {
+        image: "./assets/hero-tno-1962.svg",
+        metadata: "./assets/hero-tno-1962.json",
+        open: "./app/?sample=tno-1962-atlantropa-briefing&view=guide",
+        project: "./assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
+        scenario: "tno_1962",
+        tags: ["scenario"],
+        evidence: new Map([
+          ["tno-1962-europe-features", "landing/assets/hero-tno-1962.json:counts.political_features"],
         ]),
       },
     ],
     [
       "japan-tokaido-corridor",
       {
-        image: "./assets/work-atlas-japan-corridor.webp",
+        image: "./assets/work-atlas-japan-corridor.svg",
         metadata: "./assets/work-atlas-japan-corridor.json",
         open: "./app/?sample=modern-world-japan-corridor&view=guide",
         project: "./assets/sample-projects/modern-world-japan-corridor.project.json",
         scenario: "modern_world",
-        tags: ["transport", "atlas", "evidence"],
+        tags: ["transport"],
         evidence: new Map([
           ["japan-transport-lines", "landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"],
           ["japan-stations", "landing/assets/work-atlas-japan-corridor.json:counts.major_stations"],
@@ -817,9 +942,14 @@ test("landing sample runs resolve checked-in assets and evidence markers", () =>
     const sampleProjects = new Map(sampleRunsManifest.sample_projects.map((project) => [project.project_url, project]));
     const sampleProjectListLinks = extractSampleProjectListLinks(html);
     const sampleProjectOpenLinks = extractSampleProjectOpenLinks(html);
+    const libraryStart = html.indexOf('data-output-library hidden');
+    const libraryEnd = html.indexOf('data-sample-project-downloads', libraryStart);
+    assert.ok(libraryStart >= 0 && libraryEnd > libraryStart, `${assetRoot} output library missing`);
+    const libraryHtml = html.slice(libraryStart, libraryEnd);
+    assert.ok(!libraryHtml.includes('data-sample-run-card'), `${assetRoot} output library must be separate from map cards`);
     assert.ok(html.includes("Open editable sample"), `${assetRoot} editable sample CTA copy missing`);
     assert.ok(html.includes("Download JSON"), `${assetRoot} short download CTA copy missing`);
-    assert.ok(html.includes("View recipe"), `${assetRoot} recipe CTA copy missing`);
+    assert.ok(html.includes('data-i18n="sampleRecipeManifest">All samples</a>'), `${assetRoot} all-samples CTA copy missing`);
     assert.ok(
       html.includes("Editor links open the sample with the Guide panel"),
       `${assetRoot} sample guide note missing`,
@@ -852,6 +982,9 @@ test("landing sample runs resolve checked-in assets and evidence markers", () =>
       assert.equal(actual.manifestLink, "./assets/sample-runs.json", `${assetRoot}/${runId} manifest link drifted`);
       assert.equal(actual.scenario, expected.scenario, `${assetRoot}/${runId} scenario attribute drifted`);
       assert.deepEqual(actual.tags, expected.tags, `${assetRoot}/${runId} tags drifted`);
+      for (const linkedAsset of [expected.image, expected.project, expected.metadata]) {
+        assert.ok(libraryHtml.includes(`href="${linkedAsset}"`), `${assetRoot}/${runId} output library missing ${linkedAsset}`);
+      }
 
       const imageUrl = new URL(`../${assetRoot}/${expected.image.slice(2)}`, import.meta.url);
       const metadataUrl = new URL(`../${assetRoot}/${expected.metadata.slice(2)}`, import.meta.url);
@@ -892,19 +1025,21 @@ test("landing sample runs gallery filters cards and updates active state", () =>
   harness.domContentLoaded[0]();
 
   assert.equal(harness.root.dataset.sampleFilter, "all");
+  assert.equal(harness.viewTitle.textContent, "Europe, across three starting points.");
   assert.equal(harness.filterButtons[0].attributes["aria-pressed"], "true");
-  assert.equal(harness.cards.every((card) => card.hidden === false), true);
+  assert.deepEqual(harness.cards.map((card) => card.hidden), [false, false, false, true]);
   assert.equal(harness.cards[0].dataset.sampleFeatured, "true");
+  assert.equal(harness.library.hidden, true);
 
   harness.filterButtons.find((button) => button.getAttribute("data-sample-run-filter") === "transport").dispatchEvent("click");
   assert.equal(harness.root.dataset.sampleFilter, "transport");
-  assert.equal(harness.filterButtons[2].attributes["aria-pressed"], "true");
+  assert.equal(harness.filterButtons[1].attributes["aria-pressed"], "true");
   assert.equal(harness.filterButtons[0].attributes["tabindex"], "-1");
-  assert.equal(harness.filterButtons[2].attributes["tabindex"], "0");
-  assert.equal(harness.cards[0].hidden, true);
-  assert.equal(harness.cards[1].hidden, true);
-  assert.equal(harness.cards[2].hidden, false);
-  assert.equal(harness.cards[2].dataset.sampleActive, "true");
+  assert.equal(harness.filterButtons[1].attributes["tabindex"], "0");
+  assert.deepEqual(harness.cards.map((card) => card.hidden), [true, true, true, false]);
+  assert.equal(harness.cards[3].dataset.sampleActive, "true");
+  assert.equal(harness.library.hidden, true);
+  assert.equal(harness.viewTitle.textContent, "From national network to regional detail.");
 });
 
 test("landing sample runs gallery keyboard navigation changes filter focus", () => {
@@ -917,20 +1052,23 @@ test("landing sample runs gallery keyboard navigation changes filter focus", () 
   const nextFilterEvent = createEvent({ key: "ArrowRight" });
   harness.filterButtons[0].dispatchEvent("keydown", nextFilterEvent);
   assert.equal(nextFilterEvent.defaultPrevented, true);
-  assert.equal(harness.root.dataset.sampleFilter, "scenario");
+  assert.equal(harness.root.dataset.sampleFilter, "transport");
   assert.equal(harness.filterButtons[1].focused, true);
-  assert.equal(harness.cards[0].hidden, false);
-  assert.equal(harness.cards[1].hidden, false);
-  assert.equal(harness.cards[2].hidden, true);
+  assert.deepEqual(harness.cards.map((card) => card.hidden), [true, true, true, false]);
 
   harness.filterButtons[1].dispatchEvent("keydown", createEvent({ key: "End" }));
   assert.equal(harness.root.dataset.sampleFilter, "evidence");
-  assert.equal(harness.filterButtons[4].focused, true);
-  assert.equal(harness.cards.every((card) => card.hidden === false), true);
+  assert.equal(harness.filterButtons[2].focused, true);
+  assert.equal(harness.cards.every((card) => card.hidden), true);
+  assert.equal(harness.library.hidden, false);
+  assert.equal(harness.root.dataset.sampleVisibleCount, "0");
+  assert.equal(harness.viewTitle.textContent, "The artwork and its record, together.");
 
-  harness.filterButtons[4].dispatchEvent("keydown", createEvent({ key: "Home" }));
+  harness.filterButtons[2].dispatchEvent("keydown", createEvent({ key: "Home" }));
   assert.equal(harness.root.dataset.sampleFilter, "all");
   assert.equal(harness.filterButtons[0].focused, true);
+  assert.equal(harness.library.hidden, true);
+  assert.deepEqual(harness.cards.map((card) => card.hidden), [false, false, false, true]);
 });
 
 test("landing sample runs gallery reduced-motion path is state-only", () => {
@@ -941,21 +1079,59 @@ test("landing sample runs gallery reduced-motion path is state-only", () => {
   harness.domContentLoaded[0]();
 
   assert.equal(harness.root.dataset.sampleMotion, "reduced");
-  harness.filterButtons.find((button) => button.getAttribute("data-sample-run-filter") === "atlas").dispatchEvent("click");
-  assert.equal(harness.root.dataset.sampleFilter, "atlas");
-  assert.equal(harness.cards[0].hidden, true);
-  assert.equal(harness.cards[1].hidden, true);
-  assert.equal(harness.cards[2].hidden, false);
+  harness.filterButtons.find((button) => button.getAttribute("data-sample-run-filter") === "evidence").dispatchEvent("click");
+  assert.equal(harness.root.dataset.sampleFilter, "evidence");
+  assert.equal(harness.cards.every((card) => card.hidden), true);
+  assert.equal(harness.library.hidden, false);
+  assert.equal(harness.root.dataset.sampleVisibleCount, "0");
+  harness.filterButtons[0].dispatchEvent("click");
+  assert.equal(harness.root.dataset.sampleVisibleCount, "3");
+  assert.equal(harness.library.hidden, true);
+});
+
+test("landing transport pages keep preview, download, and source record in sync", () => {
+  const source = readFileSync(new URL("../landing/app.js", import.meta.url), "utf8");
+  const harness = createSampleRunsGalleryHarness();
+  vm.createContext(harness.context);
+  vm.runInContext(source, harness.context);
+  harness.domContentLoaded[0]();
+
+  const { transport, root } = harness;
+  assert.equal(transport.image.src, "./assets/work-atlas-japan-corridor.svg");
+  assert.equal(transport.download.href, transport.image.src);
+  assert.equal(transport.source.href, "./assets/work-atlas-japan-corridor.json");
+  assert.equal(transport.regionalEvidence.hidden, false);
+  assert.equal(transport.buttons[0].getAttribute("aria-pressed"), "true");
+
+  transport.buttons[1].click();
+  assert.equal(root.dataset.transportView, "national");
+  assert.equal(transport.image.src, "./assets/japan-preview-transport.svg");
+  assert.equal(transport.download.href, transport.image.src);
+  assert.equal(transport.source.href, "./assets/japan-preview.json");
+  assert.equal(transport.scope.textContent, "National overview of the available source roads and railways. The editable project opens the Central Japan starting point.");
+  assert.equal(transport.regionalEvidence.hidden, true);
+  assert.equal(transport.buttons[1].getAttribute("aria-pressed"), "true");
+  assert.equal(transport.buttons[0].getAttribute("aria-pressed"), "false");
+
+  transport.buttons[0].click();
+  assert.equal(root.dataset.transportView, "regional");
+  assert.equal(transport.image.src, "./assets/work-atlas-japan-corridor.svg");
+  assert.equal(transport.source.href, "./assets/work-atlas-japan-corridor.json");
+  assert.equal(transport.regionalEvidence.hidden, false);
 });
 
 test("landing sample runs bilingual keys exist", () => {
   const source = readFileSync(new URL("../landing/app.js", import.meta.url), "utf8");
   for (const key of [
     "sampleFiltersLabel",
-    "sampleFilterScenario",
+    "sampleFilterAll",
     "sampleFilterTransport",
-    "sampleFilterAtlas",
     "sampleFilterEvidence",
+    "transportRegional",
+    "transportNational",
+    "libraryTitle",
+    "libraryRecord",
+    "transportNationalScope",
     "sampleRecipeLabel",
     "sampleEvidenceLabel",
     "sampleProjectActionsLabel",
@@ -974,8 +1150,9 @@ test("landing sample runs bilingual keys exist", () => {
     "workTwoScenario",
     "workThreeScenario",
   ]) {
-    const occurrences = source.match(new RegExp(`\\b${key}:`, "g")) || [];
-    assert.equal(occurrences.length, 2, `missing English/Chinese translation pair for ${key}`);
+    const occurrences = source.match(new RegExp(`(?:\\b|"|')${key}(?:"|')?:`, "g")) || [];
+    const expectedCount = ["sampleFilterAll", "sampleFilterEvidence"].includes(key) ? 4 : 2;
+    assert.equal(occurrences.length, expectedCount, `missing English/Chinese translation pair for ${key}`);
   }
   assert.ok(source.includes('worksEyebrow: "精选地图"'), "missing Simplified Chinese sample-runs copy");
 });

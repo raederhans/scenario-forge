@@ -276,7 +276,7 @@ const translations = {
     dataCardOneTag: "TNO 1962 output",
     dataCardOneTitle: "Atlantropa Mediterranean",
     dataCardOneBody:
-      "724 rendered Atlantropa features and 47 dissolved country owners · Mediterranean extent · scenario output · record schema 1 · sample manifest updated 2026-06-30.",
+      "724 Atlantropa features and 30 scenario owners in the Mediterranean extent. Open the map record for source files and processing details.",
     dataCardTwoTag: "HOI4 comparison output",
     dataCardTwoTitle: "1936 / 1939 Central–Eastern Europe",
     dataCardTwoBody:
@@ -322,7 +322,7 @@ const translations = {
       "The public workbench is a static browser application. HGO validation, larger data refreshes, Cloud Saves, and community workflows belong to the local/developer setup.",
     faqFourQuestion: "What can I export?",
     faqFourAnswer:
-      "The public workbench exports PNG or JPG presentation snapshots at 1x–4x scale and saves editable project JSON.",
+      "Export PNG or JPG at 1×–4×, within the image-size and memory limits. Map geometry is rendered for the output resolution. Save a JSON project to keep editing; the gallery also provides its generated maps as SVG.",
     faqFiveQuestion: "How mature are the transport layers?",
     faqFiveAnswer:
       "Roads and rail are the strongest current public transport paths. Airports and ports provide overview context; mineral resources, energy, industry, and logistics remain preview/workbench families.",
@@ -579,7 +579,7 @@ const translations = {
     dataBody: "三个可见输出都链接到公开输出详情、来源记录，以及代码、数据与衍生资产各自适用的许可边界。",
     dataCardOneTag: "TNO 1962 输出",
     dataCardOneTitle: "Atlantropa 地中海",
-    dataCardOneBody: "724 个已渲染 Atlantropa 要素与 47 个已融合国家归属 · 地中海范围 · 场景输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
+    dataCardOneBody: "地中海范围内的 724 个 Atlantropa 要素与 30 个剧本归属。来源文件与处理细节见地图记录。",
     dataCardTwoTag: "HOI4 对比输出",
     dataCardTwoTitle: "1936 / 1939 中东欧",
     dataCardTwoBody: "每个场景 2,626 个源政治要素 · 共享中东欧范围 · 对比输出 · 记录格式 1 · 样例清单更新于 2026-06-30。",
@@ -614,7 +614,7 @@ const translations = {
     faqThreeQuestion: "可以在本地运行吗？",
     faqThreeAnswer: "公开工作台是静态浏览器应用。HGO 验证、更大数据刷新、Cloud Saves 与社区工作流属于本地/开发设置。",
     faqFourQuestion: "可以导出什么？",
-    faqFourAnswer: "公开工作台支持按 1x–4x 比例导出 PNG 或 JPG 展示快照，并保存可编辑项目 JSON。",
+    faqFourAnswer: "在尺寸与内存限制内，以 1×–4× 导出 PNG 或 JPG；地图几何按输出分辨率绘制。保存 JSON 工程可继续编辑，作品区也提供生成地图的 SVG 文件。",
     faqFiveQuestion: "交通图层成熟度如何？",
     faqFiveAnswer: "道路与铁路是当前最强的公开交通路径。机场和港口提供总览上下文；矿产资源、能源、工业与物流保持预览/工作台状态。",
     faqSixQuestion: "Scenario Forge 使用什么许可？",
@@ -673,17 +673,17 @@ const HERO_SCENARIO_ASSETS = {
     altKey: "heroAltBlank",
   },
   "hoi4-1936": {
-    src: "./assets/hero-hoi4-1936.webp",
+    src: "./assets/hero-hoi4-1936.svg",
     metadata: "./assets/hero-hoi4-1936.json",
     altKey: "heroAltHoi41936",
   },
   "hoi4-1939": {
-    src: "./assets/hero-hoi4-1939.webp",
+    src: "./assets/hero-hoi4-1939.svg",
     metadata: "./assets/hero-hoi4-1939.json",
     altKey: "heroAltHoi41939",
   },
   "tno-1962": {
-    src: "./assets/hero-tno-1962.webp",
+    src: "./assets/hero-tno-1962.svg",
     metadata: "./assets/hero-tno-1962.json",
     altKey: "heroAltTno1962",
   },
@@ -692,21 +692,21 @@ const DEFAULT_PRODUCT_STORY_STEP = "baseline";
 const DEFAULT_PRODUCT_STORY_COMPARISON = "hoi4-1936";
 const PRODUCT_STORY_COMPARISON_ASSETS = {
   "hoi4-1936": {
-    src: "./assets/hero-hoi4-1936.webp",
-    altKey: "storyAltBaseline",
+    src: "./assets/hero-hoi4-1936.svg",
+    altKey: "scenario1936Alt",
   },
   "hoi4-1939": {
-    src: "./assets/hero-hoi4-1939.webp",
+    src: "./assets/hero-hoi4-1939.svg",
     altKey: "heroAltHoi41939",
   },
   "tno-1962": {
-    src: "./assets/hero-tno-1962.webp",
+    src: "./assets/hero-tno-1962.svg",
     altKey: "heroAltTno1962",
   },
 };
 const PRODUCT_STORY_STEPS = {
   baseline: {
-    src: "./assets/hero-hoi4-1936.webp",
+    src: "./assets/hero-blank.svg",
     altKey: "storyAltBaseline",
     badgeKey: "storyStageBadgeBaseline",
     titleKey: "storyStageTitleBaseline",
@@ -720,29 +720,223 @@ const PRODUCT_STORY_STEPS = {
     bodyKey: "storyStageBodyScenario",
   },
   transport: {
-    src: "./assets/japan-preview-transport.webp",
+    src: "./assets/japan-preview-transport.svg",
     altKey: "storyAltTransport",
     badgeKey: "storyStageBadgeTransport",
     titleKey: "storyStageTitleTransport",
     bodyKey: "storyStageBodyTransport",
   },
   evidence: {
-    src: "./assets/europe-1936-showcase.svg",
+    src: "./assets/hero-blank.svg",
     altKey: "storyAltEvidence",
     badgeKey: "storyStageBadgeEvidence",
     titleKey: "storyStageTitleEvidence",
     bodyKey: "storyStageBodyEvidence",
   },
   export: {
-    src: "./assets/work-atlas-japan-corridor.webp",
+    src: "./assets/export-workbench.webp",
     altKey: "storyAltExport",
     badgeKey: "storyStageBadgeExport",
     titleKey: "storyStageTitleExport",
     bodyKey: "storyStageBodyExport",
   },
 };
+
+Object.assign(translations.en, {
+  "transportOverviewAlt": "Japan road and railway overview with city labels and a transport legend.",
+  "transportOverviewLabel": "THE WIDER NETWORK",
+  "transportOverviewTitle": "See how the region connects.",
+  "transportOverviewBody": "The national view puts the regional atlas in context. Roads and railways stay distinct; city labels and a compact legend make the network readable.",
+  "galleryAllTitle": "Three maps. Three different questions.",
+  "galleryAllBody": "An alternate Mediterranean, a changing Europe, and the connections across Japan. Each map comes with an editable starting point.",
+  "galleryScenarioTitle": "Read the world through its scenario.",
+  "galleryScenarioBody": "TNO 1962 ownership and Atlantropa geography; HOI4 borders in 1936 and 1939. Each view uses its own scenario data.",
+  "galleryTransportTitle": "From national network to regional detail.",
+  "galleryTransportBody": "Follow the road and rail network across Japan, then open the Central Japan sample to work with routes, stations, and geographic context.",
+  "galleryAtlasTitle": "Take the artwork. Keep the editable project.",
+  "galleryAtlasBody": "Download these vector maps as SVG, or open a sample to compose your own PNG or JPG in the export workbench.",
+  "galleryEvidenceTitle": "The data behind every map.",
+  "galleryEvidenceBody": "Ownership, geographic extent, and processing are attached to the map they describe. Open a source record to inspect the exact inputs.",
+  "sampleVectorDownload": "Download SVG",
+  "mapSourceRecord": "Map data & processing",
+  "mapScopeTno": "TNO 1962 ownership, scenario country colours, and Atlantropa land and water. This view does not use modern country borders.",
+  "mapScopeHoi4": "The same Central European extent, shown with the HOI4 1936 and 1939 ownership records.",
+  "mapScopeJapan": "Modern World · Central Japan. Road, rail, station, river, and land data are clipped to this regional extent.",
+  "starterBlankBody": "A clean political base for your own world.",
+  "starterJapanBody": "A regional road-and-rail composition with station context.",
+  "starter1936Body": "The pre-war European baseline, ready to edit.",
+  "starter1939Body": "A second date for comparing borders and control.",
+  "starterTnoBody": "Alternate-history ownership and a transformed Mediterranean.",
+  "storyStageTitleTransport": "Japan, from network to place.",
+  "storyStageBodyTransport": "A separate Modern World example: real road and rail paths, clear city anchors, and a restrained geographic base.",
+  "storyStageTitleEvidence": "Follow the map back to its inputs.",
+  "storyStageBodyEvidence": "Inspect the source record, geographic extent, and layer counts attached to each example.",
+  "storyStageTitleExport": "Compose an image. Keep your project.",
+  "storyStageBodyExport": "Use the export workbench for PNG or JPG, and save the project to continue editing."
+});
+Object.assign(translations.zh, {
+  "transportOverviewAlt": "日本道路与铁路全域概览，包含城市标注与交通图例。",
+  "transportOverviewLabel": "更广阔的交通网络",
+  "transportOverviewTitle": "看清区域之间的联系。",
+  "transportOverviewBody": "全国视图为区域图集提供背景。道路与铁路分层呈现，城市标注与图例帮助读懂线路。",
+  "galleryAllTitle": "三张地图，三个观察世界的角度。",
+  "galleryAllBody": "改造后的地中海、两个年份的欧洲，以及日本的交通联系。每张地图都提供可继续编辑的起点。",
+  "galleryScenarioTitle": "按剧本，读懂这个世界。",
+  "galleryScenarioBody": "TNO 1962 的国家归属与亚特兰特罗帕地理；HOI4 1936 与 1939 的疆界对照。每张图都采用对应剧本的数据。",
+  "galleryTransportTitle": "从全国网络，走进区域细节。",
+  "galleryTransportBody": "先观察日本的道路与铁路网络，再打开日本中部示例，编辑线路、车站与地理上下文。",
+  "galleryAtlasTitle": "带走成图，也保留下一次编辑。",
+  "galleryAtlasBody": "直接下载这些 SVG 矢量图，或打开示例，在导出工作台中制作自己的 PNG / JPG。",
+  "galleryEvidenceTitle": "每张地图，都有对应的来源。",
+  "galleryEvidenceBody": "国家归属、地理范围与处理方式随图展示。打开来源记录，可以核对具体输入，而不必在无关数据中查找。",
+  "sampleVectorDownload": "下载 SVG",
+  "mapSourceRecord": "地图数据与处理记录",
+  "mapScopeTno": "采用 TNO 1962 的归属、剧本国家配色及亚特兰特罗帕陆地与水域，不使用现代国家疆界。",
+  "mapScopeHoi4": "在同一中欧范围内，分别呈现 HOI4 1936 与 1939 的国家归属。",
+  "mapScopeJapan": "现代世界 · 日本中部。道路、铁路、车站、河流与陆地数据按此区域裁切。",
+  "starterBlankBody": "从干净的政治底图开始，构建自己的世界。",
+  "starterJapanBody": "带有车站和地理上下文的区域道路、铁路图。",
+  "starter1936Body": "从战前欧洲基线开始修改。",
+  "starter1939Body": "用另一个年份比较疆界与控制区。",
+  "starterTnoBody": "架空历史的国家归属与改造后的地中海。",
+  "storyStageTitleTransport": "日本：从交通网络到具体地点。",
+  "storyStageBodyTransport": "这是独立的现代世界示例：真实道路与铁路、清晰的城市锚点，以及克制的地理底图。",
+  "storyStageTitleEvidence": "从地图追溯到它的输入。",
+  "storyStageBodyEvidence": "查看每张示例对应的来源记录、地理范围和图层数量。",
+  "storyStageTitleExport": "制作成图，保留工程。",
+  "storyStageBodyExport": "在导出工作台中输出 PNG 或 JPG，保存工程以便继续编辑。"
+});
+Object.assign(translations.en, {
+  "sampleFilterAll": "Scenarios",
+  "sampleFilterEvidence": "Files & sources",
+  "galleryAllTitle": "Europe, across three starting points.",
+  "galleryAllBody": "Compare 1936, 1939 and TNO 1962 in a shared frame, then open the scenario you want to edit.",
+  "galleryEvidenceTitle": "The artwork and its record, together.",
+  "galleryEvidenceBody": "Choose a vector map, an editable project, or the source record behind it.",
+  "galleryTransportBody": "Turn the page between Central Japan and the national network. Both views retain the source road and rail geometry.",
+  "scenario1936Title": "Europe · 1936",
+  "scenario1939Title": "Europe · 1939",
+  "scenario1962Title": "An alternate Europe · 1962",
+  "scenario1936Body": "The HOI4 starting map, before the territorial changes.",
+  "scenario1939Body": "A later starting point, with the same geographic frame.",
+  "scenario1962Body": "TNO ownership and Atlantropa’s reshaped Mediterranean.",
+  "scenario1936Scope": "HOI4 1936 ownership. Borders describe the scenario, not a modern political map.",
+  "scenario1939Scope": "HOI4 1939 ownership. The projection and extent match the 1936 view.",
+  "scenario1962Scope": "TNO 1962 ownership with scenario land, shoals and water regions in the Mediterranean.",
+  "scenario1936Alt": "HOI4 1936 Europe political map.",
+  "scenario1939Alt": "HOI4 1939 Europe political map.",
+  "scenario1962Alt": "TNO 1962 Europe with Atlantropa geography.",
+  "scenarioFeatureCount": "Political source features",
+  "transportPagesLabel": "Transport map pages",
+  "transportRegional": "Central Japan",
+  "transportNational": "All Japan",
+  "workThreeBody": "Roads and railways across the region, with stations and geographic context.",
+  "workThreeLabel": "TRANSPORT / TWO SCALES",
+  "transportOverviewTitle": "Japan’s connected regions",
+  "transportOverviewBody": "A national view of the available road and rail data. Switch back to inspect Central Japan in detail.",
+  "libraryEyebrow": "FROM SOURCE TO FILE",
+  "libraryTitle": "Choose the file for your next step.",
+  "libraryBody": "The SVG is the artwork shown here. The project opens in Scenario Forge; the record documents the map’s extent and inputs.",
+  "formatSvg": "Vector artwork · scalable detail",
+  "formatJson": "Editable project · keep working",
+  "formatRaster": "Export workbench · layout and resolution",
+  "libraryMap": "Map",
+  "libraryArtwork": "Artwork",
+  "libraryProject": "Project",
+  "librarySource": "Sources",
+  "libraryRecord": "Record ↗",
+  "libraryNote": "Transport data has its own coverage and scale. Scenario ownership is a separate input from physical geography.",
+  "storyAltBaseline": "Neutral map with editable administrative subdivisions.",
+  "storyStageBadgeBaseline": "BLANK BASELINE",
+  "storyStageTitleBaseline": "Start with the geography.",
+  "storyStageBodyBaseline": "Neutral subdivisions are ready for your own colors, ownership and story.",
+  "storyAltExport": "Scenario Forge export workbench with composition preview and export settings.",
+  "storyStageTitleExport": "Compose the final image.",
+  "storyStageBodyExport": "Preview the composition, choose image format and resolution, then export.",
+  "storyStageBadgeEvidence": "SOURCE LINEAGE",
+  "storyStageBodyEvidence": "Follow each branch to the record for geography, ownership, transport or context.",
+  "lineageRootLabel": "THE MAP",
+  "lineageRoot": "One composition, traceable layers",
+  "lineageGeography": "Geography",
+  "lineageGeographySource": "Coastlines · administrative subdivisions",
+  "lineageOwnership": "Scenario ownership",
+  "lineageOwnershipSource": "Scenario boundaries · country colors · Atlantropa",
+  "lineageTransport": "Transport network",
+  "lineageTransportSource": "Road geometry · rail geometry · stations",
+  "lineageContext": "Geographic context",
+  "lineageContextSource": "Terrain contours · rivers · city anchors",
+  "lineageRecord": "Inspect source record ↗",
+  "lineageNote": "Each record lists the actual files and the geographic extent used in that map.",
+  "openExportEditor": "Open sample in editor ↗"
+});
+Object.assign(translations.zh, {
+  "sampleFilterAll": "场景",
+  "sampleFilterEvidence": "输出与来源",
+  "galleryAllTitle": "三个年代，同一幅欧洲。",
+  "galleryAllBody": "在统一范围中比较 1936、1939 与 TNO 1962，再打开你想编辑的剧本。",
+  "galleryEvidenceTitle": "成图、工程与来源，一一对应。",
+  "galleryEvidenceBody": "按用途下载矢量地图或工程文件，也可以直接查阅对应的数据记录。",
+  "galleryTransportBody": "在日本中部与全国网络之间翻页；两种尺度都保留来源中的道路与铁路几何。",
+  "scenario1936Title": "欧洲 · 1936",
+  "scenario1939Title": "欧洲 · 1939",
+  "scenario1962Title": "架空欧洲 · 1962",
+  "scenario1936Body": "以 HOI4 的 1936 年国家归属为起点。",
+  "scenario1939Body": "同一地理范围，呈现 1939 年的政治版图。",
+  "scenario1962Body": "TNO 国家归属与 Atlantropa 改造后的地中海。",
+  "scenario1936Scope": "采用 HOI4 1936 剧本归属；边界表达剧本设定。",
+  "scenario1939Scope": "采用 HOI4 1939 剧本归属；投影与范围和 1936 年一致。",
+  "scenario1962Scope": "采用 TNO 1962 剧本归属，包含地中海的剧本陆地、浅滩与水域。",
+  "scenario1936Alt": "HOI4 1936 欧洲政治地图。",
+  "scenario1939Alt": "HOI4 1939 欧洲政治地图。",
+  "scenario1962Alt": "包含 Atlantropa 地貌的 TNO 1962 欧洲地图。",
+  "scenarioFeatureCount": "政治地图来源地块",
+  "transportPagesLabel": "交通地图翻页",
+  "transportRegional": "日本中部",
+  "transportNational": "日本全国",
+  "workThreeBody": "区域道路与铁路网络，辅以车站和地理背景。",
+  "workThreeLabel": "交通 / 两种尺度",
+  "transportOverviewTitle": "日本全国交通网络",
+  "transportOverviewBody": "查看现有道路与铁路数据的全国分布，翻回上一页查看日本中部细节。",
+  "libraryEyebrow": "从来源到文件",
+  "libraryTitle": "选对文件，继续创作。",
+  "libraryBody": "SVG 是这里展示的成图；JSON 工程可在编辑器中继续修改；来源记录说明每张地图的范围与输入。",
+  "formatSvg": "矢量成图 · 放大仍清晰",
+  "formatJson": "可编辑工程 · 保留创作状态",
+  "formatRaster": "导出工作台 · 调整构图与分辨率",
+  "libraryMap": "地图",
+  "libraryArtwork": "成图",
+  "libraryProject": "工程",
+  "librarySource": "来源",
+  "libraryRecord": "记录 ↗",
+  "libraryNote": "交通数据有其覆盖范围与尺度；剧本归属与自然地理是不同的数据层。",
+  "storyAltBaseline": "显示行政地块的空白基线地图。",
+  "storyStageBadgeBaseline": "空白基线",
+  "storyStageTitleBaseline": "从地理底图开始。",
+  "storyStageBodyBaseline": "保留清晰的地块划分，让配色、归属与故事由你决定。",
+  "storyAltExport": "Scenario Forge 导出工作台，包含构图预览与导出设置。",
+  "storyStageTitleExport": "在工作台完成最后的构图。",
+  "storyStageBodyExport": "预览构图，选择图片格式与分辨率，再导出成图。",
+  "storyStageBadgeEvidence": "数据来源关系",
+  "storyStageBodyEvidence": "沿分支查看地理、归属、交通与上下文各自的来源记录。",
+  "lineageRootLabel": "地图展开",
+  "lineageRoot": "地图的四条来源",
+  "lineageGeography": "地理基线",
+  "lineageGeographySource": "海岸线 · 行政地块",
+  "lineageOwnership": "剧本归属",
+  "lineageOwnershipSource": "剧本边界 · 国家配色 · Atlantropa",
+  "lineageTransport": "交通网络",
+  "lineageTransportSource": "道路几何 · 铁路几何 · 车站",
+  "lineageContext": "地理上下文",
+  "lineageContextSource": "地形等高线 · 河流 · 城市锚点",
+  "lineageRecord": "查看来源记录 ↗",
+  "lineageNote": "每份记录列出实际输入文件与地图采用的地理范围。",
+  "openExportEditor": "在编辑器中打开示例 ↗"
+});
+Object.assign(translations.en, { transportNationalScope: "National overview of the available source roads and railways. The editable project opens the Central Japan starting point.", heroAltTno1962: "TNO 1962 Europe with scenario ownership and Atlantropa geography." });
+Object.assign(translations.zh, { transportNationalScope: "全国尺度展示现有来源中的道路与铁路。可编辑工程从日本中部起步。", heroAltTno1962: "TNO 1962 欧洲剧本归属与 Atlantropa 地貌。" });
+const GALLERY_VIEWS = {all: ["galleryAllTitle", "galleryAllBody"], transport: ["galleryTransportTitle", "galleryTransportBody"], evidence: ["galleryEvidenceTitle", "galleryEvidenceBody"]};
 const DEFAULT_SAMPLE_RUN_FILTER = "all";
-const SAMPLE_RUN_FILTERS = new Set(["all", "scenario", "transport", "atlas", "evidence"]);
+const SAMPLE_RUN_FILTERS = new Set(["all", "transport", "evidence"]);
 
 function getStoredLanguage() {
   try {
@@ -859,7 +1053,7 @@ function initScrollReveal() {
   const motionQuery = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
   if (motionQuery?.matches) return;
 
-  const revealNodes = Array.from(document.querySelectorAll("[data-reveal]"));
+  const revealNodes = Array.from(document.querySelectorAll(".section-heading[data-reveal], .hero__copy[data-reveal]"));
   if (!revealNodes.length) return;
 
   document.documentElement.dataset.reveal = "enabled";
@@ -1034,7 +1228,8 @@ function resolveSampleRunFilter(root, filter) {
 }
 
 function sampleRunCardMatches(card, filter) {
-  if (filter === DEFAULT_SAMPLE_RUN_FILTER) return true;
+  if (filter === "evidence") return false;
+  if (filter === DEFAULT_SAMPLE_RUN_FILTER) filter = "scenario";
   return String(card.getAttribute("data-sample-tags") || "")
     .split(/\s+/)
     .map((tag) => tag.trim())
@@ -1047,9 +1242,19 @@ function updateSampleRunsGallery(root) {
   const buttons = Array.from(root.querySelectorAll("[data-sample-run-filter]"));
   const cards = Array.from(root.querySelectorAll("[data-sample-run-card]"));
   let featuredAssigned = false;
+  const library = root.querySelector("[data-output-library]");
+  if (library) library.hidden = filter !== "evidence";
 
+  const copy = translations[getActiveLanguage()] || translations.en;
+  const viewCopy = GALLERY_VIEWS[filter];
+  const viewTitle = root.querySelector("[data-gallery-view-title]");
+  const viewBody = root.querySelector("[data-gallery-view-body]");
+  if (viewTitle) viewTitle.textContent = copy[viewCopy[0]];
+  if (viewBody) viewBody.textContent = copy[viewCopy[1]];
+  root.dataset.sampleVisibleCount = String(cards.filter((card) => sampleRunCardMatches(card, filter)).length);
   root.dataset.sampleFilter = filter;
   root.dataset.sampleMotion = isReducedMotionPreferred() ? "reduced" : "standard";
+  updateTransportPage(root);
 
   buttons.forEach((button) => {
     const active = button.getAttribute("data-sample-run-filter") === filter;
@@ -1065,7 +1270,7 @@ function updateSampleRunsGallery(root) {
     if (visible) featuredAssigned = true;
   });
 
-  if (featuredAssigned) {
+  if (featuredAssigned || filter === "evidence") {
     delete root.dataset.sampleRunEmpty;
   } else {
     root.dataset.sampleRunEmpty = "true";
@@ -1107,7 +1312,37 @@ function initSampleRunsGallery() {
     });
   });
 
+  root.querySelectorAll("[data-transport-page]").forEach((button, index, buttons) => {
+    button.addEventListener("click", () => { root.dataset.transportView = button.getAttribute("data-transport-page"); updateTransportPage(root); });
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (index + 1) % buttons.length;
+      buttons[next].focus(); buttons[next].click();
+    });
+  });
   updateSampleRunsGallery(root);
+}
+
+function updateTransportPage(root) {
+  const national = root.dataset.transportView === "national";
+  const asset = national ? "japan-preview-transport" : "work-atlas-japan-corridor";
+  const metadata = national ? "japan-preview" : asset;
+  const copy = translations[getActiveLanguage()] || translations.en;
+  const image = root.querySelector("[data-transport-image]");
+  if (!image) return;
+  image.src = `./assets/${asset}.svg`;
+  image.alt = copy[national ? "transportOverviewAlt" : "workThreeAlt"];
+  root.querySelector("[data-transport-title]").textContent = copy[national ? "transportOverviewTitle" : "workThreeTitle"];
+  root.querySelector("[data-transport-body]").textContent = copy[national ? "transportOverviewBody" : "workThreeBody"];
+  const scope = root.querySelector("[data-transport-scope]");
+  if (scope) scope.textContent = copy[national ? "transportNationalScope" : "mapScopeJapan"];
+  root.querySelector("[data-transport-download]").href = image.getAttribute("src");
+  root.querySelector("[data-transport-source]").href = `./assets/${metadata}.json`;
+  root.querySelector("[data-transport-regional-evidence]").hidden = national;
+  root.querySelectorAll("[data-transport-page]").forEach((button) => {
+    button.setAttribute("aria-pressed", String((button.getAttribute("data-transport-page") === "national") === national));
+  });
 }
 
 function updateProductStoryStage(root, language = getActiveLanguage()) {
@@ -1123,7 +1358,12 @@ function updateProductStoryStage(root, language = getActiveLanguage()) {
   root.dataset.storyComparison = resolveProductStoryComparison(root.dataset.storyComparison || DEFAULT_PRODUCT_STORY_COMPARISON);
   root.dataset.storyStageAsset = asset.src;
 
+  const tree = root.querySelector("[data-story-source-tree]");
+  const exportAction = root.querySelector("[data-story-export-action]");
+  if (tree) tree.hidden = stepId !== "evidence";
+  if (exportAction) exportAction.hidden = stepId !== "export";
   if (image) {
+    image.hidden = stepId === "evidence";
     image.src = asset.src;
     image.alt = copy[asset.altKey] || "";
     image.setAttribute("src", asset.src);
@@ -1143,6 +1383,8 @@ function updateProductStoryStage(root, language = getActiveLanguage()) {
     }
   });
 
+  const comparisonControls = root.querySelector("[data-story-comparison-controls]");
+  if (comparisonControls) comparisonControls.hidden = !PRODUCT_STORY_STEPS[stepId].comparisonDriven;
   root.querySelectorAll("[data-story-compare]").forEach((button) => {
     const active = button.getAttribute("data-story-compare") === root.dataset.storyComparison;
     button.setAttribute("aria-pressed", active ? "true" : "false");
@@ -1208,19 +1450,7 @@ function initProductStory() {
     });
   });
 
-  if (!isReducedMotionPreferred() && "IntersectionObserver" in globalThis) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        const stepId = visibleEntry?.target?.getAttribute?.("data-story-step-button");
-        if (stepId) selectStep(stepId);
-      },
-      { threshold: [0.42, 0.62], rootMargin: "-18% 0px -34% 0px" },
-    );
-    stepButtons.forEach((button) => observer.observe(button));
-  }
+  // Step selection is deliberate: scrolling must not override a user's choice.
 
   updateProductStoryStage(root);
 }

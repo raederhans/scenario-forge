@@ -19,7 +19,7 @@
 - **Choose a world.** Start from Blank Map, Modern World, HOI4 1936, HOI4 1939, or TNO 1962.
 - **Reshape the story.** Edit ownership and control, draw frontlines, and add labels and strategic markings.
 - **Compose the details.** Tune palettes, borders, and legends; add cities, roads, rail, terrain, and rivers.
-- **Keep creating.** Work in English or Chinese, export PNG/JPG at 1×–4×, and save editable JSON projects.
+- **Keep creating.** Work in English or Chinese, export PNG/JPG with resolution-aware map rendering, and save editable JSON projects. Choose 1×–4× within the export size and memory limits.
 
 ## Selected maps
 
@@ -27,15 +27,15 @@ These overview maps are generated from project data. They illustrate scenario ge
 
 ### An altered Mediterranean
 
-![TNO 1962 Mediterranean overview with political borders and Atlantropa geography](landing/assets/work-alt-history-med.webp)
+![TNO 1962 Mediterranean overview with political borders and Atlantropa geography](landing/assets/work-alt-history-med.svg)
 
-TNO 1962: political borders meet the reshaped coastline of Atlantropa.
+TNO 1962 ownership and country colours, with Atlantropa land, shoals, and water.
 
-[Open the TNO sample](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide)
+[Open the TNO sample](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide) · [Vector map](landing/assets/work-alt-history-med.svg)
 
 ### Europe, between two dates
 
-![HOI4 1936 and 1939 political maps compared in the same geographic frame](landing/assets/work-scenario-switch-europe.webp)
+![HOI4 1936 and 1939 political maps compared in the same geographic frame](landing/assets/work-scenario-switch-europe.svg)
 
 Compare two HOI4 baselines across the same region.
 

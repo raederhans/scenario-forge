@@ -252,6 +252,45 @@ test('staged project patch includes unchanged visibility values and leaves live 
   assert.equal(target.showRivers, patch.showRivers);
 });
 
+test('scenario project import retains staged owner colors and applies saved colors on top', async () => {
+  const source = readFileSync(new URL('../js/core/interaction_funnel.js', import.meta.url), 'utf8');
+  const fn = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body
+    .find(node => node.type === 'FunctionDeclaration' && node.id.name === 'stageImportedProjectPatch');
+  const globals = Object.assign({},
+    await import('../js/core/state.js'), await import('../js/core/releasable_manager.js'),
+    await import('../js/core/special_zone_layers.js'), await import('../js/core/state/dev_state.js'),
+    await import('../js/core/state/strategic_overlay_state.js'),
+    { cloneImportedProjectValue: structuredClone, captureProjectImportState });
+  const context = vm.createContext(globals);
+  vm.runInContext(source.slice(fn.start, fn.end), context);
+  const data = { ...payload(), countryBaseColors: {}, sovereignBaseColors: {} };
+  const prepared = {
+    scenarioState: { activeScenarioId: 'tno_1962', mapSemanticMode: 'political' },
+    preparedScenario: { staged: {
+      coarseColorMap: { GER: '#112233', FRA: '#223344' },
+      scenarioColorMap: { GER: '#334455', ITA: '#445566' },
+    } },
+    importedOwnershipState: { sovereigntyByFeatureId: {} },
+    validFeatureIds: null,
+  };
+  const baseline = context.stageImportedProjectPatch(data, prepared);
+  assert.equal(baseline.sovereignBaseColors.GER, '#334455', 'scenario colors override coarse fallback');
+  assert.equal(baseline.sovereignBaseColors.FRA, '#223344');
+  assert.equal(baseline.sovereignBaseColors.ITA, '#445566');
+  assert.equal(baseline.countryBaseColors.GER, '#334455');
+
+  data.sovereignBaseColors = { GER: '#abcdef' };
+  const customized = context.stageImportedProjectPatch(data, prepared);
+  assert.equal(customized.sovereignBaseColors.GER, '#abcdef', 'saved project owner color wins');
+  assert.equal(customized.sovereignBaseColors.FRA, '#223344', 'unsaved owner retains baseline color');
+
+  prepared.scenarioState = { activeScenarioId: '' };
+  prepared.preparedScenario = null;
+  const plain = context.stageImportedProjectPatch(data, prepared);
+  assert.equal(plain.sovereignBaseColors.GER, '#abcdef');
+  assert.equal(Object.hasOwn(plain.sovereignBaseColors, 'FRA'), false, 'plain project does not inherit scenario colors');
+});
+
 test('configured optional scenario resource null is failure; absent configuration and chunk ownership are valid', async () => {
   const source = readFileSync(new URL('../js/core/interaction_funnel.js', import.meta.url), 'utf8');
   const fn = parse(source, { ecmaVersion: 'latest', sourceType: 'module' }).body

@@ -213,7 +213,14 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"(?m)^\s*function\s+getIdleRenderPassDefinitions\s*\(", renderer_content))
         self.assertIsNone(re.search(r"(?m)^\s*function\s+prepareIdleRenderPassDefinition\s*\(", renderer_content))
         self.assertIsNone(re.search(r"(?m)^\s*function\s+ensureIdleRenderPasses\s*\(", renderer_content))
-        self.assertEqual(renderer_content.count("getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()"), 0)
+        # Exact-resolution export reuses the owner's pass catalog in its isolated cache.
+        # Interactive idle scheduling remains in the extracted scheduler.
+        pass_catalog_call = "getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()"
+        self.assertEqual(renderer_content.count(pass_catalog_call), 1)
+        export_content = renderer_content.split("function renderExportPassesToCanvas(", 1)[1].split(
+            "\nfunction composeTransformedFrameToBuffer(", 1
+        )[0]
+        self.assertEqual(export_content.count(pass_catalog_call), 1)
         self.assertEqual(exact_scheduler_content.count("getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()"), 4)
         self.assertEqual(
             renderer_content.count(

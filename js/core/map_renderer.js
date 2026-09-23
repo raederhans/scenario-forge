@@ -9,6 +9,7 @@ import { createBathymetryStylePolicy } from './renderer/bathymetry_style_policy.
 import { createRenderPassSignaturePolicy } from './renderer/render_pass_signature_policy.js';
 import { createProjectedBoundsDiagnosticsOwner } from "./renderer/projected_bounds_diagnostics_owner.js";
 import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
+import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
@@ -121,6 +122,7 @@ import {
 } from "./state/strategic_overlay_state.js";
 import {
   createDefaultProjectedBoundsDiagnostics,
+  createDefaultRenderPassCacheState,
   createDefaultIntensityFieldToolState,
   applyRendererSurfaceBridgeState,
   ensureProjectedBoundsCacheState,
@@ -155,7 +157,7 @@ import {
 } from "./state/actions/renderer_exact_refresh_actions.js";
 import {
   clearSphericalFeatureDiagnosticsCacheState, getSphericalFeatureDiagnosticsCacheEntryState,
-  setSphericalFeatureDiagnosticsCacheEntryState,
+  setSphericalFeatureDiagnosticsCacheEntryState, commitRenderPassCacheState,
 } from "./state/actions/renderer_cache_actions.js";
 import {
   captureRenderPerfContextBreakdownState,
@@ -3211,6 +3213,7 @@ function getPoliticalPassOrchestratorOwner() {
       hasPoliticalLandFeatures: () => !!runtimeState.landData?.features?.length,
       isPoliticalRasterWorkerBitmapEnabled,
       hasPendingPoliticalColorEdit,
+      isExportRendering: () => exportRenderInProgress,
     },
     resolvers: {
       resolvePoliticalPassIdentity,
@@ -3223,7 +3226,7 @@ function getPoliticalPassOrchestratorOwner() {
     },
     effects: {
       recordRenderPerfMetric,
-      resolvePoliticalRecoveryQuality: getPoliticalRecoveryQuality,
+      resolvePoliticalRecoveryQuality: () => exportRenderInProgress ? POLITICAL_RECOVERY_QUALITY_EXACT : getPoliticalRecoveryQuality(),
       recordPoliticalRasterWorkerSnapshot,
       publishPoliticalPassDiagnostics,
       consumePoliticalRasterWorkerBitmapResult,
@@ -3278,7 +3281,7 @@ function getPoliticalBackgroundRenderOwner() {
       screenRectToProjectedRect,
       collectLandSpatialItemsForProjectedRects,
       projectedBoundsIntersectScreenRects,
-      getPoliticalRecoveryQuality,
+      getPoliticalRecoveryQuality: () => exportRenderInProgress ? POLITICAL_RECOVERY_QUALITY_EXACT : getPoliticalRecoveryQuality(),
       hasPendingPoliticalColorEdit,
       getAdmin0BackgroundFillColor,
       getProjectionGeometryGeneration,
@@ -12309,19 +12312,75 @@ function composeRenderPassesToTarget(
   );
 }
 
-function renderExportPassesToCanvas(passNames) {
+let exportRenderInProgress = false;
+
+function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
-  getRenderPipelinePassesOwner().ensureIdleRenderPasses({});
+  const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
+  if (!Number.isFinite(targetDpr) || targetDpr <= 0) {
+    throw new RangeError("Export pixel ratio must be positive and finite.");
+  }
+  // A matching screen DPR may still hold transformed interaction passes. Final
+  // exports at that density need an exact redraw as well.
+  const redrawAtTargetResolution = pixelRatio !== null && targetDpr >= Number(runtimeState.dpr || 1);
+  const logicalWidth = Number(runtimeState.width || 0);
+  const logicalHeight = Number(runtimeState.height || 0);
+  if (redrawAtTargetResolution) {
+    if (!(logicalWidth > 0) || !(logicalHeight > 0)) {
+      throw new RangeError("Export viewport dimensions are unavailable.");
+    }
+    const estimatedBytes = estimateExportRenderBytes({
+      width: logicalWidth,
+      height: logicalHeight,
+      pixelRatio: targetDpr,
+      passNames,
+    });
+    if (estimatedBytes > EXPORT_RENDER_BUDGET_BYTES) {
+      throw new RangeError(
+        `Export render budget exceeded (${Math.ceil(estimatedBytes / 1048576)} MiB estimated for ${passNames.length} passes; limit ${EXPORT_RENDER_BUDGET_BYTES / 1048576} MiB).`,
+      );
+    }
+  }
+  if (!redrawAtTargetResolution) getRenderPipelinePassesOwner().ensureIdleRenderPasses({});
   const exportCanvas = document.createElement("canvas");
-  exportCanvas.width = width;
-  exportCanvas.height = height;
+  exportCanvas.width = redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width;
+  exportCanvas.height = redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height;
   const exportContext = exportCanvas.getContext("2d");
   if (!exportContext) return null;
   exportContext.setTransform(1, 0, 0, 1, 0, 0);
-  exportContext.clearRect(0, 0, width, height);
-  composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
+  exportContext.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+  if (!redrawAtTargetResolution) {
+    composeRenderPassesToTarget(exportContext, passNames, runtimeState.zoomTransform || globalThis.d3.zoomIdentity);
+    return exportCanvas;
+  }
+
+  // An export has its own pixel density and pass canvases. Keep the visible frame's
+  // cache object intact, including its reference transforms and water-layer cache.
+  const visibleCache = runtimeState.renderPassCache;
+  const visibleDpr = runtimeState.dpr;
+  const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
+  const requestedPasses = new Set(passNames);
+  try {
+    exportRenderInProgress = true;
+    runtimeState.dpr = targetDpr;
+    commitRenderPassCacheState(runtimeState, createDefaultRenderPassCacheState());
+    for (const [passName, drawFn] of getRenderPipelinePassesOwner().getIdleRenderPassDefinitions()) {
+      if (!requestedPasses.has(passName)) continue;
+      const result = getRenderPassCacheHostOwner().prepareRenderPassHost({ passName, transform, drawFn });
+      if (result.skipped || result.drawResult?.committed === false) {
+        throw new Error(`Export render pass failed: ${passName}.`);
+      }
+      setPassReferenceTransform(passName, transform);
+    }
+    const result = composeRenderPassesToTarget(exportContext, passNames, transform, { requireAllPasses: true });
+    if (!result.ok) throw new Error(`Export composition failed: ${result.reason}.`);
+  } finally {
+    commitRenderPassCacheState(runtimeState, visibleCache);
+    runtimeState.dpr = visibleDpr;
+    exportRenderInProgress = false;
+  }
   return exportCanvas;
 }
 

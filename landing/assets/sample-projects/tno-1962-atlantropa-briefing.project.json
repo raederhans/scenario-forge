@@ -6,11 +6,11 @@
     "baselineHash": "36915186ad106d80be94476f4809f92b3ad8e3e4b7c9ebedfee4fe1e5c38c5a0",
     "viewMode": "ownership"
   },
-  "mapSemanticMode": "ownership",
+  "mapSemanticMode": "political",
   "paintMode": "visual",
   "interactionGranularity": "subdivision",
   "batchFillScope": "parent",
-  "activePaletteId": "hoi4_vanilla",
+  "activePaletteId": "tno",
   "legendLabels": {
     "#4b5563": "Political owners",
     "#b6a27a": "Atlantropa basin",

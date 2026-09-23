@@ -24,7 +24,7 @@ function classifyExportFailure(error) {
   if (Object.values(EXPORT_FAILURE_KINDS).includes(kind)) return kind;
   const message = String(error?.message || "").toLowerCase();
   if (message.includes("svg overlay export failed") || message.includes("tainted")) return EXPORT_FAILURE_KINDS.SVG_CORS;
-  if (message.includes("memory") || message.includes("allocation") || message.includes("out of memory")) return EXPORT_FAILURE_KINDS.OUT_OF_MEMORY;
+  if (message.startsWith("export render budget exceeded (") || message.includes("memory") || message.includes("allocation") || message.includes("out of memory")) return EXPORT_FAILURE_KINDS.OUT_OF_MEMORY;
   const stage = String(error?.exportStage || "").trim();
   if (stage === "download") return EXPORT_FAILURE_KINDS.DOWNLOAD_FAILED;
   if (stage === "artifact") return EXPORT_FAILURE_KINDS.ARTIFACT_FAILED;
@@ -71,6 +71,13 @@ function createExportFailureToastHandler({
       presentToast(
         translate("Export artifact could not be created. Check export settings, then retry.", "ui"),
         { title: translate("Export failed · Artifact unavailable", "ui"), tone: "warning", duration: 6200 }
+      );
+      return failureKind;
+    }
+    if (/^Export (?:size exceeds 8K cap|pixel budget exceeded) \(\d+x\d+\)\.$/.test(String(error?.message || ""))) {
+      presentToast(
+        `${translate("Preview rendering and final export resolution are independent. Final export is capped at 8K (7680 × 4320).", "ui")} ${error.message}`,
+        { title: translate("Export failed · Invalid parameters", "ui"), tone: "warning", duration: 7000 }
       );
       return failureKind;
     }

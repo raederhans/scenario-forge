@@ -52,6 +52,7 @@ HERO_SCENARIO_OUTPUTS = {
     },
 }
 EUROPE_BBOX = (-12.5, 34.0, 41.5, 72.5)
+HERO_BBOX = (-10.0, 34.0, 39.0, 65.0)
 SHOWCASE_BBOX = (-14.0, 29.0, 44.0, 72.5)
 SHOWCASE_DETAIL_BBOX = EUROPE_BBOX
 SHOWCASE_CANVAS_WIDTH = 980
@@ -73,6 +74,7 @@ HERO_BLANK_COASTLINE_PATH_LIMIT = 1000
 HERO_BASE_UNDERLAY_PATH_LIMIT = 360
 HERO_BASE_UNDERLAY_COASTLINE_LIMIT = 360
 SHOWCASE_CANVAS_PADDING = 36
+HERO_CANVAS_PADDING = 18
 PROJECTION_CENTER_LON = 10.0
 PROJECTION_CENTER_LAT = 52.0
 HERO_PROJECTION_DECIMAL_PLACES = 12
@@ -168,7 +170,7 @@ HERO_SCENARIOS = (
     HeroScenario(
         mode="tno-1962",
         scenario_id="tno_1962",
-        title="TNO 1962 political ownership crop; Atlantropa overlay omitted",
+        title="TNO 1962 Europe and Atlantropa",
         manifest_path=TNO_1962_MANIFEST,
         palette_class="tno-1962",
         capital_defaults_path=REPO_ROOT / "data" / "scenarios" / "tno_1962" / "capital_defaults.partial.json",
@@ -190,14 +192,14 @@ class Canvas:
     offset_y: float
 
     @classmethod
-    def create(cls, width: int, height: int, bbox: tuple[float, float, float, float]) -> "Canvas":
+    def create(cls, width: int, height: int, bbox: tuple[float, float, float, float], padding: int = SHOWCASE_CANVAS_PADDING) -> "Canvas":
         min_x, min_y, max_x, max_y = (
             canonical_projection_value(value) for value in projection_bounds_for_bbox(bbox)
         )
         projected_width = max_x - min_x
         projected_height = max_y - min_y
-        usable_width = width - SHOWCASE_CANVAS_PADDING * 2
-        usable_height = height - SHOWCASE_CANVAS_PADDING * 2
+        usable_width = width - padding * 2
+        usable_height = height - padding * 2
         scale = canonical_projection_value(min(usable_width / projected_width, usable_height / projected_height))
         fitted_width = projected_width * scale
         fitted_height = projected_height * scale
@@ -457,8 +459,8 @@ def bounds_intersect(first: tuple[float, float, float, float], second: tuple[flo
 
 
 def intersects_mediterranean_island_bbox(geometry: BaseGeometry) -> bool:
-    bounds = geometry.bounds
-    return any(bounds_intersect(bounds, island_bbox) for island_bbox in HERO_MEDITERRANEAN_ISLAND_BBOXES)
+    point = geometry.representative_point()
+    return any(box(*island_bbox).covers(point) for island_bbox in HERO_MEDITERRANEAN_ISLAND_BBOXES)
 
 
 def ring_path(points: Iterable[tuple[float, float]], canvas: Canvas) -> str:
@@ -511,6 +513,7 @@ def load_scenario_territories(
     capital_defaults_path: Path | None = None,
     tag_filter: set[str] | None = None,
     clip_bbox: tuple[float, float, float, float] | None = None,
+    simplify_owner_geometry: bool = True,
 ) -> tuple[list[dict], dict[str, int], dict[str, Path], dict]:
     paths = scenario_paths(manifest_path, capital_defaults_path)
     countries = read_json(paths["countries"])["countries"]
@@ -523,6 +526,8 @@ def load_scenario_territories(
 
     for feature in topology_features(paths["runtime_topology"], "political"):
         properties = feature.get("properties") or {}
+        if properties.get("render_as_base_geography") is False:
+            continue
         feature_id = properties.get("id") or feature.get("id")
         tag = owners.get(feature_id)
         country = countries.get(tag)
@@ -544,7 +549,10 @@ def load_scenario_territories(
     for tag, geometries in sorted(by_tag.items()):
         country = countries[tag]
         merged = canonicalize_hero_geometry(unary_union(geometries))
-        merged = canonicalize_hero_geometry(merged.simplify(0.055, preserve_topology=True))
+        # Keep the existing showcase detail budget. Hero maps retain the
+        # runtime's shared edges; owner-by-owner simplification exposes seams.
+        if simplify_owner_geometry:
+            merged = canonicalize_hero_geometry(merged.simplify(0.055, preserve_topology=True))
         path_commands = polygon_path(merged, canvas)
         if not path_commands:
             continue
@@ -1286,9 +1294,12 @@ def day_night_nodes(canvas: Canvas, capitals: list[dict], city_lights: list[dict
 
 
 def blank_land_nodes(paths: list[str], coastline_paths: list[str]) -> str:
+    # A continuous neutral land fill keeps independently simplified province
+    # boundaries from exposing sea-coloured hairline gaps.
+    underlay_nodes = "\n".join(f'      <path class="blank-land-underlay" d="{path}" />' for path in coastline_paths)
     land_nodes = "\n".join(f'      <path class="blank-land" fill-rule="evenodd" d="{path}" />' for path in paths)
     coastline_nodes = "\n".join(f'      <path class="blank-coastline" fill="none" d="{path}" />' for path in coastline_paths)
-    return "\n".join(node for node in (land_nodes, coastline_nodes) if node)
+    return "\n".join(node for node in (underlay_nodes, land_nodes, coastline_nodes) if node)
 
 
 def base_land_nodes(paths: list[str], coastline_paths: list[str]) -> str:
@@ -1408,7 +1419,12 @@ def load_tno_base_underlay_paths(canvas: Canvas) -> tuple[list[str], list[str], 
                 }
             )
 
-    ranked_paths = sorted(selected_paths, key=lambda item: float(item["area"]), reverse=True)
+    # Only restore small Mediterranean islands that the political crop can
+    # miss. Mainland underlay adds modern North Africa to the TNO-only view.
+    ranked_paths = sorted(
+        (item for item in selected_paths if item["island"]),
+        key=lambda item: float(item["area"]), reverse=True,
+    )
     chosen: list[str] = []
     seen_paths: set[str] = set()
     for item in ranked_paths[:HERO_BASE_UNDERLAY_PATH_LIMIT]:
@@ -1427,8 +1443,9 @@ def load_tno_base_underlay_paths(canvas: Canvas) -> tuple[list[str], list[str], 
         seen_paths.add(path)
         island_path_count += 1
 
-    coastline_paths, coastline_counts = load_blank_coastline_paths(canvas)
-    limited_coastline_paths = coastline_paths[:HERO_BASE_UNDERLAY_COASTLINE_LIMIT]
+    limited_coastline_paths: list[str] = []
+    coastline_counts = {"coastline_features_inspected": 0, "coastline_features_candidates": 0,
+                        "coastline_features_clipped": 0, "coastline_paths": 0}
     return chosen, limited_coastline_paths, {
         "land_features_inspected": inspected,
         "land_features_candidates": candidate_count,
@@ -1436,15 +1453,43 @@ def load_tno_base_underlay_paths(canvas: Canvas) -> tuple[list[str], list[str], 
         "land_paths_available": len(selected_paths),
         "land_path_limit": HERO_BASE_UNDERLAY_PATH_LIMIT,
         "land_paths": len(chosen),
-        "land_paths_dropped": max(0, len(selected_paths) - len(chosen)),
+        "land_paths_dropped": max(0, len(ranked_paths) - len(chosen)),
         "mediterranean_island_paths": island_path_count,
         "land_simplify_tolerance": BLANK_LAND_SIMPLIFY,
         **coastline_counts,
         "coastline_path_limit": HERO_BASE_UNDERLAY_COASTLINE_LIMIT,
         "coastline_paths": len(limited_coastline_paths),
-        "coastline_paths_available": len(coastline_paths),
-        "coastline_paths_dropped": max(0, len(coastline_paths) - len(limited_coastline_paths)),
-    }, [EUROPE_BLANK_TOPOLOGY, EUROPE_BLANK_COASTLINE]
+        "coastline_paths_available": 0,
+        "coastline_paths_dropped": 0,
+    }, [EUROPE_BLANK_TOPOLOGY]
+
+
+def load_atlantropa_paths(canvas: Canvas) -> tuple[dict[str, list[str]], dict[str, int], Path]:
+    source = TNO_1962_MANIFEST.parent / "scenario_atlantropa.topo.json"
+    clip = box(*canvas.bbox)
+    groups: dict[str, list[BaseGeometry]] = defaultdict(list)
+    source_count = 0
+    for feature in topology_features(source, "scenario_atlantropa"):
+        props = feature.get("properties") or {}
+        layer = props.get("atl_render_layer")
+        if layer not in {"water", "land", "shoal"}:
+            continue
+        geometry = renderable_geometry(shape(feature["geometry"]))
+        if geometry.is_empty or not geometry.intersects(clip):
+            continue
+        groups[layer].append(geometry.intersection(clip))
+        source_count += 1
+    present_land = canonicalize_hero_geometry(unary_union([
+        shape(feature["geometry"]) for feature in read_json(EUROPE_BLANK_COASTLINE)["features"]
+    ]))
+    paths = {}
+    for layer, parts in groups.items():
+        geometry = canonicalize_hero_geometry(unary_union(parts))
+        if layer == "land":
+            geometry = canonicalize_hero_geometry(geometry.difference(present_land))
+        paths[layer] = polygon_path(geometry, canvas, include_interiors=True)
+    return paths, {"atlantropa_features": source_count,
+                   **{f"atlantropa_{layer}_paths": len(paths.get(layer, [])) for layer in ("water", "land", "shoal")}}, source
 
 
 def hero_output_paths(output_dir: Path, mode: str) -> dict[str, Path]:
@@ -1478,6 +1523,7 @@ def build_hero_svg(
     capitals: list[dict],
     land_paths: list[str],
     coastline_paths: list[str] | None = None,
+    atlantropa_paths: dict[str, list[str]] | None = None,
 ) -> str:
     title = xml_escape(scenario.title)
     if scenario.blank:
@@ -1488,6 +1534,11 @@ def build_hero_svg(
         political_layer = territory_nodes(territories, include_scenario_only_class=False)
         capital_layer = capital_nodes(capitals, canvas)
         base_layer = base_land_nodes(land_paths, coastline_paths or [])
+    atlantropa_layer = "\n".join(
+        f'      <path class="atlantropa-{layer}" data-atlantropa-layer="{layer}" fill-rule="evenodd" d="{path}" />'
+        for layer in ("water", "land", "shoal")
+        for path in (atlantropa_paths or {}).get(layer, [])
+    )
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {canvas.width} {canvas.height}" role="img" aria-label="{title}" data-hero-scenario="{xml_escape(scenario.mode)}" data-scenario-id="{xml_escape(scenario.scenario_id)}">
   <defs>
     <radialGradient id="heroSeaGlow" cx="50%" cy="44%" r="78%">
@@ -1497,9 +1548,10 @@ def build_hero_svg(
     <filter id="heroCapitalGlow"><feGaussianBlur stdDeviation="7" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <style>
       .hero-graticule path {{ fill: none; stroke: rgba(255,255,255,.13); stroke-width: 1; }}
-      .territory {{ stroke: #0b1725; stroke-width: 1.08; vector-effect: non-scaling-stroke; opacity: .9; }}
-      .territory--focus {{ stroke: #f5d675; stroke-width: 1.55; }}
+      .territory {{ stroke: #0b1725; stroke-width: .72; opacity: .9; }}
+      .territory--focus {{ stroke: #0b1725; stroke-width: .72; }}
       .blank-land {{ fill: #aab9ae; stroke: #d8e2db; stroke-width: .25; vector-effect: non-scaling-stroke; opacity: .72; }}
+      .blank-land-underlay {{ fill: #aab9ae; opacity: .72; }}
       .blank-coastline {{ fill: none; stroke: #edf4ee; stroke-width: .5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .72; }}
       .base-land {{ fill: #8ea099; stroke: #cad8d0; stroke-width: .22; vector-effect: non-scaling-stroke; opacity: .38; }}
       .base-coastline {{ stroke: #d8e7df; stroke-width: .5; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: .58; }}
@@ -1510,10 +1562,13 @@ def build_hero_svg(
       svg[data-hero-scenario="blank"] .blank-coastline {{ stroke: #f7fbf7; opacity: .78; }}
       svg[data-hero-scenario="hoi4-1936"] .territory {{ opacity: .9; }}
       svg[data-hero-scenario="hoi4-1939"] .territory {{ opacity: .93; }}
-      svg[data-hero-scenario="tno-1962"] .territory {{ stroke: #050b13; stroke-width: 1.18; opacity: .88; }}
+      svg[data-hero-scenario="tno-1962"] .territory {{ stroke: #050b13; stroke-width: .76; opacity: .88; }}
+      .atlantropa-water {{ fill: #203856; }}
+      .atlantropa-land {{ fill: #c0af87; stroke: #b4a582; stroke-width: .3; }}
+      .atlantropa-shoal {{ fill: #a9b6a0; opacity: .55; }}
     </style>
   </defs>
-  <rect width="{canvas.width}" height="{canvas.height}" rx="28" fill="url(#heroSeaGlow)" />
+  <rect width="{canvas.width}" height="{canvas.height}" rx="28" fill="#203856" />
   <g class="hero-graticule" aria-hidden="true">
       {graticule(canvas)}
   </g>
@@ -1522,6 +1577,9 @@ def build_hero_svg(
   </g>
   <g class="hero-political" data-layer="political">
 {political_layer}
+  </g>
+  <g class="hero-atlantropa" data-layer="atlantropa">
+{atlantropa_layer}
   </g>
   <g class="hero-capitals" data-layer="capitals">
 {capital_layer}
@@ -1557,8 +1615,8 @@ def build_hero_metadata(
         selection_policy.update(
             {
                 "hero_geometry_source": "runtime_topology political ownership crop",
-                "atlantropa_overlay": "omitted_from_political_ownership_crop",
-                "base_underlay": "original Europe land and coastline for small Mediterranean islands",
+                "atlantropa_overlay": "source water, reclaimed land, and shoal geometry",
+                "base_underlay": "Mediterranean island fragments only",
                 "base_underlay_path_limit": HERO_BASE_UNDERLAY_PATH_LIMIT,
                 "base_underlay_coastline_limit": HERO_BASE_UNDERLAY_COASTLINE_LIMIT,
             }
@@ -1584,13 +1642,13 @@ def build_hero_metadata(
         "title": scenario.title,
         "palette_class": scenario.palette_class,
         "viewport": {
-            "bbox": list(EUROPE_BBOX),
+            "bbox": list(HERO_BBOX),
             "projection": "lambert_azimuthal_equal_area",
             "center_lon": PROJECTION_CENTER_LON,
             "center_lat": PROJECTION_CENTER_LAT,
             "canvas_width": canvas.width,
             "canvas_height": canvas.height,
-            "canvas_padding": SHOWCASE_CANVAS_PADDING,
+            "canvas_padding": HERO_CANVAS_PADDING,
             "projected_bounds": [min_x, min_y, max_x, max_y],
             "scale": canvas.scale,
         },
@@ -1613,11 +1671,12 @@ def build_hero_metadata(
 
 
 def build_hero_scenario_maps(output_dir: Path = LANDING_ASSETS) -> None:
-    canvas = Canvas.create(HERO_CANVAS_WIDTH, HERO_CANVAS_HEIGHT, EUROPE_BBOX)
+    canvas = Canvas.create(HERO_CANVAS_WIDTH, HERO_CANVAS_HEIGHT, HERO_BBOX, HERO_CANVAS_PADDING)
     for scenario in HERO_SCENARIOS:
         output_paths = hero_output_paths(output_dir, scenario.mode)
         land_paths: list[str] = []
         coastline_paths: list[str] = []
+        atlantropa_paths: dict[str, list[str]] = {}
         if scenario.blank:
             land_paths, coastline_paths, counts, blank_source_paths = load_blank_land_paths(canvas)
             territories: list[dict] = []
@@ -1628,6 +1687,7 @@ def build_hero_scenario_maps(output_dir: Path = LANDING_ASSETS) -> None:
                 canvas,
                 scenario.manifest_path,
                 capital_defaults_path=scenario.capital_defaults_path,
+                simplify_owner_geometry=False,
             )
             capitals, capital_source_paths = load_scenario_capitals(canvas, countries, paths, limit=HERO_CAPITAL_LIMIT)
             if scenario.hero_capital_tags:
@@ -1645,7 +1705,9 @@ def build_hero_scenario_maps(output_dir: Path = LANDING_ASSETS) -> None:
             if scenario.scenario_id == "tno_1962":
                 land_paths, coastline_paths, raw_underlay_counts, _blank_source_paths = load_tno_base_underlay_paths(canvas)
                 underlay_counts = {f"base_{key}": value for key, value in raw_underlay_counts.items()}
-                underlay_source_paths = [EUROPE_BLANK_TOPOLOGY, EUROPE_BLANK_COASTLINE]
+                atlantropa_paths, atlantropa_counts, atlantropa_source = load_atlantropa_paths(canvas)
+                underlay_counts.update(atlantropa_counts)
+                underlay_source_paths = [EUROPE_BLANK_TOPOLOGY, EUROPE_BLANK_COASTLINE, atlantropa_source]
             counts = {
                 "territories": political_counts["territories"],
                 "political_features": political_counts["source_features"],
@@ -1662,6 +1724,7 @@ def build_hero_scenario_maps(output_dir: Path = LANDING_ASSETS) -> None:
                 capitals,
                 land_paths,
                 coastline_paths,
+                atlantropa_paths,
             ),
         )
         metadata = build_hero_metadata(canvas, scenario, source_files, counts, territories, capitals)

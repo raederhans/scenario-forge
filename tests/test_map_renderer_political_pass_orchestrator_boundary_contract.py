@@ -104,7 +104,10 @@ class MapRendererPoliticalPassOrchestratorBoundaryContractTest(unittest.TestCase
         self.assertIn("collectVisibleLandSpatialItemsWithStats({ overscanPx: politicalOverscanPx })", viewport)
         self.assertIn("effect.commitPoliticalPassDiagnostics({", diagnostics)
         self.assertIn("runtimeState.politicalRecoveryQuality = resolved;", recovery_quality)
-        self.assertIn("resolvePoliticalRecoveryQuality: getPoliticalRecoveryQuality,", renderer)
+        self.assertIn(
+            "resolvePoliticalRecoveryQuality: () => exportRenderInProgress ? POLITICAL_RECOVERY_QUALITY_EXACT : getPoliticalRecoveryQuality(),",
+            renderer,
+        )
 
         composition = extract_top_level_function(renderer, "getPoliticalPartialRepaintOwner")
         callback_tokens = (

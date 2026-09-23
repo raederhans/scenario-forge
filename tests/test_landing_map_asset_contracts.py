@@ -164,6 +164,12 @@ class JapanPreviewGeometryContractTests(unittest.TestCase):
         self.assertNotIn("consumer_zoom", serialized)
         self.assertNotIn("\"scale\":", json.dumps(projection, sort_keys=True).lower())
 
+    def test_line_sampling_keeps_terminal_endpoint(self) -> None:
+        coords = [(130.0 + index * .1, 35.0) for index in range(7)]
+        path = japan.line_to_path(coords, self.canvas, stride=4)
+        last_x, last_y = self.canvas.project(*coords[-1])
+        self.assertTrue(path.endswith(f"L{japan.fmt(last_x)} {japan.fmt(last_y)}"))
+
     def test_selected_geometry_is_fully_masked_by_carrier_frame(self) -> None:
         canvas = self.canvas
         frame = self.frame
@@ -171,11 +177,11 @@ class JapanPreviewGeometryContractTests(unittest.TestCase):
         line_layers = {
             "roads": japan.select_line_layer(
                 japan.JAPAN_ROADS, "roads", canvas, frame, japan.ROAD_LIMIT,
-                "japan-road-preview", japan.road_rank, stride=5,
+                "japan-road-preview", japan.road_rank, stride=1,
             )[0],
             "rails": japan.select_line_layer(
                 japan.JAPAN_RAIL, "railways", canvas, frame, japan.RAIL_LIMIT,
-                "japan-rail-preview", japan.rail_rank, stride=4,
+                "japan-rail-preview", japan.rail_rank, stride=1,
             )[0],
             "highlighted_motorway": japan.select_main_corridor_path(canvas, frame),
             "terrain_major": japan.select_topology_lines(
@@ -219,6 +225,20 @@ class JapanPreviewGeometryContractTests(unittest.TestCase):
 
 
 class EuropePoliticalAndLabelContractTests(unittest.TestCase):
+    def test_hero_scenarios_share_extent_and_tno_uses_reclamation_geometry(self) -> None:
+        metadata = [read_json(ASSETS / f"hero-{mode}.json") for mode in ("hoi4-1936", "hoi4-1939", "tno-1962")]
+        self.assertEqual(metadata[0]["viewport"], metadata[1]["viewport"])
+        self.assertEqual(metadata[0]["viewport"], metadata[2]["viewport"])
+        tno_svg = (ASSETS / "hero-tno-1962.svg").read_text(encoding="utf-8")
+        for layer in ("water", "land", "shoal"):
+            self.assertIn(f'data-atlantropa-layer="{layer}"', tno_svg)
+            self.assertGreater(metadata[2]["feature_counts"][f"atlantropa_{layer}_paths"], 0)
+        self.assertIn("data/scenarios/tno_1962/scenario_atlantropa.topo.json", metadata[2]["source_files"])
+        self.assertIn("data/europe_land_bg.geojson", metadata[2]["source_files"])
+        for mode in ("hoi4-1936", "hoi4-1939"):
+            svg = (ASSETS / f"hero-{mode}.svg").read_text(encoding="utf-8")
+            self.assertNotIn('stroke: #f5d675', svg)
+
     def test_tno_capitals_are_inside_their_owner_geometry(self) -> None:
         metadata = read_json(ASSETS / "hero-tno-1962.json")
         capital_entries = metadata.get("capital_points")
@@ -274,6 +294,43 @@ class EuropePoliticalAndLabelContractTests(unittest.TestCase):
 
 
 class WorkMapProjectionTests(unittest.TestCase):
+    def test_tno_detail_uses_stable_property_id_for_scenario_owner(self) -> None:
+        feature = {"id": 3110, "properties": {"id": "DZA-2143", "cntr_code": "ALC"}}
+        self.assertEqual(work_maps.feature_id(feature), "DZA-2143")
+        owners = read_json(work_maps.TNO_DIR / "owners.by_feature.json")["owners"]
+        self.assertEqual(work_maps.feature_tag(feature, owners), owners["DZA-2143"])
+
+    def test_tno_mediterranean_uses_scenario_owners_and_palette(self) -> None:
+        output = work_maps.WORK_OUTPUTS["alt_history"]
+        owners = read_json(work_maps.TNO_DIR / "owners.by_feature.json")["owners"]
+        countries = read_json(work_maps.TNO_DIR / "countries.json")["countries"]
+        source_tags: set[str] = set()
+        for path in work_maps.tno_political_detail_chunk_paths(output["bbox"]):
+            for feature, _geometry in work_maps.clipped_features(work_maps.geojson_features(path), output["bbox"]):
+                source_tags.add(work_maps.feature_tag(feature, owners))
+        svg = (ASSETS / "work-alt-history-med.svg").read_text(encoding="utf-8")
+        for tag in ("IBR", "ITA", "BRG"):
+            self.assertIn(tag, source_tags)
+            self.assertIn(f'data-owner="{tag}"', svg)
+            self.assertIn(f'fill="{countries[tag]["color_hex"]}"', svg)
+        for modern_tag in ("ES", "PT", "HR"):
+            self.assertNotIn(f'data-owner="{modern_tag}"', svg)
+        self.assertNotIn('data-owner="RU"', svg)
+        metadata = read_json(ASSETS / "work-alt-history-med.json")
+        self.assertEqual(metadata["counts"]["political_source_features"], 1114)
+        for path in work_maps.tno_political_detail_chunk_paths(output["bbox"]):
+            if path.name != "political.detail.country.ger.part.1.json":
+                continue
+            helper = next(feature for feature in work_maps.geojson_features(path)
+                          if (feature.get("properties") or {}).get("id") == "RU_ARCTIC_FB_GER_008")
+            self.assertIs(helper["properties"]["render_as_base_geography"], False)
+            self.assertIs(helper["properties"]["interactive"], False)
+            break
+        else:
+            self.fail("expected TNO shell helper source is missing")
+        self.assertIn('data-atlantropa-layer="water"', svg)
+        self.assertIn(f'fill="{work_maps.PALETTE["sea"]}"', svg)
+
     def test_regional_projection_preserves_local_shape_and_fits_extent(self) -> None:
         import math
 
@@ -305,8 +362,12 @@ class WorkMapProjectionTests(unittest.TestCase):
 
     def test_scenario_comparison_has_no_decorative_route(self) -> None:
         svg = (ASSETS / "work-scenario-switch-europe.svg").read_text(encoding="utf-8")
+        metadata = read_json(ASSETS / "work-scenario-switch-europe.json")
         self.assertNotIn("M72 344", svg)
         self.assertNotIn("C156 286", svg)
+        self.assertIn('class="neutral-land-underlay"', svg)
+        self.assertIn("data/europe_land_bg.geojson", metadata["sources"])
+        self.assertNotIn('stroke="#f8f5e9"', svg)
 
     def test_country_border_ignores_nonpolygon_remnants(self) -> None:
         polygon = Polygon([(0, 0), (4, 0), (4, 4), (0, 4)])
@@ -315,6 +376,17 @@ class WorkMapProjectionTests(unittest.TestCase):
 
 
 class JapanWorkMapSemanticsTests(unittest.TestCase):
+    def test_transport_previews_retain_every_eligible_source_path(self) -> None:
+        national = read_json(ASSETS / "japan-preview.json")["counts"]
+        self.assertEqual(national["road_lines_rendered"], national["road_eligible_paths"])
+        self.assertEqual(national["rail_lines_rendered"], national["rail_eligible_paths"])
+        regional = read_json(ASSETS / "work-atlas-japan-corridor.json")["counts"]
+        bounds = work_maps.WORK_OUTPUTS["japan_corridor"]["bbox"]
+        road_source = work_maps.topology_features(work_maps.JAPAN_TRANSPORT_DIR / "japan_road" / "roads.preview.topo.json", "roads")
+        rail_source = work_maps.topology_features(work_maps.JAPAN_TRANSPORT_DIR / "japan_rail" / "railways.preview.topo.json", "railways")
+        self.assertEqual(regional["road_lines"], len(work_maps.clipped_features(road_source, bounds)))
+        self.assertEqual(regional["rail_lines"], len(work_maps.clipped_features(rail_source, bounds)))
+
     def test_local_atlas_has_no_undisclosed_corridor_path(self) -> None:
         svg = (ASSETS / "work-atlas-japan-corridor.svg").read_text(encoding="utf-8")
         metadata = read_json(ASSETS / "work-atlas-japan-corridor.json")
@@ -326,7 +398,7 @@ class JapanWorkMapSemanticsTests(unittest.TestCase):
         self.assertIn("rail", title_and_note)
         self.assertNotIn("corridor atlas", title_and_note)
         self.assertNotIn("corridor output", title_and_note)
-        self.assertIn("no singled-out corridor geometry", metadata["selection_policy"]["note"].lower())
+        self.assertIn("every intersecting road and rail segment", metadata["selection_policy"]["note"].lower())
         self.assertNotIn("tokaido", title_and_note)
         self.assertNotIn("tokaido", svg.lower())
         self.assertGreater(metadata["counts"]["urban_anchor_points"], 0)
