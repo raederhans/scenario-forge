@@ -1,0 +1,35 @@
+name: Precision foundation dependencies
+on:
+  push:
+    branches: ["codex/precision-foundation-p0-p4-20260923"]
+    paths: [".github/workflows/precision-foundation-dependencies.yml"]
+permissions:
+  contents: read
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: |
+            /package.json
+            /package-lock.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          mkdir -p .runtime/validation-dependencies
+          tar -czf .runtime/validation-dependencies/node-dependencies.tgz node_modules
+          sha256sum package-lock.json .runtime/validation-dependencies/node-dependencies.tgz > .runtime/validation-dependencies/sha256.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: precision-foundation-dependencies
+          path: .runtime/validation-dependencies/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
