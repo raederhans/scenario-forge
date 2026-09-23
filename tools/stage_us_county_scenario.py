@@ -10,6 +10,7 @@ import argparse
 import gzip
 import json
 from pathlib import Path
+import re
 import shutil
 import sys
 import time
@@ -38,6 +39,10 @@ from tools.build_startup_bootstrap_assets import (
 )
 from tools.generate_hierarchy import slugify
 from tools.patch_tno_1962_bundle import stable_json_hash
+
+LEGACY_LINEAGE_PATH = ROOT / "tools/us_county_legacy_lineage.json"
+COUNTY_ID_PATTERN = re.compile(r"US_CNTY_[0-9]{5}\Z")
+ZONE_ID_PATTERN = re.compile(r"US_ZN_[0-9]{2}_[0-9]{3}\Z")
 
 
 def validate_source_report(source_path, source):
@@ -229,18 +234,65 @@ def county_hierarchy_override(source):
             "labels": labels}
 
 
-def project_migration_contract(old_ids, new_ids, invalid_ids, source_hash, target_hash):
-    """Approve stable county identity only; area intersections are not lineage.
+def reviewed_legacy_lineage(payload, baseline_runtime_hash, county_source_hash,
+                            old_ids, new_owners, invalid_ids):
+    """Accept explicit county membership only for the reviewed input bytes."""
+    if payload.get("version") != 1 or payload.get("scenario_id") != "modern_world":
+        raise ValueError("Unsupported US legacy lineage review record")
+    binding = payload.get("binding") or {}
+    entries = payload.get("lineage")
+    if not isinstance(entries, list) or len(entries) != 8:
+        raise ValueError("US legacy lineage review must contain exactly eight zones")
+    seen_sources, seen_targets, crosswalk = set(), set(), {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError("Invalid US legacy lineage entry")
+        source_id, targets = entry.get("source_id"), entry.get("target_ids")
+        if (not isinstance(source_id, str) or not ZONE_ID_PATTERN.fullmatch(source_id)
+                or source_id in seen_sources
+                or not isinstance(targets, list) or not targets):
+            raise ValueError(f"Invalid or duplicate US legacy source: {source_id}")
+        seen_sources.add(source_id)
+        for target_id in targets:
+            if (not isinstance(target_id, str) or not COUNTY_ID_PATTERN.fullmatch(target_id)
+                    or target_id in seen_targets):
+                raise ValueError(f"Invalid, duplicate, or conflicting US legacy target: {target_id}")
+            seen_targets.add(target_id)
+        crosswalk[source_id] = targets
+    if binding.get("baseline_runtime_sha256") != baseline_runtime_hash:
+        return {}, "baseline_runtime_sha256_mismatch"
+    if binding.get("county_source_sha256") != county_source_hash:
+        return {}, "county_source_sha256_mismatch"
+    stable_targets = {fid for fid in old_ids if fid in new_owners and fid not in invalid_ids
+                      and fid.startswith("US_")}
+    for source_id, targets in crosswalk.items():
+        if source_id not in old_ids:
+            raise ValueError(f"Unknown US legacy source: {source_id}")
+        for target_id in targets:
+            if target_id in stable_targets or new_owners.get(target_id) != "US":
+                raise ValueError(f"Conflicting or non-US legacy target: {target_id}")
+    return {source_id: targets for source_id, targets in crosswalk.items()
+            if source_id not in invalid_ids}, "applied"
 
-    Legacy aggregated zones and invalid old polygons remain explicit review
-    cases. The importer must reject edits to these IDs without losing the file.
+
+def project_migration_contract(old_ids, new_ids, invalid_ids, source_hash, target_hash,
+                               legacy_crosswalk=None):
+    """Approve stable identity and separately reviewed, input-bound zone membership.
+
+    Area intersections never authorize assignments. Invalid old polygons remain
+    unresolved even when an audit record names them.
     """
     scoped = {fid for fid in old_ids if fid.startswith("US_")}
     unresolved = (scoped - set(new_ids)) | (scoped & set(invalid_ids))
+    crosswalk = {fid: [fid] for fid in sorted(scoped - unresolved)}
+    for source_id, targets in (legacy_crosswalk or {}).items():
+        if source_id in scoped and source_id not in invalid_ids and source_id in unresolved:
+            crosswalk[source_id] = targets
+            unresolved.remove(source_id)
     return {"version": 1, "scenario_id": "modern_world",
             "source_baseline_hash": source_hash, "target_baseline_hash": target_hash,
             "feature_id_prefixes": ["US_"],
-            "crosswalk": {fid: [fid] for fid in sorted(scoped - unresolved)},
+            "crosswalk": dict(sorted(crosswalk.items())),
             "unresolved_ids": sorted(unresolved)}
 
 
@@ -299,14 +351,20 @@ def _stage_into(baseline_dir: Path, source_path: Path, output_dir: Path, *, buil
     old_baseline_hash = manifest["baseline_hash"]
     manifest["baseline_hash"] = stable_json_hash(owners)
     old_ids = set(read(baseline_dir / "owners.by_feature.json")["owners"])
+    legacy_crosswalk, lineage_status = reviewed_legacy_lineage(
+        read(LEGACY_LINEAGE_PATH), digest(baseline_dir / "runtime_topology.topo.json"),
+        digest(source_path), old_ids, owners, report["invalid_baseline_unresolved"])
     manifest["project_feature_migration"] = project_migration_contract(
         old_ids, owners, report["invalid_baseline_unresolved"],
-        old_baseline_hash, manifest["baseline_hash"])
+        old_baseline_hash, manifest["baseline_hash"], legacy_crosswalk)
     report["project_migration"] = {
-        "stable_identity_count": len(manifest["project_feature_migration"]["crosswalk"]),
+        "stable_identity_count": len(manifest["project_feature_migration"]["crosswalk"]) - len(legacy_crosswalk),
+        "reviewed_legacy_count": len(legacy_crosswalk),
+        "reviewed_legacy_target_count": sum(len(targets) for targets in legacy_crosswalk.values()),
+        "reviewed_legacy_status": lineage_status,
         "unresolved_ids": manifest["project_feature_migration"]["unresolved_ids"],
         "source_baseline_hash": old_baseline_hash, "target_baseline_hash": manifest["baseline_hash"],
-        "policy": "stable_identity_only; ambiguous or invalid edited IDs reject import"}
+        "policy": "stable_identity_plus_input_bound_reviewed_lineage; ambiguous or invalid edited IDs reject import"}
     manifest["source"]["us_county_source_sha256"] = digest(source_path)
     # Include untouched US states too: a partial source must not erase their
     # existing memberships when replacing the country's hierarchy overlay.

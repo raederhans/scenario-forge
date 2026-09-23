@@ -167,6 +167,20 @@ export function createWorkspaceChromeSupportSurfaceController({
     const target = getDockPopoverByKind(kind);
     const trigger = getDockPopoverTrigger(kind);
     if (!target) return;
+    if (kind === "quickfill") {
+      refreshQuickFillControls();
+      const isOwnershipMode = String(state.paintMode || "visual") === "sovereignty";
+      const isSubdivisionMode = String(state.interactionGranularity || "subdivision") !== "country";
+      const activePolicy = getActiveQuickFillPolicy();
+      if (
+        isOwnershipMode
+        || !isSubdivisionMode
+        || (activePolicy && !activePolicy.parentEnabled && !activePolicy.countryEnabled)
+      ) {
+        if (state.activeDockPopover === "quickfill") closeDockPopover();
+        return;
+      }
+    }
     const nextKind = state.activeDockPopover === kind ? "" : kind;
     closeDockPopover();
     if (!nextKind) return;

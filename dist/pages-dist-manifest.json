@@ -45897,7 +45897,7 @@
     },
     {
       "path": "app/js/ui/toolbar/workspace_chrome_support_surface_controller.js",
-      "size_bytes": 19344,
+      "size_bytes": 19918,
       "source_kind": "dist"
     },
     {
@@ -46517,7 +46517,7 @@
       {
         "file_count": 101,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3583604
+        "size_bytes": 3584178
       },
       {
         "file_count": 825,
@@ -64723,7 +64723,7 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3253896,
+        "deferred_graph_bytes": 3254470,
         "deferred_graph_file_count": 131,
         "deferred_module_count": 129,
         "deferred_resource_count": 2,
@@ -66176,7 +66176,7 @@
           },
           {
             "path": "app/js/ui/toolbar/workspace_chrome_support_surface_controller.js",
-            "size_bytes": 19344
+            "size_bytes": 19918
           },
           {
             "path": "app/js/ui/transport_workbench_airport_preview.js",
@@ -66290,7 +66290,7 @@
             "size_bytes": 367931
           }
         ],
-        "size_bytes": 2628146
+        "size_bytes": 2628720
       },
       {
         "basis": "deferred-resource-graph",
@@ -67567,7 +67567,7 @@
     {
       "file_count": 9215,
       "path": "app",
-      "size_bytes": 568546404
+      "size_bytes": 568546978
     },
     {
       "file_count": 59,
@@ -67600,5 +67600,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 597900675
+  "total_bytes": 597901249
 }

@@ -187,6 +187,57 @@ class CountyAdaptationTests(unittest.TestCase):
         self.assertEqual(report["boundary_point_fallbacks"][0]["point_matches"], ["US_CNTY_26001"])
         self.assertEqual(report["boundary_point_fallbacks"][0]["decision"], "retained_residual_no_positive_county_overlap")
 
+    def test_domain_face_boundary_or_outside_point_preserves_full_face(self):
+        from unittest.mock import patch
+        from shapely.geometry import Point
+        old = box(0, 0, 1, 1)
+        before = old.wkb
+        for point in (Point(0, .5), Point(2, .5)):
+            with self.subTest(point=point.wkt), patch(
+                "shapely.geometry.base.BaseGeometry.representative_point", return_value=point
+            ):
+                features, report = partition_feature({"id": "old", "name": "Historical"}, old,
+                    {"US_CNTY_26001": old}, {"owners": {"old": "USA"}, "controllers": {}})
+            self.assertEqual(len(features), 1)
+            self.assertTrue(shape(features[0]["geometry"]).equals(old))
+            self.assertEqual(features[0]["lineage"]["modern_county_id"], "US_CNTY_26001")
+            self.assertEqual(features[0]["lineage"]["assignments"], {"owners": "USA"})
+            self.assertEqual(report["domain_membership_fallbacks"][0]["decision"], "entire_face_inside")
+            self.assertEqual(old.wkb, before)
+
+    def test_outside_face_point_in_original_domain_cannot_add_area(self):
+        from unittest.mock import patch
+        from shapely.geometry import Point
+        from shapely.geometry.base import BaseGeometry
+        original_point = BaseGeometry.representative_point
+        old, outside = box(0, 0, 1, 1), box(2, 0, 3, 1)
+        def misleading_point(face):
+            return Point(.5, .5) if face.equals(outside) else original_point(face)
+        with patch("shapely.geometry.base.BaseGeometry.representative_point", misleading_point):
+            features, report = partition_feature({"id": "old"}, old, {"US_CNTY_26001": outside}, {})
+        self.assertTrue(shape(features[0]["geometry"]).equals(old))
+        self.assertIsNone(features[0]["lineage"]["modern_county_id"])
+        self.assertEqual(report["domain_membership_fallbacks"][0]["decision"], "no_polygonal_domain_overlap")
+
+    def test_ambiguous_full_face_original_domain_membership_rejected(self):
+        from unittest.mock import patch
+        from shapely.geometry import Point
+        with patch("tools.adapt_us_county_scenarios.polygonize", return_value=[box(.5, 0, 1.5, 1)]), patch(
+            "shapely.geometry.base.BaseGeometry.representative_point", return_value=Point(0, .5)
+        ), self.assertRaisesRegex(ValueError, "Ambiguous original-domain face membership"):
+            partition_feature({"id": "old"}, box(0, 0, 1, 1), {}, {})
+
+    def test_unreliable_point_single_county_match_cannot_bypass_full_face_coverage(self):
+        from unittest.mock import patch
+        from shapely.geometry import Point
+        face, county = box(1, 0, 2, 1), box(0, 0, 1.5, 1)
+        # The point lies strictly inside one county but outside the whole face.
+        # Keep county ambiguity fail-closed even if domain membership is proven.
+        with patch("tools.adapt_us_county_scenarios.polygonize", return_value=[face]), patch(
+            "shapely.geometry.base.BaseGeometry.representative_point", return_value=Point(.5, .5)
+        ), self.assertRaisesRegex(ValueError, "Ambiguous county coverage face"):
+            partition_feature({"id": "old"}, face, {"US_CNTY_26001": county}, {})
+
     def test_only_strict_point_extent_parts_are_ignored_and_reported(self):
         topology = _encode_exact_coverage(["US_ZN_36_015"], [box(0, 0, 1, 1)])
         row = topology["objects"]["political"]["geometries"][0]

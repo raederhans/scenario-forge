@@ -19,6 +19,7 @@ const createRefreshCallback = new Function("runtimeState", `return (${refreshCal
 class Button {
   constructor(id = "") {
     this.id = id;
+    this.children = [];
     this.dataset = {};
     this.attributes = new Map();
     this.listeners = new Map();
@@ -35,6 +36,8 @@ class Button {
       },
     };
   }
+  appendChild(child) { this.children.push(child); child.parent = this; return child; }
+  replaceChildren(...children) { this.children = children; for (const child of children) child.parent = this; }
   setAttribute(name, value) { this.attributes.set(name, String(value)); }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
   addEventListener(name, handler) {
@@ -57,6 +60,7 @@ function createHarness(context, initial = {}) {
   const oldDocument = Object.getOwnPropertyDescriptor(globalThis, "document");
   const oldElement = Object.getOwnPropertyDescriptor(globalThis, "Element");
   const doc = new Button("document");
+  doc.createElement = tagName => { const element = new Button(); element.tagName = String(tagName).toUpperCase(); element.ownerDocument = doc; return element; };
   Object.defineProperty(globalThis, "document", { value: doc, configurable: true });
   Object.defineProperty(globalThis, "Element", { value: Button, configurable: true });
   context.after(() => {
@@ -67,6 +71,7 @@ function createHarness(context, initial = {}) {
     "dockQuickFillBtn", "dockQuickFillRow", "quickFillParentBtn", "quickFillCountryBtn", "dockQuickFillHint",
     "dockReferenceBtn", "dockReferencePopover", "dockEditPopoverBtn", "dockEditPopover",
   ].map(id => [id, new Button(id)]));
+  for (const node of Object.values(nodes)) node.ownerDocument = doc;
   nodes.quickFillParentBtn.parent = nodes.dockQuickFillRow;
   nodes.quickFillCountryBtn.parent = nodes.dockQuickFillRow;
   const state = { activeDockPopover: "", batchFillScope: "parent", paintMode: "visual", interactionGranularity: "subdivision", ...initial };
@@ -191,4 +196,63 @@ test("scenario visual mode exposes explicit quick-fill scopes", context => {
   const h = createHarness(context, { activeScenarioId: "tno_1962" });
   assert.equal(h.nodes.dockQuickFillBtn.classList.contains("hidden"), false);
   assert.equal(h.nodes.quickFillCountryBtn.textContent, "Current scenario owner");
+});
+
+test("opening Quick Fill refreshes geographic levels from the current selected hit", context => {
+  const h = createHarness(context);
+  const hierarchyData = { quick_fill: { countries: {
+    US: { levels: { state: { label: "State", groups: {} } } },
+    FR: { levels: { region: { label: "Region", groups: {} } } },
+  } } };
+  h.state.hierarchyData = hierarchyData;
+  h.state.landIndex = new Map([
+    ["county-us", { properties: { cntr_code: "US" } }],
+    ["region-fr", { properties: { cntr_code: "FR" } }],
+  ]);
+  h.state.devSelectedHit = { id: "county-us", targetType: "land" };
+
+  h.nodes.dockQuickFillBtn.click();
+  let select = h.nodes.dockQuickFillRow.children[0];
+  assert.equal(select.children.some(option => option.value === "level:state"), true);
+  assert.equal(select.children.find(option => option.value === "level:state").textContent, "State");
+
+  h.nodes.dockQuickFillBtn.click();
+  h.state.devSelectedHit = { id: "region-fr", targetType: "land" };
+  h.nodes.dockQuickFillBtn.click();
+  select = h.nodes.dockQuickFillRow.children[0];
+  assert.equal(select.children.some(option => option.value === "level:state"), false);
+  assert.equal(select.children.some(option => option.value === "level:region"), true);
+});
+
+test("opening Quick Fill refreshes live policy and refuses a country with no allowed scopes", context => {
+  const h = createHarness(context, {
+    selectedInspectorCountryCode: "US",
+    countryInteractionPoliciesByCode: new Map([[
+      "US", { quickFillScopes: [] },
+    ]]),
+  });
+  h.nodes.dockQuickFillBtn.click();
+  assert.equal(h.state.activeDockPopover, "");
+  assert.equal(h.nodes.dockQuickFillRow.classList.contains("hidden"), true);
+});
+
+test("a newly forbidden Quick Fill closes only its own active popup", context => {
+  const h = createHarness(context, {
+    selectedInspectorCountryCode: "US",
+    countryInteractionPoliciesByCode: new Map([[
+      "US", { quickFillScopes: ["parent", "country"] },
+    ]]),
+  });
+  h.nodes.dockQuickFillBtn.click();
+  assert.equal(h.state.activeDockPopover, "quickfill");
+
+  h.state.countryInteractionPoliciesByCode.set("US", { quickFillScopes: [] });
+  h.nodes.dockQuickFillBtn.click();
+  assert.equal(h.state.activeDockPopover, "");
+  assert.equal(h.nodes.dockQuickFillRow.classList.contains("hidden"), true);
+
+  h.controller.openDockPopover("edit");
+  h.controller.openDockPopover("quickfill");
+  assert.equal(h.state.activeDockPopover, "edit");
+  assert.equal(h.nodes.dockEditPopover.classList.contains("hidden"), false);
 });

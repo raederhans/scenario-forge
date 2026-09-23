@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "scenario_id": "modern_world",
+  "binding": {
+    "baseline_runtime_sha256": "e921316a40986aa2e4df738adf5f8ead156fbdc01714a3b930652c1a214412a0",
+    "county_source_sha256": "2c0321230f88ba6d62d451209fc23e835186eaf65df877c8955299921fc94e73"
+  },
+  "evidence": {
+    "historical_commit": "78224eb2",
+    "zone_builder_blob": "5bb5c8078a244889b73a780e7061fa3bb2a26764",
+    "id_reconciler_blob": "0e0067a86b3f10740d2fde0b5b2b17d26236e61f",
+    "county_source_blob": "58109b071ff59992eefce06081f22efd2b3e3d85",
+    "state_source_blob": "08025667f08d0e6575b01ac35595cb86722b16ab",
+    "population_source_blob": "b88a1abc52a969a5fa8dde7b97108ce00af9d1c8",
+    "previous_detail_topology_sha256": "4ce418eaf4231e357f9ce31bcb449c579642dd9350c38db69264b7132e7d92ff",
+    "replayed_counts": {
+      "generated_us": 914,
+      "previous_us": 900,
+      "reused_old_ids": 8,
+      "split_child_ids": 0,
+      "renamed_recomposed_ids": 383
+    },
+    "membership_method": "78224eb2 _build_us_zones rest_df.loc[members, GEOID]; then 78224eb2 _reconcile_us_feature_ids against archived previous topology"
+  },
+  "lineage": [
+    {
+      "source_id": "US_ZN_02_005",
+      "generated_id": "US_ZN_02_001",
+      "target_ids": [
+        "US_CNTY_02016"
+      ]
+    },
+    {
+      "source_id": "US_ZN_29_012",
+      "generated_id": "US_ZN_29_012",
+      "target_ids": [
+        "US_CNTY_29510"
+      ]
+    },
+    {
+      "source_id": "US_ZN_36_015",
+      "generated_id": "US_ZN_36_013",
+      "target_ids": [
+        "US_CNTY_36085"
+      ]
+    },
+    {
+      "source_id": "US_ZN_51_013",
+      "generated_id": "US_ZN_51_025",
+      "target_ids": [
+        "US_CNTY_51001",
+        "US_CNTY_51131"
+      ]
+    },
+    {
+      "source_id": "US_ZN_51_014",
+      "generated_id": "US_ZN_51_018",
+      "target_ids": [
+        "US_CNTY_51600"
+      ]
+    },
+    {
+      "source_id": "US_ZN_51_015",
+      "generated_id": "US_ZN_51_021",
+      "target_ids": [
+        "US_CNTY_51013",
+        "US_CNTY_51510",
+        "US_CNTY_51610"
+      ]
+    },
+    {
+      "source_id": "US_ZN_53_011",
+      "generated_id": "US_ZN_53_004",
+      "target_ids": [
+        "US_CNTY_53055"
+      ]
+    },
+    {
+      "source_id": "US_ZN_53_012",
+      "generated_id": "US_ZN_53_007",
+      "target_ids": [
+        "US_CNTY_53029"
+      ]
+    }
+  ]
+}
