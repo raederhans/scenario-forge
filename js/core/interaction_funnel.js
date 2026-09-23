@@ -255,7 +255,15 @@ function stageImportedProjectPatch(data, preparedImport) {
     expandedInspectorReleaseParents: new Set(original.expandedInspectorReleaseParents || []),
   };
   const { importedOwnershipState } = preparedImport;
-  draft.sovereignBaseColors = data.sovereignBaseColors || data.countryBaseColors || {};
+  const stagedScenario = preparedImport.preparedScenario?.staged;
+  const scenarioBaseColors = stagedScenario ? {
+    ...(stagedScenario.coarseColorMap || {}),
+    ...(stagedScenario.scenarioColorMap || {}),
+  } : {};
+  draft.sovereignBaseColors = {
+    ...scenarioBaseColors,
+    ...(data.sovereignBaseColors || data.countryBaseColors || {}),
+  };
   draft.countryBaseColors = { ...draft.sovereignBaseColors };
   draft.visualOverrides = data.visualOverrides || data.featureOverrides || {};
   draft.featureOverrides = { ...draft.visualOverrides };

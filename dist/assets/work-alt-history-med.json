@@ -55,18 +55,19 @@
     "data/scenarios/tno_1962/chunks/political.detail.country.usa.part.1.json",
     "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
     "data/scenarios/tno_1962/owners.by_feature.json",
-    "data/scenarios/tno_1962/countries.json"
+    "data/scenarios/tno_1962/countries.json",
+    "data/europe_land_bg.geojson"
   ],
   "counts": {
-    "political_source_features": 1115,
-    "dissolved_country_owners": 47,
+    "political_source_features": 1114,
+    "dissolved_country_owners": 30,
     "political_detail_chunks": 39,
     "source_atlantropa_features": 724,
     "rendered_atlantropa_features": 724,
-    "rendered_atlantropa_layers": 2
+    "rendered_atlantropa_layers": 3
   },
   "selection_policy": {
-    "note": "Full Mediterranean bbox rendered from TNO detail political chunks dissolved by owner, with Atlantropa land and shoal layers dissolved to avoid internal block boundaries.",
+    "note": "Full Mediterranean bbox rendered from TNO detail political chunks dissolved by scenario owner, with Atlantropa water, land, and shoal layers dissolved; reclaimed land is clipped against present-day land geometry.",
     "ranking": "intersect bbox, clip, sort by area or length, keep top visible features"
   }
 }

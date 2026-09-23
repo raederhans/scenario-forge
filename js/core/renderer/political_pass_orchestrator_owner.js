@@ -31,6 +31,9 @@ export function createPoliticalPassOrchestratorOwner({
     getters.hasPendingPoliticalColorEdit,
     "getters.hasPendingPoliticalColorEdit",
   );
+  const isExportRendering = typeof getters.isExportRendering === "function"
+    ? getters.isExportRendering
+    : () => false;
   const resolvePoliticalPassIdentity = requireFunction(
     resolvers.resolvePoliticalPassIdentity,
     "resolvers.resolvePoliticalPassIdentity",
@@ -119,7 +122,9 @@ export function createPoliticalPassOrchestratorOwner({
       publishPoliticalPassDiagnostics({ identity, viewport });
     }
 
-    const consumedBitmapResult = consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);
+    const consumedBitmapResult = isExportRendering()
+      ? null
+      : consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);
     if (
       consumedBitmapResult
       && drawPoliticalWorkerBitmapResult(consumedBitmapResult, identity.workerIdentity)
@@ -161,10 +166,10 @@ export function createPoliticalPassOrchestratorOwner({
       });
     }
 
-    const packetState = isPoliticalRasterWorkerBitmapEnabled()
+    const packetState = !isExportRendering() && isPoliticalRasterWorkerBitmapEnabled()
       ? buildPoliticalRasterWorkerPacketEffect({ identity, viewport })
       : { packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" };
-    requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
+    if (!isExportRendering()) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
     recordPoliticalRasterWorkerSnapshot();
 
     const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit();
@@ -211,11 +216,13 @@ export function createPoliticalPassOrchestratorOwner({
       renderedCount: Number(featureMetrics.renderedCount || 0),
       visibleItemCount: viewport.visibleItemCount,
     });
-    clearPendingPoliticalColorEdit({
-      renderedCount: Number(featureMetrics.renderedCount || 0),
-      renderedIds: featureMetrics.renderedIds,
-      paintSource: "political-pass",
-    });
+    if (!isExportRendering()) {
+      clearPendingPoliticalColorEdit({
+        renderedCount: Number(featureMetrics.renderedCount || 0),
+        renderedIds: featureMetrics.renderedIds,
+        paintSource: "political-pass",
+      });
+    }
     return createPoliticalPassDrawResult(identity.sceneIdentity, {
       politicalDataStage: "fine",
       fullPoliticalReady: true,

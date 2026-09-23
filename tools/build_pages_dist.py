@@ -462,6 +462,7 @@ LANDING_PRODUCT_ASSET_PATHS = (
     "assets/atlas-physical.webp",
     "assets/europe-1936-showcase.json",
     "assets/europe-1936-showcase.svg",
+    "assets/export-workbench.webp",
     "assets/favicon.png",
     "assets/favicon.svg",
     "assets/logo-mark.png",
