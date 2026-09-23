@@ -8,7 +8,7 @@ unchanged. No merge, production deployment, or performance acceptance is implied
 | Area | Fresh evidence | Remaining gate |
 | --- | --- | --- |
 | United States, Modern World | Rebuilt 3,144 counties against current checkout bytes; strict scenario and 20 whole-shard mixed-LOD checks pass | Device/performance acceptance and old-project unresolved IDs |
-| United States, historical scenarios | Complete blank, HGO and TNO bundles pass strict contracts; HOI4 builds are being validated with the existing runtime short-ring decoder | Per-scenario runtime/performance acceptance and retained unresolved IDs |
+| United States, historical scenarios | Complete blank, HGO, TNO, HOI4 1936 and HOI4 1939 bundles all pass strict contracts | Per-scenario runtime/performance acceptance and retained unresolved IDs |
 | Albania / North Macedonia | 20 targets included in the combined TNO candidate; frozen owner-domain gate passes with zero surface delta | Detailed visual acceptance |
 | CH/HU/RO/BG/SE/NO/FI/SI/HR/RS | Cached source preflight available; first 241-target batch rejected for 1.4231851947029341 deg² surface drift | 22 inherited overlap pairs across the original batch require explicit handling; do not assign nearest-source ownership |
 | Czechia / Slovakia | 77 / 79 source IDs match governed cache provenance | Joint source seams and constrained baseline staging |
@@ -63,7 +63,7 @@ checkout only by line endings; source/sidecar plans were freshly rebound, never
 patched to bypass digest checks.
 
 - Modern candidate: `modern/modern_world`; gates `modern-current.strict.json`, `modern-lod.json`.
-- Historical candidates: `historical/<scenario_id>`; HGO and blank strict reports pass.
+- Historical candidates: `historical/{blank_base,hgo_1936,tno_1962}` and `historical-v3/{hoi4_1936,hoi4_1939}`; all five strict reports pass. The earlier `historical/hoi4_1936` is rejected and superseded.
 - Combined candidate: `combined/tno_1962`; `combined.strict.json`, `combined-validation.json`, `combined-browser.txt`.
 - Rejected Europe stage: `europe/tno_1962`, `europe-validation.json`; never publish it.
 - Safe geometry: `europe-al-mk-geometry-validation.json`.
@@ -75,6 +75,14 @@ sidecar-plan, source and new `.runtime` output directories. It refuses stale
 bindings, ambiguous city/capital hosts, unsupported references, changed
 historical assignments, and stale compressed representations. Blank and HGO
 keep their existing vector profiles; their `performance_accepted` remains false.
+
+HOI4's existing degenerate rings are decoded with the established runtime/chunk
+decoder for adjacency only. Inherited invalid and zero-area surfaces are retained
+and reported; new invalid children fail. Political detail bounds now omit
+zero-extent boxes, matching the canonical metadata contract, while preserving
+every payload feature. This resolved 51 strict errors in the first rebuilt 1936
+candidate. Both fresh v3 builds pass without changing the validator or coarse
+bounds semantics. Each retains three unresolved historical IDs unchanged.
 
 ## CI and delegated work
 
@@ -89,7 +97,8 @@ tasks; parent reviewed and reran the 11 and 68 tests. The Air inventory attempt
 produced an invalid artifact, was cancelled, and was completed by the parent.
 Native delegates covered cached source preparation, historical bundle assembly,
 review and exact policy-source receipt fixes. Full builds and browser operations
-had one parent owner.
+had one parent owner. A proposed running-session handoff was unavailable across
+agents; the parent retained execution and verified both HOI4 exits.
 
 Local evidence includes 33 migration/regional/major-country tests, 13 source/pilot
 tests, 65 blank-and-Pages tests, planner and routing tests, and exact policy suites.
@@ -97,3 +106,13 @@ Pages distribution rebuilt successfully at 550.37 MiB. The former landing parity
 failure was freshly rerun and passed; no landing asset change was needed.
 Nightly 35785752495 also had historical-builder and guide-layout failures: those
 are separate baseline findings, not proven fixed by migration candidate checks.
+
+Final targeted follow-ups: 20 assembler/source tests, two detail-bounds tests and
+38 Python performance-contract tests pass. The performance-contract assertion
+still fixes the governed scenarios to exactly TNO/HOI4, now matching the frozen
+export used by the already-tested Node behavior contract. CI on `1afb3af1` had
+six strict lanes and smoke passing, but exposed that stale text assertion and
+rejected performance measurement three times due hosted-runner background CPU.
+No usable performance regression result came from that run. Latest commit CI
+and final run receipts are maintained on draft PR #146; unchanged thresholds
+and environment admission remain mandatory.

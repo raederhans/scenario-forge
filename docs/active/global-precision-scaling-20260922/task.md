@@ -4,8 +4,8 @@
 
 2026-09-23 continuation supersedes the completion implications of older candidate reports:
 see [fresh evidence and remaining gates](continuation-20260923.md). Modern US rebuilt
-against this checkout and passes strict/LOD checks. HGO, blank and TNO now have full
-historical bundles with strict passes. Combined TNO includes 279 CN/JP/AL/MK
+against this checkout and passes strict/LOD checks. HGO, blank, TNO and both HOI4
+scenarios now have full historical bundles with strict passes. Combined TNO includes 279 CN/JP/AL/MK
 targets and passes strict plus 38 mixed-LOD checks. The first 12-country Europe
 candidate was rejected for surface drift. Fresh JP
 preparation admits 5 targets, not the old 47; 42 remain unchanged under the newer
