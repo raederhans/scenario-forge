@@ -85,6 +85,29 @@ the existing 48-feature partial-repaint limit. Neither that limit nor cache
 budgets should be raised simply to make this sample pass. Current evidence does
 not support performance release approval or a regression/speedup claim.
 
+A subsequent diagnostic used temporary HTTP overlays of the worker kernel and
+client, adding only cumulative timing calls. Tracked renderer files, budgets,
+draw order and cancellation behavior were unchanged. The same viewport, county
+selection, two warmups and five measured cycles again pass state/pixel checks.
+`interactions.profile.json` records the instrumented run; the original receipt
+is retained separately. Median worker phases are:
+
+| Action | Worker total (ms) | Path build (ms) | Draw API calls (ms) | Yield wait (ms) | Bitmap export (ms) |
+| --- | --- | --- | --- | --- | --- |
+| Fill | 482.0 | 50.2 | 201.9 | 0.2 | 219.3 |
+| Undo | 478.2 | 48.5 | 203.1 | 0.2 | 218.5 |
+| Redo | 483.8 | 49.6 | 203.5 | 0.2 | 220.3 |
+
+All twenty measured actions have distinct worker sequences within their fresh
+frame windows and no browser errors. Canvas may defer actual raster work until
+bitmap export. These measurements identify the combined drawing/submission
+path as dominant, rather than proving a serialization bottleneck. Additional
+clock calls and a separate run preclude interpreting the lower total as an
+optimization. Enlarging the path cache cannot remove the roughly 420 ms
+drawing/submission cost. The next optimization needs a measured design for
+reducing full-surface work while preserving painter order, overlap and
+asynchronous identity checks.
+
 ## Historical geometry
 
 Very thin polygonized faces may have a representative point outside the face.
@@ -199,6 +222,14 @@ The Pages distribution was rebuilt at 570.20 MiB to synchronize the controller.
 Canonical `data/` remains unchanged; local candidates are not deployed assets.
 CI for committed canonical data must not be presented as validation of these
 untracked candidate bytes.
+
+The first PR #149 fast CI run correctly stopped because the new lineage JSON
+had no adaptive test route. It is now an explicit source of the existing US
+county scenario regression route; the unmatched-file gate remains unchanged.
+Eleven routing tests pass, including a JSON-only edit regression and catalog
+authority reconciliation. Actual `verify:edit` execution for just that JSON
+passes the 613-route schema check and eighteen migration tests, selecting one
+command with no deferred main-thread work.
 
 The five measured interaction samples above still show roughly 300 ms political
 frames. They establish functional fill/undo/redo behavior and expose remaining
