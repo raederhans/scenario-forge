@@ -1,3 +1,4 @@
+import { normalizeStrategicValuesStyle } from "../strategic_values_view_model.js";
 // UI state defaults.
 // 这里收口 overlay dirty 标记、可见性开关、workbench UI 和样式配置，
 // 避免 state.js 与 UI reset 路径再维护第二份默认 shape。
@@ -208,6 +209,7 @@ export function createDefaultStyleConfig() {
     cityPoints: {
       ...createDefaultCityLayerStyleConfig(),
     },
+    strategicValues: normalizeStrategicValuesStyle(),
     urban: createDefaultUrbanStyleConfig(),
     physical: {
       ...createDefaultPhysicalStyleConfig(),
@@ -514,6 +516,7 @@ export function restoreImportedStyleConfigState(
           ...imported.cityPoints,
         })
       : currentStyleConfig.cityPoints,
+    strategicValues: normalizeStrategicValuesStyle(imported.strategicValues),
     urban: imported.urban && typeof imported.urban === "object"
       ? normalizeUrbanStyle({
           ...(currentStyleConfig.urban || defaults.urban),

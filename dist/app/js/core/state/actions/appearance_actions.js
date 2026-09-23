@@ -2,7 +2,7 @@
 
 export const APPEARANCE_STYLE_GROUP_KEYS = Object.freeze([
   "ocean", "lakes", "internalBorders", "empireBorders", "coastlines",
-  "parentBorders", "physical", "urban", "cityPoints", "rivers",
+  "parentBorders", "physical", "urban", "cityPoints", "strategicValues", "rivers",
   "texture", "dayNight", "transportOverview",
 ]);
 

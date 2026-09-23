@@ -852,20 +852,27 @@
                           </span>
                         </div>
                         <div class="city-points-panel-stack">
-                          <section class="appearance-control-card city-points-strategic-card" aria-labelledby="lblStrategicValuesGroup">
-                            <h4 id="lblStrategicValuesGroup" class="appearance-control-card-title" data-i18n="Strategic Values">Strategic Values</h4>
-                            <div class="appearance-control-card-stack">
-                              <label class="toggle-label">
-                                <input id="toggleStrategicResourceMarkers" type="checkbox" class="checkbox-input" />
-                                <span id="lblStrategicResourceMarkers" data-i18n="Show Resource Markers">Show Resource Markers</span>
-                              </label>
-                              <div>
-                                <label id="lblStrategicChoroplethMetric" class="range-label" for="strategicChoroplethMetric" data-i18n="Strategic Heat Metric">Strategic Heat Metric</label>
-                                <select id="strategicChoroplethMetric" class="select-input mt-2">
-                                  <option value="" data-i18n="None">None</option>
-                                </select>
-                              </div>
+                          <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
+                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="City hierarchy">City hierarchy</h4>
+                            <div class="city-symbol-legend" aria-label="City hierarchy" data-i18n-aria-label="City hierarchy">
+                              <span><i class="city-key-capital" aria-hidden="true">☆</i><span data-i18n="Capital">Capital</span></span>
+                              <span><i class="city-key metropolis" aria-hidden="true"></i><span data-i18n="Metropolis">Metropolis</span></span>
+                              <span><i class="city-key large" aria-hidden="true"></i><span data-i18n="Large city">Large city</span></span>
+                              <span><i class="city-key medium" aria-hidden="true"></i><span data-i18n="Medium city">Medium city</span></span>
+                              <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
+                              <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
                             </div>
+                            <div class="appearance-control-card-stack">
+                              <label class="range-label" for="cityPointsDensityPreset" data-i18n="Map detail">Map detail</label>
+                              <select id="cityPointsDensityPreset" class="select-input">
+                                <option value="compact" data-i18n="Compact">Compact</option><option value="balanced" selected data-i18n="Standard">Standard</option><option value="detailed" data-i18n="Detailed">Detailed</option>
+                              </select>
+                              <label class="range-label" for="cityPointsMinRank" data-i18n="Smallest settlements shown">Smallest settlements shown</label>
+                              <select id="cityPointsMinRank" class="select-input">
+                                <option value="metropolis" data-i18n="Metropolis">Metropolis</option><option value="large" data-i18n="Large city">Large city</option><option value="medium" data-i18n="Medium city">Medium city</option><option value="small" data-i18n="Small city">Small city</option><option value="town" selected data-i18n="Town">Town</option>
+                              </select>
+                            </div>
+                            <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
                           </section>
 
                           <section class="appearance-control-card city-points-style-card" aria-labelledby="lblCityPointsStyleGroup">
@@ -887,13 +894,7 @@
                                 </div>
                                 <input id="cityPointsMarkerScale" type="range" min="0.75" max="2.50" step="0.05" value="1.00" class="range-input" />
                               </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblCityPointsMarkerDensity" class="range-label" for="cityPointsMarkerDensity" data-i18n="Point Density">Point Density</label>
-                                  <span id="cityPointsMarkerDensityValue" class="range-value">0.95x</span>
-                                </div>
-                                <input id="cityPointsMarkerDensity" type="range" min="0.50" max="2.00" step="0.05" value="0.95" class="range-input" />
-                              </div>
+
                               <div>
                                 <div class="range-row">
                                   <label id="lblCityPointsOpacity" class="range-label" for="cityPointsOpacity">Point Opacity</label>
@@ -907,16 +908,7 @@
                           <section class="appearance-control-card city-points-label-card" aria-labelledby="lblCityPointsLabelGroup">
                             <h4 id="lblCityPointsLabelGroup" class="appearance-control-card-title" data-i18n="Labels">Labels</h4>
                             <div class="appearance-control-card-stack">
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity">Label Density</label>
-                                </div>
-                                <select id="cityPointsLabelDensity" class="select-input mt-2">
-                                  <option id="optCityLabelDensitySparse" value="sparse">Sparse</option>
-                                  <option id="optCityLabelDensityBalanced" value="balanced" selected>Balanced</option>
-                                  <option id="optCityLabelDensityDense" value="dense">Dense</option>
-                                </select>
-                              </div>
+
                               <div class="city-points-toggle-stack">
                                 <label class="toggle-label">
                                   <input id="cityPointLabelsEnabled" type="checkbox" class="checkbox-input" checked />
@@ -933,6 +925,23 @@
                           <details class="appearance-mini-section appearance-mini-section-subtle city-points-advanced">
                             <summary id="lblCityPointsAdvanced" class="section-header">Advanced</summary>
                             <div class="space-y-3 mt-3">
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsMarkerDensity" class="range-label" for="cityPointsMarkerDensity" data-i18n="Point Density">Point Density</label>
+                                  <span id="cityPointsMarkerDensityValue" class="range-value">0.95x</span>
+                                </div>
+                                <input id="cityPointsMarkerDensity" type="range" min="0.50" max="2.00" step="0.05" value="0.95" class="range-input" />
+                              </div>
+                              <div>
+                                <div class="range-row">
+                                  <label id="lblCityPointsLabelDensity" class="range-label" for="cityPointsLabelDensity">Label Density</label>
+                                </div>
+                                <select id="cityPointsLabelDensity" class="select-input mt-2">
+                                  <option id="optCityLabelDensitySparse" value="sparse">Sparse</option>
+                                  <option id="optCityLabelDensityBalanced" value="balanced" selected>Balanced</option>
+                                  <option id="optCityLabelDensityDense" value="dense">Dense</option>
+                                </select>
+                              </div>
                               <div class="flex items-center justify-between gap-3">
                                 <label id="lblCityPointsColor" class="range-label" for="cityPointsColor">Point Color</label>
                                 <input id="cityPointsColor" type="color" value="#20262e" class="color-input" />
@@ -2065,6 +2074,44 @@
                 hidden
               >
                 <h2 id="lblThematicLayersPanel" class="section-header" data-i18n="Thematic Layers">Thematic Layers</h2>
+                <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
+                  <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
+                  <p id="strategicValuesStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <p id="strategicValuesSource" class="city-points-advanced-hint"></p>
+                  <div class="appearance-control-card-stack">
+                    <label for="strategicChoroplethMetric" class="range-label" data-i18n="Region shading">Region shading</label>
+                    <select id="strategicChoroplethMetric" class="select-input"><option value="" data-i18n="None">None</option></select>
+                    <div id="strategicValuesLegend" class="strategic-values-legend" hidden>
+                      <div id="strategicValuesLegendRamp" class="strategic-values-ramp" aria-hidden="true"></div>
+                      <div class="strategic-values-scale"><span id="strategicValuesLegendMin"></span><span id="strategicValuesLegendMax"></span></div>
+                      <p id="strategicValuesLegendNote" class="city-points-advanced-hint"></p>
+                    </div>
+                    <label class="toggle-label"><input id="toggleStrategicResourceMarkers" type="checkbox" class="checkbox-input"/><span data-i18n="Show Resource Markers">Show Resource Markers</span></label>
+                    <label for="strategicResourceFilter" class="range-label" data-i18n="Resource type">Resource type</label>
+                    <select id="strategicResourceFilter" class="select-input"></select>
+                    <details class="appearance-mini-section appearance-mini-section-subtle">
+                      <summary class="section-header" data-i18n="Appearance">Appearance</summary>
+                      <div class="appearance-control-card-stack mt-3">
+                        <label for="strategicValuesPalette" class="range-label" data-i18n="Color scale">Color scale</label>
+                        <select id="strategicValuesPalette" class="select-input"></select>
+                        <div class="range-row"><label for="strategicValuesOpacity" class="range-label" data-i18n="Shading opacity">Shading opacity</label><span id="strategicValuesOpacityValue" class="range-value"></span></div>
+                        <input id="strategicValuesOpacity" type="range" min="0" max="100" value="75" class="range-input"/>
+                      </div>
+                    </details>
+                    <details class="appearance-mini-section appearance-mini-section-subtle">
+                      <summary class="section-header" data-i18n="Inspect region values">Inspect region values</summary>
+                      <div class="appearance-control-card-stack mt-3">
+                        <label for="strategicValuesSearch" class="range-label" data-i18n="Find source region">Find source region</label>
+                        <input id="strategicValuesSearch" type="search" class="select-input" placeholder="ID / tag" aria-label="Find source region" data-i18n-aria-label="Find source region"/>
+                        <label for="strategicValuesInspect" class="range-label" data-i18n="Source region">Source region</label>
+                        <select id="strategicValuesInspect" class="select-input" data-app-select-skip="true"></select>
+                        <output id="strategicValuesInspectValue" class="strategic-values-inspection" aria-live="polite"></output>
+                        <p id="strategicValuesCoverage" class="city-points-advanced-hint"></p>
+                      </div>
+                    </details>
+                  </div>
+                </section>
+                <details class="appearance-mini-section appearance-mini-section-subtle"><summary class="section-header" data-i18n="Experimental layer catalog">Experimental layer catalog</summary>
                 <p
                   id="thematicLayerCatalogStatus"
                   class="layer-status-strip is-muted"
@@ -2075,6 +2122,7 @@
                   Preview metadata pending
                 </p>
                 <div id="thematicLayerPreviewList" class="thematic-layer-preview-list" role="list"></div>
+                </details>
               </section>
             </div>
           </details>

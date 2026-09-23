@@ -1,3 +1,4 @@
+import { createStrategicValuesOwner } from "./strategic_values_owner.js";
 import {
   URBAN_ADAPTIVE_TINT_DEFAULT_COLOR,
   URBAN_MANUAL_DEFAULT_COLOR,
@@ -346,6 +347,18 @@ export function createAppearanceControlsController({
     normalizeOceanFillColor,
     ensureActiveScenarioOptionalLayerLoaded,
   });
+  const strategicValuesOwner = createStrategicValuesOwner({
+    runtimeState, t,
+    renderDirty: (reason) => {
+      // The political pass reads resolved colors, not the metric selector itself.
+      // Refresh that cache before repainting a changed strategic lens.
+      if (reason !== "strategic-resource-filter" && reason !== "toggle-strategic-resource-markers") {
+        runtimeState.refreshColorStateFn?.({ renderNow: false });
+      }
+      scheduleLayerRenderDirty(reason);
+    },
+    ensureActiveScenarioOptionalLayerLoaded,
+  });
   const physicalOwner = createAppearancePhysicalOwner({
     runtimeState,
     t,
@@ -562,6 +575,7 @@ export function createAppearanceControlsController({
     // 先让子 owner 刷到各自的稳定视图，再回填这个 shell 仍然直接拥有的原始 toggle/value。
     // 这样 transport/city/physical 的派生状态不会被后面的简单 DOM 赋值覆盖回旧值。
     cityPointsOwner.renderCityPointsUi();
+    strategicValuesOwner.render();
     renderBorderUi();
     if (toggleUrban) toggleUrban.checked = !!runtimeState.showUrban;
     physicalOwner.renderPhysicalUi();
@@ -666,6 +680,7 @@ export function createAppearanceControlsController({
     transportAppearanceController.bindEvents();
     textureOwner.bindEvents();
     cityPointsOwner.bindEvents();
+    strategicValuesOwner.bindEvents();
     physicalOwner.bindEvents();
     urbanIntensityFieldEditor.bindEvents();
     riversOwner.bindEvents();

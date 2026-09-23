@@ -35,6 +35,7 @@ export function createVisibleFrameIdentityPolicy(runtimeState, {
       runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
       `strategic-rev:${Number(runtimeState.scenarioStrategicValuesRevision || 0)}`,
       `strategic-metric:${String(runtimeState.strategicChoroplethMetric || "")}`,
+      `strategic-style:${JSON.stringify(runtimeState.styleConfig?.strategicValues || {})}`,
       runtimeState.showTransport ? "transport:on" : "transport:off",
       runtimeState.showRoad ? "road:on" : "road:off",
       runtimeState.showAirports ? "airports:on" : "airports:off",
