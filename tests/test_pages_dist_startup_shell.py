@@ -67,8 +67,8 @@ def assert_landing_workspace_hero(test_case: unittest.TestCase, html: str) -> No
     attributes = dict(re.findall(r'([\w-]+)="([^"]*)"', images[0]))
     for name, expected in {
         "src": "./assets/product-workspace.webp",
-        "width": "1280",
-        "height": "720",
+        "width": "1600",
+        "height": "900",
         "loading": "eager",
         "fetchpriority": "high",
         "data-i18n-alt": "productPreviewAlt",
@@ -83,6 +83,21 @@ def assert_landing_workspace_hero(test_case: unittest.TestCase, html: str) -> No
     test_case.assertIn('class="skip-link" href="#main"', html)
     for key in ("advancedSummary", "sourcesSummary"):
         test_case.assertRegex(html, rf'<details class="technical-details"><summary data-i18n="{key}">')
+
+
+def assert_landing_vector_maps(test_case: unittest.TestCase, html: str) -> None:
+    for asset_name in (
+        "hero-hoi4-1936.svg",
+        "hero-hoi4-1939.svg",
+        "hero-tno-1962.svg",
+        "work-atlas-japan-corridor.svg",
+        "japan-preview-transport.svg",
+        "japan-preview-cities.svg",
+        "japan-preview-terrain.svg",
+        "japan-preview-night.svg",
+    ):
+        with test_case.subTest(asset_name=asset_name):
+            test_case.assertRegex(html, rf'<img\b[^>]*src="\./assets/{re.escape(asset_name)}"[^>]*>')
 
 
 def import_landing_builder(module_name: str):
@@ -204,7 +219,13 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 if asset_name == "hero-blank.svg":
                     size_limit = 1_350_000
                 elif asset_name.startswith("japan-preview-"):
-                    size_limit = 340_000
+                    # Preserve every eligible transport path and its vertices.
+                    size_limit = 4_500_000
+                elif asset_name == "hero-tno-1962.svg":
+                    # Unsimplified owner geometry keeps political seams closed.
+                    size_limit = 1_500_000
+                elif asset_name == "hero-hoi4-1939.svg":
+                    size_limit = 360_000
                 elif asset_name.startswith("hero-") and asset_name != "hero-cartography.svg":
                     size_limit = 320_000
                 else:
@@ -258,10 +279,15 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     self.assertIn('data-source="world-cities-japan-focus"', text)
                     self.assertIn('data-source="global-contours-major"', text)
                     self.assertIn('data-source="nasa-black-marble-2016"', text)
-                    self.assertIn('class="main-corridor"', text)
+                    self.assertTrue(any(
+                        "main-corridor" in element.get("class", "").split()
+                        for element in ET.fromstring(text).iter()
+                    ), f"{asset_name} should retain the highlighted corridor")
                     self.assertIn('class="focus-city"', text)
-                    self.assertIn("corridorGlow", text)
-                    self.assertIn("cityGlow", text)
+                    self.assertNotIn("corridorGlow", text)
+                    self.assertNotIn("cityGlow", text)
+                    self.assertIn('data-layer="legend"', text)
+                    self.assertIn('data-layer="labels"', text)
                     self.assertIn("<title>Tokyo</title>", text)
                     self.assertIn("<title>Osaka</title>", text)
                     self.assertIn("<title>Nagoya · Aichi</title>", text)
@@ -290,7 +316,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertTrue(image_uri.startswith("data:image/png;base64,"))
         embedded_image = base64.b64decode(image_uri.split(",", 1)[1], validate=True)
         self.assertEqual(embedded_image[:8], b"\x89PNG\r\n\x1a\n")
-        self.assertEqual(struct.unpack(">II", embedded_image[16:24]), (1280, 720))
+        self.assertEqual(struct.unpack(">II", embedded_image[16:24]), (3200, 1800))
 
         png_bytes = png_path.read_bytes()
         self.assertEqual(png_bytes[:8], b"\x89PNG\r\n\x1a\n")
@@ -346,8 +372,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertGreater(payload["projection"]["fit_scale"], 0)
         self.assertEqual(payload["projection"]["scale_semantics"], "projection fit from carrier coordinates to SVG pixels")
         self.assertEqual(payload["ui_zoom"]["ownership"], "landing/app.js consumer")
-        self.assertEqual(payload["selection_policy"]["road_limit"], 260)
-        self.assertEqual(payload["selection_policy"]["rail_limit"], 160)
+        self.assertEqual(payload["selection_policy"]["road_limit"], 4000)
+        self.assertEqual(payload["selection_policy"]["rail_limit"], 300)
         self.assertEqual(payload["selection_policy"]["main_corridor_limit"], 1)
         self.assertEqual(payload["selection_policy"]["main_corridor_role"], "highlighted motorway")
         self.assertEqual(payload["selection_policy"]["highlighted_motorway_ref"], "C4")
@@ -359,10 +385,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(payload["selection_policy"]["focus_city_names"], ["Tokyo", "Osaka", "Nagoya"])
         self.assertEqual(payload["counts"]["road_source_features"], 4794)
         self.assertEqual(payload["counts"]["rail_source_features"], 1105)
-        self.assertGreater(payload["counts"]["road_eligible_paths"], payload["counts"]["road_lines_rendered"])
-        self.assertGreater(payload["counts"]["rail_eligible_paths"], payload["counts"]["rail_lines_rendered"])
-        self.assertEqual(payload["counts"]["road_lines_rendered"], 260)
-        self.assertEqual(payload["counts"]["rail_lines_rendered"], 160)
+        for network in ("road", "rail"):
+            self.assertEqual(payload["counts"][f"{network}_eligible_paths"], payload["counts"][f"{network}_lines_rendered"])
+            self.assertGreaterEqual(payload["selection_policy"][f"{network}_limit"], payload["counts"][f"{network}_eligible_paths"])
+        self.assertEqual(payload["counts"]["road_lines_rendered"], 3673)
+        self.assertEqual(payload["counts"]["rail_lines_rendered"], 226)
         self.assertEqual(payload["counts"]["main_corridor_paths_rendered"], 1)
         self.assertEqual(payload["counts"]["main_corridor_titles"], ["首都圏中央連絡自動車道 / C4"])
         self.assertGreater(payload["counts"]["city_source_features"], payload["counts"]["city_points_rendered"])
@@ -535,7 +562,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 self.assertEqual(payload["asset_type"], "landing_hero_scenario_map")
                 self.assertEqual(payload["mode"], mode)
                 self.assertEqual(payload["scenario_id"], scenario_id)
-                self.assertEqual(payload["viewport"]["bbox"], [-12.5, 34.0, 41.5, 72.5])
+                self.assertEqual(payload["viewport"]["bbox"], [-10.0, 34.0, 39.0, 65.0])
+                self.assertEqual(payload["viewport"]["canvas_padding"], 18)
                 self.assertEqual(payload["viewport"]["canvas_width"], 980)
                 self.assertEqual(payload["viewport"]["canvas_height"], 680)
                 self.assertGreater(len(payload["source_files"]), 1)
@@ -567,12 +595,14 @@ class PagesDistStartupShellTest(unittest.TestCase):
                         ),
                     )
                     self.assertEqual(payload["feature_counts"]["coastline_path_limit"], 1000)
-                    self.assertEqual(payload["feature_counts"]["coastline_paths"], 1000)
-                    self.assertGreater(
-                        payload["feature_counts"]["coastline_paths_available"],
+                    self.assertEqual(
                         payload["feature_counts"]["coastline_paths"],
+                        min(payload["feature_counts"]["coastline_paths_available"], 1000),
                     )
-                    self.assertGreater(payload["feature_counts"]["coastline_paths_dropped"], 0)
+                    self.assertEqual(
+                        payload["feature_counts"]["coastline_paths_dropped"],
+                        max(0, payload["feature_counts"]["coastline_paths_available"] - 1000),
+                    )
                     self.assertEqual(
                         payload["feature_counts"]["land_paths_dropped"],
                         max(
@@ -602,7 +632,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     self.assertNotIn('class="country-label"', svg_text)
                 if mode == "tno-1962":
                     self.assertIn("data/scenarios/tno_1962/capital_defaults.partial.json", payload["source_files"])
-                    self.assertNotIn("data/scenarios/tno_1962/scenario_atlantropa.topo.json", payload["source_files"])
+                    self.assertIn("data/scenarios/tno_1962/scenario_atlantropa.topo.json", payload["source_files"])
                     self.assertNotIn("data/scenarios/tno_1962/scenario_atlantropa_metadata.json", payload["source_files"])
                     self.assertIn("data/europe_topology.runtime_political_v1.json", payload["source_files"])
                     self.assertIn("data/europe_land_bg.geojson", payload["source_files"])
@@ -612,11 +642,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     )
                     self.assertEqual(
                         payload["selection_policy"]["atlantropa_overlay"],
-                        "omitted_from_political_ownership_crop",
+                        "source water, reclaimed land, and shoal geometry",
                     )
                     self.assertEqual(
                         payload["selection_policy"]["base_underlay"],
-                        "original Europe land and coastline for small Mediterranean islands",
+                        "Mediterranean island fragments only",
                     )
                     self.assertEqual(
                         payload["selection_policy"]["hero_capital_tags"],
@@ -631,8 +661,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                         {"BRG": [6.18496, 48.68439]},
                     )
                     self.assertNotIn("SOV", payload["capital_tags"])
-                    self.assertIn("WRS", payload["capital_tags"])
-                    for city_name in ("Madrid", "Kyiv", "Severodvinsk", "Nanzig"):
+                    self.assertNotIn("WRS", payload["capital_tags"])
+                    for city_name in ("Madrid", "Kyiv", "Nanzig"):
                         self.assertIn(f">{city_name}</text>", svg_text)
                     for replaced_name in ("Moskau", "Warshau", "Zagreb", "Bucharest", "Sofia", "Brussels"):
                         self.assertNotIn(f">{replaced_name}</text>", svg_text)
@@ -641,12 +671,13 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     self.assertGreater(payload["feature_counts"]["base_land_paths"], 0)
                     self.assertLessEqual(payload["feature_counts"]["base_land_paths"], 420)
                     self.assertGreater(payload["feature_counts"]["base_mediterranean_island_paths"], 0)
-                    self.assertGreater(payload["feature_counts"]["base_coastline_paths"], 0)
+                    self.assertEqual(payload["feature_counts"]["base_coastline_paths"], 0)
                     self.assertLessEqual(payload["feature_counts"]["base_coastline_paths"], 360)
                     self.assertIn('class="base-land"', svg_text)
-                    self.assertIn('class="base-coastline"', svg_text)
-                    self.assertNotIn("atlantropa_paths", payload["feature_counts"])
-                    self.assertNotIn("atlantropa", svg_text)
+                    self.assertNotIn('class="base-coastline"', svg_text)
+                    for layer in ("water", "land", "shoal"):
+                        self.assertGreater(payload["feature_counts"][f"atlantropa_{layer}_paths"], 0)
+                        self.assertIn(f'data-atlantropa-layer="{layer}"', svg_text)
 
     def test_landing_hero_scenario_assets_match_builder_output(self) -> None:
         build_landing_europe_1936_showcase = import_landing_builder("build_landing_europe_1936_showcase")
@@ -682,7 +713,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     with self.subTest(mode=mode):
                         generated_text = generated_path.read_text(encoding="utf-8")
                         ET.fromstring(generated_text)
-                        self.assertIn('class="main-corridor"', generated_text)
+                        self.assertTrue(any(
+                            "main-corridor" in element.get("class", "").split()
+                            for element in ET.fromstring(generated_text).iter()
+                        ), f"{mode} should retain the highlighted corridor")
                         self.assertIn('class="focus-city"', generated_text)
                         self.assertIn('data-source="japan-main-corridor"', generated_text)
                         self.assertIn('data-source="world-cities-japan-focus"', generated_text)
@@ -1719,7 +1753,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'class="brandmark__logo"',
             './assets/favicon.svg',
             '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
-            './assets/hero-hoi4-1936.webp',
+            './assets/hero-hoi4-1936.svg',
             'data-stat-value="21338"',
             '<meta name="robots" content="index,follow" />',
             '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
@@ -1763,31 +1797,40 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n-aria-label="primaryNavLabel"',
             'data-i18n-aria-label="languageSwitcherLabel"',
             'data-i18n-alt="productPreviewAlt"',
-            'data-i18n-alt="workOneAlt"',
-            'data-i18n-alt="workTwoAlt"',
+            'data-i18n-alt="scenario1936Alt"',
+            'data-i18n-alt="scenario1939Alt"',
+            'data-i18n-alt="scenario1962Alt"',
             'data-i18n-alt="workThreeAlt"',
             'id="sample-runs"',
             'data-sample-runs-root',
             'data-sample-runs-manifest="./assets/sample-runs.json"',
-            'data-sample-run-filter="scenario"',
+            'data-sample-run-filter="all"',
             'data-sample-run-filter="transport"',
-            'data-sample-run-filter="atlas"',
             'data-sample-run-filter="evidence"',
             'data-sample-run-card',
-            'data-sample-run-id="tno-atlantropa-mediterranean"',
-            'data-sample-run-id="hoi4-europe-comparison"',
+            'data-sample-run-id="hoi4-1936-europe"',
+            'data-sample-run-id="hoi4-1939-europe"',
+            'data-sample-run-id="tno-1962-europe"',
             'data-sample-run-id="japan-tokaido-corridor"',
             'data-sample-scenario="tno_1962"',
             'data-sample-scenario="hoi4_1936"',
+            'data-sample-scenario="hoi4_1939"',
             'data-sample-scenario="modern_world"',
             'data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json"',
             'data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json"',
             'data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json"',
-            'data-sample-metadata="./assets/work-alt-history-med.json"',
-            'data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features"',
-            'data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features"',
+            'data-sample-metadata="./assets/hero-tno-1962.json"',
+            'data-sample-evidence-source="landing/assets/hero-tno-1962.json:counts.political_features"',
+            'data-sample-evidence-source="landing/assets/hero-hoi4-1936.json:counts.political_features"',
+            'data-sample-evidence-source="landing/assets/hero-hoi4-1939.json:counts.political_features"',
             'data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"',
-            'data-i18n="sampleFilterScenario"',
+            'data-i18n="sampleFilterAll"',
+            'data-output-library hidden',
+            'data-transport-page="regional"',
+            'data-transport-page="national"',
+            'data-transport-image',
+            'data-transport-download',
+            'data-transport-source',
             'data-i18n="sampleEvidenceLabel"',
             'data-sample-project-downloads',
             'data-sample-project-list-link',
@@ -1815,9 +1858,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n="sampleProjectOpen"',
             'data-i18n="sampleProjectDownload"',
             'data-i18n="sampleRecipeManifest"',
-            './assets/work-alt-history-med.webp',
-            './assets/work-scenario-switch-europe.webp',
-            './assets/work-atlas-japan-corridor.webp',
+            './assets/hero-hoi4-1936.svg',
+            './assets/hero-hoi4-1939.svg',
+            './assets/hero-tno-1962.svg',
+            './assets/work-atlas-japan-corridor.svg',
             './assets/sample-runs.json',
             './assets/sample-projects/tno-1962-atlantropa-briefing.project.json',
             './assets/sample-projects/hoi4-1936-europe-briefing.project.json',
@@ -1843,6 +1887,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 self.assertIn(expected_fragment, html)
 
         assert_landing_workspace_hero(self, html)
+        assert_landing_vector_maps(self, html)
         self.assertNotIn('class="hero__metrics"', html)
         self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
 
@@ -1911,8 +1956,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "storyStageTitleExport",
             "syncProductStoryFromDom",
             "hero-hoi4-1936.json",
-            "hero-hoi4-1939.webp",
-            "hero-tno-1962.webp",
+            "hero-hoi4-1939.svg",
+            "hero-tno-1962.svg",
             "syncHeroMap",
             "initMetricCountUp",
             "previewPanelTransportTitle",
@@ -2223,7 +2268,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n="heroTitleAccent"',
             'class="brandmark__logo"',
             './assets/favicon.svg',
-            './assets/hero-hoi4-1936.webp',
+            './assets/hero-hoi4-1936.svg',
             'data-stat-value="21338"',
             '<meta name="robots" content="index,follow" />',
             '<link rel="canonical" href="https://raederhans.github.io/scenario-forge/" />',
@@ -2259,18 +2304,27 @@ class PagesDistStartupShellTest(unittest.TestCase):
             'data-i18n-aria-label="primaryNavLabel"',
             'data-i18n-aria-label="languageSwitcherLabel"',
             'data-i18n-alt="productPreviewAlt"',
-            'data-i18n-alt="workOneAlt"',
-            'data-i18n="workOneTitle"',
+            'data-i18n-alt="scenario1936Alt"',
+            'data-i18n-alt="scenario1939Alt"',
+            'data-i18n-alt="scenario1962Alt"',
             '<a href="#sample-runs" data-i18n="navWorks">Maps</a>',
             'id="sample-runs"',
             'data-sample-runs-root',
             'data-sample-runs-manifest="./assets/sample-runs.json"',
-            'data-sample-run-filter="scenario"',
+            'data-sample-run-filter="all"',
+            'data-sample-run-filter="transport"',
+            'data-sample-run-filter="evidence"',
             'data-sample-run-card',
+            'data-sample-run-id="hoi4-1936-europe"',
+            'data-sample-run-id="hoi4-1939-europe"',
+            'data-sample-run-id="tno-1962-europe"',
             'data-sample-run-id="japan-tokaido-corridor"',
             'data-sample-scenario="modern_world"',
             'data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json"',
             'data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines"',
+            'data-output-library hidden',
+            'data-transport-page="regional"',
+            'data-transport-page="national"',
             'data-i18n="sampleFilterEvidence"',
             'data-i18n="sampleEvidenceLabel"',
             'data-sample-project-downloads',
@@ -2301,6 +2355,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 self.assertIn(expected_fragment, html)
 
         assert_landing_workspace_hero(self, html)
+        assert_landing_vector_maps(self, html)
         self.assertNotIn('class="hero__metrics"', html)
         self.assertNotIn('data-i18n-aria-label="heroMetricsLabel"', html)
         self.assertNotIn('data-showcase-layer-tab="scenario"', html)
@@ -2377,8 +2432,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "DEFAULT_HERO_MODE",
             "HERO_SCENARIO_ASSETS",
             "hero-hoi4-1936.json",
-            "hero-hoi4-1939.webp",
-            "hero-tno-1962.webp",
+            "hero-hoi4-1939.svg",
+            "hero-tno-1962.svg",
             "syncHeroMap",
             "heroAltHoi41936",
             "heroAltHoi41939",

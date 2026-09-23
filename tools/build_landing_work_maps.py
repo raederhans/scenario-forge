@@ -22,6 +22,7 @@ TNO_DIR = REPO_ROOT / "data" / "scenarios" / "tno_1962"
 HOI4_1936_DIR = REPO_ROOT / "data" / "scenarios" / "hoi4_1936"
 HOI4_1939_DIR = REPO_ROOT / "data" / "scenarios" / "hoi4_1939"
 JAPAN_TRANSPORT_DIR = REPO_ROOT / "data" / "transport_layers"
+EUROPE_LAND_BG = REPO_ROOT / "data" / "europe_land_bg.geojson"
 
 WORK_OUTPUTS = {
     "alt_history": {
@@ -53,7 +54,7 @@ PALETTE = {
     "deep_sea": "#c5dedf",
     "paper": "#d8d2bd",
     "coast": "#e7ddbf",
-    "salt": "#d8c48e",
+    "salt": "#cbb98d",
     "shoal": "#9fb7a1",
     "water": "#2e6f83",
     "border": "#132332",
@@ -145,7 +146,9 @@ def safe_geometry(feature: dict) -> BaseGeometry | None:
 
 def feature_id(feature: dict) -> str:
     props = feature.get("properties") or {}
-    return str(feature.get("id") or props.get("id") or props.get("feature_id") or "")
+    # Detail chunks renumber the top-level GeoJSON id locally. The stable
+    # scenario identity used by owners.by_feature lives in properties.id.
+    return str(props.get("id") or props.get("feature_id") or feature.get("id") or "")
 
 
 def feature_tag(feature: dict, owners: dict[str, str] | None = None) -> str:
@@ -304,6 +307,8 @@ def dissolved_tno_countries(
     source_paths = tno_political_detail_chunk_paths(bbox_value)
     for path in source_paths:
         for feature, geometry in clipped_features(geojson_features(path), bbox_value):
+            if (feature.get("properties") or {}).get("render_as_base_geography") is False:
+                continue
             fid = feature_id(feature)
             if fid and fid in seen_feature_ids:
                 continue
@@ -340,14 +345,15 @@ def dissolve_by_property(
     return dissolved
 
 
-def svg_shell(width: int, height: int, title: str, body: str, defs: str = "") -> str:
+def svg_shell(width: int, height: int, title: str, body: str, defs: str = "", *, flat_sea: bool = False) -> str:
+    sea_fill = PALETTE["sea"] if flat_sea else "url(#seaGradient)"
     return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img" aria-label="{xml_escape(title)}">
   <defs>
     <linearGradient id="seaGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{PALETTE['deep_sea']}"/><stop offset="1" stop-color="{PALETTE['sea']}"/></linearGradient>
     <filter id="softGlow"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 {defs}
   </defs>
-  <rect width="{width}" height="{height}" fill="url(#seaGradient)" />
+  <rect width="{width}" height="{height}" fill="{sea_fill}" />
   <style>text{{font-family:Arial,sans-serif;fill:#243f49}}path{{fill-rule:evenodd}}</style>
 {body}
 </svg>
@@ -384,6 +390,9 @@ def build_alt_history_med() -> None:
     source_atlantropa_features = len(atlantropa)
     atlantropa = sorted(atlantropa, key=lambda item: item[1].area, reverse=True)
     atlantropa_layers = dissolve_by_property(atlantropa, "atl_render_layer")
+    present_land = make_valid(unary_union([
+        shape(feature["geometry"]) for feature in geojson_features(EUROPE_LAND_BG)
+    ]))
 
     nodes: list[str] = [
         '  <g class="graticule" fill="none" stroke="#6aa1b2" stroke-width=".8" opacity=".18">',
@@ -395,7 +404,7 @@ def build_alt_history_med() -> None:
     for tag, geometry in dissolved_countries:
         color = color_for_tag(tag, countries)
         for path in polygon_paths(geometry, canvas, stride=1):
-            nodes.append(f'    <path d="{path}" fill="{color}" />')
+            nodes.append(f'    <path data-owner="{xml_escape(tag)}" d="{path}" fill="{color}" />')
         # Preserve source holes as water/gaps without making every tiny inland
         # ring a bright country border at card resolution.
         for path in polygon_paths(geometry, canvas, include_interiors=False):
@@ -403,16 +412,18 @@ def build_alt_history_med() -> None:
     nodes.append("  </g>")
 
     nodes.append('  <g class="atlantropa-land" stroke-linejoin="round">')
-    for layer, geometry in atlantropa_layers:
-        if layer == "water":
-            continue
-        fill = PALETTE["salt"] if layer == "land" else PALETTE["shoal"] if layer == "shoal" else PALETTE["water"]
-        opacity = ".96" if layer == "land" else ".76"
+    # Render all supplied Atlantropa masks over political land. Water masks
+    # cut the reclaimed basins back to sea using the scenario geometry itself.
+    for layer, geometry in sorted(atlantropa_layers, key=lambda item: {"water": 0, "land": 1, "shoal": 2}.get(item[0], 3)):
+        if layer == "land":
+            geometry = make_valid(geometry.difference(present_land))
+        fill = PALETTE["salt"] if layer == "land" else PALETTE["shoal"] if layer == "shoal" else PALETTE["sea"]
+        opacity = "1" if layer in {"land", "water"} else ".36"
         stroke = "#e7ddbf" if layer == "land" else "#b8cba6" if layer == "shoal" else "none"
         stroke_width = ".8" if layer == "land" else ".55" if layer == "shoal" else "0"
         for path in polygon_paths(geometry, canvas, stride=1):
             nodes.append(
-                f'    <path d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}" opacity="{opacity}" />'
+                f'    <path data-atlantropa-layer="{xml_escape(layer)}" d="{path}" fill="{fill}" stroke="{stroke}" stroke-width="{stroke_width}" opacity="{opacity}" />'
             )
     nodes.append("  </g>")
 
@@ -422,7 +433,7 @@ def build_alt_history_med() -> None:
         '<text x="40" y="680" font-size="14">TNO / ATLANTROPA</text>',
         '<text x="1080" y="680" text-anchor="end" font-size="13">Scenario land reclamation / owner boundaries</text>',
     ])
-    svg = svg_shell(output["width"], output["height"], "TNO Atlantropa Mediterranean local work map", "\n".join(nodes))
+    svg = svg_shell(output["width"], output["height"], "TNO Atlantropa Mediterranean local work map", "\n".join(nodes), flat_sea=True)
     write_text_lf(output["svg"], svg)
     write_metadata(
         output["metadata"],
@@ -435,6 +446,7 @@ def build_alt_history_med() -> None:
             TNO_DIR / "scenario_atlantropa.topo.json",
             TNO_DIR / "owners.by_feature.json",
             TNO_DIR / "countries.json",
+            EUROPE_LAND_BG,
         ],
         {
             "political_source_features": political_source_features,
@@ -442,9 +454,9 @@ def build_alt_history_med() -> None:
             "political_detail_chunks": len(political_sources),
             "source_atlantropa_features": source_atlantropa_features,
             "rendered_atlantropa_features": len(atlantropa),
-            "rendered_atlantropa_layers": len([layer for layer, _geometry in atlantropa_layers if layer != "water"]),
+            "rendered_atlantropa_layers": len(atlantropa_layers),
         },
-        "Full Mediterranean bbox rendered from TNO detail political chunks dissolved by owner, with Atlantropa land and shoal layers dissolved to avoid internal block boundaries.",
+        "Full Mediterranean bbox rendered from TNO detail political chunks dissolved by scenario owner, with Atlantropa water, land, and shoal layers dissolved; reclaimed land is clipped against present-day land geometry.",
     )
 
 
@@ -467,14 +479,20 @@ def scenario_panel(
     groups: dict[str, list[BaseGeometry]] = {}
     for feature, geometry in features:
         groups.setdefault(feature_tag(feature, owners), []).append(geometry)
+    local_canvas = Canvas(300, 316, bbox_value, padding=8)
+    neutral_land = make_valid(unary_union([
+        shape(feature["geometry"]) for feature in geojson_features(EUROPE_LAND_BG)
+    ])).intersection(box(*bbox_value))
     panel_nodes = [
         f'  <g transform="translate({panel_x} 0)">',
         f'    <rect x="20" y="58" width="300" height="354" rx="8" fill="#eef3ed" stroke="#a6c0c1" />',
         f'    <g clip-path="url(#clip-{title.lower().replace(" ", "-")})">',
         f'      <rect x="20" y="96" width="300" height="316" fill="#d3e5e4" />',
         '      <g transform="translate(20 96)">',
+        '        <g class="neutral-land-underlay" fill="#bdc9be">',
+        *(f'          <path d="{path}" />' for path in polygon_paths(neutral_land, local_canvas)),
+        '        </g>',
     ]
-    local_canvas = Canvas(300, 316, bbox_value, padding=8)
     labels: list[str] = []
     country_geometries: list[BaseGeometry] = []
     for tag, parts in sorted(groups.items()):
@@ -497,7 +515,7 @@ def scenario_panel(
                 continue
             boundary = polygon_boundary(left).intersection(polygon_boundary(right))
             for path in line_paths(boundary, local_canvas):
-                panel_nodes.append(f'<path d="{path}" fill="none" stroke="#f8f5e9" stroke-width=".65" />')
+                panel_nodes.append(f'<path d="{path}" fill="none" stroke="#344852" stroke-width=".45" opacity=".58" />')
     panel_nodes.extend(labels)
     panel_nodes.extend(
         [
@@ -542,12 +560,13 @@ def build_scenario_switch_europe() -> None:
             HOI4_1939_DIR / "runtime_topology.topo.json",
             HOI4_1939_DIR / "owners.by_feature.json",
             HOI4_1939_DIR / "countries.json",
+            EUROPE_LAND_BG,
         ],
         {
             "hoi4_1936_political_features": left_counts["political_features"],
             "hoi4_1939_political_features": right_counts["political_features"],
         },
-        "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership.",
+        "Same Central/Eastern Europe bbox rendered from 1936 and 1939 scenario ownership; source land geometry underlays any unassigned topology gaps without inventing ownership.",
     )
 
 
@@ -562,8 +581,8 @@ def build_japan_corridor() -> None:
     rivers = clipped_features(geojson_features(REPO_ROOT / "data" / "global_rivers.geojson"), bbox_value)
     cities = clipped_features(geojson_features(REPO_ROOT / "data" / "world_cities.geojson"), bbox_value)
 
-    roads = sorted(roads, key=lambda item: item[1].length, reverse=True)[:95]
-    rail = sorted(rail, key=lambda item: item[1].length, reverse=True)[:70]
+    roads = sorted(roads, key=lambda item: item[1].length, reverse=True)
+    rail = sorted(rail, key=lambda item: item[1].length, reverse=True)
     contours = sorted(contours, key=lambda item: item[1].length, reverse=True)[:20]
     rivers = sorted(rivers, key=lambda item: item[1].length, reverse=True)[:12]
     cities = sorted(cities, key=lambda item: (item[0].get("properties") or {}).get("population", 0), reverse=True)[:24]
@@ -588,12 +607,14 @@ def build_japan_corridor() -> None:
         for path in line_paths(geometry, canvas):
             nodes.append(f'    <path d="{path}" />')
     nodes.append("  </g>")
-    nodes.append('  <g class="roads" fill="none" stroke="#ce9173" stroke-width=".85" opacity=".7">')
-    for _feature, geometry in roads:
+    nodes.append('  <g class="roads" fill="none" stroke="#ce9173" stroke-width=".7" opacity=".32">')
+    for feature, geometry in roads:
+        road_class = str((feature.get("properties") or {}).get("road_class") or "").lower()
+        prominent = road_class in {"motorway", "trunk", "primary"}
         for path in line_paths(geometry, canvas):
-            nodes.append(f'    <path d="{path}" />')
+            nodes.append(f'    <path d="{path}"' + (' stroke-width="1.05" opacity="1"' if prominent else '') + ' />')
     nodes.append("  </g>")
-    nodes.append('  <g class="rail" fill="none" stroke="#386c74" stroke-width="1.25" opacity=".9">')
+    nodes.append('  <g class="rail" fill="none" stroke="#386c74" stroke-width="1.1" opacity=".7">')
     for _feature, geometry in rail:
         for path in line_paths(geometry, canvas):
             nodes.append(f'    <path d="{path}" />')
@@ -651,7 +672,7 @@ def build_japan_corridor() -> None:
             "terrain_lines": len(contours),
             "river_lines": len(rivers),
         },
-        "Central Japan local bbox combining real roads, railways, stations, terrain, rivers, and population-ranked city anchors; no singled-out corridor geometry.",
+        "Central Japan local bbox showing every intersecting road and rail segment in the checked-in preview sources, with major road hierarchy, stations, terrain, rivers, and city anchors.",
     )
 
 

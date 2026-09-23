@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-06-30",
+  "updated_at": "2026-09-23",
   "project_schema_version": 22,
   "public_scenario_ids": [
     "blank_base",
@@ -29,9 +29,22 @@
         "format": "png",
         "scale": "2",
         "previewMode": "main",
-        "layerOrder": ["background", "political", "context", "effects", "labels"],
-        "visibleLayers": ["background", "political", "effects", "labels"],
-        "textLayers": ["render-labels"]
+        "layerOrder": [
+          "background",
+          "political",
+          "context",
+          "effects",
+          "labels"
+        ],
+        "visibleLayers": [
+          "background",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "textLayers": [
+          "render-labels"
+        ]
       }
     },
     {
@@ -50,9 +63,23 @@
         "format": "png",
         "scale": "2",
         "previewMode": "main",
-        "layerOrder": ["background", "context", "political", "effects", "labels"],
-        "visibleLayers": ["background", "context", "political", "effects", "labels"],
-        "textLayers": ["render-labels"]
+        "layerOrder": [
+          "background",
+          "context",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "visibleLayers": [
+          "background",
+          "context",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "textLayers": [
+          "render-labels"
+        ]
       }
     },
     {
@@ -71,9 +98,22 @@
         "format": "png",
         "scale": "2",
         "previewMode": "main",
-        "layerOrder": ["background", "political", "effects", "labels", "context"],
-        "visibleLayers": ["background", "political", "effects", "labels"],
-        "textLayers": ["render-labels"]
+        "layerOrder": [
+          "background",
+          "political",
+          "effects",
+          "labels",
+          "context"
+        ],
+        "visibleLayers": [
+          "background",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "textLayers": [
+          "render-labels"
+        ]
       }
     },
     {
@@ -92,9 +132,22 @@
         "format": "png",
         "scale": "2",
         "previewMode": "main",
-        "layerOrder": ["background", "political", "effects", "labels", "context"],
-        "visibleLayers": ["background", "political", "effects", "labels"],
-        "textLayers": ["render-labels"]
+        "layerOrder": [
+          "background",
+          "political",
+          "effects",
+          "labels",
+          "context"
+        ],
+        "visibleLayers": [
+          "background",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "textLayers": [
+          "render-labels"
+        ]
       }
     },
     {
@@ -114,57 +167,81 @@
         "format": "png",
         "scale": "2",
         "previewMode": "main",
-        "layerOrder": ["background", "context", "political", "effects", "labels"],
-        "visibleLayers": ["background", "context", "political", "effects", "labels"],
-        "textLayers": ["render-labels", "svg-annotations"]
+        "layerOrder": [
+          "background",
+          "context",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "visibleLayers": [
+          "background",
+          "context",
+          "political",
+          "effects",
+          "labels"
+        ],
+        "textLayers": [
+          "render-labels",
+          "svg-annotations"
+        ]
       }
     }
   ],
   "featured_runs": [
     {
-      "id": "tno-atlantropa-mediterranean",
-      "project_id": "tno-1962-atlantropa-briefing",
-      "scenario_id": "tno_1962",
-      "image_url": "./assets/work-alt-history-med.webp",
-      "metadata_url": "./assets/work-alt-history-med.json",
-      "project_url": "./assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
-      "demo_path": "./app/?sample=tno-1962-atlantropa-briefing&view=guide",
-      "export_targets": [
-        "project-json",
-        "webp-snapshot",
-        "svg-source"
-      ],
-      "evidence_markers": [
-        "landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features",
-        "landing/assets/work-alt-history-med.json:counts.dissolved_country_owners"
-      ]
-    },
-    {
-      "id": "hoi4-europe-comparison",
+      "id": "hoi4-1936-europe",
       "project_id": "hoi4-1936-europe-briefing",
       "scenario_id": "hoi4_1936",
-      "related_scenario_ids": [
-        "hoi4_1939"
-      ],
-      "image_url": "./assets/work-scenario-switch-europe.webp",
-      "metadata_url": "./assets/work-scenario-switch-europe.json",
+      "image_url": "./assets/hero-hoi4-1936.svg",
+      "metadata_url": "./assets/hero-hoi4-1936.json",
       "project_url": "./assets/sample-projects/hoi4-1936-europe-briefing.project.json",
       "demo_path": "./app/?sample=hoi4-1936-europe-briefing&view=guide",
       "export_targets": [
         "project-json",
-        "webp-snapshot",
         "svg-source"
       ],
       "evidence_markers": [
-        "landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features",
-        "landing/assets/work-scenario-switch-europe.json:counts.hoi4_1939_political_features"
+        "landing/assets/hero-hoi4-1936.json:counts.political_features"
+      ]
+    },
+    {
+      "id": "hoi4-1939-europe",
+      "project_id": "hoi4-1939-europe-switch",
+      "scenario_id": "hoi4_1939",
+      "image_url": "./assets/hero-hoi4-1939.svg",
+      "metadata_url": "./assets/hero-hoi4-1939.json",
+      "project_url": "./assets/sample-projects/hoi4-1939-europe-switch.project.json",
+      "demo_path": "./app/?sample=hoi4-1939-europe-switch&view=guide",
+      "export_targets": [
+        "project-json",
+        "svg-source"
+      ],
+      "evidence_markers": [
+        "landing/assets/hero-hoi4-1939.json:counts.political_features"
+      ]
+    },
+    {
+      "id": "tno-1962-europe",
+      "project_id": "tno-1962-atlantropa-briefing",
+      "scenario_id": "tno_1962",
+      "image_url": "./assets/hero-tno-1962.svg",
+      "metadata_url": "./assets/hero-tno-1962.json",
+      "project_url": "./assets/sample-projects/tno-1962-atlantropa-briefing.project.json",
+      "demo_path": "./app/?sample=tno-1962-atlantropa-briefing&view=guide",
+      "export_targets": [
+        "project-json",
+        "svg-source"
+      ],
+      "evidence_markers": [
+        "landing/assets/hero-tno-1962.json:counts.political_features"
       ]
     },
     {
       "id": "japan-tokaido-corridor",
       "project_id": "modern-world-japan-corridor",
       "scenario_id": "modern_world",
-      "image_url": "./assets/work-atlas-japan-corridor.webp",
+      "image_url": "./assets/work-atlas-japan-corridor.svg",
       "metadata_url": "./assets/work-atlas-japan-corridor.json",
       "project_url": "./assets/sample-projects/modern-world-japan-corridor.project.json",
       "demo_path": "./app/?sample=modern-world-japan-corridor&view=guide",

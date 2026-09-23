@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -25,7 +26,7 @@ RASTER_TARGETS = (
     ("template-hoi4.svg", "template-hoi4.webp", 1120, 720, 76),
     ("template-tno.svg", "template-tno.webp", 1120, 720, 76),
     ("showcase-final-map.svg", "showcase-final-map.webp", 1120, 720, 76),
-    ("work-alt-history-med.svg", "work-alt-history-med.webp", 1120, 720, 78),
+    ("work-alt-history-med.svg", "work-alt-history-med.webp", 2240, 1440, 78),
     ("work-scenario-switch-europe.svg", "work-scenario-switch-europe.webp", 1360, 880, 78),
     ("work-atlas-japan-corridor.svg", "work-atlas-japan-corridor.webp", 1360, 880, 78),
 )
@@ -52,14 +53,15 @@ def optimize_svg_file(target: Path) -> None:
     )
 
 
-def run_svgo() -> None:
+def run_svgo(selected_sources: set[str] | None = None) -> None:
     for name in (
         "europe-1936-showcase.svg",
         "work-alt-history-med.svg",
         "work-scenario-switch-europe.svg",
         "work-atlas-japan-corridor.svg",
     ):
-        optimize_svg_file(ASSETS_DIR / name)
+        if selected_sources is None or name in selected_sources:
+            optimize_svg_file(ASSETS_DIR / name)
 
 
 def build_playwright_script(targets: list[dict[str, str | int]]) -> str:
@@ -94,12 +96,16 @@ const targets = {json.dumps(targets)};
 """
 
 
-def rasterize_targets() -> None:
+def rasterize_targets(selected_sources: set[str] | None = None) -> int:
     from PIL import Image
 
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     targets: list[dict[str, str | int]] = []
-    for source_name, output_name, width, height, quality in ALL_RASTER_TARGETS:
+    selected_targets = [
+        target for target in ALL_RASTER_TARGETS
+        if selected_sources is None or target[0] in selected_sources
+    ]
+    for source_name, output_name, width, height, quality in selected_targets:
         source = ASSETS_DIR / source_name
         if not source.is_file():
             raise FileNotFoundError(f"Missing landing SVG source: {source}")
@@ -117,22 +123,24 @@ def rasterize_targets() -> None:
     script_path.write_text(build_playwright_script(targets), encoding="utf-8")
     subprocess.run(["node", str(script_path)], cwd=ROOT, check=True)
 
-    for target, (_source_name, output_name, _width, _height, quality) in zip(targets, ALL_RASTER_TARGETS):
+    for target, (_source_name, output_name, _width, _height, quality) in zip(targets, selected_targets):
         output_path = ASSETS_DIR / output_name
         with Image.open(str(target["png"])) as image:
             if output_path.suffix.lower() == ".png":
                 image.save(output_path, "PNG")
             else:
                 image.save(output_path, "WEBP", quality=quality, method=6)
+    return len(selected_targets)
 
 
 def main() -> None:
-    run_svgo()
-    rasterize_targets()
-    print(
-        f"[rasterize_landing_assets] wrote {len(RASTER_TARGETS)} WebP assets "
-        f"and {len(PNG_RASTER_TARGETS)} PNG asset"
-    )
+    parser = argparse.ArgumentParser(description="Optimize and rasterize landing SVG assets")
+    parser.add_argument("--source", action="append", choices=[target[0] for target in ALL_RASTER_TARGETS])
+    args = parser.parse_args()
+    selected_sources = set(args.source) if args.source else None
+    run_svgo(selected_sources)
+    count = rasterize_targets(selected_sources)
+    print(f"[rasterize_landing_assets] wrote {count} raster asset(s)")
 
 
 if __name__ == "__main__":

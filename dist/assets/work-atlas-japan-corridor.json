@@ -22,8 +22,8 @@
     "data/world_cities.geojson"
   ],
   "counts": {
-    "road_lines": 95,
-    "rail_lines": 70,
+    "road_lines": 2030,
+    "rail_lines": 392,
     "major_stations": 18,
     "urban_anchor_points": 18,
     "city_points": 24,
@@ -31,7 +31,7 @@
     "river_lines": 1
   },
   "selection_policy": {
-    "note": "Central Japan local bbox combining real roads, railways, stations, terrain, rivers, and population-ranked city anchors; no singled-out corridor geometry.",
+    "note": "Central Japan local bbox showing every intersecting road and rail segment in the checked-in preview sources, with major road hierarchy, stations, terrain, rivers, and city anchors.",
     "ranking": "intersect bbox, clip, sort by area or length, keep top visible features"
   }
 }

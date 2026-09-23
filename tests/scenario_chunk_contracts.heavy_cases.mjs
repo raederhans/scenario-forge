@@ -1615,9 +1615,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     assert.ok(/viewport: \{[\s\S]*?width: canvasWidth,[\s\S]*?height: canvasHeight,[\s\S]*?right: canvasWidth,[\s\S]*?bottom: canvasHeight,[\s\S]*?\}/.test(identitySource));
     assert.ok(identitySource.includes('passSignature: helper.getRenderPassSignature("political", transform),'));
     assert.ok(/const screenRects = \[\{[\s\S]*?maxX: identity\.canvasWidth \+ politicalOverscanPx,[\s\S]*?maxY: identity\.canvasHeight \+ politicalOverscanPx/.test(viewportSource));
-    assert.ok(ownerDrawSource.includes("const consumedBitmapResult = consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);"));
+    assert.match(ownerDrawSource, /const consumedBitmapResult = isExportRendering\(\)\s*\? null\s*: consumePoliticalRasterWorkerBitmapResult\(identity\.workerIdentity\);/);
     assert.ok(
-      ownerDrawSource.indexOf("const consumedBitmapResult = consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);")
+      ownerDrawSource.indexOf("const consumedBitmapResult = isExportRendering()")
         < ownerDrawSource.indexOf("const backgroundStartedAt = nowMs();"),
     );
     assert.ok(packetSource.includes("buildPoliticalRasterWorkerPacket({"));

@@ -19,7 +19,7 @@
 - **选择世界。** 从空白地图、现代世界、HOI4 1936、HOI4 1939 或 TNO 1962 开始。
 - **改写故事。** 调整归属与控制区，绘制前线，添加文字和战略标记。
 - **编排细节。** 设置配色、边界与图例，加入城市、公路、铁路、地形和河流。
-- **继续创作。** 使用中英文界面，以 1×–4× 导出 PNG/JPG，并保存可编辑的 JSON 工程。
+- **继续创作。** 使用中英文界面，按目标分辨率绘制并导出 PNG/JPG，保存可编辑的 JSON 工程。可在尺寸和内存限制内选择 1×–4×。
 
 ## 地图作品
 
@@ -27,15 +27,15 @@
 
 ### 另一种地中海
 
-![TNO 1962 地中海概览，展示政治疆界与亚特兰特罗帕地理](landing/assets/work-alt-history-med.webp)
+![TNO 1962 地中海概览，展示政治疆界与亚特兰特罗帕地理](landing/assets/work-alt-history-med.svg)
 
-TNO 1962：政治疆界与亚特兰特罗帕改造后的海岸线。
+采用 TNO 1962 的国家归属与剧本配色，完整呈现亚特兰特罗帕陆地、浅滩与水域。
 
-[打开 TNO 示例](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide)
+[打开 TNO 示例](https://raederhans.github.io/scenario-forge/app/?sample=tno-1962-atlantropa-briefing&view=guide) · [矢量地图](landing/assets/work-alt-history-med.svg)
 
 ### 两个年份之间的欧洲
 
-![在相同地理范围内对照 HOI4 1936 与 1939 的政治地图](landing/assets/work-scenario-switch-europe.webp)
+![在相同地理范围内对照 HOI4 1936 与 1939 的政治地图](landing/assets/work-scenario-switch-europe.svg)
 
 在同一区域，对照两个 HOI4 剧本的疆界。
 

@@ -355,6 +355,19 @@ test("worker enabled and disabled paths preserve packet construction and request
   assert.equal(disabled.events.filter((event) => eventName(event) === "worker-snapshot").length, 2);
 });
 
+test("export draws fine political geometry without consuming or scheduling worker work", () => {
+  const { events, owner } = createHarness({
+    bitmapResult: { bitmapId: "screen-result" },
+    overrides: { getters: { isExportRendering: () => true } },
+  });
+  const result = owner.drawPoliticalPass(3);
+  assert.equal(result.politicalDataStage, "fine");
+  for (const name of ["consume-bitmap", "draw-bitmap", "build-packet", "request-worker", "clear-pending"]) {
+    assert.equal(events.some((event) => eventName(event) === name), false, name);
+  }
+  assert.equal(events.some((event) => eventName(event) === "fine-loop"), true);
+});
+
 test("progressive coarse admission stays exact and keeps the foreground check lazy", () => {
   const progressive = {
     ...DEFAULT_BACKGROUND,

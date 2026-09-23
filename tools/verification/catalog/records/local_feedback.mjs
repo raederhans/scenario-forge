@@ -299,6 +299,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["legend-color-revision", "renderer-runtime", "tests/legend_color_revision_behavior.test.mjs", ["js/core/legend_manager.js", "js/core/legend_state_normalizers.js", "js/core/map_renderer.js"]],
     ["render-dispatcher", "startup", "tests/render_dispatcher_behavior.test.mjs", ["js/bootstrap/startup_bootstrap_support.js", "js/core/render_boundary.js", "js/bootstrap/render_runtime_binding.js"]],
     ["exact-composite-reuse", "renderer-runtime", "tests/exact_composite_reuse_behavior.test.mjs", ["js/core/renderer/exact_composite_reuse_owner.js", "js/core/map_renderer.js", "js/core/renderer/cached_pass_compositor_owner.js"]],
+    ["export-target-resolution", "renderer-runtime", "tests/export_target_resolution_behavior.test.mjs", ["js/core/renderer/export_render_budget.js", "js/core/map_renderer.js", "js/core/renderer/political_pass_orchestrator_owner.js", "js/ui/toolbar.js", "js/ui/toolbar/export_failure_handler.js"]],
   ];
   const testRecords = localTestFiles.map(([id, domain, testFile, extraSources = []], index) => ({
     id: "local:test:" + id, commandRef: "node --test " + testFile,

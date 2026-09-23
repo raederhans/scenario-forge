@@ -7,24 +7,24 @@
   "palette_class": "hoi4-1936",
   "viewport": {
     "bbox": [
-      -12.5,
+      -10.0,
       34.0,
-      41.5,
-      72.5
+      39.0,
+      65.0
     ],
     "projection": "lambert_azimuthal_equal_area",
     "center_lon": 10.0,
     "center_lat": 52.0,
     "canvas_width": 980,
     "canvas_height": 680,
-    "canvas_padding": 36,
+    "canvas_padding": 18,
     "projected_bounds": [
-      -0.324460434484,
-      -0.312839026885,
-      0.447276476661,
-      0.394157720515
+      -0.289373765165,
+      -0.312868099435,
+      0.413778005411,
+      0.270677211663
     ],
-    "scale": 859.975667831481
+    "scale": 1103.598962672236
   },
   "source_files": [
     "data/scenarios/hoi4_1936/manifest.json",
@@ -35,12 +35,12 @@
   ],
   "feature_counts": {
     "territories": 29,
-    "political_features": 7177,
+    "political_features": 6080,
     "capitals": 8
   },
   "counts": {
     "territories": 29,
-    "political_features": 7177,
+    "political_features": 6080,
     "capitals": 8
   },
   "territory_tags": [

@@ -1,13 +1,14 @@
 # Worktree Registry
 
-## 当前拓扑（2026-09-22）
+## 当前拓扑（2026-09-23）
 
 这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
 | 当前入口 | 用途与边界 |
 | --- | --- |
-| `C:/Users/raede/Desktop/dev/mapcreator` | 主工作区，分支 `main`；精度与性能交付通过受保护分支的 PR 检查整合，并同步 GitHub Pages。当前 SHA 和部署结果以 Git / GitHub 回执为准；保留既有未跟踪 `.playwright-mcp/`。 |
+| `C:/Users/raede/Desktop/dev/mapcreator` | 主工作区，分支 `codex/global-data-migration-20260923`，交付位于草稿 PR #146；已同步主线展示与导出更新，未将本轮候选数据发布到生产。当前 SHA、CI 与部署状态以 Git / GitHub 回执为准；保留既有未跟踪 `.playwright-mcp/`。 |
 | `C:/Users/raede/.codex/worktrees/precision-expansion-20260922/mapcreator` | 保留工作树与分支 `codex/global-precision-scaling-20260922`，保存忽略的精度/县级候选和历史边界验收证据；这些 `.runtime` 产物未进入正式数据，后续适配仍需要它们，因此合并后不清理。代码交付基线 `382ce56744d3942a9097e1352c312a23bab0dbf9`，任务记录见 [global-precision-scaling-20260922](global-precision-scaling-20260922/task.md)。 |
+| `C:/Users/raede/.codex/worktrees/showcase-map-quality/mapcreator` | 分支 `codex/showcase-release-contracts`；展示与导出交付已经通过 PR #147/#148 进入主线。本轮仅核对状态并通过 `origin/main` 整合，保留该工作树，不接管或清理其他任务的文件。 |
 | `.playwright-mcp/` | 主工作区中的未跟踪、未归属内容；本轮按 WIP 保护规则保留，不把它当作可清理缓存。 |
 | `.runtime/tmp/worktree-cleanup-20260917/recovery.md` | 本轮删除前的精确 branch/tip 恢复清单；属于忽略的本地运行证据，不参与产品提交。 |
 | `.runtime/worktree-archives/russia-full-replacement-20260920/` | 俄罗斯工作树的文件保全清单、与主目录不同的 942 个文件副本及完整 `.runtime` 证据。 |

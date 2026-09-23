@@ -83,7 +83,7 @@
 
           <figure class="hero__visual" data-reveal>
             <div class="workspace-frame">
-              <img src="./assets/product-workspace.webp" alt="Scenario Forge map editor with its map canvas and editing controls." data-i18n-alt="productPreviewAlt" loading="eager" fetchpriority="high" width="1280" height="720" />
+              <img src="./assets/product-workspace.webp" alt="Scenario Forge map editor with its map canvas and editing controls." data-i18n-alt="productPreviewAlt" loading="eager" fetchpriority="high" width="1600" height="900" />
             </div>
             <figcaption><span data-i18n="workspaceCaption">The map. The tools. Your next world.</span><span>SCENARIO FORGE / 01</span></figcaption>
           </figure>
@@ -97,93 +97,100 @@
           </div>
 
           <div class="sample-runs__filters" role="toolbar" aria-label="Sample run filters" data-i18n-aria-label="sampleFiltersLabel" data-reveal>
-            <button type="button" class="sample-run-filter" aria-pressed="true" tabindex="0" data-sample-run-filter="all" aria-controls="sample-runs-panel" data-i18n="sampleFilterAll">All</button>
-            <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="scenario" aria-controls="sample-runs-panel" data-i18n="sampleFilterScenario">Scenario</button>
+            <button type="button" class="sample-run-filter" aria-pressed="true" tabindex="0" data-sample-run-filter="all" aria-controls="sample-runs-panel" data-i18n="sampleFilterAll">Scenarios</button>
             <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="transport" aria-controls="sample-runs-panel" data-i18n="sampleFilterTransport">Transport</button>
-            <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="atlas" aria-controls="sample-runs-panel" data-i18n="sampleFilterAtlas">Atlas output</button>
-            <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="evidence" aria-controls="sample-runs-panel" data-i18n="sampleFilterEvidence">Evidence-backed</button>
+            <button type="button" class="sample-run-filter" aria-pressed="false" tabindex="-1" data-sample-run-filter="evidence" aria-controls="sample-runs-panel output-library" data-i18n="sampleFilterEvidence">Files &amp; sources</button>
           </div>
 
 
 
+          <div class="gallery-context" aria-live="polite" aria-atomic="true">
+            <strong data-gallery-view-title>Three ways to tell a map story</strong>
+            <p data-gallery-view-body>Compare scenario borders, explore transport, or inspect the data behind each map.</p>
+          </div>
           <div id="sample-runs-panel" class="works-grid works-grid--bento sample-runs__panel" role="region" aria-label="Sample run gallery" data-i18n-aria-label="sampleRunsPanelLabel">
-            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="tno-atlantropa-mediterranean" data-sample-scenario="tno_1962" data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-alt-history-med.json">
-              <div class="work-card__media work-card__media--workspace">
-                <img src="./assets/work-alt-history-med.webp" alt="Generated TNO 1962 Atlantropa Mediterranean map with political context, salt basins, shoals, and water regions." data-i18n-alt="workOneAlt" loading="lazy" width="560" height="360" />
-              </div>
+<article class="work-card sample-run-card" data-sample-run-card data-sample-run-id="hoi4-1936-europe" data-sample-scenario="hoi4_1936" data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" data-sample-tags="scenario" data-sample-metadata="./assets/hero-hoi4-1936.json">
+              <div class="work-card__media"><img src="./assets/hero-hoi4-1936.svg" alt="HOI4 1936 scenario map" data-i18n-alt="scenario1936Alt" width="980" height="680" loading="lazy" /></div>
               <div class="work-card__copy">
-                <p class="work-card__label" data-i18n="workOneLabel">TNO 1962 briefing map</p>
-                <h3 data-i18n="workOneTitle">An altered Mediterranean</h3>
-                <p data-i18n="workOneBody">TNO 1962: political borders meet the reshaped coastline of Atlantropa.</p>
-                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
-                  <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
-                  <a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
-                </div>
-                <details class="sample-run-card__proof">
-                  <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
-                  <dl>
-                    <div data-sample-evidence="tno-atlantropa-features" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.rendered_atlantropa_features">
-                      <dt data-i18n="workOneEvidenceOne">rendered Atlantropa features · Mediterranean extent · scenario output</dt>
-                      <dd data-sample-evidence-value="724">724</dd>
-                    </div>
-                    <div data-sample-evidence="tno-owner-count" data-sample-evidence-source="landing/assets/work-alt-history-med.json:counts.dissolved_country_owners">
-                      <dt data-i18n="workOneEvidenceTwo">dissolved country owners · Mediterranean extent</dt>
-                      <dd data-sample-evidence-value="47">47</dd>
-                    </div>
-                  </dl>
-                </details>
-              </div>
-            </article>
-
-            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="hoi4-europe-comparison" data-sample-scenario="hoi4_1936" data-sample-project="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" data-sample-tags="scenario evidence" data-sample-metadata="./assets/work-scenario-switch-europe.json">
-              <div class="work-card__media">
-                <img src="./assets/work-scenario-switch-europe.webp" alt="Generated HOI4 1936 and 1939 Central Europe comparison map." data-i18n-alt="workTwoAlt" loading="lazy" width="680" height="440" />
-              </div>
-              <div class="work-card__copy">
-                <p class="work-card__label" data-i18n="workTwoLabel">HOI4 comparison run</p>
-                <h3 data-i18n="workTwoTitle">Europe, between two dates</h3>
-                <p data-i18n="workTwoBody">Compare the HOI4 1936 and 1939 baselines in the same geographic frame.</p>
-                <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
+                <p class="work-card__label">HOI4 / 1936</p>
+                <h3 data-i18n="scenario1936Title">Europe · 1936</h3>
+                <p data-i18n="scenario1936Body"></p>
+                <div class="sample-run-card__actions">
                   <a href="./app/?sample=hoi4-1936-europe-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
+                  <a href="./assets/hero-hoi4-1936.svg" download data-map-download data-i18n="sampleVectorDownload">Download SVG</a>
                 </div>
-                <details class="sample-run-card__proof">
-                  <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
-                  <dl>
-                    <div data-sample-evidence="hoi4-1936-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1936_political_features">
-                      <dt data-i18n="workTwoEvidenceOne">rendered political features · 1936 · shared Central/Eastern Europe extent</dt>
-                      <dd data-sample-evidence-value="2626">2626</dd>
-                    </div>
-                    <div data-sample-evidence="hoi4-1939-features" data-sample-evidence-source="landing/assets/work-scenario-switch-europe.json:counts.hoi4_1939_political_features">
-                      <dt data-i18n="workTwoEvidenceTwo">rendered political features · 1939 · shared Central/Eastern Europe extent</dt>
-                      <dd data-sample-evidence-value="2626">2626</dd>
-                    </div>
-                  </dl>
+                <details class="sample-run-card__proof"><summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <p class="map-scope" data-i18n="scenario1936Scope"></p>
+                  <div class="map-source-links"><a href="./assets/hero-hoi4-1936.json" data-i18n="mapSourceRecord">Map data &amp; processing</a><a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">All samples</a></div>
+                  <dl><div data-sample-evidence="hoi4-1936-europe-features" data-sample-evidence-source="landing/assets/hero-hoi4-1936.json:counts.political_features"><dt data-i18n="scenarioFeatureCount">Political source features</dt><dd data-sample-evidence-value="6080">6080</dd></div></dl>
                 </details>
               </div>
             </article>
-
-            <article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="japan-tokaido-corridor" data-sample-scenario="modern_world" data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json" data-sample-tags="transport atlas evidence" data-sample-metadata="./assets/work-atlas-japan-corridor.json">
+<article class="work-card sample-run-card" data-sample-run-card data-sample-run-id="hoi4-1939-europe" data-sample-scenario="hoi4_1939" data-sample-project="./assets/sample-projects/hoi4-1939-europe-switch.project.json" data-sample-tags="scenario" data-sample-metadata="./assets/hero-hoi4-1939.json">
+              <div class="work-card__media"><img src="./assets/hero-hoi4-1939.svg" alt="HOI4 1939 scenario map" data-i18n-alt="scenario1939Alt" width="980" height="680" loading="lazy" /></div>
+              <div class="work-card__copy">
+                <p class="work-card__label">HOI4 / 1939</p>
+                <h3 data-i18n="scenario1939Title">Europe · 1939</h3>
+                <p data-i18n="scenario1939Body"></p>
+                <div class="sample-run-card__actions">
+                  <a href="./app/?sample=hoi4-1939-europe-switch&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
+                  <a href="./assets/sample-projects/hoi4-1939-europe-switch.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
+                  <a href="./assets/hero-hoi4-1939.svg" download data-map-download data-i18n="sampleVectorDownload">Download SVG</a>
+                </div>
+                <details class="sample-run-card__proof"><summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <p class="map-scope" data-i18n="scenario1939Scope"></p>
+                  <div class="map-source-links"><a href="./assets/hero-hoi4-1939.json" data-i18n="mapSourceRecord">Map data &amp; processing</a><a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">All samples</a></div>
+                  <dl><div data-sample-evidence="hoi4-1939-europe-features" data-sample-evidence-source="landing/assets/hero-hoi4-1939.json:counts.political_features"><dt data-i18n="scenarioFeatureCount">Political source features</dt><dd data-sample-evidence-value="6081">6081</dd></div></dl>
+                </details>
+              </div>
+            </article>
+<article class="work-card sample-run-card" data-sample-run-card data-sample-run-id="tno-1962-europe" data-sample-scenario="tno_1962" data-sample-project="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" data-sample-tags="scenario" data-sample-metadata="./assets/hero-tno-1962.json">
+              <div class="work-card__media"><img src="./assets/hero-tno-1962.svg" alt="TNO 1962 scenario map" data-i18n-alt="scenario1962Alt" width="980" height="680" loading="lazy" /></div>
+              <div class="work-card__copy">
+                <p class="work-card__label">TNO / 1962</p>
+                <h3 data-i18n="scenario1962Title">Europe · 1962</h3>
+                <p data-i18n="scenario1962Body"></p>
+                <div class="sample-run-card__actions">
+                  <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
+                  <a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
+                  <a href="./assets/hero-tno-1962.svg" download data-map-download data-i18n="sampleVectorDownload">Download SVG</a>
+                </div>
+                <details class="sample-run-card__proof"><summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
+                  <p class="map-scope" data-i18n="scenario1962Scope"></p>
+                  <div class="map-source-links"><a href="./assets/hero-tno-1962.json" data-i18n="mapSourceRecord">Map data &amp; processing</a><a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">All samples</a></div>
+                  <dl><div data-sample-evidence="tno-1962-europe-features" data-sample-evidence-source="landing/assets/hero-tno-1962.json:counts.political_features"><dt data-i18n="scenarioFeatureCount">Political source features</dt><dd data-sample-evidence-value="3236">3236</dd></div></dl>
+                </details>
+              </div>
+            </article>
+<article class="work-card sample-run-card" data-reveal data-sample-run-card data-sample-run-id="japan-tokaido-corridor" data-sample-scenario="modern_world" data-sample-project="./assets/sample-projects/modern-world-japan-corridor.project.json" data-sample-tags="transport" hidden data-sample-metadata="./assets/work-atlas-japan-corridor.json">
               <div class="work-card__media">
-                <img src="./assets/work-atlas-japan-corridor.webp" alt="Generated Central Japan local transport atlas with roads, rail, urban anchors, stations, terrain, and rivers." data-i18n-alt="workThreeAlt" loading="lazy" width="680" height="440" />
+                <img id="transport-map-image" data-transport-image src="./assets/work-atlas-japan-corridor.svg" alt="Generated Central Japan local transport atlas with roads, rail, urban anchors, stations, terrain, and rivers." data-i18n-alt="workThreeAlt" loading="lazy" width="680" height="440" />
               </div>
               <div class="work-card__copy">
+                <div class="transport-pagination" role="group" aria-label="Transport map pages" data-i18n-aria-label="transportPagesLabel">
+                  <button type="button" aria-controls="transport-map-image" data-transport-page="regional" aria-pressed="true"><span>01</span> <span data-i18n="transportRegional">Central Japan</span></button>
+                  <button type="button" aria-controls="transport-map-image" data-transport-page="national" aria-pressed="false"><span>02</span> <span data-i18n="transportNational">All Japan</span></button>
+                </div>
                 <p class="work-card__label" data-i18n="workThreeLabel">Central Japan local transport atlas</p>
-                <h3 data-i18n="workThreeTitle">Connections across Central Japan</h3>
-                <p data-i18n="workThreeBody">Roads, rail, and stations set against rivers and terrain.</p>
+                <h3 data-transport-title data-i18n="workThreeTitle">Connections across Central Japan</h3>
+                <p data-transport-body data-i18n="workThreeBody">Roads, rail, and stations set against rivers and terrain.</p>
                 <div class="sample-run-card__actions" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
                   <a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download data-sample-project-link data-i18n="sampleProjectDownload">Download JSON</a>
-                  <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">View recipe</a>
+                  <a href="./assets/work-atlas-japan-corridor.svg" download data-transport-download data-map-download data-i18n="sampleVectorDownload">Download SVG</a>
                 </div>
                 <details class="sample-run-card__proof">
                   <summary data-i18n="sampleEvidenceLabel">Map details &amp; sources</summary>
-                  <dl>
+                  <p class="map-scope" data-transport-scope data-i18n="mapScopeJapan"></p>
+                  <div class="map-source-links">
+                    <a href="./assets/work-atlas-japan-corridor.json" data-transport-source data-i18n="mapSourceRecord">Map data &amp; processing</a>
+                    <a href="./assets/sample-runs.json" data-sample-manifest-link data-i18n="sampleRecipeManifest">All samples</a>
+                  </div>
+                  <dl data-transport-regional-evidence>
                     <div data-sample-evidence="japan-transport-lines" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines">
                       <dt data-i18n="workThreeEvidenceOne">rendered road + rail routes · Central Japan local transport atlas</dt>
-                      <dd data-sample-evidence-value="165">165</dd>
+                      <dd data-sample-evidence-value="2422">2422</dd>
                     </div>
                     <div data-sample-evidence="japan-stations" data-sample-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.major_stations">
                       <dt data-i18n="workThreeEvidenceTwo">major stations · Central Japan local transport atlas</dt>
@@ -193,10 +200,18 @@
                 </details>
               </div>
             </article>
-          </div>
+</div>
+<div id="output-library" class="output-library" role="region" aria-label="Files and sources" data-i18n-aria-label="sampleFilterEvidence" data-output-library hidden>
+            <div class="output-library__intro"><span class="eyebrow" data-i18n="libraryEyebrow">FROM SOURCE TO FILE</span><h3 data-i18n="libraryTitle">Choose the file for your next step.</h3><p data-i18n="libraryBody"></p></div>
+            <div class="output-library__formats">
+              <div><strong>SVG</strong><span data-i18n="formatSvg">Vector artwork · sharp at any scale</span></div>
+              <div><strong>JSON</strong><span data-i18n="formatJson">Editable project · continue in the editor</span></div>
+              <div><strong>PNG / JPG</strong><span data-i18n="formatRaster">Export workbench · compose and set resolution</span></div>
+            </div>
+            <div class="output-library__table"><div class="output-library__row output-library__row--head"><span data-i18n="libraryMap">Map</span><span data-i18n="libraryArtwork">Artwork</span><span data-i18n="libraryProject">Project</span><span data-i18n="librarySource">Sources</span></div><div class="output-library__row"><strong data-i18n="scenario1936Title"></strong><a href="./assets/hero-hoi4-1936.svg" download>SVG ↓</a><a href="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" download>JSON ↓</a><a href="./assets/hero-hoi4-1936.json" data-i18n="libraryRecord">View record ↗</a></div><div class="output-library__row"><strong data-i18n="scenario1939Title"></strong><a href="./assets/hero-hoi4-1939.svg" download>SVG ↓</a><a href="./assets/sample-projects/hoi4-1939-europe-switch.project.json" download>JSON ↓</a><a href="./assets/hero-hoi4-1939.json" data-i18n="libraryRecord">View record ↗</a></div><div class="output-library__row"><strong data-i18n="scenario1962Title"></strong><a href="./assets/hero-tno-1962.svg" download>SVG ↓</a><a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download>JSON ↓</a><a href="./assets/hero-tno-1962.json" data-i18n="libraryRecord">View record ↗</a></div><div class="output-library__row"><strong data-i18n="transportRegional"></strong><a href="./assets/work-atlas-japan-corridor.svg" download>SVG ↓</a><a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download>JSON ↓</a><a href="./assets/work-atlas-japan-corridor.json" data-i18n="libraryRecord">View record ↗</a></div></div><p class="output-library__note" data-i18n="libraryNote"></p></div>
           <details class="sample-project-downloads" data-sample-project-downloads data-reveal>
             <summary class="sample-project-downloads__header">
-              <h3 data-i18n="sampleProjectDownloadsTitle">Browse all five starting points</h3>
+              <span data-i18n="sampleProjectDownloadsTitle">Browse all five starting points</span><span class="disclosure-count" aria-hidden="true">05</span>
             </summary>
             <div class="sample-project-downloads__header">
               <p data-i18n="sampleProjectDownloadsBody">Start from a sample in the editor, or download its project file.</p>
@@ -204,40 +219,55 @@
             </div>
             <div class="sample-project-downloads__grid" aria-label="Sample project actions" data-i18n-aria-label="sampleProjectActionsLabel">
               <article class="sample-project-downloads__card" data-sample-project-id="blank-base-starter" data-sample-scenario="blank_base">
+                <img src="./assets/hero-blank.svg" alt="" loading="lazy" width="480" height="300" />
+                <small class="starter-index">01</small>
                 <span data-i18n="sampleProjectBlank">Blank Map starter</span>
                 <strong>blank_base</strong>
+                <p data-i18n="starterBlankBody"></p>
                 <div class="sample-project-downloads__actions">
                   <a href="./app/?sample=blank-base-starter&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/blank-base-starter.project.json" download data-sample-project-list-link data-sample-project-id="blank-base-starter" data-sample-scenario="blank_base" data-i18n="sampleProjectDownload">Download JSON</a>
                 </div>
               </article>
               <article class="sample-project-downloads__card" data-sample-project-id="modern-world-japan-corridor" data-sample-scenario="modern_world">
+                <img src="./assets/work-atlas-japan-corridor.svg" alt="" loading="lazy" width="480" height="300" />
+                <small class="starter-index">02</small>
                 <span data-i18n="sampleProjectModern">Modern World · Central Japan local transport atlas</span>
                 <strong>modern_world</strong>
+                <p data-i18n="starterJapanBody"></p>
                 <div class="sample-project-downloads__actions">
                   <a href="./app/?sample=modern-world-japan-corridor&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/modern-world-japan-corridor.project.json" download data-sample-project-list-link data-sample-project-id="modern-world-japan-corridor" data-sample-scenario="modern_world" data-i18n="sampleProjectDownload">Download JSON</a>
                 </div>
               </article>
               <article class="sample-project-downloads__card" data-sample-project-id="hoi4-1936-europe-briefing" data-sample-scenario="hoi4_1936">
+                <img src="./assets/hero-hoi4-1936.svg" alt="" loading="lazy" width="480" height="300" />
+                <small class="starter-index">03</small>
                 <span data-i18n="sampleProjectHoi41936">HOI4 1936 Europe briefing</span>
                 <strong>hoi4_1936</strong>
+                <p data-i18n="starter1936Body"></p>
                 <div class="sample-project-downloads__actions">
                   <a href="./app/?sample=hoi4-1936-europe-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/hoi4-1936-europe-briefing.project.json" download data-sample-project-list-link data-sample-project-id="hoi4-1936-europe-briefing" data-sample-scenario="hoi4_1936" data-i18n="sampleProjectDownload">Download JSON</a>
                 </div>
               </article>
               <article class="sample-project-downloads__card" data-sample-project-id="hoi4-1939-europe-switch" data-sample-scenario="hoi4_1939">
+                <img src="./assets/hero-hoi4-1939.svg" alt="" loading="lazy" width="480" height="300" />
+                <small class="starter-index">04</small>
                 <span data-i18n="sampleProjectHoi41939">HOI4 1939 Europe switch</span>
                 <strong>hoi4_1939</strong>
+                <p data-i18n="starter1939Body"></p>
                 <div class="sample-project-downloads__actions">
                   <a href="./app/?sample=hoi4-1939-europe-switch&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/hoi4-1939-europe-switch.project.json" download data-sample-project-list-link data-sample-project-id="hoi4-1939-europe-switch" data-sample-scenario="hoi4_1939" data-i18n="sampleProjectDownload">Download JSON</a>
                 </div>
               </article>
               <article class="sample-project-downloads__card" data-sample-project-id="tno-1962-atlantropa-briefing" data-sample-scenario="tno_1962">
+                <img src="./assets/work-alt-history-med.svg" alt="" loading="lazy" width="480" height="300" />
+                <small class="starter-index">05</small>
                 <span data-i18n="sampleProjectTno">TNO 1962 Atlantropa briefing</span>
                 <strong>tno_1962</strong>
+                <p data-i18n="starterTnoBody"></p>
                 <div class="sample-project-downloads__actions">
                   <a href="./app/?sample=tno-1962-atlantropa-briefing&view=guide" data-sample-project-open-link data-i18n="sampleProjectOpen">Open editable sample</a>
                   <a href="./assets/sample-projects/tno-1962-atlantropa-briefing.project.json" download data-sample-project-list-link data-sample-project-id="tno-1962-atlantropa-briefing" data-sample-scenario="tno_1962" data-i18n="sampleProjectDownload">Download JSON</a>
@@ -261,7 +291,10 @@
                 <strong data-i18n="storyStageChrome">Scenario Forge story stage</strong>
               </div>
               <div class="story-stage__media">
-                <img src="./assets/hero-hoi4-1936.webp" alt="Generated HOI4 1936 baseline map." data-story-stage-image data-i18n-alt="storyAltBaseline" width="980" height="680" loading="lazy" />
+                <img src="./assets/hero-blank.svg" alt="Neutral map with editable subdivisions." data-story-stage-image data-i18n-alt="storyAltBaseline" width="980" height="680" loading="lazy" />
+<div class="source-tree" data-story-source-tree hidden>
+                  <div class="source-tree__root"><small data-i18n="lineageRootLabel">THE MAP</small><strong data-i18n="lineageRoot">One composition, traceable layers</strong></div>
+                  <div class="source-tree__branches"><a href="./assets/hero-blank.json" class="source-tree__node"><strong data-i18n="lineageGeography"></strong><span data-i18n="lineageGeographySource"></span><small data-i18n="lineageRecord">Inspect source record ↗</small></a><a href="./assets/hero-tno-1962.json" class="source-tree__node"><strong data-i18n="lineageOwnership"></strong><span data-i18n="lineageOwnershipSource"></span><small data-i18n="lineageRecord">Inspect source record ↗</small></a><a href="./assets/japan-preview.json" class="source-tree__node"><strong data-i18n="lineageTransport"></strong><span data-i18n="lineageTransportSource"></span><small data-i18n="lineageRecord">Inspect source record ↗</small></a><a href="./assets/work-atlas-japan-corridor.json" class="source-tree__node"><strong data-i18n="lineageContext"></strong><span data-i18n="lineageContextSource"></span><small data-i18n="lineageRecord">Inspect source record ↗</small></a></div><p data-i18n="lineageNote"></p></div>
                 <div class="story-stage__hud" aria-live="polite">
                   <span data-story-stage-badge data-i18n="storyStageBadgeBaseline">Baseline selected</span>
                   <strong data-story-stage-title data-i18n="storyStageTitleBaseline">Start from a named public baseline.</strong>
@@ -270,7 +303,7 @@
               </div>
 
               <figcaption class="story-stage__caption">
-                <div class="story-compare" role="group" aria-label="Scenario state comparison" data-i18n-aria-label="storyComparisonLabel">
+                <div class="story-compare" data-story-comparison-controls hidden role="group" aria-label="Scenario state comparison" data-i18n-aria-label="storyComparisonLabel">
                   <button type="button" data-story-compare="hoi4-1936" aria-pressed="true" data-i18n="storyCompare1936">1936</button>
                   <button type="button" data-story-compare="hoi4-1939" aria-pressed="false" data-i18n="storyCompare1939">1939</button>
                   <button type="button" data-story-compare="tno-1962" aria-pressed="false" data-i18n="storyCompareTno">TNO 1962</button>
@@ -294,12 +327,10 @@
                       <dt data-i18n="storyEvidenceCatalogLabel">cataloged assets · public project data</dt>
                       <dd data-story-evidence-value="665">665</dd>
                     </div>
-                    <div data-story-evidence="export" data-story-evidence-source="landing/assets/work-atlas-japan-corridor.json:counts.road_lines+counts.rail_lines+counts.major_stations">
-                      <dt data-i18n="storyEvidenceExportLabel">routes + major stations (165 + 18) · Central Japan local transport atlas</dt>
-                      <dd data-story-evidence-value="183">183</dd>
-                    </div>
+
                   </dl>
                 </details>
+                <a class="story-export-action" data-story-export-action hidden href="./app/?sample=modern-world-japan-corridor&view=guide" data-i18n="openExportEditor">Open sample in editor ↗</a>
               </figcaption>
             </figure>
 
@@ -443,10 +474,10 @@
 
               <div class="mini-map__surface" data-preview-surface data-i18n-aria-label="previewSurfaceLabel" aria-label="Japan preview map viewport" tabindex="0">
                 <div class="mini-map__viewport" data-preview-viewport>
-                  <img src="./assets/japan-preview-transport.webp" alt="" data-preview-image="transport" width="680" height="440" loading="lazy" />
-                  <img src="./assets/japan-preview-cities.webp" alt="" data-preview-image="cities" width="680" height="440" loading="lazy" />
-                  <img src="./assets/japan-preview-terrain.webp" alt="" data-preview-image="terrain" width="680" height="440" loading="lazy" />
-                  <img src="./assets/japan-preview-night.webp" alt="" data-preview-image="night" width="680" height="440" loading="lazy" />
+                  <img src="./assets/japan-preview-transport.svg" alt="" data-preview-image="transport" width="680" height="440" loading="lazy" />
+                  <img src="./assets/japan-preview-cities.svg" alt="" data-preview-image="cities" width="680" height="440" loading="lazy" />
+                  <img src="./assets/japan-preview-terrain.svg" alt="" data-preview-image="terrain" width="680" height="440" loading="lazy" />
+                  <img src="./assets/japan-preview-night.svg" alt="" data-preview-image="night" width="680" height="440" loading="lazy" />
                 </div>
                 <div class="mini-map__controls" data-i18n-aria-label="previewZoomControlsLabel" aria-label="Japan preview zoom controls">
                   <button type="button" data-preview-zoom="-1" data-i18n-aria-label="previewZoomOut" aria-label="Zoom out">−</button>
@@ -525,7 +556,7 @@
             <article class="data-card" data-reveal>
               <span class="data-card__tag" data-i18n="dataCardOneTag">TNO 1962 output</span>
               <h3 data-i18n="dataCardOneTitle">Atlantropa Mediterranean</h3>
-              <p data-i18n="dataCardOneBody">724 rendered Atlantropa features and 47 dissolved country owners · Mediterranean bbox · scenario output · metadata schema 1 · sample manifest updated 2026-06-30.</p>
+              <p data-i18n="dataCardOneBody">724 rendered Atlantropa features and 30 dissolved country owners · Mediterranean bbox · scenario output · metadata schema 1 · sample manifest updated 2026-06-30.</p>
               <div class="sample-run-card__actions">
                 <a href="./assets/work-alt-history-med.json" data-i18n="evidenceMetadataLink">View output metadata</a>
                 <a href="https://github.com/raederhans/scenario-forge/blob/f118a101d30373c507075da32267969b22197338/data/source_ledger.json" target="_blank" rel="noreferrer" data-i18n="evidenceSourceLedgerLink">Review source ledger</a>
@@ -614,7 +645,7 @@
             </details>
             <details>
               <summary data-i18n="faqFourQuestion">What can I export?</summary>
-              <p data-i18n="faqFourAnswer">The public workbench exports PNG or JPG presentation snapshots at 1x–4x scale and saves editable project JSON.</p>
+              <p data-i18n="faqFourAnswer">Export PNG or JPG at 1×–4×, within the image-size and memory limits. Map geometry is rendered for the output resolution. Save a JSON project to keep editing; the gallery also provides its generated maps as SVG.</p>
             </details>
             <details>
               <summary data-i18n="faqFiveQuestion">How mature are the transport layers?</summary>
