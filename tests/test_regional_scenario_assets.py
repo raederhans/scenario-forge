@@ -13,6 +13,7 @@ from topojson import Topology
 
 from tools.regional_scenario_assets import build_regional_scenario_assets
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
+from tools.build_tno_russia_precision_assets import sizes
 
 
 def _runtime(features, *, extra=None):
@@ -24,6 +25,29 @@ def _f(fid, x):
 
 
 class RegionalScenarioAssetsTest(unittest.TestCase):
+    def test_size_report_compresses_shared_files_once_and_remeasures_changes(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / 'chunks').mkdir()
+            chunks = [{'url': 'chunks/land.json', 'layer': 'political'},
+                      {'url': 'chunks/water.json', 'layer': 'water'}]
+            (root / 'detail_chunks.manifest.json').write_text(json.dumps({'chunks': chunks}))
+            paths = [root / entry['url'] for entry in chunks]
+            paths += [root / f'startup.bundle.{lang}.json' for lang in ('en', 'zh')]
+            for path in paths:
+                path.write_bytes(b'{"label":"test"}')
+            expected = len(gzip.compress(paths[0].read_bytes(), compresslevel=6, mtime=0))
+            with patch('tools.build_tno_russia_precision_assets.gzip.compress', wraps=gzip.compress) as compress:
+                report = sizes(root)
+            self.assertEqual(compress.call_count, 4)
+            self.assertEqual(report['chunks_gzip6_bytes'], expected * 2)
+            self.assertEqual(report['political_chunks_gzip6_bytes'], expected)
+            self.assertEqual(report['largest_political_chunks'][0]['gzip6_bytes'], expected)
+            self.assertEqual(report['startup_gzip6_bytes'], {'en': expected, 'zh': expected})
+            paths[0].write_bytes(b'{"changed":true,"data":[1,2,3,4,5]}')
+            changed = len(gzip.compress(paths[0].read_bytes(), compresslevel=6, mtime=0))
+            self.assertEqual(sizes(root)['political_chunks_gzip6_bytes'], changed)
+
     def _fixture(self, root: Path, *, changed=True, nonpolitical=False):
         baseline = root / "baseline"
         (baseline / "chunks").mkdir(parents=True)

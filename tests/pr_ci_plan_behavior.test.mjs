@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import fs from "node:fs";
 
-import { planPullRequest } from "../tools/ci/pr_plan.mjs";
+import { planPullRequest, SCENARIO_CONTRACT_IDS } from "../tools/ci/pr_plan.mjs";
 
 test("docs-only changes keep heavyweight PR lanes off", () => {
   const plan = planPullRequest({ changedFiles: ["docs/active/example/plan.md"] });
@@ -36,7 +37,25 @@ test("one scenario change selects only its strict contract job", () => {
 
 test("shared scenario tooling fans out to all supported scenario contracts", () => {
   const plan = planPullRequest({ changedFiles: ["map_builder/contracts.py"] });
-  assert.deepEqual(plan.scenarioIds, ["hoi4_1936", "hoi4_1939", "tno_1962"]);
+  assert.deepEqual(plan.scenarioIds, [...SCENARIO_CONTRACT_IDS]);
+});
+
+test("every registered scenario migration selects its own strict contract", () => {
+  const index = JSON.parse(fs.readFileSync(new URL("../data/scenarios/index.json", import.meta.url), "utf8"));
+  assert.deepEqual(index.scenarios.map((row) => row.scenario_id).sort(), [...SCENARIO_CONTRACT_IDS]);
+  for (const id of SCENARIO_CONTRACT_IDS) {
+    const plan = planPullRequest({ changedFiles: [`data/scenarios/${id}/runtime_topology.topo.json`] });
+    assert.deepEqual(plan.scenarioIds, [id]);
+    assert.equal(plan.runPages, true);
+  }
+});
+
+test("shared county and chunk builders select all scenario contracts", () => {
+  for (const file of ["data/scenarios/index.json", "tools/scenario_chunk_assets.py",
+    "tools/regional_scenario_assets.py", "tools/stage_us_county_scenario.py",
+    "tools/stage_us_county_adapted_bundle.py"]) {
+    assert.deepEqual(planPullRequest({ changedFiles: [file] }).scenarioIds, [...SCENARIO_CONTRACT_IDS]);
+  }
 });
 
 test("transport changes select transport without forcing browser work", () => {

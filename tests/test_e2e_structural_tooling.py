@@ -2579,6 +2579,7 @@ if (lines[0].specPath !== 'tests/e2e/ui_contract_foundation.spec.js') {
 
 
 class ScenarioContractMatrixRoutingTests(unittest.TestCase):
+    SCENARIOS = ["blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"]
     def plan(self, paths, labels=None):
         changed_files = TMP_BASE / "scenario-plan-changed-files.txt"
         plan_json = TMP_BASE / "scenario-plan.json"
@@ -2598,7 +2599,7 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
         return json.loads(plan_json.read_text(encoding="utf-8"))
 
     def test_scenario_changes_run_only_their_owner(self):
-        for changed in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+        for changed in self.SCENARIOS:
             with self.subTest(changed=changed):
                 plan = self.plan([f"data/scenarios/{changed}/manifest.json"])
                 self.assertEqual(plan["scenarioIds"], [changed])
@@ -2608,7 +2609,7 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
                      "tools/check_scenario_contracts.py", ".github/workflows/scenario-contract-matrix.yml"):
             with self.subTest(path=path):
                 plan = self.plan([path])
-                self.assertEqual(plan["scenarioIds"], ["hoi4_1936", "hoi4_1939", "tno_1962"])
+                self.assertEqual(plan["scenarioIds"], self.SCENARIOS)
 
     def test_unrelated_changes_allocate_no_heavy_scenario_work(self):
         for paths in ([], ["README.md"], ["js/ui/menu.js"]):
@@ -2624,12 +2625,12 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
 
     def test_full_label_expands_scenario_contracts(self):
         plan = self.plan(["README.md"], labels=["ci:full"])
-        self.assertEqual(plan["scenarioIds"], ["hoi4_1936", "hoi4_1939", "tno_1962"])
+        self.assertEqual(plan["scenarioIds"], self.SCENARIOS)
 
     def test_required_matrix_names_and_pr_cancellation_remain_stable(self):
         workflow = (REPO_ROOT / ".github/workflows/scenario-contract-matrix.yml").read_text(encoding="utf-8")
         self.assertIn("  strict-scenario-contract-review:", workflow)
-        for scenario in ("tno_1962", "hoi4_1936", "hoi4_1939"):
+        for scenario in self.SCENARIOS:
             self.assertIn(f"          - {scenario}\n", workflow)
         self.assertIn("Fast success for scenario-unrelated changes", workflow)
         self.assertIn("group: scenario-contract-${{ github.event_name }}-${{ github.ref }}", workflow)

@@ -2,11 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createPrecisionScalingRecords } from "../tools/verification/catalog/records/precision_scaling.mjs";
+import { reconcileVerificationRouteAuthority } from "../tools/test_route_registry.mjs";
 
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 24);
+  assert.equal(routes.length, 25);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -36,6 +37,7 @@ test("precision expansion tools route to executable source-specific regressions"
   for (const [source, testFile] of [
     ["tools/adapt_us_county_scenarios.py", "tests/test_us_county_adaptation.py"],
     ["tools/prepare_us_county_adaptation_sidecars.py", "tests/test_us_county_adaptation_sidecars.py"],
+    ["tools/stage_us_county_adapted_bundle.py", "tests/test_us_county_adapted_bundle.py"],
     ["tools/scenario_topology_decode.py", "tests/test_scenario_topology_decode.py"],
     ["js/core/project_feature_migration.js", "tests/project_feature_migration_behavior.test.mjs"],
     ["js/core/scenario_hierarchy.js", "tests/scenario_hierarchy_behavior.test.mjs"],
@@ -46,4 +48,8 @@ test("precision expansion tools route to executable source-specific regressions"
     assert.deepEqual(route.executionOwners, ["child-safe"]);
     assert.deepEqual(route.profiles, ["pr-fast"]);
   }
+});
+
+test("precision additions preserve repository-wide command ownership and resource policy", () => {
+  assert.doesNotThrow(() => reconcileVerificationRouteAuthority());
 });

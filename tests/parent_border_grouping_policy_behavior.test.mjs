@@ -50,6 +50,22 @@ test("general grouping requires coverage, multiple renderable groups and bounded
   }
 });
 
+test("scenario hierarchy switch and clear update parent grouping without changing the base", () => {
+  const entries = Array.from({ length: 8 }, (_, i) => entry(String(i)));
+  const baseGroups = { FR_Base_A: ["0", "1", "2", "3"], FR_Base_B: ["4", "5", "6", "7"] };
+  const overrideGroups = { FR_Override_A: ["0", "2", "4", "6"], FR_Override_B: ["1", "3", "5", "7"] };
+  const { state, policy } = createHarness({
+    hierarchyData: { groups: baseGroups, labels: {} },
+    activeScenarioManifest: { hierarchy_overrides: {
+      country_codes: ["FR"], groups: overrideGroups, labels: {},
+    } },
+  });
+  assert.equal(policy.resolveCountryParentGroupingCandidate("FR", entries).featureToGroup.get("0"), "FR_Override_A");
+  state.activeScenarioManifest = null;
+  assert.equal(policy.resolveCountryParentGroupingCandidate("FR", entries).featureToGroup.get("0"), "FR_Base_A");
+  assert.deepEqual(state.hierarchyData.groups, baseGroups);
+});
+
 test("district definitions take precedence, including empty districts, and TNO does not fall back", () => {
   const entries = ["1", "2", "3", "4"].map(id => entry(id));
   const { state, policy } = createHarness({ activeScenarioId: "tno_1962", hierarchyData: { groups: { FR_A: ["1", "2"], FR_B: ["3", "4"] } } });

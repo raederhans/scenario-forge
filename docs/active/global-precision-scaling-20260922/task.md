@@ -2,6 +2,18 @@
 
 ## Current status
 
+2026-09-23 continuation supersedes the completion implications of older candidate reports:
+see [fresh evidence and remaining gates](continuation-20260923.md). Modern US rebuilt
+against this checkout and passes strict/LOD checks. HGO, blank, TNO and both HOI4
+scenarios now have full historical bundles with strict passes. Combined TNO includes 279 CN/JP/AL/MK
+targets and passes strict plus 38 mixed-LOD checks. The first 12-country Europe
+candidate was rejected for surface drift. Fresh JP
+preparation admits 5 targets, not the old 47; 42 remain unchanged under the newer
+no-nearest-allocation rule. CN retains 254 upgrade targets. Canonical data remains
+unchanged and performance acceptance is still open: combined TNO coarse JSON is
+123.1 MB versus canonical 63.9 MB. Draft PR #146 tracks implementation and CI;
+local candidate validation is separate from canonical CI and production release.
+
 最新完整现代世界候选已推进到 national-v4：41处实质外国边界重叠已按保留邻国显示域处理，3,144县、20分片LOD与严格剧本契约通过；481个稳定旧县ID的项目迁移已接入，9个歧义/非法旧ID显式拒绝。非US10,804地块与印度718保持。六剧本历史域分区候选已运行，支持的侧车适配6/6通过，候选新归属已独立核对；这些历史候选尚不是完整可发布bundle。详细数据见 major-countries-results.md 和 context.md，下面旧阶段记录保留作过程证据。
 
 ## Continuation checklist

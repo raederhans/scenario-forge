@@ -2918,7 +2918,25 @@ def validate_strict_bundle_contract(
     except (TypeError, ValueError):
         errors.append(f"manifest.summary.feature_count must be an integer in strict mode. Found {manifest_feature_count!r}.")
         expected_feature_count = None
-    if expected_feature_count is not None and expected_feature_count != len(owner_ids):
+    ownerless = (target_dir.name == "blank_base" and manifest.get("scenario_id") == "blank_base"
+                 and manifest.get("map_mode") == "blank"
+                 and manifest.get("scenario_contract_profile") == "lightweight_base")
+    if ownerless:
+        controller_path = target_dir / "controllers.by_feature.json"
+        controllers_payload = _load_required_local_json(controller_path, errors) if controller_path.exists() else {}
+        controllers = (controllers_payload.get("controllers", controllers_payload)
+                       if isinstance(controllers_payload, dict) else controllers_payload)
+        if owners or cores or controllers:
+            errors.append("Ownerless blank_base must have empty owners, cores and controllers.")
+        forbidden = {"cntr_code", "country_code", "owner", "controller", "core", "cores",
+                     "scenario_owner", "scenario_controller", "color", "color_hex",
+                     "admin1_group", "legacy_name", "anchor_county_name"}
+        polluted_ids = [str((row.get("properties") or {}).get("id", ""))
+                        for row in runtime_payload.get("objects", {}).get("political", {}).get("geometries", [])
+                        if forbidden.intersection(row.get("properties") or {})]
+        if polluted_ids:
+            errors.append(f"Ownerless blank_base geometry must not contain assignment or grouping properties. Sample: {polluted_ids[:10]}.")
+    if not ownerless and expected_feature_count is not None and expected_feature_count != len(owner_ids):
         errors.append(
             "manifest.summary.feature_count must equal owners feature count in strict mode. "
             f"manifest={expected_feature_count} owners={len(owner_ids)}."
@@ -2951,6 +2969,12 @@ def validate_strict_bundle_contract(
             errors,
         )
     runtime_feature_ids = runtime_political_feature_ids | runtime_atlantropa_feature_ids
+    if ownerless and (not runtime_feature_ids or expected_feature_count != len(runtime_feature_ids)):
+        errors.append("Ownerless blank_base summary.feature_count must equal its nonempty runtime feature count.")
+    if ownerless:
+        rows = runtime_payload.get("objects", {}).get("political", {}).get("geometries", [])
+        if len(rows) != len(runtime_political_feature_ids):
+            errors.append("Ownerless blank_base political geometry IDs must be nonempty and unique.")
     runtime_topology_path = target_dir / "runtime_topology.topo.json"
     bootstrap_topology_path = None
     source_bootstrap_topology_path = None
@@ -3022,7 +3046,9 @@ def validate_strict_bundle_contract(
             "runtime_topology is missing feature ids referenced by owners/cores in strict mode. "
             f"Sample: {missing_runtime_ids[:10]}."
         )
-    extra_runtime_ids = runtime_feature_ids - owner_ids
+    # Blank Map intentionally has geometry without assignments. Its own strict
+    # contract above rejects assignment pollution rather than requiring owners.
+    extra_runtime_ids = set() if ownerless else runtime_feature_ids - owner_ids
     illegal_runtime_only_ids = sorted(
         feature_id
         for feature_id in extra_runtime_ids

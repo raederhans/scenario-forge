@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getEffectiveScenarioHierarchy } from "../js/core/scenario_hierarchy.js";
+import { getEffectiveScenarioHierarchy, getEffectiveScenarioHierarchyFromInputs } from "../js/core/scenario_hierarchy.js";
 import { createQuickFillHierarchyResolver } from "../js/core/quick_fill_hierarchy.js";
 import { createParentBorderGroupingPolicy } from "../js/core/renderer/parent_border_grouping_policy.js";
 import { getQuickFillLevelModel } from "../js/ui/toolbar/quick_fill_level_controls.js";
@@ -51,6 +51,7 @@ test("51-state snapshot replaces the entire US membership and preserves India an
   assert.equal(result.quick_fill, runtime.hierarchyData.quick_fill);
   assert.deepEqual(runtime, before);
   assert.equal(getEffectiveScenarioHierarchy(runtime), result);
+  assert.equal(getEffectiveScenarioHierarchyFromInputs(runtime.hierarchyData, overrides), result);
 });
 
 test("manifest switch, clear and rollback reuse only the matching snapshot", () => {
@@ -61,6 +62,7 @@ test("manifest switch, clear and rollback reuse only the matching snapshot", () 
   assert.notEqual(getEffectiveScenarioHierarchy(runtime), first);
   runtime.activeScenarioManifest = null;
   assert.equal(getEffectiveScenarioHierarchy(runtime), runtime.hierarchyData);
+  assert.equal(getEffectiveScenarioHierarchyFromInputs(runtime.hierarchyData, undefined), runtime.hierarchyData);
   runtime.activeScenarioManifest = {};
   assert.equal(getEffectiveScenarioHierarchy(runtime), runtime.hierarchyData);
   runtime.activeScenarioManifest = manifest;

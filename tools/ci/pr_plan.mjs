@@ -3,6 +3,9 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const normalize = (value) => String(value || "").replaceAll("\\", "/").trim();
+export const SCENARIO_CONTRACT_IDS = Object.freeze([
+  "blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962",
+]);
 
 export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
   const files = [...new Set(changedFiles.map(normalize).filter(Boolean))].sort();
@@ -31,16 +34,18 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
   ]);
 
   const scenarioIds = new Set();
-  for (const id of ["tno_1962", "hoi4_1936", "hoi4_1939"]) {
+  for (const id of SCENARIO_CONTRACT_IDS) {
     if (files.some((file) => file.startsWith(`data/scenarios/${id}/`))) scenarioIds.add(id);
   }
   const sharedScenarioRelevant = matches([
-    "data/CATALOG.json", "data/manifest.json", "data/source_ledger.json",
+    "data/CATALOG.json", "data/manifest.json", "data/source_ledger.json", "data/scenarios/index.json",
     "map_builder/**", "tools/check_scenario_contracts.py", "requirements-dev.lock.txt",
+    "tools/scenario_chunk_assets.py", "tools/regional_scenario_assets.py",
+    "tools/stage_us_county_scenario.py", "tools/stage_us_county_adapted_bundle.py",
     ".github/workflows/scenario-contract-matrix.yml",
   ]);
   if (sharedScenarioRelevant || full) {
-    for (const id of ["tno_1962", "hoi4_1936", "hoi4_1939"]) scenarioIds.add(id);
+    for (const id of SCENARIO_CONTRACT_IDS) scenarioIds.add(id);
   }
 
   const transportRelevant = matches([

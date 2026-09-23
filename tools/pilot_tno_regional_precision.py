@@ -20,6 +20,7 @@ from map_builder.geo.scenario_surface_constraints import constrain_candidate_sur
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry, replace_regional_geometry
+from tools.pilot_tno_russia_precision import constrained_partition, node_owner_interfaces
 
 
 def _metadata(item):
@@ -47,7 +48,8 @@ def _stored_edges(topology):
 
 
 def _assemble_candidate(baseline, replacements, source_countries, *, boundary_tolerance=0.0,
-                        retained_enclave_countries=(), target_feature_ids=None):
+                        retained_enclave_countries=(), target_feature_ids=None,
+                        frozen_domain_owners=None):
     countries = {str(code).strip().upper() for code in source_countries}
     if not countries or any(len(code) != 2 or not code.isascii() or not code.isalpha() for code in countries):
         raise ValueError("Source countries must be explicit ISO2 source codes.")
@@ -93,36 +95,70 @@ def _assemble_candidate(baseline, replacements, source_countries, *, boundary_to
                            for item in current.values()], crs="EPSG:4326")
     selected = old.copy()
     selected["geometry"] = [source_by_id[fid] for fid in old["id"].astype(str)]
-    enclave_codes = set(retained_enclave_countries)
-    if enclave_codes & countries:
-        raise ValueError("Reviewed enclaves must be non-target source countries")
-    anchors = [item for item in rows if item["properties"].get("cntr_code") in enclave_codes]
-    if {item["properties"].get("cntr_code") for item in anchors} != enclave_codes:
-        raise ValueError("Every reviewed enclave must exist in the baseline")
-    selected, alignment = align_regional_boundaries(
-        old, selected, retained_hole_anchors=[_decode_geometry(absolute, item) for item in anchors])
-    alignment["retained_enclave_countries"] = sorted(enclave_codes)
-    extent = box(*selected.total_bounds)
-    protected = []
-    for name in ("political", "scenario_water", "scenario_atlantropa"):
-        obj = absolute["objects"].get(name)
-        if obj is None:
-            raise ValueError(f"Published TNO protection object missing: {name}.")
-        for item in obj.get("geometries", [obj]):
-            if name == "political" and str(item.get("properties", {}).get("id")) in current:
-                continue
-            geometry = _decode_geometry(absolute, item)
-            if geometry is not None and geometry.intersects(extent):
-                protected.append(geometry)
-    land_obj = absolute["objects"].get("land_mask")
-    if land_obj is None:
-        raise ValueError("Published TNO land_mask is required.")
-    land = [_decode_geometry(absolute, item) for item in land_obj.get("geometries", [land_obj])]
-    if not land or any(g is None or not g.is_valid for g in land):
-        raise ValueError("Published land mask must contain valid geometry.")
-    protected.append(extent.difference(shapely.union_all(land)))
-    selected, constraints = constrain_candidate_surface_geometry(
-        old, selected, shapely.union_all(protected), boundary_tolerance=boundary_tolerance)
+    if frozen_domain_owners is not None:
+        if retained_enclave_countries or boundary_tolerance:
+            raise ValueError("Frozen owner domains cannot combine with enclave or boundary-tolerance options")
+        owners = {fid: frozen_domain_owners.get(fid) for fid in current}
+        if any(not owner for owner in owners.values()):
+            raise ValueError("Every frozen target requires an owner")
+        baseline_by_id = dict(zip(old["id"].astype(str), old.geometry))
+        domains = {}
+        for fid, owner in owners.items():
+            domains.setdefault(owner, []).append(fid)
+        frozen = {}
+        diagnostics = {}
+        for owner, ids in sorted(domains.items()):
+            pieces, diagnostic = constrained_partition(
+                {fid: baseline_by_id[fid] for fid in ids}, source_by_id,
+                {fid: fid for fid in ids})
+            if diagnostic.get("baseline_overlap_resolutions"):
+                raise ValueError(f"Frozen owner {owner} would resolve inherited overlap by nearest source")
+            frozen.update(pieces)
+            diagnostics[owner] = diagnostic
+        frozen = node_owner_interfaces(frozen)
+        selected["geometry"] = [frozen[fid] for fid in old["id"].astype(str)]
+        if not shapely.coverage_is_valid(selected.geometry.values):
+            raise ValueError("Frozen target coverage is invalid")
+        if shapely.union_all(old.geometry.values).symmetric_difference(
+                shapely.union_all(selected.geometry.values)).area > 1e-10:
+            raise ValueError("Frozen target surface changed")
+        alignment = {"method": "frozen_owner_domains", "owner_domains": diagnostics}
+        constraints = {"target_union_preserved": True}
+    else:
+        enclave_codes = set(retained_enclave_countries)
+        if enclave_codes & countries:
+            raise ValueError("Reviewed enclaves must be non-target source countries")
+        anchors = [item for item in rows if item["properties"].get("cntr_code") in enclave_codes]
+        if {item["properties"].get("cntr_code") for item in anchors} != enclave_codes:
+            raise ValueError("Every reviewed enclave must exist in the baseline")
+        selected, alignment = align_regional_boundaries(
+            old, selected, retained_hole_anchors=[_decode_geometry(absolute, item) for item in anchors])
+        alignment["retained_enclave_countries"] = sorted(enclave_codes)
+        extent = box(*selected.total_bounds)
+        protected = []
+        for name in ("political", "scenario_water", "scenario_atlantropa"):
+            obj = absolute["objects"].get(name)
+            if obj is None:
+                raise ValueError(f"Published TNO protection object missing: {name}.")
+            for item in obj.get("geometries", [obj]):
+                if name == "political" and str(item.get("properties", {}).get("id")) in current:
+                    continue
+                geometry = _decode_geometry(absolute, item)
+                if geometry is not None and geometry.intersects(extent):
+                    protected.append(geometry)
+        land_obj = absolute["objects"].get("land_mask")
+        if land_obj is None:
+            raise ValueError("Published TNO land_mask is required.")
+        land = [_decode_geometry(absolute, item) for item in land_obj.get("geometries", [land_obj])]
+        if not land or any(g is None or not g.is_valid for g in land):
+            raise ValueError("Published land mask must contain valid geometry.")
+        protected.append(extent.difference(shapely.union_all(land)))
+        selected, constraints = constrain_candidate_surface_geometry(
+            old, selected, shapely.union_all(protected), boundary_tolerance=boundary_tolerance)
+    target_surface_delta = shapely.union_all(old.geometry.values).symmetric_difference(
+        shapely.union_all(selected.geometry.values)).area
+    if target_surface_delta > 1e-10:
+        raise ValueError(f"Selected target surface changed: {target_surface_delta}")
     candidate, diagnostics = replace_regional_geometry(
         baseline, selected,
         source_countries=sorted(countries) if target_feature_ids is None else None,
@@ -182,7 +218,7 @@ def _assemble_candidate(baseline, replacements, source_countries, *, boundary_to
 
 
 def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Path, *, source_countries,
-                      boundary_tolerance=0.0, retained_enclave_countries=()):
+                      boundary_tolerance=0.0, retained_enclave_countries=(), freeze_owner_domains=False):
     scenario_dir, replacement_geojson, output = scenario_dir.resolve(), replacement_geojson.resolve(), output.resolve()
     baseline_path = scenario_dir / "runtime_topology.topo.json"
     report_path = output.with_suffix(".report.json")
@@ -208,7 +244,9 @@ def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Pat
     replacements = gpd.GeoDataFrame.from_features(collection["features"], crs="EPSG:4326")
     candidate, report = _assemble_candidate(read_json_strict(baseline_path), replacements, source_countries,
                                           boundary_tolerance=boundary_tolerance,
-                                          retained_enclave_countries=retained_enclave_countries)
+                                          retained_enclave_countries=retained_enclave_countries,
+                                          frozen_domain_owners=(read_json_strict(scenario_dir / "owners.by_feature.json")["owners"]
+                                                                if freeze_owner_domains else None))
     report.update({"source_file": str(replacement_geojson), "baseline_runtime": str(baseline_path), "output": str(output)})
     write_json_atomic(output, candidate, indent=None, separators=(",", ":"), allow_nan=False)
     write_json_atomic(report_path, report, indent=2, allow_nan=False)
@@ -224,11 +262,14 @@ def main(argv=None):
     parser.add_argument("--boundary-tolerance", type=float, default=0.0,
                         help="Explicit EPSG:4326 overlay residual band, at most 1e-9 degrees; never moves coordinates.")
     parser.add_argument("--retain-enclave-countries", nargs="*", default=[],
-                        help="Reviewed non-target enclaves whose surrounding baseline coverage must survive source holes.")
+        help="Reviewed non-target enclaves whose surrounding baseline coverage must survive source holes.")
+    parser.add_argument("--freeze-owner-domains", action="store_true",
+        help="Keep every selected owner footprint exact while updating internal source boundaries.")
     args = parser.parse_args(argv)
     report = prepare_candidate(args.scenario_dir, args.replacement_geojson, args.output,
                                source_countries=args.source_countries, boundary_tolerance=args.boundary_tolerance,
-                               retained_enclave_countries=args.retain_enclave_countries)
+                               retained_enclave_countries=args.retain_enclave_countries,
+                               freeze_owner_domains=args.freeze_owner_domains)
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 

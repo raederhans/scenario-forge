@@ -56,8 +56,8 @@ export function resolveMeasuredRepoRoot(argv = process.argv.slice(2), fallbackRo
 }
 
 const REPO_ROOT = resolveMeasuredRepoRoot();
-const SUPPORTED_SCENARIOS = ["blank_base", "tno_1962", "hoi4_1939"];
-const DEFAULT_GATE_SCENARIOS = ["tno_1962", "hoi4_1939"];
+export const SUPPORTED_SCENARIOS = Object.freeze(["blank_base", "tno_1962", "hoi4_1939", "modern_world"]);
+export const DEFAULT_GATE_SCENARIOS = Object.freeze(["tno_1962", "hoi4_1939"]);
 const NODE_PLATFORM_IDS = new Set(["aix", "android", "darwin", "freebsd", "linux", "openbsd", "sunos", "win32"]);
 const PERF_BASELINE_DATE = "2026-07-30";
 const DEFAULT_BASELINE_JSON = path.join(REPO_ROOT, "docs", "perf", `baseline_${PERF_BASELINE_DATE}.json`);
@@ -103,7 +103,7 @@ const GATE_METRICS = Object.freeze([
   { key: "refreshScenarioApplyMs", label: "refreshScenarioApplyMs" },
   { key: "renderSampleMedianMs", label: "renderSampleMedianMs", threshold: 1.25 },
 ]);
-const SCENARIO_MANIFEST_MAP = Object.fromEntries(
+export const SCENARIO_MANIFEST_MAP = Object.fromEntries(
   SUPPORTED_SCENARIOS.map((scenarioId) => [
     scenarioId,
     path.join(REPO_ROOT, "data", "scenarios", scenarioId, "manifest.json"),
@@ -676,7 +676,7 @@ function normalizeScenarioId(value) {
   return String(value || "").trim();
 }
 
-function getScenarioSampleRole(scenarioId) {
+export function getScenarioSampleRole(scenarioId) {
   return DEFAULT_GATE_SCENARIOS.includes(scenarioId) ? "gate" : "observation";
 }
 
@@ -827,7 +827,7 @@ function buildAggregateSampleSpread(runs) {
   return spread;
 }
 
-function buildScenarioWorkloadIdentity(manifestIdentity, options, baseUrl) {
+export function buildScenarioWorkloadIdentity(manifestIdentity, options, baseUrl) {
   const runProfile = resolveRenderSampleRunProfile(options.renderSampleRunProfileId);
   return {
     ...manifestIdentity,
@@ -839,7 +839,7 @@ function buildScenarioWorkloadIdentity(manifestIdentity, options, baseUrl) {
   };
 }
 
-function buildReportWorkloadIdentity(options, measurement) {
+export function buildReportWorkloadIdentity(options, measurement) {
   const runProfile = resolveRenderSampleRunProfile(options.renderSampleRunProfileId);
   const scenarios = {};
   for (const [scenarioId, scenario] of Object.entries(measurement.scenarios || {})) {
@@ -857,7 +857,7 @@ function buildReportWorkloadIdentity(options, measurement) {
   };
 }
 
-async function readScenarioManifestIdentity(scenarioId) {
+export async function readScenarioManifestIdentity(scenarioId) {
   const manifestPath = SCENARIO_MANIFEST_MAP[scenarioId];
   const relativeManifestPath = path.relative(REPO_ROOT, manifestPath).replaceAll("\\", "/");
   let manifest = {};
@@ -1384,7 +1384,7 @@ function formatCountRow(label, value) {
   return `- ${label}: ${finiteNumber(value).toFixed(0)}`;
 }
 
-function buildMarkdown(report) {
+export function buildMarkdown(report) {
   const configuredScenarios = Array.isArray(report?.config?.scenarios)
     ? report.config.scenarios.map((scenarioId) => String(scenarioId || "").trim()).filter(Boolean)
     : [];

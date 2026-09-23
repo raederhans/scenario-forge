@@ -33,6 +33,10 @@ function mergeHierarchy(base, override) {
 export function getEffectiveScenarioHierarchy(runtimeState) {
   const base = runtimeState?.hierarchyData;
   const override = runtimeState?.activeScenarioManifest?.hierarchy_overrides;
+  return getEffectiveScenarioHierarchyFromInputs(base, override);
+}
+
+export function getEffectiveScenarioHierarchyFromInputs(base, override) {
   if (!isRecord(base) || !isRecord(override)) return base;
   let byOverride = effectiveHierarchies.get(base);
   if (!byOverride) {

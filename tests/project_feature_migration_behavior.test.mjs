@@ -1,8 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+import { parse } from "acorn";
 import { planProjectFeatureMigration } from "../js/core/project_feature_migration.js";
 import { migrateFeatureScopedProjectDataToCurrentTopology } from "../js/core/sovereignty_manager.js";
-import { prepareImportedProjectState } from "../js/core/interaction_funnel/import_apply_orchestration.js";
+import { prepareImportedProjectState, commitImportedProjectPatch } from "../js/core/interaction_funnel/import_apply_orchestration.js";
+import { FileManager } from "../js/core/file_manager.js";
+import { captureProjectImportState } from "../js/core/state/actions/project_import_actions.js";
 import { state } from "../js/core/state.js";
 
 const manifest = {
@@ -35,6 +40,8 @@ test("approved split copies paint and ownership, equal merges coalesce without m
   assert.deepEqual(result.data.visualOverrides, { US_A: "red", US_B: "red", CA_A: "blue" });
   assert.deepEqual(result.data.sovereigntyByFeatureId, { US_A: "US", US_B: "US" });
   assert.deepEqual(result.data.featureOverrides, result.data.visualOverrides);
+  assert.equal(result.data.scenario.baselineHash, "new");
+  assert.equal(plan(result.data), null);
   assert.equal(result.summary.migratedEntries, 4);
   assert.deepEqual(data, before);
 });
@@ -162,8 +169,68 @@ test("existing import migration consumes manifest plan before valid-ID fast path
     onMigration: (value) => summaries.push(value),
   });
   assert.deepEqual(result.visualOverrides, { US_A: "red", US_B: "red" });
+  assert.equal(result.scenario.baselineHash, "new");
   assert.deepEqual(summaries, [{ migratedEntries: 2, ignoredEntries: 0 }]);
+  const secondPass = await migrateFeatureScopedProjectDataToCurrentTopology(result, {
+    scenarioManifest: manifest, validFeatureIds,
+    fetchImpl: () => { throw new Error("No legacy asset needed"); },
+  });
+  assert.deepEqual(secondPass.visualOverrides, result.visualOverrides);
+  assert.equal(secondPass.scenario.baselineHash, "new");
   await assert.rejects(migrateFeatureScopedProjectDataToCurrentTopology(project({ US_INVALID: "red" }), {
     scenarioManifest: manifest, validFeatureIds,
   }), reason("ambiguous_or_unresolved_entries"));
+});
+
+test("confirmed legacy import stages target baseline, applies it, and exports target-scoped IDs", async () => {
+  const data = project({ US_ZONE: "red", US_OTHER: "red", US_A: "red" }, {
+    sovereigntyByFeatureId: { US_ZONE: "US", US_OTHER: "US", US_A: "US" },
+  });
+  const beforeData = structuredClone(data);
+  const beforeState = captureProjectImportState(state);
+  const prompts = [];
+  const options = {
+    ui: { t: (text) => text, showAppDialog: async (dialog) => { prompts.push(dialog); return true; } },
+    debugState: {},
+    getScenarioResourcesModule: async () => ({ validateImportedScenarioBaseline: async () => ({
+      ok: false, reason: "baseline_mismatch", message: "Changed baseline", currentVersion: 2,
+      currentBaselineHash: "new",
+    }) }),
+    getScenarioManagerModule: async () => ({ prepareScenarioForProjectImport: async () => ({
+      bundle: { manifest }, staged: { scenarioId: "modern_world", countryMap: {},
+        resolvedOwners: Object.fromEntries([...validFeatureIds].map((id) => [id, "US"])) },
+    }) }),
+  };
+  const prepared = await prepareImportedProjectState({ ...options, data });
+  assert.equal(prompts.length, 1, "baseline mismatch still needs explicit confirmation");
+  assert.equal(prepared.scenarioImportAudit.savedBaselineHash, "old");
+  assert.equal(prepared.data.scenario.baselineHash, "new");
+  assert.deepEqual(data, beforeData);
+
+  const source = readFileSync(new URL("../js/core/interaction_funnel.js", import.meta.url), "utf8");
+  const fn = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .find((node) => node.type === "FunctionDeclaration" && node.id.name === "stageImportedProjectPatch");
+  const globals = Object.assign({},
+    await import("../js/core/state.js"), await import("../js/core/releasable_manager.js"),
+    await import("../js/core/special_zone_layers.js"), await import("../js/core/state/dev_state.js"),
+    await import("../js/core/state/strategic_overlay_state.js"),
+    { cloneImportedProjectValue: structuredClone, captureProjectImportState });
+  const context = vm.createContext(globals);
+  vm.runInContext(source.slice(fn.start, fn.end), context);
+  const patch = context.stageImportedProjectPatch(prepared.data, prepared);
+  // The scenario manager commits staged scenario identity before the project patch.
+  const target = { ...prepared.scenarioState };
+  commitImportedProjectPatch(target, patch);
+  const exported = FileManager.buildProjectPayload(target);
+  assert.equal(exported.scenario.baselineHash, "new");
+  assert.deepEqual(exported.visualOverrides, { US_A: "red", US_B: "red" });
+  assert.equal(exported.sovereigntyByFeatureId.US_A, "US");
+  assert.equal(exported.sovereigntyByFeatureId.US_B, "US");
+  assert.equal(Object.hasOwn(exported.sovereigntyByFeatureId, "US_ZONE"), false);
+  assert.deepEqual(captureProjectImportState(state), beforeState);
+
+  await assert.rejects(prepareImportedProjectState({ ...options,
+    data: project({ US_INVALID: "red" }),
+  }), reason("ambiguous_or_unresolved_entries"));
+  assert.deepEqual(captureProjectImportState(state), beforeState);
 });

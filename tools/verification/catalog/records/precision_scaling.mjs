@@ -88,6 +88,7 @@ export function createPrecisionScalingRecords(existingRecords) {
       ["us_county_lod", "tools/validate_us_county_lod.py", "tools/scenario_chunk_assets.py"],
       ["us_county_adaptation", "tools/adapt_us_county_scenarios.py", "tools/stage_us_county_scenario.py"],
       ["us_county_adaptation_sidecars", "tools/prepare_us_county_adaptation_sidecars.py"],
+      ["us_county_adapted_bundle", "tools/stage_us_county_adapted_bundle.py"],
     ].map(([name, ...sources]) => [name, "geo-contract",
       ["precision_shard_lod", "tno_east_europe_gaps"].includes(name)
         ? `python -m pytest tests/test_${name}.py -q`

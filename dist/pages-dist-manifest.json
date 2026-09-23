@@ -44327,7 +44327,7 @@
     },
     {
       "path": "app/js/core/project_feature_migration.js",
-      "size_bytes": 7613,
+      "size_bytes": 7702,
       "source_kind": "dist"
     },
     {
@@ -44577,7 +44577,7 @@
     },
     {
       "path": "app/js/core/renderer/parent_border_grouping_policy.js",
-      "size_bytes": 10153,
+      "size_bytes": 10264,
       "source_kind": "dist"
     },
     {
@@ -45137,7 +45137,7 @@
     },
     {
       "path": "app/js/core/scenario_hierarchy.js",
-      "size_bytes": 2281,
+      "size_bytes": 2424,
       "source_kind": "dist"
     },
     {
@@ -46512,7 +46512,7 @@
       {
         "file_count": 288,
         "id": "startup-critical",
-        "size_bytes": 27698699
+        "size_bytes": 27699042
       },
       {
         "file_count": 101,
@@ -64727,11 +64727,11 @@
         "deferred_graph_file_count": 131,
         "deferred_module_count": 129,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5403872,
+        "initial_graph_bytes": 5404215,
         "initial_graph_file_count": 319,
         "initial_module_count": 306,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4312569,
+        "initial_script_bytes": 4312912,
         "initial_script_count": 308,
         "module_count": 442,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65048,7 +65048,7 @@
           },
           {
             "path": "app/js/core/project_feature_migration.js",
-            "size_bytes": 7613
+            "size_bytes": 7702
           },
           {
             "path": "app/js/core/quick_fill_hierarchy.js",
@@ -65240,7 +65240,7 @@
           },
           {
             "path": "app/js/core/renderer/parent_border_grouping_policy.js",
-            "size_bytes": 10153
+            "size_bytes": 10264
           },
           {
             "path": "app/js/core/renderer/physical_contour_lod_policy.js",
@@ -65556,7 +65556,7 @@
           },
           {
             "path": "app/js/core/scenario_hierarchy.js",
-            "size_bytes": 2281
+            "size_bytes": 2424
           },
           {
             "path": "app/js/core/sovereignty_manager.js",
@@ -65792,7 +65792,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3246790
+        "size_bytes": 3247133
       },
       {
         "basis": "startup-resource-graph",
@@ -67567,7 +67567,7 @@
     {
       "file_count": 9215,
       "path": "app",
-      "size_bytes": 568546061
+      "size_bytes": 568546404
     },
     {
       "file_count": 59,
@@ -67600,5 +67600,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 597900332
+  "total_bytes": 597900675
 }

@@ -1,5 +1,11 @@
 # Plan
 
+## 2026-09-23 continuation
+
+The user requests implementation with CI and subagents toward a 2026 release: complete remaining continental European countries and CN/JP/US migration, preserve India's accepted district source/granularity, and assess CA/MX only when inexpensive. The earlier exploration-only/no-PR scope below records the original phase; this continuation includes branch commits, a reviewable PR and CI. Production publication remains a separate final action after concrete data, compatibility and performance evidence is available.
+
+Execution order: (1) inventory canonical versus staged country coverage and current CI failures; (2) complete fail-closed historical county bundle assembly and the missing scenario CI lanes; (3) build feasible candidates and check strict contracts, domain preservation, ID migration and resource cost; (4) validate actual staged browser behavior and performance; (5) submit the verified increment to CI, record country-specific unresolved source/domain decisions. Do not replace uncertain historical ownership, mask inherited geometry failures, enlarge repaint/cache limits, or label local candidates as released data.
+
 ## Goal
 
 在不破坏 TNO 1962 现有 ID、归属、编辑、撤销、存档与导出契约的前提下，推进三条有关但可独立验收的工作线：修复东欧内部可证明的数据缝隙；为中国、日本、印度、美国建立并落地可复用的精度提升路径；完成性能方案的低风险和中风险阶段，并对高风险阶段给出证据化 go/no-go 建议。

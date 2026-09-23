@@ -424,6 +424,50 @@ class ScenarioContractTest(unittest.TestCase):
             self.assertEqual(entry.get("feature_count"), 0, tag)
             self.assertEqual(entry.get("controller_feature_count"), 0, tag)
 
+    def test_blank_base_strict_contract_accepts_ownerless_geometry_and_rejects_pollution(self) -> None:
+        cases = ("valid", "owners", "controllers", "direct_controllers", "cores", "property", "duplicate", "count", "mode")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as tmp_dir:
+                root = Path(tmp_dir)
+                scenario_dir = _create_scenario_dir(root, "blank_base")
+                manifest_path = scenario_dir / "manifest.json"
+                manifest = json.loads(manifest_path.read_text())
+                manifest.update(map_mode="blank" if case != "mode" else "political",
+                                scenario_contract_profile="lightweight_base")
+                _write_json(manifest_path, manifest)
+                with mock.patch.object(check_scenario_contracts, "PROJECT_ROOT", root):
+                    _write_strict_bundle_files(
+                        scenario_dir, owners={"F-1": "AAA"} if case == "owners" else {},
+                        cores={"F-1": ["AAA"]} if case == "cores" else {},
+                        controllers={"F-1": "AAA"} if case == "controllers" else {},
+                        runtime_feature_ids=["F-1", "RU_ARCTIC_FB_001"],
+                        manifest_feature_count=1 if case == "count" else 2)
+                    if case == "direct_controllers":
+                        _write_json(scenario_dir / "controllers.by_feature.json", {"F-1": "AAA"})
+                    if case in {"property", "duplicate"}:
+                        runtime_path = scenario_dir / "runtime_topology.topo.json"
+                        topology = json.loads(runtime_path.read_text())
+                        rows = topology["objects"]["political"]["geometries"]
+                        if case == "duplicate":
+                            rows.append(dict(rows[0]))
+                        else:
+                            rows[0]["properties"]["cntr_code"] = "AAA"
+                        _write_json(runtime_path, topology)
+                    errors = []
+                    check_scenario_contracts.validate_strict_bundle_contract(scenario_dir, errors)
+                if case == "valid":
+                    self.assertEqual(errors, [])
+                elif case in {"owners", "cores", "controllers", "direct_controllers"}:
+                    self.assertTrue(any("empty owners, cores and controllers" in error for error in errors), errors)
+                elif case == "property":
+                    self.assertTrue(any("assignment or grouping properties" in error for error in errors), errors)
+                elif case == "count":
+                    self.assertTrue(any("nonempty runtime feature count" in error for error in errors), errors)
+                elif case == "duplicate":
+                    self.assertTrue(any("nonempty and unique" in error for error in errors), errors)
+                else:
+                    self.assertTrue(any("may only exceed" in error for error in errors), errors)
+
     def test_validate_scenario_contract_rejects_manifest_scenario_id_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_root = Path(tmp_dir)

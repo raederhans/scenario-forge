@@ -517,7 +517,7 @@ class PerfGateContractTest(unittest.TestCase):
         self.assertIn("net::ERR_NETWORK_CHANGED", script)
         self.assertIn("net::ERR_CONNECTION_FAILED", script)
         self.assertIn("getTransientNetworkFailure: diagnostics.getTransientNetworkFailure", script)
-        self.assertIn('const DEFAULT_GATE_SCENARIOS = ["tno_1962", "hoi4_1939"];', script)
+        self.assertIn('export const DEFAULT_GATE_SCENARIOS = Object.freeze(["tno_1962", "hoi4_1939"]);', script)
         self.assertIn("const MIN_GATE_WARMUPS = 3;", script)
         self.assertIn("const DEFAULT_WARMUPS = MIN_GATE_WARMUPS;", script)
         self.assertIn('throw new Error(`[perf-baseline] Gate warmups must be at least ${MIN_GATE_WARMUPS}; received ${options.warmups}.`);', script)

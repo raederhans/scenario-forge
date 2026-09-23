@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
-            echo 'scenario_ids=["hoi4_1936","hoi4_1939","tno_1962"]' >> "$GITHUB_OUTPUT"
+            echo 'scenario_ids=["blank_base","hgo_1936","hoi4_1936","hoi4_1939","modern_world","tno_1962"]' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           mkdir -p .runtime/tmp .runtime/reports/generated
@@ -60,6 +60,9 @@ jobs:
       fail-fast: false
       matrix:
         scenario_id:
+          - blank_base
+          - hgo_1936
+          - modern_world
           - tno_1962
           - hoi4_1936
           - hoi4_1939

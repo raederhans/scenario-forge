@@ -145,7 +145,9 @@ export function planProjectFeatureMigration(data, { manifest, validFeatureIds } 
   const visualOverrides = remap(data.visualOverrides || data.featureOverrides, "visualOverrides");
   if (issues.length) fail("ambiguous_or_unresolved_entries", { issues });
   return {
-    data: { ...data, ...auxiliary, sovereigntyByFeatureId, visualOverrides, featureOverrides: { ...visualOverrides } },
+    data: { ...data, ...auxiliary,
+      scenario: { ...data.scenario, baselineHash: contract.target_baseline_hash },
+      sovereigntyByFeatureId, visualOverrides, featureOverrides: { ...visualOverrides } },
     summary: { migratedEntries },
   };
 }

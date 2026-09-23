@@ -9,7 +9,7 @@ from typing import Any
 
 from map_builder.contracts import normalize_scenario_contract_tag, sha256_path
 from map_builder.io.writers import write_json_atomic
-from shapely import coverage_is_valid, coverage_simplify, make_valid, orient_polygons
+from shapely import STRtree, coverage_invalid_edges, coverage_is_valid, coverage_simplify, make_valid, orient_polygons
 from shapely.errors import GEOSException
 from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
@@ -770,7 +770,8 @@ def _shared_fr_arr_simplified_geometries(
     return _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_id)
 
 
-def _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_id):
+def _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_id, *, allow_partial=False,
+                                         protected_features=()):
     """Keep owner boundaries exact so independently loaded LODs still meet."""
     if not owner_buckets_by_feature_id:
         return {}, False
@@ -791,29 +792,77 @@ def _shared_coverage_simplified_geometries(candidates, owner_buckets_by_feature_
         all_geometries = [shape(feature["geometry"]) for _, feature in candidates]
         if any(geometry.is_empty or not geometry.is_valid for geometry in all_geometries):
             return {}, False
+        blocked_indexes = set()
         if not bool(coverage_is_valid(all_geometries)):
-            return {}, False
+            if not allow_partial:
+                return {}, False
+            # Inspect the whole coverage before grouping: an overlap or missing
+            # node can cross a load-shard boundary. Retain every participant.
+            invalid_positions = [position for position, edge in enumerate(
+                coverage_invalid_edges(all_geometries)) if not edge.is_empty]
+            blocked_positions = set(invalid_positions)
+            tree = STRtree(all_geometries)
+            for position in invalid_positions:
+                geometry = all_geometries[position]
+                # GEOS can mark only the inner polygon of a containment overlap.
+                # Preserve its containing neighbour too; union equality alone
+                # cannot detect changed overlap multiplicity inside that union.
+                blocked_positions.update(int(other) for other in tree.query(geometry, predicate="intersects")
+                    if not geometry.relate_pattern(all_geometries[int(other)], "F********"))
+            # Partial fallback must also retain overlaps with features outside
+            # the precision declaration (including retained historical IDs).
+            # Otherwise a valid precision subset could move through foreign land
+            # that was never part of its coverage check.
+            protected = [shape(feature["geometry"]) for feature in protected_features
+                         if isinstance(feature.get("geometry"), dict)]
+            if protected:
+                foreign_tree = STRtree(protected)
+                for position, geometry in enumerate(all_geometries):
+                    if position in blocked_positions:
+                        continue
+                    if any(not geometry.relate_pattern(protected[int(other)], "F********")
+                           for other in foreign_tree.query(geometry, predicate="intersects")):
+                        blocked_positions.add(position)
+            blocked_indexes = {candidates[position][0] for position in blocked_positions}
         simplified_by_index: dict[int, dict[str, Any]] = {}
         for group in candidate_groups.values():
             geometries = [shape(feature["geometry"]) for _, feature in group]
+            eligible = [(position, index) for position, (index, _) in enumerate(group)
+                        if index not in blocked_indexes]
+            originals = [geometries[position] for position, _ in eligible]
+            if not originals or not bool(coverage_is_valid(originals)):
+                if allow_partial:
+                    continue
+                return {}, False
             simplified = coverage_simplify(
-                geometries,
+                originals,
                 POLITICAL_COARSE_SIMPLIFY_TOLERANCE,
                 simplify_boundary=False,
             )
-            if len(simplified) != len(group):
+            if len(simplified) != len(eligible):
                 return {}, False
-            if not bool(coverage_is_valid(simplified)) or not unary_union(simplified).equals(unary_union(geometries)):
+            if not bool(coverage_is_valid(simplified)) or not unary_union(simplified).equals(unary_union(originals)):
+                if allow_partial:
+                    continue
                 return {}, False
-            for (index, _), geometry in zip(group, simplified):
+            combined = list(geometries)
+            for (position, _), geometry in zip(eligible, simplified):
+                combined[position] = geometry
+            # GEOS union may expose numeric differences only after reinserting
+            # retained neighbours. Reject this shard rather than tolerating drift.
+            if not unary_union(combined).equals(unary_union(geometries)):
+                if allow_partial:
+                    continue
+                return {}, False
+            for (_, index), geometry in zip(eligible, simplified):
                 if geometry.is_empty or not geometry.is_valid:
                     return {}, False
                 # GEOS coverage_simplify may reverse rings. D3 polygon fills
                 # require clockwise exteriors even when planar coverage is valid.
                 simplified_by_index[index] = mapping(orient_polygons(geometry, exterior_cw=True))
-        if len(simplified_by_index) != len(candidates):
+        if not allow_partial and len(simplified_by_index) != len(candidates):
             return {}, False
-        return simplified_by_index, True
+        return simplified_by_index, bool(simplified_by_index)
     except (GEOSException, AttributeError, TypeError, ValueError, RuntimeError):
         return {}, False
 
@@ -863,12 +912,16 @@ def _optimize_political_coarse_payload(
             or _feature_id(feature, index) in (political_precision_feature_ids or set())
         )
     ]
-    regional_geometries, regional_applied = _shared_coverage_simplified_geometries(
-        regional_candidates, owner_buckets_by_feature_id,
-    )
     regional_indexes = {index for index, _ in regional_candidates}
+    regional_geometries, regional_applied = _shared_coverage_simplified_geometries(
+        regional_candidates, owner_buckets_by_feature_id, allow_partial=True,
+        protected_features=[feature for index, feature in enumerate(source_features)
+                            if isinstance(feature, dict) and index not in regional_indexes],
+    )
     if diagnostics is not None:
         diagnostics["regional_shared_coverage_applied"] = regional_applied
+        diagnostics["regional_shared_coverage_eligible_count"] = len(regional_geometries)
+        diagnostics["regional_shared_coverage_retained_count"] = len(regional_candidates) - len(regional_geometries)
     optimized_features: list[dict[str, Any]] = []
     for index, feature in enumerate(source_features):
         if not isinstance(feature, dict):
@@ -1158,6 +1211,8 @@ def _build_chunk_payloads_for_feature_collection(
                         if political_precision_feature_ids:
                             lod_diagnostics["political_precision_feature_ids"] = sorted(political_precision_feature_ids)
                         lod_diagnostics["regional_shared_coverage_applied"] = optimization_diagnostics["regional_shared_coverage_applied"]
+                        for key in ("regional_shared_coverage_eligible_count", "regional_shared_coverage_retained_count"):
+                            lod_diagnostics[key] = optimization_diagnostics[key]
                     _write_minified_json(chunk_path, chunk_payload)
                 elif layer_key == "water":
                     _write_minified_json(chunk_path, chunk_payload)
@@ -1418,7 +1473,9 @@ def _build_political_chunk_payloads(
                 chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
                 _write_json(chunk_path, chunk_payload)
                 chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
-                feature_bounds_summary = _build_feature_bounds_summary(payload_features or [], include_zero_area=True)
+                # Detail bounds are a non-empty spatial summary, not a positional
+                # index. Retain degenerate features in the payload itself.
+                feature_bounds_summary = _build_feature_bounds_summary(payload_features or [])
                 all_chunks.append({
                     "id": chunk_id,
                     "layer": "political",
