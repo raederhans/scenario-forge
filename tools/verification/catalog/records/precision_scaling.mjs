@@ -84,7 +84,7 @@ export function createPrecisionScalingRecords(existingRecords) {
       ["tno_major_country_precision", "tools/prepare_tno_major_country_precision.py"],
       ["us_county_source", "tools/prepare_us_county_source.py"],
       ["us_county_seams", "tools/prepare_us_county_seams.py"],
-      ["us_county_scenario", "tools/stage_us_county_scenario.py"],
+      ["us_county_scenario", "tools/stage_us_county_scenario.py", "tools/us_county_legacy_lineage.json"],
       ["us_county_lod", "tools/validate_us_county_lod.py", "tools/scenario_chunk_assets.py"],
       ["us_county_adaptation", "tools/adapt_us_county_scenarios.py", "tools/stage_us_county_scenario.py"],
       ["us_county_adaptation_sidecars", "tools/prepare_us_county_adaptation_sidecars.py"],

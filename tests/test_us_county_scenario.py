@@ -8,11 +8,82 @@ from copy import deepcopy
 from shapely.geometry import box, mapping, Polygon
 
 from map_builder.regional_geometry import _encode_exact_coverage, _decode_geometry
-from tools.stage_us_county_scenario import replace_counties, startup_county_lod, validate_source_report, stage, ROOT, county_hierarchy_override, project_migration_contract
+from tools.stage_us_county_scenario import replace_counties, startup_county_lod, validate_source_report, stage, ROOT, county_hierarchy_override, project_migration_contract, reviewed_legacy_lineage, LEGACY_LINEAGE_PATH
 from tools.prepare_tno_russia_precision import digest
 
 
 class CountyScenarioTests(unittest.TestCase):
+    def _reviewed_fixture(self):
+        payload = json.loads(LEGACY_LINEAGE_PATH.read_text(encoding="utf-8"))
+        old_ids = {entry["source_id"] for entry in payload["lineage"]} | {"US_CNTY_09120", "US_CNTY_26001"}
+        owners = {target: "US" for entry in payload["lineage"] for target in entry["target_ids"]}
+        owners.update({"US_CNTY_09120": "US", "US_CNTY_26001": "US"})
+        binding = payload["binding"]
+        return payload, old_ids, owners, binding
+
+    def test_reviewed_lineage_adds_eight_explicit_members_and_keeps_invalid_county_unresolved(self):
+        payload, old_ids, owners, binding = self._reviewed_fixture()
+        lineage, status = reviewed_legacy_lineage(
+            payload, binding["baseline_runtime_sha256"], binding["county_source_sha256"],
+            old_ids, owners, {"US_CNTY_09120"})
+        self.assertEqual(status, "applied")
+        self.assertEqual(len(lineage), 8)
+        self.assertEqual(lineage["US_ZN_51_015"],
+                         ["US_CNTY_51013", "US_CNTY_51510", "US_CNTY_51610"])
+        contract = project_migration_contract(old_ids, owners, {"US_CNTY_09120"},
+                                              "source-baseline", "target-baseline", lineage)
+        self.assertEqual(len(contract["crosswalk"]), 9)
+        self.assertEqual(contract["unresolved_ids"], ["US_CNTY_09120"])
+        self.assertEqual(contract["source_baseline_hash"], "source-baseline")
+        self.assertEqual(contract["target_baseline_hash"], "target-baseline")
+
+    def test_reviewed_lineage_binding_mismatch_keeps_zones_unresolved(self):
+        payload, old_ids, owners, binding = self._reviewed_fixture()
+        for baseline_hash, source_hash, reason in [
+            ("changed", binding["county_source_sha256"], "baseline_runtime_sha256_mismatch"),
+            (binding["baseline_runtime_sha256"], "changed", "county_source_sha256_mismatch"),
+        ]:
+            with self.subTest(reason=reason):
+                lineage, status = reviewed_legacy_lineage(
+                    payload, baseline_hash, source_hash, old_ids, owners, {"US_CNTY_09120"})
+                self.assertEqual((lineage, status), ({}, reason))
+                contract = project_migration_contract(old_ids, owners, {"US_CNTY_09120"},
+                                                      "old", "new", lineage)
+                self.assertEqual(len(contract["unresolved_ids"]), 9)
+
+    def test_reviewed_lineage_rejects_duplicate_illegal_or_conflicting_targets(self):
+        payload, old_ids, owners, binding = self._reviewed_fixture()
+        bad_targets = ["US_CNTY_02016", "US_CNTY_XXXXX", "US_CNTY_26001", "US_CNTY_99999"]
+        for target in bad_targets:
+            with self.subTest(target=target):
+                changed = deepcopy(payload)
+                changed["lineage"][1]["target_ids"] = [target]
+                with self.assertRaisesRegex(ValueError, "target"):
+                    reviewed_legacy_lineage(
+                        changed, binding["baseline_runtime_sha256"], binding["county_source_sha256"],
+                        old_ids, owners, {"US_CNTY_09120"})
+        changed = deepcopy(payload)
+        changed["lineage"][1]["source_id"] = changed["lineage"][0]["source_id"]
+        with self.assertRaisesRegex(ValueError, "source"):
+            reviewed_legacy_lineage(changed, binding["baseline_runtime_sha256"],
+                                    binding["county_source_sha256"], old_ids, owners, {"US_CNTY_09120"})
+        changed_owners = dict(owners, US_CNTY_29510="CA")
+        with self.assertRaisesRegex(ValueError, "non-US legacy target"):
+            reviewed_legacy_lineage(payload, binding["baseline_runtime_sha256"],
+                                    binding["county_source_sha256"], old_ids, changed_owners,
+                                    {"US_CNTY_09120"})
+
+    def test_invalid_old_zone_is_not_rescued_by_reviewed_lineage(self):
+        payload, old_ids, owners, binding = self._reviewed_fixture()
+        invalid = {"US_CNTY_09120", "US_ZN_51_015"}
+        lineage, status = reviewed_legacy_lineage(
+            payload, binding["baseline_runtime_sha256"], binding["county_source_sha256"],
+            old_ids, owners, invalid)
+        self.assertEqual(status, "applied")
+        self.assertNotIn("US_ZN_51_015", lineage)
+        contract = project_migration_contract(old_ids, owners, invalid, "old", "new", lineage)
+        self.assertEqual(contract["unresolved_ids"], ["US_CNTY_09120", "US_ZN_51_015"])
+
     def test_project_migration_uses_stable_identity_not_area_evidence(self):
         contract = project_migration_contract(
             ['US_CNTY_26001', 'US_CNTY_09120', 'US_ZN_26_001', 'CA_TEST'],

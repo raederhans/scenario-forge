@@ -108,12 +108,32 @@ def partition_feature(properties, geometry, counties, assignments, *, unique_ids
     graph = shapely.union_all([geometry.boundary, *[county.boundary for county in counties.values()]])
     groups = defaultdict(list)
     boundary_point_fallbacks = []
+    domain_membership_fallbacks = []
     for face in polygonize(graph):
         point = face.representative_point()
-        if not geometry.covers(point):
+        needs_face_evidence = not face.contains(point)
+        if needs_face_evidence:
+            # Very thin faces may have no representable interior point. Decide
+            # original-domain membership from the full face, without a cutoff.
+            inside = polygonal(face.intersection(geometry))
+            outside = face.difference(geometry)
+            if outside.is_empty and not inside.is_empty:
+                selected = True
+            elif inside.is_empty:
+                selected = False
+            else:
+                raise ValueError(f"Ambiguous original-domain face membership for {old_id}")
+            domain_membership_fallbacks.append({
+                "face_area_degrees2": face.area,
+                "point_covered_by_face": face.covers(point),
+                "decision": "entire_face_inside" if selected else "no_polygonal_domain_overlap",
+            })
+        else:
+            selected = geometry.covers(point)
+        if not selected:
             continue
         matches = [fid for fid, county in counties.items() if county.covers(point)]
-        if len(matches) > 1 or (len(matches) == 1 and not counties[matches[0]].contains(point)):
+        if needs_face_evidence or len(matches) > 1 or (len(matches) == 1 and not counties[matches[0]].contains(point)):
             chosen, evidence = resolve_boundary_point_face(face, counties, old_id)
             evidence["point_matches"] = matches
             boundary_point_fallbacks.append(evidence)
@@ -150,6 +170,7 @@ def partition_feature(properties, geometry, counties, assignments, *, unique_ids
     return output, {"id": old_id, "pieces": len(output), "partition_method": "joint_boundary_noding_polygonize",
                     "face_count": sum(len(faces) for faces in groups.values()), "all_pieces_valid": True,
                     "boundary_point_fallbacks": boundary_point_fallbacks, "residual_area_degrees2": residual.area,
+                    "domain_membership_fallbacks": domain_membership_fallbacks,
                     "domain_preserved": True, **domain_check,
                     "internal_overlap_area_degrees2": total_pair_overlap,
                     "max_pair_overlap_area_degrees2": max_pair_overlap,

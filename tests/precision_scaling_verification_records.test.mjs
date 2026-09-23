@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createPrecisionScalingRecords } from "../tools/verification/catalog/records/precision_scaling.mjs";
+import { buildExecutionPlan } from "../tools/run_adaptive_tests.mjs";
+import { buildRepositoryRecommendation } from "../tools/select_verification_targets.mjs";
 import { reconcileVerificationRouteAuthority } from "../tools/test_route_registry.mjs";
 
 test("precision routes append unique executable targets without modifying existing records", () => {
@@ -48,6 +50,16 @@ test("precision expansion tools route to executable source-specific regressions"
     assert.deepEqual(route.executionOwners, ["child-safe"]);
     assert.deepEqual(route.profiles, ["pr-fast"]);
   }
+});
+
+test("US county lineage metadata selects the scenario migration regression without a route gap", () => {
+  const report = buildRepositoryRecommendation(["tools/us_county_legacy_lineage.json"]);
+  const plan = buildExecutionPlan(report);
+
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(plan.routeGaps, []);
+  assert.ok(report.recommendedCommands.some((entry) =>
+    entry.commandRef === "python -m unittest tests.test_us_county_scenario -q"));
 });
 
 test("precision additions preserve repository-wide command ownership and resource policy", () => {
