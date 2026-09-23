@@ -36,7 +36,7 @@
       "display_name": "Magnitogorsk",
       "display_name_en": "Magnitogorsk",
       "display_name_zh": "马格尼托哥尔斯克",
-      "color_hex": "#415638",
+      "color_hex": "#3c4551",
       "parent_owner_tag": "",
       "subject_kind": "",
       "entry_kind": "scenario_country",
@@ -56,14 +56,15 @@
       "historical_fidelity": "extended",
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
-      "inspector_group_anchor_id": "continent_europe"
+      "inspector_group_anchor_id": "continent_europe",
+      "color_policy": "locked"
     },
     "ONG": {
       "mode": "create",
       "display_name": "Onega",
       "display_name_en": "Onega",
       "display_name_zh": "奥涅加",
-      "color_hex": "#0d4510",
+      "color_hex": "#51875b",
       "parent_owner_tag": "",
       "subject_kind": "",
       "entry_kind": "scenario_country",
@@ -83,14 +84,15 @@
       "historical_fidelity": "extended",
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
-      "inspector_group_anchor_id": "continent_europe"
+      "inspector_group_anchor_id": "continent_europe",
+      "color_policy": "locked"
     },
     "ORN": {
       "mode": "create",
       "display_name": "Orenburg",
       "display_name_en": "Orenburg",
       "display_name_zh": "奥伦堡",
-      "color_hex": "#63342c",
+      "color_hex": "#567856",
       "parent_owner_tag": "",
       "subject_kind": "",
       "entry_kind": "scenario_country",
@@ -110,7 +112,8 @@
       "historical_fidelity": "extended",
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
-      "inspector_group_anchor_id": "continent_europe"
+      "inspector_group_anchor_id": "continent_europe",
+      "color_policy": "locked"
     },
     "ORS": {
       "mode": "create",
@@ -144,7 +147,7 @@
       "display_name": "Vorkuta",
       "display_name_en": "Vorkuta",
       "display_name_zh": "沃尔库塔",
-      "color_hex": "#648abe",
+      "color_hex": "#87bdb8",
       "parent_owner_tag": "",
       "subject_kind": "",
       "entry_kind": "scenario_country",
@@ -164,7 +167,8 @@
       "historical_fidelity": "extended",
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
-      "inspector_group_anchor_id": "continent_europe"
+      "inspector_group_anchor_id": "continent_europe",
+      "color_policy": "locked"
     },
     "XIK": {
       "mode": "create",
@@ -198,7 +202,7 @@
       "display_name": "Northern-Ireland",
       "display_name_en": "Northern-Ireland",
       "display_name_zh": "北爱尔兰",
-      "color_hex": "#46864b",
+      "color_hex": "#3c5a50",
       "parent_owner_tag": "IRE",
       "subject_kind": "releasable_state",
       "entry_kind": "scenario_subject",
@@ -215,7 +219,8 @@
       "notes": "",
       "scenario_only": true,
       "source_type": "scenario_extension",
-      "historical_fidelity": "extended"
+      "historical_fidelity": "extended",
+      "color_policy": "locked"
     },
     "AST": {
       "mode": "override",
@@ -236,7 +241,9 @@
       "display_name": "Bolivia",
       "display_name_en": "Bolivia",
       "display_name_zh": "玻利维亚共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#8d705d",
+      "color_policy": "locked"
     },
     "BUL": {
       "mode": "override",
@@ -257,21 +264,27 @@
       "display_name": "Chile",
       "display_name_en": "Chile",
       "display_name_zh": "智利共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#9b5833",
+      "color_policy": "locked"
     },
     "COL": {
       "mode": "override",
       "display_name": "Colombia",
       "display_name_en": "Colombia",
       "display_name_zh": "哥伦比亚共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#af9d72",
+      "color_policy": "locked"
     },
     "COS": {
       "mode": "override",
       "display_name": "Costa Rica",
       "display_name_en": "Costa Rica",
       "display_name_zh": "哥斯达黎加共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#8e2c3d",
+      "color_policy": "locked"
     },
     "CUB": {
       "mode": "override",
@@ -285,7 +298,9 @@
       "display_name": "Ecuador",
       "display_name_en": "Ecuador",
       "display_name_zh": "厄瓜多尔共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#6c8cc3",
+      "color_policy": "locked"
     },
     "ELS": {
       "mode": "override",
@@ -299,7 +314,9 @@
       "display_name": "Guatemala",
       "display_name_en": "Guatemala",
       "display_name_zh": "危地马拉共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#9c92a6",
+      "color_policy": "locked"
     },
     "HAI": {
       "mode": "override",
@@ -313,7 +330,9 @@
       "display_name": "Honduras",
       "display_name_en": "Honduras",
       "display_name_zh": "洪都拉斯共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#747a8d",
+      "color_policy": "locked"
     },
     "INS": {
       "mode": "override",
@@ -365,7 +384,9 @@
       "parent_owner_tag": "JAP",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "inspector_group_anchor_id": "continent_asia"
+      "inspector_group_anchor_id": "continent_asia",
+      "color_hex": "#993f55",
+      "color_policy": "locked"
     },
     "MEX": {
       "mode": "override",
@@ -386,7 +407,9 @@
       "display_name": "Nicaragua",
       "display_name_en": "Nicaragua",
       "display_name_zh": "尼加拉瓜共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#3d5069",
+      "color_policy": "locked"
     },
     "NZL": {
       "mode": "override",
@@ -414,7 +437,9 @@
       "display_name": "Peru",
       "display_name_en": "Peru",
       "display_name_zh": "秘鲁共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#913d3d",
+      "color_policy": "locked"
     },
     "SAF": {
       "mode": "override",
@@ -449,7 +474,9 @@
       "display_name": "Venezuela",
       "display_name_en": "Venezuela",
       "display_name_zh": "委内瑞拉共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#a55f6d",
+      "color_policy": "locked"
     },
     "VIN": {
       "mode": "override",
@@ -466,7 +493,9 @@
       "parent_owner_tag": "JAP",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "inspector_group_anchor_id": "continent_asia"
+      "inspector_group_anchor_id": "continent_asia",
+      "color_hex": "#9f647e",
+      "color_policy": "locked"
     },
     "XIN": {
       "mode": "override",
@@ -561,42 +590,54 @@
       "display_name": "Burma",
       "display_name_en": "Burma",
       "display_name_zh": "缅甸联邦",
-      "parent_owner_tag": "JAP"
+      "parent_owner_tag": "JAP",
+      "color_hex": "#a05361",
+      "color_policy": "locked"
     },
     "CEY": {
       "mode": "override",
       "display_name": "Ceylon",
       "display_name_en": "Ceylon",
       "display_name_zh": "锡兰共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#570825",
+      "color_policy": "locked"
     },
     "FRI": {
       "mode": "override",
       "display_name": "Azad Hind",
       "display_name_en": "Azad Hind",
       "display_name_zh": "自由印度政府",
-      "parent_owner_tag": "JAP"
+      "parent_owner_tag": "JAP",
+      "color_hex": "#388a33",
+      "color_policy": "locked"
     },
     "WLS": {
       "mode": "override",
       "display_name": "Wales",
       "display_name_en": "Wales",
       "display_name_zh": "威尔士共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#ada05d",
+      "color_policy": "locked"
     },
     "ALC": {
       "mode": "override",
       "display_name": "Algerian Military Command",
       "display_name_en": "Algerian Military Command",
       "display_name_zh": "阿尔及利亚军事指挥部",
-      "parent_owner_tag": "IBR"
+      "parent_owner_tag": "IBR",
+      "color_hex": "#d1c094",
+      "color_policy": "locked"
     },
     "TJK": {
       "mode": "override",
       "display_name": "Tajikistan",
       "display_name_en": "Tajikistan",
       "display_name_zh": "塔吉克苏维埃社会主义共和国",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#501414",
+      "color_policy": "locked"
     },
     "AOF": {
       "mode": "override",
@@ -620,7 +661,9 @@
       "parent_owner_tag": "JAP",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "inspector_group_anchor_id": "continent_asia"
+      "inspector_group_anchor_id": "continent_asia",
+      "color_hex": "#8e4141",
+      "color_policy": "locked"
     },
     "QMA": {
       "mode": "override",
@@ -637,7 +680,9 @@
       "display_name": "Siam",
       "display_name_en": "Siam",
       "display_name_zh": "暹罗",
-      "parent_owner_tag": ""
+      "parent_owner_tag": "",
+      "color_hex": "#636c7a",
+      "color_policy": "locked"
     },
     "RKP": {
       "mode": "override",
@@ -654,7 +699,9 @@
       "parent_owner_tag": "JAP",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "inspector_group_anchor_id": "continent_asia"
+      "inspector_group_anchor_id": "continent_asia",
+      "color_hex": "#c15a7d",
+      "color_policy": "locked"
     },
     "URA": {
       "mode": "override",
@@ -664,7 +711,9 @@
       "parent_owner_tag": "",
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
-      "inspector_group_anchor_id": "continent_europe"
+      "inspector_group_anchor_id": "continent_europe",
+      "color_hex": "#b86378",
+      "color_policy": "locked"
     },
     "ENG": {
       "mode": "override",
@@ -685,7 +734,9 @@
       "display_name": "Reichskommissariat Moskowien",
       "display_name_en": "Reichskommissariat Moskowien",
       "display_name_zh": "莫斯科维恩专员辖区",
-      "parent_owner_tag": "GER"
+      "parent_owner_tag": "GER",
+      "color_hex": "#5e5852",
+      "color_policy": "locked"
     },
     "MAL": {
       "mode": "override",
@@ -699,21 +750,27 @@
       "display_name": "German East Africa",
       "display_name_en": "German East Africa",
       "display_name_zh": "东非专员辖区",
-      "parent_owner_tag": "GER"
+      "parent_owner_tag": "GER",
+      "color_hex": "#6a7a59",
+      "color_policy": "locked"
     },
     "GCO": {
       "mode": "override",
       "display_name": "German Central Africa",
       "display_name_en": "German Central Africa",
       "display_name_zh": "中非专员辖区",
-      "parent_owner_tag": "GER"
+      "parent_owner_tag": "GER",
+      "color_hex": "#767c5e",
+      "color_policy": "locked"
     },
     "GSW": {
       "mode": "override",
       "display_name": "German Southwest Africa",
       "display_name_en": "German Southwest Africa",
       "display_name_zh": "西南非专员辖区",
-      "parent_owner_tag": "GER"
+      "parent_owner_tag": "GER",
+      "color_hex": "#71755c",
+      "color_policy": "locked"
     },
     "TAN": {
       "mode": "override",
@@ -733,7 +790,9 @@
       "parent_owner_tag": "JAP",
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
-      "inspector_group_anchor_id": "continent_asia"
+      "inspector_group_anchor_id": "continent_asia",
+      "color_hex": "#9f2349",
+      "color_policy": "locked"
     },
     "GNG": {
       "mode": "override",
@@ -744,6 +803,126 @@
       "inspector_group_id": "scenario_group_china_region",
       "inspector_group_label": "China Region",
       "inspector_group_anchor_id": "continent_asia"
+    },
+    "AOI": {
+      "mode": "override",
+      "color_hex": "#728a61",
+      "color_policy": "locked"
+    },
+    "ARG": {
+      "mode": "override",
+      "color_hex": "#789da0",
+      "color_policy": "locked"
+    },
+    "BRA": {
+      "mode": "override",
+      "color_hex": "#688941",
+      "color_policy": "locked"
+    },
+    "BZ": {
+      "mode": "override",
+      "color_hex": "#963f4d",
+      "color_policy": "locked"
+    },
+    "CHI": {
+      "mode": "override",
+      "color_hex": "#943161",
+      "color_policy": "locked"
+    },
+    "DOM": {
+      "mode": "override",
+      "color_hex": "#ae693f",
+      "color_policy": "locked"
+    },
+    "EGY": {
+      "mode": "override",
+      "color_hex": "#7c9a70",
+      "color_policy": "locked"
+    },
+    "FRA": {
+      "mode": "override",
+      "color_hex": "#5a6e8c",
+      "color_policy": "locked"
+    },
+    "GCE": {
+      "mode": "override",
+      "color_hex": "#3a312d",
+      "color_policy": "locked"
+    },
+    "GUI": {
+      "mode": "override",
+      "color_hex": "#96637a",
+      "color_policy": "locked"
+    },
+    "GXC": {
+      "mode": "override",
+      "color_hex": "#894a52",
+      "color_policy": "locked"
+    },
+    "GY": {
+      "mode": "override",
+      "color_hex": "#8e2c3d",
+      "color_policy": "locked"
+    },
+    "IAL": {
+      "mode": "override",
+      "color_hex": "#7c9a70",
+      "color_policy": "locked"
+    },
+    "KGZ": {
+      "mode": "override",
+      "color_hex": "#dc3c3c",
+      "color_policy": "locked"
+    },
+    "MC": {
+      "mode": "override",
+      "color_hex": "#ff748c",
+      "color_policy": "locked"
+    },
+    "PFC": {
+      "mode": "override",
+      "color_hex": "#abc2f0",
+      "color_policy": "locked"
+    },
+    "PUE": {
+      "mode": "override",
+      "color_hex": "#40839e",
+      "color_policy": "locked"
+    },
+    "RKNO": {
+      "mode": "override",
+      "color_hex": "#8d8073",
+      "color_policy": "locked"
+    },
+    "SIC": {
+      "mode": "override",
+      "color_hex": "#6873a0",
+      "color_policy": "locked"
+    },
+    "TAT": {
+      "mode": "override",
+      "color_hex": "#96cdd9",
+      "color_policy": "locked"
+    },
+    "TKM": {
+      "mode": "override",
+      "color_hex": "#8e2c23",
+      "color_policy": "locked"
+    },
+    "TUN": {
+      "mode": "override",
+      "color_hex": "#70825d",
+      "color_policy": "locked"
+    },
+    "VMT": {
+      "mode": "override",
+      "color_hex": "#ca1d1d",
+      "color_policy": "locked"
+    },
+    "YUN": {
+      "mode": "override",
+      "color_hex": "#803e50",
+      "color_policy": "locked"
     }
   },
   "assignments_by_feature_id": {
