@@ -20,4 +20,4 @@
 
 ## 待续
 
-已推送 `c3e29826` 并创建 PR #151。首轮 smoke、perf-gate、transport 与 quick-fill 检查通过；fast 要求补登记新测试的 heavy dependency 分组，TNO strict 与 footprint 要求同步数据元数据。分组已修复，checker 通过；数据收尾完成后重新构建、追加提交并等待必需检查通过再合并。仓库不支持 auto-merge，主代理负责普通 merge。其他两个 worktree 不在本轮整合范围。
+PR #151 已推送行为及数据修正。首轮 smoke、perf-gate、transport 与 quick-fill 通过；第二轮已确认TNO、两个HOI4 strict与footprint通过。新测试分组已补齐；最后三个场景的manifest/audit共享拓扑引用也已更新，并有完整strict通过证据。刷新镜像、推送后等待最终必需检查再普通merge，仓库不支持auto-merge。其他两个worktree不在本轮整合范围。

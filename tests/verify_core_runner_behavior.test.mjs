@@ -2264,6 +2264,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
   }), "edit", { preparedCatalog: binding.preparedCatalog });
   const expectedCommands = [
     ...(includeRenderer ? [
+      "node --test tests/atlantropa_water_color_behavior.test.mjs",
       "node --test tests/country_source_border_meshes_behavior.test.mjs",
       "node --test tests/exact_composite_reuse_behavior.test.mjs",
       "node --test tests/export_target_resolution_behavior.test.mjs",
@@ -2293,6 +2294,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     "adaptive-edit-cost-budget-exceeded",
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
+    ...(includeRenderer ? ["node-test:tests/atlantropa_water_color_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/country_source_border_meshes_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/exact_composite_reuse_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/export_target_resolution_behavior.test.mjs"] : []),

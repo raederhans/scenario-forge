@@ -16,7 +16,8 @@
 - [x] 已推送并创建 [PR #151](https://github.com/raederhans/scenario-forge/pull/151)。
 - [x] 同步全局拓扑清单、TNO及两个HOI4场景的启动引用与快照；三个 strict 场景检查通过，六场景快照匹配。
 - [x] 新增 manifest 回归后生成器5/5通过；heavy dependency分组修复后69项分类、58项元数据测试通过。
-- 首轮远端 smoke、perf-gate、transport及quick-fill通过；修正元数据后追加提交，最新必需检查与合并回执以 PR 页面为准。
+- [x] 补齐blank_base、modern_world、hgo_1936的manifest/audit共享拓扑引用；三个完整strict检查均通过。六场景均有实际strict通过证据。
+- 第二轮远端已确认TNO、两个HOI4 strict及footprint通过。剩余引用修正后刷新镜像并推送，最新必需检查与合并回执以 PR 页面为准。
 
 用户补充范围：只接入较大的湖泊，小湖泊不批量接入。
 
