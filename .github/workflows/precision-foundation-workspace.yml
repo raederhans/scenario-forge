@@ -1,0 +1,61 @@
+name: Precision foundation workspace
+
+on:
+  push:
+    branches: ["codex/precision-foundation-p0-p4-20260923"]
+    paths: [".github/workflows/precision-foundation-workspace.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Package tracked source and input inventory
+        run: |
+          mkdir -p .runtime/reports/generated/precision-foundation
+          python - <<'PY'
+          import hashlib
+          import json
+          import subprocess
+          import zipfile
+          from pathlib import Path
+
+          root = Path.cwd()
+          out = root / '.runtime/reports/generated/precision-foundation'
+          inventory = []
+          with zipfile.ZipFile(out / 'source-workspace.zip', 'w', zipfile.ZIP_DEFLATED, compresslevel=3) as archive:
+              for record in subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD']).split(b'\0'):
+                  if not record:
+                      continue
+                  metadata, raw_name = record.split(b'\t', 1)
+                  mode, kind, blob_sha = metadata.decode().split()
+                  name = raw_name.decode('utf-8')
+                  if kind != 'blob':
+                      continue
+                  source = root / name
+                  included = not name.startswith(('dist/', 'data/'))
+                  if name.startswith('data/'):
+                      included = source.stat().st_size <= 2_000_000 and not name.endswith('.gz')
+                  inventory.append({'path': name, 'git_blob_sha': blob_sha, 'size_bytes': source.stat().st_size, 'included': included})
+                  if included:
+                      archive.write(source, name)
+          (out / 'inventory.json').write_text(json.dumps({'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': inventory}, indent=2) + '\n', encoding='utf-8')
+          digest = hashlib.file_digest((out / 'source-workspace.zip').open('rb'), 'sha256').hexdigest()
+          print('workspace_sha256=' + digest)
+          print('tracked_files=' + str(len(inventory)))
+          print('included_files=' + str(sum(item['included'] for item in inventory)))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: precision-foundation-workspace
+          path: .runtime/reports/generated/precision-foundation/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
