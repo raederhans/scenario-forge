@@ -5802,7 +5802,7 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalBackgroundRenderOwner",
     compositionSourceFingerprint:
-      "eaf23737b1e05c66c977c99b7b194792421be811642a6948ac8f825ed5fe486e",
+      "3134e28dd10e02043f301a08fcc9a1dd1e5547959a62be7d9fe3d1f9b90ab3ad",
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
