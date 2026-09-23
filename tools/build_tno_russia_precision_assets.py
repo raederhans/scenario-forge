@@ -41,7 +41,13 @@ def sizes(directory):
     manifest = read(directory / "detail_chunks.manifest.json")
     chunks = [directory / "chunks" / Path(e["url"]).name for e in manifest["chunks"]]
     political = [directory / "chunks" / Path(e["url"]).name for e in manifest["chunks"] if e["layer"] == "political"]
-    compressed = lambda p: len(gzip.compress(p.read_bytes(), compresslevel=6, mtime=0))
+    compressed_sizes = {}
+    def compressed(path):
+        # Totals, political totals and largest-chunk rows share the same files.
+        # Compress each once per report, without caching across measurements.
+        if path not in compressed_sizes:
+            compressed_sizes[path] = len(gzip.compress(path.read_bytes(), compresslevel=6, mtime=0))
+        return compressed_sizes[path]
     return {"chunk_count": len(chunks), "chunks_json_bytes": sum(p.stat().st_size for p in chunks),
             "chunks_gzip6_bytes": sum(compressed(p) for p in chunks),
             "political_chunks_gzip6_bytes": sum(compressed(p) for p in political),
