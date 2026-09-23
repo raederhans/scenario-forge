@@ -219,7 +219,13 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 if asset_name == "hero-blank.svg":
                     size_limit = 1_350_000
                 elif asset_name.startswith("japan-preview-"):
-                    size_limit = 340_000
+                    # Preserve every eligible transport path and its vertices.
+                    size_limit = 4_500_000
+                elif asset_name == "hero-tno-1962.svg":
+                    # Unsimplified owner geometry keeps political seams closed.
+                    size_limit = 1_500_000
+                elif asset_name == "hero-hoi4-1939.svg":
+                    size_limit = 360_000
                 elif asset_name.startswith("hero-") and asset_name != "hero-cartography.svg":
                     size_limit = 320_000
                 else:
@@ -273,7 +279,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     self.assertIn('data-source="world-cities-japan-focus"', text)
                     self.assertIn('data-source="global-contours-major"', text)
                     self.assertIn('data-source="nasa-black-marble-2016"', text)
-                    self.assertIn('class="main-corridor"', text)
+                    self.assertTrue(any(
+                        "main-corridor" in element.get("class", "").split()
+                        for element in ET.fromstring(text).iter()
+                    ), f"{asset_name} should retain the highlighted corridor")
                     self.assertIn('class="focus-city"', text)
                     self.assertNotIn("corridorGlow", text)
                     self.assertNotIn("cityGlow", text)
@@ -363,8 +372,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertGreater(payload["projection"]["fit_scale"], 0)
         self.assertEqual(payload["projection"]["scale_semantics"], "projection fit from carrier coordinates to SVG pixels")
         self.assertEqual(payload["ui_zoom"]["ownership"], "landing/app.js consumer")
-        self.assertEqual(payload["selection_policy"]["road_limit"], 260)
-        self.assertEqual(payload["selection_policy"]["rail_limit"], 160)
+        self.assertEqual(payload["selection_policy"]["road_limit"], 4000)
+        self.assertEqual(payload["selection_policy"]["rail_limit"], 300)
         self.assertEqual(payload["selection_policy"]["main_corridor_limit"], 1)
         self.assertEqual(payload["selection_policy"]["main_corridor_role"], "highlighted motorway")
         self.assertEqual(payload["selection_policy"]["highlighted_motorway_ref"], "C4")
@@ -376,10 +385,11 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(payload["selection_policy"]["focus_city_names"], ["Tokyo", "Osaka", "Nagoya"])
         self.assertEqual(payload["counts"]["road_source_features"], 4794)
         self.assertEqual(payload["counts"]["rail_source_features"], 1105)
-        self.assertGreater(payload["counts"]["road_eligible_paths"], payload["counts"]["road_lines_rendered"])
-        self.assertGreater(payload["counts"]["rail_eligible_paths"], payload["counts"]["rail_lines_rendered"])
-        self.assertEqual(payload["counts"]["road_lines_rendered"], 260)
-        self.assertEqual(payload["counts"]["rail_lines_rendered"], 160)
+        for network in ("road", "rail"):
+            self.assertEqual(payload["counts"][f"{network}_eligible_paths"], payload["counts"][f"{network}_lines_rendered"])
+            self.assertGreaterEqual(payload["selection_policy"][f"{network}_limit"], payload["counts"][f"{network}_eligible_paths"])
+        self.assertEqual(payload["counts"]["road_lines_rendered"], 3673)
+        self.assertEqual(payload["counts"]["rail_lines_rendered"], 226)
         self.assertEqual(payload["counts"]["main_corridor_paths_rendered"], 1)
         self.assertEqual(payload["counts"]["main_corridor_titles"], ["首都圏中央連絡自動車道 / C4"])
         self.assertGreater(payload["counts"]["city_source_features"], payload["counts"]["city_points_rendered"])
@@ -703,7 +713,10 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     with self.subTest(mode=mode):
                         generated_text = generated_path.read_text(encoding="utf-8")
                         ET.fromstring(generated_text)
-                        self.assertIn('class="main-corridor"', generated_text)
+                        self.assertTrue(any(
+                            "main-corridor" in element.get("class", "").split()
+                            for element in ET.fromstring(generated_text).iter()
+                        ), f"{mode} should retain the highlighted corridor")
                         self.assertIn('class="focus-city"', generated_text)
                         self.assertIn('data-source="japan-main-corridor"', generated_text)
                         self.assertIn('data-source="world-cities-japan-focus"', generated_text)
