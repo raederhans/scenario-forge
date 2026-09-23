@@ -6,7 +6,7 @@ import { createPrecisionScalingRecords } from "../tools/verification/catalog/rec
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 24);
+  assert.equal(routes.length, 26);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -36,6 +36,8 @@ test("precision expansion tools route to executable source-specific regressions"
   for (const [source, testFile] of [
     ["tools/adapt_us_county_scenarios.py", "tests/test_us_county_adaptation.py"],
     ["tools/prepare_us_county_adaptation_sidecars.py", "tests/test_us_county_adaptation_sidecars.py"],
+    ["tools/stage_us_county_adapted_bundle.py", "tests/test_us_county_adapted_bundle.py"],
+    ["tools/prepare_tno_western_precision_sources.py", "tests/test_tno_western_precision_sources.py"],
     ["tools/scenario_topology_decode.py", "tests/test_scenario_topology_decode.py"],
     ["js/core/project_feature_migration.js", "tests/project_feature_migration_behavior.test.mjs"],
     ["js/core/scenario_hierarchy.js", "tests/scenario_hierarchy_behavior.test.mjs"],

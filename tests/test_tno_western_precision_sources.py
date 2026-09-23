@@ -3,10 +3,27 @@ import unittest
 import geopandas as gpd
 from shapely.geometry import box
 
-from tools.prepare_tno_western_precision_sources import select_same_ids
+from tools.prepare_tno_western_precision_sources import load_governed_adm2, parse_countries, select_same_ids
 
 
 class WesternPrecisionSourceTests(unittest.TestCase):
+    def test_default_and_explicit_country_selection(self):
+        self.assertEqual(parse_countries(None), {"GB", "IT", "AT", "EE", "LV", "LT", "ES", "PT", "LU"})
+        self.assertEqual(parse_countries(["CH", "HU", "MD"]), {"CH", "HU", "MD"})
+        self.assertEqual(parse_countries(["CZ", "SK"]), {"CZ", "SK"})
+        for countries in ([], ["CH", "CH"], ["GR"], ["unknown"]):
+            with self.subTest(countries=countries), self.assertRaises(ValueError):
+                parse_countries(countries)
+
+    def test_governed_adm2_sources_have_exact_country_ids(self):
+        for code, count in (("CZ", 77), ("SK", 79)):
+            with self.subTest(code=code):
+                frame, _, url = load_governed_adm2(code)
+                self.assertEqual(len(frame), count)
+                self.assertTrue(frame.id.is_unique)
+                self.assertTrue(frame.id.str.startswith(f"{code}_ADM2_").all())
+                self.assertTrue(url.startswith("https://github.com/wmgeolab/geoBoundaries/raw/9469f09/"))
+
     def fixture(self):
         return gpd.GeoDataFrame([
             {"id": "UKA", "cntr_code": "GB", "geometry": box(0, 0, 1, 1)},
@@ -27,6 +44,14 @@ class WesternPrecisionSourceTests(unittest.TestCase):
                 select_same_ids(source, baseline, {baseline[0]["cntr_code"]})
         source.loc[1, "id"] = "UKA"
         with self.assertRaises(ValueError):
+            select_same_ids(source, [{"id": "UKA", "cntr_code": "GB"}], {"GB"})
+
+    def test_duplicate_baseline_ids_and_source_country_drift_fail(self):
+        source = self.fixture()
+        with self.assertRaisesRegex(ValueError, "Baseline IDs must be unique"):
+            select_same_ids(source, [{"id": "UKA", "cntr_code": "GB"}] * 2, {"GB"})
+        source.loc[0, "cntr_code"] = "IT"
+        with self.assertRaisesRegex(ValueError, "country membership changed"):
             select_same_ids(source, [{"id": "UKA", "cntr_code": "GB"}], {"GB"})
 
     def test_overlapping_source_is_not_silently_repaired(self):

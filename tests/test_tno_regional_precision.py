@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import geopandas as gpd
 import shapely
@@ -98,6 +99,43 @@ class TnoRegionalPrecisionTests(unittest.TestCase):
         self.assertEqual(candidate['political_precision_feature_ids'], ['BE_A', 'DE_A', 'FR_KEEP', 'NL_A'])
         self.assertEqual(report['political_precision_feature_ids'], candidate['political_precision_feature_ids'])
         self.assertNotIn('FR_OTHER', candidate['political_precision_feature_ids'])
+
+    def test_frozen_owner_domains_preserve_target_surface(self):
+        baseline, replacements = self.fixture()
+        owners = {'DE_A': 'GER', 'BE_A': 'GER', 'NL_A': 'GER'}
+        candidate, report = _assemble_candidate(
+            baseline, replacements, ['DE', 'BE', 'NL'], frozen_domain_owners=owners)
+        old = _absolute_topology(baseline)
+        ids = set(owners)
+        old_geometries = [_decode_geometry(old, row) for row in old['objects']['political']['geometries']
+                          if row['properties']['id'] in ids]
+        new_geometries = [_decode_geometry(candidate, row) for row in candidate['objects']['political']['geometries']
+                          if row['properties']['id'] in ids]
+        self.assertTrue(shapely.coverage_is_valid(new_geometries))
+        self.assertLessEqual(shapely.union_all(old_geometries).symmetric_difference(
+            shapely.union_all(new_geometries)).area, 1e-10)
+        self.assertEqual(report['boundary_reconciliation']['alignment']['method'], 'frozen_owner_domains')
+        self.assertTrue(report['boundary_reconciliation']['surface_constraints']['target_union_preserved'])
+        with self.assertRaisesRegex(ValueError, 'requires an owner'):
+            _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'],
+                                frozen_domain_owners={'DE_A': 'GER'})
+
+    def test_frozen_owner_domains_reject_nearest_overlap_resolution(self):
+        baseline, replacements = self.fixture()
+        with patch('tools.pilot_tno_regional_precision.constrained_partition') as partition:
+            partition.return_value = ({}, {'baseline_overlap_resolutions': [{'ids': ['DE_A', 'BE_A']}]})
+            with self.assertRaisesRegex(ValueError, 'nearest source'):
+                _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'],
+                                    frozen_domain_owners={fid: 'GER' for fid in ['DE_A', 'BE_A', 'NL_A']})
+
+    def test_candidate_rejects_changed_target_union(self):
+        baseline, replacements = self.fixture()
+        with patch('tools.pilot_tno_regional_precision.align_regional_boundaries',
+                   side_effect=lambda old, selected, **_: (selected, {})), patch(
+                       'tools.pilot_tno_regional_precision.constrain_candidate_surface_geometry',
+                       side_effect=lambda old, selected, *_, **__: (selected, {})):
+            with self.assertRaisesRegex(ValueError, 'Selected target surface changed'):
+                _assemble_candidate(baseline, replacements, ['DE', 'BE', 'NL'])
 
     def test_file_candidate_and_no_overwrite_guards(self):
         baseline, replacements = self.fixture()
