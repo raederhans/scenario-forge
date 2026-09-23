@@ -402,9 +402,20 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 7,
   };
 
+  const hoi4ManualRulesRecord = {
+    ...editorCheckoutRecord,
+    id: "local:hoi4-manual-rules",
+    commandRef: "python -m unittest tests.test_build_hoi4_scenario tests.test_check_hoi4_scenario_bundle -q",
+    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "tools/build_hoi4_scenario.py",
+      "tools/check_hoi4_scenario_bundle.py", "tests/test_build_hoi4_scenario.py",
+      "tests/test_check_hoi4_scenario_bundle.py"],
+    ownerHints: ["scenario-builder"], domains: ["scenario-build"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 8,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
-    paletteLibraryOperationRecord];
+    paletteLibraryOperationRecord, hoi4ManualRulesRecord];
 }
