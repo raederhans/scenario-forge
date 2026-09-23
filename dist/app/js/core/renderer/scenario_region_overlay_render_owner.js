@@ -402,7 +402,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
         });
         renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
-      } else if (strategy !== "redraw" && canReuseWaterLayer && scenarioLayerCache.draw("water", currentTransform)) {
+      } else if (strategy !== "redraw" && canReuseWaterLayer && scenarioLayerCache.draw("water", currentTransform, { allowTransform: false })) {
         waterCacheMode = "reuse";
         collectContextMetric("contextScenarioLayerCacheHit", 0, {
           layer: "water",

@@ -140,20 +140,39 @@ test("whole water paths replace duplicate component retention without eviction",
   assert.equal(h.events.filter((event) => event[0] === "pathSvg").length, 1);
 });
 
-test("water cache draws into the live target then reuses with DPR and overscan translation", (t) => {
+test("water cache reuses the same view but repaints changed transforms without rebuilding paths", (t) => {
   const h = harness(t);
   h.draw();
   assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
   assert.equal(h.events.filter((event) => event[0] === "layer" && event[1] === "fill").length, 1);
   assert.equal(h.events.filter((event) => event[0] === "main" && event[1] === "fill").length, 0);
   h.events.length = 0;
-  h.state.zoomTransform = { k: 2, x: 10, y: 20 };
   h.draw();
-  assert.deepEqual(h.events.find((event) => event[1] === "translate"), ["main", "translate", 12, 28]);
-  assert.deepEqual(h.events.find((event) => event[1] === "scale"), ["main", "scale", 2, 2]);
   assert.equal(h.events.some((event) => event[1] === "fill"), false);
   assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+  h.state.zoomTransform = { k: 2, x: 10, y: 20 };
+  h.events.length = 0;
+  h.draw();
+  assert.equal(h.events.filter((event) => event[1] === "fill").length, 1);
+  assert.equal(h.events.some((event) => event[0] === "pathSvg"), false);
+  assert.equal(h.metrics.at(-1).waterCacheMode, "redraw");
 });
+
+for (const mode of ["reuse", "adaptive"]) {
+  test(`${mode} fills newly visible lakes after a pan and zoom round trip`, (t) => {
+    const h = harness(t, { mode });
+    h.setVisible(false); h.draw();
+    assert.equal(h.owner.getPreviousWaterRenderedCount(), 0);
+    h.setVisible(true);
+    for (const transform of [{ k: 1, x: -1000, y: 0 }, { k: 3, x: -1400, y: 80 }, { k: 1, x: 0, y: 0 }]) {
+      h.state.zoomTransform = transform;
+      h.events.length = 0; h.draw();
+      assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
+      assert.equal(h.events.filter((event) => event[1] === "fill").length, 1);
+      assert.equal(h.metrics.at(-1).waterCacheMode, "redraw");
+    }
+  });
+}
 
 test("water bounds reuse projection coordinates while zoom culling and selection stay live", t => {
   const h = harness(t, { mode: "direct" });

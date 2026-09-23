@@ -329,7 +329,7 @@ export function createRenderCacheOwner({
     return layerEntry.canvas;
   }
 
-  function drawCachedContextScenarioLayer(layerName, currentTransform) {
+  function drawCachedContextScenarioLayer(layerName, currentTransform, { allowTransform = true } = {}) {
     const layerEntry = getContextScenarioLayerCacheEntry(layerName);
     const layerCanvas = layerEntry.canvas;
     const referenceTransform = layerEntry.referenceTransform
@@ -340,6 +340,9 @@ export function createRenderCacheOwner({
     if (layerCanvas.width !== layout.pixelWidth || layerCanvas.height !== layout.pixelHeight) {
       return false;
     }
+    // An exact outer pass must not publish a transformed, viewport-clipped
+    // water image as newly painted coverage at the current reference transform.
+    if (!allowTransform && !areZoomTransformsEquivalent(referenceTransform, currentTransform)) return false;
     getContext().save();
     getContext().setTransform(1, 0, 0, 1, 0, 0);
     if (areZoomTransformsEquivalent(referenceTransform, currentTransform)) {

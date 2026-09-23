@@ -2606,6 +2606,14 @@ TNO_BASE_GEOGRAPHY_WATER_CLONE_IDS = (
     "lake_huron",
     "lake_erie",
     "lake_ontario",
+    "lake_ladoga",
+    "lake_onega",
+    "lake_vanern",
+    "lake_vattern",
+    "lake_saimaa",
+    "lake_paijanne",
+    "lake_inari",
+    "lake_pielinen",
 )
 TNO_MANIFEST_EXCLUDED_BASE_WATER_REGION_IDS = sorted({
     spec["source_id"]
@@ -5983,8 +5991,10 @@ def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[lis
     return named_features, diagnostics
 
 
-def build_tno_base_geography_water_clone_features() -> list[dict]:
-    feature_index = load_global_water_regions_feature_index()
+def build_tno_base_geography_water_clone_features(
+    feature_index: dict[str, dict] | None = None,
+) -> list[dict]:
+    feature_index = feature_index if feature_index is not None else load_global_water_regions_feature_index()
     clone_features: list[dict] = []
     for feature_id in TNO_BASE_GEOGRAPHY_WATER_CLONE_IDS:
         base_feature = feature_index.get(feature_id)

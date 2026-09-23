@@ -331,7 +331,7 @@ import { createRenderCacheOwner } from "./renderer/render_cache_owner.js";
 import { createExactCompositeReuseOwner } from "./renderer/exact_composite_reuse_owner.js";
 import { createCachedPassCompositorOwner } from "./renderer/cached_pass_compositor_owner.js";
 import { createTransformedFrameCompositorOwner } from "./map_renderer/transformed_frame_compositor_owner.js";
-import { createRenderTransformReusePolicyOwner } from "./renderer/render_transform_reuse_policy_owner.js";
+import { createRenderTransformReusePolicyOwner, VIEWPORT_CULL_OVERSCAN_PX } from "./renderer/render_transform_reuse_policy_owner.js";
 import { createProjectedGeometryBoundsOwner } from "./renderer/projected_geometry_bounds_owner.js";
 import { createViewportReadModelOwner } from "./renderer/viewport_read_model_owner.js";
 import { createRenderSnapshotOwner } from "./renderer/render_snapshot.js";
@@ -387,7 +387,6 @@ let lastDevSelectionOverlaySignature = "";
 
 const PROJECTION_PRECISION = 0.1;
 const PATH_POINT_RADIUS = 2;
-const VIEWPORT_CULL_OVERSCAN_PX = 96;
 const MAP_PAN_PADDING_PX = 50;
 const PROJECTION_FIT_PADDING_RATIO = 0.04;
 const MIN_ZOOM_SCALE = 0.35;
@@ -5210,13 +5209,6 @@ function isAtlantropaSeaFeature(feature) {
     && getAtlantropaSurfaceKind(feature) === "sea";
 }
 
-function getAtlantropaSeaManifestFillColor() {
-  return getSafeCanvasColor(
-    runtimeState.activeScenarioManifest?.style_defaults?.atlantropa_sea?.fillColor,
-    null
-  );
-}
-
 function getAtlantropaSaltFlatManifestFillColor() {
   return getSafeCanvasColor(
     runtimeState.activeScenarioManifest?.style_defaults?.atlantropa_salt_flat?.fillColor,
@@ -5234,7 +5226,7 @@ function getAtlantropaShoalManifestFillColor() {
 function getAtlantropaRuleColor(rule) {
   const normalizedRule = String(rule || "").trim().toLowerCase();
   if (normalizedRule === "atlantropa_sea") {
-    return getAtlantropaSeaManifestFillColor() || getOceanBaseFillColor();
+    return getOceanBaseFillColor();
   }
   if (normalizedRule === "salt_flat") {
     return getAtlantropaSaltFlatManifestFillColor();
@@ -5257,7 +5249,7 @@ function isInteractiveAtlantropaBooleanWeldIslandFeature(feature, featureId = nu
 }
 
 function getAtlantropaSeaPoliticalFillColor() {
-  return getAtlantropaSeaManifestFillColor() || getOceanBaseFillColor();
+  return getOceanBaseFillColor();
 }
 
 function getAtlantropaSeaPoliticalStrokeColor() {

@@ -10,17 +10,10 @@ const {
 } = require("./support/playwright-app");
 
 const ATLANTROPA_ISLAND_PROBES = [
-  { label: "Cyprus", featureId: "ATLISL_levant_cyprus", ownerCode: "TUR", focus: { lon: 33.3, lat: 35.1, zoomPercent: 260 } },
-  { label: "Balearics", featureId: "ATLISL_west_med_balearics", ownerCode: "IBR", focus: { lon: 3.0, lat: 39.6, zoomPercent: 260 } },
-  { label: "Crete", featureId: "ATLISL_aegean_crete", ownerCode: "GRE", focus: { lon: 24.9, lat: 35.2, zoomPercent: 260 } },
-  { label: "Sicily", featureId: "ATLISL_sicily_tunis_sicily", ownerCode: "ITA", focus: { lon: 14.3, lat: 37.5, zoomPercent: 260 } },
-];
-
-const ATLANTROPA_SEA_SAMPLE_POINTS = [
-  { label: "Adriatic Basin", lon: 16.5, lat: 42.5 },
-  { label: "Tyrrhenian Basin", lon: 13.2, lat: 39.0 },
-  { label: "Aegean Basin", lon: 24.0, lat: 36.9 },
-  { label: "Libya-Suez Basin", lon: 18.0, lat: 31.0 },
+  { label: "Cyprus", featureId: "ATLISL_levant_cyprus", ownerCode: "TUR", joinMode: "none", focus: { lon: 33.3, lat: 35.1, zoomPercent: 260 } },
+  { label: "Balearics", featureId: "ATLISL_west_med_balearics", ownerCode: "IBR", joinMode: "none", focus: { lon: 3.0, lat: 39.6, zoomPercent: 260 } },
+  { label: "Crete", featureId: "ATLISL_aegean_crete", ownerCode: "GRE", joinMode: "boolean_weld", focus: { lon: 24.9, lat: 35.2, zoomPercent: 260 } },
+  { label: "Sicily", featureId: "ATLISL_sicily_tunis_sicily", ownerCode: "ITA", joinMode: "boolean_weld", focus: { lon: 14.3, lat: 37.5, zoomPercent: 260 } },
 ];
 
 const HELPER_PREFIXES = ["ATLSHL_", "ATLWLD_"];
@@ -362,27 +355,21 @@ async function waitForLandFeature(page, featureId) {
 }
 
 async function projectGeoPointToPagePoint(page, point) {
-  return page.evaluate(({ targetPoint }) => {
-    const state = globalThis.__playwrightStateRef || null;
-    const d3 = globalThis.d3;
-    const mapContainer = document.querySelector("#mapContainer");
-    if (!state || !d3 || !mapContainer || !targetPoint) {
+  return page.evaluate(async ({ targetPoint }) => {
+    const { projectGeoToScreen } = await import("/js/core/map_renderer.js");
+    const canvas = document.querySelector("#map-canvas");
+    if (!canvas || !targetPoint) {
       return null;
     }
-    const projection = d3.geoEqualEarth().precision(0.1);
-    const padding = Math.max(16, Math.round(Math.min(state.width, state.height) * 0.04));
-    const x1 = Math.max(padding + 1, state.width - padding);
-    const y1 = Math.max(padding + 1, state.height - padding);
-    projection.fitExtent([[padding, padding], [x1, y1]], state.landData);
-    const projected = projection([Number(targetPoint.lon), Number(targetPoint.lat)]);
+    // Chunked political data is not the renderer's projection-fit authority.
+    const projected = projectGeoToScreen(Number(targetPoint.lon), Number(targetPoint.lat));
     if (!Array.isArray(projected) || !projected.every(Number.isFinite)) {
       return null;
     }
-    const transform = state.zoomTransform || d3.zoomIdentity || { x: 0, y: 0, k: 1 };
-    const rect = mapContainer.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
     return {
-      x: rect.left + (projected[0] * transform.k) + transform.x,
-      y: rect.top + (projected[1] * transform.k) + transform.y,
+      x: rect.left + projected[0],
+      y: rect.top + projected[1],
       rect: {
         left: rect.left,
         top: rect.top,
@@ -1027,7 +1014,7 @@ test("tno open ocean override is visibly rendered and indexed by polygon part", 
   await setWaterOverrideColor(page, targetFeatureId, "");
 });
 
-test("tno atlantropa welded donor islands stay clickable and mediterranean sea uses dedicated fill", async ({ page }) => {
+test("tno atlantropa donor islands stay clickable and mediterranean sea follows ocean fill", async ({ page }) => {
   test.setTimeout(300000);
 
   const screenshotDir = path.join(".runtime", "tests", "playwright", "tno_open_ocean_rendering");
@@ -1037,31 +1024,51 @@ test("tno atlantropa welded donor islands stay clickable and mediterranean sea u
   await waitForAppInteractive(page);
   await applyScenario(page, "tno_1962");
   await waitForOpenOceanFeature(page, "tno_northwest_pacific_ocean");
-  const outerOceanPatch = await sampleFeaturePatchStats(page, "tno_northwest_pacific_ocean");
-  expect(outerOceanPatch).not.toBeNull();
 
-  const atlantropaSeaSamples = [];
-  for (const point of ATLANTROPA_SEA_SAMPLE_POINTS) {
-    const patch = await sampleCanvasPatchAtGeoPoint(page, point, 8);
-    if (patch) {
-      const channelDistance =
-        Math.abs(patch.avgRed - outerOceanPatch.avgRed)
-        + Math.abs(patch.avgGreen - outerOceanPatch.avgGreen)
-        + Math.abs(patch.avgBlue - outerOceanPatch.avgBlue);
-      atlantropaSeaSamples.push({
-        ...point,
-        patch,
-        channelDistance,
-      });
-    }
-  }
-  const blueDominantAtlantropaSamples = atlantropaSeaSamples.filter((entry) => (
-    entry.patch.avgBlue > entry.patch.avgRed + 5
-    && entry.patch.avgBlue > entry.patch.avgGreen + 3
-  )).sort((left, right) => Number(right.channelDistance || 0) - Number(left.channelDistance || 0));
-  expect(blueDominantAtlantropaSamples.length).toBeGreaterThan(0);
-  const atlantropaSeaSample = blueDominantAtlantropaSamples[0];
-  expect(atlantropaSeaSample.channelDistance).toBeGreaterThan(20);
+  const outerOceanSamplePoint = { label: "North Atlantic", lon: -20, lat: 35 };
+  const atlantropaSeaSample = { label: "Tyrrhenian Basin", lon: 13.2, lat: 39.0 };
+  // Keep both interiors visible, with enough scale to exclude coastline pixels
+  // from the patch even in the narrower CI viewport.
+  await centerMapOnGeoPoint(page, { lon: -3.4, lat: 37 }, { zoomPercent: 400 });
+  await waitForRenderIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
+  const outerOceanPatch = await sampleCanvasPatchAtGeoPoint(page, outerOceanSamplePoint, 2);
+  expect(outerOceanPatch).not.toBeNull();
+  atlantropaSeaSample.before = await sampleCanvasPatchAtGeoPoint(page, atlantropaSeaSample, 2);
+  expect(atlantropaSeaSample.before).not.toBeNull();
+  const channelDistance = (left, right) => (
+    Math.abs(left.avgRed - right.avgRed)
+    + Math.abs(left.avgGreen - right.avgGreen)
+    + Math.abs(left.avgBlue - right.avgBlue)
+  );
+  expect(channelDistance(atlantropaSeaSample.before, outerOceanPatch)).toBeLessThan(12);
+
+  const oceanFillInput = page.locator("#oceanFillColor");
+  const originalOceanFillColor = await oceanFillInput.inputValue();
+  const linkedOceanFillColor = "#397f96";
+  await oceanFillInput.evaluate((input, color) => {
+    input.value = color;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }, linkedOceanFillColor);
+  await waitForRenderIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
+
+  const outerOceanAfter = await sampleCanvasPatchAtGeoPoint(page, outerOceanSamplePoint, 2);
+  atlantropaSeaSample.after = await sampleCanvasPatchAtGeoPoint(page, atlantropaSeaSample, 2);
+  expect(outerOceanAfter).not.toBeNull();
+  expect(atlantropaSeaSample.after).not.toBeNull();
+  const expectedOceanChannels = { avgRed: 57, avgGreen: 127, avgBlue: 150 };
+  expect(channelDistance(atlantropaSeaSample.before, atlantropaSeaSample.after)).toBeGreaterThan(80);
+  expect(channelDistance(outerOceanAfter, expectedOceanChannels)).toBeLessThan(12);
+  expect(channelDistance(atlantropaSeaSample.after, expectedOceanChannels)).toBeLessThan(12);
+  expect(channelDistance(atlantropaSeaSample.after, outerOceanAfter)).toBeLessThan(12);
+
+  await oceanFillInput.evaluate((input, color) => {
+    input.value = color;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }, originalOceanFillColor);
+  await waitForRenderIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
+  const atlantropaSeaSamples = [atlantropaSeaSample];
 
   await resetZoomToFit(page);
   await waitForRenderIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
@@ -1116,7 +1123,7 @@ test("tno atlantropa welded donor islands stay clickable and mediterranean sea u
     expect(runtime.countryCode).toBe("ATL");
     expect(runtime.ownerCode).toBe(probe.ownerCode);
     expect(runtime.atlGeometryRole).toBe("donor_island");
-    expect(runtime.atlJoinMode).toBe("boolean_weld");
+    expect(runtime.atlJoinMode).toBe(probe.joinMode);
     expect(runtime.interactive).toBe(true);
 
     const { point: clickPoint } = await clickLandFeature(page, probe.featureId);

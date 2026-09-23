@@ -6,6 +6,7 @@ const CONTEXT_BASE_BUCKET_LOW_MAX = 1.4;
 const CONTEXT_BASE_BUCKET_MID_MAX = 2.5;
 const CONTEXT_SCENARIO_REUSE_MAX_DISTANCE_PX = 960;
 const CONTEXT_SCENARIO_REUSE_FRAME_LIMIT = 24;
+export const VIEWPORT_CULL_OVERSCAN_PX = 96;
 const EXACT_AFTER_SETTLE_FAST_PATH_REQUIRED_PASS_NAMES = Object.freeze([
   "background", "physicalBase", "political",
   "contextBase", "contextScenario", "effects", "lineEffects",
@@ -205,14 +206,30 @@ export function createRenderTransformReusePolicyOwner({
       contextScenarioReuseMaxDistancePx,
     );
     const reachesReuseFrameLimit = reuseFrameCount >= contextScenarioReuseFrameLimit;
+    const layout = cache.layouts?.contextScenario;
+    const width = Number(state.width || 0);
+    const height = Number(state.height || 0);
+    // The canvas padding can exceed the region that feature culling painted.
+    // Only their intersection is valid coverage, including after zooming out.
+    const cullPadding = Math.max(VIEWPORT_CULL_OVERSCAN_PX, Math.min(width, height) * 0.08);
+    const paddingX = Math.min(Number(layout?.offsetX || 0), cullPadding);
+    const paddingY = Math.min(Number(layout?.offsetY || 0), cullPadding);
+    const coversViewport = width > 0 && height > 0
+      && delta.dx - paddingX * delta.scaleRatio <= 0
+      && delta.dy - paddingY * delta.scaleRatio <= 0
+      && delta.dx + (width + paddingX) * delta.scaleRatio >= width
+      && delta.dy + (height + paddingY) * delta.scaleRatio >= height;
     const shouldExactRefresh =
       delta.distancePx > maxDistancePx
-      || reachesReuseFrameLimit;
+      || reachesReuseFrameLimit
+      || !coversViewport;
     let reason = "transform-reuse";
     if (delta.distancePx > maxDistancePx) {
       reason = "distance-threshold";
     } else if (reachesReuseFrameLimit) {
       reason = "reuse-frame-limit";
+    } else if (!coversViewport) {
+      reason = "viewport-uncovered";
     }
     return {
       enabled: true,
