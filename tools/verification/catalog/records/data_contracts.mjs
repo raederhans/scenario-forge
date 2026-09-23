@@ -1,6 +1,30 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    id: "python:nordic-water-seed",
+    commandRef: "python -m unittest tests.test_nordic_water_seed -q",
+    sourceRefs: [
+      "tests/test_nordic_water_seed.py",
+      "tools/append_nordic_water.py",
+      "tools/patch_tno_1962_bundle.py",
+      "init_map_data.py",
+      "data/ne_10m_lakes.zip",
+    ],
+    ownerHints: ["geo-contract"],
+    domains: ["geo-contract"],
+    tiers: ["heavy"],
+    cost: "heavy",
+    resourceLocks: ["heavy-geo", ".runtime-output"],
+    executionOwners: ["main-thread"],
+    profiles: ["full"],
+    platforms: ["all"],
+    entrypointPolicyIndex: 0,
+    verificationOrder: null,
+    selectorOrder: 1038,
+    verification: null,
+    selector: {},
+  },
+  {
     "id": "python:contour-lod-assets",
     "commandRef": "python -m unittest tests.test_build_contour_lod_assets -q",
     "sourceRefs": [

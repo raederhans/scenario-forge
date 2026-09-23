@@ -285,6 +285,7 @@ export function createLocalFeedbackRecords(baseRecords) {
   const localTestFiles = [
     ["scenario-water-fill", "renderer-runtime", "tests/scenario_water_fill_behavior.test.mjs"],
     ["scenario-water-signature", "renderer-runtime", "tests/scenario_water_signature_behavior.test.mjs"],
+    ["atlantropa-water-color", "renderer-runtime", "tests/atlantropa_water_color_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["retired-frontline", "renderer-runtime", "tests/retired_frontline_behavior.test.mjs"],
     ["scenario-chunk-cancellation", "scenario-runtime", "tests/scenario_chunk_cancellation_behavior.test.mjs", ["js/core/scenario/chunk_runtime.js", "js/core/scenario/chunk_payload_loader.js"]],
     ["scenario-deferred-infra-lifecycle", "scenario-runtime", "tests/scenario_deferred_infra_lifecycle_behavior.test.mjs", ["js/core/map_renderer/scenario_refresh_runtime.js"]],

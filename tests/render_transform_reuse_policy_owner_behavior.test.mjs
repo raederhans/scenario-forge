@@ -44,6 +44,7 @@ function createOwner({
   const cache = {
     canvases: {},
     counters: {},
+    layouts: { contextScenario: { offsetX: 150, offsetY: 150 } },
     ...cacheOverrides,
   };
   const referenceTransforms = { ...references };
@@ -162,6 +163,23 @@ test("getContextScenarioReuseDecision covers disabled missing reference distance
   }).owner.getContextScenarioReuseDecision({ k: 1, x: 50, y: 50 });
   assert.equal(reuse.reason, "transform-reuse");
   assert.equal(reuse.shouldExactRefresh, false);
+});
+
+test("scenario reuse requires painted viewport coverage, not just distance and frame budgets", () => {
+  const { owner } = createOwner({ references: { contextScenario: { k: 1, x: 0, y: 0 } } });
+  for (const transform of [
+    { k: 1, x: 100, y: 0 }, { k: 1, x: -100, y: 0 },
+    { k: 1, x: 0, y: 100 }, { k: 1, x: 0, y: -100 },
+    { k: 0.5, x: 250, y: 250 },
+  ]) {
+    const decision = owner.getContextScenarioReuseDecision(transform);
+    assert.equal(decision.shouldExactRefresh, true);
+    assert.equal(decision.reason, "viewport-uncovered");
+  }
+  assert.equal(owner.getContextScenarioReuseDecision({ k: 1, x: 90, y: -90 }).shouldExactRefresh, false);
+  assert.equal(owner.getContextScenarioReuseDecision({ k: 2, x: -500, y: -500 }).shouldExactRefresh, false);
+  const unpadded = createOwner({ cache: { layouts: {} }, references: { contextScenario: { k: 1, x: 0, y: 0 } } });
+  assert.equal(unpadded.owner.getContextScenarioReuseDecision({ k: 1, x: 1, y: 0 }).shouldExactRefresh, true);
 });
 
 test("ready ordinary maps can schedule sliced recovery while contextBase transform reuse remains disabled", () => {

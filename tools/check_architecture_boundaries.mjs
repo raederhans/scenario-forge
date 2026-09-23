@@ -226,8 +226,9 @@ const LINE_BUDGETS = Object.freeze({
   [FILES.exactAfterSettleScheduler]: 760,
   [FILES.exactAfterSettlePassCatalog]: 120,
   [FILES.hgoPreviewRenderOwner]: 280,
-  [FILES.renderCacheOwner]: 724,
-  [FILES.renderTransformReusePolicyOwner]: 260,
+  // Water cache reuse guards belong to the existing cache and transform owners.
+  [FILES.renderCacheOwner]: 727,
+  [FILES.renderTransformReusePolicyOwner]: 274,
   [FILES.projectedGeometryBoundsOwner]: 420,
   [FILES.viewportReadModelOwner]: 260,
   [FILES.viewportCommandOwner]: 220,

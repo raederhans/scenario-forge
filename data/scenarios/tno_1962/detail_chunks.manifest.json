@@ -157177,15 +157177,18 @@
         90.0
       ],
       "priority": 1,
-      "feature_count": 141,
-      "byte_size": 22615688,
-      "sha256": "bbab6b630b0bbd0c339d83d18782db8dfa0f72ba562005b6ad71ac42d8a7fddb",
-      "coord_count": 729888,
-      "part_count": 20969,
-      "estimated_path_cost": 898063,
+      "feature_count": 149,
+      "byte_size": 22767166,
+      "sha256": "ecdb07d566d7ee14fb44cd2185e03a52dc6c519ea80bc3e4fceba4a0c909fdfb",
+      "decoded_byte_size": 22767166,
+      "coord_count": 733718,
+      "part_count": 20978,
+      "estimated_path_cost": 901989,
       "data_format": "geojson",
       "global_coverage": true,
-      "country_codes": []
+      "country_codes": [
+        "LAK"
+      ]
     },
     {
       "id": "water.detail.r0c0",
@@ -157204,6 +157207,7 @@
       "feature_count": 6,
       "byte_size": 616936,
       "sha256": "ca851774fa332d13b858af6ee019d3ae87df16fcdcdafed2c47b80f6d71ec519",
+      "decoded_byte_size": 616936,
       "coord_count": 21435,
       "part_count": 846,
       "estimated_path_cost": 28221,
@@ -157228,6 +157232,7 @@
       "feature_count": 14,
       "byte_size": 1135635,
       "sha256": "3b52a586f289d4826c1f563e7e39d993cea8e27be17d09e8fb43d1e09c62df7e",
+      "decoded_byte_size": 1135635,
       "coord_count": 39020,
       "part_count": 1073,
       "estimated_path_cost": 47646,
@@ -157252,6 +157257,7 @@
       "feature_count": 15,
       "byte_size": 2433953,
       "sha256": "e107212b6b9d26d89cbb475a6af5484d23151f7641aaea55dc900d645fa00fba",
+      "decoded_byte_size": 2433953,
       "coord_count": 79750,
       "part_count": 7565,
       "estimated_path_cost": 140315,
@@ -157276,6 +157282,7 @@
       "feature_count": 23,
       "byte_size": 3417222,
       "sha256": "e3baa44b6096e03f675b71d9f6e49496df8d5b88259870275a59337bf3fdcdab",
+      "decoded_byte_size": 3417222,
       "coord_count": 107780,
       "part_count": 6523,
       "estimated_path_cost": 160033,
@@ -157300,6 +157307,7 @@
       "feature_count": 11,
       "byte_size": 2833795,
       "sha256": "2519deb717e3f22b00d2b3d12d09e83402ae62b55f213504a18e6ef9b1161aaf",
+      "decoded_byte_size": 2833795,
       "coord_count": 89494,
       "part_count": 478,
       "estimated_path_cost": 93351,
@@ -157324,6 +157332,7 @@
       "feature_count": 60,
       "byte_size": 7812012,
       "sha256": "54b6a7c4ca4b5e57596fe5937d15d649a562be76a5058620f59dfa40c60b770b",
+      "decoded_byte_size": 7812012,
       "coord_count": 249657,
       "part_count": 2200,
       "estimated_path_cost": 267437,
@@ -157345,15 +157354,18 @@
         90.0
       ],
       "priority": 2,
-      "feature_count": 48,
-      "byte_size": 10668211,
-      "sha256": "3f512d35bdfcb6c8dcbc47f64ee975fc3672cb8dceb4cae250cbe16e008db6aa",
-      "coord_count": 357053,
-      "part_count": 15808,
-      "estimated_path_cost": 483661,
+      "feature_count": 56,
+      "byte_size": 10819689,
+      "sha256": "ab57af92c69ede161d5e540f8befe90bf8aa85bff680d6bbe019e9d74193d716",
+      "decoded_byte_size": 10819689,
+      "coord_count": 360883,
+      "part_count": 15817,
+      "estimated_path_cost": 487587,
       "data_format": "geojson",
       "global_coverage": false,
-      "country_codes": []
+      "country_codes": [
+        "LAK"
+      ]
     },
     {
       "id": "water.detail.r1c3",
@@ -157372,6 +157384,7 @@
       "feature_count": 29,
       "byte_size": 5268080,
       "sha256": "d12ccdb7d08543f326a7f1095c01efd4124a6e3c66f3e5a1241d0c6e7ae879c5",
+      "decoded_byte_size": 5268080,
       "coord_count": 165183,
       "part_count": 3544,
       "estimated_path_cost": 193622,

@@ -138,14 +138,14 @@ test("final base topology keeps polar, Antarctic, mid-latitude, and dateline oce
   const result = validateBaseTopologyAsset("../data/europe_topology.json");
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 71);
+  assert.equal(result.stats.checkedFeatureCount, 77);
 });
 
-test("final detail topology keeps the same 71-feature ocean contract", () => {
+test("final detail topology keeps the same 77-feature water contract", () => {
   const result = validateBaseTopologyAsset("../data/europe_topology.na_v2.json");
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 71);
+  assert.equal(result.stats.checkedFeatureCount, 77);
 });
 
 test("final TNO runtime topology excludes Antarctic land and keeps polar/dateline continuity", () => {
@@ -172,7 +172,7 @@ test("final TNO runtime topology excludes Antarctic land and keeps polar/datelin
   });
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 141);
+  assert.equal(result.stats.checkedFeatureCount, 149);
 });
 
 test("final TNO water chunks exactly preserve source and runtime geometry before their merged payload overrides topology", () => {
@@ -186,8 +186,11 @@ test("final TNO water chunks exactly preserve source and runtime geometry before
 
   const sourceById = new Map(source.features.map((entry) => [getFeatureId(entry), entry]));
   const runtimeById = new Map(runtime.features.map((entry) => [getFeatureId(entry), entry]));
-  assert.equal(sourceById.size, 141);
-  assert.equal(runtimeById.size, 141);
+  assert.equal(sourceById.size, 149);
+  assert.equal(runtimeById.size, 149);
+  for (const id of ["lake_ladoga", "lake_onega", "lake_vanern", "lake_vattern", "lake_saimaa", "lake_paijanne", "lake_inari", "lake_pielinen"]) {
+    assert.ok(sourceById.has(id), `major Nordic lake ${id} must reach the published water payload`);
+  }
 
   const mergedFeatures = [];
   const mergedIds = new Set();
@@ -230,5 +233,5 @@ test("final TNO water chunks exactly preserve source and runtime geometry before
   });
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 141);
+  assert.equal(result.stats.checkedFeatureCount, 149);
 });

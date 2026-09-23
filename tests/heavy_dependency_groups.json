@@ -19,6 +19,7 @@
       "tests/test_global_transport_builder_contracts.py",
       "tests/test_landing_map_asset_contracts.py",
       "tests/test_local_canonicalization.py",
+      "tests/test_nordic_water_seed.py",
       "tests/test_pages_dist_startup_shell_heavy.py",
       "tests/test_patch_checked_in_urban_artifacts.py",
       "tests/test_physical_context_contours.py",

@@ -42,12 +42,12 @@
     },
     {
       "path": "app/data/europe_topology.json",
-      "size_bytes": 7401187,
+      "size_bytes": 7438093,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/europe_topology.na_v2.json",
-      "size_bytes": 45389418,
+      "size_bytes": 45514380,
       "source_kind": "generated_ignored"
     },
     {
@@ -38142,22 +38142,22 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json.gz",
-      "size_bytes": 2587621,
+      "size_bytes": 2600235,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json.gz",
-      "size_bytes": 2587622,
+      "size_bytes": 2600236,
       "source_kind": "generated_ignored"
     },
     {
@@ -38902,22 +38902,22 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json.gz",
-      "size_bytes": 2585471,
+      "size_bytes": 2598921,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json.gz",
-      "size_bytes": 2585472,
+      "size_bytes": 2598922,
       "source_kind": "generated_ignored"
     },
     {
@@ -39997,7 +39997,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/water.coarse.r0c0.json.gz",
-      "size_bytes": 6429412,
+      "size_bytes": 6478256,
       "source_kind": "generated_ignored"
     },
     {
@@ -40032,7 +40032,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/water.detail.r1c2.json.gz",
-      "size_bytes": 2853558,
+      "size_bytes": 2902339,
       "source_kind": "generated_ignored"
     },
     {
@@ -40077,7 +40077,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/detail_chunks.manifest.json",
-      "size_bytes": 1732519,
+      "size_bytes": 1732529,
       "source_kind": "generated_ignored"
     },
     {
@@ -40122,7 +40122,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/manifest.json",
-      "size_bytes": 6283,
+      "size_bytes": 6398,
       "source_kind": "generated_ignored"
     },
     {
@@ -40187,22 +40187,22 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json",
-      "size_bytes": 12109213,
+      "size_bytes": 12146054,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json.gz",
-      "size_bytes": 2874996,
+      "size_bytes": 2888608,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json",
-      "size_bytes": 12109213,
+      "size_bytes": 12146054,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json.gz",
-      "size_bytes": 2874994,
+      "size_bytes": 2888609,
       "source_kind": "generated_ignored"
     },
     {
@@ -40212,7 +40212,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/water_regions.geojson",
-      "size_bytes": 22658362,
+      "size_bytes": 22809995,
       "source_kind": "generated_ignored"
     },
     {
@@ -44142,7 +44142,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 584654,
+      "size_bytes": 584388,
       "source_kind": "dist"
     },
     {
@@ -44677,7 +44677,7 @@
     },
     {
       "path": "app/js/core/renderer/render_cache_owner.js",
-      "size_bytes": 27607,
+      "size_bytes": 27905,
       "source_kind": "dist"
     },
     {
@@ -44722,7 +44722,7 @@
     },
     {
       "path": "app/js/core/renderer/render_transform_reuse_policy_owner.js",
-      "size_bytes": 9610,
+      "size_bytes": 10584,
       "source_kind": "dist"
     },
     {
@@ -44772,7 +44772,7 @@
     },
     {
       "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-      "size_bytes": 22154,
+      "size_bytes": 22181,
       "source_kind": "dist"
     },
     {
@@ -46397,7 +46397,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2201046,
+      "size_bytes": 2201048,
       "source_kind": "dist"
     },
     {
@@ -46409,7 +46409,7 @@
   "largest_files": [
     {
       "path": "app/data/europe_topology.na_v2.json",
-      "size_bytes": 45389418,
+      "size_bytes": 45514380,
       "source_kind": "generated_ignored"
     },
     {
@@ -46419,7 +46419,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/water_regions.geojson",
-      "size_bytes": 22658362,
+      "size_bytes": 22809995,
       "source_kind": "generated_ignored"
     },
     {
@@ -46439,32 +46439,32 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json",
-      "size_bytes": 12141379,
+      "size_bytes": 12178105,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json",
-      "size_bytes": 12136239,
+      "size_bytes": 12172965,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json",
-      "size_bytes": 12109213,
+      "size_bytes": 12146054,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json",
-      "size_bytes": 12109213,
+      "size_bytes": 12146054,
       "source_kind": "generated_ignored"
     },
     {
@@ -46499,7 +46499,7 @@
     },
     {
       "path": "app/data/europe_topology.json",
-      "size_bytes": 7401187,
+      "size_bytes": 7438093,
       "source_kind": "generated_ignored"
     },
     {
@@ -46522,7 +46522,7 @@
       {
         "file_count": 289,
         "id": "startup-critical",
-        "size_bytes": 27721254
+        "size_bytes": 27722287
       },
       {
         "file_count": 102,
@@ -46532,12 +46532,12 @@
       {
         "file_count": 825,
         "id": "on-demand-product",
-        "size_bytes": 283319562
+        "size_bytes": 283481432
       },
       {
         "file_count": 8048,
         "id": "scenario-specific",
-        "size_bytes": 282994733
+        "size_bytes": 283544057
       },
       {
         "file_count": 5,
@@ -49572,7 +49572,7 @@
               {
                 "column": 21,
                 "kind": "new-url-reference",
-                "line": 620,
+                "line": 619,
                 "local": true,
                 "reference": "../../vendor/textures/paper_vintage_01.svg",
                 "resolved_path": "app/vendor/textures/paper_vintage_01.svg"
@@ -50774,7 +50774,7 @@
               {
                 "column": 1,
                 "kind": "export-named-source",
-                "line": 14857,
+                "line": 14849,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -64870,17 +64870,17 @@
         "deferred_graph_file_count": 132,
         "deferred_module_count": 130,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5426427,
+        "initial_graph_bytes": 5427460,
         "initial_graph_file_count": 320,
         "initial_module_count": 307,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4328007,
+        "initial_script_bytes": 4329040,
         "initial_script_count": 309,
         "module_count": 444,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 566182268,
+        "untraversed_dist_bytes": 566893462,
         "untraversed_dist_file_count": 8813,
         "untraversed_module_count": 7
       },
@@ -65075,7 +65075,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 584654
+            "size_bytes": 584388
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -65463,7 +65463,7 @@
           },
           {
             "path": "app/js/core/renderer/render_cache_owner.js",
-            "size_bytes": 27607
+            "size_bytes": 27905
           },
           {
             "path": "app/js/core/renderer/render_cache_validation_scope.js",
@@ -65495,7 +65495,7 @@
           },
           {
             "path": "app/js/core/renderer/render_transform_reuse_policy_owner.js",
-            "size_bytes": 9610
+            "size_bytes": 10584
           },
           {
             "path": "app/js/core/renderer/renderer_fit_projection_owner.js",
@@ -65531,7 +65531,7 @@
           },
           {
             "path": "app/js/core/renderer/scenario_region_overlay_render_owner.js",
-            "size_bytes": 22154
+            "size_bytes": 22181
           },
           {
             "path": "app/js/core/renderer/screen_label_placement.js",
@@ -65939,7 +65939,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3262228
+        "size_bytes": 3263261
       },
       {
         "basis": "startup-resource-graph",
@@ -66523,11 +66523,11 @@
           },
           {
             "path": "app/data/europe_topology.json",
-            "size_bytes": 7401187
+            "size_bytes": 7438093
           },
           {
             "path": "app/data/europe_topology.na_v2.json",
-            "size_bytes": 45389418
+            "size_bytes": 45514380
           },
           {
             "path": "app/data/europe_topology.runtime_political_v1.json",
@@ -66631,7 +66631,7 @@
             "size_bytes": 802059
           }
         ],
-        "size_bytes": 162376950
+        "size_bytes": 162538818
       },
       {
         "basis": "product-registry:on-demand-module-entries",
@@ -66862,11 +66862,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2201046
+            "size_bytes": 2201048
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2201046
+        "size_bytes": 2201048
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -67221,7 +67221,7 @@
           {
             "file_count": 584,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 272095502
+            "size_bytes": 272644826
           },
           {
             "file_count": 10,
@@ -67229,7 +67229,7 @@
             "size_bytes": 94013
           }
         ],
-        "size_bytes": 272189515
+        "size_bytes": 272738839
       },
       {
         "basis": "product-registry:export-modules",
@@ -67430,7 +67430,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 272189515
+          "size_bytes": 272738839
         },
         {
           "category": "scenario-specific",
@@ -67571,7 +67571,7 @@
             ]
           },
           "owner": "editor-data-runtime",
-          "size_bytes": 162376950
+          "size_bytes": 162538818
         },
         {
           "category": "on-demand-product",
@@ -67675,7 +67675,7 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2201046
+          "size_bytes": 2201048
         }
       ],
       "status": "complete",
@@ -67718,7 +67718,7 @@
     {
       "file_count": 9217,
       "path": "app",
-      "size_bytes": 568589549
+      "size_bytes": 569301774
     },
     {
       "file_count": 59,
@@ -67728,7 +67728,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2201046
+      "size_bytes": 2201048
     },
     {
       "file_count": 1,
@@ -67751,5 +67751,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 597949516
+  "total_bytes": 598661743
 }
