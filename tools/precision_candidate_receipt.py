@@ -81,6 +81,24 @@ def gate_inventory(current: dict, receipts: list[dict]) -> dict:
             'release_ready': False, 'release_status': 'requires-reviewed-gate-acceptance'}
 
 
+def read_verified_receipt(path: Path) -> dict:
+    """Read an execution receipt and validate both adjacent immutable logs."""
+    path = Path(path)
+    if has_reparse_point_component(path) or not path.is_file():
+        raise ValueError(f'Missing or linked receipt: {path}')
+    value = json.loads(path.read_text(encoding='utf-8'))
+    for stream in ('stdout', 'stderr'):
+        entry = value.get('logs', {}).get(stream, {})
+        name = entry.get('file', '')
+        if not isinstance(name, str) or not name or Path(name).name != name:
+            raise ValueError(f'Invalid receipt log path: {path}')
+        log = path.resolve().parent / name
+        if (has_reparse_point_component(log) or not log.is_file()
+                or sha256_file(log) != entry.get('sha256')):
+            raise ValueError(f'Missing or changed receipt log: {path}')
+    return value
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('operation', choices=('snapshot', 'run', 'inventory'))
@@ -111,15 +129,7 @@ def main(argv=None) -> int:
         receipts = []
         for path in args.receipt:
             path = resolve_runtime_path(path, repo_root=ROOT, label='Gate receipt', must_exist=True)
-            value = json.loads(path.read_text(encoding='utf-8'))
-            # Logs are evidence artifacts: a missing/changed log invalidates a receipt.
-            for stream in ('stdout', 'stderr'):
-                entry = value.get('logs', {}).get(stream, {})
-                log = path.resolve().parent / entry.get('file', '')
-                if (log.parent != path.resolve().parent or not log.is_file() or log.is_symlink()
-                        or sha256_file(log) != entry.get('sha256')):
-                    raise ValueError(f'Missing or changed receipt log: {path}')
-            receipts.append(value)
+            receipts.append(read_verified_receipt(path))
         report = gate_inventory(before, receipts)
         write_json_atomic(output, report)
         return 0 if report['all_commands_passed'] else 2

@@ -123,6 +123,18 @@ export function createPrecisionScalingRecords(existingRecords) {
     sourceRefs: ["tests/e2e/dev/precision_foundation_patch.dev.spec.js", "tests/e2e/dev/support/precision_foundation_native_case.mjs"],
     selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:precision-build:graph",
+    commandRef: "python -m unittest tests.test_precision_build_graph -q",
+    sourceRefs: ["tools/precision_build_graph.py", "tests/test_precision_build_graph.py",
+      "tools/build_political_display_lods.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:precision-engineering:campaign",
+    commandRef: "python -m unittest tests.test_precision_campaign -q",
+    sourceRefs: ["tools/precision_campaign.py", "tools/precision_comparison.py", "tools/precision_candidate_receipt.py",
+      "tests/test_precision_campaign.py", "ops/precision/campaign.example.json"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
   records.push({ ...records[0], id: "local:precision-resources:accounting",
     commandRef: "node --test tests/runtime_resource_budget_behavior.test.mjs tests/worker_resource_accounting_behavior.test.mjs",
     sourceRefs: ["js/core/runtime_resource_budget.js", "js/core/scenario/chunk_load_scheduler.js",
