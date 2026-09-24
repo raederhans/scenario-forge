@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 29);
+  assert.equal(routes.length, 30);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -64,4 +64,17 @@ test("US county lineage metadata selects the scenario migration regression witho
 
 test("precision additions preserve repository-wide command ownership and resource policy", () => {
   assert.doesNotThrow(() => reconcileVerificationRouteAuthority());
+});
+
+test("artifact tests append without replacing the existing foundation build command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.equal(routes.find((record) => record.id === "local:precision-foundation:build").commandRef,
+    "python -m unittest tests.test_precision_foundation_build -q");
+  assert.equal(routes[29].id, "local:precision-artifact:partition-rehearsal");
+  for (const source of ["tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py", "tests/test_pages_artifact_partition.py"]) {
+    const report = buildRepositoryRecommendation([source]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === "python -m unittest tests.test_pages_artifact_partition -q"));
+  }
 });
