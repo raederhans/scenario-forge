@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { createRiverLayerRenderOwner } from "../js/core/renderer/river_layer_render_owner.js";
+import { createRiverLayerRenderOwner, getRiverZoomBucket } from "../js/core/renderer/river_layer_render_owner.js";
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -118,7 +118,7 @@ test("river layer owner records skip metrics with explicit reasons", () => {
   assert.equal(noContext.metrics.at(-1).details.reason, "no-context");
 });
 
-test("river layer owner keeps zoom and class visibility rules in metrics", () => {
+test("river layer owner adds a small near-zoom tier without drawing lake centerlines", () => {
   const features = [
     createFeature("River", 4),
     createFeature("River", 7),
@@ -138,7 +138,13 @@ test("river layer owner keeps zoom and class visibility rules in metrics", () =>
 
   harness.owner.drawRiversLayer(2.6);
   assert.equal(harness.metrics.at(-1).details.zoomBucket, "high");
-  assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 5);
+  assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 2);
+
+  harness.owner.drawRiversLayer(5);
+  assert.equal(harness.metrics.at(-1).details.zoomBucket, "detail");
+  assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 4);
+  assert.equal(getRiverZoomBucket(4.99), "high");
+  assert.equal(getRiverZoomBucket(5), "detail");
 });
 
 test("river layer owner keeps min zoom bridge for rank eight rivers at mid zoom", () => {
@@ -180,8 +186,12 @@ test("river draw preserves zero ranks and finite rank defaults across zoom bucke
       const strokes = harness.context.calls.filter((call) => call.type === "stroke");
       assert.equal(strokes.length, visible ? 2 : 0, message);
       if (visible) {
-        const widthFactor = [1.2, 1, 0.75][zoomIndex];
-        assert.equal(strokes[1].lineWidth, 1.2 * widthFactor / scale, message);
+        const widthFactor = [1.3, 1.2, 1.2][zoomIndex];
+        const rank = Number.isFinite(Number(sample.properties.scalerank ?? sample.properties.SCALERANK))
+          ? Number(sample.properties.scalerank ?? sample.properties.SCALERANK)
+          : 8;
+        const rankWidthFactor = rank <= 5 ? 1.15 : rank <= 7 ? 1 : rank === 8 ? 0.85 : 0.75;
+        assert.equal(strokes[1].lineWidth, 1.2 * widthFactor * rankWidthFactor / scale, message);
       }
     }
   }
@@ -199,6 +209,38 @@ test("river layer owner culls offscreen features before drawing", () => {
 
   assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 1);
   assert.ok(harness.pathCalls.every((feature) => feature === visibleFeature));
+});
+
+test("river candidates are classified once per data object and screened by tier before viewport checks", () => {
+  const major = createFeature("River", 4);
+  const tributary = createFeature("River", 9);
+  const centerline = createFeature("Lake Centerline", 4);
+  const checked = [];
+  const harness = createOwner({
+    features: [major, tributary, centerline],
+    pathBoundsInScreen: (feature) => { checked.push(feature); return true; },
+  });
+  harness.owner.drawRiversLayer(1);
+  assert.deepEqual(checked, [major]);
+  harness.owner.drawRiversLayer(5);
+  assert.deepEqual(checked.slice(1), [major, tributary]);
+  harness.state.riversData = { type: "FeatureCollection", features: [tributary] };
+  harness.owner.drawRiversLayer(1);
+  assert.equal(harness.metrics.at(-1).details.visibleFeatureCount, 0);
+  assert.equal(checked.length, 3);
+});
+
+test("river rank changes visual weight while close zoom retains visible core width", () => {
+  const major = createFeature("River", 3);
+  const tributary = createFeature("River", 9);
+  const harness = createOwner({ features: [major, tributary] });
+  harness.owner.drawRiversLayer(5);
+  const strokes = harness.context.calls.filter((call) => call.type === "stroke");
+  const core = strokes.filter((call) => call.strokeStyle === "#336699");
+  const outlines = strokes.filter((call) => call.strokeStyle === "#ddeeff");
+  assert.ok(core[0].lineWidth > core[1].lineWidth);
+  assert.ok(core[0].lineWidth * 5 > 1.2 * 0.75);
+  assert.ok(outlines[0].alpha > outlines[1].alpha);
 });
 
 test("river layer owner scales dash and line widths by zoom", () => {
@@ -300,7 +342,7 @@ test("river geometry is projected once per outlined feature with outline-before-
   const canal = createFeature("Canal", 3);
   const projection = createSwitchablePath(context);
   const harness = createOwner({ context, features: [a, b, canal], pathCanvas: projection.path });
-  harness.owner.drawRiversLayer(3);
+  harness.owner.drawRiversLayer(5);
   const strokes = context.calls.filter((call) => call.type === "stroke");
   assert.deepEqual(projection.calls.map((call) => call.feature), [a, b, canal]);
   assert.deepEqual(strokes.map((call) => call.strokeStyle), ["#ddeeff", "#ddeeff", "#336699", "#336699", "#336699"]);
@@ -310,7 +352,7 @@ test("river geometry is projected once per outlined feature with outline-before-
   assert.deepEqual(strokes[1].path.features, [b]);
   assert.equal(strokes[4].path, undefined);
   assert.equal(projection.path.context(), context);
-  harness.owner.drawRiversLayer(3);
+  harness.owner.drawRiversLayer(5);
   const laterStrokes = context.calls.filter((call) => call.type === "stroke").slice(5);
   assert.notEqual(laterStrokes[0].path, strokes[0].path);
   assert.equal(projection.calls.length, 6);

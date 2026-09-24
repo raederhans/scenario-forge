@@ -19,3 +19,19 @@ test('93-feature worker patches match complete native rasterization, holes and p
   expect(result.fallbacks).toBe(0);
   expect(result.uploads.slice(1).every(count => count === 0)).toBe(true);
 });
+
+test('separated native crops clear holes without stale exterior pixels', async ({ page }, testInfo) => {
+  await page.route(url => url.pathname === '/', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Separated crop oracle</title>' }));
+  await page.goto('/');
+  const result = await page.evaluate(async () => {
+    const { runPrecisionFoundationNativeCase } = await import('/tests/e2e/dev/support/precision_foundation_native_case.mjs');
+    return runPrecisionFoundationNativeCase({ separatedEdits: true });
+  });
+  await testInfo.attach('separated-crop-result', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
+  expect(result.samples).toHaveLength(7);
+  expect(result.samples.every(sample => sample.differences === 0)).toBe(true);
+  expect(result.patchMetrics).toHaveLength(6);
+  expect(result.clearedPixels.slice(1,7).every(count => count < result.clearedPixels[0])).toBe(true);
+  expect(result.staleDraw).toBeNull();
+  expect(result.fallbacks).toBe(0);
+});

@@ -85,6 +85,20 @@ test("getContextBaseZoomBucketId classifies low mid and high zoom buckets", () =
   assert.equal(owner.getContextBaseZoomBucketId(3.0), "high");
 });
 
+test("river detail boundary forces exact repaint in both zoom directions only while rivers are visible", () => {
+  for (const [from, to] of [[4.9, 5], [5, 4.9]]) {
+    const { owner, state } = createOwner({
+      state: { showRivers: true },
+      references: { contextBase: { k: from, x: 0, y: 0 } },
+    });
+    const next = { k: to, x: 0, y: 0 };
+    assert.equal(owner.getContextBaseReuseDecision(next).reason, "river-bucket-change");
+    assert.equal(owner.getContextBaseReuseDecision(next).shouldExactRefresh, true);
+    state.showRivers = false;
+    assert.equal(owner.getContextBaseReuseDecision(next).shouldExactRefresh, false);
+  }
+});
+
 test("getContextBaseReuseMaxDistancePx clamps viewport-scaled distance", () => {
   assert.equal(createOwner({ state: { width: 500, height: 1000 } }).owner.getContextBaseReuseMaxDistancePx(), 320);
   assert.equal(createOwner({ state: { width: 1200, height: 2000 } }).owner.getContextBaseReuseMaxDistancePx(), 420);

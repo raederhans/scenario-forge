@@ -52,14 +52,14 @@ function cropHarness(createBitmap) {
   const transforms = [];
   const context = { setTransform: (...args) => transforms.push(["set", ...args]),
     translate: (...args) => transforms.push(["translate", ...args]), scale: (...args) => transforms.push(["scale", ...args]),
-    clearRect() {}, fill() {}, stroke() {} };
+    clearRect: (...args) => transforms.push(["clear", ...args]), fill() {}, stroke() {} };
   const feature = { type: "Feature", geometry: { type: "Polygon", coordinates: [[[0, 0], [0, 2], [2, 2], [2, 0], [0, 0]]] } };
   const packet = { kind: "political", sceneKey: "fixture", projectionKey: "projection", width: 800, height: 600,
     dpr: 1.5, offsetX: 20, offsetY: 10, transform: { x: 3, y: 4, k: 2.5 },
     geometryUpdates: [{ id: "region", feature }], entries: [{ id: "region", fillColor: "red" }],
     renderRegion: { x: 137, y: 83, width: 160, height: 120 }, drawEntryIds: ["region"], patchBaseIdentity: "accepted" };
   const kernel = createGeometryRasterWorkerKernel({ d3: createRequire(import.meta.url)("../vendor/d3.v7.min.js"),
-    createCanvas: (width, height) => ({ width, height, getContext: () => context }),
+    createCanvas: (width, height) => ({ width, height, getContext: () => context, transferToImageBitmap: () => ({ close() {} }) }),
     createPath: () => ({ moveTo() {}, lineTo() {}, closePath() {}, arc() {} }), createBitmap, yieldTask: async () => {} });
   return { kernel, packet, transforms };
 }
@@ -129,4 +129,59 @@ test("patch commits a bitmap snapshot and retires full, cropped and composed bit
   assert.equal(composite.closes, 0);
   owner.dispose();
   assert.equal(composite.closes, 1);
+});
+
+
+test("accepted-frame bounds are indexed once and queried in painter order", () => {
+  const f = fixture(); let calls = 0;
+  const getter = e => { calls++; return e.bounds; };
+  let previous = f.previous;
+  for (let iteration = 0; iteration < 6; iteration++) {
+    const current = previous.entries.map((e, i) => i < 93 ? { ...e, fillColor: String(iteration) } : e);
+    const result = planPoliticalRasterPatch(previous, current, f.description, getter);
+    assert.equal(result.changedCount, 93);
+    assert.equal(result.boundsIndex.reused, iteration > 0);
+    assert.equal(calls, 1000);
+    const r = result.region;
+    const expected = current.filter(e => e.bounds.maxX >= r.x && e.bounds.minX <= r.x + r.width
+      && e.bounds.maxY >= r.y && e.bounds.minY <= r.y + r.height).map(e => e.id);
+    assert.deepEqual(result.drawEntryIds, expected);
+    assert.ok(result.boundsIndex.visitedBounds < 1000);
+    previous = { patchKey: f.description.patchKey, entries: current };
+  }
+});
+
+test("bounds getter and view changes never reuse the previous index", () => {
+  const f = fixture();
+  planPoliticalRasterPatch(f.previous, f.current, f.description, f.bounds);
+  const previous = { patchKey: 'stable', entries: f.current };
+  const current = f.current.map((e, i) => i === 0 ? { ...e, fillColor: 'green' } : e);
+  let calls = 0;
+  const result = planPoliticalRasterPatch(previous, current, f.description, e => { calls++; return e.bounds; });
+  assert.equal(calls, 1000); assert.equal(result.boundsIndex.reused, false);
+  assert.equal(planPoliticalRasterPatch(previous, current, { ...f.description, patchKey: 'changed' }, f.bounds), null);
+});
+
+test("numeric index does not retain borrowed bounds and agrees with naive overlap oracle", () => {
+  const f = fixture(); let previous = f.previous;
+  for (let iteration = 0; iteration < 40; iteration++) {
+    const selected = (iteration * 173) % 1000;
+    const current = previous.entries.map((e, i) => i === selected ? { ...e, fillColor: `edit-${iteration}` } : e);
+    const result = planPoliticalRasterPatch(previous, current, f.description, f.bounds);
+    const r = result.region;
+    assert.deepEqual(result.drawEntryIds, current.filter(e => e.bounds.maxX >= r.x && e.bounds.minX <= r.x+r.width
+      && e.bounds.maxY >= r.y && e.bounds.minY <= r.y+r.height).map(e => e.id));
+    previous = { patchKey: 'stable', entries: current };
+  }
+});
+
+test("worker clears only the published crop but full frames clear the complete surface", async () => {
+  const { kernel, packet, transforms } = cropHarness(async () => ({ close() {} }));
+  const result = await kernel.render(packet);
+  assert.ok(transforms.some(row => JSON.stringify(row) === JSON.stringify(['clear',137,83,160,120])));
+  assert.equal(result.clearedPixelCount, 160*120);
+  const full = { ...packet, renderRegion: null, drawEntryIds: null, patchBaseIdentity: null };
+  const rendered = await kernel.render(full);
+  assert.ok(transforms.some(row => JSON.stringify(row) === JSON.stringify(['clear',0,0,800,600])));
+  assert.equal(rendered.clearedPixelCount, 800*600);
 });

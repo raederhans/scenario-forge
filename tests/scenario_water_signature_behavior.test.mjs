@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { parse } from "acorn";
+import { resolveEffectiveWaterRegionFeatures } from "../js/core/renderer/effective_water_regions.js";
 
 const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const identitySource = readFileSync(new URL("../js/core/renderer/object_identity.js", import.meta.url), "utf8")
@@ -34,6 +35,7 @@ export function createHarness(source = rendererSource) {
   };
   const calls = { water: 0, buckets: 0, mask: 0, revision: 0 };
   const context = vm.createContext({
+    resolveEffectiveWaterRegionFeatures,
     runtimeState: state,
     SCENARIO_PRESENTATION_FEATURES: { ATLANTROPA_RELIEF: "atlantropa" },
     scenarioHasPresentationFeature: (manifest) => !!manifest.legacyAtlantropa,
@@ -57,7 +59,7 @@ export function createHarness(source = rendererSource) {
 
 const atlantropa = "scenario-atlantropa:4:features:2:water:1:land:1:shoal:0:relief:0:visible:on";
 const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|detail-phase:single/detail-pending/detail-idle"
-  + "|mask-tag:scenarioLandMask:scenario-mask:2:1:na:d3-valid|water-ref:scenario-water:3|water-tag:features:3"
+  + "|mask-tag:scenarioLandMask:scenario-mask:2:1:na:d3-valid|water-ref:scenario-water:3|lakes-ref:global-lakes:none|water-tag:features:3"
   + `|water-mode:combined|atlantropa:${atlantropa}`;
 const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|water-overrides:{}`
   + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
@@ -104,7 +106,7 @@ test("explicit revision tags retain their bytes and skip unused identity allocat
   Object.assign(h.state, { scenarioRuntimeTopologyVersionTag: " runtime-v2 ", scenarioContextLandMaskVersionTag: " mask-v3 ", scenarioWaterOverlayVersionTag: " water-v4 " });
   const token = h.water();
   assert.match(token, /runtime-tag:runtime-v2\|/);
-  assert.match(token, /mask-tag:mask-v3\|water-ref:scenario-water:1\|water-tag:water-v4/);
+  assert.match(token, /mask-tag:mask-v3\|water-ref:scenario-water:1\|lakes-ref:global-lakes:none\|water-tag:water-v4/);
   assert.match(token, /atlantropa:scenario-atlantropa:2:features:2/);
   assert.deepEqual(h.calls, { water: 1, buckets: 2, mask: 1, revision: 1 });
 });
@@ -145,8 +147,17 @@ test("an empty effective collection reuses zero and absent collections keep none
   Object.assign(h.state, { scenarioWaterRegionsData: null, scenarioAtlantropaData: null,
     scenarioLandMaskData: null, scenarioRuntimeTopologyData: null, waterRegionsData: null });
   const token = h.water();
-  assert.match(token, /water-ref:scenario-water:none\|water-tag:features:0/);
+  assert.match(token, /water-ref:scenario-water:none\|lakes-ref:global-lakes:none\|water-tag:features:0/);
   assert.match(token, /atlantropa:scenario-atlantropa:none:features:0/);
   assert.match(token, /water-effective:0\|water-scenario:0/);
   assert.deepEqual(h.calls, { water: 1, buckets: 2, mask: 1, revision: 1 });
+});
+
+test("shared lake replacement invalidates the water cache even with equal counts and an explicit scenario tag", () => {
+  const h = createHarness();
+  h.state.scenarioWaterOverlayVersionTag = "fixed-scenario-water";
+  h.state.contextLayerExternalDataByName = { lakes: { features: [feature("lake_baikal")] } };
+  const first = h.water();
+  h.state.contextLayerExternalDataByName.lakes = { features: [feature("lake_baikal", { updated: true })] };
+  assert.notEqual(h.water(), first);
 });

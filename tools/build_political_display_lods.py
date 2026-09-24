@@ -16,6 +16,15 @@ import json
 import math
 from pathlib import Path
 import re
+import sys
+import platform
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.precision_build_graph import BuildGraph, BuildStage
 
 from shapely import coverage_invalid_edges, coverage_is_valid, coverage_simplify, orient_polygons
 from shapely.geometry import shape, mapping
@@ -113,6 +122,44 @@ def simplify_coverage_features(features, tolerance, protected_ids=()):
                     "status": "simplified", "reason": "shared-interiors-only"}
 
 
+def cached_simplify_coverage_features(features, tolerance, protected_ids, *, cache_root, stage_name):
+    """Cache exactly the pure simplification stage, including fallback diagnostics.
+
+    Bind the actual shard values rather than a global topology timestamp. Whole
+    world/regional construction and release checks keep their original ownership.
+    """
+    import shapely
+    source_ids = [feature_id(feature) for feature in features]
+    protected_ids = tuple(protected_ids)
+    # Insertion order is observable in the existing JSON asset writer. Bind it,
+    # rather than reusing differently ordered source properties under one key.
+    ordered_hash = hashlib.sha256()
+    for part in json.JSONEncoder(ensure_ascii=False, separators=(",", ":"), allow_nan=False).iterencode(features):
+        ordered_hash.update(part.encode("utf-8"))
+    parameters = {"feature_sha256": ordered_hash.hexdigest(), "tolerance": tolerance,
+                  "protected_ids": sorted(set(protected_ids))}
+    def build(output, dependencies):
+        value, report = simplify_coverage_features(features, tolerance, protected_ids)
+        write_json(output / "result.json", {"features": value, "report": report})
+    def validate(output):
+        value = json.loads((output / "result.json").read_text(encoding="utf-8"))
+        if ([feature_id(feature) for feature in value["features"]] != source_ids
+                or value["report"]["status"] not in {"simplified", "unchanged", "fallback"}
+                or value["report"]["input_points"] != sum(coordinate_count(f.get("geometry")) for f in features)
+                or value["report"]["output_points"] != sum(coordinate_count(f.get("geometry")) for f in value["features"])):
+            raise ValueError("Invalid cached LOD result")
+    stage = BuildStage(stage_name, build, validate, parameters=parameters,
+                       algorithms={"lod": Path(__file__), "json_io": ROOT / "tools/precision_build_support.py"},
+                       toolchain={"python": platform.python_version(), "shapely": shapely.__version__,
+                                  "geos": shapely.geos_version_string})
+    result = BuildGraph(cache_root).run([stage])[stage_name]
+    value = json.loads((result.output_root / "result.json").read_text(encoding="utf-8"))
+    # Preserve the existing identity-based no-op contract. A cache hit is not a
+    # geometry change and must not regenerate a byte-identical coarse payload.
+    return (value["features"] if value["report"]["status"] == "simplified" else features,
+            value["report"], result.summary())
+
+
 def load_json(path):
     raw = path.read_bytes()
     return json.loads(gzip.decompress(raw) if path.suffix == ".gz" else raw)
@@ -149,12 +196,22 @@ def describe_chunk(template, features, url, raw):
             "feature_bounds": bounds, "data_format": "geojson"}
 
 
-def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protected_ids=(), world_tolerance=0.02, regional_tolerance=0.005):
+def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protected_ids=(), world_tolerance=0.02, regional_tolerance=0.005, cache_root=None, use_cache=True):
+    started_at = time.monotonic()
+    cache_records = []
     source_root, output_root = Path(source_root).resolve(), Path(output_root).resolve()
     if not re.fullmatch(r"[a-z0-9_-]+", scenario_id):
         raise ValueError("Invalid scenario ID")
     if output_root == source_root or source_root.is_relative_to(output_root):
         raise ValueError("Output must be a separate staging directory")
+    cache_root = Path(cache_root) if cache_root is not None else source_root / ".runtime/cache/display-lod"
+    def simplify(features, tolerance, name):
+        if not use_cache:
+            return simplify_coverage_features(features, tolerance, protected_ids)
+        result, diagnostics, cache = cached_simplify_coverage_features(
+            features, tolerance, protected_ids, cache_root=cache_root, stage_name=name)
+        cache_records.append(cache)
+        return result, diagnostics
     prefix = Path("data/scenarios") / scenario_id
     manifest_path = source_path(source_root, prefix / "detail_chunks.manifest.json")
     context_path = source_path(source_root, prefix / "context_lod.manifest.json")
@@ -183,11 +240,11 @@ def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protec
         if len(ids) != len(set(ids)) or seen.intersection(ids):
             raise ValueError("Overlapping shard membership requires explicit regrouping")
         seen.update(ids)
-        regional, regional_report = simplify_coverage_features(features, regional_tolerance, protected_ids)
+        regional, regional_report = simplify(features, regional_tolerance, "lod-regional")
         world_report = {"status": "unchanged", "reason": "not-in-base"}
         if all(fid in by_id for fid in ids):
             members = [base_features[by_id[fid]] for fid in ids]
-            world, world_report = simplify_coverage_features(members, world_tolerance, protected_ids)
+            world, world_report = simplify(members, world_tolerance, "lod-world")
             for fid, feature in zip(ids, world):
                 new_base[by_id[fid]] = feature
         reports.append({"chunk_id": detail["id"], "world": world_report, "regional": regional_report})
@@ -223,7 +280,9 @@ def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protec
               "world_points_before": sum(coordinate_count(f["geometry"]) for f in base_features),
               "world_points_after": sum(coordinate_count(f["geometry"]) for f in new_base),
               "world_tolerance_degrees": world_tolerance, "regional_tolerance_degrees": regional_tolerance,
-              "groups": reports}
+              "groups": reports, "build_graph": {"enabled": use_cache, "stages": cache_records,
+                  "cache_hits": sum(record["cache_hit"] for record in cache_records),
+                  "elapsed_seconds": time.monotonic() - started_at, "release_approved": False}}
     # Manifests are written last. Existing source manifests and detail geometry
     # are neither overwritten nor copied into a second editable authority.
     write_json(output_root / prefix / "detail_chunks.manifest.json", manifest)
@@ -240,12 +299,15 @@ def main():
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--chunk-id", action="append", default=[])
     parser.add_argument("--protected-ids", type=Path)
+    parser.add_argument("--cache-root", type=Path)
+    parser.add_argument("--no-cache", action="store_true")
     args = parser.parse_args()
     protected = load_json(args.protected_ids) if args.protected_ids else []
     if not isinstance(protected, list) or not all(isinstance(x, str) for x in protected):
         raise ValueError("Protected IDs must be a JSON string array")
     result = build_overlay(args.source_root, args.scenario_id, args.output_root,
-                           chunk_ids=args.chunk_id, protected_ids=protected)
+                           chunk_ids=args.chunk_id, protected_ids=protected,
+                           cache_root=args.cache_root, use_cache=not args.no_cache)
     print(json.dumps({k: v for k, v in result.items() if k != "groups"}, ensure_ascii=False))
 
 

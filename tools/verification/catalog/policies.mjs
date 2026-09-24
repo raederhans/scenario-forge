@@ -103,6 +103,7 @@ export const CATALOG_POLICIES = {
           "tests/test_physical_water_mask.py",
           "tests/test_water_geometry.py",
           "tests/test_nordic_water_seed.py",
+          "tests/test_global_lakes.py",
           "tests/test_water_region_authority.py",
           "tests/test_atlantropa_coastline.py",
           "tests/test_atlantropa_geometry_quality.py",

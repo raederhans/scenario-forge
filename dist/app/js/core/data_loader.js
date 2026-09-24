@@ -64,6 +64,7 @@ const GLOBAL_ROAD_CATALOG_URL = resolveDataAssetUrl("transport_catalog:road");
 let globalRoadContextCollectionsPromise = null;
 let globalRailContextCollectionsPromise = null;
 const CONTEXT_LAYER_PACKS = {
+  lakes: { url: resolveDataAssetUrl("context_layer:lakes"), format: "geojson" },
   airports: { url: resolveDataAssetUrl("context_layer:airports"), format: "geojson" },
   ports: { url: resolveDataAssetUrl("context_layer:ports"), format: "geojson" },
   physical: { url: resolveDataAssetUrl("context_layer:physical"), format: "geojson" },

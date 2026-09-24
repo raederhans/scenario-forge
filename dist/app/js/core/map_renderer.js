@@ -249,6 +249,7 @@ import {
   shouldBlockUnderlyingMapSelectionForFacility,
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
+import { resolveEffectiveWaterRegionFeatures } from "./renderer/effective_water_regions.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
@@ -3157,6 +3158,17 @@ function getGeometryRasterRuntimeOwner() {
         && !isPoliticalRasterWorkerBitmapEnabled(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
+      getPoliticalPatchStaticSignature: () => getCachedPoliticalPassStaticSignature(
+        getRenderPassSignature("political", runtimeState.zoomTransform)),
+      getPoliticalEntryPixelBounds: ({ feature, id }) => {
+        const bounds = getFeatureScreenBounds(feature, { featureId: id, allowCompute: false, padding: 4 });
+        if (!bounds) return null;
+        const layout = getRenderPassLayout("political");
+        return { minX: (bounds.minX + layout.offsetX) * runtimeState.dpr,
+          minY: (bounds.minY + layout.offsetY) * runtimeState.dpr,
+          maxX: (bounds.maxX + layout.offsetX) * runtimeState.dpr,
+          maxY: (bounds.maxY + layout.offsetY) * runtimeState.dpr };
+      },
       needsPoliticalRender: () => {
         const cache = getRenderPassCacheState();
         return cache.dirty?.political || cache.signatures?.political !== getRenderPassSignature("political", runtimeState.zoomTransform);
@@ -4594,6 +4606,7 @@ function getScenarioSurfaceVersionParts(waterFeatureCount = null, atlantropaCoun
     `detail-phase:${getScenarioDetailPhaseSignatureToken()}`,
     `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`}`,
     `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
+    `lakes-ref:${getObjectIdentityToken(runtimeState.contextLayerExternalDataByName?.lakes, "global-lakes")}`,
     `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
     `water-mode:${getScenarioWaterRegionsMode()}`,
   ];
@@ -4890,6 +4903,7 @@ function isWaterRegionRenderable(feature) {
 
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
+  if (feature.properties?.interactive === false) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
   }
@@ -5038,13 +5052,14 @@ function getEffectiveWaterRegionFeatures() {
       : []),
     ...atlantropaFeatures.water,
   ];
-  if (isScenarioWaterTopologyExclusiveMode()) {
-    return sanitizeWaterRegionFeatures(scenarioFeatures.filter((feature) => !isWaterRegionExcludedByScenario(feature)));
-  }
-  return sanitizeWaterRegionFeatures([
-    ...(Array.isArray(runtimeState.waterRegionsData?.features) ? runtimeState.waterRegionsData.features : []),
-    ...scenarioFeatures,
-  ].filter((feature) => !isWaterRegionExcludedByScenario(feature)));
+  return sanitizeWaterRegionFeatures(resolveEffectiveWaterRegionFeatures({
+    baseFeatures: runtimeState.waterRegionsData?.features || [],
+    scenarioFeatures,
+    globalLakeFeatures: runtimeState.contextLayerExternalDataByName?.lakes?.features || [],
+    activeScenarioId: runtimeState.activeScenarioId || "",
+    exclusive: isScenarioWaterTopologyExclusiveMode(),
+    isExcluded: isWaterRegionExcludedByScenario,
+  }));
 }
 
 function getSpecialRegionType(feature) {
@@ -7162,6 +7177,9 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
     }
     if (normalized === "urban") {
       targetPasses.add("dayNight");
+    }
+    if (normalized === "lakes") {
+      targetPasses.add("contextScenario");
     }
   });
   const resolvedPasses = Array.from(targetPasses);
