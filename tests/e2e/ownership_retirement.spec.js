@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const { gotoApp } = require("./support/playwright-app");
 
-test("ownership editing stays disabled in editor and developer workspace", async ({ page }) => {
+test("ownership editing stays disabled in editor and developer workspace", async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -46,5 +46,11 @@ test("ownership editing stays disabled in editor and developer workspace", async
   await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
   await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
   await expect(page.locator("#devQuickRemoveSelectedBtn")).toBeVisible();
+  for (const category of ["scenario", "runtime", "selection"]) {
+    await page.locator(`[data-dev-workspace-category="${category}"]`).click();
+    await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
+    await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
+  }
+  await page.screenshot({ path: testInfo.outputPath("visual-only-developer-workspace.png") });
   expect(errors).toEqual([]);
 });

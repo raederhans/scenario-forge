@@ -5,6 +5,7 @@ export function createOwnershipRetirementRecords(existingRecords) {
     id: "node:test:node:ownership-retirement", commandRef: "test:node:ownership-retirement",
     sourceRefs: [
       "js/core/map_editing_policy.js", "js/core/map_data_boundary.js", "js/core/state/color_state.js",
+      "js/core/map_renderer.js", "js/ui/dev_workspace.js",
       "js/core/color_resolver.js", "js/core/sovereignty_manager.js", "js/core/scenario_ownership_editor.js",
       "js/core/interaction_funnel/import_trust_projection.js", "js/core/state/actions/scenario_activation_actions.js",
       "js/core/state/actions/scenario_presentation_actions.js", "js/core/history_manager.js",
