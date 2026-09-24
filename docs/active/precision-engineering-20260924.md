@@ -16,7 +16,7 @@ and publication. Source changes, parameter changes, candidate changes, changed
 logs and conflicting receipts remain visible. Reference and synthetic runs never
 approve a precision candidate.
 
-Start with `docs/active/precision-campaign.example.json`, copy it to
+Start with `ops/precision/campaign.example.json`, copy it to
 `.runtime/precision-campaign.json`, populate source records/parameters and place
 candidate bundles at the paths in that file. The example contains no passing
 candidate gates or invented source/license assertions. On a clean checkout:

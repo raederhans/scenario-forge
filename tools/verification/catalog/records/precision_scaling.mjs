@@ -126,7 +126,7 @@ export function createPrecisionScalingRecords(existingRecords) {
   records.push({ ...records[0], id: "local:precision-engineering:campaign",
     commandRef: "python -m unittest tests.test_precision_campaign -q",
     sourceRefs: ["tools/precision_campaign.py", "tools/precision_comparison.py", "tools/precision_candidate_receipt.py",
-      "tests/test_precision_campaign.py", "docs/active/precision-campaign.example.json"],
+      "tests/test_precision_campaign.py", "ops/precision/campaign.example.json"],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
   return records;
