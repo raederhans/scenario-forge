@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import http from "node:http";
@@ -7,9 +8,13 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "@playwright/test";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const argument = process.argv.indexOf("--report");
-if (argument < 0 || !process.argv[argument + 1]) throw new Error("Use --report .runtime/.../transport.json");
-const reportPath = path.resolve(root, process.argv[argument + 1]);
+const reportArgument = process.argv.indexOf("--report");
+const directoryArgument = process.argv.indexOf("--report-dir");
+if ((reportArgument >= 0) === (directoryArgument >= 0)) throw new Error("Use exactly one of --report or --report-dir under .runtime");
+const argument = reportArgument >= 0 ? reportArgument : directoryArgument;
+if (!process.argv[argument + 1]) throw new Error("Report path is required");
+const selectedPath = path.resolve(root, process.argv[argument + 1]);
+const reportPath = reportArgument >= 0 ? selectedPath : path.join(selectedPath, `canonical-road-${randomUUID()}.json`);
 const runtimeRoot = path.join(root, ".runtime");
 if (!reportPath.startsWith(runtimeRoot + path.sep) || fs.existsSync(reportPath)) throw new Error("Report must be a new .runtime file");
 for (let current = path.dirname(reportPath); current !== root; current = path.dirname(current)) {
