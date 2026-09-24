@@ -14,8 +14,9 @@ export function createPrecisionScalingRecords(existingRecords) {
     ["lod-selection", "scenario-runtime", "node --test tests/precision_scaling_lod_selection_behavior.test.mjs", [
       "js/core/scenario/political_lod_policy.js", "js/core/scenario_chunk_manager.js", "js/core/scenario/chunk_layer_payloads.js", "tests/precision_scaling_lod_selection_behavior.test.mjs",
     ]],
-    ["lod-builder", "geo-contract", "python -m unittest tests.test_political_display_lods -q", [
+    ["lod-builder", "geo-contract", "python -m unittest tests.test_political_display_lods tests.test_precision_build_graph -q", [
       "tools/build_political_display_lods.py", "tests/test_political_display_lods.py",
+      "tools/precision_build_graph.py", "tests/test_precision_build_graph.py", "docs/active/precision-build-graph-p3-20260924.md",
     ]],
     ["routes", "test-routing", "node --test tests/precision_scaling_verification_records.test.mjs", [
       "tools/verification/catalog/records/precision_scaling.mjs", "tests/precision_scaling_verification_records.test.mjs",
