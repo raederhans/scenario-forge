@@ -45,12 +45,17 @@ test("ownership editing stays disabled in editor and developer workspace", async
   }
   await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
   await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
-  await expect(page.locator("#devQuickRemoveSelectedBtn")).toBeVisible();
+  // The quickbar is collapsed in this layout. The selection panel stays usable.
+  await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeVisible();
+  await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeEnabled();
+  await expect(page.locator("#devSelectionRemoveLastBtn")).toBeVisible();
+  await expect(page.locator("#devSelectionClearBtn")).toBeVisible();
   for (const category of ["scenario", "runtime", "selection"]) {
     await page.locator(`[data-dev-workspace-category="${category}"]`).click();
     await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
     await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
   }
+  await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("visual-only-developer-workspace.png") });
   expect(errors).toEqual([]);
 });
