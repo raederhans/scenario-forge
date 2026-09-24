@@ -37,8 +37,8 @@ export function planPoliticalRasterPatch(previous, entries, description, boundsF
   const region = { x, y, width: right - x, height: bottom - y };
   if (region.width <= 0 || region.height <= 0) return null;
   const area = region.width * region.height;
-  // Account for old full frame + new full composite + worker patch at handoff.
-  if (area / (width * height) > maxCoverage || (2 * width * height + area) * 4 > maxTransientBytes) return null;
+  // Account for old frame + new composite + worker surface + cropped bitmap.
+  if (area / (width * height) > maxCoverage || (3 * width * height + area) * 4 > maxTransientBytes) return null;
   const drawEntryIds = [];
   for (let i = 0; i < entries.length; i++) {
     const b = getBounds(i);
@@ -47,5 +47,5 @@ export function planPoliticalRasterPatch(previous, entries, description, boundsF
   }
   if (!drawEntryIds.length || drawEntryIds.length >= entries.length) return null;
   return { region, drawEntryIds, changedCount: changed.length, coverage: area / (width * height),
-    estimatedTransientBytes: (2 * width * height + area) * 4 };
+    estimatedTransientBytes: (3 * width * height + area) * 4 };
 }

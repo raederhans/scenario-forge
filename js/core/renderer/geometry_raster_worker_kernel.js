@@ -31,6 +31,7 @@ export function createGeometryRasterWorkerKernel({
   d3,
   createCanvas = (width, height) => new OffscreenCanvas(width, height),
   createPath = () => new Path2D(),
+  createBitmap = (...args) => createImageBitmap(...args),
   yieldTask = () => globalThis.scheduler?.yield
     ? globalThis.scheduler.yield()
     : new Promise((resolve) => setTimeout(resolve, 0)),
@@ -70,7 +71,10 @@ export function createGeometryRasterWorkerKernel({
         throw new Error("Invalid political raster patch.");
       }
     }
-    const surfaceWidth = region?.width ?? width, surfaceHeight = region?.height ?? height;
+    // Keep the same device-space raster origin and clipping as a full frame.
+    // Translating paths into a smaller canvas changes native edge coverage.
+    // Draw only patch contributors, then crop the bitmap without re-rasterizing.
+    const surfaceWidth = width, surfaceHeight = height;
     const options = packet.projectionOptions || {};
     const optionsSignature = JSON.stringify(options);
     if (sceneKey !== packet.sceneKey || packet.resetGeometry) {
@@ -122,7 +126,7 @@ export function createGeometryRasterWorkerKernel({
     context.fillStyle = "#000000";
     context.strokeStyle = "#000000";
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    context.translate(offsetX - (region?.x || 0) / dpr, offsetY - (region?.y || 0) / dpr);
+    context.translate(offsetX, offsetY);
     context.translate(x, y);
     context.scale(k, k);
     context.lineJoin = "round";
@@ -195,7 +199,9 @@ export function createGeometryRasterWorkerKernel({
       renderedCount += 1;
     }
     abortIfNeeded(isCancelled);
-    const bitmap = canvas.transferToImageBitmap();
+    const bitmap = region
+      ? await createBitmap(canvas, region.x, region.y, region.width, region.height)
+      : canvas.transferToImageBitmap();
     if (isCancelled()) {
       bitmap.close();
       abortIfNeeded(isCancelled);
@@ -205,7 +211,7 @@ export function createGeometryRasterWorkerKernel({
     // client can re-upload it on a later view without disabling the worker.
     const evictedGeometryIds = geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
-    return { bitmap, kind: packet.kind, width: surfaceWidth, height: surfaceHeight,
+    return { bitmap, kind: packet.kind, width: region?.width ?? width, height: region?.height ?? height,
       ...(region ? { renderRegion: { ...region }, patchBaseIdentity: packet.patchBaseIdentity } : {}), renderedCount, pathBuildCount, yieldCount, unpackingMs,
       geometryTransportMode: packet.geometryTransport ? "packed-f64" : "geojson",
       evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),

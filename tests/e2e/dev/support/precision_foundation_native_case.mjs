@@ -1,7 +1,7 @@
-export async function runPrecisionFoundationNativeCase() {
+export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
   await import('/vendor/d3.v7.min.js');
   const { createGeometryRasterRuntimeOwner } = await import('/js/core/renderer/geometry_raster_runtime_owner.js');
-  const dpr = 1.5, width = 960, height = 600;
+  const width = 960, height = 600;
   const features = Array.from({ length: 1000 }, (_, i) => {
     const x = (i % 40) * 3 - 60, y = Math.floor(i / 40) * 2.4 - 30;
     const rings = [[[x, y], [x, y + 2.2], [x + 2.8, y + 2.2], [x + 2.8, y], [x, y]]];
@@ -53,7 +53,11 @@ export async function runPrecisionFoundationNativeCase() {
       const b = reference.context.getImageData(0, 0, width, height).data;
       let differences = 0, maxDifference = 0;
       for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) { differences++; maxDifference = Math.max(maxDifference, Math.abs(a[i] - b[i])); }
-      samples.push({ color, differences, maxDifference });
+      const firstDifferences = [];
+      for (let i = 0; i < a.length && firstDifferences.length < 12; i++) if (a[i] !== b[i]) {
+        firstDifferences.push({ x: Math.floor(i / 4) % width, y: Math.floor(i / 4 / width), channel: i % 4, actual: a[i], expected: b[i] });
+      }
+      samples.push({ color, differences, maxDifference, firstDifferences });
     }
     incremental.state.zoomTransform.x += 15; reference.state.zoomTransform.x += 15;
     const patchesBeforePan = incremental.metrics.filter(([name]) => name === 'geometryWorkerPoliticalPatch').length;
@@ -63,7 +67,7 @@ export async function runPrecisionFoundationNativeCase() {
     const stale = incremental.owner.preparePolitical();
     incremental.state.activeScenarioId = 'new-scene';
     await stale;
-    return { samples, editedCount: edited.size, patchesBeforePan, patchesAfterPan,
+    return { dpr, samples, editedCount: edited.size, patchesBeforePan, patchesAfterPan,
       patchMetrics: incremental.metrics.filter(([name]) => name === 'geometryWorkerPoliticalPatch').map(([, , details]) => details),
       staleDraw: incremental.owner.drawPolitical(),
       staleResults: incremental.metrics.filter(([name]) => name === 'geometryWorkerStaleResult').length,
