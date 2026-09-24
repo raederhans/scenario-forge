@@ -1,0 +1,44 @@
+name: Precision runtime input snapshot
+on:
+  push:
+    branches: ["codex/precision-engineering-workspace-20260924"]
+    paths: [".github/workflows/precision-runtime-inputs.yml"]
+permissions:
+  contents: read
+jobs:
+  inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /data/scenarios/tno_1962/detail_chunks.manifest.json
+      - name: Snapshot pinned canonical bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/runtime-inputs
+          python - <<'PY'
+          import hashlib, json, subprocess, zipfile
+          from pathlib import Path
+          name = 'data/scenarios/tno_1962/detail_chunks.manifest.json'
+          raw = Path(name).read_bytes()
+          blob = hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()
+          expected = subprocess.check_output(['git', 'rev-parse', 'HEAD:' + name], text=True).strip()
+          assert blob == expected
+          out = Path('.runtime/runtime-inputs')
+          with zipfile.ZipFile(out / 'canonical-inputs.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              archive.writestr(name, raw)
+          (out / 'receipt.json').write_text(json.dumps({'source_sha': subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(), 'path': name, 'git_blob_sha': blob, 'sha256': hashlib.sha256(raw).hexdigest()}), encoding='utf-8')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: precision-runtime-inputs
+          path: .runtime/runtime-inputs/
+          retention-days: 5
+          if-no-files-found: error
