@@ -17,6 +17,7 @@ jobs:
           sparse-checkout: |
             /package.json
             /package-lock.json
+            /requirements-dev.lock.txt
           sparse-checkout-cone-mode: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -25,7 +26,8 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           mkdir -p .runtime/validation-dependencies
           tar -czf .runtime/validation-dependencies/node-dependencies.tgz node_modules
-          sha256sum package-lock.json .runtime/validation-dependencies/node-dependencies.tgz > .runtime/validation-dependencies/sha256.txt
+          python -m pip download --no-deps --only-binary=:all: "$(grep '^topojson==' requirements-dev.lock.txt)" --dest .runtime/validation-dependencies
+          sha256sum package-lock.json requirements-dev.lock.txt .runtime/validation-dependencies/node-dependencies.tgz .runtime/validation-dependencies/*.whl > .runtime/validation-dependencies/sha256.txt
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: precision-foundation-dependencies
