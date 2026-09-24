@@ -2,6 +2,11 @@ import { getGeometryRetentionWeights } from "../core/renderer/geometry_cache_bud
 
 const estimates = new WeakMap();
 
+// Admission estimates for the shipped road packs, including transient decode
+// work. Japan's full topology alone is about 80 MiB; the scheduler's generic
+// 8 MiB fallback is unsuitable. These are weights, not measured heap limits.
+export const ROAD_PACK_LOAD_BYTES = Object.freeze({ preview: 24 * 1024 * 1024, full: 192 * 1024 * 1024 });
+
 // A deterministic retention weight, not browser heap measurement. Count the
 // owned road records, native/projected coordinate arrays, path strings, segment
 // records and lookup slots. DOM, renderer canvases and shared catalog/manifest

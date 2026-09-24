@@ -1,5 +1,5 @@
 import { resolveTransportManifestUrl } from "../core/data_loader.js";
-import { estimateRoadPackRetentionBytes } from "./transport_workbench_retention.js";
+import { estimateRoadPackRetentionBytes, ROAD_PACK_LOAD_BYTES } from "./transport_workbench_retention.js";
 import {
   ensureTransportWorkbenchCarrierForManifest,
   getTransportWorkbenchCarrierViewState,
@@ -44,6 +44,7 @@ const lineRuntime = createTransportWorkbenchLinePackRuntime({
   manifestUrl: MANIFEST_URL,
   ensureClient: ensureTopojsonClient,
   estimatePackBytes: estimateRoadPackRetentionBytes,
+  estimatedLoadBytes: ROAD_PACK_LOAD_BYTES,
   initialRenderStats: {
     visibleRoads: 0,
     visibleLabels: 0,

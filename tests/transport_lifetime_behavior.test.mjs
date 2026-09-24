@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createChunkLoadScheduler } from "../js/core/scenario/chunk_load_scheduler.js";
-import { estimateRoadPackRetentionBytes } from "../js/ui/transport_workbench_retention.js";
+import { estimateRoadPackRetentionBytes, ROAD_PACK_LOAD_BYTES } from "../js/ui/transport_workbench_retention.js";
 
 // Isolate only catalog/network and page snapshot registration. The real
 // transport lifetime, resource ledger and scheduler execute unchanged.
@@ -21,11 +21,12 @@ const { createTransportWorkbenchLinePackRuntime } = await import(`data:text/java
 const tick = () => new Promise(setImmediate);
 const deferred = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 let sequence = 0;
-function fixture({ getAsset, buildPack, estimatePackBytes = () => 20, budget = 100, prepareCarrier } = {}) {
+function fixture({ getAsset, buildPack, estimatePackBytes = () => 20, budget = 100, prepareCarrier,
+  estimatedLoadBytes = { preview: 10, full: 10 } } = {}) {
   const resources = createRuntimeResourceBudget({ softLimitBytes: budget });
   const requests = [], builds = [];
   const definition = {
-    familyId: `fixture-${sequence++}`, manifestUrl: "manifest.json", estimatedLoadBytes: { preview: 10, full: 10 },
+    familyId: `fixture-${sequence++}`, manifestUrl: "manifest.json", estimatedLoadBytes,
     estimatePackBytes, prepareCarrier,
     buildPack: async (options) => {
       builds.push(options.mode);
@@ -116,6 +117,27 @@ test("hide cancels a queued background pack rather than restarting it after pres
   await tick(); f.runtime.release(); f.resources.release(external); await tick();
   assert.deepEqual(f.builds, ["preview"]);
   assert.equal(hydrated, 0);
+  assert.equal(f.resources.snapshot().ownerCount, 0);
+});
+
+test("shipped road weights defer full loading with only generic-load headroom and resume when released", async () => {
+  const mib = 1024 * 1024;
+  for (const mode of ["preview", "full"]) {
+    const suffix = mode === "preview" ? ".preview" : "";
+    const bytes = fs.statSync(new URL(`../data/transport_layers/japan_road/roads${suffix}.topo.json`, import.meta.url)).size
+      + fs.statSync(new URL(`../data/transport_layers/japan_road/road_labels${suffix}.geojson`, import.meta.url)).size;
+    assert.ok(ROAD_PACK_LOAD_BYTES[mode] > bytes * 2, "reserve payload plus decode headroom");
+  }
+  const f = fixture({ budget: 256 * mib, estimatedLoadBytes: ROAD_PACK_LOAD_BYTES });
+  await f.runtime.loadPack();
+  const external = Symbol(); f.resources.update(external, { workerGeometry: 247 * mib });
+  f.runtime.startBackgroundFullPackLoad();
+  await tick();
+  assert.deepEqual(f.builds, ["preview"], "8 MiB available must not admit the actual full road pack");
+  f.resources.release(external);
+  await tick();
+  assert.deepEqual(f.builds, ["preview", "full"]);
+  f.runtime.release();
   assert.equal(f.resources.snapshot().ownerCount, 0);
 });
 

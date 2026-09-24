@@ -115,3 +115,18 @@ and shared-carrier cache reclamation remain separate acceptance items.
 Integration: merge resource PR158 first, then this dependent PR. Other PR155/157/159
 catalog records are additive: preserve all original command identities, append all
 new records and update the explicit count/order tests for the actual union.
+
+## Local integration, 2026-09-24
+
+The generic 8 MiB reservation understated the actual Japan full road topology
+(roughly 80 MiB before decode). Road consumers now supply explicit preview/full
+admission estimates of 24/192 MiB. These conservative weights are not measured
+heap peaks and do not raise the shared soft limit or scheduler concurrency.
+A regression checks shipped asset sizes, deferral with only 8 MiB headroom and
+automatic admission after pressure is released. Explicit-demand promotion remains
+covered separately. All 24 lifecycle/data-service tests pass on Windows.
+
+The parent reran the real Japan preview Chromium probe: two open/close cycles,
+owner retention returns to baseline and all error arrays are empty. Report:
+`.runtime/reports/generated/transport-lifetime/canonical-road-4449e5cb-c5be-43fa-90c7-caaed2f89643.json`.
+Pressure is injected ledger pressure, not an actual heap measurement.
