@@ -44737,7 +44737,7 @@
     },
     {
       "path": "app/js/core/renderer/render_transform_reuse_policy_owner.js",
-      "size_bytes": 10920,
+      "size_bytes": 10767,
       "source_kind": "dist"
     },
     {
@@ -46537,7 +46537,7 @@
       {
         "file_count": 291,
         "id": "startup-critical",
-        "size_bytes": 27735410
+        "size_bytes": 27735257
       },
       {
         "file_count": 102,
@@ -64953,11 +64953,11 @@
         "deferred_graph_file_count": 132,
         "deferred_module_count": 130,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5440713,
+        "initial_graph_bytes": 5440560,
         "initial_graph_file_count": 322,
         "initial_module_count": 309,
         "initial_resource_count": 13,
-        "initial_script_bytes": 4341649,
+        "initial_script_bytes": 4341496,
         "initial_script_count": 311,
         "module_count": 446,
         "registry_resolved_dynamic_expression_count": 2,
@@ -65586,7 +65586,7 @@
           },
           {
             "path": "app/js/core/renderer/render_transform_reuse_policy_owner.js",
-            "size_bytes": 10920
+            "size_bytes": 10767
           },
           {
             "path": "app/js/core/renderer/renderer_fit_projection_owner.js",
@@ -66030,7 +66030,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3275870
+        "size_bytes": 3275717
       },
       {
         "basis": "startup-resource-graph",
@@ -67814,7 +67814,7 @@
     {
       "file_count": 9220,
       "path": "app",
-      "size_bytes": 571696817
+      "size_bytes": 571696664
     },
     {
       "file_count": 59,
@@ -67847,5 +67847,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 601060040
+  "total_bytes": 601059887
 }

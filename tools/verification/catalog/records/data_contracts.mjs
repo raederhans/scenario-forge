@@ -1,6 +1,30 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    id: "python:global-lakes",
+    commandRef: "python -m unittest tests.test_global_lakes -q",
+    sourceRefs: [
+      "tests/test_global_lakes.py",
+      "tools/build_global_lakes.py",
+      "data/global_lakes.geojson",
+      "data/ne_10m_lakes.zip",
+      "data/water_regions.geojson",
+    ],
+    ownerHints: ["geo-contract"],
+    domains: ["geo-contract"],
+    tiers: ["heavy"],
+    cost: "heavy",
+    resourceLocks: ["heavy-geo", ".runtime-output"],
+    executionOwners: ["main-thread"],
+    profiles: ["full"],
+    platforms: ["all"],
+    entrypointPolicyIndex: 0,
+    verificationOrder: null,
+    selectorOrder: null,
+    verification: null,
+    selector: {},
+  },
+  {
     id: "python:nordic-water-seed",
     commandRef: "python -m unittest tests.test_nordic_water_seed -q",
     sourceRefs: [

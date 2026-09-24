@@ -64,10 +64,7 @@ export function createRenderTransformReusePolicyOwner({
   function getContextBaseReuseMaxDistancePx() {
     const viewportMin = Math.max(1, Math.min(Number(state.width || 0), Number(state.height || 0)));
     const scaled = viewportMin * contextBaseReuseMaxDistanceViewportRatio;
-    return Math.max(
-      contextBaseReuseMinDistancePx,
-      Math.min(contextBaseReuseMaxDistancePx, scaled),
-    );
+    return Math.max(contextBaseReuseMinDistancePx, Math.min(contextBaseReuseMaxDistancePx, scaled));
   }
 
   function getTransformReuseDelta(currentTransform, referenceTransform) {
@@ -137,11 +134,6 @@ export function createRenderTransformReusePolicyOwner({
     const crossesRiverBucket = !!state.showRivers
       && getRiverZoomBucket(delta.reference.k) !== getRiverZoomBucket(delta.current.k);
     const maxDistancePx = getContextBaseReuseMaxDistancePx();
-    const shouldExactRefresh =
-      crossesZoomBucket
-      || crossesRiverBucket
-      || delta.distancePx > maxDistancePx
-      || crossesMinorContourThreshold;
     let reason = "transform-reuse";
     if (crossesZoomBucket) {
       reason = "zoom-bucket-change";
@@ -154,7 +146,7 @@ export function createRenderTransformReusePolicyOwner({
     }
     return {
       enabled: true,
-      shouldExactRefresh,
+      shouldExactRefresh: reason !== "transform-reuse",
       reason,
       scaleRatio: Number(delta.scaleRatio.toFixed(4)),
       distancePx: Number(delta.distancePx.toFixed(2)),
