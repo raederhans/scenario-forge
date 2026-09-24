@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 29);
+  assert.equal(routes.length, 30);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -64,4 +64,10 @@ test("US county lineage metadata selects the scenario migration regression witho
 
 test("precision additions preserve repository-wide command ownership and resource policy", () => {
   assert.doesNotThrow(() => reconcileVerificationRouteAuthority());
+});
+
+test("LOD graph coverage preserves the original discovered command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_political_display_lods -q"));
+  assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_precision_build_graph -q"));
 });
