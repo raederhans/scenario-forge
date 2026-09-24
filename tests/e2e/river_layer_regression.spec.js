@@ -49,7 +49,8 @@ function bucketForZoomPercent(percent) {
   const scale = Number(percent) / 100;
   if (scale < 1.4) return 'low';
   if (scale < 2.5) return 'mid';
-  return 'high';
+  if (scale < 5) return 'high';
+  return 'detail';
 }
 
 async function waitForMapReady(page) {
@@ -514,15 +515,15 @@ test('river layer major zoom gating regression', async ({ page }) => {
   expect(riverMajorLow.renderMetric.zoomBucket).toBe('low');
   expect(riverMajorMid.renderMetric.zoomBucket).toBe('mid');
   expect(riverMajorHigh.renderMetric.zoomBucket).toBe('high');
-  expect(riverMajorLow.renderMetric.coreWidthFactor).toBeCloseTo(1.2, 4);
-  expect(riverMajorMid.renderMetric.coreWidthFactor).toBeCloseTo(1.0, 4);
-  expect(riverMajorHigh.renderMetric.coreWidthFactor).toBeCloseTo(0.75, 4);
-  expect(riverMajorLow.renderMetric.outlineWidthFactor).toBeCloseTo(0.85, 4);
-  expect(riverMajorMid.renderMetric.outlineWidthFactor).toBeCloseTo(0.7, 4);
-  expect(riverMajorHigh.renderMetric.outlineWidthFactor).toBeCloseTo(0.35, 4);
-  expect(riverMajorLow.renderMetric.outlineAlphaFactor).toBeCloseTo(0.6, 4);
-  expect(riverMajorMid.renderMetric.outlineAlphaFactor).toBeCloseTo(0.7, 4);
-  expect(riverMajorHigh.renderMetric.outlineAlphaFactor).toBeCloseTo(0.45, 4);
+  expect(riverMajorLow.renderMetric.coreWidthFactor).toBeCloseTo(1.3, 4);
+  expect(riverMajorMid.renderMetric.coreWidthFactor).toBeCloseTo(1.2, 4);
+  expect(riverMajorHigh.renderMetric.coreWidthFactor).toBeCloseTo(1.2, 4);
+  expect(riverMajorLow.renderMetric.outlineWidthFactor).toBeCloseTo(0.55, 4);
+  expect(riverMajorMid.renderMetric.outlineWidthFactor).toBeCloseTo(0.5, 4);
+  expect(riverMajorHigh.renderMetric.outlineWidthFactor).toBeCloseTo(0.4, 4);
+  expect(riverMajorLow.renderMetric.outlineAlphaFactor).toBeCloseTo(0.38, 4);
+  expect(riverMajorMid.renderMetric.outlineAlphaFactor).toBeCloseTo(0.42, 4);
+  expect(riverMajorHigh.renderMetric.outlineAlphaFactor).toBeCloseTo(0.35, 4);
 
   const { finalRiverState } = await restoreRiverRegressionState(page);
   expectNoRiverRuntimeIssues(trackers);
@@ -615,15 +616,16 @@ test('river layer lake zoom gating regression', async ({ page }) => {
     subsetName: 'lake-centerline',
     label: 'river_layer_regression_lake_mid',
   });
-  const lakeHigh = await measureRiverInk(page, {
-    zoomPercent: 260,
+  const lakeDetail = await measureRiverInk(page, {
+    zoomPercent: 500,
     subsetName: 'lake-centerline',
-    label: 'river_layer_regression_lake_high',
+    label: 'river_layer_regression_lake_detail',
   });
 
   expect(lakeLow.renderMetric.visibleFeatureCount).toBe(0);
   expect(lakeMid.renderMetric.visibleFeatureCount).toBe(0);
-  expect(lakeHigh.renderMetric.visibleFeatureCount).toBeGreaterThan(0);
+  expect(lakeDetail.renderMetric.zoomBucket).toBe('detail');
+  expect(lakeDetail.renderMetric.visibleFeatureCount).toBe(0);
 
   const { finalRiverState } = await restoreRiverRegressionState(page);
   expectNoRiverRuntimeIssues(trackers);
@@ -639,10 +641,10 @@ test('river layer lake zoom gating regression', async ({ page }) => {
       changedPixels: lakeMid.changedPixels,
       luminanceDelta: lakeMid.luminanceDelta,
     },
-    lakeHigh: {
-      renderMetric: lakeHigh.renderMetric,
-      changedPixels: lakeHigh.changedPixels,
-      luminanceDelta: lakeHigh.luminanceDelta,
+    lakeDetail: {
+      renderMetric: lakeDetail.renderMetric,
+      changedPixels: lakeDetail.changedPixels,
+      luminanceDelta: lakeDetail.luminanceDelta,
     },
     finalRiverState,
   }, null, 2));
@@ -697,25 +699,28 @@ test('river layer intermittent zoom gating regression', async ({ page }) => {
 test('river layer canal zoom gating regression', async ({ page }) => {
   const trackers = await beginRiverRegression(page);
 
-  const canalLow = await measureRiverInk(page, {
-    zoomPercent: 100,
-    subsetName: 'canal',
-    label: 'river_layer_regression_canal_low',
-  });
   const canalMid = await measureRiverInk(page, {
     zoomPercent: 150,
     subsetName: 'canal',
     label: 'river_layer_regression_canal_mid',
   });
   const canalHigh = await measureRiverInk(page, {
-    zoomPercent: 260,
+    zoomPercent: 490,
     subsetName: 'canal',
     label: 'river_layer_regression_canal_high',
   });
 
-  expect(canalLow.renderMetric.visibleFeatureCount).toBe(0);
+  const canalDetail = await measureRiverInk(page, {
+    zoomPercent: 500,
+    subsetName: 'canal',
+    label: 'river_layer_regression_canal_detail',
+  });
+
   expect(canalMid.renderMetric.visibleFeatureCount).toBe(0);
-  expect(canalHigh.renderMetric.visibleFeatureCount).toBeGreaterThan(0);
+  expect(canalHigh.renderMetric.visibleFeatureCount).toBe(0);
+  expect(canalHigh.renderMetric.zoomBucket).toBe('high');
+  expect(canalDetail.renderMetric.zoomBucket).toBe('detail');
+  expect(canalDetail.renderMetric.featureCount).toBeGreaterThan(0);
 
   const { finalRiverState, finalScreenshotPath } = await restoreRiverRegressionState(page, {
     captureFinalScreenshot: true,
@@ -723,11 +728,6 @@ test('river layer canal zoom gating regression', async ({ page }) => {
   expectNoRiverRuntimeIssues(trackers);
 
   console.log(JSON.stringify({
-    canalLow: {
-      renderMetric: canalLow.renderMetric,
-      changedPixels: canalLow.changedPixels,
-      luminanceDelta: canalLow.luminanceDelta,
-    },
     canalMid: {
       renderMetric: canalMid.renderMetric,
       changedPixels: canalMid.changedPixels,
@@ -737,6 +737,11 @@ test('river layer canal zoom gating regression', async ({ page }) => {
       renderMetric: canalHigh.renderMetric,
       changedPixels: canalHigh.changedPixels,
       luminanceDelta: canalHigh.luminanceDelta,
+    },
+    canalDetail: {
+      renderMetric: canalDetail.renderMetric,
+      changedPixels: canalDetail.changedPixels,
+      luminanceDelta: canalDetail.luminanceDelta,
     },
     finalRiverState,
     finalScreenshot: finalScreenshotPath,

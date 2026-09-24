@@ -1,3 +1,5 @@
+import { getRiverZoomBucket } from "./river_layer_render_owner.js";
+
 const CONTEXT_BASE_REUSE_MIN_DISTANCE_PX = 320;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_PX = 640;
 const CONTEXT_BASE_REUSE_MAX_DISTANCE_VIEWPORT_RATIO = 0.35;
@@ -132,14 +134,19 @@ export function createRenderTransformReusePolicyOwner({
       (delta.reference.k < contextBaseMinorContourThreshold && delta.current.k >= contextBaseMinorContourThreshold)
       || (delta.reference.k >= contextBaseMinorContourThreshold && delta.current.k < contextBaseMinorContourThreshold);
     const crossesZoomBucket = currentBucket !== referenceBucket;
+    const crossesRiverBucket = !!state.showRivers
+      && getRiverZoomBucket(delta.reference.k) !== getRiverZoomBucket(delta.current.k);
     const maxDistancePx = getContextBaseReuseMaxDistancePx();
     const shouldExactRefresh =
       crossesZoomBucket
+      || crossesRiverBucket
       || delta.distancePx > maxDistancePx
       || crossesMinorContourThreshold;
     let reason = "transform-reuse";
     if (crossesZoomBucket) {
       reason = "zoom-bucket-change";
+    } else if (crossesRiverBucket) {
+      reason = "river-bucket-change";
     } else if (delta.distancePx > maxDistancePx) {
       reason = "distance-threshold";
     } else if (crossesMinorContourThreshold) {
@@ -155,6 +162,7 @@ export function createRenderTransformReusePolicyOwner({
       zoomBucket: currentBucket,
       referenceZoomBucket: referenceBucket,
       crossesZoomBucket,
+      crossesRiverBucket,
       crossesMinorContourThreshold,
       referenceTransform,
       currentTransform: delta.current,

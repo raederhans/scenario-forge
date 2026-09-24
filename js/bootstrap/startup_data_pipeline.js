@@ -67,6 +67,7 @@ import {
 } from "../core/state/index.js";
 
 const CONTEXT_LAYER_LOAD_ORDER = [
+  "lakes",
   "rivers",
   "roads",
   "railways",
@@ -709,7 +710,7 @@ export function createStartupDataPipelineOwner({
       currentLanguage: state.currentLanguage || "en",
       d3Client,
       includeCityData: false,
-      includeContextLayers: ["urban"],
+      includeContextLayers: ["urban", "lakes"],
       localeLevel: "startup",
       localesUrl: startupScenarioLocalesUrl || null,
       geoAliasesUrl: startupScenarioGeoAliasesUrl || null,

@@ -121,6 +121,7 @@ DATA_RUNTIME_FILES = (
     "ru_city_overrides.geojson",
     "special_zones.geojson",
     "global_rivers.geojson",
+    "global_lakes.geojson",
     "europe_physical.geojson",
     "europe_urban.geojson",
     "world_urban_lights.geojson",
