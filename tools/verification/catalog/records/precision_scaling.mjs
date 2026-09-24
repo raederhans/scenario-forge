@@ -100,5 +100,28 @@ export function createPrecisionScalingRecords(existingRecords) {
     ...records[0], id: "local:precision-expansion:" + id, commandRef, sourceRefs,
     ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
   });
+  const foundationRoutes = [
+    ["ci", "test-routing", "node --test tests/precision_foundation_ci_behavior.test.mjs", [
+      "tools/ci/perf_policy.mjs", "tools/ci/pr_plan.mjs", "tests/precision_foundation_ci_behavior.test.mjs",
+      ".github/workflows/pr-verify.yml", ".github/workflows/perf-pr-gate.yml",
+    ]],
+    ["patch", "renderer-runtime", "node --test tests/precision_foundation_patch_behavior.test.mjs", [
+      "js/core/renderer/political_raster_patch_plan.js", "js/core/renderer/geometry_raster_runtime_owner.js",
+      "js/core/renderer/geometry_raster_worker_kernel.js", "tests/precision_foundation_patch_behavior.test.mjs",
+    ]],
+    ["build", "geo-contract", "python -m unittest tests.test_precision_foundation_build -q", [
+      "tools/precision_build_support.py", "tools/precision_candidate_receipt.py", "tests/test_precision_foundation_build.py",
+      "tools/stage_us_county_adapted_bundle.py", "docs/active/precision-foundation-p0-p4-20260924.md",
+    ]],
+  ];
+  for (const [id, domain, commandRef, sourceRefs] of foundationRoutes) records.push({
+    ...records[0], id: "local:precision-foundation:" + id, commandRef, sourceRefs,
+    ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[6], id: "local:precision-foundation:native-browser",
+    commandRef: "npx playwright test --config=playwright.config.cjs tests/e2e/dev/precision_foundation_patch.dev.spec.js --workers=1",
+    sourceRefs: ["tests/e2e/dev/precision_foundation_patch.dev.spec.js", "tests/e2e/dev/support/precision_foundation_native_case.mjs"],
+    selectorOrder: start + records.length,
+  });
   return records;
 }

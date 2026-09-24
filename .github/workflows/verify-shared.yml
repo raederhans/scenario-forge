@@ -109,17 +109,18 @@ jobs:
           test -s "$changed_files" || { echo "::error::verification selector received an empty changed-file set"; exit 1; }
           node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
 
-      - name: Check tracked Pages mirrors for relevant PR changes
+      - name: Build and check Pages artifact for relevant PR changes
         if: inputs.profile == 'pr-fast' && inputs.run-pages-check
         shell: bash
         run: |
           changed_files=.runtime/tmp/verification-selector-changed-files.txt
           if grep -Eq '^(js/|css/|vendor/|landing/|data/|dist/|index\.html$|app\.js$|styles\.css$|tools/(build_pages_dist|pages_|app_entry_resolver)|\.github/workflows/verify-shared\.yml$)' "$changed_files"; then
-            python tools/build_pages_dist.py
-            git diff --exit-code -- dist/.nojekyll dist/app.js dist/index.html dist/styles.css dist/assets dist/app/index.html dist/app/js dist/app/css dist/app/vendor dist/pages-dist-manifest.json \
-              || { echo "::error::tracked dist must match this PR's final source; run the canonical Pages builder and commit its output."; exit 1; }
+            artifact_root=.runtime/pages-pr/dist
+            python tools/build_pages_dist.py --output-root "$artifact_root"
+            SCENARIO_FORGE_PAGES_ARTIFACT_ROOT="$artifact_root" python -m unittest tests.test_pages_dist_startup_shell -q
+            echo "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=$artifact_root" >> "$GITHUB_ENV"
           else
-            echo "No Pages source, builder or mirror changes; mirror rebuild is not required."
+            echo "No Pages source, builder or artifact changes; artifact rebuild is not required."
           fi
 
       - name: Cache Playwright browsers

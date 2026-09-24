@@ -58,6 +58,8 @@ class PerfWorkflowClassifierTest(unittest.TestCase):
         runtime.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="perf-classifier-", dir=runtime) as directory:
             root = Path(directory)
+            (root / "tools/ci").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(REPO_ROOT / "tools/ci/perf_policy.mjs", root / "tools/ci/perf_policy.mjs")
             fixture = {
                 "files": files, "diffFailure": diff_failure,
                 "base": json.dumps(base or {"scripts": {"test:isolated": "node test.mjs"}}),
@@ -155,6 +157,8 @@ function git {
         runtime.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix="perf-native-classifier-", dir=runtime) as directory:
             root = Path(directory)
+            (root / "tools/ci").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(REPO_ROOT / "tools/ci/perf_policy.mjs", root / "tools/ci/perf_policy.mjs")
 
             def git(*args):
                 return subprocess.run(["git", *args], cwd=root, check=True,
@@ -306,16 +310,11 @@ class PerfGateContractTest(unittest.TestCase):
             '"should_enforce_regressions=$($shouldEnforceRegressions.ToString().ToLowerInvariant())"',
             workflow_content,
         )
-        rule_block = workflow_content[
-            workflow_content.index("$rules = @("):
-            workflow_content.index("$ruleHits = @()")
-        ]
-        policy_pairs = dict(
-            re.findall(
-                r"name = '([^']+)'[\s\S]*?regression_policy = '(enforce|diagnostic)'[\s\S]*?patterns = @\(",
-                rule_block,
-            )
-        )
+        policy_rows = json.loads(subprocess.check_output([
+            "node", "--input-type=module", "-e",
+            "import { PERF_RULES } from './tools/ci/perf_policy.mjs'; console.log(JSON.stringify(PERF_RULES));",
+        ], cwd=REPO_ROOT, text=True))
+        policy_pairs = {name: policy for name, policy, _patterns in policy_rows}
         for enforced_rule in (
             "runtime-js",
             "app-shell",
@@ -333,11 +332,9 @@ class PerfGateContractTest(unittest.TestCase):
         ):
             self.assertEqual(policy_pairs.get(diagnostic_rule), "diagnostic")
         self.assertEqual(len(policy_pairs), 10)
-        self.assertIn("regression_policy = $rule.regression_policy", workflow_content)
-        self.assertIn(
-            "Where-Object { $_.regression_policy -eq 'enforce' }",
-            workflow_content,
-        )
+        self.assertIn("node tools/ci/perf_policy.mjs", workflow_content)
+        self.assertIn("$policy.should_enforce_regressions", workflow_content)
+        self.assertNotIn("$rules = @(", workflow_content)
         self.assertIn(
             "$regressionMode = if ('${{ needs.classify.outputs.should_enforce_regressions }}' -eq 'true')",
             workflow_content,

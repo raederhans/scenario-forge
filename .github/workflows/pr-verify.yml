@@ -2,6 +2,7 @@ name: pr-verify
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 concurrency:
   group: pr-verify-${{ github.event.pull_request.number }}
@@ -30,6 +31,7 @@ jobs:
         with:
           sparse-checkout: |
             tools/ci/pr_plan.mjs
+            tools/ci/perf_policy.mjs
           sparse-checkout-cone-mode: false
           fetch-depth: 1
 
@@ -96,7 +98,10 @@ jobs:
           const planPassed = needs["pr-plan"]?.result === "success";
           const fastPassed = needs["pr-verify-fast"]?.result === "success";
           const smokeResult = needs["pr-verify-smoke"]?.result;
-          const smokeAccepted = smokeResult === "success" || smokeResult === "skipped";
+          const plannedSmoke = needs["pr-plan"]?.outputs?.run_smoke;
+          const smokeAccepted = plannedSmoke === "true"
+            ? smokeResult === "success"
+            : plannedSmoke === "false" && (smokeResult === "success" || smokeResult === "skipped");
           for (const job of expectedJobs) console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
           if (!dependencySetMatches || !planPassed || !fastPassed || !smokeAccepted) {
             console.error("Required PR verification failed.");

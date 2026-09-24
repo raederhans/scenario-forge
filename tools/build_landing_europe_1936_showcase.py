@@ -391,24 +391,32 @@ def europe_country_tags(countries: dict) -> set[str]:
     return tags | TRANSREGIONAL_EUROPE_SHOWCASE_TAGS
 
 
-def polygon_path(geometry: BaseGeometry, canvas: Canvas, include_interiors: bool = False) -> list[str]:
+def polygon_path(
+    geometry: BaseGeometry,
+    canvas: Canvas,
+    include_interiors: bool = False,
+    canonical_ring_start: bool = False,
+) -> list[str]:
     if geometry.is_empty:
         return []
     if geometry.geom_type == "Polygon":
-        rings = [ring_path(geometry.exterior.coords, canvas)]
+        rings = [ring_path(geometry.exterior.coords, canvas, canonical_start=canonical_ring_start)]
         if include_interiors:
-            rings.extend(ring_path(interior.coords, canvas) for interior in geometry.interiors)
+            rings.extend(
+                ring_path(interior.coords, canvas, canonical_start=canonical_ring_start)
+                for interior in geometry.interiors
+            )
         path = " ".join(ring for ring in rings if ring)
         return [path] if path else []
     if geometry.geom_type == "MultiPolygon":
         paths: list[str] = []
         for polygon in sorted(geometry.geoms, key=lambda item: item.area, reverse=True):
-            paths.extend(polygon_path(polygon, canvas, include_interiors=include_interiors))
+            paths.extend(polygon_path(polygon, canvas, include_interiors, canonical_ring_start))
         return [path for path in paths if path]
     if geometry.geom_type == "GeometryCollection":
         paths: list[str] = []
         for part in sorted(polygon_parts(geometry), key=lambda item: item.area, reverse=True):
-            paths.extend(polygon_path(part, canvas, include_interiors=include_interiors))
+            paths.extend(polygon_path(part, canvas, include_interiors, canonical_ring_start))
         return [path for path in paths if path]
     return []
 
@@ -428,21 +436,23 @@ def polygon_parts(geometry: BaseGeometry) -> list[BaseGeometry]:
     return []
 
 
-def polygon_exterior_paths(geometry: BaseGeometry, canvas: Canvas) -> list[str]:
+def polygon_exterior_paths(
+    geometry: BaseGeometry, canvas: Canvas, canonical_ring_start: bool = False
+) -> list[str]:
     if geometry.is_empty:
         return []
     if geometry.geom_type == "Polygon":
-        path = ring_path(geometry.exterior.coords, canvas)
+        path = ring_path(geometry.exterior.coords, canvas, canonical_start=canonical_ring_start)
         return [path] if path else []
     if geometry.geom_type == "MultiPolygon":
         paths: list[str] = []
         for polygon in sorted(geometry.geoms, key=lambda item: item.area, reverse=True):
-            paths.extend(polygon_exterior_paths(polygon, canvas))
+            paths.extend(polygon_exterior_paths(polygon, canvas, canonical_ring_start))
         return [path for path in paths if path]
     if geometry.geom_type == "GeometryCollection":
         paths: list[str] = []
         for part in geometry.geoms:
-            paths.extend(polygon_exterior_paths(part, canvas))
+            paths.extend(polygon_exterior_paths(part, canvas, canonical_ring_start))
         return [path for path in paths if path]
     return []
 
@@ -463,12 +473,28 @@ def intersects_mediterranean_island_bbox(geometry: BaseGeometry) -> bool:
     return any(box(*island_bbox).covers(point) for island_bbox in HERO_MEDITERRANEAN_ISLAND_BBOXES)
 
 
-def ring_path(points: Iterable[tuple[float, float]], canvas: Canvas) -> str:
-    projected = [canvas.project(float(lon), float(lat)) for lon, lat, *_ in points]
+def ring_path(
+    points: Iterable[tuple[float, float]], canvas: Canvas, canonical_start: bool = False
+) -> str:
+    projected = [
+        (fmt(x), fmt(y))
+        for lon, lat, *_ in points
+        for x, y in [canvas.project(float(lon), float(lat))]
+    ]
     if len(projected) < 3:
         return ""
-    commands = [f"M{fmt(projected[0][0])} {fmt(projected[0][1])}"]
-    commands.extend(f"L{fmt(x)} {fmt(y)}" for x, y in projected[1:])
+    if canonical_start and projected[0] == projected[-1]:
+        projected.pop()
+        # GEOS may choose a different first vertex for the same closed ring.
+        # Compare the complete rotation when rounded projected vertices tie.
+        first_vertex = min(projected, key=lambda xy: (float(xy[0]), float(xy[1])))
+        start = min(
+            (index for index, vertex in enumerate(projected) if vertex == first_vertex),
+            key=lambda index: projected[index:] + projected[:index],
+        )
+        projected = projected[start:] + projected[:start] + [projected[start]]
+    commands = [f"M{projected[0][0]} {projected[0][1]}"]
+    commands.extend(f"L{x} {y}" for x, y in projected[1:])
     commands.append("Z")
     return " ".join(commands)
 
@@ -1329,7 +1355,9 @@ def load_blank_coastline_paths(canvas: Canvas) -> tuple[list[str], dict[str, int
             continue
         clipped_count += 1
         clipped_geometries.append(clipped)
-    coastline_paths = polygon_exterior_paths(renderable_geometry(unary_union(clipped_geometries)), canvas)
+    coastline_paths = polygon_exterior_paths(
+        renderable_geometry(unary_union(clipped_geometries)), canvas, canonical_ring_start=True
+    )
     return coastline_paths, {
         "coastline_features_inspected": inspected,
         "coastline_features_candidates": candidate_count,
@@ -1363,7 +1391,10 @@ def load_blank_land_paths(canvas: Canvas) -> tuple[list[str], list[str], dict[st
         if clipped.is_empty:
             continue
         clipped_count += 1
-        selected_paths.extend((clipped.area, path) for path in polygon_path(clipped, canvas, include_interiors=True))
+        selected_paths.extend(
+            (clipped.area, path)
+            for path in polygon_path(clipped, canvas, include_interiors=True, canonical_ring_start=True)
+        )
     selected_paths.sort(reverse=True)
     path_commands = [path for _area, path in selected_paths[:HERO_BLANK_LAND_PATH_LIMIT]]
     coastline_paths, coastline_counts = load_blank_coastline_paths(canvas)

@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 25);
+  assert.equal(routes.length, 29);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -17,7 +17,7 @@ test("precision routes append unique executable targets without modifying existi
     assert.ok(record.commandRef.length > 0);
     for (const source of record.sourceRefs) assert.ok(fs.existsSync(source), source);
   }
-  for (const browser of [routes[6], routes[10]]) {
+  for (const browser of [routes[6], routes[10], routes[28]]) {
   assert.deepEqual(browser.executionOwners, ["main-thread"]);
   assert.ok(browser.resourceLocks.includes("playwright-browser"));
   assert.deepEqual(browser.profiles, ["full"]);

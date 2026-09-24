@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { classifyPerformance } from "./perf_policy.mjs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -13,7 +14,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
   const full = labelSet.has("ci:full");
 
   const matches = (patterns) => files.some((file) => patterns.some((pattern) => (
-    pattern.endsWith("/**") ? file.startsWith(pattern.slice(0, -3)) :
+    pattern.endsWith("/**") ? file.startsWith(pattern.slice(0, -2)) :
     pattern.endsWith("*") ? file.startsWith(pattern.slice(0, -1)) :
     pattern.endsWith("/") ? file.startsWith(pattern) :
     pattern.startsWith("*.") ? file.endsWith(pattern.slice(1)) :
@@ -55,14 +56,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
     ".github/workflows/transport-contract-required.yml",
   ]);
 
-  const perfRelevant = runtimeRelevant || matches([
-    "data/scenarios/tno_1962/**", "data/scenarios/hoi4_1939/**",
-    "data/scenarios/index.json", "tools/perf/**", "tools/dev_server.py",
-    "requirements-perf.lock.txt", "playwright.config.cjs",
-  ]);
-  let perfMode = perfRelevant ? "sample" : "skip";
-  if (labelSet.has("ci:perf-strict") || full) perfMode = "strict";
-  if (labelSet.has("ci:perf-expected") && perfMode === "strict" && !labelSet.has("ci:perf-strict")) perfMode = "sample";
+  const performance = classifyPerformance({ changedFiles: files, labels: [...labelSet] });
 
   return {
     schemaVersion: 1,
@@ -74,7 +68,7 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
     runPages: full || pagesRelevant,
     scenarioIds: [...scenarioIds].sort(),
     runTransport: full || transportRelevant,
-    perfMode,
+    perfMode: performance.perf_mode,
     expectedPerformanceChange: labelSet.has("ci:perf-expected"),
   };
 }

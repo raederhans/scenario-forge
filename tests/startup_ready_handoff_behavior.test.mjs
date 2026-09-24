@@ -532,17 +532,17 @@ test("schedulePostReadyDeferredContextWarmup warms context layers, contours, and
   });
 
   await scheduler.tasks[0].callback();
-  assert.deepEqual(contextCalls[0], {
-    layerNames: ["rivers", "urban", "physical-set"],
-    options: { reason: "post-ready", renderNow: false, taskContext: contextCalls[0].options.taskContext },
+  assert.deepEqual(contextCalls.map(({ layerNames }) => layerNames), [["rivers"], ["urban"], ["physical-set"]]);
+  for (const call of contextCalls) assert.deepEqual(call.options, {
+    reason: "post-ready", renderNow: false, taskContext: call.options.taskContext,
   });
   assert.deepEqual(cityCalls, [{ reason: "post-ready", renderNow: false, taskContext: cityCalls[0].taskContext }]);
   assert.equal(renderCalls[0], "post-ready-context-warmup");
 
   await scheduler.tasks[1].callback();
-  assert.deepEqual(contextCalls[1], {
+  assert.deepEqual(contextCalls[3], {
     layerNames: ["physical-contours-set"],
-    options: { reason: "post-ready-contours", renderNow: false, taskContext: contextCalls[1].options.taskContext },
+    options: { reason: "post-ready-contours", renderNow: false, taskContext: contextCalls[3].options.taskContext },
   });
   assert.equal(renderCalls[1], "post-ready-contours");
 
@@ -720,3 +720,50 @@ for (const cancellation of ["deadline", "reset"]) {
     }
   });
 }
+
+
+test("queued optional warmup drops disabled layers and cities before allocating work", async () => {
+  const loads = [];
+  const targetRuntime = createTargetRuntime({ showRivers: true, showUrban: true, showCityPoints: true, baseCityDataState: "idle" });
+  const { owner, scheduler } = createOwnerHarness({ targetRuntime, helpers: createHelpers({ overrides: {
+    ensureContextLayerDataReady: async (layers) => loads.push(layers),
+    ensureBaseCityDataReady: async () => loads.push("cities"),
+    requestMainRender: () => loads.push("render"),
+  } }) });
+  owner.schedulePostReadyDeferredContextWarmup();
+  targetRuntime.showRivers = targetRuntime.showUrban = targetRuntime.showCityPoints = false;
+  await scheduler.tasks[0].callback();
+  assert.deepEqual(loads, []);
+});
+
+test("optional warmup waits for each load and rereads remaining demand", async () => {
+  const events = [];
+  let finishFirst;
+  const targetRuntime = createTargetRuntime({ showRivers: true, showUrban: true, showPhysical: true });
+  const { owner, scheduler } = createOwnerHarness({ targetRuntime, helpers: createHelpers({ overrides: {
+    ensureContextLayerDataReady: async ([layer]) => {
+      events.push(layer);
+      if (layer === "rivers") await new Promise(resolve => { finishFirst = resolve; });
+    },
+  } }) });
+  owner.schedulePostReadyDeferredContextWarmup();
+  const pending = scheduler.tasks[0].callback();
+  await Promise.resolve();
+  assert.deepEqual(events, ["rivers"]);
+  targetRuntime.showUrban = false;
+  finishFirst();
+  await pending;
+  assert.deepEqual(events, ["rivers", "physical-set"]);
+});
+
+test("scenario replacement during optional warmup prevents later loads and render", async () => {
+  const events = [];
+  const targetRuntime = createTargetRuntime({ activeScenarioId: "old", showRivers: true, showUrban: true });
+  const { owner, scheduler } = createOwnerHarness({ targetRuntime, helpers: createHelpers({ overrides: {
+    ensureContextLayerDataReady: async ([layer]) => { events.push(layer); targetRuntime.activeScenarioId = "new"; },
+    requestMainRender: () => events.push("render"),
+  } }) });
+  owner.schedulePostReadyDeferredContextWarmup();
+  await assert.rejects(scheduler.tasks[0].callback(), /stale/);
+  assert.deepEqual(events, ["rivers"]);
+});

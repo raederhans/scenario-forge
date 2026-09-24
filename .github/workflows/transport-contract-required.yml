@@ -2,6 +2,7 @@ name: Transport Contract Required
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
@@ -26,6 +27,7 @@ jobs:
         with:
           sparse-checkout: |
             tools/ci/pr_plan.mjs
+            tools/ci/perf_policy.mjs
           sparse-checkout-cone-mode: false
           fetch-depth: 1
 
