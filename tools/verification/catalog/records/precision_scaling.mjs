@@ -123,5 +123,11 @@ export function createPrecisionScalingRecords(existingRecords) {
     sourceRefs: ["tests/e2e/dev/precision_foundation_patch.dev.spec.js", "tests/e2e/dev/support/precision_foundation_native_case.mjs"],
     selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:precision-build:graph",
+    commandRef: "python -m unittest tests.test_precision_build_graph -q",
+    sourceRefs: ["tools/precision_build_graph.py", "tests/test_precision_build_graph.py",
+      "tools/build_political_display_lods.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
   return records;
 }
