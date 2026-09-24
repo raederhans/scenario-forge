@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 33);
+  assert.equal(routes.length, 35);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -17,7 +17,7 @@ test("precision routes append unique executable targets without modifying existi
     assert.ok(record.commandRef.length > 0);
     for (const source of record.sourceRefs) assert.ok(fs.existsSync(source), source);
   }
-  for (const browser of [routes[6], routes[10], routes[28]]) {
+  for (const browser of [routes[6], routes[10], routes[28], routes[34]]) {
   assert.deepEqual(browser.executionOwners, ["main-thread"]);
   assert.ok(browser.resourceLocks.includes("playwright-browser"));
   assert.deepEqual(browser.profiles, ["full"]);
@@ -93,4 +93,22 @@ test("resource accounting has its own executable route and retains the original 
     assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
     assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[31].commandRef));
   }
+});
+
+test("transport lifetime tests and the real-data browser probe have separate execution owners", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.equal(routes[33].id, "local:precision-transport:lifetime");
+  assert.equal(routes[34].id, "local:precision-transport:native-browser");
+  for (const source of ["js/ui/transport_workbench_line_runtime_shared.js", "js/core/data_service.js", "tests/transport_lifetime_behavior.test.mjs"]) {
+    const report = buildRepositoryRecommendation([source]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[33].commandRef));
+  }
+  const probe = buildRepositoryRecommendation(["tools/probe_transport_lifetime.mjs"]);
+  assert.deepEqual(probe.unmatchedChangedFiles, []);
+  assert.deepEqual(buildExecutionPlan(probe).routeGaps, []);
+  assert.ok(probe.recommendedCommands.some((entry) => entry.commandRef === routes[34].commandRef));
+  assert.deepEqual(routes[34].executionOwners, ["main-thread"]);
+  assert.deepEqual(routes[34].resourceLocks, ["browser-dev-server", "playwright-browser", ".runtime-output"]);
 });

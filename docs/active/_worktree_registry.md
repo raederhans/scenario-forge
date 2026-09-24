@@ -4,6 +4,8 @@
 
 这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。
 
+本轮接手“优化架构与数据性能”的两批交付，整合 PR #155、#156、#157、#158、#159、#161，并保留已合并 #160 的湖泊与河流改动。对应记录为 `precision-engineering-20260924.md`、`precision-raster-p1-20260924.md`、`precision-build-graph-p3-20260924.md`、`precision-resources-p3-20260924.md`、`precision-artifact-p4-20260924.md`、`precision-transport-lifecycle-p5-20260924.md`。主代理统一运行本地测试并负责合并；其他工作树、候选数据及 `.playwright-mcp/` 保留。最终主分支与部署状态以 Git/GitHub 回执为准；下表旧批次描述仅为入口历史。
+
 | 当前入口 | 用途与边界 |
 | --- | --- |
 | `C:/Users/raede/Desktop/dev/mapcreator` | 主工作区；湖泊修复已通过 PR #151 进入主线。本轮收尾交付为 [PR #152](https://github.com/raederhans/scenario-forge/pull/152)，分支 `codex/precision-foundation-p0-p4-20260923`，见 [实现与收尾记录](precision-foundation-p0-p4-20260924.md)。合并后主工作区回到 `main`；当前 SHA、CI、合并与自动部署状态以 Git / GitHub 回执为准。保留既有未跟踪 `.playwright-mcp/`。 |
