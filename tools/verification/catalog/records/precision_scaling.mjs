@@ -126,7 +126,7 @@ export function createPrecisionScalingRecords(existingRecords) {
   records.push({ ...records[0], id: "local:precision-build:graph",
     commandRef: "python -m unittest tests.test_precision_build_graph -q",
     sourceRefs: ["tools/precision_build_graph.py", "tests/test_precision_build_graph.py",
-      "tools/build_political_display_lods.py", "docs/active/precision-build-graph-p3-20260924.md"],
+      "tools/build_political_display_lods.py"],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
   return records;
