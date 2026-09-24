@@ -320,7 +320,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     const showWater = !!runtimeState.showWaterRegions;
     const showSpecial = !!runtimeState.showScenarioSpecialRegions;
     const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible();
-    const waterFeatures = showWater ? getEffectiveWaterRegionFeatures() : [];
+    // Common lakes are base geography, including in scenes such as HGO that
+    // disable the editable water-region overlay by default.
+    const sharedLakeIds = new Set((runtimeState.contextLayerExternalDataByName?.lakes?.features || []).map(getFeatureId));
+    const waterFeatures = showWater || sharedLakeIds.size
+      ? getEffectiveWaterRegionFeatures().filter((feature) => showWater || sharedLakeIds.has(getFeatureId(feature)))
+      : [];
+    const paintWater = showWater || waterFeatures.length > 0;
     const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
     let renderedWaterCount = 0;
     let renderedAtlantropaLandLikeCount = 0;
@@ -336,7 +342,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     // water/special overlay 这里走的是显式策略选择，不是错误恢复链：
     // adaptive 会按覆盖率和复杂度在 reuse/redraw/direct 间切换；
     // direct 表示“直接画到当前 pass，不维护复用缓存”，不要把它当失败兜底继续叠 fallback。
-    if (!showWater && !showSpecial && !showAtlantropaLandLikeOverlay) {
+    if (!paintWater && !showSpecial && !showAtlantropaLandLikeOverlay) {
       collectContextMetric("contextScenarioLayerWater", 0, {
         featureCount: 0,
         renderedCount: 0,
@@ -372,7 +378,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       return;
     }
 
-    if (showWater) {
+    if (paintWater) {
       const forcedWaterCache = getForcedScenarioWaterCacheMode();
       waterCacheStrategyMode = forcedWaterCache.mode;
       waterCacheStrategySource = forcedWaterCache.source;
@@ -425,7 +431,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
           renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
         }
       }
-      highlightedWaterCount = drawScenarioWaterHighlightLayer(k);
+      highlightedWaterCount = showWater ? drawScenarioWaterHighlightLayer(k) : 0;
       if (showAtlantropaLandLikeOverlay) {
         renderedAtlantropaLandLikeCount = drawScenarioAtlantropaLandLikeOverlayLayer(k);
       }

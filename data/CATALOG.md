@@ -2,7 +2,7 @@
 
 - generated_at: 2026-09-11T02:47:14.044292+00:00
 - version: 1
-- entries: 665
+- entries: 666
 
 ## Counts by role
 
@@ -14,7 +14,7 @@
 | city_lights_entries | 1 |
 | city_lights_source | 1 |
 | city_overrides | 1 |
-| context_layer | 6 |
+| context_layer | 7 |
 | country_feature_policies | 1 |
 | detail_topology_na_v1 | 1 |
 | detail_topology_na_v2 | 1 |
@@ -90,6 +90,7 @@
 | context_layer:physical_contours_mid_major | data/global_contours.mid.major.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_major |  |
 | context_layer:physical_contours_mid_minor | data/global_contours.mid.minor.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_minor |  |
 | manifest_output:global_contours.minor.topo.json | data/global_contours.minor.topo.json | terrain_contours_minor_topology | topojson | json | schema://topology/terrain_contours_minor_v1 | data/manifest.json::outputs::global_contours.minor.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
+| manifest_output:global_lakes.geojson | data/global_lakes.geojson | context_layer | geojson | json | schema://geojson/feature_collection/polygon/v1 | data/manifest.json::outputs::global_lakes.geojson::sha256 | default | tools/build_global_lakes.py | global_lakes_natural_earth |
 | manifest_output:global_physical_semantics.topo.json | data/global_physical_semantics.topo.json | physical_semantics_topology | topojson | json | schema://topology/physical_semantics_v1 | data/manifest.json::outputs::global_physical_semantics.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | context_layer:rivers | data/global_rivers.geojson | context_layer | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.context_layer:rivers |  |
 | manifest_output:hgo_catalogs/hgo_flags.index.json | data/hgo_catalogs/hgo_flags.index.json | hgo_flags_index | json | json | schema://json/object/v1 | data/manifest.json::outputs::hgo_catalogs/hgo_flags.index.json::sha256 | default | tools.build_hgo_flag_index |  |

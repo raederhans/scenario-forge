@@ -832,6 +832,18 @@
       "sha256": "0d1e3ddced1a878d122ef638d960df1c04c60d82789e5be5c87754f0e24eeacb",
       "schema_ref": "schema://quick_fill/prefecture_crosswalk/v1",
       "type": "json"
+    },
+    "global_lakes.geojson": {
+      "role": "context_layer",
+      "artifact_class": "derived",
+      "owner": "tools/build_global_lakes.py",
+      "description": "Shared simplified global inland waters, excluding scenario-only Congo Lake.",
+      "size_bytes": 2381103,
+      "sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b",
+      "schema_ref": "schema://geojson/feature_collection/polygon/v1",
+      "type": "geojson",
+      "feature_count": 1355,
+      "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved"
     }
   },
   "runtime_asset_registry": {
@@ -1439,6 +1451,12 @@
           "publish_scope": "repo_only",
           "runtime_readiness": "catalog_only"
         }
+      },
+      "context_layer:lakes": {
+        "url": "data/global_lakes.geojson",
+        "role": "context_layer",
+        "family_id": "lakes",
+        "description": "Shared simplified lakes for every scenario; scenario-only Congo Lake stays in TNO."
       }
     },
     "scenario_registry_key": "scenario_registry",

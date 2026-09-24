@@ -528,5 +528,37 @@
     "provenance_sidecar": "data/quick_fill/china_prefecture_crosswalk.v1.json",
     "status": "frozen_verified",
     "local_presence": "required"
+  },
+  {
+    "upstream_url": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/",
+    "status": "frozen_verified",
+    "local_presence": "required",
+    "source_id": "natural_earth_lakes_10m",
+    "local_path": "data/ne_10m_lakes.zip",
+    "origin_kind": "download",
+    "immutable_ref": "Source ZIP sha256:0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
+    "current_local_sha256": "0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
+    "consumers": [
+      "tools/build_global_lakes.py",
+      "init_map_data.py"
+    ]
+  },
+  {
+    "upstream_url": "https://naturalearth.s3.amazonaws.com/10m_physical/ne_10m_lakes.zip",
+    "license": "Natural Earth public domain",
+    "citation": "https://www.naturalearthdata.com/downloads/10m-physical-vectors/10m-lakes/",
+    "status": "frozen_verified",
+    "local_presence": "required",
+    "source_id": "global_lakes_natural_earth",
+    "local_path": "data/global_lakes.geojson",
+    "origin_kind": "generated",
+    "immutable_ref": "Source ZIP sha256:0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a; canonical water sha256:0dab28f9809e2964c4e5b32278c9030386e1941e2e3284757d7cc62849edefed",
+    "current_local_sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b",
+    "consumers": [
+      "data/runtime_asset_registry.json"
+    ],
+    "rebuild_command": "python tools/build_global_lakes.py"
   }
 ]
