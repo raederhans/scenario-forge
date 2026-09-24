@@ -142,5 +142,11 @@ export function createPrecisionScalingRecords(existingRecords) {
       "tests/worker_resource_accounting_behavior.test.mjs", "docs/active/precision-resources-p3-20260924.md"],
     ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:precision-artifact:partition-rehearsal",
+    commandRef: "python -m unittest tests.test_pages_artifact_partition -q",
+    sourceRefs: ["tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py",
+      "tests/test_pages_artifact_partition.py", "docs/active/precision-artifact-p4-20260924.md"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
   return records;
 }
