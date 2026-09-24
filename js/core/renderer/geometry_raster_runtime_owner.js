@@ -125,9 +125,13 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
         context.drawImage(baseFrame.result.bitmap, 0, 0);
         context.clearRect(patch.region.x, patch.region.y, patch.region.width, patch.region.height);
         context.drawImage(result.bitmap, patch.region.x, patch.region.y);
+        // Publish the same immutable source type as a full worker frame.
+        // Drawing the live canvas can replay its commands on a different native
+        // raster backend, changing even pixels outside the replaced region.
+        const bitmap = canvas.transferToImageBitmap();
         close(result);
         receivedResult = null;
-        composed = { ...result, bitmap: canvas, width: description.width, height: description.height,
+        composed = { ...result, bitmap, width: description.width, height: description.height,
           rasterizedCount: result.renderedCount, renderedCount: entries.length };
         e.recordMetric("geometryWorkerPoliticalPatch", 0, { changedCount: patch.changedCount,
           rasterizedCount: result.renderedCount, composedCount: entries.length,

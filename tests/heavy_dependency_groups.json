@@ -27,6 +27,7 @@
       "tests/test_polar_water_spherical_safety.py",
       "tests/test_political_display_lods.py",
       "tests/test_political_topology_gap_contract.py",
+      "tests/test_precision_foundation_build.py",
       "tests/test_precision_shard_lod.py",
       "tests/test_regional_basic_processors.py",
       "tests/test_regional_boundary_alignment.py",

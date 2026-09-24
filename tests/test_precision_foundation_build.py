@@ -1,6 +1,8 @@
 import gzip
 import json
+import os
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -10,7 +12,9 @@ from tools.precision_candidate_receipt import snapshot, gate_inventory, GATES
 
 class PrecisionFoundationBuildTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        runtime_tmp = Path(__file__).resolve().parents[1] / '.runtime' / 'tmp'
+        runtime_tmp.mkdir(parents=True, exist_ok=True)
+        self.temp = tempfile.TemporaryDirectory(dir=runtime_tmp)
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
@@ -64,9 +68,25 @@ class PrecisionFoundationBuildTests(unittest.TestCase):
         (self.root / 'a').rename(self.root / 'b')
         self.assertNotEqual(before['candidate_tree_sha256'], snapshot(self.root, source)['candidate_tree_sha256'])
 
-    def test_empty_candidates_and_symlinks_are_rejected(self):
+    def test_empty_candidates_and_filesystem_links_are_rejected(self):
         with self.assertRaises(ValueError): snapshot(self.root, {})
-        (self.root / 'a').write_text('data'); (self.root / 'link').symlink_to('a')
+        target = self.root / 'target'
+        target.mkdir()
+        (target / 'a').write_text('data')
+        link = self.root / 'link'
+        if os.name == 'nt':
+            # Junctions exercise the real reparse-point guard without requiring
+            # Windows' privileged symbolic-link creation permission.
+            subprocess.run([
+                'powershell', '-NoProfile', '-NonInteractive', '-Command',
+                'New-Item -ItemType Junction -Path $env:TEST_LINK_PATH '
+                '-Target $env:TEST_LINK_TARGET -ErrorAction Stop | Out-Null',
+            ], env={**os.environ, 'TEST_LINK_PATH': str(link), 'TEST_LINK_TARGET': str(target)},
+                check=True, capture_output=True)
+            self.assertTrue(link.is_junction())
+        else:
+            link.symlink_to(target, target_is_directory=True)
+            self.assertTrue(link.is_symlink())
         with self.assertRaises(ValueError): snapshot(self.root, {})
 
     def test_inventory_rejects_stale_source_candidate_missing_or_conflicting_gates(self):

@@ -37,7 +37,7 @@ test("label-driven workflows load the same policy and subscribe to label changes
   }
 });
 test("required aggregator refuses accidentally skipped planned smoke", () => {
-  const source = fs.readFileSync(".github/workflows/pr-verify.yml", "utf8");
+  const source = fs.readFileSync(".github/workflows/pr-verify.yml", "utf8").replace(/\r\n/g, "\n");
   const script = source.split("node <<'NODE'\n")[1].split("\n          NODE")[0];
   function run(planned, smoke) {
     const needs = { "pr-plan": { result: "success", outputs: { run_smoke: planned } }, "pr-verify-fast": { result: "success" }, "pr-verify-smoke": { result: smoke } };

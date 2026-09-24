@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { createGeometryRasterWorkerKernel } from "../js/core/renderer/geometry_raster_worker_kernel.js";
 import { planPoliticalRasterPatch } from "../js/core/renderer/political_raster_patch_plan.js";
+import { createGeometryRasterRuntimeOwner } from "../js/core/renderer/geometry_raster_runtime_owner.js";
 
 function fixture() {
   const entries = Array.from({ length: 1000 }, (_, index) => ({ id: String(index), feature: { geometry: {} },
@@ -80,4 +81,52 @@ test("cancelling an asynchronous patch crop closes its late bitmap", async () =>
   const { kernel, packet } = cropHarness(async () => { cancelled = true; return { close() { closed = true; } }; });
   await assert.rejects(kernel.render(packet, { isCancelled: () => cancelled }), { name: "AbortError" });
   assert.equal(closed, true);
+});
+
+test("patch commits a bitmap snapshot and retires full, cropped and composed bitmaps", async () => {
+  const features = [{ geometry: {} }, { geometry: {} }];
+  const projection = {}, requests = [], paints = [], operations = [];
+  const makeBitmap = () => ({ closes: 0, close() { this.closes++; } });
+  const full = makeBitmap(), cropped = makeBitmap(), composite = makeBitmap();
+  let color = "red";
+  const owner = createGeometryRasterRuntimeOwner({
+    state: { firstVisibleFramePainted: true, dpr: 1, zoomTransform: { x: 0, y: 0, k: 1 }, landData: { features } },
+    client: { available: () => true, dispose() {}, request: async packet => {
+      requests.push(packet);
+      return packet.renderRegion ? { bitmap: cropped, width: packet.renderRegion.width, height: packet.renderRegion.height,
+        renderRegion: packet.renderRegion, patchBaseIdentity: packet.patchBaseIdentity, renderedCount: 1 }
+        : { bitmap: full, width: 100, height: 100, renderedCount: 2 };
+    } },
+    surface: { getProjection: () => projection, getContext: () => ({
+      save() {}, restore() {}, setTransform() {}, drawImage: bitmap => paints.push(bitmap),
+    }) },
+    helpers: { isEnabled: () => true, hasPendingColorEdit: () => false, needsPoliticalRender: () => true,
+      getPoliticalLayout: () => ({ pixelWidth: 100, pixelHeight: 100 }),
+      getPoliticalSignature: () => color, getPoliticalPatchStaticSignature: () => "static",
+      collectPoliticalItems: () => features.map((feature, i) => ({ id: String(i), feature })),
+      orderPoliticalItems: items => items, excludeVisual: () => false, skipVisual: () => false,
+      resolveFillColor: (_, id) => id === "0" ? color : "gray", resolveStrokeColor: () => null,
+      getPoliticalEntryPixelBounds: ({ id }) => id === "0"
+        ? { minX: 10, minY: 10, maxX: 20, maxY: 20 } : { minX: 80, minY: 80, maxX: 90, maxY: 90 },
+    },
+    effects: { recordMetric() {}, requestRender() {} },
+    createCanvas: () => ({ getContext: () => ({
+      drawImage: (...args) => operations.push(["draw", ...args]),
+      clearRect: (...args) => operations.push(["clear", ...args]),
+    }), transferToImageBitmap() { operations.push(["snapshot"]); return composite; } }),
+  });
+  await owner.preparePolitical();
+  color = "blue";
+  await owner.preparePolitical();
+  assert.equal(requests.length, 2);
+  assert.deepEqual(requests[1].drawEntryIds, ["0"]);
+  assert.deepEqual(operations, [["draw", full, 0, 0], ["clear", 10, 10, 10, 10],
+    ["draw", cropped, 10, 10], ["snapshot"]]);
+  assert.equal(owner.drawPolitical().renderedCount, 2);
+  assert.deepEqual(paints, [composite]);
+  assert.equal(full.closes, 1);
+  assert.equal(cropped.closes, 1);
+  assert.equal(composite.closes, 0);
+  owner.dispose();
+  assert.equal(composite.closes, 1);
 });

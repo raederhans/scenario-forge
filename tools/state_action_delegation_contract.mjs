@@ -1294,7 +1294,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   "targetParameterName": "state",
   "targetParameterIndex": 0,
   "targetParameterPath": "$/property:state",
-  "sourceFingerprint": "907c22372859c0c58ba664c24b7155126beb8ad4a7565f203b3028c96a142ec4",
+  "sourceFingerprint": "1cdfb5b09ebe2fbc0cc7bea7a748e85d18a2ad64221f3cfb9658a8a2a73b2c46",
   "localFunctionFingerprints": {},
   "conservativeFindings": [
     {
@@ -5229,7 +5229,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "compositionSourceFingerprint": "6b88510c1e256f9811da4ce7a9438d5965efcd84830982559f65c9c714d16bd3",
   "factoryModulePath": "js/core/renderer/geometry_raster_runtime_owner.js",
   "factoryExportName": "createGeometryRasterRuntimeOwner",
-  "factorySourceFingerprint": "907c22372859c0c58ba664c24b7155126beb8ad4a7565f203b3028c96a142ec4",
+  "factorySourceFingerprint": "1cdfb5b09ebe2fbc0cc7bea7a748e85d18a2ad64221f3cfb9658a8a2a73b2c46",
   "ownerBindingName": "geometryRasterRuntimeOwner",
   "methods": [
     "prepareFrame",

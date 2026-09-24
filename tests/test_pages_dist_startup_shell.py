@@ -679,6 +679,24 @@ class PagesDistStartupShellTest(unittest.TestCase):
                         self.assertGreater(payload["feature_counts"][f"atlantropa_{layer}_paths"], 0)
                         self.assertIn(f'data-atlantropa-layer="{layer}"', svg_text)
 
+    def test_blank_hero_ring_start_is_independent_of_geos_rotation(self) -> None:
+        builder = import_landing_builder("build_landing_europe_1936_showcase")
+
+        class IdentityCanvas:
+            @staticmethod
+            def project(x: float, y: float) -> tuple[float, float]:
+                return x, y
+
+        vertices = [(2.0, 1.0), (1.0, 1.0), (1.0, 2.0)]
+        expected = "M1 1 L1 2 L2 1 L1 1 Z"
+        for start in range(len(vertices)):
+            rotated = vertices[start:] + vertices[:start]
+            with self.subTest(start=start):
+                self.assertEqual(
+                    builder.ring_path(rotated + [rotated[0]], IdentityCanvas(), canonical_start=True),
+                    expected,
+                )
+
     def test_landing_hero_scenario_assets_match_builder_output(self) -> None:
         build_landing_europe_1936_showcase = import_landing_builder("build_landing_europe_1936_showcase")
         with tempfile.TemporaryDirectory() as tmpdir:
