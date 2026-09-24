@@ -1,0 +1,50 @@
+name: Precision continuation validation
+on:
+  push:
+    branches: ["codex/precision-continuation-p0-p5-20260924"]
+    paths:
+      - ".github/workflows/precision-continuation-validation.yml"
+      - "js/core/runtime_resource_budget.js"
+      - "js/core/scenario/chunk_load_scheduler.js"
+      - "js/core/scenario/chunk_payload_loader.js"
+      - "js/core/scenario/bundle_cache_policy.js"
+      - "js/core/geometry_raster_worker_client.js"
+      - "tests/runtime_resource_budget_behavior.test.mjs"
+      - "tests/precision_continuation*"
+permissions:
+  contents: read
+concurrency:
+  group: precision-continuation-validation
+  cancel-in-progress: true
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Runtime resource and original scheduler tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/continuation-validation
+          node --test tests/runtime_resource_budget_behavior.test.mjs tests/precision_scaling_scheduler_behavior.test.mjs 2>&1 | tee .runtime/continuation-validation/runtime.log
+      - name: Syntax and whitespace
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check js/core/runtime_resource_budget.js
+          node --check js/core/scenario/chunk_load_scheduler.js
+          git diff --check 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc HEAD
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: precision-continuation-validation
+          path: .runtime/continuation-validation/
+          if-no-files-found: warn
+          retention-days: 5
