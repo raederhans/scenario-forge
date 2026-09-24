@@ -7,7 +7,7 @@ on:
       - "js/core/runtime_resource_budget.js"
       - "js/core/scenario/chunk_load_scheduler.js"
       - "js/core/scenario/chunk_payload_loader.js"
-      - "js/core/scenario/bundle_cache_policy.js"
+      - "js/core/scenario/bundle_cache*.js"
       - "js/core/geometry_raster_worker_client.js"
       - "tests/runtime_resource_budget_behavior.test.mjs"
       - "tests/precision_continuation*"
@@ -23,18 +23,60 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          fetch-depth: 1
+          fetch-depth: 50
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Runtime resource and original scheduler tests
+      - name: Locked Node and native browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npx playwright install chromium
+      - name: Runtime resource and original cache scheduler worker tests
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p .runtime/continuation-validation
-          node --test tests/runtime_resource_budget_behavior.test.mjs tests/precision_scaling_scheduler_behavior.test.mjs 2>&1 | tee .runtime/continuation-validation/runtime.log
+          node --test tests/runtime_resource_budget_behavior.test.mjs tests/precision_continuation_resource_integration.test.mjs tests/precision_scaling_scheduler_behavior.test.mjs tests/scenario_chunk_payload_loader_behavior.test.mjs tests/scenario_cache_efficiency_behavior.test.mjs tests/scenario_cache_byte_budget_behavior.test.mjs tests/geometry_raster_worker_client_behavior.test.mjs 2>&1 | tee .runtime/continuation-validation/runtime.log
+      - name: State authority and source boundaries
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/continuation-validation
+          node --input-type=module <<'JS' 2>&1 | tee .runtime/continuation-validation/boundaries.log
+          import fs from 'node:fs';
+          import { spawnSync } from 'node:child_process';
+          const files = fs.readdirSync('tests').filter(name => /^(state_borrowed_effect|state_action_delegation).*\.test\.mjs$/.test(name)).map(name => `tests/${name}`);
+          if (files.length < 2) throw new Error('Required state boundary suites not found');
+          console.log(files);
+          const result = spawnSync(process.execPath, ['--test', ...files], { stdio: 'inherit' });
+          process.exit(result.status ?? 1);
+          JS
+          node tools/check_architecture_boundaries.mjs
+      - name: Original native module-worker pixel oracle
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/continuation-validation
+          cat > .runtime/continuation-validation/native.config.cjs <<'JS'
+          const path = require('node:path');
+          const root = path.resolve(__dirname, '../..');
+          module.exports = {
+            testDir: path.join(root, 'tests/e2e/dev'),
+            testMatch: 'precision_foundation_patch.dev.spec.js',
+            outputDir: path.join(root, '.runtime/tests/playwright/continuation-native'),
+            retries: 0, workers: 1, reporter: 'list',
+            webServer: { command: 'python -m http.server 4177 --bind 127.0.0.1', cwd: root, url: 'http://127.0.0.1:4177', reuseExistingServer: false },
+            use: { baseURL: 'http://127.0.0.1:4177' },
+          };
+          JS
+          npx playwright test --config=.runtime/continuation-validation/native.config.cjs --retries=0 2>&1 | tee .runtime/continuation-validation/native.log
       - name: Syntax and whitespace
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
