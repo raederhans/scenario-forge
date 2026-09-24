@@ -1,0 +1,51 @@
+name: Precision engineering workspace
+on:
+  push:
+    branches: ["codex/precision-engineering-workspace-20260924"]
+    paths: [".github/workflows/precision-engineering-workspace.yml"]
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Package verified source without generated mirrors
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/engineering-workspace
+          python - <<'PY'
+          import hashlib, json, subprocess, zipfile
+          from pathlib import Path
+          root = Path.cwd()
+          out = root / '.runtime/engineering-workspace'
+          records = []
+          with zipfile.ZipFile(out / 'source.zip', 'w', zipfile.ZIP_DEFLATED, compresslevel=3) as archive:
+              for row in subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD']).split(b'\0'):
+                  if not row: continue
+                  meta, name = row.split(b'\t', 1)
+                  mode, kind, sha = meta.decode().split()
+                  name = name.decode()
+                  if kind != 'blob': continue
+                  path = root / name
+                  included = not name.startswith('dist/') and (not name.startswith('data/') or (path.stat().st_size <= 2000000 and not name.endswith('.gz')))
+                  records.append({'path': name, 'git_blob_sha': sha, 'size_bytes': path.stat().st_size, 'included': included})
+                  if included: archive.write(path, name)
+          (out / 'inventory.json').write_text(json.dumps({'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': records}, indent=2) + '\n')
+          with (out / 'source.zip').open('rb') as source:
+              (out / 'sha256.txt').write_text(hashlib.file_digest(source, 'sha256').hexdigest() + '  source.zip\n')
+          print('files', len(records), 'included', sum(r['included'] for r in records))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: precision-engineering-workspace
+          path: .runtime/engineering-workspace/
+          retention-days: 3
+          compression-level: 0
+          if-no-files-found: error
