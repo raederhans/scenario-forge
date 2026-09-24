@@ -130,5 +130,17 @@ export function createPrecisionScalingRecords(existingRecords) {
       "tests/worker_resource_accounting_behavior.test.mjs", "docs/active/precision-resources-p3-20260924.md"],
     ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:precision-transport:lifetime",
+    commandRef: "node --test tests/transport_lifetime_behavior.test.mjs tests/data_service_cancellation_behavior.test.mjs",
+    sourceRefs: ["js/core/data_service.js", "js/ui/transport_workbench_line_runtime_shared.js",
+      "js/ui/transport_workbench_road_preview.js", "js/ui/transport_workbench_retention.js",
+      "tests/transport_lifetime_behavior.test.mjs", "tests/data_service_cancellation_behavior.test.mjs",
+      "docs/active/precision-transport-lifecycle-p5-20260924.md"],
+    ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[6], id: "local:precision-transport:native-browser",
+    commandRef: "node tools/probe_transport_lifetime.mjs --report-dir .runtime/reports/generated/transport-lifetime",
+    sourceRefs: ["tools/probe_transport_lifetime.mjs"], selectorOrder: start + records.length,
+  });
   return records;
 }
