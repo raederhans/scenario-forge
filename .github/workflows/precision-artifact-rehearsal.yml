@@ -1,0 +1,84 @@
+name: Precision artifact rehearsal
+on:
+  push:
+    branches: ["codex/precision-artifact-p4-20260924"]
+    paths:
+      - ".github/workflows/precision-artifact-rehearsal.yml"
+      - "tools/pages_artifact_partition.py"
+      - "tools/pages_artifact_rehearsal.py"
+      - "tests/test_pages_artifact_partition.py"
+permissions:
+  contents: read
+concurrency:
+  group: precision-artifact-rehearsal
+  cancel-in-progress: true
+jobs:
+  isolated:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Partition and recovery negative tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/artifact-rehearsal-evidence
+          python -m unittest tests.test_pages_artifact_partition -v 2>&1 | tee .runtime/artifact-rehearsal-evidence/unit.log
+      - name: Build one real canonical artifact and verify its existing shell contracts
+        shell: bash
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/artifact-rehearsal-input/source
+        run: |
+          set -euo pipefail
+          python tools/build_pages_dist.py --output-root .runtime/artifact-rehearsal-input/source
+          python -m unittest tests.test_pages_dist_startup_shell -v 2>&1 | tee .runtime/artifact-rehearsal-evidence/shell.log
+          npm ci --no-audit --no-fund
+          npx playwright install chromium
+      - name: Smoke the real source artifact and record its actual receipt
+        shell: bash
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/artifact-rehearsal-input/source
+          PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:4183/
+        run: |
+          set -euo pipefail
+          python -m http.server 4183 --bind 127.0.0.1 --directory .runtime/artifact-rehearsal-input/source > .runtime/artifact-rehearsal-evidence/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          python - <<'PY'
+          import time, urllib.request
+          for attempt in range(30):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:4183/', timeout=2).close()
+                  break
+              except OSError:
+                  time.sleep(0.1)
+          else:
+              raise SystemExit('Loopback server did not become ready')
+          PY
+          npm run test:e2e:pages-public-release-gate -- --retries=0 2>&1 | tee .runtime/artifact-rehearsal-evidence/smoke.log
+          python tools/pages_artifact_admission.py --artifact-root .runtime/artifact-rehearsal-input/source --run-id "rehearsal-$GITHUB_RUN_ID" --public-smoke passed --receipt-out .runtime/artifact-rehearsal-input/receipt.json --summary-out .runtime/artifact-rehearsal-input/summary.json
+      - name: Partition reassemble and serve the exact admitted bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/pages_artifact_partition.py partition --input-root .runtime/artifact-rehearsal-input/source --receipt .runtime/artifact-rehearsal-input/receipt.json --source-sha "$GITHUB_SHA" --output-root .runtime/artifact-rehearsal-input/package > .runtime/artifact-rehearsal-evidence/partition.json
+          python tools/pages_artifact_partition.py assemble --input-root .runtime/artifact-rehearsal-input/package --receipt .runtime/artifact-rehearsal-input/receipt.json --source-sha "$GITHUB_SHA" --output-root .runtime/artifact-rehearsal-input/restored > .runtime/artifact-rehearsal-evidence/assembly.json
+          python tools/pages_artifact_rehearsal.py --previous-root .runtime/artifact-rehearsal-input/source --previous-receipt .runtime/artifact-rehearsal-input/receipt.json --previous-sha "$GITHUB_SHA" --candidate-root .runtime/artifact-rehearsal-input/restored --candidate-receipt .runtime/artifact-rehearsal-input/receipt.json --candidate-sha "$GITHUB_SHA" --output-root .runtime/artifact-rehearsal-evidence/real-reassembly --smoke-command-json '["npm","run","test:e2e:pages-public-release-gate","--","--retries=0"]'
+          git diff --check 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc HEAD
+          git diff --exit-code -- dist data
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: precision-artifact-rehearsal-evidence
+          path: .runtime/artifact-rehearsal-evidence/
+          retention-days: 5
+          if-no-files-found: warn
