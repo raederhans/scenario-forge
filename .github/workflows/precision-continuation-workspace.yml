@@ -1,0 +1,53 @@
+name: Precision continuation workspace
+on:
+  push:
+    branches: ["codex/precision-continuation-p0-p5-20260924"]
+    paths: [".github/workflows/precision-continuation-workspace.yml"]
+permissions:
+  contents: read
+jobs:
+  workspace:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Package tracked source and canonical inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/continuation-workspace
+          python - <<'PY'
+          import hashlib, json, subprocess, zipfile
+          from pathlib import Path
+          root = Path.cwd()
+          out = root / '.runtime/continuation-workspace'
+          rows = []
+          with zipfile.ZipFile(out / 'workspace.zip', 'w', zipfile.ZIP_DEFLATED, compresslevel=3) as z:
+              for record in subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD']).split(b'\0'):
+                  if not record: continue
+                  meta, raw_name = record.split(b'\t', 1)
+                  mode, kind, blob_sha = meta.decode().split()
+                  if kind != 'blob': continue
+                  name = raw_name.decode('utf-8')
+                  source = root / name
+                  included = not name.startswith('dist/')
+                  rows.append({'path': name, 'git_blob_sha': blob_sha, 'size_bytes': source.stat().st_size, 'included': included})
+                  if included: z.write(source, name)
+          (out / 'inventory.json').write_text(json.dumps({'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': rows}, indent=2) + '\n', encoding='utf-8')
+          with (out / 'workspace.zip').open('rb') as f: digest = hashlib.file_digest(f, 'sha256').hexdigest()
+          (out / 'sha256.txt').write_text(digest + '  workspace.zip\n', encoding='utf-8')
+          print('source_sha=2b2f1fecf9c388616a01dfb10da5e372ea65b3dc')
+          print('workspace_sha256=' + digest)
+          print('included_files=' + str(sum(x['included'] for x in rows)))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: precision-continuation-workspace
+          path: .runtime/continuation-workspace/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: error
