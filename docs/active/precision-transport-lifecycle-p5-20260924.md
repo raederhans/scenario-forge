@@ -130,3 +130,14 @@ The parent reran the real Japan preview Chromium probe: two open/close cycles,
 owner retention returns to baseline and all error arrays are empty. Report:
 `.runtime/reports/generated/transport-lifetime/canonical-road-4449e5cb-c5be-43fa-90c7-caaed2f89643.json`.
 Pressure is injected ledger pressure, not an actual heap measurement.
+
+Six-PR integration retains all 35 precision verification routes in order. The
+combined metadata, worker, resource and lifetime run passed 91 checks; its sole
+failure was the transport route's old positional assertion after additive merges.
+After updating that assertion, all nine route tests pass. Both Windows Chromium
+native pixel oracles pass again with #156 and #158 combined. The 27 existing
+workbench regressions also pass. Canonical #160 data and unrelated worktrees are
+preserved. Current-head CI and the final automatic Pages deployment remain the
+remote acceptance authorities. Main protection's strict-up-to-date toggle is
+temporarily relaxed for this authorized batch; all six required checks remain
+enabled and the toggle must be restored after integration.

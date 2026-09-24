@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 32);
+  assert.equal(routes.length, 35);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -17,7 +17,7 @@ test("precision routes append unique executable targets without modifying existi
     assert.ok(record.commandRef.length > 0);
     for (const source of record.sourceRefs) assert.ok(fs.existsSync(source), source);
   }
-  for (const browser of [routes[6], routes[10], routes[28], routes[31]]) {
+  for (const browser of [routes[6], routes[10], routes[28], routes[34]]) {
   assert.deepEqual(browser.executionOwners, ["main-thread"]);
   assert.ok(browser.resourceLocks.includes("playwright-browser"));
   assert.deepEqual(browser.profiles, ["full"]);
@@ -66,32 +66,49 @@ test("precision additions preserve repository-wide command ownership and resourc
   assert.doesNotThrow(() => reconcileVerificationRouteAuthority());
 });
 
+test("artifact tests append without replacing the existing foundation build command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.equal(routes.find((record) => record.id === "local:precision-foundation:build").commandRef,
+    "python -m unittest tests.test_precision_foundation_build -q");
+  assert.equal(routes[32].id, "local:precision-artifact:partition-rehearsal");
+  for (const source of ["tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py", "tests/test_pages_artifact_partition.py"]) {
+    const report = buildRepositoryRecommendation([source]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === "python -m unittest tests.test_pages_artifact_partition -q"));
+  }
+});
+test("LOD graph coverage preserves the original discovered command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_political_display_lods -q"));
+  assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_precision_build_graph -q"));
+});
 test("resource accounting has its own executable route and retains the original scheduler command", () => {
   const routes = createPrecisionScalingRecords([]);
   assert.equal(routes[0].commandRef, "node --test tests/precision_scaling_scheduler_behavior.test.mjs");
-  assert.equal(routes[29].id, "local:precision-resources:accounting");
+  assert.equal(routes[31].id, "local:precision-resources:accounting");
   for (const source of ["js/core/runtime_resource_budget.js", "js/core/geometry_raster_worker_client.js", "tests/worker_resource_accounting_behavior.test.mjs"]) {
     const report = buildRepositoryRecommendation([source]);
     assert.deepEqual(report.unmatchedChangedFiles, []);
     assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
-    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[29].commandRef));
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[31].commandRef));
   }
 });
 
 test("transport lifetime tests and the real-data browser probe have separate execution owners", () => {
   const routes = createPrecisionScalingRecords([]);
-  assert.equal(routes[30].id, "local:precision-transport:lifetime");
-  assert.equal(routes[31].id, "local:precision-transport:native-browser");
+  assert.equal(routes[33].id, "local:precision-transport:lifetime");
+  assert.equal(routes[34].id, "local:precision-transport:native-browser");
   for (const source of ["js/ui/transport_workbench_line_runtime_shared.js", "js/core/data_service.js", "tests/transport_lifetime_behavior.test.mjs"]) {
     const report = buildRepositoryRecommendation([source]);
     assert.deepEqual(report.unmatchedChangedFiles, []);
     assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
-    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[30].commandRef));
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[33].commandRef));
   }
   const probe = buildRepositoryRecommendation(["tools/probe_transport_lifetime.mjs"]);
   assert.deepEqual(probe.unmatchedChangedFiles, []);
   assert.deepEqual(buildExecutionPlan(probe).routeGaps, []);
-  assert.ok(probe.recommendedCommands.some((entry) => entry.commandRef === routes[31].commandRef));
-  assert.deepEqual(routes[31].executionOwners, ["main-thread"]);
-  assert.deepEqual(routes[31].resourceLocks, ["browser-dev-server", "playwright-browser", ".runtime-output"]);
+  assert.ok(probe.recommendedCommands.some((entry) => entry.commandRef === routes[34].commandRef));
+  assert.deepEqual(routes[34].executionOwners, ["main-thread"]);
+  assert.deepEqual(routes[34].resourceLocks, ["browser-dev-server", "playwright-browser", ".runtime-output"]);
 });
