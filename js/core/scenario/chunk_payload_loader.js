@@ -1,3 +1,4 @@
+import { pageResourceBudget } from "../runtime_resource_budget.js";
 import { createChunkLoadScheduler, estimateChunkLoadBytes } from "./chunk_load_scheduler.js";
 import {
   beginScenarioChunkLoadState,
@@ -7,7 +8,7 @@ import {
   finishScenarioChunkLoadState,
 } from "../state/actions/scenario_chunk_runtime_actions.js";
 import { recordScenarioChunkPayloadSourceBytes, touchScenarioChunkPayloadCache, trimScenarioChunkPayloadCache } from "./bundle_cache.js";
-import { getScenarioChunkPayloadEvictionIds } from "./bundle_cache_policy.js";
+import { getScenarioChunkPayloadEvictionIds, getScenarioChunkPayloadRetentionStats } from "./bundle_cache_policy.js";
 import {
   clearScenarioBundleChunkProtectionState,
   removeScenarioBundleChunkPayloadState,
@@ -28,15 +29,49 @@ function ensureScenarioChunkPromiseCache(bundle) {
 }
 
 // Owns bundle caches and in-flight requests; selection and promotion stay in the controller.
-export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile, loadScheduler = null, onLoadMetric = () => {} }) {
+export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile, loadScheduler = null, onLoadMetric = () => {}, resourceBudget = pageResourceBudget }) {
   const chunkRequestsByRequest = new Map();
-  const scheduler = loadScheduler || createChunkLoadScheduler({ onMetric: onLoadMetric });
+  const scheduler = loadScheduler || createChunkLoadScheduler({ onMetric: onLoadMetric, resourceBudget });
+  const cacheResourceOwner = Symbol("scenario-chunk-payloads");
+  let pressureEvictions = 0;
   let activeRequestScenarioId = normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || runtimeState.activeScenarioId || ""));
+
+  function ownedBundles(extraBundle = null) {
+    return [...new Set([
+      ...Object.values(runtimeState.scenarioBundleCacheById || {}),
+      ...[...chunkRequestsByRequest.values()].map((entry) => entry.bundle),
+      ...(extraBundle ? [extraBundle] : []),
+    ])];
+  }
+
+  function refreshResourceAccounting(extraBundle = null) {
+    const stats = getScenarioChunkPayloadRetentionStats(ownedBundles(extraBundle));
+    if (stats.payloadCount) resourceBudget.update(cacheResourceOwner, {
+      mainChunkPayload: stats.unknownPayloads ? null : stats.knownSourceBytes,
+    });
+    else resourceBudget.release(cacheResourceOwner);
+    return stats;
+  }
 
   function activePayloadIds(bundle) {
     return getScenarioBundleId(bundle) === activeRequestScenarioId
       && getScenarioBundleId(bundle) === normalizeScenarioId(String(runtimeState.activeScenarioChunks?.scenarioId || ""))
       ? Object.keys(runtimeState.activeScenarioChunks?.payloadByChunkId || {}) : [];
+  }
+
+  function releaseInactivePayloadsUnderPressure(extraBundle = null, extraProtectedIds = []) {
+    refreshResourceAccounting(extraBundle);
+    if (!resourceBudget.snapshot().pressure) return;
+    // Only this cache owner's references are removed. Active renderer geometry,
+    // returned snapshots, required selection pins and in-flight loads survive.
+    for (const bundle of ownedBundles(extraBundle)) {
+      const protectedIds = [...activePayloadIds(bundle), ...(bundle === extraBundle ? extraProtectedIds : [])];
+      for (const id of getScenarioChunkPayloadEvictionIds(bundle, protectedIds, { pressure: true })) {
+        delete bundle.chunkPayloadCacheById[id];
+        pressureEvictions++;
+      }
+    }
+    refreshResourceAccounting(extraBundle);
   }
 
   async function loadScenarioChunkPayloadEntries(bundle, chunks, options) {
@@ -49,6 +84,7 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       if (entry.bundle === bundle) scheduler.reprioritize(request, selected.has(entry.chunkId) ? 1 : -1);
     }
     trimScenarioChunkPayloadCache(bundle, activePayloadIds(bundle));
+    releaseInactivePayloadsUnderPressure(bundle, [...selected]);
     return Promise.all(chunks.map(async (chunk) => ({
       chunkId: chunk.id,
       payload: await loadScenarioChunkPayload(bundle, chunk, { priority: 1, ...options }),
@@ -76,16 +112,19 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       }
     }
     activeRequestScenarioId = scenarioId;
+    releaseInactivePayloadsUnderPressure();
   }
 
-  async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3, priority = 0 } = {}) {
+  async function loadScenarioChunkPayload(bundle, chunkMeta, { d3Client = globalThis.d3, priority = 0, speculative = false } = {}) {
     const chunkId = String(chunkMeta?.id || "").trim();
     if (!bundle || !chunkId) return null;
+    releaseInactivePayloadsUnderPressure(bundle, [chunkId]);
     const payloadCache = ensureScenarioChunkPayloadCache(bundle);
     if (payloadCache[chunkId]) {
       const payload = payloadCache[chunkId];
       recordScenarioChunkPayloadSourceBytes(payload, chunkMeta);
       touchScenarioChunkPayloadCache(bundle, chunkId, activePayloadIds(bundle));
+      refreshResourceAccounting(bundle);
       return payload;
     }
     const promiseCache = ensureScenarioChunkPromiseCache(bundle);
@@ -140,7 +179,7 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       } finally {
         finishScenarioChunkLoadState(runtimeState, chunkId, { expectedLoadStateGeneration: generation });
       }
-    }, { key: request, bytes: estimateChunkLoadBytes(chunkMeta), priority,
+    }, { key: request, bytes: estimateChunkLoadBytes(chunkMeta), priority, speculative,
       signal: request.controller.signal }).catch((error) => {
       // Queued cancellation never enters the operation's try/finally.
       if (!loadStarted) {
@@ -157,10 +196,15 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       if (promiseCache[chunkId] === loadPromise) delete promiseCache[chunkId];
       chunkRequestsByRequest.delete(request);
       if (payloadCache[chunkId]) touchScenarioChunkPayloadCache(bundle, chunkId, activePayloadIds(bundle));
+      refreshResourceAccounting();
     };
     void loadPromise.then(clearCachedLoadPromise, clearCachedLoadPromise);
     return loadPromise;
   }
 
-  return Object.freeze({ loadScenarioChunkPayload, loadScenarioChunkPayloadEntries, resetScenarioChunkRequests, getLoadSchedulerStats: scheduler.getStats });
+  const getLoadSchedulerStats = () => {
+    const payloadRetention = refreshResourceAccounting();
+    return { ...scheduler.getStats(), payloadRetention, pressureEvictions };
+  };
+  return Object.freeze({ loadScenarioChunkPayload, loadScenarioChunkPayloadEntries, resetScenarioChunkRequests, getLoadSchedulerStats });
 }
