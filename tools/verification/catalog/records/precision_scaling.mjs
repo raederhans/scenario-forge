@@ -109,11 +109,9 @@ export function createPrecisionScalingRecords(existingRecords) {
       "js/core/renderer/political_raster_patch_plan.js", "js/core/renderer/geometry_raster_runtime_owner.js",
       "js/core/renderer/geometry_raster_worker_kernel.js", "tests/precision_foundation_patch_behavior.test.mjs",
     ]],
-    ["build", "geo-contract", "python -m unittest tests.test_precision_foundation_build tests.test_pages_artifact_partition -q", [
+    ["build", "geo-contract", "python -m unittest tests.test_precision_foundation_build -q", [
       "tools/precision_build_support.py", "tools/precision_candidate_receipt.py", "tests/test_precision_foundation_build.py",
       "tools/stage_us_county_adapted_bundle.py", "docs/active/precision-foundation-p0-p4-20260924.md",
-      "tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py",
-      "tests/test_pages_artifact_partition.py", "docs/active/precision-artifact-p4-20260924.md",
     ]],
   ];
   for (const [id, domain, commandRef, sourceRefs] of foundationRoutes) records.push({
@@ -124,6 +122,12 @@ export function createPrecisionScalingRecords(existingRecords) {
     commandRef: "npx playwright test --config=playwright.config.cjs tests/e2e/dev/precision_foundation_patch.dev.spec.js --workers=1",
     sourceRefs: ["tests/e2e/dev/precision_foundation_patch.dev.spec.js", "tests/e2e/dev/support/precision_foundation_native_case.mjs"],
     selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:precision-artifact:partition-rehearsal",
+    commandRef: "python -m unittest tests.test_pages_artifact_partition -q",
+    sourceRefs: ["tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py",
+      "tests/test_pages_artifact_partition.py", "docs/active/precision-artifact-p4-20260924.md"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
   return records;
 }
