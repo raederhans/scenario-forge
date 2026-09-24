@@ -6,10 +6,13 @@ on:
       - .github/workflows/ownership-boundary-workbench.yml
 permissions:
   contents: read
+concurrency:
+  group: ownership-boundary-workbench
+  cancel-in-progress: true
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,7 +33,7 @@ jobs:
       - name: Package tracked source for isolated verification
         run: |
           mkdir -p .runtime/tmp
-          git ls-tree -rl HEAD > .runtime/tmp/tracked-tree.txt
+          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
           tar --exclude=.git --exclude=.runtime --exclude=data --exclude=dist -czf .runtime/tmp/source.tgz .
       - uses: actions/upload-artifact@v4
         with:
