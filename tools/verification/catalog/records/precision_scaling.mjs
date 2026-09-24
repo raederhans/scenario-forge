@@ -2,8 +2,11 @@
 export function createPrecisionScalingRecords(existingRecords) {
   const start = Math.max(0, ...existingRecords.map((record) => record.selectorOrder || 0)) + 1;
   const routes = [
-    ["scheduler", "scenario-runtime", "node --test tests/precision_scaling_scheduler_behavior.test.mjs", [
+    ["scheduler", "scenario-runtime", "node --test tests/precision_scaling_scheduler_behavior.test.mjs tests/runtime_resource_budget_behavior.test.mjs tests/worker_resource_accounting_behavior.test.mjs", [
       "js/core/scenario/chunk_load_scheduler.js", "js/core/scenario/chunk_payload_loader.js", "tests/precision_scaling_scheduler_behavior.test.mjs",
+      "js/core/runtime_resource_budget.js", "js/core/geometry_raster_worker_client.js",
+      "tests/runtime_resource_budget_behavior.test.mjs", "tests/worker_resource_accounting_behavior.test.mjs",
+      "docs/active/precision-resources-p3-20260924.md",
     ]],
     ["store", "renderer-runtime", "node --test tests/precision_scaling_store_behavior.test.mjs", [
       "js/core/political_geometry_store.js", "js/core/scenario/chunk_layer_payloads.js", "tests/precision_scaling_store_behavior.test.mjs",
