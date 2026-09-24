@@ -1,0 +1,77 @@
+name: Precision resource source audit
+on:
+  push:
+    branches: ["codex/precision-resources-p3-20260924"]
+    paths: [".github/workflows/precision-resources-source-audit.yml"]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          fetch-depth: 50
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Report exact source locations and identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/resources-source-audit
+          python - <<'PY' | tee .runtime/resources-source-audit/source.log
+          import hashlib, subprocess
+          from pathlib import Path
+          print('SOURCE', subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip())
+          print('BASE', subprocess.check_output(['git','rev-parse','2b2f1fecf9c388616a01dfb10da5e372ea65b3dc^{tree}'],text=True).strip())
+          for p in sorted(Path('tools').glob('*')):
+              if p.is_file() and ('role' in p.name or 'startup' in p.name): print('TOOL',p)
+          for top in ('tools','tests','ops','js'):
+              for p in sorted(Path(top).rglob('*')):
+                  if not p.is_file() or p.suffix not in ('.mjs','.json','.py'): continue
+                  if p.stat().st_size > 2_000_000: continue
+                  text=p.read_text(encoding='utf-8')
+                  needles=['Unregistered production runtime importers','Unregistered production runtime state importers','transportJapanRoadManifest','check_startup_public_state']
+                  if not any(n in text for n in needles): continue
+                  if not ('startup' in p.name or 'role' in p.name or p.name=='test_pages_dist_startup_shell.py'): continue
+                  print('\nFILE',p,'SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+                  lines=text.splitlines()
+                  for i,line in enumerate(lines):
+                      if any(n in line for n in needles):
+                          print('\n'.join(f'{j+1}: {lines[j]}' for j in range(max(0,i-8),min(len(lines),i+12))))
+          PY
+      - name: Locked validation dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          python -m pip install -r requirements-dev.lock.txt
+      - name: Current resource behavior and existing source-boundary suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test tests/runtime_resource_budget_behavior.test.mjs tests/worker_resource_accounting_behavior.test.mjs tests/precision_scaling_scheduler_behavior.test.mjs tests/geometry_raster_worker_client_behavior.test.mjs tests/state_action_delegation_edges_behavior.test.mjs tests/state_borrowed_effect_contract_behavior.test.mjs 2>&1 | tee .runtime/resources-source-audit/runtime.log
+          node tools/check_architecture_boundaries.mjs
+      - name: Current source artifact with complete Python dependencies
+        if: always()
+        shell: bash
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/resources-source-audit/dist
+        run: |
+          set -euo pipefail
+          python tools/build_pages_dist.py --output-root .runtime/resources-source-audit/dist
+          python -m unittest tests.test_pages_dist_startup_shell -v 2>&1 | tee .runtime/resources-source-audit/shell.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: precision-resources-source-audit
+          path: |
+            .runtime/resources-source-audit/*.log
+          retention-days: 5
+          if-no-files-found: warn
