@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "note": "INPUT TEMPLATE ONLY. Stage is an intended bundle layout, not proof of completion. Add reviewed source versions, license references, actual input hashes and build parameters. Missing inputs and all candidate gates remain not-run. Historical combined candidates require revised US partition acceptance.",
+  "targets": [
+    {
+      "id": "us-modern",
+      "countries": [
+        "US"
+      ],
+      "scenario_id": "modern_world",
+      "kind": "precision-candidate",
+      "declared_stage": "complete-bundle",
+      "candidate_root": ".runtime/precision-candidates/us-modern/modern_world",
+      "parameters": {},
+      "sources": [],
+      "receipts": []
+    },
+    {
+      "id": "us-hoi4-1936",
+      "countries": [
+        "US"
+      ],
+      "scenario_id": "hoi4_1936",
+      "kind": "precision-candidate",
+      "declared_stage": "complete-bundle",
+      "candidate_root": ".runtime/precision-candidates/us-hoi4-1936/hoi4_1936",
+      "parameters": {},
+      "sources": [],
+      "receipts": []
+    },
+    {
+      "id": "us-hoi4-1939",
+      "countries": [
+        "US"
+      ],
+      "scenario_id": "hoi4_1939",
+      "kind": "precision-candidate",
+      "declared_stage": "complete-bundle",
+      "candidate_root": ".runtime/precision-candidates/us-hoi4-1939/hoi4_1939",
+      "parameters": {},
+      "sources": [],
+      "receipts": []
+    },
+    {
+      "id": "us-tno",
+      "countries": [
+        "US"
+      ],
+      "scenario_id": "tno_1962",
+      "kind": "precision-candidate",
+      "declared_stage": "complete-bundle",
+      "candidate_root": ".runtime/precision-candidates/us-tno/tno_1962",
+      "parameters": {},
+      "sources": [],
+      "receipts": []
+    },
+    {
+      "id": "cn-jp-europe-tno",
+      "countries": [
+        "CN",
+        "JP",
+        "AL",
+        "MK",
+        "BG",
+        "CH",
+        "FI",
+        "HR",
+        "HU",
+        "NO",
+        "RO",
+        "RS",
+        "SE",
+        "SI"
+      ],
+      "scenario_id": "tno_1962",
+      "kind": "precision-candidate",
+      "declared_stage": "complete-bundle",
+      "candidate_root": ".runtime/precision-candidates/cn-jp-europe-tno/tno_1962",
+      "parameters": {},
+      "sources": [],
+      "receipts": []
+    }
+  ]
+}

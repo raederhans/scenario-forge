@@ -129,6 +129,19 @@ export function createPrecisionScalingRecords(existingRecords) {
       "tools/build_political_display_lods.py"],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:precision-engineering:campaign",
+    commandRef: "python -m unittest tests.test_precision_campaign -q",
+    sourceRefs: ["tools/precision_campaign.py", "tools/precision_comparison.py", "tools/precision_candidate_receipt.py",
+      "tests/test_precision_campaign.py", "ops/precision/campaign.example.json"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:precision-resources:accounting",
+    commandRef: "node --test tests/runtime_resource_budget_behavior.test.mjs tests/worker_resource_accounting_behavior.test.mjs",
+    sourceRefs: ["js/core/runtime_resource_budget.js", "js/core/scenario/chunk_load_scheduler.js",
+      "js/core/geometry_raster_worker_client.js", "tests/runtime_resource_budget_behavior.test.mjs",
+      "tests/worker_resource_accounting_behavior.test.mjs", "docs/active/precision-resources-p3-20260924.md"],
+    ownerHints: ["scenario-runtime"], domains: ["scenario-runtime"], selectorOrder: start + records.length,
+  });
   records.push({ ...records[0], id: "local:precision-artifact:partition-rehearsal",
     commandRef: "python -m unittest tests.test_pages_artifact_partition -q",
     sourceRefs: ["tools/pages_artifact_partition.py", "tools/pages_artifact_rehearsal.py",
