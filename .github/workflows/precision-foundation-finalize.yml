@@ -1,0 +1,155 @@
+name: Precision foundation corrected validation
+on:
+  push:
+    branches: ["codex/precision-foundation-p0-p4-20260923"]
+    paths: [".github/workflows/precision-foundation-finalize.yml"]
+permissions:
+  contents: write
+concurrency:
+  group: precision-foundation-corrected-validation
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+      EVIDENCE: .runtime/reports/generated/precision-foundation-corrected
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.lock.txt
+      - name: Apply reviewed source and exact proof changes
+        id: apply
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE"
+          python - <<'PY'
+          import base64, hashlib, json, lzma, os, subprocess
+          from pathlib import Path
+          raw=base64.b64decode(Path('.github/precision-foundation-finalize.b64').read_text(),validate=True)
+          assert hashlib.sha256(raw).hexdigest()=='c07cae9ed4bfa052fa591da47d08a0a4d635d56fc0af031c82536eac006172de'
+          payload=json.loads(lzma.decompress(raw))
+          entries=payload['audit_files']+payload['files']
+          for item in entries:
+              assert subprocess.check_output(['git','rev-parse','HEAD:'+item['path']],text=True).strip()==item['before']
+          for op in payload['operations']:
+              p=Path(op['path']);s=p.read_text();assert s.count(op['old'])==op['count'];p.write_text(s.replace(op['old'],op['new']))
+          for item in payload['files']:
+              Path(item['path']).write_text(item['content'])
+          for item in entries:
+              b=Path(item['path']).read_bytes();assert hashlib.sha1(b'blob '+str(len(b)).encode()+b'\0'+b).hexdigest()==item['after']
+          Path(os.environ['EVIDENCE'],'changes.json').write_text(json.dumps([{k:item[k] for k in ('path','before','after')} for item in entries],indent=2)+'\n')
+          PY
+      - name: Store verified blobs without moving refs
+        id: objects
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,json,os,urllib.request
+          from pathlib import Path
+          root=Path(os.environ['EVIDENCE']);entries=[]
+          for item in json.loads((root/'changes.json').read_text()):
+              request=urllib.request.Request('https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/git/blobs',data=json.dumps({'content':base64.b64encode(Path(item['path']).read_bytes()).decode(),'encoding':'base64'}).encode(),method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request,timeout=60) as response: result=json.load(response)
+              assert result['sha']==item['after'];entries.append({'path':item['path'],'mode':'100644','type':'blob','sha':result['sha']})
+          (root/'verified-tree-entries.json').write_text(json.dumps(entries,indent=2)+'\n')
+          PY
+      - name: Install locked dependencies
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          python -m pip install -r requirements-dev.lock.txt
+          npx playwright install --with-deps chromium
+      - name: Reviewed state boundaries and mutation negatives
+        id: proofs
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          node --test tests/state_borrowed_effect_contract_behavior.test.mjs tests/state_action_delegation_edges_behavior.test.mjs tests/state_action_source_boundary_contracts.test.mjs tests/state_write_allowlist_behavior.test.mjs 2>&1 | tee "$EVIDENCE/proofs.tap"
+      - name: Runtime and CI behavior
+        id: behavior
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          node --test tests/precision_foundation_patch_behavior.test.mjs tests/geometry_raster_runtime_owner_behavior.test.mjs tests/geometry_raster_worker_kernel_behavior.test.mjs tests/geometry_raster_worker_client_behavior.test.mjs tests/latency_bulk_worker_behavior.test.mjs tests/precision_foundation_ci_behavior.test.mjs tests/pr_ci_plan_behavior.test.mjs tests/startup_ready_handoff_behavior.test.mjs tests/precision_scaling_verification_records.test.mjs 2>&1 | tee "$EVIDENCE/behavior.tap"
+      - name: Build and publication contracts
+        id: python
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          python -m unittest tests.test_precision_foundation_build tests.test_e2e_structural_tooling tests.test_perf_gate_contract tests.test_pages_artifact_admission tests.test_us_county_adapted_bundle -q 2>&1 | tee "$EVIDENCE/python.log"
+      - name: Native pixel equality without translated raster origin
+        id: native
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:8000
+        run: |
+          set -euo pipefail
+          python -m http.server 8000 --bind 127.0.0.1 > "$EVIDENCE/server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:8000/ > /dev/null
+          env -u CI node node_modules/@playwright/test/cli.js test tests/e2e/dev/precision_foundation_patch.dev.spec.js --workers=1 --retries=0 2>&1 | tee "$EVIDENCE/native.log"
+      - name: Reproduce original-main SVG parity separately
+        id: baseline
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin e339681abcc8cc9fb554136cce8275622ba81eab
+          base="$PWD/.runtime/tmp/foundation-main-reference"
+          git worktree add --detach "$base" e339681abcc8cc9fb554136cce8275622ba81eab
+          evidence="$PWD/$EVIDENCE"
+          cd "$base"
+          python -m unittest tests.test_pages_dist_startup_shell.PagesDistStartupShellTest.test_landing_hero_scenario_assets_match_builder_output -q 2>&1 | tee "$evidence/main-svg.log"
+      - name: Record exact outcomes
+        if: always()
+        env:
+          STEP_OUTCOMES: ${{ toJSON(steps) }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$EVIDENCE"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          Path(os.environ['EVIDENCE'],'outcomes.json').write_text(json.dumps({'source_sha':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'steps':json.loads(os.environ['STEP_OUTCOMES']),'production_published':False,'candidate_performance_accepted':False},indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: precision-foundation-corrected-evidence
+          path: |
+            .runtime/reports/generated/precision-foundation-corrected/
+            .runtime/tests/playwright/
+          retention-days: 5
+          if-no-files-found: error
+      - name: Enforce implementation verification
+        if: always()
+        env:
+          STEP_OUTCOMES: ${{ toJSON(steps) }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          steps=json.loads(os.environ['STEP_OUTCOMES']);failed=[k for k in ('apply','objects','proofs','behavior','python','native') if steps.get(k,{}).get('outcome')!='success']
+          if failed:raise SystemExit('Implementation checks failed: '+', '.join(failed))
+          print('Implementation checks pass. Separate main SVG result is diagnostic and is not release acceptance.')
+          PY
