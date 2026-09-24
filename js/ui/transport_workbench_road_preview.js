@@ -1,4 +1,5 @@
 import { resolveTransportManifestUrl } from "../core/data_loader.js";
+import { estimateRoadPackRetentionBytes } from "./transport_workbench_retention.js";
 import {
   ensureTransportWorkbenchCarrierForManifest,
   getTransportWorkbenchCarrierViewState,
@@ -42,6 +43,7 @@ const lineRuntime = createTransportWorkbenchLinePackRuntime({
   familyLabel: "Japan road",
   manifestUrl: MANIFEST_URL,
   ensureClient: ensureTopojsonClient,
+  estimatePackBytes: estimateRoadPackRetentionBytes,
   initialRenderStats: {
     visibleRoads: 0,
     visibleLabels: 0,
@@ -338,7 +340,10 @@ export function selectJapanRoadPreviewFeature(selection) {
 }
 
 export async function renderJapanRoadPreview(config, options = {}) {
-  await loadJapanRoadPack(PACK_MODE_PREVIEW, config);
+  const pending = loadJapanRoadPack(PACK_MODE_PREVIEW, config);
+  const loadGeneration = runtime.loadGeneration;
+  const pack = await pending;
+  if (!pack || loadGeneration !== runtime.loadGeneration) return null;
   if (typeof options.isCurrent === "function" && !options.isCurrent()) {
     return null;
   }
@@ -372,6 +377,7 @@ export async function warmJapanRoadPreviewPack({ includeFull = false } = {}) {
 export function clearJapanRoadPreview() {
   const totalRoads = runtime.activePack?.roadFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.roadFeatures?.length || 0;
   const totalLabels = runtime.activePack?.labelFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.labelFeatures?.length || 0;
+  lineRuntime.release({ preserveSelection: true });
   runtime.lastRenderedConfig = null;
   runtime.activePack = null;
   runtime.activePackMode = null;
@@ -388,6 +394,7 @@ export function clearJapanRoadPreview() {
 export function destroyJapanRoadPreview() {
   const totalRoads = runtime.activePack?.roadFeatures?.length || runtime.projectedPacks[PACK_MODE_FULL]?.roadFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.roadFeatures?.length || 0;
   const totalLabels = runtime.activePack?.labelFeatures?.length || runtime.projectedPacks[PACK_MODE_FULL]?.labelFeatures?.length || runtime.projectedPacks[PACK_MODE_PREVIEW]?.labelFeatures?.length || 0;
+  lineRuntime.release();
   runtime.selectedFeature = null;
   runtime.lastRenderedConfig = null;
   runtime.activePack = null;
