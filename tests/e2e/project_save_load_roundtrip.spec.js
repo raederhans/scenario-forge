@@ -1048,17 +1048,21 @@ for (const baseline of [
     const painted = await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }));
     expect(painted).not.toEqual(selected.before);
     expect(Object.values(painted)).toContain("#e31ac4");
-    if (baseline.roundtripOnly) {
-      await page.locator("h1").click();
-      await page.keyboard.press("Control+z");
-    } else {
-      await page.locator("#undoBtn").click();
+    // The rejected-import case covers this real undo/redo cycle. The successful
+    // release case keeps its own post-export undo and import/switch assertions.
+    if (!baseline.roundtripOnly || baseline.rejectedImportsOnly) {
+      if (baseline.roundtripOnly) {
+        await page.locator("h1").click();
+        await page.keyboard.press("Control+z");
+      } else {
+        await page.locator("#undoBtn").click();
+      }
+      expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
+      expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.historyPast.length)).toBe(selected.history);
+      if (baseline.roundtripOnly) await page.keyboard.press("Control+y");
+      else await page.locator("#redoBtn").click();
+      expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
     }
-    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
-    expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.historyPast.length)).toBe(selected.history);
-    if (baseline.roundtripOnly) await page.keyboard.press("Control+y");
-    else await page.locator("#redoBtn").click();
-    expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(painted);
     const savePath = testInfo.outputPath("edited.project.json");
     const saved = await exportProjectJson(page, savePath);
     expect(saved.visualOverrides).toEqual(painted);
