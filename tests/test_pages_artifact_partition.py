@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import json
+import copy
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-from tools.pages_artifact_admission import build_admission_receipt
+from tools.pages_artifact_admission import build_admission_receipt, receipt_hash
 from tools.pages_artifact_partition import partition_artifact, assemble_artifact, verify_partition
 from tools.pages_artifact_rehearsal import run_rehearsal
 from tools.pages_artifact_shadow import build_tree_snapshot
@@ -91,6 +94,23 @@ class ArtifactPartitionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_partition(package, receipt, "2" * 40, repo_root=self.repo)
 
+    def test_direct_verification_rejects_tampered_or_nonpassing_receipts(self):
+        root, receipt = self.artifact()
+        package = self.repo / ".runtime/package"
+        partition_artifact(root, receipt, "1" * 40, package, repo_root=self.repo)
+        for reseal in (False, True):
+            changed = copy.deepcopy(receipt)
+            changed["publicSmoke"] = "failed"
+            if reseal:
+                changed["receiptSha256"] = receipt_hash(changed)
+            with self.assertRaisesRegex(ValueError, "receiptSha256|passing public smoke"):
+                verify_partition(package, changed, "1" * 40, repo_root=self.repo)
+        changed = copy.deepcopy(receipt)
+        changed["source"]["gitSha"] = "2" * 40
+        changed["receiptSha256"] = receipt_hash(changed)
+        with self.assertRaisesRegex(ValueError, "source identity"):
+            verify_partition(package, changed, "1" * 40, repo_root=self.repo)
+
     def test_outputs_cannot_overwrite_inputs_or_escape_runtime(self):
         root, receipt = self.artifact()
         for output in (root, root / "nested", self.repo / "dist", self.repo / ".runtime"):
@@ -118,7 +138,16 @@ class ArtifactPartitionTests(unittest.TestCase):
     def test_symbolic_link_package_is_rejected(self):
         root, receipt = self.artifact()
         link = self.repo / ".runtime/link"
-        link.symlink_to(root, target_is_directory=True)
+        if os.name == "nt":
+            subprocess.run([
+                "powershell", "-NoProfile", "-NonInteractive", "-Command",
+                "New-Item -ItemType Junction -Path $env:TEST_LINK_PATH "
+                "-Target $env:TEST_LINK_TARGET -ErrorAction Stop | Out-Null",
+            ], env={**os.environ, "TEST_LINK_PATH": str(link), "TEST_LINK_TARGET": str(root)},
+                check=True, capture_output=True)
+            self.assertTrue(link.is_junction())
+        else:
+            link.symlink_to(root, target_is_directory=True)
         with self.assertRaises(ValueError):
             partition_artifact(link, receipt, "1" * 40, self.repo / ".runtime/rejected", repo_root=self.repo)
 

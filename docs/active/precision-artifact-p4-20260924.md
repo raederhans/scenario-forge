@@ -114,3 +114,15 @@ normal-command migration and all downstream consumers still need review. Existin
 shadow retirement receipt requirements are unchanged; one same-artifact rehearsal
 cannot manufacture that eligibility. Current application/data partition and the
 CLI recovery path are usable independently of that larger migration.
+
+## Local integration, 2026-09-24
+
+Direct partition verification now validates the complete independently supplied
+admission receipt, expected source identity and passing public smoke before
+accepting a package. Regressions reject both tampered and resealed nonpassing
+receipts. On Windows the link rejection test uses a real directory junction,
+without requiring symbolic-link privileges. All 11 artifact tests pass with no
+skips. Main through #157 is integrated, preserving #160 data and #156 raster
+changes. Both build-graph and artifact verification routes are retained.
+The parent owns test/server execution; delegated review was read-only.
+Logs: `.runtime/tmp/pr158-161-closeout/artifact-tests.log`.

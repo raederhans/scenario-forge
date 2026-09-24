@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from tools.pages_artifact_admission import verify_artifact_handoff
+from tools.pages_artifact_admission import GIT_IDENTITY_PATTERN, validate_admission_receipt, verify_artifact_handoff
 from tools.pages_artifact_root import resolve_runtime_path
 from tools.pages_artifact_shadow import build_tree_snapshot, canonical_bytes, sha256_bytes
 
@@ -106,6 +106,12 @@ def partition_artifact(artifact_root: Path, receipt: dict[str, Any], expected_so
 
 def verify_partition(package_root: Path, receipt: dict[str, Any], expected_source_sha: str,
                      *, repo_root: Path = ROOT) -> dict[str, Any]:
+    validate_admission_receipt(receipt)
+    if GIT_IDENTITY_PATTERN.fullmatch(expected_source_sha) is None \
+            or receipt.get("source", {}).get("gitSha") != expected_source_sha:
+        raise ValueError("Partition receipt source identity mismatch")
+    if receipt.get("publicSmoke") != "passed":
+        raise ValueError("Partition requires a passing public smoke receipt")
     package = _path(package_root, repo_root, exists=True)
     # Reject links and extra root entries before opening a manifest path.
     build_tree_snapshot(package)
