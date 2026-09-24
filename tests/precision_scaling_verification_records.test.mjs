@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 31);
+  assert.equal(routes.length, 32);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -70,4 +70,15 @@ test("LOD graph coverage preserves the original discovered command", () => {
   const routes = createPrecisionScalingRecords([]);
   assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_political_display_lods -q"));
   assert.ok(routes.some(r => r.commandRef === "python -m unittest tests.test_precision_build_graph -q"));
+});
+test("resource accounting has its own executable route and retains the original scheduler command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.equal(routes[0].commandRef, "node --test tests/precision_scaling_scheduler_behavior.test.mjs");
+  assert.equal(routes[31].id, "local:precision-resources:accounting");
+  for (const source of ["js/core/runtime_resource_budget.js", "js/core/geometry_raster_worker_client.js", "tests/worker_resource_accounting_behavior.test.mjs"]) {
+    const report = buildRepositoryRecommendation([source]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[31].commandRef));
+  }
 });
