@@ -1004,9 +1004,12 @@ test("baseline mismatch acceptance persists scenario import audit", async ({ pag
 for (const baseline of [
   { mode: "fresh", scenario: "tno_1962", sample: "tno-1962-atlantropa-briefing" },
   { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing" },
+  // The release grep selects both independent pages. Keep rejected imports out
+  // of the successful roundtrip's total budget without dropping either check.
   { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing", roundtripOnly: true },
+  { mode: "fast", scenario: "hoi4_1936", sample: "hoi4-1936-europe-briefing", roundtripOnly: true, rejectedImportsOnly: true },
 ]) {
-  test(`editing baseline ${baseline.mode} ${baseline.scenario} click undo save reload${baseline.roundtripOnly ? " (roundtrip only)" : ""}`, async ({ page }, testInfo) => {
+  test(`editing baseline ${baseline.mode} ${baseline.scenario} click undo save reload${baseline.roundtripOnly ? ` (roundtrip only${baseline.rejectedImportsOnly ? ": rejected imports" : ""})` : ""}`, async ({ page }, testInfo) => {
     test.setTimeout(110000);
     page.setDefaultTimeout(10000);
     await page.setViewportSize(baseline.roundtripOnly
@@ -1062,7 +1065,7 @@ for (const baseline of [
     await page.locator("h1").click();
     await page.keyboard.press("Control+z");
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
-    if (baseline.roundtripOnly) {
+    if (baseline.rejectedImportsOnly) {
       // Cancellation and parse failure must preserve the actual unsaved edit state.
       // Undo restores its historical dirty snapshot, so make a fresh real edit.
       await page.mouse.click(point.x, point.y);
@@ -1090,6 +1093,9 @@ for (const baseline of [
       await page.locator("#projectFileInput").setInputFiles(invalidPath);
       await expect(page.locator("#projectSaveStatus")).toContainText("Project import failed before completion.");
       expect(await page.evaluate(() => globalThis.__pwProjectSaveLoad.state.isDirty)).toBe(true);
+      return;
+    }
+    if (baseline.roundtripOnly) {
       fs.writeFileSync(savePath, JSON.stringify({ ...saved, visualOverrides: { ...saved.visualOverrides, U1_FORGED_FEATURE: "#00ff00" } }));
     }
     const watch = await beginProjectImportWait(page, { expectedFileName: path.basename(savePath) });
