@@ -61,6 +61,16 @@ export function createGeometryRasterWorkerKernel({
       || ![dpr, x, y, k, offsetX, offsetY].every(Number.isFinite) || dpr <= 0 || k <= 0) {
       throw new Error("Invalid raster dimensions or transform.");
     }
+    const region = packet.renderRegion || null;
+    if (region) {
+      const { x: rx, y: ry, width: rw, height: rh } = region;
+      if (packet.kind !== "political" || ![rx, ry, rw, rh].every(Number.isInteger)
+        || rx < 0 || ry < 0 || rw <= 0 || rh <= 0 || rx + rw > width || ry + rh > height
+        || !packet.patchBaseIdentity || !Array.isArray(packet.drawEntryIds) || !packet.drawEntryIds.length) {
+        throw new Error("Invalid political raster patch.");
+      }
+    }
+    const surfaceWidth = region?.width ?? width, surfaceHeight = region?.height ?? height;
     const options = packet.projectionOptions || {};
     const optionsSignature = JSON.stringify(options);
     if (sceneKey !== packet.sceneKey || packet.resetGeometry) {
@@ -87,17 +97,17 @@ export function createGeometryRasterWorkerKernel({
     }
     let surface = surfaces.get(packet.kind);
     if (!surface) {
-      const canvas = createCanvas(width, height);
+      const canvas = createCanvas(surfaceWidth, surfaceHeight);
       const context = canvas.getContext("2d");
       if (!context) throw new Error("Worker 2D context unavailable.");
       surface = { canvas, context };
       surfaces.set(packet.kind, surface);
     }
     const { canvas, context } = surface;
-    if (canvas.width !== width) canvas.width = width;
-    if (canvas.height !== height) canvas.height = height;
+    if (canvas.width !== surfaceWidth) canvas.width = surfaceWidth;
+    if (canvas.height !== surfaceHeight) canvas.height = surfaceHeight;
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, width, height);
+    context.clearRect(0, 0, surfaceWidth, surfaceHeight);
     context.globalCompositeOperation = "source-over";
     context.globalAlpha = 1;
     context.filter = "none";
@@ -112,7 +122,7 @@ export function createGeometryRasterWorkerKernel({
     context.fillStyle = "#000000";
     context.strokeStyle = "#000000";
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    context.translate(offsetX, offsetY);
+    context.translate(offsetX - (region?.x || 0) / dpr, offsetY - (region?.y || 0) / dpr);
     context.translate(x, y);
     context.scale(k, k);
     context.lineJoin = "round";
@@ -121,8 +131,13 @@ export function createGeometryRasterWorkerKernel({
     let pathBuildCount = 0;
     let yieldCount = 0;
     let pathAdmissionSkips = 0;
-    const entries = packet.entries || [];
-    const frameGeometryIds = new Set(entries.map((entry) => entry.id));
+    const allEntries = packet.entries || [];
+    const drawIds = region ? new Set(packet.drawEntryIds) : null;
+    const entries = drawIds ? allEntries.filter(entry => drawIds.has(entry.id)) : allEntries;
+    if (drawIds && (drawIds.size !== packet.drawEntryIds.length || entries.length !== drawIds.size)) {
+      throw new Error("Raster patch entry inventory mismatch.");
+    }
+    const frameGeometryIds = new Set(allEntries.map((entry) => entry.id));
     // Reserve the paths this frame can already reuse, once per ID. Touching
     // them first leaves inactive paths at the LRU front. Only admit misses
     // into the remaining byte budget, so an early miss cannot evict a later
@@ -190,7 +205,8 @@ export function createGeometryRasterWorkerKernel({
     // client can re-upload it on a later view without disabling the worker.
     const evictedGeometryIds = geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
-    return { bitmap, kind: packet.kind, width, height, renderedCount, pathBuildCount, yieldCount, unpackingMs,
+    return { bitmap, kind: packet.kind, width: surfaceWidth, height: surfaceHeight,
+      ...(region ? { renderRegion: { ...region }, patchBaseIdentity: packet.patchBaseIdentity } : {}), renderedCount, pathBuildCount, yieldCount, unpackingMs,
       geometryTransportMode: packet.geometryTransport ? "packed-f64" : "geojson",
       evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),
         paths: { ...paths.getStats(), frameAdmissionSkips: pathAdmissionSkips } }, renderMs: now() - startedAt };

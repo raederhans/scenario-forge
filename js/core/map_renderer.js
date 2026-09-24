@@ -3157,6 +3157,17 @@ function getGeometryRasterRuntimeOwner() {
         && !isPoliticalRasterWorkerBitmapEnabled(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
+      getPoliticalPatchStaticSignature: () => getCachedPoliticalPassStaticSignature(
+        getRenderPassSignature("political", runtimeState.zoomTransform)),
+      getPoliticalEntryPixelBounds: ({ feature, id }) => {
+        const bounds = getFeatureScreenBounds(feature, { featureId: id, allowCompute: false, padding: 4 });
+        if (!bounds) return null;
+        const layout = getRenderPassLayout("political");
+        return { minX: (bounds.minX + layout.offsetX) * runtimeState.dpr,
+          minY: (bounds.minY + layout.offsetY) * runtimeState.dpr,
+          maxX: (bounds.maxX + layout.offsetX) * runtimeState.dpr,
+          maxY: (bounds.maxY + layout.offsetY) * runtimeState.dpr };
+      },
       needsPoliticalRender: () => {
         const cache = getRenderPassCacheState();
         return cache.dirty?.political || cache.signatures?.political !== getRenderPassSignature("political", runtimeState.zoomTransform);

@@ -2,6 +2,7 @@ name: perf-pr-gate
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   schedule:
     - cron: '17 18 * * *'
   workflow_dispatch:
@@ -35,6 +36,7 @@ jobs:
           sparse-checkout: |
             /package.json
             /package-lock.json
+            /tools/ci/perf_policy.mjs
 
       # 分类结果同时决定是否测量与是否阻断回归，生成的审计文件是后续复核这两个决定的真相源。
       - name: Classify perf-relevant changes
@@ -113,124 +115,25 @@ jobs:
             }
           }
 
-          $rules = @(
-            @{
-              name = 'perf-workflow'
-              reason = 'perf gate workflow changed'
-              regression_policy = 'diagnostic'
-              patterns = @('.github/workflows/perf-pr-gate.yml')
-            },
-            @{
-              name = 'perf-baseline-docs'
-              reason = 'perf baseline or non-Markdown perf asset changed'
-              regression_policy = 'diagnostic'
-              patterns = @('docs/perf/**')
-            },
-            @{
-              name = 'runtime-js'
-              reason = 'runtime JavaScript can change measured behavior'
-              regression_policy = 'enforce'
-              patterns = @('js/**')
-            },
-            @{
-              name = 'app-shell'
-              reason = 'app shell markup or styles can change startup and rendering behavior'
-              regression_policy = 'enforce'
-              patterns = @('index.html', 'css/**', 'vendor/**')
-            },
-            @{
-              name = 'scenario-registry'
-              reason = 'scenario registry can change startup selection and measured scenario inputs'
-              regression_policy = 'diagnostic'
-              patterns = @('data/scenarios/index.json')
-            },
-            @{
-              name = 'perf-scenario-data'
-              reason = 'measured scenario data changed'
-              regression_policy = 'diagnostic'
-              patterns = @('data/scenarios/tno_1962/**', 'data/scenarios/hoi4_1939/**')
-            },
-            @{
-              name = 'playwright-app-support'
-              reason = 'playwright app support affects perf harness'
-              regression_policy = 'diagnostic'
-              patterns = @('tests/e2e/support/**', 'playwright.config.cjs')
-            },
-            @{
-              name = 'perf-tools'
-              reason = 'perf tooling changed'
-              regression_policy = 'diagnostic'
-              patterns = @('tools/perf/**')
-            },
-            @{
-              name = 'dev-server'
-              reason = 'dev server behavior affects perf runs'
-              regression_policy = 'diagnostic'
-              patterns = @('tools/dev_server.py')
-            },
-            @{
-              name = 'node-manifests'
-              reason = 'dependency manifest can affect perf gate environment'
-              regression_policy = 'diagnostic'
-              patterns = @('package.json', 'package-lock.json', 'requirements-perf.lock.txt')
-            }
-          )
-
-          $ruleHits = @()
-          foreach ($rule in $rules) {
-            $regexes = @($rule.patterns | ForEach-Object { Convert-GlobToRegex $_ })
-            $matchedFilesForRule = @(
-              $changedFiles |
-                Where-Object {
-                  $file = $_
-                  ($regexes | Where-Object { $file -match $_ } | Select-Object -First 1) -and
-                    -not ($rule.name -eq 'perf-baseline-docs' -and $file -match '\.md$') -and
-                    -not ($file -eq 'package.json' -and -not $packageRequiresPerf)
-                } |
-                Sort-Object -Unique
-            )
-
-            if ($matchedFilesForRule.Count -gt 0) {
-              $ruleHits += [ordered]@{
-                name = $rule.name
-                reason = $rule.reason
-                regression_policy = $rule.regression_policy
-                patterns = $rule.patterns
-                files = $matchedFilesForRule
-              }
-            }
-          }
-
-          $matchedRuleNames = @($ruleHits | ForEach-Object { $_.name })
-          $regressionEnforcementRuleHits = @(
-            $ruleHits |
-              Where-Object { $_.regression_policy -eq 'enforce' } |
-              ForEach-Object { $_.name }
-          )
-          $shouldRunPerf = $forceMeasurement -or $ruleHits.Count -gt 0
           $labels = @()
           if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
             $labels = @($eventPayload.pull_request.labels | ForEach-Object { [string]$_.name })
           }
-          $explicitStrict = $labels -contains 'ci:perf-strict' -or $labels -contains 'ci:full'
-          $expectedPerformanceChange = $labels -contains 'ci:perf-expected'
-          if (-not $shouldRunPerf) {
-            $perfMode = 'skip'
-          } elseif ($forceMeasurement -or $explicitStrict) {
-            $perfMode = 'strict'
-          } else {
-            $perfMode = 'sample'
-          }
-          $shouldEnforceRegressions = $perfMode -eq 'strict' -and ($forceMeasurement -or $regressionEnforcementRuleHits.Count -gt 0)
-          if ($expectedPerformanceChange -and -not $explicitStrict -and -not $forceMeasurement) {
-            $shouldEnforceRegressions = $false
-          }
-          [string[]]$scenarioMatrix = @()
-          if ($perfMode -eq 'strict') {
-            $scenarioMatrix = @('tno_1962', 'hoi4_1939')
-          } elseif ($perfMode -eq 'sample') {
-            $scenarioMatrix = @('hoi4_1939')
-          }
+          $policyInput = '.runtime/reports/generated/perf-policy-input.json'
+          [ordered]@{ changedFiles = @($changedFiles); labels = @($labels)
+            force = [bool]$forceMeasurement; packageRequiresPerf = [bool]$packageRequiresPerf
+          } | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 $policyInput
+          $policyJson = node tools/ci/perf_policy.mjs $policyInput
+          if ($LASTEXITCODE -ne 0) { throw 'Shared performance policy failed' }
+          $policy = ($policyJson -join "`n") | ConvertFrom-Json
+          $ruleHits = @($policy.matched_rules)
+          $matchedRuleNames = @($ruleHits | ForEach-Object { $_.name })
+          $regressionEnforcementRuleHits = @($policy.regression_enforcement_rules)
+          $shouldRunPerf = [bool]$policy.should_run_perf
+          $perfMode = [string]$policy.perf_mode
+          $shouldEnforceRegressions = [bool]$policy.should_enforce_regressions
+          $expectedPerformanceChange = [bool]$policy.expected_performance_change
+          [string[]]$scenarioMatrix = @($policy.scenario_matrix)
           if ($forceMeasurement) {
             $reason = "run npm run perf:gate for $($env:GITHUB_EVENT_NAME), regardless of changed paths"
           } elseif ($shouldRunPerf) {

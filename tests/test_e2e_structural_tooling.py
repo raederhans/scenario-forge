@@ -1305,7 +1305,7 @@ const cases = [
     name: 'perf gate workflow routes to its contract without claiming a live runtime delta',
     changedFiles: ['.github/workflows/perf-pr-gate.yml'],
     expectedCommands: ['verify:perf-gate-contract'],
-    exactCommands: ['verify:perf-gate-contract'],
+    exactCommands: ['verify:perf-gate-contract', 'node --test tests/precision_foundation_ci_behavior.test.mjs'],
     exactExecutionOwners: ['child-safe'],
     exactResourceLocks: [],
     exactMainThreadCommands: [],
@@ -1937,6 +1937,7 @@ jobs:
                     job: {"result": result, "outputs": {}}
                     for job, result in zip(job_names, result_matrix, strict=True)
                 }
+                needs["pr-plan"]["outputs"]["run_smoke"] = "true"
                 completed = run_command(
                     "node",
                     "-e",
@@ -1947,7 +1948,7 @@ jobs:
                 should_pass = (
                     result_by_job["pr-plan"] == "success"
                     and result_by_job["pr-verify-fast"] == "success"
-                    and result_by_job["pr-verify-smoke"] in {"success", "skipped"}
+                    and result_by_job["pr-verify-smoke"] == "success"
                 )
                 self.assertEqual(completed.returncode == 0, should_pass, completed.stdout + completed.stderr)
 
@@ -1979,10 +1980,10 @@ jobs:
                 )
                 self.assertNotEqual(completed.returncode, 0, completed.stdout + completed.stderr)
 
-    def test_pr_pages_mirrors_cover_runtime_without_rebuilding_unrelated_edits(self) -> None:
+    def test_pr_pages_artifact_covers_runtime_without_rebuilding_unrelated_edits(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
         step = next(step for step in parse_job_steps(parse_workflow_job_blocks(workflow)["verify"])
-                    if step.get("name") == "Check tracked Pages mirrors for relevant PR changes")
+                    if step.get("name") == "Build and check Pages artifact for relevant PR changes")
         body = "\n".join(str(line) for line in step["lines"])
         self.assertIn("if: inputs.profile == 'pr-fast'", body)
         pattern = re.search(r"grep -Eq '([^']+)'", body).group(1)
@@ -1992,9 +1993,11 @@ jobs:
         for changed in ["docs/notes.md", "tests/history_feature_color_refresh_behavior.test.mjs"]:
             self.assertNotRegex(changed, pattern)
         self.assertIn("python tools/build_pages_dist.py", body)
-        self.assertIn("git diff --exit-code --", body)
-        self.assertIn("dist/pages-dist-manifest.json", body)
-        self.assertIn("exit 1", body)
+        self.assertIn('python tools/build_pages_dist.py --output-root "$artifact_root"', body)
+        self.assertIn("tests.test_pages_dist_startup_shell", body)
+        self.assertIn("SCENARIO_FORGE_PAGES_ARTIFACT_ROOT", body)
+        self.assertNotIn("git diff --exit-code --", body)
+        self.assertIn("artifact_root=.runtime/pages-pr/dist", body)
 
     def test_verify_shared_rejects_unknown_profiles_before_profile_steps(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")

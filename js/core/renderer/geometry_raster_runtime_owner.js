@@ -1,7 +1,9 @@
+import { planPoliticalRasterPatch } from "./political_raster_patch_plan.js";
 import { createGeometryRasterWorkerClient } from "../geometry_raster_worker_client.js";
 import { getProjectionGeometryGeneration as identityOf } from "./projection_geometry_identity.js";
 
-export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, effects: e, client = null }) {
+export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, effects: e, client = null,
+  createCanvas = (width, height) => new OffscreenCanvas(width, height) }) {
   const worker = client || createGeometryRasterWorkerClient({ onMetric: e.recordMetric });
   const pending = new Map();
   // The client coalesces A -> B -> A onto A's original promise. Keep one
@@ -11,7 +13,11 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   let disposed = false;
   let failedPoliticalIdentity = null;
   const pendingEditBlocksWorker = () => h.hasPendingColorEdit() && !h.allowPendingColorEdit?.();
-  const close = (result) => result?.bitmap?.close?.();
+  const close = (result) => {
+    const bitmap = result?.bitmap;
+    if (typeof bitmap?.close === "function") bitmap.close();
+    else if (bitmap && typeof bitmap.getContext === "function") { bitmap.width = 0; bitmap.height = 0; }
+  };
   const enabled = () => !disposed && worker.available() && h.isEnabled() && state.firstVisibleFramePainted
     && !state.startupReadonly && !state.startupReadonlyUnlockInFlight;
 
@@ -39,7 +45,9 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     const contentKey = entries.map(({ id, feature, fillColor, strokeColor, lineWidth }) =>
       [id, identityOf(feature.geometry), fillColor, strokeColor, lineWidth]);
     const identity = JSON.stringify([kind, sceneKey, projectionKey, transform, width, height, state.dpr, layout, semanticKey, contentKey]);
-    return { kind, sceneKey: workerSceneKey(), projectionKey, identity, transform, width, height,
+    const patchStatic = kind === "political" ? h.getPoliticalPatchStaticSignature?.() : null;
+    const patchKey = patchStatic == null ? null : JSON.stringify([sceneKey, projectionKey, transform, width, height, state.dpr, layout, patchStatic]);
+    return { kind, sceneKey: workerSceneKey(), projectionKey, identity, patchKey, transform, width, height,
       dpr: state.dpr, offsetX: layout?.offsetX || 0, offsetY: layout?.offsetY || 0 };
   }
 
@@ -61,7 +69,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
       const id = item.id || h.getFeatureId(feature);
       if (!id || !feature?.geometry || h.excludeVisual(feature, id) || h.skipVisual(feature)) continue;
       const fillColor = h.resolveFillColor(feature, id, item.drawOrder);
-      entries.push({ id, feature, fillColor, strokeColor: h.resolveStrokeColor(feature, fillColor),
+      entries.push({ id, feature, geometryIdentity: identityOf(feature.geometry), fillColor, strokeColor: h.resolveStrokeColor(feature, fillColor),
         lineWidth: 0.75 / Math.max(0.0001, state.zoomTransform.k) });
     }
     return entries;
@@ -76,16 +84,18 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     if (failedPoliticalIdentity === description.identity) return null;
     if (politicalFrame?.identity === description.identity) return null;
     if (pending.get("political")?.identity === description.identity) return pending.get("political").promise;
-    close(politicalFrame?.result);
-    politicalFrame = null;
     const existing = inFlight.get(description.identity);
     if (existing) {
       pending.set("political", existing);
       return existing.promise;
     }
+    const baseFrame = politicalFrame;
+    const patch = planPoliticalRasterPatch(baseFrame, entries, description, h.getPoliticalEntryPixelBounds);
     const task = { identity: String(description.identity) };
+    const patchInput = patch ? { renderRegion: patch.region, drawEntryIds: patch.drawEntryIds,
+      patchBaseIdentity: baseFrame.identity } : {};
     let receivedResult = null;
-    task.promise = worker.request({ ...description, projectionOptions: projectionOptions(), entries }).then((result) => {
+    task.promise = worker.request({ ...description, ...patchInput, projectionOptions: projectionOptions(), entries }).then((result) => {
       receivedResult = result;
       if (!result) {
         failedPoliticalIdentity = task.identity;
@@ -99,9 +109,34 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
         e.recordMetric("geometryWorkerStaleResult", 0, { kind: "political" });
         return;
       }
+      let composed = result;
+      if (patch) {
+        if (politicalFrame !== baseFrame || result.patchBaseIdentity !== baseFrame.identity
+          || !result.renderRegion || ["x", "y", "width", "height"].some(key => result.renderRegion[key] !== patch.region[key])
+          || result.width !== patch.region.width || result.height !== patch.region.height) {
+          throw new Error("Political patch baseline or dimensions changed.");
+        }
+        // transferToImageBitmap clears the worker surface. Assemble against the
+        // retained accepted frame, never the worker's now-empty canvas or a
+        // potentially cleared render-pass target. Publish only after success.
+        const canvas = createCanvas(description.width, description.height);
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error("Political patch composite unavailable.");
+        context.drawImage(baseFrame.result.bitmap, 0, 0);
+        context.clearRect(patch.region.x, patch.region.y, patch.region.width, patch.region.height);
+        context.drawImage(result.bitmap, patch.region.x, patch.region.y);
+        close(result);
+        receivedResult = null;
+        composed = { ...result, bitmap: canvas, width: description.width, height: description.height,
+          rasterizedCount: result.renderedCount, renderedCount: entries.length };
+        e.recordMetric("geometryWorkerPoliticalPatch", 0, { changedCount: patch.changedCount,
+          rasterizedCount: result.renderedCount, composedCount: entries.length,
+          coverage: patch.coverage, estimatedTransientBytes: patch.estimatedTransientBytes });
+      }
       failedPoliticalIdentity = null;
       close(politicalFrame?.result);
-      politicalFrame = { identity: task.identity, result, ids: new Set(entries.map((entry) => entry.id)) };
+      politicalFrame = { identity: task.identity, patchKey: description.patchKey, entries,
+        result: composed, ids: new Set(entries.map((entry) => entry.id)) };
       e.requestRender("geometry-worker-political-ready");
     }).catch(() => {
       failedPoliticalIdentity = task.identity;

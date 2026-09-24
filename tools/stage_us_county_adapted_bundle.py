@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import gzip
 from collections import Counter
 from copy import deepcopy
 import json
@@ -37,6 +36,8 @@ from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
 from tools.scenario_topology_decode import topology_object_to_geojson
 from tools.build_tno_russia_precision_assets import finalize_stage, peak_memory
 from tools.regional_scenario_assets import _copy_gzip
+from tools.precision_build_support import assert_gzip_matches, PhaseRecorder, cached_json_result, hash_json, sha256_file
+from tools.pages_artifact_root import resolve_runtime_path
 
 SCENARIOS = {'blank_base', 'hgo_1936', 'hoi4_1936', 'hoi4_1939', 'tno_1962'}
 SIDECARS = {'strategic_values.by_feature.json', 'victory_points.json', 'city_overrides.json',
@@ -182,6 +183,47 @@ def neighbor_frame(topology, retained_ids):
                    'retained_empty_ids': empty, 'feature_count': len(frame)}
 
 
+
+def cached_neighbor_graph(topology, retained_ids, cache_root):
+    """Reuse only an input/toolchain-bound derived graph; never geometry or acceptance."""
+    cache_root = resolve_runtime_path(cache_root, label='Adjacency cache', require_directory=True)
+    rows = topology['objects']['political']['geometries']
+    ids = {row['properties']['id'] for row in rows}
+    inputs = {
+        'topology_sha256': hash_json(topology), 'retained_ids': sorted(retained_ids),
+        'python': list(sys.version_info[:3]), 'shapely': shapely.__version__,
+        'geos': shapely.geos_version_string, 'geopandas': gpd.__version__,
+        'sources': {name: sha256_file(ROOT / name) for name in (
+            'tools/stage_us_county_adapted_bundle.py', 'tools/scenario_topology_decode.py',
+            'map_builder/geo/topology.py', 'tools/precision_build_support.py')},
+    }
+
+    def validate(value):
+        graph, diagnostics = value['graph'], value['diagnostics']
+        if not isinstance(graph, list) or len(graph) != len(rows) or diagnostics['feature_count'] != len(rows):
+            raise ValueError('Invalid cached graph size')
+        if diagnostics['decoder'] != 'scenario_topology_decode.topology_object_to_geojson':
+            raise ValueError('Unknown cached adjacency decoder')
+        for index, neighbors in enumerate(graph):
+            if (not isinstance(neighbors, list) or any(type(n) is not int or n < 0 or n >= len(rows) or n == index for n in neighbors)
+                    or neighbors != sorted(set(neighbors))):
+                raise ValueError('Invalid cached graph membership')
+        sets = [set(neighbors) for neighbors in graph]
+        if any(index not in sets[n] for index, neighbors in enumerate(graph) for n in neighbors):
+            raise ValueError('Asymmetric cached adjacency graph')
+        for field in ('retained_invalid_nonzero_area_ids', 'retained_zero_area_ids', 'retained_empty_ids'):
+            values = diagnostics[field]
+            if not isinstance(values, list) or len(values) != len(set(values)) or not set(values) <= (ids & set(retained_ids)):
+                raise ValueError('Invalid retained geometry diagnostics')
+
+    def build():
+        frame, diagnostics = neighbor_frame(topology, retained_ids)
+        graph = compute_neighbor_graph(frame)
+        return {'graph': graph, 'diagnostics': diagnostics}
+
+    value, receipt = cached_json_result(cache_root, inputs, build, validate)
+    return value['graph'], value['diagnostics'], receipt
+
 def assemble(topology, overlay, report, assignments):
     """Validate lineage and preserve untouched topology arcs, properties and object data."""
     result = _absolute_topology(topology)
@@ -254,6 +296,7 @@ def _local(directory, url, sid):
 
 def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir):
     started = time.monotonic()
+    phases = PhaseRecorder(process_peak=peak_memory)
     baseline, adaptation, sidecars, source, output = map(lambda p: Path(p).resolve(),
         (baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir))
     manifest = read(baseline / 'manifest.json')
@@ -295,8 +338,10 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
         assignments[key] = payloads[key].get(key, payloads[key]) if present else {}
         if key != 'controllers' and not present:
             raise ValueError(f'Missing required assignments: {key}')
+    phases.checkpoint("input-validation")
     baseline_topology = read(runtime)
     candidate, expanded, crosswalk, geometries = assemble(baseline_topology, read(overlay_path), report, assignments)
+    phases.checkpoint("geometry-assembly")
     ids = {row['properties']['id'] for row in candidate['objects']['political']['geometries']}
     ownerless = (sid == 'blank_base' and manifest.get('map_mode') == 'blank'
                  and manifest.get('scenario_contract_profile') == 'lightweight_base')
@@ -361,13 +406,18 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
         raise ValueError('Unknown owner country')
     for tag, country in countries['countries'].items():
         country['feature_count'] = counts[tag]
+    phases.checkpoint("sidecar-and-domain-validation")
     output.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(prefix='.historical-county-', dir=output.parent) as temp:
         staged = Path(temp) / sid
         shutil.copytree(baseline, staged)
+        phases.checkpoint("stage-copy")
         rows = candidate['objects']['political']['geometries']
-        frame, neighbor_diagnostics = neighbor_frame(candidate, {fid for fid, children in crosswalk.items() if children == [fid]})
-        candidate['objects']['political']['computed_neighbors'] = compute_neighbor_graph(frame)
+        graph, neighbor_diagnostics, neighbor_cache = cached_neighbor_graph(candidate,
+            {fid for fid, children in crosswalk.items() if children == [fid]},
+            ROOT / '.runtime/cache/precision-adjacency')
+        candidate['objects']['political']['computed_neighbors'] = graph
+        phases.checkpoint("adjacency")
         write(staged / 'runtime_topology.topo.json', candidate)
         candidate_hash = digest(staged / 'runtime_topology.topo.json')
         for key, payload in payloads.items():
@@ -409,7 +459,9 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
         if chunked:
             manifest['source']['detail_chunk_manifest_sha256'] = digest(staged / 'detail_chunks.manifest.json')
         write(staged / 'manifest.json', manifest)
+        phases.checkpoint("asset-generation")
         finalize_stage(staged)
+        phases.checkpoint("finalization")
         # Startup bundle generation narrows source metadata to transport hashes.
         # Restore all bound historical provenance, then synchronize audit/snapshot.
         from tools.check_scenario_contracts import _build_snapshot_for_scenario, _refresh_audit_payload
@@ -431,8 +483,8 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
             if (staged / (name + '.gz')).exists():
                 _copy_gzip(staged / name)
         for path in staged.rglob('*.json.gz'):
-            if gzip.decompress(path.read_bytes()) != path.with_suffix('').read_bytes():
-                raise ValueError(f'Stale gzip after binding restoration: {path.name}')
+            assert_gzip_matches(path, path.with_suffix(''))
+        phases.checkpoint("binding-restoration-and-streaming-gzip-validation")
         for key, original in payloads.items():
             path = staged / f'{key}.by_feature.json'
             if original is None:
@@ -448,9 +500,11 @@ def stage(baseline_dir, adaptation_dir, sidecars_dir, county_source, output_dir)
             raise ValueError('Finalizer changed country counts or feature summary')
         if any(digest(Path(path)) != value for path, value in bindings.items()):
             raise ValueError('Input changed during build')
-        result = {'scenario_id': sid, 'release_ready': False, 'complete_runtime_bundle': True,
+        phases.checkpoint("final-contracts")
+        result = {'build_phases': phases.phases, 'scenario_id': sid, 'release_ready': False, 'complete_runtime_bundle': True,
                   'chunked': chunked, 'performance_accepted': False,
                   'derived_neighbor_geometry': neighbor_diagnostics,
+                  'derived_neighbor_cache': neighbor_cache,
                   'elapsed_seconds': time.monotonic() - started, 'peak_working_set_bytes': peak_memory(),
                   'input_sha256': bindings, 'replaced_old_ids': sorted(removed),
                   'unresolved_ids_retained_in_baseline': report['unresolved_ids_retained_in_baseline'],

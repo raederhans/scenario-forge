@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 63,
-    "nodeCount": 78,
-    "reverseIndexKeyCount": 121,
+    "specCount": 64,
+    "nodeCount": 80,
+    "reverseIndexKeyCount": 123,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -396,6 +396,20 @@
         "js/core/sovereignty_manager.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/dev/precision_foundation_patch.dev.spec.js": {
+      "directDependencies": [
+        "tests/e2e/dev/support/precision_foundation_native_case.mjs"
+      ],
+      "transitiveDependencies": [
+        "js/core/renderer/geometry_raster_runtime_owner.js",
+        "tests/e2e/dev/support/precision_foundation_native_case.mjs",
+        "vendor/d3.v7.min.js"
+      ],
+      "repoImpact": [
+        "js/core/renderer/geometry_raster_runtime_owner.js",
+        "vendor/d3.v7.min.js"
       ]
     },
     "tests/e2e/dev/precision_geometry_transfer.dev.spec.js": {
@@ -2127,7 +2141,8 @@
       "tests/e2e/dev/latency_batches.dev.spec.js"
     ],
     "js/core/renderer/geometry_raster_runtime_owner.js": [
-      "tests/e2e/dev/latency_batches.dev.spec.js"
+      "tests/e2e/dev/latency_batches.dev.spec.js",
+      "tests/e2e/dev/precision_foundation_patch.dev.spec.js"
     ],
     "js/core/renderer/geometry_raster_worker_kernel.js": [
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
@@ -2450,6 +2465,9 @@
     "tests/e2e/dev/normal_visual_paths.dev.spec.js": [
       "tests/e2e/dev/normal_visual_paths.dev.spec.js"
     ],
+    "tests/e2e/dev/precision_foundation_patch.dev.spec.js": [
+      "tests/e2e/dev/precision_foundation_patch.dev.spec.js"
+    ],
     "tests/e2e/dev/precision_geometry_transfer.dev.spec.js": [
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js"
     ],
@@ -2470,6 +2488,9 @@
     ],
     "tests/e2e/dev/shared_labels_runtime.dev.spec.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "tests/e2e/dev/support/precision_foundation_native_case.mjs": [
+      "tests/e2e/dev/precision_foundation_patch.dev.spec.js"
     ],
     "tests/e2e/dev/support/precision_scaling_native_case.mjs": [
       "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
@@ -3016,6 +3037,7 @@
     ],
     "vendor/d3.v7.min.js": [
       "tests/e2e/dev/latency_batches.dev.spec.js",
+      "tests/e2e/dev/precision_foundation_patch.dev.spec.js",
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
       "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
     ]

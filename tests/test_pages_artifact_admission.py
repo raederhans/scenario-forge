@@ -40,13 +40,13 @@ class QuietStaticHandler(SimpleHTTPRequestHandler):
 
 
 class ArtifactReleaseWorkflowTests(unittest.TestCase):
-    def test_existing_release_path_keeps_opt_in_and_verifies_before_upload(self) -> None:
+    def test_source_artifact_is_default_and_verifies_before_upload(self) -> None:
         from tests.test_e2e_structural_tooling import (
             parse_workflow_dispatch_inputs, parse_workflow_job_blocks, parse_job_steps, parse_step_run,
         )
         deploy = (REPO_ROOT / ".github/workflows/deploy.yml").read_text(encoding="utf-8")
         inputs = parse_workflow_dispatch_inputs(deploy)
-        self.assertEqual(inputs["artifact_only"]["default"], "false")
+        self.assertEqual(inputs["artifact_only"]["default"], "true")
         self.assertEqual(inputs["artifact_only"]["type"], "boolean")
         steps = parse_job_steps(parse_workflow_job_blocks(deploy)["build"])
         names = [step["name"] for step in steps]
@@ -54,7 +54,9 @@ class ArtifactReleaseWorkflowTests(unittest.TestCase):
         self.assertIn("--verify-receipt", parse_step_run(verify))
         self.assertIn('--expected-source-sha "$EXPECTED_SOURCE_SHA"', parse_step_run(verify))
         self.assertLess(names.index(verify["name"]), names.index("Upload artifact"))
-        self.assertIn("github.event_name == 'workflow_dispatch' && inputs.artifact_only", "\n".join(verify["lines"]))
+        self.assertIn("github.event_name != 'workflow_dispatch' || inputs.artifact_only", "\n".join(verify["lines"]))
+        legacy = steps[names.index("Validate dist artifact payload")]
+        self.assertIn("github.event_name == 'workflow_dispatch' && !inputs.artifact_only", "\n".join(legacy["lines"]))
         shared = (REPO_ROOT / ".github/workflows/verify-shared.yml").read_text(encoding="utf-8")
         steps = parse_job_steps(parse_workflow_job_blocks(shared)["verify"])
         by_name = {step["name"]: step for step in steps}
