@@ -47,7 +47,7 @@ jobs:
           set -euo pipefail
           mkdir -p .runtime/reports/generated/native-engineering
           git rev-parse HEAD > .runtime/reports/generated/native-engineering/source-sha.txt
-          python -m http.server 8000 --bind 127.0.0.1 > .runtime/reports/generated/native-engineering/server.log 2>&1 &
+          python -c 'import http.server; http.server.SimpleHTTPRequestHandler.extensions_map.update({".mjs":"application/javascript",".js":"application/javascript"}); http.server.ThreadingHTTPServer(("127.0.0.1",8000),http.server.SimpleHTTPRequestHandler).serve_forever()' > .runtime/reports/generated/native-engineering/server.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           for attempt in {1..30}; do
