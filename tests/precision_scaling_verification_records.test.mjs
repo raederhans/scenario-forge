@@ -9,7 +9,7 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 29);
+  assert.equal(routes.length, 30);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
@@ -64,4 +64,16 @@ test("US county lineage metadata selects the scenario migration regression witho
 
 test("precision additions preserve repository-wide command ownership and resource policy", () => {
   assert.doesNotThrow(() => reconcileVerificationRouteAuthority());
+});
+
+test("resource accounting has its own executable route and retains the original scheduler command", () => {
+  const routes = createPrecisionScalingRecords([]);
+  assert.equal(routes[0].commandRef, "node --test tests/precision_scaling_scheduler_behavior.test.mjs");
+  assert.equal(routes[29].id, "local:precision-resources:accounting");
+  for (const source of ["js/core/runtime_resource_budget.js", "js/core/geometry_raster_worker_client.js", "tests/worker_resource_accounting_behavior.test.mjs"]) {
+    const report = buildRepositoryRecommendation([source]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) => entry.commandRef === routes[29].commandRef));
+  }
 });
