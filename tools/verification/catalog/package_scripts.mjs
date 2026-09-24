@@ -1,5 +1,6 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const PACKAGE_SCRIPTS = {
+    "test:node:ownership-retirement": "node --test tests/map_data_boundary_behavior.test.mjs tests/ownership_retirement_behavior.test.mjs tests/dev_workspace_selection_ownership_behavior.test.mjs tests/scenario_import_trust_projection_behavior.test.mjs tests/quick_fill_hierarchy.test.mjs tests/scenario_state_actions_atomicity_behavior.test.mjs tests/click_selection_transaction_owner_behavior.test.mjs tests/history_feature_color_refresh_behavior.test.mjs tests/atlantropa_water_color_behavior.test.mjs tests/toolbar_render_scheduler_behavior.test.mjs",
     "test:node:city-lights-assets": "node --test tests/city_lights_asset_contract.test.mjs",
     "test:node:city-lights-render-owner": "node --test tests/city_lights_render_owner_behavior.test.mjs",
     "test:node:modern-city-lights-owner": "npm run test:node:city-lights-render-owner",

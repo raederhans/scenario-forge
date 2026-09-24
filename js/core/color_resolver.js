@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "./map_data_boundary.js";
 import { normalizeStrategicValuesStyle, getStrategicValuesColorStops } from "./strategic_values_view_model.js";
 import {
   buildStrategicChoroplethColorInput,
@@ -7,11 +8,6 @@ import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js"
 
 // Central color resolver for land features.
 // It keeps canonical visual/owner state precedence in one small, testable place.
-
-function readSafeColor(colorMap, key, getSafeColor) {
-  if (!colorMap || typeof colorMap !== "object" || !key) return "";
-  return getSafeColor(colorMap[key], "");
-}
 
 function defaultSafeColor(value, fallback = "") {
   const raw = String(value || "").trim();
@@ -107,37 +103,14 @@ function resolveFeatureColor(featureId, ctx = {}) {
 }
 
 function resolveBaseLandColor(id, ctx, getSafeColor) {
-  const runtimeState = ctx.state || {};
-  const feature = ctx.feature || null;
-  const visualColor = readSafeColor(runtimeState.visualOverrides, id, getSafeColor);
-  if (visualColor) {
-    return { color: visualColor, source: "visualOverrides", featureId: id, ownerCode: "" };
-  }
-
-  const compatFeatureColor = readSafeColor(runtimeState.featureOverrides, id, getSafeColor);
-  if (compatFeatureColor) {
-    return { color: compatFeatureColor, source: "featureOverrides", featureId: id, ownerCode: "" };
-  }
-
-  const ownerCode = String(
-    typeof ctx.getOwnerCode === "function" ? ctx.getOwnerCode(feature, id) : "",
-  ).trim().toUpperCase();
-  if (!ownerCode) {
-    return { color: null, source: "", featureId: id, ownerCode: "" };
-  }
-
-  const ownerColor = readSafeColor(runtimeState.sovereignBaseColors, ownerCode, getSafeColor);
-  if (ownerColor) {
-    return { color: ownerColor, source: "sovereignBaseColors", featureId: id, ownerCode };
-  }
-
-  const compatOwnerColor = readSafeColor(runtimeState.countryBaseColors, ownerCode, getSafeColor);
-  return {
-    color: compatOwnerColor || null,
-    source: compatOwnerColor ? "countryBaseColors" : "",
-    featureId: id,
-    ownerCode,
-  };
+  const resolved = getMapDataBoundary(ctx.state || {}).paint.resolveFeatureColor(id, {
+    getSafeColor,
+    getBaseGroupCode: typeof ctx.getOwnerCode === "function"
+      ? () => ctx.getOwnerCode(ctx.feature || null, id)
+      : null,
+  });
+  // Preserve the renderer diagnostic envelope during the staged migration.
+  return { color: resolved.color, source: resolved.source, featureId: resolved.featureId, ownerCode: resolved.groupCode };
 }
 
 export {

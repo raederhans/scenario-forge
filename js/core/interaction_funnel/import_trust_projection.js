@@ -1,4 +1,4 @@
-import { getFeatureId, normalizeFeatureOwnershipMap } from "../sovereignty_manager.js";
+import { getFeatureId } from "../sovereignty_manager.js";
 
 // Borrow geometry only while collecting identities. The result contains new
 // string values, never topology objects or runtime feature payloads.
@@ -26,11 +26,11 @@ export function getScenarioImportValidFeatureIds(target, preparedScenario) {
 }
 
 export function resolveImportedOwnershipState(data, scenarioState) {
-  const importedOwnersByFeatureId = normalizeFeatureOwnershipMap(data.sovereigntyByFeatureId);
+  // Project input cannot overwrite the read-only scenario reference assignments.
   return {
     sovereigntyByFeatureId: scenarioState.activeScenarioId
-      ? { ...(scenarioState.scenarioBaselineOwnersByFeatureId || {}), ...importedOwnersByFeatureId }
-      : importedOwnersByFeatureId,
+      ? { ...(scenarioState.scenarioBaselineOwnersByFeatureId || {}) }
+      : {},
     shouldRestoreScenarioBaselineControllers: false,
   };
 }

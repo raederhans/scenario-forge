@@ -1,3 +1,4 @@
+import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
@@ -611,7 +612,7 @@ class FileManager {
       }),
       sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       mapSemanticMode: normalizeMapSemanticMode(appState.mapSemanticMode),
-      paintMode: appState.paintMode || "visual",
+      paintMode: normalizePaintMode(appState.paintMode),
       interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
       batchFillScope: normalizeBatchFillScope(appState.batchFillScope),
       activeSovereignCode: appState.activeSovereignCode || "",

@@ -59,9 +59,14 @@ READ_ONLY_ACTION_EXPORTS = {
 
 ACTION_STATE_DEPENDENCIES = {
     "scenario_activation_actions.js": {
+        "../color_state.js": {"applyFeaturePaintState"},
+        "../../map_data_boundary.js": {"createReadonlyReferenceAssignments"},
+        "../../scenario/bundle_cache_policy.js": {"SCENARIO_BUNDLE_CACHE_LIMIT", "getScenarioChunkPayloadEvictionIds"},
         "./special_zone_actions.js": {"commitSpecialZoneLayersState"},
     },
     "scenario_presentation_actions.js": {
+        "../../map_editing_policy.js": {"normalizePaintMode"},
+        "../../quick_fill_hierarchy.js": {"normalizeQuickFillScope"},
         "./appearance_actions.js": {
             "patchAppearanceStyleGroupState", "setAppearanceParentBorderEnabledMapState",
             "setAppearanceStyleConfigState", "setAppearanceStyleGroupState",

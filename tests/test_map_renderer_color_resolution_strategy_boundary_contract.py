@@ -61,14 +61,21 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
             "function applyFeatureVisualOverrideTransaction(",
             1,
         )[1].split("function refreshResolvedColorsForOwners(", 1)[0]
-        self.assertIn("delete runtimeState.visualOverrides[targetId];", override_transaction_body)
-        self.assertIn("delete runtimeState.featureOverrides[targetId];", override_transaction_body)
-        self.assertIn("runtimeState.visualOverrides[targetId] = color;", override_transaction_body)
-        self.assertIn("runtimeState.featureOverrides[targetId] = color;", override_transaction_body)
-        self.assertEqual(renderer_content.count("runtimeState.visualOverrides[targetId] ="), 1)
-        self.assertEqual(renderer_content.count("runtimeState.featureOverrides[targetId] ="), 1)
-        self.assertEqual(renderer_content.count("delete runtimeState.visualOverrides[targetId];"), 1)
-        self.assertEqual(renderer_content.count("delete runtimeState.featureOverrides[targetId];"), 1)
+        # Paint writes moved into the shared state authority; preserve the
+        # single transaction and prohibit duplicate renderer writes.
+        self.assertIn("applyFeaturePaintState(runtimeState, resolvedIds,", override_transaction_body)
+        self.assertIn("refreshResolvedColorsForFeatures(resolvedIds,", override_transaction_body)
+        for token in (
+            "runtimeState.visualOverrides[targetId] =", "runtimeState.featureOverrides[targetId] =",
+            "delete runtimeState.visualOverrides[targetId];", "delete runtimeState.featureOverrides[targetId];",
+        ):
+            self.assertNotIn(token, renderer_content)
+        paint_state_content = (REPO_ROOT / "js/core/state/color_state.js").read_text(encoding="utf-8")
+        self.assertIn("export function applyFeaturePaintState(", paint_state_content)
+        self.assertIn("target.visualOverrides[id] = color;", paint_state_content)
+        self.assertIn("target.featureOverrides[id] = color;", paint_state_content)
+        self.assertIn("delete target.visualOverrides[id];", paint_state_content)
+        self.assertIn("delete target.featureOverrides[id];", paint_state_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(resolvedIds, color,", renderer_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(freshIds, selectedColor,", renderer_content)
         click_owner_content = (REPO_ROOT / "js/core/map_renderer/click_selection_transaction_owner.js").read_text(encoding="utf-8")

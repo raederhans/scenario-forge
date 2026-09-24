@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "./map_editing_policy.js";
 import { coalesceQuickFillGesture } from "./history_quick_fill_gesture.js";
 import { state as runtimeState } from "./state.js";
 import {
@@ -303,7 +304,9 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(runtimeState.countryBaseColors, snapshot.countryBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
-  applyEntries(runtimeState.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
+  if (isOwnershipEditingEnabled()) {
+    applyEntries(runtimeState.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
+  }
   if (
     snapshot.visualOverrides
     || snapshot.featureOverrides

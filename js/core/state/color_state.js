@@ -1,3 +1,4 @@
+import { normalizeHexColor } from "../color_hex_utils.js";
 // Color/palette state defaults.
 // 这里收口渲染颜色、palette 选择、preset 编辑和 inspector 展开状态，
 // 让 color 相关默认值只维护一份真源。
@@ -410,4 +411,35 @@ export function normalizeColorStateForRender(
   target.countryBaseColors = syncPlainObjectMirror(target.countryBaseColors, target.sovereignBaseColors);
   target.featureOverrides = syncPlainObjectMirror(target.featureOverrides, target.visualOverrides);
   return target;
+}
+
+/** Apply one visual edit batch. Effects/history belong to the caller. */
+export function applyFeaturePaintState(target, featureIds, value, { remove = false } = {}) {
+  if (!target || typeof target !== "object" || Array.isArray(target)) {
+    throw new TypeError("Paint state requires a state object");
+  }
+  if (!Array.isArray(featureIds)) throw new TypeError("Paint targets must be an array");
+  const ids = Array.from(new Set(featureIds.map((id) => String(id ?? "").trim()).filter(Boolean)));
+  if (ids.some((id) => ["__proto__", "constructor", "prototype"].includes(id))) {
+    throw new TypeError("Invalid paint feature ID");
+  }
+  if (!ids.length) return [];
+  const color = remove ? null : normalizeHexColor(value);
+  if (!remove && !color) throw new TypeError("Paint color must be a hexadecimal RGB color");
+  // Validate the entire request before the first mutation. Existing storage
+  // names are transition adapters, not two independently editable states.
+  target.visualOverrides = target.visualOverrides && typeof target.visualOverrides === "object" && !Array.isArray(target.visualOverrides)
+    ? target.visualOverrides : {};
+  target.featureOverrides = target.featureOverrides && typeof target.featureOverrides === "object" && !Array.isArray(target.featureOverrides)
+    ? target.featureOverrides : {};
+  for (const id of ids) {
+    if (remove) {
+      delete target.visualOverrides[id];
+      delete target.featureOverrides[id];
+    } else {
+      target.visualOverrides[id] = color;
+      target.featureOverrides[id] = color;
+    }
+  }
+  return ids;
 }

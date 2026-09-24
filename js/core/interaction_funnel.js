@@ -1,3 +1,4 @@
+import { normalizePaintMode } from "./map_editing_policy.js";
 import { clearDirty } from "./dirty_state.js";
 import { getPhysicalContextLayerRequests } from "./state_defaults.js";
 import { createProjectImportCompletion } from "./interaction_funnel/import_completion.js";
@@ -276,7 +277,7 @@ function stageImportedProjectPatch(data, preparedImport) {
     draft.activeScenarioId ? draft.mapSemanticMode : "political"
   );
   draft.sovereigntyInitialized = false;
-  draft.paintMode = data.paintMode || "visual";
+  draft.paintMode = normalizePaintMode(data.paintMode);
   draft.activeSovereignCode = data.activeSovereignCode || "";
   draft.selectedInspectorCountryCode = "";
   draft.inspectorHighlightCountryCode = draft.selectedInspectorCountryCode;

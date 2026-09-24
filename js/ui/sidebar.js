@@ -1,3 +1,6 @@
+import { applyFeaturePaintState } from "../core/state/color_state.js";
+import { getMapDataBoundary } from "../core/map_data_boundary.js";
+import { isOwnershipEditingEnabled, normalizePaintMode, ownershipEditingDisabledResult } from "../core/map_editing_policy.js";
 import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
 // Sidebar UI (Phase 13)
 import {
@@ -401,7 +404,7 @@ export function getHierarchyGroupsForCode(code) {
 
 function normalizeActionMode(mode = "auto") {
   if (mode === "ownership" || mode === "visual") return mode;
-  return String(runtimeState.paintMode || "visual") === "sovereignty" ? "ownership" : "visual";
+  return normalizePaintMode(runtimeState.paintMode);
 }
 
 function applyVisualOverridesToFeatureIds(
@@ -431,10 +434,7 @@ function applyVisualOverridesToFeatureIds(
   const before = captureHistoryState({
     featureIds: normalizedTargetIds,
   });
-  normalizedTargetIds.forEach((id) => {
-    runtimeState.visualOverrides[id] = colorToApply;
-    runtimeState.featureOverrides[id] = colorToApply;
-  });
+  applyFeaturePaintState(runtimeState, normalizedTargetIds, colorToApply);
   markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (render) render();
@@ -503,10 +503,7 @@ function clearVisualOverridesForFeatureIds(
   const before = captureHistoryState({
     featureIds: changedIds,
   });
-  changedIds.forEach((id) => {
-    delete runtimeState.visualOverrides[id];
-    delete runtimeState.featureOverrides[id];
-  });
+  applyFeaturePaintState(runtimeState, changedIds, null, { remove: true });
   markLegacyColorStateDirty();
   refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
   if (render) render();
@@ -542,6 +539,7 @@ function applyOwnershipToFeatureIds(
     recomputeReason = "sidebar-ownership-batch",
   } = {}
 ) {
+  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
   if (blockLockedScenarioInteraction()) {
     return {
       applied: false,
@@ -624,6 +622,7 @@ function applyScenarioOwnerControllerAssignments(
     recomputeReason = "scenario-owner-controller-apply",
   } = {}
 ) {
+  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
   if (blockLockedScenarioInteraction()) {
     return {
       applied: false,
@@ -832,18 +831,10 @@ function getOwnedVisibleFeatureIds(ownerCode) {
     };
   }
 
-  let requestedIds = [];
-  if (runtimeState.sovereigntyByFeatureId && typeof runtimeState.sovereigntyByFeatureId === "object") {
-    requestedIds = Object.entries(runtimeState.sovereigntyByFeatureId)
-      .filter(([, rawOwnerCode]) => normalizeCountryCode(rawOwnerCode) === normalizedOwnerCode)
-      .map(([featureId]) => featureId);
-  }
-
-  if (!requestedIds.length && runtimeState.countryToFeatureIds instanceof Map) {
-    requestedIds = Array.isArray(runtimeState.countryToFeatureIds?.get(normalizedOwnerCode))
-      ? runtimeState.countryToFeatureIds.get(normalizedOwnerCode)
-      : [];
-  }
+  const reference = getMapDataBoundary(runtimeState).reference;
+  const requestedIds = runtimeState.activeScenarioId
+    ? reference.getScenarioGroupFeatureIds(normalizedOwnerCode)
+    : reference.getGeographicCountryFeatureIds(normalizedOwnerCode);
 
   return filterToVisibleFeatureIds(requestedIds);
 }
@@ -3233,7 +3224,7 @@ function initSidebar({ render } = {}) {
   });
 
   const setScenarioMapPaintMode = (nextMode) => {
-    const normalizedMode = nextMode === "ownership" ? "sovereignty" : "visual";
+    const normalizedMode = normalizePaintMode(nextMode);
     runtimeState.paintMode = normalizedMode;
     if (normalizedMode === "sovereignty") {
       runtimeState.interactionGranularity = "subdivision";
@@ -3418,6 +3409,7 @@ function initSidebar({ render } = {}) {
   };
 
   const activateScenarioCountry = (countryState) => {
+    if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult();
     const isReleasable = !!countryState?.releasable;
 
     const normalizedCountryCode = normalizeCountryCode(countryState.code);
@@ -3523,6 +3515,7 @@ function initSidebar({ render } = {}) {
   });
 
   const renderNoActiveGuard = (container) => {
+    if (!isOwnershipEditingEnabled()) return false;
     const needsGuard = runtimeState.activeScenarioId
       ? !normalizeCountryCode(runtimeState.activeSovereignCode)
       : (

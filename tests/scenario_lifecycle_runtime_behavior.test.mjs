@@ -284,7 +284,7 @@ function createFeatures(count) {
   }));
 }
 
-test("scenario activation starts in visual paint mode and preserves the previous mode for exit", () => {
+test("scenario activation and exit force visual mode while preserving selection scope", () => {
   const updates = [];
   const runtimeState = createBaseState({
     scenarioPaintModeBeforeActivate: null,
@@ -296,14 +296,20 @@ test("scenario activation starts in visual paint mode and preserves the previous
   assert.equal(runtimeState.interactionGranularity, "subdivision");
   assert.equal(runtimeState.ui.politicalEditingExpanded, false);
   assert.deepEqual(runtimeState.scenarioPaintModeBeforeActivate, {
-    paintMode: "sovereignty",
+    paintMode: "visual",
     interactionGranularity: "country",
     batchFillScope: "country",
-    politicalEditingExpanded: true,
+    politicalEditingExpanded: false,
   });
   lifecycle.applyScenarioPaintMode();
-  assert.equal(runtimeState.scenarioPaintModeBeforeActivate.paintMode, "sovereignty");
+  assert.equal(runtimeState.scenarioPaintModeBeforeActivate.paintMode, "visual");
   assert.deepEqual(updates, ["visual", "visual"]);
+  lifecycle.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
+  assert.equal(runtimeState.paintMode, "visual");
+  assert.equal(runtimeState.interactionGranularity, "country");
+  assert.equal(runtimeState.batchFillScope, "country");
+  assert.equal(runtimeState.ui.politicalEditingExpanded, false);
+  assert.equal(runtimeState.scenarioPaintModeBeforeActivate, null);
 });
 
 test("chunked coarse data health signals remain internal until full derived state settles", () => {
