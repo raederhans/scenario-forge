@@ -48,3 +48,10 @@ it never sets `performance_accepted` true. Small-sample p95 is explicitly coarse
 Cloud source snapshots omit large data. Local source-snapshot tests and synthetic
 runner tests establish tool behavior only; actual high-precision candidate
 results remain **not-run** until the corresponding local bundles are supplied.
+
+Local integration (2026-09-24): all 27 campaign/foundation Python tests pass on
+Windows. The comparison runner now rejects report and measurement paths that
+overlap either candidate before creating directories; real-run regression checks
+prove candidate bytes remain unchanged on rejection. Main through #160 is
+preserved. Logs: `.runtime/tmp/pr158-161-closeout/evidence-tests.log`.
+These are tool checks, not acceptance of an untracked precision candidate.

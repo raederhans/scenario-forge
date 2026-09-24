@@ -110,6 +110,15 @@ def run(definition: dict, output: Path, *, root: Path = ROOT) -> dict:
     run_id = output.name
     if not run_id or any(ch not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for ch in run_id):
         raise ValueError('Output directory name must be a safe unique run id')
+    sample_roots = {
+        side: resolve_runtime_path(checkout / '.runtime' / 'precision-measurements' / run_id,
+                                   repo_root=checkout, label='Sample output')
+        for side, checkout in variant_roots.items()
+    }
+    for destination in (output, *sample_roots.values()):
+        for candidate in candidates.values():
+            if destination == candidate or destination.is_relative_to(candidate) or candidate.is_relative_to(destination):
+                raise ValueError('Comparison outputs must not overlap candidate inputs')
     output.mkdir(parents=True)
     report = {'schema_version': 1, 'mode': definition['mode'], 'evidence_kind': definition['evidence_kind'],
               'definition_sha256': hash_json(definition), 'harness_sha256': harness_hashes,
@@ -120,7 +129,7 @@ def run(definition: dict, output: Path, *, root: Path = ROOT) -> dict:
         for item in plan:
             side, sample_id = item['side'], item['id']
             checkout, candidate = variant_roots[side], candidates[side]
-            sample_root = resolve_runtime_path(checkout / '.runtime' / 'precision-measurements' / run_id / sample_id,
+            sample_root = resolve_runtime_path(sample_roots[side] / sample_id,
                                                repo_root=checkout, label='Sample output')
             if sample_root.exists():
                 raise ValueError('Sample output exists; refusing stale evidence')

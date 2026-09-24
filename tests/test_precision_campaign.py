@@ -188,6 +188,20 @@ class ComparisonExecutionTests(unittest.TestCase):
             definition = {'schema_version':1,'evidence_kind':'synthetic-fixture','mode':'fixed-data','left':variant,'right':variant,
                 'scenario_id':'modern_world','warmups':0,'runs':1,'harness_files':[str(harness)],
                 'command':[sys.executable,str(harness),'{source_root}','{candidate_root}','{sample_out}','{sample_id}']}
+            before = receipts.snapshot(root / '.runtime/candidate', receipts.source_identity(root))
+            with self.assertRaisesRegex(ValueError, 'overlap candidate'):
+                run(definition, Path('.runtime/candidate/polluted'), root=root)
+            self.assertFalse((root / '.runtime/candidate/polluted').exists())
+            self.assertEqual(receipts.snapshot(root / '.runtime/candidate', receipts.source_identity(root)), before)
+            (root / '.runtime/precision-measurements').mkdir()
+            (root / '.runtime/precision-measurements/data.json').write_text('{}')
+            overlapping = copy.deepcopy(definition)
+            overlapping['right']['candidate_root'] = '.runtime/precision-measurements'
+            with self.assertRaisesRegex(ValueError, 'overlap candidate'):
+                run(overlapping, Path('.runtime/comparison/overlap'), root=root)
+            self.assertFalse((root / '.runtime/comparison/overlap').exists())
+            self.assertEqual(list((root / '.runtime/precision-measurements').iterdir()),
+                             [root / '.runtime/precision-measurements/data.json'])
             report = run(definition, Path('.runtime/comparison/success'), root=root)
             self.assertEqual(report['status'],'completed-diagnostic',report)
             self.assertEqual(len(report['samples']),2)
