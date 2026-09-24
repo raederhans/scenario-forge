@@ -1,0 +1,67 @@
+name: Precision engineering native oracle
+on:
+  push:
+    branches: ["codex/precision-engineering-workspace-20260924"]
+    paths: [".github/workflows/precision-engineering-native.yml"]
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
+      PLAYWRIGHT_TEST_BASE_URL: http://127.0.0.1:8000
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 2bff51b2cce2a9d0d5a64afef19bc5eaa75f5aee
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: |
+            js
+            vendor
+            tests
+            tools
+            ops
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install locked browser dependencies
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Exact native oracles
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/reports/generated/native-engineering
+          git rev-parse HEAD > .runtime/reports/generated/native-engineering/source-sha.txt
+          python -m http.server 8000 --bind 127.0.0.1 > .runtime/reports/generated/native-engineering/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:8000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:8000/ > /dev/null
+          env -u CI node node_modules/@playwright/test/cli.js test tests/e2e/dev/precision_foundation_patch.dev.spec.js --workers=1 --retries=0 2>&1 | tee .runtime/reports/generated/native-engineering/native.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: precision-native-${{ matrix.os }}
+          path: |
+            .runtime/reports/generated/native-engineering/
+            .runtime/tests/playwright/
+          retention-days: 5
+          if-no-files-found: error
