@@ -6,6 +6,7 @@ import {
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
 import { RENDER_PASS_NAMES, VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
 import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
+import { getRiverZoomBucket } from './river_layer_render_owner.js';
 
 // Keep pass identities tied to the fields that the pass actually paints.  The
 // physical style object also contains atlas-only controls; including all of it
@@ -217,6 +218,9 @@ export function createRenderPassSignaturePolicy(runtimeState, {
           ? `urban-scale:${Number(transform?.k || runtimeState.zoomTransform?.k || 1).toFixed(4)}`
           : "urban-scale:inactive",
         runtimeState.showRivers ? "rivers:on" : "rivers:off",
+        runtimeState.showRivers
+          ? `river-bucket:${getRiverZoomBucket(transform?.k || runtimeState.zoomTransform?.k || 1)}`
+          : "river-bucket:inactive",
         `context:${Number(runtimeState.contextLayerRevision || 0)}`,
         `context-colors:${shouldRefreshContextBaseForColorChanges() ? Number(runtimeState.colorRevision || 0) : 0}`,
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,

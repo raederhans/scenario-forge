@@ -190,6 +190,21 @@ test("water bounds reuse projection coordinates while zoom culling and selection
   assert.ok(h.events.some(e => e[0] === "bounds" && e[1] === "projection-2"));
 });
 
+test("shared base lakes render with the editable water overlay off, without highlighting hidden regions", t => {
+  const h = harness(t, { mode: "direct" });
+  h.state.showWaterRegions = false;
+  h.state.contextLayerExternalDataByName = { lakes: { features: [h.water] } };
+  h.state.selectedWaterRegionId = "water";
+  h.draw();
+  assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
+  assert.equal(h.events.filter((event) => event[1] === "fill").length, 1);
+  assert.equal(h.events.filter((event) => event[1] === "stroke").length, 0);
+  h.state.contextLayerExternalDataByName.lakes = { features: [{ id: "another-lake" }] };
+  h.events.length = 0;
+  h.draw();
+  assert.equal(h.events.some((event) => event[1] === "fill"), false);
+});
+
 test("failed water bounds do not poison the cache", t => {
   const h = harness(t, { mode: "direct" });
   h.setBoundsAvailable(false); h.draw();

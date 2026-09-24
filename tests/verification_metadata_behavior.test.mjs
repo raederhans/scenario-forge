@@ -369,7 +369,13 @@ test("authored catalog source covers command authority, policies, and every proj
   assert.equal(summary.packageAliasCount, 17);
   assert.equal(summary.prProfileCount, 4);
   assert.equal(summary.nightlyRoleCount, 12);
-  assert.equal(summary.documentationProjectionCount, 62);
+  const expectedDocumentation = [...new Set(VERIFICATION_METADATA_SOURCE.records
+    .flatMap((record) => record.sourceRefs)
+    .filter((sourceRef) => sourceRef.startsWith("docs/")))].sort();
+  const projectedDocumentation = buildCanonicalDocumentationProjection().documentation
+    .map((entry) => entry.sourceRef);
+  assert.deepEqual(projectedDocumentation, expectedDocumentation);
+  assert.equal(summary.documentationProjectionCount, expectedDocumentation.length);
   assert.deepEqual(
     buildCanonicalDocumentationProjection().documentation.filter((entry) =>
       entry.sourceRef === "docs/active/precision-foundation-p0-p4-20260924.md"),

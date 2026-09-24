@@ -1,21 +1,36 @@
 const RIVER_LOW_MAX_SCALERANK = 5;
 const RIVER_MID_MAX_SCALERANK = 7;
+const RIVER_HIGH_MAX_SCALERANK = 8;
+
+// Keep this token in the context-base cache signature and transform reuse decision.
+export function getRiverZoomBucket(k) {
+  const zoom = Math.max(0.0001, Number(k) || 1);
+  if (zoom < 1.4) return "low";
+  if (zoom < 2.5) return "mid";
+  if (zoom < 5) return "high";
+  return "detail";
+}
 
 const RIVER_ZOOM_STYLE_FACTORS = {
   low: {
-    coreWidthFactor: 1.2,
-    outlineWidthFactor: 0.85,
-    outlineAlphaFactor: 0.6,
+    coreWidthFactor: 1.3,
+    outlineWidthFactor: 0.55,
+    outlineAlphaFactor: 0.38,
   },
   mid: {
-    coreWidthFactor: 1,
-    outlineWidthFactor: 0.7,
-    outlineAlphaFactor: 0.7,
+    coreWidthFactor: 1.2,
+    outlineWidthFactor: 0.5,
+    outlineAlphaFactor: 0.42,
   },
   high: {
-    coreWidthFactor: 0.75,
+    coreWidthFactor: 1.2,
+    outlineWidthFactor: 0.4,
+    outlineAlphaFactor: 0.35,
+  },
+  detail: {
+    coreWidthFactor: 1.3,
     outlineWidthFactor: 0.35,
-    outlineAlphaFactor: 0.45,
+    outlineAlphaFactor: 0.3,
   },
 };
 
@@ -56,7 +71,6 @@ export function createRiverLayerRenderOwner({
     clamp,
     collectContextMetric,
     getContext = () => null,
-    getContextBaseZoomBucketId,
     getDashPattern,
     getFeatureCollectionFeatureCount,
     getPathCanvas = () => null,
@@ -66,7 +80,7 @@ export function createRiverLayerRenderOwner({
   } = helpers;
 
   function getRiverZoomStyleFactors(k) {
-    return RIVER_ZOOM_STYLE_FACTORS[getContextBaseZoomBucketId(k)] || RIVER_ZOOM_STYLE_FACTORS.mid;
+    return RIVER_ZOOM_STYLE_FACTORS[getRiverZoomBucket(k)];
   }
 
   function isHgoVectorSceneActive() {
@@ -97,9 +111,8 @@ export function createRiverLayerRenderOwner({
     }
   }
 
-  function getRiverVisibilityProfile(feature, k) {
+  function getRiverVisibilityProfile(feature) {
     const props = feature?.properties || {};
-    const zoomBucket = getContextBaseZoomBucketId(k);
     const classKind = getRiverClassKind(feature);
     const rawScalerank = Number(props.scalerank ?? props.SCALERANK ?? 8);
     const scalerank = clamp(
@@ -108,35 +121,51 @@ export function createRiverLayerRenderOwner({
       12,
     );
     const minZoom = Number(props.min_zoom ?? props.minZoom);
-    let visible = false;
-
-    if (zoomBucket === "low") {
-      visible = classKind === "river" && scalerank <= RIVER_LOW_MAX_SCALERANK;
-    } else if (zoomBucket === "mid") {
-      visible = classKind === "river"
-        && (
-          scalerank <= RIVER_MID_MAX_SCALERANK
-          || (
-            scalerank === RIVER_MID_MAX_SCALERANK + 1
-            && Number.isFinite(minZoom)
-            && minZoom <= 5
-          )
-        );
-    } else {
-      visible = classKind !== "unknown";
-    }
-
     const classStyle = RIVER_CLASS_STYLE_FACTORS[classKind] || RIVER_CLASS_STYLE_FACTORS.unknown;
+    const rankWidthFactor = scalerank <= 5 ? 1.15 : scalerank <= 7 ? 1 : scalerank === 8 ? 0.85 : 0.75;
     return {
-      visible,
-      zoomBucket,
       classKind,
       scalerank,
       minZoom: Number.isFinite(minZoom) ? minZoom : null,
-      widthFactor: classStyle.widthFactor,
-      opacityFactor: classStyle.opacityFactor,
-      outlineFactor: classStyle.outlineFactor,
+      widthFactor: classStyle.widthFactor * rankWidthFactor,
+      opacityFactor: classStyle.opacityFactor * (scalerank <= 7 ? 1 : 0.82),
+      outlineFactor: classStyle.outlineFactor * (scalerank <= 5 ? 1 : 0.45),
     };
+  }
+
+  function getFirstVisibleBucket(profile) {
+    if (profile.classKind === "river") {
+      if (profile.scalerank <= RIVER_LOW_MAX_SCALERANK) return "low";
+      if (profile.scalerank <= RIVER_MID_MAX_SCALERANK
+        || (profile.scalerank === RIVER_HIGH_MAX_SCALERANK && profile.minZoom !== null && profile.minZoom <= 5)) return "mid";
+      return profile.scalerank <= RIVER_HIGH_MAX_SCALERANK ? "high" : "detail";
+    }
+    if (profile.classKind === "intermittent") return profile.scalerank <= 6 ? "high" : "detail";
+    if (profile.classKind === "canal") return "detail";
+    // Lake centerlines run through lake polygons and clutter the water surface.
+    return null;
+  }
+
+  let classifiedData = null;
+  let candidatesByBucket = null;
+  function getCandidates(bucket) {
+    const data = runtimeState.riversData;
+    if (classifiedData !== data || !candidatesByBucket) {
+      const tiers = { low: [], mid: [], high: [], detail: [] };
+      for (const feature of data.features) {
+        const profile = getRiverVisibilityProfile(feature);
+        const firstBucket = getFirstVisibleBucket(profile);
+        if (firstBucket) tiers[firstBucket].push({ feature, profile });
+      }
+      candidatesByBucket = {
+        low: tiers.low,
+        mid: [...tiers.low, ...tiers.mid],
+        high: [...tiers.low, ...tiers.mid, ...tiers.high],
+        detail: [...tiers.low, ...tiers.mid, ...tiers.high, ...tiers.detail],
+      };
+      classifiedData = data;
+    }
+    return candidatesByBucket[bucket];
   }
 
   function recordDeferredRiversLayerMetric({ interactive = false, reason = "staged-apply" } = {}) {
@@ -189,10 +218,9 @@ export function createRiverLayerRenderOwner({
     const zoomStyle = getRiverZoomStyleFactors(k);
     const visibleEntries = [];
 
-    runtimeState.riversData.features.forEach((feature) => {
+    const zoomBucket = getRiverZoomBucket(k);
+    getCandidates(zoomBucket).forEach(({ feature, profile }) => {
       if (!pathBoundsInScreen(feature)) return;
-      const profile = getRiverVisibilityProfile(feature, k);
-      if (!profile.visible) return;
       visibleEntries.push({ feature, profile });
     });
 
@@ -273,7 +301,7 @@ export function createRiverLayerRenderOwner({
     collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
       featureCount,
       visibleFeatureCount: visibleEntries.length,
-      zoomBucket: getContextBaseZoomBucketId(k),
+      zoomBucket,
       coreWidthFactor: zoomStyle.coreWidthFactor,
       outlineWidthFactor: zoomStyle.outlineWidthFactor,
       outlineAlphaFactor: zoomStyle.outlineAlphaFactor,
