@@ -1,8 +1,10 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
+import { pageResourceBudget } from "./runtime_resource_budget.js";
 import "./geometry_transfer_codec_shared.js";
 
 const WORKER_URL = new URL("../workers/geometry_raster.worker.js", import.meta.url);
 const closeResult = (result) => result?.bitmap?.close?.();
+const measuredBytes = (value) => Number.isSafeInteger(value) && value >= 0 ? value : null;
 
 // One active request plus the latest request for each surface. Geometry is
 // acknowledged separately from frame currentness, so a stale frame cannot
@@ -12,9 +14,13 @@ export function createGeometryRasterWorkerClient({
   isSupported = () => typeof Worker === "function" && typeof OffscreenCanvas === "function"
     && typeof Path2D === "function",
   onMetric = () => {},
+  resourceBudget = pageResourceBudget,
 } = {}) {
   let disabled = false;
   let active = null;
+  const resourceOwner = Symbol("geometry-raster-worker");
+  const transferOwner = Symbol("geometry-raster-transfer");
+  const surfaceBytesByKind = new Map();
   // geometryStoreKey: tracks which scene the worker's geometry store belongs to.
   // This is the sceneKey supplied by the runtime owner (activeScenarioId +
   // sceneGeneration only), NOT the full frame identity, so that topology/data
@@ -88,6 +94,10 @@ export function createGeometryRasterWorkerClient({
       const packingStartedAt = performance.now();
       const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(updates);
       const packingMs = performance.now() - packingStartedAt;
+      const transferBytes = transport.transferables.reduce((sum, buffer) => sum + buffer.byteLength, 0);
+      // These transferred buffers remain live while the receiver consumes them.
+      // This is a temporary reservation, not another persistent geometry copy.
+      resourceBudget.update(transferOwner, { decodeTransient: measuredBytes(transferBytes) });
       result = await client.dispatchTask("RENDER_GEOMETRY", {
         packet: { ...input, entries, geometryUpdates: transport.transferables.length ? null : updates,
           geometryTransport: transport.transferables.length ? transport.payload : null, resetGeometry },
@@ -102,6 +112,14 @@ export function createGeometryRasterWorkerClient({
       geometryStoreKey = task.input.sceneKey;
       geometryRefs = nextRefs;
       geometryIdsByKind = nextIdsByKind;
+      surfaceBytesByKind.set(task.input.kind, measuredBytes(task.input.width * task.input.height * 4));
+      resourceBudget.update(resourceOwner, {
+        workerGeometry: measuredBytes(result.cacheBudget?.geometry?.estimatedBytes),
+        projectedPaths: measuredBytes(result.cacheBudget?.paths?.estimatedBytes),
+        workerSurfaces: [...surfaceBytesByKind.values()].some((bytes) => bytes === null)
+          ? null : [...surfaceBytesByKind.values()].reduce((sum, bytes) => sum + bytes, 0),
+      });
+      resourceBudget.release(transferOwner);
       metric("geometryWorkerRoundTrip", performance.now() - startedAt, {
         kind: task.input.kind, geometryUploads: updates.filter((update) => update.feature).length,
         geometryRemovals: updates.filter((update) => !update.feature).length, retainedGeometryCount: nextRefs.size, entries: entries.length,
@@ -109,6 +127,7 @@ export function createGeometryRasterWorkerClient({
         yieldCount: result?.yieldCount || 0,
         packingMs, unpackingMs: result?.unpackingMs || 0,
         cacheBudget: result?.cacheBudget || null, geometryEvictions: result?.evictedGeometryIds?.length || 0,
+        sharedResources: resourceBudget.snapshot(),
       });
       task.resolve(result);
     } catch (error) {
@@ -124,7 +143,10 @@ export function createGeometryRasterWorkerClient({
       for (const pending of queued.values()) pending.resolve(null);
       queued.clear();
       client.terminate();
+      surfaceBytesByKind.clear();
+      resourceBudget.release(resourceOwner);
     } finally {
+      resourceBudget.release(transferOwner);
       liveTaskIds.clear();
       if (active === task) active = null;
       const next = queued.values().next().value;
@@ -163,6 +185,9 @@ export function createGeometryRasterWorkerClient({
     client.terminate();
     geometryRefs.clear();
     geometryIdsByKind.clear();
+    surfaceBytesByKind.clear();
+    resourceBudget.release(resourceOwner);
+    resourceBudget.release(transferOwner);
     geometryStoreKey = null;
   }
 
