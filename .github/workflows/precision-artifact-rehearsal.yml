@@ -27,6 +27,12 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
+      - name: Install locked builder and browser dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npx playwright install chromium
       - name: Partition and recovery negative tests
         shell: bash
         run: |
@@ -39,10 +45,8 @@ jobs:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/artifact-rehearsal-input/source
         run: |
           set -euo pipefail
-          python tools/build_pages_dist.py --output-root .runtime/artifact-rehearsal-input/source
+          python tools/build_pages_dist.py --output-root .runtime/artifact-rehearsal-input/source 2>&1 | tee .runtime/artifact-rehearsal-evidence/build.log
           python -m unittest tests.test_pages_dist_startup_shell -v 2>&1 | tee .runtime/artifact-rehearsal-evidence/shell.log
-          npm ci --no-audit --no-fund
-          npx playwright install chromium
       - name: Smoke the real source artifact and record its actual receipt
         shell: bash
         env:
