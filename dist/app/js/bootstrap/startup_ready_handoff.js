@@ -320,23 +320,26 @@ export function createStartupReadyHandoffOwner({
     if (targetRuntime.bootBlocking || postReadyContextWarmupScheduled) {
       return;
     }
-    const requestedLayerNames = [];
-    const requestedContourLayerNames = [];
-    if (targetRuntime.showRivers) {
-      requestedLayerNames.push("rivers");
-    }
-    if (targetRuntime.showUrban) {
-      requestedLayerNames.push("urban");
-    }
-    if (targetRuntime.showPhysical) {
-      requestedLayerNames.push("physical-set");
-      if (normalizePhysicalStyleConfig(targetRuntime.styleConfig?.physical).mode !== "atlas_only") {
-        requestedContourLayerNames.push("physical-contours-set");
+    const readContextDemand = () => {
+      const requestedLayerNames = [];
+      const requestedContourLayerNames = [];
+      if (targetRuntime.showRivers) {
+        requestedLayerNames.push("rivers");
       }
-    }
-    const shouldWarmCities =
-      targetRuntime.showCityPoints !== false
-      && targetRuntime.baseCityDataState === "idle";
+      if (targetRuntime.showUrban) {
+        requestedLayerNames.push("urban");
+      }
+      if (targetRuntime.showPhysical) {
+        requestedLayerNames.push("physical-set");
+        if (normalizePhysicalStyleConfig(targetRuntime.styleConfig?.physical).mode !== "atlas_only") {
+          requestedContourLayerNames.push("physical-contours-set");
+        }
+      }
+      const shouldWarmCities = targetRuntime.showCityPoints !== false
+        && targetRuntime.baseCityDataState === "idle";
+      return { requestedLayerNames, requestedContourLayerNames, shouldWarmCities };
+    };
+    const { requestedLayerNames, requestedContourLayerNames, shouldWarmCities } = readContextDemand();
     if (!requestedLayerNames.length && !shouldWarmCities) {
       return;
     }
@@ -346,19 +349,27 @@ export function createStartupReadyHandoffOwner({
       if (targetRuntime.bootBlocking) {
         return;
       }
-      const tasks = [];
-      if (requestedLayerNames.length) {
-        tasks.push(ensureContextLayerDataReady(requestedLayerNames, {
-          taskContext: task,
-          reason: "post-ready",
-          renderNow: false,
-        }));
+      // Visibility can change while queued. Re-read it before every optional
+      // load and yield between layers, rather than launching a second unbounded
+      // Promise.all beside the existing precision chunk scheduler.
+      let loaded = false;
+      for (const layer of requestedLayerNames) {
+        task.throwIfStale();
+        if (!readContextDemand().requestedLayerNames.includes(layer)) continue;
+        await task.waitFor(Promise.allSettled([ensureContextLayerDataReady([layer], {
+          taskContext: task, reason: "post-ready", renderNow: false,
+        })]));
+        loaded = true;
+        await task.yield();
       }
-      if (shouldWarmCities && targetRuntime.baseCityDataState === "idle") {
-        tasks.push(ensureBaseCityDataReady({ reason: "post-ready", renderNow: false, taskContext: task }));
+      task.throwIfStale();
+      if (readContextDemand().shouldWarmCities) {
+        await task.waitFor(Promise.allSettled([ensureBaseCityDataReady({
+          reason: "post-ready", renderNow: false, taskContext: task,
+        })]));
+        loaded = true;
       }
-      await task.waitFor(Promise.allSettled(tasks));
-      task.commit(() => requestMainRender("post-ready-context-warmup"));
+      if (loaded) task.commit(() => requestMainRender("post-ready-context-warmup"));
     }, scopedTaskOptions({
       timeout: 1600,
       delayMs: 900,

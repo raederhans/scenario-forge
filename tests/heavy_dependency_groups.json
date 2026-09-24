@@ -17,6 +17,7 @@
       "tests/test_france_precision.py",
       "tests/test_france_topology_precision.py",
       "tests/test_global_transport_builder_contracts.py",
+      "tests/test_global_lakes.py",
       "tests/test_landing_map_asset_contracts.py",
       "tests/test_local_canonicalization.py",
       "tests/test_nordic_water_seed.py",

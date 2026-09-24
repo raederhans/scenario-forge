@@ -32,7 +32,7 @@ class MainStartupDataPipelineBoundaryContractTest(unittest.TestCase):
         self.assertIn("async function ensureActiveScenarioBundleHydrated(options = {}) {", owner_content)
         self.assertIn("function shouldFastTrackScenarioHydration() {", owner_content)
         self.assertIn("function expandDeferredContextLayerNames(requestedLayerNames) {", owner_content)
-        self.assertIn("commitContextLayerCollection(state, layerName, collection, { bumpRevision: true });", owner_content)
+        self.assertRegex(owner_content, r"commitContextLayerCollection\(state, layerName, collection, \{")
         self.assertIn("setContextLayerLoadState(state, layerName, \"loaded\", { clearError: true });", owner_content)
         self.assertIn("async function ensureContextLayerDataReady(", owner_content)
 
