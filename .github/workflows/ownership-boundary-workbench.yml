@@ -20,25 +20,16 @@ jobs:
             js
             tests
             tools
-            map_backend
-            backend
-            scenario_builder
-            map_builder
-            ops
-            .github
-            app
-            css
-            vendor
-            docs
-      - name: Package tracked source for isolated verification
+      - name: Package exact metadata imported by source modules
         run: |
-          mkdir -p .runtime/tmp
-          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
-          tar --exclude=.git --exclude=.runtime --exclude=data --exclude=dist -czf .runtime/tmp/source.tgz .
+          mkdir -p .runtime/tmp/metadata
+          for path in data/runtime_asset_registry.json data/country_feature_policies.json data/CATALOG.json data/thematic_layers/index.json data/city_lights/historical_1930_entries.json; do
+            mkdir -p ".runtime/tmp/metadata/$(dirname "$path")"
+            git show "HEAD:$path" > ".runtime/tmp/metadata/$path"
+          done
+          tar -czf .runtime/tmp/metadata.tgz -C .runtime/tmp/metadata .
       - uses: actions/upload-artifact@v4
         with:
-          name: ownership-boundary-source
-          path: |
-            .runtime/tmp/source.tgz
-            .runtime/tmp/tracked-tree.txt
+          name: ownership-boundary-metadata
+          path: .runtime/tmp/metadata.tgz
           retention-days: 1
