@@ -107,6 +107,8 @@ export function createGeometryRasterWorkerClient({
         geometryRemovals: updates.filter((update) => !update.feature).length, retainedGeometryCount: nextRefs.size, entries: entries.length,
         workerMs: result?.renderMs || 0, pathBuildCount: result?.pathBuildCount || 0,
         yieldCount: result?.yieldCount || 0,
+        rasterizedCount: result?.renderedCount ?? null,
+        clearedPixelCount: result?.clearedPixelCount ?? null,
         packingMs, unpackingMs: result?.unpackingMs || 0,
         cacheBudget: result?.cacheBudget || null, geometryEvictions: result?.evictedGeometryIds?.length || 0,
       });
