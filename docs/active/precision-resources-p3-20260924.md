@@ -66,3 +66,17 @@ no controlled end-to-end improvement percentage and no data publication approval
 Integration: PR #155 and #157 append independent verification records. Preserve
 those additions when combining their catalog changes with this PR's expanded
 existing scheduler route; do not replace one branch's whole catalog with another.
+
+## Local integration, 2026-09-24
+
+The local integration owner merged main through #160 without changing its lake
+or river data. Resource budget, worker accounting, worker client, chunk scheduler
+and verification metadata tests pass together: 80 tests, zero failures/skips.
+The owner runs tests and servers serially; delegated reviews are read-only.
+Logs: `.runtime/tmp/pr158-161-closeout/resource-tests.log`.
+
+The documentation projection assertion now compares the exact unique authored
+documentation source set instead of a stale literal count. It still rejects
+missing, extra or duplicate projected entries. This resolves the common CI
+failure in #158/#159/#161 without weakening coverage. Current-head hosted checks
+and final integrated deployment remain separate acceptance steps.
