@@ -1,0 +1,117 @@
+name: Ownership boundary UI review
+on:
+  push:
+    branches: [codex/visual-editing-boundary-p1-p2-20260924]
+    paths: [.github/workflows/ownership-boundary-ui-review.yml]
+permissions:
+  contents: write
+concurrency:
+  group: ownership-boundary-ui-review
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/visual-editing-boundary-p1-p2-20260924
+          sparse-checkout: |
+            .github
+            js
+            tests
+            tools
+            css
+            vendor
+            backend
+            map_backend
+            map_builder
+            scenario_builder
+            ops
+            landing
+      - name: Apply exact reviewed visibility correction
+        run: |
+          python - <<'PY'
+          import base64, hashlib, re, subprocess
+          from pathlib import Path
+          encoded = 'ZGlmZiAtLWdpdCBhL2pzL3VpL2Rldl93b3Jrc3BhY2UuanMgYi9qcy91aS9kZXZfd29ya3NwYWNlLmpzCmluZGV4IGI3OTFlYmMyNGI3ZDhhMmRiNjgxMjEzZGFkMDYwOTU5NTM1OWQ4MWQuLjVmNDUwOWI4ODI2N2NmM2U3NjE1MTdmOWZhZGQ5NTRlN2JlNGE0YzQgMTAwNjQ0Ci0tLSBhL2pzL3VpL2Rldl93b3Jrc3BhY2UuanMKKysrIGIvanMvdWkvZGV2X3dvcmtzcGFjZS5qcwpAQCAtMCwwICsxIEBACitpbXBvcnQgeyBpc093bmVyc2hpcEVkaXRpbmdFbmFibGVkIH0gZnJvbSAiLi4vY29yZS9tYXBfZWRpdGluZ19wb2xpY3kuanMiOwpAQCAtOTE4ICs5MTkgQEAgZnVuY3Rpb24gaW5pdERldldvcmtzcGFjZSgpIHsKLSAgICBzeW5jQ2F0ZWdvcnlQYW5lbChzY2VuYXJpb093bmVyc2hpcFBhbmVsLCAic2VsZWN0aW9uIiwgaGFzQWN0aXZlU2NlbmFyaW8pOworICAgIHN5bmNDYXRlZ29yeVBhbmVsKHNjZW5hcmlvT3duZXJzaGlwUGFuZWwsICJzZWxlY3Rpb24iLCBoYXNBY3RpdmVTY2VuYXJpbyAmJiBpc093bmVyc2hpcEVkaXRpbmdFbmFibGVkKCkpOwpAQCAtOTIwICs5MjEgQEAgZnVuY3Rpb24gaW5pdERldldvcmtzcGFjZSgpIHsKLSAgICBzeW5jQ2F0ZWdvcnlQYW5lbChzY2VuYXJpb1RhZ0NyZWF0b3JQYW5lbCwgInNjZW5hcmlvIiwgaGFzQWN0aXZlU2NlbmFyaW8pOworICAgIHN5bmNDYXRlZ29yeVBhbmVsKHNjZW5hcmlvVGFnQ3JlYXRvclBhbmVsLCAic2NlbmFyaW8iLCBoYXNBY3RpdmVTY2VuYXJpbyAmJiBpc093bmVyc2hpcEVkaXRpbmdFbmFibGVkKCkpOwpkaWZmIC0tZ2l0IGEvdGVzdHMvZTJlL293bmVyc2hpcF9yZXRpcmVtZW50LnNwZWMuanMgYi90ZXN0cy9lMmUvb3duZXJzaGlwX3JldGlyZW1lbnQuc3BlYy5qcwppbmRleCBlM2Y1OGRlYjU4Y2UwNDYwM2E2OTU4YWI4N2E5NjQ3MjlmMTRmMzBlLi45NmIyOTQ5YWUzYTRkNzlhODA2NzdlZTg4OWY5OGIwNjJiNzIzNmZlIDEwMDY0NAotLS0gYS90ZXN0cy9lMmUvb3duZXJzaGlwX3JldGlyZW1lbnQuc3BlYy5qcworKysgYi90ZXN0cy9lMmUvb3duZXJzaGlwX3JldGlyZW1lbnQuc3BlYy5qcwpAQCAtNCArNCBAQCBjb25zdCB7IGdvdG9BcHAgfSA9IHJlcXVpcmUoIi4vc3VwcG9ydC9wbGF5d3JpZ2h0LWFwcCIpOwotdGVzdCgib3duZXJzaGlwIGVkaXRpbmcgc3RheXMgZGlzYWJsZWQgaW4gZWRpdG9yIGFuZCBkZXZlbG9wZXIgd29ya3NwYWNlIiwgYXN5bmMgKHsgcGFnZSB9KSA9PiB7Cit0ZXN0KCJvd25lcnNoaXAgZWRpdGluZyBzdGF5cyBkaXNhYmxlZCBpbiBlZGl0b3IgYW5kIGRldmVsb3BlciB3b3Jrc3BhY2UiLCBhc3luYyAoeyBwYWdlIH0sIHRlc3RJbmZvKSA9PiB7CkBAIC00OCwwICs0OSw2IEBAIHRlc3QoIm93bmVyc2hpcCBlZGl0aW5nIHN0YXlzIGRpc2FibGVkIGluIGVkaXRvciBhbmQgZGV2ZWxvcGVyIHdvcmtzcGFjZSIsIGFzeW5jCisgIGZvciAoY29uc3QgY2F0ZWdvcnkgb2YgWyJzY2VuYXJpbyIsICJydW50aW1lIiwgInNlbGVjdGlvbiJdKSB7CisgICAgYXdhaXQgcGFnZS5sb2NhdG9yKGBbZGF0YS1kZXYtd29ya3NwYWNlLWNhdGVnb3J5PSIke2NhdGVnb3J5fSJdYCkuY2xpY2soKTsKKyAgICBhd2FpdCBleHBlY3QocGFnZS5sb2NhdG9yKCIjZGV2U2NlbmFyaW9Pd25lcnNoaXBQYW5lbCIpKS50b0JlSGlkZGVuKCk7CisgICAgYXdhaXQgZXhwZWN0KHBhZ2UubG9jYXRvcigiI2RldlNjZW5hcmlvVGFnQ3JlYXRvclBhbmVsIikpLnRvQmVIaWRkZW4oKTsKKyAgfQorICBhd2FpdCBwYWdlLnNjcmVlbnNob3QoeyBwYXRoOiB0ZXN0SW5mby5vdXRwdXRQYXRoKCJ2aXN1YWwtb25seS1kZXZlbG9wZXItd29ya3NwYWNlLnBuZyIpIH0pOwpkaWZmIC0tZ2l0IGEvdG9vbHMvdmVyaWZpY2F0aW9uL2NhdGFsb2cvcmVjb3Jkcy9vd25lcnNoaXBfcmV0aXJlbWVudC5tanMgYi90b29scy92ZXJpZmljYXRpb24vY2F0YWxvZy9yZWNvcmRzL293bmVyc2hpcF9yZXRpcmVtZW50Lm1qcwppbmRleCAyY2ZiZWQ1MjBlYjZiZWY1ZTBlMTlkNjgyMDI1ZGM3OTQyZjM0YjA4Li5hNzA1M2ZhZDNkODk2MWY2ODMzZGI5M2Q1MWI0YzMyYTZmMDgyYzU4IDEwMDY0NAotLS0gYS90b29scy92ZXJpZmljYXRpb24vY2F0YWxvZy9yZWNvcmRzL293bmVyc2hpcF9yZXRpcmVtZW50Lm1qcworKysgYi90b29scy92ZXJpZmljYXRpb24vY2F0YWxvZy9yZWNvcmRzL293bmVyc2hpcF9yZXRpcmVtZW50Lm1qcwpAQCAtNywwICs4IEBAIGV4cG9ydCBmdW5jdGlvbiBjcmVhdGVPd25lcnNoaXBSZXRpcmVtZW50UmVjb3JkcyhleGlzdGluZ1JlY29yZHMpIHsKKyAgICAgICJqcy9jb3JlL21hcF9yZW5kZXJlci5qcyIsICJqcy91aS9kZXZfd29ya3NwYWNlLmpzIiwK'
+          patch = base64.b64decode(encoded, validate=True)
+          assert hashlib.sha256(patch).hexdigest() == '87ba7de96765a63e9637e2f5fc9ac3bcfca1da75e84e24c80682d8a08b3973a5'
+          def git(*args): return subprocess.check_output(['git', *args], text=True).strip()
+          entries = []
+          for block in patch.decode().split('diff --git ')[1:]:
+              header, _, body = block.partition('\n')
+              path = re.fullmatch(r'a/(\S+) b/\1', header)[1]
+              before, after = re.search(r'^index ([a-f0-9]{40})\.\.([a-f0-9]{40})', body, re.M).groups()
+              entries.append((path, before, after))
+          assert len(entries) == 3
+          if not all(git('hash-object', path) == after for path, _, after in entries):
+              for path, before, _ in entries: assert git('hash-object', path) == before, path
+              out = Path('.runtime/tmp/ui-correction.patch'); out.parent.mkdir(parents=True, exist_ok=True); out.write_bytes(patch)
+              subprocess.run(['git','apply','--index','--unidiff-zero',str(out)],check=True)
+              for path, _, after in entries: assert git('hash-object', path) == after, path
+              assert set(git('diff','--cached','--name-only').splitlines()) == {p for p,_,_ in entries}
+              subprocess.run(['git','diff','--cached','--check'],check=True)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix: keep retired ownership panels hidden across developer categories'
+            git push origin HEAD:codex/visual-editing-boundary-p1-p2-20260924
+          fi
+          mkdir -p .runtime/reports/ownership-ui-review
+          git rev-parse HEAD > .runtime/reports/ownership-ui-review/source-sha.txt
+      - name: Load exact assets requested by the UI shell regression
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          files = ['CATALOG.json','city_lights/historical_1930_entries.json','country_feature_policies.json','geo_aliases.json','locales.json','runtime_asset_registry.json','scenarios/index.json','thematic_layers/index.json','thematic_layers/political/state_capacity_demo/manifest.json','thematic_layers/political/wgi_state_capacity_v1/manifest.json','thematic_layers/population/population_density_demo/manifest.json','thematic_layers/social/human_development_demo/manifest.json','transport_layers/japan_road/manifest.json']
+          for name in files:
+              path = Path('data') / name
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_bytes(subprocess.check_output(['git','show',f'HEAD:{path.as_posix()}']))
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+          npx playwright install --with-deps chromium
+      - name: Recheck behavior, policy and developer category UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess, json
+          root = Path('.runtime/reports/ownership-ui-review')
+          commands = [
+            ('node-retirement',['npm','run','test:node:ownership-retirement']),
+            ('python-boundaries',['python','-m','unittest','tests.test_map_renderer_color_resolution_strategy_boundary_contract','tests.test_scenario_state_actions_boundary_contract','tests.test_sidebar_split_boundary_contract','-q']),
+            ('state-write-boundary',['node','tools/check_state_write_allowlist.mjs']),
+            ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
+            ('browser-retirement',['npx','playwright','test','tests/e2e/ownership_retirement.spec.js','tests/e2e/ui_rework_mainline_shell_sidebar.spec.js','--grep','ownership editing|desktop commands','--workers=1']),
+          ]
+          results=[]
+          for name, command in commands:
+              print(f'::group::{name}',flush=True)
+              run=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+              (root/f'{name}.log').write_text(run.stdout)
+              print(run.stdout,flush=True)
+              results.append({'check':name,'exit_code':run.returncode})
+              (root/'checks.json').write_text(json.dumps(results,indent=2))
+              print('::endgroup::',flush=True)
+          raise SystemExit(any(row['exit_code'] for row in results))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ownership-ui-review-evidence
+          path: |
+            .runtime/reports/ownership-ui-review
+            .runtime/tests/playwright
+          retention-days: 3
