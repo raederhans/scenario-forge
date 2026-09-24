@@ -8,6 +8,7 @@ on:
       - "js/core/data_service.js"
       - "tests/transport_lifetime_behavior.test.mjs"
       - "tests/data_service_cancellation_behavior.test.mjs"
+      - "tools/probe_transport_lifetime.mjs"
 permissions:
   contents: read
 concurrency:
@@ -30,12 +31,13 @@ jobs:
         run: |
           set -euo pipefail
           npm ci --no-audit --no-fund
+          npx playwright install chromium
       - name: Actual lifetime scheduler and asset wrapper behavior
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p .runtime/transport-lifetime-evidence
-          node --test tests/transport_lifetime_behavior.test.mjs tests/data_service_runtime_behavior.test.mjs 2>&1 | tee .runtime/transport-lifetime-evidence/tests.log
+          node --test tests/transport_lifetime_behavior.test.mjs tests/data_service_cancellation_behavior.test.mjs tests/data_service_runtime_behavior.test.mjs 2>&1 | tee .runtime/transport-lifetime-evidence/tests.log
       - name: Existing transport behavior and source boundaries
         if: always()
         shell: bash
@@ -53,6 +55,13 @@ jobs:
           JS
           node tools/check_architecture_boundaries.mjs
           git diff --check 2b2f1fecf9c388616a01dfb10da5e372ea65b3dc HEAD
+      - name: Native canonical road preview lifecycle
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime/transport-lifetime-evidence
+          node tools/probe_transport_lifetime.mjs --report .runtime/transport-lifetime-evidence/canonical-road.json 2>&1 | tee .runtime/transport-lifetime-evidence/native.log
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
