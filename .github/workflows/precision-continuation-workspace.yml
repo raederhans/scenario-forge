@@ -37,17 +37,37 @@ jobs:
                   included = not name.startswith('dist/')
                   rows.append({'path': name, 'git_blob_sha': blob_sha, 'size_bytes': source.stat().st_size, 'included': included})
                   if included: z.write(source, name)
-          (out / 'inventory.json').write_text(json.dumps({'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': rows}, indent=2) + '\n', encoding='utf-8')
+          inventory = {'source_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': rows}
           with (out / 'workspace.zip').open('rb') as f: digest = hashlib.file_digest(f, 'sha256').hexdigest()
-          (out / 'sha256.txt').write_text(digest + '  workspace.zip\n', encoding='utf-8')
-          print('source_sha=2b2f1fecf9c388616a01dfb10da5e372ea65b3dc')
+          with (out / 'workspace.zip').open('rb') as f:
+              for index in range(3):
+                  part = out / str(index)
+                  part.mkdir()
+                  (part / ('workspace.part' + str(index))).write_bytes(f.read(230_000_000))
+                  (part / 'inventory.json').write_text(json.dumps(inventory, indent=2) + '\n', encoding='utf-8')
+                  (part / 'sha256.txt').write_text(digest + '  workspace.zip\n', encoding='utf-8')
+              if f.read(1): raise ValueError('Workspace needs more than three transport parts')
+          print('source_sha=' + inventory['source_sha'])
           print('workspace_sha256=' + digest)
-          print('included_files=' + str(sum(x['included'] for x in rows)))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: precision-continuation-workspace
-          path: .runtime/continuation-workspace/
+          name: precision-continuation-part0
+          path: .runtime/continuation-workspace/0/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: precision-continuation-part1
+          path: .runtime/continuation-workspace/1/
+          retention-days: 5
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: precision-continuation-part2
+          path: .runtime/continuation-workspace/2/
           retention-days: 5
           compression-level: 0
           if-no-files-found: error
