@@ -44,6 +44,12 @@
       "url": "data/europe_topology.runtime_political_v1.json",
       "role": "runtime_political_topology"
     },
+    "context_layer:lakes": {
+      "url": "data/global_lakes.geojson",
+      "role": "context_layer",
+      "family_id": "lakes",
+      "description": "Shared simplified lakes for every scenario; scenario-only Congo Lake stays in TNO."
+    },
     "context_layer:rivers": {
       "url": "data/global_rivers.geojson",
       "role": "context_layer",

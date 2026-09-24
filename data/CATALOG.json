@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-09-11T02:47:14.044292+00:00",
   "counts": {
-    "entries": 665,
+    "entries": 666,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -10,7 +10,7 @@
       "city_lights_entries": 1,
       "city_lights_source": 1,
       "city_overrides": 1,
-      "context_layer": 6,
+      "context_layer": 7,
       "country_feature_policies": 1,
       "detail_topology_na_v1": 1,
       "detail_topology_na_v2": 1,
@@ -64,14 +64,14 @@
     },
     "by_format": {
       "bmp": 1,
-      "geojson": 148,
+      "geojson": 149,
       "javascript": 2,
       "json": 343,
       "topojson": 171
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 662,
+      "json": 663,
       "module": 2
     }
   },
@@ -348,6 +348,22 @@
       "readMode": "json",
       "aliases": [
         "context_layer:physical_contours_minor"
+      ]
+    },
+    {
+      "key": "manifest_output:global_lakes.geojson",
+      "url": "data/global_lakes.geojson",
+      "role": "context_layer",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/polygon/v1",
+      "hashRef": "data/manifest.json::outputs::global_lakes.geojson::sha256",
+      "owner": "tools/build_global_lakes.py",
+      "cachePolicy": "default",
+      "sourceId": "global_lakes_natural_earth",
+      "readMode": "json",
+      "aliases": [
+        "context_layer:lakes",
+        "source:global_lakes_natural_earth"
       ]
     },
     {

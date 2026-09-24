@@ -1052,8 +1052,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       scenarioWaterExclusiveModeComesFromManifestWithLegacyAtlantropaDefault:
         /function getScenarioWaterRegionsMode\(\) \{[\s\S]*?runtimeState\.activeScenarioManifest\?\.water_regions_mode[\s\S]*?SCENARIO_PRESENTATION_FEATURES\.ATLANTROPA_RELIEF[\s\S]*?return "exclusive";[\s\S]*?return "combined";[\s\S]*?\}/.test(rendererSource)
         && /function isScenarioWaterTopologyExclusiveMode\(\) \{[\s\S]*?return getScenarioWaterRegionsMode\(\) === "exclusive";[\s\S]*?\}/.test(rendererSource),
-      tnoWaterUsesScenarioCollectionOnly:
-        /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?if \(isScenarioWaterTopologyExclusiveMode\(\)\) \{[\s\S]*?return sanitizeWaterRegionFeatures\(scenarioFeatures\.filter\(\(feature\) => !isWaterRegionExcludedByScenario\(feature\)\)\);/.test(rendererSource),
+      tnoWaterCombinesExclusiveScenarioMarineWithSharedLakes:
+        /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
       openOceanRenderAndInteractionUseActiveOverlayGate:
         /function isOpenOceanOverlayActive\(\) \{[\s\S]*?return isOpenOceanSelectionEnabled\(\) \|\| isOpenOceanPaintEnabled\(\);[\s\S]*?\}/.test(rendererSource)
         && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)

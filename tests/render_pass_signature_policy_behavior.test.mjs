@@ -126,6 +126,17 @@ test("urban screen paint invalidates on zoom within a reuse bucket but not on pa
   }
 });
 
+test("river detail tier changes the reusable context signature without changing the shared zoom bucket", () => {
+  const { state, live, policy } = createHarness({ getContextBaseZoomBucketId: () => "high" });
+  live.reuse = true;
+  state.showRivers = true;
+  const at = (k) => policy.getRenderPassSignature("contextBase", { k, x: 0, y: 0 });
+  assert.notEqual(at(4.9), at(5));
+  assert.equal(at(5), at(5.1));
+  state.showRivers = false;
+  assert.equal(at(4.9), at(5));
+});
+
 test("transport presentation changes invalidate shared labels without invalidating political pixels", () => {
   for (const change of [
     (state) => { state.showAirports = true; },
