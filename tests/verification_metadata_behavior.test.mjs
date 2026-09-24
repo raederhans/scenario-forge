@@ -369,7 +369,12 @@ test("authored catalog source covers command authority, policies, and every proj
   assert.equal(summary.packageAliasCount, 17);
   assert.equal(summary.prProfileCount, 4);
   assert.equal(summary.nightlyRoleCount, 12);
-  assert.equal(summary.documentationProjectionCount, 61);
+  assert.equal(summary.documentationProjectionCount, 62);
+  assert.deepEqual(
+    buildCanonicalDocumentationProjection().documentation.filter((entry) =>
+      entry.sourceRef === "docs/active/precision-foundation-p0-p4-20260924.md"),
+    [{ sourceRef: "docs/active/precision-foundation-p0-p4-20260924.md" }],
+  );
 });
 
 test("renderer split delivery records route to assembly verification", () => {
