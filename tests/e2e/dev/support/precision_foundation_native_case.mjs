@@ -1,4 +1,4 @@
-export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
+export async function runPrecisionFoundationNativeCase({ dpr = 1.5, separatedEdits = false } = {}) {
   await import('/vendor/d3.v7.min.js');
   const { createGeometryRasterRuntimeOwner } = await import('/js/core/renderer/geometry_raster_runtime_owner.js');
   const width = 960, height = 600;
@@ -14,6 +14,7 @@ export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
   ] } });
   const edited = new Set(features.filter((_, i) => i < 480 && i % 40 < 8).slice(0, 93).map(f => f.id));
   let color = '#dd4422', revision = 0;
+  const separatedColors = new Map();
   const projection = d3.geoEqualEarth().scale(300).translate([320, 200]);
   const path = d3.geoPath(projection);
   function create(patches) {
@@ -34,7 +35,7 @@ export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
         } } : {}),
         collectPoliticalItems: () => features.map(feature => ({ id: feature.id, feature })),
         orderPoliticalItems: items => items, excludeVisual: () => false, skipVisual: () => false,
-        resolveFillColor: (_, id) => id === 'overlap' ? '#11bb66' : edited.has(id) ? color : '#cccccc',
+        resolveFillColor: (_, id) => id === 'overlap' ? '#11bb66' : separatedEdits ? (separatedColors.get(id) || '#cccccc') : edited.has(id) ? color : '#cccccc',
         resolveStrokeColor: (_, fill) => fill, pointRadius: 2 },
       effects: { recordMetric: (...args) => metrics.push(args), requestRender() {} },
     });
@@ -42,7 +43,17 @@ export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
   }
   const incremental = create(true), reference = create(false), samples = [];
   try {
-    for (const nextColor of ['#dd4422', '#2244dd', '#dd4422', '#2244dd']) {
+    const nextColors = separatedEdits
+      ? ['#dd4422', '#2244dd', '#998833', '#33aabb', '#22dd44', '#993377', '#ddee33']
+      : ['#dd4422', '#2244dd', '#dd4422', '#2244dd'];
+    for (const [step, nextColor] of nextColors.entries()) {
+      if (separatedEdits) {
+        // Paint separated areas without reverting the other area. Its accepted
+        // pixels must survive every crop, including a hole and later overlap.
+        const column = step % 2 ? 28 : 0;
+        features.filter((_, i) => i < 480 && i % 40 >= column && i % 40 < column + 8)
+          .slice(0, 93).forEach(feature => separatedColors.set(feature.id, nextColor));
+      }
       color = nextColor; revision++;
       await Promise.all([incremental.owner.preparePolitical(), reference.owner.preparePolitical()]);
       for (const fixture of [incremental, reference]) {
@@ -67,7 +78,7 @@ export async function runPrecisionFoundationNativeCase({ dpr = 1.5 } = {}) {
     const stale = incremental.owner.preparePolitical();
     incremental.state.activeScenarioId = 'new-scene';
     await stale;
-    return { dpr, samples, editedCount: edited.size, patchesBeforePan, patchesAfterPan,
+    return { dpr, samples, clearedPixels: incremental.metrics.filter(([name]) => name === 'geometryWorkerRoundTrip').map(([, , data]) => data.clearedPixelCount), editedCount: edited.size, patchesBeforePan, patchesAfterPan,
       patchMetrics: incremental.metrics.filter(([name]) => name === 'geometryWorkerPoliticalPatch').map(([, , details]) => details),
       staleDraw: incremental.owner.drawPolitical(),
       staleResults: incremental.metrics.filter(([name]) => name === 'geometryWorkerStaleResult').length,

@@ -4,10 +4,11 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 from math import sin
 from shapely.geometry import Polygon, mapping, shape
 from shapely.ops import unary_union
-from tools.build_political_display_lods import simplify_coverage_features, build_overlay, coordinate_count
+from tools.build_political_display_lods import simplify_coverage_features, cached_simplify_coverage_features, build_overlay, coordinate_count
 
 
 def fixture():
@@ -71,6 +72,20 @@ class DisplayLodTests(unittest.TestCase):
         features[1]["properties"].clear()
         with self.assertRaises(ValueError): simplify_coverage_features(features, .02)
 
+    def test_cache_binds_property_order_and_preserves_protection_iterators(self):
+        with tempfile.TemporaryDirectory() as folder:
+            features = fixture()
+            cache = Path(folder)
+            _, _, first = cached_simplify_coverage_features(features, .02, [], cache_root=cache, stage_name="lod")
+            features[0]["properties"] = dict(reversed(list(features[0]["properties"].items())))
+            value, _, second = cached_simplify_coverage_features(features, .02, [], cache_root=cache, stage_name="lod")
+            self.assertNotEqual(first["key"], second["key"])
+            self.assertEqual(list(value[0]["properties"]), ["owner", "id"])
+            protected, report, _ = cached_simplify_coverage_features(
+                features, .02, iter(["a"]), cache_root=cache, stage_name="lod")
+            self.assertEqual(report["status"], "unchanged")
+            self.assertIs(protected, features)
+
     def test_staged_manifest_family_hash_bounds_and_source_bytes(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder) / "source"
@@ -109,6 +124,21 @@ class DisplayLodTests(unittest.TestCase):
                 actual = json.loads(data)["features"]
                 self.assertEqual([list(shape(f["geometry"]).bounds) for f in actual], chunk["feature_bounds"])
             self.assertEqual(before, {p: p.read_bytes() for p in before})
+            self.assertEqual(report["build_graph"]["cache_hits"], 0)
+            with patch("tools.build_political_display_lods.simplify_coverage_features",
+                       side_effect=AssertionError("warm build must not simplify again")):
+                warm = Path(folder) / "warm"
+                warm_report = build_overlay(root, "pilot", warm)
+            uncached = Path(folder) / "uncached"
+            uncached_report = build_overlay(root, "pilot", uncached, use_cache=False)
+            def artifacts(directory):
+                return {p.relative_to(directory).as_posix(): p.read_bytes()
+                        for p in (directory / "data").rglob("*") if p.is_file()}
+            self.assertEqual(artifacts(output), artifacts(warm))
+            self.assertEqual(artifacts(output), artifacts(uncached))
+            self.assertEqual(warm_report["build_graph"]["cache_hits"], 2)
+            self.assertFalse(uncached_report["build_graph"]["enabled"])
+            self.assertFalse(warm_report["build_graph"]["release_approved"])
             with self.assertRaises(ValueError): build_overlay(root, "pilot", root)
             with self.assertRaises(ValueError): build_overlay(root, "../pilot", output)
 
