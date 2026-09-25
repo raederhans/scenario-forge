@@ -2278,7 +2278,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
     "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
-    ...(includeRenderer ? ["test:node:startup-lifecycle"] : []),
+    ...(includeRenderer ? ["test:node:ownership-retirement", "test:node:startup-lifecycle"] : []),
   ];
 
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), expectedCommands);
@@ -2295,22 +2295,28 @@ test(`local projection preserves exact test routes with renderer scope ${include
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
     ...(includeRenderer ? ["node-test:tests/atlantropa_water_color_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/click_selection_transaction_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/country_source_border_meshes_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/dev_workspace_selection_ownership_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/exact_composite_reuse_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/export_target_resolution_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/history_feature_color_refresh_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/latency_preview_and_layers_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/legend_color_revision_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/map_data_boundary_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/ownership_retirement_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/physical_contour_visible_set_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/political_derived_state_cache_behavior.test.mjs"] : []),
-    ...(includeRenderer ? ["node-test:tests/quick_fill_history.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/quick_fill_hierarchy.test.mjs", "node-test:tests/quick_fill_history.test.mjs"] : []),
     "node-test:tests/render_change_set_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
+    ...(includeRenderer ? ["node-test:tests/scenario_import_trust_projection_behavior.test.mjs", "node-test:tests/scenario_state_actions_atomicity_behavior.test.mjs"] : []),
     ...(includeRenderer ? [
       "node-test:tests/startup_data_pipeline_lifecycle_behavior.test.mjs",
       "node-test:tests/startup_interaction_lifecycle_behavior.test.mjs",
       "node-test:tests/startup_ready_handoff_behavior.test.mjs",
+      "node-test:tests/toolbar_render_scheduler_behavior.test.mjs",
     ] : []),
     "python-unittest:tests.test_map_renderer_render_snapshot_boundary_contract",
   ]);

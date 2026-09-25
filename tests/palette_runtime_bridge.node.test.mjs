@@ -30,7 +30,9 @@ const patchedStateDefaultsSource = stateDefaultsSource
   .replace("./country_feature_policies.js", countryFeaturePoliciesDataUrl);
 const stateDefaultsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(patchedStateDefaultsSource)}`;
 const colorStateSource = await readFile(new URL("../js/core/state/color_state.js", import.meta.url), "utf8");
-const patchedColorStateSource = colorStateSource.replace("../state_defaults.js", stateDefaultsDataUrl);
+const patchedColorStateSource = colorStateSource
+  .replace("../state_defaults.js", stateDefaultsDataUrl)
+  .replace("../color_hex_utils.js", colorHexUtilsDataUrl);
 const colorStateModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedColorStateSource)}`);
 const colorResolverModule = await import(new URL("../js/core/color_resolver.js", import.meta.url));
 const colorHexUtilsModule = await import(new URL("../js/core/color_hex_utils.js", import.meta.url));

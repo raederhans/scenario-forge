@@ -119,33 +119,30 @@ test("parent and child navigation retain labels, swatches, and country targets",
   assert.equal(nodes(cards[1]).find((node) => node.tagName === "span").style.backgroundColor, "#abcdef");
   cards.forEach((card) => card.fire());
   assert.deepEqual(h.calls.filter(([name]) => name === "select"), [["select", "PP"], ["select", "CC"]]);
-  const section = nodes(h.root).find((node) => node.textContent === "Hierarchy Groups");
-  assert.equal(section.options.rememberKey, "territories-presets:hierarchy-groups");
-  assert.equal(section.children[0].textContent, "No hierarchy groups");
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "Hierarchy Groups"));
 });
 
-test("core path routes variants, activation and reapply without parent hierarchy", (t) => {
+test("core reference keeps visual actions while retired ownership actions are absent", (t) => {
   const h = harness(t);
   const target = country({ releasable: true, boundaryVariants: [{ id: " BASE ", label: "Base" }, { id: "alt", label: "Alternate" }] });
   h.render(target);
-  assert.equal(button(h.root, "Base").disabled, true);
-  assert.equal(button(h.root, "Base").title, "Already using this boundary variant.");
-  button(h.root, "Alternate").fire();
-  button(h.root, "Activate Releasable").fire();
-  button(h.root, "Reapply Core Territory").fire();
-  assert.ok(h.calls.some(([name]) => name === "transfers"));
+  const labels = nodes(h.root).filter((node) => node.tagName === "button").map((node) => node.textContent);
+  for (const label of ["Base", "Alternate", "Activate Releasable", "Reapply Core Territory"]) {
+    assert.ok(!labels.includes(label), `retired action remains absent: ${label}`);
+  }
+  button(h.root, "Apply Visual Color to Core Territory").fire();
+  assert.ok(!h.calls.some(([name]) => ["activate", "variant", "transfers"].includes(name)));
   assert.ok(!h.calls.some(([name]) => name === "presets"));
-  assert.deepEqual(h.calls.find(([name]) => name === "activate"), ["activate", target]);
-  assert.deepEqual(h.calls.find(([name]) => name === "variant"), ["variant", target, target.boundaryVariants[1]]);
-  assert.deepEqual(h.calls.find(([name]) => name === "core"), ["core", target, { source: "scenario-actions", actionMode: "ownership" }]);
+  assert.deepEqual(h.calls.find(([name]) => name === "core"), ["core", target, { source: "visual-adjustments", actionMode: "visual" }]);
 });
 
-test("non-releasable country may use core actions and still get country visuals", (t) => {
+test("non-releasable country retains reference painting without an ownership target action", (t) => {
   const h = harness(t, { hasScenarioCoreTerritoryActions: () => true });
   h.render(country());
-  button(h.root, "Target This Country").fire();
-  assert.equal(h.calls.filter(([name]) => name === "activate").length, 1);
-  assert.ok(button(h.root, "Paint Owned Regions With Country Color"));
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "Target This Country"));
+  button(h.root, "Paint Reference Regions With Country Color").fire();
+  assert.equal(h.calls.filter(([name]) => name === "activate").length, 0);
+  assert.equal(h.calls.filter(([name]) => name === "paintOwned").length, 1);
 });
 
 test("missing core disables visual core buttons and explains missing territory", (t) => {
@@ -153,7 +150,7 @@ test("missing core disables visual core buttons and explains missing territory",
   h.render(country({ releasable: true }));
   assert.equal(button(h.root, "Apply Visual Color to Core Territory").disabled, true);
   assert.equal(button(h.root, "Clear Core Territory Visual Overrides").disabled, true);
-  assert.equal(nodes(h.root).filter((node) => node.textContent === "No core territory defined").length, 2);
+  assert.equal(nodes(h.root).filter((node) => node.textContent === "No core territory defined").length, 1);
 });
 
 test("visual core actions preserve visual mode and filter clear targets to visible features", (t) => {
@@ -178,30 +175,29 @@ test("hierarchy visuals read click-time color and leave ownership routes untouch
   const visual = nodes(h.root).find((node) => node.textContent === "Hierarchy Groups (Visual Color)");
   h.view.selectedColor = "#fedcba";
   button(visual, "Group A").fire();
-  button(h.root, "Paint Owned Regions With Country Color").fire();
-  button(h.root, "Clear Owned Region Visual Overrides").fire();
+  button(h.root, "Paint Reference Regions With Country Color").fire();
+  button(h.root, "Clear Reference Region Color Edits").fire();
   const hierarchy = h.calls.filter(([name]) => name === "hierarchy");
   assert.equal(hierarchy.length, 1);
   assert.equal(hierarchy[0][2].mode, "visual");
   assert.equal(hierarchy[0][2].color, "#fedcba");
   assert.ok(!h.calls.some(([name]) => ["activate", "core", "variant", "paintMode"].includes(name)));
-  assert.deepEqual(h.calls.filter(([name]) => name === "presets").map((call) => call[3].mode), ["ownership", "visual"]);
+  assert.deepEqual(h.calls.filter(([name]) => name === "presets").map((call) => call[3].mode), ["visual"]);
 });
 
-test("ownership hierarchy keeps explicit owner and history metadata", (t) => {
+test("hierarchy exposes only a visual action even if stale view state requests ownership", (t) => {
   const h = harness(t);
   const group = { label: "Group A" };
   h.render(country({ hierarchyGroups: [group] }));
   button(h.root, "Group A").fire();
   const call = h.calls.find(([name]) => name === "hierarchy");
-  assert.equal(call[2].mode, "ownership");
-  assert.equal(call[2].ownerCode, "AA");
-  assert.equal(call[2].ownershipHistoryKind, "scenario-hierarchy-apply-ownership");
+  assert.equal(call[2].mode, "visual");
+  assert.equal(nodes(h.root).filter((node) => node.textContent === "Group A").length, 1);
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "Hierarchy Groups"));
 });
 
-test("disclosure persists open state and schedules layout; brush persists before mode switch", (t) => {
+test("color disclosure opens by default, records toggles, and has no ownership brush switch", (t) => {
   const h = harness(t);
-  h.view.visualOpen = true;
   h.render(country());
   const details = nodes(h.root).find((node) => node.tagName === "details");
   assert.equal(details.open, true);
@@ -210,10 +206,9 @@ test("disclosure persists open state and schedules layout; brush persists before
   details.fire("toggle");
   assert.equal(h.host.className, "");
   assert.deepEqual(h.calls.slice(-2), [["storeOpen", false], ["schedule"]]);
-  button(h.root, "Use Visual Color Brush").fire();
-  assert.deepEqual(h.calls.slice(-2), [["storeOpen", true], ["paintMode", "visual"]]);
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "Use Visual Color Brush"));
   h.view.paintMode = "visual";
   h.render(country());
-  button(h.root, "Return to Political Ownership Brush").fire();
-  assert.deepEqual(h.calls.slice(-2), [["storeOpen", true], ["paintMode", "ownership"]]);
+  assert.ok(!nodes(h.root).some((node) => node.textContent === "Return to Political Ownership Brush"));
+  assert.ok(!h.calls.some(([name]) => name === "paintMode"));
 });

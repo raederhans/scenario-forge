@@ -422,6 +422,7 @@ export function createScenarioInspectorController({
     }
 
     if (!isOwnershipEditingEnabled()) {
+      if (countryState.scenarioSubject) renderScenarioParentReturnAction(container, countryState);
       renderScenarioRelatedCountryGroups(container, countryState);
     } else if (hasScenarioCoreTerritoryActions(countryState)) {
       renderScenarioReleasableActions(container, countryState);
