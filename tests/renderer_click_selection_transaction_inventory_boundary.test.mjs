@@ -434,11 +434,11 @@ test("transaction owner keeps the global branch spine and branch-local order", (
     step.syncReadOnly("post-hydration state refresh", "state = getClickState();"),
     step.syncReadOnly("target expansion", "const targetIds = resolveInteractionTargetIds(feature, landId);"),
     step.syncReadOnly("preset admission", "if (state.isEditingPreset) {"),
-    step.syncReadOnly("eraser branch", "if (state.currentTool === \"eraser\") {"),
     step.syncReadOnly("eyedropper branch", "if (state.currentTool === \"eyedropper\") {"),
+    step.syncReadOnly("complete target admission", "if (!targetIds.length) {"),
+    step.syncReadOnly("eraser branch", "if (state.currentTool === \"eraser\") {"),
     step.syncReadOnly("fill color", "const selectedColor = getSafeCanvasColor(state.selectedColor, landFillColor);"),
-    step.syncEffectful("fill render", "requestInteractionRender(\"click-fill\");"),
-    step.syncEffectful("fill metric", "noteRenderAction(\"click-fill\", actionStart);"),
+    step.syncEffectful("visual fill transaction", "applyVisualSubdivisionFill(targetIds, selectedColor, {"),
   ], "owner handleClick must keep the global branch spine");
 
   const emptyBranch = sliceBetween(
@@ -516,16 +516,17 @@ test("land water special and empty click branches remain in the transaction owne
     "if (decision.devSelectionRequested) {",
     "const changedSelection = toggleFeatureInDevSelection(landId);",
     "await ensureLeafDetailReady(countryCode, { announce: true })",
-    "markDirty(\"erase-sovereignty\")",
-    "markDirty(\"erase-country-color\")",
-    "markDirty(\"erase-feature-color\")",
+    "const kind = countryScope ? \"erase-country-color\" : \"erase-feature-color\";",
+    "applyFeatureVisualOverrideTransaction(targetIds, null, {",
+    "markDirty(kind);",
     "requestInteractionRender(\"click-erase\")",
-    "markDirty(\"fill-sovereignty\")",
-    "markDirty(\"fill-country-color\")",
-    "requestInteractionRender(\"click-fill\")",
+    "const kind = countryScope ? \"fill-country-color\" : \"fill-feature-color\";",
+    "applyVisualSubdivisionFill(targetIds, selectedColor, {",
   ]) {
     assertIncludes(handleClickSource, token, "handleClick must keep current click branch token");
   }
+  assert.equal(handleClickSource.includes("fill-sovereignty"), false);
+  assert.equal(handleClickSource.includes("erase-sovereignty"), false);
 
   for (const token of [
     stateWriteToken("runtimeState", "selectedWaterRegionId", " = resolvedId;"),
