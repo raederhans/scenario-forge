@@ -5,55 +5,150 @@ on:
     paths: [.github/workflows/p3-workbench.yml]
 permissions:
   contents: read
+concurrency:
+  group: p3-visual-workbench
+  cancel-in-progress: true
 jobs:
-  coverage:
+  source:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: codex/visual-editing-p3-20260925
           sparse-checkout: |
+            .github
             js
+            tests
             tools
-      - name: Compare complete reference membership with topology and coarse chunks
+            docs/architecture
+      - name: Publish exact verified source on isolated branch
+        id: source
         run: |
-          mkdir -p .runtime/reports/p3-coverage
+          python .github/apply-p3a.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'refactor: migrate reference consumers and unify visual country transactions (P3A)'
+            git push origin HEAD:codex/visual-editing-p3-20260925
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  behavior:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Behavior, full-data lifecycle, reference audit and module boundaries
+        run: |
           python - <<'PY'
-          import subprocess,json,gzip,hashlib
+          import json,subprocess
           from pathlib import Path
-          reports=[]
-          def read(path):
-              data=subprocess.check_output(['git','show',f'HEAD:{path}'])
-              payload=json.loads(gzip.decompress(data) if path.endswith('.gz') else data)
-              return payload,hashlib.sha256(data).hexdigest()
-          def ids(data):
-              rows=data.get('features') or data.get('objects',{}).get('political',{}).get('geometries',[]) or []
-              return {str(row.get('properties',{}).get('id') or row.get('id') or '') for row in rows} - {''}
-          for scenario in ['blank_base','modern_world','hoi4_1936','hoi4_1939','tno_1962']:
-              manifest,_=read(f'data/scenarios/{scenario}/manifest.json')
-              owners,owners_hash=read(manifest['owners_url'])
-              reference=set(owners.get('owners',{}))
-              report={'scenario':scenario,'reference_count':len(reference),'reference_sha256':owners_hash,'sources':[]}
-              paths=[(key,manifest[key]) for key in ['runtime_bootstrap_topology_url','runtime_topology_url'] if manifest.get(key)]
-              chunk_url=manifest.get('detail_chunk_manifest_url')
-              if chunk_url:
-                  chunks,_=read(chunk_url)
-                  report['political_chunk_count']=sum(chunk.get('layer')=='political' for chunk in chunks.get('chunks',[]))
-                  paths += [('global_coarse_chunk',chunk['url']) for chunk in chunks.get('chunks',[]) if chunk.get('layer')=='political' and chunk.get('lod')=='coarse' and chunk.get('global_coverage')]
-              for kind,path in paths:
-                  payload,digest=read(path)
-                  feature_ids=ids(payload)
-                  missing=sorted(reference-feature_ids)
-                  report['sources'].append({'kind':kind,'path':path,'sha256':digest,'format':payload.get('type'),'feature_count':len(feature_ids),'missing_reference_count':len(missing),'missing_reference_examples':missing[:12]})
-                  del payload
-              reports.append(report)
-          output={'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'kind':'membership_coverage_not_pixel_or_adjacency_proof','scenarios':reports}
-          Path('.runtime/reports/p3-coverage/coverage.json').write_text(json.dumps(output,indent=2))
-          print(json.dumps(output,indent=2))
+          root=Path('.runtime/reports/p3-behavior');root.mkdir(parents=True,exist_ok=True)
+          (root/'source-sha.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'],text=True))
+          checks=[
+            ('node-p3',['npm','run','test:node:ownership-retirement']),
+            ('scenario-lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
+            ('python-boundaries',['python','-m','unittest','tests.test_map_renderer_color_resolution_strategy_boundary_contract','tests.test_scenario_state_actions_boundary_contract','tests.test_sidebar_split_boundary_contract','tests.test_map_renderer_click_selection_transaction_boundary_contract','tests.test_map_renderer_brush_interaction_session_owner_boundary_contract','-q']),
+            ('state-write-allowlist',['node','tools/check_state_write_allowlist.mjs']),
+            ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
+            ('quick-fill-real-data',['node','tools/audit_quick_fill.mjs']),
+          ]
+          results=[]
+          for name,cmd in checks:
+            print(f'::group::{name}',flush=True)
+            run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            (root/f'{name}.log').write_text(run.stdout)
+            print(run.stdout,flush=True)
+            results.append({'check':name,'exit_code':run.returncode,'command':cmd})
+            (root/'checks.json').write_text(json.dumps(results,indent=2))
+            print('::endgroup::',flush=True)
+          raise SystemExit(any(row['exit_code'] for row in results))
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: p3-reference-topology-coverage
-          path: .runtime/reports/p3-coverage
+          name: p3-behavior-evidence
+          path: |
+            .runtime/reports/p3-behavior
+            .runtime/reports/generated/quick-fill-support.*
+          retention-days: 3
+  browser:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+          npx playwright install --with-deps chromium
+      - name: Real-map transactions and editor UI regressions
+        run: |
+          mkdir -p .runtime/reports/p3-browser
+          git rev-parse HEAD > .runtime/reports/p3-browser/source-sha.txt
+          set -o pipefail
+          npx playwright test tests/e2e/ownership_retirement.spec.js tests/e2e/ui_rework_mainline_shell_sidebar.spec.js --grep 'ownership editing|P3 real-map|desktop commands' --workers=1 2>&1 | tee .runtime/reports/p3-browser/playwright.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-browser-evidence
+          path: |
+            .runtime/reports/p3-browser
+            .runtime/tests/playwright
+          retention-days: 3
+  publication:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install publication dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+      - name: Verify built Pages artifact
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3/pages
+        run: |
+          mkdir -p .runtime/reports/p3-publication
+          git rev-parse HEAD > .runtime/reports/p3-publication/source-sha.txt
+          set -o pipefail
+          python tools/build_pages_dist.py --output-root .runtime/p3/pages 2>&1 | tee .runtime/reports/p3-publication/build.log
+          python -m unittest tests.test_pages_dist_startup_shell -q 2>&1 | tee .runtime/reports/p3-publication/startup-shell.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-publication-evidence
+          path: .runtime/reports/p3-publication
           retention-days: 3
