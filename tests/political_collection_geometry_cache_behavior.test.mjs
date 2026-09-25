@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 import test from "node:test";
 import { createPoliticalCollectionOwner } from "../js/core/renderer/political_collection_owner.js";
 import { createPoliticalGeometryStore, getPoliticalGeometrySnapshot } from "../js/core/political_geometry_store.js";
@@ -73,16 +75,23 @@ function makePrimaryCollection(features = []) {
   return { type: "FeatureCollection", features };
 }
 
+function loadVendorD3() {
+  const context = { globalThis: null };
+  context.globalThis = context;
+  runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), context);
+  return context.d3;
+}
+
 // ---------------------------------------------------------------------------
 // normalizeFeatureGeometry cache: geometry normalization is cached per geometry
 // ---------------------------------------------------------------------------
 
-test("normalizeFeatureGeometry caches result – geoArea called only once per geometry object", () => {
+test("normalizeFeatureGeometry caches spherical ring normalization per geometry object", () => {
   let calls = 0;
   const geom = makeGeometry("normal");
   const feature = makeFeature("A", geom);
 
-  // area <= Math.PI*2 means no rewind needed; cache GEOM_UNCHANGED
+  // Small, already-normalized geometry keeps the fast path.
   const owner = makeOwner({
     geoAreaImpl: (f) => {
       calls += 1;
@@ -94,7 +103,7 @@ test("normalizeFeatureGeometry caches result – geoArea called only once per ge
   const r2 = owner.normalizeFeatureGeometry(feature);
   // Same geometry object → same geometry should be returned both times
   assert.equal(r1.geometry, r2.geometry);
-  // geoArea should only be called once because second call hits cache
+  // geoArea should not be called again because second call hits cache
   assert.equal(calls, 1);
 });
 
@@ -105,10 +114,10 @@ test("normalizeFeatureGeometry reuses successful orientation repair", () => {
 
   // Simulate backward-wound geometry: first area > π*2, rewound area < first.
   const owner = makeOwner({
-    geoAreaImpl: () => {
+    geoAreaImpl: (f) => {
       calls += 1;
-      // Return large area on first call, smaller on second (rewound).
-      return calls === 1 ? Math.PI * 4 : Math.PI * 0.5;
+      if (f?.geometry === geom) return calls === 1 ? Math.PI * 4 : Math.PI * 0.5;
+      return Math.PI * 0.5;
     },
   });
 
@@ -122,6 +131,45 @@ test("normalizeFeatureGeometry reuses successful orientation repair", () => {
   // Original geometry is unchanged
   assert.equal(geom, feature.geometry);
   assert.notEqual(r1.geometry, geom);
+});
+
+test("spherical ring normalization repairs the real RU shell and preserves holes and dateline rings", () => {
+  const d3 = loadVendorD3();
+  globalThis.d3 = d3;
+  const owner = makeOwner({ geoAreaImpl: d3.geoArea });
+
+  // Decoded coordinates from hoi4_1939/runtime_topology.topo.json,
+  // RU_ARCTIC_FB_9426. Its tiny ring's planar backtracking fooled the former
+  // signed-area winding check, making d3.geoArea treat it as nearly 4π.
+  const ruFeature = makeFeature("RU_ARCTIC_FB_9426", {
+    type: "Polygon",
+    coordinates: [[
+      [166.06426064260643, 55.145737629376285], [166.0678606786068, 55.144001791017914],
+      [166.06426064260643, 55.147473467734685], [166.06066060660606, 55.149209306093056],
+      [166.00666006660066, 55.18739774997751], [165.99585995859962, 55.213435325353245],
+      [165.74385743857442, 55.30022724327243], [165.76905769057691, 55.29154805148052],
+      [165.8338583385834, 55.26898215282152], [165.99585995859962, 55.213435325353245],
+      [166.00666006660066, 55.18739774997751], [165.99585995859962, 55.213435325353245],
+    ]],
+  });
+  assert.ok(d3.geoArea(ruFeature) > Math.PI * 3.9);
+  const normalizedRu = owner.normalizeFeatureGeometry(ruFeature);
+  assert.ok(d3.geoArea(normalizedRu) < 1e-6);
+  assert.equal(owner.normalizeFeatureGeometry(ruFeature).geometry, normalizedRu.geometry);
+
+  const polygonWithHole = makeFeature("hole-and-dateline", {
+    type: "Polygon",
+    coordinates: [
+      [[170, -10], [-170, -10], [-170, 10], [170, 10], [170, -10]],
+      [[175, -5], [175, 5], [-175, 5], [-175, -5], [175, -5]],
+    ],
+  });
+  const normalized = owner.normalizeFeatureGeometry(polygonWithHole);
+  const [outer, hole] = normalized.geometry.coordinates;
+  const ringArea = (ring) => d3.geoArea({ type: "Polygon", coordinates: [ring] });
+  assert.ok(ringArea(outer) <= Math.PI * 2, "outer ring uses the small-region spherical winding");
+  assert.ok(ringArea(hole) > Math.PI * 2, "hole uses the opposite spherical winding");
+  assert.ok(d3.geoArea(normalized) < 0.2, "antimeridian polygon keeps its small area and hole");
 });
 
 test("normalizeFeatureGeometry with changed geometry same ID: fresh compute", () => {
@@ -140,7 +188,7 @@ test("normalizeFeatureGeometry with changed geometry same ID: fresh compute", ()
 
   owner.normalizeFeatureGeometry(featureA);
   owner.normalizeFeatureGeometry(featureB);
-  // Each distinct geometry object triggers a fresh geoArea call
+  // Each distinct geometry object triggers a fresh feature area check.
   assert.equal(calls, 2);
 });
 
@@ -189,6 +237,28 @@ test("normalizeFeatureGeometry with no d3 returns feature unchanged without cach
   };
   owner.normalizeFeatureGeometry(feature);
   assert.equal(calls, 1);
+});
+
+test("normalizeFeatureGeometry retries when spherical ring area fails", () => {
+  let calls = 0;
+  const geometry = makeGeometry("ring-retry");
+  const feature = makeFeature("ring-retry", geometry);
+  const owner = makeOwner({
+    geoAreaImpl: (candidate) => {
+      calls += 1;
+      if (calls === 1 || calls === 3) return Math.PI * 4;
+      if (calls === 2) throw new Error("temporary spherical stream failure");
+      if (candidate?.geometry === geometry) return 0.5;
+      return 0.5;
+    },
+  });
+
+  assert.equal(owner.normalizeFeatureGeometry(feature), feature);
+  const retried = owner.normalizeFeatureGeometry(feature);
+  assert.notEqual(retried.geometry, geometry);
+  assert.equal(calls, 5);
+  assert.equal(owner.normalizeFeatureGeometry(feature).geometry, retried.geometry);
+  assert.equal(calls, 5);
 });
 
 test("composition retries failed normalization, including non-finite rewind results", () => {
@@ -337,8 +407,8 @@ test("orientation repair: rewound geometry is cached and returned on subsequent 
   const feature = makeFeature("OR1", geom);
 
   const repaired = owner.normalizeFeatureGeometry(feature, { sourceLabel: "s" });
-  // geoArea called twice (original + rewound)
-  assert.equal(callIdx, 2);
+  // geoArea checks the original feature, its ring, and the normalized feature.
+  assert.equal(callIdx, 3);
   // Rewound geometry differs from original
   assert.notEqual(repaired.geometry, geom);
   // Source properties are preserved through the spread
@@ -346,7 +416,7 @@ test("orientation repair: rewound geometry is cached and returned on subsequent 
 
   // Second normalizeFeatureGeometry call: must not call geoArea again
   const repaired2 = owner.normalizeFeatureGeometry(feature, { sourceLabel: "s" });
-  assert.equal(callIdx, 2); // no additional calls
+  assert.equal(callIdx, 3); // no additional calls
   // Same rewound geometry returned both times
   assert.equal(repaired.geometry, repaired2.geometry);
   // Properties flow through per-call (new spread from current feature)

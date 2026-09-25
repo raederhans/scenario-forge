@@ -6095,7 +6095,9 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
     GIANT_FEATURE_ALLOWLIST.has(countryCode) &&
     isAdmin0ShellFeature(feature, featureId);
   const spherical = getSphericalFeatureDiagnostics(feature, { featureId });
-  if (spherical?.invalid && !isTrustedAdmin0Shell) {
+  // Large-country shells may have wide projected bounds, but must never
+  // bypass spherical validity: a tiny inverted island can cover the ocean.
+  if (spherical?.invalid) {
     return {
       skip: true,
       reason: spherical.isWorldBounds ? "world_bounds" : "spherical_area",
@@ -6651,6 +6653,8 @@ function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame"
   return resolvedColorCount > 0;
 }
 
+let resolvedColorFeatureLookupCache = { features: null, revision: -1, index: null };
+
 function findResolvedColorFeatureById(featureId) {
   const id = String(featureId || "").trim();
   if (!id) return null;
@@ -6659,14 +6663,20 @@ function findResolvedColorFeatureById(featureId) {
     return indexedFeature;
   }
   const features = getResolvedColorSourceFeatures();
-  for (let index = 0; index < features.length; index += 1) {
-    const feature = features[index];
-    const candidateId = getFeatureId(feature) || `feature-${index}`;
-    if (candidateId === id) {
-      return feature;
-    }
+  const revision = Number(runtimeState.topologyRevision || 0);
+  // Shell/background features are absent from the interactive land index.
+  // Pending edits can include thousands of them; index the complete source
+  // once per geometry revision instead of scanning it for every pending id.
+  if (resolvedColorFeatureLookupCache.features !== features
+      || resolvedColorFeatureLookupCache.revision !== revision) {
+    const index = new Map();
+    features.forEach((feature, offset) => {
+      const candidateId = getFeatureId(feature) || `feature-${offset}`;
+      if (!index.has(candidateId)) index.set(candidateId, feature);
+    });
+    resolvedColorFeatureLookupCache = { features, revision, index };
   }
-  return null;
+  return resolvedColorFeatureLookupCache.index.get(id) || null;
 }
 
 function collectResolvedColorFeatureIdsForOwners(ownerCodes = []) {

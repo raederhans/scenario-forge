@@ -185,44 +185,56 @@ export function createPoliticalCollectionOwner({
       .filter(Boolean);
   }
 
-  function getRingOrientationAccumulator(ring) {
-    if (!Array.isArray(ring) || ring.length < 4) return 0;
-    let total = 0;
-    for (let index = 0; index < ring.length - 1; index += 1) {
-      const start = ring[index];
-      const end = ring[index + 1];
-      if (!Array.isArray(start) || !Array.isArray(end)) continue;
-      total += (Number(end[0]) - Number(start[0])) * (Number(end[1]) + Number(start[1]));
-    }
-    return total;
-  }
-
-  function orientRingCoordinates(ring, clockwise) {
+  function orientRingCoordinates(ring, outerRing) {
     if (!Array.isArray(ring) || ring.length < 4) return ring;
-    const signed = getRingOrientationAccumulator(ring);
-    const isClockwise = signed > 0;
-    if (clockwise === isClockwise) return ring;
-    return [...ring].reverse();
+    const first = ring[0];
+    const last = ring[ring.length - 1];
+    const closedRing = Array.isArray(first) && Array.isArray(last)
+      && first.length >= 2 && last.length >= 2
+      && Number(first[0]) === Number(last[0])
+      && Number(first[1]) === Number(last[1])
+      ? ring
+      : [...ring, first];
+    const geoArea = globalThis.d3?.geoArea;
+    if (typeof geoArea !== "function") return null;
+    let area;
+    try {
+      area = Number(geoArea({ type: "Polygon", coordinates: [closedRing] }));
+    } catch (_error) {
+      return null;
+    }
+    if (!Number.isFinite(area)) return null;
+    // d3.geoArea follows spherical winding: a clockwise outer ring describes
+    // the smaller region (<= 2π); holes use the opposite winding. Planar
+    // signed area is unreliable for antimeridian and near-polar rings.
+    const hasDesiredWinding = outerRing ? area <= Math.PI * 2 : area > Math.PI * 2;
+    if (hasDesiredWinding) return closedRing;
+    return [...closedRing].reverse();
   }
 
   function rewindGeometryRings(geometry) {
     if (!geometry || !geometry.type || !geometry.coordinates) return null;
     if (geometry.type === "Polygon") {
+      const coordinates = geometry.coordinates.map((ring, index) =>
+        orientRingCoordinates(ring, index === 0)
+      );
+      if (coordinates.some((ring) => ring === null)) return null;
       return {
         ...geometry,
-        coordinates: geometry.coordinates.map((ring, index) =>
-          orientRingCoordinates(ring, index === 0)
-        ),
+        coordinates,
       };
     }
     if (geometry.type === "MultiPolygon") {
+      const coordinates = geometry.coordinates.map((polygon) =>
+        Array.isArray(polygon)
+          ? polygon.map((ring, index) => orientRingCoordinates(ring, index === 0))
+          : polygon
+      );
+      if (coordinates.some((polygon) => Array.isArray(polygon)
+        && polygon.some((ring) => ring === null))) return null;
       return {
         ...geometry,
-        coordinates: geometry.coordinates.map((polygon) =>
-          Array.isArray(polygon)
-            ? polygon.map((ring, index) => orientRingCoordinates(ring, index === 0))
-            : polygon
-        ),
+        coordinates,
       };
     }
     return null;
@@ -252,11 +264,11 @@ export function createPoliticalCollectionOwner({
     }
     if (!Number.isFinite(area)) return feature;
     if (area <= Math.PI * 2) {
-      // Geometry passes orientation check; record that no rewind is needed.
+      // Preserve the fast path for already-small geometries. Spherical ring
+      // normalization is needed when geoArea signals reversed winding.
       normalizedGeometryByGeometry.set(geometry, GEOM_UNCHANGED);
       return feature;
     }
-
     const rewoundGeometry = rewindGeometryRings(geometry);
     if (!rewoundGeometry) {
       // rewindGeometryRings returned null (unsupported type); do not cache.
@@ -287,7 +299,8 @@ export function createPoliticalCollectionOwner({
       // Do not cache: second geoArea call failed; return original feature.
       return feature;
     }
-    // Rewind made no improvement; record that no rewind is needed.
+    // Spherical ring normalization made no improvement; record that no
+    // rewind is needed. Errors above remain uncached so a later retry works.
     normalizedGeometryByGeometry.set(geometry, GEOM_UNCHANGED);
     return feature;
   }

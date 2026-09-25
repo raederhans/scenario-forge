@@ -110,9 +110,12 @@ test("fragment camouflage leaves unmatched countries unchanged", () => {
 
 test("detail composition normalizes large-area geometry before tagging source", () => {
   globalThis.d3 = {
-    geoArea: (feature) => {
-      const coordinates = feature?.geometry?.coordinates;
-      const firstPolygon = feature?.geometry?.type === "MultiPolygon" ? coordinates?.[0] : coordinates;
+    geoArea: (input) => {
+      // Production normalization measures both Features and a standalone
+      // Polygon ring, so this mock accepts either geoJSON shape.
+      const geometry = input?.geometry || input;
+      const coordinates = geometry?.coordinates;
+      const firstPolygon = geometry?.type === "MultiPolygon" ? coordinates?.[0] : coordinates;
       const secondPointX = Number(firstPolygon?.[0]?.[1]?.[0]);
       return secondPointX === 1 ? Math.PI * 4 : 1;
     },

@@ -16,6 +16,32 @@ function rendererFunction(name, globals) {
   return context[name];
 }
 
+test("background color lookup indexes a source once and follows replacement and geometry revisions", () => {
+  let reads = 0;
+  let features = Array.from({ length: 2000 }, (_, i) => ({ id: `shell-${i}` }));
+  const state = { landIndex: new Map(), topologyRevision: 1 };
+  const lookup = rendererFunction("findResolvedColorFeatureById", {
+    runtimeState: state,
+    resolvedColorFeatureLookupCache: { features: null, revision: -1, index: null },
+    getResolvedColorSourceFeatures: () => features,
+    getFeatureId: feature => { reads++; return feature.id; },
+  });
+  for (const feature of features) assert.equal(lookup(feature.id), feature);
+  assert.equal(reads, 2000, "pending background ids must not each scan the full source");
+  assert.equal(lookup("missing"), null);
+  assert.equal(reads, 2000);
+  const old = features[0];
+  features = [{ id: old.id }, { id: old.id }, {}];
+  assert.equal(lookup(old.id), features[0], "preserve first-match semantics");
+  assert.equal(lookup("feature-2"), features[2]);
+  features[0] = { id: old.id, changed: true };
+  state.topologyRevision++;
+  assert.equal(lookup(old.id), features[0]);
+  const interactive = { id: old.id, interactive: true };
+  state.landIndex.set(old.id, interactive);
+  assert.equal(lookup(old.id), interactive);
+});
+
 test("visible legend avoids feature scans until actual renderer color transaction commits", () => {
   let scans = 0;
   const colors = new Proxy({ A: "#112233", B: "#445566" }, {

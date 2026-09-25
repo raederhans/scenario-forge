@@ -298,6 +298,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["scenario-core-value-normalizer", "scenario-runtime", "tests/scenario_core_value_normalizer_behavior.test.mjs", ["js/core/scenario/shared.js", "js/core/scenario/core_value_normalizer.js"]],
     ["legend-actions", "renderer-runtime", "tests/legend_actions_behavior.test.mjs", ["js/core/state/actions/legend_actions.js", "js/core/legend_state_normalizers.js"]],
     ["legend-color-revision", "renderer-runtime", "tests/legend_color_revision_behavior.test.mjs", ["js/core/legend_manager.js", "js/core/legend_state_normalizers.js", "js/core/map_renderer.js"]],
+    ["political-feature-spherical-guard", "renderer-runtime", "tests/political_feature_spherical_guard_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["render-dispatcher", "startup", "tests/render_dispatcher_behavior.test.mjs", ["js/bootstrap/startup_bootstrap_support.js", "js/core/render_boundary.js", "js/bootstrap/render_runtime_binding.js"]],
     ["exact-composite-reuse", "renderer-runtime", "tests/exact_composite_reuse_behavior.test.mjs", ["js/core/renderer/exact_composite_reuse_owner.js", "js/core/map_renderer.js", "js/core/renderer/cached_pass_compositor_owner.js"]],
     ["export-target-resolution", "renderer-runtime", "tests/export_target_resolution_behavior.test.mjs", ["js/core/renderer/export_render_budget.js", "js/core/map_renderer.js", "js/core/renderer/political_pass_orchestrator_owner.js", "js/ui/toolbar.js", "js/ui/toolbar/export_failure_handler.js"]],
