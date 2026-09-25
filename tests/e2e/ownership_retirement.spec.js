@@ -159,6 +159,7 @@ test('P3B worker contours render exact split seams and clear stale pixels', asyn
   const result = await page.evaluate(async () => {
     const load = path => import(new URL(path, location.href).href);
     const { createPaintContourRuntime } = await load('./js/core/renderer/paint_contour_runtime.js');
+    const { registerContourSourcePrecision } = await load('./js/core/paint_contour_source.js');
     const { createBorderDrawOwner } = await load('./js/core/renderer/border_draw_owner.js');
     const rect = (id, x) => ({ id, geometry: { type:'Polygon', coordinates:[[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]] } });
     const a = rect('A',0), b = rect('B',1);
@@ -192,13 +193,20 @@ test('P3B worker contours render exact split seams and clear stale pixels', asyn
     state.land=[a,rect('B',4)];state.topologyRevision++;const pending=draw();await ready();const moved=draw();
     state.land=[a,b,rect('supplement',2)];colors.supplement='#fedcba';state.topologyRevision++;await ready();
     const supplementCount=runtime.diagnostics().featureCount;
+    // Join a declared coarse/fine seam through the real Worker, without
+    // allowing the same close geometry to merge when both sources are fine.
+    const coarse=rect('A',0), fine=rect('B',1.000003);
+    registerContourSourcePrecision({features:[coarse]},{lod:'coarse',coordinatePrecision:4});
+    state.land=[coarse,fine];state.topologyRevision++;await ready();const quantized=draw();
+    registerContourSourcePrecision({features:[coarse]},{lod:'detail',coordinatePrecision:7});
+    state.scenarioDataGeneration=1;runtime.getMeshes();await ready();const strictFine=draw();
     state.activeScenarioId='new-scene';state.land=[];const cleared=draw();runtime.dispose();
-    return {different,interactive,merged,overlay,undo,noReindex,pending,moved,supplementCount,cleared};
+    return {different,interactive,merged,overlay,undo,noReindex,pending,moved,supplementCount,quantized,strictFine,cleared};
   });
   await testInfo.attach('contour-pixel-probes.json',{body:JSON.stringify(result,null,2),contentType:'application/json'});
   expect(result.different).toBeGreaterThan(0); expect(result.interactive).toBeGreaterThan(0);
-  for(const key of ['merged','overlay','pending','moved','cleared'])expect(result[key],key).toBe(0);
-  expect(result.undo).toBe(result.different);expect(result.noReindex).toBe(true);expect(result.supplementCount).toBe(3);
+  for(const key of ['merged','overlay','pending','moved','strictFine','cleared'])expect(result[key],key).toBe(0);
+  expect(result.undo).toBe(result.different);expect(result.noReindex).toBe(true);expect(result.supplementCount).toBe(3);expect(result.quantized).toBe(result.different);
 });
 
 for (const scenario of ['modern_world', 'tno_1962']) {

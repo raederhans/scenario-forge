@@ -157,3 +157,16 @@ test('malformed-ring contours follow the vendored d3 geometry stream', async () 
   const builder=createPaintContourGraphBuilder();builder.patch([feature,rect('neighbor',1)]);
   const graph=builder.finish();assert.equal(graph.diagnostics.invalidRings,1);assert.equal(graph.diagnostics.arcCount,1);
 });
+
+test('precision-only metadata publication updates the affected worker registration', async () => {
+  const { registerContourSourcePrecision } = await import('../js/core/paint_contour_source.js');
+  const h=harness();h.runtime.getMeshes();await h.flush();await h.finish();
+  const disposals=h.disposals();
+  registerContourSourcePrecision({features:[h.a]},{lod:'coarse',coordinatePrecision:4});
+  h.state.scenarioDataGeneration=1;
+  h.runtime.getMeshes();await h.flush();
+  assert.equal(h.tasks.length,2);
+  assert.deepEqual(h.tasks[1].features.map(f=>[f.id,f.coordinatePrecision]),[['A',4]]);
+  assert.equal(h.disposals(),disposals);
+  await h.finish();assert.equal(h.runtime.diagnostics().status,'ready');
+});

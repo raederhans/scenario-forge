@@ -10,12 +10,12 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
 } = {}) {
   let scene = '', sourceRef = null, sourceSignal = '', sourceVersion = 0, generation = 0;
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
-  let featuresById = new Map(), registered = null, view = null;
+  let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
   const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
   function clear() {
-    generation += 1; client.dispose(); registered = null; view = null; inFlight = null;
+    generation += 1; client.dispose(); registered = null; registeredPrecision = null; view = null; inFlight = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
   }
   function queue() {
@@ -35,13 +35,15 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     topologyRevision = Number(state.topologyRevision || 0);
     if (forcedGeometryRefresh) geometryEpoch += 1;
     sourceRef = features; sourceSignal = signal;
-    const next = new Map();
+    const next = new Map(), nextPrecision = new Map();
     for (const feature of features) {
       const id = getFeatureId(feature);
-      if (id && isEligible(feature, id) && feature.geometry) next.set(id, feature);
+      if (id && isEligible(feature, id) && feature.geometry) {
+        next.set(id, feature); nextPrecision.set(id, getContourCoordinatePrecision(feature.geometry));
+      }
     }
-    const geometryChanged = next.size !== featuresById.size || [...next].some(([id, feature]) => featuresById.get(id)?.geometry !== feature.geometry);
-    featuresById = next;
+    const geometryChanged = next.size !== featuresById.size || [...next].some(([id, feature]) => featuresById.get(id)?.geometry !== feature.geometry || precisionById.get(id) !== nextPrecision.get(id));
+    featuresById = next; precisionById = nextPrecision;
     if (geometryChanged || forcedGeometryRefresh || status === 'idle') {
       sourceVersion += 1; view = null; revision += 1; status = next.size ? 'building' : 'empty';
       if (!next.size) { clear(); featuresById = next; status = 'empty'; }
@@ -58,10 +60,10 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   }
   async function start() {
     const ownedGeneration = generation, ownedVersion = sourceVersion, snapshot = featuresById;
-    const epoch = geometryEpoch;
+    const epoch = geometryEpoch, snapshotPrecision = precisionById;
     const changed = [];
     for (const [id, feature] of snapshot) {
-      if (!registered || registeredEpoch !== epoch || registered.get(id)?.geometry !== feature.geometry) changed.push({ id, geometry: feature.geometry, coordinatePrecision: getContourCoordinatePrecision(feature.geometry) });
+      if (!registered || registeredEpoch !== epoch || registered.get(id)?.geometry !== feature.geometry || registeredPrecision?.get(id) !== snapshotPrecision.get(id)) changed.push({ id, geometry: feature.geometry, coordinatePrecision: snapshotPrecision.get(id) });
     }
     const removed = registered ? [...registered.keys()].filter(id => !snapshot.has(id)) : [];
     status = 'building'; error = ''; sentFeatures += changed.length; builds += 1;
@@ -70,7 +72,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     try {
       const graph = await task;
       if (generation !== ownedGeneration || inFlight !== task) return;
-      registered = snapshot; registeredEpoch = epoch;
+      registered = snapshot; registeredPrecision = snapshotPrecision; registeredEpoch = epoch;
       if (sourceVersion !== ownedVersion || sceneIdentity() !== scene) return;
       view = createPaintContourMesh(graph, id => {
         const feature = featuresById.get(id);
@@ -112,6 +114,6 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     notifyPaintChanged(ids = null) { const before = revision; syncSource(); syncPaint(ids); return revision !== before; },
     diagnostics() { syncSource(); syncPaint(); return { status, error, revision, sourceVersion, builds, sentFeatures,
       activeArcCount: view?.getActiveArcCount() || 0, ...graphDiagnostics }; },
-    dispose() { clear(); scene = ''; sourceRef = null; featuresById = new Map(); },
+    dispose() { clear(); scene = ''; sourceRef = null; featuresById = new Map(); precisionById = new Map(); },
   });
 }
