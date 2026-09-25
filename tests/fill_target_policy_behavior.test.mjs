@@ -29,8 +29,10 @@ function fixture() {
   return { state, mode, policy, a: features[0], hidden: features[4] };
 }
 
-test("country targets filter absent and excluded features and observe replacement indexes", () => {
+test("geographic macros require complete membership, accept Sets and observe replacement indexes", () => {
   const { state, policy } = fixture();
+  assert.deepEqual(policy.getCountryFeatureIds("AA"), [], "missing member must block the whole macro");
+  state.countryToFeatureIds.set("AA", new Set(["a", "b", "c", "hidden"]));
   const ids = policy.getCountryFeatureIds("AA");
   assert.deepEqual(ids, ["a", "b", "c"]);
   ids.pop();
@@ -45,22 +47,23 @@ test("country targets filter absent and excluded features and observe replacemen
   }
 });
 
-test("interaction targets prefer owner scope then runtime country then interaction country", () => {
+test("interaction targets use complete reference membership and fail closed on missing geometry", () => {
   const { state, policy, a, mode, hidden } = fixture();
   state.interactionGranularity = "country";
-  state.sovereigntyByFeatureId.a = "ZZ";
-  state.ownerToFeatureIds.set("ZZ", ["a", "d", "hidden"]);
-  assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a", "d"]);
-  state.ownerToFeatureIds.clear();
+  assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), [], "geographic member missing");
+  state.countryToFeatureIds.set("AA", ["a", "b", "c", "hidden"]);
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a", "b", "c"]);
-  state.countryToFeatureIds.delete("AA");
-  state.countryToFeatureIds.set("ZZ", ["a", "d"]);
+  state.activeScenarioId = "fixture";
+  state.scenarioBaselineOwnersByFeatureId = Object.freeze({ a: "ZZ", d: "ZZ", hidden: "ZZ" });
+  state.sovereigntyByFeatureId.a = "WRONG";
+  state.ownerToFeatureIds.set("ZZ", ["b"]);
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a", "d"]);
   mode.sovereignty = true;
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a"]);
   assert.deepEqual(policy.resolveInteractionTargetIds(hidden, "hidden"), []);
-  mode.sovereignty = false; state.countryToFeatureIds.clear();
-  assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a"]);
+  mode.sovereignty = false;
+  state.scenarioBaselineOwnersByFeatureId = Object.freeze({ a: "ZZ", missing: "ZZ" });
+  assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), []);
 });
 
 test("parent targets use scenario district and normalized owner before direct grouping", () => {
@@ -69,7 +72,7 @@ test("parent targets use scenario district and normalized owner before direct gr
   state.activeScenarioId = "fixture";
   state.scenarioDistrictGroupsData = { scenario_id: "fixture", tags: { ZZ: { districts: { district: { feature_ids: ["a", "d"] } } } } };
   state.scenarioDistrictGroupByFeatureId = new Map([["a", "district"], ["d", "district"]]);
-  state.sovereigntyByFeatureId = { a: " zz ", d: "ZZ" };
+  state.scenarioBaselineOwnersByFeatureId = Object.freeze({ a: " zz ", d: "ZZ" });
   state.ownerToFeatureIds = new Map([["ZZ", ["a", "d", "d", "hidden", "missing"]]]);
   assert.deepEqual(policy.resolveParentGroupTargetIds(a, "a"), ["a", "d"]);
   assert.deepEqual(policy.resolveSpecialZoneParentGroupTargetIds(" a "), ["a", "d"]);

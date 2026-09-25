@@ -264,7 +264,8 @@ test("getFrontlineMesh remains disabled after control layer retirement", () => {
     activeScenarioId: "tno_1962",
     annotationView: { frontlineEnabled: true },
     runtimePoliticalTopology: { objects: { political: {} } },
-    sovereigntyByFeatureId: { A: "GER", B: "USA" },
+    scenarioBaselineOwnersByFeatureId: Object.freeze({ A: "GER", B: "USA" }),
+    sovereigntyByFeatureId: { A: "STALE", B: "STALE" },
     scenarioAutoShellOwnerByFeatureId: {},
     scenarioShellOverlayRevision: 1,
     sovereigntyRevision: 4,
@@ -275,7 +276,7 @@ test("getFrontlineMesh remains disabled after control layer retirement", () => {
   const { owner } = createTestOwner(state);
 
   assert.deepEqual(owner.getFrontlineOwnershipContext(), {
-    ownershipByFeatureId: state.sovereigntyByFeatureId,
+    ownershipByFeatureId: state.scenarioBaselineOwnersByFeatureId,
     shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
     scenarioActive: true,
     viewMode: "ownership",

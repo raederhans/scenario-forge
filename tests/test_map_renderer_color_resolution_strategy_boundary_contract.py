@@ -77,7 +77,7 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         self.assertIn("delete target.visualOverrides[id];", paint_state_content)
         self.assertIn("delete target.featureOverrides[id];", paint_state_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(resolvedIds, color,", renderer_content)
-        self.assertIn("applyFeatureVisualOverrideTransaction(freshIds, selectedColor,", renderer_content)
+        self.assertIn("applyFeatureVisualOverrideTransaction(freshIds, remove ? null : selectedColor,", renderer_content)
         click_owner_content = (REPO_ROOT / "js/core/map_renderer/click_selection_transaction_owner.js").read_text(encoding="utf-8")
         self.assertIn("applyFeatureVisualOverrideTransaction(targetIds, null,", click_owner_content)
 

@@ -41,7 +41,7 @@ function loadSnapshot(scenarioId) {
 function auditSnapshot(scenarioId = "") {
   const snapshot = loadSnapshot(scenarioId);
   const state = { activeScenarioId: scenarioId, hierarchyData: hierarchy, landIndex: new Map(), countryToFeatureIds: new Map(),
-    sovereigntyByFeatureId: snapshot.owners, scenarioDistrictGroupsData: snapshot.districts, mapSemanticMode: "political" };
+    scenarioBaselineOwnersByFeatureId: Object.freeze({ ...snapshot.owners }), scenarioDistrictGroupsData: snapshot.districts, mapSemanticMode: "political" };
   const visibility = createPoliticalFeaturePolicy(state, {
     getFeatureId: idOf, getFeatureCountryCodeNormalized: countryOf,
     isAtlantropaFieldDrivenFeature: (feature) => !!(feature.properties?.atl_render_layer || feature.properties?.atl_color_rule),
@@ -61,7 +61,7 @@ function auditSnapshot(scenarioId = "") {
   const resolver = createQuickFillHierarchyResolver(state, {
     getAdmin1Group: (feature) => String(feature?.properties?.admin1_group || "").trim(),
     getFeatureCountryCodeNormalized: countryOf,
-    getFeatureInteractionCountryCodeNormalized: (feature, id) => state.sovereigntyByFeatureId[id] || countryOf(feature),
+    getFeatureInteractionCountryCodeNormalized: (feature, id) => state.scenarioBaselineOwnersByFeatureId[id] || countryOf(feature),
     shouldExcludePoliticalInteractionFeature: visibility.shouldExcludePoliticalInteractionFeature,
   });
   const countries = [];

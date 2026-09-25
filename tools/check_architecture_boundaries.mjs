@@ -3399,11 +3399,27 @@ function collectFailures() {
     "setClickSelectedSpecialRegionId(id)",
     "requestInteractionRender(\"clear-water-selection-empty-click\")",
     "requestInteractionRender(\"select-special-region\")",
-    "requestInteractionRender(\"click-fill\")",
+    "applyVisualSubdivisionFill(targetIds, selectedColor, {",
     "return Object.freeze({ handleClick });",
   ]) {
     if (!clickSelectionTransactionOwner.includes(token)) {
       failures.push(`${FILES.clickSelectionTransactionOwner} must keep P3.3 transaction token: ${token}`);
+    }
+  }
+  // Country and subdivision clicks now share the existing paint transaction.
+  // Keep its render/history/sidebar effects required at the composition root,
+  // rather than requiring a duplicate click-only render in the caller.
+  const visualFillStart = renderer.indexOf("function applyVisualSubdivisionFill(");
+  const visualFillEnd = renderer.indexOf("function applyWaterRegionFill(", visualFillStart);
+  const visualFillTransaction = renderer.slice(visualFillStart, visualFillEnd);
+  for (const token of [
+    "applyFeatureVisualOverrideTransaction(resolvedIds, color, {",
+    "commitHistoryEntry({",
+    "requestInteractionRender(kind)",
+    "refreshSidebarAfterPaint({ featureIds: resolvedIds })",
+  ]) {
+    if (visualFillStart < 0 || visualFillEnd < visualFillStart || !visualFillTransaction.includes(token)) {
+      failures.push(`${FILES.renderer} must keep shared visual fill transaction effect: ${token}`);
     }
   }
   for (const token of [

@@ -155,6 +155,8 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
   const previousOwnerToFeatureIds = state.ownerToFeatureIds;
   const previousSovereigntyInitialized = state.sovereigntyInitialized;
   const previousMapSemanticMode = state.mapSemanticMode;
+  const previousScenario = state.activeScenarioId;
+  const previousBaseline = state.scenarioBaselineOwnersByFeatureId;
   const feature = {
     id: "HGO-S1",
     properties: {
@@ -166,7 +168,9 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
   try {
     state.landIndex = new Map([["HGO-S1", feature]]);
     state.landData = { features: [feature] };
-    state.sovereigntyByFeatureId = { "HGO-S1": "2RA" };
+    state.activeScenarioId = "hgo_1936";
+    state.scenarioBaselineOwnersByFeatureId = Object.freeze({ "HGO-S1": "2RA" });
+    state.sovereigntyByFeatureId = { "HGO-S1": "STALE" };
     state.ownerToFeatureIds = new Map();
     state.sovereigntyInitialized = false;
     state.mapSemanticMode = "ownership";
@@ -184,14 +188,16 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
     state.ownerToFeatureIds = previousOwnerToFeatureIds;
     state.sovereigntyInitialized = previousSovereigntyInitialized;
     state.mapSemanticMode = previousMapSemanticMode;
+    state.activeScenarioId = previousScenario;
+    state.scenarioBaselineOwnersByFeatureId = previousBaseline;
   }
 });
 
 test("all ownership mutation APIs reject before writes, history, revision changes, or rendering", () => {
-  const keys = ["sovereigntyByFeatureId", "sovereigntyRevision", "sovereigntyInitialized", "ownerToFeatureIds", "mapSemanticMode", "paintMode", "visualOverrides", "featureOverrides", "historyPast", "historyFuture", "pendingDynamicBorderTimerId", "dynamicBordersDirty"];
+  const keys = ["activeScenarioId", "scenarioBaselineOwnersByFeatureId", "sovereigntyByFeatureId", "sovereigntyRevision", "sovereigntyInitialized", "ownerToFeatureIds", "mapSemanticMode", "paintMode", "visualOverrides", "featureOverrides", "historyPast", "historyFuture", "pendingDynamicBorderTimerId", "dynamicBordersDirty"];
   const old = Object.fromEntries(keys.map(key => [key, state[key]]));
   try {
-    Object.assign(state, { sovereigntyByFeatureId: { test: "2RA" }, sovereigntyRevision: 77, sovereigntyInitialized: true,
+    Object.assign(state, { activeScenarioId: "hgo_1936", scenarioBaselineOwnersByFeatureId: Object.freeze({ test: "2RA" }), sovereigntyByFeatureId: { test: "STALE" }, sovereigntyRevision: 77, sovereigntyInitialized: true,
       ownerToFeatureIds: new Map([["2RA", new Set(["test"])]]), paintMode: "sovereignty", visualOverrides: {}, featureOverrides: {} });
     const before = structuredClone(Object.fromEntries(keys.map(key => [key, state[key]])));
     assert.equal(setFeatureOwnerCode("test", "GB"), false);

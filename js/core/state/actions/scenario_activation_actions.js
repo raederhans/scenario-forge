@@ -546,7 +546,7 @@ export function commitScenarioActivationState(target, patch) {
     patch.scenarioShellOverlayRevision;
   target.countryNames = { ...(patch.countryNames || {}) };
   target.sovereigntyByFeatureId =
-    { ...(patch.sovereigntyByFeatureId || {}) };
+    createReadonlyReferenceAssignments(patch.sovereigntyByFeatureId);
   target.sovereigntyInitialized = patch.sovereigntyInitialized;
   target.visualOverrides = { ...(patch.visualOverrides || {}) };
   target.featureOverrides = { ...(patch.featureOverrides || {}) };

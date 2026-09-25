@@ -114,25 +114,31 @@ class MapRendererClickSelectionTransactionBoundaryContractTest(unittest.TestCase
             "captureHistoryState({",
             "commitHistoryEntry({",
             'markDirty("erase-water-region-color")',
-            'markDirty("erase-sovereignty")',
-            'markDirty("erase-country-color")',
-            'markDirty("erase-feature-color")',
-            'markDirty("fill-sovereignty")',
-            'markDirty("fill-country-color")',
             'requestInteractionRender("clear-water-selection-empty-click")',
             'requestInteractionRender("clear-special-selection-empty-click")',
             'requestInteractionRender("select-special-region")',
             'requestInteractionRender("click-erase-water")',
             'requestInteractionRender("click-erase")',
-            'requestInteractionRender("click-fill")',
             "refreshWaterRegionSidebarRowsNow(",
             "refreshSpecialRegionSidebarRowsNow(",
             "refreshSidebarAfterPaint(",
+            'const countryScope = state.interactionGranularity === "country";',
+            'const kind = countryScope ? "erase-country-color" : "erase-feature-color";',
+            'const kind = countryScope ? "fill-country-color" : "fill-feature-color";',
+            "markDirty(kind);",
+            "warnIncompletePaintTargets();",
+            "getFeaturePaintColor(landId)",
             "noteRenderAction(",
             'setClickSelectedWaterRegionId("")',
             "setClickSelectedSpecialRegionId(id)",
         ]:
             self.assertIn(token, self.owner_click_handler)
+
+    def test_retired_ownership_and_country_palette_commands_are_not_invoked(self):
+        for token in ["setFeatureOwnerCodes(", "resetFeatureOwnerCodes(",
+                      "setClickCountryColors(", "removeClickCountryColors(",
+                      "scheduleDynamicBorderRecompute("]:
+            self.assertNotIn(token, self.owner_click_handler)
 
     def test_history_dirty_and_render_wrappers_keep_existing_owners(self):
         history_content = HISTORY_MANAGER_JS.read_text(encoding="utf-8")

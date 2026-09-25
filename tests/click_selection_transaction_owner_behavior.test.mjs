@@ -272,7 +272,7 @@ const SERVICE_NAMES = [
   "appendSpecialZoneVertexFromEvent", "applyFacilityInfoCardState", "applyFeatureVisualOverrideTransaction",
   "applyVisualSubdivisionFill", "applyWaterRegionFill", "blockStartupReadonlyInteraction", "captureHistoryState",
   "commitHistoryEntry", "dismissOnboardingHint", "ensureLeafDetailReady", "getFeatureCountryCodeNormalized",
-  "getFeatureOwnerCode", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
+  "getFeatureOwnerCode", "getFeaturePaintColor", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
   "getSafeCanvasColor", "getSpecialRegionColor", "getWaterRegionColor", "handleSpecialZoneMembershipClick",
   "inspectHgoRuntimePreviewFromEvent", "isDoubleClickBatchEligible", "isFacilityDetailsSurfaceActive",
   "isMacroOceanWaterRegion", "isOpenOceanPaintEnabled", "isSovereigntyModeActive", "markDirty",
@@ -282,7 +282,7 @@ const SERVICE_NAMES = [
   "requestInteractionRender", "resetFeatureOwnerCodes", "resolveInteractionTargetIds", "scheduleDynamicBorderRecompute",
   "setFeatureOwnerCodes", "shouldBlockUnderlyingSelectionForFacility", "shouldRequireLeafDetail",
   "syncInspectorCountryToLandSelection", "toggleFeatureInDevSelection", "updateDevSelectedHit",
-  "warnMissingActiveSovereign",
+  "warnMissingActiveSovereign", "warnIncompletePaintTargets",
 ];
 
 const ACTION_NAMES = [
@@ -328,6 +328,7 @@ function createTransactionHarness({ state: stateOverrides = {}, services: servic
     ensureLeafDetailReady: async () => true,
     getFeatureCountryCodeNormalized: () => "AA",
     getFeatureOwnerCode: () => "AA",
+    getFeaturePaintColor: (id) => state.visualOverrides?.[id] || "#cccccc",
     getHitFromEvent: () => hit,
     getHoveredFacilityEntryFromEvent: () => null,
     getIntensityFieldTool: () => ({ active: false }),
@@ -582,7 +583,8 @@ test("deferred land hydration refreshes the hit and resumes with the latest tool
   let selectedColor = "#111111";
   let hitCount = 0;
   const baseState = {
-    colors: { "land-2": "#fedcba" },
+    colors: { "land-2": "#000000" },
+    visualOverrides: { "land-2": "#fedcba" },
     landIndex: new Map([
       ["land-1", { properties: { id: "land-1" } }],
       ["land-2", { properties: { id: "land-2" } }],
@@ -638,50 +640,88 @@ test("preset admission after hydration delegates the refreshed land id only", as
   assert.equal(traceNames(harness.trace).includes("setClickSelectedColor"), false);
 });
 
-test("sovereignty fill fails closed without an active owner and commits in canonical order with one", async () => {
-  const missing = await createTransactionOwner({
-    state: { activeSovereignCode: "" },
-    services: {
-      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
-      isSovereigntyModeActive: () => true,
-    },
-  });
-  await missing.owner.handleClick({});
-  assert.deepEqual(traceNames(missing.trace).slice(-3), [
-    "setClickSelectedColor",
-    "captureHistoryState",
-    "warnMissingActiveSovereign",
-  ]);
-  for (const forbidden of ["setFeatureOwnerCodes", "markDirty", "commitHistoryEntry", "requestInteractionRender"]) {
-    assert.equal(traceNames(missing.trace).includes(forbidden), false);
-  }
-
-  const active = await createTransactionOwner({
-    state: { activeSovereignCode: "OWNER-1" },
-    services: {
-      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
-      isSovereigntyModeActive: () => true,
-      setFeatureOwnerCodes: (...args) => {
-        active.trace.push(["setFeatureOwnerCodes", ...args]);
-        return 1;
+test("a stale ownership-mode service cannot reactivate political editing", async () => {
+  for (const activeSovereignCode of ["", "OWNER-1"]) {
+    const harness = await createTransactionOwner({
+      state: { activeSovereignCode },
+      services: {
+        getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
+        isSovereigntyModeActive: () => true,
       },
+    });
+    await harness.owner.handleClick({});
+    assert.ok(traceNames(harness.trace).includes("applyVisualSubdivisionFill"));
+    for (const forbidden of ["setFeatureOwnerCodes", "resetFeatureOwnerCodes", "scheduleDynamicBorderRecompute", "warnMissingActiveSovereign"]) {
+      assert.equal(traceNames(harness.trace).includes(forbidden), false);
+    }
+  }
+});
+
+test("country click paints the admitted feature batch instead of changing a geographic base palette", async () => {
+  const harness = await createTransactionOwner({
+    state: { interactionGranularity: "country" },
+    services: {
+      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: "BB" }),
+      resolveInteractionTargetIds: () => ["land-1", "land-2"],
     },
   });
-  await active.owner.handleClick({});
-  assert.deepEqual(traceNames(active.trace).slice(-12), [
-    "setClickSelectedColor",
-    "captureHistoryState",
-    "setFeatureOwnerCodes",
-    "refreshResolvedColorsForFeatures",
-    "scheduleDynamicBorderRecompute",
-    "markDirty",
-    "captureHistoryState",
-    "commitHistoryEntry",
-    "addRecentColor",
-    "requestInteractionRender",
-    "refreshSidebarAfterPaint",
-    "noteRenderAction",
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "applyVisualSubdivisionFill"), [
+    "applyVisualSubdivisionFill", ["land-1", "land-2"], "#123456",
+    { kind: "fill-country-color", dirtyReason: "fill-country-color" },
   ]);
+  for (const forbidden of ["setClickCountryColors", "refreshResolvedColorsForOwners", "setFeatureOwnerCodes"]) {
+    assert.equal(traceNames(harness.trace).includes(forbidden), false);
+  }
+});
+
+test("country eraser removes feature paint, preserving reference and base colors", async () => {
+  const harness = await createTransactionOwner({
+    state: { interactionGranularity: "country", currentTool: "eraser" },
+    services: {
+      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
+      resolveInteractionTargetIds: () => ["land-1", "land-2"],
+    },
+  });
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "applyFeatureVisualOverrideTransaction"), [
+    "applyFeatureVisualOverrideTransaction", ["land-1", "land-2"], null,
+    { remove: true, inputStartedAt: 17, inputLabel: "erase-country-color" },
+  ]);
+  assert.equal(traceNames(harness.trace).includes("removeClickCountryColors"), false);
+  assert.deepEqual(harness.trace.filter(([name]) => name === "captureHistoryState").map(([, scope]) => scope), [
+    { featureIds: ["land-1", "land-2"] }, { featureIds: ["land-1", "land-2"] },
+  ]);
+});
+
+test("incomplete country selection warns without painting, history or palette mutation", async () => {
+  for (const currentTool of ["fill", "eraser"]) {
+    const harness = await createTransactionOwner({
+      state: { currentTool, interactionGranularity: "country" },
+      services: {
+        getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
+        resolveInteractionTargetIds: () => [],
+      },
+    });
+    await harness.owner.handleClick({});
+    assert.equal(traceNames(harness.trace).at(-1), "warnIncompletePaintTargets");
+    for (const forbidden of ["applyVisualSubdivisionFill", "applyFeatureVisualOverrideTransaction", "setClickCountryColors", "removeClickCountryColors", "captureHistoryState", "markDirty", "commitHistoryEntry"]) {
+      assert.equal(traceNames(harness.trace).includes(forbidden), false);
+    }
+  }
+});
+
+test("land eyedropper samples persistent paint even with a partial group and a heatmap display", async () => {
+  const harness = await createTransactionOwner({
+    state: { currentTool: "eyedropper", interactionGranularity: "country", colors: { "land-1": "#ff0000" }, visualOverrides: { "land-1": "#00ff00" } },
+    services: {
+      getHitFromEvent: () => ({ targetType: "land", id: "land-1", countryCode: "AA", runtimeCountryCode: null }),
+      resolveInteractionTargetIds: () => [],
+    },
+  });
+  await harness.owner.handleClick({});
+  assert.deepEqual(harness.trace.find(([name]) => name === "setClickSelectedColor"), ["setClickSelectedColor", "#00ff00", { updateSwatch: true }]);
+  assert.equal(traceNames(harness.trace).includes("warnIncompletePaintTargets"), false);
 });
 
 test("an early HGO inspection failure propagates before hover or render effects", async () => {

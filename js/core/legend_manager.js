@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "./map_data_boundary.js";
 // Legend manager (Phase 13)
 
 import { getScenarioCountryDisplayName } from "./scenario_country_display.js";
@@ -15,7 +16,6 @@ import {
 import { patchLegendState, setLegendLabelState, ensureLegendState } from "./state/actions/legend_actions.js";
 import {
   getFeatureId,
-  getFeatureOwnerCode,
 } from "./sovereignty_manager.js";
 import {
   getSpecialZoneLegendLayers,
@@ -172,8 +172,7 @@ function getFeatureContinentId(feature, appState, ownerCode = "") {
 function getFeatureOwner(feature, appState) {
   const id = getFeatureId(feature);
   return normalizeCode(
-    getFeatureOwnerCode(id, { skipEnsure: true })
-    || appState?.sovereigntyByFeatureId?.[id]
+    getMapDataBoundary(appState).reference.getBaseGroupCode(feature)
     || appState?.runtimeCanonicalCountryByFeatureId?.[id]
     || feature?.properties?.ISO_A3
     || feature?.properties?.ADM0_A3
