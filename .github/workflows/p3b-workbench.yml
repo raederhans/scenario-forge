@@ -1,0 +1,57 @@
+name: P3B isolated workbench
+on:
+  push:
+    branches: [codex/paint-contours-p3b-20260925]
+    paths: [.github/workflows/p3b-workbench.yml]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            js
+            tests
+            tools
+            docs/architecture
+            css
+            vendor
+            backend
+            map_backend
+            map_builder
+            scenario_builder
+            ops
+            landing
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - name: Collect exact sources and metadata without heavy geometry
+        run: |
+          mkdir -p .runtime/tmp
+          git rev-parse HEAD > .runtime/tmp/source-sha.txt
+          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          paths=['data/runtime_asset_registry.json','data/country_feature_policies.json','data/CATALOG.json','data/thematic_layers/index.json','data/city_lights/historical_1930_entries.json','data/scenarios/index.json']
+          for scenario in ['blank_base','modern_world','hoi4_1936','hoi4_1939','tno_1962']:
+              paths += [f'data/scenarios/{scenario}/{name}' for name in ['manifest.json','owners.by_feature.json','countries.json','detail_chunks.manifest.json']]
+          for name in paths:
+              result=subprocess.run(['git','show',f'HEAD:{name}'],stdout=subprocess.PIPE)
+              if result.returncode: continue
+              path=Path(name);path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(result.stdout)
+          PY
+          tar --exclude='./.git' --exclude='./.runtime' -czf .runtime/tmp/source.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3b-source
+          path: |
+            .runtime/tmp/source.tgz
+            .runtime/tmp/source-sha.txt
+            .runtime/tmp/tracked-tree.txt
+          retention-days: 2
