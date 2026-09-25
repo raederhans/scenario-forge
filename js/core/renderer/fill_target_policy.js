@@ -23,45 +23,14 @@ export function createFillTargetPolicy(runtimeState, {
     });
   }
 
-  function getScenarioOwnerFeatureIds(ownerTag) {
-    const normalizedOwnerTag = String(ownerTag || "").trim().toUpperCase();
-    if (!normalizedOwnerTag || !(runtimeState.ownerToFeatureIds instanceof Map)) return [];
-    const ids = runtimeState.ownerToFeatureIds.get(normalizedOwnerTag);
-    if (!Array.isArray(ids)) return [];
-    return ids.filter((candidateId) => {
-      const candidateFeature = runtimeState.landIndex?.get(candidateId);
-      return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);
-    });
-  }
-
-  function getInteractionCountryFeatureIds(feature, featureId) {
-    const interactionCountryCode = getFeatureInteractionCountryCodeNormalized(feature, featureId);
-    const ownerIds = interactionCountryCode ? getScenarioOwnerFeatureIds(interactionCountryCode) : [];
-    if (ownerIds.length) return ownerIds;
-
-    const runtimeCountryCode = getFeatureCountryCodeNormalized(feature);
-    const runtimeIds = runtimeCountryCode ? getCountryFeatureIds(runtimeCountryCode) : [];
-    if (runtimeIds.length) return runtimeIds;
-
-    return interactionCountryCode ? getCountryFeatureIds(interactionCountryCode) : [];
-  }
-
   function resolveInteractionTargetIds(feature, id) {
-    if (shouldExcludePoliticalInteractionFeature(feature, id)) {
-      return [];
-    }
-    if (isSovereigntyModeActive()) {
-      return [id];
-    }
-    if (runtimeState.interactionGranularity !== "country") {
-      return [id];
-    }
-    const countryCode = getFeatureInteractionCountryCodeNormalized(feature, id);
-    if (!countryCode) {
-      return [id];
-    }
-    const ids = getInteractionCountryFeatureIds(feature, id);
-    return ids.length ? ids : [id];
+    if (shouldExcludePoliticalInteractionFeature(feature, id)) return [];
+    if (isSovereigntyModeActive()) return [id];
+    if (runtimeState.interactionGranularity !== "country") return [id];
+    // Country clicks use the same complete reference membership and hydration
+    // guard as double-click Auto Fill. Never fall back to a loaded subset.
+    const resolution = hierarchy.resolve(feature, id, "country");
+    return resolution.status === "ready" ? resolution.targetIds : [];
   }
 
   function resolveParentGroupTargetIds(feature, featureId) {

@@ -6,7 +6,6 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   nowMs,
   captureHistoryState,
   pushHistoryEntry,
-  isSovereigntyModeActive,
   addRecentColor,
   markDirty,
   refreshSidebarAfterPaint,
@@ -34,12 +33,9 @@ export function createBrushInteractionSessionOwner(runtimeState, {
       visitedFeatureIds: new Set(),
       visitedWaterRegionIds: new Set(),
       visitedSpecialRegionIds: new Set(),
-      visitedOwnerCodes: new Set(),
       affectedFeatureIds: new Set(),
       affectedWaterRegionIds: new Set(),
       affectedSpecialRegionIds: new Set(),
-      affectedOwnerCodes: new Set(),
-      affectedSovereigntyIds: new Set(),
       before: {},
       changed: false,
     };
@@ -59,15 +55,13 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     const featureIds = Array.from(current.affectedFeatureIds);
     const waterRegionIds = Array.from(current.affectedWaterRegionIds);
     const specialRegionIds = Array.from(current.affectedSpecialRegionIds);
-    const ownerCodes = Array.from(current.affectedOwnerCodes);
-    const sovereigntyFeatureIds = Array.from(current.affectedSovereigntyIds);
-    const after = captureHistoryState({ featureIds, waterRegionIds, specialRegionIds, ownerCodes, sovereigntyFeatureIds });
+    const after = captureHistoryState({ featureIds, waterRegionIds, specialRegionIds });
     pushHistoryEntry({
       kind: runtimeState.currentTool === "eraser" ? "brush-erase" : "brush-fill",
       before: current.before,
       after,
       meta: {
-        affectsSovereignty: isSovereigntyModeActive(),
+        affectsSovereignty: false,
       },
     });
     if (runtimeState.currentTool !== "eyedropper") {
@@ -78,7 +72,6 @@ export function createBrushInteractionSessionOwner(runtimeState, {
       featureIds,
       waterRegionIds,
       specialRegionIds,
-      ownerCodes,
     });
     requestRendererRender("brush-stroke", { flush: true });
     noteRenderAction("brush-stroke", actionStart);

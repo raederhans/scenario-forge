@@ -272,10 +272,12 @@ test("feature apply changes both compatibility fields without changing sovereign
   });
 });
 
-test("owner apply updates both base-color fields, preserves sovereignty, and partially refreshes the live union", () => {
+test("owner apply updates both base-color fields, preserves reference, and partially refreshes complete baseline membership", () => {
   const sovereignty = { a: "GER", b: "FRA" };
   const countryPalette = { GER: "legacy-value" };
   const state = {
+    activeScenarioId: "test-scene",
+    scenarioBaselineOwnersByFeatureId: Object.freeze({ a: "GER", c: "GER", d: "GER", unloaded: "GER" }),
     selectedInspectorCountryCode: "ger",
     landIndex: new Map([["a", {}], ["c", {}], ["d", {}]]),
     sovereigntyByFeatureId: sovereignty,
@@ -484,6 +486,8 @@ test("palette operation rejects incomplete service assembly before editing state
 
 test("palette capabilities read replacement indexes and keep writes scoped to color actions", () => {
   const state = {
+    activeScenarioId: "test-scene",
+    scenarioBaselineOwnersByFeatureId: Object.freeze({ first: "DEU" }),
     hoveredId: "first",
     landIndex: new Map([["first", {}]]),
     ownerToFeatureIds: new Map([["DEU", ["first"]]]),
@@ -502,7 +506,8 @@ test("palette capabilities read replacement indexes and keep writes scoped to co
   assert.deepEqual(access.getApplyTarget(), { type: "feature", featureIds: ["first"] });
   state.hoveredId = "second";
   state.landIndex = new Map([["second", {}]]);
-  state.ownerToFeatureIds = new Map([["DEU", ["second"]]]);
+  state.scenarioBaselineOwnersByFeatureId = Object.freeze({ second: "DEU" });
+  state.ownerToFeatureIds = new Map([["DEU", ["stale-index"]]]);
   assert.deepEqual(access.getApplyTarget(), { type: "feature", featureIds: ["second"] });
   assert.deepEqual(access.getOwnerFeatureIds("DEU"), ["second"]);
   access.applyFeatureColor(["second"], "#abcdef");

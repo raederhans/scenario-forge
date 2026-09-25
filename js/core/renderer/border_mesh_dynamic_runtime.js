@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "../map_data_boundary.js";
 export function buildDynamicBorderHash({
   sovereigntyRevision = 0,
   activeScenarioId = '',
@@ -11,7 +12,7 @@ export function buildDynamicBorderHash({
 
 export function getDynamicBorderOwnershipContext(state = {}) {
   return {
-    ownershipByFeatureId: state.sovereigntyByFeatureId,
+    ownershipByFeatureId: getMapDataBoundary(state).reference.getScenarioAssignments(),
     shellOwnerByFeatureId: state.scenarioAutoShellOwnerByFeatureId,
     scenarioActive: !!state.activeScenarioId,
     viewMode: "ownership",

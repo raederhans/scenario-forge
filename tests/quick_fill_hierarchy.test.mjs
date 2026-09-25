@@ -11,12 +11,12 @@ function fixture() {
     landIndex: new Map(features.map((f) => [f.properties.id, f])),
     countryToFeatureIds: new Map([["CN", ["a", "b", "c"]]]),
     currentTool: "fill", interactionGranularity: "subdivision", batchFillScope: "parent",
-    sovereigntyByFeatureId: {}, activeScenarioId: "", parentGroupByFeatureId: new Map(),
+    scenarioBaselineOwnersByFeatureId: {}, activeScenarioId: "", parentGroupByFeatureId: new Map(),
   };
   const helpers = {
     getAdmin1Group: (f) => f?.properties.admin1_group,
     getFeatureCountryCodeNormalized: (f) => f?.properties.cntr_code,
-    getFeatureInteractionCountryCodeNormalized: (f, id) => state.sovereigntyByFeatureId[id] || f.properties.cntr_code,
+    getFeatureInteractionCountryCodeNormalized: (f, id) => state.scenarioBaselineOwnersByFeatureId[id] || f.properties.cntr_code,
     shouldExcludePoliticalInteractionFeature: (f) => f?.properties.interactive === false,
     isSovereigntyModeActive: () => state.paintMode === "sovereignty",
   };
@@ -79,32 +79,32 @@ test("incomplete reference groups are not exposed as complete parent fills", () 
   assert.equal(f.resolve("a", "level:prefecture").status, "incomplete_group");
 });
 
-test("parent fill is intersected with the current scenario owner", () => {
+test("parent fill is intersected with the read-only scenario group", () => {
   const f = fixture();
   f.state.activeScenarioId = "hoi4_1936";
-  f.state.sovereigntyByFeatureId = { a: "CHI", b: "JAP", c: "CHI" };
+  f.state.scenarioBaselineOwnersByFeatureId = { a: "CHI", b: "JAP", c: "CHI" };
   assert.deepEqual(f.resolve().targetIds, ["a"]);
   assert.deepEqual(f.resolve("a", "country").targetIds, ["a", "c"]);
-  f.state.sovereigntyByFeatureId.b = "CHI";
-  f.state.sovereigntyRevision = 1;
+  f.state.scenarioBaselineOwnersByFeatureId.b = "CHI";
+
   assert.deepEqual(f.resolve("a", "country").targetIds, ["a", "b", "c"]);
 });
 
 test("unloaded scenario members prevent partial fill, absent scenario IDs do not", () => {
   const f = fixture();
   f.state.activeScenarioId = "hoi4_1936";
-  f.state.sovereigntyByFeatureId = { a: "CHI", b: "CHI", c: "CHI" };
+  f.state.scenarioBaselineOwnersByFeatureId = { a: "CHI", b: "CHI", c: "CHI" };
   f.state.landIndex.delete("b");
   assert.equal(f.resolve().status, "loading");
   assert.equal(f.resolve("a", "country").status, "loading");
-  delete f.state.sovereigntyByFeatureId.b;
+  delete f.state.scenarioBaselineOwnersByFeatureId.b;
   assert.deepEqual(f.resolve().targetIds, ["a"]);
 });
 
 test("TNO default remains scenario-aware; geographic scope is explicit", () => {
   const f = fixture();
   f.state.activeScenarioId = "tno_1962";
-  f.state.sovereigntyByFeatureId = { a: "CHI", b: "CHI", c: "CHI" };
+  f.state.scenarioBaselineOwnersByFeatureId = { a: "CHI", b: "CHI", c: "CHI" };
   assert.equal(f.resolve().status, "scenario_level_unavailable");
   assert.deepEqual(f.resolve("a", "level:parent").targetIds, ["a", "b"]);
 });
@@ -115,20 +115,20 @@ test("district tags are owner-scoped and old payload normalization is idempotent
   const normalized = normalizeScenarioDistrictGroupsPayload(legacy);
   assert.deepEqual(normalizeScenarioDistrictGroupsPayload(normalized), normalized);
   f.state.activeScenarioId = "hoi4_1936";
-  f.state.sovereigntyByFeatureId = { a: "CHI", b: "CHI", c: "JAP" };
+  f.state.scenarioBaselineOwnersByFeatureId = { a: "CHI", b: "CHI", c: "JAP" };
   f.state.scenarioDistrictGroupsData = normalized;
   assert.deepEqual(f.resolve().targetIds, ["a", "b"]);
   f.state.scenarioDistrictGroupsData = { scenario_id: "hoi4_1936", tags: { CHI: { districts: { district: { feature_ids: ["a", "c"] } } } } };
   assert.deepEqual(f.resolve().targetIds, ["a"]);
   assert.equal(f.resolve("b").status, "missing_membership");
-  const groups = getScenarioDistrictCountryGrouping(f.state.scenarioDistrictGroupsData, "CN", f.features.map((feature) => ({ id: feature.properties.id, feature })), f.state.sovereigntyByFeatureId);
+  const groups = getScenarioDistrictCountryGrouping(f.state.scenarioDistrictGroupsData, "CN", f.features.map((feature) => ({ id: feature.properties.id, feature })), f.state.scenarioBaselineOwnersByFeatureId);
   assert.deepEqual([...groups], [["a", "CHI::district"]]);
 });
 
 test("stale scenario data cannot survive a scenario switch", () => {
   const f = fixture();
   f.state.activeScenarioId = "hoi4_1939";
-  f.state.sovereigntyByFeatureId = { a: "CHI" };
+  f.state.scenarioBaselineOwnersByFeatureId = { a: "CHI" };
   f.state.scenarioDistrictGroupsData = { scenario_id: "hoi4_1936", tags: {} };
   assert.equal(f.resolve().status, "stale_scenario");
 });

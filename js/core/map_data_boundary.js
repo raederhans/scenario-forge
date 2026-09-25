@@ -65,6 +65,28 @@ export function getMapDataBoundary(source) {
       });
     },
     getScenarioGroupCode,
+    hasScenarioFeature(featureId) {
+      return Object.hasOwn(getScenarioAssignments(), text(featureId));
+    },
+    getScenarioAssignments() {
+      const assignments = getScenarioAssignments();
+      return Object.isFrozen(assignments) ? assignments : createReadonlyReferenceAssignments(assignments);
+    },
+    getBaseGroupCode(featureOrId) {
+      const id = getFeatureId(featureOrId, { fallback: "" });
+      const feature = typeof featureOrId === "string" ? source.landIndex?.get(id) : featureOrId;
+      const props = feature?.properties || {};
+      if (text(props.detail_tier).toLowerCase() === "antarctic_sector") return "";
+      const direct = getScenarioGroupCode(id);
+      const shell = id.toUpperCase().includes("_FB_")
+        || text(props.name).toLowerCase().includes("shell fallback");
+      const shellCode = normalizeCode(ownValue(source.scenarioAutoShellOwnerByFeatureId, id)
+        || props.scenario_shell_owner_hint || props.scenario_shell_controller_hint);
+      if (text(source.mapSemanticMode) === "blank") return shell ? direct || shellCode : direct;
+      if (shell) return direct || shellCode;
+      return direct || normalizeCode(getCountryCode(feature, { useIdFallback: false }))
+        || normalizeCode(ownValue(source.runtimeCanonicalCountryByFeatureId, id));
+    },
     getScenarioFeatureIds() {
       // Complete scenario membership, independent of the hydrated land index.
       return getReferenceIndex(getScenarioAssignments()).ids;
@@ -74,7 +96,7 @@ export function getMapDataBoundary(source) {
     },
     getGeographicCountryFeatureIds(countryCode) {
       const members = source.countryToFeatureIds?.get(normalizeCode(countryCode));
-      return Array.isArray(members) ? Object.freeze([...members]) : EMPTY_IDS;
+      return Array.isArray(members) || members instanceof Set ? Object.freeze([...members]) : EMPTY_IDS;
     },
   });
 
@@ -86,11 +108,11 @@ export function getMapDataBoundary(source) {
         const color = safe(ownValue(source[field], id), "");
         if (color) return { color, source: field, featureId: id, groupCode: "" };
       }
-      // The renderer's existing shell/blank/geographic fallback policy remains
-      // an explicit adapter during P2. Auto Fill and border migration are later.
+      // Persistent base paint uses read-only reference membership, never a
+      // mutable ownership mirror or a display overlay. Adapters remain explicit.
       const groupCode = typeof getBaseGroupCode === "function"
         ? normalizeCode(getBaseGroupCode(id))
-        : reference.getScenarioGroupCode(id);
+        : reference.getBaseGroupCode(id);
       if (groupCode) {
         for (const field of ["sovereignBaseColors", "countryBaseColors"]) {
           const color = safe(ownValue(source[field], groupCode), "");
