@@ -1,0 +1,56 @@
+name: P3B pristine baseline
+on:
+  push:
+    branches: [codex/p3b-acceptance-20260925]
+    paths: [.github/workflows/p3b-baseline.yml]
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 278886451ed93b383aaee6e6a715efbec69640b2
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - run: npm ci && python -m pip install -r requirements-dev.lock.txt
+      - name: Compare the same failed contracts without P3B
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-baseline/pages
+        run: |
+          python - <<'PY'
+          import subprocess,json
+          from pathlib import Path
+          root=Path('.runtime/reports/p3b-pristine');root.mkdir(parents=True,exist_ok=True)
+          (root/'source-sha.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'],text=True))
+          checks=[
+            ('build',['python','tools/build_pages_dist.py','--output-root','.runtime/p3b-baseline/pages']),
+            ('historical-proof',['node','tools/run_p4_state_writer_policy_tests.mjs','--quick']),
+            ('inventories',['node','--test','tests/render_pass_cache_host_owner_inventory.test.mjs','tests/render_pass_commit_accounting_owner_inventory.test.mjs']),
+            ('chunk-contracts',['node','--test','tests/scenario_chunk_contracts.test.mjs','tests/scenario_chunk_contracts.quick.test.mjs']),
+            ('startup-graph',['node','--test','tests/startup_resource_graph_contract.test.mjs']),
+            ('routes',['node','--test','tests/verify_core_runner_behavior.test.mjs','tests/verify_commit_runner_behavior.test.mjs']),
+          ]
+          results=[]
+          for name,cmd in checks:
+            print(f'::group::{name}',flush=True)
+            run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
+            results.append({'check':name,'exit_code':run.returncode,'command':cmd})
+            (root/'checks.json').write_text(json.dumps(results,indent=2))
+            print('::endgroup::',flush=True)
+          raise SystemExit(any(row['exit_code'] for row in results))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p3b-pristine-comparison
+          path: .runtime/reports/p3b-pristine
+          retention-days: 3
