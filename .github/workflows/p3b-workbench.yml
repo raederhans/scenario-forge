@@ -11,7 +11,7 @@ concurrency:
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     permissions:
       contents: write
     outputs:
@@ -20,22 +20,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: codex/paint-contours-p3b-20260925
+          fetch-depth: 40
           sparse-checkout: |
             .github
             js
             tests
             tools
             docs/architecture
-      - name: Apply exact guarded P3B sources
+      - name: Apply exact reviewed source and integrate latest main
         id: apply
         run: |
-          python .github/apply-p3b.py
+          python .github/apply-p3b-continuation.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if ! git diff --cached --quiet; then
-            git commit -m 'feat: derive interior land contours from persistent paint (P3B)'
-            git push origin HEAD:codex/paint-contours-p3b-20260925
+            git commit -m 'fix: preserve mixed-LOD contour seams and incremental geometry lifecycle'
           fi
+          git fetch origin 278886451ed93b383aaee6e6a715efbec69640b2 --depth=12
+          git merge --no-edit --no-ff 278886451ed93b383aaee6e6a715efbec69640b2
+          git push origin HEAD:codex/paint-contours-p3b-20260925
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   behavior:
     needs: source
@@ -62,8 +65,10 @@ jobs:
           commands=[
             ('node-retirement',['npm','run','test:node:ownership-retirement']),
             ('lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
+            ('source-composition',['node','--test','tests/scenario_chunk_layer_payloads_behavior.test.mjs','tests/political_collection_owner_behavior.test.mjs','tests/scenario_chunk_registry_behavior.test.mjs']),
             ('export-behavior',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
-            ('border-contract',['python','-m','unittest','tests.test_map_renderer_border_draw_owner_boundary_contract','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_whitelist_stays_explicit','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_facade_named_imports_stay_whitelisted','-q']),
+            ('border-contract',['python','-m','unittest','tests.test_map_renderer_border_draw_owner_boundary_contract','tests.test_map_renderer_political_collection_owner_boundary_contract','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_whitelist_stays_explicit','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_facade_named_imports_stay_whitelisted','-q']),
+            ('city-regressions',['node','--test','tests/city_data_contract_behavior.test.mjs','tests/scenario_capitals_behavior.test.mjs']),
             ('architecture',['node','tools/check_architecture_boundaries.mjs']),
             ('state-writes',['node','tools/check_state_write_allowlist.mjs']),
             ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
@@ -98,7 +103,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Audit actual topology and cross-source adjacency
+      - name: Audit actual native arcs and coarse-detail promotion and demotion
         run: |
           mkdir -p .runtime/reports/p3b-geometry
           git rev-parse HEAD > .runtime/reports/p3b-geometry/source-sha.txt
@@ -128,7 +133,7 @@ jobs:
           npm ci
           python -m pip install -r requirements-dev.lock.txt
           npx playwright install --with-deps chromium
-      - name: Real worker pixels and composed scenario regressions
+      - name: Real Worker pixels and composed scenario regressions
         run: |
           mkdir -p .runtime/reports/p3b-browser
           git rev-parse HEAD > .runtime/reports/p3b-browser/source-sha.txt
@@ -159,7 +164,7 @@ jobs:
       - run: |
           npm ci
           python -m pip install -r requirements-dev.lock.txt
-      - name: Build and validate publication including worker assets
+      - name: Build and validate publication including Worker assets
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b/pages
         run: |
@@ -168,6 +173,7 @@ jobs:
           set -o pipefail
           python tools/build_pages_dist.py --output-root .runtime/p3b/pages 2>&1 | tee .runtime/reports/p3b-publication/build.log
           test -s .runtime/p3b/pages/js/workers/paint_contour.worker.js
+          test -s .runtime/p3b/pages/js/core/paint_contour_source.js
           python -m unittest tests.test_pages_dist_startup_shell -q 2>&1 | tee .runtime/reports/p3b-publication/startup-shell.log
       - uses: actions/upload-artifact@v4
         if: always()
