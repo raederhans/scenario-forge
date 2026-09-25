@@ -1,0 +1,68 @@
+name: P3B continuation source
+on:
+  push:
+    branches: [codex/paint-contours-p3b-20260925]
+    paths: [.github/workflows/p3b-continuation-source.yml]
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 40
+          sparse-checkout: |
+            .github
+            js
+            tests
+            tools
+            docs
+            css
+            vendor
+            backend
+            map_backend
+            map_builder
+            scenario_builder
+            ops
+            landing
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - name: Package exact source and small module dependencies
+        run: |
+          mkdir -p .runtime/tmp/main-source
+          git rev-parse HEAD > .runtime/tmp/source-sha.txt
+          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
+          git fetch origin 278886451ed93b383aaee6e6a715efbec69640b2 --depth=12
+          git diff --stat 278886451ed93b383aaee6e6a715efbec69640b2...HEAD > .runtime/tmp/change-stat.txt
+          git diff 278886451ed93b383aaee6e6a715efbec69640b2...HEAD > .runtime/tmp/branch.diff
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess,json
+          for name in ['data/runtime_asset_registry.json','data/country_feature_policies.json','data/CATALOG.json','data/thematic_layers/index.json','data/city_lights/historical_1930_entries.json','data/scenarios/index.json']:
+              p=Path(name);p.parent.mkdir(parents=True,exist_ok=True)
+              p.write_bytes(subprocess.check_output(['git','show',f'HEAD:{name}']))
+          base='278886451ed93b383aaee6e6a715efbec69640b2'
+          paths=subprocess.check_output(['git','diff','--name-only','HEAD',base,'--','js','tests','tools','docs/architecture','package.json'],text=True).splitlines()
+          root=Path('.runtime/tmp/main-source')
+          for name in paths:
+              run=subprocess.run(['git','show',f'{base}:{name}'],stdout=subprocess.PIPE)
+              if run.returncode:continue
+              p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(run.stdout)
+          PY
+          tar --exclude=./.git --exclude=./.runtime -czf .runtime/tmp/source.tgz .
+          tar -czf .runtime/tmp/main-source.tgz -C .runtime/tmp/main-source .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3b-continuation-source
+          path: |
+            .runtime/tmp/source.tgz
+            .runtime/tmp/main-source.tgz
+            .runtime/tmp/source-sha.txt
+            .runtime/tmp/tracked-tree.txt
+            .runtime/tmp/change-stat.txt
+            .runtime/tmp/branch.diff
+          retention-days: 2
