@@ -32,7 +32,7 @@
   "runtime_topology_url": "data/scenarios/blank_base/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "52c1990966a9fb9018d3eeda265b066f6bf6e4a309375db9b3e5da5c4db6ac69",
+  "snapshot_fingerprint": "46c702dfd29f8d23f4e5b9260baa85eeffbc2e8cc9bfd97e400c5eb42542b6dc",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",

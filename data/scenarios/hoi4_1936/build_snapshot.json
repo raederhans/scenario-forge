@@ -7,8 +7,8 @@
   "feature_count": 23426,
   "generated_at": "2026-06-13T22:53:26.473496+00:00",
   "input_sha": {
-    "capital_hints.json": "dbe109eb38f141f126f1994a038c7a14f7ebb9a9dc76bf57ba3e488c36d5d7ed",
-    "city_overrides.json": "fac04b535304d48f7c262c90880f8a339c0cb7dc91deebe39c382b1419e9a3c1",
+    "capital_hints.json": "2b1d3d407af5010a47dcd3679c7e80e092bbfaa2fa6c21ddd8bedbee8c86bc24",
+    "city_overrides.json": "00dc5a03dbde9e88d4ec26d4d4af2dabfc9284a21c2fa551d5e137f0debd6871",
     "cores.by_feature.json": "b40640040b1a9d069208b343823a784c4a5ad6b3ccfe353ef5bc3975b05b4774",
     "countries.json": "37a12a9b9d1ee1b8e12eaf9a54b64e439351507a30cf1905aaba1b42ccfa3a6e",
     "geo_locale_patch.json": "914d0cb5ad98c911fa3459b976908fd2419f407bc2290bbf9aba8f59abc6eb98",
@@ -33,6 +33,6 @@
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "6dbd4c03667c7f97ac35591952c7c3638dc886bcdb21ba100d41ad7adfb8e4b7",
+  "snapshot_fingerprint": "a6524c7ba848d717018973a1c4ca4e15bfd64c03af38350f0220d81e1d643714",
   "water_count": 0
 }

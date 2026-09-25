@@ -9,6 +9,22 @@ const city = (id = "CITY::gn::1", properties = {}) => ({
 });
 const normalize = (features) => normalizeCityFeatureCollection({ type: "FeatureCollection", features });
 
+test("sourced small capital cities normalize as scenario-only points", () => {
+  const overrides = normalizeScenarioCityOverridesPayload({ cities: {
+    "CITY::gn::1810604": { city_id: "CITY::gn::1810604", add_city: true,
+      lon: 100.269403, lat: 29.988143, host_feature_id: "litang",
+      display_name: { en: "Litang", zh: "理塘" }, country_code: "CN", base_tier: "regional" },
+  } });
+  const city = overrides.featureCollection.features[0];
+  assert.deepEqual(city.geometry.coordinates, [100.269403, 29.988143]);
+  assert.equal(city.properties.__city_host_feature_id, "litang");
+  assert.equal(city.properties.__city_country_code, "CN");
+  assert.equal(city.properties.__city_locale.zh, "理塘");
+  assert.throws(() => normalizeScenarioCityOverridesPayload({ cities: {
+    bad: { add_city: true, lon: 181, lat: 0 },
+  } }), /city-contract/);
+});
+
 test("city identity survives reorder and retains unloaded host references", () => {
   const a = city("a", { host_feature_id: "unloaded-host", urban_match_id: "unloaded-urban" });
   const b = city("b");

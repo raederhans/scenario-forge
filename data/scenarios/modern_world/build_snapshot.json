@@ -7,8 +7,8 @@
   "feature_count": 11294,
   "generated_at": "2026-03-09T14:09:29.123Z",
   "input_sha": {
-    "capital_hints.json": "98404ff4979f08b60914aff9ebf7a851418ef96dedbd7e906fceb9985bd9db04",
-    "city_overrides.json": "b9cdb12fc5724242cb19649375e971a14a6c9ccba4c3a38ce04a58d73ad1e973",
+    "capital_hints.json": "22abcfea7863ef9cd6ab5f5305b3b0af88afdf8f6786d9b3e7eac0ce8e7ea411",
+    "city_overrides.json": "bc3f0dd3f4b474be6e51a07a431234cab60fffa41a7954eb7068b6bb617aefac",
     "cores.by_feature.json": "b5f1030f4144d4d56aa8ea7b2b1d56390b1911fa4a3f4f79fd1a8d4296e85063",
     "countries.json": "2471a3c423bd08c807fa30bfd9feda2e680c56f424477c74aa61d3ca56ad4eb2",
     "owners.by_feature.json": "46d2d85039a58b07bea3d310f1fbef7e43de15e8336c35a787891c1c5b782e9c",
@@ -19,6 +19,6 @@
   "profile": "lightweight_base",
   "report_paths": {},
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "b77e07752d205f87752e91fc9fbf917eb12cf19bf47b64539d8f9c973134f1c3",
+  "snapshot_fingerprint": "f9be9358d3638e484d38d9297d8f96e3d7737e3f91408347fb943f3a5a104921",
   "water_count": 0
 }

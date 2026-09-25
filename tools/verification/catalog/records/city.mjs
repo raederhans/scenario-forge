@@ -1,6 +1,34 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const CITY_RECORDS = [
   {
+    id: "city:scenario-capital-rules-python",
+    commandRef: "python -m unittest tests.test_scenario_capital_rules -q",
+    sourceRefs: [
+      "tests/test_scenario_capital_rules.py", "tools/repair_scenario_capitals.py",
+      "map_builder/scenario_capital_rules.py", "map_builder/scenario_capital_placement.py",
+      "map_builder/scenario_city_overrides_composer.py",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 410,
+    verification: null, selector: {},
+  },
+  {
+    id: "city:scenario-capitals-node",
+    commandRef: "node --test tests/scenario_capitals_behavior.test.mjs",
+    sourceRefs: [
+      "tests/scenario_capitals_behavior.test.mjs", "tools/repair_scenario_capitals.py",
+      "js/core/data_loader.js", "js/core/renderer/urban_city_policy.js",
+      "js/core/renderer/city_label_text_model.js",
+      "data/scenarios/modern_world/city_overrides.json", "data/scenarios/hoi4_1936/city_overrides.json",
+      "data/scenarios/hoi4_1939/city_overrides.json", "data/scenarios/tno_1962/city_overrides.json",
+    ],
+    ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 411,
+    verification: null, selector: {},
+  },
+  {
     id: "city:reviewed-place-names-python",
     commandRef: "python -m unittest tests.test_reviewed_place_names -q",
     sourceRefs: [

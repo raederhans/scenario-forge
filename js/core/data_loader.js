@@ -403,8 +403,19 @@ function normalizeScenarioCityOverridesPayload(payload, { sourceLabel = "scenari
     };
   });
 
-  const featureCollection = Array.isArray(payload.feature_collection?.features)
-    ? normalizeCityFeatureCollection(payload.feature_collection, { sourceLabel: `${sourceLabel}:feature_collection` })
+  const additionalFeatures = Object.values(cities)
+    .filter((entry) => entry.add_city === true)
+    .map((entry) => ({
+      type: "Feature",
+      properties: { ...entry, id: entry.city_id },
+      geometry: { type: "Point", coordinates: [entry.lon, entry.lat] },
+    }));
+  const rawFeatures = [
+    ...(Array.isArray(payload.feature_collection?.features) ? payload.feature_collection.features : []),
+    ...additionalFeatures,
+  ];
+  const featureCollection = rawFeatures.length
+    ? normalizeCityFeatureCollection({ type: "FeatureCollection", features: rawFeatures }, { sourceLabel: `${sourceLabel}:feature_collection` })
     : null;
 
   return {

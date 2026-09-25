@@ -61,9 +61,12 @@ def build_capital_overrides_payload_from_capital_hints(
             continue
         normalized_tag = str(raw_entry.get("tag") or "").strip().upper()
         normalized_city_id = str(raw_entry.get("city_id") or "").strip()
-        if not normalized_tag or not normalized_city_id:
+        if not normalized_tag:
             continue
-        capitals_by_tag[normalized_tag] = normalized_city_id
+        if normalized_city_id:
+            capitals_by_tag[normalized_tag] = normalized_city_id
+        elif raw_entry.get("resolution_method") != "no_capital":
+            continue
         capital_city_hints[normalized_tag] = copy.deepcopy(raw_entry)
 
     audit_payload = _normalize_dict(normalized_payload.get("audit"))
