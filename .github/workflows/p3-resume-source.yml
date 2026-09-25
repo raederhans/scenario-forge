@@ -1,0 +1,54 @@
+name: P3 continuation source snapshot
+on:
+  push:
+    branches: [codex/visual-editing-p3-20260925]
+    paths: [.github/workflows/p3-resume-source.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            js
+            tests
+            tools
+            docs
+            css
+            vendor
+            backend
+            map_backend
+            map_builder
+            scenario_builder
+            ops
+            landing
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - name: Package current sources and exact small runtime metadata
+        run: |
+          mkdir -p .runtime/tmp
+          git rev-parse HEAD > .runtime/tmp/source-sha.txt
+          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          paths = ['data/runtime_asset_registry.json','data/country_feature_policies.json','data/CATALOG.json','data/thematic_layers/index.json','data/city_lights/historical_1930_entries.json','data/scenarios/index.json']
+          for name in paths:
+              path=Path(name); path.parent.mkdir(parents=True,exist_ok=True)
+              path.write_bytes(subprocess.check_output(['git','show',f'HEAD:{name}']))
+          PY
+          tar --exclude=.git --exclude=.runtime --exclude=dist -czf .runtime/tmp/source.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-continuation-source
+          path: |
+            .runtime/tmp/source.tgz
+            .runtime/tmp/source-sha.txt
+            .runtime/tmp/tracked-tree.txt
+          retention-days: 2
