@@ -5,17 +5,14 @@ on:
     paths: [.github/workflows/p3b-acceptance.yml]
 permissions:
   contents: read
-concurrency:
-  group: p3b-acceptance
-  cancel-in-progress: true
 jobs:
-  publication:
+  integration-diagnostics:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          ref: 4d533d4224cfe549b3b93ac4a676e63b490d7755
+          ref: a8b5a4447d1ab3b28d226015647ca106c907ad3a
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -23,113 +20,61 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.13'
-      - name: Install exact dependencies
+      - name: Install exact dependencies and capture real changed paths
         run: |
           npm ci
           python -m pip install -r requirements-dev.lock.txt
-          npx playwright install --with-deps chromium
-      - name: Prepare published worker probe
+          mkdir -p .runtime/reports/p3b-child-diagnostics
+          git rev-parse HEAD > .runtime/reports/p3b-child-diagnostics/source-sha.txt
+          git fetch --no-tags --depth=1 origin 278886451ed93b383aaee6e6a715efbec69640b2
+          git diff --name-only 278886451ed93b383aaee6e6a715efbec69640b2 HEAD > .runtime/reports/p3b-child-diagnostics/changed-files.txt
+      - name: Build the same Pages input required by PR contracts
         run: |
-          mkdir -p .runtime/reports/p3b-published
-          git rev-parse HEAD > .runtime/reports/p3b-published/source-sha.txt
-          cat > .runtime/reports/p3b-published/worker-probe.cjs <<'JS'
-          const assert = require('node:assert/strict');
-          const fs = require('node:fs');
-          const path = require('node:path');
-          const http = require('node:http');
-          const { chromium } = require('@playwright/test');
-          const root = path.resolve('.runtime/p3b-published/pages');
-          const requests = [], failures = [], pageErrors = [], workers = [];
-          const server = http.createServer((req, res) => {
-            const route = new URL(req.url, 'http://localhost').pathname;
-            if (route === '/__contour_probe__') {
-              res.setHeader('Content-Type', 'text/html');
-              return res.end('<!doctype html><html><title>Published contour worker probe</title><body>Publication acceptance</body></html>');
-            }
-            const file = path.resolve(root, '.' + route);
-            if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
-              failures.push('HTTP 404 ' + route); res.statusCode = 404; return res.end('Not found');
-            }
-            requests.push(route);
-            res.setHeader('Content-Type', file.endsWith('.js') ? 'text/javascript' : 'application/octet-stream');
-            res.end(fs.readFileSync(file));
-          });
-          (async () => {
-            await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-            const browser = await chromium.launch({ headless: true });
-            let result;
-            try {
-              const context = await browser.newContext();
-              context.on('requestfailed', req => failures.push(req.url() + ': ' + req.failure()?.errorText));
-              const page = await context.newPage();
-              page.on('pageerror', error => pageErrors.push(error.message));
-              page.on('worker', worker => workers.push(worker.url()));
-              await page.goto(`http://127.0.0.1:${server.address().port}/__contour_probe__`);
-              result = await page.evaluate(async () => {
-                const { createPaintContourWorkerClient } = await import('/app/js/core/paint_contour_worker_client.js');
-                const { createPaintContourMesh } = await import('/app/js/core/renderer/paint_contour_mesh.js');
-                const rect = (id, x) => ({ id, geometry: { type: 'Polygon', coordinates: [[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]] } });
-                const client = createPaintContourWorkerClient();
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Published contour worker did not respond')), 15000));
-                try {
-                  const graph = await Promise.race([client.build([rect('A',0),rect('B',1)],[],{reset:true}), timeout]);
-                  const colors = {A:'#010101',B:'#020202'};
-                  const mesh = createPaintContourMesh(graph, id => colors[id]);
-                  const different = mesh.getActiveArcCount();
-                  colors.B = colors.A; mesh.refresh(['B']);
-                  const same = mesh.getActiveArcCount();
-                  const moved = await client.build([rect('B',3)],[],{reset:false});
-                  return { featureIds:graph.featureIds, coordinateType:graph.coordinates.constructor.name,
-                    offsetType:graph.offsets.constructor.name, initialArcs:graph.diagnostics.arcCount,
-                    different,same,movedArcs:moved.diagnostics.arcCount };
-                } finally { client.dispose(); }
-              });
-              assert.deepEqual(result, {featureIds:['A','B'],coordinateType:'Float64Array',offsetType:'Uint32Array',initialArcs:1,different:1,same:0,movedArcs:0});
-              assert.equal(workers.length, 1, 'Must execute the production module Worker, not fallback');
-              assert.ok(workers[0].endsWith('/app/js/workers/paint_contour.worker.js'));
-              assert.ok(requests.includes('/app/js/workers/paint_contour.worker.js'));
-              assert.ok(requests.includes('/app/js/core/renderer/paint_contour_graph.js'));
-              assert.deepEqual(failures, []); assert.deepEqual(pageErrors, []);
-              fs.writeFileSync('.runtime/reports/p3b-published/worker-result.json', JSON.stringify({result,workers,requests,failures,pageErrors},null,2));
-              console.log(JSON.stringify({result,workers,requestCount:requests.length,failures,pageErrors},null,2));
-            } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
-          })().catch(error => { console.error(error); process.exitCode = 1; server.close(); });
-          JS
-      - name: Build, verify published dependency paths, run worker, and check export regressions
+          set -o pipefail
+          python tools/build_pages_dist.py --output-root .runtime/p3b-child-diagnostics/pages 2>&1 | tee .runtime/reports/p3b-child-diagnostics/build.log
+      - name: Diagnose all selected child-safe contracts, preserving every failure
         env:
-          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-published/pages
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-child-diagnostics/pages
         run: |
-          python - <<'PY'
-          import json,hashlib,subprocess,os
-          from pathlib import Path
-          root=Path('.runtime/reports/p3b-published')
-          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='4d533d4224cfe549b3b93ac4a676e63b490d7755'
-          checks=[
-            ('export-guards',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
-            ('writers',['node','tools/check_state_write_allowlist.mjs']),
-            ('build',['python','tools/build_pages_dist.py','--output-root','.runtime/p3b-published/pages']),
-            ('published-worker',['node','.runtime/reports/p3b-published/worker-probe.cjs']),
-            ('startup-shell',['python','-m','unittest','tests.test_pages_dist_startup_shell','-q']),
-          ]
-          results=[]
-          for name,cmd in checks:
-            print(f'::group::{name}',flush=True)
-            run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
-            results.append({'check':name,'command':cmd,'exit_code':run.returncode})
-            (root/'checks.json').write_text(json.dumps(results,indent=2))
-            print('::endgroup::',flush=True)
-          manifest=[]
-          for source in ['js/workers/paint_contour.worker.js','js/core/paint_contour_worker_client.js','js/core/worker_task_client.js','js/core/paint_contour_source.js','js/core/renderer/paint_contour_graph.js','js/core/renderer/paint_contour_runtime.js','js/core/renderer/paint_contour_mesh.js']:
-            published=Path(os.environ['SCENARIO_FORGE_PAGES_ARTIFACT_ROOT'])/'app'/source
-            raw=published.read_bytes();assert raw==Path(source).read_bytes(),f'Published bytes mismatch: {source}'
-            manifest.append({'published_path':str(published),'size_bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
-          (root/'published-files.json').write_text(json.dumps(manifest,indent=2))
-          raise SystemExit(any(item['exit_code'] for item in results))
-          PY
+          node --input-type=module - <<'JS'
+          import fs from 'node:fs';
+          import assert from 'node:assert/strict';
+          import {spawnSync} from 'node:child_process';
+          import {buildRepositoryRecommendation} from './tools/select_verification_targets.mjs';
+          import {buildExecutionPlan,executeAdaptivePlan} from './tools/run_adaptive_tests.mjs';
+          const root='.runtime/reports/p3b-child-diagnostics';
+          assert.equal(fs.readFileSync(root+'/source-sha.txt','utf8').trim(),'a8b5a4447d1ab3b28d226015647ca106c907ad3a');
+          const files=fs.readFileSync(root+'/changed-files.txt','utf8').trim().split(/\r?\n/);
+          const report=buildRepositoryRecommendation(files),plan=buildExecutionPlan(report);
+          assert.deepEqual(report.unmatchedChangedFiles,[]);
+          assert.deepEqual(plan.routeGaps,[]);
+          assert.ok(plan.executionCommands.length>100);
+          assert.ok(plan.executionGroups.every(group=>group.executionOwner==='child-safe'&&group.resourceLocks.length===0));
+          fs.writeFileSync(root+'/selection.json',JSON.stringify(report,null,2));
+          fs.writeFileSync(root+'/plan.json',JSON.stringify(plan,null,2));
+          let index=0;
+          const results=executeAdaptivePlan(plan,{
+            continueOnFailure:true,
+            runner:(bin,args,options)=>{
+              const id=String(++index).padStart(3,'0');
+              console.log(`::group::${id} ${bin} ${args.join(' ')}`);
+              const result=spawnSync(bin,args,{...options,stdio:'pipe',encoding:'utf8',maxBuffer:64*1024*1024});
+              const output=(result.stdout||'')+'\n'+(result.stderr||'');
+              fs.writeFileSync(root+'/'+id+'.log',output);
+              console.log(output);console.log('::endgroup::');return result;
+            },
+            onCheckpoint:results=>fs.writeFileSync(root+'/results.json',JSON.stringify(results,null,2))
+          });
+          const failures=results.map((result,index)=>({...result,log:String(index+1).padStart(3,'0')+'.log'})).filter(result=>result.status!=='passed');
+          fs.writeFileSync(root+'/summary.json',JSON.stringify({source:fs.readFileSync(root+'/source-sha.txt','utf8').trim(),commands:results.length,passed:results.length-failures.length,failures,deferredMainThread:plan.mainThreadCommands},null,2));
+          process.exitCode=failures.length?1:0;
+          JS
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: p3b-published-final
-          path: .runtime/reports/p3b-published
+          name: p3b-child-contract-diagnostics
+          path: |
+            .runtime/reports/p3b-child-diagnostics/*.json
+            .runtime/reports/p3b-child-diagnostics/*.log
+            .runtime/reports/p3b-child-diagnostics/*.txt
           retention-days: 3
