@@ -24,6 +24,8 @@ from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_city_overrides_composer import (
     compose_city_overrides_payload,
 )
+from map_builder.scenario_capital_rules import apply_reviewed_capitals
+from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
 
 
 GEONAMES_COLUMNS = [
@@ -4608,7 +4610,8 @@ def _build_default_capital_outputs(
     capital_city_hints = {
         tag: copy.deepcopy(accepted_capital_entries[tag])
         for tag in accepted_tags
-        if _clean_text(accepted_capital_entries[tag].get("city_id"))
+        if (_clean_text(accepted_capital_entries[tag].get("city_id"))
+            or accepted_capital_entries[tag].get("resolution_method") == "no_capital")
     }
 
     capital_defaults_partial_payload = {
@@ -6036,6 +6039,8 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
                     candidate_count=1,
                 )
                 _append_unique_capital_entry(accepted_capital_entries, tag=tag, entry=manual_entry)
+                capital_city_hints[tag] = manual_entry
+                continue
 
             candidate_rows = _dedupe_city_rows(tag_city_index.get(tag, []))
             candidate_rows.sort(key=lambda row: _city_resolution_sort_key(row, preferred_country_codes))
@@ -6147,6 +6152,31 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             scenario_id=scenario_id,
             generated_at=generated_at,
         )
+        overrides_payload = apply_reviewed_capitals(
+            overrides_payload, countries,
+            {_clean_text(row.get("id")): row for row in world_cities.to_dict(orient="records")},
+            scenario_id=scenario_id,
+        )
+        runtime_topology_path = scenario_dir / "runtime_topology.topo.json"
+        if runtime_topology_path.exists() and owners_by_feature:
+            conflicts = place_capital_markers(
+                overrides_payload, countries, owners_by_feature,
+                read_political_features(runtime_topology_path),
+            )
+            overrides_payload["audit"]["capital_territory_conflicts"] = conflicts
+        reviewed_entries = {
+            tag: entry for tag, entry in overrides_payload["capital_city_hints"].items()
+            if entry.get("resolution_method") in {"reviewed_capital", "no_capital"}
+        }
+        accepted_capital_entries.update(reviewed_entries)
+        # Keep placements in both the public hints and durable default inputs.
+        for tag, entry in overrides_payload["capital_city_hints"].items():
+            if tag in accepted_capital_entries and entry.get("city_id") == accepted_capital_entries[tag].get("city_id"):
+                accepted_capital_entries[tag] = copy.deepcopy(entry)
+        unresolved_capitals = [entry for entry in unresolved_capitals if entry.get("tag") not in reviewed_entries]
+        rejected_capital_entries = [entry for entry in rejected_capital_entries if entry.get("tag") not in reviewed_entries]
+        featured_runtime_missing = [tag for tag in featured_runtime_missing if tag not in reviewed_entries]
+        city_assets_payload["cities"] = copy.deepcopy(overrides_payload["cities"])
         city_assets_partial_path = scenario_dir / cfg.SCENARIO_CITY_ASSETS_PARTIAL_FILENAME
         write_json_atomic(city_assets_partial_path, city_assets_payload, ensure_ascii=False, indent=2)
 

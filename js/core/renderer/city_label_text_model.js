@@ -171,7 +171,9 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     const baseComparison = normalizeCityLabelComparisonValue(
       baseStrict || (prefersLocalizedFallback ? baseFallback : rawCurrentLanguageLabel) || (prefersLocalizedFallback ? rawCurrentLanguageLabel : baseFallback) || rawFallback
     );
-    if (hostComparison && hostComparison !== baseComparison) {
+    // Rebinding a capital to the correct scenario polygon does not rename the
+    // settlement after that polygon (for example Nuuk must not become Greenland).
+    if (!props.__city_has_host_override && hostComparison && hostComparison !== baseComparison) {
       return hostFeatureLabel;
     }
     if (baseStrict) {

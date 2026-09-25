@@ -15,48 +15,73 @@
     "KOM": "CITY::ne::1159146551",
     "NOV": "CITY::ne::1159150713",
     "OMS": "CITY::ne::1159149579",
-    "VYT": "CITY::ne::1159149571",
-    "OUR": "CITY::ne::1159149571",
+    "VYT": "CITY::ne::1159148141",
+    "OUR": "CITY::ne::1159146525",
     "PAK": "CITY::ne::1159150645",
     "PFC": "CITY::ne::1159150795",
-    "PRM": "CITY::ne::1159150775",
+    "PRM": "CITY::scenario::cherdyn",
     "QAT": "CITY::ne::1159149469",
     "RKM": "CITY::ne::1159151585",
     "RKNO": "CITY::ne::1159151281",
-    "RKP": "CITY::ne::1159151299",
+    "RKP": "CITY::ne::1159149709",
     "RSF": "CITY::ne::1159150749",
     "RUR": "CITY::ne::1159149585",
     "SAF": "CITY::ne::1159150661",
     "SAM": "CITY::ne::1159150703",
-    "SBA": "CITY::ne::1159150713",
-    "TOM": "CITY::ne::1159150685",
+    "SBA": "CITY::ne::1159146637",
+    "TOM": "CITY::ne::1159146491",
     "TYM": "CITY::ne::1159149581",
     "USA": "CITY::ne::1159151573",
-    "VOR": "CITY::ne::1159149563"
+    "VOR": "CITY::ne::1159149563",
+    "ALT": "CITY::ne::1159149615",
+    "BKR": "CITY::ne::1159150775",
+    "BOP": "CITY::ne::1159137605",
+    "BRY": "CITY::ne::1159149623",
+    "BZ": "CITY::ne::1159144449",
+    "CAM": "CITY::ne::1159151127",
+    "CHI": "CITY::ne::1159151385",
+    "CHL": "CITY::ne::1159151615",
+    "CHT": "CITY::ne::1159150737",
+    "FFR": "CITY::ne::1159151439",
+    "GCE": "CITY::gn::2635412",
+    "GNG": "CITY::ne::1159151331",
+    "GOR": "CITY::ne::1159146557",
+    "GUI": "CITY::ne::1159151325",
+    "GY": "CITY::ne::1159150585",
+    "IRK": "CITY::ne::1159150731",
+    "JAP": "CITY::ne::1159151609",
+    "KAZ": "CITY::ne::1159150969",
+    "KRS": "CITY::ne::1159150733",
+    "LAO": "CITY::ne::1159139147",
+    "MAG": "CITY::ne::1159149559",
+    "MAN": "CITY::ne::1159151393",
+    "MC": "CITY::ne::1159149077",
+    "NIE": "CITY::ne::1159149369",
+    "ONG": "CITY::ne::1159148101",
+    "ORN": "CITY::ne::1159149571",
+    "ORS": "CITY::ne::1159146559",
+    "PHI": "CITY::ne::1159151525",
+    "RGC": "CITY::ne::1159151533",
+    "RKO": "CITY::ne::1159150811",
+    "SCO": "CITY::ne::1159146365",
+    "SVR": "CITY::ne::1159150701",
+    "TAN": "CITY::ne::1159149621",
+    "TIB": "CITY::ne::1159150879",
+    "URA": "CITY::ne::1159146569",
+    "VIN": "CITY::ne::1159147549",
+    "VOK": "CITY::ne::1159149563",
+    "VOL": "CITY::ne::1159148095",
+    "WRS": "CITY::ne::1159146517",
+    "XIK": "CITY::gn::1810604",
+    "XIN": "CITY::ne::1159151531",
+    "YAK": "CITY::ne::1159150745",
+    "ZLT": "CITY::ne::1159139111"
   },
   "capital_city_hints": {
     "AFA": {
       "tag": "AFA",
-      "display_name": "African Anarchy",
-      "lookup_iso2": "NE",
-      "base_iso2": "NE",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159150605",
-      "stable_key": "id::CITY::ne::1159150605",
-      "city_name": "Niamey",
-      "name_ascii": "Niamey",
-      "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 1323691,
-      "country_code": "NE",
-      "host_feature_id": "NE_ADM1_NER-94",
-      "urban_match_id": "",
-      "lon": 2.1098,
-      "lat": 13.51366,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "high",
-      "candidate_count": 76
+      "city_id": "",
+      "resolution_method": "no_capital"
     },
     "AFG": {
       "tag": "AFG",
@@ -166,12 +191,17 @@
       "country_code": "AE",
       "host_feature_id": "ARE-349",
       "urban_match_id": "",
-      "lon": 54.39696,
-      "lat": 24.45118,
+      "lon": 54.433609419711146,
+      "lat": 24.533351824984454,
       "source": "merged",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 16
+      "candidate_count": 16,
+      "source_coordinates": [
+        54.39696,
+        24.45118
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "ARG": {
       "tag": "ARG",
@@ -266,27 +296,27 @@
       "candidate_count": 6
     },
     "BKR": {
-      "tag": "BKR",
-      "display_name": "Bashkir",
-      "lookup_iso2": "RU",
-      "base_iso2": "RU",
-      "capital_state_id": 853,
-      "city_id": "CITY::ne::1159150775",
-      "stable_key": "id::CITY::ne::1159150775",
-      "city_name": "Perm",
-      "name_ascii": "Perm",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 997000,
       "country_code": "RU",
       "host_feature_id": "RU_RAY_50074027B41842513634160",
       "urban_match_id": "",
       "lon": 56.25017,
       "lat": 58.01046,
+      "population": 997000,
+      "base_tier": "major",
       "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 5
+      "tag": "BKR",
+      "city_id": "CITY::ne::1159150775",
+      "stable_key": "id::CITY::ne::1159150775",
+      "city_name": "Perm",
+      "name_ascii": "Perm",
+      "display_name": "Bashkir",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": 853,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "BOL": {
       "tag": "BOL",
@@ -419,12 +449,17 @@
       "country_code": "NG",
       "host_feature_id": "NG_ADM1_NGA-2850",
       "urban_match_id": "",
-      "lon": 3.39467,
-      "lat": 6.45407,
+      "lon": 3.3964715242087253,
+      "lat": 6.448465602583956,
       "source": "merged",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 248
+      "candidate_count": 248,
+      "source_coordinates": [
+        3.39467,
+        6.45407
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "CAN": {
       "tag": "CAN",
@@ -473,50 +508,50 @@
       "candidate_count": 19
     },
     "CHI": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B45149819427590",
+      "urban_match_id": "",
+      "lon": 118.77778,
+      "lat": 32.06167,
+      "population": 9314685,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "CHI",
+      "city_id": "CITY::ne::1159151385",
+      "stable_key": "id::CITY::ne::1159151385",
+      "city_name": "Nanjing",
+      "name_ascii": "Nanjing",
       "display_name": "Republic of China",
       "lookup_iso2": "CN",
       "base_iso2": "CN",
       "capital_state_id": 1035,
-      "city_id": "CITY::ne::1159151533",
-      "stable_key": "id::CITY::ne::1159151533",
-      "city_name": "Chengdu",
-      "name_ascii": "Chengdu",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 13568357,
-      "country_code": "CN",
-      "host_feature_id": "CN_CITY_17275852B39008212883754",
-      "urban_match_id": "",
-      "lon": 104.06667,
-      "lat": 30.66667,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 760
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "CHL": {
+      "country_code": "CL",
+      "host_feature_id": "CL_ADM1_CHL-2698",
+      "urban_match_id": "",
+      "lon": -70.64827,
+      "lat": -33.45694,
+      "population": 5720000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "CHL",
+      "city_id": "CITY::ne::1159151615",
+      "stable_key": "id::CITY::ne::1159151615",
+      "city_name": "Santiago",
+      "name_ascii": "Santiago",
       "display_name": "Chile",
       "lookup_iso2": "CL",
       "base_iso2": "CL",
       "capital_state_id": 279,
-      "city_id": "CITY::ne::1159150931",
-      "stable_key": "id::CITY::ne::1159150931",
-      "city_name": "Valparaíso",
-      "name_ascii": "Valparaiso",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 854000,
-      "country_code": "CL",
-      "host_feature_id": "CL_ADM1_CHL-2699",
-      "urban_match_id": "",
-      "lon": -71.62963,
-      "lat": -33.036,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 99
+      "candidate_count": 1
     },
     "COL": {
       "tag": "COL",
@@ -818,27 +853,27 @@
       "candidate_count": 47
     },
     "GCE": {
+      "country_code": "GB",
+      "host_feature_id": "UKK30",
+      "urban_match_id": "UA_00A1343321DB",
+      "lon": -5.05436,
+      "lat": 50.26526,
+      "population": 23041,
+      "base_tier": "regional",
+      "source": "geonames",
       "tag": "GCE",
+      "city_id": "CITY::gn::2635412",
+      "stable_key": "id::CITY::gn::2635412",
+      "city_name": "Truro",
+      "name_ascii": "Truro",
       "display_name": "German Cornwall Expeditionary Force",
       "lookup_iso2": "GB",
       "base_iso2": "GB",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159127297",
-      "stable_key": "id::CITY::ne::1159127297",
-      "city_name": "Bristol",
-      "name_ascii": "Bristol",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 553528,
-      "country_code": "GB",
-      "host_feature_id": "UKK11",
-      "urban_match_id": "UA_254007292336",
-      "lon": -2.59665,
-      "lat": 51.45523,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 30
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "GCO": {
       "tag": "GCO",
@@ -887,27 +922,27 @@
       "candidate_count": 297
     },
     "GER": {
-      "tag": "GER",
-      "display_name": "Germany",
-      "lookup_iso2": "DE",
-      "base_iso2": "DE",
-      "capital_state_id": 64,
-      "city_id": "CITY::ne::1159151529",
-      "stable_key": "id::CITY::ne::1159151529",
-      "city_name": "Berlin",
-      "name_ascii": "Berlin",
-      "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 3426354,
       "country_code": "DE",
       "host_feature_id": "DE300",
       "urban_match_id": "UA_FD1A5680BB21",
       "lon": 13.41053,
       "lat": 52.52437,
+      "population": 3426354,
+      "base_tier": "major",
       "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "tag": "GER",
+      "city_id": "CITY::ne::1159151529",
+      "stable_key": "id::CITY::ne::1159151529",
+      "city_name": "Germania",
+      "name_ascii": "Berlin",
+      "display_name": "Germany",
+      "lookup_iso2": "DE",
+      "base_iso2": "DE",
+      "capital_state_id": 64,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 1644
+      "candidate_count": 1
     },
     "GMA": {
       "tag": "GMA",
@@ -933,27 +968,27 @@
       "candidate_count": 112
     },
     "GOR": {
-      "tag": "GOR",
-      "display_name": "13th Panzer Army - Gorky",
-      "lookup_iso2": "RU",
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159146557",
-      "stable_key": "id::CITY::ne::1159146557",
-      "city_name": "Cheboksary",
-      "name_ascii": "Cheboksary",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 492331,
       "country_code": "RU",
       "host_feature_id": "RU_RAY_50074027B57067541625780",
       "urban_match_id": "",
       "lon": 47.246,
       "lat": 56.13218,
+      "population": 492331,
+      "base_tier": "regional",
       "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 4
+      "tag": "GOR",
+      "city_id": "CITY::ne::1159146557",
+      "stable_key": "id::CITY::ne::1159146557",
+      "city_name": "Cheboksary",
+      "name_ascii": "Cheboksary",
+      "display_name": "13th Panzer Army - Gorky",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "GRE": {
       "tag": "GRE",
@@ -994,12 +1029,17 @@
       "country_code": "GL",
       "host_feature_id": "GL",
       "urban_match_id": "",
-      "lon": -51.732659,
-      "lat": 64.198282,
+      "lon": -51.71990070766818,
+      "lat": 64.206811848944,
       "source": "natural_earth",
       "resolution_method": "capital_state_fallback",
       "confidence": "medium",
-      "candidate_count": 21
+      "candidate_count": 21,
+      "source_coordinates": [
+        -51.732659,
+        64.198282
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "GSW": {
       "tag": "GSW",
@@ -1301,27 +1341,27 @@
       "candidate_count": 620
     },
     "JAP": {
+      "country_code": "JP",
+      "host_feature_id": "JPN-1860",
+      "urban_match_id": "",
+      "lon": 139.69171,
+      "lat": 35.6895,
+      "population": 35676000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "JAP",
+      "city_id": "CITY::ne::1159151609",
+      "stable_key": "id::CITY::ne::1159151609",
+      "city_name": "Tōkyō",
+      "name_ascii": "Tokyo",
       "display_name": "Japan",
       "lookup_iso2": "JP",
       "base_iso2": "JP",
       "capital_state_id": 282,
-      "city_id": "CITY::ne::1159149967",
-      "stable_key": "id::CITY::ne::1159149967",
-      "city_name": "Kyoto",
-      "name_ascii": "Kyoto",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 1805000,
-      "country_code": "JP",
-      "host_feature_id": "JPN-1850",
-      "urban_match_id": "",
-      "lon": 135.75385,
-      "lat": 35.02107,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 829
+      "candidate_count": 1
     },
     "JOR": {
       "tag": "JOR",
@@ -1347,27 +1387,27 @@
       "candidate_count": 23
     },
     "KAZ": {
+      "country_code": "KZ",
+      "host_feature_id": "KAZ-4829",
+      "urban_match_id": "",
+      "lon": 76.9115,
+      "lat": 43.25249,
+      "population": 1977011,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "KAZ",
+      "city_id": "CITY::ne::1159150969",
+      "stable_key": "id::CITY::ne::1159150969",
+      "city_name": "Alma-Ata",
+      "name_ascii": "Almaty",
       "display_name": "Kazakhstan",
       "lookup_iso2": "KZ",
       "base_iso2": "KZ",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159150965",
-      "stable_key": "id::CITY::ne::1159150965",
-      "city_name": "Nur-Sultan",
-      "name_ascii": "Astana",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 345604,
-      "country_code": "KZ",
-      "host_feature_id": "KAZ-4830",
-      "urban_match_id": "",
-      "lon": 71.44598,
-      "lat": 51.1801,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 120
+      "candidate_count": 1
     },
     "KGZ": {
       "tag": "KGZ",
@@ -1393,27 +1433,27 @@
       "candidate_count": 26
     },
     "KOM": {
-      "tag": "KOM",
-      "display_name": "Komi Republic",
-      "lookup_iso2": "RU",
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159146551",
-      "stable_key": "id::CITY::ne::1159146551",
-      "city_name": "Syktyvkar",
-      "name_ascii": "Syktyvkar",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 245083,
       "country_code": "RU",
       "host_feature_id": "RU_RAY_50074027B71551288540526",
       "urban_match_id": "",
       "lon": 50.8163,
       "lat": 61.66393,
+      "population": 245083,
+      "base_tier": "regional",
       "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 4
+      "tag": "KOM",
+      "city_id": "CITY::ne::1159146551",
+      "stable_key": "id::CITY::ne::1159146551",
+      "city_name": "Syktyvkar",
+      "name_ascii": "Syktyvkar",
+      "display_name": "Komi Republic",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "KOR": {
       "tag": "KOR",
@@ -1546,12 +1586,17 @@
       "country_code": "LR",
       "host_feature_id": "LR_ADM1_LBR-788",
       "urban_match_id": "",
-      "lon": -10.7969,
-      "lat": 6.30054,
+      "lon": -10.795056804597337,
+      "lat": 6.3040686357909665,
       "source": "merged",
       "resolution_method": "capital_state_fallback",
       "confidence": "high",
-      "candidate_count": 14
+      "candidate_count": 14,
+      "source_coordinates": [
+        -10.7969,
+        6.30054
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "MAD": {
       "tag": "MAD",
@@ -1600,27 +1645,27 @@
       "candidate_count": 90
     },
     "MAN": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B64529865795141",
+      "urban_match_id": "",
+      "lon": 125.32278,
+      "lat": 43.88,
+      "population": 4714996,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "MAN",
+      "city_id": "CITY::ne::1159151393",
+      "stable_key": "id::CITY::ne::1159151393",
+      "city_name": "Xinjing",
+      "name_ascii": "Changchun",
       "display_name": "Manchukuo",
       "lookup_iso2": "CN",
       "base_iso2": "CN",
       "capital_state_id": 328,
-      "city_id": "CITY::ne::1159151377",
-      "stable_key": "id::CITY::ne::1159151377",
-      "city_name": "Shenyeng",
-      "name_ascii": "Shenyang",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 7050000,
-      "country_code": "CN",
-      "host_feature_id": "CN_CITY_17275852B24114902469869",
-      "urban_match_id": "",
-      "lon": 123.43278,
-      "lat": 41.79222,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 176
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "MEN": {
       "tag": "MEN",
@@ -1659,7 +1704,7 @@
       "base_tier": "major",
       "population": 19028000,
       "country_code": "MX",
-      "host_feature_id": "MX_ZN_14_003",
+      "host_feature_id": "MX_ZN_14_002",
       "urban_match_id": "",
       "lon": -99.12766,
       "lat": 19.42847,
@@ -1684,12 +1729,17 @@
       "country_code": "MV",
       "host_feature_id": "MV",
       "urban_match_id": "",
-      "lon": 73.50916,
+      "lon": 73.50012500135003,
       "lat": 4.17521,
       "source": "merged",
       "resolution_method": "capital_state_fallback",
       "confidence": "high",
-      "candidate_count": 1
+      "candidate_count": 1,
+      "source_coordinates": [
+        73.50916,
+        4.17521
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "MNT": {
       "tag": "MNT",
@@ -1853,50 +1903,50 @@
       "candidate_count": 16
     },
     "VYT": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B50420734283306",
+      "urban_match_id": "",
+      "lon": 53.19862,
+      "lat": 56.85225,
+      "population": 648213,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "VYT",
+      "city_id": "CITY::ne::1159148141",
+      "stable_key": "id::CITY::ne::1159148141",
+      "city_name": "Izhevsk",
+      "name_ascii": "Izhevsk",
       "display_name": "Vyatka",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 652,
-      "city_id": "CITY::ne::1159150699",
-      "stable_key": "id::CITY::ne::1159150699",
-      "city_name": "Ufa",
-      "name_ascii": "Ufa",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 1120547,
-      "country_code": "RU",
-      "host_feature_id": "RU_RAY_50074027B44870327389428",
-      "urban_match_id": "",
-      "lon": 55.96779,
-      "lat": 54.74306,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 23
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "OUR": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B5244237471572",
+      "urban_match_id": "",
+      "lon": 55.9533,
+      "lat": 53.63793,
+      "population": 267231,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "OUR",
+      "city_id": "CITY::ne::1159146525",
+      "stable_key": "id::CITY::ne::1159146525",
+      "city_name": "Sterlitamak",
+      "name_ascii": "Sterlitamak",
       "display_name": "Orenburg-Ural Union",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159149571",
-      "stable_key": "id::CITY::ne::1159149571",
-      "city_name": "Orenburg",
-      "name_ascii": "Orenburg",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 564773,
-      "country_code": "RU",
-      "host_feature_id": "RU_RAY_50074027B32234523409019",
-      "urban_match_id": "",
-      "lon": 55.09883,
-      "lat": 51.76712,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 10
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "PAK": {
       "tag": "PAK",
@@ -2014,27 +2064,27 @@
       "candidate_count": 263
     },
     "PHI": {
+      "country_code": "PH",
+      "host_feature_id": "PHL-5543",
+      "urban_match_id": "",
+      "lon": 120.9822,
+      "lat": 14.6042,
+      "population": 11100000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "PHI",
+      "city_id": "CITY::ne::1159151525",
+      "stable_key": "id::CITY::ne::1159151525",
+      "city_name": "Manila",
+      "name_ascii": "Manila",
       "display_name": "Philippines",
       "lookup_iso2": "PH",
       "base_iso2": "PH",
       "capital_state_id": 327,
-      "city_id": "CITY::ne::1159149605",
-      "stable_key": "id::CITY::ne::1159149605",
-      "city_name": "Baguio",
-      "name_ascii": "Baguio",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 447824,
-      "country_code": "PH",
-      "host_feature_id": "PHL-5539",
-      "urban_match_id": "",
-      "lon": 120.59306,
-      "lat": 16.41639,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 378
+      "candidate_count": 1
     },
     "PRC": {
       "tag": "PRC",
@@ -2098,12 +2148,17 @@
       "country_code": "PR",
       "host_feature_id": "PR",
       "urban_match_id": "",
-      "lon": -66.10572,
-      "lat": 18.46633,
+      "lon": -66.11835124365471,
+      "lat": 18.448865650409047,
       "source": "merged",
       "resolution_method": "capital_state_fallback",
       "confidence": "high",
-      "candidate_count": 21
+      "candidate_count": 21,
+      "source_coordinates": [
+        -66.10572,
+        18.46633
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "QAT": {
       "tag": "QAT",
@@ -2175,27 +2230,27 @@
       "candidate_count": 537
     },
     "RGC": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B39008212883754",
+      "urban_match_id": "",
+      "lon": 104.06667,
+      "lat": 30.66667,
+      "population": 13568357,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "RGC",
+      "city_id": "CITY::ne::1159151533",
+      "stable_key": "id::CITY::ne::1159151533",
+      "city_name": "Chengdu",
+      "name_ascii": "Chengdu",
       "display_name": "Sichuan Clique",
       "lookup_iso2": "CN",
       "base_iso2": "CN",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151605",
-      "stable_key": "id::CITY::ne::1159151605",
-      "city_name": "Shanghai",
-      "name_ascii": "Shanghai",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 24874500,
-      "country_code": "CN",
-      "host_feature_id": "CN_CITY_17275852B82708605205805",
-      "urban_match_id": "",
-      "lon": 121.45806,
-      "lat": 31.22222,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 232
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "RKK": {
       "tag": "RKK",
@@ -2290,50 +2345,50 @@
       "candidate_count": 50
     },
     "RKO": {
+      "country_code": "LV",
+      "host_feature_id": "LV006",
+      "urban_match_id": "UA_8711E708809C",
+      "lon": 24.10589,
+      "lat": 56.946,
+      "population": 742572,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "RKO",
+      "city_id": "CITY::ne::1159150811",
+      "stable_key": "id::CITY::ne::1159150811",
+      "city_name": "Riga",
+      "name_ascii": "Riga",
       "display_name": "Reichskommissariat Ostland",
       "lookup_iso2": "LT",
       "base_iso2": "LT",
       "capital_state_id": 808,
-      "city_id": "CITY::ne::1159150809",
-      "stable_key": "id::CITY::ne::1159150809",
-      "city_name": "Vilnius",
-      "name_ascii": "Vilnius",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 542366,
-      "country_code": "LT",
-      "host_feature_id": "LT011",
-      "urban_match_id": "UA_A6EEFCF54AA2",
-      "lon": 25.2798,
-      "lat": 54.68916,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 125
+      "candidate_count": 1
     },
     "RKP": {
+      "country_code": "PL",
+      "host_feature_id": "PL_POW_1261",
+      "urban_match_id": "UA_00F4BF70D3F2",
+      "lon": 19.93658,
+      "lat": 50.06143,
+      "population": 804237,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "RKP",
-      "display_name": "Reichskommissariat Polen",
+      "city_id": "CITY::ne::1159149709",
+      "stable_key": "id::CITY::ne::1159149709",
+      "city_name": "Krakau",
+      "name_ascii": "Krakow",
+      "display_name": "General Government of Poland",
       "lookup_iso2": "PL",
       "base_iso2": "PL",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151299",
-      "stable_key": "id::CITY::ne::1159151299",
-      "city_name": "Warsaw",
-      "name_ascii": "Warsaw",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 1707000,
-      "country_code": "PL",
-      "host_feature_id": "PL_POW_1465",
-      "urban_match_id": "UA_2BE5967FAC8E",
-      "lon": 21.01178,
-      "lat": 52.22977,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 145
+      "candidate_count": 1
     },
     "RKU": {
       "tag": "RKU",
@@ -2428,27 +2483,27 @@
       "candidate_count": 39
     },
     "SCO": {
+      "country_code": "GB",
+      "host_feature_id": "UKM75",
+      "urban_match_id": "UA_F0B13DEE489F",
+      "lon": -3.19648,
+      "lat": 55.95206,
+      "population": 514990,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "SCO",
+      "city_id": "CITY::ne::1159146365",
+      "stable_key": "id::CITY::ne::1159146365",
+      "city_name": "Edinburgh",
+      "name_ascii": "Edinburgh",
       "display_name": "Scotland",
       "lookup_iso2": "GB",
       "base_iso2": "GB",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159150591",
-      "stable_key": "id::CITY::ne::1159150591",
-      "city_name": "Glasgow",
-      "name_ascii": "Glasgow",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 1160000,
-      "country_code": "GB",
-      "host_feature_id": "UKM82",
-      "urban_match_id": "UA_4D82EEE7DA9E",
-      "lon": -4.25763,
-      "lat": 55.86515,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 62
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "SER": {
       "tag": "SER",
@@ -2612,27 +2667,27 @@
       "candidate_count": 51
     },
     "SVR": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B76835864360350",
+      "urban_match_id": "",
+      "lon": 60.61529,
+      "lat": 56.85733,
+      "population": 1495066,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "SVR",
+      "city_id": "CITY::ne::1159150701",
+      "stable_key": "id::CITY::ne::1159150701",
+      "city_name": "Sverdlovsk",
+      "name_ascii": "Yekaterinburg",
       "display_name": "Ural Military District",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 653,
-      "city_id": "CITY::ne::1159146559",
-      "stable_key": "id::CITY::ne::1159146559",
-      "city_name": "Orsk",
-      "name_ascii": "Orsk",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 246836,
-      "country_code": "RU",
-      "host_feature_id": "RU_RAY_50074027B36993675567197",
-      "urban_match_id": "",
-      "lon": 58.48802,
-      "lat": 51.23206,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 5
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "SWE": {
       "tag": "SWE",
@@ -2727,27 +2782,27 @@
       "candidate_count": 18
     },
     "TIB": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B46177532075867",
+      "urban_match_id": "",
+      "lon": 91.1,
+      "lat": 29.65,
+      "population": 219599,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "TIB",
+      "city_id": "CITY::ne::1159150879",
+      "stable_key": "id::CITY::ne::1159150879",
+      "city_name": "Lhasa",
+      "name_ascii": "Lhasa",
       "display_name": "Tibet",
       "lookup_iso2": "CN",
       "base_iso2": "CN",
       "capital_state_id": null,
-      "city_id": "CITY::gn::13527052",
-      "stable_key": "id::CITY::gn::13527052",
-      "city_name": "Chéngguān Qū",
-      "name_ascii": "Chengguan Qu",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 478275,
-      "country_code": "CN",
-      "host_feature_id": "CN_CITY_17275852B46177532075867",
-      "urban_match_id": "",
-      "lon": 91.04441,
-      "lat": 29.63842,
-      "source": "geonames",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 17
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "TJK": {
       "tag": "TJK",
@@ -2865,27 +2920,27 @@
       "candidate_count": 32
     },
     "ZLT": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B96019567685522",
+      "urban_match_id": "",
+      "lon": 56.97157,
+      "lat": 57.41435,
+      "population": 66389,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "ZLT",
+      "city_id": "CITY::ne::1159139111",
+      "stable_key": "id::CITY::ne::1159139111",
+      "city_name": "Kungur",
+      "name_ascii": "Kungur",
       "display_name": "Zlatoust",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
       "capital_state_id": 848,
-      "city_id": "CITY::ne::1159139121",
-      "stable_key": "id::CITY::ne::1159139121",
-      "city_name": "Chusovoy",
-      "name_ascii": "Chusovoy",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 72113,
-      "country_code": "RU",
-      "host_feature_id": "RU_RAY_50074027B60091493242386",
-      "urban_match_id": "",
-      "lon": 57.81261,
-      "lat": 58.28915,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 7
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "USA": {
       "tag": "USA",
@@ -2957,27 +3012,27 @@
       "candidate_count": 205
     },
     "VIN": {
+      "country_code": "VN",
+      "host_feature_id": "VNM-490",
+      "urban_match_id": "",
+      "lon": 107.59546,
+      "lat": 16.4619,
+      "population": 1380000,
+      "base_tier": "regional",
+      "source": "merged",
       "tag": "VIN",
+      "city_id": "CITY::ne::1159147549",
+      "stable_key": "id::CITY::ne::1159147549",
+      "city_name": "Huế",
+      "name_ascii": "Hue",
       "display_name": "Vietnam",
       "lookup_iso2": "VN",
       "base_iso2": "VN",
       "capital_state_id": 671,
-      "city_id": "CITY::ne::1159151251",
-      "stable_key": "id::CITY::ne::1159151251",
-      "city_name": "Hanoi",
-      "name_ascii": "Hanoi",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 8053663,
-      "country_code": "VN",
-      "host_feature_id": "VNM-462",
-      "urban_match_id": "",
-      "lon": 105.84117,
-      "lat": 21.0245,
-      "source": "merged",
-      "resolution_method": "capital_state_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 208
+      "candidate_count": 1
     },
     "VMT": {
       "tag": "VMT",
@@ -3003,27 +3058,27 @@
       "candidate_count": 26
     },
     "VOL": {
-      "tag": "VOL",
-      "display_name": "Vologda Neutral Zone",
-      "lookup_iso2": "RU",
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159148095",
-      "stable_key": "id::CITY::ne::1159148095",
-      "city_name": "Velsk",
-      "name_ascii": "Vel'sk",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 26300,
       "country_code": "RU",
       "host_feature_id": "RU_RAY_50074027B32782787425978",
       "urban_match_id": "UA_E219425EA75A",
       "lon": 42.0992,
       "lat": 61.06919,
+      "population": 26300,
+      "base_tier": "regional",
       "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 2
+      "tag": "VOL",
+      "city_id": "CITY::ne::1159148095",
+      "stable_key": "id::CITY::ne::1159148095",
+      "city_name": "Velsk",
+      "name_ascii": "Vel'sk",
+      "display_name": "Vologda Neutral Zone",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "WLS": {
       "tag": "WLS",
@@ -3049,27 +3104,27 @@
       "candidate_count": 41
     },
     "WRS": {
-      "tag": "WRS",
-      "display_name": "West Russian Revolutionary Front",
-      "lookup_iso2": "RU",
-      "base_iso2": "RU",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159146517",
-      "stable_key": "id::CITY::ne::1159146517",
-      "city_name": "Severodvinsk",
-      "name_ascii": "Severodvinsk",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 194292,
       "country_code": "RU",
       "host_feature_id": "RU_RAY_50074027B51159964054862",
       "urban_match_id": "UA_EA2EECA8CC32",
       "lon": 39.82971,
       "lat": 64.55825,
+      "population": 194292,
+      "base_tier": "regional",
       "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 17
+      "tag": "WRS",
+      "city_id": "CITY::ne::1159146517",
+      "stable_key": "id::CITY::ne::1159146517",
+      "city_name": "Severodvinsk",
+      "name_ascii": "Severodvinsk",
+      "display_name": "West Russian Revolutionary Front",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "XSM": {
       "tag": "XSM",
@@ -3162,6 +3217,800 @@
       "resolution_method": "manual_override",
       "confidence": "high",
       "candidate_count": 1
+    },
+    "ALT": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B27229100203359",
+      "urban_match_id": "",
+      "lon": 91.42593,
+      "lat": 53.7154,
+      "population": 184168,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "ALT",
+      "city_id": "CITY::ne::1159149615",
+      "stable_key": "id::CITY::ne::1159149615",
+      "city_name": "Abakan",
+      "name_ascii": "Abakan",
+      "display_name": "Oirotia",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": 654,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "BOP": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B44738927608854",
+      "urban_match_id": "",
+      "lon": 60.413253,
+      "lat": 60.693645,
+      "population": 19379,
+      "base_tier": "minor",
+      "source": "natural_earth",
+      "tag": "BOP",
+      "city_id": "CITY::ne::1159137605",
+      "stable_key": "id::CITY::ne::1159137605",
+      "city_name": "Ivdel",
+      "name_ascii": "Ivdel",
+      "display_name": "вор в законе",
+      "lookup_iso2": "BOP",
+      "base_iso2": "BOP",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "BRY": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B15921204725831",
+      "urban_match_id": "",
+      "lon": 107.59979,
+      "lat": 51.82648,
+      "population": 360278,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "BRY",
+      "city_id": "CITY::ne::1159149623",
+      "stable_key": "id::CITY::ne::1159149623",
+      "city_name": "Ulan-Ude",
+      "name_ascii": "Ulan-Ude",
+      "display_name": "Buryat Soviet Socialist Republic",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "BZ": {
+      "country_code": "BZ",
+      "host_feature_id": "BZ_ADM1_BLZ-1323",
+      "urban_match_id": "",
+      "lon": -88.19836599616492,
+      "lat": 17.50186023016844,
+      "population": 65222,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "BZ",
+      "city_id": "CITY::ne::1159144449",
+      "stable_key": "id::CITY::ne::1159144449",
+      "city_name": "Belize City",
+      "name_ascii": "Belize City",
+      "display_name": "Belize",
+      "lookup_iso2": "BZ",
+      "base_iso2": "BZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        -88.19756,
+        17.49952
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "CAM": {
+      "country_code": "KH",
+      "host_feature_id": "KHM-1789",
+      "urban_match_id": "",
+      "lon": 104.91601,
+      "lat": 11.56245,
+      "population": 1573544,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "CAM",
+      "city_id": "CITY::ne::1159151127",
+      "stable_key": "id::CITY::ne::1159151127",
+      "city_name": "Phnom Penh",
+      "name_ascii": "Phnom Penh",
+      "display_name": "Cambodia",
+      "lookup_iso2": "KH",
+      "base_iso2": "KH",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "CHT": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B52095363621144",
+      "urban_match_id": "",
+      "lon": 113.49171,
+      "lat": 52.04311,
+      "population": 349005,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "CHT",
+      "city_id": "CITY::ne::1159150737",
+      "stable_key": "id::CITY::ne::1159150737",
+      "city_name": "Chita",
+      "name_ascii": "Chita",
+      "display_name": "Far Eastern Tsardom",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "FFR": {
+      "country_code": "CI",
+      "host_feature_id": "CI_ADM1_83157122B76853064397847",
+      "urban_match_id": "",
+      "lon": -4.00167,
+      "lat": 5.35444,
+      "population": 6321017,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "FFR",
+      "city_id": "CITY::ne::1159151439",
+      "stable_key": "id::CITY::ne::1159151439",
+      "city_name": "Abidjan",
+      "name_ascii": "Abidjan",
+      "display_name": "Free France",
+      "lookup_iso2": "FR",
+      "base_iso2": "FR",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GNG": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B38988280096574",
+      "urban_match_id": "",
+      "lon": 113.25,
+      "lat": 23.11667,
+      "population": 16096724,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GNG",
+      "city_id": "CITY::ne::1159151331",
+      "stable_key": "id::CITY::ne::1159151331",
+      "city_name": "Kōshū",
+      "name_ascii": "Guangzhou",
+      "display_name": "Guangdong State",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GUI": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B16907822302081",
+      "urban_match_id": "",
+      "lon": 106.71667,
+      "lat": 26.58333,
+      "population": 3662000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GUI",
+      "city_id": "CITY::ne::1159151325",
+      "stable_key": "id::CITY::ne::1159151325",
+      "city_name": "Guiyang",
+      "name_ascii": "Guiyang",
+      "display_name": "Guizhou Clique",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "GY": {
+      "country_code": "GY",
+      "host_feature_id": "GY_ADM1_GUY-677",
+      "urban_match_id": "",
+      "lon": -58.15527,
+      "lat": 6.80448,
+      "population": 264350,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "GY",
+      "city_id": "CITY::ne::1159150585",
+      "stable_key": "id::CITY::ne::1159150585",
+      "city_name": "Georgetown",
+      "name_ascii": "Georgetown",
+      "display_name": "Guyana",
+      "lookup_iso2": "GY",
+      "base_iso2": "GY",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "IRK": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B16590534350990",
+      "urban_match_id": "",
+      "lon": 104.29076,
+      "lat": 52.29566,
+      "population": 623869,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "IRK",
+      "city_id": "CITY::ne::1159150731",
+      "stable_key": "id::CITY::ne::1159150731",
+      "city_name": "Irkutsk",
+      "name_ascii": "Irkutsk",
+      "display_name": "Far Eastern Presidium",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "KRS": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B86573453113564",
+      "urban_match_id": "",
+      "lon": 92.93136,
+      "lat": 56.03742,
+      "population": 1090811,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "KRS",
+      "city_id": "CITY::ne::1159150733",
+      "stable_key": "id::CITY::ne::1159150733",
+      "city_name": "Krasnoyarsk",
+      "name_ascii": "Krasnoyarsk",
+      "display_name": "Krasnodar",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "LAO": {
+      "country_code": "LA",
+      "host_feature_id": "LAO-3289",
+      "urban_match_id": "",
+      "lon": 102.1525,
+      "lat": 19.8933,
+      "population": 107142,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "LAO",
+      "city_id": "CITY::ne::1159139147",
+      "stable_key": "id::CITY::ne::1159139147",
+      "city_name": "Luang Prabang",
+      "name_ascii": "Luang Prabang",
+      "display_name": "Laos",
+      "lookup_iso2": "LA",
+      "base_iso2": "LA",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MAG": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B40271227634983",
+      "urban_match_id": "",
+      "lon": 59.0066,
+      "lat": 53.39808,
+      "population": 413351,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "MAG",
+      "city_id": "CITY::ne::1159149559",
+      "stable_key": "id::CITY::ne::1159149559",
+      "city_name": "Magnitogorsk",
+      "name_ascii": "Magnitogorsk",
+      "display_name": "Magnitogorsk",
+      "lookup_iso2": "MAG",
+      "base_iso2": "MAG",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "MC": {
+      "country_code": "MC",
+      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "urban_match_id": "UA_BBD8D7524307",
+      "lon": 7.418141920294424,
+      "lat": 43.75090156108269,
+      "population": 36371,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MC",
+      "city_id": "CITY::ne::1159149077",
+      "stable_key": "id::CITY::ne::1159149077",
+      "city_name": "Monaco",
+      "name_ascii": "Monaco",
+      "display_name": "Monaco",
+      "lookup_iso2": "MC",
+      "base_iso2": "MC",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        7.42145,
+        43.73718
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "NIE": {
+      "country_code": "GB",
+      "host_feature_id": "UKN06",
+      "urban_match_id": "UA_DFEA2C48028D",
+      "lon": -5.92541,
+      "lat": 54.59682,
+      "population": 450406,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "NIE",
+      "city_id": "CITY::ne::1159149369",
+      "stable_key": "id::CITY::ne::1159149369",
+      "city_name": "Belfast",
+      "name_ascii": "Belfast",
+      "display_name": "Northern-Ireland",
+      "lookup_iso2": "NIE",
+      "base_iso2": "NIE",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "ONG": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B51176471238152",
+      "urban_match_id": "UA_50E0924B712A",
+      "lon": 38.09944,
+      "lat": 63.9057,
+      "population": 22693,
+      "base_tier": "minor",
+      "source": "merged",
+      "tag": "ONG",
+      "city_id": "CITY::ne::1159148101",
+      "stable_key": "id::CITY::ne::1159148101",
+      "city_name": "Onega",
+      "name_ascii": "Onega",
+      "display_name": "Onega",
+      "lookup_iso2": "ONG",
+      "base_iso2": "ONG",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "ORN": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B32234523409019",
+      "urban_match_id": "",
+      "lon": 55.09883,
+      "lat": 51.76712,
+      "population": 564773,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "ORN",
+      "city_id": "CITY::ne::1159149571",
+      "stable_key": "id::CITY::ne::1159149571",
+      "city_name": "Orenburg",
+      "name_ascii": "Orenburg",
+      "display_name": "Orenburg",
+      "lookup_iso2": "ORN",
+      "base_iso2": "ORN",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "ORS": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B36993675567197",
+      "urban_match_id": "",
+      "lon": 58.48802,
+      "lat": 51.23206,
+      "population": 246836,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "ORS",
+      "city_id": "CITY::ne::1159146559",
+      "stable_key": "id::CITY::ne::1159146559",
+      "city_name": "Orsk",
+      "name_ascii": "Orsk",
+      "display_name": "Orsk",
+      "lookup_iso2": "ORS",
+      "base_iso2": "ORS",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "PRM": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B67988371503022",
+      "urban_match_id": null,
+      "lon": 56.516667,
+      "lat": 60.4,
+      "population": 0,
+      "base_tier": "regional",
+      "source": "reviewed_settlement",
+      "tag": "PRM",
+      "city_id": "CITY::scenario::cherdyn",
+      "stable_key": "id::CITY::scenario::cherdyn",
+      "city_name": "Cherdyn",
+      "name_ascii": "Cherdyn",
+      "display_name": "Perm",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": 753,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "SBA": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B23914902368646",
+      "urban_match_id": "",
+      "lon": 95.71848,
+      "lat": 56.20218,
+      "population": 101502,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "SBA",
+      "city_id": "CITY::ne::1159146637",
+      "stable_key": "id::CITY::ne::1159146637",
+      "city_name": "Kansk",
+      "name_ascii": "Kansk",
+      "display_name": "Siberian Black Army",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "TAN": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B82563298264185",
+      "urban_match_id": "",
+      "lon": 94.43776,
+      "lat": 51.71108,
+      "population": 116983,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "TAN",
+      "city_id": "CITY::ne::1159149621",
+      "stable_key": "id::CITY::ne::1159149621",
+      "city_name": "Kyzyl",
+      "name_ascii": "Kyzyl",
+      "display_name": "People's Revolutionary Council",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": 329,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "TOM": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B48772613269862",
+      "urban_match_id": "",
+      "lon": 82.90295,
+      "lat": 58.32007,
+      "population": 27876,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "TOM",
+      "city_id": "CITY::ne::1159146491",
+      "stable_key": "id::CITY::ne::1159146491",
+      "city_name": "Kolpashevo",
+      "name_ascii": "Kolpashevo",
+      "display_name": "Tomsk",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": 578,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "URA": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B75983799969403",
+      "urban_match_id": "",
+      "lon": 69.02728,
+      "lat": 61.00187,
+      "population": 101466,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "URA",
+      "city_id": "CITY::ne::1159146569",
+      "stable_key": "id::CITY::ne::1159146569",
+      "city_name": "Khanty-Mansiysk",
+      "name_ascii": "Khanty-Mansiysk",
+      "display_name": "Ural Military District Red Air Force",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "VOK": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B78297177563949",
+      "urban_match_id": "",
+      "lon": 64.0667,
+      "lat": 67.50867,
+      "population": 80039,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "VOK",
+      "city_id": "CITY::ne::1159149563",
+      "stable_key": "id::CITY::ne::1159149563",
+      "city_name": "Vorkuta",
+      "name_ascii": "Vorkuta",
+      "display_name": "Vorkuta",
+      "lookup_iso2": "VOK",
+      "base_iso2": "VOK",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "XIK": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B55184179127017",
+      "urban_match_id": null,
+      "lon": 100.269403,
+      "lat": 29.988143,
+      "population": 0,
+      "base_tier": "regional",
+      "source": "geonames",
+      "tag": "XIK",
+      "city_id": "CITY::gn::1810604",
+      "stable_key": "id::CITY::gn::1810604",
+      "city_name": "Litang",
+      "name_ascii": "Litang",
+      "display_name": "24th Army of the National Revolutionary Army",
+      "lookup_iso2": "XIK",
+      "base_iso2": "XIK",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "XIN": {
+      "country_code": "CN",
+      "host_feature_id": "CN_CITY_17275852B35279738214019",
+      "urban_match_id": "",
+      "lon": 87.60046,
+      "lat": 43.80096,
+      "population": 3575000,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "XIN",
+      "city_id": "CITY::ne::1159151531",
+      "stable_key": "id::CITY::ne::1159151531",
+      "city_name": "Dihua",
+      "name_ascii": "UEruemqi",
+      "display_name": "Xinjiang",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "YAK": {
+      "country_code": "RU",
+      "host_feature_id": "RU_RAY_50074027B2556018304316",
+      "urban_match_id": "",
+      "lon": 129.72288,
+      "lat": 62.03114,
+      "population": 235600,
+      "base_tier": "regional",
+      "source": "merged",
+      "tag": "YAK",
+      "city_id": "CITY::ne::1159150745",
+      "stable_key": "id::CITY::ne::1159150745",
+      "city_name": "Yakutsk",
+      "name_ascii": "Yakutsk",
+      "display_name": "Sakha Republic",
+      "lookup_iso2": "RU",
+      "base_iso2": "RU",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
+    },
+    "RFA": {
+      "tag": "RFA",
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "ATL": {
+      "tag": "ATL",
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "SPR": {
+      "tag": "SPR",
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "AQ": {
+      "tag": "AQ",
+      "city_id": "",
+      "resolution_method": "no_capital"
+    },
+    "AST": {
+      "tag": "AST",
+      "city_id": "CITY::ne::1159151161",
+      "stable_key": "id::CITY::ne::1159151161",
+      "city_name": "Canberra",
+      "lon": 149.12807,
+      "lat": -35.28346,
+      "host_feature_id": "AU_ADM1_AUS-2653",
+      "population": 367752,
+      "base_tier": "major",
+      "country_code": "AU"
+    },
+    "FIC": {
+      "tag": "FIC",
+      "city_id": "CITY::ne::1159146681",
+      "stable_key": "id::CITY::ne::1159146681",
+      "city_name": "Tynda",
+      "lon": 124.73676,
+      "lat": 55.14941,
+      "host_feature_id": "RU_RAY_50074027B86870758219567",
+      "population": 37335,
+      "base_tier": "regional",
+      "country_code": "RU"
+    },
+    "HOL": {
+      "tag": "HOL",
+      "city_id": "CITY::ne::1159150597",
+      "stable_key": "id::CITY::ne::1159150597",
+      "city_name": "Paramaribo",
+      "lon": -55.16682,
+      "lat": 5.86638,
+      "host_feature_id": "SR_ADM1_SUR-72",
+      "population": 254169,
+      "base_tier": "major",
+      "country_code": "SR"
+    },
+    "NOV": {
+      "tag": "NOV",
+      "city_id": "CITY::ne::1159150713",
+      "stable_key": "id::CITY::ne::1159150713",
+      "city_name": "Novosibirsk",
+      "lon": 82.93175,
+      "lat": 55.02259,
+      "host_feature_id": "RU_RAY_50074027B18253095483754",
+      "population": 1612833,
+      "base_tier": "major",
+      "country_code": "RU"
+    },
+    "OMS": {
+      "tag": "OMS",
+      "city_id": "CITY::ne::1159149579",
+      "stable_key": "id::CITY::ne::1159149579",
+      "city_name": "Omsk",
+      "lon": 73.36859,
+      "lat": 54.99244,
+      "host_feature_id": "RU_RAY_50074027B53792659884597",
+      "population": 1172070,
+      "base_tier": "major",
+      "country_code": "RU"
+    },
+    "PFC": {
+      "tag": "PFC",
+      "city_id": "CITY::ne::1159150795",
+      "stable_key": "id::CITY::ne::1159150795",
+      "city_name": "Petropavlovsk-Kamchatsky",
+      "lon": 158.62751,
+      "lat": 53.06393,
+      "host_feature_id": "RU_RAY_50074027B69870482204976",
+      "population": 187282,
+      "base_tier": "regional",
+      "country_code": "RU"
+    },
+    "RSF": {
+      "tag": "RSF",
+      "city_id": "CITY::ne::1159150749",
+      "stable_key": "id::CITY::ne::1159150749",
+      "city_name": "Magadan",
+      "lon": 150.80211,
+      "lat": 59.56274,
+      "host_feature_id": "RU_RAY_50074027B87273501478717",
+      "population": 95282,
+      "base_tier": "regional",
+      "country_code": "RU"
+    },
+    "RUR": {
+      "tag": "RUR",
+      "city_id": "CITY::ne::1159149585",
+      "stable_key": "id::CITY::ne::1159149585",
+      "city_name": "Kemerovo",
+      "lon": 86.10435,
+      "lat": 55.35417,
+      "host_feature_id": "RU_RAY_50074027B54038498434692",
+      "population": 558973,
+      "base_tier": "regional",
+      "country_code": "RU"
+    },
+    "SAF": {
+      "tag": "SAF",
+      "city_id": "CITY::ne::1159150661",
+      "stable_key": "id::CITY::ne::1159150661",
+      "city_name": "Pretoria",
+      "lon": 28.18783,
+      "lat": -25.74486,
+      "host_feature_id": "ZA_ADM1_ZAF-1208",
+      "population": 2112693,
+      "base_tier": "major",
+      "country_code": "ZA"
+    },
+    "TYM": {
+      "tag": "TYM",
+      "city_id": "CITY::ne::1159149581",
+      "stable_key": "id::CITY::ne::1159149581",
+      "city_name": "Tyumen",
+      "lon": 65.52722,
+      "lat": 57.15222,
+      "host_feature_id": "RU_RAY_50074027B55944525718876",
+      "population": 768358,
+      "base_tier": "regional",
+      "country_code": "RU"
     }
   },
   "cities": {
@@ -13763,14 +14612,16 @@
       "stable_key": "id::CITY::ne::1159149709",
       "display_name": {
         "en": "Krakau",
-        "zh": "克拉考"
+        "zh": "克拉科夫"
       },
       "aliases": [
         "Krakau",
         "Krakow"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "city_id": "CITY::ne::1159149709",
+      "host_feature_id": "PL_POW_1261"
     },
     "CITY::ne::1159149723": {
       "stable_key": "id::CITY::ne::1159149723",
@@ -14107,7 +14958,8 @@
         "Windhoek"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "NA_ADM1_NAM-3340"
     },
     "CITY::ne::1159150787": {
       "stable_key": "id::CITY::ne::1159150787",
@@ -14234,7 +15086,8 @@
         "Tbilisi"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "GEO-3036"
     },
     "CITY::ne::1159150993": {
       "stable_key": "id::CITY::ne::1159150993",
@@ -14309,7 +15162,8 @@
         "Yerevan"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "ARM-1675"
     },
     "CITY::ne::1159151123": {
       "stable_key": "id::CITY::ne::1159151123",
@@ -14372,7 +15226,8 @@
         "Dar es Salaam"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "TZ_ADM1_TZA-3378"
     },
     "CITY::ne::1159151465": {
       "stable_key": "id::CITY::ne::1159151465",
@@ -14385,7 +15240,8 @@
         "Brussels"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "BE100"
     },
     "CITY::ne::1159151495": {
       "stable_key": "id::CITY::ne::1159151495",
@@ -14398,7 +15254,8 @@
         "Kyiv"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "UA_RAY_74538382B60890943260132"
     },
     "CITY::ne::1159151539": {
       "stable_key": "id::CITY::ne::1159151539",
@@ -14411,7 +15268,8 @@
         "Kinshasa"
       ],
       "tier": "major",
-      "hidden": false
+      "hidden": false,
+      "host_feature_id": "CD_ADM1_COD-1884"
     },
     "CITY::gn::232146": {
       "stable_key": "id::CITY::gn::232146",
@@ -14610,7 +15468,9 @@
       "display_name": {
         "en": "Sverdlovsk",
         "zh": "斯维尔德洛夫斯克"
-      }
+      },
+      "city_id": "CITY::ne::1159150701",
+      "host_feature_id": "RU_RAY_50074027B76835864360350"
     },
     "CITY::ne::1159149653": {
       "stable_key": "id::CITY::ne::1159149653",
@@ -14659,7 +15519,9 @@
       "display_name": {
         "en": "Syktyvkar",
         "zh": "瑟克特夫卡尔"
-      }
+      },
+      "city_id": "CITY::ne::1159146551",
+      "host_feature_id": "RU_RAY_50074027B71551288540526"
     },
     "CITY::gn::1497543": {
       "stable_key": "id::CITY::gn::1497543",
@@ -20490,7 +21352,8 @@
       "display_name": {
         "en": "Costantina",
         "zh": "君士坦丁纳"
-      }
+      },
+      "host_feature_id": "DZA-2217"
     },
     "CITY::ne::1159150341": {
       "stable_key": "id::CITY::ne::1159150341",
@@ -21764,7 +22627,8 @@
       "display_name": {
         "en": "Addis Abeba",
         "zh": "亚的斯亚贝巴"
-      }
+      },
+      "host_feature_id": "ET_ADM1_ETH-3133"
     },
     "CITY::ne::1159142363": {
       "stable_key": "id::CITY::ne::1159142363",
@@ -22982,7 +23846,8 @@
       "display_name": {
         "en": "Roma",
         "zh": "罗马"
-      }
+      },
+      "host_feature_id": "ITI43"
     },
     "CITY::ne::1159151315": {
       "stable_key": "id::CITY::ne::1159151315",
@@ -27581,7 +28446,8 @@
       "display_name": {
         "en": "Baruti",
         "zh": "巴鲁蒂"
-      }
+      },
+      "host_feature_id": "LBN-3024"
     },
     "CITY::ne::1159148623": {
       "stable_key": "id::CITY::ne::1159148623",
@@ -28862,7 +29728,8 @@
       "display_name": {
         "en": "Tunisi",
         "zh": "突尼斯"
-      }
+      },
+      "host_feature_id": "TUN-108"
     },
     "CITY::ne::1159147487": {
       "stable_key": "id::CITY::ne::1159147487",
@@ -29723,7 +30590,8 @@
       "display_name": {
         "en": "København",
         "zh": "哥本哈根"
-      }
+      },
+      "host_feature_id": "DK011"
     },
     "CITY::ne::1159148699": {
       "stable_key": "id::CITY::ne::1159148699",
@@ -30710,7 +31578,8 @@
       "display_name": {
         "en": "Cardiff",
         "zh": "加的夫"
-      }
+      },
+      "host_feature_id": "UKL22"
     },
     "CITY::ne::1159135309": {
       "stable_key": "id::CITY::ne::1159135309",
@@ -31697,7 +32566,9 @@
       "display_name": {
         "en": "Truro",
         "zh": "特鲁罗"
-      }
+      },
+      "city_id": "CITY::gn::2635412",
+      "host_feature_id": "UKK30"
     },
     "CITY::gn::2634573": {
       "stable_key": "id::CITY::gn::2634573",
@@ -36681,7 +37552,8 @@
       "display_name": {
         "en": "Der Haag",
         "zh": "海牙"
-      }
+      },
+      "host_feature_id": "NL332"
     },
     "CITY::gn::2745641": {
       "stable_key": "id::CITY::gn::2745641",
@@ -39020,14 +39892,885 @@
         "en": "Lelydorp",
         "zh": "莱利多普"
       }
+    },
+    "CITY::ne::1159149615": {
+      "city_id": "CITY::ne::1159149615",
+      "stable_key": "id::CITY::ne::1159149615",
+      "display_name": {
+        "en": "Abakan",
+        "zh": "阿巴坎"
+      },
+      "host_feature_id": "RU_RAY_50074027B27229100203359"
+    },
+    "CITY::ne::1159150775": {
+      "city_id": "CITY::ne::1159150775",
+      "stable_key": "id::CITY::ne::1159150775",
+      "display_name": {
+        "en": "Perm",
+        "zh": "彼尔姆"
+      },
+      "host_feature_id": "RU_RAY_50074027B41842513634160"
+    },
+    "CITY::ne::1159137605": {
+      "city_id": "CITY::ne::1159137605",
+      "stable_key": "id::CITY::ne::1159137605",
+      "display_name": {
+        "en": "Ivdel",
+        "zh": "伊夫杰利"
+      },
+      "host_feature_id": "RU_RAY_50074027B44738927608854"
+    },
+    "CITY::ne::1159149623": {
+      "city_id": "CITY::ne::1159149623",
+      "stable_key": "id::CITY::ne::1159149623",
+      "display_name": {
+        "en": "Ulan-Ude",
+        "zh": "乌兰乌德"
+      },
+      "host_feature_id": "RU_RAY_50074027B15921204725831"
+    },
+    "CITY::ne::1159144449": {
+      "city_id": "CITY::ne::1159144449",
+      "stable_key": "id::CITY::ne::1159144449",
+      "display_name": {
+        "en": "Belize City",
+        "zh": "伯利兹城"
+      },
+      "host_feature_id": "BZ_ADM1_BLZ-1323",
+      "lon": -88.19836599616492,
+      "lat": 17.50186023016844
+    },
+    "CITY::ne::1159151127": {
+      "city_id": "CITY::ne::1159151127",
+      "stable_key": "id::CITY::ne::1159151127",
+      "display_name": {
+        "en": "Phnom Penh",
+        "zh": "金边"
+      },
+      "host_feature_id": "KHM-1789"
+    },
+    "CITY::ne::1159151385": {
+      "city_id": "CITY::ne::1159151385",
+      "stable_key": "id::CITY::ne::1159151385",
+      "display_name": {
+        "en": "Nanjing",
+        "zh": "南京"
+      },
+      "host_feature_id": "CN_CITY_17275852B45149819427590"
+    },
+    "CITY::ne::1159151615": {
+      "city_id": "CITY::ne::1159151615",
+      "stable_key": "id::CITY::ne::1159151615",
+      "display_name": {
+        "en": "Santiago",
+        "zh": "圣地亚哥"
+      },
+      "host_feature_id": "CL_ADM1_CHL-2698"
+    },
+    "CITY::ne::1159150737": {
+      "city_id": "CITY::ne::1159150737",
+      "stable_key": "id::CITY::ne::1159150737",
+      "display_name": {
+        "en": "Chita",
+        "zh": "赤塔"
+      },
+      "host_feature_id": "RU_RAY_50074027B52095363621144"
+    },
+    "CITY::ne::1159151439": {
+      "city_id": "CITY::ne::1159151439",
+      "stable_key": "id::CITY::ne::1159151439",
+      "display_name": {
+        "en": "Abidjan",
+        "zh": "阿比让"
+      },
+      "host_feature_id": "CI_ADM1_83157122B76853064397847"
+    },
+    "CITY::ne::1159151529": {
+      "city_id": "CITY::ne::1159151529",
+      "stable_key": "id::CITY::ne::1159151529",
+      "display_name": {
+        "en": "Germania",
+        "zh": "日耳曼尼亚"
+      },
+      "host_feature_id": "DE300"
+    },
+    "CITY::ne::1159151331": {
+      "city_id": "CITY::ne::1159151331",
+      "stable_key": "id::CITY::ne::1159151331",
+      "display_name": {
+        "en": "Kōshū",
+        "zh": "廣州"
+      },
+      "host_feature_id": "CN_CITY_17275852B38988280096574"
+    },
+    "CITY::ne::1159146557": {
+      "city_id": "CITY::ne::1159146557",
+      "stable_key": "id::CITY::ne::1159146557",
+      "display_name": {
+        "en": "Cheboksary",
+        "zh": "切博克萨雷"
+      },
+      "host_feature_id": "RU_RAY_50074027B57067541625780"
+    },
+    "CITY::ne::1159151325": {
+      "city_id": "CITY::ne::1159151325",
+      "stable_key": "id::CITY::ne::1159151325",
+      "display_name": {
+        "en": "Guiyang",
+        "zh": "贵阳"
+      },
+      "host_feature_id": "CN_CITY_17275852B16907822302081"
+    },
+    "CITY::ne::1159150585": {
+      "city_id": "CITY::ne::1159150585",
+      "stable_key": "id::CITY::ne::1159150585",
+      "display_name": {
+        "en": "Georgetown",
+        "zh": "乔治敦"
+      },
+      "host_feature_id": "GY_ADM1_GUY-677"
+    },
+    "CITY::ne::1159150731": {
+      "city_id": "CITY::ne::1159150731",
+      "stable_key": "id::CITY::ne::1159150731",
+      "display_name": {
+        "en": "Irkutsk",
+        "zh": "伊尔库茨克"
+      },
+      "host_feature_id": "RU_RAY_50074027B16590534350990"
+    },
+    "CITY::ne::1159151609": {
+      "city_id": "CITY::ne::1159151609",
+      "stable_key": "id::CITY::ne::1159151609",
+      "display_name": {
+        "en": "Tōkyō",
+        "zh": "东京"
+      },
+      "host_feature_id": "JPN-1860"
+    },
+    "CITY::ne::1159150969": {
+      "city_id": "CITY::ne::1159150969",
+      "stable_key": "id::CITY::ne::1159150969",
+      "display_name": {
+        "en": "Alma-Ata",
+        "zh": "阿拉木图"
+      },
+      "host_feature_id": "KAZ-4829"
+    },
+    "CITY::ne::1159150733": {
+      "city_id": "CITY::ne::1159150733",
+      "stable_key": "id::CITY::ne::1159150733",
+      "display_name": {
+        "en": "Krasnoyarsk",
+        "zh": "克拉斯诺亚尔斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B86573453113564"
+    },
+    "CITY::ne::1159139147": {
+      "city_id": "CITY::ne::1159139147",
+      "stable_key": "id::CITY::ne::1159139147",
+      "display_name": {
+        "en": "Luang Prabang",
+        "zh": "琅勃拉邦"
+      },
+      "host_feature_id": "LAO-3289"
+    },
+    "CITY::ne::1159149559": {
+      "city_id": "CITY::ne::1159149559",
+      "stable_key": "id::CITY::ne::1159149559",
+      "display_name": {
+        "en": "Magnitogorsk",
+        "zh": "马格尼托哥尔斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B40271227634983"
+    },
+    "CITY::ne::1159151393": {
+      "city_id": "CITY::ne::1159151393",
+      "stable_key": "id::CITY::ne::1159151393",
+      "display_name": {
+        "en": "Xinjing",
+        "zh": "新京"
+      },
+      "host_feature_id": "CN_CITY_17275852B64529865795141"
+    },
+    "CITY::ne::1159149077": {
+      "city_id": "CITY::ne::1159149077",
+      "stable_key": "id::CITY::ne::1159149077",
+      "display_name": {
+        "en": "Monaco",
+        "zh": "摩纳哥"
+      },
+      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "lon": 7.418141920294424,
+      "lat": 43.75090156108269
+    },
+    "CITY::ne::1159149369": {
+      "city_id": "CITY::ne::1159149369",
+      "stable_key": "id::CITY::ne::1159149369",
+      "display_name": {
+        "en": "Belfast",
+        "zh": "贝尔法斯特"
+      },
+      "host_feature_id": "UKN06"
+    },
+    "CITY::ne::1159148101": {
+      "city_id": "CITY::ne::1159148101",
+      "stable_key": "id::CITY::ne::1159148101",
+      "display_name": {
+        "en": "Onega",
+        "zh": "奥涅加"
+      },
+      "host_feature_id": "RU_RAY_50074027B51176471238152"
+    },
+    "CITY::ne::1159149571": {
+      "city_id": "CITY::ne::1159149571",
+      "stable_key": "id::CITY::ne::1159149571",
+      "display_name": {
+        "en": "Orenburg",
+        "zh": "奥伦堡"
+      },
+      "host_feature_id": "RU_RAY_50074027B32234523409019"
+    },
+    "CITY::ne::1159146559": {
+      "city_id": "CITY::ne::1159146559",
+      "stable_key": "id::CITY::ne::1159146559",
+      "display_name": {
+        "en": "Orsk",
+        "zh": "奥尔斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B36993675567197"
+    },
+    "CITY::ne::1159146525": {
+      "city_id": "CITY::ne::1159146525",
+      "stable_key": "id::CITY::ne::1159146525",
+      "display_name": {
+        "en": "Sterlitamak",
+        "zh": "斯捷尔利塔马克"
+      },
+      "host_feature_id": "RU_RAY_50074027B5244237471572"
+    },
+    "CITY::ne::1159151525": {
+      "city_id": "CITY::ne::1159151525",
+      "stable_key": "id::CITY::ne::1159151525",
+      "display_name": {
+        "en": "Manila",
+        "zh": "马尼拉"
+      },
+      "host_feature_id": "PHL-5543"
+    },
+    "CITY::scenario::cherdyn": {
+      "city_id": "CITY::scenario::cherdyn",
+      "stable_key": "id::CITY::scenario::cherdyn",
+      "display_name": {
+        "en": "Cherdyn",
+        "zh": "切尔登"
+      },
+      "id": "CITY::scenario::cherdyn",
+      "name": "Cherdyn",
+      "name_en": "Cherdyn",
+      "name_zh": "切尔登",
+      "lon": 56.516667,
+      "lat": 60.4,
+      "country_code": "RU",
+      "population": 0,
+      "base_tier": "regional",
+      "capital_kind": "admin_capital",
+      "source": "reviewed_settlement",
+      "add_city": true,
+      "host_feature_id": "RU_RAY_50074027B67988371503022"
+    },
+    "CITY::ne::1159151533": {
+      "city_id": "CITY::ne::1159151533",
+      "stable_key": "id::CITY::ne::1159151533",
+      "display_name": {
+        "en": "Chengdu",
+        "zh": "成都"
+      },
+      "host_feature_id": "CN_CITY_17275852B39008212883754"
+    },
+    "CITY::ne::1159150811": {
+      "city_id": "CITY::ne::1159150811",
+      "stable_key": "id::CITY::ne::1159150811",
+      "display_name": {
+        "en": "Riga",
+        "zh": "里加"
+      },
+      "host_feature_id": "LV006"
+    },
+    "CITY::ne::1159146637": {
+      "city_id": "CITY::ne::1159146637",
+      "stable_key": "id::CITY::ne::1159146637",
+      "display_name": {
+        "en": "Kansk",
+        "zh": "坎斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B23914902368646"
+    },
+    "CITY::ne::1159146365": {
+      "city_id": "CITY::ne::1159146365",
+      "stable_key": "id::CITY::ne::1159146365",
+      "display_name": {
+        "en": "Edinburgh",
+        "zh": "爱丁堡"
+      },
+      "host_feature_id": "UKM75"
+    },
+    "CITY::ne::1159149621": {
+      "city_id": "CITY::ne::1159149621",
+      "stable_key": "id::CITY::ne::1159149621",
+      "display_name": {
+        "en": "Kyzyl",
+        "zh": "克孜勒"
+      },
+      "host_feature_id": "RU_RAY_50074027B82563298264185"
+    },
+    "CITY::ne::1159150879": {
+      "city_id": "CITY::ne::1159150879",
+      "stable_key": "id::CITY::ne::1159150879",
+      "display_name": {
+        "en": "Lhasa",
+        "zh": "拉萨"
+      },
+      "host_feature_id": "CN_CITY_17275852B46177532075867"
+    },
+    "CITY::ne::1159146491": {
+      "city_id": "CITY::ne::1159146491",
+      "stable_key": "id::CITY::ne::1159146491",
+      "display_name": {
+        "en": "Kolpashevo",
+        "zh": "科尔帕舍沃"
+      },
+      "host_feature_id": "RU_RAY_50074027B48772613269862"
+    },
+    "CITY::ne::1159146569": {
+      "city_id": "CITY::ne::1159146569",
+      "stable_key": "id::CITY::ne::1159146569",
+      "display_name": {
+        "en": "Khanty-Mansiysk",
+        "zh": "汉特-曼西斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B75983799969403"
+    },
+    "CITY::ne::1159147549": {
+      "city_id": "CITY::ne::1159147549",
+      "stable_key": "id::CITY::ne::1159147549",
+      "display_name": {
+        "en": "Huế",
+        "zh": "顺化"
+      },
+      "host_feature_id": "VNM-490"
+    },
+    "CITY::ne::1159149563": {
+      "city_id": "CITY::ne::1159149563",
+      "stable_key": "id::CITY::ne::1159149563",
+      "display_name": {
+        "en": "Vorkuta",
+        "zh": "沃尔库塔"
+      },
+      "host_feature_id": "RU_RAY_50074027B78297177563949"
+    },
+    "CITY::ne::1159148095": {
+      "city_id": "CITY::ne::1159148095",
+      "stable_key": "id::CITY::ne::1159148095",
+      "display_name": {
+        "en": "Velsk",
+        "zh": "韦利斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B32782787425978"
+    },
+    "CITY::ne::1159148141": {
+      "city_id": "CITY::ne::1159148141",
+      "stable_key": "id::CITY::ne::1159148141",
+      "display_name": {
+        "en": "Izhevsk",
+        "zh": "伊热夫斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B50420734283306"
+    },
+    "CITY::ne::1159146517": {
+      "city_id": "CITY::ne::1159146517",
+      "stable_key": "id::CITY::ne::1159146517",
+      "display_name": {
+        "en": "Severodvinsk",
+        "zh": "北德文斯克"
+      },
+      "host_feature_id": "RU_RAY_50074027B51159964054862"
+    },
+    "CITY::gn::1810604": {
+      "city_id": "CITY::gn::1810604",
+      "stable_key": "id::CITY::gn::1810604",
+      "display_name": {
+        "en": "Litang",
+        "zh": "理塘"
+      },
+      "id": "CITY::gn::1810604",
+      "name": "Litang",
+      "name_en": "Litang",
+      "name_zh": "理塘",
+      "lon": 100.269403,
+      "lat": 29.988143,
+      "country_code": "CN",
+      "population": 0,
+      "base_tier": "regional",
+      "capital_kind": "admin_capital",
+      "source": "geonames",
+      "add_city": true,
+      "host_feature_id": "CN_CITY_17275852B55184179127017"
+    },
+    "CITY::ne::1159151531": {
+      "city_id": "CITY::ne::1159151531",
+      "stable_key": "id::CITY::ne::1159151531",
+      "display_name": {
+        "en": "Dihua",
+        "zh": "迪化"
+      },
+      "host_feature_id": "CN_CITY_17275852B35279738214019"
+    },
+    "CITY::ne::1159150745": {
+      "city_id": "CITY::ne::1159150745",
+      "stable_key": "id::CITY::ne::1159150745",
+      "display_name": {
+        "en": "Yakutsk",
+        "zh": "雅库茨克"
+      },
+      "host_feature_id": "RU_RAY_50074027B2556018304316"
+    },
+    "CITY::ne::1159139111": {
+      "city_id": "CITY::ne::1159139111",
+      "stable_key": "id::CITY::ne::1159139111",
+      "display_name": {
+        "en": "Kungur",
+        "zh": "昆古尔"
+      },
+      "host_feature_id": "RU_RAY_50074027B96019567685522"
+    },
+    "CITY::ne::1159151561": {
+      "city_id": "CITY::ne::1159151561",
+      "host_feature_id": "AFG-1767"
+    },
+    "CITY::ne::1159151137": {
+      "city_id": "CITY::ne::1159151137",
+      "host_feature_id": "DZA-2145"
+    },
+    "CITY::ne::1159151513": {
+      "city_id": "CITY::ne::1159151513",
+      "host_feature_id": "SN_ADM1_SEN-759"
+    },
+    "CITY::ne::1159150565": {
+      "city_id": "CITY::ne::1159150565",
+      "host_feature_id": "ARE-349",
+      "lon": 54.433609419711146,
+      "lat": 24.533351824984454
+    },
+    "CITY::ne::1159151559": {
+      "city_id": "CITY::ne::1159151559",
+      "host_feature_id": "AR_ADM1_ARG-5493"
+    },
+    "CITY::ne::1159150451": {
+      "city_id": "CITY::ne::1159150451",
+      "host_feature_id": "BHR-4929"
+    },
+    "CITY::ne::1159151151": {
+      "city_id": "CITY::ne::1159151151",
+      "host_feature_id": "BTN-2439"
+    },
+    "CITY::ne::1159151133": {
+      "city_id": "CITY::ne::1159151133",
+      "host_feature_id": "BO_ADM1_BOL-1936"
+    },
+    "CITY::ne::1159151443": {
+      "city_id": "CITY::ne::1159151443",
+      "host_feature_id": "BR_ADM1_BRA-599"
+    },
+    "CITY::ne::1159151477": {
+      "city_id": "CITY::ne::1159151477",
+      "host_feature_id": "MMR-3269"
+    },
+    "CITY::ne::1159151147": {
+      "city_id": "CITY::ne::1159151147",
+      "host_feature_id": "BG411"
+    },
+    "CITY::ne::1159151591": {
+      "city_id": "CITY::ne::1159151591",
+      "host_feature_id": "NG_ADM1_NGA-2850",
+      "lon": 3.3964715242087253,
+      "lat": 6.448465602583956
+    },
+    "CITY::ne::1159151059": {
+      "city_id": "CITY::ne::1159151059",
+      "host_feature_id": "CA_FED_35079"
+    },
+    "CITY::ne::1159150719": {
+      "city_id": "CITY::ne::1159150719",
+      "host_feature_id": "LKA-2470"
+    },
+    "CITY::ne::1159151601": {
+      "city_id": "CITY::ne::1159151601",
+      "host_feature_id": "CO_ADM1_COL-1399"
+    },
+    "CITY::ne::1159150849": {
+      "city_id": "CITY::ne::1159150849",
+      "host_feature_id": "CR_ADM1_CRI-1331"
+    },
+    "CITY::ne::1159150875": {
+      "city_id": "CITY::ne::1159150875",
+      "host_feature_id": "HR050"
+    },
+    "CITY::ne::1159151347": {
+      "city_id": "CITY::ne::1159151347",
+      "host_feature_id": "CU"
+    },
+    "CITY::ne::1159151401": {
+      "city_id": "CITY::ne::1159151401",
+      "host_feature_id": "DO_ADM1_DOM-1985"
+    },
+    "CITY::ne::1159150847": {
+      "city_id": "CITY::ne::1159150847",
+      "host_feature_id": "EC_ADM1_ECU-1287"
+    },
+    "CITY::ne::1159151603": {
+      "city_id": "CITY::ne::1159151603",
+      "host_feature_id": "EGY-1533"
+    },
+    "CITY::ne::1159150853": {
+      "city_id": "CITY::ne::1159150853",
+      "host_feature_id": "SV_ADM1_SLV-1349"
+    },
+    "CITY::ne::1159151577": {
+      "city_id": "CITY::ne::1159151577",
+      "host_feature_id": "UKI32"
+    },
+    "CITY::ne::1159151419": {
+      "city_id": "CITY::ne::1159151419",
+      "host_feature_id": "FI1B1"
+    },
+    "CITY::ne::1159151613": {
+      "city_id": "CITY::ne::1159151613",
+      "host_feature_id": "FR_ARR_75001"
+    },
+    "CITY::ne::1159151617": {
+      "city_id": "CITY::ne::1159151617",
+      "host_feature_id": "IN_ADM2_76128533B72507508533064"
+    },
+    "CITY::ne::1159151321": {
+      "city_id": "CITY::ne::1159151321",
+      "host_feature_id": "CN_CITY_17275852B84192730453130"
+    },
+    "CITY::ne::1159151545": {
+      "city_id": "CITY::ne::1159151545",
+      "host_feature_id": "EL303"
+    },
+    "CITY::ne::1159150939": {
+      "city_id": "CITY::ne::1159150939",
+      "host_feature_id": "GL",
+      "lon": -51.71990070766818,
+      "lat": 64.206811848944
+    },
+    "CITY::ne::1159150909": {
+      "city_id": "CITY::ne::1159150909",
+      "host_feature_id": "GT_ADM1_GTM-1951"
+    },
+    "CITY::ne::1159151323": {
+      "city_id": "CITY::ne::1159151323",
+      "host_feature_id": "CN_CITY_17275852B34195804181253"
+    },
+    "CITY::ne::1159150589": {
+      "city_id": "CITY::ne::1159150589",
+      "host_feature_id": "HT_ADM1_HTI-1388"
+    },
+    "CITY::ne::1159150583": {
+      "city_id": "CITY::ne::1159150583",
+      "host_feature_id": "HN_ADM1_HND-639"
+    },
+    "CITY::ne::1159151257": {
+      "city_id": "CITY::ne::1159151257",
+      "host_feature_id": "HU110"
+    },
+    "CITY::ne::1159151503": {
+      "city_id": "CITY::ne::1159151503",
+      "host_feature_id": "ES300"
+    },
+    "CITY::ne::1159150587": {
+      "city_id": "CITY::ne::1159150587",
+      "host_feature_id": "IS001"
+    },
+    "CITY::ne::1159151599": {
+      "city_id": "CITY::ne::1159151599",
+      "host_feature_id": "ID_ADM1_65028918B14696209246677"
+    },
+    "CITY::ne::1159151309": {
+      "city_id": "CITY::ne::1159151309",
+      "host_feature_id": "IE061"
+    },
+    "CITY::ne::1159151547": {
+      "city_id": "CITY::ne::1159151547",
+      "host_feature_id": "IRQ-3063"
+    },
+    "CITY::ne::1159150807": {
+      "city_id": "CITY::ne::1159150807",
+      "host_feature_id": "JOR-851"
+    },
+    "CITY::ne::1159150813": {
+      "city_id": "CITY::ne::1159150813",
+      "host_feature_id": "KGZ-1115"
+    },
+    "CITY::ne::1159151523": {
+      "city_id": "CITY::ne::1159151523",
+      "host_feature_id": "KOR-2497"
+    },
+    "CITY::ne::1159150087": {
+      "city_id": "CITY::ne::1159150087",
+      "host_feature_id": "IRQ-3051"
+    },
+    "CITY::ne::1159151361": {
+      "city_id": "CITY::ne::1159151361",
+      "host_feature_id": "KWT-1663"
+    },
+    "CITY::ne::1159151415": {
+      "city_id": "CITY::ne::1159151415",
+      "host_feature_id": "LBY-2978"
+    },
+    "CITY::ne::1159151311": {
+      "city_id": "CITY::ne::1159151311",
+      "host_feature_id": "LR_ADM1_LBR-788",
+      "lon": -10.795056804597337,
+      "lat": 6.3040686357909665
+    },
+    "CITY::ne::1159150835": {
+      "city_id": "CITY::ne::1159150835",
+      "host_feature_id": "MG_ADM1_MDG-5862"
+    },
+    "CITY::ne::1159151317": {
+      "city_id": "CITY::ne::1159151317",
+      "host_feature_id": "MYS-4831"
+    },
+    "CITY::ne::1159147139": {
+      "city_id": "CITY::ne::1159147139",
+      "host_feature_id": "CN_CITY_17275852B88620213203291"
+    },
+    "CITY::ne::1159151587": {
+      "city_id": "CITY::ne::1159151587",
+      "host_feature_id": "MX_ZN_14_002"
+    },
+    "CITY::ne::1159151201": {
+      "city_id": "CITY::ne::1159151201",
+      "host_feature_id": "MV",
+      "lon": 73.50012500135003,
+      "lat": 4.17521
+    },
+    "CITY::ne::1159149511": {
+      "city_id": "CITY::ne::1159149511",
+      "host_feature_id": "ME_ADM1_MNE-1517"
+    },
+    "CITY::ne::1159150781": {
+      "city_id": "CITY::ne::1159150781",
+      "host_feature_id": "MNG-3331"
+    },
+    "CITY::ne::1159151595": {
+      "city_id": "CITY::ne::1159151595",
+      "host_feature_id": "CN_CITY_17275852B40522342172572"
+    },
+    "CITY::ne::1159150655": {
+      "city_id": "CITY::ne::1159150655",
+      "host_feature_id": "NPL-1130"
+    },
+    "CITY::ne::1159150623": {
+      "city_id": "CITY::ne::1159150623",
+      "host_feature_id": "NI_ADM1_NIC-659"
+    },
+    "CITY::ne::1159151699": {
+      "city_id": "CITY::ne::1159151699",
+      "host_feature_id": "NZ_ADM1_NZL-5469"
+    },
+    "CITY::ne::1159150717": {
+      "city_id": "CITY::ne::1159150717",
+      "host_feature_id": "OMN-2426"
+    },
+    "CITY::ne::1159150645": {
+      "city_id": "CITY::ne::1159150645",
+      "host_feature_id": "PAK-1110"
+    },
+    "CITY::ne::1159151417": {
+      "city_id": "CITY::ne::1159151417",
+      "host_feature_id": "ISR-3057"
+    },
+    "CITY::ne::1159150667": {
+      "city_id": "CITY::ne::1159150667",
+      "host_feature_id": "PA_ADM1_PAN-1340"
+    },
+    "CITY::ne::1159150621": {
+      "city_id": "CITY::ne::1159150621",
+      "host_feature_id": "PY_ADM1_PRY-4837"
+    },
+    "CITY::ne::1159151551": {
+      "city_id": "CITY::ne::1159151551",
+      "host_feature_id": "IRN-3216"
+    },
+    "CITY::ne::1159151511": {
+      "city_id": "CITY::ne::1159151511",
+      "host_feature_id": "PE_ADM1_PER-587"
+    },
+    "CITY::ne::1159151181": {
+      "city_id": "CITY::ne::1159151181",
+      "host_feature_id": "PR",
+      "lon": -66.11835124365471,
+      "lat": 18.448865650409047
+    },
+    "CITY::ne::1159149469": {
+      "city_id": "CITY::ne::1159149469",
+      "host_feature_id": "QAT-1099"
+    },
+    "CITY::ne::1159150819": {
+      "city_id": "CITY::ne::1159150819",
+      "host_feature_id": "CN_CITY_17275852B10439048942215"
+    },
+    "CITY::ne::1159151541": {
+      "city_id": "CITY::ne::1159151541",
+      "host_feature_id": "IN_ADM2_76128533B58262202014972"
+    },
+    "CITY::ne::1159151585": {
+      "city_id": "CITY::ne::1159151585",
+      "host_feature_id": "RU_CITY_MOSCOW"
+    },
+    "CITY::ne::1159151281": {
+      "city_id": "CITY::ne::1159151281",
+      "host_feature_id": "NO081"
+    },
+    "CITY::ne::1159151263": {
+      "city_id": "CITY::ne::1159151263",
+      "host_feature_id": "RO321"
+    },
+    "CITY::ne::1159150703": {
+      "city_id": "CITY::ne::1159150703",
+      "host_feature_id": "RU_RAY_50074027B12201890066789"
+    },
+    "CITY::ne::1159151581": {
+      "city_id": "CITY::ne::1159151581",
+      "host_feature_id": "SAU-1097"
+    },
+    "CITY::ne::1159151079": {
+      "city_id": "CITY::ne::1159151079",
+      "host_feature_id": "RS110"
+    },
+    "CITY::ne::1159150867": {
+      "city_id": "CITY::ne::1159150867",
+      "host_feature_id": "GQ_ADM1_GNQ-1478"
+    },
+    "CITY::ne::1159151365": {
+      "city_id": "CITY::ne::1159151365",
+      "host_feature_id": "CN_CITY_17275852B21492950184785"
+    },
+    "CITY::ne::1159151509": {
+      "city_id": "CITY::ne::1159151509",
+      "host_feature_id": "THA-416"
+    },
+    "CITY::ne::1159149463": {
+      "city_id": "CITY::ne::1159149463",
+      "host_feature_id": "SK_ADM2_56367889B40480781512108"
+    },
+    "CITY::ne::1159151507": {
+      "city_id": "CITY::ne::1159151507",
+      "host_feature_id": "SE110"
+    },
+    "CITY::ne::1159149737": {
+      "city_id": "CITY::ne::1159149737",
+      "host_feature_id": "CH021"
+    },
+    "CITY::ne::1159151269": {
+      "city_id": "CITY::ne::1159151269",
+      "host_feature_id": "SYR-4843"
+    },
+    "CITY::ne::1159150705": {
+      "city_id": "CITY::ne::1159150705",
+      "host_feature_id": "RU_RAY_50074027B16082818896565"
+    },
+    "CITY::ne::1159150609": {
+      "city_id": "CITY::ne::1159150609",
+      "host_feature_id": "TJK-5491"
+    },
+    "CITY::ne::1159150567": {
+      "city_id": "CITY::ne::1159150567",
+      "host_feature_id": "TKM-352"
+    },
+    "CITY::ne::1159151255": {
+      "city_id": "CITY::ne::1159151255",
+      "host_feature_id": "TR510"
+    },
+    "CITY::ne::1159150469": {
+      "city_id": "CITY::ne::1159150469",
+      "host_feature_id": "UY_ADM1_URY-21"
+    },
+    "CITY::ne::1159151573": {
+      "city_id": "CITY::ne::1159151573",
+      "host_feature_id": "US_CNTY_11001"
+    },
+    "CITY::ne::1159151501": {
+      "city_id": "CITY::ne::1159151501",
+      "host_feature_id": "UZB-4828"
+    },
+    "CITY::ne::1159151493": {
+      "city_id": "CITY::ne::1159151493",
+      "host_feature_id": "VE_ADM1_VEN-43"
+    },
+    "CITY::ne::1159146331": {
+      "city_id": "CITY::ne::1159146331",
+      "host_feature_id": "VNM-452"
+    },
+    "CITY::ne::1159151259": {
+      "city_id": "CITY::ne::1159151259",
+      "host_feature_id": "YEM-3498"
+    },
+    "CITY::ne::1159151371": {
+      "city_id": "CITY::ne::1159151371",
+      "host_feature_id": "CN_CITY_17275852B36917281821750"
+    },
+    "CITY::ne::1159151161": {
+      "city_id": "CITY::ne::1159151161",
+      "host_feature_id": "AU_ADM1_AUS-2653"
+    },
+    "CITY::ne::1159146681": {
+      "city_id": "CITY::ne::1159146681",
+      "host_feature_id": "RU_RAY_50074027B86870758219567"
+    },
+    "CITY::ne::1159150597": {
+      "city_id": "CITY::ne::1159150597",
+      "host_feature_id": "SR_ADM1_SUR-72"
+    },
+    "CITY::ne::1159150713": {
+      "city_id": "CITY::ne::1159150713",
+      "host_feature_id": "RU_RAY_50074027B18253095483754"
+    },
+    "CITY::ne::1159149579": {
+      "city_id": "CITY::ne::1159149579",
+      "host_feature_id": "RU_RAY_50074027B53792659884597"
+    },
+    "CITY::ne::1159150795": {
+      "city_id": "CITY::ne::1159150795",
+      "host_feature_id": "RU_RAY_50074027B69870482204976"
+    },
+    "CITY::ne::1159150749": {
+      "city_id": "CITY::ne::1159150749",
+      "host_feature_id": "RU_RAY_50074027B87273501478717"
+    },
+    "CITY::ne::1159149585": {
+      "city_id": "CITY::ne::1159149585",
+      "host_feature_id": "RU_RAY_50074027B54038498434692"
+    },
+    "CITY::ne::1159150661": {
+      "city_id": "CITY::ne::1159150661",
+      "host_feature_id": "ZA_ADM1_ZAF-1208"
+    },
+    "CITY::ne::1159149581": {
+      "city_id": "CITY::ne::1159149581",
+      "host_feature_id": "RU_RAY_50074027B55944525718876"
     }
   },
   "audit": {
-    "manual_capital_count": 29,
-    "capital_hint_count": 139,
+    "manual_capital_count": 73,
+    "capital_hint_count": 178,
     "renamed_city_count": 4427,
     "name_conflict_count": 242,
-    "unresolved_capital_count": 29,
+    "unresolved_capital_count": 14,
     "unresolved_manual_capital_count": 0,
     "unresolved_city_rename_count": 0,
     "featured_runtime_missing_count": 0,
@@ -42424,27 +44167,11 @@
     ],
     "unresolved_capitals": [
       {
-        "tag": "ALT",
-        "display_name": "Altai",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": 654,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
         "tag": "ANG",
         "display_name": "Angola",
         "lookup_iso2": "AO",
         "base_iso2": "AO",
         "capital_state_id": 540,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "ATL",
-        "display_name": "Atlantropa Reclamation Zone",
-        "lookup_iso2": "ZZ",
-        "base_iso2": "ZZ",
-        "capital_state_id": null,
         "reason": "no_controlled_city_candidates"
       },
       {
@@ -42461,70 +44188,6 @@
         "lookup_iso2": "BW",
         "base_iso2": "BW",
         "capital_state_id": 542,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "BRY",
-        "display_name": "Buryat Soviet Socialist Republic",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "CAM",
-        "display_name": "Cambodia",
-        "lookup_iso2": "KH",
-        "base_iso2": "KH",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "CHT",
-        "display_name": "Far Eastern Tsardom",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "GNG",
-        "display_name": "Guangdong State",
-        "lookup_iso2": "CN",
-        "base_iso2": "CN",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "GUI",
-        "display_name": "Guizhou Clique",
-        "lookup_iso2": "CN",
-        "base_iso2": "CN",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "IRK",
-        "display_name": "Far Eastern Presidium",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "KRS",
-        "display_name": "Krasnodar",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "LAO",
-        "display_name": "Laos",
-        "lookup_iso2": "LA",
-        "base_iso2": "LA",
-        "capital_state_id": null,
         "reason": "no_controlled_city_candidates"
       },
       {
@@ -42560,27 +44223,11 @@
         "reason": "no_controlled_city_candidates"
       },
       {
-        "tag": "RFA",
-        "display_name": "Russian Anarchy",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
         "tag": "RWA",
         "display_name": "Rwanda",
         "lookup_iso2": "RW",
         "base_iso2": "RW",
         "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "SPR",
-        "display_name": "Spain",
-        "lookup_iso2": "ES",
-        "base_iso2": "ES",
-        "capital_state_id": 41,
         "reason": "no_controlled_city_candidates"
       },
       {
@@ -42608,32 +44255,8 @@
         "reason": "no_controlled_city_candidates"
       },
       {
-        "tag": "URA",
-        "display_name": "Ural Military District Red Air Force",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
         "tag": "VOR",
         "display_name": "Vorkuta Labor Camp",
-        "lookup_iso2": "RU",
-        "base_iso2": "RU",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "XIN",
-        "display_name": "Xinjiang",
-        "lookup_iso2": "CN",
-        "base_iso2": "CN",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "YAK",
-        "display_name": "Sakha Republic",
         "lookup_iso2": "RU",
         "base_iso2": "RU",
         "capital_state_id": null,
@@ -42657,6 +44280,7 @@
       }
     ],
     "unresolved_manual_capitals": [],
-    "unresolved_city_renames": []
+    "unresolved_city_renames": [],
+    "capital_territory_conflicts": []
   }
 }

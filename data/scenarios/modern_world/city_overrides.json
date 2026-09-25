@@ -2,7 +2,24 @@
   "version": 1,
   "scenario_id": "modern_world",
   "generated_at": "2026-03-17T04:10:44.164493+00:00",
-  "capitals_by_tag": {},
+  "capitals_by_tag": {
+    "BI": "CITY::ne::1159146001",
+    "BJ": "CITY::ne::1159150345",
+    "CI": "CITY::ne::1159150999",
+    "CL": "CITY::ne::1159151615",
+    "HK": "CITY::ne::1159151629",
+    "JP": "CITY::ne::1159151609",
+    "MC": "CITY::ne::1159149077",
+    "MM": "CITY::ne::1159151179",
+    "MO": "CITY::ne::1159149085",
+    "NG": "CITY::ne::1159150799",
+    "NL": "CITY::ne::1159151519",
+    "PH": "CITY::ne::1159151525",
+    "TW": "CITY::ne::1159151567",
+    "TZ": "CITY::ne::1159149731",
+    "ZA": "CITY::ne::1159150661",
+    "KZ": "CITY::ne::1159150965"
+  },
   "capital_city_hints": {
     "AD": {
       "tag": "AD",
@@ -43,12 +60,17 @@
       "country_code": "AE",
       "host_feature_id": "ARE-349",
       "urban_match_id": "",
-      "lon": 54.39696,
-      "lat": 24.45118,
+      "lon": 54.433609419711146,
+      "lat": 24.533351824984454,
       "source": "merged",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 16
+      "candidate_count": 16,
+      "source_coordinates": [
+        54.39696,
+        24.45118
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "AF": {
       "tag": "AF",
@@ -373,50 +395,50 @@
       "candidate_count": 3
     },
     "BI": {
+      "country_code": "BI",
+      "host_feature_id": "BI_ADM1_BDI-2639",
+      "urban_match_id": "",
+      "lon": 29.92463,
+      "lat": -3.42708,
+      "population": 64904,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "BI",
+      "city_id": "CITY::ne::1159146001",
+      "stable_key": "id::CITY::ne::1159146001",
+      "city_name": "Gitega",
+      "name_ascii": "Gitega",
       "display_name": "Burundi",
       "lookup_iso2": "BI",
       "base_iso2": "BI",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159150427",
-      "stable_key": "id::CITY::ne::1159150427",
-      "city_name": "Bujumbura",
-      "name_ascii": "Bujumbura",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 769317,
-      "country_code": "BI",
-      "host_feature_id": "BI_ADM1_BDI-3364",
-      "urban_match_id": "",
-      "lon": 29.36142,
-      "lat": -3.38193,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 16
+      "candidate_count": 1
     },
     "BJ": {
+      "country_code": "BJ",
+      "host_feature_id": "BJ_ADM1_BEN-2177",
+      "urban_match_id": "",
+      "lon": 2.60359,
+      "lat": 6.49646,
+      "population": 300000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "BJ",
+      "city_id": "CITY::ne::1159150345",
+      "stable_key": "id::CITY::ne::1159150345",
+      "city_name": "Porto-Novo",
+      "name_ascii": "Porto-Novo",
       "display_name": "Benin",
       "lookup_iso2": "BJ",
       "base_iso2": "BJ",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151141",
-      "stable_key": "id::CITY::ne::1159151141",
-      "city_name": "Cotonou",
-      "name_ascii": "Cotonou",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 762000,
-      "country_code": "BJ",
-      "host_feature_id": "BJ_ADM1_BEN-2175",
-      "urban_match_id": "",
-      "lon": 2.41833,
-      "lat": 6.36536,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 22
+      "candidate_count": 1
     },
     "BN": {
       "tag": "BN",
@@ -695,50 +717,50 @@
       "candidate_count": 102
     },
     "CI": {
+      "country_code": "CI",
+      "host_feature_id": "CI_ADM1_83157122B30232425959699",
+      "urban_match_id": "",
+      "lon": -5.27674,
+      "lat": 6.82055,
+      "population": 275686,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "CI",
+      "city_id": "CITY::ne::1159150999",
+      "stable_key": "id::CITY::ne::1159150999",
+      "city_name": "Yamoussoukro",
+      "name_ascii": "Yamoussoukro",
       "display_name": "Ivory Coast",
       "lookup_iso2": "CI",
       "base_iso2": "CI",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151439",
-      "stable_key": "id::CITY::ne::1159151439",
-      "city_name": "Abidjan",
-      "name_ascii": "Abidjan",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 6321017,
-      "country_code": "CI",
-      "host_feature_id": "CI_ADM1_83157122B76853064397847",
-      "urban_match_id": "",
-      "lon": -4.00167,
-      "lat": 5.35444,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 77
+      "candidate_count": 1
     },
     "CL": {
+      "country_code": "CL",
+      "host_feature_id": "CL_ADM1_CHL-2698",
+      "urban_match_id": "",
+      "lon": -70.64827,
+      "lat": -33.45694,
+      "population": 5720000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "CL",
+      "city_id": "CITY::ne::1159151615",
+      "stable_key": "id::CITY::ne::1159151615",
+      "city_name": "Santiago",
+      "name_ascii": "Santiago",
       "display_name": "Chile",
       "lookup_iso2": "CL",
       "base_iso2": "CL",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159150931",
-      "stable_key": "id::CITY::ne::1159150931",
-      "city_name": "Valparaíso",
-      "name_ascii": "Valparaiso",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 854000,
-      "country_code": "CL",
-      "host_feature_id": "CL_ADM1_CHL-2699",
-      "urban_match_id": "",
-      "lon": -71.62963,
-      "lat": -33.036,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 99
+      "candidate_count": 1
     },
     "CM": {
       "tag": "CM",
@@ -1331,12 +1353,17 @@
       "country_code": "GM",
       "host_feature_id": "GM_ADM1_GMB-2153",
       "urban_match_id": "",
-      "lon": -16.57803,
-      "lat": 13.45274,
+      "lon": -16.58409346847067,
+      "lat": 13.44252256094568,
       "source": "merged",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 8
+      "candidate_count": 8,
+      "source_coordinates": [
+        -16.57803,
+        13.45274
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "GN": {
       "tag": "GN",
@@ -1477,27 +1504,32 @@
       "candidate_count": 10
     },
     "HK": {
+      "country_code": "HK",
+      "host_feature_id": "HK_ADM1_HKG-5154",
+      "urban_match_id": "",
+      "lon": 114.17109072836105,
+      "lat": 22.274587651474373,
+      "population": 7396076,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "HK",
+      "city_id": "CITY::ne::1159151629",
+      "stable_key": "id::CITY::ne::1159151629",
+      "city_name": "Hong Kong",
+      "name_ascii": "Hong Kong",
       "display_name": "Hong Kong S.A.R.",
       "lookup_iso2": "HK",
       "base_iso2": "HK",
       "capital_state_id": null,
-      "city_id": "CITY::gn::1818673",
-      "stable_key": "id::CITY::gn::1818673",
-      "city_name": "Tai Po",
-      "name_ascii": "Tai Po",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 274100,
-      "country_code": "HK",
-      "host_feature_id": "HK_ADM1_HKG-5169",
-      "urban_match_id": "",
-      "lon": 114.16877,
-      "lat": 22.45007,
-      "source": "geonames",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 3
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        114.17469,
+        22.27832
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "HN": {
       "tag": "HN",
@@ -1799,27 +1831,27 @@
       "candidate_count": 23
     },
     "JP": {
+      "country_code": "JP",
+      "host_feature_id": "JPN-1860",
+      "urban_match_id": "",
+      "lon": 139.69171,
+      "lat": 35.6895,
+      "population": 35676000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "JP",
+      "city_id": "CITY::ne::1159151609",
+      "stable_key": "id::CITY::ne::1159151609",
+      "city_name": "Tokyo",
+      "name_ascii": "Tokyo",
       "display_name": "Japan",
       "lookup_iso2": "JP",
       "base_iso2": "JP",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159149967",
-      "stable_key": "id::CITY::ne::1159149967",
-      "city_name": "Kyoto",
-      "name_ascii": "Kyoto",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 1805000,
-      "country_code": "JP",
-      "host_feature_id": "JPN-1850",
-      "urban_match_id": "",
-      "lon": 135.75385,
-      "lat": 35.02107,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 773
+      "candidate_count": 1
     },
     "KE": {
       "tag": "KE",
@@ -1983,27 +2015,27 @@
       "candidate_count": 7
     },
     "KZ": {
-      "tag": "KZ",
-      "display_name": "Kazakhstan",
-      "lookup_iso2": "KZ",
-      "base_iso2": "KZ",
-      "capital_state_id": null,
-      "city_id": "CITY::ne::1159150965",
-      "stable_key": "id::CITY::ne::1159150965",
-      "city_name": "Nur-Sultan",
-      "name_ascii": "Astana",
-      "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 345604,
       "country_code": "KZ",
       "host_feature_id": "KAZ-4830",
       "urban_match_id": "",
       "lon": 71.44598,
       "lat": 51.1801,
+      "population": 345604,
+      "base_tier": "major",
       "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "tag": "KZ",
+      "city_id": "CITY::ne::1159150965",
+      "stable_key": "id::CITY::ne::1159150965",
+      "city_name": "Astana",
+      "name_ascii": "Astana",
+      "display_name": "Kazakhstan",
+      "lookup_iso2": "KZ",
+      "base_iso2": "KZ",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 120
+      "candidate_count": 1
     },
     "LA": {
       "tag": "LA",
@@ -2067,12 +2099,17 @@
       "country_code": "LI",
       "host_feature_id": "LI_ADM1_LIE-4893",
       "urban_match_id": "UA_33CA4932BAA1",
-      "lon": 9.51667,
-      "lat": 47.133724,
+      "lon": 9.51311776601958,
+      "lat": 47.12786010550352,
       "source": "natural_earth",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 1
+      "candidate_count": 1,
+      "source_coordinates": [
+        9.51667,
+        47.133724
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "LK": {
       "tag": "LK",
@@ -2113,12 +2150,17 @@
       "country_code": "LR",
       "host_feature_id": "LR_ADM1_LBR-788",
       "urban_match_id": "",
-      "lon": -10.7969,
-      "lat": 6.30054,
+      "lon": -10.795056804597337,
+      "lat": 6.3040686357909665,
       "source": "merged",
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
-      "candidate_count": 14
+      "candidate_count": 14,
+      "source_coordinates": [
+        -10.7969,
+        6.30054
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     },
     "LS": {
       "tag": "LS",
@@ -2374,27 +2416,27 @@
       "candidate_count": 45
     },
     "MM": {
+      "country_code": "MM",
+      "host_feature_id": "MMR-3267",
+      "urban_match_id": "",
+      "lon": 96.12972,
+      "lat": 19.745,
+      "population": 930000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "MM",
+      "city_id": "CITY::ne::1159151179",
+      "stable_key": "id::CITY::ne::1159151179",
+      "city_name": "Naypyidaw",
+      "name_ascii": "Nay Pyi Taw",
       "display_name": "Myanmar",
       "lookup_iso2": "MM",
       "base_iso2": "MM",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151477",
-      "stable_key": "id::CITY::ne::1159151477",
-      "city_name": "Yangon",
-      "name_ascii": "Yangon",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 4477638,
-      "country_code": "MM",
-      "host_feature_id": "MMR-3269",
-      "urban_match_id": "",
-      "lon": 96.15611,
-      "lat": 16.80528,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 52
+      "candidate_count": 1
     },
     "MN": {
       "tag": "MN",
@@ -2502,7 +2544,7 @@
       "base_tier": "major",
       "population": 19028000,
       "country_code": "MX",
-      "host_feature_id": "MX_ZN_14_003",
+      "host_feature_id": "MX_ZN_14_002",
       "urban_match_id": "",
       "lon": -99.12766,
       "lat": 19.42847,
@@ -2604,27 +2646,27 @@
       "candidate_count": 35
     },
     "NG": {
+      "country_code": "NG",
+      "host_feature_id": "NG_ADM1_NGA-3470",
+      "urban_match_id": "",
+      "lon": 7.49508,
+      "lat": 9.05785,
+      "population": 2690000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "NG",
+      "city_id": "CITY::ne::1159150799",
+      "stable_key": "id::CITY::ne::1159150799",
+      "city_name": "Abuja",
+      "name_ascii": "Abuja",
       "display_name": "Nigeria",
       "lookup_iso2": "NG",
       "base_iso2": "NG",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151591",
-      "stable_key": "id::CITY::ne::1159151591",
-      "city_name": "Lagos",
-      "name_ascii": "Lagos",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 15388000,
-      "country_code": "NG",
-      "host_feature_id": "NG_ADM1_NGA-2850",
-      "urban_match_id": "",
-      "lon": 3.39467,
-      "lat": 6.45407,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 205
+      "candidate_count": 1
     },
     "NI": {
       "tag": "NI",
@@ -2650,27 +2692,27 @@
       "candidate_count": 40
     },
     "NL": {
+      "country_code": "NL",
+      "host_feature_id": "NL329",
+      "urban_match_id": "UA_5BFA89F5B119",
+      "lon": 4.88969,
+      "lat": 52.37403,
+      "population": 1031000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "NL",
+      "city_id": "CITY::ne::1159151519",
+      "stable_key": "id::CITY::ne::1159151519",
+      "city_name": "Amsterdam",
+      "name_ascii": "Amsterdam",
       "display_name": "Netherlands",
       "lookup_iso2": "NL",
       "base_iso2": "NL",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159149457",
-      "stable_key": "id::CITY::ne::1159149457",
-      "city_name": "The Hague",
-      "name_ascii": "The Hague",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 1406000,
-      "country_code": "NL",
-      "host_feature_id": "NL332",
-      "urban_match_id": "UA_5BFA89F5B119",
-      "lon": 4.29861,
-      "lat": 52.07667,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 240
+      "candidate_count": 1
     },
     "NO": {
       "tag": "NO",
@@ -2834,27 +2876,27 @@
       "candidate_count": 24
     },
     "PH": {
+      "country_code": "PH",
+      "host_feature_id": "PHL-5543",
+      "urban_match_id": "",
+      "lon": 120.9822,
+      "lat": 14.6042,
+      "population": 11100000,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "PH",
+      "city_id": "CITY::ne::1159151525",
+      "stable_key": "id::CITY::ne::1159151525",
+      "city_name": "Manila",
+      "name_ascii": "Manila",
       "display_name": "Philippines",
       "lookup_iso2": "PH",
       "base_iso2": "PH",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159149605",
-      "stable_key": "id::CITY::ne::1159149605",
-      "city_name": "Baguio",
-      "name_ascii": "Baguio",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 447824,
-      "country_code": "PH",
-      "host_feature_id": "PHL-5539",
-      "urban_match_id": "",
-      "lon": 120.59306,
-      "lat": 16.41639,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 378
+      "candidate_count": 1
     },
     "PK": {
       "tag": "PK",
@@ -3639,50 +3681,50 @@
       "candidate_count": 422
     },
     "TW": {
+      "country_code": "TW",
+      "host_feature_id": "TWN-1166",
+      "urban_match_id": "",
+      "lon": 121.52639,
+      "lat": 25.05306,
+      "population": 7871900,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "TW",
+      "city_id": "CITY::ne::1159151567",
+      "stable_key": "id::CITY::ne::1159151567",
+      "city_name": "Taipei",
+      "name_ascii": "Taipei",
       "display_name": "Taiwan",
       "lookup_iso2": "TW",
       "base_iso2": "TW",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159150459",
-      "stable_key": "id::CITY::ne::1159150459",
-      "city_name": "Magong",
-      "name_ascii": "Magong",
-      "capital_kind": "admin_capital",
-      "base_tier": "regional",
-      "population": 63745,
-      "country_code": "TW",
-      "host_feature_id": "TWN-3414",
-      "urban_match_id": "",
-      "lon": 119.58627,
-      "lat": 23.5654,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
-      "confidence": "medium",
-      "candidate_count": 2
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "TZ": {
+      "country_code": "TZ",
+      "host_feature_id": "TZ_ADM1_TZA-3385",
+      "urban_match_id": "",
+      "lon": 35.73947,
+      "lat": -6.17221,
+      "population": 765179,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "TZ",
+      "city_id": "CITY::ne::1159149731",
+      "stable_key": "id::CITY::ne::1159149731",
+      "city_name": "Dodoma",
+      "name_ascii": "Dodoma",
       "display_name": "United Republic of Tanzania",
       "lookup_iso2": "TZ",
       "base_iso2": "TZ",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151305",
-      "stable_key": "id::CITY::ne::1159151305",
-      "city_name": "Dar es Salaam",
-      "name_ascii": "Dar es Salaam",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 5383728,
-      "country_code": "TZ",
-      "host_feature_id": "TZ_ADM1_TZA-3378",
-      "urban_match_id": "",
-      "lon": 39.26951,
-      "lat": -6.82349,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 63
+      "candidate_count": 1
     },
     "UA": {
       "tag": "UA",
@@ -3892,27 +3934,27 @@
       "candidate_count": 29
     },
     "ZA": {
+      "country_code": "ZA",
+      "host_feature_id": "ZA_ADM1_ZAF-1208",
+      "urban_match_id": "",
+      "lon": 28.18783,
+      "lat": -25.74486,
+      "population": 2112693,
+      "base_tier": "major",
+      "source": "merged",
       "tag": "ZA",
+      "city_id": "CITY::ne::1159150661",
+      "stable_key": "id::CITY::ne::1159150661",
+      "city_name": "Pretoria",
+      "name_ascii": "Pretoria",
       "display_name": "South Africa",
       "lookup_iso2": "ZA",
       "base_iso2": "ZA",
       "capital_state_id": null,
-      "city_id": "CITY::ne::1159151515",
-      "stable_key": "id::CITY::ne::1159151515",
-      "city_name": "Johannesburg",
-      "name_ascii": "Johannesburg",
       "capital_kind": "country_capital",
-      "base_tier": "major",
-      "population": 9418183,
-      "country_code": "ZA",
-      "host_feature_id": "ZA_ADM1_ZAF-1208",
-      "urban_match_id": "",
-      "lon": 28.04363,
-      "lat": -26.20227,
-      "source": "merged",
-      "resolution_method": "controlled_city_fallback",
+      "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 173
+      "candidate_count": 1
     },
     "ZM": {
       "tag": "ZM",
@@ -3959,39 +4001,870 @@
       "resolution_method": "controlled_city_fallback",
       "confidence": "high",
       "candidate_count": 23
+    },
+    "MC": {
+      "country_code": "MC",
+      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "urban_match_id": "UA_BBD8D7524307",
+      "lon": 7.418141920294424,
+      "lat": 43.75090156108269,
+      "population": 36371,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MC",
+      "city_id": "CITY::ne::1159149077",
+      "stable_key": "id::CITY::ne::1159149077",
+      "city_name": "Monaco",
+      "name_ascii": "Monaco",
+      "display_name": "Monaco",
+      "lookup_iso2": "MC",
+      "base_iso2": "MC",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        7.42145,
+        43.73718
+      ],
+      "coordinate_adjustment": "simplified_coastline"
+    },
+    "MO": {
+      "country_code": "MO",
+      "host_feature_id": "MO_ADMIN0_PASSTHROUGH",
+      "urban_match_id": "",
+      "lon": 113.5332949338323,
+      "lat": 22.225872154719767,
+      "population": 649335,
+      "base_tier": "major",
+      "source": "merged",
+      "tag": "MO",
+      "city_id": "CITY::ne::1159149085",
+      "stable_key": "id::CITY::ne::1159149085",
+      "city_name": "Macau",
+      "name_ascii": "Macau",
+      "display_name": "Macao S.A.R",
+      "lookup_iso2": "MO",
+      "base_iso2": "MO",
+      "capital_state_id": null,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1,
+      "source_coordinates": [
+        113.54611,
+        22.20056
+      ],
+      "coordinate_adjustment": "simplified_coastline"
     }
   },
-  "cities": {},
+  "cities": {
+    "CITY::ne::1159146001": {
+      "city_id": "CITY::ne::1159146001",
+      "stable_key": "id::CITY::ne::1159146001",
+      "display_name": {
+        "en": "Gitega",
+        "zh": "基特加"
+      },
+      "host_feature_id": "BI_ADM1_BDI-2639"
+    },
+    "CITY::ne::1159150345": {
+      "city_id": "CITY::ne::1159150345",
+      "stable_key": "id::CITY::ne::1159150345",
+      "display_name": {
+        "en": "Porto-Novo",
+        "zh": "波多诺伏"
+      },
+      "host_feature_id": "BJ_ADM1_BEN-2177"
+    },
+    "CITY::ne::1159150999": {
+      "city_id": "CITY::ne::1159150999",
+      "stable_key": "id::CITY::ne::1159150999",
+      "display_name": {
+        "en": "Yamoussoukro",
+        "zh": "亚穆苏克罗"
+      },
+      "host_feature_id": "CI_ADM1_83157122B30232425959699"
+    },
+    "CITY::ne::1159151615": {
+      "city_id": "CITY::ne::1159151615",
+      "stable_key": "id::CITY::ne::1159151615",
+      "display_name": {
+        "en": "Santiago",
+        "zh": "圣地亚哥"
+      },
+      "host_feature_id": "CL_ADM1_CHL-2698"
+    },
+    "CITY::ne::1159151629": {
+      "city_id": "CITY::ne::1159151629",
+      "stable_key": "id::CITY::ne::1159151629",
+      "display_name": {
+        "en": "Hong Kong",
+        "zh": "香港"
+      },
+      "host_feature_id": "HK_ADM1_HKG-5154",
+      "lon": 114.17109072836105,
+      "lat": 22.274587651474373
+    },
+    "CITY::ne::1159151609": {
+      "city_id": "CITY::ne::1159151609",
+      "stable_key": "id::CITY::ne::1159151609",
+      "display_name": {
+        "en": "Tokyo",
+        "zh": "东京"
+      },
+      "host_feature_id": "JPN-1860"
+    },
+    "CITY::ne::1159149077": {
+      "city_id": "CITY::ne::1159149077",
+      "stable_key": "id::CITY::ne::1159149077",
+      "display_name": {
+        "en": "Monaco",
+        "zh": "摩纳哥"
+      },
+      "host_feature_id": "MC_ADMIN0_PASSTHROUGH",
+      "lon": 7.418141920294424,
+      "lat": 43.75090156108269
+    },
+    "CITY::ne::1159151179": {
+      "city_id": "CITY::ne::1159151179",
+      "stable_key": "id::CITY::ne::1159151179",
+      "display_name": {
+        "en": "Naypyidaw",
+        "zh": "内比都"
+      },
+      "host_feature_id": "MMR-3267"
+    },
+    "CITY::ne::1159149085": {
+      "city_id": "CITY::ne::1159149085",
+      "stable_key": "id::CITY::ne::1159149085",
+      "display_name": {
+        "en": "Macau",
+        "zh": "澳门"
+      },
+      "host_feature_id": "MO_ADMIN0_PASSTHROUGH",
+      "lon": 113.5332949338323,
+      "lat": 22.225872154719767
+    },
+    "CITY::ne::1159150799": {
+      "city_id": "CITY::ne::1159150799",
+      "stable_key": "id::CITY::ne::1159150799",
+      "display_name": {
+        "en": "Abuja",
+        "zh": "阿布贾"
+      },
+      "host_feature_id": "NG_ADM1_NGA-3470"
+    },
+    "CITY::ne::1159151519": {
+      "city_id": "CITY::ne::1159151519",
+      "stable_key": "id::CITY::ne::1159151519",
+      "display_name": {
+        "en": "Amsterdam",
+        "zh": "阿姆斯特丹"
+      },
+      "host_feature_id": "NL329"
+    },
+    "CITY::ne::1159151525": {
+      "city_id": "CITY::ne::1159151525",
+      "stable_key": "id::CITY::ne::1159151525",
+      "display_name": {
+        "en": "Manila",
+        "zh": "马尼拉"
+      },
+      "host_feature_id": "PHL-5543"
+    },
+    "CITY::ne::1159151567": {
+      "city_id": "CITY::ne::1159151567",
+      "stable_key": "id::CITY::ne::1159151567",
+      "display_name": {
+        "en": "Taipei",
+        "zh": "台北"
+      },
+      "host_feature_id": "TWN-1166"
+    },
+    "CITY::ne::1159149731": {
+      "city_id": "CITY::ne::1159149731",
+      "stable_key": "id::CITY::ne::1159149731",
+      "display_name": {
+        "en": "Dodoma",
+        "zh": "多多马"
+      },
+      "host_feature_id": "TZ_ADM1_TZA-3385"
+    },
+    "CITY::ne::1159150661": {
+      "city_id": "CITY::ne::1159150661",
+      "stable_key": "id::CITY::ne::1159150661",
+      "display_name": {
+        "en": "Pretoria",
+        "zh": "比勒陀利亚"
+      },
+      "host_feature_id": "ZA_ADM1_ZAF-1208"
+    },
+    "CITY::ne::1159149089": {
+      "city_id": "CITY::ne::1159149089",
+      "host_feature_id": "AD_ADM1_AND-4876"
+    },
+    "CITY::ne::1159150565": {
+      "city_id": "CITY::ne::1159150565",
+      "host_feature_id": "ARE-349",
+      "lon": 54.433609419711146,
+      "lat": 24.533351824984454
+    },
+    "CITY::ne::1159151561": {
+      "city_id": "CITY::ne::1159151561",
+      "host_feature_id": "AFG-1767"
+    },
+    "CITY::ne::1159151117": {
+      "city_id": "CITY::ne::1159151117",
+      "host_feature_id": "AL022"
+    },
+    "CITY::ne::1159151119": {
+      "city_id": "CITY::ne::1159151119",
+      "host_feature_id": "ARM-1675"
+    },
+    "CITY::ne::1159151469": {
+      "city_id": "CITY::ne::1159151469",
+      "host_feature_id": "AO_ADM1_AGO-1880"
+    },
+    "CITY::ne::1159151559": {
+      "city_id": "CITY::ne::1159151559",
+      "host_feature_id": "AR_ADM1_ARG-5493"
+    },
+    "CITY::ne::1159151563": {
+      "city_id": "CITY::ne::1159151563",
+      "host_feature_id": "AT130"
+    },
+    "CITY::ne::1159151161": {
+      "city_id": "CITY::ne::1159151161",
+      "host_feature_id": "AU_ADM1_AUS-2653"
+    },
+    "CITY::ne::1159151123": {
+      "city_id": "CITY::ne::1159151123",
+      "host_feature_id": "AZE-1689"
+    },
+    "CITY::ne::1159151177": {
+      "city_id": "CITY::ne::1159151177",
+      "host_feature_id": "BA_ADM1_54001226B17629474923252"
+    },
+    "CITY::ne::1159151467": {
+      "city_id": "CITY::ne::1159151467",
+      "host_feature_id": "BGD-1806"
+    },
+    "CITY::ne::1159151465": {
+      "city_id": "CITY::ne::1159151465",
+      "host_feature_id": "BE100"
+    },
+    "CITY::ne::1159151173": {
+      "city_id": "CITY::ne::1159151173",
+      "host_feature_id": "BF_ADM1_92566538B14190085014946"
+    },
+    "CITY::ne::1159151147": {
+      "city_id": "CITY::ne::1159151147",
+      "host_feature_id": "BG411"
+    },
+    "CITY::ne::1159150451": {
+      "city_id": "CITY::ne::1159150451",
+      "host_feature_id": "BHR-4929"
+    },
+    "CITY::ne::1159151083": {
+      "city_id": "CITY::ne::1159151083",
+      "host_feature_id": "BN_ADM1_BRN-1182"
+    },
+    "CITY::ne::1159151133": {
+      "city_id": "CITY::ne::1159151133",
+      "host_feature_id": "BO_ADM1_BOL-1936"
+    },
+    "CITY::ne::1159151443": {
+      "city_id": "CITY::ne::1159151443",
+      "host_feature_id": "BR_ADM1_BRA-599"
+    },
+    "CITY::ne::1159151151": {
+      "city_id": "CITY::ne::1159151151",
+      "host_feature_id": "BTN-2439"
+    },
+    "CITY::ne::1159151153": {
+      "city_id": "CITY::ne::1159151153",
+      "host_feature_id": "BW_ADM1_BWA-5501"
+    },
+    "CITY::ne::1159151149": {
+      "city_id": "CITY::ne::1159151149",
+      "host_feature_id": "BY_CITY_MINSK"
+    },
+    "CITY::ne::1159151109": {
+      "city_id": "CITY::ne::1159151109",
+      "host_feature_id": "BZ_ADM1_BLZ-1324"
+    },
+    "CITY::ne::1159151059": {
+      "city_id": "CITY::ne::1159151059",
+      "host_feature_id": "CA_FED_35079"
+    },
+    "CITY::ne::1159151539": {
+      "city_id": "CITY::ne::1159151539",
+      "host_feature_id": "CD_ADM1_COD-1884"
+    },
+    "CITY::ne::1159151111": {
+      "city_id": "CITY::ne::1159151111",
+      "host_feature_id": "CF_ADM1_CAF-1460"
+    },
+    "CITY::ne::1159150993": {
+      "city_id": "CITY::ne::1159150993",
+      "host_feature_id": "CG_ADM1_COG-4855"
+    },
+    "CITY::ne::1159149737": {
+      "city_id": "CITY::ne::1159149737",
+      "host_feature_id": "CH021"
+    },
+    "CITY::ne::1159151115": {
+      "city_id": "CITY::ne::1159151115",
+      "host_feature_id": "CM_ADM1_CMR-1480"
+    },
+    "CITY::ne::1159151595": {
+      "city_id": "CITY::ne::1159151595",
+      "host_feature_id": "CN_CITY_17275852B40522342172572"
+    },
+    "CITY::ne::1159151601": {
+      "city_id": "CITY::ne::1159151601",
+      "host_feature_id": "CO_ADM1_COL-1399"
+    },
+    "CITY::ne::1159150849": {
+      "city_id": "CITY::ne::1159150849",
+      "host_feature_id": "CR_ADM1_CRI-1331"
+    },
+    "CITY::ne::1159151205": {
+      "city_id": "CITY::ne::1159151205",
+      "host_feature_id": "CV_ADM1_CPV-5053"
+    },
+    "CITY::ne::1159151209": {
+      "city_id": "CITY::ne::1159151209",
+      "host_feature_id": "CY000"
+    },
+    "CITY::ne::1159151359": {
+      "city_id": "CITY::ne::1159151359",
+      "host_feature_id": "CZ_ADM2_57006924B6298598328883"
+    },
+    "CITY::ne::1159151529": {
+      "city_id": "CITY::ne::1159151529",
+      "host_feature_id": "DE300"
+    },
+    "CITY::ne::1159149869": {
+      "city_id": "CITY::ne::1159149869",
+      "host_feature_id": "DJ_ADM1_DJI-1567"
+    },
+    "CITY::ne::1159151437": {
+      "city_id": "CITY::ne::1159151437",
+      "host_feature_id": "DK011"
+    },
+    "CITY::ne::1159151401": {
+      "city_id": "CITY::ne::1159151401",
+      "host_feature_id": "DO_ADM1_DOM-1985"
+    },
+    "CITY::ne::1159151471": {
+      "city_id": "CITY::ne::1159151471",
+      "host_feature_id": "DZA-2195"
+    },
+    "CITY::ne::1159150847": {
+      "city_id": "CITY::ne::1159150847",
+      "host_feature_id": "EC_ADM1_ECU-1287"
+    },
+    "CITY::ne::1159150877": {
+      "city_id": "CITY::ne::1159150877",
+      "host_feature_id": "EE001"
+    },
+    "CITY::ne::1159151603": {
+      "city_id": "CITY::ne::1159151603",
+      "host_feature_id": "EGY-1533"
+    },
+    "CITY::ne::1159149075": {
+      "city_id": "CITY::ne::1159149075",
+      "host_feature_id": "EH_ADMIN0_PASSTHROUGH"
+    },
+    "CITY::ne::1159150873": {
+      "city_id": "CITY::ne::1159150873",
+      "host_feature_id": "ER_ADM1_ERI-1561"
+    },
+    "CITY::ne::1159151503": {
+      "city_id": "CITY::ne::1159151503",
+      "host_feature_id": "ES300"
+    },
+    "CITY::ne::1159151549": {
+      "city_id": "CITY::ne::1159151549",
+      "host_feature_id": "ET_ADM1_ETH-3133"
+    },
+    "CITY::ne::1159151419": {
+      "city_id": "CITY::ne::1159151419",
+      "host_feature_id": "FI1B1"
+    },
+    "CITY::ne::1159151613": {
+      "city_id": "CITY::ne::1159151613",
+      "host_feature_id": "FR_ARR_75001"
+    },
+    "CITY::ne::1159150913": {
+      "city_id": "CITY::ne::1159150913",
+      "host_feature_id": "GA_ADM1_GAB-2168"
+    },
+    "CITY::ne::1159151577": {
+      "city_id": "CITY::ne::1159151577",
+      "host_feature_id": "UKI32"
+    },
+    "CITY::ne::1159150961": {
+      "city_id": "CITY::ne::1159150961",
+      "host_feature_id": "GEO-3036"
+    },
+    "CITY::ne::1159151403": {
+      "city_id": "CITY::ne::1159151403",
+      "host_feature_id": "GH_ADM1_GHA-2172"
+    },
+    "CITY::ne::1159149997": {
+      "city_id": "CITY::ne::1159149997",
+      "host_feature_id": "GM_ADM1_GMB-2153",
+      "lon": -16.58409346847067,
+      "lat": 13.44252256094568
+    },
+    "CITY::ne::1159150997": {
+      "city_id": "CITY::ne::1159150997",
+      "host_feature_id": "GN_ADM1_385441B29247776226513"
+    },
+    "CITY::ne::1159150867": {
+      "city_id": "CITY::ne::1159150867",
+      "host_feature_id": "GQ_ADM1_GNQ-1478"
+    },
+    "CITY::ne::1159151545": {
+      "city_id": "CITY::ne::1159151545",
+      "host_feature_id": "EL303"
+    },
+    "CITY::ne::1159150909": {
+      "city_id": "CITY::ne::1159150909",
+      "host_feature_id": "GT_ADM1_GTM-1951"
+    },
+    "CITY::ne::1159150803": {
+      "city_id": "CITY::ne::1159150803",
+      "host_feature_id": "GW_ADM1_GNB-769"
+    },
+    "CITY::ne::1159150585": {
+      "city_id": "CITY::ne::1159150585",
+      "host_feature_id": "GY_ADM1_GUY-677"
+    },
+    "CITY::ne::1159150583": {
+      "city_id": "CITY::ne::1159150583",
+      "host_feature_id": "HN_ADM1_HND-639"
+    },
+    "CITY::ne::1159150875": {
+      "city_id": "CITY::ne::1159150875",
+      "host_feature_id": "HR050"
+    },
+    "CITY::ne::1159150589": {
+      "city_id": "CITY::ne::1159150589",
+      "host_feature_id": "HT_ADM1_HTI-1388"
+    },
+    "CITY::ne::1159151257": {
+      "city_id": "CITY::ne::1159151257",
+      "host_feature_id": "HU110"
+    },
+    "CITY::ne::1159151599": {
+      "city_id": "CITY::ne::1159151599",
+      "host_feature_id": "ID_ADM1_65028918B14696209246677"
+    },
+    "CITY::ne::1159151309": {
+      "city_id": "CITY::ne::1159151309",
+      "host_feature_id": "IE061"
+    },
+    "CITY::ne::1159151417": {
+      "city_id": "CITY::ne::1159151417",
+      "host_feature_id": "ISR-3057"
+    },
+    "CITY::ne::1159151541": {
+      "city_id": "CITY::ne::1159151541",
+      "host_feature_id": "IN_ADM2_76128533B58262202014972"
+    },
+    "CITY::ne::1159151547": {
+      "city_id": "CITY::ne::1159151547",
+      "host_feature_id": "IRQ-3063"
+    },
+    "CITY::ne::1159151551": {
+      "city_id": "CITY::ne::1159151551",
+      "host_feature_id": "IRN-3216"
+    },
+    "CITY::ne::1159150587": {
+      "city_id": "CITY::ne::1159150587",
+      "host_feature_id": "IS001"
+    },
+    "CITY::ne::1159151593": {
+      "city_id": "CITY::ne::1159151593",
+      "host_feature_id": "ITI43"
+    },
+    "CITY::ne::1159150807": {
+      "city_id": "CITY::ne::1159150807",
+      "host_feature_id": "JOR-851"
+    },
+    "CITY::ne::1159151597": {
+      "city_id": "CITY::ne::1159151597",
+      "host_feature_id": "KE_ADM1_KEN-1196"
+    },
+    "CITY::ne::1159150813": {
+      "city_id": "CITY::ne::1159150813",
+      "host_feature_id": "KGZ-1115"
+    },
+    "CITY::ne::1159151127": {
+      "city_id": "CITY::ne::1159151127",
+      "host_feature_id": "KHM-1789"
+    },
+    "CITY::ne::1159149083": {
+      "city_id": "CITY::ne::1159149083",
+      "host_feature_id": "KM_ADM1_COM-4935"
+    },
+    "CITY::ne::1159151303": {
+      "city_id": "CITY::ne::1159151303",
+      "host_feature_id": "PRK-3305"
+    },
+    "CITY::ne::1159151523": {
+      "city_id": "CITY::ne::1159151523",
+      "host_feature_id": "KOR-2497"
+    },
+    "CITY::ne::1159151361": {
+      "city_id": "CITY::ne::1159151361",
+      "host_feature_id": "KWT-1663"
+    },
+    "CITY::ne::1159150965": {
+      "city_id": "CITY::ne::1159150965",
+      "host_feature_id": "KAZ-4830",
+      "stable_key": "id::CITY::ne::1159150965",
+      "display_name": {
+        "en": "Astana",
+        "zh": "阿斯塔纳"
+      }
+    },
+    "CITY::ne::1159150991": {
+      "city_id": "CITY::ne::1159150991",
+      "host_feature_id": "LAO-3283"
+    },
+    "CITY::ne::1159150957": {
+      "city_id": "CITY::ne::1159150957",
+      "host_feature_id": "LBN-3024"
+    },
+    "CITY::ne::1159146061": {
+      "city_id": "CITY::ne::1159146061",
+      "host_feature_id": "LI_ADM1_LIE-4893",
+      "lon": 9.51311776601958,
+      "lat": 47.12786010550352
+    },
+    "CITY::ne::1159150719": {
+      "city_id": "CITY::ne::1159150719",
+      "host_feature_id": "LKA-2470"
+    },
+    "CITY::ne::1159151311": {
+      "city_id": "CITY::ne::1159151311",
+      "host_feature_id": "LR_ADM1_LBR-788",
+      "lon": -10.795056804597337,
+      "lat": 6.3040686357909665
+    },
+    "CITY::ne::1159150831": {
+      "city_id": "CITY::ne::1159150831",
+      "host_feature_id": "LS_ADM1_LSO-1203"
+    },
+    "CITY::ne::1159150809": {
+      "city_id": "CITY::ne::1159150809",
+      "host_feature_id": "LT011"
+    },
+    "CITY::ne::1159146437": {
+      "city_id": "CITY::ne::1159146437",
+      "host_feature_id": "LU_ADM1_LUX-908"
+    },
+    "CITY::ne::1159150811": {
+      "city_id": "CITY::ne::1159150811",
+      "host_feature_id": "LV006"
+    },
+    "CITY::ne::1159151415": {
+      "city_id": "CITY::ne::1159151415",
+      "host_feature_id": "LBY-2978"
+    },
+    "CITY::ne::1159150673": {
+      "city_id": "CITY::ne::1159150673",
+      "host_feature_id": "MAR-1451"
+    },
+    "CITY::ne::1159150677": {
+      "city_id": "CITY::ne::1159150677",
+      "host_feature_id": "MDA-1627"
+    },
+    "CITY::ne::1159149511": {
+      "city_id": "CITY::ne::1159149511",
+      "host_feature_id": "ME_ADM1_MNE-1517"
+    },
+    "CITY::ne::1159150835": {
+      "city_id": "CITY::ne::1159150835",
+      "host_feature_id": "MG_ADM1_MDG-5862"
+    },
+    "CITY::ne::1159150073": {
+      "city_id": "CITY::ne::1159150073",
+      "host_feature_id": "MK008"
+    },
+    "CITY::ne::1159150945": {
+      "city_id": "CITY::ne::1159150945",
+      "host_feature_id": "ML_ADM1_MLI-2792"
+    },
+    "CITY::ne::1159150781": {
+      "city_id": "CITY::ne::1159150781",
+      "host_feature_id": "MNG-3331"
+    },
+    "CITY::ne::1159150943": {
+      "city_id": "CITY::ne::1159150943",
+      "host_feature_id": "MR_ADM1_MRT-2787"
+    },
+    "CITY::ne::1159151199": {
+      "city_id": "CITY::ne::1159151199",
+      "host_feature_id": "MT001"
+    },
+    "CITY::ne::1159150907": {
+      "city_id": "CITY::ne::1159150907",
+      "host_feature_id": "MW_ADM1_82672581B12520625652479"
+    },
+    "CITY::ne::1159151587": {
+      "city_id": "CITY::ne::1159151587",
+      "host_feature_id": "MX_ZN_14_002"
+    },
+    "CITY::ne::1159151317": {
+      "city_id": "CITY::ne::1159151317",
+      "host_feature_id": "MYS-4831"
+    },
+    "CITY::ne::1159150683": {
+      "city_id": "CITY::ne::1159150683",
+      "host_feature_id": "MZ_ADM1_MOZ-5854"
+    },
+    "CITY::ne::1159150785": {
+      "city_id": "CITY::ne::1159150785",
+      "host_feature_id": "NA_ADM1_NAM-3340"
+    },
+    "CITY::ne::1159150605": {
+      "city_id": "CITY::ne::1159150605",
+      "host_feature_id": "NE_ADM1_NER-94"
+    },
+    "CITY::ne::1159150623": {
+      "city_id": "CITY::ne::1159150623",
+      "host_feature_id": "NI_ADM1_NIC-659"
+    },
+    "CITY::ne::1159151281": {
+      "city_id": "CITY::ne::1159151281",
+      "host_feature_id": "NO081"
+    },
+    "CITY::ne::1159150655": {
+      "city_id": "CITY::ne::1159150655",
+      "host_feature_id": "NPL-1130"
+    },
+    "CITY::ne::1159151699": {
+      "city_id": "CITY::ne::1159151699",
+      "host_feature_id": "NZ_ADM1_NZL-5469"
+    },
+    "CITY::ne::1159150717": {
+      "city_id": "CITY::ne::1159150717",
+      "host_feature_id": "OMN-2426"
+    },
+    "CITY::ne::1159150667": {
+      "city_id": "CITY::ne::1159150667",
+      "host_feature_id": "PA_ADM1_PAN-1340"
+    },
+    "CITY::ne::1159151511": {
+      "city_id": "CITY::ne::1159151511",
+      "host_feature_id": "PE_ADM1_PER-587"
+    },
+    "CITY::ne::1159150663": {
+      "city_id": "CITY::ne::1159150663",
+      "host_feature_id": "PG_ADM1_PNG-1254"
+    },
+    "CITY::ne::1159150645": {
+      "city_id": "CITY::ne::1159150645",
+      "host_feature_id": "PAK-1110"
+    },
+    "CITY::ne::1159151299": {
+      "city_id": "CITY::ne::1159151299",
+      "host_feature_id": "PL_POW_1465"
+    },
+    "CITY::ne::1159150445": {
+      "city_id": "CITY::ne::1159150445",
+      "host_feature_id": "GAZ+00?"
+    },
+    "CITY::ne::1159151273": {
+      "city_id": "CITY::ne::1159151273",
+      "host_feature_id": "PT170"
+    },
+    "CITY::ne::1159150621": {
+      "city_id": "CITY::ne::1159150621",
+      "host_feature_id": "PY_ADM1_PRY-4837"
+    },
+    "CITY::ne::1159149469": {
+      "city_id": "CITY::ne::1159149469",
+      "host_feature_id": "QAT-1099"
+    },
+    "CITY::ne::1159151263": {
+      "city_id": "CITY::ne::1159151263",
+      "host_feature_id": "RO321"
+    },
+    "CITY::ne::1159151079": {
+      "city_id": "CITY::ne::1159151079",
+      "host_feature_id": "RS110"
+    },
+    "CITY::ne::1159151585": {
+      "city_id": "CITY::ne::1159151585",
+      "host_feature_id": "RU_CITY_MOSCOW"
+    },
+    "CITY::ne::1159149385": {
+      "city_id": "CITY::ne::1159149385",
+      "host_feature_id": "RW_ADM1_RWA-3495"
+    },
+    "CITY::ne::1159151581": {
+      "city_id": "CITY::ne::1159151581",
+      "host_feature_id": "SAU-1097"
+    },
+    "CITY::ne::1159151275": {
+      "city_id": "CITY::ne::1159151275",
+      "host_feature_id": "SD_ADM1_SDN-874"
+    },
+    "CITY::ne::1159151507": {
+      "city_id": "CITY::ne::1159151507",
+      "host_feature_id": "SE110"
+    },
+    "CITY::ne::1159151627": {
+      "city_id": "CITY::ne::1159151627",
+      "host_feature_id": "SGP-4871"
+    },
+    "CITY::ne::1159149461": {
+      "city_id": "CITY::ne::1159149461",
+      "host_feature_id": "SI041"
+    },
+    "CITY::ne::1159149463": {
+      "city_id": "CITY::ne::1159149463",
+      "host_feature_id": "SK_ADM2_56367889B40480781512108"
+    },
+    "CITY::ne::1159150625": {
+      "city_id": "CITY::ne::1159150625",
+      "host_feature_id": "SL_ADM1_SLE-761"
+    },
+    "CITY::ne::1159146051": {
+      "city_id": "CITY::ne::1159146051",
+      "host_feature_id": "SM_ADM1_SMR-4883"
+    },
+    "CITY::ne::1159151513": {
+      "city_id": "CITY::ne::1159151513",
+      "host_feature_id": "SN_ADM1_SEN-759"
+    },
+    "CITY::ne::1159150715": {
+      "city_id": "CITY::ne::1159150715",
+      "host_feature_id": "SO_ADM1_83879307B32896531038690"
+    },
+    "CITY::ne::1159150597": {
+      "city_id": "CITY::ne::1159150597",
+      "host_feature_id": "SR_ADM1_SUR-72"
+    },
+    "CITY::ne::1159149449": {
+      "city_id": "CITY::ne::1159149449",
+      "host_feature_id": "SS_ADM1_SDS-865"
+    },
+    "CITY::ne::1159151195": {
+      "city_id": "CITY::ne::1159151195",
+      "host_feature_id": "ST_ADM1_STP-4861"
+    },
+    "CITY::ne::1159150853": {
+      "city_id": "CITY::ne::1159150853",
+      "host_feature_id": "SV_ADM1_SLV-1349"
+    },
+    "CITY::ne::1159151269": {
+      "city_id": "CITY::ne::1159151269",
+      "host_feature_id": "SYR-4843"
+    },
+    "CITY::ne::1159149413": {
+      "city_id": "CITY::ne::1159149413",
+      "host_feature_id": "SZ_ADM1_SWZ-534"
+    },
+    "CITY::ne::1159150863": {
+      "city_id": "CITY::ne::1159150863",
+      "host_feature_id": "TD_ADM1_TCD-4857"
+    },
+    "CITY::ne::1159150535": {
+      "city_id": "CITY::ne::1159150535",
+      "host_feature_id": "TG_ADM1_TGO-87"
+    },
+    "CITY::ne::1159151509": {
+      "city_id": "CITY::ne::1159151509",
+      "host_feature_id": "THA-416"
+    },
+    "CITY::ne::1159150609": {
+      "city_id": "CITY::ne::1159150609",
+      "host_feature_id": "TJK-5491"
+    },
+    "CITY::ne::1159150577": {
+      "city_id": "CITY::ne::1159150577",
+      "host_feature_id": "TL_ADM1_TLS-541"
+    },
+    "CITY::ne::1159150567": {
+      "city_id": "CITY::ne::1159150567",
+      "host_feature_id": "TKM-352"
+    },
+    "CITY::ne::1159150537": {
+      "city_id": "CITY::ne::1159150537",
+      "host_feature_id": "TUN-108"
+    },
+    "CITY::ne::1159151255": {
+      "city_id": "CITY::ne::1159151255",
+      "host_feature_id": "TR510"
+    },
+    "CITY::ne::1159151495": {
+      "city_id": "CITY::ne::1159151495",
+      "host_feature_id": "UA_RAY_74538382B60890943260132"
+    },
+    "CITY::ne::1159150593": {
+      "city_id": "CITY::ne::1159150593",
+      "host_feature_id": "UG_ADM1_17295835B48340970483027"
+    },
+    "CITY::ne::1159151573": {
+      "city_id": "CITY::ne::1159151573",
+      "host_feature_id": "US_CNTY_11001"
+    },
+    "CITY::ne::1159150469": {
+      "city_id": "CITY::ne::1159150469",
+      "host_feature_id": "UY_ADM1_URY-21"
+    },
+    "CITY::ne::1159151501": {
+      "city_id": "CITY::ne::1159151501",
+      "host_feature_id": "UZB-4828"
+    },
+    "CITY::ne::1159151493": {
+      "city_id": "CITY::ne::1159151493",
+      "host_feature_id": "VE_ADM1_VEN-43"
+    },
+    "CITY::ne::1159151251": {
+      "city_id": "CITY::ne::1159151251",
+      "host_feature_id": "VNM-462"
+    },
+    "CITY::gn::786714": {
+      "city_id": "CITY::gn::786714",
+      "host_feature_id": "XK_ADM1_KOS-5902"
+    },
+    "CITY::ne::1159151259": {
+      "city_id": "CITY::ne::1159151259",
+      "host_feature_id": "YEM-3498"
+    },
+    "CITY::ne::1159150571": {
+      "city_id": "CITY::ne::1159150571",
+      "host_feature_id": "ZM_ADM1_ZMB-520"
+    },
+    "CITY::ne::1159150573": {
+      "city_id": "CITY::ne::1159150573",
+      "host_feature_id": "ZW_ADM1_ZWE-525"
+    }
+  },
   "audit": {
-    "manual_capital_count": 0,
-    "capital_hint_count": 172,
+    "manual_capital_count": 16,
+    "capital_hint_count": 174,
     "renamed_city_count": 0,
     "name_conflict_count": 0,
-    "unresolved_capital_count": 2,
+    "unresolved_capital_count": 0,
     "unresolved_manual_capital_count": 0,
     "unresolved_city_rename_count": 0,
     "featured_runtime_missing_count": 0,
     "featured_runtime_missing_tags": [],
     "name_conflicts": [],
-    "unresolved_capitals": [
-      {
-        "tag": "MC",
-        "display_name": "Monaco",
-        "lookup_iso2": "MC",
-        "base_iso2": "MC",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      },
-      {
-        "tag": "MO",
-        "display_name": "Macao S.A.R",
-        "lookup_iso2": "MO",
-        "base_iso2": "MO",
-        "capital_state_id": null,
-        "reason": "no_controlled_city_candidates"
-      }
-    ],
+    "unresolved_capitals": [],
     "unresolved_manual_capitals": [],
-    "unresolved_city_renames": []
+    "unresolved_city_renames": [],
+    "capital_territory_conflicts": []
   }
 }
