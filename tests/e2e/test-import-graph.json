@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 64,
-    "nodeCount": 80,
-    "reverseIndexKeyCount": 123,
+    "specCount": 65,
+    "nodeCount": 81,
+    "reverseIndexKeyCount": 124,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 59
+        "specCount": 60
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -929,6 +929,31 @@
       ],
       "repoImpact": [
         "js/core/history_manager.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/ownership_retirement.spec.js": {
+      "directDependencies": [
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
@@ -2028,6 +2053,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2089,6 +2115,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2191,6 +2218,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2284,6 +2312,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2380,6 +2409,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2522,6 +2552,9 @@
     "tests/e2e/ocean_geometry_contract.spec.js": [
       "tests/e2e/ocean_geometry_contract.spec.js"
     ],
+    "tests/e2e/ownership_retirement.spec.js": [
+      "tests/e2e/ownership_retirement.spec.js"
+    ],
     "tests/e2e/physical_layer_regression.spec.js": [
       "tests/e2e/physical_layer_regression.spec.js"
     ],
@@ -2630,6 +2663,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2691,6 +2725,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2752,6 +2787,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2813,6 +2849,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2885,6 +2922,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",
@@ -2953,6 +2991,7 @@
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/ownership_retirement.spec.js",
       "tests/e2e/physical_layer_regression.spec.js",
       "tests/e2e/physical_layer_runtime_contract.spec.js",
       "tests/e2e/project_save_load_roundtrip.spec.js",

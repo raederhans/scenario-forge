@@ -12,6 +12,7 @@ interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
+ownership_retirement.spec.js
 physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js

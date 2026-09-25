@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-25 所有权编辑退役整合
+
+接手 [PR #162](https://github.com/raederhans/scenario-forge/pull/162)，在主工作区检出 `codex/visual-editing-boundary-p1-p2-20260924`，核对第一、二阶段实现并补齐 E2E 清单、依赖图与调色板边界测试。合并后主工作区回到 `main` 并快进同步；最终合并状态以 PR 回执及 Git 为准。其他两个工作树与未跟踪 `.playwright-mcp/` 保留，本轮不清理。
+
 ## 当前拓扑（2026-09-24）
 
 这里只维护当前工作树与分支事实。任务、进程和验收状态的历史快照统一见任务记录或下方归档，不能把其中的“current”“clean”或“HEAD 相等”解释为今天的事实。

@@ -99,8 +99,21 @@ test("palette facade delegates compatible colors and selection mode to their sta
   assert.deepEqual(facadeFindings, []);
   const activationPath = "js/core/state/actions/scenario_activation_actions.js";
   const activationSource = readFileSync(new URL(activationPath, ROOT), "utf8");
-  const findings = ["applyPaletteFeatureColorState", "applyPaletteOwnerColorState"]
-    .flatMap((functionName) => scanParameter(activationSource, activationPath, functionName, "target"));
+  const activationAst = parseModule(activationPath);
+  assert.ok(importedNames(activationAst, "../color_state.js").has("applyFeaturePaintState"));
+  const featureAction = activationAst.body.find((node) =>
+    node.declaration?.id?.name === "applyPaletteFeatureColorState").declaration;
+  assert.equal(featureAction.body.body.length, 1);
+  const delegatedCall = featureAction.body.body[0].expression;
+  assert.equal(delegatedCall.type, "CallExpression");
+  assert.equal(delegatedCall.callee.name, "applyFeaturePaintState");
+  assert.deepEqual(delegatedCall.arguments.map((argument) => argument.name), ["target", "featureIds", "color"]);
+  const colorPath = "js/core/state/color_state.js";
+  const colorSource = readFileSync(new URL(colorPath, ROOT), "utf8");
+  const findings = [
+    ...scanParameter(activationSource, activationPath, "applyPaletteOwnerColorState", "target"),
+    ...scanParameter(colorSource, colorPath, "applyFeaturePaintState", "target"),
+  ];
   assert.deepEqual(
     new Set(findings.map(({ key }) => key)),
     new Set([
