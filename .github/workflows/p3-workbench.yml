@@ -62,7 +62,7 @@ jobs:
           checks=[
             ('node-p3',['npm','run','test:node:ownership-retirement']),
             ('scenario-lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
-            ('python-boundaries',['python','-m','unittest','tests.test_map_renderer_color_resolution_strategy_boundary_contract','tests.test_scenario_state_actions_boundary_contract','tests.test_sidebar_split_boundary_contract','tests.test_map_renderer_click_selection_transaction_boundary_contract','tests.test_map_renderer_brush_interaction_session_owner_boundary_contract','-q']),
+            ('python-boundaries',['python','-m','unittest','tests.test_map_renderer_color_resolution_strategy_boundary_contract','tests.test_scenario_state_actions_boundary_contract','tests.test_sidebar_split_boundary_contract','tests.test_map_renderer_click_selection_transaction_boundary_contract','tests.test_history_manager_strategic_overlay_contract','-q']),
             ('state-write-allowlist',['node','tools/check_state_write_allowlist.mjs']),
             ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
             ('quick-fill-real-data',['node','tools/audit_quick_fill.mjs']),
