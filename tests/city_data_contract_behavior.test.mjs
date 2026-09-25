@@ -1,13 +1,29 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
-import { normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
+import { buildCityLocalizationPatch, normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
 
 const city = (id = "CITY::gn::1", properties = {}) => ({
   type: "Feature", properties: { id, stable_key: `id::${id}`, ...properties },
   geometry: { type: "Point", coordinates: [103.8, 1.3] },
 });
 const normalize = (features) => normalizeCityFeatureCollection({ type: "FeatureCollection", features });
+
+test("metadata-only scenario city overrides do not manufacture display names or locale entries", () => {
+  const id = "CITY::ne::1159149089";
+  for (const metadata of [{ host_feature_id: "AD_ADM1_AND-4876" }, { hidden: true }, { tier: "major" }]) {
+    const overrides = normalizeScenarioCityOverridesPayload({ cities: { [id]: metadata } });
+    const entry = overrides.cities[id];
+    assert.equal(entry.display_name, null);
+    assert.equal(entry.name_en, "");
+    assert.equal(entry.name_zh, "");
+    const patch = buildCityLocalizationPatch({ cityAliases: { cities: [entry] } });
+    assert.deepEqual(patch.geo, {});
+    assert.equal(patch.aliasToStableKey[id], `id::${id}`);
+  }
+  // Raw alias-only records also must not replace a city's existing translation.
+  assert.deepEqual(buildCityLocalizationPatch({ cityAliases: { cities: [{ city_id: id, aliases: ["Andorra"] }] } }).geo, {});
+});
 
 test("sourced small capital cities normalize as scenario-only points", () => {
   const overrides = normalizeScenarioCityOverridesPayload({ cities: {

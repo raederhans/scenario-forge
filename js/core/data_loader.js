@@ -318,7 +318,9 @@ function normalizeScenarioCityOverrideEntry(rawEntry, rawCityId = "") {
   const cityId = normalizeCityText(rawEntry.city_id || rawEntry.cityId || rawCityId);
   if (!cityId) return null;
   const stableKey = normalizeCityText(rawEntry.stable_key || rawEntry.stableKey || `id::${cityId}`);
-  const localeEntry = getCityLocaleEntry(rawEntry, cityId);
+  // A host/position/tier override is not a rename. An identity fallback here
+  // becomes an explicit display_name and masks the base city's translations.
+  const localeEntry = getCityLocaleEntry(rawEntry);
   const tierRaw = normalizeCityText(
     rawEntry.tier || rawEntry.base_tier || rawEntry.baseTier || rawEntry.level
   ).toLowerCase();
@@ -506,7 +508,8 @@ function applyCityAliasEntriesToPatch(entries, geo, aliasToStableKey) {
       entry.stable_key || entry.locale_key || entry.localeKey || entry.id || entry.city_id || `city_alias_${index + 1}`
     );
     if (!stableKey) return;
-    const localeEntry = getCityLocaleEntry(entry, stableKey);
+    // Alias-only and metadata-only entries must not publish IDs as translations.
+    const localeEntry = getCityLocaleEntry(entry);
     if (localeEntry) {
       geo[stableKey] = {
         ...(geo[stableKey] || {}),
