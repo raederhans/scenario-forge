@@ -7,12 +7,25 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, "..");
+const PAGES_ARTIFACT_ROOT_ENV = "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT";
+const explicitPagesArtifactRoot = String(process.env[PAGES_ARTIFACT_ROOT_ENV] || "").trim();
+const PAGES_DIST_ROOT = explicitPagesArtifactRoot
+  ? path.resolve(REPO_ROOT, explicitPagesArtifactRoot)
+  : path.join(REPO_ROOT, "dist");
+if (explicitPagesArtifactRoot) {
+  const runtimeRelative = path.relative(path.join(REPO_ROOT, ".runtime"), PAGES_DIST_ROOT);
+  assert.ok(runtimeRelative && !runtimeRelative.startsWith("..") && !path.isAbsolute(runtimeRelative));
+}
+function pagesDistPath(...segments) {
+  return path.relative(REPO_ROOT, path.join(PAGES_DIST_ROOT, ...segments)).replaceAll("\\", "/");
+}
+
 
 const MAP_RENDERER_PATH = "js/core/map_renderer.js";
 const OWNER_PATH = "js/core/map_renderer/render_pass_cache_host_owner.js";
-const DIST_MAP_RENDERER_PATH = "dist/app/js/core/map_renderer.js";
-const DIST_OWNER_PATH = "dist/app/js/core/map_renderer/render_pass_cache_host_owner.js";
-const DIST_PUBLIC_FACADE_PATH = "dist/app/js/core/map_renderer/public.js";
+const DIST_MAP_RENDERER_PATH = pagesDistPath("app/js/core/map_renderer.js");
+const DIST_OWNER_PATH = pagesDistPath("app/js/core/map_renderer/render_pass_cache_host_owner.js");
+const DIST_PUBLIC_FACADE_PATH = pagesDistPath("app/js/core/map_renderer/public.js");
 const WRONG_OWNER_PATH = "js/core/renderer/render_pass_cache_host_owner.js";
 const PUBLIC_FACADE_PATH = "js/core/map_renderer/public.js";
 const STATE_WRITE_ALLOWLIST_PATH = "tools/eslint-rules/state-writer-allowlist.json";
