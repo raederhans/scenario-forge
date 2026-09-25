@@ -61,7 +61,7 @@ test("ownership editing stays disabled in editor and developer workspace", async
 });
 
 test("P3 real-map country paint, erase, history and current-format reload share one visual state", async ({ page }, testInfo) => {
-  test.setTimeout(180_000);
+  test.setTimeout(60_000);
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
