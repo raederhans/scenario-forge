@@ -1209,7 +1209,7 @@
   <g class="hero-capitals" data-layer="capitals">
       <g class="capital capital--focus" data-tag="ENG" data-label-box="307.4,295,361.5,314.1"><title>London · Britain</title><circle cx="300.4" cy="317.8" r="5.8" /><text class="city-label" x="309.4" y="308.8">London</text></g>
       <g class="capital capital--focus" data-tag="FRA" data-label-box="331.5,349.5,374.2,368.6"><title>Paris · France</title><circle cx="324.5" cy="372.3" r="5.8" /><text class="city-label" x="333.5" y="363.3">Paris</text></g>
-      <g class="capital capital--focus" data-tag="GER" data-label-box="468.3,282.9,515.7,302"><title>Berlin · Germany</title><circle cx="461.3" cy="305.7" r="5.8" /><text class="city-label" x="470.3" y="296.7">Berlin</text></g>
+      <g class="capital capital--focus" data-tag="GER" data-label-box="468.3,282.9,535.3,302"><title>Germania · Germany</title><circle cx="461.3" cy="305.7" r="5.8" /><text class="city-label" x="470.3" y="296.7">Germania</text></g>
       <g class="capital capital--focus" data-tag="ITA" data-label-box="464.5,487.8,502.4,506.9"><title>Rome · Italy</title><circle cx="457.5" cy="510.6" r="5.8" /><text class="city-label" x="466.5" y="501.6">Rome</text></g>
       <g class="capital" data-tag="IBR" data-label-box="227.6,498.4,281.5,517.6"><title>Madrid · Iberian Union</title><circle cx="220.6" cy="521.2" r="5.8" /><text class="city-label" x="229.6" y="512.2">Madrid</text></g>
       <g class="capital" data-tag="RKU" data-label-box="676.3,288.5,710.8,307.7"><title>Kyiv · Reichskommissariat Ukraine</title><circle cx="669.3" cy="311.3" r="5.8" /><text class="city-label" x="678.3" y="302.3">Kyiv</text></g>
