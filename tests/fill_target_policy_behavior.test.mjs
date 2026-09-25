@@ -29,8 +29,10 @@ function fixture() {
   return { state, mode, policy, a: features[0], hidden: features[4] };
 }
 
-test("country targets filter absent and excluded features and observe replacement indexes", () => {
+test("geographic macros require complete membership, accept Sets and observe replacement indexes", () => {
   const { state, policy } = fixture();
+  assert.deepEqual(policy.getCountryFeatureIds("AA"), [], "missing member must block the whole macro");
+  state.countryToFeatureIds.set("AA", new Set(["a", "b", "c", "hidden"]));
   const ids = policy.getCountryFeatureIds("AA");
   assert.deepEqual(ids, ["a", "b", "c"]);
   ids.pop();

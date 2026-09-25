@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "../map_data_boundary.js";
 import { createQuickFillHierarchyResolver, normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 
 // Owns fill target policy decisions; inputs remain live.
@@ -14,9 +15,9 @@ export function createFillTargetPolicy(runtimeState, {
   });
 
   function getCountryFeatureIds(countryCode) {
-    if (!countryCode || !(runtimeState.countryToFeatureIds instanceof Map)) return [];
-    const ids = runtimeState.countryToFeatureIds.get(countryCode);
-    if (!Array.isArray(ids)) return [];
+    const ids = getMapDataBoundary(runtimeState).reference.getGeographicCountryFeatureIds(countryCode);
+    // Developer geographic macros must not silently paint the loaded subset.
+    if (!ids.length || ids.some((id) => !runtimeState.landIndex?.has(id))) return [];
     return ids.filter((candidateId) => {
       const candidateFeature = runtimeState.landIndex?.get(candidateId);
       return candidateFeature && !shouldExcludePoliticalInteractionFeature(candidateFeature, candidateId);

@@ -14027,9 +14027,9 @@ function applyDevMacroFillCurrentOwnerScope() {
   const ownerCode = getFeatureOwnerCode(contextInfo.featureId) || contextInfo.countryCode;
   const ids = getFeatureIdsForOwner(ownerCode)
     .map((value) => String(value || "").trim())
-    .filter((featureId) => featureId && runtimeState.landIndex?.has(featureId));
-  if (!ids.length) {
-    showToast(t("No owner scope is available for this feature.", "ui"), {
+    .filter(Boolean);
+  if (!ids.length || ids.some((featureId) => !runtimeState.landIndex?.has(featureId))) {
+    showToast(t("The complete reference group must be loaded before filling it.", "ui"), {
       title: t("Dev Workspace", "ui"),
       tone: "warning",
     });

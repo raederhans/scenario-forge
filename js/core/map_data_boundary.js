@@ -95,7 +95,7 @@ export function getMapDataBoundary(source) {
       return getReferenceIndex(getScenarioAssignments()).groups.get(normalizeCode(groupCode)) || EMPTY_IDS;
     },
     getGeographicCountryFeatureIds(countryCode) {
-      const members = source.countryToFeatureIds?.get(normalizeCode(countryCode));
+      const members = source.countryToFeatureIds?.get?.(normalizeCode(countryCode));
       return Array.isArray(members) || members instanceof Set ? Object.freeze([...members]) : EMPTY_IDS;
     },
   });

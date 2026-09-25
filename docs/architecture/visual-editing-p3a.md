@@ -1,6 +1,9 @@
 # Visual editing P3A: migrate consumers and unify paint transactions
 
-Base: main `5ba80dacb62cb74ad960b557d8ea176fe210ad22`, after PR #162.
+Initial base: `5ba80dacb62cb74ad960b557d8ea176fe210ad22`, after PR #162.
+Continuation integration target: `aed67962d6f814c7a2d86e3e6d2fb43385704404`,
+including the subsequent capital corrections from PR #163. Those source/data
+changes are preserved and rechecked with the P3A branch, not overwritten.
 
 ## P1/P2 recheck
 
@@ -77,3 +80,26 @@ The pristine merged source still fails the historical borrowed-owner proof in
 `check_state_writer_policy.mjs` at `political_path_cache_owner.js`. The working
 source's direct-write allowlist remains unchanged. No allowance, timeout, route
 rule or unrelated proof fingerprint is widened to hide a failure.
+
+## Continuation review corrections
+
+The developer reference-group macro still filtered out unhydrated members. It now
+rejects the whole operation before history or paint, just like normal country
+clicks and Auto Fill. The geographic macro helper likewise requires complete
+Array/Set membership and tolerates an unavailable geographic index. Regression
+tests bind the actual composition-root macro instead of duplicating its logic.
+
+The historical overlay test asserted an assignment statement that disappeared
+when selective snapshots were introduced. It now executes the real capture
+function and checks full/scoped membership and deep-copy isolation; overlay
+undo/redo coverage remains. The architecture checker follows the delegated
+shared paint transaction and still requires paint, history, render and sidebar
+effects. A behavior test checks that both country and subdivision fills publish
+exactly one render after their history commit. No fake duplicate render is added
+to satisfy the old string assertion.
+
+Generated E2E lists/import graph, route schema and script portfolio are checked as
+part of integration. The focused source checks do not replace the outstanding
+historical writer-proof work recorded in PR #162: that record identifies both
+baseline failures and newer proof-registration gaps. No all-green proof claim or
+new protection exception is made by P3A.
