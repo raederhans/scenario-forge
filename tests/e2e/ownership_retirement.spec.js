@@ -220,6 +220,9 @@ for (const scenario of ['modern_world', 'tno_1962']) {
       const renderer=await load('./js/core/map_renderer.js');
       const {applyFeaturePaintState}=await load('./js/core/state/color_state.js');
       const history=await load('./js/core/history_manager.js');
+      // A promotion may land between the preceding poll and this task. Await
+      // the actual generation here, then perform the synchronous transaction.
+      await renderer.ensurePaintContoursReady();
       const initial=renderer.getPaintContourDiagnostics();
       const ids=state.landData.features.map(f=>String(f.properties?.id||f.id||'')).filter(Boolean);
       history.clearHistory();

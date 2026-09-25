@@ -94,10 +94,11 @@ test('patch replacement/removal equals rebuilding the current composed source', 
   builder.patch([b,c]); assert.deepEqual(segments(builder.finish()),segments(buildPaintContourGraph([a,b,c])));
 });
 
-test('bad rings are diagnosed, not implicitly closed across missing geometry', () => {
+test('open rings are diagnosed and follow the actual d3 streamed fill surface', () => {
   const broken=polygon('bad',[[[0,0],[1,0],[1,1],[0,1]]]);
   const graph=buildPaintContourGraph([broken,rect('A',1,0,2,1)]);
-  assert.equal(graph.diagnostics.invalidRings,1);assert.equal(graph.diagnostics.arcCount,0);
+  assert.equal(graph.diagnostics.invalidRings,1);assert.equal(graph.diagnostics.arcCount,1);
+  assert.deepEqual(segments(graph), ['A:bad|[1,0]|[1,1]']);
 });
 
 test('palette or undo refresh changes only the active set, never the packed graph', () => {
@@ -108,4 +109,32 @@ test('palette or undo refresh changes only the active set, never the packed grap
   colors.B=colors.A; view.refresh();assert.equal(view.getActiveArcCount(),1);
   colors.B='#020202';view.refresh(['B']);assert.equal(view.getActiveArcCount(),2);
   assert.equal(Buffer.from(graph.coordinates.buffer).toString('hex'),bytes);
+});
+
+test('declared coarse quantization repairs coarse/fine seams without merging fine/fine gaps', () => {
+  const coarse = {...rect('A',0,0,1,1), coordinatePrecision:4};
+  const fine = rect('B',1.00002,0.00002,2,1.00002);
+  const g=buildPaintContourGraph([coarse,fine]);
+  assert.equal(g.diagnostics.quantizedSharedSegments,1);
+  assert.deepEqual(segments(g), ['A:B|[1,0]|[1,1]']);
+  assert.equal(buildPaintContourGraph([rect('A',0,0,1,1),fine]).diagnostics.arcCount,0);
+  assert.equal(buildPaintContourGraph([coarse,rect('B',1.00006,0,2,1)]).diagnostics.arcCount,0);
+  assert.equal(buildPaintContourGraph([coarse, fine, {...fine,id:'C'}]).diagnostics.arcCount,0);
+});
+
+test('mixed LOD partial intervals node once and replacing coarse precision removes the join', () => {
+  const a={...rect('A',0,0,1,2),coordinatePrecision:4};
+  const b=polygon('B',[[[1.00002,0],[2,0],[2,2],[1.00002,2],[1.00002,1],[1.00002,0]]]);
+  const builder=createPaintContourGraphBuilder();builder.patch([a,b]);
+  assert.equal(builder.finish().diagnostics.quantizedSharedSegments,2);
+  builder.patch([{...a,coordinatePrecision:7}]);assert.equal(builder.finish().diagnostics.arcCount,0);
+});
+
+test('partially exact seams retain the unmatched interval for coarse/fine reconciliation', () => {
+  const a={...rect('A',0,0,1,2),coordinatePrecision:4};
+  const b=polygon('B',[[[1,0],[2,0],[2,2],[1.00002,2],[1.00002,1],[1,1],[1,0]]]);
+  const g=buildPaintContourGraph([a,b]);
+  assert.equal(g.diagnostics.nodedSharedSegments,1);
+  assert.equal(g.diagnostics.quantizedSharedSegments,1);
+  assert.deepEqual(segments(g),['A:B|[1,0]|[1,1]','A:B|[1,1]|[1,2]']);
 });

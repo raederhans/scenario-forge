@@ -116,3 +116,44 @@ test('export readiness waits for the actual graph and surfaces worker failures',
   const failure = assert.rejects(h.runtime.ensureReady(), /preparation failed/);
   h.tasks.at(-1).reject(new Error('worker failure')); await failure;
 });
+
+test('same-scene data promotions preserve the worker index and only send replacements', async () => {
+  const h=harness();h.runtime.getMeshes();await h.flush();await h.finish();
+  const disposals=h.disposals();
+  h.state.scenarioDataGeneration=3;h.state.land=[h.a,rect('B',4)];
+  h.runtime.getMeshes();await h.flush();assert.equal(h.disposals(),disposals);
+  assert.deepEqual(h.tasks.at(-1).features.map(f=>f.id),['B']);
+  await h.finish();assert.equal(h.runtime.diagnostics().status,'ready');
+});
+
+test('source-declared coordinate precision survives composition and normalizer sidecars', async () => {
+  const {registerContourSourcePrecision,getContourCoordinatePrecision,inheritContourCoordinatePrecision}=await import('../js/core/paint_contour_source.js');
+  const coarse=rect('coarse',0),preserved=rect('preserved',1.000001),fine=rect('fine',3);
+  registerContourSourcePrecision({features:[coarse,preserved]},{lod:'coarse',coordinatePrecision:4});
+  registerContourSourcePrecision({features:[fine]},{lod:'detail',coordinatePrecision:4});
+  assert.equal(getContourCoordinatePrecision(coarse.geometry),4);
+  assert.equal(getContourCoordinatePrecision(preserved.geometry),7);
+  assert.equal(getContourCoordinatePrecision(fine.geometry),7);
+  const copied=structuredClone(coarse.geometry);inheritContourCoordinatePrecision(coarse.geometry,copied);
+  assert.equal(getContourCoordinatePrecision(copied),4);
+  assert.equal(Object.keys(coarse.geometry).includes('coordinatePrecision'),false);
+});
+
+test('metadata-only promotions during indexing do not discard an otherwise current graph', async () => {
+  const h=harness();h.runtime.getMeshes();await h.flush();
+  const version=h.runtime.diagnostics().sourceVersion;
+  h.state.scenarioDataGeneration=8;h.runtime.getMeshes();
+  assert.equal(h.runtime.diagnostics().sourceVersion,version);
+  await h.finish();assert.equal(h.runtime.diagnostics().status,'ready');assert.equal(h.tasks.length,1);
+});
+
+test('malformed-ring contours follow the vendored d3 geometry stream', async () => {
+  const {readFileSync}=await import('node:fs');const vm=await import('node:vm');
+  const context={exports:{}};context.module={exports:context.exports};
+  vm.runInNewContext(readFileSync(new URL('../vendor/d3.v7.min.js',import.meta.url),'utf8'),context);
+  const feature={id:'open',geometry:{type:'Polygon',coordinates:[[[0,0],[1,0],[1,1],[0,1]]]}};
+  const vertices=[];context.exports.geoStream({type:'Feature',...feature},{polygonStart(){},polygonEnd(){},lineStart(){},lineEnd(){},point(x,y){vertices.push([x,y]);}});
+  assert.deepEqual(vertices,[[0,0],[1,0],[1,1]]);
+  const builder=createPaintContourGraphBuilder();builder.patch([feature,rect('neighbor',1)]);
+  const graph=builder.finish();assert.equal(graph.diagnostics.invalidRings,1);assert.equal(graph.diagnostics.arcCount,1);
+});

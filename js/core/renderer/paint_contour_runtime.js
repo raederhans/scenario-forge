@@ -1,3 +1,4 @@
+import { getContourCoordinatePrecision } from '../paint_contour_source.js';
 import { createPaintContourWorkerClient } from '../paint_contour_worker_client.js';
 import { createPaintContourMesh } from './paint_contour_mesh.js';
 
@@ -12,7 +13,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   let featuresById = new Map(), registered = null, view = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
-  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, state.scenarioDataGeneration || 0].join('|');
+  const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
   function clear() {
     generation += 1; client.dispose(); registered = null; view = null; inFlight = null;
     status = 'idle'; error = ''; graphDiagnostics = null; revision += 1;
@@ -26,7 +27,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const nextScene = sceneIdentity();
     if (scene !== nextScene) { clear(); scene = nextScene; sourceRef = null; }
     const features = getFeatures() || EMPTY;
-    const signal = [state.topologyRevision || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode].join('|');
+    const signal = [state.topologyRevision || 0, state.scenarioDataGeneration || 0, state.showScenarioAtlantropa, state.showWaterRegions, state.mapSemanticMode].join('|');
     if (sourceRef === features && signal === sourceSignal) return;
     // Published geometry is normally immutable. An explicit topology revision
     // with the same collection also supports an in-place geometry publisher.
@@ -41,7 +42,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     }
     const geometryChanged = next.size !== featuresById.size || [...next].some(([id, feature]) => featuresById.get(id)?.geometry !== feature.geometry);
     featuresById = next;
-    if (geometryChanged || forcedGeometryRefresh || !view) {
+    if (geometryChanged || forcedGeometryRefresh || status === 'idle') {
       sourceVersion += 1; view = null; revision += 1; status = next.size ? 'building' : 'empty';
       if (!next.size) { clear(); featuresById = next; status = 'empty'; }
       else queue();
@@ -60,7 +61,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
     const epoch = geometryEpoch;
     const changed = [];
     for (const [id, feature] of snapshot) {
-      if (!registered || registeredEpoch !== epoch || registered.get(id)?.geometry !== feature.geometry) changed.push({ id, geometry: feature.geometry });
+      if (!registered || registeredEpoch !== epoch || registered.get(id)?.geometry !== feature.geometry) changed.push({ id, geometry: feature.geometry, coordinatePrecision: getContourCoordinatePrecision(feature.geometry) });
     }
     const removed = registered ? [...registered.keys()].filter(id => !snapshot.has(id)) : [];
     status = 'building'; error = ''; sentFeatures += changed.length; builds += 1;

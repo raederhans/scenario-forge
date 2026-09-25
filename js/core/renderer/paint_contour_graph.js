@@ -28,30 +28,18 @@ function ringSide(ring, hole) {
 }
 
 function pairFor(members) {
-  // Multiple polygons on the same side signal overlapping source geometry, not
-  // a proven interior border. Do not invent an edge through an ambiguous face.
-  const left = new Set(), right = new Set();
-  for (const member of members) (member > 0 ? left : right).add(Math.abs(member) - 1);
-  if (left.size !== 1 || right.size !== 1) return null;
-  const a = left.values().next().value, b = right.values().next().value;
-  return a === b ? null : [Math.min(a, b), Math.max(a, b)];
+  let left = -1, right = -1;
+  for (const member of members) {
+    const id = Math.abs(member) - 1;
+    if (member > 0) { if (left !== -1 && left !== id) return null; left = id; }
+    else { if (right !== -1 && right !== id) return null; right = id; }
+  }
+  return left < 0 || right < 0 || left === right ? null : [Math.min(left, right), Math.max(left, right)];
 }
 
-function sharedSegments(edges, diagnostics) {
-  const shared = [];
-  const unmatched = [];
-  for (const edge of edges.values()) {
-    const pair = pairFor(edge.members);
-    if (pair) shared.push({ ...edge, pair });
-    else if (edge.members.length === 1) unmatched.push(edge);
-    else if (new Set(edge.members.map(Math.abs)).size > 1) diagnostics.ambiguousSegments += 1;
-  }
-  diagnostics.exactSharedSegments = shared.length;
-
-  // Only unmatched edges need noding. An exact infinite-line key and a sweep of
-  // interval endpoints handle a long edge opposite several collinear pieces.
-  // This is NOT a nearest-neighbour join: close but distinct borders stay apart.
-  const lines = new Map();
+function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedSharedSegments') {
+  // Exact line sweep also handles unequal segmentation. No distance search.
+  const shared = [], lines = new Map(), repaired = new Set(), remaining = [];
   for (const edge of unmatched) {
     const dx = edge.b[0] - edge.a[0], dy = edge.b[1] - edge.a[1];
     if (Math.abs(dx) > 180 * SCALE) continue;
@@ -60,13 +48,18 @@ function sharedSegments(edges, diagnostics) {
     const ux = dx / divisor, uy = dy / divisor;
     const offset = BigInt(ux) * BigInt(edge.a[1]) - BigInt(uy) * BigInt(edge.a[0]);
     const key = `${ux},${uy},${offset}`;
-    let group = lines.get(key);
-    if (!group) lines.set(key, group = []);
-    group.push(edge);
+    const previous = lines.get(key);
+    // Most coast segments are unique. Avoid allocating an Array per coastline.
+    if (!previous) lines.set(key, edge);
+    else if (Array.isArray(previous)) previous.push(edge);
+    else lines.set(key, [previous, edge]);
   }
-  let repairedSourceSegments = 0;
   for (const group of lines.values()) {
-    if (group.length < 2 || !group.some(e => e.members[0] > 0) || !group.some(e => e.members[0] < 0)) continue;
+    if (!Array.isArray(group)) { remaining.push(group); continue; }
+    if (!accept(group) || !group.some(e => e.members[0] > 0) || !group.some(e => e.members[0] < 0)) {
+      for (const edge of group) remaining.push(edge);
+      continue;
+    }
     const useX = group[0].b[0] !== group[0].a[0];
     const events = new Map();
     const event = (point, original) => {
@@ -79,20 +72,85 @@ function sharedSegments(edges, diagnostics) {
       event(edge.b, edge.end).remove.push(edge);
     }
     const ordered = [...events.keys()].sort((a, b) => a - b);
-    const active = new Set(), repaired = new Set();
+    const active = new Set();
     for (let i = 0; i < ordered.length - 1; i += 1) {
       const current = events.get(ordered[i]), next = events.get(ordered[i + 1]);
       for (const edge of current.remove) active.delete(edge);
       for (const edge of current.add) active.add(edge);
-      const pair = pairFor([...active].flatMap(e => e.members));
-      if (!pair) continue;
+      const list = [...active];
+      const pair = accept(list) ? pairFor(list.flatMap(e => e.members)) : null;
+      if (!pair) {
+        // Keep unmatched subintervals. Dropping an entire partly matched edge
+        // would hide a later coarse/fine seam along its remaining portion.
+        for (const edge of list) remaining.push({ ...edge, a: current.point, b: next.point,
+          start: current.original, end: next.original });
+        continue;
+      }
       shared.push({ a: current.point, b: next.point, start: current.original, end: next.original, pair });
-      diagnostics.nodedSharedSegments += 1;
+      diagnostics[metric] += 1;
       for (const edge of active) repaired.add(edge);
     }
-    repairedSourceSegments += repaired.size;
   }
-  diagnostics.oneSidedSegments = unmatched.length - repairedSourceSegments;
+  return { shared, repaired, remaining };
+}
+
+function sharedSegments(edges, diagnostics, precisions) {
+  const shared = [], unmatched = [];
+  for (const edge of edges.values()) {
+    const pair = pairFor(edge.members);
+    if (pair) { edge.pair = pair; shared.push(edge); }
+    else if (edge.members.length === 1) unmatched.push(edge);
+    else if (edge.members.some(member => Math.abs(member) !== Math.abs(edge.members[0]))) diagnostics.ambiguousSegments += 1;
+  }
+  diagnostics.exactSharedSegments = shared.length;
+  const exact = nodeEdges(unmatched, diagnostics);
+  for (const edge of exact.shared) shared.push(edge);
+
+  // Cross-LOD joins are allowed ONLY by the actual coarse source's declared
+  // coordinate grid. Fine/fine boundaries retain 1e-7 identity, even if close.
+  // Compare unresolved edges at that grid, require two unique opposite sides,
+  // and render the coarser line. Ambiguous overlaps are never welded.
+  const remaining = exact.remaining;
+  const coarseEdges = remaining.filter(edge => precisions.get(Math.abs(edge.members[0]) - 1) === 4);
+  let joinedSources = 0;
+  if (coarseEdges.length) {
+    const grid = 1000;
+    const snap = point => point.map(n => Math.round(n / grid) * grid);
+    const candidates = new Map();
+    const quantize = edge => {
+      let a = snap(edge.a), b = snap(edge.b);
+      const order = compare(a, b);
+      if (!order) return null;
+      const forward = order < 0;
+      if (!forward) [a, b] = [b, a];
+      return { a, b, start: a.map(n => n / SCALE), end: b.map(n => n / SCALE),
+        members: forward ? edge.members : edge.members.map(n => -n),
+        coarse: precisions.get(Math.abs(edge.members[0]) - 1) === 4, source: edge };
+    };
+    for (const edge of remaining) {
+      const q = quantize(edge); if (!q) continue;
+      const key = `${keyOf(q.a)};${keyOf(q.b)}`;
+      const group = candidates.get(key);
+      if (group) group.push(q); else candidates.set(key, [q]);
+    }
+    const leftover = [];
+    const validMixed = list => list.some(e => e.coarse) && list.some(e => !e.coarse);
+    const joined = new Set();
+    for (const group of candidates.values()) {
+      const pair = validMixed(group) ? pairFor(group.flatMap(e => e.members)) : null;
+      if (pair) {
+        const edge = group.find(e => e.coarse);
+        shared.push({ ...edge, pair }); diagnostics.quantizedSharedSegments += 1;
+        for (const candidate of group) joined.add(candidate.source);
+      } else if (group.length === 1) leftover.push(group[0]);
+      else if (validMixed(group)) diagnostics.ambiguousQuantizedSegments += 1;
+    }
+    const quantized = nodeEdges(leftover, diagnostics, validMixed, 'quantizedSharedSegments');
+    for (const edge of quantized.shared) shared.push(edge);
+    for (const edge of quantized.repaired) joined.add(edge.source);
+    joinedSources = joined.size;
+  }
+  diagnostics.oneSidedSegments = remaining.length - joinedSources;
   return shared;
 }
 
@@ -154,7 +212,7 @@ function packChains(segments, featureIds, diagnostics) {
 
 export function createPaintContourGraphBuilder() {
   const edges = new Map(), idToIndex = new Map(), featureIds = [], featureEdges = new Map();
-  const invalidRingsById = new Map();
+  const invalidRingsById = new Map(), precisions = new Map();
   function remove(featureId) {
     const id = idToIndex.get(String(featureId));
     if (id === undefined) return;
@@ -162,22 +220,31 @@ export function createPaintContourGraphBuilder() {
       edge.members = edge.members.filter(member => Math.abs(member) !== id + 1);
       if (!edge.members.length) edges.delete(edge.key);
     }
-    featureEdges.delete(id); invalidRingsById.delete(id);
+    featureEdges.delete(id); invalidRingsById.delete(id); precisions.delete(id);
   }
-  function add({ id: rawId, geometry }) {
+  function add({ id: rawId, geometry, coordinatePrecision = 7 }) {
     const featureId = String(rawId || '').trim();
     if (!featureId) return;
     remove(featureId);
     let id = idToIndex.get(featureId);
     if (id === undefined) { id = featureIds.length; featureIds.push(featureId); idToIndex.set(featureId, id); }
+    precisions.set(id, coordinatePrecision === 4 ? 4 : 7);
     const touched = new Set();
     let invalidRings = 0;
     function polygon(rings) {
       if (!Array.isArray(rings)) return;
       rings.forEach((ring, ringIndex) => {
         if (!Array.isArray(ring) || ring.length < 4) { invalidRings += 1; return; }
-        const snapped = ring.map(coordinate);
-        if (snapped.some(p => !p) || compare(snapped[0], snapped.at(-1)) !== 0) { invalidRings += 1; return; }
+        let snapped = ring.map(coordinate);
+        if (snapped.some(p => !p)) { invalidRings += 1; return; }
+        if (compare(snapped[0], snapped.at(-1)) !== 0) {
+          // d3.geoStream consumes ring.length - 1 vertices then closes it. Match
+          // the actual filled surface for malformed open input, not an invented
+          // last-to-first segment that the renderer never draws. Keep diagnosis.
+          invalidRings += 1;
+          ring = [...ring.slice(0, -1), ring[0]];
+          snapped = [...snapped.slice(0, -1), snapped[0]];
+        }
         const side = ringSide(ring, ringIndex > 0);
         for (let i = 0; i < snapped.length - 1; i += 1) {
           const order = compare(snapped[i], snapped[i + 1]);
@@ -209,8 +276,8 @@ export function createPaintContourGraphBuilder() {
     patch(features = [], removedIds = []) { removedIds.forEach(remove); features.forEach(add); },
     finish() {
       const diagnostics = { featureCount: featureEdges.size, segmentCount: edges.size, invalidRings: [...invalidRingsById.values()].reduce((sum, count) => sum + count, 0),
-        ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, oneSidedSegments: 0 };
-      return packChains(sharedSegments(edges, diagnostics), featureIds, diagnostics);
+        ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0 };
+      return packChains(sharedSegments(edges, diagnostics, precisions), featureIds, diagnostics);
     },
   });
 }

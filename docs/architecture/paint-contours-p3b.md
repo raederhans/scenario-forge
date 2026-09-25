@@ -1,6 +1,7 @@
 # P3B: paint-derived interior contours
 
-Base: main `330ad7c6`, including P3A and the ocean/paint-latency repairs in PR #165.
+Initial base: main `330ad7c6`, including P3A and the ocean/paint-latency repairs in PR #165.
+Continuation integrates `27888645` and retains PR #166 city-label corrections.
 
 The primary land boundary represents a difference between **persistent base fill
 colors**, not country ownership, screen pixels, a heatmap, a hover state, or an
@@ -22,8 +23,14 @@ A dedicated module worker maintains a geometry-only edge index. Coordinate keys
 use a 1e-7 degree identity grid; rendered positions retain the source coordinates.
 Ring side and holes determine true shared sides. Unmatched, exactly collinear
 intervals are noded so that independently split chunk edges can meet. Date-line
-aliases join; nearby but distinct curves and ambiguous overlaps are not silently
-welded. Only proven two-sided interior edges become contours. One-sided edges
+aliases join. Fine/fine identity stays at 1e-7. For coarse sources declaring
+four-decimal quantization, only geometries actually on that grid receive a
+sidecar precision marker. Fine/coarse unresolved segments may join at the declared
+grid when there are exactly two opposite occupied sides. The coarse line is used
+for the sub-grid transition. This is a deterministic precision reconciliation,
+not a nearest-curve search or a country-color identity rule. Precision-preserved
+coarse exceptions remain at 1e-7. Sidecar provenance survives normalization and
+never enters saved projects. Ambiguous overlaps are suppressed and counted. Only proven two-sided interior edges become contours. One-sided edges
 include legitimate coastlines and are not automatically classified as defects.
 
 Geometry batches are bounded for messaging and incremental feature replacement.
@@ -61,3 +68,32 @@ This change does not clear the previously recorded historical state-writer proof
 registration/fingerprint debt, relax required checks, remove all legacy internal
 field names, or promise full-world pixel coverage. Geometry/behavior verification
 must be distinguished from performance measurements and from repository CI.
+
+## Continuation corrections and measured limits
+
+The first real-scene browser failure was a readiness race: an additional geometry
+promotion landed between the readiness poll and the measurement task. The test
+now awaits `ensurePaintContoursReady` inside that task before any synchronous
+paint/history assertions. Same-scene data promotions no longer terminate the
+worker as if the whole scene were replaced. Metadata-only publications cannot
+invalidate an otherwise current in-flight geometry result.
+
+Exact noding preserves unpaired subintervals for cross-LOD reconciliation instead
+of dropping an entire partly matched edge. Malformed open rings are diagnosed;
+the graph follows the vendored d3 stream (first n-1 vertices, then closure), so its
+boundary matches the actual filled surface without silently changing source data.
+
+The native-arc oracle uses oriented two-sided incidences on eligible interactive
+features, not `topojson.neighbors` alone: raw assets include shell underlays and
+same-side overlaps. Candidate misses are additionally checked against coordinate
+incidences where separate native arc IDs coincide. Both exclusions and missing
+native pairs are reported; a proven missing interior fails. Four real scenario
+geometries, TNO coarse/detail promotion/demotion and synthetic unequal-segmentation
+and half-quantum negative examples are checked separately. These tests are not an
+exhaustive all-viewport screenshot comparison or a repair of historical polygon
+overlaps.
+
+Large initial graphs are still expensive and remain off the main thread in normal
+browsers. Audit reports record build time, heap usage, packed bytes and local paint
+refresh cost; no whole-application FPS or low-memory-device acceptance is claimed.
+The unsupported-Worker fallback yields per message batch but packing is synchronous.
