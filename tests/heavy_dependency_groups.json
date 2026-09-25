@@ -50,6 +50,7 @@
       "tests/test_tno_eastern_precision_sources.py",
       "tests/test_tno_major_country_precision.py",
       "tests/test_tno_named_marginal_water_contract.py",
+      "tests/test_tno_ownership_repairs.py",
       "tests/test_tno_regional_precision.py",
       "tests/test_tno_russia_coverage_normalization.py",
       "tests/test_tno_russia_full_conservation.py",
