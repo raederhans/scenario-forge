@@ -1,0 +1,48 @@
+name: P3 audit workbench
+on:
+  push:
+    branches: [codex/visual-editing-p3-20260925]
+    paths: [.github/workflows/p3-workbench.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            js
+            tests
+            tools
+            css
+            vendor
+            backend
+            map_backend
+            map_builder
+            scenario_builder
+            ops
+            landing
+            docs/architecture
+      - name: Snapshot source and small runtime metadata
+        run: |
+          mkdir -p .runtime/tmp
+          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+          files = ['CATALOG.json','city_lights/historical_1930_entries.json','country_feature_policies.json','geo_aliases.json','locales.json','runtime_asset_registry.json','scenarios/index.json','thematic_layers/index.json','thematic_layers/political/state_capacity_demo/manifest.json','thematic_layers/political/wgi_state_capacity_v1/manifest.json','thematic_layers/population/population_density_demo/manifest.json','thematic_layers/social/human_development_demo/manifest.json','transport_layers/japan_road/manifest.json']
+          for name in files:
+              path=Path('data')/name
+              path.parent.mkdir(parents=True,exist_ok=True)
+              path.write_bytes(subprocess.check_output(['git','show',f'HEAD:{path.as_posix()}']))
+          PY
+          tar --exclude=.git --exclude=.runtime -czf .runtime/tmp/source.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3-audit-source
+          path: |
+            .runtime/tmp/source.tgz
+            .runtime/tmp/tracked-tree.txt
+          retention-days: 1
