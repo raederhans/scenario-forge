@@ -38,9 +38,7 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         self.assertIn("const colorSourceFeatures = getResolvedColorSourceFeatures();", rebuild_body)
         self.assertIn("colorSourceFeatures.forEach((feature, index) => {", rebuild_body)
         self.assertIn("function findResolvedColorFeatureById(featureId) {", rebuild_body)
-        self.assertIn("for (let index = 0; index < features.length; index += 1) {", rebuild_body)
-        self.assertIn("const candidateId = getFeatureId(feature) || `feature-${index}`;", rebuild_body)
-        self.assertIn("if (candidateId === id) {", rebuild_body)
+        self.assertIn("resolvedColorFeatureLookupCache.index.get(id)", rebuild_body)
         refresh_start = renderer_content.index("function refreshResolvedColorsForFeatures(")
         refresh_end = renderer_content.index("function refreshResolvedColorsForOwners(", refresh_start)
         refresh_body = renderer_content[refresh_start:refresh_end]
