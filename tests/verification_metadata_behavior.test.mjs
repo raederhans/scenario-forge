@@ -63,12 +63,15 @@ test("HOI4 manual rules select the existing scenario checks without a route gap"
 });
 
 test("scenario ownership rules select their regression tests without route gaps", () => {
-  for (const file of ["data/scenario-rules/hoi4_1939.manual.json", "data/scenario-rules/tno_1962.russia_ownership.manual.json"]) {
+  for (const [file, command] of [
+    ["data/scenario-rules/hoi4_1939.manual.json", "python -m unittest tests.test_hoi4_territory_regressions -q"],
+    ["data/scenario-rules/tno_1962.russia_ownership.manual.json", "python -m unittest tests.test_tno_ownership_repairs -q"],
+  ]) {
     const report = buildRepositoryRecommendation([file]);
     assert.deepEqual(report.unmatchedChangedFiles, []);
     assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
     assert.ok(report.recommendedCommands.some((entry) =>
-      entry.commandRef === "python -m unittest tests.test_hoi4_territory_regressions tests.test_tno_ownership_repairs -q"));
+      entry.commandRef === command));
   }
 });
 

@@ -418,17 +418,24 @@ export function createLocalFeedbackRecords(baseRecords) {
   const ownershipRepairsRecord = {
     ...editorCheckoutRecord,
     id: "local:scenario-ownership-repairs",
-    commandRef: "python -m unittest tests.test_hoi4_territory_regressions tests.test_tno_ownership_repairs -q",
-    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "data/scenario-rules/hoi4_1939.manual.json",
-      "data/scenario-rules/tno_1962.russia_ownership.manual.json", "scenario_builder/hoi4/compiler.py",
-      "tools/patch_tno_1962_bundle.py", "tests/test_hoi4_territory_regressions.py", "tests/test_tno_ownership_repairs.py"],
+    commandRef: "python -m unittest tests.test_tno_ownership_repairs -q",
+    sourceRefs: ["data/scenario-rules/tno_1962.russia_ownership.manual.json",
+      "tools/patch_tno_1962_bundle.py", "tests/test_tno_ownership_repairs.py"],
     ownerHints: ["scenario-builder"], domains: ["scenario-build"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 9,
+  };
+  const hoi4OwnershipRepairsRecord = {
+    ...ownershipRepairsRecord,
+    id: "local:hoi4-ownership-repairs",
+    commandRef: "python -m unittest tests.test_hoi4_territory_regressions -q",
+    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "data/scenario-rules/hoi4_1939.manual.json",
+      "scenario_builder/hoi4/compiler.py", "tests/test_hoi4_territory_regressions.py"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 10,
   };
 
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
-    paletteLibraryOperationRecord, hoi4ManualRulesRecord, ownershipRepairsRecord];
+    paletteLibraryOperationRecord, hoi4ManualRulesRecord, ownershipRepairsRecord, hoi4OwnershipRepairsRecord];
 }
