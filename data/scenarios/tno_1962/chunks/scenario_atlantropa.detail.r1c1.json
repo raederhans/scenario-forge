@@ -20,7 +20,7 @@
         "atl_join_mode": "none",
         "interactive": true,
         "render_as_base_geography": false,
-        "owner_tag": "SPR",
+        "owner_tag": "IBR",
         "synthetic_owner": false,
         "donor_state_ids": [
           8446
@@ -112,7 +112,7 @@
         "atl_join_mode": "none",
         "interactive": true,
         "render_as_base_geography": false,
-        "owner_tag": "SPR",
+        "owner_tag": "IBR",
         "synthetic_owner": false,
         "donor_state_ids": [
           8447

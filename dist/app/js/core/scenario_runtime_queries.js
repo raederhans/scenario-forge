@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "./map_data_boundary.js";
 import { state as runtimeState } from "./state.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import {
@@ -62,7 +63,7 @@ export function getScenarioEffectiveOwnerCodeByFeatureId(featureId) {
   const normalizedId = String(featureId || "").trim();
   if (!normalizedId) return "";
   return String(
-    runtimeState.sovereigntyByFeatureId?.[normalizedId] ||
+    getMapDataBoundary(runtimeState).reference.getScenarioGroupCode(normalizedId) ||
     runtimeState.runtimeCanonicalCountryByFeatureId?.[normalizedId] ||
     ""
   )

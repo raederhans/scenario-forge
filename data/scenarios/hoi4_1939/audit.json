@@ -16318,12 +16318,12 @@
       "feature_id": "CN_CITY_17275852B82452317993245",
       "feature_name": "Jidongxian",
       "from_tag": "CHI",
-      "notes": "Jidong corridor remains under Chinese legal ownership in 1939 while Japanese field control is represented via controller rules.",
+      "notes": "Reviewed ownership correction: geographical identity and scenario source verified.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_jidong_owner_chi",
+      "rule_id": "manchukuo",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "CHI"
+      "to_tag": "MAN"
     },
     {
       "country_code": "CN",
@@ -37742,12 +37742,12 @@
       "feature_id": "SYR-134",
       "feature_name": "Lattakia",
       "from_tag": "SYR",
-      "notes": "Hatay transfer to Turkey shortly before scenario start.",
+      "notes": "Reviewed ownership correction: geographical identity and scenario source verified.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_turkey_hatay",
+      "rule_id": "french_mandate_syria",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "TUR"
+      "to_tag": "SYR"
     },
     {
       "country_code": "SY",
@@ -231092,10 +231092,10 @@
     "CHI": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 1445,
+      "controller_feature_count": 1444,
       "display_name": "China",
       "entry_kind": "",
-      "feature_count": 1445,
+      "feature_count": 1444,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -231108,7 +231108,7 @@
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 1013,
-        "manual_reviewed": 432
+        "manual_reviewed": 431
       },
       "rule_sources": [
         "1939_china_hainan_reintegration",
@@ -232459,10 +232459,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 234,
+      "controller_feature_count": 235,
       "display_name": "Manchukuo",
       "entry_kind": "",
-      "feature_count": 234,
+      "feature_count": 235,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -232474,7 +232474,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 234
+        "manual_reviewed": 235
       },
       "rule_sources": [
         "manchukuo"
@@ -233833,10 +233833,10 @@
     "SYR": {
       "base_iso2": "SY",
       "continent_label": "Asia",
-      "controller_feature_count": 14,
+      "controller_feature_count": 15,
       "display_name": "French Mandate for Syria",
       "entry_kind": "scenario_subject",
-      "feature_count": 14,
+      "feature_count": 15,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -233850,7 +233850,7 @@
       "provenance_iso2": "SY",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 14
+        "manual_reviewed": 15
       },
       "rule_sources": [
         "french_mandate_syria"
@@ -234000,10 +234000,10 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 82,
+      "controller_feature_count": 81,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 82,
+      "feature_count": 81,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -234016,7 +234016,7 @@
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 81,
-        "manual_reviewed": 1
+        "manual_reviewed": 0
       },
       "rule_sources": [
         "1939_turkey_hatay"
@@ -234381,12 +234381,12 @@
         "CN_CITY_17275852B66983384026241",
         "CN_CITY_17275852B69502424824259",
         "CN_CITY_17275852B70108594636400",
+        "CN_CITY_17275852B71122715185286",
         "CN_CITY_17275852B75499036549183",
         "CN_CITY_17275852B75702344877030",
         "CN_CITY_17275852B77637740681005",
         "CN_CITY_17275852B78610390708344",
         "CN_CITY_17275852B82032886612970",
-        "CN_CITY_17275852B82452317993245",
         "CN_CITY_17275852B82709828135465",
         "CN_CITY_17275852B83272093468807",
         "CN_CITY_17275852B83634722552305",
@@ -235302,11 +235302,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "1e96ce380ebd942311e51b49cb341adf57e1d945d646afbf552c0011822940f0",
+  "snapshot_fingerprint": "9bcdbe0f2a2231cba5fb3f37169e5e219c8dc6b1bea87f1169395798107a4bdc",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-    "build_snapshot_sha256": "f55c92ad6fcdf29132e22e93a80bf0f8f90e3e9fe8d78c6e691e21efc2155bcd",
-    "detail_chunk_manifest_sha256": "e75d1f481b4880fbb95c11bb22b4bf7c2a3bcbdc8e7e3cf0b585c779c2458726",
+    "build_snapshot_sha256": "5eb9ed398021bfc5e2be52da11ca256d9cc3a9311e0ff4db6b3652b4c1552308",
+    "detail_chunk_manifest_sha256": "04eaa97b533d53caaef9d2ca2fdce8a0ac6a3eead6886cb81470fa2917ac19a3",
     "runtime_bootstrap_topology_sha256": "74d6f39ab2280fa524109d9bd35e15149df48681688deb22ecfac60911527115",
     "runtime_topology_sha256": "50cad6f666725fa6518b8aa5f8519a1b520946f3b4c2e46614029234ad8be0c3"
   },

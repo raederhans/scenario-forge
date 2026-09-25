@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "hoi4_1939",
-  "baseline_hash": "bae1300c43e275df18d16b4b2743582ef53930ebf96ce36e7c60357d056b78b7",
+  "baseline_hash": "6f7c4b59b89e54e1795e28dd17deac98c02c611468fb9d9ac5aa09146296af89",
   "as_of_date": "1939.8.14.12",
   "metrics": {
     "manpower": {
@@ -19585,7 +19585,7 @@
     "CN_CITY_17275852B82247440115910": "s747",
     "CN_CITY_17275852B82302902278950": "s612",
     "CN_CITY_17275852B82327711064596": "s748",
-    "CN_CITY_17275852B82452317993245": "s597",
+    "CN_CITY_17275852B82452317993245": "s717",
     "CN_CITY_17275852B82453745419321": "s748",
     "CN_CITY_17275852B82537963815987": "s596",
     "CN_CITY_17275852B82571536959459": "s751",
@@ -37491,7 +37491,7 @@
     "SV_ADM1_SLV-1354": "s314",
     "SV_ADM1_SLV-1357": "s314",
     "SV_ADM1_SLV-1358": "s314",
-    "SYR-134": "s799",
+    "SYR-134": "s677",
     "SYR-135": "s677",
     "SYR-136": "s680",
     "SYR-137": "s677",
@@ -54572,8 +54572,8 @@
       "host_feature_id": "SYR-134",
       "lon": 35.79088,
       "lat": 35.53125,
-      "match_method": "name_match",
-      "confidence": "low"
+      "match_method": "name_owner_match",
+      "confidence": "high"
     },
     {
       "province_id": 12758,

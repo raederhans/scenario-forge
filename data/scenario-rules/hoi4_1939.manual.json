@@ -190,17 +190,6 @@
       "display_name_override": "Italy"
     },
     {
-      "rule_id": "1939_turkey_hatay",
-      "owner_tag": "TUR",
-      "priority": 912,
-      "quality": "manual_reviewed",
-      "critical": true,
-      "notes": "Hatay transfer to Turkey shortly before scenario start.",
-      "include_feature_ids": ["SYR-134"],
-      "base_iso2": "TR",
-      "display_name_override": "Turkey"
-    },
-    {
       "rule_id": "1939_britain_aden",
       "owner_tag": "ENG",
       "priority": 913,
@@ -260,7 +249,6 @@
         "CN_CITY_17275852B69801287390069",
         "CN_CITY_17275852B71122715185286",
         "CN_CITY_17275852B79805983057899",
-        "CN_CITY_17275852B82452317993245",
         "CN_CITY_17275852B84296108244083",
         "CN_CITY_17275852B84472681161194",
         "CN_CITY_17275852B88151757349593",

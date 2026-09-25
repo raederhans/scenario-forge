@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "../map_data_boundary.js";
 import { getEffectiveScenarioHierarchyFromInputs } from "../scenario_hierarchy.js";
 import { getScenarioDistrictCountryGrouping } from "../scenario_districts.js";
 
@@ -119,7 +120,7 @@ export function createParentBorderGroupingPolicy(runtimeState, {
   function buildScenarioDistrictGroupingCandidate(countryCode, featureEntries) {
     const featureToGroup = getScenarioDistrictCountryGrouping(
       runtimeState.scenarioDistrictGroupsData, countryCode, featureEntries,
-      runtimeState.sovereigntyByFeatureId,
+      getMapDataBoundary(runtimeState).reference.getScenarioAssignments(),
     );
     if (!featureToGroup) return null;
     if (!featureToGroup.size) {

@@ -9,7 +9,7 @@
       "display_name": "Bashkir",
       "color_hex": "#92ba8b",
       "color_policy": "palette",
-      "feature_count": 18,
+      "feature_count": 19,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -43,7 +43,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 18,
+      "controller_feature_count": 19,
       "display_name_en": "Bashkir",
       "display_name_zh": "巴什科尔托斯坦共和国"
     },
@@ -864,7 +864,7 @@
       "tag": "SPR",
       "display_name": "Spain",
       "color_hex": "#dd99ef",
-      "feature_count": 4,
+      "feature_count": 0,
       "quality": "approx_existing_geometry",
       "source": "direct_active_owner",
       "base_iso2": "ES",
@@ -877,7 +877,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
-      "notes": "Releasable Spain under the Iberian Union in tno_1962.",
+      "notes": "Releasable Spain under the Iberian Union; no active territory at the 1962 start.",
       "synthetic_owner": false,
       "source_type": "tno_baseline",
       "historical_fidelity": "tno_baseline",
@@ -897,8 +897,9 @@
       ],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 4,
-      "color_policy": "palette"
+      "controller_feature_count": 0,
+      "color_policy": "palette",
+      "hidden_from_country_list": true
     },
     "VEN": {
       "tag": "VEN",
@@ -1663,7 +1664,7 @@
       "display_name": "Vologda Neutral Zone",
       "color_hex": "#6e6e85",
       "color_policy": "locked",
-      "feature_count": 30,
+      "feature_count": 31,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -1698,7 +1699,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 30,
+      "controller_feature_count": 31,
       "display_name_en": "Vologda Neutral Zone",
       "display_name_zh": "沃洛格达中立国"
     },
@@ -1901,7 +1902,7 @@
       "tag": "AOI",
       "display_name": "Italian East Africa",
       "color_hex": "#728a61",
-      "feature_count": 58,
+      "feature_count": 49,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "ET",
@@ -1934,7 +1935,7 @@
       ],
       "subject_kind": "colonial_government",
       "entry_kind": "scenario_subject",
-      "controller_feature_count": 58,
+      "controller_feature_count": 49,
       "color_policy": "locked"
     },
     "GCE": {
@@ -2761,7 +2762,7 @@
       "display_name": "Rurik Kingdom",
       "color_hex": "#3c5a8a",
       "color_policy": "locked",
-      "feature_count": 42,
+      "feature_count": 43,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -2796,7 +2797,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 42
+      "controller_feature_count": 43
     },
     "MWI": {
       "tag": "MWI",
@@ -2958,10 +2959,10 @@
     },
     "KRS": {
       "tag": "KRS",
-      "display_name": "Krasnodar",
+      "display_name": "Krasnoyarsk",
       "color_hex": "#d7d4ae",
       "color_policy": "locked",
-      "feature_count": 15,
+      "feature_count": 16,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -2974,7 +2975,7 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_eastern_europe",
       "subregion_label": "Eastern Europe",
-      "notes": "Krasnodar created from the requested central Siberian transfer set in TNO 1962 using the KRS palette color.",
+      "notes": "Krasnoyarsk created from the requested central Siberian transfer set in TNO 1962 using the KRS palette color.",
       "synthetic_owner": false,
       "source_type": "scenario_extension",
       "historical_fidelity": "extended",
@@ -2996,7 +2997,9 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 15
+      "controller_feature_count": 16,
+      "display_name_en": "Krasnoyarsk",
+      "display_name_zh": "克拉斯诺亚尔斯克"
     },
     "WLS": {
       "tag": "WLS",
@@ -3981,7 +3984,7 @@
       "display_name": "West Russian Revolutionary Front",
       "color_hex": "#a3424c",
       "color_policy": "locked",
-      "feature_count": 28,
+      "feature_count": 30,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -4016,7 +4019,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 28
+      "controller_feature_count": 30
     },
     "VYT": {
       "tag": "VYT",
@@ -4915,7 +4918,7 @@
       "tag": "PER",
       "display_name": "Iran",
       "color_hex": "#7b6551",
-      "feature_count": 41,
+      "feature_count": 39,
       "quality": "direct_country_copy",
       "source": "direct_active_owner",
       "base_iso2": "IR",
@@ -4944,7 +4947,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "",
-      "controller_feature_count": 41,
+      "controller_feature_count": 39,
       "display_name_en": "Iran",
       "display_name_zh": "伊朗帝国",
       "color_policy": "palette"
@@ -5079,7 +5082,7 @@
       "display_name": "Novosibirsk",
       "color_hex": "#5e7d88",
       "color_policy": "palette",
-      "feature_count": 134,
+      "feature_count": 132,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -5113,7 +5116,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 134
+      "controller_feature_count": 132
     },
     "KGZ": {
       "tag": "KGZ",
@@ -6896,7 +6899,7 @@
       "display_name": "Zlatoust",
       "color_hex": "#a95838",
       "color_policy": "palette",
-      "feature_count": 26,
+      "feature_count": 25,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -6930,7 +6933,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 26
+      "controller_feature_count": 25
     },
     "BOT": {
       "tag": "BOT",
@@ -7092,7 +7095,7 @@
       "display_name": "Russian Liberation Army",
       "color_hex": "#c2a994",
       "color_policy": "locked",
-      "feature_count": 73,
+      "feature_count": 74,
       "quality": "approx_existing_geometry",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -7127,7 +7130,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 73
+      "controller_feature_count": 74
     },
     "GSW": {
       "tag": "GSW",
@@ -7175,7 +7178,7 @@
       "tag": "ITA",
       "display_name": "Italy",
       "color_hex": "#6d8e60",
-      "feature_count": 223,
+      "feature_count": 232,
       "quality": "manual_reviewed",
       "source": "direct_active_owner",
       "base_iso2": "IT",
@@ -7216,7 +7219,7 @@
         "Italian Greek Islands"
       ],
       "disabled_regional_preset_reason": "Already applied in scenario baseline",
-      "controller_feature_count": 223,
+      "controller_feature_count": 232,
       "display_name_en": "Italy",
       "display_name_zh": "意大利帝国",
       "color_policy": "palette"
@@ -7304,7 +7307,7 @@
       "tag": "RKK",
       "display_name": "Reichskommissariat Kaukasien",
       "color_hex": "#6b5c57",
-      "feature_count": 338,
+      "feature_count": 339,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "GE",
@@ -7336,7 +7339,7 @@
         "GER"
       ],
       "entry_kind": "scenario_country",
-      "controller_feature_count": 338
+      "controller_feature_count": 339
     },
     "JOR": {
       "tag": "JOR",
@@ -7794,7 +7797,7 @@
       "tag": "RKM",
       "display_name": "Reichskommissariat Moskowien",
       "color_hex": "#5e5852",
-      "feature_count": 774,
+      "feature_count": 767,
       "quality": "manual_reviewed",
       "source": "tno_reichskommissariat_baseline",
       "base_iso2": "RU",
@@ -7826,7 +7829,7 @@
         "GER"
       ],
       "entry_kind": "scenario_country",
-      "controller_feature_count": 774,
+      "controller_feature_count": 767,
       "display_name_en": "Reichskommissariat Moskowien",
       "display_name_zh": "莫斯科维恩专员辖区",
       "color_policy": "locked"
@@ -8162,7 +8165,7 @@
       "display_name": "13th Panzer Army - Gorky",
       "color_hex": "#a07683",
       "color_policy": "locked",
-      "feature_count": 46,
+      "feature_count": 48,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "RU",
@@ -8197,7 +8200,7 @@
       "inspector_group_id": "scenario_group_russia_region",
       "inspector_group_label": "Russia Region",
       "inspector_group_anchor_id": "continent_europe",
-      "controller_feature_count": 46
+      "controller_feature_count": 48
     },
     "TUN": {
       "tag": "TUN",
@@ -8446,8 +8449,8 @@
       ],
       "subject_kind": "client_state",
       "entry_kind": "scenario_subject",
-      "feature_count": 48,
-      "controller_feature_count": 48,
+      "feature_count": 50,
+      "controller_feature_count": 50,
       "color_policy": "palette"
     },
     "URL": {
@@ -8495,7 +8498,7 @@
       "tag": "IBR",
       "display_name": "Iberian Union",
       "color_hex": "#c6ac82",
-      "feature_count": 151,
+      "feature_count": 155,
       "quality": "manual_reviewed",
       "source": "manual_rule",
       "base_iso2": "ES",
@@ -8526,7 +8529,7 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": "scenario_country",
-      "controller_feature_count": 151,
+      "controller_feature_count": 155,
       "color_policy": "palette"
     },
     "BRM": {

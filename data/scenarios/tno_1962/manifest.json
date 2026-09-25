@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "36915186ad106d80be94476f4809f92b3ad8e3e4b7c9ebedfee4fe1e5c38c5a0",
+  "baseline_hash": "e9af1218e1acd8e99f4d8aa8822eac1d35345070c0c698d31d856fd8d013ae36",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -170,12 +170,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "39b7ed67f851e76434f82510c223645fffcea37a5da5f56c96a491a2ea42ddd3",
+  "snapshot_fingerprint": "c359876650e3c5c8f2453fa461bec100795fe1e45456346574c7502a56894f6d",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-    "detail_chunk_manifest_sha256": "9249ccf3b4a3952fba9ad5b0a24918e62577fd8bdb02078a6562dcd88bb27ddd",
+    "detail_chunk_manifest_sha256": "8e5753fc9756648b56f3ba9cde6da241b81779b39aebdd714208524bb9777600",
     "runtime_bootstrap_topology_sha256": "e56805c31f92feae16a65fc947d93323915b9a80d47bac45e6c34734892975a1",
-    "runtime_topology_sha256": "908541ca1dc046cbaca3246dea44375331912fc06bf7964c355309891a48d698"
+    "runtime_topology_sha256": "ec7bb5bcc2c524a2941624329270f2ec8a215689123b26cceeebb70ffa45233a"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -207,7 +207,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 173,
+    "controller_count": 172,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -217,7 +217,7 @@
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 173,
+    "owner_count": 172,
     "quality_counts": {
       "approx_existing_geometry": 919,
       "direct_country_copy": 2578,

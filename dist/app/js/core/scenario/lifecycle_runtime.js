@@ -1,3 +1,4 @@
+import { normalizePaintMode } from "../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 import {
   createDefaultScenarioDataHealth,
@@ -79,12 +80,12 @@ function createScenarioLifecycleRuntime({
   function applyScenarioPaintMode() {
     if (!runtimeState.scenarioPaintModeBeforeActivate) {
       runtimeState.scenarioPaintModeBeforeActivate = {
-        paintMode: String(runtimeState.paintMode || "visual") === "sovereignty" ? "sovereignty" : "visual",
+        paintMode: normalizePaintMode(runtimeState.paintMode),
         interactionGranularity: String(runtimeState.interactionGranularity || "subdivision") === "country"
           ? "country"
           : "subdivision",
         batchFillScope: normalizeQuickFillScope(runtimeState.batchFillScope),
-        politicalEditingExpanded: !!runtimeState.ui?.politicalEditingExpanded,
+        politicalEditingExpanded: false,
       };
     }
     runtimeState.paintMode = "visual";
@@ -101,13 +102,13 @@ function createScenarioLifecycleRuntime({
   function restorePaintModeAfterScenario() {
     const previous = runtimeState.scenarioPaintModeBeforeActivate;
     if (previous && typeof previous === "object") {
-      runtimeState.paintMode = previous.paintMode === "sovereignty" ? "sovereignty" : "visual";
+      runtimeState.paintMode = normalizePaintMode(previous.paintMode);
       runtimeState.interactionGranularity = previous.interactionGranularity === "country"
         ? "country"
         : "subdivision";
       runtimeState.batchFillScope = normalizeQuickFillScope(previous.batchFillScope);
       if (runtimeState.ui && typeof runtimeState.ui === "object") {
-        runtimeState.ui.politicalEditingExpanded = !!previous.politicalEditingExpanded;
+        runtimeState.ui.politicalEditingExpanded = false;
         runtimeState.ui.scenarioVisualAdjustmentsOpen = false;
       }
     }

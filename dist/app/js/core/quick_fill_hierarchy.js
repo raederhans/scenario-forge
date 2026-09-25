@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "./map_data_boundary.js";
 // Semantic quick-fill membership. No rendering thresholds, DOM, or state writes.
 // Hierarchy payloads are immutable snapshots; replacing a snapshot invalidates the index.
 import { getEffectiveScenarioHierarchy } from "./scenario_hierarchy.js";
@@ -8,7 +9,6 @@ const hierarchyIndexes = new WeakMap();
 const districtIndexes = new WeakMap();
 const text = (value) => String(value ?? "").trim();
 const code = (value) => normalizeCountryCodeAlias(text(value).toUpperCase());
-const own = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
 const unique = (values) => Array.from(new Set((Array.isArray(values) ? values : []).map(text).filter(Boolean)));
 
 export function normalizeQuickFillScope(value) {
@@ -105,22 +105,20 @@ export function createQuickFillHierarchyResolver(state, {
   getFeatureCountryCodeNormalized,
   shouldExcludePoliticalInteractionFeature,
 }) {
-  let ownershipSnapshot = null;
-  let ownershipRevision = -1;
-  let ownersToIds = new Map();
-  const owner = (id) => text(state.sovereigntyByFeatureId?.[id]).toUpperCase();
+  const reference = getMapDataBoundary(state).reference;
+  const usesScenarioGroups = () => !!text(state.activeScenarioId) && state.mapSemanticMode !== "blank";
+  const owner = (id) => reference.getScenarioGroupCode(id);
   const excluded = (feature, id) => !feature || shouldExcludePoliticalInteractionFeature(feature, id);
 
   // Full membership first, loaded geometry second. Never silently paint a loaded subset.
   function admitMembers(members, feature, featureId, metadata = {}) {
-    const scenario = !!text(state.activeScenarioId);
+    const scenario = usesScenarioGroups();
     const targetOwner = owner(featureId);
     if (scenario && !targetOwner) return result("missing_owner", metadata);
-    const owners = state.sovereigntyByFeatureId || {};
     const targetIds = [];
     const missingIds = [];
     for (const id of unique(members)) {
-      if (scenario && !own(owners, id)) continue; // Not a member of this scenario's ID universe.
+      if (scenario && !reference.hasScenarioFeature(id)) continue; // Not a member of this scenario's ID universe.
       if (scenario && owner(id) !== targetOwner) continue;
       const candidate = state.landIndex?.get(id);
       if (!candidate) missingIds.push(id);
@@ -132,26 +130,16 @@ export function createQuickFillHierarchyResolver(state, {
   }
 
   function countryMembers(feature, id) {
-    if (text(state.activeScenarioId)) {
+    if (usesScenarioGroups()) {
       const tag = owner(id);
       if (!tag) return null;
-      // Ownership is the complete semantic universe, unlike the hydrated land index.
-      const revision = Number(state.sovereigntyRevision || 0);
-      if (ownershipSnapshot !== state.sovereigntyByFeatureId || ownershipRevision !== revision) {
-        ownershipSnapshot = state.sovereigntyByFeatureId;
-        ownershipRevision = revision;
-        ownersToIds = new Map();
-        for (const candidate of Object.keys(ownershipSnapshot || {})) {
-          const candidateOwner = owner(candidate);
-          if (!ownersToIds.has(candidateOwner)) ownersToIds.set(candidateOwner, []);
-          ownersToIds.get(candidateOwner).push(candidate);
-        }
-      }
-      return ownersToIds.get(tag) || [];
+      // Baseline membership includes not-yet-hydrated features. A paint edit
+      // or stale mutable owner mirror cannot redefine selection scope.
+      return reference.getScenarioGroupFeatureIds(tag);
     }
     const country = code(getFeatureCountryCodeNormalized(feature));
-    const ids = state.countryToFeatureIds?.get(country);
-    return Array.isArray(ids) ? ids : null;
+    const ids = reference.getGeographicCountryFeatureIds(country);
+    return ids.length ? ids : null;
   }
 
   function resolveLevel(level, id, feature, metadata) {
@@ -169,7 +157,7 @@ export function createQuickFillHierarchyResolver(state, {
     if (excluded(feature, id)) return result("excluded");
     const scope = normalizeQuickFillScope(requestedScope);
     const countryCode = code(getFeatureCountryCodeNormalized(feature));
-    const scenario = text(state.activeScenarioId);
+    const scenario = usesScenarioGroups() ? text(state.activeScenarioId) : "";
     const metadata = { scope, countryCode, ownerTag: scenario ? owner(id) : "" };
     if (scope === "country") {
       const members = countryMembers(feature, id);
@@ -199,8 +187,8 @@ export function createQuickFillHierarchyResolver(state, {
     // Legacy direct attributes remain supported, independently of border visibility.
     const direct = text(getAdmin1Group(feature));
     if (!direct) return result("missing_membership", metadata);
-    const rawIds = state.countryToFeatureIds?.get(countryCode);
-    if (!Array.isArray(rawIds)) return result("loading", metadata);
+    const rawIds = reference.getGeographicCountryFeatureIds(countryCode);
+    if (!rawIds.length) return result("loading", metadata);
     if (rawIds.some((candidate) => !state.landIndex?.has(candidate))) return result("loading", metadata);
     const members = rawIds.filter((candidate) => text(getAdmin1Group(state.landIndex.get(candidate))) === direct);
     return admitMembers(members, feature, id, { ...metadata, level: "admin1", groupId: `${countryCode}:${direct}`, label: direct });
