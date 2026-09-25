@@ -39002,7 +39002,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/capital_defaults.partial.json",
-      "size_bytes": 91630,
+      "size_bytes": 91721,
       "source_kind": "generated_ignored"
     },
     {
@@ -40052,7 +40052,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/city_overrides.json",
-      "size_bytes": 730974,
+      "size_bytes": 731267,
       "source_kind": "generated_ignored"
     },
     {
@@ -46572,7 +46572,7 @@
       {
         "file_count": 8048,
         "id": "scenario-specific",
-        "size_bytes": 283539046
+        "size_bytes": 283539430
       },
       {
         "file_count": 5,
@@ -65395,7 +65395,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 569286287,
+        "untraversed_dist_bytes": 569286671,
         "untraversed_dist_file_count": 8814,
         "untraversed_module_count": 7
       },
@@ -67764,7 +67764,7 @@
           {
             "file_count": 584,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 272639688
+            "size_bytes": 272640072
           },
           {
             "file_count": 10,
@@ -67772,7 +67772,7 @@
             "size_bytes": 93653
           }
         ],
-        "size_bytes": 272733341
+        "size_bytes": 272733725
       },
       {
         "basis": "product-registry:export-modules",
@@ -67973,7 +67973,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 272733341
+          "size_bytes": 272733725
         },
         {
           "category": "scenario-specific",
@@ -68262,7 +68262,7 @@
     {
       "file_count": 9224,
       "path": "app",
-      "size_bytes": 571712042
+      "size_bytes": 571712426
     },
     {
       "file_count": 59,
@@ -68295,5 +68295,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 601087277
+  "total_bytes": 601087661
 }

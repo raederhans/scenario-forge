@@ -75,7 +75,7 @@
     "XIK": "CITY::gn::1810604",
     "XIN": "CITY::ne::1159151531",
     "YAK": "CITY::ne::1159150745",
-    "ZLT": "CITY::ne::1159139111"
+    "ZLT": "CITY::ne::1159139121"
   },
   "capital_city_hints": {
     "AFA": {
@@ -2921,18 +2921,18 @@
     },
     "ZLT": {
       "country_code": "RU",
-      "host_feature_id": "RU_RAY_50074027B96019567685522",
+      "host_feature_id": "RU_RAY_50074027B60091493242386",
       "urban_match_id": "",
-      "lon": 56.97157,
-      "lat": 57.41435,
-      "population": 66389,
+      "lon": 57.81261,
+      "lat": 58.28915,
+      "population": 72113,
       "base_tier": "regional",
       "source": "merged",
       "tag": "ZLT",
-      "city_id": "CITY::ne::1159139111",
-      "stable_key": "id::CITY::ne::1159139111",
-      "city_name": "Kungur",
-      "name_ascii": "Kungur",
+      "city_id": "CITY::ne::1159139121",
+      "stable_key": "id::CITY::ne::1159139121",
+      "city_name": "Chusovoy",
+      "name_ascii": "Chusovoy",
       "display_name": "Zlatoust",
       "lookup_iso2": "RU",
       "base_iso2": "RU",
@@ -2940,7 +2940,8 @@
       "capital_kind": "country_capital",
       "resolution_method": "reviewed_capital",
       "confidence": "high",
-      "candidate_count": 1
+      "candidate_count": 1,
+      "selection_note": "Current-border fallback: Zlatoust belongs to SVR and Kungur to BKR."
     },
     "USA": {
       "tag": "USA",
@@ -40343,6 +40344,15 @@
         "zh": "昆古尔"
       },
       "host_feature_id": "RU_RAY_50074027B96019567685522"
+    },
+    "CITY::ne::1159139121": {
+      "city_id": "CITY::ne::1159139121",
+      "stable_key": "id::CITY::ne::1159139121",
+      "display_name": {
+        "en": "Chusovoy",
+        "zh": "丘索沃伊"
+      },
+      "host_feature_id": "RU_RAY_50074027B60091493242386"
     },
     "CITY::ne::1159151561": {
       "city_id": "CITY::ne::1159151561",
