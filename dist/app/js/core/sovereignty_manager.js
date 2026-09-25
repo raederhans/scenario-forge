@@ -1,3 +1,5 @@
+import { createReadonlyReferenceAssignments, getMapDataBoundary } from "./map_data_boundary.js";
+import { normalizePaintMode } from "./map_editing_policy.js";
 import {
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
@@ -129,13 +131,13 @@ function ensureSovereigntyState({ force = false } = {}) {
   }
 
   if (runtimeState.mapSemanticMode === "blank") {
-    runtimeState.sovereigntyByFeatureId = { ...runtimeState.sovereigntyByFeatureId };
+    runtimeState.sovereigntyByFeatureId = getMapDataBoundary(runtimeState).reference.getScenarioAssignments();
   } else {
     const seeded = seedSovereigntyFromLandData(runtimeState.landData);
-    runtimeState.sovereigntyByFeatureId = {
+    runtimeState.sovereigntyByFeatureId = createReadonlyReferenceAssignments({
       ...seeded,
-      ...runtimeState.sovereigntyByFeatureId,
-    };
+      ...getMapDataBoundary(runtimeState).reference.getScenarioAssignments(),
+    });
   }
   runtimeState.sovereigntyInitialized = true;
   rebuildOwnerIndex();
@@ -143,117 +145,24 @@ function ensureSovereigntyState({ force = false } = {}) {
 }
 
 function getFeatureOwnerCode(featureOrId, { skipEnsure = true } = {}) {
-  const id = getFeatureId(featureOrId);
-  if (!id) return "";
-  if (!skipEnsure) {
-    ensureSovereigntyState();
-  }
-  const direct = normalizeOwnerCode(runtimeState.sovereigntyByFeatureId?.[id] || "");
-  if (direct) return direct;
-  const feature = typeof featureOrId === "string" ? runtimeState.landIndex?.get(id) : featureOrId;
-  return getCanonicalCountryCodeForFeature(feature);
+  if (!skipEnsure) ensureSovereigntyState();
+  // Transitional name: this is origin/reference membership, not player ownership.
+  return getMapDataBoundary(runtimeState).reference.getBaseGroupCode(featureOrId);
 }
 
-function touchSovereigntyRevision() {
-  runtimeState.sovereigntyRevision = (Number(runtimeState.sovereigntyRevision) || 0) + 1;
-}
-
-function updateOwnerIndexForMove(featureId, prevOwnerCode, nextOwnerCode) {
-  ensureOwnerIndexMaps();
-  const prevCode = normalizeOwnerCode(prevOwnerCode);
-  const nextCode = normalizeOwnerCode(nextOwnerCode);
-  if (prevCode) {
-    const prevBucket = runtimeState.ownerToFeatureIds.get(prevCode);
-    if (prevBucket instanceof Set) {
-      prevBucket.delete(featureId);
-      if (prevBucket.size === 0) {
-        runtimeState.ownerToFeatureIds.delete(prevCode);
-      }
-    }
-  }
-  if (nextCode) {
-    const nextBucket = runtimeState.ownerToFeatureIds.get(nextCode) || new Set();
-    nextBucket.add(featureId);
-    runtimeState.ownerToFeatureIds.set(nextCode, nextBucket);
-  }
-}
-
-function setFeatureOwnerCode(featureId, ownerCode) {
-  const id = getFeatureId(featureId);
-  const code = normalizeOwnerCode(ownerCode);
-  if (!id || !code) return false;
-  const landIndex = runtimeState.landIndex instanceof Map ? runtimeState.landIndex : null;
-  if (landIndex && landIndex.size > 0 && !landIndex.has(id)) {
-    // Ignore writes for features that are not currently present in the loaded map topology.
-    return false;
-  }
-  if (shouldExcludeScenarioPoliticalFeature(landIndex?.get(id), id)) {
-    return false;
-  }
-  ensureSovereigntyState();
-  const prev = getFeatureOwnerCode(id, { skipEnsure: true });
-  if (prev === code) return false;
-  runtimeState.sovereigntyByFeatureId[id] = code;
-  updateOwnerIndexForMove(id, prev, code);
-  touchSovereigntyRevision();
-  return true;
-}
-
-function setFeatureOwnerCodes(featureIds, ownerCode) {
-  ensureSovereigntyState();
-  const ids = Array.isArray(featureIds) ? featureIds : [];
-  let changed = 0;
-  ids.forEach((featureId) => {
-    if (setFeatureOwnerCode(featureId, ownerCode)) {
-      changed += 1;
-    }
-  });
-  return changed;
-}
-
-function resetFeatureOwnerCode(featureId) {
-  const id = getFeatureId(featureId);
-  if (!id) return false;
-  ensureSovereigntyState();
-  const feature = runtimeState.landIndex?.get(id);
-  if (shouldExcludeScenarioPoliticalFeature(feature, id)) return false;
-  const canonical = getCanonicalCountryCodeForFeature(feature);
-  if (!canonical) return false;
-  const prev = getFeatureOwnerCode(id, { skipEnsure: true });
-  if (prev === canonical) return false;
-  runtimeState.sovereigntyByFeatureId[id] = canonical;
-  updateOwnerIndexForMove(id, prev, canonical);
-  touchSovereigntyRevision();
-  return true;
-}
-
-function resetFeatureOwnerCodes(featureIds) {
-  ensureSovereigntyState();
-  const ids = Array.isArray(featureIds) ? featureIds : [];
-  let changed = 0;
-  ids.forEach((featureId) => {
-    if (resetFeatureOwnerCode(featureId)) {
-      changed += 1;
-    }
-  });
-  return changed;
-}
-
-function resetAllFeatureOwnersToCanonical() {
-  runtimeState.mapSemanticMode = "political";
-  runtimeState.sovereigntyByFeatureId = seedSovereigntyFromLandData(runtimeState.landData);
-  runtimeState.sovereigntyInitialized = true;
-  rebuildOwnerIndex();
-  touchSovereigntyRevision();
-}
+// Retired command bridges. Lifecycle reference publication above is separate.
+function setFeatureOwnerCode() { return false; }
+function setFeatureOwnerCodes() { return 0; }
+function resetFeatureOwnerCode() { return false; }
+function resetFeatureOwnerCodes() { return 0; }
+function resetAllFeatureOwnersToCanonical() { return false; }
 
 function getFeatureIdsForOwner(ownerCode) {
-  ensureOwnerIndexMaps();
-  const code = normalizeOwnerCode(ownerCode);
-  if (!code) return [];
-  const bucket = runtimeState.ownerToFeatureIds.get(code);
-  if (!(bucket instanceof Set)) return [];
-  return Array.from(bucket);
+  const reference = getMapDataBoundary(runtimeState).reference;
+  const ids = runtimeState.activeScenarioId && runtimeState.mapSemanticMode !== "blank"
+    ? reference.getScenarioGroupFeatureIds(ownerCode)
+    : reference.getGeographicCountryFeatureIds(ownerCode);
+  return Array.from(ids).filter(id => !shouldExcludeScenarioPoliticalFeature(runtimeState.landIndex?.get(id), id));
 }
 
 function migrateImportedProjectData(data) {
@@ -271,9 +180,8 @@ function migrateImportedProjectData(data) {
       : payload.featureOverrides && typeof payload.featureOverrides === "object"
         ? payload.featureOverrides
         : {};
-  payload.sovereigntyByFeatureId = normalizeFeatureOwnershipMap(payload.sovereigntyByFeatureId);
-  payload.paintMode =
-    payload.paintMode === "sovereignty" ? "sovereignty" : "visual";
+  payload.sovereigntyByFeatureId = {};
+  payload.paintMode = normalizePaintMode(payload.paintMode);
   payload.mapSemanticMode = normalizeMapSemanticMode(payload.mapSemanticMode);
   payload.activeSovereignCode = normalizeOwnerCode(payload.activeSovereignCode || "");
   payload.dynamicBordersDirty = !!payload.dynamicBordersDirty;

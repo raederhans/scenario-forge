@@ -408,16 +408,34 @@ export function createLocalFeedbackRecords(baseRecords) {
     ...editorCheckoutRecord,
     id: "local:hoi4-manual-rules",
     commandRef: "python -m unittest tests.test_build_hoi4_scenario tests.test_check_hoi4_scenario_bundle -q",
-    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "tools/build_hoi4_scenario.py",
+    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "data/scenario-rules/hoi4_1939.manual.json", "tools/build_hoi4_scenario.py",
       "tools/check_hoi4_scenario_bundle.py", "tests/test_build_hoi4_scenario.py",
       "tests/test_check_hoi4_scenario_bundle.py"],
     ownerHints: ["scenario-builder"], domains: ["scenario-build"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 8,
   };
 
+  const ownershipRepairsRecord = {
+    ...editorCheckoutRecord,
+    id: "local:scenario-ownership-repairs",
+    commandRef: "python -m unittest tests.test_tno_ownership_repairs -q",
+    sourceRefs: ["data/scenario-rules/tno_1962.russia_ownership.manual.json",
+      "tools/patch_tno_1962_bundle.py", "tests/test_tno_ownership_repairs.py"],
+    ownerHints: ["scenario-builder"], domains: ["scenario-build"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 9,
+  };
+  const hoi4OwnershipRepairsRecord = {
+    ...ownershipRepairsRecord,
+    id: "local:hoi4-ownership-repairs",
+    commandRef: "python -m unittest tests.test_hoi4_territory_regressions -q",
+    sourceRefs: ["data/scenario-rules/hoi4_1936.manual.json", "data/scenario-rules/hoi4_1939.manual.json",
+      "scenario_builder/hoi4/compiler.py", "tests/test_hoi4_territory_regressions.py"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 10,
+  };
+
   return [...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
-    paletteLibraryOperationRecord, hoi4ManualRulesRecord];
+    paletteLibraryOperationRecord, hoi4ManualRulesRecord, ownershipRepairsRecord, hoi4OwnershipRepairsRecord];
 }

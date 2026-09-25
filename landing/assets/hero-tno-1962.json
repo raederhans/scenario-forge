@@ -38,7 +38,7 @@
   ],
   "feature_counts": {
     "territories": 32,
-    "political_features": 3236,
+    "political_features": 3247,
     "capitals": 7,
     "base_land_features_inspected": 23426,
     "base_land_features_candidates": 6162,
@@ -63,7 +63,7 @@
   },
   "counts": {
     "territories": 32,
-    "political_features": 3236,
+    "political_features": 3247,
     "capitals": 7,
     "base_land_features_inspected": 23426,
     "base_land_features_candidates": 6162,

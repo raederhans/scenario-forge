@@ -28,6 +28,7 @@ const transportEntryByUrl = new Map(
 );
 const statusByRequestId = new Map();
 const metricsByRequestId = new Map();
+const pendingJsonRequestsById = new Map();
 let lastUpdatedAt = 0;
 
 function cloneJsonLike(value) {
@@ -212,6 +213,9 @@ async function loadJsonEntry(kind, id, url, entry, options = {}) {
   const requestId = createRequestId(kind, id || normalizedUrl);
   const cachePolicy = resolveEntryCachePolicy(entry, options.cachePolicy);
   ensureReadableJsonEntry(entry, { kind, id, url: normalizedUrl });
+  const request = Symbol(requestId);
+  pendingJsonRequestsById.set(requestId, request);
+  const isCurrent = () => pendingJsonRequestsById.get(requestId) === request;
   updateStatus(requestId, {
     kind,
     id,
@@ -224,36 +228,47 @@ async function loadJsonEntry(kind, id, url, entry, options = {}) {
     cachePolicy,
   });
   try {
+    options.signal?.throwIfAborted();
     const { payload, metrics } = await loadMeasuredJsonResource(normalizedUrl, {
       d3Client: options.d3Client,
       label: options.label || requestId,
       cache: cachePolicy,
+      signal: options.signal,
     });
-    updateMetrics(requestId, {
-      ...metrics,
-      cachePolicy,
-      kind,
-      id,
-      url: normalizedUrl,
-      role: String(entry?.role || "").trim(),
-    });
-    updateStatus(requestId, {
-      status: "ready",
-      error: "",
-      errorCode: "",
-      httpStatus: 200,
-      loadedAt: Date.now(),
-      cachePolicy,
-    });
+    options.signal?.throwIfAborted();
+    if (isCurrent()) {
+      updateMetrics(requestId, {
+        ...metrics,
+        cachePolicy,
+        kind,
+        id,
+        url: normalizedUrl,
+        role: String(entry?.role || "").trim(),
+      });
+      updateStatus(requestId, {
+        status: "ready",
+        error: "",
+        errorCode: "",
+        httpStatus: 200,
+        loadedAt: Date.now(),
+        cachePolicy,
+      });
+    }
     return payload;
   } catch (error) {
+    if (error?.name === "AbortError" || options.signal?.aborted) {
+      if (isCurrent()) updateStatus(requestId, {
+        status: "cancelled", error: "", errorCode: "aborted", httpStatus: 0, cachePolicy,
+      });
+      throw error;
+    }
     const normalizedError = normalizeDataServiceError(error, {
       kind,
       id,
       url: normalizedUrl,
       cachePolicy,
     });
-    updateStatus(requestId, {
+    if (isCurrent()) updateStatus(requestId, {
       status: "error",
       error: normalizedError.message,
       errorCode: String(normalizedError.code || "load-failed"),
@@ -261,6 +276,10 @@ async function loadJsonEntry(kind, id, url, entry, options = {}) {
       cachePolicy,
     });
     throw normalizedError;
+  } finally {
+    // An aborted old request must not overwrite or retire a newer receiver for
+    // the same catalog URL. This map contains identities, never response data.
+    if (isCurrent()) pendingJsonRequestsById.delete(requestId);
   }
 }
 

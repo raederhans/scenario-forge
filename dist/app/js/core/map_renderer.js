@@ -1,3 +1,6 @@
+import { getMapDataBoundary } from "./map_data_boundary.js";
+import { applyFeaturePaintState } from "./state/color_state.js";
+import { isOwnershipEditingEnabled } from "./map_editing_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
@@ -2924,6 +2927,10 @@ function getClickSelectionTransactionOwner() {
       ensureLeafDetailReady,
       getFeatureCountryCodeNormalized,
       getFeatureOwnerCode,
+      getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
+        getSafeColor: getSafeCanvasColor,
+        getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
+      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
       getHitFromEvent,
       getHoveredFacilityEntryFromEvent,
       getIntensityFieldTool,
@@ -2960,6 +2967,14 @@ function getClickSelectionTransactionOwner() {
       toggleFeatureInDevSelection,
       updateDevSelectedHit,
       warnMissingActiveSovereign: () => console.warn("[sovereignty] No active sovereign selected."),
+      warnIncompletePaintTargets: () => {
+        const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
+        showDetailPromotionToast(
+          zh ? "参考分组尚未完整加载，未执行填色。请启用细节层后重试。"
+            : "Reference group members are not fully loaded. No paint was applied; enable the detail layer and retry.",
+          { title: zh ? "填色范围" : "Paint scope", tone: "warning", duration: 3600 },
+        );
+      },
     },
   });
   return clickSelectionTransactionOwner;
@@ -4709,7 +4724,7 @@ function isDynamicBordersEnabled() {
 }
 
 function isSovereigntyModeActive() {
-  return String(runtimeState.paintMode || "visual").toLowerCase() === "sovereignty";
+  return isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual").toLowerCase() === "sovereignty";
 }
 
 function clearPendingDynamicBorderTimer() {
@@ -6093,7 +6108,9 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
     GIANT_FEATURE_ALLOWLIST.has(countryCode) &&
     isAdmin0ShellFeature(feature, featureId);
   const spherical = getSphericalFeatureDiagnostics(feature, { featureId });
-  if (spherical?.invalid && !isTrustedAdmin0Shell) {
+  // Large-country shells may have wide projected bounds, but must never
+  // bypass spherical validity: a tiny inverted island can cover the ocean.
+  if (spherical?.invalid) {
     return {
       skip: true,
       reason: spherical.isWorldBounds ? "world_bounds" : "spherical_area",
@@ -6649,6 +6666,8 @@ function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame"
   return resolvedColorCount > 0;
 }
 
+let resolvedColorFeatureLookupCache = { features: null, revision: -1, index: null };
+
 function findResolvedColorFeatureById(featureId) {
   const id = String(featureId || "").trim();
   if (!id) return null;
@@ -6657,14 +6676,20 @@ function findResolvedColorFeatureById(featureId) {
     return indexedFeature;
   }
   const features = getResolvedColorSourceFeatures();
-  for (let index = 0; index < features.length; index += 1) {
-    const feature = features[index];
-    const candidateId = getFeatureId(feature) || `feature-${index}`;
-    if (candidateId === id) {
-      return feature;
-    }
+  const revision = Number(runtimeState.topologyRevision || 0);
+  // Shell/background features are absent from the interactive land index.
+  // Pending edits can include thousands of them; index the complete source
+  // once per geometry revision instead of scanning it for every pending id.
+  if (resolvedColorFeatureLookupCache.features !== features
+      || resolvedColorFeatureLookupCache.revision !== revision) {
+    const index = new Map();
+    features.forEach((feature, offset) => {
+      const candidateId = getFeatureId(feature) || `feature-${offset}`;
+      if (!index.has(candidateId)) index.set(candidateId, feature);
+    });
+    resolvedColorFeatureLookupCache = { features, revision, index };
   }
-  return null;
+  return resolvedColorFeatureLookupCache.index.get(id) || null;
 }
 
 function collectResolvedColorFeatureIdsForOwners(ownerCodes = []) {
@@ -7029,24 +7054,8 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
   // Import/legacy writes are normalized once before this canonical transaction.
   // Both override maps below stay in sync, so a paint need not copy them again.
   migrateLegacyColorState();
-  runtimeState.visualOverrides = runtimeState.visualOverrides && typeof runtimeState.visualOverrides === "object"
-    ? runtimeState.visualOverrides
-    : {};
-  runtimeState.featureOverrides = runtimeState.featureOverrides && typeof runtimeState.featureOverrides === "object"
-    ? runtimeState.featureOverrides
-    : {};
-  if (remove) {
-    resolvedIds.forEach((targetId) => {
-      delete runtimeState.visualOverrides[targetId];
-      delete runtimeState.featureOverrides[targetId];
-    });
-  } else {
-    const color = getSafeCanvasColor(selectedColor, defaultColor);
-    resolvedIds.forEach((targetId) => {
-      runtimeState.visualOverrides[targetId] = color;
-      runtimeState.featureOverrides[targetId] = color;
-    });
-  }
+  applyFeaturePaintState(runtimeState, resolvedIds,
+    remove ? null : getSafeCanvasColor(selectedColor, defaultColor), { remove });
   refreshResolvedColorsForFeatures(resolvedIds, {
     renderNow,
     inputStartedAt,
@@ -13119,7 +13128,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
         canonicalCountryByFeatureId: runtimeState.runtimeCanonicalCountryByFeatureId,
         neighborGraph: runtimeState.runtimeNeighborGraph,
       },
-      runtimeState.sovereigntyByFeatureId,
+      getMapDataBoundary(runtimeState).reference.getScenarioAssignments(),
       {
         fixedOwnerColors: {
           ...(runtimeState.fixedPaletteColorsByIso2 || {}),
@@ -14028,9 +14037,9 @@ function applyDevMacroFillCurrentOwnerScope() {
   const ownerCode = getFeatureOwnerCode(contextInfo.featureId) || contextInfo.countryCode;
   const ids = getFeatureIdsForOwner(ownerCode)
     .map((value) => String(value || "").trim())
-    .filter((featureId) => featureId && runtimeState.landIndex?.has(featureId));
-  if (!ids.length) {
-    showToast(t("No owner scope is available for this feature.", "ui"), {
+    .filter(Boolean);
+  if (!ids.length || ids.some((featureId) => !runtimeState.landIndex?.has(featureId))) {
+    showToast(t("The complete reference group must be loaded before filling it.", "ui"), {
       title: t("Dev Workspace", "ui"),
       tone: "warning",
     });
@@ -14294,80 +14303,6 @@ function applyBrushHit(hit) {
   const selectedColor = getSafeCanvasColor(runtimeState.selectedColor, LAND_FILL_COLOR);
 
   if (runtimeState.currentTool === "eyedropper") return false;
-  if (runtimeState.currentTool === "eraser") {
-    if (isSovereigntyModeActive()) {
-      const freshIds = targetIds.filter((targetId) => !brushSession.affectedSovereigntyIds.has(targetId));
-      if (!freshIds.length) return false;
-      mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
-      freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
-      const changed = resetFeatureOwnerCodes(freshIds);
-      if (changed > 0) {
-        brushSession.changed = true;
-        refreshResolvedColorsForFeatures(freshIds, {
-          renderNow: false,
-          inputLabel: "brush-erase-feature-color",
-        });
-        scheduleDynamicBorderRecompute("brush-sovereignty-reset", 90);
-        return true;
-      }
-      return false;
-    }
-    if (runtimeState.interactionGranularity === "country" && countryCode) {
-      if (brushSession.visitedOwnerCodes.has(countryCode)) return false;
-      brushSession.visitedOwnerCodes.add(countryCode);
-      mergeHistorySnapshot(brushSession.before, captureHistoryState({ ownerCodes: [countryCode] }));
-      brushSession.affectedOwnerCodes.add(countryCode);
-      delete runtimeState.sovereignBaseColors[countryCode];
-      delete runtimeState.countryBaseColors[countryCode];
-      markLegacyColorStateDirty();
-      refreshResolvedColorsForOwners([countryCode], { renderNow: false });
-      brushSession.changed = true;
-      return true;
-    }
-    const freshIds = targetIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
-    if (!freshIds.length) return false;
-    mergeHistorySnapshot(brushSession.before, captureHistoryState({ featureIds: freshIds }));
-    freshIds.forEach((targetId) => {
-      brushSession.visitedFeatureIds.add(targetId);
-      brushSession.affectedFeatureIds.add(targetId);
-    });
-    applyFeatureVisualOverrideTransaction(freshIds, null, {
-      remove: true,
-      inputLabel: "brush-erase-feature-color",
-    });
-    brushSession.changed = true;
-    return true;
-  }
-
-  if (isSovereigntyModeActive()) {
-    if (!runtimeState.activeSovereignCode) return false;
-    const freshIds = targetIds.filter((targetId) => !brushSession.affectedSovereigntyIds.has(targetId));
-    if (!freshIds.length) return false;
-    mergeHistorySnapshot(brushSession.before, captureHistoryState({ sovereigntyFeatureIds: freshIds }));
-    freshIds.forEach((targetId) => brushSession.affectedSovereigntyIds.add(targetId));
-    const changed = setFeatureOwnerCodes(freshIds, runtimeState.activeSovereignCode);
-    if (changed > 0) {
-      brushSession.changed = true;
-      refreshResolvedColorsForFeatures(freshIds, { renderNow: false });
-      scheduleDynamicBorderRecompute("brush-sovereignty-fill", 90);
-      return true;
-    }
-    return false;
-  }
-
-  if (runtimeState.interactionGranularity === "country" && countryCode) {
-    if (brushSession.visitedOwnerCodes.has(countryCode)) return false;
-    brushSession.visitedOwnerCodes.add(countryCode);
-    mergeHistorySnapshot(brushSession.before, captureHistoryState({ ownerCodes: [countryCode] }));
-    brushSession.affectedOwnerCodes.add(countryCode);
-    runtimeState.sovereignBaseColors[countryCode] = selectedColor;
-    runtimeState.countryBaseColors[countryCode] = selectedColor;
-    markLegacyColorStateDirty();
-    refreshResolvedColorsForOwners([countryCode], { renderNow: false });
-    brushSession.changed = true;
-    return true;
-  }
-
   const freshIds = targetIds.filter((targetId) => !brushSession.visitedFeatureIds.has(targetId));
   if (!freshIds.length) return false;
   mergeHistorySnapshot(brushSession.before, captureHistoryState({ featureIds: freshIds }));
@@ -14375,8 +14310,10 @@ function applyBrushHit(hit) {
     brushSession.visitedFeatureIds.add(targetId);
     brushSession.affectedFeatureIds.add(targetId);
   });
-  applyFeatureVisualOverrideTransaction(freshIds, selectedColor, {
-    inputLabel: "brush-fill-feature-color",
+  const remove = runtimeState.currentTool === "eraser";
+  applyFeatureVisualOverrideTransaction(freshIds, remove ? null : selectedColor, {
+    remove,
+    inputLabel: remove ? "brush-erase-feature-color" : "brush-fill-feature-color",
   });
   brushSession.changed = true;
   return true;

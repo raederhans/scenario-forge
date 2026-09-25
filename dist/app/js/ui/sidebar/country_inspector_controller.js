@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "../../core/map_editing_policy.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
   ensureInspectorExpansionState,
@@ -559,7 +560,7 @@ export function createCountryInspectorController({
     const hasChildren = childCount > 0;
     const isActiveOwner = runtimeState.activeSovereignCode === countryState.code;
     const hasReleasableActivateAction = !!(
-      showActivateSubaction &&
+      isOwnershipEditingEnabled() && showActivateSubaction &&
       runtimeState.activeScenarioId &&
       countryState.releasable &&
       getPrimaryReleasablePresetRef(countryState)
@@ -1105,7 +1106,7 @@ export function createCountryInspectorController({
       if (countryInspectorSetActive) {
         countryInspectorSetActive.disabled = true;
         countryInspectorSetActive.classList.remove("is-active");
-        countryInspectorSetActive.classList.remove("hidden");
+        countryInspectorSetActive.classList.add("hidden");
         countryInspectorSetActive.textContent = t("Use as Active Owner", "ui");
         countryInspectorSetActive.setAttribute("aria-pressed", "false");
       }
@@ -1130,8 +1131,8 @@ export function createCountryInspectorController({
     const isScenarioReleasable = !!runtimeState.activeScenarioId && !!countryState.releasable;
     if (countryInspectorSetActive) {
       const isActive = runtimeState.activeSovereignCode === countryState.code;
-      countryInspectorSetActive.disabled = false;
-      countryInspectorSetActive.classList.toggle("hidden", isScenarioReleasable);
+      countryInspectorSetActive.disabled = !isOwnershipEditingEnabled();
+      countryInspectorSetActive.classList.toggle("hidden", !isOwnershipEditingEnabled() || isScenarioReleasable);
       countryInspectorSetActive.classList.toggle("is-active", !isScenarioReleasable && isActive);
       countryInspectorSetActive.textContent = isActive
         ? t("Stop Using as Active Owner", "ui")
@@ -1139,7 +1140,7 @@ export function createCountryInspectorController({
       countryInspectorSetActive.setAttribute("aria-pressed", String(!isScenarioReleasable && isActive));
     }
     if (countryInspectorDetailHint) {
-      if (isScenarioReleasable) {
+      if (isOwnershipEditingEnabled() && isScenarioReleasable) {
         countryInspectorDetailHint.classList.remove("hidden");
         countryInspectorDetailHint.textContent = t(
           "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
@@ -1258,6 +1259,7 @@ export function createCountryInspectorController({
 
     if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
       countryInspectorSetActive.addEventListener("click", () => {
+        if (!isOwnershipEditingEnabled()) return;
         const latestCountryStatesByCode = getLatestCountryStatesByCode();
         const selectedCode = ensureSelectedInspectorCountry();
         if (!selectedCode) return;

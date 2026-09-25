@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "../../core/map_editing_policy.js";
 import { state as runtimeState } from "../../core/state.js";
 import {
   applyOwnerToFeatureIds,
@@ -75,7 +76,7 @@ export function createSelectionOwnershipController({
     const fallbackOwnerCode = normalizeOwnerInput(runtimeState.activeSovereignCode);
     const effectiveOwnerCode = requestedOwnerCode || fallbackOwnerCode;
 
-    scenarioOwnershipPanel?.classList.toggle("hidden", !hasActiveScenario);
+    scenarioOwnershipPanel?.classList.toggle("hidden", !isOwnershipEditingEnabled() || !hasActiveScenario);
     if (scenarioOwnershipTitle) {
       scenarioOwnershipTitle.textContent = hasActiveScenario
         ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
@@ -91,7 +92,7 @@ export function createSelectionOwnershipController({
     }
     if (scenarioOwnerInput) {
       scenarioOwnerInput.placeholder = fallbackOwnerCode || "GER";
-      scenarioOwnerInput.disabled = !hasActiveScenario || !!editorState.isSaving;
+      scenarioOwnerInput.disabled = !isOwnershipEditingEnabled() || !hasActiveScenario || !!editorState.isSaving;
     }
 
     const statusBits = [];
@@ -107,9 +108,9 @@ export function createSelectionOwnershipController({
       scenarioOwnershipStatus.textContent = statusBits.join(" | ");
     }
 
-    const canApplyOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !!effectiveOwnerCode && !editorState.isSaving;
-    const canResetOwner = hasActiveScenario && ownershipModel.selectionCount > 0 && !editorState.isSaving;
-    const canSaveOwners = hasActiveScenario && !editorState.isSaving;
+    const canApplyOwner = isOwnershipEditingEnabled() && hasActiveScenario && ownershipModel.selectionCount > 0 && !!effectiveOwnerCode && !editorState.isSaving;
+    const canResetOwner = isOwnershipEditingEnabled() && hasActiveScenario && ownershipModel.selectionCount > 0 && !editorState.isSaving;
+    const canSaveOwners = isOwnershipEditingEnabled() && hasActiveScenario && !editorState.isSaving;
 
     const selectionTagValue = ownershipModel.selectionCount <= 0
       ? ui("No selection")
@@ -157,13 +158,13 @@ export function createSelectionOwnershipController({
     }
     if (devQuickOwnerInput) {
       devQuickOwnerInput.placeholder = fallbackOwnerCode || "GER";
-      devQuickOwnerInput.disabled = !hasActiveScenario || !!editorState.isSaving;
+      devQuickOwnerInput.disabled = !isOwnershipEditingEnabled() || !hasActiveScenario || !!editorState.isSaving;
     }
     if (devQuickRemoveSelectedBtn) {
       devQuickRemoveSelectedBtn.disabled = !hasActiveScenario || !resolveSelectedSelectionId() || !devSelectionToggleSelectedBtn;
     }
     if (devQuickUseTagBtn) {
-      devQuickUseTagBtn.disabled = !hasActiveScenario || ownershipModel.selectionCount <= 0;
+      devQuickUseTagBtn.disabled = !isOwnershipEditingEnabled() || !hasActiveScenario || ownershipModel.selectionCount <= 0;
     }
     if (devQuickApplyOwnerBtn) {
       devQuickApplyOwnerBtn.disabled = !canApplyOwner;
@@ -181,8 +182,16 @@ export function createSelectionOwnershipController({
     }
   };
 
+  const ownershipControls = new Set([
+    applyOwnerBtn, resetOwnerBtn, saveOwnersBtn, devQuickUseTagBtn,
+    devQuickApplyOwnerBtn, devQuickResetOwnerBtn, devQuickSaveOwnersBtn,
+  ].filter(Boolean));
+  const bindEditingAction = (button, action) => bindButtonAction(button, (...args) => {
+    if (ownershipControls.has(button) && !isOwnershipEditingEnabled()) return;
+    return action(...args);
+  });
   const bindEvents = () => {
-    bindButtonAction(applyOwnerBtn, () => {
+    bindEditingAction(applyOwnerBtn, () => {
       const targetIds = resolveOwnershipTargetIds();
       const requestedOwnerCode = normalizeOwnerInput(runtimeState.devScenarioEditor?.targetOwnerCode);
       const ownerCode = requestedOwnerCode || normalizeOwnerInput(runtimeState.activeSovereignCode);
@@ -210,11 +219,11 @@ export function createSelectionOwnershipController({
       renderWorkspace();
     });
 
-    bindButtonAction(devQuickApplyOwnerBtn, () => {
+    bindEditingAction(devQuickApplyOwnerBtn, () => {
       applyOwnerBtn?.click();
     });
 
-    bindButtonAction(resetOwnerBtn, () => {
+    bindEditingAction(resetOwnerBtn, () => {
       const result = resetOwnersToScenarioBaselineForFeatureIds(resolveOwnershipTargetIds(), {
         historyKind: "dev-workspace-ownership-reset",
         dirtyReason: "dev-workspace-ownership-reset",
@@ -240,11 +249,11 @@ export function createSelectionOwnershipController({
       renderWorkspace();
     });
 
-    bindButtonAction(devQuickResetOwnerBtn, () => {
+    bindEditingAction(devQuickResetOwnerBtn, () => {
       resetOwnerBtn?.click();
     });
 
-    bindButtonAction(devQuickRemoveSelectedBtn, () => {
+    bindEditingAction(devQuickRemoveSelectedBtn, () => {
       if (!resolveSelectedSelectionId()) {
         showToast(ui("No selection"), {
           title: ui("Selection Clipboard"),
@@ -260,7 +269,7 @@ export function createSelectionOwnershipController({
       devSelectionToggleSelectedBtn?.click();
     });
 
-    bindButtonAction(saveOwnersBtn, async () => {
+    bindEditingAction(saveOwnersBtn, async () => {
       if (!runtimeState.activeScenarioId || runtimeState.devScenarioEditor?.isSaving) return;
       const payload = buildScenarioOwnershipSavePayload();
       runtimeState.devScenarioEditor = {
@@ -307,11 +316,11 @@ export function createSelectionOwnershipController({
       renderWorkspace();
     });
 
-    bindButtonAction(devQuickSaveOwnersBtn, () => {
+    bindEditingAction(devQuickSaveOwnersBtn, () => {
       saveOwnersBtn?.click();
     });
 
-    bindButtonAction(devQuickUseTagBtn, () => {
+    bindEditingAction(devQuickUseTagBtn, () => {
       const ownershipModel = resolveOwnershipEditorModel();
       const inferredTag = ownershipModel.isMixedOwner
         ? ""

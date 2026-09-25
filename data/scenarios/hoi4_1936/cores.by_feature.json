@@ -2,7 +2,7 @@
   "version": 1,
   "scenario_id": "hoi4_1936",
   "generated_at": "2026-06-13T22:53:22.663027+00:00",
-  "baseline_hash": "027d74242b917f66fa5efbeb5bafd54acb7926a2c018bc34b9941f6423b77aa3",
+  "baseline_hash": "6d2ec7ba7d7a641270d4512499226a90f5f3695c8fc105b0411b2bc4d385bf53",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -6536,7 +6536,7 @@
       "CHI"
     ],
     "CN_CITY_17275852B82452317993245": [
-      "JAP"
+      "MAN"
     ],
     "CN_CITY_17275852B82453745419321": [
       "CHI"

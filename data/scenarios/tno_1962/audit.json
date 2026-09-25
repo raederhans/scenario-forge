@@ -56424,12 +56424,12 @@
       "feature_id": "RS228",
       "feature_name": "Пчињска област",
       "from_tag": "",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
+      "notes": "Serbian Pcinja district was erroneously placed in the Iran static transfer list; preserve the surrounding Serbian territory and the explicit Bulgarian Pirot boundary.",
       "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "YUG"
+      "to_tag": "SER"
     },
     {
       "country_code": "RS",
@@ -60623,12 +60623,12 @@
       "feature_id": "RU_RAY_50074027B26247941998925",
       "feature_name": "городской округ Новодвинск",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Novodvinsk is an independent city face in the existing Arkhangelsk WRS area; local TNO state 214 also supports WRS.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "WRS"
     },
     {
       "country_code": "RU",
@@ -63717,12 +63717,12 @@
       "feature_id": "RU_RAY_50074027B40536112899816",
       "feature_name": "городской округ Похвистнев",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Pokhvistnevo city was omitted while corresponding Pokhvistnevsky District and Kinel-Cherkassky District belong to SAM.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "SAM"
     },
     {
       "country_code": "RU",
@@ -64237,12 +64237,12 @@
       "feature_id": "RU_RAY_50074027B42720608112791",
       "feature_name": "Sharya",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Reviewed ownership correction: geographical identity and scenario source verified.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
+      "rule_id": "reviewed_ownership_20260925",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "VOL"
     },
     {
       "country_code": "RU",
@@ -67045,12 +67045,12 @@
       "feature_id": "RU_RAY_50074027B5573235052647",
       "feature_name": "Shumerlya",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Independent Shumerlya city face omitted from the existing Gorky transfer of Shumerlinsky District; preserve the user's existing macro borders.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "GOR"
     },
     {
       "country_code": "RU",
@@ -67812,12 +67812,12 @@
       "feature_id": "RU_RAY_50074027B58613203253678",
       "feature_name": "Bataysk",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Bataysk city face follows the preserved RKK area of Azovsky District, Rostov-on-Don and Aksaysky District; do not migrate the surrounding border to a newer MOD version.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "RKK"
     },
     {
       "country_code": "RU",
@@ -75430,12 +75430,12 @@
       "feature_id": "RU_RAY_50074027B91746933948416",
       "feature_name": "Novocheboksarsk",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Independent Novocheboksarsk city face omitted from the existing Gorky area around Cheboksarsky District.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "GOR"
     },
     {
       "country_code": "RU",
@@ -76470,12 +76470,12 @@
       "feature_id": "RU_RAY_50074027B96019567685522",
       "feature_name": "Кунгурский городской округ",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Kungur city face should follow the preserved Bashkir ownership of its surrounding Kungursky District.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "BKR"
     },
     {
       "country_code": "RU",
@@ -94007,12 +94007,12 @@
       "feature_id": "SM_ADM1_SMR-4883",
       "feature_name": "Borgo Maggiore",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94020,12 +94020,12 @@
       "feature_id": "SM_ADM1_SMR-4884",
       "feature_name": "San Marino",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94033,12 +94033,12 @@
       "feature_id": "SM_ADM1_SMR-4885",
       "feature_name": "Acquaviva",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94046,12 +94046,12 @@
       "feature_id": "SM_ADM1_SMR-4886",
       "feature_name": "Serravalle",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94059,12 +94059,12 @@
       "feature_id": "SM_ADM1_SMR-4887",
       "feature_name": "Domagnano",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94072,12 +94072,12 @@
       "feature_id": "SM_ADM1_SMR-4888",
       "feature_name": "Faetano",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94085,12 +94085,12 @@
       "feature_id": "SM_ADM1_SMR-4890",
       "feature_name": "Fiorentino",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SM",
@@ -94098,12 +94098,12 @@
       "feature_id": "SM_ADM1_SMR-4891",
       "feature_name": "Chiesanuova",
       "from_tag": "",
-      "notes": "Italian East Africa replaces the separate Eritrean and Somali colonial administrations in the 1939 setup.",
+      "notes": "Stale Ethiopia/AOI import assignment; restore the existing Italian San Marino policy already used in both HOI4 source scenarios.",
       "quality": "manual_reviewed",
-      "rule_id": "1939_italy_ethiopia",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "AOI"
+      "to_tag": "ITA"
     },
     {
       "country_code": "SR",
@@ -94709,12 +94709,12 @@
       "feature_id": "XK_ADM1_KOS-5909",
       "feature_name": "Dragaš",
       "from_tag": "KOS",
-      "notes": "Yugoslavia baseline override across current Balkan successor states.",
+      "notes": "Dragash was erroneously placed in the Iran static transfer list; all other Kosovo faces remain SER.",
       "quality": "manual_reviewed",
-      "rule_id": "yugoslavia_union",
-      "source": "manual_rule",
+      "rule_id": "scenario_manual_overrides",
+      "source": "manual_override",
       "synthetic_owner": false,
-      "to_tag": "YUG"
+      "to_tag": "SER"
     },
     {
       "country_code": "XK",
@@ -98245,12 +98245,12 @@
       "feature_id": "RU_CITY_ARKHANGELSK",
       "feature_name": "Arkhangelsk",
       "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
+      "notes": "Reviewed ownership correction: geographical identity and scenario source verified.",
       "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
+      "rule_id": "reviewed_ownership_20260925",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "SOV"
+      "to_tag": "WRS"
     },
     {
       "country_code": "RU",
@@ -103906,10 +103906,10 @@
     "AOI": {
       "base_iso2": "ET",
       "continent_label": "Africa",
-      "controller_feature_count": 58,
+      "controller_feature_count": 49,
       "display_name": "Italian East Africa",
       "entry_kind": "scenario_subject",
-      "feature_count": 58,
+      "feature_count": 49,
       "hidden_from_country_list": false,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
@@ -103924,7 +103924,7 @@
       "provenance_iso2": "ET",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 58
+        "manual_reviewed": 49
       },
       "rule_sources": [
         "1939_italy_ethiopia"
@@ -104234,10 +104234,10 @@
     "BKR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 18,
+      "controller_feature_count": 19,
       "display_name": "Bashkir",
       "entry_kind": "scenario_country",
-      "feature_count": 18,
+      "feature_count": 19,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -104250,7 +104250,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 18
+        "manual_reviewed": 19
       },
       "rule_sources": [
         "tno_1962_russia_bkr"
@@ -105521,10 +105521,10 @@
     "GOR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 46,
+      "controller_feature_count": 48,
       "display_name": "13th Panzer Army - Gorky",
       "entry_kind": "scenario_country",
-      "feature_count": 46,
+      "feature_count": 48,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -105537,7 +105537,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 46
+        "manual_reviewed": 48
       },
       "rule_sources": [
         "tno_1962_gor_manual_override"
@@ -105953,10 +105953,10 @@
     "IBR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 151,
+      "controller_feature_count": 155,
       "display_name": "Iberian Union",
       "entry_kind": "scenario_country",
-      "feature_count": 151,
+      "feature_count": 155,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -105969,7 +105969,7 @@
       "provenance_iso2": "ES",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 151
+        "manual_reviewed": 155
       },
       "rule_sources": [
         "tno_1962_iberian_union"
@@ -106147,10 +106147,10 @@
     "ITA": {
       "base_iso2": "IT",
       "continent_label": "Europe",
-      "controller_feature_count": 223,
+      "controller_feature_count": 232,
       "display_name": "Italy",
       "entry_kind": "",
-      "feature_count": 223,
+      "feature_count": 232,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -106163,7 +106163,7 @@
       "provenance_iso2": "IT",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 223
+        "manual_reviewed": 232
       },
       "rule_sources": [
         "1939_italy_albania"
@@ -106382,10 +106382,10 @@
     "KRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 15,
-      "display_name": "Krasnodar",
+      "controller_feature_count": 16,
+      "display_name": "Krasnoyarsk",
       "entry_kind": "scenario_country",
-      "feature_count": 15,
+      "feature_count": 16,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -106398,7 +106398,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 15
+        "manual_reviewed": 16
       },
       "rule_sources": [
         "tno_1962_krs_manual_override"
@@ -107180,10 +107180,10 @@
     "NOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 134,
+      "controller_feature_count": 132,
       "display_name": "Novosibirsk",
       "entry_kind": "scenario_country",
-      "feature_count": 134,
+      "feature_count": 132,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -107196,7 +107196,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 134
+        "manual_reviewed": 132
       },
       "rule_sources": [
         "tno_1962_russia_nov"
@@ -107601,10 +107601,10 @@
     "PER": {
       "base_iso2": "IR",
       "continent_label": "Asia",
-      "controller_feature_count": 41,
+      "controller_feature_count": 39,
       "display_name": "Iran",
       "entry_kind": "",
-      "feature_count": 41,
+      "feature_count": 39,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -107617,7 +107617,7 @@
       "provenance_iso2": "IR",
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 41
+        "direct_country_copy": 39
       },
       "rule_sources": [],
       "scenario_only": false,
@@ -108028,10 +108028,10 @@
     "RKK": {
       "base_iso2": "GE",
       "continent_label": "Asia",
-      "controller_feature_count": 338,
+      "controller_feature_count": 339,
       "display_name": "Reichskommissariat Kaukasien",
       "entry_kind": "scenario_country",
-      "feature_count": 338,
+      "feature_count": 339,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108046,7 +108046,7 @@
       "provenance_iso2": "GE",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 338
+        "manual_reviewed": 339
       },
       "rule_sources": [
         "tno_baseline_rkk"
@@ -108063,10 +108063,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 774,
+      "controller_feature_count": 767,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 774,
+      "feature_count": 767,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108081,7 +108081,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 774
+        "manual_reviewed": 767
       },
       "rule_sources": [
         "tno_baseline_rkm"
@@ -108339,10 +108339,10 @@
     "RUR": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 42,
+      "controller_feature_count": 43,
       "display_name": "Rurik Kingdom",
       "entry_kind": "scenario_country",
-      "feature_count": 42,
+      "feature_count": 43,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108355,7 +108355,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 42
+        "manual_reviewed": 43
       },
       "rule_sources": [
         "tno_1962_rur_manual_override"
@@ -108438,10 +108438,10 @@
     "SAM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 73,
+      "controller_feature_count": 74,
       "display_name": "Russian Liberation Army",
       "entry_kind": "scenario_country",
-      "feature_count": 73,
+      "feature_count": 74,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108454,7 +108454,8 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 73
+        "approx_existing_geometry": 73,
+        "manual_reviewed": 1
       },
       "rule_sources": [
         "tno_1962_sam_manual_override"
@@ -108568,10 +108569,10 @@
     "SER": {
       "base_iso2": "RS",
       "continent_label": "Europe",
-      "controller_feature_count": 48,
+      "controller_feature_count": 50,
       "display_name": "Serbian Administration",
       "entry_kind": "scenario_subject",
-      "feature_count": 48,
+      "feature_count": 50,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108586,7 +108587,7 @@
       "provenance_iso2": "RS",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 48
+        "manual_reviewed": 50
       },
       "rule_sources": [
         "tno_italy_ser"
@@ -108801,11 +108802,11 @@
     "SPR": {
       "base_iso2": "ES",
       "continent_label": "Europe",
-      "controller_feature_count": 4,
+      "controller_feature_count": 0,
       "display_name": "Spain",
       "entry_kind": "",
-      "feature_count": 4,
-      "hidden_from_country_list": false,
+      "feature_count": 0,
+      "hidden_from_country_list": true,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
         "tno_baseline"
@@ -108819,7 +108820,7 @@
       "provenance_iso2": "ES",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 4
+        "approx_existing_geometry": 0
       },
       "rule_sources": [
         "spanish_andorra_only"
@@ -109626,10 +109627,10 @@
     "VOL": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 30,
+      "controller_feature_count": 31,
       "display_name": "Vologda Neutral Zone",
       "entry_kind": "scenario_country",
-      "feature_count": 30,
+      "feature_count": 31,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -109642,7 +109643,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 30
+        "manual_reviewed": 31
       },
       "rule_sources": [
         "tno_1962_vol_manual_override"
@@ -109756,10 +109757,10 @@
     "WRS": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 28,
+      "controller_feature_count": 30,
       "display_name": "West Russian Revolutionary Front",
       "entry_kind": "scenario_country",
-      "feature_count": 28,
+      "feature_count": 30,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -109772,7 +109773,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 28
+        "manual_reviewed": 30
       },
       "rule_sources": [
         "tno_1962_wrs_manual_override"
@@ -110053,10 +110054,10 @@
     "ZLT": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 26,
+      "controller_feature_count": 25,
       "display_name": "Zlatoust",
       "entry_kind": "scenario_country",
-      "feature_count": 26,
+      "feature_count": 25,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -110069,7 +110070,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 26
+        "approx_existing_geometry": 25
       },
       "rule_sources": [
         "tno_1962_russia_zlt"
@@ -110089,13 +110090,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "39b7ed67f851e76434f82510c223645fffcea37a5da5f56c96a491a2ea42ddd3",
+  "snapshot_fingerprint": "e1a42e39a4d93b55baf89dfb906d4176e991e20636a5da25c35388a582a4874a",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-    "build_snapshot_sha256": "59ee35cd257a3f159483d507cb0ad4ea6e460cc506071d035720b60d2c4a7f6d",
-    "detail_chunk_manifest_sha256": "9249ccf3b4a3952fba9ad5b0a24918e62577fd8bdb02078a6562dcd88bb27ddd",
+    "build_snapshot_sha256": "466452dd517e7ef84e8a0070bdfe8fe3ee04ac56f47f4d14ac59348935b42ad0",
+    "detail_chunk_manifest_sha256": "8e5753fc9756648b56f3ba9cde6da241b81779b39aebdd714208524bb9777600",
     "runtime_bootstrap_topology_sha256": "e56805c31f92feae16a65fc947d93323915b9a80d47bac45e6c34734892975a1",
-    "runtime_topology_sha256": "908541ca1dc046cbaca3246dea44375331912fc06bf7964c355309891a48d698"
+    "runtime_topology_sha256": "ec7bb5bcc2c524a2941624329270f2ec8a215689123b26cceeebb70ffa45233a"
   },
   "summary": {
     "approximate_count": 859,
@@ -110106,7 +110107,7 @@
     "context_land_mask_area_delta_ratio": 0.009049578699125939,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.35,
-    "controller_count": 173,
+    "controller_count": 172,
     "controller_rule_count": 8,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
@@ -110116,7 +110117,7 @@
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
-    "owner_count": 173,
+    "owner_count": 172,
     "quality_counts": {
       "approx_existing_geometry": 919,
       "direct_country_copy": 2578,

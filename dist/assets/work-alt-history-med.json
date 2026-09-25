@@ -15,7 +15,6 @@
   "sources": [
     "data/scenarios/tno_1962/detail_chunks.manifest.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.alc.json",
-    "data/scenarios/tno_1962/chunks/political.detail.country.aoi.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.brg.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.bul.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.can.json",
@@ -40,7 +39,6 @@
     "data/scenarios/tno_1962/chunks/political.detail.country.mc.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.mnt.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.pal.json",
-    "data/scenarios/tno_1962/chunks/political.detail.country.per.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rkk.part.0.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rkm.part.4.json",
     "data/scenarios/tno_1962/chunks/political.detail.country.rkp.json",
@@ -60,8 +58,8 @@
   ],
   "counts": {
     "political_source_features": 1114,
-    "dissolved_country_owners": 30,
-    "political_detail_chunks": 39,
+    "dissolved_country_owners": 28,
+    "political_detail_chunks": 37,
     "source_atlantropa_features": 724,
     "rendered_atlantropa_features": 724,
     "rendered_atlantropa_layers": 3

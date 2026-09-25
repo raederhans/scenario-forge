@@ -147240,16 +147240,16 @@
       "bounds": [
         99.13599135991359,
         18.163701404014034,
-        131.68391683916838,
-        45.675003546035455
+        122.68382683826837,
+        42.13910081000809
       ],
       "priority": 95,
-      "feature_count": 1445,
-      "byte_size": 4305685,
-      "sha256": "166d610abae17c50f4a91489409ecefa5e2a878e4a894fb0fc6a8da1afa9c10f",
-      "coord_count": 37886,
-      "part_count": 1456,
-      "estimated_path_cost": 53869,
+      "feature_count": 1444,
+      "byte_size": 4300762,
+      "sha256": "5c3ab258930ed1f092a978b92a78341c63815999321f70b9dd5b43e2138763c5",
+      "coord_count": 37839,
+      "part_count": 1455,
+      "estimated_path_cost": 53811,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -154091,12 +154091,6 @@
           27.62575629556295
         ],
         [
-          130.639906399064,
-          44.86436703267033,
-          131.68391683916838,
-          45.675003546035455
-        ],
-        [
           107.12807128071285,
           26.91406256862568,
           107.66807668076683,
@@ -155926,7 +155920,9 @@
           112.02412024120241,
           30.40830518405184
         ]
-      ]
+      ],
+      "owner_code": "CHI",
+      "decoded_byte_size": 4300762
     },
     {
       "id": "political.detail.country.chl",
@@ -174548,12 +174544,12 @@
         53.53314379443795
       ],
       "priority": 95,
-      "feature_count": 234,
-      "byte_size": 1039068,
-      "sha256": "6cae7afed35452b688ea9986843171dec918a36e9e93facf21ef80d841eda513",
-      "coord_count": 9758,
-      "part_count": 236,
-      "estimated_path_cost": 12348,
+      "feature_count": 235,
+      "byte_size": 1043991,
+      "sha256": "da02b747aa06105f25baa43e5177ab609b1feb919bd9fa1302e37b92ebe09fd9",
+      "coord_count": 9805,
+      "part_count": 237,
+      "estimated_path_cost": 12406,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -175963,8 +175959,16 @@
           39.97103870038701,
           120.45180451804521,
           40.5837896408964
+        ],
+        [
+          130.639906399064,
+          44.86436703267033,
+          131.68391683916838,
+          45.675003546035455
         ]
-      ]
+      ],
+      "owner_code": "MAN",
+      "decoded_byte_size": 1043991
     },
     {
       "id": "political.detail.country.men",
@@ -274458,18 +274462,18 @@
       "min_zoom": 1.35,
       "max_zoom": 99.0,
       "bounds": [
-        35.76815768157681,
+        35.732157321573226,
         32.324670731707315,
         42.39582395823959,
         37.3169418504185
       ],
       "priority": 95,
-      "feature_count": 14,
-      "byte_size": 46061,
-      "sha256": "c66aa5ec2915b335d825c89a3951a7295fdbf929619ecba64de3064a040b1a7c",
-      "coord_count": 420,
-      "part_count": 15,
-      "estimated_path_cost": 582,
+      "feature_count": 15,
+      "byte_size": 48663,
+      "sha256": "f46d63513ce8477731530556d983ef74815e9922f3c22e2d06afc61cfe21a0ab",
+      "coord_count": 443,
+      "part_count": 16,
+      "estimated_path_cost": 616,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -274559,8 +274563,16 @@
           32.741271937719375,
           35.91215912159123,
           33.43039976599766
+        ],
+        [
+          35.732157321573226,
+          35.221784951849514,
+          36.27216272162721,
+          35.92653532535326
         ]
-      ]
+      ],
+      "owner_code": "SYR",
+      "decoded_byte_size": 48663
     },
     {
       "id": "political.detail.country.tai",
@@ -275529,29 +275541,23 @@
       "max_zoom": 99.0,
       "bounds": [
         25.652056520565225,
-        35.221784951849514,
+        35.8362717307173,
         44.80784807848079,
         42.097440689406895
       ],
       "priority": 95,
-      "feature_count": 82,
-      "byte_size": 296186,
-      "sha256": "d64466ff9c5b6a28f122fc200954fd2071db2a940575fae6d3f277dae19efc9d",
-      "coord_count": 2748,
-      "part_count": 86,
-      "estimated_path_cost": 3682,
+      "feature_count": 81,
+      "byte_size": 293584,
+      "sha256": "13c51f979bd13ce7fd4d78dcd6a36ce158a1a9c3850afa4cc4aceb7c060677d0",
+      "coord_count": 2725,
+      "part_count": 85,
+      "estimated_path_cost": 3648,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
         "TUR"
       ],
       "feature_bounds": [
-        [
-          35.732157321573226,
-          35.221784951849514,
-          36.27216272162721,
-          35.92653532535326
-        ],
         [
           27.956079560795615,
           40.81292030420305,
@@ -276038,7 +276044,9 @@
           42.97182971829719,
           38.250822887228864
         ]
-      ]
+      ],
+      "owner_code": "TUR",
+      "decoded_byte_size": 293584
     },
     {
       "id": "political.detail.country.urg",

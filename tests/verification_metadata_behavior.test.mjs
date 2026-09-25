@@ -62,6 +62,19 @@ test("HOI4 manual rules select the existing scenario checks without a route gap"
     entry.commandRef === "python -m unittest tests.test_build_hoi4_scenario tests.test_check_hoi4_scenario_bundle -q"));
 });
 
+test("scenario ownership rules select their regression tests without route gaps", () => {
+  for (const [file, command] of [
+    ["data/scenario-rules/hoi4_1939.manual.json", "python -m unittest tests.test_hoi4_territory_regressions -q"],
+    ["data/scenario-rules/tno_1962.russia_ownership.manual.json", "python -m unittest tests.test_tno_ownership_repairs -q"],
+  ]) {
+    const report = buildRepositoryRecommendation([file]);
+    assert.deepEqual(report.unmatchedChangedFiles, []);
+    assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+    assert.ok(report.recommendedCommands.some((entry) =>
+      entry.commandRef === command));
+  }
+});
+
 test("reviewed city names select executable Python and Node regression routes", () => {
   const routes = buildRouteIndex();
   const python = routes.find((route) => route.id === "city:reviewed-place-names-python");
