@@ -68,6 +68,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   stableJson,
   getDayNightRuntimeOwner,
   getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
+  getPaintContourRevision = () => runtimeState.colorRevision || 0,
 }) {
   let observedTopologyRevision = Number(runtimeState.topologyRevision || 0);
   const topologyRevisionByPass = new Map();
@@ -315,12 +316,13 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         getHgoRuntimePreviewVisibilitySignature(),
         getPassTopologyRevision(passName),
         getBorderAppearanceRevision(),
+        getPaintContourRevision(),
         runtimeState.cachedDynamicBordersHash || "",
         runtimeState.sovereigntyRevision || 0,
         0,
         runtimeState.activeScenarioId || "",
         runtimeState.scenarioBorderMode || "canonical",
-        "ownership",
+        "paint-contours",
         stableJson(runtimeState.parentBorderEnabledByCountry || {}),
         stableJson(runtimeState.styleConfig?.internalBorders || {}),
         stableJson(runtimeState.styleConfig?.empireBorders || {}),

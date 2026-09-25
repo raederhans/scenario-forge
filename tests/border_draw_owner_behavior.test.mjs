@@ -124,7 +124,7 @@ function createOwner({ hgoVectorScene = false, interactive = false, helpers = {}
       getInternalBorderStrokeColor: (_countryCode, fallbackColor) => fallbackColor,
       getSafeCanvasColor: (value, fallbackColor) => value || fallbackColor,
       getVisibleCountryCodesForBorderMeshes: () => new Set(["AAA"]),
-      isDynamicBordersEnabled: () => false,
+      getPaintContourMeshes: () => [mesh],
       isUsableMesh: (candidate) => !!candidate?.coordinates?.length,
       sanitizePolyline: (line) => (Array.isArray(line) ? line : []),
       ...helpers,
@@ -171,5 +171,19 @@ test("HGO vector scenes suppress canonical coastlines in both passes", () => {
     assert.ok(context.strokes.find(stroke => stroke.strokeStyle === "#222222"));
     assert.equal(context.strokes.find(stroke => stroke.strokeStyle === "#333333"), undefined);
     if (!interactive) assert.equal(coastalAccentCalls.length, 0);
+  }
+});
+
+
+test("empty or pending paint contours never revive cached reference borders", () => {
+  for (const interactive of [false, true]) {
+    const { owner, context, state } = createOwner({ helpers: { getPaintContourMeshes: () => [] } });
+    state.activeScenarioId = "tno_1962";
+    state.scenarioBorderMode = "scenario_owner_only";
+    state.cachedDynamicOwnerBorders = state.cachedCountryBorders[0];
+    state.cachedScenarioOpeningOwnerBorders = state.cachedCountryBorders[0];
+    owner.drawHierarchicalBorders(2, { interactive });
+    assert.equal(context.strokes.some(stroke => stroke.strokeStyle === "#222222"), false);
+    assert.ok(context.strokes.some(stroke => stroke.strokeStyle === "#333333"));
   }
 });

@@ -938,6 +938,7 @@
     },
     "tests/e2e/ownership_retirement.spec.js": {
       "directDependencies": [
+        "js/core/map_renderer.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
