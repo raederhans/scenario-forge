@@ -47,8 +47,10 @@ const definitions = [
         "primaryLayerStats"
       ]
     ],
-    "dependencyFingerprints": {},
-    "sourceFingerprint": "c41c6e3f39776556f2b930a15fa301bac390311f37167ac2687d0709721c3b6f",
+    "dependencyFingerprints": {
+      "js/core/paint_contour_source.js": "9412f0064b506cd07d56395fb46e0c3da3ba18bda43c00503920a5ecc15e20ca"
+    },
+    "sourceFingerprint": "8b2d728b4ad8b02fc48adb54f01b58ab1a00374719e0be2f1c91467434097dd8",
     "callbackBorrowedParameterIndexes": {
       "mergeScenarioChunkPayloads": [
         1
@@ -162,7 +164,8 @@ const callbackInjectionDefinitions =[
     "sourceFingerprints": {
       "js/core/scenario/chunk_runtime.js": "101ec13a55df42cf8d2172aaa9bb7c4783dd44327804a37bc3135fdc24d13eb2",
       "js/core/scenario_resources.js": "e36e72f798362aba893fc63cba90e5695b96e2fbf90217eab09f5012516457ca",
-      "js/core/scenario_chunk_manager.js": "5a75e7365981920d6f5a0755a675bd89c32a6e4837a6c94d368c7bf2535ad560",
+      "js/core/scenario_chunk_manager.js": "600141575549766e7be14102def421dd86f8476174ee4fb59f0ebb14996281dc",
+      "js/core/scenario/political_lod_policy.js": "2ddb65299ede3a51ce306f8e42bfa5b5710b0a7ac87c7eac8819142ee04a9c45",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
       "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
       "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5"
@@ -181,7 +184,8 @@ const callbackInjectionDefinitions =[
     "sourceFingerprints": {
       "js/core/scenario/chunk_runtime.js": "101ec13a55df42cf8d2172aaa9bb7c4783dd44327804a37bc3135fdc24d13eb2",
       "js/core/scenario_resources.js": "e36e72f798362aba893fc63cba90e5695b96e2fbf90217eab09f5012516457ca",
-      "js/core/scenario_chunk_manager.js": "5a75e7365981920d6f5a0755a675bd89c32a6e4837a6c94d368c7bf2535ad560",
+      "js/core/scenario_chunk_manager.js": "600141575549766e7be14102def421dd86f8476174ee4fb59f0ebb14996281dc",
+      "js/core/scenario/political_lod_policy.js": "2ddb65299ede3a51ce306f8e42bfa5b5710b0a7ac87c7eac8819142ee04a9c45",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
       "js/core/feature_identity_shared.js": "8f87083cb48bd69c7c0c31c5ae9227e9bde7aeec2435481f09a688dd490ededf",
       "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5"
