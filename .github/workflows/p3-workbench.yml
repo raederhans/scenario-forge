@@ -6,43 +6,54 @@ on:
 permissions:
   contents: read
 jobs:
-  snapshot:
+  coverage:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             js
-            tests
             tools
-            css
-            vendor
-            backend
-            map_backend
-            map_builder
-            scenario_builder
-            ops
-            landing
-            docs/architecture
-      - name: Snapshot source and small runtime metadata
+      - name: Compare complete reference membership with topology and coarse chunks
         run: |
-          mkdir -p .runtime/tmp
-          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
+          mkdir -p .runtime/reports/p3-coverage
           python - <<'PY'
+          import subprocess,json,gzip,hashlib
           from pathlib import Path
-          import subprocess
-          files = ['CATALOG.json','city_lights/historical_1930_entries.json','country_feature_policies.json','geo_aliases.json','locales.json','runtime_asset_registry.json','scenarios/index.json','thematic_layers/index.json','thematic_layers/political/state_capacity_demo/manifest.json','thematic_layers/political/wgi_state_capacity_v1/manifest.json','thematic_layers/population/population_density_demo/manifest.json','thematic_layers/social/human_development_demo/manifest.json','transport_layers/japan_road/manifest.json']
-          for name in files:
-              path=Path('data')/name
-              path.parent.mkdir(parents=True,exist_ok=True)
-              path.write_bytes(subprocess.check_output(['git','show',f'HEAD:{path.as_posix()}']))
+          reports=[]
+          def read(path):
+              data=subprocess.check_output(['git','show',f'HEAD:{path}'])
+              payload=json.loads(gzip.decompress(data) if path.endswith('.gz') else data)
+              return payload,hashlib.sha256(data).hexdigest()
+          def ids(data):
+              rows=data.get('features') or data.get('objects',{}).get('political',{}).get('geometries',[]) or []
+              return {str(row.get('properties',{}).get('id') or row.get('id') or '') for row in rows} - {''}
+          for scenario in ['blank_base','modern_world','hoi4_1936','hoi4_1939','tno_1962']:
+              manifest,_=read(f'data/scenarios/{scenario}/manifest.json')
+              owners,owners_hash=read(manifest['owners_url'])
+              reference=set(owners.get('owners',{}))
+              report={'scenario':scenario,'reference_count':len(reference),'reference_sha256':owners_hash,'sources':[]}
+              paths=[(key,manifest[key]) for key in ['runtime_bootstrap_topology_url','runtime_topology_url'] if manifest.get(key)]
+              chunk_url=manifest.get('detail_chunk_manifest_url')
+              if chunk_url:
+                  chunks,_=read(chunk_url)
+                  report['political_chunk_count']=sum(chunk.get('layer')=='political' for chunk in chunks.get('chunks',[]))
+                  paths += [('global_coarse_chunk',chunk['url']) for chunk in chunks.get('chunks',[]) if chunk.get('layer')=='political' and chunk.get('lod')=='coarse' and chunk.get('global_coverage')]
+              for kind,path in paths:
+                  payload,digest=read(path)
+                  feature_ids=ids(payload)
+                  missing=sorted(reference-feature_ids)
+                  report['sources'].append({'kind':kind,'path':path,'sha256':digest,'format':payload.get('type'),'feature_count':len(feature_ids),'missing_reference_count':len(missing),'missing_reference_examples':missing[:12]})
+                  del payload
+              reports.append(report)
+          output={'source_sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'kind':'membership_coverage_not_pixel_or_adjacency_proof','scenarios':reports}
+          Path('.runtime/reports/p3-coverage/coverage.json').write_text(json.dumps(output,indent=2))
+          print(json.dumps(output,indent=2))
           PY
-          tar --exclude=.git --exclude=.runtime -czf .runtime/tmp/source.tgz .
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: p3-audit-source
-          path: |
-            .runtime/tmp/source.tgz
-            .runtime/tmp/tracked-tree.txt
-          retention-days: 1
+          name: p3-reference-topology-coverage
+          path: .runtime/reports/p3-coverage
+          retention-days: 3
