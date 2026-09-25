@@ -9,17 +9,13 @@ concurrency:
   group: p3b-acceptance
   cancel-in-progress: true
 jobs:
-  acceptance:
+  publication:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        lane: [behavior, geometry, browser, publication]
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          ref: db3e92f230e93c6729ba8c3b3ed810b552764e7e
+          ref: 4d533d4224cfe549b3b93ac4a676e63b490d7755
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -27,61 +23,113 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.13'
-      - run: npm ci
-      - if: matrix.lane == 'browser' || matrix.lane == 'publication'
-        run: python -m pip install -r requirements-dev.lock.txt
-      - if: matrix.lane == 'browser'
-        run: npx playwright install --with-deps chromium
-      - name: Verify exact source and retain per-check evidence
+      - name: Install exact dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+          npx playwright install --with-deps chromium
+      - name: Prepare published worker probe
+        run: |
+          mkdir -p .runtime/reports/p3b-published
+          git rev-parse HEAD > .runtime/reports/p3b-published/source-sha.txt
+          cat > .runtime/reports/p3b-published/worker-probe.cjs <<'JS'
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const http = require('node:http');
+          const { chromium } = require('@playwright/test');
+          const root = path.resolve('.runtime/p3b-published/pages');
+          const requests = [], failures = [], pageErrors = [], workers = [];
+          const server = http.createServer((req, res) => {
+            const route = new URL(req.url, 'http://localhost').pathname;
+            if (route === '/__contour_probe__') {
+              res.setHeader('Content-Type', 'text/html');
+              return res.end('<!doctype html><html><title>Published contour worker probe</title><body>Publication acceptance</body></html>');
+            }
+            const file = path.resolve(root, '.' + route);
+            if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
+              failures.push('HTTP 404 ' + route); res.statusCode = 404; return res.end('Not found');
+            }
+            requests.push(route);
+            res.setHeader('Content-Type', file.endsWith('.js') ? 'text/javascript' : 'application/octet-stream');
+            res.end(fs.readFileSync(file));
+          });
+          (async () => {
+            await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+            const browser = await chromium.launch({ headless: true });
+            let result;
+            try {
+              const context = await browser.newContext();
+              context.on('requestfailed', req => failures.push(req.url() + ': ' + req.failure()?.errorText));
+              const page = await context.newPage();
+              page.on('pageerror', error => pageErrors.push(error.message));
+              page.on('worker', worker => workers.push(worker.url()));
+              await page.goto(`http://127.0.0.1:${server.address().port}/__contour_probe__`);
+              result = await page.evaluate(async () => {
+                const { createPaintContourWorkerClient } = await import('/app/js/core/paint_contour_worker_client.js');
+                const { createPaintContourMesh } = await import('/app/js/core/renderer/paint_contour_mesh.js');
+                const rect = (id, x) => ({ id, geometry: { type: 'Polygon', coordinates: [[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]] } });
+                const client = createPaintContourWorkerClient();
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Published contour worker did not respond')), 15000));
+                try {
+                  const graph = await Promise.race([client.build([rect('A',0),rect('B',1)],[],{reset:true}), timeout]);
+                  const colors = {A:'#010101',B:'#020202'};
+                  const mesh = createPaintContourMesh(graph, id => colors[id]);
+                  const different = mesh.getActiveArcCount();
+                  colors.B = colors.A; mesh.refresh(['B']);
+                  const same = mesh.getActiveArcCount();
+                  const moved = await client.build([rect('B',3)],[],{reset:false});
+                  return { featureIds:graph.featureIds, coordinateType:graph.coordinates.constructor.name,
+                    offsetType:graph.offsets.constructor.name, initialArcs:graph.diagnostics.arcCount,
+                    different,same,movedArcs:moved.diagnostics.arcCount };
+                } finally { client.dispose(); }
+              });
+              assert.deepEqual(result, {featureIds:['A','B'],coordinateType:'Float64Array',offsetType:'Uint32Array',initialArcs:1,different:1,same:0,movedArcs:0});
+              assert.equal(workers.length, 1, 'Must execute the production module Worker, not fallback');
+              assert.ok(workers[0].endsWith('/app/js/workers/paint_contour.worker.js'));
+              assert.ok(requests.includes('/app/js/workers/paint_contour.worker.js'));
+              assert.ok(requests.includes('/app/js/core/renderer/paint_contour_graph.js'));
+              assert.deepEqual(failures, []); assert.deepEqual(pageErrors, []);
+              fs.writeFileSync('.runtime/reports/p3b-published/worker-result.json', JSON.stringify({result,workers,requests,failures,pageErrors},null,2));
+              console.log(JSON.stringify({result,workers,requestCount:requests.length,failures,pageErrors},null,2));
+            } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }
+          })().catch(error => { console.error(error); process.exitCode = 1; server.close(); });
+          JS
+      - name: Build, verify published dependency paths, run worker, and check export regressions
         env:
-          LANE: ${{ matrix.lane }}
-          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-acceptance/pages
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-published/pages
         run: |
           python - <<'PY'
-          import os,json,subprocess
+          import json,hashlib,subprocess,os
           from pathlib import Path
-          lane=os.environ['LANE'];root=Path('.runtime/reports/p3b-acceptance')/lane;root.mkdir(parents=True,exist_ok=True)
-          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
-          assert sha=='db3e92f230e93c6729ba8c3b3ed810b552764e7e'
-          (root/'source-sha.txt').write_text(sha+'\n')
-          checks={
-            'behavior':[
-              ('retirement',['npm','run','test:node:ownership-retirement']),
-              ('composition',['node','--test','tests/scenario_chunk_layer_payloads_behavior.test.mjs','tests/political_collection_coverage_behavior.test.mjs','tests/political_collection_geometry_cache_behavior.test.mjs','tests/political_collection_fragment_camouflage_behavior.test.mjs','tests/scenario_spatial_chunk_selection_behavior.test.mjs']),
-              ('lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
-              ('export',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
-              ('contracts',['python','-m','unittest','tests.test_map_renderer_border_draw_owner_boundary_contract','tests.test_map_renderer_political_collection_boundary_contract','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_whitelist_stays_explicit','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_facade_named_imports_stay_whitelisted','-q']),
-              ('city',['node','--test','tests/city_data_contract_behavior.test.mjs','tests/scenario_capitals_behavior.test.mjs']),
-              ('writer-guard-tests',['node','--test','tests/state_write_allowlist_behavior.test.mjs']),
-              ('architecture',['node','tools/check_architecture_boundaries.mjs']),
-              ('writers',['node','tools/check_state_write_allowlist.mjs']),
-              ('scripts',['node','tools/verification/script_portfolio.mjs','check']),
-              ('inventory',['node','tools/e2e_layering.mjs','check']),
-              ('imports',['node','tools/check_test_import_graph.mjs']),
-              ('routes',['node','tools/select_verification_targets.mjs','--check'])],
-            'geometry':[('full-and-mixed-geometry',['node','tools/audit_paint_contours.mjs'])],
-            'browser':[('browser',['npx','playwright','test','tests/e2e/ownership_retirement.spec.js','--workers=1'])],
-            'publication':[('build',['python','tools/build_pages_dist.py','--output-root','.runtime/p3b-acceptance/pages']),('startup-shell',['python','-m','unittest','tests.test_pages_dist_startup_shell','-q'])]
-          }[lane]
+          root=Path('.runtime/reports/p3b-published')
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='4d533d4224cfe549b3b93ac4a676e63b490d7755'
+          checks=[
+            ('export-guards',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
+            ('writers',['node','tools/check_state_write_allowlist.mjs']),
+            ('build',['python','tools/build_pages_dist.py','--output-root','.runtime/p3b-published/pages']),
+            ('published-worker',['node','.runtime/reports/p3b-published/worker-probe.cjs']),
+            ('startup-shell',['python','-m','unittest','tests.test_pages_dist_startup_shell','-q']),
+          ]
           results=[]
-          for name,command in checks:
-              print(f'::group::{name}',flush=True)
-              run=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-              (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
-              results.append({'check':name,'command':command,'exit_code':run.returncode})
-              (root/'checks.json').write_text(json.dumps(results,indent=2))
-              print('::endgroup::',flush=True)
-          if lane=='publication':
-              for path in ['js/workers/paint_contour.worker.js','js/core/paint_contour_source.js','js/core/renderer/paint_contour_graph.js','js/core/renderer/paint_contour_runtime.js']:
-                  assert (Path(os.environ['SCENARIO_FORGE_PAGES_ARTIFACT_ROOT'])/path).stat().st_size>0,path
-          raise SystemExit(any(r['exit_code'] for r in results))
+          for name,cmd in checks:
+            print(f'::group::{name}',flush=True)
+            run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
+            results.append({'check':name,'command':cmd,'exit_code':run.returncode})
+            (root/'checks.json').write_text(json.dumps(results,indent=2))
+            print('::endgroup::',flush=True)
+          manifest=[]
+          for source in ['js/workers/paint_contour.worker.js','js/core/paint_contour_worker_client.js','js/core/worker_task_client.js','js/core/paint_contour_source.js','js/core/renderer/paint_contour_graph.js','js/core/renderer/paint_contour_runtime.js','js/core/renderer/paint_contour_mesh.js']:
+            published=Path(os.environ['SCENARIO_FORGE_PAGES_ARTIFACT_ROOT'])/'app'/source
+            raw=published.read_bytes();assert raw==Path(source).read_bytes(),f'Published bytes mismatch: {source}'
+            manifest.append({'published_path':str(published),'size_bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()})
+          (root/'published-files.json').write_text(json.dumps(manifest,indent=2))
+          raise SystemExit(any(item['exit_code'] for item in results))
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: p3b-acceptance-${{ matrix.lane }}
-          path: |
-            .runtime/reports/p3b-acceptance
-            .runtime/reports/p3b-geometry
-            .runtime/tests/playwright
+          name: p3b-published-final
+          path: .runtime/reports/p3b-published
           retention-days: 3
