@@ -5,53 +5,173 @@ on:
     paths: [.github/workflows/p3b-workbench.yml]
 permissions:
   contents: read
+concurrency:
+  group: p3b-isolated-workbench
+  cancel-in-progress: true
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      sha: ${{ steps.apply.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: codex/paint-contours-p3b-20260925
           sparse-checkout: |
             .github
             js
             tests
             tools
             docs/architecture
-            css
-            vendor
-            backend
-            map_backend
-            map_builder
-            scenario_builder
-            ops
-            landing
+      - name: Apply exact guarded P3B sources
+        id: apply
+        run: |
+          python .github/apply-p3b.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: derive interior land contours from persistent paint (P3B)'
+            git push origin HEAD:codex/paint-contours-p3b-20260925
+          fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  behavior:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm ci --ignore-scripts
-      - name: Collect exact sources and metadata without heavy geometry
-        run: |
-          mkdir -p .runtime/tmp
-          git rev-parse HEAD > .runtime/tmp/source-sha.txt
-          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-          paths=['data/runtime_asset_registry.json','data/country_feature_policies.json','data/CATALOG.json','data/thematic_layers/index.json','data/city_lights/historical_1930_entries.json','data/scenarios/index.json']
-          for scenario in ['blank_base','modern_world','hoi4_1936','hoi4_1939','tno_1962']:
-              paths += [f'data/scenarios/{scenario}/{name}' for name in ['manifest.json','owners.by_feature.json','countries.json','detail_chunks.manifest.json']]
-          for name in paths:
-              result=subprocess.run(['git','show',f'HEAD:{name}'],stdout=subprocess.PIPE)
-              if result.returncode: continue
-              path=Path(name);path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(result.stdout)
-          PY
-          tar --exclude='./.git' --exclude='./.runtime' -czf .runtime/tmp/source.tgz .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/setup-python@v5
         with:
-          name: p3b-source
+          python-version: '3.12'
+      - run: npm ci
+      - name: Validate product and integration contracts
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path('.runtime/reports/p3b-behavior');root.mkdir(parents=True,exist_ok=True)
+          (root/'source-sha.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'],text=True))
+          commands=[
+            ('node-retirement',['npm','run','test:node:ownership-retirement']),
+            ('lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
+            ('export-behavior',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
+            ('border-contract',['python','-m','unittest','tests.test_map_renderer_border_draw_owner_boundary_contract','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_whitelist_stays_explicit','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_facade_named_imports_stay_whitelisted','-q']),
+            ('architecture',['node','tools/check_architecture_boundaries.mjs']),
+            ('state-writes',['node','tools/check_state_write_allowlist.mjs']),
+            ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
+            ('e2e-inventory',['node','tools/e2e_layering.mjs','check']),
+            ('import-graph',['node','tools/check_test_import_graph.mjs']),
+            ('routes',['node','tools/select_verification_targets.mjs','--check']),
+          ]
+          results=[]
+          for name,command in commands:
+            print(f'::group::{name}',flush=True)
+            run=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
+            results.append({'check':name,'exit_code':run.returncode})
+            (root/'checks.json').write_text(json.dumps(results,indent=2))
+            print('::endgroup::',flush=True)
+          raise SystemExit(any(row['exit_code'] for row in results))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3b-behavior
+          path: .runtime/reports/p3b-behavior
+          retention-days: 3
+  geometry:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Audit actual topology and cross-source adjacency
+        run: |
+          mkdir -p .runtime/reports/p3b-geometry
+          git rev-parse HEAD > .runtime/reports/p3b-geometry/source-sha.txt
+          node tools/audit_paint_contours.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3b-geometry
+          path: .runtime/reports/p3b-geometry
+          retention-days: 3
+  browser:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser dependencies
+        run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+          npx playwright install --with-deps chromium
+      - name: Real worker pixels and composed scenario regressions
+        run: |
+          mkdir -p .runtime/reports/p3b-browser
+          git rev-parse HEAD > .runtime/reports/p3b-browser/source-sha.txt
+          set -o pipefail
+          npx playwright test tests/e2e/ownership_retirement.spec.js --workers=1 2>&1 | tee .runtime/reports/p3b-browser/playwright.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3b-browser
           path: |
-            .runtime/tmp/source.tgz
-            .runtime/tmp/source-sha.txt
-            .runtime/tmp/tracked-tree.txt
-          retention-days: 2
+            .runtime/reports/p3b-browser
+            .runtime/tests/playwright
+          retention-days: 3
+  publication:
+    needs: source
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          npm ci
+          python -m pip install -r requirements-dev.lock.txt
+      - name: Build and validate publication including worker assets
+        env:
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b/pages
+        run: |
+          mkdir -p .runtime/reports/p3b-publication
+          git rev-parse HEAD > .runtime/reports/p3b-publication/source-sha.txt
+          set -o pipefail
+          python tools/build_pages_dist.py --output-root .runtime/p3b/pages 2>&1 | tee .runtime/reports/p3b-publication/build.log
+          test -s .runtime/p3b/pages/js/workers/paint_contour.worker.js
+          python -m unittest tests.test_pages_dist_startup_shell -q 2>&1 | tee .runtime/reports/p3b-publication/startup-shell.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3b-publication
+          path: .runtime/reports/p3b-publication
+          retention-days: 3
