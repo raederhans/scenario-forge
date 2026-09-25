@@ -10,7 +10,7 @@ const end = source.indexOf("\nfunction composeTransformedFrameToBuffer(", start)
 assert.ok(start >= 0 && end > start);
 const exportSource = source.slice(start, end);
 
-function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false } = {}) {
+function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false, contourStatus = "ready", hgo = false } = {}) {
   const visibleCache = { canvases: { background: { width: 100, height: 50 } } };
   const runtimeState = {
     width: 100,
@@ -21,6 +21,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     zoomTransform: { k: 1, x: 0, y: 0 },
   };
   const calls = [];
+  let allocatedCanvases = 0;
   const context = vm.createContext({
     runtimeState,
     EXPORT_RENDER_BUDGET_BYTES,
@@ -28,15 +29,25 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
       ? EXPORT_RENDER_BUDGET_BYTES + 1
       : estimateExportRenderBytes(input),
     document: {
-      createElement: () => ({
-        width: 0,
-        height: 0,
-        getContext() { return { canvas: this, setTransform() {}, clearRect() {} }; },
-      }),
+      createElement: () => {
+        allocatedCanvases += 1;
+        return {
+          width: 0,
+          height: 0,
+          getContext() { return { canvas: this, setTransform() {}, clearRect() {} }; },
+        };
+      },
     },
+    isHgoRuntimePreviewReady: () => hgo,
+    getPaintContourRuntimeOwner: () => ({
+      diagnostics() { calls.push(`contours-${contourStatus}`); return { status: contourStatus }; },
+    }),
     getRenderPipelinePassesOwner: () => ({
       ensureIdleRenderPasses: () => calls.push("screen-pass"),
-      getIdleRenderPassDefinitions: () => [["background", () => calls.push("draw-source")]],
+      getIdleRenderPassDefinitions: () => [
+        ["background", () => calls.push("draw-source")],
+        ["borders", () => calls.push("draw-contours")],
+      ],
     }),
     getRenderPassCacheHostOwner: () => ({
       prepareRenderPassHost: ({ passName, drawFn }) => {
@@ -65,7 +76,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     createDefaultRenderPassCacheState: () => ({ canvases: {}, referenceTransforms: {} }),
   });
   vm.runInContext(exportSource, context);
-  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls };
+  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, allocatedCanvases: () => allocatedCanvases };
 }
 
 test("2x export redraws passes at target pixels and restores visible cache", () => {
@@ -113,3 +124,34 @@ for (const [name, options, message] of [
     assert.equal(h.runtimeState.dpr, 1);
   });
 }
+
+// Exercise the actual synchronous export entry, not a copy of the readiness guard.
+for (const contourStatus of ["building", "error"]) {
+  test(`border export rejects ${contourStatus} contours before allocation or cache mutation`, () => {
+    const h = harness({ contourStatus });
+    assert.throws(() => h.run(["background", "borders"], { pixelRatio: 2 }),
+      new RegExp(`Paint contours are ${contourStatus}`));
+    assert.equal(h.allocatedCanvases(), 0);
+    assert.deepEqual(h.calls, [`contours-${contourStatus}`]);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.runtimeState.dpr, 1);
+  });
+}
+
+for (const contourStatus of ["ready", "empty"]) {
+  test(`border export accepts a ${contourStatus} contour graph at exact target resolution`, () => {
+    const h = harness({ contourStatus });
+    const canvas = h.run(["borders"], { pixelRatio: 2 });
+    assert.equal(canvas.width, 200);
+    assert.deepEqual(h.calls, [`contours-${contourStatus}`, "render-borders-2", "draw-contours", "compose-200"]);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.runtimeState.dpr, 1);
+  });
+}
+
+test("HGO vector export does not depend on the separate land-contour worker", () => {
+  const h = harness({ hgo: true, contourStatus: "error" });
+  assert.ok(h.run(["borders"], { pixelRatio: 2 }));
+  assert.deepEqual(h.calls, ["render-borders-2", "draw-contours", "compose-200"]);
+  assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+});
