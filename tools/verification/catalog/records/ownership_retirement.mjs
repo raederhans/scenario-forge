@@ -47,5 +47,22 @@ export function createOwnershipRetirementRecords(existingRecords) {
     resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
     executionOwners: ["main-thread"], profiles: ["full"], platforms: ["all"],
     entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: start + 1, verification: null, selector: {},
+  }, {
+    id: "local:paint-contours:audit",
+    commandRef: "node tools/audit_paint_contours.mjs",
+    sourceRefs: ["tools/audit_paint_contours.mjs", "js/core/renderer/paint_contour_graph.js",
+      "js/core/renderer/paint_contour_mesh.js", "js/core/paint_contour_source.js"],
+    ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"], tiers: ["heavy"], cost: "heavy",
+    resourceLocks: [".runtime-output", "heavy-geo", "scenario-data"],
+    executionOwners: ["main-thread"], profiles: ["full"], platforms: ["all"],
+    entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: start + 2, verification: null, selector: {},
+  }, {
+    id: "local:paint-contours:routes",
+    commandRef: "node --test tests/paint_contour_verification_records.test.mjs",
+    sourceRefs: ["tools/verification/catalog/records/ownership_retirement.mjs",
+      "tests/paint_contour_verification_records.test.mjs", "tools/audit_paint_contours.mjs"],
+    ownerHints: ["test-routing"], domains: ["test-routing"], tiers: ["contract"], cost: "fast",
+    resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"], platforms: ["all"],
+    entrypointPolicyIndex: 5, verificationOrder: null, selectorOrder: start + 3, verification: null, selector: {},
   }];
 }
