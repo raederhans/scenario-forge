@@ -5,51 +5,83 @@ on:
     paths: [.github/workflows/p3b-acceptance.yml]
 permissions:
   contents: read
+concurrency:
+  group: p3b-acceptance
+  cancel-in-progress: true
 jobs:
-  source:
+  acceptance:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        lane: [behavior, geometry, browser, publication]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-          ref: 705ebbecb2ab7b3af8b493b8cb143e64dab265e0
+          ref: db3e92f230e93c6729ba8c3b3ed810b552764e7e
           persist-credentials: false
-          sparse-checkout: |
-            js
-            tests
-            tools
-            docs/architecture
-            css
-            vendor
-            backend
-            map_backend
-            map_builder
-            scenario_builder
-            ops
-            .github
-            landing
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - run: npm ci --ignore-scripts
-      - name: Package exact code and direct-import metadata
-        run: |
-          mkdir -p .runtime/tmp
-          git rev-parse HEAD > .runtime/tmp/source-sha.txt
-          git ls-tree -r HEAD > .runtime/tmp/tracked-tree.txt
-          python - <<'PY'
-          import subprocess
-          from pathlib import Path
-          for name in ['runtime_asset_registry.json','country_feature_policies.json','CATALOG.json','thematic_layers/index.json','city_lights/historical_1930_entries.json','scenarios/index.json']:
-              path=Path('data')/name;path.parent.mkdir(parents=True,exist_ok=True)
-              path.write_bytes(subprocess.check_output(['git','show',f'HEAD:{path.as_posix()}']))
-          PY
-          tar --exclude=./.git --exclude=./.runtime --exclude=./dist -czf .runtime/tmp/source.tgz .
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
-          name: p3b-source-review
+          python-version: '3.13'
+      - run: npm ci
+      - if: matrix.lane == 'browser' || matrix.lane == 'publication'
+        run: python -m pip install -r requirements-dev.lock.txt
+      - if: matrix.lane == 'browser'
+        run: npx playwright install --with-deps chromium
+      - name: Verify exact source and retain per-check evidence
+        env:
+          LANE: ${{ matrix.lane }}
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/p3b-acceptance/pages
+        run: |
+          python - <<'PY'
+          import os,json,subprocess
+          from pathlib import Path
+          lane=os.environ['LANE'];root=Path('.runtime/reports/p3b-acceptance')/lane;root.mkdir(parents=True,exist_ok=True)
+          sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          assert sha=='db3e92f230e93c6729ba8c3b3ed810b552764e7e'
+          (root/'source-sha.txt').write_text(sha+'\n')
+          checks={
+            'behavior':[
+              ('retirement',['npm','run','test:node:ownership-retirement']),
+              ('composition',['node','--test','tests/scenario_chunk_layer_payloads_behavior.test.mjs','tests/political_collection_coverage_behavior.test.mjs','tests/political_collection_geometry_cache_behavior.test.mjs','tests/political_collection_fragment_camouflage_behavior.test.mjs','tests/scenario_spatial_chunk_selection_behavior.test.mjs']),
+              ('lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
+              ('export',['node','--test','tests/export_target_resolution_behavior.test.mjs','tests/exact_composite_reuse_behavior.test.mjs']),
+              ('contracts',['python','-m','unittest','tests.test_map_renderer_border_draw_owner_boundary_contract','tests.test_map_renderer_political_collection_boundary_contract','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_whitelist_stays_explicit','tests.test_map_renderer_public_contract.MapRendererPublicContractTest.test_public_facade_named_imports_stay_whitelisted','-q']),
+              ('city',['node','--test','tests/city_data_contract_behavior.test.mjs','tests/scenario_capitals_behavior.test.mjs']),
+              ('writer-guard-tests',['node','--test','tests/state_write_allowlist_behavior.test.mjs']),
+              ('architecture',['node','tools/check_architecture_boundaries.mjs']),
+              ('writers',['node','tools/check_state_write_allowlist.mjs']),
+              ('scripts',['node','tools/verification/script_portfolio.mjs','check']),
+              ('inventory',['node','tools/e2e_layering.mjs','check']),
+              ('imports',['node','tools/check_test_import_graph.mjs']),
+              ('routes',['node','tools/select_verification_targets.mjs','--check'])],
+            'geometry':[('full-and-mixed-geometry',['node','tools/audit_paint_contours.mjs'])],
+            'browser':[('browser',['npx','playwright','test','tests/e2e/ownership_retirement.spec.js','--workers=1'])],
+            'publication':[('build',['python','tools/build_pages_dist.py','--output-root','.runtime/p3b-acceptance/pages']),('startup-shell',['python','-m','unittest','tests.test_pages_dist_startup_shell','-q'])]
+          }[lane]
+          results=[]
+          for name,command in checks:
+              print(f'::group::{name}',flush=True)
+              run=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+              (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
+              results.append({'check':name,'command':command,'exit_code':run.returncode})
+              (root/'checks.json').write_text(json.dumps(results,indent=2))
+              print('::endgroup::',flush=True)
+          if lane=='publication':
+              for path in ['js/workers/paint_contour.worker.js','js/core/paint_contour_source.js','js/core/renderer/paint_contour_graph.js','js/core/renderer/paint_contour_runtime.js']:
+                  assert (Path(os.environ['SCENARIO_FORGE_PAGES_ARTIFACT_ROOT'])/path).stat().st_size>0,path
+          raise SystemExit(any(r['exit_code'] for r in results))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p3b-acceptance-${{ matrix.lane }}
           path: |
-            .runtime/tmp/source.tgz
-            .runtime/tmp/source-sha.txt
-            .runtime/tmp/tracked-tree.txt
-          retention-days: 2
+            .runtime/reports/p3b-acceptance
+            .runtime/reports/p3b-geometry
+            .runtime/tests/playwright
+          retention-days: 3
