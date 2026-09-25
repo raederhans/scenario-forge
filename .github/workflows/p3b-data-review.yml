@@ -1,0 +1,46 @@
+name: P3B geometry review inputs
+on:
+  push:
+    branches: [codex/paint-contours-p3b-20260925]
+    paths: [.github/workflows/p3b-data-review.yml]
+permissions:
+  contents: read
+jobs:
+  inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            js
+            tools
+            vendor
+      - name: Collect topology and active-source seam inputs
+        run: |
+          mkdir -p .runtime/tmp/inputs
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path('.runtime/tmp/inputs')
+          def get(name):
+              p=root/name;p.parent.mkdir(parents=True,exist_ok=True)
+              data=subprocess.check_output(['git','show',f'HEAD:{name}']);p.write_bytes(data)
+              return json.loads(data)
+          for scenario in ['modern_world','hoi4_1936','hoi4_1939','tno_1962']:
+              m=get(f'data/scenarios/{scenario}/manifest.json')
+              get(m['runtime_topology_url'])
+              if scenario=='tno_1962':
+                  for key in ['scenario_atlantropa_topology_url','runtime_bootstrap_topology_url']:
+                      if m.get(key):get(m[key])
+                  entries=get(m['detail_chunk_manifest_url'])['chunks']
+                  coarse=next(c for c in entries if c['layer']=='political' and c.get('lod')=='coarse' and c.get('global_coverage'))
+                  get(coarse['url'])
+                  for c in [c for c in entries if c['layer']=='political' and c.get('lod')!='coarse'][:2]:get(c['url'])
+          PY
+          tar -czf .runtime/tmp/geometry-inputs.tgz -C .runtime/tmp/inputs .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p3b-geometry-inputs
+          path: .runtime/tmp/geometry-inputs.tgz
+          retention-days: 2
