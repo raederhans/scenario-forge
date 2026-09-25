@@ -209,8 +209,13 @@ export function createUrbanCityPolicyOwner({
       overrideEntry.stable_key,
     ].filter(Boolean).map((value) => String(value).trim())));
     const overrideMinZoom = Number(overrideEntry.min_zoom ?? overrideEntry.minZoom);
-    return cloneCityFeature(feature, {
+    const nextFeature = cloneCityFeature(feature, {
       __city_aliases: nextAliases,
+      ...(overrideEntry.host_feature_id ? {
+        host_feature_id: String(overrideEntry.host_feature_id),
+        __city_host_feature_id: String(overrideEntry.host_feature_id),
+        __city_has_host_override: true,
+      } : {}),
       __city_has_display_name_override: hasDisplayNameOverride,
       __city_display_name_override: hasDisplayNameOverride ? { ...displayName } : null,
       __city_hidden: overrideEntry.hidden === undefined ? !!props.__city_hidden : !!overrideEntry.hidden,
@@ -226,6 +231,13 @@ export function createUrbanCityPolicyOwner({
       name_zh: String(displayName.zh || overrideEntry.name_zh || props.name_zh || "").trim(),
       label_zh: String(displayName.zh || overrideEntry.name_zh || props.label_zh || props.name_zh || "").trim(),
     });
+    if (Number.isFinite(overrideEntry.lon) && Number.isFinite(overrideEntry.lat)
+      && Math.abs(overrideEntry.lon) <= 180 && Math.abs(overrideEntry.lat) <= 90) {
+      nextFeature.geometry = { type: "Point", coordinates: [overrideEntry.lon, overrideEntry.lat] };
+      nextFeature.properties.lon = overrideEntry.lon;
+      nextFeature.properties.lat = overrideEntry.lat;
+    }
+    return nextFeature;
   }
 
   function normalizeStrategicCityReference(value) {
@@ -566,6 +578,10 @@ export function createUrbanCityPolicyOwner({
       Object.keys(state.scenarioCountriesByTag).forEach((rawTag) => {
         const tag = String(rawTag || "").trim().toUpperCase();
         if (!tag) return;
+        const country = state.scenarioCountriesByTag[rawTag];
+        const capitalHint = state.scenarioCityOverridesData?.capital_city_hints?.[tag];
+        if ((scenarioId !== "blank_base" && country?.feature_count === 0)
+          || capitalHint?.resolution_method === "no_capital") return;
         const explicitKey = resolveCityFeatureKey(state.scenarioCityOverridesData?.capitals_by_tag?.[tag], featuresByKey, aliasToKey);
         const hintedKey = explicitKey
           ? ""
@@ -591,9 +607,16 @@ export function createUrbanCityPolicyOwner({
     Array.from(featuresByKey.entries()).forEach(([key, feature]) => {
       const cityId = getCityCanonicalId(feature) || key;
       const nextIsCapital = scenarioId ? activeCapitalCityIds.has(cityId) : !!feature?.properties?.__city_is_capital;
+      // Country-capital priority must follow the scenario, including newly
+      // promoted regional cities and former modern capitals being demoted.
+      const nextIsCountryCapital = scenarioId ? nextIsCapital : !!feature?.properties?.__city_is_country_capital;
       const nextFeature = feature?.properties?.__city_is_capital === nextIsCapital
+          && feature?.properties?.__city_is_country_capital === nextIsCountryCapital
         ? feature
-        : cloneCityFeature(feature, { __city_is_capital: nextIsCapital });
+        : cloneCityFeature(feature, {
+          __city_is_capital: nextIsCapital,
+          __city_is_country_capital: nextIsCountryCapital,
+        });
       const strategicFeature = applyStrategicVictoryPointRank(nextFeature);
       if (!strategicFeature?.properties?.__city_hidden && !shouldHideCityPointForScenarioCountry(strategicFeature)) {
         finalFeatures.push(strategicFeature);

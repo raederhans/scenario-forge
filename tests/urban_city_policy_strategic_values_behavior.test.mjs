@@ -78,6 +78,63 @@ function createOwner(state) {
   });
 }
 
+test("scenario capitals promote regional cities, demote modern capitals and restore on exit", () => {
+  const base = [
+    createCityFeature("kyoto", "JP", { __city_is_capital: true, __city_is_country_capital: true }),
+    createCityFeature("tokyo", "JP", { __city_is_capital: false, __city_is_country_capital: false }),
+  ];
+  const state = {
+    activeScenarioId: "test", worldCitiesData: { features: base },
+    scenarioCountriesByTag: { JAP: { feature_count: 1 } },
+    sovereigntyByFeatureId: { JP: "JAP" },
+    scenarioCityOverridesData: { capitals_by_tag: { JAP: "tokyo" } },
+  };
+  const owner = createOwner(state);
+  const scenario = owner.getEffectiveCityCollection().features;
+  assert.equal(scenario[0].properties.__city_is_country_capital, false);
+  assert.equal(scenario[1].properties.__city_is_country_capital, true);
+  assert.equal(scenario[1].properties.__city_is_capital, true);
+  assert.equal(base[0].properties.__city_is_country_capital, true);
+  state.activeScenarioId = "";
+  state.scenarioCityOverridesData = null;
+  const restored = owner.getEffectiveCityCollection().features;
+  assert.equal(restored[0].properties.__city_is_country_capital, true);
+  assert.equal(restored[1].properties.__city_is_country_capital, false);
+});
+
+test("anarchy and dormant countries cannot acquire a fallback or stale explicit capital", () => {
+  const state = {
+    activeScenarioId: "tno_1962",
+    worldCitiesData: { features: [createCityFeature("niamey", "NE"), createCityFeature("dormant", "FR")] },
+    scenarioCountriesByTag: { AFA: { feature_count: 1 }, OLD: { feature_count: 0 } },
+    sovereigntyByFeatureId: { NE: "AFA", FR: "OLD" },
+    scenarioCityOverridesData: {
+      capitals_by_tag: { OLD: "dormant" },
+      capital_city_hints: { AFA: { resolution_method: "no_capital" } },
+    },
+  };
+  assert.ok(createOwner(state).getEffectiveCityCollection().features.every((f) => !f.properties.__city_is_capital));
+});
+
+test("scenario placement changes marker and host without mutating the base city", () => {
+  const base = createCityFeature("capital", "old-host");
+  const state = {
+    activeScenarioId: "test", worldCitiesData: { features: [base] },
+    scenarioCountriesByTag: { AAA: {} }, sovereigntyByFeatureId: { "new-host": "AAA" },
+    scenarioCityOverridesData: { capitals_by_tag: { AAA: "capital" }, cities: {
+      capital: { city_id: "capital", host_feature_id: "new-host", lon: 12.5, lat: 53,
+        display_name: { en: "Capital", zh: "首都" } },
+    } },
+  };
+  const owner = createOwner(state);
+  const result = owner.getEffectiveCityCollection().features[0];
+  assert.equal(owner.getCityScenarioTag(result), "AAA");
+  assert.deepEqual(result.geometry.coordinates, [12.5, 53]);
+  assert.equal(result.properties.name_zh, "首都");
+  assert.deepEqual(base.geometry.coordinates, [13.4, 52.5]);
+  assert.equal(base.properties.__city_host_feature_id, "old-host");
+});
+
 test("urban city policy owns revision-sensitive render pass signature parts", () => {
   const state = {
     cityLayerRevision: 4,
