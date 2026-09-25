@@ -11,7 +11,7 @@ concurrency:
 jobs:
   source:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     permissions:
       contents: write
     outputs:
@@ -20,27 +20,65 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: codex/visual-editing-p3-20260925
+          fetch-depth: 40
           sparse-checkout: |
             .github
             js
             tests
             tools
             docs/architecture
-      - name: Publish exact verified source on isolated branch
+      - name: Apply reviewed fixes and retain merged capital corrections
         id: source
         run: |
-          python .github/apply-p3a.py
+          python .github/apply-p3-review.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if ! git diff --cached --quiet; then
-            git commit -m 'refactor: migrate reference consumers and unify visual country transactions (P3A)'
-            git push origin HEAD:codex/visual-editing-p3-20260925
+            git commit -m 'fix: reject partial developer fills and verify shared paint publication'
           fi
+          git fetch origin aed67962d6f814c7a2d86e3e6d2fb43385704404 --depth=8
+          git merge --no-edit --no-ff aed67962d6f814c7a2d86e3e6d2fb43385704404
+          git push origin HEAD:codex/visual-editing-p3-20260925
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: aed67962d6f814c7a2d86e3e6d2fb43385704404
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - name: Independently recheck merged P1/P2 and record the historical proof limitation
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path('.runtime/reports/p3-baseline');root.mkdir(parents=True,exist_ok=True)
+          (root/'source-sha.txt').write_text(subprocess.check_output(['git','rev-parse','HEAD'],text=True))
+          checks=[('p1p2-behavior',['npm','run','test:node:ownership-retirement']),('boundaries',['node','tools/check_architecture_boundaries.mjs']),('write-allowlist',['node','tools/check_state_write_allowlist.mjs'])]
+          results=[]
+          for name,cmd in checks:
+            run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            (root/f'{name}.log').write_text(run.stdout); print(run.stdout,flush=True)
+            results.append({'check':name,'exit_code':run.returncode})
+          proof=subprocess.run(['node','tools/check_state_writer_policy.mjs','--json'],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+          (root/'historical-proof.log').write_text(proof.stdout)
+          (root/'checks.json').write_text(json.dumps({'checks':results,'historical_proof_exit_code':proof.returncode},indent=2))
+          raise SystemExit(any(row['exit_code'] for row in results))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p3-baseline-evidence
+          path: .runtime/reports/p3-baseline
+          retention-days: 3
   behavior:
     needs: source
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +90,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
-      - name: Behavior, full-data lifecycle, reference audit and module boundaries
+      - name: Behavior, complete reference data and integration boundaries
         run: |
           python - <<'PY'
           import json,subprocess
@@ -63,19 +101,26 @@ jobs:
             ('node-p3',['npm','run','test:node:ownership-retirement']),
             ('scenario-lifecycle',['npm','run','test:node:scenario-lifecycle-runtime-behavior']),
             ('python-boundaries',['python','-m','unittest','tests.test_map_renderer_color_resolution_strategy_boundary_contract','tests.test_scenario_state_actions_boundary_contract','tests.test_sidebar_split_boundary_contract','tests.test_map_renderer_click_selection_transaction_boundary_contract','tests.test_history_manager_strategic_overlay_contract','-q']),
+            ('architecture',['node','tools/check_architecture_boundaries.mjs']),
             ('state-write-allowlist',['node','tools/check_state_write_allowlist.mjs']),
             ('script-portfolio',['node','tools/verification/script_portfolio.mjs','check']),
+            ('e2e-inventory',['node','tools/e2e_layering.mjs','check']),
+            ('import-graph',['node','tools/check_test_import_graph.mjs']),
+            ('route-schema',['node','tools/select_verification_targets.mjs','--check']),
             ('quick-fill-real-data',['node','tools/audit_quick_fill.mjs']),
+            ('capital-regressions',['node','--test','tests/city_data_contract_behavior.test.mjs','tests/scenario_capitals_behavior.test.mjs','tests/urban_city_policy_strategic_values_behavior.test.mjs']),
           ]
           results=[]
           for name,cmd in checks:
             print(f'::group::{name}',flush=True)
             run=subprocess.run(cmd,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            (root/f'{name}.log').write_text(run.stdout)
-            print(run.stdout,flush=True)
+            (root/f'{name}.log').write_text(run.stdout);print(run.stdout,flush=True)
             results.append({'check':name,'exit_code':run.returncode,'command':cmd})
             (root/'checks.json').write_text(json.dumps(results,indent=2))
             print('::endgroup::',flush=True)
+          proof=subprocess.run(['node','tools/check_state_writer_policy.mjs','--json'],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+          (root/'historical-proof.log').write_text(proof.stdout)
+          (root/'historical-proof-status.json').write_text(json.dumps({'exit_code':proof.returncode}))
           raise SystemExit(any(row['exit_code'] for row in results))
           PY
       - uses: actions/upload-artifact@v4
@@ -89,7 +134,7 @@ jobs:
   browser:
     needs: source
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,7 +167,7 @@ jobs:
   publication:
     needs: source
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
