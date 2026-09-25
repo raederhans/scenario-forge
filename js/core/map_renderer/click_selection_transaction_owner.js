@@ -99,6 +99,7 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "ensureLeafDetailReady",
   "getFeatureCountryCodeNormalized",
   "getFeatureOwnerCode",
+  "getFeaturePaintColor",
   "getHitFromEvent",
   "getHoveredFacilityEntryFromEvent",
   "getIntensityFieldTool",
@@ -135,6 +136,7 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "toggleFeatureInDevSelection",
   "updateDevSelectedHit",
   "warnMissingActiveSovereign",
+  "warnIncompletePaintTargets",
 ]);
 const CLICK_SELECTION_ACTION_NAMES = Object.freeze([
   "clearClickHoverIds",
@@ -161,7 +163,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const getClickState = requireFunction(getters.getClickState, "getters.getClickState");
   const getSelectedFacilityEntry = requireFunction(getters.getSelectedFacilityEntry, "getters.getSelectedFacilityEntry");
   const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry, togglePresetRegion } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
-  const { addRecentColor, appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeatureOwnerCode, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, inspectHgoRuntimePreviewFromEvent, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, isSovereigntyModeActive, markDirty, markLegacyColorStateDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshResolvedColorsForFeatures, refreshResolvedColorsForOwners, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resetFeatureOwnerCodes, resolveInteractionTargetIds, scheduleDynamicBorderRecompute, setFeatureOwnerCodes, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnMissingActiveSovereign } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
+  const { addRecentColor, appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeatureOwnerCode, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, inspectHgoRuntimePreviewFromEvent, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, isSovereigntyModeActive, markDirty, markLegacyColorStateDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshResolvedColorsForFeatures, refreshResolvedColorsForOwners, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resetFeatureOwnerCodes, resolveInteractionTargetIds, scheduleDynamicBorderRecompute, setFeatureOwnerCodes, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnMissingActiveSovereign, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
@@ -408,163 +410,53 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
       return;
     }
 
-    if (state.currentTool === "eraser") {
-      const shouldRefreshCountryList = (!!countryCode);
-      let historyBefore = null;
-      if (isSovereigntyModeActive()) {
-        historyBefore = captureHistoryState({
-          sovereigntyFeatureIds: targetIds,
-        });
-        const changed = resetFeatureOwnerCodes(targetIds);
-        if (changed > 0) {
-          refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-          markDirty("erase-sovereignty");
-          if (targetIds.length > 1) {
-            scheduleDynamicBorderRecompute("sovereignty-batch-reset", 90);
-          } else {
-            scheduleDynamicBorderRecompute("sovereignty-single-reset", 150);
-          }
-          commitHistoryEntry({
-            kind: "erase-sovereignty",
-            before: historyBefore,
-            after: captureHistoryState({
-              sovereigntyFeatureIds: targetIds,
-            }),
-            affectsSovereignty: true,
-          });
-        }
-      } else if (state.interactionGranularity === "country" && countryCode) {
-        historyBefore = captureHistoryState({
-          ownerCodes: [countryCode],
-        });
-        removeClickCountryColors(countryCode);
-        markLegacyColorStateDirty();
-        refreshResolvedColorsForOwners([countryCode], { renderNow: false });
-        markDirty("erase-country-color");
-        commitHistoryEntry({
-          kind: "erase-country-color",
-          before: historyBefore,
-          after: captureHistoryState({
-            ownerCodes: [countryCode],
-          }),
-        });
-      } else {
-        historyBefore = captureHistoryState({
-          featureIds: targetIds,
-        });
-        applyFeatureVisualOverrideTransaction(targetIds, null, {
-          remove: true,
-          inputStartedAt: actionStart,
-          inputLabel: "erase-feature-color",
-        });
-        markDirty("erase-feature-color");
-        commitHistoryEntry({
-          kind: "erase-feature-color",
-          before: historyBefore,
-          after: captureHistoryState({
-            featureIds: targetIds,
-          }),
-        });
-      }
-      requestInteractionRender("click-erase");
-      if (shouldRefreshCountryList) {
-        refreshSidebarAfterPaint({
-          featureIds: targetIds,
-          ownerCodes: countryCode ? [countryCode] : [],
-        });
-      }
-      noteRenderAction("click-erase", actionStart);
-      return;
-    }
-
     if (state.currentTool === "eyedropper") {
-      if (isSovereigntyModeActive()) {
-        const ownerCode = getFeatureOwnerCode(landId) || countryCode;
-        if (ownerCode) {
-          const previousActiveOwner = state.activeSovereignCode;
-          setClickActiveSovereignCode(ownerCode, { updateUi: true });
-          refreshSidebarAfterPaint({
-            ownerCodes: [previousActiveOwner, ownerCode],
-          });
-        }
-      } else {
-        const picked =
-          (state.interactionGranularity === "country" && countryCode
-            ? getSafeCanvasColor(state.sovereignBaseColors?.[countryCode] || state.countryBaseColors?.[countryCode], null)
-            : null) ||
-          getSafeCanvasColor(state.colors[landId], null);
-        if (picked) setClickSelectedColor(picked, { updateSwatch: true });
-      }
+      // Sample persistent paint, never a heatmap/highlight rendered into colors.
+      const picked = getSafeCanvasColor(getFeaturePaintColor(landId), null);
+      if (picked) setClickSelectedColor(picked, { updateSwatch: true });
       noteRenderAction("eyedropper", actionStart);
       return;
     }
 
-    const selectedColor = getSafeCanvasColor(state.selectedColor, landFillColor);
-    setClickSelectedColor(selectedColor);
-    if (isSovereigntyModeActive()) {
-      const historyBefore = captureHistoryState({
-        sovereigntyFeatureIds: targetIds,
-      });
-      if (!state.activeSovereignCode) {
-        warnMissingActiveSovereign();
-        return;
-      }
-      const changed = setFeatureOwnerCodes(targetIds, state.activeSovereignCode);
-      if (changed > 0) {
-        refreshResolvedColorsForFeatures(targetIds, { renderNow: false });
-        if (targetIds.length > 1) {
-          scheduleDynamicBorderRecompute("sovereignty-batch-fill", 90);
-        } else {
-          scheduleDynamicBorderRecompute("sovereignty-single-fill", 150);
-        }
-      }
-      if (changed > 0) {
-        markDirty("fill-sovereignty");
-        commitHistoryEntry({
-          kind: "fill-sovereignty",
-          before: historyBefore,
-          after: captureHistoryState({
-            sovereigntyFeatureIds: targetIds,
-          }),
-          affectsSovereignty: true,
-        });
-      }
-    } else if (state.interactionGranularity === "country" && countryCode) {
-      const historyBefore = captureHistoryState({
-        ownerCodes: [countryCode],
-      });
-      setClickCountryColors(countryCode, selectedColor);
-      markLegacyColorStateDirty();
-      refreshResolvedColorsForOwners([countryCode], { renderNow: false });
-      markDirty("fill-country-color");
-      commitHistoryEntry({
-        kind: "fill-country-color",
-        before: historyBefore,
-        after: captureHistoryState({
-          ownerCodes: [countryCode],
-        }),
-      });
-    } else {
-      const clickCount = Math.max(1, Number(event?.detail || 1));
-      if (clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature)) {
-        return;
-      }
-      applyVisualSubdivisionFill(targetIds, selectedColor, {
-        kind: "fill-feature-color",
-        dirtyReason: "fill-feature-color",
-        gesture: { type: "leaf-click", featureId: landId, timeStamp: Number(event?.timeStamp) },
-      });
+    if (!targetIds.length) {
+      // Country and parent scopes must not silently edit only loaded geometry.
+      warnIncompletePaintTargets();
       return;
     }
-    addRecentColor(selectedColor);
-    requestInteractionRender("click-fill");
-    if (isSovereigntyModeActive() || (state.interactionGranularity === "country" && countryCode)) {
-      refreshSidebarAfterPaint({
-        featureIds: targetIds,
-        ownerCodes: countryCode ? [countryCode] : [],
+    const countryScope = state.interactionGranularity === "country";
+    if (state.currentTool === "eraser") {
+      const kind = countryScope ? "erase-country-color" : "erase-feature-color";
+      const before = captureHistoryState({ featureIds: targetIds });
+      applyFeatureVisualOverrideTransaction(targetIds, null, {
+        remove: true,
+        inputStartedAt: actionStart,
+        inputLabel: kind,
       });
+      markDirty(kind);
+      commitHistoryEntry({
+        kind, before, after: captureHistoryState({ featureIds: targetIds }),
+      });
+      requestInteractionRender("click-erase");
+      refreshSidebarAfterPaint({ featureIds: targetIds });
+      noteRenderAction("click-erase", actionStart);
+      return;
     }
-    noteRenderAction("click-fill", actionStart);
+
+    const selectedColor = getSafeCanvasColor(state.selectedColor, landFillColor);
+    const clickCount = Math.max(1, Number(event?.detail || 1));
+    if (!countryScope && clickCount >= 2 && isDoubleClickBatchEligible(landHit, feature)) {
+      return;
+    }
+    setClickSelectedColor(selectedColor);
+    const kind = countryScope ? "fill-country-color" : "fill-feature-color";
+    applyVisualSubdivisionFill(targetIds, selectedColor, {
+      kind,
+      dirtyReason: kind,
+      ...(!countryScope ? {
+        gesture: { type: "leaf-click", featureId: landId, timeStamp: Number(event?.timeStamp) },
+      } : {}),
+    });
+
   }
 
 

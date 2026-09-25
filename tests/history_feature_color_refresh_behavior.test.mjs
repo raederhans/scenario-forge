@@ -116,7 +116,7 @@ test('feature-only history refreshes color and selection UI without rebuilding u
   ]);
 });
 
-test('mixed and ownership history retain the complete UI refresh set', t => {
+test('mixed history retains broad UI refresh while retired ownership entries are rejected', t => {
   const oldDocument = globalThis.document;
   const hadDocument = Object.hasOwn(globalThis, 'document');
   const hookNames = [
@@ -165,7 +165,9 @@ test('mixed and ownership history retain the complete UI refresh set', t => {
     meta: { affectsSovereignty: true },
   });
   undoHistory();
-  assert.deepEqual(calls, expected, 'ownership history must use broad UI refresh');
+  assert.deepEqual(calls, [], 'retired ownership history must schedule no UI or render effects');
+  assert.equal(state.historyPast.length, 0);
+  assert.equal(state.historyFuture.length, 0);
 });
 
 test('renderer uses local refresh only for resolved non-Atlantropa targets; existing callers remain full', () => {

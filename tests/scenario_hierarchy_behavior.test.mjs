@@ -95,7 +95,7 @@ test("quick-fill and border consumers plus source-bound sidebar and releasable c
   Object.assign(runtime, {
     activeScenarioId: "modern_world", selectedInspectorCountryCode: "US", batchFillScope: "level:state",
     landIndex: new Map(features.map(f => [f.id, f])),
-    sovereigntyByFeatureId: Object.fromEntries(ids.map(id => [id, "US"])),
+    scenarioBaselineOwnersByFeatureId: Object.freeze(Object.fromEntries(ids.map(id => [id, "US"]))),
   });
   const helpers = {
     canonicalCountryCode: value => value,

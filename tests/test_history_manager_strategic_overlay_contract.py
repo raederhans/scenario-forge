@@ -27,9 +27,30 @@ class HistoryManagerStrategicOverlayContractTest(unittest.TestCase):
         return json.loads(completed.stdout)
 
     def test_capture_snapshot_includes_operational_lines_contract(self):
-        content = HISTORY_MANAGER_JS.read_text(encoding="utf-8")
-
-        self.assertIn("snapshot.operationalLines = cloneStructuredValue(runtimeState.operationalLines || []);", content)
+        result = self._run_node_json(textwrap.dedent(
+            """
+            const { state } = await import("./js/core/state.js");
+            const { captureHistoryState } = await import("./js/core/history_manager.js");
+            state.operationalLines = [{ id: "line", points: [[1, 2], [3, 4]] }];
+            state.operationGraphics = [{ id: "graphic" }];
+            state.unitCounters = [{ id: "unit" }];
+            const full = captureHistoryState({ strategicOverlay: true });
+            const scoped = captureHistoryState({ strategicOverlay: ["operationalLines", "sovereigntyByFeatureId"] });
+            state.operationalLines[0].points[0][0] = 99;
+            scoped.operationalLines[0].points[1][1] = 88;
+            console.log(JSON.stringify({
+              full, scoped, live: state.operationalLines,
+              ordinary: captureHistoryState({ featureIds: ["a"] }),
+            }));
+            """
+        ))
+        self.assertEqual(result["full"]["operationalLines"][0]["points"], [[1, 2], [3, 4]])
+        self.assertEqual(result["full"]["operationGraphics"], [{"id": "graphic"}])
+        self.assertEqual(result["full"]["unitCounters"], [{"id": "unit"}])
+        self.assertEqual(set(result["scoped"]), {"operationalLines"})
+        self.assertEqual(result["scoped"]["operationalLines"][0]["points"], [[1, 2], [3, 88]])
+        self.assertEqual(result["live"][0]["points"], [[99, 2], [3, 4]])
+        self.assertNotIn("operationalLines", result["ordinary"])
 
     def test_undo_redo_replays_operational_lines_and_marks_dirty(self):
         result = self._run_node_json(textwrap.dedent(
