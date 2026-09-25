@@ -6,6 +6,7 @@ dev_workspace_render_boundary.spec.js
 hoi4_rk_russia_regression.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
+ownership_retirement.spec.js
 physical_layer_regression.spec.js
 review_regressions.spec.js
 river_layer_regression.spec.js

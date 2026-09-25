@@ -101,6 +101,13 @@
       "ownerHint": "water-runtime"
     },
     {
+      "specPath": "tests/e2e/ownership_retirement.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "scenario-runtime",
+      "ownerHint": "scenario-runtime"
+    },
+    {
       "specPath": "tests/e2e/physical_layer_regression.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",

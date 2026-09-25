@@ -21,8 +21,8 @@ export function createDevWorkspacePanel(bottomDock) {
   section.innerHTML = `
     <div class="dev-workspace-category-strip">
       <div class="dev-workspace-category-tabs" role="tablist" aria-label="Development workspace sections" data-i18n-aria-label="Development workspace sections">
-        <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true" data-i18n="Selection & Ownership">
-          Selection &amp; Ownership
+        <button id="devWorkspaceTabSelection" type="button" class="dev-workspace-category-tab is-active" data-dev-workspace-category="selection" role="tab" aria-selected="true" data-i18n="Selection">
+          Selection
         </button>
         <button id="devWorkspaceTabScenario" type="button" class="dev-workspace-category-tab" data-dev-workspace-category="scenario" role="tab" aria-selected="false" data-i18n="Scenario Data">
           Scenario Data
@@ -309,11 +309,11 @@ export function createDevWorkspaceQuickbar(bottomDock) {
       </div>
     </div>
     <div class="dev-workspace-quick-owner">
-      <span class="dev-quick-label" data-i18n="Owner Tag"></span>
+      <span class="dev-quick-label" data-i18n="Selection"></span>
       <div class="dev-workspace-quick-owner-row">
         <input
-          id="devQuickOwnerInput"
-          class="input dev-workspace-input dev-workspace-quick-input"
+          id="devQuickOwnerInput" hidden disabled aria-hidden="true" tabindex="-1"
+          class="input dev-workspace-input dev-workspace-quick-input hidden"
           type="text"
           autocomplete="off"
           spellcheck="false"
@@ -323,17 +323,17 @@ export function createDevWorkspaceQuickbar(bottomDock) {
         />
         <div class="dev-workspace-quick-owner-controls">
           <button id="devQuickRemoveSelectedBtn" type="button" class="btn-secondary" data-i18n="Remove Selection"></button>
-          <button id="devQuickUseTagBtn" type="button" class="btn-secondary" data-i18n="Use Selection Tag" data-i18n-title="Copy the selected feature's tag into the owner input"></button>
+          <button id="devQuickUseTagBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Use Selection Tag" data-i18n-title="Copy the selected feature's tag into the owner input"></button>
         </div>
       </div>
     </div>
     <div class="dev-workspace-quick-actions" role="toolbar" aria-label="Development quick actions" data-i18n-aria-label="Development quick actions">
-      <button id="devQuickApplyOwnerBtn" type="button" class="btn-primary" data-i18n="Apply to Selection" data-i18n-title="Set the owner tag for all selected features"></button>
-      <button id="devQuickResetOwnerBtn" type="button" class="btn-secondary" data-i18n="Reset Selection" data-i18n-title="Clear owner assignment from selected features"></button>
+      <button id="devQuickApplyOwnerBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-primary hidden" data-i18n="Apply to Selection" data-i18n-title="Set the owner tag for all selected features"></button>
+      <button id="devQuickResetOwnerBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Reset Selection" data-i18n-title="Clear owner assignment from selected features"></button>
     </div>
     <div class="dev-workspace-quick-secondary" role="toolbar" aria-label="Development utility actions" data-i18n-aria-label="Development utility actions">
       <button id="devQuickRebuildBordersBtn" type="button" class="btn-secondary" data-i18n="Recalculate Borders" data-i18n-title="Rebuild political borders based on current ownership"></button>
-      <button id="devQuickSaveOwnersBtn" type="button" class="btn-secondary" data-i18n="Save Owners File" data-i18n-title="Export ownership data to a downloadable JSON file"></button>
+      <button id="devQuickSaveOwnersBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Save Owners File" data-i18n-title="Export ownership data to a downloadable JSON file"></button>
     </div>
   `;
 

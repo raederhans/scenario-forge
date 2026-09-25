@@ -18,6 +18,7 @@ export const VERIFICATION_CATALOG_SOURCE_FILES = Object.freeze([
   "tools/verification/catalog/records/renderer_projection_viewport.mjs",
   "tools/verification/catalog/records/renderer_surface_state.mjs",
   "tools/verification/catalog/records/renderer_ui_bootstrap.mjs",
+  "tools/verification/catalog/records/ownership_retirement.mjs",
   "tools/verification/catalog/records/scenario.mjs",
   "tools/verification/catalog/records/startup.mjs",
   "tools/verification/catalog/records/state_ownership.mjs",

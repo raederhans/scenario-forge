@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled, normalizePaintMode } from "./map_editing_policy.js";
 import {
   normalizeMapSemanticMode,
   normalizePhysicalStyleConfig,
@@ -179,6 +180,7 @@ function updateOwnerIndexForMove(featureId, prevOwnerCode, nextOwnerCode) {
 }
 
 function setFeatureOwnerCode(featureId, ownerCode) {
+  if (!isOwnershipEditingEnabled()) return false;
   const id = getFeatureId(featureId);
   const code = normalizeOwnerCode(ownerCode);
   if (!id || !code) return false;
@@ -200,6 +202,7 @@ function setFeatureOwnerCode(featureId, ownerCode) {
 }
 
 function setFeatureOwnerCodes(featureIds, ownerCode) {
+  if (!isOwnershipEditingEnabled()) return 0;
   ensureSovereigntyState();
   const ids = Array.isArray(featureIds) ? featureIds : [];
   let changed = 0;
@@ -212,6 +215,7 @@ function setFeatureOwnerCodes(featureIds, ownerCode) {
 }
 
 function resetFeatureOwnerCode(featureId) {
+  if (!isOwnershipEditingEnabled()) return false;
   const id = getFeatureId(featureId);
   if (!id) return false;
   ensureSovereigntyState();
@@ -228,6 +232,7 @@ function resetFeatureOwnerCode(featureId) {
 }
 
 function resetFeatureOwnerCodes(featureIds) {
+  if (!isOwnershipEditingEnabled()) return 0;
   ensureSovereigntyState();
   const ids = Array.isArray(featureIds) ? featureIds : [];
   let changed = 0;
@@ -240,6 +245,7 @@ function resetFeatureOwnerCodes(featureIds) {
 }
 
 function resetAllFeatureOwnersToCanonical() {
+  if (!isOwnershipEditingEnabled()) return false;
   runtimeState.mapSemanticMode = "political";
   runtimeState.sovereigntyByFeatureId = seedSovereigntyFromLandData(runtimeState.landData);
   runtimeState.sovereigntyInitialized = true;
@@ -272,8 +278,7 @@ function migrateImportedProjectData(data) {
         ? payload.featureOverrides
         : {};
   payload.sovereigntyByFeatureId = normalizeFeatureOwnershipMap(payload.sovereigntyByFeatureId);
-  payload.paintMode =
-    payload.paintMode === "sovereignty" ? "sovereignty" : "visual";
+  payload.paintMode = normalizePaintMode(payload.paintMode);
   payload.mapSemanticMode = normalizeMapSemanticMode(payload.mapSemanticMode);
   payload.activeSovereignCode = normalizeOwnerCode(payload.activeSovereignCode || "");
   payload.dynamicBordersDirty = !!payload.dynamicBordersDirty;

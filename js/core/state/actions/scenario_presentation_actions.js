@@ -1,3 +1,4 @@
+import { normalizePaintMode } from "../../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";
 // Canonical scenario presentation state authority.
 // UI publication, DOM work, rendering, and persistence remain in composition roots.
@@ -386,7 +387,7 @@ export function commitScenarioPresentationState(target, patch) {
   }
   target.scenarioPaintModeBeforeActivate =
     patch.scenarioPaintModeBeforeActivate;
-  target.paintMode = patch.paintMode;
+  target.paintMode = normalizePaintMode(patch.paintMode);
   target.interactionGranularity = patch.interactionGranularity;
   target.batchFillScope = patch.batchFillScope;
   if (target.ui !== patch.ui) {
@@ -570,7 +571,7 @@ function restoreScenarioPresentationStateFromValidated(
     delete target.scenarioPaintModeBeforeActivate;
   }
   if (presentKeys.has("paintMode")) {
-    target.paintMode = values.paintMode;
+    target.paintMode = normalizePaintMode(values.paintMode);
   } else {
     delete target.paintMode;
   }
@@ -798,6 +799,6 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "inspectorExpansionInitialized")) target.inspectorExpansionInitialized = patch.inspectorExpansionInitialized;
   if (Object.hasOwn(patch, "inspectorHighlightCountryCode")) target.inspectorHighlightCountryCode = patch.inspectorHighlightCountryCode;
   if (Object.hasOwn(patch, "interactionGranularity")) target.interactionGranularity = patch.interactionGranularity;
-  if (Object.hasOwn(patch, "paintMode")) target.paintMode = patch.paintMode;
+  if (Object.hasOwn(patch, "paintMode")) target.paintMode = normalizePaintMode(patch.paintMode);
   if (Object.hasOwn(patch, "selectedInspectorCountryCode")) target.selectedInspectorCountryCode = patch.selectedInspectorCountryCode;
 }

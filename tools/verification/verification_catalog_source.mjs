@@ -18,6 +18,7 @@ import { RENDERER_CACHE_PIPELINE_RECORDS } from "./catalog/records/renderer_cach
 import { STATE_OWNERSHIP_RECORDS } from "./catalog/records/state_ownership.mjs";
 import { RENDERER_PROJECTION_VIEWPORT_RECORDS } from "./catalog/records/renderer_projection_viewport.mjs";
 import { createLocalFeedbackRecords } from "./catalog/records/local_feedback.mjs";
+import { createOwnershipRetirementRecords } from "./catalog/records/ownership_retirement.mjs";
 import { createQuickFillRecords } from "./catalog/records/quick_fill.mjs";
 import { createPrecisionScalingRecords } from "./catalog/records/precision_scaling.mjs";
 
@@ -50,6 +51,7 @@ const AUTHORED_VERIFICATION_METADATA = {
 };
 
 AUTHORED_VERIFICATION_METADATA.records.push(...createQuickFillRecords(AUTHORED_VERIFICATION_METADATA.records));
+AUTHORED_VERIFICATION_METADATA.records.push(...createOwnershipRetirementRecords(AUTHORED_VERIFICATION_METADATA.records));
 
 export const VERIFICATION_METADATA_SOURCE = deepFreeze(
   normalizeVerificationMetadataSource(AUTHORED_VERIFICATION_METADATA),

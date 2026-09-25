@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled, ownershipEditingDisabledResult } from "./map_editing_policy.js";
 import { state as runtimeState } from "./state.js";
 import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import {
@@ -70,6 +71,7 @@ function applyOwnerToFeatureIds(
     recomputeReason = "scenario-ownership-editor-apply",
   } = {}
 ) {
+  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
   const { requestedIds, matchedIds, missingIds } = filterEditableOwnershipFeatureIds(targetIds);
   const normalizedOwnerCode = normalizeOwnerCode(ownerCode);
   if (!matchedIds.length) {
@@ -137,6 +139,7 @@ function resetOwnersToScenarioBaselineForFeatureIds(
     recomputeReason = "scenario-ownership-editor-reset",
   } = {}
 ) {
+  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
   const { requestedIds, matchedIds, missingIds } = filterEditableOwnershipFeatureIds(targetIds);
   if (!matchedIds.length) {
     return {
@@ -237,6 +240,7 @@ function applyOwnerControllerAssignmentsToFeatureIds(
     recomputeReason = "feature-apply-owner-controller",
   } = {}
 ) {
+  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
   const entries = Object.entries(assignmentsByFeatureId || {})
     .map(([featureId, assignment]) => {
       const normalizedFeatureId = String(featureId || "").trim();

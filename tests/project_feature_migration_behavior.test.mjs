@@ -214,6 +214,7 @@ test("confirmed legacy import stages target baseline, applies it, and exports ta
     await import("../js/core/state.js"), await import("../js/core/releasable_manager.js"),
     await import("../js/core/special_zone_layers.js"), await import("../js/core/state/dev_state.js"),
     await import("../js/core/state/strategic_overlay_state.js"),
+    await import("../js/core/map_editing_policy.js"),
     { cloneImportedProjectValue: structuredClone, captureProjectImportState });
   const context = vm.createContext(globals);
   vm.runInContext(source.slice(fn.start, fn.end), context);

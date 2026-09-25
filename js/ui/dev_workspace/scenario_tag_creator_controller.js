@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "../../core/map_editing_policy.js";
 import { state as runtimeState } from "../../core/state.js";
 import {
   clearDevSelection,
@@ -585,6 +586,7 @@ export function createScenarioTagCreatorController({
   };
 
   const applyScenarioTagCreatorSuccess = (response, payload, targetIds = []) => {
+    if (!isOwnershipEditingEnabled()) return;
     const normalizedTag = String(payload?.tag || "").trim().toUpperCase();
     if (!normalizedTag) return;
     const normalizedNameEn = normalizeScenarioNameInput(payload?.nameEn);
@@ -731,7 +733,7 @@ export function createScenarioTagCreatorController({
     const tagCreatorState = syncTagCreatorDerivedState();
     const tagCreatorValidation = validateTagCreatorInput(tagCreatorState, tagCreatorModel.targetIds);
 
-    scenarioTagCreatorPanel?.classList.toggle("hidden", !hasActiveScenario);
+    scenarioTagCreatorPanel?.classList.toggle("hidden", !isOwnershipEditingEnabled() || !hasActiveScenario);
     if (scenarioTagCreatorTitle) {
       scenarioTagCreatorTitle.textContent = hasActiveScenario
         ? String(runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "")
@@ -822,7 +824,7 @@ export function createScenarioTagCreatorController({
       scenarioTagGroupAnchorSelect.disabled = !hasActiveScenario || !!tagCreatorState.isSaving;
     }
 
-    const canCreateTag = hasActiveScenario && tagCreatorModel.selectionCount > 0 && tagCreatorValidation.ok && !tagCreatorState.isSaving;
+    const canCreateTag = isOwnershipEditingEnabled() && hasActiveScenario && tagCreatorModel.selectionCount > 0 && tagCreatorValidation.ok && !tagCreatorState.isSaving;
     const canClearTagForm = !!(
       normalizeScenarioTagInput(tagCreatorState.tag)
       || normalizeScenarioNameInput(tagCreatorState.nameEn)
@@ -929,6 +931,7 @@ export function createScenarioTagCreatorController({
 
   const bindEvents = () => {
     bindButtonAction(createTagBtn, async () => {
+      if (!isOwnershipEditingEnabled()) return;
       const built = buildScenarioTagCreatorPayload();
       if (!built.ok || !built.payload) {
         showToast(built.validation?.message || ui("Select one or more land features before creating a tag."), {

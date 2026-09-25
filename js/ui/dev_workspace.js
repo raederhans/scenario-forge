@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "../core/map_editing_policy.js";
 import { state as runtimeState } from "../core/state.js";
 import { registerRuntimeHook } from "../core/state/index.js";
 import {
@@ -915,9 +916,9 @@ function initDevWorkspace() {
       const isVisible = !!isAvailable && activeDevCategory === category;
       panelElement.classList.toggle("hidden", !isVisible);
     };
-    syncCategoryPanel(scenarioOwnershipPanel, "selection", hasActiveScenario);
+    syncCategoryPanel(scenarioOwnershipPanel, "selection", hasActiveScenario && isOwnershipEditingEnabled());
     syncCategoryPanel(scenarioTagInspectorPanel, "selection", hasActiveScenario);
-    syncCategoryPanel(scenarioTagCreatorPanel, "scenario", hasActiveScenario);
+    syncCategoryPanel(scenarioTagCreatorPanel, "scenario", hasActiveScenario && isOwnershipEditingEnabled());
     syncCategoryPanel(scenarioCountryPanel, "scenario", hasActiveScenario);
     syncCategoryPanel(scenarioCapitalPanel, "scenario", hasActiveScenario);
     syncCategoryPanel(scenarioDistrictPanel, "scenario", hasActiveScenario);

@@ -1,3 +1,5 @@
+import { applyFeaturePaintState } from "./state/color_state.js";
+import { isOwnershipEditingEnabled } from "./map_editing_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
@@ -4709,7 +4711,7 @@ function isDynamicBordersEnabled() {
 }
 
 function isSovereigntyModeActive() {
-  return String(runtimeState.paintMode || "visual").toLowerCase() === "sovereignty";
+  return isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual").toLowerCase() === "sovereignty";
 }
 
 function clearPendingDynamicBorderTimer() {
@@ -7029,24 +7031,8 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
   // Import/legacy writes are normalized once before this canonical transaction.
   // Both override maps below stay in sync, so a paint need not copy them again.
   migrateLegacyColorState();
-  runtimeState.visualOverrides = runtimeState.visualOverrides && typeof runtimeState.visualOverrides === "object"
-    ? runtimeState.visualOverrides
-    : {};
-  runtimeState.featureOverrides = runtimeState.featureOverrides && typeof runtimeState.featureOverrides === "object"
-    ? runtimeState.featureOverrides
-    : {};
-  if (remove) {
-    resolvedIds.forEach((targetId) => {
-      delete runtimeState.visualOverrides[targetId];
-      delete runtimeState.featureOverrides[targetId];
-    });
-  } else {
-    const color = getSafeCanvasColor(selectedColor, defaultColor);
-    resolvedIds.forEach((targetId) => {
-      runtimeState.visualOverrides[targetId] = color;
-      runtimeState.featureOverrides[targetId] = color;
-    });
-  }
+  applyFeaturePaintState(runtimeState, resolvedIds,
+    remove ? null : getSafeCanvasColor(selectedColor, defaultColor), { remove });
   refreshResolvedColorsForFeatures(resolvedIds, {
     renderNow,
     inputStartedAt,

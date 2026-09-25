@@ -1,9 +1,14 @@
+import { setFeatureOwnerCodes, resetFeatureOwnerCode, resetFeatureOwnerCodes, resetAllFeatureOwnersToCanonical } from "../js/core/sovereignty_manager.js";
+import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds } from "../js/core/scenario_ownership_editor.js";
+import { applyFeaturePaintState } from "../js/core/state/color_state.js";
+import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 
 import { state } from "../js/core/state.js";
 import {
   getFeatureIdsForOwner,
+  ensureSovereigntyState,
   getFeatureOwnerCode,
   setFeatureOwnerCode,
 } from "../js/core/sovereignty_manager.js";
@@ -143,7 +148,7 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
   }
 });
 
-test("scenario ownership edits preserve digit-prefixed HGO owner tags", () => {
+test("read-only scenario assignments preserve digit-prefixed HGO tags and reject edits", () => {
   const previousLandIndex = state.landIndex;
   const previousLandData = state.landData;
   const previousSovereigntyByFeatureId = state.sovereigntyByFeatureId;
@@ -161,12 +166,13 @@ test("scenario ownership edits preserve digit-prefixed HGO owner tags", () => {
   try {
     state.landIndex = new Map([["HGO-S1", feature]]);
     state.landData = { features: [feature] };
-    state.sovereigntyByFeatureId = { "HGO-S1": "AAA" };
+    state.sovereigntyByFeatureId = { "HGO-S1": "2RA" };
     state.ownerToFeatureIds = new Map();
     state.sovereigntyInitialized = false;
     state.mapSemanticMode = "ownership";
 
-    assert.equal(setFeatureOwnerCode("HGO-S1", "2ra"), true);
+    ensureSovereigntyState();
+    assert.equal(setFeatureOwnerCode("HGO-S1", "AAA"), false);
 
     assert.equal(getFeatureOwnerCode("HGO-S1"), "2RA");
     assert.deepEqual(getFeatureIdsForOwner("2RA"), ["HGO-S1"]);
@@ -179,4 +185,50 @@ test("scenario ownership edits preserve digit-prefixed HGO owner tags", () => {
     state.sovereigntyInitialized = previousSovereigntyInitialized;
     state.mapSemanticMode = previousMapSemanticMode;
   }
+});
+
+test("all ownership mutation APIs reject before writes, history, revision changes, or rendering", () => {
+  const keys = ["sovereigntyByFeatureId", "sovereigntyRevision", "sovereigntyInitialized", "ownerToFeatureIds", "mapSemanticMode", "paintMode", "visualOverrides", "featureOverrides", "historyPast", "historyFuture", "pendingDynamicBorderTimerId", "dynamicBordersDirty"];
+  const old = Object.fromEntries(keys.map(key => [key, state[key]]));
+  try {
+    Object.assign(state, { sovereigntyByFeatureId: { test: "2RA" }, sovereigntyRevision: 77, sovereigntyInitialized: true,
+      ownerToFeatureIds: new Map([["2RA", new Set(["test"])]]), paintMode: "sovereignty", visualOverrides: {}, featureOverrides: {} });
+    const before = structuredClone(Object.fromEntries(keys.map(key => [key, state[key]])));
+    assert.equal(setFeatureOwnerCode("test", "GB"), false);
+    assert.equal(setFeatureOwnerCodes(["test"], "GB"), 0);
+    assert.equal(resetFeatureOwnerCode("test"), false);
+    assert.equal(resetFeatureOwnerCodes(["test"]), 0);
+    assert.equal(resetAllFeatureOwnersToCanonical(), false);
+    for (const result of [applyOwnerToFeatureIds(["test"], "GB"), resetOwnersToScenarioBaselineForFeatureIds(["test"]), applyOwnerControllerAssignmentsToFeatureIds({ test: { ownerCode: "GB" } })]) {
+      assert.equal(result.applied, false);
+      assert.equal(result.changed, 0);
+      assert.equal(result.reason, "ownership-editing-disabled");
+    }
+    assert.deepEqual(Object.fromEntries(keys.map(key => [key, state[key]])), before);
+    assert.equal(getFeatureOwnerCode("test"), "2RA");
+  } finally { Object.assign(state, old); }
+});
+
+test("real paint undo/redo restores visual state and never replays ownership patches", () => {
+  const keys = ["visualOverrides", "featureOverrides", "sovereigntyByFeatureId", "historyPast", "historyFuture", "legacyColorStateDirty"];
+  const old = Object.fromEntries(keys.map(key => [key, state[key]]));
+  const oldDocument = globalThis.document;
+  globalThis.document = { getElementById: () => null };
+  try {
+    state.visualOverrides = {}; state.featureOverrides = {}; state.sovereigntyByFeatureId = { paintTest: "2RA" };
+    clearHistory();
+    const before = captureHistoryState({ featureIds: ["paintTest"] });
+    applyFeaturePaintState(state, ["paintTest"], "#aabbcc");
+    const after = captureHistoryState({ featureIds: ["paintTest"] });
+    // A stale internal entry must not be a write bypass even without any saved projects.
+    before.sovereigntyByFeatureId = { paintTest: "OTHER" };
+    after.sovereigntyByFeatureId = { paintTest: "THIRD" };
+    pushHistoryEntry({ kind: "paint-test", before, after });
+    undoHistory();
+    assert.deepEqual(state.visualOverrides, {});
+    assert.equal(state.sovereigntyByFeatureId.paintTest, "2RA");
+    redoHistory();
+    assert.deepEqual(state.visualOverrides, { paintTest: "#aabbcc" });
+    assert.equal(state.sovereigntyByFeatureId.paintTest, "2RA");
+  } finally { clearHistory(); Object.assign(state, old); if (oldDocument === undefined) delete globalThis.document; else globalThis.document = oldDocument; }
 });

@@ -1,3 +1,5 @@
+import { applyFeaturePaintState } from "../color_state.js";
+import { createReadonlyReferenceAssignments } from "../../map_data_boundary.js";
 // Canonical scenario activation state authority.
 // Rendering, observers, rollback orchestration, and recovery stay outside this module.
 
@@ -5,14 +7,7 @@ import { commitSpecialZoneLayersState } from "./special_zone_actions.js";
 import { SCENARIO_BUNDLE_CACHE_LIMIT, getScenarioChunkPayloadEvictionIds } from "../../scenario/bundle_cache_policy.js";
 
 export function applyPaletteFeatureColorState(target, featureIds, color) {
-  target.visualOverrides = target.visualOverrides || {};
-  target.featureOverrides = target.featureOverrides || {};
-  for (let index = 0; index < featureIds.length; index += 1) {
-    if (!(index in featureIds)) continue;
-    const featureId = featureIds[index];
-    target.visualOverrides[featureId] = color;
-    target.featureOverrides[featureId] = color;
-  }
+  applyFeaturePaintState(target, featureIds, color);
 }
 
 export function applyPaletteOwnerColorState(target, ownerCode, color) {
@@ -542,7 +537,7 @@ export function commitScenarioActivationState(target, patch) {
   target.scenarioImportAudit = patch.scenarioImportAudit;
   target.scenarioBaselineHash = patch.scenarioBaselineHash;
   target.scenarioBaselineOwnersByFeatureId =
-    { ...(patch.scenarioBaselineOwnersByFeatureId || {}) };
+    createReadonlyReferenceAssignments(patch.scenarioBaselineOwnersByFeatureId);
   target.scenarioAutoShellOwnerByFeatureId =
     { ...(patch.scenarioAutoShellOwnerByFeatureId || {}) };
   target.scenarioBaselineCoresByFeatureId =

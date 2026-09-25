@@ -207,6 +207,8 @@ function assertCompleteAtomicAuthority({
   assert.deepEqual(exportedKeys, keys);
 
   const target = createAuthorityTarget(keys, absentKey);
+  // A paint mode is now a visual-only capability, not an arbitrary sentinel.
+  if (keys.includes("paintMode")) target.paintMode = "visual";
   const snapshot = capture(target);
   assert.deepEqual(Object.keys(snapshot.values), keys);
   assert.deepEqual(
@@ -223,7 +225,7 @@ function assertCompleteAtomicAuthority({
   restore(target, snapshot);
   assert.equal(Object.prototype.hasOwnProperty.call(target, absentKey), false);
   for (const key of keys.filter((key) => key !== absentKey)) {
-    assert.deepEqual(target[key], { version: `before:${key}` });
+    assert.deepEqual(target[key], key === "paintMode" ? "visual" : { version: `before:${key}` });
   }
 
   const incompletePatch = createAuthorityPatch(keys);
