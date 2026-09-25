@@ -1198,11 +1198,12 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
       mapSemanticMode: "ownership",
       visualOverrides: {},
       featureOverrides: {},
-      sovereigntyByFeatureId: {
+      activeScenarioId: "tno_1962",
+      scenarioBaselineOwnersByFeatureId: Object.freeze({
         marine_red_sea: "SOV",
         RU_LAND: "SOV",
         ATL_OWNER: "ATL",
-      },
+      }),
       scenarioAutoShellOwnerByFeatureId: {},
       sovereignBaseColors: {
         SOV: "#c01010",

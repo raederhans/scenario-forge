@@ -923,6 +923,62 @@
       "mode": "override",
       "color_hex": "#803e50",
       "color_policy": "locked"
+    },
+    "SPR": {
+      "mode": "override",
+      "display_name": "Spain",
+      "display_name_en": "Spain",
+      "display_name_zh": "",
+      "color_hex": "#dd99ef",
+      "color_policy": "palette",
+      "parent_owner_tag": "IBR",
+      "subject_kind": "",
+      "entry_kind": "",
+      "featured": false,
+      "hidden_from_country_list": true,
+      "base_iso2": "ES",
+      "lookup_iso2": "ES",
+      "provenance_iso2": "ES",
+      "capital_state_id": 41,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "inspector_group_id": "",
+      "inspector_group_label": "",
+      "inspector_group_anchor_id": "",
+      "notes": "Releasable Spain under the Iberian Union; no active territory at the 1962 start.",
+      "scenario_only": false,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
+    },
+    "KRS": {
+      "mode": "override",
+      "display_name": "Krasnoyarsk",
+      "display_name_en": "Krasnoyarsk",
+      "display_name_zh": "克拉斯诺亚尔斯克",
+      "color_hex": "#d7d4ae",
+      "color_policy": "locked",
+      "parent_owner_tag": "",
+      "subject_kind": "",
+      "entry_kind": "scenario_country",
+      "featured": false,
+      "hidden_from_country_list": false,
+      "base_iso2": "RU",
+      "lookup_iso2": "RU",
+      "provenance_iso2": "RU",
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_eastern_europe",
+      "subregion_label": "Eastern Europe",
+      "inspector_group_id": "scenario_group_russia_region",
+      "inspector_group_label": "Russia Region",
+      "inspector_group_anchor_id": "continent_europe",
+      "notes": "Krasnoyarsk created from the requested central Siberian transfer set in TNO 1962 using the KRS palette color.",
+      "scenario_only": true,
+      "source_type": "scenario_extension",
+      "historical_fidelity": "extended"
     }
   },
   "assignments_by_feature_id": {
@@ -1519,6 +1575,162 @@
       "controller": "RKK",
       "cores": [
         "RKK"
+      ]
+    },
+    "RU_CITY_ARKHANGELSK": {
+      "owner": "WRS",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B42720608112791": {
+      "owner": "VOL",
+      "cores": [
+        "VOL"
+      ]
+    },
+    "ATLPRV_18160": {
+      "owner": "IBR",
+      "cores": [
+        "IBR"
+      ]
+    },
+    "ATLPRV_18167": {
+      "owner": "IBR",
+      "cores": [
+        "IBR"
+      ]
+    },
+    "ATLPRV_18216": {
+      "owner": "IBR",
+      "cores": [
+        "IBR"
+      ]
+    },
+    "ATLSHL_west_med_5": {
+      "owner": "IBR",
+      "cores": [
+        "IBR"
+      ]
+    },
+    "RU_RAY_50074027B5573235052647": {
+      "owner": "GOR",
+      "cores": [
+        "GOR"
+      ]
+    },
+    "RU_RAY_50074027B91746933948416": {
+      "owner": "GOR",
+      "cores": [
+        "GOR"
+      ]
+    },
+    "RU_RAY_50074027B96019567685522": {
+      "owner": "BKR",
+      "cores": [
+        "BKR"
+      ]
+    },
+    "RU_RAY_50074027B26247941998925": {
+      "owner": "WRS",
+      "cores": [
+        "WRS"
+      ]
+    },
+    "RU_RAY_50074027B40536112899816": {
+      "owner": "SAM",
+      "cores": [
+        "SAM"
+      ]
+    },
+    "RU_RAY_50074027B58613203253678": {
+      "owner": "RKK",
+      "cores": [
+        "RKK"
+      ]
+    },
+    "RU_RAY_50074027B47936450781023": {
+      "owner": "RUR",
+      "cores": [
+        "RUR"
+      ]
+    },
+    "RU_RAY_50074027B18536602285327": {
+      "owner": "RUR",
+      "cores": [
+        "RUR"
+      ]
+    },
+    "RU_RAY_50074027B23063195205268": {
+      "owner": "KRS",
+      "cores": [
+        "KRS"
+      ]
+    },
+    "RS228": {
+      "owner": "SER",
+      "cores": [
+        "SER"
+      ]
+    },
+    "XK_ADM1_KOS-5909": {
+      "owner": "SER",
+      "cores": [
+        "SER"
+      ]
+    },
+    "SM_ADM1_SMR-4883": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4884": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4885": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4886": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4887": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4888": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4889": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4890": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
+      ]
+    },
+    "SM_ADM1_SMR-4891": {
+      "owner": "ITA",
+      "cores": [
+        "ITA"
       ]
     }
   },

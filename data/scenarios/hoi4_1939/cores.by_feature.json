@@ -2,7 +2,7 @@
   "version": 1,
   "scenario_id": "hoi4_1939",
   "generated_at": "2026-06-13T22:56:16.275693+00:00",
-  "baseline_hash": "bae1300c43e275df18d16b4b2743582ef53930ebf96ce36e7c60357d056b78b7",
+  "baseline_hash": "6f7c4b59b89e54e1795e28dd17deac98c02c611468fb9d9ac5aa09146296af89",
   "cores": {
     "AFG-1741": [
       "AFG"
@@ -6536,7 +6536,7 @@
       "CHI"
     ],
     "CN_CITY_17275852B82452317993245": [
-      "CHI"
+      "MAN"
     ],
     "CN_CITY_17275852B82453745419321": [
       "CHI"
@@ -16958,7 +16958,7 @@
       "YUG"
     ],
     "SYR-134": [
-      "TUR"
+      "SYR"
     ],
     "SYR-135": [
       "SYR"

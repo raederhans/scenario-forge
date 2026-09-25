@@ -100,7 +100,9 @@ TNO_CAPITALS = {
     "XIK": ("CITY::gn::1810604", "Litang", "理塘"),
     "XIN": ("1159151531", "Dihua", "迪化"),
     "YAK": ("1159150745", "Yakutsk", "雅库茨克"),
-    "ZLT": ("1159139111", "Kungur", "昆古尔"),
+    # Current-border fallback: Zlatoust is held by SVR and former fallback Kungur by BKR.
+    # Chusovoy is within ZLT; this does not assert a historical ZLT capital.
+    "ZLT": ("1159139121", "Chusovoy", "丘索沃伊"),
 }
 REVIEWED_CAPITALS = {
     "blank_base": MODERN_CAPITALS,
@@ -167,6 +169,8 @@ def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, stric
             "capital_kind": "country_capital", "resolution_method": "reviewed_capital",
             "confidence": "high", "candidate_count": 1,
         })
+        if scenario_id == "tno_1962" and tag == "ZLT":
+            hint["selection_note"] = "Current-border fallback: Zlatoust belongs to SVR and Kungur to BKR."
         capitals[tag] = city_id
         hints[tag] = hint
         cities[city_id] = {

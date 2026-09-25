@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled, normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
   state as runtimeState,
@@ -1079,13 +1080,13 @@ function initToolbar({ render } = {}) {
   initializeTransportWorkbenchRuntime();
 
   const getPaintModeLabel = () => (
-    String(runtimeState.paintMode || "visual") === "sovereignty"
+    isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
       ? t("Political Ownership", "ui")
       : t("Visual Color", "ui")
   );
 
   const getPrimaryActionLabel = () => (
-    String(runtimeState.paintMode || "visual") === "sovereignty"
+    isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
       ? t("Auto-Fill Ownership", "ui")
       : t("Auto-Fill Visuals", "ui")
   );
@@ -1157,12 +1158,12 @@ function initToolbar({ render } = {}) {
 
   const refreshPaintControlsLayout = () => {
     const isScenarioMode = !!runtimeState.activeScenarioId;
-    const isOwnershipMode = String(runtimeState.paintMode || "visual") === "sovereignty";
-    const showPoliticalPanel = !isScenarioMode && (runtimeState.ui.politicalEditingExpanded || isOwnershipMode);
+    const isOwnershipMode = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty";
+    const showPoliticalPanel = isOwnershipEditingEnabled() && !isScenarioMode && (runtimeState.ui.politicalEditingExpanded || isOwnershipMode);
     const showBorderMaintenance = isScenarioMode || runtimeState.ui.politicalEditingExpanded || isOwnershipMode;
     const showGranularityField = !isScenarioMode;
     const showColorModeField = !isOwnershipMode;
-    const showPoliticalEditingToggle = !isScenarioMode;
+    const showPoliticalEditingToggle = isOwnershipEditingEnabled() && !isScenarioMode;
     const showEditConfigButton = showGranularityField || showColorModeField || showPoliticalEditingToggle || showPoliticalPanel;
     const primaryActionLabel = getPrimaryActionLabel();
 
@@ -1395,10 +1396,17 @@ function initToolbar({ render } = {}) {
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
   const refreshPaintModeUi = () => {
+    runtimeState.paintMode = normalizePaintMode(runtimeState.paintMode);
+    runtimeState.ui.politicalEditingExpanded = false;
+    if (paintModePoliticalBtn) {
+      paintModePoliticalBtn.hidden = true;
+      paintModePoliticalBtn.disabled = true;
+      paintModePoliticalBtn.classList.add("hidden");
+    }
     if (paintModeSelect) {
       paintModeSelect.value = runtimeState.paintMode || "visual";
     }
-    const isOwnershipMode = String(runtimeState.paintMode || "visual") === "sovereignty";
+    const isOwnershipMode = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty";
     [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
       if (!button) return;
       const buttonMode = button.dataset.paintMode || "visual";
@@ -2151,7 +2159,8 @@ function initToolbar({ render } = {}) {
   [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
-      const nextMode = button.dataset.paintMode || "visual";
+      if (button.dataset.paintMode === "sovereignty" && !isOwnershipEditingEnabled()) return;
+      const nextMode = normalizePaintMode(button.dataset.paintMode);
       if (paintModeSelect) {
         paintModeSelect.value = nextMode;
       }
@@ -2213,6 +2222,7 @@ function initToolbar({ render } = {}) {
 
   if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
     politicalEditingToggleBtn.addEventListener("click", () => {
+      if (!isOwnershipEditingEnabled()) return;
       runtimeState.ui.politicalEditingExpanded = !runtimeState.ui.politicalEditingExpanded;
       if (typeof runtimeState.updatePaintModeUIFn === "function") {
         runtimeState.updatePaintModeUIFn();
@@ -2829,7 +2839,7 @@ function initToolbar({ render } = {}) {
       const value = String(event.target.value || "subdivision");
       const requested = value === "country" ? "country" : "subdivision";
       runtimeState.interactionGranularity =
-        runtimeState.paintMode === "sovereignty" ? "subdivision" : requested;
+        (isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty") ? "subdivision" : requested;
       paintGranularitySelect.value = runtimeState.interactionGranularity;
       if (typeof runtimeState.updatePaintModeUIFn === "function") {
         runtimeState.updatePaintModeUIFn();
@@ -2841,8 +2851,8 @@ function initToolbar({ render } = {}) {
     paintModeSelect.value = runtimeState.paintMode || "visual";
     paintModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "visual");
-      runtimeState.paintMode = value === "sovereignty" ? "sovereignty" : "visual";
-      if (runtimeState.paintMode === "sovereignty") {
+      runtimeState.paintMode = normalizePaintMode(value);
+      if ((isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty")) {
         runtimeState.interactionGranularity = "subdivision";
         runtimeState.ui.politicalEditingExpanded = true;
         if (paintGranularitySelect) {
@@ -2868,7 +2878,7 @@ function initToolbar({ render } = {}) {
         title: t("Clear Map", "ui"),
         message: t("Clear the current map?", "ui"),
         details: t(
-          "This removes current paint overrides and, in political mode, restores ownership to its baseline. You can undo the clear from history.",
+          "This removes current paint overrides. You can undo the clear from history.",
           "ui"
         ),
         confirmLabel: t("Clear Map", "ui"),
@@ -2881,7 +2891,7 @@ function initToolbar({ render } = {}) {
         ...Object.keys(runtimeState.sovereignBaseColors || {}),
         ...Object.keys(runtimeState.countryBaseColors || {}),
       ]));
-      const sovereigntyFeatureIds = String(runtimeState.paintMode || "visual") === "sovereignty"
+      const sovereigntyFeatureIds = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
         ? Object.keys(runtimeState.sovereigntyByFeatureId || {})
         : [];
       const before = captureHistoryState({
@@ -2889,7 +2899,7 @@ function initToolbar({ render } = {}) {
         ownerCodes,
         sovereigntyFeatureIds,
       });
-      if (runtimeState.paintMode === "sovereignty") {
+      if ((isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty")) {
         if (runtimeState.activeScenarioId) {
           resetScenarioToBaselineCommand({
             renderMode: "none",
@@ -2921,7 +2931,7 @@ function initToolbar({ render } = {}) {
           sovereigntyFeatureIds,
         }),
         meta: {
-          affectsSovereignty: runtimeState.paintMode === "sovereignty",
+          affectsSovereignty: (isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty"),
         },
       });
       showToast(t("Map cleared. Undo is available from history.", "ui"), {

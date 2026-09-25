@@ -1,3 +1,4 @@
+import { isOwnershipEditingEnabled } from "../../core/map_editing_policy.js";
 export function createScenarioInspectorController({
   t,
   getView,
@@ -229,7 +230,7 @@ export function createScenarioInspectorController({
   const renderScenarioVisualAdjustments = (container, countryState) => {
     const details = document.createElement("details");
     details.className = "scenario-visual-adjustments inspector-action-section";
-    details.open = getView().visualOpen;
+    details.open = !isOwnershipEditingEnabled() || getView().visualOpen;
     selectedCountryActionsSection?.classList.toggle("has-open-visual-adjustments", details.open);
     details.addEventListener("toggle", () => {
       storeVisualOpen(details.open);
@@ -239,7 +240,7 @@ export function createScenarioInspectorController({
 
     const summary = document.createElement("summary");
     summary.className = "section-header";
-    summary.textContent = t("Color Only", "ui");
+    summary.textContent = t("Color", "ui");
     details.appendChild(summary);
 
     const body = document.createElement("div");
@@ -250,23 +251,25 @@ export function createScenarioInspectorController({
     const note = document.createElement("p");
     note.className = "scenario-action-hint";
     note.textContent = t(
-      "These actions only change visual color. Ownership, controllers, and dynamic borders stay unchanged.",
+      "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.",
       "ui"
     );
     body.appendChild(note);
 
-    const brushSection = appendActionSection(body, t("Brush", "ui"));
-    const isVisualBrush = String(getView().paintMode || "visual") !== "sovereignty";
-    const brushBtn = createInspectorActionButton(
-      isVisualBrush
-        ? t("Return to Political Ownership Brush", "ui")
-        : t("Use Visual Color Brush", "ui"),
-      () => {
-        storeVisualOpen(true);
-        setScenarioMapPaintMode(isVisualBrush ? "ownership" : "visual");
-      }
-    );
-    brushSection.appendChild(brushBtn);
+    if (isOwnershipEditingEnabled()) {
+      const brushSection = appendActionSection(body, t("Brush", "ui"));
+      const isVisualBrush = String(getView().paintMode || "visual") !== "sovereignty";
+      const brushBtn = createInspectorActionButton(
+        isVisualBrush
+          ? t("Return to Political Ownership Brush", "ui")
+          : t("Use Visual Color Brush", "ui"),
+        () => {
+          storeVisualOpen(true);
+          setScenarioMapPaintMode(isVisualBrush ? "ownership" : "visual");
+        }
+      );
+      brushSection.appendChild(brushBtn);
+    }
 
     if (!countryState) {
       body.appendChild(
@@ -334,7 +337,7 @@ export function createScenarioInspectorController({
       const countrySection = appendActionSection(body, t("Country Visuals", "ui"));
 
       countrySection.appendChild(createInspectorActionButton(
-        t("Paint Owned Regions With Country Color", "ui"),
+        t("Paint Reference Regions With Country Color", "ui"),
         () => {
           const result = applyVisualColorToOwnedRegions(countryState);
           if (result.changed > 0) {
@@ -347,7 +350,7 @@ export function createScenarioInspectorController({
               }
             );
           } else {
-            showToast(t("No owned regions were recolored.", "ui"), {
+            showToast(t("No reference regions were recolored.", "ui"), {
               title: t("No changes", "ui"),
               tone: "info",
               duration: 2600,
@@ -358,7 +361,7 @@ export function createScenarioInspectorController({
       ));
 
       countrySection.appendChild(createInspectorActionButton(
-        t("Clear Owned Region Visual Overrides", "ui"),
+        t("Clear Reference Region Color Edits", "ui"),
         () => {
           const result = clearCountryVisualOverrides(countryState);
           if (result.changed > 0) {
@@ -418,7 +421,10 @@ export function createScenarioInspectorController({
       return;
     }
 
-    if (hasScenarioCoreTerritoryActions(countryState)) {
+    if (!isOwnershipEditingEnabled()) {
+      if (countryState.scenarioSubject) renderScenarioParentReturnAction(container, countryState);
+      renderScenarioRelatedCountryGroups(container, countryState);
+    } else if (hasScenarioCoreTerritoryActions(countryState)) {
       renderScenarioReleasableActions(container, countryState);
     } else {
       renderScenarioParentActions(container, countryState);

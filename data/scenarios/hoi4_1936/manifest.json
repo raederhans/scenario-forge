@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/hoi4_1936/audit.json",
-  "baseline_hash": "027d74242b917f66fa5efbeb5bafd54acb7926a2c018bc34b9941f6423b77aa3",
+  "baseline_hash": "6d2ec7ba7d7a641270d4512499226a90f5f3695c8fc105b0411b2bc4d385bf53",
   "bookmark_date": "1936.1.1.12",
   "bookmark_description": "GATHERING_STORM_DESC",
   "bookmark_name": "GATHERING_STORM_NAME",
@@ -94,10 +94,10 @@
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "a6524c7ba848d717018973a1c4ca4e15bfd64c03af38350f0220d81e1d643714",
+  "snapshot_fingerprint": "55f78b5cc5fc2d7c0c82018ca492281bbf3b60c8bfea59ee15b025603f0f2a5f",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-    "detail_chunk_manifest_sha256": "1d026cd9396922d741ce9ec4a1d68d3cf5f0573dbc7a4c1438dc1a3867a8f9e1",
+    "detail_chunk_manifest_sha256": "f1fd0ab627d20fc6b6fbb8219df5c670375db9fc54d9e139bfc78a1ba690c637",
     "runtime_bootstrap_topology_sha256": "74d6f39ab2280fa524109d9bd35e15149df48681688deb22ecfac60911527115",
     "runtime_topology_sha256": "50cad6f666725fa6518b8aa5f8519a1b520946f3b4c2e46614029234ad8be0c3"
   },

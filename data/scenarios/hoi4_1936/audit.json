@@ -15523,12 +15523,12 @@
       "feature_id": "CN_CITY_17275852B82452317993245",
       "feature_name": "Jidongxian",
       "from_tag": "CHI",
-      "notes": "Jidong Anti-Communist Autonomous Government area is represented as Japanese-controlled territory for 1936 scenario coloring.",
+      "notes": "Reviewed ownership correction: geographical identity and scenario source verified.",
       "quality": "manual_reviewed",
-      "rule_id": "jidong_japanese_occupation",
+      "rule_id": "manchukuo",
       "source": "manual_rule",
       "synthetic_owner": false,
-      "to_tag": "JAP"
+      "to_tag": "MAN"
     },
     {
       "country_code": "CN",
@@ -231198,10 +231198,10 @@
     "JAP": {
       "base_iso2": "JP",
       "continent_label": "Asia",
-      "controller_feature_count": 66,
+      "controller_feature_count": 65,
       "display_name": "Japan",
       "entry_kind": "",
-      "feature_count": 66,
+      "feature_count": 65,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -231214,7 +231214,7 @@
       "quality": "manual_reviewed",
       "quality_breakdown": {
         "direct_country_copy": 47,
-        "manual_reviewed": 19
+        "manual_reviewed": 18
       },
       "rule_sources": [
         "jidong_japanese_occupation"
@@ -231617,10 +231617,10 @@
     "MAN": {
       "base_iso2": "CN",
       "continent_label": "Asia",
-      "controller_feature_count": 234,
+      "controller_feature_count": 235,
       "display_name": "Manchukuo",
       "entry_kind": "",
-      "feature_count": 234,
+      "feature_count": 235,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -231632,7 +231632,7 @@
       "provenance_iso2": "CN",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 234
+        "manual_reviewed": 235
       },
       "rule_sources": [
         "manchukuo"
@@ -233530,12 +233530,12 @@
         "CN_CITY_17275852B66983384026241",
         "CN_CITY_17275852B69502424824259",
         "CN_CITY_17275852B70108594636400",
+        "CN_CITY_17275852B71122715185286",
         "CN_CITY_17275852B75499036549183",
         "CN_CITY_17275852B75702344877030",
         "CN_CITY_17275852B77637740681005",
         "CN_CITY_17275852B78610390708344",
         "CN_CITY_17275852B82032886612970",
-        "CN_CITY_17275852B82452317993245",
         "CN_CITY_17275852B82709828135465",
         "CN_CITY_17275852B83272093468807",
         "CN_CITY_17275852B83634722552305",
@@ -234448,11 +234448,11 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "a6524c7ba848d717018973a1c4ca4e15bfd64c03af38350f0220d81e1d643714",
+  "snapshot_fingerprint": "55f78b5cc5fc2d7c0c82018ca492281bbf3b60c8bfea59ee15b025603f0f2a5f",
   "source": {
     "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-    "build_snapshot_sha256": "2c4be9dd929e0910385385a3e78da19bcf09fb32c11ebd544f78a623804dab07",
-    "detail_chunk_manifest_sha256": "1d026cd9396922d741ce9ec4a1d68d3cf5f0573dbc7a4c1438dc1a3867a8f9e1",
+    "build_snapshot_sha256": "940bcd13fe83756a2f3434e6ab961f1411e4e3d4ddd38b6d6ed041378cc4b13b",
+    "detail_chunk_manifest_sha256": "f1fd0ab627d20fc6b6fbb8219df5c670375db9fc54d9e139bfc78a1ba690c637",
     "runtime_bootstrap_topology_sha256": "74d6f39ab2280fa524109d9bd35e15149df48681688deb22ecfac60911527115",
     "runtime_topology_sha256": "50cad6f666725fa6518b8aa5f8519a1b520946f3b4c2e46614029234ad8be0c3"
   },

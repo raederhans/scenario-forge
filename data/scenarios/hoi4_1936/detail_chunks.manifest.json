@@ -172121,15 +172121,15 @@
         117.10017100171001,
         24.259965718657185,
         145.8320583205832,
-        45.675003546035455
+        45.511834740347396
       ],
       "priority": 95,
-      "feature_count": 66,
-      "byte_size": 289224,
-      "sha256": "40d1986ef8fb7100101a136f024b129052253bb686bfee98846864812b522aae",
-      "coord_count": 2645,
-      "part_count": 98,
-      "estimated_path_cost": 3627,
+      "feature_count": 65,
+      "byte_size": 284301,
+      "sha256": "0ebb53bcda250a7742993fac16f599c243ba56cc65a04ccf4b04de9acfb1567d",
+      "coord_count": 2598,
+      "part_count": 97,
+      "estimated_path_cost": 3569,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -172207,12 +172207,6 @@
           39.54402246422465,
           118.39618396183965,
           40.05956645666457
-        ],
-        [
-          130.639906399064,
-          44.86436703267033,
-          131.68391683916838,
-          45.675003546035455
         ],
         [
           117.10017100171001,
@@ -172532,7 +172526,9 @@
           139.67599675996763,
           37.03747187471875
         ]
-      ]
+      ],
+      "owner_code": "JAP",
+      "decoded_byte_size": 284301
     },
     {
       "id": "political.detail.country.jor",
@@ -174480,12 +174476,12 @@
         53.53314379443795
       ],
       "priority": 95,
-      "feature_count": 234,
-      "byte_size": 1039068,
-      "sha256": "6cae7afed35452b688ea9986843171dec918a36e9e93facf21ef80d841eda513",
-      "coord_count": 9758,
-      "part_count": 236,
-      "estimated_path_cost": 12348,
+      "feature_count": 235,
+      "byte_size": 1043991,
+      "sha256": "da02b747aa06105f25baa43e5177ab609b1feb919bd9fa1302e37b92ebe09fd9",
+      "coord_count": 9805,
+      "part_count": 237,
+      "estimated_path_cost": 12406,
       "data_format": "geojson",
       "global_coverage": false,
       "country_codes": [
@@ -175895,8 +175891,16 @@
           39.97103870038701,
           120.45180451804521,
           40.5837896408964
+        ],
+        [
+          130.639906399064,
+          44.86436703267033,
+          131.68391683916838,
+          45.675003546035455
         ]
-      ]
+      ],
+      "owner_code": "MAN",
+      "decoded_byte_size": 1043991
     },
     {
       "id": "political.detail.country.men",

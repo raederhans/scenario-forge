@@ -111,7 +111,10 @@ export function createGeometryRasterWorkerKernel({
     if (canvas.width !== surfaceWidth) canvas.width = surfaceWidth;
     if (canvas.height !== surfaceHeight) canvas.height = surfaceHeight;
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, surfaceWidth, surfaceHeight);
+    // A patch publishes only its crop. Clear that entire crop, including holes,
+    // without changing the full-frame raster origin or the immutable result.
+    if (region) context.clearRect(region.x, region.y, region.width, region.height);
+    else context.clearRect(0, 0, surfaceWidth, surfaceHeight);
     context.globalCompositeOperation = "source-over";
     context.globalAlpha = 1;
     context.filter = "none";
@@ -213,6 +216,7 @@ export function createGeometryRasterWorkerKernel({
     for (const id of evictedGeometryIds) paths.delete(id);
     return { bitmap, kind: packet.kind, width: region?.width ?? width, height: region?.height ?? height,
       ...(region ? { renderRegion: { ...region }, patchBaseIdentity: packet.patchBaseIdentity } : {}), renderedCount, pathBuildCount, yieldCount, unpackingMs,
+      clearedPixelCount: region ? region.width * region.height : width * height,
       geometryTransportMode: packet.geometryTransport ? "packed-f64" : "geojson",
       evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),
         paths: { ...paths.getStats(), frameAdmissionSkips: pathAdmissionSkips } }, renderMs: now() - startedAt };

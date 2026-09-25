@@ -1,8 +1,11 @@
 import { getTransportAsset } from "../core/data_service.js";
 import { registerMapcreatorSnapshotProvider } from "../core/mapcreator_snapshot.js";
+import { createChunkLoadScheduler } from "../core/scenario/chunk_load_scheduler.js";
+import { pageResourceBudget } from "../core/runtime_resource_budget.js";
 
 export const PACK_MODE_PREVIEW = "preview";
 export const PACK_MODE_FULL = "full";
+const sharedTransportScheduler = createChunkLoadScheduler();
 
 export function createTransportWorkbenchSvgNode(tagName) {
   return document.createElementNS("http://www.w3.org/2000/svg", tagName);
@@ -162,19 +165,19 @@ export function getTransportWorkbenchPackPath(manifest, mode, key) {
   return packPath;
 }
 
-export function createTransportWorkbenchLinePackRuntime(definition) {
-  // 每个 line family 共用这组 runtime 字段：manifest、preview pack、full pack 与 selection 快照必须同生同灭。
+export function createTransportWorkbenchLinePackRuntime(definition, {
+  getAsset = getTransportAsset,
+  resourceBudget = pageResourceBudget,
+  scheduler = resourceBudget === pageResourceBudget ? sharedTransportScheduler : createChunkLoadScheduler({ resourceBudget }),
+  yieldTask = () => new Promise((resolve) => setTimeout(resolve, 0)),
+} = {}) {
+  // Each family owns its promises, projected geometry and selection. Neither
+  // this lifetime nor shared resource accounting may mutate political state.
   const runtime = {
     manifestPromise: null,
     auditPromise: null,
-    packPromises: {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    },
-    projectedPacks: {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    },
+    packPromises: { [PACK_MODE_PREVIEW]: null, [PACK_MODE_FULL]: null },
+    projectedPacks: { [PACK_MODE_PREVIEW]: null, [PACK_MODE_FULL]: null },
     activePack: null,
     activePackMode: null,
     loadState: createInitialLoadState(),
@@ -187,19 +190,29 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
     loadGeneration: 0,
   };
   const fetchOptions = definition.fetchOptions || { cache: "no-cache" };
+  const packResourceOwner = Symbol(`transport:${definition.familyId}`);
+  let controller = new AbortController();
+  let packTaskKeys = new Map();
+  let packWeights = new Map();
+  let releaseCount = 0;
+
+  function reportPackRetention() {
+    if (!packWeights.size) resourceBudget.release(packResourceOwner);
+    else resourceBudget.update(packResourceOwner, { transport: [...packWeights.values()].some((bytes) => bytes === null)
+      ? null : [...packWeights.values()].reduce((sum, bytes) => sum + bytes, 0) });
+  }
 
   function resetLoadStateForActivePack() {
     runtime.loadGeneration += 1;
+    controller.abort();
+    controller = new AbortController();
+    packTaskKeys = new Map();
+    packWeights = new Map();
+    resourceBudget.release(packResourceOwner);
     runtime.manifestPromise = null;
     runtime.auditPromise = null;
-    runtime.packPromises = {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    };
-    runtime.projectedPacks = {
-      [PACK_MODE_PREVIEW]: null,
-      [PACK_MODE_FULL]: null,
-    };
+    runtime.packPromises = { [PACK_MODE_PREVIEW]: null, [PACK_MODE_FULL]: null };
+    runtime.projectedPacks = { [PACK_MODE_PREVIEW]: null, [PACK_MODE_FULL]: null };
     runtime.activePack = null;
     runtime.activePackMode = null;
     runtime.loadState = createInitialLoadState();
@@ -207,8 +220,14 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
     runtime.lastRenderedConfig = null;
   }
 
+  function release({ preserveSelection = false } = {}) {
+    const selected = preserveSelection ? runtime.selectedFeature : null;
+    resetLoadStateForActivePack();
+    runtime.selectedFeature = selected;
+    releaseCount++;
+  }
+
   function setActivePack(packId = "", manifestUrl = "") {
-    // packId/manifestUrl 是国家包切换的真实边界；其中任一变化都要丢弃旧 promise 与投影结果。
     const normalizedPackId = String(packId || "").trim().toLowerCase();
     const normalizedManifestUrl = String(manifestUrl || definition.manifestUrl || "").trim();
     if (runtime.activePackId === normalizedPackId && runtime.activeManifestUrl === normalizedManifestUrl) return;
@@ -224,13 +243,15 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
   async function loadManifest() {
     if (!runtime.manifestPromise) {
       const loadGeneration = runtime.loadGeneration;
+      const signal = controller.signal;
       const manifestUrl = runtime.activeManifestUrl || definition.manifestUrl;
       const activePackId = runtime.activePackId || "default";
       runtime.manifestPromise = (async () => {
         definition.ensureClient?.();
-        const manifest = await getTransportAsset(manifestUrl, {
+        const manifest = await getAsset(manifestUrl, {
           cachePolicy: fetchOptions.cache,
           label: `transport-manifest:${definition.familyId}:${activePackId}`,
+          signal,
         });
         if (!isLoadGenerationCurrent(loadGeneration)) return null;
         if (!manifest) {
@@ -263,10 +284,12 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
   function startAuditLoad(manifest, onAuditReady) {
     if (!manifest?.paths?.build_audit || runtime.loadState.audit || runtime.auditPromise) return runtime.auditPromise;
     const loadGeneration = runtime.loadGeneration;
-    runtime.auditPromise = getTransportAsset(manifest.paths.build_audit, {
+    const signal = controller.signal;
+    runtime.auditPromise = scheduler.schedule(() => getAsset(manifest.paths.build_audit, {
       cachePolicy: fetchOptions.cache,
       label: `transport-audit:${definition.familyId}`,
-    })
+      signal,
+    }), { signal, speculative: true, priority: -1 })
       .then((audit) => {
         if (!isLoadGenerationCurrent(loadGeneration)) return null;
         runtime.loadState.audit = audit;
@@ -281,55 +304,74 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
     return runtime.auditPromise;
   }
 
-  async function loadPack(mode = PACK_MODE_PREVIEW, onAuditReady) {
+  async function loadPack(mode = PACK_MODE_PREVIEW, onAuditReady, { speculative = false } = {}) {
+    if (mode !== PACK_MODE_PREVIEW && mode !== PACK_MODE_FULL) throw new TypeError("Unknown transport pack mode.");
     if (runtime.projectedPacks[mode]) return runtime.projectedPacks[mode];
-    if (!runtime.packPromises[mode]) {
-      const loadGeneration = runtime.loadGeneration;
-      runtime.packPromises[mode] = (async () => {
-        const isPreview = mode === PACK_MODE_PREVIEW;
+    if (runtime.packPromises[mode]) {
+      if (!speculative) scheduler.promote(packTaskKeys.get(mode), 1);
+      return runtime.packPromises[mode];
+    }
+    const loadGeneration = runtime.loadGeneration;
+    const signal = controller.signal;
+    const taskKey = Symbol(`${definition.familyId}:${mode}:${loadGeneration}`);
+    packTaskKeys.set(mode, taskKey);
+    const hint = definition.estimatedLoadBytes?.[mode];
+    runtime.packPromises[mode] = scheduler.schedule(async () => {
+      const isPreview = mode === PACK_MODE_PREVIEW;
+      if (isPreview) {
+        runtime.loadState.status = "loading";
+        runtime.loadState.previewStatus = "loading";
+        runtime.loadState.error = null;
+      } else {
+        runtime.loadState.fullStatus = "loading";
+      }
+      const manifest = await loadManifest();
+      if (!isLoadGenerationCurrent(loadGeneration)) return null;
+      if (!manifest) {
         if (isPreview) {
-          runtime.loadState.status = "loading";
-          runtime.loadState.previewStatus = "loading";
-          runtime.loadState.error = null;
+          runtime.loadState.status = "pending";
+          runtime.loadState.previewStatus = "pending";
         } else {
-          runtime.loadState.fullStatus = "loading";
+          runtime.loadState.fullStatus = "pending";
         }
-        const manifest = await loadManifest();
-        if (!isLoadGenerationCurrent(loadGeneration)) return null;
-        if (!manifest) {
-          if (isPreview) {
-            runtime.loadState.status = "pending";
-            runtime.loadState.previewStatus = "pending";
-          } else {
-            runtime.loadState.fullStatus = "pending";
-          }
-          return null;
-        }
-        startAuditLoad(manifest, onAuditReady);
-        await definition.prepareCarrier?.(manifest);
-        if (!isLoadGenerationCurrent(loadGeneration)) return null;
-        const pack = await definition.buildPack({
-          mode,
-          manifest,
-          runtime,
-          fetchOptions,
-          getPackPath: getTransportWorkbenchPackPath,
-          loadTransportAsset: (path, overrides = {}) => getTransportAsset(path, {
-            cachePolicy: overrides.cachePolicy || fetchOptions.cache,
-            label: overrides.label || `transport-pack:${definition.familyId}:${mode}`,
-          }),
-        });
-        if (!isLoadGenerationCurrent(loadGeneration)) return null;
-        runtime.projectedPacks[mode] = pack;
-        if (isPreview) {
-          runtime.loadState.status = "ready";
-          runtime.loadState.previewStatus = "ready";
-          runtime.loadState.error = null;
-        } else {
-          runtime.loadState.fullStatus = "ready";
-        }
-        return pack;
-      })().catch((error) => {
+        return null;
+      }
+      startAuditLoad(manifest, onAuditReady);
+      await yieldTask();
+      if (!isLoadGenerationCurrent(loadGeneration)) return null;
+      await definition.prepareCarrier?.(manifest);
+      if (!isLoadGenerationCurrent(loadGeneration)) return null;
+      const pack = await definition.buildPack({
+        mode,
+        manifest,
+        runtime,
+        fetchOptions,
+        signal,
+        isCurrent: () => isLoadGenerationCurrent(loadGeneration),
+        getPackPath: getTransportWorkbenchPackPath,
+        loadTransportAsset: (path, overrides = {}) => getAsset(path, {
+          cachePolicy: overrides.cachePolicy || fetchOptions.cache,
+          label: overrides.label || `transport-pack:${definition.familyId}:${mode}`,
+          signal,
+        }),
+      });
+      if (!isLoadGenerationCurrent(loadGeneration)) return null;
+      runtime.projectedPacks[mode] = pack;
+      let weight = null;
+      try { weight = definition.estimatePackBytes?.(pack); } catch { /* Keep valid content, report unknown weight. */ }
+      packWeights.set(mode, Number.isSafeInteger(weight) && weight >= 0 ? weight : null);
+      reportPackRetention();
+      if (isPreview) {
+        runtime.loadState.status = "ready";
+        runtime.loadState.previewStatus = "ready";
+        runtime.loadState.error = null;
+      } else {
+        runtime.loadState.fullStatus = "ready";
+      }
+      return pack;
+    }, { key: taskKey, signal, priority: speculative ? -1 : 1, speculative,
+      ...(Number.isSafeInteger(hint) && hint > 0 ? { bytes: hint } : {}) })
+      .catch((error) => {
         if (!isLoadGenerationCurrent(loadGeneration)) return null;
         if (mode === PACK_MODE_PREVIEW) {
           runtime.loadState.status = "error";
@@ -340,7 +382,6 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
         }
         throw error;
       });
-    }
     return runtime.packPromises[mode];
   }
 
@@ -365,6 +406,10 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
       selected: typeof getSelectedSnapshot === "function"
         ? getSelectedSnapshot(runtime.lastRenderedConfig)
         : runtime.selectedFeature,
+      lifetime: { generation: runtime.loadGeneration, releaseCount, retainedPackCount: packWeights.size,
+        estimatedPackBytes: [...packWeights.values()].some((bytes) => bytes === null)
+          ? null : [...packWeights.values()].reduce((sum, bytes) => sum + bytes, 0),
+        accounting: "owned-pack-retention-estimates-not-heap", sharedResources: resourceBudget.snapshot() },
     };
   }
 
@@ -373,21 +418,23 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
   }
 
   function startBackgroundFullPackLoad({ onAuditReady, onHydrated } = {}) {
-    // full pack 只在 preview 可用后后台补齐；主图继续先用轻量 preview，避免工作台首开被完整包阻塞。
     if (runtime.projectedPacks[PACK_MODE_FULL] || runtime.packPromises[PACK_MODE_FULL]) return;
-    loadPack(PACK_MODE_FULL, onAuditReady)
+    const loadGeneration = runtime.loadGeneration;
+    loadPack(PACK_MODE_FULL, onAuditReady, { speculative: true })
       .then((pack) => {
-        if (!pack) return;
+        if (!pack || !isLoadGenerationCurrent(loadGeneration)) return;
         onHydrated?.(pack);
       })
       .catch((error) => {
+        if (!isLoadGenerationCurrent(loadGeneration)) return;
         console.warn(`[transport-workbench] Failed to hydrate full ${definition.familyId} pack.`, error);
       });
   }
 
   async function warm({ includeFull = false, onAuditReady, onHydrated } = {}) {
+    const loadGeneration = runtime.loadGeneration;
     await loadPack(PACK_MODE_PREVIEW, onAuditReady);
-    if (includeFull && runtime.loadState.status === "ready") {
+    if (isLoadGenerationCurrent(loadGeneration) && includeFull && runtime.loadState.status === "ready") {
       startBackgroundFullPackLoad({ onAuditReady, onHydrated });
     }
     return getSnapshot();
@@ -407,5 +454,6 @@ export function createTransportWorkbenchLinePackRuntime(definition) {
     startBackgroundFullPackLoad,
     warm,
     setActivePack,
+    release,
   };
 }

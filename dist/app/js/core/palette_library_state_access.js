@@ -20,10 +20,11 @@ export function createPaletteLibraryStateAccess(state) {
   }
 
   function getOwnerFeatureIds(ownerCode) {
+    // The old query name is a bridge; only reference inputs enter this scope.
     return getFeatureIdsForOwnerColorRefresh({
-      sovereigntyByFeatureId: state.sovereigntyByFeatureId,
-      ownerToFeatureIds: state.ownerToFeatureIds,
-      countryToFeatureIds: state.countryToFeatureIds,
+      sovereigntyByFeatureId: state.activeScenarioId ? state.scenarioBaselineOwnersByFeatureId : null,
+      ownerToFeatureIds: null,
+      countryToFeatureIds: state.activeScenarioId && state.mapSemanticMode !== "blank" ? null : state.countryToFeatureIds,
       landIndex: state.landIndex,
     }, ownerCode);
   }

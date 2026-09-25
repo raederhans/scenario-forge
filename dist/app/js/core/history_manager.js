@@ -21,7 +21,7 @@ import {
 } from "./state/actions/strategic_overlay_actions.js";
 import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
 import { markDirty } from "./dirty_state.js";
-import { markLegacyColorStateDirty, rebuildOwnerIndex } from "./sovereignty_manager.js";
+import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { callRuntimeHook, callRuntimeHooks } from "./state/index.js";
 const state = runtimeState;
@@ -72,7 +72,6 @@ function captureHistoryState({
   waterRegionIds = [],
   specialRegionIds = [],
   ownerCodes = [],
-  sovereigntyFeatureIds = [],
   stylePaths = [],
   strategicOverlay = false,
   intensityFieldChannels = [],
@@ -85,7 +84,6 @@ function captureHistoryState({
   const ids = uniqueKeys(featureIds);
   const waterIds = uniqueKeys(waterRegionIds);
   const ownerKeys = uniqueKeys(ownerCodes);
-  const sovereigntyIds = uniqueKeys(sovereigntyFeatureIds);
   const styleKeys = uniqueKeys(stylePaths);
 
   if (ids.length) {
@@ -101,10 +99,6 @@ function captureHistoryState({
     snapshot.sovereignBaseColors = captureEntries(runtimeState.sovereignBaseColors || {}, ownerKeys);
     snapshot.countryBaseColors = captureEntries(runtimeState.countryBaseColors || {}, ownerKeys);
     snapshot.countryPalette = captureEntries(runtimeState.countryPalette || {}, ownerKeys);
-  }
-
-  if (sovereigntyIds.length) {
-    snapshot.sovereigntyByFeatureId = captureEntries(runtimeState.sovereigntyByFeatureId || {}, sovereigntyIds);
   }
 
   if (styleKeys.length) {
@@ -193,7 +187,15 @@ function hasHistoryDelta(before, after) {
 }
 
 function pushHistoryEntry(entry) {
-  const nextEntry = entry && typeof entry === "object" ? entry : null;
+  const stripReference = (snapshot) => {
+    if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return snapshot;
+    const { sovereigntyByFeatureId: _retired, ...paintAndOtherDomains } = snapshot;
+    return paintAndOtherDomains;
+  };
+  const nextEntry = entry && typeof entry === "object" ? {
+    ...entry, before: stripReference(entry.before), after: stripReference(entry.after),
+    meta: { ...(entry.meta || {}), affectsSovereignty: false },
+  } : null;
   if (!nextEntry || !hasHistoryDelta(nextEntry.before, nextEntry.after)) {
     return false;
   }
@@ -232,18 +234,11 @@ function getFeatureColorHistoryIds(entry) {
 function refreshUiAfterHistory(direction, entry) {
   // undo/redo 之后统一从这里补 UI 和 render side effects，
   // 调用方只负责准备 before/after，不要在外面各自手写半套刷新逻辑。
-  if (entry?.before?.sovereigntyByFeatureId || entry?.after?.sovereigntyByFeatureId) {
-    runtimeState.sovereigntyInitialized = true;
-    rebuildOwnerIndex();
-  }
   const featureIds = getFeatureColorHistoryIds(entry);
   callRuntimeHook(state, "refreshColorStateFn", {
     renderNow: false,
     ...(featureIds ? { featureIds, inputLabel: `history-${direction}` } : {}),
   });
-  if (entry?.meta?.affectsSovereignty) {
-    callRuntimeHook(state, "recomputeDynamicBordersNowFn", { renderNow: false, reason: `history-${direction}` });
-  }
   // Feature-only visual history does not change ownership, region lists,
   // appearance controls, legend configuration, or strategic overlays. Keep
   // its UI work local to the color/tool/selection surfaces; broader history
@@ -295,7 +290,6 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
   runtimeState.countryBaseColors = runtimeState.countryBaseColors || {};
   runtimeState.countryPalette = runtimeState.countryPalette || {};
-  runtimeState.sovereigntyByFeatureId = runtimeState.sovereigntyByFeatureId || {};
 
   applyEntries(runtimeState.visualOverrides, snapshot.visualOverrides);
   applyEntries(runtimeState.featureOverrides, snapshot.featureOverrides);
@@ -303,7 +297,6 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(runtimeState.countryBaseColors, snapshot.countryBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
-  applyEntries(runtimeState.sovereigntyByFeatureId, snapshot.sovereigntyByFeatureId);
   if (
     snapshot.visualOverrides
     || snapshot.featureOverrides

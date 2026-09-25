@@ -3042,6 +3042,15 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "CG_ADM1_COG-3346__tno1962_2",
     ],
     "ITA": [
+        "SM_ADM1_SMR-4883",
+        "SM_ADM1_SMR-4884",
+        "SM_ADM1_SMR-4885",
+        "SM_ADM1_SMR-4886",
+        "SM_ADM1_SMR-4887",
+        "SM_ADM1_SMR-4888",
+        "SM_ADM1_SMR-4889",
+        "SM_ADM1_SMR-4890",
+        "SM_ADM1_SMR-4891",
         "ATLPRV_18263",
         "ATLPRV_18260",
         "ATLISL_adriatica_CRO_3",
@@ -3111,6 +3120,7 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B99894122533642",
     ],
     "RKK": [
+        "RU_RAY_50074027B58613203253678",
         "RU_RAY_50074027B17781956857402",
         "RU_RAY_50074027B16130547537538",
         "RU_RAY_50074027B44442883085225",
@@ -3140,6 +3150,7 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B28279959544204",
     ],
     "WRS": [
+        "RU_RAY_50074027B26247941998925",
         "RU_RAY_50074027B94330276236622",
         "RU_RAY_50074027B57840246477228",
         "RU_RAY_50074027B88418643135218",
@@ -3209,8 +3220,6 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "PAK-1108",
     ],
     "PER": [
-        "XK_ADM1_KOS-5909",
-        "RS228",
         "AZE-2415",
         "AZE-2419",
         "AZE-2420",
@@ -3219,6 +3228,10 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "AZE-2421",
         "AZE-2422",
         "AZE-2418",
+    ],
+    "SER": [
+        "XK_ADM1_KOS-5909",
+        "RS228",
     ],
     "FRI": [
         "IN_ADM2_76128533B27432148084533",
@@ -3415,6 +3428,8 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B2452640805703",
     ],
     "GOR": [
+        "RU_RAY_50074027B5573235052647",
+        "RU_RAY_50074027B91746933948416",
         "RU_RAY_50074027B54726203316693",
         "RU_RAY_50074027B31803957515687",
         "RU_RAY_50074027B96655496117027",
@@ -3933,9 +3948,11 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B49783608080364",
         "RU_RAY_50074027B61181893774399",
         "RU_RAY_50074027B76012718832492",
-        "RU_RAY_50074027B23063195205268",
+        "RU_RAY_50074027B18536602285327",
+        "RU_RAY_50074027B47936450781023",
     ],
     "KRS": [
+        "RU_RAY_50074027B23063195205268",
         "RU_RAY_50074027B68213314202961",
         "RU_RAY_50074027B31073193528551",
         "RU_RAY_50074027B97548464924661",
@@ -4045,8 +4062,6 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B15799482797585",
         "RU_RAY_50074027B76855541737815",
         "RU_RAY_50074027B71391443757864",
-        "RU_RAY_50074027B18536602285327",
-        "RU_RAY_50074027B47936450781023",
         "RU_RAY_50074027B45476358417172",
         "RU_RAY_50074027B19670057495733",
         "RU_RAY_50074027B94992557454451",
@@ -4093,6 +4108,7 @@ TNO_1962_FEATURE_ASSIGNMENT_OVERRIDES = {
         "RU_RAY_50074027B47783670520754",
     ],
     "SAM": [
+        "RU_RAY_50074027B40536112899816",
         "RU_RAY_50074027B81019147084957",
         "RU_RAY_50074027B71952656261998",
         "RU_RAY_50074027B29450610179229",
@@ -4632,7 +4648,9 @@ TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
         "parent_owner_tag": "",
     },
     "KRS": {
-        "display_name": "Krasnodar",
+        "display_name": "Krasnoyarsk",
+        "display_name_en": "Krasnoyarsk",
+        "display_name_zh": "克拉斯诺亚尔斯克",
         "continent_id": "continent_europe",
         "continent_label": "Europe",
         "subregion_id": "subregion_eastern_europe",
@@ -4641,7 +4659,7 @@ TNO_1962_MANUAL_COUNTRY_OVERRIDES = {
         "lookup_iso2": "RU",
         "provenance_iso2": "RU",
         "color_hex": "#d7d4ae",
-        "notes": "Krasnodar created from the requested central Siberian transfer set in TNO 1962 using the KRS palette color.",
+        "notes": "Krasnoyarsk created from the requested central Siberian transfer set in TNO 1962 using the KRS palette color.",
         "entry_kind": "scenario_country",
         "parent_owner_tag": "",
     },
@@ -5170,19 +5188,19 @@ ATLANTROPA_REGION_CONFIGS = {
         ],
         "water_state_ids": [8577, 8580, 8581, 8582, 8583, 8584, 8585, 8586, 8587, 8594, 8595, 8596, 9040],
         "state_owner_overrides": {
-            8446: "SPR",
-            8447: "SPR",
-            8448: "SPR",
-            8452: "SPR",
-            8453: "SPR",
+            8446: "IBR",
+            8447: "IBR",
+            8448: "IBR",
+            8452: "IBR",
+            8453: "IBR",
             8454: "ALC",
-            8455: "SPR",
-            8456: "SPR",
-            8457: "SPR",
-            8458: "SPR",
-            8459: "SPR",
-            8460: "SPR",
-            8461: "SPR",
+            8455: "IBR",
+            8456: "IBR",
+            8457: "IBR",
+            8458: "IBR",
+            8459: "IBR",
+            8460: "IBR",
+            8461: "IBR",
             8462: "FRA",
             8463: "FRA",
             8464: "FRA",
@@ -5223,7 +5241,7 @@ ATLANTROPA_REGION_CONFIGS = {
             {
                 "id": "balearics",
                 "label": "Balearics",
-                "owner_tag": "SPR",
+                "owner_tag": "IBR",
                 "donor_state_ids": [8459, 8460, 8461],
                 "baseline_feature_ids": ["ES531", "ES532", "ES533"],
                 "source_island_anchors": [
@@ -7958,6 +7976,9 @@ def ensure_tno_manual_override_countries(countries_payload: dict, owners_payload
             scenario_only=True,
             hidden_from_country_list=False,
         )
+        for field in ("display_name_en", "display_name_zh"):
+            if metadata.get(field):
+                countries[tag][field] = metadata[field]
 
 
 def apply_tno_country_display_name_overrides(countries_payload: dict) -> None:
@@ -11584,6 +11605,20 @@ def hydrate_atl_island_lineage(published_features, lineage_features):
     return hydrated
 
 
+def normalize_atlantropa_published_owner(region_id: str, owner_tag: str) -> str:
+    owner = normalize_tag(owner_tag)
+    return "IBR" if region_id == "west_med" and owner == "SPR" else owner
+
+
+def apply_atlantropa_published_owner(region_id: str, row: dict, owner_by_feature_id: dict | None) -> None:
+    old_owner = normalize_tag((owner_by_feature_id or {}).get(row["id"]))
+    published_owner = normalize_atlantropa_published_owner(region_id, old_owner)
+    if published_owner:
+        row["assigned_owner_tag"] = published_owner
+        if owner_by_feature_id is not None and published_owner != old_owner:
+            owner_by_feature_id[row["id"]] = published_owner
+
+
 def build_atlantropa_from_hgo(
     donor_context: dict,
     baseline_land_full_gdf: gpd.GeoDataFrame,
@@ -11624,6 +11659,10 @@ def build_atlantropa_from_hgo(
     seen_province_ids: set[int] = set()
 
     for region_id, config in ATLANTROPA_REGION_CONFIGS.items():
+        region_published_owner_map = {
+            feature_id: normalize_atlantropa_published_owner(region_id, owner)
+            for feature_id, owner in published_owner_map.items()
+        }
         aoi = box(*config["aoi_bbox"])
         precision_simplify_tolerance = float(
             config.get("precision_simplify_tolerance", config.get("simplify_tolerance", 0.01))
@@ -11767,7 +11806,7 @@ def build_atlantropa_from_hgo(
         merged_island_rows = merge_island_rows(region_id, config, residual_island_rows)
         island_identity_map = {}
         island_identity_diagnostics = {}
-        if merged_island_rows and published_owner_map:
+        if merged_island_rows and region_published_owner_map:
             envelopes = {}
             identity_raw_sources = {}
             unsupported = []
@@ -11795,7 +11834,7 @@ def build_atlantropa_from_hgo(
                     and feature["properties"]["id"] not in named_island_ids]
                 try:
                     merged_island_rows, island_identity_diagnostics = reconcile_island_identity(
-                        merged_island_rows, published_region_islands, published_owner_map,
+                        merged_island_rows, published_region_islands, region_published_owner_map,
                         source_support_by_row_id=envelopes,
                         raw_source_by_row_id=identity_raw_sources,
                     )
@@ -11812,9 +11851,7 @@ def build_atlantropa_from_hgo(
                         owner_by_feature_id[new_id] = entry["owner"]
         region_feature_rows = [*non_island_rows, *rebuilt_island_rows, *merged_island_rows]
         for row in region_feature_rows:
-            published_owner = normalize_tag((owner_by_feature_id or {}).get(row["id"]))
-            if published_owner:
-                row["assigned_owner_tag"] = published_owner
+            apply_atlantropa_published_owner(region_id, row, owner_by_feature_id)
             owner = normalize_tag(row["assigned_owner_tag"])
             if owner:
                 source_parts_by_owner.setdefault(owner, []).extend(

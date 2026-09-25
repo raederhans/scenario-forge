@@ -1,3 +1,4 @@
+import { getMapDataBoundary } from "../map_data_boundary.js";
 import { resolveFeatureColor } from "../color_resolver.js";
 import { isScenarioWaterLikeFeature } from "../scenario_runtime_queries.js";
 
@@ -27,12 +28,12 @@ export function isColorResolutionOceanFeature(feature, id, {
 
 /**
  * Owns political fill color strategy:
- * - display owner/controller precedence
+ * - read-only reference group precedence
  * - scenario shell owner hints
  * - final feature color delegation through color_resolver.js
  *
  * map_renderer.js keeps rebuild orchestration and cache invalidation; this owner only decides
- * which country owns the color and which resolved color should be written.
+ * which reference group seeds the color and which resolved color should be written.
  */
 export function createColorResolutionStrategyOwner({
   state,
@@ -63,7 +64,7 @@ export function createColorResolutionStrategyOwner({
     const shellOwnerCode = String(
       state.scenarioAutoShellOwnerByFeatureId?.[resolvedId] || shellOwnerHintCode || shellControllerHintCode || ""
     ).trim().toUpperCase();
-    const directOwnerCode = canonicalCountryCode(state.sovereigntyByFeatureId?.[resolvedId] || "");
+    const directOwnerCode = getMapDataBoundary(state).reference.getScenarioGroupCode(resolvedId);
     if (mapSemanticMode === "blank") {
       return isScenarioShell ? (directOwnerCode || shellOwnerCode || "") : directOwnerCode;
     }

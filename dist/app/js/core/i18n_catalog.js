@@ -2,6 +2,11 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "This removes current paint overrides. You can undo the clear from history.": { zh: "这会清除当前着色修改。你可以通过历史记录撤销。", en: "This removes current paint overrides. You can undo the clear from history." },
+  "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": { zh: "根据剧本参考分组编辑地图颜色。参考边界保持不变。", en: "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged." },
+  "Paint Reference Regions With Country Color": { zh: "用国家颜色填充参考区域", en: "Paint Reference Regions With Country Color" },
+  "Clear Reference Region Color Edits": { zh: "清除参考区域的着色修改", en: "Clear Reference Region Color Edits" },
+  "No reference regions were recolored.": { zh: "没有参考区域被重新着色。", en: "No reference regions were recolored." },
   "Capital": { zh: "首都", en: "Capital" },
   "Loaded": { zh: "已加载", en: "Loaded" },
   "visible": { zh: "个可见", en: "visible" },

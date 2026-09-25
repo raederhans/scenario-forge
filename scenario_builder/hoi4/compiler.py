@@ -729,7 +729,7 @@ def _evaluate_region_checks(
                     ids_by_country=ids_by_country,
                     ids_by_group=ids_by_group,
                     name_index=name_index,
-                    include_feature_ids=["CN_CITY_17275852B82452317993245"],
+                    include_feature_ids=["CN_CITY_17275852B71122715185286"],
                 ),
             },
         ],
