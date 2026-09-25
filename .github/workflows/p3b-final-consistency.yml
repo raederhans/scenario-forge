@@ -26,7 +26,7 @@ jobs:
         run: |
           npm ci
           python -m pip install -r requirements-dev.lock.txt
-      - name: Correct only the reviewed evidence marker from authoritative metadata
+      - name: Correct only the two reviewed evidence markers from authoritative metadata
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -36,21 +36,22 @@ jobs:
           def git(*args): return subprocess.check_output(['git',*args],text=True).strip()
           assert git('rev-parse','HEAD')==source,'Refusing concurrent source change'
           root=Path('.runtime/reports/p3b-final-consistency');root.mkdir(parents=True,exist_ok=True)
-          expected=json.loads(Path('landing/assets/hero-hoi4-1939.json').read_text())['counts']['political_features']
-          assert expected==6080,'Unreviewed metadata change'
-          paths=['landing/index.html','dist/index.html']
-          before=[]
+          markers=[('hoi4-1939-europe-features','hero-hoi4-1939.json',6081,6080),('tno-1962-europe-features','hero-tno-1962.json',3236,3247)]
+          paths=['landing/index.html','dist/index.html'];changes=[]
           for path in paths:
               assert git('rev-parse',f'HEAD:{path}')==git('rev-parse',f'{base}:{path}'),path
               p=Path(path);text=p.read_text()
-              pattern=r'(<div data-sample-evidence="hoi4-1939-europe-features"[^>]*>.*?<dd data-sample-evidence-value=")6081(">)6081(</dd>)'
-              updated,count=re.subn(pattern,lambda m:m[1]+str(expected)+m[2]+str(expected)+m[3],text,flags=re.S)
-              assert count==1,f'Expected exactly one stale marker in {path}'
-              p.write_text(updated)
-              before.append({'path':path,'old':6081,'new':expected,'source':'landing/assets/hero-hoi4-1939.json:counts.political_features'})
+              for marker,asset,old,expected in markers:
+                  metadata=f'landing/assets/{asset}'
+                  assert json.loads(Path(metadata).read_text())['counts']['political_features']==expected,'Unreviewed metadata change'
+                  pattern=rf'(<div data-sample-evidence="{re.escape(marker)}"[^>]*>.*?<dd data-sample-evidence-value="){old}(">){old}(</dd>)'
+                  text,count=re.subn(pattern,lambda m:m[1]+str(expected)+m[2]+str(expected)+m[3],text,flags=re.S)
+                  assert count==1,f'Expected one stale {marker} in {path}'
+                  changes.append({'path':path,'marker':marker,'old':old,'new':expected,'source':metadata+':counts.political_features'})
+              p.write_text(text)
           assert set(git('diff','--name-only').splitlines())==set(paths)
           subprocess.run(['git','diff','--check'],check=True)
-          (root/'correction.json').write_text(json.dumps({'source':source,'base':base,'baseline_identical_paths':paths,'correction':before},indent=2))
+          (root/'correction.json').write_text(json.dumps({'source':source,'base':base,'baseline_identical_paths':paths,'correction':changes},indent=2))
           PY
       - name: Verify corrected source and checked-in output without weakening assertions
         run: |
@@ -69,20 +70,20 @@ jobs:
           import hashlib,json
           root=Path('.runtime/p3b-final/pages');out=[]
           html=(root/'index.html').read_text()
-          assert 'data-sample-evidence-value="6080">6080</dd>' in html
+          for number in [6080,3247]:assert f'data-sample-evidence-value="{number}">{number}</dd>' in html
           for path in ['js/workers/paint_contour.worker.js','js/core/paint_contour_worker_client.js','js/core/paint_contour_source.js','js/core/renderer/paint_contour_graph.js','js/core/renderer/paint_contour_runtime.js','js/core/renderer/paint_contour_mesh.js']:
               data=Path(path).read_bytes();assert (root/'app'/path).read_bytes()==data,path
               out.append({'path':path,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
           Path('.runtime/reports/p3b-final-consistency/published-files.json').write_text(json.dumps(out,indent=2))
           PY
-      - name: Commit only the tested evidence correction to the existing task branch
+      - name: Commit only the tested evidence corrections to the existing task branch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -- landing/index.html dist/index.html
           test "$(git diff --cached --name-only | wc -l)" -eq 2
           git diff --cached --check
-          git commit -m 'fix: synchronize 1939 showcase evidence with merged source metadata'
+          git commit -m 'fix: synchronize 1939 and TNO showcase evidence with merged source metadata'
           git push origin HEAD:codex/paint-contours-p3b-20260925
           git rev-parse HEAD > .runtime/reports/p3b-final-consistency/source-sha.txt
           git show --stat --oneline HEAD > .runtime/reports/p3b-final-consistency/commit.txt
