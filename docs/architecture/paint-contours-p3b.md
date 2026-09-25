@@ -2,6 +2,7 @@
 
 Initial base: main `330ad7c6`, including P3A and the ocean/paint-latency repairs in PR #165.
 Continuation integrates `27888645` and retains PR #166 city-label corrections.
+Final integration retains main `f98c734790233bc31993506bd1761be85cea90c5`, including PR #168 data repairs.
 
 The primary land boundary represents a difference between **persistent base fill
 colors**, not country ownership, screen pixels, a heatmap, a hover state, or an
@@ -97,3 +98,47 @@ Large initial graphs are still expensive and remain off the main thread in norma
 browsers. Audit reports record build time, heap usage, packed bytes and local paint
 refresh cost; no whole-application FPS or low-memory-device acceptance is claimed.
 The unsupported-Worker fallback yields per message batch but packing is synchronous.
+
+## Current-main closeout receipt (2026-09-25)
+
+Runtime source `9d6a22bb233c93a723a4787781fe93207384bfdb` was verified after
+integrating main `f98c734790233bc31993506bd1761be85cea90c5`.
+Run `36151691720` records separate pristine-main, geometry, browser and integration
+results. Artifacts were downloaded and their actual logs checked.
+
+- Real topology audit passed for Modern World, HOI4 1936, HOI4 1939 and TNO 1962.
+  Proven eligible native interior pairs were 21,428 / 23,523 / 23,523 / 11,480;
+  each reported zero unresolved proven interior pairs. The sampled TNO coarse
+  plus AFA/AFG detail promotion reported no lost seams. This is not all possible
+  chunk combinations or an assertion that source polygons contain no overlaps.
+- Five Playwright cases passed: retired editing controls, actual country paint
+  and current-format reload, synthetic Worker/draw-owner seam pixels, and actual
+  Modern World/TNO uniform paint, erase, undo and redo. Real-scene geometry build
+  counts and source versions stayed unchanged during those paint transactions.
+- Pages build passed; startup-shell tests ran 65 cases, with 64 passing and one
+  existing conditional skip. Published contour modules matched source bytes.
+- The selected integration run executed 221 groups: 218 passed and three failed.
+  One was stale landing evidence after the concurrent data repair. The other two
+  were the borrowed-effect and quick P4 proof groups, which overlap in coverage.
+  A clean main run and P3B both had the same 25 failing P4 test names. Main ran
+  481 cases; P3B ran 484, with the three additional regression cases passing.
+  No new failing name was observed, but that comparison does not prove every
+  diagnostic inside a failing case equivalent or clear historical proof debt.
+
+Run `36156577597` then verified only the narrow landing correction and relevant
+regressions before committing `1783f9606aab9f80efb6281bdd449e4504ab77ae`:
+
+- Corrected source and checked-in landing HTML markers from their existing JSON:
+  HOI4 1939 6,081 to 6,080; TNO 3,236 to 3,247. Scenario data was not changed.
+- All 22 existing landing behavior/evidence tests passed without weakening them.
+- All 238 ownership-retirement/contour/reference/history/export behavior tests
+  passed, with no failures or skips.
+- Pages build and byte-for-byte publication checks passed again.
+
+That correction changes only `landing/index.html` and `dist/index.html`; contour
+runtime, geometry, tests and scenario data remain identical to the previously
+verified runtime source. The subsequent documentation receipt changes no runtime
+behavior. The entire 221-group matrix was not rerun after this HTML-only fix.
+The two historical proof execution groups remain unresolved, not waived. Normal
+required PR checks and their approval state are separate from these scoped
+receipts. No main merge, deployment or protection relaxation is part of this PR.
