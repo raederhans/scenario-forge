@@ -2,7 +2,7 @@
 
 ## 合并前复核（2026-09-26）
 
-PR #175 的首次 CI 已通过全部剧本契约、Pages 产物、浏览器冒烟和性能检查，但新编辑用例的 120 秒总超时触发既有 60 秒测试规范。已将用例改为 60 秒，不扩展白名单或修改规则；对应结构检查通过，实际点击／填色／撤销重跑仍以 44.9 秒通过。最终合并等待修正提交的远端检查。
+PR #175 的首次 CI 通过全部剧本契约、浏览器冒烟和性能检查，但失败于两个独立项：新编辑用例的 120 秒总超时，以及未同步更新的 TNO 主页预览图。已将用例改为 60 秒，不扩展白名单或修改规则；对应结构检查通过，实际点击／填色／撤销重跑仍以 44.9 秒通过。第二轮确认超时项修复，预览图一致性仍失败。需要同步来源生成的 TNO SVG/WebP 并通过完整 PR 检查后才能合并。
 
 用户追加授权检查、合并与推送。交付分支 `codex/atlantropa-expansion-20260926` 从最新主线 `a5eed904` 隔离建立，重新生成全部本轮场景产物，保留 PR #174 的法国／阿尔及利亚政治区修复。最终交付涉及 29 个场景文件；当前主线的启动语言文件无改动，192 个政治区分块及政治边界网格逐字节保留。
 
@@ -65,3 +65,5 @@ PR #175 的首次 CI 已通过全部剧本契约、Pages 产物、浏览器冒�
 - 对照图：`.runtime/reports/generated/atlantropa-expansion-20260926/additions.png`，橙色为新增陆地。已确认图中新增几何与最终采纳结果一致。
 - 浏览器最终海岸线结果：`.runtime/tmp/atlantropa-expansion-20260926/browser-final.log` 中第一项；最终编辑结果：`browser-edit.log`。截图位于 `.runtime/tests/playwright/atlantropa-expansion-20260926-edit/`。
 - 详细来源与延期依据：[source-decisions.md](source-decisions.md)。
+
+TNO 主页 SVG、元数据与 WebP 已用既有生成器同步，其他三个剧本输出逐字节未变。原失败项 `test_landing_hero_scenario_assets_match_builder_output` 已直接重跑通过（80.930 秒）。最终远端合并仍以修正提交的新一轮 CI 为准。
