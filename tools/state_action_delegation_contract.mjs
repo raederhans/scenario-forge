@@ -5021,12 +5021,12 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getCityLightsRenderOwner",
-  "compositionSourceFingerprint": "ece72a38a9c38c2ad7221d89d793996bd228eb78da01fa80770196fc4f2e0709",
+  "compositionSourceFingerprint": "3dcc379b6389be2ee8c82220ebdb79c5b003e07de1f84a1fd060106380af17dc",
   "factoryModulePath": "js/core/renderer/city_lights_render_owner.js",
   "factoryExportName": "createCityLightsRenderOwner",
   "borrowedLocalParameterIndexes": { "getUrbanLightWeight": [0], "sampleModernCityLightsGridNormalized": [0, 1], "getModernPopulationCoreGain": [0] },
   "borrowedMapReadResultPaths": { "getModernPopulationCoreGain": [["feature"], ["urbanFeature"]] },
-  "factorySourceFingerprint": "fd86667f1243909ec3db5cecb4a4d2abbd0ccc88fa85613d0278eac1c0a4a512",
+  "factorySourceFingerprint": "430433c78c981240fb3ba9125c59427b16f3cf44e3b6655a7d3994472acf133c",
   "ownerBindingName": "cityLightsRenderOwner",
   "methods": [
     "toRgbaString",
@@ -5879,11 +5879,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getDayNightRuntimeOwner",
     compositionSourceFingerprint:
-      "3ce0f2dde1cf99c3836747e3369daf71c0476bd8f8da60d1f136e0f7e2dd9596",
+      "4dbc276b277c80484572a7baf5ac576e94ec898a3bdb8c4733ad0d4bd788f736",
     factoryModulePath: "js/core/renderer/day_night_runtime_owner.js",
     factoryExportName: "createDayNightRuntimeOwner",
     factorySourceFingerprint:
-      "ec2eceb9e94ff0559597ea365226f5b27907274855f1a35e0b1e86a2438a46b7",
+      "1f998689fa7b4f055cbe9d844af6f36078088b9635b46e8243318b661553a475",
     ownerBindingName: "dayNightRuntimeOwner",
     methods: [
       "buildNightHemisphereFeature",
