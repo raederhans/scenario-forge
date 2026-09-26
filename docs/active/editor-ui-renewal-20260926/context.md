@@ -34,3 +34,5 @@
 在 `origin/main@2e127eb4` 上重新验证：91 项 Node、119 项 Python、70 项 E2E 结构工具检查和 11 项真实浏览器用例通过；Pages 构建成功。浏览器包含工作区 9 项、真实导出和交通应用，使用独占 localhost:8012。新增 spec 已登记至 E2E 清单并重新生成依赖图；清单、导入图和超时 guardrail 均通过。移除条件跳过，统一使用 60 秒单测超时。
 
 dist 从该隔离工作树完整生成，其中也同步了已在主线合并的湖泊/轮廓代码；未从主工作区复制 renderer WIP。旧静态检查仍有 4 条源码 token 断言失败（HGO hover、legend action、project support callback/listener），均已在原实现基线复核；旧 dist 差异失败已消除。不据此声明全量测试通过，也不修改分支保护。
+
+PR #171 的第一轮 CI 检出三份启动词典变更遗漏 snapshot 校验值更新。按现有 snapshot 生成函数补齐 `build_snapshot.json`、manifest fingerprint 与 audit 引用，并断言实际变化的 artifact 只有 `locales.startup.json`；未重建剧本地理数据。三个严格剧本契约本地通过，catalog 重新生成后无内容差异，19 项 catalog 单测通过。远端第一轮 UI smoke 与 transport contract 通过，后续结果以 PR 当前提交为准。
