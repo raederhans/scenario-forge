@@ -149,4 +149,8 @@ test("shouldPreferWaterHit keeps macro hover low priority and lake strict hits h
     }),
     true,
   );
+  lakeHit.feature.properties.type = "reservoir";
+  assert.equal(shouldPreferWaterHit(landHit, lakeHit, {
+    eventType: "click", getWaterRegionType: (feature) => feature.properties.type,
+  }), true);
 });

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 import { parse } from "acorn";
+import { isLakeRegion } from "../js/core/renderer/effective_water_regions.js";
 
 const rendererSource = readFileSync(
   new URL("../js/core/renderer/scenario_region_overlay_render_owner.js", import.meta.url),
@@ -25,6 +26,28 @@ const drawScenarioWaterFillLayerSource = extractFunctionSource(
   "drawScenarioWaterFillLayer",
 );
 
+test("political preview punches out visible shared and scenario lakes, preserving hidden scenario waters", () => {
+  const shared = { properties: { id: "shared", water_type: "lake" } };
+  const scenario = { properties: { id: "scenario", water_type: "lake" } };
+  const sea = { properties: { id: "sea", water_type: "sea" } };
+  const state = { showWaterRegions: false, contextLayerExternalDataByName: { lakes: { features: [shared] } } };
+  const calls = [];
+  const drawingContext = { globalCompositeOperation: "source-over",
+    save() { this.saved = this.globalCompositeOperation; }, restore() { this.globalCompositeOperation = this.saved; } };
+  const scope = vm.createContext({ runtimeState: state, isLakeRegion,
+    getFeatureId: f => f.properties.id, getEffectiveWaterRegionFeatures: () => [shared, scenario, sea],
+    rendererSurfaceHost: { getContext: () => drawingContext },
+    drawScenarioWaterFillLayer: (k, options) => calls.push({ k, ids: Array.from(options.waterFeatures, f => f.properties.id), maskOnly: options.maskOnly, operation: drawingContext.globalCompositeOperation }),
+  });
+  vm.runInContext(extractFunctionSource(rendererSource, "maskLakesFromPoliticalPatch"), scope);
+  scope.maskLakesFromPoliticalPatch(2);
+  assert.deepEqual(calls[0], { k: 2, ids: ["shared"], maskOnly: true, operation: "destination-out" });
+  state.showWaterRegions = true;
+  scope.maskLakesFromPoliticalPatch(3);
+  assert.deepEqual(calls[1].ids, ["shared", "scenario"]);
+  assert.equal(drawingContext.globalCompositeOperation, "source-over");
+});
+
 function part(id, { visible = true } = {}) {
   return { id, bounds: { id, visible } };
 }
@@ -42,10 +65,12 @@ function createHarness({
   featurePath = null,
   partPaths = new Map(),
   pathCanvas = null,
+  showRivers = false,
 } = {}) {
   const calls = {
     beginPath: 0,
     fill: [],
+    stroke: [],
     pathCanvas: [],
     restore: 0,
     save: 0,
@@ -60,6 +85,10 @@ function createHarness({
     fill(pathValue) {
       calls.fill.push(arguments.length ? pathValue : "current-path");
     },
+    stroke(pathValue) {
+      calls.stroke.push({ path: pathValue || "current-path", color: this.strokeStyle, alpha: this.globalAlpha, width: this.lineWidth });
+    },
+    setLineDash() {},
     restore() {
       calls.restore += 1;
     },
@@ -74,6 +103,9 @@ function createHarness({
       }
     : null;
   const context = vm.createContext({
+    isLakeRegion,
+    runtimeState: { showRivers, styleConfig: { rivers: { color: "#456789" } } },
+    getSafeCanvasColor: (value, fallback) => value || fallback,
     Path2D: hasPath2D ? function Path2D() {} : undefined,
     collectContextMetric: (name, duration, payload) => metrics.push({ name, duration, payload }),
     collectSafeWaterRegionGeometryParts: (candidate) => candidate.parts,
@@ -100,7 +132,7 @@ function createHarness({
   return {
     calls,
     metrics,
-    draw: (waterFeatures) => context.__drawScenarioWaterFillLayer(1, { waterFeatures }),
+    draw: (waterFeatures, options = {}) => context.__drawScenarioWaterFillLayer(1, { waterFeatures, ...options }),
   };
 }
 
@@ -114,6 +146,17 @@ test("scenario water fill counts a feature drawn through its complete Path2D", (
   assert.equal(harness.calls.save, 1);
   assert.equal(harness.calls.restore, 1);
   assert.equal(harness.metrics.at(-1).payload.renderedCount, 1);
+});
+
+test("lake shoreline follows the river hue while patch masks never draw a shore", () => {
+  const lake = { ...feature("lake"), properties: { water_type: "lake" } };
+  const path = { name: "lake-path" };
+  const h = createHarness({ featurePath: path, showRivers: true });
+  h.draw([lake]);
+  assert.deepEqual(h.calls.stroke, [{ path, color: "#456789", alpha: 0.22, width: 1.4 }]);
+  h.draw([lake], { maskOnly: true });
+  assert.equal(h.calls.stroke.length, 1);
+  assert.equal(h.calls.fill.length, 2);
 });
 
 test("scenario water fill counts multiple visible part paths as one rendered feature", () => {

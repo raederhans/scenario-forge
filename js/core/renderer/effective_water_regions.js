@@ -1,5 +1,15 @@
 // Ordinary lakes share one geometry set across scenarios. Scenario-only waters
 // remain in their owning scenario; exclusive mode applies to marine regions.
+export function isLakeRegion(feature) {
+  return ["lake", "reservoir", "inland_sea"].includes(
+    String(feature?.properties?.water_type || "").trim().toLowerCase(),
+  );
+}
+
+export function isLakeInteractionEnabled(state) {
+  return state?.styleConfig?.lakes?.interactive === true;
+}
+
 export function resolveEffectiveWaterRegionFeatures({
   baseFeatures = [],
   scenarioFeatures = [],

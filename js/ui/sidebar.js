@@ -2284,6 +2284,7 @@ function initSidebar({ render } = {}) {
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const waterInspectorSection = document.getElementById("waterInspectorSection");
   const waterInspectorOpenOceanSelectToggle = document.getElementById("waterInspectorOpenOceanSelectToggle");
+  const waterInspectorLakeInteractionToggle = document.getElementById("waterInspectorLakeInteractionToggle");
   const waterInspectorOpenOceanSelectHint = document.getElementById("waterInspectorOpenOceanSelectHint");
   const waterInspectorOpenOceanPaintToggle = document.getElementById("waterInspectorOpenOceanPaintToggle");
   const waterInspectorOpenOceanPaintHint = document.getElementById("waterInspectorOpenOceanPaintHint");
@@ -3891,6 +3892,7 @@ function initSidebar({ render } = {}) {
     elements: {
       waterInspectorSection,
       waterInspectorOpenOceanSelectToggle,
+      waterInspectorLakeInteractionToggle,
       waterInspectorOpenOceanSelectHint,
       waterInspectorOpenOceanPaintToggle,
       waterInspectorOpenOceanPaintHint,
