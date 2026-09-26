@@ -3,7 +3,7 @@
 
 ## 2026-09-26 地图清晰度与政治边界修复
 
-`C:/Users/raede/.codex/worktrees/map-clarity/mapcreator` 使用 `codex/map-clarity-20260926`，基于 `2f4cb130` 实施显示密度、独立政治国界、线条层级与 TNO 阿尔及利亚源覆盖修复。主工作区的未归属 UI、昼夜与其他改动保留原样。本任务通过受保护 main 的 PR 检查整合；最终推送和合并以 GitHub 回执为准。工作树继续承担 localhost:8001 预览并保存 `.runtime` 中的修复前数据、候选及浏览器证据，因此合并后保留。记录见 [map-clarity-20260926](map-clarity-20260926/task.md)。
+`C:/Users/raede/.codex/worktrees/map-clarity/mapcreator` 使用 `codex/map-clarity-20260926`，基于 `2f4cb130` 实施显示密度、独立政治国界、线条层级与 TNO 阿尔及利亚源覆盖修复。主工作区的未归属 UI、昼夜与其他改动保留原样。本任务通过 [PR #174](https://github.com/raederhans/scenario-forge/pull/174) 的受保护 main 检查整合；最终推送和合并以该回执为准。工作树继续承担 localhost:8001 预览并保存 `.runtime` 中的修复前数据、候选及浏览器证据，因此合并后保留。记录见 [map-clarity-20260926](map-clarity-20260926/task.md)。
 
 ## 2026-09-26 编辑工作区 UI 整合
 

@@ -1,7 +1,7 @@
 # Map clarity task
 
 ## Current status
-Implementation and focused validation complete on codex/map-clarity-20260926. Original main checkout untouched; no commit, push, merge or deployment.
+Implementation and focused validation complete on codex/map-clarity-20260926. Delivery: [PR #174](https://github.com/raederhans/scenario-forge/pull/174). The PR receipt is authoritative for the merged SHA, required checks and automatic deployment. Original main checkout WIP remains untouched.
 
 ## Checklist
 - [x] Baseline captured at 1440x1000, device DPR2, TNO100%/250%; old effective DPR1.5, new DPR2.
@@ -59,3 +59,10 @@ Implementation and focused validation complete on codex/map-clarity-20260926. Or
 
 ### Scope
 Actual scenario data repair is the confirmed Algerian group. The shared-source simplification fix applies upstream to extension countries, but other overlap candidates and other scenarios have not all been migrated or visually accepted. The corrected report is .runtime/reports/generated/political-border-continuity-audit.md.
+
+
+## Authorized integration and delivery
+- Product commit0511b624, main integration05d54e28, verification registration79d7fa09. Remote main cc76f209 merged without file conflicts.
+- Rechecked changed Node tests:167 passed across15 files. Post-integration architecture check passed; focused browser passed in56.6s; Pages artifact-only build passed at573.64MiB (integration-dist under.runtime).
+- Added10 standalone verification routes,3 geospatial dependency classifications and focused E2E regression registration. Metadata59, classification75, schema651, E2E layering/timeout and script portfolio checks passed.
+- PR #174 is the protected-main delivery record. Retain this worktree for active localhost8001 and repair recovery artifacts. Do not synchronize/reset the dirty original main checkout; other tasks own those files.
