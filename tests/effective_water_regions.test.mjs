@@ -16,8 +16,9 @@ test("all lake types require opt-in, including legacy named lakes and display-on
   const declarations = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
     .filter((node) => node.type === "FunctionDeclaration" && names.includes(node.id.name));
   const state = { styleConfig: { lakes: normalizeLakeStyleConfig() }, showWaterRegions: true };
+  let oceanActive = false;
   const scope = vm.createContext({ runtimeState: state, isLakeRegion, isLakeInteractionEnabled,
-    isOpenOceanOverlayActive: () => false, isOpenOceanRenderable: () => false });
+    isOpenOceanOverlayActive: () => oceanActive, isOpenOceanRenderable: () => false });
   vm.runInContext(declarations.map(({ start, end }) => source.slice(start, end)).join("\n"), scope);
   for (const water_type of ["lake", "reservoir", "inland_sea"]) {
     for (const interactive of [true, false, undefined]) {
@@ -33,6 +34,14 @@ test("all lake types require opt-in, including legacy named lakes and display-on
   }
   assert.equal(scope.isWaterRegionEnabled(water("sea", { water_type: "sea" })), true);
   assert.equal(scope.isWaterRegionEnabled(water("ocean", { water_type: "ocean" })), false);
+  const legacyOcean = water("legacy-ocean", { water_type: "ocean", interactive: false });
+  assert.equal(scope.isWaterRegionEnabled(legacyOcean), false);
+  oceanActive = true;
+  assert.equal(scope.isWaterRegionEnabled(legacyOcean), true);
+  assert.equal(scope.isWaterRegionEnabled(water("disabled-sea", { water_type: "sea", interactive: false })), false);
+  state.showWaterRegions = false;
+  assert.equal(scope.isWaterRegionEnabled(water("hidden-sea", { water_type: "sea" })), false);
+  assert.equal(scope.isWaterRegionEnabled(legacyOcean), true);
   assert.equal(normalizeLakeStyleConfig({ interactive: "false" }).interactive, false);
   assert.equal(normalizeLakeStyleConfig(JSON.parse(JSON.stringify({ interactive: true }))).interactive, true);
 });

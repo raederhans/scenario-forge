@@ -1626,6 +1626,12 @@ def build_water_regions(
             crs="EPSG:4326",
         )
         water_regions = _build_water_region_records_gdf(water_regions.to_dict("records"))
+    # Partial/regional source fixtures must not gain unrelated global water.
+    # Production world inputs include both Atlantic and Pacific parents.
+    if {"marine_atlantic_ocean", "marine_pacific_ocean"} <= set(water_regions["id"]):
+        from map_builder.geo.marine_refinement import refine_base_water_regions
+        refined = refine_base_water_regions(json.loads(water_regions.to_json()))
+        water_regions = gpd.GeoDataFrame.from_features(refined["features"], crs="EPSG:4326")
     water_regions = _compute_water_region_neighbors(water_regions)
     from map_builder.geo.spherical_safety import (
         prepare_primary_polar_water_regions,

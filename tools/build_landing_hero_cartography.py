@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import json
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
-from topojson.utils import serialize_as_geojson
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.scenario_topology_decode import topology_object_to_geojson
+
 LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
 EUROPE_TOPOLOGY = REPO_ROOT / "data" / "europe_topology.json"
 
@@ -44,7 +49,7 @@ def read_json(path: Path) -> dict:
 
 def topology_features(path: Path, object_name: str) -> list[dict]:
     payload = read_json(path)
-    collection = serialize_as_geojson(payload, objectname=object_name)
+    collection = topology_object_to_geojson(payload, object_name)
     features = collection.get("features") if isinstance(collection, dict) else None
     if not isinstance(features, list):
         return []

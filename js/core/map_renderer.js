@@ -1,3 +1,4 @@
+import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
 import { isOwnershipEditingEnabled } from "./map_editing_policy.js";
@@ -5000,13 +5001,14 @@ function isWaterRegionRenderable(feature) {
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
   if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
-  if (!runtimeState.showWaterRegions && !isOpenOceanWaterRegion(feature)) return false;
+  // Legacy oceans become interactive through the explicit ocean controls.
+  if (isOpenOceanWaterRegion(feature)) {
+    return isOpenOceanOverlayActive();
+  }
+  if (!runtimeState.showWaterRegions) return false;
   if (feature.properties?.interactive === false) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
-  }
-  if (isOpenOceanWaterRegion(feature)) {
-    return isOpenOceanOverlayActive();
   }
   return feature?.properties?.interactive !== false;
 }
@@ -5022,7 +5024,7 @@ function getWaterRegionColor(id, feature = null) {
     return getWaterRegionDefaultStyle(defaultStyleFeature).fill;
   }
   return (
-    getSafeCanvasColor(runtimeState.waterRegionOverrides?.[resolvedId], null) ||
+    resolveWaterRegionOverride(resolvedId, defaultStyleFeature, runtimeState.waterRegionsById, runtimeState.waterRegionOverrides, getSafeCanvasColor) ||
     getWaterRegionDefaultStyle(defaultStyleFeature).fill
   );
 }

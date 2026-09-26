@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-26 外海细化整合
+
+`C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator` 使用 `codex/ocean-refinement`，实施共享命名海域、11项外海补齐及基础外洋分区。用户已授权合并推送；以隔离分支整合最新主线，主工作区既有 WIP 保留。合并后保留此工作树中的 `.runtime` 原始几何、集成比较和浏览器证据供复核。任务及最终 GitHub 回执见 [ocean-refinement-20260926](ocean-refinement-20260926/task.md)。
+
 
 ## 2026-09-26 地图清晰度与政治边界修复
 

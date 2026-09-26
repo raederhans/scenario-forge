@@ -260,6 +260,95 @@ def densify_water_topology(topology, *, object_name="water_regions", max_step_de
     rewrite_geometry(target)
     return result
 
+def transplant_water_features(target, source, *, object_name="water_regions", feature_ids=None):
+    """Copy encoded water features exactly, including into an unquantized LOD.
+
+    Used to retain out-of-scope water and to share the canonical water geometry
+    across political LODs. No booleans, resampling or snap rounding occur here.
+    """
+    result = deepcopy(target)
+    source_transform = source.get("transform")
+    target_transform = target.get("transform")
+    if target_transform and target_transform != source_transform:
+        raise ValueError("Exact water transplant requires identical grids or an unquantized target.")
+    originals = source["objects"][object_name]["geometries"]
+    selected = {str((g.get("properties") or {}).get("id") or g.get("id")): g for g in originals}
+    if feature_ids is not None:
+        missing = set(feature_ids) - selected.keys()
+        if missing:
+            raise ValueError(f"Missing preserved water features: {sorted(missing)}")
+        selected = {key: value for key, value in selected.items() if key in feature_ids}
+    remap = {}
+
+    def copy_arc(reference):
+        index = reference if reference >= 0 else ~reference
+        if index not in remap:
+            arc = deepcopy(source["arcs"][index])
+            if source_transform and not target_transform:
+                sx, sy = source_transform["scale"]
+                tx, ty = source_transform["translate"]
+                x = y = 0
+                decoded = []
+                for dx, dy in arc:
+                    x, y = x + dx, y + dy
+                    decoded.append([x * sx + tx, y * sy + ty])
+                arc = decoded
+            remap[index] = len(result["arcs"])
+            result["arcs"].append(arc)
+        return remap[index] if reference >= 0 else ~remap[index]
+
+    def rewrite(value):
+        return [rewrite(child) for child in value] if isinstance(value, list) else copy_arc(value)
+
+    replacements = {}
+    for key, original in selected.items():
+        geometry = deepcopy(original)
+        geometry["arcs"] = rewrite(geometry["arcs"])
+        replacements[key] = geometry
+    if feature_ids is None:
+        result["objects"][object_name] = {**deepcopy(source["objects"][object_name]),
+                                         "geometries": list(replacements.values())}
+        for key in ("water_geometry_precision", "water_geometry_quantization"):
+            if key in source:
+                result[key] = deepcopy(source[key])
+    else:
+        geometries = result["objects"][object_name]["geometries"]
+        replaced = set()
+        for index, geometry in enumerate(geometries):
+            key = str((geometry.get("properties") or {}).get("id") or geometry.get("id"))
+            if key in replacements:
+                geometries[index] = replacements[key]
+                replaced.add(key)
+        geometries.extend(value for key, value in replacements.items() if key not in replaced)
+        report = result.get("water_geometry_quantization")
+        if report is not None:
+            report["features"] = [row for row in report.get("features", []) if row.get("id") not in selected]
+            report["total_symmetric_difference_area_degrees2"] = sum(row["symmetric_difference_area_degrees2"] for row in report["features"])
+            report["preserved_feature_ids"] = sorted(set(report.get("preserved_feature_ids", [])) | set(selected))
+    # Discard superseded arcs without altering any surviving coordinates.
+    referenced = set()
+    def visit(value, action):
+        if isinstance(value, list):
+            return [visit(child, action) for child in value]
+        return action(value)
+    def objects(geometry, action):
+        if "arcs" in geometry:
+            geometry["arcs"] = visit(geometry["arcs"], action)
+        for child in geometry.get("geometries", []):
+            objects(child, action)
+    def collect(reference):
+        referenced.add(reference if reference >= 0 else ~reference)
+        return reference
+    for geometry in result["objects"].values():
+        objects(geometry, collect)
+    ordered = sorted(referenced)
+    compact = {old: new for new, old in enumerate(ordered)}
+    for geometry in result["objects"].values():
+        objects(geometry, lambda ref: compact[ref] if ref >= 0 else ~compact[~ref])
+    result["arcs"] = [result["arcs"][index] for index in ordered]
+    return result
+
+
 def _grid_limits(origin, scale, lower, upper):
     low = math.ceil((lower - origin) / scale)
     high = math.floor((upper - origin) / scale)

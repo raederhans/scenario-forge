@@ -2,7 +2,7 @@
 
 - generated_at: 2026-09-11T02:47:14.044292+00:00
 - version: 1
-- entries: 666
+- entries: 668
 
 ## Counts by role
 
@@ -31,6 +31,7 @@
 | hierarchy | 1 |
 | historical_1930_city_lights_asset | 1 |
 | locales | 1 |
+| marine_refinement_source | 1 |
 | modern_city_lights_asset | 1 |
 | modern_city_lights_source_descriptor | 1 |
 | palette_audit | 5 |
@@ -45,7 +46,7 @@
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
 | scenario_registry | 1 |
-| source_ledger_asset | 3 |
+| source_ledger_asset | 4 |
 | special_zones | 1 |
 | terrain_contours_major_topology | 1 |
 | terrain_contours_minor_topology | 1 |
@@ -105,6 +106,8 @@
 | city_lights:historical_1930:exclusions | data/historical_city_lights_1930_exclusions.json | city_lights_source | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.city_lights:historical_1930:exclusions |  |
 | locales | data/locales.json | locales | json | json | schema://json/object/v1 | data/manifest.json::outputs::locales.json::sha256 | default | init_map_data.hierarchy_locales |  |
 | build_manifest | data/manifest.json | build_manifest | json | json | schema://json/object/v1 |  | no-cache | runtime_asset_registry.assets.build_manifest |  |
+| source:marine_regions_refinement_supplement_v19 | data/marine_regions.additional.source.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::marine_regions_refinement_supplement_v19::current_local_sha256 | default | source_ledger | marine_regions_refinement_supplement_v19 |
+| manifest_output:marine_regions.refined.source.geojson | data/marine_regions.refined.source.geojson | marine_refinement_source | geojson | json | schema://geojson/feature_collection/v1 | data/manifest.json::outputs::marine_regions.refined.source.geojson::sha256 | default | tools/build_marine_refinement_sources.py | marine_regions_shared_refinement |
 | manifest_output:palette-maps/hgo.audit.json | data/palette-maps/hgo.audit.json | palette_audit | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hgo.audit.json::sha256 | default | init_map_data.palette_assets |  |
 | manifest_output:palette-maps/hgo.map.json | data/palette-maps/hgo.map.json | palette_map | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hgo.map.json::sha256 | default | tools.import_country_palette |  |
 | manifest_output:palette-maps/hoi4_vanilla.audit.json | data/palette-maps/hoi4_vanilla.audit.json | palette_audit | json | json | schema://json/object/v1 | data/manifest.json::outputs::palette-maps/hoi4_vanilla.audit.json::sha256 | default | init_map_data.palette_assets |  |

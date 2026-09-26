@@ -2,6 +2,17 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const explicitArtifactRoot = String(process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT || "").trim();
+const pagesRoot = path.resolve(REPO_ROOT, explicitArtifactRoot || "dist");
+if (explicitArtifactRoot) {
+  const relative = path.relative(path.join(REPO_ROOT, ".runtime"), pagesRoot);
+  assert.ok(relative && !relative.startsWith("..") && !path.isAbsolute(relative));
+}
+const PAGES_DIST_RELATIVE = path.relative(REPO_ROOT, pagesRoot).replaceAll("\\", "/");
 
 const PUBLIC_SCENARIO_IDS = [
   "blank_base",
@@ -730,7 +741,7 @@ test("landing local asset references exist", () => {
 
 test("landing stat cards stay aligned with source data", () => {
   const expectedStats = getExpectedLandingStats();
-  for (const assetRoot of ["landing", "dist"]) {
+  for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
     const html = readFileSync(new URL(`../${assetRoot}/index.html`, import.meta.url), "utf8");
     const actualStats = extractLandingStats(html);
 
@@ -752,7 +763,7 @@ test("landing product story evidence markers resolve to checked-in metadata", ()
     ["evidence", "data/CATALOG.json:counts.entries"],
   ]);
 
-  for (const assetRoot of ["landing", "dist"]) {
+  for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
     const html = readFileSync(new URL(`../${assetRoot}/index.html`, import.meta.url), "utf8");
     const actualEvidence = extractStoryEvidence(html);
 
@@ -930,7 +941,7 @@ test("landing sample runs resolve checked-in assets and evidence markers", () =>
     ],
   ]);
 
-  for (const assetRoot of ["landing", "dist"]) {
+  for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
     const html = readFileSync(new URL(`../${assetRoot}/index.html`, import.meta.url), "utf8");
     const actualRuns = extractSampleRuns(html);
     const sampleRunsManifestUrl = extractSampleRunsManifestUrl(html);
@@ -1164,7 +1175,7 @@ test("landing work-card maps expose source-backed metadata", () => {
     "work-atlas-japan-corridor.json",
   ];
 
-  for (const assetRoot of ["landing", "dist"]) {
+  for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
     for (const fileName of metadataFiles) {
       const metadataUrl = new URL(`../${assetRoot}/assets/${fileName}`, import.meta.url);
       assert.ok(existsSync(metadataUrl), `missing ${assetRoot} work-card metadata: ${fileName}`);
@@ -1192,7 +1203,7 @@ test("landing work-card maps expose source-backed metadata", () => {
 });
 
 test("TNO work-card map uses dissolved detail sources without visible topology blocks", () => {
-  for (const assetRoot of ["landing", "dist"]) {
+  for (const assetRoot of ["landing", PAGES_DIST_RELATIVE]) {
     const svg = readFileSync(new URL(`../${assetRoot}/assets/work-alt-history-med.svg`, import.meta.url), "utf8");
     const metadata = JSON.parse(
       readFileSync(new URL(`../${assetRoot}/assets/work-alt-history-med.json`, import.meta.url), "utf8"),

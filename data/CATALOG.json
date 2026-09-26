@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-09-11T02:47:14.044292+00:00",
   "counts": {
-    "entries": 666,
+    "entries": 668,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -27,6 +27,7 @@
       "hierarchy": 1,
       "historical_1930_city_lights_asset": 1,
       "locales": 1,
+      "marine_refinement_source": 1,
       "modern_city_lights_asset": 1,
       "modern_city_lights_source_descriptor": 1,
       "palette_audit": 5,
@@ -41,7 +42,7 @@
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
-      "source_ledger_asset": 3,
+      "source_ledger_asset": 4,
       "special_zones": 1,
       "terrain_contours_major_topology": 1,
       "terrain_contours_minor_topology": 1,
@@ -64,14 +65,14 @@
     },
     "by_format": {
       "bmp": 1,
-      "geojson": 149,
+      "geojson": 151,
       "javascript": 2,
       "json": 343,
       "topojson": 171
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 663,
+      "json": 665,
       "module": 2
     }
   },
@@ -565,6 +566,34 @@
       "sourceId": "",
       "readMode": "json",
       "aliases": []
+    },
+    {
+      "key": "source:marine_regions_refinement_supplement_v19",
+      "url": "data/marine_regions.additional.source.geojson",
+      "role": "source_ledger_asset",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/source_ledger.json::marine_regions_refinement_supplement_v19::current_local_sha256",
+      "owner": "source_ledger",
+      "cachePolicy": "default",
+      "sourceId": "marine_regions_refinement_supplement_v19",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "manifest_output:marine_regions.refined.source.geojson",
+      "url": "data/marine_regions.refined.source.geojson",
+      "role": "marine_refinement_source",
+      "format": "geojson",
+      "schemaRef": "schema://geojson/feature_collection/v1",
+      "hashRef": "data/manifest.json::outputs::marine_regions.refined.source.geojson::sha256",
+      "owner": "tools/build_marine_refinement_sources.py",
+      "cachePolicy": "default",
+      "sourceId": "marine_regions_shared_refinement",
+      "readMode": "json",
+      "aliases": [
+        "source:marine_regions_shared_refinement"
+      ]
     },
     {
       "key": "manifest_output:palette-maps/hgo.audit.json",

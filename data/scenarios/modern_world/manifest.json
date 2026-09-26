@@ -40,7 +40,7 @@
   "scenario_id": "modern_world",
   "snapshot_fingerprint": "f9be9358d3638e484d38d9297d8f96e3d7737e3f91408347fb943f3a5a104921",
   "source": {
-    "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
+    "base_topology_sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
     "runtime_topology_sha256": "09b27c13a505d684c4abd54b25530d4b3ab0c48f393b12e5869ef0463b110bd3"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",

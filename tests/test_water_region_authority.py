@@ -39,6 +39,18 @@ class WaterAuthorityTests(unittest.TestCase):
         self.assertTrue(shapes["ocean"].union(shapes["sea"]).equals(ocean.difference(land)))
         self.assertEqual(shapes["lake"].area, 12)
 
+    def test_ocean_subdivision_and_named_sea_partition_cover_parent_once(self):
+        source = collection(feature("ocean", box(0, 0, 10, 10), "ocean"),
+                            feature("sector", box(0, 0, 5, 10), "ocean", parent_id="ocean"),
+                            feature("sea", box(0, 0, 2, 3)))
+        compiled = compile_named_water_regions(source)
+        geometries = [shape(f["geometry"]) for f in compiled["features"]]
+        for index, left in enumerate(geometries):
+            for right in geometries[index + 1:]:
+                self.assertEqual(left.intersection(right).area, 0)
+        from shapely.ops import unary_union
+        self.assertTrue(unary_union(geometries).equals(box(0, 0, 10, 10)))
+
     def test_explicit_parent_excludes_child_without_assigning_unrelated_priority(self):
         source = collection(feature("sea", box(0, 0, 5, 5)),
                             feature("bay", box(0, 0, 2, 2), parent_id="sea"))

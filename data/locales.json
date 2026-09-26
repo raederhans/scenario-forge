@@ -294739,6 +294739,82 @@
     "Historic Geographical Overhaul state-level vector scenario.": {
       "en": "Historic Geographical Overhaul state-level vector scenario.",
       "zh": "Historic Geographical Overhaul 州级矢量剧本。"
+    },
+    "Flores Sea": {
+      "en": "Flores Sea",
+      "zh": "弗洛勒斯海"
+    },
+    "Bali Sea": {
+      "en": "Bali Sea",
+      "zh": "巴厘海"
+    },
+    "Sunda Strait": {
+      "en": "Sunda Strait",
+      "zh": "巽他海峡"
+    },
+    "Sumba Strait": {
+      "en": "Sumba Strait",
+      "zh": "松巴海峡"
+    },
+    "Sawu Sea": {
+      "en": "Sawu Sea",
+      "zh": "萨武海"
+    },
+    "Gulf of Tomini": {
+      "en": "Gulf of Tomini",
+      "zh": "托米尼湾"
+    },
+    "Gulf of Bone": {
+      "en": "Gulf of Bone",
+      "zh": "波尼湾"
+    },
+    "Aru Sea": {
+      "en": "Aru Sea",
+      "zh": "阿鲁海"
+    },
+    "Ceram Sea": {
+      "en": "Ceram Sea",
+      "zh": "塞兰海"
+    },
+    "Berau Gulf": {
+      "en": "Berau Gulf",
+      "zh": "贝劳湾"
+    },
+    "Straits of Florida": {
+      "en": "Straits of Florida",
+      "zh": "佛罗里达海峡"
+    },
+    "Northwest Atlantic Ocean": {
+      "en": "Northwest Atlantic Ocean",
+      "zh": "西北大西洋"
+    },
+    "Northeast Atlantic Ocean": {
+      "en": "Northeast Atlantic Ocean",
+      "zh": "东北大西洋"
+    },
+    "Southwest Atlantic Ocean": {
+      "en": "Southwest Atlantic Ocean",
+      "zh": "西南大西洋"
+    },
+    "Southeast Atlantic Ocean": {
+      "en": "Southeast Atlantic Ocean",
+      "zh": "东南大西洋"
+    },
+    "Northwest Pacific Ocean": {
+      "en": "Northwest Pacific Ocean",
+      "zh": "西北太平洋"
+    },
+    "Northeast Pacific Ocean": {
+      "en": "Northeast Pacific Ocean",
+      "zh": "东北太平洋"
+    },
+    "Southwest Pacific Ocean": {
+      "en": "Southwest Pacific Ocean",
+      "zh": "西南太平洋"
+    },
+    "Southeast Pacific Ocean": {
+      "en": "Southeast Pacific Ocean",
+      "zh": "东南太平洋"
     }
   },
   "ui": {

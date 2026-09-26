@@ -9,6 +9,7 @@
  * - shared layout scheduling and sidebar shell events
  * - cross-panel bridges such as special-zone and workspace status updates
  */
+import { expandWaterRegionColorDependents } from "../../core/renderer/water_region_color.js";
 import { isLakeRegion, isLakeInteractionEnabled } from "../../core/renderer/effective_water_regions.js";
 
 export function createWaterSpecialRegionController({
@@ -818,11 +819,11 @@ export function createWaterSpecialRegionController({
   };
 
   const refreshWaterRegionRows = ({ regionIds = [], refreshInspector = true } = {}) => {
-    const ids = Array.from(new Set(
+    const ids = expandWaterRegionColorDependents(Array.from(new Set(
       (Array.isArray(regionIds) ? regionIds : [])
         .map((value) => String(value || "").trim())
         .filter(Boolean)
-    ));
+    )), runtimeState.waterRegionsById);
     const sortMode = getWaterFilterValue(waterInspectorSortSelect) || "name";
     if (waterInspectorOverridesOnlyToggle?.checked || sortMode === "override") {
       renderWaterRegionList();

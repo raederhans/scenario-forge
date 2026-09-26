@@ -560,5 +560,39 @@
       "data/runtime_asset_registry.json"
     ],
     "rebuild_command": "python tools/build_global_lakes.py"
+  },
+  {
+    "source_id": "marine_regions_refinement_supplement_v19",
+    "local_path": "data/marine_regions.additional.source.geojson",
+    "origin_kind": "download",
+    "upstream_url": "https://www.marineregions.org/sources.php",
+    "immutable_ref": "SeaVoX v19 (2023); IHO v3 (2018) for existing shared inputs",
+    "current_local_sha256": "ca4a1b7848d0ef39f1aa02f6a7d291093cb208f17dfdcc95e0b5430d72cbe987",
+    "citation": "https://doi.org/10.14284/590",
+    "license": "See upstream Marine Regions dataset terms; provenance retained per feature.",
+    "consumers": [
+      "map_builder/geo/marine_refinement.py",
+      "tools/rebuild_water_geometry.py"
+    ],
+    "rebuild_command": "python -B tools/build_marine_refinement_sources.py",
+    "status": "frozen_local_only",
+    "local_presence": "required"
+  },
+  {
+    "source_id": "marine_regions_shared_refinement",
+    "local_path": "data/marine_regions.refined.source.geojson",
+    "origin_kind": "derived",
+    "upstream_url": "https://www.marineregions.org/sources.php",
+    "immutable_ref": "SeaVoX v19 (2023); IHO v3 (2018) for existing shared inputs",
+    "current_local_sha256": "b81de47c67949111ab74fa0c9cde068a24b60c612bff2ea0c9afc2d7b4f4f505",
+    "citation": "https://doi.org/10.14284/590",
+    "license": "See upstream Marine Regions dataset terms; provenance retained per feature.",
+    "consumers": [
+      "map_builder/geo/marine_refinement.py",
+      "tools/rebuild_water_geometry.py"
+    ],
+    "rebuild_command": "python -B tools/build_marine_refinement_sources.py",
+    "status": "frozen_local_only",
+    "local_presence": "required"
   }
 ]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import math
 import re
 from collections import defaultdict
@@ -15,10 +16,14 @@ from shapely.geometry import GeometryCollection, box, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from shapely.validation import make_valid
-from topojson.utils import serialize_as_geojson
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from tools.scenario_topology_decode import topology_object_to_geojson
+
 LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
 HOI4_MANIFEST = REPO_ROOT / "data" / "scenarios" / "hoi4_1936" / "manifest.json"
 HOI4_1939_MANIFEST = REPO_ROOT / "data" / "scenarios" / "hoi4_1939" / "manifest.json"
@@ -298,7 +303,7 @@ def validate_tag(tag: str) -> str:
 
 def topology_features(path: Path, object_name: str) -> list[dict]:
     payload = read_json(path)
-    collection = serialize_as_geojson(payload, objectname=object_name)
+    collection = topology_object_to_geojson(payload, object_name)
     features = collection.get("features") if isinstance(collection, dict) else None
     if not isinstance(features, list):
         return []

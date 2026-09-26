@@ -1399,7 +1399,10 @@ def test_tno_water_family_refinement_terminal_source_reviews_exit_actionable_que
         generated_at="2026-06-02T00:00:00Z",
     )
 
-    expected_remaining_backlog_ids = set()
+    # New source-backed siblings have not undergone a child-source terminal
+    # review. Keep them visible as follow-up work instead of declaring closure.
+    from map_builder.geo.marine_refinement import tno_additional_specs
+    expected_remaining_backlog_ids = {spec["id"] for spec in tno_additional_specs()}
     assert len(reviewed_ids) == 44
     assert reviewed_ids <= {item["id"] for item in report["terminal_public_source_candidates"]}
     reviewed_rows = [row for row in report["families"] if row["id"] in reviewed_ids]

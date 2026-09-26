@@ -81,7 +81,7 @@ def compile_named_water_regions(collection, *, ocean_mask=None, land_mask=None):
         geometry = geometries[props["id"]]
         if props.get("water_type") == "ocean" and not named_union.is_empty:
             geometry = polygonal(geometry.difference(named_union))
-        elif props["id"] in children:
+        if props["id"] in children:
             geometry = polygonal(geometry.difference(unary_union(children[props["id"]])))
         feature["geometry"] = mapping(geometry)
     # Physical runtime masks have spherical edges, unlike planar named-water
