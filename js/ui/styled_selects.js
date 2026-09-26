@@ -21,6 +21,7 @@ const MENU_TRIGGER_GAP = 6;
 const MENU_MIN_WIDTH = 160;
 const MENU_MIN_HEIGHT = 96;
 const MENU_MAX_HEIGHT = 240;
+const SEARCH_OPTION_THRESHOLD = 10;
 
 // 统一 select 外壳保留原生 select 作为数据入口；业务 owner 继续监听原 select 的 input/change 事件。
 function isElement(value) {
@@ -124,19 +125,49 @@ function closeActiveSurface(nextSurface = null) {
 }
 
 function focusSelectedOption(surface) {
-  const selected = surface.menu.querySelector(".app-select-option.is-selected:not(:disabled)");
-  const first = surface.menu.querySelector(".app-select-option:not(:disabled)");
+  const options = getVisibleOptions(surface);
+  const selected = options.find((option) => option.classList.contains("is-selected"));
+  const first = options[0];
   (selected || first)?.focus();
 }
 
+function getVisibleOptions(surface) {
+  return Array.from(surface.list.querySelectorAll(".app-select-option"))
+    .filter((option) => !option.hidden && !option.disabled);
+}
+
+function filterSurfaceOptions(surface) {
+  const query = String(surface.search.value || "").trim().toLocaleLowerCase();
+  let visibleCount = 0;
+  Array.from(surface.list.children).forEach((child) => {
+    if (child.classList.contains("app-select-group")) {
+      const groupMatches = child.dataset.searchLabel?.includes(query);
+      let groupVisible = 0;
+      child.querySelectorAll(".app-select-option").forEach((option) => {
+        option.hidden = !!query && !groupMatches && !option.dataset.searchLabel.includes(query);
+        if (!option.hidden) groupVisible++;
+      });
+      child.hidden = groupVisible === 0;
+      visibleCount += groupVisible;
+    } else if (child.classList.contains("app-select-option")) {
+      child.hidden = !!query && !child.dataset.searchLabel.includes(query);
+      if (!child.hidden) visibleCount++;
+    }
+  });
+  surface.noMatches.hidden = visibleCount > 0;
+  surface.noMatches.textContent = t("No matching options", "ui");
+}
+
 function openSurface(surface) {
+  surface.search.value = "";
   syncSurface(surface.select);
   closeActiveSurface(surface);
   positionSurfaceMenu(surface);
   surface.menu.classList.remove("hidden");
   surface.button.setAttribute("aria-expanded", "true");
   activeSurface = surface;
-  focusSelectedOption(surface);
+  if (!surface.search.hidden) surface.search.focus();
+  else focusSelectedOption(surface);
 }
 
 function toggleSurface(surface) {
@@ -150,7 +181,7 @@ function toggleSurface(surface) {
 }
 
 function moveOptionFocus(surface, direction) {
-  const options = Array.from(surface.menu.querySelectorAll(".app-select-option:not(:disabled)"));
+  const options = getVisibleOptions(surface);
   if (!options.length) return;
   const currentIndex = options.indexOf(document.activeElement);
   const nextIndex = currentIndex < 0
@@ -187,9 +218,15 @@ function syncSurface(select) {
   if (labelKey) surface.button.setAttribute("data-i18n-aria-label", labelKey);
   else surface.button.removeAttribute("data-i18n-aria-label");
   surface.button.setAttribute("aria-label", labelKey ? t(labelKey, "ui") : getSelectLabel(select));
+  surface.search.hidden = Array.from(select.options || []).filter((option) => !option.disabled && !option.parentElement?.disabled).length < SEARCH_OPTION_THRESHOLD;
+  surface.search.placeholder = t("Search options", "ui");
+  surface.search.setAttribute("aria-label", t("Search options", "ui"));
+  if (surface.search.hidden) surface.search.value = "";
   // option 节点数量和禁用态可能由面板重新渲染，整表重建比增量补丁更贴近原生 select 真相源。
-  surface.menu.replaceChildren();
-  Array.from(select.options || []).forEach((option, index) => {
+  surface.list.replaceChildren();
+  let optionIndex = 0;
+  const appendOption = (option, parent, groupDisabled = false) => {
+    const index = optionIndex++;
     const value = option.value;
     const optionButton = document.createElement("button");
     optionButton.type = "button";
@@ -198,12 +235,37 @@ function syncSurface(select) {
     optionButton.setAttribute("role", "option");
     optionButton.setAttribute("aria-selected", option.selected ? "true" : "false");
     optionButton.classList.toggle("is-selected", option.selected);
-    optionButton.disabled = !!option.disabled;
+    optionButton.disabled = !!option.disabled || groupDisabled;
     optionButton.dataset.value = value;
     optionButton.textContent = option.textContent || option.label || value;
+    optionButton.dataset.searchLabel = optionButton.textContent.toLocaleLowerCase();
     optionButton.addEventListener("click", () => selectOption(surface, value));
-    surface.menu.appendChild(optionButton);
+    parent.appendChild(optionButton);
+  };
+  Array.from(select.children || []).forEach((child) => {
+    const tag = String(child.tagName || "").toLowerCase();
+    if (tag === "option") {
+      appendOption(child, surface.list);
+    } else if (tag === "optgroup") {
+      const group = document.createElement("div");
+      group.className = "app-select-group";
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", child.label);
+      group.dataset.searchLabel = String(child.label || "").toLocaleLowerCase();
+      const heading = document.createElement("div");
+      heading.className = "app-select-group-heading";
+      heading.textContent = child.label;
+      heading.setAttribute("aria-hidden", "true");
+      group.appendChild(heading);
+      Array.from(child.children || []).forEach((option) => {
+        if (String(option.tagName || "").toLowerCase() === "option") {
+          appendOption(option, group, !!child.disabled);
+        }
+      });
+      surface.list.appendChild(group);
+    }
   });
+  filterSurfaceOptions(surface);
 }
 
 function enhanceSelect(select) {
@@ -229,8 +291,22 @@ function enhanceSelect(select) {
   const menu = document.createElement("div");
   menu.id = `${idBase}Menu`;
   menu.className = "app-select-menu hidden";
-  menu.setAttribute("role", "listbox");
-  button.setAttribute("aria-controls", menu.id);
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "app-select-search";
+  search.autocomplete = "off";
+  search.setAttribute("data-i18n-placeholder", "Search options");
+  search.setAttribute("data-i18n-aria-label", "Search options");
+  const list = document.createElement("div");
+  list.id = `${idBase}List`;
+  list.className = "app-select-list";
+  list.setAttribute("role", "listbox");
+  const noMatches = document.createElement("div");
+  noMatches.className = "app-select-no-matches";
+  noMatches.setAttribute("role", "status");
+  noMatches.setAttribute("data-i18n", "No matching options");
+  menu.append(search, list, noMatches);
+  button.setAttribute("aria-controls", list.id);
 
   select.parentNode.insertBefore(shell, select);
   shell.append(select, button, menu);
@@ -240,10 +316,11 @@ function enhanceSelect(select) {
   select.setAttribute("aria-hidden", "true");
   select.tabIndex = -1;
 
-  const surface = { idBase, select, shell, button, text, menu };
+  const surface = { idBase, select, shell, button, text, menu, search, list, noMatches };
   surfaces.set(select, surface);
 
   button.addEventListener("click", () => toggleSurface(surface));
+  search.addEventListener("input", () => filterSurfaceOptions(surface));
   button.addEventListener("keydown", (event) => {
     if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown") {
       event.preventDefault();
@@ -260,6 +337,10 @@ function enhanceSelect(select) {
     if (event.key === "Escape") {
       event.preventDefault();
       closeSurface(surface, { restoreFocus: true });
+    } else if (event.key === "Enter" && event.target === surface.search) {
+      event.preventDefault();
+      const first = getVisibleOptions(surface)[0];
+      if (first) selectOption(surface, first.dataset.value);
     } else if (event.key === "ArrowDown") {
       event.preventDefault();
       moveOptionFocus(surface, 1);
@@ -268,11 +349,17 @@ function enhanceSelect(select) {
       moveOptionFocus(surface, -1);
     } else if (event.key === "Home") {
       event.preventDefault();
-      surface.menu.querySelector(".app-select-option:not(:disabled)")?.focus();
+      getVisibleOptions(surface)[0]?.focus();
     } else if (event.key === "End") {
       event.preventDefault();
-      const options = surface.menu.querySelectorAll(".app-select-option:not(:disabled)");
+      const options = getVisibleOptions(surface);
       options[options.length - 1]?.focus();
+    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
+      && !surface.search.hidden && event.target !== surface.search) {
+      event.preventDefault();
+      surface.search.value += event.key;
+      filterSurfaceOptions(surface);
+      surface.search.focus();
     } else if (event.key === "Tab") {
       closeSurface(surface);
     }

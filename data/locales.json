@@ -294742,32 +294742,106 @@
     }
   },
   "ui": {
-    "Capital": { "zh": "首都", "en": "Capital" },
-    "Loaded": { "zh": "已加载", "en": "Loaded" },
-    "visible": { "zh": "个可见", "en": "visible" },
-    "Enabled · waiting for data": { "zh": "已启用 · 等待数据", "en": "Enabled · waiting for data" },
-    "Find source region": { "zh": "查找来源区域", "en": "Find source region" },
-    "Experimental layer catalog": { "zh": "实验图层目录", "en": "Experimental layer catalog" },
-    "City hierarchy": {"en": "City hierarchy", "zh": "城市层级"},
-    "Metropolis": {"en": "Metropolis", "zh": "大都会"},
-    "Large city": {"en": "Large city", "zh": "大型城市"},
-    "Medium city": {"en": "Medium city", "zh": "中型城市"},
-    "Small city": {"en": "Small city", "zh": "小城"},
-    "Town": {"en": "Town", "zh": "小镇"},
-    "Map detail": {"en": "Map detail", "zh": "地图详细程度"},
-    "Compact": {"en": "Compact", "zh": "简洁"},
-    "Standard": {"en": "Standard", "zh": "标准"},
-    "Detailed": {"en": "Detailed", "zh": "详细"},
-    "Smallest settlements shown": {"en": "Smallest settlements shown", "zh": "最低显示等级"},
-    "Scenario strategic data": {"en": "Scenario strategic data", "zh": "剧本战略数据"},
-    "Load data": {"en": "Load data", "zh": "加载数据"},
-    "Region shading": {"en": "Region shading", "zh": "区域着色"},
-    "Resource type": {"en": "Resource type", "zh": "资源种类"},
-    "Color scale": {"en": "Color scale", "zh": "色带"},
-    "Shading opacity": {"en": "Shading opacity", "zh": "着色透明度"},
-    "Inspect region values": {"en": "Inspect region values", "zh": "查看区域数值"},
-    "Source region": {"en": "Source region", "zh": "来源区域"},
-
+    "Capital": {
+      "zh": "首都",
+      "en": "Capital"
+    },
+    "Loaded": {
+      "zh": "已加载",
+      "en": "Loaded"
+    },
+    "visible": {
+      "zh": "个可见",
+      "en": "visible"
+    },
+    "Enabled · waiting for data": {
+      "zh": "已启用 · 等待数据",
+      "en": "Enabled · waiting for data"
+    },
+    "Find source region": {
+      "zh": "查找来源区域",
+      "en": "Find source region"
+    },
+    "Experimental layer catalog": {
+      "zh": "实验图层目录",
+      "en": "Experimental layer catalog"
+    },
+    "City hierarchy": {
+      "en": "City hierarchy",
+      "zh": "城市层级"
+    },
+    "Metropolis": {
+      "en": "Metropolis",
+      "zh": "大都会"
+    },
+    "Large city": {
+      "en": "Large city",
+      "zh": "大型城市"
+    },
+    "Medium city": {
+      "en": "Medium city",
+      "zh": "中型城市"
+    },
+    "Small city": {
+      "en": "Small city",
+      "zh": "小城"
+    },
+    "Town": {
+      "en": "Town",
+      "zh": "小镇"
+    },
+    "Map detail": {
+      "en": "Map detail",
+      "zh": "地图详细程度"
+    },
+    "Compact": {
+      "en": "Compact",
+      "zh": "简洁"
+    },
+    "Standard": {
+      "en": "Standard",
+      "zh": "标准"
+    },
+    "Detailed": {
+      "en": "Detailed",
+      "zh": "详细"
+    },
+    "Smallest settlements shown": {
+      "en": "Smallest settlements shown",
+      "zh": "最低显示等级"
+    },
+    "Scenario strategic data": {
+      "en": "Scenario strategic data",
+      "zh": "剧本战略数据"
+    },
+    "Load data": {
+      "en": "Load data",
+      "zh": "加载数据"
+    },
+    "Region shading": {
+      "en": "Region shading",
+      "zh": "区域着色"
+    },
+    "Resource type": {
+      "en": "Resource type",
+      "zh": "资源种类"
+    },
+    "Color scale": {
+      "en": "Color scale",
+      "zh": "色带"
+    },
+    "Shading opacity": {
+      "en": "Shading opacity",
+      "zh": "着色透明度"
+    },
+    "Inspect region values": {
+      "en": "Inspect region values",
+      "zh": "查看区域数值"
+    },
+    "Source region": {
+      "en": "Source region",
+      "zh": "来源区域"
+    },
     "--- Presets ---": {
       "en": "--- Presets ---",
       "zh": "--- 预设 ---"
@@ -302251,6 +302325,422 @@
     "Interactive map line layer.": {
       "en": "Interactive map line layer.",
       "zh": "交互式地图线条图层。"
+    },
+    "Bay": {
+      "en": "Bay",
+      "zh": "海湾（Bay）"
+    },
+    "Channel": {
+      "en": "Channel",
+      "zh": "水道"
+    },
+    "Gulf": {
+      "en": "Gulf",
+      "zh": "海湾（Gulf）"
+    },
+    "Sea": {
+      "en": "Sea",
+      "zh": "海域"
+    },
+    "Sound": {
+      "en": "Sound",
+      "zh": "海峡水道"
+    },
+    "Strait": {
+      "en": "Strait",
+      "zh": "海峡"
+    },
+    "Lake": {
+      "en": "Lake",
+      "zh": "湖泊"
+    },
+    "HGO reconstruction": {
+      "en": "HGO reconstruction",
+      "zh": "HGO 重建"
+    },
+    "Mediterranean supplement": {
+      "en": "Mediterranean supplement",
+      "zh": "地中海补充数据"
+    },
+    "Preview only": {
+      "en": "Preview only",
+      "zh": "仅供预览"
+    },
+    "Choose a pack for this layer": {
+      "en": "Choose a pack for this layer",
+      "zh": "请选择此图层的数据包"
+    },
+    "This layer can't be added to the main map yet.": {
+      "en": "This layer can't be added to the main map yet.",
+      "zh": "此图层暂时无法添加到主地图。"
+    },
+    "Road preview": {
+      "en": "Road preview",
+      "zh": "道路预览"
+    },
+    "Rail preview": {
+      "en": "Rail preview",
+      "zh": "铁路预览"
+    },
+    "Airport preview": {
+      "en": "Airport preview",
+      "zh": "机场预览"
+    },
+    "Port preview": {
+      "en": "Port preview",
+      "zh": "港口预览"
+    },
+    "Mineral preview": {
+      "en": "Mineral preview",
+      "zh": "矿产预览"
+    },
+    "Energy preview": {
+      "en": "Energy preview",
+      "zh": "能源设施预览"
+    },
+    "Industrial land preview": {
+      "en": "Industrial land preview",
+      "zh": "工业用地预览"
+    },
+    "Logistics preview": {
+      "en": "Logistics preview",
+      "zh": "物流枢纽预览"
+    },
+    "Select a road or route label to see its details.": {
+      "en": "Select a road or route label to see its details.",
+      "zh": "选择道路或路线编号以查看详情。"
+    },
+    "Select a rail line or major station to see its details.": {
+      "en": "Select a rail line or major station to see its details.",
+      "zh": "选择铁路线或主要车站以查看详情。"
+    },
+    "Select an airport to see its details.": {
+      "en": "Select an airport to see its details.",
+      "zh": "选择机场以查看详情。"
+    },
+    "Select a port to see its details.": {
+      "en": "Select a port to see its details.",
+      "zh": "选择港口以查看详情。"
+    },
+    "Select a mineral site to see its details.": {
+      "en": "Select a mineral site to see its details.",
+      "zh": "选择矿产地点以查看详情。"
+    },
+    "Select an energy facility to see its details.": {
+      "en": "Select an energy facility to see its details.",
+      "zh": "选择能源设施以查看详情。"
+    },
+    "Select an industrial site to see its details.": {
+      "en": "Select an industrial site to see its details.",
+      "zh": "选择工业地点以查看详情。"
+    },
+    "Select a logistics hub to see its details.": {
+      "en": "Select a logistics hub to see its details.",
+      "zh": "选择物流枢纽以查看详情。"
+    },
+    "Drag layers in the center board to change their order.": {
+      "en": "Drag layers in the center board to change their order.",
+      "zh": "在中间拖动图层以调整顺序。"
+    },
+    "Objects": {
+      "en": "Objects",
+      "zh": "对象"
+    },
+    "Palette": {
+      "en": "Palette",
+      "zh": "调色板"
+    },
+    "Assets": {
+      "en": "Assets",
+      "zh": "素材"
+    },
+    "Properties": {
+      "en": "Properties",
+      "zh": "属性"
+    },
+    "Map style": {
+      "en": "Map style",
+      "zh": "地图样式"
+    },
+    "Map content": {
+      "en": "Map content",
+      "zh": "地图内容"
+    },
+    "Filters & interaction": {
+      "en": "Filters & interaction",
+      "zh": "筛选与交互"
+    },
+    "Edit annotations": {
+      "en": "Edit annotations",
+      "zh": "编辑标注"
+    },
+    "Finish annotations": {
+      "en": "Finish annotations",
+      "zh": "结束标注"
+    },
+    "Names & display": {
+      "en": "Names & display",
+      "zh": "名称与显示"
+    },
+    "Select a country to view its properties.": {
+      "en": "Select a country to view its properties.",
+      "zh": "选择一个国家以查看属性。"
+    },
+    "Search options": {
+      "en": "Search options",
+      "zh": "搜索选项"
+    },
+    "No matching options": {
+      "en": "No matching options",
+      "zh": "没有匹配的选项"
+    },
+    "No overview family selected": {
+      "en": "No overview family selected",
+      "zh": "未选择概览图层"
+    },
+    "Interactive": {
+      "en": "Interactive",
+      "zh": "可交互"
+    },
+    "Chokepoint": {
+      "en": "Chokepoint",
+      "zh": "战略要冲"
+    },
+    "Base Geography": {
+      "en": "Base Geography",
+      "zh": "基础地理"
+    },
+    "Override active": {
+      "en": "Override active",
+      "zh": "已自定义颜色"
+    },
+    "Default color": {
+      "en": "Default color",
+      "zh": "默认颜色"
+    },
+    "regions affected": {
+      "en": "regions affected",
+      "zh": "个区域受影响"
+    },
+    "Pack details": {
+      "en": "Pack details",
+      "zh": "数据包详情"
+    },
+    "Source and use": {
+      "en": "Source and use",
+      "zh": "来源与使用限制"
+    },
+    "Pack version": {
+      "en": "Pack version",
+      "zh": "数据包版本"
+    },
+    "Recipe version": {
+      "en": "Recipe version",
+      "zh": "构建方案版本"
+    },
+    "Source policy": {
+      "en": "Source policy",
+      "zh": "来源政策"
+    },
+    "License tier": {
+      "en": "License tier",
+      "zh": "许可级别"
+    },
+    "Distribution tier": {
+      "en": "Distribution tier",
+      "zh": "分发级别"
+    },
+    "Release policy": {
+      "en": "Release policy",
+      "zh": "发布政策"
+    },
+    "N06 member": {
+      "en": "N06 member",
+      "zh": "N06 数据成员"
+    },
+    "N06 encoding": {
+      "en": "N06 encoding",
+      "zh": "N06 编码"
+    },
+    "Source encoding": {
+      "en": "Source encoding",
+      "zh": "源数据编码"
+    },
+    "Source dataset": {
+      "en": "Source dataset",
+      "zh": "源数据集"
+    },
+    "Source member": {
+      "en": "Source member",
+      "zh": "源文件成员"
+    },
+    "Last build": {
+      "en": "Last build",
+      "zh": "最近构建"
+    },
+    "Data packs": {
+      "en": "Data packs",
+      "zh": "数据包"
+    },
+    "Geometry source": {
+      "en": "Geometry source",
+      "zh": "几何来源"
+    },
+    "Coverage scope": {
+      "en": "Coverage scope",
+      "zh": "覆盖范围"
+    },
+    "Review roads": {
+      "en": "Review roads",
+      "zh": "检查道路"
+    },
+    "Choose which major roads and route labels appear in the preview.": {
+      "en": "Choose which major roads and route labels appear in the preview.",
+      "zh": "选择预览中显示的主要道路和路线编号。"
+    },
+    "Motorway, trunk, and primary roads are available. Road links are hidden by default.": {
+      "en": "Motorway, trunk, and primary roads are available. Road links are hidden by default.",
+      "zh": "可查看高速、主干和一级道路。连接线默认隐藏。"
+    },
+    "Adjust the road rules on the left, then select a road or route label to inspect it.": {
+      "en": "Adjust the road rules on the left, then select a road or route label to inspect it.",
+      "zh": "在左侧调整道路规则，再选择道路或路线编号查看详情。"
+    },
+    "Select a road to see its class, route label, and visibility.": {
+      "en": "Select a road to see its class, route label, and visibility.",
+      "zh": "选择道路以查看等级、路线编号和显示状态。"
+    },
+    "Review railways": {
+      "en": "Review railways",
+      "zh": "检查铁路"
+    },
+    "Choose which railway lines and major stations appear in the preview.": {
+      "en": "Choose which railway lines and major stations appear in the preview.",
+      "zh": "选择预览中显示的铁路线和主要车站。"
+    },
+    "Use the network and status controls to focus the review.": {
+      "en": "Use the network and status controls to focus the review.",
+      "zh": "使用路网和状态控件缩小查看范围。"
+    },
+    "Review lines and stations in the preview; main lines stay visually prominent.": {
+      "en": "Review lines and stations in the preview; main lines stay visually prominent.",
+      "zh": "在预览中查看线路和车站；主要线路会更醒目。"
+    },
+    "Select a line or major station to see its status and source.": {
+      "en": "Select a line or major station to see its status and source.",
+      "zh": "选择线路或主要车站以查看状态和来源。"
+    },
+    "Filter airport points by type, status, and importance.": {
+      "en": "Filter airport points by type, status, and importance.",
+      "zh": "按类型、状态和重要程度筛选机场。"
+    },
+    "Select an airport to review its details.": {
+      "en": "Select an airport to review its details.",
+      "zh": "选择机场以查看详情。"
+    },
+    "Review airports by type, status, and importance.": {
+      "en": "Review airports by type, status, and importance.",
+      "zh": "按类型、状态和重要程度查看机场。"
+    },
+    "Select an airport to see its type, status, and details.": {
+      "en": "Select an airport to see its type, status, and details.",
+      "zh": "选择机场以查看类型、状态和详细信息。"
+    },
+    "Filter major ports by designation and manager.": {
+      "en": "Filter major ports by designation and manager.",
+      "zh": "按港口指定类别和管理方筛选主要港口。"
+    },
+    "Select a port to review its facilities and services.": {
+      "en": "Select a port to review its facilities and services.",
+      "zh": "选择港口以查看设施和服务。"
+    },
+    "Review major ports by designation and manager.": {
+      "en": "Review major ports by designation and manager.",
+      "zh": "按指定类别和管理方查看主要港口。"
+    },
+    "Select a port to see its designation, manager, and facilities.": {
+      "en": "Select a port to see its designation, manager, and facilities.",
+      "zh": "选择港口以查看指定类别、管理方和设施。"
+    },
+    "Review mineral sites and their resource types.": {
+      "en": "Review mineral sites and their resource types.",
+      "zh": "查看矿产地点及资源类型。"
+    },
+    "Select a site to see its recorded attributes.": {
+      "en": "Select a site to see its recorded attributes.",
+      "zh": "选择地点以查看记录的属性。"
+    },
+    "Review mineral sites and select one for details.": {
+      "en": "Review mineral sites and select one for details.",
+      "zh": "查看矿产地点，并选择一个查看详情。"
+    },
+    "Select a mineral site to see its resource and work status.": {
+      "en": "Select a mineral site to see its resource and work status.",
+      "zh": "选择矿产地点以查看资源类型和开采状态。"
+    },
+    "Filter available energy facilities by subtype and status.": {
+      "en": "Filter available energy facilities by subtype and status.",
+      "zh": "按子类型和状态筛选可用的能源设施。"
+    },
+    "Reference-only categories are listed in Data and do not appear on the map.": {
+      "en": "Reference-only categories are listed in Data and do not appear on the map.",
+      "zh": "仅供参考的类别列在“数据”页，不会显示在地图上。"
+    },
+    "Review available facilities; reference-only categories are listed in Data.": {
+      "en": "Review available facilities; reference-only categories are listed in Data.",
+      "zh": "查看可用设施；仅供参考的类别列在“数据”页。"
+    },
+    "Select a facility to see its subtype, status, and operator.": {
+      "en": "Select a facility to see its subtype, status, and operator.",
+      "zh": "选择设施以查看子类型、状态和运营方。"
+    },
+    "Choose a source track and filter industrial sites by land type.": {
+      "en": "Choose a source track and filter industrial sites by land type.",
+      "zh": "选择来源类别，并按土地类型筛选工业地点。"
+    },
+    "The active track determines which sites appear in the preview.": {
+      "en": "The active track determines which sites appear in the preview.",
+      "zh": "当前来源类别决定预览中显示哪些地点。"
+    },
+    "Review industrial sites from the selected source track.": {
+      "en": "Review industrial sites from the selected source track.",
+      "zh": "查看所选来源类别的工业地点。"
+    },
+    "Select an industrial site to review its land type and location.": {
+      "en": "Select an industrial site to review its land type and location.",
+      "zh": "选择工业地点以查看土地类型和位置。"
+    },
+    "Filter logistics hubs by category and operator type.": {
+      "en": "Filter logistics hubs by category and operator type.",
+      "zh": "按类别和运营方类型筛选物流枢纽。"
+    },
+    "Select a hub to review its recorded details.": {
+      "en": "Select a hub to review its recorded details.",
+      "zh": "选择枢纽以查看记录的详情。"
+    },
+    "Review logistics hubs and select one for details.": {
+      "en": "Review logistics hubs and select one for details.",
+      "zh": "查看物流枢纽，并选择一个查看详情。"
+    },
+    "Select a logistics hub to see its category and operator type.": {
+      "en": "Select a logistics hub to see its category and operator type.",
+      "zh": "选择物流枢纽以查看类别和运营方类型。"
+    },
+    "Drag transport layers into the order you want to review.": {
+      "en": "Drag transport layers into the order you want to review.",
+      "zh": "拖动交通图层以调整查看顺序。"
+    },
+    "Changes to this order stay in the workbench.": {
+      "en": "Changes to this order stay in the workbench.",
+      "zh": "此顺序的更改仅保留在工作台中。"
+    },
+    "Check the current layer order here.": {
+      "en": "Check the current layer order here.",
+      "zh": "在此查看当前图层顺序。"
+    },
+    "Review the current data and loading status.": {
+      "en": "Review the current data and loading status.",
+      "zh": "查看当前数据和加载状态。"
     }
   }
 }

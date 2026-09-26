@@ -20,6 +20,7 @@ const STATE_BUS_EVENT_BY_HOOK_NAME = Object.freeze({
   clearReferenceImageFn: "toolbar:clear-reference-image",
   updateWaterInteractionUIFn: "sidebar:update-water-interaction",
   updateProjectSaveStatusFn: "sidebar:update-project-save-status",
+  refreshProjectAccountLanguageFn: "sidebar:refresh-project-account-language",
   updateTransportAppearanceUIFn: "toolbar:update-transport-appearance",
   updateFacilityInfoCardUiFn: "transport:update-facility-card-ui",
   syncFacilityInfoCardVisibilityFn: "transport:sync-facility-card-visibility",

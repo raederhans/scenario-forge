@@ -9,9 +9,18 @@ async function openProjectFrontlineSection(page, { timeout = 30_000 } = {}) {
     ) {
       sidebarModule.initSidebar({ render: mapRendererModule.render });
     }
-    const projectTab = document.querySelector("#inspectorSidebarTabProject");
-    if (projectTab instanceof HTMLElement) {
-      projectTab.click();
+    const editorWorkspace = document.body.classList.contains("editor-workspace");
+    if (editorWorkspace) {
+      document.querySelector("#editorTaskLayersBtn")?.click();
+      document.querySelector("#editorLayer-annotations")?.click();
+      if (!document.body.classList.contains("frontline-mode-active")) {
+        document.querySelector("#editorStrategicModeBtn")?.click();
+      }
+    } else {
+      const projectTab = document.querySelector("#inspectorSidebarTabProject");
+      if (projectTab instanceof HTMLElement) {
+        projectTab.click();
+      }
     }
     const section = document.querySelector("#frontlineProjectSection");
     if (section instanceof HTMLDetailsElement) {
@@ -24,18 +33,20 @@ async function openProjectFrontlineSection(page, { timeout = 30_000 } = {}) {
       state.ui = {};
     }
     if (state) {
-      state.ui.rightSidebarTab = "project";
+      if (!editorWorkspace) state.ui.rightSidebarTab = "project";
       state.updateScenarioUIFn?.();
       state.updateStrategicOverlayUIFn?.();
     }
   });
   await page.waitForFunction(() => {
-    const projectPanel = document.querySelector("#projectSidebarPanel");
+    const editorWorkspace = document.body.classList.contains("editor-workspace");
+    const projectPanel = document.querySelector(editorWorkspace ? "#editorProperty-annotations" : "#projectSidebarPanel");
     const section = document.querySelector("#frontlineProjectSection");
     return !!projectPanel
       && !projectPanel.hidden
       && !!section
       && !!section.open
+      && (!editorWorkspace || document.body.classList.contains("frontline-mode-active"))
       && !!document.querySelector("#frontlineOverlayPanel")
       && !!document.querySelector("#strategicOverlayPanel");
   }, { timeout });

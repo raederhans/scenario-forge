@@ -11,8 +11,10 @@ import {
 import {
   TRANSPORT_WORKBENCH_CONTROL_SCHEMAS,
   TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS,
+  TRANSPORT_WORKBENCH_DATA_CONTRACTS,
   TRANSPORT_WORKBENCH_TAB_SECTION_MAP,
 } from "./transport_workbench_descriptor.js";
+import { buildTransportWorkbenchPackDetailsRows } from "./transport_workbench_inspector_owner.js";
 import {
   mapTransportWorkbenchLabelLevelToMaxLevel,
   mapTransportWorkbenchMaxLevelToLabelLevel,
@@ -394,6 +396,22 @@ export function createTransportWorkbenchRightDeckOwner({
     );
     header.append(title, meta);
     card.appendChild(header);
+    const packDetailsRows = buildTransportWorkbenchPackDetailsRows(
+      previewSnapshot, TRANSPORT_WORKBENCH_DATA_CONTRACTS[family.id], family.id,
+    );
+    if (packDetailsRows.length) {
+      const details = document.createElement("details");
+      details.className = "transport-workbench-pack-details";
+      const summary = document.createElement("summary");
+      summary.textContent = translate("Pack details");
+      const detailList = document.createElement("div");
+      detailList.className = "transport-workbench-data-meta";
+      packDetailsRows.forEach(([label, value]) => {
+        detailList.appendChild(createDataMetaNode(translate(label), value));
+      });
+      details.append(summary, detailList);
+      card.appendChild(details);
+    }
     if (rows.length === 0) {
       const empty = document.createElement("p");
       empty.className = "transport-workbench-note-text";
@@ -982,12 +1000,12 @@ export function createTransportWorkbenchRightDeckOwner({
       copy.className = "transport-workbench-section-description";
       copy.textContent = tabId === "aggregation"
         ? pickUiCopy(
-          "这里放当前聚合精调项，例如 cluster radius、cell size 和密度触发阈值。默认折叠，便于先完成主设置，再做细调。",
-          "This section contains active aggregation fine-tuning controls such as cluster radius, cell size, and density thresholds. It stays collapsed by default so the main setup remains easy to scan."
+          "调整聚合半径、网格大小和密度阈值。",
+          "Adjust cluster radius, cell size, and density thresholds."
         )
         : pickUiCopy(
-          "这里放当前标签精调项，例如 label separation 和聚合阈值。默认折叠，便于先完成主设置，再做细调。",
-          "This section contains active label fine-tuning controls such as label separation and aggregation thresholds. It stays collapsed by default so the main setup remains easy to scan."
+          "调整标签间距和显示阈值。",
+          "Adjust label spacing and display thresholds."
         );
       appendAdvancedRange(tabId, family, config, body, compareHeld);
       body.appendChild(copy);
@@ -1006,12 +1024,12 @@ export function createTransportWorkbenchRightDeckOwner({
         ? translate("This family has not exposed extra manifest or audit cards in the current shell.")
         : family.id === "layers"
           ? pickUiCopy(
-            "Layers 的主要操作在中间排序板完成。Inspect 用来确认当前顺序，其余页签保留统一结构。",
-            "Layers is operated from the center reorder board. Inspect confirms the active order, and the remaining tabs keep the shared workbench structure."
+            "在中间拖动图层以调整顺序，并在 Inspect 确认结果。",
+            "Drag layers in the center board to change their order, then check the result in Inspect."
           )
           : pickUiCopy(
-            "这个 family 当前没有单独的页签控件。请在有内容的页签中调整真实规则，Inspect 会继续显示当前状态。",
-            "This family does not expose separate controls in this tab yet. Use the populated tabs for active tuning, and use Inspect to confirm the current runtimeState."
+            "此页没有可调整的设置。请使用其他页签，或在 Inspect 查看当前结果。",
+            "No settings are available here. Use another tab or check the current result in Inspect."
           );
       empty.append(title, body);
       mountNode.appendChild(empty);

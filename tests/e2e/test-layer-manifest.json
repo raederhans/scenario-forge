@@ -59,6 +59,13 @@
       "ownerHint": "dev-workspace"
     },
     {
+      "specPath": "tests/e2e/editor_workspace_renewal.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
       "specPath": "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "primaryLayer": "smoke",
       "executionMode": "browser",

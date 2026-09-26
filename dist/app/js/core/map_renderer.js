@@ -191,6 +191,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
+import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
 import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
@@ -240,7 +241,7 @@ import { createCityLabelOwner } from "./renderer/city_label_owner.js";
 import { createCityPointsRenderOwner } from "./renderer/city_points_render_owner.js";
 import { buildStrategicResourceMarkerEntries } from "./renderer/strategic_resource_markers.js";
 import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js";
-import { createColorResolutionStrategyOwner } from "./renderer/color_resolution_strategy.js";
+import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from "./renderer/color_resolution_strategy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
 import { createStrategicOverlayRenderOwner } from "./renderer/strategic_overlay_render_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
@@ -252,7 +253,7 @@ import {
   shouldBlockUnderlyingMapSelectionForFacility,
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
-import { resolveEffectiveWaterRegionFeatures } from "./renderer/effective_water_regions.js";
+import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
@@ -275,6 +276,7 @@ import {
   updateSpecialZoneLayerMembership,
 } from "./special_zone_layers.js";
 import { createBorderDrawOwner } from "./renderer/border_draw_owner.js";
+import { createPaintContourRuntime } from "./renderer/paint_contour_runtime.js";
 import { createInteractionBorderSnapshotOwner } from "./renderer/interaction_border_snapshot_owner.js";
 import { createSpatialIndexRuntimeOwner } from "./renderer/spatial_index_runtime_owner.js";
 import { getSpatialBucketKey } from "./renderer/spatial_index_runtime_builders.js";
@@ -868,6 +870,7 @@ function getRenderPassSignaturePolicy() {
       getLakeStyleConfig,
       stableJson,
       getDayNightRuntimeOwner,
+      getPaintContourRevision: () => getPaintContourRuntimeOwner().getRevision(),
       getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
         ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
     });
@@ -2054,6 +2057,7 @@ function getCityLightsRenderOwner() {
     },
     helpers: {
       buildNightHemisphereFeature,
+      getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
       clamp,
       ColorManager,
       createCanvas: (canvasWidth, canvasHeight, targetContext) => {
@@ -2092,7 +2096,7 @@ function getCityLightsRenderOwner() {
     },
     effects: {
       onModernAssetsReady: () => {
-        cityLightsRenderOwner = null;
+        cityLightsRenderOwner?.updateAssets(cityLightsAssetProvider.getAssets());
         invalidateRenderPasses("dayNight", "modern-city-lights-asset-ready");
         requestRendererRender("modern-city-lights-asset-ready");
       },
@@ -2112,6 +2116,7 @@ function getDayNightRuntimeOwner() {
     rendererSurfaceHost,
     getters: {
       getDayNightStyleConfigState: () => runtimeState.styleConfig?.dayNight,
+      getCityLayerRevision: () => runtimeState.cityLayerRevision,
       isBootInteractionReady,
       isRenderPhaseIdle: () => runtimeState.renderPhase === RENDER_PHASE_IDLE,
     },
@@ -2124,6 +2129,12 @@ function getDayNightRuntimeOwner() {
     },
     effects: {
       drawNightLightsLayer,
+      ensureCityLightsData: () => {
+        if (runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
+          // The loader logs failures and owns retries; do not retry on every animation frame.
+          void runtimeState.ensureBaseCityDataFn({ reason: "day-night", renderNow: true, includeLocalization: false }).catch(() => {});
+        }
+      },
       invalidateRenderPasses,
       renderFallback: render,
       requestRender: requestRendererRender,
@@ -2222,6 +2233,37 @@ function getBorderMeshOwner() {
   return borderMeshOwner;
 }
 
+let paintContourRuntimeOwner = null;
+function getPaintContourRuntimeOwner() {
+  if (!paintContourRuntimeOwner) {
+    paintContourRuntimeOwner = createPaintContourRuntime({
+      state: runtimeState,
+      getFeatures: () => runtimeState.landData?.features,
+      getFeatureId,
+      isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
+        && !isScenarioShellFeature(feature, id)
+        && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
+        && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
+      resolveColor: (feature, id) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
+        getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
+      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+      onChange: (reason) => {
+        invalidateRenderPasses("borders", reason);
+        requestRendererRender(reason, { flush: false });
+      },
+    });
+  }
+  return paintContourRuntimeOwner;
+}
+
+async function ensurePaintContoursReady() {
+  if (!isHgoRuntimePreviewReady()) await getPaintContourRuntimeOwner().ensureReady();
+}
+
+function getPaintContourDiagnostics() {
+  return getPaintContourRuntimeOwner().diagnostics();
+}
+
 function getBorderDrawOwner() {
   if (borderDrawOwner) {
     return borderDrawOwner;
@@ -2265,7 +2307,6 @@ function getBorderDrawOwner() {
       getContext: () => rendererSurfaceHost.getContext(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getProjection: () => rendererSurfaceHost.getProjection(),
-      getScenarioOwnerOnlyCanonicalFallbackWarnings: () => scenarioOwnerOnlyCanonicalFallbackWarnings,
       getVisibleInternalBorderMeshSignature: () => visibleInternalBorderMeshSignature,
     },
     helpers: {
@@ -2278,7 +2319,7 @@ function getBorderDrawOwner() {
       getSafeCanvasColor,
       getVisibleCountryCodesForBorderMeshes,
       isUsableMesh,
-      isDynamicBordersEnabled,
+      getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
       sanitizePolyline,
       scheduleDeferredHeavyBorderMeshes,
       reconcileDetailAdmBorders: (meta) => getBorderMeshOwner().reconcileDetailAdmBorders(meta),
@@ -4660,6 +4701,7 @@ function getScenarioWaterVisualRevisionToken() {
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
+    `lake-shore:${runtimeState.showRivers ? runtimeState.styleConfig?.rivers?.color : "off"}`,
   ].join("|");
 }
 
@@ -4907,6 +4949,7 @@ function isOpenOceanOverlayActive() {
 
 function isWaterRegionRenderable(feature) {
   if (!feature) return false;
+  if (isLakeRegion(feature)) return true;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
   }
@@ -4918,6 +4961,8 @@ function isWaterRegionRenderable(feature) {
 
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
+  if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
+  if (!runtimeState.showWaterRegions && !isOpenOceanWaterRegion(feature)) return false;
   if (feature.properties?.interactive === false) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
@@ -6599,6 +6644,7 @@ function rebuildResolvedColors() {
   replaceResolvedColorsState(state, nextColors);
   bumpColorRevision(state);
   getCountryFillPaletteOwner().invalidate();
+  if (getPaintContourRuntimeOwner().notifyPaintChanged()) invalidateRenderPasses("borders", "paint-contours-colors");
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   recordColorRebuildDiagnostics(runtimeState, {
@@ -6627,6 +6673,7 @@ function getResolvedColorSourceName() {
 }
 
 let visibleFrameColorReadinessAttemptSignature = "";
+const rendererSourceMetrics = createSourceMetricsCache();
 
 function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame") {
   const colorSourceName = getResolvedColorSourceName();
@@ -6636,7 +6683,7 @@ function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame"
     Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features.length : 0,
   );
   if (landFeatureCount <= 0) return false;
-  if (Object.keys(runtimeState.colors || {}).length > 0) return false;
+  if (rendererSourceMetrics.hasResolvedColors(runtimeState.colors, runtimeState.colorRevision)) return false;
   const attemptSignature = [
     String(runtimeState.activeScenarioId || ""),
     Number(runtimeState.sceneGeneration || 0),
@@ -6891,6 +6938,7 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
           useCachedPath: true, allowBuildPath: true, countPathBuild: false, metricsCollector,
         });
       }
+      getScenarioRegionOverlayRenderOwner().maskLakesFromPoliticalPatch(k);
     });
   } finally { context.restore(); }
   const renderedCount = Number(metricsCollector.renderedCount || 0);
@@ -7009,6 +7057,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
 
   bumpColorRevision(state);
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
+  if (getPaintContourRuntimeOwner().notifyPaintChanged(ids)) invalidateRenderPasses("borders", "paint-contours-colors");
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
     inputLabel,
@@ -8635,7 +8684,7 @@ function getWaterHitFromPointer(
   pointer,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
-  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive()) return createHitResult();
+  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive() && !isLakeInteractionEnabled(runtimeState)) return createHitResult();
   if (!runtimeState.waterSpatialItems?.length) {
     recordWaterHitDiagnostic({
       reason: "empty-water-spatial-items",
@@ -9798,11 +9847,10 @@ function getLakeBaseFillColor() {
 }
 
 function getUnifiedWaterBaseStyle(feature) {
-  const waterType = getWaterRegionType(feature);
   return {
     fill: isAtlantropaSeaFeature(feature)
       ? getAtlantropaSeaPoliticalFillColor()
-      : (waterType === "lake" ? getLakeBaseFillColor() : getOceanBaseFillColor()),
+      : (isLakeRegion(feature) ? getLakeBaseFillColor() : getOceanBaseFillColor()),
     stroke: UNIFIED_WATER_STROKE_COLOR,
     opacity: UNIFIED_WATER_FILL_OPACITY,
   };
@@ -10507,24 +10555,8 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
   return 1;
 }
 
-function countTopologyArcRefs(arcs) {
-  if (Number.isInteger(arcs)) return 1;
-  if (!Array.isArray(arcs)) return 0;
-  return arcs.reduce((sum, entry) => sum + countTopologyArcRefs(entry), 0);
-}
-
 function estimateTopologyObjectArcRefs(topology, objectName) {
-  const object = topology?.objects?.[objectName];
-  if (!object || typeof object !== "object") return null;
-  if (Array.isArray(object.geometries)) {
-    const total = object.geometries.reduce(
-      (sum, geometry) => sum + countTopologyArcRefs(geometry?.arcs),
-      0
-    );
-    return total > 0 ? total : null;
-  }
-  const total = countTopologyArcRefs(object.arcs);
-  return total > 0 ? total : null;
+  return rendererSourceMetrics.estimateTopologyObjectArcRefs(topology, objectName, runtimeState.topologyRevision);
 }
 
 function getFeatureCollectionFeatureCount(collection) {
@@ -12340,6 +12372,12 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
+  if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
+    const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
+    if (contourStatus === "building" || contourStatus === "error") {
+      throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
+    }
+  }
   const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
   if (!Number.isFinite(targetDpr) || targetDpr <= 0) {
     throw new RangeError("Export pixel ratio must be positive and finite.");
@@ -14638,6 +14676,7 @@ function resetRendererTransactionState({
   hitCanvasDirty = false,
 } = {}) {
   contextLayerRenderScheduler.reset();
+  paintContourRuntimeOwner?.dispose();
   return getRendererTransactionResetOwner().resetRendererTransactionState({
     cancelSecondarySpatialBuild,
     cancelHoverOverlayRender,
@@ -14807,12 +14846,14 @@ export { RENDER_PASS_NAMES } from "./map_renderer/render_pass_catalog.js";
 export function getRendererAsyncWorkStatus() {
   return {
     geometryPendingCount: geometryRasterRuntimeOwner?.getPendingWorkCount() || 0,
-    borderScheduled: staticBorderMeshLifecycle?.hasPendingWork() || false,
+    borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
 }
 
 export {
+  getPaintContourDiagnostics,
+  ensurePaintContoursReady,
   // Core render lifecycle facade.
   initMap,
   setMapData,

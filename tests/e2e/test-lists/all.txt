@@ -6,6 +6,7 @@ city_reveal_plan_regression.spec.js
 city_urban_rendering_regression.spec.js
 dev_workspace_i18n.spec.js
 dev_workspace_render_boundary.spec.js
+editor_workspace_renewal.spec.js
 hoi4_1939_ui_smoke.spec.js
 hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js

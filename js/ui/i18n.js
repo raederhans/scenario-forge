@@ -668,6 +668,7 @@ async function toggleLanguage() {
   // 语言切换分三段：先切 runtime language，再刷新现有 UI 文案，最后补 active scenario 的 geo locale patch。
   // 这样即使异步 locale 资源稍后到达，界面也能先用稳定回退链完成一次可见刷新。
   updateUIText();
+  callRuntimeHook(state, "renderPaletteFn", runtimeState.currentPaletteTheme);
   callRuntimeHooks(state, [
     "updateToolbarInputsFn",
     "renderCountryListFn",
@@ -677,6 +678,10 @@ async function toggleLanguage() {
     "updateDevWorkspaceUIFn",
     "refreshSampleProjectBannerFn",
     "updateSpecialZoneEditorUIFn",
+    "updateWaterInteractionUIFn",
+    "renderWaterRegionListFn",
+    "renderSpecialRegionListFn",
+    "refreshProjectAccountLanguageFn",
   ]);
   try {
     const { ensureScenarioGeoLocalePatchForLanguage } = await import("../core/scenario_resources.js");

@@ -200,7 +200,7 @@ const BASE_LAYER_PANEL_CONTRACTS = Object.freeze([
     defaultVisibilityField: "styleConfig.ocean.experimentalAdvancedStyles",
     requiredRuntimeKeys: ["styleConfig.ocean.experimentalAdvancedStyles", "activeBathymetryBandsData", "activeBathymetryContoursData"],
     dataKeys: ["activeBathymetryBandsData", "activeBathymetryContoursData"],
-    disabledReasonProvider: ({ translate } = {}) => translateUi(translate, "Experimental Bathymetry disabled"),
+    disabledReasonProvider: ({ translate } = {}) => translateUi(translate, "Off"),
   }),
   createLayerPanelContract({
     id: "day-night",

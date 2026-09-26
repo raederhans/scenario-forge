@@ -9,6 +9,7 @@ const DEFERRED_UI_MODULE_PATHS = Object.freeze([
 ]);
 
 const UI_INTERACTION_ROOT_IDS = Object.freeze([
+  "editorProjectBar",
   "leftSidebar",
   "rightSidebar",
   "bottomDock",

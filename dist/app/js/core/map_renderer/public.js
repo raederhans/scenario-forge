@@ -67,6 +67,7 @@ export {
   getWaterRegionColor,
   rebuildStaticMeshes,
   renderExportPassesToCanvas,
+  ensurePaintContoursReady,
   renderLegend,
   RENDER_PASS_NAMES,
 

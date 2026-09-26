@@ -545,9 +545,9 @@ class LegendManager {
   }
 }
 
-// Renderer-only opt-in: its resolved-color transaction advances colorRevision before rendering.
+// Opt-in for application readers whose color transactions advance colorRevision.
 // General LegendManager callers retain uncached reads for arbitrary mutable input objects.
-function createRevisionedLegendColorReader() {
+function createRevisionedLegendColorReader(readColors = getUniqueLegendColors) {
   let lastState = null;
   let lastSource = null;
   let lastKey = "";
@@ -555,11 +555,11 @@ function createRevisionedLegendColorReader() {
   return (appState) => {
     ensureLegendState(appState);
     if (!appState || typeof appState.colorRevision !== "number" || !Number.isFinite(Number(appState.colorRevision))) {
-      return getUniqueLegendColors(appState);
+      return readColors(appState);
     }
     const key = getLegendColorRevisionKey(appState);
     if (lastState !== appState || lastSource !== appState.colors || lastKey !== key) {
-      lastColors = getUniqueLegendColors(appState);
+      lastColors = readColors(appState);
       lastState = appState;
       lastSource = appState.colors;
       lastKey = key;
