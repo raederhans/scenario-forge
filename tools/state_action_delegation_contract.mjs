@@ -2546,22 +2546,13 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "data",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "6baa3db16ae9bf40d4f663aa5694901d9b64a590e676075de7933553a9b6633e",
+  "sourceFingerprint": "1ac029c5f3870423e3e63ae89999caf13b2225ee19199cd6d203d8749f1b7c17",
   "importedArgumentCount": 2,
   "allowBorrowedTarget": false,
   "localFunctionFingerprints": {},
   "acceptedEscapes": [],
   "reviewedReadSiteFingerprints": [],
-  "conservativeFindings": [
-  {
-    "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"resolveImportedOwnershipState\",\"ordinal\":0}]}",
-    "reason": "state-alias-escape",
-    "operation": "unsupported",
-    "key": "sovereigntyByFeatureId",
-    "sourceFingerprint": "ed8a7f8b9ada9fc6e308b97db6117a2e9afabd4285af5f1f615be3d769b4da09",
-    "count": 1
-  }
-]
+  "conservativeFindings": []
 }),
   freezeStateTargetPureReaderEntry({
   // The hierarchy resolver reads the supplied state and keeps only private
@@ -2569,7 +2560,7 @@ freezeStateTargetPureReaderEntry({
   // scope escapes are scalar inputs, never publication or mutation authority.
   "modulePath": "js/core/renderer/fill_target_policy.js",
   "dependencyFingerprints": {
-    "js/core/quick_fill_hierarchy.js": "8538c360f3d4083f258240eac02c778278aff8a3d085f90a9eff69084bac9bff",
+    "js/core/quick_fill_hierarchy.js": "9bb402481f47b798971706c7fd5b08d42f1dd89e2e8e014c68f897027dd3b460",
     "js/core/scenario_hierarchy.js": "dc144761d44906a21c1638bbe25729e23c869164a798b3bf98635391e863e7c9",
     "js/core/scenario_districts.js": "bb1a7059d3f2a211377972a734ecd78cd953bd0444c5df25672b650805759eab",
     "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -2581,12 +2572,11 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "dfea968ab2952248c263ba9e32ac135a584a6063e4174e398b99fc70950d7b91",
+  "sourceFingerprint": "17218c0ec27fb28560e91d0772ed653e1f2d92385018278c8e0c449b3439a664",
   "reviewedReadSiteFingerprints": [
-    "7b885591dab7ab6d93797f0a408ad1d4fa33e4982e7674e8da5392f59be17215",
     "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
-    "90ba4e4c01486eea5e532bed52d65d1d41517445f540787567990b3290ad4b61",
-    "44afb93474315315a086f168cd8ba61f10b7601ee62389e0ada7c85c47f2d02e"
+    "44afb93474315315a086f168cd8ba61f10b7601ee62389e0ada7c85c47f2d02e",
+    "58bccd8f81db61f62bdfb788db84eee8d67cd9cb229c092b684c2825dc77bc62"
   ],
   "conservativeFindings": [
     {
@@ -2595,38 +2585,6 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "countryToFeatureIds",
-      "sourceFingerprint": "7b885591dab7ab6d93797f0a408ad1d4fa33e4982e7674e8da5392f59be17215",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getScenarioOwnerFeatureIds\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "ownerToFeatureIds",
-      "sourceFingerprint": "90ba4e4c01486eea5e532bed52d65d1d41517445f540787567990b3290ad4b61",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getScenarioOwnerFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "landIndex",
-      "sourceFingerprint": "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
       "count": 1
     },
     {
@@ -2651,6 +2609,30 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "batchFillScope",
       "sourceFingerprint": "c4cf4cee341d6695166a50fcab4bcaa94ff2600c8aafc4006436564789054c3a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "58bccd8f81db61f62bdfb788db84eee8d67cd9cb229c092b684c2825dc77bc62",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createFillTargetPolicy\",\"ordinal\":0},{\"name\":\"getCountryFeatureIds\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "landIndex",
+      "sourceFingerprint": "5dcd9eb86a0a447a7fd1b06157a3e81c9ae82a20398c2646cfb477f6efe57bb0",
       "count": 1
     }
   ]
@@ -2747,7 +2729,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "afc0803f73123b844156b250c7db3ad4e46ecd56065c6c296f4472df8c14fbbe",
+  "sourceFingerprint": "de5e4227a36a2e8028c4b69acba13baf9881b9876bf98a9c9001216679db77a3",
   "reviewedReadSiteFingerprints": [],
   "conservativeFindings": [
     {
@@ -2810,8 +2792,8 @@ freezeStateTargetPureReaderEntry({
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createParentBorderGroupingPolicy\",\"ordinal\":0},{\"name\":\"buildScenarioDistrictGroupingCandidate\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
-      "key": "sovereigntyByFeatureId",
-      "sourceFingerprint": "5393292088f52d2cd1220f67245b2e6770f349d43bba94162c2c5b56cf2fee7f",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
       "count": 1
     }
   ]
@@ -2835,7 +2817,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "9cc3bc1f0470e6ca9bafe93dcf07d0a81d01101af982cd9e31bd6960f995a14f",
+  "sourceFingerprint": "5bcd59e950689a28696c566a40626d12a31522d84e8396aec31563e87f9f95b7",
   "reviewedReadSiteFingerprints": [
     "f38922bf2ac55c279fc4f7e5d23f4cbe80872d898fcc3a76e5682bef064d1af4",
     "c6bbb29d1a3bb2321007ce1b62a30086a381878e1e8cac83eb7bde9edfafa6a2",
@@ -2846,7 +2828,7 @@ freezeStateTargetPureReaderEntry({
     "0f5857dad6947040430f92b3ecc62a49bb6baa7d1f7b6e1187ccea489c5a396d",
     "1196a33ac663fb9b6a0d2d7c89f29733e2978b3b7f41f1cee5960284d8c1bb1d",
     "713d9ad0482a9dc81c4873c99f2af571f7de9d6d1cc8c9c004ce3e9ef578eb2c",
-    "3e5b42740b51f880848d5abc86cf0daeecd3edac0404f7e56eecb863990c3567"
+    "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f"
   ],
   "conservativeFindings": [
     {
@@ -3023,7 +3005,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "8ce80812e36b0cf81bccd066585ee426d85089d62619f8ef45468d0b673194ab",
-      "count": 1
+      "count": 2
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -3131,14 +3113,6 @@ freezeStateTargetPureReaderEntry({
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
-      "reason": "unsupported-call-mutation",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "3e5b42740b51f880848d5abc86cf0daeecd3edac0404f7e56eecb863990c3567",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
       "operation": "unsupported",
       "key": "*",
@@ -3199,6 +3173,22 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "814a638b718c74404bf36981e5d2704cf8405dddee63fb90dec6992979ba42bc",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPaintContourRevision\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f2b9df28b4be5de5a0c10d49b317bb6cc2cd3201c163db4ea5331ecadad88648",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f",
       "count": 1
     }
   ]
@@ -3269,7 +3259,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "453d6c8856513622143f405f0317fc1dffdf101cf53367a1cfb52f20fe8ea3ce",
+  "sourceFingerprint": "0e4b42d8d0a0d5c0e6ea8d1bb07e1f97c76409c08eebe6b75591b6b6e3270e93",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createCityLabelTextModel\",\"ordinal\":0},{\"name\":\"getCityRawFallbackLabel\",\"ordinal\":0}]}",
@@ -3445,7 +3435,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "fc2e1d1ed5a96512a40bea2b7b1aa80c2d76ebbcf82b643dacfeffabb3952da0",
+  "sourceFingerprint": "6c7e7526109839d4fa7e77890f45ab00c7d1301e4b051af9a9975f55c895dba8",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createBrushInteractionSessionOwner\",\"ordinal\":0},{\"name\":\"flushBrushSession\",\"ordinal\":0}]}",
@@ -4677,6 +4667,29 @@ freezeStateTargetPureReaderEntry({
       ),
     ],
   }),
+  // Copies before freezing; the dependency receipt binds the record helper.
+  freezeStateTargetPureReaderEntry({
+    "modulePath": "js/core/map_data_boundary.js",
+    "functionName": "createReadonlyReferenceAssignments",
+    "targetParameterName": "assignments",
+    "sourceFingerprint": "8ef33d19d6f0f06a48e062bc7cfa2be4855b11973dffacb7e2e83d52203da30a",
+    "importedArgumentCount": 1,
+    "allowBorrowedTarget": true,
+    "dependencyFingerprints": {
+      "js/core/map_data_boundary.js": "f7cf91f14e066e6b260f7358757c58e54a323559577129c9c58d866ceac16e1b"
+    },
+    "reviewedReadSiteFingerprints": [],
+    "conservativeFindings": [
+      {
+        "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createReadonlyReferenceAssignments\",\"ordinal\":0}]}",
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "ef8dcf7162a955368a7a33b8596e363a92e03fa7a4f0820231a02124089c059c",
+        "count": 1
+      }
+    ]
+  }),
 ]);
 
 function freezeStateImportedPureNormalizerEntry({
@@ -5267,7 +5280,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "factoryModulePath": "js/core/palette_library_state_access.js",
   "factoryExportName": "createPaletteLibraryStateAccess",
   "factoryStateArgumentShape": "target",
-  "factorySourceFingerprint": "b07ddf91f7ebbc6d39c1f425a1710dfad82bf859a61abcbd158356b3fc7a8374",
+  "factorySourceFingerprint": "bbe708cea15270aa6bf8bcb87b355e104a25fa68a41edc6aa9efc8921d217306",
   "ownerBindingName": "stateAccess",
   "methods": [
     "getApplyTarget",
@@ -5329,7 +5342,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "466362d23f7fa54eaf838f3a038fb8e60ef1716d832d3989c54fdfbf8300ab24",
   "factoryModulePath": "js/core/renderer/pixel_ratio_policy.js",
   "factoryExportName": "createPixelRatioPolicy",
-  "factorySourceFingerprint": "562da86ec29a16d6dabb1be5d875ded0f0b8638e143517dfe5c2d0892d3bf400",
+  "factorySourceFingerprint": "cc26c68b584fc2f9690575d064738ed969bfbd94556a8e5e51db481f0a9f227d",
   "ownerBindingName": "pixelRatioPolicy",
   "methods": [
     "getMaxDprForProfile",
@@ -5372,7 +5385,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "bc6d83e78976b4dae096897ab3c09bddd93c44c8830eed2c1153d415ab13a2bd",
   "factoryModulePath": "js/core/renderer/city_label_text_model.js",
   "factoryExportName": "createCityLabelTextModel",
-  "factorySourceFingerprint": "453d6c8856513622143f405f0317fc1dffdf101cf53367a1cfb52f20fe8ea3ce",
+  "factorySourceFingerprint": "0e4b42d8d0a0d5c0e6ea8d1bb07e1f97c76409c08eebe6b75591b6b6e3270e93",
   "ownerBindingName": "owner",
   "methods": [
     "getCityFeatureKey",
@@ -5451,7 +5464,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "29330f19625cc92158ee8d91c7c9cfec930d86b21da42575427cc52ec25dc354",
   "factoryModulePath": "js/core/renderer/brush_interaction_session_owner.js",
   "factoryExportName": "createBrushInteractionSessionOwner",
-  "factorySourceFingerprint": "fc2e1d1ed5a96512a40bea2b7b1aa80c2d76ebbcf82b643dacfeffabb3952da0",
+  "factorySourceFingerprint": "6c7e7526109839d4fa7e77890f45ab00c7d1301e4b051af9a9975f55c895dba8",
   "ownerBindingName": "owner",
   "methods": [
     "flushBrushSession",
@@ -5510,7 +5523,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "7e65d0dbae48519b822d257b396121ee0cb5194ecd403b77237f8a43cc66bc7b",
   "factoryModulePath": "js/core/renderer/scenario_region_overlay_render_owner.js",
   "factoryExportName": "createScenarioRegionOverlayRenderOwner",
-  "factorySourceFingerprint": "7fbb336c2070abb662bd2bf23c7c42a9ef3c5422c30f6034a8272036fd4a00cd",
+  "factorySourceFingerprint": "3013092cec2f83261c49153b0071b53d83b8413dcee5f5a5a02f9957911efa10",
   "ownerBindingName": "scenarioRegionOverlayRenderOwner",
   "methods": [
     "drawScenarioRegionOverlaysPass",
@@ -5915,11 +5928,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getClickSelectionTransactionOwner",
     compositionSourceFingerprint:
-      "7350227e1b3f93d2b850189e536c04df594007f7a7e86e0b7ba689be00112590",
+      "543fb3d316bf50716b84f9796759260d41acc2103fae4448933968fafeaab52c",
     factoryModulePath: "js/core/map_renderer/click_selection_transaction_owner.js",
     factoryExportName: "createClickSelectionTransactionOwner",
     factorySourceFingerprint:
-      "7f3ffe2878ff950345b5916e91f5576d53d4bfbb6b19d0a8c89675bd669b43c9",
+      "d2e29f4d3949d0b3a14ee77291dfe3709fb9fa059d7422f3270ecacd4def8cde",
     ownerBindingName: "clickSelectionTransactionOwner",
     methods: ["handleClick"],
     actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH,
@@ -12724,7 +12737,17 @@ export function validateStateActionPolicyBindings(
 }
 
 // Effectful target delegation: the imported implementation is scanned separately, including its commit action edge.
-export const STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT = Object.freeze([Object.freeze({"modulePath":"js/core/state/renderer_runtime_state.js","exportName":"ensureProjectedBoundsCacheState","targetArgumentIndex":0,"argumentCount":1,"sourceFingerprint":"86c16c937cd2d3a28ef05dc3c42b47630f70b32355caab99394e6a835783abb8"})]);
+export const STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT = Object.freeze([
+  // The target is mutated; the reviewed sibling inputs are only read.
+  Object.freeze({
+    "modulePath": "js/core/state/color_state.js",
+    "exportName": "applyFeaturePaintState",
+    "targetArgumentIndex": 0,
+    "argumentCount": 3,
+    "readOnlyArgumentIndexes": Object.freeze([1, 2]),
+    "sourceFingerprint": "1af3801be5a12ff595f62ed707aa04bff05adeef65b643d41a24a907ace81a06"
+  }),
+  Object.freeze({"modulePath":"js/core/state/renderer_runtime_state.js","exportName":"ensureProjectedBoundsCacheState","targetArgumentIndex":0,"argumentCount":1,"sourceFingerprint":"86c16c937cd2d3a28ef05dc3c42b47630f70b32355caab99394e6a835783abb8"})]);
 
 // Exact Map storage effects borrow keys/values without mutating them. Function drift invalidates this proof.
 export const STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT = Object.freeze([{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"setProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"139d116c8614556880da2a440519ec83bc1ebcd7fd9ca072d808473f573e7ae7"},{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"syncProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"d399d0e2920a555fc9041ecef290bcd9c0d899017ef47acfb471f20d496f36da"}].map(Object.freeze));

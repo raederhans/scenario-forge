@@ -1733,7 +1733,8 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "test:python:source-coverage-repair",
     "sourceRefs": [
       "tests/test_source_coverage_repair.py",
-      "map_builder/geo/source_coverage_repair.py"
+      "map_builder/geo/source_coverage_repair.py",
+      "tools/repair_scenario_source_seams.py"
     ],
     "ownerHints": [
       "geo-contract"
@@ -1805,7 +1806,8 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "test:python:tno-border-continuity",
     "sourceRefs": [
       "tests/test_tno_border_continuity.py",
-      "data/scenarios/tno_1962/manifest.json"
+      "data/scenarios/tno_1962/manifest.json",
+      "tools/repair_scenario_source_seams.py"
     ],
     "ownerHints": [
       "geo-contract"
