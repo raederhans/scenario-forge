@@ -80,6 +80,7 @@ function previewFixture() {
     normalizePoliticalColorEditIds: (ids) => [...new Set(ids)], nowMs: () => clock,
     findResolvedColorFeatureById: (id) => { calls.push(["resolve", id]); return features.get(id); },
     getPoliticalFeaturePathEntry: () => null,
+    getScenarioRegionOverlayRenderOwner: () => ({ maskLakesFromPoliticalPatch: () => calls.push(["mask-lakes"]) }),
     clearPoliticalPatchOverlay: (reason) => calls.push(["clear", reason]),
     recordRenderPerfMetric: (...args) => metrics.push(args),
     runtimeState: { zoomTransform: { k: 1 }, activeScenarioId: "tno", colorRevision: 2 },
@@ -106,6 +107,7 @@ test("production preview records only actually drawn IDs when it yields to exact
   assert.equal(f.budget.isDeferred(), true);
   assert.equal(f.calls.filter(([type]) => type === "draw").length, 1);
   assert.deepEqual([...f.calls.find(([type]) => type === "first-pixel")[1].renderedIds], ["a"]);
+  assert.ok(f.calls.findIndex(([type]) => type === "mask-lakes") > f.calls.findIndex(([type]) => type === "draw"));
 });
 test("production layer invalidation preserves the water source token and schedules rather than flushes", () => {
   const body = source.slice(source.indexOf("function invalidateContextLayerVisualStateBatch("), source.indexOf("\nfunction createHitCanvasElement("));

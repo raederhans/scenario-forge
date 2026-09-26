@@ -1,5 +1,6 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
+import { isLakeRegion } from "./effective_water_regions.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
 
 export function createScenarioRegionOverlayRenderOwner(runtimeState, {
@@ -55,11 +56,11 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     return bounds;
   }
 
-  function drawScenarioWaterFillLayer(k, { waterFeatures = [] } = {}) {
+  function drawScenarioWaterFillLayer(k, { waterFeatures = [], maskOnly = false } = {}) {
     const startedAt = nowMs();
     let renderedWaterCount = 0;
     if (!waterFeatures.length) {
-      collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+      if (!maskOnly) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
         featureCount: 0,
         renderedCount: 0,
         skipped: true,
@@ -71,7 +72,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       const id = getFeatureId(feature) || `water-${index}`;
       if (!isWaterRegionRenderable(feature)) return;
       const defaultStyle = getWaterRegionDefaultStyle(feature);
-      const fillOpacity = defaultStyle.opacity;
+      const fillOpacity = maskOnly ? 1 : defaultStyle.opacity;
       if (!(fillOpacity > 0)) return;
       const parts = collectSafeWaterRegionGeometryParts(feature);
       if (!parts.length) return;
@@ -84,23 +85,40 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost.getContext().save();
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
       rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
+      const context = rendererSurfaceHost.getContext();
+      const softenShore = !maskOnly && isLakeRegion(feature) && runtimeState.showRivers;
+      const fillWaterPath = (path = null) => {
+        // A sub-pixel shore in the river hue bridges the two water styles.
+        // Keep the lake interior opaque and keep the river below the lake.
+        if (softenShore) {
+          context.save();
+          context.globalAlpha = fillOpacity * 0.22;
+          context.strokeStyle = getSafeCanvasColor(runtimeState.styleConfig?.rivers?.color, "#3b82f6");
+          context.lineWidth = 1.4 / Math.max(0.0001, k);
+          context.lineJoin = "round";
+          context.setLineDash([]);
+          if (path) context.stroke(path); else context.stroke();
+          context.restore();
+        }
+        if (path) context.fill(path); else context.fill();
+      };
       const waterPath = visibleParts.length === parts.length
         ? getScenarioWaterFeaturePath(feature, parts)
         : null;
       let didFill = false;
       if (waterPath) {
-        rendererSurfaceHost.getContext().fill(waterPath);
+        fillWaterPath(waterPath);
         didFill = true;
       } else if (globalThis.Path2D) {
         visibleParts.forEach((part) => {
           const partPath = getScenarioWaterPartPath(part);
           if (partPath) {
-            rendererSurfaceHost.getContext().fill(partPath);
+            fillWaterPath(partPath);
             didFill = true;
           } else if (rendererSurfaceHost.getPathCanvas()) {
             rendererSurfaceHost.getContext().beginPath();
             rendererSurfaceHost.getPathCanvas()(part);
-            rendererSurfaceHost.getContext().fill();
+            fillWaterPath();
             didFill = true;
           }
         });
@@ -109,13 +127,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         visibleParts.forEach((part) => {
           if (rendererSurfaceHost.getPathCanvas()) rendererSurfaceHost.getPathCanvas()(part);
         });
-        rendererSurfaceHost.getContext().fill();
+        fillWaterPath();
         didFill = true;
       }
       rendererSurfaceHost.getContext().restore();
       if (didFill) renderedWaterCount += 1;
     });
-    collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
+    if (!maskOnly) collectContextMetric("drawScenarioWaterFillLayer", nowMs() - startedAt, {
       featureCount: waterFeatures.length,
       renderedCount: renderedWaterCount,
       skipped: renderedWaterCount === 0,
@@ -524,6 +542,20 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     scenarioWaterPartBoundsCache = new WeakMap();
   }
 
+  function maskLakesFromPoliticalPatch(k) {
+    const sharedLakeIds = new Set((runtimeState.contextLayerExternalDataByName?.lakes?.features || []).map(getFeatureId));
+    const waterFeatures = getEffectiveWaterRegionFeatures().filter((feature) =>
+      isLakeRegion(feature) && (runtimeState.showWaterRegions || sharedLakeIds.has(getFeatureId(feature))));
+    const context = rendererSurfaceHost.getContext();
+    context.save();
+    try {
+      context.globalCompositeOperation = "destination-out";
+      drawScenarioWaterFillLayer(k, { waterFeatures, maskOnly: true });
+    } finally {
+      context.restore();
+    }
+  }
+
   function getPreviousWaterRenderedCount() {
     return lastScenarioWaterRenderedCount;
   }
@@ -533,6 +565,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   return Object.freeze({
+    maskLakesFromPoliticalPatch,
     getScenarioWaterPartBounds,
     drawScenarioRegionOverlaysPass,
     resetWaterPathCaches,

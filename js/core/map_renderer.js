@@ -252,7 +252,7 @@ import {
   shouldBlockUnderlyingMapSelectionForFacility,
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
-import { resolveEffectiveWaterRegionFeatures } from "./renderer/effective_water_regions.js";
+import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
@@ -4692,6 +4692,7 @@ function getScenarioWaterVisualRevisionToken() {
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
+    `lake-shore:${runtimeState.showRivers ? runtimeState.styleConfig?.rivers?.color : "off"}`,
   ].join("|");
 }
 
@@ -4939,6 +4940,7 @@ function isOpenOceanOverlayActive() {
 
 function isWaterRegionRenderable(feature) {
   if (!feature) return false;
+  if (isLakeRegion(feature)) return true;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
   }
@@ -4950,6 +4952,8 @@ function isWaterRegionRenderable(feature) {
 
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
+  if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
+  if (!runtimeState.showWaterRegions && !isOpenOceanWaterRegion(feature)) return false;
   if (feature.properties?.interactive === false) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
@@ -6924,6 +6928,7 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
           useCachedPath: true, allowBuildPath: true, countPathBuild: false, metricsCollector,
         });
       }
+      getScenarioRegionOverlayRenderOwner().maskLakesFromPoliticalPatch(k);
     });
   } finally { context.restore(); }
   const renderedCount = Number(metricsCollector.renderedCount || 0);
@@ -8669,7 +8674,7 @@ function getWaterHitFromPointer(
   pointer,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
-  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive()) return createHitResult();
+  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive() && !isLakeInteractionEnabled(runtimeState)) return createHitResult();
   if (!runtimeState.waterSpatialItems?.length) {
     recordWaterHitDiagnostic({
       reason: "empty-water-spatial-items",
@@ -9832,11 +9837,10 @@ function getLakeBaseFillColor() {
 }
 
 function getUnifiedWaterBaseStyle(feature) {
-  const waterType = getWaterRegionType(feature);
   return {
     fill: isAtlantropaSeaFeature(feature)
       ? getAtlantropaSeaPoliticalFillColor()
-      : (waterType === "lake" ? getLakeBaseFillColor() : getOceanBaseFillColor()),
+      : (isLakeRegion(feature) ? getLakeBaseFillColor() : getOceanBaseFillColor()),
     stroke: UNIFIED_WATER_STROKE_COLOR,
     opacity: UNIFIED_WATER_FILL_OPACITY,
   };

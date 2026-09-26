@@ -434,6 +434,19 @@ test("project payload builder keeps open ocean visible with interaction off by d
   assert.equal(payload.layerVisibility.showOpenOceanRegions, true);
   assert.equal(payload.layerVisibility.allowOpenOceanSelect, false);
   assert.equal(payload.layerVisibility.allowOpenOceanPaint, false);
+  assert.equal(payload.styleConfig.lakes.interactive, false);
+});
+
+test("project roundtrip preserves lake opt-in and old projects default to display-only", () => {
+  for (const interactive of [false, true]) {
+    const payload = FileManager.buildProjectPayload({ styleConfig: { lakes: { interactive } },
+      waterRegionOverrides: { ne_lake_1159125405: "#66bbdd" } });
+    const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(payload)));
+    assert.equal(imported.styleConfig.lakes.interactive, interactive);
+    assert.equal(imported.waterRegionOverrides.ne_lake_1159125405, "#66bbdd");
+    delete payload.styleConfig.lakes.interactive;
+    assert.equal(FileManager.normalizeImportedProjectData(payload).styleConfig.lakes.interactive, false);
+  }
 });
 
 test("project export and import preserve unified intensity fields", async () => {

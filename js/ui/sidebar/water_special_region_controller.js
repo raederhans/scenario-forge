@@ -9,6 +9,8 @@
  * - shared layout scheduling and sidebar shell events
  * - cross-panel bridges such as special-zone and workspace status updates
  */
+import { isLakeRegion, isLakeInteractionEnabled } from "../../core/renderer/effective_water_regions.js";
+
 export function createWaterSpecialRegionController({
   runtimeState,
   elements,
@@ -16,6 +18,7 @@ export function createWaterSpecialRegionController({
 }) {
   const {
     waterInspectorSection,
+    waterInspectorLakeInteractionToggle,
     waterInspectorOpenOceanSelectToggle,
     waterInspectorOpenOceanSelectHint,
     waterInspectorOpenOceanPaintToggle,
@@ -250,6 +253,7 @@ export function createWaterSpecialRegionController({
 
   const isWaterFeatureVisibleInInspector = (feature) => {
     if (!feature) return false;
+    if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
     if (isOpenOceanWaterFeature(feature)) {
       return isOpenOceanSelectionEnabled();
     }
@@ -430,6 +434,9 @@ export function createWaterSpecialRegionController({
 
   const renderWaterInteractionUi = () => {
     syncOpenOceanInspectorState();
+    if (waterInspectorLakeInteractionToggle) {
+      waterInspectorLakeInteractionToggle.checked = isLakeInteractionEnabled(runtimeState);
+    }
     if (waterInspectorOpenOceanSelectToggle) {
       waterInspectorOpenOceanSelectToggle.checked = isOpenOceanSelectionEnabled();
     }
@@ -613,7 +620,7 @@ export function createWaterSpecialRegionController({
         ["Group", formatWaterTokenLabel(getWaterFeatureGroup(feature))],
         ["Parent", featureParentId || "None"],
         ["Source", formatWaterTokenLabel(getWaterFeatureSource(feature))],
-        ["Interactive", feature?.properties?.interactive === false ? "No" : "Yes"],
+        ["Interactive", isWaterFeatureVisibleInInspector(feature) ? "Yes" : "No"],
         ["Chokepoint", feature?.properties?.is_chokepoint ? "Yes" : "No"],
         ["Base Geography", feature?.properties?.render_as_base_geography ? "Yes" : "No"],
         ["Default Color", defaultColor.toUpperCase()],
@@ -1098,6 +1105,20 @@ export function createWaterSpecialRegionController({
 
 
   const bindEvents = () => {
+  if (waterInspectorLakeInteractionToggle && !waterInspectorLakeInteractionToggle.dataset.bound) {
+    waterInspectorLakeInteractionToggle.addEventListener("change", (event) => {
+      runtimeState.styleConfig.lakes.interactive = !!event.target.checked;
+      closeWaterInspectorColorPicker();
+      clearHiddenOpenOceanInteractionState();
+      markDirty("toggle-lake-interaction");
+      renderWaterInteractionUi();
+      renderWaterRegionList();
+      renderWaterInspectorDetail();
+      updateSpecialZoneEditorUi();
+      if (render) render();
+    });
+    waterInspectorLakeInteractionToggle.dataset.bound = "true";
+  }
   // 这一层不是纯 UI 绑定：多个 toggle 会同步 runtime flag、可见图层、hover/inspector 状态，
   // 还会在需要时触发 optional layer 懒加载，所以事件顺序要保持集中，不要拆到零散回调里。
   if (waterInspectorOpenOceanSelectToggle && !waterInspectorOpenOceanSelectToggle.dataset.bound) {

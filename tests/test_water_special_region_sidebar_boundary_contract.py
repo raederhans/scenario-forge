@@ -135,7 +135,7 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         for pattern in selection_patterns:
             self.assertRegex(owner_content, pattern)
 
-    def test_hidden_open_ocean_toggle_clears_hover_and_selected_state(self):
+    def test_hidden_water_toggles_clear_hover_and_selected_state(self):
         owner_content = WATER_SPECIAL_REGION_CONTROLLER_JS.read_text(encoding="utf-8")
         clear_body = owner_content.split("const clearHiddenOpenOceanInteractionState = () => {", 1)[1].split(
             "\n  const formatWaterTokenLabel",
@@ -150,7 +150,8 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn("runtimeState.selectedWaterRegionId = \"\";", clear_body)
         self.assertIn("!isWaterFeatureVisibleInInspector(hoveredFeature)", clear_body)
         self.assertIn("!isWaterFeatureVisibleInInspector(selectedFeature)", clear_body)
-        self.assertEqual(toggle_handlers.count("clearHiddenOpenOceanInteractionState();"), 2)
+        self.assertEqual(toggle_handlers.count("clearHiddenOpenOceanInteractionState();"), 3)
+        self.assertIn("waterInspectorLakeInteractionToggle.addEventListener", toggle_handlers)
 
     def test_atlantropa_water_fragments_keep_real_feature_ids(self):
         data = json.loads(ATLANTROPA_DETAIL_CHUNK.read_text(encoding="utf-8"))
