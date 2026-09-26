@@ -299130,11 +299130,11 @@
     },
     "Population / City Boost (Modern only)": {
       "en": "Population / City Boost (Modern only)",
-      "zh": "人口/城市增长（仅限现代）"
+      "zh": "人口亮度增强（仅限现代）"
     },
     "Population Boost Strength (Modern only)": {
       "en": "Population Boost Strength (Modern only)",
-      "zh": "人口增长强度（仅限现代）"
+      "zh": "人口增强强度（仅限现代）"
     },
     "Port": {
       "en": "Port",
@@ -301005,8 +301005,8 @@
       "zh": "纹理"
     },
     "Texture Opacity (Modern only)": {
-      "en": "Texture Opacity (Modern only)",
-      "zh": "纹理不透明度（仅现代）"
+      "en": "Background Light Opacity (Modern only)",
+      "zh": "背景夜光不透明度（仅现代）"
     },
     "Texture Overlay": {
       "en": "Texture Overlay",

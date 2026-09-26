@@ -119,7 +119,7 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
             1,
         )[0]
         urban_layer_body = (URBAN_CITY_POLICY_JS.parent / "urban_layer_render_owner.js").read_text(encoding="utf-8")
-        modern_static_key_body = city_lights_content.split("function getModernCityLightsStaticLayerKey(config) {", 1)[1].split(
+        modern_static_key_body = city_lights_content.split('function getModernCityLightsStaticLayerKey(config, part = "all") {', 1)[1].split(
             "\n}",
             1,
         )[0]

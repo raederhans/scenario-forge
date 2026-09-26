@@ -4,6 +4,10 @@
 
 `C:/Users/raede/.codex/worktrees/lake-interaction-merge/mapcreator` 使用分支 `codex/lake-interaction-opt-in`，从主工作区提取湖泊交互开关、河湖样式协调与填色预览遮罩改动。主工作区仍有城市灯光并行修改，保持其分支、索引与工作文件不变。本工作树保留供合并后的差异复核，最终检查与合并状态以 Git/GitHub 回执为准。
 
+## 2026-09-26 昼夜与现代夜光优化
+
+`C:/Users/raede/.codex/worktrees/day-night-tiles/mapcreator` 使用 `codex/day-night-tiles` 隔离本次昼夜、夜光与性能改动。主工作区含其他 UI、水体和交通 WIP，保留原样，不在其中执行重置或整合。此工作树在合并后保留，用于复核 `.runtime/browser/day-night-tiles/` 的 Canvas 像素负对照和性能记录；远端提交及合并状态以该分支的 PR 回执为准。其他工作树不属于本次清理范围。
+
 ## 2026-09-25 所有权编辑退役整合
 
 接手 [PR #162](https://github.com/raederhans/scenario-forge/pull/162)，在主工作区检出 `codex/visual-editing-boundary-p1-p2-20260924`，核对第一、二阶段实现并补齐 E2E 清单、依赖图与调色板边界测试。合并后主工作区回到 `main` 并快进同步；最终合并状态以 PR 回执及 Git 为准。其他两个工作树与未跟踪 `.playwright-mcp/` 保留，本轮不清理。

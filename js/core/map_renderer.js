@@ -191,6 +191,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
+import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
 import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
@@ -2056,6 +2057,7 @@ function getCityLightsRenderOwner() {
     },
     helpers: {
       buildNightHemisphereFeature,
+      getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
       clamp,
       ColorManager,
       createCanvas: (canvasWidth, canvasHeight, targetContext) => {
@@ -2094,7 +2096,7 @@ function getCityLightsRenderOwner() {
     },
     effects: {
       onModernAssetsReady: () => {
-        cityLightsRenderOwner = null;
+        cityLightsRenderOwner?.updateAssets(cityLightsAssetProvider.getAssets());
         invalidateRenderPasses("dayNight", "modern-city-lights-asset-ready");
         requestRendererRender("modern-city-lights-asset-ready");
       },
@@ -2114,6 +2116,7 @@ function getDayNightRuntimeOwner() {
     rendererSurfaceHost,
     getters: {
       getDayNightStyleConfigState: () => runtimeState.styleConfig?.dayNight,
+      getCityLayerRevision: () => runtimeState.cityLayerRevision,
       isBootInteractionReady,
       isRenderPhaseIdle: () => runtimeState.renderPhase === RENDER_PHASE_IDLE,
     },
@@ -2126,6 +2129,12 @@ function getDayNightRuntimeOwner() {
     },
     effects: {
       drawNightLightsLayer,
+      ensureCityLightsData: () => {
+        if (runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
+          // The loader logs failures and owns retries; do not retry on every animation frame.
+          void runtimeState.ensureBaseCityDataFn({ reason: "day-night", renderNow: true, includeLocalization: false }).catch(() => {});
+        }
+      },
       invalidateRenderPasses,
       renderFallback: render,
       requestRender: requestRendererRender,
@@ -6664,6 +6673,7 @@ function getResolvedColorSourceName() {
 }
 
 let visibleFrameColorReadinessAttemptSignature = "";
+const rendererSourceMetrics = createSourceMetricsCache();
 
 function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame") {
   const colorSourceName = getResolvedColorSourceName();
@@ -6673,7 +6683,7 @@ function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame"
     Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features.length : 0,
   );
   if (landFeatureCount <= 0) return false;
-  if (Object.keys(runtimeState.colors || {}).length > 0) return false;
+  if (rendererSourceMetrics.hasResolvedColors(runtimeState.colors, runtimeState.colorRevision)) return false;
   const attemptSignature = [
     String(runtimeState.activeScenarioId || ""),
     Number(runtimeState.sceneGeneration || 0),
@@ -10545,24 +10555,8 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
   return 1;
 }
 
-function countTopologyArcRefs(arcs) {
-  if (Number.isInteger(arcs)) return 1;
-  if (!Array.isArray(arcs)) return 0;
-  return arcs.reduce((sum, entry) => sum + countTopologyArcRefs(entry), 0);
-}
-
 function estimateTopologyObjectArcRefs(topology, objectName) {
-  const object = topology?.objects?.[objectName];
-  if (!object || typeof object !== "object") return null;
-  if (Array.isArray(object.geometries)) {
-    const total = object.geometries.reduce(
-      (sum, geometry) => sum + countTopologyArcRefs(geometry?.arcs),
-      0
-    );
-    return total > 0 ? total : null;
-  }
-  const total = countTopologyArcRefs(object.arcs);
-  return total > 0 ? total : null;
+  return rendererSourceMetrics.estimateTopologyObjectArcRefs(topology, objectName, runtimeState.topologyRevision);
 }
 
 function getFeatureCollectionFeatureCount(collection) {
