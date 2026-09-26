@@ -56,10 +56,10 @@
     "base_coastline_path_limit": 360,
     "base_coastline_paths_available": 0,
     "base_coastline_paths_dropped": 0,
-    "atlantropa_features": 641,
-    "atlantropa_water_paths": 337,
-    "atlantropa_land_paths": 290,
-    "atlantropa_shoal_paths": 60
+    "atlantropa_features": 646,
+    "atlantropa_water_paths": 343,
+    "atlantropa_land_paths": 292,
+    "atlantropa_shoal_paths": 61
   },
   "counts": {
     "territories": 32,
@@ -81,10 +81,10 @@
     "base_coastline_path_limit": 360,
     "base_coastline_paths_available": 0,
     "base_coastline_paths_dropped": 0,
-    "atlantropa_features": 641,
-    "atlantropa_water_paths": 337,
-    "atlantropa_land_paths": 290,
-    "atlantropa_shoal_paths": 60
+    "atlantropa_features": 646,
+    "atlantropa_water_paths": 343,
+    "atlantropa_land_paths": 292,
+    "atlantropa_shoal_paths": 61
   },
   "territory_tags": [
     "BRG",

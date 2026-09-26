@@ -1,7 +1,7 @@
 {
   "coverage_ledger_hashes": {
-    "atlantropa_donor_ledger": "79d99d1db8cd8bd3dd4189503aba23ae7804986cb9b6acf18c6df38c7a6a8a47",
-    "geometry_drop_audit": "2a06e2f6c2b60fcf3076bf076dacb737bce29ffa37313b8fbbf158129b296ccf"
+    "atlantropa_donor_ledger": "22dc3cd848c53bb996d63f8e634a201f8a3de2824223b29557fc2ebad0765a85",
+    "geometry_drop_audit": "f96d77f696da604503fc9758c719013475f56d950ac619bf350ca5d66ceae8db"
   },
   "coverage_ledger_paths": {
     "atlantropa_donor_ledger": "data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",

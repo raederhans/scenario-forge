@@ -1428,6 +1428,28 @@ export const DATA_CONTRACTS_RECORDS = [
     "selector": {}
   },
   {
+    "id": "python:test_atlantropa_source_inventory",
+    "commandRef": "python -m unittest tests.test_atlantropa_source_inventory -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_source_inventory.py",
+      "tools/audit_atlantropa_sources.py",
+      "tools/patch_tno_1962_bundle.py"
+    ],
+    "ownerHints": ["geo-contract"],
+    "domains": ["geo-contract"],
+    "tiers": ["heavy"],
+    "cost": "heavy",
+    "resourceLocks": ["heavy-geo", ".runtime-output"],
+    "executionOwners": ["main-thread"],
+    "profiles": ["full"],
+    "platforms": ["all"],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "python:test_check_atlantropa_geometry",
     "commandRef": "python -m unittest tests.test_check_atlantropa_geometry -q",
     "sourceRefs": [

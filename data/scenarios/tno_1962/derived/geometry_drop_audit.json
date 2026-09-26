@@ -3207,6 +3207,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLPRV_18332",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLPRV_18333",
       "final_area": null,
       "missing_stages": [],
@@ -3346,6 +3369,29 @@
         "owner_core"
       ],
       "feature_id": "ATLPRV_18348",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_18349",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -6428,52 +6474,6 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_FILL_aegean_56",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_57",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_aegean_58",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -12177,7 +12177,99 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLSEA_FILL_west_med_89",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLSEA_FILL_west_med_9",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_90",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_91",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLSEA_FILL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLSEA_FILL_west_med_92",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -16094,23 +16186,23 @@
     "detail_chunk": {
       "AQ": 1,
       "ATLISL_": 69,
-      "ATLPRV_": 85,
+      "ATLPRV_": 87,
       "ATLSEA_": 118,
-      "ATLSEA_FILL_": 375,
+      "ATLSEA_FILL_": 377,
       "RU_ARCTIC_FB_": 51
     },
     "owner_core": {
       "AQ": 1,
       "ATLISL_": 69,
-      "ATLPRV_": 85,
+      "ATLPRV_": 87,
       "ATLSEA_": 118,
-      "ATLSEA_FILL_": 375
+      "ATLSEA_FILL_": 377
     },
     "runtime_atlantropa": {
       "ATLISL_": 69,
-      "ATLPRV_": 85,
+      "ATLPRV_": 87,
       "ATLSEA_": 118,
-      "ATLSEA_FILL_": 375
+      "ATLSEA_FILL_": 377
     },
     "runtime_political": {
       "AQ": 1,
@@ -16122,7 +16214,7 @@
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 699,
+    "protected_feature_count": 703,
     "protected_prefix_drop_count": 0,
     "runtime_only_shell_count": 51
   },
