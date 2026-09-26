@@ -790,7 +790,7 @@ function createDefaultDayNightStyleConfig() {
     cityLightsCorridorStrength: 0.42,
     cityLightsCoreSharpness: 0.62,
     cityLightsPopulationBoostEnabled: true,
-    cityLightsPopulationBoostStrength: 0.7,
+    cityLightsPopulationBoostStrength: 0.3,
     historicalCityLightsDensity: 1.12,
     historicalCityLightsSecondaryRetention: 0.46,
   };

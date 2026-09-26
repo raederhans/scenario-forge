@@ -45,10 +45,10 @@ function createRecordedCanvasContext(width, height, label, events, counters) {
       return { addColorStop: () => {} };
     },
     drawImage(image, ...args) {
-      events.push({ type: "draw-image", label, image, args, alpha: this.globalAlpha });
+      events.push({ type: "draw-image", label, image, args, alpha: this.globalAlpha, blend: this.globalCompositeOperation, transform: this.transform });
     },
     fill(path, rule) {
-      events.push({ type: "fill", label, path, rule, alpha: this.globalAlpha });
+      events.push({ type: "fill", label, path, rule, alpha: this.globalAlpha, transform: this.transform });
     },
     fillRect: () => {},
     restore() {
@@ -59,13 +59,14 @@ function createRecordedCanvasContext(width, height, label, events, counters) {
     },
     rotate: () => {},
     save() {
+      counters.saves = (counters.saves || 0) + 1;
       savedStates.push({
         globalAlpha: this.globalAlpha,
         globalCompositeOperation: this.globalCompositeOperation,
       });
     },
     scale: () => {},
-    setTransform: () => {},
+    setTransform(...args) { this.transform = args; },
     translate: () => {},
   };
   context.canvas = {
@@ -82,6 +83,7 @@ function createModernDrawHarness({
 } = {}) {
   const events = [];
   const metrics = [];
+  const partMetrics = [];
   const counters = { gradients: 0, canvases: 0 };
   const state = {
     activeScenarioId: "scenario-a",
@@ -163,8 +165,9 @@ function createModernDrawHarness({
         nowValue += 4;
         return current;
       },
-      prepareTargetContext: () => 1,
-      recordRenderPerfMetric: (name, duration, details) => metrics.push({ name, duration, details }),
+      prepareTargetContext: (context) => { context.clearRect(0, 0, context.canvas.width, context.canvas.height); return 1; },
+      recordRenderPerfMetric: (name, duration, details) =>
+        (name === "modernCityLightsStaticLayerCache" ? metrics : partMetrics).push({ name, duration, details }),
       stableJson,
       withRenderTarget: (targetContext, callback) => {
         const previousContext = activeContext;
@@ -178,7 +181,7 @@ function createModernDrawHarness({
       ...helpers,
     },
   });
-  return { counters, events, metrics, owner, state };
+  return { counters, events, metrics, partMetrics, owner, state };
 }
 
 function createOwner(overrides = {}) {
@@ -772,7 +775,8 @@ test("modern static cache reuses bounded blob sprites and reports measured rebui
 
   assert.equal(harness.counters.gradients, 1, "one reusable sprite profile should serve every visible background entry and rebuild");
   assert.deepEqual(harness.metrics.map(({ details }) => details.hit), [false, true, false, false]);
-  assert.deepEqual(harness.metrics.map(({ duration }) => duration), [4, 0, 4, 4]);
+  assert.equal(harness.metrics[1].duration, 0);
+  assert.ok(harness.metrics.filter(({ details }) => !details.hit).every(({ duration }) => duration > 0));
   for (const metric of harness.metrics) {
     assert.equal(metric.name, "modernCityLightsStaticLayerCache");
   }
@@ -788,7 +792,7 @@ test("modern static cache reuses bounded blob sprites and reports measured rebui
     [
       { blobs: 4, spriteBuilds: 1, spriteCacheSize: 1, width: 400, height: 200 },
       { blobs: 4, spriteBuilds: 0, spriteCacheSize: 1, width: 400, height: 200 },
-      { blobs: 4, spriteBuilds: 0, spriteCacheSize: 1, width: 400, height: 200 },
+      { blobs: 0, spriteBuilds: 0, spriteCacheSize: 1, width: 400, height: 200 },
     ],
   );
 });
@@ -862,7 +866,8 @@ test("population boost changes existing urban core opacity without changing core
   assert.equal(withoutBoost.length, 1);
   assert.equal(withBoost.length, withoutBoost.length, "population data must enrich existing cores instead of adding boost splats");
   assert.equal(withBoost[0].feature, withoutBoost[0].feature);
-  assert.ok(withoutBoost[0].weight >= 1.3, "fixture must exercise a high-weight core");
+  assert.ok(withoutBoost[0].weight > 0.9, "fixture must exercise a substantial core after the soft knee");
+  assert.ok(withoutBoost[0].weight < 1.3, "brightest cores must retain headroom below the former hard cap");
   assert.equal(withoutBoost[0].sample, 1, "fixture must exercise the brightest grid value");
   assert.ok(withBoost[0].haloAlpha > withoutBoost[0].haloAlpha);
   assert.ok(withBoost[0].coreAlpha > withoutBoost[0].coreAlpha);
@@ -870,6 +875,235 @@ test("population boost changes existing urban core opacity without changing core
   assert.ok(withBoost[0].haloAlpha < 0.4, "soft saturation must retain halo headroom at high intensity");
   assert.ok(withoutBoost[0].coreAlpha < 0.7);
   assert.ok(withBoost[0].coreAlpha < 0.7, "soft saturation must retain core headroom at high intensity");
+});
+
+test("modern lights apply the shared night mask without modifying the cached static field", () => {
+  const mask = { width: 100, height: 50 };
+  let hemisphereBuilds = 0;
+  const harness = createModernDrawHarness({ helpers: {
+    getNightMask: () => mask,
+    buildNightHemisphereFeature: () => { hemisphereBuilds += 1; return {}; },
+  } });
+  const config = normalizeDayNightStyleConfig({ cityLightsStyle: "modern" });
+  harness.owner.drawModernNightLightsLayer(1, config, {});
+  harness.owner.drawModernNightLightsLayer(1, { ...config, twilightWidthDeg: 20 }, {});
+  assert.equal(hemisphereBuilds, 0, "a continuous mask replaces the hard hemisphere clip");
+  const maskDraws = harness.events.filter((event) => event.type === "draw-image" && event.image === mask);
+  assert.equal(maskDraws.length, 2);
+  assert.ok(maskDraws.every((event) => event.blend === "destination-in"));
+  assert.deepEqual(harness.metrics.map(({ details }) => details.hit), [false, true], "twilight width changes must not rebuild the static light field");
+  assert.ok(harness.events.filter((event) => event.type === "draw-image" && event.label === "main")
+    .every((event) => event.blend === "screen"));
+});
+
+test("texture opacity gates the corridor field while urban and fallback cores keep their alpha", () => {
+  const city = { properties: { id: "fallback", __city_population: 500000, __city_is_country_capital: true } };
+  const harness = createModernDrawHarness({ cities: [city] });
+  const draw = (opacity) => {
+    const before = harness.events.length;
+    harness.owner.drawModernNightLightsLayer(1, normalizeDayNightStyleConfig({
+      cityLightsTextureOpacity: opacity, cityLightsCorridorStrength: 1,
+    }), {});
+    return harness.events.slice(before).filter((event) => event.type === "draw-image" && event.image?.width === 96);
+  };
+  const visible = draw(1);
+  const hidden = draw(0);
+  assert.equal(visible.length, 6, "four background splats plus two fallback core blobs");
+  assert.equal(hidden.length, 0, "zero texture opacity draws no background splats and reuses cached cores");
+  assert.equal(harness.partMetrics.at(-1).details.hit, true);
+  const coreCanvas = harness.events.find((event) => event.type === "draw-image" && event.image?.width === 96 && event.label === visible.at(-1).label);
+  assert.ok(coreCanvas, "the retained core surface already contains the original core alpha");
+
+  const urbanFeature = createShapeFeature("urban-opacity");
+  const urban = createModernDrawHarness({ urbanFeatures: [urbanFeature], helpers: shapeHelpers() });
+  const low = urban.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({ cityLightsTextureOpacity: 0 }), 1);
+  const high = urban.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({ cityLightsTextureOpacity: 1 }), 1);
+  assert.equal(low.length, 1);
+  assert.equal(low[0].haloAlpha, high[0].haloAlpha);
+  assert.equal(low[0].coreAlpha, high[0].coreAlpha);
+});
+
+test("urban shapes share the padded pass coordinates at the terminator after zoom, pan and DPR changes", () => {
+  const harness = createModernDrawHarness({ urbanFeatures: [createShapeFeature()], helpers: shapeHelpers({
+    getRenderPassLayout: () => ({ offsetX: 60, offsetY: 30 }),
+  }) });
+  const config = normalizeDayNightStyleConfig({});
+  for (const [k, x, y, dpr] of [[1, 0, 0, 1], [2, -130, -40, 1.5], [1.3, 18, -12, 2]]) {
+    harness.state.zoomTransform = { k, x, y };
+    harness.state.dpr = dpr;
+    const before = harness.events.length;
+    harness.owner.drawModernNightLightsLayer(k, config, {});
+    const events = harness.events.slice(before);
+    const shapeFill = events.find((event) => event.type === "fill");
+    const shapeComposite = events.find((event) => event.type === "draw-image" && event.image.width !== 96 && event.args.length === 4);
+    assert.ok(shapeFill && shapeComposite);
+    const [a, b, c, d, e, f] = shapeFill.transform;
+    const sx = shapeComposite.args[2] / shapeComposite.image.width;
+    const sy = shapeComposite.args[3] / shapeComposite.image.height;
+    // Compare a geographic point after downsample + upsample with a normal pass light.
+    const px = 100, py = 100;
+    assert.ok(Math.abs((a * px + c * py + e) * sx - dpr * (px * k + x + 60)) < 1e-8);
+    assert.ok(Math.abs((b * px + d * py + f) * sy - dpr * (py * k + y + 30)) < 1e-8);
+  }
+});
+
+test("texture batching preserves affine placement and alpha while avoiding per-blob saves", () => {
+  const base = { a: 2, b: 0.3, c: 0.2, d: 3, e: 17, f: 23 };
+  const reference = createModernDrawHarness();
+  const batched = createModernDrawHarness({ helpers: { prepareTargetContext: (context) => {
+    context.getTransform = () => base;
+    return 1;
+  } } });
+  const config = normalizeDayNightStyleConfig({});
+  reference.owner.drawModernNightLightsLayer(1, config, {});
+  batched.owner.drawModernNightLightsLayer(1, config, {});
+  const ref = reference.events.filter((event) => event.type === "draw-image" && event.image?.width === 96);
+  const actual = batched.events.filter((event) => event.type === "draw-image" && event.image?.width === 96);
+  assert.deepEqual(actual.map((event) => event.alpha), ref.map((event) => event.alpha));
+  const geometry = batched.owner.getModernCityLightsGeometry().baseEntries;
+  actual.forEach((event, index) => {
+    const { x, y, rotation } = geometry[index];
+    const cos = Math.cos(rotation), sin = Math.sin(rotation);
+    assert.deepEqual(event.transform, [base.a * cos + base.c * sin, base.b * cos + base.d * sin,
+      base.c * cos - base.a * sin, base.d * cos - base.b * sin, base.a * x + base.c * y + base.e, base.b * x + base.d * y + base.f]);
+    assert.deepEqual(event.args.slice(2), ref[index].args.slice(2));
+  });
+  assert.ok(reference.counters.saves - batched.counters.saves >= actual.length - 2,
+    "batch boundaries must replace per-blob state saves");
+});
+
+test("late urban shapes preserve geometry, sprites and the background surface; sliders invalidate their own part", () => {
+  const harness = createModernDrawHarness();
+  const config = normalizeDayNightStyleConfig({});
+  harness.owner.drawModernNightLightsLayer(1, config, {});
+  const entries = harness.owner.getModernCityLightsGeometry().baseEntries;
+  harness.owner.updateAssets({ MODERN_CITY_LIGHTS_URBAN_AREAS: { features: [] } });
+  harness.owner.drawModernNightLightsLayer(1, config, {});
+  assert.equal(harness.owner.getModernCityLightsGeometry().baseEntries, entries);
+  assert.deepEqual(harness.partMetrics.slice(-2).map(({ details }) => details.hit), [true, false]);
+  assert.equal(harness.metrics.at(-1).details.spriteBuilds, 0);
+  harness.owner.drawModernNightLightsLayer(1, { ...config, cityLightsTextureOpacity: 0.2 }, {});
+  assert.deepEqual(harness.partMetrics.slice(-2).map(({ details }) => details.hit), [false, true]);
+  harness.owner.drawModernNightLightsLayer(1, { ...config, cityLightsTextureOpacity: 0.2, cityLightsPopulationBoostStrength: 0.8 }, {});
+  assert.deepEqual(harness.partMetrics.slice(-2).map(({ details }) => details.hit), [true, false]);
+});
+
+test("grid and urban shape fetches start together without waiting for either promise", async () => {
+  const requests = [];
+  const pending = new Promise(() => {});
+  const harness = createModernDrawHarness({ assetProvider: {
+    isModernAssetsReady: () => false, isUrbanShapeAssetsReady: () => false,
+    ensureModernAssets: () => { requests.push("grid"); return pending; },
+    ensureUrbanShapeAssets: () => { requests.push("urban"); return pending; },
+  } });
+  harness.owner.drawNightLightsLayer(1, normalizeDayNightStyleConfig({}), {});
+  harness.owner.drawNightLightsLayer(1, normalizeDayNightStyleConfig({}), {});
+  assert.deepEqual(requests.sort(), ["grid", "urban"]);
+});
+
+test("urban population uses a non-neighborhood maximum proxy and invalidates on city state", () => {
+  const urbanFeature = createShapeFeature("metro", { city_ids: ["parent", "second", "district"] });
+  const cities = [
+    { properties: { id: "parent", feature_code: "PPL", __city_population: 2_000_000, capitalScore: 0 } },
+    { properties: { id: "second", feature_code: "PPL", __city_population: 600_000, capitalScore: 2 } },
+    { properties: { id: "district", feature_code: "PPLX", __city_population: 900_000, capitalScore: 0 } },
+  ];
+  let collection = { type: "FeatureCollection", features: cities };
+  const state = { cityLayerRevision: 1, activeScenarioId: "a" };
+  const owner = createOwner({
+    state,
+    cityCollection: collection,
+    assets: { MODERN_CITY_LIGHTS_URBAN_AREAS: { type: "FeatureCollection", features: [urbanFeature] } },
+    helpers: {
+      getEffectiveCityCollection: () => collection,
+      getCityCanonicalId: (feature) => feature.properties.id,
+      getCityCapitalScore: (feature) => feature.properties.capitalScore,
+    },
+  });
+  const read = () => owner.getModernCityLightsPopulationBoostData().urbanEntries[0];
+  assert.equal(read().populationSum, 2_000_000);
+  assert.equal(read().capitalScore, 2, "capital score remains independent of the population proxy");
+  assert.equal(read().density, 2_000_000 / (urbanFeature.properties.area_sqkm || 0.01));
+
+  cities[0].properties.__city_population = 0;
+  cities[1].properties.__city_population = 0;
+  state.cityLayerRevision += 1;
+  assert.equal(read().populationSum, 900_000, "PPLX is used only when no positive non-PPLX population exists");
+  cities[2].properties.__city_population = 1_100_000;
+  state.activeScenarioId = "b";
+  assert.equal(read().populationSum, 1_100_000);
+  collection = { ...collection, features: [...cities] };
+  assert.equal(read().populationSum, 1_100_000);
+  assert.equal(owner.getModernCityLightsPopulationBoostData().cityCollection, collection);
+});
+
+test("urban core soft knee is monotonic across weak and bright samples", () => {
+  const feature = createShapeFeature("weight-range");
+  const samples = [0, 0.15, 0.4, 0.7, 1];
+  const weights = samples.map((sample) => {
+    const harness = createModernDrawHarness({
+      urbanFeatures: [feature], helpers: shapeHelpers(),
+      grid: [Math.max(1, Math.round(sample * 249))],
+    });
+    return harness.owner.collectModernUrbanCoreEntries(1, normalizeDayNightStyleConfig({}), 1)[0]?.weight;
+  });
+  assert.ok(weights.every(Number.isFinite), "weak cores remain visible");
+  assert.ok(weights.every((weight, index) => index === 0 || weight >= weights[index - 1]));
+  assert.ok(weights.at(-1) > weights[0], "stronger sampled light must produce a stronger core");
+  assert.ok(weights.at(-1) < 1.4, "the strongest core approaches the knee without a hard plateau");
+});
+
+test("fallback candidates survive pan rebuilds and refresh for city and urban state", () => {
+  const city = { properties: { id: "candidate", __city_population: 80000 } };
+  let collection = { type: "FeatureCollection", features: [city] };
+  let canonicalCalls = 0;
+  const harness = createModernDrawHarness({
+    cities: [city],
+    helpers: {
+      getEffectiveCityCollection: () => collection,
+      getCityCanonicalId: (feature) => { canonicalCalls += 1; return feature.properties.id; },
+    },
+  });
+  const config = normalizeDayNightStyleConfig({ cityLightsPopulationBoostEnabled: false });
+  const draw = () => harness.owner.drawModernNightLightsLayer(1, config, {});
+  draw();
+  assert.equal(canonicalCalls, 1);
+  harness.state.zoomTransform.x += 1;
+  draw();
+  assert.equal(canonicalCalls, 1, "pan rebuild reuses the city candidate scan");
+  harness.state.cityLayerRevision += 1;
+  draw();
+  assert.equal(canonicalCalls, 2);
+  harness.state.activeScenarioId = "scenario-b";
+  draw();
+  assert.equal(canonicalCalls, 3);
+  collection = { ...collection };
+  harness.state.zoomTransform.x += 1;
+  draw();
+  assert.equal(canonicalCalls, 4);
+  collection.features = [...collection.features];
+  harness.state.zoomTransform.x += 1;
+  draw();
+  assert.equal(canonicalCalls, 5);
+  harness.state.urbanData = { ...harness.state.urbanData };
+  harness.state.zoomTransform.x += 1;
+  draw();
+  assert.equal(canonicalCalls, 6);
+});
+
+test("fallback overlap lookup includes neighboring screen bins", () => {
+  const feature = createShapeFeature("urban-bin");
+  const city = { properties: { id: "nearby", __city_population: 500000 } };
+  const harness = createModernDrawHarness({
+    cities: [city], urbanFeatures: [feature],
+    helpers: shapeHelpers({
+      getCityAnchor: () => [120, 100],
+      getProjectedGeographicPath: () => null,
+    }),
+  });
+  harness.owner.drawModernNightLightsLayer(1, normalizeDayNightStyleConfig({}), {});
+  const blobs = harness.events.filter((event) => event.type === "draw-image" && event.image?.width === 96);
+  assert.equal(blobs.length, 6, "adjacent-bin city is suppressed by the visible urban core");
 });
 
 test("modern city lights owner caches population boost data by current renderer state", () => {

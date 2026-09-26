@@ -1,3 +1,5 @@
+import { createDayNightMask } from "./day_night_mask.js";
+
 function requireFunction(value, label) {
   if (typeof value !== "function") {
     throw new TypeError(`createDayNightRuntimeOwner requires ${label}`);
@@ -40,6 +42,8 @@ export function createDayNightRuntimeOwner({
     "helpers.normalizeDayNightStyleConfig",
   );
   const createDate = typeof helpers.createDate === "function" ? helpers.createDate : () => new Date();
+  const getCityLayerRevision = getters.getCityLayerRevision || (() => 0);
+  const ensureCityLightsData = effects.ensureCityLightsData || (() => {});
   const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
   const stableJson = requireFunction(helpers.stableJson, "helpers.stableJson");
   const drawNightLightsLayer = requireFunction(
@@ -68,6 +72,13 @@ export function createDayNightRuntimeOwner({
   let clockFrameHandle = null;
   let lastClockToken = "";
   let lastCycleFrameAt = 0;
+  const nightMask = createDayNightMask({
+    createCanvas: (width, height, context) => {
+      const document = context?.canvas?.ownerDocument || platform.document;
+      return document?.createElement?.("canvas")
+        || (typeof platform.OffscreenCanvas === "function" ? new platform.OffscreenCanvas(width, height) : null);
+    },
+  });
 
   function getDayNightStyleConfig() {
     const config = normalizeDayNightStyleConfig(getDayNightStyleConfigState());
@@ -167,38 +178,32 @@ export function createDayNightRuntimeOwner({
       .precision(2)();
   }
 
+  function getNightMask(config, solarState) {
+    return nightMask.getMask({
+      context: rendererSurfaceHost.getContext(),
+      projection: rendererSurfaceHost.getProjection?.(),
+      solarState,
+      twilightWidthDeg: config.twilightWidthDeg,
+    });
+  }
+
   function drawDayNightShadowLayer(k, config, solarState) {
-    const twilightBand = buildNightHemisphereFeature(solarState, 90);
-    if (!twilightBand) return;
-    const coreRadius = clamp(90 - Number(config.twilightWidthDeg || 10), 56, 89);
-    const nightCore = buildNightHemisphereFeature(solarState, coreRadius);
     const context = rendererSurfaceHost.getContext();
-    const pathCanvas = rendererSurfaceHost.getPathCanvas();
-    if (!context || !pathCanvas) return;
-
+    if (!context || config.shadowOpacity <= 0) return;
+    const mask = getNightMask(config, solarState);
+    if (!mask) return;
     context.save();
-    context.globalCompositeOperation = "source-over";
-    context.fillStyle = "#24374c";
-    context.globalAlpha = clamp(config.shadowOpacity * 0.5, 0, 0.5);
-    context.beginPath();
-    pathCanvas(twilightBand);
-    context.fill();
-
-    if (nightCore) {
-      context.fillStyle = "#081423";
-      context.globalAlpha = clamp(config.shadowOpacity, 0, 0.85);
-      context.beginPath();
-      pathCanvas(nightCore);
-      context.fill();
+    try {
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.globalCompositeOperation = "source-over";
+      const opacity = clamp(config.shadowOpacity, 0, 0.85);
+      // Preserve the former combined deep-night darkness without discrete bands.
+      context.globalAlpha = 1 - (1 - opacity) * (1 - opacity * 0.5);
+      context.imageSmoothingEnabled = true;
+      context.drawImage(mask, 0, 0, context.canvas.width, context.canvas.height);
+    } finally {
+      context.restore();
     }
-
-    context.strokeStyle = "#8aa1ba";
-    context.globalAlpha = clamp(config.shadowOpacity * 0.28, 0, 0.24);
-    context.lineWidth = 1.1 / Math.max(0.0001, Number(k || 1));
-    context.beginPath();
-    pathCanvas(twilightBand);
-    context.stroke();
-    context.restore();
   }
 
   function clearDayNightClockTimer() {
@@ -310,6 +315,7 @@ export function createDayNightRuntimeOwner({
       transformSignature,
       topologyRevision || 0,
       `field:urbanGlow:${Number(urbanGlowRevision || 0)}`,
+      `cities:${Number(getCityLayerRevision() || 0)}`,
       stableJson(config),
       getDayNightSignatureClockToken(config),
     ].join("::");
@@ -318,6 +324,7 @@ export function createDayNightRuntimeOwner({
   function drawDayNightPass(k, { interactive = false } = {}) {
     const config = getDayNightStyleConfig();
     if (!config.enabled || !isBootInteractionReady()) return;
+    if (config.cityLightsEnabled) ensureCityLightsData();
     const solarState = getCurrentSolarState(config);
     drawDayNightShadowLayer(k, config, solarState);
     drawNightLightsLayer(k, config, solarState);
@@ -330,6 +337,7 @@ export function createDayNightRuntimeOwner({
     drawDayNightShadowLayer,
     drawDayNightPass,
     getDayNightStyleConfig,
+    getNightMask,
     getCurrentSolarState,
     getCurrentUtcMinutes,
     getCycleUtcMinutes,

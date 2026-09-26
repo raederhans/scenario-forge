@@ -161,6 +161,62 @@ for (const resource of ["city", "localization"]) {
   });
 }
 
+test("night-light geometry skips localization; a concurrent labels caller upgrades once using the same cities", async () => {
+  const load = deferred();
+  const requests = [];
+  const cities = { features: [{ properties: { population: 120000 } }] };
+  const { owner, state, events } = harness({ loadCitySupportData: (options) => {
+    requests.push(options);
+    return options.includeLocalization ? Promise.resolve({ worldCities: options.cityCollection, localizationReady: true }) : load.promise;
+  } });
+  const geo = owner.ensureBaseCityDataReady({ includeLocalization: false, renderNow: false });
+  const labels = owner.ensureBaseCityDataReady({ renderNow: false });
+  load.resolve({ worldCities: cities, localizationReady: false });
+  assert.equal(await geo, cities);
+  assert.equal(await labels, cities);
+  assert.deepEqual(requests.map((request) => request.includeLocalization), [false, true]);
+  assert.equal(requests[1].cityCollection, cities);
+  assert.equal(state.cityLayerRevision, 1);
+  assert.equal(state.baseCityLocalizationReady, true);
+  assert.equal(events.filter((event) => event === "sync-localization").length, 1);
+  await owner.ensureBaseCityDataReady({ renderNow: false });
+  assert.equal(requests.length, 2);
+});
+
+test("geometry load preserves localization objects and a failed label upgrade can retry", async () => {
+  let fail = true;
+  const cities = { features: [] };
+  const { owner, state, events } = harness({ loadCitySupportData: async (options) => {
+    if (options.includeLocalization && fail) throw new Error("aliases unavailable");
+    return { worldCities: options.cityCollection || cities, localizationReady: options.includeLocalization };
+  } });
+  const locales = state.locales;
+  await owner.ensureBaseCityDataReady({ includeLocalization: false, renderNow: false });
+  assert.equal(state.locales, locales);
+  assert.equal(state.baseCityLocalizationReady, false);
+  assert.ok(!events.includes("sync-localization"));
+  await assert.rejects(owner.ensureBaseCityDataReady(), /aliases unavailable/);
+  assert.equal(state.worldCitiesData, cities);
+  fail = false;
+  await owner.ensureBaseCityDataReady({ renderNow: false });
+  assert.equal(state.baseCityLocalizationReady, true);
+});
+
+test("a cancelled labels receiver cannot trigger an upgrade after a shared geometry fetch", async () => {
+  const load = deferred();
+  let requests = 0;
+  const { owner, state } = harness({ loadCitySupportData: () => { requests += 1; return load.promise; } });
+  const geo = owner.ensureBaseCityDataReady({ includeLocalization: false });
+  const controller = new AbortController();
+  const labels = owner.ensureBaseCityDataReady({ signal: controller.signal });
+  controller.abort();
+  load.resolve({ worldCities: { features: [] }, localizationReady: false });
+  await geo;
+  await assert.rejects(labels, { name: "AbortError" });
+  assert.equal(requests, 1);
+  assert.equal(state.baseCityLocalizationReady, false);
+});
+
 function contourHarness() {
   const loads = new Map();
   const calls = [];

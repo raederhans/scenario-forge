@@ -1,5 +1,6 @@
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
+import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -1626,10 +1627,11 @@ export function createProjectSupportDiagnosticsController({
     return pager;
   };
 
+  const readLegendColors = createRevisionedLegendColorReader((appState) => legendManager.getUniqueColors(appState));
   const refreshLegendEditor = () => {
     if (!legendList) return;
     incrementSidebarCounter("legendRenders");
-    const colors = legendManager.getUniqueColors(state);
+    const colors = readLegendColors(state);
     const specialZoneLegendLayers = getVisibleSpecialZoneLegendLayers();
     const specialZoneLegendKey = legendManager.getSpecialZoneSignature(state);
     const colorItems = colors.map((color, index) => ({ type: "color", color, index }));

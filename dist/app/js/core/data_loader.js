@@ -1855,22 +1855,25 @@ export async function loadCitySupportData({
   cityAliasesUrls = CITY_ALIASES_URLS,
   locales = { ui: {}, geo: {} },
   geoAliases = { alias_to_stable_key: {} },
+  includeLocalization = true,
+  cityCollection = null,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadCitySupportData().");
   }
 
   const [worldCities, cityAliases] = await Promise.all([
-    loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
+    cityCollection || loadOptionalJsonCandidate(d3Client, worldCitiesUrls, {
       label: "world_cities",
       normalizer: (payload) => normalizeCityFeatureCollection(payload, { sourceLabel: "world_cities" }),
     }),
-    loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
+    includeLocalization ? loadOptionalJsonCandidate(d3Client, cityAliasesUrls, {
       label: "city_aliases",
       normalizer: (payload) => (payload && typeof payload === "object" ? payload : null),
-    }),
+    }) : null,
   ]);
 
+  if (!includeLocalization) return { worldCities, localizationReady: false };
   const merged = mergeCityLocalizationData({
     locales,
     geoAliases,
@@ -1884,6 +1887,7 @@ export async function loadCitySupportData({
     locales: merged.locales,
     geoAliases: merged.geoAliases,
     cityLocalizationPatch: merged.cityLocalizationPatch,
+    localizationReady: true,
   };
 }
 
