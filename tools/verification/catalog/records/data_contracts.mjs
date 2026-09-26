@@ -1,6 +1,20 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    id: "marine:refinement-contract",
+    commandRef: "python -m unittest tests.test_marine_refinement -q",
+    sourceRefs: [
+      "tests/test_marine_refinement.py", "map_builder/geo/marine_refinement.py",
+      "tools/build_marine_refinement_sources.py", "tools/sync_marine_refinement.py",
+      "data/marine_regions.additional.source.geojson", "data/marine_regions.refined.source.geojson",
+    ],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"],
+    tiers: ["heavy"], cost: "heavy", resourceLocks: ["heavy-geo", ".runtime-output"],
+    executionOwners: ["main-thread"], profiles: ["full"], platforms: ["all"],
+    entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: null,
+    verification: null, selector: {},
+  },
+  {
     id: "python:global-lakes",
     commandRef: "python -m unittest tests.test_global_lakes -q",
     sourceRefs: [

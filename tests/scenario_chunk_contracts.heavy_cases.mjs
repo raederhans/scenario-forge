@@ -1294,7 +1294,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && !rendererSource.includes("collectActiveAtlantropaSeaWaterFeatures")
         && !rendererSource.includes("getActiveAtlantropaSeaWaterProjectionState"),
       macroOceanOverridesRequirePaintMode:
-        /function getWaterRegionColor\(id, feature = null\) \{[\s\S]*?const defaultStyleFeature = feature \|\| runtimeState\.waterRegionsById\?\.get\(resolvedId\);[\s\S]*?if \(isMacroOceanWaterRegion\(defaultStyleFeature\) && !isOpenOceanPaintEnabled\(\)\) \{[\s\S]*?return getWaterRegionDefaultStyle\(defaultStyleFeature\)\.fill;[\s\S]*?\}[\s\S]*?getSafeCanvasColor\(runtimeState\.waterRegionOverrides\?\.\[resolvedId\], null\)/.test(rendererSource),
+        /function getWaterRegionColor\(id, feature = null\) \{[\s\S]*?const defaultStyleFeature = feature \|\| runtimeState\.waterRegionsById\?\.get\(resolvedId\);[\s\S]*?if \(isMacroOceanWaterRegion\(defaultStyleFeature\) && !isOpenOceanPaintEnabled\(\)\) \{[\s\S]*?return getWaterRegionDefaultStyle\(defaultStyleFeature\)\.fill;[\s\S]*?\}[\s\S]*?resolveWaterRegionOverride\(resolvedId, defaultStyleFeature, runtimeState\.waterRegionsById, runtimeState\.waterRegionOverrides, getSafeCanvasColor\)/.test(rendererSource),
       politicalPromotionTreatsAtlantropaLayerAsWaterChange:
         /const hasAtlantropaLayerChange = normalizedChangedLayerKeys\.includes\("scenario_atlantropa"\);/.test(chunkPromotionHelperSource)
         && /const effectiveChangedLayerKeys = hasAtlantropaLayerChange[\s\S]*?"water"/.test(chunkPromotionHelperSource)

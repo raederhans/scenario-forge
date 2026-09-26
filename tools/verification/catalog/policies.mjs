@@ -105,6 +105,7 @@ export const CATALOG_POLICIES = {
           "tests/test_transport_country_source_contracts.py",
           "tests/test_physical_water_mask.py",
           "tests/test_water_geometry.py",
+          "tests/test_marine_refinement.py",
           "tests/test_nordic_water_seed.py",
           "tests/test_global_lakes.py",
           "tests/test_water_region_authority.py",

@@ -79,7 +79,7 @@ export function createPrecisionScalingRecords(existingRecords) {
     ]],
     ...[
       ["precision_shard_lod", "tools/scenario_chunk_assets.py"],
-      ["scenario_topology_decode", "tools/scenario_topology_decode.py", "tools/regional_scenario_assets.py", "tools/scenario_chunk_assets.py"],
+      ["scenario_topology_decode", "tools/scenario_topology_decode.py", "tools/regional_scenario_assets.py", "tools/scenario_chunk_assets.py", "tools/build_landing_hero_cartography.py", "tools/build_landing_europe_1936_showcase.py"],
       ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py"],
       ["tno_major_country_precision", "tools/prepare_tno_major_country_precision.py"],
       ["us_county_source", "tools/prepare_us_county_source.py"],

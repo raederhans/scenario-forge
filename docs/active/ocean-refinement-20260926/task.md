@@ -34,3 +34,7 @@
 CI定位补充：两次PR快速验证在Pages测试收到runner shutdown。本地同一入口复现旧TopoJSON补齐解码器的内存激增，私有内存约39GB，已主动停止。两个受影响展示图构建器改用现有scenario_topology_decode的变长弧线解码器；3项回归测试验证输出一致且禁止补齐分配。完整Pages启动壳测试继续验证生成资产字节一致性，远端CI以最新提交为准。
 
 修复后完整Pages启动壳65项测试通过（109.655秒），包含生成资产字节一致性。解码器回归3项通过；独立产物继续使用pages-integrated，未修改跟踪的dist。
+
+CI配套收尾：补齐海域源文件、生成器和展示图解码器的验证路由；海域测试按已有geo_stack规则登记依赖并保持独立路由。展示页Node测试遵循SCENARIO_FORGE_PAGES_ARTIFACT_ROOT，检查本次生成产物而非过期跟踪dist；保留数值与内容断言。外洋填色静态契约更新为继承解析器调用，并新增开关关闭时直接色/继承色均无效的行为测试。
+
+自动选择检查分批执行完成：selector-execution.json中已通过项与selector-remaining.json续跑项合并核对；后者仅有的两组旧契约失败已在integration-contract-fixes.log重新验证，189项全部通过。未受影响的通过项未重跑。E2E层清单、导入图、地理依赖分类均通过；完整远端CI仍以PR最新提交为准。
