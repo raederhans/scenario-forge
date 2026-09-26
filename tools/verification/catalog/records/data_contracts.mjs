@@ -1727,5 +1727,113 @@ export const DATA_CONTRACTS_RECORDS = [
     "selectorOrder": 1500,
     "verification": null,
     "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_source_coverage_repair.py",
+    "commandRef": "test:python:source-coverage-repair",
+    "sourceRefs": [
+      "tests/test_source_coverage_repair.py",
+      "map_builder/geo/source_coverage_repair.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_extension_admin1_coverage.py",
+    "commandRef": "test:python:extension-admin1-coverage",
+    "sourceRefs": [
+      "tests/test_extension_admin1_coverage.py",
+      "map_builder/processors/admin1.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_tno_border_continuity.py",
+    "commandRef": "test:python:tno-border-continuity",
+    "sourceRefs": [
+      "tests/test_tno_border_continuity.py",
+      "data/scenarios/tno_1962/manifest.json"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
   }
 ];

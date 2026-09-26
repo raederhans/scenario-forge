@@ -13,6 +13,7 @@
     "tests/e2e/hoi4_rk_russia_regression.spec.js",
     "tests/e2e/interaction_funnel_contract.spec.js",
     "tests/e2e/main_shell_i18n.spec.js",
+    "tests/e2e/map_clarity.spec.js",
     "tests/e2e/non_1962_runtime_matrix.spec.js",
     "tests/e2e/physical_layer_regression.spec.js",
     "tests/e2e/project_save_load_roundtrip.spec.js",

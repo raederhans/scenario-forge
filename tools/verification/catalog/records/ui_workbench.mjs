@@ -1474,5 +1474,41 @@ export const UI_WORKBENCH_RECORDS = [
     "selectorOrder": 373,
     "verification": null,
     "selector": {}
+  },
+  {
+    "id": "e2e:tests/e2e/map_clarity.spec.js",
+    "commandRef": "test:e2e:map-clarity",
+    "sourceRefs": [
+      "tests/e2e/map_clarity.spec.js"
+    ],
+    "ownerHints": [
+      "map-runtime"
+    ],
+    "domains": [
+      "map-layer"
+    ],
+    "tiers": [
+      "regression"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "browser-dev-server",
+      "playwright-browser",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
   }
 ];

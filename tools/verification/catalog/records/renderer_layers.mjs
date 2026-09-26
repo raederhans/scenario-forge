@@ -1642,5 +1642,138 @@ export const RENDERER_LAYERS_RECORDS = [
       "routeRegistry": true
     },
     "selector": {}
+  },
+  {
+    "id": "node:test:node:display-quality-policy",
+    "commandRef": "test:node:display-quality-policy",
+    "sourceRefs": [
+      "js/core/renderer/display_quality_policy.js",
+      "tests/display_quality_policy_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "node:test:node:political-border-assets",
+    "commandRef": "test:node:political-border-assets",
+    "sourceRefs": [
+      "js/core/renderer/political_border_runtime.js",
+      "tests/political_border_assets_behavior.test.mjs",
+      "data/scenarios/tno_1962/mesh_pack.json"
+    ],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "node:test:node:political-border-policy",
+    "commandRef": "test:node:political-border-policy",
+    "sourceRefs": [
+      "js/core/renderer/political_border_policy.js",
+      "tests/political_border_policy_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "node:test:node:political-border-runtime",
+    "commandRef": "test:node:political-border-runtime",
+    "sourceRefs": [
+      "js/core/renderer/political_border_runtime.js",
+      "tests/political_border_runtime_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
   }
 ];
