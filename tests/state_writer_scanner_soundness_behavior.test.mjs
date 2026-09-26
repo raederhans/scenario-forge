@@ -2091,3 +2091,47 @@ test("action binding discovery fails closed when a non-target parameter is mutat
       && error.violations?.[0]?.key === "*",
   );
 });
+
+test("paint delegation keeps its target effectful and binds read-only siblings to exact source", async () => {
+  const modulePath = "js/core/state/color_state.js";
+  const source = await readFile(new URL("../" + modulePath, import.meta.url), "utf8");
+  const binding = parameterBindingFor(source, "applyFeaturePaintState", "target");
+  const inventory = scanStateMutationInventory(source, { filePath: modulePath, bindings: [binding] });
+  assert.ok(inventory.findings.some(finding => !finding.unsupported && finding.key.startsWith("visualOverrides")));
+  for (const statement of ["featureIds.push('bad');", "value.changed = true;"]) {
+    const marker = "if (!Array.isArray(featureIds))";
+    assert.ok(source.includes(marker));
+    await assert.rejects(discoverStateWriterBindingsForSource(modulePath,
+      source.replace(marker, statement + " " + marker), "production", { scanAllParameters: true }),
+      error => error.code === "state-effectful-delegator-source-mismatch");
+  }
+  const actionPath = "js/core/state/actions/scenario_activation_actions.js";
+  const actionSource = await readFile(new URL("../" + actionPath, import.meta.url), "utf8");
+  for (const replacement of [
+    "applyFeaturePaintState(target, featureIds, color, {});",
+    "unknownPaintState(target, featureIds, color);",
+    "featureIds.push('bad'); applyFeaturePaintState(target, featureIds, color);",
+  ]) {
+    const marker = "applyFeaturePaintState(target, featureIds, color);";
+    assert.ok(actionSource.includes(marker));
+    assert.ok((await validateStateActionNonTargetParameterMutations(actionPath,
+      actionSource.replace(marker, replacement))).length > 0);
+  }
+});
+
+test("reference assignment copying rejects source writes and changed record helpers", async () => {
+  const { STATE_TARGET_PURE_READER_CONTRACT, inspectStateTargetPureReaderFunctionSource } =
+    await import("../tools/state_action_delegation_contract.mjs");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(item => item.functionName === "createReadonlyReferenceAssignments");
+  const source = await readFile(new URL("../" + entry.modulePath, import.meta.url), "utf8");
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry).violations, []);
+  const marker = "return Object.freeze({ ...record(assignments) });";
+  assert.ok(source.includes(marker));
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source.replace(marker,
+    "assignments.bad = true; " + marker), entry).violations.some(item => item.code === "state-target-pure-reader-source-drift"));
+  const helperMarker = "const record = (value) =>";
+  assert.ok(source.includes(helperMarker));
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, entry, {
+    readSource: () => source.replace(helperMarker, "const record = (value) => (value.bad = true); const changedRecord = (value) =>"),
+  }).violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"));
+});

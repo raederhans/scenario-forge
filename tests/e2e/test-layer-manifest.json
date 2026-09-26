@@ -94,6 +94,13 @@
       "ownerHint": "ui-shell"
     },
     {
+      "specPath": "tests/e2e/map_clarity.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "map-layer",
+      "ownerHint": "map-runtime"
+    },
+    {
       "specPath": "tests/e2e/non_1962_runtime_matrix.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",

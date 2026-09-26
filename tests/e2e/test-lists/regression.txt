@@ -5,6 +5,7 @@ city_urban_rendering_regression.spec.js
 dev_workspace_render_boundary.spec.js
 editor_workspace_renewal.spec.js
 hoi4_rk_russia_regression.spec.js
+map_clarity.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
 ownership_retirement.spec.js

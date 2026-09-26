@@ -50,6 +50,16 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test('a political border source publication invalidates only the border signature', () => {
+  let revision=0;
+  const {policy}=createHarness({getPoliticalBorderRevision:()=>revision});
+  const borders=policy.getRenderPassSignature('borders');
+  const fill=policy.getRenderPassSignature('political');
+  revision++;
+  assert.notEqual(policy.getRenderPassSignature('borders'),borders);
+  assert.equal(policy.getRenderPassSignature('political'),fill);
+});
+
 test("strategic lens and resource filter changes invalidate their rendered passes", () => {
   const { state, policy } = createHarness();
   const before = policy.getRenderPassSignature("political");

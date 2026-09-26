@@ -125,6 +125,7 @@ function createOwner({ hgoVectorScene = false, interactive = false, helpers = {}
       getSafeCanvasColor: (value, fallbackColor) => value || fallbackColor,
       getVisibleCountryCodesForBorderMeshes: () => new Set(["AAA"]),
       getPaintContourMeshes: () => [mesh],
+      getPoliticalBorderMeshes: () => [],
       isUsableMesh: (candidate) => !!candidate?.coordinates?.length,
       sanitizePolyline: (line) => (Array.isArray(line) ? line : []),
       ...helpers,
@@ -186,4 +187,52 @@ test("empty or pending paint contours never revive cached reference borders", ()
     assert.equal(context.strokes.some(stroke => stroke.strokeStyle === "#222222"), false);
     assert.ok(context.strokes.some(stroke => stroke.strokeStyle === "#333333"));
   }
+});
+
+test("scenario paint and political borders draw separately with subdued paint styling", () => {
+  const politicalMesh = { type: "MultiLineString", coordinates: [[[1, 1], [2, 2]]] };
+  const { owner, context, state } = createOwner({
+    helpers: { getPoliticalBorderMeshes: () => [politicalMesh] },
+  });
+  state.activeScenarioId = "tno_1962";
+  state.styleConfig.empireBorders = { color: "#abcdef", opacity: 0.4, width: 2 };
+
+  owner.drawHierarchicalBorders(1);
+
+  const borders = context.strokes.filter(stroke => stroke.strokeStyle === "#abcdef");
+  assert.equal(borders.length, 2);
+  nearlyEqual(borders[0].lineWidth, 1.3);
+  nearlyEqual(borders[0].alpha, 0.2);
+  nearlyEqual(borders[1].lineWidth, 1.2);
+  nearlyEqual(borders[1].alpha, 0.272);
+});
+
+test("political borders reach the full user style by medium zoom in both passes", () => {
+  const politicalMesh = { type: "MultiLineString", coordinates: [[[1, 1], [2, 2]]] };
+  const records = [];
+  for (const interactive of [false, true]) {
+    const { owner, context, state } = createOwner({
+      interactive,
+      helpers: { getPoliticalBorderMeshes: () => [politicalMesh] },
+    });
+    state.activeScenarioId = "tno_1962";
+    state.styleConfig.empireBorders = { color: "#abcdef", opacity: 0.4, width: 2 };
+    owner.drawHierarchicalBorders(3.2, { interactive });
+    records.push(context.strokes.find(stroke => stroke.strokeStyle === "#abcdef" && Math.abs(stroke.alpha - 0.4) < 0.0001));
+  }
+  const expectedWidth = (2 * (0.95 + (0.40 * ((3.2 - 1) / 7))) / 3.2);
+  for (const border of records) {
+    assert.ok(border);
+    nearlyEqual(border.lineWidth, expectedWidth);
+    nearlyEqual(border.alpha, 0.4);
+  }
+  nearlyEqual(records[0].lineWidth, records[1].lineWidth);
+  nearlyEqual(records[0].alpha, records[1].alpha);
+});
+
+test("disabled political layer draws no political mesh", () => {
+  const { owner, context, state } = createOwner();
+  state.activeScenarioId = "tno_1962";
+  owner.drawHierarchicalBorders(1);
+  assert.equal(context.strokes.filter(stroke => stroke.strokeStyle === "#222222").length, 1);
 });

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import geopandas as gpd
 import pandas as pd
+import shapely
 
 from map_builder import config as cfg
 from map_builder.geo.utils import clip_to_map_bounds, pick_column
@@ -20,6 +21,21 @@ def extract_country_code(id_val: object) -> str:
     if len(prefix) == 2 and prefix.isalpha() and prefix.isupper():
         return prefix
     return ""
+
+
+def _simplify_country_coverages(admin1: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Simplify shared admin borders together while retaining each country's outline."""
+    simplified = admin1.geometry.tolist()
+    for country, positions in admin1.groupby("cntr_code", sort=False).indices.items():
+        geometries = admin1.geometry.iloc[positions].tolist()
+        if not shapely.coverage_is_valid(geometries):
+            raise ValueError(f"Admin1 source for {country!r} is not a valid coverage.")
+        result = shapely.coverage_simplify(
+            geometries, cfg.SIMPLIFY_ADMIN1, simplify_boundary=False
+        )
+        for position, geometry in zip(positions, result):
+            simplified[position] = geometry
+    return admin1.set_geometry(simplified)
 
 
 def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -131,7 +147,4 @@ def build_extension_admin1(land: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         "constituent_country",
     ]
     admin1 = admin1[[col for col in keep_cols if col in admin1.columns]].copy()
-    admin1["geometry"] = admin1.geometry.simplify(
-        tolerance=cfg.SIMPLIFY_ADMIN1, preserve_topology=True
-    )
-    return admin1
+    return _simplify_country_coverages(admin1)

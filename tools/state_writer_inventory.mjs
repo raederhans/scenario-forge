@@ -3581,7 +3581,7 @@ function analyzeBindingMutations(
     if (effectfulDelegator) {
       return callNode.arguments.length === effectfulDelegator.argumentCount
         && !callNode.arguments.some(argument => argument.type === "SpreadElement")
-        ? { targetArgumentIndex: effectfulDelegator.targetArgumentIndex, actionContract: null }
+        ? { targetArgumentIndex: effectfulDelegator.targetArgumentIndex, actionContract: null, effectfulDelegator }
         : null;
     }
     const actionContract =
@@ -3692,6 +3692,13 @@ function analyzeBindingMutations(
 
     const importedDelegation = importedTargetDelegation(node);
     if (importedDelegation) {
+      // Exact source-bound effectful helpers may read specified sibling values.
+      // Their target remains effectful; no other argument receives this grant.
+      for (const index of importedDelegation.effectfulDelegator?.readOnlyArgumentIndexes || []) {
+        if (index !== importedDelegation.targetArgumentIndex && index < node.arguments.length) {
+          delegatedArgumentIndexes.add(index);
+        }
+      }
       if (importedDelegation.borrowedEffectContract) {
         const entry = importedDelegation.borrowedEffectContract;
         const options = node.arguments[entry.optionsArgumentIndex];

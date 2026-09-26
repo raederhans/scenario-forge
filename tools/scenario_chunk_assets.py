@@ -367,6 +367,8 @@ def _build_opening_owner_border_mesh(
             min_bx, min_by, max_bx, max_by = geom_b.bounds
             if max_ax < min_bx or max_bx < min_ax or max_ay < min_by or max_by < min_ay:
                 continue
+            # Only line contact between different owner regions is a border;
+            # points and the outer edge of overlapping area are excluded.
             shared_boundary = geom_a.intersection(geom_b)
             line_coordinates.extend(_iter_line_coords(shared_boundary))
 

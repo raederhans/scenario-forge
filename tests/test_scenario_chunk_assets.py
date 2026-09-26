@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 import geopandas as gpd
-from shapely.geometry import Polygon, shape
+from shapely.geometry import LineString, Polygon, shape
 from topojson import Topology
 
 from tools import build_scenario_chunk_assets, scenario_chunk_assets
@@ -43,6 +43,46 @@ def _chunk_feature_ids(payload: dict) -> list[str]:
 
 
 class ScenarioChunkAssetsTest(unittest.TestCase):
+    def test_opening_owner_borders_include_only_strict_shared_edges(self) -> None:
+        cases = (
+            ("adjacent", [_square(0, 0)], [_square(1, 0)], 1.0),
+            ("point contact", [_square(0, 0)], [_square(1, 1)], 0.0),
+            ("gap", [_square(0, 0)], [_square(1.001, 0)], 0.0),
+            ("same-side overlap", [_square(0, 0)], [_square(0.5, 0)], 0.0),
+            (
+                "overlap plus strict edge",
+                [_square(0, 0), _square(3, 0)],
+                [_square(1, 0), _square(3.5, 0)],
+                1.0,
+            ),
+            ("full overlap", [_square(0, 0)], [_square(0, 0)], 0.0),
+        )
+        for name, owner_a, owner_b, expected_length in cases:
+            with self.subTest(name=name):
+                features = [
+                    {
+                        "type": "Feature",
+                        "properties": {"id": f"{owner}-{index}"},
+                        "geometry": polygon.__geo_interface__,
+                    }
+                    for owner, polygons in (("AAA", owner_a), ("BBB", owner_b))
+                    for index, polygon in enumerate(polygons)
+                ]
+                owners = {feature["properties"]["id"]: feature["properties"]["id"][:3] for feature in features}
+                with patch.object(
+                    scenario_chunk_assets,
+                    "_topology_object_to_feature_collection",
+                    return_value={"type": "FeatureCollection", "features": features},
+                ):
+                    mesh = scenario_chunk_assets._build_opening_owner_border_mesh({}, owners)
+                self.assertEqual(mesh["type"], "MultiLineString")
+                self.assertAlmostEqual(
+                    sum(LineString(coords).length for coords in mesh["coordinates"]),
+                    expected_length,
+                )
+                if expected_length:
+                    self.assertTrue(LineString(mesh["coordinates"][0]).equals(LineString([(1, 0), (1, 1)])))
+
     def test_checked_in_tno_chunk_manifest_byte_sizes_and_hashes_match_files(self) -> None:
         scenario_id = "tno_1962"
         manifest_path = REPO_ROOT / "data" / "scenarios" / scenario_id / "detail_chunks.manifest.json"
