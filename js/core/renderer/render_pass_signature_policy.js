@@ -69,6 +69,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getDayNightRuntimeOwner,
   getBorderAppearanceRevision = () => runtimeState.colorRevision || 0,
   getPaintContourRevision = () => runtimeState.colorRevision || 0,
+  getPoliticalBorderRevision = () => 0,
 }) {
   let observedTopologyRevision = Number(runtimeState.topologyRevision || 0);
   const topologyRevisionByPass = new Map();
@@ -317,6 +318,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         getPassTopologyRevision(passName),
         getBorderAppearanceRevision(),
         getPaintContourRevision(),
+        getPoliticalBorderRevision(),
         runtimeState.cachedDynamicBordersHash || "",
         runtimeState.sovereigntyRevision || 0,
         0,

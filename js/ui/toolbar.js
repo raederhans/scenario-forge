@@ -1542,7 +1542,7 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.styleConfig.empireBorders.color = normalizeHexColor(
     runtimeState.styleConfig.empireBorders.color,
-    "#666666"
+    "#4b5563"
   );
   runtimeState.styleConfig.empireBorders.opacity = clamp(
     Number.isFinite(Number(runtimeState.styleConfig.empireBorders.opacity))
@@ -1554,7 +1554,7 @@ function initToolbar({ render } = {}) {
   runtimeState.styleConfig.empireBorders.width = clamp(
     Number.isFinite(Number(runtimeState.styleConfig.empireBorders.width))
       ? Number(runtimeState.styleConfig.empireBorders.width)
-      : 1,
+      : 1.2,
     0.01,
     5
   );

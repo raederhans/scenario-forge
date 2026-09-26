@@ -1,4 +1,5 @@
 import { normalizePaintMode } from "./map_editing_policy.js";
+import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
@@ -640,6 +641,7 @@ class FileManager {
       legendControl: LegendManager.normalizeControl(appState.legendControl),
       layerVisibility,
       styleConfig: {
+        rendering: normalizeRenderingStyleConfig(appState.styleConfig?.rendering),
         internalBorders: appState.styleConfig?.internalBorders || null,
         empireBorders: appState.styleConfig?.empireBorders || null,
         coastlines: appState.styleConfig?.coastlines || null,
@@ -853,6 +855,7 @@ class FileManager {
     if (!data.styleConfig.ocean || typeof data.styleConfig.ocean !== "object") {
       data.styleConfig.ocean = null;
     }
+    data.styleConfig.rendering = normalizeRenderingStyleConfig(data.styleConfig.rendering);
     data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
     data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
     data.styleConfig.strategicValues = normalizeStrategicValuesStyle(data.styleConfig.strategicValues);

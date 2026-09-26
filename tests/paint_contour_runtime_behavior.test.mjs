@@ -7,8 +7,9 @@ import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_
 const rect=(id,x)=>({id,geometry:{type:'Polygon',coordinates:[[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]]}});
 function harness() {
   const a=rect('A',0),b=rect('B',1);
-  const state={colorRevision:0,activeScenarioId:'test',land:[a,b]};
+  const state={colorRevision:0,sovereigntyRevision:0,viewMode:'owner',separatePoliticalBorders:false,activeScenarioId:'test',land:[a,b]};
   const colors={A:'#ff0000',B:'#00ff00'};
+  const owners={A:'A',B:'B'};
   const tasks=[],scheduled=[],changes=[];let disposals=0,builder=null;
   const client={dispose(){disposals++;builder=null;},build(features,removed,options){
     if(options.reset)builder=createPaintContourGraphBuilder();
@@ -16,11 +17,45 @@ function harness() {
     return new Promise((resolve,reject)=>tasks.push({features,removed,resolve:()=>resolve(graph),reject}));
   }};
   const runtime=createPaintContourRuntime({state,getFeatures:()=>state.land,getFeatureId:f=>f.id,
-    isEligible:f=>!f.hidden,resolveColor:f=>colors[f.id],client,schedule:fn=>scheduled.push(fn),onChange:r=>changes.push(r)});
+    isEligible:f=>!f.hidden,resolveColor:f=>colors[f.id],
+    resolveBoundaryKey:f=>owners[f.id],
+    getBoundaryRevision:()=>`${state.sovereigntyRevision}|${state.viewMode}`,
+    separatePoliticalBorders:()=>state.separatePoliticalBorders,
+    client,schedule:fn=>scheduled.push(fn),onChange:r=>changes.push(r)});
   const flush=async()=>{while(scheduled.length)scheduled.shift()();await Promise.resolve();};
   const finish=async()=>{tasks.at(-1).resolve();await Promise.resolve();await Promise.resolve();};
-  return {a,b,state,colors,runtime,tasks,changes,flush,finish,disposals:()=>disposals};
+  return {a,b,state,colors,owners,runtime,tasks,changes,flush,finish,disposals:()=>disposals};
 }
+
+test('political separation, ownership and view changes reuse the geometry graph', async () => {
+  const h = harness();
+  h.runtime.getMeshes(); await h.flush(); await h.finish();
+  assert.equal(h.runtime.diagnostics().activeArcCount, 1);
+  h.state.separatePoliticalBorders = true;
+  assert.deepEqual(h.runtime.getMeshes(), []);
+  const built = h.runtime.diagnostics().builds;
+  h.owners.B = h.owners.A; h.state.sovereigntyRevision++;
+  assert.equal(h.runtime.getMeshes().length, 1);
+  h.state.viewMode = 'control';
+  assert.equal(h.runtime.getMeshes().length, 1);
+  h.owners.B = 'B'; h.state.sovereigntyRevision++;
+  assert.deepEqual(h.runtime.getMeshes(), []);
+  h.state.separatePoliticalBorders = false;
+  assert.equal(h.runtime.getMeshes().length, 1);
+  assert.equal(h.runtime.diagnostics().builds, built);
+});
+
+test('late geometry uses current separation and ownership state and scene reset rejects old ownership', async () => {
+  const h = harness();
+  h.runtime.getMeshes(); await h.flush();
+  h.state.separatePoliticalBorders = true;
+  h.owners.B = h.owners.A;
+  await h.finish(); assert.equal(h.runtime.getMeshes().length, 1);
+  h.state.activeScenarioId = 'next'; h.state.land = [rect('C', 4)];
+  h.colors.C = '#111111'; h.owners.C = 'C';
+  assert.deepEqual(h.runtime.getMeshes(), []); await h.flush(); await h.finish();
+  assert.equal(h.runtime.diagnostics().activeArcCount, 0);
+});
 
 test('paint, erase/undo and palette updates do not re-index geometry',async()=>{
   const h=harness();assert.deepEqual(h.runtime.getMeshes(),[]);await h.flush();await h.finish();

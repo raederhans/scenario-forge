@@ -1,6 +1,7 @@
 // Canonical appearance style state mutations. UI/render effects stay in callers.
 
 export const APPEARANCE_STYLE_GROUP_KEYS = Object.freeze([
+  "rendering",
   "ocean", "lakes", "internalBorders", "empireBorders", "coastlines",
   "parentBorders", "physical", "urban", "cityPoints", "strategicValues", "rivers",
   "texture", "dayNight", "transportOverview",

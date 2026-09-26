@@ -31,6 +31,42 @@ test('only shared boundaries between unequal persistent colors are active', () =
   colors.A='#ff0000'; view.refresh(['A']); assert.equal(view.getActiveArcCount(),1);
 });
 
+test('political separation keeps only unequal-color arcs between features with the same known owner', () => {
+  const graph = buildPaintContourGraph([rect('A',0,0,1,1),rect('B',1,0,2,1)]);
+  const colors = { A:'#111111', B:'#111111' };
+  const owners = { A:'RED', B:'BLUE' };
+  let separated = false;
+  const view = createPaintContourMesh(graph, id => colors[id], {
+    resolveBoundaryKey: id => owners[id],
+    separatePoliticalBorders: () => separated,
+  });
+  assert.equal(view.getActiveArcCount(), 0);
+  colors.B = '#222222';
+  assert.equal(view.refresh(['B']), true);
+  assert.equal(view.getActiveArcCount(), 1);
+  separated = true; assert.equal(view.refresh(), true);
+  assert.equal(view.getActiveArcCount(), 0);
+  owners.B = 'RED'; assert.equal(view.refresh(['B']), true);
+  assert.equal(view.getActiveArcCount(), 1);
+  colors.B = colors.A;
+  assert.equal(view.refresh(['B']), true);
+  assert.equal(view.getActiveArcCount(), 0);
+  owners.B = 'BLUE';
+  assert.equal(view.refresh(['B']), false);
+  assert.equal(view.getActiveArcCount(), 0);
+  colors.B = '#222222';
+  assert.equal(view.refresh(['B']), false);
+  assert.equal(view.getActiveArcCount(), 0);
+  owners.B = '';
+  assert.equal(view.refresh(['B']), false);
+  assert.equal(view.getActiveArcCount(), 0);
+  separated = false; view.refresh();
+  assert.equal(view.getActiveArcCount(), 1);
+  colors.B = colors.A;
+  view.refresh(['B']);
+  assert.equal(view.getActiveArcCount(), 0);
+});
+
 test('cross-source arcs with unequal collinear segmentation are noded once', () => {
   const a=rect('A',0,0,1,2);
   const b=polygon('B',[[[1,0],[2,0],[2,2],[1,2],[1,1],[1,0]]]);

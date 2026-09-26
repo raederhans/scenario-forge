@@ -1,5 +1,10 @@
 # Worktree Registry
 
+
+## 2026-09-26 地图清晰度与政治边界修复
+
+`C:/Users/raede/.codex/worktrees/map-clarity/mapcreator` 使用 `codex/map-clarity-20260926`，基于 `2f4cb130` 实施显示密度、独立政治国界、线条层级与 TNO 阿尔及利亚源覆盖修复。主工作区的未归属 UI、昼夜与其他改动保留原样。本任务通过受保护 main 的 PR 检查整合；最终推送和合并以 GitHub 回执为准。工作树继续承担 localhost:8001 预览并保存 `.runtime` 中的修复前数据、候选及浏览器证据，因此合并后保留。记录见 [map-clarity-20260926](map-clarity-20260926/task.md)。
+
 ## 2026-09-26 编辑工作区 UI 整合
 
 `C:/Users/raede/.codex/worktrees/editor-ui-merge-20260926/mapcreator` 使用分支 `codex/editor-ui-renewal-20260926`，基于 `origin/main@2e127eb4` 提取 UI 四阶段增量。主工作区的昼夜、渲染指标、启动管线等并行修改保留，不混入提交。隔离工作树用于构建、浏览器与合并验证，保留其 `.runtime` 运行证据供复核。任务记录见 [editor-ui-renewal-20260926](editor-ui-renewal-20260926/task.md)，最终推送、合并及部署状态以 Git/GitHub 回执为准。

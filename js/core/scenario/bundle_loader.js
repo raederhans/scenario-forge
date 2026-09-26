@@ -398,6 +398,7 @@ async function loadScenarioChunkFile(
 function createScenarioChunkRegistryEnsurer({
   patchRuntimeChunkLoadState,
 } = {}) {
+  const inFlightResourceGroups = new Map();
   return async function ensureScenarioChunkRegistryLoaded(
     bundle,
     {
@@ -420,34 +421,52 @@ function createScenarioChunkRegistryEnsurer({
       { registryStatus: "loading" },
       { returnLoadStateGeneration: true },
     );
-    const [chunkManifestResult, contextLodResult, runtimeMetaResult, meshPackResult] = await Promise.all([
-      loadScenarioChunkFile(runtimeShell.detailChunkManifestUrl, {
-        d3Client,
-        scenarioId: runtimeShell.scenarioId,
-        resourceLabel: "detail_chunk_manifest",
-      }),
-      runtimeShell.contextLodManifestUrl
-        ? loadScenarioChunkFile(runtimeShell.contextLodManifestUrl, {
-          d3Client,
-          scenarioId: runtimeShell.scenarioId,
-          resourceLabel: "context_lod_manifest",
-        })
-        : Promise.resolve(null),
-      runtimeShell.runtimeMetaUrl
-        ? loadScenarioChunkFile(runtimeShell.runtimeMetaUrl, {
-          d3Client,
-          scenarioId: runtimeShell.scenarioId,
-          resourceLabel: "runtime_meta",
-        })
-        : Promise.resolve(null),
-      runtimeShell.meshPackUrl
-        ? loadScenarioChunkFile(runtimeShell.meshPackUrl, {
-          d3Client,
-          scenarioId: runtimeShell.scenarioId,
-          resourceLabel: "mesh_pack",
-        })
-        : Promise.resolve(null),
+    const resourceGroupKey = JSON.stringify([
+      runtimeShell.scenarioId,
+      getScenarioManifestVersion(bundle.manifest),
+      runtimeShell.detailChunkManifestUrl,
+      runtimeShell.contextLodManifestUrl,
+      runtimeShell.runtimeMetaUrl,
+      runtimeShell.meshPackUrl,
     ]);
+    let resourceGroupPromise = inFlightResourceGroups.get(resourceGroupKey);
+    if (!resourceGroupPromise) {
+      resourceGroupPromise = Promise.all([
+        loadScenarioChunkFile(runtimeShell.detailChunkManifestUrl, {
+          d3Client,
+          scenarioId: runtimeShell.scenarioId,
+          resourceLabel: "detail_chunk_manifest",
+        }),
+        runtimeShell.contextLodManifestUrl
+          ? loadScenarioChunkFile(runtimeShell.contextLodManifestUrl, {
+            d3Client,
+            scenarioId: runtimeShell.scenarioId,
+            resourceLabel: "context_lod_manifest",
+          })
+          : Promise.resolve(null),
+        runtimeShell.runtimeMetaUrl
+          ? loadScenarioChunkFile(runtimeShell.runtimeMetaUrl, {
+            d3Client,
+            scenarioId: runtimeShell.scenarioId,
+            resourceLabel: "runtime_meta",
+          })
+          : Promise.resolve(null),
+        runtimeShell.meshPackUrl
+          ? loadScenarioChunkFile(runtimeShell.meshPackUrl, {
+            d3Client,
+            scenarioId: runtimeShell.scenarioId,
+            resourceLabel: "mesh_pack",
+          })
+          : Promise.resolve(null),
+      ]);
+      inFlightResourceGroups.set(resourceGroupKey, resourceGroupPromise);
+      // Keep only concurrent work; a settled group (including a failure) may be loaded again.
+      resourceGroupPromise.then(
+        () => inFlightResourceGroups.delete(resourceGroupKey),
+        () => inFlightResourceGroups.delete(resourceGroupKey),
+      );
+    }
+    const [chunkManifestResult, contextLodResult, runtimeMetaResult, meshPackResult] = await resourceGroupPromise;
     bundle.chunkRegistry = normalizeScenarioChunkManifest(chunkManifestResult?.payload || {});
     bundle.contextLodManifest = normalizeScenarioContextLodManifest(contextLodResult?.payload || {});
     bundle.runtimeMetaPayload = runtimeMetaResult?.payload || null;

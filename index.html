@@ -357,6 +357,14 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header">Borders</h2>
+                <div class="border-control-row mt-3">
+                  <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
+                  <select id="displayQuality" class="select-input">
+                    <option value="high" data-i18n="High clarity">High clarity</option>
+                    <option value="balanced" data-i18n="Balanced quality">Balanced quality</option>
+                    <option value="performance" data-i18n="Performance priority">Performance priority</option>
+                  </select>
+                </div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
@@ -389,9 +397,13 @@
                   <details class="appearance-mini-section">
                     <summary id="lblEmpireBorders" class="section-header">Country Borders</summary>
                     <div class="border-control-body mt-3">
+                      <label class="toggle-label">
+                        <input id="politicalBorderToggle" type="checkbox" class="checkbox-input" />
+                        <span data-i18n="Show political borders">Show political borders</span>
+                      </label>
                       <div class="border-control-row">
                         <label class="range-label" for="empireBorderColor" data-i18n="Color">Color</label>
-                        <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
+                        <input id="empireBorderColor" type="color" value="#4b5563" class="color-input" />
                       </div>
                       <div>
                         <div class="range-row">
@@ -403,9 +415,9 @@
                       <div>
                         <div class="range-row">
                           <label class="range-label" for="empireBorderWidth" data-i18n="Width">Width</label>
-                          <span id="empireBorderWidthValue" class="range-value">1.0</span>
+                          <span id="empireBorderWidthValue" class="range-value">1.2</span>
                         </div>
-                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.0" class="range-input" />
+                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.2" class="range-input" />
                       </div>
                     </div>
                   </details>

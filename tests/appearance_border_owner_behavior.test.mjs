@@ -35,6 +35,7 @@ function createHarness() {
     internalBorderWidth: new TestElement(),
     internalBorderWidthValue: new TestElement(),
     empireBorderColor: new TestElement(),
+    politicalBorderToggle: new TestElement(),
     empireBorderOpacity: new TestElement(),
     empireBorderOpacityValue: new TestElement(),
     empireBorderWidth: new TestElement(),
@@ -157,6 +158,25 @@ test("appearance border owner falls invalid colors back to border defaults", () 
   owner.renderBorderUi();
 
   assert.equal(nodes.internalBorderColor.value, "#cccccc");
-  assert.equal(nodes.empireBorderColor.value, "#666666");
+  assert.equal(nodes.empireBorderColor.value, "#4b5563");
   assert.equal(nodes.coastlineColor.value, "#333333");
+});
+
+test("political border control follows scenario defaults, persists opt-out and disables in blank maps", () => {
+  const { owner, runtimeState, nodes, dirtyReasons } = createHarness();
+  runtimeState.activeScenarioId = "tno_1962";
+  owner.renderBorderUi();
+  assert.equal(nodes.politicalBorderToggle.checked, true);
+  owner.bindEvents();
+  nodes.politicalBorderToggle.checked = false;
+  nodes.politicalBorderToggle.dispatch("change");
+  assert.equal(runtimeState.styleConfig.empireBorders.political, "off");
+  owner.renderBorderUi();
+  assert.equal(nodes.politicalBorderToggle.checked, false);
+  assert.deepEqual(dirtyReasons, ["empire-border-political"]);
+  runtimeState.mapSemanticMode = "blank";
+  runtimeState.styleConfig.empireBorders.political = "on";
+  owner.renderBorderUi();
+  assert.equal(nodes.politicalBorderToggle.checked, false);
+  assert.equal(nodes.politicalBorderToggle.disabled, true);
 });

@@ -18,6 +18,7 @@ function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, ge
   return owner;
 }
 import { registerRuntimeHook } from "../state/index.js";
+import { setScenarioRuntimeOptionalLayerState } from "../state/scenario_runtime_state.js";
 import { setRenderPerfMetricEntryState } from "../state/actions/renderer_diagnostics_actions.js";
 import {
   captureScenarioChunkLoadStateContinuation,
@@ -2474,6 +2475,16 @@ function createScenarioChunkRuntimeController({
         return null;
       }
       if (!scenarioBundleUsesChunkedLayer(bundle)) return null;
+    }
+    // The registry loads the full-source border pack into the bundle after the
+    // bootstrap apply. Publish it only after the active continuation is valid;
+    // prewarming another scene must never replace the visible border source.
+    if (bundle.meshPackPayload?.scenario_id === scenarioId
+      && runtimeState.activeScenarioMeshPack !== bundle.meshPackPayload) {
+      setScenarioRuntimeOptionalLayerState(runtimeState, {
+        activeScenarioMeshPack: bundle.meshPackPayload,
+      });
+      requestRender("scenario-political-border-source");
     }
     clearPendingScenarioChunkRefresh(loadState);
     const viewportBbox = getCurrentScenarioChunkViewportBbox();

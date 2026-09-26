@@ -1,4 +1,5 @@
 import { normalizeStrategicValuesStyle } from "../strategic_values_view_model.js";
+import { normalizeRenderingStyleConfig } from "../renderer/display_quality_policy.js";
 // UI state defaults.
 // 这里收口 overlay dirty 标记、可见性开关、workbench UI 和样式配置，
 // 避免 state.js 与 UI reset 路径再维护第二份默认 shape。
@@ -170,6 +171,7 @@ export function normalizeReferenceImageState(rawState, {
 
 export function createDefaultStyleConfig() {
   return {
+    rendering: normalizeRenderingStyleConfig(),
     internalBorders: {
       color: "#cccccc",
       colorMode: "auto",
@@ -177,9 +179,10 @@ export function createDefaultStyleConfig() {
       width: 0.5,
     },
     empireBorders: {
-      color: "#666666",
+      color: "#4b5563",
       opacity: 0.9,
-      width: 1.0,
+      width: 1.2,
+      political: "auto",
     },
     coastlines: {
       color: "#333333",
@@ -481,6 +484,7 @@ export function restoreImportedStyleConfigState(
     target.styleConfig && typeof target.styleConfig === "object" ? target.styleConfig : defaults;
   target.styleConfig = {
     ...currentStyleConfig,
+    rendering: normalizeRenderingStyleConfig(imported.rendering),
     internalBorders: {
       ...defaults.internalBorders,
       ...((imported.internalBorders && typeof imported.internalBorders === "object")
