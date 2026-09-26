@@ -36,3 +36,7 @@
 dist 从该隔离工作树完整生成，其中也同步了已在主线合并的湖泊/轮廓代码；未从主工作区复制 renderer WIP。旧静态检查仍有 4 条源码 token 断言失败（HGO hover、legend action、project support callback/listener），均已在原实现基线复核；旧 dist 差异失败已消除。不据此声明全量测试通过，也不修改分支保护。
 
 PR #171 的第一轮 CI 检出三份启动词典变更遗漏 snapshot 校验值更新。按现有 snapshot 生成函数补齐 `build_snapshot.json`、manifest fingerprint 与 audit 引用，并断言实际变化的 artifact 只有 `locales.startup.json`；未重建剧本地理数据。三个严格剧本契约本地通过，catalog 重新生成后无内容差异，19 项 catalog 单测通过。远端第一轮 UI smoke 与 transport contract 通过，后续结果以 PR 当前提交为准。
+
+后续 CI 检出图例分页行为失败：共享 controller 中有三行并行 legend cache 改动在初次提取时混入，调用依赖了未迁入本分支的 helper 签名。已从隔离分支剔除这三行，父工作区保持不变；支持/语言 34 项测试通过。新增 E2E 的 canonical selector route 也已补齐，路由覆盖、依赖图和超时检查通过。受影响 child-safe 集合执行 63 个命令，唯一失败是 Windows power-scheme journal 临时文件 Replace IOException，对该失败用例独立复跑通过；保留原失败与复跑日志，不改写原回执。
+
+性能 CI 的 3/5 样本角色校验失败，尚未进行性能差值比较。只读分析指向延后启用 workspace 尺寸引发的启动 resize：现将 body workspace class 与顶部预留高度放在初始 HTML/CSS，保留原有控件挂载时序。新增浏览器用例先延迟主脚本，断言初始化前后的 mapContainer 坐标和尺寸严格相等；该用例、默认工作区及尺寸回归 3/3 通过。发布产物重新生成，性能结果以新提交的标准五轮 CI 为准，不放宽采样角色校验。

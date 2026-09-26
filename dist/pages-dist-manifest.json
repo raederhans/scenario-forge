@@ -12,7 +12,7 @@
     },
     {
       "path": "app/css/editor-workspace.css",
-      "size_bytes": 14012,
+      "size_bytes": 14040,
       "source_kind": "dist"
     },
     {
@@ -43842,7 +43842,7 @@
     },
     {
       "path": "app/index.html",
-      "size_bytes": 272268,
+      "size_bytes": 272285,
       "source_kind": "dist"
     },
     {
@@ -45677,7 +45677,7 @@
     },
     {
       "path": "app/js/ui/sidebar/project_support_diagnostics_controller.js",
-      "size_bytes": 82374,
+      "size_bytes": 82188,
       "source_kind": "dist"
     },
     {
@@ -46472,7 +46472,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2231532,
+      "size_bytes": 2231195,
       "source_kind": "dist"
     },
     {
@@ -46597,17 +46597,17 @@
       {
         "file_count": 301,
         "id": "startup-critical",
-        "size_bytes": 27791333
+        "size_bytes": 27791378
       },
       {
         "file_count": 104,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3627675
+        "size_bytes": 3627489
       },
       {
         "file_count": 826,
         "id": "on-demand-product",
-        "size_bytes": 285902499
+        "size_bytes": 285902162
       },
       {
         "file_count": 8048,
@@ -61581,21 +61581,13 @@
                 "kind": "import-declaration",
                 "line": 3,
                 "local": true,
-                "reference": "../../core/legend_manager.js",
-                "resolved_path": "app/js/core/legend_manager.js"
-              },
-              {
-                "column": 1,
-                "kind": "import-declaration",
-                "line": 4,
-                "local": true,
                 "reference": "../../core/special_zone_layers.js",
                 "resolved_path": "app/js/core/special_zone_layers.js"
               },
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 8,
+                "line": 7,
                 "local": true,
                 "reference": "../../api/backend_client.js",
                 "resolved_path": "app/js/api/backend_client.js"
@@ -61603,7 +61595,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 21,
+                "line": 20,
                 "local": true,
                 "reference": "../../core/project_package_io.js",
                 "resolved_path": "app/js/core/project_package_io.js"
@@ -61615,7 +61607,6 @@
           "static_imports": [
             "app/js/api/backend_client.js",
             "app/js/core/dirty_state.js",
-            "app/js/core/legend_manager.js",
             "app/js/core/project_package_io.js",
             "app/js/core/special_zone_layers.js",
             "app/js/core/state.js"
@@ -65673,11 +65664,11 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3299699,
+        "deferred_graph_bytes": 3299513,
         "deferred_graph_file_count": 134,
         "deferred_module_count": 132,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5498039,
+        "initial_graph_bytes": 5498084,
         "initial_graph_file_count": 332,
         "initial_module_count": 318,
         "initial_resource_count": 14,
@@ -65687,7 +65678,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 569349327,
+        "untraversed_dist_bytes": 569348990,
         "untraversed_dist_file_count": 8814,
         "untraversed_module_count": 7
       },
@@ -65728,11 +65719,11 @@
         "path_exceptions": [
           {
             "path": "app/index.html",
-            "size_bytes": 272268
+            "size_bytes": 272285
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 272268
+        "size_bytes": 272285
       },
       {
         "basis": "startup-module-graph",
@@ -66803,10 +66794,10 @@
           {
             "file_count": 2,
             "prefix": "app/css/",
-            "size_bytes": 311655
+            "size_bytes": 311683
           }
         ],
-        "size_bytes": 344175
+        "size_bytes": 344203
       },
       {
         "basis": "startup-resource-graph",
@@ -67295,10 +67286,10 @@
           {
             "file_count": 13,
             "prefix": "app/js/ui/sidebar/",
-            "size_bytes": 373087
+            "size_bytes": 372901
           }
         ],
-        "size_bytes": 2672217
+        "size_bytes": 2672031
       },
       {
         "basis": "deferred-resource-graph",
@@ -67723,11 +67714,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2231532
+            "size_bytes": 2231195
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2231532
+        "size_bytes": 2231195
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -68538,7 +68529,7 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2231532
+          "size_bytes": 2231195
         }
       ],
       "status": "complete",
@@ -68581,7 +68572,7 @@
     {
       "file_count": 9232,
       "path": "app",
-      "size_bytes": 571834183
+      "size_bytes": 571834042
     },
     {
       "file_count": 59,
@@ -68591,7 +68582,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2231532
+      "size_bytes": 2231195
     },
     {
       "file_count": 1,
@@ -68614,5 +68605,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 601220340
+  "total_bytes": 601219862
 }

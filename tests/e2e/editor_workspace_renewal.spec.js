@@ -17,6 +17,32 @@ async function readState(page, field) {
   }, field);
 }
 
+test("workspace geometry is stable before and after deferred controls mount", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let releaseMain;
+  const mainReady = new Promise((resolve) => { releaseMain = resolve; });
+  await page.route("**/js/main.js", async (route) => {
+    await mainReady;
+    await route.continue();
+  });
+  let initialBounds;
+  try {
+    await gotoApp(page, "/", { waitUntil: "commit" });
+    await expect(page.locator("#editorProjectBar")).toBeVisible();
+    await expect(page.locator("#editorProjectBar")).toBeEmpty();
+    initialBounds = await page.locator("#mapContainer").boundingBox();
+    expect(initialBounds).not.toBeNull();
+    expect(initialBounds.y).toBe(56);
+    expect(initialBounds.height).toBe(844);
+  } finally {
+    releaseMain();
+  }
+  await waitForAppInteractive(page);
+  await expect(page.locator("#editorProjectBar")).toHaveAttribute("data-ready", "true");
+  const finalBounds = await page.locator("#mapContainer").boundingBox();
+  expect(finalBounds).toEqual(initialBounds);
+});
+
 test("default workspace keeps four tasks, project header, and the bottom dock", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);

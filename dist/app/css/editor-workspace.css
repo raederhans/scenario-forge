@@ -1,5 +1,5 @@
 /* Editor workspace: one browser on the left, one context on the right. */
-.editor-project-bar:empty { display: none; }
+/* Reserve final shell geometry before deferred controls are mounted. */
 .editor-workspace {
   --editor-topbar-height: 56px;
   --editor-left-width: 272px;
