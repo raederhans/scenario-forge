@@ -10,7 +10,7 @@ const end = source.indexOf("\nfunction composeTransformedFrameToBuffer(", start)
 assert.ok(start >= 0 && end > start);
 const exportSource = source.slice(start, end);
 
-function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false, contourStatus = "ready", hgo = false } = {}) {
+function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false, contourStatus = "ready", politicalStatus = "ready", hgo = false } = {}) {
   const visibleCache = { canvases: { background: { width: 100, height: 50 } } };
   const runtimeState = {
     width: 100,
@@ -41,6 +41,9 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     isHgoRuntimePreviewReady: () => hgo,
     getPaintContourRuntimeOwner: () => ({
       diagnostics() { calls.push(`contours-${contourStatus}`); return { status: contourStatus }; },
+    }),
+    getPoliticalBorderRuntimeOwner: () => ({
+      diagnostics() { calls.push(`political-${politicalStatus}`); return { status: politicalStatus }; },
     }),
     getRenderPipelinePassesOwner: () => ({
       ensureIdleRenderPasses: () => calls.push("screen-pass"),
@@ -77,6 +80,18 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
   });
   vm.runInContext(exportSource, context);
   return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, allocatedCanvases: () => allocatedCanvases };
+}
+
+for (const politicalStatus of ["pending", "error"]) {
+  test(`border export rejects ${politicalStatus} political borders before allocation or cache mutation`, () => {
+    const h = harness({ politicalStatus });
+    assert.throws(() => h.run(["background", "borders"], { pixelRatio: 2 }),
+      new RegExp(`Political borders are ${politicalStatus}`));
+    assert.equal(h.allocatedCanvases(), 0);
+    assert.deepEqual(h.calls, ["contours-ready", `political-${politicalStatus}`]);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.runtimeState.dpr, 1);
+  });
 }
 
 test("2x export redraws passes at target pixels and restores visible cache", () => {
@@ -143,7 +158,7 @@ for (const contourStatus of ["ready", "empty"]) {
     const h = harness({ contourStatus });
     const canvas = h.run(["borders"], { pixelRatio: 2 });
     assert.equal(canvas.width, 200);
-    assert.deepEqual(h.calls, [`contours-${contourStatus}`, "render-borders-2", "draw-contours", "compose-200"]);
+    assert.deepEqual(h.calls, [`contours-${contourStatus}`, "political-ready", "render-borders-2", "draw-contours", "compose-200"]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.runtimeState.dpr, 1);
   });

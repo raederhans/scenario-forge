@@ -128,9 +128,10 @@ export function createStartupDataPipelineOwner({
   }
 
   async function ensureBaseCityDataReady(options = {}) {
-    const { reason = "manual", renderNow = true } = options;
+    const { reason = "manual", renderNow = true, includeLocalization = true } = options;
     assertReceiverCurrent(options);
-    if (state.worldCitiesData && state.baseCityDataState === "loaded") {
+    if (state.worldCitiesData && state.baseCityDataState === "loaded"
+      && (!includeLocalization || state.baseCityLocalizationReady)) {
       if (renderNow) {
         requestMainRender?.(`base-city-ready:${reason}`, { flush: true });
       }
@@ -138,11 +139,19 @@ export function createStartupDataPipelineOwner({
     }
     const { canCommit, shouldRender } = registerResourceReceiver("cities", options, state.baseCityDataPromise);
     if (state.baseCityDataPromise) {
-      return state.baseCityDataPromise;
+      const cities = await state.baseCityDataPromise;
+      assertReceiverCurrent(options);
+      // A label caller can arrive while night lights are loading geometry only.
+      if (cities && includeLocalization && !state.baseCityLocalizationReady) {
+        return ensureBaseCityDataReady(options);
+      }
+      return cities;
     }
     beginBaseCitySupportLoad(state);
     const promise = loadCitySupportData({
       d3Client: globalThis.d3,
+      includeLocalization,
+      cityCollection: state.worldCitiesData || null,
       locales: {
         ui: state.locales?.ui || {},
         geo: state.baseGeoLocales && typeof state.baseGeoLocales === "object"
@@ -160,7 +169,7 @@ export function createStartupDataPipelineOwner({
         commitBaseCitySupportData(state, result, {
           scenarioActive: !!state.activeScenarioId,
         });
-        if (state.activeScenarioId) {
+        if (state.activeScenarioId && result.localizationReady !== false) {
           syncScenarioLocalizationState({
             cityOverridesPayload: state.scenarioCityOverridesData,
             geoLocalePatchPayload: state.scenarioGeoLocalePatchData,

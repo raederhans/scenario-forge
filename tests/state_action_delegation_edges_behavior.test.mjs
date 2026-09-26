@@ -2748,7 +2748,7 @@ test("rollback snapshot composition has no state-alias escape from returned capt
 test("quick fill readers reject mutations in imported hierarchy and district dependencies", () => {
   const readSource = modulePath => fs.readFileSync(modulePath, "utf8");
   for (const [modulePath, dependencyPath, marker, mutation] of [
-    ["js/core/renderer/fill_target_policy.js", "js/core/quick_fill_hierarchy.js", "let ownershipSnapshot = null;", "state.batchFillScope = 'country';"],
+    ["js/core/renderer/fill_target_policy.js", "js/core/quick_fill_hierarchy.js", "const reference = getMapDataBoundary(state).reference;", "state.batchFillScope = 'country';"],
     ["js/core/renderer/fill_target_policy.js", "js/core/scenario_hierarchy.js", "export function getEffectiveScenarioHierarchyFromInputs(base, override) {", "base.groups = {};"],
     ["js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_hierarchy.js", "export function getEffectiveScenarioHierarchyFromInputs(base, override) {", "base.groups = {};"],
     ["js/core/renderer/parent_border_grouping_policy.js", "js/core/scenario_districts.js", "const normalized = normalizeScenarioDistrictGroupsPayload(payload);", "owners.changed = 'OTHER';"],
@@ -2756,6 +2756,7 @@ test("quick fill readers reject mutations in imported hierarchy and district dep
   ]) {
     const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath);
     assert.deepEqual(inspectStateTargetPureReaderFunctionSource(readSource(modulePath), entry, { readSource }).violations, []);
+    assert.ok(readSource(dependencyPath).includes(marker), `mutation marker exists: ${dependencyPath}`);
     const result = inspectStateTargetPureReaderFunctionSource(readSource(modulePath), entry, {
       readSource: path => path === dependencyPath
         ? readSource(path).replace(marker, `${marker}\n${mutation}`) : readSource(path),

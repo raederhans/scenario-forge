@@ -352,9 +352,9 @@ test("political owner effect proof rejects external cache substitution, input wr
   }
 });
 
-test("city exact operation receipts preserve frozen inputs, sparse slices and set member identity", () => {
+test("city exact operation receipts preserve frozen inputs and sparse slices", () => {
   const entries = STATE_BORROWED_SCOPED_OPERATION_CONTRACT;
-  assert.equal(entries.length, 3);
+  assert.equal(entries.length, 2);
   for (const entry of entries) assert.deepEqual(inspectStateBorrowedScopedOperationSources(entry).violations, []);
   const finite = entries.find(entry => entry.operationKind === "finite-literal-array");
   const check = Function("minX", "minY", "maxX", "maxY", `return ${finite.operationSource};`);
@@ -371,17 +371,14 @@ test("city exact operation receipts preserve frozen inputs, sparse slices and se
   assert.equal(sliced[2], point);
   assert.notEqual(sliced, anchors);
   assert.deepEqual(slice.borrowedResultPaths, [[]]);
-  const membership = entries.find(entry => entry.operationKind === "borrowed-membership-set");
-  const id = Object.freeze({ id: "retained-identity" });
-  const input = Object.freeze([Object.freeze({ feature: Object.freeze({ properties: Object.freeze({ city_ids: Object.freeze([id, "A", "A"]) }) }) })]);
-  const set = Function("urbanCoreEntries", `return ${membership.operationSource};`)(input);
-  assert.equal(set.size, 2);
-  assert.equal(set.has(id), true);
-  assert.deepEqual(membership.borrowedResultPaths, [[]]);
-  assert.deepEqual(membership.resultCalls.map(call => [call.method, call.argumentCount]), [["has", 1]]);
+  assert.equal(entries.some(entry => entry.operationKind === "borrowed-membership-set"), false);
+  assert.ok(inspectStateBorrowedScopedOperationSources({
+    ...slice, functionName: "drawModernCityFallbackLights", operationKind: "borrowed-membership-set",
+    operationSource: "new Set(urbanCoreEntries.flatMap((entry) => entry.feature.properties?.city_ids || []))",
+  }).violations.some(item => item.code === "borrowed-scoped-operation-unknown-contract"));
 });
 
-test("city scoped operation gates reject nested writes, different callbacks, set mutation and forged grants", () => {
+test("city scoped operation gates reject nested writes, mutating replacements and forged grants", () => {
   for (const entry of STATE_BORROWED_SCOPED_OPERATION_CONTRACT) {
     const read = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8");
     const replacement = entry.operationKind === "finite-literal-array"

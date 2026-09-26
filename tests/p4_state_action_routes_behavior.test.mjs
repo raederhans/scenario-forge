@@ -430,7 +430,7 @@ test("the current phase command must remain in the state-ownership domain", () =
 });
 
 test("selector unmatched files fail even outside the P4-owned path set", () => {
-  const changedFile = "docs/archive/unrelated.md";
+  const changedFile = ".codex/unregistered-support.toml";
   const recommendation = createRecommendation({
     changedFile,
     unmatchedChangedFiles: [changedFile],
@@ -457,6 +457,8 @@ test("task records and agent config are reported as nonbehavioral, not as execut
     "docs/active/business-efficiency-20260908/editing-analysis.md",
     "docs/active/business-efficiency-20260908/render-reuse-analysis.md",
     ".codex/config.toml",
+    "docs/archive/task.md",
+    "docs/active/editor-kernel-renewal-20260909/unknown.md",
   ];
   const report = buildP4StateActionRouteReport({
     phase: "P4.4", changedFiles, routes: [],
@@ -471,11 +473,10 @@ test("task records and agent config are reported as nonbehavioral, not as execut
   assert.ok(report.files.every((entry) => !entry.selectorMatched));
 });
 
-test("nonbehavioral classification never covers adjacent code or unknown documents", () => {
+test("nonbehavioral classification never covers unknown application code or agent config", () => {
   const changedFiles = [
-    "docs/active/editor-kernel-renewal-20260909/task.js",
-    "docs/active/editor-kernel-renewal-20260909/unknown.md",
-    "docs/archive/task.md",
+    "application/task.js",
+    "application/unknown.md",
     "js/core/task.js",
     ".codex/unknown.toml",
   ];

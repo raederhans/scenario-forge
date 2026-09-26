@@ -186,7 +186,7 @@ test("river draw preserves zero ranks and finite rank defaults across zoom bucke
       const strokes = harness.context.calls.filter((call) => call.type === "stroke");
       assert.equal(strokes.length, visible ? 2 : 0, message);
       if (visible) {
-        const widthFactor = [1.3, 1.2, 1.2][zoomIndex];
+        const widthFactor = [0.95, 1.05, 1.2][zoomIndex];
         const rank = Number.isFinite(Number(sample.properties.scalerank ?? sample.properties.SCALERANK))
           ? Number(sample.properties.scalerank ?? sample.properties.SCALERANK)
           : 8;
@@ -256,6 +256,24 @@ test("river layer owner scales dash and line widths by zoom", () => {
   assert.equal(strokeCalls.length, 2);
   assert.ok(strokeCalls[0].lineWidth > strokeCalls[1].lineWidth);
   assert.equal(harness.metrics.at(-1).details.dashStyle, "dashed");
+});
+
+test("river core alpha increases from low and mid zoom while retaining configured opacity", () => {
+  const alphaAtZoom = (zoom) => {
+    const harness = createOwner({ features: [createFeature("River", 4)] });
+    harness.owner.drawRiversLayer(zoom);
+    return harness.context.calls.find((call) => call.type === "stroke" && call.strokeStyle === "#336699").alpha;
+  };
+
+  const low = alphaAtZoom(1);
+  const mid = alphaAtZoom(1.5);
+  const detail = alphaAtZoom(5);
+
+  assert.ok(low < mid);
+  assert.ok(mid < detail);
+  assert.equal(low, 0.8 * 0.78);
+  assert.equal(mid, 0.8 * 0.9);
+  assert.equal(detail, 0.8 * 1);
 });
 
 test("river layer owner records deferred metrics without drawing", () => {

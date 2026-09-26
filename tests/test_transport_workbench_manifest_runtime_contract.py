@@ -414,7 +414,7 @@ class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
         self.assertIn('getApplyDisabledReasonCopy', apply_owner_content)
         self.assertIn('Select a transport pack before applying to the main map', apply_owner_content)
         self.assertIn('Checking pack source before apply', apply_owner_content)
-        self.assertIn('Selected pack belongs to another transport family', apply_owner_content)
+        self.assertIn('Choose a pack for this layer', apply_owner_content)
         self.assertNotIn("applyTransportCountryOverlayState(runtimeState, overlayState)", controller_content)
         self.assertNotIn("clearTransportCountryOverlayState(runtimeState, \"transport-workbench-pack-switch\")", controller_content)
         self.assertIn("transportWorkbenchPackSelect", controller_content)
@@ -425,7 +425,8 @@ class TransportWorkbenchManifestRuntimeContractTest(unittest.TestCase):
         self.assertIn('usa_port: Object.freeze({ packId: "usa_port", family: "port"', resolver_content)
         self.assertIn('reason: "consumer_missing"', resolver_content)
         self.assertNotRegex(registry_content, re.compile(r"return\s*\{[\s\S]*?\bdisplayConfig\s*,[\s\S]*?\};"))
-        self.assertIn('label: t("Workbench preview only", "ui")', apply_owner_content)
+        self.assertIn('label: t("Preview only", "ui")', apply_owner_content)
+        self.assertIn('label: t("Workbench only", "ui")', apply_owner_content)
         expected_apply_order = [
             "const gateReport = await refreshPackGateReport(activePackId);",
             "const patch = resolveTransportOverviewPatchFromWorkbench(",

@@ -18,3 +18,13 @@
 实施位置：C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator；分支codex/ocean-refinement。主工作区原有UI/Atlantropa WIP未修改；未合并、推送或线上发布。
 
 可复用入口：tools/build_marine_refinement_sources.py（默认离线，--refresh显式刷新19项来源）；tools/rebuild_water_geometry.py --refine-marine --stage-root .runtime/<new-stage>（先暂存并验证，再按outputs.json核对输入与采用五个输出）；tools/sync_marine_refinement.py（水域分块与依赖启动资产同步，保留政治分块）；最后执行严格契约和数据目录检查。
+
+## 合并阶段（2026-09-26）
+
+用户已授权合并推送。实施提交 `895f887e`；整合远端主线 `e1ae7953`（此前相差28提交），保留新版UI、湖泊交互和亚特兰托帕数据。两边水域变更不重叠：外海34项、主线海峡2项。主线的全部非水对象逐项解码一致。主线两海峡有8个面积低于既有1e-10平方度下限的退化组件，集成时仅清除这些组件（合计约6.97e-11平方度），其余海峡坐标保留；因此上述最初实施的78项完全一致证明仅对应实施基线，最终集成另以主线保留核对及几何测试为准。
+
+- [x] 独立提交并整合最新主线。
+- [ ] 完成集成验证并推送PR。
+- [ ] 必需CI通过后合并远端main。
+
+主工作区的分支、索引与未归属修改保持原样。独立工作树保留几何基线、候选和忽略的浏览器/构建证据。

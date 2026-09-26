@@ -374,7 +374,7 @@ test("day-night owner renders modern defaults from normalized state", () => {
   assert.equal(harness.nodes.dayNightCityLightsCoreSharpnessValue.textContent, "62%");
   assert.equal(harness.nodes.dayNightCityLightsPopulationBoostEnabled.checked, defaults.cityLightsPopulationBoostEnabled);
   assert.equal(harness.nodes.dayNightCityLightsPopulationBoostStrength.value, String(Math.round(defaults.cityLightsPopulationBoostStrength * 100)));
-  assert.equal(harness.nodes.dayNightCityLightsPopulationBoostStrengthValue.textContent, "70%");
+  assert.equal(harness.nodes.dayNightCityLightsPopulationBoostStrengthValue.textContent, "30%");
   assert.equal(harness.nodes.dayNightShadowOpacity.value, String(Math.round(defaults.shadowOpacity * 100)));
   assert.equal(harness.nodes.dayNightShadowOpacityValue.textContent, "38%");
 });

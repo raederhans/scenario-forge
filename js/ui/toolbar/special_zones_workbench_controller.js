@@ -444,7 +444,7 @@ function createSpecialZonesWorkbenchController({
     const header = document.createElement("div");
     header.className = "special-zone-workbench-header";
     const title = document.createElement("h3");
-    title.textContent = translate("Layer-based special zones");
+    title.textContent = translate("Special Zones");
     const overlayToggleLabel = document.createElement("label");
     overlayToggleLabel.className = "special-zone-overlay-toggle";
     overlayToggleNode = document.createElement("input");
@@ -511,6 +511,12 @@ function createSpecialZonesWorkbenchController({
       empty.textContent = translate("Create a layer before editing members or styles.");
       layerListNode.appendChild(empty);
       return;
+    }
+    if (!state.layers.some((layer) => layer.id === state.activeLayerId)) {
+      const empty = document.createElement("p");
+      empty.className = "muted";
+      empty.textContent = translate("Select or create a layer before editing members.");
+      layerListNode.appendChild(empty);
     }
     state.layers.forEach((layer, index) => {
       const row = document.createElement("div");
@@ -1121,13 +1127,24 @@ function createSpecialZonesWorkbenchController({
       void loadScenarioSpecialZoneLayers(loadContext);
     }
     renderLayerList(state);
+    const hasActiveLayer = !!layer;
+    root.dataset.emptyState = String(!hasActiveLayer);
+    [presetListNode, propertyNode, actionsNode].forEach((node) => {
+      node.hidden = !hasActiveLayer;
+      node.style.display = hasActiveLayer ? "" : "none";
+      if (!hasActiveLayer) node.replaceChildren();
+    });
     registerSpecialZonesWorkbenchRuntimeHooks(runtimeState, {
       renderWorkbench: renderSpecialZonesWorkbenchUi,
       renderCurrentTarget: renderSpecialZonesWorkbenchCurrentTargetUi,
     });
-    renderPresetList(layer);
-    renderProperties(layer);
-    renderActions(state, layer);
+    if (hasActiveLayer) {
+      renderPresetList(layer);
+      renderProperties(layer);
+      renderActions(state, layer);
+    } else {
+      currentTargetActionsNode = null;
+    }
     callRuntimeHook(runtimeState, "renderScenarioAuditPanelFn");
   };
 

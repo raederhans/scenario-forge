@@ -17,10 +17,12 @@
       }
     </script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/editor-workspace.css" />
     <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
     <link rel="modulepreload" href="js/main.js" />
   </head>
-  <body class="app-booting">
+  <body class="app-booting editor-workspace">
+    <header id="editorProjectBar" class="editor-project-bar" aria-label="Project" data-i18n-aria-label="Project"></header>
     <div id="appShell" class="app-layout">
       <a class="skip-link" href="#mapContainer" data-i18n="Skip to map workspace">Skip to map workspace</a>
       <aside id="leftSidebar" class="sidebar sidebar-left">
@@ -96,6 +98,7 @@
                   type="button"
                   class="appearance-tab-btn is-active"
                   data-appearance-tab="borders"
+                  data-i18n="Borders"
                   role="tab"
                   aria-selected="true"
                   aria-controls="appearancePanelBorders"
@@ -108,6 +111,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-appearance-tab="physical"
+                  data-i18n="Physical Regions"
                   role="tab"
                   aria-selected="false"
                   aria-controls="appearancePanelPhysical"
@@ -120,6 +124,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-appearance-tab="urban"
+                  data-i18n="Urban Areas"
                   role="tab"
                   aria-selected="false"
                   aria-controls="appearancePanelUrban"
@@ -132,6 +137,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-appearance-tab="citypoints"
+                  data-i18n="City Points"
                   role="tab"
                   aria-selected="false"
                   aria-controls="appearancePanelCityPoints"
@@ -351,6 +357,14 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header">Borders</h2>
+                <div class="border-control-row mt-3">
+                  <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
+                  <select id="displayQuality" class="select-input">
+                    <option value="high" data-i18n="High clarity">High clarity</option>
+                    <option value="balanced" data-i18n="Balanced quality">Balanced quality</option>
+                    <option value="performance" data-i18n="Performance priority">Performance priority</option>
+                  </select>
+                </div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
@@ -383,9 +397,13 @@
                   <details class="appearance-mini-section">
                     <summary id="lblEmpireBorders" class="section-header">Country Borders</summary>
                     <div class="border-control-body mt-3">
+                      <label class="toggle-label">
+                        <input id="politicalBorderToggle" type="checkbox" class="checkbox-input" />
+                        <span data-i18n="Show political borders">Show political borders</span>
+                      </label>
                       <div class="border-control-row">
                         <label class="range-label" for="empireBorderColor" data-i18n="Color">Color</label>
-                        <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
+                        <input id="empireBorderColor" type="color" value="#4b5563" class="color-input" />
                       </div>
                       <div>
                         <div class="range-row">
@@ -397,9 +415,9 @@
                       <div>
                         <div class="range-row">
                           <label class="range-label" for="empireBorderWidth" data-i18n="Width">Width</label>
-                          <span id="empireBorderWidthValue" class="range-value">1.0</span>
+                          <span id="empireBorderWidthValue" class="range-value">1.2</span>
                         </div>
-                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.0" class="range-input" />
+                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.2" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -1134,7 +1152,7 @@
                             class="range-label"
                             for="dayNightCityLightsTextureOpacity"
                           >
-                            Texture Opacity (Modern only)
+                            Background Light Opacity (Modern only)
                           </label>
                           <span id="dayNightCityLightsTextureOpacityValue" class="range-value">74%</span>
                         </div>
@@ -1202,14 +1220,14 @@
                           >
                             <span data-i18n="Population Boost Strength (Modern only)">Population Boost Strength (Modern only)</span>
                           </label>
-                          <span id="dayNightCityLightsPopulationBoostStrengthValue" class="range-value">70%</span>
+                          <span id="dayNightCityLightsPopulationBoostStrengthValue" class="range-value">30%</span>
                         </div>
                         <input
                           id="dayNightCityLightsPopulationBoostStrength"
                           type="range"
                           min="0"
                           max="150"
-                          value="70"
+                          value="30"
                           class="range-input"
                         />
                       </div>
@@ -2006,6 +2024,7 @@
                   type="button"
                   class="appearance-tab-btn is-active"
                   data-map-content-tab="ocean"
+                  data-i18n="Ocean"
                   role="tab"
                   aria-selected="true"
                   aria-controls="appearancePanelOcean"
@@ -2031,6 +2050,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-map-content-tab="daynight"
+                  data-i18n="Day / Night"
                   role="tab"
                   aria-selected="false"
                   aria-controls="appearancePanelDayNight"
@@ -2043,6 +2063,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-map-content-tab="texture"
+                  data-i18n="Texture"
                   role="tab"
                   aria-selected="false"
                   aria-controls="appearancePanelTexture"
@@ -2055,6 +2076,7 @@
                   type="button"
                   class="appearance-tab-btn"
                   data-map-content-tab="rivers"
+                  data-i18n="Rivers"
                   role="tab"
                   aria-selected="false"
                   aria-controls="mapContentPanelRivers"
@@ -2127,14 +2149,7 @@
             </div>
           </details>
 
-          <details id="specialZonePopover" class="card special-zone-editor-card sidebar-details-card" data-inline-editor="true" aria-labelledby="lblSpecialZoneEditor">
-            <summary class="section-header" id="lblSpecialZoneEditor">Special Zone Editor</summary>
-            <div class="sidebar-details-body">
-              <p id="specialZoneEditorHint" class="parent-border-empty mt-2" data-i18n="Layer-based special zones are the canonical editor. Use the workbench below to create layers, choose presets, and edit memberships.">
-                Layer-based special zones are the canonical editor. Use the workbench below to create layers, choose presets, and edit memberships.
-              </p>
-            </div>
-          </details>
+          <section id="specialZonePopover" data-inline-editor="true"></section>
 
           <div class="card color-library-card sidebar-secondary-card">
             <div class="palette-library-header-row">
@@ -2584,6 +2599,10 @@
             <div class="inspector-panel-body">
               <div class="card-flat inspector-detail-section">
                 <h3 id="lblWaterInteraction" class="sidebar-group-label">Interaction</h3>
+                <label class="toggle-label mt-2">
+                  <input id="waterInspectorLakeInteractionToggle" type="checkbox" class="checkbox-input" />
+                  <span data-i18n="Allow Lake Selection and Paint">Allow Lake Selection and Paint</span>
+                </label>
                 <label class="toggle-label mt-2" title="Allow or ignore macro open-ocean regions during hover, click, and paint." data-i18n-title="Allow or ignore macro open-ocean regions during hover, click, and paint.">
                   <input id="waterInspectorOpenOceanSelectToggle" type="checkbox" class="checkbox-input" />
                   <span id="lblWaterInspectorOpenOceanSelectToggle" data-i18n="Allow Open-Ocean Selection">Allow Open-Ocean Selection</span>

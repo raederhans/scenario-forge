@@ -14,10 +14,12 @@ import {
 } from "../js/core/state/ui_state.js";
 import {
   buildBathymetryDiagnostic,
+  buildDayNightDiagnostic,
   buildLayerStatusDiagnostics,
   buildThematicCatalogDiagnostic,
   buildTransportFamilyDiagnostics,
   buildTransportMasterDiagnostic,
+  resolveLayerStatusTone,
   sanitizeLayerStatusText,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
 
@@ -119,8 +121,9 @@ test("transport master diagnostic exposes enabled state with zero selected famil
 
   const diagnostic = buildTransportMasterDiagnostic(state, { translate: (key) => key });
 
-  assert.equal(diagnostic.summary, "Enabled · no overview family selected");
-  assert.equal(diagnostic.severity, "warning");
+  assert.equal(diagnostic.summary, "No overview family selected");
+  assert.equal(diagnostic.severity, "muted");
+  assert.equal(resolveLayerStatusTone(diagnostic), "muted");
   assert.deepEqual(diagnostic.selectedFamilies, []);
 });
 
@@ -140,8 +143,9 @@ test("transport family diagnostics expose workbench-only disabled reasons", () =
 
 test("bathymetry diagnostic explains disabled and pending data states", () => {
   const disabled = buildBathymetryDiagnostic(createState(), { translate: (key) => key });
-  assert.equal(disabled.summary, "Experimental Bathymetry disabled");
+  assert.equal(disabled.summary, "Off");
   assert.equal(disabled.severity, "muted");
+  assert.equal(resolveLayerStatusTone(disabled), "off");
 
   const pending = buildBathymetryDiagnostic(createState({
     styleConfig: {
@@ -155,6 +159,25 @@ test("bathymetry diagnostic explains disabled and pending data states", () => {
   }), { translate: (key) => key });
   assert.equal(pending.summary, "Bathymetry data pending for selected style");
   assert.equal(pending.severity, "warning");
+  assert.equal(resolveLayerStatusTone(pending), "warning");
+});
+
+test("day and night diagnostic uses the clock mode labels", () => {
+  const labels = {
+    Enabled: "启用",
+    "Manual UTC": "手动 UTC",
+    "Live Computer UTC": "本机 UTC 实时同步",
+    "Continuous Cycle": "连续循环",
+  };
+  for (const [mode, expected] of [
+    ["manual", "手动 UTC"], ["utc", "本机 UTC 实时同步"], ["cycle", "连续循环"],
+  ]) {
+    const state = createState({
+      styleConfig: { ...createDefaultStyleConfig(), dayNight: { enabled: true, mode } },
+    });
+    const diagnostic = buildDayNightDiagnostic(state, { translate: (key) => labels[key] || key });
+    assert.equal(diagnostic.summary, `启用 · ${expected}`);
+  }
 });
 
 test("thematic catalog diagnostic reports read-only fixture preview state", () => {

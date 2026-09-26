@@ -1,4 +1,5 @@
 import { createStrategicValuesOwner } from "./strategic_values_owner.js";
+import { normalizeDisplayQuality } from "../../core/renderer/display_quality_policy.js";
 import {
   URBAN_ADAPTIVE_TINT_DEFAULT_COLOR,
   URBAN_MANUAL_DEFAULT_COLOR,
@@ -104,6 +105,7 @@ export function createAppearanceControlsController({
   const urbanAdaptiveTintStrengthValue = document.getElementById("urbanAdaptiveTintStrengthValue");
   const urbanMinAreaValue = document.getElementById("urbanMinAreaValue");
   const appearanceLayerFilter = document.getElementById("appearanceLayerFilter");
+  const displayQuality = document.getElementById("displayQuality");
   const mapContentStack = document.getElementById("mapContentStack");
   const mapContentPanelSpecs = [
     {
@@ -398,7 +400,10 @@ export function createAppearanceControlsController({
     clamp,
     renderDirty: scheduleLayerRenderDirty,
   });
-  const renderBorderUi = borderOwner.renderBorderUi;
+  const renderBorderUi = () => {
+    borderOwner.renderBorderUi();
+    if (displayQuality) displayQuality.value = normalizeDisplayQuality(runtimeState.styleConfig?.rendering?.quality);
+  };
   const parentBorderOwner = createAppearanceParentBorderOwner({
     runtimeState,
     nodes: {
@@ -615,6 +620,15 @@ export function createAppearanceControlsController({
   const renderParentBorderCountryList = () => parentBorderOwner.renderCountryList();
 
   const bindEvents = () => {
+    if (displayQuality && displayQuality.dataset.bound !== "true") {
+      displayQuality.addEventListener("change", () => {
+        setAppearanceStyleGroupState(runtimeState, "rendering", {
+          quality: normalizeDisplayQuality(displayQuality.value),
+        });
+        renderLayerDirtyNow("display-quality-change");
+      });
+      displayQuality.dataset.bound = "true";
+    }
     if (appearanceSpecialZoneBtn && !appearanceSpecialZoneBtn.dataset.bound) {
       appearanceSpecialZoneBtn.setAttribute("aria-haspopup", "dialog");
       appearanceSpecialZoneBtn.setAttribute("aria-controls", "specialZonePopover");

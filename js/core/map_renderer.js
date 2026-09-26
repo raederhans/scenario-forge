@@ -14,6 +14,9 @@ import { createBathymetryStylePolicy } from './renderer/bathymetry_style_policy.
 import { createRenderPassSignaturePolicy } from './renderer/render_pass_signature_policy.js';
 import { createProjectedBoundsDiagnosticsOwner } from "./renderer/projected_bounds_diagnostics_owner.js";
 import { createPixelRatioPolicy } from "./renderer/pixel_ratio_policy.js";
+import { normalizeDisplayQuality } from "./renderer/display_quality_policy.js";
+import { separatesPoliticalBorders } from "./renderer/political_border_policy.js";
+import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
@@ -192,6 +195,7 @@ import {
   requestPoliticalRasterWorkerPass,
 } from "./political_raster_worker_client.js";
 import { LegendManager, createRevisionedLegendColorReader } from "./legend_manager.js";
+import { createSourceMetricsCache } from "./renderer/source_metrics_cache.js";
 import { createTransientOverlayRenderOwner } from "./renderer/transient_overlay_render_owner.js";
 import { createSelectionOverlayOwner } from "./renderer/selection_overlay_owner.js";
 import { createLegendControlOwner } from "./renderer/legend_control_owner.js";
@@ -253,7 +257,7 @@ import {
   shouldBlockUnderlyingMapSelectionForFacility,
 } from "./renderer/facility_surface.js";
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
-import { resolveEffectiveWaterRegionFeatures } from "./renderer/effective_water_regions.js";
+import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
@@ -871,6 +875,7 @@ function getRenderPassSignaturePolicy() {
       stableJson,
       getDayNightRuntimeOwner,
       getPaintContourRevision: () => getPaintContourRuntimeOwner().getRevision(),
+      getPoliticalBorderRevision: () => getPoliticalBorderRuntimeOwner().getRevision(),
       getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
         ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
     });
@@ -879,6 +884,7 @@ function getRenderPassSignaturePolicy() {
 }
 
 let pixelRatioPolicy = null;
+let appliedDisplayQuality = null;
 
 function getPixelRatioPolicy() {
   if (!pixelRatioPolicy) {
@@ -2057,6 +2063,7 @@ function getCityLightsRenderOwner() {
     },
     helpers: {
       buildNightHemisphereFeature,
+      getNightMask: (config, solarState) => getDayNightRuntimeOwner().getNightMask(config, solarState),
       clamp,
       ColorManager,
       createCanvas: (canvasWidth, canvasHeight, targetContext) => {
@@ -2095,7 +2102,7 @@ function getCityLightsRenderOwner() {
     },
     effects: {
       onModernAssetsReady: () => {
-        cityLightsRenderOwner = null;
+        cityLightsRenderOwner?.updateAssets(cityLightsAssetProvider.getAssets());
         invalidateRenderPasses("dayNight", "modern-city-lights-asset-ready");
         requestRendererRender("modern-city-lights-asset-ready");
       },
@@ -2115,6 +2122,7 @@ function getDayNightRuntimeOwner() {
     rendererSurfaceHost,
     getters: {
       getDayNightStyleConfigState: () => runtimeState.styleConfig?.dayNight,
+      getCityLayerRevision: () => runtimeState.cityLayerRevision,
       isBootInteractionReady,
       isRenderPhaseIdle: () => runtimeState.renderPhase === RENDER_PHASE_IDLE,
     },
@@ -2127,6 +2135,12 @@ function getDayNightRuntimeOwner() {
     },
     effects: {
       drawNightLightsLayer,
+      ensureCityLightsData: () => {
+        if (runtimeState.baseCityDataState === "idle" && typeof runtimeState.ensureBaseCityDataFn === "function") {
+          // The loader logs failures and owns retries; do not retry on every animation frame.
+          void runtimeState.ensureBaseCityDataFn({ reason: "day-night", renderNow: true, includeLocalization: false }).catch(() => {});
+        }
+      },
       invalidateRenderPasses,
       renderFallback: render,
       requestRender: requestRendererRender,
@@ -2225,6 +2239,34 @@ function getBorderMeshOwner() {
   return borderMeshOwner;
 }
 
+let politicalBorderRuntimeOwner = null;
+function getPoliticalBorderRuntimeOwner() {
+  if (!politicalBorderRuntimeOwner) {
+    politicalBorderRuntimeOwner = createPoliticalBorderRuntime({
+      state: runtimeState,
+      resolveOwnerCode: entity => {
+        const feature = asFeatureLike(entity);
+        return canonicalCountryCode(getDisplayOwnerCode(feature, getFeatureId(feature)));
+      },
+      isEligible: entity => {
+        const feature = asFeatureLike(entity);
+        const id = getFeatureId(feature);
+        return feature?.properties?.interactive !== false
+          && feature?.properties?.render_as_base_geography !== true
+          && !shouldExcludePoliticalVisualFeature(feature, id)
+          && !isScenarioShellFeature(feature, id)
+          && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
+          && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner");
+      },
+    });
+  }
+  return politicalBorderRuntimeOwner;
+}
+
+function getPoliticalBorderDiagnostics() {
+  return getPoliticalBorderRuntimeOwner().diagnostics();
+}
+
 let paintContourRuntimeOwner = null;
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
@@ -2232,6 +2274,10 @@ function getPaintContourRuntimeOwner() {
       state: runtimeState,
       getFeatures: () => runtimeState.landData?.features,
       getFeatureId,
+      resolveBoundaryKey: (feature, id) => canonicalCountryCode(getDisplayOwnerCode(feature, id)),
+      getBoundaryRevision: () => [runtimeState.sovereigntyRevision, runtimeState.scenarioDataGeneration,
+        runtimeState.scenarioShellOverlayRevision, runtimeState.scenarioViewMode].join("|"),
+      separatePoliticalBorders: () => separatesPoliticalBorders(runtimeState),
       isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
         && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
@@ -2312,6 +2358,7 @@ function getBorderDrawOwner() {
       getVisibleCountryCodesForBorderMeshes,
       isUsableMesh,
       getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
+      getPoliticalBorderMeshes: () => getPoliticalBorderRuntimeOwner().getMeshes(),
       sanitizePolyline,
       scheduleDeferredHeavyBorderMeshes,
       reconcileDetailAdmBorders: (meta) => getBorderMeshOwner().reconcileDetailAdmBorders(meta),
@@ -4693,6 +4740,7 @@ function getScenarioWaterVisualRevisionToken() {
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
+    `lake-shore:${runtimeState.showRivers ? runtimeState.styleConfig?.rivers?.color : "off"}`,
   ].join("|");
 }
 
@@ -4940,6 +4988,7 @@ function isOpenOceanOverlayActive() {
 
 function isWaterRegionRenderable(feature) {
   if (!feature) return false;
+  if (isLakeRegion(feature)) return true;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
   }
@@ -4951,11 +5000,12 @@ function isWaterRegionRenderable(feature) {
 
 function isWaterRegionEnabled(feature) {
   if (!feature) return false;
-  // Legacy ocean records are noninteractive by default; the explicit ocean
-  // controls opt them in. Keep hard-disabled non-ocean regions disabled.
+  if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
+  // Legacy oceans become interactive through the explicit ocean controls.
   if (isOpenOceanWaterRegion(feature)) {
     return isOpenOceanOverlayActive();
   }
+  if (!runtimeState.showWaterRegions) return false;
   if (feature.properties?.interactive === false) return false;
   if (isBaseGeographyScenarioFeature(feature)) {
     return true;
@@ -6238,10 +6288,6 @@ function getSphericalFeatureDiagnostics(feature, { featureId = null, allowComput
   return diagnostics;
 }
 
-function getMaxDprForProfile(renderProfile) {
-  return getPixelRatioPolicy().getMaxDprForProfile(String(renderProfile || "auto"));
-}
-
 function updateDprStage(...args) { return getPixelRatioPolicy().updateDprStage(...args); }
 
 function getRuntimePoliticalBaseCollection(collection) {
@@ -6663,6 +6709,7 @@ function getResolvedColorSourceName() {
 }
 
 let visibleFrameColorReadinessAttemptSignature = "";
+const rendererSourceMetrics = createSourceMetricsCache();
 
 function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame") {
   const colorSourceName = getResolvedColorSourceName();
@@ -6672,7 +6719,7 @@ function ensureResolvedColorsReadyForStableVisibleFrame(reason = "visible-frame"
     Array.isArray(runtimeState.landData?.features) ? runtimeState.landData.features.length : 0,
   );
   if (landFeatureCount <= 0) return false;
-  if (Object.keys(runtimeState.colors || {}).length > 0) return false;
+  if (rendererSourceMetrics.hasResolvedColors(runtimeState.colors, runtimeState.colorRevision)) return false;
   const attemptSignature = [
     String(runtimeState.activeScenarioId || ""),
     Number(runtimeState.sceneGeneration || 0),
@@ -6927,6 +6974,7 @@ function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-co
           useCachedPath: true, allowBuildPath: true, countPathBuild: false, metricsCollector,
         });
       }
+      getScenarioRegionOverlayRenderOwner().maskLakesFromPoliticalPatch(k);
     });
   } finally { context.restore(); }
   const renderedCount = Number(metricsCollector.renderedCount || 0);
@@ -7297,8 +7345,6 @@ function setCanvasSize({
   const previousWidth = Number(runtimeState.width || 0);
   const previousHeight = Number(runtimeState.height || 0);
   const previousDpr = Number(runtimeState.dpr || 1);
-  const deviceDpr = Math.max(Number(globalThis.devicePixelRatio || 1), 1);
-  runtimeState.dpr = Math.min(deviceDpr, getMaxDprForProfile(runtimeState.renderProfile));
   const rect = rendererSurfaceHost.getMapContainer()?.getBoundingClientRect?.();
   const measuredWidth = rect?.width || rendererSurfaceHost.getMapContainer()?.clientWidth || globalThis.innerWidth;
   const measuredHeight = rect?.height || rendererSurfaceHost.getMapContainer()?.clientHeight || globalThis.innerHeight;
@@ -7308,6 +7354,9 @@ function setCanvasSize({
 
   if (runtimeState.width < 100) runtimeState.width = Math.max(100, globalThis.innerWidth - 580);
   if (runtimeState.height < 100) runtimeState.height = Math.max(100, globalThis.innerHeight);
+
+  appliedDisplayQuality = normalizeDisplayQuality(runtimeState.styleConfig?.rendering?.quality);
+  runtimeState.dpr = getPixelRatioPolicy().getDisplayDpr(appliedDisplayQuality, runtimeState.width, runtimeState.height);
 
   const scaledW = Math.floor(runtimeState.width * runtimeState.dpr);
   const scaledH = Math.floor(runtimeState.height * runtimeState.dpr);
@@ -8672,7 +8721,7 @@ function getWaterHitFromPointer(
   pointer,
   { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
 ) {
-  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive()) return createHitResult();
+  if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive() && !isLakeInteractionEnabled(runtimeState)) return createHitResult();
   if (!runtimeState.waterSpatialItems?.length) {
     recordWaterHitDiagnostic({
       reason: "empty-water-spatial-items",
@@ -9835,11 +9884,10 @@ function getLakeBaseFillColor() {
 }
 
 function getUnifiedWaterBaseStyle(feature) {
-  const waterType = getWaterRegionType(feature);
   return {
     fill: isAtlantropaSeaFeature(feature)
       ? getAtlantropaSeaPoliticalFillColor()
-      : (waterType === "lake" ? getLakeBaseFillColor() : getOceanBaseFillColor()),
+      : (isLakeRegion(feature) ? getLakeBaseFillColor() : getOceanBaseFillColor()),
     stroke: UNIFIED_WATER_STROKE_COLOR,
     opacity: UNIFIED_WATER_FILL_OPACITY,
   };
@@ -10544,24 +10592,8 @@ function getAtlasFeatureAlphaMultiplier(atlasClass, cfg) {
   return 1;
 }
 
-function countTopologyArcRefs(arcs) {
-  if (Number.isInteger(arcs)) return 1;
-  if (!Array.isArray(arcs)) return 0;
-  return arcs.reduce((sum, entry) => sum + countTopologyArcRefs(entry), 0);
-}
-
 function estimateTopologyObjectArcRefs(topology, objectName) {
-  const object = topology?.objects?.[objectName];
-  if (!object || typeof object !== "object") return null;
-  if (Array.isArray(object.geometries)) {
-    const total = object.geometries.reduce(
-      (sum, geometry) => sum + countTopologyArcRefs(geometry?.arcs),
-      0
-    );
-    return total > 0 ? total : null;
-  }
-  const total = countTopologyArcRefs(object.arcs);
-  return total > 0 ? total : null;
+  return rendererSourceMetrics.estimateTopologyObjectArcRefs(topology, objectName, runtimeState.topologyRevision);
 }
 
 function getFeatureCollectionFeatureCount(collection) {
@@ -12382,6 +12414,10 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     if (contourStatus === "building" || contourStatus === "error") {
       throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
     }
+    const politicalStatus = getPoliticalBorderRuntimeOwner().diagnostics().status;
+    if (politicalStatus === "pending" || politicalStatus === "error") {
+      throw new Error(`Political borders are ${politicalStatus}; wait for the scenario border source before exporting.`);
+    }
   }
   const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
   if (!Number.isFinite(targetDpr) || targetDpr <= 0) {
@@ -13107,6 +13143,11 @@ function render() {
       activeScenarioId: String(runtimeState.activeScenarioId || ""),
     });
     return;
+  }
+  // Quality can change through controls, project import or appearance presets.
+  // Reallocate only when it changes; preserve the projection and camera.
+  if (appliedDisplayQuality !== normalizeDisplayQuality(runtimeState.styleConfig?.rendering?.quality)) {
+    if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
   drawCanvas();
@@ -14682,6 +14723,7 @@ function resetRendererTransactionState({
 } = {}) {
   contextLayerRenderScheduler.reset();
   paintContourRuntimeOwner?.dispose();
+  politicalBorderRuntimeOwner?.dispose();
   return getRendererTransactionResetOwner().resetRendererTransactionState({
     cancelSecondarySpatialBuild,
     cancelHoverOverlayRender,
@@ -14858,6 +14900,7 @@ export function getRendererAsyncWorkStatus() {
 
 export {
   getPaintContourDiagnostics,
+  getPoliticalBorderDiagnostics,
   ensurePaintContoursReady,
   // Core render lifecycle facade.
   initMap,

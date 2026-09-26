@@ -1928,5 +1928,71 @@ export const SCENARIO_RECORDS = [
       "supervisorDomain": "scenario-runtime"
     },
     "selector": null
+  },
+  {
+    "id": "node:test:node:scenario-border-pack-loading",
+    "commandRef": "test:node:scenario-border-pack-loading",
+    "sourceRefs": [
+      "js/core/scenario/bundle_loader.js",
+      "tests/scenario_border_pack_loading_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "scenario-runtime"
+    ],
+    "domains": [
+      "scenario-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "node:test:node:scenario-display-profile",
+    "commandRef": "test:node:scenario-display-profile",
+    "sourceRefs": [
+      "js/core/scenario/presentation_display_restore.js",
+      "tests/scenario_display_profile_behavior.test.mjs"
+    ],
+    "ownerHints": [
+      "scenario-runtime"
+    ],
+    "domains": [
+      "scenario-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 4,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
   }
 ];

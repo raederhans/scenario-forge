@@ -307,6 +307,7 @@ export function normalizePhysicalStyleConfig(rawConfig) {
 
 function createDefaultLakeStyleConfig() {
   return {
+    interactive: false,
     linkedToOcean: true,
     fillColor: null,
   };
@@ -317,6 +318,7 @@ function normalizeLakeStyleConfig(rawConfig) {
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
   const fillColor = typeof raw.fillColor === "string" ? raw.fillColor.trim() : "";
   return {
+    interactive: raw.interactive === true,
     linkedToOcean: raw.linkedToOcean === undefined ? defaults.linkedToOcean : !!raw.linkedToOcean,
     fillColor: fillColor || null,
   };
@@ -788,7 +790,7 @@ function createDefaultDayNightStyleConfig() {
     cityLightsCorridorStrength: 0.42,
     cityLightsCoreSharpness: 0.62,
     cityLightsPopulationBoostEnabled: true,
-    cityLightsPopulationBoostStrength: 0.7,
+    cityLightsPopulationBoostStrength: 0.3,
     historicalCityLightsDensity: 1.12,
     historicalCityLightsSecondaryRetention: 0.46,
   };

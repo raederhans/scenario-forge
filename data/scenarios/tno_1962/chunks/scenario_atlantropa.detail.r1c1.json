@@ -1298,7 +1298,7 @@
       }
     },
     {
-      "id": 140,
+      "id": 141,
       "type": "Feature",
       "properties": {
         "id": "ATLISL_west_med_ATL_1",
@@ -1638,7 +1638,7 @@
       }
     },
     {
-      "id": 141,
+      "id": 142,
       "type": "Feature",
       "properties": {
         "id": "ATLISL_west_med_ATL_2",
@@ -2618,7 +2618,7 @@
       }
     },
     {
-      "id": 145,
+      "id": 147,
       "type": "Feature",
       "properties": {
         "id": "ATLSHL_west_med_6",
@@ -2689,7 +2689,7 @@
       }
     },
     {
-      "id": 487,
+      "id": 490,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8577_5407_0",
@@ -3171,7 +3171,7 @@
       }
     },
     {
-      "id": 495,
+      "id": 498,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8582_5454_0",
@@ -3751,7 +3751,7 @@
       }
     },
     {
-      "id": 499,
+      "id": 502,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8582_5454_4",
@@ -3809,7 +3809,7 @@
       }
     },
     {
-      "id": 500,
+      "id": 503,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8583_8793_0",
@@ -4135,7 +4135,7 @@
       }
     },
     {
-      "id": 501,
+      "id": 504,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8583_8793_1",
@@ -4193,7 +4193,7 @@
       }
     },
     {
-      "id": 502,
+      "id": 505,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8584_5431_0",
@@ -4575,7 +4575,7 @@
       }
     },
     {
-      "id": 506,
+      "id": 509,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8587_8819_0",
@@ -4973,7 +4973,7 @@
       }
     },
     {
-      "id": 513,
+      "id": 516,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_9040_18325_0",
@@ -5043,11 +5043,11 @@
       }
     },
     {
-      "id": 533,
+      "id": 535,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_20",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 20",
+        "id": "ATLSEA_FILL_west_med_19",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 19",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -5071,7 +5071,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_20",
+        "atl_subbasin_id": "west_med_fill_19",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -5433,11 +5433,11 @@
       }
     },
     {
-      "id": 534,
+      "id": 536,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_21",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 21",
+        "id": "ATLSEA_FILL_west_med_20",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 20",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -5461,7 +5461,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_21",
+        "atl_subbasin_id": "west_med_fill_20",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -5515,11 +5515,11 @@
       }
     },
     {
-      "id": 535,
+      "id": 537,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_22",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 22",
+        "id": "ATLSEA_FILL_west_med_21",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 21",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -5543,7 +5543,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_22",
+        "atl_subbasin_id": "west_med_fill_21",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -5597,7 +5597,69 @@
       }
     },
     {
-      "id": 536,
+      "id": 538,
+      "type": "Feature",
+      "properties": {
+        "id": "ATLSEA_FILL_west_med_22",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 22",
+        "cntr_code": "ATL",
+        "admin1_group": "atlantropa_west_mediterranean_margin_sea",
+        "detail_tier": "scenario_atlantropa",
+        "__source": "hgo_donor",
+        "scenario_id": "tno_1962",
+        "region_id": "west_med",
+        "region_group": "atlantropa_west_mediterranean_margin_sea",
+        "atl_surface_kind": "sea",
+        "atl_region_group": "mediterranean_remaining_west_med",
+        "atl_geometry_role": "sea_completion",
+        "atl_join_mode": "gap_fill",
+        "interactive": true,
+        "render_as_base_geography": false,
+        "owner_tag": "ATL",
+        "synthetic_owner": true,
+        "donor_state_ids": null,
+        "donor_state_names": null,
+        "donor_province_ids": null,
+        "donor_state_id": null,
+        "donor_state_name": null,
+        "donor_province_id": null,
+        "assignment_source": null,
+        "source_standard": "mediterranean_template_sea_completion",
+        "atl_subbasin_id": "west_med_fill_22",
+        "atl_render_layer": "water",
+        "atl_interactive": true,
+        "atl_color_rule": "atlantropa_sea"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -5.31989285499808,
+              36.11585512433558
+            ],
+            [
+              -5.268620885789419,
+              36.227113374342075
+            ],
+            [
+              -5.21364710705262,
+              36.30537630950119
+            ],
+            [
+              -5.213656054027938,
+              36.30535834974327
+            ],
+            [
+              -5.31989285499808,
+              36.11585512433558
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "id": 539,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_23",
@@ -5635,31 +5697,31 @@
         "coordinates": [
           [
             [
-              -5.31989285499808,
-              36.11585512433558
+              -4.745098338597851,
+              36.4716750741464
             ],
             [
-              -5.268620885789419,
-              36.227113374342075
+              -4.671404928070779,
+              36.482029156390425
             ],
             [
-              -5.21364710705262,
-              36.30537630950119
+              -4.684054012563116,
+              36.42625505347396
             ],
             [
-              -5.213656054027938,
-              36.30535834974327
+              -4.68350518545503,
+              36.47231623554519
             ],
             [
-              -5.31989285499808,
-              36.11585512433558
+              -4.745098338597851,
+              36.4716750741464
             ]
           ]
         ]
       }
     },
     {
-      "id": 537,
+      "id": 540,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_24",
@@ -5697,31 +5759,31 @@
         "coordinates": [
           [
             [
-              -4.745098338597851,
-              36.4716750741464
+              -4.614951151272552,
+              36.47213252336501
             ],
             [
-              -4.671404928070779,
-              36.482029156390425
+              -4.613517354906817,
+              36.509977737921346
             ],
             [
-              -4.684054012563116,
-              36.42625505347396
+              -4.599389777975024,
+              36.518477233946115
             ],
             [
-              -4.68350518545503,
-              36.47231623554519
+              -4.554997289874971,
+              36.47012958722174
             ],
             [
-              -4.745098338597851,
-              36.4716750741464
+              -4.614951151272552,
+              36.47213252336501
             ]
           ]
         ]
       }
     },
     {
-      "id": 538,
+      "id": 541,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_25",
@@ -5759,31 +5821,31 @@
         "coordinates": [
           [
             [
-              -4.614951151272552,
-              36.47213252336501
+              -4.534313554110746,
+              36.52613256880849
             ],
             [
-              -4.613517354906817,
-              36.509977737921346
+              -4.525682291266155,
+              36.55402031202194
             ],
             [
-              -4.599389777975024,
-              36.518477233946115
+              -4.492558749751325,
+              36.57835195944715
             ],
             [
-              -4.554997289874971,
-              36.47012958722174
+              -4.115602478034655,
+              36.523337092604606
             ],
             [
-              -4.614951151272552,
-              36.47213252336501
+              -4.534313554110746,
+              36.52613256880849
             ]
           ]
         ]
       }
     },
     {
-      "id": 539,
+      "id": 542,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_26",
@@ -5821,31 +5883,31 @@
         "coordinates": [
           [
             [
-              -4.534313554110746,
-              36.52613256880849
+              -0.7473539406978414,
+              37.79887267555335
             ],
             [
-              -4.525682291266155,
-              36.55402031202194
+              -0.6814850457128041,
+              37.925927140962386
             ],
             [
-              -4.492558749751325,
-              36.57835195944715
+              -0.6482616490859796,
+              37.97399919165864
             ],
             [
-              -4.115602478034655,
-              36.523337092604606
+              -0.648269572589418,
+              37.97398342557597
             ],
             [
-              -4.534313554110746,
-              36.52613256880849
+              -0.7473539406978414,
+              37.79887267555335
             ]
           ]
         ]
       }
     },
     {
-      "id": 540,
+      "id": 543,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_27",
@@ -5883,35 +5945,31 @@
         "coordinates": [
           [
             [
-              -0.7473539406978414,
-              37.79887267555335
+              -0.6091194876875949,
+              38.128926910982365
             ],
             [
-              -0.6814850457128041,
-              37.925927140962386
+              -0.5672010294143336,
+              38.15453415025853
             ],
             [
-              -0.6482616490859796,
-              37.97399919165864
+              -0.5009582523708704,
+              38.170506997046395
             ],
             [
-              -0.648269572589418,
-              37.97398342557597
-            ],
-            [
-              -0.7473539406978414,
-              37.79887267555335
+              -0.6091194876875949,
+              38.128926910982365
             ]
           ]
         ]
       }
     },
     {
-      "id": 541,
+      "id": 586,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_28",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 28",
+        "id": "ATLSEA_FILL_west_med_70",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 70",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -5935,7 +5993,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_28",
+        "atl_subbasin_id": "west_med_fill_70",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -5945,27 +6003,31 @@
         "coordinates": [
           [
             [
-              -0.6091194876875949,
-              38.128926910982365
+              -3.782054747442933,
+              35.757002884329076
             ],
             [
-              -0.5672010294143336,
-              38.15453415025853
+              -3.779040656390932,
+              35.85685669753691
             ],
             [
-              -0.5009582523708704,
-              38.170506997046395
+              -3.7271641567021243,
+              35.86223241051916
             ],
             [
-              -0.6091194876875949,
-              38.128926910982365
+              -3.7195038625570995,
+              35.75715701474971
+            ],
+            [
+              -3.782054747442933,
+              35.757002884329076
             ]
           ]
         ]
       }
     },
     {
-      "id": 584,
+      "id": 587,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_71",
@@ -6003,68 +6065,6 @@
         "coordinates": [
           [
             [
-              -3.782054747442933,
-              35.757002884329076
-            ],
-            [
-              -3.779040656390932,
-              35.85685669753691
-            ],
-            [
-              -3.7271641567021243,
-              35.86223241051916
-            ],
-            [
-              -3.7195038625570995,
-              35.75715701474971
-            ],
-            [
-              -3.782054747442933,
-              35.757002884329076
-            ]
-          ]
-        ]
-      }
-    },
-    {
-      "id": 585,
-      "type": "Feature",
-      "properties": {
-        "id": "ATLSEA_FILL_west_med_72",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 72",
-        "cntr_code": "ATL",
-        "admin1_group": "atlantropa_west_mediterranean_margin_sea",
-        "detail_tier": "scenario_atlantropa",
-        "__source": "hgo_donor",
-        "scenario_id": "tno_1962",
-        "region_id": "west_med",
-        "region_group": "atlantropa_west_mediterranean_margin_sea",
-        "atl_surface_kind": "sea",
-        "atl_region_group": "mediterranean_remaining_west_med",
-        "atl_geometry_role": "sea_completion",
-        "atl_join_mode": "gap_fill",
-        "interactive": true,
-        "render_as_base_geography": false,
-        "owner_tag": "ATL",
-        "synthetic_owner": true,
-        "donor_state_ids": null,
-        "donor_state_names": null,
-        "donor_province_ids": null,
-        "donor_state_id": null,
-        "donor_state_name": null,
-        "donor_province_id": null,
-        "assignment_source": null,
-        "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_72",
-        "atl_render_layer": "water",
-        "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
               -3.5855997709036096,
               35.87839227626432
             ],
@@ -6089,11 +6089,11 @@
       }
     },
     {
-      "id": 589,
+      "id": 595,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_76",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 76",
+        "id": "ATLSEA_FILL_west_med_79",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 79",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -6117,7 +6117,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_76",
+        "atl_subbasin_id": "west_med_fill_79",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -6151,11 +6151,11 @@
       }
     },
     {
-      "id": 590,
+      "id": 596,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_77",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 77",
+        "id": "ATLSEA_FILL_west_med_80",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 80",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -6179,7 +6179,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_77",
+        "atl_subbasin_id": "west_med_fill_80",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -6221,11 +6221,11 @@
       }
     },
     {
-      "id": 591,
+      "id": 597,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_78",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 78",
+        "id": "ATLSEA_FILL_west_med_81",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 81",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -6249,7 +6249,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_78",
+        "atl_subbasin_id": "west_med_fill_81",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"
@@ -6283,11 +6283,11 @@
       }
     },
     {
-      "id": 592,
+      "id": 598,
       "type": "Feature",
       "properties": {
-        "id": "ATLSEA_FILL_west_med_79",
-        "name": "West Mediterranean and Iberia-Algeria Sea Completion 79",
+        "id": "ATLSEA_FILL_west_med_82",
+        "name": "West Mediterranean and Iberia-Algeria Sea Completion 82",
         "cntr_code": "ATL",
         "admin1_group": "atlantropa_west_mediterranean_margin_sea",
         "detail_tier": "scenario_atlantropa",
@@ -6311,7 +6311,7 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_79",
+        "atl_subbasin_id": "west_med_fill_82",
         "atl_render_layer": "water",
         "atl_interactive": true,
         "atl_color_rule": "atlantropa_sea"

@@ -5197,6 +5197,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "land_state_ids": [
             8446, 8447, 8448, 8449, 8450, 8451, 8452, 8453, 8454, 8455,
             8456, 8457, 8458, 8459, 8460, 8461, 8462, 8463, 8464, 8465,
+            9070,
         ],
         "water_state_ids": [8577, 8580, 8581, 8582, 8583, 8584, 8585, 8586, 8587, 8594, 8595, 8596, 9040],
         "state_owner_overrides": {
@@ -5217,6 +5218,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8463: "FRA",
             8464: "FRA",
             8465: "IAL",
+            9070: "IAL",  # Constantine donor joins the existing IAL coast at DZA-2166.
         },
         "control_points": {
             8447: (-5.55, 36.05),
@@ -5277,7 +5279,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
             8533, 8534, 8535, 8536, 8537, 8538, 8539, 8540, 8541, 8542,
             8543,
-            8653, 9097,
+            8653, 9038, 9097,
         ],
         "water_state_ids": [8445, 8607, 8608, 8610, 8619, 8620, 8621, 8622],
         "state_owner_overrides": {
@@ -5313,6 +5315,7 @@ ATLANTROPA_REGION_CONFIGS = {
             8542: "GRE",
             8543: "TUR",
             8653: "GRE",
+            9038: "TUR",  # Marmara south-coast donor; named waters are clipped to its land.
             9097: "TUR",
         },
         "control_points": {

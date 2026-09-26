@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { FileManager } from "../js/core/file_manager.js";
+import { createDefaultStyleConfig, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
 import {
   getInteractionFunnelDebugState,
   importProjectThroughFunnel,
@@ -434,6 +435,39 @@ test("project payload builder keeps open ocean visible with interaction off by d
   assert.equal(payload.layerVisibility.showOpenOceanRegions, true);
   assert.equal(payload.layerVisibility.allowOpenOceanSelect, false);
   assert.equal(payload.layerVisibility.allowOpenOceanPaint, false);
+  assert.equal(payload.styleConfig.lakes.interactive, false);
+});
+
+test("project roundtrip preserves lake opt-in and old projects default to display-only", () => {
+  for (const interactive of [false, true]) {
+    const payload = FileManager.buildProjectPayload({ styleConfig: { lakes: { interactive } },
+      waterRegionOverrides: { ne_lake_1159125405: "#66bbdd" } });
+    const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(payload)));
+    assert.equal(imported.styleConfig.lakes.interactive, interactive);
+    assert.equal(imported.waterRegionOverrides.ne_lake_1159125405, "#66bbdd");
+    delete payload.styleConfig.lakes.interactive;
+    assert.equal(FileManager.normalizeImportedProjectData(payload).styleConfig.lakes.interactive, false);
+  }
+});
+
+test("project roundtrip retains display quality and political border choices with safe legacy defaults", () => {
+  for (const quality of ["performance", "balanced", "high"]) {
+    const payload = FileManager.buildProjectPayload({ styleConfig: {
+      rendering: { quality }, empireBorders: { political: "off", width: 2.4, color: "#123456" },
+    } });
+    const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(payload)));
+    const target = { styleConfig: createDefaultStyleConfig() };
+    restoreImportedStyleConfigState(target, imported.styleConfig);
+    assert.equal(target.styleConfig.rendering.quality, quality);
+    assert.equal(target.styleConfig.empireBorders.political, "off");
+    assert.equal(target.styleConfig.empireBorders.width, 2.4);
+    assert.equal(target.styleConfig.empireBorders.color, "#123456");
+    delete payload.styleConfig.rendering;
+    delete payload.styleConfig.empireBorders.political;
+    restoreImportedStyleConfigState(target, FileManager.normalizeImportedProjectData(payload).styleConfig);
+    assert.equal(target.styleConfig.rendering.quality, "high");
+    assert.equal(target.styleConfig.empireBorders.political, "auto");
+  }
 });
 
 test("project export and import preserve unified intensity fields", async () => {

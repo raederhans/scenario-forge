@@ -94,6 +94,7 @@ export function createDefaultContentState() {
     worldCitiesData: null,
     baseCityAliasesData: null,
     baseCityDataState: "idle",
+    baseCityLocalizationReady: false,
     baseCityDataError: "",
     baseCityDataPromise: null,
     physicalData: null,
@@ -200,6 +201,14 @@ export function commitBaseCitySupportData(
     return null;
   }
   target.worldCitiesData = result?.worldCities || null;
+  if (result?.localizationReady === false) {
+    target.cityLayerRevision = (Number(target.cityLayerRevision) || 0) + 1;
+    target.baseCityLocalizationReady = false;
+    target.baseCityDataState = "loaded";
+    target.baseCityDataError = "";
+    target.baseCityDataPromise = null;
+    return target.worldCitiesData;
+  }
   target.baseCityAliasesData = result?.cityAliases || null;
   target.baseGeoLocales = {
     ...(
@@ -222,6 +231,7 @@ export function commitBaseCitySupportData(
       bumpCityLayerRevision: true,
     });
   }
+  target.baseCityLocalizationReady = true;
   target.baseCityDataState = "loaded";
   target.baseCityDataError = "";
   target.baseCityDataPromise = null;
@@ -518,6 +528,7 @@ export function hydrateStartupBaseContentState(
   target.baseGeoAliasToStableKey = { ...target.geoAliasToStableKey };
   target.worldCitiesData = null;
   target.baseCityAliasesData = null;
+  target.baseCityLocalizationReady = false;
   target.baseCityDataState = "idle";
   target.baseCityDataError = "";
   target.baseCityDataPromise = null;

@@ -51,7 +51,10 @@ class StrategicOverlaySidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('bindStrategicOverlayEvents();', content)
         self.assertIn('registerRuntimeHook(state, "updateStrategicOverlayUIFn", refreshStrategicOverlayUI);', content)
         self.assertIn('registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);', content)
-        self.assertIn('document.body.classList.toggle("frontline-mode-active", activeId === "project");', content)
+        navigation = content.split('const setRightSidebarTab = (tabId) => {', 1)[1].split('\n  };', 1)[0]
+        self.assertNotIn('classList.toggle("frontline-mode-active"', navigation)
+        self.assertIn('setStrategicMode: (active) => {', content)
+        self.assertIn('document.body.classList.toggle("frontline-mode-active", active);', content)
         self.assertIn('scopes: ["workspaceChrome", "counterIdentity", "counterPreview", "counterList"]', content)
 
     def test_sidebar_keeps_strategic_overlay_dom_surface_and_frontline_invalidation_hook(self):

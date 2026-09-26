@@ -298,7 +298,7 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
         owner_content = CITY_LIGHTS_RENDER_OWNER_JS.read_text(encoding="utf-8")
         signature_match = re.search(
-            r"function getModernCityLightsStaticConfigSignature\(config\) \{(?P<body>[\s\S]*?)\n  \}",
+            r"function getModernCityLightsStaticConfigSignature\(config, part = \"all\"\) \{(?P<body>[\s\S]*?)\n  \}",
             owner_content,
         )
         self.assertIsNotNone(signature_match)
@@ -314,12 +314,12 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         self.assertNotIn("twilightWidthDeg", signature_body)
 
         key_match = re.search(
-            r"function getModernCityLightsStaticLayerKey\(config\) \{(?P<body>[\s\S]*?)\n  \}",
+            r"function getModernCityLightsStaticLayerKey\(config, part = \"all\"\) \{(?P<body>[\s\S]*?)\n  \}",
             owner_content,
         )
         self.assertIsNotNone(key_match)
         key_body = key_match.group("body")
-        self.assertIn("getModernCityLightsStaticConfigSignature(config)", key_body)
+        self.assertIn("getModernCityLightsStaticConfigSignature(config, part)", key_body)
         self.assertIn("getTransformSignature(getZoomTransform())", key_body)
         self.assertIn("runtimeState.contextLayerRevision", key_body)
         self.assertIn("runtimeState.cityLayerRevision", key_body)
@@ -408,14 +408,14 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         owner_content = CITY_LIGHTS_RENDER_OWNER_JS.read_text(encoding="utf-8")
 
         texture_match = re.search(
-            r"function drawModernCityLightsTexture\(config, intensity\) \{(?P<body>[\s\S]*?)\n  \}",
+            r"function drawModernCityLightsTexture\(config, intensity, entries = null\) \{(?P<body>[\s\S]*?)\n  \}",
             owner_content,
         )
         self.assertIsNotNone(texture_match)
         texture_body = texture_match.group("body")
         self.assertIn('getModernDayNightNumber(config, "cityLightsTextureOpacity")', texture_body)
         self.assertIn('getModernDayNightNumber(config, "cityLightsCorridorStrength")', texture_body)
-        self.assertIn("textureOpacity <= 0 && corridorStrength <= 0", texture_body)
+        self.assertIn("if (textureOpacity <= 0) return;", texture_body)
         self.assertIn("textureOpacity *", texture_body)
         self.assertIn("corridorStrength *", texture_body)
         self.assertNotIn("function drawModernCityLightsCorridors(", owner_content)

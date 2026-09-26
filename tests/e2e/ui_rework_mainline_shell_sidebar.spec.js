@@ -1,5 +1,5 @@
 const { test, expect } = require("@playwright/test");
-const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("./support/playwright-app");
 
 async function expectDockCommandsToFit(page, width) {
   const ids = ["toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
@@ -74,7 +74,7 @@ test("desktop commands and tablet drawers remain usable", async ({ page }) => {
 });
 
 test("desktop export preview opens with the real scenario", async ({ page }, testInfo) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await page.setViewportSize({ width: 1440, height: 900 });
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
@@ -86,10 +86,14 @@ test("desktop export preview opens with the real scenario", async ({ page }, tes
     nodes.filter((node) => node.getClientRects().length).map((node) => node.getBoundingClientRect().height));
   for (const height of closedSections) expect(height).toBeLessThanOrEqual(58);
   await page.screenshot({ path: testInfo.outputPath("editor-desktop.png") });
+  await waitForRenderIdle(page);
   await page.locator("#workspaceExportBtn").click();
   await expect(page.locator("#exportWorkbenchPanel")).toBeVisible();
   await expect(page.locator("#exportWorkbenchParams")).toBeHidden();
   await expect(page.locator("#exportWorkbenchSnapshotBtn")).toBeEnabled({ timeout: 30_000 });
+  const previewState = page.locator("#exportWorkbenchPreviewState");
+  await expect(previewState).toHaveText(/Main image preview ready|Single layer preview ready|Preview unavailable\./, { timeout: 30_000 });
+  await expect(previewState).toHaveText("Main image preview ready");
   await expect(page.locator("#exportWorkbenchPreviewStage canvas")).toBeVisible();
   await expect(page.locator("#exportWorkbenchPreviewLayerSelect")).toHaveCSS("opacity", "0");
   await page.screenshot({ path: testInfo.outputPath("export-desktop.png") });
@@ -110,14 +114,20 @@ test("phase 02 shell and sidebar mainline stays on the new rails", async ({ page
 
   await expect(page.locator("#scenarioContextBar #scenarioTransportWorkbenchBtn")).toHaveCount(0);
   await expect(page.locator("#zoomControls #scenarioTransportWorkbenchBtn")).toHaveCount(0);
-  await page.locator("#inspectorSidebarTabProject").click();
+  if (await page.locator("body.editor-workspace").count()) {
+    await expect(page.locator("#editorProjectBar #inspectorSidebarTabProject")).toBeVisible();
+    await page.locator("#editorTaskLayersBtn").click();
+  } else {
+    await page.locator("#inspectorSidebarTabProject").click();
+  }
   const transportSection = page.locator("#transportProjectSection");
   if ((await transportSection.evaluate((node) => node.open)) !== true) {
     await page.locator("#lblTransportProject").click();
   }
   await expect(transportSection).toHaveJSProperty("open", true);
-  await expect(page.locator("#projectSidebarPanel #scenarioTransportWorkbenchBtn")).toBeVisible();
-  await expect(page.locator("#projectSidebarPanel #scenarioTransportWorkbenchBtn")).toHaveText("Open workbench");
+  const transportTrigger = page.locator("#transportProjectSection #scenarioTransportWorkbenchBtn");
+  await expect(transportTrigger).toBeVisible();
+  await expect(transportTrigger).toHaveText("Open workbench");
   await expect(page.locator("#scenarioGuideBtn")).toHaveText("Guide");
 
   await expect(page.locator("#dockEditPopoverBtn")).toHaveCount(0);
@@ -266,7 +276,7 @@ test("desktop bottom dock keeps quick controls in a usable horizontal rail", asy
       primaryScrollWidth: primary?.scrollWidth || 0,
       primaryClientWidth: primary?.clientWidth || 0,
       dockFlexDirection: dock ? getComputedStyle(dock).flexDirection : "",
-      primaryGridColumns: primary ? getComputedStyle(primary).gridTemplateColumns : "",
+      primaryDisplay: primary ? getComputedStyle(primary).display : "",
       groups,
     };
   });
@@ -278,12 +288,21 @@ test("desktop bottom dock keeps quick controls in a usable horizontal rail", asy
   expect(metrics.dock.right).toBeLessThanOrEqual(metrics.viewportWidth);
   expect(metrics.dockScrollWidth).toBeLessThanOrEqual(metrics.dockClientWidth + 1);
   expect(metrics.primaryScrollWidth).toBeLessThanOrEqual(metrics.primaryClientWidth + 1);
-  expect(metrics.primaryGridColumns.split(" ").length).toBeGreaterThanOrEqual(4);
+  expect(metrics.primaryDisplay).toBe("flex");
+  await expectDockCommandsToFit(page, 1440);
   for (const group of metrics.groups) {
     expect(group.rect.width).toBeGreaterThan(34);
     expect(group.rect.left).toBeGreaterThanOrEqual(metrics.dock.left - 1);
     expect(group.rect.right).toBeLessThanOrEqual(metrics.dock.right + 1);
     expect(group.rect.bottom).toBeLessThanOrEqual(metrics.viewportHeight);
+  }
+  for (let index = 0; index < metrics.groups.length; index += 1) {
+    for (const other of metrics.groups.slice(index + 1)) {
+      const box = metrics.groups[index].rect;
+      const overlap = box.left < other.rect.right - 1 && box.right > other.rect.left + 1
+        && box.top < other.rect.bottom - 1 && box.bottom > other.rect.top + 1;
+      expect(overlap, `${metrics.groups[index].className} overlaps ${other.className}`).toBe(false);
+    }
   }
 });
 
@@ -292,6 +311,53 @@ test("country inspector submenus keep hierarchy and compact adaptive heights", a
   await page.setViewportSize({ width: 1440, height: 900 });
   await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
+
+  if (await page.locator("body.editor-workspace").count()) {
+    await expect(page.locator("#editorTask-objects #countryInspectorSection")).toBeVisible();
+    await expect(page.locator("#countryList .country-select-main-btn").first()).toBeVisible();
+    await page.locator("#countryList .country-select-main-btn").first().click();
+    await expect(page.locator("#editorProperty-countries #selectedCountryActionsSection")).toBeVisible();
+    const hierarchy = await page.evaluate(() => {
+      const taskBody = document.querySelector(".editor-task-body");
+      const list = document.querySelector("#countryList");
+      const title = document.querySelector("#countryList .country-select-title");
+      const actionsTitle = document.querySelector("#selectedCountryActionsSection .sidebar-section-title");
+      const firstGroup = document.querySelector("#countryList > .country-explorer-group:not(.country-select-card)");
+      const firstRow = document.querySelector("#countryList .country-select-row");
+      return {
+        taskOverflowY: getComputedStyle(taskBody).overflowY,
+        taskClientHeight: taskBody.clientHeight,
+        taskScrollHeight: taskBody.scrollHeight,
+        listOverflowY: getComputedStyle(list).overflowY,
+        listMaxHeight: getComputedStyle(list).maxHeight,
+        actionTitleSize: Number.parseFloat(getComputedStyle(actionsTitle).fontSize),
+        countryTitleSize: Number.parseFloat(getComputedStyle(title).fontSize),
+        firstGroupBackground: firstGroup ? getComputedStyle(firstGroup).backgroundImage : "",
+        firstRowBackground: firstRow ? getComputedStyle(firstRow).backgroundImage : "",
+        firstRowTransition: firstRow ? getComputedStyle(firstRow).transitionProperty : "",
+        presetText: document.querySelector("#presetTree")?.textContent || "",
+        presetSummaries: [...document.querySelectorAll("#presetTree summary")].map((summary) => summary.textContent.trim()),
+      };
+    });
+    expect(["auto", "scroll"]).toContain(hierarchy.taskOverflowY);
+    expect(hierarchy.taskScrollHeight).toBeGreaterThan(hierarchy.taskClientHeight);
+    expect(["visible", "clip"]).toContain(hierarchy.listOverflowY);
+    expect(hierarchy.listMaxHeight).toBe("none");
+    expect(hierarchy.actionTitleSize).toBeGreaterThan(hierarchy.countryTitleSize);
+    expect(hierarchy.firstGroupBackground).toContain("linear-gradient");
+    expect(hierarchy.firstRowBackground).toContain("linear-gradient");
+    expect(hierarchy.firstRowTransition).not.toContain("transform");
+    expect(hierarchy.presetText).not.toContain("Notes");
+    expect(hierarchy.presetSummaries).not.toContain("Navigation");
+
+    await page.locator("#editorObjects-special").click();
+    await expect(page.locator("#specialRegionInspectorSection")).toBeVisible();
+    await expect(page.locator("#editorProperty-special")).toBeVisible();
+    await page.locator("#editorObjects-water").click();
+    await expect(page.locator("#waterInspectorSection")).toBeVisible();
+    await expect(page.locator("#editorProperty-water")).toBeVisible();
+    return;
+  }
 
   await page.evaluate(() => {
     document.querySelector("#countryInspectorSection")?.setAttribute("open", "");

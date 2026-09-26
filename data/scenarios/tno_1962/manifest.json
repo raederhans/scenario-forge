@@ -170,12 +170,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "b676047bde6f18f81f2e3d7760cc92765ce4dd2141d0d1f79581d4d0e6128b68",
+  "snapshot_fingerprint": "f69e1e8973c85dbcc2f2a3c06af9bd5832c0e78fe01d89edc2996c6d862e04f1",
   "source": {
     "base_topology_sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
-    "detail_chunk_manifest_sha256": "f237a38fc8352a2bb97d083e4eb582a9b0fe9978c1673ab3157ed1bea1855545",
-    "runtime_bootstrap_topology_sha256": "a0ec55eb17575c0cca79d942317f2ba8a266ae92d484daa7bcf6215e7c6664b7",
-    "runtime_topology_sha256": "8ecdb25ef584da64b44277b11083c925bdbf34493c5e801b7b94b55f80c1e154"
+    "detail_chunk_manifest_sha256": "b415d84a88861e69d7f1ba2fb936d37078349799648c81d22ccac6b0450fa3ab",
+    "runtime_bootstrap_topology_sha256": "a62fdf98d63ca6f60e4b22f5f2a900e233b56b9c83dd3889eafcc90f0643ea39",
+    "runtime_topology_sha256": "172a925f2fe745e03d98bb827f042a5e2e5ceeea80bba5580f07d59c490d22df"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -212,7 +212,7 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12696,
+    "feature_count": 12701,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
@@ -223,7 +223,7 @@
       "direct_country_copy": 2578,
       "manual_reviewed": 9369
     },
-    "scenario_atlantropa_feature_count": 725,
+    "scenario_atlantropa_feature_count": 730,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
@@ -234,8 +234,8 @@
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1828
     },
-    "synthetic_count": 499,
-    "synthetic_owner_feature_count": 499,
+    "synthetic_count": 501,
+    "synthetic_owner_feature_count": 501,
     "tno_bathymetry_band_count": 94,
     "tno_bathymetry_contour_count": 77,
     "tno_named_marginal_water_count": 124,

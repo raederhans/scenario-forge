@@ -64,11 +64,12 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn('renderSpecialRegionList,', content)
         self.assertIn('refreshSpecialRegionRows,', content)
         self.assertIn('bindWaterSpecialRegionEvents();', content)
-        self.assertIn('registerRuntimeHook(state, "renderWaterRegionListFn", renderWaterRegionList);', content)
-        self.assertIn('registerRuntimeHook(state, "refreshWaterRegionListRowsFn", refreshWaterRegionRows);', content)
+        self.assertIn('registerRuntimeHook(state, "renderWaterRegionListFn", withEditorSelection(renderWaterRegionList));', content)
+        self.assertIn('registerRuntimeHook(state, "refreshWaterRegionListRowsFn", withEditorSelection(refreshWaterRegionRows));', content)
         self.assertIn('registerRuntimeHook(state, "updateWaterInteractionUIFn", renderWaterInteractionUi);', content)
-        self.assertIn('registerRuntimeHook(state, "renderSpecialRegionListFn", renderSpecialRegionList);', content)
-        self.assertIn('registerRuntimeHook(state, "refreshSpecialRegionListRowsFn", refreshSpecialRegionRows);', content)
+        self.assertIn('registerRuntimeHook(state, "renderSpecialRegionListFn", withEditorSelection(renderSpecialRegionList));', content)
+        self.assertIn('registerRuntimeHook(state, "refreshSpecialRegionListRowsFn", withEditorSelection(refreshSpecialRegionRows));', content)
+        self.assertIn('editorWorkspace?.showProperty(kind);', content)
         self.assertIn('registerRuntimeHook(state, "updateScenarioSpecialRegionUIFn", renderSpecialRegionInspectorUi);', content)
         self.assertIn('registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);', content)
 
@@ -135,7 +136,7 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         for pattern in selection_patterns:
             self.assertRegex(owner_content, pattern)
 
-    def test_hidden_open_ocean_toggle_clears_hover_and_selected_state(self):
+    def test_hidden_water_toggles_clear_hover_and_selected_state(self):
         owner_content = WATER_SPECIAL_REGION_CONTROLLER_JS.read_text(encoding="utf-8")
         clear_body = owner_content.split("const clearHiddenOpenOceanInteractionState = () => {", 1)[1].split(
             "\n  const formatWaterTokenLabel",
@@ -150,7 +151,8 @@ class WaterSpecialRegionSidebarBoundaryContractTest(unittest.TestCase):
         self.assertIn("runtimeState.selectedWaterRegionId = \"\";", clear_body)
         self.assertIn("!isWaterFeatureVisibleInInspector(hoveredFeature)", clear_body)
         self.assertIn("!isWaterFeatureVisibleInInspector(selectedFeature)", clear_body)
-        self.assertEqual(toggle_handlers.count("clearHiddenOpenOceanInteractionState();"), 2)
+        self.assertEqual(toggle_handlers.count("clearHiddenOpenOceanInteractionState();"), 3)
+        self.assertIn("waterInspectorLakeInteractionToggle.addEventListener", toggle_handlers)
 
     def test_atlantropa_water_fragments_keep_real_feature_ids(self):
         data = json.loads(ATLANTROPA_DETAIL_CHUNK.read_text(encoding="utf-8"))

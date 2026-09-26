@@ -1428,6 +1428,28 @@ export const DATA_CONTRACTS_RECORDS = [
     "selector": {}
   },
   {
+    "id": "python:test_atlantropa_source_inventory",
+    "commandRef": "python -m unittest tests.test_atlantropa_source_inventory -q",
+    "sourceRefs": [
+      "tests/test_atlantropa_source_inventory.py",
+      "tools/audit_atlantropa_sources.py",
+      "tools/patch_tno_1962_bundle.py"
+    ],
+    "ownerHints": ["geo-contract"],
+    "domains": ["geo-contract"],
+    "tiers": ["heavy"],
+    "cost": "heavy",
+    "resourceLocks": ["heavy-geo", ".runtime-output"],
+    "executionOwners": ["main-thread"],
+    "profiles": ["full"],
+    "platforms": ["all"],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "python:test_check_atlantropa_geometry",
     "commandRef": "python -m unittest tests.test_check_atlantropa_geometry -q",
     "sourceRefs": [
@@ -1725,6 +1747,116 @@ export const DATA_CONTRACTS_RECORDS = [
     "entrypointPolicyIndex": 0,
     "verificationOrder": null,
     "selectorOrder": 1500,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_source_coverage_repair.py",
+    "commandRef": "test:python:source-coverage-repair",
+    "sourceRefs": [
+      "tests/test_source_coverage_repair.py",
+      "map_builder/geo/source_coverage_repair.py",
+      "tools/repair_scenario_source_seams.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_extension_admin1_coverage.py",
+    "commandRef": "test:python:extension-admin1-coverage",
+    "sourceRefs": [
+      "tests/test_extension_admin1_coverage.py",
+      "map_builder/processors/admin1.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python-heavy:geo_stack:tests/test_tno_border_continuity.py",
+    "commandRef": "test:python:tno-border-continuity",
+    "sourceRefs": [
+      "tests/test_tno_border_continuity.py",
+      "data/scenarios/tno_1962/manifest.json",
+      "tools/repair_scenario_source_seams.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
     "verification": null,
     "selector": {}
   }

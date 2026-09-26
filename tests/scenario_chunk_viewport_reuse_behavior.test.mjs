@@ -26,6 +26,7 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
   let subset = "west";
   let required = [first];
   const refreshes = [];
+  const renderRequests = [];
   const loads = [];
   let merges = 0;
   const state = { activeScenarioId: scenarioId, renderPhase: "idle", zoomTransform: { k: 3 }, renderPerfMetrics: {}, getViewportGeoBoundsFn: () => subset === "west" ? [-5, -5, 5, 5] : [0, -5, 10, 5] };
@@ -45,9 +46,10 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
     getScenarioOptionalLayerConfig: (layer) => SCENARIO_OPTIONAL_LAYER_CONFIGS[layer] || null, syncScenarioLocalizationState: () => {},
     refreshMapDataForScenarioChunkPromotion: (options) => refreshes.push(options), flushRenderBoundary: () => {},
     recordScenarioPerfMetric: () => {}, ensureScenarioChunkRegistryLoaded: async () => {},
+    requestRender: reason => renderRequests.push(reason),
   });
   return {
-    state, controller, refreshes, payloads, first, second, bundle, loads,
+    state, controller, refreshes, payloads, first, second, bundle, loads, renderRequests,
     getMerges: () => merges,
     setSubset: (next) => { subset = next; }, setRequired: (next) => { required = next; },
     async refresh(reason = "viewport-test") {
@@ -61,6 +63,24 @@ function fixture(t, { globalCoverage = true, scenarioId = "viewport-test" } = {}
     },
   };
 }
+
+test("a late same-scene border pack is published and drawn even when chunk selection is unchanged", async (t) => {
+  const h=fixture(t); await h.refresh();
+  const promotions=h.refreshes.length;
+  const pack={scenario_id:'viewport-test',meshes:{opening_owner_borders:{type:'MultiLineString',coordinates:[]}}};
+  h.bundle.meshPackPayload=pack;
+  await h.refresh();
+  assert.equal(h.state.activeScenarioMeshPack,pack);
+  assert.equal(h.refreshes.length,promotions);
+  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
+  await h.refresh();
+  assert.equal(h.state.activeScenarioMeshPack,pack);
+  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
+  h.bundle.meshPackPayload={...pack,scenario_id:'another-scene'};
+  await h.refresh();
+  assert.equal(h.state.activeScenarioMeshPack,pack);
+  assert.equal(h.renderRequests.filter(r=>r==='scenario-political-border-source').length,1);
+});
 
 test("a committed global political collection survives pans without merge, promotion or version growth", async (t) => {
   const h = fixture(t); await h.refresh();

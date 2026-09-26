@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 208,
-    "feature_count": 12696,
+    "feature_count": 12701,
     "water_count": 160
   },
   "controller_changes": [
@@ -4337,8 +4337,8 @@
     "active_controller_tag_count": 133,
     "active_owner_tag_count": 133,
     "as_of_date": "1962.1.1.12",
-    "atl_feature_count": 232,
-    "atl_sea_feature_count": 493,
+    "atl_feature_count": 235,
+    "atl_sea_feature_count": 495,
     "atlantropa_geometry_source": "hgo_donor_provinces",
     "atlantropa_island_replacement_stats": {
       "adriatica": {
@@ -5483,7 +5483,7 @@
         "assigned_owner_counts": {
           "BUL": 3,
           "GRE": 60,
-          "TUR": 16
+          "TUR": 17
         },
         "bounds": [
           20.002311,
@@ -5492,8 +5492,8 @@
           40.923187
         ],
         "centroid": [
-          24.942896,
-          37.639814
+          24.993628,
+          37.677205
         ],
         "control_points": [
           {
@@ -5675,7 +5675,7 @@
         "feature_group_id": "atlantropa_aegean_and_islands",
         "geometry_role_counts": {
           "donor_island": 33,
-          "donor_land": 15,
+          "donor_land": 16,
           "shore_seal": 31
         },
         "group_label": "Aegean and Greek Islands",
@@ -6045,7 +6045,7 @@
             "donor_province_ids": [
               18186
             ],
-            "id": "ATLWLD_aegean_88"
+            "id": "ATLWLD_aegean_89"
           },
           {
             "bounds": [
@@ -6399,12 +6399,12 @@
         "join_mode_counts": {
           "boolean_weld": 9,
           "gap_fill": 27,
-          "none": 43
+          "none": 44
         },
         "overlap_with_baseline_land_area": 1.344562,
         "pixel_fragment_area_threshold": 0.0024,
         "pixel_fragment_count": 48,
-        "post_clip_area": 7.061203,
+        "post_clip_area": 7.148251,
         "postprocess_precision": [
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
@@ -6668,6 +6668,15 @@
             "snap_tolerance_degrees": 0.12
           },
           {
+            "boundary_vertex_hausdorff_degrees": 0.0006801744284509204,
+            "fallback_reason": null,
+            "max_postprocess_degrees": 0.0025,
+            "province_id": 18349,
+            "snap_attempt_boundary_vertex_hausdorff_degrees": null,
+            "snap_fallback_reason": "invalid_snap_geometry",
+            "snap_tolerance_degrees": 0.12
+          },
+          {
             "boundary_vertex_hausdorff_degrees": 0.0,
             "fallback_reason": null,
             "max_postprocess_degrees": 0.0025,
@@ -6853,7 +6862,7 @@
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
             "fallback_reason": null,
-            "feature_id": "ATLWLD_aegean_88",
+            "feature_id": "ATLWLD_aegean_89",
             "max_postprocess_degrees": 0.0025
           },
           {
@@ -6863,15 +6872,15 @@
             "max_postprocess_degrees": 0.0025
           }
         ],
-        "province_feature_count": 79,
-        "restored_source_coast_contact_count": 43,
+        "province_feature_count": 80,
+        "restored_source_coast_contact_count": 44,
         "sea_completion_bbox": [
           22.0,
           34.4,
           31.7,
           42.55
         ],
-        "verified_final_coastal_components": 42
+        "verified_final_coastal_components": 43
       },
       "gabes": {
         "affine_coeffs": [
@@ -7065,18 +7074,18 @@
           {
             "area": 1.0030734710987015,
             "centroid": [
-              16.509538795432622,
-              42.84609871022896
+              16.509538795432626,
+              42.84609871022895
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLISL_adriatica_CRO_9"
           },
           {
-            "area": 0.009575338936488974,
+            "area": 0.009575338936488962,
             "centroid": [
-              17.39679420429144,
-              42.847274609249816
+              17.39679420429143,
+              42.84727460924986
             ],
             "component_index": 1,
             "distance_to_largest": 0.05709529696877931,
@@ -7193,10 +7202,10 @@
             "feature_id": "ATLISL_adriatica_source_a0eedb2a11dd70d7457c077c692b02548258e559ccc58cf8ab19b2c7144dc7cf"
           },
           {
-            "area": 0.0017996481856394407,
+            "area": 0.0017996481856394405,
             "centroid": [
-              16.25789422396906,
-              43.293899616786874
+              16.257894223969053,
+              43.29389961678685
             ],
             "component_index": 4,
             "distance_to_largest": 1.191892398468002,
@@ -9563,6 +9572,26 @@
             "feature_id": "ATLPRV_18330"
           },
           {
+            "area": 0.11493678438097307,
+            "centroid": [
+              5.717143440648731,
+              36.936274005193226
+            ],
+            "component_index": 0,
+            "distance_to_largest": 0.0,
+            "feature_id": "ATLPRV_18332"
+          },
+          {
+            "area": 0.05890031566846696,
+            "centroid": [
+              6.876217283515153,
+              37.0070396241458
+            ],
+            "component_index": 1,
+            "distance_to_largest": 0.3940955131530853,
+            "feature_id": "ATLPRV_18332"
+          },
+          {
             "area": 0.02988644308659101,
             "centroid": [
               11.145521218182045,
@@ -9631,6 +9660,16 @@
             "component_index": 0,
             "distance_to_largest": 0.0,
             "feature_id": "ATLPRV_18348"
+          },
+          {
+            "area": 0.08704842411484896,
+            "centroid": [
+              29.1089319508503,
+              40.710283758020246
+            ],
+            "component_index": 0,
+            "distance_to_largest": 0.0,
+            "feature_id": "ATLPRV_18349"
           },
           {
             "area": 0.05144803004176612,
@@ -9833,14 +9872,14 @@
             "feature_id": "ATLWLD_aegean_51"
           },
           {
-            "area": 2.4042671899908965e-05,
+            "area": 2.4042671899908972e-05,
             "centroid": [
               20.782643702504345,
               38.950976942431865
             ],
             "component_index": 0,
             "distance_to_largest": 0.0,
-            "feature_id": "ATLWLD_aegean_88"
+            "feature_id": "ATLWLD_aegean_89"
           },
           {
             "area": 3.0172495263810257e-05,
@@ -10899,7 +10938,7 @@
             "owner": "ATL",
             "removed_area": 0.005250667128283165,
             "source_owners": [
-              "SPR"
+              "IBR"
             ],
             "source_policy": "other_owner_exclusive_pre_snap_source"
           },
@@ -12060,21 +12099,20 @@
           44.7
         ],
         "assigned_owner_counts": {
-          "ATL": 2,
+          "ATL": 1,
           "FRA": 3,
-          "IAL": 3,
-          "IBR": 8,
-          "SPR": 4
+          "IAL": 5,
+          "IBR": 13
         },
         "bounds": [
           -5.990495,
           35.202069,
-          5.536634,
+          7.076626,
           43.538982
         ],
         "centroid": [
-          1.828334,
-          39.347608
+          1.982626,
+          39.261567
         ],
         "control_points": [
           {
@@ -12257,12 +12295,24 @@
         "geometry_role_counts": {
           "causeway": 1,
           "donor_island": 3,
-          "donor_land": 12,
-          "shore_seal": 4
+          "donor_land": 13,
+          "shore_seal": 5
         },
         "group_label": "West Mediterranean and Iberia-Algeria",
         "helper_id_assignment": "region_component_enumeration_not_stable_across_geometry_rebuilds",
         "helper_lineage": [
+          {
+            "bounds": [
+              6.099880339764385,
+              36.89080295911422,
+              6.23906043522193,
+              36.9449410277584
+            ],
+            "donor_province_ids": [
+              18332
+            ],
+            "id": "ATLSHL_west_med_2"
+          },
           {
             "bounds": [
               4.152400843362268,
@@ -12273,7 +12323,7 @@
             "donor_province_ids": [
               18153
             ],
-            "id": "ATLSHL_west_med_2"
+            "id": "ATLSHL_west_med_4"
           },
           {
             "bounds": [
@@ -12285,7 +12335,7 @@
             "donor_province_ids": [
               18153
             ],
-            "id": "ATLSHL_west_med_3"
+            "id": "ATLSHL_west_med_5"
           },
           {
             "bounds": [
@@ -12297,7 +12347,7 @@
             "donor_province_ids": [
               18216
             ],
-            "id": "ATLSHL_west_med_5"
+            "id": "ATLSHL_west_med_7"
           },
           {
             "bounds": [
@@ -12310,7 +12360,7 @@
               18160,
               18164
             ],
-            "id": "ATLSHL_west_med_6"
+            "id": "ATLSHL_west_med_8"
           }
         ],
         "island_alignment": {
@@ -12537,13 +12587,13 @@
           "ATLISL_west_med_ATL_2": "ATLISL_west_med_ATL_2"
         },
         "join_mode_counts": {
-          "gap_fill": 4,
-          "none": 16
+          "gap_fill": 5,
+          "none": 17
         },
         "overlap_with_baseline_land_area": 0.549443,
         "pixel_fragment_area_threshold": 0.0028,
         "pixel_fragment_count": 2,
-        "post_clip_area": 4.754053,
+        "post_clip_area": 4.931726,
         "postprocess_precision": [
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
@@ -12708,6 +12758,15 @@
             "snap_tolerance_degrees": 0.12
           },
           {
+            "boundary_vertex_hausdorff_degrees": 0.002133409279372981,
+            "fallback_reason": null,
+            "max_postprocess_degrees": 0.0025,
+            "province_id": 18332,
+            "snap_attempt_boundary_vertex_hausdorff_degrees": 0.1741065203751624,
+            "snap_fallback_reason": "snap_displacement_exceeds_tolerance",
+            "snap_tolerance_degrees": 0.12
+          },
+          {
             "boundary_vertex_hausdorff_degrees": 0.0,
             "fallback_reason": null,
             "feature_id": "ATLSHL_west_med_2",
@@ -12716,7 +12775,7 @@
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
             "fallback_reason": null,
-            "feature_id": "ATLSHL_west_med_3",
+            "feature_id": "ATLSHL_west_med_4",
             "max_postprocess_degrees": 0.0025
           },
           {
@@ -12728,19 +12787,25 @@
           {
             "boundary_vertex_hausdorff_degrees": 0.0,
             "fallback_reason": null,
-            "feature_id": "ATLSHL_west_med_6",
+            "feature_id": "ATLSHL_west_med_7",
+            "max_postprocess_degrees": 0.0025
+          },
+          {
+            "boundary_vertex_hausdorff_degrees": 0.0,
+            "fallback_reason": null,
+            "feature_id": "ATLSHL_west_med_8",
             "max_postprocess_degrees": 0.0025
           }
         ],
-        "province_feature_count": 20,
-        "restored_source_coast_contact_count": 17,
+        "province_feature_count": 22,
+        "restored_source_coast_contact_count": 19,
         "sea_completion_bbox": [
           -6.8,
           33.3,
           12.3,
           45.1
         ],
-        "verified_final_coastal_components": 17
+        "verified_final_coastal_components": 19
       }
     },
     "atlantropa_topology_mode": "atl_land_and_sea_tiles",
@@ -12974,8 +13039,8 @@
       }
     },
     "congo_lake_topology_mode": "true_water_preserved",
-    "context_land_mask_arc_refs": 40495,
-    "context_land_mask_area_delta_ratio": 0.0046084346492410964,
+    "context_land_mask_arc_refs": 41006,
+    "context_land_mask_area_delta_ratio": 0.004626533529222941,
     "context_land_mask_fallback_used": false,
     "context_land_mask_tolerance": 0.08,
     "controller_rule_count": 8,
@@ -14396,6 +14461,287 @@
       "feature_count": 11
     },
     "hgo_donor_root": "C:\\Users\\raede\\Desktop\\dev\\mapcreator\\historic geographic overhaul",
+    "identity_preserved_atl_helper_ids": [
+      "ATLSHL_adriatica_1",
+      "ATLSHL_adriatica_10",
+      "ATLSHL_adriatica_11",
+      "ATLSHL_adriatica_12",
+      "ATLSHL_adriatica_13",
+      "ATLSHL_adriatica_14",
+      "ATLSHL_adriatica_15",
+      "ATLSHL_adriatica_16",
+      "ATLSHL_adriatica_17",
+      "ATLSHL_adriatica_18",
+      "ATLSHL_adriatica_2",
+      "ATLSHL_adriatica_20",
+      "ATLSHL_adriatica_3",
+      "ATLSHL_adriatica_4",
+      "ATLSHL_adriatica_6",
+      "ATLSHL_adriatica_7",
+      "ATLSHL_adriatica_8",
+      "ATLSHL_adriatica_9",
+      "ATLSHL_aegean_1",
+      "ATLSHL_aegean_10",
+      "ATLSHL_aegean_11",
+      "ATLSHL_aegean_12",
+      "ATLSHL_aegean_13",
+      "ATLSHL_aegean_14",
+      "ATLSHL_aegean_15",
+      "ATLSHL_aegean_17",
+      "ATLSHL_aegean_18",
+      "ATLSHL_aegean_19",
+      "ATLSHL_aegean_2",
+      "ATLSHL_aegean_20",
+      "ATLSHL_aegean_21",
+      "ATLSHL_aegean_22",
+      "ATLSHL_aegean_24",
+      "ATLSHL_aegean_26",
+      "ATLSHL_aegean_27",
+      "ATLSHL_aegean_28",
+      "ATLSHL_aegean_29",
+      "ATLSHL_aegean_3",
+      "ATLSHL_aegean_31",
+      "ATLSHL_aegean_32",
+      "ATLSHL_aegean_4",
+      "ATLSHL_aegean_5",
+      "ATLSHL_aegean_6",
+      "ATLSHL_aegean_7",
+      "ATLSHL_aegean_8",
+      "ATLSHL_gabes_1",
+      "ATLSHL_levant_2",
+      "ATLSHL_levant_3",
+      "ATLSHL_levant_4",
+      "ATLSHL_levant_5",
+      "ATLSHL_levant_7",
+      "ATLSHL_levant_8",
+      "ATLSHL_levant_9",
+      "ATLSHL_libya_suez_1",
+      "ATLSHL_libya_suez_2",
+      "ATLSHL_sicily_tunis_1",
+      "ATLSHL_sicily_tunis_2",
+      "ATLSHL_sicily_tunis_3",
+      "ATLSHL_tyrrhenian_1",
+      "ATLSHL_tyrrhenian_3",
+      "ATLSHL_tyrrhenian_4",
+      "ATLSHL_tyrrhenian_5",
+      "ATLSHL_tyrrhenian_6",
+      "ATLSHL_tyrrhenian_7",
+      "ATLSHL_tyrrhenian_8",
+      "ATLSHL_west_med_2",
+      "ATLSHL_west_med_3",
+      "ATLSHL_west_med_5",
+      "ATLSHL_west_med_6",
+      "ATLWLD_adriatica_19",
+      "ATLWLD_adriatica_20",
+      "ATLWLD_adriatica_21",
+      "ATLWLD_adriatica_23",
+      "ATLWLD_adriatica_24",
+      "ATLWLD_aegean_21",
+      "ATLWLD_aegean_51",
+      "ATLWLD_aegean_88",
+      "ATLWLD_aegean_90"
+    ],
+    "identity_preserved_atl_helper_renames": {
+      "ATLSHL_west_med_4": "ATLSHL_west_med_2",
+      "ATLSHL_west_med_5": "ATLSHL_west_med_3",
+      "ATLSHL_west_med_7": "ATLSHL_west_med_5",
+      "ATLSHL_west_med_8": "ATLSHL_west_med_6",
+      "ATLWLD_aegean_89": "ATLWLD_aegean_88"
+    },
+    "identity_preserved_political_chunk_ids": [
+      "political.coarse.r0c0",
+      "political.detail.country.afa",
+      "political.detail.country.afg",
+      "political.detail.country.alc",
+      "political.detail.country.alt",
+      "political.detail.country.aof",
+      "political.detail.country.aoi",
+      "political.detail.country.aq",
+      "political.detail.country.are",
+      "political.detail.country.arg",
+      "political.detail.country.arm",
+      "political.detail.country.ast",
+      "political.detail.country.bhr",
+      "political.detail.country.bhu",
+      "political.detail.country.bkr",
+      "political.detail.country.bol",
+      "political.detail.country.bop",
+      "political.detail.country.bra",
+      "political.detail.country.brg",
+      "political.detail.country.brm",
+      "political.detail.country.bry",
+      "political.detail.country.bul",
+      "political.detail.country.bwa",
+      "political.detail.country.bz",
+      "political.detail.country.cam",
+      "political.detail.country.can",
+      "political.detail.country.cey",
+      "political.detail.country.chi",
+      "political.detail.country.chl",
+      "political.detail.country.cht",
+      "political.detail.country.col",
+      "political.detail.country.cos",
+      "political.detail.country.cro",
+      "political.detail.country.cub",
+      "political.detail.country.den",
+      "political.detail.country.dom",
+      "political.detail.country.ecu",
+      "political.detail.country.egy",
+      "political.detail.country.els",
+      "political.detail.country.eng",
+      "political.detail.country.ffr",
+      "political.detail.country.fic",
+      "political.detail.country.fin",
+      "political.detail.country.fra.part.0",
+      "political.detail.country.fra.part.1",
+      "political.detail.country.fra.part.2",
+      "political.detail.country.fra.part.3",
+      "political.detail.country.fri",
+      "political.detail.country.gce",
+      "political.detail.country.gco",
+      "political.detail.country.gea",
+      "political.detail.country.ger.part.0",
+      "political.detail.country.ger.part.1",
+      "political.detail.country.ger.part.2",
+      "political.detail.country.ger.part.3",
+      "political.detail.country.ger.part.4",
+      "political.detail.country.ger.part.5",
+      "political.detail.country.gma",
+      "political.detail.country.gng",
+      "political.detail.country.gor",
+      "political.detail.country.gre",
+      "political.detail.country.grn",
+      "political.detail.country.gsw",
+      "political.detail.country.gua",
+      "political.detail.country.gui",
+      "political.detail.country.gxc",
+      "political.detail.country.gy",
+      "political.detail.country.hai",
+      "political.detail.country.hol",
+      "political.detail.country.hon",
+      "political.detail.country.hun",
+      "political.detail.country.ial",
+      "political.detail.country.ibr",
+      "political.detail.country.ice",
+      "political.detail.country.ins",
+      "political.detail.country.ire",
+      "political.detail.country.irk",
+      "political.detail.country.irq",
+      "political.detail.country.ita",
+      "political.detail.country.jap",
+      "political.detail.country.jor",
+      "political.detail.country.kaz",
+      "political.detail.country.kgz",
+      "political.detail.country.kom",
+      "political.detail.country.kor",
+      "political.detail.country.krs",
+      "political.detail.country.kur",
+      "political.detail.country.kuw",
+      "political.detail.country.lao",
+      "political.detail.country.lba",
+      "political.detail.country.leb",
+      "political.detail.country.lib",
+      "political.detail.country.mad",
+      "political.detail.country.mag",
+      "political.detail.country.mal",
+      "political.detail.country.man",
+      "political.detail.country.mc",
+      "political.detail.country.men",
+      "political.detail.country.mex",
+      "political.detail.country.mld",
+      "political.detail.country.mnt",
+      "political.detail.country.mon",
+      "political.detail.country.ncp",
+      "political.detail.country.nep",
+      "political.detail.country.nic",
+      "political.detail.country.nie",
+      "political.detail.country.nov",
+      "political.detail.country.nzl",
+      "political.detail.country.oma",
+      "political.detail.country.oms",
+      "political.detail.country.ong",
+      "political.detail.country.orn",
+      "political.detail.country.ors",
+      "political.detail.country.our",
+      "political.detail.country.pak",
+      "political.detail.country.pal",
+      "political.detail.country.pan",
+      "political.detail.country.par",
+      "political.detail.country.per",
+      "political.detail.country.pfc",
+      "political.detail.country.phi",
+      "political.detail.country.prm",
+      "political.detail.country.pru",
+      "political.detail.country.pue",
+      "political.detail.country.qat",
+      "political.detail.country.qma",
+      "political.detail.country.raj",
+      "political.detail.country.rfa.part.0",
+      "political.detail.country.rfa.part.1",
+      "political.detail.country.rgc",
+      "political.detail.country.rkk.part.0",
+      "political.detail.country.rkk.part.1",
+      "political.detail.country.rkk.part.2",
+      "political.detail.country.rkm.part.0",
+      "political.detail.country.rkm.part.1",
+      "political.detail.country.rkm.part.2",
+      "political.detail.country.rkm.part.3",
+      "political.detail.country.rkm.part.4",
+      "political.detail.country.rkm.part.5",
+      "political.detail.country.rkm.part.6",
+      "political.detail.country.rkm.part.7",
+      "political.detail.country.rkm.part.8",
+      "political.detail.country.rkn",
+      "political.detail.country.rkno",
+      "political.detail.country.rko",
+      "political.detail.country.rkp",
+      "political.detail.country.rku",
+      "political.detail.country.rom",
+      "political.detail.country.rsf",
+      "political.detail.country.rur",
+      "political.detail.country.saf",
+      "political.detail.country.sam",
+      "political.detail.country.sau",
+      "political.detail.country.sba",
+      "political.detail.country.sco",
+      "political.detail.country.ser",
+      "political.detail.country.sgn",
+      "political.detail.country.shx",
+      "political.detail.country.sia",
+      "political.detail.country.slo",
+      "political.detail.country.svr",
+      "political.detail.country.swe",
+      "political.detail.country.swi",
+      "political.detail.country.syr",
+      "political.detail.country.tan",
+      "political.detail.country.tat",
+      "political.detail.country.tib",
+      "political.detail.country.tjk",
+      "political.detail.country.tkm",
+      "political.detail.country.tom",
+      "political.detail.country.tun",
+      "political.detail.country.tur",
+      "political.detail.country.tym",
+      "political.detail.country.ura",
+      "political.detail.country.urg",
+      "political.detail.country.usa.part.0",
+      "political.detail.country.usa.part.1",
+      "political.detail.country.uzb",
+      "political.detail.country.ven",
+      "political.detail.country.vin",
+      "political.detail.country.vmt",
+      "political.detail.country.vok",
+      "political.detail.country.vol",
+      "political.detail.country.vyt",
+      "political.detail.country.wls",
+      "political.detail.country.wrs",
+      "political.detail.country.xik",
+      "political.detail.country.xin",
+      "political.detail.country.yak",
+      "political.detail.country.yem",
+      "political.detail.country.yun",
+      "political.detail.country.zlt"
+    ],
     "italy_baseline_annex_sets_applied": [
       "French Occupation Strip (1940, Approx.)",
       "Nice + Savoy",
@@ -14459,7 +14805,7 @@
         ]
       },
       "aegean": {
-        "area": 20.705053,
+        "area": 20.644437,
         "bounds": [
           22.0,
           34.4,
@@ -14467,16 +14813,16 @@
           41.048032
         ],
         "centroid": [
-          26.260197,
-          36.762962
+          26.252081,
+          36.751357
         ],
-        "completion_area": 12.665031,
-        "completion_feature_count": 58,
-        "expected_completion_area": 22.655263,
-        "feature_count": 73,
+        "completion_area": 12.605877,
+        "completion_feature_count": 56,
+        "expected_completion_area": 22.593948,
+        "feature_count": 71,
         "group_label": "Aegean and Greek Islands",
-        "remaining_hole_area": 0.048418,
-        "remaining_hole_count": 113,
+        "remaining_hole_area": 0.048149,
+        "remaining_hole_count": 112,
         "template_feature_count": 5,
         "water_state_feature_counts": {
           "8608": 3,
@@ -14621,7 +14967,7 @@
             "feature_id": "ATLSEA_FILL_adriatica_9"
           },
           {
-            "area": 0.003449467531118186,
+            "area": 0.0034466468372371614,
             "feature_id": "ATLSEA_FILL_aegean_19"
           },
           {
@@ -14641,16 +14987,16 @@
             "feature_id": "ATLSEA_FILL_aegean_41"
           },
           {
+            "area": 0.00015753591142343986,
+            "feature_id": "ATLSEA_FILL_aegean_48"
+          },
+          {
             "area": 3.800404036376987e-05,
             "feature_id": "ATLSEA_FILL_aegean_5"
           },
           {
-            "area": 0.00015753591142343986,
-            "feature_id": "ATLSEA_FILL_aegean_50"
-          },
-          {
             "area": 0.0002050344144019751,
-            "feature_id": "ATLSEA_FILL_aegean_58"
+            "feature_id": "ATLSEA_FILL_aegean_56"
           },
           {
             "area": 2.880044623156113e-05,
@@ -14689,7 +15035,7 @@
             "feature_id": "ATLSEA_FILL_sicily_tunis_5"
           },
           {
-            "area": 0.0001025566184560719,
+            "area": 0.0001024947863346942,
             "feature_id": "ATLSEA_FILL_tyrrhenian_1"
           },
           {
@@ -14706,19 +15052,19 @@
           },
           {
             "area": 3.565881047705673e-06,
-            "feature_id": "ATLSEA_FILL_west_med_40"
+            "feature_id": "ATLSEA_FILL_west_med_39"
           },
           {
             "area": 2.6070933154383273e-05,
-            "feature_id": "ATLSEA_FILL_west_med_41"
+            "feature_id": "ATLSEA_FILL_west_med_40"
           },
           {
             "area": 3.0272237529090446e-05,
-            "feature_id": "ATLSEA_FILL_west_med_42"
+            "feature_id": "ATLSEA_FILL_west_med_41"
           },
           {
             "area": 0.00022684755477721228,
-            "feature_id": "ATLSEA_FILL_west_med_43"
+            "feature_id": "ATLSEA_FILL_west_med_42"
           },
           {
             "area": 4.629720883712684e-06,
@@ -14876,7 +15222,7 @@
         "remaining_hole_count": 0
       },
       "sicily_tunis": {
-        "area": 28.310381,
+        "area": 28.301046,
         "bounds": [
           7.000002,
           34.2,
@@ -14884,12 +15230,12 @@
           39.5
         ],
         "centroid": [
-          12.265603,
-          36.846789
+          12.26733,
+          36.846724
         ],
-        "completion_area": 17.256518,
+        "completion_area": 17.247175,
         "completion_feature_count": 27,
-        "expected_completion_area": 31.800348,
+        "expected_completion_area": 31.790862,
         "feature_count": 38,
         "group_label": "Sicily-Tunis Salt Shelf",
         "remaining_hole_area": 0.003524,
@@ -14912,7 +15258,7 @@
         ]
       },
       "tyrrhenian": {
-        "area": 27.575333,
+        "area": 27.526265,
         "bounds": [
           5.0,
           37.0,
@@ -14920,15 +15266,15 @@
           45.744039
         ],
         "centroid": [
-          9.089092,
-          40.399206
+          9.093957,
+          40.40519
         ],
-        "completion_area": 15.808862,
+        "completion_area": 15.759795,
         "completion_feature_count": 56,
-        "expected_completion_area": 60.438581,
+        "expected_completion_area": 60.380664,
         "feature_count": 99,
         "group_label": "Tyrrhenian and West Italian Coast",
-        "remaining_hole_area": 0.005885,
+        "remaining_hole_area": 0.0058,
         "remaining_hole_count": 14,
         "template_feature_count": 5,
         "water_state_feature_counts": {
@@ -14949,7 +15295,7 @@
         ]
       },
       "west_med": {
-        "area": 30.008597,
+        "area": 29.902658,
         "bounds": [
           -5.859888,
           33.300002,
@@ -14957,16 +15303,16 @@
           44.398756
         ],
         "centroid": [
-          1.500106,
-          38.423519
+          1.484683,
+          38.428842
         ],
-        "completion_area": 4.121619,
-        "completion_feature_count": 88,
-        "expected_completion_area": 65.737081,
-        "feature_count": 115,
+        "completion_area": 4.016066,
+        "completion_feature_count": 92,
+        "expected_completion_area": 65.570421,
+        "feature_count": 119,
         "group_label": "West Mediterranean and Iberia-Algeria",
-        "remaining_hole_area": 0.011558,
-        "remaining_hole_count": 30,
+        "remaining_hole_area": 0.010529,
+        "remaining_hole_count": 28,
         "template_feature_count": 5,
         "water_state_feature_counts": {
           "8577": 1,
@@ -14999,6 +15345,23 @@
           9040
         ]
       }
+    },
+    "named_water_new_atl_land_clip": {
+      "changed_water_ids": [
+        "tno_sea_of_marmara",
+        "tno_bosporus_dardanelles"
+      ],
+      "features": [
+        {
+          "id": "tno_sea_of_marmara",
+          "removed_area_degrees2": 0.08690059239805939
+        },
+        {
+          "id": "tno_bosporus_dardanelles",
+          "removed_area_degrees2": 0.00014783168725117057
+        }
+      ],
+      "removed_area_degrees2": 0.08704842408531056
     },
     "named_water_snapshot_path": "data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson",
     "named_water_source_diagnostics": {
@@ -17406,6 +17769,9 @@
         "supplement_bboxes": []
       }
     },
+    "new_atl_helper_reallocations": {
+      "ATLSHL_west_med_2": "ATLSHL_west_med_9"
+    },
     "owner_only_backfill_diagnostics": {
       "by_tag": {
         "AFA": [
@@ -17519,7 +17885,7 @@
       ]
     },
     "romania_transnistria_applied": true,
-    "runtime_feature_count": 12693,
+    "runtime_feature_count": 12701,
     "runtime_topology_objects": [
       "political",
       "land_mask",
@@ -104118,7 +104484,7 @@
       "controller_feature_count": 496,
       "display_name": "Atlantropa Reclamation Zone",
       "entry_kind": "",
-      "feature_count": 496,
+      "feature_count": 498,
       "hidden_from_country_list": true,
       "historical_fidelity": "alternate_history",
       "historical_fidelity_summary": [
@@ -104131,7 +104497,7 @@
       "provenance_iso2": "ZZ",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 496
+        "manual_reviewed": 498
       },
       "rule_sources": [
         "atlantropa_dummy_owner"
@@ -105932,7 +106298,7 @@
       "controller_feature_count": 30,
       "display_name": "Italian Algeria",
       "entry_kind": "scenario_subject",
-      "feature_count": 30,
+      "feature_count": 32,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -105947,7 +106313,7 @@
       "provenance_iso2": "DZ",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 30
+        "manual_reviewed": 32
       },
       "rule_sources": [
         "tno_1962_ial_manual_override"
@@ -109218,7 +109584,7 @@
       "controller_feature_count": 111,
       "display_name": "Turkey",
       "entry_kind": "",
-      "feature_count": 111,
+      "feature_count": 112,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -109231,7 +109597,7 @@
       "provenance_iso2": "TR",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 111
+        "manual_reviewed": 112
       },
       "rule_sources": [
         "1939_turkey_hatay"
@@ -110101,13 +110467,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "b676047bde6f18f81f2e3d7760cc92765ce4dd2141d0d1f79581d4d0e6128b68",
+  "snapshot_fingerprint": "f69e1e8973c85dbcc2f2a3c06af9bd5832c0e78fe01d89edc2996c6d862e04f1",
   "source": {
     "base_topology_sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
-    "build_snapshot_sha256": "7096575397c26897474652ef1464668605e9fcd42dd303a2787eb79a8f6481fa",
-    "detail_chunk_manifest_sha256": "f237a38fc8352a2bb97d083e4eb582a9b0fe9978c1673ab3157ed1bea1855545",
-    "runtime_bootstrap_topology_sha256": "a0ec55eb17575c0cca79d942317f2ba8a266ae92d484daa7bcf6215e7c6664b7",
-    "runtime_topology_sha256": "8ecdb25ef584da64b44277b11083c925bdbf34493c5e801b7b94b55f80c1e154"
+    "build_snapshot_sha256": "4b8573bd39568f0824b58233420c70c099c258eba4f097979ae7eb354fb01484",
+    "detail_chunk_manifest_sha256": "b415d84a88861e69d7f1ba2fb936d37078349799648c81d22ccac6b0450fa3ab",
+    "runtime_bootstrap_topology_sha256": "a62fdf98d63ca6f60e4b22f5f2a900e233b56b9c83dd3889eafcc90f0643ea39",
+    "runtime_topology_sha256": "172a925f2fe745e03d98bb827f042a5e2e5ceeea80bba5580f07d59c490d22df"
   },
   "summary": {
     "approximate_count": 859,
@@ -110123,7 +110489,7 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12696,
+    "feature_count": 12701,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 9369,
     "manual_reviewed_region_count": 0,
@@ -110134,7 +110500,7 @@
       "direct_country_copy": 2578,
       "manual_reviewed": 9369
     },
-    "scenario_atlantropa_feature_count": 725,
+    "scenario_atlantropa_feature_count": 730,
     "scenario_rule_blocker_count": 0,
     "scenario_runtime_topology_object_count": 7,
     "source_counts": {
@@ -110145,8 +110511,8 @@
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1828
     },
-    "synthetic_count": 499,
-    "synthetic_owner_feature_count": 499,
+    "synthetic_count": 501,
+    "synthetic_owner_feature_count": 501,
     "tno_bathymetry_band_count": 94,
     "tno_bathymetry_contour_count": 77,
     "tno_named_marginal_water_count": 124,

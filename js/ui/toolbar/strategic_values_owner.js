@@ -94,6 +94,12 @@ export function createStrategicValuesOwner({
     const status = view.status === "ready" ? "ready"
       : localRequest?.scenarioId === view.scenarioId ? "loading"
       : localError?.scenarioId === view.scenarioId && localRequest === null ? "failed" : view.status;
+    const unsupported = status === "unsupported";
+    const controls = nodes.strategicChoroplethMetric?.parentElement;
+    if (controls) {
+      controls.hidden = unsupported;
+      controls.style.display = unsupported ? "none" : "";
+    }
     const style = normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues);
     const metric = view.metricId;
     renderOptions(nodes.strategicChoroplethMetric, [
@@ -141,8 +147,8 @@ export function createStrategicValuesOwner({
     };
     setText("strategicValuesStatus", statusCopy[status]);
     const source = view.scenarioName || view.scenarioId;
-    setText("strategicValuesSource", status === "unsupported"
-      ? source
+    setText("strategicValuesSource", unsupported
+      ? ""
       : `${say("HOI4 game values", "HOI4 游戏数值")}${source ? ` · ${source}` : ""}${view.asOf ? ` · ${view.asOf}` : ""}`);
     if (nodes.strategicValuesLoad) {
       nodes.strategicValuesLoad.hidden = status === "ready" || status === "unsupported";

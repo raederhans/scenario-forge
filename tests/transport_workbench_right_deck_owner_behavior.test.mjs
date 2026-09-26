@@ -386,7 +386,26 @@ test("right deck owner renders diagnostics body in the data tab", () => withTest
 
   assert.deepEqual(events, [["road", true]]);
   assert.match(textOf(mount), /diagnostic-body/);
-  assert.match(textOf(mount), /Explain rule intent only/);
+  assert.match(textOf(mount), /Review the current data and loading status/);
+}));
+
+test("Data tab keeps source restrictions in collapsed pack details", () => withTestDocument(() => {
+  const mount = new TestElement("div");
+  const owner = createTransportWorkbenchRightDeckOwner({
+    getPreviewSnapshot: () => ({
+      status: "ready",
+      manifest: { adapter_id: "japan_road_v1", source_policy: "internal review", n06_encoding: "CP932" },
+      dataRows: [],
+    }),
+  });
+  owner.renderTabSections({ id: "road" }, {}, false, "data", mount);
+  const details = findAllByTag(mount, "details").find((node) => node.className === "transport-workbench-pack-details");
+  assert.ok(details);
+  assert.equal(details.open, false);
+  assert.match(textOf(details), /Pack details/);
+  assert.match(textOf(details), /Source policy internal review/);
+  assert.match(textOf(details), /N06 encoding CP932/);
+  assert.match(textOf(details), /Source and use/);
 }));
 
 test("right deck owner renders preview data rows and selects rows without mutating config", () => withTestDocument(() => {
@@ -632,7 +651,7 @@ test("right deck owner replaces the active mount when tab and family change", ()
     compareHeld: false,
     activeTab: "display",
   });
-  assert.match(textOf(displayMount), /Layers is operated/);
+  assert.match(textOf(displayMount), /Drag layers in the center board/);
 
   currentTab = "labels";
   owner.renderTabs({

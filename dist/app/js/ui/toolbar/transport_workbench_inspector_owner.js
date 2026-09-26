@@ -39,7 +39,45 @@ const INSPECTOR_GOVERNANCE_ROW_LABELS = new Set([
   "Data path",
   "Data check",
   "Pack mode",
+  "Adapter",
+  "Coverage scope",
+  "N06 member",
+  "N06 encoding",
+  "Source encoding",
+  "Release policy",
+  "Full features",
+  "Preview features",
+  "Default variant",
+  "Variants",
 ]);
+
+export function buildTransportWorkbenchPackDetailsRows(previewSnapshot = {}, dataContract = null, familyId = "") {
+  const manifest = previewSnapshot.manifest || {};
+  const audit = previewSnapshot.audit || {};
+  const selectedProps = previewSnapshot.selected?.properties || {};
+  const variant = previewSnapshot.activeVariant
+    ? getTransportWorkbenchManifestVariantMeta(manifest, previewSnapshot.activeVariant, familyId)
+    : null;
+  const rows = [
+    ["Pack version", manifest.adapter_id || dataContract?.adapterId || "—"],
+    ["Recipe version", manifest.recipe_version || audit.recipe_version || "—"],
+    ["Source policy", manifest.source_policy || "—"],
+    ["License tier", variant?.license_tier || manifest.license_tier || "—"],
+    ["Distribution tier", variant?.distribution_tier || manifest.distribution_tier || "—"],
+    ["Release policy", manifest.release_policy || "—"],
+    ["N06 member", manifest.n06_source_member || audit.n06_source_member || "—"],
+    ["N06 encoding", manifest.n06_encoding || audit.n06_encoding || "—"],
+    ["Source encoding", manifest.source_encoding || audit.source_encoding || "—"],
+    ["Data packs", Array.isArray(dataContract?.packs) ? dataContract.packs.join(", ") : "—"],
+    ["Geometry source", dataContract?.geometrySource || "—"],
+    ["Coverage scope", manifest.coverage_scope || "—"],
+    ["Source dataset", selectedProps.source_dataset || "—"],
+    ["Source member", selectedProps.source_member || "—"],
+    ["Last build", formatTransportWorkbenchManifestTimestamp(manifest.generated_at)],
+    ["Source and use", dataContract?.governance || "—"],
+  ];
+  return rows.filter(([, value]) => value !== "—" && value !== "unknown");
+}
 
 export function formatTransportWorkbenchOptionLabels(values, options) {
   const labelByValue = new Map((options || []).map((option) => [option.value, option.label]));
@@ -232,10 +270,7 @@ export function buildTransportWorkbenchLensSummaryRows({
 } = {}) {
   return [
     ["Preview", family?.previewTitle || family?.label || ""],
-    ["Data packs", Array.isArray(dataContract?.packs) && dataContract.packs.length ? dataContract.packs.join(", ") : "Deferred"],
-    ["Geometry", dataContract?.geometryKind || "reserved"],
     ["Pack status", previewSnapshot?.status || "pending"],
-    ["Right deck", rightDeckLabel || ""],
   ];
 }
 
@@ -700,7 +735,7 @@ export function buildTransportWorkbenchInspectorModel({
     ];
   }
   return {
-    rows: rows || [],
+    rows: (rows || []).filter(([label]) => !INSPECTOR_GOVERNANCE_ROW_LABELS.has(label)),
     stateCards,
   };
 }

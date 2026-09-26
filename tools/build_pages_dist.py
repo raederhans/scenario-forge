@@ -706,7 +706,7 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         "id": "editor-styles",
         "category": "on-demand-product",
         "owner": "editor-startup",
-        "paths": ("app/css/style.css",),
+        "paths": ("app/css/style.css", "app/css/editor-workspace.css"),
     },
     {
         "id": "pages-release-files",

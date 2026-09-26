@@ -1,5 +1,26 @@
 # Worktree Registry
 
+## 2026-09-26 外海细化整合
+
+`C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator` 使用 `codex/ocean-refinement`，实施共享命名海域、11项外海补齐及基础外洋分区。用户已授权合并推送；以隔离分支整合最新主线，主工作区既有 WIP 保留。合并后保留此工作树中的 `.runtime` 原始几何、集成比较和浏览器证据供复核。任务及最终 GitHub 回执见 [ocean-refinement-20260926](ocean-refinement-20260926/task.md)。
+
+
+## 2026-09-26 地图清晰度与政治边界修复
+
+`C:/Users/raede/.codex/worktrees/map-clarity/mapcreator` 使用 `codex/map-clarity-20260926`，基于 `2f4cb130` 实施显示密度、独立政治国界、线条层级与 TNO 阿尔及利亚源覆盖修复。主工作区的未归属 UI、昼夜与其他改动保留原样。本任务通过 [PR #174](https://github.com/raederhans/scenario-forge/pull/174) 的受保护 main 检查整合；最终推送和合并以该回执为准。工作树继续承担 localhost:8001 预览并保存 `.runtime` 中的修复前数据、候选及浏览器证据，因此合并后保留。记录见 [map-clarity-20260926](map-clarity-20260926/task.md)。
+
+## 2026-09-26 编辑工作区 UI 整合
+
+`C:/Users/raede/.codex/worktrees/editor-ui-merge-20260926/mapcreator` 使用分支 `codex/editor-ui-renewal-20260926`，基于 `origin/main@2e127eb4` 提取 UI 四阶段增量。主工作区的昼夜、渲染指标、启动管线等并行修改保留，不混入提交。隔离工作树用于构建、浏览器与合并验证，保留其 `.runtime` 运行证据供复核。任务记录见 [editor-ui-renewal-20260926](editor-ui-renewal-20260926/task.md)，最终推送、合并及部署状态以 Git/GitHub 回执为准。
+
+## 2026-09-26 湖泊交互与显示整合
+
+`C:/Users/raede/.codex/worktrees/lake-interaction-merge/mapcreator` 使用分支 `codex/lake-interaction-opt-in`，从主工作区提取湖泊交互开关、河湖样式协调与填色预览遮罩改动。主工作区仍有城市灯光并行修改，保持其分支、索引与工作文件不变。本工作树保留供合并后的差异复核，最终检查与合并状态以 Git/GitHub 回执为准。
+
+## 2026-09-26 昼夜与现代夜光优化
+
+`C:/Users/raede/.codex/worktrees/day-night-tiles/mapcreator` 使用 `codex/day-night-tiles` 隔离本次昼夜、夜光与性能改动。主工作区含其他 UI、水体和交通 WIP，保留原样，不在其中执行重置或整合。此工作树在合并后保留，用于复核 `.runtime/browser/day-night-tiles/` 的 Canvas 像素负对照和性能记录；远端提交及合并状态以该分支的 PR 回执为准。其他工作树不属于本次清理范围。
+
 ## 2026-09-25 所有权编辑退役整合
 
 接手 [PR #162](https://github.com/raederhans/scenario-forge/pull/162)，在主工作区检出 `codex/visual-editing-boundary-p1-p2-20260924`，核对第一、二阶段实现并补齐 E2E 清单、依赖图与调色板边界测试。合并后主工作区回到 `main` 并快进同步；最终合并状态以 PR 回执及 Git 为准。其他两个工作树与未跟踪 `.playwright-mcp/` 保留，本轮不清理。

@@ -48,7 +48,7 @@ const REPO_ROOT = process.cwd();
 const DEFAULT_JSON_OUT = path.join(REPO_ROOT, ".runtime", "reports", "generated", "verify-core.json");
 const DEFAULT_MD_OUT = path.join(REPO_ROOT, ".runtime", "reports", "generated", "verify-core.md");
 const NIGHTLY_SCENARIO_HEAVY_ROUTE_PREFIX = "python-heavy:geo_stack:";
-const NIGHTLY_SCENARIO_HEAVY_ROUTE_COUNT = 15;
+const NIGHTLY_SCENARIO_HEAVY_ROUTE_COUNT = 18;
 
 export const NIGHTLY_LINUX_CORE_EXCLUDED_COMMAND_REFS = Object.freeze([
   "verify:p4:state-writer-policy",

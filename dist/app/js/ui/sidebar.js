@@ -1,4 +1,5 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
+import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
 import { isOwnershipEditingEnabled, normalizePaintMode, ownershipEditingDisabledResult } from "../core/map_editing_policy.js";
 import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
@@ -2132,7 +2133,7 @@ function initSidebar({ render } = {}) {
     });
   };
   const collectOpenRightSidebarSections = () => rightSidebarDetails()
-    .filter((details) => details.open && !details.hidden)
+    .filter((details) => details.open && !details.hidden && !details.closest(".editor-property-panel[hidden]"))
     .map((details) => details.id)
     .join(",");
   const syncRightSidebarUrlState = () => {
@@ -2284,6 +2285,7 @@ function initSidebar({ render } = {}) {
   const countryInspectorSection = document.getElementById("countryInspectorSection");
   const waterInspectorSection = document.getElementById("waterInspectorSection");
   const waterInspectorOpenOceanSelectToggle = document.getElementById("waterInspectorOpenOceanSelectToggle");
+  const waterInspectorLakeInteractionToggle = document.getElementById("waterInspectorLakeInteractionToggle");
   const waterInspectorOpenOceanSelectHint = document.getElementById("waterInspectorOpenOceanSelectHint");
   const waterInspectorOpenOceanPaintToggle = document.getElementById("waterInspectorOpenOceanPaintToggle");
   const waterInspectorOpenOceanPaintHint = document.getElementById("waterInspectorOpenOceanPaintHint");
@@ -2382,6 +2384,12 @@ function initSidebar({ render } = {}) {
   const inspectorDisclosureOpenByKey = new Map();
 
   const collapseScenarioManagedSections = () => {
+    if (document.body.classList.contains("editor-workspace")) {
+      [countryInspectorSection, waterInspectorSection, specialRegionInspectorSection, frontlineProjectSection].forEach((section) => {
+        if (section) section.open = true;
+      });
+      return;
+    }
     countryInspectorSection?.removeAttribute("open");
     selectedCountryActionsSection?.removeAttribute("open");
     waterInspectorSection?.removeAttribute("open");
@@ -2458,6 +2466,10 @@ function initSidebar({ render } = {}) {
 
   const syncAdaptiveInspectorHeights = () => {
     adaptiveInspectorHeightFrame = 0;
+    if (document.body.classList.contains("editor-workspace")) {
+      [list, waterRegionList, waterLegendList, specialRegionList, specialRegionLegendList, presetTree].forEach(releaseAdaptiveInspectorHeight);
+      return;
+    }
     applyAdaptiveInspectorHeight(
       list,
       toViewportPixels(INSPECTOR_VH_BASELINE.countryList),
@@ -3380,6 +3392,7 @@ function initSidebar({ render } = {}) {
   let bindProjectSupportDiagnosticsEvents = () => {};
   let refreshLegendEditor = () => {};
   let refreshProjectSaveStatus = () => {};
+  let refreshProjectAccountLanguage = () => {};
   let renderScenarioAuditPanel = () => {};
 
   let bindStrategicOverlayEvents = () => {};
@@ -3849,11 +3862,7 @@ function initSidebar({ render } = {}) {
       runtimeState.ui = {};
     }
     runtimeState.ui.rightSidebarTab = activeId;
-    document.body.classList.toggle("frontline-mode-active", activeId === "project");
     if (activeId !== "project") {
-      closeCounterEditorModal({ restoreFocus: false });
-      cancelStrategicEditingModes();
-      closeStrategicWorkspace();
       clearRightSidebarSupportViewParam();
     }
     inspectorSidebarTabButtons.forEach((button) => {
@@ -3873,6 +3882,7 @@ function initSidebar({ render } = {}) {
     });
     syncRightSidebarUrlState();
     scheduleAdaptiveInspectorHeights();
+    document.dispatchEvent(new CustomEvent("editor-sidebar-tab", { detail: activeId }));
   };
 
 
@@ -3891,6 +3901,7 @@ function initSidebar({ render } = {}) {
     elements: {
       waterInspectorSection,
       waterInspectorOpenOceanSelectToggle,
+      waterInspectorLakeInteractionToggle,
       waterInspectorOpenOceanSelectHint,
       waterInspectorOpenOceanPaintToggle,
       waterInspectorOpenOceanPaintHint,
@@ -3963,6 +3974,7 @@ function initSidebar({ render } = {}) {
     bindEvents: bindProjectSupportDiagnosticsEvents,
     refreshLegendEditor,
     refreshProjectSaveStatus,
+    refreshProjectAccountLanguage,
     renderScenarioAuditPanel,
   } = createProjectSupportDiagnosticsController({
     state,
@@ -4128,21 +4140,39 @@ function initSidebar({ render } = {}) {
 
   bindStrategicOverlayEvents();
 
-  registerRuntimeHook(state, "renderCountryListFn", renderList);
-  registerRuntimeHook(state, "renderWaterRegionListFn", renderWaterRegionList);
-  registerRuntimeHook(state, "refreshWaterRegionListRowsFn", refreshWaterRegionRows);
+  let editorWorkspace = null;
+  const selectionFields = { countries: "selectedInspectorCountryCode", water: "selectedWaterRegionId", special: "selectedSpecialRegionId" };
+  const lastEditorSelection = {};
+  const syncEditorSelection = () => {
+    for (const [kind, field] of Object.entries(selectionFields)) {
+      const value = String(runtimeState[field] || "");
+      if (value && value !== lastEditorSelection[kind] && !document.body.classList.contains("frontline-mode-active")) {
+        editorWorkspace?.showProperty(kind);
+      }
+      lastEditorSelection[kind] = value;
+    }
+  };
+  const withEditorSelection = (callback) => (...args) => {
+    const result = callback(...args);
+    syncEditorSelection();
+    return result;
+  };
+  registerRuntimeHook(state, "renderCountryListFn", withEditorSelection(renderList));
+  registerRuntimeHook(state, "renderWaterRegionListFn", withEditorSelection(renderWaterRegionList));
+  registerRuntimeHook(state, "refreshWaterRegionListRowsFn", withEditorSelection(refreshWaterRegionRows));
   registerRuntimeHook(state, "updateWaterInteractionUIFn", renderWaterInteractionUi);
-  registerRuntimeHook(state, "renderSpecialRegionListFn", renderSpecialRegionList);
-  registerRuntimeHook(state, "refreshSpecialRegionListRowsFn", refreshSpecialRegionRows);
+  registerRuntimeHook(state, "renderSpecialRegionListFn", withEditorSelection(renderSpecialRegionList));
+  registerRuntimeHook(state, "refreshSpecialRegionListRowsFn", withEditorSelection(refreshSpecialRegionRows));
   registerRuntimeHook(state, "updateScenarioSpecialRegionUIFn", renderSpecialRegionInspectorUi);
   registerRuntimeHook(state, "updateScenarioReliefOverlayUIFn", renderSpecialRegionInspectorUi);
   registerRuntimeHook(state, "updateLegendUI", refreshLegendEditor);
   registerRuntimeHook(state, "updateProjectSaveStatusFn", refreshProjectSaveStatus);
+  registerRuntimeHook(state, "refreshProjectAccountLanguageFn", refreshProjectAccountLanguage);
   registerRuntimeHook(state, "renderScenarioAuditPanelFn", renderScenarioAuditPanel);
   registerRuntimeHook(state, "updateStrategicOverlayUIFn", refreshStrategicOverlayUI);
   registerRuntimeHook(state, "getStrategicOverlayPerfCountersFn", getStrategicOverlayPerfCounters);
-  registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);
-  registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);
+  registerRuntimeHook(state, "refreshCountryListRowsFn", withEditorSelection(refreshCountryRows));
+  registerRuntimeHook(state, "refreshCountryInspectorDetailFn", withEditorSelection(renderCountryInspectorDetail));
   const requestedSidebarTab = restoreRightSidebarUrlState();
   setRightSidebarTab(requestedSidebarTab || runtimeState.ui?.rightSidebarTab || "inspector");
   callRuntimeHook(state, "restoreSupportSurfaceFromUrlFn");
@@ -4270,6 +4300,28 @@ function initSidebar({ render } = {}) {
   renderPresetTree();
   refreshLegendEditor();
   renderScenarioAuditPanel();
+  editorWorkspace = initEditorWorkspace({
+    t,
+    onNavigate: () => {
+      // Manual context navigation consumes the current selection snapshot so a
+      // delayed list refresh cannot take the inspector back to an older choice.
+      for (const [kind, field] of Object.entries(selectionFields)) {
+        lastEditorSelection[kind] = String(runtimeState[field] || "");
+      }
+      syncRightSidebarUrlState();
+    },
+    setSidebarTab: setRightSidebarTab,
+    setStrategicMode: (active) => {
+      document.body.classList.toggle("frontline-mode-active", active);
+      if (!active) {
+        closeCounterEditorModal({ restoreFocus: false });
+        cancelStrategicEditingModes();
+        closeStrategicWorkspace();
+      }
+      refreshStrategicOverlayUI();
+    },
+  });
+  syncEditorSelection();
   scheduleAdaptiveInspectorHeights();
 }
 

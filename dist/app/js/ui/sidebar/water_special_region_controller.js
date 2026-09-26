@@ -9,6 +9,8 @@
  * - shared layout scheduling and sidebar shell events
  * - cross-panel bridges such as special-zone and workspace status updates
  */
+import { isLakeRegion, isLakeInteractionEnabled } from "../../core/renderer/effective_water_regions.js";
+
 export function createWaterSpecialRegionController({
   runtimeState,
   elements,
@@ -16,6 +18,7 @@ export function createWaterSpecialRegionController({
 }) {
   const {
     waterInspectorSection,
+    waterInspectorLakeInteractionToggle,
     waterInspectorOpenOceanSelectToggle,
     waterInspectorOpenOceanSelectHint,
     waterInspectorOpenOceanPaintToggle,
@@ -164,14 +167,39 @@ export function createWaterSpecialRegionController({
   const getWaterFeatureSource = (feature) =>
     String(feature?.properties?.source_standard || "").trim().toLowerCase();
 
+  const getWaterRowSourceLabel = (source) => {
+    const aliases = {
+      hgo_donor_water_georef: "HGO reconstruction",
+      mediterranean_template_sea_completion: "Mediterranean supplement",
+    };
+    return aliases[source]
+      ? t(aliases[source], "ui")
+      : formatWaterTokenLabel(source);
+  };
+
   const getWaterFeatureHasOverride = (featureId) =>
     Object.prototype.hasOwnProperty.call(runtimeState.waterRegionOverrides || {}, String(featureId || "").trim());
 
   const getWaterFeatureMeta = (feature) => {
-    const waterType = formatWaterTokenLabel(getWaterFeatureType(feature), "Water");
+    const waterType = t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui");
     const regionGroup = formatWaterTokenLabel(getWaterFeatureGroup(feature));
     const sourceLabel = formatWaterTokenLabel(getWaterFeatureSource(feature));
     return [waterType, regionGroup, sourceLabel].filter(Boolean).join(" · ");
+  };
+
+  const getWaterFeatureRowMeta = (feature, sameNameItems = []) => {
+    const type = t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui");
+    if (sameNameItems.length < 2) return type;
+    const source = getWaterFeatureSource(feature);
+    const sources = new Set(sameNameItems.map((item) => getWaterFeatureSource(item.feature)));
+    const groups = new Set(sameNameItems.map((item) => getWaterFeatureGroup(item.feature)));
+    const distinguishingValue = sources.size > 1 ? source
+      : groups.size > 1 ? getWaterFeatureGroup(feature)
+      : getWaterFeatureParentId(feature) || getWaterFeatureId(feature);
+    const detail = distinguishingValue && (sources.size > 1
+      ? getWaterRowSourceLabel(distinguishingValue)
+      : formatWaterTokenLabel(distinguishingValue));
+    return [type, detail].filter(Boolean).join(" · ");
   };
 
   const getWaterFeatureListName = (feature) => {
@@ -250,6 +278,7 @@ export function createWaterSpecialRegionController({
 
   const isWaterFeatureVisibleInInspector = (feature) => {
     if (!feature) return false;
+    if (isLakeRegion(feature)) return isLakeInteractionEnabled(runtimeState);
     if (isOpenOceanWaterFeature(feature)) {
       return isOpenOceanSelectionEnabled();
     }
@@ -328,13 +357,13 @@ export function createWaterSpecialRegionController({
     if (!input) return;
     const currentValue = String(input.value || "");
     const nextValues = ["", ...values];
-    const signature = JSON.stringify(nextValues);
+    const signature = JSON.stringify([nextValues, runtimeState.currentLanguage]);
     if (input.dataset.optionsSignature !== signature) {
       input.replaceChildren();
       nextValues.forEach((value) => {
         const option = document.createElement("option");
         option.value = value;
-        option.textContent = value ? formatWaterTokenLabel(value) : t(emptyLabel, "ui") || emptyLabel;
+        option.textContent = value ? t(formatWaterTokenLabel(value), "ui") : t(emptyLabel, "ui") || emptyLabel;
         input.appendChild(option);
       });
       input.dataset.optionsSignature = signature;
@@ -430,6 +459,9 @@ export function createWaterSpecialRegionController({
 
   const renderWaterInteractionUi = () => {
     syncOpenOceanInspectorState();
+    if (waterInspectorLakeInteractionToggle) {
+      waterInspectorLakeInteractionToggle.checked = isLakeInteractionEnabled(runtimeState);
+    }
     if (waterInspectorOpenOceanSelectToggle) {
       waterInspectorOpenOceanSelectToggle.checked = isOpenOceanSelectionEnabled();
     }
@@ -613,7 +645,7 @@ export function createWaterSpecialRegionController({
         ["Group", formatWaterTokenLabel(getWaterFeatureGroup(feature))],
         ["Parent", featureParentId || "None"],
         ["Source", formatWaterTokenLabel(getWaterFeatureSource(feature))],
-        ["Interactive", feature?.properties?.interactive === false ? "No" : "Yes"],
+        ["Interactive", isWaterFeatureVisibleInInspector(feature) ? "Yes" : "No"],
         ["Chokepoint", feature?.properties?.is_chokepoint ? "Yes" : "No"],
         ["Base Geography", feature?.properties?.render_as_base_geography ? "Yes" : "No"],
         ["Default Color", defaultColor.toUpperCase()],
@@ -708,6 +740,12 @@ export function createWaterSpecialRegionController({
     renderWaterFilterUi();
     const filteredFeatures = getFilteredWaterFeatures();
     const displayItems = getWaterListDisplayItems(filteredFeatures);
+    const itemsByName = new Map();
+    displayItems.forEach((item) => {
+      const items = itemsByName.get(item.listName) || [];
+      items.push(item);
+      itemsByName.set(item.listName, items);
+    });
     syncWaterAggregateMemberIndex(displayItems);
 
     waterRowRefsById.clear();
@@ -744,10 +782,7 @@ export function createWaterSpecialRegionController({
 
       const meta = document.createElement("div");
       meta.className = "country-select-meta";
-      meta.textContent = [
-        getWaterFeatureMeta(feature),
-        memberIds.length > 1 ? `${memberIds.length} ${t("fragments", "ui") || "fragments"}` : "",
-      ].filter(Boolean).join(" · ");
+      meta.textContent = getWaterFeatureRowMeta(feature, itemsByName.get(listName));
 
       const swatch = document.createElement("span");
       swatch.className = "country-select-swatch";
@@ -1098,6 +1133,20 @@ export function createWaterSpecialRegionController({
 
 
   const bindEvents = () => {
+  if (waterInspectorLakeInteractionToggle && !waterInspectorLakeInteractionToggle.dataset.bound) {
+    waterInspectorLakeInteractionToggle.addEventListener("change", (event) => {
+      runtimeState.styleConfig.lakes.interactive = !!event.target.checked;
+      closeWaterInspectorColorPicker();
+      clearHiddenOpenOceanInteractionState();
+      markDirty("toggle-lake-interaction");
+      renderWaterInteractionUi();
+      renderWaterRegionList();
+      renderWaterInspectorDetail();
+      updateSpecialZoneEditorUi();
+      if (render) render();
+    });
+    waterInspectorLakeInteractionToggle.dataset.bound = "true";
+  }
   // 这一层不是纯 UI 绑定：多个 toggle 会同步 runtime flag、可见图层、hover/inspector 状态，
   // 还会在需要时触发 optional layer 懒加载，所以事件顺序要保持集中，不要拆到零散回调里。
   if (waterInspectorOpenOceanSelectToggle && !waterInspectorOpenOceanSelectToggle.dataset.bound) {
