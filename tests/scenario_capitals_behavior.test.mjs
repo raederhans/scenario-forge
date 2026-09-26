@@ -1,8 +1,11 @@
-import test from "node:test";
+import test, { before } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { mergeCityLocalizationData, normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
 import { state as runtimeState } from "../js/core/state.js";
+import { commitBaseCitySupportData, setCurrentLanguage } from "../js/core/state/content_state.js";
+import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
+import { captureScenarioPresentationState, restoreScenarioPresentationState } from "../js/core/state/actions/scenario_presentation_actions.js";
 import { syncScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
 import { getStrictGeoLabel, getPreferredGeoLabel } from "../js/core/i18n.js";
 import { createUrbanCityPolicyOwner } from "../js/core/renderer/urban_city_policy.js";
@@ -16,21 +19,37 @@ const baseLocalization = mergeCityLocalizationData({
   cityAliases: read("../data/city_aliases.json"),
 });
 
+// Publish the process-local baseline through the same authority as city loading.
+before(() => commitBaseCitySupportData(runtimeState, {
+  worldCities: base,
+  locales: baseLocalization.locales,
+  geoAliases: baseLocalization.geoAliases,
+}));
+
 for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", "blank_base"]) {
-  test(`${scenarioId}: every active capital resolves to the saved point in an owned feature`, () => {
+  test(`${scenarioId}: every active capital resolves to the saved point in an owned feature`, (t) => {
     const directory = `../data/scenarios/${scenarioId}/`;
     const rawOverrides = read(`${directory}city_overrides.json`);
     const manifest = read(`${directory}manifest.json`);
     const overrides = normalizeScenarioCityOverridesPayload(rawOverrides);
     const countries = read(`${directory}countries.json`).countries;
     const owners = read(`${directory}owners.by_feature.json`).owners;
-    const state = Object.assign(runtimeState, {
-      activeScenarioId: scenarioId, currentLanguage: "zh", worldCitiesData: base,
-      scenarioCityOverridesData: overrides, scenarioCountriesByTag: countries, sovereigntyByFeatureId: owners,
-      baseGeoLocales: baseLocalization.locales.geo,
-      baseGeoAliasToStableKey: baseLocalization.geoAliases.alias_to_stable_key,
-      ruCityOverrides: null,
+    const state = runtimeState;
+    const originalLanguage = state.currentLanguage;
+    const activation = captureScenarioActivationState(state);
+    // Localization updates the geo child in place. Preserve the container as
+    // well, and restore after failures so one scenario cannot mask another.
+    const presentation = captureScenarioPresentationState({ ...state, locales: { ...state.locales } });
+    t.after(() => {
+      restoreScenarioActivationState(state, activation);
+      restoreScenarioPresentationState(state, presentation);
+      setCurrentLanguage(state, originalLanguage);
     });
+    restoreScenarioActivationState(state, captureScenarioActivationState({
+      ...state, activeScenarioId: scenarioId, scenarioCountriesByTag: countries,
+      sovereigntyByFeatureId: owners, scenarioBaselineOwnersByFeatureId: owners,
+    }));
+    setCurrentLanguage(state, "zh");
     syncScenarioLocalizationState({ cityOverridesPayload: overrides,
       geoLocalePatchPayload: manifest.geo_locale_patch_url ? read(`../${manifest.geo_locale_patch_url}`) : null });
     const labels = createCityLabelTextModel(state, { getStrictGeoLabel, getPreferredGeoLabel });
@@ -46,7 +65,7 @@ for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", 
     const effective = owner.getEffectiveCityCollection();
     const cities = new Map(effective.features.map((f) => [f.properties.__city_id, f]));
     for (const language of ["en", "zh"]) {
-      state.currentLanguage = language;
+      setCurrentLanguage(state, language);
       for (const [cityId, raw] of Object.entries(rawOverrides.cities)) {
         const city = cities.get(cityId);
         if (!city) continue;
@@ -60,7 +79,7 @@ for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", 
         }
       }
     }
-    state.currentLanguage = "zh";
+    setCurrentLanguage(state, "zh");
     for (const [tag, country] of Object.entries(countries)) {
       if (!country.feature_count) continue;
       const hint = overrides.capital_city_hints[tag];
@@ -79,7 +98,7 @@ for (const scenarioId of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962", 
         assert.equal(labels.getCityDisplayLabel(city), overrides.cities[cityId].display_name.zh, tag);
       }
     }
-    state.activeScenarioId = "";
+    restoreScenarioActivationState(state, captureScenarioActivationState({ ...state, activeScenarioId: "" }));
     syncScenarioLocalizationState({ cityOverridesPayload: null, geoLocalePatchPayload: null });
     assert.deepEqual(state.locales.geo, baseLocalization.locales.geo);
     const restored = owner.getEffectiveCityCollection();

@@ -240,7 +240,7 @@ import { createCityLabelOwner } from "./renderer/city_label_owner.js";
 import { createCityPointsRenderOwner } from "./renderer/city_points_render_owner.js";
 import { buildStrategicResourceMarkerEntries } from "./renderer/strategic_resource_markers.js";
 import { isScenarioStrategicValuesUsable } from "./scenario/strategic_values.js";
-import { createColorResolutionStrategyOwner } from "./renderer/color_resolution_strategy.js";
+import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from "./renderer/color_resolution_strategy.js";
 import { createStrategicOverlayHelpersOwner } from "./renderer/strategic_overlay_helpers.js";
 import { createStrategicOverlayRenderOwner } from "./renderer/strategic_overlay_render_owner.js";
 import { createStrategicOverlayRuntimeOwner } from "./renderer/strategic_overlay_runtime_owner.js";
@@ -275,6 +275,7 @@ import {
   updateSpecialZoneLayerMembership,
 } from "./special_zone_layers.js";
 import { createBorderDrawOwner } from "./renderer/border_draw_owner.js";
+import { createPaintContourRuntime } from "./renderer/paint_contour_runtime.js";
 import { createInteractionBorderSnapshotOwner } from "./renderer/interaction_border_snapshot_owner.js";
 import { createSpatialIndexRuntimeOwner } from "./renderer/spatial_index_runtime_owner.js";
 import { getSpatialBucketKey } from "./renderer/spatial_index_runtime_builders.js";
@@ -868,6 +869,7 @@ function getRenderPassSignaturePolicy() {
       getLakeStyleConfig,
       stableJson,
       getDayNightRuntimeOwner,
+      getPaintContourRevision: () => getPaintContourRuntimeOwner().getRevision(),
       getBorderAppearanceRevision: () => String(runtimeState.styleConfig?.internalBorders?.colorMode || "auto").trim().toLowerCase() === "manual"
         ? 0 : getCountryFillPaletteOwner().getAppearanceRevision(),
     });
@@ -2222,6 +2224,37 @@ function getBorderMeshOwner() {
   return borderMeshOwner;
 }
 
+let paintContourRuntimeOwner = null;
+function getPaintContourRuntimeOwner() {
+  if (!paintContourRuntimeOwner) {
+    paintContourRuntimeOwner = createPaintContourRuntime({
+      state: runtimeState,
+      getFeatures: () => runtimeState.landData?.features,
+      getFeatureId,
+      isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
+        && !isScenarioShellFeature(feature, id)
+        && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
+        && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
+      resolveColor: (feature, id) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
+        getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
+      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+      onChange: (reason) => {
+        invalidateRenderPasses("borders", reason);
+        requestRendererRender(reason, { flush: false });
+      },
+    });
+  }
+  return paintContourRuntimeOwner;
+}
+
+async function ensurePaintContoursReady() {
+  if (!isHgoRuntimePreviewReady()) await getPaintContourRuntimeOwner().ensureReady();
+}
+
+function getPaintContourDiagnostics() {
+  return getPaintContourRuntimeOwner().diagnostics();
+}
+
 function getBorderDrawOwner() {
   if (borderDrawOwner) {
     return borderDrawOwner;
@@ -2265,7 +2298,6 @@ function getBorderDrawOwner() {
       getContext: () => rendererSurfaceHost.getContext(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getProjection: () => rendererSurfaceHost.getProjection(),
-      getScenarioOwnerOnlyCanonicalFallbackWarnings: () => scenarioOwnerOnlyCanonicalFallbackWarnings,
       getVisibleInternalBorderMeshSignature: () => visibleInternalBorderMeshSignature,
     },
     helpers: {
@@ -2278,7 +2310,7 @@ function getBorderDrawOwner() {
       getSafeCanvasColor,
       getVisibleCountryCodesForBorderMeshes,
       isUsableMesh,
-      isDynamicBordersEnabled,
+      getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),
       sanitizePolyline,
       scheduleDeferredHeavyBorderMeshes,
       reconcileDetailAdmBorders: (meta) => getBorderMeshOwner().reconcileDetailAdmBorders(meta),
@@ -6599,6 +6631,7 @@ function rebuildResolvedColors() {
   replaceResolvedColorsState(state, nextColors);
   bumpColorRevision(state);
   getCountryFillPaletteOwner().invalidate();
+  if (getPaintContourRuntimeOwner().notifyPaintChanged()) invalidateRenderPasses("borders", "paint-contours-colors");
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
   invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
   recordColorRebuildDiagnostics(runtimeState, {
@@ -7009,6 +7042,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
 
   bumpColorRevision(state);
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
+  if (getPaintContourRuntimeOwner().notifyPaintChanged(ids)) invalidateRenderPasses("borders", "paint-contours-colors");
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
     inputLabel,
@@ -12340,6 +12374,12 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
+  if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
+    const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
+    if (contourStatus === "building" || contourStatus === "error") {
+      throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
+    }
+  }
   const targetDpr = Number(pixelRatio ?? runtimeState.dpr ?? 1);
   if (!Number.isFinite(targetDpr) || targetDpr <= 0) {
     throw new RangeError("Export pixel ratio must be positive and finite.");
@@ -14638,6 +14678,7 @@ function resetRendererTransactionState({
   hitCanvasDirty = false,
 } = {}) {
   contextLayerRenderScheduler.reset();
+  paintContourRuntimeOwner?.dispose();
   return getRendererTransactionResetOwner().resetRendererTransactionState({
     cancelSecondarySpatialBuild,
     cancelHoverOverlayRender,
@@ -14807,12 +14848,14 @@ export { RENDER_PASS_NAMES } from "./map_renderer/render_pass_catalog.js";
 export function getRendererAsyncWorkStatus() {
   return {
     geometryPendingCount: geometryRasterRuntimeOwner?.getPendingWorkCount() || 0,
-    borderScheduled: staticBorderMeshLifecycle?.hasPendingWork() || false,
+    borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
 }
 
 export {
+  getPaintContourDiagnostics,
+  ensurePaintContoursReady,
   // Core render lifecycle facade.
   initMap,
   setMapData,

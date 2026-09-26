@@ -3246,7 +3246,10 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "chunkState",
   "targetParameterIndex": 1,
   "targetParameterPath": "$",
-  "sourceFingerprint": "cc023636af2b04563cb2fb5718b5d873d322ed109e3229059a2a4247437657b0",
+  "sourceFingerprint": "a2f9bb3fad9dacb7dda5a93e4a9e0eaadbee404619d1a880eaa00fc70bd1632b",
+  "dependencyFingerprints": {
+    "js/core/paint_contour_source.js": "9412f0064b506cd07d56395fb46e0c3da3ba18bda43c00503920a5ecc15e20ca"
+  },
   "importedArgumentCount": 3,
   "conservativeFindings": [
     {

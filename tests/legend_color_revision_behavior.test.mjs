@@ -66,16 +66,27 @@ test("visible legend avoids feature scans until actual renderer color transactio
   assert.equal(scans, 1);
   let visibleColors;
   const deferredRenders = [];
+  const contourNotifications = [], borderInvalidations = [];
   const refresh = rendererFunction("refreshResolvedColorsForFeatures", {
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
     getCountryFillPaletteOwner: () => palette,
+    getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: (ids) => {
+      // The extracted transaction owns publication order; the contour runtime
+      // has its own behavior suite. Observe the actual committed colors here.
+      contourNotifications.push({ ids: Array.from(ids), revision: state.colorRevision });
+      for (const id of ids) assert.equal(state.colors[id], "#abcdef");
+      return true;
+    } }),
     migrateLegacyColorState() {}, ensureSovereigntyState() {},
     getRenderPassCacheState: () => ({ partialPoliticalDirtyIds: new Set() }),
     hasPendingPoliticalColorEdit: () => false, normalizePoliticalColorEditIds: ids => ids,
     findResolvedColorFeatureById: id => features.find(feature => feature.id === id) || null,
     getResolvedFeatureColor: () => "#abcdef",
     markPendingPoliticalColorEdit: () => false, clearPendingPoliticalColorEdit() {},
-    invalidateRenderPasses() {}, shouldRefreshContextBaseForColorChanges: () => false,
+    invalidateRenderPasses: (pass, reason) => {
+      if (pass === "borders") borderInvalidations.push({ reason, revision: state.colorRevision });
+    },
+    shouldRefreshContextBaseForColorChanges: () => false,
     recordPartialColorRefreshDiagnostics() {}, rendererSurfaceHost: { getContext: () => ({}) },
     requestRendererRender: (_reason, { fallback }) => fallback(),
     scheduleDeferredWork: (callback) => deferredRenders.push(callback),
@@ -92,11 +103,17 @@ test("visible legend avoids feature scans until actual renderer color transactio
   assert.equal(state.colorRevision, 1, "color transaction commits before deferred presentation");
   assert.equal(visibleColors, undefined, "fallback does not render synchronously");
   assert.equal(deferredRenders.length, 1);
+  assert.deepEqual(contourNotifications, [{ ids: ["A"], revision: 1 }]);
+  assert.deepEqual(borderInvalidations, [{ reason: "paint-contours-colors", revision: 1 }]);
   deferredRenders.shift()();
   assert.deepEqual(visibleColors, ["#abcdef", "#445566"]);
   assert.equal(scans, 2, "revision already changed before deferred render fallback");
   refresh(["B"], { renderNow: false });
   assert.equal(state.colorRevision, 2);
+  assert.deepEqual(contourNotifications.at(-1), { ids: ["B"], revision: 2 });
+  assert.deepEqual(borderInvalidations.at(-1), { reason: "paint-contours-colors", revision: 2 });
+  assert.equal(contourNotifications.length, 2);
+  assert.equal(borderInvalidations.length, 2);
   assert.equal(dominantColors.get("BB"), "#abcdef", "non-rendering color transactions also update palette");
   assert.deepEqual(read(state), ["#abcdef"]);
   assert.equal(scans, 3);

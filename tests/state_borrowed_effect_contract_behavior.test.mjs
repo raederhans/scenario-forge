@@ -435,3 +435,77 @@ test("localization callback proof preserves global publication effects and rejec
     assert.ok(checked.violations.some(item => item.code === "borrowed-callback-injection-source-mismatch" && item.modulePath === changedPath));
   }
 });
+
+
+// P3B renewed only the two merge capabilities and their new precision sidecar.
+// They may update private caches but may not write borrowed feature/state data.
+test("contour merge receipts bind sidecar source and reject imported mutation or replacement", async () => {
+  const { STATE_TARGET_PURE_READER_CONTRACT, inspectStateTargetPureReaderFunctionSource } =
+    await import("../tools/state_action_delegation_contract.mjs");
+  const modulePath = "js/core/scenario/chunk_layer_payloads.js";
+  const dependency = "js/core/paint_contour_source.js";
+  const read = name => readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+  const source = read(modulePath);
+  const reader = STATE_TARGET_PURE_READER_CONTRACT.find(entry => entry.modulePath === modulePath
+    && entry.functionName === "buildMergedScenarioChunkLayerPayloads");
+  const effect = findStateBorrowedEffectContractEntry(modulePath, "buildMergedScenarioChunkLayerPayloads");
+  assert.ok(reader.dependencyFingerprints[dependency]);
+  assert.equal(reader.dependencyFingerprints[dependency], effect.dependencyFingerprints[dependency]);
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, reader).violations, []);
+  const original = "export function registerContourSourcePrecision(payload, chunk) {";
+  const replaced = read(dependency).replace(original, `${original} payload.features.length = 0;`);
+  assert.notEqual(replaced, read(dependency));
+  const inspected = inspectStateTargetPureReaderFunctionSource(source, reader, {
+    readSource: name => name === dependency ? replaced : read(name),
+  });
+  assert.ok(inspected.violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"
+    && item.dependencyName === dependency));
+  const substitutedImport = source.replace('../paint_contour_source.js', '../unreviewed_contour_source.js');
+  assert.notEqual(substitutedImport, source);
+  assert.ok(inspectStateBorrowedEffectSource(substitutedImport, effect).violations.some(item =>
+    item.code === "borrowed-effect-source-mismatch"));
+});
+
+test("contour merge injections bind LOD ranking and reject a changed transitive helper", () => {
+  const dependency = "js/core/scenario/political_lod_policy.js";
+  const read = name => readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+  for (const name of ["mergeScenarioChunkPayloads", "mergeScenarioChunkPayloadsForViewport"]) {
+    const entry = STATE_BORROWED_CALLBACK_INJECTION_CONTRACT.find(entry => entry.parameterName === name);
+    assert.ok(entry.sourceFingerprints[dependency]);
+    assert.deepEqual(inspectStateBorrowedCallbackInjectionSources(entry).violations, []);
+    const checked = inspectStateBorrowedCallbackInjectionSources(entry, {
+      productionModulePaths: [],
+      readSource: path => read(path) + (path === dependency ? "\nthrow new Error('unreviewed LOD helper');" : ""),
+    });
+    assert.ok(checked.violations.some(item => item.code === "borrowed-callback-injection-source-mismatch"
+      && item.modulePath === dependency));
+  }
+});
+
+test("contour precision publication preserves deeply frozen borrowed payloads and result aliases", async () => {
+  const { buildMergedScenarioChunkLayerPayloads } = await import("../js/core/scenario/chunk_layer_payloads.js");
+  const { mergeScenarioChunkPayloads, mergeScenarioChunkPayloadsForViewport } = await import("../js/core/scenario_chunk_manager.js");
+  const { getContourCoordinatePrecision, registerContourSourcePrecision } = await import("../js/core/paint_contour_source.js");
+  const freeze = value => {
+    if (value && typeof value === "object") { Object.values(value).forEach(freeze); Object.freeze(value); }
+    return value;
+  };
+  const feature = { type: "Feature", id: "coarse-A", properties: { id: "coarse-A" },
+    geometry: { type: "Polygon", coordinates: [[[0,0],[1,0],[1,1],[0,1],[0,0]]] } };
+  const payload = { type: "FeatureCollection", features: [feature] };
+  const chunk = { id: "coarse", layerKey: "political", lod: "coarse", coordinatePrecision: 4, globalCoverage: true };
+  const bundle = freeze({ chunkRegistry: { byLayer: { political: [chunk] } } });
+  const chunkState = freeze({ loadedChunkIds: ["coarse"], payloadByChunkId: { coarse: { layerKey: "political", payload } } });
+  const before = JSON.stringify({bundle, chunkState});
+  const result = buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
+    mergeScenarioChunkPayloads, mergeScenarioChunkPayloadsForViewport,
+  });
+  assert.equal(getContourCoordinatePrecision(feature.geometry), 4);
+  assert.equal(result.mergedLayerPayloads.political.features[0], feature, "reused borrowed features retain their original frozen identity");
+  assert.equal(result.primaryMergedLayerPayloads.political, result.mergedLayerPayloads.political);
+  registerContourSourcePrecision(payload, { ...chunk, lod: "detail" });
+  assert.equal(getContourCoordinatePrecision(feature.geometry), 7);
+  assert.equal(JSON.stringify({bundle, chunkState}), before, "provenance must not be written into saved inputs");
+  assert.deepEqual(Object.keys(feature.geometry).sort(), ["coordinates", "type"]);
+  assert.throws(() => { result.mergedLayerPayloads.political.features[0].properties.bad = true; }, TypeError);
+});

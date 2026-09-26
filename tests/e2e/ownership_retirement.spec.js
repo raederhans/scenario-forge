@@ -150,3 +150,110 @@ test("P3 real-map country paint, erase, history and current-format reload share 
   expect(result.mode).toBe("visual");
   expect(errors).toEqual([]);
 });
+
+// Pixel acceptance deliberately uses tiny geometries and the real worker/draw
+// owner, so missing shared edges cannot hide behind a whole-world screenshot.
+test('P3B worker contours render exact split seams and clear stale pixels', async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  await gotoApp(page, '/?ui_shell=1', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const load = path => import(new URL(path, location.href).href);
+    const { createPaintContourRuntime } = await load('./js/core/renderer/paint_contour_runtime.js');
+    const { registerContourSourcePrecision } = await load('./js/core/paint_contour_source.js');
+    const { createBorderDrawOwner } = await load('./js/core/renderer/border_draw_owner.js');
+    const rect = (id, x) => ({ id, geometry: { type:'Polygon', coordinates:[[[x,0],[x+1,0],[x+1,1],[x,1],[x,0]]] } });
+    const a = rect('A',0), b = rect('B',1);
+    b.geometry.coordinates[0] = [[1,0],[2,0],[2,1],[1,1],[1,0.5],[1,0]];
+    const state = { colorRevision:0, topologyRevision:0, activeScenarioId:'pixel-fixture',
+      land:[a,b], styleConfig:{empireBorders:{color:'#ff0000',opacity:1,width:3},internalBorders:{opacity:0}},
+      cachedCountryBorders:[{type:'MultiLineString',coordinates:[[[0,0],[2,1]]]}], cachedDetailAdmBorders:[] };
+    const colors = { A:'#123456', B:'#654321' };
+    const runtime = createPaintContourRuntime({state,getFeatures:()=>state.land,getFeatureId:f=>f.id,resolveColor:f=>colors[f.id]});
+    const canvas = document.createElement('canvas'); canvas.width=120; canvas.height=100;
+    const context = canvas.getContext('2d', {willReadFrequently:true});
+    const project = p => [p[0]*40+10,70-p[1]*40];
+    const owner = createBorderDrawOwner({state,getters:{getContext:()=>context,getProjection:()=>project,
+      getPathCanvas:()=>mesh=>{ for(const line of mesh.coordinates){ line.forEach((point,i)=>{ const p=project(point); i?context.lineTo(...p):context.moveTo(...p); }); } }},
+      helpers:{getPaintContourMeshes:()=>runtime.getMeshes(),isUsableMesh:m=>!!m?.coordinates?.length}});
+    const draw = (interactive=false) => {context.clearRect(0,0,120,100); owner.drawHierarchicalBorders(1,{interactive});
+      const pixels=context.getImageData(48,45,5,10).data;return [...pixels].filter((_,i)=>i%4===3).reduce((a,b)=>a+b,0);};
+    const ready = async () => {
+      runtime.getMeshes();
+      const until=performance.now()+15_000;
+      while(runtime.diagnostics().status==='building'&&performance.now()<until)await new Promise(r=>setTimeout(r,20));
+      if(runtime.diagnostics().status!=='ready')throw new Error(JSON.stringify(runtime.diagnostics()));
+    };
+    await ready();
+    const different=draw(),interactive=draw(true),builds=runtime.diagnostics().builds;
+    colors.B=colors.A;state.colorRevision++;runtime.notifyPaintChanged(['B']);const merged=draw();
+    // Overlay colors must not participate in persistent contour resolution.
+    state.colors={A:'#ff00ff',B:'#00ff00'};state.strategicChoroplethMetric='steel';const overlay=draw();
+    colors.B='#654321';state.colorRevision++;runtime.notifyPaintChanged(['B']);const undo=draw();
+    const noReindex=runtime.diagnostics().builds===builds;
+    state.land=[a,rect('B',4)];state.topologyRevision++;const pending=draw();await ready();const moved=draw();
+    state.land=[a,b,rect('supplement',2)];colors.supplement='#fedcba';state.topologyRevision++;await ready();
+    const supplementCount=runtime.diagnostics().featureCount;
+    // Join a declared coarse/fine seam through the real Worker, without
+    // allowing the same close geometry to merge when both sources are fine.
+    const coarse=rect('A',0), fine=rect('B',1.000003);
+    registerContourSourcePrecision({features:[coarse]},{lod:'coarse',coordinatePrecision:4});
+    state.land=[coarse,fine];state.topologyRevision++;await ready();const quantized=draw();
+    registerContourSourcePrecision({features:[coarse]},{lod:'detail',coordinatePrecision:7});
+    state.scenarioDataGeneration=1;runtime.getMeshes();await ready();const strictFine=draw();
+    state.activeScenarioId='new-scene';state.land=[];const cleared=draw();runtime.dispose();
+    return {different,interactive,merged,overlay,undo,noReindex,pending,moved,supplementCount,quantized,strictFine,cleared};
+  });
+  await testInfo.attach('contour-pixel-probes.json',{body:JSON.stringify(result,null,2),contentType:'application/json'});
+  expect(result.different).toBeGreaterThan(0); expect(result.interactive).toBeGreaterThan(0);
+  for(const key of ['merged','overlay','pending','moved','strictFine','cleared'])expect(result[key],key).toBe(0);
+  expect(result.undo).toBe(result.different);expect(result.noReindex).toBe(true);expect(result.supplementCount).toBe(3);expect(result.quantized).toBe(result.different);
+});
+
+for (const scenario of ['modern_world', 'tno_1962']) {
+  test(`P3B ${scenario} composed land paint, erase and history update contours without rebuilding geometry`, async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
+    const errors=[];page.on('pageerror',error=>errors.push(error.message));
+    await page.setViewportSize({width:1440,height:1000});
+    await gotoApp(page, `/?default_scenario=${scenario}&startup_interaction=full&startup_worker=0&startup_cache=0`, {waitUntil:'domcontentloaded'});
+    const {waitForAppInteractive,waitForRenderIdle}=require('./support/playwright-app');
+    await waitForAppInteractive(page,{timeout:30_000});
+    await waitForRenderIdle(page,{scenarioId:scenario,timeout:30_000});
+    await page.waitForFunction(async()=>{
+      const renderer=await import(new URL('./js/core/map_renderer.js',location.href).href);
+      return renderer.getPaintContourDiagnostics().status==='ready';
+    },null,{timeout:25_000});
+    const result=await page.evaluate(async()=>{
+      const load=path=>import(new URL(path,location.href).href);
+      const {state}=await load('./js/core/state.js');
+      const renderer=await load('./js/core/map_renderer.js');
+      const {applyFeaturePaintState}=await load('./js/core/state/color_state.js');
+      const history=await load('./js/core/history_manager.js');
+      // A promotion may land between the preceding poll and this task. Await
+      // the actual generation here, then perform the synchronous transaction.
+      await renderer.ensurePaintContoursReady();
+      const initial=renderer.getPaintContourDiagnostics();
+      const ids=state.landData.features.map(f=>String(f.properties?.id||f.id||'')).filter(Boolean);
+      history.clearHistory();
+      const before=history.captureHistoryState({featureIds:ids});
+      applyFeaturePaintState(state,ids,'#142638');renderer.refreshResolvedColorsForFeatures(ids,{renderNow:true});
+      const after=history.captureHistoryState({featureIds:ids});
+      history.pushHistoryEntry({kind:'p3b-test-paint',before,after,meta:{}});
+      const uniform=renderer.getPaintContourDiagnostics();
+      history.undoHistory();const undo=renderer.getPaintContourDiagnostics();
+      history.redoHistory();const redo=renderer.getPaintContourDiagnostics();
+      applyFeaturePaintState(state,ids,null,{remove:true});renderer.refreshResolvedColorsForFeatures(ids,{renderNow:true});
+      const erased=renderer.getPaintContourDiagnostics();
+      return {scenario:state.activeScenarioId,initial,uniform,undo,redo,erased,
+        supplementaryLand:ids.filter(id=>id.startsWith('ATL')).length,
+        geometryStable:[uniform,undo,redo,erased].every(d=>d.builds===initial.builds&&d.sourceVersion===initial.sourceVersion)};
+    });
+    await testInfo.attach(`${scenario}-contours.json`,{body:JSON.stringify(result,null,2),contentType:'application/json'});
+    expect(result.initial.activeArcCount).toBeGreaterThan(0);
+    expect(result.uniform.activeArcCount).toBe(0);expect(result.redo.activeArcCount).toBe(0);
+    expect(result.undo.activeArcCount).toBe(result.initial.activeArcCount);
+    expect(result.erased.activeArcCount).toBe(result.initial.activeArcCount);
+    expect(result.geometryStable).toBe(true);expect(errors).toEqual([]);
+    if(scenario==='tno_1962')expect(result.supplementaryLand).toBeGreaterThan(0);
+    await page.screenshot({path:testInfo.outputPath(`${scenario}-paint-contours.png`)});
+  });
+}

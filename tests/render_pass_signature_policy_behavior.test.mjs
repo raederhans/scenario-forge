@@ -95,8 +95,8 @@ test("coastline border pixels invalidate on overlay visibility and geometry arri
 });
 
 test("border pixels depend on country appearance rather than unrelated individual color edits", () => {
-  let appearanceRevision = 1;
-  const { state, policy } = createHarness({ getBorderAppearanceRevision: () => appearanceRevision });
+  let appearanceRevision = 1, contourRevision = 1;
+  const { state, policy } = createHarness({ getBorderAppearanceRevision: () => appearanceRevision, getPaintContourRevision: () => contourRevision });
   const before = policy.getRenderPassSignature("borders");
   state.colorRevision = 7;
   assert.equal(policy.getRenderPassSignature("borders"), before);
@@ -105,6 +105,9 @@ test("border pixels depend on country appearance rather than unrelated individua
   const recolored = policy.getRenderPassSignature("borders");
   state.styleConfig.internalBorders = { colorMode: "manual", color: "#ff0000" };
   assert.notEqual(policy.getRenderPassSignature("borders"), recolored);
+  const manual = policy.getRenderPassSignature("borders");
+  contourRevision += 1;
+  assert.notEqual(policy.getRenderPassSignature("borders"), manual);
 });
 
 test("urban screen paint invalidates on zoom within a reuse bucket but not on pan or inactive urban data", () => {

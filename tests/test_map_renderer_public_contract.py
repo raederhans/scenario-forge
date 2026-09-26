@@ -35,6 +35,7 @@ EXPECTED_PUBLIC_EXPORTS = {
     "deleteSelectedOperationGraphicVertex",
     "deleteSelectedOperationalLine",
     "deleteSelectedUnitCounter",
+    "ensurePaintContoursReady",
     "finishOperationGraphicDraw",
     "finishOperationalLineDraw",
     "finishSpecialZoneDraw",

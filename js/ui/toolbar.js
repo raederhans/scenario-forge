@@ -24,6 +24,7 @@ import {
   setZoomPercent,
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
+  ensurePaintContoursReady,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
@@ -2451,6 +2452,7 @@ function initToolbar({ render } = {}) {
 
   const bakeLayer = async (layerId, exportUiOverride = null) => {
     await ensureScenarioPoliticalDetailForExport();
+    await ensurePaintContoursReady();
     const exportUi = exportUiOverride && typeof exportUiOverride === "object"
       ? exportUiOverride
       : ensureExportWorkbenchUiState();
@@ -2572,6 +2574,7 @@ function initToolbar({ render } = {}) {
 
   const buildCompositeSourceCanvas = async (exportUi, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
+    await ensurePaintContoursReady();
     const passNames = resolveExportPassSequence({
       ...exportUi,
       visibility: exportUi.visibility,
@@ -2602,6 +2605,7 @@ function initToolbar({ render } = {}) {
 
   const buildSingleExportSourceCanvas = async (exportUi, sourceId, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
+    await ensurePaintContoursReady();
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);

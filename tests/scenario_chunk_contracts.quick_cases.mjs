@@ -1195,15 +1195,17 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
 
   register(37, "color strategy resolves generic water-like political features to ocean fill while preserving owner land", () => {
     const state = {
-      mapSemanticMode: "ownership",
-      visualOverrides: {},
-      featureOverrides: {},
-      activeScenarioId: "tno_1962",
+      mapSemanticMode: "political",
+      activeScenarioId: "color-reference-fixture",
       scenarioBaselineOwnersByFeatureId: Object.freeze({
         marine_red_sea: "SOV",
         RU_LAND: "SOV",
         ATL_OWNER: "ATL",
       }),
+      visualOverrides: {},
+      featureOverrides: {},
+      // A stale editable-owner mirror must not override the reference palette.
+      sovereigntyByFeatureId: { RU_LAND: "STALE", ATL_OWNER: "STALE" },
       scenarioAutoShellOwnerByFeatureId: {},
       sovereignBaseColors: {
         SOV: "#c01010",

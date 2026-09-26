@@ -11,8 +11,17 @@ import {
 } from "../tools/startup_resource_graph.mjs";
 
 test("startup resource graph is deterministic and reconciles the source entrypoint to Pages ownership", () => {
-  const first = buildStartupResourceGraph();
-  const second = buildStartupResourceGraph();
+  const explicitArtifactRoot = String(process.env.SCENARIO_FORGE_PAGES_ARTIFACT_ROOT || "").trim();
+  const options = {};
+  if (explicitArtifactRoot) {
+    const artifactRoot = path.resolve(explicitArtifactRoot);
+    const runtimeRelative = path.relative(path.resolve(".runtime"), artifactRoot);
+    assert.ok(runtimeRelative && !runtimeRelative.startsWith("..") && !path.isAbsolute(runtimeRelative));
+    options.manifestPath = path.relative(process.cwd(), path.join(artifactRoot, "pages-dist-manifest.json")).replaceAll("\\", "/");
+  }
+  // Reconcile with the exact PR artifact, not an older tracked dist manifest.
+  const first = buildStartupResourceGraph(options);
+  const second = buildStartupResourceGraph(options);
 
   assert.deepEqual(second, first);
   assert.deepEqual(first.entrypoint, {

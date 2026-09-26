@@ -46,7 +46,6 @@ export function createBorderDrawOwner({
     getContext = () => null,
     getPathCanvas = () => null,
     getProjection = () => null,
-    getScenarioOwnerOnlyCanonicalFallbackWarnings = () => new Set(),
     getVisibleInternalBorderMeshSignature = () => "",
   } = getters;
 
@@ -60,7 +59,7 @@ export function createBorderDrawOwner({
     getSafeCanvasColor = (value, fallbackColor) => value || fallbackColor,
     getVisibleCountryCodesForBorderMeshes = () => new Set(),
     isUsableMesh = () => false,
-    isDynamicBordersEnabled = () => false,
+    getPaintContourMeshes = () => [],
     sanitizePolyline = (line) => (Array.isArray(line) ? line : []),
     scheduleDeferredHeavyBorderMeshes = () => {},
     reconcileDetailAdmBorders = () => {},
@@ -382,7 +381,7 @@ export function createBorderDrawOwner({
     const parentColor = getSafeCanvasColor(parent.color, "#4b5563");
     const provinceMeshTransform = getBoundaryMeshTransform("internal-province", k);
     const localMeshTransform = getBoundaryMeshTransform("internal-local", k);
-    const empireMeshTransform = getBoundaryMeshTransform("empire", k);
+    const empireMeshTransform = null; // preserve the exact outline of small painted regions
     const coastlineMeshTransform = getBoundaryMeshTransform("coastline", k);
 
     const empireWidthBase = Number(empire.width) || 1;
@@ -409,40 +408,9 @@ export function createBorderDrawOwner({
       0,
       1
     );
-    const scenarioOwnerOnlyBorders =
-      !!state.activeScenarioId && state.scenarioBorderMode === "scenario_owner_only";
-    // scenario_owner_only 模式只接受动态 owner mesh 或启动期 opening owner mesh；
-    // 这保证剧本边界完整性优先于 canonical 国家边界的视觉兜底。
-    const dynamicOwnerMeshes =
-      isDynamicBordersEnabled() && isUsableMesh(state.cachedDynamicOwnerBorders)
-        ? [state.cachedDynamicOwnerBorders]
-        : null;
-    const openingOwnerMeshes =
-      scenarioOwnerOnlyBorders
-      && !isDynamicBordersEnabled()
-      && isUsableMesh(state.cachedScenarioOpeningOwnerBorders)
-        ? [state.cachedScenarioOpeningOwnerBorders]
-        : null;
-    let empireMeshes = dynamicOwnerMeshes || state.cachedCountryBorders;
-    const shouldReportScenarioOwnerOnlyGap =
-      !state.scenarioApplyInFlight
-      && !state.startupReadonly
-      && !state.startupReadonlyUnlockInFlight
-      && !state.detailPromotionInFlight
-      && !!state.detailPromotionCompleted;
-    if (scenarioOwnerOnlyBorders) {
-      empireMeshes = dynamicOwnerMeshes || openingOwnerMeshes || null;
-      if (!dynamicOwnerMeshes && !openingOwnerMeshes && state.cachedCountryBorders?.length && shouldReportScenarioOwnerOnlyGap) {
-        const scenarioId = String(state.activeScenarioId || "").trim() || "(unknown)";
-        const warnings = getScenarioOwnerOnlyCanonicalFallbackWarnings();
-        if (!warnings.has(scenarioId)) {
-          warnings.add(scenarioId);
-          console.warn(
-            `[map_renderer] scenario_owner_only borders unavailable for scenario=${scenarioId}; canonical country-border fallback suppressed to preserve scenario integrity.`
-          );
-        }
-      }
-    }
+    // An empty contour mesh is a valid result (same-color land or pending
+    // geometry). Never substitute old owner/canonical borders for that result.
+    const empireMeshes = getPaintContourMeshes();
 
     if (interactive) {
       const countryWidth = (empireWidthBase * 0.95) / kDenom;

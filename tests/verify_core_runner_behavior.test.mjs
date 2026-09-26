@@ -2309,6 +2309,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ...(includeRenderer ? ["node-test:tests/legend_manager_generation_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/map_data_boundary_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/ownership_retirement_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/paint_contour_graph_behavior.test.mjs", "node-test:tests/paint_contour_runtime_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/palette_library_operation_behavior.test.mjs", "node-test:tests/palette_library_operation_boundary.test.mjs", "node-test:tests/parent_border_grouping_policy_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/physical_contour_visible_set_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/political_derived_state_cache_behavior.test.mjs"] : []),
@@ -3780,11 +3781,16 @@ test("local action and border feedback uses existing behavior leaves without pha
     const local = constrainAdaptiveEntrypointSelection(recommendation, "edit", { preparedCatalog });
     assert.deepEqual(local.localEntrypointRouteGaps, [], file);
     const hasBorrowedStorageRoute = file === "js/core/renderer/border_mesh_owner.js";
-    assert.equal(local.recommendedCommands.length, hasBorrowedStorageRoute ? 2 : 1, file);
+    const hasPaintContourRoute = file === "js/core/renderer/border_draw_owner.js";
+    assert.equal(local.recommendedCommands.length, hasBorrowedStorageRoute || hasPaintContourRoute ? 2 : 1, file);
+    assert.equal(local.recommendedCommands.some((command) => command.commandRef ===
+      "test:node:ownership-retirement"), hasPaintContourRoute, file);
     assert.equal(local.recommendedCommands.some((command) => command.commandRef ===
       "node --test tests/state_owner_borrowed_storage_behavior.test.mjs"), hasBorrowedStorageRoute, file);
     for (const command of local.recommendedCommands) {
-      assert.match(command.commandRef, /^node --test tests\/.*_behavior.test.mjs$/);
+      if (command.commandRef !== "test:node:ownership-retirement") {
+        assert.match(command.commandRef, /^node --test tests\/.*_behavior.test.mjs$/);
+      }
       assert.equal(command.executionOwner, "child-safe");
       assert.deepEqual(command.resourceLocks, []);
     }
