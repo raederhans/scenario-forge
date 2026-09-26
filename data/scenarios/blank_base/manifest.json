@@ -34,7 +34,7 @@
   "scenario_id": "blank_base",
   "snapshot_fingerprint": "46c702dfd29f8d23f4e5b9260baa85eeffbc2e8cc9bfd97e400c5eb42542b6dc",
   "source": {
-    "base_topology_sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
+    "base_topology_sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "runtime_topology_sha256": "ffe47c9e06585ca4ce7167358024584899d59914d7ac711e0d1dfb3d8ad8cd1e"
   },

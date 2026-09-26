@@ -1,0 +1,20 @@
+# 进度
+
+- [x] 只读盘点与隔离工作区。
+- [x] 上游查询证实缺失命名海区与八个外洋分区。
+- [x] 共享来源与离线生成入口。
+- [x] 基础和 TNO 资产、旧 ID 与颜色继承兼容。
+- [x] 目标测试、数据契约、浏览器交互与打包。
+- [x] 结果与整合说明。
+
+基础水域77→167：外洋5→13、命名宏区41→71、细分区0→52；31个湖泊/地中海要素保持原解码内容。TNO149→160，新增11命名海域，原20外洋分区ID保留。两级基础拓扑及TNO共78个受保护要素逐项完全一致，非水对象也经构建器解码核对。
+
+验证：Python几何/层级31项；极区12项；Node运行时/颜色22项；TNO水域73项；数据目录19项（18项首轮通过，目录计数668的展示同步后对应1项重跑通过）；Playwright真实页面2项；六剧本严格契约均通过；data health通过，仅既有大文件治理警告。
+
+真实页面已验证：旧父区颜色继承、新外洋分区独立填色/撤销、基础与TNO极区/日期线命中、TNO外洋选择和填色。修复了旧外洋 interactive:false 在用户开启外洋开关后仍被禁止选择的问题。
+
+基础拓扑17.42MiB，细节拓扑75.18MiB；完整Pages产物697.62MiB，低于1024MiB gate。两个新增来源文件仅用于构建，不加入站点运行时资源清单。
+
+实施位置：C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator；分支codex/ocean-refinement。主工作区原有UI/Atlantropa WIP未修改；未合并、推送或线上发布。
+
+可复用入口：tools/build_marine_refinement_sources.py（默认离线，--refresh显式刷新19项来源）；tools/rebuild_water_geometry.py --refine-marine --stage-root .runtime/<new-stage>（先暂存并验证，再按outputs.json核对输入与采用五个输出）；tools/sync_marine_refinement.py（水域分块与依赖启动资产同步，保留政治分块）；最后执行严格契约和数据目录检查。

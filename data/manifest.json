@@ -1,21 +1,45 @@
 {
-  "version": 1,
   "generated_at": "2026-09-11T02:47:14.044292+00:00",
   "outputs": {
+    "city_aliases.json": {
+      "alias_count": 189255,
+      "ambiguous_alias_count": 3935,
+      "artifact_class": "publish",
+      "description": "City alias lookup generated from world city build outputs.",
+      "entry_count": 21338,
+      "owner": "init_map_data.world_cities",
+      "role": "city_aliases",
+      "sha256": "3238cc9f943a3f56c8e1040aa1ee3d629e0d05bbfe9b0788e5eb0acb833f0618",
+      "size_bytes": 31116634,
+      "type": "city_aliases"
+    },
+    "city_lights/modern_source_descriptor.json": {
+      "artifact_class": "source_descriptor",
+      "description": "Production source identity, provenance, licensing, and grid contract for modern city lights.",
+      "input_attestation": "not_attested",
+      "input_identity_status": "unavailable",
+      "owner": "source_authority.city_lights_modern_descriptor",
+      "role": "modern_city_lights_source_descriptor",
+      "schema_ref": "schema://city_lights/source_descriptor/v1",
+      "sha256": "1376c8bf53ac0049cfe4443ecd42531f72dd2ec62c60a141b9b26afb8086b0ec",
+      "size_bytes": 1118,
+      "source_id": "nasa_black_marble_2016_3km_gray",
+      "type": "modern_city_lights_source_descriptor"
+    },
+    "country_feature_policies.json": {
+      "artifact_class": "manual",
+      "description": "Manual country policy table for subdivision protection and country gate thresholds.",
+      "owner": "data/country_feature_policies.json",
+      "role": "country_feature_policies",
+      "sha256": "36a4b57a9eaecfb597da69ec06e2c1bba9c65241306022b0061481d35d001084",
+      "size_bytes": 19049
+    },
     "europe_topology.json": {
-      "role": "primary_topology",
+      "arc_count": 243010,
+      "arc_point_count": 1276136,
       "artifact_class": "derived",
-      "owner": "init_map_data.primary_topology_bundle",
       "description": "Primary political topology emitted by the coarse GIS pipeline.",
-      "size_bytes": 7438093,
-      "sha256": "32f36b22a6027fc50b56efbdcc9516a9d94b6f930332973e2bf4e2f155f999a5",
-      "schema_ref": "schema://topology/political_bundle_v1",
-      "simplification": "coarse_publish_v1",
-      "target_zoom_range": [
-        0,
-        1.7
-      ],
-      "type": "topology",
+      "has_computed_neighbors": true,
       "object_names": [
         "land",
         "ocean",
@@ -26,27 +50,27 @@
         "urban",
         "water_regions"
       ],
+      "owner": "init_map_data.primary_topology_bundle",
       "political_geometries": 209,
-      "has_computed_neighbors": true,
-      "arc_count": 64410,
-      "arc_point_count": 516842,
-      "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 0
-    },
-    "europe_topology.na_v1.json": {
-      "role": "detail_topology_na_v1",
-      "artifact_class": "derived",
-      "owner": "init_map_data.detail_topology",
-      "description": "Legacy North America detail topology checkpoint.",
-      "size_bytes": 8569107,
-      "sha256": "e7f423f07204a9f863bd63f6d068a8ea304222774dfbc9700bfd8814fd24fecd",
-      "schema_ref": "schema://topology/detail_political_bundle_v1",
-      "simplification": "detail_publish_legacy_v1",
+      "raw_world_bounds_geometries": 0,
+      "role": "primary_topology",
+      "schema_ref": "schema://topology/political_bundle_v1",
+      "sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
+      "simplification": "coarse_publish_v1",
+      "size_bytes": 18267182,
       "target_zoom_range": [
-        1.7,
-        20
+        0,
+        1.7
       ],
       "type": "topology",
+      "world_bounds_geometries": 0
+    },
+    "europe_topology.na_v1.json": {
+      "arc_count": 120462,
+      "arc_point_count": 533080,
+      "artifact_class": "derived",
+      "description": "Legacy North America detail topology checkpoint.",
+      "has_computed_neighbors": false,
       "object_names": [
         "land",
         "ocean",
@@ -56,27 +80,27 @@
         "special_zones",
         "urban"
       ],
-      "political_geometries": 10542,
-      "has_computed_neighbors": false,
-      "arc_count": 120462,
-      "arc_point_count": 533080,
-      "world_bounds_geometries": 1,
-      "raw_world_bounds_geometries": 64
-    },
-    "europe_topology.na_v2.json": {
-      "role": "detail_topology_na_v2",
-      "artifact_class": "derived",
       "owner": "init_map_data.detail_topology",
-      "description": "Current detail political topology used for runtime enrichment.",
-      "size_bytes": 45514380,
-      "sha256": "a8d997584b0357e90f8810c98cbc8191c126a6003d2bd290babffb127c2e0739",
-      "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "simplification": "detail_publish_v2",
+      "political_geometries": 10542,
+      "raw_world_bounds_geometries": 64,
+      "role": "detail_topology_na_v1",
+      "schema_ref": "schema://topology/detail_political_bundle_v1",
+      "sha256": "e7f423f07204a9f863bd63f6d068a8ea304222774dfbc9700bfd8814fd24fecd",
+      "simplification": "detail_publish_legacy_v1",
+      "size_bytes": 8569107,
       "target_zoom_range": [
         1.7,
         20
       ],
       "type": "topology",
+      "world_bounds_geometries": 1
+    },
+    "europe_topology.na_v2.json": {
+      "arc_count": 367411,
+      "arc_point_count": 1711013,
+      "artifact_class": "derived",
+      "description": "Current detail political topology used for runtime enrichment.",
+      "has_computed_neighbors": true,
       "object_names": [
         "land",
         "ocean",
@@ -87,1472 +111,1458 @@
         "urban",
         "water_regions"
       ],
+      "owner": "init_map_data.detail_topology",
       "political_geometries": 22527,
-      "has_computed_neighbors": true,
-      "arc_count": 188806,
-      "arc_point_count": 948210,
-      "world_bounds_geometries": 11,
-      "raw_world_bounds_geometries": 44
-    },
-    "europe_topology.runtime_political_v1.json": {
-      "role": "runtime_political_topology",
-      "artifact_class": "publish",
-      "owner": "init_map_data.runtime_political_topology",
-      "description": "Unified runtime political topology consumed by the app and scenarios.",
-      "size_bytes": 14128976,
-      "sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
-      "schema_ref": "schema://topology/runtime_political_v1",
-      "simplification": "runtime_projection_v1",
+      "raw_world_bounds_geometries": 44,
+      "role": "detail_topology_na_v2",
+      "schema_ref": "schema://topology/detail_political_bundle_v2",
+      "sha256": "4509828231ff51ecaeb288924d246daba22318663d998f2c9ba38e0a3fd73b41",
+      "simplification": "detail_publish_v2",
+      "size_bytes": 78835216,
       "target_zoom_range": [
         1.7,
         20
       ],
       "type": "topology",
+      "world_bounds_geometries": 11
+    },
+    "europe_topology.runtime_political_v1.json": {
+      "arc_count": 147909,
+      "arc_point_count": 618868,
+      "artifact_class": "publish",
+      "description": "Unified runtime political topology consumed by the app and scenarios.",
+      "has_computed_neighbors": true,
       "object_names": [
         "political"
       ],
+      "owner": "init_map_data.runtime_political_topology",
       "political_geometries": 23426,
-      "has_computed_neighbors": true,
-      "arc_count": 147909,
-      "arc_point_count": 618868,
-      "world_bounds_geometries": 177,
-      "raw_world_bounds_geometries": 527
+      "raw_world_bounds_geometries": 527,
+      "role": "runtime_political_topology",
+      "schema_ref": "schema://topology/runtime_political_v1",
+      "sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
+      "simplification": "runtime_projection_v1",
+      "size_bytes": 14128976,
+      "target_zoom_range": [
+        1.7,
+        20
+      ],
+      "type": "topology",
+      "world_bounds_geometries": 177
     },
-    "global_physical_semantics.topo.json": {
-      "role": "physical_semantics_topology",
+    "geo_aliases.json": {
+      "alias_count": 48351,
       "artifact_class": "publish",
+      "conflict_count": 0,
+      "description": "Canonical geographic alias index.",
+      "entry_count": 22527,
+      "owner": "init_map_data.hierarchy_locales",
+      "role": "geo_aliases",
+      "sha256": "849b43f252e5781a5c348c64c6b3133e41c5e81df63b62648558b7fea018547b",
+      "size_bytes": 10132858,
+      "type": "geo_aliases"
+    },
+    "global_contours.major.topo.json": {
+      "arc_count": 16411,
+      "arc_point_count": 221202,
+      "artifact_class": "publish",
+      "description": "Major contour topology published for runtime relief rendering.",
+      "has_computed_neighbors": false,
+      "object_names": [
+        "contours"
+      ],
       "owner": "init_map_data.primary_topology_bundle",
-      "description": "Physical semantics topology shipped with the runtime bundle.",
-      "size_bytes": 729934,
-      "sha256": "d1416c4897fbedce563408de7365c2af9bd67a2df8748a0984a787cf3140d3e5",
-      "schema_ref": "schema://topology/physical_semantics_v1",
-      "simplification": "semantic_dissolve_v1",
+      "political_geometries": 0,
+      "raw_world_bounds_geometries": 0,
+      "role": "terrain_contours_major_topology",
+      "schema_ref": "schema://topology/terrain_contours_major_v1",
+      "sha256": "2787e99490aa7a5f62b91b3c4e61212efe9e4706c14e38243e469a65249d60a5",
+      "simplification": "contour_major_publish_v1",
+      "size_bytes": 3381519,
       "target_zoom_range": [
         0,
         20
       ],
       "type": "topology",
+      "world_bounds_geometries": 0
+    },
+    "global_contours.minor.topo.json": {
+      "arc_count": 198350,
+      "arc_point_count": 1423560,
+      "artifact_class": "publish",
+      "description": "Minor contour topology published for runtime relief rendering.",
+      "has_computed_neighbors": false,
+      "object_names": [
+        "contours"
+      ],
+      "owner": "init_map_data.primary_topology_bundle",
+      "political_geometries": 0,
+      "raw_world_bounds_geometries": 0,
+      "role": "terrain_contours_minor_topology",
+      "schema_ref": "schema://topology/terrain_contours_minor_v1",
+      "sha256": "eaccca87418f8a36792c5d8b2b644fe2de82c756c6257a9050440e8ef5376e0f",
+      "simplification": "contour_minor_publish_v1",
+      "size_bytes": 20712299,
+      "target_zoom_range": [
+        0,
+        20
+      ],
+      "type": "topology",
+      "world_bounds_geometries": 0
+    },
+    "global_lakes.geojson": {
+      "artifact_class": "derived",
+      "description": "Shared simplified global inland waters, excluding scenario-only Congo Lake.",
+      "feature_count": 1355,
+      "owner": "tools/build_global_lakes.py",
+      "role": "context_layer",
+      "schema_ref": "schema://geojson/feature_collection/polygon/v1",
+      "sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b",
+      "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved",
+      "size_bytes": 2381103,
+      "type": "geojson"
+    },
+    "global_physical_semantics.topo.json": {
+      "arc_count": 5991,
+      "arc_point_count": 35367,
+      "artifact_class": "publish",
+      "description": "Physical semantics topology shipped with the runtime bundle.",
+      "has_computed_neighbors": false,
       "object_names": [
         "physical_semantics"
       ],
-      "political_geometries": 0,
-      "has_computed_neighbors": false,
-      "arc_count": 5991,
-      "arc_point_count": 35367,
-      "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 0
-    },
-    "global_contours.major.topo.json": {
-      "role": "terrain_contours_major_topology",
-      "artifact_class": "publish",
       "owner": "init_map_data.primary_topology_bundle",
-      "description": "Major contour topology published for runtime relief rendering.",
-      "size_bytes": 3381519,
-      "sha256": "2787e99490aa7a5f62b91b3c4e61212efe9e4706c14e38243e469a65249d60a5",
-      "schema_ref": "schema://topology/terrain_contours_major_v1",
-      "simplification": "contour_major_publish_v1",
+      "political_geometries": 0,
+      "raw_world_bounds_geometries": 0,
+      "role": "physical_semantics_topology",
+      "schema_ref": "schema://topology/physical_semantics_v1",
+      "sha256": "d1416c4897fbedce563408de7365c2af9bd67a2df8748a0984a787cf3140d3e5",
+      "simplification": "semantic_dissolve_v1",
+      "size_bytes": 729934,
       "target_zoom_range": [
         0,
         20
       ],
       "type": "topology",
-      "object_names": [
-        "contours"
-      ],
-      "political_geometries": 0,
-      "has_computed_neighbors": false,
-      "arc_count": 16411,
-      "arc_point_count": 221202,
-      "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 0
-    },
-    "global_contours.minor.topo.json": {
-      "role": "terrain_contours_minor_topology",
-      "artifact_class": "publish",
-      "owner": "init_map_data.primary_topology_bundle",
-      "description": "Minor contour topology published for runtime relief rendering.",
-      "size_bytes": 20712299,
-      "sha256": "eaccca87418f8a36792c5d8b2b644fe2de82c756c6257a9050440e8ef5376e0f",
-      "schema_ref": "schema://topology/terrain_contours_minor_v1",
-      "simplification": "contour_minor_publish_v1",
-      "target_zoom_range": [
-        0,
-        20
-      ],
-      "type": "topology",
-      "object_names": [
-        "contours"
-      ],
-      "political_geometries": 0,
-      "has_computed_neighbors": false,
-      "arc_count": 198350,
-      "arc_point_count": 1423560,
-      "world_bounds_geometries": 0,
-      "raw_world_bounds_geometries": 0
-    },
-    "hierarchy.json": {
-      "role": "hierarchy",
-      "artifact_class": "publish",
-      "owner": "init_map_data.hierarchy_locales",
-      "description": "Hierarchy and grouping data consumed by scenario and inspector flows.",
-      "size_bytes": 553825,
-      "sha256": "0361ae3adaffce99b3ceb3f02add63b9e8f41caca7bd653f08e90343b3ce433d",
-      "type": "hierarchy",
-      "group_count": 1521,
-      "child_count": 10085
-    },
-    "geo_aliases.json": {
-      "role": "geo_aliases",
-      "artifact_class": "publish",
-      "owner": "init_map_data.hierarchy_locales",
-      "description": "Canonical geographic alias index.",
-      "size_bytes": 10132858,
-      "sha256": "849b43f252e5781a5c348c64c6b3133e41c5e81df63b62648558b7fea018547b",
-      "type": "geo_aliases",
-      "entry_count": 22527,
-      "alias_count": 48351,
-      "conflict_count": 0
-    },
-    "world_cities.geojson": {
-      "role": "world_cities",
-      "artifact_class": "publish",
-      "owner": "init_map_data.world_cities",
-      "description": "Published world city dataset with stable feature links.",
-      "size_bytes": 24980735,
-      "sha256": "7ae6c36d667a787e7b52421ba5515ff850719850622ea12a0c55ccd7359fd30e",
-      "type": "world_cities",
-      "feature_count": 21338,
-      "country_capital_count": 233,
-      "attached_feature_count": 21242,
-      "attached_urban_count": 8107
-    },
-    "city_aliases.json": {
-      "role": "city_aliases",
-      "artifact_class": "publish",
-      "owner": "init_map_data.world_cities",
-      "description": "City alias lookup generated from world city build outputs.",
-      "size_bytes": 31116634,
-      "sha256": "3238cc9f943a3f56c8e1040aa1ee3d629e0d05bbfe9b0788e5eb0acb833f0618",
-      "type": "city_aliases",
-      "entry_count": 21338,
-      "alias_count": 189255,
-      "ambiguous_alias_count": 3935
-    },
-    "locales.json": {
-      "role": "locales",
-      "artifact_class": "publish",
-      "owner": "init_map_data.hierarchy_locales",
-      "description": "Published locale bundle for UI and geo labels.",
-      "size_bytes": 8467060,
-      "sha256": "aac63a847cea56383ea6a944c3a321aee255f8903cc1e5ee01c4242edfbb1f67",
-      "type": "locales",
-      "geo_entry_count": 73684,
-      "ui_entry_count": 1870
-    },
-    "country_feature_policies.json": {
-      "role": "country_feature_policies",
-      "artifact_class": "manual",
-      "owner": "data/country_feature_policies.json",
-      "description": "Manual country policy table for subdivision protection and country gate thresholds.",
-      "size_bytes": 19049,
-      "sha256": "36a4b57a9eaecfb597da69ec06e2c1bba9c65241306022b0061481d35d001084"
-    },
-    "runtime_asset_registry.json": {
-      "role": "runtime_asset_registry",
-      "artifact_class": "manual",
-      "owner": "data/runtime_asset_registry.json",
-      "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
-      "size_bytes": 27434,
-      "sha256": "b77433836e6897315120e5babc2ef1ad7f6367414bf95400f83bfb1331a67123"
-    },
-    "palettes/index.json": {
-      "role": "palette_registry",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "Palette registry exposed to runtime and scenario builders.",
-      "size_bytes": 1705,
-      "sha256": "8a4ae8e4b9ef28de55cfaca852bb336f6c72262e783912a8ec76e82df00ba608",
-      "type": "palette_registry",
-      "default_palette_id": "hoi4_vanilla",
-      "palette_count": 5
-    },
-    "palettes/hoi4_vanilla.palette.json": {
-      "role": "palette_pack",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "HOI4 vanilla palette pack.",
-      "size_bytes": 203719,
-      "sha256": "a1c6e52e3c87de2399f2c9cfaeecf889fa3a1603414dcacc0b9c448b418f5578",
-      "type": "palette_pack",
-      "palette_id": "hoi4_vanilla",
-      "entry_count": 427,
-      "quick_tag_count": 24
-    },
-    "palettes/kaiserreich.palette.json": {
-      "role": "palette_pack",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "Kaiserreich palette pack.",
-      "size_bytes": 149011,
-      "sha256": "d3f6fe0ac7ddfe1aaeb7a0240c95906b64d77aa165b46962cfff751829986e6b",
-      "type": "palette_pack",
-      "palette_id": "kaiserreich",
-      "entry_count": 331,
-      "quick_tag_count": 23
-    },
-    "palettes/tno.palette.json": {
-      "role": "palette_pack",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "TNO palette pack.",
-      "size_bytes": 235007,
-      "sha256": "52388b21bfb0150155a7729d85852bf6463698ae56df17c106cf0c71cc105a83",
-      "type": "palette_pack",
-      "palette_id": "tno",
-      "entry_count": 511,
-      "quick_tag_count": 24
-    },
-    "palettes/red_flood.palette.json": {
-      "role": "palette_pack",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "Red Flood palette pack.",
-      "size_bytes": 140841,
-      "sha256": "41ac666be9ba6ed26a026968411ad5048bf3a6772667b3f7ff7ac632dab9215e",
-      "type": "palette_pack",
-      "palette_id": "red_flood",
-      "entry_count": 307,
-      "quick_tag_count": 23
-    },
-    "palettes/hgo.palette.json": {
-      "role": "palette_pack",
-      "artifact_class": "publish",
-      "owner": "init_map_data.palette_assets",
-      "description": "Historic Geographical Overhaul palette pack.",
-      "size_bytes": 826983,
-      "sha256": "174664e3f03b049fef32075d845635935b78cb49653e2b35a4e97c701448ca6a",
-      "type": "palette_pack",
-      "palette_id": "hgo",
-      "entry_count": 1284,
-      "quick_tag_count": 0
-    },
-    "palette-maps/hoi4_vanilla.map.json": {
-      "role": "palette_map",
-      "artifact_class": "manual",
-      "owner": "tools.import_country_palette",
-      "description": "Manual mapping layer for HOI4 vanilla palette import.",
-      "size_bytes": 33953,
-      "sha256": "614ff7479d969df05fc6926fd5599850616e0af4dc867b36e133a53dd2aaaa7d",
-      "type": "palette_map",
-      "palette_id": "hoi4_vanilla",
-      "mapped_count": 155,
-      "unmapped_count": 272
-    },
-    "palette-maps/kaiserreich.map.json": {
-      "role": "palette_map",
-      "artifact_class": "manual",
-      "owner": "tools.import_country_palette",
-      "description": "Manual mapping layer for Kaiserreich palette import.",
-      "size_bytes": 26822,
-      "sha256": "e230d3f51668baa87d1f12964ab4a4f3166be17dd63fb85b94814d5ed48b8971",
-      "type": "palette_map",
-      "palette_id": "kaiserreich",
-      "mapped_count": 127,
-      "unmapped_count": 204
-    },
-    "palette-maps/tno.map.json": {
-      "role": "palette_map",
-      "artifact_class": "manual",
-      "owner": "tools.import_country_palette",
-      "description": "Manual mapping layer for TNO palette import.",
-      "size_bytes": 38893,
-      "sha256": "82d9b83f743f37bb1891d13ff96d90ec1658f6d152acdbb86ca1762dcfbdfe3f",
-      "type": "palette_map",
-      "palette_id": "tno",
-      "mapped_count": 163,
-      "unmapped_count": 348
-    },
-    "palette-maps/red_flood.map.json": {
-      "role": "palette_map",
-      "artifact_class": "manual",
-      "owner": "tools.import_country_palette",
-      "description": "Manual mapping layer for Red Flood palette import.",
-      "size_bytes": 23917,
-      "sha256": "110e78028a91dc4cbfbf0f4103c007b071ecf79e353b281dc844a7fa1e6c4d13",
-      "type": "palette_map",
-      "palette_id": "red_flood",
-      "mapped_count": 110,
-      "unmapped_count": 197
-    },
-    "palette-maps/hgo.map.json": {
-      "role": "palette_map",
-      "artifact_class": "manual",
-      "owner": "tools.import_country_palette",
-      "description": "Catalog-only mapping layer for Historic Geographical Overhaul palette import.",
-      "size_bytes": 63979,
-      "sha256": "c2ac14271762285ea53202c65d695a8e5edc7081f242bf87737e24854cabebd9",
-      "type": "palette_map",
-      "palette_id": "hgo",
-      "mapped_count": 0,
-      "unmapped_count": 1284
-    },
-    "palette-maps/hoi4_vanilla.audit.json": {
-      "role": "palette_audit",
-      "artifact_class": "derived",
-      "owner": "init_map_data.palette_assets",
-      "description": "Generated audit for HOI4 vanilla palette mapping coverage.",
-      "size_bytes": 140010,
-      "sha256": "eb41535d7ddfb4399219e1df97d3b0d0855dab98d680399fee9ed111aa2e0e24",
-      "type": "palette_audit",
-      "palette_id": "hoi4_vanilla",
-      "entry_count": 427,
-      "mapped_count": 155,
-      "unmapped_count": 272
-    },
-    "palette-maps/kaiserreich.audit.json": {
-      "role": "palette_audit",
-      "artifact_class": "derived",
-      "owner": "init_map_data.palette_assets",
-      "description": "Generated audit for Kaiserreich palette mapping coverage.",
-      "size_bytes": 107146,
-      "sha256": "56a4fdbd0b06188bd20b63bd500ca7c2f60e7c3833f896d48e0fc895300ea7e5",
-      "type": "palette_audit",
-      "palette_id": "kaiserreich",
-      "entry_count": 331,
-      "mapped_count": 127,
-      "unmapped_count": 204
-    },
-    "palette-maps/tno.audit.json": {
-      "role": "palette_audit",
-      "artifact_class": "derived",
-      "owner": "init_map_data.palette_assets",
-      "description": "Generated audit for TNO palette mapping coverage.",
-      "size_bytes": 164409,
-      "sha256": "45502fdf49c9d66a3425add69396afac1fba2c36a4268f66b9211a077ca58095",
-      "type": "palette_audit",
-      "palette_id": "tno",
-      "entry_count": 511,
-      "mapped_count": 163,
-      "unmapped_count": 348
-    },
-    "palette-maps/red_flood.audit.json": {
-      "role": "palette_audit",
-      "artifact_class": "derived",
-      "owner": "init_map_data.palette_assets",
-      "description": "Generated audit for Red Flood palette mapping coverage.",
-      "size_bytes": 101053,
-      "sha256": "000a3a2e6c8d631af985e838d45f9f189406835ea4ff7fc58b73f4556469277e",
-      "type": "palette_audit",
-      "palette_id": "red_flood",
-      "entry_count": 307,
-      "mapped_count": 110,
-      "unmapped_count": 197
-    },
-    "palette-maps/hgo.audit.json": {
-      "role": "palette_audit",
-      "artifact_class": "derived",
-      "owner": "init_map_data.palette_assets",
-      "description": "Generated audit for Historic Geographical Overhaul palette mapping coverage.",
-      "size_bytes": 380867,
-      "sha256": "477e6d4a93bf1e8d3f571ff528bf108a96dc20bb1def45c319d4ac6ed7313a0b",
-      "type": "palette_audit",
-      "palette_id": "hgo",
-      "entry_count": 1284,
-      "mapped_count": 0,
-      "unmapped_count": 1284
-    },
-    "hgo_catalogs/index.json": {
-      "role": "hgo_tier_a_catalog",
-      "artifact_class": "derived",
-      "owner": "tools.build_hgo_flag_index",
-      "description": "Historic Geographical Overhaul Tier-A catalog index.",
-      "size_bytes": 1141,
-      "sha256": "a438604c7585b42092c7d83fe4f0b087adf1b8aca2ef822696eb9113ef31c46f"
-    },
-    "hgo_catalogs/hgo_place_names.json": {
-      "role": "hgo_place_names",
-      "artifact_class": "derived",
-      "owner": "tools.build_hgo_name_catalog",
-      "description": "Historic Geographical Overhaul reusable place-name catalog.",
-      "size_bytes": 5164039,
-      "sha256": "750a80293ae05d212dd4e0208d59d800647337a5dee9915f2eec530e2055f378"
+      "world_bounds_geometries": 0
     },
     "hgo_catalogs/hgo_flags.index.json": {
-      "role": "hgo_flags_index",
       "artifact_class": "derived",
-      "owner": "tools.build_hgo_flag_index",
       "description": "Historic Geographical Overhaul source-only flag index.",
-      "size_bytes": 1947346,
-      "sha256": "1accd58eecbe63524ca482955b898d41f650d752da724a935f04220ed7188658"
+      "owner": "tools.build_hgo_flag_index",
+      "role": "hgo_flags_index",
+      "sha256": "1accd58eecbe63524ca482955b898d41f650d752da724a935f04220ed7188658",
+      "size_bytes": 1947346
     },
     "hgo_catalogs/hgo_flags.png_manifest.json": {
-      "role": "hgo_flags_png_manifest",
       "artifact_class": "derived",
-      "owner": "tools.build_hgo_flag_png_catalog",
       "description": "Historic Geographical Overhaul authorized converted flag PNG manifest.",
-      "size_bytes": 4744356,
-      "sha256": "f799e1bde0e22cbfd86376f524cb8b6adc7756c18c829bde982f22209b72451d"
+      "owner": "tools.build_hgo_flag_png_catalog",
+      "role": "hgo_flags_png_manifest",
+      "sha256": "f799e1bde0e22cbfd86376f524cb8b6adc7756c18c829bde982f22209b72451d",
+      "size_bytes": 4744356
     },
     "hgo_catalogs/hgo_identity_aliases.json": {
-      "role": "hgo_identity_aliases",
       "artifact_class": "manual",
-      "owner": "hgo_identity_aliases.manual_review",
       "description": "Historic Geographical Overhaul manually reviewed identity alias catalog.",
-      "size_bytes": 1069,
-      "sha256": "65c06f5316893d7e44407e5283c62492a53c15ffe64d477c3944ce3599bbee7d"
+      "owner": "hgo_identity_aliases.manual_review",
+      "role": "hgo_identity_aliases",
+      "sha256": "65c06f5316893d7e44407e5283c62492a53c15ffe64d477c3944ce3599bbee7d",
+      "size_bytes": 1069
+    },
+    "hgo_catalogs/hgo_place_names.json": {
+      "artifact_class": "derived",
+      "description": "Historic Geographical Overhaul reusable place-name catalog.",
+      "owner": "tools.build_hgo_name_catalog",
+      "role": "hgo_place_names",
+      "sha256": "750a80293ae05d212dd4e0208d59d800647337a5dee9915f2eec530e2055f378",
+      "size_bytes": 5164039
+    },
+    "hgo_catalogs/index.json": {
+      "artifact_class": "derived",
+      "description": "Historic Geographical Overhaul Tier-A catalog index.",
+      "owner": "tools.build_hgo_flag_index",
+      "role": "hgo_tier_a_catalog",
+      "sha256": "a438604c7585b42092c7d83fe4f0b087adf1b8aca2ef822696eb9113ef31c46f",
+      "size_bytes": 1141
     },
     "hgo_runtime/manifest.json": {
-      "role": "hgo_runtime_manifest",
       "artifact_class": "derived",
-      "owner": "tools.build_hgo_runtime_assets",
+      "asset_count": 2,
       "description": "Historic Geographical Overhaul independent runtime asset manifest.",
-      "size_bytes": 2403,
-      "sha256": "b48a3c64e253a56faed6b682a48708363137f9aac1c3c09e2e48df5cb6357e36",
-      "schema_ref": "schema://hgo/runtime_manifest/v1",
-      "type": "hgo_runtime_manifest",
+      "owner": "tools.build_hgo_runtime_assets",
+      "role": "hgo_runtime_manifest",
       "runtime_id": "hgo_raster_runtime_assets",
+      "schema_ref": "schema://hgo/runtime_manifest/v1",
+      "sha256": "b48a3c64e253a56faed6b682a48708363137f9aac1c3c09e2e48df5cb6357e36",
+      "size_bytes": 2403,
       "source_id": "hgo_mod_2241701657",
-      "asset_count": 2
+      "type": "hgo_runtime_manifest"
     },
     "hgo_runtime/provinces.bmp": {
-      "role": "hgo_runtime_raster",
       "artifact_class": "derived",
-      "owner": "tools.build_hgo_runtime_assets",
-      "description": "Historic Geographical Overhaul province-color raster used by the independent runtime preview.",
-      "size_bytes": 39321654,
-      "sha256": "d353ea3b41ca98fd1029eae290b5a43cacce12e5d5603cd970d47f87398c49a2",
-      "schema_ref": "schema://bitmap/bmp_rgb24/v1",
-      "type": "hgo_runtime_raster",
-      "width": 5120,
-      "height": 2560,
       "bits_per_pixel": 24,
       "compression": 0,
-      "row_stride": 15360,
-      "pixel_data_offset": 54,
-      "top_down": false,
+      "description": "Historic Geographical Overhaul province-color raster used by the independent runtime preview.",
       "file_size_header": 39321654,
-      "image_size_header": 0
+      "height": 2560,
+      "image_size_header": 0,
+      "owner": "tools.build_hgo_runtime_assets",
+      "pixel_data_offset": 54,
+      "role": "hgo_runtime_raster",
+      "row_stride": 15360,
+      "schema_ref": "schema://bitmap/bmp_rgb24/v1",
+      "sha256": "d353ea3b41ca98fd1029eae290b5a43cacce12e5d5603cd970d47f87398c49a2",
+      "size_bytes": 39321654,
+      "top_down": false,
+      "type": "hgo_runtime_raster",
+      "width": 5120
     },
     "hgo_runtime/seed.json": {
-      "role": "hgo_runtime_seed",
       "artifact_class": "derived",
-      "owner": "tools.build_hgo_runtime_assets",
-      "description": "Historic Geographical Overhaul independent runtime seed built from mod source.",
-      "size_bytes": 9678303,
-      "sha256": "7bbf8cf338a4b9961f9c5f19217cc4b8df457463685e47cb051f77a475ff6e69",
-      "schema_ref": "schema://hgo/runtime_seed/v1",
-      "type": "hgo_runtime_seed",
-      "runtime_id": "hgo_raster_runtime_seed",
-      "source_id": "hgo_mod_2241701657",
-      "province_count": 20782,
-      "state_count": 11894,
       "country_count": 1431,
-      "mapped_province_count": 20781
+      "description": "Historic Geographical Overhaul independent runtime seed built from mod source.",
+      "mapped_province_count": 20781,
+      "owner": "tools.build_hgo_runtime_assets",
+      "province_count": 20782,
+      "role": "hgo_runtime_seed",
+      "runtime_id": "hgo_raster_runtime_seed",
+      "schema_ref": "schema://hgo/runtime_seed/v1",
+      "sha256": "7bbf8cf338a4b9961f9c5f19217cc4b8df457463685e47cb051f77a475ff6e69",
+      "size_bytes": 9678303,
+      "source_id": "hgo_mod_2241701657",
+      "state_count": 11894,
+      "type": "hgo_runtime_seed"
     },
-    "city_lights/modern_source_descriptor.json": {
-      "role": "modern_city_lights_source_descriptor",
-      "artifact_class": "source_descriptor",
-      "owner": "source_authority.city_lights_modern_descriptor",
-      "description": "Production source identity, provenance, licensing, and grid contract for modern city lights.",
-      "size_bytes": 1118,
-      "sha256": "1376c8bf53ac0049cfe4443ecd42531f72dd2ec62c60a141b9b26afb8086b0ec",
-      "schema_ref": "schema://city_lights/source_descriptor/v1",
-      "type": "modern_city_lights_source_descriptor",
-      "source_id": "nasa_black_marble_2016_3km_gray",
-      "input_identity_status": "unavailable",
-      "input_attestation": "not_attested"
+    "hierarchy.json": {
+      "artifact_class": "publish",
+      "child_count": 10085,
+      "description": "Hierarchy and grouping data consumed by scenario and inspector flows.",
+      "group_count": 1521,
+      "owner": "init_map_data.hierarchy_locales",
+      "role": "hierarchy",
+      "sha256": "0361ae3adaffce99b3ceb3f02add63b9e8f41caca7bd653f08e90343b3ce433d",
+      "size_bytes": 553825,
+      "type": "hierarchy"
+    },
+    "js/core/city_lights_historical_1930_asset.js": {
+      "artifact_class": "publish",
+      "description": "Generated 1930 historical city lights runtime asset.",
+      "owner": "init_map_data.city_lights_assets",
+      "role": "historical_1930_city_lights_asset",
+      "sha256": "c06b718dc02ea23e01d3c9ed1aa595667515fbe8b23b009bfd6aef1303c0fe65",
+      "size_bytes": 1704,
+      "stats": {
+        "adminCapitalCount": 1267,
+        "adminCapitalPopulationThreshold": 400000,
+        "calibrationVersion": "balanced-2026-04",
+        "countryCapitalCount": 230,
+        "entryCount": 1580,
+        "excludedCount": 6,
+        "maxWeight": 1,
+        "meanWeight": 0.5864,
+        "populationThreshold": 1200000
+      },
+      "type": "historical_1930_city_lights_asset"
     },
     "js/core/city_lights_modern_asset.js": {
-      "role": "modern_city_lights_asset",
       "artifact_class": "publish",
-      "owner": "init_map_data.city_lights_assets",
       "description": "Generated modern city lights runtime asset.",
-      "size_bytes": 834442,
-      "sha256": "d2438a7372c12411e048ea95fc55758fd4c95a1089547f54dd36258d60555dae",
-      "type": "modern_city_lights_asset",
-      "grid_width": 720,
       "grid_height": 360,
+      "grid_width": 720,
+      "owner": "init_map_data.city_lights_assets",
+      "role": "modern_city_lights_asset",
+      "sha256": "d2438a7372c12411e048ea95fc55758fd4c95a1089547f54dd36258d60555dae",
+      "size_bytes": 834442,
       "stats": {
         "max": 249,
         "nonzeroCount": 34568,
         "nonzeroMean": 79.825,
+        "nonzero_count": 34568,
+        "nonzero_mean": 79.825,
         "p50": 57,
         "p90": 183,
-        "p99": 203,
-        "nonzero_count": 34568,
-        "nonzero_mean": 79.825
-      }
+        "p99": 203
+      },
+      "type": "modern_city_lights_asset"
     },
-    "js/core/city_lights_historical_1930_asset.js": {
-      "role": "historical_1930_city_lights_asset",
+    "locales.json": {
       "artifact_class": "publish",
-      "owner": "init_map_data.city_lights_assets",
-      "description": "Generated 1930 historical city lights runtime asset.",
-      "size_bytes": 1704,
-      "sha256": "c06b718dc02ea23e01d3c9ed1aa595667515fbe8b23b009bfd6aef1303c0fe65",
-      "type": "historical_1930_city_lights_asset",
-      "stats": {
-        "entryCount": 1580,
-        "countryCapitalCount": 230,
-        "adminCapitalCount": 1267,
-        "excludedCount": 6,
-        "populationThreshold": 1200000,
-        "adminCapitalPopulationThreshold": 400000,
-        "calibrationVersion": "balanced-2026-04",
-        "maxWeight": 1,
-        "meanWeight": 0.5864
-      }
+      "description": "Published locale bundle for UI and geo labels.",
+      "geo_entry_count": 73684,
+      "owner": "init_map_data.hierarchy_locales",
+      "role": "locales",
+      "sha256": "aac63a847cea56383ea6a944c3a321aee255f8903cc1e5ee01c4242edfbb1f67",
+      "size_bytes": 8467060,
+      "type": "locales",
+      "ui_entry_count": 1870
+    },
+    "marine_regions.refined.source.geojson": {
+      "artifact_class": "derived",
+      "description": "Shared ordinary sea and source-backed ocean subdivisions before physical coast clipping.",
+      "owner": "tools/build_marine_refinement_sources.py",
+      "role": "marine_refinement_source",
+      "schema_ref": "schema://geojson/feature_collection/v1",
+      "sha256": "b81de47c67949111ab74fa0c9cde068a24b60c612bff2ea0c9afc2d7b4f4f505",
+      "size_bytes": 20594569,
+      "type": "geojson"
+    },
+    "palette-maps/hgo.audit.json": {
+      "artifact_class": "derived",
+      "description": "Generated audit for Historic Geographical Overhaul palette mapping coverage.",
+      "entry_count": 1284,
+      "mapped_count": 0,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "hgo",
+      "role": "palette_audit",
+      "sha256": "477e6d4a93bf1e8d3f571ff528bf108a96dc20bb1def45c319d4ac6ed7313a0b",
+      "size_bytes": 380867,
+      "type": "palette_audit",
+      "unmapped_count": 1284
+    },
+    "palette-maps/hgo.map.json": {
+      "artifact_class": "manual",
+      "description": "Catalog-only mapping layer for Historic Geographical Overhaul palette import.",
+      "mapped_count": 0,
+      "owner": "tools.import_country_palette",
+      "palette_id": "hgo",
+      "role": "palette_map",
+      "sha256": "c2ac14271762285ea53202c65d695a8e5edc7081f242bf87737e24854cabebd9",
+      "size_bytes": 63979,
+      "type": "palette_map",
+      "unmapped_count": 1284
+    },
+    "palette-maps/hoi4_vanilla.audit.json": {
+      "artifact_class": "derived",
+      "description": "Generated audit for HOI4 vanilla palette mapping coverage.",
+      "entry_count": 427,
+      "mapped_count": 155,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "hoi4_vanilla",
+      "role": "palette_audit",
+      "sha256": "eb41535d7ddfb4399219e1df97d3b0d0855dab98d680399fee9ed111aa2e0e24",
+      "size_bytes": 140010,
+      "type": "palette_audit",
+      "unmapped_count": 272
+    },
+    "palette-maps/hoi4_vanilla.map.json": {
+      "artifact_class": "manual",
+      "description": "Manual mapping layer for HOI4 vanilla palette import.",
+      "mapped_count": 155,
+      "owner": "tools.import_country_palette",
+      "palette_id": "hoi4_vanilla",
+      "role": "palette_map",
+      "sha256": "614ff7479d969df05fc6926fd5599850616e0af4dc867b36e133a53dd2aaaa7d",
+      "size_bytes": 33953,
+      "type": "palette_map",
+      "unmapped_count": 272
+    },
+    "palette-maps/kaiserreich.audit.json": {
+      "artifact_class": "derived",
+      "description": "Generated audit for Kaiserreich palette mapping coverage.",
+      "entry_count": 331,
+      "mapped_count": 127,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "kaiserreich",
+      "role": "palette_audit",
+      "sha256": "56a4fdbd0b06188bd20b63bd500ca7c2f60e7c3833f896d48e0fc895300ea7e5",
+      "size_bytes": 107146,
+      "type": "palette_audit",
+      "unmapped_count": 204
+    },
+    "palette-maps/kaiserreich.map.json": {
+      "artifact_class": "manual",
+      "description": "Manual mapping layer for Kaiserreich palette import.",
+      "mapped_count": 127,
+      "owner": "tools.import_country_palette",
+      "palette_id": "kaiserreich",
+      "role": "palette_map",
+      "sha256": "e230d3f51668baa87d1f12964ab4a4f3166be17dd63fb85b94814d5ed48b8971",
+      "size_bytes": 26822,
+      "type": "palette_map",
+      "unmapped_count": 204
+    },
+    "palette-maps/red_flood.audit.json": {
+      "artifact_class": "derived",
+      "description": "Generated audit for Red Flood palette mapping coverage.",
+      "entry_count": 307,
+      "mapped_count": 110,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "red_flood",
+      "role": "palette_audit",
+      "sha256": "000a3a2e6c8d631af985e838d45f9f189406835ea4ff7fc58b73f4556469277e",
+      "size_bytes": 101053,
+      "type": "palette_audit",
+      "unmapped_count": 197
+    },
+    "palette-maps/red_flood.map.json": {
+      "artifact_class": "manual",
+      "description": "Manual mapping layer for Red Flood palette import.",
+      "mapped_count": 110,
+      "owner": "tools.import_country_palette",
+      "palette_id": "red_flood",
+      "role": "palette_map",
+      "sha256": "110e78028a91dc4cbfbf0f4103c007b071ecf79e353b281dc844a7fa1e6c4d13",
+      "size_bytes": 23917,
+      "type": "palette_map",
+      "unmapped_count": 197
+    },
+    "palette-maps/tno.audit.json": {
+      "artifact_class": "derived",
+      "description": "Generated audit for TNO palette mapping coverage.",
+      "entry_count": 511,
+      "mapped_count": 163,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "tno",
+      "role": "palette_audit",
+      "sha256": "45502fdf49c9d66a3425add69396afac1fba2c36a4268f66b9211a077ca58095",
+      "size_bytes": 164409,
+      "type": "palette_audit",
+      "unmapped_count": 348
+    },
+    "palette-maps/tno.map.json": {
+      "artifact_class": "manual",
+      "description": "Manual mapping layer for TNO palette import.",
+      "mapped_count": 163,
+      "owner": "tools.import_country_palette",
+      "palette_id": "tno",
+      "role": "palette_map",
+      "sha256": "82d9b83f743f37bb1891d13ff96d90ec1658f6d152acdbb86ca1762dcfbdfe3f",
+      "size_bytes": 38893,
+      "type": "palette_map",
+      "unmapped_count": 348
+    },
+    "palettes/hgo.palette.json": {
+      "artifact_class": "publish",
+      "description": "Historic Geographical Overhaul palette pack.",
+      "entry_count": 1284,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "hgo",
+      "quick_tag_count": 0,
+      "role": "palette_pack",
+      "sha256": "174664e3f03b049fef32075d845635935b78cb49653e2b35a4e97c701448ca6a",
+      "size_bytes": 826983,
+      "type": "palette_pack"
+    },
+    "palettes/hoi4_vanilla.palette.json": {
+      "artifact_class": "publish",
+      "description": "HOI4 vanilla palette pack.",
+      "entry_count": 427,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "hoi4_vanilla",
+      "quick_tag_count": 24,
+      "role": "palette_pack",
+      "sha256": "a1c6e52e3c87de2399f2c9cfaeecf889fa3a1603414dcacc0b9c448b418f5578",
+      "size_bytes": 203719,
+      "type": "palette_pack"
+    },
+    "palettes/index.json": {
+      "artifact_class": "publish",
+      "default_palette_id": "hoi4_vanilla",
+      "description": "Palette registry exposed to runtime and scenario builders.",
+      "owner": "init_map_data.palette_assets",
+      "palette_count": 5,
+      "role": "palette_registry",
+      "sha256": "8a4ae8e4b9ef28de55cfaca852bb336f6c72262e783912a8ec76e82df00ba608",
+      "size_bytes": 1705,
+      "type": "palette_registry"
+    },
+    "palettes/kaiserreich.palette.json": {
+      "artifact_class": "publish",
+      "description": "Kaiserreich palette pack.",
+      "entry_count": 331,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "kaiserreich",
+      "quick_tag_count": 23,
+      "role": "palette_pack",
+      "sha256": "d3f6fe0ac7ddfe1aaeb7a0240c95906b64d77aa165b46962cfff751829986e6b",
+      "size_bytes": 149011,
+      "type": "palette_pack"
+    },
+    "palettes/red_flood.palette.json": {
+      "artifact_class": "publish",
+      "description": "Red Flood palette pack.",
+      "entry_count": 307,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "red_flood",
+      "quick_tag_count": 23,
+      "role": "palette_pack",
+      "sha256": "41ac666be9ba6ed26a026968411ad5048bf3a6772667b3f7ff7ac632dab9215e",
+      "size_bytes": 140841,
+      "type": "palette_pack"
+    },
+    "palettes/tno.palette.json": {
+      "artifact_class": "publish",
+      "description": "TNO palette pack.",
+      "entry_count": 511,
+      "owner": "init_map_data.palette_assets",
+      "palette_id": "tno",
+      "quick_tag_count": 24,
+      "role": "palette_pack",
+      "sha256": "52388b21bfb0150155a7729d85852bf6463698ae56df17c106cf0c71cc105a83",
+      "size_bytes": 235007,
+      "type": "palette_pack"
+    },
+    "quick_fill/china_prefecture_crosswalk.v1.json": {
+      "artifact_class": "derived",
+      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
+      "owner": "quick_fill_hierarchy",
+      "role": "quick_fill_prefecture_crosswalk",
+      "schema_ref": "schema://quick_fill/prefecture_crosswalk/v1",
+      "sha256": "0d1e3ddced1a878d122ef638d960df1c04c60d82789e5be5c87754f0e24eeacb",
+      "size_bytes": 154413,
+      "type": "json"
+    },
+    "quick_fill/reference/china-pca-2017.json": {
+      "artifact_class": "source",
+      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
+      "owner": "quick_fill_hierarchy",
+      "role": "quick_fill_china_reference",
+      "schema_ref": "schema://quick_fill/china_reference/v1",
+      "sha256": "3da1a40dd9395ac8a55673a41d2308b56f3e4fe3a6e55cc93fc55fefb1fba561",
+      "size_bytes": 138639,
+      "type": "json"
+    },
+    "runtime_asset_registry.json": {
+      "artifact_class": "manual",
+      "description": "Manual runtime asset registry shared by JS resolvers and build manifest generation.",
+      "owner": "data/runtime_asset_registry.json",
+      "role": "runtime_asset_registry",
+      "sha256": "b77433836e6897315120e5babc2ef1ad7f6367414bf95400f83bfb1331a67123",
+      "size_bytes": 27434
     },
     "thematic_layers/index.json": {
-      "role": "thematic_layer_catalog",
       "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
       "description": "Catalog for checked-in thematic layer manifests and fixture-only foundation layers.",
-      "size_bytes": 3478,
-      "sha256": "cc06c7abfced7b2c45eb2a174b94c8950748ff410ad6764c354dea6b23eea7ae",
+      "layer_count": 4,
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_layer_catalog",
       "schema_ref": "schema://thematic/layer_index/v1",
-      "type": "thematic_layer_index",
-      "layer_count": 4
-    },
-    "thematic_layers/source_recipes/wgi_state_capacity.manual.json": {
-      "role": "thematic_source_recipe",
-      "artifact_class": "manual",
-      "owner": "tools.build_thematic_layers",
-      "description": "Manual source recipe for future WGI-derived governance proxy thematic layers.",
-      "size_bytes": 1186,
-      "sha256": "bda6ca0230a8cac3f23d100114fc8b52c2fa21204048e6c9b3dc77a50f12a0e9",
-      "type": "thematic_source_recipe",
-      "recipe_id": "wgi_state_capacity_manual",
-      "source_family": "World Bank Worldwide Governance Indicators",
-      "source_policy": "fixture_only"
-    },
-    "thematic_layers/source_recipes/undp_hdi.manual.json": {
-      "role": "thematic_source_recipe",
-      "artifact_class": "manual",
-      "owner": "tools.build_thematic_layers",
-      "description": "Manual source recipe for future UNDP HDI-derived thematic layers.",
-      "size_bytes": 1042,
-      "sha256": "c66bd2bab5f9c12407b474d040416a3683f7039fe1b1209771e29c42e83acb8b",
-      "type": "thematic_source_recipe",
-      "recipe_id": "undp_hdi_manual",
-      "source_family": "UNDP Human Development Index",
-      "source_policy": "fixture_only"
-    },
-    "thematic_layers/source_recipes/population_density_grid.manual.json": {
-      "role": "thematic_source_recipe",
-      "artifact_class": "manual",
-      "owner": "tools.build_thematic_layers",
-      "description": "Manual source recipe for future population-density grid thematic layers.",
-      "size_bytes": 1531,
-      "sha256": "e818bc015f6e2e16adedfe5250c929bbe5eaa2c7c005e690019f1b9a27abe97a",
-      "type": "thematic_source_recipe",
-      "recipe_id": "population_density_grid_manual",
-      "source_family": "GHSL or WorldPop population grids",
-      "source_policy": "fixture_only"
-    },
-    "thematic_layers/political/state_capacity_demo/manifest.json": {
-      "role": "thematic_layer_manifest",
-      "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
-      "description": "Fixture-only admin0 state capacity thematic layer manifest.",
-      "size_bytes": 2579,
-      "sha256": "6adafd938257f5164beb6d61ae6f428104105462da2b2b283d0d70aea87623e5",
-      "schema_ref": "schema://thematic/layer_manifest/v1",
-      "type": "thematic_layer_manifest",
-      "layer_id": "political_state_capacity_demo",
-      "theme": "political",
-      "geometry_kind": "admin0"
-    },
-    "thematic_layers/political/state_capacity_demo/metrics.admin0.json": {
-      "role": "thematic_admin_metrics",
-      "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
-      "description": "Fixture-only admin0 state capacity metric values.",
-      "size_bytes": 10229,
-      "sha256": "5b8a600e10c210f5f90d6e2148b56bbb5524ae8e584f52d1ed4269e0f9a3eff4",
-      "schema_ref": "schema://thematic/admin_metrics/v1",
-      "type": "thematic_admin_metrics",
-      "layer_id": "political_state_capacity_demo",
-      "metric_count": 3,
-      "feature_count": 10
+      "sha256": "cc06c7abfced7b2c45eb2a174b94c8950748ff410ad6764c354dea6b23eea7ae",
+      "size_bytes": 3478,
+      "type": "thematic_layer_index"
     },
     "thematic_layers/political/state_capacity_demo/build_audit.json": {
-      "role": "thematic_build_audit",
       "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
       "description": "Build audit for fixture-only state capacity thematic layer.",
-      "size_bytes": 1229,
-      "sha256": "8e17f33622d983fff1fde85f2ecd89f7db2b4933c16675cddb97868a249bd33f",
-      "schema_ref": "schema://thematic/build_audit/v1",
-      "type": "thematic_build_audit",
       "layer_id": "political_state_capacity_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_build_audit",
+      "schema_ref": "schema://thematic/build_audit/v1",
+      "sha256": "8e17f33622d983fff1fde85f2ecd89f7db2b4933c16675cddb97868a249bd33f",
+      "size_bytes": 1229,
+      "type": "thematic_build_audit",
+      "warning_count": 1
+    },
+    "thematic_layers/political/state_capacity_demo/manifest.json": {
+      "artifact_class": "derived",
+      "description": "Fixture-only admin0 state capacity thematic layer manifest.",
+      "geometry_kind": "admin0",
+      "layer_id": "political_state_capacity_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_layer_manifest",
+      "schema_ref": "schema://thematic/layer_manifest/v1",
+      "sha256": "6adafd938257f5164beb6d61ae6f428104105462da2b2b283d0d70aea87623e5",
+      "size_bytes": 2579,
+      "theme": "political",
+      "type": "thematic_layer_manifest"
+    },
+    "thematic_layers/political/state_capacity_demo/metrics.admin0.json": {
+      "artifact_class": "derived",
+      "description": "Fixture-only admin0 state capacity metric values.",
+      "feature_count": 10,
+      "layer_id": "political_state_capacity_demo",
+      "metric_count": 3,
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_admin_metrics",
+      "schema_ref": "schema://thematic/admin_metrics/v1",
+      "sha256": "5b8a600e10c210f5f90d6e2148b56bbb5524ae8e584f52d1ed4269e0f9a3eff4",
+      "size_bytes": 10229,
+      "type": "thematic_admin_metrics"
+    },
+    "thematic_layers/political/wgi_state_capacity_v1/build_audit.json": {
+      "artifact_class": "derived",
+      "description": "Build audit for the World Bank WGI governance proxy thematic layer.",
+      "layer_id": "political_wgi_state_capacity_v1",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_build_audit",
+      "schema_ref": "schema://thematic/build_audit/v1",
+      "sha256": "dc9b5bad7a04ee659af371f8540b6734c213934ec2d615612cab865a8ca057e9",
+      "size_bytes": 6426,
+      "type": "thematic_build_audit",
+      "warning_count": 1
+    },
+    "thematic_layers/political/wgi_state_capacity_v1/manifest.json": {
+      "artifact_class": "derived",
+      "description": "World Bank WGI 2025 admin0 governance proxy thematic layer manifest.",
+      "geometry_kind": "admin0",
+      "layer_id": "political_wgi_state_capacity_v1",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_layer_manifest",
+      "schema_ref": "schema://thematic/layer_manifest/v1",
+      "sha256": "0e764d2a71a1d8bb318474ef0d686197fe7653e1491d46fa6fccec71c09b4460",
+      "size_bytes": 4222,
+      "theme": "political",
+      "type": "thematic_layer_manifest"
+    },
+    "thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json": {
+      "artifact_class": "derived",
+      "description": "World Bank WGI 2024 admin0 official dimension scores and project-defined proxy scores.",
+      "feature_count": 215,
+      "layer_id": "political_wgi_state_capacity_v1",
+      "metric_count": 3,
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_admin_metrics",
+      "schema_ref": "schema://thematic/admin_metrics/v1",
+      "sha256": "c55efe93ac5cc254d47737b5e8c3a2a15b47b3a78c79d7c56d3359307e390e9a",
+      "size_bytes": 653323,
+      "type": "thematic_admin_metrics"
+    },
+    "thematic_layers/population/population_density_demo/build_audit.json": {
+      "artifact_class": "derived",
+      "description": "Build audit for fixture-only population-density thematic layer.",
+      "layer_id": "population_density_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_build_audit",
+      "schema_ref": "schema://thematic/build_audit/v1",
+      "sha256": "4c5bb8d377991c5e3cb10d6ae266f13e9da8bf352e9d997af016174705fc021e",
+      "size_bytes": 1231,
+      "type": "thematic_build_audit",
+      "warning_count": 1
+    },
+    "thematic_layers/population/population_density_demo/grid.rle.json": {
+      "artifact_class": "derived",
+      "description": "Fixture-only 720x360 population-density RLE grid.",
+      "layer_id": "population_density_demo",
+      "owner": "tools.build_thematic_layers",
+      "rle_run_count": 397,
+      "role": "thematic_grid_rle",
+      "schema_ref": "schema://thematic/grid_rle/v1",
+      "sha256": "a2528a74906d50fa1d7791a8b842c3ce5f04da89a70677ad8cbfde3d9b660d0c",
+      "size_bytes": 13864,
+      "type": "thematic_grid_rle"
+    },
+    "thematic_layers/population/population_density_demo/manifest.json": {
+      "artifact_class": "derived",
+      "description": "Fixture-only 720x360 population-density thematic layer manifest.",
+      "geometry_kind": "grid_720x360",
+      "layer_id": "population_density_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_layer_manifest",
+      "schema_ref": "schema://thematic/layer_manifest/v1",
+      "sha256": "fa8e43efb8649bd8047be773cf83cfb594895214ee468d8f889b8dacd9ea034b",
+      "size_bytes": 3074,
+      "theme": "population",
+      "type": "thematic_layer_manifest"
+    },
+    "thematic_layers/social/human_development_demo/build_audit.json": {
+      "artifact_class": "derived",
+      "description": "Build audit for fixture-only human development thematic layer.",
+      "layer_id": "social_human_development_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_build_audit",
+      "schema_ref": "schema://thematic/build_audit/v1",
+      "sha256": "e3e0a90134260e9193f60bb1932a4d393c44522f16b2aad2769ab5b66bae9ae3",
+      "size_bytes": 1217,
+      "type": "thematic_build_audit",
       "warning_count": 1
     },
     "thematic_layers/social/human_development_demo/manifest.json": {
-      "role": "thematic_layer_manifest",
       "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
       "description": "Fixture-only admin0 human development thematic layer manifest.",
-      "size_bytes": 2492,
-      "sha256": "9fabb9f62af6d74a46f94226c05c27698a9271edd44775cb2de6ccf56f74b0b7",
-      "schema_ref": "schema://thematic/layer_manifest/v1",
-      "type": "thematic_layer_manifest",
+      "geometry_kind": "admin0",
       "layer_id": "social_human_development_demo",
+      "owner": "tools.build_thematic_layers",
+      "role": "thematic_layer_manifest",
+      "schema_ref": "schema://thematic/layer_manifest/v1",
+      "sha256": "9fabb9f62af6d74a46f94226c05c27698a9271edd44775cb2de6ccf56f74b0b7",
+      "size_bytes": 2492,
       "theme": "social",
-      "geometry_kind": "admin0"
+      "type": "thematic_layer_manifest"
     },
     "thematic_layers/social/human_development_demo/metrics.admin0.json": {
-      "role": "thematic_admin_metrics",
       "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
       "description": "Fixture-only admin0 human development metric values.",
-      "size_bytes": 10183,
-      "sha256": "ce8f8bb02c07872fd7c076eb406ff41f796a064ff85c1aa6b77a44fe9508b6bd",
-      "schema_ref": "schema://thematic/admin_metrics/v1",
-      "type": "thematic_admin_metrics",
+      "feature_count": 10,
       "layer_id": "social_human_development_demo",
       "metric_count": 3,
-      "feature_count": 10
-    },
-    "thematic_layers/social/human_development_demo/build_audit.json": {
-      "role": "thematic_build_audit",
-      "artifact_class": "derived",
       "owner": "tools.build_thematic_layers",
-      "description": "Build audit for fixture-only human development thematic layer.",
-      "size_bytes": 1217,
-      "sha256": "e3e0a90134260e9193f60bb1932a4d393c44522f16b2aad2769ab5b66bae9ae3",
-      "schema_ref": "schema://thematic/build_audit/v1",
-      "type": "thematic_build_audit",
-      "layer_id": "social_human_development_demo",
-      "warning_count": 1
+      "role": "thematic_admin_metrics",
+      "schema_ref": "schema://thematic/admin_metrics/v1",
+      "sha256": "ce8f8bb02c07872fd7c076eb406ff41f796a064ff85c1aa6b77a44fe9508b6bd",
+      "size_bytes": 10183,
+      "type": "thematic_admin_metrics"
     },
-    "thematic_layers/population/population_density_demo/manifest.json": {
-      "role": "thematic_layer_manifest",
-      "artifact_class": "derived",
+    "thematic_layers/source_recipes/population_density_grid.manual.json": {
+      "artifact_class": "manual",
+      "description": "Manual source recipe for future population-density grid thematic layers.",
       "owner": "tools.build_thematic_layers",
-      "description": "Fixture-only 720x360 population-density thematic layer manifest.",
-      "size_bytes": 3074,
-      "sha256": "fa8e43efb8649bd8047be773cf83cfb594895214ee468d8f889b8dacd9ea034b",
-      "schema_ref": "schema://thematic/layer_manifest/v1",
-      "type": "thematic_layer_manifest",
-      "layer_id": "population_density_demo",
-      "theme": "population",
-      "geometry_kind": "grid_720x360"
+      "recipe_id": "population_density_grid_manual",
+      "role": "thematic_source_recipe",
+      "sha256": "e818bc015f6e2e16adedfe5250c929bbe5eaa2c7c005e690019f1b9a27abe97a",
+      "size_bytes": 1531,
+      "source_family": "GHSL or WorldPop population grids",
+      "source_policy": "fixture_only",
+      "type": "thematic_source_recipe"
     },
-    "thematic_layers/population/population_density_demo/grid.rle.json": {
-      "role": "thematic_grid_rle",
-      "artifact_class": "derived",
+    "thematic_layers/source_recipes/undp_hdi.manual.json": {
+      "artifact_class": "manual",
+      "description": "Manual source recipe for future UNDP HDI-derived thematic layers.",
       "owner": "tools.build_thematic_layers",
-      "description": "Fixture-only 720x360 population-density RLE grid.",
-      "size_bytes": 13864,
-      "sha256": "a2528a74906d50fa1d7791a8b842c3ce5f04da89a70677ad8cbfde3d9b660d0c",
-      "schema_ref": "schema://thematic/grid_rle/v1",
-      "type": "thematic_grid_rle",
-      "layer_id": "population_density_demo",
-      "rle_run_count": 397
+      "recipe_id": "undp_hdi_manual",
+      "role": "thematic_source_recipe",
+      "sha256": "c66bd2bab5f9c12407b474d040416a3683f7039fe1b1209771e29c42e83acb8b",
+      "size_bytes": 1042,
+      "source_family": "UNDP Human Development Index",
+      "source_policy": "fixture_only",
+      "type": "thematic_source_recipe"
     },
-    "thematic_layers/population/population_density_demo/build_audit.json": {
-      "role": "thematic_build_audit",
-      "artifact_class": "derived",
+    "thematic_layers/source_recipes/wgi_state_capacity.manual.json": {
+      "artifact_class": "manual",
+      "description": "Manual source recipe for future WGI-derived governance proxy thematic layers.",
       "owner": "tools.build_thematic_layers",
-      "description": "Build audit for fixture-only population-density thematic layer.",
-      "size_bytes": 1231,
-      "sha256": "4c5bb8d377991c5e3cb10d6ae266f13e9da8bf352e9d997af016174705fc021e",
-      "schema_ref": "schema://thematic/build_audit/v1",
-      "type": "thematic_build_audit",
-      "layer_id": "population_density_demo",
-      "warning_count": 1
+      "recipe_id": "wgi_state_capacity_manual",
+      "role": "thematic_source_recipe",
+      "sha256": "bda6ca0230a8cac3f23d100114fc8b52c2fa21204048e6c9b3dc77a50f12a0e9",
+      "size_bytes": 1186,
+      "source_family": "World Bank Worldwide Governance Indicators",
+      "source_policy": "fixture_only",
+      "type": "thematic_source_recipe"
     },
     "thematic_layers/source_recipes/wgi_state_capacity_v1.manual.json": {
-      "role": "thematic_source_recipe",
       "artifact_class": "manual",
-      "owner": "tools.build_thematic_layers",
       "description": "Cache-only source recipe for the WGI 2025 governance proxy thematic layer.",
-      "size_bytes": 3218,
-      "sha256": "b68c337f0ec3f47d444b77326d60b91b046c257a8fecb86bf7757ae9f6045d99",
-      "type": "thematic_source_recipe",
+      "owner": "tools.build_thematic_layers",
       "recipe_id": "wgi_state_capacity_v1",
+      "role": "thematic_source_recipe",
+      "sha256": "b68c337f0ec3f47d444b77326d60b91b046c257a8fecb86bf7757ae9f6045d99",
+      "size_bytes": 3218,
       "source_family": "World Bank Worldwide Governance Indicators",
-      "source_policy": "real_source_cache_only"
+      "source_policy": "real_source_cache_only",
+      "type": "thematic_source_recipe"
     },
-    "thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json": {
-      "role": "thematic_admin_metrics",
-      "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
-      "description": "World Bank WGI 2024 admin0 official dimension scores and project-defined proxy scores.",
-      "size_bytes": 653323,
-      "sha256": "c55efe93ac5cc254d47737b5e8c3a2a15b47b3a78c79d7c56d3359307e390e9a",
-      "schema_ref": "schema://thematic/admin_metrics/v1",
-      "type": "thematic_admin_metrics",
-      "layer_id": "political_wgi_state_capacity_v1",
-      "metric_count": 3,
-      "feature_count": 215
-    },
-    "thematic_layers/political/wgi_state_capacity_v1/manifest.json": {
-      "role": "thematic_layer_manifest",
-      "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
-      "description": "World Bank WGI 2025 admin0 governance proxy thematic layer manifest.",
-      "size_bytes": 4222,
-      "sha256": "0e764d2a71a1d8bb318474ef0d686197fe7653e1491d46fa6fccec71c09b4460",
-      "schema_ref": "schema://thematic/layer_manifest/v1",
-      "type": "thematic_layer_manifest",
-      "layer_id": "political_wgi_state_capacity_v1",
-      "theme": "political",
-      "geometry_kind": "admin0"
-    },
-    "thematic_layers/political/wgi_state_capacity_v1/build_audit.json": {
-      "role": "thematic_build_audit",
-      "artifact_class": "derived",
-      "owner": "tools.build_thematic_layers",
-      "description": "Build audit for the World Bank WGI governance proxy thematic layer.",
-      "size_bytes": 6426,
-      "sha256": "dc9b5bad7a04ee659af371f8540b6734c213934ec2d615612cab865a8ca057e9",
-      "schema_ref": "schema://thematic/build_audit/v1",
-      "type": "thematic_build_audit",
-      "layer_id": "political_wgi_state_capacity_v1",
-      "warning_count": 1
-    },
-    "quick_fill/reference/china-pca-2017.json": {
-      "role": "quick_fill_china_reference",
-      "artifact_class": "source",
-      "owner": "quick_fill_hierarchy",
-      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
-      "size_bytes": 138639,
-      "sha256": "3da1a40dd9395ac8a55673a41d2308b56f3e4fe3a6e55cc93fc55fefb1fba561",
-      "schema_ref": "schema://quick_fill/china_reference/v1",
-      "type": "json"
-    },
-    "quick_fill/china_prefecture_crosswalk.v1.json": {
-      "role": "quick_fill_prefecture_crosswalk",
-      "artifact_class": "derived",
-      "owner": "quick_fill_hierarchy",
-      "description": "Pinned, geometry-free reference for audited quick-fill membership.",
-      "size_bytes": 154413,
-      "sha256": "0d1e3ddced1a878d122ef638d960df1c04c60d82789e5be5c87754f0e24eeacb",
-      "schema_ref": "schema://quick_fill/prefecture_crosswalk/v1",
-      "type": "json"
-    },
-    "global_lakes.geojson": {
-      "role": "context_layer",
-      "artifact_class": "derived",
-      "owner": "tools/build_global_lakes.py",
-      "description": "Shared simplified global inland waters, excluding scenario-only Congo Lake.",
-      "size_bytes": 2381103,
-      "sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b",
-      "schema_ref": "schema://geojson/feature_collection/polygon/v1",
-      "type": "geojson",
-      "feature_count": 1355,
-      "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved"
+    "world_cities.geojson": {
+      "artifact_class": "publish",
+      "attached_feature_count": 21242,
+      "attached_urban_count": 8107,
+      "country_capital_count": 233,
+      "description": "Published world city dataset with stable feature links.",
+      "feature_count": 21338,
+      "owner": "init_map_data.world_cities",
+      "role": "world_cities",
+      "sha256": "7ae6c36d667a787e7b52421ba5515ff850719850622ea12a0c55ccd7359fd30e",
+      "size_bytes": 24980735,
+      "type": "world_cities"
     }
   },
   "runtime_asset_registry": {
-    "schema_version": 1,
     "assets": {
+      "bathymetry:global_topology": {
+        "family_id": "global",
+        "role": "bathymetry_topology",
+        "url": "data/global_bathymetry.topo.json"
+      },
       "build_manifest": {
-        "url": "data/manifest.json",
+        "description": "Build output manifest consumed by startup cache and runtime asset hashing.",
         "role": "build_manifest",
-        "description": "Build output manifest consumed by startup cache and runtime asset hashing."
-      },
-      "country_feature_policies": {
-        "url": "data/country_feature_policies.json",
-        "role": "country_feature_policies",
-        "description": "Shared JS/Python display and gating policy table for country features."
-      },
-      "world_cities": {
-        "url": "data/world_cities.geojson",
-        "role": "world_cities"
+        "url": "data/manifest.json"
       },
       "city_aliases": {
-        "url": "data/city_aliases.json",
-        "role": "city_aliases"
-      },
-      "locales": {
-        "url": "data/locales.json",
-        "role": "locales"
-      },
-      "geo_aliases": {
-        "url": "data/geo_aliases.json",
-        "role": "geo_aliases"
-      },
-      "ru_city_overrides": {
-        "url": "data/ru_city_overrides.geojson",
-        "role": "city_overrides"
-      },
-      "special_zones": {
-        "url": "data/special_zones.geojson",
-        "role": "special_zones"
-      },
-      "runtime_political_topology": {
-        "url": "data/europe_topology.runtime_political_v1.json",
-        "role": "runtime_political_topology"
-      },
-      "context_layer:rivers": {
-        "url": "data/global_rivers.geojson",
-        "role": "context_layer",
-        "family_id": "rivers"
-      },
-      "context_layer:airports": {
-        "url": "data/transport_layers/global_airport/airports.geojson",
-        "role": "context_layer",
-        "family_id": "airports"
-      },
-      "context_layer:ports": {
-        "url": "data/transport_layers/global_port/ports.geojson",
-        "role": "context_layer",
-        "family_id": "ports"
-      },
-      "context_layer:physical": {
-        "url": "data/europe_physical.geojson",
-        "role": "context_layer",
-        "family_id": "physical"
-      },
-      "context_layer:urban": {
-        "url": "data/europe_urban.geojson",
-        "role": "context_layer",
-        "family_id": "urban"
-      },
-      "context_layer:physical_semantics": {
-        "url": "data/global_physical_semantics.topo.json",
-        "role": "context_layer",
-        "family_id": "physical_semantics"
-      },
-      "context_layer:physical_contours_major": {
-        "url": "data/global_contours.major.topo.json",
-        "role": "context_layer",
-        "family_id": "physical_contours_major"
-      },
-      "context_layer:physical_contours_minor": {
-        "url": "data/global_contours.minor.topo.json",
-        "role": "context_layer",
-        "family_id": "physical_contours_minor"
-      },
-      "transport_catalog:rail": {
-        "url": "data/transport_layers/global_rail/catalog.json",
-        "role": "transport_catalog",
-        "family_id": "rail"
-      },
-      "transport_catalog:road": {
-        "url": "data/transport_layers/global_road/catalog.json",
-        "role": "transport_catalog",
-        "family_id": "road"
-      },
-      "palette_registry": {
-        "url": "data/palettes/index.json",
-        "role": "palette_registry"
-      },
-      "hgo_tier_a_catalog": {
-        "url": "data/hgo_catalogs/index.json",
-        "role": "hgo_tier_a_catalog",
-        "family_id": "hgo"
-      },
-      "hgo_place_names": {
-        "url": "data/hgo_catalogs/hgo_place_names.json",
-        "role": "hgo_place_names",
-        "family_id": "hgo"
-      },
-      "hgo_palette_pack": {
-        "url": "data/palettes/hgo.palette.json",
-        "role": "palette_pack",
-        "family_id": "hgo"
-      },
-      "hgo_flags_png_manifest": {
-        "url": "data/hgo_catalogs/hgo_flags.png_manifest.json",
-        "role": "hgo_flags_png_manifest",
-        "family_id": "hgo"
-      },
-      "hgo_identity_aliases": {
-        "url": "data/hgo_catalogs/hgo_identity_aliases.json",
-        "role": "hgo_identity_aliases",
-        "family_id": "hgo"
-      },
-      "hgo_runtime_manifest": {
-        "url": "data/hgo_runtime/manifest.json",
-        "role": "hgo_runtime_manifest",
-        "family_id": "hgo"
-      },
-      "hgo_runtime_seed": {
-        "url": "data/hgo_runtime/seed.json",
-        "role": "hgo_runtime_seed",
-        "family_id": "hgo"
-      },
-      "hgo_runtime_provinces_bmp": {
-        "url": "data/hgo_runtime/provinces.bmp",
-        "role": "hgo_runtime_raster",
-        "family_id": "hgo"
-      },
-      "releasable_catalog": {
-        "url": "data/releasables/hoi4_vanilla.internal.phase1.catalog.json",
-        "role": "releasable_catalog"
-      },
-      "scenario_registry": {
-        "url": "data/scenarios/index.json",
-        "role": "scenario_registry",
-        "description": "Runtime scenario registry consumed by scenario boot and scenario picker flows."
-      },
-      "transport_manifest:road": {
-        "url": "data/transport_layers/japan_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "road"
-      },
-      "transport_manifest:rail": {
-        "url": "data/transport_layers/japan_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "rail"
-      },
-      "transport_manifest:airport": {
-        "url": "data/transport_layers/japan_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "airport"
-      },
-      "transport_manifest:port": {
-        "url": "data/transport_layers/japan_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "port"
-      },
-      "transport_manifest:mineral_resources": {
-        "url": "data/transport_layers/japan_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "mineral_resources"
-      },
-      "transport_manifest:energy_facilities": {
-        "url": "data/transport_layers/japan_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "energy_facilities"
-      },
-      "transport_manifest:industrial_zones": {
-        "url": "data/transport_layers/japan_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "industrial_zones"
-      },
-      "transport_manifest:logistics_hubs": {
-        "url": "data/transport_layers/japan_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "logistics_hubs"
-      },
-      "transport_carrier:japan_corridor": {
-        "url": "data/transport_layers/japan_corridor/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "japan_corridor"
-      },
-      "bathymetry:global_topology": {
-        "url": "data/global_bathymetry.topo.json",
-        "role": "bathymetry_topology",
-        "family_id": "global"
-      },
-      "feature_migrations:by_hybrid_v1": {
-        "url": "data/feature-migrations/by_hybrid_v1.json",
-        "role": "feature_migration_table",
-        "family_id": "hybrid_v1"
-      },
-      "unit_counter_manifest:hoi4": {
-        "url": "data/unit_counter_libraries/hoi4/manifest.json",
-        "role": "unit_counter_manifest",
-        "family_id": "hoi4"
-      },
-      "city_lights:modern:asset": {
-        "url": "js/core/city_lights_modern_asset.js",
-        "role": "city_lights_asset",
-        "family_id": "modern"
-      },
-      "city_lights:modern:source_descriptor": {
-        "url": "data/city_lights/modern_source_descriptor.json",
-        "role": "city_lights_source_descriptor",
-        "family_id": "modern"
+        "role": "city_aliases",
+        "url": "data/city_aliases.json"
       },
       "city_lights:historical_1930:asset": {
-        "url": "js/core/city_lights_historical_1930_asset.js",
+        "family_id": "historical_1930",
         "role": "city_lights_asset",
-        "family_id": "historical_1930"
+        "url": "js/core/city_lights_historical_1930_asset.js"
       },
       "city_lights:historical_1930:entries": {
-        "url": "data/city_lights/historical_1930_entries.json",
+        "family_id": "historical_1930",
         "role": "city_lights_entries",
-        "family_id": "historical_1930"
-      },
-      "city_lights:historical_1930:source": {
-        "url": "data/world_cities.geojson",
-        "role": "city_lights_source",
-        "family_id": "historical_1930"
+        "url": "data/city_lights/historical_1930_entries.json"
       },
       "city_lights:historical_1930:exclusions": {
-        "url": "data/historical_city_lights_1930_exclusions.json",
+        "family_id": "historical_1930",
         "role": "city_lights_source",
-        "family_id": "historical_1930"
+        "url": "data/historical_city_lights_1930_exclusions.json"
       },
-      "transport_manifest:germany_road": {
-        "url": "data/transport_layers/germany_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_road"
+      "city_lights:historical_1930:source": {
+        "family_id": "historical_1930",
+        "role": "city_lights_source",
+        "url": "data/world_cities.geojson"
       },
-      "transport_manifest:uk_road": {
-        "url": "data/transport_layers/uk_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_road"
+      "city_lights:modern:asset": {
+        "family_id": "modern",
+        "role": "city_lights_asset",
+        "url": "js/core/city_lights_modern_asset.js"
       },
-      "transport_manifest:uk_rail": {
-        "url": "data/transport_layers/uk_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_rail"
+      "city_lights:modern:source_descriptor": {
+        "family_id": "modern",
+        "role": "city_lights_source_descriptor",
+        "url": "data/city_lights/modern_source_descriptor.json"
       },
-      "transport_manifest:france_rail": {
-        "url": "data/transport_layers/france_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_rail"
+      "context_layer:airports": {
+        "family_id": "airports",
+        "role": "context_layer",
+        "url": "data/transport_layers/global_airport/airports.geojson"
       },
-      "transport_manifest:france_road": {
-        "url": "data/transport_layers/france_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_road"
+      "context_layer:lakes": {
+        "description": "Shared simplified lakes for every scenario; scenario-only Congo Lake stays in TNO.",
+        "family_id": "lakes",
+        "role": "context_layer",
+        "url": "data/global_lakes.geojson"
       },
-      "transport_manifest:usa_airport": {
-        "url": "data/transport_layers/usa_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_airport"
+      "context_layer:physical": {
+        "family_id": "physical",
+        "role": "context_layer",
+        "url": "data/europe_physical.geojson"
       },
-      "transport_manifest:china_airport": {
-        "url": "data/transport_layers/china_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_airport"
+      "context_layer:physical_contours_major": {
+        "family_id": "physical_contours_major",
+        "role": "context_layer",
+        "url": "data/global_contours.major.topo.json"
       },
-      "transport_manifest:russia_airport": {
-        "url": "data/transport_layers/russia_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_airport"
+      "context_layer:physical_contours_minor": {
+        "family_id": "physical_contours_minor",
+        "role": "context_layer",
+        "url": "data/global_contours.minor.topo.json"
       },
-      "transport_manifest:india_airport": {
-        "url": "data/transport_layers/india_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_airport"
+      "context_layer:physical_semantics": {
+        "family_id": "physical_semantics",
+        "role": "context_layer",
+        "url": "data/global_physical_semantics.topo.json"
       },
-      "transport_manifest:usa_road": {
-        "url": "data/transport_layers/usa_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_road"
+      "context_layer:ports": {
+        "family_id": "ports",
+        "role": "context_layer",
+        "url": "data/transport_layers/global_port/ports.geojson"
       },
-      "transport_manifest:usa_rail": {
-        "url": "data/transport_layers/usa_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_rail"
+      "context_layer:rivers": {
+        "family_id": "rivers",
+        "role": "context_layer",
+        "url": "data/global_rivers.geojson"
       },
-      "transport_manifest:usa_energy_facilities": {
-        "url": "data/transport_layers/usa_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_energy_facilities"
+      "context_layer:urban": {
+        "family_id": "urban",
+        "role": "context_layer",
+        "url": "data/europe_urban.geojson"
       },
-      "transport_manifest:usa_mineral_resources": {
-        "url": "data/transport_layers/usa_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_mineral_resources"
+      "country_feature_policies": {
+        "description": "Shared JS/Python display and gating policy table for country features.",
+        "role": "country_feature_policies",
+        "url": "data/country_feature_policies.json"
       },
-      "transport_manifest:usa_industrial_zones": {
-        "url": "data/transport_layers/usa_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_industrial_zones"
+      "feature_migrations:by_hybrid_v1": {
+        "family_id": "hybrid_v1",
+        "role": "feature_migration_table",
+        "url": "data/feature-migrations/by_hybrid_v1.json"
       },
-      "transport_manifest:usa_logistics_hubs": {
-        "url": "data/transport_layers/usa_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_logistics_hubs"
+      "geo_aliases": {
+        "role": "geo_aliases",
+        "url": "data/geo_aliases.json"
       },
-      "transport_manifest:uk_energy_facilities": {
-        "url": "data/transport_layers/uk_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_energy_facilities"
+      "hgo_flags_png_manifest": {
+        "family_id": "hgo",
+        "role": "hgo_flags_png_manifest",
+        "url": "data/hgo_catalogs/hgo_flags.png_manifest.json"
       },
-      "transport_manifest:uk_industrial_zones": {
-        "url": "data/transport_layers/uk_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_industrial_zones"
+      "hgo_identity_aliases": {
+        "family_id": "hgo",
+        "role": "hgo_identity_aliases",
+        "url": "data/hgo_catalogs/hgo_identity_aliases.json"
       },
-      "transport_manifest:uk_logistics_hubs": {
-        "url": "data/transport_layers/uk_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_logistics_hubs"
+      "hgo_palette_pack": {
+        "family_id": "hgo",
+        "role": "palette_pack",
+        "url": "data/palettes/hgo.palette.json"
       },
-      "transport_manifest:france_energy_facilities": {
-        "url": "data/transport_layers/france_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_energy_facilities"
+      "hgo_place_names": {
+        "family_id": "hgo",
+        "role": "hgo_place_names",
+        "url": "data/hgo_catalogs/hgo_place_names.json"
       },
-      "transport_manifest:france_industrial_zones": {
-        "url": "data/transport_layers/france_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_industrial_zones"
+      "hgo_runtime_manifest": {
+        "family_id": "hgo",
+        "role": "hgo_runtime_manifest",
+        "url": "data/hgo_runtime/manifest.json"
       },
-      "transport_manifest:france_mineral_resources": {
-        "url": "data/transport_layers/france_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_mineral_resources"
+      "hgo_runtime_provinces_bmp": {
+        "family_id": "hgo",
+        "role": "hgo_runtime_raster",
+        "url": "data/hgo_runtime/provinces.bmp"
       },
-      "transport_manifest:france_logistics_hubs": {
-        "url": "data/transport_layers/france_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_logistics_hubs"
+      "hgo_runtime_seed": {
+        "family_id": "hgo",
+        "role": "hgo_runtime_seed",
+        "url": "data/hgo_runtime/seed.json"
       },
-      "transport_manifest:germany_rail": {
-        "url": "data/transport_layers/germany_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_rail"
+      "hgo_tier_a_catalog": {
+        "family_id": "hgo",
+        "role": "hgo_tier_a_catalog",
+        "url": "data/hgo_catalogs/index.json"
       },
-      "transport_manifest:germany_airport": {
-        "url": "data/transport_layers/germany_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_airport"
+      "locales": {
+        "role": "locales",
+        "url": "data/locales.json"
       },
-      "transport_manifest:france_airport": {
-        "url": "data/transport_layers/france_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_airport"
+      "palette_registry": {
+        "role": "palette_registry",
+        "url": "data/palettes/index.json"
       },
-      "transport_manifest:uk_airport": {
-        "url": "data/transport_layers/uk_airport/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_airport"
+      "releasable_catalog": {
+        "role": "releasable_catalog",
+        "url": "data/releasables/hoi4_vanilla.internal.phase1.catalog.json"
       },
-      "transport_manifest:usa_port": {
-        "url": "data/transport_layers/usa_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "usa_port"
+      "ru_city_overrides": {
+        "role": "city_overrides",
+        "url": "data/ru_city_overrides.geojson"
       },
-      "transport_manifest:germany_port": {
-        "url": "data/transport_layers/germany_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_port"
+      "runtime_political_topology": {
+        "role": "runtime_political_topology",
+        "url": "data/europe_topology.runtime_political_v1.json"
       },
-      "transport_manifest:france_port": {
-        "url": "data/transport_layers/france_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "france_port"
+      "scenario_registry": {
+        "description": "Runtime scenario registry consumed by scenario boot and scenario picker flows.",
+        "role": "scenario_registry",
+        "url": "data/scenarios/index.json"
       },
-      "transport_manifest:uk_port": {
-        "url": "data/transport_layers/uk_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_port"
+      "special_zones": {
+        "role": "special_zones",
+        "url": "data/special_zones.geojson"
       },
-      "transport_manifest:china_port": {
-        "url": "data/transport_layers/china_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_port"
+      "thematic_layer:political_state_capacity_demo": {
+        "metadata": {
+          "geometry_kind": "admin0",
+          "layer_id": "political_state_capacity_demo",
+          "publish_scope": "repo_only",
+          "runtime_readiness": "catalog_only",
+          "source_policy": "fixture_only",
+          "theme": "political"
+        },
+        "role": "thematic_layer_manifest",
+        "url": "data/thematic_layers/political/state_capacity_demo/manifest.json"
       },
-      "transport_manifest:india_port": {
-        "url": "data/transport_layers/india_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_port"
+      "thematic_layer:political_wgi_state_capacity_v1": {
+        "metadata": {
+          "geometry_kind": "admin0",
+          "layer_id": "political_wgi_state_capacity_v1",
+          "publish_scope": "repo_only",
+          "runtime_readiness": "catalog_only",
+          "source_policy": "real_source_cache_only",
+          "theme": "political"
+        },
+        "role": "thematic_layer_manifest",
+        "url": "data/thematic_layers/political/wgi_state_capacity_v1/manifest.json"
       },
-      "transport_manifest:russia_port": {
-        "url": "data/transport_layers/russia_port/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_port"
+      "thematic_layer:population_density_demo": {
+        "metadata": {
+          "geometry_kind": "grid_720x360",
+          "layer_id": "population_density_demo",
+          "publish_scope": "repo_only",
+          "runtime_readiness": "catalog_only",
+          "source_policy": "fixture_only",
+          "theme": "population"
+        },
+        "role": "thematic_layer_manifest",
+        "url": "data/thematic_layers/population/population_density_demo/manifest.json"
       },
-      "transport_manifest:germany_energy_facilities": {
-        "url": "data/transport_layers/germany_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_energy_facilities"
-      },
-      "transport_manifest:germany_mineral_resources": {
-        "url": "data/transport_layers/germany_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_mineral_resources"
-      },
-      "transport_manifest:germany_industrial_zones": {
-        "url": "data/transport_layers/germany_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_industrial_zones"
-      },
-      "transport_manifest:germany_logistics_hubs": {
-        "url": "data/transport_layers/germany_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "germany_logistics_hubs"
-      },
-      "transport_carrier:china": {
-        "url": "data/transport_layers/china_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "china"
-      },
-      "transport_carrier:france": {
-        "url": "data/transport_layers/france_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "france"
-      },
-      "transport_carrier:germany": {
-        "url": "data/transport_layers/germany_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "germany"
-      },
-      "transport_carrier:india": {
-        "url": "data/transport_layers/india_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "india"
-      },
-      "transport_carrier:russia": {
-        "url": "data/transport_layers/russia_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "russia"
-      },
-      "transport_carrier:uk": {
-        "url": "data/transport_layers/uk_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "uk"
-      },
-      "transport_carrier:usa": {
-        "url": "data/transport_layers/usa_carrier/carrier.json",
-        "role": "transport_workbench_carrier",
-        "family_id": "usa"
-      },
-      "transport_manifest:china_road": {
-        "url": "data/transport_layers/china_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_road"
-      },
-      "transport_manifest:china_rail": {
-        "url": "data/transport_layers/china_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_rail"
-      },
-      "transport_manifest:china_energy_facilities": {
-        "url": "data/transport_layers/china_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_energy_facilities"
-      },
-      "transport_manifest:china_industrial_zones": {
-        "url": "data/transport_layers/china_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_industrial_zones"
-      },
-      "transport_manifest:china_logistics_hubs": {
-        "url": "data/transport_layers/china_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_logistics_hubs"
-      },
-      "transport_manifest:china_mineral_resources": {
-        "url": "data/transport_layers/china_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "china_mineral_resources"
-      },
-      "transport_manifest:india_road": {
-        "url": "data/transport_layers/india_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_road"
-      },
-      "transport_manifest:india_rail": {
-        "url": "data/transport_layers/india_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_rail"
-      },
-      "transport_manifest:india_energy_facilities": {
-        "url": "data/transport_layers/india_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_energy_facilities"
-      },
-      "transport_manifest:india_industrial_zones": {
-        "url": "data/transport_layers/india_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_industrial_zones"
-      },
-      "transport_manifest:india_logistics_hubs": {
-        "url": "data/transport_layers/india_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_logistics_hubs"
-      },
-      "transport_manifest:india_mineral_resources": {
-        "url": "data/transport_layers/india_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "india_mineral_resources"
-      },
-      "transport_manifest:russia_road": {
-        "url": "data/transport_layers/russia_road/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_road"
-      },
-      "transport_manifest:russia_rail": {
-        "url": "data/transport_layers/russia_rail/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_rail"
-      },
-      "transport_manifest:russia_energy_facilities": {
-        "url": "data/transport_layers/russia_energy_facilities/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_energy_facilities"
-      },
-      "transport_manifest:russia_industrial_zones": {
-        "url": "data/transport_layers/russia_industrial_zones/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_industrial_zones"
-      },
-      "transport_manifest:russia_logistics_hubs": {
-        "url": "data/transport_layers/russia_logistics_hubs/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_logistics_hubs"
-      },
-      "transport_manifest:russia_mineral_resources": {
-        "url": "data/transport_layers/russia_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "russia_mineral_resources"
-      },
-      "transport_manifest:uk_mineral_resources": {
-        "url": "data/transport_layers/uk_mineral_resources/manifest.json",
-        "role": "transport_manifest",
-        "family_id": "uk_mineral_resources"
+      "thematic_layer:social_human_development_demo": {
+        "metadata": {
+          "geometry_kind": "admin0",
+          "layer_id": "social_human_development_demo",
+          "publish_scope": "repo_only",
+          "runtime_readiness": "catalog_only",
+          "source_policy": "fixture_only",
+          "theme": "social"
+        },
+        "role": "thematic_layer_manifest",
+        "url": "data/thematic_layers/social/human_development_demo/manifest.json"
       },
       "thematic_layer_catalog": {
-        "url": "data/thematic_layers/index.json",
-        "role": "thematic_layer_catalog",
         "metadata": {
           "layer_count": 4,
           "publish_scope": "repo_only",
           "runtime_readiness": "catalog_only"
-        }
+        },
+        "role": "thematic_layer_catalog",
+        "url": "data/thematic_layers/index.json"
       },
-      "thematic_layer:political_state_capacity_demo": {
-        "url": "data/thematic_layers/political/state_capacity_demo/manifest.json",
-        "role": "thematic_layer_manifest",
-        "metadata": {
-          "layer_id": "political_state_capacity_demo",
-          "source_policy": "fixture_only",
-          "theme": "political",
-          "geometry_kind": "admin0",
-          "publish_scope": "repo_only",
-          "runtime_readiness": "catalog_only"
-        }
+      "transport_carrier:china": {
+        "family_id": "china",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/china_carrier/carrier.json"
       },
-      "thematic_layer:social_human_development_demo": {
-        "url": "data/thematic_layers/social/human_development_demo/manifest.json",
-        "role": "thematic_layer_manifest",
-        "metadata": {
-          "layer_id": "social_human_development_demo",
-          "source_policy": "fixture_only",
-          "theme": "social",
-          "geometry_kind": "admin0",
-          "publish_scope": "repo_only",
-          "runtime_readiness": "catalog_only"
-        }
+      "transport_carrier:france": {
+        "family_id": "france",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/france_carrier/carrier.json"
       },
-      "thematic_layer:population_density_demo": {
-        "url": "data/thematic_layers/population/population_density_demo/manifest.json",
-        "role": "thematic_layer_manifest",
-        "metadata": {
-          "layer_id": "population_density_demo",
-          "source_policy": "fixture_only",
-          "theme": "population",
-          "geometry_kind": "grid_720x360",
-          "publish_scope": "repo_only",
-          "runtime_readiness": "catalog_only"
-        }
+      "transport_carrier:germany": {
+        "family_id": "germany",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/germany_carrier/carrier.json"
       },
-      "thematic_layer:political_wgi_state_capacity_v1": {
-        "url": "data/thematic_layers/political/wgi_state_capacity_v1/manifest.json",
-        "role": "thematic_layer_manifest",
-        "metadata": {
-          "layer_id": "political_wgi_state_capacity_v1",
-          "source_policy": "real_source_cache_only",
-          "theme": "political",
-          "geometry_kind": "admin0",
-          "publish_scope": "repo_only",
-          "runtime_readiness": "catalog_only"
-        }
+      "transport_carrier:india": {
+        "family_id": "india",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/india_carrier/carrier.json"
       },
-      "context_layer:lakes": {
-        "url": "data/global_lakes.geojson",
-        "role": "context_layer",
-        "family_id": "lakes",
-        "description": "Shared simplified lakes for every scenario; scenario-only Congo Lake stays in TNO."
+      "transport_carrier:japan_corridor": {
+        "family_id": "japan_corridor",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/japan_corridor/carrier.json"
+      },
+      "transport_carrier:russia": {
+        "family_id": "russia",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/russia_carrier/carrier.json"
+      },
+      "transport_carrier:uk": {
+        "family_id": "uk",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/uk_carrier/carrier.json"
+      },
+      "transport_carrier:usa": {
+        "family_id": "usa",
+        "role": "transport_workbench_carrier",
+        "url": "data/transport_layers/usa_carrier/carrier.json"
+      },
+      "transport_catalog:rail": {
+        "family_id": "rail",
+        "role": "transport_catalog",
+        "url": "data/transport_layers/global_rail/catalog.json"
+      },
+      "transport_catalog:road": {
+        "family_id": "road",
+        "role": "transport_catalog",
+        "url": "data/transport_layers/global_road/catalog.json"
+      },
+      "transport_manifest:airport": {
+        "family_id": "airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_airport/manifest.json"
+      },
+      "transport_manifest:china_airport": {
+        "family_id": "china_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_airport/manifest.json"
+      },
+      "transport_manifest:china_energy_facilities": {
+        "family_id": "china_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_energy_facilities/manifest.json"
+      },
+      "transport_manifest:china_industrial_zones": {
+        "family_id": "china_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_industrial_zones/manifest.json"
+      },
+      "transport_manifest:china_logistics_hubs": {
+        "family_id": "china_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:china_mineral_resources": {
+        "family_id": "china_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_mineral_resources/manifest.json"
+      },
+      "transport_manifest:china_port": {
+        "family_id": "china_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_port/manifest.json"
+      },
+      "transport_manifest:china_rail": {
+        "family_id": "china_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_rail/manifest.json"
+      },
+      "transport_manifest:china_road": {
+        "family_id": "china_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/china_road/manifest.json"
+      },
+      "transport_manifest:energy_facilities": {
+        "family_id": "energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_energy_facilities/manifest.json"
+      },
+      "transport_manifest:france_airport": {
+        "family_id": "france_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_airport/manifest.json"
+      },
+      "transport_manifest:france_energy_facilities": {
+        "family_id": "france_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_energy_facilities/manifest.json"
+      },
+      "transport_manifest:france_industrial_zones": {
+        "family_id": "france_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_industrial_zones/manifest.json"
+      },
+      "transport_manifest:france_logistics_hubs": {
+        "family_id": "france_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:france_mineral_resources": {
+        "family_id": "france_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_mineral_resources/manifest.json"
+      },
+      "transport_manifest:france_port": {
+        "family_id": "france_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_port/manifest.json"
+      },
+      "transport_manifest:france_rail": {
+        "family_id": "france_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_rail/manifest.json"
+      },
+      "transport_manifest:france_road": {
+        "family_id": "france_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/france_road/manifest.json"
+      },
+      "transport_manifest:germany_airport": {
+        "family_id": "germany_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_airport/manifest.json"
+      },
+      "transport_manifest:germany_energy_facilities": {
+        "family_id": "germany_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_energy_facilities/manifest.json"
+      },
+      "transport_manifest:germany_industrial_zones": {
+        "family_id": "germany_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_industrial_zones/manifest.json"
+      },
+      "transport_manifest:germany_logistics_hubs": {
+        "family_id": "germany_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:germany_mineral_resources": {
+        "family_id": "germany_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_mineral_resources/manifest.json"
+      },
+      "transport_manifest:germany_port": {
+        "family_id": "germany_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_port/manifest.json"
+      },
+      "transport_manifest:germany_rail": {
+        "family_id": "germany_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_rail/manifest.json"
+      },
+      "transport_manifest:germany_road": {
+        "family_id": "germany_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/germany_road/manifest.json"
+      },
+      "transport_manifest:india_airport": {
+        "family_id": "india_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_airport/manifest.json"
+      },
+      "transport_manifest:india_energy_facilities": {
+        "family_id": "india_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_energy_facilities/manifest.json"
+      },
+      "transport_manifest:india_industrial_zones": {
+        "family_id": "india_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_industrial_zones/manifest.json"
+      },
+      "transport_manifest:india_logistics_hubs": {
+        "family_id": "india_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:india_mineral_resources": {
+        "family_id": "india_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_mineral_resources/manifest.json"
+      },
+      "transport_manifest:india_port": {
+        "family_id": "india_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_port/manifest.json"
+      },
+      "transport_manifest:india_rail": {
+        "family_id": "india_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_rail/manifest.json"
+      },
+      "transport_manifest:india_road": {
+        "family_id": "india_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/india_road/manifest.json"
+      },
+      "transport_manifest:industrial_zones": {
+        "family_id": "industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_industrial_zones/manifest.json"
+      },
+      "transport_manifest:logistics_hubs": {
+        "family_id": "logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:mineral_resources": {
+        "family_id": "mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_mineral_resources/manifest.json"
+      },
+      "transport_manifest:port": {
+        "family_id": "port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_port/manifest.json"
+      },
+      "transport_manifest:rail": {
+        "family_id": "rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_rail/manifest.json"
+      },
+      "transport_manifest:road": {
+        "family_id": "road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/japan_road/manifest.json"
+      },
+      "transport_manifest:russia_airport": {
+        "family_id": "russia_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_airport/manifest.json"
+      },
+      "transport_manifest:russia_energy_facilities": {
+        "family_id": "russia_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_energy_facilities/manifest.json"
+      },
+      "transport_manifest:russia_industrial_zones": {
+        "family_id": "russia_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_industrial_zones/manifest.json"
+      },
+      "transport_manifest:russia_logistics_hubs": {
+        "family_id": "russia_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:russia_mineral_resources": {
+        "family_id": "russia_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_mineral_resources/manifest.json"
+      },
+      "transport_manifest:russia_port": {
+        "family_id": "russia_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_port/manifest.json"
+      },
+      "transport_manifest:russia_rail": {
+        "family_id": "russia_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_rail/manifest.json"
+      },
+      "transport_manifest:russia_road": {
+        "family_id": "russia_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/russia_road/manifest.json"
+      },
+      "transport_manifest:uk_airport": {
+        "family_id": "uk_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_airport/manifest.json"
+      },
+      "transport_manifest:uk_energy_facilities": {
+        "family_id": "uk_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_energy_facilities/manifest.json"
+      },
+      "transport_manifest:uk_industrial_zones": {
+        "family_id": "uk_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_industrial_zones/manifest.json"
+      },
+      "transport_manifest:uk_logistics_hubs": {
+        "family_id": "uk_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:uk_mineral_resources": {
+        "family_id": "uk_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_mineral_resources/manifest.json"
+      },
+      "transport_manifest:uk_port": {
+        "family_id": "uk_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_port/manifest.json"
+      },
+      "transport_manifest:uk_rail": {
+        "family_id": "uk_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_rail/manifest.json"
+      },
+      "transport_manifest:uk_road": {
+        "family_id": "uk_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/uk_road/manifest.json"
+      },
+      "transport_manifest:usa_airport": {
+        "family_id": "usa_airport",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_airport/manifest.json"
+      },
+      "transport_manifest:usa_energy_facilities": {
+        "family_id": "usa_energy_facilities",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_energy_facilities/manifest.json"
+      },
+      "transport_manifest:usa_industrial_zones": {
+        "family_id": "usa_industrial_zones",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_industrial_zones/manifest.json"
+      },
+      "transport_manifest:usa_logistics_hubs": {
+        "family_id": "usa_logistics_hubs",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_logistics_hubs/manifest.json"
+      },
+      "transport_manifest:usa_mineral_resources": {
+        "family_id": "usa_mineral_resources",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_mineral_resources/manifest.json"
+      },
+      "transport_manifest:usa_port": {
+        "family_id": "usa_port",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_port/manifest.json"
+      },
+      "transport_manifest:usa_rail": {
+        "family_id": "usa_rail",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_rail/manifest.json"
+      },
+      "transport_manifest:usa_road": {
+        "family_id": "usa_road",
+        "role": "transport_manifest",
+        "url": "data/transport_layers/usa_road/manifest.json"
+      },
+      "unit_counter_manifest:hoi4": {
+        "family_id": "hoi4",
+        "role": "unit_counter_manifest",
+        "url": "data/unit_counter_libraries/hoi4/manifest.json"
+      },
+      "world_cities": {
+        "role": "world_cities",
+        "url": "data/world_cities.geojson"
       }
     },
+    "city_lights": {
+      "historical_1930": {
+        "asset_key": "city_lights:historical_1930:asset",
+        "entries_key": "city_lights:historical_1930:entries",
+        "exclusions_key": "city_lights:historical_1930:exclusions",
+        "source_key": "city_lights:historical_1930:source"
+      },
+      "modern": {
+        "asset_key": "city_lights:modern:asset",
+        "source_descriptor_key": "city_lights:modern:source_descriptor"
+      }
+    },
+    "country_feature_policies_key": "country_feature_policies",
     "scenario_registry_key": "scenario_registry",
+    "schema_version": 1,
+    "thematic_layer_index_key": "thematic_layer_catalog",
+    "thematic_layer_manifest_keys": {
+      "political_state_capacity_demo": "thematic_layer:political_state_capacity_demo",
+      "political_wgi_state_capacity_v1": "thematic_layer:political_wgi_state_capacity_v1",
+      "population_density_demo": "thematic_layer:population_density_demo",
+      "social_human_development_demo": "thematic_layer:social_human_development_demo"
+    },
     "transport_manifest_keys": {
-      "road": "transport_manifest:road",
-      "rail": "transport_manifest:rail",
-      "japan_road": "transport_manifest:road",
-      "japan_rail": "transport_manifest:rail",
       "airport": "transport_manifest:airport",
-      "port": "transport_manifest:port",
-      "mineral_resources": "transport_manifest:mineral_resources",
-      "energy_facilities": "transport_manifest:energy_facilities",
-      "industrial_zones": "transport_manifest:industrial_zones",
-      "logistics_hubs": "transport_manifest:logistics_hubs",
-      "germany_road": "transport_manifest:germany_road",
-      "uk_road": "transport_manifest:uk_road",
-      "uk_rail": "transport_manifest:uk_rail",
-      "france_rail": "transport_manifest:france_rail",
-      "france_road": "transport_manifest:france_road",
-      "usa_airport": "transport_manifest:usa_airport",
       "china_airport": "transport_manifest:china_airport",
-      "russia_airport": "transport_manifest:russia_airport",
-      "india_airport": "transport_manifest:india_airport",
-      "usa_road": "transport_manifest:usa_road",
-      "usa_rail": "transport_manifest:usa_rail",
-      "usa_energy_facilities": "transport_manifest:usa_energy_facilities",
-      "usa_mineral_resources": "transport_manifest:usa_mineral_resources",
-      "usa_industrial_zones": "transport_manifest:usa_industrial_zones",
-      "usa_logistics_hubs": "transport_manifest:usa_logistics_hubs",
-      "uk_energy_facilities": "transport_manifest:uk_energy_facilities",
-      "uk_industrial_zones": "transport_manifest:uk_industrial_zones",
-      "uk_logistics_hubs": "transport_manifest:uk_logistics_hubs",
-      "france_energy_facilities": "transport_manifest:france_energy_facilities",
-      "france_industrial_zones": "transport_manifest:france_industrial_zones",
-      "france_mineral_resources": "transport_manifest:france_mineral_resources",
-      "france_logistics_hubs": "transport_manifest:france_logistics_hubs",
-      "germany_rail": "transport_manifest:germany_rail",
-      "germany_airport": "transport_manifest:germany_airport",
-      "france_airport": "transport_manifest:france_airport",
-      "uk_airport": "transport_manifest:uk_airport",
-      "usa_port": "transport_manifest:usa_port",
-      "germany_port": "transport_manifest:germany_port",
-      "france_port": "transport_manifest:france_port",
-      "uk_port": "transport_manifest:uk_port",
-      "china_port": "transport_manifest:china_port",
-      "india_port": "transport_manifest:india_port",
-      "russia_port": "transport_manifest:russia_port",
-      "germany_energy_facilities": "transport_manifest:germany_energy_facilities",
-      "germany_mineral_resources": "transport_manifest:germany_mineral_resources",
-      "germany_industrial_zones": "transport_manifest:germany_industrial_zones",
-      "germany_logistics_hubs": "transport_manifest:germany_logistics_hubs",
-      "japan_airport": "transport_manifest:airport",
-      "japan_port": "transport_manifest:port",
-      "japan_mineral_resources": "transport_manifest:mineral_resources",
-      "japan_energy_facilities": "transport_manifest:energy_facilities",
-      "japan_industrial_zones": "transport_manifest:industrial_zones",
-      "japan_logistics_hubs": "transport_manifest:logistics_hubs",
-      "china_road": "transport_manifest:china_road",
-      "china_rail": "transport_manifest:china_rail",
       "china_energy_facilities": "transport_manifest:china_energy_facilities",
       "china_industrial_zones": "transport_manifest:china_industrial_zones",
       "china_logistics_hubs": "transport_manifest:china_logistics_hubs",
       "china_mineral_resources": "transport_manifest:china_mineral_resources",
-      "india_road": "transport_manifest:india_road",
-      "india_rail": "transport_manifest:india_rail",
+      "china_port": "transport_manifest:china_port",
+      "china_rail": "transport_manifest:china_rail",
+      "china_road": "transport_manifest:china_road",
+      "energy_facilities": "transport_manifest:energy_facilities",
+      "france_airport": "transport_manifest:france_airport",
+      "france_energy_facilities": "transport_manifest:france_energy_facilities",
+      "france_industrial_zones": "transport_manifest:france_industrial_zones",
+      "france_logistics_hubs": "transport_manifest:france_logistics_hubs",
+      "france_mineral_resources": "transport_manifest:france_mineral_resources",
+      "france_port": "transport_manifest:france_port",
+      "france_rail": "transport_manifest:france_rail",
+      "france_road": "transport_manifest:france_road",
+      "germany_airport": "transport_manifest:germany_airport",
+      "germany_energy_facilities": "transport_manifest:germany_energy_facilities",
+      "germany_industrial_zones": "transport_manifest:germany_industrial_zones",
+      "germany_logistics_hubs": "transport_manifest:germany_logistics_hubs",
+      "germany_mineral_resources": "transport_manifest:germany_mineral_resources",
+      "germany_port": "transport_manifest:germany_port",
+      "germany_rail": "transport_manifest:germany_rail",
+      "germany_road": "transport_manifest:germany_road",
+      "india_airport": "transport_manifest:india_airport",
       "india_energy_facilities": "transport_manifest:india_energy_facilities",
       "india_industrial_zones": "transport_manifest:india_industrial_zones",
       "india_logistics_hubs": "transport_manifest:india_logistics_hubs",
       "india_mineral_resources": "transport_manifest:india_mineral_resources",
-      "russia_road": "transport_manifest:russia_road",
-      "russia_rail": "transport_manifest:russia_rail",
+      "india_port": "transport_manifest:india_port",
+      "india_rail": "transport_manifest:india_rail",
+      "india_road": "transport_manifest:india_road",
+      "industrial_zones": "transport_manifest:industrial_zones",
+      "japan_airport": "transport_manifest:airport",
+      "japan_energy_facilities": "transport_manifest:energy_facilities",
+      "japan_industrial_zones": "transport_manifest:industrial_zones",
+      "japan_logistics_hubs": "transport_manifest:logistics_hubs",
+      "japan_mineral_resources": "transport_manifest:mineral_resources",
+      "japan_port": "transport_manifest:port",
+      "japan_rail": "transport_manifest:rail",
+      "japan_road": "transport_manifest:road",
+      "logistics_hubs": "transport_manifest:logistics_hubs",
+      "mineral_resources": "transport_manifest:mineral_resources",
+      "port": "transport_manifest:port",
+      "rail": "transport_manifest:rail",
+      "road": "transport_manifest:road",
+      "russia_airport": "transport_manifest:russia_airport",
       "russia_energy_facilities": "transport_manifest:russia_energy_facilities",
       "russia_industrial_zones": "transport_manifest:russia_industrial_zones",
       "russia_logistics_hubs": "transport_manifest:russia_logistics_hubs",
       "russia_mineral_resources": "transport_manifest:russia_mineral_resources",
-      "uk_mineral_resources": "transport_manifest:uk_mineral_resources"
-    },
-    "city_lights": {
-      "modern": {
-        "asset_key": "city_lights:modern:asset",
-        "source_descriptor_key": "city_lights:modern:source_descriptor"
-      },
-      "historical_1930": {
-        "asset_key": "city_lights:historical_1930:asset",
-        "entries_key": "city_lights:historical_1930:entries",
-        "source_key": "city_lights:historical_1930:source",
-        "exclusions_key": "city_lights:historical_1930:exclusions"
-      }
-    },
-    "country_feature_policies_key": "country_feature_policies",
-    "thematic_layer_index_key": "thematic_layer_catalog",
-    "thematic_layer_manifest_keys": {
-      "political_state_capacity_demo": "thematic_layer:political_state_capacity_demo",
-      "social_human_development_demo": "thematic_layer:social_human_development_demo",
-      "population_density_demo": "thematic_layer:population_density_demo",
-      "political_wgi_state_capacity_v1": "thematic_layer:political_wgi_state_capacity_v1"
+      "russia_port": "transport_manifest:russia_port",
+      "russia_rail": "transport_manifest:russia_rail",
+      "russia_road": "transport_manifest:russia_road",
+      "uk_airport": "transport_manifest:uk_airport",
+      "uk_energy_facilities": "transport_manifest:uk_energy_facilities",
+      "uk_industrial_zones": "transport_manifest:uk_industrial_zones",
+      "uk_logistics_hubs": "transport_manifest:uk_logistics_hubs",
+      "uk_mineral_resources": "transport_manifest:uk_mineral_resources",
+      "uk_port": "transport_manifest:uk_port",
+      "uk_rail": "transport_manifest:uk_rail",
+      "uk_road": "transport_manifest:uk_road",
+      "usa_airport": "transport_manifest:usa_airport",
+      "usa_energy_facilities": "transport_manifest:usa_energy_facilities",
+      "usa_industrial_zones": "transport_manifest:usa_industrial_zones",
+      "usa_logistics_hubs": "transport_manifest:usa_logistics_hubs",
+      "usa_mineral_resources": "transport_manifest:usa_mineral_resources",
+      "usa_port": "transport_manifest:usa_port",
+      "usa_rail": "transport_manifest:usa_rail",
+      "usa_road": "transport_manifest:usa_road"
     }
-  }
+  },
+  "version": 1
 }

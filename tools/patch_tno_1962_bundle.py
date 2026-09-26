@@ -2599,6 +2599,18 @@ TNO_NAMED_MARGINAL_WATER_SPECS = (
         "simplify_tolerance": 0.006,
     },
 )
+# Shared ordinary-sea additions use upstream polygons and no TNO-specific coast.
+from map_builder.geo.marine_refinement import (
+    tno_additional_specs, additional_snapshot_features, restore_ocean_parent_footprints,
+    reconcile_marine_source_boundaries,
+)
+TNO_NAMED_MARGINAL_WATER_SPECS += tno_additional_specs()
+# The coarse South China / archipelagic source overlaps these independently
+# named SeaVoX regions. Subtract explicit source footprints, never draw order.
+for _spec in TNO_NAMED_MARGINAL_WATER_SPECS:
+    if _spec["id"] in {"tno_south_china_sea", "tno_banda_sea", "tno_java_sea", "tno_arafura_sea", "tno_timor_sea", "tno_caribbean_sea", "tno_gulf_of_mexico"}:
+        _spec["subtract_named_ids"] = (*_spec.get("subtract_named_ids", ()), *(s["id"] for s in tno_additional_specs()))
+
 TNO_BASE_GEOGRAPHY_WATER_CLONE_IDS = (
     "caspian_sea",
     "lake_superior",
@@ -5636,7 +5648,7 @@ def load_global_water_regions_feature_index() -> dict[str, dict]:
     global _global_water_regions_feature_index
     if _global_water_regions_feature_index is not None:
         return copy.deepcopy(_global_water_regions_feature_index)
-    payload = load_json(WATER_REGIONS_PATH)
+    payload = restore_ocean_parent_footprints(load_json(WATER_REGIONS_PATH))
     feature_index = {}
     for feature in payload.get("features", []):
         props = feature.get("properties", {})
@@ -5889,7 +5901,7 @@ def clip_tno_open_ocean_split_features(
 def build_tno_named_marginal_water_features(snapshot_payload: dict) -> tuple[list[dict], dict[str, dict]]:
     feature_index = load_global_water_regions_feature_index()
     snapshot_features_by_id: dict[str, dict] = {}
-    for feature in snapshot_payload.get("features", []):
+    for feature in [*additional_snapshot_features(), *snapshot_payload.get("features", [])]:
         props = feature.get("properties", {}) if isinstance(feature, dict) else {}
         feature_id = str(props.get("id") or "").strip()
         if feature_id:
@@ -6637,7 +6649,10 @@ def load_or_refresh_marine_regions_named_water_snapshot(
         raise FileNotFoundError(
             f"Missing water-region provenance file: {provenance_path}. Run with --refresh-named-water-snapshot to create it."
         )
-    return load_json(snapshot_path), load_json(provenance_path)
+    snapshot = load_json(snapshot_path)
+    existing_ids = {f["properties"]["id"] for f in snapshot.get("features", [])}
+    snapshot["features"].extend(f for f in additional_snapshot_features() if f["properties"]["id"] not in existing_ids)
+    return snapshot, load_json(provenance_path)
 
 
 def parse_args() -> argparse.Namespace:
@@ -8799,7 +8814,7 @@ def apply_d3_spherical_safe_source_split_to_gdf(gdf: gpd.GeoDataFrame) -> gpd.Ge
 def replace_topology_object_from_gdf_for_d3(topo_dict: dict, object_name: str, gdf: gpd.GeoDataFrame) -> None:
     if object_name == "scenario_water":
         compiled = compile_named_water_regions(
-            gdf_to_feature_collection(gdf),
+            reconcile_marine_source_boundaries(gdf_to_feature_collection(gdf)),
             land_mask=topology_object_to_feature_collection(topo_dict, "land_mask")
                 if "land_mask" in topo_dict.get("objects", {}) else None,
         )
@@ -13237,7 +13252,7 @@ def build_water_stage_state_from_countries_state(
         stage_label="scenario_water_seed_final",
     )
     water_feature_collection = compile_named_water_regions(
-        feature_collection_from_features(scenario_water_features), land_mask=ocean_land_mask_geom,
+        reconcile_marine_source_boundaries(feature_collection_from_features(scenario_water_features)), land_mask=ocean_land_mask_geom,
     )
     water_gdf = geopandas_from_features(water_feature_collection["features"])
     water_gdf = apply_d3_spherical_safe_source_split_to_gdf(water_gdf)

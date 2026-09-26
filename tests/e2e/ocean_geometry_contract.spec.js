@@ -9,7 +9,7 @@ const {
 const BASE_PROBES = [
   { id: "north-pole", point: [0, 89], expectedIds: ["marine_arctic_ocean"], expectedLand: false, expectedOcean: true, expectWaterPixel: true },
   { id: "antarctic-interior", point: [90, -80], expectedIds: [], expectedLand: true, expectedOcean: false },
-  { id: "mid-atlantic", point: [-30, 30], expectedIds: ["marine_atlantic_ocean"], expectedLand: false, expectedOcean: true, expectWaterPixel: true },
+  { id: "mid-atlantic", point: [-30, 30], expectedIds: ["marine_northeast_atlantic_ocean"], expectedLand: false, expectedOcean: true, expectWaterPixel: true },
   { id: "dateline-east", point: [179.5, 85], expectedIds: ["marine_arctic_ocean"], expectedLand: false, expectedOcean: true, expectWaterPixel: true },
   { id: "dateline-west", point: [-179.5, 85], expectedIds: ["marine_arctic_ocean"], expectedLand: false, expectedOcean: true, expectWaterPixel: true },
 ];
@@ -255,6 +255,47 @@ function patchDistance(left, right) {
     + Math.abs(left.avgGreen - right.avgGreen)
     + Math.abs(left.avgBlue - right.avgBlue);
 }
+
+test("new base ocean sectors inherit saved parent colors and support independent paint and undo", async ({ page }) => {
+  test.setTimeout(60_000);
+  await gotoApp(page, "/?startup_interaction=full", { waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page, { timeout: 60_000 });
+  await primeStateRef(page);
+  await ensureBaseMode(page);
+  await setOpenOceanInteraction(page);
+  await page.evaluate(async () => {
+    const { state } = await import(new URL("./js/core/state.js", location.href));
+    const { invalidateOceanWaterInteractionVisualState, render } = await import(new URL("./js/core/map_renderer.js", location.href));
+    state.waterRegionOverrides = { marine_atlantic_ocean: "#123456" };
+    state.selectedColor = "#ff00ff";
+    invalidateOceanWaterInteractionVisualState("e2e-inherited-ocean-color");
+    render();
+  });
+  await waitForRenderIdle(page, { timeout: 30_000 });
+  const targetId = "marine_northeast_atlantic_ocean";
+  const point = await projectGeoPointToPagePoint(page, [-30, 30]);
+  await page.keyboard.down("Control");
+  try { await page.mouse.click(point.x, point.y); }
+  finally { await page.keyboard.up("Control"); }
+  await expect.poll(() => page.evaluate(() => globalThis.__playwrightStateRef?.selectedWaterRegionId)).toBe(targetId);
+  await waitForRenderIdle(page, { timeout: 30_000 });
+  const inherited = await sampleCanvasPatch(page, [-30, 30]);
+  await page.mouse.click(point.x, point.y);
+  await expect.poll(() => page.evaluate(() => globalThis.__playwrightStateRef?.waterRegionOverrides?.marine_northeast_atlantic_ocean)).toBe("#ff00ff");
+  await waitForRenderIdle(page, { timeout: 30_000 });
+  expect(patchDistance(inherited, await sampleCanvasPatch(page, [-30, 30]))).toBeGreaterThan(35);
+  expect(await page.evaluate(async () => {
+    const { undoHistory } = await import(new URL("./js/core/history_manager.js", location.href));
+    return undoHistory();
+  })).toBe(true);
+  await waitForRenderIdle(page, { timeout: 30_000 });
+  expect(await page.evaluate(async () => {
+    const { state } = await import(new URL("./js/core/state.js", location.href));
+    const { getWaterRegionColor } = await import(new URL("./js/core/map_renderer.js", location.href));
+    return { overrides: state.waterRegionOverrides, color: getWaterRegionColor("marine_northeast_atlantic_ocean") };
+  })).toEqual({ overrides: { marine_atlantic_ocean: "#123456" }, color: "#123456" });
+  expect(patchDistance(inherited, await sampleCanvasPatch(page, [-30, 30]))).toBeLessThan(18);
+});
 
 test("open-ocean geometry stays visible, uniquely hittable, paintable, and undo-stable across base and TNO", async ({ page }, testInfo) => {
   test.setTimeout(60_000);

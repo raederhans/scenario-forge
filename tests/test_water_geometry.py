@@ -6,7 +6,7 @@ import unittest
 
 from shapely.geometry import Polygon, box, mapping, shape
 
-from map_builder.geo.water_geometry import compile_water_feature_collection, densify_water_topology, replace_water_topology_object
+from map_builder.geo.water_geometry import compile_water_feature_collection, densify_water_topology, replace_water_topology_object, transplant_water_features
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +40,27 @@ process.stdout.write(JSON.stringify(Object.fromEntries(Object.entries(data.objec
 
 
 class WaterGeometryTests(unittest.TestCase):
+    def test_water_transplant_preserves_protected_feature_and_foreign_geometry_exactly(self):
+        original = replace_water_topology_object({"type": "Topology", "objects": {}, "arcs": []}, collection(box(0, 0, 1, 1), box(2, 0, 3, 1)))
+        changed = replace_water_topology_object(original, collection(box(0, 0, 2, 2), box(2, 0, 4, 2)))
+        restored = transplant_water_features(changed, original, feature_ids={"1"})
+        old_features = decode(original)["water_regions"]["features"]
+        restored_features = decode(restored)["water_regions"]["features"]
+        self.assertEqual(restored_features[1], old_features[1])
+        self.assertNotEqual(restored_features[0], old_features[0])
+
+    def test_water_transplant_decodes_quantized_source_into_unquantized_detail_exactly(self):
+        source = {"type": "Topology", "transform": {"scale": [0.1, 0.1], "translate": [-180, -90]},
+                  "arcs": [[[0, 0], [0, 10], [10, 0], [0, -10], [-10, 0]]],
+                  "objects": {"water_regions": {"type": "GeometryCollection", "geometries": [
+                      {"type": "Polygon", "arcs": [[0]], "properties": {"id": "sea"}}]}}}
+        target = {"type": "Topology", "arcs": [[[0, 0], [2, 2]]], "objects": {
+            "political": {"type": "LineString", "arcs": [0]},
+            "water_regions": {"type": "GeometryCollection", "geometries": []}}}
+        result = transplant_water_features(target, source)
+        self.assertEqual(decode(result)["water_regions"], decode(source)["water_regions"])
+        self.assertEqual(decode(result)["political"], decode(target)["political"])
+
     def test_south_indian_long_latitude_edge_stays_out_of_antarctica(self):
         source = collection(box(20, -60.54, 147, -10))
         compiled = compile_water_feature_collection(source)
