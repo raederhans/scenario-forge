@@ -35,6 +35,26 @@ class ScenarioTopologyDecodeTest(unittest.TestCase):
                 self.assertEqual(json.dumps(actual, ensure_ascii=False), json.dumps(expected, ensure_ascii=False))
                 self.assertEqual(payload, before)
 
+    def test_landing_builders_do_not_pad_refined_water_arcs(self):
+        import tempfile
+        from pathlib import Path
+        from tools import build_landing_hero_cartography, build_landing_europe_1936_showcase
+
+        payload = {"type": "Topology", "arcs": [
+            [[0, 0], [0, 1], [1, 1], [0, 0]],
+            [[i / 1000, 0] for i in range(2000)],
+        ], "objects": {"political": {"type": "GeometryCollection", "geometries": [
+            {"type": "Polygon", "arcs": [[0]], "properties": {"id": "land"}},
+        ]}}}
+        expected = serialize_as_geojson(payload, objectname="political")["features"]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "topology.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with patch("topojson.utils.np_array_from_arcs", side_effect=AssertionError("padded allocation")):
+                for builder in (build_landing_hero_cartography, build_landing_europe_1936_showcase):
+                    with self.subTest(builder=builder.__name__):
+                        self.assertEqual(builder.topology_features(path, "political"), expected)
+
     def test_empty_and_point_only_topology(self):
         for geometries in ([], [{"type": "Point", "coordinates": [1, 2]}]):
             payload = {"arcs": [], "objects": {"p": {"type": "GeometryCollection", "geometries": geometries}}}

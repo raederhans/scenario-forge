@@ -15,7 +15,7 @@ from shapely.geometry import GeometryCollection, box, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from shapely.validation import make_valid
-from topojson.utils import serialize_as_geojson
+from tools.scenario_topology_decode import topology_object_to_geojson
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -298,7 +298,7 @@ def validate_tag(tag: str) -> str:
 
 def topology_features(path: Path, object_name: str) -> list[dict]:
     payload = read_json(path)
-    collection = serialize_as_geojson(payload, objectname=object_name)
+    collection = topology_object_to_geojson(payload, object_name)
     features = collection.get("features") if isinstance(collection, dict) else None
     if not isinstance(features, list):
         return []

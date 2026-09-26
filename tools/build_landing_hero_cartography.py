@@ -7,7 +7,7 @@ from typing import Iterable
 
 from shapely.geometry import shape
 from shapely.geometry.base import BaseGeometry
-from topojson.utils import serialize_as_geojson
+from tools.scenario_topology_decode import topology_object_to_geojson
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -44,7 +44,7 @@ def read_json(path: Path) -> dict:
 
 def topology_features(path: Path, object_name: str) -> list[dict]:
     payload = read_json(path)
-    collection = serialize_as_geojson(payload, objectname=object_name)
+    collection = topology_object_to_geojson(payload, object_name)
     features = collection.get("features") if isinstance(collection, dict) else None
     if not isinstance(features, list):
         return []
