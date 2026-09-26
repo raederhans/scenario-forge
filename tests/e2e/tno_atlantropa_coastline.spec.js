@@ -256,7 +256,7 @@ async function centerNewLand(page, point) {
 }
 
 test("new TNO Atlantropa coasts accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
   const pageErrors = [];
   page.on("pageerror", error => pageErrors.push(error.message));
   await gotoApp(page, TNO_PATH, { waitUntil: "domcontentloaded" });
