@@ -1091,7 +1091,7 @@ test("fallback candidates survive pan rebuilds and refresh for city and urban st
   assert.equal(canonicalCalls, 6);
 });
 
-test("fallback overlap lookup includes neighboring screen bins", () => {
+test("independent cities retain lights beside an unrelated urban core", () => {
   const feature = createShapeFeature("urban-bin");
   const city = { properties: { id: "nearby", __city_population: 500000 } };
   const harness = createModernDrawHarness({
@@ -1103,7 +1103,43 @@ test("fallback overlap lookup includes neighboring screen bins", () => {
   });
   harness.owner.drawModernNightLightsLayer(1, normalizeDayNightStyleConfig({}), {});
   const blobs = harness.events.filter((event) => event.type === "draw-image" && event.image?.width === 96);
-  assert.equal(blobs.length, 6, "adjacent-bin city is suppressed by the visible urban core");
+  assert.equal(blobs.length, 8, "nearby independent city keeps both halo and core");
+});
+
+test("urban membership merges only coincident centers and retains distinct centers", () => {
+  function drawAt(x, { area = 160, path = true, global = true } = {}) {
+    const feature = createShapeFeature("metro", { city_ids: ["member"] });
+    const city = { properties: { id: "member", __city_population: 500000 } };
+    const harness = createModernDrawHarness({
+      cities: [city], urbanFeatures: [feature],
+      assets: global ? { MODERN_CITY_LIGHTS_URBAN_AREAS: { features: [feature] } } : {},
+      helpers: shapeHelpers({
+        getCityAnchor: () => [x, 100],
+        estimateProjectedAreaPx: () => area,
+        getProjectedGeographicPath: () => path ? feature.geometry : null,
+        getUrbanCityPolicyOwner: () => ({
+          getUrbanFeatureIndex: () => new Map(),
+          getCityUrbanRuntimeInfo: () => ({ hasUrbanMatch: true, urbanFeature: feature }),
+        }),
+      }),
+    });
+    harness.owner.drawModernNightLightsLayer(1, normalizeDayNightStyleConfig({ cityLightsPopulationBoostEnabled: false }), {});
+    return harness.events.filter((event) => event.type === "draw-image" && event.image?.width === 96);
+  }
+  for (const global of [true, false]) {
+    const same = drawAt(100, { global });
+    const separate = drawAt(120, { global });
+    assert.equal(separate.length, same.length + 2, "distinct member center keeps its halo and core");
+    const unshaped = drawAt(120, { global, path: false });
+    assert.ok(separate.at(-1).alpha > unshaped.at(-1).alpha * 0.6,
+      "ambient shape must not erase the member city center");
+    assert.ok(separate.at(-1).alpha < unshaped.at(-1).alpha,
+      "shape overlap receives modest attenuation instead of double exposure");
+  }
+  for (const global of [true, false]) {
+    assert.equal(drawAt(100, { global, area: 1 }).length, 6,
+      "an unresolved urban polygon cannot suppress its city fallback");
+  }
 });
 
 test("modern city lights owner caches population boost data by current renderer state", () => {

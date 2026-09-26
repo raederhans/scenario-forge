@@ -49,7 +49,6 @@ export function initEditorWorkspace({ documentRef = document, t, setSidebarTab, 
     const entry = propertyEntries.get(key);
     if (!entry) return;
     currentProperty = key;
-    onNavigate(key);
     if (syncTab) setSidebarTab(key === "project" ? "project" : "inspector");
     for (const [id, item] of propertyEntries) item.host.hidden = id !== key;
     for (const item of layerEntries) {
@@ -61,6 +60,7 @@ export function initEditorWorkspace({ documentRef = document, t, setSidebarTab, 
     title.textContent = t(entry.label, "ui");
     right.dataset.editorContext = key;
     right.scrollTop = 0;
+    onNavigate(key);
   };
 
   const nav = make("nav", "editor-task-nav", "", "editorTaskNav");

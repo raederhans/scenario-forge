@@ -162,7 +162,7 @@ async function waitForProjectUiReady(page) {
 
 async function exportProjectJson(page, outputPath) {
   logProjectSaveLoadStep("exportProjectJson:start", { outputPath });
-  await page.getByRole("tablist", { name: "Inspector panels" }).getByRole("tab", { name: "Project" }).click();
+  await page.locator("#editorProjectBar #inspectorSidebarTabProject").click();
   const projectLegendSection = page.locator("#projectLegendSection");
   const projectLegendSummary = page.locator("#lblProjectLegend");
   await expect(projectLegendSummary).toBeVisible();
@@ -1052,7 +1052,7 @@ for (const baseline of [
     // release case keeps its own post-export undo and import/switch assertions.
     if (!baseline.roundtripOnly || baseline.rejectedImportsOnly) {
       if (baseline.roundtripOnly) {
-        await page.locator("h1").click();
+        await page.locator("#editorPropertiesTitle").click();
         await page.keyboard.press("Control+z");
       } else {
         await page.locator("#undoBtn").click();
@@ -1066,7 +1066,7 @@ for (const baseline of [
     const savePath = testInfo.outputPath("edited.project.json");
     const saved = await exportProjectJson(page, savePath);
     expect(saved.visualOverrides).toEqual(painted);
-    await page.locator("h1").click();
+    await page.locator("#editorPropertiesTitle").click();
     await page.keyboard.press("Control+z");
     expect(await page.evaluate(() => ({ ...globalThis.__pwProjectSaveLoad.state.visualOverrides }))).toEqual(selected.before);
     if (baseline.rejectedImportsOnly) {

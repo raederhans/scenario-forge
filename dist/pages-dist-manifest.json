@@ -45677,7 +45677,7 @@
     },
     {
       "path": "app/js/ui/sidebar.js",
-      "size_bytes": 187020,
+      "size_bytes": 187054,
       "source_kind": "dist"
     },
     {
@@ -46617,7 +46617,7 @@
       {
         "file_count": 104,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3627675
+        "size_bytes": 3627709
       },
       {
         "file_count": 826,
@@ -65764,7 +65764,7 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3299699,
+        "deferred_graph_bytes": 3299733,
         "deferred_graph_file_count": 134,
         "deferred_module_count": 132,
         "deferred_resource_count": 2,
@@ -67115,7 +67115,7 @@
           },
           {
             "path": "app/js/ui/sidebar.js",
-            "size_bytes": 187020
+            "size_bytes": 187054
           },
           {
             "path": "app/js/ui/styled_selects.js",
@@ -67401,7 +67401,7 @@
             "size_bytes": 373087
           }
         ],
-        "size_bytes": 2672217
+        "size_bytes": 2672251
       },
       {
         "basis": "deferred-resource-graph",
@@ -68684,7 +68684,7 @@
     {
       "file_count": 9235,
       "path": "app",
-      "size_bytes": 571863132
+      "size_bytes": 571863166
     },
     {
       "file_count": 59,
@@ -68717,5 +68717,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 601252698
+  "total_bytes": 601252732
 }

@@ -1020,8 +1020,11 @@ export function createCityLightsRenderOwner({
         const population = Math.max(0, Number(props.__city_population || 0));
         const isCapital = !!props.__city_is_country_capital;
         if (!isCapital && population < 15000) continue;
-        if (!MODERN_CITY_LIGHTS_URBAN_AREAS && urbanPolicy.getCityUrbanRuntimeInfo(feature, urbanIndex).hasUrbanMatch) continue;
-        entries.push({ feature, population, isCapital, cityId: getCityCanonicalId(feature) });
+        const cityId = getCityCanonicalId(feature);
+        const urbanFeature = MODERN_CITY_LIGHTS_URBAN_AREAS
+          ? globalUrbanByCityId.get(cityId)
+          : urbanPolicy.getCityUrbanRuntimeInfo(feature, urbanIndex).urbanFeature;
+        entries.push({ feature, population, isCapital, cityId, urbanFeature });
       }
     }
     Object.assign(modernCityFallbackCandidateCache, {
@@ -1041,21 +1044,12 @@ export function createCityLightsRenderOwner({
     const zoomScale = Math.max(0.0001, Number(runtimeState.zoomTransform?.k || 1));
     const overscan = Math.max(28, Math.min(runtimeState.width, runtimeState.height) * 0.05);
     const minPopulation = zoomScale <= 1.1 ? 60000 : zoomScale <= 1.8 ? 30000 : 15000;
-    const visibleUrbanCityIds = new Set(urbanCoreEntries.flatMap((entry) => entry.feature.properties?.city_ids || []));
-    const binSize = 40;
-    const urbanBins = new Map();
-    for (const entry of urbanCoreEntries) {
-      const binX = Math.floor(entry.screenX / binSize);
-      const binY = Math.floor(entry.screenY / binSize);
-      const key = `${binX}:${binY}`;
-      if (!urbanBins.has(key)) urbanBins.set(key, []);
-      urbanBins.get(key).push(entry);
-    }
+    // Geographic membership prevents a nearby conurbation from swallowing
+    // independent cities across a region. Match only cores actually drawn.
+    const visibleUrbanCores = new Map(urbanCoreEntries.map((entry) => [entry.feature, entry]));
 
-    for (const { feature, population, isCapital, cityId } of candidates) {
-      const props = feature?.properties || {};
+    for (const { feature, population, isCapital, cityId, urbanFeature } of candidates) {
       if (!isCapital && population < minPopulation) continue;
-      if (visibleUrbanCityIds.has(cityId)) continue;
       const anchor = getCityAnchor(feature);
       const screenPoint = getCityScreenPoint(anchor);
       if (!anchor || !screenPoint) continue;
@@ -1067,20 +1061,13 @@ export function createCityLightsRenderOwner({
       ) {
         continue;
       }
-      const cityBinX = Math.floor(screenPoint[0] / binSize);
-      const cityBinY = Math.floor(screenPoint[1] / binSize);
-      let overlapsUrbanCore = false;
-      // Core radius is bounded by the soft knee, so adjacent 40px bins cover
-      // every overlap without checking the entire visible urban collection.
-      for (let dx = -1; dx <= 1 && !overlapsUrbanCore; dx += 1) {
-        for (let dy = -1; dy <= 1 && !overlapsUrbanCore; dy += 1) {
-          overlapsUrbanCore = (urbanBins.get(`${cityBinX + dx}:${cityBinY + dy}`) || []).some((entry) => (
-            Math.hypot(entry.screenX - screenPoint[0], entry.screenY - screenPoint[1]) <= Math.max(18, entry.baseRadiusPx * 10)
-          ));
-        }
-      }
-      if (overlapsUrbanCore) continue;
-  
+      const urbanCore = visibleUrbanCores.get(urbanFeature);
+      if (urbanCore && Math.hypot(urbanCore.screenX - screenPoint[0], urbanCore.screenY - screenPoint[1])
+          <= urbanCore.baseRadiusPx * urbanCore.aspectRatio) continue;
+      // A large built-up footprint is ambient light, not a replacement for all
+      // its city centers. Retain distinct centers with modest overlap attenuation.
+      const urbanRetention = 1 - (urbanCore?.shapeBlend || 0) * 0.35;
+
       const populationScore = clamp(Math.log10(population + 1) / 6.5, 0.18, 1);
       const geographicCoords = getCityGeoCoordinates(feature);
       const sample = geographicCoords
@@ -1130,7 +1117,7 @@ export function createCityLightsRenderOwner({
         {
           rotation: orientation,
           rgb: haloRgb,
-          alpha: haloAlpha * haloAlphaScale,
+          alpha: haloAlpha * haloAlphaScale * urbanRetention,
           innerStop: 0.05 + ((1 - coreSharpness) * 0.04),
           midStop: 0.48 + ((1 - coreSharpness) * 0.16),
           innerAlphaScale: 0.92,
@@ -1146,7 +1133,7 @@ export function createCityLightsRenderOwner({
         {
           rotation: orientation,
           rgb: coreRgb,
-          alpha: coreAlpha * coreAlphaScale,
+          alpha: coreAlpha * coreAlphaScale * urbanRetention,
           innerStop: coreInnerStop,
           midStop: coreMidStop,
           innerAlphaScale: 1,
