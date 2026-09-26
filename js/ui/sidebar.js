@@ -4308,6 +4308,7 @@ function initSidebar({ render } = {}) {
       for (const [kind, field] of Object.entries(selectionFields)) {
         lastEditorSelection[kind] = String(runtimeState[field] || "");
       }
+      syncRightSidebarUrlState();
     },
     setSidebarTab: setRightSidebarTab,
     setStrategicMode: (active) => {
