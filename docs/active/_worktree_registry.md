@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-26 编辑工作区 UI 整合
+
+`C:/Users/raede/.codex/worktrees/editor-ui-merge-20260926/mapcreator` 使用分支 `codex/editor-ui-renewal-20260926`，基于 `origin/main@2e127eb4` 提取 UI 四阶段增量。主工作区的昼夜、渲染指标、启动管线等并行修改保留，不混入提交。隔离工作树用于构建、浏览器与合并验证，保留其 `.runtime` 运行证据供复核。任务记录见 [editor-ui-renewal-20260926](editor-ui-renewal-20260926/task.md)，最终推送、合并及部署状态以 Git/GitHub 回执为准。
+
 ## 2026-09-26 湖泊交互与显示整合
 
 `C:/Users/raede/.codex/worktrees/lake-interaction-merge/mapcreator` 使用分支 `codex/lake-interaction-opt-in`，从主工作区提取湖泊交互开关、河湖样式协调与填色预览遮罩改动。主工作区仍有城市灯光并行修改，保持其分支、索引与工作文件不变。本工作树保留供合并后的差异复核，最终检查与合并状态以 Git/GitHub 回执为准。

@@ -1,5 +1,6 @@
 import { setScenarioDiagnosticsState } from "../../core/state.js";
 import { markDirty } from "../../core/dirty_state.js";
+import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -266,6 +267,7 @@ export function createProjectSupportDiagnosticsController({
       cloudStatus.setAttribute("aria-live", "polite");
       cloudStatus.setAttribute("aria-atomic", "true");
       cloudStatus.textContent = t("Local backend cloud saves are available after login.", "ui");
+      cloudStatus.dataset.localizationKey = "Local backend cloud saves are available after login.";
       cloudHeaderCopy.append(cloudTitle, cloudStatus);
 
       const closeAccountBtn = documentRef.createElement("button");
@@ -481,10 +483,45 @@ export function createProjectSupportDiagnosticsController({
   let backendCloudSessionMode = "hidden";
   let lastExpandedSpecialZoneDiagnosticsKey = "";
 
-  const setBackendCloudStatus = (message) => {
+  const setBackendCloudStatus = (message, localizationKey = "", suffix = "") => {
     if (backendCloudStatus) {
       backendCloudStatus.textContent = message;
+      backendCloudStatus.dataset.localizationKey = localizationKey;
+      backendCloudStatus.dataset.localizationSuffix = suffix;
     }
+  };
+
+  const setLocalizedBackendCloudStatus = (key, suffix = "") =>
+    setBackendCloudStatus(`${t(key, "ui")}${suffix}`, key, suffix);
+
+  const refreshProjectAccountLanguage = () => {
+    const textById = [
+      ["backendAccountPopoverTitle", "Cloud Saves"],
+      ["backendCloudRegisterBtn", "Register"],
+      ["backendCloudLoginBtn", "Login"],
+      ["backendCloudLogoutBtn", "Logout"],
+      ["backendCloudSaveBtn", "Save Cloud Copy"],
+      ["backendCloudPublishBtn", "Publish Latest"],
+      ["backendCommunityRefreshBtn", "Refresh Community"],
+    ];
+    textById.forEach(([id, key]) => {
+      const element = documentRef.getElementById(id);
+      if (element) element.textContent = t(key, "ui");
+    });
+    const accountHint = backendAccountToggleBtn?.parentElement?.querySelector(".project-account-hint");
+    if (accountHint) accountHint.textContent = t("Account", "ui");
+    if (backendAccountToggleBtn) {
+      backendAccountToggleBtn.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
+      backendAccountToggleBtn.title = t("Account and Cloud Saves", "ui");
+    }
+    backendAccountPopover?.setAttribute("aria-label", t("Account and Cloud Saves", "ui"));
+    backendAccountCloseBtn?.setAttribute("aria-label", t("Close", "ui"));
+    if (backendCloudUsername) backendCloudUsername.placeholder = t("Username", "ui");
+    if (backendCloudPassword) backendCloudPassword.placeholder = t("Password", "ui");
+    if (backendCloudSaveTitle) backendCloudSaveTitle.placeholder = t("Save title", "ui");
+    const statusKey = backendCloudStatus?.dataset.localizationKey;
+    if (statusKey) setLocalizedBackendCloudStatus(statusKey, backendCloudStatus.dataset.localizationSuffix || "");
+    renderCommunitySaves(latestCommunitySaves);
   };
 
   const setBackendCloudSectionVisible = (visible) => {
@@ -541,7 +578,7 @@ export function createProjectSupportDiagnosticsController({
     onAuthenticated: (payload) => {
       updateActiveCloudUser(payload?.user);
       setBackendCloudSessionState("authenticated");
-      setBackendCloudStatus(`${t("Logged in as", "ui")} ${payload?.user?.displayName || payload?.user?.username || ""}`);
+      setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || payload?.user?.username || ""}`);
     },
     onAnonymous: () => {
       clearActiveCloudUser();
@@ -550,7 +587,7 @@ export function createProjectSupportDiagnosticsController({
     onUnavailable: (error) => {
       clearActiveCloudUser();
       setBackendCloudSessionState(error?.payload?.code ? "unavailable" : "hidden");
-      setBackendCloudStatus(t("Local backend unavailable. Start the local dev server to use Cloud Saves.", "ui"));
+      setLocalizedBackendCloudStatus("Local backend unavailable. Start the local dev server to use Cloud Saves.");
     },
     onSettled: () => {
       if (backendCloudStatus?.dataset) {
@@ -682,7 +719,7 @@ export function createProjectSupportDiagnosticsController({
         invalidateFrontlineOverlayState,
         onProjectImportComplete: (summary) => {
           completeProjectImportStatus(summary);
-          setBackendCloudStatus(t("Community save loaded into the editor.", "ui"));
+          setLocalizedBackendCloudStatus("Community save loaded into the editor.");
         },
         onProjectImportError: (error) => {
           const message = failProjectImportStatus(error);
@@ -691,9 +728,9 @@ export function createProjectSupportDiagnosticsController({
       },
     });
     if (outcome?.status === "committed-with-warnings") {
-      setBackendCloudStatus(`${t("Community save loaded into the editor.", "ui")} ${outcome.warnings.map(item => item.resource).join(", ")}`);
+      setLocalizedBackendCloudStatus("Community save loaded into the editor.", ` ${outcome.warnings.map(item => item.resource).join(", ")}`);
     } else if (outcome?.status === "failed" && outcome.reason === "import-in-progress") {
-      setBackendCloudStatus(t("Project import is already in progress.", "ui"));
+      setLocalizedBackendCloudStatus("Project import is already in progress.");
     }
   };
 
@@ -725,7 +762,7 @@ export function createProjectSupportDiagnosticsController({
           try {
             if (!(await confirmReplaceCurrentProject())) return;
             await hydrateProjectFromCommunitySave(String(save.id || ""));
-            setBackendCloudStatus(t("Community save import started.", "ui"));
+            setLocalizedBackendCloudStatus("Community save import started.");
           } catch (error) {
             setBackendCloudStatus(String(error?.message || error || ""));
           }
@@ -739,7 +776,7 @@ export function createProjectSupportDiagnosticsController({
       commentButton.addEventListener("click", async () => {
         try {
           await addCommunityComment(String(save.id || ""), "Tried this save locally.");
-          setBackendCloudStatus(t("Comment posted.", "ui"));
+          setLocalizedBackendCloudStatus("Comment posted.");
         } catch (error) {
           setBackendCloudStatus(String(error?.message || error || ""));
         }
@@ -752,7 +789,7 @@ export function createProjectSupportDiagnosticsController({
       reportButton.addEventListener("click", async () => {
         try {
           await reportCommunitySave(String(save.id || ""), "other", "Reported from the local editor.");
-          setBackendCloudStatus(t("Report submitted for review.", "ui"));
+          setLocalizedBackendCloudStatus("Report submitted for review.");
         } catch (error) {
           setBackendCloudStatus(String(error?.message || error || ""));
         }
@@ -1590,10 +1627,11 @@ export function createProjectSupportDiagnosticsController({
     return pager;
   };
 
+  const readLegendColors = createRevisionedLegendColorReader((appState) => legendManager.getUniqueColors(appState));
   const refreshLegendEditor = () => {
     if (!legendList) return;
     incrementSidebarCounter("legendRenders");
-    const colors = legendManager.getUniqueColors(state);
+    const colors = readLegendColors(state);
     const specialZoneLegendLayers = getVisibleSpecialZoneLegendLayers();
     const specialZoneLegendKey = legendManager.getSpecialZoneSignature(state);
     const colorItems = colors.map((color, index) => ({ type: "color", color, index }));
@@ -1681,7 +1719,7 @@ export function createProjectSupportDiagnosticsController({
           openBackendAccountPopover();
           try {
             await refreshCommunitySaves();
-            setBackendCloudStatus(t("Community saves refreshed.", "ui"));
+            setLocalizedBackendCloudStatus("Community saves refreshed.");
           } catch (error) {
             setBackendCloudStatus(String(error?.message || error || ""));
           }
@@ -1826,7 +1864,7 @@ export function createProjectSupportDiagnosticsController({
           latestCloudSaveUserKey = "";
           updateActiveCloudUser(payload?.user);
           setBackendCloudSessionState("authenticated");
-          setBackendCloudStatus(`${t("Logged in as", "ui")} ${payload?.user?.displayName || credentials.username}`);
+          setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || credentials.username}`);
         } catch (error) {
           setBackendCloudStatus(String(error?.message || error || ""));
         }
@@ -1843,7 +1881,7 @@ export function createProjectSupportDiagnosticsController({
           latestCloudSaveUserKey = "";
           updateActiveCloudUser(payload?.user);
           setBackendCloudSessionState("authenticated");
-          setBackendCloudStatus(`${t("Logged in as", "ui")} ${payload?.user?.displayName || credentials.username}`);
+          setLocalizedBackendCloudStatus("Logged in as", ` ${payload?.user?.displayName || credentials.username}`);
         } catch (error) {
           setBackendCloudStatus(String(error?.message || error || ""));
         }
@@ -1857,7 +1895,7 @@ export function createProjectSupportDiagnosticsController({
           await logoutBackendUser();
           clearActiveCloudUser();
           setBackendCloudSessionState("anonymous");
-          setBackendCloudStatus(t("Logged out.", "ui"));
+          setLocalizedBackendCloudStatus("Logged out.");
         } catch (error) {
           setBackendCloudStatus(String(error?.message || error || ""));
         }
@@ -1878,7 +1916,7 @@ export function createProjectSupportDiagnosticsController({
             });
             latestCloudSaveId = String(payload?.save?.id || "");
             latestCloudSaveUserKey = activeCloudUserKey;
-            setBackendCloudStatus(t("Cloud save created.", "ui"));
+            setLocalizedBackendCloudStatus("Cloud save created.");
           } catch (error) {
             setBackendCloudStatus(String(error?.message || error || ""));
           }
@@ -1895,7 +1933,7 @@ export function createProjectSupportDiagnosticsController({
             if (!saveId) throw new Error("Create a cloud save before publishing.");
             await publishBackendSave(saveId);
             await refreshCommunitySaves();
-            setBackendCloudStatus(t("Latest cloud save published.", "ui"));
+            setLocalizedBackendCloudStatus("Latest cloud save published.");
           } catch (error) {
             setBackendCloudStatus(String(error?.message || error || ""));
           }
@@ -1909,7 +1947,7 @@ export function createProjectSupportDiagnosticsController({
         await runExclusiveButtonTask(backendCommunityRefreshBtn, async () => {
           try {
             await refreshCommunitySaves();
-            setBackendCloudStatus(t("Community saves refreshed.", "ui"));
+            setLocalizedBackendCloudStatus("Community saves refreshed.");
           } catch (error) {
             setBackendCloudStatus(String(error?.message || error || ""));
           }
@@ -1922,6 +1960,7 @@ export function createProjectSupportDiagnosticsController({
 
   return {
     bindEvents,
+    refreshProjectAccountLanguage,
     refreshProjectSaveStatus,
     refreshLegendEditor,
     renderScenarioAuditPanel,

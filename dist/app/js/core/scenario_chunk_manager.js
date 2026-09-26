@@ -215,6 +215,8 @@ function normalizeChunkEntry(rawChunk = {}) {
     countryCodes: Array.isArray(rawChunk.country_codes || rawChunk.countryCodes)
       ? rawChunk.country_codes || rawChunk.countryCodes
       : [],
+    coordinatePrecision: String(rawChunk.lod || '').toLowerCase() === 'coarse'
+      && (rawChunk.lod_diagnostics?.round_decimals ?? rawChunk.coordinatePrecision) === 4 ? 4 : 7,
     globalCoverage: rawChunk.global_coverage === true || rawChunk.globalCoverage === true,
   };
 }

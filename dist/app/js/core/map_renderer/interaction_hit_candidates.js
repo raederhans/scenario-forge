@@ -274,7 +274,7 @@ function shouldPreferWaterHit(
   }
   if (!landHit?.id) return true;
   const waterType = getWaterRegionType(waterHit.feature);
-  if (["lake", "inland_sea", "strait", "chokepoint"].includes(waterType)) {
+  if (["lake", "reservoir", "inland_sea", "strait", "chokepoint"].includes(waterType)) {
     return true;
   }
   const landArea = Number(landHit.bboxArea || Infinity);

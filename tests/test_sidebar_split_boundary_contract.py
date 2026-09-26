@@ -48,9 +48,10 @@ class SidebarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("refreshCountryRows,", content)
         self.assertIn("renderCountryInspectorDetail,", content)
         self.assertIn("renderList,", content)
-        self.assertIn('registerRuntimeHook(state, "renderCountryListFn", renderList);', content)
-        self.assertIn('registerRuntimeHook(state, "refreshCountryListRowsFn", refreshCountryRows);', content)
-        self.assertIn('registerRuntimeHook(state, "refreshCountryInspectorDetailFn", renderCountryInspectorDetail);', content)
+        self.assertIn('registerRuntimeHook(state, "renderCountryListFn", withEditorSelection(renderList));', content)
+        self.assertIn('registerRuntimeHook(state, "refreshCountryListRowsFn", withEditorSelection(refreshCountryRows));', content)
+        self.assertIn('registerRuntimeHook(state, "refreshCountryInspectorDetailFn", withEditorSelection(renderCountryInspectorDetail));', content)
+        self.assertIn('const withEditorSelection = (callback) => (...args) => {', content)
         self.assertIn("bindCountryInspectorEvents();", content)
 
     def test_sidebar_collapse_labels_are_localized(self):

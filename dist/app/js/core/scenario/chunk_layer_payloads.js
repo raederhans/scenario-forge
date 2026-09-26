@@ -1,3 +1,4 @@
+import { registerContourSourcePrecision } from "../paint_contour_source.js";
 import { getPoliticalLodRank } from "./political_lod_policy.js";
 import { createPoliticalGeometryStore, getPoliticalGeometrySnapshot } from "../political_geometry_store.js";
 
@@ -102,6 +103,9 @@ export function buildMergedScenarioChunkLayerPayloads(bundle, chunkState, {
     const layerChunkPayloadEntries = getScenarioChunkPayloadEntriesForLayer(chunkState, layerKey, activeChunkIdSet);
     if (layerKey === "political") {
       chunkMetaById ||= buildScenarioChunkMetaIndex(bundle);
+      for (const { chunkId, entry } of layerChunkPayloadEntries) {
+        registerContourSourcePrecision(entry?.payload, chunkMetaById.get(chunkId));
+      }
       // mergeScenarioChunkPayloads keeps the first feature with each ID.
       layerChunkPayloadEntries.sort((left, right) => (
         getPoliticalLodRank(chunkMetaById.get(right.chunkId))

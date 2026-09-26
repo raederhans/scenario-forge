@@ -43,11 +43,11 @@ function getApplyDisabledReasonCopy(reason, compatibility) {
   if (reason === "source_pending") return t("Checking pack source before apply", "ui");
   if (reason === "source_failed") return t("Pack source check failed", "ui");
   if (reason === "unknown_pack") return t("Selected transport pack is unavailable", "ui");
-  if (reason === "family_mismatch") return t("Selected pack belongs to another transport family", "ui");
+  if (reason === "family_mismatch") return t("Choose a pack for this layer", "ui");
   if (compatibility === TRANSPORT_CAPABILITY_APPLY_COMPATIBILITY.localBoard) {
     return t("Layer order stays inside this workbench", "ui");
   }
-  return t("This family is preview-only until a main-map bridge exists.", "ui");
+  return t("This layer can't be added to the main map yet.", "ui");
 }
 
 export function getTransportWorkbenchActivePackId(runtimeState, familyId) {
@@ -127,7 +127,7 @@ export function createTransportWorkbenchApplyBridgeOwner(runtimeState, {
         return {
           compatibility,
           enabled: false,
-          label: t("Workbench preview only", "ui"),
+          label: t("Preview only", "ui"),
           reason: getApplyDisabledReasonCopy(bridgeSupport.reason, compatibility),
         };
       }
@@ -142,14 +142,14 @@ export function createTransportWorkbenchApplyBridgeOwner(runtimeState, {
       return {
         compatibility,
         enabled: false,
-        label: t("Workbench-only family", "ui"),
+        label: t("Workbench only", "ui"),
         reason: getApplyDisabledReasonCopy("", compatibility),
       };
     }
     return {
       compatibility,
       enabled: false,
-      label: t("Workbench preview only", "ui"),
+      label: t("Preview only", "ui"),
       reason: getApplyDisabledReasonCopy("", compatibility),
     };
   };

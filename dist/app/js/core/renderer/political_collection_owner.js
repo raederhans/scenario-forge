@@ -1,3 +1,4 @@
+import { inheritContourCoordinatePrecision } from "../paint_contour_source.js";
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "../political_geometry_store.js";
 
 export function createPoliticalCollectionOwner({
@@ -141,10 +142,10 @@ export function createPoliticalCollectionOwner({
 
     return {
       ...feature,
-      geometry: {
+      geometry: inheritContourCoordinatePrecision(feature.geometry, {
         ...feature.geometry,
         coordinates: keptComponents.map((component) => component.polygon),
-      },
+      }),
       properties: {
         ...(feature.properties || {}),
         __visualFragmentCamouflage: true,
@@ -292,6 +293,7 @@ export function createPoliticalCollectionOwner({
           );
         }
         // Store the rewound geometry for reuse; do not re-run geoArea next time.
+        inheritContourCoordinatePrecision(geometry, rewoundGeometry);
         normalizedGeometryByGeometry.set(geometry, rewoundGeometry);
         return rewoundFeature;
       }

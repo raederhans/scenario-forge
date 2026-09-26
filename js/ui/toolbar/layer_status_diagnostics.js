@@ -32,6 +32,7 @@ const STATUS_SEVERITY = Object.freeze({
 const STATUS_TONE = Object.freeze({
   ACTIVE: "active",
   DISABLED: "disabled",
+  OFF: "off",
   MUTED: "muted",
   PENDING: "pending",
   WARNING: "warning",
@@ -138,7 +139,8 @@ export function resolveLayerStatusTone(diagnostic = {}, severity = "") {
   if (normalizedSeverity === STATUS_SEVERITY.WARNING || loadStatus === "error" || loadStatus === "failed") {
     return STATUS_TONE.WARNING;
   }
-  if (diagnostic?.enabled === false || diagnostic?.supported === false) return STATUS_TONE.DISABLED;
+  if (diagnostic?.supported === false) return STATUS_TONE.DISABLED;
+  if (diagnostic?.enabled === false) return STATUS_TONE.OFF;
   return STATUS_TONE.MUTED;
 }
 
@@ -224,7 +226,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
   let severity = STATUS_SEVERITY.ACTIVE;
   if (!enabled) {
     summary = getLayerPanelDisabledReason(contract, { translate })
-      || translateUi(translate, "Experimental Bathymetry disabled");
+      || translateUi(translate, "Off");
     severity = STATUS_SEVERITY.MUTED;
   } else if (preset === "flat") {
     summary = translateUi(translate, "Experimental Bathymetry enabled · flat style selected");
@@ -270,13 +272,18 @@ export function buildDayNightDiagnostic(state = {}, { translate } = {}) {
   const config = state.styleConfig?.dayNight || {};
   const enabled = config.enabled === true;
   const mode = String(config.mode || "manual").trim().toLowerCase() || "manual";
+  const modeLabel = {
+    manual: "Manual UTC",
+    utc: "Live Computer UTC",
+    cycle: "Continuous Cycle",
+  }[mode] || mode;
   return {
     id: "day-night",
     label: contract?.label || "Day / Night",
     enabled,
     severity: enabled ? STATUS_SEVERITY.ACTIVE : STATUS_SEVERITY.MUTED,
     summary: sanitizeLayerStatusText(enabled
-      ? joinStatusParts(translateUi(translate, "Enabled"), translateUi(translate, mode))
+      ? joinStatusParts(translateUi(translate, "Enabled"), translateUi(translate, modeLabel))
       : translateUi(translate, "Hidden")),
   };
 }
@@ -366,8 +373,7 @@ export function buildTransportMasterDiagnostic(state = {}, { translate } = {}) {
   let summary = translateUi(translate, "Hidden");
   let severity = STATUS_SEVERITY.MUTED;
   if (masterEnabled && selectedFamilies.length === 0) {
-    summary = translateUi(translate, "Enabled · no overview family selected");
-    severity = STATUS_SEVERITY.WARNING;
+    summary = translateUi(translate, "No overview family selected");
   } else if (masterEnabled) {
     summary = joinStatusParts(
       translateUi(translate, "Enabled"),

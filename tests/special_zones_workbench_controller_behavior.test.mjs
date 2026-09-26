@@ -146,6 +146,33 @@ function getNodeText(node) {
   return [node.textContent, ...(node.children || []).map(getNodeText)].join(" ");
 }
 
+test("empty workbench presents one create action and reveals editing cards after creation", async () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+  const container = new TestElement("section");
+  const runtimeState = { specialZoneLayers: { layers: [], activeLayerId: "" } };
+  const controller = createSpecialZonesWorkbenchController({
+    runtimeState, container, markDirty() {}, render() {}, updateToolUI() {}, t: (value) => value,
+  });
+  try {
+    controller.renderSpecialZonesWorkbenchUi();
+    const root = container.querySelector("[data-special-zone-layers-workbench]");
+    const cards = findAll(container, (node) => node.parentNode?.className === "special-zone-workbench-grid");
+    assert.equal(root.dataset.emptyState, "true");
+    assert.equal(cards.length, 4);
+    assert.equal(cards.filter((card) => !card.hidden).length, 1);
+    assert.equal(findButtonByText(container, "New layer")?.disabled, false);
+    assert.equal(getNodeText(container).includes("Create a layer before editing members or styles."), true);
+    assert.equal(getNodeText(container).includes("Select or create a layer to apply style presets."), false);
+    await findButtonByText(container, "New layer").click();
+    assert.equal(root.dataset.emptyState, "false");
+    assert.equal(cards.filter((card) => !card.hidden).length, 4);
+    assert.ok(container.querySelector(".special-zone-preset-groups"));
+  } finally {
+    globalThis.document = previousDocument;
+  }
+});
+
 test("first scenario save loads the optional layer asset and posts canonical payload", async () => {
   const previousDocument = globalThis.document;
   const previousFetch = globalThis.fetch;

@@ -5,6 +5,7 @@ import {
   buildManifestOnlyInspectorRows,
   buildTransportWorkbenchInspectorRenderSignature,
   buildTransportWorkbenchDiagnosticRows,
+  buildTransportWorkbenchPackDetailsRows,
   buildTransportWorkbenchInspectorModel,
   createTransportWorkbenchInspectorOwner,
   formatTransportWorkbenchManifestTimestamp,
@@ -178,7 +179,7 @@ test("inspector model preserves road, rail, airport, and port pack status rows",
     dataContract: { governance: "road.json" },
   });
   assert.equal(rowValue(roadLoading.rows, "Pack status"), "Loading Japan road pack");
-  assert.equal(rowValue(roadLoading.rows, "Adapter"), "OSM only");
+  assert.equal(roadLoading.rows.some(([label]) => label === "Adapter"), false);
 
   const pendingCases = [
     {
@@ -426,8 +427,37 @@ test("owner factory injects layer metadata and keeps translated lens label", () 
     dataContract: { packs: ["japan_road"], geometryKind: "line" },
     rightDeckLabel: "Translated right deck",
   });
-  assert.equal(rowValue(summaryRows, "Right deck"), "Translated right deck");
+  assert.equal(summaryRows.some(([label]) => label === "Right deck"), false);
+  assert.equal(rowValue(summaryRows, "Pack status"), "ready");
   assert.equal(summaryRows.some(([label]) => label === "Compare"), false);
+});
+
+test("pack governance stays available for Data while Inspect shows the current result", () => {
+  const previewSnapshot = {
+    status: "ready",
+    manifest: {
+      adapter_id: "japan_road_v1",
+      source_policy: "internal review",
+      license_tier: "restricted",
+      n06_source_member: "N06-23",
+      n06_encoding: "CP932",
+    },
+    stats: { totalRoads: 12, visibleLabels: 3, filteredRoads: 2 },
+  };
+  const model = buildTransportWorkbenchInspectorModel({
+    family: { id: "road", label: "Road" }, previewSnapshot,
+    dataContract: { governance: "Review source terms before distribution." },
+  });
+  assert.equal(rowValue(model.rows, "Loaded roads"), "12");
+  for (const label of ["Pack version", "Source policy", "N06 member", "N06 encoding"]) {
+    assert.equal(model.rows.some(([candidate]) => candidate === label), false);
+  }
+  const details = buildTransportWorkbenchPackDetailsRows(previewSnapshot, {
+    governance: "Review source terms before distribution.",
+  }, "road");
+  assert.equal(rowValue(details, "N06 encoding"), "CP932");
+  assert.equal(rowValue(details, "License tier"), "restricted");
+  assert.equal(rowValue(details, "Source and use"), "Review source terms before distribution.");
 });
 
 test("inspector owner skips detail DOM rebuilds when the rendered model is unchanged", () => {
@@ -453,7 +483,7 @@ test("inspector owner skips detail DOM rebuilds when the rendered model is uncha
     assert.equal(firstRender.reused, false);
     assert.equal(secondRender.reused, true);
     assert.equal(detailsNode.replaceChildrenCallCount, 1);
-    assert.equal(detailsNode.childElementCount, 3);
+    assert.equal(detailsNode.childElementCount, 2);
     assert.equal(emptyCard.classList.contains("hidden"), true);
 
     const changedRender = owner.renderInspectorDetails({

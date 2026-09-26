@@ -63,12 +63,16 @@ test("strategic overlay shell keeps command bar, focus return, and counter place
     return !!state?.unitCounterEditor?.active;
   }, { timeout: 4_000 });
 
-  await page.evaluate(() => {
-    const inspectorTab = document.querySelector("#inspectorSidebarTabInspector");
-    if (inspectorTab instanceof HTMLElement) {
-      inspectorTab.click();
-    }
-  });
+  const editorWorkspace = await page.locator("body.editor-workspace").count() > 0;
+  if (editorWorkspace) {
+    await page.locator("#editorFinishAnnotationsBtn").click();
+    await expect(page.locator("body")).not.toHaveClass(/frontline-mode-active/);
+  } else {
+    await page.evaluate(() => {
+      const inspectorTab = document.querySelector("#inspectorSidebarTabInspector");
+      if (inspectorTab instanceof HTMLElement) inspectorTab.click();
+    });
+  }
   await expect.poll(async () => page.evaluate(() => {
     const state = globalThis.__playwrightStateRef || null;
     return {
@@ -89,7 +93,7 @@ test("strategic overlay shell keeps command bar, focus return, and counter place
       unitCounterActive: !!state?.unitCounterEditor?.active,
     };
   }), { timeout: 4_000 }).toEqual({
-    rightSidebarTab: "project",
+    rightSidebarTab: editorWorkspace ? "inspector" : "project",
     unitCounterActive: false,
   });
   await expect(commandBar).toBeVisible();

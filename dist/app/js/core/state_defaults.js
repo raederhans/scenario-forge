@@ -307,6 +307,7 @@ export function normalizePhysicalStyleConfig(rawConfig) {
 
 function createDefaultLakeStyleConfig() {
   return {
+    interactive: false,
     linkedToOcean: true,
     fillColor: null,
   };
@@ -317,6 +318,7 @@ function normalizeLakeStyleConfig(rawConfig) {
   const raw = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
   const fillColor = typeof raw.fillColor === "string" ? raw.fillColor.trim() : "";
   return {
+    interactive: raw.interactive === true,
     linkedToOcean: raw.linkedToOcean === undefined ? defaults.linkedToOcean : !!raw.linkedToOcean,
     fillColor: fillColor || null,
   };

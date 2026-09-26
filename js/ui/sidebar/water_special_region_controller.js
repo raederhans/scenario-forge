@@ -167,14 +167,39 @@ export function createWaterSpecialRegionController({
   const getWaterFeatureSource = (feature) =>
     String(feature?.properties?.source_standard || "").trim().toLowerCase();
 
+  const getWaterRowSourceLabel = (source) => {
+    const aliases = {
+      hgo_donor_water_georef: "HGO reconstruction",
+      mediterranean_template_sea_completion: "Mediterranean supplement",
+    };
+    return aliases[source]
+      ? t(aliases[source], "ui")
+      : formatWaterTokenLabel(source);
+  };
+
   const getWaterFeatureHasOverride = (featureId) =>
     Object.prototype.hasOwnProperty.call(runtimeState.waterRegionOverrides || {}, String(featureId || "").trim());
 
   const getWaterFeatureMeta = (feature) => {
-    const waterType = formatWaterTokenLabel(getWaterFeatureType(feature), "Water");
+    const waterType = t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui");
     const regionGroup = formatWaterTokenLabel(getWaterFeatureGroup(feature));
     const sourceLabel = formatWaterTokenLabel(getWaterFeatureSource(feature));
     return [waterType, regionGroup, sourceLabel].filter(Boolean).join(" · ");
+  };
+
+  const getWaterFeatureRowMeta = (feature, sameNameItems = []) => {
+    const type = t(formatWaterTokenLabel(getWaterFeatureType(feature), "Water"), "ui");
+    if (sameNameItems.length < 2) return type;
+    const source = getWaterFeatureSource(feature);
+    const sources = new Set(sameNameItems.map((item) => getWaterFeatureSource(item.feature)));
+    const groups = new Set(sameNameItems.map((item) => getWaterFeatureGroup(item.feature)));
+    const distinguishingValue = sources.size > 1 ? source
+      : groups.size > 1 ? getWaterFeatureGroup(feature)
+      : getWaterFeatureParentId(feature) || getWaterFeatureId(feature);
+    const detail = distinguishingValue && (sources.size > 1
+      ? getWaterRowSourceLabel(distinguishingValue)
+      : formatWaterTokenLabel(distinguishingValue));
+    return [type, detail].filter(Boolean).join(" · ");
   };
 
   const getWaterFeatureListName = (feature) => {
@@ -332,13 +357,13 @@ export function createWaterSpecialRegionController({
     if (!input) return;
     const currentValue = String(input.value || "");
     const nextValues = ["", ...values];
-    const signature = JSON.stringify(nextValues);
+    const signature = JSON.stringify([nextValues, runtimeState.currentLanguage]);
     if (input.dataset.optionsSignature !== signature) {
       input.replaceChildren();
       nextValues.forEach((value) => {
         const option = document.createElement("option");
         option.value = value;
-        option.textContent = value ? formatWaterTokenLabel(value) : t(emptyLabel, "ui") || emptyLabel;
+        option.textContent = value ? t(formatWaterTokenLabel(value), "ui") : t(emptyLabel, "ui") || emptyLabel;
         input.appendChild(option);
       });
       input.dataset.optionsSignature = signature;
@@ -715,6 +740,12 @@ export function createWaterSpecialRegionController({
     renderWaterFilterUi();
     const filteredFeatures = getFilteredWaterFeatures();
     const displayItems = getWaterListDisplayItems(filteredFeatures);
+    const itemsByName = new Map();
+    displayItems.forEach((item) => {
+      const items = itemsByName.get(item.listName) || [];
+      items.push(item);
+      itemsByName.set(item.listName, items);
+    });
     syncWaterAggregateMemberIndex(displayItems);
 
     waterRowRefsById.clear();
@@ -751,10 +782,7 @@ export function createWaterSpecialRegionController({
 
       const meta = document.createElement("div");
       meta.className = "country-select-meta";
-      meta.textContent = [
-        getWaterFeatureMeta(feature),
-        memberIds.length > 1 ? `${memberIds.length} ${t("fragments", "ui") || "fragments"}` : "",
-      ].filter(Boolean).join(" · ");
+      meta.textContent = getWaterFeatureRowMeta(feature, itemsByName.get(listName));
 
       const swatch = document.createElement("span");
       swatch.className = "country-select-swatch";

@@ -10,9 +10,15 @@ class Node {
 }
 function document() {
   const nodes = new Map();
+  const controls = new Node();
   return {
     nodes,
-    getElementById(id) { if (!nodes.has(id)) nodes.set(id, new Node()); return nodes.get(id); },
+    controls,
+    getElementById(id) {
+      if (!nodes.has(id)) nodes.set(id, new Node());
+      if (id === "strategicChoroplethMetric") nodes.get(id).parentElement = controls;
+      return nodes.get(id);
+    },
     createElement() { return new Node(); },
     createDocumentFragment() { return { children: [], appendChild(node) { this.children.push(node); } }; },
   };
@@ -73,12 +79,18 @@ test("null load is retryable and stale scenario completion cannot change current
   resolveOld(null);
   await tick();
   assert.match(doc.getElementById("strategicValuesStatus").textContent, /not connected/);
-  assert.equal(doc.getElementById("strategicValuesSource").textContent, "TNO 1962");
+  assert.equal(doc.getElementById("strategicValuesSource").textContent, "");
+  assert.equal(doc.controls.hidden, true);
+  assert.equal(doc.controls.style.display, "none");
+  assert.equal(doc.getElementById("strategicValuesLoad").hidden, true);
   assert.equal(doc.getElementById("strategicResourceFilter").disabled, true);
   assert.equal(doc.getElementById("strategicChoroplethMetric").disabled, true);
   runtimeState.activeScenarioId = "hoi4_1936";
   owner.render();
   assert.match(doc.getElementById("strategicValuesStatus").textContent, /available/);
+  assert.equal(doc.controls.hidden, false);
+  assert.equal(doc.controls.style.display, "");
+  assert.equal(doc.getElementById("strategicValuesLoad").hidden, false);
 });
 
 test("null result and rejected load show retry without claiming ready", async () => {
