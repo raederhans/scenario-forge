@@ -5026,7 +5026,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "factoryExportName": "createCityLightsRenderOwner",
   "borrowedLocalParameterIndexes": { "getUrbanLightWeight": [0], "sampleModernCityLightsGridNormalized": [0, 1], "getModernPopulationCoreGain": [0] },
   "borrowedMapReadResultPaths": { "getModernPopulationCoreGain": [["feature"], ["urbanFeature"]] },
-  "factorySourceFingerprint": "430433c78c981240fb3ba9125c59427b16f3cf44e3b6655a7d3994472acf133c",
+  "factorySourceFingerprint": "66531d6554dfa4d3c962772283dee3705fb849e5ba6954d9112bc8f258a7a162",
   "ownerBindingName": "cityLightsRenderOwner",
   "methods": [
     "toRgbaString",
