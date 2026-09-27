@@ -29,15 +29,15 @@ jobs:
             tools/ci/pr_plan.mjs
             tools/ci/perf_policy.mjs
           sparse-checkout-cone-mode: false
-          fetch-depth: 1
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Resolve transport relevance
         id: plan
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number || '' }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
@@ -46,7 +46,8 @@ jobs:
             exit 0
           fi
           mkdir -p .runtime/tmp .runtime/reports/generated
-          gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files?per_page=100" --jq '.[].filename' > .runtime/tmp/pr-changed-files.txt
+          git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt
+          test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::Transport planner received an empty changed-file set"; exit 1; }
           node tools/ci/pr_plan.mjs \
             --changed-files .runtime/tmp/pr-changed-files.txt \
             --labels "$PR_LABELS" \
