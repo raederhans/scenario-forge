@@ -77,7 +77,7 @@ class StartupHydrationBoundaryContractTest(unittest.TestCase):
         self.assertIn("|| topologyWaterPayload", content)
         self.assertIn("|| state.scenarioWaterRegionsData", content)
         self.assertIn("mergedPoliticalPayload !== undefined", content)
-        self.assertIn('getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political")', content)
+        self.assertIn('getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political", bundle)', content)
         self.assertIn("const promotableFeatures = features.filter", content)
         self.assertIn("{ ...collection, features: promotableFeatures }", content)
         self.assertIn("let nextScenarioPoliticalPayload = previousScenarioPoliticalPayload || null", content)

@@ -38,6 +38,39 @@ function harness(overrides = {}, helperOverrides = {}) {
   return { owner, state, events };
 }
 
+for (const { label, startupResult, expectedOverride } of [
+  { label: "startup bundle", startupResult: { ok: true, startupBootArtifactsOverride: { topologyPrimary: "bundled" } }, expectedOverride: { topologyPrimary: "bundled" } },
+  { label: "no default scenario", startupResult: { ok: true, skipped: true }, expectedOverride: undefined },
+  { label: "failed startup bundle", startupResult: { ok: false, error: new Error("bundle failed") }, expectedOverride: null },
+]) {
+  test(`base resource loading begins before ${label} settles and keeps its fallback selection`, async () => {
+    const bundle = deferred();
+    const events = [];
+    const { owner } = harness({
+      SCENARIO_STARTUP_LOCALES_FILENAME: "locales.startup.json",
+      SCENARIO_STARTUP_GEO_ALIASES_FILENAME: "geo_aliases.startup.json",
+      getStartupScenarioSupportUrl: (scenarioId, filename) => scenarioId ? `${scenarioId}/${filename}` : "",
+      loadMapData: async ({ startupBootArtifactsOverride, ...options }) => {
+        events.push("independent-resources-started");
+        assert.equal(options.includeCityData, false);
+        assert.deepEqual(options.includeContextLayers, ["urban", "lakes"]);
+        const override = await startupBootArtifactsOverride;
+        events.push("bundle-selection-ready");
+        return { override };
+      },
+    });
+    const pending = owner.loadStartupBaseData({
+      d3Client: { json() {} },
+      startupFallbackScenarioId: label === "no default scenario" ? "" : "sample",
+      startupBundleResultPromise: bundle.promise,
+    });
+    assert.deepEqual(events, ["independent-resources-started"]);
+    bundle.resolve(startupResult);
+    assert.deepEqual(await pending, { override: expectedOverride });
+    assert.deepEqual(events, ["independent-resources-started", "bundle-selection-ready"]);
+  });
+}
+
 test("resource finalizers cannot clear a replacement request or its status", () => {
   const previous = Promise.resolve();
   const replacement = Promise.resolve();

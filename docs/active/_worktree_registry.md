@@ -1,5 +1,11 @@
 # Worktree Registry
 
+## 2026-09-27 性能优化整合
+
+`C:/Users/raede/.codex/worktrees/performance-integration/mapcreator` 从远端 `main` 的 `b4f9089c` 建立，分支 `codex/performance-closeout-20260927`。本对话四轮性能改动从脏主工作区定向提取，保留远端海洋、UI 和昼夜更新。主工作区 `main` 及未归属 WIP 不变；精度扩展与旧 pr164 工作树不在本次清理范围。
+
+验证及交付状态见 [性能整合任务](performance-closeout-20260927/task.md)。本工作树仍承担 PR 验证与运行证据，不在合并前清理；最终合并和推送以 GitHub 回执为准。
+
 ## 2026-09-26 外海细化整合
 
 `C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator` 当前使用 `codex/ocean-refinement-next`，从已合并 PR #176 的主线 ea450a0c 开始第二轮外海细化：6 个海区、连接检查、层级定位及分级标签。主工作区既有 WIP 保留；新增标签、覆盖率和侧栏性能优化，本地验证完成，用户已授权经 PR 合并推送。工作树保留用于性能前后对比及几何证据复核，远端交付入口为 [PR #177](https://github.com/raederhans/scenario-forge/pull/177)，检查及合并状态以 GitHub 为准。记录见 [ocean-refinement-next-20260927](ocean-refinement-next-20260927/task.md)；上一轮回执保留在 [ocean-refinement-20260926](ocean-refinement-20260926/task.md)。

@@ -13,6 +13,51 @@ const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.j
 const sharedSource = await readFile(new URL("../js/core/json_resource_decoder_shared.js", import.meta.url), "utf8");
 const dataLoaderSource = await readFile(new URL("../js/core/data_loader.js", import.meta.url), "utf8");
 
+test("plain response reads body once without re-encoding valid UTF-8 for metrics", async () => {
+  let blobAllocations = 0;
+  const context = vm.createContext({
+    TextDecoder, TextEncoder, Uint8Array, ArrayBuffer, TypeError,
+    Blob: class extends Blob { constructor(parts) { super(parts); blobAllocations++; } },
+  });
+  vm.runInContext(sharedSource, context);
+  const decoder = context.__scenarioForgeJsonResourceDecoderShared;
+  const text = JSON.stringify({ label: "红海 🌊", values: [1.2345678901234567, -12] });
+  for (const bytes of [Buffer.from(text), Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(text)])]) {
+    let bodyReads = 0;
+    const result = await decoder.decodeResponsePayload({
+      async arrayBuffer() { throw new Error("Body must not be read twice"); },
+      async text() { bodyReads++; return new Response(bytes).text(); },
+    }, { url: "coarse.json" });
+    assert.equal(JSON.stringify(result.payload), text);
+    assert.equal(result.rawText, text);
+    assert.equal(result.decodedBytes, Buffer.byteLength(text));
+    assert.equal(result.encodedBytes, Buffer.byteLength(text));
+    assert.equal(bodyReads, 1);
+  }
+  assert.equal(blobAllocations, 0);
+});
+
+test("plain response preserves malformed UTF-8 replacement and text-only response behavior", async () => {
+  const bytes = Buffer.concat([Buffer.from('{"label":"'), Buffer.from([0xff]), Buffer.from('"}')]);
+  const expected = await new Response(bytes).text();
+  const replaced = await sharedDecoder.decodeResponsePayload(new Response(bytes), { url: "coarse.json" });
+  assert.equal(replaced.rawText, expected);
+  assert.deepEqual(replaced.payload, JSON.parse(expected));
+  assert.equal(replaced.decodedBytes, Buffer.byteLength(expected));
+  const valid = await sharedDecoder.decodeResponsePayload(new Response('{"valid":true}'));
+  assert.deepEqual(valid.payload, { valid: true });
+  const textOnly = await sharedDecoder.decodeResponsePayload({ text: async () => '{"label":"海"}' });
+  assert.deepEqual(textOnly.payload, { label: "海" });
+  assert.equal(textOnly.decodedBytes, Buffer.byteLength('{"label":"海"}'));
+});
+
+test("UTF-8 metrics count multibyte characters, surrogate pairs and lone surrogates exactly", () => {
+  const cases = ["", "ASCII", "éø", "红海", "🌊", "a\ud800b", "\udc00", "\ud800\ud800\udc00\udc00", "\ufeff"];
+  for (const text of cases) assert.equal(sharedDecoder.getUtf8ByteLength(text), new TextEncoder().encode(text).byteLength);
+  const allCodeUnits = Array.from({ length: 65536 }, (_, value) => String.fromCharCode(value)).join("");
+  assert.equal(sharedDecoder.getUtf8ByteLength(allCodeUnits), new TextEncoder().encode(allCodeUnits).byteLength);
+});
+
 function gzipSync(content) {
   const buf = typeof content === "string" ? Buffer.from(content, "utf8") : Buffer.from(content);
   return zlib.gzipSync(buf);

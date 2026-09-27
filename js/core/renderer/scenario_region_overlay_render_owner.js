@@ -69,11 +69,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       return 0;
     }
     waterFeatures.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `water-${index}`;
       if (!isWaterRegionRenderable(feature)) return;
-      const defaultStyle = getWaterRegionDefaultStyle(feature);
-      const fillOpacity = maskOnly ? 1 : defaultStyle.opacity;
-      if (!(fillOpacity > 0)) return;
       const parts = collectSafeWaterRegionGeometryParts(feature);
       if (!parts.length) return;
       const visibleParts = [];
@@ -82,6 +78,9 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         visibleParts.push(part);
       });
       if (!visibleParts.length) return;
+      const fillOpacity = maskOnly ? 1 : getWaterRegionDefaultStyle(feature).opacity;
+      if (!(fillOpacity > 0)) return;
+      const id = getFeatureId(feature) || `water-${index}`;
       rendererSurfaceHost.getContext().save();
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
       rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
@@ -143,9 +142,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     return renderedWaterCount;
   }
 
-  function drawScenarioAtlantropaLandLikeOverlayLayer(k) {
+  function drawScenarioAtlantropaLandLikeOverlayLayer(k, buckets = getEffectiveAtlantropaFeatures()) {
     const startedAt = nowMs();
-    const buckets = getEffectiveAtlantropaFeatures();
     const overlayFeatures = [
       ...buckets.land,
       ...buckets.shoal,
@@ -201,10 +199,10 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     return renderedCount;
   }
 
-  function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures) {
+  function renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures, waterVisualRevision) {
     return scenarioLayerCache.render("water", currentTransform, {
       draw: (layerK) => drawScenarioWaterFillLayer(layerK, { waterFeatures }),
-      getSignature: getScenarioWaterVisualRevisionToken,
+      getSignature: () => waterVisualRevision,
     });
   }
 
@@ -340,10 +338,13 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible();
     // Common lakes are base geography, including in scenes such as HGO that
     // disable the editable water-region overlay by default.
-    const sharedLakeIds = new Set((runtimeState.contextLayerExternalDataByName?.lakes?.features || []).map(getFeatureId));
-    const waterFeatures = showWater || sharedLakeIds.size
-      ? getEffectiveWaterRegionFeatures().filter((feature) => showWater || sharedLakeIds.has(getFeatureId(feature)))
-      : [];
+    const sharedLakes = showWater ? [] : (runtimeState.contextLayerExternalDataByName?.lakes?.features || []);
+    const atlantropaFeatures = showWater || sharedLakes.length ? getEffectiveAtlantropaFeatures() : null;
+    const effectiveWaterFeatures = atlantropaFeatures ? getEffectiveWaterRegionFeatures(atlantropaFeatures) : [];
+    const sharedLakeIds = sharedLakes.length ? new Set(sharedLakes.map(getFeatureId)) : null;
+    const waterFeatures = showWater
+      ? effectiveWaterFeatures
+      : sharedLakeIds ? effectiveWaterFeatures.filter((feature) => sharedLakeIds.has(getFeatureId(feature))) : [];
     const paintWater = showWater || waterFeatures.length > 0;
     const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
     let renderedWaterCount = 0;
@@ -404,7 +405,10 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
 
       const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
       const waterLayerEntry = scenarioLayerCache.getSnapshot("water");
-      const waterVisualRevision = getScenarioWaterVisualRevisionToken();
+      const waterVisualRevision = getScenarioWaterVisualRevisionToken({
+        effectiveWaterFeatureCount: effectiveWaterFeatures.length,
+        atlantropaFeatures,
+      });
       const canReuseWaterLayer = (
         shouldEnableContextScenarioTransformReuse()
         && waterLayerEntry.signature === waterVisualRevision
@@ -454,7 +458,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
             : waterLayerEntry.signature === waterVisualRevision ? "transform" : "signature",
           signatureChanged: waterLayerEntry.signature !== waterVisualRevision,
         });
-        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures);
+        renderedWaterCount = renderScenarioWaterFillLayerToCache(currentTransform, waterFeatures, waterVisualRevision);
         if (!scenarioLayerCache.draw("water", currentTransform)) {
           waterCacheMode = "direct";
           renderedWaterCount = drawScenarioWaterFillLayer(k, { waterFeatures });
@@ -462,7 +466,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       }
       highlightedWaterCount = showWater ? drawScenarioWaterHighlightLayer(k) : 0;
       if (showAtlantropaLandLikeOverlay) {
-        renderedAtlantropaLandLikeCount = drawScenarioAtlantropaLandLikeOverlayLayer(k);
+        renderedAtlantropaLandLikeCount = drawScenarioAtlantropaLandLikeOverlayLayer(k, atlantropaFeatures);
       }
       lastScenarioWaterRenderedCount = Math.max(0, Number(renderedWaterCount || 0));
       collectContextMetric("contextScenarioLayerWater", 0, {

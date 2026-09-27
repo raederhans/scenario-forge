@@ -14,8 +14,8 @@ const stableInputWindow = process.env.M2_STABLE_INPUT === '1';
 const variant = process.env.P1_VARIANT || 'baseline';
 const viewport = { width: 1600, height: 1000 };
 
-async function waitForStableInputWindow(page) {
-  if (!stableInputWindow) return;
+async function waitForStableInputWindow(page, { required = stableInputWindow } = {}) {
+  if (!required) return;
   await page.evaluate(() => { globalThis.__inputStableWindow = null; });
   await page.waitForFunction(() => {
     const s = globalThis.__playwrightStateRef;
@@ -128,6 +128,7 @@ async function installInputObserver(page, point) {
     globalThis.__runtimeInputProbe = { results: [], pending: null, readPixels, busyTasks: [],
       runBusyRender: () => {
         const task = { kind: 'full-color-refresh', startTime: performance.now() };
+        console.debug('__runtime_busy_render_started__');
         try { refreshColorState({ renderNow: true }); }
         finally {
           task.endTime = performance.now();
@@ -222,7 +223,9 @@ async function installInputObserver(page, point) {
 }
 
 async function arm(page, kind, rgb = null, inputPoint = null, { naturalBackground = false } = {}) {
-  if (kind !== 'zoom' && !naturalBackground) await waitForStableInputWindow(page);
+  // Controlled load needs the same quiet baseline: otherwise a natural promotion
+  // can delay the injected renderer task until after the real input was handled.
+  if (kind !== 'zoom' && !naturalBackground) await waitForStableInputWindow(page, { required: true });
   // Resolve actionability/coordinates and move before the measured busy task.
   if (inputPoint) await page.mouse.move(inputPoint.x, inputPoint.y);
   await page.evaluate(({ kind, rgb }) => {
@@ -242,11 +245,14 @@ async function controlPoint(page, selector) {
 }
 
 async function dispatchInput(page) {
-  // Do not await renderer work before injecting real mouse events. A client-side
-  // delay lets the renderer task start, while EventTiming must prove overlap.
+  // The renderer's start signal establishes ordering across the automation and
+  // input channels. A client delay alone cannot prove evaluation has started.
+  const busyStarted = stableInputWindow ? Promise.resolve() : page.waitForEvent('console', {
+    predicate: message => message.text() === '__runtime_busy_render_started__', timeout: 30_000,
+  });
   const work = stableInputWindow ? Promise.resolve() : page.evaluate(() => globalThis.__runtimeInputProbe.runBusyRender());
   const workOutcome = work.then(() => null, error => error);
-  if (!stableInputWindow) await new Promise(resolve => setTimeout(resolve, 10));
+  await busyStarted;
   const started = process.hrtime.bigint();
   await page.mouse.down();
   await page.mouse.up();
@@ -280,7 +286,9 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       await page.locator('#customColor').fill('#e31ac4');
       const point = await page.evaluate(async () => {
         const { projectGeoToScreen } = await import(new URL('./js/core/map_renderer.js', location.href));
-        const xy = projectGeoToScreen(13.4, 52.5);
+        // A broad rural interior keeps the fixed RGB probe clear of capital
+        // symbols at world zoom. Berlin's city overlay covers the old 9x9 probe.
+        const xy = projectGeoToScreen(-110, 56);
         const rect = document.querySelector('#mapContainer').getBoundingClientRect();
         return { x: rect.left + xy[0], y: rect.top + xy[1] };
       });
@@ -301,6 +309,11 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       expect(initial.id).toBeTruthy();
       await waitForRenderIdle(page, { scenarioId });
+      expect(await page.evaluate(rgb => {
+        const pixels = globalThis.__runtimeInputProbe.readPixels();
+        return pixels.some((value, i) => i % 4 === 0
+          && rgb.every((channel, offset) => Math.abs(pixels[i + offset] - channel) < 18));
+      }, initial.rgb), 'probe must contain the selected land color before painting').toBe(true);
       await arm(page, 'fill', [227, 26, 196], point);
       await dispatchInput(page);
       await waitForInputEvidence(page);
@@ -340,6 +353,12 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         snapshot: globalThis.__mc_perf__?.snapshot?.() || null,
         inputs: globalThis.__runtimeInputProbe?.results || [],
         pendingInput: globalThis.__runtimeInputProbe?.pending || null,
+        paintDiagnostics: {
+          overrides: { ...globalThis.__playwrightStateRef?.visualOverrides },
+          colors: Object.fromEntries(Object.keys(globalThis.__playwrightStateRef?.visualOverrides || {})
+            .map(id => [id, globalThis.__playwrightStateRef.colors?.[id]])),
+          pixels: globalThis.__runtimeInputProbe?.readPixels?.() || [],
+        },
         stableDiagnostics: globalThis.__inputStableDiagnostics || null,
         eventTimings: globalThis.__inputEventTimings || [],
         longTasks: globalThis.__inputLongTasks || [],
@@ -351,7 +370,7 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       const evidencePath = testInfo.outputPath('runtime-stage-input-evidence.json');
       fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, variant, viewport, stableInputWindow,
-        measurementVersion: 3,
+        measurementVersion: 4, probeGeo: [-110, 56],
         baselineRevision: process.env.P1_BASE_REVISION || null,
         browserVersion: page.context().browser()?.version(), nodeVersion: process.version,
         host: require('node:os').hostname(), platform: process.platform,
@@ -359,7 +378,7 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
           trace: 'off: before-action DOM snapshots would perturb dispatch timing',
           handlerBoundary: 'capture listener; exact processingStart/End retained per EventTiming entry',
           eventAssociation: 'unique pointerdown timestamp and target; queue from that entry only; raw events retained separately',
-          busyCondition: 'concurrent synchronous full-color-refresh and mouse down/up after 10ms client delay; overlap must be observed',
+          busyCondition: 'quiet baseline, then synchronous full-color-refresh with a renderer start signal before mouse down/up; overlap must be observed',
           wheel: 'capture timestamps and frame evidence; excluded from discrete EventTiming' }, pageErrors, ...interpreted }, null, 2));
       await testInfo.attach('runtime-stage-input-evidence', { path: evidencePath, contentType: 'application/json' });
       if (!stableInputWindow && evidence.inputs.length === 5) {

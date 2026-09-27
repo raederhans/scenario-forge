@@ -17,7 +17,7 @@ function fixture() {
     visualOverrides: {}, featureOverrides: {}, waterRegionOverrides: {},
     sovereignBaseColors: { GER: "#445566" }, countryBaseColors: { GER: "#445566" },
     scenarioBaselineOwnersByFeatureId: Object.freeze({ a: "GER", b: "GER" }),
-    landIndex: new Map([["a", { id: "a" }], ["b", { id: "b" }]]),
+    landIndex: new Map([["a", { id: "a" }], ["b", { id: "b" }], ["c", { id: "c" }]]),
   };
   const session = { before: {}, changed: false, visitedFeatureIds: new Set(), affectedFeatureIds: new Set(),
     visitedWaterRegionIds: new Set(), affectedWaterRegionIds: new Set(), visitedSpecialRegionIds: new Set() };
@@ -65,6 +65,18 @@ test("country brush eraser clears feature overrides but not the base palette", (
   assert.deepEqual(h.runtime.visualOverrides, {});
   assert.deepEqual(h.runtime.sovereignBaseColors, { GER: "#445566" });
   assert.equal(h.session.before.visualOverrides.a, "#000000");
+});
+
+test("brush keeps the first land preview immediate and coalesces later hits", () => {
+  const h = fixture();
+  for (const id of ["a", "b", "c"]) {
+    h.setIds([id]);
+    assert.equal(h.apply({ id, targetType: "land" }), true);
+  }
+  const paints = h.calls.filter(([name]) => name === "paint");
+  assert.deepEqual(paints.map(([, ids]) => [...ids]), [["a"], ["b"], ["c"]]);
+  assert.deepEqual(paints.map(([, , , options]) => options.coalescePatchPreview), [false, true, true]);
+  assert.deepEqual(h.runtime.visualOverrides, { a: "#112233", b: "#112233", c: "#112233" });
 });
 
 test("incomplete brush group produces no paint, capture or changed session", () => {

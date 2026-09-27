@@ -109,6 +109,65 @@ test("production preview records only actually drawn IDs when it yields to exact
   assert.deepEqual([...f.calls.find(([type]) => type === "first-pixel")[1].renderedIds], ["a"]);
   assert.ok(f.calls.findIndex(([type]) => type === "mask-lakes") > f.calls.findIndex(([type]) => type === "draw"));
 });
+test("brush preview paints the first hit immediately, merges later hits by frame, and flushes the final set", () => {
+  const f = previewFixture();
+  const cache = f.scope.getRenderPassCacheState();
+  const session = {};
+  const frames = new Map();
+  let nextFrame = 1;
+  f.scope.brushSession = session;
+  f.scope.requestAnimationFrame = callback => { const handle = nextFrame++; frames.set(handle, callback); return handle; };
+  f.scope.cancelAnimationFrame = handle => frames.delete(handle);
+  f.scope.hasPendingPoliticalColorEdit = () => cache.pendingPoliticalColorEditIds?.size > 0;
+  f.scope.requestRendererRender = () => {};
+  const helpers = source.slice(source.indexOf("function cancelScheduledBrushPatchPreview()"),
+    source.indexOf("\nfunction paintPoliticalPatchOverlayForIds("));
+  vm.runInContext(`let brushPatchPreviewFrame = null, brushPatchPreviewCancel = null;
+    let brushPatchPreviewSession = null, brushPatchPreviewTransformSignature = "";\n${helpers}`, f.scope);
+  for (const id of ["a", "b", "c"]) f.features.set(id, { id, ...pointFeature() });
+  cache.pendingPoliticalColorEditInputLabel = "brush-fill-feature-color";
+  cache.pendingPoliticalColorEditIds = new Set(["a"]);
+  assert.equal(f.paint(cache.pendingPoliticalColorEditIds), true);
+  assert.deepEqual(f.calls.filter(([type]) => type === "draw").map(([, id]) => id), ["a"]);
+  cache.pendingPoliticalColorEditIds = new Set(["a", "b"]);
+  f.scope.scheduleBrushPatchPreview();
+  cache.pendingPoliticalColorEditIds = new Set(["a", "b", "c"]);
+  f.scope.scheduleBrushPatchPreview();
+  assert.equal(frames.size, 1);
+  const firstFrame = [...frames.values()][0]; firstFrame();
+  assert.deepEqual(f.calls.filter(([type]) => type === "draw").map(([, id]) => id), ["a", "a", "b", "c"]);
+  assert.equal(f.calls.filter(([type]) => type === "mask-lakes").length, 2);
+  f.scope.scheduleBrushPatchPreview();
+  assert.equal(f.scope.flushScheduledBrushPatchPreview(session), true);
+  assert.equal(frames.size, 0);
+  assert.deepEqual(f.calls.filter(([type]) => type === "draw").slice(-3).map(([, id]) => id), ["a", "b", "c"]);
+});
+test("pending-edit reset cancels a queued brush preview before it can repaint stale pixels", () => {
+  const f = previewFixture();
+  const cache = f.scope.getRenderPassCacheState();
+  const session = {};
+  let callback = null;
+  const cancelled = [];
+  f.scope.brushSession = session;
+  f.scope.requestAnimationFrame = fn => { callback = fn; return 7; };
+  f.scope.cancelAnimationFrame = handle => cancelled.push(handle);
+  f.scope.hasPendingPoliticalColorEdit = () => cache.pendingPoliticalColorEditIds?.size > 0;
+  f.scope.requestRendererRender = () => {};
+  f.scope.recordPendingPoliticalColorEditClearDiagnostics = () => {};
+  const helpers = source.slice(source.indexOf("function cancelScheduledBrushPatchPreview()"),
+    source.indexOf("\nfunction paintPoliticalPatchOverlayForIds("));
+  const clear = source.slice(source.indexOf("function clearPendingPoliticalColorEdit("),
+    source.indexOf("\nfunction retargetPendingPoliticalColorEditRevisionAfterColorRebuild("));
+  vm.runInContext(`let brushPatchPreviewFrame = null, brushPatchPreviewCancel = null;
+    let brushPatchPreviewSession = null, brushPatchPreviewTransformSignature = "";\n${helpers}\n${clear}`, f.scope);
+  cache.pendingPoliticalColorEditIds = new Set(["a"]);
+  f.scope.scheduleBrushPatchPreview();
+  f.scope.clearPendingPoliticalColorEdit({ force: true });
+  callback();
+  assert.deepEqual(cancelled, [7]);
+  assert.equal(f.calls.some(([type]) => type === "draw"), false);
+  assert.equal(cache.pendingPoliticalColorEditIds.size, 0);
+});
 test("production layer invalidation preserves the water source token and schedules rather than flushes", () => {
   const body = source.slice(source.indexOf("function invalidateContextLayerVisualStateBatch("), source.indexOf("\nfunction createHitCanvasElement("));
   const scheduled = [], invalidated = [];

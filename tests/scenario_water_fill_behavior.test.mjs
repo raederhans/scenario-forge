@@ -70,10 +70,13 @@ function createHarness({
   const calls = {
     beginPath: 0,
     fill: [],
+    paint: [],
     stroke: [],
     pathCanvas: [],
     restore: 0,
     save: 0,
+    featureIds: [],
+    defaultStyles: [],
   };
   const metrics = [];
   const drawingContext = {
@@ -84,6 +87,7 @@ function createHarness({
     },
     fill(pathValue) {
       calls.fill.push(arguments.length ? pathValue : "current-path");
+      calls.paint.push({ path: arguments.length ? pathValue : "current-path", color: this.fillStyle, alpha: this.globalAlpha });
     },
     stroke(pathValue) {
       calls.stroke.push({ path: pathValue || "current-path", color: this.strokeStyle, alpha: this.globalAlpha, width: this.lineWidth });
@@ -111,11 +115,11 @@ function createHarness({
     collectSafeWaterRegionGeometryParts: (candidate) => candidate.parts,
     getScenarioWaterPartBounds: (candidate) => candidate.bounds,
     scenarioWaterPathCache: { getStats: () => ({ entries: 0 }) },
-    getFeatureId: (candidate) => candidate.id,
+    getFeatureId: (candidate) => { calls.featureIds.push(candidate.id); return candidate.id; },
     getScenarioWaterFeaturePath: () => featurePath,
     getScenarioWaterPartPath: (candidate) => partPaths.get(candidate.id) || null,
     getWaterRegionColor: () => "#123456",
-    getWaterRegionDefaultStyle: (candidate) => ({ opacity: candidate.opacity }),
+    getWaterRegionDefaultStyle: (candidate) => { calls.defaultStyles.push(candidate.id); return { opacity: candidate.opacity }; },
     isWaterRegionRenderable: (candidate) => candidate.renderable,
     nowMs: () => 10,
     projectedGeoBoundsInScreen: (candidateBounds) => candidateBounds?.visible !== false,
@@ -216,4 +220,23 @@ test("scenario water fill excludes transparent, disabled, and offscreen features
   assert.equal(harness.calls.restore, 0);
   assert.equal(harness.metrics.at(-1).payload.featureCount, 3);
   assert.equal(harness.metrics.at(-1).payload.renderedCount, 0);
+});
+
+test("water paint resolves styles and IDs only for visible features; masks skip unused opacity lookup", () => {
+  const offscreen = feature("offscreen", { parts: [part("offscreen-part", { visible: false })] });
+  const visible = feature("visible", { opacity: 0.6 });
+  const h = createHarness({ featurePath: { name: "water-path" } });
+  assert.equal(h.draw([offscreen, visible]), 1);
+  assert.deepEqual(h.calls.defaultStyles, ["visible"]);
+  assert.deepEqual(h.calls.featureIds, ["visible"]);
+  h.calls.defaultStyles.length = 0;
+  h.calls.featureIds.length = 0;
+  assert.equal(h.draw([offscreen, visible], { maskOnly: true }), 1);
+  assert.deepEqual(h.calls.defaultStyles, []);
+  assert.deepEqual(h.calls.featureIds, ["visible"]);
+  assert.equal(h.calls.fill.length, 2);
+  assert.deepEqual(h.calls.paint, [
+    { path: h.calls.fill[0], color: "#123456", alpha: 0.6 },
+    { path: h.calls.fill[1], color: "#123456", alpha: 1 },
+  ]);
 });

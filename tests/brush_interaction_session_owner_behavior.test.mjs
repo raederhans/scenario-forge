@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createBrushInteractionSessionOwner } from "../js/core/renderer/brush_interaction_session_owner.js";
 
-function harness() {
+function harness({ flushBrushPatchPreview = null } = {}) {
   let session = null;
   const calls = [];
   const state = { brushModeEnabled: true, currentTool: "fill", selectedColor: "#abcdef", landIndex: new Map([["a", {}]]) };
@@ -16,6 +16,7 @@ function harness() {
     pushHistoryEntry: record("history"), isSovereigntyModeActive: () => false,
     addRecentColor: record("recent"), markDirty: record("dirty"), refreshSidebarAfterPaint: record("sidebar"),
     requestRendererRender: record("render"), noteRenderAction: record("note"),
+    flushBrushPatchPreview,
     getHitFromEvent: (_event, options) => { calls.push(["hit", options]); return modes.hit; },
     getStrategicOverlayRuntimeOwner: () => ({
       hasSpecialZoneMembershipDragSession: () => modes.special,
@@ -73,6 +74,16 @@ test("click without dragging makes no transaction; unchanged drag still suppress
   h.calls.length = 0;
   h.owner.flushBrushSession();
   assert.deepEqual(h.calls.map(([name]) => name), ["session", "suppress"]);
+});
+
+test("brush end flushes any queued preview before publishing history and the final render", () => {
+  const calls = [];
+  const h = harness({ flushBrushPatchPreview: () => calls.push("flush-preview") });
+  h.owner.handleBrushPointerDown(h.event());
+  h.owner.handleBrushPointerMove(h.event(4));
+  h.owner.flushBrushSession();
+  assert.deepEqual(calls, ["flush-preview"]);
+  assert.ok(h.calls.findIndex(([name]) => name === "history") < h.calls.findIndex(([name]) => name === "render"));
 });
 
 test("readonly, physical, and special membership take precedence over normal brush", () => {
