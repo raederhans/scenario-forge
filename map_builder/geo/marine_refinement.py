@@ -25,6 +25,12 @@ ADDITIONAL_SEAS = (
     ("ceram_sea", "Ceram Sea", "塞兰海", "24132", "sea"),
     ("berau_gulf", "Berau Gulf", "贝劳湾", "24131", "gulf"),
     ("florida_strait", "Straits of Florida", "佛罗里达海峡", "24043", "strait"),
+    ("kara_sea", "Kara Sea", "喀拉海", "24027", "sea"),
+    ("laptev_sea", "Laptev Sea", "拉普捷夫海", "24026", "sea"),
+    ("east_siberian_sea", "East Siberian Sea", "东西伯利亚海", "24025", "sea"),
+    ("chukchi_sea", "Chukchi Sea", "楚科奇海", "24022", "sea"),
+    ("bering_strait", "Bering Strait", "白令海峡", "24122", "strait"),
+    ("strait_of_hormuz", "Strait of Hormuz", "霍尔木兹海峡", "24076", "strait"),
 )
 OCEAN_SECTORS = (
     ("northwest_atlantic_ocean", "Northwest Atlantic Ocean", "西北大西洋", "24047", "atlantic"),
@@ -43,7 +49,7 @@ OCEAN_SECTORS = (
 # input or paint order. Ocean/parent subtraction remains in the water compiler.
 MARINE_BOUNDARY_EXCLUSIONS = {
     "banda_sea": ("timor_sea", "gulf_of_bone"),
-    "barents_sea": ("norwegian_sea", "fram_strait"),
+    "barents_sea": ("norwegian_sea", "fram_strait", "kara_sea"),
     "black_sea": ("sea_of_azov", "sea_of_marmara"),
     "celebes_sea": ("sulu_sea",),
     "east_china_sea": ("philippine_sea", "yellow_sea", "sea_of_japan"),
@@ -60,6 +66,11 @@ MARINE_BOUNDARY_EXCLUSIONS = {
     "halmahera_sea": ("ceram_sea",),
     "flores_sea": ("bali_sea", "sumba_strait"),
     "aru_sea": ("ceram_sea",),
+    "kara_sea": ("laptev_sea",),
+    "laptev_sea": ("east_siberian_sea",),
+    "beaufort_sea": ("chukchi_sea",),
+    "bering_sea": ("bering_strait",),
+    "persian_gulf": ("strait_of_hormuz",),
 }
 
 
@@ -81,6 +92,19 @@ def load_collection(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def additional_ocean_clip_ids(slug):
+    """Explicit affected TNO sectors for each source family, including seam straits."""
+    if slug == "florida_strait":
+        return ("tno_northwest_atlantic_ocean", "tno_west_central_atlantic_ocean")
+    if slug in {"kara_sea", "laptev_sea", "east_siberian_sea", "chukchi_sea", "bering_strait"}:
+        return ("tno_western_arctic_ocean", "tno_eastern_arctic_ocean",
+                "tno_northwest_pacific_ocean", "tno_northeast_pacific_ocean")
+    if slug == "strait_of_hormuz":
+        return ("tno_western_indian_ocean", "tno_eastern_indian_ocean")
+    return ("tno_northwest_pacific_ocean", "tno_west_central_pacific_ocean",
+            "tno_southwest_pacific_ocean", "tno_eastern_indian_ocean", "tno_southern_indian_ocean")
+
+
 def tno_additional_specs():
     return tuple({
         "id": f"tno_{slug}", "name": name, "label": name,
@@ -88,14 +112,7 @@ def tno_additional_specs():
         "is_chokepoint": kind == "strait", "source_layer": "seavox_v19",
         "source_query": f"mrgid_sr='{mrgid}'", "source_standard": "marine_regions_seavox_v19",
         "subtract_base_ids": (), "simplify_tolerance": 0.005,
-        "clip_open_ocean_ids": (
-            ("tno_northwest_atlantic_ocean", "tno_west_central_atlantic_ocean")
-            if slug == "florida_strait" else (
-                "tno_northwest_pacific_ocean", "tno_west_central_pacific_ocean",
-                "tno_southwest_pacific_ocean", "tno_eastern_indian_ocean",
-                "tno_southern_indian_ocean",
-            )
-        ),
+        "clip_open_ocean_ids": additional_ocean_clip_ids(slug),
     } for slug, name, _zh, mrgid, kind in ADDITIONAL_SEAS)
 
 

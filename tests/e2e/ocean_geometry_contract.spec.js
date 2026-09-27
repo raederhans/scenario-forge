@@ -18,7 +18,7 @@ const TNO_PROBES = [
   { id: "antarctic-indian-80e", point: [80, -70], expectedIds: [], expectedLand: true },
   { id: "antarctic-indian-90e", point: [90, -75], expectedIds: [], expectedLand: true },
   { id: "arctic", point: [0, 85], expectedIds: ["tno_western_arctic_ocean"], expectedLand: false, expectWaterPixel: true },
-  { id: "dateline-east", point: [179.5, 75], expectedIds: ["tno_eastern_arctic_ocean"], expectedLand: false, expectWaterPixel: true },
+  { id: "dateline-east", point: [179.5, 75], expectedIds: ["tno_east_siberian_sea"], expectedLand: false, expectWaterPixel: true },
   { id: "dateline-west", point: [-179.5, 75], expectedIds: ["tno_western_arctic_ocean"], expectedLand: false, expectWaterPixel: true },
   { id: "mid-atlantic", point: [-30, 30], expectedIds: ["tno_northeast_atlantic_ocean"], expectedLand: false, expectWaterPixel: true },
 ];
@@ -31,11 +31,12 @@ async function setOpenOceanInteraction(page) {
       invalidateOceanWaterInteractionVisualState,
       render,
     } = await import(new URL("./js/core/map_renderer.js", globalThis.location.href).toString());
-    state.allowOpenOceanSelect = true;
-    state.allowOpenOceanPaint = true;
-    state.showOpenOceanRegions = true;
-    state.currentTool = "fill";
-    state.devSelectedHit = null;
+    const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
+    const { callRuntimeHook } = await import("/js/core/state/index.js");
+    const { applyProjectImportPatch } = await import("/js/core/state/actions/project_import_actions.js");
+    patchAppearanceVisibilityState(state, { allowOpenOceanSelect: true, allowOpenOceanPaint: true, showOpenOceanRegions: true });
+    callRuntimeHook(state, "runToolSelectionFn", "fill", { dismissHint: false });
+    applyProjectImportPatch(state, { devSelectedHit: null });
     clearHistory();
     invalidateOceanWaterInteractionVisualState("e2e-ocean-geometry-contract");
     render();
@@ -151,10 +152,10 @@ async function readProbeResults(page, probes) {
     const { state } = await import(new URL("./js/core/state.js", globalThis.location.href).toString());
     const { projectGeoToScreen } = await import(new URL("./js/core/map_renderer.js", globalThis.location.href).toString());
     const d3 = globalThis.d3;
-    const macroFeatures = Array.from(state.waterRegionsById?.values?.() || [])
-      .filter((feature) => feature?.properties?.region_group === "ocean_macro");
-    const macroSpatialItems = (state.waterSpatialItems || [])
-      .filter((item) => item?.feature?.properties?.region_group === "ocean_macro");
+    const marineFeatures = Array.from(state.waterRegionsById?.values?.() || [])
+      .filter((feature) => ["ocean_macro", "marine_macro", "marine_detail"].includes(feature?.properties?.region_group));
+    const marineSpatialItems = (state.waterSpatialItems || [])
+      .filter((item) => ["ocean_macro", "marine_macro", "marine_detail"].includes(item?.feature?.properties?.region_group));
     // Chunked startup shells intentionally contain empty mask collections.
     // Match the renderer's nonempty-mask preference and background fallback.
     const landMask = [state.scenarioContextLandMaskData, state.scenarioLandMaskData, state.landBgData]
@@ -170,12 +171,12 @@ async function readProbeResults(page, probes) {
             (screenPoint[1] - Number(transform.y || 0)) / zoomScale,
           ]
         : null;
-      const geometryIds = macroFeatures
+      const geometryIds = marineFeatures
         .filter((feature) => d3.geoContains(feature, probe.point))
         .map((feature) => String(feature.properties?.id || feature.id || ""))
         .filter(Boolean)
         .sort();
-      const spatialCandidates = macroSpatialItems.map((item) => {
+      const spatialCandidates = marineSpatialItems.map((item) => {
         const contains = d3.geoContains(item.hitGeometry || item.feature, probe.point);
         const bboxContains = Array.isArray(projected)
           && projected[0] >= Number(item.minX) - 0.5
@@ -206,7 +207,7 @@ async function readProbeResults(page, probes) {
           y: Number(transform.y || 0),
           k: zoomScale,
         },
-        spatialItemCount: macroSpatialItems.length,
+        spatialItemCount: marineSpatialItems.length,
         spatialCandidates,
         land: !!(landMask && d3.geoContains(landMask, probe.point)),
         ocean: !!(oceanMask && d3.geoContains(oceanMask, probe.point)),
@@ -266,8 +267,10 @@ test("new base ocean sectors inherit saved parent colors and support independent
   await page.evaluate(async () => {
     const { state } = await import(new URL("./js/core/state.js", location.href));
     const { invalidateOceanWaterInteractionVisualState, render } = await import(new URL("./js/core/map_renderer.js", location.href));
-    state.waterRegionOverrides = { marine_atlantic_ocean: "#123456" };
-    state.selectedColor = "#ff00ff";
+    const { restoreProjectImportFields } = await import("/js/core/state/actions/renderer_interaction_actions.js");
+    const { setSelectedColorState } = await import("/js/core/state/actions/appearance_selection_actions.js");
+    restoreProjectImportFields(state, { waterRegionOverrides: { marine_atlantic_ocean: "#123456" } });
+    setSelectedColorState(state, "#ff00ff");
     invalidateOceanWaterInteractionVisualState("e2e-inherited-ocean-color");
     render();
   });
@@ -342,9 +345,12 @@ test("open-ocean geometry stays visible, uniquely hittable, paintable, and undo-
 
   await page.evaluate(async () => {
     const { state } = await import(new URL("./js/core/state.js", globalThis.location.href).toString());
-    state.currentTool = "fill";
-    state.selectedColor = "#ff00ff";
-    state.devSelectedHit = null;
+    const { callRuntimeHook } = await import("/js/core/state/index.js");
+    const { setSelectedColorState } = await import("/js/core/state/actions/appearance_selection_actions.js");
+    const { applyProjectImportPatch } = await import("/js/core/state/actions/project_import_actions.js");
+    callRuntimeHook(state, "runToolSelectionFn", "fill", { dismissHint: false });
+    setSelectedColorState(state, "#ff00ff");
+    applyProjectImportPatch(state, { devSelectedHit: null });
   });
   await page.mouse.click(pagePoint.x, pagePoint.y);
   await expect.poll(async () => page.evaluate(async (expectedId) => {
@@ -387,4 +393,21 @@ test("open-ocean geometry stays visible, uniquely hittable, paintable, and undo-
   await page.locator("#mapContainer").screenshot({
     path: testInfo.outputPath("tno-ocean-geometry-contract.png"),
   });
+  // Exercise independent ocean selection while the world-view fixture is loaded.
+  const focusResult = await page.evaluate(async (id) => {
+    const { state } = await import("/js/core/state.js");
+    const { focusWaterRegionById } = await import("/js/core/map_renderer.js");
+    const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
+    patchAppearanceVisibilityState(state, {
+      showWaterRegions: false, allowOpenOceanSelect: true,
+      allowOpenOceanPaint: false, showOpenOceanRegions: false,
+    });
+    const before = { x: state.zoomTransform.x, y: state.zoomTransform.y, k: state.zoomTransform.k };
+    return { before, focused: focusWaterRegionById(id) };
+  }, targetId);
+  expect(focusResult.focused).toBe(true);
+  await expect.poll(() => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return { x: state.zoomTransform.x, y: state.zoomTransform.y, k: state.zoomTransform.k };
+  })).not.toEqual(focusResult.before);
 });

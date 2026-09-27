@@ -525,8 +525,10 @@ process.stdout.write(JSON.stringify(ignores));
         self.assertIn("sparse-checkout:", workflow)
         self.assertIn("tools/ci/pr_plan.mjs", workflow)
         self.assertIn("tools/ci/pr_plan.mjs", transport_workflow)
-        self.assertIn("gh api --paginate", workflow)
-        self.assertIn("gh api --paginate", transport_workflow)
+        for planner_workflow in (workflow, transport_workflow):
+            tree_diff = 'git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt'
+            self.assertIn(tree_diff, planner_workflow)
+            self.assertLess(planner_workflow.index(tree_diff), planner_workflow.index("      - name: Checkout\n"))
         self.assertIn("scenario_id:", workflow)
         self.assertIn("Resolve this scenario lane", workflow)
         self.assertIn("Fast success for scenario-unrelated changes", workflow)
@@ -2583,6 +2585,26 @@ if (lines[0].specPath !== 'tests/e2e/ui_contract_foundation.spec.js') {
 
 class ScenarioContractMatrixRoutingTests(unittest.TestCase):
     SCENARIOS = ["blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"]
+
+    def test_pr_planners_read_name_only_tree_diff_without_pr_files_api(self):
+        for workflow_name in (
+            "pr-verify.yml",
+            "scenario-contract-matrix.yml",
+            "transport-contract-required.yml",
+        ):
+            with self.subTest(workflow=workflow_name):
+                workflow = (REPO_ROOT / ".github/workflows" / workflow_name).read_text(encoding="utf-8")
+                self.assertIn("fetch-depth: 0", workflow)
+                self.assertIn("filter: blob:none", workflow)
+                self.assertIn("BASE_SHA: ${{ github.event.pull_request.base.sha", workflow)
+                self.assertIn("HEAD_SHA: ${{ github.event.pull_request.head.sha", workflow)
+                self.assertIn(
+                    'git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt',
+                    workflow,
+                )
+                self.assertIn("test -s .runtime/tmp/pr-changed-files.txt", workflow)
+                self.assertNotIn("/pulls/$PR_NUMBER/files", workflow)
+
     def plan(self, paths, labels=None):
         changed_files = TMP_BASE / "scenario-plan-changed-files.txt"
         plan_json = TMP_BASE / "scenario-plan.json"

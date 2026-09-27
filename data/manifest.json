@@ -35,8 +35,8 @@
       "size_bytes": 19049
     },
     "europe_topology.json": {
-      "arc_count": 243010,
-      "arc_point_count": 1276136,
+      "arc_count": 244972,
+      "arc_point_count": 1305691,
       "artifact_class": "derived",
       "description": "Primary political topology emitted by the coarse GIS pipeline.",
       "has_computed_neighbors": true,
@@ -55,9 +55,9 @@
       "raw_world_bounds_geometries": 0,
       "role": "primary_topology",
       "schema_ref": "schema://topology/political_bundle_v1",
-      "sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
+      "sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
       "simplification": "coarse_publish_v1",
-      "size_bytes": 18267182,
+      "size_bytes": 18591301,
       "target_zoom_range": [
         0,
         1.7
@@ -96,8 +96,8 @@
       "world_bounds_geometries": 1
     },
     "europe_topology.na_v2.json": {
-      "arc_count": 367411,
-      "arc_point_count": 1711013,
+      "arc_count": 369373,
+      "arc_point_count": 1740568,
       "artifact_class": "derived",
       "description": "Current detail political topology used for runtime enrichment.",
       "has_computed_neighbors": true,
@@ -116,9 +116,9 @@
       "raw_world_bounds_geometries": 44,
       "role": "detail_topology_na_v2",
       "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "sha256": "4509828231ff51ecaeb288924d246daba22318663d998f2c9ba38e0a3fd73b41",
+      "sha256": "0b302e8186546d8aa254e200a0e73898dfda1e5627662f8923b7c16286b1ed21",
       "simplification": "detail_publish_v2",
-      "size_bytes": 78835216,
+      "size_bytes": 79977077,
       "target_zoom_range": [
         1.7,
         20

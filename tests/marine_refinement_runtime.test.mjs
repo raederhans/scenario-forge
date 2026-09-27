@@ -7,7 +7,17 @@ const topojson = require("../vendor/topojson-client.min.js");
 const d3 = require("../vendor/d3.v7.min.js");
 const read = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url), "utf8"));
 
+const expansionProbes = [
+  ["marine_kara_sea", [70, 75]],
+  ["marine_laptev_sea", [125, 76]],
+  ["marine_east_siberian_sea", [160, 72]],
+  ["marine_chukchi_sea", [-170, 69]],
+  ["marine_chukchi_sea", [179, 70]],
+  ["marine_bering_strait", [-168.8, 65.8]],
+  ["marine_strait_of_hormuz", [56.3, 26.6]],
+];
 const probes = [
+  ...expansionProbes,
   ["marine_bo_hai", [119.3, 38.5]],
   ["marine_taiwan_strait", [119.6, 24]],
   ["marine_flores_sea", [119.3, -7.1]],
@@ -25,6 +35,9 @@ test("shared refinements have unique interior membership in both published base 
       const hits = water.filter((f) => d3.geoContains(f, point)).map((f) => f.properties.id).sort();
       assert.deepEqual(hits, [id], `${file}: ${id} must be selectable exactly once at ${point}`);
     }
+    // The nearby Chukotka coast stays land while the date-line sea remains selectable.
+    assert.equal(d3.geoContains(topojson.feature(topology, topology.objects.land), [179, 69]), true);
+    assert.deepEqual(water.filter((f) => d3.geoContains(f, [179, 69])).map((f) => f.properties.id), []);
     const byId = new Map(water.map((f) => [f.properties.id, f]));
     assert.ok(water.filter((f) => f.properties.parent_id && f.properties.water_type === "ocean").every((f) => f.properties.interactive === true));
     for (const id of ["marine_atlantic_ocean", "marine_pacific_ocean", "marine_indian_ocean", "marine_arctic_ocean", "marine_southern_ocean"]) {
@@ -39,7 +52,7 @@ test("shared refinements have unique interior membership in both published base 
 test("new ordinary sea polygons reach TNO without replacing its existing ocean sector identity", () => {
   const t = read("../data/scenarios/tno_1962/runtime_topology.topo.json");
   const water = topojson.feature(t, t.objects.scenario_water).features;
-  for (const [id, point] of probes.filter(([id]) => /flores|bali|florida/.test(id))) {
+  for (const [id, point] of [...expansionProbes, ...probes.filter(([id]) => /flores|bali|florida/.test(id))]) {
     assert.deepEqual(water.filter((f) => d3.geoContains(f, point)).map((f) => f.properties.id), [id.replace("marine_", "tno_")]);
   }
   assert.deepEqual(water.filter((f) => d3.geoContains(f, [-30, 30])).map((f) => f.properties.id), ["tno_northeast_atlantic_ocean"]);

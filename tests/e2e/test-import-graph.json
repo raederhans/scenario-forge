@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 67,
-    "nodeCount": 83,
-    "reverseIndexKeyCount": 126,
+    "specCount": 68,
+    "nodeCount": 84,
+    "reverseIndexKeyCount": 130,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 62
+        "specCount": 63
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -930,6 +930,40 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/marine_label_performance.spec.js": {
+      "directDependencies": [
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/ui/sidebar.js"
+      ]
+    },
     "tests/e2e/non_1962_runtime_matrix.spec.js": {
       "directDependencies": [
         "js/core/map_renderer.js",
@@ -963,6 +997,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
@@ -971,6 +1010,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
@@ -985,6 +1029,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "js/ui/sidebar.js"
       ]
     },
@@ -2106,6 +2155,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2170,6 +2220,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2275,6 +2326,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2371,6 +2423,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2414,11 +2467,23 @@
     "js/core/state/actions/appearance_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "js/core/state/actions/appearance_selection_actions.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
+    "js/core/state/actions/appearance_visibility_actions.js": [
+      "tests/e2e/marine_label_performance.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
+    "js/core/state/actions/project_import_actions.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
     "js/core/state/actions/renderer_interaction_actions.js": [
-      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js"
     ],
     "js/core/state/actions/scenario_presentation_actions.js": [
-      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/marine_label_performance.spec.js"
     ],
     "js/core/state/actions/transport_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
@@ -2430,6 +2495,7 @@
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
     "js/core/state/index.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js"
     ],
     "js/core/state/ui_state.js": [
@@ -2470,6 +2536,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2615,6 +2682,9 @@
     "tests/e2e/map_clarity.spec.js": [
       "tests/e2e/map_clarity.spec.js"
     ],
+    "tests/e2e/marine_label_performance.spec.js": [
+      "tests/e2e/marine_label_performance.spec.js"
+    ],
     "tests/e2e/non_1962_runtime_matrix.spec.js": [
       "tests/e2e/non_1962_runtime_matrix.spec.js"
     ],
@@ -2732,6 +2802,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2796,6 +2867,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2860,6 +2932,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2924,6 +2997,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -2999,6 +3073,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",
@@ -3070,6 +3145,7 @@
       "tests/e2e/interaction_funnel_contract.spec.js",
       "tests/e2e/main_shell_i18n.spec.js",
       "tests/e2e/map_clarity.spec.js",
+      "tests/e2e/marine_label_performance.spec.js",
       "tests/e2e/non_1962_runtime_matrix.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/ownership_retirement.spec.js",

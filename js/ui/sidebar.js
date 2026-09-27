@@ -26,6 +26,7 @@ import {
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
   getWaterRegionColor,
+  focusWaterRegionById,
   refreshColorState,
   refreshResolvedColorsForFeatures,
   renderLegend,
@@ -133,6 +134,7 @@ const mapRenderer = Object.freeze({
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
   getWaterRegionColor,
+  focusWaterRegionById,
   refreshColorState,
   renderLegend,
   selectOperationGraphicById,
@@ -2301,9 +2303,11 @@ function initSidebar({ render } = {}) {
   const waterInspectorEmpty = document.getElementById("waterInspectorEmpty");
   const waterInspectorSelected = document.getElementById("waterInspectorSelected");
   const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
+  const waterInspectorLocateBtn = document.getElementById("waterInspectorLocateBtn");
   const waterInspectorMetaSection = document.getElementById("waterInspectorMetaSection");
   const waterInspectorMetaList = document.getElementById("waterInspectorMetaList");
   const waterInspectorHierarchySection = document.getElementById("waterInspectorHierarchySection");
+  const waterInspectorBreadcrumb = document.getElementById("waterInspectorBreadcrumb");
   const waterInspectorJumpToParentBtn = document.getElementById("waterInspectorJumpToParentBtn");
   const waterInspectorChildrenList = document.getElementById("waterInspectorChildrenList");
   const waterInspectorColorRow = document.getElementById("waterInspectorColorRow");
@@ -3917,9 +3921,11 @@ function initSidebar({ render } = {}) {
       waterInspectorEmpty,
       waterInspectorSelected,
       waterInspectorDetailHint,
+      waterInspectorLocateBtn,
       waterInspectorMetaSection,
       waterInspectorMetaList,
       waterInspectorHierarchySection,
+      waterInspectorBreadcrumb,
       waterInspectorJumpToParentBtn,
       waterInspectorChildrenList,
       waterInspectorColorRow,

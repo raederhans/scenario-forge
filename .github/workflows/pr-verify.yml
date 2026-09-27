@@ -33,16 +33,17 @@ jobs:
             tools/ci/pr_plan.mjs
             tools/ci/perf_policy.mjs
           sparse-checkout-cone-mode: false
-          fetch-depth: 1
+          fetch-depth: 0
+          filter: blob:none
 
       - name: Read changed files
         env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          GH_REPO: ${{ github.repository }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          set -euo pipefail
           mkdir -p .runtime/tmp .runtime/reports/generated
-          gh api --paginate "repos/$GH_REPO/pulls/$PR_NUMBER/files?per_page=100" --jq '.[].filename' > .runtime/tmp/pr-changed-files.txt
+          git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt
           test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::PR planner received an empty changed-file set"; exit 1; }
 
       - name: Plan PR verification

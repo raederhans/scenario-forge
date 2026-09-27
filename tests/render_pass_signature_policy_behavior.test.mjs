@@ -169,13 +169,30 @@ test("transport presentation changes invalidate shared labels without invalidati
   }
 });
 
+test("marine visibility, selection, data and language invalidate only labels among unrelated passes", () => {
+  for (const change of [
+    (state) => { state.showWaterRegions = true; },
+    (state) => { state.showOpenOceanRegions = true; },
+    (state) => { state.allowOpenOceanPaint = true; },
+    (state) => { state.selectedWaterRegionId = "tno_bo_hai"; },
+    (state) => { state.waterRegionsDataToken = "new-water"; },
+    (state) => { state.scenarioWaterOverlayVersionTag = "new-scenario-water"; },
+    (state) => { state.currentLanguage = "zh"; },
+  ]) {
+    const { state, policy } = createHarness();
+    const before = policy.getRenderPassSignature("labels");
+    change(state);
+    assert.notEqual(policy.getRenderPassSignature("labels"), before);
+  }
+});
+
 test("every catalog pass reads its live invalidation input and ignores unrelated UI state", () => {
   assert.deepEqual(invalidationCases.map(([pass]) => pass).sort(), [...RENDER_PASS_NAMES].sort());
   for (const [pass, field] of invalidationCases) {
     const { state, policy } = createHarness();
     const before = policy.getRenderPassSignature(pass);
     state.selectedWaterRegionId = "unrelated-ui-selection";
-    assert.equal(policy.getRenderPassSignature(pass), before, `${pass}: unrelated state`);
+    assert.equal(policy.getRenderPassSignature(pass) === before, pass !== "labels", `${pass}: water selection`);
     state[field] = Number(state[field] || 0) + 1;
     assert.notEqual(policy.getRenderPassSignature(pass), before, `${pass}: ${field}`);
   }

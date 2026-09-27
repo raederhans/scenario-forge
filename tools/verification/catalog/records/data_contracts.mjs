@@ -1,6 +1,15 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    id: "e2e:tests/e2e/marine_label_performance.spec.js",
+    commandRef: "node tools/e2e_layering.mjs run-spec tests/e2e/marine_label_performance.spec.js",
+    sourceRefs: ["tests/e2e/marine_label_performance.spec.js", "js/core/renderer/marine_label_owner.js"],
+    ownerHints: ["water-runtime"], domains: ["water-runtime"], tiers: ["regression"],
+    cost: "heavy", resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
+    executionOwners: ["main-thread"], profiles: ["full"], platforms: ["all"],
+    entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  },
+  {
     id: "marine:refinement-contract",
     commandRef: "python -m unittest tests.test_marine_refinement -q",
     sourceRefs: [

@@ -354,7 +354,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     let waterCacheStrategyMode = "disabled";
     let waterCacheStrategySource = "disabled";
     let waterCoverageAlgo = "disabled";
-    let waterVisibleCoverageRatio = 0;
+    let waterVisibleCoverageRatio = null;
     let waterPrevRenderedCount = Math.max(0, Number(lastScenarioWaterRenderedCount || 0));
     let specialCacheMode = "disabled";
     // water/special overlay 这里走的是显式策略选择，不是错误恢复链：
@@ -400,10 +400,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       const forcedWaterCache = getForcedScenarioWaterCacheMode();
       waterCacheStrategyMode = forcedWaterCache.mode;
       waterCacheStrategySource = forcedWaterCache.source;
-      const signals = getScenarioWaterCacheComplexitySignals(waterFeatures);
-      waterVisibleCoverageRatio = signals.visibleCoverageRatio;
-      waterPrevRenderedCount = signals.previousRenderedCount;
-      waterCoverageAlgo = signals.waterCoverageAlgo || "grid";
+      waterCoverageAlgo = "not-evaluated";
 
       const currentTransform = cloneZoomTransform(runtimeState.zoomTransform || globalThis.d3?.zoomIdentity);
       const waterLayerEntry = scenarioLayerCache.getSnapshot("water");
@@ -415,7 +412,21 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
         && waterLayerEntry.hasReferenceTransform
       );
 
-      const useAdaptiveDirect = forcedWaterCache.mode === "adaptive" && shouldUseDirectScenarioWaterDraw(signals);
+      let evaluatedSignals = null;
+      // The policy reads coverage only after feature and prior-render thresholds pass.
+      const useAdaptiveDirect = forcedWaterCache.mode === "adaptive" && shouldUseDirectScenarioWaterDraw({
+        featureCount: waterFeatures.length,
+        previousRenderedCount: waterPrevRenderedCount,
+        get visibleCoverageRatio() {
+          evaluatedSignals ??= getScenarioWaterCacheComplexitySignals(waterFeatures);
+          return evaluatedSignals.visibleCoverageRatio;
+        },
+      });
+      if (evaluatedSignals) {
+        waterVisibleCoverageRatio = evaluatedSignals.visibleCoverageRatio;
+        waterPrevRenderedCount = evaluatedSignals.previousRenderedCount;
+        waterCoverageAlgo = evaluatedSignals.waterCoverageAlgo || "grid";
+      }
       const strategy = useAdaptiveDirect ? "adaptive-direct" : forcedWaterCache.mode;
 
       if (strategy === "direct" || strategy === "adaptive-direct") {

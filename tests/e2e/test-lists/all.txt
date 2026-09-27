@@ -12,6 +12,7 @@ hoi4_rk_russia_regression.spec.js
 interaction_funnel_contract.spec.js
 main_shell_i18n.spec.js
 map_clarity.spec.js
+marine_label_performance.spec.js
 non_1962_runtime_matrix.spec.js
 ocean_geometry_contract.spec.js
 ownership_retirement.spec.js

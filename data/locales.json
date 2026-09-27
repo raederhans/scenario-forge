@@ -294815,6 +294815,30 @@
     "Southeast Pacific Ocean": {
       "en": "Southeast Pacific Ocean",
       "zh": "东南太平洋"
+    },
+    "Kara Sea": {
+      "en": "Kara Sea",
+      "zh": "喀拉海"
+    },
+    "Laptev Sea": {
+      "en": "Laptev Sea",
+      "zh": "拉普捷夫海"
+    },
+    "East Siberian Sea": {
+      "en": "East Siberian Sea",
+      "zh": "东西伯利亚海"
+    },
+    "Chukchi Sea": {
+      "en": "Chukchi Sea",
+      "zh": "楚科奇海"
+    },
+    "Bering Strait": {
+      "en": "Bering Strait",
+      "zh": "白令海峡"
+    },
+    "Strait of Hormuz": {
+      "en": "Strait of Hormuz",
+      "zh": "霍尔木兹海峡"
     }
   },
   "ui": {
@@ -302817,6 +302841,14 @@
     "Review the current data and loading status.": {
       "en": "Review the current data and loading status.",
       "zh": "查看当前数据和加载状态。"
+    },
+    "Locate on Map": {
+      "en": "Locate on Map",
+      "zh": "在地图上定位"
+    },
+    "Water Hierarchy": {
+      "en": "Water Hierarchy",
+      "zh": "海域层级"
     }
   }
 }

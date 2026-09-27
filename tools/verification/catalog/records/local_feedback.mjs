@@ -270,6 +270,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["urban-adaptive-paint", "renderer-runtime", "js/core/renderer/urban_adaptive_paint_model.js", "tests/urban_adaptive_paint_model_behavior.test.mjs"],
     ["urban-layer-render", "renderer-runtime", "js/core/renderer/urban_layer_render_owner.js", "tests/urban_layer_render_owner_behavior.test.mjs"],
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
+    ["marine-label", "renderer-runtime", "js/core/renderer/marine_label_owner.js", "tests/marine_label_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["water-inspector-navigation", "sidebar-shell", "js/ui/sidebar/water_special_region_controller.js", "tests/water_inspector_navigation_behavior.test.mjs", ["js/ui/sidebar.js"]],
   ];
 
   const localOwnerOrder = precisionPytestOrder + precisionPytestRecords.length;

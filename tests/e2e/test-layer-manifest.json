@@ -101,6 +101,13 @@
       "ownerHint": "map-runtime"
     },
     {
+      "specPath": "tests/e2e/marine_label_performance.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "water-runtime",
+      "ownerHint": "water-runtime"
+    },
+    {
       "specPath": "tests/e2e/non_1962_runtime_matrix.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",

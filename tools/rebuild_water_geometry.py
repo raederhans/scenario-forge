@@ -132,6 +132,11 @@ def rebuild(stage_root, *, refine_marine=False):
             feature["geometry"] = mapping(polygonal(shape(feature["geometry"]).difference(physical_land)))
         current_water["features"].extend(additions)
         current_water = reconcile_marine_source_boundaries(current_water)
+        # The ordinary-marine rebuild must not re-clip scenario-managed waters,
+        # even if a repeated subtraction only moves a quantized edge by one cell.
+        protected_ids = {"tno_bosporus_dardanelles", "tno_sea_of_marmara", "tno_black_sea", "tno_sea_of_azov"}
+        current_water["features"] = [deepcopy(originals[f["properties"]["id"]])
+            if f["properties"]["id"] in protected_ids else f for f in current_water["features"]]
         # Existing runtime water is already physically clipped. Re-clipping its
         # spherical coast creates new numerical slivers along unrelated shores.
         changed = [f for f in current_water["features"] if f["properties"]["id"] not in originals
