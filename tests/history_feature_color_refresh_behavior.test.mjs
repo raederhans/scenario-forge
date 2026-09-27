@@ -44,18 +44,23 @@ test('water-only undo and redo restore overrides with scoped render and UI hooks
   const hookNames = ['refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn', 'updatePaintModeUIFn',
     'updateToolbarInputsFn', 'renderWaterRegionListFn', 'renderCountryListFn', 'renderSpecialRegionListFn'];
   const oldHooks = new Map(hookNames.map(name => [name, readRegisteredRuntimeHookSource(state, name)]));
-  const oldWater = state.waterRegionOverrides?.W;
-  const oldWaterIndex = state.waterRegionsById;
-  state.waterRegionsById = new Map([['W', { id: 'W', properties: {} }]]);
+  const originalWaterColors = captureHistoryState({ waterRegionIds: ['W'] });
+  let waterFeature = { id: 'W', properties: {} };
+  const originalWaterLookup = state.waterRegionsById.get.bind(state.waterRegionsById);
+  t.mock.method(state.waterRegionsById, 'get', id => id === 'W' ? waterFeature : originalWaterLookup(id));
   globalThis.document = { getElementById: () => null };
   t.after(() => {
-    clearHistory();
-    if (oldWater === undefined) delete state.waterRegionOverrides.W;
-    else state.waterRegionOverrides.W = oldWater;
-    state.waterRegionsById = oldWaterIndex;
-    oldHooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
-    if (hadDocument) globalThis.document = oldDocument;
-    else delete globalThis.document;
+    try {
+      clearHistory();
+      pushHistoryEntry({ before: originalWaterColors,
+        after: captureHistoryState({ waterRegionIds: ['W'] }) });
+      undoHistory();
+      clearHistory();
+    } finally {
+      oldHooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
+      if (hadDocument) globalThis.document = oldDocument;
+      else delete globalThis.document;
+    }
   });
   const calls = [];
   hookNames.forEach(name => registerRuntimeHook(state, name, (...args) => {
@@ -73,7 +78,7 @@ test('water-only undo and redo restore overrides with scoped render and UI hooks
   assert.equal(redoHistory(), true);
   assert.equal(state.waterRegionOverrides.W, '#123456');
   assert.equal(calls[0][1].inputLabel, 'history-redo');
-  state.waterRegionsById.set('W', { id: 'W', properties: { atl_render_layer: 'water' } });
+  waterFeature = { id: 'W', properties: { atl_render_layer: 'water' } };
   calls.length = 0;
   assert.equal(undoHistory(), true);
   assert.deepEqual(calls[0][1], { renderNow: false });
