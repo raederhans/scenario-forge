@@ -18,7 +18,6 @@ function fixture() {
     getFeatureCountryCodeNormalized: (f) => f?.properties.cntr_code,
     getFeatureInteractionCountryCodeNormalized: (f, id) => state.scenarioBaselineOwnersByFeatureId[id] || f.properties.cntr_code,
     shouldExcludePoliticalInteractionFeature: (f) => f?.properties.interactive === false,
-    isSovereigntyModeActive: () => state.paintMode === "sovereignty",
   };
   const resolver = createQuickFillHierarchyResolver(state, helpers);
   const policy = createFillTargetPolicy(state, helpers);
@@ -133,9 +132,9 @@ test("stale scenario data cannot survive a scenario switch", () => {
   assert.equal(f.resolve().status, "stale_scenario");
 });
 
-test("all double-click entry points enforce tool/mode gates", () => {
+test("all double-click entry points enforce tool and interaction gates", () => {
   for (const change of [
-    { currentTool: "erase" }, { paintMode: "sovereignty" }, { brushModeEnabled: true },
+    { currentTool: "erase" }, { brushModeEnabled: true },
     { interactionGranularity: "country" }, { specialZoneEditor: { active: true } },
   ]) {
     const f = fixture(); Object.assign(f.state, change);

@@ -24,6 +24,8 @@ The real-map paint/erase/undo/redo/reload browser case passed. That browser run 
 
 ## Delivery
 
+Delivery PR: https://github.com/raederhans/scenario-forge/pull/179. The first CI run exposed one Quick Fill assertion still expecting retired ownership-mode gating. Its obsolete fixture callback and assertion were removed; the complete Quick Fill node suite passes 56/56, and the existing state-write allowlist check passes (118 projected files, 67 observed direct writers). Required checks and the merge receipt remain available on the PR.
+
 All changes are isolated in the managed `runtime-simplification` worktree. The original checkout's mixed WIP is not an integration target. Remote main remains protected; use a normal PR and all six required checks. No force push, protection bypass or manual production deployment.
 
 The full-policy generation did not pass. Its final progression stage reported 816 violations (mostly duplicate comparisons against frozen and previous-active baselines) and a test alias-escape budget increase from 632 to 637. Policy was last updated at 3fd7478a on September 12; accepted main 1afa55b7 contains 159 subsequently changed JS paths. Two unchanged sample modules were rescanned with current tools and reproduced the stored findings; several reported modules did not exist at the old policy checkpoint. These facts establish a substantial inherited source/policy gap, not that every reported finding is inherited.
