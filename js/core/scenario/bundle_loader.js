@@ -535,6 +535,11 @@ function createScenarioBootstrapBundleFromCache({
     manifest,
     cachedCorePayload?.source || manifest?.source || null
   );
+  const reusePriorDecodedCollections = priorBundle?.runtimeTopologyPayload === runtimeTopologyPayload
+    && priorBundle?.bundleLevel === bundleLevel
+    && priorBundle?.source?.runtime_topology_sha256 === source?.runtime_topology_sha256
+    && priorBundle?.source?.runtime_bootstrap_topology_sha256 === source?.runtime_bootstrap_topology_sha256
+    && priorBundle?.source?.detail_chunk_manifest_sha256 === source?.detail_chunk_manifest_sha256;
   const runtimeFeatureIds = Array.isArray(runtimePoliticalMeta?.featureIds)
     ? runtimePoliticalMeta.featureIds
     : [];
@@ -569,7 +574,7 @@ function createScenarioBootstrapBundleFromCache({
     },
     runtimeTopologyPayload,
     runtimePoliticalMeta,
-    runtimeDecodedCollections: priorBundle?.runtimeDecodedCollections || null,
+    runtimeDecodedCollections: reusePriorDecodedCollections ? (priorBundle?.runtimeDecodedCollections || null) : null,
     releasableCatalog: priorBundle?.releasableCatalog || null,
     districtGroupsPayload: priorBundle?.districtGroupsPayload || null,
     auditPayload: priorBundle?.auditPayload || null,

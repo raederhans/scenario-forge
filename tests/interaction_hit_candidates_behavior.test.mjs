@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+import { parse } from "acorn";
 import {
   collectSpatialGridCandidates,
   createHitResult,
@@ -153,4 +156,95 @@ test("shouldPreferWaterHit keeps macro hover low priority and lake strict hits h
   assert.equal(shouldPreferWaterHit(landHit, lakeHit, {
     eventType: "click", getWaterRegionType: (feature) => feature.properties.type,
   }), true);
+});
+
+const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+const hitFunctionNames = new Set([
+  "createInteractionHitCandidateCollector", "collectInteractionHitMetricDetails", "recordInteractionHitMetrics",
+  "getLandHitFromPointer", "getWaterHitFromPointer", "getSpecialHitFromPointer", "getHitFromEvent",
+]);
+const hitFunctionSources = parse(rendererSource, { ecmaVersion: "latest", sourceType: "module" }).body
+  .filter((node) => node.type === "FunctionDeclaration" && hitFunctionNames.has(node.id.name))
+  .map((node) => rendererSource.slice(node.start, node.end));
+assert.equal(hitFunctionSources.length, hitFunctionNames.size);
+
+function createRendererHitHarness({ cacheEnabled, candidatesByKey }) {
+  const gridCalls = [];
+  const metrics = [];
+  const pointer = { px: 5, py: 5, zoomK: 1, lonLat: [0, 0] };
+  const collect = (type, _px, _py, radius) => {
+    gridCalls.push(`${type}:${radius}`);
+    return candidatesByKey[`${type}:${radius}`] || [];
+  };
+  const scope = vm.createContext({
+    runtimeState: {
+      landData: { features: [] }, spatialItems: [{}], waterSpatialItems: [{}], specialSpatialItems: [{}],
+      showWaterRegions: true, showScenarioSpecialRegions: true,
+    },
+    HIT_SNAP_RADIUS_PX: 5,
+    getPointerProjectionPosition: () => pointer,
+    collectSpecialGridCandidates: (...args) => collect("special", ...args),
+    collectGridCandidates: (...args) => collect("land", ...args),
+    collectWaterGridCandidates: (...args) => collect("water", ...args),
+    resolveHitMode: () => "spatial",
+    rankCandidates: (candidates) => candidates.map((candidate) => ({ ...candidate, containsGeo: !!candidate.item.feature.contains })),
+    findFirstContainingCandidate: (candidates) => candidates.find((candidate) => candidate.item.feature.contains) || null,
+    toHitResult: (candidate, options) => ({
+      id: candidate.item.id, targetType: options.targetType, feature: candidate.item.feature,
+      hitSource: "spatial", strict: options.strict, viaSnap: options.viaSnap,
+    }),
+    createHitResult,
+    shouldPreferWaterHit: (_land, water) => !!water?.id,
+    isScenarioWaterRegion: () => false,
+    isMacroOceanWaterRegion: () => false,
+    shouldSuppressOpenOceanHit: () => false,
+    isOpenOceanOverlayActive: () => false,
+    isLakeInteractionEnabled: () => false,
+    incrementPerfCounter: (name, count) => metrics.push(["counter", name, count]),
+    recordRenderPerfMetric: (name, _duration, payload) => metrics.push([name, structuredClone(payload)]),
+  });
+  const code = hitFunctionSources.map((source) => cacheEnabled ? source : source.replace(
+    'const candidateCollector = eventType === "hover" ? null : createInteractionHitCandidateCollector(pointer);',
+    "const candidateCollector = null;",
+  )).join("\n");
+  vm.runInContext(code, scope);
+  return {
+    gridCalls,
+    metrics,
+    hit: (options) => scope.getHitFromEvent({}, options),
+  };
+}
+
+function rendererCandidate(id) {
+  return { item: { id, feature: { contains: true } }, distanceProj: 0 };
+}
+
+for (const [label, options, candidatesByKey, expectedBefore, expectedAfter, expectedId] of [
+  ["brush strict", { enableSnap: false, snapPx: 0, eventType: "brush" },
+    { "land:0": [rendererCandidate("land")] }, 6, 3, "land"],
+  ["click water snap", { enableSnap: true, snapPx: 5, eventType: "click" },
+    { "water:5": [rendererCandidate("water")] }, 12, 6, "water"],
+  ["click special strict", { enableSnap: true, snapPx: 5, eventType: "click" },
+    { "special:0": [rendererCandidate("special")] }, 7, 6, "special"],
+]) {
+  test(`${label} shares exact grid candidates with diagnostics without changing the hit or counts`, () => {
+    const before = createRendererHitHarness({ cacheEnabled: false, candidatesByKey });
+    const after = createRendererHitHarness({ cacheEnabled: true, candidatesByKey });
+    const priorHit = before.hit(options);
+    const currentHit = after.hit(options);
+    assert.deepEqual(currentHit, priorHit);
+    assert.equal(currentHit.id, expectedId);
+    assert.deepEqual(after.metrics, before.metrics);
+    assert.equal(before.gridCalls.length, expectedBefore);
+    assert.equal(after.gridCalls.length, expectedAfter);
+  });
+}
+
+test("hover avoids event candidate caching and keeps its existing lightweight metric path", () => {
+  const h = createRendererHitHarness({ cacheEnabled: true, candidatesByKey: {
+    "water:0": [rendererCandidate("water")],
+  } });
+  assert.equal(h.hit({ enableSnap: false, snapPx: 0, eventType: "hover" }).id, "water");
+  assert.deepEqual(h.gridCalls, ["special:0", "land:0", "water:0"]);
+  assert.equal(h.metrics.filter((entry) => entry[0] === "interactionHitCandidateCount").length, 0);
 });

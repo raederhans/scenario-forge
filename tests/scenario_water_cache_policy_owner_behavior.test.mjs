@@ -29,6 +29,7 @@ function createHarness({
     safeParts: [],
     projectedBounds: [],
     renderable: [],
+    transforms: [],
   };
   const owner = createScenarioWaterCachePolicyOwner({
     state: modelState,
@@ -39,11 +40,14 @@ function createHarness({
       getPreviousRenderedCount: () => previousRenderedCount,
     },
     helpers: {
-      cloneZoomTransform: (transform) => ({
-        x: Number(transform?.x || 0),
-        y: Number(transform?.y || 0),
-        k: Number(transform?.k || 1),
-      }),
+      cloneZoomTransform: (transform) => {
+        calls.transforms.push({ ...transform });
+        return {
+          x: Number(transform?.x || 0),
+          y: Number(transform?.y || 0),
+          k: Number(transform?.k || 1),
+        };
+      },
       collectSafeWaterRegionGeometryParts: (feature) => {
         calls.safeParts.push(feature?.id);
         return Array.isArray(feature?.parts) ? feature.parts : [];
@@ -147,6 +151,23 @@ test("legacy coverage uses viewport transform safe parts bounds and renderable f
   assert.deepEqual(calls.renderable, ["renderable", "ignored"]);
   assert.deepEqual(calls.safeParts, ["renderable"]);
   assert.deepEqual(calls.projectedBounds, ["A"]);
+});
+
+test("coverage snapshots the current zoom once for all parts in each legacy or grid scan", () => {
+  const feature = createFeature("water", [createPart("A"), createPart("B")]);
+  const { calls, modelState, owner } = createHarness({ boundsByPartId: {
+    A: { minX: 0, minY: 0, maxX: 20, maxY: 50 },
+    B: { minX: 20, minY: 0, maxX: 40, maxY: 50 },
+  } });
+  assert.equal(owner.getScenarioWaterVisibleCoverageRatioLegacy([feature]), 0.2);
+  assert.equal(calls.transforms.length, 1);
+  const firstGrid = owner.getScenarioWaterVisibleCoverageRatioGrid([feature]);
+  assert.equal(calls.transforms.length, 2);
+  modelState.zoomTransform = { x: 0, y: 0, k: 2 };
+  assert.equal(owner.getScenarioWaterVisibleCoverageRatioLegacy([feature]), 0.8);
+  assert.equal(calls.transforms.length, 3);
+  assert.ok(owner.getScenarioWaterVisibleCoverageRatioGrid([feature]) > firstGrid);
+  assert.equal(calls.transforms.length, 4);
 });
 
 test("grid coverage respects grid constants capped dpr invalid viewport and clamp", () => {

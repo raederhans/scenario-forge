@@ -10,6 +10,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   const events = [];
   const metrics = [];
   const coverageCalls = [];
+  const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0, featureIdReads: 0 };
   const context = (name) => Object.fromEntries(
     ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "clip", "moveTo", "lineTo", "setLineDash"]
       .map((method) => [method, (...args) => events.push([name, method, ...args])]),
@@ -80,14 +81,14 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     cloneZoomTransform: (value) => ({ ...value }),
     nowMs: () => 1,
     collectContextMetric: (name, _duration, payload) => metrics.push({ name, ...payload }),
-    getFeatureId: (feature) => feature.id,
+    getFeatureId: (feature) => { waterWork.featureIdReads += 1; return feature.id; },
     isWaterRegionRenderable: () => true,
     getWaterRegionDefaultStyle: () => ({ opacity: 0.6 }),
     collectSafeWaterRegionGeometryParts: (feature) => feature.parts,
     projectedGeoBoundsInScreen: (bounds) => { events.push(["cull", state.zoomTransform.k, bounds]); return !!bounds && visible; },
     computeProjectedGeoBounds: (part) => { events.push(["bounds", projection, part.id]); return boundsAvailable ? { minX: 0, minY: 0, maxX: 10, maxY: 10, part, projection } : null; },
     getWaterRegionColor: () => "#123456",
-    getScenarioWaterVisualRevisionToken: () => revision,
+    getScenarioWaterVisualRevisionToken: () => { waterWork.signatures += 1; return revision; },
     isWaterRegionEnabled: () => true,
     isMacroOceanWaterRegion: () => false,
     isBaseGeographyScenarioFeature: () => false,
@@ -98,14 +99,14 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     getSpecialRegionStrokeColor: () => "#000000",
     getScenarioSpecialVisualRevisionToken: () => "special-1",
     isScenarioAtlantropaVisible: () => !!state.showScenarioAtlantropa,
-    getEffectiveAtlantropaFeatures: () => ({ land: [{ id: "land" }], shoal: [{ id: "shoal" }], relief: [{ id: "relief" }] }),
+    getEffectiveAtlantropaFeatures: () => { waterWork.atlantropaBuckets += 1; return { land: [{ id: "land" }], shoal: [{ id: "shoal" }], relief: [{ id: "relief" }] }; },
     getLogicalCanvasDimensions: () => [100, 100],
     shouldExcludePoliticalVisualFeature: (feature) => feature.id === "relief",
     shouldSkipFeature: () => false,
     getResolvedFeatureColor: () => "#abcdef",
     LAND_FILL_COLOR: "#f0f0f0",
     getPoliticalFeaturePathEntry: (feature) => ({ path: feature.id }),
-    getEffectiveWaterRegionFeatures: () => waterFeatures,
+    getEffectiveWaterRegionFeatures: () => { waterWork.effectiveCollections += 1; return waterFeatures; },
     getEffectiveSpecialRegionFeatures: () => [{ id: "special" }],
     getForcedScenarioWaterCacheMode: () => ({ mode, source: "test" }),
     getScenarioWaterCacheComplexitySignals: (features) => {
@@ -121,7 +122,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
       ? waterPolicy.shouldUseDirectScenarioWaterDraw(signals)
       : adaptiveDirect,
   });
-  return { owner, reliefOwner, cacheOwner, state, water, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
+  return { owner, reliefOwner, cacheOwner, state, water, waterWork, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
     setNoLayerContext: (value) => { noLayerContext = value; },
     setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
     replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
@@ -132,6 +133,30 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
   };
 }
+
+test("water pass reuses one effective collection, Atlantropa buckets and signature through cache redraw", t => {
+  const h = harness(t);
+  h.state.showScenarioAtlantropa = true;
+  h.draw();
+  assert.equal(h.waterWork.effectiveCollections, 1);
+  assert.equal(h.waterWork.atlantropaBuckets, 1);
+  assert.equal(h.waterWork.signatures, 1);
+  assert.equal(h.metrics.findLast((metric) => metric.name === "contextScenarioLayerWater")?.renderedCount, 1);
+  h.draw();
+  assert.equal(h.waterWork.effectiveCollections, 2);
+  assert.equal(h.waterWork.atlantropaBuckets, 2);
+  assert.equal(h.waterWork.signatures, 2);
+  assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+});
+
+test("cached visible-water pass avoids a redundant feature-ID filter", t => {
+  const h = harness(t);
+  h.draw();
+  h.waterWork.featureIdReads = 0;
+  h.draw();
+  assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+  assert.equal(h.waterWork.featureIdReads, 0);
+});
 
 test("water path eviction preserves fill and live highlight, including oversized transient paths", (t) => {
   const h = harness(t, { mode: "direct", waterPathCacheBudget: 1 });

@@ -705,8 +705,13 @@ export function createStartupDataPipelineOwner({
     startupFallbackScenarioId,
     startupBundleResultPromise,
   } = {}) {
-    const startupBundleResult = await startupBundleResultPromise;
-    const useScenarioStartupSupport = startupBundleResult?.ok === true;
+    // Let loadMapData start bundle-independent assets now. Its topology/localization
+    // branches still await this selection before deciding whether to reuse the bundle.
+    const startupBootArtifactsOverride = Promise.resolve(startupBundleResultPromise).then(
+      (startupBundleResult) => startupBundleResult?.ok === true
+        ? startupBundleResult.startupBootArtifactsOverride
+        : null
+    );
     const startupScenarioLocalesUrl = getStartupScenarioSupportUrl(
       startupFallbackScenarioId,
       SCENARIO_STARTUP_LOCALES_FILENAME
@@ -725,9 +730,7 @@ export function createStartupDataPipelineOwner({
       geoAliasesUrl: startupScenarioGeoAliasesUrl || null,
       useStartupWorker: true,
       useStartupCache: true,
-      startupBootArtifactsOverride: Promise.resolve(
-        useScenarioStartupSupport ? startupBundleResult.startupBootArtifactsOverride : null
-      ),
+      startupBootArtifactsOverride,
     });
   }
 

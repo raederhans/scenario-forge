@@ -4717,21 +4717,21 @@ function getScenarioSurfaceVersionSignal() {
   return getScenarioSurfaceVersionParts().signal;
 }
 
-function getScenarioWaterVisualRevisionToken() {
-  const atlantropaFeatures = getEffectiveAtlantropaFeatures();
-  const effectiveWaterFeatureCount = getEffectiveWaterRegionFeatures().length;
+function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null, atlantropaFeatures = null } = {}) {
+  const resolvedAtlantropaFeatures = atlantropaFeatures || getEffectiveAtlantropaFeatures();
+  const resolvedWaterFeatureCount = effectiveWaterFeatureCount ?? getEffectiveWaterRegionFeatures().length;
   const atlantropaCounts = {
-    water: Number(atlantropaFeatures.water.length),
-    land: Number(atlantropaFeatures.land.length),
-    shoal: Number(atlantropaFeatures.shoal.length),
-    relief: Number(atlantropaFeatures.relief.length),
+    water: Number(resolvedAtlantropaFeatures.water.length),
+    land: Number(resolvedAtlantropaFeatures.land.length),
+    shoal: Number(resolvedAtlantropaFeatures.shoal.length),
+    relief: Number(resolvedAtlantropaFeatures.relief.length),
   };
   const { signal, atlantropaRevisionToken } = getScenarioSurfaceVersionParts(
-    effectiveWaterFeatureCount, atlantropaCounts
+    resolvedWaterFeatureCount, atlantropaCounts
   );
   return [
     signal,
-    `water-effective:${effectiveWaterFeatureCount}`,
+    `water-effective:${resolvedWaterFeatureCount}`,
     `water-scenario:${getFeatureCollectionFeatureCount(runtimeState.scenarioWaterRegionsData)}`,
     `water-atlantropa:${atlantropaRevisionToken}`,
     `water-overrides:${stableJson(runtimeState.waterRegionOverrides || {})}`,
@@ -5146,8 +5146,7 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection) {
   return result;
 }
 
-function getEffectiveWaterRegionFeatures() {
-  const atlantropaFeatures = getEffectiveAtlantropaFeatures();
+function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures()) {
   const scenarioFeatures = [
     ...(Array.isArray(runtimeState.scenarioWaterRegionsData?.features)
       ? runtimeState.scenarioWaterRegionsData.features
@@ -6926,6 +6925,44 @@ function clearPoliticalPatchOverlayIfStale(reason = "stale-overlay") {
 }
 
 const politicalPatchPreviewBudget = createPoliticalPatchPreviewBudget({ now: nowMs });
+let brushPatchPreviewFrame = null;
+let brushPatchPreviewCancel = null;
+let brushPatchPreviewSession = null;
+let brushPatchPreviewTransformSignature = "";
+
+function cancelScheduledBrushPatchPreview() {
+  if (brushPatchPreviewFrame !== null) brushPatchPreviewCancel?.(brushPatchPreviewFrame);
+  brushPatchPreviewFrame = null;
+  brushPatchPreviewCancel = null;
+  brushPatchPreviewSession = null;
+  brushPatchPreviewTransformSignature = "";
+}
+
+function flushScheduledBrushPatchPreview(session = brushSession) {
+  if (brushPatchPreviewFrame === null || session !== brushPatchPreviewSession) return false;
+  const transformSignature = brushPatchPreviewTransformSignature;
+  cancelScheduledBrushPatchPreview();
+  if (session !== brushSession || !hasPendingPoliticalColorEdit()
+    || getTransformSignature() !== transformSignature) return false;
+  const cache = getRenderPassCacheState();
+  const painted = paintPoliticalPatchOverlayForIds(cache.pendingPoliticalColorEditIds, {
+    inputLabel: cache.pendingPoliticalColorEditInputLabel || "brush-preview",
+  });
+  if (politicalPatchPreviewBudget.isDeferred()) requestRendererRender("brush-preview-deferred");
+  return painted;
+}
+
+function scheduleBrushPatchPreview() {
+  if (brushPatchPreviewFrame !== null) return;
+  const session = brushSession;
+  const useRaf = typeof globalThis.requestAnimationFrame === "function"
+    && typeof globalThis.cancelAnimationFrame === "function";
+  const request = useRaf ? globalThis.requestAnimationFrame.bind(globalThis) : globalThis.setTimeout.bind(globalThis);
+  brushPatchPreviewCancel = useRaf ? globalThis.cancelAnimationFrame.bind(globalThis) : globalThis.clearTimeout.bind(globalThis);
+  brushPatchPreviewSession = session;
+  brushPatchPreviewTransformSignature = getTransformSignature();
+  brushPatchPreviewFrame = request(() => flushScheduledBrushPatchPreview(session), 0);
+}
 
 function paintPoliticalPatchOverlayForIds(featureIds, { inputLabel = "refresh-colors" } = {}) {
   const ids = normalizePoliticalColorEditIds(featureIds);
@@ -7011,6 +7048,7 @@ function clearPendingPoliticalColorEdit({
   const preClearFirstPixelRecorded = !!cache.pendingPoliticalColorEditFirstPixelRecorded;
   const renderedIdCount = renderedIds instanceof Set ? renderedIds.size : (Array.isArray(renderedIds) ? renderedIds.length : 0);
   const reset = (resetReason = "pending-edit-cleared") => {
+    cancelScheduledBrushPatchPreview();
     if (cache.pendingPoliticalColorEditIds instanceof Set) cache.pendingPoliticalColorEditIds.clear(); else cache.pendingPoliticalColorEditIds = new Set();
     cache.pendingPoliticalColorEditRevision = -1;
     Object.assign(cache, {
@@ -7067,7 +7105,7 @@ function retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColo
   return false;
 }
 
-function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, inputStartedAt = 0, inputLabel = "" } = {}) {
+function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, inputStartedAt = 0, inputLabel = "", coalescePatchPreview = false } = {}) {
   migrateLegacyColorState();
   ensureSovereigntyState();
   const cache = getRenderPassCacheState();
@@ -7102,9 +7140,14 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
   })) {
     clearPendingPoliticalColorEdit({ force: true });
   } else {
-    paintPoliticalPatchOverlayForIds(pendingRenderIds, {
-      inputLabel: inputLabel || "refresh-colors",
-    });
+    if (coalescePatchPreview && !politicalPatchPreviewBudget.exceedsFeatureLimit(pendingRenderIds.size)) {
+      scheduleBrushPatchPreview();
+    } else {
+      cancelScheduledBrushPatchPreview();
+      paintPoliticalPatchOverlayForIds(pendingRenderIds, {
+        inputLabel: inputLabel || "refresh-colors",
+      });
+    }
   }
   invalidateRenderPasses("political", "refresh-colors");
   invalidateRenderPasses(["contextMarkers", "labels"], "refresh-colors-collateral");
@@ -7135,6 +7178,7 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
   renderNow = false,
   inputStartedAt = 0,
   inputLabel = "",
+  coalescePatchPreview = false,
 } = {}) {
   const resolvedIds = normalizeFeatureOverrideTargetIds(targetIds);
   if (!resolvedIds.length) return [];
@@ -7147,6 +7191,7 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
     renderNow,
     inputStartedAt,
     inputLabel,
+    coalescePatchPreview,
   });
   return resolvedIds;
 }
@@ -7156,8 +7201,25 @@ function refreshResolvedColorsForOwners(ownerCodes, { renderNow = false } = {}) 
   refreshResolvedColorsForFeatures(ids, { renderNow });
 }
 
-function refreshColorState({ renderNow = true, featureIds = null, inputLabel = "" } = {}) {
+function refreshColorState({ renderNow = true, featureIds = null, waterRegionIds = null, inputLabel = "" } = {}) {
   const startedAt = nowMs();
+  const waterIds = Array.isArray(waterRegionIds) ? normalizeFeatureOverrideTargetIds(waterRegionIds) : [];
+  if (waterIds.length && featureIds === null && waterIds.every((id) => {
+    const feature = runtimeState.waterRegionsById?.get(id);
+    return feature && !isAtlantropaFieldDrivenFeature(feature);
+  })) {
+    // Water overrides only feed the scenario-water layer. Its visual signature
+    // includes the overrides, so the layer cache will redraw the restored colors.
+    invalidateRenderPasses("contextScenario", "refresh-water-colors");
+    recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
+      renderNow: !!renderNow,
+      waterRegionCount: waterIds.length,
+      mode: "water-partial",
+      inputLabel,
+    });
+    if (renderNow && rendererSurfaceHost.getContext()) render();
+    return;
+  }
   const ids = Array.isArray(featureIds) ? normalizeFeatureOverrideTargetIds(featureIds) : [];
   // Only local political colors can bypass the full surface refresh. Atlantropa
   // colors also participate in contextScenario and keep the existing full path.
@@ -8514,6 +8576,29 @@ function collectSpecialGridCandidates(px, py, radiusProj = 0) {
   });
 }
 
+function createInteractionHitCandidateCollector(pointer) {
+  // One input can resolve a strict/snap hit and then collect the same grids
+  // again for diagnostics. Keep the exact radius as the key: metric and hit
+  // paths intentionally retain their own radius normalization rules.
+  const caches = {
+    special: new Map(),
+    land: new Map(),
+    water: new Map(),
+  };
+  const collect = (type, radiusProj, collector) => {
+    const cache = caches[type];
+    if (!cache.has(radiusProj)) {
+      cache.set(radiusProj, collector(pointer.px, pointer.py, radiusProj));
+    }
+    return cache.get(radiusProj);
+  };
+  return {
+    special: (radiusProj) => collect("special", radiusProj, collectSpecialGridCandidates),
+    land: (radiusProj) => collect("land", radiusProj, collectGridCandidates),
+    water: (radiusProj) => collect("water", radiusProj, collectWaterGridCandidates),
+  };
+}
+
 function rankCandidates(candidates, lonLat, { eventType = "unknown", targetType = "unknown" } = {}) {
   return rankHitCandidates(candidates, lonLat, {
     eventType,
@@ -8574,7 +8659,7 @@ function shouldPreferWaterHit(landHit, waterHit, { eventType = "unknown" } = {})
 
 function collectInteractionHitMetricDetails(
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", resolvedHit = null } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", resolvedHit = null, candidateCollector = null } = {}
 ) {
   if (!pointer) {
     return {
@@ -8593,12 +8678,21 @@ function collectInteractionHitMetricDetails(
   const radiusProj = enableSnap && snapRadiusPx > 0
     ? snapRadiusPx / Math.max(0.0001, pointer.zoomK)
     : 0;
-  const specialStrict = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
-  const specialSnap = radiusProj > 0 ? collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj) : [];
-  const landStrict = collectGridCandidates(pointer.px, pointer.py, 0);
-  const landSnap = radiusProj > 0 ? collectGridCandidates(pointer.px, pointer.py, radiusProj) : [];
-  const waterStrict = collectWaterGridCandidates(pointer.px, pointer.py, 0);
-  const waterSnap = radiusProj > 0 ? collectWaterGridCandidates(pointer.px, pointer.py, radiusProj) : [];
+  const specialStrict = candidateCollector
+    ? candidateCollector.special(0) : collectSpecialGridCandidates(pointer.px, pointer.py, 0);
+  const specialSnap = radiusProj > 0
+    ? (candidateCollector ? candidateCollector.special(radiusProj) : collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj))
+    : [];
+  const landStrict = candidateCollector
+    ? candidateCollector.land(0) : collectGridCandidates(pointer.px, pointer.py, 0);
+  const landSnap = radiusProj > 0
+    ? (candidateCollector ? candidateCollector.land(radiusProj) : collectGridCandidates(pointer.px, pointer.py, radiusProj))
+    : [];
+  const waterStrict = candidateCollector
+    ? candidateCollector.water(0) : collectWaterGridCandidates(pointer.px, pointer.py, 0);
+  const waterSnap = radiusProj > 0
+    ? (candidateCollector ? candidateCollector.water(radiusProj) : collectWaterGridCandidates(pointer.px, pointer.py, radiusProj))
+    : [];
   return {
     eventType,
     specialCandidateCount: Math.max(specialStrict.length, specialSnap.length),
@@ -8647,7 +8741,7 @@ function recordInteractionHitMetrics(pointer, options = {}) {
 function getLandHitFromPointer(
   event,
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", candidateCollector = null } = {}
 ) {
   if (!runtimeState.landData || !runtimeState.spatialItems?.length) return createHitResult();
   const hitMode = resolveHitMode();
@@ -8660,7 +8754,8 @@ function getLandHitFromPointer(
     }
   }
 
-  const strictCandidates = collectGridCandidates(pointer.px, pointer.py, 0);
+  const strictCandidates = candidateCollector
+    ? candidateCollector.land(0) : collectGridCandidates(pointer.px, pointer.py, 0);
   if (eventType === "hover" && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     return strictHoverHit
@@ -8705,7 +8800,8 @@ function getLandHitFromPointer(
   const radiusProj = snapRadiusPx / pointer.zoomK;
   if (radiusProj <= 0) return createHitResult();
 
-  const snapCandidates = collectGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapCandidates = candidateCollector
+    ? candidateCollector.land(radiusProj) : collectGridCandidates(pointer.px, pointer.py, radiusProj);
   const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "land" });
   if (!snapRanked.length) return createHitResult();
 
@@ -8721,7 +8817,7 @@ function getLandHitFromPointer(
 
 function getWaterHitFromPointer(
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", candidateCollector = null } = {}
 ) {
   if (!runtimeState.showWaterRegions && !isOpenOceanOverlayActive() && !isLakeInteractionEnabled(runtimeState)) return createHitResult();
   if (!runtimeState.waterSpatialItems?.length) {
@@ -8737,7 +8833,8 @@ function getWaterHitFromPointer(
     return createHitResult();
   }
 
-  const strictCandidates = collectWaterGridCandidates(pointer.px, pointer.py, 0);
+  const strictCandidates = candidateCollector
+    ? candidateCollector.water(0) : collectWaterGridCandidates(pointer.px, pointer.py, 0);
   if (eventType === "hover" && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "water" });
     if (!strictHoverHit) return createHitResult();
@@ -8775,7 +8872,8 @@ function getWaterHitFromPointer(
   const radiusProj = snapRadiusPx / pointer.zoomK;
   if (radiusProj <= 0) return createHitResult();
 
-  const snapCandidates = collectWaterGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapCandidates = candidateCollector
+    ? candidateCollector.water(radiusProj) : collectWaterGridCandidates(pointer.px, pointer.py, radiusProj);
   const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "water" });
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
@@ -8795,7 +8893,7 @@ function getWaterHitFromPointer(
 
 function getSpecialHitFromPointer(
   pointer,
-  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown" } = {}
+  { enableSnap = true, snapPx = HIT_SNAP_RADIUS_PX, eventType = "unknown", candidateCollector = null } = {}
 ) {
   if (!runtimeState.showScenarioSpecialRegions) return createHitResult();
   if (!runtimeState.specialSpatialItems?.length) {
@@ -8807,7 +8905,8 @@ function getSpecialHitFromPointer(
     return createHitResult();
   }
 
-  const strictCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, 0);
+  const strictCandidates = candidateCollector
+    ? candidateCollector.special(0) : collectSpecialGridCandidates(pointer.px, pointer.py, 0);
   if (eventType === "hover" && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "special" });
     return strictHoverHit
@@ -8838,7 +8937,8 @@ function getSpecialHitFromPointer(
   const radiusProj = snapRadiusPx / pointer.zoomK;
   if (radiusProj <= 0) return createHitResult();
 
-  const snapCandidates = collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj);
+  const snapCandidates = candidateCollector
+    ? candidateCollector.special(radiusProj) : collectSpecialGridCandidates(pointer.px, pointer.py, radiusProj);
   const snapRanked = rankCandidates(snapCandidates, pointer.lonLat, { eventType, targetType: "special" });
   const chosen = snapRanked.find((candidate) => candidate.containsGeo);
   if (!chosen) return createHitResult();
@@ -9742,10 +9842,12 @@ function getHitFromEvent(
   }
   const pointer = getPointerProjectionPosition(event);
   if (!pointer) return createHitResult();
+  const candidateCollector = eventType === "hover" ? null : createInteractionHitCandidateCollector(pointer);
   const specialHit = getSpecialHitFromPointer(pointer, {
     enableSnap,
     snapPx,
     eventType,
+    candidateCollector,
   });
   let resolvedHit = specialHit;
   if (!resolvedHit.id) {
@@ -9753,11 +9855,13 @@ function getHitFromEvent(
       enableSnap,
       snapPx,
       eventType,
+      candidateCollector,
     });
     const waterHit = getWaterHitFromPointer(pointer, {
       enableSnap,
       snapPx,
       eventType,
+      candidateCollector,
     });
     if (
       waterHit.id
@@ -9780,6 +9884,7 @@ function getHitFromEvent(
     snapPx,
     eventType,
     resolvedHit,
+    candidateCollector,
   });
   return resolvedHit;
 }
@@ -14451,6 +14556,7 @@ function composeBrushInteractionSessionOwner() {
     markDirty,
     refreshSidebarAfterPaint,
     requestRendererRender,
+    flushBrushPatchPreview: flushScheduledBrushPatchPreview,
     noteRenderAction,
     getHitFromEvent,
     getStrategicOverlayRuntimeOwner,
@@ -14530,7 +14636,9 @@ function applyBrushHit(hit) {
   applyFeatureVisualOverrideTransaction(freshIds, remove ? null : selectedColor, {
     remove,
     inputLabel: remove ? "brush-erase-feature-color" : "brush-fill-feature-color",
+    coalescePatchPreview: brushSession.patchPreviewStarted === true,
   });
+  brushSession.patchPreviewStarted = true;
   brushSession.changed = true;
   return true;
 }
@@ -14730,6 +14838,7 @@ function initMap({
   suppressRender = false,
   interactionLevel = "full",
   deferInteractionInfrastructure = false,
+  deferStaticMeshesUntilSetMapData = false,
 } = {}) {
   if (!globalThis.d3) {
     console.error("D3 is required for map renderer.");
@@ -14825,9 +14934,13 @@ function initMap({
       inFlight: false,
     });
   }
-  rebuildStaticMeshes();
-  invalidateBorderCache();
-  updateDynamicBorderStatusUI();
+  // The main startup path calls setMapData synchronously before its first render.
+  // Let that transaction build static/dynamic borders once after its state reset.
+  if (!(suppressRender && deferStaticMeshesUntilSetMapData)) {
+    rebuildStaticMeshes();
+    invalidateBorderCache();
+    updateDynamicBorderStatusUI();
+  }
   fitProjection({ skipSpatialIndex: shouldDeferInteractionInfrastructure });
   initZoom();
   bindEvents();

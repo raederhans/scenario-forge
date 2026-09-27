@@ -170,3 +170,41 @@ test("HGO vector export does not depend on the separate land-contour worker", ()
   assert.deepEqual(h.calls, ["render-borders-2", "draw-contours", "compose-200"]);
   assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
 });
+
+const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
+const compositeStart = toolbarSource.indexOf("  const buildCompositeSourceCanvas = async");
+const compositeEnd = toolbarSource.indexOf("  const buildSingleExportSourceCanvas = async", compositeStart);
+assert.ok(compositeStart >= 0 && compositeEnd > compositeStart);
+
+for (const pixelRatio of [null, 2]) {
+  test(`composite source owns one renderer canvas with ordered SVG overlays at ${pixelRatio ?? "screen"} resolution`, async () => {
+    const h = harness();
+    const events = [];
+    const context = vm.createContext({
+      ensureScenarioPoliticalDetailForExport: async () => events.push("detail-ready"),
+      ensurePaintContoursReady: async () => events.push("contours-ready"),
+      resolveExportPassSequence: () => ["background", "labels"],
+      RENDER_PASS_NAMES: ["background", "labels"],
+      SVG_ANNOTATION_VIEWPORT_SELECTOR: ".annotation-layer",
+      renderExportPassesToCanvas: h.run,
+      createExportError: (_kind, message) => new Error(message),
+      drawSvgLayerToCanvas: async (canvas, ctx, options) => {
+        assert.equal(ctx.canvas, canvas);
+        (canvas.overlays ??= []).push(options.onlyViewportSelector);
+      },
+    });
+    vm.runInContext(`${toolbarSource.slice(compositeStart, compositeEnd)}\nthis.buildComposite = buildCompositeSourceCanvas;`, context);
+    const dimensions = pixelRatio === null ? null : { pixelRatio };
+    const result = await context.buildComposite({ textVisibility: { "svg-annotations": true, "special-zones": true } }, dimensions);
+    assert.equal(h.allocatedCanvases(), 1);
+    assert.equal(result.width, pixelRatio === null ? 100 : 200);
+    assert.deepEqual(result.overlays, [".annotation-layer", ".special-zones-layer"]);
+    assert.deepEqual(events, ["detail-ready", "contours-ready"]);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.visibleCache.canvases.background.overlays, undefined);
+    const rasterOnly = await context.buildComposite({ textVisibility: {} }, dimensions);
+    assert.notEqual(rasterOnly, result);
+    assert.equal(rasterOnly.overlays, undefined);
+    assert.equal(h.allocatedCanvases(), 2);
+  });
+}

@@ -28,6 +28,59 @@ test('feature-only history scope unions both snapshots and rejects mixed/global 
   assert.equal(scope({ before: { visualOverrides: { A: null } }, after: {}, meta: { affectsSovereignty: true } }), null);
 });
 
+test('water-only history scope excludes mixed and ownership changes', () => {
+  const scope = privateFunction('../js/core/history_manager.js', 'getWaterColorHistoryIds');
+  assert.deepEqual(Array.from(scope({ before: { waterRegionOverrides: { W: null } },
+    after: { waterRegionOverrides: { W: '#123456', X: '#abcdef' } } })), ['W', 'X']);
+  assert.equal(scope({ before: { waterRegionOverrides: { W: null } },
+    after: { waterRegionOverrides: { W: '#123456' }, visualOverrides: { A: '#abcdef' } } }), null);
+  assert.equal(scope({ before: { waterRegionOverrides: { W: null } },
+    after: { waterRegionOverrides: { W: '#123456' } }, meta: { affectsSovereignty: true } }), null);
+});
+
+test('water-only undo and redo restore overrides with scoped render and UI hooks', t => {
+  const oldDocument = globalThis.document;
+  const hadDocument = Object.hasOwn(globalThis, 'document');
+  const hookNames = ['refreshColorStateFn', 'updateToolUIFn', 'updateSwatchUIFn', 'updatePaintModeUIFn',
+    'updateToolbarInputsFn', 'renderWaterRegionListFn', 'renderCountryListFn', 'renderSpecialRegionListFn'];
+  const oldHooks = new Map(hookNames.map(name => [name, readRegisteredRuntimeHookSource(state, name)]));
+  const oldWater = state.waterRegionOverrides?.W;
+  const oldWaterIndex = state.waterRegionsById;
+  state.waterRegionsById = new Map([['W', { id: 'W', properties: {} }]]);
+  globalThis.document = { getElementById: () => null };
+  t.after(() => {
+    clearHistory();
+    if (oldWater === undefined) delete state.waterRegionOverrides.W;
+    else state.waterRegionOverrides.W = oldWater;
+    state.waterRegionsById = oldWaterIndex;
+    oldHooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
+    if (hadDocument) globalThis.document = oldDocument;
+    else delete globalThis.document;
+  });
+  const calls = [];
+  hookNames.forEach(name => registerRuntimeHook(state, name, (...args) => {
+    calls.push([name, ...args]);
+  }));
+  clearHistory();
+  pushHistoryEntry({ before: { waterRegionOverrides: { W: null } },
+    after: { waterRegionOverrides: { W: '#123456' } }, meta: { affectsSovereignty: false } });
+  assert.equal(undoHistory(), true);
+  assert.equal(state.waterRegionOverrides.W, undefined);
+  assert.deepEqual(calls.map(([name]) => name), ['refreshColorStateFn', 'updateToolUIFn',
+    'updateSwatchUIFn', 'updatePaintModeUIFn', 'updateToolbarInputsFn', 'renderWaterRegionListFn']);
+  assert.deepEqual(calls[0][1], { renderNow: false, waterRegionIds: ['W'], inputLabel: 'history-undo' });
+  calls.length = 0;
+  assert.equal(redoHistory(), true);
+  assert.equal(state.waterRegionOverrides.W, '#123456');
+  assert.equal(calls[0][1].inputLabel, 'history-redo');
+  state.waterRegionsById.set('W', { id: 'W', properties: { atl_render_layer: 'water' } });
+  calls.length = 0;
+  assert.equal(undoHistory(), true);
+  assert.deepEqual(calls[0][1], { renderNow: false });
+  assert.equal(calls.some(([name]) => name === 'renderCountryListFn'), true,
+    'Atlantropa water retains the broad history path');
+});
+
 test('multi-feature undo/redo restores removals and supplies the union to the existing hook', t => {
   const oldDocument = globalThis.document;
   const hadDocument = Object.hasOwn(globalThis, 'document');
@@ -173,10 +226,11 @@ test('mixed history retains broad UI refresh while retired ownership entries are
 test('renderer uses local refresh only for resolved non-Atlantropa targets; existing callers remain full', () => {
   const calls = [];
   const refresh = privateFunction('../js/core/map_renderer.js', 'refreshColorState', {
-    nowMs: () => 1, state: {}, runtimeState: { colors: { A: '#123456' } },
+    nowMs: () => 1, state: {}, runtimeState: { colors: { A: '#123456' },
+      waterRegionsById: new Map([['W', { id: 'W' }], ['atl-water', { id: 'atl-water' }]]) },
     normalizeFeatureOverrideTargetIds: ids => [...new Set(ids)],
     findResolvedColorFeatureById: id => id === 'missing' ? null : { id },
-    isAtlantropaFieldDrivenFeature: feature => feature.id === 'atlantropa',
+    isAtlantropaFieldDrivenFeature: feature => feature.id === 'atlantropa' || feature.id === 'atl-water',
     refreshResolvedColorsForFeatures: (...args) => calls.push(['partial', ...args]),
     normalizeColorStateForRender: () => calls.push(['normalize']), sanitizeColorMap: () => {}, sanitizeCountryColorMap: () => {},
     rebuildResolvedColors: () => calls.push(['full']),
@@ -187,8 +241,14 @@ test('renderer uses local refresh only for resolved non-Atlantropa targets; exis
   assert.equal(calls.length, 1);
   assert.equal(calls[0][0], 'partial');
   assert.deepEqual(Array.from(calls[0][1]), ['A']);
+  calls.length = 0;
+  refresh({ renderNow: false, waterRegionIds: ['W', 'W'], inputLabel: 'history-undo' });
+  assert.deepEqual(calls.map(call => call[0]), ['invalidate']);
+  assert.deepEqual(calls[0].slice(1), ['contextScenario', 'refresh-water-colors']);
   for (const options of [{ renderNow: false }, { renderNow: false, featureIds: ['missing'] },
-    { renderNow: false, featureIds: ['A', 'atlantropa'] }]) {
+    { renderNow: false, featureIds: ['A', 'atlantropa'] },
+    { renderNow: false, waterRegionIds: ['atl-water'] },
+    { renderNow: false, waterRegionIds: ['unknown'] }]) {
     calls.length = 0; refresh(options);
     assert.deepEqual(calls.map(call => call[0]), ['normalize', 'full', 'invalidate']);
     assert.equal(calls[2][1], 'contextScenario');

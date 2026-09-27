@@ -38,7 +38,7 @@ export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
       || Object.values(bundle?.chunkPayloadPromisesById || {}).some(Boolean)) continue;
     if (!bundle) continue;
     clearScenarioBundleChunkProtectionState(target, id);
-    for (const chunkId of getScenarioChunkPayloadEvictionIds(target.scenarioBundleCacheById[id])) {
+    for (const chunkId of getScenarioChunkPayloadEvictionIds(target.scenarioBundleCacheById[id], [], { preferPoliticalBase: true })) {
       removeScenarioBundleChunkPayloadState(target, id, chunkId);
     }
     if (cacheSize <= SCENARIO_BUNDLE_CACHE_LIMIT) continue;

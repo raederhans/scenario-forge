@@ -3,10 +3,12 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 
 import {
   createRendererStartupTransactionOwner,
 } from "../js/core/renderer/renderer_startup_transaction_owner.js";
+import { createSetMapDataTransactionOwner } from "../js/core/map_renderer/set_map_data_transaction_owner.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,6 +72,78 @@ function readRepoFile(...parts) {
 function assertExcludes(source, token, message) {
   assert.equal(source.includes(token), false, `${message}: unexpected ${JSON.stringify(token)}`);
 }
+
+test("startup defers only duplicate border derivation until the following setMapData", () => {
+  const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+  const initMapSource = rendererSource.slice(
+    rendererSource.indexOf("function initMap({"),
+    rendererSource.indexOf("function markRendererTopologyChanged(")
+  );
+  const mainSource = readRepoFile("js", "main.js");
+  assert.match(mainSource, /initMap\(\{[\s\S]*?deferStaticMeshesUntilSetMapData: true,[\s\S]*?\}\);\s*setMapData\(\{/);
+
+  function runStartup(deferStaticMeshesUntilSetMapData) {
+    const calls = [];
+    const record = (name) => () => { calls.push(name); };
+    const canvas = { style: {} };
+    const surfaceHost = {
+      getMapContainer: () => ({}),
+      getContext: () => ({}),
+      getHitContext: () => ({}),
+      getMapCanvas: () => canvas,
+      getPoliticalPatchCanvas: () => null,
+      getInteractionOverlayCanvas: () => null,
+    };
+    const context = {
+      globalThis: { d3: {} }, document: { getElementById: () => null }, console,
+      runtimeState: {}, rendererSurfaceHost: surfaceHost, debugMode: "PROD",
+      getRendererSurfaceLifecycleOwner: () => ({
+        resolveDomHandles: record("resolveDomHandles"),
+        ensureHitCanvasHandle: record("ensureHitCanvasHandle"),
+        acquireCanvasContexts: record("acquireCanvasContexts"),
+      }),
+      getRendererProjectionPathOwner: () => ({ initializeProjectionPaths: record("initializeProjectionPaths") }),
+      getRendererStartupTransactionOwner: () => ({ runInitMapResetTransaction: record("resetInitMap") }),
+      applyFacilityInfoCardState: record("applyFacilityInfoCardState"),
+      ensureHybridLayers: record("ensureHybridLayers"),
+      refreshColorState() {}, recomputeDynamicBordersNow() {}, resolveSpecialZoneParentGroupTargetIds() {},
+      syncFacilityInfoCardVisibility() {},
+      buildRuntimePoliticalMeta: record("buildRuntimePoliticalMeta"),
+      setCanvasSize: record("setCanvasSize"),
+      buildIndex: record("buildIndex"),
+      setInteractionInfrastructureState: record("setInteractionInfrastructureState"),
+      rebuildStaticMeshes: record("rebuildStaticMeshes"),
+      invalidateBorderCache: record("invalidateBorderCache"),
+      updateDynamicBorderStatusUI: record("updateDynamicBorderStatusUI"),
+      fitProjection: record("fitProjection"),
+      initZoom: record("initZoom"),
+      bindEvents: record("bindEvents"),
+      getViewportGeoBounds() {},
+      render: record("render"),
+    };
+    const initMap = vm.runInNewContext(`(${initMapSource})`, context);
+    initMap({ suppressRender: true, interactionLevel: "readonly-startup", deferStaticMeshesUntilSetMapData });
+    const transaction = createSetMapDataTransactionOwner({
+      getters: { nowMs: () => 0, getActiveScenarioId: () => "", getLandFeatureCount: () => 1, getRenderProfile: () => "auto" },
+      effects: new Proxy({}, { get: (_, name) => record(name) }),
+    });
+    transaction.runSetMapDataTransaction({ suppressRender: true, interactionLevel: "readonly-startup" });
+    return calls;
+  }
+
+  const defaultCalls = runStartup(false);
+  const deferredCalls = runStartup(true);
+  const count = (calls, name) => calls.filter((call) => call === name).length;
+  for (const name of ["rebuildStaticMeshes", "invalidateBorderCache", "updateDynamicBorderStatusUI"]) {
+    assert.equal(count(defaultCalls, name), 2, `default path retains both ${name} calls`);
+    assert.equal(count(deferredCalls, name), 1, `startup path performs ${name} in setMapData`);
+    assert.ok(deferredCalls.indexOf(name) > deferredCalls.indexOf("resetRendererTransactionState"));
+  }
+  assert.equal(count(deferredCalls, "fitProjection"), 2);
+  assert.equal(count(deferredCalls, "initZoom"), 1);
+  assert.ok(deferredCalls.indexOf("fitProjection") < deferredCalls.indexOf("initZoom"));
+  assert.ok(deferredCalls.indexOf("initZoom") < deferredCalls.lastIndexOf("fitProjection"));
+});
 
 test("runInitMapResetTransaction runs effects in exact initMap order", () => {
   const { calls, owner } = createHarness();

@@ -1053,7 +1053,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function getScenarioWaterRegionsMode\(\) \{[\s\S]*?runtimeState\.activeScenarioManifest\?\.water_regions_mode[\s\S]*?SCENARIO_PRESENTATION_FEATURES\.ATLANTROPA_RELIEF[\s\S]*?return "exclusive";[\s\S]*?return "combined";[\s\S]*?\}/.test(rendererSource)
         && /function isScenarioWaterTopologyExclusiveMode\(\) \{[\s\S]*?return getScenarioWaterRegionsMode\(\) === "exclusive";[\s\S]*?\}/.test(rendererSource),
       tnoWaterCombinesExclusiveScenarioMarineWithSharedLakes:
-        /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
+        /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
       openOceanRenderAndInteractionUseActiveOverlayGate:
         /function isOpenOceanOverlayActive\(\) \{[\s\S]*?return isOpenOceanSelectionEnabled\(\) \|\| isOpenOceanPaintEnabled\(\);[\s\S]*?\}/.test(rendererSource)
         && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
@@ -1076,9 +1076,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?cached\?\.parts === parts[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterPathCache\.set\(feature, \{ path, parts, estimatedBytes \}\);/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false \} = \{\}\) \{[\s\S]*?const waterPath = visibleParts\.length === parts\.length[\s\S]*?getScenarioWaterFeaturePath\(feature, parts\)[\s\S]*?fillWaterPath\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?fillWaterPath\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
       waterCoverageUsesSafeParts:
-        /function getScreenBounds\(part\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)
-        && /function getScenarioWaterVisibleCoverageRatioLegacy\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part\)/.test(scenarioWaterCachePolicyOwnerSource)
-        && /function getScenarioWaterVisibleCoverageRatioGrid\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part\)/.test(scenarioWaterCachePolicyOwnerSource),
+        /function getScreenBounds\(part, transform\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)
+        && /function getScenarioWaterVisibleCoverageRatioLegacy\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part, transform\)/.test(scenarioWaterCachePolicyOwnerSource)
+        && /function getScenarioWaterVisibleCoverageRatioGrid\(waterFeatures = \[\]\) \{[\s\S]*?if \(!isWaterRegionRenderable\(feature\)\) continue;[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?getScreenBounds\(part, transform\)/.test(scenarioWaterCachePolicyOwnerSource),
       waterSpatialIndexSkipsUnsafeParts:
         /function buildWaterSpatialItems\(\{[\s\S]*?shouldExcludeWaterHitGeometry = \(\) => false,[\s\S]*?if \(shouldExcludeWaterHitGeometry\(hitGeometry, feature, id\)\) return;/.test(spatialBuilderSource)
         && /shouldExcludeWaterHitGeometry = \(\) => false/.test(spatialOwnerSource)
@@ -1093,7 +1093,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /`water-mode:\$\{getScenarioWaterRegionsMode\(\)\}`/.test(rendererSource)
         && /maskInfo\.maskQualityToken \|\| "unchecked"/.test(rendererSource)
         && /function getScenarioSurfaceVersionParts\(waterFeatureCount = null, atlantropaCounts = null\) \{[\s\S]*?const atlantropaRevisionToken = String\(getScenarioAtlantropaRevisionToken\(atlantropaCounts\)\);[\s\S]*?return \{ signal: signal\.join\("\|"\), atlantropaRevisionToken \};/.test(rendererSource)
-        && /function getScenarioWaterVisualRevisionToken\(\) \{[\s\S]*?const \{ signal, atlantropaRevisionToken \} = getScenarioSurfaceVersionParts\(\s*effectiveWaterFeatureCount, atlantropaCounts\s*\);\s*return \[\s*signal,/.test(rendererSource)
+        && /function getScenarioWaterVisualRevisionToken\(\{ effectiveWaterFeatureCount = null, atlantropaFeatures = null \} = \{\}\) \{[\s\S]*?const \{ signal, atlantropaRevisionToken \} = getScenarioSurfaceVersionParts\(\s*resolvedWaterFeatureCount, atlantropaCounts\s*\);\s*return \[\s*signal,/.test(rendererSource)
         && /function getPhysicalLandClipCacheKey\(maskInfo\) \{[\s\S]*?scenario-surface:\$\{getScenarioSurfaceVersionSignal\(\)\}/.test(rendererSource)
         && /function getCoastlineDecisionSignature\(decision = null\) \{[\s\S]*?String\(decision\.scenarioSurfaceVersionSignal \|\| ""\)/.test(staticBorderMeshLifecycleSource),
       chunkPromotionSkipsDeferredInfraWhenSecondaryIndexesAlreadySynced:
@@ -1279,16 +1279,16 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       atlantropaScenarioLayerFeedsScenarioWaterPath:
         /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?runtimeState\.scenarioAtlantropaData[\s\S]*?water:\$\{counts \? counts\.water : buckets\.water\.length\}/.test(rendererSource)
         && /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?isScenarioAtlantropaVisible\(\) \? "visible:on" : "visible:off"/.test(rendererSource)
-        && /function getEffectiveWaterRegionFeatures\(\) \{[\s\S]*?\.\.\.atlantropaFeatures\.water,/.test(rendererSource)
-        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?const buckets = getEffectiveAtlantropaFeatures\(\);[\s\S]*?\.\.\.buckets\.shoal,/.test(scenarioRegionOverlayOwnerSource)
-        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k\) \{[\s\S]*?getSafeCanvasColor\(runtimeState\.colors\?\.\[id\], null\)[\s\S]*?getSafeCanvasColor\(getResolvedFeatureColor\(feature, id\), null\)/.test(scenarioRegionOverlayOwnerSource)
-        && /function drawScenarioRegionOverlaysPass\(k\) \{[\s\S]*?const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible\(\);[\s\S]*?if \(showAtlantropaLandLikeOverlay\) \{[\s\S]*?drawScenarioAtlantropaLandLikeOverlayLayer\(k\);[\s\S]*?\}/.test(scenarioRegionOverlayOwnerSource)
+        && /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?\.\.\.atlantropaFeatures\.water,/.test(rendererSource)
+        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k, buckets = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?\.\.\.buckets\.shoal,/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k, buckets = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?getSafeCanvasColor\(runtimeState\.colors\?\.\[id\], null\)[\s\S]*?getSafeCanvasColor\(getResolvedFeatureColor\(feature, id\), null\)/.test(scenarioRegionOverlayOwnerSource)
+        && /function drawScenarioRegionOverlaysPass\(k\) \{[\s\S]*?const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible\(\);[\s\S]*?if \(showAtlantropaLandLikeOverlay\) \{[\s\S]*?drawScenarioAtlantropaLandLikeOverlayLayer\(k, atlantropaFeatures\);[\s\S]*?\}/.test(scenarioRegionOverlayOwnerSource)
         && /function shouldExcludeWaterHitGeometry\(hitGeometry, feature = null\) \{[\s\S]*?return getProjectedGeometryBoundsOwner\(\)\.shouldExcludeWaterHitGeometry\(hitGeometry, feature\);[\s\S]*?\}/.test(rendererSource)
         && /function shouldExcludeWaterHitGeometry\(hitGeometry, _feature = null\) \{[\s\S]*?return isSphericalGeometryUnsafe\(hitGeometry\);[\s\S]*?\}/.test(projectedGeometryBoundsOwnerSource)
         && /function getUnifiedWaterBaseStyle\(feature\) \{[\s\S]*?isAtlantropaSeaFeature\(feature\)[\s\S]*?getAtlantropaSeaPoliticalFillColor\(\)/.test(rendererSource)
         && /function getWaterRegionColor\(id, feature = null\) \{[\s\S]*?const defaultStyleFeature = feature \|\| runtimeState\.waterRegionsById\?\.get\(resolvedId\);/.test(rendererSource)
         && /rendererSurfaceHost\.getContext\(\)\.fillStyle = getWaterRegionColor\(id, feature\);/.test(scenarioRegionOverlayOwnerSource)
-        && /function getScenarioWaterVisualRevisionToken\(\) \{[\s\S]*?water-atlantropa:\$\{atlantropaRevisionToken\}/.test(rendererSource)
+        && /function getScenarioWaterVisualRevisionToken\(\{ effectiveWaterFeatureCount = null, atlantropaFeatures = null \} = \{\}\) \{[\s\S]*?water-atlantropa:\$\{atlantropaRevisionToken\}/.test(rendererSource)
         && /let bounds = computeProjectedGeoBounds\(hitGeometry\);[\s\S]*?if \(!bounds\) \{[\s\S]*?if \(!featureBoundsComputed\) \{[\s\S]*?featureBounds = computeProjectedGeoBounds\(feature\);[\s\S]*?featureBoundsComputed = true;[\s\S]*?bounds = featureBounds;/.test(spatialBuilderSource)
         && !rendererSource.includes("atl_water_projection")
         && !rendererSource.includes("collectActiveAtlantropaSeaWaterFeatures")

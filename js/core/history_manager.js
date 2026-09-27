@@ -231,13 +231,39 @@ function getFeatureColorHistoryIds(entry) {
   return ids.size ? Array.from(ids) : null;
 }
 
+function getWaterColorHistoryIds(entry) {
+  if (entry?.meta?.affectsSovereignty) return null;
+  const ids = new Set();
+  for (const snapshot of [entry?.before, entry?.after]) {
+    if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
+    for (const [key, values] of Object.entries(snapshot)) {
+      if (key !== "waterRegionOverrides") return null;
+      if (!values || typeof values !== "object" || Array.isArray(values)) return null;
+      Object.keys(values).forEach((id) => ids.add(id));
+    }
+  }
+  return ids.size ? Array.from(ids) : null;
+}
+
+function canRefreshWaterColorHistoryLocally(ids) {
+  return Array.isArray(ids) && ids.length > 0 && ids.every((id) => {
+    const feature = runtimeState.waterRegionsById?.get(id);
+    const props = feature?.properties;
+    return !!feature && !String(props?.atl_render_layer || "").trim()
+      && !String(props?.atl_color_rule || "").trim();
+  });
+}
+
 function refreshUiAfterHistory(direction, entry) {
   // undo/redo 之后统一从这里补 UI 和 render side effects，
   // 调用方只负责准备 before/after，不要在外面各自手写半套刷新逻辑。
   const featureIds = getFeatureColorHistoryIds(entry);
+  const waterRegionIds = featureIds ? null : getWaterColorHistoryIds(entry);
+  const scopedWaterUi = canRefreshWaterColorHistoryLocally(waterRegionIds);
   callRuntimeHook(state, "refreshColorStateFn", {
     renderNow: false,
     ...(featureIds ? { featureIds, inputLabel: `history-${direction}` } : {}),
+    ...(scopedWaterUi ? { waterRegionIds, inputLabel: `history-${direction}` } : {}),
   });
   // Feature-only visual history does not change ownership, region lists,
   // appearance controls, legend configuration, or strategic overlays. Keep
@@ -253,7 +279,15 @@ function refreshUiAfterHistory(direction, entry) {
       "updateActiveSovereignUIFn",
       "refreshCountryInspectorDetailFn",
     ]
-    : [
+    : scopedWaterUi
+      ? [
+        "updateToolUIFn",
+        "updateSwatchUIFn",
+        "updatePaintModeUIFn",
+        "updateToolbarInputsFn",
+        "renderWaterRegionListFn",
+      ]
+      : [
       "updateToolUIFn",
       "updateSwatchUIFn",
       "updatePaintModeUIFn",

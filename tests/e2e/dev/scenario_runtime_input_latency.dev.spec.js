@@ -280,7 +280,9 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       await page.locator('#customColor').fill('#e31ac4');
       const point = await page.evaluate(async () => {
         const { projectGeoToScreen } = await import(new URL('./js/core/map_renderer.js', location.href));
-        const xy = projectGeoToScreen(13.4, 52.5);
+        // A broad rural interior keeps the fixed RGB probe clear of capital
+        // symbols at world zoom. Berlin's city overlay covers the old 9x9 probe.
+        const xy = projectGeoToScreen(-110, 56);
         const rect = document.querySelector('#mapContainer').getBoundingClientRect();
         return { x: rect.left + xy[0], y: rect.top + xy[1] };
       });
@@ -301,6 +303,11 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       expect(initial.id).toBeTruthy();
       await waitForRenderIdle(page, { scenarioId });
+      expect(await page.evaluate(rgb => {
+        const pixels = globalThis.__runtimeInputProbe.readPixels();
+        return pixels.some((value, i) => i % 4 === 0
+          && rgb.every((channel, offset) => Math.abs(pixels[i + offset] - channel) < 18));
+      }, initial.rgb), 'probe must contain the selected land color before painting').toBe(true);
       await arm(page, 'fill', [227, 26, 196], point);
       await dispatchInput(page);
       await waitForInputEvidence(page);
@@ -340,6 +347,12 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
         snapshot: globalThis.__mc_perf__?.snapshot?.() || null,
         inputs: globalThis.__runtimeInputProbe?.results || [],
         pendingInput: globalThis.__runtimeInputProbe?.pending || null,
+        paintDiagnostics: {
+          overrides: { ...globalThis.__playwrightStateRef?.visualOverrides },
+          colors: Object.fromEntries(Object.keys(globalThis.__playwrightStateRef?.visualOverrides || {})
+            .map(id => [id, globalThis.__playwrightStateRef.colors?.[id]])),
+          pixels: globalThis.__runtimeInputProbe?.readPixels?.() || [],
+        },
         stableDiagnostics: globalThis.__inputStableDiagnostics || null,
         eventTimings: globalThis.__inputEventTimings || [],
         longTasks: globalThis.__inputLongTasks || [],
@@ -351,7 +364,7 @@ for (const scenarioId of ['tno_1962', 'hoi4_1939']) {
       });
       const evidencePath = testInfo.outputPath('runtime-stage-input-evidence.json');
       fs.writeFileSync(evidencePath, JSON.stringify({ scenarioId, variant, viewport, stableInputWindow,
-        measurementVersion: 3,
+        measurementVersion: 4, probeGeo: [-110, 56],
         baselineRevision: process.env.P1_BASE_REVISION || null,
         browserVersion: page.context().browser()?.version(), nodeVersion: process.version,
         host: require('node:os').hostname(), platform: process.platform,

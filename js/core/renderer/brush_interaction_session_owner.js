@@ -10,6 +10,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
   markDirty,
   refreshSidebarAfterPaint,
   requestRendererRender,
+  flushBrushPatchPreview,
   noteRenderAction,
   getHitFromEvent,
   getStrategicOverlayRuntimeOwner,
@@ -47,6 +48,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     const actionStart = nowMs();
     const current = getBrushSession();
     if (!current) return;
+    flushBrushPatchPreview?.(current);
     setBrushSession(null);
     if (current.dragging) {
       suppressNextClick();

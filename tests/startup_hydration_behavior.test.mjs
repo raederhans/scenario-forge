@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { createScenarioStartupHydrationController } from "../js/core/scenario/startup_hydration.js";
+import { createScenarioBootstrapBundleFromCache } from "../js/core/scenario/bundle_loader.js";
 import {
   createStartupScenarioBootstrapCacheKey,
   createStartupScenarioBootstrapCoreCacheKey,
@@ -53,6 +54,122 @@ function createMinimalHydrationController(state, overrides = {}) {
     ...overrides,
   });
 }
+
+test("scenario topology decode reuses a valid bundle result and retries invalid results", () => {
+  const previousTopojson = globalThis.topojson;
+  let decodeCalls = 0;
+  let failDecode = false;
+  let emptyDecode = false;
+  globalThis.topojson = {
+    feature(_topology, object) {
+      decodeCalls += 1;
+      if (failDecode) throw new Error("decode failed");
+      if (emptyDecode) return { type: "FeatureCollection", features: [] };
+      return { type: "FeatureCollection", features: object.geometries.map((geometry) => ({
+        type: "Feature", properties: geometry.properties || {}, geometry: null,
+      })) };
+    },
+  };
+  try {
+    const topology = {
+      type: "Topology", arcs: [],
+      objects: { political: { type: "GeometryCollection", geometries: [{ properties: { id: "A" } }] } },
+    };
+    const bundle = {
+      bundleLevel: "bootstrap", manifest: { scenario_id: "sample" },
+      source: { runtime_bootstrap_topology_sha256: "first" },
+      runtimeTopologyPayload: topology,
+    };
+    const { hasRenderableScenarioPoliticalTopology, getScenarioTopologyFeatureCollection } =
+      createMinimalHydrationController({ activeScenarioId: "sample" });
+
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(getScenarioTopologyFeatureCollection(topology, "political", bundle).features.length, 1);
+    assert.equal(decodeCalls, 1);
+
+    bundle.source.runtime_bootstrap_topology_sha256 = "second";
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(decodeCalls, 2);
+    bundle.bundleLevel = "full";
+    bundle.source.runtime_topology_sha256 = "full";
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(decodeCalls, 3);
+    topology.objects.political = { type: "GeometryCollection", geometries: [{ properties: { id: "B" } }] };
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(decodeCalls, 4);
+
+    topology.objects.political = { type: "GeometryCollection", geometries: [{ properties: { id: "C" } }] };
+    failDecode = true;
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), false);
+    failDecode = false;
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(decodeCalls, 6);
+    topology.objects.political = { type: "GeometryCollection", geometries: [{ properties: { id: "D" } }] };
+    emptyDecode = true;
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), false);
+    emptyDecode = false;
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(decodeCalls, 8);
+    topology.objects.political = { type: "GeometryCollection", geometries: [] };
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), false);
+    assert.equal(decodeCalls, 8);
+  } finally {
+    globalThis.topojson = previousTopojson;
+  }
+});
+
+test("scenario topology uses matching worker decode without a main-thread decode", () => {
+  const previousTopojson = globalThis.topojson;
+  let decodeCalls = 0;
+  globalThis.topojson = { feature() { decodeCalls += 1; throw new Error("unexpected decode"); } };
+  try {
+    const topology = {
+      type: "Topology", arcs: [],
+      objects: { political: { type: "GeometryCollection", geometries: [{ properties: { id: "A" } }] } },
+    };
+    const politicalData = { type: "FeatureCollection", features: [{ type: "Feature", properties: { id: "A" }, geometry: null }] };
+    const bundle = {
+      bundleLevel: "bootstrap", manifest: { scenario_id: "sample" },
+      source: { runtime_bootstrap_topology_sha256: "sha" },
+      runtimeTopologyPayload: topology,
+      runtimeDecodedCollections: { politicalData },
+    };
+    const { hasRenderableScenarioPoliticalTopology, getScenarioTopologyFeatureCollection } =
+      createMinimalHydrationController({ activeScenarioId: "sample" }, {
+        getScenarioDecodedCollection: (value, key) => value.runtimeDecodedCollections?.[key] || null,
+      });
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), true);
+    assert.equal(getScenarioTopologyFeatureCollection(topology, "political", bundle), politicalData);
+    assert.equal(decodeCalls, 0);
+    bundle.source.runtime_bootstrap_topology_sha256 = "changed-source";
+    assert.equal(hasRenderableScenarioPoliticalTopology(topology, bundle), false);
+    assert.equal(decodeCalls, 1);
+  } finally {
+    globalThis.topojson = previousTopojson;
+  }
+});
+
+test("cached bootstrap bundle does not inherit decode from another topology or source", () => {
+  const oldTopology = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
+  const newTopology = { type: "Topology", objects: { political: { type: "GeometryCollection", geometries: [] } }, arcs: [] };
+  const politicalData = { type: "FeatureCollection", features: [] };
+  const priorBundle = {
+    bundleLevel: "bootstrap", runtimeTopologyPayload: oldTopology,
+    source: { runtime_bootstrap_topology_sha256: "old" },
+    runtimeDecodedCollections: { politicalData },
+  };
+  const makeBundle = (topology, sha) => createScenarioBootstrapBundleFromCache({
+    priorBundle,
+    meta: { scenario_id: "sample" },
+    manifest: { scenario_id: "sample", source: { runtime_bootstrap_topology_sha256: sha } },
+    bundleLevel: "bootstrap",
+    cachedCorePayload: { runtimeTopologyPayload: topology, source: { runtime_bootstrap_topology_sha256: sha } },
+  });
+  assert.equal(makeBundle(newTopology, "old").runtimeDecodedCollections, null);
+  assert.equal(makeBundle(oldTopology, "new").runtimeDecodedCollections, null);
+  assert.equal(makeBundle(oldTopology, "old").runtimeDecodedCollections.politicalData, politicalData);
+});
 
 for (const invalidation of ["request", "epoch"]) {
 test(`health gate retry arriving after a new scenario ${invalidation} cannot change its recovery state`, async () => {

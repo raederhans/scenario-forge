@@ -152,21 +152,26 @@ var SCENARIO_FORGE_JSON_RESOURCE_DECODER_SHARED = globalThis.__scenarioForgeJson
 
   function getUtf8ByteLength(text) {
     if (!text) return 0;
-    // Fast path: avoid allocating full UTF-8 buffer when Blob size is available
-    if (typeof Blob === "function") {
-      try {
-        return new Blob([text]).size;
-      } catch (_e) {
-        // Fall back to TextEncoder
+    // Geometry JSON is mostly ASCII. Scan only non-ASCII matches without
+    // allocating a second body-sized Blob or encoded buffer for diagnostics.
+    let bytes = text.length;
+    const nonAscii = /[\u0080-\uffff]+/g;
+    let match;
+    while ((match = nonAscii.exec(text))) {
+      const run = match[0];
+      for (let index = 0; index < run.length; index++) {
+        const code = run.charCodeAt(index);
+        if (code <= 0x7ff) bytes += 1;
+        else {
+          bytes += 2;
+          // A surrogate pair encodes to four bytes for two UTF-16 code units.
+          // Lone surrogates use the three-byte replacement character.
+          const next = run.charCodeAt(index + 1);
+          if (code >= 0xd800 && code <= 0xdbff && next >= 0xdc00 && next <= 0xdfff) index++;
+        }
       }
     }
-    if (!cachedTextEncoder && typeof TextEncoder === "function") {
-      cachedTextEncoder = new TextEncoder();
-    }
-    if (cachedTextEncoder) {
-      return cachedTextEncoder.encode(text).byteLength;
-    }
-    return text.length;
+    return bytes;
   }
 
   function decodeUtf8Bytes(buffer) {

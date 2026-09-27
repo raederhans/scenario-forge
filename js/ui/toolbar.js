@@ -2540,17 +2540,6 @@ function initToolbar({ render } = {}) {
     return adjustedCanvas;
   };
 
-  const cloneCanvas = (sourceCanvas) => {
-    if (!sourceCanvas) return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = sourceCanvas.width || 0;
-    canvas.height = sourceCanvas.height || 0;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-    ctx.drawImage(sourceCanvas, 0, 0);
-    return canvas;
-  };
-
   const buildSvgAnnotationCanvas = async (options = {}, dimensions = null) => {
     const width = dimensions?.width || runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
     const height = dimensions?.height || runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
@@ -2583,7 +2572,9 @@ function initToolbar({ render } = {}) {
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
     }
-    const workingCanvas = cloneCanvas(compositeCanvas) || compositeCanvas;
+    // The renderer returns a new, caller-owned canvas in both resolution paths.
+    // SVG overlays can compose directly onto it without a full-frame copy.
+    const workingCanvas = compositeCanvas;
     if (exportUi.textVisibility?.["svg-annotations"]) {
       const workingCtx = workingCanvas.getContext("2d");
       if (!workingCtx) {

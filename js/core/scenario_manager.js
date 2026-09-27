@@ -661,7 +661,7 @@ async function applyScenarioBundle(
         topologyDecodeMs,
         scenarioApplyEpoch: transactionScenarioApplyEpoch,
         scenarioApplyRequestId: transactionScenarioApplyRequestId,
-        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload),
+        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload, bundle),
         runtimeVersionTag: staged.runtimeVersionTag || "",
         fixedOwnerColorCount: Object.keys(staged.scenarioColorMap || {}).length,
         coarseColorCount: Object.keys(staged.coarseColorMap || {}).length,
@@ -851,7 +851,7 @@ async function applyScenarioBundle(
       && (
         hasChunkedRuntime
         || !!runtimeState.scenarioPoliticalChunkData
-        || hasRenderableScenarioPoliticalTopology(runtimeState.runtimePoliticalTopology)
+        || hasRenderableScenarioPoliticalTopology(runtimeState.runtimePoliticalTopology, bundle)
       )
     ) {
       recordScenarioPerfMetric(

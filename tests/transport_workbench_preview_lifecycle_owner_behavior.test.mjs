@@ -5,15 +5,19 @@ import { createTransportWorkbenchPreviewLifecycleOwner } from "../js/ui/toolbar/
 import {
   buildTransportWorkbenchProjectedLines,
   createTransportWorkbenchLinePathD,
+  createTransportWorkbenchLinePackRuntime,
   measureTransportWorkbenchProjectedLineLength,
   normalizeTransportWorkbenchNumber,
+  PACK_MODE_FULL,
+  PACK_MODE_PREVIEW,
 } from "../js/ui/transport_workbench_line_runtime_shared.js";
+import { prepareTransportWorkbenchFamilyPreview } from "../js/ui/transport_workbench_family_preview.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { createChunkLoadScheduler } from "../js/core/scenario/chunk_load_scheduler.js";
 import {
   __transportWorkbenchPointPreviewTestInternals,
 } from "../js/ui/transport_workbench_point_preview_shared.js";
 import {
-  PACK_MODE_FULL,
-  PACK_MODE_PREVIEW,
   buildTransportWorkbenchPointSnapshot,
   createTransportWorkbenchEffectivePointPack,
   getTransportWorkbenchPointPackCacheKey,
@@ -582,4 +586,496 @@ test("point preview runtime snapshot sorts visibility rows and preserves loading
   assert.equal(snapshot.dataRows[1].id, "hidden");
   assert.equal(snapshot.dataRows[1].hiddenReason, "below_threshold");
   assert.equal(snapshot.dataRowLimit, 240);
+});
+
+test("carrier view refresh preserves the initial preview status update without rebuilding it on later pans", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  let finishCarrier;
+  const carrier = new Promise((resolve) => { finishCarrier = resolve; });
+  const lensCalls = [];
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({}),
+    ensureCarrier: () => carrier,
+    prepareFamilyPreview: async () => ({}),
+    renderFamilyPreview: async () => null,
+    renderLensSections: (family) => lensCalls.push(family.id),
+  });
+  const context = { isOpen: true, family: { id: "road" }, config: {}, compareHeld: false };
+  const initial = owner.refreshPreview(context);
+  await flushMicrotasks();
+  assert.deepEqual(lensCalls, []);
+  await owner.refreshPreview(context, { allowCarrierPrep: false, viewOnly: true });
+  assert.deepEqual(lensCalls, ["road"]);
+  finishCarrier();
+  await initial;
+  await owner.refreshPreview(context, { allowCarrierPrep: false, viewOnly: true });
+  assert.deepEqual(lensCalls, ["road"]);
+});
+
+test("preview lifecycle owner starts selected pack preparation in parallel before carrier promise resolves", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const callEvents = [];
+  let carrierResolver = null;
+  let packResolver = null;
+  let renderResolver = null;
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({ id: "mount" }),
+    ensureCarrier: () => {
+      callEvents.push("ensureCarrier:start");
+      return new Promise((resolve) => {
+        carrierResolver = () => {
+          callEvents.push("ensureCarrier:resolve");
+          resolve({ land: {}, sea: {} });
+        };
+      });
+    },
+    prepareFamilyPreview: (familyId, config) => {
+      callEvents.push(`prepareFamilyPreview:${familyId}:${config?.activePackId}`);
+      return new Promise((resolve) => {
+        packResolver = () => {
+          callEvents.push("prepareFamilyPreview:resolve");
+          resolve(true);
+        };
+      });
+    },
+    renderFamilyPreview: (familyId, config) => {
+      callEvents.push(`renderFamilyPreview:${familyId}:${config?.activePackId}`);
+      return new Promise((resolve) => {
+        renderResolver = () => {
+          callEvents.push("renderFamilyPreview:resolve");
+          resolve(null);
+        };
+      });
+    },
+    renderInspector: (family) => {
+      callEvents.push(`renderInspector:${family.id}`);
+    },
+    renderLensSections: (family) => {
+      callEvents.push(`renderLensSections:${family.id}`);
+    },
+    runtimeFamilyIds: ["road", "rail"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  const context = {
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "japan_custom_road", scope: "all" },
+    compareHeld: false,
+  };
+
+  const refreshPromise = owner.refreshPreview(context);
+  await flushMicrotasks();
+
+  // Evidence: Both ensureCarrier and prepareFamilyPreview started in parallel!
+  assert.deepEqual(callEvents, [
+    "prepareFamilyPreview:road:japan_custom_road",
+    "ensureCarrier:start",
+  ]);
+
+  // Pack resolves before carrier resolves:
+  packResolver();
+  await flushMicrotasks();
+
+  // Render must NOT have started yet because carrier has not resolved!
+  assert.equal(callEvents.includes("renderFamilyPreview:road:japan_custom_road"), false);
+
+  // Now carrier resolves:
+  carrierResolver();
+  await flushMicrotasks();
+
+  // Render starts now!
+  assert.equal(callEvents.includes("renderFamilyPreview:road:japan_custom_road"), true);
+
+  // Finish render:
+  renderResolver();
+  await refreshPromise;
+
+  assert.deepEqual(callEvents, [
+    "prepareFamilyPreview:road:japan_custom_road",
+    "ensureCarrier:start",
+    "prepareFamilyPreview:resolve",
+    "ensureCarrier:resolve",
+    "renderFamilyPreview:road:japan_custom_road",
+    "renderFamilyPreview:resolve",
+    "renderLensSections:road",
+    "renderInspector:road",
+  ]);
+});
+
+test("preview lifecycle owner prevents spurious asset prep on closed, layers, missing mount, and view-only paths", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const prepareCalls = [];
+  const carrierCalls = [];
+  const renderCalls = [];
+
+  let mount = { id: "mount" };
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => mount,
+    ensureCarrier: async () => {
+      carrierCalls.push("ensureCarrier");
+      return {};
+    },
+    prepareFamilyPreview: async (familyId, config) => {
+      prepareCalls.push({ familyId, config });
+      return true;
+    },
+    renderFamilyPreview: async (familyId, config, options) => {
+      renderCalls.push({ familyId, config, viewOnly: !!options?.viewOnly });
+      return null;
+    },
+    renderInspector: () => {},
+    renderLayerOrderPanel: () => {},
+    runtimeFamilyIds: ["road"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  // 1. Closed workbench
+  await owner.refreshPreview({
+    isOpen: false,
+    family: { id: "road" },
+    config: { activePackId: "road_pack" },
+  });
+  assert.equal(prepareCalls.length, 0);
+  assert.equal(carrierCalls.length, 0);
+
+  // 2. Layers panel
+  await owner.refreshPreview({
+    isOpen: true,
+    family: { id: "layers" },
+    config: {},
+  });
+  assert.equal(prepareCalls.length, 0);
+  assert.equal(carrierCalls.length, 0);
+
+  // 3. Missing carrier mount
+  mount = null;
+  await owner.refreshPreview({
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "road_pack" },
+  });
+  assert.equal(prepareCalls.length, 0);
+  assert.equal(carrierCalls.length, 0);
+  mount = { id: "mount" };
+
+  // 4. View-only refresh (e.g. camera sync)
+  await owner.refreshPreview({
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "road_pack" },
+  }, { allowCarrierPrep: false, viewOnly: true });
+
+  assert.equal(prepareCalls.length, 0);
+  assert.equal(carrierCalls.length, 0);
+  assert.equal(renderCalls.length, 1);
+  assert.equal(renderCalls[0].viewOnly, true);
+});
+
+test("preview lifecycle owner aborts stale generation when family switches during preparation", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const renderCalls = [];
+  const inspectorCalls = [];
+  let resolveRoadCarrier = null;
+  let resolveRailCarrier = null;
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({ id: "mount" }),
+    ensureCarrier: () => new Promise((resolve) => {
+      if (runtimeState.transportWorkbenchUi.activeFamily === "road") {
+        resolveRoadCarrier = resolve;
+      } else {
+        resolveRailCarrier = resolve;
+      }
+    }),
+    prepareFamilyPreview: async () => true,
+    renderFamilyPreview: async (familyId, config) => {
+      renderCalls.push({ familyId, config });
+      return null;
+    },
+    renderInspector: (family) => {
+      inspectorCalls.push(family.id);
+    },
+    runtimeFamilyIds: ["road", "rail"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  const roadPromise = owner.refreshPreview({
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "road_pack" },
+  });
+  await flushMicrotasks();
+
+  // User switches active family to rail before road carrier finishes:
+  runtimeState.transportWorkbenchUi.activeFamily = "rail";
+  const railPromise = owner.refreshPreview({
+    isOpen: true,
+    family: { id: "rail" },
+    config: { activePackId: "rail_pack" },
+  });
+  await flushMicrotasks();
+
+  // Road carrier resolves:
+  resolveRoadCarrier({});
+  await roadPromise;
+
+  // Stale road render and inspector writes must NOT occur!
+  assert.deepEqual(renderCalls, []);
+  assert.deepEqual(inspectorCalls, []);
+
+  // Rail carrier resolves:
+  resolveRailCarrier({});
+  await railPromise;
+
+  // Rail renders and writes inspector:
+  assert.deepEqual(renderCalls, [{ familyId: "rail", config: { activePackId: "rail_pack" } }]);
+  assert.deepEqual(inspectorCalls, ["rail"]);
+});
+
+test("preview lifecycle owner aborts in-flight preview when workbench closes", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const renderCalls = [];
+  const inspectorCalls = [];
+  let resolveCarrier = null;
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({ id: "mount" }),
+    ensureCarrier: () => new Promise((resolve) => { resolveCarrier = resolve; }),
+    prepareFamilyPreview: async () => true,
+    renderFamilyPreview: async (familyId) => {
+      renderCalls.push(familyId);
+      return null;
+    },
+    renderInspector: (family) => {
+      inspectorCalls.push(family.id);
+    },
+    destroyCarrier: () => {},
+    destroyFamilyPreviews: () => {},
+    runtimeFamilyIds: ["road"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  const refreshPromise = owner.refreshPreview({
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "road_pack" },
+  });
+  await flushMicrotasks();
+
+  // Close workbench:
+  runtimeState.transportWorkbenchUi.open = false;
+  owner.dispose();
+
+  // Carrier resolves after close:
+  resolveCarrier({});
+  await refreshPromise;
+
+  assert.deepEqual(renderCalls, []);
+  assert.deepEqual(inspectorCalls, []);
+});
+
+test("preview lifecycle owner preserves pack preparation failure, skips render commit, and allows retry", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const renderCalls = [];
+  const inspectorCalls = [];
+  let shouldFailPrep = true;
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({ id: "mount" }),
+    ensureCarrier: async () => ({}),
+    prepareFamilyPreview: async (familyId, config) => {
+      if (shouldFailPrep) {
+        throw new Error("Simulated pack fetch failure 500");
+      }
+      return true;
+    },
+    renderFamilyPreview: async (familyId, config) => {
+      renderCalls.push({ familyId, config });
+      return null;
+    },
+    renderInspector: (family, config) => {
+      inspectorCalls.push({ familyId: family.id, config });
+    },
+    runtimeFamilyIds: ["road"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  const failedContext = {
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "bad_pack" },
+  };
+
+  await owner.refreshPreview(failedContext);
+
+  // Render was aborted due to prep failure; inspector still received update (reporting failure state)
+  assert.deepEqual(renderCalls, []);
+  assert.equal(inspectorCalls.length, 1);
+  assert.equal(inspectorCalls[0].familyId, "road");
+
+  // Retry with fixed pack:
+  shouldFailPrep = false;
+  const retryContext = {
+    isOpen: true,
+    family: { id: "road" },
+    config: { activePackId: "good_pack" },
+  };
+
+  await owner.refreshPreview(retryContext);
+
+  // Render succeeds on retry!
+  assert.equal(renderCalls.length, 1);
+  assert.equal(renderCalls[0].config.activePackId, "good_pack");
+  assert.equal(inspectorCalls.length, 2);
+});
+
+test("preview lifecycle owner handles carrier preparation failure without stale preview commit", async () => {
+  const runtimeState = { transportWorkbenchUi: { open: true, activeFamily: "road" } };
+  const renderCalls = [];
+  const inspectorCalls = [];
+
+  const owner = createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
+    getCarrierMount: () => ({ id: "mount" }),
+    ensureCarrier: async () => {
+      throw new Error("Simulated carrier 404");
+    },
+    prepareFamilyPreview: async () => true,
+    renderFamilyPreview: async (familyId) => {
+      renderCalls.push(familyId);
+      return null;
+    },
+    renderInspector: (family) => {
+      inspectorCalls.push(family.id);
+    },
+    runtimeFamilyIds: ["road"],
+    listWarmupPlans: () => [],
+    scheduleTimeout: () => 0,
+  });
+
+  await owner.refreshPreview({
+    isOpen: true,
+    family: { id: "road" },
+    config: {},
+  });
+
+  assert.deepEqual(renderCalls, []);
+  assert.deepEqual(inspectorCalls, ["road"]);
+});
+
+test("road and rail line pack runtime harnesses exercise nondefault activePackId, preview-only requests, no selection emission before render, and dedup", async () => {
+  function createLinePreviewHarness({ familyId = "road", defaultManifestUrl = "manifest:default" } = {}) {
+    const requests = [];
+    const builds = [];
+    let selectionEmissions = 0;
+    const resources = createRuntimeResourceBudget({ softLimitBytes: 1_000_000 });
+    const scheduler = createChunkLoadScheduler({ resourceBudget: resources });
+
+    const lineRuntime = createTransportWorkbenchLinePackRuntime({
+      familyId,
+      manifestUrl: defaultManifestUrl,
+      estimatedLoadBytes: { [PACK_MODE_PREVIEW]: 100, [PACK_MODE_FULL]: 500 },
+      prepareCarrier: async () => {},
+      buildPack: async ({ mode, manifest }) => {
+        builds.push({ mode, packId: manifest.pack_id });
+        return {
+          mode,
+          manifest,
+          features: [{ id: `feature_${mode}_${manifest.pack_id}` }],
+        };
+      },
+    }, {
+      resourceBudget: resources,
+      scheduler,
+      yieldTask: () => Promise.resolve(),
+      getAsset: async (path, options) => {
+        requests.push({ path, label: options?.label });
+        if (path.includes("manifest")) {
+          return {
+            pack_id: path,
+            paths: {
+              preview: { lines: `${path}:preview:lines` },
+              full: { lines: `${path}:full:lines` },
+            },
+          };
+        }
+        return { objects: { lines: {} } };
+      },
+    });
+
+    const runtime = lineRuntime.runtime;
+    lineRuntime.setSelectionListener(() => {
+      selectionEmissions += 1;
+    });
+
+    async function loadPack(mode = PACK_MODE_PREVIEW, config = {}, { emitSelection = true } = {}) {
+      if (config?.activePackId) {
+        lineRuntime.setActivePack(config.activePackId, `manifest:${config.activePackId}`);
+      }
+      return lineRuntime.loadPack(mode, () => {
+        if (emitSelection && runtime.loadState.status === "ready" && runtime.lastRenderedConfig) {
+          lineRuntime.emitSelectionChange();
+        }
+      });
+    }
+
+    async function prepare(config = {}) {
+      return loadPack(PACK_MODE_PREVIEW, config, { emitSelection: false });
+    }
+
+    async function render(config = {}, options = {}) {
+      const pack = await loadPack(PACK_MODE_PREVIEW, config, { emitSelection: true });
+      if (typeof options.isCurrent === "function" && !options.isCurrent()) return null;
+      runtime.lastRenderedConfig = config;
+      runtime.activePack = pack;
+      runtime.activePackMode = PACK_MODE_PREVIEW;
+      lineRuntime.emitSelectionChange();
+      return pack;
+    }
+
+    return {
+      lineRuntime,
+      runtime,
+      requests,
+      builds,
+      getSelectionEmissions: () => selectionEmissions,
+      prepare,
+      render,
+    };
+  }
+
+  // 1. Nondefault activePackId and preview-only requests
+  const roadHarness = createLinePreviewHarness({ familyId: "road" });
+  const nonDefaultConfig = { activePackId: "tno_custom_road_pack", scope: "motorway" };
+
+  const preparePromise = roadHarness.prepare(nonDefaultConfig);
+  await preparePromise;
+
+  assert.equal(roadHarness.runtime.activePackId, "tno_custom_road_pack");
+  assert.equal(roadHarness.requests[0].path, "manifest:tno_custom_road_pack");
+  assert.deepEqual(roadHarness.builds.map((b) => b.mode), [PACK_MODE_PREVIEW]);
+  assert.equal(roadHarness.runtime.loadState.previewStatus, "ready");
+  assert.equal(roadHarness.runtime.loadState.fullStatus, "idle");
+  assert.equal(roadHarness.requests.some((r) => r.path.includes("full")), false);
+
+  // 2. No selection emission before render
+  assert.equal(roadHarness.getSelectionEmissions(), 0);
+
+  // 3. Single request dedup when prepare + render load same pack
+  const renderPack = await roadHarness.render(nonDefaultConfig);
+  assert.ok(renderPack);
+  assert.equal(roadHarness.builds.length, 1);
+  assert.equal(roadHarness.requests.filter((r) => r.path.includes("manifest")).length, 1);
+  assert.equal(roadHarness.getSelectionEmissions(), 1);
+
+  // 4. Family preview layer dispatches only declared prepare and returns null for undeclared
+  const undeclaredResult = await prepareTransportWorkbenchFamilyPreview("airport", { activePackId: "airport_pack" });
+  assert.equal(undeclaredResult, null);
 });

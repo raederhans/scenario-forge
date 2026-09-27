@@ -21,6 +21,7 @@ import { normalizeExportWorkbenchUiState } from "../js/core/state_defaults.js";
 import { replaceExportWorkbenchUiState } from "../js/core/state/ui_state.js";
 import {
   createExportWorkbenchController,
+  getExportPreviewSourceKey,
   ensureExportWorkbenchUiState,
   getExportAnnotationCountSummary,
   getExportAnnotationFamilyCounts,
@@ -646,4 +647,251 @@ test("export workbench controller renders annotation family summaries", () => {
   assert.match(source, /entry\.familyCounts/);
   assert.match(source, /EXPORT_ANNOTATION_FAMILY_VIEW_MODELS/);
   assert.match(source, /export-workbench-layer-meta/);
+});
+
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+  return { promise, resolve, reject };
+}
+
+function createState() {
+  return {
+    activeScenarioId: "scene-a", scenarioDataGeneration: 1, sceneGeneration: 1,
+    colorRevision: 1, topologyRevision: 1, dirtyRevision: 1,
+    width: 800, height: 600, dpr: 1, colorCanvas: { width: 800, height: 600 },
+    zoomTransform: { k: 1, x: 0, y: 0 }, renderPhase: "idle", styleConfig: {},
+    renderPassCache: { dirty: { background: false }, signatures: { background: "background-a" } },
+    exportWorkbenchUi: normalizeExportWorkbenchUiState({ previewMode: "layer", previewLayerId: "background" }),
+  };
+}
+
+function createHarness(t, overrides = {}) {
+  const oldDocument = globalThis.document;
+  const svg = { outerHTML: "<svg><text>A</text></svg>" };
+  globalThis.document = { getElementById: () => svg };
+  t.after(() => { globalThis.document = oldDocument; });
+  const state = createState();
+  const frames = [];
+  const sources = [];
+  const adjustments = [];
+  const stage = { children: [], replaceChildren(...children) { this.children = children; } };
+  const status = { textContent: "" };
+  const build = async (ui) => { const canvas = { id: sources.length }; sources.push({ ui, canvas }); return canvas; };
+  const controller = createExportWorkbenchController({
+    state, t: (key) => key, showToast() {}, showExportFailureToast() {},
+    normalizeExportWorkbenchUiState, renderPassNames: ["background"],
+    exportWorkbenchPreviewStage: stage, exportWorkbenchPreviewState: status,
+    exportWorkbenchOverlay: { classList: { toggle() {} }, setAttribute() {} },
+    buildCompositeSourceCanvas: build, buildSingleExportSourceCanvas: build,
+    applyExportAdjustmentsToCanvas(source, ui) {
+      const canvas = { source, brightness: ui.adjustments.brightness, classList: { add() {} } };
+      adjustments.push(canvas);
+      return canvas;
+    },
+    bakeLayer() {}, clearBakeCache() {},
+    requestPreviewFrame: (callback) => frames.push(callback),
+    ...overrides,
+  });
+  return {
+    state, controller, stage, status, svg, sources, adjustments, frames,
+    async frame() {
+      assert.ok(frames.length > 0, "a preview frame must be scheduled");
+      frames.shift()(0);
+      await new Promise(setImmediate);
+    },
+  };
+}
+
+test("preview collapses a burst into one source and one latest adjustment draw", async (t) => {
+  const h = createHarness(t);
+  const promises = [];
+  for (const brightness of [100, 110, 120, 130, 140]) {
+    h.state.exportWorkbenchUi.adjustments.brightness = brightness;
+    promises.push(h.controller.renderExportWorkbenchPreview());
+  }
+  assert.equal(h.frames.length, 1);
+  await h.frame();
+  await Promise.all(promises);
+  assert.equal(h.sources.length, 1);
+  assert.equal(h.adjustments.length, 1);
+  assert.equal(h.stage.children[0].brightness, 140);
+});
+
+test("raster previews reuse the source across SVG edits without serializing SVG", async (t) => {
+  const h = createHarness(t);
+  let svgReads = 0;
+  let markup = "<svg><text>A</text></svg>";
+  Object.defineProperty(h.svg, "outerHTML", { get() { svgReads += 1; return markup; } });
+  const draw = async () => { const p = h.controller.renderExportWorkbenchPreview(); await h.frame(); await p; };
+  await draw();
+  const firstSource = h.stage.children[0].source;
+  h.state.exportWorkbenchUi.adjustments.contrast = 150;
+  h.state.exportWorkbenchUi.scale = "4";
+  h.state.exportWorkbenchUi.format = "jpg";
+  await draw();
+  assert.equal(h.sources.length, 1);
+  assert.equal(h.stage.children[0].source, firstSource);
+  h.state.scenarioDataGeneration += 1;
+  await draw();
+  assert.equal(h.sources.length, 2);
+  markup = "<svg><text>B</text></svg>";
+  await draw();
+  assert.equal(h.sources.length, 2, "SVG changes do not affect a raster source");
+  assert.equal(svgReads, 0);
+});
+
+test("SVG source edits invalidate annotation, special-zone and composite previews", async (t) => {
+  const h = createHarness(t);
+  const draw = async () => { const p = h.controller.renderExportWorkbenchPreview(); await h.frame(); await p; };
+  for (const source of ["svg-annotations", "special-zones", "main"]) {
+    h.state.exportWorkbenchUi.previewMode = source === "main" ? "main" : "layer";
+    h.state.exportWorkbenchUi.previewLayerId = source;
+    h.state.exportWorkbenchUi.textVisibility["svg-annotations"] = true;
+    await draw();
+    const firstSource = h.stage.children[0].source;
+    h.svg.outerHTML = `<svg><text>${source}</text></svg>`;
+    await draw();
+    assert.notEqual(h.stage.children[0].source, firstSource, "same count with changed text must invalidate");
+  }
+});
+
+test("in-flight requests are serialized and stale jobs skip adjustment work", async (t) => {
+  const first = deferred();
+  const builds = [];
+  const h = createHarness(t, {
+    buildSingleExportSourceCanvas(ui, id) {
+      builds.push(id);
+      return builds.length === 1 ? first.promise : Promise.resolve({ id });
+    },
+  });
+  const p1 = h.controller.renderExportWorkbenchPreview();
+  await h.frame();
+  h.state.exportWorkbenchUi.previewLayerId = "political";
+  const p2 = h.controller.renderExportWorkbenchPreview();
+  h.state.exportWorkbenchUi.previewLayerId = "labels";
+  const p3 = h.controller.renderExportWorkbenchPreview();
+  assert.deepEqual(builds, ["background"]);
+  first.resolve({ id: "old" });
+  await new Promise(setImmediate);
+  assert.equal(h.adjustments.length, 0);
+  await h.frame();
+  await Promise.all([p1, p2, p3]);
+  assert.deepEqual(builds, ["background", "labels"]);
+  assert.equal(h.stage.children[0].source.id, "labels");
+});
+
+test("an in-flight source can serve the latest adjustment without rebuilding", async (t) => {
+  const source = deferred();
+  let builds = 0;
+  const h = createHarness(t, { buildSingleExportSourceCanvas() { builds += 1; return source.promise; } });
+  const first = h.controller.renderExportWorkbenchPreview();
+  await h.frame();
+  h.state.exportWorkbenchUi.adjustments.brightness = 170;
+  const latest = h.controller.renderExportWorkbenchPreview();
+  source.resolve({ id: "shared" });
+  await new Promise(setImmediate);
+  await h.frame();
+  await Promise.all([first, latest]);
+  assert.equal(builds, 1);
+  assert.equal(h.adjustments.length, 1);
+  assert.equal(h.stage.children[0].brightness, 170);
+});
+
+test("close discards pending work and prevents an active source from repopulating the cache", async (t) => {
+  const source = deferred();
+  let builds = 0;
+  const h = createHarness(t, {
+    buildSingleExportSourceCanvas() { builds += 1; return builds === 1 ? source.promise : Promise.resolve({ id: "new" }); },
+  });
+  const first = h.controller.renderExportWorkbenchPreview();
+  await h.frame();
+  h.controller.renderExportWorkbenchUi(false);
+  source.resolve({ id: "closed" });
+  await first;
+  assert.equal(h.adjustments.length, 0);
+  assert.equal(h.stage.children.length, 0);
+  const reopen = h.controller.renderExportWorkbenchPreview();
+  await h.frame();
+  await reopen;
+  assert.equal(builds, 2);
+  assert.equal(h.stage.children[0].source.id, "new");
+  const pending = h.controller.renderExportWorkbenchPreview();
+  h.controller.renderExportWorkbenchUi(false);
+  await h.frame();
+  await pending;
+  assert.equal(builds, 2);
+  assert.equal(h.stage.children.length, 0);
+});
+
+test("source failure is visible and retry starts a fresh build", async (t) => {
+  t.mock.method(console, "error", () => {});
+  let builds = 0;
+  const h = createHarness(t, {
+    async buildSingleExportSourceCanvas() {
+      builds += 1;
+      if (builds === 1) throw new Error("detail unavailable");
+      return { id: "retry" };
+    },
+  });
+  let p = h.controller.renderExportWorkbenchPreview();
+  await h.frame(); await p;
+  assert.match(h.status.textContent, /Preview unavailable/);
+  p = h.controller.renderExportWorkbenchPreview();
+  await h.frame(); await p;
+  assert.equal(builds, 2);
+  assert.equal(h.stage.children[0].source.id, "retry");
+});
+
+test("inputs changed during preparation are not cached under either scene", async (t) => {
+  const source = deferred();
+  let builds = 0;
+  const h = createHarness(t, {
+    buildSingleExportSourceCanvas() { builds += 1; return builds === 1 ? source.promise : Promise.resolve({ id: "current" }); },
+  });
+  const first = h.controller.renderExportWorkbenchPreview();
+  await h.frame();
+  h.state.activeScenarioId = "scene-b";
+  source.resolve({ id: "old" });
+  await first;
+  const next = h.controller.renderExportWorkbenchPreview();
+  await h.frame(); await next;
+  assert.equal(builds, 2);
+});
+
+test("source identity covers geometry, viewport, style, pass, order and visibility; dirty passes never reuse", () => {
+  const state = createState();
+  const key = () => getExportPreviewSourceKey(state, state.exportWorkbenchUi, ["background"], "svg");
+  let previous = key();
+  for (const change of [
+    () => { state.topologyRevision += 1; },
+    () => { state.colorRevision += 1; },
+    () => { state.zoomTransform.x += 0.001; },
+    () => { state.colorCanvas.width += 1; },
+    () => { state.styleConfig.ocean = { color: "red" }; },
+    () => { state.renderPassCache.signatures.background = "background-b"; },
+    () => { state.exportWorkbenchUi.layerOrder.reverse(); },
+    () => { state.exportWorkbenchUi.visibility.political = false; },
+    () => { state.exportWorkbenchUi.textVisibility["svg-annotations"] = false; },
+  ]) {
+    change();
+    assert.notEqual(key(), previous);
+    previous = key();
+  }
+  state.renderPassCache.dirty.background = true;
+  assert.equal(key(), null);
+  state.renderPassCache.dirty.background = false;
+  state.renderPhase = "interacting";
+  assert.equal(key(), null);
+  state.renderPhase = "idle";
+  for (const flag of ["scenarioApplyInFlight", "legacyColorStateDirty", "dynamicBordersDirty"]) {
+    state[flag] = true;
+    assert.equal(key(), null, flag);
+    state[flag] = false;
+  }
+  state.runtimeChunkLoadState = { pendingPromotion: {} };
+  assert.equal(key(), null);
+  state.runtimeChunkLoadState = { promotionCommitInFlight: true };
+  assert.equal(key(), null);
 });

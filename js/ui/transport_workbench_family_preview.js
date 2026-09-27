@@ -54,6 +54,7 @@ function createPreviewHandler(previewConfig) {
     selectFeature: previewModule[exportsConfig.selectFeature],
     setSelectionListener: previewModule[exportsConfig.setSelectionListener],
     warm: previewModule[exportsConfig.warm],
+    prepare: exportsConfig?.prepare ? previewModule[exportsConfig.prepare] : null,
     previewOnly: !!previewConfig.previewOnly,
   };
 
@@ -111,6 +112,15 @@ export async function renderTransportWorkbenchFamilyPreview(familyId, config, op
     candidateHandler.clear?.();
   });
   return handler.render(config, options);
+}
+
+export async function prepareTransportWorkbenchFamilyPreview(familyId, config, options = {}) {
+  const normalizedFamilyId = String(familyId || "").trim();
+  const handler = getFamilyHandler(normalizedFamilyId);
+  if (typeof handler?.prepare === "function") {
+    return handler.prepare(config, options);
+  }
+  return null;
 }
 
 export async function warmTransportWorkbenchFamilyPreview(familyId, options = {}) {

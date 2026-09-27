@@ -62,7 +62,7 @@ export function createScenarioChunkPayloadLoader({ runtimeState, normalizeScenar
       const outgoingBundle = runtimeState.scenarioBundleCacheById?.[outgoingScenarioId];
       if (outgoingBundle) {
         clearScenarioBundleChunkProtectionState(runtimeState, outgoingScenarioId);
-        for (const chunkId of getScenarioChunkPayloadEvictionIds(outgoingBundle)) {
+        for (const chunkId of getScenarioChunkPayloadEvictionIds(outgoingBundle, [], { preferPoliticalBase: true })) {
           removeScenarioBundleChunkPayloadState(runtimeState, outgoingScenarioId, chunkId);
         }
       }

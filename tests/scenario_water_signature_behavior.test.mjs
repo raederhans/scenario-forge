@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { parse } from "acorn";
 import { resolveEffectiveWaterRegionFeatures } from "../js/core/renderer/effective_water_regions.js";
+import { createSourceMetricsCache } from "../js/core/renderer/source_metrics_cache.js";
 
 const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const identitySource = readFileSync(new URL("../js/core/renderer/object_identity.js", import.meta.url), "utf8")
@@ -14,7 +15,7 @@ const names = [
   "isScenarioAtlantropaVisible", "getScenarioWaterRegionsMode", "isScenarioWaterTopologyExclusiveMode",
   "getScenarioExcludedWaterRegionIds", "getScenarioExcludedWaterRegionGroups", "isScenarioWaterRegion",
   "isWaterRegionExcludedByScenario", "getScenarioDetailPhaseSignatureToken",
-  "getScenarioRuntimeTopologySignatureToken", "estimateTopologyObjectArcRefs", "countTopologyArcRefs",
+  "getScenarioRuntimeTopologySignatureToken", "estimateTopologyObjectArcRefs",
   "getPhysicalLandMaskInfo", "getFirstUsablePhysicalLandMaskInfo", "getPhysicalLandMaskCandidateQuality",
   "createPhysicalLandMaskInfo", "getScenarioOverlaySignatureToken",
 ];
@@ -36,6 +37,7 @@ export function createHarness(source = rendererSource) {
   const calls = { water: 0, buckets: 0, mask: 0, revision: 0 };
   const context = vm.createContext({
     resolveEffectiveWaterRegionFeatures,
+    rendererSourceMetrics: createSourceMetricsCache(),
     runtimeState: state,
     SCENARIO_PRESENTATION_FEATURES: { ATLANTROPA_RELIEF: "atlantropa" },
     scenarioHasPresentationFeature: (manifest) => !!manifest.legacyAtlantropa,
@@ -160,6 +162,33 @@ test("shared lake replacement invalidates the water cache even with equal counts
   const first = h.water();
   h.state.contextLayerExternalDataByName.lakes = { features: [feature("lake_baikal", { updated: true })] };
   assert.notEqual(h.water(), first);
+});
+
+test("prepared water collection and Atlantropa buckets retain exact signature without recomposition", () => {
+  const h = createHarness();
+  const buckets = h.context.getEffectiveAtlantropaFeatures();
+  const features = h.context.getEffectiveWaterRegionFeatures(buckets);
+  assert.equal(h.context.getScenarioWaterVisualRevisionToken({
+    effectiveWaterFeatureCount: features.length,
+    atlantropaFeatures: buckets,
+  }), surface + suffix);
+  assert.deepEqual(h.calls, { water: 1, buckets: 1, mask: 1, revision: 1 });
+});
+
+test("prepared signature matches the live signature with shared lakes hidden and Atlantropa visible", () => {
+  const h = createHarness();
+  h.state.showWaterRegions = false;
+  h.state.contextLayerExternalDataByName = { lakes: { features: [feature("shared", { water_type: "lake" })] } };
+  const buckets = h.context.getEffectiveAtlantropaFeatures();
+  const features = h.context.getEffectiveWaterRegionFeatures(buckets);
+  const prepared = h.context.getScenarioWaterVisualRevisionToken({
+    effectiveWaterFeatureCount: features.length,
+    atlantropaFeatures: buckets,
+  });
+  assert.equal(prepared, h.water());
+  assert.match(prepared, /water-effective:4\|/);
+  assert.match(prepared, /features:2:water:1:land:1/);
+  assert.match(prepared, /scenario-water:off/);
 });
 
 test("river visibility and color refresh both lake fills and the outer overlay cache", () => {
