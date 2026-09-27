@@ -61,6 +61,11 @@ function getAngularDistanceDegrees(left, right) {
 }
 
 function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
+  const props = cityFeature?.properties || {};
+  // This supplemental polygon layer contains Russian cities only. A global
+  // capital must never acquire a Russian host through a spatial fallback.
+  const countryCode = normalizeCityText(props.__city_country_code || props.country_code).toUpperCase();
+  if (countryCode !== "RU") return "";
   const point = getFeaturePointCoordinates(cityFeature);
   const overrideFeatures = Array.isArray(runtimeState.ruCityOverrides?.features) ? runtimeState.ruCityOverrides.features : [];
   if (!point || !overrideFeatures.length) return "";
@@ -74,16 +79,14 @@ function resolveScenarioGeoFeatureIdForCityFeature(cityFeature) {
     const featureId = normalizeCityText(feature?.properties?.id || feature?.id);
     if (!featureId || !feature?.geometry) continue;
     try {
-      if (typeof geoContains === "function" && geoContains(feature, point)) {
-        return featureId;
-      }
-    } catch (_error) {
-      // Ignore invalid geometries and fall back to centroid proximity.
-    }
-    try {
       if (typeof geoCentroid !== "function") continue;
       const centroid = geoCentroid(feature);
       const distance = getAngularDistanceDegrees(point, centroid);
+      // Reversed spherical rings can contain almost the entire world. Require
+      // the same local proximity used by the fallback before trusting contains.
+      if (distance <= 1.5 && typeof geoContains === "function" && geoContains(feature, point)) {
+        return featureId;
+      }
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearestId = featureId;

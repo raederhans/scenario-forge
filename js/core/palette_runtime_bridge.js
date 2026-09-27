@@ -248,9 +248,19 @@ function buildScenarioOwnerColorMapDetails(
       generatedTags.push(tag);
     }
   });
+  // State normalization collapses legacy aliases onto canonical country codes.
+  // Keep their colors aligned so a later alias cannot overwrite the explicit color.
+  Object.entries(RUNTIME_BRIDGE_COUNTRY_CODE_ALIASES).forEach(([alias, canonical]) => {
+    if (byTag[alias] && byTag[canonical]) {
+      byTag[alias] = byTag[canonical];
+    }
+  });
   return {
     byTag,
-    generatedTags,
+    generatedTags: generatedTags.filter((tag) => {
+      const canonical = RUNTIME_BRIDGE_COUNTRY_CODE_ALIASES[tag];
+      return !canonical || !byTag[canonical] || generatedTags.includes(canonical);
+    }),
   };
 }
 

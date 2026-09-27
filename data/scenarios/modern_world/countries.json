@@ -1,7 +1,7 @@
 {
   "version": 1,
   "scenario_id": "modern_world",
-  "generated_at": "2026-03-09T14:09:29.123Z",
+  "generated_at": "2026-09-27T13:55:57.885587+00:00",
   "default_country": "US",
   "countries": {
     "AD": {
@@ -41,8 +41,8 @@
     "AE": {
       "tag": "AE",
       "display_name": "United Arab Emirates",
-      "color_hex": "#666600",
-      "feature_count": 9,
+      "color_hex": "#1e96c8",
+      "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "AE",
@@ -75,7 +75,7 @@
     "AF": {
       "tag": "AF",
       "display_name": "Afghanistan",
-      "color_hex": "#40a0a7",
+      "color_hex": "#61a6aa",
       "feature_count": 34,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -143,7 +143,7 @@
     "AM": {
       "tag": "AM",
       "display_name": "Armenia",
-      "color_hex": "#b066b4",
+      "color_hex": "#e97450",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -177,7 +177,7 @@
     "AO": {
       "tag": "AO",
       "display_name": "Angola",
-      "color_hex": "#258c3d",
+      "color_hex": "#aa1428",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -208,10 +208,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "AQ": {
+      "tag": "AQ",
+      "display_name": "Antarctica",
+      "color_hex": "#e8edf2",
+      "feature_count": 11,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "AQ",
+      "lookup_iso2": "AQ",
+      "provenance_iso2": "AQ",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_antarctica",
+      "continent_label": "Antarctica",
+      "subregion_id": "subregion_antarctica",
+      "subregion_label": "Antarctica",
+      "notes": "Neutral Antarctic map region; sector claims do not assign sovereignty.",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "AR": {
       "tag": "AR",
       "display_name": "Argentina",
-      "color_hex": "#919dec",
+      "color_hex": "#7f9edc",
       "feature_count": 24,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -245,7 +279,7 @@
     "AT": {
       "tag": "AT",
       "display_name": "Austria",
-      "color_hex": "#c2c6d7",
+      "color_hex": "#d1e7f8",
       "feature_count": 35,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -279,7 +313,7 @@
     "AU": {
       "tag": "AU",
       "display_name": "Australia",
-      "color_hex": "#398f61",
+      "color_hex": "#589048",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -310,10 +344,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "AX": {
+      "tag": "AX",
+      "display_name": "Aland",
+      "color_hex": "#cdd4e4",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "AX",
+      "lookup_iso2": "AX",
+      "provenance_iso2": "AX",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "AZ": {
       "tag": "AZ",
       "display_name": "Azerbaijan",
-      "color_hex": "#459731",
+      "color_hex": "#6261b1",
       "feature_count": 76,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -347,7 +415,7 @@
     "BA": {
       "tag": "BA",
       "display_name": "Bosnia and Herzegovina",
-      "color_hex": "#1a5276",
+      "color_hex": "#e0b058",
       "feature_count": 3,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -381,7 +449,7 @@
     "BD": {
       "tag": "BD",
       "display_name": "Bangladesh",
-      "color_hex": "#cccc00",
+      "color_hex": "#377167",
       "feature_count": 7,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -415,7 +483,7 @@
     "BE": {
       "tag": "BE",
       "display_name": "Belgium",
-      "color_hex": "#c1ab08",
+      "color_hex": "#da9f34",
       "feature_count": 44,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -449,7 +517,7 @@
     "BF": {
       "tag": "BF",
       "display_name": "Burkina Faso",
-      "color_hex": "#5d7cba",
+      "color_hex": "#64a01e",
       "feature_count": 13,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -483,7 +551,7 @@
     "BG": {
       "tag": "BG",
       "display_name": "Bulgaria",
-      "color_hex": "#339b00",
+      "color_hex": "#41a754",
       "feature_count": 28,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -551,7 +619,7 @@
     "BI": {
       "tag": "BI",
       "display_name": "Burundi",
-      "color_hex": "#cc9900",
+      "color_hex": "#8c5966",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -585,7 +653,7 @@
     "BJ": {
       "tag": "BJ",
       "display_name": "Benin",
-      "color_hex": "#0033cc",
+      "color_hex": "#c84614",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -619,7 +687,7 @@
     "BN": {
       "tag": "BN",
       "display_name": "Brunei",
-      "color_hex": "#e6e600",
+      "color_hex": "#3f3124",
       "feature_count": 4,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -653,7 +721,7 @@
     "BO": {
       "tag": "BO",
       "display_name": "Bolivia",
-      "color_hex": "#cca66c",
+      "color_hex": "#c88bc8",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -687,7 +755,7 @@
     "BR": {
       "tag": "BR",
       "display_name": "Brazil",
-      "color_hex": "#4c913f",
+      "color_hex": "#4e8c20",
       "feature_count": 27,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -701,6 +769,40 @@
       "continent_label": "South America",
       "subregion_id": "subregion_south_america",
       "subregion_label": "South America",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "BS": {
+      "tag": "BS",
+      "display_name": "The Bahamas",
+      "color_hex": "#8b929c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "BS",
+      "lookup_iso2": "BS",
+      "provenance_iso2": "BS",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
       "notes": "",
       "synthetic_owner": false,
       "source_type": "canonical_baseline",
@@ -755,7 +857,7 @@
     "BW": {
       "tag": "BW",
       "display_name": "Botswana",
-      "color_hex": "#0b8470",
+      "color_hex": "#c8c850",
       "feature_count": 15,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -789,7 +891,7 @@
     "BY": {
       "tag": "BY",
       "display_name": "Belarus",
-      "color_hex": "#b4dcbe",
+      "color_hex": "#769772",
       "feature_count": 35,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -823,7 +925,7 @@
     "BZ": {
       "tag": "BZ",
       "display_name": "Belize",
-      "color_hex": "#00cccc",
+      "color_hex": "#40489f",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -857,7 +959,7 @@
     "CA": {
       "tag": "CA",
       "display_name": "Canada",
-      "color_hex": "#e93b3b",
+      "color_hex": "#773027",
       "feature_count": 343,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -891,7 +993,7 @@
     "CD": {
       "tag": "CD",
       "display_name": "Democratic Republic of the Congo",
-      "color_hex": "#5d7cba",
+      "color_hex": "#5a88c4",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -925,7 +1027,7 @@
     "CF": {
       "tag": "CF",
       "display_name": "Central African Republic",
-      "color_hex": "#990000",
+      "color_hex": "#7ec8a0",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -959,7 +1061,7 @@
     "CG": {
       "tag": "CG",
       "display_name": "Republic of the Congo",
-      "color_hex": "#66ccff",
+      "color_hex": "#467878",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1027,7 +1129,7 @@
     "CI": {
       "tag": "CI",
       "display_name": "Ivory Coast",
-      "color_hex": "#ffffcc",
+      "color_hex": "#cb764d",
       "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1061,7 +1163,7 @@
     "CL": {
       "tag": "CL",
       "display_name": "Chile",
-      "color_hex": "#9b656b",
+      "color_hex": "#14266e",
       "feature_count": 16,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1095,7 +1197,7 @@
     "CM": {
       "tag": "CM",
       "display_name": "Cameroon",
-      "color_hex": "#ff3300",
+      "color_hex": "#c8836f",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1129,8 +1231,8 @@
     "CN": {
       "tag": "CN",
       "display_name": "China",
-      "color_hex": "#28288c",
-      "feature_count": 2391,
+      "color_hex": "#a20050",
+      "feature_count": 2395,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "CN",
@@ -1163,7 +1265,7 @@
     "CO": {
       "tag": "CO",
       "display_name": "Colombia",
-      "color_hex": "#debb5b",
+      "color_hex": "#ebb63b",
       "feature_count": 34,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1197,7 +1299,7 @@
     "CR": {
       "tag": "CR",
       "display_name": "Costa Rica",
-      "color_hex": "#98802b",
+      "color_hex": "#ebc846",
       "feature_count": 7,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1228,10 +1330,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "CU": {
+      "tag": "CU",
+      "display_name": "Cuba",
+      "color_hex": "#8c41a6",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "CU",
+      "lookup_iso2": "CU",
+      "provenance_iso2": "CU",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "CV": {
       "tag": "CV",
       "display_name": "Cabo Verde",
-      "color_hex": "#0066cc",
+      "color_hex": "#82a0fa",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1265,7 +1401,7 @@
     "CY": {
       "tag": "CY",
       "display_name": "Cyprus",
-      "color_hex": "#ffcc00",
+      "color_hex": "#e6e6e6",
       "feature_count": 1,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1299,8 +1435,8 @@
     "CZ": {
       "tag": "CZ",
       "display_name": "Czechia",
-      "color_hex": "#3498db",
-      "feature_count": 77,
+      "color_hex": "#4caec9",
+      "feature_count": 172,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "CZ",
@@ -1333,8 +1469,8 @@
     "DE": {
       "tag": "DE",
       "display_name": "Germany",
-      "color_hex": "#3c3c3c",
-      "feature_count": 401,
+      "color_hex": "#52757f",
+      "feature_count": 620,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "DE",
@@ -1367,7 +1503,7 @@
     "DJ": {
       "tag": "DJ",
       "display_name": "Djibouti",
-      "color_hex": "#006699",
+      "color_hex": "#e600e6",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1401,7 +1537,7 @@
     "DK": {
       "tag": "DK",
       "display_name": "Denmark",
-      "color_hex": "#99745d",
+      "color_hex": "#ac4a74",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1469,7 +1605,7 @@
     "DZ": {
       "tag": "DZ",
       "display_name": "Algeria",
-      "color_hex": "#996633",
+      "color_hex": "#689853",
       "feature_count": 48,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1537,7 +1673,7 @@
     "EE": {
       "tag": "EE",
       "display_name": "Estonia",
-      "color_hex": "#3287af",
+      "color_hex": "#6b92c6",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1605,7 +1741,7 @@
     "EH": {
       "tag": "EH",
       "display_name": "Western Sahara",
-      "color_hex": "#ffb266",
+      "color_hex": "#d2d2d2",
       "feature_count": 1,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1639,7 +1775,7 @@
     "ER": {
       "tag": "ER",
       "display_name": "Eritrea",
-      "color_hex": "#993300",
+      "color_hex": "#78d778",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1674,7 +1810,7 @@
       "tag": "ES",
       "display_name": "Spain",
       "color_hex": "#f2cd5e",
-      "feature_count": 52,
+      "feature_count": 59,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "ES",
@@ -1707,7 +1843,7 @@
     "ET": {
       "tag": "ET",
       "display_name": "Ethiopia",
-      "color_hex": "#9882bf",
+      "color_hex": "#5a5faa",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1772,10 +1908,78 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "FK": {
+      "tag": "FK",
+      "display_name": "Falkland Islands",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "FK",
+      "lookup_iso2": "FK",
+      "provenance_iso2": "FK",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_south_america",
+      "continent_label": "South America",
+      "subregion_id": "subregion_south_america",
+      "subregion_label": "South America",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "FO": {
+      "tag": "FO",
+      "display_name": "Faroe Islands",
+      "color_hex": "#ac4a74",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "FO",
+      "lookup_iso2": "FO",
+      "provenance_iso2": "FO",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "FR": {
       "tag": "FR",
       "display_name": "France",
-      "color_hex": "#3971e4",
+      "color_hex": "#3b508c",
       "feature_count": 320,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1809,7 +2013,7 @@
     "GA": {
       "tag": "GA",
       "display_name": "Gabon",
-      "color_hex": "#33cccc",
+      "color_hex": "#1bd97f",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1843,8 +2047,8 @@
     "GB": {
       "tag": "GB",
       "display_name": "United Kingdom",
-      "color_hex": "#c9385d",
-      "feature_count": 191,
+      "color_hex": "#b9364c",
+      "feature_count": 467,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "GB",
@@ -1877,7 +2081,7 @@
     "GE": {
       "tag": "GE",
       "display_name": "Georgia",
-      "color_hex": "#ff9696",
+      "color_hex": "#b32851",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1908,10 +2112,78 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "GF": {
+      "tag": "GF",
+      "display_name": "French Guiana",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "GF",
+      "lookup_iso2": "GF",
+      "provenance_iso2": "GF",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_unclassified",
+      "continent_label": "Unclassified",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "GG": {
+      "tag": "GG",
+      "display_name": "Guernsey",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "GG",
+      "lookup_iso2": "GG",
+      "provenance_iso2": "GG",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "GH": {
       "tag": "GH",
       "display_name": "Ghana",
-      "color_hex": "#666633",
+      "color_hex": "#cbba65",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1942,10 +2214,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "GL": {
+      "tag": "GL",
+      "display_name": "Greenland",
+      "color_hex": "#ac4a74",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "GL",
+      "lookup_iso2": "GL",
+      "provenance_iso2": "GL",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "GM": {
       "tag": "GM",
       "display_name": "Gambia",
-      "color_hex": "#990000",
+      "color_hex": "#283264",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -1979,7 +2285,7 @@
     "GN": {
       "tag": "GN",
       "display_name": "Guinea",
-      "color_hex": "#6699ff",
+      "color_hex": "#328ca0",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2010,10 +2316,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "GP": {
+      "tag": "GP",
+      "display_name": "Guadeloupe",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "GP",
+      "lookup_iso2": "GP",
+      "provenance_iso2": "GP",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_unclassified",
+      "continent_label": "Unclassified",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "GQ": {
       "tag": "GQ",
       "display_name": "Equatorial Guinea",
-      "color_hex": "#ffcc00",
+      "color_hex": "#e6aa3c",
       "feature_count": 7,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2047,7 +2387,7 @@
     "GR": {
       "tag": "GR",
       "display_name": "Greece",
-      "color_hex": "#5db5e3",
+      "color_hex": "#4880b6",
       "feature_count": 66,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2078,10 +2418,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "GS": {
+      "tag": "GS",
+      "display_name": "South Georgia and the Islands",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "GS",
+      "lookup_iso2": "GS",
+      "provenance_iso2": "GS",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_other",
+      "continent_label": "Other",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "GT": {
       "tag": "GT",
       "display_name": "Guatemala",
-      "color_hex": "#483170",
+      "color_hex": "#6b6780",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2115,7 +2489,7 @@
     "GW": {
       "tag": "GW",
       "display_name": "Guinea-Bissau",
-      "color_hex": "#996600",
+      "color_hex": "#d21428",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2149,7 +2523,7 @@
     "GY": {
       "tag": "GY",
       "display_name": "Guyana",
-      "color_hex": "#ffcc99",
+      "color_hex": "#dca082",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2183,7 +2557,7 @@
     "HK": {
       "tag": "HK",
       "display_name": "Hong Kong S.A.R.",
-      "color_hex": "#5d7cba",
+      "color_hex": "#172685",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2214,10 +2588,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "HM": {
+      "tag": "HM",
+      "display_name": "Heard Island and McDonald Islands",
+      "color_hex": "#589048",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "HM",
+      "lookup_iso2": "HM",
+      "provenance_iso2": "HM",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "HN": {
       "tag": "HN",
       "display_name": "Honduras",
-      "color_hex": "#809141",
+      "color_hex": "#679b4b",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2251,7 +2659,7 @@
     "HR": {
       "tag": "HR",
       "display_name": "Croatia",
-      "color_hex": "#e646b4",
+      "color_hex": "#977cae",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2353,7 +2761,7 @@
     "ID": {
       "tag": "ID",
       "display_name": "Indonesia",
-      "color_hex": "#283278",
+      "color_hex": "#585bb1",
       "feature_count": 34,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2387,7 +2795,7 @@
     "IE": {
       "tag": "IE",
       "display_name": "Ireland",
-      "color_hex": "#509f5a",
+      "color_hex": "#508750",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2421,7 +2829,7 @@
     "IL": {
       "tag": "IL",
       "display_name": "Israel",
-      "color_hex": "#9882bf",
+      "color_hex": "#1946ad",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2452,11 +2860,45 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "IM": {
+      "tag": "IM",
+      "display_name": "Isle of Man",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "IM",
+      "lookup_iso2": "IM",
+      "provenance_iso2": "IM",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "IN": {
       "tag": "IN",
       "display_name": "India",
-      "color_hex": "#d62828",
-      "feature_count": 718,
+      "color_hex": "#fea906",
+      "feature_count": 729,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "IN",
@@ -2469,6 +2911,40 @@
       "continent_label": "Asia",
       "subregion_id": "subregion_southern_asia",
       "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "IO": {
+      "tag": "IO",
+      "display_name": "British Indian Ocean Territory",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "IO",
+      "lookup_iso2": "IO",
+      "provenance_iso2": "IO",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
       "notes": "",
       "synthetic_owner": false,
       "source_type": "canonical_baseline",
@@ -2523,7 +2999,7 @@
     "IR": {
       "tag": "IR",
       "display_name": "Iran",
-      "color_hex": "#477161",
+      "color_hex": "#366e6e",
       "feature_count": 31,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2591,8 +3067,8 @@
     "IT": {
       "tag": "IT",
       "display_name": "Italy",
-      "color_hex": "#437f3f",
-      "feature_count": 107,
+      "color_hex": "#2f894b",
+      "feature_count": 108,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "IT",
@@ -2605,6 +3081,74 @@
       "continent_label": "Europe",
       "subregion_id": "subregion_southern_europe",
       "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "JE": {
+      "tag": "JE",
+      "display_name": "Jersey",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "JE",
+      "lookup_iso2": "JE",
+      "provenance_iso2": "JE",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_northern_europe",
+      "subregion_label": "Northern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "JM": {
+      "tag": "JM",
+      "display_name": "Jamaica",
+      "color_hex": "#477161",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "JM",
+      "lookup_iso2": "JM",
+      "provenance_iso2": "JM",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
       "notes": "",
       "synthetic_owner": false,
       "source_type": "canonical_baseline",
@@ -2659,8 +3203,8 @@
     "JP": {
       "tag": "JP",
       "display_name": "Japan",
-      "color_hex": "#ffc9b2",
-      "feature_count": 47,
+      "color_hex": "#ffdcaf",
+      "feature_count": 49,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "JP",
@@ -2693,7 +3237,7 @@
     "KE": {
       "tag": "KE",
       "display_name": "Kenya",
-      "color_hex": "#91670e",
+      "color_hex": "#792e2e",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2727,7 +3271,7 @@
     "KG": {
       "tag": "KG",
       "display_name": "Kyrgyzstan",
-      "color_hex": "#994c00",
+      "color_hex": "#d75664",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2761,7 +3305,7 @@
     "KH": {
       "tag": "KH",
       "display_name": "Cambodia",
-      "color_hex": "#644796",
+      "color_hex": "#6667a1",
       "feature_count": 24,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2795,7 +3339,7 @@
     "KM": {
       "tag": "KM",
       "display_name": "Comoros",
-      "color_hex": "#5d7cba",
+      "color_hex": "#f0820a",
       "feature_count": 3,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2829,7 +3373,7 @@
     "KP": {
       "tag": "KP",
       "display_name": "North Korea",
-      "color_hex": "#7f1d1d",
+      "color_hex": "#c81932",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2863,8 +3407,8 @@
     "KR": {
       "tag": "KR",
       "display_name": "South Korea",
-      "color_hex": "#2563eb",
-      "feature_count": 17,
+      "color_hex": "#4d64af",
+      "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "KR",
@@ -2897,7 +3441,7 @@
     "KW": {
       "tag": "KW",
       "display_name": "Kuwait",
-      "color_hex": "#994c00",
+      "color_hex": "#b4be50",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2931,7 +3475,7 @@
     "KZ": {
       "tag": "KZ",
       "display_name": "Kazakhstan",
-      "color_hex": "#4bb8cb",
+      "color_hex": "#66aed7",
       "feature_count": 16,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -2965,7 +3509,7 @@
     "LA": {
       "tag": "LA",
       "display_name": "Laos",
-      "color_hex": "#b06688",
+      "color_hex": "#caa5de",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3067,7 +3611,7 @@
     "LK": {
       "tag": "LK",
       "display_name": "Sri Lanka",
-      "color_hex": "#cc0066",
+      "color_hex": "#df8270",
       "feature_count": 25,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3203,7 +3747,7 @@
     "LU": {
       "tag": "LU",
       "display_name": "Luxembourg",
-      "color_hex": "#41afb3",
+      "color_hex": "#5ea1c5",
       "feature_count": 3,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3237,7 +3781,7 @@
     "LV": {
       "tag": "LV",
       "display_name": "Latvia",
-      "color_hex": "#4b4dba",
+      "color_hex": "#7e4852",
       "feature_count": 6,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3305,7 +3849,7 @@
     "MA": {
       "tag": "MA",
       "display_name": "Morocco",
-      "color_hex": "#663300",
+      "color_hex": "#a33232",
       "feature_count": 16,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3373,7 +3917,7 @@
     "MD": {
       "tag": "MD",
       "display_name": "Moldova",
-      "color_hex": "#ffcccc",
+      "color_hex": "#bf9683",
       "feature_count": 40,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3407,7 +3951,7 @@
     "ME": {
       "tag": "ME",
       "display_name": "Montenegro",
-      "color_hex": "#4d5a69",
+      "color_hex": "#6fbcbd",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3441,7 +3985,7 @@
     "MG": {
       "tag": "MG",
       "display_name": "Madagascar",
-      "color_hex": "#ffff99",
+      "color_hex": "#64af9e",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3475,7 +4019,7 @@
     "MK": {
       "tag": "MK",
       "display_name": "North Macedonia",
-      "color_hex": "#7d3c98",
+      "color_hex": "#ff5000",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3509,7 +4053,7 @@
     "ML": {
       "tag": "ML",
       "display_name": "Mali",
-      "color_hex": "#ccccff",
+      "color_hex": "#c19f62",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3543,8 +4087,8 @@
     "MM": {
       "tag": "MM",
       "display_name": "Myanmar",
-      "color_hex": "#4c9900",
-      "feature_count": 14,
+      "color_hex": "#8b6e45",
+      "feature_count": 15,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "MM",
@@ -3577,7 +4121,7 @@
     "MN": {
       "tag": "MN",
       "display_name": "Mongolia",
-      "color_hex": "#666057",
+      "color_hex": "#9f6f54",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3642,10 +4186,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "MQ": {
+      "tag": "MQ",
+      "display_name": "Martinique",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "MQ",
+      "lookup_iso2": "MQ",
+      "provenance_iso2": "MQ",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_unclassified",
+      "continent_label": "Unclassified",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "MR": {
       "tag": "MR",
       "display_name": "Mauritania",
-      "color_hex": "#ff9999",
+      "color_hex": "#4a817b",
       "feature_count": 13,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3679,7 +4257,7 @@
     "MT": {
       "tag": "MT",
       "display_name": "Malta",
-      "color_hex": "#ffff99",
+      "color_hex": "#ff5a00",
       "feature_count": 2,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3710,10 +4288,78 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "MU": {
+      "tag": "MU",
+      "display_name": "Mauritius",
+      "color_hex": "#1414be",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "MU",
+      "lookup_iso2": "MU",
+      "provenance_iso2": "MU",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "MV": {
+      "tag": "MV",
+      "display_name": "Maldives",
+      "color_hex": "#b2ff66",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "MV",
+      "lookup_iso2": "MV",
+      "provenance_iso2": "MV",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_asia",
+      "continent_label": "Asia",
+      "subregion_id": "subregion_southern_asia",
+      "subregion_label": "Southern Asia",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "MW": {
       "tag": "MW",
       "display_name": "Malawi",
-      "color_hex": "#99cc00",
+      "color_hex": "#a46380",
       "feature_count": 3,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3781,7 +4427,7 @@
     "MY": {
       "tag": "MY",
       "display_name": "Malaysia",
-      "color_hex": "#c56064",
+      "color_hex": "#fa6455",
       "feature_count": 16,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3815,7 +4461,7 @@
     "MZ": {
       "tag": "MZ",
       "display_name": "Mozambique",
-      "color_hex": "#703e5a",
+      "color_hex": "#336679",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3849,7 +4495,7 @@
     "NA": {
       "tag": "NA",
       "display_name": "Namibia",
-      "color_hex": "#e5ccff",
+      "color_hex": "#675b67",
       "feature_count": 13,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3883,7 +4529,7 @@
     "NE": {
       "tag": "NE",
       "display_name": "Niger",
-      "color_hex": "#ff9966",
+      "color_hex": "#a67547",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3917,7 +4563,7 @@
     "NG": {
       "tag": "NG",
       "display_name": "Nigeria",
-      "color_hex": "#ffcc66",
+      "color_hex": "#268238",
       "feature_count": 37,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3951,7 +4597,7 @@
     "NI": {
       "tag": "NI",
       "display_name": "Nicaragua",
-      "color_hex": "#92b3bf",
+      "color_hex": "#af3a49",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -3985,8 +4631,8 @@
     "NL": {
       "tag": "NL",
       "display_name": "Netherlands",
-      "color_hex": "#cb8a4a",
-      "feature_count": 40,
+      "color_hex": "#d4893f",
+      "feature_count": 41,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "NL",
@@ -4019,8 +4665,8 @@
     "NO": {
       "tag": "NO",
       "display_name": "Norway",
-      "color_hex": "#6f4747",
-      "feature_count": 12,
+      "color_hex": "#87aebe",
+      "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "NO",
@@ -4088,7 +4734,7 @@
       "tag": "NZ",
       "display_name": "New Zealand",
       "color_hex": "#9882bf",
-      "feature_count": 17,
+      "feature_count": 19,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "NZ",
@@ -4121,7 +4767,7 @@
     "OM": {
       "tag": "OM",
       "display_name": "Oman",
-      "color_hex": "#9b656b",
+      "color_hex": "#aa5aaa",
       "feature_count": 11,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4155,7 +4801,7 @@
     "PA": {
       "tag": "PA",
       "display_name": "Panama",
-      "color_hex": "#9882bf",
+      "color_hex": "#7b95b3",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4189,7 +4835,7 @@
     "PE": {
       "tag": "PE",
       "display_name": "Peru",
-      "color_hex": "#c4bdcc",
+      "color_hex": "#e15870",
       "feature_count": 26,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4223,7 +4869,7 @@
     "PG": {
       "tag": "PG",
       "display_name": "Papua New Guinea",
-      "color_hex": "#99004c",
+      "color_hex": "#7d2d1c",
       "feature_count": 20,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4257,7 +4903,7 @@
     "PH": {
       "tag": "PH",
       "display_name": "Philippines",
-      "color_hex": "#0028c3",
+      "color_hex": "#835dc8",
       "feature_count": 117,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4291,7 +4937,7 @@
     "PK": {
       "tag": "PK",
       "display_name": "Pakistan",
-      "color_hex": "#006600",
+      "color_hex": "#278442",
       "feature_count": 8,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4325,7 +4971,7 @@
     "PL": {
       "tag": "PL",
       "display_name": "Poland",
-      "color_hex": "#d6668b",
+      "color_hex": "#ca6371",
       "feature_count": 380,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4356,10 +5002,78 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "PM": {
+      "tag": "PM",
+      "display_name": "Saint Pierre and Miquelon",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "PM",
+      "lookup_iso2": "PM",
+      "provenance_iso2": "PM",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_northern_america",
+      "subregion_label": "Northern America",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
+    "PR": {
+      "tag": "PR",
+      "display_name": "Puerto Rico",
+      "color_hex": "#9999ff",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "PR",
+      "lookup_iso2": "PR",
+      "provenance_iso2": "PR",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "PS": {
       "tag": "PS",
       "display_name": "Palestine",
-      "color_hex": "#aa7d50",
+      "color_hex": "#569423",
       "feature_count": 2,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4394,7 +5108,7 @@
       "tag": "PT",
       "display_name": "Portugal",
       "color_hex": "#277446",
-      "feature_count": 23,
+      "feature_count": 31,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "PT",
@@ -4461,7 +5175,7 @@
     "QA": {
       "tag": "QA",
       "display_name": "Qatar",
-      "color_hex": "#800000",
+      "color_hex": "#641414",
       "feature_count": 7,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4492,10 +5206,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "RE": {
+      "tag": "RE",
+      "display_name": "Reunion",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "RE",
+      "lookup_iso2": "RE",
+      "provenance_iso2": "RE",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_unclassified",
+      "continent_label": "Unclassified",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "RO": {
       "tag": "RO",
       "display_name": "Romania",
-      "color_hex": "#d7c448",
+      "color_hex": "#d8ac00",
       "feature_count": 42,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4529,7 +5277,7 @@
     "RS": {
       "tag": "RS",
       "display_name": "Republic of Serbia",
-      "color_hex": "#6c3483",
+      "color_hex": "#5a506e",
       "feature_count": 25,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4563,8 +5311,8 @@
     "RU": {
       "tag": "RU",
       "display_name": "Russia",
-      "color_hex": "#4a4e69",
-      "feature_count": 2156,
+      "color_hex": "#366138",
+      "feature_count": 12152,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "RU",
@@ -4597,7 +5345,7 @@
     "RW": {
       "tag": "RW",
       "display_name": "Rwanda",
-      "color_hex": "#ffff66",
+      "color_hex": "#50a9c7",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4631,8 +5379,8 @@
     "SA": {
       "tag": "SA",
       "display_name": "Saudi Arabia",
-      "color_hex": "#abbe98",
-      "feature_count": 13,
+      "color_hex": "#0a640a",
+      "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "SA",
@@ -4662,10 +5410,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "SC": {
+      "tag": "SC",
+      "display_name": "Seychelles",
+      "color_hex": "#8b929c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "SC",
+      "lookup_iso2": "SC",
+      "provenance_iso2": "SC",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_eastern_africa",
+      "subregion_label": "Eastern Africa",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "SD": {
       "tag": "SD",
       "display_name": "Sudan",
-      "color_hex": "#cc6600",
+      "color_hex": "#006233",
       "feature_count": 17,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4699,7 +5481,7 @@
     "SE": {
       "tag": "SE",
       "display_name": "Sweden",
-      "color_hex": "#2484f7",
+      "color_hex": "#41609f",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4733,7 +5515,7 @@
     "SG": {
       "tag": "SG",
       "display_name": "Singapore",
-      "color_hex": "#cc0000",
+      "color_hex": "#fa6414",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4764,10 +5546,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "SH": {
+      "tag": "SH",
+      "display_name": "Saint Helena",
+      "color_hex": "#b9364c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "SH",
+      "lookup_iso2": "SH",
+      "provenance_iso2": "SH",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_western_africa",
+      "subregion_label": "Western Africa",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "SI": {
       "tag": "SI",
       "display_name": "Slovenia",
-      "color_hex": "#66b2ff",
+      "color_hex": "#51a0b6",
       "feature_count": 12,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4801,7 +5617,7 @@
     "SK": {
       "tag": "SK",
       "display_name": "Slovakia",
-      "color_hex": "#9ea1bc",
+      "color_hex": "#7a98ca",
       "feature_count": 79,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4835,7 +5651,7 @@
     "SL": {
       "tag": "SL",
       "display_name": "Sierra Leone",
-      "color_hex": "#cc66ff",
+      "color_hex": "#82fae6",
       "feature_count": 4,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4903,7 +5719,7 @@
     "SN": {
       "tag": "SN",
       "display_name": "Senegal",
-      "color_hex": "#cc3300",
+      "color_hex": "#a0ff00",
       "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4937,7 +5753,7 @@
     "SO": {
       "tag": "SO",
       "display_name": "Somalia",
-      "color_hex": "#336600",
+      "color_hex": "#80b3eb",
       "feature_count": 18,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -4971,7 +5787,7 @@
     "SR": {
       "tag": "SR",
       "display_name": "Suriname",
-      "color_hex": "#ffb266",
+      "color_hex": "#c85000",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5005,7 +5821,7 @@
     "SS": {
       "tag": "SS",
       "display_name": "South Sudan",
-      "color_hex": "#5d7cba",
+      "color_hex": "#9d8278",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5073,7 +5889,7 @@
     "SV": {
       "tag": "SV",
       "display_name": "El Salvador",
-      "color_hex": "#9882bf",
+      "color_hex": "#6b9b9c",
       "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5107,7 +5923,7 @@
     "SY": {
       "tag": "SY",
       "display_name": "Syria",
-      "color_hex": "#646496",
+      "color_hex": "#7169a3",
       "feature_count": 15,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5175,7 +5991,7 @@
     "TD": {
       "tag": "TD",
       "display_name": "Chad",
-      "color_hex": "#ccffcc",
+      "color_hex": "#bef01e",
       "feature_count": 22,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5206,10 +6022,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "TF": {
+      "tag": "TF",
+      "display_name": "French Southern and Antarctic Lands",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "TF",
+      "lookup_iso2": "TF",
+      "provenance_iso2": "TF",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_africa",
+      "continent_label": "Africa",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "TG": {
       "tag": "TG",
       "display_name": "Togo",
-      "color_hex": "#006600",
+      "color_hex": "#906673",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5243,7 +6093,7 @@
     "TH": {
       "tag": "TH",
       "display_name": "Thailand",
-      "color_hex": "#abbe98",
+      "color_hex": "#a1b298",
       "feature_count": 77,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5277,7 +6127,7 @@
     "TJ": {
       "tag": "TJ",
       "display_name": "Tajikistan",
-      "color_hex": "#336600",
+      "color_hex": "#fabe82",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5345,7 +6195,7 @@
     "TM": {
       "tag": "TM",
       "display_name": "Turkmenistan",
-      "color_hex": "#004c99",
+      "color_hex": "#88cd7e",
       "feature_count": 5,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5379,7 +6229,7 @@
     "TN": {
       "tag": "TN",
       "display_name": "Tunisia",
-      "color_hex": "#999966",
+      "color_hex": "#be2d2d",
       "feature_count": 23,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5413,7 +6263,7 @@
     "TR": {
       "tag": "TR",
       "display_name": "Turkey",
-      "color_hex": "#abbe98",
+      "color_hex": "#971919",
       "feature_count": 81,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5444,10 +6294,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "TT": {
+      "tag": "TT",
+      "display_name": "Trinidad and Tobago",
+      "color_hex": "#606060",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "TT",
+      "lookup_iso2": "TT",
+      "provenance_iso2": "TT",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_north_america",
+      "continent_label": "North America",
+      "subregion_id": "subregion_caribbean",
+      "subregion_label": "Caribbean",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "TW": {
       "tag": "TW",
       "display_name": "Taiwan",
-      "color_hex": "#f59e0b",
+      "color_hex": "#0555a6",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5481,7 +6365,7 @@
     "TZ": {
       "tag": "TZ",
       "display_name": "United Republic of Tanzania",
-      "color_hex": "#5d7cba",
+      "color_hex": "#8bbdbd",
       "feature_count": 30,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5515,8 +6399,8 @@
     "UA": {
       "tag": "UA",
       "display_name": "Ukraine",
-      "color_hex": "#0050e6",
-      "feature_count": 495,
+      "color_hex": "#5476a4",
+      "feature_count": 1072,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "UA",
@@ -5549,7 +6433,7 @@
     "UG": {
       "tag": "UG",
       "display_name": "Uganda",
-      "color_hex": "#ff5050",
+      "color_hex": "#dacb26",
       "feature_count": 4,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5583,8 +6467,8 @@
     "US": {
       "tag": "US",
       "display_name": "United States of America",
-      "color_hex": "#1485ed",
-      "feature_count": 490,
+      "color_hex": "#4782af",
+      "feature_count": 914,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "US",
@@ -5617,7 +6501,7 @@
     "UY": {
       "tag": "UY",
       "display_name": "Uruguay",
-      "color_hex": "#abbe98",
+      "color_hex": "#7dc3e1",
       "feature_count": 19,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5651,7 +6535,7 @@
     "UZ": {
       "tag": "UZ",
       "display_name": "Uzbekistan",
-      "color_hex": "#006666",
+      "color_hex": "#7949af",
       "feature_count": 14,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5682,10 +6566,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "VA": {
+      "tag": "VA",
+      "display_name": "Vatican",
+      "color_hex": "#8b929c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "VA",
+      "lookup_iso2": "VA",
+      "provenance_iso2": "VA",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_europe",
+      "continent_label": "Europe",
+      "subregion_id": "subregion_southern_europe",
+      "subregion_label": "Southern Europe",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "VE": {
       "tag": "VE",
       "display_name": "Venezuela",
-      "color_hex": "#abbe98",
+      "color_hex": "#fa826b",
       "feature_count": 26,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5719,8 +6637,8 @@
     "VN": {
       "tag": "VN",
       "display_name": "Vietnam",
-      "color_hex": "#5d7cba",
-      "feature_count": 63,
+      "color_hex": "#f1d019",
+      "feature_count": 64,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
       "base_iso2": "VN",
@@ -5753,7 +6671,7 @@
     "XK": {
       "tag": "XK",
       "display_name": "Kosovo",
-      "color_hex": "#d0a650",
+      "color_hex": "#816197",
       "feature_count": 30,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5787,7 +6705,7 @@
     "YE": {
       "tag": "YE",
       "display_name": "Yemen",
-      "color_hex": "#9b656b",
+      "color_hex": "#ac7c6f",
       "feature_count": 21,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5818,10 +6736,44 @@
       "subject_kind": "",
       "entry_kind": ""
     },
+    "YT": {
+      "tag": "YT",
+      "display_name": "Mayotte",
+      "color_hex": "#3b508c",
+      "feature_count": 1,
+      "quality": "direct_country_copy",
+      "source": "canonical_baseline",
+      "base_iso2": "YT",
+      "lookup_iso2": "YT",
+      "provenance_iso2": "YT",
+      "scenario_only": false,
+      "featured": false,
+      "capital_state_id": null,
+      "continent_id": "continent_unclassified",
+      "continent_label": "Unclassified",
+      "subregion_id": "subregion_unclassified",
+      "subregion_label": "Unclassified",
+      "notes": "",
+      "synthetic_owner": false,
+      "source_type": "canonical_baseline",
+      "historical_fidelity": "modern",
+      "primary_rule_source": "",
+      "rule_sources": [],
+      "source_types": [
+        "canonical_baseline"
+      ],
+      "historical_fidelity_summary": [
+        "modern"
+      ],
+      "parent_owner_tag": "",
+      "parent_owner_tags": [],
+      "subject_kind": "",
+      "entry_kind": ""
+    },
     "ZA": {
       "tag": "ZA",
       "display_name": "South Africa",
-      "color_hex": "#c36ba0",
+      "color_hex": "#a17cab",
       "feature_count": 9,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5855,7 +6807,7 @@
     "ZM": {
       "tag": "ZM",
       "display_name": "Zambia",
-      "color_hex": "#6666ff",
+      "color_hex": "#758e5b",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5889,7 +6841,7 @@
     "ZW": {
       "tag": "ZW",
       "display_name": "Zimbabwe",
-      "color_hex": "#0707ef",
+      "color_hex": "#417158",
       "feature_count": 10,
       "quality": "direct_country_copy",
       "source": "canonical_baseline",
@@ -5919,6 +6871,814 @@
       "parent_owner_tags": [],
       "subject_kind": "",
       "entry_kind": ""
+    }
+  },
+  "color_source": {
+    "name": "The Fire Rises",
+    "version": "1.0.9.1c",
+    "workshop_id": "3350890356",
+    "policy": "Explicit TFR map colors; colors.txt overrides country-file color. Territories without a direct tag may reference the recorded parent color without changing identity; other entities retain defaults. Antarctica uses a neutral ice color.",
+    "matched": {
+      "AE": {
+        "tag": "UAE",
+        "file": "common/countries/colors.txt"
+      },
+      "AF": {
+        "tag": "AFG",
+        "file": "common/countries/colors.txt"
+      },
+      "AL": {
+        "tag": "ALB",
+        "file": "common/countries/colors.txt"
+      },
+      "AM": {
+        "tag": "ARM",
+        "file": "common/countries/colors.txt"
+      },
+      "AO": {
+        "tag": "ANG",
+        "file": "common/countries/colors.txt"
+      },
+      "AR": {
+        "tag": "ARG",
+        "file": "common/countries/colors.txt"
+      },
+      "AT": {
+        "tag": "AUS",
+        "file": "common/countries/colors.txt"
+      },
+      "AU": {
+        "tag": "AST",
+        "file": "common/countries/colors.txt"
+      },
+      "AZ": {
+        "tag": "AZR",
+        "file": "common/countries/colors.txt"
+      },
+      "BA": {
+        "tag": "BOS",
+        "file": "common/countries/colors.txt"
+      },
+      "BD": {
+        "tag": "BAN",
+        "file": "common/countries/colors.txt"
+      },
+      "BE": {
+        "tag": "BEL",
+        "file": "common/countries/colors.txt"
+      },
+      "BF": {
+        "tag": "VOL",
+        "file": "common/countries/colors.txt"
+      },
+      "BG": {
+        "tag": "BUL",
+        "file": "common/countries/colors.txt"
+      },
+      "BI": {
+        "tag": "BRD",
+        "file": "common/countries/colors.txt"
+      },
+      "BJ": {
+        "tag": "DAH",
+        "file": "common/countries/colors.txt"
+      },
+      "BN": {
+        "tag": "BRN",
+        "file": "common/countries/colors.txt"
+      },
+      "BO": {
+        "tag": "BOL",
+        "file": "common/countries/colors.txt"
+      },
+      "BR": {
+        "tag": "BRA",
+        "file": "common/countries/colors.txt"
+      },
+      "BT": {
+        "tag": "BHU",
+        "file": "common/countries/colors.txt"
+      },
+      "BW": {
+        "tag": "BOT",
+        "file": "common/countries/colors.txt"
+      },
+      "BY": {
+        "tag": "BLR",
+        "file": "common/countries/colors.txt"
+      },
+      "BZ": {
+        "tag": "BLZ",
+        "file": "common/countries/colors.txt"
+      },
+      "CA": {
+        "tag": "CAN",
+        "file": "common/countries/colors.txt"
+      },
+      "CD": {
+        "tag": "COG",
+        "file": "common/countries/colors.txt"
+      },
+      "CF": {
+        "tag": "CAR",
+        "file": "common/countries/colors.txt"
+      },
+      "CG": {
+        "tag": "RCG",
+        "file": "common/countries/colors.txt"
+      },
+      "CH": {
+        "tag": "SWI",
+        "file": "common/countries/colors.txt"
+      },
+      "CI": {
+        "tag": "IVO",
+        "file": "common/countries/colors.txt"
+      },
+      "CL": {
+        "tag": "CHL",
+        "file": "common/countries/colors.txt"
+      },
+      "CM": {
+        "tag": "CMR",
+        "file": "common/countries/colors.txt"
+      },
+      "CN": {
+        "tag": "PRC",
+        "file": "common/countries/colors.txt"
+      },
+      "CO": {
+        "tag": "COL",
+        "file": "common/countries/colors.txt"
+      },
+      "CR": {
+        "tag": "COS",
+        "file": "common/countries/colors.txt"
+      },
+      "CV": {
+        "tag": "CAB",
+        "file": "common/countries/colors.txt"
+      },
+      "CY": {
+        "tag": "CYP",
+        "file": "common/countries/colors.txt"
+      },
+      "CZ": {
+        "tag": "CZE",
+        "file": "common/countries/colors.txt"
+      },
+      "DE": {
+        "tag": "GER",
+        "file": "common/countries/colors.txt"
+      },
+      "DJ": {
+        "tag": "DJI",
+        "file": "common/countries/colors.txt"
+      },
+      "DK": {
+        "tag": "DEN",
+        "file": "common/countries/colors.txt"
+      },
+      "DO": {
+        "tag": "DOM",
+        "file": "common/countries/colors.txt"
+      },
+      "DZ": {
+        "tag": "ALG",
+        "file": "common/countries/colors.txt"
+      },
+      "EC": {
+        "tag": "ECU",
+        "file": "common/countries/colors.txt"
+      },
+      "EE": {
+        "tag": "EST",
+        "file": "common/countries/colors.txt"
+      },
+      "EG": {
+        "tag": "EGY",
+        "file": "common/countries/colors.txt"
+      },
+      "EH": {
+        "tag": "WES",
+        "file": "common/countries/colors.txt"
+      },
+      "ER": {
+        "tag": "ERI",
+        "file": "common/countries/colors.txt"
+      },
+      "ES": {
+        "tag": "SPR",
+        "file": "common/countries/colors.txt"
+      },
+      "ET": {
+        "tag": "ETH",
+        "file": "common/countries/colors.txt"
+      },
+      "FI": {
+        "tag": "FIN",
+        "file": "common/countries/colors.txt"
+      },
+      "FR": {
+        "tag": "FRA",
+        "file": "common/countries/colors.txt"
+      },
+      "GA": {
+        "tag": "GAB",
+        "file": "common/countries/colors.txt"
+      },
+      "GB": {
+        "tag": "ENG",
+        "file": "common/countries/colors.txt"
+      },
+      "GE": {
+        "tag": "GEO",
+        "file": "common/countries/colors.txt"
+      },
+      "GH": {
+        "tag": "GHA",
+        "file": "common/countries/colors.txt"
+      },
+      "GM": {
+        "tag": "GAM",
+        "file": "common/countries/colors.txt"
+      },
+      "GN": {
+        "tag": "GNA",
+        "file": "common/countries/colors.txt"
+      },
+      "GQ": {
+        "tag": "EQG",
+        "file": "common/countries/colors.txt"
+      },
+      "GR": {
+        "tag": "GRE",
+        "file": "common/countries/colors.txt"
+      },
+      "GT": {
+        "tag": "GUA",
+        "file": "common/countries/colors.txt"
+      },
+      "GW": {
+        "tag": "GNB",
+        "file": "common/countries/colors.txt"
+      },
+      "GY": {
+        "tag": "GYA",
+        "file": "common/countries/colors.txt"
+      },
+      "HK": {
+        "tag": "HKN",
+        "file": "common/countries/Hong Kong.txt"
+      },
+      "HN": {
+        "tag": "HON",
+        "file": "common/countries/colors.txt"
+      },
+      "HR": {
+        "tag": "CRO",
+        "file": "common/countries/colors.txt"
+      },
+      "HT": {
+        "tag": "HAI",
+        "file": "common/countries/colors.txt"
+      },
+      "HU": {
+        "tag": "HUN",
+        "file": "common/countries/colors.txt"
+      },
+      "ID": {
+        "tag": "INS",
+        "file": "common/countries/colors.txt"
+      },
+      "IE": {
+        "tag": "IRE",
+        "file": "common/countries/colors.txt"
+      },
+      "IL": {
+        "tag": "ISR",
+        "file": "common/countries/colors.txt"
+      },
+      "IN": {
+        "tag": "RAJ",
+        "file": "common/countries/colors.txt"
+      },
+      "IQ": {
+        "tag": "IRQ",
+        "file": "common/countries/colors.txt"
+      },
+      "IR": {
+        "tag": "PER",
+        "file": "common/countries/colors.txt"
+      },
+      "IS": {
+        "tag": "ICE",
+        "file": "common/countries/colors.txt"
+      },
+      "IT": {
+        "tag": "ITA",
+        "file": "common/countries/colors.txt"
+      },
+      "JO": {
+        "tag": "JOR",
+        "file": "common/countries/colors.txt"
+      },
+      "JP": {
+        "tag": "JAP",
+        "file": "common/countries/colors.txt"
+      },
+      "KE": {
+        "tag": "KEN",
+        "file": "common/countries/colors.txt"
+      },
+      "KG": {
+        "tag": "KYR",
+        "file": "common/countries/colors.txt"
+      },
+      "KH": {
+        "tag": "CAM",
+        "file": "common/countries/colors.txt"
+      },
+      "KM": {
+        "tag": "COM",
+        "file": "common/countries/colors.txt"
+      },
+      "KP": {
+        "tag": "PRK",
+        "file": "common/countries/colors.txt"
+      },
+      "KR": {
+        "tag": "KOR",
+        "file": "common/countries/colors.txt"
+      },
+      "KW": {
+        "tag": "KUW",
+        "file": "common/countries/colors.txt"
+      },
+      "KZ": {
+        "tag": "KAZ",
+        "file": "common/countries/colors.txt"
+      },
+      "LA": {
+        "tag": "LAO",
+        "file": "common/countries/colors.txt"
+      },
+      "LB": {
+        "tag": "LEB",
+        "file": "common/countries/colors.txt"
+      },
+      "LK": {
+        "tag": "SRL",
+        "file": "common/countries/colors.txt"
+      },
+      "LR": {
+        "tag": "LIB",
+        "file": "common/countries/colors.txt"
+      },
+      "LT": {
+        "tag": "LIT",
+        "file": "common/countries/colors.txt"
+      },
+      "LU": {
+        "tag": "LUX",
+        "file": "common/countries/colors.txt"
+      },
+      "LV": {
+        "tag": "LAT",
+        "file": "common/countries/colors.txt"
+      },
+      "LY": {
+        "tag": "LBA",
+        "file": "common/countries/colors.txt"
+      },
+      "MA": {
+        "tag": "MOR",
+        "file": "common/countries/colors.txt"
+      },
+      "MD": {
+        "tag": "MOL",
+        "file": "common/countries/colors.txt"
+      },
+      "ME": {
+        "tag": "MNT",
+        "file": "common/countries/colors.txt"
+      },
+      "MG": {
+        "tag": "MAD",
+        "file": "common/countries/colors.txt"
+      },
+      "MK": {
+        "tag": "MAC",
+        "file": "common/countries/colors.txt"
+      },
+      "ML": {
+        "tag": "MLI",
+        "file": "common/countries/colors.txt"
+      },
+      "MM": {
+        "tag": "BRM",
+        "file": "common/countries/colors.txt"
+      },
+      "MN": {
+        "tag": "MON",
+        "file": "common/countries/colors.txt"
+      },
+      "MR": {
+        "tag": "MRT",
+        "file": "common/countries/colors.txt"
+      },
+      "MT": {
+        "tag": "MLT",
+        "file": "common/countries/Malta.txt"
+      },
+      "MW": {
+        "tag": "MLW",
+        "file": "common/countries/colors.txt"
+      },
+      "MX": {
+        "tag": "MEX",
+        "file": "common/countries/colors.txt"
+      },
+      "MY": {
+        "tag": "MAL",
+        "file": "common/countries/colors.txt"
+      },
+      "MZ": {
+        "tag": "MZB",
+        "file": "common/countries/colors.txt"
+      },
+      "NA": {
+        "tag": "NMB",
+        "file": "common/countries/colors.txt"
+      },
+      "NE": {
+        "tag": "NGR",
+        "file": "common/countries/colors.txt"
+      },
+      "NG": {
+        "tag": "NGA",
+        "file": "common/countries/colors.txt"
+      },
+      "NI": {
+        "tag": "NIC",
+        "file": "common/countries/colors.txt"
+      },
+      "NL": {
+        "tag": "HOL",
+        "file": "common/countries/colors.txt"
+      },
+      "NO": {
+        "tag": "NOR",
+        "file": "common/countries/colors.txt"
+      },
+      "NP": {
+        "tag": "NEP",
+        "file": "common/countries/colors.txt"
+      },
+      "NZ": {
+        "tag": "NZL",
+        "file": "common/countries/colors.txt"
+      },
+      "OM": {
+        "tag": "OMA",
+        "file": "common/countries/colors.txt"
+      },
+      "PA": {
+        "tag": "PAN",
+        "file": "common/countries/colors.txt"
+      },
+      "PE": {
+        "tag": "PRU",
+        "file": "common/countries/colors.txt"
+      },
+      "PG": {
+        "tag": "PNG",
+        "file": "common/countries/colors.txt"
+      },
+      "PH": {
+        "tag": "PHI",
+        "file": "common/countries/colors.txt"
+      },
+      "PK": {
+        "tag": "PAK",
+        "file": "common/countries/colors.txt"
+      },
+      "PL": {
+        "tag": "POL",
+        "file": "common/countries/colors.txt"
+      },
+      "PS": {
+        "tag": "PAL",
+        "file": "common/countries/colors.txt"
+      },
+      "PT": {
+        "tag": "POR",
+        "file": "common/countries/colors.txt"
+      },
+      "PY": {
+        "tag": "PAR",
+        "file": "common/countries/colors.txt"
+      },
+      "QA": {
+        "tag": "QAT",
+        "file": "common/countries/colors.txt"
+      },
+      "RO": {
+        "tag": "ROM",
+        "file": "common/countries/colors.txt"
+      },
+      "RS": {
+        "tag": "SER",
+        "file": "common/countries/colors.txt"
+      },
+      "RU": {
+        "tag": "SOV",
+        "file": "common/countries/colors.txt"
+      },
+      "RW": {
+        "tag": "RWA",
+        "file": "common/countries/colors.txt"
+      },
+      "SA": {
+        "tag": "SAU",
+        "file": "common/countries/colors.txt"
+      },
+      "SD": {
+        "tag": "SUD",
+        "file": "common/countries/colors.txt"
+      },
+      "SE": {
+        "tag": "SWE",
+        "file": "common/countries/colors.txt"
+      },
+      "SG": {
+        "tag": "SIG",
+        "file": "common/countries/colors.txt"
+      },
+      "SI": {
+        "tag": "SLV",
+        "file": "common/countries/colors.txt"
+      },
+      "SK": {
+        "tag": "SLO",
+        "file": "common/countries/colors.txt"
+      },
+      "SL": {
+        "tag": "SIE",
+        "file": "common/countries/colors.txt"
+      },
+      "SN": {
+        "tag": "SEN",
+        "file": "common/countries/colors.txt"
+      },
+      "SO": {
+        "tag": "SOM",
+        "file": "common/countries/colors.txt"
+      },
+      "SR": {
+        "tag": "SUR",
+        "file": "common/countries/colors.txt"
+      },
+      "SS": {
+        "tag": "SSD",
+        "file": "common/countries/colors.txt"
+      },
+      "SV": {
+        "tag": "ELS",
+        "file": "common/countries/colors.txt"
+      },
+      "SY": {
+        "tag": "SYR",
+        "file": "common/countries/colors.txt"
+      },
+      "TD": {
+        "tag": "CHA",
+        "file": "common/countries/colors.txt"
+      },
+      "TG": {
+        "tag": "TOG",
+        "file": "common/countries/colors.txt"
+      },
+      "TH": {
+        "tag": "SIA",
+        "file": "common/countries/colors.txt"
+      },
+      "TJ": {
+        "tag": "TAJ",
+        "file": "common/countries/colors.txt"
+      },
+      "TM": {
+        "tag": "TMS",
+        "file": "common/countries/colors.txt"
+      },
+      "TN": {
+        "tag": "TUN",
+        "file": "common/countries/colors.txt"
+      },
+      "TR": {
+        "tag": "TUR",
+        "file": "common/countries/colors.txt"
+      },
+      "TW": {
+        "tag": "CHI",
+        "file": "common/countries/colors.txt"
+      },
+      "TZ": {
+        "tag": "TZN",
+        "file": "common/countries/colors.txt"
+      },
+      "UA": {
+        "tag": "UKR",
+        "file": "common/countries/colors.txt"
+      },
+      "UG": {
+        "tag": "UGA",
+        "file": "common/countries/colors.txt"
+      },
+      "US": {
+        "tag": "USA",
+        "file": "common/countries/colors.txt"
+      },
+      "UY": {
+        "tag": "URG",
+        "file": "common/countries/colors.txt"
+      },
+      "UZ": {
+        "tag": "UZB",
+        "file": "common/countries/colors.txt"
+      },
+      "VE": {
+        "tag": "VEN",
+        "file": "common/countries/colors.txt"
+      },
+      "VN": {
+        "tag": "VIN",
+        "file": "common/countries/colors.txt"
+      },
+      "XK": {
+        "tag": "KOS",
+        "file": "common/countries/colors.txt"
+      },
+      "YE": {
+        "tag": "YEM",
+        "file": "common/countries/colors.txt"
+      },
+      "ZA": {
+        "tag": "SAF",
+        "file": "common/countries/colors.txt"
+      },
+      "ZM": {
+        "tag": "ZAM",
+        "file": "common/countries/colors.txt"
+      },
+      "ZW": {
+        "tag": "ZIM",
+        "file": "common/countries/colors.txt"
+      },
+      "CU": {
+        "tag": "CUB",
+        "file": "common/countries/colors.txt"
+      },
+      "JM": {
+        "tag": "JAM",
+        "file": "common/countries/colors.txt"
+      },
+      "MU": {
+        "tag": "MAU",
+        "file": "common/countries/colors.txt"
+      },
+      "PR": {
+        "tag": "PUE",
+        "file": "common/countries/Puerto Rico.txt"
+      }
+    },
+    "unmatched": [
+      "AD",
+      "AQ",
+      "BH",
+      "BS",
+      "LI",
+      "LS",
+      "MC",
+      "MO",
+      "MV",
+      "SC",
+      "SM",
+      "ST",
+      "SZ",
+      "TL",
+      "TT",
+      "VA"
+    ],
+    "inherited": {
+      "AX": {
+        "from_iso2": "FI",
+        "tag": "FIN",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "FK": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "FO": {
+        "from_iso2": "DK",
+        "tag": "DEN",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "GF": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "GG": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "GL": {
+        "from_iso2": "DK",
+        "tag": "DEN",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "GP": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "GS": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "HM": {
+        "from_iso2": "AU",
+        "tag": "AST",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "IM": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "IO": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "JE": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "MQ": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "PM": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "RE": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "SH": {
+        "from_iso2": "GB",
+        "tag": "ENG",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "TF": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      },
+      "YT": {
+        "from_iso2": "FR",
+        "tag": "FRA",
+        "file": "common/countries/colors.txt",
+        "policy": "Color reference only; the territory keeps its canonical ISO2 identity."
+      }
     }
   }
 }

@@ -56,7 +56,7 @@ import {
   loadScenarioAuditPayload,
   releaseScenarioAuditPayload,
 } from "../core/scenario_resources.js";
-import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
+import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
@@ -96,6 +96,9 @@ import {
 } from "../core/unit_counter_presets.js";
 
 const state = runtimeState;
+const translateCountryGeoLabel = (label, type = "ui") => (
+  type === "geo" ? getDirectGeoLabel(label) : t(label, type)
+);
 const {
   getScenarioCountryMeta,
   resolveScenarioInspectorGroupMeta,
@@ -103,7 +106,7 @@ const {
   resolveInspectorDataCode,
   resolveCountryGroupingCode,
   getCountryGroupingMeta,
-} = createCountryInspectorModel(runtimeState, t);
+} = createCountryInspectorModel(runtimeState, translateCountryGeoLabel);
 
 function requestHgoIdentityAssetsForSettings(settings, loadAssets) {
   if (settings?.enabled === true && typeof loadAssets === "function") {
@@ -254,7 +257,7 @@ function getDynamicCountryEntries() {
         const code = normalizeCountryCode(rawCode);
         if (!code) return null;
         const name = getScenarioCountryDisplayName(scenarioCountry, runtimeState.countryNames?.[code] || code) || code;
-        const displayName = t(name, "geo") || name || code;
+        const displayName = getDirectGeoLabel(name) || name || code;
         const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
         const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
         return {
@@ -335,7 +338,7 @@ function getDynamicCountryEntries() {
   return Array.from(codes)
     .map((code) => {
       const name = nameByCode.get(code) || runtimeState.countryNames?.[code] || countryNames[code] || code;
-      const displayName = t(name, "geo") || code;
+      const displayName = getDirectGeoLabel(name) || code;
       return { code, name, displayName };
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -543,7 +546,7 @@ function previewHierarchyGroupHighlight(group, featureIds = []) {
   const { matchedIds } = filterToVisibleFeatureIds(featureIds);
   setInspectorFeatureHighlight(matchedIds, {
     groupMode: true,
-    label: t(group?.label || "Hierarchy group", "geo") || group?.label || "Hierarchy group",
+    label: getDirectGeoLabel(group?.label || "Hierarchy group") || group?.label || "Hierarchy group",
   });
 }
 
@@ -876,7 +879,7 @@ function initSidebar({ render } = {}) {
       : fallbackName;
     return {
       tag: normalizedTag,
-      displayName: t(scenarioName || normalizedTag, "geo") || scenarioName || normalizedTag,
+      displayName: getDirectGeoLabel(scenarioName || normalizedTag) || scenarioName || normalizedTag,
       color: String(
         scenarioMeta?.color_hex
           || scenarioMeta?.colorHex
@@ -2530,10 +2533,10 @@ function initSidebar({ render } = {}) {
     const scenarioCountry = runtimeState.scenarioCountriesByTag?.[normalized];
     const scenarioName = getScenarioCountryDisplayName(scenarioCountry);
     if (scenarioName) {
-      return t(scenarioName, "geo") || scenarioName;
+      return getDirectGeoLabel(scenarioName) || scenarioName;
     }
     const fallbackName = String(runtimeState.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
-    return t(fallbackName, "geo") || fallbackName || normalized;
+    return getDirectGeoLabel(fallbackName) || fallbackName || normalized;
   };
 
   const formatReleasableParentLabel = (countryState, { conjunction = false } = {}) => {
@@ -2619,7 +2622,7 @@ function initSidebar({ render } = {}) {
     const displayNameSource = scenarioDisplayName.toUpperCase() === normalizedEntryCode && fallbackDisplayName
       ? fallbackDisplayName
       : (scenarioDisplayName || fallbackDisplayName || normalizedEntryCode);
-    const displayName = t(displayNameSource, "geo") || displayNameSource || normalizedEntryCode;
+    const displayName = getDirectGeoLabel(displayNameSource) || displayNameSource || normalizedEntryCode;
     const name = normalizeCountryDisplayNameCandidate(displayNameSource || entry?.name || normalizedEntryCode) || normalizedEntryCode;
     const lookupIso2 = resolveScenarioLookupCode(entry);
     const inspectorDataCode = resolveInspectorDataCode(entry);
@@ -2673,16 +2676,16 @@ function initSidebar({ render } = {}) {
       hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
       continentId,
       continentLabel,
-      continentDisplayLabel: t(continentLabel, "geo") || continentLabel,
+      continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,
       subregionId,
       subregionLabel,
-      subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
+      subregionDisplayLabel: getDirectGeoLabel(subregionLabel) || subregionLabel,
       inspectorGroupId,
       inspectorGroupLabel,
       inspectorGroupAnchorId,
       topLevelGroupId,
       topLevelGroupLabel,
-      topLevelGroupDisplayLabel: t(topLevelGroupLabel, "geo") || topLevelGroupLabel,
+      topLevelGroupDisplayLabel: getDirectGeoLabel(topLevelGroupLabel) || topLevelGroupLabel,
       topLevelGroupAnchorId: inspectorGroupAnchorId,
       quality: String(scenarioMeta.quality || entry.quality || "").trim(),
       featureCount,
@@ -2940,7 +2943,7 @@ function initSidebar({ render } = {}) {
       ? (
         String(suggestion.localizedNameZh || "").trim()
         || String(countryState?.displayName || "").trim()
-        || t(suggestion.label, "geo")
+        || getDirectGeoLabel(suggestion.label)
       )
       : (
         String(suggestion.localizedNameEn || "").trim()
@@ -3353,7 +3356,7 @@ function initSidebar({ render } = {}) {
     if (countryState.hierarchyGroups.length > 0) {
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
-          t(group.label, "geo") || group.label,
+          getDirectGeoLabel(group.label) || group.label,
           () => applyHierarchyGroup(group, runtimeState.selectedColor, render)
         );
         groupSection.appendChild(button);
@@ -3366,7 +3369,7 @@ function initSidebar({ render } = {}) {
   };
 
   const { renderScenarioActionsPanel } = createScenarioInspectorController({
-    t,
+    t: translateCountryGeoLabel,
     getView: () => ({
       visualOpen: !!runtimeState.ui?.scenarioVisualAdjustmentsOpen,
       paintMode: String(runtimeState.paintMode || "visual"),

@@ -36333,6 +36333,15 @@
       },
       "host_feature_id": "RU_RAY_50074027B96019567685522"
     },
+    "CITY::ne::1159139121": {
+      "city_id": "CITY::ne::1159139121",
+      "stable_key": "id::CITY::ne::1159139121",
+      "display_name": {
+        "en": "Chusovoy",
+        "zh": "丘索沃伊"
+      },
+      "host_feature_id": "RU_RAY_50074027B60091493242386"
+    },
     "CITY::ne::1159151561": {
       "city_id": "CITY::ne::1159151561",
       "host_feature_id": "AFG-1767"
@@ -36505,7 +36514,12 @@
     },
     "CITY::ne::1159151523": {
       "city_id": "CITY::ne::1159151523",
-      "host_feature_id": "KOR-2497"
+      "host_feature_id": "KOR-2497",
+      "stable_key": "id::CITY::ne::1159151523",
+      "display_name": {
+        "en": "Keijō",
+        "zh": "京城"
+      }
     },
     "CITY::ne::1159150087": {
       "city_id": "CITY::ne::1159150087",
@@ -36752,6 +36766,22 @@
     "CITY::ne::1159149581": {
       "city_id": "CITY::ne::1159149581",
       "host_feature_id": "RU_RAY_50074027B55944525718876"
+    },
+    "CITY::ne::1159150965": {
+      "city_id": "CITY::ne::1159150965",
+      "stable_key": "id::CITY::ne::1159150965",
+      "display_name": {
+        "en": "Akmola",
+        "zh": "阿克莫拉"
+      }
+    },
+    "CITY::ne::1159151567": {
+      "city_id": "CITY::ne::1159151567",
+      "stable_key": "id::CITY::ne::1159151567",
+      "display_name": {
+        "en": "Taipei",
+        "zh": "台北"
+      }
     }
   },
   "audit": {

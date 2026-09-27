@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-27 现代剧本重建与剧本译名隔离
+
+`C:/Users/raede/.codex/worktrees/scenario-names-merge/mapcreator` 使用分支 `codex/scenario-names-and-modern-rebuild`，基于 `origin/main@4a160b37` 定向整合现代国家地块、烈焰升腾配色、首都及 1936/1939/TNO 地名隔离修复。用户已授权合并推送；原主工作区 `main@28310add` 的其他未归属改动完整保留。本工作树的 `.runtime/reports/generated/scenario-delivery/` 保存重建、严格契约、首都行为及 Pages 构建结果，因此合并后保留供复核。最终提交、检查和合并状态以此分支的 GitHub PR 回执为准。
+
 ## 2026-09-27 运行时代码简化整合
 
 `C:/Users/raede/.codex/worktrees/runtime-simplification/mapcreator` 使用分支 `codex/runtime-simplification-20260927`，基于 `origin/main@1afa55b7` 实施四批运行时简化。用户已授权解决剩余状态证明缺口并合并推送；通过受保护 main 的正常 PR 检查交付。原主工作区及其他工作树的未归属改动不在本次整合范围。验证、提交和远端回执见 [任务记录](runtime-simplification-20260927/task.md)。工作树保留以保存忽略的构建、浏览器及状态证明排查证据，不在本轮清理。

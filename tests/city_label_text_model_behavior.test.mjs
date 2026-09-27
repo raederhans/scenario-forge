@@ -23,13 +23,46 @@ test('city display labels follow live language, explicit overrides and replaced 
   assert.equal(h.model.getCityDisplayLabel(feature), '本地名称');
 });
 
-test('host administrative labels are rejected while real host names take precedence', () => {
+test('host labels require an explicit matching scenario city identity', () => {
   const h = setup();
   const feature = { properties: { id: 'city', label_en: 'Raw', __city_host_feature_id: 'host' } };
   h.setLabels({ host: 'Example District' });
   assert.equal(h.model.getCityDisplayLabel(feature), 'Raw');
   h.setLabels({ host: 'Host City' });
+  assert.equal(h.model.getCityDisplayLabel(feature), 'Raw');
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { 'id::host': { en: 'Host City' } } };
+  assert.equal(h.model.getCityDisplayLabel(feature), 'Raw');
+  feature.properties.political_feature_name = 'Raw';
   assert.equal(h.model.getCityDisplayLabel(feature), 'Host City');
+});
+
+test('city host locale does not rename a distinct settlement inside its polygon', () => {
+  const h = setup();
+  h.runtimeState.currentLanguage = 'zh';
+  h.setLabels({ host: '科兹巴' });
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { 'id::LKA-2470': { zh: '科兹巴' } } };
+  const kotte = { properties: {
+    id: 'CITY::ne::1159149593',
+    label_en: 'Sri Jayawardenepura Kotte',
+    political_feature_name: 'Kŏḷamba',
+    country_code: 'LK',
+    __city_host_feature_id: 'LKA-2470',
+  } };
+  assert.equal(h.model.getCityDisplayLabel(kotte), 'Sri Jayawardenepura Kotte');
+});
+
+test('explicit host city rename still applies when its source name matches the city', () => {
+  const h = setup();
+  h.setLabels({ host: 'Moskowien' });
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { 'id::host': { en: 'Moskowien' } } };
+  const moscow = { properties: {
+    id: 'moscow',
+    name: 'Moscow',
+    label_en: 'Moscow',
+    political_feature_name: 'Moscow',
+    __city_host_feature_id: 'host',
+  } };
+  assert.equal(h.model.getCityDisplayLabel(moscow), 'Moskowien');
 });
 
 test('aliases preserve ordered identity and deduplicate normalized extra aliases', () => {
@@ -54,7 +87,7 @@ test('explicit scenario city identity wins over unrelated host translations and 
   assert.equal(h.model.getCityDisplayLabel(feature), '显式剧本名');
   delete feature.properties.__city_display_name_override;
   h.runtimeState.scenarioGeoLocalePatchData = null;
-  assert.equal(h.model.getCityDisplayLabel(feature), '河北');
+  assert.equal(h.model.getCityDisplayLabel(feature), '石家庄');
 });
 
 test('raw-name and alias patches do not imply an explicit city identity', () => {
@@ -62,7 +95,7 @@ test('raw-name and alias patches do not imply an explicit city identity', () => 
   h.setLabels({ Raw: 'Alias City', host: 'Host City' });
   h.runtimeState.scenarioGeoLocalePatchData = { geo: { Raw: { en: 'Alias City' } } };
   const feature = { properties: { id: 'city', name: 'Raw', __city_aliases: ['Raw'], __city_host_feature_id: 'host' } };
-  assert.equal(h.model.getCityDisplayLabel(feature), 'Host City');
+  assert.equal(h.model.getCityDisplayLabel(feature), 'Alias City');
 });
 
 test('an explicit top-level city ID resolves without normalized properties', () => {
@@ -130,8 +163,12 @@ test('all city label sources share cleanup without modifying locale data or iden
   const h = setup();
   h.runtimeState.currentLanguage = 'zh';
   const labels = { host: '基尔，独立城市', city: '哈姆，独立城市' };
-  const feature = { properties: { id: 'city', __city_host_feature_id: 'host' } };
+  const feature = { properties: {
+    id: 'city', name: 'Kiel', label_en: 'Kiel', political_feature_name: 'Kiel',
+    __city_host_feature_id: 'host',
+  } };
   h.setLabels(labels);
+  h.runtimeState.scenarioGeoLocalePatchData = { geo: { 'id::host': { zh: labels.host } } };
   assert.equal(h.model.getCityDisplayLabel(feature), '基尔');
   h.runtimeState.scenarioGeoLocalePatchData = { geo: { city: { zh: labels.city } } };
   assert.equal(h.model.getCityDisplayLabel(feature), '哈姆');
