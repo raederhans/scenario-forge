@@ -25,7 +25,7 @@ const BUILTIN_PROFILES = Object.freeze({
     { id: "antarctic-indian-80e", point: [80, -70], group: "ocean_macro", expectedCount: 0, expectedLand: true },
     { id: "antarctic-indian-90e", point: [90, -75], group: "ocean_macro", expectedCount: 0, expectedLand: true },
     { id: "arctic-control", point: [0, 85], group: "ocean_macro", expectedCount: 1, expectedLand: false },
-    { id: "dateline-east", point: [179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
+    { id: "dateline-east", point: [179.5, 75], expectedIds: ["tno_east_siberian_sea"], expectedCount: 1, expectedLand: false },
     { id: "dateline-west", point: [-179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
     { id: "mid-atlantic-control", point: [-30, 30], group: "ocean_macro", expectedCount: 1, expectedLand: false },
   ],
@@ -97,9 +97,12 @@ function pointOnSegment(point, start, end, tolerance = 1e-10) {
     return Math.hypot(point[0] - start[0], point[1] - start[1]) <= tolerance;
   }
   const cross = (point[0] - start[0]) * dy - (point[1] - start[1]) * dx;
-  if (Math.abs(cross) > tolerance * Math.max(1, Math.abs(dx), Math.abs(dy))) return false;
+  // Cross/dot products have squared-distance units. A fixed tolerance makes
+  // sub-grid edges falsely contain points kilometres away from the segment.
+  const segmentTolerance = tolerance * Math.hypot(dx, dy);
+  if (Math.abs(cross) > segmentTolerance) return false;
   const dot = (point[0] - start[0]) * dx + (point[1] - start[1]) * dy;
-  return dot >= -tolerance && dot <= dx * dx + dy * dy + tolerance;
+  return dot >= -segmentTolerance && dot <= dx * dx + dy * dy + segmentTolerance;
 }
 
 function pointInRing(point, sourceRing) {

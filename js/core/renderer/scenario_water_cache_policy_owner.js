@@ -229,8 +229,8 @@ export function createScenarioWaterCachePolicyOwner({
   function shouldUseDirectScenarioWaterDraw(signals) {
     return (
       Number(signals?.featureCount || 0) <= scenarioWaterLowComplexityFeatureMax
-      && Number(signals?.visibleCoverageRatio || 0) <= scenarioWaterLowComplexityCoverageMax
       && Number(signals?.previousRenderedCount || 0) <= scenarioWaterLowComplexityPrevRenderedMax
+      && Number(signals?.visibleCoverageRatio || 0) <= scenarioWaterLowComplexityCoverageMax
     );
   }
 

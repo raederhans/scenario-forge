@@ -2,7 +2,7 @@
   "artifact_counts": {
     "chunk_count": 208,
     "feature_count": 12701,
-    "water_count": 160
+    "water_count": 166
   },
   "controller_changes": [
     {
@@ -18181,7 +18181,13 @@
       "tno_aru_sea",
       "tno_ceram_sea",
       "tno_berau_gulf",
-      "tno_florida_strait"
+      "tno_florida_strait",
+      "tno_kara_sea",
+      "tno_laptev_sea",
+      "tno_east_siberian_sea",
+      "tno_chukchi_sea",
+      "tno_bering_strait",
+      "tno_strait_of_hormuz"
     ],
     "tno_reichskommissariat_tags": [
       "RKN",
@@ -110467,13 +110473,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "f69e1e8973c85dbcc2f2a3c06af9bd5832c0e78fe01d89edc2996c6d862e04f1",
+  "snapshot_fingerprint": "45b7b123ca44b268b958ff45892e5375a0dbe15c4614d1921b2bdf3ca0bcd65f",
   "source": {
-    "base_topology_sha256": "28a1e4c94c419ac08d421fd0a0ca1659c4490d4920c6495f465ad121533872ec",
-    "build_snapshot_sha256": "4b8573bd39568f0824b58233420c70c099c258eba4f097979ae7eb354fb01484",
-    "detail_chunk_manifest_sha256": "b415d84a88861e69d7f1ba2fb936d37078349799648c81d22ccac6b0450fa3ab",
-    "runtime_bootstrap_topology_sha256": "a62fdf98d63ca6f60e4b22f5f2a900e233b56b9c83dd3889eafcc90f0643ea39",
-    "runtime_topology_sha256": "172a925f2fe745e03d98bb827f042a5e2e5ceeea80bba5580f07d59c490d22df"
+    "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
+    "build_snapshot_sha256": "d8db1002d291500a4bec51e84b6fb3108a0b7c5ffcb2a4f22b7320a643595677",
+    "detail_chunk_manifest_sha256": "eb8a0af608a709b8351f00f110920ef751ccbe05fcf6f71250c4628914653e5f",
+    "runtime_bootstrap_topology_sha256": "d37d866fd4efdf974ceee728e9b7990f70826e15ff888174a5d19001c59c7570",
+    "runtime_topology_sha256": "47e1301fea30c13835c15e697099d782b8f646068ffaae9017dc0fd20113d66a"
   },
   "summary": {
     "approximate_count": 859,
@@ -110515,11 +110521,11 @@
     "synthetic_owner_feature_count": 501,
     "tno_bathymetry_band_count": 94,
     "tno_bathymetry_contour_count": 77,
-    "tno_named_marginal_water_count": 124,
+    "tno_named_marginal_water_count": 130,
     "tno_reichskommissariat_count": 8,
     "tno_relief_overlay_count": 25,
     "tno_special_region_count": 0,
-    "tno_water_region_count": 160,
+    "tno_water_region_count": 166,
     "topology_blocker_count": 0
   },
   "topology_blockers": [],

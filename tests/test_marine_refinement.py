@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from shapely.geometry import box, mapping, shape
+from shapely.geometry import LineString, box, mapping, shape
 
 from map_builder.geo import marine_refinement as marine
 
@@ -22,6 +22,21 @@ class MarineRefinementTests(unittest.TestCase):
         left, right = geometries.values()
         self.assertEqual(left.intersection(right).area, 0)
         self.assertTrue(left.union(right).equals(box(0, 0, 5, 8)))
+
+    def test_new_source_seams_keep_union_for_base_and_scenario_ids(self):
+        pairs = (("barents_sea", "kara_sea"), ("kara_sea", "laptev_sea"),
+                 ("laptev_sea", "east_siberian_sea"), ("beaufort_sea", "chukchi_sea"),
+                 ("bering_sea", "bering_strait"), ("persian_gulf", "strait_of_hormuz"))
+        for prefix in ("marine_", "tno_"):
+            for parent, child in pairs:
+                with self.subTest(prefix=prefix, parent=parent, child=child):
+                    inputs = [feature(prefix + parent, box(0, 0, 5, 5)),
+                              feature(prefix + child, box(4, 0, 7, 5))]
+                    result = marine.reconcile_marine_source_boundaries({"features": inputs})
+                    left, right = [shape(f["geometry"]) for f in result["features"]]
+                    self.assertEqual(left.intersection(right).area, 0)
+                    self.assertTrue(left.union(right).equals(box(0, 0, 7, 5)))
+                    self.assertEqual(inputs[0]["geometry"], mapping(box(0, 0, 5, 5)))
 
     def test_shared_source_preserves_lakes_med_and_old_identity(self):
         lake = feature("lake", box(0, 0, 1, 1), water_type="lake")
@@ -51,9 +66,9 @@ class MarineRefinementTests(unittest.TestCase):
 
     def test_supplement_is_public_polygon_data_with_unique_source_ids(self):
         source = marine.load_collection(marine.ADDITIONAL_SOURCE_PATH)
-        self.assertEqual(len(source["features"]), 19)
+        self.assertEqual(len(source["features"]), len(marine.ADDITIONAL_SEAS) + len(marine.OCEAN_SECTORS))
         ids = [f["properties"]["id"] for f in source["features"]]
-        self.assertEqual(len(set(ids)), 19)
+        self.assertEqual(len(set(ids)), len(ids))
         for f in source["features"]:
             self.assertTrue(shape(f["geometry"]).is_valid)
             self.assertFalse(shape(f["geometry"]).is_empty)
@@ -61,8 +76,23 @@ class MarineRefinementTests(unittest.TestCase):
             self.assertTrue(f["properties"]["source_record_ids"])
             self.assertNotIn("scenario_id", f["properties"])
         tno = marine.additional_snapshot_features()
-        self.assertEqual(len(tno), 11)
+        self.assertEqual(len(tno), len(marine.ADDITIONAL_SEAS))
         self.assertTrue(all(f["properties"]["id"].startswith("tno_") for f in tno))
+
+    def test_strait_interior_corridors_remain_continuous_after_coast_clipping(self):
+        # Interior tracks around coastal land, not straight shortcuts across it.
+        corridors = {
+            "bering_strait": [(-168.8, 65.4), (-168.8, 66.1)],
+            "strait_of_hormuz": [(56.1, 26.5), (56.3, 26.6), (56.8, 26.6), (56.9, 26.3)],
+            "florida_strait": [(-81, 24), (-80.5, 24)],
+        }
+        for relative, prefix in (("data/water_regions.geojson", "marine_"),
+                                 ("data/scenarios/tno_1962/water_regions.geojson", "tno_")):
+            features = {f["properties"]["id"]: f for f in marine.load_collection(marine.ROOT / relative)["features"]}
+            for slug, points in corridors.items():
+                with self.subTest(asset=relative, strait=slug):
+                    geometry = shape(features[prefix + slug]["geometry"])
+                    self.assertTrue(geometry.covers(LineString(points)))
 
     def test_published_marine_partitions_do_not_overlap_across_hierarchy_levels(self):
         from shapely.strtree import STRtree

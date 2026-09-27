@@ -6,9 +6,10 @@ import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
 
-function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget } = {}) {
+function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false } = {}) {
   const events = [];
   const metrics = [];
+  const coverageCalls = [];
   const context = (name) => Object.fromEntries(
     ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "clip", "moveTo", "lineTo", "setLineDash"]
       .map((method) => [method, (...args) => events.push([name, method, ...args])]),
@@ -17,6 +18,9 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   const main = target;
   const layer = context("layer");
   const water = { id: "water", parts: [{ id: "part" }] };
+  let waterFeatures = [water];
+  let coverageRatio = 0.5;
+  const waterPolicy = createScenarioWaterCachePolicyOwner();
   const state = { width: 40, height: 60, renderPhase: "idle", showScenarioReliefOverlays: true, showWaterRegions: true, dpr: 2, zoomTransform: { k: 1, x: 0, y: 0 }, waterRegionsById: new Map([["water", water]]) };
   let cache = { contextScenarioLayerCache: {}, layouts: {} };
   let revision = "water-1";
@@ -101,19 +105,30 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     getResolvedFeatureColor: () => "#abcdef",
     LAND_FILL_COLOR: "#f0f0f0",
     getPoliticalFeaturePathEntry: (feature) => ({ path: feature.id }),
-    getEffectiveWaterRegionFeatures: () => [water],
+    getEffectiveWaterRegionFeatures: () => waterFeatures,
     getEffectiveSpecialRegionFeatures: () => [{ id: "special" }],
     getForcedScenarioWaterCacheMode: () => ({ mode, source: "test" }),
-    getScenarioWaterCacheComplexitySignals: () => ({ visibleCoverageRatio: 0.5, previousRenderedCount: owner.getPreviousWaterRenderedCount() }),
+    getScenarioWaterCacheComplexitySignals: (features) => {
+      coverageCalls.push(features.length);
+      return {
+        visibleCoverageRatio: coverageRatio,
+        previousRenderedCount: owner.getPreviousWaterRenderedCount(),
+        waterCoverageAlgo: "grid",
+      };
+    },
     shouldEnableContextScenarioTransformReuse: () => true,
-    shouldUseDirectScenarioWaterDraw: () => adaptiveDirect,
+    shouldUseDirectScenarioWaterDraw: (signals) => actualWaterPolicy
+      ? waterPolicy.shouldUseDirectScenarioWaterDraw(signals)
+      : adaptiveDirect,
   });
-  return { owner, reliefOwner, cacheOwner, state, water, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
+  return { owner, reliefOwner, cacheOwner, state, water, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
     setNoLayerContext: (value) => { noLayerContext = value; },
     setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
     replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
     setMode: (value) => { mode = value; }, setRevision: (value) => { revision = value; },
     setProjection: (value) => { projection = value; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
+    setCoverageRatio: (value) => { coverageRatio = value; },
+    setWaterFeatureCount: (value) => { waterFeatures = Array.from({ length: value }, (_, index) => ({ ...water, id: `water-${index}` })); },
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
   };
 }
@@ -261,6 +276,60 @@ test("direct and adaptive-direct bypass layer canvases, while redraw rebuilds ea
   h.setMode("redraw"); h.draw(); h.draw();
   assert.equal(h.events.filter((event) => event[0] === "layer" && event[1] === "fill").length, 2);
 });
+
+for (const mode of ["direct", "reuse", "redraw"]) {
+  test(`forced ${mode} water cache does not calculate screen coverage`, (t) => {
+    const h = harness(t, { mode, actualWaterPolicy: true });
+    h.draw();
+    assert.deepEqual(h.coverageCalls, [], `${mode} should not request coverage`);
+    assert.equal(h.metrics.at(-1).waterVisibleCoverageRatio, null);
+    assert.equal(h.metrics.at(-1).waterCoverageAlgo, "not-evaluated");
+    assert.equal(h.metrics.at(-1).waterCacheStrategyMode, mode);
+  });
+}
+
+test("adaptive water cache calculates coverage only after count thresholds can allow direct draw", (t) => {
+  const h = harness(t, { mode: "adaptive", actualWaterPolicy: true });
+  h.setWaterFeatureCount(24);
+  h.setCoverageRatio(0.2);
+  h.draw();
+  assert.deepEqual(h.coverageCalls, [24]);
+  assert.equal(h.metrics.at(-1).waterCacheMode, "adaptive-direct");
+  assert.equal(h.metrics.at(-1).waterVisibleCoverageRatio, 0.2);
+
+  h.setWaterFeatureCount(25);
+  h.draw();
+  assert.deepEqual(h.coverageCalls, [24], "25 features fail before reading coverage");
+  assert.equal(h.metrics.at(-1).waterCacheMode, "redraw");
+  assert.equal(h.metrics.at(-1).waterVisibleCoverageRatio, null);
+  assert.equal(h.metrics.at(-1).waterCoverageAlgo, "not-evaluated");
+
+  h.setWaterFeatureCount(24);
+  h.setCoverageRatio(0.2001);
+  h.draw();
+  assert.deepEqual(h.coverageCalls, [24, 24]);
+  assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
+  assert.equal(h.metrics.at(-1).waterVisibleCoverageRatio, 0.2001);
+});
+
+for (const [previousCount, expectedCalls, expectedMode] of [
+  [28, [24], "adaptive-direct"],
+  [29, [], "redraw"],
+]) {
+  test(`adaptive with ${previousCount} prior rendered regions preserves its decision and coverage cost`, (t) => {
+    const h = harness(t, { mode: "direct", actualWaterPolicy: true });
+    h.setWaterFeatureCount(previousCount);
+    h.draw();
+    h.setMode("adaptive");
+    h.setWaterFeatureCount(24);
+    h.setCoverageRatio(0.2);
+    h.draw();
+    assert.deepEqual(h.coverageCalls, expectedCalls);
+    assert.equal(h.metrics.at(-1).waterCacheMode, expectedMode);
+    assert.equal(h.metrics.at(-1).waterPrevRenderedCount, previousCount);
+    assert.equal(h.metrics.at(-1).waterVisibleCoverageRatio, previousCount === 28 ? 0.2 : null);
+  });
+}
 
 test("missing offscreen context clears cache identity and draws directly", (t) => {
   const h = harness(t, { noLayerContext: true }); h.draw();

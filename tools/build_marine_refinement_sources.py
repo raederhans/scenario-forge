@@ -32,10 +32,14 @@ def write(path, payload):
     path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
-def refresh():
-    features = []
+def refresh(*, missing_only=False):
+    existing = json.loads(ADDITIONAL_SOURCE_PATH.read_text(encoding="utf-8")) if missing_only and ADDITIONAL_SOURCE_PATH.exists() else {}
+    features = existing.get("features", [])
+    existing_ids = {f["properties"]["id"] for f in features}
     for ocean, rows in ((False, ADDITIONAL_SEAS), (True, OCEAN_SECTORS)):
         for slug, name, zh, mrgid, category in rows:
+            if f"marine_{slug}" in existing_ids:
+                continue
             query = f"mrgid_sr='{mrgid}'"
             response = requests.get(WFS, params={
                 "service": "WFS", "version": "1.0.0", "request": "GetFeature",
@@ -118,7 +122,8 @@ def build():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--refresh", action="store_true", help="Explicitly refetch the SeaVoX supplement")
+    parser.add_argument("--refresh-missing", action="store_true", help="Fetch new SeaVoX records without changing recorded existing polygons")
     args = parser.parse_args()
-    if args.refresh:
-        refresh()
+    if args.refresh or args.refresh_missing:
+        refresh(missing_only=args.refresh_missing and not args.refresh)
     build()

@@ -567,7 +567,7 @@
     "origin_kind": "download",
     "upstream_url": "https://www.marineregions.org/sources.php",
     "immutable_ref": "SeaVoX v19 (2023); IHO v3 (2018) for existing shared inputs",
-    "current_local_sha256": "ca4a1b7848d0ef39f1aa02f6a7d291093cb208f17dfdcc95e0b5430d72cbe987",
+    "current_local_sha256": "5e68e3190bdfc7f2331b788d135fef0cf39399e597139fe6b92fd2cff84935cd",
     "citation": "https://doi.org/10.14284/590",
     "license": "See upstream Marine Regions dataset terms; provenance retained per feature.",
     "consumers": [
@@ -584,7 +584,7 @@
     "origin_kind": "derived",
     "upstream_url": "https://www.marineregions.org/sources.php",
     "immutable_ref": "SeaVoX v19 (2023); IHO v3 (2018) for existing shared inputs",
-    "current_local_sha256": "b81de47c67949111ab74fa0c9cde068a24b60c612bff2ea0c9afc2d7b4f4f505",
+    "current_local_sha256": "2f168a4ce847183ebb2ecf4b5714e20bed486cd1ccebaac21ea4faa9f281ebbe",
     "citation": "https://doi.org/10.14284/590",
     "license": "See upstream Marine Regions dataset terms; provenance retained per feature.",
     "consumers": [

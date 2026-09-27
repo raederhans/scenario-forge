@@ -58,6 +58,17 @@ function validateBaseTopologyAsset(relativePath) {
   });
 }
 
+test("tiny boundary segments do not turn a concave polygon exterior into water", () => {
+  const concave = feature("concave-short-edge", [
+    [0, 0], [0, 1], [0.1, 1], [0.1, 0.1], [0.1000000005, 0.1], [1, 0.1], [1, 0], [0, 0],
+  ], { water_type: "sea", region_group: "marine_macro" });
+  const result = validateWaterGeometry(concave, {
+    probes: [{ id: "outside-concavity", point: [0.2, 0.2], expectedCount: 0 },
+      { id: "inside-arm", point: [0.05, 0.5], expectedCount: 1 }],
+  });
+  assert.equal(result.ok, true, JSON.stringify(result.errors));
+});
+
 test("accepts densified planar water geometry with stable D3 fill and hit semantics", () => {
   const result = validateWaterGeometry(collection(densifiedRectangle("polar-water", 20, 65, 160, 85)), {
     probes: [{ id: "interior", point: [90, 75], group: "ocean_macro", expectedCount: 1 }],
@@ -138,14 +149,14 @@ test("final base topology keeps polar, Antarctic, mid-latitude, and dateline oce
   const result = validateBaseTopologyAsset("../data/europe_topology.json");
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 167);
+  assert.equal(result.stats.checkedFeatureCount, 173);
 });
 
-test("final detail topology keeps the same 167-feature water contract", () => {
+test("final detail topology keeps the same 173-feature water contract", () => {
   const result = validateBaseTopologyAsset("../data/europe_topology.na_v2.json");
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 167);
+  assert.equal(result.stats.checkedFeatureCount, 173);
 });
 
 test("final TNO runtime topology excludes Antarctic land and keeps polar/dateline continuity", () => {
@@ -157,7 +168,7 @@ test("final TNO runtime topology excludes Antarctic land and keeps polar/datelin
       { id: "antarctic-indian-80e", point: [80, -70], group: "ocean_macro", expectedCount: 0, expectedLand: true },
       { id: "antarctic-indian-90e", point: [90, -75], group: "ocean_macro", expectedCount: 0, expectedLand: true },
       { id: "arctic", point: [0, 85], group: "ocean_macro", expectedCount: 1, expectedLand: false },
-      { id: "dateline-east", point: [179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
+      { id: "dateline-east", point: [179.5, 75], expectedIds: ["tno_east_siberian_sea"], expectedCount: 1, expectedLand: false },
       { id: "dateline-west", point: [-179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
       { id: "mid-atlantic", point: [-30, 30], group: "ocean_macro", expectedCount: 1, expectedLand: false },
       // Coastal coordinates clipped by the physical mask must remain excluded;
@@ -172,7 +183,7 @@ test("final TNO runtime topology excludes Antarctic land and keeps polar/datelin
   });
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 160);
+  assert.equal(result.stats.checkedFeatureCount, 166);
 });
 
 test("final TNO water chunks exactly preserve source and runtime geometry before their merged payload overrides topology", () => {
@@ -186,8 +197,8 @@ test("final TNO water chunks exactly preserve source and runtime geometry before
 
   const sourceById = new Map(source.features.map((entry) => [getFeatureId(entry), entry]));
   const runtimeById = new Map(runtime.features.map((entry) => [getFeatureId(entry), entry]));
-  assert.equal(sourceById.size, 160);
-  assert.equal(runtimeById.size, 160);
+  assert.equal(sourceById.size, 166);
+  assert.equal(runtimeById.size, 166);
   for (const id of ["lake_ladoga", "lake_onega", "lake_vanern", "lake_vattern", "lake_saimaa", "lake_paijanne", "lake_inari", "lake_pielinen"]) {
     assert.ok(sourceById.has(id), `major Nordic lake ${id} must reach the published water payload`);
   }
@@ -226,12 +237,12 @@ test("final TNO water chunks exactly preserve source and runtime geometry before
       { id: "antarctic-indian-80e", point: [80, -70], group: "ocean_macro", expectedCount: 0, expectedLand: true },
       { id: "antarctic-indian-90e", point: [90, -75], group: "ocean_macro", expectedCount: 0, expectedLand: true },
       { id: "arctic", point: [0, 85], group: "ocean_macro", expectedCount: 1, expectedLand: false },
-      { id: "dateline-east", point: [179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
+      { id: "dateline-east", point: [179.5, 75], expectedIds: ["tno_east_siberian_sea"], expectedCount: 1, expectedLand: false },
       { id: "dateline-west", point: [-179.5, 75], group: "ocean_macro", expectedCount: 1, expectedLand: false },
       { id: "mid-atlantic", point: [-30, 30], group: "ocean_macro", expectedCount: 1, expectedLand: false },
     ],
   });
 
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
-  assert.equal(result.stats.checkedFeatureCount, 160);
+  assert.equal(result.stats.checkedFeatureCount, 166);
 });

@@ -1,5 +1,5 @@
 ﻿const { test, expect } = require("@playwright/test");
-const { gotoApp, waitForAppInteractive } = require("./support/playwright-app");
+const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("./support/playwright-app");
 
 async function waitForScenarioManagerIdle(page) {
   await page.waitForFunction(async () => {
@@ -36,6 +36,10 @@ async function clickWaterRegionByName(page, targetName) {
 }
 
 async function ensureWaterInspectorOpen(page) {
+  if (await page.locator("#editorObjects-water").count()) {
+    await page.locator("#editorTaskObjectsBtn").click();
+    await page.locator("#editorObjects-water").click();
+  }
   await page.evaluate(() => {
     document.querySelector("#waterInspectorSection")?.setAttribute("open", "");
   });
@@ -163,6 +167,26 @@ test("water inspector shows hierarchy and jump-to-parent for detail waters", asy
     return meta.ID || "";
   }).toContain("tno_baltic_sea");
   await expect(page.locator("#waterInspectorChildrenList .inspector-item-btn")).toHaveCount(8);
+  await expect(page.locator("#waterRegionSearch")).toHaveValue("");
+  await expect(page.locator('#waterRegionList [data-region-id="tno_baltic_sea"]')).toHaveClass(/is-active/);
+  await selectWaterRegion(page, "Liaodong", "Liaodong");
+  await expect(page.locator("#waterInspectorBreadcrumb")).toContainText("Yellow Sea");
+  await expect(page.locator("#waterInspectorBreadcrumb")).toContainText("Bo Hai");
+  await page.locator("#waterInspectorBreadcrumb button").filter({ hasText: "Bo Hai" }).click();
+  await expect(page.locator("#waterRegionSearch")).toHaveValue("");
+  await expect.poll(async () => (await readWaterInspectorMeta(page)).ID).toBe("tno_bo_hai");
+  await page.click("#waterInspectorLocateBtn");
+  await expect.poll(() => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return state.zoomTransform?.k || 0;
+  })).toBeGreaterThan(2);
+  await waitForRenderIdle(page, { scenarioId: "tno_1962" });
+  await expect.poll(() => page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return state.renderPerfMetrics?.drawMarineLabels?.selectedVisible || false;
+  })).toBe(true);
+  await page.screenshot({ path: ".runtime/browser/ocean-next-hierarchy.png" });
+
 });
 
 test("tracked named waters expose stable inspector metadata", async ({ page }) => {

@@ -42,6 +42,7 @@ EXPECTED_PUBLIC_EXPORTS = {
     "getBathymetryPresetStyleDefaults",
     "getEffectiveCityCollection",
     "getWaterRegionColor",
+    "focusWaterRegionById",
     "getZoomPercent",
     "initMap",
     "invalidateAllRenderPasses",

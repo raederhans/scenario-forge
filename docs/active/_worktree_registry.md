@@ -2,7 +2,7 @@
 
 ## 2026-09-26 外海细化整合
 
-`C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator` 使用 `codex/ocean-refinement`，实施共享命名海域、11项外海补齐及基础外洋分区。用户已授权合并推送；以隔离分支整合最新主线，主工作区既有 WIP 保留。合并后保留此工作树中的 `.runtime` 原始几何、集成比较和浏览器证据供复核。任务及最终 GitHub 回执见 [ocean-refinement-20260926](ocean-refinement-20260926/task.md)。
+`C:/Users/raede/.codex/worktrees/ocean-refinement/mapcreator` 当前使用 `codex/ocean-refinement-next`，从已合并 PR #176 的主线 ea450a0c 开始第二轮外海细化：6 个海区、连接检查、层级定位及分级标签。主工作区既有 WIP 保留；新增标签、覆盖率和侧栏性能优化，本地验证完成，用户已授权经 PR 合并推送。工作树保留用于性能前后对比及几何证据复核，远端交付入口见任务记录。记录见 [ocean-refinement-next-20260927](ocean-refinement-next-20260927/task.md)；上一轮回执保留在 [ocean-refinement-20260926](ocean-refinement-20260926/task.md)。
 
 
 ## 2026-09-26 地图清晰度与政治边界修复
