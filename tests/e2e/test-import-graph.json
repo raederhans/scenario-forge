@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 68,
     "nodeCount": 84,
-    "reverseIndexKeyCount": 127,
+    "reverseIndexKeyCount": 130,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -935,6 +935,8 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
@@ -942,6 +944,8 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
@@ -955,6 +959,8 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
         "js/ui/sidebar.js"
       ]
     },
@@ -991,6 +997,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
@@ -999,6 +1010,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
@@ -1013,6 +1029,11 @@
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/appearance_selection_actions.js",
+        "js/core/state/actions/appearance_visibility_actions.js",
+        "js/core/state/actions/project_import_actions.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/index.js",
         "js/ui/sidebar.js"
       ]
     },
@@ -2446,11 +2467,23 @@
     "js/core/state/actions/appearance_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "js/core/state/actions/appearance_selection_actions.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
+    "js/core/state/actions/appearance_visibility_actions.js": [
+      "tests/e2e/marine_label_performance.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
+    "js/core/state/actions/project_import_actions.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js"
+    ],
     "js/core/state/actions/renderer_interaction_actions.js": [
-      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/ocean_geometry_contract.spec.js"
     ],
     "js/core/state/actions/scenario_presentation_actions.js": [
-      "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+      "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
+      "tests/e2e/marine_label_performance.spec.js"
     ],
     "js/core/state/actions/transport_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
@@ -2462,6 +2495,7 @@
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
     "js/core/state/index.js": [
+      "tests/e2e/ocean_geometry_contract.spec.js",
       "tests/e2e/tno_open_ocean_rendering.spec.js"
     ],
     "js/core/state/ui_state.js": [

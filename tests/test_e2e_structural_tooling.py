@@ -525,8 +525,10 @@ process.stdout.write(JSON.stringify(ignores));
         self.assertIn("sparse-checkout:", workflow)
         self.assertIn("tools/ci/pr_plan.mjs", workflow)
         self.assertIn("tools/ci/pr_plan.mjs", transport_workflow)
-        self.assertIn("gh api --paginate", workflow)
-        self.assertIn("gh api --paginate", transport_workflow)
+        for planner_workflow in (workflow, transport_workflow):
+            tree_diff = 'git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt'
+            self.assertIn(tree_diff, planner_workflow)
+            self.assertLess(planner_workflow.index(tree_diff), planner_workflow.index("      - name: Checkout\n"))
         self.assertIn("scenario_id:", workflow)
         self.assertIn("Resolve this scenario lane", workflow)
         self.assertIn("Fast success for scenario-unrelated changes", workflow)

@@ -31,11 +31,12 @@ async function setOpenOceanInteraction(page) {
       invalidateOceanWaterInteractionVisualState,
       render,
     } = await import(new URL("./js/core/map_renderer.js", globalThis.location.href).toString());
-    state.allowOpenOceanSelect = true;
-    state.allowOpenOceanPaint = true;
-    state.showOpenOceanRegions = true;
-    state.currentTool = "fill";
-    state.devSelectedHit = null;
+    const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
+    const { callRuntimeHook } = await import("/js/core/state/index.js");
+    const { applyProjectImportPatch } = await import("/js/core/state/actions/project_import_actions.js");
+    patchAppearanceVisibilityState(state, { allowOpenOceanSelect: true, allowOpenOceanPaint: true, showOpenOceanRegions: true });
+    callRuntimeHook(state, "runToolSelectionFn", "fill", { dismissHint: false });
+    applyProjectImportPatch(state, { devSelectedHit: null });
     clearHistory();
     invalidateOceanWaterInteractionVisualState("e2e-ocean-geometry-contract");
     render();
@@ -266,8 +267,10 @@ test("new base ocean sectors inherit saved parent colors and support independent
   await page.evaluate(async () => {
     const { state } = await import(new URL("./js/core/state.js", location.href));
     const { invalidateOceanWaterInteractionVisualState, render } = await import(new URL("./js/core/map_renderer.js", location.href));
-    state.waterRegionOverrides = { marine_atlantic_ocean: "#123456" };
-    state.selectedColor = "#ff00ff";
+    const { restoreProjectImportFields } = await import("/js/core/state/actions/renderer_interaction_actions.js");
+    const { setSelectedColorState } = await import("/js/core/state/actions/appearance_selection_actions.js");
+    restoreProjectImportFields(state, { waterRegionOverrides: { marine_atlantic_ocean: "#123456" } });
+    setSelectedColorState(state, "#ff00ff");
     invalidateOceanWaterInteractionVisualState("e2e-inherited-ocean-color");
     render();
   });
@@ -342,9 +345,12 @@ test("open-ocean geometry stays visible, uniquely hittable, paintable, and undo-
 
   await page.evaluate(async () => {
     const { state } = await import(new URL("./js/core/state.js", globalThis.location.href).toString());
-    state.currentTool = "fill";
-    state.selectedColor = "#ff00ff";
-    state.devSelectedHit = null;
+    const { callRuntimeHook } = await import("/js/core/state/index.js");
+    const { setSelectedColorState } = await import("/js/core/state/actions/appearance_selection_actions.js");
+    const { applyProjectImportPatch } = await import("/js/core/state/actions/project_import_actions.js");
+    callRuntimeHook(state, "runToolSelectionFn", "fill", { dismissHint: false });
+    setSelectedColorState(state, "#ff00ff");
+    applyProjectImportPatch(state, { devSelectedHit: null });
   });
   await page.mouse.click(pagePoint.x, pagePoint.y);
   await expect.poll(async () => page.evaluate(async (expectedId) => {
@@ -391,10 +397,11 @@ test("open-ocean geometry stays visible, uniquely hittable, paintable, and undo-
   const focusResult = await page.evaluate(async (id) => {
     const { state } = await import("/js/core/state.js");
     const { focusWaterRegionById } = await import("/js/core/map_renderer.js");
-    state.showWaterRegions = false;
-    state.allowOpenOceanSelect = true;
-    state.allowOpenOceanPaint = false;
-    state.showOpenOceanRegions = false;
+    const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
+    patchAppearanceVisibilityState(state, {
+      showWaterRegions: false, allowOpenOceanSelect: true,
+      allowOpenOceanPaint: false, showOpenOceanRegions: false,
+    });
     const before = { x: state.zoomTransform.x, y: state.zoomTransform.y, k: state.zoomTransform.k };
     return { before, focused: focusWaterRegionById(id) };
   }, targetId);

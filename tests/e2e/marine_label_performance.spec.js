@@ -12,8 +12,8 @@ test("marine label redraw preserves pixels and records repeated geometry work", 
     await applyScenarioByIdCommand("tno_1962", { renderMode: "request", showToastOnComplete: false });
     const { state } = await import("/js/core/state.js");
     const { render, invalidateOceanWaterInteractionVisualState } = await import("/js/core/map_renderer.js");
-    state.showWaterRegions = true;
-    state.showOpenOceanRegions = true;
+    const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
+    patchAppearanceVisibilityState(state, { showWaterRegions: true, showOpenOceanRegions: true });
     invalidateOceanWaterInteractionVisualState("marine-label-perf");
     render();
   });
@@ -24,7 +24,8 @@ test("marine label redraw preserves pixels and records repeated geometry work", 
       expect(await page.evaluate(async () => {
         const { state } = await import("/js/core/state.js");
         const { focusWaterRegionById } = await import("/js/core/map_renderer.js");
-        state.selectedWaterRegionId = "tno_bo_hai";
+        const { setClickSelectedWaterRegionIdState } = await import("/js/core/state/actions/scenario_presentation_actions.js");
+        setClickSelectedWaterRegionIdState(state, "tno_bo_hai");
         return focusWaterRegionById(state.selectedWaterRegionId);
       })).toBe(true);
       await page.waitForFunction(async () => (await import("/js/core/state.js")).state.zoomTransform.k > 2);
