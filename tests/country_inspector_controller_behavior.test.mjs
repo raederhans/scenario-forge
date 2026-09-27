@@ -264,8 +264,6 @@ function createHarness({
     selectedCountryActionsSection: new TestElement("section"),
     countryInspectorDetail: new TestElement("section"),
     countryInspectorSelected,
-    countryInspectorSetActive: new TestElement("button"),
-    countryInspectorDetailHint: new TestElement("div"),
     countryInspectorColorRow: new TestElement("div"),
     countryInspectorColorSwatch: new TestElement("span"),
     countryInspectorColorInput: new TestElement("input"),
@@ -300,12 +298,9 @@ function createHarness({
     buildCountryRowMetaText,
     getResolvedCountryColor: () => "#000000",
     getDisplayCountryColor: () => "#000000",
-    getPrimaryReleasablePresetRef: () => null,
-    applyScenarioReleasableCoreTerritory: () => {},
     applyCountryColor: () => {},
     incrementSidebarCounter: () => {},
     markDirty: () => {},
-    showToast: () => {},
     getHgoIdentity: hgoIdentity
       ? ((countryState, options) => (
         typeof hgoIdentity === "function" ? hgoIdentity(countryState, options) : hgoIdentity
@@ -574,6 +569,7 @@ test("related country child rows hide releasable parent lists", () => {
 
     let renderedText = textOf(harness.host);
     assert.match(renderedText, /Nanjing China/);
+    assert.equal(harness.host.querySelector(".country-select-subaction"), null);
     assert.doesNotMatch(renderedText, /东亚/);
     assert.doesNotMatch(renderedText, /tag CHI/);
     assert.doesNotMatch(renderedText, /可自以下母国释放/);

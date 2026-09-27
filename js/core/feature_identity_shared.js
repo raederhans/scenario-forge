@@ -3,7 +3,7 @@
 // 2. startup_boot.worker.js 里的 importScripts
 // 所以这里保持纯脚本语法，并把 API 挂到 globalThis。
 
-var SCENARIO_FORGE_FEATURE_IDENTITY_SHARED = globalThis.__scenarioForgeFeatureIdentityShared || (() => {
+var SCENARIO_FORGE_FEATURE_IDENTITY_SHARED = (() => {
   const FEATURE_ID_KEYS = Object.freeze(["id", "NUTS_ID"]);
   const COUNTRY_CODE_KEYS = Object.freeze([
     "cntr_code",

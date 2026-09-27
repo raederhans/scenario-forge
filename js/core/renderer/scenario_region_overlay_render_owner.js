@@ -2,6 +2,7 @@
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 import { isLakeRegion } from "./effective_water_regions.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
+import { getFeatureId as getSharedFeatureId } from "../feature_identity.js";
 
 export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
@@ -9,7 +10,6 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   cloneZoomTransform,
   nowMs,
   collectContextMetric,
-  getFeatureId,
   isWaterRegionRenderable,
   getWaterRegionDefaultStyle,
   collectSafeWaterRegionGeometryParts,
@@ -80,7 +80,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (!visibleParts.length) return;
       const fillOpacity = maskOnly ? 1 : getWaterRegionDefaultStyle(feature).opacity;
       if (!(fillOpacity > 0)) return;
-      const id = getFeatureId(feature) || `water-${index}`;
+      const id = getSharedFeatureId(feature) || `water-${index}`;
       rendererSurfaceHost.getContext().save();
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
       rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
@@ -162,7 +162,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
     overlayFeatures.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `atlantropa-overlay-${index}`;
+      const id = getSharedFeatureId(feature) || `atlantropa-overlay-${index}`;
       if (!id) return;
       if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
@@ -296,7 +296,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       return 0;
     }
     specialFeatures.forEach((feature, index) => {
-      const id = getFeatureId(feature) || `special-${index}`;
+      const id = getSharedFeatureId(feature) || `special-${index}`;
       const renderAsBase = isBaseGeographyScenarioFeature(feature);
       if (!isSpecialRegionEnabled(feature)) return;
       if (!pathBoundsInScreen(feature)) return;
@@ -341,10 +341,12 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     const sharedLakes = showWater ? [] : (runtimeState.contextLayerExternalDataByName?.lakes?.features || []);
     const atlantropaFeatures = showWater || sharedLakes.length ? getEffectiveAtlantropaFeatures() : null;
     const effectiveWaterFeatures = atlantropaFeatures ? getEffectiveWaterRegionFeatures(atlantropaFeatures) : [];
-    const sharedLakeIds = sharedLakes.length ? new Set(sharedLakes.map(getFeatureId)) : null;
+    const sharedLakeIds = sharedLakes.length
+      ? new Set(sharedLakes.map((feature) => getSharedFeatureId(feature) || null))
+      : null;
     const waterFeatures = showWater
       ? effectiveWaterFeatures
-      : sharedLakeIds ? effectiveWaterFeatures.filter((feature) => sharedLakeIds.has(getFeatureId(feature))) : [];
+      : sharedLakeIds ? effectiveWaterFeatures.filter((feature) => sharedLakeIds.has(getSharedFeatureId(feature) || null)) : [];
     const paintWater = showWater || waterFeatures.length > 0;
     const specialFeatures = showSpecial ? getEffectiveSpecialRegionFeatures() : [];
     let renderedWaterCount = 0;
@@ -558,9 +560,12 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   }
 
   function maskLakesFromPoliticalPatch(k) {
-    const sharedLakeIds = new Set((runtimeState.contextLayerExternalDataByName?.lakes?.features || []).map(getFeatureId));
+    const sharedLakeIds = new Set(
+      (runtimeState.contextLayerExternalDataByName?.lakes?.features || [])
+        .map((feature) => getSharedFeatureId(feature) || null),
+    );
     const waterFeatures = getEffectiveWaterRegionFeatures().filter((feature) =>
-      isLakeRegion(feature) && (runtimeState.showWaterRegions || sharedLakeIds.has(getFeatureId(feature))));
+      isLakeRegion(feature) && (runtimeState.showWaterRegions || sharedLakeIds.has(getSharedFeatureId(feature) || null)));
     const context = rendererSurfaceHost.getContext();
     context.save();
     try {

@@ -130,8 +130,8 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("export function createDefaultDevState()", owner_content)
         self.assertIn("devHoverHit: null,", owner_content)
-        self.assertIn("devScenarioEditor: {", owner_content)
-        self.assertIn("devScenarioTagCreator: {", owner_content)
+        self.assertNotIn("devScenarioEditor", owner_content)
+        self.assertNotIn("devScenarioTagCreator", owner_content)
         self.assertIn("devScenarioCountryEditor: {", owner_content)
         self.assertIn("devLocaleEditor: {", owner_content)
         self.assertIn("devScenarioDistrictEditor: {", owner_content)

@@ -191,7 +191,7 @@ test("click selection actions reject invalid targets", async () => {
   }
 });
 
-test("click selection actions preserve normalization deletion and paired color writes", async () => {
+test("click selection actions preserve normalization deletion and canonical color writes", async () => {
   const {
     clearClickHoveredIdState,
     clearClickScenarioHoverIdsState,
@@ -206,7 +206,6 @@ test("click selection actions preserve normalization deletion and paired color w
   } = await loadActions();
   const selectedColor = { css: "#123456" };
   const target = {
-    countryBaseColors: { AA: "#aaaaaa", BB: "#bbbbbb" },
     hoveredId: "land-1",
     hoveredSpecialRegionId: "special-1",
     hoveredWaterRegionId: "water-1",
@@ -229,13 +228,13 @@ test("click selection actions preserve normalization deletion and paired color w
   assert.deepEqual(target.waterRegionOverrides, { "water-2": "#222222" });
   assert.equal(removeClickCountryColorsState(target, " AA "), true);
   assert.deepEqual(target.sovereignBaseColors, { BB: "#bbbbbb" });
-  assert.deepEqual(target.countryBaseColors, { BB: "#bbbbbb" });
   assert.equal(setClickActiveSovereignCodeState(target, " CC "), "CC");
   assert.equal(setClickCountryColorsState(target, " DD ", "#dddddd"), true);
   assert.equal(target.sovereignBaseColors.DD, "#dddddd");
-  assert.equal(target.countryBaseColors.DD, "#dddddd");
   assert.equal(removeClickWaterRegionOverrideState(target, ""), false);
   assert.equal(removeClickCountryColorsState(target, ""), false);
+  assert.equal(removeClickCountryColorsState(target, "MISSING"), false);
+  assert.equal(Object.hasOwn(target, "countryBaseColors"), false);
   assert.equal(setClickCountryColorsState(target, "", "#000000"), false);
 });
 

@@ -16,7 +16,7 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         renderer_imports = renderer_content.replace('"', "'")
 
         self.assertIn(
-            "import { createColorResolutionStrategyOwner } from './renderer/color_resolution_strategy.js';",
+            "import { createColorResolutionStrategyOwner, isColorResolutionOceanFeature } from './renderer/color_resolution_strategy.js';",
             renderer_imports,
         )
         self.assertIn("let colorResolutionStrategyOwner = null;", renderer_content)
@@ -71,9 +71,9 @@ class MapRendererColorResolutionStrategyBoundaryContractTest(unittest.TestCase):
         paint_state_content = (REPO_ROOT / "js/core/state/color_state.js").read_text(encoding="utf-8")
         self.assertIn("export function applyFeaturePaintState(", paint_state_content)
         self.assertIn("target.visualOverrides[id] = color;", paint_state_content)
-        self.assertIn("target.featureOverrides[id] = color;", paint_state_content)
+        self.assertNotIn("target.featureOverrides", paint_state_content)
         self.assertIn("delete target.visualOverrides[id];", paint_state_content)
-        self.assertIn("delete target.featureOverrides[id];", paint_state_content)
+        self.assertNotIn("target.countryBaseColors", paint_state_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(resolvedIds, color,", renderer_content)
         self.assertIn("applyFeatureVisualOverrideTransaction(freshIds, remove ? null : selectedColor,", renderer_content)
         click_owner_content = (REPO_ROOT / "js/core/map_renderer/click_selection_transaction_owner.js").read_text(encoding="utf-8")

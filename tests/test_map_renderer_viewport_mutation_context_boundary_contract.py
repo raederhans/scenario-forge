@@ -126,7 +126,6 @@ class MapRendererViewportMutationContextBoundaryContractTest(unittest.TestCase):
             "function renderPassToCache(passName, drawFn, transform, timings)",
             "async function handleClick(event, interactionContext = null)",
             "return getClickSelectionTransactionOwner().handleClick(event, interactionContext);",
-            "dispatchMapClick,",
         ]:
             self.assertIn(token, renderer_content)
 

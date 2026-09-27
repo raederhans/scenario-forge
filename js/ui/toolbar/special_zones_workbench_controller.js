@@ -131,6 +131,7 @@ function featureIdFromDevSelectionEntry(entry) {
 
 function createSpecialZonesWorkbenchController({
   runtimeState,
+  resolveParentGroupTargetIds = (featureId) => callRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", featureId) ?? [],
   container = null,
   markDirty,
   render,
@@ -323,8 +324,7 @@ function createSpecialZonesWorkbenchController({
 
   const getParentGroupFeatureIds = () => {
     const featureId = getActiveLandFeatureId();
-    if (!featureId || typeof runtimeState.resolveSpecialZoneParentGroupTargetIdsFn !== "function") return [];
-    return runtimeState.resolveSpecialZoneParentGroupTargetIdsFn(featureId);
+    return featureId ? resolveParentGroupTargetIds(featureId) : [];
   };
 
   const getMemberTool = () => {

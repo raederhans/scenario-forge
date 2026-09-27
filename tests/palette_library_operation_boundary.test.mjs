@@ -87,7 +87,7 @@ test("palette state access delegates writes and rejects unrelated state mutation
   );
 });
 
-test("palette facade delegates compatible colors and selection mode to their state owners", () => {
+test("palette facade delegates canonical colors and selection mode to their state owners", () => {
   const filePath = "js/core/state/actions/palette_library_actions.js";
   const source = readFileSync(new URL(filePath, ROOT), "utf8");
   const ast = parseModule(filePath);
@@ -118,9 +118,7 @@ test("palette facade delegates compatible colors and selection mode to their sta
     new Set(findings.map(({ key }) => key)),
     new Set([
       "visualOverrides",
-      "featureOverrides",
       "sovereignBaseColors",
-      "countryBaseColors",
     ]),
   );
   const presentationPath = "js/core/state/actions/scenario_presentation_actions.js";

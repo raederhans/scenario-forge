@@ -268,21 +268,21 @@ test("readonlyModifiers rejects missing extra symbol nested function and nonbool
 });
 
 const SERVICE_NAMES = [
-  "addRecentColor", "appendOperationalLineVertexFromEvent", "appendOperationGraphicVertexFromEvent",
+  "appendOperationalLineVertexFromEvent", "appendOperationGraphicVertexFromEvent",
   "appendSpecialZoneVertexFromEvent", "applyFacilityInfoCardState", "applyFeatureVisualOverrideTransaction",
   "applyVisualSubdivisionFill", "applyWaterRegionFill", "blockStartupReadonlyInteraction", "captureHistoryState",
   "commitHistoryEntry", "dismissOnboardingHint", "ensureLeafDetailReady", "getFeatureCountryCodeNormalized",
-  "getFeatureOwnerCode", "getFeaturePaintColor", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
+  "getFeaturePaintColor", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
   "getSafeCanvasColor", "getSpecialRegionColor", "getWaterRegionColor", "handleSpecialZoneMembershipClick",
   "inspectHgoRuntimePreviewFromEvent", "isDoubleClickBatchEligible", "isFacilityDetailsSurfaceActive",
-  "isMacroOceanWaterRegion", "isOpenOceanPaintEnabled", "isSovereigntyModeActive", "markDirty",
-  "markLegacyColorStateDirty", "noteRenderAction", "nowMs", "placeUnitCounterFromEvent", "queueTooltipUpdate",
-  "refreshResolvedColorsForFeatures", "refreshResolvedColorsForOwners", "refreshSidebarAfterPaint",
+  "isMacroOceanWaterRegion", "isOpenOceanPaintEnabled", "markDirty",
+  "noteRenderAction", "nowMs", "placeUnitCounterFromEvent", "queueTooltipUpdate",
+  "refreshSidebarAfterPaint",
   "refreshSpecialRegionSidebarRowsNow", "refreshWaterRegionSidebarRowsNow", "renderHoverOverlayIfNeeded",
-  "requestInteractionRender", "resetFeatureOwnerCodes", "resolveInteractionTargetIds", "scheduleDynamicBorderRecompute",
-  "setFeatureOwnerCodes", "shouldBlockUnderlyingSelectionForFacility", "shouldRequireLeafDetail",
+  "requestInteractionRender", "resolveInteractionTargetIds", "scheduleDynamicBorderRecompute",
+  "shouldBlockUnderlyingSelectionForFacility", "shouldRequireLeafDetail",
   "syncInspectorCountryToLandSelection", "toggleFeatureInDevSelection", "updateDevSelectedHit",
-  "warnMissingActiveSovereign", "warnIncompletePaintTargets",
+  "warnIncompletePaintTargets",
 ];
 
 const ACTION_NAMES = [

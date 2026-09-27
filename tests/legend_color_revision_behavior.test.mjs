@@ -77,7 +77,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
       for (const id of ids) assert.equal(state.colors[id], "#abcdef");
       return true;
     } }),
-    migrateLegacyColorState() {}, ensureSovereigntyState() {},
+    ensureSovereigntyState() {},
     getRenderPassCacheState: () => ({ partialPoliticalDirtyIds: new Set() }),
     hasPendingPoliticalColorEdit: () => false, normalizePoliticalColorEditIds: ids => ids,
     findResolvedColorFeatureById: id => features.find(feature => feature.id === id) || null,

@@ -42,7 +42,6 @@ const RESET_TRANSACTION_TOKENS = Object.freeze([
   "ensureLayerDataFromTopology();",
   "rebuildPoliticalLandCollections();",
   "applyRendererSurfaceBridgeState(runtimeState, {",
-  "migrateLegacyColorState();",
   "ensureSovereigntyState();",
   "normalizeColorStateForRender(state, {",
   `${RUNTIME_STATE_TOKEN}.debugMode = debugMode;`,
@@ -80,7 +79,6 @@ const OWNER_EFFECT_TOKENS = Object.freeze([
   "ensureLayerDataFromTopology",
   "rebuildPoliticalLandCollections",
   "applyRendererSurfaceBridgeState",
-  "migrateLegacyColorState",
   "ensureSovereigntyState",
   "normalizeColorStateForRender",
   "setDebugMode",
@@ -341,7 +339,7 @@ test("map_renderer wires startup transaction owner effects at the composition ro
     "resetRenderPhaseState: () => getRenderPhaseLifecycleOwner().resetRenderPhaseState(\"init-map\"),",
     "resetTooltipState: () => getMapHoverInteractionOwner().resetTooltipState(),",
     `${RUNTIME_STATE_TOKEN}.deferContextBasePass = false;`,
-    `${RUNTIME_STATE_TOKEN}.syncDayNightClockTimerFn = syncDayNightClockTimer;`,
+    'registerRuntimeHook(null, "syncDayNightClockTimerFn", syncDayNightClockTimer);',
   ]) {
     assertIncludes(ownerFactorySource, token, "map_renderer must wire startup transaction owner effect");
   }

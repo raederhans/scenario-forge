@@ -14,7 +14,7 @@ export function createPaletteLibraryOperation({
   applyOwnerColor,
   captureHistoryState,
   pushHistoryEntry,
-  markLegacyColorStateDirty,
+
   refreshResolvedColorsForFeatures,
   refreshColorState,
   markDirty,
@@ -23,7 +23,7 @@ export function createPaletteLibraryOperation({
   for (const [name, service] of Object.entries({
     captureHistoryState,
     pushHistoryEntry,
-    markLegacyColorStateDirty,
+
     refreshResolvedColorsForFeatures,
     refreshColorState,
     markDirty,
@@ -58,7 +58,7 @@ export function createPaletteLibraryOperation({
     } else {
       applyOwnerColor(target.ownerCode, color);
     }
-    markLegacyColorStateDirty();
+
     if (featureIds.length) {
       refreshResolvedColorsForFeatures(featureIds, { renderNow: false });
     } else {

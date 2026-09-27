@@ -486,7 +486,6 @@ DEVELOPER_PRODUCT_MODULE_PATHS = (
     "app/js/ui/dev_workspace/dev_workspace_normalizers.js",
     "app/js/ui/dev_workspace/dev_workspace_shell_builder.js",
     "app/js/ui/dev_workspace/district_editor_controller.js",
-    "app/js/ui/dev_workspace/scenario_tag_creator_controller.js",
     "app/js/ui/dev_workspace/scenario_text_editors_controller.js",
     "app/js/ui/dev_workspace/selection_ownership_controller.js",
 )
@@ -494,7 +493,6 @@ DEVELOPER_PRODUCT_MODULE_PATHS = (
 EXPORT_PRODUCT_MODULE_PATHS = (
     "app/js/core/export_artifact_package.js",
     "app/js/core/sample_export_recommendation.js",
-    "app/js/ui/toolbar/export_artifact_download_transaction.js",
     "app/js/ui/toolbar/export_artifact_pipeline.js",
     "app/js/ui/toolbar/export_failure_handler.js",
     "app/js/ui/toolbar/export_workbench_contract.js",
@@ -607,33 +605,12 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         ),
     },
     {
-        "id": "appearance-transport-contract-modules",
-        "category": "on-demand-product",
-        "owner": "appearance-transport-contract",
-        "override_reachability": True,
-        "paths": (
-            "app/js/core/appearance_transport_change_set.js",
-            "app/js/core/appearance_transport_change_set_contract.js",
-            "app/js/core/appearance_transport_operation.js",
-        ),
-    },
-    {
         "id": "render-handoff-contract-modules",
         "category": "on-demand-product",
         "owner": "render-handoff-contract",
         "override_reachability": True,
         "paths": (
-            "app/js/core/render_change_set.js",
             "app/js/core/renderer/render_snapshot.js",
-        ),
-    },
-    {
-        "id": "on-demand-module-entries",
-        "category": "on-demand-product",
-        "owner": "editor-on-demand-features",
-        "paths": (
-            "app/js/core/thematic_admin_metrics_loader.js",
-            "app/js/ui/i18n_catalog.js",
         ),
     },
     {

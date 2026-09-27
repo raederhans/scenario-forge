@@ -1118,7 +1118,7 @@ export function createProjectSupportDiagnosticsController({
       body: preview ? JSON.stringify({ scenarioId }) : undefined,
       credentials: "same-origin",
     });
-    const payload = await response.json().catch(() => ({}));
+    const payload = await response.json();
     if (!response.ok) {
       throw new Error(String(payload?.message || payload?.error || "Scenario diagnostics request failed."));
     }

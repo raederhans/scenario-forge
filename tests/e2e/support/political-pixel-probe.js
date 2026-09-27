@@ -126,7 +126,6 @@ async function samplePoliticalFeaturePixels(page, probes, { radius = 5 } = {}) {
       const resolvedColor = featureId ? String(state.colors?.[featureId] || "") : "";
       const ownerColor = String(
         state.sovereignBaseColors?.[displayOwnerCode]
-        || state.countryBaseColors?.[displayOwnerCode]
         || ""
       );
       const rendererScreenPoint = typeof projectGeoToScreen === "function"

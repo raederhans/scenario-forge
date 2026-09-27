@@ -20,7 +20,6 @@ export function createRenderPipelinePassesOwner({
     getRenderPassCacheState = () => ({ signatures: {}, dirty: {}, reasons: {}, canvases: {}, counters: {} }),
     getRenderPassSignature = () => "",
     incrementPerfCounter = () => {},
-    rebuildResolvedColors = () => {},
     recordRenderPerfMetric = () => {},
     renderPassToCache = () => {},
     shouldEnableContextBaseTransformReuse = () => false,
@@ -159,9 +158,6 @@ export function createRenderPipelinePassesOwner({
     const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
     const cache = getRenderPassCacheState();
     const requestedPassNames = Array.isArray(passNames) ? new Set(passNames.filter(Boolean)) : null;
-    if (state.legacyColorStateDirty) {
-      rebuildResolvedColors();
-    }
     getIdleRenderPassDefinitions()
       .filter(([passName]) => !requestedPassNames || requestedPassNames.has(passName))
       .forEach(([passName, drawFn]) => {

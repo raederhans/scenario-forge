@@ -66,10 +66,10 @@ test("paint order is stable and sees replaced override maps and pending cache on
   const entries = [detailA, primary, detailB, shell];
   assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), [primary, shell, detailA, detailB]);
   h.state.visualOverrides = { primary: "invalid" };
-  h.state.featureOverrides = { primary: "#112233" };
+  h.state.visualOverrides = { primary: "#112233" };
   assert.equal(h.policy.hasVisiblePoliticalForegroundColorOverride(entries), true);
   assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), [shell, detailA, detailB, primary]);
-  h.state.featureOverrides = {};
+  h.state.visualOverrides = {};
   h.pending = true;
   h.cache = { pendingPoliticalColorEditIds: new Set(["RU_ARCTIC_FB_1", "detail-a"]) };
   assert.deepEqual(h.policy.orderPoliticalShellUnderlayFirst(entries), [primary, detailB, detailA, shell]);

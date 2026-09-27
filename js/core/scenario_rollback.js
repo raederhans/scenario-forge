@@ -1,7 +1,6 @@
 import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import { callRuntimeHook, readRegisteredRuntimeHookSource } from "./state/index.js";
-import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import {
   createDefaultActiveScenarioChunksState,
@@ -118,9 +117,7 @@ const ROLLBACK_REQUIRED_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
-  "featureOverrides",
   "sovereignBaseColors",
-  "countryBaseColors",
   "activeSovereignCode",
   "selectedWaterRegionId",
   "selectedSpecialRegionId",
@@ -400,11 +397,8 @@ function buildScenarioTransactionRollbackStatePatch(snapshot) {
         cloneScenarioStateValue(snapshot.sovereigntyByFeatureId),
       sovereigntyInitialized: !!snapshot.sovereigntyInitialized,
       visualOverrides: cloneScenarioStateValue(snapshot.visualOverrides),
-      featureOverrides: cloneScenarioStateValue(snapshot.featureOverrides),
       sovereignBaseColors:
         cloneScenarioStateValue(snapshot.sovereignBaseColors),
-      countryBaseColors:
-        cloneScenarioStateValue(snapshot.countryBaseColors),
       topologyDetail: cloneScenarioStateValue(snapshot.topologyDetail),
       topologyBundleMode: snapshot.topologyBundleMode,
       detailDeferred: snapshot.detailDeferred,
@@ -631,7 +625,7 @@ export function restoreScenarioApplyRollbackSnapshot(
     runtimeState,
     rollbackStatePatch.scenarioHealth.scenarioDataHealth,
   );
-  markLegacyColorStateDirty();
+
   restoreScenarioActivationAfterColorDirtyState(
     runtimeState,
     rollbackStatePatch.activation,

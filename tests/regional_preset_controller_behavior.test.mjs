@@ -215,40 +215,15 @@ test("missing, empty, and no-visible presets fail without invoking either mutati
   });
 });
 
-test("core apply supports explicit options and reports partial ownership matches", () => {
+test("preset apply stays visual even when obsolete ownership options are supplied", () => {
   const { controller, calls, render } = createHarness({
-    presets: [{ name: "North", ids: ["a", "missing", "b"] }],
-    visibleIds: ["a", "b"],
-    runtime: { activeSovereignCode: "" },
+    presets: [{ name: "North", ids: ["a", "missing", "b"] }], visibleIds: ["a", "b"],
+    runtime: { activeSovereignCode: "", paintMode: "sovereignty" },
   });
-
-  const result = controller.applyPresetWithMode("ALIAS", 0, {
-    mode: "ownership",
-    ownerCode: "EXPLICIT",
-    render,
-    ownershipHistoryKind: "custom-history",
-    ownershipDirtyReason: "custom-dirty",
-  });
-
-  assert.deepEqual(result, {
-    applied: true,
-    changed: 2,
-    reason: "ownership-applied",
-    matchedCount: 2,
-    requestedCount: 3,
-    missingCount: 1,
-  });
-  assert.deepEqual(calls.ownership, [{
-    ids: ["a", "b"],
-    ownerCode: "EXPLICIT",
-    options: {
-      render,
-      historyKind: "custom-history",
-      dirtyReason: "custom-dirty",
-      recomputeReason: "sidebar-preset-batch",
-    },
-  }]);
-  assert.equal(calls.visual.length, 0);
+  const result = controller.applyPresetWithMode("ALIAS", 0, { mode: "ownership", ownerCode: "EXPLICIT", render });
+  assert.deepEqual(result, { applied: true, changed: 2, reason: "visual-applied", matchedCount: 2, requestedCount: 3, missingCount: 1 });
+  assert.deepEqual(calls.ownership, []);
+  assert.deepEqual(calls.visual, [{ ids: ["a", "b"], color: "#112233", options: { render, historyKind: "preset-apply-color", dirtyReason: "preset-apply-color" } }]);
 });
 
 test("core visual apply uses direct color/history options and preserves match counts", () => {
@@ -279,7 +254,7 @@ test("core visual apply uses direct color/history options and preserves match co
   }]);
 });
 
-test("ordinary rendering keeps disabled presets visible and guards a missing active owner", () => {
+test("ordinary rendering keeps baseline-disabled presets visible and permits paint without an active owner", () => {
   const { controller, calls } = createHarness({
     presets: [
       { name: "Baseline", ids: ["a"] },
@@ -315,11 +290,7 @@ test("ordinary rendering keeps disabled presets visible and guards a missing act
   assert.equal(baseline.disabled, true);
   assert.equal(baseline.title, "Scenario already owns this preset");
   assert.equal(editable.textContent, "Editable");
-  assert.equal(editable.disabled, true);
-  assert.equal(
-    editable.title,
-    "t:Choose an active owner before changing political ownership or borders."
-  );
+  assert.equal(editable.disabled, false);
 });
 
 test("ordinary preset clicks resolve color and action state at click time", () => {
@@ -348,19 +319,11 @@ test("ordinary preset clicks resolve color and action state at click time", () =
   runtimeState.paintMode = "sovereignty";
   runtimeState.activeSovereignCode = "CLICK_OWNER";
   button.click();
-  assert.deepEqual(calls.ownership[0], {
-    ids: ["a"],
-    ownerCode: "CLICK_OWNER",
-    options: {
-      render,
-      historyKind: "preset-apply-sovereignty",
-      dirtyReason: "preset-apply-sovereignty",
-      recomputeReason: "sidebar-preset-batch",
-    },
-  });
+  assert.deepEqual(calls.ownership, []);
+  assert.deepEqual(calls.visual[1], calls.visual[0]);
 });
 
-test("scenario ownership filters consumed/disabled names while retaining source indexes", () => {
+test("scenario presets filter consumed/disabled names while retaining source indexes", () => {
   const presets = [
     { name: "Consumed", ids: ["consumed-id"] },
     { name: "First Visible", ids: ["first-id"] },
@@ -390,15 +353,10 @@ test("scenario ownership filters consumed/disabled names while retaining source 
   assert.deepEqual(buttons.map((button) => button.textContent), ["First Visible", "Second Visible"]);
   assert.equal(buttons.every((button) => button.disabled === false), true);
   buttons[1].click();
-  assert.deepEqual(calls.ownership, [{
-    ids: ["second-id"],
-    ownerCode: "SCENARIO_OWNER",
-    options: {
-      render,
-      historyKind: "scenario-preset-apply-ownership",
-      dirtyReason: "scenario-preset-apply-ownership",
-      recomputeReason: "sidebar-preset-batch",
-    },
+  assert.deepEqual(calls.ownership, []);
+  assert.deepEqual(calls.visual, [{
+    ids: ["second-id"], color: "#112233",
+    options: { render, historyKind: "preset-apply-color", dirtyReason: "preset-apply-color" },
   }]);
 });
 
@@ -646,29 +604,7 @@ test("controller remains a registered pure reader and fails closed on source dri
   ));
   assert.ok(contractEntry);
   assert.deepEqual(contractEntry.acceptedEscapes, []);
-  assert.equal(contractEntry.conservativeFindings.length, 1);
-  assert.deepEqual(
-    {
-      reason: contractEntry.conservativeFindings[0].reason,
-      operation: contractEntry.conservativeFindings[0].operation,
-      key: contractEntry.conservativeFindings[0].key,
-      count: contractEntry.conservativeFindings[0].count,
-    },
-    {
-      reason: "state-alias-escape",
-      operation: "unsupported",
-      key: "*",
-      count: 1,
-    },
-  );
-  assert.match(
-    contractEntry.conservativeFindings[0].enclosingFunctionIdentity,
-    /"name":"applyPresetWithMode"/,
-  );
-  assert.match(
-    contractEntry.conservativeFindings[0].sourceFingerprint,
-    /^[a-f0-9]{64}$/,
-  );
+  assert.deepEqual(contractEntry.conservativeFindings, []);
 
   const strictDiscovery = await discoverStateWriterBindingsForSource(
     modulePath,

@@ -10,7 +10,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   const events = [];
   const metrics = [];
   const coverageCalls = [];
-  const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0, featureIdReads: 0 };
+  const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0 };
   const context = (name) => Object.fromEntries(
     ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "clip", "moveTo", "lineTo", "setLineDash"]
       .map((method) => [method, (...args) => events.push([name, method, ...args])]),
@@ -81,7 +81,6 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     cloneZoomTransform: (value) => ({ ...value }),
     nowMs: () => 1,
     collectContextMetric: (name, _duration, payload) => metrics.push({ name, ...payload }),
-    getFeatureId: (feature) => { waterWork.featureIdReads += 1; return feature.id; },
     isWaterRegionRenderable: () => true,
     getWaterRegionDefaultStyle: () => ({ opacity: 0.6 }),
     collectSafeWaterRegionGeometryParts: (feature) => feature.parts,
@@ -149,13 +148,13 @@ test("water pass reuses one effective collection, Atlantropa buckets and signatu
   assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
 });
 
-test("cached visible-water pass avoids a redundant feature-ID filter", t => {
+test("cached visible-water pass reuses the existing layer without repainting", t => {
   const h = harness(t);
   h.draw();
-  h.waterWork.featureIdReads = 0;
+  const fillsBeforeReuse = h.events.filter((event) => event[1] === "fill").length;
   h.draw();
   assert.equal(h.metrics.at(-1).waterCacheMode, "reuse");
-  assert.equal(h.waterWork.featureIdReads, 0);
+  assert.equal(h.events.filter((event) => event[1] === "fill").length, fillsBeforeReuse);
 });
 
 test("water path eviction preserves fill and live highlight, including oversized transient paths", (t) => {

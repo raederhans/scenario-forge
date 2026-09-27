@@ -18,15 +18,13 @@ function fixture() {
     scenarioDistrictGroupByFeatureId: new Map(), parentGroupByFeatureId: new Map(),
     currentTool: "fill", interactionGranularity: "subdivision", batchFillScope: "parent",
   };
-  const mode = { sovereignty: false };
   const policy = createFillTargetPolicy(state, {
     getAdmin1Group: feature => feature.group,
     getFeatureCountryCodeNormalized: feature => feature.country,
     getFeatureInteractionCountryCodeNormalized: (feature, id) => state.sovereigntyByFeatureId[id] || feature.country,
-    isSovereigntyModeActive: () => mode.sovereignty,
     shouldExcludePoliticalInteractionFeature: feature => !!feature.excluded,
   });
-  return { state, mode, policy, a: features[0], hidden: features[4] };
+  return { state, policy, a: features[0], hidden: features[4] };
 }
 
 test("geographic macros require complete membership, accept Sets and observe replacement indexes", () => {
@@ -48,7 +46,7 @@ test("geographic macros require complete membership, accept Sets and observe rep
 });
 
 test("interaction targets use complete reference membership and fail closed on missing geometry", () => {
-  const { state, policy, a, mode, hidden } = fixture();
+  const { state, policy, a, hidden } = fixture();
   state.interactionGranularity = "country";
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), [], "geographic member missing");
   state.countryToFeatureIds.set("AA", ["a", "b", "c", "hidden"]);
@@ -58,10 +56,7 @@ test("interaction targets use complete reference membership and fail closed on m
   state.sovereigntyByFeatureId.a = "WRONG";
   state.ownerToFeatureIds.set("ZZ", ["b"]);
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a", "d"]);
-  mode.sovereignty = true;
-  assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), ["a"]);
   assert.deepEqual(policy.resolveInteractionTargetIds(hidden, "hidden"), []);
-  mode.sovereignty = false;
   state.scenarioBaselineOwnersByFeatureId = Object.freeze({ a: "ZZ", missing: "ZZ" });
   assert.deepEqual(policy.resolveInteractionTargetIds(a, "a"), []);
 });
@@ -106,7 +101,6 @@ test("double click eligibility enforces every tool and mode gate before planning
     ({ state }) => { state.interactionGranularity = "country"; },
     ({ state }) => { state.brushModeEnabled = true; },
     ({ state }) => { state.specialZoneEditor = { active: true }; },
-    ({ mode }) => { mode.sovereignty = true; },
   ]) {
     const current = fixture();
     assert.equal(current.policy.isDoubleClickBatchEligible({ id: "a" }, current.a), true);

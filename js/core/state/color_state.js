@@ -13,10 +13,8 @@ export function createDefaultColorState() {
     // Resolved colors used by canvas render/legend.
     colors: {},
     // Country-level base colors (applies when no subdivision override exists).
-    countryBaseColors: {},
     sovereignBaseColors: {},
     // Subdivision-level explicit color overrides keyed by feature ID.
-    featureOverrides: {},
     visualOverrides: {},
     waterRegionOverrides: {},
     specialRegionOverrides: {},
@@ -84,7 +82,6 @@ export function createDefaultColorPresetState() {
     editingPresetIds: new Set(),
     customPresets: {},
     presetsState: {},
-    legacyColorStateDirty: true,
     expandedInspectorContinents: new Set(),
     expandedInspectorReleaseParents: new Set(),
     expandedPresetCountries: new Set(),
@@ -311,87 +308,6 @@ export function sanitizeRegionOverrideColors(
   };
 }
 
-function syncPlainObjectMirror(targetValue, sourceValue) {
-  const source = sourceValue && typeof sourceValue === "object" ? sourceValue : {};
-  const target = targetValue && typeof targetValue === "object" && !Array.isArray(targetValue)
-    ? targetValue
-    : {};
-  const sourceKeys = new Set(Object.keys(source));
-  Object.keys(target).forEach((key) => {
-    if (!sourceKeys.has(key)) {
-      delete target[key];
-    }
-  });
-  sourceKeys.forEach((key) => {
-    const nextValue = source[key];
-    if (target[key] !== nextValue) {
-      target[key] = nextValue;
-    }
-  });
-  return target;
-}
-
-function collectMirrorIssues(sourceValue, mirrorValue, sourceName, mirrorName) {
-  const source = sourceValue && typeof sourceValue === "object" && !Array.isArray(sourceValue)
-    ? sourceValue
-    : {};
-  const mirror = mirrorValue && typeof mirrorValue === "object" && !Array.isArray(mirrorValue)
-    ? mirrorValue
-    : {};
-  const issueKeys = new Set([
-    ...Object.keys(source),
-    ...Object.keys(mirror),
-  ]);
-  return Array.from(issueKeys)
-    .sort((left, right) => String(left).localeCompare(String(right)))
-    .flatMap((key) => {
-      const sourceHas = Object.prototype.hasOwnProperty.call(source, key);
-      const mirrorHas = Object.prototype.hasOwnProperty.call(mirror, key);
-      if (!sourceHas && !mirrorHas) return [];
-      if (!sourceHas || !mirrorHas) {
-        return [{
-          mirror: `${sourceName}<->${mirrorName}`,
-          key,
-          kind: "missing-key",
-          sourceName,
-          mirrorName,
-          sourceValue: sourceHas ? source[key] : undefined,
-          mirrorValue: mirrorHas ? mirror[key] : undefined,
-        }];
-      }
-      if (source[key] === mirror[key]) return [];
-      return [{
-        mirror: `${sourceName}<->${mirrorName}`,
-        key,
-        kind: "value-mismatch",
-        sourceName,
-        mirrorName,
-        sourceValue: source[key],
-        mirrorValue: mirror[key],
-      }];
-    });
-}
-
-export function collectColorStateConsistencyIssues(target) {
-  if (!target || typeof target !== "object") {
-    return [];
-  }
-  return [
-    ...collectMirrorIssues(
-      target.sovereignBaseColors,
-      target.countryBaseColors,
-      "sovereignBaseColors",
-      "countryBaseColors",
-    ),
-    ...collectMirrorIssues(
-      target.visualOverrides,
-      target.featureOverrides,
-      "visualOverrides",
-      "featureOverrides",
-    ),
-  ];
-}
-
 export function normalizeColorStateForRender(
   target,
   {
@@ -402,14 +318,10 @@ export function normalizeColorStateForRender(
   if (!target || typeof target !== "object") {
     return null;
   }
-  target.countryBaseColors = sanitizeCountryColorMap(target.countryBaseColors);
-  target.featureOverrides = sanitizeColorMap(target.featureOverrides);
   target.sovereignBaseColors = sanitizeCountryColorMap(target.sovereignBaseColors);
   target.visualOverrides = sanitizeColorMap(target.visualOverrides);
   sanitizeRegionOverrideColors(target, { sanitizeColorMap });
   target.colors = sanitizeColorMap(target.colors);
-  target.countryBaseColors = syncPlainObjectMirror(target.countryBaseColors, target.sovereignBaseColors);
-  target.featureOverrides = syncPlainObjectMirror(target.featureOverrides, target.visualOverrides);
   return target;
 }
 
@@ -426,19 +338,14 @@ export function applyFeaturePaintState(target, featureIds, value, { remove = fal
   if (!ids.length) return [];
   const color = remove ? null : normalizeHexColor(value);
   if (!remove && !color) throw new TypeError("Paint color must be a hexadecimal RGB color");
-  // Validate the entire request before the first mutation. Existing storage
-  // names are transition adapters, not two independently editable states.
+  // Validate the entire request before the first mutation.
   target.visualOverrides = target.visualOverrides && typeof target.visualOverrides === "object" && !Array.isArray(target.visualOverrides)
     ? target.visualOverrides : {};
-  target.featureOverrides = target.featureOverrides && typeof target.featureOverrides === "object" && !Array.isArray(target.featureOverrides)
-    ? target.featureOverrides : {};
   for (const id of ids) {
     if (remove) {
       delete target.visualOverrides[id];
-      delete target.featureOverrides[id];
     } else {
       target.visualOverrides[id] = color;
-      target.featureOverrides[id] = color;
     }
   }
   return ids;

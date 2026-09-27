@@ -30,7 +30,6 @@ function createLegendState(features, overrides = {}) {
   return {
     currentLanguage: "en",
     colors: {},
-    countryBaseColors: {},
     sovereignBaseColors: {},
     sovereigntyByFeatureId: Object.fromEntries(features.map((feature) => [feature.id, feature.properties.ISO_A3])),
     landData: { type: "FeatureCollection", features },
@@ -94,7 +93,6 @@ test("generated legend reads displayed owner colors and preserves map colors", (
   ], {
     colors: { germany: "#abcdef" },
     sovereignBaseColors: { GER: "#101010" },
-    countryBaseColors: { GER: "#202020" },
   });
   const generation = LegendManager.generate(state, { mode: "direct-area" });
   const owners = LegendManager.applyGeneratedLegend(state, generation);
@@ -102,7 +100,6 @@ test("generated legend reads displayed owner colors and preserves map colors", (
   assert.deepEqual(owners, ["GER"]);
   assert.equal(generation.entries[0].color, "#abcdef");
   assert.equal(state.sovereignBaseColors.GER, "#101010");
-  assert.equal(state.countryBaseColors.GER, "#202020");
   assert.deepEqual(state.legendColorOrder, ["#abcdef"]);
   assert.deepEqual(LegendManager.getUniqueColors(state), ["#abcdef"]);
   assert.equal(state.legendLabels[generation.entries[0].color], "Germany");

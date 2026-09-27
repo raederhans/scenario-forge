@@ -300,13 +300,13 @@ test("map_renderer still owns current initMap lifecycle ordering and forbidden s
     rendererSource.indexOf("applyRendererSurfaceBridgeState(runtimeState, {"),
   );
   const bridgeIndex = rendererSource.indexOf("applyRendererSurfaceBridgeState(runtimeState, {");
-  const migrateIndex = rendererSource.indexOf("migrateLegacyColorState();", bridgeIndex);
+  const referenceIndex = rendererSource.indexOf("ensureSovereigntyState();", bridgeIndex);
   assert.ok(rebuildIndex >= 0, "P33 bridge call must follow rebuildPoliticalLandCollections");
   assert.ok(bridgeIndex >= 0, "P33 bridge call must exist in initMap");
-  assert.ok(migrateIndex >= 0, "P33 bridge call must precede migrateLegacyColorState");
+  assert.ok(referenceIndex >= 0, "P33 bridge call must precede ensureSovereigntyState");
   assert.ok(
-    rebuildIndex < bridgeIndex && bridgeIndex < migrateIndex,
-    "P33 bridge call must stay between rebuildPoliticalLandCollections and migrateLegacyColorState",
+    rebuildIndex < bridgeIndex && bridgeIndex < referenceIndex,
+    "P33 bridge call must stay between rebuildPoliticalLandCollections and ensureSovereigntyState",
   );
   assertIncludes(
     runtimeStateSource,

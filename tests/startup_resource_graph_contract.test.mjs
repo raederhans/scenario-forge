@@ -72,7 +72,6 @@ test("startup resource graph is deterministic and reconciles the source entrypoi
   assert.deepEqual(Object.keys(first.categories), STARTUP_RESOURCE_CLASSES);
   assert.ok(first.categories.critical.includes("js/main.js"));
   assert.ok(first.categories.deferred.includes("js/bootstrap/startup_sample_project_deeplink.js"));
-  assert.ok(first.categories.deferred.includes("js/core/appearance_transport_change_set.js"));
   assert.ok(first.categories["scenario-specific"].includes("js/bootstrap/startup_scenario_boot.js"));
   assert.equal(first.stage_a_lazy_loader.path, "js/bootstrap/startup_lazy_module_loader.js");
   assert.equal(first.stage_a_lazy_loader.entrypoint_imported, true);

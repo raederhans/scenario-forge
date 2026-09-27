@@ -9,10 +9,6 @@ import {
   buildExportArtifactPackage,
 } from "../js/core/export_artifact_package.js";
 import {
-  EXPORT_ARTIFACT_DOWNLOAD_PHASES,
-  createExportArtifactDownloadTransaction,
-} from "../js/ui/toolbar/export_artifact_download_transaction.js";
-import {
   EXPORT_FAILURE_KINDS,
   classifyExportFailure,
   createExportFailureToastHandler,
@@ -184,180 +180,6 @@ test("export workbench controller commits detached bake artifact metadata throug
   artifacts[0].dependencies.push("caller-mutation");
 
   assert.deepEqual(runtimeState.exportWorkbenchUi.bakeArtifacts[0].dependencies, ["color-revision:1"]);
-});
-
-test("export artifact download transaction records the artifact and download lifecycle", async () => {
-  const lifecycle = [];
-  const downloads = [];
-  const toasts = [];
-  const exportUi = { target: "per-layer", format: "jpg" };
-  const transaction = createExportArtifactDownloadTransaction({
-    getExportUi: () => exportUi,
-    getSelectedExportScale: () => 2,
-    buildPerLayerExportPackage: async (ui, scale) => {
-      assert.equal(ui, exportUi);
-      assert.equal(scale, 2);
-      return { blob: { id: "layers" }, extension: "zip", fileStem: "map_layers" };
-    },
-    buildBakePackPackage: async () => assert.fail("unexpected bake package"),
-    buildCompositeExportCanvas: async () => assert.fail("unexpected composite canvas"),
-    triggerBlobDownload: async (...args) => downloads.push(args),
-    triggerCanvasDownload: async () => assert.fail("unexpected canvas download"),
-    showToast: (...args) => toasts.push(args),
-    showExportFailureToast: () => assert.fail("unexpected export failure"),
-    t: (key) => key,
-    onLifecycle: (entry) => lifecycle.push(entry),
-  });
-
-  const receipt = await transaction.run();
-
-  assert.deepEqual(receipt, {
-    status: "ready",
-    target: "per-layer",
-    scale: 2,
-    extension: "zip",
-    fileStem: "map_layers",
-  });
-  assert.equal(exportUi.scale, "2");
-  assert.deepEqual(downloads, [[{ id: "layers" }, "zip", "map_layers"]]);
-  assert.deepEqual(lifecycle.map((entry) => entry.phase), [
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.ARTIFACT_READY,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.DOWNLOADING,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.READY,
-  ]);
-  assert.equal(toasts.at(-1)[1].tone, "success");
-  assert.equal(transaction.getJobsInFlight(), 0);
-});
-
-test("export artifact download transaction fails with stage-aware taxonomy", async () => {
-  const lifecycle = [];
-  const failures = [];
-  const transaction = createExportArtifactDownloadTransaction({
-    getExportUi: () => ({ target: "composite", format: "png" }),
-    getSelectedExportScale: () => 1,
-    buildPerLayerExportPackage: async () => assert.fail("unexpected layer package"),
-    buildBakePackPackage: async () => assert.fail("unexpected bake package"),
-    buildCompositeExportCanvas: async () => ({ id: "canvas" }),
-    triggerBlobDownload: async () => assert.fail("unexpected blob download"),
-    triggerCanvasDownload: async () => { throw new Error("browser rejected the download"); },
-    showToast() {},
-    showExportFailureToast: (error) => failures.push(error),
-    t: (key) => key,
-    onLifecycle: (entry) => lifecycle.push(entry),
-  });
-
-  const receipt = await transaction.run();
-
-  assert.deepEqual(receipt, {
-    status: "failed",
-    target: "composite",
-    failureKind: EXPORT_FAILURE_KINDS.DOWNLOAD_FAILED,
-  });
-  assert.equal(failures[0].exportStage, "download");
-  assert.deepEqual(lifecycle.map((entry) => entry.phase), [
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.ARTIFACT_READY,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.DOWNLOADING,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.FAILED,
-  ]);
-  assert.equal(classifyExportFailure(failures[0]), EXPORT_FAILURE_KINDS.DOWNLOAD_FAILED);
-});
-
-test("export artifact download transaction preserves explicit failure kinds across stage wrapping", async () => {
-  const failures = [];
-  const invalidParameters = new Error("invalid export scale");
-  invalidParameters.exportKind = EXPORT_FAILURE_KINDS.INVALID_PARAMS;
-  Object.freeze(invalidParameters);
-  const transaction = createExportArtifactDownloadTransaction({
-    getExportUi: () => ({ target: "composite", format: "png" }),
-    getSelectedExportScale: () => 1,
-    buildPerLayerExportPackage: async () => assert.fail("unexpected layer package"),
-    buildBakePackPackage: async () => assert.fail("unexpected bake package"),
-    buildCompositeExportCanvas: async () => { throw invalidParameters; },
-    triggerBlobDownload: async () => assert.fail("unexpected blob download"),
-    triggerCanvasDownload: async () => assert.fail("download must not start"),
-    showToast() {},
-    showExportFailureToast: (error) => failures.push(error),
-    t: (key) => key,
-  });
-
-  const receipt = await transaction.run();
-
-  assert.equal(receipt.failureKind, EXPORT_FAILURE_KINDS.INVALID_PARAMS);
-  assert.equal(failures[0].exportKind, EXPORT_FAILURE_KINDS.INVALID_PARAMS);
-  assert.equal(failures[0].exportStage, "artifact");
-  assert.equal(failures[0].cause, invalidParameters);
-});
-
-test("concurrent export lifecycle events retain their originating transaction IDs", async () => {
-  const lifecycle = [];
-  const pendingArtifacts = [];
-  const transaction = createExportArtifactDownloadTransaction({
-    getExportUi: () => ({ target: "composite", format: "png" }),
-    getSelectedExportScale: () => 1,
-    buildPerLayerExportPackage: async () => assert.fail("unexpected layer package"),
-    buildBakePackPackage: async () => assert.fail("unexpected bake package"),
-    buildCompositeExportCanvas: () => new Promise((resolve) => pendingArtifacts.push(resolve)),
-    triggerBlobDownload: async () => assert.fail("unexpected blob download"),
-    triggerCanvasDownload: async () => {},
-    showToast() {},
-    showExportFailureToast: () => assert.fail("unexpected export failure"),
-    t: (key) => key,
-    onLifecycle: (entry) => lifecycle.push(entry),
-    maxConcurrentJobs: 2,
-  });
-
-  const first = transaction.run();
-  const second = transaction.run();
-  assert.deepEqual(lifecycle.map(({ phase, transactionId }) => [phase, transactionId]), [
-    [EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING, 1],
-    [EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING, 2],
-  ]);
-
-  pendingArtifacts[1]({ id: "second" });
-  await second;
-  pendingArtifacts[0]({ id: "first" });
-  await first;
-
-  for (const transactionId of [1, 2]) {
-    assert.deepEqual(
-      lifecycle.filter((entry) => entry.transactionId === transactionId).map((entry) => entry.phase),
-      [
-        EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING,
-        EXPORT_ARTIFACT_DOWNLOAD_PHASES.ARTIFACT_READY,
-        EXPORT_ARTIFACT_DOWNLOAD_PHASES.DOWNLOADING,
-        EXPORT_ARTIFACT_DOWNLOAD_PHASES.READY,
-      ],
-    );
-  }
-});
-
-test("export artifact download transaction rejects incomplete package artifacts before download", async () => {
-  const lifecycle = [];
-  const failures = [];
-  const transaction = createExportArtifactDownloadTransaction({
-    getExportUi: () => ({ target: "bake-pack" }),
-    getSelectedExportScale: () => 1,
-    buildPerLayerExportPackage: async () => assert.fail("unexpected layer package"),
-    buildBakePackPackage: async () => ({}),
-    buildCompositeExportCanvas: async () => assert.fail("unexpected composite canvas"),
-    triggerBlobDownload: async () => assert.fail("download must not start"),
-    triggerCanvasDownload: async () => assert.fail("unexpected canvas download"),
-    showToast() {},
-    showExportFailureToast: (error) => failures.push(error),
-    t: (key) => key,
-    onLifecycle: (entry) => lifecycle.push(entry),
-  });
-
-  const receipt = await transaction.run();
-
-  assert.equal(receipt.failureKind, EXPORT_FAILURE_KINDS.ARTIFACT_FAILED);
-  assert.equal(failures[0].exportStage, "artifact");
-  assert.deepEqual(lifecycle.map((entry) => entry.phase), [
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.PREPARING,
-    EXPORT_ARTIFACT_DOWNLOAD_PHASES.FAILED,
-  ]);
 });
 
 test("export failure handler exposes a construction-validated taxonomy presenter", () => {
@@ -659,6 +481,7 @@ function deferred() {
 function createState() {
   return {
     activeScenarioId: "scene-a", scenarioDataGeneration: 1, sceneGeneration: 1,
+    renderTransactionDiagnostics: { scenarioApplyEpoch: 1 },
     colorRevision: 1, topologyRevision: 1, dirtyRevision: 1,
     width: 800, height: 600, dpr: 1, colorCanvas: { width: 800, height: 600 },
     zoomTransform: { k: 1, x: 0, y: 0 }, renderPhase: "idle", styleConfig: {},
@@ -860,11 +683,12 @@ test("inputs changed during preparation are not cached under either scene", asyn
   assert.equal(builds, 2);
 });
 
-test("source identity covers geometry, viewport, style, pass, order and visibility; dirty passes never reuse", () => {
+test("source identity covers scenario epoch, geometry, viewport, style, pass, order and visibility; dirty passes never reuse", () => {
   const state = createState();
   const key = () => getExportPreviewSourceKey(state, state.exportWorkbenchUi, ["background"], "svg");
   let previous = key();
   for (const change of [
+    () => { state.renderTransactionDiagnostics.scenarioApplyEpoch += 1; },
     () => { state.topologyRevision += 1; },
     () => { state.colorRevision += 1; },
     () => { state.zoomTransform.x += 0.001; },
@@ -885,7 +709,7 @@ test("source identity covers geometry, viewport, style, pass, order and visibili
   state.renderPhase = "interacting";
   assert.equal(key(), null);
   state.renderPhase = "idle";
-  for (const flag of ["scenarioApplyInFlight", "legacyColorStateDirty", "dynamicBordersDirty"]) {
+  for (const flag of ["scenarioApplyInFlight", "dynamicBordersDirty"]) {
     state[flag] = true;
     assert.equal(key(), null, flag);
     state[flag] = false;

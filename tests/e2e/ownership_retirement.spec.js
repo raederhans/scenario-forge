@@ -10,9 +10,8 @@ test("ownership editing stays disabled in editor and developer workspace", async
   await expect(page.locator("#workspaceExportBtn")).toBeEnabled({ timeout: 30_000 });
   await expect(page.locator("#bootOverlay")).toBeHidden();
   await expect(page.locator("#paintModeVisualBtn")).toBeVisible();
-  await expect(page.locator("#paintModePoliticalBtn")).toBeHidden();
-  await expect(page.locator("#paintModePoliticalBtn")).toBeDisabled();
-  await expect(page.locator("#countryInspectorSetActive")).toBeHidden();
+  await expect(page.locator("#paintModePoliticalBtn")).toHaveCount(0);
+  await expect(page.locator("#countryInspectorSetActive")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Return to Political Ownership Brush", exact: true })).toHaveCount(0);
   await expect(page.locator(".scenario-visual-adjustments").first()).toBeVisible();
 
@@ -40,11 +39,10 @@ test("ownership editing stays disabled in editor and developer workspace", async
   await page.locator("#developerModeBtn").click();
   await expect(page.locator("#devWorkspacePanel")).toBeVisible();
   for (const id of ["devQuickOwnerInput", "devQuickUseTagBtn", "devQuickApplyOwnerBtn", "devQuickResetOwnerBtn", "devQuickSaveOwnersBtn"]) {
-    await expect(page.locator(`#${id}`)).toBeHidden();
-    await expect(page.locator(`#${id}`)).toBeDisabled();
+    await expect(page.locator(`#${id}`)).toHaveCount(0);
   }
-  await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
-  await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
+  await expect(page.locator("#devScenarioOwnershipPanel")).toHaveCount(0);
+  await expect(page.locator("#devScenarioTagCreatorPanel")).toHaveCount(0);
   // The quickbar is collapsed in this layout. The selection panel stays usable.
   await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeVisible();
   await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeEnabled();
@@ -52,8 +50,8 @@ test("ownership editing stays disabled in editor and developer workspace", async
   await expect(page.locator("#devSelectionClearBtn")).toBeVisible();
   for (const category of ["scenario", "runtime", "selection"]) {
     await page.locator(`[data-dev-workspace-category="${category}"]`).click();
-    await expect(page.locator("#devScenarioOwnershipPanel")).toBeHidden();
-    await expect(page.locator("#devScenarioTagCreatorPanel")).toBeHidden();
+    await expect(page.locator("#devScenarioOwnershipPanel")).toHaveCount(0);
+    await expect(page.locator("#devScenarioTagCreatorPanel")).toHaveCount(0);
   }
   await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("visual-only-developer-workspace.png") });
@@ -95,7 +93,8 @@ test("P3 real-map country paint, erase, history and current-format reload share 
     const ids = [...reference.getScenarioGroupFeatureIds(origin.scenarioGroupCode)];
     const point = renderer.projectGeoToScreen(...globalThis.d3.geoCentroid(feature));
     const rect = document.getElementById("mapContainer").getBoundingClientRect();
-    const click = () => funnel.dispatchMapClick({
+    const interactionRect = globalThis.d3.select("rect.interaction-layer");
+    const click = () => interactionRect.on("click").call(interactionRect.node(), {
       clientX: rect.left + point[0], clientY: rect.top + point[1],
       detail: 1, timeStamp: performance.now(), preventDefault() {},
       ctrlKey: false, metaKey: false, altKey: false, shiftKey: false,
@@ -121,18 +120,20 @@ test("P3 real-map country paint, erase, history and current-format reload share 
     document.getElementById("toolEraserBtn").click();
     await click();
     const eraseKind = state.historyPast.at(-1)?.kind;
-    const erased = ids.every(id => !Object.hasOwn(state.visualOverrides, id) && !Object.hasOwn(state.featureOverrides, id));
+    const erased = ids.every(id => !Object.hasOwn(state.visualOverrides, id));
     const baseUnchanged = JSON.stringify(state.sovereignBaseColors) === paletteBefore;
     const referenceUnchanged = JSON.stringify(reference.getScenarioAssignments()) === referenceBefore;
     history.undoHistory();
     const exported = FileManager.buildProjectPayload(state);
     const serialized = JSON.stringify(exported);
     const savedAllPaint = ids.every(id => exported.visualOverrides[id] === "#12ab34");
+    const canonicalOnly = ["countryBaseColors", "featureOverrides", "sovereigntyByFeatureId"]
+      .every(key => !Object.hasOwn(exported, key));
     const imported = await funnel.importProjectTextThroughFunnel(serialized, { fileName: "p3-current-format.json" });
     return {
       scenario: state.activeScenarioId, group: origin.scenarioGroupCode, members: ids.length,
       fillHistoryCount, fillKind, painted, undoRestored, redoRestored, eraseKind, erased,
-      baseUnchanged, referenceUnchanged, savedAllPaint,
+      baseUnchanged, referenceUnchanged, savedAllPaint, canonicalOnly,
       importStatus: imported?.status, reloadedPaint: ids.every(id => state.visualOverrides[id] === "#12ab34"),
       mode: state.paintMode,
     };
@@ -143,7 +144,7 @@ test("P3 real-map country paint, erase, history and current-format reload share 
   expect(result.fillHistoryCount).toBe(1);
   expect(result.fillKind).toBe("fill-country-color");
   expect(result.eraseKind).toBe("erase-country-color");
-  for (const key of ["painted", "undoRestored", "redoRestored", "erased", "baseUnchanged", "referenceUnchanged", "savedAllPaint", "reloadedPaint"]) {
+  for (const key of ["painted", "undoRestored", "redoRestored", "erased", "baseUnchanged", "referenceUnchanged", "savedAllPaint", "reloadedPaint", "canonicalOnly"]) {
     expect(result[key], key).toBe(true);
   }
   expect(["committed", "committed-with-warnings"]).toContain(result.importStatus);

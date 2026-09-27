@@ -20,7 +20,6 @@ export const RENDERER_UI_BOOTSTRAP_RECORDS = [
       "js/core/export_artifact_package.js",
       "js/core/state/ui_state.js",
       "js/core/state_defaults.js",
-      "js/ui/toolbar/export_artifact_download_transaction.js",
       "js/ui/toolbar/export_artifact_model.js",
       "js/ui/toolbar/export_failure_handler.js",
       "js/ui/toolbar/export_workbench_controller.js",

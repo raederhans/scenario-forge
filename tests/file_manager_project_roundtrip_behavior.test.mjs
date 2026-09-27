@@ -48,8 +48,8 @@ test("import summary counts rejected entries while preserving valid unloaded reg
     onMigration: (summary) => summaries.push(summary),
   });
   assert.deepEqual(result.visualOverrides, { loaded: "#111111", unloaded: "#222222", successor: "#444444" });
-  assert.deepEqual(result.sovereigntyByFeatureId, { unloaded: "GER" });
-  assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 2 }]);
+  assert.equal(Object.hasOwn(result, "sovereigntyByFeatureId"), false);
+  assert.deepEqual(summaries, [{ migratedEntries: 1, ignoredEntries: 1 }]);
   assert.equal(original.visualOverrides.forged, "#333333");
   assert.equal(Object.hasOwn(result, "importSummary"), false, "summary must not alter the project file format");
   await migrate({ visualOverrides: { unloaded: "#222222", AQ_INVALID: "#333333" } }, {
@@ -268,9 +268,10 @@ test("file and text project imports share normalized callback payloads", async (
 
   const fileData = fileResult.callbacks[0];
   const textData = textResult.callbacks[0];
+  assert.deepEqual(fileData.visualOverrides, { legacyFeature: "#123456" });
+  assert.deepEqual(textData.visualOverrides, { legacyFeature: "#123456" });
   for (const field of [
-    "featureOverrides",
-    "countryBaseColors",
+    "sovereignBaseColors",
     "visualOverrides",
     "waterRegionOverrides",
     "specialRegionOverrides",
@@ -1627,4 +1628,34 @@ test("ZIP parsed import skips FileReader while retaining preview, normalization 
     assert.equal(callbackCount, 0);
     assert.equal(events.length, 2);
   } finally { console.error = oldError; }
+});
+
+
+test("legacy-only and schema 1 paint normalize once; canonical maps including empty maps win", () => {
+  const cases = [
+    [{ schemaVersion: 1, colors: { A: "#112233" } }, {}, { A: "#112233" }],
+    [{ schemaVersion: 21, countryBaseColors: { AA: "#445566" }, featureOverrides: { A: "#778899" } }, { AA: "#445566" }, { A: "#778899" }],
+    [{ sovereignBaseColors: {}, visualOverrides: {}, countryBaseColors: { AA: "#445566" }, featureOverrides: { A: "#778899" }, colors: { A: "#112233" } }, {}, {}],
+    [{ sovereignBaseColors: { AA: "#abcdef" }, visualOverrides: { A: "#fedcba" }, countryBaseColors: { AA: "#445566" }, featureOverrides: { A: "#778899" } }, { AA: "#abcdef" }, { A: "#fedcba" }],
+    [{ sovereignBaseColors: [], visualOverrides: [], countryBaseColors: { AA: "#445566" }, featureOverrides: { A: "#778899" } }, { AA: "#445566" }, { A: "#778899" }],
+  ];
+  for (const [input, bases, features] of cases) {
+    input.sovereigntyByFeatureId = { A: "FORGED" };
+    const original = structuredClone(input);
+    const normalized = FileManager.normalizeImportedProjectData(input);
+    assert.deepEqual(normalized.sovereignBaseColors, bases);
+    assert.deepEqual(normalized.visualOverrides, features);
+    assert.deepEqual(input, original, "normalization cannot mutate the input document");
+    for (const key of ["countryBaseColors", "featureOverrides", "colors", "sovereigntyByFeatureId"]) {
+      assert.equal(Object.hasOwn(normalized, key), false, key);
+    }
+    const exported = FileManager.buildProjectPayload({ ...normalized, sovereigntyByFeatureId: { A: "REFERENCE" } });
+    assert.equal(exported.schemaVersion, 22);
+    for (const key of ["countryBaseColors", "featureOverrides", "sovereigntyByFeatureId"]) {
+      assert.equal(Object.hasOwn(exported, key), false, key);
+    }
+    const restored = FileManager.normalizeImportedProjectData(exported);
+    assert.deepEqual(restored.sovereignBaseColors, bases);
+    assert.deepEqual(restored.visualOverrides, features);
+  }
 });

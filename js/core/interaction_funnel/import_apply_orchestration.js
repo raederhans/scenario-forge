@@ -86,7 +86,7 @@ export async function prepareImportedProjectState({
       scenarioId: String(scenarioState.activeScenarioId || ""),
       scenarioName: String(scenarioState.activeScenarioManifest?.display_name || scenarioState.activeScenarioId || ""),
       restoredColorEntries: Object.keys(data.visualOverrides || {}).length,
-      restoredOwnershipEntries: Object.keys(data.sovereigntyByFeatureId || {}).length,
+      restoredOwnershipEntries: 0,
       ignoredEntries: migrationSummary?.ignoredEntries ?? null,
       migratedEntries: migrationSummary?.migratedEntries ?? 0,
     },

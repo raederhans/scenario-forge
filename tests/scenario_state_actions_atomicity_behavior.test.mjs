@@ -49,11 +49,9 @@ const ACTIVATION_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
-  "featureOverrides",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",
   "sovereignBaseColors",
-  "countryBaseColors",
 ]);
 
 const PRESENTATION_KEYS = Object.freeze([
@@ -327,11 +325,9 @@ test("scenario activation commit preserves legacy shallow-copy isolation for mut
     countryNames: { FRA: "France" },
     sovereigntyByFeatureId: sharedOwnerMap,
     visualOverrides: { A: { fill: "#0055aa" } },
-    featureOverrides: { A: { owner: "FRA" } },
     scenarioGeneratedColorTags: generatedColorTags,
     scenarioFixedOwnerColors: sharedColorMap,
     sovereignBaseColors: sharedColorMap,
-    countryBaseColors: sharedColorMap,
   };
   const target = {};
 
@@ -344,10 +340,8 @@ test("scenario activation commit preserves legacy shallow-copy isolation for mut
     "countryNames",
     "sovereigntyByFeatureId",
     "visualOverrides",
-    "featureOverrides",
     "scenarioFixedOwnerColors",
     "sovereignBaseColors",
-    "countryBaseColors",
   ]) {
     assert.notEqual(target[key], patch[key], `${key} must be shallow-copied`);
     assert.deepEqual(target[key], patch[key]);
@@ -363,14 +357,6 @@ test("scenario activation commit preserves legacy shallow-copy isolation for mut
     target.scenarioFixedOwnerColors,
     target.sovereignBaseColors,
   );
-  assert.notEqual(
-    target.scenarioFixedOwnerColors,
-    target.countryBaseColors,
-  );
-  assert.notEqual(
-    target.sovereignBaseColors,
-    target.countryBaseColors,
-  );
 
   sharedOwnerMap.A = "GER";
   sharedColorMap.FRA = "#ffffff";
@@ -379,7 +365,6 @@ test("scenario activation commit preserves legacy shallow-copy isolation for mut
   assert.equal(target.sovereigntyByFeatureId.A, "FRA");
   assert.equal(target.scenarioFixedOwnerColors.FRA, "#0055aa");
   assert.equal(target.sovereignBaseColors.FRA, "#0055aa");
-  assert.equal(target.countryBaseColors.FRA, "#0055aa");
   assert.deepEqual(target.scenarioGeneratedColorTags, ["FRA"]);
 
   assert.equal(
@@ -447,7 +432,6 @@ test("scenario activation rollback phases preserve the audit and color-dirty bou
 
   restoreScenarioActivationBeforeColorDirtyState(target, snapshot);
   assert.equal(target.scenarioImportAudit, source.scenarioImportAudit);
-  assert.equal(target.countryBaseColors, source.countryBaseColors);
 
   const restoredKeysBeforeCompatibilityPhase = Object.keys(target).sort();
   restoreScenarioActivationAfterColorDirtyState(target, snapshot);

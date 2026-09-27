@@ -1,7 +1,6 @@
 import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
-import { isOwnershipEditingEnabled } from "./map_editing_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "./renderer/context_layer_render_scheduler.js";
@@ -220,10 +219,8 @@ import {
   ensureSovereigntyState,
   getFeatureOwnerCode,
   getFeatureIdsForOwner,
-  markLegacyColorStateDirty,
-  migrateLegacyColorState,
-  setFeatureOwnerCodes,
-  resetFeatureOwnerCodes,
+
+
 } from "./sovereignty_manager.js";
 import { COUNTRY_CODE_ALIASES, normalizeCountryCodeAlias } from "./country_code_aliases.js";
 import { fragmentCamouflageRules } from "./country_feature_policies.js";
@@ -236,11 +233,6 @@ import {
 import { enqueueFrameTask, getFrameSchedulerQueueLength } from "./frame_scheduler.js";
 import { flushRenderBoundary, getRenderBoundaryDebugState, requestRender } from "./render_boundary.js";
 import { callRuntimeHook, callRuntimeHooks, captureCompatRuntimeHook, registerRuntimeHook } from "./state/index.js";
-import {
-  bindInteractionFunnel,
-  dispatchMapClick,
-  dispatchMapDoubleClick,
-} from "./interaction_funnel.js";
 import { createUrbanCityPolicyOwner } from "./renderer/urban_city_policy.js";
 import { createCityPaintStyleModel } from "./renderer/city_paint_style_model.js";
 import { createCityLabelOwner } from "./renderer/city_label_owner.js";
@@ -846,7 +838,7 @@ function getFillTargetPolicy() {
       getAdmin1Group,
       getFeatureCountryCodeNormalized,
       getFeatureInteractionCountryCodeNormalized,
-      isSovereigntyModeActive,
+
       shouldExcludePoliticalInteractionFeature,
     });
   }
@@ -993,7 +985,6 @@ function getLegendControlOwner() {
       activeScenarioId: runtimeState.activeScenarioId,
       hasScenarioVisualEdits: !!runtimeState.activeScenarioId && (
         Object.keys(runtimeState.visualOverrides || {}).length > 0
-        || Object.keys(runtimeState.featureOverrides || {}).length > 0
       ),
     }),
     getControlState: () => LegendManager.getControlState(state),
@@ -1141,9 +1132,6 @@ function getRendererStartupTransactionOwner() {
           interactionOverlayContext: rendererSurfaceHost.getInteractionOverlayContext(),
         });
       },
-      migrateLegacyColorState: () => {
-        migrateLegacyColorState();
-      },
       ensureSovereigntyState: () => {
         ensureSovereigntyState();
       },
@@ -1174,7 +1162,7 @@ function getRendererStartupTransactionOwner() {
       resetProjectedBoundsCacheState,
       invalidateAllRenderPasses,
       syncDayNightClockTimerBridge: () => {
-        runtimeState.syncDayNightClockTimerFn = syncDayNightClockTimer;
+        registerRuntimeHook(null, "syncDayNightClockTimerFn", syncDayNightClockTimer);
         syncDayNightClockTimer();
       },
     },
@@ -1236,12 +1224,12 @@ function getSetMapDataTransactionOwner() {
         }
       },
       sanitizeSetMapDataColorState: () => {
-        runtimeState.countryBaseColors = sanitizeCountryColorMap(runtimeState.countryBaseColors);
-        runtimeState.featureOverrides = sanitizeColorMap(runtimeState.featureOverrides);
+        runtimeState.sovereignBaseColors = sanitizeCountryColorMap(runtimeState.sovereignBaseColors);
+        runtimeState.visualOverrides = sanitizeColorMap(runtimeState.visualOverrides);
         runtimeState.waterRegionOverrides = sanitizeColorMap(runtimeState.waterRegionOverrides);
         runtimeState.specialRegionOverrides = {};
       },
-      migrateLegacyColorState,
+
       setCanvasSize,
       buildRuntimePoliticalMeta,
       resetSovereigntyInitialized: () => {
@@ -2278,7 +2266,7 @@ function getPaintContourRuntimeOwner() {
       getFeatureId,
       resolveBoundaryKey: (feature, id) => canonicalCountryCode(getDisplayOwnerCode(feature, id)),
       getBoundaryRevision: () => [runtimeState.sovereigntyRevision, runtimeState.scenarioDataGeneration,
-        runtimeState.scenarioShellOverlayRevision, runtimeState.scenarioViewMode].join("|"),
+        runtimeState.scenarioShellOverlayRevision].join("|"),
       separatePoliticalBorders: () => separatesPoliticalBorders(runtimeState),
       isEligible: (feature, id) => !shouldExcludePoliticalVisualFeature(feature, id)
         && !isScenarioShellFeature(feature, id)
@@ -2933,7 +2921,6 @@ function getClickSelectionTransactionOwner() {
       getClickState: () => Object.freeze({
         activeSovereignCode: runtimeState.activeSovereignCode,
         colors: runtimeState.colors,
-        countryBaseColors: runtimeState.countryBaseColors,
         currentTool: runtimeState.currentTool,
         interactionGranularity: runtimeState.interactionGranularity,
         isEditingPreset: runtimeState.isEditingPreset,
@@ -2994,7 +2981,6 @@ function getClickSelectionTransactionOwner() {
       },
     },
     services: {
-      addRecentColor,
       appendOperationalLineVertexFromEvent,
       appendOperationGraphicVertexFromEvent,
       appendSpecialZoneVertexFromEvent,
@@ -3008,7 +2994,6 @@ function getClickSelectionTransactionOwner() {
       dismissOnboardingHint,
       ensureLeafDetailReady,
       getFeatureCountryCodeNormalized,
-      getFeatureOwnerCode,
       getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
         getSafeColor: getSafeCanvasColor,
         getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
@@ -3025,30 +3010,23 @@ function getClickSelectionTransactionOwner() {
       isFacilityDetailsSurfaceActive,
       isMacroOceanWaterRegion,
       isOpenOceanPaintEnabled,
-      isSovereigntyModeActive,
       markDirty,
-      markLegacyColorStateDirty,
+
       noteRenderAction,
       nowMs,
       placeUnitCounterFromEvent,
       queueTooltipUpdate,
-      refreshResolvedColorsForFeatures,
-      refreshResolvedColorsForOwners,
       refreshSidebarAfterPaint,
       refreshSpecialRegionSidebarRowsNow,
       refreshWaterRegionSidebarRowsNow,
       renderHoverOverlayIfNeeded,
       requestInteractionRender,
-      resetFeatureOwnerCodes,
       resolveInteractionTargetIds,
-      scheduleDynamicBorderRecompute,
-      setFeatureOwnerCodes,
       shouldBlockUnderlyingSelectionForFacility,
       shouldRequireLeafDetail,
       syncInspectorCountryToLandSelection,
       toggleFeatureInDevSelection,
       updateDevSelectedHit,
-      warnMissingActiveSovereign: () => console.warn("[sovereignty] No active sovereign selected."),
       warnIncompletePaintTargets: () => {
         const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
         showDetailPromotionToast(
@@ -3072,9 +3050,6 @@ function getMapInteractionEventBindingOwner() {
       getWindow: () => window,
       getInteractionRectNode: () => rendererSurfaceHost.getInteractionRect()?.node?.(),
     },
-    helpers: {
-      bindInteractionFunnel,
-    },
     handlers: {
       mapClick: handleClick,
       mapDoubleClick: handleDoubleClick,
@@ -3085,8 +3060,6 @@ function getMapInteractionEventBindingOwner() {
       handleBrushPointerDown,
       handleBrushPointerMove,
       handleMouseLeave: handleMapMouseLeave,
-      dispatchMapClick,
-      dispatchMapDoubleClick,
       handleSidebarLayoutStart,
       handleResize,
       flushSpecialZoneMembershipDragSession,
@@ -3554,7 +3527,6 @@ function getRenderPipelinePassesOwner() {
       getRenderPassCacheState,
       getRenderPassSignature,
       incrementPerfCounter,
-      rebuildResolvedColors,
       recordRenderPerfMetric,
       renderPassToCache,
       shouldEnableContextBaseTransformReuse,
@@ -4806,10 +4778,6 @@ function isDynamicBordersEnabled() {
   return !["0", "false", "off", "no"].includes(raw);
 }
 
-function isSovereigntyModeActive() {
-  return isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual").toLowerCase() === "sovereignty";
-}
-
 function clearPendingDynamicBorderTimer() {
   return getBorderMeshOwner().clearPendingDynamicBorderTimer();
 }
@@ -5468,7 +5436,6 @@ function getAdmin0BackgroundFillColor(countryCode) {
   const dominantFillColor = buildCountryDominantFillColorMap().get(canonicalCode);
   return getSafeCanvasColor(dominantFillColor, null)
     || getSafeCanvasColor(getColorByCanonicalCountryCode(runtimeState.sovereignBaseColors, canonicalCode), null)
-    || getSafeCanvasColor(getColorByCanonicalCountryCode(runtimeState.countryBaseColors, canonicalCode), null)
     || LAND_FILL_COLOR;
 }
 
@@ -5806,7 +5773,6 @@ function getExactAfterSettleScheduler() {
       ? getGeometryRasterRuntimeOwner().preparePolitical({ force: true }) : null,
     getPhysicalExactRefreshPasses,
     invalidateRenderPasses,
-    rebuildResolvedColors,
     requestRendererRender,
     render,
     recordRenderPerfMetric,
@@ -6645,7 +6611,7 @@ function flushPendingScenarioChunkRefreshAfterExact(reason = "exact-after-settle
 function rebuildResolvedColors() {
   const startedAt = nowMs();
   const previousColorRevision = Number(runtimeState.colorRevision || 0);
-  migrateLegacyColorState();
+
   ensureSovereigntyState();
   normalizeColorStateForRender(state, {
     sanitizeColorMap,
@@ -7106,7 +7072,7 @@ function retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColo
 }
 
 function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, inputStartedAt = 0, inputLabel = "", coalescePatchPreview = false } = {}) {
-  migrateLegacyColorState();
+
   ensureSovereigntyState();
   const cache = getRenderPassCacheState();
   const pendingRenderIds = new Set();
@@ -7184,7 +7150,7 @@ function applyFeatureVisualOverrideTransaction(targetIds, selectedColor, {
   if (!resolvedIds.length) return [];
   // Import/legacy writes are normalized once before this canonical transaction.
   // Both override maps below stay in sync, so a paint need not copy them again.
-  migrateLegacyColorState();
+
   applyFeaturePaintState(runtimeState, resolvedIds,
     remove ? null : getSafeCanvasColor(selectedColor, defaultColor), { remove });
   refreshResolvedColorsForFeatures(resolvedIds, {
@@ -7235,10 +7201,6 @@ function refreshColorState({ renderNow = true, featureIds = null, waterRegionIds
     });
     return;
   }
-  normalizeColorStateForRender(state, {
-    sanitizeColorMap,
-    sanitizeCountryColorMap,
-  });
   rebuildResolvedColors();
   invalidateRenderPasses("contextScenario", "refresh-colors");
   recordRenderPerfMetric("refreshColorState", nowMs() - startedAt, {
@@ -12149,7 +12111,6 @@ function getScenarioRegionOverlayRenderOwner() {
       cloneZoomTransform,
       nowMs,
       collectContextMetric,
-      getFeatureId,
       isWaterRegionRenderable,
       getWaterRegionDefaultStyle,
       collectSafeWaterRegionGeometryParts,
@@ -13437,7 +13398,6 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     return;
   }
 
-  migrateLegacyColorState();
   ensureSovereigntyState();
   const nextCountryBaseColors = {};
   const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
@@ -13498,7 +13458,6 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
   const historyFeatureIds = Object.keys(runtimeState.visualOverrides || {});
   const historyOwnerCodes = Array.from(new Set([
     ...Object.keys(runtimeState.sovereignBaseColors || {}),
-    ...Object.keys(runtimeState.countryBaseColors || {}),
     ...Object.keys(nextCountryBaseColors || {}),
   ]));
   const stylePaths = styleUpdates && typeof styleUpdates === "object"
@@ -13513,10 +13472,8 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     : null;
 
   runtimeState.visualOverrides = {};
-  runtimeState.featureOverrides = {};
   runtimeState.sovereignBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
-  runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
-  markLegacyColorStateDirty();
+
   if (styleUpdates && typeof styleUpdates === "object") {
     Object.entries(styleUpdates).forEach(([path, value]) => {
       const segments = String(path || "").split(".").filter(Boolean);
@@ -13753,7 +13710,6 @@ function getCountryInteractionPolicy(countryCode) {
 function shouldRequireLeafDetail(countryCode) {
   const policy = getCountryInteractionPolicy(countryCode);
   if (!policy?.requiresComposite) return false;
-  if (isSovereigntyModeActive()) return false;
   return runtimeState.interactionGranularity !== "country";
 }
 
@@ -14184,80 +14140,10 @@ function eraseVisualOverridesForIds(targetIds, { kind, dirtyReason } = {}) {
   return true;
 }
 
-function applySovereigntyFillToIds(targetIds, { kind, dirtyReason, recomputeReason } = {}) {
-  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)));
-  if (!resolvedIds.length) return false;
-  if (!runtimeState.activeSovereignCode) {
-    showToast(t("No active sovereign selected.", "ui"), {
-      title: t("Dev Workspace", "ui"),
-      tone: "warning",
-    });
-    return false;
-  }
-  const historyBefore = captureHistoryState({
-    sovereigntyFeatureIds: resolvedIds,
-  });
-  const changed = setFeatureOwnerCodes(resolvedIds, runtimeState.activeSovereignCode);
-  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
-  if (changed > 0) {
-    scheduleDynamicBorderRecompute(recomputeReason || kind || "dev-workspace-sovereignty-fill", 90);
-    markDirty(dirtyReason || kind || "fill-sovereignty");
-    commitHistoryEntry({
-      kind: kind || "fill-sovereignty",
-      before: historyBefore,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: resolvedIds,
-      }),
-      affectsSovereignty: true,
-    });
-    if (rendererSurfaceHost.getContext()) {
-      render();
-    }
-    refreshSidebarAfterPaint({ featureIds: resolvedIds });
-    return true;
-  }
-  return false;
-}
-
-function eraseSovereigntyForIds(targetIds, { kind, dirtyReason, recomputeReason } = {}) {
-  const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
-    .map((value) => String(value || "").trim())
-    .filter(Boolean)));
-  if (!resolvedIds.length) return false;
-  const historyBefore = captureHistoryState({
-    sovereigntyFeatureIds: resolvedIds,
-  });
-  const changed = resetFeatureOwnerCodes(resolvedIds);
-  refreshResolvedColorsForFeatures(resolvedIds, { renderNow: false });
-  if (changed > 0) {
-    scheduleDynamicBorderRecompute(recomputeReason || kind || "dev-workspace-sovereignty-reset", 90);
-    markDirty(dirtyReason || kind || "erase-sovereignty");
-    commitHistoryEntry({
-      kind: kind || "erase-sovereignty",
-      before: historyBefore,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: resolvedIds,
-      }),
-      affectsSovereignty: true,
-    });
-    if (rendererSurfaceHost.getContext()) {
-      render();
-    }
-    refreshSidebarAfterPaint({ featureIds: resolvedIds });
-    return true;
-  }
-  return false;
-}
-
 function applyDevLandBatchAction(targetIds, {
   ownerCodes = [],
   visualKind = "dev-batch-fill",
   visualDirtyReason = visualKind,
-  sovereigntyFillKind = "dev-batch-sovereignty-fill",
-  sovereigntyEraseKind = "dev-batch-sovereignty-reset",
-  recomputeReason = "dev-batch",
 } = {}) {
   const resolvedIds = Array.from(new Set((Array.isArray(targetIds) ? targetIds : [])
     .map((value) => String(value || "").trim())
@@ -14269,19 +14155,6 @@ function applyDevLandBatchAction(targetIds, {
       tone: "warning",
     });
     return false;
-  }
-  if (isSovereigntyModeActive()) {
-    return runtimeState.currentTool === "eraser"
-      ? eraseSovereigntyForIds(resolvedIds, {
-        kind: sovereigntyEraseKind,
-        dirtyReason: sovereigntyEraseKind,
-        recomputeReason,
-      })
-      : applySovereigntyFillToIds(resolvedIds, {
-        kind: sovereigntyFillKind,
-        dirtyReason: sovereigntyFillKind,
-        recomputeReason,
-      });
   }
   if (runtimeState.currentTool === "eraser") {
     return eraseVisualOverridesForIds(resolvedIds, {
@@ -14314,9 +14187,6 @@ function applyDevMacroFillCurrentCountry() {
     ownerCodes: [contextInfo.countryCode],
     visualKind: "dev-fill-country",
     visualDirtyReason: "dev-fill-country",
-    sovereigntyFillKind: "dev-fill-country-sovereignty",
-    sovereigntyEraseKind: "dev-erase-country-sovereignty",
-    recomputeReason: "dev-fill-country",
   });
 }
 
@@ -14340,9 +14210,6 @@ function applyDevMacroFillCurrentParentGroup() {
   return applyDevLandBatchAction(ids, {
     visualKind: "dev-fill-parent-group",
     visualDirtyReason: "dev-fill-parent-group",
-    sovereigntyFillKind: "dev-fill-parent-group-sovereignty",
-    sovereigntyEraseKind: "dev-erase-parent-group-sovereignty",
-    recomputeReason: "dev-fill-parent-group",
   });
 }
 
@@ -14370,9 +14237,6 @@ function applyDevMacroFillCurrentOwnerScope() {
     ownerCodes: ownerCode ? [ownerCode] : [],
     visualKind: "dev-fill-owner-scope",
     visualDirtyReason: "dev-fill-owner-scope",
-    sovereigntyFillKind: "dev-fill-owner-scope-sovereignty",
-    sovereigntyEraseKind: "dev-erase-owner-scope-sovereignty",
-    recomputeReason: "dev-fill-owner-scope",
   });
 }
 
@@ -14388,9 +14252,6 @@ function applyDevSelectionFill() {
   return applyDevLandBatchAction(ids, {
     visualKind: "dev-fill-selection",
     visualDirtyReason: "dev-fill-selection",
-    sovereigntyFillKind: "dev-fill-selection-sovereignty",
-    sovereigntyEraseKind: "dev-erase-selection-sovereignty",
-    recomputeReason: "dev-fill-selection",
   });
 }
 
@@ -14515,7 +14376,7 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
   lastQuickFillLeafClick = null;
   const plan = buildDoubleClickBatchPlan(feature, featureId);
   if (!plan?.targetIds?.length) {
-    if (runtimeState.currentTool === "fill" && !isSovereigntyModeActive()
+    if (runtimeState.currentTool === "fill"
         && runtimeState.interactionGranularity === "subdivision" && !runtimeState.brushModeEnabled) {
       const resolution = getFillTargetPolicy().resolveQuickFillPlan(feature, featureId);
       const zh = String(runtimeState.currentLanguage || "en").startsWith("zh");
@@ -14551,7 +14412,7 @@ function composeBrushInteractionSessionOwner() {
     nowMs,
     captureHistoryState,
     pushHistoryEntry,
-    isSovereigntyModeActive,
+
     addRecentColor,
     markDirty,
     refreshSidebarAfterPaint,
@@ -14854,7 +14715,7 @@ function initMap({
   facilityInfoCardMoreBtn = document.getElementById("facilityInfoCardMoreBtn");
   runtimeState.refreshColorStateFn = refreshColorState;
   runtimeState.recomputeDynamicBordersNowFn = recomputeDynamicBordersNow;
-  runtimeState.resolveSpecialZoneParentGroupTargetIdsFn = resolveSpecialZoneParentGroupTargetIds;
+  registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);
 
   if (!rendererSurfaceHost.getMapContainer()) {
     console.error("Map container not found.");

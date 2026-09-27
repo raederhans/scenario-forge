@@ -113,13 +113,11 @@ function createHarness(ids, runtimeOverrides = {}) {
       },
     },
     syncDayNightClockTimerCount: 0,
-    syncDayNightClockTimerFn() {
-      this.syncDayNightClockTimerCount += 1;
-    },
     ...runtimeOverrides,
   };
   const owner = createAppearanceTextureOwner({
     runtimeState,
+    syncDayNightClockTimer: () => { runtimeState.syncDayNightClockTimerCount += 1; },
     clamp: (value, min, max) => Math.min(max, Math.max(min, value)),
     normalizeOceanFillColor: (value) => String(value || "").toLowerCase(),
     renderDirty: (reason) => dirtyReasons.push(reason),

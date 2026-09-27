@@ -19,8 +19,8 @@ function privateFunction(file, name, globals = {}) {
 test('feature-only history scope unions both snapshots and rejects mixed/global effects', () => {
   const scope = privateFunction('../js/core/history_manager.js', 'getFeatureColorHistoryIds');
   assert.deepEqual(Array.from(scope({ before: { visualOverrides: { A: null } },
-    after: { featureOverrides: { B: '#123456' } } })), ['A', 'B']);
-  for (const key of ['styleConfig', 'sovereigntyByFeatureId', 'countryBaseColors', 'waterRegionOverrides', 'futureField']) {
+    after: { visualOverrides: { B: '#123456' } } })), ['A', 'B']);
+  for (const key of ['styleConfig', 'sovereigntyByFeatureId', 'sovereignBaseColors', 'waterRegionOverrides', 'futureField']) {
     assert.equal(scope({ before: { visualOverrides: { A: null } },
       after: { visualOverrides: { A: '#123456' }, [key]: {} } }), null);
   }
@@ -109,8 +109,8 @@ test('multi-feature undo/redo restores removals and supplies the union to the ex
   const calls = [];
   registerRuntimeHook(state, 'refreshColorStateFn', options => calls.push(options));
   clearHistory();
-  const before = { visualOverrides: { A: null, B: '#123456' }, featureOverrides: { A: null, B: null } };
-  const after = { visualOverrides: { A: '#e31ac4', B: null }, featureOverrides: { A: null, B: null } };
+  const before = { visualOverrides: { A: null, B: '#123456' } };
+  const after = { visualOverrides: { A: '#e31ac4', B: null } };
   // Seed the applied snapshot with the existing history entrypoint, without a singleton write.
   pushHistoryEntry({ before: after, after: originalColors });
   undoHistory();
@@ -159,8 +159,8 @@ test('feature-only history refreshes color and selection UI without rebuilding u
   trackedHooks.forEach(name => registerRuntimeHook(state, name, () => calls.push(name)));
   clearHistory();
   pushHistoryEntry({
-    before: { visualOverrides: { A: null }, featureOverrides: { A: null } },
-    after: { visualOverrides: { A: '#123456' }, featureOverrides: { A: '#123456' } },
+    before: { visualOverrides: { A: null } },
+    after: { visualOverrides: { A: '#123456' } },
     meta: { affectsSovereignty: false },
   });
   undoHistory();
@@ -208,8 +208,8 @@ test('mixed history retains broad UI refresh while retired ownership entries are
 
   clearHistory();
   pushHistoryEntry({
-    before: { visualOverrides: { A: null }, featureOverrides: { A: null }, waterRegionOverrides: { W: null } },
-    after: { visualOverrides: { A: '#123456' }, featureOverrides: { A: '#123456' }, waterRegionOverrides: { W: '#abcdef' } },
+    before: { visualOverrides: { A: null }, waterRegionOverrides: { W: null } },
+    after: { visualOverrides: { A: '#123456' }, waterRegionOverrides: { W: '#abcdef' } },
     meta: { affectsSovereignty: false },
   });
   undoHistory();
@@ -255,8 +255,9 @@ test('renderer uses local refresh only for resolved non-Atlantropa targets; exis
     { renderNow: false, waterRegionIds: ['atl-water'] },
     { renderNow: false, waterRegionIds: ['unknown'] }]) {
     calls.length = 0; refresh(options);
-    assert.deepEqual(calls.map(call => call[0]), ['normalize', 'full', 'invalidate']);
-    assert.equal(calls[2][1], 'contextScenario');
+    // Normalization is owned by the full rebuild rather than repeated here.
+    assert.deepEqual(calls.map(call => call[0]), ['full', 'invalidate']);
+    assert.equal(calls[1][1], 'contextScenario');
   }
 });
 

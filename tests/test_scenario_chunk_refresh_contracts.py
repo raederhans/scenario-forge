@@ -91,10 +91,10 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             self.render_phase_lifecycle_owner_source,
             re.compile(
                 r'const promotionWorkActive = PROMOTION_ACTIVE_STATUSES\.includes\(String\(pendingChunkRefreshStatus \|\| ""\)\);\s*'
-                r'if \(runGetter\(createTrace\(\), "shouldStartExactAfterSettleFastPath"\)\) \{\s*'
+                r'if \(runGetter\("shouldStartExactAfterSettleFastPath"\)\) \{\s*'
                 r"if \(promotionWorkActive\) return;[\s\S]*?"
-                r'runEffect\(createTrace\(\), "setDeferExactAfterSettle", true\);[\s\S]*?'
-                r'runEffect\(createTrace\(\), "scheduleExactAfterSettleRefresh", settleProfile\);',
+                r'runEffect\("setDeferExactAfterSettle", true\);[\s\S]*?'
+                r'runEffect\("scheduleExactAfterSettleRefresh", settleProfile\);',
                 re.S,
             ),
         )

@@ -65,7 +65,6 @@ function createHarness({
 } = {}) {
   const calls = {
     order: [],
-    funnel: [],
     effects: [],
     handlers: [],
   };
@@ -82,8 +81,6 @@ function createHarness({
     handleBrushPointerDown: createHandler("handleBrushPointerDown", calls),
     handleBrushPointerMove: createHandler("handleBrushPointerMove", calls),
     handleMouseLeave: createHandler("handleMouseLeave", calls),
-    dispatchMapClick: createHandler("dispatchMapClick", calls),
-    dispatchMapDoubleClick: createHandler("dispatchMapDoubleClick", calls),
     handleSidebarLayoutStart: createHandler("handleSidebarLayoutStart", calls),
     handleResize: createHandler("handleResize", calls),
     flushSpecialZoneMembershipDragSession: createHandler("flushSpecialZoneMembershipDragSession", calls),
@@ -95,12 +92,6 @@ function createHarness({
       getInteractionRect: () => interactionRect,
       getWindow: () => fakeWindow,
       getInteractionRectNode: () => node,
-    },
-    helpers: {
-      bindInteractionFunnel(options) {
-        calls.funnel.push(options);
-        calls.order.push("bindInteractionFunnel");
-      },
     },
     handlers,
     effects: {
@@ -129,35 +120,31 @@ test("bindEvents noops when interaction rect is missing", () => {
   const { calls, fakeWindow, node, owner } = createHarness({ includeInteractionRect: false });
 
   assert.equal(owner.bindEvents(), false);
-  assert.deepEqual(calls.funnel, []);
   assert.deepEqual(calls.effects, []);
   assert.equal(fakeWindow.listeners.size, 0);
   assert.equal(node.listeners.size, 0);
 });
 
-test("bindEvents wires interaction rect handlers and funnel dispatchers", () => {
+test("bindEvents wires interaction rect handlers directly to the injected click handlers", () => {
   const { calls, handlers, interactionRect, owner } = createHarness();
 
   assert.equal(owner.bindEvents(), true);
 
-  assert.equal(calls.funnel.length, 1);
-  assert.equal(calls.funnel[0].mapClick, handlers.mapClick);
-  assert.equal(calls.funnel[0].mapDoubleClick, handlers.mapDoubleClick);
   assert.equal(interactionRect.handlers.get("mousemove"), handlers.handleMouseMove);
   assert.equal(interactionRect.handlers.get("pointerdown.fieldTool"), handlers.handlePhysicalIntensityPointerDown);
   assert.equal(interactionRect.handlers.get("pointermove.fieldTool"), handlers.handlePhysicalIntensityPointerMove);
   assert.equal(interactionRect.handlers.get("mousedown.brush"), handlers.handleBrushPointerDown);
   assert.equal(interactionRect.handlers.get("mousemove.brush"), handlers.handleBrushPointerMove);
   assert.equal(interactionRect.handlers.get("mouseleave"), handlers.handleMouseLeave);
-  assert.equal(interactionRect.handlers.get("click"), handlers.dispatchMapClick);
-  assert.equal(interactionRect.handlers.get("dblclick"), handlers.dispatchMapDoubleClick);
+  assert.equal(interactionRect.handlers.get("click"), handlers.mapClick);
+  assert.equal(interactionRect.handlers.get("dblclick"), handlers.mapDoubleClick);
 
   interactionRect.dispatch("mouseleave", { type: "mouseleave" });
   interactionRect.dispatch("click", { type: "click" });
   interactionRect.dispatch("dblclick", { type: "dblclick" });
   assert.deepEqual(
     calls.handlers.map((entry) => entry.name),
-    ["handleMouseLeave", "dispatchMapClick", "dispatchMapDoubleClick"],
+    ["handleMouseLeave", "mapClick", "mapDoubleClick"],
   );
 });
 
@@ -216,4 +203,15 @@ test("factory freezes its exact public API", () => {
   const { owner } = createHarness();
 
   assert.equal(Object.isFrozen(owner), true);
+});
+
+ test("direct click bindings preserve event identity and asynchronous failures", async () => {
+  const { handlers, interactionRect, owner } = createHarness();
+  const event = { detail: 2, ctrlKey: true, shiftKey: true };
+  const failure = new Error("click failed");
+  handlers.mapClick = async (received) => { assert.equal(received, event); throw failure; };
+  handlers.mapDoubleClick = async (received) => { assert.equal(received, event); return "done"; };
+  owner.bindEvents();
+  await assert.rejects(interactionRect.dispatch("click", event), error => error === failure);
+  assert.equal(await interactionRect.dispatch("dblclick", event), "done");
 });

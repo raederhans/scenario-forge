@@ -56,47 +56,53 @@ class DevWorkspaceShellBuilderBoundaryContractTest(unittest.TestCase):
     def test_shell_builder_preserves_dom_surface_contracts(self):
         owner_content = DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
 
-        self.assertIn('id="devScenarioOwnershipPanel"', owner_content)
-        self.assertIn('id="devScenarioTagCreatorPanel"', owner_content)
+        self.assertNotIn('id="devScenarioOwnershipPanel"', owner_content)
+        self.assertNotIn('id="devScenarioTagCreatorPanel"', owner_content)
         self.assertIn('id="devScenarioDistrictPanel"', owner_content)
         self.assertIn('quickbar.id = "devWorkspaceQuickbar";', owner_content)
         self.assertIn('id="devQuickRebuildBordersBtn"', owner_content)
         self.assertIn('class="dev-workspace-quick-owner-controls"', owner_content)
         self.assertIn('id="devQuickRemoveSelectedBtn"', owner_content)
-        self.assertIn('id="devQuickUseTagBtn"', owner_content)
+        for readonly_id in [
+            "devQuickSelectionValue",
+            "devQuickTagValue",
+            "devQuickOwnerValue",
+            "devQuickControllerValue",
+        ]:
+            self.assertIn(f'id="{readonly_id}"', owner_content)
+        for retired_id in [
+            "devScenarioOwnerInput",
+            "devScenarioApplyOwnerBtn",
+            "devScenarioResetOwnerBtn",
+            "devScenarioSaveOwnersBtn",
+            "devQuickOwnerInput",
+            "devQuickUseTagBtn",
+            "devQuickApplyOwnerBtn",
+            "devQuickResetOwnerBtn",
+            "devQuickSaveOwnersBtn",
+        ]:
+            self.assertNotIn(f'id="{retired_id}"', owner_content)
         self.assertIn('applyDeclarativeTranslations(section);', owner_content)
         self.assertIn('applyDeclarativeTranslations(quickbar);', owner_content)
         self.assertNotIn('id="devScenarioTagCreatorHint"', owner_content)
         self.assertNotIn('id="devLocalRuntimeLabel"', owner_content)
         self.assertNotIn('id="devRuntimeMeta"', owner_content)
 
-    def test_quickbar_owner_controls_keep_compact_stacked_layout(self):
+    def test_quickbar_keeps_readonly_values_and_selection_removal(self):
         owner_content = DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        dist_owner_content = DIST_DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        css_content = STYLE_CSS.read_text(encoding="utf-8")
-        dist_css_content = DIST_STYLE_CSS.read_text(encoding="utf-8")
 
         for token in [
             'class="dev-workspace-quick-owner-controls"',
             'id="devQuickRemoveSelectedBtn"',
             'data-i18n="Remove Selection"',
-            'id="devQuickUseTagBtn"',
+            'id="devQuickSelectionValue"',
+            'id="devQuickTagValue"',
+            'id="devQuickOwnerValue"',
+            'id="devQuickControllerValue"',
         ]:
             self.assertIn(token, owner_content)
-            self.assertIn(token, dist_owner_content)
-
-        for token in [
-            ".dev-workspace-quick-owner-row {",
-            "grid-template-columns: minmax(96px, 1fr) minmax(120px, 0.82fr);",
-            ".dev-workspace-quick-owner-controls {",
-            "grid-template-rows: repeat(2, minmax(30px, 1fr));",
-            ".dev-workspace-quick-actions .btn-primary {",
-            ".dev-workspace-quick-owner-controls .btn-secondary {",
-            "white-space: normal;",
-            "font-size: 0.71rem;",
-        ]:
-            self.assertIn(token, css_content)
-            self.assertIn(token, dist_css_content)
+        for retired_id in ["devQuickOwnerInput", "devQuickUseTagBtn", "devQuickApplyOwnerBtn", "devQuickResetOwnerBtn", "devQuickSaveOwnersBtn"]:
+            self.assertNotIn(f'id="{retired_id}"', owner_content)
 
     def test_feature_inspector_duplicate_hint_is_removed(self):
         contents = [
@@ -131,15 +137,6 @@ class DevWorkspaceShellBuilderBoundaryContractTest(unittest.TestCase):
             self.assertNotIn(token, owner_content)
             self.assertNotIn(token, state_content)
 
-    def test_tag_creator_hint_copy_is_removed_from_controller(self):
-        owner_content = DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        controller_content = (REPO_ROOT / "js" / "ui" / "dev_workspace" / "scenario_tag_creator_controller.js").read_text(encoding="utf-8")
-
-        self.assertNotIn("devScenarioTagCreatorHint", owner_content)
-        self.assertNotIn("devScenarioTagCreatorHint", controller_content)
-        self.assertNotIn("resolveTagCreatorHint", controller_content)
-        self.assertNotIn("Create a new scenario tag, optionally set a parent owner", controller_content)
-
     def test_collapsed_dev_quickbar_keeps_usable_width(self):
         css_content = STYLE_CSS.read_text(encoding="utf-8")
 
@@ -171,71 +168,6 @@ class DevWorkspaceShellBuilderBoundaryContractTest(unittest.TestCase):
             "#devScenarioTagInspectorPanel .dev-workspace-actions > .btn-secondary,",
         ]:
             self.assertIn(token, css_content)
-
-    def test_tag_creator_panel_uses_compact_bottom_dock_layout(self):
-        owner_content = DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        css_content = STYLE_CSS.read_text(encoding="utf-8")
-
-        for token in [
-            'class="dev-scenario-tag-creator-head"',
-            'class="dev-workspace-meta dev-scenario-tag-creator-meta"',
-            'class="dev-workspace-form-grid dev-scenario-tag-creator-grid"',
-            'class="dev-workspace-form-field dev-workspace-form-field-span-2 dev-scenario-tag-color-field"',
-            'class="dev-workspace-actions dev-scenario-tag-creator-actions"',
-            'class="dev-workspace-note dev-scenario-tag-creator-status"',
-        ]:
-            self.assertIn(token, owner_content)
-
-        for token in [
-            "#devScenarioTagCreatorPanel {",
-            ".dev-scenario-tag-creator-head {",
-            "grid-template-columns: minmax(150px, 0.64fr) minmax(0, 1.36fr);",
-            ".dev-scenario-tag-creator-grid {",
-            "grid-template-columns: minmax(96px, 0.65fr) minmax(120px, 0.8fr) minmax(150px, 1fr);",
-            "#devScenarioTagCreatorPanel .dev-scenario-tag-color-field {",
-            "display: grid;",
-            ".dev-scenario-tag-color-field .dev-workspace-swatch-grid {",
-            "grid-template-columns: max-content minmax(0, 1fr);",
-            "grid-auto-flow: column;",
-            "grid-auto-columns: 24px;",
-            "overflow-x: auto;",
-            "overflow-y: hidden;",
-            "white-space: nowrap;",
-            ".dev-scenario-tag-color-field #devScenarioTagRecentWrap {",
-            ".dev-scenario-tag-color-field .dev-workspace-color-popover {",
-            "top: calc(100% + 6px);",
-            "grid-column: 1 / -1;",
-            ".dev-scenario-tag-creator-status:empty {",
-            "display: none;",
-        ]:
-            self.assertIn(token, css_content)
-
-    def test_tag_creator_compact_layout_is_synced_to_dist_app(self):
-        owner_content = DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        dist_owner_content = DIST_DEV_WORKSPACE_SHELL_BUILDER_JS.read_text(encoding="utf-8")
-        css_content = STYLE_CSS.read_text(encoding="utf-8")
-        dist_css_content = DIST_STYLE_CSS.read_text(encoding="utf-8")
-
-        for token in [
-            'class="dev-scenario-tag-creator-head"',
-            'id="devScenarioTagColorPopoverAnchor"',
-            'id="devScenarioTagColorPopover"',
-            'class="dev-workspace-actions dev-scenario-tag-creator-actions"',
-        ]:
-            self.assertIn(token, owner_content)
-            self.assertIn(token, dist_owner_content)
-
-        for token in [
-            "#devScenarioTagCreatorPanel {",
-            ".dev-scenario-tag-creator-grid {",
-            "#devScenarioTagCreatorPanel .dev-scenario-tag-color-field {",
-            "display: grid;",
-            "grid-template-columns: max-content minmax(0, 1fr);",
-            ".dev-scenario-tag-color-field .dev-workspace-color-popover {",
-            ".dev-scenario-tag-creator-status:empty {",
-        ]:
-            self.assertIn(token, css_content)
-            self.assertIn(token, dist_css_content)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
   "rebuildPrimaryPoliticalCollections",
   "recordCompositeCoverageDiagnostics",
   "sanitizeSetMapDataColorState",
-  "migrateLegacyColorState",
+
   "setCanvasSize",
   "buildRuntimePoliticalMeta",
   "resetSovereigntyInitialized",
@@ -127,7 +127,7 @@ export function createSetMapDataTransactionOwner({
     const politicalCollections = runEffect("rebuildPrimaryPoliticalCollections");
     runEffect("recordCompositeCoverageDiagnostics", politicalCollections);
     runEffect("sanitizeSetMapDataColorState");
-    runEffect("migrateLegacyColorState");
+
     runEffect("setCanvasSize");
     runEffect("buildRuntimePoliticalMeta");
     runEffect("resetSovereigntyInitialized");

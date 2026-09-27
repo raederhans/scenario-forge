@@ -15,13 +15,11 @@ export function coalesceQuickFillGesture(previous, next) {
   if (previous.meta?.affectsSovereignty || next.meta?.affectsSovereignty) return null;
   const id = first.featureId;
   const before = { ...next.before };
-  for (const field of ["visualOverrides", "featureOverrides"]) {
-    const oldBefore = previous.before?.[field];
-    const oldAfter = previous.after?.[field];
-    if (!oldBefore || !oldAfter || Object.keys(oldBefore).length !== 1 || !Object.hasOwn(oldBefore, id)) return null;
-    if (!Object.hasOwn(next.before?.[field] || {}, id) || oldAfter[id] !== next.before[field][id]) return null;
-    before[field] = { ...next.before[field], [id]: oldBefore[id] };
-  }
-  if (Object.keys(previous.before).some((key) => !["visualOverrides", "featureOverrides"].includes(key))) return null;
+  const oldBefore = previous.before?.visualOverrides;
+  const oldAfter = previous.after?.visualOverrides;
+  if (!oldBefore || !oldAfter || Object.keys(oldBefore).length !== 1 || !Object.hasOwn(oldBefore, id)) return null;
+  if (!Object.hasOwn(next.before?.visualOverrides || {}, id) || oldAfter[id] !== next.before.visualOverrides[id]) return null;
+  before.visualOverrides = { ...next.before.visualOverrides, [id]: oldBefore[id] };
+  if (Object.keys(previous.before).some((key) => key !== "visualOverrides")) return null;
   return { ...next, before };
 }

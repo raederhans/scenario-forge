@@ -603,15 +603,12 @@ class FileManager {
     // 这里宁可集中做一次 normalize，也不要让读取方承担多套历史字段和 UI 派生状态。
     const payload = {
       schemaVersion: 22,
-      countryBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
-      featureOverrides: appState.visualOverrides || appState.featureOverrides || {},
-      sovereignBaseColors: appState.sovereignBaseColors || appState.countryBaseColors || {},
-      visualOverrides: appState.visualOverrides || appState.featureOverrides || {},
+      sovereignBaseColors: appState.sovereignBaseColors || {},
+      visualOverrides: appState.visualOverrides || {},
       waterRegionOverrides: appState.waterRegionOverrides || {},
       specialZoneLayers: serializeSpecialZoneLayersState(appState.specialZoneLayers, {
         topologyFingerprint: resolveSpecialZoneTopologyFingerprint(appState),
       }),
-      sovereigntyByFeatureId: appState.sovereigntyByFeatureId || {},
       mapSemanticMode: normalizeMapSemanticMode(appState.mapSemanticMode),
       paintMode: normalizePaintMode(appState.paintMode),
       interactionGranularity: normalizeInteractionGranularity(appState.interactionGranularity),
@@ -782,21 +779,6 @@ class FileManager {
 
     // import 是旧 schema、缺省字段和 UI/场景派生状态重新归一化的唯一入口。
     // 回调拿到的必须已经是可直接进入运行时的稳定形态，避免把兼容判断分散到各个调用点。
-    // Backward compatibility: v1 only had `colors`.
-    if (data.colors && !data.featureOverrides && !data.countryBaseColors) {
-      data.featureOverrides = data.colors;
-      data.countryBaseColors = {};
-    }
-
-    if (!data.featureOverrides || typeof data.featureOverrides !== "object") {
-      data.featureOverrides = {};
-    }
-    if (!data.countryBaseColors || typeof data.countryBaseColors !== "object") {
-      data.countryBaseColors = {};
-    }
-    if (!data.visualOverrides || typeof data.visualOverrides !== "object") {
-      data.visualOverrides = data.featureOverrides;
-    }
     if (!data.waterRegionOverrides || typeof data.waterRegionOverrides !== "object") {
       data.waterRegionOverrides = {};
     }
@@ -811,12 +793,6 @@ class FileManager {
       topologyFingerprint: String(data.scenario?.baselineHash || "").trim(),
     });
     data.specialRegionOverrides = {};
-    if (!data.sovereignBaseColors || typeof data.sovereignBaseColors !== "object") {
-      data.sovereignBaseColors = data.countryBaseColors;
-    }
-    if (!data.sovereigntyByFeatureId || typeof data.sovereigntyByFeatureId !== "object") {
-      data.sovereigntyByFeatureId = {};
-    }
     delete data.scenarioControllersByFeatureId;
     data.mapSemanticMode = normalizeMapSemanticMode(data.mapSemanticMode);
     data.interactionGranularity = normalizeInteractionGranularity(data.interactionGranularity);

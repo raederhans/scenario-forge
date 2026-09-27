@@ -46,7 +46,6 @@ function harness(t, overrides = {}) {
     t: (value) => value,
     getView: () => ({ ...view }),
     getCountryState: () => null,
-    activateScenarioCountry: record("activate"),
     storeVisualOpen: record("storeOpen"),
     selectInspectorCountry: record("select"),
     getScenarioSubjectKindLabel: () => "Subject",
@@ -70,15 +69,10 @@ function harness(t, overrides = {}) {
     createEmptyNote: (text) => Object.assign(new Element(), { textContent: text }),
     renderRegionalPresets: record("presets"),
     normalizeCountryCode: (value) => String(value || "").trim().toUpperCase(),
-    getResolvedReleasableBoundaryVariant: () => ({ id: "base" }),
-    getScenarioCountryMeta: () => null,
-    applyReleasableBoundaryVariantSelection: record("variant"),
     getPrimaryReleasablePresetRef: () => ({ preset: { name: "Core A", ids: ["visible", "hidden"] } }),
     applyScenarioReleasableCoreTerritory: record("core"),
-    renderScenarioHistoricalTransfers: record("transfers"),
     selectedCountryActionsSection: host,
     scheduleAdaptiveInspectorHeights: record("schedule"),
-    setScenarioMapPaintMode: record("paintMode"),
     setScenarioVisualAdjustmentsOpen: record("open"),
     filterToVisibleFeatureIds: record("filter", { matchedIds: ["visible"] }),
     clearVisualOverridesForFeatureIds: record("clearCore", { changed: 1 }),
@@ -86,7 +80,6 @@ function harness(t, overrides = {}) {
     applyVisualColorToOwnedRegions: record("paintOwned", { changed: 1, matchedCount: 1 }),
     clearCountryVisualOverrides: record("clearOwned", { changed: 0 }),
     renderCountryColorSyncAffordance: record("colorSync"),
-    hasScenarioCoreTerritoryActions: (value) => !!value.releasable,
     ...overrides,
   };
   const controller = createScenarioInspectorController(deps);
@@ -137,7 +130,7 @@ test("core reference keeps visual actions while retired ownership actions are ab
 });
 
 test("non-releasable country retains reference painting without an ownership target action", (t) => {
-  const h = harness(t, { hasScenarioCoreTerritoryActions: () => true });
+  const h = harness(t);
   h.render(country());
   assert.ok(!nodes(h.root).some((node) => node.textContent === "Target This Country"));
   button(h.root, "Paint Reference Regions With Country Color").fire();

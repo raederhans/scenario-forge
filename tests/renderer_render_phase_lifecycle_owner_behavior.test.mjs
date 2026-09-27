@@ -142,36 +142,23 @@ function names(calls) {
   return calls.map((call) => call[0]);
 }
 
-test("clearRenderPhaseTimer clears an active timer handle and returns a frozen summary", () => {
+test("clearRenderPhaseTimer clears an active timer handle through injected effects", () => {
   const { owner, calls, state } = createHarness({ renderPhaseTimerId: "timer-a" });
 
-  const summary = owner.clearRenderPhaseTimer("manual-clear");
+  owner.clearRenderPhaseTimer();
 
   assert.deepEqual(calls, [
     ["getRenderPhaseTimerId"],
     ["clearTimeout", "timer-a"],
     ["setRenderPhaseTimerId", null],
-    ["getRenderPhase"],
   ]);
   assert.equal(state.renderPhaseTimerId, null);
-  assert.deepEqual(summary, {
-    phase: "idle",
-    previousPhase: "idle",
-    reason: "manual-clear",
-    timerScheduled: false,
-    timerCleared: true,
-    effectOrder: ["clearTimeout", "setRenderPhaseTimerId"],
-    getterOrder: ["getRenderPhaseTimerId", "getRenderPhase"],
-  });
-  assert.equal(Object.isFrozen(summary), true);
-  assert.equal(Object.isFrozen(summary.effectOrder), true);
-  assert.equal(Object.isFrozen(summary.getterOrder), true);
 });
 
 test("setRenderPhase enters interacting with exact write and effect order", () => {
   const { owner, calls, state } = createHarness({ renderPhase: "idle", dprStageChanged: true });
 
-  const summary = owner.setRenderPhase("interacting");
+  owner.setRenderPhase("interacting");
 
   assert.deepEqual(names(calls), [
     "getRenderPhase",
@@ -192,21 +179,12 @@ test("setRenderPhase enters interacting with exact write and effect order", () =
     reason: "phase-interacting-dpr-stage",
     targetPassesOnDprChange: ["political", "contextBase", "borders"],
   });
-  assert.deepEqual(summary.effectOrder, [
-    "setRenderPhaseValue",
-    "setPhaseEnteredAt",
-    "setIsInteracting",
-    "cancelPoliticalPathWarmup",
-    "setHoverOverlayDirty",
-    "updateDprStage",
-    "setCanvasSize",
-  ]);
 });
 
 test("setRenderPhase enters settling without interaction state", () => {
   const { owner, calls, state } = createHarness({ renderPhase: "interacting" });
 
-  const summary = owner.setRenderPhase("settling");
+  owner.setRenderPhase("settling");
 
   assert.equal(state.renderPhase, "settling");
   assert.equal(state.isInteracting, false);
@@ -216,7 +194,6 @@ test("setRenderPhase enters settling without interaction state", () => {
     "phase-settling",
   ]);
   assert.deepEqual(calls.find((call) => call[0] === "updateDprStage"), ["updateDprStage", "idle"]);
-  assert.equal(summary.previousPhase, "interacting");
 });
 
 test("setRenderPhase enters idle and flushes pending day-night refresh", () => {
@@ -225,8 +202,20 @@ test("setRenderPhase enters idle and flushes pending day-night refresh", () => {
     pendingDayNightRefresh: true,
   });
 
-  const summary = owner.setRenderPhase("idle");
+  owner.setRenderPhase("idle");
 
+  assert.deepEqual(names(calls), [
+    "getRenderPhase",
+    "nowMs",
+    "setRenderPhaseValue",
+    "setPhaseEnteredAt",
+    "setIsInteracting",
+    "setHoverOverlayDirty",
+    "hasPendingDayNightRefresh",
+    "setPendingDayNightRefresh",
+    "invalidateRenderPasses",
+    "updateDprStage",
+  ]);
   assert.equal(state.renderPhase, "idle");
   assert.equal(state.isInteracting, false);
   assert.equal(state.pendingDayNightRefresh, false);
@@ -235,11 +224,6 @@ test("setRenderPhase enters idle and flushes pending day-night refresh", () => {
     "invalidateRenderPasses",
     "dayNight",
     "day-night-clock-deferred",
-  ]);
-  assert.deepEqual(summary.getterOrder, [
-    "getRenderPhase",
-    "nowMs",
-    "hasPendingDayNightRefresh",
   ]);
 });
 
@@ -251,13 +235,12 @@ test("scheduleRenderPhaseIdle clears old timer and stores a new adaptive timer",
     settleProfile,
   });
 
-  const summary = owner.scheduleRenderPhaseIdle();
+  owner.scheduleRenderPhaseIdle();
 
   assert.deepEqual(names(calls), [
     "getRenderPhaseTimerId",
     "clearTimeout",
     "setRenderPhaseTimerId",
-    "getRenderPhase",
     "getAdaptiveSettleProfile",
     "setAdaptiveSettleProfile",
     "setTimeout",
@@ -266,25 +249,6 @@ test("scheduleRenderPhaseIdle clears old timer and stores a new adaptive timer",
   assert.equal(scheduledCallbacks.length, 1);
   assert.equal(state.renderPhaseTimerId, "timer-1");
   assert.equal(state.adaptiveSettleProfile, settleProfile);
-  assert.deepEqual(summary, {
-    phase: "interacting",
-    previousPhase: "interacting",
-    reason: "render-phase-idle",
-    timerScheduled: true,
-    timerCleared: true,
-    effectOrder: [
-      "clearTimeout",
-      "setRenderPhaseTimerId",
-      "setAdaptiveSettleProfile",
-      "setTimeout",
-      "setRenderPhaseTimerId",
-    ],
-    getterOrder: [
-      "getRenderPhaseTimerId",
-      "getRenderPhase",
-      "getAdaptiveSettleProfile",
-    ],
-  });
 });
 
 test("scheduleRenderPhaseIdle callback renders the normal idle path", () => {
@@ -354,13 +318,12 @@ test("resetRenderPhaseState restores idle phase timer fields through injected ef
     nowValues: [2222],
   });
 
-  const summary = owner.resetRenderPhaseState("init-map");
+  owner.resetRenderPhaseState();
 
   assert.deepEqual(names(calls), [
     "getRenderPhaseTimerId",
     "clearTimeout",
     "setRenderPhaseTimerId",
-    "getRenderPhase",
     "nowMs",
     "setRenderPhaseValue",
     "setPhaseEnteredAt",
@@ -370,14 +333,6 @@ test("resetRenderPhaseState restores idle phase timer fields through injected ef
   assert.equal(state.phaseEnteredAt, 2222);
   assert.equal(state.isInteracting, false);
   assert.equal(state.renderPhaseTimerId, null);
-  assert.equal(summary.timerCleared, true);
-  assert.deepEqual(summary.effectOrder, [
-    "clearTimeout",
-    "setRenderPhaseTimerId",
-    "setRenderPhaseValue",
-    "setPhaseEnteredAt",
-    "setIsInteracting",
-  ]);
 });
 
 test("createRenderPhaseLifecycleOwner fails fast for missing dependencies", () => {
@@ -410,5 +365,8 @@ test("render phase lifecycle owner stays outside broad render internals", () => 
     "renderer_render_lifecycle_owner",
   ]) {
     assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must avoid ${token}`);
+  }
+  for (const token of ["createTrace", "createSummary", "effectOrder", "getterOrder"]) {
+    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must not retain trace bookkeeping ${token}`);
   }
 });

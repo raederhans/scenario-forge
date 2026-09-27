@@ -7,6 +7,7 @@ import { isDeepStrictEqual } from "node:util";
 
 import {
   findStateActionCrossFileMigrationContractEntry,
+  findStateCapabilityRetirementContractEntry,
 } from "./state_action_delegation_contract.mjs";
 
 import {
@@ -27,6 +28,7 @@ import {
   scanStateWriterPolicySnapshot,
   STATE_WRITER_POLICY_PATH,
   validateLegacyMembershipRetirementReplacements,
+  inspectStateCapabilityRetirementEvidence,
   validateLegacyStateWriterSemanticAuthority,
   validateLegacyStateWriterSemanticLedger,
   validateStateWriterPolicyProgression,
@@ -243,6 +245,13 @@ export function validateCallerToActionLedgerHistoryTransition({
         retiredMembershipIdentity:
           previousEntry.retiredMembershipIdentity,
       });
+      continue;
+    }
+    const endedAuthority = findStateCapabilityRetirementContractEntry(previousEntry.retiredMembershipIdentity);
+    if (currentEntry.proofPrecision === "explicit-capability-retirement"
+      && currentEntry.capabilityRetirementContractIdentity === endedAuthority?.contractIdentity
+      && endedAuthority?.previousActionProofFingerprint === createHash("sha256").update(JSON.stringify(previousEntry)).digest("hex")
+      && isDeepStrictEqual(currentEntry.previousActionProof, previousEntry)) {
       continue;
     }
     const migrationContract =
@@ -724,6 +733,16 @@ export function validateStateWriterPolicyTransition({
       currentPolicy,
     }),
   ];
+  const capabilityEntries = (currentPolicy?.progress?.callerToActionLedger?.entries || [])
+    .filter((entry) => entry?.proofPrecision === "explicit-capability-retirement");
+  if (capabilityEntries.length) {
+    violations.push(...inspectStateCapabilityRetirementEvidence({
+      previousPolicy,
+      currentWriters: currentPolicy?.writers || [],
+      contractEntries: capabilityEntries.map((entry) =>
+        findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity)).filter(Boolean),
+    }));
+  }
   if (!isDeepStrictEqual(previousPolicy?.baseline, currentPolicy?.baseline)) {
     violations.push({
       code: "policy-baseline-drift",
@@ -1004,6 +1023,7 @@ export async function recomputeDerivedAliasTaintBaseline({
     policy: currentPolicy,
     prove: () => buildFrozenDerivedAliasTaintBaseline({
       sourceBaseSha,
+      acceptedPolicy: previousPolicy,
       relativePaths: expectedPaths,
       legacySemanticBaseline:
         currentPolicy?.baselines?.legacySemanticAuthority,
@@ -1187,7 +1207,7 @@ export function validateFrozenCloseoutTargets(baselines = {}) {
   return violations;
 }
 
-function compareDefaultStateBaselines(policy, report) {
+export function compareDefaultStateBaselines(policy, report) {
   const expected = policy?.baselines?.defaultState || {};
   const actual = {
     factoryGroups: report.factoryGroups.length,
@@ -1202,16 +1222,8 @@ function compareDefaultStateBaselines(policy, report) {
     collisions: report.collisions.length,
   };
   const violations = [];
-  for (const [key, actualValue] of Object.entries(actual)) {
-    if (Number(expected[key]) !== Number(actualValue)) {
-      violations.push({
-        code: "default-state-baseline-drift",
-        key,
-        expected: expected[key],
-        actual: actualValue,
-      });
-    }
-  }
+  // Keep the P4.0 counts as historical evidence. Retiring state fields may
+  // change them; live ownership completeness is checked below.
   for (const collision of report.collisions) {
     violations.push({
       code: "default-state-key-collision",

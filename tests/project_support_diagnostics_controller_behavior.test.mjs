@@ -599,6 +599,59 @@ test("scenario audit panel renders special zone runtime diagnostics in the right
   }
 });
 
+test("malformed diagnostics JSON uses the existing error state instead of displaying zero violations", async () => {
+  const previousDocument = globalThis.document;
+  const previousFetch = globalThis.fetch;
+  const previousConsoleError = console.error;
+  const previousActiveScenarioId = state.activeScenarioId;
+  const previousScenarioAuditUi = state.scenarioAuditUi;
+  const previousScenarioDiagnosticsUi = state.scenarioDiagnosticsUi;
+  const previousScenarioAudit = state.scenarioAudit;
+  const previousScenarioDiagnostics = state.scenarioDiagnostics;
+  const previousScenarioDiagnosticsPreview = state.scenarioDiagnosticsPreview;
+  const scenarioAuditSection = createElementNode("section");
+  const controller = createController(createStatusNode(), {
+    elements: { scenarioAuditSection },
+    helpers: {
+      createEmptyNote: (message) => Object.assign(createElementNode("div"), { textContent: String(message || "") }),
+    },
+  });
+
+  try {
+    globalThis.document = { createElement: createElementNode };
+    globalThis.fetch = async () => ({ ok: true, json: async () => { throw new SyntaxError("Invalid JSON"); } });
+    console.error = () => {};
+    state.activeScenarioId = "hoi4_1936";
+    state.scenarioAuditUi = {};
+    state.scenarioDiagnosticsUi = {};
+    state.scenarioAudit = null;
+    state.scenarioDiagnostics = null;
+    state.scenarioDiagnosticsPreview = null;
+
+    controller.renderScenarioAuditPanel();
+    const button = findNode(scenarioAuditSection, (node) => node.textContent === "Load Diagnostics");
+    assert.ok(button);
+    await button.listeners.click();
+
+    assert.equal(state.scenarioDiagnostics, null);
+    assert.equal(state.scenarioDiagnosticsPreview, null);
+    assert.equal(state.scenarioDiagnosticsUi.loading, false);
+    assert.equal(state.scenarioDiagnosticsUi.errorMessage, "Invalid JSON");
+    assert.match(getNodeText(scenarioAuditSection), /Unable to load diagnostics: Invalid JSON/);
+    assert.doesNotMatch(getNodeText(scenarioAuditSection), /Forbidden\s+0/);
+  } finally {
+    state.activeScenarioId = previousActiveScenarioId;
+    state.scenarioAuditUi = previousScenarioAuditUi;
+    state.scenarioDiagnosticsUi = previousScenarioDiagnosticsUi;
+    state.scenarioAudit = previousScenarioAudit;
+    state.scenarioDiagnostics = previousScenarioDiagnostics;
+    state.scenarioDiagnosticsPreview = previousScenarioDiagnosticsPreview;
+    globalThis.document = previousDocument;
+    globalThis.fetch = previousFetch;
+    console.error = previousConsoleError;
+  }
+});
+
 test("legend generator config changes mark the project dirty", () => {
   const previousDocument = globalThis.document;
   const previousDirty = state.isDirty;

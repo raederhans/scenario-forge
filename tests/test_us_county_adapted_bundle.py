@@ -375,7 +375,7 @@ process.stdout.write(JSON.stringify(results));
             old, retained, _ = case['entries']
             children = case['contract']['crosswalk'][old]
             expected = {**{child: 'EDIT' for child in children}, retained: 'KEEP', 'CAN-1': 'OTHER'}
-            self.assertEqual(result['data']['sovereigntyByFeatureId'], expected)
+            self.assertNotIn('sovereigntyByFeatureId', result['data'])
             self.assertEqual(result['data']['visualOverrides'], expected)
             self.assertEqual(result['data']['customPresets']['test'][0]['ids'], [*children, retained, 'CAN-1'])
         with self.assertRaisesRegex(ValueError, 'distinct baseline hashes'):

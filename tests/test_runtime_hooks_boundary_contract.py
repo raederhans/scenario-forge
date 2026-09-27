@@ -165,7 +165,7 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         hover_start = renderer_content.index("function handleMouseMove(event) {")
         hover_end = renderer_content.index("function addRecentColor(color) {", hover_start)
         hover_body = renderer_content[hover_start:hover_end]
-        self.assertIn("getMapHoverInteractionOwner().handleMouseMove(event);", hover_body)
+        self.assertIn("getMapHoverInteractionOwner().scheduleMouseMove(event);", hover_body)
         self.assertIn('"inspectHgoRuntimePreviewFromEvent"', hover_owner_content)
         self.assertIn('getterApi.inspectHgoRuntimePreviewFromEvent(event, { eventType: "hover" });', hover_owner_content)
         self.assertIn('if (hgoRuntimeHover?.active) {', hover_owner_content)

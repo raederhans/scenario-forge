@@ -58,6 +58,7 @@ import {
   findStateActionDelegationContractEntry,
   findStateActionCrossFileMigrationContractEntry,
   findStateActionSuccessorProofContractEntry,
+  findStateCapabilityRetirementContractEntry,
   validateStateActionCrossFileMigrationContract,
 } from "./state_action_delegation_contract.mjs";
 import {
@@ -1001,6 +1002,7 @@ function isRegisteredP4Phase(value) {
 }
 
 function callerToActionLedgerEntryProofs(entry = {}) {
+  if (entry?.proofPrecision === "explicit-capability-retirement") return [];
   const firstHopProofs = Array.isArray(entry?.functionProofs)
     ? entry.functionProofs.map((proof) => ({
       ...entry,
@@ -1112,6 +1114,46 @@ function validateCallerToActionLedgerSchema(policy = {}) {
       );
     }
     seenRetiredMemberships.add(retiredMembershipIdentity);
+    if (entry?.proofPrecision === "explicit-capability-retirement") {
+      const contract = findStateCapabilityRetirementContractEntry(retiredMembershipIdentity);
+      const expected = contract ? {
+        retiredMembershipIdentity,
+        retiredCallerPath: contract.modulePath,
+        retiredCallerBindingIdentity: contract.bindingIdentity,
+        retiredMutationSiteFingerprint: contract.retiredMutationSiteFingerprint,
+        retiredMutationSiteCount: contract.retiredMutationSiteCount,
+        proofPrecision: "explicit-capability-retirement",
+        capabilityRetirementContractIdentity: contract.contractIdentity,
+        previousSourceRevision: contract.previousSourceRevision,
+        previousSourceFingerprint: contract.previousSourceFingerprint,
+        currentSourceFingerprint: contract.currentSourceFingerprint,
+        domain: contract.domain,
+        migrationPhase: contract.migrationPhase,
+        operation: contract.operation,
+        key: contract.key,
+        retiredInPhase: entry.retiredInPhase,
+        recordedInPhase: entry.recordedInPhase,
+        backfilled: contract.previousActionProofFingerprint ? entry.previousActionProof?.backfilled : false,
+        ...(contract.previousActionProofFingerprint ? { previousActionProof: entry.previousActionProof } : {}),
+      } : null;
+      const priorActionValid = !contract?.previousActionProofFingerprint || (
+        entry.previousActionProof
+        && createHash("sha256").update(JSON.stringify(entry.previousActionProof)).digest("hex") === contract.previousActionProofFingerprint
+        && entry.retiredInPhase === entry.previousActionProof.retiredInPhase
+        && entry.recordedInPhase === entry.previousActionProof.recordedInPhase
+      );
+      const phaseValid = isRegisteredP4Phase(String(entry?.retiredInPhase || ""))
+        && compareP4StateActionPhases(entry.retiredInPhase, entry.recordedInPhase) <= 0
+        && compareP4StateActionPhases(entry.recordedInPhase, latestPhase) <= 0;
+      if (!expected || ledgerSchemaVersion !== 3 || !phaseValid || !priorActionValid
+        || !retiredMemberships.has(retiredMembershipIdentity)
+        || JSON.stringify(entry) !== JSON.stringify(expected)) {
+        violations.push(createViolation("caller-action-ledger-entry-invalid", {
+          index, retiredMembershipIdentity, reason: "capability-retirement-proof-invalid",
+        }));
+      }
+      continue;
+    }
     const functionProofs = Array.isArray(entry?.functionProofs)
       ? entry.functionProofs
       : null;

@@ -5,6 +5,10 @@ test.setTimeout(90_000);
 
 async function gotoDevWorkspace(page) {
   await page.goto(getAppUrl(), { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => {
+    const overlay = document.getElementById("bootOverlay");
+    return !overlay || overlay.classList.contains("hidden");
+  });
   await expect.poll(
     async () => page.evaluate(async () => {
       const { state } = await import("/js/core/state.js");
@@ -12,13 +16,13 @@ async function gotoDevWorkspace(page) {
     }),
     { timeout: 30_000 }
   ).toBe(true);
-  await page.evaluate(async () => {
-    const { state } = await import("/js/core/state.js");
-    state.ui.devWorkspaceCategory = "scenario";
-    state.setDevWorkspaceExpandedFn?.(true);
-  });
+  const developerModeBtn = page.locator("#developerModeBtn");
+  if ((await developerModeBtn.getAttribute("aria-pressed")) !== "true") {
+    await developerModeBtn.click();
+  }
   await expect(page.locator("#devWorkspacePanel")).toBeVisible();
-  await expect(page.locator("#devScenarioTagCreatorLabel")).toBeVisible();
+  await page.locator("#devWorkspaceTabScenario").click();
+  await expect(page.locator("#devScenarioTagCreatorPanel")).toHaveCount(0);
 }
 
 async function installRenderBoundarySpy(page) {
@@ -58,69 +62,51 @@ async function readBoundarySpy(page) {
   }));
 }
 
-test("@dev dev workspace local selection and inspector actions flush through render boundary", async ({ page }) => {
+test("@dev dev workspace selection and visible tag inspector actions preserve behavior", async ({ page }) => {
   await gotoDevWorkspace(page);
   await installRenderBoundarySpy(page);
 
-  const featureId = await page.evaluate(async () => {
+  const { featureId, nextTag } = await page.evaluate(async () => {
     const state = globalThis.__pwDevWorkspaceBoundary.state;
-    const { shouldExcludeScenarioPoliticalFeature } = await import("/js/core/sovereignty_manager.js");
+    const { shouldExcludeScenarioPoliticalFeature, getFeatureIdsForOwner } = await import("/js/core/sovereignty_manager.js");
     const nextFeatureId = Array.from(state.landIndex?.entries?.() || []).find(([id, feature]) => (
       !!id && feature && !shouldExcludeScenarioPoliticalFeature(feature, id)
     ))?.[0] || "";
-    state.activeScenarioId = "dev_workspace_boundary_test";
-    state.activeScenarioManifest = {
-      display_name: "Dev Workspace Boundary Test",
-    };
-    state.scenarioCountriesByTag = {
-      AAA: {
-        tag: "AAA",
-        display_name: "Alpha",
-        display_name_en: "Alpha",
-        display_name_zh: "阿尔法",
-        feature_count: 1,
-      },
-      BBB: {
-        tag: "BBB",
-        display_name: "Beta",
-        display_name_en: "Beta",
-        display_name_zh: "贝塔",
-        feature_count: 1,
-      },
-    };
+    const tags = Object.keys(state.scenarioCountriesByTag || {})
+      .filter(tag => getFeatureIdsForOwner(tag).length > 0);
+    if (tags.length < 2) throw new Error("Tag inspector requires two populated scenario countries.");
     state.devSelectionFeatureIds = new Set(nextFeatureId ? [nextFeatureId] : []);
     state.devSelectionOrder = nextFeatureId ? [nextFeatureId] : [];
     state.devSelectedHit = nextFeatureId ? { id: nextFeatureId, targetType: "land" } : null;
     state.devScenarioTagInspector = {
       ...(state.devScenarioTagInspector || {}),
-      selectedTag: "AAA",
-      threshold: 3,
+      selectedTag: tags[0],
+      threshold: state.landIndex.size,
     };
-    state.selectedInspectorCountryCode = "AAA";
-    state.inspectorHighlightCountryCode = "AAA";
+    state.selectedInspectorCountryCode = tags[0];
+    state.inspectorHighlightCountryCode = tags[0];
     state.updateDevWorkspaceUIFn?.();
-    return nextFeatureId;
+    return { featureId: nextFeatureId, nextTag: tags[1] };
   });
 
   expect(featureId).not.toBe("");
 
-  await page.evaluate(() => {
-    document.getElementById("devScenarioClearTagSelectionBtn")?.click();
-  });
-  await expect.poll(async () => (await readBoundarySpy(page)).flushes).toContain(
-    "dev-workspace-tag-clear-target"
-  );
-  expect(
-    await page.evaluate(() => globalThis.__pwDevWorkspaceBoundary.state.devSelectedHit)
-  ).toBeNull();
+  await expect(page.locator("#devScenarioCountryPanel")).toBeVisible();
+  await page.locator("#devWorkspaceTabSelection").click();
+  await expect(page.locator("#devSelectionToggleSelectedBtn")).toBeVisible();
+  await expect(page.locator("#devScenarioTagInspectorPanel")).toBeVisible();
+  await page.locator("#devSelectionToggleSelectedBtn").click();
+  await expect.poll(async () => page.evaluate((selectedFeatureId) => (
+    globalThis.__pwDevWorkspaceBoundary.state.devSelectionFeatureIds.has(selectedFeatureId)
+  ), featureId)).toBe(false);
 
+  await page.locator("#devWorkspaceTabScenario").click();
+  await expect(page.locator("#devScenarioCountryPanel")).toBeVisible();
+  await page.locator("#devWorkspaceTabSelection").click();
+  await expect(page.locator("#devScenarioTagInspectorPanel")).toBeVisible();
   await resetBoundarySpy(page);
-  await page.evaluate(() => {
-    const select = document.getElementById("devScenarioTagInspectorSelect");
-    if (!(select instanceof HTMLSelectElement)) return;
-    select.value = "BBB";
-    select.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+
+  await page.locator("#devScenarioTagInspectorSelect").selectOption(nextTag);
   await expect.poll(async () => (await readBoundarySpy(page)).flushes).toContain(
     "dev-workspace-tag-inspector-select"
   );
@@ -128,14 +114,12 @@ test("@dev dev workspace local selection and inspector actions flush through ren
     selected: globalThis.__pwDevWorkspaceBoundary.state.selectedInspectorCountryCode,
     highlight: globalThis.__pwDevWorkspaceBoundary.state.inspectorHighlightCountryCode,
   }))).toEqual({
-    selected: "BBB",
-    highlight: "BBB",
+    selected: nextTag,
+    highlight: nextTag,
   });
 
   await resetBoundarySpy(page);
-  await page.evaluate(() => {
-    document.getElementById("devScenarioTagInspectorClearHighlightBtn")?.click();
-  });
+  await page.locator("#devScenarioTagInspectorClearHighlightBtn").click();
   await expect.poll(async () => (await readBoundarySpy(page)).flushes).toContain(
     "dev-workspace-tag-inspector-clear-highlight"
   );

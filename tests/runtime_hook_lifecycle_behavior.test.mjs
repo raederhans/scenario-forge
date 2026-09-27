@@ -60,6 +60,29 @@ test("required commands fail when absent, preserve arguments/results/errors, and
   release();
 });
 
+test("unknown hook registration and dispatch fail instead of silently losing commands", () => {
+  const target = { ordinaryField: true };
+  assert.throws(() => registerRuntimeHook(target, "misspelledHookFn", () => {}), /Unknown runtime hook/);
+  assert.throws(() => callRuntimeHook(target, "misspelledHookFn"), /Unknown runtime hook/);
+  assert.deepEqual(Object.keys(target), ["ordinaryField"]);
+});
+
+test("internal renderer commands and first-frame checkpoint dispatch without adding state properties", () => {
+  for (const name of ["noteFirstVisibleFramePaintedFn", "syncDayNightClockTimerFn", "resolveSpecialZoneParentGroupTargetIdsFn"]) {
+    const payload = { featureId: "A" };
+    const dispose = registerOwnedRuntimeHook(null, name, received => {
+      assert.equal(received, payload);
+      return payload;
+    });
+    try {
+      assert.equal(callRuntimeHook(null, name, payload), payload);
+    } finally {
+      dispose();
+    }
+    assert.equal(callRuntimeHook(null, name, payload), undefined);
+  }
+});
+
 const source = fs.readFileSync(new URL("../js/ui/scenario_controls.js", import.meta.url), "utf8")
   .replace(/^import[\s\S]*?from "[^"]+";\r?\n/gm, "")
   .replace("export function initScenarioControls", "function initScenarioControls");

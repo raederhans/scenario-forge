@@ -233,12 +233,10 @@ export const RENDERER_FRAME_ORCHESTRATION_RECORDS = [
     "selector": {}
   },
   {
-    "id": "direct:renderer-render-snapshot-change-set-contracts",
-    "commandRef": "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
+    "id": "direct:renderer-render-snapshot-contracts",
+    "commandRef": "node --test tests/render_snapshot_behavior.test.mjs",
     "sourceRefs": [
-      "js/core/render_change_set.js",
       "js/core/renderer/render_snapshot.js",
-      "tests/render_change_set_behavior.test.mjs",
       "tests/render_snapshot_behavior.test.mjs"
     ],
     "ownerHints": [
@@ -339,7 +337,6 @@ export const RENDERER_FRAME_ORCHESTRATION_RECORDS = [
     "commandRef": "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
     "sourceRefs": [
       "js/core/map_renderer.js",
-      "js/core/render_change_set.js",
       "js/core/renderer/render_snapshot.js",
       "tests/test_map_renderer_render_snapshot_boundary_contract.py"
     ],

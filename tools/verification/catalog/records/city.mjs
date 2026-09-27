@@ -558,45 +558,6 @@ export const CITY_RECORDS = [
     "selector": {}
   },
   {
-    "id": "node:test:node:thematic-admin-metrics-loader",
-    "commandRef": "test:node:thematic-admin-metrics-loader",
-    "sourceRefs": [
-      "tests/thematic_admin_metrics_loader_behavior.test.mjs",
-      "data/thematic_layers/political/state_capacity_demo/manifest.json",
-      "data/thematic_layers/political/state_capacity_demo/metrics.admin0.json",
-      "data/thematic_layers/political/wgi_state_capacity_v1/manifest.json",
-      "data/thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json",
-      "data/thematic_layers/population/population_density_demo/manifest.json",
-      "js/core/data_service.js",
-      "js/core/thematic_admin_metrics_loader.js"
-    ],
-    "ownerHints": [
-      "city-runtime"
-    ],
-    "domains": [
-      "city-runtime"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 178,
-    "verification": null,
-    "selector": {}
-  },
-  {
     "id": "node:test:node:thematic-layer-catalog",
     "commandRef": "test:node:thematic-layer-catalog",
     "sourceRefs": [

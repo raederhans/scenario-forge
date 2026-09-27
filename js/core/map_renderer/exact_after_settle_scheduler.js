@@ -46,7 +46,6 @@ function createExactAfterSettleScheduler({
   prepareRenderPassAsync = () => null,
   getPhysicalExactRefreshPasses,
   invalidateRenderPasses,
-  rebuildResolvedColors,
   requestRendererRender,
   render,
   recordRenderPerfMetric,
@@ -221,9 +220,6 @@ function createExactAfterSettleScheduler({
     const timings = {};
     const cache = getRenderPassCacheState();
     const passStartedAt = nowMs();
-    if (runtimeState.legacyColorStateDirty) {
-      rebuildResolvedColors();
-    }
 
     const enqueueNextPass = (index, activePlan) => {
       if (index >= definitions.length) {

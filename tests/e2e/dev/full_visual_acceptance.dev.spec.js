@@ -701,9 +701,7 @@ async function applyPoliticalFillEdit(page) {
     }
     if (!selected) return { error: "no-edit-probe" };
     state.visualOverrides = state.visualOverrides || {};
-    state.featureOverrides = state.featureOverrides || {};
     state.visualOverrides[selected.featureId] = color;
-    state.featureOverrides[selected.featureId] = color;
     refreshResolvedColorsForFeatures([selected.featureId], { renderNow: false });
     refreshMapDataForScenarioChunkPromotion({
       reason: "stage5-fill-edit",

@@ -4,8 +4,7 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require("./support
 async function expectDockCommandsToFit(page, width) {
   const ids = ["toolFillBtn", "toolEraserBtn", "toolEyedropperBtn", "brushModeBtn",
     "undoBtn", "redoBtn", "presetPolitical", "paintModeVisualBtn", "selectedColorPreview"];
-  await expect(page.locator("#paintModePoliticalBtn")).toBeHidden();
-  await expect(page.locator("#paintModePoliticalBtn")).toBeDisabled();
+  await expect(page.locator("#paintModePoliticalBtn")).toHaveCount(0);
   const boxes = [];
   for (const id of ids) {
     const control = page.locator(`#${id}`);

@@ -22,8 +22,8 @@ function fixture({ blank = false } = {}) {
     countryToFeatureIds: new Map([["GB", ["a", "b", "c"]]]),
     landIndex: new Map(["a", "b", "c"].map(id => [id, feature(id)])),
     hierarchyData: { groups: { GB_north: ["a", "b", "c"] } },
-    sovereignBaseColors: { "2RA": "#111111", GB: "#222222" }, countryBaseColors: {},
-    visualOverrides: {}, featureOverrides: {},
+    sovereignBaseColors: { "2RA": "#111111", GB: "#222222" },
+    visualOverrides: {},
     currentTool: "fill", interactionGranularity: "country", batchFillScope: "country",
   };
   const helpers = {

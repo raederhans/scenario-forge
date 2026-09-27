@@ -1532,56 +1532,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 module_graph=empty_graph,
             )
 
-    def test_appearance_transport_contract_modules_have_exact_product_ownership(self) -> None:
-        reachable_graph = {
-            "schema_version": build_pages_dist.PAGES_REACHABILITY_SCHEMA_VERSION,
-            "module_entrypoint": build_pages_dist.PAGES_MODULE_ENTRYPOINT,
-            "entrypoints": [],
-            "summary": {},
-            "initial_resource_paths": [],
-            "deferred_resource_paths": [],
-            "nodes": [
-                {
-                    "path": "app/js/core/appearance_transport_change_set.js",
-                    "load_phase": "initial",
-                },
-                {
-                    "path": "app/js/core/appearance_transport_change_set_contract.js",
-                    "load_phase": "deferred-runtime",
-                },
-                {
-                    "path": "app/js/core/appearance_transport_operation.js",
-                    "load_phase": "deferred-runtime",
-                },
-            ],
-            "unresolved_references": [],
-        }
-        expected_paths = {
-            "app/js/core/appearance_transport_change_set.js",
-            "app/js/core/appearance_transport_change_set_contract.js",
-            "app/js/core/appearance_transport_operation.js",
-        }
-        rule = next(
-            rule
-            for rule in build_pages_dist.PAGES_PRODUCT_INVENTORY_RULES
-            if rule["id"] == "appearance-transport-contract-modules"
-        )
-        self.assertEqual(set(rule["paths"]), expected_paths)
-        self.assertEqual(rule["category"], "on-demand-product")
-        self.assertEqual(rule["owner"], "appearance-transport-contract")
-        self.assertTrue(rule["override_reachability"])
-
-        for path in sorted(expected_paths):
-            with self.subTest(path=path):
-                self.assertEqual(
-                    build_pages_dist._classify_pages_dist_path(path, reachable_graph),
-                    (
-                        "on-demand-product",
-                        "appearance-transport-contract",
-                        "product-registry:appearance-transport-contract-modules",
-                    ),
-                )
-
     def test_shared_production_publication_policy_rejects_scenario_and_transport_nonproducts(self) -> None:
         empty_graph = {
             "schema_version": build_pages_dist.PAGES_REACHABILITY_SCHEMA_VERSION,

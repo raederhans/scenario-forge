@@ -80,7 +80,7 @@ function createLifecycleRuntime(runtimeState, overrides = {}) {
     getScenarioDefaultCountryCode: () => "FR",
     getScenarioMapSemanticMode: () => "countries",
     markDirty: () => {},
-    markLegacyColorStateDirty: () => {},
+    disableScenarioParentBorders: () => {},
     normalizeScenarioId: (value) => String(value || "").trim(),
     releaseScenarioAuditPayload: () => {},
     resetScenarioChunkRuntimeState: () => {},
@@ -152,9 +152,7 @@ function createBaseState(overrides = {}) {
     sovereigntyByFeatureId: { A: "FR", B: "DE" },
     sovereigntyInitialized: true,
     visualOverrides: { A: "#fff" },
-    featureOverrides: { A: { color: "#fff" } },
     sovereignBaseColors: { FR: "#00f" },
-    countryBaseColors: { FR: "#00f" },
     activeSovereignCode: "FR",
     parentBordersVisible: true,
     parentBorderEnabledByCountry: { FR: true, DE: true },
@@ -446,7 +444,7 @@ function createApplyPipelineForRuntimeTest(runtimeState, overrides = {}) {
     applyBlankScenarioPresentationDefaults: () => {},
     setScenarioAuditUiState: () => {},
     getScenarioBaselineHashFromBundle: (bundle) => bundle?.manifest?.baseline_hash || "baseline",
-    markLegacyColorStateDirty: () => {},
+    disableScenarioParentBorders: () => {},
     syncScenarioInspectorSelection: () => {},
     disableScenarioParentBorders: () => {},
     applyScenarioPaintMode: () => {},
@@ -750,7 +748,7 @@ test("scenario apply staging rejects unrenderable political runtime topology bef
     applyBlankScenarioPresentationDefaults: () => {},
     setScenarioAuditUiState: () => {},
     getScenarioBaselineHashFromBundle: () => "baseline",
-    markLegacyColorStateDirty: () => {},
+    disableScenarioParentBorders: () => {},
     syncScenarioInspectorSelection: () => {},
     disableScenarioParentBorders: () => {},
     applyScenarioPaintMode: () => {},
@@ -944,7 +942,7 @@ test("scenario palette publication waits for a validated commit and rollback kee
       applyPaletteBaseline();
       const rollbackPipeline = createApplyPipelineForRuntimeTest(appState, {
         ...configurePaletteStage(),
-        markLegacyColorStateDirty: () => {
+        disableScenarioParentBorders: () => {
           throw new Error("post-commit rollback");
         },
       });
@@ -1195,7 +1193,6 @@ test("scenario activation validator failure commits no state and publishes no ob
     },
     syncScenarioLocalizationState: () => observerEvents.push("localization"),
     setScenarioAuditUiState: () => observerEvents.push("audit"),
-    markLegacyColorStateDirty: () => observerEvents.push("legacy-color"),
   });
   const bundle = createScenarioApplyBundleForRuntimeTest("validator_target");
   const staged = await pipeline.prepareScenarioApplyState(bundle, { syncPalette: false });
@@ -1231,7 +1228,7 @@ test("scenario activation restores the complete snapshot when a post-commit obse
       restoreScenarioTransactionState(model, snapshot);
     },
     validateScenarioActivationCommitState: () => true,
-    markLegacyColorStateDirty: () => {
+    disableScenarioParentBorders: () => {
       throw new Error("injected post-commit observer failure");
     },
   });
@@ -1285,7 +1282,7 @@ test("default activation rollback restores localization, audit, and blank defaul
         errorMessage: "",
       };
     },
-    markLegacyColorStateDirty: () => {
+    disableScenarioParentBorders: () => {
       throw new Error("injected observer failure after localization");
     },
   });
@@ -1802,7 +1799,7 @@ test("scenario apply normalizes bundled strategic values before commit", async (
   assert.equal(runtimeState.scenarioStrategicValuesRevision, 1);
 });
 
-test("scenario apply includes external political owner codes in base color mirrors", async () => {
+test("scenario apply includes external political owner codes in canonical base colors", async () => {
   const ownerCodes = ["CF", "CG", "CM", "CY", "EH", "GA", "MT", "TW", "VA"];
   const runtimeState = createBaseState({
     activeScenarioId: "",
@@ -1874,7 +1871,6 @@ test("scenario apply includes external political owner codes in base color mirro
   assert.equal(runtimeState.sovereignBaseColors.GER, "#222222");
   for (const code of ownerCodes) {
     assert.match(runtimeState.sovereignBaseColors[code], /^#[0-9a-f]{6}$/);
-    assert.equal(runtimeState.countryBaseColors[code], runtimeState.sovereignBaseColors[code]);
   }
   assert.equal(runtimeState.sovereignBaseColors.CF, "#224466");
   assert.equal(runtimeState.sovereignBaseColors.CM, "#335577");
@@ -1948,12 +1944,8 @@ test("scenario apply gives every TNO 1962 runtime political owner code a base co
   }
   const missingSovereignColors = ownerCodes
     .filter((code) => !/^#[0-9a-f]{6}$/.test(String(runtimeState.sovereignBaseColors?.[code] || "")));
-  const missingCountryColors = ownerCodes
-    .filter((code) => !/^#[0-9a-f]{6}$/.test(String(runtimeState.countryBaseColors?.[code] || "")));
   assert.deepEqual(missingSovereignColors.slice(0, 20), [], `missing sovereign colors: ${missingSovereignColors.slice(0, 20).join(", ")}`);
   assert.equal(missingSovereignColors.length, 0);
-  assert.deepEqual(missingCountryColors.slice(0, 20), [], `missing country colors: ${missingCountryColors.slice(0, 20).join(", ")}`);
-  assert.equal(missingCountryColors.length, 0);
 });
 
 test("blank scenario apply preserves ownerless editable runtime topology", async () => {
@@ -2026,7 +2018,6 @@ test("blank scenario apply preserves ownerless editable runtime topology", async
     applyBlankScenarioPresentationDefaults: () => phaseEvents.push(`observer:blank:${runtimeState.activeScenarioId}`),
     setScenarioAuditUiState: () => phaseEvents.push(`observer:audit:${runtimeState.activeScenarioId}`),
     getScenarioBaselineHashFromBundle: () => "blank-baseline",
-    markLegacyColorStateDirty: () => phaseEvents.push(`post:legacy:${runtimeState.activeScenarioId}`),
     syncScenarioInspectorSelection: (code) => phaseEvents.push(`post:inspector:${runtimeState.activeScenarioId}:${code}`),
     disableScenarioParentBorders: () => phaseEvents.push(`post:borders:${runtimeState.activeScenarioId}`),
     applyScenarioPaintMode: () => phaseEvents.push(`post:paint:${runtimeState.activeScenarioId}`),
@@ -2058,7 +2049,6 @@ test("blank scenario apply preserves ownerless editable runtime topology", async
     "observer:localization:blank_base",
     "observer:blank:blank_base",
     "observer:audit:blank_base",
-    "post:legacy:blank_base",
     "post:inspector:blank_base:",
     "post:borders:blank_base",
     "post:paint:blank_base",

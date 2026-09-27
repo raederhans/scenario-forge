@@ -1,5 +1,5 @@
 import { setFeatureOwnerCodes, resetFeatureOwnerCode, resetFeatureOwnerCodes, resetAllFeatureOwnersToCanonical } from "../js/core/sovereignty_manager.js";
-import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds } from "../js/core/scenario_ownership_editor.js";
+import { applyOwnerToFeatureIds, resetOwnersToScenarioBaselineForFeatureIds, applyOwnerControllerAssignmentsToFeatureIds, buildScenarioOwnershipSavePayload, filterEditableOwnershipFeatureIds, summarizeOwnershipForFeatureIds } from "../js/core/scenario_ownership_editor.js";
 import { applyFeaturePaintState } from "../js/core/state/color_state.js";
 import { captureHistoryState, clearHistory, pushHistoryEntry, undoHistory, redoHistory } from "../js/core/history_manager.js";
 import test from "node:test";
@@ -34,14 +34,6 @@ class TestButton {
   }
 }
 
-class TestInput extends TestButton {
-  constructor() {
-    super();
-    this.value = "";
-    this.placeholder = "";
-  }
-}
-
 class TestText {
   constructor() {
     this.textContent = "";
@@ -57,37 +49,15 @@ function createLookupRoot(elementsById) {
   };
 }
 
-function createController({ quickRemoveBtn, selectionToggleBtn, renderWorkspace }) {
+function createController({ quickbar, quickRemoveBtn, selectionToggleBtn, renderWorkspace, selectionSummary, localizeSelectionSummary = (count) => String(count) }) {
   return createSelectionOwnershipController({
     panel: createLookupRoot({
       devSelectionToggleSelectedBtn: selectionToggleBtn,
     }),
-    quickbar: createLookupRoot({
-      devQuickSelectionValue: new TestText(),
-      devQuickTagValue: new TestText(),
-      devQuickOwnerValue: new TestText(),
-      devQuickControllerValue: new TestText(),
-      devQuickOwnerInput: new TestInput(),
-      devQuickRemoveSelectedBtn: quickRemoveBtn,
-      devQuickUseTagBtn: new TestButton(),
-      devQuickApplyOwnerBtn: new TestButton(),
-      devQuickResetOwnerBtn: new TestButton(),
-      devQuickSaveOwnersBtn: new TestButton(),
-    }),
+    quickbar: quickbar || createLookupRoot({ devQuickRemoveSelectedBtn: quickRemoveBtn }),
     renderWorkspace,
-    renderMetaRows() {},
-    normalizeOwnerInput: (value) => String(value || "").trim().toUpperCase(),
-    localizeSelectionSummary: (count) => String(count),
-    resolveOwnershipTargetIds: () => Array.from(state.devSelectionFeatureIds || []),
-    resolveOwnershipEditorModel: () => ({
-      selectionCount: state.devSelectionFeatureIds?.size || 0,
-      isMixedOwner: false,
-      ownerCodes: ["GER"],
-      currentOwnerCode: "GER",
-      currentControllerCode: "GER",
-    }),
-    resolveOwnershipEditorHint: () => "",
-    buildOwnershipMetaRows: () => [],
+    localizeSelectionSummary,
+    resolveSelectedOwnershipSummary: selectionSummary,
   });
 }
 
@@ -96,10 +66,15 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
   const previousSelectionFeatureIds = state.devSelectionFeatureIds;
   const previousSelectionOrder = state.devSelectionOrder;
   const previousActiveScenarioId = state.activeScenarioId;
-  const previousDevScenarioEditor = state.devScenarioEditor;
   const previousLandIndex = state.landIndex;
   const quickRemoveBtn = new TestButton();
   const selectionToggleBtn = new TestButton();
+  const quickbarValues = {
+    selection: new TestText(),
+    tag: new TestText(),
+    owner: new TestText(),
+    controller: new TestText(),
+  };
   let toggleClicks = 0;
 
   selectionToggleBtn.addEventListener("click", () => {
@@ -112,7 +87,6 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
 
   try {
     state.activeScenarioId = "tno_1962";
-    state.devScenarioEditor = {};
     state.devSelectedHit = { targetType: "land", id: "feature-1" };
     state.devSelectionFeatureIds = new Set(["feature-1", "feature-2"]);
     state.devSelectionOrder = ["feature-1", "feature-2"];
@@ -122,14 +96,32 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
     ]);
 
     const controller = createController({
+      quickbar: createLookupRoot({
+        devQuickSelectionValue: quickbarValues.selection,
+        devQuickTagValue: quickbarValues.tag,
+        devQuickOwnerValue: quickbarValues.owner,
+        devQuickControllerValue: quickbarValues.controller,
+        devQuickRemoveSelectedBtn: quickRemoveBtn,
+      }),
       quickRemoveBtn,
       selectionToggleBtn,
+      localizeSelectionSummary: (count) => `${count} selected`,
+      selectionSummary: () => ({
+        selectionCount: 2,
+        isMixedOwner: true,
+        ownerCodes: ["GER", "FRA"],
+        currentOwnerCode: "",
+      }),
       renderWorkspace() {},
     });
     controller.bindEvents();
 
     controller.render({ hasActiveScenario: true });
     assert.equal(quickRemoveBtn.disabled, false);
+    assert.equal(quickbarValues.selection.textContent, "2 selected");
+    assert.equal(quickbarValues.tag.textContent, "GER, FRA");
+    assert.equal(quickbarValues.owner.textContent, "GER, FRA");
+    assert.equal(quickbarValues.controller.textContent, "GER, FRA");
 
     await quickRemoveBtn.click();
     assert.equal(toggleClicks, 1);
@@ -138,12 +130,13 @@ test("quickbar remove selected reuses the selection clipboard toggle for the cur
     state.devSelectedHit = { targetType: "land", id: "feature-3" };
     controller.render({ hasActiveScenario: true });
     assert.equal(quickRemoveBtn.disabled, true);
+    controller.render({ hasActiveScenario: false });
+    assert.equal(quickRemoveBtn.disabled, true);
   } finally {
     state.devSelectedHit = previousSelectedHit;
     state.devSelectionFeatureIds = previousSelectionFeatureIds;
     state.devSelectionOrder = previousSelectionOrder;
     state.activeScenarioId = previousActiveScenarioId;
-    state.devScenarioEditor = previousDevScenarioEditor;
     state.landIndex = previousLandIndex;
   }
 });
@@ -157,6 +150,7 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
   const previousMapSemanticMode = state.mapSemanticMode;
   const previousScenario = state.activeScenarioId;
   const previousBaseline = state.scenarioBaselineOwnersByFeatureId;
+  const previousBaselineHash = state.scenarioBaselineHash;
   const feature = {
     id: "HGO-S1",
     properties: {
@@ -170,6 +164,7 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
     state.landData = { features: [feature] };
     state.activeScenarioId = "hgo_1936";
     state.scenarioBaselineOwnersByFeatureId = Object.freeze({ "HGO-S1": "2RA" });
+    state.scenarioBaselineHash = "hgo-baseline";
     state.sovereigntyByFeatureId = { "HGO-S1": "STALE" };
     state.ownerToFeatureIds = new Map();
     state.sovereigntyInitialized = false;
@@ -181,6 +176,15 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
     assert.equal(getFeatureOwnerCode("HGO-S1"), "2RA");
     assert.deepEqual(getFeatureIdsForOwner("2RA"), ["HGO-S1"]);
     assert.deepEqual(getFeatureIdsForOwner("RA"), []);
+    assert.deepEqual(filterEditableOwnershipFeatureIds(["HGO-S1", "missing", "HGO-S1"]), {
+      requestedIds: ["HGO-S1", "missing"], matchedIds: ["HGO-S1"], missingIds: ["missing"],
+    });
+    assert.deepEqual(summarizeOwnershipForFeatureIds(["HGO-S1"]), {
+      featureCount: 1, ownerCodes: ["2RA"], isMixed: false, singleOwnerCode: "2RA",
+    });
+    assert.deepEqual(buildScenarioOwnershipSavePayload(), {
+      scenarioId: "hgo_1936", baselineHash: "hgo-baseline", owners: { "HGO-S1": "2RA" },
+    });
   } finally {
     state.landIndex = previousLandIndex;
     state.landData = previousLandData;
@@ -190,15 +194,16 @@ test("read-only scenario assignments preserve digit-prefixed HGO tags and reject
     state.mapSemanticMode = previousMapSemanticMode;
     state.activeScenarioId = previousScenario;
     state.scenarioBaselineOwnersByFeatureId = previousBaseline;
+    state.scenarioBaselineHash = previousBaselineHash;
   }
 });
 
 test("all ownership mutation APIs reject before writes, history, revision changes, or rendering", () => {
-  const keys = ["activeScenarioId", "scenarioBaselineOwnersByFeatureId", "sovereigntyByFeatureId", "sovereigntyRevision", "sovereigntyInitialized", "ownerToFeatureIds", "mapSemanticMode", "paintMode", "visualOverrides", "featureOverrides", "historyPast", "historyFuture", "pendingDynamicBorderTimerId", "dynamicBordersDirty"];
+  const keys = ["activeScenarioId", "scenarioBaselineOwnersByFeatureId", "sovereigntyByFeatureId", "sovereigntyRevision", "sovereigntyInitialized", "ownerToFeatureIds", "mapSemanticMode", "paintMode", "visualOverrides", "sovereignBaseColors", "historyPast", "historyFuture", "pendingDynamicBorderTimerId", "dynamicBordersDirty"];
   const old = Object.fromEntries(keys.map(key => [key, state[key]]));
   try {
     Object.assign(state, { activeScenarioId: "hgo_1936", scenarioBaselineOwnersByFeatureId: Object.freeze({ test: "2RA" }), sovereigntyByFeatureId: { test: "STALE" }, sovereigntyRevision: 77, sovereigntyInitialized: true,
-      ownerToFeatureIds: new Map([["2RA", new Set(["test"])]]), paintMode: "sovereignty", visualOverrides: {}, featureOverrides: {} });
+      ownerToFeatureIds: new Map([["2RA", new Set(["test"])]]), paintMode: "sovereignty", visualOverrides: {}, sovereignBaseColors: { GER: "#112233" } });
     const before = structuredClone(Object.fromEntries(keys.map(key => [key, state[key]])));
     assert.equal(setFeatureOwnerCode("test", "GB"), false);
     assert.equal(setFeatureOwnerCodes(["test"], "GB"), 0);
@@ -208,6 +213,7 @@ test("all ownership mutation APIs reject before writes, history, revision change
     for (const result of [applyOwnerToFeatureIds(["test"], "GB"), resetOwnersToScenarioBaselineForFeatureIds(["test"]), applyOwnerControllerAssignmentsToFeatureIds({ test: { ownerCode: "GB" } })]) {
       assert.equal(result.applied, false);
       assert.equal(result.changed, 0);
+      assert.equal(result.requestedCount, 1);
       assert.equal(result.reason, "ownership-editing-disabled");
     }
     assert.deepEqual(Object.fromEntries(keys.map(key => [key, state[key]])), before);
@@ -215,13 +221,13 @@ test("all ownership mutation APIs reject before writes, history, revision change
   } finally { Object.assign(state, old); }
 });
 
-test("real paint undo/redo restores visual state and never replays ownership patches", () => {
-  const keys = ["visualOverrides", "featureOverrides", "sovereigntyByFeatureId", "historyPast", "historyFuture", "legacyColorStateDirty"];
+test("real paint undo/redo restores visual state without changing canonical ownership colors", () => {
+  const keys = ["visualOverrides", "sovereignBaseColors", "sovereigntyByFeatureId", "historyPast", "historyFuture"];
   const old = Object.fromEntries(keys.map(key => [key, state[key]]));
   const oldDocument = globalThis.document;
   globalThis.document = { getElementById: () => null };
   try {
-    state.visualOverrides = {}; state.featureOverrides = {}; state.sovereigntyByFeatureId = { paintTest: "2RA" };
+    state.visualOverrides = {}; state.sovereignBaseColors = { GER: "#112233" }; state.sovereigntyByFeatureId = { paintTest: "2RA" };
     clearHistory();
     const before = captureHistoryState({ featureIds: ["paintTest"] });
     applyFeaturePaintState(state, ["paintTest"], "#aabbcc");
@@ -232,9 +238,11 @@ test("real paint undo/redo restores visual state and never replays ownership pat
     pushHistoryEntry({ kind: "paint-test", before, after });
     undoHistory();
     assert.deepEqual(state.visualOverrides, {});
+    assert.deepEqual(state.sovereignBaseColors, { GER: "#112233" });
     assert.equal(state.sovereigntyByFeatureId.paintTest, "2RA");
     redoHistory();
     assert.deepEqual(state.visualOverrides, { paintTest: "#aabbcc" });
+    assert.deepEqual(state.sovereignBaseColors, { GER: "#112233" });
     assert.equal(state.sovereigntyByFeatureId.paintTest, "2RA");
   } finally { clearHistory(); Object.assign(state, old); if (oldDocument === undefined) delete globalThis.document; else globalThis.document = oldDocument; }
 });

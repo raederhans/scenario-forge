@@ -35,51 +35,39 @@ function captureScopedColorState(state, scope) {
   if (scope.featureIds) {
     return {
       visualOverrides: captureEntries(state.visualOverrides, scope.featureIds),
-      featureOverrides: captureEntries(state.featureOverrides, scope.featureIds),
     };
   }
   return {
     sovereignBaseColors: captureEntries(state.sovereignBaseColors, scope.ownerCodes),
-    countryBaseColors: captureEntries(state.countryBaseColors, scope.ownerCodes),
     countryPalette: captureEntries(state.countryPalette, scope.ownerCodes),
   };
 }
 
 test("palette facade preserves color container identity and sparse feature traversal", () => {
   const visualOverrides = { retained: "#111111" };
-  const featureOverrides = { retained: "#222222" };
   const sovereignBaseColors = {};
-  const countryBaseColors = {};
-  const state = { visualOverrides, featureOverrides, sovereignBaseColors, countryBaseColors };
+  const state = { visualOverrides, sovereignBaseColors };
   const featureIds = new Array(4);
   featureIds[1] = "first";
   featureIds[3] = "last";
   applyPaletteFeatureColorState(state, featureIds, "#abcdef");
   applyPaletteOwnerColorState(state, "GER", "#fedcba");
   assert.equal(state.visualOverrides, visualOverrides);
-  assert.equal(state.featureOverrides, featureOverrides);
   assert.equal(state.sovereignBaseColors, sovereignBaseColors);
-  assert.equal(state.countryBaseColors, countryBaseColors);
   assert.deepEqual(visualOverrides, { retained: "#111111", first: "#abcdef", last: "#abcdef" });
-  assert.deepEqual(featureOverrides, { retained: "#222222", first: "#abcdef", last: "#abcdef" });
   assert.deepEqual(sovereignBaseColors, { GER: "#fedcba" });
-  assert.deepEqual(countryBaseColors, { GER: "#fedcba" });
 });
 
-test("palette facade preserves partial commits when a compatibility setter fails", () => {
-  const failure = new Error("compatibility write rejected");
-  const rejectingMap = () => Object.defineProperty({}, "target", {
-    set() { throw failure; },
-  });
-  const featureState = { visualOverrides: {}, featureOverrides: rejectingMap() };
-  assert.throws(() => applyPaletteFeatureColorState(featureState, ["target", "later"], "#abcdef"), (error) => error === failure);
-  assert.deepEqual(featureState.visualOverrides, { target: "#abcdef" });
-  assert.equal(Object.hasOwn(featureState.featureOverrides, "later"), false);
-  const ownerState = { sovereignBaseColors: {}, countryBaseColors: rejectingMap() };
-  assert.throws(() => applyPaletteOwnerColorState(ownerState, "target", "#abcdef"), (error) => error === failure);
-  assert.deepEqual(ownerState.sovereignBaseColors, { target: "#abcdef" });
+test("palette facade ignores obsolete compatibility setters and retains selection failure behavior", () => {
+  const failure = new Error("obsolete compatibility write rejected");
+  const state = { visualOverrides: {}, sovereignBaseColors: {},
+    get featureOverrides() { throw failure; }, get countryBaseColors() { throw failure; } };
+  applyPaletteFeatureColorState(state, ["target", "later"], "#abcdef");
+  applyPaletteOwnerColorState(state, "GER", "#abcdef");
+  assert.deepEqual(state.visualOverrides, { target: "#abcdef", later: "#abcdef" });
+  assert.deepEqual(state.sovereignBaseColors, { GER: "#abcdef" });
   const selectionState = { selectedColor: "#000000", set paintMode(_value) { throw failure; } };
-  assert.throws(() => selectPalettePaintColorState(selectionState, "#abcdef"), (error) => error === failure);
+  assert.throws(() => selectPalettePaintColorState(selectionState, "#abcdef"), error => error === failure);
   assert.equal(selectionState.selectedColor, "#abcdef");
 });
 
@@ -96,9 +84,6 @@ function createOperationHarness(state) {
       events.push(["history", entry.kind]);
       history.push(entry);
       return true;
-    },
-    markLegacyColorStateDirty() {
-      events.push(["legacy-dirty"]);
     },
     refreshResolvedColorsForFeatures(featureIds, options) {
       events.push(["partial-refresh", [...featureIds], options]);
@@ -226,7 +211,6 @@ test("feature apply changes both compatibility fields without changing sovereign
     landIndex: new Map([["target", {}], ["other", {}]]),
     sovereigntyByFeatureId: sovereignty,
     visualOverrides: { target: "#222222" },
-    featureOverrides: { target: "#222222" },
     updatePaintModeUIFn: () => modeUpdates.push("paint-ui"),
   };
   const { apply, events, history } = createOperationHarness(state);
@@ -242,37 +226,33 @@ test("feature apply changes both compatibility fields without changing sovereign
   assert.equal(state.paintMode, "visual");
   assert.equal(state.ui.politicalEditingExpanded, true);
   assert.equal(state.visualOverrides.target, "#aabbcc");
-  assert.equal(state.featureOverrides.target, "#aabbcc");
   assert.equal(state.sovereigntyByFeatureId, sovereignty);
   assert.deepEqual(sovereignty, { target: "ITA" });
   assert.deepEqual(modeUpdates, ["paint-ui"]);
   assert.deepEqual(events.map((event) => event[0]), [
     "paint-selected",
     "capture",
-    "legacy-dirty",
     "partial-refresh",
     "project-dirty",
     "capture",
     "history",
   ]);
-  assert.deepEqual(events[3], ["partial-refresh", ["target"], { renderNow: false }]);
-  assert.deepEqual(events[4], ["project-dirty", "palette-library-apply-color"]);
+  assert.deepEqual(events[2], ["partial-refresh", ["target"], { renderNow: false }]);
+  assert.deepEqual(events[3], ["project-dirty", "palette-library-apply-color"]);
   assert.equal(history.length, 1);
   assert.deepEqual(history[0], {
     kind: "palette-library-apply-color",
     before: {
       visualOverrides: { target: "#222222" },
-      featureOverrides: { target: "#222222" },
     },
     after: {
       visualOverrides: { target: "#aabbcc" },
-      featureOverrides: { target: "#aabbcc" },
     },
     meta: { affectsSovereignty: false },
   });
 });
 
-test("owner apply updates both base-color fields, preserves reference, and partially refreshes complete baseline membership", () => {
+test("owner apply updates canonical base colors, preserves reference, and partially refreshes complete baseline membership", () => {
   const sovereignty = { a: "GER", b: "FRA" };
   const countryPalette = { GER: "legacy-value" };
   const state = {
@@ -284,7 +264,6 @@ test("owner apply updates both base-color fields, preserves reference, and parti
     ownerToFeatureIds: new Map([["GER", ["c"]]]),
     countryToFeatureIds: new Map([["GER", new Set(["d"])]]),
     sovereignBaseColors: { GER: "#111111" },
-    countryBaseColors: { GER: "#111111" },
     countryPalette,
     ui: {},
   };
@@ -292,7 +271,6 @@ test("owner apply updates both base-color fields, preserves reference, and parti
 
   assert.equal(apply("#336699").status, "applied");
   assert.equal(state.sovereignBaseColors.GER, "#336699");
-  assert.equal(state.countryBaseColors.GER, "#336699");
   assert.equal(state.countryPalette, countryPalette);
   assert.deepEqual(countryPalette, { GER: "legacy-value" });
   assert.equal(state.sovereigntyByFeatureId, sovereignty);
@@ -313,7 +291,6 @@ test("owner apply falls back to one non-rendering full refresh when no land ids 
     ownerToFeatureIds: new Map([["USA", ["missing"]]]),
     countryToFeatureIds: new Map(),
     sovereignBaseColors: {},
-    countryBaseColors: {},
     ui: {},
   };
   const { apply, events } = createOperationHarness(state);
@@ -379,7 +356,6 @@ test("operation-produced feature and owner entries round-trip through the real h
     devSelectedHit: { id: featureId },
     landIndex: new Map([[featureId, {}]]),
     visualOverrides: { [featureId]: "#101010" },
-    featureOverrides: { [featureId]: "#101010" },
   };
   const featureHarness = createOperationHarness(featureState);
   assert.equal(featureHarness.apply("#f0a020").status, "applied");
@@ -389,7 +365,6 @@ test("operation-produced feature and owner entries round-trip through the real h
   assert.equal(pushHistoryEntry(featureEntry), true);
   assert.equal(undoHistory(), true);
   assert.equal(runtimeState.visualOverrides[featureId], "#101010");
-  assert.equal(runtimeState.featureOverrides[featureId], "#101010");
   assert.deepEqual(refreshes.at(-1), {
     renderNow: false,
     featureIds: [featureId],
@@ -397,7 +372,6 @@ test("operation-produced feature and owner entries round-trip through the real h
   });
   assert.equal(redoHistory(), true);
   assert.equal(runtimeState.visualOverrides[featureId], "#f0a020");
-  assert.equal(runtimeState.featureOverrides[featureId], "#f0a020");
   assert.deepEqual(refreshes.at(-1), {
     renderNow: false,
     featureIds: [featureId],
@@ -408,7 +382,6 @@ test("operation-produced feature and owner entries round-trip through the real h
     selectedInspectorCountryCode: ownerCode,
     landIndex: new Map(),
     sovereignBaseColors: { [ownerCode]: "#202020" },
-    countryBaseColors: { [ownerCode]: "#202020" },
     countryPalette: {},
     ui: {},
   };
@@ -420,11 +393,9 @@ test("operation-produced feature and owner entries round-trip through the real h
   assert.equal(pushHistoryEntry(ownerEntry), true);
   assert.equal(undoHistory(), true);
   assert.equal(runtimeState.sovereignBaseColors[ownerCode], "#202020");
-  assert.equal(runtimeState.countryBaseColors[ownerCode], "#202020");
   assert.deepEqual(refreshes.at(-1), { renderNow: false });
   assert.equal(redoHistory(), true);
   assert.equal(runtimeState.sovereignBaseColors[ownerCode], "#306090");
-  assert.equal(runtimeState.countryBaseColors[ownerCode], "#306090");
   assert.deepEqual(refreshes.at(-1), { renderNow: false });
 });
 
@@ -456,7 +427,6 @@ test("paint selection feedback errors propagate before history or map color writ
     selectedColor: "#123456",
     paintMode: "sovereignty",
     visualOverrides: { selected: "#112233" },
-    featureOverrides: { selected: "#112233" },
     updatePaintModeUIFn() { throw failure; },
   };
   const { apply, events, history } = createOperationHarness(state);
@@ -464,7 +434,6 @@ test("paint selection feedback errors propagate before history or map color writ
   assert.equal(state.selectedColor, "#abcdef");
   assert.equal(state.paintMode, "visual");
   assert.deepEqual(state.visualOverrides, { selected: "#112233" });
-  assert.deepEqual(state.featureOverrides, { selected: "#112233" });
   assert.deepEqual(events, [["paint-selected"]]);
   assert.deepEqual(history, []);
 });
@@ -475,7 +444,6 @@ test("palette operation rejects incomplete service assembly before editing state
       ...createPaletteLibraryStateAccess({}),
       captureHistoryState: () => ({}),
       pushHistoryEntry: () => true,
-      markLegacyColorStateDirty: () => {},
       refreshResolvedColorsForFeatures: () => {},
       refreshColorState: () => {},
       markDirty: () => {},
@@ -492,9 +460,7 @@ test("palette capabilities read replacement indexes and keep writes scoped to co
     landIndex: new Map([["first", {}]]),
     ownerToFeatureIds: new Map([["DEU", ["first"]]]),
     visualOverrides: {},
-    featureOverrides: {},
     sovereignBaseColors: {},
-    countryBaseColors: {},
     countryPalette: Object.freeze({ DEU: "#123456" }),
     sovereigntyByFeatureId: Object.freeze({ first: "DEU" }),
   };
@@ -513,9 +479,7 @@ test("palette capabilities read replacement indexes and keep writes scoped to co
   access.applyFeatureColor(["second"], "#abcdef");
   access.applyOwnerColor("DEU", "#654321");
   assert.deepEqual(state.visualOverrides, { second: "#abcdef" });
-  assert.deepEqual(state.featureOverrides, state.visualOverrides);
   assert.deepEqual(state.sovereignBaseColors, { DEU: "#654321" });
-  assert.deepEqual(state.countryBaseColors, state.sovereignBaseColors);
   assert.deepEqual(state.countryPalette, { DEU: "#123456" });
   assert.deepEqual(state.sovereigntyByFeatureId, { first: "DEU" });
 });
@@ -525,7 +489,6 @@ test("palette operation validates every required state capability at assembly", 
     ...createPaletteLibraryStateAccess({}),
     captureHistoryState: () => ({}),
     pushHistoryEntry: () => true,
-    markLegacyColorStateDirty: () => {},
     refreshResolvedColorsForFeatures: () => {},
     refreshColorState: () => {},
     markDirty: () => {},
