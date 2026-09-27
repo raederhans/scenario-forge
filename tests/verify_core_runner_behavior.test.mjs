@@ -2305,6 +2305,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ...(includeRenderer ? ["node-test:tests/border_draw_owner_behavior.test.mjs", "node-test:tests/border_mesh_owner_behavior.test.mjs", "node-test:tests/brush_interaction_session_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/click_selection_transaction_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/country_source_border_meshes_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/data_loader_detail_fallback_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/dev_workspace_selection_ownership_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/exact_composite_reuse_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/export_target_resolution_behavior.test.mjs"] : []),

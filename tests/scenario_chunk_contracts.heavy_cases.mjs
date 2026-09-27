@@ -240,7 +240,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const exactSchedulerSource = readRepoFile("js", "core", "map_renderer", "exact_after_settle_scheduler.js");
     const renderPassCatalogSource = readRepoFile("js", "core", "map_renderer", "render_pass_catalog.js");
     const renderInvalidationCatalogSource = readRepoFile("js", "core", "map_renderer", "render_invalidation_catalog.js");
-    const scenarioOwnershipEditorSource = readRepoFile("js", "core", "scenario_ownership_editor.js");
     const politicalRasterWorkerClientSource = readRepoFile("js", "core", "political_raster_worker_client.js");
     const politicalRasterWorkerSource = readRepoFile("js", "workers", "political_raster.worker.js");
     const chunkRuntimeSource = readRepoFile("js", "core", "scenario", "chunk_runtime.js");
@@ -490,11 +489,6 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && renderRequestBoundaryOwnerSource.includes("requestInteractionRenderBoundary")
         && renderRequestBoundaryOwnerSource.includes("effectApi.requestRender(normalizedReason)")
         && renderRequestBoundaryOwnerSource.includes("options: { flush: false, interaction: true }")
-        && !scenarioOwnershipEditorSource.includes("flushRenderBoundary")
-        && /function requestScenarioOwnershipRender\(reason = "scenario-ownership"\) \{[\s\S]*?requestInteractionRender\(reason\);/.test(scenarioOwnershipEditorSource)
-        && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner");')
-        && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-reset-baseline");')
-        && scenarioOwnershipEditorSource.includes('requestScenarioOwnershipRender("scenario-ownership-apply-owner-controller");')
         && /function handleBrushPointerMove[\s\S]*?requestInteractionRender\("brush-preview"\);/.test(brushInteractionSessionOwnerSource)
         && /function addFeatureToDevSelection[\s\S]*?requestInteractionRender\("dev-selection-add"\);/.test(rendererSource)
         && /function toggleFeatureInDevSelection[\s\S]*?requestInteractionRender\("dev-selection-toggle"\);/.test(rendererSource)

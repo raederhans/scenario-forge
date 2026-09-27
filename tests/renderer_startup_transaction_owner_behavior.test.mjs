@@ -110,6 +110,12 @@ test("startup defers only duplicate border derivation until the following setMap
       applyFacilityInfoCardState: record("applyFacilityInfoCardState"),
       ensureHybridLayers: record("ensureHybridLayers"),
       refreshColorState() {}, recomputeDynamicBordersNow() {}, resolveSpecialZoneParentGroupTargetIds() {},
+      registerRuntimeHook(target, name, callback) {
+        assert.equal(target, null);
+        assert.equal(name, "resolveSpecialZoneParentGroupTargetIdsFn");
+        assert.equal(callback, context.resolveSpecialZoneParentGroupTargetIds);
+        calls.push("registerRuntimeHook");
+      },
       syncFacilityInfoCardVisibility() {},
       buildRuntimePoliticalMeta: record("buildRuntimePoliticalMeta"),
       setCanvasSize: record("setCanvasSize"),
@@ -144,6 +150,7 @@ test("startup defers only duplicate border derivation until the following setMap
   }
   assert.equal(count(deferredCalls, "fitProjection"), 2);
   assert.equal(count(deferredCalls, "initZoom"), 1);
+  assert.equal(count(deferredCalls, "registerRuntimeHook"), 1);
   assert.ok(deferredCalls.indexOf("fitProjection") < deferredCalls.indexOf("initZoom"));
   assert.ok(deferredCalls.indexOf("initZoom") < deferredCalls.lastIndexOf("fitProjection"));
 });
