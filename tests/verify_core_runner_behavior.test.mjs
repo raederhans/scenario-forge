@@ -565,18 +565,19 @@ test("Nightly scenario heavy plan selects the exact canonical geo stack routes",
   const expected = routes.filter((route) => route.id.startsWith("python-heavy:geo_stack:"));
   const plan = buildNightlyScenarioHeavyPlan({ routes });
 
-  assert.equal(expected.length, 18);
-  assert.equal(plan.commandsToRun.length, 18);
+  assert.equal(expected.length, 19);
+  assert.equal(plan.commandsToRun.length, 19);
   assert.deepEqual(
     plan.commandsToRun.map((entry) => entry.commandRef),
     expected.map((route) => route.commandRef),
   );
   assert.deepEqual(plan.nightlyScenarioHeavy.routeIds, expected.map((route) => route.id));
-  assert.equal(new Set(plan.nightlyScenarioHeavy.routeIds).size, 18);
+  assert.equal(new Set(plan.nightlyScenarioHeavy.routeIds).size, 19);
   for (const testPath of [
     "tests/test_extension_admin1_coverage.py",
     "tests/test_source_coverage_repair.py",
     "tests/test_tno_border_continuity.py",
+    "tests/test_modern_world_rebuild.py",
   ]) {
     assert.ok(plan.nightlyScenarioHeavy.routeIds.includes(`python-heavy:geo_stack:${testPath}`));
   }
@@ -592,7 +593,7 @@ test("Nightly scenario heavy plan fails closed on route metadata drift", () => {
 
   assert.throws(
     () => buildNightlyScenarioHeavyPlan({ routes: validRoutes.filter((route) => route.id !== first.id) }),
-    /exactly 18/,
+    /exactly 19/,
   );
   assert.throws(
     () => buildNightlyScenarioHeavyPlan({
@@ -785,8 +786,8 @@ test("--nightly-scenario-heavy wires the canonical plan into checkpointed report
 
   assert.equal(result.exitCode, 0);
   assert.equal(result.report.runnerId, "verify-nightly-scenario-heavy");
-  assert.equal(result.report.commands.length, 18);
-  assert.equal(result.report.nightlyScenarioHeavy.routeCount, 18);
+  assert.equal(result.report.commands.length, 19);
+  assert.equal(result.report.nightlyScenarioHeavy.routeCount, 19);
   assert.equal(result.report.verdict, "listed");
 });
 
