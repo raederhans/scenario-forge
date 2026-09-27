@@ -120,10 +120,25 @@ export function createCityLabelTextModel(runtimeState, { getStrictGeoLabel, getP
     const props = feature?.properties || {};
     const hostFeatureId = String(props.__city_host_feature_id || "").trim();
     if (!hostFeatureId) return "";
+    const scenarioGeo = runtimeState.scenarioGeoLocalePatchData?.geo;
+    const hostLocaleKeys = [hostFeatureId, `id::${hostFeatureId}`];
+    const hasExplicitHostLocale = hostLocaleKeys.some((key) => (
+      scenarioGeo
+      && Object.prototype.hasOwnProperty.call(scenarioGeo, key)
+    ));
+    if (!hasExplicitHostLocale) return "";
     const hostLabel = getStrictGeoLabel(hostFeatureId, "");
     if (!hostLabel || isAdministrativeCityLabelCandidate(hostLabel)) {
       return "";
     }
+    const normalizedHostLabel = normalizeCityLabelComparisonValue(hostLabel);
+    const localizedCityLabel = normalizeCityLabelComparisonValue(getCityBaseLocalizedLabel(feature, { strict: true }));
+    const rawHostCityIdentity = normalizeCityLabelComparisonValue(props.political_feature_name);
+    const cityAliases = getCityFeatureAliases(feature, getCityFeatureKey(feature));
+    const hostMatchesCityLocale = localizedCityLabel && normalizedHostLabel === localizedCityLabel;
+    const hostMatchesCityIdentity = rawHostCityIdentity
+      && cityAliases.some((alias) => normalizeCityLabelComparisonValue(alias) === rawHostCityIdentity);
+    if (!hostMatchesCityLocale && !hostMatchesCityIdentity) return "";
     return hostLabel;
   }
 

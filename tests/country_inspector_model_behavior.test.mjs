@@ -94,6 +94,25 @@ test("group tree inserts localized scenario groups before anchors without mutati
   assert.equal(model.buildCountryColorTree(entries)[0].displayLabel, "China Region");
 });
 
+test("inspector continent labels use the caller's exact geo translator", () => {
+  const locales = { Mahdia: { zh: "马赫迪耶" } };
+  const cityAliases = { Africa: "Mahdia" };
+  const unsafeTranslator = (label, type) => (
+    type === "geo" ? locales[cityAliases[label] || label]?.zh || label : label
+  );
+  const translateCountryGeoLabel = (label, type) => {
+    if (type !== "geo") return label;
+    return locales[label]?.zh || label;
+  };
+  const model = createCountryInspectorModel({ currentLanguage: "zh" }, translateCountryGeoLabel);
+
+  assert.equal(unsafeTranslator("Africa", "geo"), "马赫迪耶");
+  const [group] = model.buildCountryColorTree([
+    { code: "NIC", continentId: "continent_africa", continentLabel: "Africa" },
+  ]);
+  assert.equal(group.displayLabel, "Africa");
+});
+
 test("initial expansion prefers selected then active country and preserves persisted expansion", () => {
   const state = {
     selectedInspectorCountryCode: "FR", activeSovereignCode: "JP",

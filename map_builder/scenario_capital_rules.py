@@ -15,15 +15,19 @@ MODERN_CAPITALS = {
     "BJ": ("1159150345", "Porto-Novo", "波多诺伏"),
     "CI": ("1159150999", "Yamoussoukro", "亚穆苏克罗"),
     "CL": ("1159151615", "Santiago", "圣地亚哥"),
+    "GP": ("1159143181", "Basse-Terre", "巴斯特尔"),
     "HK": ("1159151629", "Hong Kong", "香港"),
     "JP": ("1159151609", "Tokyo", "东京"),
     "KZ": ("1159150965", "Astana", "阿斯塔纳"),
+    "LK": ("1159149593", "Sri Jayawardenepura Kotte", "斯里贾亚瓦德纳普拉科特"),
     "MC": ("1159149077", "Monaco", "摩纳哥"),
     "MM": ("1159151179", "Naypyidaw", "内比都"),
     "MO": ("1159149085", "Macau", "澳门"),
     "NG": ("1159150799", "Abuja", "阿布贾"),
     "NL": ("1159151519", "Amsterdam", "阿姆斯特丹"),
     "PH": ("1159151525", "Manila", "马尼拉"),
+    "PM": ("CITY::gn::3424934", "Saint-Pierre", "圣皮埃尔"),
+    "SH": ("CITY::gn::3370903", "Jamestown", "詹姆斯敦"),
     "TW": ("1159151567", "Taipei", "台北"),
     "TZ": ("1159149731", "Dodoma", "多多马"),
     "ZA": ("1159150661", "Pretoria", "比勒陀利亚"),
@@ -40,6 +44,7 @@ HOI4_CAPITALS = {
     "MEN": ("1159147139", "Xilinhot", "锡林浩特"),
     "PHI": MODERN_CAPITALS["PH"],
     "SAF": MODERN_CAPITALS["ZA"],
+    "SIK": ("1159151531", "Dihua", "迪化"),
     "TAI": ("1159151567", "Taihoku", "台北"),
     "TAN": ("1159149621", "Kyzyl", "克孜勒"),
     "TIB": ("1159150879", "Lhasa", "拉萨"),
@@ -116,11 +121,49 @@ REVIEWED_CAPITALS = {
     "hoi4_1939": {**HOI4_CAPITALS, "CHI": ("1159151327", "Chongqing", "重庆")},
     "tno_1962": TNO_CAPITALS,
 }
-NO_CAPITAL_TAGS = {"tno_1962": {"AFA", "RFA", "ATL", "AQ", "SPR"}}
+NO_CAPITAL_TAGS = {
+    "tno_1962": {"AFA", "RFA", "ATL", "AQ", "SPR"},
+    # Neutral/uninhabited regions or administrations seated outside the mapped
+    # territory have no in-territory civilian capital marker.
+    "modern_world": {"AQ", "HM", "IO", "TF"},
+}
+
+# Non-capital historical names use the same stable identities as the capital
+# rules. Keep these scenario-scoped: the base world layer is modern, and TNO
+# has its own political naming policy. Evidence: docs/data/scenario-capitals.md.
+HOI4_CITY_NAMES = {
+    "1159151531": ("Dihua", "迪化"),
+    "1159150965": ("Akmolinsk", "阿克莫林斯克"),
+    "1159150969": ("Alma-Ata", "阿拉木图"),
+    "1159151523": ("Keijō", "京城"),
+}
+REVIEWED_CITY_NAMES = {
+    "hoi4_1936": {**HOI4_CITY_NAMES, "1159151595": ("Beiping", "北平")},
+    # This repository's 1939 owner rules keep the Beijing polygon under CHI;
+    # use the Republic's Beiping rather than the occupation authority's Beijing.
+    "hoi4_1939": {**HOI4_CITY_NAMES, "1159151595": ("Beiping", "北平")},
+    # Local TNO victory-point names, resolved against this project's ownership:
+    # KOR is a Japanese residency, KAZ is independent, and Taipei is held by CHI.
+    "tno_1962": {
+        "1159151523": ("Keijō", "京城"),
+        "1159150965": ("Akmola", "阿克莫拉"),
+        "1159151567": ("Taipei", "台北"),
+    },
+}
 
 # Small settlements absent from the population-filtered world layer. Coordinates
 # are sourced, not territory centroids; see the evidence document.
 ADDITIONAL_CAPITAL_CITIES = {
+    "CITY::gn::3424934": {
+        "id": "CITY::gn::3424934", "name": "Saint-Pierre", "name_en": "Saint-Pierre", "name_zh": "圣皮埃尔",
+        "lon": -56.17730, "lat": 46.77914, "country_code": "PM", "population": 6200,
+        "base_tier": "regional", "capital_kind": "country_capital", "source": "geonames",
+    },
+    "CITY::gn::3370903": {
+        "id": "CITY::gn::3370903", "name": "Jamestown", "name_en": "Jamestown", "name_zh": "詹姆斯敦",
+        "lon": -5.71816, "lat": -15.92488, "country_code": "SH", "population": 637,
+        "base_tier": "regional", "capital_kind": "country_capital", "source": "geonames",
+    },
     "CITY::scenario::cherdyn": {
         "id": "CITY::scenario::cherdyn", "name": "Cherdyn", "name_en": "Cherdyn", "name_zh": "切尔登",
         "lon": 56.516667, "lat": 60.4, "country_code": "RU", "population": 0,
@@ -145,6 +188,20 @@ def apply_reviewed_capitals(payload, countries, city_rows, *, scenario_id, stric
     hints = result.setdefault("capital_city_hints", {})
     cities = result.setdefault("cities", {})
     applied = set()
+    for ne_id, (en, zh) in REVIEWED_CITY_NAMES.get(scenario_id, {}).items():
+        city_id = f"CITY::ne::{ne_id}"
+        if city_id not in city_rows:
+            if strict:
+                raise ValueError(f"{scenario_id}: missing reviewed city {city_id}")
+            continue
+        cities[city_id] = {
+            **cities.get(city_id, {}), "city_id": city_id, "stable_key": f"id::{city_id}",
+            "display_name": {"en": en, "zh": zh},
+        }
+        # Existing hints for regional capitals must agree with their labels.
+        for hint in hints.values():
+            if hint.get("city_id") == city_id:
+                hint["city_name"] = en
     for tag, (ne_id, en, zh) in REVIEWED_CAPITALS.get(scenario_id, {}).items():
         if tag not in countries:
             continue

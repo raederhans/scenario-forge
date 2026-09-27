@@ -35,7 +35,7 @@ import {
 } from "../core/palette_manager.js";
 import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
-import { toggleLanguage, updateUIText, t } from "./i18n.js";
+import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
@@ -1103,7 +1103,7 @@ function initToolbar({ render } = {}) {
     const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     if (selectedCode) {
       const label = String(runtimeState.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
-      return `${t(label, "geo") || label} (${selectedCode})`;
+      return `${getDirectGeoLabel(label) || label} (${selectedCode})`;
     }
 
     return t("No selection", "ui");
@@ -1338,7 +1338,7 @@ function initToolbar({ render } = {}) {
         activeSovereignLabel.textContent = t("None selected", "ui");
       } else {
         const label = String(runtimeState.countryNames?.[code] || code).trim() || code;
-        activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
+        activeSovereignLabel.textContent = `${getDirectGeoLabel(label) || label} (${code})`;
       }
     }
     refreshScenarioContextBar();
@@ -1651,6 +1651,7 @@ function initToolbar({ render } = {}) {
   const appearanceControlsController = createAppearanceControlsController({
     runtimeState: state,
     t,
+    translateGeo: getDirectGeoLabel,
     clamp,
     markDirty,
     requestRender: () => {

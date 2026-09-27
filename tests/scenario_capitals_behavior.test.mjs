@@ -19,6 +19,31 @@ const baseLocalization = mergeCityLocalizationData({
   cityAliases: read("../data/city_aliases.json"),
 });
 
+test("scenario name synchronization never maps distant capitals into Russian city polygons", (t) => {
+  const originalD3 = globalThis.d3;
+  const originalRu = runtimeState.ruCityOverrides;
+  const presentation = captureScenarioPresentationState({ ...runtimeState, locales: { ...runtimeState.locales } });
+  t.after(() => {
+    globalThis.d3 = originalD3;
+    runtimeState.ruCityOverrides = originalRu;
+    restoreScenarioPresentationState(runtimeState, presentation);
+  });
+  runtimeState.ruCityOverrides = { features: [{ properties: { id: "RU_TEST_VOLGOGRAD" },
+    geometry: { type: "Point", coordinates: [44.50184, 48.71939] } }] };
+  globalThis.d3 = { geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] };
+  for (const cityId of ["CITY::ne::1159149593", "CITY::ne::1159150731"]) {
+    syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+      cities: { [cityId]: { city_id: cityId, display_name: { en: "Reviewed city", zh: "审核城市" } } },
+    }), geoLocalePatchPayload: null });
+    assert.equal(runtimeState.locales.geo.RU_TEST_VOLGOGRAD, undefined, cityId);
+  }
+  const cityId = "CITY::ne::1159150697";
+  syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+    cities: { [cityId]: { city_id: cityId, display_name: { en: "Stalingrad", zh: "斯大林格勒" } } },
+  }), geoLocalePatchPayload: null });
+  assert.deepEqual(runtimeState.locales.geo.RU_TEST_VOLGOGRAD, { en: "Stalingrad", zh: "斯大林格勒" });
+});
+
 // Publish the process-local baseline through the same authority as city loading.
 before(() => commitBaseCitySupportData(runtimeState, {
   worldCities: base,

@@ -11,12 +11,14 @@ import { resolveContourLodRequest } from "../core/renderer/physical_contour_lod_
 import {
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
+  ensureActiveScenarioOptionalLayersForVisibility,
   hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
   validateScenarioRuntimeShellContract,
 } from "../core/scenario_resources.js";
 import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
+import { syncCountryUi } from "../core/scenario_ui_sync.js";
 import {
   SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
   SCENARIO_STARTUP_GEO_ALIASES_FILENAME,
@@ -251,6 +253,9 @@ export function createStartupDataPipelineOwner({
           reason,
           resourceMetrics: result.resourceMetrics || {},
         });
+        // Panels may have rendered with the smaller startup dictionary. Refresh
+        // their labels when the full dictionary replaces those fallback names.
+        syncCountryUi({ renderNow: false });
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (shouldRender()) {
           requestMainRender?.(`localization-full-ready:${reason}`, { flush: true });
@@ -293,6 +298,13 @@ export function createStartupDataPipelineOwner({
       });
       assertReceiverCurrent({ isCurrent });
       hydrateActiveScenarioBundle(bundle, { renderNow });
+      // Post-apply skips optional layers while boot is blocking. Complete the
+      // visible layers here too, including scenario capital/name overrides.
+      await ensureActiveScenarioOptionalLayersForVisibility({
+        bundle, renderNow, scenarioApplyEpoch, scenarioApplyRequestId: requestId,
+        isScenarioApplyRequestCurrent: isCurrent,
+      });
+      assertReceiverCurrent({ isCurrent });
       const healthGateResult = await enforceScenarioHydrationHealthGate({
         renderNow,
         reason,

@@ -1,6 +1,42 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    "id": "python-heavy:geo_stack:tests/test_modern_world_rebuild.py",
+    "commandRef": "python -m unittest tests.test_modern_world_rebuild -q",
+    "sourceRefs": [
+      "tests/test_modern_world_rebuild.py",
+      "tools/build_modern_world_scenario.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": 371,
+    "verification": null,
+    "selector": {}
+  },
+  {
     id: "e2e:tests/e2e/marine_label_performance.spec.js",
     commandRef: "node tools/e2e_layering.mjs run-spec tests/e2e/marine_label_performance.spec.js",
     sourceRefs: ["tests/e2e/marine_label_performance.spec.js", "js/core/renderer/marine_label_owner.js"],

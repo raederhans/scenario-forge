@@ -78,6 +78,55 @@ python tools/check_scenario_contracts.py --scenario-dir data/scenarios/tno_1962 
 [哈萨克斯坦总统府的 Astana](https://www.akorda.kz/en/republic_of_kazakhstan/kazakhstan)。
 其余点位沿用仓库 Natural Earth/GeoNames 的真实城市坐标和稳定 ID，修正从省会/人口候选中选错城市的映射。
 多多马原有中文误称“松巴万加”同步纠正，内比都与阿斯塔纳采用对应中文名称。
+瓜德罗普首府采用 Basse-Terre／巴斯特尔，而非 Pointe-à-Pitre，依据
+[INSEE 2026 行政区划](https://www.insee.fr/fr/metadonnees/geographie/commune/97120-pointe-a-pitre)。
+斯里兰卡依单一行政首都政策采用 Sri Jayawardenepura Kotte／斯里贾亚瓦德纳普拉科特，依据
+[斯里兰卡外交部](https://www.mfa.gov.lk/national-profile-and-geography)。
+圣皮埃尔和密克隆的首府采用 Saint-Pierre／圣皮埃尔，依据
+[INSEE 行政区划](https://www.insee.fr/fr/information/7929495)，坐标来自
+[GeoNames 3424934](https://www.geonames.org/3424934/saint-pierre.html)。
+现代拓扑原先漏了圣皮埃尔岛，首都点距剩余领土约 9.47 km；重建器从仓库
+`ne_50m_admin_0_countries.zip` 恢复该独立岛组件，并入既有 `PM` 地块。
+仅补现有覆盖不足 5% 的独立组件并裁去既有世界覆盖，不扩大首都海岸内移容差。
+圣赫勒拿采用 Jamestown／詹姆斯敦，依据
+[圣赫勒拿政府驻地](https://www.sainthelena.gov.sh/contact/)，坐标来自
+[GeoNames 3370903](https://www.geonames.org/3370903/jamestown.html)。这两座小城作为现代剧本城市补充。
+
+现代 `HM` 没有常住居民行政首府（[澳大利亚南极局](https://www.antarctica.gov.au/antarctic-operations/stations-and-field-locations/heard-island/)）；
+`IO` 行政机构位于伦敦（[领地政府](https://www.biot.gov.io/governance/)），
+`TF` 行政总部位于留尼汪圣皮埃尔（[法属南方和南极领地政府](https://taaf.fr/collectivites/presentation/)）。
+三者按当前“首都标记必须位于本领土内”的模型明确记录 `no_capital`，不虚构境内城市；
+它表示不绘制境内首都星标，不表示这些领地没有行政管理机构。
+
+## 历史剧本地名隔离
+
+`scenario_capital_rules.py` 的 `REVIEWED_CITY_NAMES` 以稳定城市 ID 保存非首都历史名，
+与首都规则一起由城市构建和首都修复入口应用；它不改共享现代底图，也不覆盖 TNO 的架空设定。
+1936/1939 补充 Dihua／迪化、Akmolinsk／阿克莫林斯克、Alma-Ata／阿拉木图、Keijō／京城。
+既有 Hsinking／新京、Taihoku／台北、Leningrad／列宁格勒、Stalingrad／斯大林格勒及
+Sverdlovsk／斯维尔德洛夫斯克继续保留。Perm 在这两个年份仍为彼尔姆。
+
+- [北京市政府城市沿革](https://www.beijing.gov.cn/renwen/sy/whkb/201907/t20190715_1866582.html)
+  记载 1928 年改北平、1937 年日占当局改北京。当前两版地图的北京地块均归 CHI，
+  1939 的 `1939_hebei_chahar_owner_chi` 为明确作者规则，因此均采用中华民国命名 Beiping／北平；
+  本次命名修复不改变归属，也不把现实日占名称强加到该剧本地块。
+- [哈萨克斯坦政府城市沿革](https://www.gov.kz/memleket/entities/vko-altay-polyanskoe/press/events/details/29850)
+  说明 Akmolinsk 至 1961 年；现代使用 Astana，不将现代 Nur-Sultan 基础旧名带进历史剧本。
+  [政府阿拉木图历史资料](https://kgd.gov.kz/sites/default/files/UIT/kgd-kniga60h90_posledniy_compressed.pdf)
+  记录 Alma-Ata 与 Almaty 的年代变化。
+- [首尔历史博物馆](https://museum.seoul.go.kr/eng/exhibition/permanent/permExhibit/permExhibit3.jsp)
+  记载殖民时期 Gyeongseong；[日本国立国会图书馆 1930 年地图](https://ndlsearch.ndl.go.jp/books/R100000136-I1970023484984750979)
+  标为 Keijo。两版 KOR 均为 `Government-General of Korea`、`parent_owner_tag=JAP`，故采用日方拼写 Keijō。
+- 迪化于 1954 年改乌鲁木齐，见
+  [新疆政府收录的城市沿革资料](https://sthjt.xinjiang.gov.cn/xjepd/hjyxpjsl/201903/9006e595669b4a0aac7654f660e1beb7/files/%E4%B9%8C%E9%B2%81%E6%9C%A8%E9%BD%90%E5%B8%82%E7%B1%B3%E4%B8%9C%E5%8C%BA%E5%A4%A7%E7%94%B0%E9%BB%84%E7%89%9B%E5%85%BB%E6%AE%96%E8%82%B2%E8%82%A5%E5%9F%BA%E5%9C%B0%E6%94%B9%E6%89%A9%E5%BB%BA%E9%A1%B9%E7%9B%AE.pdf)。
+  TNO 保留自己既有的 Dihua；它采用架空年代政策，不由现实 1962 年名称反推。
+
+TNO 另按本机模组 `2438003901/localisation/english/TNO_victory_points_l_english.yml`
+核对胜利点：`7125` 基准 Keijō、朝鲜变体 Seoul；`10308` 基准 Akmola、俄方变体 Akmolinsk；
+`15887` 基准 Taihoku、中国变体 Taipei。
+项目 KOR 是日本附属的 `Korean Residency-General`，故城市用 Keijō／京城；
+KAZ 独立，用 Akmola／阿克莫拉；台北城市宿主目前归 CHI，采用 Taipei／台北。
+最后一项遵循项目现有地图归属，与原模组该州初始归 JAP 的设定有差异，不调整边界。
 
 ## 坐标和例外
 

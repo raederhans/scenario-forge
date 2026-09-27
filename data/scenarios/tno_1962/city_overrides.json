@@ -1463,7 +1463,7 @@
       "capital_state_id": 525,
       "city_id": "CITY::ne::1159151523",
       "stable_key": "id::CITY::ne::1159151523",
-      "city_name": "Seoul",
+      "city_name": "Keijō",
       "name_ascii": "Seoul",
       "capital_kind": "country_capital",
       "base_tier": "major",
@@ -40526,7 +40526,12 @@
     },
     "CITY::ne::1159151523": {
       "city_id": "CITY::ne::1159151523",
-      "host_feature_id": "KOR-2497"
+      "host_feature_id": "KOR-2497",
+      "stable_key": "id::CITY::ne::1159151523",
+      "display_name": {
+        "en": "Keijō",
+        "zh": "京城"
+      }
     },
     "CITY::ne::1159150087": {
       "city_id": "CITY::ne::1159150087",
@@ -40773,6 +40778,22 @@
     "CITY::ne::1159149581": {
       "city_id": "CITY::ne::1159149581",
       "host_feature_id": "RU_RAY_50074027B55944525718876"
+    },
+    "CITY::ne::1159150965": {
+      "city_id": "CITY::ne::1159150965",
+      "stable_key": "id::CITY::ne::1159150965",
+      "display_name": {
+        "en": "Akmola",
+        "zh": "阿克莫拉"
+      }
+    },
+    "CITY::ne::1159151567": {
+      "city_id": "CITY::ne::1159151567",
+      "stable_key": "id::CITY::ne::1159151567",
+      "display_name": {
+        "en": "Taipei",
+        "zh": "台北"
+      }
     }
   },
   "audit": {

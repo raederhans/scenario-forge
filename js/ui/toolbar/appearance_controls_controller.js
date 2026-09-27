@@ -62,6 +62,7 @@ import {
 export function createAppearanceControlsController({
   runtimeState,
   t,
+  translateGeo = (label) => label,
   clamp,
   markDirty,
   requestRender,
@@ -418,7 +419,7 @@ export function createAppearanceControlsController({
       countryList: parentBorderCountryList,
       emptyNode: parentBorderEmpty,
     },
-    translateGeo: (label) => t(label, "geo"),
+    translateGeo,
     renderDirty: scheduleLayerRenderDirty,
   });
 

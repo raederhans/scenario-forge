@@ -24,7 +24,8 @@
     "YT": "CITY::ne::1159146067",
     "CHI": "CITY::ne::1159151385",
     "LUQ": "CITY::ne::1159151379",
-    "YUE": "CITY::ne::1159151331"
+    "YUE": "CITY::ne::1159151331",
+    "SIK": "CITY::ne::1159151531"
   },
   "capital_city_hints": {
     "AEF": {
@@ -1333,7 +1334,7 @@
       "capital_state_id": 525,
       "city_id": "CITY::ne::1159151523",
       "stable_key": "id::CITY::ne::1159151523",
-      "city_name": "Seoul",
+      "city_name": "Keijō",
       "name_ascii": "Seoul",
       "capital_kind": "country_capital",
       "base_tier": "major",
@@ -2307,27 +2308,27 @@
       "candidate_count": 256
     },
     "SIK": {
-      "tag": "SIK",
-      "display_name": "Sinkiang",
-      "lookup_iso2": "CN",
-      "base_iso2": "CN",
-      "capital_state_id": 617,
-      "city_id": "CITY::ne::1159151531",
-      "stable_key": "id::CITY::ne::1159151531",
-      "city_name": "Ürümqi",
-      "name_ascii": "UEruemqi",
-      "capital_kind": "admin_capital",
-      "base_tier": "major",
-      "population": 3575000,
       "country_code": "CN",
       "host_feature_id": "CN_CITY_17275852B35279738214019",
       "urban_match_id": "",
       "lon": 87.60046,
       "lat": 43.80096,
+      "population": 3575000,
+      "base_tier": "major",
       "source": "merged",
-      "resolution_method": "capital_state_fallback",
-      "confidence": "medium",
-      "candidate_count": 101
+      "tag": "SIK",
+      "city_id": "CITY::ne::1159151531",
+      "stable_key": "id::CITY::ne::1159151531",
+      "city_name": "Dihua",
+      "name_ascii": "UEruemqi",
+      "display_name": "Xinjiang Provincial Government",
+      "lookup_iso2": "CN",
+      "base_iso2": "CN",
+      "capital_state_id": 617,
+      "capital_kind": "country_capital",
+      "resolution_method": "reviewed_capital",
+      "confidence": "high",
+      "candidate_count": 1
     },
     "SMR": {
       "tag": "SMR",
@@ -3441,7 +3442,12 @@
     },
     "CITY::ne::1159151523": {
       "city_id": "CITY::ne::1159151523",
-      "host_feature_id": "KOR-2497"
+      "host_feature_id": "KOR-2497",
+      "stable_key": "id::CITY::ne::1159151523",
+      "display_name": {
+        "en": "Keijō",
+        "zh": "京城"
+      }
     },
     "CITY::ne::1159151361": {
       "city_id": "CITY::ne::1159151361",
@@ -3591,7 +3597,12 @@
     },
     "CITY::ne::1159151531": {
       "city_id": "CITY::ne::1159151531",
-      "host_feature_id": "CN_CITY_17275852B35279738214019"
+      "host_feature_id": "CN_CITY_17275852B35279738214019",
+      "stable_key": "id::CITY::ne::1159151531",
+      "display_name": {
+        "en": "Dihua",
+        "zh": "迪化"
+      }
     },
     "CITY::ne::1159148063": {
       "city_id": "CITY::ne::1159148063",
@@ -3668,10 +3679,34 @@
     "CITY::ne::1159151371": {
       "city_id": "CITY::ne::1159151371",
       "host_feature_id": "CN_CITY_17275852B36917281821750"
+    },
+    "CITY::ne::1159150965": {
+      "city_id": "CITY::ne::1159150965",
+      "stable_key": "id::CITY::ne::1159150965",
+      "display_name": {
+        "en": "Akmolinsk",
+        "zh": "阿克莫林斯克"
+      }
+    },
+    "CITY::ne::1159150969": {
+      "city_id": "CITY::ne::1159150969",
+      "stable_key": "id::CITY::ne::1159150969",
+      "display_name": {
+        "en": "Alma-Ata",
+        "zh": "阿拉木图"
+      }
+    },
+    "CITY::ne::1159151595": {
+      "city_id": "CITY::ne::1159151595",
+      "stable_key": "id::CITY::ne::1159151595",
+      "display_name": {
+        "en": "Beiping",
+        "zh": "北平"
+      }
     }
   },
   "audit": {
-    "manual_capital_count": 22,
+    "manual_capital_count": 23,
     "capital_hint_count": 127,
     "renamed_city_count": 4,
     "name_conflict_count": 4,

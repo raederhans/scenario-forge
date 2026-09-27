@@ -23,6 +23,8 @@ function harness(overrides = {}, helperOverrides = {}) {
     ...contentLoadActions,
     normalizeRequestedContextLayerNames: (names) => names,
     syncScenarioLocalizationState: () => events.push("sync-localization"),
+    syncCountryUi: () => events.push("country-ui"),
+    ensureActiveScenarioOptionalLayersForVisibility: async () => {},
     emitStateBusEvent: () => events.push("ui-event"),
     STATE_BUS_EVENTS: {},
     buildCityLocalizationPatch: () => ({}),
@@ -176,7 +178,9 @@ for (const resource of ["city", "localization"]) {
     await Promise.all([old, current]);
     assert.equal(loads, 1);
     assert.equal(resource === "city" ? state.baseCityDataState : state.baseLocalizationDataState, "loaded");
-    assert.deepEqual(events, ["sync-localization", "ui-event", "render"]);
+    assert.deepEqual(events, resource === "localization"
+      ? ["sync-localization", "country-ui", "ui-event", "render"]
+      : ["sync-localization", "ui-event", "render"]);
   });
 
   test(`${resource} with no current receiver discards data and releases the pending promise`, async () => {
@@ -214,6 +218,41 @@ test("night-light geometry skips localization; a concurrent labels caller upgrad
   assert.equal(events.filter((event) => event === "sync-localization").length, 1);
   await owner.ensureBaseCityDataReady({ renderNow: false });
   assert.equal(requests.length, 2);
+});
+
+test("post-boot hydration loads visible scenario names before reporting readiness", async () => {
+  const calls = [];
+  const bundle = { bundleLevel: "full" };
+  const { owner, state } = harness({
+    loadScenarioBundle: async () => bundle,
+    hydrateActiveScenarioBundle: () => calls.push("hydrate"),
+    ensureActiveScenarioOptionalLayersForVisibility: async (options) => {
+      assert.equal(options.bundle, bundle);
+      assert.equal(options.scenarioApplyRequestId, state.currentScenarioApplyRequestId);
+      assert.equal(options.isScenarioApplyRequestCurrent(), true);
+      calls.push("visible-names");
+    },
+    enforceScenarioHydrationHealthGate: async () => { calls.push("ready"); return { ok: true }; },
+  });
+  await owner.ensureActiveScenarioBundleHydrated();
+  assert.deepEqual(calls, ["hydrate", "visible-names", "ready"]);
+});
+
+test("scenario switch during optional name loading cannot complete the older hydration", async () => {
+  const optional = deferred();
+  let healthChecks = 0;
+  const { owner, state } = harness({
+    loadScenarioBundle: async () => ({ bundleLevel: "full" }),
+    hydrateActiveScenarioBundle: () => {},
+    ensureActiveScenarioOptionalLayersForVisibility: () => optional.promise,
+    enforceScenarioHydrationHealthGate: async () => { healthChecks++; return { ok: true }; },
+  });
+  const pending = owner.ensureActiveScenarioBundleHydrated();
+  await Promise.resolve();
+  state.activeScenarioId = "B";
+  optional.resolve();
+  await assert.rejects(pending, { name: "AbortError" });
+  assert.equal(healthChecks, 0);
 });
 
 test("geometry load preserves localization objects and a failed label upgrade can retry", async () => {

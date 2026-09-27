@@ -665,3 +665,27 @@ test("resolveFeatureColor applies strategic choropleth lens when metric data is 
     },
   );
 });
+
+test("canonical scenario colors survive legacy alias normalization", () => {
+  const details = buildScenarioOwnerColorMapDetails(
+    { GB: { color_hex: "#b9364c" }, GR: { color_hex: "#4880b6" } },
+    {
+      ownerTags: ["UK", "EL"],
+      palettePack: { entries: { ENG: { map_hex: "#c9385d" } } },
+      paletteMap: { mapped: { ENG: { iso2: "GB" } } },
+    },
+  );
+  // UK has a conflicting palette fallback; EL would otherwise get a generated color.
+  assert.deepEqual(details.byTag, {
+    GB: "#b9364c", GR: "#4880b6", UK: "#b9364c", EL: "#4880b6",
+  });
+  assert.deepEqual(details.generatedTags, []);
+  const normalized = Object.fromEntries(Object.entries(details.byTag).map(([tag, color]) => [
+    runtimeBridge.normalizeRuntimeBridgeIso2(tag), color,
+  ]));
+  assert.deepEqual(normalized, { GB: "#b9364c", GR: "#4880b6" });
+
+  const aliasOnly = buildScenarioOwnerColorMapDetails({}, { ownerTags: ["UK"] });
+  assert.ok(aliasOnly.byTag.UK);
+  assert.deepEqual(aliasOnly.generatedTags, ["UK"]);
+});

@@ -255,6 +255,22 @@ function t(key, type = "geo") {
   return key;
 }
 
+function getDirectGeoLabel(key) {
+  const candidate = String(key || "").trim();
+  if (!candidate) return "";
+  const entry = runtimeState.locales?.geo?.[candidate];
+  if (entry && typeof entry === "object") {
+    recordStartupSupportKeyUsage({
+      queryKey: candidate,
+      directLocaleKey: candidate,
+    });
+    const lang = runtimeState.currentLanguage === "zh" ? "zh" : "en";
+    return String(entry[lang] || entry.en || candidate).trim();
+  }
+  recordStartupSupportKeyUsage({ queryKey: candidate, miss: true });
+  return candidate;
+}
+
 function getTooltipFeatureId(feature) {
   return getSharedFeatureId(feature);
 }
@@ -298,7 +314,7 @@ function getTooltipCountryContext(feature) {
     getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[countryCode]) ||
     runtimeState.countryNames?.[countryCode] ||
     countryCode;
-  const countryDisplayName = t(rawCountryName, "geo") || rawCountryName || countryCode;
+  const countryDisplayName = getDirectGeoLabel(rawCountryName) || rawCountryName || countryCode;
   return {
     countryCode,
     countryDisplayName,
@@ -316,7 +332,7 @@ function getTooltipAdmin1Name(feature, { regionName = "", countryDisplayName = "
   for (const candidate of candidates) {
     const rawValue = String(candidate || "").trim();
     if (!rawValue) continue;
-    const displayValue = t(rawValue, "geo") || rawValue;
+    const displayValue = getDirectGeoLabel(rawValue) || rawValue;
     const comparisonValue = normalizeTooltipComparisonValue(displayValue);
     if (!comparisonValue) continue;
     if (comparisonValue === regionKey || comparisonValue === countryKey) continue;
@@ -459,6 +475,7 @@ export {
   getStartupSupportKeyUsageAuditReport,
   setStartupSupportKeyUsageAuditEnabled,
   t,
+  getDirectGeoLabel,
   getPreferredGeoLabel,
   getStrictGeoLabel,
   getGeoFeatureDisplayLabel,
