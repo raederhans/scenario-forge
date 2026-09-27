@@ -20,6 +20,8 @@ import {
   STATE_ACTION_DELEGATION_CONTRACT,
   STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT,
   STATE_ACTION_SUCCESSOR_PROOF_CONTRACT,
+  STATE_CAPABILITY_RETIREMENT_CONTRACT,
+  STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
   validateStateActionCrossFileMigrationContract,
   validateStateActionDelegationContract,
   validateStateActionLegacyMembershipReplacementContract,
@@ -45,8 +47,10 @@ import {
   buildStateWriterDerivedAliasTaintModeManifest,
   buildP4CloseoutTargets,
   buildCallerToActionLedger,
+  inspectStateCapabilityRetirementEvidence,
   buildDerivedAliasTaintDiagnosticDelta,
   buildFrozenDerivedAliasTaintBaseline,
+  buildHistoricalStateKeyAuthorityIndex,
   buildHistoricalDerivedAliasProofCheckpoint,
   buildHistoricalDerivedAliasProofIdentity,
   buildIncrementalDerivedAliasTaintBaseline,
@@ -83,6 +87,7 @@ import {
 } from "../tools/state_writer_inventory.mjs";
 import {
   buildStateWriterVerificationIdentity,
+  compareDefaultStateBaselines,
   loadPreviousStateWriterPolicy,
   buildStateWriterCloseoutTargetViolations,
   buildStateWriterPolicyReport,
@@ -3675,24 +3680,59 @@ test("policy snapshot admits only exact registered ambiguous alias sites", () =>
   );
 });
 
-test("default state ownership locks the 16 plus 9 and 402 plus 488 baselines", async () => {
+test("default state ownership remains complete after retired fields are removed", async () => {
   const report = await buildDefaultStateOwnershipReport();
 
   assert.equal(report.factoryGroups.length, 16);
   assert.equal(report.explicitKeys.length, 9);
-  assert.equal(report.preCompatKeyCount, 402);
-  assert.equal(report.compatibilityHookCount, 86);
+  assert.equal(report.preCompatKeyCount, 398);
+  assert.equal(report.compatibilityHookCount, 87);
   assert.equal(report.compatibilityHooks.includes("clearExportBakeCacheFn"), false);
-  assert.equal(report.postCompatKeyCount, 488);
+  assert.equal(report.postCompatKeyCount, 485);
   assert.ok(report.authorityOnlyLazyKeys.includes("scenarioAtlantropaRevision"));
   assert.deepEqual(
     report.authorityOnlyLazyKeys.filter((key) => key.startsWith("uiHydration")),
     ["uiHydrationError", "uiHydrationStatus", "uiHydrationUpdatedAt"],
   );
   assert.deepEqual(report.collisions, []);
-  assert.equal(report.actualFacadeKeyCount, 488);
+  assert.equal(report.actualFacadeKeyCount, 485);
   assert.deepEqual(report.unownedActualFacadeKeys, []);
   assert.deepEqual(report.registeredKeysMissingFromFacade, []);
+});
+
+test("checker keeps frozen default-state counts as history while accepting retired keys", () => {
+  const frozen = {
+    factoryGroups: 16, explicitKeys: 9, preCompatKeys: 402,
+    compatibilityHooks: 86, postCompatKeys: 488, actualFacadeKeys: 488,
+    unownedActualFacadeKeys: 0, registeredKeysMissingFromFacade: 0,
+    collisions: 0,
+  };
+  const report = {
+    factoryGroups: Array(16).fill({}), explicitKeys: Array(9).fill({}),
+    preCompatKeyCount: 398, compatibilityHookCount: 87,
+    postCompatKeyCount: 485, actualFacadeKeyCount: 485,
+    unownedActualFacadeKeys: [], registeredKeysMissingFromFacade: [],
+    collisions: [],
+  };
+  const result = compareDefaultStateBaselines({ baselines: { defaultState: frozen } }, report);
+  assert.deepEqual(result.violations, []);
+  assert.deepEqual(result.expected, frozen);
+  assert.equal(result.actual.actualFacadeKeys, 485);
+});
+
+test("checker still rejects unowned, missing, and colliding default-state keys", () => {
+  const result = compareDefaultStateBaselines({ baselines: { defaultState: {} } }, {
+    factoryGroups: [], explicitKeys: [], preCompatKeyCount: 0,
+    compatibilityHookCount: 0, postCompatKeyCount: 0, actualFacadeKeyCount: 1,
+    unownedActualFacadeKeys: ["unregisteredKey"],
+    registeredKeysMissingFromFacade: ["missingKey"],
+    collisions: [{ key: "duplicateKey", owners: ["first", "second"] }],
+  });
+  assert.deepEqual(result.violations, [
+    { code: "default-state-key-collision", key: "duplicateKey", owners: ["first", "second"] },
+    { code: "unowned-actual-state-key", key: "unregisteredKey" },
+    { code: "registered-state-key-missing-from-facade", key: "missingKey" },
+  ]);
 });
 
 test("default state ownership reports injected root-key collisions", async () => {
@@ -4079,6 +4119,33 @@ test("legacy semantic authority freezes alias dynamic and diagnostic source site
       "unsupportedSites",
     ],
   );
+});
+
+test("frozen taint replay uses accepted legacy key authority without restoring current keys", async () => {
+  const accepted = readStateWriterPolicyAtRevision("HEAD");
+  const currentIndex = buildCanonicalStateKeyAuthorityIndex();
+  assert.equal(currentIndex.has("countryBaseColors"), false);
+  const historicalIndex = buildHistoricalStateKeyAuthorityIndex(currentIndex, {
+    legacySemanticBaseline: accepted.baselines.legacySemanticAuthority,
+    acceptedPolicy: accepted,
+  });
+  assert.equal(historicalIndex.get("countryBaseColors").domain, "color");
+  assert.equal(historicalIndex.get("countryBaseColors").migrationPhase, "P4.4");
+  assert.equal(currentIndex.has("countryBaseColors"), false);
+  assert.deepEqual(historicalIndex.get("visualOverrides"), currentIndex.get("visualOverrides"));
+  await assert.doesNotReject(buildFrozenDerivedAliasTaintBaseline({
+    sourceBaseSha: accepted.baseline.sourceBaseSha,
+    relativePaths: ["js/core/logic.js"],
+    legacySemanticBaseline: accepted.baselines.legacySemanticAuthority,
+    acceptedPolicy: accepted,
+    stateKeyAuthorityIndex: currentIndex,
+  }));
+  assert.throws(() => buildHistoricalStateKeyAuthorityIndex(new Map(), {
+    legacySemanticBaseline: { memberships: [
+      "js/example.js|{}|color|P4.4|assign|oldKey",
+      "js/example.js|{}|scenario|P4.2|assign|oldKey",
+    ] },
+  }), { code: "historical-state-key-authority-conflict" });
 });
 
 test("derived alias diagnostic baseline admits frozen strict diagnostics only", async () => {
@@ -8797,6 +8864,505 @@ test("caller-to-action ledger accepts one exact cross-file edge for multiple ret
   );
 });
 
+function capabilityRetirementFingerprint(source) {
+  return createHash("sha256")
+    .update(String(source).replace(/\r\n?/g, "\n"))
+    .digest("hex");
+}
+
+function repinCapabilityRetirementEntry(entry, overrides) {
+  const { contractIdentity: _contractIdentity, ...base } = {
+    ...entry,
+    ...overrides,
+  };
+  return {
+    ...base,
+    contractIdentity: createHash("sha256")
+      .update(JSON.stringify({
+        ...base,
+        sourceProofs: STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
+      }))
+      .digest("hex"),
+  };
+}
+
+function findCapabilityRetirementMembership(policy, entry) {
+  const writer = policy.writers.find(
+    ({ path: writerPath }) => writerPath === entry.modulePath,
+  );
+  const binding = writer?.bindings.find(
+    (candidate) => buildStableStateBindingIdentity(candidate)
+      === entry.bindingIdentity,
+  );
+  const grant = binding?.grants.find(
+    (candidate) => candidate.domain === entry.domain
+      && candidate.migrationPhase === entry.migrationPhase,
+  );
+  const membership = grant?.memberships.find(
+    (candidate) => candidate.operation === entry.operation
+      && candidate.key === entry.key,
+  );
+  return { writer, binding, membership };
+}
+
+function readRetirementCurrentSource(modulePath) {
+  try {
+    return fs.readFileSync(modulePath, "utf8");
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+function capabilityRetirementPreviousPolicy() {
+  const { previousSourceRevision } = STATE_CAPABILITY_RETIREMENT_CONTRACT[0];
+  return readStateWriterPolicyAtRevision(previousSourceRevision);
+}
+
+test("capability retirement proves each exact historical membership and current absence", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const violations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+  });
+
+  assert.deepEqual(violations, []);
+  assert.ok(STATE_CAPABILITY_RETIREMENT_CONTRACT.length > 0);
+  assert.equal(
+    new Set(STATE_CAPABILITY_RETIREMENT_CONTRACT.map(
+      ({ retiredMembershipIdentity }) => retiredMembershipIdentity,
+    )).size,
+    STATE_CAPABILITY_RETIREMENT_CONTRACT.length,
+  );
+});
+
+test("capability retirement rejects stale historical sites and source pins", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const [entry] = STATE_CAPABILITY_RETIREMENT_CONTRACT;
+  const staleMembershipPolicy = structuredClone(previousPolicy);
+  const staleMembership = findCapabilityRetirementMembership(
+    staleMembershipPolicy,
+    entry,
+  ).membership;
+  assert.ok(staleMembership?.mutationSites?.length);
+  staleMembership.mutationSites[0].occurrenceIndex += 1;
+
+  const membershipViolations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy: staleMembershipPolicy,
+    currentWriters: [],
+    contractEntries: [entry],
+  });
+  assert.ok(membershipViolations.some(
+    ({ reason, identity }) => reason === "historical-membership-drift"
+      && identity === entry.retiredMembershipIdentity,
+  ));
+
+  const sourceViolations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [entry],
+    readHistoricalSource: () => "// changed historical source",
+  });
+  assert.ok(sourceViolations.some(
+    ({ reason, identity }) => reason === "historical-source-drift"
+      && identity === entry.retiredMembershipIdentity,
+  ));
+});
+
+test("capability retirement rejects a deleted source or old writer membership returning", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const deletedModuleEntry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find(
+    ({ currentSourceFingerprint }) => currentSourceFingerprint === "",
+  );
+  assert.ok(deletedModuleEntry, "one fully deleted owner is covered");
+
+  const restoredSourceViolations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [deletedModuleEntry],
+    readCurrentSource: (modulePath) => modulePath === deletedModuleEntry.modulePath
+      ? "// reappeared owner: devScenarioTagCreator"
+      : readRetirementCurrentSource(modulePath),
+  });
+  assert.ok(restoredSourceViolations.some(
+    ({ reason, identity }) => reason === "current-source-drift"
+      && identity === deletedModuleEntry.retiredMembershipIdentity,
+  ));
+
+  const oldWriter = findCapabilityRetirementMembership(
+    previousPolicy,
+    deletedModuleEntry,
+  ).writer;
+  assert.ok(oldWriter, "historical owner writer exists");
+  const membershipViolations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [oldWriter],
+    contractEntries: [deletedModuleEntry],
+  });
+  assert.ok(membershipViolations.some(
+    ({ reason, identity }) => reason === "current-membership-still-present"
+      && identity === deletedModuleEntry.retiredMembershipIdentity,
+  ));
+});
+
+test("capability retirement rejects current writes even after the local source pin is refreshed", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find(
+    ({ modulePath, key }) => modulePath
+      === "js/ui/dev_workspace/selection_ownership_controller.js"
+      && key === "devScenarioEditor",
+  );
+  assert.ok(entry, "selection owner retirement entry exists");
+  const source = readRetirementCurrentSource(entry.modulePath);
+  assert.equal(typeof source, "string");
+  const mutatedSource = `${source}\nstate.devScenarioEditor = null;\n`;
+  const refreshedEntry = repinCapabilityRetirementEntry(entry, {
+    currentSourceFingerprint: capabilityRetirementFingerprint(mutatedSource),
+  });
+
+  const violations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [refreshedEntry],
+    readCurrentSource: (modulePath) => modulePath === entry.modulePath
+      ? mutatedSource
+      : readRetirementCurrentSource(modulePath),
+  });
+  assert.ok(violations.some(
+    ({ reason, identity }) => reason === "current-source-drift"
+      && identity === entry.retiredMembershipIdentity,
+  ));
+});
+
+test("capability retirement ledger records an exact non-action proof and rejects fabricated successors", () => {
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT[0];
+  const historicalPolicy = capabilityRetirementPreviousPolicy();
+  const previousPolicy = {
+    ...historicalPolicy,
+    progress: {
+      ...historicalPolicy.progress,
+      retiredLegacySemanticAuthority: {
+        ...historicalPolicy.progress.retiredLegacySemanticAuthority,
+        memberships: [],
+      },
+      callerToActionLedger: {
+        ...historicalPolicy.progress.callerToActionLedger,
+        entries: [],
+      },
+    },
+  };
+  const ledger = buildCallerToActionLedger({
+    phase: "P4.4",
+    previousPolicy,
+    writers: [],
+    retiredLegacySemanticAuthority: {
+      memberships: [entry.retiredMembershipIdentity],
+    },
+    actionDelegations: [],
+  });
+  const [proof] = ledger.entries;
+  assert.equal(ledger.schemaVersion, 3);
+  assert.equal(ledger.entries.length, 1);
+  assert.equal(proof.proofPrecision, "explicit-capability-retirement");
+  assert.equal(
+    proof.capabilityRetirementContractIdentity,
+    entry.contractIdentity,
+  );
+  assert.equal(proof.retiredMutationSiteCount, entry.retiredMutationSiteCount);
+  assert.equal(
+    proof.retiredMutationSiteFingerprint,
+    entry.retiredMutationSiteFingerprint,
+  );
+  assert.deepEqual(Object.keys(proof).sort(), [
+    "backfilled",
+    "capabilityRetirementContractIdentity",
+    "currentSourceFingerprint",
+    "domain",
+    "key",
+    "migrationPhase",
+    "operation",
+    "previousSourceFingerprint",
+    "previousSourceRevision",
+    "proofPrecision",
+    "recordedInPhase",
+    "retiredCallerBindingIdentity",
+    "retiredCallerPath",
+    "retiredInPhase",
+    "retiredMembershipIdentity",
+    "retiredMutationSiteCount",
+    "retiredMutationSiteFingerprint",
+  ].sort());
+  assert.equal(proof.actionCallEdgeIdentity, undefined);
+  assert.equal(proof.actionModulePath, undefined);
+  assert.equal(proof.successorActionProofs, undefined);
+
+  const currentPolicy = {
+    ...previousPolicy,
+    progress: {
+      ...previousPolicy.progress,
+      latestPhase: "P4.4",
+      retiredLegacySemanticAuthority: {
+        ...previousPolicy.progress.retiredLegacySemanticAuthority,
+        memberships: [entry.retiredMembershipIdentity],
+      },
+      callerToActionLedger: ledger,
+    },
+  };
+  assert.equal(
+    validateStateWriterPolicySchema(currentPolicy).some(
+      ({ code }) => code === "caller-action-ledger-entry-invalid",
+    ),
+    false,
+  );
+
+  for (const forge of [
+    (candidate) => {
+      candidate.retiredMembershipIdentity = `${candidate.retiredMembershipIdentity}|unregistered`;
+    },
+    (candidate) => {
+      candidate.capabilityRetirementContractIdentity = "0".repeat(64);
+    },
+    (candidate) => {
+      candidate.retiredMutationSiteFingerprint = "0".repeat(64);
+    },
+    (candidate) => {
+      candidate.actionCallEdgeIdentity = "a".repeat(64);
+      candidate.successorActionProofs = [{ actionModulePath: "unreviewed.js" }];
+    },
+  ]) {
+    const forged = structuredClone(currentPolicy);
+    forge(forged.progress.callerToActionLedger.entries[0]);
+    assert.ok(
+      validateStateWriterPolicySchema(forged).some(
+        ({ code }) => code === "caller-action-ledger-entry-invalid",
+      ),
+    );
+  }
+});
+
+test("capability retirement retains the complete previous action proof for all eight ended edges", () => {
+  const historicalPolicy = capabilityRetirementPreviousPolicy();
+  const historicalEntries = historicalPolicy.progress.callerToActionLedger.entries;
+  const inherited = STATE_CAPABILITY_RETIREMENT_CONTRACT.map((entry) => ({
+    entry,
+    proof: historicalEntries.find((candidate) => (
+      candidate.retiredMembershipIdentity === entry.retiredMembershipIdentity
+      && entry.previousActionProofFingerprint
+      && capabilityRetirementFingerprint(JSON.stringify(candidate))
+        === entry.previousActionProofFingerprint
+    )),
+  })).filter(({ proof }) => proof);
+  assert.equal(inherited.length, 8);
+  assert.equal(inherited.filter(({ proof }) => proof.successorActionProofs?.length).length, 2,
+    "the two historical successor chains are part of the retained proof payload");
+
+  const identities = inherited.map(({ entry }) => entry.retiredMembershipIdentity);
+  const previousPolicy = structuredClone(historicalPolicy);
+  previousPolicy.progress.callerToActionLedger.entries = inherited.map(({ proof }) => proof);
+  previousPolicy.progress.retiredLegacySemanticAuthority = {
+    ...previousPolicy.progress.retiredLegacySemanticAuthority,
+    memberships: identities,
+  };
+  const ledger = buildCallerToActionLedger({
+    phase: "P4.4",
+    previousPolicy,
+    writers: [],
+    retiredLegacySemanticAuthority: { memberships: identities },
+    actionDelegations: [],
+  });
+  assert.equal(ledger.entries.length, 8);
+  const ledgerByIdentity = new Map(ledger.entries.map((entry) => [
+    entry.retiredMembershipIdentity,
+    entry,
+  ]));
+  for (const { entry, proof } of inherited) {
+    const retirement = ledgerByIdentity.get(entry.retiredMembershipIdentity);
+    assert.equal(retirement?.proofPrecision, "explicit-capability-retirement");
+    assert.deepEqual(retirement.previousActionProof, proof,
+      `full historical action receipt is retained for ${entry.key}`);
+  }
+
+  const currentPolicy = structuredClone(previousPolicy);
+  currentPolicy.progress.callerToActionLedger = ledger;
+  const selectedContracts = inherited.map(({ entry }) => entry);
+  assert.deepEqual(inspectStateCapabilityRetirementEvidence({
+    previousPolicy: currentPolicy,
+    currentWriters: [],
+    contractEntries: selectedContracts,
+  }), []);
+
+  const forged = structuredClone(currentPolicy);
+  forged.progress.callerToActionLedger.entries[0].previousActionProof.actionExportName = "unrelatedAction";
+  assert.ok(inspectStateCapabilityRetirementEvidence({
+    previousPolicy: forged,
+    currentWriters: [],
+    contractEntries: selectedContracts,
+  }).some(({ reason }) => reason === "historical-action-proof-drift"));
+});
+
+test("all six terminal action retirements reject restoration of the retired grant", () => {
+  const historicalPolicy = capabilityRetirementPreviousPolicy();
+  const terminalEntries = STATE_CAPABILITY_RETIREMENT_CONTRACT.filter(
+    ({ terminalActionModulePath }) => terminalActionModulePath,
+  );
+  assert.equal(terminalEntries.length, 6);
+  for (const entry of terminalEntries) {
+    const restoredWriter = {
+      path: entry.terminalActionModulePath,
+      bindings: [{
+        functionName: entry.terminalActionExportName,
+        grants: [{ memberships: [{ operation: entry.operation, key: entry.key }] }],
+      }],
+    };
+    const violations = inspectStateCapabilityRetirementEvidence({
+      previousPolicy: historicalPolicy,
+      currentWriters: [restoredWriter],
+      contractEntries: [entry],
+    });
+    assert.ok(violations.some(({ reason, identity }) => (
+      reason === "terminal-action-authority-drift"
+      && identity === entry.retiredMembershipIdentity
+    )), entry.retiredMembershipIdentity);
+  }
+});
+
+test("terminal retirement receipts reject repinned unrelated actions and successor chains", () => {
+  const historicalPolicy = capabilityRetirementPreviousPolicy();
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find(
+    ({ terminalActionModulePath }) => terminalActionModulePath,
+  );
+  assert.ok(entry);
+  const originalProof = historicalPolicy.progress.callerToActionLedger.entries.find(
+    ({ retiredMembershipIdentity }) => retiredMembershipIdentity === entry.retiredMembershipIdentity,
+  );
+  assert.ok(originalProof);
+  for (const mutateProof of [
+    (proof) => { proof.actionModulePath = "js/core/state/actions/unrelated_actions.js"; },
+    (proof) => { proof.actionExportName = "unrelatedAction"; },
+    (proof) => { proof.successorActionProofs = [{ actionModulePath: proof.actionModulePath }]; },
+  ]) {
+    const changedProof = structuredClone(originalProof);
+    mutateProof(changedProof);
+    const changedPolicy = structuredClone(historicalPolicy);
+    const changedProofs = changedPolicy.progress.callerToActionLedger.entries;
+    changedProofs[changedProofs.findIndex(({ retiredMembershipIdentity }) => (
+      retiredMembershipIdentity === entry.retiredMembershipIdentity
+    ))] = changedProof;
+    const repinnedEntry = repinCapabilityRetirementEntry(entry, {
+      previousActionProofFingerprint: capabilityRetirementFingerprint(JSON.stringify(changedProof)),
+    });
+    const violations = inspectStateCapabilityRetirementEvidence({
+      previousPolicy: changedPolicy,
+      currentWriters: [],
+      contractEntries: [repinnedEntry],
+    });
+    assert.ok(violations.some(({ reason }) => reason === "terminal-action-authority-drift"));
+  }
+});
+
+test("historical caller retirement rejects the retired key returning but permits another key", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find((candidate) => (
+    candidate.retirementKind === "historical-caller"
+    && candidate.key === "showStrategicResourceMarkers"
+  ));
+  assert.ok(entry);
+  const source = readRetirementCurrentSource(entry.modulePath);
+  assert.equal(typeof source, "string");
+  const readCurrentSource = (modulePath, replacement = source) => modulePath === entry.modulePath
+    ? replacement
+    : readRetirementCurrentSource(modulePath);
+  assert.deepEqual(inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [entry],
+  }), [], "the removed caller is absent in the accepted current source");
+
+  const otherKeyCall = `${source}\nsetAppearanceVisibilityState(runtimeState, "otherVisibilityFlag", true);\n`;
+  const otherKeyEntry = repinCapabilityRetirementEntry(entry, {
+    currentSourceFingerprint: capabilityRetirementFingerprint(otherKeyCall),
+  });
+  assert.deepEqual(inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [otherKeyEntry],
+    readCurrentSource: (modulePath) => readCurrentSource(modulePath, otherKeyCall),
+  }), [], "an unrelated key is not the retired capability call");
+
+  const restoredKeyCall = `${source}\nsetAppearanceVisibilityState(runtimeState, "showStrategicResourceMarkers", true);\n`;
+  const restoredKeyEntry = repinCapabilityRetirementEntry(entry, {
+    currentSourceFingerprint: capabilityRetirementFingerprint(restoredKeyCall),
+  });
+  assert.ok(inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [restoredKeyEntry],
+    readCurrentSource: (modulePath) => readCurrentSource(modulePath, restoredKeyCall),
+  }).some(({ reason }) => reason === "historical-action-call-still-present"));
+});
+
+test("allowReadReferences tolerates a read while a repinned direct write still fails", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find((candidate) => (
+    candidate.modulePath === "js/core/history_manager.js"
+    && candidate.key === "sovereigntyByFeatureId"
+    && candidate.operation === "assign"
+  ));
+  assert.ok(entry?.allowReadReferences);
+  const source = readRetirementCurrentSource(entry.modulePath);
+  assert.equal(typeof source, "string");
+  const readOnlySource = `${source}\nvoid runtimeState.sovereigntyByFeatureId;\n`;
+  const readEntry = repinCapabilityRetirementEntry(entry, {
+    currentSourceFingerprint: capabilityRetirementFingerprint(readOnlySource),
+  });
+  assert.deepEqual(inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [readEntry],
+    readCurrentSource: (modulePath) => modulePath === entry.modulePath
+      ? readOnlySource
+      : readRetirementCurrentSource(modulePath),
+  }), [], "the allow-read contract distinguishes observation from mutation");
+
+  const writeSource = `${source}\nruntimeState.sovereigntyByFeatureId = {};\n`;
+  const writeEntry = repinCapabilityRetirementEntry(entry, {
+    currentSourceFingerprint: capabilityRetirementFingerprint(writeSource),
+  });
+  assert.ok(inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [writeEntry],
+    readCurrentSource: (modulePath) => modulePath === entry.modulePath
+      ? writeSource
+      : readRetirementCurrentSource(modulePath),
+  }).some(({ reason }) => reason === "current-source-drift"));
+});
+
+test("historical stale reconciliation rejects current source substituted for the pinned old source", () => {
+  const previousPolicy = capabilityRetirementPreviousPolicy();
+  const entry = STATE_CAPABILITY_RETIREMENT_CONTRACT.find((candidate) => (
+    candidate.retirementKind === "direct-authority"
+    && candidate.modulePath === "js/core/history_manager.js"
+    && candidate.key === "sovereigntyByFeatureId"
+  ));
+  assert.ok(entry);
+  const currentSource = readRetirementCurrentSource(entry.modulePath);
+  assert.notEqual(capabilityRetirementFingerprint(currentSource), entry.previousSourceFingerprint,
+    "the pinned historical source is distinct from the current stale-reconciliation source");
+  const violations = inspectStateCapabilityRetirementEvidence({
+    previousPolicy,
+    currentWriters: [],
+    contractEntries: [entry],
+    readHistoricalSource: (_revision, modulePath) => modulePath === entry.modulePath
+      ? currentSource
+      : readStateWriterPolicyAtRevision(entry.previousSourceRevision),
+  });
+  assert.ok(violations.some(({ reason, identity }) => (
+    reason === "historical-source-drift"
+    && identity === entry.retiredMembershipIdentity
+  )));
+});
+
 test("domain-action membership authority is unique across action modules", () => {
   const policy = createCallerActionLedgerPolicy([]);
   policy.progress.latestPhase = "P4.1";
@@ -9047,8 +9613,8 @@ test("repository checker reports a passing closed-world policy and default-state
     source:
       "baselines.bindingScopedMemberships.production.legacyCombined",
   });
-  assert.equal(report.defaultState.actual.preCompatKeys, 402);
-  assert.equal(report.defaultState.actual.postCompatKeys, 488);
+  assert.equal(report.defaultState.actual.preCompatKeys, 398);
+  assert.equal(report.defaultState.actual.postCompatKeys, 485);
   assert.equal(report.defaultState.actual.collisions, 0);
 });
 

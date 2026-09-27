@@ -167,27 +167,15 @@ class MapRendererClickSelectionTransactionBoundaryContractTest(unittest.TestCase
         ]:
             self.assertIn(token, dirty_content)
 
-    def test_event_binding_and_funnel_keep_injected_click_dispatch(self):
+    def test_event_binding_is_independent_of_project_import(self):
         event_binding_content = EVENT_BINDING_OWNER_JS.read_text(encoding="utf-8")
         funnel_content = INTERACTION_FUNNEL_JS.read_text(encoding="utf-8")
-
-        for token in [
-            'requireFunction(helpers, "bindInteractionFunnel")({',
-            'mapClick: requireFunction(handlers, "mapClick")',
-            'mapDoubleClick: requireFunction(handlers, "mapDoubleClick")',
-            'interactionRect.on("click", requireFunction(handlers, "dispatchMapClick"));',
-            'interactionRect.on("dblclick", requireFunction(handlers, "dispatchMapDoubleClick"));',
-        ]:
-            self.assertIn(token, event_binding_content)
-        for token in [
-            "let mapClickImpl = null;",
-            "export function bindInteractionFunnel({",
-            'mapClickImpl = typeof mapClick === "function" ? mapClick : null;',
-            "export function dispatchMapClick(event)",
-            'debugState.lastClickContext = buildMapInteractionContext("click", event);',
-            "return mapClickImpl(event, debugState.lastClickContext);",
-        ]:
-            self.assertIn(token, funnel_content)
+        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
+        self.assertIn('interactionRect.on("click", requireFunction(handlers, "mapClick"));', event_binding_content)
+        self.assertIn('interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));', event_binding_content)
+        self.assertNotIn('from "./interaction_funnel.js"', renderer_content)
+        self.assertNotIn("bindInteractionFunnel", funnel_content)
+        self.assertNotIn("mapClickImpl", funnel_content)
 
     def test_hit_candidates_remain_pure_and_outside_click_transaction_ownership(self):
         hit_candidates_content = INTERACTION_HIT_CANDIDATES_JS.read_text(encoding="utf-8")

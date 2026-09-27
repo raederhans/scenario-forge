@@ -2252,9 +2252,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
   });
   const changedFiles = [
     ...(includeRenderer ? ["js/core/map_renderer.js"] : []),
-    "js/core/render_change_set.js",
     "js/core/renderer/render_snapshot.js",
-    "tests/render_change_set_behavior.test.mjs",
     "tests/render_snapshot_behavior.test.mjs",
     "tests/test_map_renderer_render_snapshot_boundary_contract.py",
   ];
@@ -2285,7 +2283,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
       "node --test tests/quick_fill_history.test.mjs tests/history_feature_color_refresh_behavior.test.mjs",
       "node --test tests/render_pass_signature_policy_behavior.test.mjs",
     ] : []),
-    "node --test tests/render_snapshot_behavior.test.mjs tests/render_change_set_behavior.test.mjs",
+    "node --test tests/render_snapshot_behavior.test.mjs",
     "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
     ...(includeRenderer ? ["test:node:ownership-retirement", "test:node:startup-lifecycle"] : []),
   ];
@@ -2325,7 +2323,6 @@ test(`local projection preserves exact test routes with renderer scope ${include
     ...(includeRenderer ? ["node-test:tests/political_feature_spherical_guard_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/quick_fill_hierarchy.test.mjs", "node-test:tests/quick_fill_history.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/reference_consumer_retirement.test.mjs"] : []),
-    "node-test:tests/render_change_set_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/render_pass_signature_policy_behavior.test.mjs"] : []),
     "node-test:tests/render_snapshot_behavior.test.mjs",
     ...(includeRenderer ? ["node-test:tests/scenario_hierarchy_behavior.test.mjs", "node-test:tests/scenario_import_trust_projection_behavior.test.mjs", "node-test:tests/scenario_state_actions_atomicity_behavior.test.mjs"] : []),

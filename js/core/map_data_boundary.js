@@ -104,20 +104,16 @@ export function getMapDataBoundary(source) {
     resolveFeatureColor(featureId, { getSafeColor = defaultSafeColor, getBaseGroupCode = null } = {}) {
       const id = text(featureId);
       const safe = typeof getSafeColor === "function" ? getSafeColor : defaultSafeColor;
-      for (const field of ["visualOverrides", "featureOverrides"]) {
-        const color = safe(ownValue(source[field], id), "");
-        if (color) return { color, source: field, featureId: id, groupCode: "" };
-      }
+      const override = safe(ownValue(source.visualOverrides, id), "");
+      if (override) return { color: override, source: "visualOverrides", featureId: id, groupCode: "" };
       // Persistent base paint uses read-only reference membership, never a
-      // mutable ownership mirror or a display overlay. Adapters remain explicit.
+      // mutable ownership mirror or a display overlay.
       const groupCode = typeof getBaseGroupCode === "function"
         ? normalizeCode(getBaseGroupCode(id))
         : reference.getBaseGroupCode(id);
       if (groupCode) {
-        for (const field of ["sovereignBaseColors", "countryBaseColors"]) {
-          const color = safe(ownValue(source[field], groupCode), "");
-          if (color) return { color, source: field, featureId: id, groupCode };
-        }
+        const color = safe(ownValue(source.sovereignBaseColors, groupCode), "");
+        if (color) return { color, source: "sovereignBaseColors", featureId: id, groupCode };
       }
       return { color: null, source: "", featureId: id, groupCode };
     },

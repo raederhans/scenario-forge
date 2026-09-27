@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-27 运行时代码简化整合
+
+`C:/Users/raede/.codex/worktrees/runtime-simplification/mapcreator` 使用分支 `codex/runtime-simplification-20260927`，基于 `origin/main@1afa55b7` 实施四批运行时简化。用户已授权解决剩余状态证明缺口并合并推送；通过受保护 main 的正常 PR 检查交付。原主工作区及其他工作树的未归属改动不在本次整合范围。验证、提交和远端回执见 [任务记录](runtime-simplification-20260927/task.md)。工作树保留以保存忽略的构建、浏览器及状态证明排查证据，不在本轮清理。
+
 ## 2026-09-27 性能优化整合
 
 `C:/Users/raede/.codex/worktrees/performance-integration/mapcreator` 从远端 `main` 的 `b4f9089c` 建立，分支 `codex/performance-closeout-20260927`。本对话四轮性能改动从脏主工作区定向提取，保留远端海洋、UI 和昼夜更新。主工作区 `main` 及未归属 WIP 不变；精度扩展与旧 pr164 工作树不在本次清理范围。

@@ -47,7 +47,6 @@ runEffect("queueTooltipUpdate", { visible: false })
 runEffect("rebuildPrimaryPoliticalCollections")
 runEffect("recordCompositeCoverageDiagnostics", politicalCollections)
 runEffect("sanitizeSetMapDataColorState")
-runEffect("migrateLegacyColorState")
 runEffect("setCanvasSize")
 runEffect("buildRuntimePoliticalMeta")
 runEffect("resetSovereigntyInitialized")
@@ -99,8 +98,8 @@ const MAP_RENDERER_WIRING_TOKENS = Object.freeze([
 ]);
 
 const MAP_RENDERER_STATE_WRITE_TOKEN_PARTS = Object.freeze([
-  [RUNTIME_STATE_TOKEN, ".countryBaseColors = sanitizeCountryColorMap"],
-  [RUNTIME_STATE_TOKEN, ".featureOverrides = sanitizeColorMap"],
+  [RUNTIME_STATE_TOKEN, ".sovereignBaseColors = sanitizeCountryColorMap"],
+  [RUNTIME_STATE_TOKEN, ".visualOverrides = sanitizeColorMap"],
   [RUNTIME_STATE_TOKEN, ".waterRegionOverrides = sanitizeColorMap"],
   [RUNTIME_STATE_TOKEN, ".specialRegionOverrides = {};"],
   [RUNTIME_STATE_TOKEN, ".sovereigntyInitialized = false;"],

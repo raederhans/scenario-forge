@@ -6,7 +6,6 @@ export function createFillTargetPolicy(runtimeState, {
   getAdmin1Group,
   getFeatureCountryCodeNormalized,
   getFeatureInteractionCountryCodeNormalized,
-  isSovereigntyModeActive,
   shouldExcludePoliticalInteractionFeature,
 }) {
   const hierarchy = createQuickFillHierarchyResolver(runtimeState, {
@@ -26,7 +25,6 @@ export function createFillTargetPolicy(runtimeState, {
 
   function resolveInteractionTargetIds(feature, id) {
     if (shouldExcludePoliticalInteractionFeature(feature, id)) return [];
-    if (isSovereigntyModeActive()) return [id];
     if (runtimeState.interactionGranularity !== "country") return [id];
     // Country clicks use the same complete reference membership and hydration
     // guard as double-click Auto Fill. Never fall back to a loaded subset.
@@ -49,7 +47,6 @@ export function createFillTargetPolicy(runtimeState, {
   function isBatchFillDoubleClickBaseEligible(hit, feature) {
     if (!hit?.id || !feature) return false;
     if (runtimeState.currentTool !== "fill") return false;
-    if (isSovereigntyModeActive()) return false;
     if (runtimeState.interactionGranularity !== "subdivision") return false;
     if (runtimeState.brushModeEnabled) return false;
     if (runtimeState.specialZoneEditor?.active) return false;

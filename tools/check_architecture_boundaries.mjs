@@ -1073,7 +1073,7 @@ function collectFailures() {
     "renderer_render_lifecycle_owner.js",
     "assertNoRendererOwnerImportsMapRenderer",
     "P33 must keep surface bridge state writes behind applyRendererSurfaceBridgeState",
-    "P33 bridge call must stay between rebuildPoliticalLandCollections and migrateLegacyColorState",
+    "P33 bridge call must stay between rebuildPoliticalLandCollections and ensureSovereigntyState",
   ]) {
     if (!rendererSurfaceLifecycleInventoryTest.includes(token)) {
       failures.push(`${FILES.rendererSurfaceLifecycleInventoryTest} must lock P26 lifecycle inventory token: ${token}`);
@@ -1131,14 +1131,14 @@ function collectFailures() {
   }
   const startupOwnerRebuildIndex = rendererStartupTransactionOwner.indexOf("\"rebuildPoliticalLandCollections\"");
   const startupOwnerBridgeIndex = rendererStartupTransactionOwner.indexOf("\"applyRendererSurfaceBridgeState\"");
-  const startupOwnerMigrateIndex = rendererStartupTransactionOwner.indexOf("\"migrateLegacyColorState\"");
+  const startupOwnerNormalizeIndex = rendererStartupTransactionOwner.indexOf("\"normalizeColorStateForRender\"");
   if (
     startupOwnerRebuildIndex < 0
     || startupOwnerBridgeIndex < 0
-    || startupOwnerMigrateIndex < 0
-    || !(startupOwnerRebuildIndex < startupOwnerBridgeIndex && startupOwnerBridgeIndex < startupOwnerMigrateIndex)
+    || startupOwnerNormalizeIndex < 0
+    || !(startupOwnerRebuildIndex < startupOwnerBridgeIndex && startupOwnerBridgeIndex < startupOwnerNormalizeIndex)
   ) {
-    failures.push(`${FILES.rendererStartupTransactionOwner} must order applyRendererSurfaceBridgeState between rebuildPoliticalLandCollections and migrateLegacyColorState.`);
+    failures.push(`${FILES.rendererStartupTransactionOwner} must order applyRendererSurfaceBridgeState between rebuildPoliticalLandCollections and normalizeColorStateForRender.`);
   }
   const startupOwnerFactorySource = sliceBetween(
     renderer,
@@ -1161,7 +1161,7 @@ function collectFailures() {
     "resetRenderPhaseState: () => getRenderPhaseLifecycleOwner().resetRenderPhaseState(\"init-map\"),",
     "resetTooltipState: () => getMapHoverInteractionOwner().resetTooltipState(),",
     "runtimeState.deferContextBasePass = false;",
-    "runtimeState.syncDayNightClockTimerFn = syncDayNightClockTimer;",
+    'registerRuntimeHook(null, "syncDayNightClockTimerFn", syncDayNightClockTimer);',
     "syncDayNightClockTimer();",
   ]) {
     if (!startupOwnerFactorySource.includes(token)) {
@@ -1808,7 +1808,6 @@ function collectFailures() {
     "runEffect(\"rebuildPrimaryPoliticalCollections\")",
     "runEffect(\"recordCompositeCoverageDiagnostics\", politicalCollections)",
     "runEffect(\"sanitizeSetMapDataColorState\")",
-    "runEffect(\"migrateLegacyColorState\")",
     "runEffect(\"setCanvasSize\")",
     "runEffect(\"buildRuntimePoliticalMeta\")",
     "runEffect(\"resetSovereigntyInitialized\")",
@@ -1891,8 +1890,8 @@ function collectFailures() {
     }
   }
   for (const token of [
-    "runtimeState.countryBaseColors = sanitizeCountryColorMap",
-    "runtimeState.featureOverrides = sanitizeColorMap",
+    "runtimeState.sovereignBaseColors = sanitizeCountryColorMap",
+    "runtimeState.visualOverrides = sanitizeColorMap",
     "runtimeState.waterRegionOverrides = sanitizeColorMap",
     "runtimeState.specialRegionOverrides = {};",
     "runtimeState.sovereigntyInitialized = false;",
@@ -3332,7 +3331,7 @@ function collectFailures() {
     "function isClickSelectionTransactionOwnerPath(sourcePath)",
     "async function handleClick(event, interactionContext = null)",
     "mapClick: handleClick",
-    "interactionRect.on(\\\"click\\\", requireFunction(handlers, \\\"dispatchMapClick\\\"));",
+    "event owner binds click handlers directly",
     "Land click transaction logic remains",
     "Water click transaction logic remains",
     "Special region click transaction logic remains",
@@ -3437,8 +3436,6 @@ function collectFailures() {
   for (const token of [
     "mapClick: handleClick",
     "mapDoubleClick: handleDoubleClick",
-    "dispatchMapClick",
-    "dispatchMapDoubleClick",
     "function updateDevSelectedHit(hit = null)",
     "function addFeatureToDevSelection(featureId)",
     "function toggleFeatureInDevSelection(featureId)",
@@ -3452,27 +3449,15 @@ function collectFailures() {
     }
   }
   for (const token of [
-    "requireFunction(helpers, \"bindInteractionFunnel\")({",
-    "mapClick: requireFunction(handlers, \"mapClick\")",
-    "mapDoubleClick: requireFunction(handlers, \"mapDoubleClick\")",
-    "interactionRect.on(\"click\", requireFunction(handlers, \"dispatchMapClick\"));",
-    "interactionRect.on(\"dblclick\", requireFunction(handlers, \"dispatchMapDoubleClick\"));",
+    'interactionRect.on("click", requireFunction(handlers, "mapClick"));',
+    'interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));',
   ]) {
     if (!mapInteractionEventBindingOwner.includes(token)) {
-      failures.push(`${FILES.mapInteractionEventBindingOwner} must keep P54 injected event binding token: ${token}`);
+      failures.push(`${FILES.mapInteractionEventBindingOwner} must bind injected events directly: ${token}`);
     }
   }
-  for (const token of [
-    "let mapClickImpl = null;",
-    "export function bindInteractionFunnel({",
-    "mapClickImpl = typeof mapClick === \"function\" ? mapClick : null;",
-    "export function dispatchMapClick(event)",
-    "debugState.lastClickContext = buildMapInteractionContext(\"click\", event);",
-    "return mapClickImpl(event, debugState.lastClickContext);",
-  ]) {
-    if (!interactionFunnel.includes(token)) {
-      failures.push(`${FILES.interactionFunnel} must keep P54 click dispatch token: ${token}`);
-    }
+  if (renderer.includes('from "./interaction_funnel.js"') || interactionFunnel.includes("bindInteractionFunnel")) {
+    failures.push("Renderer event dispatch must stay independent of project import orchestration.");
   }
   for (const token of [
     "runtimeState",
@@ -3905,9 +3890,6 @@ function collectFailures() {
     "function resetRenderPhaseState(",
     "getAdaptiveSettleProfile",
     "PROMOTION_ACTIVE_STATUSES",
-    "createSummary({",
-    "effectOrder",
-    "getterOrder",
     "Object.freeze({",
   ]) {
     if (!renderPhaseLifecycleOwner.includes(token)) {
@@ -4035,7 +4017,7 @@ function collectFailures() {
     }
   }
   for (const token of [
-    "clearRenderPhaseTimer clears an active timer handle and returns a frozen summary",
+    "clearRenderPhaseTimer clears an active timer handle through injected effects",
     "setRenderPhase enters interacting with exact write and effect order",
     "setRenderPhase enters idle and flushes pending day-night refresh",
     "scheduleRenderPhaseIdle clears old timer and stores a new adaptive timer",
@@ -4952,7 +4934,7 @@ function collectFailures() {
         "function setRenderPhase(",
         "function scheduleRenderPhaseIdle(",
         "function resetRenderPhaseState(",
-        "clearRenderPhaseTimerCore(trace)",
+        "clearRenderPhaseTimerCore()",
         "setRenderPhase(renderPhaseIdle",
         "scheduleExactAfterSettleRefresh",
       ],

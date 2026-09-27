@@ -9,12 +9,15 @@ import {
   STATE_ACTION_DELEGATION_CONTRACT,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
   STATE_ACTION_LEGACY_MEMBERSHIP_REPLACEMENT_CONTRACT,
+  STATE_ACTION_NON_TARGET_NORMALIZER_SITES,
+  STATE_ACTION_IMPORTED_CALL_RECEIPTS,
   STATE_DETACHED_CAPTURE_CONTRACT,
   STATE_MUTATION_DELEGATING_OWNER_CONTRACT,
   STATE_IMPORTED_PURE_NORMALIZER_CONTRACT,
   STATE_TARGET_PURE_READER_CONTRACT,
   STATE_IMPORTED_BORROWED_PROJECTION_CONTRACT,
   inspectStateImportedBorrowedProjectionSource,
+  inspectStateActionNonTargetNormalizerSites,
   inspectStateImportedPureNormalizerSource,
   inspectStateDetachedCaptureSource,
   inspectStateMutationDelegatingOwnerSources,
@@ -26,11 +29,14 @@ import {
   validateStateDetachedCaptureContract,
   validateStateMutationDelegatingOwnerContract,
   validateStateTargetPureReaderContract,
+  inspectStateActionImportedCallReceipt,
+  validateStateActionPolicyBindings,
 } from "../tools/state_action_delegation_contract.mjs";
 import {
   applyStateWriterBindingFindingContracts,
   discoverStateWriterBindingsForSource,
   normalizeStateActionDelegations,
+  projectPalettePaintActionCandidate,
   scanStateWriterBindingInventoriesBatch,
   validateStateActionNonTargetParameterMutations,
 } from "../tools/build_state_writer_policy.mjs";
@@ -58,6 +64,158 @@ function fingerprintDirectExportedFunction(source, exportName) {
       statement.declaration.end,
     ).trim())
     .digest("hex");
+}
+
+function visitAst(node, visitor) {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const child of node) visitAst(child, visitor);
+    return;
+  }
+  if (typeof node.type === "string") visitor(node);
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "loc" || key === "start" || key === "end") continue;
+    if (Array.isArray(value)) {
+      for (const child of value) visitAst(child, visitor);
+    } else if (value && typeof value === "object") {
+      visitAst(value, visitor);
+    }
+  }
+}
+
+function pureReaderFingerprint(source, node) {
+  return createHash("sha256")
+    .update(source.slice(node.start, node.end).trim().replaceAll("\r\n", "\n"))
+    .digest("hex");
+}
+
+function replaceFunctionBody(source, functionName, replacementBody, { prepend = "" } = {}) {
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+  const statement = ast.body.find((candidate) => (
+    candidate.type === "ExportNamedDeclaration"
+      ? candidate.declaration?.type === "FunctionDeclaration" && candidate.declaration.id?.name === functionName
+      : candidate.type === "FunctionDeclaration" && candidate.id?.name === functionName
+  ));
+  const declaration = statement?.type === "ExportNamedDeclaration" ? statement.declaration : statement;
+  assert.ok(declaration, functionName);
+  return `${source.slice(0, statement.start)}${prepend}${source.slice(statement.start, declaration.body.start)}${replacementBody}${source.slice(declaration.body.end)}`;
+}
+
+function replaceNamedFunctionBody(source, functionName, replacementBody, { sourceType = "script" } = {}) {
+  const ast = parse(source, { ecmaVersion: "latest", sourceType });
+  let declaration = null;
+  visitAst(ast, (node) => {
+    if (node.type === "FunctionDeclaration" && node.id?.name === functionName) declaration = node;
+  });
+  assert.ok(declaration, functionName);
+  return `${source.slice(0, declaration.body.start)}${replacementBody}${source.slice(declaration.body.end)}`;
+}
+
+function refreshPureReaderDependencyPin(entry, modulePath, source) {
+  return {
+    ...entry,
+    dependencyFingerprints: {
+      ...entry.dependencyFingerprints,
+      [modulePath]: createHash("sha256").update(source.replace(/\r\n?/g, "\n")).digest("hex"),
+    },
+  };
+}
+
+function refreshPureReaderFunctionPin(entry, source) {
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+  const declaration = ast.body
+    .map((statement) => statement.type === "ExportNamedDeclaration" ? statement.declaration : statement)
+    .find((candidate) => candidate?.type === "FunctionDeclaration" && candidate.id?.name === entry.functionName);
+  assert.ok(declaration, entry.functionName);
+  return {
+    ...entry,
+    sourceFingerprint: createHash("sha256")
+      .update(source.slice(declaration.start, declaration.end).replaceAll("\r\n", "\n"))
+      .digest("hex"),
+  };
+}
+
+function refreshNonTargetNormalizerEntry(entry, source) {
+  const ast = parse(source, { ecmaVersion: "latest", sourceType: "module", locations: true });
+  const statement = ast.body.find((candidate) => (
+    candidate.type === "ExportNamedDeclaration"
+      && candidate.declaration?.type === "FunctionDeclaration"
+      && candidate.declaration.id?.name === entry.exportName
+  ));
+  assert.ok(statement, entry.exportName);
+  const calls = [];
+  visitAst(statement.declaration.body, (node) => {
+    if (node.type === "CallExpression" && node.callee?.type === "Identifier"
+      && node.callee.name === entry.normalizerExportName) calls.push(node);
+  });
+  assert.equal(calls.length, 1, entry.exportName);
+  return {
+    ...entry,
+    actionFingerprint: pureReaderFingerprint(source, statement.declaration),
+    callFingerprint: pureReaderFingerprint(source, calls[0]),
+  };
+}
+
+function refreshPureReaderOwnerPins(entry, source) {
+  const rawSource = String(source || "");
+  const ast = parse(rawSource, { ecmaVersion: "latest", sourceType: "module" });
+  const declaration = ast.body
+    .map((statement) => statement.type === "ExportNamedDeclaration" ? statement.declaration : statement)
+    .find((candidate) => candidate?.type === "FunctionDeclaration" && candidate.id?.name === entry.functionName);
+  assert.ok(declaration, entry.functionName);
+  const methodCalls = [];
+  const methodCallNodes = [];
+  const importedCalls = new Map();
+  visitAst(declaration.body, (node) => {
+    if (node.type !== "CallExpression") return;
+    const callee = node.callee;
+    if (callee?.type === "MemberExpression" && !callee.computed
+      && ["get", "has", "keys", "join", "map", "filter", "forEach", "some"].includes(callee.property?.name)) {
+      methodCalls.push(pureReaderFingerprint(rawSource, node));
+      methodCallNodes.push(node);
+    }
+    if (callee?.type === "Identifier") {
+      const site = (entry.reviewedImportedReadCalls || []).find((candidate) => candidate.localName === callee.name);
+      if (site) importedCalls.set(site, pureReaderFingerprint(rawSource, node));
+    }
+  });
+  const refreshedReadSites = (entry.reviewedReadSiteFingerprints || []).map((fingerprint, index) => (
+    methodCalls.includes(fingerprint) ? fingerprint : (methodCalls[index] || fingerprint)
+  ));
+  for (const site of entry.reviewedImportedReadCalls || []) {
+    if (!site.callbackParameterName) continue;
+    const parent = methodCallNodes.find((node) => {
+      if (node.callee?.property?.name !== "filter") return false;
+      const callback = node.arguments?.[0];
+      if (!["ArrowFunctionExpression", "FunctionExpression"].includes(callback?.type)
+        || callback.params?.[0]?.name !== site.callbackParameterName) return false;
+      let referencesImportedCallee = false;
+      visitAst(callback.body, (candidate) => {
+        if (candidate.type === "Identifier" && candidate.name === site.localName) referencesImportedCallee = true;
+      });
+      return referencesImportedCallee;
+    });
+    if (parent && refreshedReadSites.length) {
+      refreshedReadSites[0] = pureReaderFingerprint(rawSource, parent);
+    }
+  }
+  const refreshedReadSiteByOldFingerprint = new Map((entry.reviewedReadSiteFingerprints || [])
+    .map((fingerprint, index) => [fingerprint, refreshedReadSites[index]]));
+  return {
+    ...entry,
+    sourceFingerprint: createHash("sha256")
+      .update(rawSource.slice(declaration.start, declaration.end).replaceAll("\r\n", "\n"))
+      .digest("hex"),
+    reviewedReadSiteFingerprints: refreshedReadSites,
+    reviewedImportedReadCalls: (entry.reviewedImportedReadCalls || []).map((site) => ({
+      ...site,
+      ...(importedCalls.has(site) ? { callFingerprint: importedCalls.get(site) } : {}),
+    })),
+    conservativeFindings: (entry.conservativeFindings || []).map((finding) => ({
+      ...finding,
+      sourceFingerprint: refreshedReadSiteByOldFingerprint.get(finding.sourceFingerprint) || finding.sourceFingerprint,
+    })),
+  };
 }
 
 test("active chunk ID reader proves its three scalar map callbacks without accepting callback writes", async () => {
@@ -3109,4 +3267,528 @@ test("chunk publication actions accept borrowed payloads and retain external-eff
   assert.ok((await validateStateActionNonTargetParameterMutations(modulePath, changed)).length);
   const entry = STATE_ACTION_DELEGATION_CONTRACT.find(entry => entry.exportName === "applyScenarioChunkOptionalLayerState");
   assert.ok(validateStateActionDelegationContract([{...entry, borrowedResultPaths: []}]).length);
+});
+
+test("imported pure-reader proofs reject stale bindings, dependency drift, taint effects, and borrowed results", () => {
+  const modulePath = "js/core/renderer/render_pass_signature_policy.js";
+  const dependencyPath = "js/core/renderer/urban_city_policy.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const dependencySource = fs.readFileSync(dependencyPath, "utf8");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) => candidate.modulePath === modulePath);
+  assert.ok(entry);
+  const readSource = (path) => fs.readFileSync(path, "utf8");
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry, { readSource }).violations, []);
+
+  const bindingDrift = source.replace(
+    "import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';",
+    "import { unrelatedExport as getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';",
+  );
+  assert.notEqual(bindingDrift, source);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(bindingDrift, entry, { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-imported-read-binding-drift"));
+
+  const dependencyDrift = `${dependencySource}\n// unreviewed dependency change`;
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, entry, {
+    readSource: (path) => path === dependencyPath ? dependencyDrift : readSource(path),
+  }).violations.some(({ code }) => code === "state-target-pure-reader-dependency-source-drift"));
+
+  const cases = [
+    {
+      name: "directly mutating the imported reader argument",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ state.cityLayerRevision = -1; return []; }"),
+      code: "state-target-pure-reader-imported-read-mutation",
+    },
+    {
+      name: "indirectly mutating the imported reader argument",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ mutateSignatureInput(state); return []; }",
+        { prepend: "function mutateSignatureInput(state) { state.cityLayerRevision = -1; }\n" }),
+      code: "state-target-pure-reader-imported-read-mutation",
+    },
+    {
+      name: "directly returning the borrowed argument",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts", "{ return state; }"),
+      code: "state-target-pure-reader-imported-read-borrowed-result",
+    },
+    {
+      name: "indirectly returning the borrowed argument",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ return returnSignatureInput(state); }",
+        { prepend: "function returnSignatureInput(state) { return state; }\n" }),
+      code: "state-target-pure-reader-imported-read-borrowed-result",
+    },
+    {
+      name: "returning an object borrowed through destructuring",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ const { x } = state; return x; }"),
+      code: "state-target-pure-reader-imported-read-borrowed-result",
+    },
+    {
+      name: "returning a borrowed argument through reassignment",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ let result = ''; result = state; return result; }"),
+      code: "state-target-pure-reader-imported-read-borrowed-result",
+    },
+    {
+      name: "returning a borrowed argument through a shadowed built-in helper",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ return String(state); }",
+        { prepend: "const String = (value) => value;\n" }),
+      acceptedCodes: [
+        "state-target-pure-reader-imported-read-borrowed-result",
+        "state-target-pure-reader-imported-read-mutation",
+      ],
+    },
+    {
+      name: "mutating an alias returned by a local projection helper",
+      changed: replaceFunctionBody(dependencySource, "getUrbanCityRenderPassSignatureParts",
+        "{ const value = selectSignatureMember(state); value.changed = true; return []; }",
+        { prepend: "function selectSignatureMember(state) { return state.inner; }\n" }),
+      code: "state-target-pure-reader-imported-read-mutation",
+    },
+  ];
+  for (const { name, changed, code, acceptedCodes = [code] } of cases) {
+    assert.notEqual(changed, dependencySource, `${name}: mutation fixture must apply`);
+    const updatedEntry = {
+      ...entry,
+      dependencyFingerprints: {
+        ...entry.dependencyFingerprints,
+        [dependencyPath]: createHash("sha256").update(changed.replace(/\r\n?/g, "\n")).digest("hex"),
+      },
+    };
+    const violations = inspectStateTargetPureReaderFunctionSource(source, updatedEntry, {
+      readSource: (path) => path === dependencyPath ? changed : readSource(path),
+    }).violations;
+    assert.ok(violations.some(({ code: actualCode }) => acceptedCodes.includes(actualCode)),
+      `${name}: ${violations.map(({ code }) => code).join(", ")}`);
+  }
+});
+
+test("cache reader proofs reject callback writes, missing imported receipts, and mutable WeakMap get receivers", () => {
+  const modulePath = "js/core/scenario/bundle_cache_policy.js";
+  const dependencyPath = "js/core/scenario_chunk_manager.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) => candidate.modulePath === modulePath);
+  assert.ok(entry);
+  const readSource = (path) => fs.readFileSync(path, "utf8");
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry, { readSource }).violations, []);
+
+  const missingReceipt = { ...entry, reviewedImportedReadCalls: [] };
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, missingReceipt, { readSource }).violations.length,
+    "imported callback call must not become implicitly trusted when its receipt is removed");
+
+  const callbackMutation = source.replace(
+    "const bytes = sourceBytesByPayloadEntry.get(cache[chunk.id]) || 0;",
+    "chunk.cachePoisoned = true;\n          const bytes = sourceBytesByPayloadEntry.get(cache[chunk.id]) || 0;",
+  );
+  assert.notEqual(callbackMutation, source, "callback mutation fixture must apply");
+  const refreshedCallbackEntry = refreshPureReaderOwnerPins(entry, callbackMutation);
+  const callbackViolations = inspectStateTargetPureReaderFunctionSource(callbackMutation, refreshedCallbackEntry, { readSource }).violations;
+  assert.ok(callbackViolations.some(({ code }) => code === "state-target-pure-reader-read-callback-mutation"),
+    callbackViolations.map(({ code }) => code).join(", "));
+
+  const dependencySource = readSource(dependencyPath);
+  const dependencyMutant = dependencySource.replace(
+    "export function isScenarioPoliticalBaseChunk(chunk) {",
+    "export function isScenarioPoliticalBaseChunk(chunk) {\n  chunk.cachePoisoned = true;",
+  );
+  assert.notEqual(dependencyMutant, dependencySource);
+  const refreshedDependencyEntry = {
+    ...entry,
+    dependencyFingerprints: {
+      ...entry.dependencyFingerprints,
+      [dependencyPath]: createHash("sha256").update(dependencyMutant.replace(/\r\n?/g, "\n")).digest("hex"),
+    },
+  };
+  const dependencyViolations = inspectStateTargetPureReaderFunctionSource(source, refreshedDependencyEntry, {
+    readSource: (path) => path === dependencyPath ? dependencyMutant : readSource(path),
+  }).violations;
+  assert.ok(dependencyViolations.some(({ code }) => code === "state-target-pure-reader-imported-read-mutation"),
+    dependencyViolations.map(({ code }) => code).join(", "));
+
+  const weakMapMutations = [
+    source.replace("const sourceBytesByPayloadEntry = new WeakMap();", "let sourceBytesByPayloadEntry = new WeakMap();"),
+    source.replace("const sourceBytesByPayloadEntry = new WeakMap();", "const sourceBytesByPayloadEntry = new WeakMap();\nsourceBytesByPayloadEntry.get = () => 0;"),
+    source.replace("const sourceBytesByPayloadEntry = new WeakMap();", "const sourceBytesByPayloadEntry = new WeakMap();\nObject.defineProperty(sourceBytesByPayloadEntry, 'get', { value: () => 0 });"),
+    source.replace("const sourceBytesByPayloadEntry = new WeakMap();", "WeakMap.prototype.get = () => 0;\nconst sourceBytesByPayloadEntry = new WeakMap();"),
+    source.replace("const sourceBytesByPayloadEntry = new WeakMap();", "function WeakMap() {};\nconst sourceBytesByPayloadEntry = new WeakMap();"),
+    source.replace("export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = [], { preferPoliticalBase = false } = {}) {", "export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = [], { preferPoliticalBase = false } = {}) {\n  const WeakMap = class {};")
+  ];
+  for (const [index, mutated] of weakMapMutations.entries()) {
+    assert.notEqual(mutated, source, `WeakMap fixture ${index} must apply`);
+    const refreshedEntry = refreshPureReaderOwnerPins(entry, mutated);
+    assert.ok(inspectStateTargetPureReaderFunctionSource(mutated, refreshedEntry, { readSource }).violations
+      .some(({ code }) => code === "state-target-pure-reader-weakmap-binding-drift"), `WeakMap fixture ${index}`);
+  }
+});
+
+test("shared feature-ID bridge proofs reject import, bridge, and getter mutations after dependency repinning", () => {
+  const modulePath = "js/core/renderer/scenario_region_overlay_render_owner.js";
+  const bridgePath = "js/core/feature_identity.js";
+  const sharedPath = "js/core/feature_identity_shared.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const bridgeSource = fs.readFileSync(bridgePath, "utf8");
+  const sharedSource = fs.readFileSync(sharedPath, "utf8");
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) => candidate.modulePath === modulePath);
+  assert.ok(entry?.reviewedSharedFeatureIdBridge);
+  const readSource = (path) => fs.readFileSync(path, "utf8");
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry, { readSource }).violations, []);
+
+  const importDrift = source.replace(
+    'import { getFeatureId as getSharedFeatureId } from "../feature_identity.js";',
+    'import { getFeatureId as wrongFeatureId } from "../feature_identity.js";',
+  );
+  assert.notEqual(importDrift, source);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(importDrift, entry, { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-shared-bridge-import-drift"));
+
+  const localShadow = source.replace(
+    "  const scenarioWaterPathCache = new GeometryBudgetMap",
+    "  const getSharedFeatureId = (feature) => feature?.id;\n  const scenarioWaterPathCache = new GeometryBudgetMap",
+  );
+  assert.notEqual(localShadow, source);
+  const localShadowEntry = refreshPureReaderFunctionPin(entry, localShadow);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(localShadow, localShadowEntry, { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-shared-bridge-import-drift"));
+
+  const setPrototypeOverride = source.replace(
+    "export function createScenarioRegionOverlayRenderOwner(runtimeState, {",
+    "Set.prototype.has = () => true;\nexport function createScenarioRegionOverlayRenderOwner(runtimeState, {",
+  );
+  assert.notEqual(setPrototypeOverride, source);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(setPrototypeOverride, entry, { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-set-binding-drift"));
+
+  const setConstructorShadow = source.replace(
+    "export function createScenarioRegionOverlayRenderOwner(runtimeState, {",
+    "class Set {};\nexport function createScenarioRegionOverlayRenderOwner(runtimeState, {",
+  );
+  assert.notEqual(setConstructorShadow, source);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(setConstructorShadow, entry, { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-set-binding-drift"));
+
+  const setShadow = source.replace(
+    "  const scenarioWaterPathCache = new GeometryBudgetMap",
+    "  const Set = class {};\n  const scenarioWaterPathCache = new GeometryBudgetMap",
+  );
+  assert.notEqual(setShadow, source);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(setShadow, refreshPureReaderFunctionPin(entry, setShadow), { readSource }).violations
+    .some(({ code }) => code === "state-target-pure-reader-set-binding-drift"));
+
+  const noSideEffectImport = bridgeSource.replace(/^import "\.\/feature_identity_shared\.js";\r?\n/m, "");
+  assert.notEqual(noSideEffectImport, bridgeSource);
+  const sideEffectEntry = refreshPureReaderDependencyPin(entry, bridgePath, noSideEffectImport);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, sideEffectEntry, {
+    readSource: (path) => path === bridgePath ? noSideEffectImport : readSource(path),
+  }).violations.some(({ code }) => code === "state-target-pure-reader-shared-bridge-binding-drift"));
+
+  const wrongGetterBinding = bridgeSource.replace(
+    /(^\s*getFeatureId,)\r?\n(?=\s*getStableKey,)/m,
+    "  otherGetter: getFeatureId,\n",
+  );
+  assert.notEqual(wrongGetterBinding, bridgeSource);
+  const getterBindingEntry = refreshPureReaderDependencyPin(entry, bridgePath, wrongGetterBinding);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, getterBindingEntry, {
+    readSource: (path) => path === bridgePath ? wrongGetterBinding : readSource(path),
+  }).violations.some(({ code }) => code === "state-target-pure-reader-shared-bridge-binding-drift"));
+
+  const mutatedGetter = replaceNamedFunctionBody(sharedSource, "getFeatureId",
+    "{ featureOrId.id = 'mutated'; return featureOrId; }");
+  assert.notEqual(mutatedGetter, sharedSource);
+  const mutationEntry = refreshPureReaderDependencyPin(entry, sharedPath, mutatedGetter);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, mutationEntry, {
+    readSource: (path) => path === sharedPath ? mutatedGetter : readSource(path),
+  }).violations.some(({ code }) => code === "state-target-pure-reader-shared-bridge-mutation"));
+
+  const borrowedGetter = replaceNamedFunctionBody(sharedSource, "getFeatureId", "{ return featureOrId; }");
+  assert.notEqual(borrowedGetter, sharedSource);
+  const borrowedEntry = refreshPureReaderDependencyPin(entry, sharedPath, borrowedGetter);
+  assert.ok(inspectStateTargetPureReaderFunctionSource(source, borrowedEntry, {
+    readSource: (path) => path === sharedPath ? borrowedGetter : readSource(path),
+  }).violations.some(({ code }) => code === "state-target-pure-reader-shared-bridge-borrowed-result"));
+});
+
+test("non-target normalizer receipts bind exactly three scalar calls across line endings and reject refreshed semantic drift", async () => {
+  const modulePath = "js/core/state/actions/scenario_presentation_actions.js";
+  const quickFillPath = "js/core/quick_fill_hierarchy.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const quickFillSource = fs.readFileSync(quickFillPath, "utf8");
+  const readSource = (path) => fs.readFileSync(path, "utf8");
+  const inspect = (text, contractEntries = STATE_ACTION_NON_TARGET_NORMALIZER_SITES, sourceReader = readSource) =>
+    inspectStateActionNonTargetNormalizerSites(text, modulePath, {
+      readSource: sourceReader,
+      contractEntries,
+    });
+  const lfResult = inspect(source.replace(/\r\n/g, "\n"));
+  assert.deepEqual(lfResult.violations, []);
+  assert.equal(lfResult.sites.size, 3);
+  const crlfResult = inspect(source.replace(/\r?\n/g, "\r\n"));
+  assert.deepEqual(crlfResult.violations, []);
+  assert.deepEqual([...crlfResult.sites].sort(), [...lfResult.sites].sort());
+
+  const wrongImport = source.replace(
+    'import { normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";',
+    'import { unrelatedNormalizer as normalizeQuickFillScope } from "../../quick_fill_hierarchy.js";',
+  );
+  assert.notEqual(wrongImport, source);
+  const wrongImportResult = inspect(wrongImport);
+  assert.ok(wrongImportResult.violations.some(({ code }) =>
+    code === "state-action-non-target-normalizer-binding-drift"));
+  assert.equal(wrongImportResult.sites.size, 2);
+
+  const localShadow = source.replace(
+    "const nextScope = normalizeQuickFillScope(scope);",
+    "const normalizeQuickFillScope = (value) => value;\n  const nextScope = normalizeQuickFillScope(scope);",
+  );
+  assert.notEqual(localShadow, source);
+  const localShadowEntries = STATE_ACTION_NON_TARGET_NORMALIZER_SITES.map((entry) =>
+    entry.exportName === "setBatchFillScopeState" ? refreshNonTargetNormalizerEntry(entry, localShadow) : entry);
+  const localShadowResult = inspect(localShadow, localShadowEntries);
+  assert.ok(localShadowResult.violations.some(({ code }) =>
+    code === "state-action-non-target-normalizer-binding-drift"));
+  assert.equal(localShadowResult.sites.size, 2);
+
+  const changedArgument = source.replace(
+    "const nextScope = normalizeQuickFillScope(scope);",
+    "const nextScope = normalizeQuickFillScope(String(scope));",
+  );
+  assert.notEqual(changedArgument, source);
+  const changedArgumentEntries = STATE_ACTION_NON_TARGET_NORMALIZER_SITES.map((entry) =>
+    entry.exportName === "setBatchFillScopeState" ? refreshNonTargetNormalizerEntry(entry, changedArgument) : entry);
+  const changedArgumentResult = inspect(changedArgument, changedArgumentEntries);
+  assert.ok(changedArgumentResult.violations.some(({ code }) =>
+    code === "state-action-non-target-normalizer-call-drift"));
+  assert.equal(changedArgumentResult.sites.size, 2);
+
+  const unknownCallSource = source.replace(
+    "  const nextScope = normalizeQuickFillScope(scope);",
+    "  consumeUnknown(scope);\n  const nextScope = normalizeQuickFillScope(scope);",
+  );
+  assert.notEqual(unknownCallSource, source);
+  const unknownCallEntries = STATE_ACTION_NON_TARGET_NORMALIZER_SITES.map((entry) =>
+    entry.exportName === "setBatchFillScopeState" ? refreshNonTargetNormalizerEntry(entry, unknownCallSource) : entry);
+  const unknownCallResult = inspect(unknownCallSource, unknownCallEntries);
+  assert.deepEqual(unknownCallResult.violations, []);
+  const unknownAst = parse(unknownCallSource, { ecmaVersion: "latest", sourceType: "module", locations: true });
+  let unknownArgument = null;
+  visitAst(unknownAst, (node) => {
+    if (node.type === "CallExpression" && node.callee?.name === "consumeUnknown") unknownArgument = node.arguments[0];
+  });
+  assert.ok(unknownArgument);
+  const unknownSiteKey = [
+    "setBatchFillScopeState",
+    unknownArgument.loc.start.line,
+    unknownArgument.loc.start.column + 1,
+    "scope",
+  ].join(":");
+  assert.equal(unknownCallResult.sites.has(unknownSiteKey), false,
+    "an unrelated unknown call must not receive a normalizer receipt");
+  const unknownCallFindings = await validateStateActionNonTargetParameterMutations(modulePath, unknownCallSource);
+  assert.ok(unknownCallFindings.some((finding) => finding.exportName === "setBatchFillScopeState"
+    && finding.parameterName === "scope" && finding.evidenceKind === "unknown-call-argument"
+    && finding.line === unknownArgument.loc.start.line
+    && finding.column === unknownArgument.loc.start.column + 1));
+
+  const directWrite = replaceFunctionBody(quickFillSource, "normalizeQuickFillScope",
+    "{ value.changed = true; return 'parent'; }");
+  const borrowedReturn = replaceFunctionBody(quickFillSource, "normalizeQuickFillScope", "{ return value; }");
+  const reboundText = quickFillSource
+    .replace("const text = (value) => String(value ?? \"\").trim();", "let text = (value) => String(value ?? \"\").trim();")
+    .replace(
+      "export function normalizeQuickFillScope(value) {",
+      "text = (value) => { value.x = 1; return value; };\nexport function normalizeQuickFillScope(value) {",
+    );
+  const changedDependencyCases = [
+    ["direct normalizer input mutation", directWrite],
+    ["borrowed normalizer result", borrowedReturn],
+    ["mutating text helper rebound after its declaration", reboundText],
+  ];
+  for (const [name, changedDependency] of changedDependencyCases) {
+    assert.notEqual(changedDependency, quickFillSource, name);
+    const refreshedEntries = STATE_ACTION_NON_TARGET_NORMALIZER_SITES.map((entry) =>
+      entry.normalizerModulePath === quickFillPath
+        ? {
+          ...entry,
+          dependencyFingerprint: createHash("sha256")
+            .update(changedDependency.replace(/\r\n?/g, "\n"))
+            .digest("hex"),
+        }
+        : entry);
+    const result = inspect(source, refreshedEntries, (path) =>
+      path === quickFillPath ? changedDependency : readSource(path));
+    assert.ok(result.violations.some(({ code }) =>
+      code === "state-action-non-target-normalizer-dependency-drift"), name);
+    assert.equal(result.sites.size, 2, name);
+  }
+
+  const unpinnedDependencyDrift = [quickFillSource, "// unreviewed normalizer change"].join("\n");
+  const stalePinResult = inspect(source, STATE_ACTION_NON_TARGET_NORMALIZER_SITES, (path) =>
+    path === quickFillPath ? unpinnedDependencyDrift : readSource(path));
+  assert.ok(stalePinResult.violations.some(({ code }) =>
+    code === "state-action-non-target-normalizer-dependency-drift"));
+  assert.equal(stalePinResult.sites.size, 2);
+});
+
+function refreshImportedCallOwnerPins(entry, source) {
+  const normalized = String(source).replace(/\r\n?/g, "\n");
+  const ast = parse(normalized, { ecmaVersion: "latest", sourceType: "module" });
+  const statement = ast.body.find((candidate) => (
+    candidate.type === "ExportNamedDeclaration"
+    && candidate.declaration?.type === "FunctionDeclaration"
+    && candidate.declaration.id?.name === entry.exportName
+  ));
+  assert.ok(statement, entry.exportName);
+  return {
+    ...entry,
+    sourceFingerprint: createHash("sha256").update(normalized).digest("hex"),
+    functionFingerprint: createHash("sha256")
+      .update(normalized.slice(statement.declaration.start, statement.declaration.end))
+      .digest("hex"),
+  };
+}
+
+test("imported activation calls preserve exact paint projection and detached eviction read", async () => {
+  const receipts = STATE_ACTION_IMPORTED_CALL_RECEIPTS;
+  const readSource = (modulePath) => fs.readFileSync(modulePath, "utf8");
+  for (const entry of Object.values(receipts)) {
+    const { violations, call } = inspectStateActionImportedCallReceipt(entry, { readSource });
+    assert.deepEqual(violations, [], entry.exportName);
+    assert.ok(call, entry.exportName);
+  }
+
+  const colorPath = receipts.paint.calleeModulePath;
+  const colorSource = fs.readFileSync(colorPath, "utf8");
+  const { bindingInventories } = await discoverStateWriterBindingsForSource(
+    colorPath,
+    colorSource,
+    "production",
+    { includeInventories: true, scanAllParameters: true },
+  );
+  const scannedCandidates = bindingInventories.map(({ binding, findings }) => ({
+    path: colorPath,
+    surface: "production",
+    binding,
+    findings,
+  }));
+  const projectedPaint = projectPalettePaintActionCandidate(scannedCandidates, { readSource });
+  assert.equal(projectedPaint.delegationOnly, false);
+  assert.equal(projectedPaint.binding.functionName, receipts.paint.exportName);
+  assert.deepEqual(projectedPaint.findings.map(({ operation, key, pathSegments }) => ({
+    operation,
+    key,
+    pathSegments,
+  })), [{
+    operation: "assign",
+    key: "visualOverrides",
+    pathSegments: ["visualOverrides", "*"],
+  }]);
+
+  const actionSource = fs.readFileSync(receipts.eviction.modulePath, "utf8");
+  const actionScan = await discoverStateWriterBindingsForSource(
+    receipts.eviction.modulePath,
+    actionSource,
+    "production",
+    { includeInventories: true, scanAllParameters: true },
+  );
+  const trimTarget = actionScan.bindingInventories.find(({ binding }) => (
+    binding.functionName === receipts.eviction.exportName
+    && binding.parameterIndex === 0
+    && binding.parameterPath === "$"
+  ));
+  assert.ok(trimTarget, "the eviction action target remains discoverable");
+  assert.equal(receipts.eviction.argumentFingerprint,
+    createHash("sha256").update("target.scenarioBundleCacheById[id]").digest("hex"));
+  assert.ok(trimTarget.findings.some(({ key, reason, operation, sourceFingerprint }) => (
+    key === "scenarioBundleCacheById"
+    && reason === "state-alias-escape"
+    && operation === "unsupported"
+    && sourceFingerprint === receipts.eviction.argumentFingerprint
+  )), "only the exact bundle argument is the borrowed reader escape");
+});
+
+test("imported activation receipts reject refreshed wrong bindings, changed calls, and callee drift", () => {
+  const { paint, eviction } = STATE_ACTION_IMPORTED_CALL_RECEIPTS;
+  const actionSource = fs.readFileSync(paint.modulePath, "utf8");
+  const paintReadSource = (source) => (modulePath) => (
+    modulePath === paint.modulePath ? source : fs.readFileSync(modulePath, "utf8")
+  );
+
+  const wrongImportSource = actionSource.replace(
+    'import { applyFeaturePaintState } from "../color_state.js";',
+    'import { applyFeaturePaintState as unrelatedPaintWriter } from "../color_state.js";',
+  );
+  assert.notEqual(wrongImportSource, actionSource);
+  const wrongImportEntry = refreshImportedCallOwnerPins(paint, wrongImportSource);
+  assert.ok(inspectStateActionImportedCallReceipt(wrongImportEntry, {
+    readSource: paintReadSource(wrongImportSource),
+  }).violations.some(({ code }) => code === "state-action-imported-call-binding-drift"));
+
+  const changedCallSource = actionSource.replace(
+    "applyFeaturePaintState(target, featureIds, color);",
+    "applyFeaturePaintState(target, featureIds, String(color));",
+  );
+  assert.notEqual(changedCallSource, actionSource);
+  const changedCallEntry = refreshImportedCallOwnerPins(paint, changedCallSource);
+  const changedCallViolations = inspectStateActionImportedCallReceipt(changedCallEntry, {
+    readSource: paintReadSource(changedCallSource),
+  }).violations;
+  assert.ok(changedCallViolations.some(({ code }) => code === "state-action-imported-call-site-drift"));
+  assert.ok(changedCallViolations.some(({ code }) => code === "state-action-imported-target-effect-drift"));
+
+  const colorPath = paint.calleeModulePath;
+  const colorSource = fs.readFileSync(colorPath, "utf8");
+  const changedCallee = colorSource.replace(
+    "export function applyFeaturePaintState(target, featureIds, value, { remove = false } = {}) {",
+    "export function applyFeaturePaintState(target, featureIds, value, { remove = false } = {}) {\n  target.unreviewedPaintMutation = true;",
+  );
+  assert.notEqual(changedCallee, colorSource);
+  const calleeViolations = inspectStateActionImportedCallReceipt(paint, {
+    readSource: (modulePath) => modulePath === colorPath
+      ? changedCallee
+      : fs.readFileSync(modulePath, "utf8"),
+  }).violations;
+  assert.ok(calleeViolations.some(({ code }) => code === "state-action-imported-target-effect-drift"));
+
+  const readerPath = eviction.calleeModulePath;
+  const readerSource = fs.readFileSync(readerPath, "utf8");
+  const mutatedReader = readerSource.replace(
+    "export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = [], { preferPoliticalBase = false } = {}) {",
+    "export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = [], { preferPoliticalBase = false } = {}) {\n  bundle.unreviewedMutation = true;",
+  );
+  assert.notEqual(mutatedReader, readerSource);
+  const readerViolations = inspectStateActionImportedCallReceipt(eviction, {
+    readSource: (modulePath) => modulePath === readerPath
+      ? mutatedReader
+      : fs.readFileSync(modulePath, "utf8"),
+  }).violations;
+  assert.ok(readerViolations.some(({ code }) => code === "state-action-imported-reader-drift"));
+});
+
+test("paint projection fails closed when the imported callee's recorded target effects change", async () => {
+  const receipt = STATE_ACTION_IMPORTED_CALL_RECEIPTS.paint;
+  const colorPath = receipt.calleeModulePath;
+  const source = fs.readFileSync(colorPath, "utf8");
+  const { bindingInventories } = await discoverStateWriterBindingsForSource(
+    colorPath,
+    source,
+    "production",
+    { includeInventories: true, scanAllParameters: true },
+  );
+  const candidates = bindingInventories.map(({ binding, findings }) => ({
+    path: colorPath,
+    surface: "production",
+    binding,
+    findings,
+  }));
+  const callee = candidates.find(({ binding }) => (
+    binding.functionName === receipt.importedName
+    && binding.parameterIndex === 0
+  ));
+  assert.ok(callee);
+  callee.findings[0].unsupported = true;
+  assert.throws(
+    () => projectPalettePaintActionCandidate(candidates),
+    (error) => error?.code === "state-action-imported-target-effects-drift",
+  );
 });

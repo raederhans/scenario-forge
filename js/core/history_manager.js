@@ -21,7 +21,6 @@ import {
 } from "./state/actions/strategic_overlay_actions.js";
 import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
 import { markDirty } from "./dirty_state.js";
-import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { callRuntimeHook, callRuntimeHooks } from "./state/index.js";
 const state = runtimeState;
@@ -88,7 +87,6 @@ function captureHistoryState({
 
   if (ids.length) {
     snapshot.visualOverrides = captureEntries(runtimeState.visualOverrides || {}, ids);
-    snapshot.featureOverrides = captureEntries(runtimeState.featureOverrides || {}, ids);
   }
 
   if (waterIds.length) {
@@ -97,7 +95,6 @@ function captureHistoryState({
 
   if (ownerKeys.length) {
     snapshot.sovereignBaseColors = captureEntries(runtimeState.sovereignBaseColors || {}, ownerKeys);
-    snapshot.countryBaseColors = captureEntries(runtimeState.countryBaseColors || {}, ownerKeys);
     snapshot.countryPalette = captureEntries(runtimeState.countryPalette || {}, ownerKeys);
   }
 
@@ -223,7 +220,7 @@ function getFeatureColorHistoryIds(entry) {
   for (const snapshot of [entry?.before, entry?.after]) {
     if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
     for (const [key, values] of Object.entries(snapshot)) {
-      if (key !== "visualOverrides" && key !== "featureOverrides") return null;
+      if (key !== "visualOverrides") return null;
       if (!values || typeof values !== "object" || Array.isArray(values)) return null;
       Object.keys(values).forEach((id) => ids.add(id));
     }
@@ -318,27 +315,15 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   // runtimeState 上这一批容器必须先补齐，历史快照恢复才可以安全地执行 delete / replace。
 
   runtimeState.visualOverrides = runtimeState.visualOverrides || {};
-  runtimeState.featureOverrides = runtimeState.featureOverrides || {};
   runtimeState.waterRegionOverrides = runtimeState.waterRegionOverrides || {};
   runtimeState.specialRegionOverrides = runtimeState.specialRegionOverrides || {};
   runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
-  runtimeState.countryBaseColors = runtimeState.countryBaseColors || {};
   runtimeState.countryPalette = runtimeState.countryPalette || {};
 
   applyEntries(runtimeState.visualOverrides, snapshot.visualOverrides);
-  applyEntries(runtimeState.featureOverrides, snapshot.featureOverrides);
   applyEntries(runtimeState.waterRegionOverrides, snapshot.waterRegionOverrides);
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
-  applyEntries(runtimeState.countryBaseColors, snapshot.countryBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
-  if (
-    snapshot.visualOverrides
-    || snapshot.featureOverrides
-    || snapshot.sovereignBaseColors
-    || snapshot.countryBaseColors
-  ) {
-    markLegacyColorStateDirty();
-  }
   applyStyleSnapshot(snapshot.styleConfig);
   if (hasAnnotationView) {
     runtimeState.annotationView = cloneStructuredValue(snapshot.annotationView);

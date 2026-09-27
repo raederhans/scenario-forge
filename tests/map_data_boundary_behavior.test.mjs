@@ -12,7 +12,7 @@ function fixture() {
     sovereigntyByFeatureId: { a: "OTHER", b: "OTHER" },
     landIndex: new Map([["a", { properties: { id: "a", country_code: "GB" } }]]),
     sovereignBaseColors: { "2RA": "#123456", GB: "#123456" },
-    countryBaseColors: {}, visualOverrides: {}, featureOverrides: {},
+    visualOverrides: {},
     countryToFeatureIds: new Map([["GB", ["a", "b"]]]),
   };
 }
@@ -78,7 +78,7 @@ test("one paint API resolves baseline, edit, palette update, and erase without c
   assert.equal(paint.resolveFeatureColor("a").color, "#123456");
   assert.deepEqual(applyFeaturePaintState(state, [" a ", "b", "a"], "#ABC"), ["a", "b"]);
   assert.equal(paint.resolveFeatureColor("a").color, "#aabbcc");
-  assert.deepEqual(state.visualOverrides, state.featureOverrides);
+  assert.equal(Object.hasOwn(state, "featureOverrides"), false);
   state.sovereignBaseColors["2RA"] = "#654321";
   assert.equal(paint.resolveFeatureColor("a").color, "#aabbcc");
   applyFeaturePaintState(state, ["a"], null, { remove: true });

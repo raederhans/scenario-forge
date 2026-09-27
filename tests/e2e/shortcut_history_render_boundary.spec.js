@@ -53,24 +53,15 @@ test("@dev history undo and redo flush through render boundary", async ({ page }
     state.visualOverrides = {
       [featureId]: { fill: "#112233" },
     };
-    state.featureOverrides = {
-      [featureId]: null,
-    };
     state.historyPast = [{
       before: {
         visualOverrides: {
-          [featureId]: null,
-        },
-        featureOverrides: {
           [featureId]: null,
         },
       },
       after: {
         visualOverrides: {
           [featureId]: { fill: "#112233" },
-        },
-        featureOverrides: {
-          [featureId]: null,
         },
       },
       meta: {},

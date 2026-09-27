@@ -29,7 +29,6 @@ const EFFECT_ORDER = Object.freeze([
   "ensureLayerDataFromTopology",
   "rebuildPoliticalLandCollections",
   "applyRendererSurfaceBridgeState",
-  "migrateLegacyColorState",
   "ensureSovereigntyState",
   "normalizeColorStateForRender",
   "setDebugMode",
@@ -51,6 +50,7 @@ const EFFECT_ORDER = Object.freeze([
 function createHarness() {
   const calls = [];
   const payloads = [];
+  const getterCalls = [];
   const effects = {};
   for (const name of EFFECT_ORDER) {
     effects[name] = (...args) => {
@@ -59,10 +59,13 @@ function createHarness() {
     };
   }
   const getters = {
-    isPerfOverlayEnabled: () => true,
+    isPerfOverlayEnabled: () => {
+      getterCalls.push("isPerfOverlayEnabled");
+      return true;
+    },
   };
   const owner = createRendererStartupTransactionOwner({ effects, getters });
-  return { calls, effects, getters, owner, payloads };
+  return { calls, effects, getterCalls, getters, owner, payloads };
 }
 
 function readRepoFile(...parts) {
@@ -163,13 +166,13 @@ test("topology and hit-canvas revision effects are called in order", () => {
   assert.ok(calls.indexOf("bumpTopologyRevision") < calls.indexOf("resetHitCanvasTopologyRevision"));
 });
 
-test("surface bridge state effect is between political rebuild and legacy color migration", () => {
+test("surface bridge state effect is between political rebuild and reference initialization", () => {
   const { calls, owner } = createHarness();
 
   owner.runInitMapResetTransaction({ debugMode: "PROD" });
 
   assert.ok(calls.indexOf("rebuildPoliticalLandCollections") < calls.indexOf("applyRendererSurfaceBridgeState"));
-  assert.ok(calls.indexOf("applyRendererSurfaceBridgeState") < calls.indexOf("migrateLegacyColorState"));
+  assert.ok(calls.indexOf("applyRendererSurfaceBridgeState") < calls.indexOf("ensureSovereigntyState"));
 });
 
 test("cancel and reset effects preserve startup transaction order", () => {
@@ -177,7 +180,7 @@ test("cancel and reset effects preserve startup transaction order", () => {
 
   owner.runInitMapResetTransaction({ debugMode: "PROD" });
 
-  assert.deepEqual(calls.slice(22, 31), [
+  assert.deepEqual(calls.slice(calls.indexOf("cancelScheduledHoverOverlayRender")), [
     "cancelScheduledHoverOverlayRender",
     "markAllOverlaysDirty",
     "clearStagedMapDataTasks",
@@ -190,26 +193,12 @@ test("cancel and reset effects preserve startup transaction order", () => {
   ]);
 });
 
-test("owner returns a diagnostics summary", () => {
-  const { owner } = createHarness();
-
-  const summary = owner.runInitMapResetTransaction({ debugMode: "ARTIFACTS" });
-
-  assert.deepEqual(summary, {
-    reason: "init-map",
-    debugMode: "ARTIFACTS",
-    effects: EFFECT_ORDER,
-  });
-  assert.throws(() => {
-    summary.effects.push("extra");
-  }, TypeError);
-});
-
 test("owner forwards exact effect payloads", () => {
-  const { owner, payloads } = createHarness();
+  const { owner, payloads, getterCalls } = createHarness();
 
   owner.runInitMapResetTransaction({ debugMode: "ID_HASH" });
 
+  assert.deepEqual(getterCalls, ["isPerfOverlayEnabled"]);
   assert.deepEqual(payloads.find((entry) => entry.name === "clearPendingPoliticalColorEdit")?.args, [
     {
       force: true,
@@ -267,5 +256,8 @@ test("owner source stays import-safe and avoids forbidden renderer semantics", (
       tokenParts.join(""),
       "startup transaction owner must avoid forbidden semantic token",
     );
+  }
+  for (const token of ["summary", "effectOrder"]) {
+    assertExcludes(ownerSource, token, "startup transaction owner must not retain trace bookkeeping");
   }
 });

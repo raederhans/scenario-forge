@@ -45,7 +45,6 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     if (!id) return false;
     return !!(
       getSafeCanvasColor(runtimeState.visualOverrides?.[id], null)
-      || getSafeCanvasColor(runtimeState.featureOverrides?.[id], null)
     );
   }
 

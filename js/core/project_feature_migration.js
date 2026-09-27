@@ -141,13 +141,13 @@ export function planProjectFeatureMigration(data, { manifest, validFeatureIds } 
     }
     return result;
   }
-  const sovereigntyByFeatureId = remap(data.sovereigntyByFeatureId, "sovereigntyByFeatureId");
-  const visualOverrides = remap(data.visualOverrides || data.featureOverrides, "visualOverrides");
+  const visualOverrides = remap(data.visualOverrides, "visualOverrides");
   if (issues.length) fail("ambiguous_or_unresolved_entries", { issues });
+  const { sovereigntyByFeatureId: _reference, featureOverrides: _legacy, ...documentData } = data;
   return {
-    data: { ...data, ...auxiliary,
+    data: { ...documentData, ...auxiliary,
       scenario: { ...data.scenario, baselineHash: contract.target_baseline_hash },
-      sovereigntyByFeatureId, visualOverrides, featureOverrides: { ...visualOverrides } },
+      visualOverrides },
     summary: { migratedEntries },
   };
 }

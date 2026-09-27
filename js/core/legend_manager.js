@@ -241,7 +241,6 @@ function getOwnerBaseColor(appState, ownerCode) {
   if (!normalized) return "";
   return normalizeColor(
     appState?.sovereignBaseColors?.[normalized]
-    || appState?.countryBaseColors?.[normalized]
     || appState?.resolvedDefaultCountryPalette?.[normalized]
   );
 }
@@ -251,7 +250,6 @@ function getFeatureDisplayedColor(appState, feature, ownerCode) {
   return normalizeColor(
     appState?.colors?.[id]
     || appState?.visualOverrides?.[id]
-    || appState?.featureOverrides?.[id]
     || getOwnerBaseColor(appState, ownerCode)
   );
 }
@@ -362,7 +360,6 @@ function collectPaletteColors(appState, count) {
   };
   Object.values(appState?.colors || {}).forEach(push);
   Object.values(appState?.sovereignBaseColors || {}).forEach(push);
-  Object.values(appState?.countryBaseColors || {}).forEach(push);
   (appState?.paletteQuickSwatches || []).forEach((entry) => {
     push(entry?.color ?? entry);
   });

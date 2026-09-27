@@ -40,7 +40,7 @@ test("city country palette precedence remains live when no host exists", () => {
   const entry = { properties: { __city_scenario_tag: " aa ", country_code: "BB" } };
   assert.equal(model.getCityLabelRenderStyle(entry).backgroundColor, "#111111");
   runtimeState.sovereignBaseColors = {};
-  assert.equal(model.getCityMarkerRenderStyle(entry).backgroundColor, "#eeeeee");
+  assert.equal(model.getCityMarkerRenderStyle(entry).backgroundColor, "", "retired mirrors do not affect paint");
   runtimeState.countryBaseColors = {};
   assert.equal(model.getCityLabelRenderStyle(entry).backgroundColor, "");
   assert.equal(model.getCityMarkerRenderStyle(entry).adapted, false);
@@ -62,12 +62,12 @@ test("city themes preserve capital distinction and do not retain per-call colors
 });
 
 test("dark host adaptation shares contrast but retains marker fill and capital colors", () => {
-  const runtimeState = { countryBaseColors: { AA: "#101010" } };
+  const runtimeState = { sovereignBaseColors: { AA: "#101010" } };
   const model = createModel(runtimeState);
   const entry = { isCapital: true, feature: { properties: { country_code: "AA" } } };
   const dark = model.getCityMarkerRenderStyle(entry);
   assert.equal(model.getCityLabelRenderStyle(entry).fillStyle, "rgba(248, 245, 238, 0.98)");
-  runtimeState.countryBaseColors.AA = "#ffffff";
+  runtimeState.sovereignBaseColors.AA = "#ffffff";
   const light = model.getCityMarkerRenderStyle(entry);
   assert.equal(dark.tokens.fillMid, light.tokens.fillMid);
   assert.equal(dark.tokens.capitalAccent, light.tokens.capitalAccent);

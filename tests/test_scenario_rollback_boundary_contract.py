@@ -177,7 +177,6 @@ class ScenarioRollbackBoundaryContractTest(unittest.TestCase):
             "restoreScenarioActivationBeforeColorDirtyState(",
             "restoreScenarioReadinessState(",
             "restoreScenarioDataHealthState(",
-            "markLegacyColorStateDirty();",
             "restoreScenarioActivationAfterColorDirtyState(",
             "setActiveScenarioPerformanceHintsState(",
             "setScenarioPoliticalChunkPayloadState(",

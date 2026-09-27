@@ -92,42 +92,6 @@ test("explicit SF-ATS route coverage leaves no unmatched files", () => {
   }
 });
 
-test("Appearance Transport change-set modules and focused tests share the child-safe Node route", () => {
-  const changedFiles = [
-    "js/core/appearance_transport_change_set.js",
-    "js/core/appearance_transport_change_set_contract.js",
-    "js/core/appearance_transport_operation.js",
-    "tests/appearance_transport_change_set_contract_behavior.test.mjs",
-    "tests/appearance_transport_operation_behavior.test.mjs",
-    "tests/helpers/appearance_transport_change_set_fixtures.mjs",
-  ];
-  const report = recommendationFor(changedFiles);
-  const route = routeForCommand(report, "test:node:appearance-transport-change-set");
-  const routeMetadata = buildRouteIndex().find(
-    (entry) => entry.commandRef === "test:node:appearance-transport-change-set",
-  );
-
-  assert.deepEqual(report.unmatchedChangedFiles, []);
-  assert.ok(route);
-  assert.deepEqual(route.domains, ["transport-workbench"]);
-  assert.deepEqual(route.ownerHints, ["transport-workbench"]);
-  assert.ok(routeMetadata);
-  const directSourceRefs = new Set(routeMetadata.sourceRef.split(","));
-  for (const sourceRef of [
-    "js/core/appearance_transport_change_set.js",
-    "js/core/appearance_transport_change_set_contract.js",
-    "js/core/appearance_transport_operation.js",
-  ]) {
-    assert.ok(directSourceRefs.has(sourceRef), `${sourceRef} must be a direct route sourceRef.`);
-  }
-  for (const changedFile of changedFiles) {
-    assert.ok(
-      report.matchedByFile.some((entry) => entry.changedFile === changedFile),
-      `${changedFile} must be matched by the adaptive selector.`,
-    );
-  }
-});
-
 test("primary polar water outputs stay on the heavy spherical safety route", () => {
   const changedFiles = [
     "data/europe_topology.json",

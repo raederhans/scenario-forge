@@ -297,7 +297,6 @@ async function collectPostEditPoliticalSnapshot(page, { label, featureId, probe 
       featureId: String(featureId || ""),
       resolvedColor: String(state?.colors?.[featureId] || ""),
       visualOverride: String(state?.visualOverrides?.[featureId] || ""),
-      featureOverride: String(state?.featureOverrides?.[featureId] || ""),
       colorRevision: Number(state?.colorRevision || 0),
       sovereigntyRevision: Number(state?.sovereigntyRevision || 0),
       scenarioDataGeneration: Number(state?.scenarioDataGeneration || 0),
@@ -1200,7 +1199,6 @@ test("tno post-edit keeps political detail fill before progressive recovery skip
         featureId: selected.featureId,
         resolvedColor: String(state.colors?.[selected.featureId] || ""),
         visualOverride: String(state.visualOverrides?.[selected.featureId] || ""),
-        featureOverride: String(state.featureOverrides?.[selected.featureId] || ""),
         colorRevision: Number(state.colorRevision || 0),
         sovereigntyRevision: Number(state.sovereigntyRevision || 0),
         scenarioDataGeneration: Number(state.scenarioDataGeneration || 0),
@@ -1249,9 +1247,7 @@ test("tno post-edit keeps political detail fill before progressive recovery skip
     const snapshots = [buildSnapshot("before-edit")];
 
     state.visualOverrides = state.visualOverrides || {};
-    state.featureOverrides = state.featureOverrides || {};
     state.visualOverrides[selected.featureId] = color;
-    state.featureOverrides[selected.featureId] = color;
     refreshResolvedColorsForFeatures([selected.featureId], { renderNow: false });
     snapshots.push(buildSnapshot("after-refresh-resolved-colors"));
     const pendingAfterRefresh = {
@@ -1356,7 +1352,6 @@ test("tno runtime color coverage includes rendered spatial items", async ({ page
     const spatialItems = Array.isArray(state.spatialItems) ? state.spatialItems : [];
     const colors = state.colors && typeof state.colors === "object" ? state.colors : {};
     const ownerColors = {
-      ...(state.countryBaseColors || {}),
       ...(state.sovereignBaseColors || {}),
     };
     const missingFeatureIds = [];
@@ -1390,12 +1385,10 @@ test("tno runtime color coverage includes rendered spatial items", async ({ page
     };
     const getBaseColorFields = (countryCode) => {
       const code = normalizeCode(countryCode);
-      const countryBaseColor = String(state.countryBaseColors?.[code] || "");
       const sovereignBaseColor = String(state.sovereignBaseColors?.[code] || "");
       return {
-        countryBaseColor,
         sovereignBaseColor,
-        baseColor: sovereignBaseColor || countryBaseColor,
+        baseColor: sovereignBaseColor,
       };
     };
     const getDisplayOwnerCode = (feature, featureId, fallbackCountryCode = "") => {
@@ -1492,9 +1485,7 @@ test("tno runtime color coverage includes rendered spatial items", async ({ page
           countryCode,
           displayOwnerCode,
           resolvedColor,
-          countryBaseColor: countryBase.countryBaseColor,
           sovereignBaseColor: countryBase.sovereignBaseColor,
-          displayOwnerCountryBaseColor: displayOwnerBase.countryBaseColor,
           displayOwnerSovereignBaseColor: displayOwnerBase.sovereignBaseColor,
           drawOrder: Number(item?.drawOrder || 0),
           sourceCollection,
@@ -1515,9 +1506,7 @@ test("tno runtime color coverage includes rendered spatial items", async ({ page
           countryCode,
           displayOwnerCode,
           resolvedColor,
-          countryBaseColor: countryBase.countryBaseColor,
           sovereignBaseColor: countryBase.sovereignBaseColor,
-          displayOwnerCountryBaseColor: displayOwnerBase.countryBaseColor,
           displayOwnerSovereignBaseColor: displayOwnerBase.sovereignBaseColor,
           drawOrder: Number(item?.drawOrder || 0),
           sourceCollection,

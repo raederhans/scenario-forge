@@ -1,6 +1,7 @@
 import { parse as parseJavaScript } from "acorn";
 import * as astWalk from "acorn-walk";
 import fs from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -37,10 +38,16 @@ import {
   getStateTargetPureReaderContractEntriesForModule,
   getStateActionDelegationContractEntriesForModule,
   inspectStateDetachedCaptureSource,
+  inspectStateActionNonTargetNormalizerSites,
+  STATE_CAPABILITY_RETIREMENT_CONTRACT,
+  STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
+  findStateCapabilityRetirementContractEntry,
   inspectStateTargetPureReaderFunctionSource,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
   STATE_ACTION_DELEGATION_CONTRACT,
   STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT,
+  STATE_ACTION_IMPORTED_CALL_RECEIPTS,
+  inspectStateActionImportedCallReceipt,
   STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT,
   STATE_DETACHED_CAPTURE_CONTRACT,
   STATE_TARGET_PURE_READER_CONTRACT,
@@ -1120,6 +1127,45 @@ export async function resolveCachedHistoricalDerivedAliasProof({
   );
 }
 
+// Frozen-source replay must use the key authorities accepted with that source.
+// Current state factories may have retired those keys; this overlay is never
+// passed to current writer discovery or the current unknown-key gate.
+export function buildHistoricalStateKeyAuthorityIndex(
+  currentIndex,
+  { legacySemanticBaseline = {}, acceptedPolicy = null } = {},
+) {
+  const historicalIndex = new Map(currentIndex);
+  const historicalOnly = new Map();
+  const add = (key, domain, migrationPhase) => {
+    if (!key || key === "*" || currentIndex.has(key)) return;
+    if (!domain || !migrationPhase) return;
+    const authority = { domain, migrationPhase, owner: "accepted-historical-policy" };
+    const previous = historicalOnly.get(key);
+    if (previous && (previous.domain !== domain || previous.migrationPhase !== migrationPhase)) {
+      const error = new Error(`Conflicting accepted historical state authority for ${key}.`);
+      error.code = "historical-state-key-authority-conflict";
+      throw error;
+    }
+    historicalOnly.set(key, authority);
+  };
+  for (const identity of legacySemanticBaseline.memberships || []) {
+    const parts = String(identity).split("|");
+    if (parts.length < 6) continue;
+    add(parts.at(-1), parts.at(-4), parts.at(-3));
+  }
+  for (const writer of acceptedPolicy?.writers || []) {
+    for (const binding of writer.bindings || []) {
+      for (const grant of binding.grants || []) {
+        for (const membership of grant.memberships || []) {
+          add(membership.key, grant.domain, grant.migrationPhase);
+        }
+      }
+    }
+  }
+  for (const [key, authority] of historicalOnly) historicalIndex.set(key, authority);
+  return historicalIndex;
+}
+
 export async function buildFrozenDerivedAliasTaintBaseline({
   sourceBaseSha = "",
   relativePaths = [],
@@ -1129,6 +1175,7 @@ export async function buildFrozenDerivedAliasTaintBaseline({
   transitionCheckpoints = null,
   readSourceAtRevision = defaultReadSourceAtRevision,
   stateKeyAuthorityIndex = buildCanonicalStateKeyAuthorityIndex(),
+  acceptedPolicy = null,
 } = {}) {
   const normalizedSourceBaseSha = String(sourceBaseSha || "").trim();
   if (!/^[0-9a-f]{40}$/i.test(normalizedSourceBaseSha)) {
@@ -1252,6 +1299,10 @@ export async function buildFrozenDerivedAliasTaintBaseline({
   }
   const strictHistoricalWriters = [];
   const transitionHistoricalWriters = [];
+  const historicalStateKeyAuthorityIndex = buildHistoricalStateKeyAuthorityIndex(
+    stateKeyAuthorityIndex,
+    { legacySemanticBaseline, acceptedPolicy },
+  );
   const frozenBaselineWritersByPath =
     buildFrozenBaselineWritersByPath(legacySemanticBaseline);
   for (const relativePath of frozenProofPaths) {
@@ -1300,7 +1351,7 @@ export async function buildFrozenDerivedAliasTaintBaseline({
           grants: buildStateWriterBindingGrants(
             diagnosticFindings,
             relativePath,
-            stateKeyAuthorityIndex,
+            historicalStateKeyAuthorityIndex,
             "production",
             { allowUnknownUnsupportedAuthority: true },
           ),
@@ -1341,7 +1392,7 @@ export async function buildFrozenDerivedAliasTaintBaseline({
           grants: buildStateWriterBindingGrants(
             findings,
             relativePath,
-            stateKeyAuthorityIndex,
+            historicalStateKeyAuthorityIndex,
             "production",
             {
               allowUnknownUnsupportedAuthority:
@@ -2227,6 +2278,215 @@ function findPreviousRetiredMutationSites(
     );
 }
 
+function hasRetiredDirectMutation(source, entry) {
+  const identity = JSON.parse(entry.bindingIdentity);
+  const ast = parseJavaScript(source, { ecmaVersion: "latest", sourceType: "module" });
+  let rootName = identity.name || identity.parameterName;
+  if (identity.kind === "function-parameter") {
+    const functions = [];
+    astWalk.simple(ast, {
+      FunctionDeclaration(node) {
+        if (node.id?.name === identity.functionName) functions.push(node);
+      },
+      VariableDeclarator(node) {
+        if (node.id?.name === identity.functionName
+          && ["FunctionExpression", "ArrowFunctionExpression"].includes(node.init?.type)) functions.push(node.init);
+      },
+    });
+    // A removed binding has no remaining direct writes; an unresolved live
+    // binding still fails closed (including a re-export or renamed declaration).
+    if (!functions.length) return source.includes(identity.functionName);
+    if (functions.length !== 1) return true;
+    let parameter = functions[0].params[identity.parameterIndex];
+    for (const segment of String(identity.parameterPath || "$").split("/").slice(1)) {
+      if (parameter?.type === "AssignmentPattern") parameter = parameter.left;
+      if (!segment.startsWith("property:") || parameter?.type !== "ObjectPattern") return true;
+      const property = parameter.properties.find(prop => prop.type === "Property"
+        && !prop.computed && (prop.key.name ?? String(prop.key.value)) === segment.slice(9));
+      parameter = property?.value;
+    }
+    if (parameter?.type === "AssignmentPattern") parameter = parameter.left;
+    if (parameter?.type !== "Identifier") return true;
+    rootName = parameter.name;
+  }
+  if (!rootName) return true;
+  const aliases = new Map([[rootName, []]]);
+  const resolvePath = (node) => {
+    if (node?.type === "Identifier") return aliases.get(node.name);
+    if (node?.type !== "MemberExpression") return undefined;
+    const base = resolvePath(node.object);
+    if (!base) return undefined;
+    const key = node.computed ? node.property.type === "Literal" ? String(node.property.value) : "*" : node.property.name;
+    return [...base, key];
+  };
+  let changed = true;
+  while (changed) {
+    changed = false;
+    astWalk.simple(ast, { VariableDeclarator(node) {
+      const alias = node.id.type === "Identifier" && resolvePath(node.init);
+      if (alias && !aliases.has(node.id.name)) { aliases.set(node.id.name, alias); changed = true; }
+    } });
+  }
+  let found = false;
+  const inspect = (node, operation) => {
+    const path = resolvePath(node);
+    if (operation === entry.operation && path?.[0] === entry.key) found = true;
+  };
+  astWalk.simple(ast, {
+    AssignmentExpression(node) { inspect(node.left, "assign"); },
+    UpdateExpression(node) { inspect(node.argument, "assign"); },
+    UnaryExpression(node) { if (node.operator === "delete") inspect(node.argument, "delete"); },
+    CallExpression(node) {
+      if (entry.operation !== "assign" || node.callee.type !== "MemberExpression"
+        || node.callee.object?.name !== "Object" || node.callee.property?.name !== "assign"
+        || resolvePath(node.arguments[0])?.length !== 0) return;
+      if (node.arguments.slice(1).some(arg => arg.type === "ObjectExpression"
+        && arg.properties.some(prop => (prop.key?.name || String(prop.key?.value)) === entry.key))) found = true;
+    },
+  });
+  return found;
+}
+
+export function inspectStateCapabilityRetirementEvidence({
+  previousPolicy = null,
+  currentWriters = [],
+  contractEntries = STATE_CAPABILITY_RETIREMENT_CONTRACT,
+  readCurrentSource = (modulePath) => {
+    try { return readFileSync(path.join(PROJECT_ROOT, modulePath), "utf8"); }
+    catch (error) { if (error?.code === "ENOENT") return null; throw error; }
+  },
+  readHistoricalSource = (revision, modulePath) => execFileSync(
+    "git", ["show", `${revision}:${modulePath}`],
+    { cwd: PROJECT_ROOT, encoding: "utf8" },
+  ),
+} = {}) {
+  const violations = [];
+  const fingerprint = (source) => createHash("sha256")
+    .update(String(source).replace(/\r\n?/g, "\n")).digest("hex");
+  const currentSourceByPath = new Map();
+  const historicalSourceByPath = new Map();
+  const currentSource = (modulePath) => {
+    if (!currentSourceByPath.has(modulePath)) currentSourceByPath.set(modulePath, readCurrentSource(modulePath));
+    return currentSourceByPath.get(modulePath);
+  };
+  for (const proof of STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS) {
+    try {
+      const source = currentSource(proof.modulePath);
+      if (source === null || fingerprint(source) !== proof.sourceFingerprint
+        || /scenario_tag_creator_controller|devScenarioTagCreator|devScenarioEditor/.test(source)) {
+        violations.push({ code: "state-capability-retirement-proof-invalid", reason: "entry-point-source-drift", modulePath: proof.modulePath });
+      }
+    } catch (error) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "entry-point-source-unavailable", modulePath: proof.modulePath, message: String(error?.message || error) });
+    }
+  }
+  const seen = new Set();
+  for (const entry of contractEntries) {
+    if (seen.has(entry.retiredMembershipIdentity)) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "contract-identity-duplicate", identity: entry.retiredMembershipIdentity });
+      continue;
+    }
+    seen.add(entry.retiredMembershipIdentity);
+    const historicalKey = `${entry.previousSourceRevision}:${entry.modulePath}`;
+    try {
+      if (!historicalSourceByPath.has(historicalKey)) historicalSourceByPath.set(historicalKey,
+        readHistoricalSource(entry.previousSourceRevision, entry.modulePath));
+      if (fingerprint(historicalSourceByPath.get(historicalKey)) !== entry.previousSourceFingerprint) {
+        violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-source-drift", identity: entry.retiredMembershipIdentity });
+      }
+    } catch (error) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-source-unavailable", identity: entry.retiredMembershipIdentity, message: String(error?.message || error) });
+    }
+    try {
+      const source = currentSource(entry.modulePath);
+      if (entry.currentSourceFingerprint
+        ? source === null || fingerprint(source) !== entry.currentSourceFingerprint
+          || (entry.allowReadReferences ? hasRetiredDirectMutation(source, entry) : source.includes(entry.key))
+        : source !== null) {
+        violations.push({ code: "state-capability-retirement-proof-invalid", reason: "current-source-drift", identity: entry.retiredMembershipIdentity });
+      }
+    } catch (error) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "current-source-unavailable", identity: entry.retiredMembershipIdentity, message: String(error?.message || error) });
+    }
+    const retired = parseLegacyMembershipSemanticSignature(entry.retiredMembershipIdentity);
+    const priorSites = retired ? findPreviousRetiredMutationSites(previousPolicy, retired) : [];
+    const priorFingerprint = createHash("sha256").update(JSON.stringify(priorSites)).digest("hex");
+    const previousWriter = (previousPolicy?.writers || []).find((writer) => writer.path === entry.modulePath);
+    const previousBinding = previousWriter?.bindings?.find((binding) =>
+      buildStableStateBindingIdentity(binding) === entry.bindingIdentity);
+    const previousRetirement = previousPolicy?.progress?.callerToActionLedger?.entries?.find((candidate) =>
+      candidate.retiredMembershipIdentity === entry.retiredMembershipIdentity);
+    const inheritedActionProof = previousRetirement?.previousActionProof || previousRetirement;
+    const inheritedActionProofMatches = !!entry.previousActionProofFingerprint
+      && inheritedActionProof
+      && fingerprint(JSON.stringify(inheritedActionProof)) === entry.previousActionProofFingerprint;
+    const historicalWriterMatches = previousBinding
+      && priorSites.length === entry.retiredMutationSiteCount
+      && priorFingerprint === entry.retiredMutationSiteFingerprint;
+    const previousLedgerMatches = previousRetirement?.proofPrecision === "explicit-capability-retirement"
+      && previousRetirement.capabilityRetirementContractIdentity === entry.contractIdentity
+      && previousRetirement.retiredMutationSiteCount === entry.retiredMutationSiteCount
+      && previousRetirement.retiredMutationSiteFingerprint === entry.retiredMutationSiteFingerprint;
+    if (!retired || (!historicalWriterMatches && !previousLedgerMatches && !inheritedActionProofMatches)) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-membership-drift", identity: entry.retiredMembershipIdentity });
+    }
+    if (entry.previousActionProofFingerprint && !inheritedActionProofMatches) {
+      violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-action-proof-drift", identity: entry.retiredMembershipIdentity });
+    }
+    if (entry.terminalActionModulePath) {
+      // These six receipts retire direct terminal actions, all with target 0.
+      // A different callee or successor chain needs its own explicit proof.
+      const terminalIdentityMatches = inheritedActionProof
+        && !inheritedActionProof.successorActionProofs?.length
+        && inheritedActionProof.actionModulePath === entry.terminalActionModulePath
+        && inheritedActionProof.actionExportName === entry.terminalActionExportName
+        && inheritedActionProof.targetArgumentIndex === 0;
+      const actionSource = currentSource(entry.terminalActionModulePath);
+      const terminalWritePresent = (currentWriters || []).filter(writer => writer.path === entry.terminalActionModulePath)
+        .flatMap(writer => writer.bindings || []).filter(binding => binding.functionName === entry.terminalActionExportName)
+        .flatMap(binding => binding.grants || []).flatMap(grant => grant.memberships || [])
+        .some(membership => membership.operation === entry.operation && membership.key === entry.key);
+      if (!terminalIdentityMatches || actionSource === null
+        || fingerprint(actionSource) !== entry.terminalActionSourceFingerprint || terminalWritePresent) {
+        violations.push({ code: "state-capability-retirement-proof-invalid", reason: "terminal-action-authority-drift", identity: entry.retiredMembershipIdentity });
+      }
+    }
+    if (entry.retirementKind === "historical-caller") {
+      // These accepted visibility calls select their state key with argument 1.
+      const source = currentSource(entry.modulePath);
+      const ast = parseJavaScript(source, { ecmaVersion: "latest", sourceType: "module" });
+      const actionNames = new Set();
+      for (const node of ast.body) {
+        if (node.type !== "ImportDeclaration"
+          || path.posix.normalize(path.posix.join(path.posix.dirname(entry.modulePath), node.source.value))
+            !== inheritedActionProof?.actionModulePath) continue;
+        for (const specifier of node.specifiers) {
+          if (specifier.type === "ImportSpecifier"
+            && specifier.imported.name === inheritedActionProof.actionExportName) actionNames.add(specifier.local.name);
+        }
+      }
+      let callPresent = false;
+      astWalk.simple(ast, {
+        CallExpression(node) {
+          if (node.callee.type !== "Identifier" || !actionNames.has(node.callee.name)) return;
+          const key = node.arguments[1];
+          if (key?.type !== "Literal" || key.value === entry.key) callPresent = true;
+        },
+      });
+      if (!inheritedActionProofMatches || inheritedActionProof?.targetArgumentIndex !== 0 || callPresent) {
+        violations.push({ code: "state-capability-retirement-proof-invalid", reason: "historical-action-call-still-present", identity: entry.retiredMembershipIdentity });
+      }
+    }
+    const stillPresent = (currentWriters || []).filter((writer) => writer.path === entry.modulePath)
+      .flatMap((writer) => writer.bindings || [])
+      .flatMap((binding) => binding.grants || [])
+      .some((grant) => grant.domain === entry.domain && grant.migrationPhase === entry.migrationPhase
+        && (grant.memberships || []).some((membership) => membership.operation === entry.operation && membership.key === entry.key));
+    if (stillPresent) violations.push({ code: "state-capability-retirement-proof-invalid", reason: "current-membership-still-present", identity: entry.retiredMembershipIdentity });
+  }
+  return violations;
+}
+
 function lastEnclosingFunctionName(identity = "") {
   try {
     const parsed = JSON.parse(String(identity || ""));
@@ -2441,6 +2701,29 @@ function assertUniqueStableCallerBindingIdentities(writers = []) {
   throw error;
 }
 
+function buildCapabilityRetirementLedgerEntry(contract, phase, previousActionProof = null) {
+  return {
+    retiredMembershipIdentity: contract.retiredMembershipIdentity,
+    retiredCallerPath: contract.modulePath,
+    retiredCallerBindingIdentity: contract.bindingIdentity,
+    retiredMutationSiteFingerprint: contract.retiredMutationSiteFingerprint,
+    retiredMutationSiteCount: contract.retiredMutationSiteCount,
+    proofPrecision: "explicit-capability-retirement",
+    capabilityRetirementContractIdentity: contract.contractIdentity,
+    previousSourceRevision: contract.previousSourceRevision,
+    previousSourceFingerprint: contract.previousSourceFingerprint,
+    currentSourceFingerprint: contract.currentSourceFingerprint,
+    domain: contract.domain,
+    migrationPhase: contract.migrationPhase,
+    operation: contract.operation,
+    key: contract.key,
+    retiredInPhase: previousActionProof?.retiredInPhase || phase,
+    recordedInPhase: previousActionProof?.recordedInPhase || phase,
+    backfilled: previousActionProof?.backfilled || false,
+    ...(previousActionProof ? { previousActionProof: cloneJsonValue(previousActionProof) } : {}),
+  };
+}
+
 export function buildCallerToActionLedger({
   phase,
   previousPolicy = null,
@@ -2473,6 +2756,19 @@ export function buildCallerToActionLedger({
     && normalizedPhaseIndex < ledgerIntroductionPhaseIndex
   ) {
     return null;
+  }
+  const capabilityRetirements = STATE_CAPABILITY_RETIREMENT_CONTRACT.filter((entry) =>
+    retiredMembershipIdentities.includes(entry.retiredMembershipIdentity));
+  if (capabilityRetirements.length) {
+    const violations = inspectStateCapabilityRetirementEvidence({
+      previousPolicy, currentWriters: writers, contractEntries: capabilityRetirements,
+    });
+    if (violations.length) {
+      const error = new Error("Explicit capability retirement proof failed.");
+      error.code = "state-capability-retirement-proof-invalid";
+      error.violations = violations;
+      throw error;
+    }
   }
   assertUniqueStableCallerBindingIdentities(writers);
   const crossFileMigrationContractViolations =
@@ -2592,6 +2888,20 @@ export function buildCallerToActionLedger({
           entry.retiredMembershipIdentity,
         reason: "retired-membership-identity-invalid",
       });
+      continue;
+    }
+    if (entry.proofPrecision === "explicit-capability-retirement") {
+      const capability = findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity);
+      if (!capability || entry.capabilityRetirementContractIdentity !== capability.contractIdentity) {
+        missingProofs.push({ code: "state-capability-retirement-proof-invalid", retiredMembershipIdentity: entry.retiredMembershipIdentity });
+      }
+      continue;
+    }
+    const endedActionAuthority = findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity);
+    if (endedActionAuthority?.previousActionProofFingerprint
+      === createHash("sha256").update(JSON.stringify(entry)).digest("hex")) {
+      entriesByRetiredIdentity.set(entry.retiredMembershipIdentity,
+        buildCapabilityRetirementLedgerEntry(endedActionAuthority, normalizedPhase, entry));
       continue;
     }
     const crossFileMigration =
@@ -2814,6 +3124,13 @@ export function buildCallerToActionLedger({
         code: "caller-action-ledger-entry-invalid",
         retiredMembershipIdentity,
       });
+      continue;
+    }
+    const capabilityRetirement = capabilityRetirements.find((entry) =>
+      entry.retiredMembershipIdentity === retiredMembershipIdentity);
+    if (capabilityRetirement) {
+      entriesByRetiredIdentity.set(retiredMembershipIdentity,
+        buildCapabilityRetirementLedgerEntry(capabilityRetirement, normalizedPhase));
       continue;
     }
     const crossFileMigration =
@@ -3150,6 +3467,22 @@ export function validateLegacyMembershipRetirementReplacements({
     const proof = ledgerByRetiredMembershipIdentity.get(
       record.signature,
     );
+    if (proof?.proofPrecision === "explicit-capability-retirement") {
+      const contract = findStateCapabilityRetirementContractEntry(record.signature);
+      const expectedCallerBindingIdentity = stableLegacyBindingIdentity(
+        previousWriters.find(({ path: writerPath }) => writerPath === record.path)
+          ?.bindings?.find(({ id }) => id === record.bindingId),
+      );
+      if (!contract || proof.capabilityRetirementContractIdentity !== contract.contractIdentity
+        || contract.modulePath !== record.path || contract.bindingIdentity !== expectedCallerBindingIdentity
+        || proof.retiredMutationSiteFingerprint !== contract.retiredMutationSiteFingerprint
+        || proof.retiredMutationSiteCount !== contract.retiredMutationSiteCount) {
+        violations.push({ code: "legacy-membership-retirement-replacement-missing",
+          path: record.path, bindingId: record.bindingId, domain: record.domain,
+          migrationPhase: record.migrationPhase, operation: record.operation, key: record.key });
+      }
+      continue;
+    }
     const functionProofs = proof
       ? callerToActionEntryProofs(proof)
       : [];
@@ -3822,6 +4155,9 @@ export async function validateStateActionNonTargetParameterMutations(
     return [];
   }
   const violations = [];
+  const reviewedNormalizerSites = inspectStateActionNonTargetNormalizerSites(
+    source, relativePath,
+  ).sites;
   for (const entry of contractEntries || []) {
     const storageSites = borrowedMapStorageArgumentSites(relativePath, source, entry);
     for (
@@ -3844,6 +4180,8 @@ export async function validateStateActionNonTargetParameterMutations(
       for (const finding of mutationFindings) {
         if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
           && storageSites.has(`${finding.line}:${finding.column}:${candidate.parameterName}`)) continue;
+        if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
+          && reviewedNormalizerSites.has(`${entry.exportName}:${finding.line}:${finding.column}:${candidate.parameterName}`)) continue;
         const conservativeMutationEvidence = Boolean(
           !finding?.unsupported
           || finding.reason !== "state-alias-escape"
@@ -5288,6 +5626,87 @@ export function isDelegationOnlyStateWriterCandidate({
     && actionDelegations.length > 0;
 }
 
+// A registered action delegates its only target effect to the exact imported
+// paint implementation. Project the reachable assignment into its logical
+// action binding without adding another runtime write. The deletion branch in
+// the implementation requires remove=true, which this three-argument call
+// never supplies.
+export function projectPalettePaintActionCandidate(scannedCandidates, {
+  readSource = modulePath => readFileSync(path.join(PROJECT_ROOT, modulePath), "utf8"),
+} = {}) {
+  const receipt = STATE_ACTION_IMPORTED_CALL_RECEIPTS.paint;
+  const evidence = inspectStateActionImportedCallReceipt(receipt, { readSource });
+  if (evidence.violations.length) {
+    const error = new Error("Palette paint action delegation proof failed.");
+    error.code = "state-action-imported-target-effect-invalid";
+    error.violations = evidence.violations;
+    throw error;
+  }
+  const calleeCandidates = scannedCandidates.filter(candidate =>
+    candidate.path === receipt.calleeModulePath
+    && candidate.binding?.kind === "function-parameter"
+    && candidate.binding.functionName === receipt.importedName
+    && candidate.binding.parameterIndex === 0
+    && candidate.binding.parameterPath === "$");
+  const calleeFindings = calleeCandidates[0]?.findings || [];
+  const actualEffects = calleeFindings.map(finding => [
+    finding.operation, finding.key, finding.pathSegments?.join("."),
+    finding.unsupported, finding.sourceFingerprint,
+  ].join("|")).sort();
+  const expectedEffects = [
+    "assign|visualOverrides|visualOverrides|false|480611b47858cfa78e28a67a707381b5650bdb07cc4344ac8c8feb58c2889b88",
+    "assign|visualOverrides|visualOverrides.*|false|91883c994dfd68079ce6f9b74f8e9ef0e10a4b08c27d21eeaaa2b663be690cd0",
+    "delete|visualOverrides|visualOverrides.*|false|0732c3c19a5f7f84ee8a1d733333d1ccdc637b56ebf3b8ee7a0b2cb123bdba18",
+  ].sort();
+  if (calleeCandidates.length !== 1 || !isDeepStrictEqual(actualEffects, expectedEffects)) {
+    const error = new Error("Palette paint callee target effects changed.");
+    error.code = "state-action-imported-target-effects-drift";
+    throw error;
+  }
+  if (scannedCandidates.some(candidate => candidate.path === receipt.modulePath
+    && candidate.binding?.functionName === receipt.exportName)) {
+    const error = new Error("Palette paint action already has a scanned writer binding.");
+    error.code = "state-action-imported-target-duplicate-binding";
+    throw error;
+  }
+  const actionSource = readSource(receipt.modulePath);
+  const targetCandidates = discoverFunctionParameterBindings(actionSource, { parameterNames: null }).bindings
+    .filter(candidate => candidate.functionName === receipt.exportName
+      && candidate.parameterIndex === 0 && candidate.parameterName === "target"
+      && candidate.parameterPath === "$");
+  if (targetCandidates.length !== 1) {
+    const error = new Error("Palette paint action target binding changed.");
+    error.code = "state-action-imported-target-binding-drift";
+    throw error;
+  }
+  const binding = createParameterBinding(targetCandidates[0]);
+  const call = evidence.call;
+  const finding = {
+    filePath: receipt.modulePath,
+    bindingId: binding.id,
+    bindingKind: binding.kind,
+    root: "target",
+    alias: "",
+    aliasChain: [],
+    operation: "assign",
+    key: "visualOverrides",
+    pathSegments: ["visualOverrides", "*"],
+    dynamic: true,
+    unsupported: false,
+    reason: "",
+    evidenceKind: "reviewed-imported-target-effect",
+    start: call.start,
+    end: call.end,
+    line: call.loc.start.line,
+    column: call.loc.start.column,
+    endLine: call.loc.end.line,
+    endColumn: call.loc.end.column,
+    enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: receipt.exportName, ordinal: 0 }] }),
+    sourceFingerprint: receipt.callFingerprint,
+  };
+  return { path: receipt.modulePath, surface: "production", binding, findings: [finding], delegationOnly: false };
+}
+
 export async function resolveCachedStateWriterRepositoryScan({
   repositoryScanCache = null,
   previousPolicy = null,
@@ -5780,7 +6199,7 @@ export async function buildStateWriterPolicySnapshot({
   const defaultStateReport = await buildDefaultStateOwnershipReport();
   const stateKeyAuthorityIndex = buildCanonicalStateKeyAuthorityIndex();
   const {
-    candidates: scannedCandidates,
+    candidates: cachedScannedCandidates,
     actionDelegations,
     derivedAliasTaintModeManifest,
   } = await resolveCachedStateWriterRepositoryScan({
@@ -5800,6 +6219,9 @@ export async function buildStateWriterPolicySnapshot({
       },
     ),
   });
+  const scannedCandidates = compareP4StateActionPhases(normalizedPhase, "P4.4") >= 0
+    ? [...cachedScannedCandidates, projectPalettePaintActionCandidate(cachedScannedCandidates)]
+    : cachedScannedCandidates;
   const unknownStateKeyAuthorityViolations =
     collectUnknownStateKeyAuthorityViolations(
       scannedCandidates,
@@ -6021,6 +6443,7 @@ export async function buildStateWriterPolicySnapshot({
           previousPolicy.baselines.derivedAliasTaint || null,
         acceptedPolicyCheckpoint,
         stateKeyAuthorityIndex,
+        acceptedPolicy: previousPolicy,
       }),
     })
     : null;

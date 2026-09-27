@@ -77,18 +77,18 @@ class MapRendererSpatialIndexRuntimeOwnerBoundaryContractTest(unittest.TestCase)
         reset_binding = renderer_content[reset_binding_start:renderer_content.index("function getMapHoverInteractionOwner()", reset_binding_start)]
         self.assertIn("setMapDataTransactionOwner = createSetMapDataTransactionOwner({", transaction_binding)
         self.assertRegex(set_map_data_body, r"return getSetMapDataTransactionOwner\(\)\.runSetMapDataTransaction\(\{\s*refitProjection,\s*resetZoom,\s*suppressRender,\s*interactionLevel,\s*deferInteractionInfrastructure,\s*\}\);")
-        for effect in ("resetRendererTransactionState", "clearLastGoodFrame", "invalidateAllRenderPasses", "migrateLegacyColorState", "setCanvasSize", "buildRuntimePoliticalMeta"):
+        for effect in ("resetRendererTransactionState", "clearLastGoodFrame", "invalidateAllRenderPasses", "setCanvasSize", "buildRuntimePoliticalMeta"):
             self.assertIn(f"      {effect},", transaction_binding)
         self.assertIn('const SET_MAP_DATA_REASON = "set-map-data";', transaction_content)
         self.assertRegex(transaction_content, r'runEffect\("resetRendererTransactionState", \{\s*cancelHoverOverlayRender: true,\s*cancelSecondarySpatialBuild: true,\s*\}\);')
         self.assertIn('runEffect("clearLastGoodFrame", SET_MAP_DATA_REASON);', transaction_content)
         self.assertIn('runEffect("invalidateAllRenderPasses", SET_MAP_DATA_REASON);', transaction_content)
         self.assertRegex(transaction_binding, r"sanitizeSetMapDataColorState: \(\) => \{\s*"
-                         r"runtimeState\.countryBaseColors = sanitizeCountryColorMap\(runtimeState\.countryBaseColors\);\s*"
-                         r"runtimeState\.featureOverrides = sanitizeColorMap\(runtimeState\.featureOverrides\);\s*"
+                         r"runtimeState\.sovereignBaseColors = sanitizeCountryColorMap\(runtimeState\.sovereignBaseColors\);\s*"
+                         r"runtimeState\.visualOverrides = sanitizeColorMap\(runtimeState\.visualOverrides\);\s*"
                          r"runtimeState\.waterRegionOverrides = sanitizeColorMap\(runtimeState\.waterRegionOverrides\);\s*"
                          r"runtimeState\.specialRegionOverrides = \{\};")
-        self.assertRegex(transaction_content, r'runEffect\("sanitizeSetMapDataColorState"\);\s*runEffect\("migrateLegacyColorState"\);\s*runEffect\("setCanvasSize"\);\s*runEffect\("buildRuntimePoliticalMeta"\);')
+        self.assertRegex(transaction_content, r'runEffect\("sanitizeSetMapDataColorState"\);\s*runEffect\("setCanvasSize"\);\s*runEffect\("buildRuntimePoliticalMeta"\);')
         self.assertIn("resetRendererTransactionState({ hitCanvasDirty: true });", scenario_apply_body)
         self.assertRegex(refresh_transaction_body, r"return getRendererTransactionResetOwner\(\)\.resetRendererRefreshTransactionState\(\{\s*cancelHoverOverlay,\s*cancelSecondarySpatialBuild,\s*\}\);")
         refresh_start = reset_content.index("  function resetRendererRefreshTransactionState({")

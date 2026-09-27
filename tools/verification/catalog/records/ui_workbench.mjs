@@ -1065,43 +1065,6 @@ export const UI_WORKBENCH_RECORDS = [
     "selector": {}
   },
   {
-    "id": "node:test:node:appearance-transport-change-set",
-    "commandRef": "test:node:appearance-transport-change-set",
-    "sourceRefs": [
-      "tests/appearance_transport_change_set_contract_behavior.test.mjs",
-      "tests/appearance_transport_operation_behavior.test.mjs",
-      "js/core/appearance_transport_change_set.js",
-      "js/core/appearance_transport_change_set_contract.js",
-      "tests/helpers/appearance_transport_change_set_fixtures.mjs",
-      "js/core/appearance_transport_operation.js"
-    ],
-    "ownerHints": [
-      "transport-workbench"
-    ],
-    "domains": [
-      "transport-workbench"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 171,
-    "verification": null,
-    "selector": {}
-  },
-  {
     "id": "node:test:node:physical-layer-contracts",
     "commandRef": "test:node:physical-layer-contracts",
     "sourceRefs": [

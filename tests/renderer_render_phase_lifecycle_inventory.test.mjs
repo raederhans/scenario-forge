@@ -71,12 +71,13 @@ test("P43 owner owns render phase and timer lifecycle only", () => {
     "resetRenderPhaseState",
     "getAdaptiveSettleProfile",
     "PROMOTION_ACTIVE_STATUSES",
-    "createSummary({",
-    "effectOrder",
-    "getterOrder",
     "Object.freeze({",
   ]) {
     assert.equal(ownerSource.includes(token), true, `${OWNER_PATH} must own ${token}`);
+  }
+
+  for (const token of ["createTrace", "createSummary", "effectOrder", "getterOrder"]) {
+    assert.equal(ownerSource.includes(token), false, `${OWNER_PATH} must not retain trace bookkeeping ${token}`);
   }
 
   for (const token of [

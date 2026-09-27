@@ -46,7 +46,6 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     deferExactAfterSettle: true,
     dpr: 1,
     exactAfterSettleHandle: null,
-    legacyColorStateDirty: false,
     pendingExactPoliticalFastFrame: true,
     renderPerfMetricSequence: 0,
     renderPerfMetrics: {},

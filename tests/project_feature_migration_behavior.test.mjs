@@ -31,22 +31,22 @@ const reason = (expected) => (error) => {
   return true;
 };
 
-test("approved split copies paint and ownership, equal merges coalesce without mutation", () => {
+test("approved split copies paint and discards saved ownership, equal merges coalesce without mutation", () => {
   const data = project({ US_ZONE: "red", US_OTHER: "red", US_A: "red", CA_A: "blue" }, {
     sovereigntyByFeatureId: { US_ZONE: "US", US_OTHER: "US", US_A: "US" },
   });
   const before = structuredClone(data);
   const result = plan(data);
   assert.deepEqual(result.data.visualOverrides, { US_A: "red", US_B: "red", CA_A: "blue" });
-  assert.deepEqual(result.data.sovereigntyByFeatureId, { US_A: "US", US_B: "US" });
-  assert.deepEqual(result.data.featureOverrides, result.data.visualOverrides);
+  assert.equal(Object.hasOwn(result.data, "sovereigntyByFeatureId"), false);
+  assert.equal(Object.hasOwn(result.data, "featureOverrides"), false);
   assert.equal(result.data.scenario.baselineHash, "new");
   assert.equal(plan(result.data), null);
-  assert.equal(result.summary.migratedEntries, 4);
+  assert.equal(result.summary.migratedEntries, 2);
   assert.deepEqual(data, before);
 });
 
-test("different paint and owners cannot silently merge, regardless of entry order", () => {
+test("different paint cannot silently merge, regardless of entry order", () => {
   for (const entries of [{ US_ZONE: "red", US_OTHER: "blue" }, { US_OTHER: "blue", US_ZONE: "red" }]) {
     assert.throws(() => plan(project(entries)), (error) => {
       assert.equal(error.migrationDetails.issues[0].reason, "conflicting_values");
@@ -54,8 +54,7 @@ test("different paint and owners cannot silently merge, regardless of entry orde
       return reason("ambiguous_or_unresolved_entries")(error);
     });
   }
-  assert.throws(() => plan(project({}, { sovereigntyByFeatureId: { US_ZONE: "US", US_OTHER: "CA" } })),
-    reason("ambiguous_or_unresolved_entries"));
+  assert.deepEqual(plan(project({}, { sovereigntyByFeatureId: { US_ZONE: "US", US_OTHER: "CA" } })).data.visualOverrides, {});
 });
 
 test("existing same-ID entry is a contributor, never an implicit winner", () => {
@@ -225,9 +224,8 @@ test("confirmed legacy import stages target baseline, applies it, and exports ta
   const exported = FileManager.buildProjectPayload(target);
   assert.equal(exported.scenario.baselineHash, "new");
   assert.deepEqual(exported.visualOverrides, { US_A: "red", US_B: "red" });
-  assert.equal(exported.sovereigntyByFeatureId.US_A, "US");
-  assert.equal(exported.sovereigntyByFeatureId.US_B, "US");
-  assert.equal(Object.hasOwn(exported.sovereigntyByFeatureId, "US_ZONE"), false);
+  assert.equal(Object.hasOwn(exported, "sovereigntyByFeatureId"), false);
+  assert.equal(target.sovereigntyByFeatureId.US_A, "US", "runtime derives scenario reference");
   assert.deepEqual(captureProjectImportState(state), beforeState);
 
   await assert.rejects(prepareImportedProjectState({ ...options,

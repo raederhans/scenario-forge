@@ -357,7 +357,7 @@ test("click entry remains in map_renderer and event binding keeps injected dispa
   assertIncludes(rendererSource, "async function handleClick(event, interactionContext = null)", "map_renderer must keep click facade entry");
   assertIncludes(rendererSource, "return getClickSelectionTransactionOwner().handleClick(event, interactionContext);", "map_renderer must delegate the click transaction once");
   assertIncludes(rendererSource, "mapClick: handleClick", "map_renderer must inject click handler");
-  assertIncludes(rendererSource, "dispatchMapClick", "map_renderer must keep click dispatcher wiring");
+  assert.ok(!rendererSource.includes('from "./interaction_funnel.js"'), "rendering must not depend on project import orchestration");
   assertIncludes(
     rendererSource,
     "createClickSelectionTransactionOwner,",
@@ -375,24 +375,13 @@ test("click entry remains in map_renderer and event binding keeps injected dispa
   );
 
   for (const token of [
-    "requireFunction(helpers, \"bindInteractionFunnel\")({",
-    "mapClick: requireFunction(handlers, \"mapClick\")",
-    "mapDoubleClick: requireFunction(handlers, \"mapDoubleClick\")",
-    "interactionRect.on(\"click\", requireFunction(handlers, \"dispatchMapClick\"));",
-    "interactionRect.on(\"dblclick\", requireFunction(handlers, \"dispatchMapDoubleClick\"));",
+    'interactionRect.on("click", requireFunction(handlers, "mapClick"));',
+    'interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));',
   ]) {
-    assertIncludes(eventBindingOwnerSource, token, "event binding owner must keep injected click binding token");
+    assertIncludes(eventBindingOwnerSource, token, "event owner binds click handlers directly");
   }
-  for (const token of [
-    "let mapClickImpl = null;",
-    "export function bindInteractionFunnel({",
-    "mapClickImpl = typeof mapClick === \"function\" ? mapClick : null;",
-    "export function dispatchMapClick(event)",
-    "debugState.lastClickContext = buildMapInteractionContext(\"click\", event);",
-    "return mapClickImpl(event, debugState.lastClickContext);",
-  ]) {
-    assertIncludes(interactionFunnelSource, token, "interaction funnel must keep click dispatch token");
-  }
+  assert.ok(!interactionFunnelSource.includes("mapClickImpl"));
+  assert.ok(!interactionFunnelSource.includes("bindInteractionFunnel"));
   assertIncludes(handleClickSource, "getHitFromEvent(event, {", "handleClick must keep hit resolution");
   assertIncludes(handleClickSource, "eventType: \"click\"", "handleClick must resolve click hit type");
   assertIncludes(

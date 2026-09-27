@@ -495,7 +495,6 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
       colorRevision: 1,
       colors: {},
       visualOverrides: {},
-      featureOverrides: {},
       renderPassCache: {
         pendingPoliticalColorEditIds: new Set(),
         pendingPoliticalColorEditRevision: 1,
@@ -509,8 +508,7 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
     const isAtlantropaSeaFeature = () => false;
     const getAtlantropaSeaPoliticalFillColor = () => "#123456";
     const getResolvedFeatureColor = (feature, id) => (
-      runtimeState.featureOverrides?.[id]
-      || runtimeState.visualOverrides?.[id]
+      runtimeState.visualOverrides?.[id]
       || feature?.properties?.fill
       || ""
     );
@@ -562,7 +560,6 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
       setMapSemanticMode: (value) => { runtimeState.mapSemanticMode = value; },
       setVisualOverrides: (value) => {
         runtimeState.visualOverrides = value || {};
-        runtimeState.featureOverrides = { ...(value || {}) };
       },
       setPendingColorEditIds: (ids) => {
         runtimeState.renderPassCache.pendingPoliticalColorEditIds = new Set(ids || []);

@@ -67,7 +67,6 @@ const {
   buildScenarioRuntimeDefaultTagColors,
 } = runtimeBridge;
 const {
-  collectColorStateConsistencyIssues,
   createDefaultColorState,
   normalizeColorStateForRender,
   replaceResolvedColorsState,
@@ -230,7 +229,7 @@ test("color state accessor sanitizes water and special overrides through injecte
   assert.deepEqual(colorRuntimeState.specialRegionOverrides, {});
 });
 
-test("normalizeColorStateForRender sanitizes mirrors and resolved colors together", () => {
+test("normalizeColorStateForRender sanitizes canonical paint and resolved colors together", () => {
   const colorRuntimeState = createDefaultColorState();
   colorRuntimeState.sovereignBaseColors = { AAA: "#AABBCC" };
   colorRuntimeState.visualOverrides = { feature_1: "#DDEEFF" };
@@ -249,32 +248,17 @@ test("normalizeColorStateForRender sanitizes mirrors and resolved colors togethe
     },
   });
 
-  assert.deepEqual(colorRuntimeState.countryBaseColors, { AAA: "#aabbcc" });
-  assert.deepEqual(colorRuntimeState.featureOverrides, { feature_1: "#ddeeff" });
+  assert.deepEqual(colorRuntimeState.sovereignBaseColors, { AAA: "#aabbcc" });
+  assert.deepEqual(colorRuntimeState.visualOverrides, { feature_1: "#ddeeff" });
   assert.deepEqual(colorRuntimeState.colors, { feature_2: "#abcdef" });
 });
 
-test("color state consistency checker reports mirror drift before normalization", () => {
-  const colorRuntimeState = createDefaultColorState();
-  colorRuntimeState.sovereignBaseColors = { AAA: "#112233" };
-  colorRuntimeState.countryBaseColors = { BBB: "#445566" };
-  colorRuntimeState.visualOverrides = { feature_1: "#778899" };
-  colorRuntimeState.featureOverrides = { feature_1: "#aabbcc", feature_2: "#ddeeff" };
-
-  const issues = collectColorStateConsistencyIssues(colorRuntimeState);
-  const issueLabels = issues.map((issue) => `${issue.mirror}:${issue.key}:${issue.kind}`);
-  assert.deepEqual(issueLabels, [
-    "sovereignBaseColors<->countryBaseColors:AAA:missing-key",
-    "sovereignBaseColors<->countryBaseColors:BBB:missing-key",
-    "visualOverrides<->featureOverrides:feature_1:value-mismatch",
-    "visualOverrides<->featureOverrides:feature_2:missing-key",
-  ]);
-
-  normalizeColorStateForRender(colorRuntimeState, {
-    sanitizeColorMap: (value) => value || {},
-    sanitizeCountryColorMap: (value) => value || {},
-  });
-  assert.deepEqual(collectColorStateConsistencyIssues(colorRuntimeState), []);
+test("color defaults and render normalization never create retired mirrors", () => {
+  const target = createDefaultColorState();
+  normalizeColorStateForRender(target);
+  for (const key of ["countryBaseColors", "featureOverrides", "legacyColorStateDirty"]) {
+    assert.equal(Object.hasOwn(target, key), false, key);
+  }
 });
 
 test("color manager cache signature is stable across object key order", () => {
@@ -599,7 +583,7 @@ test("checked-in scenarios declare expected palette and complete colors", async 
   }
 });
 
-test("resolveFeatureColor reports canonical color source before compatibility mirrors", () => {
+test("resolveFeatureColor reports canonical color source while ignoring retired mirrors", () => {
   const colorRuntimeState = createDefaultColorState();
   colorRuntimeState.visualOverrides = { feature_1: "#112233" };
   colorRuntimeState.featureOverrides = { feature_1: "#445566" };
@@ -620,7 +604,6 @@ test("resolveFeatureColor reports canonical color source before compatibility mi
   );
 
   delete colorRuntimeState.visualOverrides.feature_1;
-  delete colorRuntimeState.featureOverrides.feature_1;
   assert.deepEqual(
     resolveFeatureColor("feature_1", {
       state: colorRuntimeState,

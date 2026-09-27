@@ -173,7 +173,7 @@ function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup =
     : sourceId === "render-labels"
       ? ["labels"]
       : EXPORT_MAIN_LAYER_MODEL_BY_ID.get(sourceId)?.passNames || [];
-  if (!cache || state.scenarioApplyInFlight || state.legacyColorStateDirty || state.dynamicBordersDirty
+  if (!cache || state.scenarioApplyInFlight || state.dynamicBordersDirty
     || state.runtimeChunkLoadState?.pendingPromotion || state.runtimeChunkLoadState?.promotionCommitInFlight
     || (state.renderPhase && state.renderPhase !== "idle")
     || passes.some((name) => cache.dirty?.[name] !== false || !cache.signatures?.[name])) {
@@ -186,7 +186,7 @@ function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup =
     exportUi.visibility,
     exportUi.textVisibility,
     state.activeScenarioId,
-    state.scenarioApplyEpoch,
+    state.renderTransactionDiagnostics?.scenarioApplyEpoch,
     state.sceneGeneration,
     state.scenarioDataGeneration,
     state.topologyRevision,

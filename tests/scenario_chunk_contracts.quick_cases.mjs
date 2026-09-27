@@ -1203,7 +1203,6 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         ATL_OWNER: "ATL",
       }),
       visualOverrides: {},
-      featureOverrides: {},
       // A stale editable-owner mirror must not override the reference palette.
       sovereigntyByFeatureId: { RU_LAND: "STALE", ATL_OWNER: "STALE" },
       scenarioAutoShellOwnerByFeatureId: {},
@@ -1211,7 +1210,6 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         SOV: "#c01010",
         ATL: "#123abc",
       },
-      countryBaseColors: {},
     };
     const helpers = {
       canonicalCountryCode: (value) => String(value || "").trim().toUpperCase(),

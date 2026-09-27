@@ -32,12 +32,12 @@ class FrontendRenderBoundaryContractTest(unittest.TestCase):
             msg=f"Direct renderNowFn calls reappeared in mainline modules: {', '.join(offenders)}",
         )
 
-    def test_scenario_ownership_editor_uses_request_boundary(self):
+    def test_scenario_ownership_editor_has_no_render_request_after_edit_retirement(self):
         content = (REPO_ROOT / "js" / "core" / "scenario_ownership_editor.js").read_text(encoding="utf-8")
         self.assertNotIn('from "./render_boundary.js"', content)
         self.assertNotIn("flushRenderBoundary", content)
-        self.assertIn("requestInteractionRender", content)
-        self.assertIn("return requestInteractionRender(reason);", content)
+        self.assertNotIn("requestInteractionRender", content)
+        self.assertIn("ownershipEditingDisabledResult", content)
 
     def test_render_boundary_reasons_survive_until_render_perf_snapshot(self):
         boundary = (REPO_ROOT / "js" / "core" / "render_boundary.js").read_text(encoding="utf-8")

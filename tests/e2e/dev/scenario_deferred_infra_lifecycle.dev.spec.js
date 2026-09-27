@@ -95,7 +95,7 @@ test('deferred infra terminates across cold warm and scenario-switch editing win
       const featureId = await page.evaluate(() => globalThis.__playwrightStateRef.devSelectedHit.id);
       const oldColor = await page.evaluate(id => globalThis.__playwrightStateRef.colors[id], featureId);
       await page.mouse.click(point.x, point.y);
-      await expect.poll(() => page.evaluate(id => globalThis.__playwrightStateRef.featureOverrides[id], featureId)).toBe('#e31ac4');
+      await expect.poll(() => page.evaluate(id => globalThis.__playwrightStateRef.visualOverrides[id], featureId)).toBe('#e31ac4');
       entry.painted = { featureId, oldColor, color: '#e31ac4' };
       await waitForRenderIdle(page, { scenarioId, timeout: 30_000 });
       await page.waitForFunction(() => {
@@ -113,7 +113,7 @@ test('deferred infra terminates across cold warm and scenario-switch editing win
       expect(entry.afterDrain.failure).toBeNull();
       expect(entry.afterDrain.scheduler.pendingTaskKeys).toEqual([]);
       console.log(`[N4] ${window}: drained, ready, index=${entry.afterDrain.indexSize}`);
-      expect(await page.evaluate(id => globalThis.__playwrightStateRef.featureOverrides[id], featureId)).toBe('#e31ac4');
+      expect(await page.evaluate(id => globalThis.__playwrightStateRef.visualOverrides[id], featureId)).toBe('#e31ac4');
       await page.locator('#undoBtn').click();
       await expect.poll(() => page.evaluate(id => globalThis.__playwrightStateRef.colors[id], featureId)).toBe(oldColor);
       await page.locator('#redoBtn').click();

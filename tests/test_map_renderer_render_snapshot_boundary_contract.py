@@ -6,7 +6,6 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 RENDER_SNAPSHOT_JS = REPO_ROOT / "js" / "core" / "renderer" / "render_snapshot.js"
-RENDER_CHANGE_SET_JS = REPO_ROOT / "js" / "core" / "render_change_set.js"
 
 
 def get_function_body(source, function_name):
@@ -40,9 +39,8 @@ class MapRendererRenderSnapshotBoundaryContractTest(unittest.TestCase):
         self.assertIn("getViewportGeoBounds", facade_body)
         self.assertRegex(renderer, r"\n\s+captureRenderSnapshot,\n")
 
-    def test_snapshot_and_change_set_modules_are_declarative_only(self):
+    def test_snapshot_module_is_declarative_only(self):
         snapshot = RENDER_SNAPSHOT_JS.read_text(encoding="utf-8")
-        change_set = RENDER_CHANGE_SET_JS.read_text(encoding="utf-8")
 
         for token in [
             "sovereignBaseColors",
@@ -63,12 +61,7 @@ class MapRendererRenderSnapshotBoundaryContractTest(unittest.TestCase):
             "globalThis.d3",
         ]:
             self.assertNotIn(forbidden, snapshot)
-            self.assertNotIn(forbidden, change_set)
 
-        self.assertIn("sideEffectsPerformed: false", change_set)
-        self.assertIn("RENDER_CHANGE_SET_ERROR.BASE_STALE", change_set)
-        self.assertNotRegex(change_set, r"\.apply\(")
-        self.assertNotRegex(change_set, r"\.undo\(")
 
 
 if __name__ == "__main__":

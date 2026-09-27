@@ -14,7 +14,7 @@ function fixture() {
   assert.equal(functions.length, names.size);
   const runtime = {
     currentTool: "fill", interactionGranularity: "country", selectedColor: "#112233",
-    visualOverrides: {}, featureOverrides: {}, waterRegionOverrides: {},
+    visualOverrides: {}, waterRegionOverrides: {},
     sovereignBaseColors: { GER: "#445566" }, countryBaseColors: { GER: "#445566" },
     scenarioBaselineOwnersByFeatureId: Object.freeze({ a: "GER", b: "GER" }),
     landIndex: new Map([["a", { id: "a" }], ["b", { id: "b" }], ["c", { id: "c" }]]),
@@ -49,7 +49,7 @@ test("country brush uses per-feature paint and records each feature only once", 
   const reference = h.runtime.scenarioBaselineOwnersByFeatureId;
   assert.equal(h.apply({ id: "a", targetType: "land", countryCode: "DE" }), true);
   assert.deepEqual(h.runtime.visualOverrides, { a: "#112233", b: "#112233" });
-  assert.deepEqual(h.runtime.featureOverrides, h.runtime.visualOverrides);
+  assert.equal(Object.hasOwn(h.runtime, "featureOverrides"), false);
   assert.deepEqual(h.runtime.sovereignBaseColors, { GER: "#445566" });
   assert.equal(h.runtime.scenarioBaselineOwnersByFeatureId, reference);
   assert.equal(h.apply({ id: "b", targetType: "land" }), false);

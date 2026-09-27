@@ -81,7 +81,6 @@ class ScenarioHealthActionsBoundaryContractTest(unittest.TestCase):
             "restoreScenarioHydrationHealthGateState(",
             "setScenarioAuditUiState(",
             "restoreScenarioDataHealthState(",
-            "markLegacyColorStateDirty();",
             "setActiveScenarioPerformanceHintsState(",
             "replaceScenarioChunkRuntimeState(",
         ]

@@ -1205,7 +1205,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function isPoliticalShellUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isRuntimeOnlyShellFallbackPoliticalFeature\(feature, featureId\)/.test(politicalFeaturePolicySource)
         && /function isPoliticalPrimaryUnderlayFeature\(feature, _featureId = null\) \{[\s\S]*?__source[\s\S]*?=== "primary";[\s\S]*?\}/.test(politicalFeaturePolicySource)
         && /function isPoliticalUnderlayFeature\(feature, featureId = null\) \{[\s\S]*?isPoliticalShellUnderlayFeature\(feature, featureId\)[\s\S]*?isPoliticalPrimaryUnderlayFeature\(feature, featureId\)/.test(politicalFeaturePolicySource)
-        && /function hasPoliticalForegroundColorOverride\(featureId\) \{[\s\S]*?runtimeState\.visualOverrides\?\.\[id\][\s\S]*?runtimeState\.featureOverrides\?\.\[id\]/.test(politicalFeaturePolicySource)
+        && /function hasPoliticalForegroundColorOverride\(featureId\) \{[\s\S]*?runtimeState\.visualOverrides\?\.\[id\]/.test(politicalFeaturePolicySource)
         && /function isPendingPoliticalColorEditFeature\(feature, featureId = null\) \{[\s\S]*?hasPendingPoliticalColorEdit\(\)[\s\S]*?pendingPoliticalColorEditIds[\s\S]*?pendingIds\.has\(id\);/.test(politicalFeaturePolicySource)
         && /function isPoliticalForegroundFeature\(feature, featureId = null, pendingIds = undefined\) \{[\s\S]*?hasPoliticalForegroundColorOverride\(id\)[\s\S]*?isPendingPoliticalColorEditFeature\(feature, id\)/.test(politicalFeaturePolicySource)
         && /function orderPoliticalShellUnderlayFirst\(entries = \[\]\) \{[\s\S]*?const underlayEntries = \[\];[\s\S]*?const detailEntries = \[\];[\s\S]*?const foregroundEntries = \[\];[\s\S]*?isPoliticalForegroundFeature\(feature, featureId, pendingIds\)[\s\S]*?isPoliticalUnderlayFeature\(feature, featureId\)[\s\S]*?return \[\.\.\.underlayEntries, \.\.\.detailEntries, \.\.\.foregroundEntries\];/.test(politicalFeaturePolicySource)
@@ -1226,7 +1226,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function buildScenarioPoliticalBackgroundEntries\(\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(feature, id\)/.test(politicalBackgroundOwnerSource)
         && /function buildScenarioPoliticalBackgroundEntriesFromSpatialItems\(items = \[\]\) \{[\s\S]*?shouldExcludePoliticalVisualFeature\(entry\.feature, entry\.id\)/.test(politicalBackgroundOwnerSource),
       admin0BackgroundUsesDominantResolvedFillBeforeBaseColor:
-        /function getAdmin0BackgroundFillColor\(countryCode\) \{[\s\S]*?const dominantFillColor = buildCountryDominantFillColorMap\(\)\.get\(canonicalCode\);[\s\S]*?return getSafeCanvasColor\(dominantFillColor, null\)[\s\S]*?getSafeCanvasColor\(getColorByCanonicalCountryCode\(runtimeState\.sovereignBaseColors, canonicalCode\), null\)[\s\S]*?getSafeCanvasColor\(getColorByCanonicalCountryCode\(runtimeState\.countryBaseColors, canonicalCode\), null\)[\s\S]*?\|\| LAND_FILL_COLOR;[\s\S]*?\}/.test(rendererSource)
+        /function getAdmin0BackgroundFillColor\(countryCode\) \{[\s\S]*?const dominantFillColor = buildCountryDominantFillColorMap\(\)\.get\(canonicalCode\);[\s\S]*?return getSafeCanvasColor\(dominantFillColor, null\)[\s\S]*?getSafeCanvasColor\(getColorByCanonicalCountryCode\(runtimeState\.sovereignBaseColors, canonicalCode\), null\)[\s\S]*?\|\| LAND_FILL_COLOR;[\s\S]*?\}/.test(rendererSource)
         && /function drawAdmin0BackgroundFills\([\s\S]*?const fillColor = getAdmin0BackgroundFillColor\(code\);/.test(politicalBackgroundOwnerSource),
       colorCoverageOwnerDiagnosticsUseDisplayOwnerCode:
         /import\("\/js\/core\/feature_identity\.js"\)/.test(colorCoverageE2eSource)
@@ -1248,7 +1248,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /normalizeFeatureCountryCode\(state\.sovereigntyByFeatureId\?\.\[featureId\][\s\S]*?allowReserved: true/.test(pixelProbeSource)
         && /shellCandidate\.startsWith\("RU_ARCTIC_FB_"\)[\s\S]*?props\.name[\s\S]*?shell fallback/.test(pixelProbeSource)
         && /const displayOwnerCode = getDisplayOwnerCode\(matchedFeature, featureId, countryCode\);/.test(pixelProbeSource)
-        && /state\.sovereignBaseColors\?\.\[displayOwnerCode\][\s\S]*?state\.countryBaseColors\?\.\[displayOwnerCode\]/.test(pixelProbeSource),
+        && /state\.sovereignBaseColors\?\.\[displayOwnerCode\]/.test(pixelProbeSource),
       pixelProbeResolvesColorsFromFullVisualFeatures:
         /const colorFeatures = Array\.isArray\(state\.landDataFull\?\.features\) && state\.landDataFull\.features\.length[\s\S]*?\? state\.landDataFull\.features[\s\S]*?: \(Array\.isArray\(state\.landData\?\.features\) \? state\.landData\.features : \[\]\);/.test(pixelProbeSource)
         && /for \(const feature of colorFeatures\)/.test(pixelProbeSource),

@@ -11,7 +11,7 @@ export function createOwnershipRetirementRecords(existingRecords) {
       "js/core/state/actions/scenario_presentation_actions.js", "js/core/history_manager.js",
       "js/core/scenario/lifecycle_runtime.js", "js/core/interaction_funnel.js", "js/core/file_manager.js",
       "js/ui/sidebar.js", "js/ui/toolbar.js", "js/ui/dev_workspace/selection_ownership_controller.js",
-      "js/ui/dev_workspace/scenario_tag_creator_controller.js", "js/ui/dev_workspace/dev_workspace_shell_builder.js",
+      "js/ui/dev_workspace/dev_workspace_shell_builder.js",
       "js/ui/sidebar/scenario_inspector_controller.js", "js/ui/sidebar/country_inspector_controller.js",
       "js/core/quick_fill_hierarchy.js", "js/core/renderer/fill_target_policy.js",
       "js/core/renderer/color_resolution_strategy.js", "js/core/renderer/border_mesh_dynamic_runtime.js",

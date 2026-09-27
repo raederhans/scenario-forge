@@ -1,5 +1,5 @@
 // Regional preset selection, presentation and application validation share one owner.
-// Mutations remain in the sidebar's existing ownership and visual transactions.
+// Mutations remain in the sidebar's existing visual paint transactions.
 export function createRegionalPresetController(runtimeState, {
   t,
   normalizeCountryCode,
@@ -7,9 +7,7 @@ export function createRegionalPresetController(runtimeState, {
   resolveScenarioLookupCode,
   getScenarioCountryMeta,
   resolveFeatureIdsFromPresetSource,
-  normalizeActionMode,
   filterToVisibleFeatureIds,
-  applyOwnershipToFeatureIds,
   applyVisualOverridesToFeatureIds,
   showToast,
   render,
@@ -37,15 +35,11 @@ export function createRegionalPresetController(runtimeState, {
   function applyPresetReference(
     presetRef,
     {
-      mode = "auto",
       color,
-      ownerCode,
       render,
       countryCode = presetRef?.presetLookupCode,
       presetLookupCode = presetRef?.presetLookupCode,
       presetIndex = presetRef?.presetIndex,
-      ownershipHistoryKind = "preset-apply-sovereignty",
-      ownershipDirtyReason = "preset-apply-sovereignty",
       visualHistoryKind = "preset-apply-color",
       visualDirtyReason = "preset-apply-color",
     } = {}
@@ -104,22 +98,6 @@ export function createRegionalPresetController(runtimeState, {
         requestedCount: requestedIds.length,
         missingCount: missingIds.length,
         reason: "no-visible-features",
-      };
-    }
-
-    const resolvedMode = normalizeActionMode(mode);
-    if (resolvedMode === "ownership") {
-      const result = applyOwnershipToFeatureIds(targetIds, ownerCode || String(runtimeState.activeSovereignCode || ""), {
-        render,
-        historyKind: ownershipHistoryKind,
-        dirtyReason: ownershipDirtyReason,
-        recomputeReason: "sidebar-preset-batch",
-      });
-      return {
-        ...result,
-        matchedCount: targetIds.length,
-        requestedCount: requestedIds.length,
-        missingCount: missingIds.length,
       };
     }
 
@@ -339,8 +317,6 @@ export function createRegionalPresetController(runtimeState, {
         defaultOpen: false,
         rememberKey: "territories-presets:regional-presets",
       });
-    const missingOwner = mode === "auto" && normalizeActionMode() === "ownership"
-      && !normalizeCountryCode(String(runtimeState.activeSovereignCode || ""));
     for (const { preset, presetIndex } of entries) {
       const normalizedName = normalizePresetName(preset?.name);
       const baselineDisabled = !!normalizedName && disabledNames.includes(normalizedName);
@@ -348,25 +324,16 @@ export function createRegionalPresetController(runtimeState, {
       button.type = "button";
       button.className = "inspector-item-btn";
       button.textContent = preset.name;
-      button.disabled = baselineDisabled || !!missingOwner;
+      button.disabled = baselineDisabled;
       if (baselineDisabled) {
         button.title = String(countryState.disabledRegionalPresetReason
           || t("Already applied in scenario baseline", "ui")).trim();
-      } else if (missingOwner) {
-        button.title = t("Choose an active owner before changing political ownership or borders.", "ui");
       }
       button.addEventListener("click", () => {
-        const options = { mode, render };
-        if (mode === "ownership") {
-          options.ownerCode = countryState.code;
-          options.ownershipHistoryKind = "scenario-preset-apply-ownership";
-          options.ownershipDirtyReason = "scenario-preset-apply-ownership";
-        } else {
-          options.color = String(runtimeState.selectedColor || "");
-          if (visual) {
-            options.visualHistoryKind = "scenario-preset-apply-visual";
-            options.visualDirtyReason = "scenario-preset-apply-visual";
-          }
+        const options = { color: String(runtimeState.selectedColor || ""), render };
+        if (visual) {
+          options.visualHistoryKind = "scenario-preset-apply-visual";
+          options.visualDirtyReason = "scenario-preset-apply-visual";
         }
         applyPresetWithMode(presetLookupCode, presetIndex, options);
         if (visual) setScenarioVisualAdjustmentsOpen(true);

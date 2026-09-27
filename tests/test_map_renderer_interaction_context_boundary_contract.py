@@ -70,8 +70,6 @@ class MapRendererInteractionContextBoundaryContractTest(unittest.TestCase):
             "handlers: {",
             "mapClick: handleClick,",
             "mapDoubleClick: handleDoubleClick,",
-            "dispatchMapClick,",
-            "dispatchMapDoubleClick,",
             "effects: {",
             "bindMapContainerResizeObserver,",
             "bindBrowserZoomObservers,",

@@ -6,11 +6,15 @@ import { getBorderWorkerIdentity, getDefaultBorderWorkerSources,
 
 test("worker readers retain live source references and optional Map lookup semantics", () => {
   const topology = Object.freeze({ objects: Object.freeze({}) });
-  const state = { activeScenarioId: "one", scenarioApplyEpoch: 2, sceneGeneration: 3,
+  const state = { activeScenarioId: "one", renderTransactionDiagnostics: { scenarioApplyEpoch: 2 }, sceneGeneration: 3,
     scenarioDataGeneration: 4, topologyRevision: 5, sovereigntyRevision: 6,
     scenarioShellOverlayRevision: 7, mapSemanticMode: "visual", showScenarioAtlantropa: false,
     topology, topologyDetail: topology };
-  assert.equal(getBorderWorkerIdentity(state), "one|2|3|4|5|6|7|visual|false");
+  const identity = getBorderWorkerIdentity(state);
+  assert.equal(identity, "one|2|3|4|5|6|7|visual|false");
+  state.renderTransactionDiagnostics.scenarioApplyEpoch += 1;
+  assert.notEqual(getBorderWorkerIdentity(state), identity);
+  assert.equal(getBorderWorkerIdentity(state), "one|3|3|4|5|6|7|visual|false");
   const first = getDefaultBorderWorkerSources(state);
   assert.equal(first[0].topology, topology);
   assert.equal(first[1].topology, topology);

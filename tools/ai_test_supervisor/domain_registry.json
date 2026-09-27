@@ -444,7 +444,6 @@
         "tests/e2e/transport_*.spec.js"
       ],
       "preferredChildSafeChecks": [
-        "npm run test:node:appearance-transport-change-set",
         "npm run test:node:transport-workbench-controller",
         "npm run test:node:transport-workbench-preview-lifecycle-owner"
       ],

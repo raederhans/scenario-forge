@@ -85,7 +85,6 @@ function createHarness({ collapsed = false, selectionLabel = "Berlin" } = {}) {
     activeScenarioManifest: { display_name: "HGO 1936" },
     activeSovereignCode: "abc",
     countryNames: { ABC: "Alpha" },
-    scenarioViewMode: "frontline",
     transportWorkbenchUi: { open: false },
     ui: {
       scenarioBarCollapsed: collapsed,
@@ -135,7 +134,7 @@ test("scenario context bar refresh owns labels, selection chip, and safe width",
 
   assert.equal(nodes.scenarioContextScenarioText.textContent, "HGO 1936");
   assert.equal(nodes.scenarioContextModeText.textContent, "Visual Color");
-  assert.match(nodes.scenarioContextModeText.attributes.get("title"), /View: Frontline/);
+  assert.equal(nodes.scenarioContextModeText.attributes.get("title"), "Mode: Visual Color");
   assert.equal(nodes.scenarioContextActiveText.textContent, "Alpha (ABC)");
   assert.equal(nodes.scenarioContextSelectionItem.classList.contains("hidden"), false);
   assert.equal(nodes.scenarioContextSelectionText.textContent, "Berlin");

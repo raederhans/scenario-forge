@@ -4,7 +4,7 @@ import {
   clearActiveScenarioApplyRequestState,
   setLatestScenarioApplyRequestState,
 } from "./state/actions/scenario_apply_request_actions.js";
-import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
+import { ensureSovereigntyState } from "./sovereignty_manager.js";
 import {
   invalidateOceanBackgroundVisualState,
 } from "./scenario/scenario_renderer_bridge.js";
@@ -290,7 +290,7 @@ const {
   getScenarioDefaultCountryCode,
   getScenarioMapSemanticMode,
   markDirty,
-  markLegacyColorStateDirty,
+
   normalizeScenarioId,
   releaseScenarioAuditPayload,
   resetScenarioChunkRuntimeState,
@@ -543,7 +543,7 @@ const {
   applyBlankScenarioPresentationDefaults,
   setScenarioAuditUiState,
   getScenarioBaselineHashFromBundle,
-  markLegacyColorStateDirty,
+
   syncScenarioInspectorSelection,
   disableScenarioParentBorders,
   applyScenarioPaintMode,

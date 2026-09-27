@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
+import { createReadonlyReferenceAssignments, getMapDataBoundary } from '../js/core/map_data_boundary.js';
 import { parse } from 'acorn';
 import { state } from '../js/core/state.js';
 import { getPhysicalContextLayerRequests } from '../js/core/state_defaults.js';
@@ -74,11 +75,11 @@ test('scenario import never seeds outgoing Atlantropa, TNO split or coarse land 
       createProjectImportCompletion, createImportRecoveryUi: () => () => {},
       commitStartupReadonlyStateFields, clearStartupReadonlyStateForReason,
       captureProjectImportState, commitImportedProjectPatch: applyProjectImportPatch, seedSovereigntyFromLandData,
-      normalizeMapSemanticMode: mode => mode, migrateLegacyColorState: () => {},
+      normalizeMapSemanticMode: mode => mode, createReadonlyReferenceAssignments, getMapDataBoundary,
       ensureOwnerIndexMaps: () => {}, rebuildOwnerIndex: () => events.push('owners'),
       getScenarioResourcesModule: () => {}, captureImportDocumentIdentity: () => [],
       isImportDocumentCurrent: () => true, clearHistory: () => {}, clearDirty: () => {},
-      markLegacyColorStateDirty: () => events.push('invalidate'), callRuntimeHook: () => {},
+      callRuntimeHook: () => events.push('invalidate'),
       restoreImportedTransportOverviewDataLayers: () => {},
       restoreImportedTransportCountryOverlayState: () => {}, syncProjectImportUiState: () => {},
       stageImportedProjectPatch: () => ({ sovereigntyByFeatureId: { HOI4_TARGET: 'GER' }, sovereigntyInitialized: false }),
@@ -117,9 +118,9 @@ test('cancelled baseline confirmation preserves document, dirty state and real u
   globalThis.document = { getElementById: () => null };
   try {
     clearHistory();
-    const before = { visualOverrides: { IMPORT_TEST: null }, featureOverrides: { IMPORT_TEST: null } };
-    const middle = { visualOverrides: { IMPORT_TEST: '#112233' }, featureOverrides: { IMPORT_TEST: null } };
-    const after = { visualOverrides: { IMPORT_TEST: '#445566' }, featureOverrides: { IMPORT_TEST: null } };
+    const before = { visualOverrides: { IMPORT_TEST: null } };
+    const middle = { visualOverrides: { IMPORT_TEST: '#112233' } };
+    const after = { visualOverrides: { IMPORT_TEST: '#445566' } };
     pushHistoryEntry({ before, after: middle });
     pushHistoryEntry({ before: middle, after });
     undoHistory();
@@ -265,7 +266,7 @@ test('scenario project import retains staged owner colors and applies saved colo
     { cloneImportedProjectValue: structuredClone, captureProjectImportState });
   const context = vm.createContext(globals);
   vm.runInContext(source.slice(fn.start, fn.end), context);
-  const data = { ...payload(), countryBaseColors: {}, sovereignBaseColors: {} };
+  const data = { ...payload(), sovereignBaseColors: {} };
   const prepared = {
     scenarioState: { activeScenarioId: 'tno_1962', mapSemanticMode: 'political' },
     preparedScenario: { staged: {
@@ -279,7 +280,6 @@ test('scenario project import retains staged owner colors and applies saved colo
   assert.equal(baseline.sovereignBaseColors.GER, '#334455', 'scenario colors override coarse fallback');
   assert.equal(baseline.sovereignBaseColors.FRA, '#223344');
   assert.equal(baseline.sovereignBaseColors.ITA, '#445566');
-  assert.equal(baseline.countryBaseColors.GER, '#334455');
 
   data.sovereignBaseColors = { GER: '#abcdef' };
   const customized = context.stageImportedProjectPatch(data, prepared);

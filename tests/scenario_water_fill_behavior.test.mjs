@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 import { parse } from "acorn";
+import { getFeatureId as getSharedFeatureId } from "../js/core/feature_identity.js";
 import { isLakeRegion } from "../js/core/renderer/effective_water_regions.js";
 
 const rendererSource = readFileSync(
@@ -35,7 +36,7 @@ test("political preview punches out visible shared and scenario lakes, preservin
   const drawingContext = { globalCompositeOperation: "source-over",
     save() { this.saved = this.globalCompositeOperation; }, restore() { this.globalCompositeOperation = this.saved; } };
   const scope = vm.createContext({ runtimeState: state, isLakeRegion,
-    getFeatureId: f => f.properties.id, getEffectiveWaterRegionFeatures: () => [shared, scenario, sea],
+    getSharedFeatureId, getEffectiveWaterRegionFeatures: () => [shared, scenario, sea],
     rendererSurfaceHost: { getContext: () => drawingContext },
     drawScenarioWaterFillLayer: (k, options) => calls.push({ k, ids: Array.from(options.waterFeatures, f => f.properties.id), maskOnly: options.maskOnly, operation: drawingContext.globalCompositeOperation }),
   });
@@ -75,7 +76,7 @@ function createHarness({
     pathCanvas: [],
     restore: 0,
     save: 0,
-    featureIds: [],
+    featureColorIds: [],
     defaultStyles: [],
   };
   const metrics = [];
@@ -115,10 +116,10 @@ function createHarness({
     collectSafeWaterRegionGeometryParts: (candidate) => candidate.parts,
     getScenarioWaterPartBounds: (candidate) => candidate.bounds,
     scenarioWaterPathCache: { getStats: () => ({ entries: 0 }) },
-    getFeatureId: (candidate) => { calls.featureIds.push(candidate.id); return candidate.id; },
+    getSharedFeatureId,
     getScenarioWaterFeaturePath: () => featurePath,
     getScenarioWaterPartPath: (candidate) => partPaths.get(candidate.id) || null,
-    getWaterRegionColor: () => "#123456",
+    getWaterRegionColor: (id) => { calls.featureColorIds.push(id); return "#123456"; },
     getWaterRegionDefaultStyle: (candidate) => { calls.defaultStyles.push(candidate.id); return { opacity: candidate.opacity }; },
     isWaterRegionRenderable: (candidate) => candidate.renderable,
     nowMs: () => 10,
@@ -222,18 +223,18 @@ test("scenario water fill excludes transparent, disabled, and offscreen features
   assert.equal(harness.metrics.at(-1).payload.renderedCount, 0);
 });
 
-test("water paint resolves styles and IDs only for visible features; masks skip unused opacity lookup", () => {
+test("water paint resolves styles and feature IDs only for visible features; masks skip opacity lookup", () => {
   const offscreen = feature("offscreen", { parts: [part("offscreen-part", { visible: false })] });
   const visible = feature("visible", { opacity: 0.6 });
   const h = createHarness({ featurePath: { name: "water-path" } });
   assert.equal(h.draw([offscreen, visible]), 1);
   assert.deepEqual(h.calls.defaultStyles, ["visible"]);
-  assert.deepEqual(h.calls.featureIds, ["visible"]);
+  assert.deepEqual(h.calls.featureColorIds, ["visible"]);
   h.calls.defaultStyles.length = 0;
-  h.calls.featureIds.length = 0;
+  h.calls.featureColorIds.length = 0;
   assert.equal(h.draw([offscreen, visible], { maskOnly: true }), 1);
   assert.deepEqual(h.calls.defaultStyles, []);
-  assert.deepEqual(h.calls.featureIds, ["visible"]);
+  assert.deepEqual(h.calls.featureColorIds, ["visible"]);
   assert.equal(h.calls.fill.length, 2);
   assert.deepEqual(h.calls.paint, [
     { path: h.calls.fill[0], color: "#123456", alpha: 0.6 },

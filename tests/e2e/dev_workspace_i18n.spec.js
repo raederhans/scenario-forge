@@ -1,5 +1,3 @@
-const fs = require("fs");
-const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { getAppUrl } = require("./support/playwright-app");
 
@@ -26,7 +24,7 @@ async function openDevWorkspace(page) {
   await expect(page.locator("#devWorkspacePanel")).toBeVisible();
 }
 
-test("dev workspace declarative i18n updates static labels and placeholders", async ({ page }) => {
+test("dev workspace declarative i18n updates static labels and accessibility text", async ({ page }) => {
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
   await openDevWorkspace(page);
@@ -34,19 +32,16 @@ test("dev workspace declarative i18n updates static labels and placeholders", as
   const clipboardLabel = page.locator("#devSelectionClipboardLabel");
   const selectionPreview = page.locator("#devSelectionPreview");
   const selectionSortOption = page.locator('#devSelectionSortMode option[value="selection"]');
-  const tagNamePlaceholder = page.locator("#devScenarioTagNameEnInput");
 
   await expect(clipboardLabel).toHaveText("Selection Clipboard");
   await expect(selectionPreview).toHaveAttribute("aria-label", "Development selection preview");
   await expect(selectionSortOption).toHaveText("Selection Order");
-  await expect(tagNamePlaceholder).toHaveAttribute("placeholder", "New Country");
 
   await page.locator("#btnToggleLang").click();
 
   await expect(clipboardLabel).not.toHaveText("Selection Clipboard");
   await expect(selectionPreview).not.toHaveAttribute("aria-label", "Development selection preview");
   await expect(selectionSortOption).not.toHaveText("Selection Order");
-  await expect(tagNamePlaceholder).not.toHaveAttribute("placeholder", "New Country");
 });
 
 test("dev workspace locale helper prefers effective scenario geo locale over raw patch values", async ({ page }) => {
@@ -151,7 +146,6 @@ test("dev workspace select option labels render injected markup as literal text"
   await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1200);
   await openDevWorkspace(page);
-  await expect(page.locator("#devScenarioTagGroupSelect")).toHaveCount(1);
   await expect(page.locator("#devScenarioCountrySelect")).toHaveCount(1);
   await expect(page.locator("#devScenarioDistrictSelect")).toHaveCount(1);
 
@@ -172,11 +166,6 @@ test("dev workspace select option labels render injected markup as literal text"
     };
     state.devScenarioCountryEditor = { tag: "AAA", isSaving: false };
     state.devScenarioCapitalEditor = { tag: "AAA", isSaving: false };
-    state.devScenarioTagCreator = {
-      ...(state.devScenarioTagCreator || {}),
-      selectedInspectorGroupId: "grp",
-      isSaving: false,
-    };
     state.scenarioDistrictGroupsData = {
       version: 1,
       scenario_id: "xss_test",
@@ -215,84 +204,17 @@ test("dev workspace select option labels render injected markup as literal text"
     };
 
     return {
-      group: readOptions("#devScenarioTagGroupSelect"),
       country: readOptions("#devScenarioCountrySelect"),
       district: readOptions("#devScenarioDistrictSelect"),
     };
   });
 
-  expect(options.group).not.toBeNull();
   expect(options.country).not.toBeNull();
   expect(options.district).not.toBeNull();
-  expect(options.group).toHaveLength(2);
   expect(options.country).toHaveLength(2);
   expect(options.district).toHaveLength(2);
-  expect(options.group[1].text).toContain('</option><option value="BAD">Injected');
   expect(options.country[1].text).toContain('</option><option value="ZZZ">Injected');
   expect(options.district[1].text).toContain('</option><option value="BAD">Injected');
-});
-
-test("dev workspace reinit keeps one tracked color-popover document click listener", async ({ page }) => {
-  await page.goto(resolveBaseUrl(), { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1200);
-  await openDevWorkspace(page);
-
-  const stats = await page.evaluate(async () => {
-    const workspaceModuleUrl = new URL("/js/ui/dev_workspace.js", window.location.href).href;
-    const { initDevWorkspace } = await import(workspaceModuleUrl);
-    const trackedClickListeners = new Set();
-    const originalAddEventListener = document.addEventListener.bind(document);
-    const originalRemoveEventListener = document.removeEventListener.bind(document);
-
-    document.addEventListener = function addEventListenerPatched(type, listener, options) {
-      if (type === "click") {
-        trackedClickListeners.add(listener);
-      }
-      return originalAddEventListener(type, listener, options);
-    };
-    document.removeEventListener = function removeEventListenerPatched(type, listener, options) {
-      if (type === "click") {
-        trackedClickListeners.delete(listener);
-      }
-      return originalRemoveEventListener(type, listener, options);
-    };
-
-    try {
-      initDevWorkspace();
-      initDevWorkspace();
-      return { trackedClickListenerCount: trackedClickListeners.size };
-    } finally {
-      document.addEventListener = originalAddEventListener;
-      document.removeEventListener = originalRemoveEventListener;
-    }
-  });
-
-  expect(stats.trackedClickListenerCount).toBe(1);
-
-  await page.evaluate(async () => {
-    const stateModuleUrl = new URL("/js/core/state.js", window.location.href).href;
-    const { state } = await import(stateModuleUrl);
-    state.activeScenarioId = "listener_test";
-    state.activeScenarioManifest = { display_name: "Listener Test" };
-    state.ui = {
-      ...(state.ui || {}),
-      devWorkspaceCategory: "scenario",
-    };
-    state.devSelectionFeatureIds = new Set(["AAA-1"]);
-    state.devSelectionOrder = ["AAA-1"];
-    state.landIndex = new Map([["AAA-1", { properties: {} }]]);
-    state.devScenarioTagCreator = {
-      ...(state.devScenarioTagCreator || {}),
-      isSaving: false,
-    };
-    state.updateDevWorkspaceUIFn?.();
-  });
-
-  await expect(page.locator("#devScenarioTagColorPreviewBtn")).toBeVisible();
-  await page.locator("#devScenarioTagColorPreviewBtn").click();
-  await expect(page.locator("#devScenarioTagColorPopover")).toBeVisible();
-  await page.mouse.click(5, 5);
-  await expect(page.locator("#devScenarioTagColorPopover")).toBeHidden();
 });
 
 test("dev workspace Add Hovered only enables land hits and ignores non-land fallbacks", async ({ page }) => {

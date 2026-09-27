@@ -229,7 +229,7 @@ function createScenarioApplyPipeline({
   applyBlankScenarioPresentationDefaults,
   setScenarioAuditUiState,
   getScenarioBaselineHashFromBundle,
-  markLegacyColorStateDirty,
+
   syncScenarioInspectorSelection,
   disableScenarioParentBorders,
   applyScenarioPaintMode,
@@ -472,11 +472,9 @@ function createScenarioApplyPipeline({
       sovereigntyByFeatureId: staged.resolvedOwners,
       sovereigntyInitialized: false,
       visualOverrides: {},
-      featureOverrides: {},
       scenarioGeneratedColorTags: staged.scenarioGeneratedColorTags || [],
       scenarioFixedOwnerColors: fixedOwnerColors,
       sovereignBaseColors: fixedOwnerColors,
-      countryBaseColors: fixedOwnerColors,
     };
   }
 
@@ -611,7 +609,7 @@ function createScenarioApplyPipeline({
   }
 
   function runScenarioActivationPostCommitPhase(bundle, staged) {
-    markLegacyColorStateDirty();
+
     syncScenarioInspectorSelection("");
     disableScenarioParentBorders();
     applyScenarioPaintMode();
