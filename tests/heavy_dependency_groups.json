@@ -11,6 +11,7 @@
       "tests/test_atlantropa_precision.py",
       "tests/test_atlantropa_source_inventory.py",
       "tests/test_check_atlantropa_geometry.py",
+      "tests/test_build_global_bathymetry_asset.py",
       "tests/test_city_assets.py",
       "tests/test_city_data_contract.py",
       "tests/test_explicit_precision_lod.py",
