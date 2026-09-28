@@ -1285,7 +1285,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function shouldExcludeWaterHitGeometry\(hitGeometry, _feature = null\) \{[\s\S]*?return isSphericalGeometryUnsafe\(hitGeometry\);[\s\S]*?\}/.test(projectedGeometryBoundsOwnerSource)
         && /function getUnifiedWaterBaseStyle\(feature\) \{[\s\S]*?isAtlantropaSeaFeature\(feature\)[\s\S]*?getAtlantropaSeaPoliticalFillColor\(\)/.test(rendererSource)
         && /function getWaterRegionColor\(id, feature = null\) \{[\s\S]*?const defaultStyleFeature = feature \|\| runtimeState\.waterRegionsById\?\.get\(resolvedId\);/.test(rendererSource)
-        && /rendererSurfaceHost\.getContext\(\)\.fillStyle = getWaterRegionColor\(id, feature\);/.test(scenarioRegionOverlayOwnerSource)
+        && /rendererSurfaceHost\.getContext\(\)\.fillStyle = oceanSurfacePattern && !isLakeRegion\(feature\) && !hasColorOverride\s*\? oceanSurfacePattern\s*: getWaterRegionColor\(id, feature\);/.test(scenarioRegionOverlayOwnerSource)
         && /function getScenarioWaterVisualRevisionToken\(\{ effectiveWaterFeatureCount = null, atlantropaFeatures = null \} = \{\}\) \{[\s\S]*?water-atlantropa:\$\{atlantropaRevisionToken\}/.test(rendererSource)
         && /let bounds = computeProjectedGeoBounds\(hitGeometry\);[\s\S]*?if \(!bounds\) \{[\s\S]*?if \(!featureBoundsComputed\) \{[\s\S]*?featureBounds = computeProjectedGeoBounds\(feature\);[\s\S]*?featureBoundsComputed = true;[\s\S]*?bounds = featureBounds;/.test(spatialBuilderSource)
         && !rendererSource.includes("atl_water_projection")
