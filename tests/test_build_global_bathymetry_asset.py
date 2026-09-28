@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 from shapely.geometry import LineString, Point, Polygon, box
 from topojson.utils import serialize_as_geojson
@@ -184,7 +185,9 @@ class BuildGlobalBathymetryAssetTest(unittest.TestCase):
         ), tile))
 
     def test_global_marine_mask_includes_polar_and_indian_water_but_not_inland_seas(self) -> None:
-        sources = bathymetry_asset.load_expansion_water()
+        # Full-world source arcs must not enter topojson's padded dense decoder.
+        with patch.object(bathymetry_asset, "serialize_as_geojson", side_effect=AssertionError("dense decode")):
+            sources = bathymetry_asset.load_expansion_water()
 
         def covered(point):
             return any(geom.covers(Point(*point)) for _, _, geom in sources)

@@ -2,6 +2,7 @@ import argparse
 import gzip
 import json
 import math
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +23,11 @@ from topojson.utils import serialize_as_geojson
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.scenario_topology_decode import topology_object_to_geojson
+
 DATA_DIR = ROOT / "data"
 SOURCE_RASTER_PATH = DATA_DIR / "ETOPO_2022_v1_60s_N90W180_surface.tif"
 EUROPE_OCEAN_PATH = DATA_DIR / "europe_ocean.geojson"
@@ -379,7 +385,7 @@ def load_expansion_water():
         selected.append((row.name, str(WATER_REGIONS_PATH.relative_to(ROOT)).replace("\\", "/"), row.geometry))
     inland = unary_union(regional.loc[regional.water_type.isin(["lake", "inland_sea"]), "geometry"])
     source = json.loads(GLOBAL_OCEAN_TOPOLOGY_PATH.read_text(encoding="utf-8"))
-    for feature in serialize_as_geojson(source, objectname="ocean")["features"]:
+    for feature in topology_object_to_geojson(source, "ocean")["features"]:
         geom = shape(feature["geometry"])
         if inland.covers(geom.representative_point()):
             continue
