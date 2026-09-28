@@ -206,6 +206,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
     ["geometry-cache-budget", "renderer-runtime", "js/core/renderer/geometry_cache_budget.js", "tests/geometry_cache_budget_behavior.test.mjs", ["js/core/renderer/political_path_cache_owner.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
+    ["bathymetry-global-coverage", "renderer-runtime", "data/global_bathymetry.topo.json", "tests/bathymetry_ocean_coverage_behavior.test.mjs", ["data/global_bathymetry.provenance.json"]],
     ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
     ["bathymetry-geometry", "renderer-runtime", "js/core/renderer/bathymetry_geometry.js", "tests/bathymetry_geometry_behavior.test.mjs"],
     ["projected-geographic-path-cache", "renderer-runtime", "js/core/renderer/projected_geographic_path_cache.js", "tests/projected_geographic_path_cache_behavior.test.mjs"],
@@ -442,7 +443,16 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 10,
   };
 
-  return [...actionRecords, ...borderRecords, countryInspectorRecord,
+  const bathymetryBuilderRecord = {
+    ...editorCheckoutRecord,
+    id: "local:bathymetry-builder",
+    commandRef: "python -m unittest tests.test_build_global_bathymetry_asset -q",
+    sourceRefs: ["tools/build_global_bathymetry_asset.py", "tests/test_build_global_bathymetry_asset.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 11,
+  };
+
+  return [bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
