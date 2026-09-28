@@ -86,7 +86,7 @@ class MapRendererSpatialIndexRuntimeOrchestrationContractTest(unittest.TestCase)
             self.refresh_runtime_content,
             re.compile(
                 r'if \(hasPoliticalChange\) \{[\s\S]*?'
-                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\);',
+                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\)\?\.coverageInputSnapshot;',
                 re.S,
             ),
         )

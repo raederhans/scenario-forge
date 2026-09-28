@@ -1,5 +1,6 @@
 const DEFAULT_MIN_ZOOM_SCALE = 0.35;
 const DEFAULT_MAX_ZOOM_SCALE = 50;
+const CAMERA_TRANSITION_MS = 180;
 
 export function createViewportCommandOwner({
   state = {},
@@ -14,6 +15,9 @@ export function createViewportCommandOwner({
     minZoomScale = DEFAULT_MIN_ZOOM_SCALE,
     maxZoomScale = DEFAULT_MAX_ZOOM_SCALE,
   } = constants;
+  let pendingScale = null;
+  let pendingCommand = null;
+  let observedZoomBehavior = null;
 
   function getViewportDimensions() {
     return {
@@ -61,7 +65,46 @@ export function createViewportCommandOwner({
       : null;
   }
 
-  function resetZoomToFit({ centerContent = false, centerX = true, centerY = false } = {}) {
+  function canAnimateCamera(selection) {
+    if (typeof selection?.transition !== "function" || getters.canAnimateCamera?.() !== true) return false;
+    return globalThis.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches !== true;
+  }
+
+  function observeNativeZoom(zoomBehavior) {
+    if (observedZoomBehavior === zoomBehavior || typeof zoomBehavior?.on !== "function") return;
+    observedZoomBehavior?.on?.("start.viewport-command", null);
+    zoomBehavior.on("start.viewport-command", (event) => {
+      if (event.sourceEvent) {
+        pendingScale = null;
+        pendingCommand = null;
+      }
+    });
+    observedZoomBehavior = zoomBehavior;
+  }
+
+  function applyZoomCommand(selection, zoomBehavior, zoomMethod, args, nextScale = null) {
+    const animate = canAnimateCamera(selection);
+    selection.interrupt?.();
+    pendingScale = null;
+    pendingCommand = null;
+    if (!animate) {
+      selection.call(zoomMethod, ...args);
+      return;
+    }
+    observeNativeZoom(zoomBehavior);
+    const command = {};
+    pendingCommand = command;
+    pendingScale = nextScale;
+    const transition = selection.transition().duration(CAMERA_TRANSITION_MS);
+    transition.on?.("cancel.viewport-command interrupt.viewport-command end.viewport-command", () => {
+      if (pendingCommand !== command) return;
+      pendingScale = null;
+      pendingCommand = null;
+    });
+    transition.call(zoomMethod, ...args);
+  }
+
+  function resetZoomToFit({ centerContent = false, centerX = true, centerY = false, animate = false } = {}) {
     const zoomBehavior = getZoomBehavior();
     const d3 = getD3();
     const selection = selectInteractionRect();
@@ -70,8 +113,15 @@ export function createViewportCommandOwner({
     const transform = centerContent
       ? (getCenteredFitZoomTransform({ centerX, centerY }) || d3.zoomIdentity)
       : d3.zoomIdentity;
-    effects.setZoomTransform?.(transform);
-    selection.call(zoomBehavior.transform, transform);
+    if (animate && canAnimateCamera(selection)) {
+      applyZoomCommand(selection, zoomBehavior, zoomBehavior.transform, [transform], transform.k);
+    } else {
+      selection.interrupt?.();
+      pendingScale = null;
+      pendingCommand = null;
+      effects.setZoomTransform?.(transform);
+      selection.call(zoomBehavior.transform, transform);
+    }
   }
 
   function zoomByStep(direction = 1) {
@@ -79,7 +129,15 @@ export function createViewportCommandOwner({
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
     const factor = Number(direction) >= 0 ? 1.2 : 1 / 1.2;
-    selection.call(zoomBehavior.scaleBy, factor);
+    const d3 = getD3();
+    const currentScale = d3?.zoomTransform?.(getInteractionRectNode())?.k;
+    if (canAnimateCamera(selection) && Number.isFinite(currentScale)) {
+      const baseScale = pendingScale ?? currentScale;
+      const nextScale = Math.min(maxZoomScale, Math.max(minZoomScale, baseScale * factor));
+      applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleTo, [nextScale], nextScale);
+    } else {
+      applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleBy, [factor]);
+    }
   }
 
   function setZoomPercent(percent) {
@@ -91,13 +149,16 @@ export function createViewportCommandOwner({
       : Number(percent);
     if (!Number.isFinite(rawPercent)) return;
     const nextScale = Math.min(maxZoomScale, Math.max(minZoomScale, rawPercent / 100));
-    selection.call(zoomBehavior.scaleTo, nextScale);
+    applyZoomCommand(selection, zoomBehavior, zoomBehavior.scaleTo, [nextScale], nextScale);
   }
 
   function enforceZoomConstraints() {
     const zoomBehavior = getZoomBehavior();
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
+    selection.interrupt?.();
+    pendingScale = null;
+    pendingCommand = null;
     selection.call(zoomBehavior.translateBy, 0, 0);
   }
 

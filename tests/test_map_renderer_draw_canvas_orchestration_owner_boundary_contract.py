@@ -98,10 +98,12 @@ class DrawCanvasOrchestrationOwnerBoundaryContract(unittest.TestCase):
         self.assertRegex(
             renderer,
             re.compile(
-                r"commitLastFrame:\s*\(\{ phase, totalMs, timings, transform \}\) => \{\s*"
-                r"getRenderPassCacheState\(\)\.lastFrame = \{\s*"
-                r"phase,\s*totalMs,\s*timings,\s*transform: cloneZoomTransform\(transform\),\s*"
-                r"\};\s*\}",
+                r"commitLastFrame:\s*\(\{ phase, totalMs, timings, transform, frameMode, presented = true \}\) => \{\s*"
+                r"const cache = getRenderPassCacheState\(\);\s*cache\.lastFrame = \{\s*"
+                r"phase,\s*totalMs,\s*timings,\s*frameMode,\s*presented,\s*"
+                r"targetTransform: cloneZoomTransform\(transform\),\s*"
+                r"transform: presented \? cloneZoomTransform\(transform\) : cache\.lastFrame\?\.transform,\s*"
+                r"\};\s*if \(presented\) getRendererViewportUpdateOwner\(\)\.applyViewportTransform\(transform\);\s*\}",
                 re.S,
             ),
         )

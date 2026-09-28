@@ -810,6 +810,10 @@ test("chunk promotion deferred infra restores full political derived state after
   };
   const deps = {
     runtimeState,
+    buildInteractiveLandData: (collection) => {
+      calls.push(["buildInteractiveLandData"]);
+      return { type: "FeatureCollection", features: [...collection.features] };
+    },
     buildIndex: () => calls.push(["buildIndex"]),
     buildSpatialIndexChunked: () => calls.push(["buildSpatialIndexChunked"]),
     rebuildPoliticalLandCollections: () => {
@@ -832,6 +836,10 @@ test("chunk promotion deferred infra restores full political derived state after
       runtimeState.landData = primaryVisiblePayload;
       runtimeState.landDataFull = primaryVisiblePayload;
       runtimeState.colors = colorsFor(primaryVisiblePayload);
+      return { coverageInputSnapshot: {
+        fullCollection: primaryVisiblePayload,
+        expectedInteractiveCollection: { features: [...primaryVisiblePayload.features] },
+      } };
     },
     setInteractionInfrastructureState: (...args) => calls.push(["setInteractionInfrastructureState", ...args]),
     scheduleSecondarySpatialIndexBuild: (...args) => calls.push(["scheduleSecondarySpatialIndexBuild", ...args]),
@@ -911,6 +919,8 @@ test("chunk promotion deferred infra restores full political derived state after
   });
 
   assert.deepEqual(idsOf(runtimeState.landData), ["GER", "ITA"]);
+  assert.equal(calls.filter(([name]) => name === "buildInteractiveLandData").length, 0,
+    "synchronous visual coverage uses the rebuild snapshot");
   assert.equal(runtimeState.runtimeChunkLoadState.pendingInfraPromotion.completePoliticalDerivedStateReady, false);
   assert.equal(typeof deferredCallback, "function");
   assert.equal(calls.some(([name]) => name === "render"), false, "synchronous suppressRender must remain respected");
@@ -919,6 +929,8 @@ test("chunk promotion deferred infra restores full political derived state after
   deps.render();
   assert.equal(dirtyPasses.size, 0);
   await deferredCallback();
+  assert.ok(calls.some(([name]) => name === "buildInteractiveLandData"),
+    "deferred infra coverage keeps its independent filter check");
 
   assert.equal(renderedPasses.length, 2, "deferred visible invalidation must get its own normal render");
   assert.deepEqual(renderedPasses[1], ["borders", "contextBase", "contextScenario", "physicalBase", "political"]);

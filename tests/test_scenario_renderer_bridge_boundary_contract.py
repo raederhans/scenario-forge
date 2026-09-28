@@ -83,6 +83,25 @@ class ScenarioRendererBridgeBoundaryContractTest(unittest.TestCase):
         self.assertIn("./scenario/scenario_renderer_bridge.js", SCENARIO_SHELL_OVERLAY_JS.read_text(encoding="utf-8"))
         self.assertIn("../core/scenario/scenario_renderer_bridge.js", DEFERRED_DETAIL_PROMOTION_JS.read_text(encoding="utf-8"))
 
+    def test_post_apply_prefetches_navigation_after_synchronous_refresh(self):
+        renderer = (REPO_ROOT / "js" / "core" / "map_renderer.js").read_text(encoding="utf-8")
+        bridge = BRIDGE_JS.read_text(encoding="utf-8")
+        apply_body = SCENARIO_POST_APPLY_EFFECTS_JS.read_text(encoding="utf-8").split(
+            "async function runPostScenarioApplyEffects(", 1
+        )[1].split("function runPostScenarioResetEffects(", 1)[0]
+
+        prepare_body = renderer.split("function prepareScenarioNavigation() {", 1)[1].split("\n}", 1)[0]
+        self.assertLess(prepare_body.index("ensureCurrentSceneSnapshot("), prepare_body.index("getNavigationSceneOwner().prewarm()"))
+        self.assertIn("prepareScenarioNavigation,", bridge)
+        self.assertLess(
+            apply_body.index("refreshScenarioOpeningOwnerBorders({"),
+            apply_body.index("prepareScenarioNavigation();"),
+        )
+        self.assertLess(
+            apply_body.index("prepareScenarioNavigation();"),
+            apply_body.index("await ensureChunkedScenarioFirstFrameReady({"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

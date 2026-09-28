@@ -103,6 +103,52 @@ test("current political identity detects exact camera, projection, scene, geomet
   }
 });
 
+test("moved camera rejects stale political result before collecting entries and wakes recovery", async () => {
+  const f = fixture();
+  let collections = 0;
+  const collect = f.h.collectPoliticalItems;
+  f.h.collectPoliticalItems = () => { collections++; return collect(); };
+  const pending = f.owner.preparePolitical();
+  assert.equal(collections, 1);
+  f.state.zoomTransform.x = 10;
+  const bitmap = f.finish(0); await pending;
+  assert.equal(bitmap.closes, 1);
+  assert.equal(collections, 1, "stale camera must not enumerate political items");
+  assert.deepEqual(f.renders, ["geometry-worker-political-stale"]);
+  f.owner.dispose();
+});
+
+test("unchanged political result still passes full snapshot validation", async () => {
+  const f = fixture();
+  let collections = 0;
+  const collect = f.h.collectPoliticalItems;
+  f.h.collectPoliticalItems = () => { collections++; return collect(); };
+  const pending = f.owner.preparePolitical();
+  const bitmap = f.finish(0); await pending;
+  assert.equal(collections, 2, "current result runs exact entry validation");
+  assert.equal(bitmap.closes, 0);
+  assert.equal(f.owner.drawPolitical().renderedCount, 1);
+  f.owner.dispose();
+});
+
+test("superseded political task closes without recomputing or waking over the latest task", async () => {
+  const f = fixture();
+  let collections = 0;
+  const collect = f.h.collectPoliticalItems;
+  f.h.collectPoliticalItems = () => { collections++; return collect(); };
+  const old = f.owner.preparePolitical();
+  f.state.zoomTransform.x = 20;
+  const latest = f.owner.preparePolitical();
+  assert.equal(collections, 2);
+  const staleBitmap = f.finish(0); await old;
+  assert.equal(staleBitmap.closes, 1);
+  assert.equal(collections, 2, "superseded result skips current snapshot");
+  assert.deepEqual(f.renders, []);
+  f.finish(1); await latest;
+  assert.equal(collections, 3, "latest result still validates exactly");
+  f.owner.dispose();
+});
+
 test("versioned political snapshot avoids repeated collection, color resolution and description", async () => {
   const f = fixture();
   let version = 1;

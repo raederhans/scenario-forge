@@ -92,7 +92,9 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             re.compile(
                 r'const promotionWorkActive = PROMOTION_ACTIVE_STATUSES\.includes\(String\(pendingChunkRefreshStatus \|\| ""\)\);\s*'
                 r'if \(runGetter\("shouldStartExactAfterSettleFastPath"\)\) \{\s*'
-                r"if \(promotionWorkActive\) return;[\s\S]*?"
+                r'if \(promotionWorkActive\) \{\s*'
+                r'if \(needsNavigationRecovery\(\)\) runEffect\("render"\);\s*'
+                r'return;\s*\}[\s\S]*?'
                 r'runEffect\("setDeferExactAfterSettle", true\);[\s\S]*?'
                 r'runEffect\("scheduleExactAfterSettleRefresh", settleProfile\);',
                 re.S,
@@ -928,7 +930,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             promotion_source,
             re.compile(
                 r'if \(hasPoliticalChange\) \{[\s\S]*?'
-                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\);\s*\}'
+                r'rebuildPrimaryPoliticalDerivedState\(\{\s*scheduleUiMode: "deferred",\s*buildSpatial: true,\s*includeSecondarySpatial: false,\s*incremental: true,\s*\}\)\?\.coverageInputSnapshot;\s*\}'
                 r'[\s\S]*?if \(hasPoliticalChange\) \{\s*clearDeferredInternalBorderMeshCaches\(\);\s*scheduleDeferredHeavyBorderMeshes\(\);\s*\}',
                 re.S,
             ),

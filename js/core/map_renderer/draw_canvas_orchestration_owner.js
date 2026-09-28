@@ -126,6 +126,33 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     finalizePendingExactAfterSettleRefreshAfterPaint: effects.finalizePendingExactAfterSettleRefreshAfterPaint,
   });
 
+  function drawNavigationFrame(includeSummary, { waitingWorker = false } = {}) {
+    if (typeof effects.drawNavigationFrame !== "function") return null;
+    const phase = getRenderPhase();
+    const deferExact = !!getDeferExactAfterSettle();
+    if (!waitingWorker && phase === renderPhaseIdle && !deferExact) return null;
+    if (waitingWorker && (phase !== renderPhaseIdle || deferExact)) return null;
+    const transform = getRawZoomTransform();
+    const frameStart = nowMs();
+    if (!effects.drawNavigationFrame(transform)) return null;
+    incrementPerfCounter("drawCanvas");
+    clearPoliticalPatchOverlayIfStale("drawCanvas-stale-overlay");
+    cancelPoliticalPathWarmup("drawCanvas-navigation");
+    const totalMs = Math.max(0, nowMs() - Number(frameStart || 0));
+    commitLastFrame({ phase: getRenderPhase(), totalMs, timings: {}, transform,
+      frameMode: "navigation", presented: true });
+    markFirstVisibleFramePainted("navigation-frame");
+    incrementPerfCounter("frames");
+    return includeSummary ? createSummary({ status: "drawn", frameMode: "navigation", totalMs,
+      branch: { drewFrame: true } }) : true;
+  }
+
+  function waitingWorkerResult(includeSummary) {
+    const navigationResult = drawNavigationFrame(includeSummary, { waitingWorker: true });
+    if (navigationResult !== null) return includeSummary ? navigationResult : undefined;
+    return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
+  }
+
   function drawCanvasFrameCore(options) {
     const includeSummary = options?.includeSummary === true;
     if (!isFrameSurfaceReady()) {
@@ -134,14 +161,22 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
         : undefined;
     }
 
+    // A ready navigation frame can cover the requested transform before fine
+    // topology and worker preparation. Color edits may require exact rendering.
+    const hasNavigationFrame = typeof effects.drawNavigationFrame === "function";
+    if (hasNavigationFrame) {
+      promoteDeferredColorRenderToIdle();
+      const navigationResult = drawNavigationFrame(includeSummary);
+      if (navigationResult !== null) return includeSummary ? navigationResult : undefined;
+    }
     ensureLayerDataFromTopology();
     // Color recovery can promote settling/deferred input to an exact idle draw.
     // Decide that phase before asking the worker to prepare its fine geometry.
-    promoteDeferredColorRenderToIdle();
+    if (!hasNavigationFrame) promoteDeferredColorRenderToIdle();
     // Exact asynchronous work keeps the last complete visible frame intact.
     // Input frames still take the ordinary transformed-frame branch.
     if (effects.prepareAsyncFrame?.()) {
-      return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
+      return waitingWorkerResult(includeSummary);
     }
     incrementPerfCounter("drawCanvas");
     clearPoliticalPatchOverlayIfStale("drawCanvas-stale-overlay");
@@ -200,7 +235,7 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
       resetContextBreakdownForExactFrame();
       const activeRenderPassNames = getActiveRenderPassNames();
       if (ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false) {
-        return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
+        return waitingWorkerResult(includeSummary);
       }
       drewExactFrame = !!composeCachedPasses(activeRenderPassNames);
       drewFrame = drewExactFrame;
@@ -217,6 +252,8 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
       totalMs,
       timings: frameTimings,
       transform: getRawZoomTransform(),
+      frameMode,
+      presented: drewFrame && !keptPreviousPixels,
     });
 
     let capturePhase = currentPhase;
@@ -231,6 +268,7 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
       && frameTimings.usedDirtyFastFramePasses.length > 0;
     if (
       drewFrame
+      && !keptPreviousPixels
       && !usedLastGoodFallback
       && !usedBaseVisibleFallback
       && !usedDirtyFastFramePasses

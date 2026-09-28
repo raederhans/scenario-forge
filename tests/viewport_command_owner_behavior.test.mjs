@@ -15,6 +15,7 @@ function createHarness({
   d3 = undefined,
   panExtent = [[-50, -50], [850, 650]],
   centeredTransform = createTransform("centered"),
+  canAnimateCamera = false,
 } = {}) {
   const state = {
     width: 800,
@@ -34,6 +35,12 @@ function createHarness({
     d3Call: [],
     centered: [],
     order: [],
+    interrupt: [],
+    transition: [],
+    duration: [],
+    pending: [],
+    zoomListeners: new Map(),
+    lastSelection: null,
   };
   const effectLog = {
     zoomTransform: null,
@@ -63,12 +70,44 @@ function createHarness({
     translateBy(x, y) {
       calls.translateBy.push([x, y]);
     },
+    on(name, listener) {
+      if (listener === null) calls.zoomListeners.delete(name);
+      else calls.zoomListeners.set(name, listener);
+      return behavior;
+    },
   } : zoomBehavior;
   const d3Runtime = d3 === undefined ? {
     zoomIdentity: createTransform("identity"),
+    zoomTransform(node) {
+      return node.__zoom || d3Runtime.zoomIdentity;
+    },
     select(node) {
       calls.select.push(node);
-      return {
+      const selection = {
+        interrupt() {
+          calls.interrupt.push(node);
+          for (const pending of calls.pending) pending.listeners?.("interrupt");
+          calls.pending.length = 0;
+          return this;
+        },
+        transition() {
+          calls.transition.push(node);
+          const transition = {
+            duration(ms) {
+              calls.duration.push(ms);
+              return this;
+            },
+            on(_events, listener) {
+              this.listeners = listener;
+              return this;
+            },
+            call(method, ...args) {
+              calls.pending.push({ method, args, listeners: this.listeners });
+              return this;
+            },
+          };
+          return transition;
+        },
         call(method, ...args) {
           calls.order.push("d3.call");
           calls.d3Call.push({ method, args });
@@ -76,6 +115,8 @@ function createHarness({
           return this;
         },
       };
+      calls.lastSelection = selection;
+      return selection;
     },
   } : d3;
   const owner = createViewportCommandOwner({
@@ -92,6 +133,7 @@ function createHarness({
         calls.centered.push(options);
         return centeredTransform;
       },
+      canAnimateCamera: () => canAnimateCamera,
     },
     effects: {
       setZoomTransform: (transform) => {
@@ -180,6 +222,84 @@ test("zoomByStep applies fixed positive and negative zoom factors", () => {
   owner.zoomByStep(-1);
 
   assert.deepEqual(calls.scaleBy, [1.2, 1.2, 1 / 1.2]);
+});
+
+test("animation is opt-in and animated reset leaves presented state to zoom events", () => {
+  const { behavior, calls, effectLog, owner } = createHarness({ canAnimateCamera: true });
+
+  owner.zoomByStep(1);
+  assert.deepEqual(calls.duration, [180]);
+  assert.deepEqual(calls.pending.map(({ args }) => args), [[1.2]]);
+  assert.deepEqual(calls.scaleTo, []);
+
+  owner.resetZoomToFit({ centerContent: true, animate: true });
+  assert.deepEqual(calls.duration, [180, 180]);
+  assert.equal(calls.pending.length, 1);
+  assert.equal(calls.pending[0].method, behavior.transform);
+  assert.equal(effectLog.zoomTransform, null);
+  assert.deepEqual(calls.transform, []);
+});
+
+test("new commands cancel an in-flight target and invalid input does not disturb it", () => {
+  const { behavior, calls, owner } = createHarness({ canAnimateCamera: true });
+
+  owner.setZoomPercent("125%");
+  const pending = calls.pending[0];
+  owner.setZoomPercent("invalid");
+  assert.equal(calls.pending[0], pending);
+  assert.equal(calls.interrupt.length, 1);
+
+  owner.zoomByStep(-1);
+  assert.equal(calls.pending.length, 1);
+  assert.equal(calls.pending[0].method, behavior.scaleTo);
+  assert.deepEqual(calls.pending[0].args, [1.25 / 1.2]);
+  assert.equal(calls.interrupt.length, 2);
+});
+
+test("rapid zoom steps accumulate their target before the first animation frame", () => {
+  const { behavior, calls, effectLog, owner } = createHarness({ canAnimateCamera: true });
+
+  owner.zoomByStep(1);
+  owner.zoomByStep(1);
+
+  assert.equal(calls.pending.length, 1);
+  assert.equal(calls.pending[0].method, behavior.scaleTo);
+  assert.equal(calls.pending[0].args[0], 1.44);
+  assert.equal(effectLog.zoomTransform, null);
+});
+
+test("native gesture clears the command target before the next step", () => {
+  const interactionNode = { id: "interaction-rect" };
+  const { calls, owner } = createHarness({ canAnimateCamera: true, interactionNode });
+
+  owner.zoomByStep(1);
+  interactionNode.__zoom = { k: 1.1, x: 0, y: 0 };
+  calls.zoomListeners.get("start.viewport-command")({ sourceEvent: { type: "wheel" } });
+  owner.zoomByStep(1);
+
+  assert.equal(calls.pending[0].args[0], 1.32);
+});
+
+test("reduced motion keeps commands immediate and reset remains immediate without animate", () => {
+  const originalMatchMedia = globalThis.matchMedia;
+  globalThis.matchMedia = () => ({ matches: true });
+  try {
+    const { calls, effectLog, owner } = createHarness({ canAnimateCamera: true });
+    owner.zoomByStep(1);
+    owner.setZoomPercent("150%");
+    owner.resetZoomToFit({ animate: true });
+    assert.deepEqual(calls.duration, []);
+    assert.deepEqual(calls.scaleBy, [1.2]);
+    assert.deepEqual(calls.scaleTo, [1.5]);
+    assert.equal(effectLog.zoomTransform?.label, "identity");
+  } finally {
+    globalThis.matchMedia = originalMatchMedia;
+  }
+
+  const normal = createHarness({ canAnimateCamera: true });
+  normal.owner.resetZoomToFit();
+  assert.deepEqual(normal.calls.duration, []);
+  assert.equal(normal.effectLog.zoomTransform?.label, "identity");
 });
 
 test("setZoomPercent parses percent strings numbers clamps and ignores non-finite values", () => {

@@ -1,5 +1,11 @@
 # Worktree Registry
 
+## 2026-09-28 交互连续性与首次窗口交付
+
+`C:/Users/raede/.codex/worktrees/pan-zoom-integration/mapcreator` 当前分支为 `codex/interaction-continuity-20260928`，基于 `origin/main@291b5aa2`。用户已接受当前优化结果并授权合并推送，通过受保护 main 的 PR 检查交付。范围包括导航完整底图、相机呈现一致性、冷路径缓存和传输复用、首次窗口 Worker 准备，以及不启用候选资产的水体 LOD 诊断工具。主工作区及其他工作树的未归属改动保留。
+
+目标测试与浏览器证据见 [任务记录](interaction-continuity-20260928/task.md) 和 [首次窗口记录](interaction-continuity-20260928/first-window.md)。首次窗口仍有等待的限制已明确，不将本次交付描述为完全消除卡顿。此工作树保留，以保存 `.runtime/browser/` 中的对照证据并供后续工作复用。提交、检查和合并状态以当前分支 GitHub PR 回执为准；原分支的旧条目仅作历史记录。
+
 ## 2026-09-28 缩放与平移性能整合
 
 `C:/Users/raede/.codex/worktrees/pan-zoom-integration/mapcreator` 使用分支 `codex/pan-zoom-performance-20260928`，基于 `origin/main@5ee7712f` 定向整合本对话的缩放、平移覆盖修复及政治条目、概览帧、水域整理和空间索引复用。用户已授权合并推送；主工作区 `main@28310add` 的其他未归属改动保留。隔离工作树保留 `.runtime/tmp/pan-zoom-integration/` 中的验证输出，合并后继续保留供复核和复用。最终推送与受保护 main 的合并状态以本分支 GitHub PR 回执为准。

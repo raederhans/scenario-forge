@@ -26,6 +26,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   let cache = { contextScenarioLayerCache: {}, layouts: {} };
   let revision = "water-1";
   let projection = "projection-1";
+  let projectionHandle = () => null;
   let adaptiveDirect = false;
   let boundsAvailable = true;
   let visible = true;
@@ -74,6 +75,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     waterPathCacheBudget,
     rendererSurfaceHost: {
       getContext: () => target,
+      getProjection: () => projectionHandle,
       getPathCanvas: () => (feature) => events.push(["pathCanvas", feature.id]),
       getPathSvg: () => (part) => { events.push(["pathSvg", projection, part.id]); return `${projection}:${part.id}`; },
     },
@@ -126,7 +128,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
     replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
     setMode: (value) => { mode = value; }, setRevision: (value) => { revision = value; },
-    setProjection: (value) => { projection = value; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
+    setProjection: (value) => { projection = value; projectionHandle = () => null; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
     setCoverageRatio: (value) => { coverageRatio = value; },
     setWaterFeatureCount: (value) => { waterFeatures = Array.from({ length: value }, (_, index) => ({ ...water, id: `water-${index}` })); },
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,

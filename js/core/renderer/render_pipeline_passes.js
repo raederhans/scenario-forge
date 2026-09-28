@@ -158,6 +158,7 @@ export function createRenderPipelinePassesOwner({
     ) {
       return;
     }
+    if (passName === "contextScenario" && prepareRenderPassAsync(passName)) return false;
     renderPassToCache(passName, drawFn, transform, timings);
   }
 
@@ -180,7 +181,7 @@ export function createRenderPipelinePassesOwner({
     const startedAt = nowMs();
     for (let index = 0; index < definitions.length; index += 1) {
       const [passName, drawFn] = definitions[index];
-      prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
+      if (prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache) === false) return false;
       if (index < definitions.length - 1 && Number.isFinite(timings[passName])
         && canYieldRenderPassWork() && nowMs() - startedAt >= 8) {
         requestRenderContinuation("exact-pass-continuation");

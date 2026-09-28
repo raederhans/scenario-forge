@@ -27,6 +27,7 @@ import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from 
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
+import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
@@ -684,6 +685,7 @@ let countryFillPaletteOwner = null;
 let geometryRasterRuntimeOwner = null;
 let politicalEntriesInvalidationEpoch = 0;
 let overviewFrameOwner = null;
+let navigationSceneOwner = null;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
 let contourHostFillColorCache = new WeakMap();
@@ -1313,6 +1315,7 @@ function getRenderPhaseLifecycleOwner() {
       getAdaptiveSettleProfile,
       hasPendingDayNightRefresh: () => Boolean(runtimeState.pendingDayNightRefresh),
       shouldStartExactAfterSettleFastPath,
+      needsNavigationRecovery: () => getRenderPassCacheState().lastFrame?.frameMode === "navigation",
     },
     effects: {
       clearTimeout: (timerId) => globalThis.clearTimeout(timerId),
@@ -2748,6 +2751,7 @@ function getViewportCommandOwner() {
       getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
       getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
       getD3: () => globalThis.d3,
+      canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted && !!navigationSceneOwner?.isReady(),
       calculatePanExtent,
       getCenteredFitZoomTransform,
     },
@@ -2768,6 +2772,7 @@ function getRendererViewportUpdateOwner() {
   rendererViewportUpdateOwner = createRendererViewportUpdateOwner({
     getters: {
       getViewportGroup: () => rendererSurfaceHost.getViewportGroup(),
+      getPresentedTransform: () => getRenderPassCacheState().lastFrame?.transform,
     },
     effects: {
       setZoomTransform: (transform) => {
@@ -3555,8 +3560,13 @@ function getRenderPipelinePassesOwner() {
       getExactAfterSettleControllerState,
       getPassReferenceTransform,
       getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
-      prepareRenderPassAsync: (passName) => passName === "political"
-        ? getGeometryRasterRuntimeOwner().preparePolitical({ force: true }) : null,
+      prepareRenderPassAsync: (passName) => {
+        if (passName === "political") return getGeometryRasterRuntimeOwner().preparePolitical({ force: true });
+        if (passName === "contextScenario" && !exportRenderInProgress) {
+          return !getScenarioRegionOverlayRenderOwner().prepareVisibleWaterPaths();
+        }
+        return null;
+      },
       canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted
         && isBootInteractionReady() && !hasPendingPoliticalColorEdit(),
       nowMs,
@@ -3616,6 +3626,7 @@ function getDrawCanvasOrchestrationOwner() {
       drawTransformedFrameFromCaches,
       drawLastGoodFrameFallback,
       drawOverviewFrameFallback,
+      drawNavigationFrame: (transform) => !exportRenderInProgress && !!navigationSceneOwner?.draw(transform),
       noteMissingVisibleFrameSkippedDuringInteraction,
       drawBaseVisibleFrameFallback,
       resetContextBreakdownForExactFrame,
@@ -3628,13 +3639,18 @@ function getDrawCanvasOrchestrationOwner() {
       ensureIdleRenderPasses: (frameTimings, activeRenderPassNames) => {
         return getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
       },
-      commitLastFrame: ({ phase, totalMs, timings, transform }) => {
-        getRenderPassCacheState().lastFrame = {
+      commitLastFrame: ({ phase, totalMs, timings, transform, frameMode, presented = true }) => {
+        const cache = getRenderPassCacheState();
+        cache.lastFrame = {
           phase,
           totalMs,
           timings,
-          transform: cloneZoomTransform(transform),
+          frameMode,
+          presented,
+          targetTransform: cloneZoomTransform(transform),
+          transform: presented ? cloneZoomTransform(transform) : cache.lastFrame?.transform,
         };
+        if (presented) getRendererViewportUpdateOwner().applyViewportTransform(transform);
       },
     },
   });
@@ -4382,8 +4398,11 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
     committedFrameIdentity,
   });
   if (reason === "exact-frame") {
-    getOverviewFrameOwner().capture(targetCanvas, transform, runtimeState.dpr);
+    if (!navigationSceneOwner?.isReady()) getOverviewFrameOwner().capture(targetCanvas, transform, runtimeState.dpr);
   }
+  if (!exportRenderInProgress) getNavigationSceneOwner().captureDetail(targetCanvas, transform, runtimeState.dpr, {
+    completeExact: reason === "exact-frame" && !!committedFrameIdentity.metadata?.fullPoliticalReady,
+  });
   return true;
 }
 
@@ -4401,6 +4420,32 @@ function getOverviewFrameOwner() {
     recordMetric: recordRenderPerfMetric,
   });
   return overviewFrameOwner;
+}
+
+function getNavigationSceneOwner() {
+  navigationSceneOwner ||= createNavigationSceneOwner(runtimeState, {
+    surface: rendererSurfaceHost,
+    helpers: {
+      recordMetric: (name, duration, details) => {
+        if (name === "navigationFramePrepare") overviewFrameOwner?.clear();
+        recordRenderPerfMetric(name, duration, details);
+      },
+      getFeatureId, getEffectiveAtlantropaFeatures, getEffectiveWaterRegionFeatures,
+      ensureNavigationSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
+      isAntarcticSectorFeature, isBaseGeographyScenarioFeature, shouldExcludePoliticalVisualFeature,
+      getResolvedFeatureColor, getWaterRegionColor, getWaterRegionDefaultStyle,
+      isLakeRegion, isWaterRegionRenderable, collectSafeWaterRegionGeometryParts,
+      getCachedWaterPath: (feature, parts) => getScenarioRegionOverlayRenderOwner().getCachedWaterFeaturePath(feature, parts),
+      getCachedLandPath: (feature, featureId) => getPoliticalFeaturePathEntry(feature, { featureId, allowBuild: false })?.path,
+      getOceanBaseFillColor, landFill: LAND_FILL_COLOR,
+    },
+  });
+  return navigationSceneOwner;
+}
+
+function prepareScenarioNavigation() {
+  ensureCurrentSceneSnapshot("scenario-navigation-prefetch");
+  getNavigationSceneOwner().prewarm();
 }
 
 function drawOverviewFrameFallback(currentTransform) {
@@ -5141,9 +5186,9 @@ function isAtlantropaFieldDrivenFeature(feature) {
   return !!(getAtlantropaRenderLayer(feature) || getAtlantropaColorRule(feature));
 }
 
-function getEffectiveAtlantropaFeatures() {
-  const features = Array.isArray(runtimeState.scenarioAtlantropaData?.features)
-    ? runtimeState.scenarioAtlantropaData.features
+function getEffectiveAtlantropaFeatures(sourceFeatures = runtimeState.scenarioAtlantropaData?.features) {
+  const features = Array.isArray(sourceFeatures)
+    ? sourceFeatures
     : [];
   const buckets = {
     water: [],
@@ -5204,10 +5249,10 @@ function appendUniqueFeatureCollections(primaryCollection, extraCollection) {
   return result;
 }
 
-function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures()) {
+function getEffectiveWaterRegionFeatures(atlantropaFeatures = getEffectiveAtlantropaFeatures(), scenarioWaterFeatures = runtimeState.scenarioWaterRegionsData?.features) {
   const scenarioFeatures = [
-    ...(Array.isArray(runtimeState.scenarioWaterRegionsData?.features)
-      ? runtimeState.scenarioWaterRegionsData.features
+    ...(Array.isArray(scenarioWaterFeatures)
+      ? scenarioWaterFeatures
       : []),
     ...atlantropaFeatures.water,
   ];
@@ -6701,6 +6746,7 @@ function flushPendingScenarioChunkRefreshAfterExact(reason = "exact-after-settle
 function rebuildResolvedColors() {
   const startedAt = nowMs();
   const previousColorRevision = Number(runtimeState.colorRevision || 0);
+  const previousColors = runtimeState.colors;
 
   ensureSovereigntyState();
   normalizeColorStateForRender(state, {
@@ -6736,6 +6782,13 @@ function rebuildResolvedColors() {
 
   replaceResolvedColorsState(state, nextColors);
   bumpColorRevision(state);
+  if (colorSourceFeatures === runtimeState.landDataFull?.features) {
+    politicalDerivedStateCache.refreshColors({
+      identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull,
+      previousColors, previousColorRevision,
+      colors: runtimeState.colors, colorRevision: runtimeState.colorRevision,
+    });
+  }
   getCountryFillPaletteOwner().invalidate();
   if (getPaintContourRuntimeOwner().notifyPaintChanged()) invalidateRenderPasses("borders", "paint-contours-colors");
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
@@ -9578,7 +9631,10 @@ function syncScenarioSecondaryRegionIndexes({
   return true;
 }
 
-const politicalDerivedStateCache = createPoliticalDerivedStateCache({ getFeatureId });
+const politicalDerivedStateCache = createPoliticalDerivedStateCache({
+  getFeatureId,
+  onMiss: (details) => recordRenderPerfMetric("politicalDerivedStateCacheMiss", 0, details),
+});
 
 function getPoliticalDerivedStateIdentity() {
   return [runtimeState.activeScenarioId, runtimeState.sceneGeneration,
@@ -9588,7 +9644,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
     runtimeState.strategicChoroplethMetric, JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
-    runtimeState.colorRevision, runtimeState.landIndex,
+    runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
 
@@ -9638,7 +9694,8 @@ function rebuildRuntimeDerivedState({
     });
   }
   if (buildSpatial) {
-    politicalDerivedStateCache.commit({ identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull, colors: runtimeState.colors });
+    politicalDerivedStateCache.commit({ identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull,
+      colors: runtimeState.colors, colorRevision: runtimeState.colorRevision });
   } else {
     politicalDerivedStateCache.reset();
   }
@@ -12231,6 +12288,11 @@ function getScenarioRegionOverlayRenderOwner() {
       getScenarioWaterCacheComplexitySignals,
       shouldEnableContextScenarioTransformReuse,
       shouldUseDirectScenarioWaterDraw,
+      scheduleWaterWork: (callback) => enqueueFrameTask(callback, {
+        priority: "low", label: "visible-water-paths", dedupe: true, deferOnContinuousInput: true,
+      }),
+      cancelWaterWork: (handle) => handle?.cancel(),
+      requestRender: () => queueMicrotask(() => requestRendererRender("visible-water-paths-ready")),
     });
   }
   return scenarioRegionOverlayRenderOwner;
@@ -12743,7 +12805,15 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       );
     }
   }
-  if (!redrawAtTargetResolution) getRenderPipelinePassesOwner().ensureIdleRenderPasses({});
+  if (!redrawAtTargetResolution) {
+    const previousExportState = exportRenderInProgress;
+    try {
+      exportRenderInProgress = true;
+      getRenderPipelinePassesOwner().ensureIdleRenderPasses({});
+    } finally {
+      exportRenderInProgress = previousExportState;
+    }
+  }
   const exportCanvas = document.createElement("canvas");
   exportCanvas.width = redrawAtTargetResolution ? Math.round(logicalWidth * targetDpr) : width;
   exportCanvas.height = redrawAtTargetResolution ? Math.round(logicalHeight * targetDpr) : height;
@@ -14703,8 +14773,8 @@ function getCenteredFitZoomTransform({ centerX = true, centerY = false } = {}) {
   return getViewportReadModelOwner().getCenteredFitZoomTransform({ centerX, centerY });
 }
 
-function resetZoomToFit({ centerContent = false, centerX = true, centerY = false } = {}) {
-  return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY });
+function resetZoomToFit({ centerContent = false, centerX = true, centerY = false, animate = false } = {}) {
+  return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY, animate });
 }
 
 function zoomByStep(direction = 1) {
@@ -14951,9 +15021,16 @@ function rebuildPrimaryPoliticalDerivedState({
 } = {}) {
   const previousCollection = runtimeState.landDataFull;
   rebuildPrimaryPoliticalCollections();
+  const coverageInputSnapshot = {
+    fullCollection: runtimeState.landDataFull,
+    expectedInteractiveCollection: {
+      type: "FeatureCollection",
+      features: [...(runtimeState.landData?.features || [])],
+    },
+  };
   const incrementalDelta = incremental ? politicalDerivedStateCache.describe({
     identity: getPoliticalDerivedStateIdentity(), previousCollection,
-    collection: runtimeState.landDataFull, colors: runtimeState.colors,
+    collection: runtimeState.landDataFull, colors: runtimeState.colors, colorRevision: runtimeState.colorRevision,
   }) : null;
   rebuildRuntimeDerivedState({
     includeRuntimePoliticalMeta: true,
@@ -14963,7 +15040,7 @@ function rebuildPrimaryPoliticalDerivedState({
     incrementalDelta,
     reuseGeometry: incremental,
   });
-  return { incremental: !!incrementalDelta, changedFeatureCount: incrementalDelta?.changedIds.length || 0,
+  return { coverageInputSnapshot, incremental: !!incrementalDelta, changedFeatureCount: incrementalDelta?.changedIds.length || 0,
     removedFeatureCount: incrementalDelta?.removedIds.length || 0 };
 }
 
@@ -15118,6 +15195,7 @@ export {
   // Scenario refresh and color synchronization facade.
   refreshMapDataForScenarioChunkPromotion,
   refreshMapDataForScenarioApply,
+  prepareScenarioNavigation,
   reconcileDetailPromotionPoliticalPass,
   refreshColorState,
   refreshResolvedColorsForFeatures,

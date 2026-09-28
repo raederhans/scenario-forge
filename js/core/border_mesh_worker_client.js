@@ -1,4 +1,5 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
+import { packTopologyForTransfer } from "./topology_transfer_codec.js";
 
 export function createBorderMeshWorkerClient({
   createWorker = () => new Worker(new URL("../workers/border_mesh.worker.js", import.meta.url), { type: "module" }),
@@ -23,8 +24,23 @@ export function createBorderMeshWorkerClient({
     const ownedGeneration = generation;
     const { sourceKey, sourceSignature } = source;
     let registration = registrations.get(sourceKey);
-    if (!registration || registration.signature !== sourceSignature) {
-      registration = { signature: sourceSignature, promise: client.dispatchTask("REGISTER_SOURCE", source, { timeoutMs }) };
+    if (!registration || registration.signature !== sourceSignature || registration.topology !== source.topology) {
+      const sameTopology = registration?.topology === source.topology;
+      let promise;
+      if (sameTopology) {
+        promise = client.dispatchTask("UPDATE_POLICY", { sourceKey, sourceSignature,
+          geometryPolicy: source.geometryPolicy }, { timeoutMs });
+        onDiagnostic({ status: "dispatch", type: "UPDATE_POLICY", sourceKey });
+      } else {
+        const startedAt = performance.now();
+        const packed = packTopologyForTransfer(source.topology);
+        const packingMs = performance.now() - startedAt;
+        const transferBytes = packed.transfer.reduce((sum, buffer) => sum + buffer.byteLength, 0);
+        promise = client.dispatchTask("REGISTER_SOURCE", { ...source,
+          topology: packed.topology, topologyArcs: packed.topologyArcs }, { timeoutMs, transfer: packed.transfer });
+        onDiagnostic({ status: "dispatch", type: "REGISTER_SOURCE", sourceKey, packingMs, transferBytes });
+      }
+      registration = { topology: source.topology, signature: sourceSignature, promise };
       registrations.set(sourceKey, registration);
     }
     try {

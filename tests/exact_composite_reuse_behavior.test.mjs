@@ -117,15 +117,36 @@ test("actual export remains a separate pass composition after exact buffer reuse
   const h = harness(), names = ["base", "overlay"];
   h.render(names); h.render(names);
   let prepared = 0;
-  const exportFrame = realFunction("renderExportPassesToCanvas", {
-    runtimeState: h.state, getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() { prepared++; } }),
+  const exportGlobals = {
+    exportRenderInProgress: false,
+    runtimeState: h.state, getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
+      assert.equal(exportGlobals.exportRenderInProgress, true);
+      prepared++;
+    } }),
     document: { createElement: () => canvas() }, composeRenderPassesToTarget: h.compositor.composeRenderPassesToTarget,
-  });
+  };
+  const exportFrame = realFunction("renderExportPassesToCanvas", exportGlobals);
   const result = exportFrame(names);
   assert.notEqual(result, h.buffer);
   assert.deepEqual(result.pixels, h.main.pixels);
   assert.equal(result.getContext().draws, 2);
   assert.equal(prepared, 1);
+  assert.equal(exportGlobals.exportRenderInProgress, false);
+});
+
+test("export restores its prior rendering mode when pass preparation throws", () => {
+  for (const previous of [false, true]) {
+    const h = harness();
+    const globals = { runtimeState: h.state, exportRenderInProgress: previous,
+      getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
+        assert.equal(globals.exportRenderInProgress, true);
+        throw new Error("pass preparation failed");
+      } }),
+    };
+    const exportFrame = realFunction("renderExportPassesToCanvas", globals);
+    assert.throws(() => exportFrame(["base", "overlay"]), /pass preparation failed/);
+    assert.equal(globals.exportRenderInProgress, previous);
+  }
 });
 
 

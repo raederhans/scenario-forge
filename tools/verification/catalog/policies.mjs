@@ -89,6 +89,7 @@ export const CATALOG_POLICIES = {
           "tests/test_tno_border_continuity.py",
           "tests/test_scenario_chunk_assets.py",
           "tests/test_tno_water_geometries.py",
+          "tests/test_water_display_lods.py",
           "tests/test_tno_named_marginal_water_contract.py",
           "tests/test_physical_context_contours.py",
           "tests/test_patch_checked_in_urban_artifacts.py",
