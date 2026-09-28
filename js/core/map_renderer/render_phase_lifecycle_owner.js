@@ -62,6 +62,8 @@ export function createRenderPhaseLifecycleOwner({ state = {}, effects = {}, gett
   const getterApi = Object.fromEntries(
     REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
   );
+  const needsNavigationRecovery = typeof getters.needsNavigationRecovery === "function"
+    ? getters.needsNavigationRecovery : () => false;
 
   function runEffect(name, ...args) {
     return effectApi[name](...args);
@@ -130,7 +132,10 @@ export function createRenderPhaseLifecycleOwner({ state = {}, effects = {}, gett
       });
       const promotionWorkActive = PROMOTION_ACTIVE_STATUSES.includes(String(pendingChunkRefreshStatus || ""));
       if (runGetter("shouldStartExactAfterSettleFastPath")) {
-        if (promotionWorkActive) return;
+        if (promotionWorkActive) {
+          if (needsNavigationRecovery()) runEffect("render");
+          return;
+        }
         runEffect("setDeferExactAfterSettle", true);
         runEffect("render");
         runEffect("scheduleExactAfterSettleRefresh", settleProfile);

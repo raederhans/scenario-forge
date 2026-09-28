@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { createBorderMeshWorkerKernel } from "../js/core/renderer/border_mesh_worker_kernel.js";
 import { createBorderMeshWorkerClient } from "../js/core/border_mesh_worker_client.js";
 import { buildSourceBorderMeshes } from "../js/core/renderer/border_mesh_source_selection.js";
+import { packTopologyForTransfer, unpackTopologyFromTransfer } from "../js/core/topology_transfer_codec.js";
 vm.runInThisContext(readFileSync(new URL("../vendor/topojson-client.min.js", import.meta.url), "utf8"));
 const source = () => ({ sourceKey: "primary", sourceSignature: "v1", topology: {
   type: "Topology", arcs: [[[0,0],[1,0]], [[1,0],[1,1]], [[1,1],[0,0]]],
@@ -62,6 +63,56 @@ test("kernel preserves cross-country shared arcs and policy changes", () => {
     assert.deepEqual(actual.localMeshes, expected.localMeshes);
     assert.equal(actual.provinceMeshes.length, neighbor === "AA" ? 1 : 0);
   }
+});
+
+test("arc transfer round trips empty, ragged, signed, and large exact coordinates", () => {
+  const topology = { type: "Topology", transform: { scale: [0.1, 1], translate: [5, -5] },
+    arcs: [[], [[], [-0, -22, 9007199254740991], [1.25, 1e120]], [[-1e-100, 3]]],
+    objects: { political: { type: "GeometryCollection", geometries: [] } } };
+  const snapshot = structuredClone(topology);
+  const packed = packTopologyForTransfer(topology);
+  assert.equal("arcs" in packed.topology, false);
+  const transferred = structuredClone({ topology: packed.topology, topologyArcs: packed.topologyArcs },
+    { transfer: packed.transfer });
+  assert.deepEqual(unpackTopologyFromTransfer(transferred.topology, transferred.topologyArcs), snapshot);
+  assert.deepEqual(topology, snapshot);
+  assert.ok(packed.transfer.every((buffer) => buffer.byteLength === 0));
+});
+
+test("client reuses topology across policy revisions and registers replacements", async () => {
+  const messages = []; const diagnostics = []; let terminated = 0;
+  const kernel = createBorderMeshWorkerKernel();
+  const client = createBorderMeshWorkerClient({ isSupported: () => true,
+    onDiagnostic: (entry) => diagnostics.push(entry), createWorker: () => ({
+      postMessage(message, transfer = []) {
+        const copy = structuredClone(message, { transfer });
+        messages.push(copy);
+        queueMicrotask(() => {
+          try {
+            const result = copy.type === "REGISTER_SOURCE" ? kernel.registerSource(copy)
+              : copy.type === "UPDATE_POLICY" ? kernel.updatePolicy(copy) : kernel.build(copy);
+            this.onmessage({ data: { taskId: copy.taskId, result } });
+          } catch (error) { this.onmessage({ data: { type: "ERROR", taskId: copy.taskId, message: error.message } }); }
+        });
+      }, terminate() { terminated++; kernel.clear(); },
+    }) });
+  const original = source(); const originalArcs = structuredClone(original.topology.arcs);
+  const request = { sceneKey: "same-scene", source: original, countries: ["AA"] };
+  await client.build(request);
+  assert.deepEqual(original.topology.arcs, originalArcs);
+  assert.equal(messages[0].topology.arcs, undefined);
+  assert.ok(diagnostics.some((entry) => entry.type === "REGISTER_SOURCE" && entry.transferBytes > 0));
+  const changed = { ...original, sourceSignature: "v2",
+    geometryPolicy: [{ ...original.geometryPolicy[0], excluded: true }] };
+  await client.build({ ...request, source: changed });
+  assert.deepEqual(kernel.build({ sourceKey: "primary", sourceSignature: "v2", countries: ["AA"] }).localMeshes, []);
+  assert.deepEqual(messages.map((message) => message.type),
+    ["REGISTER_SOURCE", "BUILD", "UPDATE_POLICY", "BUILD"]);
+  assert.equal(terminated, 0);
+  await client.build({ ...request, source: { ...changed, sourceSignature: "v3",
+    topology: structuredClone(original.topology) } });
+  assert.equal(messages.filter((message) => message.type === "REGISTER_SOURCE").length, 2);
+  client.dispose();
 });
 
 test("timeout recycles the worker and forces fresh registration", async (t) => {

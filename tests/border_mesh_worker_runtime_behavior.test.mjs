@@ -87,6 +87,18 @@ test("source replacement and scene changes reject stale commits and refresh poli
   await h.owner.buildDeferredBorderMeshesAsync(args); assert.equal(h.policies(), 5);
 });
 
+test("policy revision keeps worker scene while stale identity still rejects commit", async () => {
+  const h = fixture();
+  const previous = await h.owner.buildDeferredBorderMeshesAsync(args);
+  const originalScene = h.requests[0].sceneKey;
+  h.state.sovereigntyRevision = 2;
+  assert.equal(h.owner.commitDeferredBorderMeshes(previous), false);
+  await h.owner.buildDeferredBorderMeshesAsync(args);
+  assert.equal(h.requests.at(-1).sceneKey, originalScene);
+  assert.notEqual(h.requests.at(-1).source.sourceSignature, h.requests[0].source.sourceSignature);
+  assert.equal(h.policies(), 4);
+});
+
 test("unsupported worker falls back, and old scene cannot dispatch remaining sources", async () => {
   const h = fixture(); h.setBuild(async () => null);
   assert.equal(await h.owner.buildDeferredBorderMeshesAsync(args), null);

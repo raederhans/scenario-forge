@@ -10,14 +10,15 @@ import {
   isMarineLabelEligible,
 } from "../js/core/renderer/marine_label_owner.js";
 
-test("anchor cache reuses successes and misses only for identical geometry and viewport", () => {
+test("anchor remains stable under modest pan and zoom while inside visible water", () => {
   const resolve = createMarineInteriorAnchorResolver();
   let calls = 0;
+  const pointInWater = ([x, y]) => x >= 10 && x <= 90 && y >= 10 && y <= 90;
   const options = {
     part: {}, generation: 1, centroid: [50, 50],
     bounds: { minX: 0, minY: 0, maxX: 100, maxY: 100 },
     transform: { x: 0, y: 0, k: 1 }, width: 100, height: 100, gridSize: 3,
-    contains: () => { calls += 1; return true; },
+    contains: (point) => { calls += 1; return pointInWater(point); },
   };
   const first = resolve(options);
   assert.deepEqual(first, [50, 50]);
@@ -27,20 +28,75 @@ test("anchor cache reuses successes and misses only for identical geometry and v
     { transform: { x: 1, y: 0, k: 1 } },
     { transform: { x: 0, y: 1, k: 1 } },
     { transform: { x: 0, y: 0, k: 1.1 } },
-    { width: 110 }, { height: 110 }, { gridSize: 5 },
-    { generation: 2 }, { part: {} },
+    { width: 110 }, { height: 110 },
+  ]) {
+    const anchor = resolve({ ...options, ...change });
+    assert.equal(anchor, first);
+    assert.ok(pointInWater(anchor), "reused anchor remains inside the polygon");
+    const { x, y, k } = { ...options.transform, ...change.transform };
+    assert.ok(anchor[0] * k + x >= 2 && anchor[0] * k + x <= (change.width ?? options.width) - 2);
+    assert.ok(anchor[1] * k + y >= 2 && anchor[1] * k + y <= (change.height ?? options.height) - 2);
+  }
+  assert.equal(calls, 1, "valid reused anchors skip contains");
+});
+
+test("offscreen anchor recomputes, while geometry and search parameter changes invalidate", () => {
+  const resolve = createMarineInteriorAnchorResolver();
+  let calls = 0;
+  const options = {
+    part: {}, generation: 1, centroid: [50, 50],
+    bounds: { minX: 0, minY: 0, maxX: 100, maxY: 100 },
+    transform: { x: 0, y: 0, k: 1 }, width: 100, height: 100, gridSize: 3,
+    contains: () => { calls += 1; return true; },
+  };
+  const first = resolve(options);
+  const shifted = resolve({ ...options, transform: { x: -60, y: 0, k: 1 } });
+  assert.notDeepEqual(shifted, first);
+  assert.ok(calls > 1);
+  for (const change of [
+    { gridSize: 5 }, { generation: 2 }, { part: {} },
     { bounds: { ...options.bounds, maxX: 101 } }, { centroid: [51, 50] },
   ]) {
     resolve(options);
     const before = calls;
     resolve({ ...options, ...change });
-    assert.ok(calls > before, `cache must invalidate for ${JSON.stringify(change)}`);
+    assert.ok(calls > before, `search must rerun for ${JSON.stringify(change)}`);
   }
-  const absent = { ...options, part: {}, contains: () => { calls += 1; return false; } };
-  assert.equal(resolve(absent), null);
+});
+
+test("failed prior search is cached only for its own viewport", () => {
+  const resolve = createMarineInteriorAnchorResolver();
+  let calls = 0;
+  const options = {
+    part: {}, generation: 1, centroid: [50, 50],
+    bounds: { minX: 0, minY: 0, maxX: 100, maxY: 100 },
+    transform: { x: 0, y: 0, k: 1 }, width: 100, height: 100,
+    contains: () => { calls += 1; return false; },
+  };
+  assert.equal(resolve(options), null);
   const afterMiss = calls;
-  assert.equal(resolve(absent), null);
+  assert.equal(resolve(options), null);
   assert.equal(calls, afterMiss, "cache failed interior searches too");
+  assert.equal(resolve({ ...options, transform: { x: 1, y: 0, k: 1 } }), null);
+  assert.ok(calls > afterMiss, "new viewport retries a failed search");
+});
+
+test("visible anchor reuse honors the two pixel viewport margins", () => {
+  const resolve = createMarineInteriorAnchorResolver();
+  let calls = 0;
+  const options = {
+    part: {}, generation: 1, centroid: [2, 50],
+    bounds: { minX: 0, minY: 0, maxX: 100, maxY: 100 },
+    transform: { x: 0, y: 0, k: 1 }, width: 100, height: 100,
+    contains: () => { calls += 1; return true; },
+  };
+  const first = resolve(options);
+  assert.deepEqual(first, [2, 50]);
+  assert.equal(resolve({ ...options, transform: { x: 0.5, y: 0, k: 1 } }), first);
+  assert.equal(calls, 1);
+  const beyondMargin = resolve({ ...options, transform: { x: -0.5, y: 0, k: 1 } });
+  assert.notDeepEqual(beyondMargin, first);
+  assert.ok(calls > 1);
 });
 
 test("failed grid search checks its center once", () => {

@@ -126,3 +126,71 @@ test("ensureIdleRenderPasses filters requested pass names before preparation and
   assert.equal(cache.reasons.political, "signature");
   assert.equal(helperCalls.mismatchChecks, 1);
 });
+
+test("context scenario async preparation preserves the old pass until ready", () => {
+  const oldCanvas = { id: "painted-before-warmup" };
+  const cache = {
+    canvases: { contextScenario: oldCanvas }, counters: {},
+    dirty: { contextScenario: true }, reasons: {},
+    signatures: { contextScenario: "previous" },
+  };
+  const prepared = [];
+  const rendered = [];
+  let pending = true;
+  const owner = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 1 } },
+    helpers: {
+      getRenderPassCacheState: () => cache,
+      getRenderPassSignature: () => "next",
+      prepareRenderPassAsync: (name) => {
+        prepared.push(name);
+        return pending;
+      },
+      renderPassToCache: (name) => {
+        rendered.push(name);
+        cache.canvases[name] = { id: "newly-painted" };
+        cache.signatures[name] = "next";
+        cache.dirty[name] = false;
+      },
+    },
+  });
+
+  assert.equal(owner.ensureIdleRenderPasses({}, ["contextScenario"]), false);
+  assert.deepEqual(prepared, ["contextScenario"]);
+  assert.deepEqual(rendered, []);
+  assert.equal(cache.canvases.contextScenario, oldCanvas);
+  assert.equal(cache.signatures.contextScenario, "previous");
+  assert.equal(cache.dirty.contextScenario, true);
+
+  pending = false;
+  assert.equal(owner.ensureIdleRenderPasses({}, ["contextScenario"]), true);
+  assert.deepEqual(rendered, ["contextScenario"]);
+  assert.equal(cache.signatures.contextScenario, "next");
+  assert.equal(cache.dirty.contextScenario, false);
+  assert.notEqual(cache.canvases.contextScenario, oldCanvas);
+});
+
+test("context scenario async hook skips clean passes and does not affect other passes", () => {
+  const cache = {
+    canvases: {}, counters: {}, dirty: {}, reasons: {},
+    signatures: { contextScenario: "same", background: "same" },
+  };
+  const prepared = [];
+  const rendered = [];
+  const owner = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 1 } },
+    helpers: {
+      getRenderPassCacheState: () => cache,
+      getRenderPassSignature: () => "same",
+      prepareRenderPassAsync: (name) => { prepared.push(name); return true; },
+      renderPassToCache: (name) => rendered.push(name),
+    },
+  });
+
+  assert.equal(owner.ensureIdleRenderPasses({}, ["contextScenario"]), true);
+  assert.deepEqual(prepared, []);
+  cache.dirty.background = true;
+  assert.equal(owner.ensureIdleRenderPasses({}, ["background"]), true);
+  assert.deepEqual(prepared, []);
+  assert.deepEqual(rendered, ["background"]);
+});

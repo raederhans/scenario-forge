@@ -117,7 +117,10 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     }
     const baseFrame = politicalFrame;
     const patch = planPoliticalRasterPatch(baseFrame, entries, description, h.getPoliticalEntryPixelBounds);
-    const task = { identity: String(description.identity) };
+    const task = { identity: String(description.identity), transform: description.transform,
+      scenarioId: state.activeScenarioId, sceneGeneration: state.sceneGeneration,
+      scenarioDataGeneration: state.scenarioDataGeneration, topologyRevision: state.topologyRevision,
+      colorRevision: state.colorRevision, projectionKey: description.projectionKey };
     const patchInput = patch ? { renderRegion: patch.region, drawEntryIds: patch.drawEntryIds,
       patchBaseIdentity: baseFrame.identity } : {};
     let receivedResult = null;
@@ -128,15 +131,23 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
         if (!disposed && pending.get("political") === task) e.requestRender("geometry-worker-fallback");
         return;
       }
-      const current = enabled() && !pendingEditBlocksWorker() ? getPoliticalSnapshot() : null;
-      if (pending.get("political") !== task || !current
+      const latest = pending.get("political") === task;
+      const canUseWorker = enabled() && !pendingEditBlocksWorker();
+      const superseded = !latest || state.zoomTransform.x !== task.transform.x
+        || state.zoomTransform.y !== task.transform.y || state.zoomTransform.k !== task.transform.k
+        || state.activeScenarioId !== task.scenarioId || state.sceneGeneration !== task.sceneGeneration
+        || state.scenarioDataGeneration !== task.scenarioDataGeneration
+        || state.topologyRevision !== task.topologyRevision || state.colorRevision !== task.colorRevision
+        || String(identityOf(surface.getProjection())) !== task.projectionKey;
+      const current = canUseWorker && !superseded ? getPoliticalSnapshot() : null;
+      if (superseded || !current
         || current.description.identity !== task.identity) {
         close(result);
         e.recordMetric("geometryWorkerStaleResult", 0, { kind: "political" });
         // The last input/data update may have arrived while this request was
         // the frame's preparation gate. A stale latest result must wake drawing
         // again, or the visible frame can remain frozen with no pending work.
-        if (pending.get("political") === task && current) {
+        if (latest && canUseWorker && (superseded || current)) {
           e.requestRender("geometry-worker-political-stale");
         }
         return;

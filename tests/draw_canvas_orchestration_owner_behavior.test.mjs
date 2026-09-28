@@ -48,6 +48,7 @@ function createHarness({
   prepareAsyncFrame = null,
   idlePassesReady = true,
   overview = false,
+  navigation = null,
 } = {}) {
   const calls = [];
   let currentPhase = phase;
@@ -160,6 +161,10 @@ function createHarness({
     },
   };
   if (overview) effects.drawOverviewFrameFallback = () => { calls.push(["drawOverviewFrameFallback"]); return true; };
+  if (navigation) effects.drawNavigationFrame = (transform) => {
+    calls.push(["drawNavigationFrame", transform]);
+    return navigation({ phase: currentPhase, deferExact: currentDeferExact });
+  };
   const owner = createDrawCanvasOrchestrationOwner({ constants: CONSTANTS, getters, effects });
   return { calls, effectiveTransform, owner, rawTransform: currentRawTransform };
 }
@@ -172,6 +177,60 @@ test("valid overview publishes during coverage recovery without blocking on fine
   assert.ok(names(calls).includes("commitLastFrame"));
   for(const name of ["drawTransformedFrameFromCaches","ensureIdleRenderPasses","captureLastGoodFrame"])
     assert.ok(!names(calls).includes(name),name);
+});
+
+test("navigation frame presents requested transform before topology, worker and coverage work", () => {
+  const { calls, owner, rawTransform } = createHarness({
+    phase: "interacting", navigation: () => true,
+    prepareAsyncFrame: () => true,
+  });
+  const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.status, "drawn");
+  assert.equal(summary.frameMode, "navigation");
+  assert.equal(summary.drewFrame, true);
+  assert.deepEqual(calls.find((call) => call[0] === "drawNavigationFrame"),
+    ["drawNavigationFrame", rawTransform]);
+  assert.deepEqual(calls.find((call) => call[0] === "commitLastFrame")?.[1], {
+    phase: "interacting", totalMs: 42, timings: {}, transform: rawTransform,
+    frameMode: "navigation", presented: true,
+  });
+  for (const name of ["ensureLayerDataFromTopology", "prepareAsyncFrame", "drawTransformedFrameFromCaches",
+    "ensureIdleRenderPasses", "captureLastGoodFrame", "finalizePendingExactAfterSettleRefreshAfterPaint"]) {
+    assert.ok(!names(calls).includes(name), name);
+  }
+  assert.ok(names(calls).includes("clearPoliticalPatchOverlayIfStale"));
+  assert.ok(names(calls).includes("cancelPoliticalPathWarmup"));
+  assert.deepEqual(calls.at(-1), ["incrementPerfCounter", "frames"]);
+});
+
+test("color recovery promotion selects exact frame before navigation", () => {
+  const { calls, owner } = createHarness({ phase: "settling", deferExact: true,
+    promoteToPhase: "idle", promoteToDefer: false, navigation: () => true,
+  });
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "exact");
+  assert.ok(!names(calls).includes("drawNavigationFrame"));
+  assert.ok(names(calls).includes("composeCachedPasses"));
+});
+
+test("idle worker wait may present navigation once without capturing or scheduling", () => {
+  const { calls, owner } = createHarness({ phase: "idle", navigation: () => true,
+    prepareAsyncFrame: () => true,
+  });
+  const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.frameMode, "navigation");
+  assert.equal(names(calls).filter((name) => name === "drawNavigationFrame").length, 1);
+  assert.ok(!names(calls).includes("captureLastGoodFrame"));
+  assert.ok(!names(calls).includes("composeCachedPasses"));
+});
+
+test("idle ensure-pass wait may present navigation", () => {
+  const { calls, owner } = createHarness({ phase: "idle", idlePassesReady: false,
+    navigation: () => true,
+  });
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "navigation");
+  assert.ok(names(calls).includes("ensureIdleRenderPasses"));
+  assert.ok(!names(calls).includes("composeCachedPasses"));
+  assert.ok(!names(calls).includes("captureLastGoodFrame"));
 });
 
 test("overview does not replace final exact idle rendering", () => {
@@ -244,6 +303,8 @@ test("exact idle success preserves order and final frames counter", () => {
     totalMs: 42,
     timings: { idle: 7 },
     transform: rawTransform,
+    frameMode: "exact",
+    presented: true,
   });
   assert.deepEqual(calls.at(-1), ["incrementPerfCounter", "frames"]);
 });
@@ -275,6 +336,8 @@ test("last-frame commit reads phase before total time before raw transform", () 
     totalMs: 42,
     timings: { idle: 7 },
     transform: afterTotalTransform,
+    frameMode: "exact",
+    presented: true,
   });
 });
 
@@ -363,6 +426,11 @@ test("interacting first-visible failure keeps previous pixels", () => {
     "missing-fast-frame-no-continuity",
   ]);
   assert.equal(calls.some((call) => call[0] === "markFirstVisibleFramePainted"), false);
+  assert.equal(calls.some((call) => call[0] === "captureLastGoodFrame"), false);
+  assert.deepEqual(calls.find((call) => call[0] === "commitLastFrame")?.[1], {
+    phase: "interacting", totalMs: 42, timings: {}, transform: { x: 12, y: 34, k: 2 },
+    frameMode: "previous-pixels", presented: false,
+  });
 });
 
 test("previous-pixel continuity uses the phase after transformed and last-good effects", () => {

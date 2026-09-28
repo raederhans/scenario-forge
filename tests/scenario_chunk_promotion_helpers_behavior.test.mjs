@@ -59,6 +59,38 @@ test("full and interactive coverage follow existing shell and aggregate filterin
   assert.deepEqual(coverage.missingColorFeatureIdsSample, ["RU_ARCTIC_FB_TEST"]);
 });
 
+test("coverage reuses only a matching prepared expectation and still checks current full and interactive data", () => {
+  const first = { id: "A" };
+  const second = { id: "B" };
+  const full = { features: [first, second] };
+  const state = { scenarioPoliticalChunkData: full, landDataFull: full,
+    landData: { features: [first, second] }, colors: { A: "#123", B: "#456" } };
+  let builds = 0;
+  const buildInteractiveLandData = (collection) => {
+    builds++;
+    return { features: [...collection.features] };
+  };
+  const coverageInputSnapshot = { fullCollection: full,
+    expectedInteractiveCollection: { features: [first, second] } };
+  const check = (snapshot) => analyzeScenarioPoliticalDerivedStateCoverage(state, {
+    buildInteractiveLandData, coverageInputSnapshot: snapshot,
+  });
+  assert.equal(check(coverageInputSnapshot).landDataCoverageMissing, false);
+  assert.equal(builds, 0, "matching prepared expectation skips the duplicate filter build");
+  state.landData = { features: [first] };
+  assert.deepEqual(check(coverageInputSnapshot).missingInteractiveFeatureIdsSample, ["B"]);
+  assert.equal(builds, 0, "expected features remain separate from current landData");
+  state.landDataFull = { features: [first] };
+  const incompleteFull = check(coverageInputSnapshot);
+  assert.equal(incompleteFull.fullLandDataCoverageMissing, true);
+  assert.deepEqual(incompleteFull.missingFullLandFeatureIdsSample, ["B"]);
+  assert.equal(builds, 1, "a changed full collection recomputes the interactive expectation");
+  check();
+  assert.equal(builds, 2, "a missing snapshot uses the original independent check");
+  check({ fullCollection: state.landDataFull, expectedInteractiveCollection: null });
+  assert.equal(builds, 3, "a malformed snapshot also uses the original independent check");
+});
+
 test("color coverage counts canonical regions once across coarse and detail topology IDs", () => {
   const coarse = { id: 10, properties: { id: "REGION_A" } };
   const detail = { id: 900, properties: { id: "REGION_A" } };

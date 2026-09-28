@@ -1050,7 +1050,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function getScenarioWaterRegionsMode\(\) \{[\s\S]*?runtimeState\.activeScenarioManifest\?\.water_regions_mode[\s\S]*?SCENARIO_PRESENTATION_FEATURES\.ATLANTROPA_RELIEF[\s\S]*?return "exclusive";[\s\S]*?return "combined";[\s\S]*?\}/.test(rendererSource)
         && /function isScenarioWaterTopologyExclusiveMode\(\) \{[\s\S]*?return getScenarioWaterRegionsMode\(\) === "exclusive";[\s\S]*?\}/.test(rendererSource),
       tnoWaterCombinesExclusiveScenarioMarineWithSharedLakes:
-        /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
+        /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\), scenarioWaterFeatures = runtimeState\.scenarioWaterRegionsData\?\.features\) \{[\s\S]*?resolveEffectiveWaterRegionFeatures\(\{[\s\S]*?globalLakeFeatures: runtimeState\.contextLayerExternalDataByName\?\.lakes\?\.features[\s\S]*?exclusive: isScenarioWaterTopologyExclusiveMode\(\)/.test(rendererSource),
       openOceanRenderAndInteractionUseActiveOverlayGate:
         /function isOpenOceanOverlayActive\(\) \{[\s\S]*?return isOpenOceanSelectionEnabled\(\) \|\| isOpenOceanPaintEnabled\(\);[\s\S]*?\}/.test(rendererSource)
         && /function isWaterRegionRenderable\(feature\) \{[\s\S]*?if \(isOpenOceanWaterRegion\(feature\)\) \{[\s\S]*?return isOpenOceanRenderable\(\);[\s\S]*?return feature\?\.properties\?\.interactive !== false;[\s\S]*?\}/.test(rendererSource)
@@ -1070,7 +1070,8 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /function drawScenarioWaterHighlightLayer\(k\) \{[\s\S]*?collectSafeWaterRegionGeometryParts\(feature\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\)/.test(scenarioRegionOverlayOwnerSource),
       waterFillUsesProjectionPathCacheBeforeCanvasFallback:
         /const scenarioWaterPathCache = new GeometryBudgetMap\(/.test(scenarioRegionOverlayOwnerSource)
-        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?cached\?\.parts === parts[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterPathCache\.set\(feature, \{ path, parts, estimatedBytes \}\);/.test(scenarioRegionOverlayOwnerSource)
+        && /function getScenarioWaterFeaturePath\(feature, parts\) \{[\s\S]*?getCachedWaterFeaturePath\(feature, parts\)[\s\S]*?combinedPath\.addPath\(partPath\)[\s\S]*?scenarioWaterPathCache\.set\(cacheKey, \{ path, parts, estimatedBytes \}\);/.test(scenarioRegionOverlayOwnerSource)
+        && /sameWaterPathParts\(cached\.parts, parts\)[\s\S]*?cached\.projectionGeneration === getProjectionGeometryGeneration/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioWaterFillLayer\(k, \{ waterFeatures = \[\], maskOnly = false \} = \{\}\) \{[\s\S]*?const waterPath = visibleParts\.length === parts\.length[\s\S]*?getScenarioWaterFeaturePath\(feature, parts\)[\s\S]*?fillWaterPath\(waterPath\);[\s\S]*?getScenarioWaterPartPath\(part\)[\s\S]*?fillWaterPath\(partPath\)[\s\S]*?rendererSurfaceHost\.getPathCanvas\(\)\(part\);/.test(scenarioRegionOverlayOwnerSource),
       waterCoverageUsesSafeParts:
         /function getScreenBounds\(part, transform\) \{[\s\S]*?const bounds = computeProjectedGeoBounds\(part\);/.test(scenarioWaterCachePolicyOwnerSource)

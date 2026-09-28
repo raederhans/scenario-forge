@@ -1924,7 +1924,7 @@ function initToolbar({ render } = {}) {
 
   const runZoomReset = () => {
     dismissOnboardingHint();
-    resetZoomToFit();
+    resetZoomToFit({ animate: true });
   };
 
   registerRuntimeHook(state, "runToolSelectionFn", runToolSelection);
@@ -2034,7 +2034,9 @@ function initToolbar({ render } = {}) {
       }
     });
     zoomPercentInput.addEventListener("blur", () => {
-      commitZoomInputValue();
+      // Enter already committed; its UI refresh may still show the animation's
+      // current scale. Do not replace the requested target with that value.
+      if (zoomPercentInput.dataset.editing === "true") commitZoomInputValue();
     });
     zoomPercentInput.dataset.bound = "true";
   }

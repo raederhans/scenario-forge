@@ -273,7 +273,7 @@ function initShortcuts() {
       if (runtimeState.runZoomResetFn) {
         callRuntimeHook(runtimeState, "runZoomResetFn");
       } else {
-        resetZoomToFit();
+        resetZoomToFit({ animate: true });
       }
       return;
     }

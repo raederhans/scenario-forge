@@ -81,13 +81,21 @@ export function chooseMarineFocusBounds(boundsList = []) {
     .sort((a, b) => (b.maxX - b.minX) * (b.maxY - b.minY) - (a.maxX - a.minX) * (a.maxY - a.minY))[0] || null;
 }
 
-export function findMarineInteriorAnchor({ centroid = null, bounds, transform, width, height, contains, gridSize = 3 } = {}) {
-  if (!bounds || !transform || typeof contains !== "function" || !(transform.k > 0)) return null;
+function getVisibleMarineBounds(bounds, transform, width, height) {
+  if (!bounds || !transform || !(transform.k > 0)) return null;
   const minX = Math.max(bounds.minX, (2 - transform.x) / transform.k);
   const maxX = Math.min(bounds.maxX, (width - 2 - transform.x) / transform.k);
   const minY = Math.max(bounds.minY, (2 - transform.y) / transform.k);
   const maxY = Math.min(bounds.maxY, (height - 2 - transform.y) / transform.k);
   if (!(maxX > minX) || !(maxY > minY)) return null;
+  return { minX, maxX, minY, maxY };
+}
+
+export function findMarineInteriorAnchor({ centroid = null, bounds, transform, width, height, contains, gridSize = 3 } = {}) {
+  if (typeof contains !== "function") return null;
+  const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height);
+  if (!visibleBounds) return null;
+  const { minX, maxX, minY, maxY } = visibleBounds;
   const inside = (point) => Array.isArray(point) && point.every(Number.isFinite)
     && point[0] >= minX && point[0] <= maxX && point[1] >= minY && point[1] <= maxY
     && contains(point);
@@ -121,6 +129,16 @@ export function createMarineInteriorAnchorResolver() {
       bounds.minX, bounds.minY, bounds.maxX, bounds.maxY, centroid?.[0], centroid?.[1]];
     const previous = byPart.get(part);
     if (previous && key.every((value, index) => Object.is(value, previous.key[index]))) return previous.anchor;
+    const sameGeometry = previous && key.slice(5).every((value, index) => Object.is(value, previous.key[index + 5]));
+    if (sameGeometry && previous.anchor && typeof options.contains === "function") {
+      const visibleBounds = getVisibleMarineBounds(bounds, transform, width, height);
+      const [x, y] = previous.anchor;
+      if (visibleBounds && x >= visibleBounds.minX && x <= visibleBounds.maxX
+        && y >= visibleBounds.minY && y <= visibleBounds.maxY) {
+        byPart.set(part, { key, anchor: previous.anchor });
+        return previous.anchor;
+      }
+    }
     const anchor = findMarineInteriorAnchor(options);
     // Keep only the latest viewport, including failed searches. Weak keys let
     // replaced scenario/chunk geometry go; panning does not grow a history cache.

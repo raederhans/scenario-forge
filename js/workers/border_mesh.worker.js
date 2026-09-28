@@ -8,6 +8,7 @@ self.onmessage = ({ data }) => {
   try {
     const startedAt = performance.now();
     const result = type === "REGISTER_SOURCE" ? kernel.registerSource(data)
+      : type === "UPDATE_POLICY" ? kernel.updatePolicy(data)
       : type === "BUILD" ? kernel.build(data) : (() => { throw new Error("Unknown border worker task."); })();
     self.postMessage({ type: "RESULT", taskId, result, cpuMs: performance.now() - startedAt });
   } catch (error) {

@@ -15,6 +15,7 @@ export function createGeometryRasterWorkerClient({
     && typeof Path2D === "function",
   onMetric = () => {},
   resourceBudget = pageResourceBudget,
+  packGeometry = (updates) => globalThis.__scenarioForgeGeometryTransferCodecShared.pack(updates),
 } = {}) {
   let disabled = false;
   let active = null;
@@ -61,6 +62,10 @@ export function createGeometryRasterWorkerClient({
     const startedAt = performance.now();
     let result = null;
     try {
+      if (task.controller.signal.aborted || disabled) {
+        task.resolve(null);
+        return;
+      }
       const resetGeometry = geometryStoreKey !== task.input.sceneKey;
       const savedRefs = resetGeometry ? new Map() : geometryRefs;
       const updates = [];
@@ -92,15 +97,21 @@ export function createGeometryRasterWorkerClient({
 
       const { identity: _identity, ...input } = task.input;
       const packingStartedAt = performance.now();
-      const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(updates);
+      const packed = packGeometry(updates, { signal: task.controller.signal });
+      const transport = packed?.then ? await packed : packed;
+      if (task.controller.signal.aborted || disabled) {
+        task.resolve(null);
+        return;
+      }
       const packingMs = performance.now() - packingStartedAt;
       const transferBytes = transport.transferables.reduce((sum, buffer) => sum + buffer.byteLength, 0);
+      const useTransport = transport.transferables.length > 0 || transport.payload?.encoding === "geo-f64-batches-v1";
       // These transferred buffers remain live while the receiver consumes them.
       // This is a temporary reservation, not another persistent geometry copy.
       resourceBudget.update(transferOwner, { decodeTransient: measuredBytes(transferBytes) });
       result = await client.dispatchTask("RENDER_GEOMETRY", {
-        packet: { ...input, entries, geometryUpdates: transport.transferables.length ? null : updates,
-          geometryTransport: transport.transferables.length ? transport.payload : null, resetGeometry },
+        packet: { ...input, entries, geometryUpdates: useTransport ? null : updates,
+          geometryTransport: useTransport ? transport.payload : null, resetGeometry },
       }, { signal: task.controller.signal, transfer: transport.transferables });
       if (disabled) {
         closeResult(result);
@@ -128,12 +139,21 @@ export function createGeometryRasterWorkerClient({
         rasterizedCount: result?.renderedCount ?? null,
         clearedPixelCount: result?.clearedPixelCount ?? null,
         packingMs, unpackingMs: result?.unpackingMs || 0,
+        ...(task.input.kind === "navigation" ? { navigationTimings: result?.navigationTimings || null } : {}),
         cacheBudget: result?.cacheBudget || null, geometryEvictions: result?.evictedGeometryIds?.length || 0,
         sharedResources: resourceBudget.snapshot(),
       });
       task.resolve(result);
     } catch (error) {
       closeResult(result);
+      if (task.controller.signal.aborted || error?.name === "AbortError") {
+        // The worker may have received a partial update before cancellation.
+        geometryStoreKey = null;
+        geometryRefs.clear();
+        geometryIdsByKind.clear();
+        task.resolve(null);
+        return;
+      }
       // A failed worker may have only applied part of an upload. Do not reuse
       // that acknowledgement, or retry endlessly on an unsupported browser.
       geometryStoreKey = null;
@@ -148,6 +168,7 @@ export function createGeometryRasterWorkerClient({
       surfaceBytesByKind.clear();
       resourceBudget.release(resourceOwner);
     } finally {
+      task.detachAbort?.();
       resourceBudget.release(transferOwner);
       liveTaskIds.clear();
       if (active === task) active = null;
@@ -160,7 +181,7 @@ export function createGeometryRasterWorkerClient({
     }
   }
 
-  function request(input) {
+  function request(input, { signal } = {}) {
     if (!available()) return Promise.resolve(null);
     if (!input || typeof input !== "object") return Promise.resolve(null);
     if (active?.input.kind === input.kind && active.input.identity === input.identity) return active.promise;
@@ -168,8 +189,16 @@ export function createGeometryRasterWorkerClient({
     if (previous?.input.identity === input.identity) return previous.promise;
     let resolve;
     const promise = new Promise((done) => { resolve = done; });
-    const task = { input, promise, resolve, controller: new AbortController() };
+    const controller = new AbortController();
+    const task = { input, promise, resolve, controller };
+    if (signal?.aborted) controller.abort(signal.reason);
+    else if (signal) {
+      const forwardAbort = () => controller.abort(signal.reason);
+      signal.addEventListener("abort", forwardAbort, { once: true });
+      task.detachAbort = () => signal.removeEventListener("abort", forwardAbort);
+    }
     if (active) {
+      previous?.detachAbort?.();
       previous?.resolve(null);
       queued.set(input.kind, task);
       reportQueue();
@@ -182,7 +211,7 @@ export function createGeometryRasterWorkerClient({
   function dispose() {
     disabled = true;
     active?.controller.abort();
-    for (const pending of queued.values()) pending.resolve(null);
+    for (const pending of queued.values()) { pending.detachAbort?.(); pending.resolve(null); }
     queued.clear();
     client.terminate();
     geometryRefs.clear();

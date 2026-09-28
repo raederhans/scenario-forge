@@ -18,6 +18,7 @@ export {
   invalidateContextLayerVisualStateBatch,
   invalidateOceanBackgroundVisualState,
   invalidateOceanWaterInteractionVisualState,
+  prepareScenarioNavigation,
   recomputeDynamicBordersNow,
   refreshColorState,
   refreshResolvedColorsForFeatures,

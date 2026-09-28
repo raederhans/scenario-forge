@@ -57,6 +57,9 @@ function createHarness(options = {}) {
   const getters = {
     getViewportGroup: () => group,
   };
+  if (options.getPresentedTransform) {
+    getters.getPresentedTransform = options.getPresentedTransform;
+  }
   const owner = createRendererViewportUpdateOwner({ effects, getters });
   return { calls, effects, getters, owner };
 }
@@ -109,6 +112,52 @@ test("updateMap passes null and partial transforms through exactly", () => {
   assert.deepEqual(calls.order, [...EFFECT_NAMES, ...EFFECT_NAMES]);
   assert.deepEqual(calls.setZoomTransform, [null, partialTransform]);
   assert.deepEqual(calls.applyViewportTransform, []);
+});
+
+test("frozen raster keeps the SVG on its presented transform after drawing", () => {
+  const oldFrame = { x: 3, y: 4, k: 1 };
+  const target = { x: 30, y: 40, k: 2 };
+  const { calls, owner } = createHarness({ getPresentedTransform: () => oldFrame });
+
+  owner.updateMap(target);
+
+  assert.deepEqual(calls.order, [
+    "setZoomTransform", "setHitCanvasDirty", "updateZoomUi", "drawFrame",
+    "applyViewportTransform", "renderPhysicalIntensityBrushPreview",
+    "syncUnitCounterScalesDuringZoom", "syncSpecialZonePatternTransformDuringZoom",
+  ]);
+  assert.deepEqual(calls.setZoomTransform, [target]);
+  assert.deepEqual(calls.applyViewportTransform, [{
+    name: "transform", value: "translate(3,4) scale(1)",
+  }]);
+  assert.equal(calls.order.filter((name) => name === "drawFrame").length, 1);
+});
+
+test("accepted raster and later commit callback synchronize the SVG", () => {
+  let presented = { x: 1, y: 2, k: 1 };
+  const target = { x: -12, y: 8, k: 1.5 };
+  const { calls, owner } = createHarness({ getPresentedTransform: () => presented });
+
+  owner.updateMap(target);
+  assert.equal(calls.applyViewportTransform[0].value, "translate(1,2) scale(1)");
+  presented = target;
+  owner.applyViewportTransform(presented);
+  assert.equal(calls.applyViewportTransform[1].value, "translate(-12,8) scale(1.5)");
+  assert.equal(calls.order.filter((name) => name === "drawFrame").length, 1);
+
+  const priorCalls = calls.order.length;
+  owner.applyViewportTransform(null);
+  assert.equal(calls.order.length, priorCalls);
+});
+
+test("missing presented frame falls back to target after the draw", () => {
+  const target = { x: 7, y: -9, k: 2 };
+  const { calls, owner } = createHarness({ getPresentedTransform: () => null });
+
+  owner.updateMap(target);
+
+  assert.equal(calls.applyViewportTransform[0].value, "translate(7,-9) scale(2)");
+  assert.equal(calls.order.indexOf("drawFrame") + 1, calls.order.indexOf("applyViewportTransform"));
 });
 
 test("owner fails fast when a required effect is missing", () => {

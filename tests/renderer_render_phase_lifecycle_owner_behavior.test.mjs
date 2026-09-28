@@ -16,6 +16,7 @@ function createHarness({
   pendingDayNightRefresh = false,
   dprStageChanged = false,
   exactFastPath = false,
+  navigationRecovery = null,
   chunkRefreshStatus = "noop",
   settleProfile = { settleDurationMs: 200, exactQuietWindowMs: 420 },
   nowValues = [1000, 1200, 1400],
@@ -126,6 +127,10 @@ function createHarness({
       calls.push(["shouldStartExactAfterSettleFastPath"]);
       return exactFastPath;
     },
+    ...(navigationRecovery === null ? {} : { needsNavigationRecovery: () => {
+      calls.push(["needsNavigationRecovery"]);
+      return navigationRecovery;
+    } }),
   };
   const owner = createRenderPhaseLifecycleOwner({
     state: {
@@ -308,6 +313,37 @@ test("scheduleRenderPhaseIdle callback waits when chunk promotion is active", ()
   assert.equal(state.deferExactAfterSettle, false);
   assert.equal(calls.some((call) => call[0] === "render"), false);
   assert.equal(calls.some((call) => call[0] === "scheduleExactAfterSettleRefresh"), false);
+});
+
+test("refresh-started promotion wakes navigation recovery without scheduling exact refresh", () => {
+  const { owner, calls, scheduledCallbacks, state } = createHarness({
+    renderPhase: "settling", exactFastPath: true,
+    chunkRefreshStatus: "refresh-started", navigationRecovery: true,
+  });
+  owner.scheduleRenderPhaseIdle();
+  calls.length = 0;
+  scheduledCallbacks[0]();
+  assert.equal(state.renderPhase, "idle");
+  assert.equal(state.deferExactAfterSettle, false);
+  assert.deepEqual(names(calls).slice(-4), [
+    "scheduleScenarioChunkRefresh", "shouldStartExactAfterSettleFastPath",
+    "needsNavigationRecovery", "render",
+  ]);
+  assert.equal(names(calls).filter((name) => name === "render").length, 1);
+  assert.equal(names(calls).includes("scheduleExactAfterSettleRefresh"), false);
+  assert.equal(names(calls).includes("setTimeout"), false);
+});
+
+test("refresh-started promotion still waits without navigation recovery", () => {
+  const { owner, calls, scheduledCallbacks } = createHarness({
+    renderPhase: "settling", exactFastPath: true,
+    chunkRefreshStatus: "refresh-started",
+  });
+  owner.scheduleRenderPhaseIdle();
+  calls.length = 0;
+  scheduledCallbacks[0]();
+  assert.equal(names(calls).includes("render"), false);
+  assert.equal(names(calls).includes("scheduleExactAfterSettleRefresh"), false);
 });
 
 test("resetRenderPhaseState restores idle phase timer fields through injected effects", () => {

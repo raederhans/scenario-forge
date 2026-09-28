@@ -435,7 +435,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             "\n\n  function zoomByStep",
             1,
         )[0]
-        self.assertIn("return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY });", renderer_content)
+        self.assertIn("return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY, animate });", renderer_content)
         self.assertLess(
             reset_zoom_body.index("updateZoomTranslateExtent();"),
             reset_zoom_body.index("const transform = centerContent"),

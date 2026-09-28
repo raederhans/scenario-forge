@@ -30,7 +30,7 @@ function abortIfNeeded(isCancelled) {
 export function createGeometryRasterWorkerKernel({
   d3,
   createCanvas = (width, height) => new OffscreenCanvas(width, height),
-  createPath = () => new Path2D(),
+  createPath = (svg) => new Path2D(svg),
   createBitmap = (...args) => createImageBitmap(...args),
   yieldTask = () => globalThis.scheduler?.yield
     ? globalThis.scheduler.yield()
@@ -45,6 +45,7 @@ export function createGeometryRasterWorkerKernel({
   let projectionKey = null;
   let projectionOptionsSignature = "";
   let pathGenerator = null;
+  let svgPathGenerator = null;
   let projection = null;
   const weights = (feature) => getRasterGeometryWeights(feature, getGeometryRetentionWeights);
   const geometries = new GeometryBudgetMap({ budget: geometryCacheBudget, weigh: (feature) => weights(feature).decoded, autoTrim: false });
@@ -55,11 +56,12 @@ export function createGeometryRasterWorkerKernel({
   async function render(packet, { isCancelled = () => false } = {}) {
     const startedAt = now();
     abortIfNeeded(isCancelled);
-    if (packet.kind !== "hit" && packet.kind !== "political") throw new Error("Unsupported raster kind.");
+    if (packet.kind !== "hit" && packet.kind !== "political" && packet.kind !== "navigation") throw new Error("Unsupported raster kind.");
     const { width, height, dpr = 1, offsetX = 0, offsetY = 0 } = packet;
-    const { x = 0, y = 0, k = 1 } = packet.transform || {};
+    const { x = 0, y = 0, k = 1, scaleY = k } = packet.transform || {};
     if (![width, height].every((value) => Number.isInteger(value) && value > 0)
-      || ![dpr, x, y, k, offsetX, offsetY].every(Number.isFinite) || dpr <= 0 || k <= 0) {
+      || ![dpr, x, y, k, scaleY, offsetX, offsetY].every(Number.isFinite) || dpr <= 0 || k <= 0
+      || (packet.kind === "navigation" && scaleY <= 0)) {
       throw new Error("Invalid raster dimensions or transform.");
     }
     const region = packet.renderRegion || null;
@@ -85,24 +87,67 @@ export function createGeometryRasterWorkerKernel({
     if (!pathGenerator || projectionKey !== packet.projectionKey || projectionOptionsSignature !== optionsSignature) {
       projection = createGeometryRasterProjection(d3, options);
       pathGenerator = d3.geoPath(projection).pointRadius(options.pointRadius ?? 2);
+      svgPathGenerator = null;
       projectionKey = packet.projectionKey;
       projectionOptionsSignature = optionsSignature;
       paths.clear();
     }
+    const navigationTimings = packet.kind === "navigation" ? {
+      geometryUpdateMs: 0, pathBuildMs: 0, fillMs: 0, yieldWallMs: 0,
+      bitmapMs: 0, trimMs: 0,
+      maxPathMs: 0, maxPathId: null, maxFillMs: 0, maxFillId: null,
+    } : null;
     const unpackingStartedAt = now();
-    const updates = packet.geometryTransport
-      ? decodePackedRasterUpdates(packet.geometryTransport)
-      : packet.geometryUpdates || [];
+    let updates;
+    if (packet.geometryTransport?.encoding === "geo-f64-batches-v1") {
+      if (packet.kind !== "navigation" || !Array.isArray(packet.geometryTransport.batches)) {
+        throw new Error("Invalid navigation geometry transport.");
+      }
+      updates = [];
+      let unpackSliceStartedAt = now();
+      for (const batch of packet.geometryTransport.batches) {
+        abortIfNeeded(isCancelled);
+        const decoded = batch?.encoding === "geo-f64-v1"
+          ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(batch) : batch;
+        if (!Array.isArray(decoded)) throw new Error("Invalid navigation geometry batch.");
+        updates.push(...decoded);
+        if (now() - unpackSliceStartedAt >= sliceBudgetMs) {
+          const yieldStartedAt = now();
+          await yieldTask();
+          navigationTimings.yieldWallMs += now() - yieldStartedAt;
+          unpackSliceStartedAt = now();
+        }
+      }
+    } else {
+      updates = packet.geometryTransport
+        ? packet.kind === "navigation"
+          ? globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(packet.geometryTransport)
+          : decodePackedRasterUpdates(packet.geometryTransport)
+        : packet.geometryUpdates || [];
+    }
     const unpackingMs = now() - unpackingStartedAt;
-    for (const { id, feature } of updates) {
+    const updateStartedAt = navigationTimings ? now() : 0;
+    let updateSliceStartedAt = now();
+    for (let index = 0; index < updates.length; index += 1) {
+      if (packet.kind === "navigation" && index % Math.max(1, batchSize) === 0) {
+        if (now() - updateSliceStartedAt >= sliceBudgetMs) {
+          const yieldStartedAt = now();
+          await yieldTask();
+          navigationTimings.yieldWallMs += now() - yieldStartedAt;
+          updateSliceStartedAt = now();
+        }
+        abortIfNeeded(isCancelled);
+      }
+      const { id, feature } = updates[index];
       paths.delete(id);
       if (feature) geometries.set(id, feature);
       else geometries.delete(id);
     }
+    if (navigationTimings) navigationTimings.geometryUpdateMs = now() - updateStartedAt;
     let surface = surfaces.get(packet.kind);
     if (!surface) {
       const canvas = createCanvas(surfaceWidth, surfaceHeight);
-      const context = canvas.getContext("2d");
+      const context = canvas.getContext("2d", packet.kind === "navigation" ? { willReadFrequently: true } : undefined);
       if (!context) throw new Error("Worker 2D context unavailable.");
       surface = { canvas, context };
       surfaces.set(packet.kind, surface);
@@ -131,7 +176,7 @@ export function createGeometryRasterWorkerKernel({
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.translate(offsetX, offsetY);
     context.translate(x, y);
-    context.scale(k, k);
+    context.scale(k, packet.kind === "navigation" ? scaleY : k);
     context.lineJoin = "round";
     context.lineCap = "round";
     let renderedCount = 0;
@@ -162,7 +207,9 @@ export function createGeometryRasterWorkerKernel({
         // Cached paths are cheap: yielding for every 64 features added hundreds
         // of timer delays even when the worker had hardly done any work.
         if (now() - sliceStartedAt >= sliceBudgetMs) {
+          const yieldStartedAt = navigationTimings ? now() : 0;
           await yieldTask();
+          if (navigationTimings) navigationTimings.yieldWallMs += now() - yieldStartedAt;
           yieldCount += 1;
           sliceStartedAt = now();
         }
@@ -173,12 +220,18 @@ export function createGeometryRasterWorkerKernel({
       if (!feature) throw new Error(`Missing raster geometry: ${entry.id}`);
       let path = paths.get(entry.id)?.path;
       if (!path) {
-        path = createPath();
-        try {
-          if (isPackedRasterGeometry(feature)) drawPackedRasterGeometry(feature, projection, path, options.pointRadius ?? 2);
-          else pathGenerator.context(path)(feature);
-        } finally {
-          pathGenerator.context(null);
+        const pathStartedAt = navigationTimings ? now() : 0;
+        if (packet.kind === "navigation") {
+          svgPathGenerator ||= d3.geoPath(projection).pointRadius(options.pointRadius ?? 2).digits(6);
+          path = createPath(svgPathGenerator(feature));
+        } else {
+          path = createPath();
+          try {
+            if (isPackedRasterGeometry(feature)) drawPackedRasterGeometry(feature, projection, path, options.pointRadius ?? 2);
+            else pathGenerator.context(path)(feature);
+          } finally {
+            pathGenerator.context(null);
+          }
         }
         const estimatedBytes = weights(feature).path;
         if (estimatedBytes > paths.budget) {
@@ -191,9 +244,27 @@ export function createGeometryRasterWorkerKernel({
           pathAdmissionSkips += 1;
         }
         pathBuildCount += 1;
+        if (navigationTimings) {
+          const elapsed = now() - pathStartedAt;
+          navigationTimings.pathBuildMs += elapsed;
+          if (elapsed > navigationTimings.maxPathMs) {
+            navigationTimings.maxPathMs = elapsed;
+            navigationTimings.maxPathId = entry.id;
+          }
+        }
       }
       context.fillStyle = entry.fillColor;
+      context.globalAlpha = packet.kind === "navigation" ? (entry.alpha ?? 1) : 1;
+      const fillStartedAt = navigationTimings ? now() : 0;
       context.fill(path);
+      if (navigationTimings) {
+        const elapsed = now() - fillStartedAt;
+        navigationTimings.fillMs += elapsed;
+        if (elapsed > navigationTimings.maxFillMs) {
+          navigationTimings.maxFillMs = elapsed;
+          navigationTimings.maxFillId = entry.id;
+        }
+      }
       if (packet.kind === "political" && entry.strokeColor && entry.lineWidth > 0) {
         context.strokeStyle = entry.strokeColor;
         context.lineWidth = entry.lineWidth;
@@ -202,9 +273,11 @@ export function createGeometryRasterWorkerKernel({
       renderedCount += 1;
     }
     abortIfNeeded(isCancelled);
+    const bitmapStartedAt = navigationTimings ? now() : 0;
     const bitmap = region
       ? await createBitmap(canvas, region.x, region.y, region.width, region.height)
       : canvas.transferToImageBitmap();
+    if (navigationTimings) navigationTimings.bitmapMs = now() - bitmapStartedAt;
     if (isCancelled()) {
       bitmap.close();
       abortIfNeeded(isCancelled);
@@ -212,10 +285,13 @@ export function createGeometryRasterWorkerKernel({
     // Current-frame geometry is pinned; a genuinely huge visible frame may
     // exceed the target. Retire inactive geometry and acknowledge it so the
     // client can re-upload it on a later view without disabling the worker.
+    const trimStartedAt = navigationTimings ? now() : 0;
     const evictedGeometryIds = geometries.trim(frameGeometryIds);
     for (const id of evictedGeometryIds) paths.delete(id);
+    if (navigationTimings) navigationTimings.trimMs = now() - trimStartedAt;
     return { bitmap, kind: packet.kind, width: region?.width ?? width, height: region?.height ?? height,
-      ...(region ? { renderRegion: { ...region }, patchBaseIdentity: packet.patchBaseIdentity } : {}), renderedCount, pathBuildCount, yieldCount, unpackingMs,
+      ...(region ? { renderRegion: { ...region }, patchBaseIdentity: packet.patchBaseIdentity } : {}),
+      ...(navigationTimings ? { navigationTimings } : {}), renderedCount, pathBuildCount, yieldCount, unpackingMs,
       clearedPixelCount: region ? region.width * region.height : width * height,
       geometryTransportMode: packet.geometryTransport ? "packed-f64" : "geojson",
       evictedGeometryIds, cacheBudget: { geometry: geometries.getStats(),
