@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import vm from "node:vm";
 import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
 import { createScenarioReliefOverlayRenderOwner } from "../js/core/renderer/scenario_relief_overlay_render_owner.js";
 import { readFileSync } from "node:fs";
@@ -12,7 +13,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   const coverageCalls = [];
   const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0 };
   const context = (name) => Object.fromEntries(
-    ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "clip", "moveTo", "lineTo", "setLineDash"]
+    ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "closePath", "clip", "moveTo", "lineTo", "setLineDash"]
       .map((method) => [method, (...args) => events.push([name, method, ...args])]),
   );
   let target = context("main");
@@ -128,12 +129,46 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
     replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
     setMode: (value) => { mode = value; }, setRevision: (value) => { revision = value; },
-    setProjection: (value) => { projection = value; projectionHandle = () => null; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
+    setProjection: (value) => { projection = value; projectionHandle = typeof value === "function" ? value : () => null; }, setAdaptiveDirect: () => { adaptiveDirect = true; },
     setCoverageRatio: (value) => { coverageRatio = value; },
     setWaterFeatureCount: (value) => { waterFeatures = Array.from({ length: value }, (_, index) => ({ ...water, id: `water-${index}` })); },
     replaceCache: () => { cache = { contextScenarioLayerCache: {}, layouts: {} }; }, getCache: () => cache,
   };
 }
+
+test("selected marine highlight uses simplified display geometry while fill keeps original safe parts", (t) => {
+  const sandbox = {};
+  vm.runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), sandbox);
+  const previousD3 = globalThis.d3;
+  globalThis.d3 = sandbox.d3;
+  t.after(() => {
+    if (previousD3 === undefined) delete globalThis.d3;
+    else globalThis.d3 = previousD3;
+  });
+
+  const h = harness(t);
+  const geometry = {
+    type: "Polygon",
+    coordinates: [[
+      [0, 0], [0, 5], [0, 10], [5, 10], [10, 10], [10, 5], [10, 0], [5, 0], [0, 0],
+    ]],
+  };
+  const original = JSON.stringify(geometry);
+  h.water.parts = [geometry];
+  h.water.properties = { id: "water", water_type: "sea" };
+  h.setProjection(sandbox.d3.geoMercator().scale(100).translate([0, 0]));
+  h.state.selectedWaterRegionId = "water";
+  h.draw();
+  h.events.length = 0;
+  h.draw();
+
+  assert.ok(h.events.some((event) => event[0] === "main" && event[1] === "lineTo"));
+  assert.ok(h.events.some((event) => event[0] === "main" && event[1] === "closePath"));
+  assert.ok(h.events.some((event) => event[0] === "main" && event[1] === "stroke"));
+  assert.equal(h.events.filter((event) => event[0] === "pathCanvas").length, 0);
+  assert.equal(JSON.stringify(geometry), original, "display generation leaves source coordinates intact");
+  assert.equal(h.metrics.at(-1).highlightedWaterCount, 1);
+});
 
 test("water pass reuses one effective collection, Atlantropa buckets and signature through cache redraw", t => {
   const h = harness(t);

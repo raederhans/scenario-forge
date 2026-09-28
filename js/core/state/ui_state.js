@@ -197,6 +197,7 @@ export function createDefaultStyleConfig() {
     ocean: {
       preset: "flat",
       fillColor: "#aadaff",
+      showRegionNames: false,
       opacity: 0.82,
       scale: 1.14,
       contourStrength: 0.34,

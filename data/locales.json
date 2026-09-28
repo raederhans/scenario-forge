@@ -294842,6 +294842,8 @@
     }
   },
   "ui": {
+    "Large Lake Outlines": { "en": "Large Lake Outlines", "zh": "大湖湖岸线" },
+    "Show Sea Names": { "en": "Show Sea Names", "zh": "显示海域名称" },
     "Capital": {
       "zh": "首都",
       "en": "Capital"

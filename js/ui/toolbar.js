@@ -368,8 +368,10 @@ function initToolbar({ render } = {}) {
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
   const oceanFillColor = document.getElementById("oceanFillColor");
+  const oceanRegionNamesToggle = document.getElementById("oceanRegionNamesToggle");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
   const lakeFillColor = document.getElementById("lakeFillColor");
+  const lakeOutlineToggle = document.getElementById("lake-outline-toggle");
   const oceanCoastalAccentRow = document.getElementById("oceanCoastalAccentRow");
   const oceanCoastalAccentToggle = document.getElementById("oceanCoastalAccentToggle");
   const oceanAdvancedStylesToggle = document.getElementById("oceanAdvancedStylesToggle");
@@ -1701,8 +1703,10 @@ function initToolbar({ render } = {}) {
     invalidateOceanVisualState,
     invalidateOceanWaterInteractionVisualState,
     oceanFillColor,
+    oceanRegionNamesToggle,
     lakeLinkToOcean,
     lakeFillColor,
+    lakeOutlineToggle,
     oceanCoastalAccentRow,
     oceanCoastalAccentToggle,
     oceanAdvancedStylesToggle,

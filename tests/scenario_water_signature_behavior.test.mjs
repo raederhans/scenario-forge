@@ -65,7 +65,7 @@ const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|deta
   + `|water-mode:combined|atlantropa:${atlantropa}`;
 const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|water-overrides:{}`
   + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
-  + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}|lake-shore:off';
+  + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}';
 
 test("water signature preserves bytes and identity allocation while avoiding duplicate water composition and revision work", () => {
   const h = createHarness();
@@ -191,17 +191,17 @@ test("prepared signature matches the live signature with shared lakes hidden and
   assert.match(prepared, /scenario-water:off/);
 });
 
-test("river visibility and color refresh both lake fills and the outer overlay cache", () => {
+test("lake shore cache is independent of river visibility and color", () => {
   const h = createHarness();
   const hidden = h.water();
   h.state.showRivers = true;
   h.state.styleConfig = { rivers: { color: "#123456" } };
   const visible = h.water();
-  assert.notEqual(visible, hidden);
+  assert.equal(visible, hidden);
   const overlay = h.context.getScenarioOverlaySignatureToken();
   h.state.styleConfig.rivers.color = "#654321";
-  assert.notEqual(h.water(), visible);
-  assert.notEqual(h.context.getScenarioOverlaySignatureToken(), overlay);
+  assert.equal(h.water(), visible);
+  assert.equal(h.context.getScenarioOverlaySignatureToken(), overlay);
   h.state.showRivers = false;
   assert.equal(h.water(), hidden);
 });

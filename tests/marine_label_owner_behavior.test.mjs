@@ -8,7 +8,38 @@ import {
   getMarineLabelMinScale,
   getMarineLabelName,
   isMarineLabelEligible,
+  shouldShowMarineRegionNames,
 } from "../js/core/renderer/marine_label_owner.js";
+import { createDefaultStyleConfig } from "../js/core/state/ui_state.js";
+import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass_signature_policy.js";
+
+test("ordinary sea names draw only after the display setting is enabled", () => {
+  const styleConfig = createDefaultStyleConfig();
+  assert.equal(styleConfig.ocean.showRegionNames, false);
+  assert.equal(shouldShowMarineRegionNames(styleConfig), false);
+  styleConfig.ocean.showRegionNames = true;
+  assert.equal(shouldShowMarineRegionNames(styleConfig), true);
+  assert.equal(shouldShowMarineRegionNames(styleConfig, true), false);
+});
+
+test("sea-name setting invalidates labels without repainting the ocean background", () => {
+  const state = {
+    zoomTransform: { k: 1, x: 0, y: 0 },
+    styleConfig: createDefaultStyleConfig(),
+    topologyRevision: 1,
+  };
+  const policy = createRenderPassSignaturePolicy(state, {
+    getTransformSignature: () => "view",
+    shouldEnableContextBaseTransformReuse: () => false,
+    getHgoRuntimePreviewVisibilitySignature: () => "none",
+    stableJson: JSON.stringify,
+  });
+  const labelsBefore = policy.getRenderPassSignature("labels");
+  const backgroundBefore = policy.getRenderPassSignature("background");
+  state.styleConfig.ocean.showRegionNames = true;
+  assert.notEqual(policy.getRenderPassSignature("labels"), labelsBefore);
+  assert.equal(policy.getRenderPassSignature("background"), backgroundBefore);
+});
 
 test("anchor remains stable under modest pan and zoom while inside visible water", () => {
   const resolve = createMarineInteriorAnchorResolver();

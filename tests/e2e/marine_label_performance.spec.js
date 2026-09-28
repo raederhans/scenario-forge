@@ -11,6 +11,7 @@ test("marine label redraw preserves pixels and records repeated geometry work", 
     const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
     await applyScenarioByIdCommand("tno_1962", { renderMode: "request", showToastOnComplete: false });
     const { state } = await import("/js/core/state.js");
+    state.styleConfig.ocean.showRegionNames = true;
     const { render, invalidateOceanWaterInteractionVisualState } = await import("/js/core/map_renderer.js");
     const { patchAppearanceVisibilityState } = await import("/js/core/state/actions/appearance_visibility_actions.js");
     patchAppearanceVisibilityState(state, { showWaterRegions: true, showOpenOceanRegions: true });

@@ -181,6 +181,16 @@ test("water inspector shows hierarchy and jump-to-parent for detail waters", asy
     return state.zoomTransform?.k || 0;
   })).toBeGreaterThan(2);
   await waitForRenderIdle(page, { scenarioId: "tno_1962" });
+  expect(await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    return state.styleConfig.ocean.showRegionNames;
+  })).toBe(false);
+  await page.evaluate(async () => {
+    const { state } = await import("/js/core/state.js");
+    const { render } = await import("/js/core/map_renderer.js");
+    state.styleConfig.ocean.showRegionNames = true;
+    render();
+  });
   await expect.poll(() => page.evaluate(async () => {
     const { state } = await import("/js/core/state.js");
     return state.renderPerfMetrics?.drawMarineLabels?.selectedVisible || false;
