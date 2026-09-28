@@ -3557,7 +3557,8 @@ function getRenderPipelinePassesOwner() {
       getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
       prepareRenderPassAsync: (passName) => passName === "political"
         ? getGeometryRasterRuntimeOwner().preparePolitical({ force: true }) : null,
-      canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted && !hasPendingPoliticalColorEdit(),
+      canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted
+        && isBootInteractionReady() && !hasPendingPoliticalColorEdit(),
       nowMs,
       // The active render boundary still coalesces requests until its finally
       // block. Queue after that boundary closes so the next slice is not lost.

@@ -1,11 +1,45 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "../js/core/renderer/cached_surface_coverage.js";
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
 import { createInteractionBorderSnapshotOwner } from "../js/core/renderer/interaction_border_snapshot_owner.js";
 import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed } from "../js/core/render_boundary.js";
 
 const origin = { x: 0, y: 0, k: 1 };
+
+test("production yield gate keeps startup political and context in one frame but slices ready interaction work", () => {
+  const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+  const bootGuard = source.match(/function isBootInteractionReady\(\) \{[\s\S]*?\n\}/)?.[0];
+  const yieldGate = source.match(/canYieldRenderPassWork: (\(\) => [\s\S]*?),\r?\n\s+nowMs,/)?.[1];
+  assert.ok(bootGuard && yieldGate);
+  for (const [bootPhase, bootBlocking, shouldYield] of [["warmup", true, false], ["ready", true, false], ["ready", false, true]]) {
+    const state = { firstVisibleFramePainted: true, bootPhase, bootBlocking, zoomTransform: origin };
+    const canYield = vm.runInNewContext(`${bootGuard}; (${yieldGate})`, {
+      runtimeState: state, hasPendingPoliticalColorEdit: () => false,
+    });
+    const painted = [], continuations = [];
+    let time = 0;
+    const cache = { dirty: { political: true, contextScenario: true }, signatures: {}, reasons: {}, counters: {}, canvases: {} };
+    const owner = createRenderPipelinePassesOwner({ state, helpers: {
+      getRenderPassCacheState: () => cache, nowMs: () => time, canYieldRenderPassWork: canYield,
+      requestRenderContinuation: (reason) => continuations.push(reason),
+      renderPassToCache: (name, _draw, _transform, timings) => {
+        painted.push(name); time += 10; timings[name] = 10;
+        cache.dirty[name] = false; cache.signatures[name] = "";
+      },
+    } });
+    const prepare = () => owner.ensureIdleRenderPasses({}, ["political", "contextScenario"]);
+    assert.equal(prepare(), !shouldYield, `${bootPhase}/${bootBlocking}`);
+    assert.equal(continuations.length, shouldYield ? 1 : 0);
+    if (shouldYield) {
+      assert.deepEqual(painted, ["political"]);
+      assert.equal(prepare(), true);
+    }
+    assert.deepEqual(painted, ["political", "contextScenario"]);
+  }
+});
 
 test("exact fallback resolves colors before worker preparation and preserves all surfaces while waiting", () => {
   const events = [];

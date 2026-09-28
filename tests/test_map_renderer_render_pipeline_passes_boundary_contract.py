@@ -303,6 +303,11 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             renderer_content,
         )
         self.assertIn("function ensureIdleRenderPasses(timings, passNames = null) {", owner_content)
+        self.assertIn(
+            "canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted\n"
+            "        && isBootInteractionReady() && !hasPendingPoliticalColorEdit()",
+            renderer_content,
+        )
         self.assertIn("const requestedPassNames = Array.isArray(passNames) ? new Set(passNames.filter(Boolean)) : null;", owner_content)
         self.assertIn("detectContextScenarioReasonMismatch({ cache, renderPerf: state.renderPerfMetrics || {} });", owner_content)
         self.assertIn('from "../renderer/exact_after_settle_pass_catalog.js";', exact_plan_content)
