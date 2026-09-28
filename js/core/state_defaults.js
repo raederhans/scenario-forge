@@ -310,6 +310,10 @@ function createDefaultLakeStyleConfig() {
     interactive: false,
     linkedToOcean: true,
     fillColor: null,
+    outlineEnabled: true,
+    outlineColor: "#54738f",
+    outlineWidth: 0.7,
+    outlineOpacity: 0.45,
   };
 }
 
@@ -321,6 +325,10 @@ function normalizeLakeStyleConfig(rawConfig) {
     interactive: raw.interactive === true,
     linkedToOcean: raw.linkedToOcean === undefined ? defaults.linkedToOcean : !!raw.linkedToOcean,
     fillColor: fillColor || null,
+    outlineEnabled: raw.outlineEnabled === undefined ? defaults.outlineEnabled : raw.outlineEnabled === true,
+    outlineColor: normalizeHexColorWithFallback(raw.outlineColor, defaults.outlineColor),
+    outlineWidth: clamp(toFiniteNumber(raw.outlineWidth, defaults.outlineWidth), 0, 4),
+    outlineOpacity: clamp(toFiniteNumber(raw.outlineOpacity, defaults.outlineOpacity), 0, 1),
   };
 }
 

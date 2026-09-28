@@ -186,6 +186,16 @@ test("marine visibility, selection, data and language invalidate only labels amo
   }
 });
 
+test("sea name toggle invalidates labels without repainting the ocean background", () => {
+  const { state, policy } = createHarness();
+  state.styleConfig.ocean = { fillColor: "#aadaff", showRegionNames: false };
+  const labels = policy.getRenderPassSignature("labels");
+  const background = policy.getRenderPassSignature("background");
+  state.styleConfig.ocean.showRegionNames = true;
+  assert.notEqual(policy.getRenderPassSignature("labels"), labels);
+  assert.equal(policy.getRenderPassSignature("background"), background);
+});
+
 test("every catalog pass reads its live invalidation input and ignores unrelated UI state", () => {
   assert.deepEqual(invalidationCases.map(([pass]) => pass).sort(), [...RENDER_PASS_NAMES].sort());
   for (const [pass, field] of invalidationCases) {

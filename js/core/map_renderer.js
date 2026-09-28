@@ -35,7 +35,7 @@ import { createBrushInteractionSessionOwner } from "./renderer/brush_interaction
 import { createPhysicalIntensityPreviewOwner } from "./renderer/physical_intensity_preview_owner.js";
 import { createPoliticalFeaturePolicy } from "./renderer/political_feature_policy.js";
 import { createScenarioRegionOverlayRenderOwner } from "./renderer/scenario_region_overlay_render_owner.js";
-import { chooseMarineFocusBounds, createMarineInteriorAnchorResolver, drawMarineLabels, getMarineLabelMinScale, isMarineLabelEligible } from "./renderer/marine_label_owner.js";
+import { chooseMarineFocusBounds, createMarineInteriorAnchorResolver, drawMarineLabels, getMarineLabelMinScale, isMarineLabelEligible, shouldShowMarineRegionNames } from "./renderer/marine_label_owner.js";
 import {
   createUrbanAdaptivePaintModel,
   getUrbanFeatureOwnerId,
@@ -4849,7 +4849,6 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
-    `lake-shore:${runtimeState.showRivers ? runtimeState.styleConfig?.rivers?.color : "off"}`,
   ].join("|");
 }
 
@@ -12403,7 +12402,9 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
   drawBlankFeatureLabelsPass(k, { interactive });
   const occupiedBoxes = [];
-  if (!interactive) drawOrdinaryMarineLabels(k, occupiedBoxes);
+  if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
+    drawOrdinaryMarineLabels(k, occupiedBoxes);
+  }
   getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
   if (!interactive && !runtimeState.deferContextBasePass) {
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });

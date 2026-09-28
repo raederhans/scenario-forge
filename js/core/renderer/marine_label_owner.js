@@ -1,5 +1,9 @@
 import { claimScreenLabelPlacement } from "./screen_label_placement.js";
 
+export function shouldShowMarineRegionNames(styleConfig, interactive = false) {
+  return !interactive && styleConfig?.ocean?.showRegionNames === true;
+}
+
 // Ordinary marine names use three map scales. The geometry and hit regions do
 // not change with these presentation thresholds.
 export function getMarineLabelMinScale(feature) {

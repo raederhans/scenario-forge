@@ -146,13 +146,14 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     const transformSignature = getRenderPassTransformSignature(passName, transform);
     const intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
     if (passName === "background") {
+      const { showRegionNames: _showRegionNames, ...oceanPaintStyle } = runtimeState.styleConfig?.ocean || {};
       return [
         transformSignature,
         getPassTopologyRevision(passName),
         runtimeState.oceanMaskMode || "topology_ocean",
         Number(runtimeState.oceanMaskQuality || 1).toFixed(3),
         `field:oceanDepth:${Number(intensityFields.channels.oceanDepth?.revision || 0)}`,
-        stableJson(runtimeState.styleConfig?.ocean || {}),
+        stableJson(oceanPaintStyle),
       ].join("::");
     }
     if (passName === "physicalBase") {
@@ -271,6 +272,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
+        runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         runtimeState.showWaterRegions ? "marine:on" : "marine:off",
         runtimeState.showOpenOceanRegions || runtimeState.allowOpenOceanPaint ? "open-ocean-labels:on" : "open-ocean-labels:off",
         `marine-selected:${String(runtimeState.selectedWaterRegionId || "")}`,

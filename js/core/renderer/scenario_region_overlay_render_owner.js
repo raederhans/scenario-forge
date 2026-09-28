@@ -1,6 +1,9 @@
 // Scenario water, special-region and Atlantropa overlays share one pass and cache lifecycle.
 import { getSafeCanvasColor } from "./canvas_color_helpers.js";
 import { isLakeRegion } from "./effective_water_regions.js";
+import { shouldDrawLakeOutline } from "./lake_outline_style.js";
+import { normalizeLakeStyleConfig } from "../state_defaults.js";
+import { createWaterHighlightDisplay } from "./water_highlight_display.js";
 import { GeometryBudgetMap, getGeometryRetentionWeights, PROJECTED_PATH_CACHE_BUDGET } from "./geometry_cache_budget.js";
 import { getFeatureId as getSharedFeatureId } from "../feature_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
@@ -60,6 +63,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   let visibleWaterWarmup = null;
   let skippedWaterWarmupIdentity = "";
   let waterPathCacheEpoch = 0;
+  const waterHighlightDisplay = createWaterHighlightDisplay();
+  let waterHighlightGeometryCache = new WeakMap();
 
   function getScenarioWaterPartBounds(part) {
     const cached = scenarioWaterPartBoundsCache.get(part);
@@ -117,21 +122,23 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
       rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
       const context = rendererSurfaceHost.getContext();
-      const softenShore = !maskOnly && isLakeRegion(feature) && runtimeState.showRivers;
+      const lakeStyle = !maskOnly && isLakeRegion(feature)
+        ? normalizeLakeStyleConfig(runtimeState.styleConfig?.lakes) : null;
+      const outlineLake = lakeStyle && visibleParts.some((part) =>
+        shouldDrawLakeOutline(feature, getScenarioWaterPartBounds(part), k, lakeStyle));
       const fillWaterPath = (path = null) => {
-        // A sub-pixel shore in the river hue bridges the two water styles.
-        // Keep the lake interior opaque and keep the river below the lake.
-        if (softenShore) {
+        if (path) context.fill(path); else context.fill();
+        // Shore styling affects presentation only; the original path still fills the lake.
+        if (outlineLake) {
           context.save();
-          context.globalAlpha = fillOpacity * 0.22;
-          context.strokeStyle = getSafeCanvasColor(runtimeState.styleConfig?.rivers?.color, "#3b82f6");
-          context.lineWidth = 1.4 / Math.max(0.0001, k);
+          context.globalAlpha = fillOpacity * lakeStyle.outlineOpacity;
+          context.strokeStyle = getSafeCanvasColor(lakeStyle.outlineColor, "#54738f");
+          context.lineWidth = lakeStyle.outlineWidth / Math.max(0.0001, k);
           context.lineJoin = "round";
           context.setLineDash([]);
           if (path) context.stroke(path); else context.stroke();
           context.restore();
         }
-        if (path) context.fill(path); else context.fill();
       };
       const waterPath = visibleParts.length === parts.length
         ? getScenarioWaterFeaturePath(feature, parts)
@@ -464,22 +471,57 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       const parts = collectSafeWaterRegionGeometryParts(feature);
       if (!parts.length) return;
       const isMacroOcean = isMacroOceanWaterRegion(feature);
-      rendererSurfaceHost.getContext().beginPath();
+      const visibleParts = parts.filter((part) =>
+        projectedGeoBoundsInScreen(getScenarioWaterPartBounds(part)));
+      if (!visibleParts.length) return;
+
+      const context = rendererSurfaceHost.getContext();
+      const projection = rendererSurfaceHost.getProjection?.();
+      if (!isLakeRegion(feature) && projection?.stream && globalThis.d3?.geoStream) {
+        const cacheKey = visibleParts[0];
+        let safeGeometry = waterHighlightGeometryCache.get(cacheKey);
+        if (!safeGeometry || !sameWaterPathParts(safeGeometry.parts, visibleParts)) {
+          safeGeometry = {
+            parts: [...visibleParts],
+            geometry: {
+              type: "GeometryCollection",
+              geometries: visibleParts.map((part) => part.geometry || part),
+            },
+          };
+          waterHighlightGeometryCache.set(cacheKey, safeGeometry);
+        }
+
+        const display = waterHighlightDisplay.get(safeGeometry.geometry, projection, k);
+        if (display) {
+          context.save();
+          context.globalAlpha = isMacroOcean ? 0.92 : 1;
+          context.strokeStyle = "#f1c40f";
+          context.lineWidth = (isMacroOcean ? 1.05 : 0.9) / Math.max(0.0001, k);
+          context.lineJoin = "round";
+          context.lineCap = "round";
+          const drawn = display.trace(context);
+          if (drawn) context.stroke();
+          context.restore();
+          if (drawn) highlightedCount += 1;
+          return;
+        }
+      }
+
+      context.beginPath();
       let visiblePartCount = 0;
-      parts.forEach((part) => {
-        if (!projectedGeoBoundsInScreen(getScenarioWaterPartBounds(part))) return;
+      visibleParts.forEach((part) => {
         if (!rendererSurfaceHost.getPathCanvas()) return;
         rendererSurfaceHost.getPathCanvas()(part);
         visiblePartCount += 1;
       });
       if (!visiblePartCount) return;
-      rendererSurfaceHost.getContext().save();
-      rendererSurfaceHost.getContext().globalAlpha = isMacroOcean ? 0.92 : 1;
-      rendererSurfaceHost.getContext().strokeStyle = "#f1c40f";
-      rendererSurfaceHost.getContext().lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
-      rendererSurfaceHost.getContext().lineJoin = "round";
-      rendererSurfaceHost.getContext().stroke();
-      rendererSurfaceHost.getContext().restore();
+      context.save();
+      context.globalAlpha = isMacroOcean ? 0.92 : 1;
+      context.strokeStyle = "#f1c40f";
+      context.lineWidth = (isMacroOcean ? 1.15 : 0.9) / Math.max(0.0001, k);
+      context.lineJoin = "round";
+      context.stroke();
+      context.restore();
       highlightedCount += 1;
     });
     return highlightedCount;
@@ -751,6 +793,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     cancelVisibleWaterWarmup();
     scenarioWaterPathCache.clear();
     scenarioWaterPartBoundsCache = new WeakMap();
+    waterHighlightDisplay.clear();
+    waterHighlightGeometryCache = new WeakMap();
     waterPathCacheEpoch += 1;
     skippedWaterWarmupIdentity = "";
   }

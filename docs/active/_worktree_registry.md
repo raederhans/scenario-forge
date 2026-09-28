@@ -564,3 +564,10 @@
 - Managed checkout: `C:/Users/raede/.codex/worktrees/atlantropa-southern-merge/mapcreator`. Root is sole integration/process owner.
 - Scope: source-backed Bodrum/Milas/Soke, Aegean island registration, Samos/Ikaria (TUR), Malta and source-coast completion; latest-main scenario rebuild and matching landing TNO assets.
 - Preserve primary checkout and unrelated WIP. See `atlantropa-expansion-20260926/context.md` for checks and integration receipts.
+
+## Water display integration 2026-09-28
+
+- Branch: `codex/water-outline-20260928`; base: `953d17c8`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/water-outline-merge/mapcreator`. Root owns integration and shared test processes.
+- Scope: major-lake outlines, sea-name visibility default, and marine highlight display simplification; preserve source geometry and latest-main rendering caches.
+- Primary checkout and unrelated work remain untouched. Keep this checkout available for water-display follow-up verification.

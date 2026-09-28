@@ -6,6 +6,8 @@ import vm from "node:vm";
 import { parse } from "acorn";
 import { getFeatureId as getSharedFeatureId } from "../js/core/feature_identity.js";
 import { isLakeRegion } from "../js/core/renderer/effective_water_regions.js";
+import { shouldDrawLakeOutline } from "../js/core/renderer/lake_outline_style.js";
+import { normalizeLakeStyleConfig } from "../js/core/state_defaults.js";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 
 const rendererSource = readFileSync(
@@ -27,6 +29,74 @@ const drawScenarioWaterFillLayerSource = extractFunctionSource(
   rendererSource,
   "drawScenarioWaterFillLayer",
 );
+
+function createLakeShoreHarness({ featurePath = { id: "lake-path" }, bounds } = {}) {
+  const calls = [];
+  const metrics = [];
+  const drawingContext = {
+    globalAlpha: 1,
+    fillStyle: "",
+    strokeStyle: "",
+    lineWidth: 0,
+    stack: [],
+    save() {
+      this.stack.push({ globalAlpha: this.globalAlpha, fillStyle: this.fillStyle,
+        strokeStyle: this.strokeStyle, lineWidth: this.lineWidth });
+    },
+    restore() { Object.assign(this, this.stack.pop()); },
+    fill(path) { calls.push({ type: "fill", path, color: this.fillStyle, alpha: this.globalAlpha }); },
+    stroke(path) { calls.push({ type: "stroke", path, color: this.strokeStyle, alpha: this.globalAlpha, width: this.lineWidth }); },
+    setLineDash() {},
+  };
+  const scope = vm.createContext({
+    nowMs: () => 1,
+    collectContextMetric: (...args) => metrics.push(args),
+    waterPathBuildCount: 0,
+    waterPathBuildMs: 0,
+    scenarioWaterPathCache: { getStats: () => ({ entries: 0 }) },
+    runtimeState: { styleConfig: {} },
+    rendererSurfaceHost: { getContext: () => drawingContext, getPathCanvas: () => null },
+    isWaterRegionRenderable: () => true,
+    collectSafeWaterRegionGeometryParts: (feature) => feature.parts,
+    projectedGeoBoundsInScreen: () => true,
+    getScenarioWaterPartBounds: (part) => part.bounds || bounds,
+    getWaterRegionDefaultStyle: () => ({ opacity: 1 }),
+    getSharedFeatureId: (feature) => feature.properties.id,
+    getWaterRegionColor: () => "#abc123",
+    isLakeRegion,
+    normalizeLakeStyleConfig,
+    shouldDrawLakeOutline,
+    getSafeCanvasColor: (value, fallback) => value || fallback,
+    getScenarioWaterFeaturePath: () => featurePath,
+    getScenarioWaterPartPath: () => featurePath,
+    getGeometryRetentionWeights: () => ({ path: 0 }),
+    waterPathCacheBudget: 1024,
+  });
+  vm.runInContext(`${drawScenarioWaterFillLayerSource}\nglobalThis.__drawWaterFill = drawScenarioWaterFillLayer;`, scope);
+  return { calls, metrics, draw: (features, options = {}) => scope.__drawWaterFill(1, { waterFeatures: features, ...options }) };
+}
+
+test("large curated lake gets its configured shore after fill; small and masked lakes do not", () => {
+  const visibleBounds = { minX: 0, minY: 0, maxX: 30, maxY: 20 };
+  const largeLake = {
+    properties: { id: "lake_baikal", water_type: "lake" },
+    parts: [{ id: "baikal", bounds: visibleBounds }],
+  };
+  const h = createLakeShoreHarness();
+  h.draw([largeLake]);
+  assert.deepEqual(h.calls.map(({ type }) => type), ["fill", "stroke"]);
+  assert.deepEqual(h.calls[1], {
+    type: "stroke", path: { id: "lake-path" }, color: "#54738f", alpha: 0.45, width: 0.7,
+  });
+  h.draw([largeLake], { maskOnly: true });
+  assert.deepEqual(h.calls.map(({ type }) => type), ["fill", "stroke", "fill"],
+    "political masking keeps the exact fill path without presentation outlines");
+
+  const smallLake = { properties: { id: "ne_lake_small", water_type: "lake" }, parts: largeLake.parts };
+  const small = createLakeShoreHarness();
+  small.draw([smallLake]);
+  assert.deepEqual(small.calls.map(({ type }) => type), ["fill"]);
+});
 
 function createWaterPathHarness({ withContext = true } = {}) {
   const liveContext = { name: "live-canvas" };
@@ -385,6 +455,8 @@ function createHarness({
     : null;
   const context = vm.createContext({
     isLakeRegion,
+    shouldDrawLakeOutline,
+    normalizeLakeStyleConfig,
     runtimeState: { showRivers, styleConfig: { rivers: { color: "#456789" } } },
     getSafeCanvasColor: (value, fallback) => value || fallback,
     Path2D: hasPath2D ? function Path2D() {} : undefined,
@@ -449,12 +521,13 @@ test("water metric separates cold path construction from a warm redraw", () => {
   assert.equal(h.metrics.at(-1).payload.pathBuildMs, 0);
 });
 
-test("lake shoreline follows the river hue while patch masks never draw a shore", () => {
-  const lake = { ...feature("lake"), properties: { water_type: "lake" } };
+test("large curated lake uses its configured outline while patch masks never draw a shore", () => {
+  const lake = { ...feature("lake_baikal"), properties: { id: "lake_baikal", water_type: "lake" } };
+  lake.parts[0].bounds = { minX: 0, minY: 0, maxX: 30, maxY: 20 };
   const path = { name: "lake-path" };
   const h = createHarness({ featurePath: path, showRivers: true });
   h.draw([lake]);
-  assert.deepEqual(h.calls.stroke, [{ path, color: "#456789", alpha: 0.22, width: 1.4 }]);
+  assert.deepEqual(h.calls.stroke, [{ path, color: "#54738f", alpha: 0.45, width: 0.7 }]);
   h.draw([lake], { maskOnly: true });
   assert.equal(h.calls.stroke.length, 1);
   assert.equal(h.calls.fill.length, 2);

@@ -32,8 +32,10 @@ export function createOceanLakeControlsController({
   invalidateOceanVisualState,
   invalidateOceanWaterInteractionVisualState,
   oceanFillColor,
+  oceanRegionNamesToggle,
   lakeLinkToOcean,
   lakeFillColor,
+  lakeOutlineToggle,
   oceanCoastalAccentRow,
   oceanCoastalAccentToggle,
   oceanAdvancedStylesToggle,
@@ -65,9 +67,11 @@ export function createOceanLakeControlsController({
   let pendingOceanVisualReason = "";
   const pendingOceanVisualInvalidations = new Map();
   const lakeStylePaths = [
-    "styleConfig.lakes.linkedToOcean",
-    "styleConfig.lakes.fillColor",
+    "lakes.linkedToOcean",
+    "lakes.fillColor",
+    "lakes.outlineEnabled",
   ];
+  const oceanRegionNamesStylePaths = ["ocean.showRegionNames"];
   let lakeHistoryBefore = null;
   const oceanDepthFieldEditor = createIntensityFieldEditorSection({
     runtimeState: state,
@@ -209,6 +213,9 @@ export function createOceanLakeControlsController({
         ? t("Linked to the current ocean fill color.", "ui")
         : "";
     }
+    if (lakeOutlineToggle) {
+      lakeOutlineToggle.checked = lakeConfig.outlineEnabled;
+    }
   };
 
   const oceanAdvancedStylesEnabled = () => state.styleConfig.ocean.experimentalAdvancedStyles === true;
@@ -311,6 +318,9 @@ export function createOceanLakeControlsController({
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
+    if (oceanRegionNamesToggle) {
+      oceanRegionNamesToggle.checked = state.styleConfig.ocean.showRegionNames === true;
+    }
     if (oceanStyleSelect) {
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
     }
@@ -355,6 +365,20 @@ export function createOceanLakeControlsController({
         }
         scheduleOceanVisualUpdate(invalidateOceanBackgroundVisualState, "ocean-fill");
       });
+    }
+
+    if (oceanRegionNamesToggle && oceanRegionNamesToggle.dataset.bound !== "true") {
+      oceanRegionNamesToggle.addEventListener("change", (event) => {
+        const before = captureHistoryState({ stylePaths: oceanRegionNamesStylePaths });
+        state.styleConfig.ocean.showRegionNames = !!event.target.checked;
+        pushHistoryEntry({
+          kind: "ocean-region-names",
+          before,
+          after: captureHistoryState({ stylePaths: oceanRegionNamesStylePaths }),
+        });
+        renderDirty("ocean-region-names");
+      });
+      oceanRegionNamesToggle.dataset.bound = "true";
     }
 
     if (oceanStyleSelect && oceanStyleSelect.dataset.bound !== "true") {
@@ -490,6 +514,16 @@ export function createOceanLakeControlsController({
         commitLakeHistory("lake-link");
       });
       lakeLinkToOcean.dataset.bound = "true";
+    }
+
+    if (lakeOutlineToggle && lakeOutlineToggle.dataset.bound !== "true") {
+      lakeOutlineToggle.addEventListener("change", (event) => {
+        beginLakeHistoryCapture();
+        syncLakeConfig().outlineEnabled = !!event.target.checked;
+        applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "lake-outline");
+        commitLakeHistory("lake-outline");
+      });
+      lakeOutlineToggle.dataset.bound = "true";
     }
 
     bindOceanVisualInput(lakeFillColor, (event, commitNow) => {

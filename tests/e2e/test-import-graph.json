@@ -1755,6 +1755,7 @@
     },
     "tests/e2e/tno_named_water_rendering.spec.js": {
       "directDependencies": [
+        "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "tests/e2e/support/playwright-app.js"
