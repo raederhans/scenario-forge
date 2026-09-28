@@ -2986,14 +2986,15 @@ function collectFailures() {
     "export function createCachedPassCompositorOwner({ constants = {}, getters = {}, helpers = {}, effects = {} } = {})",
     "function drawTransformedPass(passName, currentTransform, referenceTransform = null)",
     "function composeRenderPassesToTarget(",
-    "{ requireAllPasses = false } = {},",
+    "{ requireAllPasses = false, targetOffsetX = 0, targetOffsetY = 0 } = {},",
     "const cacheSnapshot = getRenderPassCacheSnapshot();",
     "const targetContext = getActiveTargetContext();",
     "const scaleRatio = current.k / Math.max(reference.k, 0.0001);",
     "const missingCanvasPassNames = [];",
     "const missingReferenceTransformPassNames = [];",
     "recordTransformedPassDiagnostics(passName, {",
-    "Math.round(-Number(layout?.offsetX || 0) * dpr)",
+    "Math.round((targetOffsetX - Number(layout?.offsetX || 0)) * dpr)",
+    "Math.round((targetOffsetY - Number(layout?.offsetY || 0)) * dpr)",
     "return Object.freeze({",
   ]) {
     if (!cachedPassCompositorOwner.includes(token)) {
@@ -5757,13 +5758,18 @@ function collectFailures() {
 
   for (const rule of ownershipRules) {
     const ownerSource = sources[rule.ownerPath];
+    // This owner delegates pure deferred-build bookkeeping to one local helper;
+    // all other imports and host/runtime dependencies remain forbidden.
+    const forbiddenSource = rule.ownerPath === FILES.politicalBackgroundRenderOwner
+      ? ownerSource.replace(/^import \{[^;]*\} from "\.\/political_background_build_helpers\.js";\r?\n/m, "")
+      : ownerSource;
     for (const token of rule.ownerTokens) {
       if (!ownerSource.includes(token)) {
         failures.push(`${rule.ownerPath} must own token: ${token}`);
       }
     }
     for (const token of rule.ownerForbiddenTokens || []) {
-      if (ownerSource.includes(token)) {
+      if (forbiddenSource.includes(token)) {
         failures.push(`${rule.ownerPath} must not own forbidden token: ${token}`);
       }
     }

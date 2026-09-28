@@ -423,7 +423,7 @@ test("HGO transformed draw failure records its reason and skips counters", () =>
   assert.equal(harness.metrics.at(-1).details.reason, "hgo-runtime-preview");
 });
 
-test("rejected reuse writes the reason before invalidation and interacting phase defers composite build", () => {
+test("rejected reuse writes the reason before invalidation and permits a copy-only composite build during input", () => {
   const harness = createHarness();
   harness.runtime.renderPhase = "interacting";
   harness.behavior.interactionReuseDecision = {
@@ -438,9 +438,9 @@ test("rejected reuse writes the reason before invalidation and interacting phase
     names.indexOf("setInteractionCompositeRejectedReason")
       < names.indexOf("invalidateInteractionComposite"),
   );
-  assert.equal(names.includes("buildInteractionComposite"), false);
+  assert.equal(names.includes("buildInteractionComposite"), true);
   assert.equal(harness.metrics.at(-1).name, "interactionCompositeUnavailable");
-  assert.equal(harness.metrics.at(-1).details.deferredBuild, true);
+  assert.equal(harness.metrics.at(-1).details.deferredBuild, false);
 });
 
 test("invalid reuse reason is recorded without redundant invalidation", () => {

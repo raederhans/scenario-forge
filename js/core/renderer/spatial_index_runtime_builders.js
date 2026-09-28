@@ -95,11 +95,27 @@ export function buildWaterSpatialItems({
   collectFeatureHitGeometries = () => [],
   computeProjectedGeoBounds = () => null,
   shouldExcludeWaterHitGeometry = () => false,
+  previousEntries = null,
+  nextEntries = null,
 } = {}) {
   const items = [];
   features.forEach((feature) => {
     const id = getFeatureId(feature);
     if (!id) return;
+    const source = String(feature?.properties?.__source || "primary");
+    const candidates = Array.isArray(previousEntries) ? previousEntries : [previousEntries];
+    const previous = candidates.map((entries) => entries?.get(id))
+      .find((entry) => entry && entry.geometry === feature.geometry && entry.source === source);
+    if (previous) {
+      const firstOrder = items.length;
+      const reused = previous.feature === feature && previous.items[0]?.drawOrder === firstOrder
+        ? previous.items
+        : previous.items.map((item, index) => ({ ...item, feature, drawOrder: firstOrder + index }));
+      items.push(...reused);
+      nextEntries?.set(id, { feature, geometry: feature.geometry, source, items: reused });
+      return;
+    }
+    const featureItems = [];
     const hitGeometries = collectFeatureHitGeometries(feature);
     let featureBounds;
     let featureBoundsComputed = false;
@@ -116,13 +132,14 @@ export function buildWaterSpatialItems({
         bounds = featureBounds;
       }
       if (!bounds) return;
-      items.push({
+      featureItems.push({
         id: `${id}::part:${partIndex}`,
+        drawOrder: items.length + featureItems.length,
         featureId: id,
         feature,
         hitGeometry,
         countryCode: "",
-        source: String(feature?.properties?.__source || "primary"),
+        source,
         minX: bounds.minX,
         minY: bounds.minY,
         maxX: bounds.maxX,
@@ -130,6 +147,8 @@ export function buildWaterSpatialItems({
         bboxArea: bounds.area,
       });
     });
+    items.push(...featureItems);
+    nextEntries?.set(id, { feature, geometry: feature.geometry, source, items: featureItems });
   });
   return items;
 }

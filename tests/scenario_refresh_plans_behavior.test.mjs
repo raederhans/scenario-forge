@@ -79,11 +79,13 @@ test("context layer fallback preserves active scenario political chunk authority
     };
     resolver.ensureLayerDataFromTopology();
     assert.equal(primaryPoliticalFallbackCount, 0);
-    assert.equal(toolbarRefreshCount, 2);
+    assert.equal(toolbarRefreshCount, 1);
 
     activeScenarioChunks.scenarioId = "modern_world";
     resolver.ensureLayerDataFromTopology();
-    assert.equal(toolbarRefreshCount, 3);
+    assert.equal(toolbarRefreshCount, 1);
+    assert.equal(primaryPoliticalFallbackCount, 1);
+    resolver.ensureLayerDataFromTopology();
     assert.equal(primaryPoliticalFallbackCount, 1);
 
     const baselineFixture = {
@@ -103,6 +105,100 @@ test("context layer fallback preserves active scenario political chunk authority
     assert.equal(primaryPoliticalFallbackCount, 2);
   } finally {
     globalThis.topojson = previousTopojson;
+  }
+});
+
+test("political promotion leaves unchanged context sources decoded while changed layers refresh", () => {
+  const layerNames = ["ocean", "land", "water_regions", "rivers", "urban", "physical", "special_zones"];
+  const feature = (id) => ({ type: "Feature", id, geometry: { type: "Point", coordinates: [0, 0] }, properties: {} });
+  const collection = (id) => ({ type: "FeatureCollection", features: [feature(id)] });
+  const objects = Object.fromEntries(layerNames.map(name => [name, { name, collection: collection(name) }]));
+  objects.political = { name: "political", geometries: [{}, {}], collection: collection("political") };
+  const state = {
+    topologyPrimary: { objects },
+    topologyBundleMode: "single",
+    activeScenarioId: "scenario-a",
+    activeScenarioChunks: { scenarioId: "scenario-a" },
+    scenarioPoliticalChunkData: collection("chunk"),
+    landData: collection("full"),
+    landDataFull: collection("full"),
+    contextLayerRevision: 0,
+  };
+  const previousTopojson = globalThis.topojson;
+  const previousD3 = globalThis.d3;
+  const decodes = new Map();
+  let boundsCalls = 0;
+  let waterResets = 0;
+  globalThis.topojson = { feature: (_topology, object) => {
+    decodes.set(object.name, (decodes.get(object.name) || 0) + 1);
+    return object.collection;
+  } };
+  globalThis.d3 = { geoBounds: () => { boundsCalls += 1; return [[0, 0], [1, 1]]; } };
+  try {
+    const resolver = createContextLayerResolverOwner({
+      runtimeState: state,
+      caches: { layerResolverCache: {} },
+      helpers: {
+        clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+        getContextLayerStableSourceToken: (_name, value) => value?.features?.[0]?.id || "none",
+        resetScenarioWaterCacheAdaptiveState: () => { waterResets += 1; },
+        getUrbanFeatureStableId: item => item.id,
+        getUrbanFeatureOwnerId: () => "owner",
+      },
+    });
+    resolver.ensureLayerDataFromTopology();
+    const initialDecodes = new Map(decodes);
+    const initialBoundsCalls = boundsCalls;
+    assert.equal(waterResets, 1);
+
+    state.scenarioPoliticalChunkData.features.push(feature("more-detail"));
+    state.scenarioDataGeneration = 1;
+    state.landDataFull = collection("larger-full");
+    resolver.ensureLayerDataFromTopology();
+    assert.deepEqual(decodes, initialDecodes);
+    assert.equal(boundsCalls, initialBoundsCalls);
+    assert.equal(waterResets, 1);
+
+    state.topologyDetail = { objects: { political: { name: "detail-political" } } };
+    resolver.ensureLayerDataFromTopology();
+    assert.deepEqual(decodes, initialDecodes);
+    assert.equal(boundsCalls, initialBoundsCalls);
+
+    objects.rivers = { name: "rivers", collection: collection("new-river") };
+    resolver.ensureLayerDataFromTopology();
+    assert.equal(decodes.get("rivers"), 2);
+    for (const name of layerNames.filter(name => name !== "rivers")) {
+      assert.equal(decodes.get(name), 1, `${name} should not be decoded again`);
+    }
+    assert.equal(state.riversData.features[0].id, "new-river");
+    assert.equal(waterResets, 1);
+
+    state.contextLayerExternalDataByName = { water_regions: collection("external-water") };
+    delete objects.water_regions;
+    resolver.ensureLayerDataFromTopology();
+    assert.equal(state.waterRegionsData.features[0].id, "external-water");
+    assert.equal(state.contextLayerSourceByName.water_regions, "external");
+    assert.equal(waterResets, 2);
+
+    objects.urban.collection.features[0].id = "mutated-urban";
+    state.contextLayerRevision += 1;
+    resolver.ensureLayerDataFromTopology();
+    assert.equal(state.urbanData.features[0].id, "mutated-urban");
+    assert.equal(state.urbanLayerCapability.adaptiveAvailable, true);
+    assert.equal(waterResets, 3, "a mutable water source revision must reset water cache");
+
+    state.specialZonesExternalData = collection("scenario-special");
+    resolver.ensureLayerDataFromTopology();
+    assert.equal(state.specialZonesData.features[0].id, "scenario-special");
+    assert.equal(state.contextLayerSourceByName.special_zones, "external");
+
+    state.activeScenarioId = "scenario-b";
+    state.specialZonesExternalData = collection("scenario-b-special");
+    resolver.ensureLayerDataFromTopology();
+    assert.equal(state.specialZonesData.features[0].id, "scenario-b-special");
+  } finally {
+    globalThis.topojson = previousTopojson;
+    globalThis.d3 = previousD3;
   }
 });
 

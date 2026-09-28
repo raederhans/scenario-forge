@@ -245,7 +245,7 @@ test("P2.2a cached pass compositor owns cached canvas transform math only", () =
     "export function createCachedPassCompositorOwner({ constants = {}, getters = {}, helpers = {}, effects = {} } = {})",
     "function drawTransformedPass(passName, currentTransform, referenceTransform = null)",
     "function composeRenderPassesToTarget(",
-    "{ requireAllPasses = false } = {},",
+    "{ requireAllPasses = false, targetOffsetX = 0, targetOffsetY = 0 } = {},",
     "const cacheSnapshot = getRenderPassCacheSnapshot();",
     "const targetContext = getActiveTargetContext();",
     "const scaleRatio = current.k / Math.max(reference.k, 0.0001);",
@@ -253,7 +253,8 @@ test("P2.2a cached pass compositor owns cached canvas transform math only", () =
     "const missingReferenceTransformPassNames = [];",
     "reason: \"missing-pass-canvas\"",
     "reason: \"missing-reference-transform\"",
-    "Math.round(-Number(layout?.offsetX || 0) * dpr)",
+    "Math.round((targetOffsetX - Number(layout?.offsetX || 0)) * dpr)",
+    "Math.round((targetOffsetY - Number(layout?.offsetY || 0)) * dpr)",
     "recordTransformedPassDiagnostics(passName, {",
     "return Object.freeze({",
   ]) {

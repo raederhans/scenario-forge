@@ -42,7 +42,9 @@ test("late bulk result cannot overwrite newer color, camera, scenario or topolog
     f => { f.state.activeScenarioId = "hoi4"; }, f => { f.state.topologyRevision++; }, f => { f.flags.bulk = false; }]) {
     const f = fixture(), pending = f.owner.preparePolitical(); mutate(f);
     const bitmap = f.finish(0); await pending;
-    assert.equal(bitmap.closed, 1); assert.equal(f.owner.drawPolitical(), null); assert.equal(f.scheduled.length, 0);
+    assert.equal(bitmap.closed, 1); assert.equal(f.owner.drawPolitical(), null);
+    assert.deepEqual(f.scheduled, f.flags.bulk ? ["geometry-worker-political-stale"] : [],
+      "an eligible latest stale result wakes preparation without committing obsolete pixels");
     f.owner.dispose();
   }
 });

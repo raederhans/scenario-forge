@@ -88,6 +88,7 @@ function createHarness(overrides = {}) {
     getPoliticalPassFineBaselineMismatch: () => "",
     getCachedPoliticalPassStaticSignature: () => "static",
     getPoliticalPathCacheHandle: () => ({ valid: true, map: new Map([["land-1", { path, geometryRef: feature.geometry }]]) }),
+    getRetainedPoliticalBackgroundPathHandle: () => null,
     getVisibleFrameIdentity: () => ({
       sceneGeneration: 2,
       scenarioDataGeneration: 3,
@@ -227,6 +228,41 @@ test("fine loop caches cold and replacement geometry and reuses paths across pan
   assert.equal(transforms.length, 4);
   assert.equal(builds.length, 2);
   assert.ok(h.events.some(event => Array.isArray(event) && event[0] === "fill" && event[1] === pathMap.get("land-1").path));
+});
+
+test("fine loop uses retained background geometry before an empty LRU and rejects replacement geometry", () => {
+  const paths = new Map();
+  const retainedPath = { retained: true };
+  let retainedHandleReads = 0;
+  let builds = 0;
+  const pathHandle = { valid: true, map: paths };
+  const h = createHarness({ helpers: {
+    getPoliticalPathCacheHandle: () => pathHandle,
+    getRetainedPoliticalBackgroundPathHandle: () => {
+      retainedHandleReads += 1;
+      return { getPath: (feature, id) => id === "land-1" && feature.geometry === h.feature.geometry
+        ? retainedPath : null };
+    },
+    getPoliticalFeaturePathEntry: (feature, options) => {
+      assert.equal(options.validatedHandle, pathHandle);
+      builds += 1;
+      const entry = { path: { built: true }, geometryRef: feature.geometry };
+      paths.set(options.featureId, entry);
+      return entry;
+    },
+  } });
+  const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
+  const draw = (feature) => h.owner.drawPoliticalFineFeatureLoop({
+    k: 1, identity, viewport: { visibleItems: [{ feature, drawOrder: 0 }] },
+  });
+  draw(h.feature);
+  assert.equal(builds, 0);
+  assert.equal(retainedHandleReads, 1);
+  assert.ok(h.events.some((event) => Array.isArray(event) && event[0] === "fill" && event[1] === retainedPath));
+  assert.ok(h.events.some((event) => Array.isArray(event) && event[0] === "stroke" && event[1] === retainedPath));
+  draw({ ...h.feature, geometry: { type: "Polygon", coordinates: [] } });
+  assert.equal(builds, 1);
+  assert.equal(retainedHandleReads, 2);
 });
 
 test("exact fine drawing persists cold geometry beyond the idle warmup queue budget", () => {

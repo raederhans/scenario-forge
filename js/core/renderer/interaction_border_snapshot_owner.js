@@ -1,3 +1,5 @@
+import { coversViewport, getSurfaceCoverage, transformCoverage } from "./cached_surface_coverage.js";
+
 export function createInteractionBorderSnapshotOwner({
   state,
   constants = {},
@@ -75,6 +77,15 @@ export function createInteractionBorderSnapshotOwner({
     if (!state.landData?.features?.length) {
       invalidateInteractionBorderSnapshot("empty-land-data");
       return false;
+    }
+    const previous = getInteractionBorderSnapshotState();
+    const expected = buildInteractionBorderSnapshotLayout();
+    if (previous.valid && previous.canvas && previous.referenceTransform
+      && previous.layout?.dpr === expected.dpr
+      && previous.canvas.width === expected.pixelWidth && previous.canvas.height === expected.pixelHeight
+      && coversViewport(transformCoverage(getSurfaceCoverage(previous.canvas, previous.layout),
+        previous.referenceTransform, transform), state.width, state.height)) {
+      return true;
     }
     const canvas = ensureInteractionBorderSnapshotCanvas();
     const snapshot = getInteractionBorderSnapshotState();

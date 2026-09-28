@@ -197,6 +197,7 @@ export function createTransformedFrameCompositorOwner({
   function drawTransformedFrameFromCaches(timings, { interactiveBorders = false } = {}) {
     const currentTransform = getCurrentTransform();
     const compositeStart = nowMs();
+    if (effects.ensureTransformedPassCoverage?.(timings) === false) return false;
     const cache = getRenderPassCacheSnapshot();
     const activeTransformedPassNames = getActiveTransformedFramePassNames();
     const transformedPasses = activeTransformedPassNames.filter((passName) => (
@@ -245,7 +246,9 @@ export function createTransformedFrameCompositorOwner({
         invalidateInteractionComposite(compositeReuseDecision.reason);
       }
     }
-    const canBuildCompositeNow = getRenderPhase() !== renderPhaseInteracting;
+    // Building a composite only copies already painted pass canvases, including
+    // their margins. It must also be available on the first input frame.
+    const canBuildCompositeNow = true;
     const canDrawDirtyInteractionPasses = allowDirtyFastFrame
       && !canReuseComposite
       && interactionCompositePassNames.every((passName) => canDrawTransformedPass(passName, cache, {

@@ -1,5 +1,6 @@
 import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
+import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
 import { applyFeaturePaintState } from "./state/color_state.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
 import { createPoliticalPatchPreviewBudget } from "./renderer/political_patch_preview_budget.js";
@@ -25,6 +26,7 @@ import { createPoliticalDerivedStateCache } from "./renderer/political_derived_s
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
+import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
@@ -680,6 +682,8 @@ let staticMeshCache = {
 };
 let countryFillPaletteOwner = null;
 let geometryRasterRuntimeOwner = null;
+let politicalEntriesInvalidationEpoch = 0;
+let overviewFrameOwner = null;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
 let contourHostFillColorCache = new WeakMap();
@@ -2424,6 +2428,13 @@ function getSpatialIndexRuntimeOwner() {
       getEffectiveWaterRegionFeatures,
       getEffectiveSpecialRegionFeatures,
       collectFeatureHitGeometries: collectSafeWaterRegionGeometryParts,
+      getSecondarySpatialCacheIdentity: () => [
+        runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+        getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+        getObjectIdentityToken(rendererSurfaceHost.getPathSvg()),
+        getObjectIdentityToken(rendererSurfaceHost.getPathCanvas()),
+        runtimeState.contextLayerRevision,
+      ].join(":"),
       computeProjectedGeoBounds,
       shouldExcludeWaterHitGeometry,
     },
@@ -2479,6 +2490,7 @@ function getCachedPassCompositorOwner() {
   cachedPassCompositorOwner = createCachedPassCompositorOwner({
     constants: {
       renderPassNames: RENDER_PASS_NAMES,
+      paintedOverscanLimit: VIEWPORT_CULL_OVERSCAN_PX,
     },
     getters: {
       getActiveTargetContext: () => rendererSurfaceHost.getContext(),
@@ -2552,6 +2564,9 @@ function getTransformedFrameCompositorOwner() {
       },
       invalidateInteractionComposite,
       buildInteractionComposite,
+      ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
+        timings, isHgoRuntimePreviewReady() ? ["hgoPreview"] : INTERACTION_COMPOSITE_PASS_NAMES,
+      ),
       canDrawInteractionComposite,
       setPendingExactPoliticalFastFrame: (value) => {
         setPendingExactPoliticalFastFrameState(runtimeState, value);
@@ -2638,6 +2653,7 @@ function getProjectedGeometryBoundsOwner() {
       getLandFeatures: () => runtimeState.landData?.features || [],
       getRiverFeatures: () => runtimeState.riversData?.features || [],
       getActiveScenarioId: () => runtimeState.activeScenarioId || "",
+      getContextLayerRevision: () => runtimeState.contextLayerRevision,
       getD3: () => globalThis.d3,
     },
     helpers: {
@@ -3228,6 +3244,19 @@ function getGeometryRasterRuntimeOwner() {
         && !isPoliticalRasterWorkerBitmapEnabled(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
+      // All supported political edits invalidate their pass. Collection identities
+      // also cover rebuilt visible sets before that pass's next preparation.
+      getPoliticalEntriesVersion: () => [
+        politicalEntriesInvalidationEpoch,
+        getObjectIdentityToken(runtimeState.renderPassCache),
+        getObjectIdentityToken(runtimeState.spatialItems),
+        getObjectIdentityToken(runtimeState.spatialGrid),
+        getObjectIdentityToken(runtimeState.landData?.features),
+        getObjectIdentityToken(runtimeState.colors),
+        runtimeState.colorRevision, runtimeState.mapSemanticMode,
+        runtimeState.scenarioShellOverlayRevision, runtimeState.sovereigntyRevision,
+        runtimeState.contextLayerRevision, getRuntimeChunkSelectionVersion(),
+      ].join(":"),
       getPoliticalPatchStaticSignature: () => getCachedPoliticalPassStaticSignature(
         getRenderPassSignature("political", runtimeState.zoomTransform)),
       getPoliticalEntryPixelBounds: ({ feature, id }) => {
@@ -3251,7 +3280,7 @@ function getGeometryRasterRuntimeOwner() {
       getFeatureId,
       excludeVisual: shouldExcludePoliticalVisualFeature,
       excludeHit: shouldExcludePoliticalInteractionFeature,
-      skipVisual: (feature) => shouldSkipFeature(feature, ...getLogicalCanvasDimensions()),
+      skipVisual: (feature, width, height) => shouldSkipFeature(feature, width, height),
       resolveFillColor: (feature, id, index) => getPoliticalPartialRepaintOwner().getPoliticalFeatureFillColor(feature, id, index),
       resolveStrokeColor: (feature, fill) => isAtlantropaSeaFeature(feature) ? getAtlantropaSeaPoliticalStrokeColor() : fill,
       keyToColor: keyToHitColor,
@@ -3440,6 +3469,7 @@ function getPoliticalPartialRepaintOwner() {
       getPoliticalFeaturePathEntry,
       isPoliticalFeaturePathEntryCurrent,
       rectsIntersect,
+      getRetainedPoliticalBackgroundPathHandle: (transform) => getPoliticalBackgroundRenderOwner().getRetainedPoliticalBackgroundPathHandle(transform),
       screenRectToProjectedRect,
       collectLandSpatialItemsForProjectedRects,
       getFeatureScreenBounds,
@@ -3524,6 +3554,15 @@ function getRenderPipelinePassesOwner() {
       getContextScenarioReuseDecision,
       getExactAfterSettleControllerState,
       getPassReferenceTransform,
+      getPassCoverage: (passName, transform) => getCachedPassCompositorOwner().getPassCoverage(passName, transform),
+      prepareRenderPassAsync: (passName) => passName === "political"
+        ? getGeometryRasterRuntimeOwner().preparePolitical({ force: true }) : null,
+      canYieldRenderPassWork: () => runtimeState.firstVisibleFramePainted && !hasPendingPoliticalColorEdit(),
+      nowMs,
+      // The active render boundary still coalesces requests until its finally
+      // block. Queue after that boundary closes so the next slice is not lost.
+      requestRenderContinuation: (reason) => queueMicrotask(() => requestRendererRender(reason)),
+      rebuildResolvedColors,
       getRenderPassCacheState,
       getRenderPassSignature,
       incrementPerfCounter,
@@ -3575,6 +3614,7 @@ function getDrawCanvasOrchestrationOwner() {
       promoteDeferredColorRenderToIdle,
       drawTransformedFrameFromCaches,
       drawLastGoodFrameFallback,
+      drawOverviewFrameFallback,
       noteMissingVisibleFrameSkippedDuringInteraction,
       drawBaseVisibleFrameFallback,
       resetContextBreakdownForExactFrame,
@@ -3585,7 +3625,7 @@ function getDrawCanvasOrchestrationOwner() {
       recordRenderPerfMetric,
       finalizePendingExactAfterSettleRefreshAfterPaint,
       ensureIdleRenderPasses: (frameTimings, activeRenderPassNames) => {
-        getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
+        return getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
       },
       commitLastFrame: ({ phase, totalMs, timings, transform }) => {
         getRenderPassCacheState().lastFrame = {
@@ -4080,6 +4120,7 @@ function getCommittedFrameIdentity(transform, metadata) {
 }
 
 function clearLastGoodFrame(reason = "clear") {
+  overviewFrameOwner?.clear();
   return getRenderCacheOwner().clearLastGoodFrame(reason);
 }
 
@@ -4105,6 +4146,7 @@ function getMutationPassNames(mutation = {}) {
 
 function applyRenderPassInvalidationEffects(mutation = {}) {
   const targetPassNames = getMutationPassNames(mutation);
+  if (targetPassNames.includes("political")) politicalEntriesInvalidationEpoch++;
   const reason = mutation.reason || "unspecified";
   const hostFollowUps = mutation.effects?.hostFollowUps || {};
   if (hostFollowUps.needsRenderPassDiagnostics || targetPassNames.length) {
@@ -4215,6 +4257,7 @@ function clearRenderPassReferenceTransforms(passNames = null) {
   const mutation = getRenderCacheOwner().clearRenderPassReferenceTransforms(passNames);
   const hostFollowUps = mutation.effects?.hostFollowUps || {};
   if (hostFollowUps.needsPoliticalPathCacheInvalidation || mutation.politicalPathCacheInvalidated) {
+    politicalEntriesInvalidationEpoch++;
     cancelPoliticalPathWarmup(mutation.reason || "clear-reference-transform");
   }
   if (hostFollowUps.needsInteractionBorderSnapshotInvalidation || mutation.interactionBorderSnapshotInvalidated) {
@@ -4253,6 +4296,7 @@ function getRenderPassLayout(passName) {
 }
 
 function resizeRenderPassCanvases(passNames = RENDER_PASS_NAMES) {
+  overviewFrameOwner?.clear();
   exactCompositeReuseOwner?.invalidate();
   return getRenderCacheOwner().resizeRenderPassCanvases(passNames);
 }
@@ -4335,6 +4379,41 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
     paintSource: "last-good-capture",
     transform,
     committedFrameIdentity,
+  });
+  if (reason === "exact-frame") {
+    getOverviewFrameOwner().capture(targetCanvas, transform, runtimeState.dpr);
+  }
+  return true;
+}
+
+function getOverviewFrameOwner() {
+  overviewFrameOwner ||= createOverviewFrameOwner({
+    getIdentity: (referenceTransform) => {
+      const identity = getCommittedFrameIdentity(referenceTransform);
+      return JSON.stringify([
+        getCommittedFrameKeySignature(identity.commitKey),
+        identity.metadata.politicalDataStage, identity.metadata.finePoliticalCacheReady,
+        getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+        getActiveRenderPassNames().map((name) => [name, getRenderPassSignature(name, referenceTransform)]),
+      ]);
+    },
+    recordMetric: recordRenderPerfMetric,
+  });
+  return overviewFrameOwner;
+}
+
+function drawOverviewFrameFallback(currentTransform) {
+  if (!overviewFrameOwner || !runtimeState.firstVisibleFramePainted) return false;
+  const context = rendererSurfaceHost.getContext();
+  const dpr = Math.max(1, runtimeState.dpr || 1);
+  const width = context.canvas.width / dpr, height = context.canvas.height / dpr;
+  const passes = getActiveTransformedFramePassNames();
+  // Prefer the current detailed passes when their painted area is sufficient.
+  if (!passes.some((name) => !coversViewport(
+    getCachedPassCompositorOwner().getPassCoverage(name, currentTransform), width, height))) return false;
+  if (!overviewFrameOwner.draw(context, currentTransform, dpr)) return false;
+  recordVisibleFrameTransactionMetric("reused", {
+    reason: "coverage-overview", paintSource: "overview-frame", transform: currentTransform,
   });
   return true;
 }
@@ -4511,6 +4590,16 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
   const canvasScaleY = canvasSizeMismatch ? identity.pixelHeight / framePixelHeight : 1;
   const dx = current.x - (reference.x * scaleRatio);
   const dy = current.y - (reference.y * scaleRatio);
+  // A viewport-sized snapshot cannot fill newly exposed land after a pan or
+  // zoom-out. Reject it before clearing the visible canvas.
+  const coverage = transformCoverage({
+    minX: 0, minY: 0,
+    maxX: fallbackCanvas.width * canvasScaleX / runtimeState.dpr,
+    maxY: fallbackCanvas.height * canvasScaleY / runtimeState.dpr,
+  }, reference, current);
+  if (!coversViewport(coverage, identity.pixelWidth / identity.dpr, identity.pixelHeight / identity.dpr)) {
+    return reject("coverage-mismatch");
+  }
   resetMainCanvas();
   rendererSurfaceHost.getContext().save();
   rendererSurfaceHost.getContext().setTransform(1, 0, 0, 1, 0, 0);
@@ -12482,14 +12571,22 @@ function canBuildInteractionComposite(cache = getRenderPassCacheState()) {
 function buildInteractionComposite(currentTransform, timings) {
   if (!rendererSurfaceHost.getContext()?.canvas || !canBuildInteractionComposite(getRenderPassCacheState())) return false;
   const cache = getRenderPassCacheState();
+  const identity = getVisibleFrameIdentity(currentTransform);
+  const coverage = getCachedPassCompositorOwner().getCompositeCoverage(INTERACTION_COMPOSITE_PASS_NAMES, currentTransform);
+  if (!coversViewport(coverage, identity.pixelWidth / identity.dpr, identity.pixelHeight / identity.dpr)) return false;
   const compositeCanvas = ensureInteractionCompositeCanvas();
   const compositeContext = compositeCanvas.getContext("2d");
   if (!compositeContext) return false;
+  invalidateInteractionComposite("composite-rebuild");
+  const layout = cache.interactionComposite.layout;
   const startedAt = nowMs();
   compositeContext.setTransform(1, 0, 0, 1, 0, 0);
   compositeContext.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
-  composeRenderPassesToTarget(compositeContext, INTERACTION_COMPOSITE_PASS_NAMES, currentTransform);
-  const identity = getVisibleFrameIdentity(currentTransform);
+  const result = composeRenderPassesToTarget(compositeContext, INTERACTION_COMPOSITE_PASS_NAMES, currentTransform, {
+    requireAllPasses: true, targetOffsetX: layout.offsetX, targetOffsetY: layout.offsetY,
+  });
+  if (!result.ok) return false;
+  cache.interactionComposite.coverage = intersectCoverage(coverage, getSurfaceCoverage(compositeCanvas, layout));
   cache.interactionComposite.referenceTransform = cloneZoomTransform(currentTransform);
   cache.interactionComposite.signature = getInteractionCompositeSignature(cache);
   cache.interactionComposite.valid = true;
@@ -12559,7 +12656,10 @@ function drawInteractionComposite(
   }
   rendererSurfaceHost.getContext().save();
   rendererSurfaceHost.getContext().setTransform(1, 0, 0, 1, 0, 0);
-  rendererSurfaceHost.getContext().translate(dx * runtimeState.dpr, dy * runtimeState.dpr);
+  rendererSurfaceHost.getContext().translate(
+    (dx - Number(composite.layout?.offsetX || 0) * scaleRatio) * runtimeState.dpr,
+    (dy - Number(composite.layout?.offsetY || 0) * scaleRatio) * runtimeState.dpr,
+  );
   rendererSurfaceHost.getContext().scale(scaleRatio, scaleRatio);
   rendererSurfaceHost.getContext().drawImage(composite.canvas, 0, 0);
   rendererSurfaceHost.getContext().restore();

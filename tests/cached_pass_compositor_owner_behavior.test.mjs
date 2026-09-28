@@ -121,6 +121,8 @@ test("factory validates the bounded dependency surface and freezes its API", () 
   const harness = createHarness();
   assert.equal(Object.isFrozen(harness.owner), true);
   assert.deepEqual(Object.keys(harness.owner), [
+    "getPassCoverage",
+    "getCompositeCoverage",
     "drawTransformedPass",
     "composeRenderPassesToTarget",
   ]);
@@ -178,6 +180,32 @@ test("each public method captures one normalized cache snapshot regardless of pa
     { ok: true },
   );
   assert.equal(requireAllHarness.cacheSnapshotReads, 1);
+});
+
+test("padded composite copies align both unchanged and transformed pass pixels", () => {
+  const harness = createHarness();
+  const target = createCanvasContext("padded");
+  harness.owner.composeRenderPassesToTarget(target, ["background", "labels"], { k: 2, x: 10, y: 20 }, {
+    targetOffsetX: 3, targetOffsetY: 4, requireAllPasses: true,
+  });
+  const blits = target.calls.filter(([op]) => op === "drawImage");
+  assert.deepEqual(blits[0], ["drawImage", harness.canvases.background, 0, 0]);
+  assert.deepEqual(target.calls.find(([op]) => op === "translate"), ["translate", 21, 37]);
+});
+
+test("coverage uses the intersection of painted bounds rather than composite allocation", () => {
+  const harness = createHarness({ constants: { paintedOverscanLimit: 96 } });
+  Object.assign(harness.canvases.background, { width: 2600, height: 1800 });
+  Object.assign(harness.canvases.labels, { width: 2000, height: 1200 });
+  harness.layouts.background = { dpr: 2, offsetX: 150, offsetY: 150, logicalWidth: 1000, logicalHeight: 600 };
+  harness.layouts.labels = { dpr: 2, offsetX: 0, offsetY: 0, logicalWidth: 1000, logicalHeight: 600 };
+  harness.references.background = harness.references.labels = { x: 0, y: 0, k: 1 };
+  assert.deepEqual(harness.owner.getPassCoverage("background", { x: 0, y: 0, k: 1 }), {
+    minX: -96, minY: -96, maxX: 1096, maxY: 696,
+  });
+  assert.deepEqual(harness.owner.getCompositeCoverage(["background", "labels"], { x: 0, y: 0, k: 1 }), {
+    minX: 0, minY: 0, maxX: 1000, maxY: 600,
+  });
 });
 
 test("drawTransformedPass preserves missing-input and explicit-reference behavior", () => {
@@ -545,7 +573,7 @@ test("compose reads requireAllPasses once before capturing the cache snapshot", 
 
 test("owner source stays free of renderer globals imports and dynamic dispatch helpers", () => {
   const source = fs.readFileSync(OWNER_PATH, "utf8");
-  assert.doesNotMatch(source, /^\s*import\s/m);
+  assert.deepEqual([...source.matchAll(/^import .* from "(.*)";/gm)].map((match) => match[1]), ["./cached_surface_coverage.js"]);
   for (const token of [
     "map_renderer.js",
     "RendererRuntimeContext",

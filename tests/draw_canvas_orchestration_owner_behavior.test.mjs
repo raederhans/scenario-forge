@@ -10,6 +10,17 @@ const CONSTANTS = Object.freeze({
 });
 const SUMMARY_OPTIONS = Object.freeze({ includeSummary: true });
 
+test("settling fallback waits for exact geometry without composing or capturing incomplete passes", () => {
+  const { calls, owner } = createHarness({ phase: "settling", firstVisible: true, idlePassesReady: false });
+  const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.status, "waiting-worker");
+  assert.equal(summary.frameMode, "previous-pixels");
+  assert.ok(names(calls).includes("ensureIdleRenderPasses"));
+  for (const name of ["composeCachedPasses", "commitLastFrame", "captureLastGoodFrame", "finalizePendingExactAfterSettleRefreshAfterPaint"]) {
+    assert.ok(!names(calls).includes(name), name);
+  }
+});
+
 function names(calls) {
   return calls.map((call) => call[0]);
 }
@@ -35,6 +46,8 @@ function createHarness({
   onLastGood = null,
   onEnsureIdleTimings = null,
   prepareAsyncFrame = null,
+  idlePassesReady = true,
+  overview = false,
 } = {}) {
   const calls = [];
   let currentPhase = phase;
@@ -55,7 +68,7 @@ function createHarness({
   const effects = {
     ...(prepareAsyncFrame ? { prepareAsyncFrame: () => {
       calls.push(["prepareAsyncFrame"]);
-      return prepareAsyncFrame();
+      return prepareAsyncFrame({ phase: currentPhase, deferExact: currentDeferExact });
     } } : {}),
     ensureLayerDataFromTopology: () => calls.push(["ensureLayerDataFromTopology"]),
     incrementPerfCounter: (name) => calls.push(["incrementPerfCounter", name]),
@@ -88,6 +101,7 @@ function createHarness({
       calls.push(["ensureIdleRenderPasses", passNames]);
       timings.idle = 7;
       if (onEnsureIdleTimings) onEnsureIdleTimings(timings);
+      return idlePassesReady;
     },
     composeCachedPasses: (passNames) => {
       calls.push(["composeCachedPasses", passNames]);
@@ -145,9 +159,28 @@ function createHarness({
       return value;
     },
   };
+  if (overview) effects.drawOverviewFrameFallback = () => { calls.push(["drawOverviewFrameFallback"]); return true; };
   const owner = createDrawCanvasOrchestrationOwner({ constants: CONSTANTS, getters, effects });
   return { calls, effectiveTransform, owner, rawTransform: currentRawTransform };
 }
+
+test("valid overview publishes during coverage recovery without blocking on fine preparation or recapturing", () => {
+  const { calls, owner }=createHarness({phase:"interacting",firstVisible:true,overview:true});
+  const summary=owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.frameMode,"overview");
+  assert.equal(summary.usedLastGoodFallback,true);
+  assert.ok(names(calls).includes("commitLastFrame"));
+  for(const name of ["drawTransformedFrameFromCaches","ensureIdleRenderPasses","captureLastGoodFrame"])
+    assert.ok(!names(calls).includes(name),name);
+});
+
+test("overview does not replace final exact idle rendering", () => {
+  const {calls,owner}=createHarness({phase:"idle",firstVisible:true,overview:true});
+  const summary=owner.drawCanvasFrame(SUMMARY_OPTIONS);
+  assert.equal(summary.frameMode,"exact");
+  assert.ok(!names(calls).includes("drawOverviewFrameFallback"));
+  assert.ok(names(calls).includes("composeCachedPasses"));
+});
 
 test("readiness failure returns before side effects and counters", () => {
   const { calls, owner } = createHarness({ ready: false });
@@ -166,7 +199,7 @@ test("pending async preparation retains existing pixels without composing or com
   assert.equal(waiting.status, "waiting-worker");
   assert.equal(waiting.frameMode, "previous-pixels");
   assert.equal(waiting.drewFrame, false);
-  assert.deepEqual(names(calls), ["isFrameSurfaceReady", "ensureLayerDataFromTopology", "prepareAsyncFrame"]);
+  assert.deepEqual(names(calls), ["isFrameSurfaceReady", "ensureLayerDataFromTopology", "promoteDeferredColorRenderToIdle", "prepareAsyncFrame"]);
   pending = false; calls.length = 0;
   const ready = owner.drawCanvasFrame(SUMMARY_OPTIONS);
   assert.equal(ready.frameMode, "exact");
@@ -181,11 +214,11 @@ test("exact idle success preserves order and final frames counter", () => {
   assert.deepEqual(names(calls), [
     "isFrameSurfaceReady",
     "ensureLayerDataFromTopology",
+    "promoteDeferredColorRenderToIdle",
     "incrementPerfCounter",
     "clearPoliticalPatchOverlayIfStale",
     "getRenderPhase",
     "getDeferExactAfterSettle",
-    "promoteDeferredColorRenderToIdle",
     "nowMs",
     "getRenderPhase",
     "getDeferExactAfterSettle",
@@ -205,7 +238,7 @@ test("exact idle success preserves order and final frames counter", () => {
     "incrementPerfCounter",
   ]);
   assert.equal(summary.frameMode, "exact");
-  assert.equal(calls[2][1], "drawCanvas");
+  assert.equal(calls[3][1], "drawCanvas");
   assert.deepEqual(calls.find((call) => call[0] === "commitLastFrame")?.[1], {
     phase: "idle",
     totalMs: 42,
@@ -245,7 +278,7 @@ test("last-frame commit reads phase before total time before raw transform", () 
   });
 });
 
-test("promotion re-reads phase and uses transformed fast frame", () => {
+test("promotion re-reads phase and uses exact frame", () => {
   const { calls, owner, rawTransform } = createHarness({
     phase: "settling",
     deferExact: true,
@@ -256,9 +289,19 @@ test("promotion re-reads phase and uses transformed fast frame", () => {
   const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
 
   assert.equal(summary.frameMode, "exact");
-  assert.deepEqual(calls.find((call) => call[0] === "cancelPoliticalPathWarmup"), ["cancelPoliticalPathWarmup", "drawCanvas-non-idle"]);
+  assert.equal(calls.some((call) => call[0] === "cancelPoliticalPathWarmup"), false);
   assert.equal(calls.some((call) => call[0] === "drawTransformedFrameFromCaches"), false);
   assert.deepEqual(calls.find((call) => call[0] === "captureLastGoodFrame"), ["captureLastGoodFrame", "exact-frame", rawTransform]);
+});
+
+test("a promoted color recovery prepares worker geometry before any synchronous exact drawing", () => {
+  const { calls, owner } = createHarness({ phase: "settling", deferExact: true,
+    promoteToPhase: "idle", promoteToDefer: false, firstVisible: true,
+    prepareAsyncFrame: ({ phase, deferExact }) => phase === "idle" && !deferExact,
+  });
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).status, "waiting-worker");
+  assert.equal(names(calls).includes("ensureIdleRenderPasses"), false);
+  assert.equal(names(calls).includes("composeCachedPasses"), false);
 });
 
 test("transformed success marks fast frame and captures clean non-interacting frame", () => {

@@ -171,12 +171,15 @@ test("actual transformed-owner buffer injection invalidates prior exact pixels",
 
 test("actual resize facade invalidates even when dimensions return to the same values", () => {
   const h = harness(), names = ["base", "overlay"];
+  let overviewClears = 0;
   h.render(names);
   const resize = realFunction("resizeRenderPassCanvases", {
     exactCompositeReuseOwner: h.owner, RENDER_PASS_NAMES: names,
+    overviewFrameOwner: { clear() { overviewClears += 1; } },
     getRenderCacheOwner: () => ({ resizeRenderPassCanvases() { h.cache.canvases.overlay.pixels = [null, null]; } }),
   });
   resize();
+  assert.equal(overviewClears, 1);
   h.render(names);
   assert.deepEqual(h.main.pixels, [1, 1]);
   assert.equal(h.counters.composites, 2);

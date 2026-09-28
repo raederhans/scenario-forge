@@ -31,7 +31,7 @@ function fixture({ injectedClient = null } = {}) {
     requests[index].resolve({ bitmap, renderedCount: 1 });
     return bitmap;
   };
-  return { owner, state, flags, requests, renders, commits, paints, finish, projection, layout, h };
+  return { owner, state, flags, requests, renders, commits, paints, finish, projection, layout, context, h };
 }
 test("prepare gates, forced exact preparation, dimensions and fine-only drawing preserve style ports", async () => {
   const f = fixture();
@@ -60,6 +60,28 @@ test("prepare gates, forced exact preparation, dimensions and fine-only drawing 
   assert.equal(f.owner.drawPolitical(), null, "edits must use synchronous fine drawing");
   f.owner.dispose(); assert.equal(bitmap.closes, 1);
 });
+
+test("political entry filtering uses pass dimensions across active surface switches", async () => {
+  const f = fixture();
+  f.context.canvas = { width: 100, height: 100 };
+  const seen = [];
+  f.h.skipVisual = (_feature, width, height) => {
+    seen.push({ width, height, activeSurfaceWidth: f.context.canvas.width });
+    return width !== f.layout.paddedWidth || height !== f.layout.paddedHeight;
+  };
+  const pending = f.owner.prepareFrame();
+  assert.equal(pending, true);
+  assert.equal(f.requests[0].input.entries.length, 1);
+  f.context.canvas = { width: 200, height: 200 };
+  const bitmap = f.finish(0);
+  await tick();
+  assert.equal(f.owner.drawPolitical().renderedCount, 1);
+  assert.equal(bitmap.closes, 0);
+  assert.deepEqual(seen.map(({ width, height }) => [width, height]),
+    seen.map(() => [f.layout.paddedWidth, f.layout.paddedHeight]));
+  assert.ok(seen.some(({ activeSurfaceWidth: width }) => width === 200));
+  f.owner.dispose();
+});
 test("current political identity detects exact camera, projection, scene, geometry and resolved color", async () => {
   for (const change of [
     (f) => { f.state.zoomTransform.x += 0.000001; },
@@ -71,8 +93,100 @@ test("current political identity detects exact camera, projection, scene, geomet
     const f = fixture(); const pending = f.owner.preparePolitical(); change(f);
     const bitmap = f.finish(0); await pending;
     assert.equal(bitmap.closes, 1); assert.equal(f.owner.drawPolitical(), null);
-    assert.equal(f.renders.length, 0);
+    assert.deepEqual(f.renders, ["geometry-worker-political-stale"]);
+    const replacement = f.owner.preparePolitical();
+    assert.ok(replacement instanceof Promise, "latest stale completion schedules preparation for the new identity");
+    const current = f.finish(1); await replacement;
+    assert.equal(f.owner.drawPolitical().renderedCount, 1);
+    assert.equal(current.closes, 0);
+    f.owner.dispose();
   }
+});
+
+test("versioned political snapshot avoids repeated collection, color resolution and description", async () => {
+  const f = fixture();
+  let version = 1;
+  f.h.getPoliticalEntriesVersion = () => version;
+  const calls = { collect: 0, color: 0, signature: 0 };
+  for (const [port, count] of [["collectPoliticalItems", "collect"],
+    ["resolveFillColor", "color"], ["getPoliticalSignature", "signature"]]) {
+    const original = f.h[port];
+    f.h[port] = (...args) => { calls[count]++; return original(...args); };
+  }
+  const pending = f.owner.preparePolitical();
+  const preparedCalls = { ...calls };
+  assert.equal(preparedCalls.collect, 1);
+  assert.equal(preparedCalls.color, 1);
+  const bitmap = f.finish(0); await pending;
+  assert.equal(f.owner.drawPolitical().renderedCount, 1);
+  assert.equal(f.owner.drawPolitical().renderedCount, 1);
+  assert.equal(f.owner.preparePolitical({ force: true }), null);
+  assert.equal(calls.collect, preparedCalls.collect);
+  assert.equal(calls.color, preparedCalls.color);
+  assert.ok(calls.signature > preparedCalls.signature, "cheap signatures still guard each use");
+  version++;
+  f.flags.color = "#abcdef";
+  assert.equal(f.owner.drawPolitical(), null);
+  assert.equal(calls.collect, 2);
+  assert.equal(calls.color, 2);
+  assert.ok(f.owner.preparePolitical({ force: true }) instanceof Promise);
+  assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
+  const replacement = f.finish(1); await tick();
+  assert.equal(f.owner.drawPolitical().renderedCount, 1);
+  assert.equal(bitmap.closes, 1);
+  assert.equal(replacement.closes, 0);
+  f.owner.dispose();
+});
+
+test("versioned political snapshot invalidates on scene, geometry, color, projection, visible set, order and camera", async () => {
+  const cases = [
+    ["scene", (f) => { f.state.activeScenarioId = "hoi4"; }],
+    ["geometry", (f) => { f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] }; }],
+    ["color", (f) => { f.flags.color = "#abcdef"; }],
+    ["projection", (f) => { markProjectionGeometryChanged(f.projection); }],
+    ["visible set", (f) => { f.flags.excluded = true; }],
+    ["order", (f) => { f.h.orderPoliticalItems = (items) => items.slice().reverse(); }],
+    ["camera", (f) => { f.state.zoomTransform.x += 0.000001; }],
+  ];
+  for (const [name, change] of cases) {
+    const f = fixture();
+    let version = 1;
+    f.h.getPoliticalEntriesVersion = () => version;
+    if (name === "order") {
+      const extra = { geometry: { type: "Point", coordinates: [10, 10] } };
+      f.h.collectPoliticalItems = () => [
+        { id: "a", feature: f.state.landData.features[0], drawOrder: 0 },
+        { id: "b", feature: extra, drawOrder: 1 },
+      ];
+    }
+    const pending = f.owner.preparePolitical();
+    const originalIdentity = f.requests[0].input.identity;
+    change(f);
+    version++;
+    const stale = f.finish(0); await pending;
+    assert.equal(stale.closes, 1, `${name}: stale bitmap closed`);
+    assert.equal(f.owner.drawPolitical(), null, `${name}: stale frame rejected`);
+    assert.deepEqual(f.renders, ["geometry-worker-political-stale"], `${name}: next frame requested`);
+    const replacement = f.owner.preparePolitical();
+    assert.ok(replacement instanceof Promise, `${name}: replacement scheduled`);
+    assert.notEqual(f.requests[1].input.identity, originalIdentity, `${name}: identity changed`);
+    f.finish(1); await replacement;
+    assert.equal(f.owner.drawPolitical().renderedCount, 1, `${name}: replacement accepted`);
+    f.owner.dispose();
+  }
+});
+
+test("versioned snapshot detects direct geometry replacement without an epoch bump", async () => {
+  const f = fixture();
+  f.h.getPoliticalEntriesVersion = () => 1;
+  const pending = f.owner.preparePolitical();
+  f.state.landData.features[0].geometry = { type: "Point", coordinates: [4, 5] };
+  const stale = f.finish(0); await pending;
+  assert.equal(stale.closes, 1);
+  assert.equal(f.owner.drawPolitical(), null);
+  assert.ok(f.owner.preparePolitical() instanceof Promise);
+  assert.notEqual(f.requests[0].input.identity, f.requests[1].input.identity);
+  f.owner.dispose(); f.requests[1].resolve(null);
 });
 test("older completion cannot clear or replace a newer pending generation", async () => {
   const f = fixture(); const old = f.owner.preparePolitical();
@@ -81,6 +195,7 @@ test("older completion cannot clear or replace a newer pending generation", asyn
   assert.notEqual(old, latest);
   const bitmap = f.finish(0); await old;
   assert.equal(bitmap.closes, 1);
+  assert.deepEqual(f.renders, [], "a newer pending request already owns its completion wakeup");
   assert.equal(f.owner.preparePolitical(), latest);
   f.finish(1); await latest;
   assert.equal(f.owner.drawPolitical().renderedCount, 1);
@@ -172,6 +287,7 @@ test("A to B to A reuses one result consumer when the real client merges the act
     const worker = { postMessage: (message) => sent.push(message), terminate() {} };
     const client = createGeometryRasterWorkerClient({ createWorker: () => worker, isSupported: () => true });
     const f = fixture({ injectedClient: client });
+    if (kind === "political") f.h.getPoliticalEntriesVersion = () => 1;
     t.after(() => f.owner.dispose());
     const request = () => kind === "political" ? f.owner.preparePolitical({ force: true }) : f.owner.requestHit();
     request();

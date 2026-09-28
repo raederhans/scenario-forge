@@ -41,7 +41,7 @@ class FrameCompositorOwnerBoundaryContract(unittest.TestCase):
             "export function createCachedPassCompositorOwner({ constants = {}, getters = {}, helpers = {}, effects = {} } = {})",
             source,
         )
-        self.assertNotRegex(source, r"(?m)^\s*import\s")
+        self.assertEqual(re.findall(r'from "([^"]+)"', source), ["./cached_surface_coverage.js"])
         for token in [
             "map_renderer.js",
             "RendererRuntimeContext",
@@ -58,7 +58,7 @@ class FrameCompositorOwnerBoundaryContract(unittest.TestCase):
         ]:
             self.assertNotIn(token, source)
         self.assertEqual(source.count("const cacheSnapshot = getRenderPassCacheSnapshot();"), 2)
-        self.assertIn("{ requireAllPasses = false } = {},", source)
+        self.assertIn("{ requireAllPasses = false, targetOffsetX = 0, targetOffsetY = 0 } = {},", source)
         self.assertNotIn("options?.requireAllPasses", source)
         self.assertLessEqual(len(source.splitlines()), 320)
 

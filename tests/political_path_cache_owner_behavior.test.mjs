@@ -137,6 +137,24 @@ test("entries build lazily, reuse cached paths, read live surfaces, and tolerate
   assert.equal(h.counters.politicalPathCacheBuild, 1);
 });
 
+test("validated handle avoids repeated cache normalization within one synchronous slice", (t) => {
+  let cacheReads = 0;
+  let h;
+  h = fixture(t, { getRenderPassCacheState: () => { cacheReads += 1; return h.cache; } });
+  const handle = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  const readsBefore = cacheReads;
+  for (const id of ["a", "b", "c"]) {
+    assert.ok(h.owner.getPoliticalFeaturePathEntry(item(id).feature, {
+      allowBuild: true, validatedHandle: handle,
+    })?.path);
+  }
+  assert.equal(cacheReads, readsBefore);
+  h.state.sceneGeneration = 1;
+  const nextHandle = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
+  assert.notEqual(nextHandle.signature, handle.signature);
+  assert.ok(cacheReads > readsBefore);
+});
+
 test("cached paths stream the exact canvas coordinates for decimals, holes, parts and antimeridian clipping", (t) => {
   const h = fixture(t);
   const sandbox = {};

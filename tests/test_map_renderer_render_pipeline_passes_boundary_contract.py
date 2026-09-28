@@ -292,8 +292,12 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             'cancelScenarioPoliticalBackgroundDeferredFullCache("scene-snapshot-mismatch");',
             political_background_owner_content,
         )
-        self.assertIn("sceneGeneration: identity.sceneGeneration,", political_background_owner_content)
-        self.assertIn("scenarioDataGeneration: identity.scenarioDataGeneration,", political_background_owner_content)
+        political_build_helpers = (
+            REPO_ROOT / "js" / "core" / "renderer" / "political_background_build_helpers.js"
+        ).read_text(encoding="utf-8")
+        self.assertIn("createDeferredPoliticalBackgroundBuildState(", political_background_owner_content)
+        self.assertIn("sceneGeneration: identity.sceneGeneration,", political_build_helpers)
+        self.assertIn("scenarioDataGeneration: identity.scenarioDataGeneration,", political_build_helpers)
         self.assertIn(
             "function drawBackgroundPass() {\n  return getPoliticalBackgroundRenderOwner().drawBackgroundPass();\n}",
             renderer_content,
@@ -384,7 +388,8 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         )[0]
         self.assertNotIn('"hgoPreview"', interaction_composite_body)
         self.assertIn("const activeRenderPassNames = getActiveRenderPassNames();", draw_canvas_owner_content)
-        self.assertIn("ensureIdleRenderPasses(frameTimings, activeRenderPassNames);", draw_canvas_owner_content)
+        self.assertIn("ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false", draw_canvas_owner_content)
+        self.assertIn("requestRenderContinuation: (reason) => queueMicrotask(() => requestRendererRender(reason))", renderer_content)
         self.assertIn("drewExactFrame = !!composeCachedPasses(activeRenderPassNames);", draw_canvas_owner_content)
         self.assertIn("function getProjectedHgoRuntimePreviewBounds() {", renderer_content)
         self.assertIn("function getProjectedBounds() {", hgo_preview_owner_content)
