@@ -2834,7 +2834,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
         },
         interactionComposite: {
           valid: true,
-          canvas: {},
+          canvas: { width: identity.pixelWidth, height: identity.pixelHeight },
           referenceTransform,
           signature: "political@political-v1@ref|contextScenario@context-v1@ref",
           ...identity,
@@ -2872,6 +2872,7 @@ export function registerScenarioChunkContractQuickTests(register = defaultRegist
       ["dpr mismatch", { dpr: 1 }, {}],
       ["canvas size mismatch", { pixelWidth: 1599 }, {}],
       ["color mismatch", { colorRevision: 3 }, {}],
+      ["coverage mismatch", { canvas: { width: 100, height: 100 } }, {}],
       ["signature mismatch", {}, { political: "political-v2" }],
     ].forEach(([label, compositeOverrides, signatureOverrides]) => {
       const decision = createHarness(compositeOverrides, signatureOverrides)

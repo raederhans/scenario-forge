@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { createSpatialIndexRuntimeOwner } from "../js/core/renderer/spatial_index_runtime_owner.js";
 import { createDefaultSpatialIndexState } from "../js/core/state/spatial_index_state.js";
 import { collectSpatialItemsForProjectedRects } from "../js/core/renderer/spatial_query_index.js";
+import { buildSpatialGridSnapshot } from "../js/core/renderer/spatial_index_runtime_builders.js";
 
 function bounds(seed) {
   return {
@@ -332,4 +333,98 @@ test("full spatial build still applies viewport skip policy", () => {
     ["skipped", 800, 600, { forceProd: true }],
   ]);
   assert.deepEqual(state.spatialItems.map((item) => item.id), ["visible"]);
+});
+
+test("secondary water reuse tracks geometry, flags, removals and projection identity", () => {
+  const part = (x) => ({ bounds: bounds(x) });
+  let waterA = { id: "a", geometry: { parts: [part(10), part(30)] }, properties: { __source: "scenario" } };
+  const waterB = { id: "b", geometry: { parts: [part(50)] } };
+  const special = { id: "zone", bounds: bounds(70) };
+  let water = [waterA, waterB];
+  let specials = [special];
+  let identity = "scenario-a:projection-1:water-1";
+  let rejected = false;
+  let collected = 0;
+  let projected = 0;
+  const state = createDefaultSpatialIndexState();
+  const owner = createSpatialIndexRuntimeOwner({ state, helpers: {
+    getFeatureId: (feature) => feature.id,
+    getLogicalCanvasDimensions: () => [800, 600],
+    getEffectiveWaterRegionFeatures: () => water,
+    getEffectiveSpecialRegionFeatures: () => specials,
+    getSecondarySpatialCacheIdentity: () => identity,
+    collectFeatureHitGeometries: (feature) => { collected += 1; return feature.geometry.parts; },
+    shouldExcludeWaterHitGeometry: () => rejected,
+    computeProjectedGeoBounds: (geometry) => { projected += 1; return geometry.bounds || null; },
+    getProjectedFeatureBounds: (feature) => feature.bounds,
+  } });
+  const build = () => owner.buildSecondarySpatialIndexes();
+  build();
+  const firstGrid = state.waterSpatialGrid;
+  const firstItem = state.waterSpatialItemsById.get("a::part:0");
+  assert.deepEqual([collected, projected], [2, 3]);
+  owner.resetSecondarySpatialIndexState({ preserveCurrent: true });
+  build();
+  assert.equal(state.waterSpatialGrid, firstGrid);
+  assert.equal(state.waterSpatialItemsById.get("a::part:0"), firstItem);
+  assert.deepEqual([collected, projected], [2, 3]);
+
+  waterA = { ...waterA };
+  water = [waterA, waterB];
+  build();
+  assert.equal(state.waterSpatialItemsById.get("a::part:0").feature, waterA);
+  assert.deepEqual([collected, projected], [2, 3]);
+
+  water = [waterB, waterA];
+  build();
+  assert.deepEqual(state.waterSpatialItems.map((item) => item.id), ["b::part:0", "a::part:0", "a::part:1"]);
+  assert.deepEqual(state.waterSpatialGrid,
+    buildSpatialGridSnapshot({ items: state.waterSpatialItems, canvasWidth: 800, canvasHeight: 600 }).grid);
+  assert.deepEqual([collected, projected], [2, 3]);
+
+  // Two distinct detail subsets must not evict the accepted overview set.
+  const coarseGrid = state.waterSpatialGrid;
+  const coarseItems = state.waterSpatialItems;
+  const detail = { id: "detail", geometry: { parts: [part(90)] } };
+  water = [detail];
+  build();
+  assert.deepEqual([collected, projected], [3, 4]);
+  water = [{ id: "other-detail", geometry: { parts: [part(95)] } }];
+  build();
+  assert.deepEqual([collected, projected], [4, 5]);
+  water = [waterB, waterA];
+  build();
+  assert.equal(state.waterSpatialGrid, coarseGrid);
+  assert.deepEqual(state.waterSpatialItems, coarseItems);
+  assert.deepEqual([collected, projected], [4, 5]);
+
+  waterA.geometry = { parts: [part(120)] };
+  water = [waterA];
+  specials = [];
+  build();
+  assert.deepEqual(state.waterSpatialItems.map((item) => item.id), ["a::part:0"]);
+  assert.equal(state.waterSpatialItems[0].minX, 120);
+  assert.equal(state.waterSpatialItemsById.has("b::part:0"), false);
+  assert.equal(state.specialSpatialItems.length, 0);
+  assert.deepEqual([collected, projected], [5, 6]);
+  const rect = { minX: 45, minY: 45, maxX: 60, maxY: 60 };
+  assert.deepEqual(collectSpatialItemsForProjectedRects({
+    grid: state.waterSpatialGrid, gridMeta: state.waterSpatialGridMeta,
+    items: state.waterSpatialItems, projectedRects: [rect],
+  }).items, []);
+
+  rejected = true;
+  identity = "scenario-a:projection-1:water-2";
+  build();
+  assert.deepEqual(state.waterSpatialItems, []);
+  rejected = false;
+  identity = "scenario-b:projection-2:water-1";
+  waterA.geometry.parts[0].bounds = bounds(240);
+  build();
+  assert.equal(state.waterSpatialItems[0].minX, 240);
+  assert.deepEqual([collected, projected], [7, 7]);
+  identity = "scenario-a:projection-1:water-2";
+  build();
+  assert.equal(state.waterSpatialItems[0].minX, 240);
+  assert.deepEqual([collected, projected], [8, 8], "an old identity must not revive a stale snapshot");
 });

@@ -75,6 +75,7 @@ function createHarness({
       getLandFeatures: () => features.land || [],
       getRiverFeatures: () => features.rivers || [],
       getActiveScenarioId: () => harnessStore.activeScenarioId,
+      getContextLayerRevision: () => harnessStore.contextLayerRevision,
       getD3: () => d3,
     },
     helpers: {
@@ -514,6 +515,104 @@ test("sanitizeWaterRegionFeatures drops features whose parts all become unsafe",
     featureIds: ["UNSAFE"],
   });
   assert.equal(calls.warnings.length, 1);
+});
+
+test("water sanitization reuses an unchanged feature sequence and refreshes replaced or revised geometry", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
+  const water = createFeature("WATER", createPolygon([10, 0]));
+  const first = owner.sanitizeWaterRegionFeatures([water]);
+  assert.equal(first[0], water);
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+
+  first.pop();
+  const reused = owner.sanitizeWaterRegionFeatures([water]);
+  assert.deepEqual(reused, [water], "a caller changing its result must not poison the cached source");
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+
+  water.geometry = createPolygon([999, 0]);
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), []);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+
+  water.geometry.coordinates[0][0][0] = 10;
+  harnessStore.contextLayerRevision = 1;
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([water]), [water]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+
+  const replacement = createFeature("WATER", createPolygon([999, 0]));
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([replacement]), []);
+  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+});
+
+test("water sanitation retains overview across two detail sets and invalidates on context or scenario change", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
+  const coarseA = createFeature("COARSE_A", createPolygon([10, 0]));
+  const coarseB = createFeature("COARSE_B", createPolygon([20, 0]));
+  const detail = createFeature("DETAIL", createPolygon([30, 0]));
+  const secondDetail = createFeature("DETAIL_2", createPolygon([40, 0]));
+  const coarse = owner.sanitizeWaterRegionFeatures([coarseA, coarseB]);
+  owner.sanitizeWaterRegionFeatures([detail]);
+  owner.sanitizeWaterRegionFeatures([secondDetail]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+  const restored = owner.sanitizeWaterRegionFeatures([coarseA, coarseB]);
+  assert.notEqual(restored, coarse);
+  assert.deepEqual(restored, coarse);
+  assert.deepEqual(diagnostics.calls, { geoArea: 4, geoBounds: 4 });
+
+  coarseA.geometry.coordinates[0][0][0] = 999;
+  harnessStore.contextLayerRevision = 1;
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 6, geoBounds: 6 });
+  harnessStore.activeScenarioId = "other";
+  owner.sanitizeWaterRegionFeatures([detail]);
+  assert.deepEqual(owner.sanitizeWaterRegionFeatures([coarseA, coarseB]), [coarseB]);
+});
+
+test("redecoded equal water coordinates reuse safe geometry while changed points and order recompute", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const original = createFeature("WATER", createPolygon([10, 0]));
+  const [first] = owner.sanitizeWaterRegionFeatures([original]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+
+  const decoded = structuredClone(original);
+  decoded.properties.name = "current metadata";
+  const [reused] = owner.sanitizeWaterRegionFeatures([decoded]);
+  assert.equal(reused.geometry, first.geometry);
+  assert.equal(reused.properties.name, "current metadata");
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+
+  const changedPoint = structuredClone(original);
+  changedPoint.geometry.coordinates[0][1][0] += 0.25;
+  owner.sanitizeWaterRegionFeatures([changedPoint]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+
+  const reordered = structuredClone(original);
+  reordered.geometry.coordinates[0].reverse();
+  owner.sanitizeWaterRegionFeatures([reordered]);
+  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+});
+
+test("repeated water list resolution skips sanitation bookkeeping for unchanged unsafe parts", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, calls } = createHarness({ d3: diagnostics.d3 });
+  let idReads = 0;
+  const water = createFeature("WATER", {
+    type: "MultiPolygon",
+    coordinates: [createPolygon([999, 0]).coordinates, createPolygon([10, 0]).coordinates],
+  });
+  Object.defineProperty(water.properties, "id", { get() { idReads += 1; return "WATER"; } });
+  const first = owner.sanitizeWaterRegionFeatures([water]);
+  assert.equal(first[0].geometry.type, "Polygon");
+  assert.equal(idReads, 1);
+  assert.equal(calls.metrics.length, 1);
+  const second = owner.sanitizeWaterRegionFeatures([water]);
+  assert.notEqual(second, first);
+  assert.equal(second[0], first[0]);
+  assert.equal(idReads, 1, "an unchanged list should not rescan unsafe part IDs");
+  assert.equal(calls.metrics.length, 1);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
 });
 
 test("clearProjectedBoundsCache clears projected bounds and triggers host water path cleanup", () => {

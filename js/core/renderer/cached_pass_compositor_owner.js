@@ -1,3 +1,5 @@
+import { getSurfaceCoverage, intersectCoverage, transformCoverage } from "./cached_surface_coverage.js";
+
 function requireFunction(candidate, label) {
   if (typeof candidate !== "function") {
     throw new TypeError(`${label} must be a function.`);
@@ -72,6 +74,35 @@ export function createCachedPassCompositorOwner({ constants = {}, getters = {}, 
     });
   }
 
+  function getPassCoverage(passName, currentTransform) {
+    const cache = getRenderPassCacheSnapshot();
+    const layout = getRenderPassLayout(passName);
+    let coverage = getSurfaceCoverage(cache.canvases?.[passName], layout);
+    // Viewport-culling can paint less than the allocated padding. Keep that
+    // limit separate from the bitmap dimensions, including on composite rebuilds.
+    const limit = Number(constants.paintedOverscanLimit ?? Infinity);
+    if (coverage && Number.isFinite(limit)) {
+      coverage = intersectCoverage(coverage, {
+        minX: -limit, minY: -limit,
+        maxX: layout.logicalWidth + limit, maxY: layout.logicalHeight + limit,
+      });
+    }
+    return transformCoverage(
+      coverage,
+      getPassReferenceTransform(passName), currentTransform,
+    );
+  }
+
+  function getCompositeCoverage(passNames, currentTransform) {
+    let coverage = null;
+    for (const [index, passName] of passNames.entries()) {
+      const next = getPassCoverage(passName, currentTransform);
+      coverage = index === 0 ? next : intersectCoverage(coverage, next);
+      if (!coverage) break;
+    }
+    return coverage;
+  }
+
   function drawTransformedPass(passName, currentTransform, referenceTransform = null) {
     const cacheSnapshot = getRenderPassCacheSnapshot();
     const passCanvas = cacheSnapshot.canvases?.[passName] || null;
@@ -112,7 +143,7 @@ export function createCachedPassCompositorOwner({ constants = {}, getters = {}, 
     targetContext,
     passNames,
     currentTransform,
-    { requireAllPasses = false } = {},
+    { requireAllPasses = false, targetOffsetX = 0, targetOffsetY = 0 } = {},
   ) {
     if (!targetContext) return { ok: false, reason: "missing-target-context" };
     const cacheSnapshot = getRenderPassCacheSnapshot();
@@ -179,8 +210,8 @@ export function createCachedPassCompositorOwner({ constants = {}, getters = {}, 
         targetContext.setTransform(1, 0, 0, 1, 0, 0);
         const dpr = getDpr();
         targetContext.translate(
-          (dx - Number(layout?.offsetX || 0) * scaleRatio) * dpr,
-          (dy - Number(layout?.offsetY || 0) * scaleRatio) * dpr,
+          (targetOffsetX + dx - Number(layout?.offsetX || 0) * scaleRatio) * dpr,
+          (targetOffsetY + dy - Number(layout?.offsetY || 0) * scaleRatio) * dpr,
         );
         targetContext.scale(scaleRatio, scaleRatio);
         targetContext.drawImage(passCanvas, 0, 0);
@@ -191,14 +222,16 @@ export function createCachedPassCompositorOwner({ constants = {}, getters = {}, 
       const dpr = getDpr();
       targetContext.drawImage(
         passCanvas,
-        Math.round(-Number(layout?.offsetX || 0) * dpr),
-        Math.round(-Number(layout?.offsetY || 0) * dpr),
+        Math.round((targetOffsetX - Number(layout?.offsetX || 0)) * dpr),
+        Math.round((targetOffsetY - Number(layout?.offsetY || 0)) * dpr),
       );
     }
     return { ok: true };
   }
 
   return Object.freeze({
+    getPassCoverage,
+    getCompositeCoverage,
     drawTransformedPass,
     composeRenderPassesToTarget,
   });

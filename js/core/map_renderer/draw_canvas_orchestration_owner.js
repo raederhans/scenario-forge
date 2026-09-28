@@ -135,6 +135,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     }
 
     ensureLayerDataFromTopology();
+    // Color recovery can promote settling/deferred input to an exact idle draw.
+    // Decide that phase before asking the worker to prepare its fine geometry.
+    promoteDeferredColorRenderToIdle();
     // Exact asynchronous work keeps the last complete visible frame intact.
     // Input frames still take the ordinary transformed-frame branch.
     if (effects.prepareAsyncFrame?.()) {
@@ -147,7 +150,6 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     if (initialPhase !== renderPhaseIdle || initialDeferExactAfterSettle) {
       cancelPoliticalPathWarmup("drawCanvas-non-idle");
     }
-    promoteDeferredColorRenderToIdle();
     const frameStart = nowMs();
     const currentPhase = getRenderPhase();
     const currentDeferExactAfterSettle = !!getDeferExactAfterSettle();
@@ -162,6 +164,12 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     let drewExactFrame = false;
     let frameMode = "none";
 
+    if (useTransformedFrame && effects.drawOverviewFrameFallback
+      && effects.drawOverviewFrameFallback(getEffectiveZoomTransform())) {
+      drewFrame = true;
+      usedLastGoodFallback = true;
+      frameMode = "overview";
+    }
     if (useTransformedFrame && !drewFrame) {
       drewFrame = !!drawTransformedFrameFromCaches(frameTimings, {
         interactiveBorders: currentPhase !== renderPhaseIdle || currentDeferExactAfterSettle,
@@ -191,7 +199,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     if (!useTransformedFrame || !drewFrame) {
       resetContextBreakdownForExactFrame();
       const activeRenderPassNames = getActiveRenderPassNames();
-      ensureIdleRenderPasses(frameTimings, activeRenderPassNames);
+      if (ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false) {
+        return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
+      }
       drewExactFrame = !!composeCachedPasses(activeRenderPassNames);
       drewFrame = drewExactFrame;
       frameMode = drewExactFrame ? "exact" : frameMode;

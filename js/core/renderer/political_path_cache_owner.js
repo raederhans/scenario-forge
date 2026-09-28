@@ -174,11 +174,14 @@ export function createPoliticalPathCacheOwner(runtimeState, {
       allowBuild = false,
       countMiss = false,
       countBuild = false,
+      validatedHandle = null,
     } = {},
   ) {
     const resolvedId = featureId || getFeatureId(feature);
     if (!resolvedId) return null;
-    const handle = getPoliticalPathCacheHandle(transform, { resetIfMismatch: allowBuild });
+    // A caller may reuse a handle only within one synchronous slice. Each new
+    // slice must validate the shared cache again before handing it back here.
+    const handle = validatedHandle || getPoliticalPathCacheHandle(transform, { resetIfMismatch: allowBuild });
     if (!handle.valid || !(handle.map instanceof Map)) {
       if (countMiss) incrementPerfCounter("politicalPartialPathCacheMisses");
       return null;

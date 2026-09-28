@@ -46,6 +46,7 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     deferExactAfterSettle: true,
     dpr: 1,
     exactAfterSettleHandle: null,
+    legacyColorStateDirty: false,
     pendingExactPoliticalFastFrame: true,
     renderPerfMetricSequence: 0,
     renderPerfMetrics: {},
@@ -211,12 +212,30 @@ function createHarness({ cameraSignatureMismatch = false, prepareRenderPassAsync
     runTimer,
     runtimeState: schedulerRuntime,
     scheduler,
+    setNow(value) { now = value; },
     setTopologyRevision(value) {
       schedulerRuntime.topologyRevision = Number(value || 0);
     },
     timers,
   };
 }
+
+test("exact refresh waits only the remainder of the quiet window after settling", () => {
+  const harness = createHarness();
+  try {
+    harness.profile.exactQuietWindowMs = 180;
+    harness.runtimeState.zoomGestureEndedAt = 400;
+    harness.setNow(500);
+    harness.scheduler.scheduleExactAfterSettleRefresh(harness.profile);
+    assert.equal(harness.timers.get(harness.runtimeState.exactAfterSettleHandle.id).delay, 79);
+    harness.setNow(700);
+    harness.scheduler.scheduleExactAfterSettleRefresh(harness.profile);
+    assert.equal(harness.timers.get(harness.runtimeState.exactAfterSettleHandle.id).delay, 0);
+    harness.runtimeState.zoomGestureEndedAt = 0;
+    harness.scheduler.scheduleExactAfterSettleRefresh(harness.profile);
+    assert.equal(harness.timers.get(harness.runtimeState.exactAfterSettleHandle.id).delay, 180);
+  } finally { harness.restore(); }
+});
 
 function assertOrdered(events, expected) {
   let cursor = -1;

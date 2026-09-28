@@ -77,7 +77,7 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
     getPoliticalPathCacheHandle: (transform, { resetIfMismatch }) => {
       calls.push("path:prepare");
       assert.equal(resetIfMismatch, true);
-      const identity = `${transform.k}:${transform.x}:${transform.y}:${state.scenarioDataGeneration}`;
+      const identity = `${state.activeScenarioId}:${state.sceneGeneration}:${state.scenarioDataGeneration}:${state.projectionRevision || 0}`;
       if (preparedPathIdentity !== null && preparedPathIdentity !== identity) {
         pathCache.clear();
         calls.push("path:reset");
@@ -98,7 +98,7 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
     },
     isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
-    getPoliticalPathCacheSignature: (transform) => `path:${transform.k}:${transform.x}:${transform.y}:${state.projectionRevision || 0}`,
+    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.scenarioDataGeneration}:${state.projectionRevision || 0}`,
     getVisibleFrameIdentity: () => ({
       scenarioId: state.activeScenarioId,
       sceneGeneration: state.sceneGeneration,
@@ -187,6 +187,13 @@ function feature(id, owner = "AA") {
   return { type: "Feature", properties: { id, owner, country: owner }, geometry: { type: "Polygon" } };
 }
 
+function completeDeferred(fixture, { deadline = null } = {}) {
+  for (let index = 0; fixture.pending.length && index < 100; index += 1) {
+    fixture.pending.shift().callback(deadline);
+  }
+  assert.equal(fixture.pending.length, 0, "deferred work completes within bounded callbacks");
+}
+
 test("background pass fills sphere once before ocean style and delegated depth state", () => {
   const fixture = createFixture();
   fixture.state.oceanData = feature("ocean");
@@ -220,7 +227,7 @@ test("ocean base never reprojects redundant ocean polygons after camera, color, 
   assert.equal(fixture.calls.filter(call => call === "commit:intensity").length, 3);
 });
 
-test("full-pass cache replays only for current transform and color identity", () => {
+test("full-pass geometry replays across camera changes but invalidates for color", () => {
   const fixture = createFixture();
   const entries = [{ feature: feature("a"), id: "a" }];
   fixture.state.landData = { features: [entries[0].feature] };
@@ -250,7 +257,45 @@ test("full-pass cache replays only for current transform and color identity", ()
     useFullPassCache: true,
     returnSummary: true,
   });
-  assert.equal(transformed.cacheHit, false);
+  assert.equal(transformed.cacheHit, true);
+  assert.equal(fixture.calls.filter((entry) => entry === "build:a").length, 1);
+});
+
+test("retained path handle survives LRU eviction and camera/color changes but rejects geometry and scene changes", () => {
+  const fixture = createFixture();
+  const original = feature("a");
+  fixture.state.landData = { features: [original] };
+  fixture.owner.drawPoliticalBackgroundFillsForEntries([{ feature: original, id: "a" }], {
+    useFullPassCache: true, returnSummary: true,
+  });
+  const path = fixture.pathCache.get("a").path;
+  fixture.pathCache.clear();
+  fixture.state.zoomTransform = { k: 2, x: 15, y: -5 };
+  fixture.state.colors.a = "#ff0000";
+  fixture.state.colorRevision += 1;
+  const handle = fixture.owner.getRetainedPoliticalBackgroundPathHandle(fixture.state.zoomTransform);
+  assert.equal(handle.getPath(original, "a"), path);
+  assert.equal(handle.getPath({ ...original }, "a"), path);
+  assert.equal(handle.getPath({ ...original, geometry: { type: "Polygon" } }, "a"), null);
+  fixture.state.projectionRevision = 1;
+  assert.equal(fixture.owner.getRetainedPoliticalBackgroundPathHandle(fixture.state.zoomTransform), null);
+  fixture.state.projectionRevision = 0;
+  fixture.state.activeScenarioId = "scenario-b";
+  assert.equal(fixture.owner.getRetainedPoliticalBackgroundPathHandle(fixture.state.zoomTransform), null);
+});
+
+test("retained index distinguishes duplicate feature IDs by geometry", () => {
+  const fixture = createFixture();
+  const first = feature("same");
+  const second = feature("same");
+  fixture.state.landData = { features: [first, second] };
+  fixture.owner.drawPoliticalBackgroundFillsForEntries([
+    { feature: first, id: "same" }, { feature: second, id: "same" },
+  ], { useFullPassCache: true, returnSummary: true });
+  const handle = fixture.owner.getRetainedPoliticalBackgroundPathHandle();
+  assert.ok(handle.getPath(first, "same"));
+  assert.ok(handle.getPath(second, "same"));
+  assert.notEqual(handle.getPath(first, "same"), handle.getPath(second, "same"));
 });
 
 test("recolor regroups warm paths with one cache preparation and no feature lookup", () => {
@@ -291,9 +336,8 @@ for (const progressiveLimit of [2400, 1]) {
   });
 }
 
-test("changed transform or geometry generation still prepares and rebuilds stale paths", () => {
+test("changed geometry generation still prepares and rebuilds stale paths", () => {
   for (const change of [
-    (fixture) => { fixture.state.zoomTransform = { k: 2, x: 0, y: 0 }; },
     (fixture, entries) => {
       entries[0].feature = feature("a");
       fixture.state.landData = { features: [entries[0].feature] };
@@ -336,13 +380,52 @@ test("deferred slices prepare once each and reuse warm paths without feature loo
   assert.equal(fixture.pending.length, 1);
   fixture.calls.length = 0;
   fixture.pending.shift().callback();
-  // One preparation for the second slice, one for the completed full-pass grouping.
-  assert.equal(fixture.calls.filter((call) => call === "path:prepare").length, 2);
+  // The final grouping never prepares or rescans paths.
+  assert.equal(fixture.calls.filter((call) => call === "path:prepare").length, 1);
   assert.equal(fixture.calls.some((call) => /^(lookup|build):/.test(call)), false);
+  completeDeferred(fixture);
   const slices = fixture.metrics.filter((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
-  assert.deepEqual(slices.map(({ processedCount, reusedPathCount, builtPathCount, pathlessEntryCount }) =>
-    [processedCount, reusedPathCount, builtPathCount, pathlessEntryCount]), [[1, 1, 0, 0], [2, 2, 0, 0]]);
+  assert.deepEqual(slices.map(({ reusedPathCount, builtPathCount, pathlessEntryCount }) =>
+    [reusedPathCount, builtPathCount, pathlessEntryCount]), [[1, 0, 0], [2, 0, 0], [0, 0, 0]]);
+  assert.equal(slices.at(-1).stage, "ready");
   assert.equal(fixture.calls.filter((call) => call === "repaint").length, 1);
+});
+
+test("deferred completion retains evicted paths and merges a large group across slices", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  FakePath2D.addPathCallCount = 0;
+  fixture.state.landData = { features: Array.from({ length: 40 }, (_, index) => feature(`f${index}`)) };
+  const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  fixture.pathCache.clear(); // Simulate LRU eviction of paths already retained by the deferred artifact.
+  completeDeferred(fixture);
+  assert.equal(fixture.calls.filter((call) => call.startsWith("build:")).length, 40);
+  assert.equal(FakePath2D.addPathCallCount, 40);
+  const slices = fixture.metrics.filter((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(slices.length > 3);
+  assert.ok(slices.some((metric) => metric.stage === "merge"));
+  assert.equal(fixture.metrics.some((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheBuild"), true);
+  const replay = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  assert.equal(replay.cacheHit, true);
+  assert.equal(fixture.calls.filter((call) => call.startsWith("build:")).length, 40);
+});
+
+test("deferred geometry replacement cancels before publishing retained paths", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: [feature("a"), feature("b")] };
+  const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  fixture.state.landData.features[0].geometry = { type: "Polygon" };
+  completeDeferred(fixture);
+  assert.equal(fixture.calls.includes("repaint"), false);
+  assert.ok(fixture.metrics.some((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+    && metric.reason === "geometry-changed"));
 });
 
 test("scenario recovery leaves modern admin0 out and schedules one current deferred completion", () => {
@@ -364,7 +447,7 @@ test("scenario recovery leaves modern admin0 out and schedules one current defer
   assert.equal(summary.deferredFullCacheScheduled, true);
   assert.equal(fixture.pending.length, 1);
 
-  fixture.pending.shift().callback();
+  completeDeferred(fixture);
   assert.equal(
     fixture.calls.filter((entry) => entry.startsWith("invalidate:")).length,
     1,
@@ -399,7 +482,7 @@ test("progressive recovery paints noninteractive scenario shell immediately with
   assert.ok(fixture.calls.includes("fill:path"));
   assert.ok(!fixture.calls.includes("path:interactive"));
   assert.equal(fixture.metrics.find((metric) => metric.name === "scenarioPoliticalBackgroundProgressiveRecovery").underlayEntryCount, 1);
-  fixture.pending.shift().callback();
+  completeDeferred(fixture);
   assert.equal(fixture.calls.filter((entry) => entry === "repaint").length, 1);
   const warm = fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
   assert.equal(warm.deferredFullCacheReady, true);
@@ -434,7 +517,7 @@ test("scenario underlay fills warm and cold paths as one compound path and reuse
 
   fixture.state.colors.cold = "#ff0000";
   fixture.calls.length = 0;
-  fixture.pending.shift().callback();
+  completeDeferred(fixture);
   assert.equal(fixture.calls.some(call => call.startsWith("build:")), false);
   fixture.filledPaths.length = 0;
   fixture.calls.length = 0;
@@ -560,7 +643,6 @@ test("outer full-land recolor and undo reuse retained paths after LRU eviction w
 for (const [label, change] of [
   ["same-ID replacement", fixture => { fixture.state.landDataFull.features[0] = feature("a"); }],
   ["geometry replacement on the same feature", fixture => { fixture.state.landDataFull.features[0].geometry = { type: "Polygon" }; }],
-  ["transform", fixture => { fixture.state.zoomTransform = { k: 2, x: 0, y: 0 }; }],
   ["projection", fixture => { fixture.state.projectionRevision = 1; }],
   ["scene", fixture => { fixture.state.sceneGeneration += 1; }],
   ["data", fixture => { fixture.state.scenarioDataGeneration += 1; }],
@@ -686,16 +768,16 @@ test("merged group Path2D reuse requires exact ordered paths and invalidates on 
   assert.equal(pathless.paths[1].paths.length, 2); // Only b1 and b2
   assert.equal(FakePath2D.addPathCallCount, 2); // 2 paths for new O2
 
-  // 4. Transform invalidation (global scene fence)
+  // 4. Pure camera change preserves projected paths and merged groups.
   b3.geometry = b3StaleGeometry; // Restore
   fixture.state.colorRevision += 1; // Invalidate entries cache so b3 is picked up again
   fixture.state.zoomTransform = { k: 2, x: 0, y: 0 };
   FakePath2D.addPathCallCount = 0;
   const transformed = draw();
-  assert.equal(transformed.summary.builtGroupMergeCount, 2);
-  assert.equal(transformed.summary.reusedGroupMergeCount, 0);
-  assert.notEqual(transformed.paths[0], pathO1Recolored);
-  assert.equal(FakePath2D.addPathCallCount, 5);
+  assert.equal(transformed.summary.builtGroupMergeCount, 1);
+  assert.equal(transformed.summary.reusedGroupMergeCount, 1);
+  assert.equal(transformed.paths[0], pathO1Recolored);
+  assert.equal(FakePath2D.addPathCallCount, 3);
 
   // 5. Scenario ID invalidation
   fixture.state.activeScenarioId = "scenario-b";

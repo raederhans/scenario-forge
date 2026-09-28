@@ -6,6 +6,7 @@
  * render pass orchestration, and visible-frame transactions.
  */
 import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";
+import { surfaceCoversViewport } from "./cached_surface_coverage.js";
 const LAST_GOOD_FRAME_VISUAL_INVALIDATION_PASS_NAMES = new Set([
   "political", "contextBase",
   "contextScenario",
@@ -457,15 +458,12 @@ export function createRenderCacheOwner({
       canvas.height = 1;
       cache.interactionComposite.canvas = canvas;
     }
-    const { width, height } = getMainTargetCanvasDimensions();
+    const layout = getRenderPassLayout(interactionCompositePassNames[0]);
+    const { pixelWidth: width, pixelHeight: height } = layout;
     const canvas = cache.interactionComposite.canvas;
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
-    cache.interactionComposite.layout = {
-      pixelWidth: width,
-      pixelHeight: height,
-      dpr: Math.max(1, Number(state.dpr || 1)),
-    };
+    cache.interactionComposite.layout = { ...layout };
     return cache.interactionComposite.canvas;
   }
 
@@ -646,6 +644,7 @@ export function createRenderCacheOwner({
       mismatchReasons.push("canvas-size-mismatch");
     }
     if (Number(composite.colorRevision || 0) !== identity.colorRevision) mismatchReasons.push("color-revision-mismatch");
+    if (!surfaceCoversViewport(composite, currentTransform, identity)) mismatchReasons.push("coverage-mismatch");
     return mismatchReasons;
   }
 

@@ -113,7 +113,8 @@ test("ensureIdleRenderPasses filters requested pass names before preparation and
 
   owner.ensureIdleRenderPasses(timings, ["political"]);
 
-  assert.deepEqual(helperCalls.signatures, ["political"]);
+  assert.deepEqual(helperCalls.signatures, ["political", "political"],
+    "the async preparation gate and exact pass both inspect only the requested political pass");
   assert.deepEqual(helperCalls.renderPasses.map(({ passName }) => passName), ["political"]);
   assert.equal(helperCalls.renderPasses[0].timings, timings);
   assert.deepEqual(calls.get("drawPoliticalPass"), ["render:political"]);

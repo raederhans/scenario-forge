@@ -826,6 +826,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
 
   register(35, "perf contracts keep coarse first frame and benchmark app-path fallback boundaries", () => {
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
+    const politicalBuildHelpersSource = readRepoFile("js", "core", "renderer", "political_background_build_helpers.js");
     const politicalPartialOwnerSource = readRepoFile(
       "js",
       "core",
@@ -916,7 +917,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
             && body.includes('cancelScenarioPoliticalBackgroundDeferredFullCache("scene-snapshot-mismatch");')
             && body.includes("scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork")
             && body.includes("const recoverySettled = isInteractionRecoverySettled({ quietMs: 600 });")
-            && /!recoverySettled[\s\S]*?deferredState\.index >= normalizedEntries\.length[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?const startedAt = nowMs\(\)[\s\S]*?getPoliticalFeaturePathEntry\([\s\S]*?allowBuild: true/.test(body)
+            && /!recoverySettled[\s\S]*?deferredState\.stage === "ready"[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?const startedAt = nowMs\(\)[\s\S]*?advanceDeferredPoliticalBackgroundBuild\(/.test(body)
+            && /getPoliticalFeaturePathEntry\([\s\S]*?allowBuild: true/.test(politicalBuildHelpersSource)
+            && body.includes('if (deferredState.stage !== "ready")')
             && /if \(!isInteractionRecoverySettled\(\{ quietMs: 600 \}\)\) \{[\s\S]*?scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork\([\s\S]*?runScenarioPoliticalBackgroundDeferredFullCacheSlice,[\s\S]*?\{ timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS \},[\s\S]*?\);[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?return false;[\s\S]*?\}/.test(body);
         })()
         && /function drawScenarioPoliticalBackgroundFills\([\s\S]*?const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?politicalDirtyReason !== "refresh-colors"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?allowBuild: false[\s\S]*?const foregroundIds = new Set[\s\S]*?const underlayEntries = visibleEntries\.filter[\s\S]*?!foregroundIds\.has[\s\S]*?drawPoliticalBackgroundFillsForEntries\(underlayEntries,[\s\S]*?scheduleScenarioPoliticalBackgroundDeferredFullCache/.test(politicalBackgroundOwnerSource)
@@ -927,7 +930,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const featureMetrics = drawPoliticalFineFeatureLoop\([\s\S]*?recordRenderPerfMetric\("drawPoliticalFeatureFillLoop"[\s\S]*?recordRenderPerfMetric\("drawPoliticalFeatureStrokeLoop"[\s\S]*?clearPendingPoliticalColorEdit\(\{[\s\S]*?renderedIds: featureMetrics\.renderedIds,[\s\S]*?\}\);/.test(politicalOwnerDrawSource)
         && /function tryPartialPoliticalPassRepaint\(transform, nextSignature, timings\) \{[\s\S]*?const partialFeatureMetrics = \{[\s\S]*?renderedIds: new Set\(\)[\s\S]*?\};[\s\S]*?metricsCollector: partialFeatureMetrics,[\s\S]*?clearPendingPoliticalColorEdit\(\{[\s\S]*?renderedIds: partialFeatureMetrics\.renderedIds,[\s\S]*?\}\);/.test(politicalPartialOwnerSource)
         && politicalBackgroundOwnerSource.includes('recordRenderPerfMetric("scenarioPoliticalBackgroundProgressiveRecovery"')
-        && politicalBackgroundOwnerSource.includes('metricName: "scenarioPoliticalBackgroundDeferredFullCacheBuild"')
+        && politicalBackgroundOwnerSource.includes('recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheBuild"')
         && politicalBackgroundOwnerSource.includes('recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheSlice"')
         && politicalPassOwnerSource.includes('reason: "progressive-coarse-underlay"'),
       progressiveFullCacheReadyRequestsPoliticalRepaint:

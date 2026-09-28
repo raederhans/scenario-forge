@@ -1,11 +1,12 @@
 import test, { before } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { mergeCityLocalizationData, normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
+import vm from "node:vm";
+import { buildCityLocalizationPatch, normalizeCityText, mergeCityLocalizationData, normalizeCityFeatureCollection, normalizeScenarioCityOverridesPayload } from "../js/core/data_loader.js";
 import { state as runtimeState } from "../js/core/state.js";
 import { commitBaseCitySupportData, setCurrentLanguage } from "../js/core/state/content_state.js";
 import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
-import { captureScenarioPresentationState, restoreScenarioPresentationState } from "../js/core/state/actions/scenario_presentation_actions.js";
+import { applyScenarioChunkCityExternalEffectState, captureScenarioPresentationState, restoreScenarioPresentationState } from "../js/core/state/actions/scenario_presentation_actions.js";
 import { syncScenarioLocalizationState } from "../js/core/scenario_localization_state.js";
 import { getStrictGeoLabel, getPreferredGeoLabel } from "../js/core/i18n.js";
 import { createUrbanCityPolicyOwner } from "../js/core/renderer/urban_city_policy.js";
@@ -19,29 +20,30 @@ const baseLocalization = mergeCityLocalizationData({
   cityAliases: read("../data/city_aliases.json"),
 });
 
-test("scenario name synchronization never maps distant capitals into Russian city polygons", (t) => {
-  const originalD3 = globalThis.d3;
-  const originalRu = runtimeState.ruCityOverrides;
-  const presentation = captureScenarioPresentationState({ ...runtimeState, locales: { ...runtimeState.locales } });
-  t.after(() => {
-    globalThis.d3 = originalD3;
-    runtimeState.ruCityOverrides = originalRu;
-    restoreScenarioPresentationState(runtimeState, presentation);
+test("scenario name synchronization never maps distant capitals into Russian city polygons", () => {
+  // Execute the real module against a process-local fixture. The synthetic
+  // polygon must not become a direct write to the application singleton.
+  const localState = { ...runtimeState, locales: { ...runtimeState.locales },
+    ruCityOverrides: { features: [{ properties: { id: "RU_TEST_VOLGOGRAD" },
+      geometry: { type: "Point", coordinates: [44.50184, 48.71939] } }] } };
+  const source = readFileSync(new URL("../js/core/scenario_localization_state.js", import.meta.url), "utf8")
+    .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
+  const syncLocal = vm.runInNewContext(`${source}\nsyncScenarioLocalizationState`, {
+    runtimeState: localState, buildCityLocalizationPatch, normalizeCityText,
+    applyScenarioChunkCityExternalEffectState, console,
+    globalThis: { d3: { geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] } },
   });
-  runtimeState.ruCityOverrides = { features: [{ properties: { id: "RU_TEST_VOLGOGRAD" },
-    geometry: { type: "Point", coordinates: [44.50184, 48.71939] } }] };
-  globalThis.d3 = { geoContains: () => true, geoCentroid: () => [44.50184, 48.71939] };
   for (const cityId of ["CITY::ne::1159149593", "CITY::ne::1159150731"]) {
-    syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+    syncLocal({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
       cities: { [cityId]: { city_id: cityId, display_name: { en: "Reviewed city", zh: "审核城市" } } },
     }), geoLocalePatchPayload: null });
-    assert.equal(runtimeState.locales.geo.RU_TEST_VOLGOGRAD, undefined, cityId);
+    assert.equal(localState.locales.geo.RU_TEST_VOLGOGRAD, undefined, cityId);
   }
   const cityId = "CITY::ne::1159150697";
-  syncScenarioLocalizationState({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
+  syncLocal({ cityOverridesPayload: normalizeScenarioCityOverridesPayload({
     cities: { [cityId]: { city_id: cityId, display_name: { en: "Stalingrad", zh: "斯大林格勒" } } },
   }), geoLocalePatchPayload: null });
-  assert.deepEqual(runtimeState.locales.geo.RU_TEST_VOLGOGRAD, { en: "Stalingrad", zh: "斯大林格勒" });
+  assert.deepEqual({ ...localState.locales.geo.RU_TEST_VOLGOGRAD }, { en: "Stalingrad", zh: "斯大林格勒" });
 });
 
 // Publish the process-local baseline through the same authority as city loading.

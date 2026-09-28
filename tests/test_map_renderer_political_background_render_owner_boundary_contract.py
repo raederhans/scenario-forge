@@ -7,6 +7,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER = REPO_ROOT / "js" / "core" / "map_renderer.js"
 OWNER = REPO_ROOT / "js" / "core" / "renderer" / "political_background_render_owner.js"
 PARTIAL_OWNER = REPO_ROOT / "js" / "core" / "renderer" / "political_partial_repaint_owner.js"
+DEFERRED_BUILD = REPO_ROOT / "js" / "core" / "renderer" / "political_background_build_helpers.js"
 
 
 class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
@@ -58,7 +59,8 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         renderer = MAP_RENDERER.read_text(encoding="utf-8")
         owner = OWNER.read_text(encoding="utf-8")
         partial_owner = PARTIAL_OWNER.read_text(encoding="utf-8")
-        self.assertNotRegex(owner, re.compile(r"^\s*import\s", re.MULTILINE))
+        self.assertRegex(owner, r'import \{[^}]+\} from "\./political_background_build_helpers\.js";')
+        self.assertEqual(len(re.findall(r"^import\s", owner, re.MULTILINE)), 1)
         for forbidden in ("runtimeState", "document.", "window.", "globalThis", "from \"../map_renderer"):
             self.assertNotIn(forbidden, owner)
         for symbol in (
@@ -88,19 +90,33 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
                 "getFeatureCountryCodeNormalized(feature)",
                 '"__NONE__"',
             ),
-            (
-                "getScenarioPoliticalBackgroundFullPassGroups(normalizedEntries",
-                'recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheComplete"',
-                "scenarioPoliticalBackgroundDeferredFullCacheState = null;",
-                'invalidateRenderPasses("political", "progressive-political-full-cache-ready")',
-                "recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState()",
-                'requestRendererRender("progressive-political-full-cache-ready"',
-            ),
         ):
             cursor = -1
             for token in ordered_tokens:
                 cursor = owner.find(token, cursor + 1)
                 self.assertGreaterEqual(cursor, 0, token)
+
+        deferred = owner[
+            owner.index("function runScenarioPoliticalBackgroundDeferredFullCacheSlice") :
+            owner.index("function scheduleScenarioPoliticalBackgroundDeferredFullCache")
+        ]
+        self.assertNotIn("getScenarioPoliticalBackgroundFullPassGroups(normalizedEntries", deferred)
+        cursor = -1
+        for token in (
+            "scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState({",
+            "...buildDeferredPoliticalBackgroundCachePatch(deferredState, currentIdentity),",
+            'recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheComplete"',
+            "scenarioPoliticalBackgroundDeferredFullCacheState = null;",
+            'invalidateRenderPasses("political", "progressive-political-full-cache-ready")',
+            "recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState()",
+            'requestRendererRender("progressive-political-full-cache-ready"',
+        ):
+            cursor = deferred.find(token, cursor + 1)
+            self.assertGreaterEqual(cursor, 0, token)
+        build = DEFERRED_BUILD.read_text(encoding="utf-8")
+        self.assertIn("fullPassGroups: deferredState.groups,", build)
+        self.assertIn("fullPassPathIndex: deferredState.pathIndex,", build)
+        self.assertIn("item.feature.geometry !== item.geometryRef", build)
 
     def test_background_and_progressive_draw_order_stay_explicit(self):
         owner = OWNER.read_text(encoding="utf-8")

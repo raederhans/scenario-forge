@@ -118,8 +118,10 @@ function createOwner({
   getTransformSignature = (transform) => transform ? `${transform.k}:${transform.x}:${transform.y}` : "none",
   getterOverrides = {},
   helperOverrides = {},
+  stateOverrides = {},
+  constantOverrides = {},
 } = {}) {
-  const state = { renderPassCache: cache };
+  const state = { renderPassCache: cache, width: 400, height: 300, dpr: 2, ...stateOverrides };
   return {
     cache,
     owner: createRenderCacheOwner({
@@ -127,6 +129,7 @@ function createOwner({
       constants: {
         interactionCompositePassNames: INTERACTION_COMPOSITE_PASS_NAMES,
         renderPassNames,
+        ...constantOverrides,
       },
       getters: {
         ...getterOverrides,
@@ -154,7 +157,7 @@ function createOwner({
   };
 }
 
-test("main-target canvas caches retain their identities while tracking the live target size", () => {
+test("interaction composite retains padded pass pixels while main-target snapshots keep viewport dimensions", () => {
   const lastGoodFrameCanvas = { width: 1, height: 1 };
   const interactionCompositeCanvas = { width: 2, height: 2 };
   const compositeBufferCanvas = { width: 3, height: 3 };
@@ -165,6 +168,8 @@ test("main-target canvas caches retain their identities while tracking the live 
   });
   const { owner } = createOwner({
     cache,
+    stateOverrides: { width: 960, height: 540, dpr: 1 },
+    constantOverrides: { renderPassOverscanRatioPerSide: 0.15, transformedFramePassNames: new Set(INTERACTION_COMPOSITE_PASS_NAMES) },
     getterOverrides: {
       getContext: () => ({ canvas: { width: 960, height: 540 } }),
     },
@@ -178,13 +183,15 @@ test("main-target canvas caches retain their identities while tracking the live 
       .map(({ width, height }) => ({ width, height })),
     [
       { width: 960, height: 540 },
-      { width: 960, height: 540 },
+      { width: 1248, height: 702 },
       { width: 960, height: 540 },
     ],
   );
   assert.deepEqual(cache.interactionComposite.layout, {
-    pixelWidth: 960,
-    pixelHeight: 540,
+    offsetX: 144, offsetY: 81, logicalWidth: 960, logicalHeight: 540,
+    paddedWidth: 1248, paddedHeight: 702,
+    pixelWidth: 1248,
+    pixelHeight: 702,
     dpr: 1,
   });
 });

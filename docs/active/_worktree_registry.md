@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-09-28 缩放与平移性能整合
+
+`C:/Users/raede/.codex/worktrees/pan-zoom-integration/mapcreator` 使用分支 `codex/pan-zoom-performance-20260928`，基于 `origin/main@5ee7712f` 定向整合本对话的缩放、平移覆盖修复及政治条目、概览帧、水域整理和空间索引复用。用户已授权合并推送；主工作区 `main@28310add` 的其他未归属改动保留。隔离工作树保留 `.runtime/tmp/pan-zoom-integration/` 中的验证输出，合并后继续保留供复核和复用。最终推送与受保护 main 的合并状态以本分支 GitHub PR 回执为准。
+
 ## 2026-09-27 现代剧本重建与剧本译名隔离
 
 `C:/Users/raede/.codex/worktrees/scenario-names-merge/mapcreator` 使用分支 `codex/scenario-names-and-modern-rebuild`，基于 `origin/main@4a160b37` 定向整合现代国家地块、烈焰升腾配色、首都及 1936/1939/TNO 地名隔离修复。用户已授权合并推送；原主工作区 `main@28310add` 的其他未归属改动完整保留。本工作树的 `.runtime/reports/generated/scenario-delivery/` 保存重建、严格契约、首都行为及 Pages 构建结果，因此合并后保留供复核。最终提交、检查和合并状态以此分支的 GitHub PR 回执为准。

@@ -2052,7 +2052,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertIn("const activeRenderPassNames = getActiveRenderPassNames();", draw_canvas_owner_source)
         self.assertIn(
-            "ensureIdleRenderPasses(frameTimings, activeRenderPassNames);",
+            "ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false",
             draw_canvas_owner_source,
         )
         self.assertIn(

@@ -7,9 +7,17 @@ export function createContextLayerResolverOwner({
   const {
     layerResolverCache = null,
   } = caches;
-  let cachedPoliticalChunkFeatureCount = -1;
-  let cachedLandDataFullFeatureCount = -1;
-  let cachedScenarioDataGeneration = -1;
+  const layerSourceStamps = new Map();
+  let politicalSourceStamp = null;
+  const contextLayerFields = {
+    ocean: "oceanData",
+    land: "landBgData",
+    water_regions: "waterRegionsData",
+    rivers: "riversData",
+    urban: "urbanData",
+    physical: "physicalData",
+    special_zones: "specialZonesData",
+  };
 
   const {
     contextLayerMinScore = 0.08,
@@ -415,56 +423,65 @@ export function createContextLayerResolverOwner({
     const politicalChunkFeatureCount = Array.isArray(runtimeState.scenarioPoliticalChunkData?.features)
       ? runtimeState.scenarioPoliticalChunkData.features.length
       : 0;
-    const landDataFullFeatureCount = Array.isArray(runtimeState.landDataFull?.features)
-      ? runtimeState.landDataFull.features.length
-      : 0;
-    const scenarioDataGeneration = Math.max(0, Number(runtimeState.scenarioDataGeneration || 0));
-    const sameSource =
-      layerResolverCache.primaryRef === primaryTopology &&
-      layerResolverCache.detailRef === runtimeState.topologyDetail &&
-      cachedPoliticalChunkFeatureCount === politicalChunkFeatureCount &&
-      cachedLandDataFullFeatureCount === landDataFullFeatureCount &&
-      cachedScenarioDataGeneration === scenarioDataGeneration &&
-      layerResolverCache.activeScenarioId === activeScenarioId &&
-      layerResolverCache.activeChunkScenarioId === activeChunkScenarioId &&
-      layerResolverCache.bundleMode === runtimeState.topologyBundleMode &&
-      layerResolverCache.contextRevision === Number(runtimeState.contextLayerRevision || 0);
-    if (sameSource) {
-      return;
-    }
-
-    runtimeState.oceanData = resolveContextLayerData("ocean");
-    runtimeState.landBgData = resolveContextLayerData("land");
+    const politicalStamp = [
+      primaryTopology, primaryTopology.objects?.political,
+      politicalChunkFeatureCount,
+      Array.isArray(runtimeState.landDataFull?.features) ? runtimeState.landDataFull.features.length : 0,
+      Math.max(0, Number(runtimeState.scenarioDataGeneration || 0)),
+      activeScenarioId, activeChunkScenarioId, runtimeState.topologyBundleMode,
+    ];
+    const detailTopology = runtimeState.topologyDetail;
+    const contextRevision = Number(runtimeState.contextLayerRevision || 0);
     const previousWaterRegionsDataToken = String(layerResolverCache.waterRegionsDataToken || "");
-    const nextWaterRegionsData = resolveContextLayerData("water_regions");
-    runtimeState.waterRegionsData = nextWaterRegionsData;
-    const nextWaterRegionsDataToken = getContextLayerStableSourceToken("water_regions", nextWaterRegionsData, {
-      primaryTopology,
-      detailTopology: runtimeState.topologyDetail,
-      externalCollection: runtimeState.contextLayerExternalDataByName?.water_regions,
-      source: runtimeState.contextLayerSourceByName?.water_regions,
-    });
-    layerResolverCache.waterRegionsDataToken = nextWaterRegionsDataToken;
-    runtimeState.riversData = resolveContextLayerData("rivers");
-    runtimeState.urbanData = resolveContextLayerData("urban");
-    runtimeState.physicalData = resolveContextLayerData("physical");
-    runtimeState.specialZonesData = resolveContextLayerData("special_zones");
-    if (previousWaterRegionsDataToken !== nextWaterRegionsDataToken) {
-      resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
-    }
-    ensureBathymetryDataAvailability({ required: false });
+    let contextChanged = false;
+    for (const [layerName, stateField] of Object.entries(contextLayerFields)) {
+      const primaryObject = primaryTopology.objects?.[layerName];
+      const detailObject = detailTopology?.objects?.[layerName];
+      const externalCollection = runtimeState.contextLayerExternalDataByName?.[layerName];
+      const specialOverride = layerName === "special_zones" ? runtimeState.specialZonesExternalData : null;
+      const stamp = [
+        primaryObject ? primaryTopology : null, primaryObject,
+        detailObject ? detailTopology : null, detailObject,
+        externalCollection, specialOverride, contextRevision, activeScenarioId,
+        runtimeState.topologyBundleMode,
+      ];
+      const previousStamp = layerSourceStamps.get(layerName);
+      if (previousStamp && stamp.every((value, index) => value === previousStamp[index])) continue;
 
-    const diag = runtimeState.layerDataDiagnostics || {};
-    console.info(
-      `${layerDiagPrefix} sources: ocean=${diag.ocean?.source || "none"}, `
-        + `land=${diag.land?.source || "none"}, water_regions=${diag.water_regions?.source || "none"}, `
-        + `rivers=${diag.rivers?.source || "none"}, `
-        + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
-        + `special_zones=${diag.special_zones?.source || "none"}, `
-        + `bathymetry=${runtimeState.activeBathymetrySource || "none"}`
-    );
-    if (typeof runtimeState.updateToolbarInputsFn === "function") {
-      runtimeState.updateToolbarInputsFn();
+      const collection = resolveContextLayerData(layerName);
+      runtimeState[stateField] = collection;
+      layerSourceStamps.set(layerName, stamp);
+      contextChanged = true;
+      if (layerName === "water_regions") {
+        const nextToken = getContextLayerStableSourceToken(layerName, collection, {
+          primaryTopology,
+          detailTopology,
+          externalCollection,
+          source: runtimeState.contextLayerSourceByName?.water_regions,
+        });
+        layerResolverCache.waterRegionsDataToken = nextToken;
+        if (previousWaterRegionsDataToken !== nextToken
+          || (previousStamp && Number(layerResolverCache.contextRevision || 0) !== contextRevision)) {
+          resetScenarioWaterCacheAdaptiveState("water-regions-data-replaced");
+        }
+      }
+    }
+    if (!contextChanged && politicalSourceStamp
+      && politicalStamp.every((value, index) => value === politicalSourceStamp[index])) return;
+    if (contextChanged) {
+      ensureBathymetryDataAvailability({ required: false });
+      const diag = runtimeState.layerDataDiagnostics || {};
+      console.info(
+        `${layerDiagPrefix} sources: ocean=${diag.ocean?.source || "none"}, `
+          + `land=${diag.land?.source || "none"}, water_regions=${diag.water_regions?.source || "none"}, `
+          + `rivers=${diag.rivers?.source || "none"}, `
+          + `urban=${diag.urban?.source || "none"}, physical=${diag.physical?.source || "none"}, `
+          + `special_zones=${diag.special_zones?.source || "none"}, `
+          + `bathymetry=${runtimeState.activeBathymetrySource || "none"}`
+      );
+      if (typeof runtimeState.updateToolbarInputsFn === "function") {
+        runtimeState.updateToolbarInputsFn();
+      }
     }
 
     const hasActiveScenarioPoliticalChunkAuthority = !!(
@@ -493,20 +510,24 @@ export function createContextLayerResolverOwner({
       }
     }
 
-    layerResolverCache.primaryRef = primaryTopology;
-    layerResolverCache.detailRef = runtimeState.topologyDetail;
-    cachedPoliticalChunkFeatureCount = politicalChunkFeatureCount;
-    cachedLandDataFullFeatureCount = Array.isArray(runtimeState.landDataFull?.features)
-      ? runtimeState.landDataFull.features.length
-      : 0;
-    cachedScenarioDataGeneration = scenarioDataGeneration;
-    layerResolverCache.activeScenarioId = activeScenarioId;
-    layerResolverCache.activeChunkScenarioId = activeChunkScenarioId;
-    layerResolverCache.bundleMode = runtimeState.topologyBundleMode;
-    layerResolverCache.contextRevision = Number(runtimeState.contextLayerRevision || 0);
+    politicalSourceStamp = [
+      primaryTopology, primaryTopology.objects?.political,
+      politicalChunkFeatureCount,
+      Array.isArray(runtimeState.landDataFull?.features) ? runtimeState.landDataFull.features.length : 0,
+      Math.max(0, Number(runtimeState.scenarioDataGeneration || 0)),
+      activeScenarioId, activeChunkScenarioId, runtimeState.topologyBundleMode,
+    ];
 
-    if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {
-      runtimeState.updateSpecialZoneEditorUIFn();
+    if (contextChanged) {
+      layerResolverCache.primaryRef = primaryTopology;
+      layerResolverCache.detailRef = detailTopology;
+      layerResolverCache.activeScenarioId = activeScenarioId;
+      layerResolverCache.activeChunkScenarioId = activeChunkScenarioId;
+      layerResolverCache.bundleMode = runtimeState.topologyBundleMode;
+      layerResolverCache.contextRevision = contextRevision;
+      if (typeof runtimeState.updateSpecialZoneEditorUIFn === "function") {
+        runtimeState.updateSpecialZoneEditorUIFn();
+      }
     }
   }
 
