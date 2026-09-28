@@ -1,5 +1,10 @@
 # Worktree Registry
 
+
+## 2026-09-28 全球测深整合
+
+`C:/Users/raede/.codex/worktrees/bathymetry-merge/mapcreator` 使用分支 `codex/bathymetry-global-20260928`，基于 `origin/main@560d5007` 定向整合全球测深数据、后台解码、概览细节分级、海域覆盖绘制和测深界面状态。用户已授权合并推送；主工作区 `main@28310add` 的其他未归属改动保留。本工作树保留 `.runtime/reports/generated/bathymetry-integration/` 中的验证输出供复核和复用。最终提交、推送和受保护 main 的合并状态以此分支 GitHub PR 回执为准。
+
 ## 2026-09-28 交互连续性与首次窗口交付
 
 `C:/Users/raede/.codex/worktrees/pan-zoom-integration/mapcreator` 当前分支为 `codex/interaction-continuity-20260928`，基于 `origin/main@291b5aa2`。用户已接受当前优化结果并授权合并推送，通过受保护 main 的 PR 检查交付。范围包括导航完整底图、相机呈现一致性、冷路径缓存和传输复用、首次窗口 Worker 准备，以及不启用候选资产的水体 LOD 诊断工具。主工作区及其他工作树的未归属改动保留。

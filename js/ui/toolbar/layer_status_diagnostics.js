@@ -222,6 +222,20 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
   const bandsCount = getFeatureCollectionCount(state.activeBathymetryBandsData) ?? 0;
   const contoursCount = getFeatureCollectionCount(state.activeBathymetryContoursData) ?? 0;
   const source = String(state.activeBathymetrySource || "none").trim() || "none";
+  const visibility = state.renderPerfMetrics?.bathymetryVisibility || {};
+  const load = state.renderPerfMetrics?.bathymetryLoad || {};
+  const visibleCount = enabled && preset !== "flat" && visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.visibleCount)
+    : null;
+  const globalVisibleCount = visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.globalVisibleCount) ?? 0
+    : 0;
+  const scenarioVisibleCount = visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.scenarioVisibleCount) ?? 0
+    : 0;
+  const failedSources = Array.isArray(load.failedSources)
+    ? load.failedSources.filter((item) => typeof item === "string" && item.trim())
+    : [];
   let summary = "";
   let severity = STATUS_SEVERITY.ACTIVE;
   if (!enabled) {
@@ -230,13 +244,53 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     severity = STATUS_SEVERITY.MUTED;
   } else if (preset === "flat") {
     summary = translateUi(translate, "Experimental Bathymetry enabled · flat style selected");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "hidden") {
+    summary = translateUi(translate, "Bathymetry opacity is zero");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (load.status === "error") {
+    summary = joinStatusParts(
+      translateUi(translate, "Bathymetry data failed to load"),
+      failedSources.join(", "),
+    );
+    severity = STATUS_SEVERITY.WARNING;
+  } else if (load.status === "loading" || visibility.status === "loading") {
+    summary = translateUi(translate, "Bathymetry loading");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "ready" && visibleCount === 0) {
+    summary = joinStatusParts(
+      translateUi(translate, "No bathymetry coverage in this view"),
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
+      load.status === "partial" ? failedSources.join(", ") : "",
+    );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "ready" && visibleCount > 0) {
+    summary = joinStatusParts(
+      globalVisibleCount > 0
+        ? `${globalVisibleCount} ${translateUi(translate, "raster-derived visible")}` : "",
+      scenarioVisibleCount > 0
+        ? `${scenarioVisibleCount} ${translateUi(translate, "schematic visible")}` : "",
+      globalVisibleCount + scenarioVisibleCount === 0
+        ? `${visibleCount} ${translateUi(translate, "visible")}` : "",
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
+      load.status === "partial" ? failedSources.join(", ") : "",
+    );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
   } else if (bandsCount > 0 || contoursCount > 0) {
     summary = joinStatusParts(
       translateUi(translate, "Bathymetry available"),
       `${translateUi(translate, "source")} ${source}`,
       formatCount(bandsCount, "bands", translate),
       formatCount(contoursCount, "contours", translate),
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
     );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
+  } else if (load.status === "partial") {
+    summary = joinStatusParts(
+      translateUi(translate, "Some bathymetry sources failed to load"),
+      failedSources.join(", "),
+    );
+    severity = STATUS_SEVERITY.WARNING;
   } else {
     summary = translateUi(translate, "Bathymetry data pending for selected style");
     severity = STATUS_SEVERITY.WARNING;
@@ -246,7 +300,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     label: contract?.label || "Bathymetry",
     enabled,
     loadedCount: bandsCount + contoursCount,
-    visibleCount: null,
+    visibleCount,
     severity,
     summary: sanitizeLayerStatusText(summary),
   };

@@ -208,3 +208,12 @@ for (const pixelRatio of [null, 2]) {
     assert.equal(h.allocatedCanvases(), 2);
   });
 }
+
+test("export budget reserves both regional bathymetry mask surfaces only with a background pass", () => {
+  const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["background"] };
+  assert.ok(estimateExportRenderBytes({ ...input, bathymetryCoverage: true })
+    >= estimateExportRenderBytes(input) + 100 * 80 * 4 * 8);
+  const withoutBackground = { ...input, passNames: ["labels"] };
+  assert.equal(estimateExportRenderBytes({ ...withoutBackground, bathymetryCoverage: true }),
+    estimateExportRenderBytes(withoutBackground));
+});

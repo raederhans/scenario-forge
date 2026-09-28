@@ -55,6 +55,7 @@ function createOwner({
   bathymetryData = {},
   context = createCanvasContext(),
   coastlineSource = "global",
+  exportRendering = false,
   oceanStyle = {
     contourStrength: 0.5,
     experimentalAdvancedStyles: true,
@@ -96,6 +97,7 @@ function createOwner({
     getters: {
       getContext: () => context,
       getPathCanvas: () => (feature) => pathCalls.push(feature),
+      isExportRendering: () => exportRendering,
     },
     helpers: {
       applyBathymetryCoverageExclusionMask: (coverage) => helperCalls.push({ type: "coverage-mask", coverage }),
@@ -148,6 +150,30 @@ function createOwner({
   return { context, helperCalls, owner, pathCalls, state: runtimeState };
 }
 
+test("contour strokes keep the same screen width after zoom", () => {
+  const collection = { features: [createFeature(2000)] };
+  const widths = [];
+  for (const k of [1, 4, 8]) {
+    const h = createOwner({ state: { zoomTransform: { k } } });
+    h.owner.drawBathymetryContours(collection, { opacity: 1, contourStrength: 0.8, preset: "bathymetry_contours" });
+    widths.push(h.context.calls.find(call => call.type === "stroke").lineWidth * k);
+  }
+  assert.deepEqual(widths, [1.3, 1.3, 1.3]);
+});
+
+test("bathymetry diagnostics distinguish an empty viewport and zero opacity", () => {
+  for (const opacity of [0, 1]) {
+    let summary;
+    const h = createOwner({ bathymetryData: { bands: { features: [createFeature(200)] } },
+      oceanStyle: { experimentalAdvancedStyles: true, preset: "bathymetry_soft", opacity, contourStrength: 0, scale: 1 },
+      helperOverrides: { pathBoundsInScreen: () => false, publishBathymetryVisibility: value => { summary = value; } },
+    });
+    h.owner.drawOceanStyle();
+    assert.equal(summary.status, opacity ? "ready" : "hidden");
+    assert.equal(summary.visibleCount, 0);
+  }
+});
+
 test("ocean owner records topology mask when advanced bathymetry is inactive", () => {
   const harness = createOwner({
     oceanStyle: {
@@ -187,7 +213,7 @@ test("ocean owner draws global and scenario bathymetry behind the bathymetry mas
   assert.equal(harness.state.oceanMaskQuality, 1);
   assert.deepEqual(
     harness.helperCalls.map((call) => call.type),
-    ["ensure-bathymetry", "ocean-mask", "coverage-mask", "coverage-mask"],
+    ["ensure-bathymetry", "ocean-mask", "coverage-mask"],
   );
   assert.equal(harness.context.calls.filter((call) => call.type === "fill").length, 2);
   assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 2);
@@ -195,6 +221,66 @@ test("ocean owner draws global and scenario bathymetry behind the bathymetry mas
   assert.ok(harness.pathCalls.includes(scenarioBand));
   assert.ok(harness.pathCalls.includes(globalContour));
   assert.ok(harness.pathCalls.includes(scenarioContour));
+});
+
+test("overview geometry is selected below zoom two while scenario geometry stays detailed", () => {
+  const detailBand = createFeature(1000);
+  const overviewBand = createFeature(1000);
+  const scenarioBand = createFeature(250, "scenario");
+  const detailContour = createFeature(2000);
+  const overviewContour = createFeature(2000);
+  const scenarioContour = createFeature(750, "scenario");
+  const bathymetryData = {
+    bands: { features: [detailBand, scenarioBand] },
+    contours: { features: [detailContour, scenarioContour] },
+    globalOverviewBands: { features: [overviewBand] },
+    globalOverviewContours: { features: [overviewContour] },
+  };
+  for (const [zoom, exportRendering, expectedBand, expectedContour] of [
+    [1.99, false, overviewBand, overviewContour],
+    [2, false, detailBand, detailContour],
+    [1.99, true, detailBand, detailContour],
+  ]) {
+    let summary;
+    const harness = createOwner({ bathymetryData, exportRendering, state: { zoomTransform: { k: zoom } },
+      helperOverrides: { publishBathymetryVisibility: value => { summary = value; } },
+    });
+    harness.owner.drawOceanStyle();
+    assert.equal(summary.lod, expectedBand === overviewBand ? "overview" : "detail");
+    assert.equal(summary.visibleCount, 4);
+    assert.ok(harness.pathCalls.includes(expectedBand), `band at zoom ${zoom}, export=${exportRendering}`);
+    assert.ok(harness.pathCalls.includes(expectedContour), `contour at zoom ${zoom}, export=${exportRendering}`);
+    assert.ok(harness.pathCalls.includes(scenarioBand));
+    assert.ok(harness.pathCalls.includes(scenarioContour));
+    assert.equal(harness.pathCalls.includes(expectedBand === detailBand ? overviewBand : detailBand), false);
+    assert.equal(harness.pathCalls.includes(expectedContour === detailContour ? overviewContour : detailContour), false);
+  }
+});
+
+test("missing, partial or empty overview collections fall back to global detail", () => {
+  const detailBand = createFeature(1000);
+  const detailContour = createFeature(2000);
+  for (const [overviewBands, overviewContours] of [
+    [undefined, undefined],
+    [{ features: [] }, { features: [] }],
+    [{ features: [createFeature(1000)] }, undefined],
+  ]) {
+    let summary;
+    const harness = createOwner({
+      bathymetryData: {
+        bands: { features: [detailBand] },
+        contours: { features: [detailContour] },
+        globalOverviewBands: overviewBands,
+        globalOverviewContours: overviewContours,
+      },
+      state: { zoomTransform: { k: 1.5 } },
+      helperOverrides: { publishBathymetryVisibility: value => { summary = value; } },
+    });
+    harness.owner.drawOceanStyle();
+    assert.equal(summary.lod, "detail");
+    assert.ok(harness.pathCalls.includes(detailBand));
+    assert.ok(harness.pathCalls.includes(detailContour));
+  }
 });
 
 test("ocean owner skips alternate contour depths through the preset profile", () => {
