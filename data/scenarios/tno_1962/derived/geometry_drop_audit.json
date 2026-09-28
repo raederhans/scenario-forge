@@ -815,6 +815,29 @@
         "detail_chunk",
         "owner_core"
       ],
+      "feature_id": "ATLISL_aegean_ikaria",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
       "feature_id": "ATLISL_aegean_lesvos",
       "final_area": null,
       "missing_stages": [],
@@ -862,6 +885,29 @@
         "owner_core"
       ],
       "feature_id": "ATLISL_aegean_rhodes",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLISL_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLISL_aegean_samos",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -3461,6 +3507,75 @@
         "owner_core"
       ],
       "feature_id": "ATLPRV_18960",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_19158",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_19190",
+      "final_area": null,
+      "missing_stages": [],
+      "owner_hint_present": false,
+      "prefix": "ATLPRV_",
+      "present": {
+        "detail_chunk": true,
+        "owner_core": true,
+        "runtime": true,
+        "startup_bootstrap": false
+      },
+      "source_area": null,
+      "visual_only": false
+    },
+    {
+      "area_delta": null,
+      "controller_hint_present": false,
+      "drop_reason": "",
+      "expected_stages": [
+        "runtime",
+        "detail_chunk",
+        "owner_core"
+      ],
+      "feature_id": "ATLPRV_19191",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -6473,29 +6588,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_FILL_aegean_56",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_FILL_aegean_6",
       "final_area": null,
       "missing_stages": [],
@@ -8635,98 +8727,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_24",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_25",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_26",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_sicily_tunis_27",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_FILL_sicily_tunis_3",
       "final_area": null,
       "missing_stages": [],
@@ -10016,52 +10016,6 @@
         "owner_core"
       ],
       "feature_id": "ATLSEA_FILL_tyrrhenian_54",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_tyrrhenian_55",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_FILL_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_FILL_tyrrhenian_56",
       "final_area": null,
       "missing_stages": [],
       "owner_hint_present": false,
@@ -13327,52 +13281,6 @@
         "detail_chunk",
         "owner_core"
       ],
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_4",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_5",
-      "final_area": null,
-      "missing_stages": [],
-      "owner_hint_present": false,
-      "prefix": "ATLSEA_",
-      "present": {
-        "detail_chunk": true,
-        "owner_core": true,
-        "runtime": true,
-        "startup_bootstrap": false
-      },
-      "source_area": null,
-      "visual_only": false
-    },
-    {
-      "area_delta": null,
-      "controller_hint_present": false,
-      "drop_reason": "",
-      "expected_stages": [
-        "runtime",
-        "detail_chunk",
-        "owner_core"
-      ],
       "feature_id": "ATLSEA_sicily_tunis_8603_5707_0",
       "final_area": null,
       "missing_stages": [],
@@ -16185,24 +16093,24 @@
   "stages": {
     "detail_chunk": {
       "AQ": 1,
-      "ATLISL_": 69,
-      "ATLPRV_": 87,
-      "ATLSEA_": 118,
-      "ATLSEA_FILL_": 377,
+      "ATLISL_": 71,
+      "ATLPRV_": 90,
+      "ATLSEA_": 116,
+      "ATLSEA_FILL_": 370,
       "RU_ARCTIC_FB_": 51
     },
     "owner_core": {
       "AQ": 1,
-      "ATLISL_": 69,
-      "ATLPRV_": 87,
-      "ATLSEA_": 118,
-      "ATLSEA_FILL_": 377
+      "ATLISL_": 71,
+      "ATLPRV_": 90,
+      "ATLSEA_": 116,
+      "ATLSEA_FILL_": 370
     },
     "runtime_atlantropa": {
-      "ATLISL_": 69,
-      "ATLPRV_": 87,
-      "ATLSEA_": 118,
-      "ATLSEA_FILL_": 377
+      "ATLISL_": 71,
+      "ATLPRV_": 90,
+      "ATLSEA_": 116,
+      "ATLSEA_FILL_": 370
     },
     "runtime_political": {
       "AQ": 1,
@@ -16214,7 +16122,7 @@
   },
   "summary": {
     "polar_feature_count": 1,
-    "protected_feature_count": 703,
+    "protected_feature_count": 699,
     "protected_prefix_drop_count": 0,
     "runtime_only_shell_count": 51
   },

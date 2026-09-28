@@ -56,9 +56,9 @@
     "base_coastline_path_limit": 360,
     "base_coastline_paths_available": 0,
     "base_coastline_paths_dropped": 0,
-    "atlantropa_features": 646,
-    "atlantropa_water_paths": 343,
-    "atlantropa_land_paths": 292,
+    "atlantropa_features": 642,
+    "atlantropa_water_paths": 336,
+    "atlantropa_land_paths": 268,
     "atlantropa_shoal_paths": 61
   },
   "counts": {
@@ -81,9 +81,9 @@
     "base_coastline_path_limit": 360,
     "base_coastline_paths_available": 0,
     "base_coastline_paths_dropped": 0,
-    "atlantropa_features": 646,
-    "atlantropa_water_paths": 343,
-    "atlantropa_land_paths": 292,
+    "atlantropa_features": 642,
+    "atlantropa_water_paths": 336,
+    "atlantropa_land_paths": 268,
     "atlantropa_shoal_paths": 61
   },
   "territory_tags": [

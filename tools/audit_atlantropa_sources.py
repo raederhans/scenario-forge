@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -26,6 +27,34 @@ DEFAULT_BASELINE = ROOT / "data/scenarios/tno_1962"
 DEFAULT_OUTPUT = ROOT / ".runtime/tmp/atlantropa-expansion-20260926/inventory"
 ADJACENCY_DEGREES = 0.35
 BLACK_SEA_SOURCE_STATE_IDS = [8444, 8630, *range(8632, 8645)]
+STATE_LOCALIZATION_RE = re.compile(r'^\s*STATE_(?P<state_id>\d+):\d+\s+"(?P<label>[^"]*)"')
+
+
+def english_state_localization_index(hgo_root: Path) -> dict[int, list[dict[str, str]]]:
+    """Index every English state label with its source file, including replace files."""
+    localization_root = hgo_root / "localisation"
+    result: dict[int, list[dict[str, str]]] = defaultdict(list)
+    for path in sorted(localization_root.rglob("*_l_english.yml")):
+        relative_path = path.relative_to(hgo_root)
+        text = path.read_text(encoding="utf-8-sig", errors="replace")
+        for line in text.splitlines():
+            match = STATE_LOCALIZATION_RE.match(line)
+            if match:
+                result[int(match.group("state_id"))].append({
+                    "label": match.group("label"),
+                    "source_file": relative_path.as_posix(),
+                })
+    return {state_id: labels for state_id, labels in sorted(result.items())}
+
+
+def state_localization_evidence(state_id: int, filename_name: str,
+                                labels_by_state: dict[int, list[dict[str, str]]]) -> dict:
+    """Keep filename and localized labels separate while exposing name conflicts."""
+    labels = labels_by_state.get(int(state_id), [])
+    unique_labels = {entry["label"] for entry in labels}
+    return {"state_id": int(state_id), "labels": labels,
+            "labels_conflict": len(unique_labels) > 1,
+            "disagrees_with_filename": any(label != filename_name for label in unique_labels)}
 
 
 def attribution_ids(properties: dict, singular: str, plural: str) -> set[int]:
@@ -150,6 +179,7 @@ def classify_candidate(*, configured_role: str | None, spatial_relation: str,
 
 def build_inventory(context: dict, baseline_dir: Path) -> dict:
     topology = builder.load_json(baseline_dir / "runtime_topology.topo.json")
+    localization_labels = english_state_localization_index(Path(context["root"]))
     by_province, by_state, land_by_province = current_attribution_index(topology)
     # The frozen scenario political layer has retired original island IDs.
     # Use the same global source as the builder for island anchors and the
@@ -226,6 +256,9 @@ def build_inventory(context: dict, baseline_dir: Path) -> dict:
                 evidence["reason"] = "unassigned_water_province_retained_for_review"
             rows.append({"province_id": province_id, "province_type": context["province_type_by_id"].get(province_id),
                          "state_ids": states, "state_names": [builder.get_state_name(context, s) for s in states],
+                         "state_localization_labels": [
+                             state_localization_evidence(state_id, builder.get_state_name(context, state_id), localization_labels)
+                             for state_id in states],
                          "configured_role": role or "spatial_candidate", "spatial_relation": relation,
                          "alignment": alignment,
                          "current_feature_ids": sorted(by_province.get(province_id, set())),
@@ -236,6 +269,8 @@ def build_inventory(context: dict, baseline_dir: Path) -> dict:
                         "adjacency_degrees": ADJACENCY_DEGREES, "affine_coeffs": list(coeffs),
                         "control_count": len(controls), "scan": scan, "candidates": rows})
     black_sea = [{"state_id": state_id, "state_name": builder.get_state_name(context, state_id),
+                  "localization_labels": state_localization_evidence(
+                      state_id, builder.get_state_name(context, state_id), localization_labels),
                   "exists": state_id in context["state_path_index"],
                   "province_ids": builder.get_state_province_ids(context, state_id)
                   if state_id in context["state_path_index"] else []}
@@ -267,6 +302,18 @@ def write_inventory(payload: dict, output_dir: Path) -> None:
                          f"state {','.join(map(str, row['state_ids'])) or '?':12} "
                          f"{row['spatial_relation']:12} {row['configured_role']:17} "
                          f"{','.join(row['state_names'])[:60]}")
+            if row["classification"] == "unresolved":
+                for state in row["state_localization_labels"]:
+                    if not (state["labels_conflict"] or state["disagrees_with_filename"]):
+                        continue
+                    labels = ", ".join(
+                        f"{entry['label']} ({entry['source_file']})" for entry in state["labels"])
+                    issues = []
+                    if state["labels_conflict"]:
+                        issues.append("conflicting labels")
+                    if state["disagrees_with_filename"]:
+                        issues.append("differs from filename")
+                    lines.append(f"    state {state['state_id']} localization [{'; '.join(issues)}]: {labels}")
         lines.append("")
     black = payload["full_black_sea"]
     lines.append(f"full_black_sea: {black['status']} — {black['note']}")

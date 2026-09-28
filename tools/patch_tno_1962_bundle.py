@@ -4931,7 +4931,7 @@ ATLANTROPA_REGION_CONFIGS = {
         "sea_completion_bbox": (7.0, 34.2, 16.5, 39.5),
         "land_state_ids": [
             8486, 8557, 8558, 8559, 8560, 8561, 8562, 8566,
-            9036, 9037, 9078, 9080, 9081, 9083,
+            9036, 9037, 9078, 9080, 9081, 9083, 9890,
         ],
         "water_state_ids": [8591, 8592, 8598, 8600, 8603, 8606],
         "state_owner_overrides": {
@@ -4949,7 +4949,9 @@ ATLANTROPA_REGION_CONFIGS = {
             9080: "ITA",
             9081: "TUN",
             9083: "ITA",
+            9890: "ITA",
         },
+        "state_name_overrides": {9890: "East Maltan Atlantropa Zone"},
         "control_points": {
             8557: (13.30, 38.15),
             8559: (15.10, 37.20),
@@ -4982,6 +4984,7 @@ ATLANTROPA_REGION_CONFIGS = {
                 "id": "sicily",
                 "label": "Sicily",
                 "owner_tag": "ITA",
+                "preserve_baseline_core": True,
                 "donor_state_ids": [8557, 8558, 8559, 8561],
                 "baseline_feature_ids": ["ITG11", "ITG12", "ITG13", "ITG14", "ITG15", "ITG17", "ITG18", "ITG19"],
                 "search_margin": 0.35,
@@ -4993,8 +4996,14 @@ ATLANTROPA_REGION_CONFIGS = {
                 "id": "malta",
                 "label": "Malta",
                 "owner_tag": "ITA",
-                "donor_state_ids": [8560],
+                "donor_state_ids": [8560, 9890],
                 "baseline_feature_ids": ["MT001", "MT002"],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["MT001", "MT002"],
+                    "source_province_ids": [12003, 13814],
+                    "donor_state_ids": [8560, 9890],
+                }],
+                "max_baseline_area_ratio": 12.5,
                 "search_margin": 0.18,
                 "gap_fill_buffer": 0.08,
                 "boolean_weld_distance": 0.1,
@@ -5279,7 +5288,8 @@ ATLANTROPA_REGION_CONFIGS = {
             8523, 8524, 8525, 8526, 8527, 8528, 8529, 8530, 8531, 8532,
             8533, 8534, 8535, 8536, 8537, 8538, 8539, 8540, 8541, 8542,
             8543,
-            8653, 9038, 9097,
+            8653, 9038, 9097, 9843, 9844, 9829,
+            9825, 9831, 9845,
         ],
         "water_state_ids": [8445, 8607, 8608, 8610, 8619, 8620, 8621, 8622],
         "state_owner_overrides": {
@@ -5317,7 +5327,23 @@ ATLANTROPA_REGION_CONFIGS = {
             8653: "GRE",
             9038: "TUR",  # Marmara south-coast donor; named waters are clipped to its land.
             9097: "TUR",
+            9829: "TUR",  # South Lesvos joins the published TUR Lesvos island.
+            9825: "TUR",  # Samos and Ikaria ownership confirmed for this scenario.
+            9831: "TUR",
+            9845: "TUR",
+            9843: "TUR",
+            9844: "TUR",
         },
+        # English localization and source pixels override stale state filenames.
+        "state_name_overrides": {
+            9825: "Samos Atlantropa Zone",
+            9831: "Soke Atlantropa Zone",
+            9829: "South Lesvos Atlantropa Zone",
+            9843: "Bodrum Atlantropa Zone",
+            9844: "Milas Atlantropa Zone",
+            9845: "Ikaria Atlantropa Zone",
+        },
+        "complete_source_coastal_band_state_ids": [8516, 8531],
         "control_points": {
             8516: (22.1, 37.35),
             8520: (23.75, 37.95),
@@ -5375,7 +5401,15 @@ ATLANTROPA_REGION_CONFIGS = {
                 "id": "lesvos",
                 "label": "Lesvos",
                 "owner_tag": "GRE",
-                "donor_state_ids": [8536],
+                "donor_state_ids": [8536, 9829],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["EL411"],
+                    # EL411 also contains Limnos; select the complete Lesvos component.
+                    "baseline_component_bbox": [25.75, 38.8, 26.7, 39.55],
+                    "source_province_ids": [8435],
+                    "donor_state_ids": [8536, 9829],
+                }],
+                "max_baseline_area_ratio": 3.40,
                 "group_bbox": (25.75, 38.8, 26.7, 39.55),
                 "search_margin": 0.16,
                 "gap_fill_buffer": 0.06,
@@ -5387,6 +5421,13 @@ ATLANTROPA_REGION_CONFIGS = {
                 "label": "Chios",
                 "owner_tag": "GRE",
                 "donor_state_ids": [8538],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["EL413"],
+                    "baseline_component_bbox": [25.75, 38.1, 26.3, 38.65],
+                    "source_province_ids": [6550],
+                    "donor_state_ids": [8538],
+                }],
+                "max_baseline_area_ratio": 3.75,
                 "group_bbox": (25.85, 38.15, 26.7, 38.8),
                 "search_margin": 0.16,
                 "gap_fill_buffer": 0.06,
@@ -5436,6 +5477,47 @@ ATLANTROPA_REGION_CONFIGS = {
                 "gap_fill_buffer": 0.05,
                 "boolean_weld_distance": 0.08,
                 "boolean_weld_width": 0.016,
+            },
+            {
+                # Keep the published Skyros feature ID and its owner/core mappings.
+                "id": "GRE_5",
+                "label": "Skyros",
+                "owner_tag": "GRE",
+                "donor_state_ids": [8524],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["EL642"],
+                    "baseline_component_bbox": [24.4, 38.7, 24.8, 39.1],
+                    "source_province_ids": [13353],
+                    "donor_state_ids": [8524],
+                }],
+                "max_baseline_area_ratio": 9.0,
+            },
+            {
+                "id": "samos",
+                "label": "Samos",
+                "owner_tag": "TUR",
+                "donor_state_ids": [9825],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["EL412"],
+                    "baseline_component_bbox": [26.5, 37.5, 27.1, 37.9],
+                    "source_province_ids": [15068],
+                    "donor_state_ids": [9825],
+                }],
+                "max_baseline_area_ratio": 2.80,
+                "clip_mainland_overlap": True,
+            },
+            {
+                "id": "ikaria",
+                "label": "Ikaria",
+                "owner_tag": "TUR",
+                "donor_state_ids": [9845],
+                "source_island_anchors": [{
+                    "baseline_feature_ids": ["EL412"],
+                    "baseline_component_bbox": [25.9, 37.4, 26.4, 37.8],
+                    "source_province_ids": [15067],
+                    "donor_state_ids": [9845],
+                }],
+                "max_baseline_area_ratio": 3.00,
             },
         ],
     },
@@ -9655,6 +9737,13 @@ def prepare_source_aligned_island_groups(config, donor_context, baseline_land_fu
             if set(target_rows["id"]) != target_ids:
                 raise ValueError(f"Missing island alignment baseline: {sorted(target_ids)}")
             target = safe_unary_union(target_rows.geometry)
+            component_bbox = anchor.get("baseline_component_bbox")
+            if component_bbox is not None:
+                window = box(*component_bbox)
+                components = [part for part in iter_polygon_parts(target) if part.intersects(window)]
+                if len(components) != 1 or not window.covers(components[0]):
+                    raise ValueError(f"Island anchor must select one complete baseline component: {group['id']}")
+                target = components[0]
             source = safe_unary_union([
                 extract_province_geometry_raw(donor_context, int(province_id))
                 for province_id in anchor["source_province_ids"]
@@ -9701,8 +9790,11 @@ def prepare_source_aligned_island_groups(config, donor_context, baseline_land_fu
             raise ValueError(f"Aligned island area budget exceeded: {group['id']} ({area_ratio:.6f})")
         prepared[group["id"]] = {
             "geometry": combined,
+            "baseline_geometry": target,
             "donor_province_ids": sorted(donor_province_ids),
-            "donor_state_names": sorted({get_state_name(donor_context, state_id) for state_id in anchored_states}),
+            "donor_state_names": sorted({config.get("state_name_overrides", {}).get(state_id)
+                                          or get_state_name(donor_context, state_id)
+                                          for state_id in anchored_states}),
             "diagnostics": {"anchors": diagnostics, "area_ratio": area_ratio,
                             "baseline_missing_area": float(target.difference(combined).area),
                             "deferred_unanchored_components": deferred_parts,
@@ -9745,7 +9837,18 @@ def build_major_island_rows(
         if aligned is not None:
             combined = aligned["geometry"]
             if mainland_union is not None and combined.intersects(mainland_union):
-                raise ValueError(f"Aligned island overlaps mainland: {region_id}/{group['id']}")
+                if not group.get("clip_mainland_overlap", False):
+                    raise ValueError(f"Aligned island overlaps mainland: {region_id}/{group['id']}")
+                # A source-supported reclamation may reach the existing mainland.
+                # Remove only duplicate mainland coverage, never the original island.
+                clipped = normalize_polygonal(combined.difference(mainland_union))
+                core = aligned["baseline_geometry"]
+                if clipped is None or core.difference(clipped).area > 1e-12:
+                    raise ValueError(f"Mainland clipping removes original island: {region_id}/{group['id']}")
+                if any(part.intersection(core).area <= 0 for part in iter_polygon_parts(clipped)):
+                    raise ValueError(f"Mainland clipping detaches island reclamation: {region_id}/{group['id']}")
+                aligned["diagnostics"]["mainland_overlap_removed_area"] = float(combined.difference(clipped).area)
+                combined = clipped
             rebuilt_rows.append(make_atl_row(
                 feature_id=f"ATLISL_{region_id}_{group['id']}",
                 name=f"{group['label']} Rebuilt Island", geometry=combined,
@@ -9854,6 +9957,13 @@ def build_major_island_rows(
                 baseline_limited = normalize_polygonal(combined.intersection(baseline_union))
                 combined = baseline_limited or baseline_union
 
+        if group.get("preserve_baseline_core", False):
+            if not explicit_baseline_ids or baseline_union is None:
+                raise ValueError(f"Original island core requires explicit baseline geometry: {group['id']}")
+            # Smoothing must not erode the original island and then allow sea
+            # generation to occupy those edges. Add only the exact known core.
+            combined = safe_unary_union([combined, baseline_union])
+
         owner_tag = normalize_tag(group.get("owner_tag")) or assign_owner_from_nearest_rows(combined, matched_rows)
         donor_state_name_set = sorted({
             str(value).strip()
@@ -9951,7 +10061,8 @@ def verify_atl_final_coast_contact(required_parts, final_land, reference):
     return len(required_parts)
 
 
-def restore_atl_source_coast_contact(geometry, source_geometry, local_land, *, collar_width: float, feature_id: str):
+def restore_atl_source_coast_contact(geometry, source_geometry, local_land, *, collar_width: float,
+                                     feature_id: str, complete_coastal_band: bool = False):
     """Restore only source-supported coast contact removed by clipping/simplification.
 
     The buffer selects a coastal band; it never supplies new land. Detached source
@@ -9972,8 +10083,10 @@ def restore_atl_source_coast_contact(geometry, source_geometry, local_land, *, c
             retained = source_part.intersection(retained_part)
             if retained.area <= 0:
                 continue
-            if any(part.intersection(retained).area > 0 and part.boundary.intersection(coast).length > 0
-                   for part in iter_polygon_parts(restored)):
+            if not complete_coastal_band and any(
+                part.intersection(retained).area > 0 and part.boundary.intersection(coast).length > 0
+                for part in iter_polygon_parts(restored)
+            ):
                 continue
             band = source_part.intersection(local_land.buffer(collar_width))
             patches = [part for part in iter_polygon_parts(band)
@@ -9981,6 +10094,8 @@ def restore_atl_source_coast_contact(geometry, source_geometry, local_land, *, c
                        and part.boundary.intersection(coast).length > 0]
             if not patches:
                 raise ValueError(f"Atlantropa coast join failed for {feature_id}: source contact cannot reach retained land")
+            if complete_coastal_band and all(patch.difference(restored).area <= 1e-14 for patch in patches):
+                continue
             restored = safe_unary_union([restored, *patches])
             if not any(part.intersection(retained).area > 0 and part.boundary.intersection(coast).length > 0
                        for part in iter_polygon_parts(restored)):
@@ -11712,7 +11827,7 @@ def build_atlantropa_from_hgo(
             if normalize_tag(tag)
         }
         for state_id in donor_land_state_ids:
-            state_name = get_state_name(donor_context, state_id)
+            state_name = config.get("state_name_overrides", {}).get(state_id) or get_state_name(donor_context, state_id)
             causeway_trim_ids = {int(value) for value in config.get("causeway_trim_state_ids", [])}
             province_ids = get_state_province_ids(donor_context, state_id)
             for province_id in province_ids:
@@ -11806,6 +11921,8 @@ def build_atlantropa_from_hgo(
                 row["geometry"], source_coast_geometries[row["id"]], local_land,
                 collar_width=float(config.get("preserve_margin", 0.03)) + 2 * precision_simplify_tolerance,
                 feature_id=row["id"],
+                complete_coastal_band=bool(set(row.get("donor_state_ids") or []).intersection(
+                    config.get("complete_source_coastal_band_state_ids", []))),
             )
             restored_coast_contact_count += restored_count
             required_coast_parts.setdefault(region_id, []).extend(

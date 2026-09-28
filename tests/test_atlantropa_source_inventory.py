@@ -1,6 +1,8 @@
 """Focused checks for HGO source inventory lineage and spatial classification."""
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from affine import Affine
@@ -12,12 +14,87 @@ from tools.audit_atlantropa_sources import (
     attribution_ids,
     classify_candidate,
     current_attribution_index,
+    english_state_localization_index,
     inverse_aoi_pixel_keys,
     province_projection,
+    state_localization_evidence,
+    write_inventory,
 )
 
 
 class AtlantropaSourceInventoryTests(unittest.TestCase):
+    def test_english_localization_index_keeps_all_labels_and_relative_sources(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            localization = root / "localisation"
+            localization.mkdir()
+            (localization / "one_l_english.yml").write_text(
+                '\ufeffl_english:\n STATE_9843:0 "Bodrum Atlantropa Zone"\n', encoding="utf-8")
+            (localization / "two_l_english.yml").write_text(
+                'l_english:\n STATE_9843:12 "Bodrum Atlantropa Zone"\n', encoding="utf-8")
+            replace = localization / "replace"
+            replace.mkdir()
+            (replace / "HGO_states_names_l_english.yml").write_text(
+                'l_english:\n STATE_9843:0 "Override label"\n', encoding="utf-8")
+
+            labels = english_state_localization_index(root)[9843]
+            evidence = state_localization_evidence(9843, "Western Lesvos", {9843: labels})
+
+        self.assertEqual([entry["label"] for entry in labels], [
+            "Bodrum Atlantropa Zone", "Override label", "Bodrum Atlantropa Zone"])
+        self.assertEqual([entry["source_file"] for entry in labels], [
+            "localisation/one_l_english.yml", "localisation/replace/HGO_states_names_l_english.yml",
+            "localisation/two_l_english.yml"])
+        self.assertTrue(evidence["labels_conflict"])
+        self.assertTrue(evidence["disagrees_with_filename"])
+
+    def test_conflicting_localization_labels_are_flagged(self):
+        evidence = state_localization_evidence(9844, "Eastern Chios", {
+            9844: [{"label": "Milas Atlantropa Zone", "source_file": "localisation/a_l_english.yml"},
+                   {"label": "Milas ATL Zone", "source_file": "localisation/b_l_english.yml"}],
+        })
+        self.assertTrue(evidence["labels_conflict"])
+        self.assertTrue(evidence["disagrees_with_filename"])
+        self.assertEqual(len(evidence["labels"]), 2)
+
+    def test_state_without_localization_label_has_empty_evidence(self):
+        evidence = state_localization_evidence(9999, "Unnamed State", {})
+        self.assertEqual(evidence["labels"], [])
+        self.assertFalse(evidence["labels_conflict"])
+        self.assertFalse(evidence["disagrees_with_filename"])
+
+    def test_single_localization_label_can_disagree_with_filename(self):
+        evidence = state_localization_evidence(9829, "Eastern Vis", {
+            9829: [{"label": "South Lesvos Atlantropa Zone", "source_file": "localisation/states_l_english.yml"}],
+        })
+        self.assertFalse(evidence["labels_conflict"])
+        self.assertTrue(evidence["disagrees_with_filename"])
+
+    def test_text_inventory_surfaces_unresolved_localization_conflicts(self):
+        with TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            write_inventory({
+                "interpretation": "Candidate inventory only",
+                "baseline_dir": "baseline",
+                "regions": [{"region_id": "test", "aoi_bbox": [0, 0, 1, 1], "candidates": [{
+                    "classification": "unresolved", "province_id": 1, "state_ids": [9843],
+                    "state_names": ["Western Lesvos"], "spatial_relation": "inside_aoi",
+                    "configured_role": "spatial_candidate",
+                    "state_localization_labels": [
+                        state_localization_evidence(9843, "Western Lesvos", {9843: [
+                            {"label": "Bodrum Atlantropa Zone", "source_file": "localisation/a_l_english.yml"},
+                            {"label": "Override label", "source_file": "localisation/replace/HGO_states_names_l_english.yml"},
+                        ]}),
+                    ],
+                }]}],
+                "full_black_sea": {"status": "not_scanned", "note": "No spatial scan", "source_states": []},
+            }, output)
+            report = (output / "source_inventory.txt").read_text(encoding="utf-8")
+
+        self.assertIn("conflicting labels", report)
+        self.assertIn("differs from filename", report)
+        self.assertIn("localisation/replace/HGO_states_names_l_english.yml", report)
+
     def test_scalar_and_list_lineage_are_both_indexed(self):
         topology = {"objects": {"scenario_atlantropa": {"geometries": [
             {"properties": {"id": "ATLPRV_1", "atl_render_layer": "land", "donor_province_id": 1, "donor_state_id": 10}},

@@ -1,5 +1,7 @@
 # Status
 
+2026-09-28 southern continuation: user authorized merge/push. Integrated onto `4506f4fe` in `codex/atlantropa-southern-expansion-20260928`; regenerated 726 ATL features (170 land / 70 shoal / 486 water) from the current-main baseline. Preserve the earlier records below as historical. Current validation and merge receipts are in `context.md`.
+
 Integration update: current-main `a5eed904` rebuild and acceptance complete in `codex/atlantropa-expansion-20260926`. 82 scoped unit/regression tests, both browser cases, full water/geometry/assignment/strict contracts and data health pass. 192 current-main political chunks and mesh pack preserve bytes; no current-main locale change. Ready for protected-branch PR checks and merge; original implementation evidence below remains historical. Remote status follows the PR receipt.
 
 - [x] Step 1: source inventory and candidate classification (4,655 region/province rows, 3,002 unique source provinces; eight registered AOIs plus explicit Black Sea non-spatial index).

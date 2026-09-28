@@ -172,7 +172,7 @@
         15.5,
         36.6
       ],
-      "bbox_candidate_count": 16,
+      "bbox_candidate_count": 12,
       "chunk_missing_feature_ids": [],
       "expected_prefixes": [
         "ATLISL_",
@@ -182,22 +182,18 @@
       "failure_reasons": [],
       "id": "malta_rebuilt_island",
       "label": "Malta Rebuilt Island",
-      "match_count": 15,
+      "match_count": 11,
       "matching_feature_ids": [
         "ATLISL_sicily_tunis_malta",
         "ATLISL_sicily_tunis_sicily",
         "ATLSEA_FILL_sicily_tunis_1",
-        "ATLSEA_FILL_sicily_tunis_12",
-        "ATLSEA_FILL_sicily_tunis_21",
-        "ATLSEA_FILL_sicily_tunis_22",
-        "ATLSEA_FILL_sicily_tunis_5",
+        "ATLSEA_FILL_sicily_tunis_18",
+        "ATLSEA_FILL_sicily_tunis_4",
         "ATLSEA_sicily_tunis_8598_9013_0",
         "ATLSEA_sicily_tunis_8600_5733_0",
         "ATLSEA_sicily_tunis_8600_5733_1",
         "ATLSEA_sicily_tunis_8600_5733_2",
         "ATLSEA_sicily_tunis_8600_5733_3",
-        "ATLSEA_sicily_tunis_8600_5733_4",
-        "ATLSEA_sicily_tunis_8600_5733_5",
         "ATLSEA_sicily_tunis_8603_5707_0"
       ],
       "ok": true
@@ -252,10 +248,10 @@
         "ATLSEA_FILL_aegean_18",
         "ATLSEA_FILL_aegean_19",
         "ATLSEA_FILL_aegean_2",
+        "ATLSEA_FILL_aegean_22",
+        "ATLSEA_FILL_aegean_23",
         "ATLSEA_FILL_aegean_24",
         "ATLSEA_FILL_aegean_25",
-        "ATLSEA_FILL_aegean_26",
-        "ATLSEA_FILL_aegean_27",
         "ATLSEA_FILL_aegean_3",
         "ATLSEA_FILL_aegean_4",
         "ATLSEA_FILL_aegean_5",
@@ -1282,10 +1278,10 @@
     },
     {
       "bbox": [
-        24.392449,
-        38.749482,
-        25.183029,
-        39.417579
+        23.924039,
+        38.723665,
+        24.764048,
+        39.278786
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -1306,7 +1302,7 @@
       "feature_id": "ATLISL_aegean_GRE_5",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.163555,
+      "planar_area": 0.186523,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -1350,10 +1346,10 @@
     },
     {
       "bbox": [
-        25.85,
-        38.15,
-        26.7,
-        38.717529
+        25.562056,
+        37.800855,
+        26.264063,
+        38.653345
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -1373,8 +1369,8 @@
       "drop_reason": "",
       "feature_id": "ATLISL_aegean_chios",
       "interactive": true,
-      "join_mode": "boolean_weld",
-      "planar_area": 0.137081,
+      "join_mode": "none",
+      "planar_area": 0.329173,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -1444,7 +1440,7 @@
       "feature_id": "ATLISL_aegean_euboea",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.209049,
+      "planar_area": 0.166889,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -1454,10 +1450,10 @@
     },
     {
       "bbox": [
-        25.75,
-        38.8,
-        26.7,
-        39.372155
+        25.924631,
+        37.490873,
+        26.387492,
+        37.719309
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -1466,19 +1462,55 @@
       "color_rule": "owner",
       "donor_basin": "atlantropa_aegean_and_islands",
       "donor_provenance": "donor_metadata",
-      "donor_province": "18198",
+      "donor_province": "19189",
       "donor_province_ids": [
-        18198
+        19189
       ],
-      "donor_state": "8536",
+      "donor_state": "9845",
       "donor_state_ids": [
-        8536
+        9845
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLISL_aegean_ikaria",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.07049,
+      "prefix": "ATLISL_",
+      "render_layer": "land",
+      "role": "donor_island",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
+        25.076051,
+        38.545915,
+        26.656794,
+        39.431193
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "owner",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "18198,19159",
+      "donor_province_ids": [
+        18198,
+        19159
+      ],
+      "donor_state": "8536,9829",
+      "donor_state_ids": [
+        8536,
+        9829
       ],
       "drop_reason": "",
       "feature_id": "ATLISL_aegean_lesvos",
       "interactive": true,
-      "join_mode": "boolean_weld",
-      "planar_area": 0.291943,
+      "join_mode": "none",
+      "planar_area": 0.560779,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -1547,6 +1579,40 @@
       "interactive": true,
       "join_mode": "boolean_weld",
       "planar_area": 0.29487,
+      "prefix": "ATLISL_",
+      "render_layer": "land",
+      "role": "donor_island",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
+        26.387492,
+        37.550412,
+        27.122928,
+        37.851146
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "owner",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "19164",
+      "donor_province_ids": [
+        19164
+      ],
+      "donor_state": "9825",
+      "donor_state_ids": [
+        9825
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLISL_aegean_samos",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.133886,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -1659,7 +1725,7 @@
     {
       "bbox": [
         23.323557,
-        39.02502,
+        39.027212,
         24.608493,
         39.805727
       ],
@@ -1682,7 +1748,7 @@
       "feature_id": "ATLISL_aegean_source_748112bfba8ebbb5f1bcca1e82260b07f95dd163e1e4640e70d55a9531bf0248",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.311932,
+      "planar_area": 0.28774,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -2111,10 +2177,10 @@
     },
     {
       "bbox": [
-        13.606562,
-        36.300247,
-        14.472567,
-        36.83232
+        14.118441,
+        35.610179,
+        15.157952,
+        36.249184
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -2123,19 +2189,21 @@
       "color_rule": "owner",
       "donor_basin": "atlantropa_sicily_tunis_salt_shelf",
       "donor_provenance": "donor_metadata",
-      "donor_province": "18159",
+      "donor_province": "18159,19216",
       "donor_province_ids": [
-        18159
+        18159,
+        19216
       ],
-      "donor_state": "8560",
+      "donor_state": "8560,9890",
       "donor_state_ids": [
-        8560
+        8560,
+        9890
       ],
       "drop_reason": "",
       "feature_id": "ATLISL_sicily_tunis_malta",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.175662,
+      "planar_area": 0.382833,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -2147,8 +2215,8 @@
       "bbox": [
         11.609854,
         35.167704,
-        15.607889,
-        38.275087
+        15.607956,
+        38.275125
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -2175,7 +2243,7 @@
       "feature_id": "ATLISL_sicily_tunis_sicily",
       "interactive": true,
       "join_mode": "boolean_weld",
-      "planar_area": 3.978675,
+      "planar_area": 3.788444,
       "prefix": "ATLISL_",
       "render_layer": "land",
       "role": "donor_island",
@@ -3423,7 +3491,7 @@
       "bbox": [
         21.016166,
         36.496616,
-        22.304058,
+        22.336938,
         38.044109
       ],
       "chunk_ids": [
@@ -3445,7 +3513,7 @@
       "feature_id": "ATLPRV_18172",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.253231,
+      "planar_area": 0.261181,
       "prefix": "ATLPRV_",
       "render_layer": "land",
       "role": "donor_land",
@@ -3594,7 +3662,7 @@
         26.387165,
         36.973655,
         27.413591,
-        37.646874
+        37.636675
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -3615,7 +3683,7 @@
       "feature_id": "ATLPRV_18181",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.301493,
+      "planar_area": 0.27369,
       "prefix": "ATLPRV_",
       "render_layer": "land",
       "role": "donor_land",
@@ -4194,7 +4262,7 @@
       "feature_id": "ATLPRV_18220",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.554308,
+      "planar_area": 0.566767,
       "prefix": "ATLPRV_",
       "render_layer": "land",
       "role": "donor_land",
@@ -5419,6 +5487,108 @@
       "interactive": true,
       "join_mode": "none",
       "planar_area": 0.029977,
+      "prefix": "ATLPRV_",
+      "render_layer": "land",
+      "role": "donor_land",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
+        26.703837,
+        38.399672,
+        26.937285,
+        38.608022
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "owner",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "19158",
+      "donor_province_ids": [
+        19158
+      ],
+      "donor_state": "9831",
+      "donor_state_ids": [
+        9831
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLPRV_19158",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.021258,
+      "prefix": "ATLPRV_",
+      "render_layer": "land",
+      "role": "donor_land",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
+        27.112564,
+        37.119739,
+        27.552856,
+        37.621575
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "owner",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "19190",
+      "donor_province_ids": [
+        19190
+      ],
+      "donor_state": "9844",
+      "donor_state_ids": [
+        9844
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLPRV_19190",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.028294,
+      "prefix": "ATLPRV_",
+      "render_layer": "land",
+      "role": "donor_land",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
+        27.546434,
+        36.813612,
+        28.172082,
+        36.988868
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "owner",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "19191",
+      "donor_province_ids": [
+        19191
+      ],
+      "donor_state": "9843",
+      "donor_state_ids": [
+        9843
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLPRV_19191",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.057626,
       "prefix": "ATLPRV_",
       "render_layer": "land",
       "role": "donor_land",
@@ -7122,7 +7292,7 @@
       "feature_id": "ATLSEA_FILL_adriatica_54",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 10.718791,
+      "planar_area": 10.718756,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -7253,7 +7423,7 @@
     {
       "bbox": [
         17.95794,
-        42.341517,
+        42.340721,
         18.140313,
         42.437638
       ],
@@ -7272,7 +7442,7 @@
       "feature_id": "ATLSEA_FILL_adriatica_59",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.006842,
+      "planar_area": 0.006955,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -7332,7 +7502,7 @@
       "feature_id": "ATLSEA_FILL_adriatica_60",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.03363,
+      "planar_area": 0.033032,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -7432,10 +7602,10 @@
     },
     {
       "bbox": [
-        16.132062,
+        16.129426,
         43.26443,
-        16.218852,
-        43.305707
+        16.218873,
+        43.310551
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -7452,7 +7622,7 @@
       "feature_id": "ATLSEA_FILL_adriatica_64",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.002128,
+      "planar_area": 0.002398,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -7642,9 +7812,9 @@
     },
     {
       "bbox": [
-        14.578974,
-        44.376994,
-        14.665764,
+        14.578953,
+        44.372151,
+        14.668399,
         44.418271
       ],
       "chunk_ids": [
@@ -7662,7 +7832,7 @@
       "feature_id": "ATLSEA_FILL_adriatica_70",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.002128,
+      "planar_area": 0.002398,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8124,7 +8294,7 @@
       "bbox": [
         22.59628,
         36.587575,
-        27.23602,
+        27.236019,
         40.969446
       ],
       "chunk_ids": [
@@ -8142,7 +8312,7 @@
       "feature_id": "ATLSEA_FILL_aegean_19",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 6.93302,
+      "planar_area": 6.557833,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8182,10 +8352,10 @@
     },
     {
       "bbox": [
-        26.363131,
-        38.371799,
-        26.400896,
-        38.41014
+        27.481373,
+        37.1716,
+        27.521153,
+        37.218335
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -8202,67 +8372,7 @@
       "feature_id": "ATLSEA_FILL_aegean_20",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.000903,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        26.939361,
-        37.639894,
-        27.008582,
-        37.661643
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_21",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.000742,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        27.338332,
-        37.142065,
-        27.522912,
-        37.317049
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_22",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.014214,
+      "planar_area": 0.001043,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8289,7 +8399,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_23",
+      "feature_id": "ATLSEA_FILL_aegean_21",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.007971,
@@ -8319,7 +8429,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_24",
+      "feature_id": "ATLSEA_FILL_aegean_22",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.019238,
@@ -8332,10 +8442,10 @@
     },
     {
       "bbox": [
-        27.548982,
-        36.815767,
-        28.111385,
-        36.964492
+        27.631796,
+        36.817818,
+        28.004801,
+        36.902452
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -8349,10 +8459,10 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_25",
+      "feature_id": "ATLSEA_FILL_aegean_23",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.054811,
+      "planar_area": 0.013674,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8379,7 +8489,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_26",
+      "feature_id": "ATLSEA_FILL_aegean_24",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.007082,
@@ -8409,7 +8519,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_27",
+      "feature_id": "ATLSEA_FILL_aegean_25",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.005967,
@@ -8439,7 +8549,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_28",
+      "feature_id": "ATLSEA_FILL_aegean_26",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000998,
@@ -8469,10 +8579,70 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_29",
+      "feature_id": "ATLSEA_FILL_aegean_27",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.06711,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        24.253098,
+        37.58102,
+        24.297442,
+        37.663355
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_28",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.001693,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        24.096663,
+        37.614482,
+        24.243761,
+        37.76059
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_29",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.010675,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8512,66 +8682,6 @@
     },
     {
       "bbox": [
-        24.253098,
-        37.58102,
-        24.297442,
-        37.663355
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_30",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.001693,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        24.096663,
-        37.614482,
-        24.243761,
-        37.76059
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_31",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.010675,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
         23.722425,
         37.813386,
         24.241386,
@@ -8589,7 +8699,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_32",
+      "feature_id": "ATLSEA_FILL_aegean_30",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.063395,
@@ -8619,7 +8729,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_33",
+      "feature_id": "ATLSEA_FILL_aegean_31",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.00169,
@@ -8649,7 +8759,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_34",
+      "feature_id": "ATLSEA_FILL_aegean_32",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.024304,
@@ -8679,7 +8789,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_35",
+      "feature_id": "ATLSEA_FILL_aegean_33",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.016682,
@@ -8709,7 +8819,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_36",
+      "feature_id": "ATLSEA_FILL_aegean_34",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.049412,
@@ -8739,7 +8849,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_37",
+      "feature_id": "ATLSEA_FILL_aegean_35",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.006276,
@@ -8769,7 +8879,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_38",
+      "feature_id": "ATLSEA_FILL_aegean_36",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.00037,
@@ -8799,10 +8909,70 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_39",
+      "feature_id": "ATLSEA_FILL_aegean_37",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.003232,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        26.843744,
+        37.097542,
+        26.919063,
+        37.184438
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_38",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.001469,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        23.777748,
+        39.116131,
+        24.17404,
+        39.335984
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_39",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.027343,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -8842,66 +9012,6 @@
     },
     {
       "bbox": [
-        26.843744,
-        37.097542,
-        26.919063,
-        37.184438
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_40",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.001469,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        23.777748,
-        39.116131,
-        24.227333,
-        39.336311
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_41",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.031142,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
         22.858835,
         38.527679,
         23.591836,
@@ -8919,7 +9029,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_42",
+      "feature_id": "ATLSEA_FILL_aegean_40",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.046788,
@@ -8949,7 +9059,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_43",
+      "feature_id": "ATLSEA_FILL_aegean_41",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.001773,
@@ -8979,7 +9089,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_44",
+      "feature_id": "ATLSEA_FILL_aegean_42",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.00528,
@@ -9009,7 +9119,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_45",
+      "feature_id": "ATLSEA_FILL_aegean_43",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.565912,
@@ -9039,7 +9149,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_46",
+      "feature_id": "ATLSEA_FILL_aegean_44",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.006866,
@@ -9069,7 +9179,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_47",
+      "feature_id": "ATLSEA_FILL_aegean_45",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000668,
@@ -9099,7 +9209,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_48",
+      "feature_id": "ATLSEA_FILL_aegean_46",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.032483,
@@ -9129,10 +9239,70 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_49",
+      "feature_id": "ATLSEA_FILL_aegean_47",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.027309,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        22.740108,
+        38.807566,
+        22.814011,
+        38.853459
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_48",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.002144,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        26.476633,
+        40.230985,
+        26.561271,
+        40.284853
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_49",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.000475,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -9172,66 +9342,6 @@
     },
     {
       "bbox": [
-        22.740108,
-        38.807566,
-        22.814011,
-        38.853459
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_50",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.002144,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        26.476633,
-        40.230985,
-        26.561271,
-        40.284853
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_aegean_and_islands_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_51",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.000475,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
         27.03968,
         37.230399,
         27.202769,
@@ -9249,7 +9359,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_52",
+      "feature_id": "ATLSEA_FILL_aegean_50",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.014632,
@@ -9279,7 +9389,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_53",
+      "feature_id": "ATLSEA_FILL_aegean_51",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.010849,
@@ -9294,8 +9404,8 @@
       "bbox": [
         26.700937,
         37.493967,
-        26.798792,
-        37.592517
+        26.788244,
+        37.54841
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -9309,10 +9419,10 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_54",
+      "feature_id": "ATLSEA_FILL_aegean_52",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.00717,
+      "planar_area": 0.003968,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -9339,7 +9449,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_55",
+      "feature_id": "ATLSEA_FILL_aegean_53",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.049283,
@@ -9369,10 +9479,40 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_aegean_56",
+      "feature_id": "ATLSEA_FILL_aegean_54",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.016644,
+      "planar_area": 0.016638,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        23.850326,
+        38.936282,
+        24.17404,
+        39.083261
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_aegean_and_islands_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_aegean_55",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.031929,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -11712,37 +11852,7 @@
       "feature_id": "ATLSEA_FILL_sicily_tunis_1",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 9.14707,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        15.580334,
-        38.028685,
-        15.613563,
-        38.132379
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_10",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.001604,
+      "planar_area": 9.130554,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -11769,40 +11879,10 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_11",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_10",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.024764,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.874236,
-        35.7815,
-        15.066289,
-        35.905558
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_12",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.011313,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -11829,7 +11909,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_13",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_11",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.001648,
@@ -11859,7 +11939,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_14",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_12",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.001548,
@@ -11889,7 +11969,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_15",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_13",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 5.686114,
@@ -11919,7 +11999,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_16",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_14",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.001044,
@@ -11949,10 +12029,10 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_17",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_15",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 1.880211,
+      "planar_area": 1.879952,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -11979,7 +12059,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_18",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_16",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.006008,
@@ -12009,10 +12089,70 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_19",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_17",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000565,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        12.926157,
+        36.13209,
+        13.248682,
+        36.339251
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_18",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.046795,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        12.586575,
+        36.371754,
+        12.736052,
+        36.452476
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_19",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.007302,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -12052,126 +12192,6 @@
     },
     {
       "bbox": [
-        13.679054,
-        36.610743,
-        13.963432,
-        36.724612
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_20",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.020855,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        13.924146,
-        36.465895,
-        14.219747,
-        36.690391
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_21",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.040329,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        12.926157,
-        36.13209,
-        13.248682,
-        36.339251
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_22",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.046795,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        12.586575,
-        36.371754,
-        12.736052,
-        36.452476
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_23",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.007302,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
         11.91212,
         36.337475,
         12.35158,
@@ -12189,7 +12209,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_24",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_20",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.039313,
@@ -12219,7 +12239,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_25",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_21",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.036934,
@@ -12249,7 +12269,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_26",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_22",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.009751,
@@ -12279,7 +12299,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_27",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_23",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.029482,
@@ -12322,9 +12342,9 @@
     },
     {
       "bbox": [
-        14.130861,
-        36.712961,
-        14.446675,
+        13.607124,
+        36.300715,
+        15.013377,
         36.966412
       ],
       "chunk_ids": [
@@ -12342,37 +12362,7 @@
       "feature_id": "ATLSEA_FILL_sicily_tunis_4",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.037678,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.215824,
-        36.306024,
-        15.013377,
-        36.787411
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_5",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.201416,
+      "planar_area": 0.480711,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -12399,7 +12389,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_6",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_5",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000232,
@@ -12429,7 +12419,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_7",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_6",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000238,
@@ -12459,7 +12449,7 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_8",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_7",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.000713,
@@ -12489,10 +12479,40 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_sicily_tunis_9",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_8",
       "interactive": true,
       "join_mode": "gap_fill",
       "planar_area": 0.001071,
+      "prefix": "ATLSEA_FILL_",
+      "render_layer": "water",
+      "role": "sea_completion",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        15.580334,
+        38.028685,
+        15.613563,
+        38.132379
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_FILL_sicily_tunis_9",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.001604,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -12562,10 +12582,10 @@
     },
     {
       "bbox": [
-        15.311555,
-        38.219866,
-        15.442467,
-        38.277389
+        15.309346,
+        38.220755,
+        15.442899,
+        38.278476
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -12582,7 +12602,7 @@
       "feature_id": "ATLSEA_FILL_tyrrhenian_11",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.000335,
+      "planar_area": 0.000438,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -12622,10 +12642,10 @@
     },
     {
       "bbox": [
-        13.778612,
+        13.778609,
         38.010724,
-        13.968522,
-        38.034956
+        13.968608,
+        38.034976
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -12652,10 +12672,10 @@
     },
     {
       "bbox": [
-        13.329961,
-        38.19609,
-        13.374984,
-        38.230087
+        13.329945,
+        38.196127,
+        13.375,
+        38.230114
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -13942,10 +13962,10 @@
     },
     {
       "bbox": [
-        17.994753,
-        42.412671,
-        18.073033,
-        42.437786
+        17.958095,
+        42.340414,
+        18.138786,
+        42.389472
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -13962,7 +13982,7 @@
       "feature_id": "ATLSEA_FILL_tyrrhenian_53",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.000202,
+      "planar_area": 0.000618,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -13972,10 +13992,10 @@
     },
     {
       "bbox": [
-        17.958094,
-        42.341195,
-        18.139694,
-        42.389474
+        17.37638,
+        42.62047,
+        17.54428,
+        42.671404
       ],
       "chunk_ids": [
         "scenario_atlantropa.detail.r1c2"
@@ -13992,67 +14012,7 @@
       "feature_id": "ATLSEA_FILL_tyrrhenian_54",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.000626,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        16.132412,
-        43.293882,
-        16.207495,
-        43.310418
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_tyrrhenian_and_west_italy_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_tyrrhenian_55",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.000236,
-      "prefix": "ATLSEA_FILL_",
-      "render_layer": "water",
-      "role": "sea_completion",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.590331,
-        44.372283,
-        14.665446,
-        44.388819
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_tyrrhenian_and_west_italy_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_FILL_tyrrhenian_56",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.000236,
+      "planar_area": 0.000543,
       "prefix": "ATLSEA_FILL_",
       "render_layer": "water",
       "role": "sea_completion",
@@ -18073,7 +18033,7 @@
       "feature_id": "ATLSEA_sicily_tunis_8591_8965_0",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 3.153718,
+      "planar_area": 3.153702,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -18103,7 +18063,7 @@
       "feature_id": "ATLSEA_sicily_tunis_8592_5605_0",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 1.518593,
+      "planar_area": 1.518601,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -18163,37 +18123,7 @@
       "feature_id": "ATLSEA_sicily_tunis_8598_9013_0",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 2.196576,
-      "prefix": "ATLSEA_",
-      "render_layer": "water",
-      "role": "donor_sea",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.819794,
-        35.860449,
-        15.170986,
-        36.021721
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_0",
-      "interactive": true,
-      "join_mode": "none",
-      "planar_area": 0.035575,
+      "planar_area": 2.199706,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -18220,100 +18150,40 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
+      "feature_id": "ATLSEA_sicily_tunis_8600_5733_0",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 2.196924,
+      "prefix": "ATLSEA_",
+      "render_layer": "water",
+      "role": "donor_sea",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        15.060951,
+        35.911991,
+        15.170986,
+        36.021721
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
       "feature_id": "ATLSEA_sicily_tunis_8600_5733_1",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 2.259645,
-      "prefix": "ATLSEA_",
-      "render_layer": "water",
-      "role": "donor_sea",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.544664,
-        35.778306,
-        14.631176,
-        35.851201
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_2",
-      "interactive": true,
-      "join_mode": "none",
-      "planar_area": 0.004141,
-      "prefix": "ATLSEA_",
-      "render_layer": "water",
-      "role": "donor_sea",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.36232,
-        35.887218,
-        14.401354,
-        35.936068
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_3",
-      "interactive": true,
-      "join_mode": "none",
-      "planar_area": 0.001086,
-      "prefix": "ATLSEA_",
-      "render_layer": "water",
-      "role": "donor_sea",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "sea"
-    },
-    {
-      "bbox": [
-        14.424869,
-        35.858323,
-        14.452263,
-        35.870952
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "atlantropa_sea",
-      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
-      "donor_provenance": "unknown",
-      "donor_province": "",
-      "donor_province_ids": [],
-      "donor_state": "",
-      "donor_state_ids": [],
-      "drop_reason": "",
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_4",
-      "interactive": true,
-      "join_mode": "none",
-      "planar_area": 0.000167,
+      "planar_area": 0.006071,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -18340,10 +18210,40 @@
       "donor_state": "",
       "donor_state_ids": [],
       "drop_reason": "",
-      "feature_id": "ATLSEA_sicily_tunis_8600_5733_5",
+      "feature_id": "ATLSEA_sicily_tunis_8600_5733_2",
       "interactive": true,
       "join_mode": "none",
       "planar_area": 0.002001,
+      "prefix": "ATLSEA_",
+      "render_layer": "water",
+      "role": "donor_sea",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "sea"
+    },
+    {
+      "bbox": [
+        14.417444,
+        35.761899,
+        14.462945,
+        35.776338
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "atlantropa_sea",
+      "donor_basin": "atlantropa_sicily_tunis_salt_shelf_sea",
+      "donor_provenance": "unknown",
+      "donor_province": "",
+      "donor_province_ids": [],
+      "donor_state": "",
+      "donor_state_ids": [],
+      "drop_reason": "",
+      "feature_id": "ATLSEA_sicily_tunis_8600_5733_3",
+      "interactive": true,
+      "join_mode": "none",
+      "planar_area": 0.000328,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -18744,7 +18644,7 @@
     {
       "bbox": [
         14.926393,
-        38.46327,
+        38.46354,
         14.95884,
         38.51071
       ],
@@ -18763,7 +18663,7 @@
       "feature_id": "ATLSEA_tyrrhenian_8588_5681_17",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.000762,
+      "planar_area": 0.000758,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -19613,7 +19513,7 @@
     },
     {
       "bbox": [
-        12.841522,
+        12.841065,
         40.926226,
         12.870058,
         40.941351
@@ -19633,7 +19533,7 @@
       "feature_id": "ATLSEA_tyrrhenian_8590_5656_5",
       "interactive": true,
       "join_mode": "none",
-      "planar_area": 0.000215,
+      "planar_area": 0.000219,
       "prefix": "ATLSEA_",
       "render_layer": "water",
       "role": "donor_sea",
@@ -21647,40 +21547,6 @@
     },
     {
       "bbox": [
-        22.159444,
-        36.694198,
-        22.336938,
-        36.90719
-      ],
-      "chunk_ids": [
-        "scenario_atlantropa.detail.r1c2"
-      ],
-      "chunk_present": true,
-      "color_rule": "shoal_pattern",
-      "donor_basin": "atlantropa_aegean_and_islands",
-      "donor_provenance": "donor_metadata",
-      "donor_province": "18172",
-      "donor_province_ids": [
-        18172
-      ],
-      "donor_state": "8516",
-      "donor_state_ids": [
-        8516
-      ],
-      "drop_reason": "",
-      "feature_id": "ATLSHL_aegean_26",
-      "interactive": true,
-      "join_mode": "gap_fill",
-      "planar_area": 0.007951,
-      "prefix": "",
-      "render_layer": "shoal",
-      "role": "shore_seal",
-      "runtime_present": true,
-      "source_kind": "hgo_donor",
-      "surface_kind": "salt_flat_land"
-    },
-    {
-      "bbox": [
         20.638832,
         38.711882,
         20.691973,
@@ -21885,6 +21751,42 @@
     },
     {
       "bbox": [
+        27.554942,
+        36.811835,
+        27.631222,
+        36.839781
+      ],
+      "chunk_ids": [
+        "scenario_atlantropa.detail.r1c2"
+      ],
+      "chunk_present": true,
+      "color_rule": "shoal_pattern",
+      "donor_basin": "atlantropa_aegean_and_islands",
+      "donor_provenance": "donor_metadata",
+      "donor_province": "18171,19191",
+      "donor_province_ids": [
+        18171,
+        19191
+      ],
+      "donor_state": "8540,9843",
+      "donor_state_ids": [
+        8540,
+        9843
+      ],
+      "drop_reason": "",
+      "feature_id": "ATLSHL_aegean_33",
+      "interactive": true,
+      "join_mode": "gap_fill",
+      "planar_area": 0.000974,
+      "prefix": "",
+      "render_layer": "shoal",
+      "role": "shore_seal",
+      "runtime_present": true,
+      "source_kind": "hgo_donor",
+      "surface_kind": "salt_flat_land"
+    },
+    {
+      "bbox": [
         27.596255,
         40.545111,
         27.660571,
@@ -21931,13 +21833,15 @@
       "color_rule": "shoal_pattern",
       "donor_basin": "atlantropa_aegean_and_islands",
       "donor_provenance": "donor_metadata",
-      "donor_province": "18181",
+      "donor_province": "18181,19190",
       "donor_province_ids": [
-        18181
+        18181,
+        19190
       ],
-      "donor_state": "8539",
+      "donor_state": "8539,9844",
       "donor_state_ids": [
-        8539
+        8539,
+        9844
       ],
       "drop_reason": "",
       "feature_id": "ATLSHL_aegean_5",
@@ -22401,8 +22305,8 @@
     },
     {
       "bbox": [
-        15.588276,
-        38.232975,
+        15.588312,
+        38.245225,
         15.643564,
         38.281542
       ],
@@ -22425,7 +22329,7 @@
       "feature_id": "ATLSHL_sicily_tunis_1",
       "interactive": true,
       "join_mode": "gap_fill",
-      "planar_area": 0.000857,
+      "planar_area": 0.000856,
       "prefix": "",
       "render_layer": "shoal",
       "role": "shore_seal",
@@ -23242,31 +23146,31 @@
   ],
   "scenario_id": "tno_1962",
   "source": {
-    "detail_chunk_manifest_sha256": "eb8a0af608a709b8351f00f110920ef751ccbe05fcf6f71250c4628914653e5f",
-    "runtime_topology_sha256": "47e1301fea30c13835c15e697099d782b8f646068ffaae9017dc0fd20113d66a",
-    "scenario_atlantropa_metadata_sha256": "81a8b5bcc72295bc955a68b2a8f0005f641dfeb9a3ed3b0b501290cb145c5edd"
+    "detail_chunk_manifest_sha256": "8b8dbdcbb1dd17760df55baa4ea7a3c11fdf4d8ef820755307ea483d3265c619",
+    "runtime_topology_sha256": "d64671953bd9815d58b6f2f734223b0d1c5a7a01a1229235e0552a6d068b7521",
+    "scenario_atlantropa_metadata_sha256": "d55d477590f7a10248c6f0f6ef6dd40d95d79b2b31ae3e457709ae7c2ea893a0"
   },
   "summary": {
     "basin_probe_count": 5,
     "basin_probe_failure_count": 0,
-    "chunk_feature_count": 730,
-    "interactive_feature_count": 730,
+    "chunk_feature_count": 726,
+    "interactive_feature_count": 726,
     "metadata_prefix_counts": {
-      "ATLISL_": 69,
-      "ATLPRV_": 87,
-      "ATLSEA_": 118,
-      "ATLSEA_FILL_": 377,
+      "ATLISL_": 71,
+      "ATLPRV_": 90,
+      "ATLSEA_": 116,
+      "ATLSEA_FILL_": 370,
       "ATLSHL_": 70,
       "ATLWLD_": 9
     },
     "missing_chunk_count": 0,
     "prefix_counts": {
-      "ATLISL_": 69,
-      "ATLPRV_": 87,
-      "ATLSEA_": 118,
-      "ATLSEA_FILL_": 377
+      "ATLISL_": 71,
+      "ATLPRV_": 90,
+      "ATLSEA_": 116,
+      "ATLSEA_FILL_": 370
     },
-    "runtime_feature_count": 730
+    "runtime_feature_count": 726
   },
   "version": 1
 }

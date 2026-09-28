@@ -85,6 +85,35 @@ class AtlantropaLandJoinTests(unittest.TestCase):
         self.assertTrue(result.equals(source))
         self.assertGreater(result.distance(self.land), 0)
 
+    def test_complete_band_restores_missing_shore_even_when_one_tip_already_touches(self):
+        source = box(-0.1, 0, 1, 1).difference(box(.005, .3, .015, .7))
+        retained = box(.03, 0, 1, 1).union(box(0, 0, 1, .1))
+        ordinary, _ = self.restore(retained, source)
+        self.assertTrue(ordinary.equals(retained))
+        result, count = restore_atl_source_coast_contact(
+            retained, source, self.land, collar_width=.05, feature_id="ATLPRV_test",
+            complete_coastal_band=True,
+        )
+        self.assertEqual(count, 1)
+        self.assertTrue(result.equals(source.difference(self.land)))
+        self.assertEqual(result.intersection(self.land).area, 0)
+        self.assertEqual(result.difference(source).area, 0)
+        repeated, count = restore_atl_source_coast_contact(
+            result, source, self.land, collar_width=.05, feature_id="ATLPRV_test",
+            complete_coastal_band=True,
+        )
+        self.assertTrue(repeated.equals(result))
+        self.assertEqual(count, 0)
+
+    def test_complete_band_does_not_bridge_real_source_strait(self):
+        source = MultiPolygon([box(.02, 0, 1, 1), box(5, 0, 5.1, .1)])
+        result, count = restore_atl_source_coast_contact(
+            source, source, self.land, collar_width=.05, feature_id="ATLPRV_test",
+            complete_coastal_band=True,
+        )
+        self.assertTrue(result.equals(source))
+        self.assertEqual(count, 0)
+
     def test_restores_mainland_contact_without_connecting_source_island(self):
         source = MultiPolygon([box(-0.1, 0, 1, 1), box(0.01, 1.5, 0.02, 1.6)])
         retained = MultiPolygon([box(0.03, 0, 1, 1), box(0.01, 1.5, 0.02, 1.6)])

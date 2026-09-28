@@ -1001,6 +1001,7 @@ def apply_safe_scenario_contract_repairs(
     *,
     report_path: Path | None = None,
     rebuild_chunk_assets: bool = True,
+    full_locales_path: Path | None = None,
 ) -> list[str]:
     manifest_path = scenario_dir / "manifest.json"
     manifest = load_json(manifest_path)
@@ -1044,7 +1045,7 @@ def apply_safe_scenario_contract_repairs(
         startup_support_whitelist_path = scenario_dir / "derived" / "startup_support_whitelist.json"
         build_startup_bootstrap_assets(
             base_topology_path=PROJECT_ROOT / profile.startup_support_base_topology,
-            full_locales_path=PROJECT_ROOT / "data/locales.json",
+            full_locales_path=full_locales_path or PROJECT_ROOT / "data/locales.json",
             full_geo_aliases_path=PROJECT_ROOT / "data/geo_aliases.json",
             full_runtime_topology_path=runtime_topology_path,
             scenario_geo_patch_path=geo_patch_paths["base"],
