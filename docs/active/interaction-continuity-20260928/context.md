@@ -32,3 +32,5 @@ Latest continuation: first-window.md records early source/worker implementation,
 
 ## Delivery verification ownership
 Root is the sole integration and live-test owner. Workdir: pan-zoom-integration/mapcreator. Command: node --test over the changed/new .test.mjs inventory in .runtime/tmp/interaction-delivery/node-tests.txt. Log: .runtime/tmp/interaction-delivery/node-tests.log. No server or port. Success requires exit0 and no failed tests; stop and diagnose on failure. Then run the affected Python contracts. User authorized merge/push; primary checkout WIP remains untouched.
+
+PR #182 first CI attempt passed Pages artifact construction and its 64 tests (one skipped), smoke E2E, scenario and transport checks. The adaptive executor then rejected an unmatched tools/build_water_display_lods.py. Added its canonical route and Shapely dependency classification; 117 metadata/portfolio tests pass and the full PR selector now reports no unmatched paths. Runtime code is unchanged.
