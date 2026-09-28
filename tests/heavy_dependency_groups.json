@@ -68,6 +68,7 @@
       "tests/test_tno_russia_precision.py",
       "tests/test_tno_russia_precision_validation.py",
       "tests/test_tno_water_geometries.py",
+      "tests/test_water_display_lods.py",
       "tests/test_tno_western_precision_sources.py",
       "tests/test_transport_country_source_contracts.py",
       "tests/test_urban_topology_contract.py",

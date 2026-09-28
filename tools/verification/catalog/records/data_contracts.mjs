@@ -1,7 +1,7 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
-    id: "python-heavy:geo_stack:tests/test_water_display_lods.py",
+    id: "python:water-display-lods",
     commandRef: "python -m unittest tests.test_water_display_lods -q",
     sourceRefs: ["tests/test_water_display_lods.py", "tools/build_water_display_lods.py"],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],

@@ -539,7 +539,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && renderPhaseLifecycleOwnerSource.includes("\"refresh-started\"")
         && /const pendingChunkRefreshStatus = runEffect\([\s\S]*?"scheduleScenarioChunkRefresh", \{/.test(renderPhaseLifecycleOwnerSource)
         && /const promotionWorkActive = PROMOTION_ACTIVE_STATUSES\.includes\(String\(pendingChunkRefreshStatus \|\| ""\)\);/.test(renderPhaseLifecycleOwnerSource)
-        && /if \(promotionWorkActive\) return;/.test(renderPhaseLifecycleOwnerSource),
+        && /if \(promotionWorkActive\) \{\s*if \(needsNavigationRecovery\(\)\) runEffect\("render"\);\s*return;\s*\}/.test(renderPhaseLifecycleOwnerSource),
       frameSchedulerQueueMetricsReportedPerPriority:
         frameSchedulerSource.includes("HIGH_PRIORITY_MIN_PER_DRAIN = 1")
         && frameSchedulerSource.includes("byLabelGeneration = false")
@@ -1216,7 +1216,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /scenario_shell_controller_hint/.test(rendererSource),
       scenarioAtlantropaVisibilityGatesFieldDrivenRenderPaths:
         /function isScenarioAtlantropaVisible\(\) \{[\s\S]*?runtimeState\.showScenarioAtlantropa !== false;[\s\S]*?\}/.test(rendererSource)
-        && /function getEffectiveAtlantropaFeatures\(\) \{[\s\S]*?if \(!isScenarioAtlantropaVisible\(\)\) \{[\s\S]*?return buckets;[\s\S]*?\}/.test(rendererSource)
+        && /function getEffectiveAtlantropaFeatures\(sourceFeatures = runtimeState\.scenarioAtlantropaData\?\.features\) \{[\s\S]*?if \(!isScenarioAtlantropaVisible\(\)\) \{[\s\S]*?return buckets;[\s\S]*?\}/.test(rendererSource)
         && /function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?isAtlantropaFieldDrivenFeature\(feature\) && !isScenarioAtlantropaVisible\(\)/.test(politicalFeaturePolicySource),
       fieldDrivenAtlantropaUsesExplicitInteractionFlag:
         /function isAtlantropaSupportHelperFeature\(feature, featureId = null\) \{[\s\S]*?if \(isAtlantropaFieldDrivenFeature\(feature\)\) \{[\s\S]*?return feature\?\.properties\?\.atl_interactive !== true;[\s\S]*?\}/.test(politicalFeaturePolicySource),
@@ -1277,7 +1277,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       atlantropaScenarioLayerFeedsScenarioWaterPath:
         /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?runtimeState\.scenarioAtlantropaData[\s\S]*?water:\$\{counts \? counts\.water : buckets\.water\.length\}/.test(rendererSource)
         && /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?isScenarioAtlantropaVisible\(\) \? "visible:on" : "visible:off"/.test(rendererSource)
-        && /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?\.\.\.atlantropaFeatures\.water,/.test(rendererSource)
+        && /function getEffectiveWaterRegionFeatures\(atlantropaFeatures = getEffectiveAtlantropaFeatures\(\), scenarioWaterFeatures = runtimeState\.scenarioWaterRegionsData\?\.features\) \{[\s\S]*?\.\.\.atlantropaFeatures\.water,/.test(rendererSource)
         && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k, buckets = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?\.\.\.buckets\.shoal,/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioAtlantropaLandLikeOverlayLayer\(k, buckets = getEffectiveAtlantropaFeatures\(\)\) \{[\s\S]*?getSafeCanvasColor\(runtimeState\.colors\?\.\[id\], null\)[\s\S]*?getSafeCanvasColor\(getResolvedFeatureColor\(feature, id\), null\)/.test(scenarioRegionOverlayOwnerSource)
         && /function drawScenarioRegionOverlaysPass\(k\) \{[\s\S]*?const showAtlantropaLandLikeOverlay = showWater && isScenarioAtlantropaVisible\(\);[\s\S]*?if \(showAtlantropaLandLikeOverlay\) \{[\s\S]*?drawScenarioAtlantropaLandLikeOverlayLayer\(k, atlantropaFeatures\);[\s\S]*?\}/.test(scenarioRegionOverlayOwnerSource)
