@@ -41,3 +41,37 @@ Next processes after successful rebuild: read-only `check_atlantropa_geometry.py
 Correction after full failure-log review: both the first and second PR verification runs failed the TNO landing hero byte-reproduction check; the first also failed the timeout guardrail. Advancing to later workflow steps did not prove Pages success because the job continues to affected contracts. Previous Pages-pass narrative is superseded. The remaining actual failure is stale hero-tno-1962.svg after the admitted coastline additions. Root will regenerate hero scenario maps into `.runtime/tmp/atlantropa-integration/hero`, copy only TNO SVG/metadata after checking unrelated outputs unchanged, rasterize only TNO WebP using the existing tool, and run the exact builder-output contract. Owner root; cwd integration worktree; logs hero-build.log, hero-raster.log, hero-test.log. No new scenario geometry build or assertion/allowlist relaxation.
 
 Hero synchronization completed: only the TNO SVG, metadata and WebP changed; all three other generated scenario heroes remained byte-identical. Existing rasterizer completed successfully. Exact PagesDistStartupShellTest.test_landing_hero_scenario_assets_match_builder_output passed (80.930 seconds). No local build/test process remains active. Fresh remote CI is pending the follow-up push.
+
+
+Integration 2026-09-28: user authorized merge and push. Root owns integration
+on codex/atlantropa-southern-expansion-20260928, based on origin/main 4506f4fe,
+in C:/Users/raede/.codex/worktrees/atlantropa-southern-merge/mapcreator.
+Primary dirty checkout remains untouched. Eight tools/tests were reconciled
+by three-way merge, preserving upstream marine refinements and political mesh
+byte preservation. Generated primary-checkout data is not copied wholesale.
+Unrelated physical-layer catalog and landing-count edits are excluded.
+
+Root exclusively owns the staged rebuild:
+`py -3 -B -m tools.rebuild_atlantropa_stage --source-dir .runtime/tmp/atlantropa-integration/baseline/tno_1962 --stage-dir .runtime/tmp/atlantropa-integration/candidate/tno_1962`.
+Cwd is this worktree; SCENARIO_FORGE_HGO_ROOT points to the original checkout's
+read-only HGO source. Log is .runtime/tmp/atlantropa-integration/build.log.
+Exit 0 enables geometry, water, baseline-retention, strict-contract and native
+browser verification. Failure retains diagnostics and blocks adoption.
+Root owns test/build/server processes; the scope reviewer is read-only.
+All generated reports stay under .runtime/reports/generated/atlantropa-integration.
+
+### Integration validation (current-main baseline)
+
+- Frozen baseline and full scoped build: `.runtime/tmp/atlantropa-integration/{baseline,candidate}/tno_1962`; build log in the same directory. Root-owned builder completed successfully; guarded adoption copied 29 changed files and confirmed exact candidate bytes.
+- Geometry/source/chunk/baseline check and strict scenario contracts PASS. 379 political chunks plus mesh pack retain bytes; 12,022 political source features and non-ATL assignments remain unchanged. Startup locale keys remain 44,568 with no missing globally available required key.
+- Full water validator retains one **pre-existing** failure: direct Oman/Persian seam expectation after upstream added Hormuz. Baseline and candidate have identical full features for all three waters and the identical 0.4255366938280165-degree reported separation. See `water-baseline-comparison.json`; this is not an all-green full-water claim and no tolerance/allowlist was relaxed.
+- Limnos pre-existing original-core edge gaps remain identical: missing coastline 0.0016635987866024861, scenario-water overlap 4.6829473039061557e-7, ATL-water overlap 3.778030253744171e-5 deg2. Its acceptance requires no new coastline loss or water gain. Newly registered island cores and Sicily use strict core coverage.
+- Catalog regeneration yields 668 entries, identical to current main. Data health PASS (10 report-only size warnings); 19 catalog contract tests PASS. Primary-checkout 667-counter changes were not imported.
+- Regenerated only the TNO hero SVG/metadata/WebP; the other hero scenarios reproduce their current-main bytes.
+- Root owns the isolated preview at localhost:8008 and all Playwright/hero checks. Runtime outputs stay under `.runtime/`. Primary checkout and other preview processes are untouched.
+
+- Independent data gate PASS: land gained 1.1878517536 deg2; old land lost 0.4492056511 deg2 exclusively within the four approved old island footprints, with 2.54e-17 residual outside. Limnos no-regression differences are zero except 1.91e-17 floating coastline residual.
+- 53 targeted Python tests PASS. Native editing on nine additions PASS across three focused Playwright cases (Bodrum/Milas, registered Aegean, southern additions). Hero reproduction PASS. Forty coastline/signature behavior tests PASS.
+- Coastline visibility browser case initially failed once at its unchanged five-second expectation. Diagnostic rerun passed without product-code changes; final clean rerun is recorded in the merge receipt. Keep the initial failure evidence under `.runtime/tests/playwright/atlantropa-integration-b`; do not describe it as a proven repaired product bug.
+
+- Clean final coastline visibility rerun PASS (35.9 seconds); original assertion and timeout unchanged. Diagnostic rerun also PASS (33.3 seconds). Root-owned localhost:8008 server stopped before commit; other servers untouched.

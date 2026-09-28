@@ -68,8 +68,8 @@ def preserve_identical_atl_helper_assignments(old_features, new_features, *, ren
     new_ids = [feature["properties"]["id"] for feature in new_helpers]
     if len(set(old_ids)) != len(old_ids) or len(set(new_ids)) != len(new_ids):
         raise ValueError("Atlantropa helper IDs are duplicated before identity reconciliation")
-    identity_fields = ("region_id", "atl_geometry_role", "atl_join_mode", "source_standard",
-                       "donor_state_ids", "donor_state_names", "donor_province_ids")
+    identity_fields = ("region_id", "atl_geometry_role", "source_standard")
+    lineage_fields = ("donor_state_ids", "donor_state_names", "donor_province_ids")
 
     def same_source(previous, current):
         old_props, new_props = previous.get("properties", {}), current.get("properties", {})
@@ -79,13 +79,35 @@ def preserve_identical_atl_helper_assignments(old_features, new_features, *, ren
                 or old_props.get("atl_render_layer", old_layer[0]) != old_layer[0]
                 or new_props.get("atl_render_layer", new_layer[0]) != new_layer[0]):
             return False
-        return (all(old_props.get(field) == new_props.get(field) for field in identity_fields)
-                and shape(previous["geometry"]).equals(shape(current["geometry"])))
+        if old_props.get("atl_join_mode") != new_props.get("atl_join_mode"):
+            return False
+        if not all(old_props.get(field) == new_props.get(field) for field in identity_fields):
+            return False
+        same_lineage = all(old_props.get(field) == new_props.get(field) for field in lineage_fields)
+        # Adding adjacent source land can extend a shore seal's attribution
+        # without changing its footprint. Never match a replacement donor or
+        # a helper lacking both state and province evidence.
+        extended_lineage = (
+            bool(old_props.get("donor_state_ids")) and bool(old_props.get("donor_province_ids"))
+            and all(set(old_props.get(field) or []).issubset(new_props.get(field) or [])
+                    for field in lineage_fields)
+        )
+        if not (same_lineage or extended_lineage):
+            return False
+        before, after = shape(previous["geometry"]), shape(current["geometry"])
+        return before.equals(after) or (
+            before.hausdorff_distance(after) <= 1e-12
+            and before.symmetric_difference(after).area <= min(1e-12, before.area * 1e-9)
+        )
 
     def retain(previous, current):
         old_props, props = previous["properties"], current["properties"]
         props["id"] = old_props["id"]
-        for field in ("name", "owner_tag", "synthetic_owner", "assignment_source"):
+        # Keep the published coordinates, including when boolean operations
+        # changed only floating-point rounding. New donor evidence is retained.
+        current["geometry"] = deepcopy(previous["geometry"])
+        for field in ("name", "owner_tag", "synthetic_owner", "assignment_source", "atl_join_mode",
+                      "atl_render_layer", "atl_interactive", "atl_color_rule"):
             if field in old_props:
                 props[field] = deepcopy(old_props[field])
 
@@ -151,6 +173,57 @@ def preserve_identical_atl_helper_assignments(old_features, new_features, *, ren
     if len(set(final_ids)) != len(final_ids):
         raise ValueError("Atlantropa helper IDs collided after identity reconciliation")
     return preserved
+
+
+def restore_published_land_welds(old_features, new_land):
+    """Retain a published land weld when one same-source shoal fully subsumes it."""
+    lineage = ("donor_state_ids", "donor_state_names", "donor_province_ids")
+    source = ("region_id", "source_standard", "owner_tag", "atl_geometry_role")
+    new_ids = [feature["properties"]["id"] for feature in new_land]
+    if len(set(new_ids)) != len(new_ids):
+        raise ValueError("Atlantropa donor IDs are duplicated before weld restoration")
+    restored = []
+    for old in old_features:
+        previous = old.get("properties", {})
+        old_id = previous.get("id", "")
+        if (not old_id.startswith("ATLWLD_") or previous.get("atl_render_layer") != "land"
+                or previous.get("atl_geometry_role") != "shore_seal"
+                or previous.get("atl_join_mode") != "boolean_weld" or old_id in new_ids
+                or not previous.get("owner_tag") or not previous.get("donor_state_ids")
+                or not previous.get("donor_province_ids")):
+            continue
+        footprint = shape(old["geometry"])
+        candidates = []
+        for feature in new_land:
+            current = feature.get("properties", {})
+            if (not str(current.get("id", "")).startswith("ATLSHL_")
+                    or current.get("atl_geometry_role") != "shore_seal"
+                    or current.get("atl_join_mode") != "gap_fill"
+                    or any(previous.get(field) != current.get(field) for field in (*source, *lineage))):
+                continue
+            geometry = shape(feature["geometry"])
+            if footprint.difference(geometry).area <= min(1e-12, footprint.area * 1e-9):
+                candidates.append((feature, geometry))
+        if len(candidates) > 1:
+            raise ValueError(f"Ambiguous Atlantropa land weld restoration: {old_id}")
+        if not candidates:
+            continue
+        shoal, shoal_geometry = candidates[0]
+        occupying = [feature["properties"]["id"] for feature in new_land
+                     if feature is not shoal
+                     and b.classify_atlantropa_feature_id(feature["properties"]["id"])[0] == "land"
+                     and shape(feature["geometry"]).intersection(footprint).area > 1e-12]
+        if occupying:
+            raise ValueError(f"Atlantropa land weld occupied by new land: {old_id} / {occupying}")
+        remainder = b.normalize_polygonal(shoal_geometry.difference(footprint))
+        if remainder is None:
+            new_land.remove(shoal)
+        else:
+            shoal["geometry"] = mapping(remainder)
+        new_land.append(deepcopy(old))
+        new_ids.append(old_id)
+        restored.append(old_id)
+    return restored
 
 
 def _mask_frame(name, geometry):
@@ -393,6 +466,7 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
     except ValueError as error:
         b.write_json(diagnostic_dir / "failure.json", {"error": str(error), "diagnostics": getattr(error, "diagnostics", None)})
         raise
+    restored_weld_ids = restore_published_land_welds(old_atl, land)
     water_snapshot = b.load_json(source_dir / b.MARINE_REGIONS_NAMED_WATER_SNAPSHOT_FILENAME)
     water = b.topology_object_to_gdf(topology, "scenario_water")
     congo = b.safe_unary_union(water.loc[water["id"] == "congo_lake"].geometry)
@@ -416,6 +490,7 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
     })
     b.write_json(diagnostic_dir / "normalized-diagnostics.json", {
         "land": land_diagnostics, "sea": sea_diagnostics,
+        "restored_published_land_weld_ids": restored_weld_ids,
     })
     print(f"Strict geometry prepared: {len(land)} land/shoal, {len(sea)} sea features", flush=True)
     classified = b.apply_atlantropa_runtime_fields(b.geopandas_from_features(all_features))
@@ -552,6 +627,7 @@ def rebuild_stage(source_dir: Path, stage_dir: Path, *, overlap_policy="strict",
     b.apply_safe_scenario_contract_repairs(
         stage_dir, rebuild_chunk_assets=False,
         report_path=diagnostic_dir / "scenario-contracts.json",
+        full_locales_path=source_dir / "locales.startup.json",
     )
     return {"stage_dir": str(stage_dir), "land_count": len(land), "sea_count": len(sea)}
 

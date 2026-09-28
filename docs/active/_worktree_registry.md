@@ -557,3 +557,10 @@
 ## Renderer frame orchestration P2 current admission note
 
 [查看原始记录](../archive/worktree-registry-history-through-20260831.md#registry-section-109)
+
+## Atlantropa southern expansion integration 2026-09-28
+
+- Branch: `codex/atlantropa-southern-expansion-20260928`; base: `4506f4fe`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/atlantropa-southern-merge/mapcreator`. Root is sole integration/process owner.
+- Scope: source-backed Bodrum/Milas/Soke, Aegean island registration, Samos/Ikaria (TUR), Malta and source-coast completion; latest-main scenario rebuild and matching landing TNO assets.
+- Preserve primary checkout and unrelated WIP. See `atlantropa-expansion-20260926/context.md` for checks and integration receipts.

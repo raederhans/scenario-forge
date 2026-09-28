@@ -36,10 +36,10 @@
         "donor_province_id": 18160.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -128,10 +128,10 @@
         "donor_province_id": 18167.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -228,10 +228,10 @@
         "donor_province_id": 18170.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -558,10 +558,10 @@
         "donor_province_id": 18164.0,
         "assignment_source": "atl_default",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -646,10 +646,10 @@
         "donor_province_id": 18155.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -770,10 +770,10 @@
         "donor_province_id": 18175.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "MultiPolygon",
@@ -1056,10 +1056,10 @@
         "donor_province_id": 18185.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -1176,10 +1176,10 @@
         "donor_province_id": 18201.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -1332,10 +1332,10 @@
         "donor_province_id": 18158.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -1672,10 +1672,10 @@
         "donor_province_id": 18162.0,
         "assignment_source": "state_owner_override",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "land",
         "atl_interactive": true,
-        "atl_color_rule": "owner"
+        "atl_color_rule": "owner",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -2655,10 +2655,10 @@
         "donor_province_id": 18160.0,
         "assignment_source": "atl_default",
         "source_standard": "hgo_donor_province_georef",
-        "atl_subbasin_id": null,
         "atl_render_layer": "shoal",
         "atl_interactive": true,
-        "atl_color_rule": "shoal_pattern"
+        "atl_color_rule": "shoal_pattern",
+        "atl_subbasin_id": null
       },
       "geometry": {
         "type": "Polygon",
@@ -2689,7 +2689,7 @@
       }
     },
     {
-      "id": 490,
+      "id": 487,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8577_5407_0",
@@ -2717,10 +2717,10 @@
         "donor_province_id": 5407.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8577_5407_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8577_5407_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -3171,7 +3171,7 @@
       }
     },
     {
-      "id": 498,
+      "id": 495,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8582_5454_0",
@@ -3199,10 +3199,10 @@
         "donor_province_id": 5454.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8582_5454_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8582_5454_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -3751,7 +3751,7 @@
       }
     },
     {
-      "id": 502,
+      "id": 499,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8582_5454_4",
@@ -3779,10 +3779,10 @@
         "donor_province_id": 5454.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8582_5454_4",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8582_5454_4"
       },
       "geometry": {
         "type": "Polygon",
@@ -3809,7 +3809,7 @@
       }
     },
     {
-      "id": 503,
+      "id": 500,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8583_8793_0",
@@ -3837,10 +3837,10 @@
         "donor_province_id": 8793.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8583_8793_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8583_8793_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -4135,7 +4135,7 @@
       }
     },
     {
-      "id": 504,
+      "id": 501,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8583_8793_1",
@@ -4163,10 +4163,10 @@
         "donor_province_id": 8793.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8583_8793_1",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8583_8793_1"
       },
       "geometry": {
         "type": "Polygon",
@@ -4193,7 +4193,7 @@
       }
     },
     {
-      "id": 505,
+      "id": 502,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8584_5431_0",
@@ -4221,10 +4221,10 @@
         "donor_province_id": 5431.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8584_5431_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8584_5431_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -4575,7 +4575,7 @@
       }
     },
     {
-      "id": 509,
+      "id": 506,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_8587_8819_0",
@@ -4603,10 +4603,10 @@
         "donor_province_id": 8819.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_8587_8819_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_8587_8819_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -4973,7 +4973,7 @@
       }
     },
     {
-      "id": 516,
+      "id": 513,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_west_med_9040_18325_0",
@@ -5001,10 +5001,10 @@
         "donor_province_id": 18325.0,
         "assignment_source": null,
         "source_standard": "hgo_donor_water_georef",
-        "atl_subbasin_id": "west_med_9040_18325_0",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_9040_18325_0"
       },
       "geometry": {
         "type": "Polygon",
@@ -5043,7 +5043,7 @@
       }
     },
     {
-      "id": 535,
+      "id": 532,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_19",
@@ -5071,10 +5071,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_19",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_19"
       },
       "geometry": {
         "type": "Polygon",
@@ -5433,7 +5433,7 @@
       }
     },
     {
-      "id": 536,
+      "id": 533,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_20",
@@ -5461,10 +5461,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_20",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_20"
       },
       "geometry": {
         "type": "Polygon",
@@ -5515,7 +5515,7 @@
       }
     },
     {
-      "id": 537,
+      "id": 534,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_21",
@@ -5543,10 +5543,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_21",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_21"
       },
       "geometry": {
         "type": "Polygon",
@@ -5597,7 +5597,7 @@
       }
     },
     {
-      "id": 538,
+      "id": 535,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_22",
@@ -5625,10 +5625,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_22",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_22"
       },
       "geometry": {
         "type": "Polygon",
@@ -5659,7 +5659,7 @@
       }
     },
     {
-      "id": 539,
+      "id": 536,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_23",
@@ -5687,10 +5687,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_23",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_23"
       },
       "geometry": {
         "type": "Polygon",
@@ -5721,7 +5721,7 @@
       }
     },
     {
-      "id": 540,
+      "id": 537,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_24",
@@ -5749,10 +5749,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_24",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_24"
       },
       "geometry": {
         "type": "Polygon",
@@ -5783,7 +5783,7 @@
       }
     },
     {
-      "id": 541,
+      "id": 538,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_25",
@@ -5811,10 +5811,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_25",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_25"
       },
       "geometry": {
         "type": "Polygon",
@@ -5845,7 +5845,7 @@
       }
     },
     {
-      "id": 542,
+      "id": 539,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_26",
@@ -5873,10 +5873,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_26",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_26"
       },
       "geometry": {
         "type": "Polygon",
@@ -5907,7 +5907,7 @@
       }
     },
     {
-      "id": 543,
+      "id": 540,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_27",
@@ -5935,10 +5935,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_27",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_27"
       },
       "geometry": {
         "type": "Polygon",
@@ -5965,7 +5965,7 @@
       }
     },
     {
-      "id": 586,
+      "id": 583,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_70",
@@ -5993,10 +5993,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_70",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_70"
       },
       "geometry": {
         "type": "Polygon",
@@ -6027,7 +6027,7 @@
       }
     },
     {
-      "id": 587,
+      "id": 584,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_71",
@@ -6055,10 +6055,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_71",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_71"
       },
       "geometry": {
         "type": "Polygon",
@@ -6089,7 +6089,7 @@
       }
     },
     {
-      "id": 595,
+      "id": 592,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_79",
@@ -6117,10 +6117,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_79",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_79"
       },
       "geometry": {
         "type": "Polygon",
@@ -6151,7 +6151,7 @@
       }
     },
     {
-      "id": 596,
+      "id": 593,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_80",
@@ -6179,10 +6179,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_80",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_80"
       },
       "geometry": {
         "type": "Polygon",
@@ -6221,7 +6221,7 @@
       }
     },
     {
-      "id": 597,
+      "id": 594,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_81",
@@ -6249,10 +6249,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_81",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_81"
       },
       "geometry": {
         "type": "Polygon",
@@ -6283,7 +6283,7 @@
       }
     },
     {
-      "id": 598,
+      "id": 595,
       "type": "Feature",
       "properties": {
         "id": "ATLSEA_FILL_west_med_82",
@@ -6311,10 +6311,10 @@
         "donor_province_id": null,
         "assignment_source": null,
         "source_standard": "mediterranean_template_sea_completion",
-        "atl_subbasin_id": "west_med_fill_82",
         "atl_render_layer": "water",
         "atl_interactive": true,
-        "atl_color_rule": "atlantropa_sea"
+        "atl_color_rule": "atlantropa_sea",
+        "atl_subbasin_id": "west_med_fill_82"
       },
       "geometry": {
         "type": "Polygon",

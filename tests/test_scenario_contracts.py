@@ -218,6 +218,30 @@ def _write_strict_bundle_files(
 
 
 class ScenarioContractTest(unittest.TestCase):
+    def test_safe_repair_uses_explicit_frozen_locales_when_requested(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            scenario_dir = Path(directory) / "tno_1962"
+            scenario_dir.mkdir()
+            _write_json(scenario_dir / "manifest.json", {
+                "scenario_id": "tno_1962", "generated_at": "2026-09-28T00:00:00Z",
+            })
+            _write_json(scenario_dir / "runtime_topology.topo.json", {"type": "Topology"})
+            frozen = scenario_dir / "frozen" / "locales.startup.json"
+            profile = Namespace(expect_runtime_bootstrap=True, expect_startup_assets=True,
+                                startup_support_base_topology="data/europe_topology.json")
+            for requested, expected in ((frozen, frozen),
+                                        (None, check_scenario_contracts.PROJECT_ROOT / "data/locales.json")):
+                with self.subTest(requested=requested), \
+                     mock.patch.object(check_scenario_contracts, "resolve_scenario_contract_profile", return_value=profile), \
+                     mock.patch.object(check_scenario_contracts, "_ensure_geo_locale_patch_inputs",
+                                       return_value={"base": scenario_dir / "geo_locale_patch.json"}), \
+                     mock.patch.object(check_scenario_contracts, "build_startup_bootstrap_assets",
+                                       side_effect=RuntimeError("captured locales")) as build:
+                    with self.assertRaisesRegex(RuntimeError, "captured locales"):
+                        check_scenario_contracts.apply_safe_scenario_contract_repairs(
+                            scenario_dir, full_locales_path=requested)
+                    self.assertEqual(build.call_args.kwargs["full_locales_path"], expected)
+
     def test_scenario_publish_scope_includes_strategic_values_asset(self) -> None:
         self.assertIn(
             SCENARIO_STRATEGIC_VALUES_FILENAME,

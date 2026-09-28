@@ -66,6 +66,7 @@ test("chunked TNO replaces submerged old coastlines and refreshes coastline on v
   const restoredCandidates = {
     ATLPRV_18345: "ITA", ATLPRV_11905: "TUR", ATLPRV_18960: "EGY",
     ATLPRV_18349: "TUR", ATLPRV_18332: "IAL",
+    ATLPRV_19191: "TUR", ATLPRV_19190: "TUR",
     ATLISL_west_med_balearics: "IBR", ATLISL_levant_cyprus: "TUR",
   };
   await expect.poll(() => page.evaluate((expected) => {
@@ -180,6 +181,16 @@ async function findNewLandPoint(page, id) {
   const points = {
     ATLPRV_18349: [28.91253315812773, 40.69848993243577],
     ATLPRV_18332: [5.755634918046521, 36.92663313862793],
+    ATLPRV_19191: [27.897687956506662, 36.92037650023392],
+    ATLPRV_19190: [27.407739670234427, 37.27662123649061],
+    // Lesvos probe is inside source province 19159, beyond the previous island.
+    ATLISL_aegean_lesvos: [26.484973940648494, 38.88440388803889],
+    ATLISL_aegean_chios: [25.96705967059671, 38.629139213892145],
+    ATLISL_aegean_GRE_5: [24.33351633416709, 38.89679769808103],
+    ATLISL_aegean_samos: [26.645476797366552, 37.66541650627095],
+    ATLISL_aegean_ikaria: [26.32819220178265, 37.59475007842151],
+    ATLISL_sicily_tunis_malta: [14.822375882050203, 35.680959879396916],
+    ATLPRV_19158: [26.802820065599498, 38.48013932352826],
   };
   return page.evaluate(({ targetId, point }) => {
     const state = globalThis.__playwrightStateRef;
@@ -255,8 +266,7 @@ async function centerNewLand(page, point) {
   }, point);
 }
 
-test("new TNO Atlantropa coasts accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
-  test.setTimeout(60_000);
+async function checkNativeCoastEditing(page, testInfo, targets) {
   const pageErrors = [];
   page.on("pageerror", error => pageErrors.push(error.message));
   await gotoApp(page, TNO_PATH, { waitUntil: "domcontentloaded" });
@@ -273,7 +283,7 @@ test("new TNO Atlantropa coasts accept native hit, fill, and undo without water 
     await page.locator("#scenarioGuideCloseBtn").click();
   }
 
-  for (const [id, owner] of [["ATLPRV_18349", "TUR"], ["ATLPRV_18332", "IAL"]]) {
+  for (const [id, owner] of targets) {
     const target = await findNewLandPoint(page, id);
     expect(target, `${id} needs a reclaimed interior point outside ATL and scenario water`).not.toBeNull();
     expect(target).toMatchObject({ inLand: true, inCoast: true, outsideOriginalLand: true, inWater: false });
@@ -318,4 +328,29 @@ test("new TNO Atlantropa coasts accept native hit, fill, and undo without water 
     });
   }
   expect(pageErrors).toEqual([]);
+}
+
+test("new TNO Atlantropa coasts accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  await checkNativeCoastEditing(page, testInfo, [["ATLPRV_18349", "TUR"], ["ATLPRV_18332", "IAL"]]);
+});
+
+test("Bodrum and Milas coasts accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  await checkNativeCoastEditing(page, testInfo, [["ATLPRV_19191", "TUR"], ["ATLPRV_19190", "TUR"]]);
+});
+
+test("registered Aegean islands accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  await checkNativeCoastEditing(page, testInfo, [
+    ["ATLISL_aegean_lesvos", "TUR"], ["ATLISL_aegean_chios", "TUR"], ["ATLISL_aegean_GRE_5", "GRE"],
+  ]);
+});
+
+test("southern expansion islands accept native hit, fill, and undo without water coverage", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
+  await checkNativeCoastEditing(page, testInfo, [
+    ["ATLISL_aegean_samos", "TUR"], ["ATLISL_aegean_ikaria", "TUR"],
+    ["ATLISL_sicily_tunis_malta", "ITA"], ["ATLPRV_19158", "TUR"],
+  ]);
 });

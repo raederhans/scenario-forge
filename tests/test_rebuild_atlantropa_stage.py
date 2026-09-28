@@ -10,12 +10,41 @@ from tools import patch_tno_1962_bundle as b
 from tools.rebuild_atlantropa_stage import (
     clip_new_atlantropa_land_from_named_water, merge_atlantropa_bathymetry,
     preserve_identical_atl_helper_assignments, preserve_political_chunks_for_unchanged_source,
-    reconcile_feature_map,
+    reconcile_feature_map, restore_published_land_welds,
 )
 from tools.check_scenario_contracts import _load_chunk_feature_index, _atlantropa_feature_row, _collect_snapshot_inputs, _sha256_path
 
 
 class AtlantropaStageTests(unittest.TestCase):
+    def test_helper_extended_lineage_preserves_identity_and_published_rounding(self):
+        old = {"type": "Feature", "properties": {
+            "id": "ATLSHL_aegean_5", "name": "Published shoal", "owner_tag": "TUR",
+            "region_id": "aegean", "atl_geometry_role": "shore_seal", "atl_join_mode": "gap_fill",
+            "source_standard": "hgo_donor_province_georef", "donor_state_ids": [8539],
+            "donor_state_names": ["Stampalia"], "donor_province_ids": [18181],
+        }, "geometry": mapping(box(27, 37, 27.01, 37.01))}
+        new = deepcopy(old)
+        new["properties"].update({"id": "ATLSHL_aegean_34", "owner_tag": "GRE",
+                                  "donor_state_ids": [8539, 9844],
+                                  "donor_state_names": ["Milas", "Stampalia"],
+                                  "donor_province_ids": [18181, 19190]})
+        new["geometry"] = mapping(box(27 + 1e-14, 37, 27.01, 37.01))
+        unmatched = deepcopy(new)
+        self.assertEqual(preserve_identical_atl_helper_assignments([old], [new]), {"ATLSHL_aegean_5"})
+        self.assertEqual(new["geometry"], old["geometry"])
+        self.assertEqual(new["properties"]["owner_tag"], "TUR")
+        self.assertEqual(new["properties"]["donor_state_ids"], [8539, 9844])
+
+        moved = deepcopy(unmatched)
+        moved["geometry"] = mapping(box(27 + 1e-7, 37, 27.01, 37.01))
+        self.assertEqual(preserve_identical_atl_helper_assignments([old], [moved]), set())
+        replaced = deepcopy(unmatched)
+        replaced["properties"]["donor_state_ids"] = [9844]
+        self.assertEqual(preserve_identical_atl_helper_assignments([old], [replaced]), set())
+        unproven = deepcopy(old)
+        unproven["properties"]["donor_province_ids"] = []
+        self.assertEqual(preserve_identical_atl_helper_assignments([unproven], [deepcopy(unmatched)]), set())
+
     def test_helper_occupied_id_chain_restores_old_ids_and_moves_only_new_source(self):
         def shoal(number, province, left, owner):
             return {"type": "Feature", "properties": {
@@ -170,6 +199,44 @@ class AtlantropaStageTests(unittest.TestCase):
         different_lineage["properties"].update(id="ATLWLD_aegean_89", donor_province_ids=[3])
         self.assertEqual(preserve_identical_atl_helper_assignments([old], [different_lineage]), set())
         self.assertEqual(different_lineage["properties"]["id"], "ATLWLD_aegean_89")
+
+    def test_published_weld_footprint_is_carved_from_larger_same_source_shoal(self):
+        old = {"type": "Feature", "properties": {
+            "id": "ATLWLD_aegean_90", "name": "Published Weld 90", "owner_tag": "GRE",
+            "region_id": "aegean", "atl_geometry_role": "shore_seal", "atl_join_mode": "boolean_weld",
+            "atl_render_layer": "land", "source_standard": "hgo_donor_province_georef",
+            "donor_state_ids": [8519], "donor_state_names": ["Poros"], "donor_province_ids": [18182],
+        }, "geometry": mapping(box(0, 0, 1, 1))}
+        generated = deepcopy(old)
+        generated["properties"].update(id="ATLSHL_aegean_32", atl_join_mode="gap_fill", atl_render_layer="shoal")
+        generated["geometry"] = mapping(box(0, 0, 2, 1))
+        full_shoal = deepcopy(generated)
+        new_land = [generated]
+        self.assertEqual(restore_published_land_welds([old], new_land), ["ATLWLD_aegean_90"])
+        self.assertEqual([feature["properties"]["id"] for feature in new_land],
+                         ["ATLSHL_aegean_32", "ATLWLD_aegean_90"])
+        self.assertEqual(shape(new_land[1]["geometry"]), shape(old["geometry"]))
+        self.assertEqual(shape(new_land[0]["geometry"]).intersection(shape(old["geometry"])).area, 0)
+        self.assertAlmostEqual(shape(new_land[0]["geometry"]).area, 1)
+        self.assertEqual(preserve_identical_atl_helper_assignments([old], new_land), {"ATLWLD_aegean_90"})
+
+        for change in [{"owner_tag": "TUR"}, {"source_standard": "other"},
+                       {"donor_province_ids": [100]}, {"donor_state_ids": []}]:
+            candidate = deepcopy(full_shoal)
+            candidate["properties"].update(change)
+            self.assertEqual(restore_published_land_welds([old], [candidate]), [])
+        partial = deepcopy(full_shoal)
+        partial["geometry"] = mapping(box(0.5, 0, 2, 1))
+        self.assertEqual(restore_published_land_welds([old], [partial]), [])
+
+        duplicate = deepcopy(full_shoal)
+        duplicate["properties"]["id"] = "ATLSHL_aegean_33"
+        with self.assertRaisesRegex(ValueError, "Ambiguous Atlantropa land weld restoration"):
+            restore_published_land_welds([old], [deepcopy(full_shoal), duplicate])
+        occupying = deepcopy(old)
+        occupying["properties"]["id"] = "ATLPRV_999"
+        with self.assertRaisesRegex(ValueError, "occupied by new land"):
+            restore_published_land_welds([old], [deepcopy(full_shoal), occupying])
 
     @staticmethod
     def _water_fixture(*, invalid=False):
