@@ -154,6 +154,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         Number(runtimeState.oceanMaskQuality || 1).toFixed(3),
         `field:oceanDepth:${Number(intensityFields.channels.oceanDepth?.revision || 0)}`,
         stableJson(oceanPaintStyle),
+        `bathymetry:${runtimeState.activeBathymetryTopologyUrl || ""}`,
       ].join("::");
     }
     if (passName === "physicalBase") {

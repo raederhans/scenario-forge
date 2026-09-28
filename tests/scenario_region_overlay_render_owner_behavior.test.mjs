@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
 
-function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false } = {}) {
+function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false, oceanSurfacePattern = null } = {}) {
   const events = [];
   const metrics = [];
   const coverageCalls = [];
@@ -90,9 +90,10 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     projectedGeoBoundsInScreen: (bounds) => { events.push(["cull", state.zoomTransform.k, bounds]); return !!bounds && visible; },
     computeProjectedGeoBounds: (part) => { events.push(["bounds", projection, part.id]); return boundsAvailable ? { minX: 0, minY: 0, maxX: 10, maxY: 10, part, projection } : null; },
     getWaterRegionColor: () => "#123456",
+    getOceanSurfacePattern: () => oceanSurfacePattern,
     getScenarioWaterVisualRevisionToken: () => { waterWork.signatures += 1; return revision; },
     isWaterRegionEnabled: () => true,
-    isMacroOceanWaterRegion: () => false,
+    isMacroOceanWaterRegion: (feature) => !!feature.macro,
     isBaseGeographyScenarioFeature: () => false,
     isSpecialRegionEnabled: () => true,
     pathBoundsInScreen: () => true,
@@ -597,4 +598,31 @@ test("a failed forced water redraw invalidates the old cache and the next draw r
   context.fill = fill; h.setMode("reuse"); h.draw();
   assert.equal(h.metrics.at(-1).waterCacheMode, "redraw");
   assert.equal(h.owner.getPreviousWaterRenderedCount(), 1);
+});
+
+test("marine fill keeps bathymetry while lakes and user paint stay solid", t => {
+  const pattern = { oceanSurface: true };
+  const h = harness(t, { mode: "direct", oceanSurfacePattern: pattern });
+  h.draw();
+  assert.equal(h.main.fillStyle, pattern);
+  h.state.waterRegionOverrides = { water: "#123456" };
+  h.draw();
+  assert.equal(h.main.fillStyle, "#123456");
+  h.state.waterRegionOverrides = {};
+  h.water.properties = { water_type: "lake" };
+  h.draw();
+  assert.equal(h.main.fillStyle, "#123456");
+});
+
+test("disabled open-ocean paint does not let a stored override hide bathymetry", t => {
+  const pattern = { oceanSurface: true };
+  const h = harness(t, { mode: "direct", oceanSurfacePattern: pattern });
+  h.water.macro = true;
+  h.state.waterRegionOverrides = { water: "#123456" };
+  h.state.allowOpenOceanPaint = false;
+  h.draw();
+  assert.equal(h.main.fillStyle, pattern);
+  h.state.allowOpenOceanPaint = true;
+  h.draw();
+  assert.equal(h.main.fillStyle, "#123456");
 });

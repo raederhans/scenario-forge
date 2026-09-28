@@ -357,3 +357,11 @@ for (const [preset, beforeZoom, afterZoom] of [["balanced", 3.1, 3.3], ["terrain
     assert.equal(policy.getRenderPassSignature("political"), before.political);
   });
 }
+
+
+test("loaded bathymetry invalidates the background signature", () => {
+  const { state, policy } = createHarness();
+  const before = policy.getRenderPassSignature("background");
+  state.activeBathymetryTopologyUrl = "global.topo.json";
+  assert.notEqual(policy.getRenderPassSignature("background"), before);
+});

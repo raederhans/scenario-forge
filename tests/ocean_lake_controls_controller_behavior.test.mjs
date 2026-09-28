@@ -120,3 +120,40 @@ test("sea names start hidden and turning them on refreshes labels with undo hist
     setAppearanceStyleConfigState(runtimeState, priorStyle);
   }
 });
+
+test("enabling bathymetry from flat chooses soft and applies defaults; disabling restores flat", () => {
+  const fixture = createFixture();
+  fixture.controller.renderOceanLakeControlsUi();
+  assert.equal(fixture.opacity.disabled, true);
+  fixture.toggle.checked = true;
+  fixture.toggle.dispatch("change");
+  assert.equal(fixture.state.styleConfig.ocean.preset, "bathymetry_soft");
+  assert.deepEqual([
+    fixture.state.styleConfig.ocean.opacity,
+    fixture.state.styleConfig.ocean.scale,
+    fixture.state.styleConfig.ocean.contourStrength,
+  ], [0.7, 1.2, 0.3]);
+  assert.equal(fixture.opacity.disabled, false);
+  fixture.toggle.checked = false;
+  fixture.toggle.dispatch("change");
+  assert.equal(fixture.state.styleConfig.ocean.preset, "flat");
+  assert.equal(fixture.opacity.disabled, true);
+});
+
+test("flat style disables sliders and zero settings remain visible", () => {
+  const fixture = createFixture();
+  fixture.toggle.checked = true;
+  fixture.toggle.dispatch("change");
+  fixture.select.value = "flat";
+  fixture.select.dispatch("change");
+  assert.equal(fixture.opacity.disabled, true);
+  assert.equal(fixture.scale.disabled, true);
+  assert.equal(fixture.contour.disabled, true);
+  fixture.state.styleConfig.ocean.opacity = 0;
+  fixture.state.styleConfig.ocean.contourStrength = 0;
+  fixture.controller.renderOceanLakeControlsUi();
+  assert.equal(fixture.opacity.value, "0");
+  assert.equal(fixture.opacityValue.textContent, "0%");
+  assert.equal(fixture.contour.value, "0");
+  assert.equal(fixture.contourValue.textContent, "0%");
+});

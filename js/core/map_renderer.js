@@ -1,3 +1,7 @@
+import { decodeBathymetryTopology } from "./renderer/bathymetry_decode.js";
+import { createBathymetryWorkerClient } from "./bathymetry_worker_client.js";
+import { createBathymetryCoverageCompositor } from "./renderer/bathymetry_coverage_compositor.js";
+import { createOceanSurfacePattern } from "./renderer/ocean_surface_pattern.js";
 import { resolveWaterRegionOverride } from "./renderer/water_region_color.js";
 import { getMapDataBoundary } from "./map_data_boundary.js";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "./renderer/cached_surface_coverage.js";
@@ -256,7 +260,6 @@ import {
 import { createRiverLayerRenderOwner } from "./renderer/river_layer_render_owner.js";
 import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEnabled } from "./renderer/effective_water_regions.js";
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
-import { normalizeBathymetryFeatureCollection } from "./renderer/bathymetry_geometry.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
 import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
 import { createPhysicalLayerRenderOwner } from "./renderer/physical_layer_render_owner.js";
@@ -453,23 +456,27 @@ const COASTLINE_ACCENT_DENSITY_WIDTH_SCALE = 0.9;
 
 const BATHYMETRY_PRESET_PROFILES = Object.freeze({
   bathymetry_soft: Object.freeze({
-    defaultOpacity: 0.84,
-    defaultScale: 1.16,
-    defaultContourStrength: 0.34,
-    bandAlphaBase: 0.62,
-    contourAlphaBase: 0.14,
-    contourLineWidthBase: 0.30,
-    contourLineWidthScale: 0.35,
+    defaultOpacity: 0.9,
+    defaultScale: 1.25,
+    defaultContourStrength: 0,
+    bandAlphaBase: 0.76,
+    contourAlphaBase: 0.6,
+    contourLineWidthBase: 0.4,
+    contourLineWidthScale: 0.25,
+    paletteMode: "soft",
+    majorContourDepths: Object.freeze([200, 1000, 4000]),
     skipAlternateContourDepths: true,
   }),
   bathymetry_contours: Object.freeze({
-    defaultOpacity: 0.56,
-    defaultScale: 1.02,
-    defaultContourStrength: 0.86,
-    bandAlphaBase: 0.18,
-    contourAlphaBase: 0.46,
-    contourLineWidthBase: 0.95,
-    contourLineWidthScale: 1.25,
+    defaultOpacity: 0.9,
+    defaultScale: 1.15,
+    defaultContourStrength: 0.85,
+    bandAlphaBase: 0.75,
+    contourAlphaBase: 0.85,
+    contourLineWidthBase: 0.55,
+    contourLineWidthScale: 0.3,
+    paletteMode: "discrete",
+    majorContourDepths: Object.freeze([200, 1000, 4000]),
     skipAlternateContourDepths: false,
   }),
 });
@@ -568,8 +575,6 @@ const OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land";
 const OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features";
 const OCEAN_MASK_MIN_QUALITY = 0.35;
 const GLOBAL_BATHYMETRY_TOPOLOGY_URL = resolveDataAssetUrl("bathymetry:global_topology");
-const BATHYMETRY_BANDS_OBJECT_NAME = "bathymetry_bands";
-const BATHYMETRY_CONTOURS_OBJECT_NAME = "bathymetry_contours";
 
 const CONTEXT_LAYER_MIN_SCORE = 0.08;
 const CONTEXT_BREAKDOWN_METRIC_NAMES = new Set([
@@ -1898,6 +1903,14 @@ function getOceanRenderOwner() {
   if (oceanRenderOwner) {
     return oceanRenderOwner;
   }
+  const paintRegionalBathymetry = createBathymetryCoverageCompositor({
+    getContext: () => rendererSurfaceHost.getContext(),
+    withRenderTarget,
+    traceGeometry: (geometry, targetContext) => globalThis.d3.geoPath(
+      rendererSurfaceHost.getProjection(), targetContext
+    )(geometry),
+    getFeatherWidth: () => 6 * Math.PI / 180 * rendererSurfaceHost.getProjection().scale(),
+  });
   oceanRenderOwner = createOceanRenderOwner({
     state,
     constants: {
@@ -1915,6 +1928,7 @@ function getOceanRenderOwner() {
     getters: {
       getContext: () => rendererSurfaceHost.getContext(),
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
+      isExportRendering: () => exportRenderInProgress,
     },
     helpers: {
       applyBathymetryCoverageExclusionMask,
@@ -1932,6 +1946,15 @@ function getOceanRenderOwner() {
       getBathymetryFeatureDepthMax,
       getBathymetryPresetProfile,
       getCoastlineCollectionForZoom,
+      publishBathymetryVisibility: (summary) => publishBathymetryDiagnostic("bathymetryVisibility", summary),
+      paintGlobalBathymetry: (draw) => {
+        const startedAt = nowMs();
+        const result = paintRegionalBathymetry.paint(
+          state.globalBathymetryTopologyData?.bbox, draw, state.globalBathymetryTopologyData?.bathymetry_clip_edges
+        );
+        collectContextMetric("paintGlobalBathymetry", nowMs() - startedAt);
+        return result;
+      },
       getOceanStyleConfig,
       getProjectedGeographicPath,
       collectContextMetric,
@@ -4849,6 +4872,9 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     `ocean-fill:${getOceanBaseFillColor()}`,
     `lake-fill:${getLakeBaseFillColor()}`,
     `lake-style:${stableJson(getLakeStyleConfig())}`,
+    `ocean-surface:${stableJson(runtimeState.styleConfig?.ocean || {})}`,
+    `bathymetry:${runtimeState.activeBathymetryTopologyUrl || ""}`,
+    `ocean-depth:${runtimeState.intensityFields?.channels?.oceanDepth?.revision || 0}`,
   ].join("|");
 }
 
@@ -10156,6 +10182,7 @@ function clearBathymetryStateSlot(slot) {
 }
 
 function disableActiveBathymetryState() {
+  activeBathymetryInputs = null;
   runtimeState.activeBathymetryBandsData = null;
   runtimeState.activeBathymetryContoursData = null;
   runtimeState.activeBathymetrySource = "none";
@@ -10219,6 +10246,17 @@ function syncActiveBathymetryState() {
     runtimeState.globalBathymetryTopologyUrl === globalUrl &&
     (!!runtimeState.globalBathymetryBandsData || !!runtimeState.globalBathymetryContoursData);
 
+  // Retain feature identities so the projected path cache survives redraws.
+  const inputs = [
+    scenarioReady ? scenarioUrl : "", globalReady ? globalUrl : "",
+    scenarioReady ? runtimeState.scenarioBathymetryBandsData : null,
+    scenarioReady ? runtimeState.scenarioBathymetryContoursData : null,
+    globalReady ? runtimeState.globalBathymetryBandsData : null,
+    globalReady ? runtimeState.globalBathymetryContoursData : null,
+  ];
+  if (activeBathymetryInputs && inputs.every((value, index) => value === activeBathymetryInputs[index])) return;
+  activeBathymetryInputs = inputs;
+
   if (scenarioReady && globalReady) {
     runtimeState.activeBathymetryBandsData = mergeBathymetryFeatureCollections(
       runtimeState.scenarioBathymetryBandsData,
@@ -10252,6 +10290,37 @@ function syncActiveBathymetryState() {
   runtimeState.activeBathymetryTopologyUrl = "";
 }
 
+function publishBathymetryDiagnostic(name, summary) {
+  const previous = runtimeState.renderPerfMetrics?.[name];
+  if (previous && Object.keys(summary).every((key) => stableJson(previous[key]) === stableJson(summary[key]))) return;
+  recordRenderPerfMetric(name, 0, summary);
+  if (bathymetryUiRefreshPending) return;
+  bathymetryUiRefreshPending = true;
+  queueMicrotask(() => {
+    bathymetryUiRefreshPending = false;
+    callRuntimeHook(runtimeState, "updateToolbarInputsFn");
+  });
+}
+
+function publishBathymetryLoadStatus() {
+  const sources = [["global", getDesiredBathymetryTopologyUrl("global")], ["scenario", getScenarioBathymetryTopologyUrl()]]
+    .filter(([, url]) => !!url);
+  const failedSources = sources.filter(([, url]) => bathymetryLoadFailureByUrl.has(url) && !getCachedBathymetryEntry(url))
+    .map(([source]) => source);
+  const loadedCount = sources.filter(([, url]) => !!getCachedBathymetryEntry(url)).length;
+  const status = failedSources.length ? (loadedCount ? "partial" : "error")
+    : loadedCount === sources.length && loadedCount > 0 ? "ready" : "loading";
+  publishBathymetryDiagnostic("bathymetryLoad", { status, failedSources });
+}
+
+const bathymetryWorkerClient = createBathymetryWorkerClient();
+
+const bathymetryOverviewByEntry = new WeakMap();
+
+let activeBathymetryInputs = null;
+
+let bathymetryUiRefreshPending = false;
+
 function getCachedBathymetryEntry(url) {
   if (!url) return null;
   const entry = bathymetryTopologyCacheByUrl.get(url);
@@ -10259,27 +10328,7 @@ function getCachedBathymetryEntry(url) {
 }
 
 function normalizeBathymetryTopologyEntry(url, topology) {
-  if (!topology || typeof topology !== "object") {
-    return null;
-  }
-  const bands = getLayerFeatureCollection(topology, BATHYMETRY_BANDS_OBJECT_NAME);
-  const contours = getLayerFeatureCollection(topology, BATHYMETRY_CONTOURS_OBJECT_NAME);
-  if (!Array.isArray(bands?.features) && !Array.isArray(contours?.features)) {
-    return null;
-  }
-  const normalizationStartedAt = nowMs();
-  const normalizedBands = normalizeBathymetryFeatureCollection(bands);
-  recordRenderPerfMetric("bathymetryGeometryNormalization", nowMs() - normalizationStartedAt, {
-    url,
-    ...normalizedBands.diagnostics,
-  });
-  return {
-    url,
-    topology,
-    bands: Array.isArray(bands?.features) ? normalizedBands.collection : null,
-    contours: Array.isArray(contours?.features) ? contours : null,
-    geometryDiagnostics: normalizedBands.diagnostics,
-  };
+  return decodeBathymetryTopology(url, topology);
 }
 
 function warnBathymetryLoadFailureOnce(url, error) {
@@ -10306,20 +10355,30 @@ async function loadBathymetryTopology(url, { slot = "global" } = {}) {
   if (!normalizedUrl || !getRendererAssetUrlPolicyOwner().isDesiredBathymetryUrl(slot, normalizedUrl)) {
     return null;
   }
-  const response = await fetch(normalizedUrl, { cache: "default" });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
-  const payload = await response.json();
-  const entry = normalizeBathymetryTopologyEntry(normalizedUrl, payload);
+  const startedAt = nowMs();
+  let entry = await bathymetryWorkerClient.load(normalizedUrl);
+  const execution = entry ? "worker" : "main";
   if (!entry) {
-    throw new Error("Missing bathymetry_bands / bathymetry_contours objects");
+    const response = await fetch(normalizedUrl, { cache: "default" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    entry = normalizeBathymetryTopologyEntry(normalizedUrl, await response.json());
   }
+  recordRenderPerfMetric("bathymetryDecode", nowMs() - startedAt, {
+    url: normalizedUrl, execution, ...entry.timings,
+  });
+  recordRenderPerfMetric("bathymetryGeometryNormalization", entry.timings?.normalizationDetailMs || 0, {
+    url: normalizedUrl, execution, ...entry.geometryDiagnostics,
+  });
+  if (entry.bandsOverview) recordRenderPerfMetric("bathymetryOverviewNormalization", entry.timings?.normalizationOverviewMs || 0, {
+    url: normalizedUrl, execution, ...entry.overviewGeometryDiagnostics,
+  });
   bathymetryTopologyCacheByUrl.set(normalizedUrl, entry);
-  applyResolvedBathymetryEntry(slot, normalizedUrl, entry);
-  invalidateOceanVisualState(`bathymetry-loaded:${slot}`);
-  if (rendererSurfaceHost.getContext()) {
-    render();
+  bathymetryLoadFailureByUrl.delete(normalizedUrl);
+  const applied = applyResolvedBathymetryEntry(slot, normalizedUrl, entry);
+  publishBathymetryLoadStatus();
+  if (applied) {
+    invalidateOceanVisualState(`bathymetry-loaded:${slot}`);
+    if (rendererSurfaceHost.getContext()) render();
   }
   return entry;
 }
@@ -10349,6 +10408,7 @@ function scheduleBathymetryTopologyLoad(url, { slot = "global" } = {}) {
         clearBathymetryStateSlot(slot);
         syncActiveBathymetryState();
       }
+      publishBathymetryLoadStatus();
       return null;
     })
     .finally(() => {
@@ -10375,11 +10435,24 @@ function ensureBathymetryDataAvailability({ required = doesOceanStyleRequireBath
     clearBathymetryStateSlot("scenario");
   }
   syncActiveBathymetryState();
+  publishBathymetryLoadStatus();
   return true;
 }
 
 function getBathymetryFeatureCollections() {
+  const globalUrl = getDesiredBathymetryTopologyUrl("global");
+  const entry = runtimeState.globalBathymetryTopologyUrl === globalUrl ? getCachedBathymetryEntry(globalUrl) : null;
+  let overview = entry && bathymetryOverviewByEntry.get(entry);
+  if (entry && !overview) {
+    overview = {
+      bands: mergeBathymetryFeatureCollections(null, entry.bandsOverview),
+      contours: mergeBathymetryFeatureCollections(null, entry.contoursOverview),
+    };
+    bathymetryOverviewByEntry.set(entry, overview);
+  }
   return {
+    globalOverviewBands: overview?.bands || null,
+    globalOverviewContours: overview?.contours || null,
     bands: Array.isArray(runtimeState.activeBathymetryBandsData?.features) ? runtimeState.activeBathymetryBandsData : null,
     contours: Array.isArray(runtimeState.activeBathymetryContoursData?.features) ? runtimeState.activeBathymetryContoursData : null,
     scenarioCoverage: Array.isArray(runtimeState.scenarioBathymetryBandsData?.features) ? runtimeState.scenarioBathymetryBandsData : null,
@@ -12263,6 +12336,15 @@ function getScenarioRegionOverlayRenderOwner() {
       projectedGeoBoundsInScreen,
       computeProjectedGeoBounds,
       getWaterRegionColor,
+      getOceanSurfacePattern: () => {
+        const depthChannel = runtimeState.intensityFields?.channels?.oceanDepth;
+        if (!doesOceanStyleRequireBathymetry() && !depthChannel?.enabled) return null;
+        const cache = getRenderPassCacheState();
+        return createOceanSurfacePattern(
+          rendererSurfaceHost.getContext(), cache.canvases?.background,
+          getRenderPassLayout("background"), getPassReferenceTransform("background"),
+        );
+      },
       getEffectiveAtlantropaFeatures,
       getLogicalCanvasDimensions,
       shouldExcludePoliticalVisualFeature,
@@ -12799,6 +12881,8 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       height: logicalHeight,
       pixelRatio: targetDpr,
       passNames,
+      bathymetryCoverage: !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles
+        && runtimeState.styleConfig.ocean.preset !== "flat",
     });
     if (estimatedBytes > EXPORT_RENDER_BUDGET_BYTES) {
       throw new RangeError(

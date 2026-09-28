@@ -2271,6 +2271,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
   const expectedCommands = [
     ...(includeRenderer ? [
       "node --test tests/atlantropa_water_color_behavior.test.mjs",
+      "node --test tests/bathymetry_runtime_state_behavior.test.mjs",
       "node --test tests/country_source_border_meshes_behavior.test.mjs",
       "node --test tests/exact_composite_reuse_behavior.test.mjs",
       "node --test tests/export_target_resolution_behavior.test.mjs",
@@ -2303,6 +2304,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
   ] : []);
   assert.deepEqual(plan.selectedLeaves.map((entry) => entry.leafId).sort(), [
     ...(includeRenderer ? ["node-test:tests/atlantropa_water_color_behavior.test.mjs"] : []),
+    ...(includeRenderer ? ["node-test:tests/bathymetry_runtime_state_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/border_draw_owner_behavior.test.mjs", "node-test:tests/border_mesh_owner_behavior.test.mjs", "node-test:tests/brush_interaction_session_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/click_selection_transaction_owner_behavior.test.mjs"] : []),
     ...(includeRenderer ? ["node-test:tests/country_source_border_meshes_behavior.test.mjs"] : []),

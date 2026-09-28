@@ -398,7 +398,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertEqual(payload["counts"]["focus_city_points_rendered"], 3)
         self.assertEqual(payload["counts"]["focus_city_titles"], ["Tokyo", "Osaka", "Nagoya · Aichi"])
         self.assertEqual(payload["counts"]["night_points_rendered"], 88)
-        self.assertEqual(payload["counts"]["bathymetry_source_features"], 6)
+        self.assertEqual(payload["counts"]["bathymetry_source_features"], 800)
         self.assertEqual(payload["counts"]["bathymetry_eligible_paths"], 0)
         self.assertEqual(payload["counts"]["bathymetry_lines_rendered"], 0)
         self.assertEqual(

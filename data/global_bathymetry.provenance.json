@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-03-22T02:08:51.269975Z",
+  "generated_at": "2026-09-28T13:17:44.450065Z",
   "asset_path": "data/global_bathymetry.topo.json",
   "coverage_bbox": [
-    -29.4961,
-    19.0,
-    63.0,
-    76.0
+    -180.0,
+    -78.73333,
+    180.0,
+    89.99996
   ],
   "band_thresholds_m": [
     [
@@ -39,6 +39,10 @@
     [
       -4000,
       -6000
+    ],
+    [
+      -6000,
+      -12000
     ]
   ],
   "contour_thresholds_m": [
@@ -47,19 +51,376 @@
     -500,
     -1000,
     -2000,
-    -4000
+    -4000,
+    -6000
   ],
-  "band_feature_count": 1534,
-  "contour_feature_count": 6,
+  "band_feature_count": 2624,
+  "contour_feature_count": 800,
   "source": {
     "name": "ETOPO 2022",
     "version": "2022 v1 60s local cache",
     "path": "data/ETOPO_2022_v1_60s_N90W180_surface.tif",
+    "derivation": "Raster-derived global marine bathymetry from ETOPO, Natural Earth ocean geometry, and named marine regions, plus preserved regional Europe/TNO bands.",
     "license_note": "Publicly available NOAA relief model used as the local raster source for this generated asset."
   },
   "water_mask_sources": [
     "data/europe_ocean.geojson",
     "data/water_regions.geojson"
   ],
-  "coverage_note": "Europe/TNO-focused bathymetry asset for current map extent; excludes lakes from the global ocean bathymetry layer."
+  "bathymetry_clip_edges": {
+    "source": "data/europe_ocean.geojson",
+    "method": "Legacy regional ocean bbox cutlines retained only where the expanded marine mask still has no water coverage; the dateline and marine coasts are not cutlines.",
+    "band_edge_tolerance_degrees": 0.001,
+    "minimum_segment_length_degrees": 0.5
+  },
+  "coverage_note": "Global connected marine coverage from Natural Earth ocean geometry and named seas, plus preserved regional Europe/TNO bathymetry. The new expansion excludes lakes and inland seas; preserved regional features are unchanged.",
+  "ocean_expansion": {
+    "origin": "global_marine_120s_v1",
+    "base_arc_count": 24133,
+    "base_bbox": [
+      -28.433333333333334,
+      20.0,
+      62.0,
+      75.0
+    ],
+    "base_clip_edges": {
+      "type": "MultiLineString",
+      "coordinates": [
+        [
+          [
+            11.138528099761237,
+            34.5718
+          ],
+          [
+            10.6046,
+            34.5718
+          ]
+        ],
+        [
+          [
+            -6.4989736737754695,
+            34.5718
+          ],
+          [
+            -10.200964359495899,
+            34.5718
+          ]
+        ],
+        [
+          [
+            -10.356197026144898,
+            34.5718
+          ],
+          [
+            -13.900957459489,
+            34.5718
+          ]
+        ],
+        [
+          [
+            -13.932329807131602,
+            34.5718
+          ],
+          [
+            -24.3173,
+            34.5718
+          ]
+        ],
+        [
+          [
+            -24.3173,
+            34.5718
+          ],
+          [
+            -24.3173,
+            36.900974740880805
+          ]
+        ],
+        [
+          [
+            -24.3173,
+            37.56551875357387
+          ],
+          [
+            -24.3173,
+            48.46765128560328
+          ]
+        ],
+        [
+          [
+            -24.3173,
+            48.899001059095
+          ],
+          [
+            -24.3173,
+            62.685151773053214
+          ]
+        ],
+        [
+          [
+            -24.3173,
+            63.33233551438352
+          ],
+          [
+            -24.3173,
+            64.7463104479555
+          ]
+        ]
+      ]
+    },
+    "tile_degrees": 20,
+    "raster_resolution_arcseconds": 120,
+    "selected_marine_sources": [
+      {
+        "name": "Andaman Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Arabian Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Arctic Ocean",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Atlantic Ocean",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Baffin Bay",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Baltic Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Banda Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Barents Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Bay of Bengal",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Bay of Biscay",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Beaufort Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Black Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Caribbean Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Celebes Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "East China Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Great Australian Bight",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Greenland Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Aden",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Alaska",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Carpentaria",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Guinea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Mexico",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gulf of Oman",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Hudson Bay",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Indian Ocean",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Irish Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Java Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Labrador Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Mozambique Channel",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "North Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Norwegian Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Pacific Ocean",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Persian Gulf",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Philippine Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Red Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Ross Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Salish Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Scotia Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Sea of Azov",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Sea of Okhotsk",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "South China Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Southern Ocean",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Sulu Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Tasman Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Weddell Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Yellow Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Adriatic Basin",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Aegean Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Bosporus-Dardanelles Chokepoint",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Central Mediterranean Corridor",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Gibraltar Chokepoint",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Ionian Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Levantine Basin",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Mediterranean Open Basin",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Suez Approach",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Tyrrhenian-Ligurian Sea",
+        "path": "data/water_regions.geojson"
+      },
+      {
+        "name": "Natural Earth open ocean",
+        "path": "data/europe_topology.na_v2.json#ocean"
+      },
+      {
+        "name": "Natural Earth open ocean",
+        "path": "data/europe_topology.na_v2.json#ocean"
+      }
+    ],
+    "tile_count": 151,
+    "band_feature_count": 1090,
+    "contour_feature_count": 794,
+    "overview_band_feature_count": 1099,
+    "overview_contour_feature_count": 800,
+    "overview_tolerance_degrees": 0.05,
+    "seam_detail_width_degrees": 0.1,
+    "constant_latitude_arc_step_degrees": 0.5
+  },
+  "overview": {
+    "band_object": "bathymetry_bands_overview",
+    "contour_object": "bathymetry_contours_overview",
+    "simplification_tolerance_degrees": 0.05,
+    "ten_tile_sample_max_band_hausdorff_degrees": 0.720779,
+    "ten_tile_sample_max_contour_hausdorff_degrees": 0.726008,
+    "ten_tile_sample_band_point_reduction_percent": 59.05,
+    "ten_tile_sample_contour_point_reduction_percent": 62.93,
+    "note": "Final ten-tile sample after TopoJSON quantization; isolated subquantum polygon/line parts can be dropped by encoding and dominate Hausdorff distance. This is not a strict global bound. Detail objects retain full geometry for higher zoom."
+  }
 }

@@ -20,6 +20,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   projectedGeoBoundsInScreen,
   computeProjectedGeoBounds,
   getWaterRegionColor,
+  getOceanSurfacePattern = () => null,
   getEffectiveAtlantropaFeatures,
   getLogicalCanvasDimensions,
   shouldExcludePoliticalVisualFeature,
@@ -105,6 +106,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       });
       return 0;
     }
+    const oceanSurfacePattern = maskOnly ? null : getOceanSurfacePattern();
     waterFeatures.forEach((feature, index) => {
       if (!isWaterRegionRenderable(feature)) return;
       const parts = collectSafeWaterRegionGeometryParts(feature);
@@ -120,7 +122,11 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       const id = getSharedFeatureId(feature) || `water-${index}`;
       rendererSurfaceHost.getContext().save();
       rendererSurfaceHost.getContext().globalAlpha = fillOpacity;
-      rendererSurfaceHost.getContext().fillStyle = getWaterRegionColor(id, feature);
+      const hasColorOverride = (!isMacroOceanWaterRegion(feature) || runtimeState.allowOpenOceanPaint)
+        && !!getSafeCanvasColor(runtimeState.waterRegionOverrides?.[id], null);
+      rendererSurfaceHost.getContext().fillStyle = oceanSurfacePattern && !isLakeRegion(feature) && !hasColorOverride
+        ? oceanSurfacePattern
+        : getWaterRegionColor(id, feature);
       const context = rendererSurfaceHost.getContext();
       const lakeStyle = !maskOnly && isLakeRegion(feature)
         ? normalizeLakeStyleConfig(runtimeState.styleConfig?.lakes) : null;

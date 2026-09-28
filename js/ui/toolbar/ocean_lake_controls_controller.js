@@ -170,22 +170,22 @@ export function createOceanLakeControlsController({
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
     }
     if (oceanTextureOpacity) {
-      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.82, 0, 1) * 100));
+      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity ?? 0.82, 0, 1) * 100));
     }
     if (oceanTextureOpacityValue) {
-      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.82, 0, 1) * 100)}%`;
+      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity ?? 0.82, 0, 1) * 100)}%`;
     }
     if (oceanTextureScale) {
-      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
+      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale ?? 1, 0.6, 2.4) * 100));
     }
     if (oceanTextureScaleValue) {
-      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
+      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale ?? 1, 0.6, 2.4).toFixed(2)}x`;
     }
     if (oceanContourStrength) {
-      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.34, 0, 1) * 100));
+      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength ?? 0.34, 0, 1) * 100));
     }
     if (oceanContourStrengthValue) {
-      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.34, 0, 1) * 100)}%`;
+      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength ?? 0.34, 0, 1) * 100)}%`;
     }
   };
 
@@ -227,7 +227,7 @@ export function createOceanLakeControlsController({
   const renderOceanAdvancedStylesUi = () => {
     const enabled = oceanAdvancedStylesEnabled();
     const selectDisabledTitle = t("Enable Experimental Bathymetry to unlock data-driven depth presets.", "ui");
-    const sliderDisabledTitle = t("Available when Experimental Bathymetry is enabled.", "ui");
+    const sliderDisabledTitle = t("Select a bathymetry style to adjust these controls.", "ui");
     if (!enabled && advancedPresets.has(state.styleConfig.ocean.preset)) {
       state.styleConfig.ocean.preset = "flat";
     }
@@ -254,8 +254,8 @@ export function createOceanLakeControlsController({
       oceanScenarioShallowContourFadeEndZoom,
     ].forEach((control) => {
       if (!control) return;
-      control.disabled = !enabled;
-      control.title = enabled ? "" : sliderDisabledTitle;
+      control.disabled = !enabled || state.styleConfig.ocean.preset === "flat";
+      control.title = control.disabled ? sliderDisabledTitle : "";
     });
     if (oceanBathymetryDebugDetails) {
       oceanBathymetryDebugDetails.classList.toggle("opacity-60", !enabled);
@@ -393,6 +393,7 @@ export function createOceanLakeControlsController({
           applyBathymetryPresetDefaults(nextPreset);
         }
         syncOceanPresetControlValues();
+        renderOceanAdvancedStylesUi();
         renderOceanBathymetryDebugUi();
         applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-style");
       });
@@ -403,6 +404,10 @@ export function createOceanLakeControlsController({
       oceanAdvancedStylesToggle.checked = oceanAdvancedStylesEnabled();
       oceanAdvancedStylesToggle.addEventListener("change", (event) => {
         state.styleConfig.ocean.experimentalAdvancedStyles = !!event.target.checked;
+        if (state.styleConfig.ocean.experimentalAdvancedStyles && state.styleConfig.ocean.preset === "flat") {
+          state.styleConfig.ocean.preset = "bathymetry_soft";
+          applyBathymetryPresetDefaults("bathymetry_soft");
+        }
         if (!state.styleConfig.ocean.experimentalAdvancedStyles && advancedPresets.has(state.styleConfig.ocean.preset)) {
           state.styleConfig.ocean.preset = "flat";
         }

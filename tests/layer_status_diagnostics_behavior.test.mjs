@@ -162,6 +162,45 @@ test("bathymetry diagnostic explains disabled and pending data states", () => {
   assert.equal(resolveLayerStatusTone(pending), "warning");
 });
 
+test("bathymetry diagnostic separates loaded data from current view and reports load failures", () => {
+  const state = createState({
+    styleConfig: {
+      ...createDefaultStyleConfig(),
+      ocean: { ...createDefaultStyleConfig().ocean, experimentalAdvancedStyles: true, preset: "bathymetry_soft" },
+    },
+    activeBathymetryBandsData: { features: [{}, {}] },
+    activeBathymetryContoursData: { features: [{}] },
+    renderPerfMetrics: {
+      bathymetryLoad: { status: "ready", failedSources: [] },
+      bathymetryVisibility: { status: "ready", globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 },
+    },
+  });
+  const diagnostic = () => buildBathymetryDiagnostic(state, { translate: (key) => key });
+  assert.equal(diagnostic().loadedCount, 3);
+  assert.equal(diagnostic().visibleCount, 0);
+  assert.equal(diagnostic().summary, "No bathymetry coverage in this view");
+
+  state.renderPerfMetrics.bathymetryVisibility = { status: "ready", globalVisibleCount: 2, scenarioVisibleCount: 1, visibleCount: 3 };
+  assert.equal(diagnostic().summary, "2 raster-derived visible · 1 schematic visible");
+  assert.equal(diagnostic().visibleCount, 3);
+
+  state.renderPerfMetrics.bathymetryLoad = { status: "partial", failedSources: ["regional source"] };
+  assert.equal(diagnostic().severity, "warning");
+  assert.match(diagnostic().summary, /Some bathymetry sources failed to load · regional source/);
+
+  state.renderPerfMetrics.bathymetryLoad = { status: "error", failedSources: ["regional source"] };
+  assert.equal(diagnostic().summary, "Bathymetry data failed to load · regional source");
+  state.activeBathymetryBandsData = { features: [] };
+  state.activeBathymetryContoursData = { features: [] };
+  state.renderPerfMetrics.bathymetryLoad = { status: "partial", failedSources: ["regional source"] };
+  state.renderPerfMetrics.bathymetryVisibility = { status: "off" };
+  assert.equal(diagnostic().summary, "Some bathymetry sources failed to load · regional source");
+  state.renderPerfMetrics.bathymetryLoad = { status: "ready", failedSources: [] };
+  state.renderPerfMetrics.bathymetryVisibility = { status: "hidden", visibleCount: 0 };
+  assert.equal(diagnostic().summary, "Bathymetry opacity is zero");
+  assert.equal(diagnostic().visibleCount, null);
+});
+
 test("day and night diagnostic uses the clock mode labels", () => {
   const labels = {
     Enabled: "启用",

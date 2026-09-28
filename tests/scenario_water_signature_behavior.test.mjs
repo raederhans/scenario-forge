@@ -65,7 +65,7 @@ const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|deta
   + `|water-mode:combined|atlantropa:${atlantropa}`;
 const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|water-overrides:{}`
   + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
-  + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}';
+  + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}|ocean-surface:{}|bathymetry:|ocean-depth:0';
 
 test("water signature preserves bytes and identity allocation while avoiding duplicate water composition and revision work", () => {
   const h = createHarness();
@@ -204,4 +204,17 @@ test("lake shore cache is independent of river visibility and color", () => {
   assert.equal(h.context.getScenarioOverlaySignatureToken(), overlay);
   h.state.showRivers = false;
   assert.equal(h.water(), hidden);
+});
+
+test("water cache invalidates when ocean style, loaded bathymetry or depth paint changes", () => {
+  const h = createHarness();
+  const initial = h.water();
+  h.state.styleConfig = { ocean: { preset: "bathymetry_soft", experimentalAdvancedStyles: true } };
+  const styled = h.water();
+  assert.notEqual(styled, initial);
+  h.state.activeBathymetryTopologyUrl = "regional.topo.json";
+  const loaded = h.water();
+  assert.notEqual(loaded, styled);
+  h.state.intensityFields = { channels: { oceanDepth: { revision: 3 } } };
+  assert.notEqual(h.water(), loaded);
 });
