@@ -4,7 +4,9 @@ import test from "node:test";
 import { createOceanLakeControlsController } from "../js/ui/toolbar/ocean_lake_controls_controller.js";
 import { createDefaultStyleConfig } from "../js/core/state/ui_state.js";
 import { state as runtimeState } from "../js/core/state.js";
-import { undoHistory, redoHistory } from "../js/core/history_manager.js";
+import { clearHistory, undoHistory, redoHistory } from "../js/core/history_manager.js";
+
+import { setAppearanceStyleConfigState } from "../js/core/state/actions/appearance_actions.js";
 
 class Control {
   constructor(value = "") {
@@ -32,7 +34,7 @@ function createFixture(stateOverride = null) {
   styleConfig.ocean.preset = "flat";
   styleConfig.ocean.experimentalAdvancedStyles = false;
   const state = stateOverride || { styleConfig };
-  if (stateOverride) state.styleConfig = styleConfig;
+  if (stateOverride) setAppearanceStyleConfigState(stateOverride, styleConfig);
   const select = new Control("flat");
   select.options = ["flat", "bathymetry_soft", "bathymetry_contours"].map((value) => ({ value, disabled: false }));
   const toggle = new Control();
@@ -72,14 +74,9 @@ function createFixture(stateOverride = null) {
 }
 
 test("lake outline control starts enabled and invalidates water on toggle", () => {
-  const prior = {
-    styleConfig: runtimeState.styleConfig,
-    historyPast: runtimeState.historyPast,
-    historyFuture: runtimeState.historyFuture,
-  };
+  const priorStyle = runtimeState.styleConfig;
   try {
-    runtimeState.historyPast = [];
-    runtimeState.historyFuture = [];
+    clearHistory();
     const fixture = createFixture(runtimeState);
     fixture.controller.renderOceanLakeControlsUi();
     assert.equal(fixture.lakeOutlineToggle.checked, true);
@@ -96,19 +93,15 @@ test("lake outline control starts enabled and invalidates water on toggle", () =
     fixture.controller.renderOceanLakeControlsUi();
     assert.equal(fixture.lakeOutlineToggle.checked, false);
   } finally {
-    Object.assign(runtimeState, prior);
+    clearHistory();
+    setAppearanceStyleConfigState(runtimeState, priorStyle);
   }
 });
 
 test("sea names start hidden and turning them on refreshes labels with undo history", () => {
-  const prior = {
-    styleConfig: runtimeState.styleConfig,
-    historyPast: runtimeState.historyPast,
-    historyFuture: runtimeState.historyFuture,
-  };
+  const priorStyle = runtimeState.styleConfig;
   try {
-    runtimeState.historyPast = [];
-    runtimeState.historyFuture = [];
+    clearHistory();
     const fixture = createFixture(runtimeState);
     fixture.controller.renderOceanLakeControlsUi();
     assert.equal(fixture.oceanRegionNamesToggle.checked, false);
@@ -123,6 +116,7 @@ test("sea names start hidden and turning them on refreshes labels with undo hist
     assert.equal(redoHistory(), true);
     assert.equal(runtimeState.styleConfig.ocean.showRegionNames, true);
   } finally {
-    Object.assign(runtimeState, prior);
+    clearHistory();
+    setAppearanceStyleConfigState(runtimeState, priorStyle);
   }
 });
