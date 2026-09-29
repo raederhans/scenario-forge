@@ -9,7 +9,7 @@
   "counts": {
     "bathymetry_eligible_paths": 0,
     "bathymetry_lines_rendered": 0,
-    "bathymetry_source_features": 6,
+    "bathymetry_source_features": 800,
     "carrier_paths": 59,
     "city_eligible_points": 753,
     "city_points_rendered": 32,

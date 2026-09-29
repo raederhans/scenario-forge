@@ -15,7 +15,7 @@ const REQUIRED_EFFECT_NAMES = Object.freeze([
   "ensureLayerDataFromTopology",
   "rebuildPoliticalLandCollections",
   "applyRendererSurfaceBridgeState",
-  "migrateLegacyColorState",
+
   "ensureSovereigntyState",
   "normalizeColorStateForRender",
   "setDebugMode",
@@ -61,15 +61,7 @@ export function createRendererStartupTransactionOwner({
 
   function runInitMapResetTransaction({ debugMode } = {}) {
     const reason = INIT_MAP_RESET_REASON;
-    const summary = {
-      reason,
-      debugMode,
-      effects: [],
-    };
-    const runEffect = (name, ...args) => {
-      summary.effects.push(name);
-      return requiredEffects[name](...args);
-    };
+    const runEffect = (name, ...args) => requiredEffects[name](...args);
 
     runEffect("resetLayerResolverCache");
     runEffect("resetPhysicalLandClipPathCache");
@@ -89,7 +81,7 @@ export function createRendererStartupTransactionOwner({
     runEffect("ensureLayerDataFromTopology");
     runEffect("rebuildPoliticalLandCollections");
     runEffect("applyRendererSurfaceBridgeState");
-    runEffect("migrateLegacyColorState");
+
     runEffect("ensureSovereigntyState");
     runEffect("normalizeColorStateForRender");
     runEffect("setDebugMode", debugMode);
@@ -106,11 +98,6 @@ export function createRendererStartupTransactionOwner({
     runEffect("resetProjectedBoundsCacheState");
     runEffect("invalidateAllRenderPasses", reason);
     runEffect("syncDayNightClockTimerBridge");
-
-    return Object.freeze({
-      ...summary,
-      effects: Object.freeze([...summary.effects]),
-    });
   }
 
   return Object.freeze({

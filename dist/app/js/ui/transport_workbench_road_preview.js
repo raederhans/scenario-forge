@@ -141,12 +141,12 @@ function createLabelFeature(rawFeature, roadFeatureById) {
   };
 }
 
-async function loadJapanRoadPack(mode = PACK_MODE_PREVIEW, config = {}) {
+async function loadJapanRoadPack(mode = PACK_MODE_PREVIEW, config = {}, { emitSelection = true } = {}) {
   if (config?.activePackId) {
     lineRuntime.setActivePack(config.activePackId, resolveTransportManifestUrl(config.activePackId));
   }
   return lineRuntime.loadPack(mode, () => {
-    if (runtime.loadState.status === "ready" && runtime.lastRenderedConfig) {
+    if (emitSelection && runtime.loadState.status === "ready" && runtime.lastRenderedConfig) {
       emitSelectionChange();
     }
   });
@@ -353,6 +353,10 @@ export async function renderJapanRoadPreview(config, options = {}) {
     return null;
   }
   return renderRoads(config);
+}
+
+export async function prepareJapanRoadPreview(config = {}) {
+  return loadJapanRoadPack(PACK_MODE_PREVIEW, config, { emitSelection: false });
 }
 
 export async function warmJapanRoadPreviewPack({ includeFull = false } = {}) {

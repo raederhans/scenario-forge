@@ -136,6 +136,10 @@ function createPhysicalPresetConfig(preset = "balanced") {
       opacity: 0.72,
       atlasOpacity: 0.68,
       atlasIntensity: 1.12,
+      landformIntensity: 1,
+      landcoverIntensity: 1,
+      hillshadeOpacity: 0,
+      showRegionLabels: false,
       atlasClassVisibility,
       rainforestEmphasis: 0.88,
       contourColor: "#5e4b3b",
@@ -157,6 +161,10 @@ function createPhysicalPresetConfig(preset = "balanced") {
       opacity: 0.36,
       atlasOpacity: 0.24,
       atlasIntensity: 0.78,
+      landformIntensity: 1,
+      landcoverIntensity: 1,
+      hillshadeOpacity: 0,
+      showRegionLabels: false,
       atlasClassVisibility,
       rainforestEmphasis: 0.52,
       contourColor: "#675645",
@@ -177,6 +185,10 @@ function createPhysicalPresetConfig(preset = "balanced") {
     opacity: 0.56,
     atlasOpacity: 0.44,
     atlasIntensity: 0.96,
+    landformIntensity: 1,
+    landcoverIntensity: 1,
+    hillshadeOpacity: 0,
+    showRegionLabels: false,
     atlasClassVisibility,
     rainforestEmphasis: 0.74,
     contourColor: "#665241",
@@ -255,6 +267,10 @@ export function normalizePhysicalStyleConfig(rawConfig) {
     ),
     atlasOpacity: clamp(toFiniteNumber(raw.atlasOpacity, atlasOpacityFallback), 0, 1),
     atlasIntensity: clamp(toFiniteNumber(raw.atlasIntensity, defaults.atlasIntensity), 0.2, 1.4),
+    landformIntensity: clamp(toFiniteNumber(raw.landformIntensity, 1), 0, 2),
+    landcoverIntensity: clamp(toFiniteNumber(raw.landcoverIntensity, 1), 0, 2),
+    hillshadeOpacity: clamp(toFiniteNumber(raw.hillshadeOpacity, 0), 0, 0.3),
+    showRegionLabels: raw.showRegionLabels === true,
     atlasClassVisibility: Object.fromEntries(
       PHYSICAL_ATLAS_CLASS_KEYS.map((key) => [
         key,
@@ -310,6 +326,10 @@ function createDefaultLakeStyleConfig() {
     interactive: false,
     linkedToOcean: true,
     fillColor: null,
+    outlineEnabled: true,
+    outlineColor: "#54738f",
+    outlineWidth: 0.7,
+    outlineOpacity: 0.45,
   };
 }
 
@@ -321,6 +341,10 @@ function normalizeLakeStyleConfig(rawConfig) {
     interactive: raw.interactive === true,
     linkedToOcean: raw.linkedToOcean === undefined ? defaults.linkedToOcean : !!raw.linkedToOcean,
     fillColor: fillColor || null,
+    outlineEnabled: raw.outlineEnabled === undefined ? defaults.outlineEnabled : raw.outlineEnabled === true,
+    outlineColor: normalizeHexColorWithFallback(raw.outlineColor, defaults.outlineColor),
+    outlineWidth: clamp(toFiniteNumber(raw.outlineWidth, defaults.outlineWidth), 0, 4),
+    outlineOpacity: clamp(toFiniteNumber(raw.outlineOpacity, defaults.outlineOpacity), 0, 1),
   };
 }
 

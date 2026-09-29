@@ -695,6 +695,11 @@ function createExactAfterSettleScheduler({
     const scheduleStartedAt = nowMs();
     const generation = Number(beginExactAfterSettleControllerSchedule(scheduleStartedAt) || 0);
     const resolvedProfile = profile || getAdaptiveSettleProfile();
+    // Both waits guard the same end of input. Count time already spent settling
+    // (including delayed timer delivery) instead of starting a second full wait.
+    const endedAt = Number(runtimeState.zoomGestureEndedAt || 0);
+    const quietElapsedMs = endedAt > 0 ? Math.max(0, scheduleStartedAt - endedAt) : 0;
+    const remainingQuietMs = Math.max(0, Number(resolvedProfile.exactQuietWindowMs || 0) - quietElapsedMs);
     setExactAfterSettleHandleState(runtimeState, {
       type: "timeout",
       id: globalThis.setTimeout(() => {
@@ -719,7 +724,7 @@ function createExactAfterSettleScheduler({
             applyScheduledExactAfterSettleRefreshPlan(generation, plan);
           });
         });
-      }, resolvedProfile.exactQuietWindowMs),
+      }, remainingQuietMs),
     });
   }
 

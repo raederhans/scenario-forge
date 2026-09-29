@@ -1,6 +1,5 @@
 export function createMapInteractionEventBindingOwner({
   getters = {},
-  helpers = {},
   handlers = {},
   effects = {},
 } = {}) {
@@ -48,19 +47,14 @@ export function createMapInteractionEventBindingOwner({
       throw new Error("Map interaction event binding owner requires window.addEventListener.");
     }
 
-    requireFunction(helpers, "bindInteractionFunnel")({
-      mapClick: requireFunction(handlers, "mapClick"),
-      mapDoubleClick: requireFunction(handlers, "mapDoubleClick"),
-    });
-
     interactionRect.on("mousemove", requireFunction(handlers, "handleMouseMove"));
     interactionRect.on("pointerdown.fieldTool", requireFunction(handlers, "handlePhysicalIntensityPointerDown"));
     interactionRect.on("pointermove.fieldTool", requireFunction(handlers, "handlePhysicalIntensityPointerMove"));
     interactionRect.on("mousedown.brush", requireFunction(handlers, "handleBrushPointerDown"));
     interactionRect.on("mousemove.brush", requireFunction(handlers, "handleBrushPointerMove"));
     interactionRect.on("mouseleave", requireFunction(handlers, "handleMouseLeave"));
-    interactionRect.on("click", requireFunction(handlers, "dispatchMapClick"));
-    interactionRect.on("dblclick", requireFunction(handlers, "dispatchMapDoubleClick"));
+    interactionRect.on("click", requireFunction(handlers, "mapClick"));
+    interactionRect.on("dblclick", requireFunction(handlers, "mapDoubleClick"));
 
     targetWindow.addEventListener("mouseup", bindWindowMouseUp);
     targetWindow.addEventListener("pointerup", requireFunction(handlers, "handlePhysicalIntensityPointerEnd"));

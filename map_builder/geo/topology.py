@@ -24,6 +24,7 @@ from map_builder.geo.water_region_authority import compile_named_water_regions
 from map_builder.geo.water_geometry import replace_water_topology_object
 from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.physical_water_mask import inherit_physical_water_masks
+from map_builder.geo.physical_topology import repair_physical_topology_winding
 
 URBAN_CORRUPT_BOUNDS_WIDTH_DEG = 300.0
 URBAN_CORRUPT_BOUNDS_HEIGHT_DEG = 150.0
@@ -732,6 +733,10 @@ def build_named_layer_topology(
         toposimplify=False,
         shared_coords=True,
     ).to_json()
+    if object_name in {"physical_semantics", "physical_hillshade"}:
+        payload = json.loads(topo)
+        repair_physical_topology_winding(payload, object_name)
+        topo = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     output_path.write_text(topo, encoding="utf-8")
     print(f"Context TopoJSON saved to {output_path}")
 

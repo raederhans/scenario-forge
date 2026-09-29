@@ -12,6 +12,7 @@ import {
   clearAllTransportWorkbenchFamilyPreviews,
   destroyAllTransportWorkbenchFamilyPreviews,
   isTransportWorkbenchFamilyLivePreviewCapable,
+  prepareTransportWorkbenchFamilyPreview,
   renderTransportWorkbenchFamilyPreview,
   setTransportWorkbenchFamilyPreviewSelectionListener,
   warmTransportWorkbenchFamilyPreview,
@@ -43,6 +44,8 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
   renderLensSections = () => {},
   syncPreviewControls = () => {},
   getCarrierViewState = getTransportWorkbenchCarrierViewState,
+  ensureCarrier = ensureTransportWorkbenchCarrier,
+  prepareFamilyPreview = prepareTransportWorkbenchFamilyPreview,
   renderFamilyPreview = renderTransportWorkbenchFamilyPreview,
   listWarmupPlans = listTransportWorkbenchWarmupPlans,
   warmFamilyPreview = warmTransportWorkbenchFamilyPreview,
@@ -69,6 +72,7 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
   let renderGeneration = 0;
   let previewViewSyncRaf = 0;
   let previewLastViewKey = "";
+  let previewLensRefreshPending = false;
   let previewWarmupScheduled = false;
   let selectionSyncRaf = 0;
   const pendingSelectionFamilyIds = new Set();
@@ -94,10 +98,16 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
     if (!carrierMount) {
       return Promise.resolve(null);
     }
-    const prepareCarrier = allowCarrierPrep
-      ? ensureTransportWorkbenchCarrier(carrierMount)
+    const isLiveCapable = isTransportWorkbenchFamilyLivePreviewCapable(context.family.id);
+    if (allowCarrierPrep && !viewOnly && isLiveCapable) previewLensRefreshPending = true;
+    const preparePack = (allowCarrierPrep && !viewOnly && isLiveCapable)
+      ? Promise.resolve().then(() => prepareFamilyPreview(context.family.id, context.config))
       : Promise.resolve();
-    return prepareCarrier
+    const prepareCarrier = allowCarrierPrep
+      ? Promise.resolve().then(() => ensureCarrier(carrierMount))
+      : Promise.resolve();
+
+    return Promise.all([prepareCarrier, preparePack])
       .then(() => {
         if (!isRenderGenerationCurrent(candidateGeneration, context.family.id)) {
           return null;
@@ -105,7 +115,7 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
         resizeTransportWorkbenchCarrier();
         syncPreviewControls();
         // Preview family modules consume the resolved config; this owner only keeps lifecycle ordering stable.
-        if (isTransportWorkbenchFamilyLivePreviewCapable(context.family.id)) {
+        if (isLiveCapable) {
           return renderFamilyPreview(context.family.id, context.config, {
             isCurrent: () => isRenderGenerationCurrent(candidateGeneration, context.family.id),
             viewOnly,
@@ -114,6 +124,12 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
               return null;
             }
             previewLastViewKey = createTransportWorkbenchPreviewViewKey(getCarrierViewState());
+            // A carrier view update may supersede the initial preparation.
+            // Let the latest committed preview publish the pending status.
+            if (previewLensRefreshPending) {
+              previewLensRefreshPending = false;
+              renderLensSections(context.family, context.config, context.compareHeld);
+            }
             renderInspector(context.family, context.config, context.compareHeld);
             return null;
           });
@@ -224,6 +240,7 @@ export function createTransportWorkbenchPreviewLifecycleOwner(runtimeState, {
     }
     renderGeneration += 1;
     previewLastViewKey = "";
+    previewLensRefreshPending = false;
     destroyFamilyPreviews();
     destroyCarrier();
     attachRuntimeListeners();

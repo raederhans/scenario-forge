@@ -84,7 +84,6 @@ function requirePorts(group, names, label) {
 }
 
 const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
-  "addRecentColor",
   "appendOperationalLineVertexFromEvent",
   "appendOperationGraphicVertexFromEvent",
   "appendSpecialZoneVertexFromEvent",
@@ -98,7 +97,6 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "dismissOnboardingHint",
   "ensureLeafDetailReady",
   "getFeatureCountryCodeNormalized",
-  "getFeatureOwnerCode",
   "getFeaturePaintColor",
   "getHitFromEvent",
   "getHoveredFacilityEntryFromEvent",
@@ -112,30 +110,22 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "isFacilityDetailsSurfaceActive",
   "isMacroOceanWaterRegion",
   "isOpenOceanPaintEnabled",
-  "isSovereigntyModeActive",
   "markDirty",
-  "markLegacyColorStateDirty",
   "noteRenderAction",
   "nowMs",
   "placeUnitCounterFromEvent",
   "queueTooltipUpdate",
-  "refreshResolvedColorsForFeatures",
-  "refreshResolvedColorsForOwners",
   "refreshSidebarAfterPaint",
   "refreshSpecialRegionSidebarRowsNow",
   "refreshWaterRegionSidebarRowsNow",
   "renderHoverOverlayIfNeeded",
   "requestInteractionRender",
-  "resetFeatureOwnerCodes",
   "resolveInteractionTargetIds",
-  "scheduleDynamicBorderRecompute",
-  "setFeatureOwnerCodes",
   "shouldBlockUnderlyingSelectionForFacility",
   "shouldRequireLeafDetail",
   "syncInspectorCountryToLandSelection",
   "toggleFeatureInDevSelection",
   "updateDevSelectedHit",
-  "warnMissingActiveSovereign",
   "warnIncompletePaintTargets",
 ]);
 const CLICK_SELECTION_ACTION_NAMES = Object.freeze([
@@ -163,7 +153,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const getClickState = requireFunction(getters.getClickState, "getters.getClickState");
   const getSelectedFacilityEntry = requireFunction(getters.getSelectedFacilityEntry, "getters.getSelectedFacilityEntry");
   const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry, togglePresetRegion } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
-  const { addRecentColor, appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeatureOwnerCode, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, inspectHgoRuntimePreviewFromEvent, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, isSovereigntyModeActive, markDirty, markLegacyColorStateDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshResolvedColorsForFeatures, refreshResolvedColorsForOwners, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resetFeatureOwnerCodes, resolveInteractionTargetIds, scheduleDynamicBorderRecompute, setFeatureOwnerCodes, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnMissingActiveSovereign, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
+  const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, inspectHgoRuntimePreviewFromEvent, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();

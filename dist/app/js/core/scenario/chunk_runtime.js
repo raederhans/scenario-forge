@@ -18,6 +18,7 @@ function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, ge
   return owner;
 }
 import { registerRuntimeHook } from "../state/index.js";
+import { setScenarioRuntimeOptionalLayerState } from "../state/scenario_runtime_state.js";
 import { setRenderPerfMetricEntryState } from "../state/actions/renderer_diagnostics_actions.js";
 import {
   captureScenarioChunkLoadStateContinuation,
@@ -286,6 +287,58 @@ function createScenarioChunkRuntimeController({
   const { loadScenarioChunkPayload, loadScenarioChunkPayloadEntries, resetScenarioChunkRequests } = composeScenarioChunkPayloadLoader(
     runtimeState, normalizeScenarioId, getScenarioBundleId, loadScenarioChunkFile,
   );
+
+  async function ensureScenarioNavigationSources({
+    layers = ["political", "water", "scenario_atlantropa"],
+    d3Client = globalThis.d3,
+  } = {}) {
+    const sourceLayers = ["political", "water", "scenario_atlantropa"];
+    const requestedLayers = new Set(Array.isArray(layers) ? layers : sourceLayers);
+    const result = { political: [], water: [], scenario_atlantropa: [] };
+    const scenarioId = normalizeScenarioId(runtimeState.activeScenarioId);
+    const sceneGeneration = runtimeState.sceneGeneration;
+    const bundle = getCachedScenarioBundle(scenarioId);
+    const assertCurrent = () => {
+      if (!scenarioId || !bundle || normalizeScenarioId(runtimeState.activeScenarioId) !== scenarioId
+        || runtimeState.sceneGeneration !== sceneGeneration
+        || getCachedScenarioBundle(scenarioId) !== bundle
+        || getScenarioBundleId(bundle) !== scenarioId
+        || (runtimeState.activeScenarioChunks?.scenarioId
+          && normalizeScenarioId(runtimeState.activeScenarioChunks.scenarioId) !== scenarioId)) {
+        throw new Error("Scenario navigation sources became stale while loading.");
+      }
+    };
+    assertCurrent();
+    if (!sourceLayers.some((layer) => requestedLayers.has(layer))) return result;
+    if (!bundle.chunkRegistry) {
+      await ensureScenarioChunkRegistryLoaded(bundle, { d3Client });
+      assertCurrent();
+    }
+    if (!bundle.chunkRegistry?.byLayer) {
+      throw new Error("Scenario navigation source registry is unavailable.");
+    }
+    const registry = bundle.chunkRegistry;
+    const loads = sourceLayers.filter((layer) => requestedLayers.has(layer)).map(async (layer) => {
+      const chunks = (Array.isArray(registry.byLayer[layer]) ? registry.byLayer[layer] : [])
+        .filter((chunk) => chunk.globalCoverage === true && chunk.lod === "coarse");
+      result[layer] = await Promise.all(chunks.map(async (chunk) => {
+        const entry = await loadScenarioChunkPayload(bundle, chunk, { d3Client });
+        assertCurrent();
+        if (bundle.chunkRegistry !== registry || !Array.isArray(entry?.payload?.features)) {
+          throw new Error(`Scenario navigation source is unavailable: ${chunk.id}`);
+        }
+        return entry.payload;
+      }));
+    });
+    await Promise.all(loads);
+    assertCurrent();
+    if (bundle.chunkRegistry !== registry) {
+      throw new Error("Scenario navigation source registry changed while loading.");
+    }
+    return result;
+  }
+
+  registerRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", ensureScenarioNavigationSources);
 
   function getScenarioApplyEpochFromDiagnostics(scenarioId = "") {
     const diagnostics = runtimeState?.renderTransactionDiagnostics || {};
@@ -2475,6 +2528,16 @@ function createScenarioChunkRuntimeController({
       }
       if (!scenarioBundleUsesChunkedLayer(bundle)) return null;
     }
+    // The registry loads the full-source border pack into the bundle after the
+    // bootstrap apply. Publish it only after the active continuation is valid;
+    // prewarming another scene must never replace the visible border source.
+    if (bundle.meshPackPayload?.scenario_id === scenarioId
+      && runtimeState.activeScenarioMeshPack !== bundle.meshPackPayload) {
+      setScenarioRuntimeOptionalLayerState(runtimeState, {
+        activeScenarioMeshPack: bundle.meshPackPayload,
+      });
+      requestRender("scenario-political-border-source");
+    }
     clearPendingScenarioChunkRefresh(loadState);
     const viewportBbox = getCurrentScenarioChunkViewportBbox();
     const requiredSemanticLayers = resolveRequiredScenarioSemanticLayers({
@@ -3466,6 +3529,7 @@ function createScenarioChunkRuntimeController({
 
   return {
     ensureRuntimeChunkLoadState,
+    ensureScenarioNavigationSources,
     hasScenarioMergedLayerPayload,
     getScenarioRuntimeMergedLayerPayloads,
     applyScenarioPoliticalChunkPayload,

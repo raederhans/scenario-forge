@@ -1,4 +1,5 @@
 import {
+  SCENARIO_RENDER_PROFILES,
   normalizeScenarioRenderProfile,
 } from "./pure_helpers.js";
 import {
@@ -22,7 +23,16 @@ function emitScenarioPresentationUiUpdates() {
 
 function createScenarioDisplayRestoreRuntime({
   state,
+  getSearchParams = () => new URLSearchParams(globalThis.location?.search || ""),
 } = {}) {
+  let lastHintRenderProfile = null;
+  let renderProfileChangedDuringScenario = false;
+
+  function getExplicitRenderProfile() {
+    const value = String(getSearchParams()?.get?.("render_profile") ?? "").trim().toLowerCase();
+    return SCENARIO_RENDER_PROFILES.has(value) ? value : null;
+  }
+
   function syncScenarioPresentationUi() {
     emitScenarioPresentationUiUpdates();
   }
@@ -49,8 +59,16 @@ function createScenarioDisplayRestoreRuntime({
     captureScenarioDisplaySettingsBeforeActivate();
     const hints = normalizeScenarioPerformanceHints(manifest);
     setActiveScenarioPerformanceHintsState(state, hints);
-    if (hints.renderProfileDefault) {
+    const explicitRenderProfile = getExplicitRenderProfile();
+    if (explicitRenderProfile) {
+      state.renderProfile = explicitRenderProfile;
+      lastHintRenderProfile = null;
+    } else if (lastHintRenderProfile && state.renderProfile !== lastHintRenderProfile) {
+      renderProfileChangedDuringScenario = true;
+    }
+    if (!explicitRenderProfile && !renderProfileChangedDuringScenario && hints.renderProfileDefault) {
       state.renderProfile = normalizeScenarioRenderProfile(hints.renderProfileDefault, state.renderProfile || "auto");
+      lastHintRenderProfile = state.renderProfile;
     }
     if (typeof hints.dynamicBordersDefault === "boolean") {
       state.dynamicBordersEnabled = hints.dynamicBordersDefault;
@@ -76,7 +94,10 @@ function createScenarioDisplayRestoreRuntime({
   function restoreScenarioDisplaySettingsAfterExit() {
     const snapshot = state.scenarioDisplaySettingsBeforeActivate;
     if (snapshot && typeof snapshot === "object") {
-      state.renderProfile = normalizeScenarioRenderProfile(snapshot.renderProfile, state.renderProfile || "auto");
+      if (!getExplicitRenderProfile() && !renderProfileChangedDuringScenario
+        && lastHintRenderProfile && state.renderProfile === lastHintRenderProfile) {
+        state.renderProfile = normalizeScenarioRenderProfile(snapshot.renderProfile, state.renderProfile || "auto");
+      }
       state.dynamicBordersEnabled = snapshot.dynamicBordersEnabled !== false;
       state.parentBordersVisible = snapshot.parentBordersVisible !== false;
       state.showWaterRegions = snapshot.showWaterRegions !== false;
@@ -87,6 +108,8 @@ function createScenarioDisplayRestoreRuntime({
       state.strategicChoroplethMetric = String(snapshot.strategicChoroplethMetric || "");
     }
     state.scenarioDisplaySettingsBeforeActivate = null;
+    lastHintRenderProfile = null;
+    renderProfileChangedDuringScenario = false;
     setActiveScenarioPerformanceHintsState(state, null);
     syncScenarioPresentationUi();
   }

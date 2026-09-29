@@ -33,97 +33,6 @@ export function createDevWorkspacePanel(bottomDock) {
       </div>
     </div>
     <div class="dev-workspace-grid">
-      <div id="devScenarioOwnershipPanel" class="dev-workspace-panel hidden" data-dev-category="selection">
-        <div id="devScenarioOwnershipLabel" class="dev-workspace-panel-title" data-i18n="Scenario Ownership Editor"></div>
-        <div id="devScenarioOwnershipTitle" class="section-header-block"></div>
-        <p id="devScenarioOwnershipHint" class="dev-workspace-note"></p>
-        <div id="devScenarioOwnershipMeta" class="dev-workspace-meta"></div>
-        <label id="devScenarioOwnerInputLabel" class="dev-workspace-note" for="devScenarioOwnerInput" data-i18n="Target Owner Tag"></label>
-        <input id="devScenarioOwnerInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="8" placeholder="GER" />
-        <div class="dev-workspace-actions">
-          <button id="devScenarioApplyOwnerBtn" type="button" class="btn-primary" data-i18n="Apply to Selection"></button>
-          <button id="devScenarioResetOwnerBtn" type="button" class="btn-secondary" data-i18n="Reset Selection"></button>
-          <button id="devScenarioSaveOwnersBtn" type="button" class="btn-secondary" data-i18n="Save Owners File"></button>
-        </div>
-        <div id="devScenarioOwnershipStatus" class="dev-workspace-note"></div>
-      </div>
-      <div id="devScenarioTagCreatorPanel" class="dev-workspace-panel dev-workspace-panel-wide hidden" data-dev-category="scenario">
-        <div class="dev-scenario-tag-creator-head">
-          <div class="dev-scenario-tag-creator-title-stack">
-            <div id="devScenarioTagCreatorLabel" class="dev-workspace-panel-title" data-i18n="Scenario Tag Creator"></div>
-            <div id="devScenarioTagCreatorTitle" class="section-header-block"></div>
-          </div>
-          <div id="devScenarioTagCreatorMeta" class="dev-workspace-meta dev-scenario-tag-creator-meta"></div>
-        </div>
-        <div class="dev-workspace-form-grid dev-scenario-tag-creator-grid">
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagLabel" class="dev-workspace-note" for="devScenarioTagInput" data-i18n="Tag"></label>
-            <input id="devScenarioTagInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="ABC" />
-            <div id="devScenarioTagFieldStatus" class="dev-workspace-field-status"></div>
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagParentLabel" class="dev-workspace-note" for="devScenarioTagParentInput" data-i18n="Parent Owner Tag"></label>
-            <input id="devScenarioTagParentInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" maxlength="4" placeholder="GER" />
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagGroupSelectLabel" class="dev-workspace-note" for="devScenarioTagGroupSelect" data-i18n="Inspector Group"></label>
-            <select id="devScenarioTagGroupSelect" class="select-input dev-workspace-select">
-              <option value="" data-i18n="No Inspector Group"></option>
-            </select>
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagNameEnLabel" class="dev-workspace-note" for="devScenarioTagNameEnInput" data-i18n="English Name"></label>
-            <input id="devScenarioTagNameEnInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagNameZhLabel" class="dev-workspace-note" for="devScenarioTagNameZhInput" data-i18n="Chinese Name"></label>
-            <input id="devScenarioTagNameZhInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="New Country" />
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagGroupIdLabel" class="dev-workspace-note" for="devScenarioTagGroupIdInput" data-i18n="New Group ID"></label>
-            <input id="devScenarioTagGroupIdInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" placeholder="scenario_group_europe" />
-          </div>
-          <div class="dev-workspace-form-field">
-            <label id="devScenarioTagGroupLabelLabel" class="dev-workspace-note" for="devScenarioTagGroupLabelInput" data-i18n="New Group Label"></label>
-            <input id="devScenarioTagGroupLabelInput" class="input dev-workspace-input" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="Europe" />
-          </div>
-          <div class="dev-workspace-form-field dev-workspace-form-field-span-2">
-            <label id="devScenarioTagGroupAnchorLabel" class="dev-workspace-note" for="devScenarioTagGroupAnchorSelect" data-i18n="Anchor Region"></label>
-            <select id="devScenarioTagGroupAnchorSelect" class="select-input dev-workspace-select">
-              <option value="" data-i18n="Select anchor region"></option>
-            </select>
-          </div>
-          <div class="dev-workspace-form-field dev-workspace-form-field-span-2 dev-scenario-tag-color-field">
-            <div class="dev-workspace-inline-row">
-              <label id="devScenarioTagColorPaletteLabel" class="dev-workspace-note" for="devScenarioTagColorPreviewBtn" data-i18n="Color Palette"></label>
-              <div id="devScenarioTagColorPopoverAnchor" class="dev-workspace-color-popover-anchor">
-                <button id="devScenarioTagColorPreviewBtn" type="button" class="dev-workspace-color-preview-button">
-                  <span id="devScenarioTagColorPreview" class="dev-workspace-color-preview">#5D7CBA</span>
-                </button>
-                <div id="devScenarioTagColorPopover" class="dev-workspace-color-popover hidden" role="dialog" aria-modal="false">
-                  <div id="devScenarioTagColorPopoverLabel" class="dev-workspace-note" data-i18n="Custom Color"></div>
-                  <div class="dev-workspace-actions">
-                    <button id="devScenarioTagColorSampleBtn" type="button" class="btn-secondary" data-i18n="Sample Selected"></button>
-                    <button id="devScenarioTagColorCustomBtn" type="button" class="btn-secondary" data-i18n="Custom..."></button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="devScenarioTagPalette" class="dev-workspace-swatch-grid" role="listbox" data-i18n-aria-label="Scenario tag color palette"></div>
-            <div id="devScenarioTagRecentWrap" class="dev-workspace-form-field hidden">
-              <label id="devScenarioTagRecentLabel" class="dev-workspace-note" for="devScenarioTagRecentColors" data-i18n="Recent Colors"></label>
-              <div id="devScenarioTagRecentColors" class="dev-workspace-swatch-row" role="listbox" data-i18n-aria-label="Recent scenario tag colors"></div>
-            </div>
-            <input id="devScenarioTagColorInput" class="dev-workspace-native-color-input" type="color" value="#5d7cba" tabindex="-1" aria-hidden="true" />
-          </div>
-        </div>
-        <div class="dev-workspace-actions dev-scenario-tag-creator-actions">
-          <button id="devScenarioClearTagSelectionBtn" type="button" class="btn-secondary" data-i18n="Clear Selection"></button>
-          <button id="devScenarioClearTagBtn" type="button" class="btn-secondary" data-i18n="Clear"></button>
-          <button id="devScenarioCreateTagBtn" type="button" class="btn-primary" data-i18n="Create Tag"></button>
-        </div>
-        <div id="devScenarioTagCreatorStatus" class="dev-workspace-note dev-scenario-tag-creator-status"></div>
-      </div>
       <div class="dev-workspace-panel" data-dev-category="selection">
         <div id="devSelectionClipboardLabel" class="dev-workspace-panel-title" data-i18n="Selection Clipboard"></div>
         <div class="dev-workspace-actions">
@@ -311,29 +220,13 @@ export function createDevWorkspaceQuickbar(bottomDock) {
     <div class="dev-workspace-quick-owner">
       <span class="dev-quick-label" data-i18n="Selection"></span>
       <div class="dev-workspace-quick-owner-row">
-        <input
-          id="devQuickOwnerInput" hidden disabled aria-hidden="true" tabindex="-1"
-          class="input dev-workspace-input dev-workspace-quick-input hidden"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          maxlength="8"
-          placeholder="GER"
-          data-i18n-title="Enter owner tag (e.g. GER, FRA, BRA)"
-        />
         <div class="dev-workspace-quick-owner-controls">
           <button id="devQuickRemoveSelectedBtn" type="button" class="btn-secondary" data-i18n="Remove Selection"></button>
-          <button id="devQuickUseTagBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Use Selection Tag" data-i18n-title="Copy the selected feature's tag into the owner input"></button>
         </div>
       </div>
     </div>
-    <div class="dev-workspace-quick-actions" role="toolbar" aria-label="Development quick actions" data-i18n-aria-label="Development quick actions">
-      <button id="devQuickApplyOwnerBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-primary hidden" data-i18n="Apply to Selection" data-i18n-title="Set the owner tag for all selected features"></button>
-      <button id="devQuickResetOwnerBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Reset Selection" data-i18n-title="Clear owner assignment from selected features"></button>
-    </div>
     <div class="dev-workspace-quick-secondary" role="toolbar" aria-label="Development utility actions" data-i18n-aria-label="Development utility actions">
       <button id="devQuickRebuildBordersBtn" type="button" class="btn-secondary" data-i18n="Recalculate Borders" data-i18n-title="Rebuild political borders based on current ownership"></button>
-      <button id="devQuickSaveOwnersBtn" hidden disabled aria-hidden="true" tabindex="-1" type="button" class="btn-secondary hidden" data-i18n="Save Owners File" data-i18n-title="Export ownership data to a downloadable JSON file"></button>
     </div>
   `;
 

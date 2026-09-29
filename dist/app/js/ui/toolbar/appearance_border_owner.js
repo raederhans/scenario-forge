@@ -1,3 +1,4 @@
+import { isPoliticalBorderEnabled } from "../../core/renderer/political_border_policy.js";
 import {
   ensureAppearanceStyleConfigState,
   patchAppearanceStyleGroupState,
@@ -74,6 +75,7 @@ function collectBorderNodes(documentRef = document) {
       widthValue: documentRef.getElementById("internalBorderWidthValue"),
     },
     country: {
+      politicalInput: documentRef.getElementById("politicalBorderToggle"),
       colorInput: documentRef.getElementById("empireBorderColor"),
       opacityInput: documentRef.getElementById("empireBorderOpacity"),
       opacityValue: documentRef.getElementById("empireBorderOpacityValue"),
@@ -108,9 +110,10 @@ export function createAppearanceBorderOwner({
       widthPrecision: 2,
     },
     empireBorders: {
-      color: "#666666",
+      color: "#4b5563",
       opacity: 0.9,
-      width: 1,
+      width: 1.2,
+      political: "auto",
       minWidth: 0.01,
       maxWidth: 5,
       widthPrecision: 2,
@@ -143,6 +146,11 @@ export function createAppearanceBorderOwner({
 
   const renderCountryUi = () => {
     const config = syncBorderConfig("empireBorders");
+    if (nodes.country.politicalInput) {
+      nodes.country.politicalInput.checked = isPoliticalBorderEnabled(runtimeState);
+      nodes.country.politicalInput.disabled = runtimeState.mapSemanticMode === "blank"
+        || runtimeState.activeScenarioId === "blank_base";
+    }
     if (nodes.country.colorInput) nodes.country.colorInput.value = config.color;
     setRangePercent(nodes.country, config.opacity);
     setRangeNumber(nodes.country, config.width, borderConfigs.empireBorders.widthPrecision);
@@ -206,6 +214,16 @@ export function createAppearanceBorderOwner({
   };
 
   const bindEvents = () => {
+    if (nodes.country.politicalInput && nodes.country.politicalInput.dataset.borderBound !== "true") {
+      nodes.country.politicalInput.addEventListener("change", (event) => {
+        syncBorderConfig("empireBorders");
+        patchAppearanceStyleGroupState(runtimeState, "empireBorders", {
+          political: event.target.checked ? "on" : "off",
+        });
+        renderDirty("empire-border-political");
+      });
+      nodes.country.politicalInput.dataset.borderBound = "true";
+    }
     if (nodes.internal.autoColorInput && nodes.internal.autoColorInput.dataset.borderBound !== "true") {
       nodes.internal.autoColorInput.addEventListener("change", (event) => {
         syncBorderConfig("internalBorders");

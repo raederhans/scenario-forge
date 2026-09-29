@@ -1,4 +1,4 @@
-import { isOwnershipEditingEnabled, normalizePaintMode } from "../core/map_editing_policy.js";
+import { normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
   state as runtimeState,
@@ -19,7 +19,6 @@ import {
   refreshResolvedColorsForFeatures,
   resetZoomToFit,
   recomputeDynamicBordersNow,
-  scheduleDynamicBorderRecompute,
   zoomByStep,
   setZoomPercent,
   RENDER_PASS_NAMES,
@@ -36,9 +35,7 @@ import {
 } from "../core/palette_manager.js";
 import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
-import { resetScenarioToBaselineCommand } from "../core/scenario_dispatcher.js";
-import { toggleLanguage, updateUIText, t } from "./i18n.js";
-import { markLegacyColorStateDirty, resetAllFeatureOwnersToCanonical } from "../core/sovereignty_manager.js";
+import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
@@ -116,7 +113,7 @@ function composePaletteLibraryOperation() {
     applyOwnerColor: stateAccess.applyOwnerColor,
     captureHistoryState,
     pushHistoryEntry,
-    markLegacyColorStateDirty,
+
     refreshResolvedColorsForFeatures,
     refreshColorState,
     markDirty,
@@ -366,16 +363,15 @@ function initToolbar({ render } = {}) {
   const dockQuickFillHint = document.getElementById("dockQuickFillHint");
   const paintModeSelect = document.getElementById("paintModeSelect");
   const paintModeVisualBtn = document.getElementById("paintModeVisualBtn");
-  const paintModePoliticalBtn = document.getElementById("paintModePoliticalBtn");
-  const politicalEditingToggleBtn = document.getElementById("politicalEditingToggleBtn");
-  const dockPoliticalEditingPanel = document.getElementById("dockPoliticalEditingPanel");
   const dockColorModeField = document.getElementById("dockColorModeField");
   const activeSovereignLabel = document.getElementById("activeSovereignLabel");
   const recalculateBordersBtn = document.getElementById("recalculateBordersBtn");
   const dynamicBorderStatus = document.getElementById("dynamicBorderStatus");
   const oceanFillColor = document.getElementById("oceanFillColor");
+  const oceanRegionNamesToggle = document.getElementById("oceanRegionNamesToggle");
   const lakeLinkToOcean = document.getElementById("lakeLinkToOcean");
   const lakeFillColor = document.getElementById("lakeFillColor");
+  const lakeOutlineToggle = document.getElementById("lake-outline-toggle");
   const oceanCoastalAccentRow = document.getElementById("oceanCoastalAccentRow");
   const oceanCoastalAccentToggle = document.getElementById("oceanCoastalAccentToggle");
   const oceanAdvancedStylesToggle = document.getElementById("oceanAdvancedStylesToggle");
@@ -1080,17 +1076,9 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "refreshTransportWorkbenchUiFn", renderTransportWorkbenchUi);
   initializeTransportWorkbenchRuntime();
 
-  const getPaintModeLabel = () => (
-    isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
-      ? t("Political Ownership", "ui")
-      : t("Visual Color", "ui")
-  );
+  const getPaintModeLabel = () => t("Visual Color", "ui");
 
-  const getPrimaryActionLabel = () => (
-    isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
-      ? t("Auto-Fill Ownership", "ui")
-      : t("Auto-Fill Visuals", "ui")
-  );
+  const getPrimaryActionLabel = () => t("Auto-Fill Visuals", "ui");
 
   const normalizeCountryCode = (rawCode) =>
     String(rawCode || "").trim().toUpperCase().replace(/[^A-Z]/g, "");
@@ -1117,7 +1105,7 @@ function initToolbar({ render } = {}) {
     const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
     if (selectedCode) {
       const label = String(runtimeState.countryNames?.[selectedCode] || selectedCode).trim() || selectedCode;
-      return `${t(label, "geo") || label} (${selectedCode})`;
+      return `${getDirectGeoLabel(label) || label} (${selectedCode})`;
     }
 
     return t("No selection", "ui");
@@ -1159,13 +1147,8 @@ function initToolbar({ render } = {}) {
 
   const refreshPaintControlsLayout = () => {
     const isScenarioMode = !!runtimeState.activeScenarioId;
-    const isOwnershipMode = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty";
-    const showPoliticalPanel = isOwnershipEditingEnabled() && !isScenarioMode && (runtimeState.ui.politicalEditingExpanded || isOwnershipMode);
-    const showBorderMaintenance = isScenarioMode || runtimeState.ui.politicalEditingExpanded || isOwnershipMode;
+    const showBorderMaintenance = isScenarioMode;
     const showGranularityField = !isScenarioMode;
-    const showColorModeField = !isOwnershipMode;
-    const showPoliticalEditingToggle = isOwnershipEditingEnabled() && !isScenarioMode;
-    const showEditConfigButton = showGranularityField || showColorModeField || showPoliticalEditingToggle || showPoliticalPanel;
     const primaryActionLabel = getPrimaryActionLabel();
 
     if (document.getElementById("labelPresetPolitical")) {
@@ -1181,30 +1164,15 @@ function initToolbar({ render } = {}) {
     }
 
     if (dockColorModeField) {
-      dockColorModeField.classList.toggle("hidden", !showColorModeField);
-    }
-
-    if (politicalEditingToggleBtn) {
-      politicalEditingToggleBtn.classList.toggle("hidden", !showPoliticalEditingToggle);
-      politicalEditingToggleBtn.classList.toggle("is-active", showPoliticalPanel);
-      politicalEditingToggleBtn.setAttribute("aria-expanded", String(showPoliticalPanel));
-    }
-
-    if (dockPoliticalEditingPanel) {
-      dockPoliticalEditingPanel.classList.toggle("hidden", !showPoliticalPanel);
-      dockPoliticalEditingPanel.setAttribute("aria-hidden", showPoliticalPanel ? "false" : "true");
-    }
-
-    if (!showEditConfigButton && runtimeState.activeDockPopover === "edit") {
-      closeDockPopover();
+      dockColorModeField.classList.remove("hidden");
     }
     if (dockEditPopoverBtn) {
-      dockEditPopoverBtn.classList.toggle("hidden", !showEditConfigButton);
-      dockEditPopoverBtn.setAttribute("aria-hidden", showEditConfigButton ? "false" : "true");
+      dockEditPopoverBtn.classList.remove("hidden");
+      dockEditPopoverBtn.setAttribute("aria-hidden", "false");
     }
     if (dockConfigGroup) {
-      dockConfigGroup.classList.toggle("hidden", !showEditConfigButton);
-      dockConfigGroup.setAttribute("aria-hidden", showEditConfigButton ? "false" : "true");
+      dockConfigGroup.classList.remove("hidden");
+      dockConfigGroup.setAttribute("aria-hidden", "false");
     }
 
     if (recalculateBordersBtn) {
@@ -1372,7 +1340,7 @@ function initToolbar({ render } = {}) {
         activeSovereignLabel.textContent = t("None selected", "ui");
       } else {
         const label = String(runtimeState.countryNames?.[code] || code).trim() || code;
-        activeSovereignLabel.textContent = `${t(label, "geo") || label} (${code})`;
+        activeSovereignLabel.textContent = `${getDirectGeoLabel(label) || label} (${code})`;
       }
     }
     refreshScenarioContextBar();
@@ -1399,22 +1367,13 @@ function initToolbar({ render } = {}) {
   const refreshPaintModeUi = () => {
     runtimeState.paintMode = normalizePaintMode(runtimeState.paintMode);
     runtimeState.ui.politicalEditingExpanded = false;
-    if (paintModePoliticalBtn) {
-      paintModePoliticalBtn.hidden = true;
-      paintModePoliticalBtn.disabled = true;
-      paintModePoliticalBtn.classList.add("hidden");
-    }
     if (paintModeSelect) {
       paintModeSelect.value = runtimeState.paintMode || "visual";
     }
-    const isOwnershipMode = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty";
-    [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
-      if (!button) return;
-      const buttonMode = button.dataset.paintMode || "visual";
-      const isActive = (buttonMode === "sovereignty") === isOwnershipMode;
-      button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-pressed", isActive ? "true" : "false");
-    });
+    if (paintModeVisualBtn) {
+      paintModeVisualBtn.classList.add("is-active");
+      paintModeVisualBtn.setAttribute("aria-pressed", "true");
+    }
     if (paintGranularitySelect) {
       paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     }
@@ -1542,7 +1501,7 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.styleConfig.empireBorders.color = normalizeHexColor(
     runtimeState.styleConfig.empireBorders.color,
-    "#666666"
+    "#4b5563"
   );
   runtimeState.styleConfig.empireBorders.opacity = clamp(
     Number.isFinite(Number(runtimeState.styleConfig.empireBorders.opacity))
@@ -1554,7 +1513,7 @@ function initToolbar({ render } = {}) {
   runtimeState.styleConfig.empireBorders.width = clamp(
     Number.isFinite(Number(runtimeState.styleConfig.empireBorders.width))
       ? Number(runtimeState.styleConfig.empireBorders.width)
-      : 1,
+      : 1.2,
     0.01,
     5
   );
@@ -1694,6 +1653,7 @@ function initToolbar({ render } = {}) {
   const appearanceControlsController = createAppearanceControlsController({
     runtimeState: state,
     t,
+    translateGeo: getDirectGeoLabel,
     clamp,
     markDirty,
     requestRender: () => {
@@ -1743,8 +1703,10 @@ function initToolbar({ render } = {}) {
     invalidateOceanVisualState,
     invalidateOceanWaterInteractionVisualState,
     oceanFillColor,
+    oceanRegionNamesToggle,
     lakeLinkToOcean,
     lakeFillColor,
+    lakeOutlineToggle,
     oceanCoastalAccentRow,
     oceanCoastalAccentToggle,
     oceanAdvancedStylesToggle,
@@ -1966,7 +1928,7 @@ function initToolbar({ render } = {}) {
 
   const runZoomReset = () => {
     dismissOnboardingHint();
-    resetZoomToFit();
+    resetZoomToFit({ animate: true });
   };
 
   registerRuntimeHook(state, "runToolSelectionFn", runToolSelection);
@@ -2076,7 +2038,9 @@ function initToolbar({ render } = {}) {
       }
     });
     zoomPercentInput.addEventListener("blur", () => {
-      commitZoomInputValue();
+      // Enter already committed; its UI refresh may still show the animation's
+      // current scale. Do not replace the requested target with that value.
+      if (zoomPercentInput.dataset.editing === "true") commitZoomInputValue();
     });
     zoomPercentInput.dataset.bound = "true";
   }
@@ -2157,16 +2121,15 @@ function initToolbar({ render } = {}) {
     developerModeBtn.dataset.bound = "true";
   }
 
-  [paintModeVisualBtn, paintModePoliticalBtn].forEach((button) => {
+  [paintModeVisualBtn].forEach((button) => {
     if (!button || button.dataset.bound === "true") return;
     button.addEventListener("click", () => {
-      if (button.dataset.paintMode === "sovereignty" && !isOwnershipEditingEnabled()) return;
       const nextMode = normalizePaintMode(button.dataset.paintMode);
       if (paintModeSelect) {
         paintModeSelect.value = nextMode;
       }
       runtimeState.paintMode = nextMode;
-      runtimeState.ui.politicalEditingExpanded = nextMode === "sovereignty";
+      runtimeState.ui.politicalEditingExpanded = false;
       markDirty?.("paint-mode");
       if (typeof runtimeState.updatePaintModeUIFn === "function") {
         runtimeState.updatePaintModeUIFn();
@@ -2220,17 +2183,6 @@ function initToolbar({ render } = {}) {
   }
 
   bindQuickFillControls();
-
-  if (politicalEditingToggleBtn && !politicalEditingToggleBtn.dataset.bound) {
-    politicalEditingToggleBtn.addEventListener("click", () => {
-      if (!isOwnershipEditingEnabled()) return;
-      runtimeState.ui.politicalEditingExpanded = !runtimeState.ui.politicalEditingExpanded;
-      if (typeof runtimeState.updatePaintModeUIFn === "function") {
-        runtimeState.updatePaintModeUIFn();
-      }
-    });
-    politicalEditingToggleBtn.dataset.bound = "true";
-  }
 
   bindScenarioContextBarEvents();
 
@@ -2540,17 +2492,6 @@ function initToolbar({ render } = {}) {
     return adjustedCanvas;
   };
 
-  const cloneCanvas = (sourceCanvas) => {
-    if (!sourceCanvas) return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = sourceCanvas.width || 0;
-    canvas.height = sourceCanvas.height || 0;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-    ctx.drawImage(sourceCanvas, 0, 0);
-    return canvas;
-  };
-
   const buildSvgAnnotationCanvas = async (options = {}, dimensions = null) => {
     const width = dimensions?.width || runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
     const height = dimensions?.height || runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
@@ -2583,7 +2524,9 @@ function initToolbar({ render } = {}) {
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
     }
-    const workingCanvas = cloneCanvas(compositeCanvas) || compositeCanvas;
+    // The renderer returns a new, caller-owned canvas in both resolution paths.
+    // SVG overlays can compose directly onto it without a full-frame copy.
+    const workingCanvas = compositeCanvas;
     if (exportUi.textVisibility?.["svg-annotations"]) {
       const workingCtx = workingCanvas.getContext("2d");
       if (!workingCtx) {
@@ -2842,8 +2785,7 @@ function initToolbar({ render } = {}) {
     paintGranularitySelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "subdivision");
       const requested = value === "country" ? "country" : "subdivision";
-      runtimeState.interactionGranularity =
-        (isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty") ? "subdivision" : requested;
+      runtimeState.interactionGranularity = requested;
       paintGranularitySelect.value = runtimeState.interactionGranularity;
       if (typeof runtimeState.updatePaintModeUIFn === "function") {
         runtimeState.updatePaintModeUIFn();
@@ -2856,13 +2798,6 @@ function initToolbar({ render } = {}) {
     paintModeSelect.addEventListener("change", (event) => {
       const value = String(event.target.value || "visual");
       runtimeState.paintMode = normalizePaintMode(value);
-      if ((isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty")) {
-        runtimeState.interactionGranularity = "subdivision";
-        runtimeState.ui.politicalEditingExpanded = true;
-        if (paintGranularitySelect) {
-          paintGranularitySelect.value = "subdivision";
-        }
-      }
       if (typeof runtimeState.updatePaintModeUIFn === "function") {
         runtimeState.updatePaintModeUIFn();
       }
@@ -2893,35 +2828,14 @@ function initToolbar({ render } = {}) {
       const featureIds = Object.keys(runtimeState.visualOverrides || {});
       const ownerCodes = Array.from(new Set([
         ...Object.keys(runtimeState.sovereignBaseColors || {}),
-        ...Object.keys(runtimeState.countryBaseColors || {}),
       ]));
-      const sovereigntyFeatureIds = isOwnershipEditingEnabled() && String(runtimeState.paintMode || "visual") === "sovereignty"
-        ? Object.keys(runtimeState.sovereigntyByFeatureId || {})
-        : [];
       const before = captureHistoryState({
         featureIds,
         ownerCodes,
-        sovereigntyFeatureIds,
       });
-      if ((isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty")) {
-        if (runtimeState.activeScenarioId) {
-          resetScenarioToBaselineCommand({
-            renderMode: "none",
-            markDirtyReason: "",
-            showToastOnComplete: false,
-          });
-        } else {
-          resetAllFeatureOwnersToCanonical();
-        }
-        scheduleDynamicBorderRecompute("clear-sovereignty", 90);
-      } else {
-        runtimeState.colors = {};
-        runtimeState.visualOverrides = {};
-        runtimeState.featureOverrides = {};
-        runtimeState.countryBaseColors = {};
-        runtimeState.sovereignBaseColors = {};
-        markLegacyColorStateDirty();
-      }
+      runtimeState.colors = {};
+      runtimeState.visualOverrides = {};
+      runtimeState.sovereignBaseColors = {};
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();
       refreshDynamicBorderStatus();
@@ -2932,11 +2846,7 @@ function initToolbar({ render } = {}) {
         after: captureHistoryState({
           featureIds,
           ownerCodes,
-          sovereigntyFeatureIds,
         }),
-        meta: {
-          affectsSovereignty: (isOwnershipEditingEnabled() && runtimeState.paintMode === "sovereignty"),
-        },
       });
       showToast(t("Map cleared. Undo is available from history.", "ui"), {
         title: t("Clear Map", "ui"),

@@ -1,4 +1,3 @@
-import { isOwnershipEditingEnabled } from "../../core/map_editing_policy.js";
 import { createCountryInspectorModel } from "./country_inspector_model.js";
 import {
   ensureInspectorExpansionState,
@@ -69,8 +68,6 @@ export function createCountryInspectorController({
   selectedCountryActionsSection,
   countryInspectorDetail,
   countryInspectorSelected,
-  countryInspectorSetActive,
-  countryInspectorDetailHint,
   countryInspectorColorRow,
   countryInspectorColorSwatch,
   countryInspectorColorInput,
@@ -92,12 +89,9 @@ export function createCountryInspectorController({
   buildCountryRowMetaText,
   getResolvedCountryColor,
   getDisplayCountryColor,
-  getPrimaryReleasablePresetRef,
-  applyScenarioReleasableCoreTerritory,
   applyCountryColor,
   incrementSidebarCounter,
   markDirty,
-  showToast,
   getHgoIdentity = null,
   getHgoIdentityCoverage = null,
   getHgoIdentityStatus = null,
@@ -430,7 +424,6 @@ export function createCountryInspectorController({
       hideExpandToggle: true,
       registerRowRef: false,
       rowClassName: "selected-land-country-quick-card",
-      showActivateSubaction: false,
       showRelationMeta: true,
     });
   };
@@ -459,11 +452,8 @@ export function createCountryInspectorController({
   const syncCountryRowVisuals = (ref, countryState) => {
     if (!ref || !countryState) return;
     const isSelected = runtimeState.selectedInspectorCountryCode === countryState.code;
-    const isActiveOwner = runtimeState.activeSovereignCode === countryState.code;
     ref.row?.classList.toggle("is-selected", isSelected);
-    ref.row?.classList.toggle("is-active-owner", isActiveOwner);
     ref.wrapper?.classList.toggle("is-selected", isSelected);
-    ref.wrapper?.classList.toggle("is-active-owner", isActiveOwner);
     if (ref.main) {
       ref.main.setAttribute("aria-pressed", String(isSelected));
     }
@@ -544,7 +534,6 @@ export function createCountryInspectorController({
       hideExpandToggle = false,
       registerRowRef = true,
       rowClassName = "",
-      showActivateSubaction = true,
       showRelationMeta = false,
     } = {}
   ) => {
@@ -559,12 +548,6 @@ export function createCountryInspectorController({
     );
     const hasChildren = childCount > 0;
     const isActiveOwner = runtimeState.activeSovereignCode === countryState.code;
-    const hasReleasableActivateAction = !!(
-      isOwnershipEditingEnabled() && showActivateSubaction &&
-      runtimeState.activeScenarioId &&
-      countryState.releasable &&
-      getPrimaryReleasablePresetRef(countryState)
-    );
     const isExpanded = hasChildren && (
       forceExpanded ||
       runtimeState.expandedInspectorReleaseParents.has(countryState.code)
@@ -578,7 +561,6 @@ export function createCountryInspectorController({
     row.dataset.countryCode = countryState.code;
     const isSelected = runtimeState.selectedInspectorCountryCode === countryState.code;
     row.classList.toggle("is-selected", isSelected);
-    row.classList.toggle("is-active-owner", isActiveOwner);
     row.classList.toggle("has-children", hasChildren);
 
     const main = document.createElement("button");
@@ -667,7 +649,7 @@ export function createCountryInspectorController({
       row.appendChild(childrenMeta);
     }
 
-    if (!hasChildren && !hasReleasableActivateAction) {
+    if (!hasChildren) {
       if (registerRowRef) {
         registerCountryRowRef(countryState.code, {
           row,
@@ -687,29 +669,8 @@ export function createCountryInspectorController({
     const wrapper = document.createElement("div");
     wrapper.className = "country-explorer-group country-select-card";
     wrapper.dataset.countryCode = countryState.code;
-    if (hasReleasableActivateAction) {
-      wrapper.classList.add("has-subaction");
-    }
-    wrapper.classList.toggle("is-active-owner", isActiveOwner);
     wrapper.classList.toggle("is-selected", isSelected);
     wrapper.appendChild(row);
-
-    if (hasReleasableActivateAction) {
-      const activateStrip = document.createElement("button");
-      activateStrip.type = "button";
-      activateStrip.className = "country-select-subaction";
-      activateStrip.textContent = t("Activate Releasable", "ui");
-      activateStrip.title = t("Apply this releasable's political ownership and make it active.", "ui");
-      activateStrip.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        applyScenarioReleasableCoreTerritory(countryState, {
-          source: "scenario-row-activate",
-          forceSovereignty: true,
-        });
-      });
-      wrapper.appendChild(activateStrip);
-    }
 
     if (isExpanded) {
       const childList = document.createElement("div");
@@ -1103,17 +1064,6 @@ export function createCountryInspectorController({
     countryInspectorSelected.classList.toggle("hidden", isEmpty);
 
     if (!countryState) {
-      if (countryInspectorSetActive) {
-        countryInspectorSetActive.disabled = true;
-        countryInspectorSetActive.classList.remove("is-active");
-        countryInspectorSetActive.classList.add("hidden");
-        countryInspectorSetActive.textContent = t("Use as Active Owner", "ui");
-        countryInspectorSetActive.setAttribute("aria-pressed", "false");
-      }
-      if (countryInspectorDetailHint) {
-        countryInspectorDetailHint.classList.add("hidden");
-        countryInspectorDetailHint.textContent = "";
-      }
       if (countryInspectorColorRow) {
         countryInspectorColorRow.classList.add("hidden");
       }
@@ -1126,30 +1076,6 @@ export function createCountryInspectorController({
       setCountryInspectorColorPickerOpen(false);
       scheduleAdaptiveInspectorHeights();
       return;
-    }
-
-    const isScenarioReleasable = !!runtimeState.activeScenarioId && !!countryState.releasable;
-    if (countryInspectorSetActive) {
-      const isActive = runtimeState.activeSovereignCode === countryState.code;
-      countryInspectorSetActive.disabled = !isOwnershipEditingEnabled();
-      countryInspectorSetActive.classList.toggle("hidden", !isOwnershipEditingEnabled() || isScenarioReleasable);
-      countryInspectorSetActive.classList.toggle("is-active", !isScenarioReleasable && isActive);
-      countryInspectorSetActive.textContent = isActive
-        ? t("Stop Using as Active Owner", "ui")
-        : t("Use as Active Owner", "ui");
-      countryInspectorSetActive.setAttribute("aria-pressed", String(!isScenarioReleasable && isActive));
-    }
-    if (countryInspectorDetailHint) {
-      if (isOwnershipEditingEnabled() && isScenarioReleasable) {
-        countryInspectorDetailHint.classList.remove("hidden");
-        countryInspectorDetailHint.textContent = t(
-          "Use Activate Releasable or Reapply Core Territory in Scenario Actions.",
-          "ui"
-        );
-      } else {
-        countryInspectorDetailHint.classList.add("hidden");
-        countryInspectorDetailHint.textContent = "";
-      }
     }
 
     renderHgoIdentityDetail(countryState);
@@ -1219,9 +1145,7 @@ export function createCountryInspectorController({
         .filter(Boolean)
     ));
     const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
-    const activeCode = normalizeCountryCode(runtimeState.activeSovereignCode);
     if (selectedCode) normalizedCodes.push(selectedCode);
-    if (activeCode) normalizedCodes.push(activeCode);
     const targetCodes = forceAll || !normalizedCodes.length
       ? Array.from(countryRowRefsByCode.keys())
       : Array.from(new Set(normalizedCodes));
@@ -1255,44 +1179,6 @@ export function createCountryInspectorController({
         }
       });
       searchInput.dataset.bound = "true";
-    }
-
-    if (countryInspectorSetActive && !countryInspectorSetActive.dataset.bound) {
-      countryInspectorSetActive.addEventListener("click", () => {
-        if (!isOwnershipEditingEnabled()) return;
-        const latestCountryStatesByCode = getLatestCountryStatesByCode();
-        const selectedCode = ensureSelectedInspectorCountry();
-        if (!selectedCode) return;
-        const countryState = latestCountryStatesByCode.get(selectedCode);
-        if (runtimeState.activeScenarioId && countryState?.releasable) {
-          return;
-        }
-        const isCurrentlyActive = runtimeState.activeSovereignCode === selectedCode;
-        const previousActiveCode = runtimeState.activeSovereignCode;
-        runtimeState.activeSovereignCode = isCurrentlyActive ? "" : selectedCode;
-        markDirty(isCurrentlyActive ? "set-inactive-sovereign" : "set-active-sovereign");
-        if (typeof runtimeState.updateActiveSovereignUIFn === "function") {
-          runtimeState.updateActiveSovereignUIFn();
-        }
-        flushSidebarRender(
-          isCurrentlyActive ? "sidebar-active-sovereign:clear" : `sidebar-active-sovereign:${selectedCode}`
-        );
-        refreshCountryRows({
-          countryCodes: [previousActiveCode, selectedCode],
-          refreshInspector: true,
-        });
-        if (!isCurrentlyActive) {
-          showToast(
-            t("Political ownership editing now targets the selected country.", "ui"),
-            {
-              title: t("Active owner updated", "ui"),
-              tone: "info",
-              duration: 3200,
-            }
-          );
-        }
-      });
-      countryInspectorSetActive.dataset.bound = "true";
     }
 
     if (countryInspectorColorSwatch && countryInspectorColorInput && !countryInspectorColorSwatch.dataset.bound) {

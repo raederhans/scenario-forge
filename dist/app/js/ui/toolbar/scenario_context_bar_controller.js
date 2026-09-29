@@ -92,10 +92,6 @@ function createScenarioContextBarController({
       ? translateGeo(runtimeState.countryNames?.[activeCode] || activeCode)
       : translateUi("None");
     const modeLabel = getPaintModeLabel();
-    const scenarioViewLabel = String(runtimeState.scenarioViewMode || "ownership") === "frontline"
-      ? translateUi("Frontline")
-      : translateUi("Ownership");
-    const showScenarioState = !!activeScenario;
     const activeValue = activeCode ? `${activeLabel} (${activeCode})` : translateUi("None");
     scenarioContextBar.classList.toggle("is-scenario", !!activeScenario);
     scenarioContextBar.classList.toggle("is-collapsed", !!runtimeState.ui.scenarioBarCollapsed);
@@ -106,12 +102,7 @@ function createScenarioContextBarController({
     }
     if (scenarioContextModeText) {
       scenarioContextModeText.textContent = modeLabel;
-      scenarioContextModeText.setAttribute(
-        "title",
-        showScenarioState
-          ? `${translateUi("Mode")}: ${modeLabel} · ${translateUi("View")}: ${scenarioViewLabel}`
-          : `${translateUi("Mode")}: ${modeLabel}`
-      );
+      scenarioContextModeText.setAttribute("title", `${translateUi("Mode")}: ${modeLabel}`);
     }
     if (scenarioContextActiveText) {
       scenarioContextActiveText.textContent = activeValue;

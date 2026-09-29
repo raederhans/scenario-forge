@@ -29,6 +29,7 @@
       "tests/test_pages_dist_startup_shell_heavy.py",
       "tests/test_patch_checked_in_urban_artifacts.py",
       "tests/test_physical_context_contours.py",
+      "tests/test_physical_detail.py",
       "tests/test_physical_water_mask.py",
       "tests/test_polar_water_spherical_safety.py",
       "tests/test_political_display_lods.py",

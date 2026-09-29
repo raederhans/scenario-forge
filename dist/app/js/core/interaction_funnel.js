@@ -13,7 +13,7 @@ import {
 import { setActivePaletteSource } from "./palette_manager.js";
 import {
   ensureSovereigntyState,
-  markLegacyColorStateDirty,
+
 } from "./sovereignty_manager.js";
 import {
   normalizeIntensityFieldsState,
@@ -49,19 +49,13 @@ import {
   resolveSpecialZoneTopologyFingerprint,
 } from "./special_zone_layers.js";
 
-let mapClickImpl = null;
-let mapDoubleClickImpl = null;
 let scenarioResourcesModulePromise = null;
 let fileManagerModulePromise = null;
 const debugState = {
-  clickCount: 0,
-  doubleClickCount: 0,
   importStartCount: 0,
   importApplyCount: 0,
   importPhase: "idle",
   lastImportError: "",
-  lastClickContext: null,
-  lastDoubleClickContext: null,
   lastImportFileName: "",
   lastImportedScenarioId: "",
 };
@@ -143,21 +137,6 @@ async function restoreImportedScenarioOptionalLayer(layer, preparedImport, isCur
     throw new Error(`${layer} could not be restored.`);
   }
   return result;
-}
-
-function buildMapInteractionContext(kind, event) {
-  return {
-    kind,
-    detail: Math.max(1, Number(event?.detail || (kind === "dblclick" ? 2 : 1))),
-    ctrlKey: !!event?.ctrlKey,
-    metaKey: !!event?.metaKey,
-    shiftKey: !!event?.shiftKey,
-    altKey: !!event?.altKey,
-    currentTool: String(state.currentTool || ""),
-    activeScenarioId: String(state.activeScenarioId || ""),
-    interactionGranularity: String(state.interactionGranularity || ""),
-    startupReadonly: !!state.startupReadonly,
-  };
 }
 
 function resolveUi(ui = {}) {
@@ -263,11 +242,9 @@ function stageImportedProjectPatch(data, preparedImport) {
   } : {};
   draft.sovereignBaseColors = {
     ...scenarioBaseColors,
-    ...(data.sovereignBaseColors || data.countryBaseColors || {}),
+    ...(data.sovereignBaseColors || {}),
   };
-  draft.countryBaseColors = { ...draft.sovereignBaseColors };
-  draft.visualOverrides = data.visualOverrides || data.featureOverrides || {};
-  draft.featureOverrides = { ...draft.visualOverrides };
+  draft.visualOverrides = data.visualOverrides || {};
 
   draft.waterRegionOverrides = data.waterRegionOverrides || {};
   draft.specialRegionOverrides = {};
@@ -414,7 +391,7 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
   const isCurrent = () => (!request || activeImportRequest === request) && isImportDocumentCurrent(committedIdentity);
   if (request) request.isCurrent = isCurrent;
   const required = [{ name: "document-refresh", run: () => {
-    markLegacyColorStateDirty();
+
     hooks.invalidateFrontlineOverlayState?.();
     callRuntimeHook(state, "clearExportBakeCacheFn");
   } }, { name: "scenario-runtime", run: ({ isCurrent: valid }) =>
@@ -494,32 +471,6 @@ async function applyImportedProjectState(data, { ui, hooks, request }) {
   };
 }
 
-export function bindInteractionFunnel({
-  mapClick = null,
-  mapDoubleClick = null,
-} = {}) {
-  mapClickImpl = typeof mapClick === "function" ? mapClick : null;
-  mapDoubleClickImpl = typeof mapDoubleClick === "function" ? mapDoubleClick : null;
-}
-
-export function dispatchMapClick(event) {
-  if (typeof mapClickImpl !== "function") {
-    return false;
-  }
-  debugState.clickCount += 1;
-  debugState.lastClickContext = buildMapInteractionContext("click", event);
-  return mapClickImpl(event, debugState.lastClickContext);
-}
-
-export function dispatchMapDoubleClick(event) {
-  if (typeof mapDoubleClickImpl !== "function") {
-    return false;
-  }
-  debugState.doubleClickCount += 1;
-  debugState.lastDoubleClickContext = buildMapInteractionContext("dblclick", event);
-  return mapDoubleClickImpl(event, debugState.lastDoubleClickContext);
-}
-
 async function runProjectImport(input, options, source) {
   if (options.signal?.aborted) return { status: "cancelled", reason: "import-aborted" };
   if (activeImportRequest?.pending) return { status: "failed", reason: "import-in-progress" };
@@ -581,26 +532,14 @@ export function importProjectTextThroughFunnel(text, options = {}) {
 }
 
 export function getInteractionFunnelDebugState() {
-  return {
-    ...debugState,
-    lastClickContext: debugState.lastClickContext
-      ? { ...debugState.lastClickContext }
-      : null,
-    lastDoubleClickContext: debugState.lastDoubleClickContext
-      ? { ...debugState.lastDoubleClickContext }
-      : null,
-  };
+  return { ...debugState };
 }
 
 export function resetInteractionFunnelDebugState() {
-  debugState.clickCount = 0;
-  debugState.doubleClickCount = 0;
   debugState.importStartCount = 0;
   debugState.importApplyCount = 0;
   debugState.importPhase = "idle";
   debugState.lastImportError = "";
-  debugState.lastClickContext = null;
-  debugState.lastDoubleClickContext = null;
   debugState.lastImportFileName = "";
   debugState.lastImportedScenarioId = "";
 }

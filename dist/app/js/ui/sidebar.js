@@ -1,7 +1,6 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
-import { isOwnershipEditingEnabled, normalizePaintMode, ownershipEditingDisabledResult } from "../core/map_editing_policy.js";
 import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
 // Sidebar UI (Phase 13)
 import {
@@ -26,10 +25,10 @@ import {
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
   getWaterRegionColor,
+  focusWaterRegionById,
   refreshColorState,
   refreshResolvedColorsForFeatures,
   renderLegend,
-  scheduleDynamicBorderRecompute,
   selectOperationGraphicById,
   selectOperationalLineById,
   selectUnitCounterById,
@@ -57,8 +56,7 @@ import {
   loadScenarioAuditPayload,
   releaseScenarioAuditPayload,
 } from "../core/scenario_resources.js";
-import { refreshScenarioShellOverlays } from "../core/scenario_shell_overlay.js";
-import { getGeoFeatureDisplayLabel, t } from "./i18n.js";
+import { getDirectGeoLabel, getGeoFeatureDisplayLabel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
 import { showAppDialog } from "./app_dialog.js";
 import { initDevWorkspace } from "./dev_workspace.js";
@@ -66,7 +64,6 @@ import { UI_URL_STATE_KEYS } from "./ui_contract.js";
 import { createCountryInspectorModel } from "./sidebar/country_inspector_model.js";
 import { createScenarioTerritoryController } from "./sidebar/scenario_territory_controller.js";
 import { createScenarioInspectorController } from "./sidebar/scenario_inspector_controller.js";
-import { createScenarioTransferController } from "./sidebar/scenario_transfer_controller.js";
 import { createRegionalPresetController } from "./sidebar/regional_preset_controller.js";
 import { createCountryInspectorController } from "./sidebar/country_inspector_controller.js";
 import { createStrategicOverlayController } from "./sidebar/strategic_overlay_controller.js";
@@ -76,19 +73,14 @@ import { importProjectThroughFunnel } from "../core/interaction_funnel.js";
 import { flushRenderBoundary } from "../core/render_boundary.js";
 import {
   getFeatureOwnerCode,
-  setFeatureOwnerCodes,
-  markLegacyColorStateDirty,
 } from "../core/sovereignty_manager.js";
 import { getCountryCode as getSharedFeatureCountryCode } from "../core/feature_identity.js";
 import { markDirty } from "../core/dirty_state.js";
 import {
-  getResolvedReleasableBoundaryVariant,
   normalizeCountryCode,
   normalizePresetName,
-  resolveCompanionActionFeatureIds,
   resolveFeatureIdsFromPresetSource,
   rebuildPresetState,
-  setReleasableBoundaryVariant,
 } from "../core/releasable_manager.js";
 import { getScenarioCountryDisplayName } from "../core/scenario_country_display.js";
 import { createHgoIdentityResolver } from "../core/hgo_identity_resolver.js";
@@ -104,6 +96,9 @@ import {
 } from "../core/unit_counter_presets.js";
 
 const state = runtimeState;
+const translateCountryGeoLabel = (label, type = "ui") => (
+  type === "geo" ? getDirectGeoLabel(label) : t(label, type)
+);
 const {
   getScenarioCountryMeta,
   resolveScenarioInspectorGroupMeta,
@@ -111,7 +106,7 @@ const {
   resolveInspectorDataCode,
   resolveCountryGroupingCode,
   getCountryGroupingMeta,
-} = createCountryInspectorModel(runtimeState, t);
+} = createCountryInspectorModel(runtimeState, translateCountryGeoLabel);
 
 function requestHgoIdentityAssetsForSettings(settings, loadAssets) {
   if (settings?.enabled === true && typeof loadAssets === "function") {
@@ -133,6 +128,7 @@ const mapRenderer = Object.freeze({
   finishOperationGraphicDraw,
   finishOperationalLineDraw,
   getWaterRegionColor,
+  focusWaterRegionById,
   refreshColorState,
   renderLegend,
   selectOperationGraphicById,
@@ -190,22 +186,6 @@ function isScenarioShellLikeFeature(feature, featureId = "") {
   if (!candidate) return false;
   if (candidate.includes("_FB_")) return true;
   return String(feature?.properties?.name || "").toLowerCase().includes("shell fallback");
-}
-
-function getScenarioInteractionLockMessage() {
-  const baseMessage = t("Scenario state is inconsistent. Reload the page before continuing.", "ui");
-  const detail = String(runtimeState.scenarioFatalRecovery?.message || "").trim();
-  return detail ? `${baseMessage} ${detail}` : baseMessage;
-}
-
-function blockLockedScenarioInteraction() {
-  if (!runtimeState.activeScenarioId || !runtimeState.scenarioFatalRecovery) return false;
-  showToast(getScenarioInteractionLockMessage(), {
-    title: t("Scenario locked", "ui"),
-    tone: "error",
-    duration: 5200,
-  });
-  return true;
 }
 
 function isAntarcticSectorLikeFeature(feature, featureId = "") {
@@ -277,7 +257,7 @@ function getDynamicCountryEntries() {
         const code = normalizeCountryCode(rawCode);
         if (!code) return null;
         const name = getScenarioCountryDisplayName(scenarioCountry, runtimeState.countryNames?.[code] || code) || code;
-        const displayName = t(name, "geo") || name || code;
+        const displayName = getDirectGeoLabel(name) || name || code;
         const ownerFeatureCount = Number(scenarioCountry?.feature_count || 0) || 0;
         const controllerFeatureCount = Number(scenarioCountry?.controller_feature_count || 0) || 0;
         return {
@@ -358,7 +338,7 @@ function getDynamicCountryEntries() {
   return Array.from(codes)
     .map((code) => {
       const name = nameByCode.get(code) || runtimeState.countryNames?.[code] || countryNames[code] || code;
-      const displayName = t(name, "geo") || code;
+      const displayName = getDirectGeoLabel(name) || code;
       return { code, name, displayName };
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -403,11 +383,6 @@ export function getHierarchyGroupsForCode(code) {
   return groups;
 }
 
-function normalizeActionMode(mode = "auto") {
-  if (mode === "ownership" || mode === "visual") return mode;
-  return normalizePaintMode(runtimeState.paintMode);
-}
-
 function applyVisualOverridesToFeatureIds(
   targetIds = [],
   color,
@@ -436,7 +411,7 @@ function applyVisualOverridesToFeatureIds(
     featureIds: normalizedTargetIds,
   });
   applyFeaturePaintState(runtimeState, normalizedTargetIds, colorToApply);
-  markLegacyColorStateDirty();
+
   refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
   if (render) render();
   if (addToRecent) {
@@ -487,7 +462,6 @@ function clearVisualOverridesForFeatureIds(
 
   const changedIds = normalizedTargetIds.filter((id) => (
     Object.prototype.hasOwnProperty.call(runtimeState.visualOverrides || {}, id)
-    || Object.prototype.hasOwnProperty.call(runtimeState.featureOverrides || {}, id)
   ));
   if (!changedIds.length) {
     return {
@@ -505,7 +479,7 @@ function clearVisualOverridesForFeatureIds(
     featureIds: changedIds,
   });
   applyFeaturePaintState(runtimeState, changedIds, null, { remove: true });
-  markLegacyColorStateDirty();
+
   refreshResolvedColorsForFeatures(changedIds, { renderNow: false });
   if (render) render();
   markDirty(dirtyReason);
@@ -530,201 +504,11 @@ function clearVisualOverridesForFeatureIds(
   };
 }
 
-function applyOwnershipToFeatureIds(
-  targetIds = [],
-  ownerCode,
-  {
-    render,
-    historyKind = "feature-apply-ownership",
-    dirtyReason = "feature-apply-ownership",
-    recomputeReason = "sidebar-ownership-batch",
-  } = {}
-) {
-  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
-  if (blockLockedScenarioInteraction()) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: 0,
-      missingCount: 0,
-      reason: "scenario-locked",
-      mode: "ownership",
-    };
-  }
-  const {
-    requestedIds,
-    matchedIds: normalizedTargetIds,
-    missingIds,
-  } = filterToVisibleFeatureIds(targetIds);
-  const normalizedOwnerCode = normalizeCountryCode(ownerCode);
-  if (!normalizedTargetIds.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-  if (!normalizedOwnerCode) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: normalizedTargetIds.length,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "missing-active-owner",
-      mode: "ownership",
-    };
-  }
-
-  const before = captureHistoryState({
-    sovereigntyFeatureIds: normalizedTargetIds,
-  });
-  // ownership 写入不是单纯改颜色：
-  // 它会触发 sovereignty、边界和历史记录三条链，所以这里先过滤可见 feature，再按批次提交。
-  const changed = setFeatureOwnerCodes(normalizedTargetIds, normalizedOwnerCode);
-  if (changed > 0) {
-    refreshResolvedColorsForFeatures(normalizedTargetIds, { renderNow: false });
-    scheduleDynamicBorderRecompute(recomputeReason, 90);
-    markDirty(dirtyReason);
-    pushHistoryEntry({
-      kind: historyKind,
-      before,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: normalizedTargetIds,
-      }),
-      meta: {
-        affectsSovereignty: true,
-      },
-    });
-  }
-  if (render) render();
-  return {
-    applied: true,
-    changed,
-    matchedCount: normalizedTargetIds.length,
-    requestedCount: requestedIds.length,
-    missingCount: missingIds.length,
-    reason: "",
-    mode: "ownership",
-  };
-}
-
-function applyScenarioOwnerControllerAssignments(
-  assignmentsByFeatureId = {},
-  {
-    render,
-    historyKind = "scenario-owner-controller-apply",
-    dirtyReason = "scenario-owner-controller-apply",
-    recomputeReason = "scenario-owner-controller-apply",
-  } = {}
-) {
-  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
-  if (blockLockedScenarioInteraction()) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: 0,
-      missingCount: 0,
-      reason: "scenario-locked",
-      mode: "ownership",
-    };
-  }
-  const entries = Object.entries(assignmentsByFeatureId || {})
-    .map(([featureId, assignment]) => {
-      const normalizedId = String(featureId || "").trim();
-      if (!normalizedId || !assignment || typeof assignment !== "object") return null;
-      const ownerCode = normalizeCountryCode(assignment.ownerCode);
-      const controllerCode = normalizeCountryCode(assignment.controllerCode || assignment.ownerCode);
-      if (!ownerCode || !controllerCode) return null;
-      return {
-        featureId: normalizedId,
-        ownerCode,
-        controllerCode,
-      };
-    })
-    .filter(Boolean);
-
-  if (!entries.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: 0,
-      missingCount: 0,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-
-  const targetIds = entries.map((entry) => entry.featureId);
-  const before = captureHistoryState({
-    sovereigntyFeatureIds: targetIds,
-  });
-
-  // 这是 sidebar 内的批量 ownership 入口；视觉覆盖不要走到这里，
-  // 否则颜色预览会变成真实政治状态修改。
-  // owner/controller 拆成两个按 code 聚合的批次，是为了尽量复用下层批量写口，
-  // 同时只对真正变动的 feature 触发颜色刷新、边界重算和 history 快照。
-  const ownerFeatureIdsByCode = new Map();
-  const changedFeatureIds = new Set();
-
-  entries.forEach(({ featureId, ownerCode }) => {
-    const currentOwnerCode = normalizeCountryCode(runtimeState.sovereigntyByFeatureId?.[featureId]);
-    if (currentOwnerCode !== ownerCode) {
-      if (!ownerFeatureIdsByCode.has(ownerCode)) {
-        ownerFeatureIdsByCode.set(ownerCode, []);
-      }
-      ownerFeatureIdsByCode.get(ownerCode).push(featureId);
-      changedFeatureIds.add(featureId);
-    }
-  });
-
-  let ownerChanged = 0;
-  ownerFeatureIdsByCode.forEach((featureIds, ownerCode) => {
-    ownerChanged += setFeatureOwnerCodes(featureIds, ownerCode);
-  });
-  if (changedFeatureIds.size) {
-    refreshResolvedColorsForFeatures(Array.from(changedFeatureIds), { renderNow: false });
-    scheduleDynamicBorderRecompute(recomputeReason, 90);
-    markDirty(dirtyReason);
-    pushHistoryEntry({
-      kind: historyKind,
-      before,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: targetIds,
-      }),
-      meta: {
-        affectsSovereignty: true,
-      },
-    });
-  }
-  if (render) render();
-  return {
-    applied: true,
-    changed: changedFeatureIds.size,
-    matchedCount: targetIds.length,
-    requestedCount: targetIds.length,
-    missingCount: 0,
-    reason: "",
-    mode: "ownership",
-  };
-}
-
 function applyHierarchyGroupWithMode(
   group,
   {
-    mode = "auto",
     color,
-    ownerCode,
     render,
-    ownershipHistoryKind = "hierarchy-apply-sovereignty",
-    ownershipDirtyReason = "hierarchy-apply-sovereignty",
     visualHistoryKind = "hierarchy-apply-color",
     visualDirtyReason = "hierarchy-apply-color",
   } = {}
@@ -737,22 +521,13 @@ function applyHierarchyGroupWithMode(
       requestedCount: 0,
       missingCount: 0,
       reason: "missing-group",
-      mode: normalizeActionMode(mode),
+      mode: "visual",
     };
   }
   const targetIds = Array.isArray(group.children)
     ? Array.from(new Set(group.children.map((id) => String(id || "").trim()).filter(Boolean)))
     : [];
   previewHierarchyGroupHighlight(group, targetIds);
-  const resolvedMode = normalizeActionMode(mode);
-  if (resolvedMode === "ownership") {
-    return applyOwnershipToFeatureIds(targetIds, ownerCode || runtimeState.activeSovereignCode, {
-      render,
-      historyKind: ownershipHistoryKind,
-      dirtyReason: ownershipDirtyReason,
-      recomputeReason: "sidebar-hierarchy-batch",
-    });
-  }
   return applyVisualOverridesToFeatureIds(targetIds, color || runtimeState.selectedColor, {
     render,
     historyKind: visualHistoryKind,
@@ -762,7 +537,6 @@ function applyHierarchyGroupWithMode(
 
 function applyHierarchyGroup(group, color, render) {
   return applyHierarchyGroupWithMode(group, {
-    mode: "auto",
     color,
     render,
   });
@@ -772,7 +546,7 @@ function previewHierarchyGroupHighlight(group, featureIds = []) {
   const { matchedIds } = filterToVisibleFeatureIds(featureIds);
   setInspectorFeatureHighlight(matchedIds, {
     groupMode: true,
-    label: t(group?.label || "Hierarchy group", "geo") || group?.label || "Hierarchy group",
+    label: getDirectGeoLabel(group?.label || "Hierarchy group") || group?.label || "Hierarchy group",
   });
 }
 
@@ -1105,7 +879,7 @@ function initSidebar({ render } = {}) {
       : fallbackName;
     return {
       tag: normalizedTag,
-      displayName: t(scenarioName || normalizedTag, "geo") || scenarioName || normalizedTag,
+      displayName: getDirectGeoLabel(scenarioName || normalizedTag) || scenarioName || normalizedTag,
       color: String(
         scenarioMeta?.color_hex
           || scenarioMeta?.colorHex
@@ -2277,8 +2051,6 @@ function initSidebar({ render } = {}) {
   const unitCounterCatalogGrid = document.getElementById("unitCounterCatalogGrid");
   const countryInspectorDetail = document.getElementById("countryInspectorDetail");
   const countryInspectorSelected = document.getElementById("countryInspectorSelected");
-  const countryInspectorSetActive = document.getElementById("countryInspectorSetActive");
-  const countryInspectorDetailHint = document.getElementById("countryInspectorDetailHint");
   const countryInspectorColorRow = document.getElementById("countryInspectorColorRow");
   const countryInspectorColorSwatch = document.getElementById("countryInspectorColorSwatch");
   const countryInspectorColorInput = document.getElementById("countryInspectorColorInput");
@@ -2301,9 +2073,11 @@ function initSidebar({ render } = {}) {
   const waterInspectorEmpty = document.getElementById("waterInspectorEmpty");
   const waterInspectorSelected = document.getElementById("waterInspectorSelected");
   const waterInspectorDetailHint = document.getElementById("waterInspectorDetailHint");
+  const waterInspectorLocateBtn = document.getElementById("waterInspectorLocateBtn");
   const waterInspectorMetaSection = document.getElementById("waterInspectorMetaSection");
   const waterInspectorMetaList = document.getElementById("waterInspectorMetaList");
   const waterInspectorHierarchySection = document.getElementById("waterInspectorHierarchySection");
+  const waterInspectorBreadcrumb = document.getElementById("waterInspectorBreadcrumb");
   const waterInspectorJumpToParentBtn = document.getElementById("waterInspectorJumpToParentBtn");
   const waterInspectorChildrenList = document.getElementById("waterInspectorChildrenList");
   const waterInspectorColorRow = document.getElementById("waterInspectorColorRow");
@@ -2759,10 +2533,10 @@ function initSidebar({ render } = {}) {
     const scenarioCountry = runtimeState.scenarioCountriesByTag?.[normalized];
     const scenarioName = getScenarioCountryDisplayName(scenarioCountry);
     if (scenarioName) {
-      return t(scenarioName, "geo") || scenarioName;
+      return getDirectGeoLabel(scenarioName) || scenarioName;
     }
     const fallbackName = String(runtimeState.countryNames?.[normalized] || countryNames[normalized] || normalized).trim();
-    return t(fallbackName, "geo") || fallbackName || normalized;
+    return getDirectGeoLabel(fallbackName) || fallbackName || normalized;
   };
 
   const formatReleasableParentLabel = (countryState, { conjunction = false } = {}) => {
@@ -2848,7 +2622,7 @@ function initSidebar({ render } = {}) {
     const displayNameSource = scenarioDisplayName.toUpperCase() === normalizedEntryCode && fallbackDisplayName
       ? fallbackDisplayName
       : (scenarioDisplayName || fallbackDisplayName || normalizedEntryCode);
-    const displayName = t(displayNameSource, "geo") || displayNameSource || normalizedEntryCode;
+    const displayName = getDirectGeoLabel(displayNameSource) || displayNameSource || normalizedEntryCode;
     const name = normalizeCountryDisplayNameCandidate(displayNameSource || entry?.name || normalizedEntryCode) || normalizedEntryCode;
     const lookupIso2 = resolveScenarioLookupCode(entry);
     const inspectorDataCode = resolveInspectorDataCode(entry);
@@ -2902,16 +2676,16 @@ function initSidebar({ render } = {}) {
       hierarchyGroups: scenarioMeta.releasable ? [] : getHierarchyGroupsForCode(groupLookupCode),
       continentId,
       continentLabel,
-      continentDisplayLabel: t(continentLabel, "geo") || continentLabel,
+      continentDisplayLabel: getDirectGeoLabel(continentLabel) || continentLabel,
       subregionId,
       subregionLabel,
-      subregionDisplayLabel: t(subregionLabel, "geo") || subregionLabel,
+      subregionDisplayLabel: getDirectGeoLabel(subregionLabel) || subregionLabel,
       inspectorGroupId,
       inspectorGroupLabel,
       inspectorGroupAnchorId,
       topLevelGroupId,
       topLevelGroupLabel,
-      topLevelGroupDisplayLabel: t(topLevelGroupLabel, "geo") || topLevelGroupLabel,
+      topLevelGroupDisplayLabel: getDirectGeoLabel(topLevelGroupLabel) || topLevelGroupLabel,
       topLevelGroupAnchorId: inspectorGroupAnchorId,
       quality: String(scenarioMeta.quality || entry.quality || "").trim(),
       featureCount,
@@ -3100,7 +2874,6 @@ function initSidebar({ render } = {}) {
     const fallbackColor = ensureCountryPaletteColor(countryState.code, countryState.fallbackIndex || 0);
     return (
       runtimeState.sovereignBaseColors?.[countryState.code] ||
-      runtimeState.countryBaseColors?.[countryState.code] ||
       runtimeState.countryPalette?.[countryState.code] ||
       fallbackColor
     );
@@ -3170,7 +2943,7 @@ function initSidebar({ render } = {}) {
       ? (
         String(suggestion.localizedNameZh || "").trim()
         || String(countryState?.displayName || "").trim()
-        || t(suggestion.label, "geo")
+        || getDirectGeoLabel(suggestion.label)
       )
       : (
         String(suggestion.localizedNameEn || "").trim()
@@ -3234,16 +3007,6 @@ function initSidebar({ render } = {}) {
   registerRuntimeHook(state, "openScenarioVisualAdjustmentsFn", ({ scrollIntoView = false } = {}) => {
     setScenarioVisualAdjustmentsOpen(true, { scrollIntoView });
   });
-
-  const setScenarioMapPaintMode = (nextMode) => {
-    const normalizedMode = normalizePaintMode(nextMode);
-    runtimeState.paintMode = normalizedMode;
-    if (normalizedMode === "sovereignty") {
-      runtimeState.interactionGranularity = "subdivision";
-    }
-    callRuntimeHook(state, "updatePaintModeUIFn");
-    flushSidebarRender(`sidebar-paint-mode:${normalizedMode}`);
-  };
 
   const applyVisualColorToOwnedRegions = (countryState, { renderNow = render, color = null } = {}) => {
     const { requestedIds, matchedIds } = getOwnedVisibleFeatureIds(countryState?.code);
@@ -3310,8 +3073,6 @@ function initSidebar({ render } = {}) {
     selectedCountryActionsSection,
     countryInspectorDetail,
     countryInspectorSelected,
-    countryInspectorSetActive,
-    countryInspectorDetailHint,
     countryInspectorColorRow,
     countryInspectorColorSwatch,
     countryInspectorColorInput,
@@ -3337,12 +3098,9 @@ function initSidebar({ render } = {}) {
     buildCountryRowMetaText,
     getResolvedCountryColor,
     getDisplayCountryColor,
-    getPrimaryReleasablePresetRef: (...args) => getPrimaryReleasablePresetRef(...args),
-    applyScenarioReleasableCoreTerritory: (...args) => applyScenarioReleasableCoreTerritory(...args),
     applyCountryColor,
     incrementSidebarCounter,
     markDirty,
-    showToast,
     getHgoIdentity: resolveHgoIdentityForCountry,
     getSelectedLandInspectorCountryCode: () => getLastSelectedLandInspectorCountryCode(),
     getHgoIdentityCoverage,
@@ -3413,53 +3171,6 @@ function initSidebar({ render } = {}) {
     return 0;
   };
 
-  const activateCoreOwner = (countryCode, { forceSovereignty = false } = {}) => {
-    if (forceSovereignty && String(runtimeState.paintMode || "visual") !== "sovereignty") {
-      setScenarioMapPaintMode("ownership");
-    }
-    runtimeState.activeSovereignCode = countryCode;
-    callRuntimeHook(state, "updateActiveSovereignUIFn");
-  };
-
-  const activateScenarioCountry = (countryState) => {
-    if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult();
-    const isReleasable = !!countryState?.releasable;
-
-    const normalizedCountryCode = normalizeCountryCode(countryState.code);
-    const alreadyActive = normalizedCountryCode && normalizedCountryCode === normalizeCountryCode(runtimeState.activeSovereignCode);
-    const previousActiveCode = normalizeCountryCode(runtimeState.activeSovereignCode);
-    const selectedCode = normalizeCountryCode(runtimeState.selectedInspectorCountryCode);
-    if (normalizedCountryCode) {
-      runtimeState.activeSovereignCode = normalizedCountryCode;
-    }
-    setScenarioMapPaintMode("ownership");
-    if (!alreadyActive) {
-      markDirty("set-active-sovereign");
-    }
-    callRuntimeHook(state, "updateActiveSovereignUIFn");
-    refreshCountryRows({
-      countryCodes: [previousActiveCode, normalizedCountryCode, selectedCode],
-      refreshInspector: true,
-    });
-    showToast(
-      t(
-        alreadyActive
-          ? (isReleasable
-            ? "Political ownership editing already targets this releasable."
-            : "Political ownership editing already targets this country.")
-          : (isReleasable
-            ? "Political ownership editing now targets this releasable."
-            : "Political ownership editing now targets this country."),
-        "ui"
-      ),
-      {
-        title: t("Active owner updated", "ui"),
-        tone: alreadyActive ? "info" : "success",
-        duration: 2800,
-      }
-    );
-  };
-
   const getCountryState = (code) => latestCountryStatesByCode.get(code);
 
   const appendActionSection = (
@@ -3510,42 +3221,7 @@ function initSidebar({ render } = {}) {
   };
 
   const {
-    applyScenarioAutoCompanionActions,
-    renderScenarioHistoricalTransfers,
-  } = createScenarioTransferController({
-    t,
-    normalizeCountryCode,
-    getScenarioCountryMeta,
-    resolveCompanionActionFeatureIds,
-    filterToVisibleFeatureIds,
-    applyScenarioOwnerControllerAssignments,
-    showToast,
-    refreshScenarioShellOverlays,
-    render,
-    renderList,
-    appendActionSection,
-    createInspectorActionButton,
-  });
-
-  const renderNoActiveGuard = (container) => {
-    if (!isOwnershipEditingEnabled()) return false;
-    const needsGuard = runtimeState.activeScenarioId
-      ? !normalizeCountryCode(runtimeState.activeSovereignCode)
-      : (
-        String(runtimeState.paintMode || "visual") === "sovereignty" &&
-        !normalizeCountryCode(runtimeState.activeSovereignCode)
-      );
-    if (!needsGuard) return false;
-    container.appendChild(
-      createEmptyNote(t("Choose an active owner before changing political ownership or borders.", "ui"))
-    );
-    return true;
-  };
-
-  const {
     getPrimaryReleasablePresetRef,
-    prepareScenarioCoreApplication,
-    hasScenarioCoreTerritoryActions,
     applyPresetReference,
     renderRegionalPresets,
   } = createRegionalPresetController(runtimeState, {
@@ -3555,9 +3231,7 @@ function initSidebar({ render } = {}) {
     resolveScenarioLookupCode,
     getScenarioCountryMeta,
     resolveFeatureIdsFromPresetSource,
-    normalizeActionMode,
     filterToVisibleFeatureIds,
-    applyOwnershipToFeatureIds,
     applyVisualOverridesToFeatureIds,
     showToast,
     render,
@@ -3567,20 +3241,12 @@ function initSidebar({ render } = {}) {
 
   const {
     applyScenarioReleasableCoreTerritory,
-    applyReleasableBoundaryVariantSelection,
   } = createScenarioTerritoryController({
     t,
-    prepareScenarioCoreApplication,
     getPrimaryReleasablePresetRef,
     applyPresetReference,
     getCountryState,
     getResolvedCountryColor,
-    blockLockedScenarioInteraction,
-    applyScenarioOwnerControllerAssignments,
-    activateCoreOwner,
-    setReleasableBoundaryVariant,
-    applyScenarioAutoCompanionActions,
-    refreshScenarioShellOverlays,
     showToast,
     render,
     renderList,
@@ -3682,7 +3348,6 @@ function initSidebar({ render } = {}) {
 
   const renderParentCountryActions = (container, countryState) => {
     renderCountryColorSyncAffordance(container, countryState);
-    const actionGuarded = renderNoActiveGuard(container);
     const groupSection = appendActionSection(container, t("Hierarchy Groups", "ui"), {
       collapsible: true,
       defaultOpen: false,
@@ -3691,13 +3356,9 @@ function initSidebar({ render } = {}) {
     if (countryState.hierarchyGroups.length > 0) {
       countryState.hierarchyGroups.forEach((group) => {
         const button = createInspectorActionButton(
-          t(group.label, "geo") || group.label,
+          getDirectGeoLabel(group.label) || group.label,
           () => applyHierarchyGroup(group, runtimeState.selectedColor, render)
         );
-        button.disabled = actionGuarded;
-        if (actionGuarded) {
-          button.title = t("Choose an active owner before changing political ownership.", "ui");
-        }
         groupSection.appendChild(button);
       });
     } else {
@@ -3708,14 +3369,13 @@ function initSidebar({ render } = {}) {
   };
 
   const { renderScenarioActionsPanel } = createScenarioInspectorController({
-    t,
+    t: translateCountryGeoLabel,
     getView: () => ({
       visualOpen: !!runtimeState.ui?.scenarioVisualAdjustmentsOpen,
       paintMode: String(runtimeState.paintMode || "visual"),
       selectedColor: String(runtimeState.selectedColor || ""),
     }),
     getCountryState,
-    activateScenarioCountry,
     storeVisualOpen,
     selectInspectorCountry,
     getScenarioSubjectKindLabel,
@@ -3729,15 +3389,10 @@ function initSidebar({ render } = {}) {
     createEmptyNote,
     renderRegionalPresets,
     normalizeCountryCode,
-    getResolvedReleasableBoundaryVariant,
-    getScenarioCountryMeta,
-    applyReleasableBoundaryVariantSelection,
     getPrimaryReleasablePresetRef,
     applyScenarioReleasableCoreTerritory,
-    renderScenarioHistoricalTransfers,
     selectedCountryActionsSection,
     scheduleAdaptiveInspectorHeights,
-    setScenarioMapPaintMode,
     setScenarioVisualAdjustmentsOpen,
     filterToVisibleFeatureIds,
     clearVisualOverridesForFeatureIds,
@@ -3745,7 +3400,6 @@ function initSidebar({ render } = {}) {
     applyVisualColorToOwnedRegions,
     clearCountryVisualOverrides,
     renderCountryColorSyncAffordance,
-    hasScenarioCoreTerritoryActions,
   });
 
   const getSelectedLandFeatureIdsForCountryInference = () => {
@@ -3917,9 +3571,11 @@ function initSidebar({ render } = {}) {
       waterInspectorEmpty,
       waterInspectorSelected,
       waterInspectorDetailHint,
+      waterInspectorLocateBtn,
       waterInspectorMetaSection,
       waterInspectorMetaList,
       waterInspectorHierarchySection,
+      waterInspectorBreadcrumb,
       waterInspectorJumpToParentBtn,
       waterInspectorChildrenList,
       waterInspectorColorRow,
@@ -4301,6 +3957,9 @@ function initSidebar({ render } = {}) {
   refreshLegendEditor();
   renderScenarioAuditPanel();
   editorWorkspace = initEditorWorkspace({
+    revealProperties: () => {
+      if (document.body.classList.contains("right-sidebar-collapsed")) setRightSidebarCollapsed(false);
+    },
     t,
     onNavigate: () => {
       // Manual context navigation consumes the current selection snapshot so a

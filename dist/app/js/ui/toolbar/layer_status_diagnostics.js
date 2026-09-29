@@ -22,6 +22,9 @@ import {
   listBaseLayerStatusContracts,
   listTransportLayerPanelContracts,
 } from "./layer_panel_contracts.js";
+import { normalizePhysicalStyleConfig } from "../../core/state_defaults.js";
+import { resolveContourLodRequest } from "../../core/renderer/physical_contour_lod_policy.js";
+import { resolvePhysicalAtlasCollection } from "../../core/renderer/physical_atlas_lod_policy.js";
 
 const STATUS_SEVERITY = Object.freeze({
   ACTIVE: "active",
@@ -179,6 +182,41 @@ function buildEnabledSummary({
   return translateUi(translate, "Enabled · waiting for data");
 }
 
+function getPhysicalStatusInputs(state) {
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const dataKeys = [];
+  const loadKeys = [];
+  const metricNames = [];
+  if (cfg.mode !== "contours_only") {
+    loadKeys.push("physical_semantics");
+    metricNames.push("drawPhysicalAtlasLayer", "drawPhysicalReliefOverlayLayer");
+  }
+  if (cfg.mode !== "atlas_only") {
+    const contourLayers = resolveContourLodRequest(state);
+    dataKeys.push("physicalContourMajorData");
+    if (contourLayers.some((name) => name.endsWith("_minor"))) dataKeys.push("physicalContourMinorData");
+    loadKeys.push(...contourLayers);
+    metricNames.push("drawPhysicalContourLayer");
+  }
+  // Count the active collections, not a skipped pass or the obsolete physical
+  // source. Atlas, relief and contours are disjoint; base-pass metrics also
+  // contain brush points and must not be added to these feature counts.
+  const measuredCounts = metricNames.map((name) => {
+    const metric = getMetric(state.renderPerfMetrics, [name]);
+    if (!metric || metric.skipped) return null;
+    const contourCount = name === "drawPhysicalContourLayer"
+      && (metric.majorRenderedCount != null || metric.minorRenderedCount != null)
+      ? Number(metric.majorRenderedCount || 0) + Number(metric.minorRenderedCount || 0) : null;
+    return normalizeFiniteCount(metric.visibleFeatureCount ?? metric.renderedCount ?? contourCount);
+  }).filter((value) => value != null);
+  return {
+    loadedCount: cfg.mode === "contours_only" ? sumFeatureCounts(state, dataKeys)
+      : (getFeatureCollectionCount(resolvePhysicalAtlasCollection(state)) ?? 0) + (sumFeatureCounts(state, dataKeys) ?? 0),
+    visibleCount: measuredCounts.length ? measuredCounts.reduce((total, count) => total + count, 0) : null,
+    loadStatus: getLoadStatus(state, loadKeys),
+  };
+}
+
 function createLayerDiagnostic(definition, state, translate) {
   const enabled = typeof definition.enabled === "function"
     ? !!definition.enabled(state || {})
@@ -188,9 +226,10 @@ function createLayerDiagnostic(definition, state, translate) {
     : getMetric(state?.renderPerfMetrics, definition.metricNames);
   const metricFeatureCount = normalizeFiniteCount(metric?.featureCount);
   const dataFeatureCount = sumFeatureCounts(state || {}, definition.dataKeys);
-  const loadedCount = metricFeatureCount ?? dataFeatureCount;
-  const visibleCount = normalizeFiniteCount(metric?.visibleFeatureCount);
-  const loadStatus = getLoadStatus(state || {}, definition.loadKeys);
+  const physical = definition.id === "physical" ? getPhysicalStatusInputs(state || {}) : null;
+  const loadedCount = physical ? physical.loadedCount : metricFeatureCount ?? dataFeatureCount;
+  const visibleCount = physical ? physical.visibleCount : normalizeFiniteCount(metric?.visibleFeatureCount);
+  const loadStatus = physical ? physical.loadStatus : getLoadStatus(state || {}, definition.loadKeys);
   const severity = !enabled
     ? STATUS_SEVERITY.MUTED
     : loadStatus === "error"
@@ -222,6 +261,20 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
   const bandsCount = getFeatureCollectionCount(state.activeBathymetryBandsData) ?? 0;
   const contoursCount = getFeatureCollectionCount(state.activeBathymetryContoursData) ?? 0;
   const source = String(state.activeBathymetrySource || "none").trim() || "none";
+  const visibility = state.renderPerfMetrics?.bathymetryVisibility || {};
+  const load = state.renderPerfMetrics?.bathymetryLoad || {};
+  const visibleCount = enabled && preset !== "flat" && visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.visibleCount)
+    : null;
+  const globalVisibleCount = visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.globalVisibleCount) ?? 0
+    : 0;
+  const scenarioVisibleCount = visibility.status === "ready"
+    ? normalizeFiniteCount(visibility.scenarioVisibleCount) ?? 0
+    : 0;
+  const failedSources = Array.isArray(load.failedSources)
+    ? load.failedSources.filter((item) => typeof item === "string" && item.trim())
+    : [];
   let summary = "";
   let severity = STATUS_SEVERITY.ACTIVE;
   if (!enabled) {
@@ -230,13 +283,53 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     severity = STATUS_SEVERITY.MUTED;
   } else if (preset === "flat") {
     summary = translateUi(translate, "Experimental Bathymetry enabled · flat style selected");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "hidden") {
+    summary = translateUi(translate, "Bathymetry opacity is zero");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (load.status === "error") {
+    summary = joinStatusParts(
+      translateUi(translate, "Bathymetry data failed to load"),
+      failedSources.join(", "),
+    );
+    severity = STATUS_SEVERITY.WARNING;
+  } else if (load.status === "loading" || visibility.status === "loading") {
+    summary = translateUi(translate, "Bathymetry loading");
+    severity = STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "ready" && visibleCount === 0) {
+    summary = joinStatusParts(
+      translateUi(translate, "No bathymetry coverage in this view"),
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
+      load.status === "partial" ? failedSources.join(", ") : "",
+    );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.MUTED;
+  } else if (visibility.status === "ready" && visibleCount > 0) {
+    summary = joinStatusParts(
+      globalVisibleCount > 0
+        ? `${globalVisibleCount} ${translateUi(translate, "raster-derived visible")}` : "",
+      scenarioVisibleCount > 0
+        ? `${scenarioVisibleCount} ${translateUi(translate, "schematic visible")}` : "",
+      globalVisibleCount + scenarioVisibleCount === 0
+        ? `${visibleCount} ${translateUi(translate, "visible")}` : "",
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
+      load.status === "partial" ? failedSources.join(", ") : "",
+    );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
   } else if (bandsCount > 0 || contoursCount > 0) {
     summary = joinStatusParts(
       translateUi(translate, "Bathymetry available"),
       `${translateUi(translate, "source")} ${source}`,
       formatCount(bandsCount, "bands", translate),
       formatCount(contoursCount, "contours", translate),
+      load.status === "partial" ? translateUi(translate, "Some bathymetry sources failed to load") : "",
     );
+    severity = load.status === "partial" ? STATUS_SEVERITY.WARNING : STATUS_SEVERITY.ACTIVE;
+  } else if (load.status === "partial") {
+    summary = joinStatusParts(
+      translateUi(translate, "Some bathymetry sources failed to load"),
+      failedSources.join(", "),
+    );
+    severity = STATUS_SEVERITY.WARNING;
   } else {
     summary = translateUi(translate, "Bathymetry data pending for selected style");
     severity = STATUS_SEVERITY.WARNING;
@@ -246,7 +339,7 @@ export function buildBathymetryDiagnostic(state = {}, { translate } = {}) {
     label: contract?.label || "Bathymetry",
     enabled,
     loadedCount: bandsCount + contoursCount,
-    visibleCount: null,
+    visibleCount,
     severity,
     summary: sanitizeLayerStatusText(summary),
   };

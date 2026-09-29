@@ -742,5 +742,22 @@
   "Interactive map color layer.": "交互式地图颜色图层。",
   "Interactive map line layer.": "交互式地图线条图层。",
   "Locate on Map": "在地图上定位",
-  "Water Hierarchy": "海域层级"
+  "Water Hierarchy": "海域层级",
+  "Landform strength": "地形强度",
+  "Land cover strength": "地表覆被强度",
+  "Physical region names": "地貌区域名称",
+  "Alps DEM shading": "阿尔卑斯 DEM 阴影",
+  "Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.": "400% 缩放启用阿尔卑斯覆被细节；参考年份为 2019，其他地区沿用概览。",
+  "Names from 200% zoom; DEM shading from 400%. Current geography reference.": "名称从 200% 缩放显示，DEM 阴影从 400% 显示，均为现实地理参考。",
+  "Local adjustments": "局部调整",
+  "Advanced contour settings": "等高线高级设置",
+  "Major Minimum Elevation (m)": "主等高线最低海拔（米）",
+  "Minor Minimum Elevation (m)": "次等高线最低海拔（米）",
+  "Landforms": "地形",
+  "Land cover": "地表覆被",
+  "Other forests": "其他森林",
+  "No coverage in current data": "当前数据未覆盖",
+  "Coverage loading": "覆盖数据加载中",
+  "regions": "个区域",
+  "Land cover reference: 2019.": "地表覆被参考年份：2019。"
 }

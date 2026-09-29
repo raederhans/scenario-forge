@@ -80,7 +80,7 @@ export function createIntensityFieldEditorSection({
       channelId,
       subMode,
       brushRadiusDeg: clamp(Number.isFinite(Number(draft.brushRadiusDeg)) ? Number(draft.brushRadiusDeg) : Number(current.brushRadiusDeg || defaults.brushRadiusDeg), 0.25, 30),
-      brushStrength: clamp(Number.isFinite(Number(draft.brushStrength)) ? Number(draft.brushStrength) : Number(current.brushStrength || defaults.brushStrength), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
+      brushStrength: clamp(Number.isFinite(Number(draft.brushStrength)) ? Number(draft.brushStrength) : Number(current.brushStrength ?? defaults.brushStrength), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
       selectedPointId: String(draft.selectedPointId === undefined ? (current.selectedPointId || "") : (draft.selectedPointId || "")),
     };
   };

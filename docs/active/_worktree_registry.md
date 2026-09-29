@@ -576,3 +576,7 @@
 - Managed checkout: `C:/Users/raede/.codex/worktrees/water-outline-merge/mapcreator`. Root owns integration and shared test processes.
 - Scope: major-lake outlines, sea-name visibility default, and marine highlight display simplification; preserve source geometry and latest-main rendering caches.
 - Primary checkout and unrelated work remain untouched. Keep this checkout available for water-display follow-up verification.
+
+## 2026-09-29 地貌图层交付
+
+整合工作树：`C:/Users/raede/.codex/worktrees/physical-layer-merge/mapcreator`；分支：`codex/physical-layer-improvements-20260929`。地貌面板、阿尔卑斯细节、局部强度、双语名称和 DEM 阴影由本分支统一交付。当前主工作区的混合 WIP 原样保留，不进行 reset、stash 或强制同步。验证及合并状态见 `docs/active/physical-layer-improvements-20260928/task.md`，运行证据保留在整合工作树 `.runtime/reports/generated/physical-integration/`。

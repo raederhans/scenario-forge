@@ -1,3 +1,6 @@
+import { createWaterHighlightDisplay } from "./water_highlight_display.js";
+import { isLakeRegion } from "./effective_water_regions.js";
+
 // Transient SVG overlays: special-zone editing and feature/facility hover.
 export function createTransientOverlayRenderOwner(runtimeState, {
   rendererSurfaceHost,
@@ -10,6 +13,7 @@ export function createTransientOverlayRenderOwner(runtimeState, {
   getFeatureId,
   getActiveFacilityHighlightEntry,
   buildFacilityEntryKey,
+  waterHighlightDisplay = createWaterHighlightDisplay(),
 }) {
   function renderSpecialZoneEditorOverlay() {
     if (!rendererSurfaceHost.getSpecialZoneEditorGroup() || !rendererSurfaceHost.getPathSvg()) return;
@@ -112,6 +116,13 @@ export function createTransientOverlayRenderOwner(runtimeState, {
       (!runtimeState.hoveredSpecialRegionId || isSpecialRegionEnabled(feature))
       && (!runtimeState.hoveredWaterRegionId || isWaterRegionEnabled(feature))
     ) ? [feature] : [];
+    const displayOnlyWaterGeometry = runtimeState.hoveredWaterRegionId && data.length && !isLakeRegion(data[0])
+      ? waterHighlightDisplay.get(
+        data[0],
+        rendererSurfaceHost.getProjection?.(),
+        runtimeState.zoomTransform?.k || 1,
+      )
+      : null;
 
     const selection = rendererSurfaceHost.getHoverGroup()
       .selectAll("path.hovered-feature")
@@ -125,12 +136,15 @@ export function createTransientOverlayRenderOwner(runtimeState, {
       .attr("aria-hidden", "true")
       .attr("vector-effect", "non-scaling-stroke")
       .merge(selection)
-      .attr("d", rendererSurfaceHost.getPathSvg())
+      .attr("d", (datum) => (displayOnlyWaterGeometry
+        ? displayOnlyWaterGeometry.svgPath
+        : rendererSurfaceHost.getPathSvg()(datum)))
       .attr("fill", "none")
       .attr("stroke", "#f1c40f")
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
-      .attr("stroke-width", () => (runtimeState.hoveredWaterRegionId ? 1.25 : 1.45));
+      .attr("stroke-width", () => (displayOnlyWaterGeometry ? 1.12 : runtimeState.hoveredWaterRegionId ? 1.25 : 1.45))
+      .attr("stroke-opacity", () => (displayOnlyWaterGeometry ? 0.86 : 1));
 
     selection.exit().remove();
 

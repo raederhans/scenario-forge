@@ -8,15 +8,18 @@ import {
   resolveScenarioRegistryUrl,
 } from "../core/data_loader.js";
 import { resolveContourLodRequest } from "../core/renderer/physical_contour_lod_policy.js";
+import { shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests } from "../core/renderer/physical_atlas_lod_policy.js";
 import {
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
+  ensureActiveScenarioOptionalLayersForVisibility,
   hydrateActiveScenarioBundle,
   loadScenarioBundle,
   loadScenarioRegistry,
   validateScenarioRuntimeShellContract,
 } from "../core/scenario_resources.js";
 import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
+import { syncCountryUi } from "../core/scenario_ui_sync.js";
 import {
   SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS,
   SCENARIO_STARTUP_GEO_ALIASES_FILENAME,
@@ -251,6 +254,9 @@ export function createStartupDataPipelineOwner({
           reason,
           resourceMetrics: result.resourceMetrics || {},
         });
+        // Panels may have rendered with the smaller startup dictionary. Refresh
+        // their labels when the full dictionary replaces those fallback names.
+        syncCountryUi({ renderNow: false });
         emitStateBusEvent(STATE_BUS_EVENTS.UPDATE_DEV_WORKSPACE_UI);
         if (shouldRender()) {
           requestMainRender?.(`localization-full-ready:${reason}`, { flush: true });
@@ -293,6 +299,13 @@ export function createStartupDataPipelineOwner({
       });
       assertReceiverCurrent({ isCurrent });
       hydrateActiveScenarioBundle(bundle, { renderNow });
+      // Post-apply skips optional layers while boot is blocking. Complete the
+      // visible layers here too, including scenario capital/name overrides.
+      await ensureActiveScenarioOptionalLayersForVisibility({
+        bundle, renderNow, scenarioApplyEpoch, scenarioApplyRequestId: requestId,
+        isScenarioApplyRequestCurrent: isCurrent,
+      });
+      assertReceiverCurrent({ isCurrent });
       const healthGateResult = await enforceScenarioHydrationHealthGate({
         renderNow,
         reason,
@@ -353,7 +366,9 @@ export function createStartupDataPipelineOwner({
       const normalized = String(name || "").trim().toLowerCase();
       if (!normalized) return [];
       if (normalized === "physical-set") {
-        return PHYSICAL_CONTEXT_LAYER_SET;
+        return [...PHYSICAL_CONTEXT_LAYER_SET,
+          ...(shouldRequestPhysicalAtlasDetail(state) ? [PHYSICAL_ATLAS_DETAIL_LAYER] : []),
+          ...getPhysicalPresentationLayerRequests(state)];
       }
       if (normalized === "physical-contours-set") {
         return resolveContourLodRequest(state);
@@ -705,8 +720,13 @@ export function createStartupDataPipelineOwner({
     startupFallbackScenarioId,
     startupBundleResultPromise,
   } = {}) {
-    const startupBundleResult = await startupBundleResultPromise;
-    const useScenarioStartupSupport = startupBundleResult?.ok === true;
+    // Let loadMapData start bundle-independent assets now. Its topology/localization
+    // branches still await this selection before deciding whether to reuse the bundle.
+    const startupBootArtifactsOverride = Promise.resolve(startupBundleResultPromise).then(
+      (startupBundleResult) => startupBundleResult?.ok === true
+        ? startupBundleResult.startupBootArtifactsOverride
+        : null
+    );
     const startupScenarioLocalesUrl = getStartupScenarioSupportUrl(
       startupFallbackScenarioId,
       SCENARIO_STARTUP_LOCALES_FILENAME
@@ -725,9 +745,7 @@ export function createStartupDataPipelineOwner({
       geoAliasesUrl: startupScenarioGeoAliasesUrl || null,
       useStartupWorker: true,
       useStartupCache: true,
-      startupBootArtifactsOverride: Promise.resolve(
-        useScenarioStartupSupport ? startupBundleResult.startupBootArtifactsOverride : null
-      ),
+      startupBootArtifactsOverride,
     });
   }
 

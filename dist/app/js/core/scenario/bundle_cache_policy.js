@@ -1,3 +1,5 @@
+import { isScenarioPoliticalBaseChunk } from "../scenario_chunk_manager.js";
+
 export const SCENARIO_BUNDLE_CACHE_LIMIT = 3;
 
 export const SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT = 32;
@@ -17,15 +19,31 @@ export function recordScenarioChunkPayloadSourceBytes(entry, chunkMeta) {
   if (Number.isFinite(bytes) && bytes > 0) sourceBytesByPayloadEntry.set(entry, Math.ceil(bytes));
 }
 
-export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = []) {
+export function getScenarioChunkPayloadEvictionIds(bundle, protectedIds = [], { preferPoliticalBase = false } = {}) {
   const cache = bundle.chunkPayloadCacheById || {};
   const protectedSet = new Set([...protectedIds, ...(bundle.chunkPayloadProtectedIds || [])]);
   const cacheIds = Object.keys(cache);
+  const pinnedIds = cacheIds.filter((id) => protectedSet.has(id) || bundle.chunkPayloadPromisesById?.[id]);
+  const availableBytes = SCENARIO_CHUNK_PAYLOAD_CACHE_BYTE_LIMIT
+    - pinnedIds.reduce((sum, id) => sum + (sourceBytesByPayloadEntry.get(cache[id]) || 0), 0);
+  // An inactive scenario will need its global political base on every return,
+  // regardless of viewport. Prefer it within the existing limits, not as a pin.
+  // Active selections retain the normal LRU policy and explicit protection.
+  const politicalBaseIds = preferPoliticalBase
+    ? new Set((bundle.chunkRegistry?.chunks || []).filter((chunk) => {
+      const bytes = sourceBytesByPayloadEntry.get(cache[chunk.id]) || 0;
+      return isScenarioPoliticalBaseChunk(chunk) && bytes > 0 && bytes <= availableBytes
+        && pinnedIds.length < SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT;
+    }).map((chunk) => chunk.id))
+    : null;
+  const evictionOrder = politicalBaseIds
+    ? [...cacheIds].sort((left, right) => Number(politicalBaseIds.has(left)) - Number(politicalBaseIds.has(right)))
+    : cacheIds;
   let cacheSize = cacheIds.length;
   let knownSourceBytes = 0;
   const evictedIds = [];
   for (const id of cacheIds) knownSourceBytes += sourceBytesByPayloadEntry.get(cache[id]) || 0;
-  for (const id of cacheIds) {
+  for (const id of evictionOrder) {
     if (cacheSize <= SCENARIO_CHUNK_PAYLOAD_CACHE_LIMIT
       && knownSourceBytes <= SCENARIO_CHUNK_PAYLOAD_CACHE_BYTE_LIMIT) break;
     if (protectedSet.has(id) || bundle.chunkPayloadPromisesById?.[id]) continue;

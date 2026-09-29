@@ -257,6 +257,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["city-label-text", "renderer-runtime", "js/core/renderer/city_label_text_model.js", "tests/city_label_text_model_behavior.test.mjs"],
     ["operation-graphics-editor-render", "renderer-runtime", "js/core/renderer/operation_graphics_editor_render_owner.js", "tests/operation_graphics_editor_render_owner_behavior.test.mjs"],
     ["physical-intensity-interaction", "renderer-runtime", "js/core/renderer/physical_intensity_interaction_owner.js", "tests/physical_intensity_interaction_owner_behavior.test.mjs"],
+    ["physical-intensity-compositor", "renderer-runtime", "js/core/renderer/physical_intensity_compositor.js", "tests/physical_intensity_compositor_behavior.test.mjs", ["js/core/intensity_field.js"]],
+    ["physical-atlas-lod", "renderer-runtime", "js/core/renderer/physical_atlas_lod_policy.js", "tests/physical_atlas_lod_policy_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
     ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
     ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
@@ -457,7 +459,15 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 11,
   };
 
-  return [bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
+  const physicalDetailRecord = {
+    ...bathymetryBuilderRecord,
+    id: "local:physical-detail",
+    commandRef: "python -m unittest tests.test_physical_detail -q",
+    sourceRefs: ["tools/build_physical_detail.py", "tools/build_physical_presentation.py", "tools/register_physical_presentation_assets.py", "map_builder/geo/physical_topology.py", "map_builder/processors/physical_context.py", "tests/test_physical_detail.py", "data/global_physical_semantics.topo.json", "data/global_physical_semantics.detail.topo.json", "data/physical_hillshade.alps.topo.json", "data/physical_region_labels.geojson"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 12,
+  };
+
+  return [physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,

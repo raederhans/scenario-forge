@@ -559,6 +559,7 @@ async function bootstrap() {
       suppressRender: true,
       interactionLevel: startupInteractionLevel,
       deferInteractionInfrastructure: startupInteractionLevel === "readonly-startup",
+      deferStaticMeshesUntilSetMapData: true,
     });
     setMapData({
       suppressRender: true,

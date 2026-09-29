@@ -74,6 +74,20 @@ const CONTEXT_LAYER_PACKS = {
     format: "topology",
     objectName: "physical_semantics",
   },
+  physical_semantics_detail: {
+    url: resolveDataAssetUrl("context_layer:physical_semantics_detail"),
+    format: "topology",
+    objectName: "physical_semantics",
+  },
+  physical_hillshade: {
+    url: resolveDataAssetUrl("context_layer:physical_hillshade"),
+    format: "topology",
+    objectName: "physical_hillshade",
+  },
+  physical_region_labels: {
+    url: resolveDataAssetUrl("context_layer:physical_region_labels"),
+    format: "geojson",
+  },
   physical_contours_major: {
     url: resolveDataAssetUrl("context_layer:physical_contours_major"),
     format: "topology",

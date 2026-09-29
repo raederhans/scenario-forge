@@ -206,6 +206,10 @@ function syncMirroredClasses(select, surface) {
   surface.shell.classList.toggle("hidden", select.hidden || select.classList.contains("hidden"));
 }
 
+export function syncStyledSelect(select) {
+  syncSurface(select);
+}
+
 function syncSurface(select) {
   const surface = surfaces.get(select);
   if (!surface) return;

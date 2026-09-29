@@ -8,6 +8,7 @@ import {
 } from "./state/scenario_runtime_state.js";
 import {
   createScenarioApplyRefreshPlan,
+  prepareScenarioNavigation,
   refreshMapDataForScenarioApply,
   refreshScenarioOpeningOwnerBorders,
   setMapData,
@@ -749,6 +750,7 @@ async function runPostScenarioApplyEffects({
     refreshOpeningOwnerBorders: false,
   });
   refreshScenarioOpeningOwnerBorders({ renderNow: false, reason: `scenario:${scenarioId}:opening` });
+  prepareScenarioNavigation();
   let chunkPrewarmResult = {
     chunkPrewarmAwaited: true,
     chunkPrewarmDeferred: false,

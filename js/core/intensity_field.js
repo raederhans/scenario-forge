@@ -11,14 +11,14 @@ export const INTENSITY_FIELD_GRID = Object.freeze({
 export const INTENSITY_FIELD_CHANNELS = Object.freeze({
   physicalAtlas: Object.freeze({
     id: "physicalAtlas",
-    targetPasses: Object.freeze(["physicalBase"]),
-    applyMode: "featureMultiplier",
+    targetPasses: Object.freeze(["physicalBase", "contextBase"]),
+    applyMode: "spatialAlpha",
     label: "Atlas",
   }),
   physicalContour: Object.freeze({
     id: "physicalContour",
     targetPasses: Object.freeze(["contextBase"]),
-    applyMode: "featureMultiplier",
+    applyMode: "spatialAlpha",
     label: "Contour",
   }),
   urbanGlow: Object.freeze({

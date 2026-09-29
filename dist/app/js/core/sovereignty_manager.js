@@ -18,10 +18,6 @@ const state = runtimeState;
 const FEATURE_MIGRATION_URLS = [resolveDataAssetUrl("feature_migrations:by_hybrid_v1")];
 let featureMigrationMapPromise = null;
 
-function markLegacyColorStateDirty() {
-  runtimeState.legacyColorStateDirty = true;
-}
-
 function normalizeOwnerCode(rawCode) {
   return normalizeCountryCodeAlias(rawCode);
 }
@@ -83,21 +79,6 @@ function seedSovereigntyFromLandData(featureCollection) {
   return next;
 }
 
-function migrateLegacyColorState() {
-  if (runtimeState.legacyColorStateDirty === false) {
-    return;
-  }
-  runtimeState.sovereignBaseColors = {
-    ...(runtimeState.countryBaseColors || {}),
-    ...(runtimeState.sovereignBaseColors || {}),
-  };
-  runtimeState.visualOverrides = {
-    ...(runtimeState.featureOverrides || {}),
-    ...(runtimeState.visualOverrides || {}),
-  };
-  runtimeState.legacyColorStateDirty = false;
-}
-
 function ensureOwnerIndexMaps() {
   if (!(runtimeState.ownerToFeatureIds instanceof Map)) {
     runtimeState.ownerToFeatureIds = new Map();
@@ -119,7 +100,7 @@ function rebuildOwnerIndex() {
 }
 
 function ensureSovereigntyState({ force = false } = {}) {
-  migrateLegacyColorState();
+
   runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
   runtimeState.visualOverrides = runtimeState.visualOverrides || {};
   runtimeState.sovereigntyByFeatureId = runtimeState.sovereigntyByFeatureId || {};
@@ -168,19 +149,18 @@ function getFeatureIdsForOwner(ownerCode) {
 function migrateImportedProjectData(data) {
   const payload = data && typeof data === "object" ? { ...data } : {};
   delete payload.scenarioControllersByFeatureId;
-  payload.sovereignBaseColors =
-    payload.sovereignBaseColors && typeof payload.sovereignBaseColors === "object"
-      ? payload.sovereignBaseColors
-      : payload.countryBaseColors && typeof payload.countryBaseColors === "object"
-        ? payload.countryBaseColors
-        : {};
-  payload.visualOverrides =
-    payload.visualOverrides && typeof payload.visualOverrides === "object"
-      ? payload.visualOverrides
-      : payload.featureOverrides && typeof payload.featureOverrides === "object"
-        ? payload.featureOverrides
-        : {};
-  payload.sovereigntyByFeatureId = {};
+  // Legacy names are accepted only at the project input boundary. An explicit
+  // canonical empty map must win over stale legacy paint.
+  const isColorMap = value => !!value && typeof value === "object" && !Array.isArray(value);
+  payload.sovereignBaseColors = isColorMap(payload.sovereignBaseColors)
+    ? payload.sovereignBaseColors : isColorMap(payload.countryBaseColors) ? payload.countryBaseColors : {};
+  payload.visualOverrides = isColorMap(payload.visualOverrides)
+    ? payload.visualOverrides : isColorMap(payload.featureOverrides) ? payload.featureOverrides
+      : isColorMap(payload.colors) ? payload.colors : {};
+  delete payload.countryBaseColors;
+  delete payload.featureOverrides;
+  delete payload.colors;
+  delete payload.sovereigntyByFeatureId;
   payload.paintMode = normalizePaintMode(payload.paintMode);
   payload.mapSemanticMode = normalizeMapSemanticMode(payload.mapSemanticMode);
   payload.activeSovereignCode = normalizeOwnerCode(payload.activeSovereignCode || "");
@@ -311,6 +291,7 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
   { fetchImpl = globalThis.fetch, validFeatureIds = null, landData = null, onMigration = null, scenarioManifest = null } = {}
 ) {
   let payload = data && typeof data === "object" ? { ...data } : {};
+  delete payload.sovereigntyByFeatureId;
   delete payload.scenarioControllersByFeatureId;
   const normalizedValidFeatureIds = (() => {
     if (validFeatureIds instanceof Set) {
@@ -334,75 +315,53 @@ async function migrateFeatureScopedProjectDataToCurrentTopology(
     return payload;
   }
 
-  const sovereigntyPartition = partitionFeatureScopedEntries(
-    payload.sovereigntyByFeatureId,
-    normalizedValidFeatureIds
-  );
-  const nextVisualOverrides = payload.visualOverrides || payload.featureOverrides || {};
+  const nextVisualOverrides = payload.visualOverrides || {};
   const visualPartition = partitionFeatureScopedEntries(nextVisualOverrides, normalizedValidFeatureIds);
   const reportMigration = (migratedEntries = 0) => {
     if (typeof onMigration !== "function") return;
-    const sourceCount = Object.keys(payload.sovereigntyByFeatureId || {}).length
-      + Object.keys(nextVisualOverrides).length;
-    const retainedCount = Object.keys(sovereigntyPartition.retained).length
-      + Object.keys(visualPartition.retained).length;
+    const sourceCount = Object.keys(nextVisualOverrides).length;
+    const retainedCount = Object.keys(visualPartition.retained).length;
     onMigration({
       migratedEntries: migratedEntries + (explicitMigration?.summary.migratedEntries || 0),
       ignoredEntries: Math.max(0, sourceCount - retainedCount - migratedEntries),
     });
   };
-  if (
-    !sovereigntyPartition.needsMigration
-    && !visualPartition.needsMigration
-  ) {
+  if (!visualPartition.needsMigration) {
     reportMigration();
-    payload.sovereigntyByFeatureId = { ...sovereigntyPartition.retained };
     delete payload.scenarioControllersByFeatureId;
     payload.visualOverrides = { ...visualPartition.retained };
-    payload.featureOverrides = { ...payload.visualOverrides };
+
     return payload;
   }
 
   const migrationMap = await loadFeatureMigrationMap({ fetchImpl });
   if (!migrationMap || typeof migrationMap !== "object") {
     reportMigration();
-    payload.sovereigntyByFeatureId = { ...sovereigntyPartition.retained };
     delete payload.scenarioControllersByFeatureId;
     payload.visualOverrides = { ...visualPartition.retained };
-    payload.featureOverrides = { ...payload.visualOverrides };
+
     return payload;
   }
 
-  const sovereigntyMigration = remapFeatureScopedEntries(
-    payload.sovereigntyByFeatureId,
-    normalizedValidFeatureIds,
-    migrationMap
-  );
   const visualMigration = remapFeatureScopedEntries(
-    payload.visualOverrides || payload.featureOverrides,
+    payload.visualOverrides,
     normalizedValidFeatureIds,
     migrationMap
   );
 
-  reportMigration(sovereigntyMigration.migratedSourceCount + visualMigration.migratedSourceCount);
-  payload.sovereigntyByFeatureId = sovereigntyMigration.remapped;
+  reportMigration(visualMigration.migratedSourceCount);
   delete payload.scenarioControllersByFeatureId;
   payload.visualOverrides = visualMigration.remapped;
-  payload.featureOverrides = { ...visualMigration.remapped };
 
-  const migratedTotal =
-    sovereigntyMigration.migratedSourceCount
-    + visualMigration.migratedSourceCount;
-  const droppedTotal =
-    sovereigntyMigration.droppedCount
-    + visualMigration.droppedCount;
+
+  const migratedTotal = visualMigration.migratedSourceCount;
+  const droppedTotal = visualMigration.droppedCount;
   if (migratedTotal || droppedTotal) {
     console.info(
       "[Project Import] Feature migration applied.",
       {
         migratedEntries: migratedTotal,
         droppedEntries: droppedTotal,
-        sovereigntyExpanded: sovereigntyMigration.expandedEntryCount,
         visualExpanded: visualMigration.expandedEntryCount,
       }
     );
@@ -427,8 +386,8 @@ export {
   resetFeatureOwnerCodes,
   resetAllFeatureOwnersToCanonical,
   getFeatureIdsForOwner,
-  markLegacyColorStateDirty,
-  migrateLegacyColorState,
+
+
   migrateImportedProjectData,
   migrateFeatureScopedProjectDataToCurrentTopology,
 };

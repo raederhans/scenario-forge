@@ -21,7 +21,7 @@ function createScenarioLifecycleRuntime({
   getScenarioDefaultCountryCode,
   getScenarioMapSemanticMode,
   markDirty,
-  markLegacyColorStateDirty,
+
   normalizeScenarioId,
   releaseScenarioAuditPayload,
   resetScenarioChunkRuntimeState,
@@ -150,10 +150,8 @@ function createScenarioLifecycleRuntime({
     ensureSovereigntyState({ force: true });
     runtimeState.parentBordersVisible = false;
     runtimeState.visualOverrides = {};
-    runtimeState.featureOverrides = {};
     runtimeState.sovereignBaseColors = { ...(runtimeState.scenarioFixedOwnerColors || {}) };
-    runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
-    markLegacyColorStateDirty();
+
     runtimeState.activeSovereignCode = runtimeState.mapSemanticMode === "blank"
       ? ""
       : (
@@ -269,11 +267,9 @@ function createScenarioLifecycleRuntime({
     runtimeState.sovereigntyByFeatureId = {};
     runtimeState.sovereigntyInitialized = false;
     runtimeState.visualOverrides = {};
-    runtimeState.featureOverrides = {};
     const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
     runtimeState.sovereignBaseColors = { ...(defaults || runtimeState.resolvedDefaultCountryPalette || defaultCountryPalette) };
-    runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
-    markLegacyColorStateDirty();
+
     runtimeState.activeSovereignCode = "";
     syncScenarioInspectorSelection("");
     restoreParentBordersAfterScenario();

@@ -134,10 +134,9 @@ export function createScenarioWaterCachePolicyOwner({
     };
   }
 
-  function getScreenBounds(part) {
+  function getScreenBounds(part, transform) {
     const bounds = computeProjectedGeoBounds(part);
     if (!bounds) return null;
-    const transform = cloneZoomTransform(state.zoomTransform);
     const minX = bounds.minX * transform.k + transform.x;
     const minY = bounds.minY * transform.k + transform.y;
     const maxX = bounds.maxX * transform.k + transform.x;
@@ -150,11 +149,12 @@ export function createScenarioWaterCachePolicyOwner({
     const { width, height } = getViewportSize();
     const viewportArea = width * height;
     if (!(viewportArea > 0)) return 0;
+    const transform = cloneZoomTransform(state.zoomTransform);
     let clippedArea = 0;
     for (const feature of Array.isArray(waterFeatures) ? waterFeatures : []) {
       if (!isWaterRegionRenderable(feature)) continue;
       for (const part of collectSafeWaterRegionGeometryParts(feature)) {
-        const bounds = getScreenBounds(part);
+        const bounds = getScreenBounds(part, transform);
         if (!bounds) continue;
         const clippedWidth = Math.max(0, Math.min(bounds.maxX, width) - Math.max(bounds.minX, 0));
         const clippedHeight = Math.max(0, Math.min(bounds.maxY, height) - Math.max(bounds.minY, 0));
@@ -167,6 +167,7 @@ export function createScenarioWaterCachePolicyOwner({
   function getScenarioWaterVisibleCoverageRatioGrid(waterFeatures = []) {
     const { width, height } = getViewportSize();
     if (!(width > 0 && height > 0)) return 0;
+    const transform = cloneZoomTransform(state.zoomTransform);
     const dpr = Math.max(1, Math.min(scenarioWaterCoverageGridMaxDpr, Number(getDevicePixelRatio() || 1)));
     const gridColumns = Math.max(1, Math.round(scenarioWaterCoverageGridBaseColumns * dpr));
     const gridRows = Math.max(1, Math.round(scenarioWaterCoverageGridBaseRows * dpr));
@@ -179,7 +180,7 @@ export function createScenarioWaterCachePolicyOwner({
       if (coveredCount >= totalCellCount) break;
       for (const part of collectSafeWaterRegionGeometryParts(feature)) {
         if (coveredCount >= totalCellCount) break;
-        const bounds = getScreenBounds(part);
+        const bounds = getScreenBounds(part, transform);
         if (!bounds) continue;
         const clippedMinX = Math.max(0, Math.min(bounds.minX, width));
         const clippedMinY = Math.max(0, Math.min(bounds.minY, height));
@@ -229,8 +230,8 @@ export function createScenarioWaterCachePolicyOwner({
   function shouldUseDirectScenarioWaterDraw(signals) {
     return (
       Number(signals?.featureCount || 0) <= scenarioWaterLowComplexityFeatureMax
-      && Number(signals?.visibleCoverageRatio || 0) <= scenarioWaterLowComplexityCoverageMax
       && Number(signals?.previousRenderedCount || 0) <= scenarioWaterLowComplexityPrevRenderedMax
+      && Number(signals?.visibleCoverageRatio || 0) <= scenarioWaterLowComplexityCoverageMax
     );
   }
 

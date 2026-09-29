@@ -1,7 +1,17 @@
 import { commitRendererDprStageState } from '../state/actions/renderer_phase_actions.js';
+import { resolveDisplayPixelRatio } from './display_quality_policy.js';
 
-// DPR limits and stage transitions share live profile/state inputs.
+// Display density reads the live device DPR; stage updates do not change it.
 export function createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRatio }) {
+  function getDisplayDpr(quality, width, height) {
+    return resolveDisplayPixelRatio({
+      quality,
+      devicePixelRatio: getDevicePixelRatio(),
+      width,
+      height,
+    });
+  }
+
   function getMaxDprForProfile(renderProfile) {
     const profile = String(renderProfile || "auto").trim().toLowerCase();
     const deviceDpr = Math.max(1, Number(getDevicePixelRatio()) || 1);
@@ -29,5 +39,5 @@ export function createPixelRatioPolicy({ runtimeState, nowMs, getDevicePixelRati
     });
     return true;
   }
-  return Object.freeze({ getMaxDprForProfile, updateDprStage });
+  return Object.freeze({ getDisplayDpr, getMaxDprForProfile, updateDprStage });
 }

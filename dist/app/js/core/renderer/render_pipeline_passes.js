@@ -1,5 +1,6 @@
 import { IDLE_RENDER_PASS_DEFINITIONS } from "./render_pipeline_catalog.js";
 import { EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES } from "./exact_after_settle_pass_catalog.js";
+import { coversViewport } from "./cached_surface_coverage.js";
 
 export function createRenderPipelinePassesOwner({
   state = {},
@@ -17,12 +18,17 @@ export function createRenderPipelinePassesOwner({
     getContextScenarioReuseDecision = () => ({ enabled: false }),
     getExactAfterSettleControllerState = () => null,
     getPassReferenceTransform = () => null,
+    getPassCoverage = () => null,
     getRenderPassCacheState = () => ({ signatures: {}, dirty: {}, reasons: {}, canvases: {}, counters: {} }),
     getRenderPassSignature = () => "",
     incrementPerfCounter = () => {},
     rebuildResolvedColors = () => {},
     recordRenderPerfMetric = () => {},
     renderPassToCache = () => {},
+    prepareRenderPassAsync = () => null,
+    canYieldRenderPassWork = () => false,
+    nowMs = () => globalThis.performance?.now?.() || 0,
+    requestRenderContinuation = () => {},
     shouldEnableContextBaseTransformReuse = () => false,
     shouldEnableContextScenarioTransformReuse = () => false,
     shouldStartExactAfterSettleFastPath = () => false,
@@ -152,6 +158,7 @@ export function createRenderPipelinePassesOwner({
     ) {
       return;
     }
+    if (passName === "contextScenario" && prepareRenderPassAsync(passName)) return false;
     renderPassToCache(passName, drawFn, transform, timings);
   }
 
@@ -162,20 +169,67 @@ export function createRenderPipelinePassesOwner({
     if (state.legacyColorStateDirty) {
       rebuildResolvedColors();
     }
-    getIdleRenderPassDefinitions()
-      .filter(([passName]) => !requestedPassNames || requestedPassNames.has(passName))
-      .forEach(([passName, drawFn]) => {
-        prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache);
-      });
+    // Color resolution and transformed-frame fallbacks can change the exact
+    // identity after the frame-level worker check. Gate the actual paint here,
+    // before clearing any pass canvas, including while still settling.
+    if ((!requestedPassNames || requestedPassNames.has("political"))
+      && (cache.dirty.political
+        || cache.signatures.political !== getRenderPassSignature("political", transform))
+      && prepareRenderPassAsync("political")) return false;
+    const definitions = getIdleRenderPassDefinitions()
+      .filter(([passName]) => !requestedPassNames || requestedPassNames.has(passName));
+    const startedAt = nowMs();
+    for (let index = 0; index < definitions.length; index += 1) {
+      const [passName, drawFn] = definitions[index];
+      if (prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache) === false) return false;
+      if (index < definitions.length - 1 && Number.isFinite(timings[passName])
+        && canYieldRenderPassWork() && nowMs() - startedAt >= 8) {
+        requestRenderContinuation("exact-pass-continuation");
+        return false;
+      }
+    }
     if (Number.isFinite(timings.contextBase) || Number.isFinite(timings.contextScenario)) {
       timings.context =
         Math.max(0, Number(timings.contextBase || 0))
         + Math.max(0, Number(timings.contextScenario || 0));
     }
     detectContextScenarioReasonMismatch({ cache, renderPerf: state.renderPerfMetrics || {} });
+    return true;
+  }
+
+  function ensureTransformedPassCoverage(timings, passNames) {
+    const transform = state.zoomTransform || globalThis.d3.zoomIdentity;
+    const cache = getRenderPassCacheState();
+    const requested = new Set(passNames);
+    const dpr = Math.max(1, Number(state.dpr || 1));
+    const width = Math.floor(state.width * dpr) / dpr;
+    const height = Math.floor(state.height * dpr) / dpr;
+    const exhausted = getIdleRenderPassDefinitions().filter(([passName]) => requested.has(passName)
+      && cache.canvases[passName] && getPassReferenceTransform(passName)
+      && !coversViewport(getPassCoverage(passName, transform), width, height));
+    // Settling may reuse dirty passes, but it must never publish their uncovered
+    // edges. Exact preparation owns pending data/color changes.
+    if (exhausted.some(([passName]) => cache.dirty[passName])) return false;
+    // Prepare the expensive fine geometry without modifying any pass canvas.
+    // The worker requests another frame when ready; input can keep coalescing.
+    if (exhausted.some(([passName]) => prepareRenderPassAsync(passName))) return false;
+    const startedAt = nowMs();
+    for (let index = 0; index < exhausted.length; index += 1) {
+      const [passName, drawFn] = exhausted[index];
+      // Refill only the exhausted pass. Other pass canvases retain their real
+      // painted margins; the compositor publishes the complete buffer atomically.
+      renderPassToCache(passName, drawFn, transform, timings);
+      recordRenderPerfMetric("interactionCoverageRefresh", 0, { passName });
+      if (index < exhausted.length - 1 && canYieldRenderPassWork() && nowMs() - startedAt >= 8) {
+        requestRenderContinuation("coverage-pass-continuation");
+        return false;
+      }
+    }
+    return true;
   }
 
   return {
+    ensureTransformedPassCoverage,
     getIdleRenderPassDefinitions,
     prepareIdleRenderPassDefinition,
     ensureIdleRenderPasses,

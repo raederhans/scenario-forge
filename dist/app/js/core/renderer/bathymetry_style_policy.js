@@ -21,6 +21,12 @@ const BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_END_ZOOM = 3.0;
 const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM = 2.4;
 const BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_END_ZOOM = 3.4;
 const BATHYMETRY_MAX_REFERENCE_DEPTH_M = 6000;
+const BATHYMETRY_DEPTH_STOPS = Object.freeze([
+  [0, 0], [50, 0.14], [100, 0.25], [200, 0.38],
+  [500, 0.50], [1000, 0.61], [2000, 0.73], [4000, 0.89], [6000, 1],
+]);
+const BATHYMETRY_BAND_ZOOM_FLOOR = 0.72;
+const BATHYMETRY_SCENARIO_CONTOUR_ZOOM_FLOOR = 0.45;
 
 // Owns bathymetry style policy decisions; inputs remain live.
 export function createBathymetryStylePolicy(runtimeState, {
@@ -33,6 +39,11 @@ export function createBathymetryStylePolicy(runtimeState, {
   parseCanvasColorChannels,
   toRgbaString,
 }) {
+  // Decoded bathymetry collections are replaced, not edited in place. Track the
+  // features array as well as its wrapper so a replacement invalidates results.
+  const sourceCollections = new WeakMap();
+  const sortedCollections = new WeakMap();
+
   function getBathymetryFeatureDepthMax(feature) {
     const rawValue = Number(
       feature?.properties?.depth_max_m ??
@@ -70,9 +81,8 @@ export function createBathymetryStylePolicy(runtimeState, {
 
   function getBathymetryVisualModifiers(feature) {
     const source = String(feature?.properties?._bathymetrySource || "").trim().toLowerCase();
-    const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
     const depthMax = getBathymetryFeatureDepthMax(feature);
-    if (source !== "scenario" || !isAtlantropaBathymetryFeature(feature)) {
+    if (source !== "scenario") {
       return {
         bandBrightness: 1,
         bandAlpha: 1,
@@ -81,47 +91,51 @@ export function createBathymetryStylePolicy(runtimeState, {
       };
     }
 
-    if (mode === "synthetic") {
-      const shallowScale = depthMax <= 150 ? 0.92 : 1;
-      return {
-        bandBrightness: 0.7 * shallowScale,
-        bandAlpha: 0.62 * shallowScale,
-        contourBrightness: 0.64 * shallowScale,
-        contourAlpha: 0.56 * shallowScale,
-      };
-    }
-
-    const shallowScale = depthMax <= 150 ? 0.95 : 1;
+    // Scenario depths are schematic geometry, including "observed" TNO polygons.
+    const shallowScale = depthMax <= 150 ? 0.92 : 1;
     return {
-      bandBrightness: 0.88 * shallowScale,
-      bandAlpha: 0.8 * shallowScale,
-      contourBrightness: 0.86 * shallowScale,
-      contourAlpha: 0.8 * shallowScale,
+      bandBrightness: 0.76 * shallowScale,
+      bandAlpha: 0.72 * shallowScale,
+      contourBrightness: 0.72 * shallowScale,
+      contourAlpha: 0.62 * shallowScale,
     };
+  }
+
+  function getBathymetryDepthTone(depth, oceanStyle) {
+    const boundedDepth = clamp(depth, 0, BATHYMETRY_MAX_REFERENCE_DEPTH_M);
+    const discrete = oceanStyle.bathymetryProfile?.paletteMode === "discrete"
+      || (oceanStyle.bathymetryProfile?.paletteMode == null && oceanStyle.preset === "bathymetry_contours");
+    let index = BATHYMETRY_DEPTH_STOPS.findIndex(([stop]) => stop >= boundedDepth);
+    if (index < 0) index = BATHYMETRY_DEPTH_STOPS.length - 1;
+    const [endDepth, endTone] = BATHYMETRY_DEPTH_STOPS[index];
+    const [startDepth, startTone] = BATHYMETRY_DEPTH_STOPS[Math.max(0, index - 1)];
+    const tone = discrete || endDepth === startDepth
+      ? endTone
+      : startTone + (endTone - startTone) * (boundedDepth - startDepth) / (endDepth - startDepth);
+    const scale = clamp(Number(oceanStyle.scale) || 1, 0.6, 2.4);
+    return clamp(0.5 + (tone - 0.5) * scale, 0, 1);
+  }
+
+  function getBathymetryPaletteRgb(baseRgb, tone) {
+    const baseLuminance = (0.2126 * baseRgb.r + 0.7152 * baseRgb.g + 0.0722 * baseRgb.b) / 255;
+    const shallowRgb = interpolateRgbChannels(baseRgb, { r: 225, g: 243, b: 250 }, baseLuminance < 0.4 ? 0.42 : 0.36);
+    const deepRgb = interpolateRgbChannels(baseRgb, { r: 9, g: 37, b: 68 }, baseLuminance < 0.4 ? 0.64 : 0.86);
+    return interpolateRgbChannels(shallowRgb, deepRgb, tone);
   }
 
   function getBathymetryBandFillStyle(feature, oceanStyle) {
     const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
     const baseRgb = getBathymetryBaseRgb();
-    const shallowRgb = interpolateRgbChannels(baseRgb, { r: 226, g: 242, b: 255 }, 0.88);
-    const deepRgb = interpolateRgbChannels(baseRgb, { r: 12, g: 47, b: 86 }, 0.78);
-    const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
-    const scaledDepthRatio = clamp(
-      Math.pow(clamp(depthRatioRaw, 0, 1), 1 / Math.max(0.45, oceanStyle.scale)),
-      0,
-      1
-    );
+    const depthTone = getBathymetryDepthTone(getBathymetryFeatureDepthMax(feature), oceanStyle);
     const visualModifiers = getBathymetryVisualModifiers(feature);
     const fillRgb = interpolateRgbChannels(
       baseRgb,
-      interpolateRgbChannels(shallowRgb, deepRgb, scaledDepthRatio),
+      getBathymetryPaletteRgb(baseRgb, depthTone),
       visualModifiers.bandBrightness
     );
-    const alphaBase = profile?.bandAlphaBase ?? 0.42;
+    const alphaBase = profile?.bandAlphaBase ?? 0.64;
     const alpha = clamp(
-      oceanStyle.opacity
-        * (alphaBase + scaledDepthRatio * 0.2 + (1 - scaledDepthRatio) * 0.1 + oceanStyle.contourStrength * 0.1)
-        * visualModifiers.bandAlpha,
+      oceanStyle.opacity * alphaBase * visualModifiers.bandAlpha,
       0,
       0.96
     );
@@ -131,22 +145,16 @@ export function createBathymetryStylePolicy(runtimeState, {
   function getBathymetryContourStrokeStyle(feature, oceanStyle) {
     const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
     const baseRgb = getBathymetryBaseRgb();
-    const depthRatioRaw = getBathymetryFeatureDepthMax(feature) / BATHYMETRY_MAX_REFERENCE_DEPTH_M;
-    const scaledDepthRatio = clamp(depthRatioRaw, 0, 1);
+    const depthTone = getBathymetryDepthTone(getBathymetryFeatureDepthMax(feature), oceanStyle);
     const visualModifiers = getBathymetryVisualModifiers(feature);
     const strokeRgb = interpolateRgbChannels(
       baseRgb,
-      interpolateRgbChannels(
-        { r: 204, g: 228, b: 246 },
-        { r: 58, g: 101, b: 144 },
-        scaledDepthRatio
-      ),
+      getBathymetryPaletteRgb(baseRgb, depthTone),
       visualModifiers.contourBrightness
     );
-    const alphaBase = profile?.contourAlphaBase ?? 0.28;
+    const alphaBase = profile?.contourAlphaBase ?? 0.4;
     const alpha = clamp(
-      oceanStyle.opacity
-        * (alphaBase + oceanStyle.contourStrength * 0.46 + scaledDepthRatio * 0.08)
+      oceanStyle.opacity * alphaBase * clamp(Number(oceanStyle.contourStrength) || 0, 0, 1)
         * visualModifiers.contourAlpha,
       0,
       0.92
@@ -156,7 +164,11 @@ export function createBathymetryStylePolicy(runtimeState, {
 
   function sortBathymetryFeaturesForFill(collection) {
     if (!Array.isArray(collection?.features)) return [];
-    return [...collection.features].sort((a, b) => getBathymetryFeatureDepthMax(b) - getBathymetryFeatureDepthMax(a));
+    const cached = sortedCollections.get(collection);
+    if (cached?.features === collection.features) return cached.sorted;
+    const sorted = [...collection.features].sort((a, b) => getBathymetryFeatureDepthMax(b) - getBathymetryFeatureDepthMax(a));
+    sortedCollections.set(collection, { features: collection.features, sorted });
+    return sorted;
   }
 
   function getBathymetryTuningConfig() {
@@ -217,12 +229,12 @@ export function createBathymetryStylePolicy(runtimeState, {
     const tuning = getBathymetryTuningConfig();
     const depthMax = getBathymetryFeatureDepthMax(feature);
     if (depthMax <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
-      return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM, tuning.shallowBandFadeEndZoom) };
+      return { alpha: Math.max(BATHYMETRY_BAND_ZOOM_FLOOR, getZoomFadeFactor(k, BATHYMETRY_BAND_SHALLOW_FADE_START_ZOOM, tuning.shallowBandFadeEndZoom)) };
     }
     if (depthMax <= BATHYMETRY_MID_DEPTH_MAX_M) {
-      return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_MID_FADE_START_ZOOM, tuning.midBandFadeEndZoom) };
+      return { alpha: Math.max(BATHYMETRY_BAND_ZOOM_FLOOR, getZoomFadeFactor(k, BATHYMETRY_BAND_MID_FADE_START_ZOOM, tuning.midBandFadeEndZoom)) };
     }
-    return { alpha: getZoomFadeFactor(k, BATHYMETRY_BAND_DEEP_FADE_START_ZOOM, tuning.deepBandFadeEndZoom) };
+    return { alpha: Math.max(BATHYMETRY_BAND_ZOOM_FLOOR, getZoomFadeFactor(k, BATHYMETRY_BAND_DEEP_FADE_START_ZOOM, tuning.deepBandFadeEndZoom)) };
   }
 
   function getBathymetryContourVisibilityConfig(feature, k) {
@@ -232,22 +244,22 @@ export function createBathymetryStylePolicy(runtimeState, {
       return { alpha: 1 };
     }
     const mode = String(feature?.properties?.bathymetry_mode || "").trim().toLowerCase();
-    if (mode === "synthetic") {
+    if (mode === "synthetic" || getBathymetryFeatureDepthMax(feature) > BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
       return {
-        alpha: getZoomFadeFactor(
+        alpha: Math.max(BATHYMETRY_SCENARIO_CONTOUR_ZOOM_FLOOR, getZoomFadeFactor(
           k,
           BATHYMETRY_SCENARIO_SYNTHETIC_CONTOUR_FADE_START_ZOOM,
           tuning.scenarioSyntheticContourFadeEndZoom
-        ),
+        )),
       };
     }
     if (getBathymetryFeatureDepthMax(feature) <= BATHYMETRY_SHALLOW_DEPTH_MAX_M) {
       return {
-        alpha: getZoomFadeFactor(
+        alpha: Math.max(BATHYMETRY_SCENARIO_CONTOUR_ZOOM_FLOOR, getZoomFadeFactor(
           k,
           BATHYMETRY_SCENARIO_SHALLOW_CONTOUR_FADE_START_ZOOM,
           tuning.scenarioShallowContourFadeEndZoom
-        ),
+        )),
       };
     }
     return { alpha: 1 };
@@ -255,9 +267,17 @@ export function createBathymetryStylePolicy(runtimeState, {
 
   function getBathymetryCollectionBySource(collection, source) {
     if (!Array.isArray(collection?.features)) return null;
-    return buildBathymetryFeatureCollection(
-      collection.features.filter((feature) => String(feature?.properties?._bathymetrySource || "") === source)
-    );
+    let cached = sourceCollections.get(collection);
+    if (!cached || cached.features !== collection.features) {
+      cached = { features: collection.features, bySource: new Map() };
+      sourceCollections.set(collection, cached);
+    }
+    if (!cached.bySource.has(source)) {
+      cached.bySource.set(source, buildBathymetryFeatureCollection(
+        collection.features.filter((feature) => String(feature?.properties?._bathymetrySource || "") === source)
+      ));
+    }
+    return cached.bySource.get(source);
   }
 
   function getScenarioCoastalAccentLineWidth(k, { interactive = false, overlay = false } = {}) {

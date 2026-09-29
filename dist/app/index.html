@@ -189,6 +189,10 @@
                         <input id="oceanFillColor" type="color" value="#aadaff" class="color-input" />
                       </div>
                       <label class="toggle-label">
+                        <input id="oceanRegionNamesToggle" type="checkbox" class="checkbox-input" />
+                        <span data-i18n="Show Sea Names">Show Sea Names</span>
+                      </label>
+                      <label class="toggle-label">
                         <input id="lakeLinkToOcean" type="checkbox" class="checkbox-input" checked />
                         <span id="lblLakeLinkToOcean" data-i18n="Link Lakes To Ocean">Link Lakes To Ocean</span>
                       </label>
@@ -196,6 +200,10 @@
                         <label id="lblLakeFillColor" class="range-label" for="lakeFillColor" data-i18n="Lake Fill Color">Lake Fill Color</label>
                         <input id="lakeFillColor" type="color" value="#aadaff" class="color-input" />
                       </div>
+                      <label class="toggle-label">
+                        <input id="lake-outline-toggle" type="checkbox" class="checkbox-input" checked />
+                        <span data-i18n="Large Lake Outlines">Large Lake Outlines</span>
+                      </label>
                       <div id="oceanCoastalAccentRow" class="space-y-2 hidden">
                         <label class="toggle-label">
                           <input id="oceanCoastalAccentToggle" type="checkbox" class="checkbox-input" checked />
@@ -222,29 +230,45 @@
                           <option id="optOceanBathymetryContours" value="bathymetry_contours" disabled>Bathymetry Contours</option>
                         </select>
                       </div>
+                      <p class="sidebar-tool-hint" data-i18n="Global oceans · raster-derived bathymetry">Global oceans · raster-derived bathymetry</p>
+                      <p class="sidebar-tool-hint" data-i18n="Scenario depth is schematic">Scenario depth is schematic</p>
+                      <details class="appearance-mini-section appearance-mini-section-subtle">
+                        <summary class="section-header" data-i18n="Depth legend and sources">Depth legend and sources</summary>
+                        <div class="sidebar-tool-hint mt-2">
+                          <p data-i18n="Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.">Regional bathymetry is terrain-derived. Areas without data keep the base ocean color.</p>
+                          <p data-i18n="Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.">Includes the Atlantic, Pacific, Indian, Southern and Arctic oceans and connected marginal seas. Local detail follows the source model.</p>
+                          <p><span data-i18n="Regional depth bins">Regional depth bins</span>:
+                            <span data-i18n="0–200 m shelf">0–200 m shelf</span> ·
+                            <span data-i18n="200–1000 m slope">200–1000 m slope</span> ·
+                            <span data-i18n="1000–4000 m deep">1000–4000 m deep</span> ·
+                            <span data-i18n="4000+ m abyss">4000+ m abyss</span>.
+                          </p>
+                          <p data-i18n="Scenario depth shows relative nearshore and deeper water, not measured meters.">Scenario depth shows relative nearshore and deeper water, not measured meters.</p>
+                        </div>
+                      </details>
                     </div>
                   </section>
 
                   <section class="appearance-control-card" aria-labelledby="lblOceanTextureCard">
-                    <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Texture Tuning">Texture Tuning</h3>
+                    <h3 id="lblOceanTextureCard" class="appearance-control-card-title" data-i18n="Bathymetry tuning">Bathymetry tuning</h3>
                     <div class="appearance-control-card-stack">
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Opacity</label>
+                          <label id="lblOceanOpacity" class="range-label" for="oceanTextureOpacity">Bathymetry opacity</label>
                           <span id="oceanTextureOpacityValue" class="range-value">72%</span>
                         </div>
                         <input id="oceanTextureOpacity" type="range" min="0" max="100" value="72" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Scale</label>
+                          <label id="lblOceanScale" class="range-label" for="oceanTextureScale">Depth contrast</label>
                           <span id="oceanTextureScaleValue" class="range-value">1.00x</span>
                         </div>
                         <input id="oceanTextureScale" type="range" min="60" max="240" step="1" value="100" class="range-input" />
                       </div>
                       <div>
                         <div class="range-row">
-                          <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Contour Strength</label>
+                          <label id="lblOceanContourStrength" class="range-label" for="oceanContourStrength">Bathymetry contour strength</label>
                           <span id="oceanContourStrengthValue" class="range-value">75%</span>
                         </div>
                         <input id="oceanContourStrength" type="range" min="0" max="100" value="75" class="range-input" />
@@ -293,7 +317,7 @@
                     <summary id="lblOceanBathymetryDebug" class="section-header">Bathymetry Debug</summary>
                     <div class="space-y-3 mt-3">
                       <p id="oceanBathymetryDebugHint" class="sidebar-tool-hint">
-                        Advanced high-zoom tuning for nearshore fill and scenario contour exit thresholds.
+                        Data source and loaded feature counts.
                       </p>
                       <div>
                         <div class="range-row">
@@ -309,35 +333,35 @@
                           <span id="oceanBathymetryContoursValue" class="range-value">0</span>
                         </div>
                       </div>
-                      <div>
+                      <div hidden>
                         <div class="range-row">
                           <label id="lblOceanShallowFadeEndZoom" class="range-label" for="oceanShallowFadeEndZoom">Nearshore Fill Exit</label>
                           <span id="oceanShallowFadeEndZoomValue" class="range-value">2.80x</span>
                         </div>
                         <input id="oceanShallowFadeEndZoom" type="range" min="210" max="480" step="1" value="280" class="range-input" />
                       </div>
-                      <div>
+                      <div hidden>
                         <div class="range-row">
                           <label id="lblOceanMidFadeEndZoom" class="range-label" for="oceanMidFadeEndZoom">Mid-depth Fill Exit</label>
                           <span id="oceanMidFadeEndZoomValue" class="range-value">3.40x</span>
                         </div>
                         <input id="oceanMidFadeEndZoom" type="range" min="270" max="520" step="1" value="340" class="range-input" />
                       </div>
-                      <div>
+                      <div hidden>
                         <div class="range-row">
                           <label id="lblOceanDeepFadeEndZoom" class="range-label" for="oceanDeepFadeEndZoom">Deep Fill Exit</label>
                           <span id="oceanDeepFadeEndZoomValue" class="range-value">4.20x</span>
                         </div>
                         <input id="oceanDeepFadeEndZoom" type="range" min="330" max="600" step="1" value="420" class="range-input" />
                       </div>
-                      <div>
+                      <div hidden>
                         <div class="range-row">
                           <label id="lblOceanScenarioSyntheticContourFadeEndZoom" class="range-label" for="oceanScenarioSyntheticContourFadeEndZoom">Synthetic Contour Exit</label>
                           <span id="oceanScenarioSyntheticContourFadeEndZoomValue" class="range-value">3.00x</span>
                         </div>
                         <input id="oceanScenarioSyntheticContourFadeEndZoom" type="range" min="210" max="460" step="1" value="300" class="range-input" />
                       </div>
-                      <div>
+                      <div hidden>
                         <div class="range-row">
                           <label id="lblOceanScenarioShallowContourFadeEndZoom" class="range-label" for="oceanScenarioShallowContourFadeEndZoom">Shallow Scenario Contour Exit</label>
                           <span id="oceanScenarioShallowContourFadeEndZoomValue" class="range-value">3.40x</span>
@@ -357,6 +381,14 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header">Borders</h2>
+                <div class="border-control-row mt-3">
+                  <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
+                  <select id="displayQuality" class="select-input">
+                    <option value="high" data-i18n="High clarity">High clarity</option>
+                    <option value="balanced" data-i18n="Balanced quality">Balanced quality</option>
+                    <option value="performance" data-i18n="Performance priority">Performance priority</option>
+                  </select>
+                </div>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">
                     <summary id="lblInternalBorders" class="section-header">Internal Borders</summary>
@@ -389,9 +421,13 @@
                   <details class="appearance-mini-section">
                     <summary id="lblEmpireBorders" class="section-header">Country Borders</summary>
                     <div class="border-control-body mt-3">
+                      <label class="toggle-label">
+                        <input id="politicalBorderToggle" type="checkbox" class="checkbox-input" />
+                        <span data-i18n="Show political borders">Show political borders</span>
+                      </label>
                       <div class="border-control-row">
                         <label class="range-label" for="empireBorderColor" data-i18n="Color">Color</label>
-                        <input id="empireBorderColor" type="color" value="#000000" class="color-input" />
+                        <input id="empireBorderColor" type="color" value="#4b5563" class="color-input" />
                       </div>
                       <div>
                         <div class="range-row">
@@ -403,9 +439,9 @@
                       <div>
                         <div class="range-row">
                           <label class="range-label" for="empireBorderWidth" data-i18n="Width">Width</label>
-                          <span id="empireBorderWidthValue" class="range-value">1.0</span>
+                          <span id="empireBorderWidthValue" class="range-value">1.2</span>
                         </div>
-                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.0" class="range-input" />
+                        <input id="empireBorderWidth" type="range" min="0.01" max="5.0" step="0.01" value="1.2" class="range-input" />
                       </div>
                     </div>
                   </details>
@@ -483,229 +519,268 @@
               >
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="physical regions terrain atlas terrain contours">
-                    <summary id="lblPhysicalPanel" class="section-header">Physical Regions</summary>
-                    <div class="mt-3">
-                      <label class="toggle-label mt-2">
-                        <input id="togglePhysical" type="checkbox" class="checkbox-input" />
-                        <span id="lblPhysicalLayer">Physical Regions</span>
-                      </label>
-                      <div class="ml-5 space-y-2">
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblPhysicalPreset" class="range-label" for="physicalPreset" data-i18n="Visual Preset">Visual Preset</label>
-                          <select id="physicalPreset" class="select-input">
-                            <option id="optPhysicalPresetPoliticalClean" value="political_clean" data-i18n="Political Clean">Political Clean</option>
-                            <option id="optPhysicalPresetBalanced" value="balanced" selected data-i18n="Balanced">Balanced</option>
-                            <option id="optPhysicalPresetTerrainRich" value="terrain_rich" data-i18n="Terrain Rich">Terrain Rich</option>
-                          </select>
-                        </div>
-                        <div class="flex items-center justify-between gap-3">
-                          <label id="lblPhysicalMode" class="range-label" for="physicalMode">Mode</label>
-                          <select id="physicalMode" class="select-input">
-                            <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected>Atlas + Contours</option>
-                            <option id="optPhysicalModeAtlasOnly" value="atlas_only">Atlas Only</option>
-                            <option id="optPhysicalModeContoursOnly" value="contours_only">Contours Only</option>
-                          </select>
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
-                            <span id="physicalOpacityValue" class="range-value">50%</span>
-                          </div>
-                          <input id="physicalOpacity" type="range" min="0" max="100" value="50" class="range-input" />
-                        </div>
-                        <div>
-                          <div class="range-row">
-                            <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
-                          </div>
-                          <select id="physicalBlendMode" class="select-input mt-2">
-                            <option id="optPhysicalBlendMultiply" value="multiply">Multiply</option>
-                            <option id="optPhysicalBlendSoftLight" value="soft-light">Soft Light</option>
-                            <option id="optPhysicalBlendOverlay" value="overlay">Overlay</option>
-                            <option id="optPhysicalBlendNormal" value="source-over" selected>Normal</option>
-                          </select>
-                        </div>
-                        <div class="appearance-prop-group">
-                          <h3 id="lblPhysicalIntensityFieldPanel" class="appearance-prop-heading">Intensity Field</h3>
-                          <div class="space-y-2 mt-2">
-                            <div class="flex items-center gap-3">
-                              <label class="toggle-label">
-                                <input id="physicalIntensityFieldChannelAtlas" name="physicalIntensityFieldChannel" type="radio" value="physicalAtlas" checked />
-                                <span id="lblPhysicalIntensityFieldChannelAtlas" data-i18n="Atlas">Atlas</span>
-                              </label>
-                              <label class="toggle-label">
-                                <input id="physicalIntensityFieldChannelContour" name="physicalIntensityFieldChannel" type="radio" value="physicalContour" />
-                                <span id="lblPhysicalIntensityFieldChannelContour" data-i18n="Contour">Contour</span>
-                              </label>
-                            </div>
-                            <label class="toggle-label">
-                              <input id="physicalIntensityFieldEnabled" type="checkbox" class="checkbox-input" />
-                              <span id="lblPhysicalIntensityFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
-                            </label>
-                            <div class="flex items-center justify-between gap-2">
-                              <button id="physicalIntensityFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
-                              <button id="physicalIntensityFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
-                              <button id="physicalIntensityFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
-                              <button id="physicalIntensityFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
-                            </div>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblPhysicalIntensityFieldWeight" class="range-label" for="physicalIntensityFieldWeight" data-i18n="Strength">Strength</label>
-                                <span id="physicalIntensityFieldWeightValue" class="range-value">100%</span>
-                              </div>
-                              <input id="physicalIntensityFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
-                            </div>
-                            <div>
-                              <div class="range-row">
-                                <label id="lblPhysicalIntensityFieldRadius" class="range-label" for="physicalIntensityFieldRadius" data-i18n="Radius">Radius</label>
-                                <span id="physicalIntensityFieldRadiusValue" class="range-value"></span>
-                              </div>
-                              <input id="physicalIntensityFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
-                            </div>
-                            <div class="flex items-center justify-between gap-2">
-                              <button id="physicalIntensityFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
-                            </div>
-                            <div class="range-row">
-                              <span id="lblPhysicalIntensityFieldPointCount" class="range-label" data-i18n="Points">Points</span>
-                              <span id="physicalIntensityFieldPointCount" class="range-value">0</span>
-                            </div>
-                            <div id="physicalIntensityFieldPointList" class="space-y-2"></div>
-                          </div>
-                        </div>
-                        <div class="ml-5 space-y-3">
-                          <div class="appearance-prop-group">
-                            <h3 id="lblTerrainAtlasPanel" class="appearance-prop-heading">Terrain Atlas</h3>
-                            <div class="space-y-2 mt-2">
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalAtlasIntensity" class="range-label" for="physicalAtlasIntensity">Atlas Intensity</label>
-                                  <span id="physicalAtlasIntensityValue" class="range-value">90%</span>
-                                </div>
-                                <input id="physicalAtlasIntensity" type="range" min="20" max="140" value="90" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalRainforestEmphasis" class="range-label" for="physicalRainforestEmphasis">Rainforest Emphasis</label>
-                                  <span id="physicalRainforestEmphasisValue" class="range-value">72%</span>
-                                </div>
-                                <input id="physicalRainforestEmphasis" type="range" min="0" max="100" value="72" class="range-input" />
-                              </div>
-                              <div class="space-y-2 pt-1">
-                                <label class="toggle-label">
-                                  <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassMountainHills" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassBadlands" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span>
-                                </label>
-                                <label class="toggle-label physical-atlas-group-start">
-                                  <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassBasin" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span>
-                                </label>
-                                <label class="toggle-label physical-atlas-group-start">
-                                  <input id="physicalClassForestTemperate" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassForestTemperate" data-i18n="Temperate Forest">Temperate Forest</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassRainforestTropical" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassGrassland" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span>
-                                </label>
-                                <label class="toggle-label">
-                                  <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked />
-                                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span>
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="appearance-prop-group">
-                            <h3 id="lblTerrainContoursPanel" class="appearance-prop-heading">Terrain Contours</h3>
-                            <div class="space-y-2 mt-2">
-                              <label class="toggle-label mt-1">
-                                <input id="physicalMinorContours" type="checkbox" class="checkbox-input" checked />
-                                <span id="lblPhysicalMinorContours">Show Minor Contours</span>
-                              </label>
-                              <div class="flex items-center justify-between gap-3">
-                                <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
-                                <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
-                                  <span id="physicalContourOpacityValue" class="range-value">34%</span>
-                                </div>
-                                <input id="physicalContourOpacity" type="range" min="0" max="100" value="34" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth">Major Width</label>
-                                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
-                                </div>
-                                <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.05" value="0.80" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth">Minor Width</label>
-                                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
-                                </div>
-                                <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.05" value="0.45" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMajorInterval" class="range-label" for="physicalContourMajorInterval">Major Interval (m)</label>
-                                  <span id="physicalContourMajorIntervalValue" class="range-value">500</span>
-                                </div>
-                                <input id="physicalContourMajorInterval" type="range" min="500" max="2000" step="500" value="500" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval">Minor Interval (m)</label>
-                                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
-                                </div>
-                                <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Low-Relief Cutoff (m)">Major Low-Relief Cutoff (m)</label>
-                                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
-                                </div>
-                                <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="50" value="200" class="range-input" />
-                              </div>
-                              <div>
-                                <div class="range-row">
-                                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Low-Relief Cutoff (m)">Minor Low-Relief Cutoff (m)</label>
-                                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
-                                </div>
-                                <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="50" value="280" class="range-input" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <summary id="lblPhysicalPanel" class="section-header">Physical Regions</summary>
+                  <div class="physical-panel-body">
+                  <label class="toggle-label mt-2">
+                  <input id="togglePhysical" type="checkbox" class="checkbox-input" />
+                  <span id="lblPhysicalLayer">Physical Regions</span>
+                  </label>
+                  <div class="physical-basic-controls">
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalPreset" class="range-label" for="physicalPreset" data-i18n="Visual Preset">Visual Preset</label>
+                  <select id="physicalPreset" class="select-input">
+                  <option id="optPhysicalPresetPoliticalClean" value="political_clean" data-i18n="Political Clean">Political Clean</option>
+                  <option id="optPhysicalPresetBalanced" value="balanced" selected data-i18n="Balanced">Balanced</option>
+                  <option id="optPhysicalPresetTerrainRich" value="terrain_rich" data-i18n="Terrain Rich">Terrain Rich</option>
+                  </select>
+                  </div>
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalMode" class="range-label" for="physicalMode">Mode</label>
+                  <select id="physicalMode" class="select-input">
+                  <option id="optPhysicalModeAtlasContours" value="atlas_and_contours" selected>Atlas + Contours</option>
+                  <option id="optPhysicalModeAtlasOnly" value="atlas_only">Atlas Only</option>
+                  <option id="optPhysicalModeContoursOnly" value="contours_only">Contours Only</option>
+                  </select>
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalOpacity" class="range-label" for="physicalOpacity">Opacity</label>
+                  <span id="physicalOpacityValue" class="range-value">50%</span>
+                  </div>
+                  <input id="physicalOpacity" type="range" min="0" max="100" value="50" class="range-input" />
+                  </div>
+                  </div>
+                  <p id="physicalPresetHint" class="physical-hint">
+                  </p>
+                  <details id="physicalAtlasSection" class="physical-disclosure" >
+                  <summary id="lblTerrainAtlasPanel" data-i18n="Terrain Atlas">Terrain Atlas</summary>
+                  <div class="physical-section-body">
+                  <p class="physical-hint" data-i18n="Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.">Alps land cover detail at 400% zoom; 2019 reference, overview elsewhere.</p>
+                  <div>
+                  <div class="range-row">
+                  <label class="range-label" for="physicalLandformIntensity" data-i18n="Landform strength">Landform strength</label>
+                  <span id="physicalLandformIntensityValue" class="range-value">100%</span>
+                  </div>
+                  <input id="physicalLandformIntensity" type="range" min="0" max="200" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label class="range-label" for="physicalLandcoverIntensity" data-i18n="Land cover strength">Land cover strength</label>
+                  <span id="physicalLandcoverIntensityValue" class="range-value">100%</span>
+                  </div>
+                  <input id="physicalLandcoverIntensity" type="range" min="0" max="200" value="100" class="range-input" />
+                  </div>
+                  <label class="toggle-label"><input id="physicalRegionLabels" type="checkbox" class="checkbox-input" /><span data-i18n="Physical region names">Physical region names</span></label>
+                  <div>
+                  <div class="range-row">
+                  <label class="range-label" for="physicalHillshadeOpacity" data-i18n="Alps DEM shading">Alps DEM shading</label>
+                  <span id="physicalHillshadeOpacityValue" class="range-value">0%</span>
+                  </div>
+                  <input id="physicalHillshadeOpacity" type="range" min="0" max="30" value="0" class="range-input" />
+                  <p class="physical-hint" data-i18n="Names from 200% zoom; DEM shading from 400%. Current geography reference.">Names from 200% zoom; DEM shading from 400%. Current geography reference.</p>
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalRainforestEmphasis" class="range-label" for="physicalRainforestEmphasis">Rainforest Emphasis</label>
+                  <span id="physicalRainforestEmphasisValue" class="range-value">72%</span>
+                  </div>
+                  <input id="physicalRainforestEmphasis" type="range" min="0" max="100" value="72" class="range-input" />
+                  </div>
+                  <div class="physical-class-list">
+<fieldset id="physicalLandformClasses" class="physical-class-group"><legend data-i18n="Landforms">Landforms</legend>
+                  <label class="toggle-label">
+                  <input id="physicalClassMountain" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassMountain" data-i18n="High Relief Mountains">High Relief Mountains</span><span id="physicalClassMountainCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassMountainHills" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassMountainHills" data-i18n="Mountain Hills">Mountain Hills</span><span id="physicalClassMountainHillsCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassPlateau" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassPlateau" data-i18n="Upland Plateaus">Upland Plateaus</span><span id="physicalClassPlateauCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassBadlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassBadlands" data-i18n="Badlands & Canyon">Badlands &amp; Canyon</span><span id="physicalClassBadlandsCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label physical-atlas-group-start">
+                  <input id="physicalClassPlains" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassPlains" data-i18n="Plains Lowlands">Plains Lowlands</span><span id="physicalClassPlainsCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassBasin" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassBasin" data-i18n="Basins & Valleys">Basins &amp; Valleys</span><span id="physicalClassBasinCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassWetlands" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassWetlands" data-i18n="Wetlands & Delta">Wetlands &amp; Delta</span><span id="physicalClassWetlandsCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  </fieldset><fieldset id="physicalCoverClasses" class="physical-class-group"><legend data-i18n="Land cover">Land cover</legend><label class="toggle-label physical-atlas-group-start">
+                  <input id="physicalClassForestTemperate" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassForestTemperate" data-i18n="Other forests">Other forests</span><span id="physicalClassForestTemperateCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassRainforestTropical" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassRainforestTropical" data-i18n="Tropical Rainforest">Tropical Rainforest</span><span id="physicalClassRainforestTropicalCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassGrassland" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassGrassland" data-i18n="Grassland & Steppe">Grassland &amp; Steppe</span><span id="physicalClassGrasslandCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassDesert" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassDesert" data-i18n="Desert & Bare">Desert &amp; Bare</span><span id="physicalClassDesertCoverage" class="physical-class-coverage"></span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalClassTundra" type="checkbox" class="checkbox-input" checked /><span class="physical-class-swatch" aria-hidden="true"></span>
+                  <span id="lblPhysicalClassTundra" data-i18n="Tundra & Ice">Tundra &amp; Ice</span><span id="physicalClassTundraCoverage" class="physical-class-coverage"></span>
+                  </label></fieldset>
+                  </div>
+                  </div>
+                  </details>
+                  <details id="physicalContourSection" class="physical-disclosure" >
+                  <summary id="lblTerrainContoursPanel" data-i18n="Terrain Contours">Terrain Contours</summary>
+                  <div class="physical-section-body">
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourOpacity" class="range-label" for="physicalContourOpacity">Contour Opacity</label>
+                  <span id="physicalContourOpacityValue" class="range-value">34%</span>
+                  </div>
+                  <input id="physicalContourOpacity" type="range" min="0" max="100" value="34" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorInterval" class="range-label" for="physicalContourMajorInterval">Major Interval (m)</label>
+                  <span id="physicalContourMajorIntervalValue" class="range-value">500</span>
+                  </div>
+                  <input id="physicalContourMajorInterval" type="range" min="500" max="2000" step="500" value="500" class="range-input" />
+                  </div>
+                  <label class="toggle-label mt-1">
+                  <input id="physicalMinorContours" type="checkbox" class="checkbox-input" checked />
+                  <span id="lblPhysicalMinorContours">Show Minor Contours</span>
+                  </label>
+                  <details id="physicalContourAdvanced" class="physical-disclosure" >
+                  <summary id="lblPhysicalContourAdvanced" data-i18n="Advanced contour settings">Advanced contour settings</summary>
+                  <div class="physical-section-body">
+                  <div class="flex items-center justify-between gap-3">
+                  <label id="lblPhysicalContourColor" class="range-label" for="physicalContourColor">Contour Color</label>
+                  <input id="physicalContourColor" type="color" value="#6b5947" class="color-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorWidth" class="range-label" for="physicalContourMajorWidth">Major Width</label>
+                  <span id="physicalContourMajorWidthValue" class="range-value">0.80</span>
+                  </div>
+                  <input id="physicalContourMajorWidth" type="range" min="0.2" max="3.0" step="0.01" value="0.80" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorWidth" class="range-label" for="physicalContourMinorWidth">Minor Width</label>
+                  <span id="physicalContourMinorWidthValue" class="range-value">0.45</span>
+                  </div>
+                  <input id="physicalContourMinorWidth" type="range" min="0.1" max="2.0" step="0.01" value="0.45" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorInterval" class="range-label" for="physicalContourMinorInterval">Minor Interval (m)</label>
+                  <span id="physicalContourMinorIntervalValue" class="range-value">100</span>
+                  </div>
+                  <input id="physicalContourMinorInterval" type="range" min="100" max="1000" step="100" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMajorLowReliefCutoff" class="range-label" for="physicalContourMajorLowReliefCutoff" data-i18n="Major Minimum Elevation (m)">Major Minimum Elevation (m)</label>
+                  <span id="physicalContourMajorLowReliefCutoffValue" class="range-value">200</span>
+                  </div>
+                  <input id="physicalContourMajorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="200" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalContourMinorLowReliefCutoff" class="range-label" for="physicalContourMinorLowReliefCutoff" data-i18n="Minor Minimum Elevation (m)">Minor Minimum Elevation (m)</label>
+                  <span id="physicalContourMinorLowReliefCutoffValue" class="range-value">280</span>
+                  </div>
+                  <input id="physicalContourMinorLowReliefCutoff" type="range" min="0" max="2000" step="10" value="280" class="range-input" />
+                  </div>
+                  </div>
+                  </details>
+                  </div>
+                  </details>
+                  <details id="physicalLocalSection" class="physical-disclosure" >
+                  <summary id="lblPhysicalIntensityFieldPanel" data-i18n="Local adjustments">Local adjustments</summary>
+                  <div class="physical-section-body">
+                  <div class="appearance-prop-group">
+
+                  <div class="space-y-2 mt-2">
+                  <div class="flex items-center gap-3">
+                  <label class="toggle-label">
+                  <input id="physicalIntensityFieldChannelAtlas" name="physicalIntensityFieldChannel" type="radio" value="physicalAtlas" checked />
+                  <span id="lblPhysicalIntensityFieldChannelAtlas" data-i18n="Atlas">Atlas</span>
+                  </label>
+                  <label class="toggle-label">
+                  <input id="physicalIntensityFieldChannelContour" name="physicalIntensityFieldChannel" type="radio" value="physicalContour" />
+                  <span id="lblPhysicalIntensityFieldChannelContour" data-i18n="Contour">Contour</span>
+                  </label>
+                  </div>
+                  <label class="toggle-label">
+                  <input id="physicalIntensityFieldEnabled" type="checkbox" class="checkbox-input" />
+                  <span id="lblPhysicalIntensityFieldEnabled" data-i18n="Enable Channel">Enable Channel</span>
+                  </label>
+                  <div class="physical-tool-actions">
+                  <button id="physicalIntensityFieldToolToggleBtn" type="button" class="sidebar-action-secondary" data-i18n="Enter Tool">Enter Tool</button>
+                  <button id="physicalIntensityFieldPaintBtn" type="button" class="sidebar-action-secondary" data-i18n="Paint">Paint</button>
+                  <button id="physicalIntensityFieldEraseBtn" type="button" class="sidebar-action-secondary" data-i18n="Erase">Erase</button>
+                  <button id="physicalIntensityFieldPointsBtn" type="button" class="sidebar-action-secondary" data-i18n="Points">Points</button>
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalIntensityFieldWeight" class="range-label" for="physicalIntensityFieldWeight" data-i18n="Strength">Strength</label>
+                  <span id="physicalIntensityFieldWeightValue" class="range-value">100%</span>
+                  </div>
+                  <input id="physicalIntensityFieldWeight" type="range" min="0" max="200" value="100" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalIntensityFieldRadius" class="range-label" for="physicalIntensityFieldRadius" data-i18n="Radius">Radius</label>
+                  <span id="physicalIntensityFieldRadiusValue" class="range-value">
+                  </span>
+                  </div>
+                  <input id="physicalIntensityFieldRadius" type="range" min="25" max="3000" step="25" value="300" class="range-input" />
+                  </div>
+                  <div class="physical-tool-actions">
+                  <button id="physicalIntensityFieldClearBtn" type="button" class="sidebar-action-secondary" data-i18n="Clear Channel">Clear Channel</button>
+                  </div>
+                  <div class="range-row">
+                  <span id="lblPhysicalIntensityFieldPointCount" class="range-label" data-i18n="Points">Points</span>
+                  <span id="physicalIntensityFieldPointCount" class="range-value">0</span>
+                  </div>
+                  <div id="physicalIntensityFieldPointList" class="space-y-2">
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                  </details>
+                  <details id="physicalAdvancedSection" class="physical-disclosure" >
+                  <summary id="lblPhysicalAdvanced" data-i18n="Advanced settings">Advanced settings</summary>
+                  <div class="physical-section-body">
+                  <div>
+                  <div class="range-row"><label id="lblPhysicalAtlasIntensity" class="range-label" for="physicalAtlasIntensity">Atlas Intensity</label><span id="physicalAtlasIntensityValue" class="range-value">96%</span></div>
+                  <input id="physicalAtlasIntensity" type="range" min="20" max="140" value="96" class="range-input" />
+                  </div>
+                  <div>
+                  <div class="range-row">
+                  <label id="lblPhysicalBlendMode" class="range-label" for="physicalBlendMode">Blend Mode</label>
+                  </div>
+                  <select id="physicalBlendMode" class="select-input mt-2">
+                  <option id="optPhysicalBlendMultiply" value="multiply">Multiply</option>
+                  <option id="optPhysicalBlendSoftLight" value="soft-light">Soft Light</option>
+                  <option id="optPhysicalBlendOverlay" value="overlay">Overlay</option>
+                  <option id="optPhysicalBlendNormal" value="source-over" selected>Normal</option>
+                  </select>
+                  </div>
+                  </div>
+                  </details>
+                  </div>
                   </details>
 
                   <details class="appearance-mini-section" data-appearance-filter-item data-appearance-filter-label="urban areas">
@@ -2302,13 +2377,6 @@
                     </svg>
                     <span data-i18n="Paint mode color">Color</span>
                   </button>
-                  <button id="paintModePoliticalBtn" type="button" hidden disabled aria-hidden="true" tabindex="-1" class="dock-segment-btn dock-segment-icon-btn hidden" data-paint-mode="sovereignty" aria-label="Political Ownership" data-i18n-aria-label="Political Ownership" title="Political Ownership" data-i18n-title="Political Ownership">
-                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M6 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-                      <path d="M7 5.5h10l-1.8 3L17 11H7" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
-                    </svg>
-                    <span data-i18n="Ownership">Ownership</span>
-                  </button>
                 </div>
               </div>
 
@@ -2457,10 +2525,6 @@
               <div id="countryList" class="country-list inspector-scroll mt-3"></div>
               <div id="countryInspectorDetail" class="inspector-detail-card mt-3">
                 <div id="countryInspectorSelected" class="hidden">
-                  <div class="inspector-detail-actions mt-3">
-                    <button id="countryInspectorSetActive" type="button" class="sidebar-action-primary inspector-detail-primary-btn">Use as Active Owner</button>
-                  </div>
-                  <p id="countryInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
                   <div id="countryInspectorColorRow" class="inspector-color-row mt-3 hidden">
                     <div class="inspector-color-row-main mt-2">
                       <button
@@ -2673,12 +2737,14 @@
                 </div>
                 <div id="waterInspectorSelected" class="hidden">
                   <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
+                  <button id="waterInspectorLocateBtn" type="button" class="sidebar-action-secondary mt-2" data-i18n="Locate on Map">Locate on Map</button>
                   <div id="waterInspectorMetaSection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorMeta" class="sidebar-group-label" data-i18n="Region Details">Region Details</h3>
                     <div id="waterInspectorMetaList" class="inspector-meta-list mt-2"></div>
                   </div>
                   <div id="waterInspectorHierarchySection" class="inspector-detail-section mt-3 hidden">
                     <h3 id="lblWaterInspectorHierarchy" class="sidebar-group-label">Family</h3>
+                    <nav id="waterInspectorBreadcrumb" class="sidebar-tool-hint mt-2" aria-label="Water hierarchy"></nav>
                     <button id="waterInspectorJumpToParentBtn" type="button" class="sidebar-action-secondary mt-2 hidden" data-i18n="Jump To Parent">Jump To Parent</button>
                     <div id="waterInspectorChildrenList" class="inspector-scroll mt-3 hidden"></div>
                   </div>
