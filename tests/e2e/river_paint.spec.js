@@ -43,15 +43,23 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
     restoreProjectImportFields(state, { interactionGranularity: 'subdivision' });
     state.brushModeEnabled = false; history.clearHistory();
     const interaction = d3.select('rect.interaction-layer');
-    const rect = document.getElementById('mapContainer').getBoundingClientRect();
+    const svg = interaction.node().ownerSVGElement;
+    const clickEvidence = [];
     const colors = ['#12ab34', '#bd24ce'];
     for (let i = 0; i < parent.cells.length; i++) {
-      const point = renderer.projectGeoToScreen(...innerPoint(parent.cells[i]));
+      const lonLat = innerPoint(parent.cells[i]);
+      const point = renderer.projectGeoToScreen(...lonLat);
+      // The container has layout/border offsets. Use the actual SVG transform,
+      // exactly inverse to d3.pointer, rather than assuming matching origins.
+      const svgPoint = svg.createSVGPoint(); svgPoint.x = point[0]; svgPoint.y = point[1];
+      const screenPoint = svgPoint.matrixTransform(svg.getScreenCTM());
       setClickSelectedColorState(state, colors[i]);
       await interaction.on('click').call(interaction.node(), {
-        clientX: rect.left + point[0], clientY: rect.top + point[1], detail: 1,
+        clientX: screenPoint.x, clientY: screenPoint.y, detail: 1,
         timeStamp: performance.now(), preventDefault() {}, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false,
       });
+      clickEvidence.push({ expected: parent.cells[i].id, lonLat, screen: [screenPoint.x, screenPoint.y],
+        actualOverrides: { ...state.riverPaint.overrides }, history: state.historyPast.at(-1) });
     }
     const painted = parent.cells.every((c, i) => state.riverPaint.overrides[c.id] === colors[i]);
     const historyCount = state.historyPast.length;
@@ -65,7 +73,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
     const imported = await funnel.importProjectTextThroughFunnel(JSON.stringify(payload), { fileName: 'river-pilot.json' });
     getRiverPaintRuntime(state).assertReadyForExport();
     return { parentCount: pack.parents.length, cellCount: pack.parents.reduce((n, p) => n + p.cells.length, 0),
-      painted, historyCount, undone, redone, schema: payload.schemaVersion,
+      painted, clickEvidence, historyCount, undone, redone, schema: payload.schemaVersion,
       noChildLandIds: sourceIds.every(id => !id.startsWith('river:')), graph,
       referenceUnchanged: referenceBefore === JSON.stringify(getMapDataBoundary(state).reference.getScenarioAssignments()),
       exportedCanvas: !!exportedCanvas?.width, importStatus: imported?.status,

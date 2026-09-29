@@ -3426,6 +3426,7 @@ function getPoliticalPassOrchestratorOwner() {
       buildPoliticalRasterWorkerPacket: buildPoliticalPassWorkerPacket,
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
+      drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
   });
@@ -12390,9 +12391,7 @@ function drawPoliticalFineFeatureLoop({ k, identity, viewport }) {
   return getPoliticalPartialRepaintOwner().drawPoliticalFineFeatureLoop({ k, identity, viewport });
 }
 function drawPoliticalPass(k) {
-  const result = getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);
-  getRiverPaintRenderOwner().draw(k);
-  return result;
+  return getPoliticalPassOrchestratorOwner().drawPoliticalPass(k);
 }
 
 function getScenarioRegionOverlayRenderOwner() {

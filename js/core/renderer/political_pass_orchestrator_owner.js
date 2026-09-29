@@ -100,7 +100,7 @@ export function createPoliticalPassOrchestratorOwner({
     return String(backgroundSummary?.recoveryQuality || resolvePoliticalRecoveryQualityEffect());
   }
 
-  function drawPoliticalPass(k) {
+  function drawBasePoliticalPass(k) {
     if (isHgoRuntimePreviewReady()) {
       recordRenderPerfMetric("drawPoliticalPass", 0, {
         skipped: true,
@@ -229,6 +229,12 @@ export function createPoliticalPassOrchestratorOwner({
       finePoliticalCacheReady: true,
       reason: "fine-feature-loop",
     });
+  }
+
+  function drawPoliticalPass(k) {
+    const result = drawBasePoliticalPass(k);
+    if (result) effects.drawPoliticalPartitions?.(k);
+    return result;
   }
 
   return Object.freeze({ drawPoliticalPass });
