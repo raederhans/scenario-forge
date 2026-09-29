@@ -92,6 +92,10 @@ jobs:
         if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || inputs.profile == 'deploy-minimal'
         run: npm ci
 
+      - name: Validate public sample projects before Pages build
+        if: inputs.profile == 'deploy-minimal' || (inputs.profile == 'pr-fast' && inputs.run-pages-check)
+        run: node --test tests/sample_project_contracts.test.mjs
+
       - name: Explain verification selector
         id: selector
         if: inputs.profile == 'pr-fast'
