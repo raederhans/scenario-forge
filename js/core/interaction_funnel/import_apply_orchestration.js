@@ -66,6 +66,10 @@ export async function prepareImportedProjectState({
     scenarioCountriesByTag: preparedScenario.staged.countryMap,
   } : { activeScenarioId: "", activeScenarioManifest: null, scenarioBaselineOwnersByFeatureId: {},
     scenarioCountriesByTag: {}, scenarioReleasableIndex: null };
+  if (data.riverPaint?.pack && (data.riverPaint.pack.sceneId !== scenarioState.activeScenarioId
+    || data.riverPaint.pack.source.baselineHash !== scenarioState.scenarioBaselineHash)) {
+    throw new Error("River partitions require their exact source baseline; migration is not automatic");
+  }
   debugState.importPhase = "migration";
   const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds(state, preparedScenario);
   let migrationSummary = null;

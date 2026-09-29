@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-09-29T02:43:25.512929+00:00",
   "counts": {
-    "entries": 671,
+    "entries": 672,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -42,6 +42,7 @@
       "quick_fill_china_reference": 1,
       "quick_fill_prefecture_crosswalk": 1,
       "releasable_catalog": 1,
+      "river_partitions": 1,
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
@@ -70,12 +71,12 @@
       "bmp": 1,
       "geojson": 152,
       "javascript": 2,
-      "json": 343,
+      "json": 344,
       "topojson": 173
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 668,
+      "json": 669,
       "module": 2
     }
   },
@@ -904,6 +905,19 @@
       "schemaRef": "schema://json/object/v1",
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.releasable_catalog",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_pilot",
+      "url": "data/river_partitions/modern_world_pilot.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_pilot",
       "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",

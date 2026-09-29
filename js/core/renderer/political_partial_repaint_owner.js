@@ -82,6 +82,9 @@ export function createPoliticalPartialRepaintOwner({
     requireFunction(effects[name], `effects.${name}`),
   ]));
 
+  const drawPartitionForParent = typeof effects.drawPartitionForParent === "function"
+    ? effects.drawPartitionForParent : () => {};
+
   const renderPhaseIdle = String(constants.renderPhaseIdle || "idle");
   const landFillColor = String(constants.landFillColor || "#d8d1bd");
   const partialFeatureThreshold = Number(constants.partialFeatureThreshold || 48);
@@ -526,6 +529,7 @@ export function createPoliticalPartialRepaintOwner({
             transform,
             metricsCollector: partialFeatureMetrics,
           });
+          drawPartitionForParent(feature, transform.k);
         });
       });
     } finally {

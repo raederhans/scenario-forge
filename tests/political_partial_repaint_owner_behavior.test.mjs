@@ -521,3 +521,15 @@ test("owner remains import-free and avoids DOM, globals, and worker singleton st
     assert.equal(source.includes(token), false, token);
   }
 });
+
+test('partial repaint draws bank surfaces inside the existing dirty rectangle after the parent', () => {
+  let h;
+  h = createHarness({ effects: { drawPartitionForParent: (feature, k) => h.events.push(['river-cells', feature.id, k]) } });
+  assert.equal(h.owner.tryPartialPoliticalPassRepaint(h.transform, 'next', {}), true);
+  const river = h.events.findIndex(event => Array.isArray(event) && event[0] === 'river-cells');
+  const fill = h.events.findIndex(event => Array.isArray(event) && event[0] === 'fill');
+  assert.ok(river > fill);
+  assert.ok(h.events.indexOf('clip') < river);
+  assert.ok(h.events.lastIndexOf('context:restore') > river);
+  assert.deepEqual(h.events[river], ['river-cells', 'land-1', 1]);
+});

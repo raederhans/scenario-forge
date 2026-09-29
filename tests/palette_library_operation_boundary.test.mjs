@@ -119,6 +119,7 @@ test("palette facade delegates canonical colors and selection mode to their stat
     new Set([
       "visualOverrides",
       "sovereignBaseColors",
+      "riverPaint", // Whole-parent paint also clears only its child overrides.
     ]),
   );
   const presentationPath = "js/core/state/actions/scenario_presentation_actions.js";

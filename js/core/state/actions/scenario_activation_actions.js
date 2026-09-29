@@ -1,3 +1,4 @@
+import { normalizeRiverPaintState } from "../../river_paint/partition_model.js";
 import { applyFeaturePaintState } from "../color_state.js";
 import { createReadonlyReferenceAssignments } from "../../map_data_boundary.js";
 // Canonical scenario activation state authority.
@@ -135,6 +136,7 @@ export const SCENARIO_ACTIVATION_STATE_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
+  "riverPaint",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",
   "sovereignBaseColors",
@@ -486,6 +488,7 @@ export function captureScenarioActivationState(target) {
 export function commitScenarioActivationState(target, patch) {
   assertStateTarget(target);
   validateCompletePatch(patch);
+  const riverPaint = normalizeRiverPaintState(patch.riverPaint);
   target.activeScenarioId = patch.activeScenarioId;
   target.scenarioBorderMode = patch.scenarioBorderMode;
   target.activeScenarioManifest = patch.activeScenarioManifest;
@@ -538,6 +541,7 @@ export function commitScenarioActivationState(target, patch) {
     createReadonlyReferenceAssignments(patch.sovereigntyByFeatureId);
   target.sovereigntyInitialized = patch.sovereigntyInitialized;
   target.visualOverrides = { ...(patch.visualOverrides || {}) };
+  target.riverPaint = riverPaint;
   target.scenarioGeneratedColorTags =
     Array.isArray(patch.scenarioGeneratedColorTags)
       ? [...patch.scenarioGeneratedColorTags]
@@ -764,6 +768,8 @@ function restoreScenarioActivationBeforeColorDirtyStateFromValidated(
   } else {
     delete target.sovereigntyInitialized;
   }
+  if (presentKeys.has("riverPaint")) target.riverPaint = values.riverPaint;
+  else delete target.riverPaint;
   if (presentKeys.has("visualOverrides")) {
     target.visualOverrides = values.visualOverrides;
   } else {
@@ -831,4 +837,5 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "sovereigntyByFeatureId")) target.sovereigntyByFeatureId = patch.sovereigntyByFeatureId;
   if (Object.hasOwn(patch, "sovereigntyInitialized")) target.sovereigntyInitialized = patch.sovereigntyInitialized;
   if (Object.hasOwn(patch, "visualOverrides")) target.visualOverrides = patch.visualOverrides;
+  if (Object.hasOwn(patch, "riverPaint")) target.riverPaint = patch.riverPaint;
 }

@@ -1,3 +1,4 @@
+import { createDefaultRiverPaintState } from "../js/core/river_paint/partition_model.js";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -49,6 +50,7 @@ const ACTIVATION_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
+  "riverPaint",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",
   "sovereignBaseColors",
@@ -121,7 +123,7 @@ function createAuthorityTarget(keys, absentKey) {
 
 function createAuthorityPatch(keys) {
   return Object.fromEntries(
-    keys.map((key) => [key, { version: `after:${key}` }]),
+    keys.map((key) => [key, key === "riverPaint" ? createDefaultRiverPaintState() : { version: `after:${key}` }]),
   );
 }
 
