@@ -30,19 +30,19 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '22'
-      - name: Apply exact targeted integration corrections
+      - name: Apply reviewed geometry build compatibility guard
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p .runtime/tmp .runtime/reports/generated/river-paint
           python - <<'PY'
           import base64, hashlib, lzma, pathlib, subprocess
-          transfer = pathlib.Path('.codex/river-paint-followup.b64')
+          transfer = pathlib.Path('.codex/river-paint-source-guard.b64')
           if transfer.exists():
               patch = lzma.decompress(base64.b64decode(transfer.read_bytes(), validate=True))
-              if len(patch) != 19114 or hashlib.sha256(patch).hexdigest() != '1f3ca12800bffc03aba9d6c8601bd6ee6e153e483aecc1f6d9d168af2709f006':
-                  raise RuntimeError('Integration patch integrity mismatch')
-              target = pathlib.Path('.runtime/tmp/river-followup.patch')
+              if len(patch) != 11329 or hashlib.sha256(patch).hexdigest() != '684bb904f95f4f6f1289ec41715de23a69e2c0ef69d353a31a252c9c8de3fded':
+                  raise RuntimeError('Source guard integrity mismatch')
+              target = pathlib.Path('.runtime/tmp/river-source-guard.patch')
               target.write_bytes(patch)
               subprocess.run(['git', 'apply', '--check', str(target)], check=True)
               subprocess.run(['git', 'apply', '--index', str(target)], check=True)
@@ -56,7 +56,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           if ! git diff --cached --quiet; then
-            git commit -m 'fix(river-paint): preserve owner boundaries and correct SVG test coordinates'
+            git commit -m 'fix(river-paint): reject regenerated geometry builds with unchanged ownership hashes'
             git push origin HEAD:refs/heads/codex/river-paint-partitions-p0-p2
           fi
           git rev-parse HEAD | tee .runtime/reports/generated/river-paint/implementation-sha.txt
