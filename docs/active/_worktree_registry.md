@@ -588,3 +588,7 @@
 - Scope: Russian Arctic truncation, Norwegian island retention, blank-map polar coverage and interaction, derived scenario assets and precision-water repair.
 - User authorized push/merge and a fast merge path. Primary checkout WIP remains untouched. Keep this worktree for reuse and ignored browser/build evidence; remote PR receipt is authoritative for final merge status.
 - Polar delivery PR: https://github.com/raederhans/scenario-forge/pull/187 . Local integration validation completed; retain checkout and ignored evidence. Final merge receipt is available on the PR.
+
+## Polar sample baseline deployment follow-up 2026-09-29
+
+The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, based on `main@490583b6`. Root owns the scoped sample baseline and early CI gate fix, local publication test server, push/merge and deployment verification. Original polar repair is already merged as PR #187; its first deployment failed. Preserve primary checkout WIP and retain this checkout for evidence/reuse.
