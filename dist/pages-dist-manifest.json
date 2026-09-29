@@ -46302,7 +46302,7 @@
     },
     {
       "path": "assets/hero-blank.svg",
-      "size_bytes": 942197,
+      "size_bytes": 942529,
       "source_kind": "dist"
     },
     {
@@ -46692,7 +46692,7 @@
       {
         "file_count": 315,
         "id": "startup-critical",
-        "size_bytes": 27934910
+        "size_bytes": 27935242
       },
       {
         "file_count": 114,
@@ -67553,7 +67553,7 @@
           },
           {
             "path": "assets/hero-blank.svg",
-            "size_bytes": 942197
+            "size_bytes": 942529
           },
           {
             "path": "assets/hero-hoi4-1936.svg",
@@ -67605,7 +67605,7 @@
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 23008112
+        "size_bytes": 23008444
       },
       {
         "basis": "html-entrypoint",
@@ -69253,7 +69253,7 @@
     {
       "file_count": 59,
       "path": "assets",
-      "size_bytes": 26912055
+      "size_bytes": 26912387
     },
     {
       "file_count": 1,
@@ -69281,5 +69281,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 858609655
+  "total_bytes": 858609987
 }

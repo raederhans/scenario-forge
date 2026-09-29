@@ -587,3 +587,4 @@
 - Managed checkout: `C:/Users/raede/.codex/worktrees/polar-data-repair/mapcreator`; root owns commit, build, push and merge.
 - Scope: Russian Arctic truncation, Norwegian island retention, blank-map polar coverage and interaction, derived scenario assets and precision-water repair.
 - User authorized push/merge and a fast merge path. Primary checkout WIP remains untouched. Keep this worktree for reuse and ignored browser/build evidence; remote PR receipt is authoritative for final merge status.
+- Polar delivery PR: https://github.com/raederhans/scenario-forge/pull/187 . Local integration validation completed; retain checkout and ignored evidence. Final merge receipt is available on the PR.

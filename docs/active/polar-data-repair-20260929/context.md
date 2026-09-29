@@ -46,3 +46,5 @@ Final acceptance: all six strict scenario contracts pass; data catalog 19/19, wa
 工作目录为当前隔离工作树，输出 dist/ 与 data/CATALOG.*；日志 .runtime/tmp/polar-data-repair/integration-*.log。任一步非零停止并定位。保留工作树以复核忽略的浏览器与构建证据，不清理主工作区。
 
 Integration build note: full Pages copy/normalization reached manifest generation, where direct overwrite failed twice with Windows OSError 22. Resumed only manifest generation via a same-directory temporary file and atomic replacement, without changing production builder code. Required dist files and the publication size limit passed: 818.83 MiB. Log: integration-dist-atomic.log. Catalog after latest-main integration has 671 entries.
+
+Integration checks: data health passed. Combined catalog/startup suite ran 83 tests; only two subcases of the hero-output consistency test failed because blank SVG/metadata and TNO metadata still described old geography. Regenerated them with build_hero_scenario_maps, synchronized dist/assets and recomputed dist manifest. The failed test then passed (55.823s); other checks were not rerun. PR: https://github.com/raederhans/scenario-forge/pull/187. Root is the sole owner; no test/server process remains.
