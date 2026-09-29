@@ -1,0 +1,61 @@
+name: River partition development
+
+on:
+  push:
+    branches: [codex/river-paint-partitions-p0-p2]
+    paths: [.github/workflows/river-partition-development.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  source-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Package tracked implementation inputs only
+        shell: bash
+        run: |
+          mkdir -p .runtime/reports/generated/river-paint
+          python - <<'PY'
+          import json, pathlib, subprocess, zipfile
+          root = pathlib.Path('.')
+          paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
+          selected, skipped = [], []
+          total = 0
+          for name in paths:
+              if not name:
+                  continue
+              p = root / name
+              if not p.is_file() or p.is_symlink():
+                  continue
+              source = not name.startswith(('data/', 'assets/', 'vendor/'))
+              data = (name.startswith('data/') and '/' not in name[5:]) or name.startswith('data/scenarios/modern_world/')
+              if not (source or data):
+                  continue
+              size = p.stat().st_size
+              if size > 80_000_000 or total + size > 300_000_000:
+                  skipped.append({'path': name, 'bytes': size})
+                  continue
+              selected.append(name)
+              total += size
+          out = root / '.runtime/reports/generated/river-paint/source-snapshot.zip'
+          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+              for name in selected:
+                  z.write(root / name, name)
+              z.writestr('.runtime/source-snapshot-manifest.json', json.dumps({
+                  'head': subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode().strip(),
+                  'selected': selected, 'skipped': skipped, 'uncompressedBytes': total,
+              }, indent=2))
+          print(json.dumps({'files': len(selected), 'bytes': total, 'zipBytes': out.stat().st_size, 'skipped': skipped}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: river-partition-source-snapshot
+          path: .runtime/reports/generated/river-paint/source-snapshot.zip
+          retention-days: 1
+          if-no-files-found: error
