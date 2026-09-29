@@ -1,62 +1,48 @@
 name: River partition development
-
 on:
   push:
     branches: [codex/river-paint-partitions-p0-p2]
     paths: [.github/workflows/river-partition-development.yml]
-
 permissions:
   contents: read
-
 jobs:
   source-snapshot:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
           fetch-depth: 1
-      - name: Package tracked implementation inputs only
-        shell: bash
+      - name: Package static imports and palette metadata
         run: |
           mkdir -p .runtime/reports/generated/river-paint
           python - <<'PY'
-          import json, pathlib, subprocess, zipfile
-          root = pathlib.Path('.')
-          paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
-          selected, skipped = [], []
-          total = 0
-          suffixes = {'.js', '.mjs', '.cjs', '.ts', '.json', '.html', '.css', '.md', '.py', '.toml', '.yml', '.yaml', '.txt', '.sh', '.svg', '.lock'}
-          for name in paths:
-              if not name:
-                  continue
-              p = root / name
-              if not p.is_file() or p.is_symlink():
-                  continue
-              source = not name.startswith(('data/', 'assets/')) and (p.suffix in suffixes or p.name in {'.gitignore', '.gitattributes'})
-              data = name in {'data/global_rivers.geojson', 'data/runtime_asset_registry.json', 'data/scenarios/index.json'} or name.startswith('data/scenarios/modern_world/')
-              if not (source or data):
-                  continue
-              size = p.stat().st_size
-              if size > 80_000_000 or total + size > 250_000_000:
-                  skipped.append({'path': name, 'bytes': size})
-                  continue
-              selected.append(name)
-              total += size
-          out = root / '.runtime/reports/generated/river-paint/source-snapshot.zip'
-          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED, compresslevel=6) as z:
-              for name in selected:
-                  z.write(root / name, name)
-              z.writestr('.runtime/source-snapshot-manifest.json', json.dumps({
-                  'head': subprocess.check_output(['git', 'rev-parse', 'HEAD']).decode().strip(),
-                  'selected': selected, 'skipped': skipped, 'uncompressedBytes': total,
-              }, indent=2))
-          print(json.dumps({'files': len(selected), 'bytes': total, 'zipBytes': out.stat().st_size, 'skipped': skipped}))
+          import pathlib, re, zipfile, json
+          root = pathlib.Path('.').resolve()
+          selected = set()
+          for source in (root / 'js').rglob('*.js'):
+              text = source.read_text(encoding='utf-8')
+              for match in re.finditer(r'''(?:from\s+|import\s*)["']([^"']+\.json)["']''', text):
+                  p = (source.parent / match.group(1)).resolve()
+                  if p.is_file() and p.is_relative_to(root):
+                      selected.add(p)
+          for family in ['data/city_lights', 'data/palettes', 'data/palette_library', 'assets/icons', 'assets/ui', 'assets/flags']:
+              folder = root / family
+              if folder.is_dir():
+                  selected.update(p for p in folder.rglob('*') if p.is_file() and p.stat().st_size < 2_000_000)
+          out = root / '.runtime/reports/generated/river-paint/static-dependencies.zip'
+          total = sum(p.stat().st_size for p in selected)
+          if total > 100_000_000:
+              raise ValueError(f'Static dependency budget exceeded: {total}')
+          with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
+              for p in sorted(selected):
+                  z.write(p, p.relative_to(root))
+          print(json.dumps({'files': len(selected), 'bytes': total, 'zipBytes': out.stat().st_size}))
           PY
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: river-partition-source-snapshot
-          path: .runtime/reports/generated/river-paint/source-snapshot.zip
+          name: river-partition-static-dependencies
+          path: .runtime/reports/generated/river-paint/static-dependencies.zip
           retention-days: 1
           if-no-files-found: error
