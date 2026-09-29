@@ -6,6 +6,7 @@ import {
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
 import { RENDER_PASS_NAMES, VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
 import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
+import { isPhysicalAtlasDetailScale } from './physical_atlas_lod_policy.js';
 import { getRiverZoomBucket } from './river_layer_render_owner.js';
 
 // Keep pass identities tied to the fields that the pass actually paints.  The
@@ -18,6 +19,8 @@ function getPhysicalBaseStyleSignature(styleConfig) {
     opacity: cfg.opacity,
     atlasOpacity: cfg.atlasOpacity,
     atlasIntensity: cfg.atlasIntensity,
+    landformIntensity: cfg.landformIntensity,
+    landcoverIntensity: cfg.landcoverIntensity,
     atlasClassVisibility: cfg.atlasClassVisibility,
     rainforestEmphasis: cfg.rainforestEmphasis,
     preset: cfg.preset,
@@ -32,6 +35,8 @@ function getPhysicalContourStyleSignature(styleConfig) {
     opacity: cfg.opacity,
     contourColor: cfg.contourColor,
     contourOpacity: cfg.contourOpacity,
+    hillshadeOpacity: cfg.hillshadeOpacity,
+    landformIntensity: cfg.hillshadeOpacity > 0 ? cfg.landformIntensity : undefined,
     contourMajorWidth: cfg.contourMajorWidth,
     contourMinorWidth: cfg.contourMinorWidth,
     contourMajorIntervalM: cfg.contourMajorIntervalM,
@@ -167,6 +172,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `field:${Number(intensityFields.channels.physicalAtlas?.revision || 0)}`,
+        `atlas-detail:${isPhysicalAtlasDetailScale({ zoomTransform: transform }) && !!runtimeState.contextLayerExternalDataByName?.physical_semantics_detail?.features?.length}:${Number(runtimeState.contextLayerRevision || 0)}`,
         stableJson(getPhysicalBaseStyleSignature(runtimeState.styleConfig?.physical || {})),
       ].join("::");
     }
@@ -230,6 +236,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `field:physicalContour:${Number(intensityFields.channels.physicalContour?.revision || 0)}`,
+        `field:physicalShading:${runtimeState.styleConfig?.physical?.hillshadeOpacity > 0 ? Number(intensityFields.channels.physicalAtlas?.revision || 0) : 0}`,
+        `hillshade-scale:${!!runtimeState.showPhysical && runtimeState.styleConfig?.physical?.hillshadeOpacity > 0 && Number(transform?.k || 1) >= 4}`,
         runtimeState.showPhysical && runtimeState.styleConfig?.physical?.mode !== "atlas_only"
           ? `contour-lod:${resolveContourLodRequest({ styleConfig: runtimeState.styleConfig, zoomTransform: transform }).join("|")}`
           : "contour-lod:inactive",
@@ -269,6 +277,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "labels") {
       return [
         transformSignature,
+        `physical-labels:${!!runtimeState.showPhysical}:${!!runtimeState.styleConfig?.physical?.showRegionLabels}:${runtimeState.styleConfig?.physical?.mode}`,
+        stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),

@@ -134,8 +134,7 @@ export function createCityPaintStyleModel(runtimeState, {
     ).trim().toUpperCase();
     if (!countryCode) return null;
     return (
-      getSafeCanvasColor(runtimeState.sovereignBaseColors?.[countryCode], null) ||
-      getSafeCanvasColor(runtimeState.countryBaseColors?.[countryCode], null)
+      getSafeCanvasColor(runtimeState.sovereignBaseColors?.[countryCode], null)
     );
   }
 

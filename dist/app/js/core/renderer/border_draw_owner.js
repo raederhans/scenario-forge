@@ -60,6 +60,7 @@ export function createBorderDrawOwner({
     getVisibleCountryCodesForBorderMeshes = () => new Set(),
     isUsableMesh = () => false,
     getPaintContourMeshes = () => [],
+    getPoliticalBorderMeshes = () => [],
     sanitizePolyline = (line) => (Array.isArray(line) ? line : []),
     scheduleDeferredHeavyBorderMeshes = () => {},
     reconcileDetailAdmBorders = () => {},
@@ -375,7 +376,7 @@ export function createBorderDrawOwner({
     const coast = state.styleConfig?.coastlines || {};
     const parent = state.styleConfig?.parentBorders || {};
 
-    const empireColor = getSafeCanvasColor(empire.color, "#666666");
+    const empireColor = getSafeCanvasColor(empire.color, "#4b5563");
     const internalColor = getSafeCanvasColor(internal.color, "#cccccc");
     const coastColor = getSafeCanvasColor(coast.color, "#333333");
     const parentColor = getSafeCanvasColor(parent.color, "#4b5563");
@@ -384,7 +385,7 @@ export function createBorderDrawOwner({
     const empireMeshTransform = null; // preserve the exact outline of small painted regions
     const coastlineMeshTransform = getBoundaryMeshTransform("coastline", k);
 
-    const empireWidthBase = Number(empire.width) || 1;
+    const empireWidthBase = Number(empire.width) || 1.2;
     const internalWidthBase = Number(internal.width) || 0.5;
     const coastWidthBase = Number(coast.width) || 1.2;
     const parentWidthBase = Number(parent.width) || 1.1;
@@ -411,9 +412,30 @@ export function createBorderDrawOwner({
     // An empty contour mesh is a valid result (same-color land or pending
     // geometry). Never substitute old owner/canonical borders for that result.
     const empireMeshes = getPaintContourMeshes();
+    const politicalMeshes = getPoliticalBorderMeshes();
+    const activeScenarioId = String(state.activeScenarioId || "").trim();
+    const hasActiveScenario = !!activeScenarioId
+      && activeScenarioId !== "blank_base"
+      && state.mapSemanticMode !== "blank";
+
+    // Political ownership boundaries enter at a quiet scale and settle into
+    // the established country-border style by medium zoom. Keep this identical
+    // in interactive and settled passes so a completed frame does not pop.
+    const politicalTransition = clamp((k - 1) / (3.2 - 1), 0, 1);
+    const politicalBlend = politicalTransition * politicalTransition * (3 - 2 * politicalTransition);
+    const fullCountryWidth = empireWidthBase * (0.95 + 0.40 * t);
+    const politicalWidth = (
+      (empireWidthBase * 0.6) + ((fullCountryWidth - (empireWidthBase * 0.6)) * politicalBlend)
+    ) / kDenom;
+    const politicalAlpha = countryOpacity * (0.68 + (0.32 * politicalBlend));
+    const paintWidth = hasActiveScenario
+      ? (empireWidthBase * 0.65) / kDenom
+      : ((interactive ? empireWidthBase * 0.95 : fullCountryWidth) / kDenom);
+    const paintAlpha = hasActiveScenario
+      ? countryOpacity * 0.5
+      : countryOpacity * (interactive ? 0.88 : 1);
 
     if (interactive) {
-      const countryWidth = (empireWidthBase * 0.95) / kDenom;
       const coastWidth = (coastWidthBase * 0.88) / kDenom;
       const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines();
       const coastlineLow = drawCanonicalCoastlines
@@ -424,8 +446,10 @@ export function createBorderDrawOwner({
         )
         : null;
 
-      context.globalAlpha = countryOpacity * 0.88;
-      drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
+      context.globalAlpha = paintAlpha;
+      drawMeshCollection(empireMeshes, empireColor, paintWidth, { transformMesh: empireMeshTransform });
+      context.globalAlpha = politicalAlpha;
+      drawMeshCollection(politicalMeshes, empireColor, politicalWidth, { transformMesh: empireMeshTransform });
 
       if (drawCanonicalCoastlines) {
         context.globalAlpha = coastOpacity * 0.78;
@@ -436,7 +460,6 @@ export function createBorderDrawOwner({
       return;
     }
 
-    const countryAlpha = countryOpacity;
     const regularProvinceAlpha = clamp(
       internalOpacity * (0.22 + 0.50 * t) * lowZoomDeclutter,
       0,
@@ -569,8 +592,10 @@ export function createBorderDrawOwner({
       });
     }
 
-    context.globalAlpha = countryAlpha;
-    drawMeshCollection(empireMeshes, empireColor, countryWidth, { transformMesh: empireMeshTransform });
+    context.globalAlpha = paintAlpha;
+    drawMeshCollection(empireMeshes, empireColor, paintWidth, { transformMesh: empireMeshTransform });
+    context.globalAlpha = politicalAlpha;
+    drawMeshCollection(politicalMeshes, empireColor, politicalWidth, { transformMesh: empireMeshTransform });
 
     if (drawCanonicalCoastlines) {
       context.globalAlpha = coastAlpha;

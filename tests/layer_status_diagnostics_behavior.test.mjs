@@ -34,6 +34,42 @@ function createState(overrides = {}) {
   };
 }
 
+test("physical atlas status ignores skipped contours and dormant contour failures", () => {
+  const state = createState({
+    showPhysical: true,
+    physicalSemanticsData: { features: [{}, {}, {}] },
+    physicalContourMajorData: { features: [{}, {}] },
+    contextLayerLoadStateByName: { physical_semantics: "loaded", physical_contours_major: "error" },
+    renderPerfMetrics: { contextBreakdown: {
+      drawPhysicalContourLayer: { featureCount: 0, skipped: true, reason: "atlas-only" },
+      drawPhysicalAtlasLayer: { featureCount: 3, renderedCount: 1 },
+      drawPhysicalReliefOverlayLayer: { featureCount: 3, renderedCount: 1 },
+      drawPhysicalBasePass: { renderedCount: 5 },
+    } },
+  });
+  const physical = buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
+  assert.equal(physical.loadedCount, 3);
+  assert.equal(physical.visibleCount, 2);
+  assert.equal(physical.summary, "Visible · 2 visible · 3 loaded");
+});
+
+test("contours-only status uses the requested LOD and excludes dormant atlas data", () => {
+  const state = createState({
+    showPhysical: true,
+    styleConfig: { physical: { mode: "contours_only" } },
+    zoomTransform: { k: 1 },
+    physicalSemanticsData: { features: [{}, {}, {}] },
+    physicalContourMajorData: { features: [{}, {}] },
+    physicalContourMinorData: { features: [{}] },
+    contextLayerLoadStateByName: { physical_contours_low_major: "loaded", physical_semantics: "error" },
+    renderPerfMetrics: { drawPhysicalContourLayer: { renderedCount: 0 } },
+  });
+  const physical = buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
+  assert.equal(physical.summary, "Loaded · 0 visible · 2 loaded");
+  state.contextLayerLoadStateByName.physical_contours_low_major = "loading";
+  assert.equal(buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical").summary, "Loading/settling");
+});
+
 test("layer diagnostics report loaded and visible counts from existing metrics", () => {
   const state = createState({
     urbanData: {

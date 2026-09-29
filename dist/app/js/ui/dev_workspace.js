@@ -1,4 +1,3 @@
-import { isOwnershipEditingEnabled } from "../core/map_editing_policy.js";
 import { state as runtimeState } from "../core/state.js";
 import { registerRuntimeHook } from "../core/state/index.js";
 import {
@@ -8,10 +7,11 @@ import {
   applyDevMacroFillCurrentParentGroup,
   applyDevSelectionFill,
   clearDevSelection,
+  refreshColorState,
   removeLastDevSelection,
   toggleFeatureInDevSelection,
 } from "../core/map_renderer/public.js";
-import { getFeatureOwnerCode, markLegacyColorStateDirty } from "../core/sovereignty_manager.js";
+import { getFeatureOwnerCode } from "../core/sovereignty_manager.js";
 import {
   filterEditableOwnershipFeatureIds,
   summarizeOwnershipForFeatureIds,
@@ -22,7 +22,6 @@ import { flushRenderBoundary } from "../core/render_boundary.js";
 import { syncScenarioLocalizationState } from "../core/scenario_localization_state.js";
 import { buildTooltipModel, t } from "./i18n.js";
 import { showToast } from "./toast.js";
-import { createScenarioTagCreatorController } from "./dev_workspace/scenario_tag_creator_controller.js";
 import { createSelectionOwnershipController } from "./dev_workspace/selection_ownership_controller.js";
 import { createScenarioTextEditorsController } from "./dev_workspace/scenario_text_editors_controller.js";
 import { createDistrictEditorController } from "./dev_workspace/district_editor_controller.js";
@@ -167,10 +166,6 @@ function buildClipboardText(format = "names_with_ids") {
   return entries.map((entry) => `${entry.name} | ${entry.id}`).join("\n");
 }
 
-function normalizeOwnerInput(value) {
-  return String(value || "").trim().toUpperCase().replace(/\s+/g, "");
-}
-
 function resolveOwnershipTargetIds() {
   const selectedIds = filterEditableOwnershipFeatureIds(sanitizeSelectionState()).matchedIds;
   if (selectedIds.length > 0) {
@@ -182,57 +177,18 @@ function resolveOwnershipTargetIds() {
   return filterEditableOwnershipFeatureIds(selectedId ? [selectedId] : []).matchedIds;
 }
 
-function resolveOwnershipEditorModel() {
+function resolveSelectedOwnershipSummary() {
   const targetIds = resolveOwnershipTargetIds();
   const summary = summarizeOwnershipForFeatureIds(targetIds);
   const singleFeatureId = targetIds.length === 1 ? targetIds[0] : "";
-  const singleFeature = singleFeatureId ? runtimeState.landIndex?.get(singleFeatureId) || null : null;
-  const currentOwnerCode = singleFeatureId ? normalizeOwnerInput(getFeatureOwnerCode(singleFeatureId)) : "";
-  const currentControllerCode = currentOwnerCode;
+  const currentOwnerCode = singleFeatureId ? normalizeScenarioTagInput(getFeatureOwnerCode(singleFeatureId)) : "";
   return {
     targetIds,
     selectionCount: targetIds.length,
-    singleFeatureId,
-    singleFeature,
     currentOwnerCode,
-    currentControllerCode,
     ownerCodes: summary.ownerCodes,
     isMixedOwner: summary.isMixed,
   };
-}
-
-function buildOwnershipMetaRows(model) {
-  if (!model.selectionCount) return [];
-  if (model.singleFeatureId) {
-    return [
-      ["ID", model.singleFeatureId],
-      [ui("Name"), resolveFeatureName(model.singleFeature, model.singleFeatureId)],
-      [ui("Owner"), model.currentOwnerCode],
-      [ui("Controller"), model.currentControllerCode],
-    ].filter(([, value]) => String(value || "").trim());
-  }
-  return [
-    [ui("Selected"), String(model.selectionCount)],
-    [
-      ui("Owner"),
-      model.isMixedOwner
-        ? `${ui("Mixed")} (${model.ownerCodes.join(", ")})`
-        : (model.ownerCodes[0] || ui("Unknown")),
-    ],
-  ];
-}
-
-function resolveOwnershipEditorHint(model) {
-  if (!runtimeState.activeScenarioId) {
-    return ui("Activate a scenario to edit and save political ownership.");
-  }
-  if (!model.selectionCount) {
-    return ui("Select one or more land features to edit political ownership.");
-  }
-  if (model.singleFeatureId) {
-    return ui("Apply a new owner tag to the selected feature or reset it to the active scenario baseline.");
-  }
-  return ui("Apply one owner tag across the current selection or reset those features to the active scenario baseline.");
 }
 
 function collectScenarioCountryOptions({ includeReleasable = true } = {}) {
@@ -263,7 +219,7 @@ function collectScenarioCountryOptions({ includeReleasable = true } = {}) {
 
 function resolvePreferredScenarioTagCode(...candidateValues) {
   const availableTags = new Set(collectScenarioCountryOptions().map((entry) => entry.tag));
-  const ownershipModel = resolveOwnershipEditorModel();
+  const ownershipModel = resolveSelectedOwnershipSummary();
   const inferredSelectionTag = ownershipModel.selectionCount > 0 && !ownershipModel.isMixedOwner
     ? normalizeScenarioTagInput(ownershipModel.currentOwnerCode || ownershipModel.ownerCodes?.[0])
     : "";
@@ -286,7 +242,7 @@ function resolveSingleSelectionScenarioTag(availableTags = null) {
         .map((entry) => normalizeScenarioTagInput(entry?.tag))
         .filter(Boolean)
     );
-  const ownershipModel = resolveOwnershipEditorModel();
+  const ownershipModel = resolveSelectedOwnershipSummary();
   if (ownershipModel.selectionCount <= 0 || ownershipModel.isMixedOwner) {
     return "";
   }
@@ -336,42 +292,6 @@ function syncActiveScenarioBundleCountryEntry(tag, entry) {
       [tag]: entry,
     },
   };
-}
-
-function syncActiveScenarioBundleAssignments(targetIds = [], ownerCode = "") {
-  const bundle = getActiveScenarioBundle();
-  const normalizedOwnerCode = normalizeScenarioTagInput(ownerCode);
-  if (!bundle || !normalizedOwnerCode || !Array.isArray(targetIds) || !targetIds.length) return;
-  const nextOwners = {
-    ...((bundle.ownersPayload && typeof bundle.ownersPayload === "object" && bundle.ownersPayload.owners && typeof bundle.ownersPayload.owners === "object")
-      ? bundle.ownersPayload.owners
-      : {}),
-  };
-  targetIds.forEach((featureId) => {
-    const id = String(featureId || "").trim();
-    if (!id) return;
-    nextOwners[id] = normalizedOwnerCode;
-  });
-  bundle.ownersPayload = {
-    ...(bundle.ownersPayload || {}),
-    owners: nextOwners,
-  };
-  if (bundle.coresPayload && typeof bundle.coresPayload === "object") {
-    const nextCores = {
-      ...((bundle.coresPayload.cores && typeof bundle.coresPayload.cores === "object")
-        ? bundle.coresPayload.cores
-        : {}),
-    };
-    targetIds.forEach((featureId) => {
-      const id = String(featureId || "").trim();
-      if (!id) return;
-      nextCores[id] = [normalizedOwnerCode];
-    });
-    bundle.coresPayload = {
-      ...bundle.coresPayload,
-      cores: nextCores,
-    };
-  }
 }
 
 function upsertRuntimeReleasableCatalogEntry(entry) {
@@ -438,11 +358,7 @@ function upsertScenarioCountryRuntimeEntry(tag, entry) {
       ...(runtimeState.sovereignBaseColors || {}),
       [normalizedTag]: colorHex,
     };
-    runtimeState.countryBaseColors = {
-      ...(runtimeState.countryBaseColors || {}),
-      [normalizedTag]: colorHex,
-    };
-    markLegacyColorStateDirty();
+    refreshColorState({ renderNow: false });
   }
   syncActiveScenarioBundleCountryEntry(normalizedTag, nextEntry);
   return nextEntry;
@@ -788,7 +704,6 @@ function initDevWorkspace() {
 
   const featureInspectorTitle = panel.querySelector("#devFeatureInspectorTitle");
   const featureInspectorMeta = panel.querySelector("#devFeatureInspectorMeta");
-  const scenarioTagCreatorPanel = panel.querySelector("#devScenarioTagCreatorPanel");
   const scenarioTagInspectorPanel = panel.querySelector("#devScenarioTagInspectorPanel");
   const scenarioTagInspectorTitle = panel.querySelector("#devScenarioTagInspectorTitle");
   const scenarioTagInspectorHint = panel.querySelector("#devScenarioTagInspectorHint");
@@ -801,13 +716,11 @@ function initDevWorkspace() {
   const scenarioCapitalPanel = panel.querySelector("#devScenarioCapitalPanel");
   const scenarioDistrictPanel = panel.querySelector("#devScenarioDistrictPanel");
   const scenarioLocalePanel = panel.querySelector("#devScenarioLocalePanel");
-  const scenarioOwnershipPanel = panel.querySelector("#devScenarioOwnershipPanel");
   const devQuickRebuildBordersBtn = quickbar.querySelector("#devQuickRebuildBordersBtn");
   const renderStatusMeta = panel.querySelector("#devRenderStatusMeta");
   const selectionSummary = panel.querySelector("#devSelectionSummary");
   const selectionPreview = panel.querySelector("#devSelectionPreview");
   const selectionSortMode = panel.querySelector("#devSelectionSortMode");
-  let scenarioTagCreatorController = null;
   let selectionOwnershipController = null;
   let scenarioTextEditorsController = null;
   let districtEditorController = null;
@@ -837,8 +750,6 @@ function initDevWorkspace() {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-selected", isActive ? "true" : "false");
     });
-    scenarioTagCreatorController?.render({ hasActiveScenario });
-
     scenarioTextEditorsController?.render({ hasActiveScenario });
     districtEditorController?.render({ hasActiveScenario });
 
@@ -916,14 +827,12 @@ function initDevWorkspace() {
       const isVisible = !!isAvailable && activeDevCategory === category;
       panelElement.classList.toggle("hidden", !isVisible);
     };
-    syncCategoryPanel(scenarioOwnershipPanel, "selection", hasActiveScenario && isOwnershipEditingEnabled());
     syncCategoryPanel(scenarioTagInspectorPanel, "selection", hasActiveScenario);
-    syncCategoryPanel(scenarioTagCreatorPanel, "scenario", hasActiveScenario && isOwnershipEditingEnabled());
     syncCategoryPanel(scenarioCountryPanel, "scenario", hasActiveScenario);
     syncCategoryPanel(scenarioCapitalPanel, "scenario", hasActiveScenario);
     syncCategoryPanel(scenarioDistrictPanel, "scenario", hasActiveScenario);
     syncCategoryPanel(scenarioLocalePanel, "scenario", hasActiveScenario);
-    panel.querySelectorAll('.dev-workspace-panel[data-dev-category="selection"]:not(#devScenarioOwnershipPanel):not(#devScenarioTagInspectorPanel)').forEach((section) => {
+    panel.querySelectorAll('.dev-workspace-panel[data-dev-category="selection"]:not(#devScenarioTagInspectorPanel)').forEach((section) => {
       syncCategoryPanel(section, "selection", true);
     });
     panel.querySelectorAll('.dev-workspace-panel[data-dev-category="runtime"]').forEach((section) => {
@@ -968,34 +877,12 @@ function initDevWorkspace() {
     });
   };
 
-  scenarioTagCreatorController = createScenarioTagCreatorController({
-    panel,
-    renderWorkspace,
-    renderMetaRows,
-    syncSelectOptions,
-    normalizeOwnerInput,
-    resolveFeatureName,
-    sanitizeSelectionState,
-    resolveOwnershipTargetIds,
-    resolveOwnershipEditorModel,
-    buildOwnershipMetaRows,
-    flushDevWorkspaceRender,
-    upsertScenarioCountryRuntimeEntry,
-    syncActiveScenarioBundleAssignments,
-    syncActiveScenarioManifestUrl,
-    upsertRuntimeReleasableCatalogEntry,
-  });
   selectionOwnershipController = createSelectionOwnershipController({
     panel,
     quickbar,
     renderWorkspace,
-    renderMetaRows,
-    normalizeOwnerInput,
     localizeSelectionSummary,
-    resolveOwnershipTargetIds,
-    resolveOwnershipEditorModel,
-    resolveOwnershipEditorHint,
-    buildOwnershipMetaRows,
+    resolveSelectedOwnershipSummary,
   });
   scenarioTextEditorsController = createScenarioTextEditorsController({
     panel,
@@ -1077,7 +964,6 @@ function initDevWorkspace() {
   bindButtonAction(panel.querySelector("#devMacroSelectionBtn"), () => {
     applyDevSelectionFill();
   });
-  scenarioTagCreatorController.bindEvents();
   selectionOwnershipController.bindEvents();
   scenarioTextEditorsController.bindEvents();
   districtEditorController.bindEvents();
@@ -1149,6 +1035,5 @@ function initDevWorkspace() {
 }
 
 export { getScenarioGeoLocaleEntry, initDevWorkspace };
-
 
 

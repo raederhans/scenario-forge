@@ -53,32 +53,6 @@ function normalizeReason(reason, defaultReason) {
   return normalized || defaultReason;
 }
 
-function createTrace() {
-  return {
-    effectOrder: [],
-    getterOrder: [],
-  };
-}
-
-function createSummary({
-  phase,
-  previousPhase = phase,
-  reason,
-  timerScheduled = false,
-  timerCleared = false,
-  trace,
-}) {
-  return Object.freeze({
-    phase: String(phase || ""),
-    previousPhase: String(previousPhase || ""),
-    reason,
-    timerScheduled: Boolean(timerScheduled),
-    timerCleared: Boolean(timerCleared),
-    effectOrder: Object.freeze([...(trace?.effectOrder || [])]),
-    getterOrder: Object.freeze([...(trace?.getterOrder || [])]),
-  });
-}
-
 export function createRenderPhaseLifecycleOwner({ state = {}, effects = {}, getters = {} } = {}) {
   const renderPhaseIdle = String(state.renderPhaseIdle || DEFAULT_RENDER_PHASE_IDLE);
   const renderPhaseInteracting = String(state.renderPhaseInteracting || DEFAULT_RENDER_PHASE_INTERACTING);
@@ -88,138 +62,100 @@ export function createRenderPhaseLifecycleOwner({ state = {}, effects = {}, gett
   const getterApi = Object.fromEntries(
     REQUIRED_GETTER_NAMES.map((name) => [name, requireFunction(getters, name, "getters")]),
   );
+  const needsNavigationRecovery = typeof getters.needsNavigationRecovery === "function"
+    ? getters.needsNavigationRecovery : () => false;
 
-  function runEffect(trace, name, ...args) {
-    trace.effectOrder.push(name);
+  function runEffect(name, ...args) {
     return effectApi[name](...args);
   }
 
-  function runGetter(trace, name, ...args) {
-    trace.getterOrder.push(name);
+  function runGetter(name, ...args) {
     return getterApi[name](...args);
   }
 
-  function clearRenderPhaseTimerCore(trace) {
-    const timerId = runGetter(trace, "getRenderPhaseTimerId");
+  function clearRenderPhaseTimerCore() {
+    const timerId = runGetter("getRenderPhaseTimerId");
     if (!timerId) return false;
-    runEffect(trace, "clearTimeout", timerId);
-    runEffect(trace, "setRenderPhaseTimerId", null);
+    runEffect("clearTimeout", timerId);
+    runEffect("setRenderPhaseTimerId", null);
     return true;
   }
 
-  function clearRenderPhaseTimer(reason = "render-phase-timer-clear") {
-    const trace = createTrace();
-    const normalizedReason = normalizeReason(reason, "render-phase-timer-clear");
-    const timerCleared = clearRenderPhaseTimerCore(trace);
-    const phase = runGetter(trace, "getRenderPhase");
-    return createSummary({
-      phase,
-      reason: normalizedReason,
-      timerCleared,
-      trace,
-    });
+  function clearRenderPhaseTimer() {
+    clearRenderPhaseTimerCore();
   }
 
-  function setRenderPhase(nextPhase, { reason = "" } = {}) {
-    const trace = createTrace();
+  function setRenderPhase(nextPhase) {
     const phase = String(nextPhase || renderPhaseIdle);
-    const normalizedReason = normalizeReason(reason, `phase-${phase}`);
-    const previousPhase = String(runGetter(trace, "getRenderPhase") || "");
-    const enteredAt = runGetter(trace, "nowMs");
+    const previousPhase = String(runGetter("getRenderPhase") || "");
+    const enteredAt = runGetter("nowMs");
 
-    runEffect(trace, "setRenderPhaseValue", phase);
-    runEffect(trace, "setPhaseEnteredAt", enteredAt);
-    runEffect(trace, "setIsInteracting", phase === renderPhaseInteracting);
+    runEffect("setRenderPhaseValue", phase);
+    runEffect("setPhaseEnteredAt", enteredAt);
+    runEffect("setIsInteracting", phase === renderPhaseInteracting);
 
     if (phase !== renderPhaseIdle) {
-      runEffect(trace, "cancelPoliticalPathWarmup", `phase-${phase}`);
+      runEffect("cancelPoliticalPathWarmup", `phase-${phase}`);
     }
     if (previousPhase !== phase && (previousPhase === renderPhaseIdle || phase === renderPhaseIdle)) {
-      runEffect(trace, "setHoverOverlayDirty", true);
+      runEffect("setHoverOverlayDirty", true);
     }
-    if (phase === renderPhaseIdle && runGetter(trace, "hasPendingDayNightRefresh")) {
-      runEffect(trace, "setPendingDayNightRefresh", false);
-      runEffect(trace, "invalidateRenderPasses", "dayNight", "day-night-clock-deferred");
+    if (phase === renderPhaseIdle && runGetter("hasPendingDayNightRefresh")) {
+      runEffect("setPendingDayNightRefresh", false);
+      runEffect("invalidateRenderPasses", "dayNight", "day-night-clock-deferred");
     }
     const dprStageChanged = runEffect(
-      trace,
       "updateDprStage",
       phase === renderPhaseInteracting ? "interactive" : "idle",
     );
     if (dprStageChanged) {
-      runEffect(trace, "setCanvasSize", {
+      runEffect("setCanvasSize", {
         reason: `phase-${phase}-dpr-stage`,
         targetPassesOnDprChange: ["political", "contextBase", "borders"],
       });
     }
-
-    return createSummary({
-      phase,
-      previousPhase,
-      reason: normalizedReason,
-      trace,
-    });
   }
 
   function scheduleRenderPhaseIdle({ reason = "render-phase-idle" } = {}) {
-    const trace = createTrace();
     const normalizedReason = normalizeReason(reason, "render-phase-idle");
-    const timerCleared = clearRenderPhaseTimerCore(trace);
-    const previousPhase = String(runGetter(trace, "getRenderPhase") || "");
-    const settleProfile = runGetter(trace, "getAdaptiveSettleProfile");
+    clearRenderPhaseTimerCore();
+    const settleProfile = runGetter("getAdaptiveSettleProfile");
 
-    runEffect(trace, "setAdaptiveSettleProfile", settleProfile);
-    const timerId = runEffect(trace, "setTimeout", () => {
-      runEffect(createTrace(), "setRenderPhaseTimerId", null);
-      setRenderPhase(renderPhaseIdle, { reason: normalizedReason });
-      const pendingChunkRefreshStatus = runEffect(createTrace(), "scheduleScenarioChunkRefresh", {
+    runEffect("setAdaptiveSettleProfile", settleProfile);
+    const timerId = runEffect("setTimeout", () => {
+      runEffect("setRenderPhaseTimerId", null);
+      setRenderPhase(renderPhaseIdle);
+      const pendingChunkRefreshStatus = runEffect("scheduleScenarioChunkRefresh", {
         reason: normalizedReason,
         delayMs: 0,
         flushPending: true,
       });
       const promotionWorkActive = PROMOTION_ACTIVE_STATUSES.includes(String(pendingChunkRefreshStatus || ""));
-      if (runGetter(createTrace(), "shouldStartExactAfterSettleFastPath")) {
-        if (promotionWorkActive) return;
-        runEffect(createTrace(), "setDeferExactAfterSettle", true);
-        runEffect(createTrace(), "render");
-        runEffect(createTrace(), "scheduleExactAfterSettleRefresh", settleProfile);
+      if (runGetter("shouldStartExactAfterSettleFastPath")) {
+        if (promotionWorkActive) {
+          if (needsNavigationRecovery()) runEffect("render");
+          return;
+        }
+        runEffect("setDeferExactAfterSettle", true);
+        runEffect("render");
+        runEffect("scheduleExactAfterSettleRefresh", settleProfile);
         return;
       }
-      runEffect(createTrace(), "render");
+      runEffect("render");
     }, Number(settleProfile?.settleDurationMs || 0));
-    runEffect(trace, "setRenderPhaseTimerId", timerId);
-
-    return createSummary({
-      phase: previousPhase,
-      previousPhase,
-      reason: normalizedReason,
-      timerScheduled: Boolean(timerId),
-      timerCleared,
-      trace,
-    });
+    runEffect("setRenderPhaseTimerId", timerId);
   }
 
-  function resetRenderPhaseState(reason = "render-phase-reset") {
-    const trace = createTrace();
-    const normalizedReason = normalizeReason(reason, "render-phase-reset");
-    const timerCleared = clearRenderPhaseTimerCore(trace);
-    const previousPhase = String(runGetter(trace, "getRenderPhase") || "");
-    const enteredAt = runGetter(trace, "nowMs");
+  function resetRenderPhaseState() {
+    const timerCleared = clearRenderPhaseTimerCore();
+    const enteredAt = runGetter("nowMs");
 
-    runEffect(trace, "setRenderPhaseValue", renderPhaseIdle);
-    runEffect(trace, "setPhaseEnteredAt", enteredAt);
-    runEffect(trace, "setIsInteracting", false);
+    runEffect("setRenderPhaseValue", renderPhaseIdle);
+    runEffect("setPhaseEnteredAt", enteredAt);
+    runEffect("setIsInteracting", false);
     if (!timerCleared) {
-      runEffect(trace, "setRenderPhaseTimerId", null);
+      runEffect("setRenderPhaseTimerId", null);
     }
-
-    return createSummary({
-      phase: renderPhaseIdle,
-      previousPhase,
-      reason: normalizedReason,
-      timerCleared,
-      trace,
-    });
   }
 
   return Object.freeze({

@@ -2,6 +2,7 @@ import {
   createPhysicalStyleConfigForPreset,
   normalizePhysicalPreset,
   normalizePhysicalStyleConfig,
+  PHYSICAL_ATLAS_PALETTE,
 } from "../../core/state.js";
 import {
   patchAppearanceStyleGroupState,
@@ -9,6 +10,8 @@ import {
 } from "../../core/state/actions/appearance_actions.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import { getPhysicalContextLayerRequests } from "../../core/state_defaults.js";
+import { syncStyledSelect } from "../styled_selects.js";
+import { resolvePhysicalAtlasCollection } from "../../core/renderer/physical_atlas_lod_policy.js";
 import {
   captureHistoryState as captureRuntimeHistoryState,
   pushHistoryEntry as pushRuntimeHistoryEntry,
@@ -44,9 +47,15 @@ function collectPhysicalNodes(documentRef) {
     togglePhysical: documentRef.getElementById("togglePhysical"),
     physicalPreset: documentRef.getElementById("physicalPreset"),
     physicalPresetHint: documentRef.getElementById("physicalPresetHint"),
+    physicalAtlasSection: documentRef.getElementById("physicalAtlasSection"),
+    physicalContourSection: documentRef.getElementById("physicalContourSection"),
     physicalMode: documentRef.getElementById("physicalMode"),
     physicalOpacity: documentRef.getElementById("physicalOpacity"),
     physicalAtlasIntensity: documentRef.getElementById("physicalAtlasIntensity"),
+    physicalLandformIntensity: documentRef.getElementById("physicalLandformIntensity"),
+    physicalLandcoverIntensity: documentRef.getElementById("physicalLandcoverIntensity"),
+    physicalHillshadeOpacity: documentRef.getElementById("physicalHillshadeOpacity"),
+    physicalRegionLabels: documentRef.getElementById("physicalRegionLabels"),
     physicalRainforestEmphasis: documentRef.getElementById("physicalRainforestEmphasis"),
     physicalContourColor: documentRef.getElementById("physicalContourColor"),
     physicalContourOpacity: documentRef.getElementById("physicalContourOpacity"),
@@ -97,6 +106,35 @@ export function createAppearancePhysicalOwner({
   pushHistoryEntry = pushRuntimeHistoryEntry,
 } = {}) {
   const nodes = collectPhysicalNodes(documentRef);
+  let coverageCollection = null;
+  let coverageCounts = {};
+
+  const renderClassCoverage = () => {
+    const collection = resolvePhysicalAtlasCollection(runtimeState);
+    const loaded = Array.isArray(collection?.features);
+    if (collection !== coverageCollection) {
+      coverageCollection = collection;
+      coverageCounts = {};
+      for (const feature of collection?.features || []) {
+        const key = feature.properties?.atlas_class || feature.properties?.atlasClass;
+        coverageCounts[key] = (coverageCounts[key] || 0) + 1;
+      }
+    }
+    for (const [key, input] of Object.entries(nodes.physicalClassToggles)) {
+      if (!input) continue;
+      const count = coverageCounts[key] || 0;
+      input.disabled = loaded && count === 0;
+      const row = input.closest?.("label");
+      const swatch = row?.querySelector(".physical-class-swatch");
+      if (swatch) swatch.style.backgroundColor = PHYSICAL_ATLAS_PALETTE[key];
+      const coverage = documentRef.getElementById(`${PHYSICAL_CLASS_TOGGLE_IDS[key]}Coverage`);
+      if (coverage) {
+        coverage.textContent = !loaded ? t("Coverage loading", "ui")
+          : count ? `${count.toLocaleString()} ${t("regions", "ui")}`
+            : t("No coverage in current data", "ui");
+      }
+    }
+  };
 
   const syncPhysicalConfig = () => {
     const normalized = normalizePhysicalStyleConfig(runtimeState.styleConfig.physical);
@@ -168,10 +206,19 @@ export function createAppearancePhysicalOwner({
     if (nodes.physicalPreset) nodes.physicalPreset.value = activePhysicalPreset;
     if (nodes.physicalPresetHint) nodes.physicalPresetHint.textContent = getPhysicalPresetHint(activePhysicalPreset);
     if (nodes.physicalMode) nodes.physicalMode.value = physicalConfig.mode;
+    if (nodes.physicalAtlasSection) nodes.physicalAtlasSection.hidden = physicalConfig.mode === "contours_only";
+    if (nodes.physicalContourSection) nodes.physicalContourSection.hidden = physicalConfig.mode === "atlas_only";
     if (nodes.physicalOpacity) nodes.physicalOpacity.value = String(Math.round(physicalConfig.opacity * 100));
     if (nodes.physicalOpacityValue) nodes.physicalOpacityValue.textContent = `${Math.round(physicalConfig.opacity * 100)}%`;
     if (nodes.physicalAtlasIntensity) nodes.physicalAtlasIntensity.value = String(Math.round(physicalConfig.atlasIntensity * 100));
     if (nodes.physicalAtlasIntensityValue) nodes.physicalAtlasIntensityValue.textContent = `${Math.round(physicalConfig.atlasIntensity * 100)}%`;
+    for (const [id, key] of [["physicalLandformIntensity", "landformIntensity"], ["physicalLandcoverIntensity", "landcoverIntensity"], ["physicalHillshadeOpacity", "hillshadeOpacity"]]) {
+      const value = Math.round(physicalConfig[key] * 100);
+      if (nodes[id]) nodes[id].value = String(value);
+      const output = documentRef.getElementById(`${id}Value`);
+      if (output) output.textContent = `${value}%`;
+    }
+    if (nodes.physicalRegionLabels) nodes.physicalRegionLabels.checked = physicalConfig.showRegionLabels;
     if (nodes.physicalRainforestEmphasis) nodes.physicalRainforestEmphasis.value = String(Math.round(physicalConfig.rainforestEmphasis * 100));
     if (nodes.physicalRainforestEmphasisValue) nodes.physicalRainforestEmphasisValue.textContent = `${Math.round(physicalConfig.rainforestEmphasis * 100)}%`;
     if (nodes.physicalContourColor) nodes.physicalContourColor.value = physicalConfig.contourColor;
@@ -191,10 +238,12 @@ export function createAppearancePhysicalOwner({
     if (nodes.physicalContourMinorLowReliefCutoff) nodes.physicalContourMinorLowReliefCutoff.value = String(Math.round(physicalConfig.contourMinorLowReliefCutoffM));
     if (nodes.physicalContourMinorLowReliefCutoffValue) nodes.physicalContourMinorLowReliefCutoffValue.textContent = `${Math.round(physicalConfig.contourMinorLowReliefCutoffM)}`;
     if (nodes.physicalBlendMode) nodes.physicalBlendMode.value = physicalConfig.blendMode;
+    [nodes.physicalPreset, nodes.physicalMode, nodes.physicalBlendMode].forEach(syncStyledSelect);
     renderPhysicalIntensityFieldUi();
     Object.entries(nodes.physicalClassToggles).forEach(([key, element]) => {
       if (element) element.checked = physicalConfig.atlasClassVisibility?.[key] !== false;
     });
+    renderClassCoverage();
     return physicalConfig;
   };
 
@@ -219,10 +268,11 @@ export function createAppearancePhysicalOwner({
       if (patch && typeof patch === "object") {
         patchAppearanceStyleGroupState(runtimeState, "physical", patch);
       }
-      if (reason === "physical-mode" && runtimeState.showPhysical
+      if ((reason === "physical-mode" || reason === "physical-region-labels") && runtimeState.showPhysical
         && typeof runtimeState.ensureContextLayerDataFn === "function") {
         void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason, renderNow: true });
       }
+      if (reason === "physical-mode") renderPhysicalUi();
       renderDirty(reason);
     });
     element.dataset.bound = "true";
@@ -243,14 +293,36 @@ export function createAppearancePhysicalOwner({
 
     if (nodes.physicalPreset && nodes.physicalPreset.dataset.bound !== "true") {
       nodes.physicalPreset.addEventListener("change", (event) => {
-        applyPhysicalPresetConfig(event.target.value || "balanced");
+        // A user-selected preset is a complete visual recipe. Project loading
+        // still normalizes the stored mode without reapplying a preset.
+        applyPhysicalPresetConfig(event.target.value || "balanced", { preserveMode: false });
         renderPhysicalUi();
+        if (runtimeState.showPhysical && typeof runtimeState.ensureContextLayerDataFn === "function") {
+          void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason: "physical-preset-select", renderNow: true });
+        }
         renderDirty("physical-preset-select");
       });
       nodes.physicalPreset.dataset.bound = "true";
     }
 
     bindPhysicalChange(nodes.physicalMode, (_cfg, event) => ({ mode: String(event.target.value || "atlas_only") }), "physical-mode");
+    bindPhysicalChange(nodes.physicalRegionLabels, (_cfg, event) => ({ showRegionLabels: !!event.target.checked }), "physical-region-labels");
+    for (const [id, key, max] of [["physicalLandformIntensity", "landformIntensity", 2], ["physicalLandcoverIntensity", "landcoverIntensity", 2], ["physicalHillshadeOpacity", "hillshadeOpacity", 0.3]]) {
+      bindPhysicalInput(nodes[id], (_cfg, event) => {
+        const value = clamp(Number(event.target.value) / 100, 0, max);
+        const output = documentRef.getElementById(`${id}Value`);
+        if (output) output.textContent = `${Math.round(value * 100)}%`;
+        return { [key]: value };
+      }, `physical-${key}`);
+    }
+    if (nodes.physicalHillshadeOpacity && nodes.physicalHillshadeOpacity.dataset.loadBound !== "true") {
+      nodes.physicalHillshadeOpacity.addEventListener("change", () => {
+      if (runtimeState.showPhysical && typeof runtimeState.ensureContextLayerDataFn === "function") {
+        void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", ["physical-set"], { reason: "physical-hillshade", renderNow: true });
+      }
+      });
+      nodes.physicalHillshadeOpacity.dataset.loadBound = "true";
+    }
     bindPhysicalInput(nodes.physicalOpacity, (_cfg, event) => {
       const value = Number(event.target.value);
       const opacity = clamp(Number.isFinite(value) ? value / 100 : 0.5, 0, 1);

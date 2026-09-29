@@ -74,6 +74,20 @@ const CONTEXT_LAYER_PACKS = {
     format: "topology",
     objectName: "physical_semantics",
   },
+  physical_semantics_detail: {
+    url: resolveDataAssetUrl("context_layer:physical_semantics_detail"),
+    format: "topology",
+    objectName: "physical_semantics",
+  },
+  physical_hillshade: {
+    url: resolveDataAssetUrl("context_layer:physical_hillshade"),
+    format: "topology",
+    objectName: "physical_hillshade",
+  },
+  physical_region_labels: {
+    url: resolveDataAssetUrl("context_layer:physical_region_labels"),
+    format: "geojson",
+  },
   physical_contours_major: {
     url: resolveDataAssetUrl("context_layer:physical_contours_major"),
     format: "topology",
@@ -1158,6 +1172,14 @@ async function loadDetailTopologyWithFallback({
         candidate.url,
         `detail(${candidate.key})`
       );
+      if (
+        topology?.type !== "Topology" ||
+        topology.objects?.political?.type !== "GeometryCollection" ||
+        !Array.isArray(topology.objects.political.geometries) ||
+        topology.objects.political.geometries.length === 0
+      ) {
+        throw new Error("Detail topology has no political geometries.");
+      }
       return { topology, sourceKey: candidate.key, metrics };
     } catch (error) {
       firstError = firstError || error;

@@ -48,6 +48,7 @@ export function createPoliticalPartialRepaintOwner({
     "getPoliticalPassFineBaselineMismatch",
     "getCachedPoliticalPassStaticSignature",
     "getPoliticalPathCacheHandle",
+    "getRetainedPoliticalBackgroundPathHandle",
     "getVisibleFrameIdentity",
     "createPoliticalRasterWorkerIdentity",
     "getLogicalCanvasDimensions",
@@ -701,13 +702,17 @@ export function createPoliticalPartialRepaintOwner({
     // Prepare once per pass; persist each cold path as it is first drawn so
     // geometry outside the bounded idle warmup queue is reusable on later pans.
     const pathHandle = helper.getPoliticalPathCacheHandle(identity.transform, { resetIfMismatch: true });
+    const retainedPathHandle = helper.getRetainedPoliticalBackgroundPathHandle(identity.transform);
     const paths = pathHandle.valid && pathHandle.map instanceof Map ? pathHandle.map : null;
     const readPath = (feature, index) => {
       const featureId = helper.getFeatureId(feature) || `feature-${index}`;
+      const retainedPath = retainedPathHandle?.getPath(feature, featureId);
+      if (retainedPath) return retainedPath;
       const entry = paths?.get(featureId);
       if (helper.isPoliticalFeaturePathEntryCurrent(entry, feature)) return entry.path;
       const built = helper.getPoliticalFeaturePathEntry(feature, {
         featureId, transform: identity.transform, allowBuild: true, countBuild: true,
+        validatedHandle: pathHandle,
       });
       return helper.isPoliticalFeaturePathEntryCurrent(built, feature) ? built.path : null;
     };

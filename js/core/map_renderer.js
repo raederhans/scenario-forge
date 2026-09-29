@@ -23,6 +23,7 @@ import { separatesPoliticalBorders } from "./renderer/political_border_policy.js
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
+import { createPhysicalIntensityCompositor } from "./renderer/physical_intensity_compositor.js";
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
@@ -262,6 +263,7 @@ import { resolveEffectiveWaterRegionFeatures, isLakeRegion, isLakeInteractionEna
 import { createOceanRenderOwner } from "./renderer/ocean_render_owner.js";
 import { createProjectedGeographicPathCache } from "./renderer/projected_geographic_path_cache.js";
 import { resolveContourLodRequest } from "./renderer/physical_contour_lod_policy.js";
+import { resolvePhysicalAtlasCollection, shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests } from "./renderer/physical_atlas_lod_policy.js";
 import { createPhysicalLayerRenderOwner } from "./renderer/physical_layer_render_owner.js";
 import { createPhysicalContourVisibleSetOwner } from "./renderer/physical_contour_visible_set_owner.js";
 import { createScenarioReliefOverlayRenderOwner } from "./renderer/scenario_relief_overlay_render_owner.js";
@@ -1982,6 +1984,13 @@ function getPhysicalLayerRenderOwner() {
   if (physicalLayerRenderOwner) {
     return physicalLayerRenderOwner;
   }
+  const paintWithPhysicalIntensity = createPhysicalIntensityCompositor({
+    state,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getProjection: () => rendererSurfaceHost.getProjection(),
+    getProjectionKey: getProjectionRenderSignature,
+    withRenderTarget,
+  });
   physicalLayerRenderOwner = createPhysicalLayerRenderOwner({
     state,
     constants: {
@@ -1992,6 +2001,7 @@ function getPhysicalLayerRenderOwner() {
       getPathCanvas: () => rendererSurfaceHost.getPathCanvas(),
       getProjection: () => rendererSurfaceHost.getProjection(),
       getContourPath2D: getProjectedGeographicPath,
+      getFillPath2D: getProjectedGeographicPath,
     },
     helpers: {
       applyPhysicalLandClipMask,
@@ -2002,7 +2012,7 @@ function getPhysicalLayerRenderOwner() {
       getContourVisibleFeatures,
       getContourZoomStyleProfile,
       getFeatureCollectionFeatureCount,
-      getFieldFeatureMultiplier,
+      paintWithPhysicalIntensity,
       getPhysicalAtlasClass,
       getPhysicalAtlasLayer,
       getPhysicalLandMaskInfo,
@@ -3638,6 +3648,7 @@ function getDrawCanvasOrchestrationOwner() {
         if (runtimeState.renderPhase !== RENDER_PHASE_INTERACTING
           && !runtimeState.bootBlocking && !runtimeState.scenarioApplyInFlight) {
           ensureContourLodForView();
+          ensurePhysicalAtlasDetailForView();
         }
       },
       prepareAsyncFrame: () => getGeometryRasterRuntimeOwner().prepareFrame(),
@@ -4264,7 +4275,7 @@ function normalizeIntensityFieldToolState(next = {}, current = runtimeState.inte
     channelId,
     subMode,
     brushRadiusDeg: clamp(Number.isFinite(Number(draft.brushRadiusDeg)) ? Number(draft.brushRadiusDeg) : Number(source.brushRadiusDeg || defaults.brushRadiusDeg), 0.25, 30),
-    brushStrength: clamp(Number.isFinite(Number(draft.brushStrength)) ? Number(draft.brushStrength) : Number(source.brushStrength || defaults.brushStrength), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
+    brushStrength: clamp(Number.isFinite(Number(draft.brushStrength)) ? Number(draft.brushStrength) : Number(source.brushStrength ?? defaults.brushStrength), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
     selectedPointId: String(draft.selectedPointId === undefined ? (source.selectedPointId || "") : (draft.selectedPointId || "")),
   };
 }
@@ -7459,10 +7470,11 @@ function invalidateContextLayerVisualStateBatch(layerNames, reason = "context-la
   const normalizedLayerNames = Array.isArray(layerNames) ? layerNames : [layerNames];
   normalizedLayerNames.forEach((layerName) => {
     const normalized = String(layerName || "").trim().toLowerCase();
-    if (normalized === "physical" || normalized === "physical_semantics") {
+    if (normalized === "physical" || normalized === "physical_semantics" || normalized === PHYSICAL_ATLAS_DETAIL_LAYER || normalized === "physical_hillshade") {
       targetPasses.add("physicalBase");
       targetPasses.add("dayNight");
     }
+    if (normalized === "physical_region_labels") targetPasses.add("labels");
     if (normalized === "urban") {
       targetPasses.add("dayNight");
     }
@@ -10796,6 +10808,8 @@ function getPhysicalAtlasLayer(feature) {
 }
 
 function getResolvedPhysicalAtlasCollection() {
+  const resolved = resolvePhysicalAtlasCollection(runtimeState);
+  if (resolved?.features?.length) return resolved;
   if (Array.isArray(runtimeState.physicalSemanticsData?.features) && runtimeState.physicalSemanticsData.features.length > 0) {
     return runtimeState.physicalSemanticsData;
   }
@@ -11168,10 +11182,6 @@ function getProjectedDegreeRadiusPx(lon, lat, radiusDeg) {
   return clamp(Math.max(eastDistance, northDistance, 0) * clamp(radiusDeg, 0.25, 30), 6, 160);
 }
 
-function drawPhysicalIntensityFieldLayer({ clipAlreadyApplied = false } = {}) {
-  return getPhysicalLayerRenderOwner().drawPhysicalIntensityFieldLayer({ clipAlreadyApplied });
-}
-
 function getPhysicalReliefOverlayBlendMode(cfg, presetProfile) {
   const requestedMode = getSafeBlendMode(cfg?.blendMode, presetProfile?.reliefBlendFallback || "source-over");
   if (requestedMode === "overlay" || requestedMode === "multiply") {
@@ -11229,6 +11239,19 @@ function drawContourCollection(
 
 let lastContourLodRequest = null;
 
+function ensurePhysicalAtlasDetailForView() {
+  if (typeof runtimeState.ensureContextLayerDataFn !== "function") return;
+  const requested = [...(shouldRequestPhysicalAtlasDetail(runtimeState) ? [PHYSICAL_ATLAS_DETAIL_LAYER] : []), ...getPhysicalPresentationLayerRequests(runtimeState)];
+  const missing = requested.filter((name) => {
+    const status = runtimeState.contextLayerLoadStateByName?.[name];
+    return !runtimeState.contextLayerExternalDataByName?.[name]?.features && status !== "loading" && status !== "error";
+  });
+  if (!missing.length) return;
+  void Promise.resolve().then(() => runtimeState.ensureContextLayerDataFn(missing, {
+    reason: "physical-atlas-detail", renderNow: true,
+  })).catch((error) => console.warn("[physical] Detail or presentation data unavailable; keeping loaded layers.", error));
+}
+
 function ensureContourLodForView() {
   if (!runtimeState.showPhysical || runtimeState.styleConfig?.physical?.mode === "atlas_only"
     || typeof runtimeState.ensureContextLayerDataFn !== "function") return;
@@ -11273,6 +11296,8 @@ function ensureContourLodForView() {
 }
 
 function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+  // DEM illumination sits above opaque political fills and below contours.
+  getPhysicalLayerRenderOwner().drawPhysicalHillshadeLayer(k);
   return getPhysicalLayerRenderOwner().drawPhysicalContourLayer(k, { interactive, clipAlreadyApplied });
 }
 
@@ -12490,6 +12515,7 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
   if (!interactive && !runtimeState.deferContextBasePass) {
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
+    getPhysicalLayerRenderOwner().drawPhysicalRegionLabels(k, { occupiedBoxes });
   }
 }
 
@@ -12883,6 +12909,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       passNames,
       bathymetryCoverage: !!runtimeState.styleConfig?.ocean?.experimentalAdvancedStyles
         && runtimeState.styleConfig.ocean.preset !== "flat",
+      physicalIntensity: !!runtimeState.showPhysical && ["physicalAtlas", "physicalContour"].some((id) => runtimeState.intensityFields?.channels?.[id]?.enabled),
     });
     if (estimatedBytes > EXPORT_RENDER_BUDGET_BYTES) {
       throw new RangeError(

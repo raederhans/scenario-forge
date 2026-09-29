@@ -50,12 +50,17 @@ function buildNodes(ids) {
 }
 
 const PHYSICAL_NODE_IDS = [
+  "physicalAtlasSection",
+  "physicalContourSection",
   "togglePhysical",
   "physicalPreset",
   "physicalPresetHint",
   "physicalMode",
   "physicalOpacity",
   "physicalAtlasIntensity",
+  "physicalLandformIntensity", "physicalLandformIntensityValue",
+  "physicalLandcoverIntensity", "physicalLandcoverIntensityValue",
+  "physicalHillshadeOpacity", "physicalHillshadeOpacityValue", "physicalRegionLabels",
   "physicalRainforestEmphasis",
   "physicalContourColor",
   "physicalContourOpacity",
@@ -93,6 +98,27 @@ const PHYSICAL_NODE_IDS = [
   "physicalIntensityFieldRadiusValue",
   ...Object.values(PHYSICAL_CLASS_TOGGLE_IDS),
 ];
+
+test("physical sections follow mode while missing categories preserve their stored preference", () => {
+  const harness = createHarness(PHYSICAL_NODE_IDS, {
+    physicalSemanticsData: { features: [{ properties: { atlas_class: "mountain_high_relief" } }] },
+  });
+  harness.owner.bindEvents();
+  harness.nodes.physicalMode.value = "atlas_only";
+  harness.nodes.physicalMode.dispatch("change");
+  assert.equal(harness.nodes.physicalContourSection.hidden, true);
+  assert.equal(harness.nodes.physicalAtlasSection.hidden, false);
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, true);
+  assert.equal(harness.nodes.physicalClassBadlands.checked, true);
+  assert.equal(harness.nodes.physicalClassMountain.disabled, false);
+  harness.nodes.physicalMode.value = "contours_only";
+  harness.nodes.physicalMode.dispatch("change");
+  assert.equal(harness.nodes.physicalContourSection.hidden, false);
+  assert.equal(harness.nodes.physicalAtlasSection.hidden, true);
+  harness.runtimeState.physicalSemanticsData = { features: [{ properties: { atlas_class: "badlands_canyon" } }] };
+  harness.owner.renderPhysicalUi();
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, false);
+});
 
 function createPhysicalConfig(overrides = {}) {
   return {
@@ -218,7 +244,7 @@ test("physical owner loads contours on demand after atlas-only mode", () => {
   });
 });
 
-test("physical owner applies presets once and preserves selected mode", () => {
+test("physical owner applies complete presets once and requests their contour data", () => {
   const harness = createHarness(PHYSICAL_NODE_IDS, {
     styleConfig: {
       physical: createPhysicalConfig({
@@ -235,10 +261,37 @@ test("physical owner applies presets once and preserves selected mode", () => {
 
   assert.equal(harness.nodes.physicalPreset.listeners.get("change").length, 1);
   assert.equal(harness.runtimeState.styleConfig.physical.preset, "terrain_rich");
-  assert.equal(harness.runtimeState.styleConfig.physical.mode, "contours_only");
+  assert.equal(harness.runtimeState.styleConfig.physical.mode, "atlas_and_contours");
   assert.equal(harness.runtimeState.styleConfig.physical.contourColor, "#aa5500");
   assert.equal(harness.nodes.physicalPresetHint.textContent, "ui:Terrain Rich pushes the atlas and contour layer for the strongest relief read.");
   assert.deepEqual(harness.dirtyReasons, ["physical-preset-select"]);
+  assert.deepEqual(harness.contextLayerLoads[0].layers, ["physical-set", "physical-contours-set"]);
+});
+
+test("physical component strengths are independent and presentation controls request deferred data once", () => {
+  const h = createHarness();
+  h.owner.bindEvents(); h.owner.bindEvents();
+  h.nodes.physicalLandformIntensity.value = "0"; h.nodes.physicalLandformIntensity.dispatch("input");
+  assert.equal(h.runtimeState.styleConfig.physical.landformIntensity, 0);
+  assert.equal(h.runtimeState.styleConfig.physical.landcoverIntensity, 1);
+  h.nodes.physicalLandcoverIntensity.value = "160"; h.nodes.physicalLandcoverIntensity.dispatch("input");
+  assert.equal(h.runtimeState.styleConfig.physical.landcoverIntensity, 1.6);
+  h.nodes.physicalHillshadeOpacity.value = "14"; h.nodes.physicalHillshadeOpacity.dispatch("input");
+  h.nodes.physicalHillshadeOpacity.dispatch("change");
+  assert.equal(h.runtimeState.styleConfig.physical.hillshadeOpacity, 0.14);
+  assert.equal(h.contextLayerLoads.length, 1);
+  h.nodes.physicalRegionLabels.checked = true; h.nodes.physicalRegionLabels.dispatch("change");
+  assert.equal(h.runtimeState.styleConfig.physical.showRegionLabels, true);
+  assert.equal(h.contextLayerLoads.length, 2);
+});
+
+test("zero brush strength survives UI refresh and switching from paint to points", () => {
+  const h = createHarness(PHYSICAL_NODE_IDS, { intensityFieldTool: { active: true, channelId: "physicalAtlas", subMode: "paint", brushStrength: 0, brushRadiusDeg: 3 } });
+  h.owner.bindEvents(); h.owner.renderPhysicalIntensityFieldUi();
+  assert.equal(h.runtimeState.intensityFieldTool.brushStrength, 0);
+  assert.equal(h.nodes.physicalIntensityFieldWeight.value, "0");
+  h.nodes.physicalIntensityFieldPointsBtn.dispatch("click");
+  assert.equal(h.runtimeState.intensityFieldTool.brushStrength, 0);
 });
 
 test("physical owner clamps numeric inputs and updates value labels", () => {

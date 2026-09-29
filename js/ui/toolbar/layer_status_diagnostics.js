@@ -22,6 +22,9 @@ import {
   listBaseLayerStatusContracts,
   listTransportLayerPanelContracts,
 } from "./layer_panel_contracts.js";
+import { normalizePhysicalStyleConfig } from "../../core/state_defaults.js";
+import { resolveContourLodRequest } from "../../core/renderer/physical_contour_lod_policy.js";
+import { resolvePhysicalAtlasCollection } from "../../core/renderer/physical_atlas_lod_policy.js";
 
 const STATUS_SEVERITY = Object.freeze({
   ACTIVE: "active",
@@ -179,6 +182,41 @@ function buildEnabledSummary({
   return translateUi(translate, "Enabled · waiting for data");
 }
 
+function getPhysicalStatusInputs(state) {
+  const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const dataKeys = [];
+  const loadKeys = [];
+  const metricNames = [];
+  if (cfg.mode !== "contours_only") {
+    loadKeys.push("physical_semantics");
+    metricNames.push("drawPhysicalAtlasLayer", "drawPhysicalReliefOverlayLayer");
+  }
+  if (cfg.mode !== "atlas_only") {
+    const contourLayers = resolveContourLodRequest(state);
+    dataKeys.push("physicalContourMajorData");
+    if (contourLayers.some((name) => name.endsWith("_minor"))) dataKeys.push("physicalContourMinorData");
+    loadKeys.push(...contourLayers);
+    metricNames.push("drawPhysicalContourLayer");
+  }
+  // Count the active collections, not a skipped pass or the obsolete physical
+  // source. Atlas, relief and contours are disjoint; base-pass metrics also
+  // contain brush points and must not be added to these feature counts.
+  const measuredCounts = metricNames.map((name) => {
+    const metric = getMetric(state.renderPerfMetrics, [name]);
+    if (!metric || metric.skipped) return null;
+    const contourCount = name === "drawPhysicalContourLayer"
+      && (metric.majorRenderedCount != null || metric.minorRenderedCount != null)
+      ? Number(metric.majorRenderedCount || 0) + Number(metric.minorRenderedCount || 0) : null;
+    return normalizeFiniteCount(metric.visibleFeatureCount ?? metric.renderedCount ?? contourCount);
+  }).filter((value) => value != null);
+  return {
+    loadedCount: cfg.mode === "contours_only" ? sumFeatureCounts(state, dataKeys)
+      : (getFeatureCollectionCount(resolvePhysicalAtlasCollection(state)) ?? 0) + (sumFeatureCounts(state, dataKeys) ?? 0),
+    visibleCount: measuredCounts.length ? measuredCounts.reduce((total, count) => total + count, 0) : null,
+    loadStatus: getLoadStatus(state, loadKeys),
+  };
+}
+
 function createLayerDiagnostic(definition, state, translate) {
   const enabled = typeof definition.enabled === "function"
     ? !!definition.enabled(state || {})
@@ -188,9 +226,10 @@ function createLayerDiagnostic(definition, state, translate) {
     : getMetric(state?.renderPerfMetrics, definition.metricNames);
   const metricFeatureCount = normalizeFiniteCount(metric?.featureCount);
   const dataFeatureCount = sumFeatureCounts(state || {}, definition.dataKeys);
-  const loadedCount = metricFeatureCount ?? dataFeatureCount;
-  const visibleCount = normalizeFiniteCount(metric?.visibleFeatureCount);
-  const loadStatus = getLoadStatus(state || {}, definition.loadKeys);
+  const physical = definition.id === "physical" ? getPhysicalStatusInputs(state || {}) : null;
+  const loadedCount = physical ? physical.loadedCount : metricFeatureCount ?? dataFeatureCount;
+  const visibleCount = physical ? physical.visibleCount : normalizeFiniteCount(metric?.visibleFeatureCount);
+  const loadStatus = physical ? physical.loadStatus : getLoadStatus(state || {}, definition.loadKeys);
   const severity = !enabled
     ? STATUS_SEVERITY.MUTED
     : loadStatus === "error"

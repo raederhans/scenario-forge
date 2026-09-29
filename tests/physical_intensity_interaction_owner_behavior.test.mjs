@@ -68,7 +68,8 @@ test("point creation then pointercancel uses normal bake and commit, without rol
   const h = harness(); h.tool.subMode = "points"; h.tool.brushStrength = 0; h.tool.brushRadiusDeg = 0;
   h.owner.handlePhysicalIntensityPointerDown(h.event([190,-95]));
   const point = h.channel().points[0];
-  assert.deepEqual({ ...point, id: "id" }, { id: "id", lon: 180, lat: -90, strength: 1, radiusDeg: 3, falloff: "smooth" });
+  assert.deepEqual({ ...point, id: "id" }, { id: "id", lon: 180, lat: -90, strength: 0, radiusDeg: 3, falloff: "smooth" });
+  assert.equal(h.calls.filter(([n]) => n === "bake").length, 1, "new point is visible before pointer release");
   assert.equal(h.tool.selectedPointId, point.id);
   h.calls.length = 0;
   assert.equal(h.owner.handlePhysicalIntensityPointerEnd({ ...h.event(), type: "pointercancel" }), true);
@@ -89,7 +90,7 @@ test("existing point selection is unchanged until drag, including wrapped radius
     else assert.deepEqual([point.lon, point.lat], [180,-90]);
     h.owner.handlePhysicalIntensityPointerEnd(h.event());
     assert.equal(h.channel().revision, 1);
-    assert.equal(h.calls.filter(([n]) => n === "bake").length, 1);
+    assert.equal(h.calls.filter(([n]) => n === "bake").length, 2, "drag preview and commit both bake");
   }
 });
 

@@ -365,3 +365,17 @@ test("loaded bathymetry invalidates the background signature", () => {
   state.activeBathymetryTopologyUrl = "global.topo.json";
   assert.notEqual(policy.getRenderPassSignature("background"), before);
 });
+
+test("physical component controls and names invalidate only their drawing passes", () => {
+  const { state, policy } = createHarness();
+  state.styleConfig.physical = { mode: "atlas_only", landformIntensity: 1, landcoverIntensity: 1, hillshadeOpacity: 0, showRegionLabels: false };
+  const base = policy.getRenderPassSignature("physicalBase");
+  const contours = policy.getRenderPassSignature("contextBase");
+  const labels = policy.getRenderPassSignature("labels");
+  state.styleConfig.physical.landformIntensity = 0;
+  assert.notEqual(policy.getRenderPassSignature("physicalBase"), base);
+  assert.equal(policy.getRenderPassSignature("contextBase"), contours);
+  assert.equal(policy.getRenderPassSignature("labels"), labels);
+  state.styleConfig.physical.showRegionLabels = true;
+  assert.notEqual(policy.getRenderPassSignature("labels"), labels);
+});

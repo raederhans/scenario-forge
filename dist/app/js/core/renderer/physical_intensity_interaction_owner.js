@@ -49,7 +49,7 @@ export function createPhysicalIntensityInteractionOwner({
       id: `point-${Date.now().toString(36)}-${nextIndex}`,
       lon: clamp(Number(lonLat[0]) || 0, -180, 180),
       lat: clamp(Number(lonLat[1]) || 0, -90, 90),
-      strength: clamp(Number(tool.brushStrength || 1), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
+      strength: clamp(Number(tool.brushStrength ?? 1), INTENSITY_FIELD_GRID.min, INTENSITY_FIELD_GRID.max),
       radiusDeg: clamp(Number(tool.brushRadiusDeg || 3), 0.25, 30),
       falloff: "smooth",
     };
@@ -125,6 +125,7 @@ export function createPhysicalIntensityInteractionOwner({
       point.lat = clamp(lonLat[1], -90, 90);
     }
     channel.enabled = true;
+    bakeIntensityComposite(channel);
     current.changed = true;
     schedulePhysicalIntensityRender(current.channelId, "physical-intensity-point-drag");
     refreshPhysicalIntensityUi();
@@ -173,6 +174,7 @@ export function createPhysicalIntensityInteractionOwner({
       } else {
         const point = createIntensityPoint(channel, lonLat, tool);
         appendIntensityFieldPointState(runtimeState, tool.channelId, point);
+        bakeIntensityComposite(channel);
         setIntensityFieldTool({ selectedPointId: point.id });
         physicalIntensityDragSession.pointId = point.id;
         physicalIntensityDragSession.changed = true;

@@ -2,6 +2,11 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Display quality": { zh: "显示画质", en: "Display quality" },
+  "High clarity": { zh: "高清", en: "High clarity" },
+  "Balanced quality": { zh: "均衡", en: "Balanced quality" },
+  "Performance priority": { zh: "性能优先", en: "Performance priority" },
+  "Show political borders": { zh: "显示政治国界", en: "Show political borders" },
   "This removes current paint overrides. You can undo the clear from history.": { zh: "这会清除当前着色修改。你可以通过历史记录撤销。", en: "This removes current paint overrides. You can undo the clear from history." },
   "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged.": { zh: "根据剧本参考分组编辑地图颜色。参考边界保持不变。", en: "Edit map colors using the scenario reference groups. Reference boundaries stay unchanged." },
   "Paint Reference Regions With Country Color": { zh: "用国家颜色填充参考区域", en: "Paint Reference Regions With Country Color" },

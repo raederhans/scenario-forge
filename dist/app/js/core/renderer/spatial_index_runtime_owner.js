@@ -58,7 +58,12 @@ export function createSpatialIndexRuntimeOwner({
     collectFeatureHitGeometries = () => [],
     computeProjectedGeoBounds = () => null,
     shouldExcludeWaterHitGeometry = () => false,
+    getSecondarySpatialCacheIdentity = () => null,
   } = helpers;
+
+  // Retain the latest and largest accepted water sets. A zoom can visit more
+  // than one detail subset before returning to the larger overview set.
+  let waterSnapshots = [];
 
   // buildIndex 负责主索引映射层（landIndex/countryToFeatureIds/idToKey/keyToId），
   // 为渲染与交互提供 feature-id 级别的稳定检索键；空间网格由 buildSpatialIndex 系列负责。
@@ -93,6 +98,9 @@ export function createSpatialIndexRuntimeOwner({
     preserveCurrent = false,
     reason = "secondary-spatial-reset",
   } = {}) {
+    if (!preserveCurrent) {
+      waterSnapshots = [];
+    }
     markSecondarySpatialBuildPending(state, {
       reason,
       preserveCurrent,
@@ -205,14 +213,22 @@ export function createSpatialIndexRuntimeOwner({
     allowComputeMissingBounds = true,
   } = {}) {
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+    // The caller's identity must change with projection, scenario, water
+    // sanitization and any in-place water edits. No identity means no reuse.
+    const cacheIdentity = getSecondarySpatialCacheIdentity();
+    const reusableSnapshots = cacheIdentity == null ? []
+      : waterSnapshots.filter((snapshot) => snapshot.identity === cacheIdentity);
+    const nextWaterEntries = cacheIdentity == null ? null : new Map();
     const waterItems = buildWaterSpatialItems({
       features: getEffectiveWaterRegionFeatures(),
       getFeatureId,
       collectFeatureHitGeometries,
       computeProjectedGeoBounds,
       shouldExcludeWaterHitGeometry,
+      previousEntries: reusableSnapshots.map((snapshot) => snapshot.entries),
+      nextEntries: nextWaterEntries,
     });
-    const waterGridSnapshot = captureSpatialGridBuild({
+    const waterGridOptions = {
       items: waterItems,
       canvasWidth,
       canvasHeight,
@@ -220,7 +236,19 @@ export function createSpatialIndexRuntimeOwner({
       hitGridMinCellPx,
       hitGridMaxCellPx,
       hitMaxCellsPerItem,
-    });
+    };
+    const exactSnapshot = reusableSnapshots.find((snapshot) =>
+      snapshot.canvasWidth === canvasWidth && snapshot.canvasHeight === canvasHeight
+      && snapshot.items.length === waterItems.length
+      && snapshot.items.every((item, index) => item === waterItems[index]));
+    const waterGridSnapshot = exactSnapshot?.gridSnapshot
+      || (reusableSnapshots.length
+        ? reconcileSpatialGridSnapshot({
+          grid: state.waterSpatialGrid,
+          gridMeta: state.waterSpatialGridMeta,
+          itemsById: state.waterSpatialItemsById,
+        }, waterGridOptions)
+        : captureSpatialGridBuild(waterGridOptions));
 
     const specialItems = buildSpecialSpatialItems({
       features: getEffectiveSpecialRegionFeatures(),
@@ -252,6 +280,19 @@ export function createSpatialIndexRuntimeOwner({
       },
       reason: "secondary-spatial-build",
     });
+    const nextWaterSnapshot = {
+      identity: cacheIdentity,
+      entries: nextWaterEntries,
+      items: waterItems,
+      gridSnapshot: waterGridSnapshot,
+      canvasWidth,
+      canvasHeight,
+    };
+    const priorLargest = waterSnapshots
+      .filter((snapshot) => snapshot.identity === cacheIdentity && snapshot !== exactSnapshot)
+      .sort((a, b) => b.items.length - a.items.length)[0];
+    waterSnapshots = cacheIdentity == null ? []
+      : [nextWaterSnapshot, ...(priorLargest ? [priorLargest] : [])];
   }
 
   // buildSpatialIndex 负责主空间索引（state.spatialItems + state.spatialGrid + spatialGridMeta），

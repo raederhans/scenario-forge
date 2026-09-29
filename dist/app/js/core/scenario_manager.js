@@ -4,7 +4,7 @@ import {
   clearActiveScenarioApplyRequestState,
   setLatestScenarioApplyRequestState,
 } from "./state/actions/scenario_apply_request_actions.js";
-import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
+import { ensureSovereigntyState } from "./sovereignty_manager.js";
 import {
   invalidateOceanBackgroundVisualState,
 } from "./scenario/scenario_renderer_bridge.js";
@@ -290,7 +290,7 @@ const {
   getScenarioDefaultCountryCode,
   getScenarioMapSemanticMode,
   markDirty,
-  markLegacyColorStateDirty,
+
   normalizeScenarioId,
   releaseScenarioAuditPayload,
   resetScenarioChunkRuntimeState,
@@ -543,7 +543,7 @@ const {
   applyBlankScenarioPresentationDefaults,
   setScenarioAuditUiState,
   getScenarioBaselineHashFromBundle,
-  markLegacyColorStateDirty,
+
   syncScenarioInspectorSelection,
   disableScenarioParentBorders,
   applyScenarioPaintMode,
@@ -661,7 +661,7 @@ async function applyScenarioBundle(
         topologyDecodeMs,
         scenarioApplyEpoch: transactionScenarioApplyEpoch,
         scenarioApplyRequestId: transactionScenarioApplyRequestId,
-        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload),
+        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload, bundle),
         runtimeVersionTag: staged.runtimeVersionTag || "",
         fixedOwnerColorCount: Object.keys(staged.scenarioColorMap || {}).length,
         coarseColorCount: Object.keys(staged.coarseColorMap || {}).length,
@@ -851,7 +851,7 @@ async function applyScenarioBundle(
       && (
         hasChunkedRuntime
         || !!runtimeState.scenarioPoliticalChunkData
-        || hasRenderableScenarioPoliticalTopology(runtimeState.runtimePoliticalTopology)
+        || hasRenderableScenarioPoliticalTopology(runtimeState.runtimePoliticalTopology, bundle)
       )
     ) {
       recordScenarioPerfMetric(

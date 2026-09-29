@@ -10,6 +10,7 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   // consumer per identity so an obsolete subscriber cannot close A's bitmap.
   const inFlight = new Map();
   let politicalFrame = null;
+  let politicalSnapshot = null;
   let disposed = false;
   let failedPoliticalIdentity = null;
   const pendingEditBlocksWorker = () => h.hasPendingColorEdit() && !h.allowPendingColorEdit?.();
@@ -63,11 +64,13 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
   function getPoliticalEntries() {
     const items = h.collectPoliticalItems();
     if (!items) return null;
+    const layout = h.getPoliticalLayout();
     const entries = [];
     for (const item of h.orderPoliticalItems(items)) {
       const { feature } = item;
       const id = item.id || h.getFeatureId(feature);
-      if (!id || !feature?.geometry || h.excludeVisual(feature, id) || h.skipVisual(feature)) continue;
+      if (!id || !feature?.geometry || h.excludeVisual(feature, id)
+        || h.skipVisual(feature, layout.paddedWidth, layout.paddedHeight)) continue;
       const fillColor = h.resolveFillColor(feature, id, item.drawOrder);
       entries.push({ id, feature, geometryIdentity: identityOf(feature.geometry), fillColor, strokeColor: h.resolveStrokeColor(feature, fillColor),
         lineWidth: 0.75 / Math.max(0.0001, state.zoomTransform.k) });
@@ -75,12 +78,35 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     return entries;
   }
 
+  function getPoliticalSnapshot() {
+    // A caller may opt in only with a complete content version: it must change
+    // for visible membership/order, geometry, filtering and resolved colors.
+    // Without that guarantee retain the original per-entry stale check.
+    const version = h.getPoliticalEntriesVersion?.();
+    const reusable = typeof version === "string" || (typeof version === "number" && Number.isFinite(version));
+    let key = null;
+    if (reusable) {
+      const projection = surface.getProjection();
+      key = JSON.stringify([version, state.activeScenarioId, state.sceneGeneration,
+        state.scenarioDataGeneration, state.topologyRevision, identityOf(state.landData),
+        identityOf(projection), state.zoomTransform.x, state.zoomTransform.y, state.zoomTransform.k,
+        state.dpr, h.getPoliticalLayout(), h.getPoliticalSignature(), h.getPoliticalPatchStaticSignature?.()]);
+      if (politicalSnapshot?.key === key && politicalSnapshot.entries.every(
+        (entry) => identityOf(entry.feature?.geometry) === entry.geometryIdentity)) return politicalSnapshot;
+    }
+    const entries = getPoliticalEntries();
+    if (!entries) { politicalSnapshot = null; return null; }
+    const description = describe("political", entries);
+    politicalSnapshot = reusable ? { key, entries, description } : null;
+    return { entries, description };
+  }
+
   function preparePolitical({ force = false } = {}) {
     if (!enabled() || pendingEditBlocksWorker()) return null;
     if (!force && !h.needsPoliticalRender()) return null;
-    const entries = getPoliticalEntries();
-    if (!entries) return null;
-    const description = describe("political", entries);
+    const snapshot = getPoliticalSnapshot();
+    if (!snapshot) return null;
+    const { entries, description } = snapshot;
     if (failedPoliticalIdentity === description.identity) return null;
     if (politicalFrame?.identity === description.identity) return null;
     if (pending.get("political")?.identity === description.identity) return pending.get("political").promise;
@@ -91,7 +117,10 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     }
     const baseFrame = politicalFrame;
     const patch = planPoliticalRasterPatch(baseFrame, entries, description, h.getPoliticalEntryPixelBounds);
-    const task = { identity: String(description.identity) };
+    const task = { identity: String(description.identity), transform: description.transform,
+      scenarioId: state.activeScenarioId, sceneGeneration: state.sceneGeneration,
+      scenarioDataGeneration: state.scenarioDataGeneration, topologyRevision: state.topologyRevision,
+      colorRevision: state.colorRevision, projectionKey: description.projectionKey };
     const patchInput = patch ? { renderRegion: patch.region, drawEntryIds: patch.drawEntryIds,
       patchBaseIdentity: baseFrame.identity } : {};
     let receivedResult = null;
@@ -102,11 +131,25 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
         if (!disposed && pending.get("political") === task) e.requestRender("geometry-worker-fallback");
         return;
       }
-      const currentEntries = enabled() && !pendingEditBlocksWorker() ? getPoliticalEntries() : null;
-      if (pending.get("political") !== task || !currentEntries
-        || describe("political", currentEntries).identity !== task.identity) {
+      const latest = pending.get("political") === task;
+      const canUseWorker = enabled() && !pendingEditBlocksWorker();
+      const superseded = !latest || state.zoomTransform.x !== task.transform.x
+        || state.zoomTransform.y !== task.transform.y || state.zoomTransform.k !== task.transform.k
+        || state.activeScenarioId !== task.scenarioId || state.sceneGeneration !== task.sceneGeneration
+        || state.scenarioDataGeneration !== task.scenarioDataGeneration
+        || state.topologyRevision !== task.topologyRevision || state.colorRevision !== task.colorRevision
+        || String(identityOf(surface.getProjection())) !== task.projectionKey;
+      const current = canUseWorker && !superseded ? getPoliticalSnapshot() : null;
+      if (superseded || !current
+        || current.description.identity !== task.identity) {
         close(result);
         e.recordMetric("geometryWorkerStaleResult", 0, { kind: "political" });
+        // The last input/data update may have arrived while this request was
+        // the frame's preparation gate. A stale latest result must wake drawing
+        // again, or the visible frame can remain frozen with no pending work.
+        if (latest && canUseWorker && (superseded || current)) {
+          e.requestRender("geometry-worker-political-stale");
+        }
         return;
       }
       let composed = result;
@@ -157,8 +200,8 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
 
   function drawPolitical() {
     if (!enabled() || pendingEditBlocksWorker() || !politicalFrame) return null;
-    const entries = getPoliticalEntries();
-    if (!entries || politicalFrame.identity !== describe("political", entries).identity) return null;
+    const snapshot = getPoliticalSnapshot();
+    if (!snapshot || politicalFrame.identity !== snapshot.description.identity) return null;
     const context = surface.getContext();
     const startedAt = performance.now();
     context.save();
@@ -228,5 +271,6 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
 
   return Object.freeze({ prepareFrame, preparePolitical, drawPolitical, requestHit,
     getPendingWorkCount: () => inFlight.size,
-    dispose() { disposed = true; worker.dispose(); close(politicalFrame?.result); politicalFrame = null; pending.clear(); inFlight.clear(); } });
+    dispose() { disposed = true; worker.dispose(); close(politicalFrame?.result); politicalFrame = null;
+      politicalSnapshot = null; pending.clear(); inFlight.clear(); } });
 }

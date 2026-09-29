@@ -18,7 +18,7 @@ import {
 import {
   patchScenarioChunkLoadState,
 } from "./state/actions/scenario_chunk_runtime_actions.js";
-import { ensureSovereigntyState, markLegacyColorStateDirty } from "./sovereignty_manager.js";
+import { ensureSovereigntyState } from "./sovereignty_manager.js";
 import { normalizeMapSemanticMode } from "./state.js";
 import {
   createStartupHydrationRefreshPlan,

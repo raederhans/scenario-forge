@@ -161,6 +161,46 @@ function resolveExportPassSequence(exportWorkbenchUi, renderPassNames) {
   return deduped.filter((passName) => renderPassNames.includes(passName));
 }
 
+// A preview source is reusable only while the exact rendered inputs stay valid.
+// Adjustments and download scale/format are deliberately absent: they do not
+// change the unfiltered, screen-resolution source. Never cache an unsettled pass.
+function getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup = "") {
+  const cache = state.renderPassCache;
+  const sourceId = exportUi.previewMode === "layer" ? exportUi.previewLayerId : "main";
+  const passes = sourceId === "main"
+    ? resolveExportPassSequence(exportUi, renderPassNames)
+      .filter((name) => exportUi.textVisibility?.["render-labels"] || name !== "labels")
+    : sourceId === "render-labels"
+      ? ["labels"]
+      : EXPORT_MAIN_LAYER_MODEL_BY_ID.get(sourceId)?.passNames || [];
+  if (!cache || state.scenarioApplyInFlight || state.dynamicBordersDirty
+    || state.runtimeChunkLoadState?.pendingPromotion || state.runtimeChunkLoadState?.promotionCommitInFlight
+    || (state.renderPhase && state.renderPhase !== "idle")
+    || passes.some((name) => cache.dirty?.[name] !== false || !cache.signatures?.[name])) {
+    return null;
+  }
+  const transform = state.zoomTransform || {};
+  return JSON.stringify([
+    sourceId,
+    exportUi.layerOrder,
+    exportUi.visibility,
+    exportUi.textVisibility,
+    state.activeScenarioId,
+    state.renderTransactionDiagnostics?.scenarioApplyEpoch,
+    state.sceneGeneration,
+    state.scenarioDataGeneration,
+    state.topologyRevision,
+    state.colorRevision,
+    state.dirtyRevision,
+    state.width, state.height, state.dpr,
+    state.colorCanvas?.width, state.colorCanvas?.height,
+    transform.k, transform.x, transform.y,
+    state.styleConfig,
+    passes.map((name) => [name, cache.signatures[name], cache.referenceTransforms?.[name]]),
+    svgMarkup,
+  ]);
+}
+
 function createExportWorkbenchController({
   state,
   t,
@@ -213,6 +253,7 @@ function createExportWorkbenchController({
   bakeLayer,
   clearBakeCache,
   exportMaxConcurrentJobs = 1,
+  requestPreviewFrame = (callback) => globalThis.requestAnimationFrame(callback),
 } = {}) {
   assertRequiredObjectDependency(state, "state");
   assertRequiredCallableDependency(t, "t");
@@ -228,6 +269,10 @@ function createExportWorkbenchController({
 
   let exportWorkbenchDraggedLayerId = "";
   let exportWorkbenchPreviewRenderToken = 0;
+  let previewSession = 0;
+  let pendingPreview = null;
+  let previewWork = null;
+  let previewSourceCache = null;
   let exportJobsInFlight = 0;
 
   const getExportUi = () => ensureExportWorkbenchUiState(state, normalizeExportWorkbenchUiState);
@@ -528,29 +573,75 @@ function createExportWorkbenchController({
     });
   };
 
+  const getPreviewSourceKey = (exportUi) => {
+    const usesSvg = exportUi.previewMode === "layer"
+      ? exportUi.previewLayerId === "svg-annotations" || exportUi.previewLayerId === "special-zones"
+      : exportUi.textVisibility?.["svg-annotations"] || exportUi.textVisibility?.["special-zones"];
+    // Raster-only previews neither render SVG nor need its serialized identity.
+    const svgMarkup = usesSvg ? document.getElementById("map-svg")?.outerHTML || "" : "";
+    return getExportPreviewSourceKey(state, exportUi, renderPassNames, svgMarkup);
+  };
+
+  const drainPreviewRequests = async () => {
+    while (pendingPreview) {
+      // Collapse slider events before drawing, and keep at most one source build
+      // in flight. A newer request replaces the pending one, not an active job.
+      await new Promise((resolve) => requestPreviewFrame(resolve));
+      const request = pendingPreview;
+      pendingPreview = null;
+      if (!request) continue;
+      const { token, exportUi, session } = request;
+      try {
+        const sourceKey = getPreviewSourceKey(exportUi);
+        let previewSource = sourceKey && previewSourceCache?.key === sourceKey
+          ? previewSourceCache.canvas
+          : null;
+        if (!previewSource) {
+          previewSourceCache = null;
+          previewSource = exportUi.previewMode === "layer"
+            ? await buildSingleExportSourceCanvas(exportUi, exportUi.previewLayerId)
+            : await buildCompositeSourceCanvas(exportUi);
+          // Detail preparation or scene updates can change the inputs while the
+          // source is building. Such a result must not populate the cache.
+          if (session === previewSession && sourceKey && sourceKey === getPreviewSourceKey(exportUi)) {
+            previewSourceCache = { key: sourceKey, canvas: previewSource };
+          }
+        }
+        if (token !== exportWorkbenchPreviewRenderToken) continue;
+        const adjustedPreview = applyExportAdjustmentsToCanvas(previewSource, exportUi);
+        adjustedPreview.classList.add("export-workbench-preview-render");
+        exportWorkbenchPreviewStage.replaceChildren(adjustedPreview);
+        exportWorkbenchPreviewState.textContent = exportUi.previewMode === "layer"
+          ? t("Single layer preview ready", "ui")
+          : t("Main image preview ready", "ui");
+      } catch (error) {
+        if (token !== exportWorkbenchPreviewRenderToken) continue;
+        console.error("[export-workbench] Failed to render preview.", error);
+        exportWorkbenchPreviewStage.replaceChildren();
+        exportWorkbenchPreviewState.textContent = t("Preview unavailable. Export settings remain editable.", "ui");
+      }
+    }
+  };
+
+  const startPreviewWork = () => {
+    if (!previewWork) {
+      previewWork = drainPreviewRequests().finally(() => {
+        previewWork = null;
+        if (pendingPreview) return startPreviewWork();
+      });
+    }
+    return previewWork;
+  };
+
   const renderExportWorkbenchPreview = async () => {
     if (!exportWorkbenchPreviewStage || !exportWorkbenchPreviewState) return;
-    const token = ++exportWorkbenchPreviewRenderToken;
-    const exportUi = getExportUi();
+    pendingPreview = {
+      token: ++exportWorkbenchPreviewRenderToken,
+      exportUi: getExportUi(),
+      session: previewSession,
+    };
     exportWorkbenchPreviewState.textContent = t("Rendering export preview…", "ui");
-    exportWorkbenchPreviewStage.replaceChildren();
-    try {
-      const previewSource = exportUi.previewMode === "layer"
-        ? await buildSingleExportSourceCanvas(exportUi, exportUi.previewLayerId)
-        : await buildCompositeSourceCanvas(exportUi);
-      const adjustedPreview = applyExportAdjustmentsToCanvas(previewSource, exportUi);
-      if (token !== exportWorkbenchPreviewRenderToken) return;
-      adjustedPreview.classList.add("export-workbench-preview-render");
-      exportWorkbenchPreviewStage.replaceChildren(adjustedPreview);
-      exportWorkbenchPreviewState.textContent = exportUi.previewMode === "layer"
-        ? t("Single layer preview ready", "ui")
-        : t("Main image preview ready", "ui");
-    } catch (error) {
-      if (token !== exportWorkbenchPreviewRenderToken) return;
-      console.error("[export-workbench] Failed to render preview.", error);
-      exportWorkbenchPreviewStage.replaceChildren();
-      exportWorkbenchPreviewState.textContent = t("Preview unavailable. Export settings remain editable.", "ui");
-    }
+    return startPreviewWork();
   };
 
   const syncExportWorkbenchControlsFromState = () => {
@@ -630,6 +721,9 @@ function createExportWorkbenchController({
     }
     if (!isOpen) {
       exportWorkbenchPreviewRenderToken += 1;
+      previewSession += 1;
+      pendingPreview = null;
+      previewSourceCache = null;
       exportWorkbenchPreviewStage?.replaceChildren();
       return;
     }
@@ -836,6 +930,7 @@ export {
   getExportAnnotationCountSummary,
   getExportAnnotationFamilyCounts,
   createExportWorkbenchController,
+  getExportPreviewSourceKey,
   ensureExportWorkbenchUiState,
   normalizeExportWorkbenchLayerOrder,
   normalizeExportWorkbenchTextVisibility,

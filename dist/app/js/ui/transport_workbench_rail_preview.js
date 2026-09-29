@@ -131,12 +131,12 @@ function createStationFeature(rawFeature) {
   };
 }
 
-async function loadJapanRailPack(mode = PACK_MODE_PREVIEW, config = {}) {
+async function loadJapanRailPack(mode = PACK_MODE_PREVIEW, config = {}, { emitSelection = true } = {}) {
   if (config?.activePackId) {
     lineRuntime.setActivePack(config.activePackId, resolveTransportManifestUrl(config.activePackId));
   }
   return lineRuntime.loadPack(mode, () => {
-    if ((runtime.loadState.status === "ready" || runtime.loadState.status === "pending") && runtime.lastRenderedConfig) {
+    if (emitSelection && (runtime.loadState.status === "ready" || runtime.loadState.status === "pending") && runtime.lastRenderedConfig) {
       emitSelectionChange();
     }
   });
@@ -374,6 +374,10 @@ export async function renderJapanRailPreview(config, options = {}) {
     return null;
   }
   return renderRail(config);
+}
+
+export async function prepareJapanRailPreview(config = {}) {
+  return loadJapanRailPack(PACK_MODE_PREVIEW, config, { emitSelection: false });
 }
 
 export async function warmJapanRailPreviewPack({ includeFull = false } = {}) {

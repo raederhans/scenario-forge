@@ -1,6 +1,6 @@
 // The workspace moves existing controls so their business owners keep their
 // element references, event handlers, and native form contracts.
-export function initEditorWorkspace({ documentRef = document, t, setSidebarTab, setStrategicMode, onNavigate = () => {} } = {}) {
+export function initEditorWorkspace({ documentRef = document, t, setSidebarTab, setStrategicMode, revealProperties = () => {}, onNavigate = () => {} } = {}) {
   const get = (id) => documentRef.getElementById(id);
   const left = get("leftSidebarContent");
   const right = get("rightSidebarContent");
@@ -179,6 +179,7 @@ export function initEditorWorkspace({ documentRef = document, t, setSidebarTab, 
       tabs.append(btn);
       layerEntries.push({ btn, host, panel, propertyKey });
       const activate = () => {
+        revealProperties();
         showProperty(propertyKey);
         // Native owners update the selected panel's contents and state.
         panel.hidden = false;

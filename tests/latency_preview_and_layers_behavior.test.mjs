@@ -171,7 +171,7 @@ test("pending-edit reset cancels a queued brush preview before it can repaint st
 test("production layer invalidation preserves the water source token and schedules rather than flushes", () => {
   const body = source.slice(source.indexOf("function invalidateContextLayerVisualStateBatch("), source.indexOf("\nfunction createHitCanvasElement("));
   const scheduled = [], invalidated = [];
-  const scope = { layerResolverCache: { waterRegionsDataToken: "stable-water" },
+  const scope = { PHYSICAL_ATLAS_DETAIL_LAYER: "physical_semantics_detail", layerResolverCache: { waterRegionsDataToken: "stable-water" },
     invalidateRenderPasses: (passes) => invalidated.push([...passes]), clearRenderPassReferenceTransforms() {},
     contextLayerRenderScheduler: { request: (...args) => scheduled.push(args) } };
   vm.createContext(scope); vm.runInContext(body, scope);
@@ -180,6 +180,10 @@ test("production layer invalidation preserves the water source token and schedul
   assert.deepEqual(invalidated[0], ["contextBase", "dayNight"]); assert.equal(scheduled.length, 1);
   scope.invalidateContextLayerVisualStateBatch(["physical"], "load", { renderNow: false });
   assert.equal(scheduled.length, 1); assert.ok(invalidated[1].includes("physicalBase"));
+  scope.invalidateContextLayerVisualStateBatch(["physical_semantics_detail", "physical_hillshade", "physical_region_labels"], "load", { renderNow: false });
+  assert.ok(invalidated[2].includes("physicalBase"));
+  assert.ok(invalidated[2].includes("contextBase"));
+  assert.ok(invalidated[2].includes("labels"));
 });
 
 test("a preset submits all context families as one batch rather than independent renderNow requests", () => {

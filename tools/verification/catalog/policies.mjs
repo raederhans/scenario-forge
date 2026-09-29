@@ -92,6 +92,7 @@ export const CATALOG_POLICIES = {
           "tests/test_water_display_lods.py",
           "tests/test_tno_named_marginal_water_contract.py",
           "tests/test_physical_context_contours.py",
+          "tests/test_physical_detail.py",
           "tests/test_patch_checked_in_urban_artifacts.py",
           "tests/test_build_global_bathymetry_asset.py",
           "tests/test_city_assets.py",

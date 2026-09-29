@@ -13,24 +13,28 @@ export function getRiverZoomBucket(k) {
 
 const RIVER_ZOOM_STYLE_FACTORS = {
   low: {
-    coreWidthFactor: 1.3,
-    outlineWidthFactor: 0.55,
-    outlineAlphaFactor: 0.38,
+    coreWidthFactor: 0.95,
+    outlineWidthFactor: 0.35,
+    outlineAlphaFactor: 0.25,
+    coreAlphaFactor: 0.78,
   },
   mid: {
-    coreWidthFactor: 1.2,
-    outlineWidthFactor: 0.5,
-    outlineAlphaFactor: 0.42,
+    coreWidthFactor: 1.05,
+    outlineWidthFactor: 0.4,
+    outlineAlphaFactor: 0.3,
+    coreAlphaFactor: 0.9,
   },
   high: {
     coreWidthFactor: 1.2,
     outlineWidthFactor: 0.4,
     outlineAlphaFactor: 0.35,
+    coreAlphaFactor: 1,
   },
   detail: {
     coreWidthFactor: 1.3,
     outlineWidthFactor: 0.35,
     outlineAlphaFactor: 0.3,
+    coreAlphaFactor: 1,
   },
 };
 
@@ -288,8 +292,8 @@ export function createRiverLayerRenderOwner({
           * zoomStyle.coreWidthFactor
           * profile.widthFactor;
         context.globalAlpha = interactive
-          ? Math.min(opacity * profile.opacityFactor, 0.78)
-          : opacity * profile.opacityFactor;
+          ? Math.min(opacity * profile.opacityFactor, 0.78) * zoomStyle.coreAlphaFactor
+          : opacity * zoomStyle.coreAlphaFactor * profile.opacityFactor;
         context.lineWidth = resolvedCoreWidth / scale;
         strokeEntry(entry);
       });

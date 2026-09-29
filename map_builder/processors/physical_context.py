@@ -42,6 +42,10 @@ def _finalize_semantic_components(
     gdf: gpd.GeoDataFrame,
     *,
     id_prefix: str,
+    simplify_degrees: float = cfg.PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES,
+    min_area_km2: float = cfg.PHYSICAL_SEMANTIC_COMPONENT_MIN_AREA_KM2,
+    rainforest_min_area_km2: float = cfg.PHYSICAL_RAINFOREST_MIN_AREA_KM2,
+    grassland_min_area_km2: float = cfg.PHYSICAL_GRASSLAND_STEPPE_MIN_AREA_KM2,
 ) -> gpd.GeoDataFrame:
     if gdf is None or gdf.empty:
         return gpd.GeoDataFrame(
@@ -67,7 +71,7 @@ def _finalize_semantic_components(
     prepared = prepared[prepared.geometry.notna() & ~prepared.geometry.is_empty].copy()
     prepared = prepared[prepared.geometry.geom_type.isin({"Polygon", "MultiPolygon"})].copy()
     prepared["geometry"] = prepared.geometry.simplify(
-        tolerance=float(cfg.PHYSICAL_SEMANTIC_SIMPLIFY_DEGREES),
+        tolerance=float(simplify_degrees),
         preserve_topology=True,
     )
     prepared = prepared[prepared.geometry.notna() & ~prepared.geometry.is_empty].copy()
@@ -81,13 +85,13 @@ def _finalize_semantic_components(
 
     metric = prepared.to_crs(EQUAL_AREA_CRS)
     areas_sqkm = metric.geometry.area / 1_000_000.0
-    min_area = float(cfg.PHYSICAL_SEMANTIC_COMPONENT_MIN_AREA_KM2)
+    min_area = float(min_area_km2)
     thresholds = prepared["atlas_class"].map(
         lambda atlas_class: max(
             min_area,
-            float(cfg.PHYSICAL_RAINFOREST_MIN_AREA_KM2)
+            float(rainforest_min_area_km2)
             if str(atlas_class or "").strip().lower() == "rainforest_tropical"
-            else float(cfg.PHYSICAL_GRASSLAND_STEPPE_MIN_AREA_KM2)
+            else float(grassland_min_area_km2)
             if str(atlas_class or "").strip().lower() == "grassland_steppe"
             else min_area,
         )
@@ -270,7 +274,7 @@ def _build_forest_semantic_code_grid(forest_type: np.ndarray, transform) -> np.n
     return semantic_codes
 
 
-def _polygonize_semantic_grid(code_grid: np.ndarray, transform) -> gpd.GeoDataFrame:
+def _polygonize_semantic_grid(code_grid: np.ndarray, transform, **finalize_options) -> gpd.GeoDataFrame:
     class_map = {
         1: "forest_temperate",
         2: "grassland_steppe",
@@ -302,7 +306,7 @@ def _polygonize_semantic_grid(code_grid: np.ndarray, transform) -> gpd.GeoDataFr
 
     gdf = gpd.GeoDataFrame(records, geometry="geometry", crs="EPSG:4326")
     gdf = gdf[gdf.geometry.notna() & ~gdf.geometry.is_empty].copy()
-    return _finalize_semantic_components(gdf, id_prefix="atlas_semantic_lc100")
+    return _finalize_semantic_components(gdf, id_prefix="atlas_semantic_lc100", **finalize_options)
 
 
 def build_physical_semantics(physical_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:

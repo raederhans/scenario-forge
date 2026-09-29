@@ -66,24 +66,86 @@ function createScenarioStartupHydrationController({
   ownerFeatureCoverageMinRatio = 0.85,
   ownerFeatureCoverageMinFeatures = 1000,
 } = {}) {
-  function getScenarioTopologyFeatureCollection(topologyPayload, objectName) {
+  const decodedTopologyCollectionsByBundle = new WeakMap();
+  const decodedCollectionKeysByObject = {
+    political: "politicalData",
+    land_mask: "scenarioLandMaskData",
+    context_land_mask: "scenarioContextLandMaskData",
+    scenario_water: "scenarioWaterRegionsData",
+    scenario_special_land: "scenarioSpecialRegionsData",
+    scenario_atlantropa: "scenarioAtlantropaData",
+  };
+
+  function getScenarioTopologyFeatureCollection(topologyPayload, objectName, bundle = null) {
     const object = topologyPayload?.objects?.[objectName];
-    if (!object || typeof globalThis.topojson?.feature !== "function") {
-      return null;
+    if (!object) return null;
+    const matchingBundle = bundle?.runtimeTopologyPayload === topologyPayload ? bundle : null;
+    const source = matchingBundle?.source || {};
+    const sourceKey = matchingBundle ? JSON.stringify([
+      matchingBundle.bundleLevel || "",
+      matchingBundle.manifest?.detail_chunk_manifest_url || "",
+      source.runtime_topology_sha256 || "",
+      source.runtime_bootstrap_topology_sha256 || "",
+      source.detail_chunk_manifest_sha256 || "",
+    ]) : "";
+    const cache = matchingBundle ? decodedTopologyCollectionsByBundle.get(matchingBundle) : null;
+    const previous = cache?.get(objectName);
+    // Loader treats decoded TopoJSON as immutable for a given source SHA. Identity/length
+    // checks cover bundle reconstruction and object replacement without rescanning large arcs.
+    const matchesPrevious = previous
+      && previous.topology === topologyPayload
+      && previous.object === object
+      && previous.geometries === object.geometries
+      && previous.geometryCount === object.geometries?.length
+      && previous.arcs === topologyPayload.arcs
+      && previous.arcCount === topologyPayload.arcs?.length
+      && previous.sourceKey === sourceKey;
+    if (matchesPrevious) return previous.collection;
+
+    const decodedKey = decodedCollectionKeysByObject[objectName];
+    const workerCollection = matchingBundle && decodedKey
+      ? getScenarioDecodedCollection(matchingBundle, decodedKey)
+      : null;
+    // Worker decode and topology are assembled by the loader from one load result;
+    // feature count is only a malformed-result guard, not a source identity check.
+    const workerResultMatchesTopology = Array.isArray(workerCollection?.features)
+      && (!Array.isArray(object.geometries) || workerCollection.features.length === object.geometries.length)
+      && (!previous || previous.workerCollection !== workerCollection);
+    let collection = workerResultMatchesTopology
+      ? normalizeScenarioFeatureCollection(workerCollection)
+      : null;
+    if (!Array.isArray(collection?.features) && typeof globalThis.topojson?.feature === "function") {
+      try {
+        collection = normalizeScenarioFeatureCollection(globalThis.topojson.feature(topologyPayload, object));
+      } catch (error) {
+        console.warn(`[scenario] Failed to decode scenario topology object "${objectName}".`, error);
+      }
     }
-    try {
-      return normalizeScenarioFeatureCollection(globalThis.topojson.feature(topologyPayload, object));
-    } catch (error) {
-      console.warn(`[scenario] Failed to decode scenario topology object "${objectName}".`, error);
-      return null;
+    if (!Array.isArray(collection?.features)
+      || (Array.isArray(object.geometries) && collection.features.length !== object.geometries.length)) return null;
+    if (matchingBundle) {
+      const nextCache = cache || new Map();
+      nextCache.set(objectName, {
+        topology: topologyPayload,
+        object,
+        geometries: object.geometries,
+        geometryCount: object.geometries?.length,
+        arcs: topologyPayload.arcs,
+        arcCount: topologyPayload.arcs?.length,
+        sourceKey,
+        workerCollection,
+        collection,
+      });
+      if (!cache) decodedTopologyCollectionsByBundle.set(matchingBundle, nextCache);
     }
+    return collection;
   }
 
-  function hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload) {
+  function hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload, bundle = null) {
     const geometries = runtimeTopologyPayload?.objects?.political?.geometries;
     return Array.isArray(geometries)
       && geometries.length > 0
-      && !!getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political");
+      && (getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political", bundle)?.features?.length || 0) > 0;
   }
 
   function isRuntimeOnlyShellFallbackFeature(feature) {
@@ -112,8 +174,8 @@ function createScenarioStartupHydrationController({
     };
   }
 
-  function getPoliticalPayloadDecisionFromRuntimeTopology(runtimeTopologyPayload, mapSemanticMode) {
-    const collection = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political");
+  function getPoliticalPayloadDecisionFromRuntimeTopology(runtimeTopologyPayload, mapSemanticMode, bundle = null) {
+    const collection = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political", bundle);
     return getPromotablePoliticalPayloadDecision(collection, mapSemanticMode);
   }
 
@@ -308,7 +370,7 @@ function createScenarioStartupHydrationController({
     if (runtimeTopologyPayload) {
       // 这里先用 runtime topology 定住“壳层真相”，再决定各类 overlay 是否复用缓存、是否需要刷新版本标签。
       // 顺序不能反过来，否则 water / land mask 这类派生层会拿到和当前 runtime 壳层不一致的身份标记。
-      if (mapSemanticMode !== "blank" && !hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload)) {
+      if (mapSemanticMode !== "blank" && !hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload, bundle)) {
         setScenarioHydrationHealthGateState(state, normalizeScenarioHydrationHealthGateState({
           status: "fatal",
           reason: SCENARIO_HYDRATION_HEALTH_REASONS.runtimeTopologyUnrenderable,
@@ -339,17 +401,17 @@ function createScenarioStartupHydrationController({
       const nextRuntimePoliticalTopology = runtimeTopologyPayload;
       const nextScenarioLandMaskData =
         getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
-        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
+        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask", bundle)
         || state.scenarioLandMaskData
         || null;
       const nextScenarioContextLandMaskData =
         getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
-        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask")
+        || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask", bundle)
         || state.scenarioContextLandMaskData
         || null;
       const hasBundleWaterPayload = Object.prototype.hasOwnProperty.call(bundle || {}, "waterRegionsPayload");
       const decodedWaterPayload = getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData");
-      const topologyWaterPayload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water");
+      const topologyWaterPayload = getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water", bundle);
       const bundleWaterPayload = hasBundleWaterPayload ? bundle.waterRegionsPayload : undefined;
       const nextScenarioWaterRegionsData =
         mergedWaterPayload !== undefined
@@ -385,7 +447,7 @@ function createScenarioStartupHydrationController({
           ? mergedSpecialPayload
           : (
             getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
-            || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+            || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land", bundle)
             || bundle.specialRegionsPayload
             || state.scenarioSpecialRegionsData
             || null
@@ -395,7 +457,7 @@ function createScenarioStartupHydrationController({
           ? mergedAtlantropaPayload
           : (
             getScenarioDecodedCollection(bundle, "scenarioAtlantropaData")
-            || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_atlantropa")
+            || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_atlantropa", bundle)
             || state.scenarioAtlantropaData
             || null
           );
@@ -419,7 +481,8 @@ function createScenarioStartupHydrationController({
         runtimeTopologyData: runtimeTopologyPayload,
         runtimePoliticalTopology: nextRuntimePoliticalTopology,
         runtimePoliticalMetaSeed: bundle.runtimePoliticalMeta || null,
-        runtimePoliticalFeatureCollectionSeed: getScenarioDecodedCollection(bundle, "politicalData") || null,
+        runtimePoliticalFeatureCollectionSeed: getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "political", bundle)
+          || (!runtimeTopologyPayload?.objects?.political ? getScenarioDecodedCollection(bundle, "politicalData") : null),
         scenarioLandMaskData: nextScenarioLandMaskData,
         scenarioContextLandMaskData: nextScenarioContextLandMaskData,
         scenarioWaterRegionsData: nextScenarioWaterRegionsData,
@@ -446,12 +509,12 @@ function createScenarioStartupHydrationController({
     const runtimePoliticalPayloadDecision = getPoliticalPayloadDecisionFromRuntimeTopology(
       runtimeTopologyPayload,
       mapSemanticMode,
+      bundle,
     );
-    const decodedPoliticalPayloadDecision = getPromotablePoliticalPayloadDecision(
-      getScenarioDecodedCollection(bundle, "politicalData"),
-      mapSemanticMode,
-    );
-    // political payload 优先级从旧 runtime -> decoded full bundle -> merged runtime layer 逐层覆盖。
+    const decodedPoliticalPayloadDecision = !runtimeTopologyPayload?.objects?.political
+      ? getPromotablePoliticalPayloadDecision(getScenarioDecodedCollection(bundle, "politicalData"), mapSemanticMode)
+      : { hasPayload: false, payload: null };
+    // political payload 优先级从旧 runtime -> bundle 对应的 runtime topology -> merged runtime layer 逐层覆盖。
     // 最后一层 merged payload 代表 chunk/apply 后的最新壳层真相，必须拥有最终解释权。
     const previousScenarioPoliticalPayload = state.scenarioPoliticalChunkData;
     let nextScenarioPoliticalPayload = previousScenarioPoliticalPayload || null;

@@ -11,7 +11,7 @@ export function isAtlantropaCoastlineLandVisible(state) {
 }
 
 export function getBorderWorkerIdentity(state) {
-  return [state.activeScenarioId, state.scenarioApplyEpoch, state.sceneGeneration,
+  return [state.activeScenarioId, state.renderTransactionDiagnostics?.scenarioApplyEpoch, state.sceneGeneration,
     state.scenarioDataGeneration, state.topologyRevision, state.sovereigntyRevision,
     state.scenarioShellOverlayRevision, state.mapSemanticMode,
     state.showScenarioAtlantropa].join("|");

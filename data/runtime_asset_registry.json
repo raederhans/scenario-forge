@@ -629,6 +629,24 @@
         "publish_scope": "repo_only",
         "runtime_readiness": "catalog_only"
       }
+    },
+    "context_layer:physical_semantics_detail": {
+      "url": "data/global_physical_semantics.detail.topo.json",
+      "role": "context_layer",
+      "family_id": "physical_semantics_detail",
+      "description": "Alps 2019 land-cover detail; overview elsewhere"
+    },
+    "context_layer:physical_hillshade": {
+      "url": "data/physical_hillshade.alps.topo.json",
+      "role": "context_layer",
+      "family_id": "physical_hillshade",
+      "description": "Alps ETOPO 2022 DEM illumination pilot, opt-in"
+    },
+    "context_layer:physical_region_labels": {
+      "url": "data/physical_region_labels.geojson",
+      "role": "context_layer",
+      "family_id": "physical_region_labels",
+      "description": "Natural Earth bilingual physical reference labels"
     }
   },
   "scenario_registry_key": "scenario_registry",
