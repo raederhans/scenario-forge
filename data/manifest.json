@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-11T02:47:14.044292+00:00",
+  "generated_at": "2026-09-29T02:43:25.512929+00:00",
   "outputs": {
     "city_aliases.json": {
       "alias_count": 189255,
@@ -96,8 +96,8 @@
       "world_bounds_geometries": 1
     },
     "europe_topology.na_v2.json": {
-      "arc_count": 369373,
-      "arc_point_count": 1740568,
+      "arc_count": 371638,
+      "arc_point_count": 1752215,
       "artifact_class": "derived",
       "description": "Current detail political topology used for runtime enrichment.",
       "has_computed_neighbors": true,
@@ -112,23 +112,23 @@
         "water_regions"
       ],
       "owner": "init_map_data.detail_topology",
-      "political_geometries": 22527,
-      "raw_world_bounds_geometries": 44,
+      "political_geometries": 22514,
+      "raw_world_bounds_geometries": 42,
       "role": "detail_topology_na_v2",
       "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "sha256": "0b302e8186546d8aa254e200a0e73898dfda1e5627662f8923b7c16286b1ed21",
+      "sha256": "334446a5ebcc291e4e64b5d3d1c2831984956d0720a2821f512bcde8a440f8e6",
       "simplification": "detail_publish_v2",
-      "size_bytes": 79977077,
+      "size_bytes": 80385719,
       "target_zoom_range": [
         1.7,
         20
       ],
       "type": "topology",
-      "world_bounds_geometries": 11
+      "world_bounds_geometries": 9
     },
     "europe_topology.runtime_political_v1.json": {
-      "arc_count": 147909,
-      "arc_point_count": 618868,
+      "arc_count": 150426,
+      "arc_point_count": 631942,
       "artifact_class": "publish",
       "description": "Unified runtime political topology consumed by the app and scenarios.",
       "has_computed_neighbors": true,
@@ -136,19 +136,19 @@
         "political"
       ],
       "owner": "init_map_data.runtime_political_topology",
-      "political_geometries": 23426,
-      "raw_world_bounds_geometries": 527,
+      "political_geometries": 23418,
+      "raw_world_bounds_geometries": 450,
       "role": "runtime_political_topology",
       "schema_ref": "schema://topology/runtime_political_v1",
-      "sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
+      "sha256": "b833908e74ecf8d1edce8ee8031feb8c230669674537d341fbaa4ef31e03491c",
       "simplification": "runtime_projection_v1",
-      "size_bytes": 14128976,
+      "size_bytes": 32742132,
       "target_zoom_range": [
         1.7,
         20
       ],
       "type": "topology",
-      "world_bounds_geometries": 177
+      "world_bounds_geometries": 149
     },
     "geo_aliases.json": {
       "alias_count": 48351,

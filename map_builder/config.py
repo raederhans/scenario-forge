@@ -181,6 +181,9 @@ COUNTRY_CODE_ALIASES = {
 # Primary components listed here survive detail replacement when they represent detached territories.
 RUNTIME_PRIMARY_COMPONENT_OVERLAP_THRESHOLD = 0.05
 RUNTIME_PRIMARY_COMPONENT_RETENTION_RULES = {
+    # Keep Norway's detached islands, including Svalbard, when detail replaces its mainland.
+    # The shared retention helper assigns the same NO_PRIMARY_GAP_N ids as modern_world.
+    "NO": (),
     "FR": (
         {
             "code": "GF",

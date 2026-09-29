@@ -882,7 +882,6 @@ export function createPoliticalBackgroundRenderOwner({
     (landCollection?.features || []).forEach((feature, index) => {
       const id = getFeatureId(feature) || `feature-${index}`;
       if (!feature?.geometry) return;
-      if (isAntarcticSectorFeature(feature, id)) return;
       if (isBaseGeographyScenarioFeature(feature)) return;
       if (shouldExcludePoliticalVisualFeature(feature, id)) return;
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight, { forceProd: true })) return;

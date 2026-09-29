@@ -580,3 +580,11 @@
 ## 2026-09-29 地貌图层交付
 
 整合工作树：`C:/Users/raede/.codex/worktrees/physical-layer-merge/mapcreator`；分支：`codex/physical-layer-improvements-20260929`。地貌面板、阿尔卑斯细节、局部强度、双语名称和 DEM 阴影由本分支统一交付。当前主工作区的混合 WIP 原样保留，不进行 reset、stash 或强制同步。验证及合并状态见 `docs/active/physical-layer-improvements-20260928/task.md`，运行证据保留在整合工作树 `.runtime/reports/generated/physical-integration/`。
+
+## Polar data repair integration 2026-09-29
+
+- Branch: `codex/polar-data-repair`; repair commit: `2b64c655`; integrated base: `origin/main@a756b139`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/polar-data-repair/mapcreator`; root owns commit, build, push and merge.
+- Scope: Russian Arctic truncation, Norwegian island retention, blank-map polar coverage and interaction, derived scenario assets and precision-water repair.
+- User authorized push/merge and a fast merge path. Primary checkout WIP remains untouched. Keep this worktree for reuse and ignored browser/build evidence; remote PR receipt is authoritative for final merge status.
+- Polar delivery PR: https://github.com/raederhans/scenario-forge/pull/187 . Local integration validation completed; retain checkout and ignored evidence. Final merge receipt is available on the PR.

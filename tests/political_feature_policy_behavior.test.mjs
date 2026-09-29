@@ -164,3 +164,17 @@ test("field-driven Atlantropa rules observe visibility changes and require expli
   state.showScenarioAtlantropa = true;
   assert.equal(policy.isPoliticalInteractionRenderableFeature(value), true);
 });
+
+test("ownerless blank maps can render and edit Antarctic sectors while scenario policy remains intact", () => {
+  const { policy, state } = fixture();
+  const sector = feature("AQ_AAT_WEST", { detail_tier: "antarctic_sector", __source: "primary" });
+  assert.equal(policy.shouldExcludePoliticalVisualFeature(sector), true);
+  state.mapSemanticMode = "blank";
+  assert.equal(policy.isAntarcticSectorFeature(sector), true);
+  assert.equal(policy.shouldExcludePoliticalVisualFeature(sector), false);
+  assert.equal(policy.isPoliticalInteractionRenderableFeature(sector), true);
+  sector.properties.interactive = false;
+  assert.equal(policy.isPoliticalInteractionRenderableFeature(sector), false);
+  state.mapSemanticMode = "scenario";
+  assert.equal(policy.shouldExcludePoliticalVisualFeature(sector), true);
+});
