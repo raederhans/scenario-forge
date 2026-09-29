@@ -1,6 +1,8 @@
+import { RIVER_PAINT_PILOT } from '../js/core/river_paint/pilot_manifest.js';
+import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, feature, d3, captureCells } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, rectangle, feature, d3, captureCells, realPilot } from './helpers/river_paint_fixture.mjs';
 import { getRiverPaintRuntime, createRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { applyFeaturePaintState } from '../js/core/state/color_state.js';
@@ -143,4 +145,19 @@ test('blocked, stale and mismatched-parent hits cannot write; eyedropper uses ch
   assert.equal(editor.handleClick(cellHit), true); assert.equal(entries.length, 1);
   state.currentTool = 'eyedropper'; state.riverPaint.editMode = false; editor.handleClick(cellHit);
   assert.equal(selected, '#0000ff');
+});
+
+
+test('same ownership hash cannot activate a pilot against a regenerated geometry build', async () => {
+  const pack = realPilot();
+  const manifest = { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt };
+  const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
+    activeScenarioManifest: manifest, riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, overrides: {} }) };
+  const runtime = createRiverPaintRuntime(state);
+  assert.equal(runtime.getActivePack().packId, pack.packId);
+  state.activeScenarioManifest = { ...manifest, generated_at: 'new-geometry-build' };
+  assert.equal(runtime.getActivePack(), null);
+  assert.throws(() => runtime.assertReadyForExport(), /geometry build/);
+  await assert.rejects(runtime.enable(async () => pack), /does not match/);
+  assert.equal(state.riverPaint.pack.packId, pack.packId);
 });

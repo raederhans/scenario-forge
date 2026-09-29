@@ -1,3 +1,4 @@
+import { isRiverPaintSourceCompatible } from './pilot_manifest.js';
 import { sameRiverParentGeometry } from './geometry_identity.js';
 import {
   collectRiverCellIdsForParents, getActiveRiverPack, getRiverParentCompatibility,
@@ -15,8 +16,12 @@ export function createRiverPaintRuntime(state, { geoContains = (feature, point) 
   let pinnedCache = null, surfaceCache = null;
   const cellFeatures = new Map();
   let compositions = 0;
-  const identity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, state.scenarioBaselineHash || ''].join('|');
-  const activePack = () => getActiveRiverPack(state.riverPaint, state.activeScenarioId, state.scenarioBaselineHash || '');
+  const identity = () => [state.activeScenarioId || '', state.sceneGeneration || 0, state.scenarioBaselineHash || '',
+    state.activeScenarioManifest?.version || '', state.activeScenarioManifest?.generated_at || ''].join('|');
+  const activePack = () => {
+    const pack = getActiveRiverPack(state.riverPaint, state.activeScenarioId, state.scenarioBaselineHash || '');
+    return isRiverPaintSourceCompatible(pack, state.activeScenarioManifest) ? pack : null;
+  };
   function syncScene() {
     const next = identity();
     if (scene === next) return;
@@ -46,7 +51,8 @@ export function createRiverPaintRuntime(state, { geoContains = (feature, point) 
         const pack = normalizeRiverPartitionPack(await Promise.resolve().then(() => loadPack({ signal })));
         if (generation !== requestGeneration || expectedScene !== identity() || signal.aborted) return { ready: false, stale: true };
         if (!state.riverPaint?.editMode) { cancel(); return { ready: false, stale: true }; }
-        if (pack.sceneId !== state.activeScenarioId || (pack.source.baselineHash && pack.source.baselineHash !== state.scenarioBaselineHash)) {
+        if (pack.sceneId !== state.activeScenarioId || (pack.source.baselineHash && pack.source.baselineHash !== state.scenarioBaselineHash)
+          || !isRiverPaintSourceCompatible(pack, state.activeScenarioManifest)) {
           throw new Error('River partition pack does not match this scenario baseline');
         }
         setRiverPaintState(state, { schemaVersion: 1, editMode: true, pack, overrides: {} });
@@ -67,7 +73,7 @@ export function createRiverPaintRuntime(state, { geoContains = (feature, point) 
   // Small, immutable geometry pins are a derived display product. They do not
   // mutate topology, membership, source feature properties, or introduce IDs.
   // The reviewed baseline hash permits coarse/fine geometry changes inside the
-  // same dataset, but never reuse against a new baseline or another scenario.
+  // same reviewed build, never reuse against a regenerated geometry dataset.
   function pinCollection(collection) {
     syncScene();
     const pack = activePack();
@@ -143,7 +149,7 @@ export function createRiverPaintRuntime(state, { geoContains = (feature, point) 
       return;
     }
     const pack = activePack();
-    if (!pack) throw new Error('Saved river partitions do not match the current scenario baseline');
+    if (!pack) throw new Error('Saved river partitions do not match the current scenario baseline or geometry build');
     for (const parent of pack.parents) {
       if (getRiverParentCompatibility(pack, state.landIndex?.get(parent.parentId), parent.parentId).status !== 'ready') {
         throw new Error(`River partition geometry is not ready: ${parent.parentId}`);

@@ -60,6 +60,9 @@ python tools/build_river_partitions.py \
 The production sidecar is registered as `river_partitions:modern_world_pilot`.
 Its complete normalized payload is authenticated by `pilot_manifest.js`.
 A self-reported geometry hash is not accepted as a coverage proof on import.
+Because the scenario baseline hash covers ownership, activation and import also
+check the approved scenario version and generated-at build stamp. A regenerated
+geometry dataset is rejected even if ownership did not change.
 The pack carries baseline, source-file hashes, generator version and stable
 parent/cell identities. Source changes require re-audit and an explicitly new
 approved pack, not silent re-splitting of saved paint.
@@ -116,3 +119,12 @@ Out of scope: global activation, arbitrary river or freehand cuts, TNO/HGO/HOI4
 packs, automatic sliver merging, migration across changed geometry baselines,
 and changing administrative or scenario ownership. The pilot is not a survey-
 grade river boundary dataset. No source geography is overwritten.
+
+## Historical policy proof limitation
+
+The full `check_state_writer_policy.mjs` historical proof is already fail-closed
+at the base snapshot: `political_path_cache_owner.js` and `render_cache_owner.js`
+factory/source fingerprints drift from their archived borrowed-effect contract.
+Restoring the base `map_renderer.js` reproduces the same six diagnostics. This
+change does not relax or regenerate that historical contract. Current
+architecture boundaries and the state-write allowlist remain required.

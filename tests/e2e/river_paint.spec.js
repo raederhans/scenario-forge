@@ -97,11 +97,13 @@ test('native canvas renders real Paris cells and PNG pixels follow state after t
   const result = await page.evaluate(async () => {
     const load = path => import(new URL(path, location.href).href);
     const { loadRiverPaintPilot } = await load('./js/core/river_paint/pilot_loader.js');
+    const { RIVER_PAINT_PILOT } = await load('./js/core/river_paint/pilot_manifest.js');
     const { normalizeRiverPaintState } = await load('./js/core/river_paint/partition_model.js');
     const { createRiverPaintRenderOwner } = await load('./js/core/river_paint/render_owner.js');
     const pack = await loadRiverPaintPilot({}); const parent = pack.parents.find(p => p.parentId === 'FR_ARR_75001');
     const feature = { type: 'Feature', id: parent.parentId, properties: { id: parent.parentId, cntr_code: 'FR' }, geometry: parent.parentGeometry };
     const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
+      activeScenarioManifest: { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt },
       riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, editMode: true, overrides: {} }),
       landData: { features: [feature] }, landIndex: new Map([[feature.id, feature]]), sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {} };
     const colors = ['#12ab34', '#bd24ce', '#2358ab'];
