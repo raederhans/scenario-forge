@@ -27,18 +27,19 @@ jobs:
           paths = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
           selected, skipped = [], []
           total = 0
+          suffixes = {'.js', '.mjs', '.cjs', '.ts', '.json', '.html', '.css', '.md', '.py', '.toml', '.yml', '.yaml', '.txt', '.sh', '.svg', '.lock'}
           for name in paths:
               if not name:
                   continue
               p = root / name
               if not p.is_file() or p.is_symlink():
                   continue
-              source = not name.startswith(('data/', 'assets/', 'vendor/'))
-              data = (name.startswith('data/') and '/' not in name[5:]) or name.startswith('data/scenarios/modern_world/')
+              source = not name.startswith(('data/', 'assets/')) and (p.suffix in suffixes or p.name in {'.gitignore', '.gitattributes'})
+              data = name in {'data/global_rivers.geojson', 'data/runtime_asset_registry.json', 'data/scenarios/index.json'} or name.startswith('data/scenarios/modern_world/')
               if not (source or data):
                   continue
               size = p.stat().st_size
-              if size > 80_000_000 or total + size > 300_000_000:
+              if size > 80_000_000 or total + size > 250_000_000:
                   skipped.append({'path': name, 'bytes': size})
                   continue
               selected.append(name)
