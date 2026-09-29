@@ -2,7 +2,7 @@
 
 - generated_at: 2026-09-29T02:43:25.512929+00:00
 - version: 1
-- entries: 668
+- entries: 671
 
 ## Counts by role
 
@@ -38,6 +38,9 @@
 | palette_map | 5 |
 | palette_pack | 5 |
 | palette_registry | 1 |
+| physical_hillshade | 1 |
+| physical_region_labels | 1 |
+| physical_semantics_detail | 1 |
 | physical_semantics_topology | 1 |
 | primary_topology | 1 |
 | quick_fill_china_reference | 1 |
@@ -92,6 +95,7 @@
 | context_layer:physical_contours_mid_minor | data/global_contours.mid.minor.topo.json | context_layer | topojson | json | schema://topojson/topology/v1 |  | default | runtime_asset_registry.assets.context_layer:physical_contours_mid_minor |  |
 | manifest_output:global_contours.minor.topo.json | data/global_contours.minor.topo.json | terrain_contours_minor_topology | topojson | json | schema://topology/terrain_contours_minor_v1 | data/manifest.json::outputs::global_contours.minor.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | manifest_output:global_lakes.geojson | data/global_lakes.geojson | context_layer | geojson | json | schema://geojson/feature_collection/polygon/v1 | data/manifest.json::outputs::global_lakes.geojson::sha256 | default | tools/build_global_lakes.py | global_lakes_natural_earth |
+| manifest_output:global_physical_semantics.detail.topo.json | data/global_physical_semantics.detail.topo.json | physical_semantics_detail | topojson | json | schema://topojson/topology/v1 | data/manifest.json::outputs::global_physical_semantics.detail.topo.json::sha256 | default | tools.build_physical_detail |  |
 | manifest_output:global_physical_semantics.topo.json | data/global_physical_semantics.topo.json | physical_semantics_topology | topojson | json | schema://topology/physical_semantics_v1 | data/manifest.json::outputs::global_physical_semantics.topo.json::sha256 | default | init_map_data.primary_topology_bundle |  |
 | context_layer:rivers | data/global_rivers.geojson | context_layer | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.context_layer:rivers |  |
 | manifest_output:hgo_catalogs/hgo_flags.index.json | data/hgo_catalogs/hgo_flags.index.json | hgo_flags_index | json | json | schema://json/object/v1 | data/manifest.json::outputs::hgo_catalogs/hgo_flags.index.json::sha256 | default | tools.build_hgo_flag_index |  |
@@ -124,6 +128,8 @@
 | manifest_output:palettes/kaiserreich.palette.json | data/palettes/kaiserreich.palette.json | palette_pack | json | json | schema://json/object/v1 | data/manifest.json::outputs::palettes/kaiserreich.palette.json::sha256 | default | init_map_data.palette_assets |  |
 | manifest_output:palettes/red_flood.palette.json | data/palettes/red_flood.palette.json | palette_pack | json | json | schema://json/object/v1 | data/manifest.json::outputs::palettes/red_flood.palette.json::sha256 | default | init_map_data.palette_assets |  |
 | manifest_output:palettes/tno.palette.json | data/palettes/tno.palette.json | palette_pack | json | json | schema://json/object/v1 | data/manifest.json::outputs::palettes/tno.palette.json::sha256 | default | init_map_data.palette_assets |  |
+| manifest_output:physical_hillshade.alps.topo.json | data/physical_hillshade.alps.topo.json | physical_hillshade | topojson | json | schema://topojson/topology/v1 | data/manifest.json::outputs::physical_hillshade.alps.topo.json::sha256 | default | tools.build_physical_presentation |  |
+| manifest_output:physical_region_labels.geojson | data/physical_region_labels.geojson | physical_region_labels | geojson | json | schema://geojson/feature_collection/point/v1 | data/manifest.json::outputs::physical_region_labels.geojson::sha256 | default | tools.build_physical_presentation |  |
 | source:pl_powiaty | data/poland_powiaty.geojson | source_ledger_asset | geojson | json | schema://geojson/feature_collection/v1 | data/source_ledger.json::pl_powiaty::current_local_sha256 | default | source_ledger | pl_powiaty |
 | manifest_output:quick_fill/china_prefecture_crosswalk.v1.json | data/quick_fill/china_prefecture_crosswalk.v1.json | quick_fill_prefecture_crosswalk | json | json | schema://quick_fill/prefecture_crosswalk/v1 | data/manifest.json::outputs::quick_fill/china_prefecture_crosswalk.v1.json::sha256 | default | quick_fill_hierarchy |  |
 | manifest_output:quick_fill/reference/china-pca-2017.json | data/quick_fill/reference/china-pca-2017.json | quick_fill_china_reference | json | json | schema://quick_fill/china_reference/v1 | data/manifest.json::outputs::quick_fill/reference/china-pca-2017.json::sha256 | default | quick_fill_hierarchy | china_pca_2017_quick_fill_reference |

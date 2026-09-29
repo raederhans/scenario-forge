@@ -509,7 +509,7 @@ test("project export and import preserve unified intensity fields", async () => 
   const payload = await exportProjectPayload({
     annotationView: {},
     exportWorkbenchUi: {},
-    styleConfig: {},
+    styleConfig: { physical: { mode: "atlas_and_contours", landformIntensity: 0, landcoverIntensity: 1.6, hillshadeOpacity: 0.14, showRegionLabels: true } },
     intensityFields,
   });
 
@@ -525,6 +525,11 @@ test("project export and import preserve unified intensity fields", async () => 
   const result = await importProjectPayload(payload);
   assert.equal(result.successes.length, 1);
   assert.equal(result.successes[0].intensityFields.channels.physicalAtlas.enabled, true);
+  const physical = result.successes[0].styleConfig.physical;
+  assert.equal(physical.landformIntensity, 0);
+  assert.equal(physical.landcoverIntensity, 1.6);
+  assert.equal(physical.hillshadeOpacity, 0.14);
+  assert.equal(physical.showRegionLabels, true);
   assert.equal(result.successes[0].intensityFields.channels.urbanGlow.enabled, true);
   assert.equal(result.successes[0].intensityFields.channels.oceanDepth.enabled, true);
   assert.ok(sampleIntensityField(result.successes[0].intensityFields, "physicalAtlas", 10, 46) > 1.4);

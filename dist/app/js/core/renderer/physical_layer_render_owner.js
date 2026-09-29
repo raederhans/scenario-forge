@@ -1,3 +1,5 @@
+import { claimScreenLabelPlacement } from "./screen_label_placement.js";
+
 export function createPhysicalLayerRenderOwner({
   state = {},
   constants = {},
@@ -12,6 +14,7 @@ export function createPhysicalLayerRenderOwner({
     getContext = () => null,
     getPathCanvas = () => null,
     getProjection = () => null,
+    getFillPath2D = null,
     // Optional contour-specific path cache. The renderer owns projection
     // generation and invalidation; this owner only consumes the replayable
     // Path2D when available and keeps the existing d3 path fallback.
@@ -26,7 +29,7 @@ export function createPhysicalLayerRenderOwner({
     getContourVisibleFeatures = () => [],
     getContourZoomStyleProfile = () => ({}),
     getFeatureCollectionFeatureCount = (collection) => collection?.features?.length || 0,
-    getFieldFeatureMultiplier = () => 1,
+    paintWithPhysicalIntensity = (_channel, blend, draw) => draw(blend),
     getPhysicalAtlasClass = () => "",
     getPhysicalAtlasLayer = () => "",
     getPhysicalLandMaskInfo = () => ({
@@ -36,11 +39,9 @@ export function createPhysicalLayerRenderOwner({
     }),
     getPhysicalPresetRenderProfile = () => ({}),
     getPhysicalReliefOverlayBlendMode = (_cfg, presetProfile) => presetProfile?.reliefBlendFallback || "source-over",
-    getProjectedDegreeRadiusPx = () => 0,
     getResolvedPhysicalAtlasCollection = () => null,
     getSafeBlendMode = (value, fallback) => value || fallback,
     getSafeCanvasColor = (value, fallback) => value || fallback,
-    normalizeIntensityFieldsState = (fields) => fields || {},
     normalizePhysicalStyleConfig = (config) => config || {},
     nowMs = () => Date.now(),
     pathBoundsInScreen = () => true,
@@ -49,6 +50,13 @@ export function createPhysicalLayerRenderOwner({
   } = helpers;
 
   function drawPhysicalAtlasCollectionLayer(
+    atlasCollection, layerName, cfg, options = {}
+  ) {
+    return paintWithPhysicalIntensity("physicalAtlas", options.blendMode || "source-over", (blendMode) =>
+      drawPhysicalAtlasCollectionUnmasked(atlasCollection, layerName, cfg, { ...options, blendMode }));
+  }
+
+  function drawPhysicalAtlasCollectionUnmasked(
     atlasCollection,
     layerName,
     cfg,
@@ -77,53 +85,19 @@ export function createPhysicalLayerRenderOwner({
       const fillColor = getSafeCanvasColor(PHYSICAL_ATLAS_PALETTE[atlasClass], null);
       if (!fillColor) return;
       context.globalAlpha = clamp(
-        baseOpacity * getAtlasFeatureAlphaMultiplier(atlasClass, cfg) * getFieldFeatureMultiplier("physicalAtlas", feature),
+        baseOpacity * getAtlasFeatureAlphaMultiplier(atlasClass, cfg),
         0,
         1
       );
+      if (context.globalAlpha === 0) return;
       context.fillStyle = fillColor;
-      context.beginPath();
-      pathCanvas(feature);
-      context.fill();
-      renderedCount += 1;
-    });
-    context.restore();
-    return renderedCount;
-  }
-
-  function drawPhysicalIntensityFieldLayer({ clipAlreadyApplied = false } = {}) {
-    runtimeState.intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
-    const fieldState = runtimeState.intensityFields?.channels?.physicalAtlas;
-    const projection = getProjection();
-    const context = getContext();
-    if (!fieldState?.enabled || !fieldState.points.length || !projection || !context) return 0;
-    let renderedCount = 0;
-    context.save();
-    if (!clipAlreadyApplied) {
-      applyPhysicalLandClipMask();
-    }
-    context.globalCompositeOperation = "soft-light";
-    fieldState.points.forEach((point) => {
-      const projected = projection([point.lon, point.lat]);
-      if (!Array.isArray(projected) || projected.length < 2) return;
-      const radiusPx = getProjectedDegreeRadiusPx(point.lon, point.lat, point.radiusDeg);
-      if (radiusPx <= 0) return;
-      const strengthDelta = clamp(Math.abs(Number(point.strength || 1) - 1), 0, 1);
-      const gradient = context.createRadialGradient(projected[0], projected[1], 0, projected[0], projected[1], radiusPx);
-      const alpha = clamp(0.08 + strengthDelta * 0.26, 0.08, 0.34);
-      const coreColor = Number(point.strength || 1) < 1
-        ? `rgba(84, 46, 20, ${alpha})`
-        : `rgba(216, 236, 255, ${alpha})`;
-      const edgeColor = Number(point.strength || 1) < 1
-        ? "rgba(84, 46, 20, 0)"
-        : "rgba(216, 236, 255, 0)";
-      gradient.addColorStop(0, coreColor);
-      gradient.addColorStop(point.falloff === "linear" ? 0.65 : 0.45, coreColor);
-      gradient.addColorStop(1, edgeColor);
-      context.fillStyle = gradient;
-      context.beginPath();
-      context.arc(projected[0], projected[1], radiusPx, 0, Math.PI * 2);
-      context.fill();
+      const fillPath = getFillPath2D?.(feature);
+      if (fillPath) context.fill(fillPath);
+      else {
+        context.beginPath();
+        pathCanvas(feature);
+        context.fill();
+      }
       renderedCount += 1;
     });
     context.restore();
@@ -169,6 +143,7 @@ export function createPhysicalLayerRenderOwner({
         * cfg.atlasOpacity
         * (interactive ? 0.7 : 1)
         * cfg.atlasIntensity
+        * (cfg.landformIntensity ?? 1)
         * presetProfile.reliefOpacityMultiplier,
       0,
       1
@@ -230,14 +205,12 @@ export function createPhysicalLayerRenderOwner({
     }
 
     const semanticRenderedCount = drawPhysicalAtlasLayer(k, { interactive });
-    const intensityRenderedCount = drawPhysicalIntensityFieldLayer();
     const reliefRenderedCount = drawPhysicalReliefOverlayLayer(k, { interactive });
-    const renderedCount = semanticRenderedCount + intensityRenderedCount + reliefRenderedCount;
+    const renderedCount = semanticRenderedCount + reliefRenderedCount;
     collectContextMetric("drawPhysicalBasePass", nowMs() - startedAt, {
       featureCount: atlasCollection.features.length,
       renderedCount,
       semanticRenderedCount,
-      intensityRenderedCount,
       reliefRenderedCount,
       interactive: !!interactive,
       skipped: renderedCount === 0,
@@ -287,7 +260,7 @@ export function createPhysicalLayerRenderOwner({
     }
     const renderedCount = drawPhysicalAtlasCollectionLayer(atlasCollection, "semantic_overlay", cfg, {
       baseOpacity: clamp(
-        cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * presetProfile.semanticOpacityMultiplier,
+        cfg.opacity * cfg.atlasOpacity * (interactive ? 0.7 : 1) * cfg.atlasIntensity * (cfg.landcoverIntensity ?? 1) * presetProfile.semanticOpacityMultiplier,
         0,
         1
       ),
@@ -430,7 +403,77 @@ export function createPhysicalLayerRenderOwner({
     };
   }
 
+  function drawPhysicalHillshadeLayer(k) {
+    const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
+    if (!runtimeState.showPhysical || cfg.mode === "contours_only" || !cfg.hillshadeOpacity || k < 4) return 0;
+    const features = runtimeState.contextLayerExternalDataByName?.physical_hillshade?.features;
+    if (!features?.length) return 0;
+    return paintWithPhysicalIntensity("physicalAtlas", "source-over", () => {
+      const context = getContext();
+      const path = getPathCanvas();
+      if (!context || !path) return 0;
+      let count = 0;
+      context.save();
+      applyPhysicalLandClipMask();
+      context.globalCompositeOperation = "source-over";
+      for (const feature of features) {
+        if (!pathBoundsInScreen(feature)) continue;
+        const shade = Number(feature.properties?.shade || 0);
+        context.fillStyle = shade > 0 ? "#ffffff" : "#26313a";
+        context.globalAlpha = cfg.opacity * cfg.hillshadeOpacity * Math.abs(shade) * (cfg.landformIntensity ?? 1);
+        const fillPath = getFillPath2D?.(feature);
+        if (fillPath) context.fill(fillPath);
+        else { context.beginPath(); path(feature); context.fill(); }
+        count += 1;
+      }
+      context.restore();
+      return count;
+    });
+  }
+
+  function drawPhysicalRegionLabels(k, { occupiedBoxes = [] } = {}) {
+    const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
+    if (!runtimeState.showPhysical || !cfg.showRegionLabels || cfg.mode === "contours_only" || k < 2) return 0;
+    const features = runtimeState.contextLayerExternalDataByName?.physical_region_labels?.features || [];
+    const context = getContext();
+    const projection = getProjection();
+    if (!context || !projection) return 0;
+    let count = 0;
+    const transform = runtimeState.zoomTransform || { x: 0, y: 0, k };
+    const maxRank = Math.max(1, Math.floor(Math.log2(k)) + 1);
+    context.save();
+    context.globalCompositeOperation = "source-over";
+    context.globalAlpha = 0.8;
+    context.font = `400 ${11.5 / k}px system-ui, sans-serif`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.lineWidth = 1.6 / k;
+    context.strokeStyle = "rgba(255,255,255,0.85)";
+    context.fillStyle = "#405048";
+    for (const feature of features) {
+      const props = feature.properties || {};
+      if (k < props.min_zoom || Number(props.rank || 1) > maxRank || cfg.atlasClassVisibility?.[props.atlas_class] === false || !pathBoundsInScreen(feature)) continue;
+      const position = projection(feature.geometry.coordinates);
+      if (!position?.every(Number.isFinite)) continue;
+      const text = runtimeState.currentLanguage === "zh" ? props.name_zh || props.name_en : props.name_en;
+      if (!text) continue;
+      const width = context.measureText(text).width * k + 18;
+      const box = { x: position[0] * k + transform.x - width / 2, y: position[1] * k + transform.y - 13, w: width, h: 26 };
+      if (!claimScreenLabelPlacement([{ box }], occupiedBoxes)) continue;
+      context.strokeText(text, ...position); context.fillText(text, ...position);
+      count += 1;
+      if (count >= 50) break;
+    }
+    context.restore();
+    return count;
+  }
+
   function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+    return paintWithPhysicalIntensity("physicalContour", "source-over", () =>
+      drawPhysicalContourLayerUnmasked(k, { interactive, clipAlreadyApplied }));
+  }
+
+  function drawPhysicalContourLayerUnmasked(k, { interactive = false, clipAlreadyApplied = false } = {}) {
     const startedAt = nowMs();
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
     const presetProfile = getPhysicalPresetRenderProfile(cfg);
@@ -484,7 +527,6 @@ export function createPhysicalLayerRenderOwner({
       1
     );
     const resolveContourColor = (feature) => getAdaptiveContourStrokeColor(feature, contourColor);
-    const resolveContourIntensity = (feature) => getFieldFeatureMultiplier("physicalContour", feature);
     const majorInterval = clamp(
       (clamp(Number(cfg.contourMajorIntervalM) || 500, 500, 2000) * zoomProfile.majorIntervalMultiplier),
       500,
@@ -515,7 +557,6 @@ export function createPhysicalLayerRenderOwner({
       lowReliefCutoff: majorLowReliefCutoff,
       intervalM: majorInterval,
       minScreenSpanPx: zoomProfile.majorMinScreenSpanPx,
-      opacityMultiplierResolver: resolveContourIntensity,
     });
 
     let minorDrawResult = { renderedCount: 0, selectedCount: 0 };
@@ -542,7 +583,6 @@ export function createPhysicalLayerRenderOwner({
           excludeIntervalM: majorInterval,
           minScreenSpanPx: zoomProfile.minorMinScreenSpanPx,
           maxFeatures: dynamicMinorMaxFeatures,
-          opacityMultiplierResolver: resolveContourIntensity,
         });
       } else {
         if (shouldReportDeferredContextLayerGap("physical_contours_minor")) {
@@ -579,7 +619,8 @@ export function createPhysicalLayerRenderOwner({
     drawPhysicalAtlasLayer,
     drawPhysicalBasePass,
     drawPhysicalContourLayer,
-    drawPhysicalIntensityFieldLayer,
     drawPhysicalReliefOverlayLayer,
+    drawPhysicalHillshadeLayer,
+    drawPhysicalRegionLabels,
   };
 }

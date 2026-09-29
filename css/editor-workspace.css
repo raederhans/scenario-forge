@@ -77,6 +77,22 @@
 .editor-workspace .editor-object-section .inspector-detail-section { padding: 8px 0; }
 .editor-disclosure { margin: 10px 0; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; font-size: 13px; }
 .editor-disclosure > summary { cursor: pointer; color: var(--text-secondary); }
+.physical-panel-body { display: grid; gap: 14px; min-width: 0; }
+.physical-basic-controls, .physical-section-body { display: grid; gap: 14px; min-width: 0; }
+.physical-disclosure { border-top: 1px solid var(--border-subtle); padding-top: 12px; min-width: 0; }
+.physical-disclosure > summary { cursor: pointer; font-size: 13px; font-weight: 600; line-height: 1.6; padding: 4px 0; }
+.physical-disclosure[open] > summary { margin-bottom: 12px; }
+.physical-disclosure[hidden] { display: none; }
+.physical-hint { margin: 0; font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+.physical-tool-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.physical-tool-actions button { white-space: normal; min-height: 36px; padding: 6px 8px; }
+.physical-class-list { display: grid; gap: 8px; }
+.physical-class-group { display: grid; gap: 10px; border: 0; padding: 0; margin: 0; min-width: 0; }
+.physical-class-group + .physical-class-group { margin-top: 14px; }
+.physical-class-group legend { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; }
+.physical-class-group .toggle-label { display: grid; grid-template-columns: 16px 12px minmax(0, 1fr); gap: 4px 8px; margin: 0; padding: 0; border: 0; }
+.physical-class-swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgb(0 0 0 / 10%); }
+.physical-class-coverage { grid-column: 3; color: var(--text-secondary); font-size: 11px; }
 .editor-workspace .water-filter-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .editor-properties-header { position: sticky; top: 0; z-index: 2; background: var(--bg-panel, #f8fafc); padding: 16px; border-bottom: 1px solid var(--border-subtle); }
 .editor-properties-title { font-size: 15px; line-height: 1.5; margin: 0; font-weight: 650; }

@@ -12,9 +12,7 @@ export function applyPaletteFeatureColorState(target, featureIds, color) {
 
 export function applyPaletteOwnerColorState(target, ownerCode, color) {
   target.sovereignBaseColors = target.sovereignBaseColors || {};
-  target.countryBaseColors = target.countryBaseColors || {};
   target.sovereignBaseColors[ownerCode] = color;
-  target.countryBaseColors[ownerCode] = color;
 }
 
 export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
@@ -38,7 +36,7 @@ export function trimScenarioBundleCacheState(target, recencyOrder, targetId) {
       || Object.values(bundle?.chunkPayloadPromisesById || {}).some(Boolean)) continue;
     if (!bundle) continue;
     clearScenarioBundleChunkProtectionState(target, id);
-    for (const chunkId of getScenarioChunkPayloadEvictionIds(target.scenarioBundleCacheById[id])) {
+    for (const chunkId of getScenarioChunkPayloadEvictionIds(target.scenarioBundleCacheById[id], [], { preferPoliticalBase: true })) {
       removeScenarioBundleChunkPayloadState(target, id, chunkId);
     }
     if (cacheSize <= SCENARIO_BUNDLE_CACHE_LIMIT) continue;
@@ -137,11 +135,9 @@ export const SCENARIO_ACTIVATION_STATE_KEYS = Object.freeze([
   "sovereigntyByFeatureId",
   "sovereigntyInitialized",
   "visualOverrides",
-  "featureOverrides",
   "scenarioGeneratedColorTags",
   "scenarioFixedOwnerColors",
   "sovereignBaseColors",
-  "countryBaseColors",
 ]);
 
 export const SCENARIO_CHUNK_OPTIONAL_LAYER_STATE_CONFIGS = Object.freeze({
@@ -168,14 +164,10 @@ export function removeClickCountryColorsState(target, countryCode) {
   const normalizedCode = String(countryCode || "").trim();
   if (!normalizedCode) return false;
   const nextSovereignColors = structuredClone(target.sovereignBaseColors || {});
-  const nextCountryColors = structuredClone(target.countryBaseColors || {});
   const removedSovereign = Object.hasOwn(nextSovereignColors, normalizedCode);
-  const removedCountry = Object.hasOwn(nextCountryColors, normalizedCode);
   delete nextSovereignColors[normalizedCode];
-  delete nextCountryColors[normalizedCode];
   target.sovereignBaseColors = nextSovereignColors;
-  target.countryBaseColors = nextCountryColors;
-  return removedSovereign || removedCountry;
+  return removedSovereign;
 }
 
 export function setClickCountryColorsState(target, countryCode, color) {
@@ -183,11 +175,8 @@ export function setClickCountryColorsState(target, countryCode, color) {
   const normalizedCode = String(countryCode || "").trim();
   if (!normalizedCode) return false;
   const nextSovereignColors = structuredClone(target.sovereignBaseColors || {});
-  const nextCountryColors = structuredClone(target.countryBaseColors || {});
   nextSovereignColors[normalizedCode] = color;
-  nextCountryColors[normalizedCode] = color;
   target.sovereignBaseColors = nextSovereignColors;
-  target.countryBaseColors = nextCountryColors;
   return true;
 }
 
@@ -549,7 +538,6 @@ export function commitScenarioActivationState(target, patch) {
     createReadonlyReferenceAssignments(patch.sovereigntyByFeatureId);
   target.sovereigntyInitialized = patch.sovereigntyInitialized;
   target.visualOverrides = { ...(patch.visualOverrides || {}) };
-  target.featureOverrides = { ...(patch.featureOverrides || {}) };
   target.scenarioGeneratedColorTags =
     Array.isArray(patch.scenarioGeneratedColorTags)
       ? [...patch.scenarioGeneratedColorTags]
@@ -557,7 +545,6 @@ export function commitScenarioActivationState(target, patch) {
   target.scenarioFixedOwnerColors =
     { ...(patch.scenarioFixedOwnerColors || {}) };
   target.sovereignBaseColors = { ...(patch.sovereignBaseColors || {}) };
-  target.countryBaseColors = { ...(patch.countryBaseColors || {}) };
   return true;
 }
 
@@ -782,20 +769,10 @@ function restoreScenarioActivationBeforeColorDirtyStateFromValidated(
   } else {
     delete target.visualOverrides;
   }
-  if (presentKeys.has("featureOverrides")) {
-    target.featureOverrides = values.featureOverrides;
-  } else {
-    delete target.featureOverrides;
-  }
   if (presentKeys.has("sovereignBaseColors")) {
     target.sovereignBaseColors = values.sovereignBaseColors;
   } else {
     delete target.sovereignBaseColors;
-  }
-  if (presentKeys.has("countryBaseColors")) {
-    target.countryBaseColors = values.countryBaseColors;
-  } else {
-    delete target.countryBaseColors;
   }
 }
 
@@ -847,8 +824,6 @@ export function restoreScenarioActivationState(target, snapshot) {
 
 // Restore only this domain's prevalidated project fields; retain references for rollback.
 export function restoreProjectImportFields(target, patch) {
-  if (Object.hasOwn(patch, "countryBaseColors")) target.countryBaseColors = patch.countryBaseColors;
-  if (Object.hasOwn(patch, "featureOverrides")) target.featureOverrides = patch.featureOverrides;
   if (Object.hasOwn(patch, "mapSemanticMode")) target.mapSemanticMode = patch.mapSemanticMode;
   if (Object.hasOwn(patch, "scenarioCountriesByTag")) target.scenarioCountriesByTag = patch.scenarioCountriesByTag;
   if (Object.hasOwn(patch, "scenarioReleasableIndex")) target.scenarioReleasableIndex = patch.scenarioReleasableIndex;

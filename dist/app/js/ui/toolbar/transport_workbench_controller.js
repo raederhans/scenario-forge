@@ -482,10 +482,6 @@ export function createTransportWorkbenchController({
     };
   };
 
-  const isTransportWorkbenchRenderGenerationCurrent = (renderGeneration, familyId) => (
-    transportWorkbenchPreviewLifecycleOwner.isRenderGenerationCurrent(renderGeneration, familyId)
-  );
-
   const refreshTransportWorkbenchPreview = (context, { allowCarrierPrep = true } = {}) => (
     transportWorkbenchPreviewLifecycleOwner.refreshPreview(context, { allowCarrierPrep })
   );

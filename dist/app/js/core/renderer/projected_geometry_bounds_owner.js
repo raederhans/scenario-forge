@@ -1,4 +1,9 @@
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
+import {
+  buildWaterRegionFeatureFromParts,
+  collectPolygonalGeometryParts,
+  createWaterSanitizationSnapshotCache,
+} from "./water_sanitization_snapshot_cache.js";
 import { ensureProjectedBoundsCacheState } from "../state/renderer_runtime_state.js";
 import {
   clearProjectedBoundsCacheEntriesState,
@@ -49,6 +54,7 @@ export function createProjectedGeometryBoundsOwner({
     getLandFeatures = () => [],
     getRiverFeatures = () => [],
     getActiveScenarioId = () => "",
+    getContextLayerRevision = () => 0,
     getD3 = () => null,
   } = getters;
   const {
@@ -60,15 +66,28 @@ export function createProjectedGeometryBoundsOwner({
     warn = defaultWarn,
   } = helpers;
 
-  const sphericalGeometryDiagnosticsByObject = new WeakMap();
-  const safeWaterRegionGeometryPartsByFeature = new WeakMap();
-  const sanitizedWaterRegionFeatureByFeature = new WeakMap();
+  let sphericalGeometryDiagnosticsByObject = new WeakMap();
+  let safeWaterRegionGeometryPartsByFeature = new WeakMap();
+  let sanitizedWaterRegionFeatureByFeature = new WeakMap();
+  const waterSnapshots = createWaterSanitizationSnapshotCache();
+  let waterSanitizationRevision = Number(getContextLayerRevision() || 0);
   const waterSphericalSanitizationWarnings = new Set();
   let projectedBoundsByGeometry = new WeakMap();
   let projectedPartBounds = new WeakMap();
-  const polygonPartsByGeometry = new WeakMap();
+  let polygonPartsByGeometry = new WeakMap();
   let boundsProjectionGeneration = -1;
   let boundsScenarioId = "";
+
+  function ensureWaterSanitizationRevision() {
+    const revision = Number(getContextLayerRevision() || 0);
+    if (revision === waterSanitizationRevision) return;
+    waterSanitizationRevision = revision;
+    sphericalGeometryDiagnosticsByObject = new WeakMap();
+    safeWaterRegionGeometryPartsByFeature = new WeakMap();
+    sanitizedWaterRegionFeatureByFeature = new WeakMap();
+    polygonPartsByGeometry = new WeakMap();
+    waterSnapshots.reset();
+  }
 
   function ensureGeometryBoundsIdentity() {
     const generation = getProjectionGeometryGeneration(getProjection());
@@ -237,12 +256,13 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function getSphericalGeometryDiagnostics(geoObject) {
+    ensureWaterSanitizationRevision();
     const normalizedGeoObject = normalizeGeoObjectForSphericalDiagnostics(geoObject);
     const d3 = getD3();
     if (!normalizedGeoObject || !d3?.geoArea || !d3?.geoBounds) return null;
-    if (sphericalGeometryDiagnosticsByObject.has(geoObject)) {
-      return sphericalGeometryDiagnosticsByObject.get(geoObject) || null;
-    }
+    const geometry = geoObject.type === "Feature" ? geoObject.geometry : geoObject;
+    const cached = sphericalGeometryDiagnosticsByObject.get(geoObject);
+    if (cached?.geometry === geometry) return cached.diagnostics;
     try {
       const area = Number(d3.geoArea(normalizedGeoObject));
       const bounds = d3.geoBounds(normalizedGeoObject);
@@ -253,7 +273,7 @@ export function createProjectedGeometryBoundsOwner({
         hasExcessiveSphereArea: Number.isFinite(area) && area > sphericalGeometryMaxArea,
       };
       diagnostics.invalid = diagnostics.isWorldBounds || diagnostics.hasExcessiveSphereArea;
-      sphericalGeometryDiagnosticsByObject.set(geoObject, diagnostics);
+      sphericalGeometryDiagnosticsByObject.set(geoObject, { geometry, diagnostics });
       return diagnostics;
     } catch (_error) {
       return null;
@@ -264,24 +284,8 @@ export function createProjectedGeometryBoundsOwner({
     return !!getSphericalGeometryDiagnostics(geoObject)?.invalid;
   }
 
-  function collectPolygonalGeometryParts(geometry) {
-    if (!geometry || typeof geometry !== "object") return [];
-    const geometryType = String(geometry.type || "");
-    if (geometryType === "Polygon") return [geometry];
-    if (geometryType === "MultiPolygon") {
-      const coordinates = Array.isArray(geometry.coordinates) ? geometry.coordinates : [];
-      return coordinates
-        .filter((partCoordinates) => Array.isArray(partCoordinates) && partCoordinates.length > 0)
-        .map((partCoordinates) => ({ type: "Polygon", coordinates: partCoordinates }));
-    }
-    if (geometryType === "GeometryCollection") {
-      return (Array.isArray(geometry.geometries) ? geometry.geometries : [])
-        .flatMap((partGeometry) => collectPolygonalGeometryParts(partGeometry));
-    }
-    return [];
-  }
-
   function collectFeatureHitGeometries(feature) {
+    ensureWaterSanitizationRevision();
     const geometry = feature?.geometry;
     if (!geometry || typeof geometry !== "object") return [];
     if (polygonPartsByGeometry.has(geometry)) return polygonPartsByGeometry.get(geometry);
@@ -291,26 +295,11 @@ export function createProjectedGeometryBoundsOwner({
     return parts;
   }
 
-  function buildWaterRegionFeatureFromParts(feature, parts) {
-    const safeParts = Array.isArray(parts) ? parts : [];
-    if (!feature || !safeParts.length) return null;
-    if (safeParts.length === 1) return { ...feature, geometry: safeParts[0] };
-    return {
-      ...feature,
-      geometry: {
-        type: "MultiPolygon",
-        coordinates: safeParts
-          .filter((part) => String(part?.type || "") === "Polygon" && Array.isArray(part.coordinates))
-          .map((part) => part.coordinates),
-      },
-    };
-  }
-
   function collectSafeWaterRegionGeometryPartsInfo(feature) {
+    ensureWaterSanitizationRevision();
     if (!feature || typeof feature !== "object") return { parts: [], rawCount: 0, removedCount: 0 };
-    if (safeWaterRegionGeometryPartsByFeature.has(feature)) {
-      return safeWaterRegionGeometryPartsByFeature.get(feature);
-    }
+    const cached = safeWaterRegionGeometryPartsByFeature.get(feature);
+    if (cached?.geometry === feature.geometry) return cached.info;
     const rawParts = collectFeatureHitGeometries(feature);
     const safeParts = [];
     let removedCount = 0;
@@ -322,7 +311,7 @@ export function createProjectedGeometryBoundsOwner({
       safeParts.push(part);
     });
     const info = { parts: safeParts, rawCount: rawParts.length, removedCount };
-    safeWaterRegionGeometryPartsByFeature.set(feature, info);
+    safeWaterRegionGeometryPartsByFeature.set(feature, { geometry: feature.geometry, info });
     return info;
   }
 
@@ -335,27 +324,45 @@ export function createProjectedGeometryBoundsOwner({
   }
 
   function sanitizeWaterRegionFeature(feature) {
+    ensureWaterSanitizationRevision();
     if (!feature || typeof feature !== "object") return null;
-    if (sanitizedWaterRegionFeatureByFeature.has(feature)) {
-      return sanitizedWaterRegionFeatureByFeature.get(feature);
-    }
+    const cached = sanitizedWaterRegionFeatureByFeature.get(feature);
+    if (cached?.geometry === feature.geometry) return cached.sanitized;
     const partInfo = collectSafeWaterRegionGeometryPartsInfo(feature);
     const sanitized = partInfo.removedCount > 0
       ? buildWaterRegionFeatureFromParts(feature, partInfo.parts)
       : feature;
-    sanitizedWaterRegionFeatureByFeature.set(feature, sanitized);
+    sanitizedWaterRegionFeatureByFeature.set(feature, { geometry: feature.geometry, sanitized });
     return sanitized;
   }
 
   function sanitizeWaterRegionFeatures(features = []) {
+    ensureWaterSanitizationRevision();
+    const source = Array.isArray(features) ? features : [];
+    const scenarioId = String(getActiveScenarioId() || "");
+    const reused = waterSnapshots.reuseSequence(source, scenarioId);
+    if (reused) return reused;
     const sanitizedFeatures = [];
     const changedFeatureIds = [];
+    const snapshotEntries = new Map();
     let removedPartCount = 0;
-    (Array.isArray(features) ? features : []).forEach((feature) => {
+    source.forEach((feature) => {
+      const featureId = getFeatureId(feature);
+      const candidate = waterSnapshots.findDecodedFeature(featureId, feature);
+      if (candidate) {
+        const priorInfo = safeWaterRegionGeometryPartsByFeature.get(candidate.feature);
+        if (priorInfo?.geometry === candidate.feature.geometry) {
+          safeWaterRegionGeometryPartsByFeature.set(feature, { geometry: feature.geometry, info: priorInfo.info });
+          const rebound = candidate.sanitized
+            ? { ...feature, geometry: candidate.sanitized.geometry }
+            : null;
+          sanitizedWaterRegionFeatureByFeature.set(feature, { geometry: feature.geometry, sanitized: rebound });
+        }
+      }
       const sanitized = sanitizeWaterRegionFeature(feature);
       const partInfo = collectSafeWaterRegionGeometryPartsInfo(feature);
+      if (featureId) snapshotEntries.set(featureId, { feature, sanitized });
       if (partInfo.removedCount > 0) {
-        const featureId = getFeatureId(feature);
         if (featureId) changedFeatureIds.push(featureId);
         removedPartCount += partInfo.removedCount;
       }
@@ -373,6 +380,7 @@ export function createProjectedGeometryBoundsOwner({
         warn(`[map_renderer] Removed ${removedPartCount} D3-unsafe water geometry part(s): ${uniqueIds.join(", ")}`);
       }
     }
+    waterSnapshots.remember(source, scenarioId, sanitizedFeatures, snapshotEntries);
     return sanitizedFeatures;
   }
 

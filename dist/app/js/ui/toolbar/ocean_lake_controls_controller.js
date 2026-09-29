@@ -32,8 +32,10 @@ export function createOceanLakeControlsController({
   invalidateOceanVisualState,
   invalidateOceanWaterInteractionVisualState,
   oceanFillColor,
+  oceanRegionNamesToggle,
   lakeLinkToOcean,
   lakeFillColor,
+  lakeOutlineToggle,
   oceanCoastalAccentRow,
   oceanCoastalAccentToggle,
   oceanAdvancedStylesToggle,
@@ -65,9 +67,11 @@ export function createOceanLakeControlsController({
   let pendingOceanVisualReason = "";
   const pendingOceanVisualInvalidations = new Map();
   const lakeStylePaths = [
-    "styleConfig.lakes.linkedToOcean",
-    "styleConfig.lakes.fillColor",
+    "lakes.linkedToOcean",
+    "lakes.fillColor",
+    "lakes.outlineEnabled",
   ];
+  const oceanRegionNamesStylePaths = ["ocean.showRegionNames"];
   let lakeHistoryBefore = null;
   const oceanDepthFieldEditor = createIntensityFieldEditorSection({
     runtimeState: state,
@@ -166,22 +170,22 @@ export function createOceanLakeControlsController({
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
     }
     if (oceanTextureOpacity) {
-      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity || 0.82, 0, 1) * 100));
+      oceanTextureOpacity.value = String(Math.round(clamp(state.styleConfig.ocean.opacity ?? 0.82, 0, 1) * 100));
     }
     if (oceanTextureOpacityValue) {
-      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity || 0.82, 0, 1) * 100)}%`;
+      oceanTextureOpacityValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.opacity ?? 0.82, 0, 1) * 100)}%`;
     }
     if (oceanTextureScale) {
-      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4) * 100));
+      oceanTextureScale.value = String(Math.round(clamp(state.styleConfig.ocean.scale ?? 1, 0.6, 2.4) * 100));
     }
     if (oceanTextureScaleValue) {
-      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale || 1, 0.6, 2.4).toFixed(2)}x`;
+      oceanTextureScaleValue.textContent = `${clamp(state.styleConfig.ocean.scale ?? 1, 0.6, 2.4).toFixed(2)}x`;
     }
     if (oceanContourStrength) {
-      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.34, 0, 1) * 100));
+      oceanContourStrength.value = String(Math.round(clamp(state.styleConfig.ocean.contourStrength ?? 0.34, 0, 1) * 100));
     }
     if (oceanContourStrengthValue) {
-      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength || 0.34, 0, 1) * 100)}%`;
+      oceanContourStrengthValue.textContent = `${Math.round(clamp(state.styleConfig.ocean.contourStrength ?? 0.34, 0, 1) * 100)}%`;
     }
   };
 
@@ -209,6 +213,9 @@ export function createOceanLakeControlsController({
         ? t("Linked to the current ocean fill color.", "ui")
         : "";
     }
+    if (lakeOutlineToggle) {
+      lakeOutlineToggle.checked = lakeConfig.outlineEnabled;
+    }
   };
 
   const oceanAdvancedStylesEnabled = () => state.styleConfig.ocean.experimentalAdvancedStyles === true;
@@ -220,7 +227,7 @@ export function createOceanLakeControlsController({
   const renderOceanAdvancedStylesUi = () => {
     const enabled = oceanAdvancedStylesEnabled();
     const selectDisabledTitle = t("Enable Experimental Bathymetry to unlock data-driven depth presets.", "ui");
-    const sliderDisabledTitle = t("Available when Experimental Bathymetry is enabled.", "ui");
+    const sliderDisabledTitle = t("Select a bathymetry style to adjust these controls.", "ui");
     if (!enabled && advancedPresets.has(state.styleConfig.ocean.preset)) {
       state.styleConfig.ocean.preset = "flat";
     }
@@ -247,8 +254,8 @@ export function createOceanLakeControlsController({
       oceanScenarioShallowContourFadeEndZoom,
     ].forEach((control) => {
       if (!control) return;
-      control.disabled = !enabled;
-      control.title = enabled ? "" : sliderDisabledTitle;
+      control.disabled = !enabled || state.styleConfig.ocean.preset === "flat";
+      control.title = control.disabled ? sliderDisabledTitle : "";
     });
     if (oceanBathymetryDebugDetails) {
       oceanBathymetryDebugDetails.classList.toggle("opacity-60", !enabled);
@@ -311,6 +318,9 @@ export function createOceanLakeControlsController({
     if (oceanFillColor) {
       oceanFillColor.value = normalizeOceanFillColor(state.styleConfig.ocean.fillColor);
     }
+    if (oceanRegionNamesToggle) {
+      oceanRegionNamesToggle.checked = state.styleConfig.ocean.showRegionNames === true;
+    }
     if (oceanStyleSelect) {
       oceanStyleSelect.value = state.styleConfig.ocean.preset || "flat";
     }
@@ -357,6 +367,20 @@ export function createOceanLakeControlsController({
       });
     }
 
+    if (oceanRegionNamesToggle && oceanRegionNamesToggle.dataset.bound !== "true") {
+      oceanRegionNamesToggle.addEventListener("change", (event) => {
+        const before = captureHistoryState({ stylePaths: oceanRegionNamesStylePaths });
+        state.styleConfig.ocean.showRegionNames = !!event.target.checked;
+        pushHistoryEntry({
+          kind: "ocean-region-names",
+          before,
+          after: captureHistoryState({ stylePaths: oceanRegionNamesStylePaths }),
+        });
+        renderDirty("ocean-region-names");
+      });
+      oceanRegionNamesToggle.dataset.bound = "true";
+    }
+
     if (oceanStyleSelect && oceanStyleSelect.dataset.bound !== "true") {
       renderOceanAdvancedStylesUi();
       oceanStyleSelect.addEventListener("change", (event) => {
@@ -369,6 +393,7 @@ export function createOceanLakeControlsController({
           applyBathymetryPresetDefaults(nextPreset);
         }
         syncOceanPresetControlValues();
+        renderOceanAdvancedStylesUi();
         renderOceanBathymetryDebugUi();
         applyOceanVisualUpdateNow(invalidateOceanVisualState, "ocean-style");
       });
@@ -379,6 +404,10 @@ export function createOceanLakeControlsController({
       oceanAdvancedStylesToggle.checked = oceanAdvancedStylesEnabled();
       oceanAdvancedStylesToggle.addEventListener("change", (event) => {
         state.styleConfig.ocean.experimentalAdvancedStyles = !!event.target.checked;
+        if (state.styleConfig.ocean.experimentalAdvancedStyles && state.styleConfig.ocean.preset === "flat") {
+          state.styleConfig.ocean.preset = "bathymetry_soft";
+          applyBathymetryPresetDefaults("bathymetry_soft");
+        }
         if (!state.styleConfig.ocean.experimentalAdvancedStyles && advancedPresets.has(state.styleConfig.ocean.preset)) {
           state.styleConfig.ocean.preset = "flat";
         }
@@ -490,6 +519,16 @@ export function createOceanLakeControlsController({
         commitLakeHistory("lake-link");
       });
       lakeLinkToOcean.dataset.bound = "true";
+    }
+
+    if (lakeOutlineToggle && lakeOutlineToggle.dataset.bound !== "true") {
+      lakeOutlineToggle.addEventListener("change", (event) => {
+        beginLakeHistoryCapture();
+        syncLakeConfig().outlineEnabled = !!event.target.checked;
+        applyOceanVisualUpdateNow(invalidateOceanWaterInteractionVisualState, "lake-outline");
+        commitLakeHistory("lake-outline");
+      });
+      lakeOutlineToggle.dataset.bound = "true";
     }
 
     bindOceanVisualInput(lakeFillColor, (event, commitNow) => {

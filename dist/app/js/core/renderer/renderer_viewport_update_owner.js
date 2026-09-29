@@ -10,6 +10,9 @@ export function createRendererViewportUpdateOwner({
   getters = {},
 } = {}) {
   const getViewportGroup = requireFunction(getters, "getViewportGroup", "getters");
+  const getPresentedTransform = typeof getters.getPresentedTransform === "function"
+    ? getters.getPresentedTransform.bind(getters)
+    : null;
   const setZoomTransform = requireFunction(effects, "setZoomTransform", "effects");
   const setHitCanvasDirty = requireFunction(effects, "setHitCanvasDirty", "effects");
   const updateZoomUi = requireFunction(effects, "updateZoomUi", "effects");
@@ -31,6 +34,7 @@ export function createRendererViewportUpdateOwner({
   const drawFrame = requireFunction(effects, "drawFrame", "effects");
 
   function applyViewportTransform(transform) {
+    if (!transform) return;
     const viewportGroup = getViewportGroup();
     if (viewportGroup) {
       viewportGroup.attr("transform", `translate(${transform.x},${transform.y}) scale(${transform.k})`);
@@ -41,6 +45,14 @@ export function createRendererViewportUpdateOwner({
     setZoomTransform(transform);
     setHitCanvasDirty();
     updateZoomUi();
+    if (getPresentedTransform) {
+      drawFrame();
+      applyViewportTransform(getPresentedTransform() || transform);
+      renderPhysicalIntensityBrushPreview();
+      syncUnitCounterScalesDuringZoom();
+      syncSpecialZonePatternTransformDuringZoom();
+      return;
+    }
     applyViewportTransform(transform);
     renderPhysicalIntensityBrushPreview();
     syncUnitCounterScalesDuringZoom();
@@ -50,5 +62,6 @@ export function createRendererViewportUpdateOwner({
 
   return Object.freeze({
     updateMap,
+    applyViewportTransform,
   });
 }

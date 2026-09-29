@@ -8,6 +8,7 @@ import {
   resolveScenarioRegistryUrl,
 } from "../core/data_loader.js";
 import { resolveContourLodRequest } from "../core/renderer/physical_contour_lod_policy.js";
+import { shouldRequestPhysicalAtlasDetail, PHYSICAL_ATLAS_DETAIL_LAYER, getPhysicalPresentationLayerRequests } from "../core/renderer/physical_atlas_lod_policy.js";
 import {
   createStartupScenarioBundleFromPayload,
   enforceScenarioHydrationHealthGate,
@@ -365,7 +366,9 @@ export function createStartupDataPipelineOwner({
       const normalized = String(name || "").trim().toLowerCase();
       if (!normalized) return [];
       if (normalized === "physical-set") {
-        return PHYSICAL_CONTEXT_LAYER_SET;
+        return [...PHYSICAL_CONTEXT_LAYER_SET,
+          ...(shouldRequestPhysicalAtlasDetail(state) ? [PHYSICAL_ATLAS_DETAIL_LAYER] : []),
+          ...getPhysicalPresentationLayerRequests(state)];
       }
       if (normalized === "physical-contours-set") {
         return resolveContourLodRequest(state);

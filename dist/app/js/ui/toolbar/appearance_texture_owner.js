@@ -5,6 +5,7 @@ import {
 } from "../../core/state.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { setAppearanceStyleGroupState } from "../../core/state/actions/appearance_actions.js";
+import { callRuntimeHook } from "../../core/state/index.js";
 
 export const TEXTURE_STYLE_PATHS = Object.freeze([
   "styleConfig.texture.mode",
@@ -152,6 +153,7 @@ export function createAppearanceTextureOwner({
   documentRef = globalThis.document,
   captureHistoryStateFn = captureHistoryState,
   pushHistoryEntryFn = pushHistoryEntry,
+  syncDayNightClockTimer = () => callRuntimeHook(null, "syncDayNightClockTimerFn"),
 } = {}) {
   const nodes = collectTextureNodes(documentRef);
   const defaultDayNight = normalizeDayNightStyleConfig({});
@@ -359,7 +361,7 @@ export function createAppearanceTextureOwner({
     updateValueLabel(nodes.dayNightShadowOpacityValue, `${Math.round(dayNight.shadowOpacity * 100)}%`);
     if (nodes.dayNightTwilightWidth) nodes.dayNightTwilightWidth.value = String(Math.round(dayNight.twilightWidthDeg));
     updateValueLabel(nodes.dayNightTwilightWidthValue, `${Math.round(dayNight.twilightWidthDeg)}°`);
-    runtimeState.syncDayNightClockTimerFn?.();
+    syncDayNightClockTimer();
   };
 
   const updateTextureStyle = (mutate, { historyKind = "texture-style", commitHistory = false, renderReason = "texture-style" } = {}) => {

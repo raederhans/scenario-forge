@@ -217,3 +217,8 @@ test("export budget reserves both regional bathymetry mask surfaces only with a 
   assert.equal(estimateExportRenderBytes({ ...withoutBackground, bathymetryCoverage: true }),
     estimateExportRenderBytes(withoutBackground));
 });
+
+test("physical brush exports account for scratch pixels and inverse projection cache", () => {
+  const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["physicalBase"] };
+  assert.ok(estimateExportRenderBytes({ ...input, physicalIntensity: true }) > estimateExportRenderBytes(input) + 100 * 80 * 4 * 8);
+});

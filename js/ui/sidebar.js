@@ -3957,6 +3957,9 @@ function initSidebar({ render } = {}) {
   refreshLegendEditor();
   renderScenarioAuditPanel();
   editorWorkspace = initEditorWorkspace({
+    revealProperties: () => {
+      if (document.body.classList.contains("right-sidebar-collapsed")) setRightSidebarCollapsed(false);
+    },
     t,
     onNavigate: () => {
       // Manual context navigation consumes the current selection snapshot so a

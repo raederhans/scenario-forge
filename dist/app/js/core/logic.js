@@ -4,7 +4,6 @@ import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import { refreshColorState, refreshResolvedColorsForOwners } from "./map_renderer.js";
 import { getCountryCode as getSharedFeatureCountryCode, normalizeFeatureCountryCode } from "./feature_identity.js";
-import { markLegacyColorStateDirty } from "./sovereignty_manager.js";
 const state = runtimeState;
 
 function normalizeCountryCode(rawCode) {
@@ -24,8 +23,7 @@ function applyCountryColor(code, color) {
   });
   runtimeState.countryPalette[target] = color;
   runtimeState.sovereignBaseColors[target] = color;
-  runtimeState.countryBaseColors[target] = color;
-  markLegacyColorStateDirty();
+
   refreshResolvedColorsForOwners([target], { renderNow: true });
   pushHistoryEntry({
     kind: "inspector-country-color",
@@ -62,11 +60,9 @@ function resetCountryColors() {
     ...resolvedDefaults,
     ...(runtimeState.activeScenarioId ? runtimeState.scenarioFixedOwnerColors || {} : {}),
   };
-  runtimeState.countryBaseColors = { ...runtimeState.sovereignBaseColors };
   runtimeState.colors = {};
   runtimeState.visualOverrides = {};
-  runtimeState.featureOverrides = {};
-  markLegacyColorStateDirty();
+
   refreshColorState({ renderNow: true });
   pushHistoryEntry({
     kind: "reset-country-colors",
@@ -89,12 +85,8 @@ function applyPaletteToMap() {
     const color = countryPalette[code];
     if (color) {
       runtimeState.sovereignBaseColors[code] = color;
-      runtimeState.countryBaseColors[code] = color;
       touchedOwners.add(code);
     }
-  }
-  if (touchedOwners.size > 0) {
-    markLegacyColorStateDirty();
   }
   refreshResolvedColorsForOwners([...touchedOwners], { renderNow: true });
 }
@@ -105,8 +97,8 @@ function saveMapState() {
       "map_colors",
       JSON.stringify({
         schemaVersion: 2,
-        countryBaseColors: runtimeState.sovereignBaseColors || runtimeState.countryBaseColors || {},
-        featureOverrides: runtimeState.visualOverrides || runtimeState.featureOverrides || {},
+        sovereignBaseColors: runtimeState.sovereignBaseColors || {},
+        visualOverrides: runtimeState.visualOverrides || {},
       })
     );
   } catch (error) {

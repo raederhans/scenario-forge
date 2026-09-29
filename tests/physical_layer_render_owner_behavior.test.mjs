@@ -29,9 +29,10 @@ function createCanvasContext() {
         },
       };
     },
-    fill() {
+    fill(path) {
       calls.push({
         type: "fill",
+        path,
         alpha: this.globalAlpha,
         composite: this.globalCompositeOperation,
         fillStyle: this.fillStyle,
@@ -65,6 +66,32 @@ function createAtlasFeature(atlasClass, layerName, id = `${atlasClass}:${layerNa
     },
   };
 }
+
+test("atlas cached fills retain per-feature alpha/blend and fall back for an unavailable path", () => {
+  const first = createAtlasFeature('mountain','relief_base','cached');
+  const second = createAtlasFeature('forest','relief_base','fallback');
+  const cached = {};
+  const { owner, state, context, pathCalls } = createOwner({atlasFeatures:[first,second],
+    getterOverrides:{getFillPath2D:feature=>feature===first?cached:null}});
+  const count=owner.drawPhysicalAtlasCollectionLayer({features:[first,second]},'relief_base',state.styleConfig.physical,
+    {baseOpacity:.5,blendMode:'multiply'});
+  assert.equal(count,2);
+  assert.deepEqual(pathCalls,[second]);
+  const fills=context.calls.filter(call=>call.type==='fill');
+  assert.deepEqual(fills.map(call=>[call.path,call.alpha,call.composite]),[[cached,.4,'multiply'],[undefined,.5,'multiply']]);
+});
+
+test("DEM reuses fill paths with current intensity rather than cached style", () => {
+  const cached = {};
+  const {owner,state,context,pathCalls}=createOwner({getterOverrides:{getFillPath2D:()=>cached}});
+  state.styleConfig.physical.hillshadeOpacity=.3;
+  state.contextLayerExternalDataByName={physical_hillshade:{features:[{properties:{shade:-.5}}]}};
+  assert.equal(owner.drawPhysicalHillshadeLayer(4),1);
+  state.styleConfig.physical.landformIntensity=2;
+  assert.equal(owner.drawPhysicalHillshadeLayer(4),1);
+  assert.equal(pathCalls.length,0);
+  assert.deepEqual(context.calls.filter(call=>call.type==='fill').map(call=>[call.path,call.alpha]),[[cached,.15],[cached,.3]]);
+});
 
 function createContourFeature(id, elevation = 500) {
   return {
@@ -207,7 +234,7 @@ test("physical layer owner records skip metrics when hidden", () => {
   assert.equal(harness.context.calls.length, 0);
 });
 
-test("physical base pass draws semantic, intensity, and relief counts in order", () => {
+test("physical base pass draws semantic and relief without an extra gradient stain", () => {
   const semantic = createAtlasFeature("forest", "semantic_overlay", "semantic");
   const relief = createAtlasFeature("mountain", "relief_base", "relief");
   const harness = createOwner({
@@ -219,22 +246,43 @@ test("physical base pass draws semantic, intensity, and relief counts in order",
 
   assert.deepEqual(harness.pathCalls.map((feature) => feature.id), ["semantic", "relief"]);
   const fills = harness.context.calls.filter((call) => call.type === "fill");
-  assert.equal(fills.length, 3);
+  assert.equal(fills.length, 2);
   assert.equal(harness.metrics.at(-1).name, "drawPhysicalBasePass");
   assert.equal(harness.metrics.at(-1).details.semanticRenderedCount, 1);
-  assert.equal(harness.metrics.at(-1).details.intensityRenderedCount, 1);
+  assert.equal(harness.metrics.at(-1).details.intensityRenderedCount, undefined);
   assert.equal(harness.metrics.at(-1).details.reliefRenderedCount, 1);
 });
 
-test("physical intensity layer tolerates missing intensity channels", () => {
-  const harness = createOwner({
-    state: {
-      intensityFields: {},
-    },
-  });
+test("landform and land cover sliders independently suppress their own fills", () => {
+  const h = createOwner({ atlasFeatures: [createAtlasFeature("forest", "semantic_overlay"), createAtlasFeature("mountain", "relief_base")] });
+  h.state.styleConfig.physical.landformIntensity = 0;
+  h.owner.drawPhysicalBasePass(2);
+  assert.deepEqual(h.pathCalls.map((f) => f.properties.atlasClass), ["forest"]);
+  h.pathCalls.length = 0;
+  h.state.styleConfig.physical.landformIntensity = 1;
+  h.state.styleConfig.physical.landcoverIntensity = 0;
+  h.owner.drawPhysicalBasePass(2);
+  assert.deepEqual(h.pathCalls.map((f) => f.properties.atlasClass), ["mountain"]);
+});
 
-  assert.equal(harness.owner.drawPhysicalIntensityFieldLayer(), 0);
-  assert.equal(harness.context.calls.length, 0);
+test("region names follow language, scale, class visibility and avoid mutual overlap", () => {
+  const context = createCanvasContext();
+  const textCalls = [];
+  context.measureText = () => ({ width: 20 });
+  context.strokeText = () => {};
+  context.fillText = (text) => textCalls.push(text);
+  const h = createOwner({ context });
+  h.state.styleConfig.physical.showRegionLabels = true;
+  h.state.currentLanguage = "zh";
+  const feature = (id, xy, extra = {}) => ({ geometry: { coordinates: xy }, properties: { id, name_en: id, name_zh: "山脉", atlas_class: "mountain", min_zoom: 2, ...extra } });
+  h.state.contextLayerExternalDataByName = { physical_region_labels: { features: [feature("a", [0,0]), feature("b", [0,0]), feature("c", [20,0], { min_zoom: 8 })] } };
+  assert.equal(h.owner.drawPhysicalRegionLabels(4), 1);
+  assert.deepEqual(textCalls, ["山脉"]);
+  assert.equal(h.owner.drawPhysicalRegionLabels(4, { occupiedBoxes: [{ x:-50, y:-50, w:100, h:100 }] }), 0, "existing city/transport labels take priority");
+  h.state.styleConfig.physical.atlasClassVisibility.mountain = false;
+  assert.equal(h.owner.drawPhysicalRegionLabels(4), 0);
+  h.state.styleConfig.physical.atlasClassVisibility.mountain = true;
+  assert.equal(h.owner.drawPhysicalRegionLabels(1), 0);
 });
 
 test("physical owner respects pre-applied clip masks", () => {
@@ -250,7 +298,6 @@ test("physical owner respects pre-applied clip masks", () => {
   harness.owner.drawPhysicalAtlasCollectionLayer(atlasCollection, "semantic_overlay", cfg, {
     clipAlreadyApplied: true,
   });
-  harness.owner.drawPhysicalIntensityFieldLayer({ clipAlreadyApplied: true });
   harness.owner.drawPhysicalReliefOverlayLayer(2, { clipAlreadyApplied: true });
 
   assert.equal(harness.helperCalls.includes("clip"), false);

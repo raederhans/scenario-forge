@@ -5,6 +5,9 @@ import { createPaintContourMesh } from './paint_contour_mesh.js';
 const EMPTY = Object.freeze([]);
 export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   isEligible = () => true, resolveColor, onChange = () => {},
+  resolveBoundaryKey = () => null,
+  getBoundaryRevision = () => 0,
+  separatePoliticalBorders = () => false,
   client = createPaintContourWorkerClient(),
   schedule = callback => setTimeout(callback, 0),
 } = {}) {
@@ -12,6 +15,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   let topologyRevision = -1, geometryEpoch = 0, registeredEpoch = -1;
   let featuresById = new Map(), precisionById = new Map(), registered = null, registeredPrecision = null, view = null;
   let inFlight = null, scheduled = false, revision = 0, paintRevision = -1;
+  let boundaryRevision = null, bordersSeparated = false;
   let status = 'idle', error = '', graphDiagnostics = null, builds = 0, sentFeatures = 0;
   const sceneIdentity = () => [state.activeScenarioId || '', state.sceneGeneration || 0].join('|');
   function clear() {
@@ -53,10 +57,15 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   function syncPaint(ids = null, force = false) {
     if (!view) return;
     const next = Number(state.colorRevision || 0);
-    if (!force && next === paintRevision && ids == null) return;
-    const scoped = ids && next === paintRevision + 1 ? ids : null;
+    const nextBoundaryRevision = String(getBoundaryRevision());
+    const nextBordersSeparated = !!separatePoliticalBorders();
+    const boundaryChanged = nextBoundaryRevision !== boundaryRevision || nextBordersSeparated !== bordersSeparated;
+    if (!force && next === paintRevision && !boundaryChanged && ids == null) return;
+    const scoped = !force && !boundaryChanged && ids && next === paintRevision + 1 ? ids : null;
     if (view.refresh(scoped)) revision += 1;
     paintRevision = next;
+    boundaryRevision = nextBoundaryRevision;
+    bordersSeparated = nextBordersSeparated;
   }
   async function start() {
     const ownedGeneration = generation, ownedVersion = sourceVersion, snapshot = featuresById;
@@ -77,9 +86,17 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
       view = createPaintContourMesh(graph, id => {
         const feature = featuresById.get(id);
         return feature ? resolveColor(feature, id) : null;
+      }, {
+        resolveBoundaryKey: id => {
+          const feature = featuresById.get(id);
+          return feature ? resolveBoundaryKey(feature, id) : null;
+        },
+        separatePoliticalBorders,
       });
       graphDiagnostics = graph.diagnostics;
       paintRevision = Number(state.colorRevision || 0);
+      boundaryRevision = String(getBoundaryRevision());
+      bordersSeparated = !!separatePoliticalBorders();
       status = 'ready'; revision += 1;
       onChange('paint-contours-ready');
     } catch (failure) {

@@ -424,13 +424,14 @@ function createScenarioRefreshRuntime(deps = {}) {
       politicalFeatureIds,
       hasPoliticalPayloadChange,
     });
+    let coverageInputSnapshot = null;
     if (hasPoliticalChange) {
-      rebuildPrimaryPoliticalDerivedState({
+      coverageInputSnapshot = rebuildPrimaryPoliticalDerivedState({
         scheduleUiMode: "deferred",
         buildSpatial: true,
         includeSecondarySpatial: false,
         incremental: true,
-      });
+      })?.coverageInputSnapshot;
     }
     scenarioChunkPromotionVersion = Number(scenarioChunkPromotionVersion || 0) + 1;
     const previousTopologyRevision = Number(runtimeState.topologyRevision || 0);
@@ -476,7 +477,7 @@ function createScenarioRefreshRuntime(deps = {}) {
     const promotedPrimaryFeatureCount = Array.isArray(runtimeState.scenarioPoliticalVisibleChunkData?.features)
       ? runtimeState.scenarioPoliticalVisibleChunkData.features.length
       : promotedTotalFeatureCount;
-    const currentPoliticalCoverage = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, shouldExcludePoliticalVisualFeature });
+    const currentPoliticalCoverage = analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, { buildInteractiveLandData, coverageInputSnapshot, shouldExcludePoliticalVisualFeature });
     const primaryVisibleDerivedStateReady = hasPoliticalChange
       && !!currentPoliticalCoverage.primaryVisibleFeatureSubsetActive;
     const completePoliticalDerivedStateReady = hasPoliticalChange

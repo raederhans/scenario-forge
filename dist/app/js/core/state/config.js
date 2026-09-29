@@ -153,4 +153,8 @@ export const STATE_HANDLER_HOOK_NAMES = Object.freeze([
 
 export const STATE_INTERNAL_HANDLER_HOOK_NAMES = Object.freeze([
   "clearExportBakeCacheFn",
+  "ensureScenarioNavigationSourcesFn",
+  "noteFirstVisibleFramePaintedFn",
+  "syncDayNightClockTimerFn",
+  "resolveSpecialZoneParentGroupTargetIdsFn",
 ]);

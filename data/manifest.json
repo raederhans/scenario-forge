@@ -236,9 +236,9 @@
       "raw_world_bounds_geometries": 0,
       "role": "physical_semantics_topology",
       "schema_ref": "schema://topology/physical_semantics_v1",
-      "sha256": "d1416c4897fbedce563408de7365c2af9bd67a2df8748a0984a787cf3140d3e5",
+      "sha256": "6c2cbc84915781e0ae6f683fa42e343fd437891706295a6ff961bf6f1433550b",
       "simplification": "semantic_dissolve_v1",
-      "size_bytes": 729934,
+      "size_bytes": 730100,
       "target_zoom_range": [
         0,
         20
@@ -853,6 +853,59 @@
       "sha256": "7ae6c36d667a787e7b52421ba5515ff850719850622ea12a0c55ccd7359fd30e",
       "size_bytes": 24980735,
       "type": "world_cities"
+    },
+    "global_physical_semantics.detail.topo.json": {
+      "role": "physical_semantics_detail",
+      "artifact_class": "publish",
+      "owner": "tools.build_physical_detail",
+      "description": "Alps 2019 land-cover detail; overview elsewhere",
+      "size_bytes": 1139530,
+      "sha256": "b185b564f4fa73acbcd30fc117535686d4564f218aed56e7586cc37c6464f827",
+      "schema_ref": "schema://topojson/topology/v1",
+      "target_zoom_range": [
+        4,
+        20
+      ],
+      "type": "topology",
+      "object_names": [
+        "physical_semantics"
+      ],
+      "arc_count": 8452,
+      "arc_point_count": 46869
+    },
+    "physical_hillshade.alps.topo.json": {
+      "role": "physical_hillshade",
+      "artifact_class": "publish",
+      "owner": "tools.build_physical_presentation",
+      "description": "Alps ETOPO 2022 DEM illumination pilot, opt-in",
+      "size_bytes": 589742,
+      "sha256": "3b00da5c185fe4c1fb39c18059cb8805226ef8f3c96309d21adb36e4dca2c636",
+      "schema_ref": "schema://topojson/topology/v1",
+      "target_zoom_range": [
+        4,
+        20
+      ],
+      "type": "topology",
+      "object_names": [
+        "physical_hillshade"
+      ],
+      "arc_count": 6912,
+      "arc_point_count": 24688
+    },
+    "physical_region_labels.geojson": {
+      "role": "physical_region_labels",
+      "artifact_class": "publish",
+      "owner": "tools.build_physical_presentation",
+      "description": "Natural Earth bilingual physical reference labels",
+      "size_bytes": 133923,
+      "sha256": "c47ad8c0c5a448c3883224e6bee948e86f10f0958b9c67029984a4a6e03277c0",
+      "schema_ref": "schema://geojson/feature_collection/point/v1",
+      "target_zoom_range": [
+        2,
+        20
+      ],
+      "type": "geojson",
+      "feature_count": 419
     }
   },
   "runtime_asset_registry": {

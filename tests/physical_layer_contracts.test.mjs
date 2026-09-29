@@ -88,8 +88,8 @@ test("physical layer source contracts stay wired to the expected renderer and st
       /function drawPhysicalReliefOverlayLayer\(k, \{ interactive = false, clipAlreadyApplied = false \} = \{\}\)/.test(physicalLayerOwnerSource)
       && /return getPhysicalLayerRenderOwner\(\)\.drawPhysicalReliefOverlayLayer\(k, \{ interactive, clipAlreadyApplied \}\);/.test(rendererSource),
     hasPhysicalIntensityFieldHelper:
-      /function drawPhysicalIntensityFieldLayer\(\{ clipAlreadyApplied = false \} = \{\}\)/.test(physicalLayerOwnerSource)
-      && /return getPhysicalLayerRenderOwner\(\)\.drawPhysicalIntensityFieldLayer\(\{ clipAlreadyApplied \}\);/.test(rendererSource),
+      rendererSource.includes("createPhysicalIntensityCompositor({")
+      && physicalLayerOwnerSource.includes("paintWithPhysicalIntensity"),
     physicalBaseSignatureTracksIntensityRevision:
       /if \(passName === "physicalBase"\) \{[\s\S]*?`field:\$\{Number\(intensityFields\.channels\.physicalAtlas\?\.revision \|\| 0\)\}`/.test(signaturePolicySource),
     reliefOverlayBlendClamp:
@@ -97,13 +97,11 @@ test("physical layer source contracts stay wired to the expected renderer and st
       && /if \(requestedMode === "overlay" \|\| requestedMode === "multiply"\) \{[\s\S]*?return "soft-light";/.test(rendererSource),
     physicalBaseKeepsPhysicalFillUnderPolitical:
       physicalBaseSource.includes("const semanticRenderedCount = drawPhysicalAtlasLayer(k, { interactive });")
-      && physicalBaseSource.includes("const intensityRenderedCount = drawPhysicalIntensityFieldLayer();")
       && physicalBaseSource.includes("const reliefRenderedCount = drawPhysicalReliefOverlayLayer(k, { interactive });")
       && physicalBaseSource.indexOf("drawPhysicalAtlasLayer(k, { interactive });")
-        < physicalBaseSource.indexOf("drawPhysicalIntensityFieldLayer();")
-      && physicalBaseSource.indexOf("drawPhysicalIntensityFieldLayer();")
         < physicalBaseSource.indexOf("drawPhysicalReliefOverlayLayer(k, { interactive });")
-      && physicalBaseSource.includes("const renderedCount = semanticRenderedCount + intensityRenderedCount + reliefRenderedCount;"),
+      && !physicalBaseSource.includes("drawPhysicalIntensityFieldLayer")
+      && physicalBaseSource.includes("const renderedCount = semanticRenderedCount + reliefRenderedCount;"),
     hasPhysicalExactRefresh:
       /invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);/.test(exactSchedulerSource),
     contextBaseKeepsReliefBelowPolitical:
@@ -130,9 +128,9 @@ test("physical layer source contracts stay wired to the expected renderer and st
       && /const batchKey = `\$\{strokeColor\}\|\$\{multiplier\.toFixed\(2\)\}`;/.test(physicalLayerOwnerSource)
       && /strokeBatches\.forEach\(\(\{ features, strokeColor, multiplier \}\) => \{[\s\S]*?context\.globalAlpha = clamp\(\(interactive \? Math\.min\(opacity, 0\.22\) : opacity\) \* multiplier, 0, 1\);[\s\S]*?features\.forEach\(\(feature\) => \{[\s\S]*?pathCanvas\(feature\);/.test(physicalLayerOwnerSource),
     physicalIntensityFieldsModulateAtlasAndContours:
-      /baseOpacity \* getAtlasFeatureAlphaMultiplier\(atlasClass, cfg\) \* getFieldFeatureMultiplier\("physicalAtlas", feature\)/.test(physicalLayerOwnerSource)
-      && /const resolveContourIntensity = \(feature\) => getFieldFeatureMultiplier\("physicalContour", feature\);/.test(physicalLayerOwnerSource)
-      && /opacityMultiplierResolver: resolveContourIntensity,/.test(physicalLayerOwnerSource),
+      physicalLayerOwnerSource.includes('paintWithPhysicalIntensity("physicalAtlas"')
+      && physicalLayerOwnerSource.includes('paintWithPhysicalIntensity("physicalContour"')
+      && !physicalLayerOwnerSource.includes('getFieldFeatureMultiplier('),
     physicalIntensityToolHookRegistered:
       /registerRuntimeHook\(runtimeState, "setIntensityFieldToolFn", setIntensityFieldTool\);/.test(rendererSource),
     physicalIntensityPointCommitRebakesComposite:

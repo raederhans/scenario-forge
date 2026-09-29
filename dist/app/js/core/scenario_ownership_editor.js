@@ -1,19 +1,10 @@
-import { isOwnershipEditingEnabled, ownershipEditingDisabledResult } from "./map_editing_policy.js";
+import { ownershipEditingDisabledResult } from "./map_editing_policy.js";
 import { state as runtimeState } from "./state.js";
-import { captureHistoryState, pushHistoryEntry } from "./history_manager.js";
-import {
-  refreshResolvedColorsForFeatures,
-  requestInteractionRender,
-  scheduleDynamicBorderRecompute,
-} from "./map_renderer.js";
-import { markDirty } from "./dirty_state.js";
 import {
   getFeatureOwnerCode,
   normalizeOwnerCode,
-  setFeatureOwnerCodes,
   shouldExcludeScenarioPoliticalFeature,
 } from "./sovereignty_manager.js";
-const state = runtimeState;
 
 function uniqueIds(featureIds = []) {
   return Array.from(new Set(
@@ -21,10 +12,6 @@ function uniqueIds(featureIds = []) {
       .map((value) => String(value || "").trim())
       .filter(Boolean)
   ));
-}
-
-function requestScenarioOwnershipRender(reason = "scenario-ownership") {
-  return requestInteractionRender(reason);
 }
 
 function filterEditableOwnershipFeatureIds(featureIds = []) {
@@ -61,271 +48,16 @@ function filterEditableOwnershipFeatureIds(featureIds = []) {
   };
 }
 
-function applyOwnerToFeatureIds(
-  targetIds = [],
-  ownerCode,
-  {
-    render = true,
-    historyKind = "feature-apply-ownership",
-    dirtyReason = "feature-apply-ownership",
-    recomputeReason = "scenario-ownership-editor-apply",
-  } = {}
-) {
-  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
-  const { requestedIds, matchedIds, missingIds } = filterEditableOwnershipFeatureIds(targetIds);
-  const normalizedOwnerCode = normalizeOwnerCode(ownerCode);
-  if (!matchedIds.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-  if (!normalizedOwnerCode) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: matchedIds.length,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "missing-owner",
-      mode: "ownership",
-    };
-  }
-
-  const before = captureHistoryState({
-    sovereigntyFeatureIds: matchedIds,
-  });
-  const changed = setFeatureOwnerCodes(matchedIds, normalizedOwnerCode);
-  if (changed > 0) {
-    refreshResolvedColorsForFeatures(matchedIds, { renderNow: false });
-    scheduleDynamicBorderRecompute(recomputeReason, 90);
-    markDirty(dirtyReason);
-    pushHistoryEntry({
-      kind: historyKind,
-      before,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: matchedIds,
-      }),
-      meta: {
-        affectsSovereignty: true,
-      },
-    });
-  }
-  if (render) {
-    requestScenarioOwnershipRender("scenario-ownership-apply-owner");
-  }
-  return {
-    applied: true,
-    changed,
-    matchedCount: matchedIds.length,
-    requestedCount: requestedIds.length,
-    missingCount: missingIds.length,
-    reason: "",
-    mode: "ownership",
-  };
+function applyOwnerToFeatureIds(targetIds = []) {
+  return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
 }
 
-function resetOwnersToScenarioBaselineForFeatureIds(
-  targetIds = [],
-  {
-    render = true,
-    historyKind = "feature-reset-scenario-ownership",
-    dirtyReason = "feature-reset-scenario-ownership",
-    recomputeReason = "scenario-ownership-editor-reset",
-  } = {}
-) {
-  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
-  const { requestedIds, matchedIds, missingIds } = filterEditableOwnershipFeatureIds(targetIds);
-  if (!matchedIds.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-  const baselineMap = runtimeState.scenarioBaselineOwnersByFeatureId
-    && typeof runtimeState.scenarioBaselineOwnersByFeatureId === "object"
-      ? runtimeState.scenarioBaselineOwnersByFeatureId
-      : null;
-  if (!runtimeState.activeScenarioId || !baselineMap) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: matchedIds.length,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length,
-      reason: "missing-scenario-baseline",
-      mode: "ownership",
-    };
-  }
-
-  const groupedIdsByOwner = new Map();
-  const baselineTargetIds = [];
-  const missingBaselineIds = [];
-  matchedIds.forEach((id) => {
-    const baselineOwnerCode = normalizeOwnerCode(baselineMap[id]);
-    if (!baselineOwnerCode) {
-      missingBaselineIds.push(id);
-      return;
-    }
-    baselineTargetIds.push(id);
-    if (!groupedIdsByOwner.has(baselineOwnerCode)) {
-      groupedIdsByOwner.set(baselineOwnerCode, []);
-    }
-    groupedIdsByOwner.get(baselineOwnerCode).push(id);
-  });
-  if (!baselineTargetIds.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: matchedIds.length,
-      requestedCount: requestedIds.length,
-      missingCount: missingIds.length + missingBaselineIds.length,
-      reason: "missing-scenario-baseline",
-      mode: "ownership",
-    };
-  }
-
-  const before = captureHistoryState({
-    sovereigntyFeatureIds: baselineTargetIds,
-  });
-  let changed = 0;
-  groupedIdsByOwner.forEach((featureIds, ownerCode) => {
-    changed += setFeatureOwnerCodes(featureIds, ownerCode);
-  });
-  if (changed > 0) {
-    refreshResolvedColorsForFeatures(baselineTargetIds, { renderNow: false });
-    scheduleDynamicBorderRecompute(recomputeReason, 90);
-    markDirty(dirtyReason);
-    pushHistoryEntry({
-      kind: historyKind,
-      before,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: baselineTargetIds,
-      }),
-      meta: {
-        affectsSovereignty: true,
-      },
-    });
-  }
-  if (render) {
-    requestScenarioOwnershipRender("scenario-ownership-reset-baseline");
-  }
-  return {
-    applied: true,
-    changed,
-    matchedCount: baselineTargetIds.length,
-    requestedCount: requestedIds.length,
-    missingCount: missingIds.length + missingBaselineIds.length,
-    reason: "",
-    mode: "ownership",
-  };
+function resetOwnersToScenarioBaselineForFeatureIds(targetIds = []) {
+  return ownershipEditingDisabledResult(Array.isArray(targetIds) ? targetIds.length : 0);
 }
 
-function applyOwnerControllerAssignmentsToFeatureIds(
-  assignmentsByFeatureId = {},
-  {
-    render = true,
-    historyKind = "feature-apply-owner-controller",
-    dirtyReason = "feature-apply-owner-controller",
-    recomputeReason = "feature-apply-owner-controller",
-  } = {}
-) {
-  if (!isOwnershipEditingEnabled()) return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
-  const entries = Object.entries(assignmentsByFeatureId || {})
-    .map(([featureId, assignment]) => {
-      const normalizedFeatureId = String(featureId || "").trim();
-      const ownerCode = normalizeOwnerCode(assignment?.ownerCode);
-      if (!normalizedFeatureId || !ownerCode) return null;
-      return {
-        featureId: normalizedFeatureId,
-        ownerCode,
-      };
-    })
-    .filter(Boolean);
-
-  if (!entries.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: 0,
-      missingCount: 0,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-
-  const targetIds = filterEditableOwnershipFeatureIds(entries.map((entry) => entry.featureId)).matchedIds;
-  if (!targetIds.length) {
-    return {
-      applied: false,
-      changed: 0,
-      matchedCount: 0,
-      requestedCount: entries.length,
-      missingCount: entries.length,
-      reason: "empty-target",
-      mode: "ownership",
-    };
-  }
-
-  const before = captureHistoryState({
-    sovereigntyFeatureIds: targetIds,
-  });
-  const ownerFeatureIdsByCode = new Map();
-  const changedFeatureIds = new Set();
-
-  entries.forEach(({ featureId, ownerCode }) => {
-    if (!targetIds.includes(featureId)) return;
-    const currentOwnerCode = normalizeOwnerCode(runtimeState.sovereigntyByFeatureId?.[featureId]);
-    if (currentOwnerCode !== ownerCode) {
-      if (!ownerFeatureIdsByCode.has(ownerCode)) {
-        ownerFeatureIdsByCode.set(ownerCode, []);
-      }
-      ownerFeatureIdsByCode.get(ownerCode).push(featureId);
-      changedFeatureIds.add(featureId);
-    }
-  });
-
-  ownerFeatureIdsByCode.forEach((featureIds, ownerCode) => {
-    setFeatureOwnerCodes(featureIds, ownerCode);
-  });
-  if (changedFeatureIds.size) {
-    refreshResolvedColorsForFeatures(Array.from(changedFeatureIds), { renderNow: false });
-    scheduleDynamicBorderRecompute(recomputeReason, 90);
-    markDirty(dirtyReason);
-    pushHistoryEntry({
-      kind: historyKind,
-      before,
-      after: captureHistoryState({
-        sovereigntyFeatureIds: targetIds,
-      }),
-      meta: {
-        affectsSovereignty: true,
-      },
-    });
-  }
-  if (render) {
-    requestScenarioOwnershipRender("scenario-ownership-apply-owner-controller");
-  }
-  return {
-    applied: true,
-    changed: changedFeatureIds.size,
-    matchedCount: targetIds.length,
-    requestedCount: entries.length,
-    missingCount: Math.max(entries.length - targetIds.length, 0),
-    reason: "",
-    mode: "ownership",
-  };
+function applyOwnerControllerAssignmentsToFeatureIds(assignmentsByFeatureId = {}) {
+  return ownershipEditingDisabledResult(Object.keys(assignmentsByFeatureId || {}).length);
 }
 
 function buildScenarioOwnershipSavePayload() {

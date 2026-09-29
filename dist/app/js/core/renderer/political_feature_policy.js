@@ -45,7 +45,6 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     if (!id) return false;
     return !!(
       getSafeCanvasColor(runtimeState.visualOverrides?.[id], null)
-      || getSafeCanvasColor(runtimeState.featureOverrides?.[id], null)
     );
   }
 
@@ -179,7 +178,8 @@ export function createPoliticalFeaturePolicy(runtimeState, {
   function isPoliticalVisualRenderableFeature(feature, featureId = null) {
     if (!feature) return false;
     if (isAtlantropaFieldDrivenFeature(feature) && !isScenarioAtlantropaVisible()) return false;
-    if (isAntarcticSectorFeature(feature, featureId)) return false;
+    if (isAntarcticSectorFeature(feature, featureId)
+      && String(runtimeState.mapSemanticMode || "").trim().toLowerCase() !== "blank") return false;
     if (isBaseGeographyScenarioFeature(feature)) return false;
     if (isAtlantropaVisualSupportHelperFeature(feature, featureId)) return false;
     return true;

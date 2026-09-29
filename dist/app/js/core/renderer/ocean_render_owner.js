@@ -20,6 +20,7 @@ export function createOceanRenderOwner({
   const {
     getContext = () => null,
     getPathCanvas = () => null,
+    isExportRendering = () => false,
   } = getters;
   const {
     applyBathymetryCoverageExclusionMask = () => {},
@@ -38,6 +39,8 @@ export function createOceanRenderOwner({
     getBathymetryPresetProfile = () => ({}),
     getCoastlineCollectionForZoom = () => [],
     getOceanStyleConfig = () => ({}),
+    publishBathymetryVisibility = () => {},
+    paintGlobalBathymetry = (draw) => draw(),
     getProjectedGeographicPath = () => null,
     collectContextMetric = () => {},
     nowMs = () => Date.now(),
@@ -68,7 +71,7 @@ export function createOceanRenderOwner({
   function drawBathymetryBands(collection, oceanStyle) {
     const context = getContext();
     const pathCanvas = getPathCanvas();
-    if (!context || !pathCanvas) return;
+    if (!context || !pathCanvas || oceanStyle.opacity === 0) return 0;
     const zoomK = Number(runtimeState.zoomTransform?.k) || 1;
     const features = sortBathymetryFeaturesForFill(collection);
     const startedAt = nowMs();
@@ -92,10 +95,15 @@ export function createOceanRenderOwner({
       renderedCount += 1;
     });
     collectContextMetric("drawBathymetryBands", nowMs() - startedAt, { featureCount: features.length, renderedCount });
+    return renderedCount;
   }
 
   function buildVisibleBathymetryContourDepthSet(collection, oceanStyle) {
     const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
+    if ((Number(runtimeState.zoomTransform?.k) || 1) < 2 && Array.isArray(profile?.majorContourDepths)
+      && collection?.features?.every((feature) => feature.properties?._bathymetrySource === "global")) {
+      return new Set(profile.majorContourDepths);
+    }
     if (!profile?.skipAlternateContourDepths || !Array.isArray(collection?.features)) {
       return null;
     }
@@ -109,7 +117,8 @@ export function createOceanRenderOwner({
   function drawBathymetryContours(collection, oceanStyle) {
     const context = getContext();
     const pathCanvas = getPathCanvas();
-    if (!context || !pathCanvas || !Array.isArray(collection?.features) || !collection.features.length) return;
+    if (!context || !pathCanvas || !Array.isArray(collection?.features) || !collection.features.length
+      || oceanStyle.opacity === 0 || oceanStyle.contourStrength === 0) return 0;
     const zoomK = Number(runtimeState.zoomTransform?.k) || 1;
     const profile = oceanStyle.bathymetryProfile || getBathymetryPresetProfile(oceanStyle.preset);
     const lineWidthBase = (profile?.contourLineWidthBase ?? 0.45)
@@ -127,7 +136,8 @@ export function createOceanRenderOwner({
       context.save();
       context.globalAlpha *= visibilityConfig.alpha;
       context.strokeStyle = getBathymetryContourStrokeStyle(feature, oceanStyle);
-      context.lineWidth = lineWidthBase;
+      // A map zoom changes the geometry, not the cartographic stroke weight.
+      context.lineWidth = lineWidthBase / Math.max(0.0001, zoomK);
       const path = getProjectedGeographicPath(feature);
       if (path) {
         context.stroke(path);
@@ -140,6 +150,7 @@ export function createOceanRenderOwner({
       renderedCount += 1;
     });
     collectContextMetric("drawBathymetryContours", nowMs() - startedAt, { featureCount: collection.features.length, renderedCount });
+    return renderedCount;
   }
 
   function buildCoastalAccentStrokeBuckets(entries) {
@@ -265,14 +276,17 @@ export function createOceanRenderOwner({
     ensureBathymetryDataAvailability({
       required: bathymetryRequired,
     });
+    const visibility = { status: "off", lod: "detail", globalVisibleCount: 0, scenarioVisibleCount: 0, visibleCount: 0 };
     if (!oceanStyle.experimentalAdvancedStyles) {
       runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
       runtimeState.oceanMaskQuality = 0;
+      publishBathymetryVisibility(visibility);
       return;
     }
     if (oceanStyle.preset === "flat") {
       runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
       runtimeState.oceanMaskQuality = 0;
+      publishBathymetryVisibility(visibility);
       return;
     }
     const bathymetryData = getBathymetryFeatureCollections();
@@ -282,39 +296,53 @@ export function createOceanRenderOwner({
     if (!hasBands && !hasContours) {
       runtimeState.oceanMaskMode = OCEAN_MASK_MODE_TOPOLOGY;
       runtimeState.oceanMaskQuality = 0;
+      publishBathymetryVisibility({ ...visibility, status: "loading" });
+      return;
+    }
+    if (oceanStyle.opacity === 0) {
+      publishBathymetryVisibility({ ...visibility, status: "hidden" });
       return;
     }
 
     const { mode: clipMaskMode } = resolveOceanMask();
-    const globalBands = getBathymetryCollectionBySource(bathymetryData.bands, "global");
+    const useOverview = (Number(runtimeState.zoomTransform?.k) || 1) < 2
+      && !isExportRendering()
+      && !!bathymetryData.globalOverviewBands?.features?.length
+      && !!bathymetryData.globalOverviewContours?.features?.length;
+    visibility.lod = useOverview ? "overview" : "detail";
+    const globalBands = useOverview
+      ? bathymetryData.globalOverviewBands
+      : getBathymetryCollectionBySource(bathymetryData.bands, "global");
     const scenarioBands = getBathymetryCollectionBySource(bathymetryData.bands, "scenario");
-    const globalContours = getBathymetryCollectionBySource(bathymetryData.contours, "global");
+    const globalContours = useOverview
+      ? bathymetryData.globalOverviewContours
+      : getBathymetryCollectionBySource(bathymetryData.contours, "global");
     const scenarioContours = getBathymetryCollectionBySource(bathymetryData.contours, "scenario");
     const scenarioCoverage = bathymetryData.scenarioCoverage;
 
     context.save();
     applyOceanClipMask(clipMaskMode);
-    if (Array.isArray(globalBands?.features) && globalBands.features.length) {
+    if (globalBands?.features?.length || globalContours?.features?.length) {
       context.save();
       applyBathymetryCoverageExclusionMask(scenarioCoverage);
-      drawBathymetryBands(globalBands, oceanStyle);
+      paintGlobalBathymetry(() => {
+        visibility.globalVisibleCount += drawBathymetryBands(globalBands, oceanStyle);
+        visibility.globalVisibleCount += drawBathymetryContours(globalContours, oceanStyle);
+      });
       context.restore();
     }
     if (Array.isArray(scenarioBands?.features) && scenarioBands.features.length) {
-      drawBathymetryBands(scenarioBands, oceanStyle);
-    }
-    if (Array.isArray(globalContours?.features) && globalContours.features.length) {
-      context.save();
-      applyBathymetryCoverageExclusionMask(scenarioCoverage);
-      drawBathymetryContours(globalContours, oceanStyle);
-      context.restore();
+      visibility.scenarioVisibleCount += drawBathymetryBands(scenarioBands, oceanStyle);
     }
     if (Array.isArray(scenarioContours?.features) && scenarioContours.features.length) {
-      drawBathymetryContours(scenarioContours, oceanStyle);
+      visibility.scenarioVisibleCount += drawBathymetryContours(scenarioContours, oceanStyle);
     }
     context.restore();
     runtimeState.oceanMaskMode = OCEAN_MASK_MODE_BATHYMETRY;
     runtimeState.oceanMaskQuality = 1;
+    visibility.status = "ready";
+    visibility.visibleCount = visibility.globalVisibleCount + visibility.scenarioVisibleCount;
+    publishBathymetryVisibility(visibility);
   }
 
   return {

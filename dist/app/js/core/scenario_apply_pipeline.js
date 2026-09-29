@@ -229,7 +229,7 @@ function createScenarioApplyPipeline({
   applyBlankScenarioPresentationDefaults,
   setScenarioAuditUiState,
   getScenarioBaselineHashFromBundle,
-  markLegacyColorStateDirty,
+
   syncScenarioInspectorSelection,
   disableScenarioParentBorders,
   applyScenarioPaintMode,
@@ -397,7 +397,7 @@ function createScenarioApplyPipeline({
     // staged 负责把 bundle/loader 结果整理成一次性 runtimeState 提交包。
     // 真正写入 runtimeState 时只认这份对象，避免 apply 流程在多个阶段分散写字段。
     const hasRenderableRuntimeTopology = staged.mapSemanticMode === "blank"
-      || hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload);
+      || hasRenderableScenarioPoliticalTopology(staged.runtimeTopologyPayload, bundle);
     const useDefaultRuntimePoliticalTopology =
       staged.mapSemanticMode !== "blank" && !hasRenderableRuntimeTopology;
     const runtimePoliticalTopology = useDefaultRuntimePoliticalTopology
@@ -440,7 +440,8 @@ function createScenarioApplyPipeline({
       useDefaultRuntimePoliticalTopology,
       scenarioPoliticalChunkData,
       runtimePoliticalMetaSeed: bundle.runtimePoliticalMeta || null,
-      runtimePoliticalFeatureCollectionSeed: getScenarioDecodedCollection(bundle, "politicalData") || null,
+      runtimePoliticalFeatureCollectionSeed: getScenarioTopologyFeatureCollection(staged.runtimeTopologyPayload, "political", bundle)
+        || (!staged.runtimeTopologyPayload?.objects?.political ? getScenarioDecodedCollection(bundle, "politicalData") : null),
       scenarioLandMaskData,
       scenarioContextLandMaskData,
       scenarioWaterRegionsData,
@@ -471,11 +472,9 @@ function createScenarioApplyPipeline({
       sovereigntyByFeatureId: staged.resolvedOwners,
       sovereigntyInitialized: false,
       visualOverrides: {},
-      featureOverrides: {},
       scenarioGeneratedColorTags: staged.scenarioGeneratedColorTags || [],
       scenarioFixedOwnerColors: fixedOwnerColors,
       sovereignBaseColors: fixedOwnerColors,
-      countryBaseColors: fixedOwnerColors,
     };
   }
 
@@ -610,7 +609,7 @@ function createScenarioApplyPipeline({
   }
 
   function runScenarioActivationPostCommitPhase(bundle, staged) {
-    markLegacyColorStateDirty();
+
     syncScenarioInspectorSelection("");
     disableScenarioParentBorders();
     applyScenarioPaintMode();
@@ -808,7 +807,7 @@ function createScenarioApplyPipeline({
         !runtimeTopologyPayload
         || !Array.isArray(runtimeTopologyPayload?.objects?.political?.geometries)
         || runtimeTopologyPayload.objects.political.geometries.length === 0
-        || !hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload)
+        || !hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload, bundle)
       )
     ) {
       throw new Error(
@@ -840,29 +839,29 @@ function createScenarioApplyPipeline({
         : (
           bundle.waterRegionsPayload
           || getScenarioDecodedCollection(bundle, "scenarioWaterRegionsData")
-          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water")
+          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_water", bundle)
         );
     const scenarioSpecialRegionsFromTopology =
       mergedSpecialPayload !== undefined
         ? mergedSpecialPayload
         : (
           getScenarioDecodedCollection(bundle, "scenarioSpecialRegionsData")
-          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land")
+          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_special_land", bundle)
         );
     const scenarioAtlantropaFromTopology =
       mergedAtlantropaPayload !== undefined
         ? mergedAtlantropaPayload
         : (
           getScenarioDecodedCollection(bundle, "scenarioAtlantropaData")
-          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_atlantropa")
+          || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "scenario_atlantropa", bundle)
         );
     const scenarioContextLandMaskFromTopology =
       getScenarioDecodedCollection(bundle, "scenarioContextLandMaskData")
-      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask");
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "context_land_mask", bundle);
     const scenarioLandMaskFromTopology =
       getScenarioDecodedCollection(bundle, "scenarioLandMaskData")
-      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask")
-      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land");
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land_mask", bundle)
+      || getScenarioTopologyFeatureCollection(runtimeTopologyPayload, "land", bundle);
     const scenarioNameMap = startupApplySeed?.scenario_name_map && typeof startupApplySeed.scenario_name_map === "object"
       ? { ...getScenarioNameMap(countryMap), ...startupApplySeed.scenario_name_map }
       : getScenarioNameMap(countryMap);
@@ -965,7 +964,7 @@ function createScenarioApplyPipeline({
       source: "scenario_apply_pipeline",
       extra: {
         allowScenarioMismatch: true,
-        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload),
+        runtimeTopologyRenderable: hasRenderableScenarioPoliticalTopology(runtimeTopologyPayload, bundle),
         runtimeTopologyObjectCount: runtimeTopologyPayload?.objects && typeof runtimeTopologyPayload.objects === "object"
           ? Object.keys(runtimeTopologyPayload.objects).length
           : 0,

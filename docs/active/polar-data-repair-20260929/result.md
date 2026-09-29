@@ -28,3 +28,7 @@
 - .runtime/browser/polar-taymyr.png、polar-svalbard.png、polar-blank.png：浏览器验收截图。
 
 以上为本地验证，不代表线上版本已更新。没有开展全项目浏览器巡检或发布检查。
+
+## 推送合并阶段
+
+用户随后授权推送合并及快速合并。已整合 origin/main@a756b139 的物理地理更新，无冲突。发布文件已同步，构建体积 818.83 MiB，在现有发布上限以内。最终 GitHub PR 为合并状态依据；本地工作树保留以供复用及查看浏览器证据。

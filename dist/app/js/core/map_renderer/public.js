@@ -72,6 +72,7 @@ export {
   RENDER_PASS_NAMES,
 
   // Viewport.
+  focusWaterRegionById,
   getZoomPercent,
   resetZoomToFit,
   setDebugMode,

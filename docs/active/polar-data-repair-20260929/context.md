@@ -38,3 +38,11 @@ Command: py -3 -B -u .runtime/tmp/polar-data-repair/finalize.py
 Log: .runtime/tmp/polar-data-repair/finalize.log. Owner root, canonical writes serial. Finish when all5 scenarios complete; no repeated geometry builds.
 
 Final acceptance: all six strict scenario contracts pass; data catalog 19/19, water runtime 11/11, renderer policy/owners 58/58, real polar geography contract pass. Blank Antarctica needed a frontend visibility-policy repair; fresh browser canvas click hit AQ_AAT_WEST (strict, no snap), GL hit GL, TNO Taymyr and Svalbard passed. Browser warnings/errors empty. See result.md. QA server and tabs are task-owned and will be closed after acceptance.
+
+## 2026-09-29 极地数据合并
+
+用户已授权推送、合并并允许快速合并。修复提交 2b64c655 基于 20bc0f6a；整合 origin/main@a756b139，仅三个 catalog/manifest 文件重叠且自动合并无冲突。root 唯一拥有本工作树的生成和验证进程。
+命令顺序：py -3 -B tools/build_data_catalog.py；py -3 -B tools/build_pages_dist.py；py -3 -B tools/data_health.py；py -3 -B -m unittest tests.test_data_catalog_contract tests.test_pages_dist_startup_shell -q。
+工作目录为当前隔离工作树，输出 dist/ 与 data/CATALOG.*；日志 .runtime/tmp/polar-data-repair/integration-*.log。任一步非零停止并定位。保留工作树以复核忽略的浏览器与构建证据，不清理主工作区。
+
+Integration build note: full Pages copy/normalization reached manifest generation, where direct overwrite failed twice with Windows OSError 22. Resumed only manifest generation via a same-directory temporary file and atomic replacement, without changing production builder code. Required dist files and the publication size limit passed: 818.83 MiB. Log: integration-dist-atomic.log. Catalog after latest-main integration has 671 entries.

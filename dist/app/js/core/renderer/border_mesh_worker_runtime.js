@@ -21,6 +21,9 @@ export function createBorderMeshWorkerRuntime({
   function identity() {
     return getBorderWorkerIdentity(state);
   }
+  function workerSceneKey() {
+    return `${state.activeScenarioId || ""}|${state.sceneGeneration || 0}`;
+  }
   function readSources() {
     return getSourceTopologies().filter(({ topology }) => topology?.objects?.political)
       .sort((a, b) => (a.key === "detail" ? -1 : 1) - (b.key === "detail" ? -1 : 1));
@@ -60,7 +63,7 @@ export function createBorderMeshWorkerRuntime({
       const allowed = getStaticMeshSourceCountries?.()[source.key];
       const selected = [...new Set([...provinceCountries, ...localCountries])].filter((code) => !allowed || allowed.has(code));
       if (!selected.length) continue;
-      const meshes = await client.build({ sceneKey: currentScene, source: packet(source), countries: selected,
+      const meshes = await client.build({ sceneKey: workerSceneKey(), source: packet(source), countries: selected,
         includeProvince: provinceCountries.length > 0, includeLocal: localCountries.length > 0, kind: "country" }, { signal });
       if (currentScene !== identity() || signal?.aborted) throw new DOMException("Stale border batch.", "AbortError");
       if (meshes == null) return null;
@@ -69,7 +72,7 @@ export function createBorderMeshWorkerRuntime({
     let detail = null;
     const detailSource = sources.find((source) => source.key === "detail");
     if (detailCountries.length && detailSource) {
-      detail = await client.build({ sceneKey: currentScene, source: packet(detailSource),
+      detail = await client.build({ sceneKey: workerSceneKey(), source: packet(detailSource),
         countries: detailCountries, kind: "detail" }, { signal });
       if (currentScene !== identity() || signal?.aborted) throw new DOMException("Stale border batch.", "AbortError");
       if (detail == null) return null;

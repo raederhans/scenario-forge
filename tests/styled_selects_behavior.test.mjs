@@ -123,12 +123,18 @@ test("long styled select searches groups and keeps native value and keyboard con
     const dispatch = select.dispatchEvent.bind(select);
     select.dispatchEvent = (event) => { events.push(event.type); return dispatch(event); };
 
-    const { initStyledSelects } = await import("../js/ui/styled_selects.js");
+    const { initStyledSelects, syncStyledSelect } = await import("../js/ui/styled_selects.js");
     initStyledSelects(document);
     const shell = select.parentNode;
     const button = shell.children[1];
     const menu = shell.children[2];
     const [search, list, noMatches] = menu.children;
+    select.value = "item-1";
+    syncStyledSelect(select);
+    assert.equal(button.children[0].textContent, "Item 1", "programmatic preset changes refresh the visible label");
+    assert.deepEqual(events, [], "refresh does not dispatch a change or reapply the preset");
+    select.value = "item-0";
+    syncStyledSelect(select);
     assert.equal(search.hidden, false);
     assert.equal(list.children[0].children[0].textContent, "Atlas");
     assert.equal(list.children[1].children[1].disabled, true);

@@ -27,6 +27,7 @@ function getMissingFeatureIdSample(completeFeatureIds, candidateFeatureIds) {
 
 export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
   buildInteractiveLandData = null,
+  coverageInputSnapshot = null,
   shouldExcludePoliticalVisualFeature = () => false,
 } = {}) {
   const completeFeatures = getFeatureCollectionFeatures(runtimeState?.scenarioPoliticalChunkData);
@@ -35,8 +36,11 @@ export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
   const fullLandCollection = Array.isArray(runtimeState?.landDataFull?.features)
     ? runtimeState.landDataFull : runtimeState?.landData;
   const fullLandDataFeatures = getFeatureCollectionFeatures(fullLandCollection);
-  const expectedInteractiveFeatures = typeof buildInteractiveLandData === "function"
-    ? getFeatureCollectionFeatures(buildInteractiveLandData(fullLandCollection)) : [];
+  const expectedInteractiveCollection = coverageInputSnapshot?.fullCollection === fullLandCollection
+    && Array.isArray(coverageInputSnapshot?.expectedInteractiveCollection?.features)
+    ? coverageInputSnapshot.expectedInteractiveCollection
+    : (typeof buildInteractiveLandData === "function" ? buildInteractiveLandData(fullLandCollection) : null);
+  const expectedInteractiveFeatures = getFeatureCollectionFeatures(expectedInteractiveCollection);
   const colorIds = new Set(Object.keys(runtimeState?.colors || {}).map((featureId) => String(featureId || "").trim()).filter(Boolean));
   const completeFeatureIds = collectFeatureIdSet(completeFeatures);
   const requiredColorFeatureIds = collectFeatureIdSet(completeFeatures.filter((feature) => (
@@ -81,7 +85,7 @@ export function analyzeScenarioPoliticalDerivedStateCoverage(runtimeState, {
     landDataFeatureCount,
     fullLandDataFeatureCount: fullLandDataFeatures.length,
     expectedInteractiveFeatureCount: expectedInteractiveFeatures.length,
-    interactiveCoverageChecked: typeof buildInteractiveLandData === "function",
+    interactiveCoverageChecked: !!expectedInteractiveCollection,
     colorsCount,
     requiredColorFeatureCount: requiredColorFeatureIds.size,
     primaryVisibleFeatureSubsetActive,

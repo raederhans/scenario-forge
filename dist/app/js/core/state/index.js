@@ -161,17 +161,14 @@ export function readRegisteredRuntimeHookSource(target, hookName) {
 
 export function registerRuntimeHook(target, hookName, hook) {
   const normalizedHookName = String(hookName || "").trim();
-  if (!normalizedHookName) {
-    return null;
+  if (!isRuntimeHookBusEventName(normalizedHookName) && !isRuntimeHookHandlerName(normalizedHookName)) {
+    throw new TypeError(`Unknown runtime hook: ${normalizedHookName}`);
   }
   bindStateCompatSurface(target);
   if (isRuntimeHookBusEventName(normalizedHookName)) {
     // 通知型 hook 暴露 dispatcher，兼容旧代码直接调用 state.someHook(...) 的写法。
     registerRuntimeHookBusListener(target, normalizedHookName, hook);
     return readRuntimeHookBusDispatcher(target, normalizedHookName);
-  }
-  if (!isRuntimeHookHandlerName(normalizedHookName)) {
-    return null;
   }
   const normalizedHook = normalizeRuntimeHook(hook);
   if (!normalizedHook) {
@@ -218,8 +215,8 @@ export function callRequiredRuntimeHook(target, hookName, ...args) {
 
 export function callRuntimeHook(target, hookName, ...args) {
   const normalizedHookName = String(hookName || "").trim();
-  if (!normalizedHookName) {
-    return undefined;
+  if (!isRuntimeHookBusEventName(normalizedHookName) && !isRuntimeHookHandlerName(normalizedHookName)) {
+    throw new TypeError(`Unknown runtime hook: ${normalizedHookName}`);
   }
   bindStateCompatSurface(target);
   if (isRuntimeHookBusEventName(normalizedHookName)) {
