@@ -3,15 +3,19 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('./support
 
 test('river pilot UI, real click transaction, undo, file roundtrip and export share cell paint', async ({ page }, testInfo) => {
   test.setTimeout(60_000);
+  const startedAt = Date.now(); const timings = {};
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
-  await waitForAppInteractive(page); await waitForRenderIdle(page);
+  await waitForAppInteractive(page); timings.interactiveMs = Date.now() - startedAt;
+  // No map pixels or geometry are read before enabling the toolbar. Avoid a
+  // redundant full-world settle here; the unchanged readiness gate below
+  // proves the final composed surface after the partition activation.
   await expect(page.locator('#riverPaintToggleBtn')).toBeEnabled();
   await page.locator('#riverPaintToggleBtn').click();
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
-  await waitForRenderIdle(page);
+  await waitForRenderIdle(page); timings.partitionReadyMs = Date.now() - startedAt;
   const result = await page.evaluate(async () => {
     const load = path => import(new URL(path, location.href).href);
     const { state } = await load('./js/core/state.js');
@@ -80,6 +84,8 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
       reloadedPaint: parent.cells.every((c, i) => state.riverPaint.overrides[c.id] === colors[i]),
     };
   });
+  timings.roundtripMs = Date.now() - startedAt;
+  await testInfo.attach('river-phase-timings.json', { body: JSON.stringify(timings, null, 2), contentType: 'application/json' });
   await testInfo.attach('river-map-roundtrip.json', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
   expect(result.parentCount).toBe(6); expect(result.cellCount).toBe(31);
   expect(result.historyCount).toBe(2); expect(result.schema).toBe(23);
