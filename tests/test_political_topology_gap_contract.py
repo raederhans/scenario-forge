@@ -54,6 +54,45 @@ def _political_topology(gdf: gpd.GeoDataFrame) -> dict:
 
 
 class PoliticalTopologyGapContractTests(unittest.TestCase):
+    def test_runtime_composition_keeps_norwegian_islands_without_duplicate_mainland(self) -> None:
+        mainland = box(5.0, 58.0, 12.0, 71.0)
+        covered_island = box(15.0, 68.0, 16.0, 69.0)
+        svalbard_west = box(10.0, 77.0, 16.0, 80.0)
+        svalbard_east = box(20.0, 78.0, 24.0, 81.0)
+        primary = gpd.GeoDataFrame(
+            [{
+                "id": "NO",
+                "name": "Norway",
+                "cntr_code": "NO",
+                "geometry": MultiPolygon([mainland, covered_island, svalbard_west, svalbard_east]),
+            }],
+            crs="EPSG:4326",
+        )
+        detail = gpd.GeoDataFrame(
+            [
+                {"id": "NO_MAINLAND", "name": "Norway detail", "cntr_code": "NO", "geometry": mainland},
+                {"id": "NO_COVERED_ISLAND", "name": "Covered island", "cntr_code": "NO", "geometry": covered_island},
+            ],
+            crs="EPSG:4326",
+        )
+
+        result = _compose_political_features(
+            _political_topology(primary),
+            _political_topology(detail),
+            override_collection=None,
+        )
+
+        ids = list(result["id"].astype(str))
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertEqual(set(ids) - {"NO_MAINLAND", "NO_COVERED_ISLAND"}, {
+            "NO_PRIMARY_GAP_3", "NO_PRIMARY_GAP_4",
+        })
+        gaps = result.loc[result["id"].str.startswith("NO_PRIMARY_GAP_")]
+        self.assertTrue(all(gaps["cntr_code"] == "NO"))
+        self.assertTrue(all(gaps["__source"] == "primary_gap"))
+        self.assertGreaterEqual(gaps.geometry.total_bounds[3], 81.0)
+        self.assertTrue(all(geometry.intersection(mainland.union(covered_island)).is_empty for geometry in gaps.geometry))
+
     def test_checked_in_tno_runtime_keeps_guyana_somaliland_and_russian_arctic_geometry(self) -> None:
         topology = json.loads(TNO_RUNTIME_TOPOLOGY.read_text(encoding="utf-8"))
         political_geometries = topology["objects"]["political"]["geometries"]

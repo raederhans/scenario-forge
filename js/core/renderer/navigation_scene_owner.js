@@ -192,7 +192,7 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     }
     const landEntry = (feature) => {
       const id = h.getFeatureId(feature);
-      if (!feature?.geometry || h.isAntarcticSectorFeature(feature, id)
+      if (!feature?.geometry
         || h.isBaseGeographyScenarioFeature(feature) || h.shouldExcludePoliticalVisualFeature(feature, id)) return;
       return { feature, fillColor: h.getResolvedFeatureColor(feature, id) || h.landFill, alpha: 1 };
     };

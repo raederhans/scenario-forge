@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
-    "chunk_count": 128,
-    "feature_count": 23426,
+    "chunk_count": 137,
+    "feature_count": 23418,
     "water_count": 0
   },
   "controller_changes": [],
@@ -150,6 +150,19 @@
     "owner_rule_paths": [
       "data/scenario-rules/hoi4_1936.manual.json"
     ],
+    "polar_materialization": {
+      "direct_nor_feature_ids": [
+        "NO_PRIMARY_GAP_15",
+        "NO_PRIMARY_GAP_16",
+        "NO_PRIMARY_GAP_26",
+        "NO_PRIMARY_GAP_27",
+        "NO_PRIMARY_GAP_28",
+        "NO_PRIMARY_GAP_29",
+        "NO_PRIMARY_GAP_30",
+        "NO_PRIMARY_GAP_31",
+        "NO_PRIMARY_GAP_32"
+      ]
+    },
     "runtime_feature_count": 23426,
     "source_root": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Hearts of Iron IV",
     "state_count": 1081,
@@ -209051,19 +209064,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_8768",
-      "feature_name": "Russia Shell Fallback 8768",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_8769",
       "feature_name": "Russia Shell Fallback 8769",
       "from_tag": "",
@@ -209963,19 +209963,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_8838",
       "feature_name": "Russia Shell Fallback 8838",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_8839",
-      "feature_name": "Russia Shell Fallback 8839",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -216162,19 +216149,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9274",
-      "feature_name": "Russia Shell Fallback 9274",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_9275",
       "feature_name": "Russia Shell Fallback 9275",
       "from_tag": "",
@@ -216255,19 +216229,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9281",
       "feature_name": "Russia Shell Fallback 9281",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9282",
-      "feature_name": "Russia Shell Fallback 9282",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -219386,19 +219347,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9499",
-      "feature_name": "Russia Shell Fallback 9499",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_9500",
       "feature_name": "Russia Shell Fallback 9500",
       "from_tag": "",
@@ -219594,19 +219542,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9515",
-      "feature_name": "Russia Shell Fallback 9515",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_9516",
       "feature_name": "Russia Shell Fallback 9516",
       "from_tag": "",
@@ -219635,19 +219570,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9518",
       "feature_name": "Russia Shell Fallback 9518",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9519",
-      "feature_name": "Russia Shell Fallback 9519",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -219739,19 +219661,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9526",
       "feature_name": "Russia Shell Fallback 9526",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9527",
-      "feature_name": "Russia Shell Fallback 9527",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -220038,19 +219947,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9549",
       "feature_name": "Russia Shell Fallback 9549",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9550",
-      "feature_name": "Russia Shell Fallback 9550",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -222909,19 +222805,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9753",
-      "feature_name": "Russia Shell Fallback 9753",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_9754",
       "feature_name": "Russia Shell Fallback 9754",
       "from_tag": "",
@@ -223171,19 +223054,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9773",
       "feature_name": "Russia Shell Fallback 9773",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9774",
-      "feature_name": "Russia Shell Fallback 9774",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -225379,19 +225249,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9926",
-      "feature_name": "Russia Shell Fallback 9926",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_9927",
       "feature_name": "Russia Shell Fallback 9927",
       "from_tag": "",
@@ -225680,19 +225537,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_9949",
       "feature_name": "Russia Shell Fallback 9949",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_9950",
-      "feature_name": "Russia Shell Fallback 9950",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -227914,19 +227758,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_10104",
-      "feature_name": "Russia Shell Fallback 10104",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_10105",
       "feature_name": "Russia Shell Fallback 10105",
       "from_tag": "",
@@ -228174,19 +228005,6 @@
     {
       "country_code": "RU",
       "critical": true,
-      "feature_id": "RU_ARCTIC_FB_10124",
-      "feature_name": "Russia Shell Fallback 10124",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
       "feature_id": "RU_ARCTIC_FB_10125",
       "feature_name": "Russia Shell Fallback 10125",
       "from_tag": "",
@@ -228384,19 +228202,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_10140",
       "feature_name": "Russia Shell Fallback 10140",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_10141",
-      "feature_name": "Russia Shell Fallback 10141",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -228644,19 +228449,6 @@
       "critical": true,
       "feature_id": "RU_ARCTIC_FB_10160",
       "feature_name": "Russia Shell Fallback 10160",
-      "from_tag": "",
-      "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
-      "quality": "manual_reviewed",
-      "rule_id": "soviet_union",
-      "source": "manual_rule",
-      "synthetic_owner": false,
-      "to_tag": "SOV"
-    },
-    {
-      "country_code": "RU",
-      "critical": true,
-      "feature_id": "RU_ARCTIC_FB_10161",
-      "feature_name": "Russia Shell Fallback 10161",
       "from_tag": "",
       "notes": "USSR baseline override across the modern Soviet successor states before western-border historical corrections.",
       "quality": "manual_reviewed",
@@ -231929,10 +231721,10 @@
     "NOR": {
       "base_iso2": "NO",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 21,
       "display_name": "Norway",
       "entry_kind": "",
-      "feature_count": 12,
+      "feature_count": 21,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -231944,7 +231736,7 @@
       "provenance_iso2": "NO",
       "quality": "direct_country_copy",
       "quality_breakdown": {
-        "direct_country_copy": 12
+        "direct_country_copy": 21
       },
       "rule_sources": [],
       "scenario_only": false,
@@ -232760,10 +232552,10 @@
     "SOV": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 13645,
+      "controller_feature_count": 13628,
       "display_name": "Soviet Union",
       "entry_kind": "",
-      "feature_count": 13645,
+      "feature_count": 13628,
       "historical_fidelity": "vanilla",
       "historical_fidelity_summary": [
         "vanilla"
@@ -232775,7 +232567,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 13645
+        "manual_reviewed": 13628
       },
       "rule_sources": [
         "soviet_union"
@@ -234448,41 +234240,41 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1936",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "e526f8bbf94f3f500f5909f38c1d97d863624694194fd802cd45cd920be5abd2",
+  "snapshot_fingerprint": "cfc49f0aaeb35784322b0be885bac280a5a9fe64ebb0eb398bf1821c00860ca1",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "build_snapshot_sha256": "cab0a0f236b6ab62ac53eff9412bc4141a90d26ae7b0164192ef7469e0662811",
-    "detail_chunk_manifest_sha256": "f1fd0ab627d20fc6b6fbb8219df5c670375db9fc54d9e139bfc78a1ba690c637",
-    "runtime_bootstrap_topology_sha256": "74d6f39ab2280fa524109d9bd35e15149df48681688deb22ecfac60911527115",
-    "runtime_topology_sha256": "50cad6f666725fa6518b8aa5f8519a1b520946f3b4c2e46614029234ad8be0c3"
+    "build_snapshot_sha256": "cfb9b22591371b3e5d172060cb8d9b8555e926e5347d73713f721c818798a7e7",
+    "detail_chunk_manifest_sha256": "6ebc1586d9e0e0bce2ddf5a234fb854a578301086ca1f126b61ae392b6396898",
+    "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
+    "runtime_topology_sha256": "b833908e74ecf8d1edce8ee8031feb8c230669674537d341fbaa4ef31e03491c"
   },
   "summary": {
     "approximate_count": 457,
     "belarus_hybrid_feature_count": 35,
     "blocker_count": 0,
-    "changed_feature_count": 17614,
+    "changed_feature_count": 17597,
     "controller_count": 127,
     "controller_rule_count": 0,
     "critical_region_check_count": 13,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 23426,
+    "feature_count": 23418,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 17157,
+    "manual_reviewed_feature_count": 17140,
     "manual_reviewed_region_count": 13,
     "owner_controller_split_feature_count": 0,
     "owner_count": 127,
     "quality_counts": {
       "approx_existing_geometry": 457,
-      "direct_country_copy": 5812,
-      "manual_reviewed": 17157
+      "direct_country_copy": 5821,
+      "manual_reviewed": 17140
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "direct_active_owner": 5812,
+      "direct_active_owner": 5821,
       "fallback_current_code": 5,
       "fallback_mapped_tag": 18,
-      "manual_rule": 17591
+      "manual_rule": 17574
     },
     "strategic_resource_point_count": 704,
     "strategic_states_anchored": 914,

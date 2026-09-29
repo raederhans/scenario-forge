@@ -4,12 +4,12 @@
   "generated_at": "2026-06-13T22:53:26.473496+00:00",
   "startup_topology_url": "data/scenarios/hoi4_1936/runtime_topology.bootstrap.topo.json",
   "runtime_topology_url": "data/scenarios/hoi4_1936/runtime_topology.topo.json",
-  "political_chunk_count": 128,
+  "political_chunk_count": 137,
   "scenario_atlantropa_chunk_count": 0,
   "layer_chunk_counts": {
-    "political": 128
+    "political": 137
   },
-  "total_chunk_count": 128,
+  "total_chunk_count": 137,
   "runtime_topology_object_names": [
     "political"
   ],

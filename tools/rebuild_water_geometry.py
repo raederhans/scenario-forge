@@ -15,7 +15,9 @@ import geopandas as gpd
 from shapely.geometry import shape
 
 from map_builder.geo.spherical_safety import _topology_feature_collection
-from map_builder.geo.water_geometry import replace_water_topology_object, transplant_water_features
+from map_builder.geo.water_geometry import (
+    D3_MIN_COMPONENT_AREA_DEGREES2, replace_water_topology_object, transplant_water_features,
+)
 from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.physical_water_mask import physical_mask_to_planar_geometry, inherit_physical_water_masks
 from map_builder.geo.water_region_authority import (
@@ -62,6 +64,65 @@ def decode_water(topology, name):
         if key in topology:
             collection[key] = deepcopy(topology[key])
     return collection
+
+
+def _needs_water_precision_rebuild(feature):
+    """Do not transplant clipped fragments below the D3 component floor."""
+    geometry = shape(feature["geometry"])
+    parts = geometry.geoms if geometry.geom_type == "MultiPolygon" else (geometry,)
+    return any(not part.is_empty and part.area <= D3_MIN_COMPONENT_AREA_DEGREES2 for part in parts)
+
+
+def _select_tno_water_rebuild_scope(features, originals):
+    changed = [feature for feature in features
+               if feature["properties"]["id"] not in originals
+               or not shape(feature["geometry"]).equals(
+                   shape(originals[feature["properties"]["id"]]["geometry"]))
+               or _needs_water_precision_rebuild(feature)]
+    preserved = set(originals) - {feature["properties"]["id"] for feature in changed}
+    return changed, preserved
+
+
+def repair_tno_water_precision(stage_root):
+    """Recompile only TNO water that cannot safely retain its old encoded arcs."""
+    stage_root = stage_root.resolve()
+    if not stage_root.is_relative_to(ROOT / ".runtime") or stage_root.exists():
+        raise ValueError("stage-root must be a new directory under repository .runtime")
+    inputs = input_identity()
+    relative = "data/scenarios/tno_1962/runtime_topology.topo.json"
+    topology = read(ROOT / relative)
+    current_water = read(ROOT / "data/scenarios/tno_1962/water_regions.geojson")
+    changed = [feature for feature in current_water["features"]
+               if _needs_water_precision_rebuild(feature)]
+    if not changed:
+        raise ValueError("No TNO water features require precision repair.")
+    changed_ids = {feature["properties"]["id"] for feature in changed}
+    print(f"Precision repair: {', '.join(sorted(changed_ids))}", flush=True)
+    preserved = {feature["properties"]["id"] for feature in current_water["features"]} - changed_ids
+    compiled = compile_named_water_regions({"type": "FeatureCollection", "features": changed})
+    replacement = replace_water_topology_object(topology, compiled, object_name="scenario_water")
+    replacement = transplant_water_features(replacement, topology, object_name="scenario_water",
+                                            feature_ids=preserved)
+    by_id = {geometry["properties"]["id"]: geometry
+             for geometry in replacement["objects"]["scenario_water"]["geometries"]}
+    replacement["objects"]["scenario_water"]["geometries"] = [
+        by_id[feature["properties"]["id"]] for feature in current_water["features"]]
+    print("Validate repaired water and unchanged context", flush=True)
+    validate_water_runtime(replacement, object_name="scenario_water", land_object="land_mask",
+                           stage_label=relative)
+    for name in topology["objects"]:
+        if name != "scenario_water" and decode(topology, name) != decode(replacement, name):
+            raise ValueError(f"Non-water object changed: TNO::{name}")
+    paths = [relative, "data/scenarios/tno_1962/water_regions.geojson"]
+    write(stage_root / relative, replacement)
+    write(stage_root / paths[1], decode_water(replacement, "scenario_water"))
+    if inputs != input_identity():
+        raise ValueError("Canonical inputs changed during staging; rebuild before promotion.")
+    write(stage_root / "outputs.json", {"paths": paths, "input_sha256": inputs,
+                                        "recompiled_feature_ids": sorted(changed_ids)})
+    print(json.dumps({"stage_root": str(stage_root), "paths": paths,
+                      "recompiled_feature_ids": sorted(changed_ids)}), flush=True)
+
 
 def rebuild(stage_root, *, refine_marine=False):
     stage_root = stage_root.resolve()
@@ -139,9 +200,7 @@ def rebuild(stage_root, *, refine_marine=False):
             if f["properties"]["id"] in protected_ids else f for f in current_water["features"]]
         # Existing runtime water is already physically clipped. Re-clipping its
         # spherical coast creates new numerical slivers along unrelated shores.
-        changed = [f for f in current_water["features"] if f["properties"]["id"] not in originals
-                   or not shape(f["geometry"]).equals(shape(originals[f["properties"]["id"]]["geometry"]))]
-        preserved = set(originals) - {f["properties"]["id"] for f in changed}
+        changed, preserved = _select_tno_water_rebuild_scope(current_water["features"], originals)
         compiled = compile_named_water_regions({"type": "FeatureCollection", "features": changed})
         replacement = replace_water_topology_object(topology, compiled, object_name="scenario_water")
         replacement = transplant_water_features(replacement, topology, object_name="scenario_water", feature_ids=preserved)
@@ -216,8 +275,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage-root", type=Path, required=True)
     parser.add_argument("--refine-marine", action="store_true", help="Apply shared sources and ordinary-sea supplements")
+    parser.add_argument("--repair-precision-only", action="store_true",
+                        help="Recompile only TNO regions with subprecision fragments")
     args = parser.parse_args()
-    rebuild(args.stage_root, refine_marine=args.refine_marine)
+    if args.repair_precision_only:
+        if args.refine_marine:
+            parser.error("--repair-precision-only cannot be combined with --refine-marine")
+        repair_tno_water_precision(args.stage_root)
+    else:
+        rebuild(args.stage_root, refine_marine=args.refine_marine)
 
 
 if __name__ == "__main__":

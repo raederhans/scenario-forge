@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/modern_world/audit.json",
-  "baseline_hash": "5946572179432085d2b3df10c1703c818ac6645a788313af23bf13877015e230",
+  "baseline_hash": "7ee2527fd2eef0f5f50356a3e41089499f08c0573b642be295453389fbdc8966",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Modern-world baseline with matched The Fire Rises country colors.",
   "bookmark_name": "Modern World",
@@ -38,13 +38,13 @@
   "runtime_topology_url": "data/scenarios/modern_world/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "29b510d35b0d1f35a78415a2af186eaa9456b7b6e67ab69cdf4f6bc5959c1e98",
+  "snapshot_fingerprint": "0191f7ddc6dbc9ac7d977e8df8efff4e7bd6372d42682805b255007f2f7f9caf",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
-    "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "b432ab5515d4339892d12b362f2885339162c38a435d84239addf658da516d79"
+    "runtime_topology_sha256": "000d37d2735fb80e6f03e9ef2ef1034f4a2bad659aeeab34978eed0fd196a03b",
+    "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "special_zone_layers_url": "data/scenarios/modern_world/special_zone_layers.json",
   "style_defaults": {
@@ -61,18 +61,18 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22969,
+    "feature_count": 22948,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 202,
     "quality_counts": {
-      "direct_country_copy": 22969
+      "direct_country_copy": 22948
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 22969
+      "canonical_baseline": 22948
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

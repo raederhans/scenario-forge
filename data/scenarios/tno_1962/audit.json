@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 208,
-    "feature_count": 12697,
+    "feature_count": 12710,
     "water_count": 166
   },
   "controller_changes": [
@@ -18273,6 +18273,23 @@
       "sicily_tunis": 23,
       "tyrrhenian": 60,
       "west_med": 36
+    },
+    "polar_materialization": {
+      "classified_feature_ids": [
+        "NO_PRIMARY_GAP_15",
+        "NO_PRIMARY_GAP_16",
+        "NO_PRIMARY_GAP_26",
+        "NO_PRIMARY_GAP_27",
+        "NO_PRIMARY_GAP_28",
+        "NO_PRIMARY_GAP_29",
+        "NO_PRIMARY_GAP_30",
+        "NO_PRIMARY_GAP_31",
+        "NO_PRIMARY_GAP_32",
+        "RU_RAY_50074027B10379539839705__tno1962_1",
+        "RU_RAY_50074027B66849950652275__tno1962_1",
+        "RU_RAY_50074027B6686274683844__tno1962_1",
+        "RU_RAY_50074027B6686274683844__tno1962_2"
+      ]
     },
     "regional_owner_layer_tags": {
       "africa": [
@@ -104935,7 +104952,7 @@
     "ATL": {
       "base_iso2": "ZZ",
       "continent_label": "Special",
-      "controller_feature_count": 496,
+      "controller_feature_count": 489,
       "display_name": "Atlantropa Reclamation Zone",
       "entry_kind": "",
       "feature_count": 489,
@@ -106385,7 +106402,7 @@
     "GRE": {
       "base_iso2": "GR",
       "continent_label": "Europe",
-      "controller_feature_count": 105,
+      "controller_feature_count": 104,
       "display_name": "Greek Protectorate",
       "entry_kind": "scenario_subject",
       "feature_count": 104,
@@ -106749,7 +106766,7 @@
     "IAL": {
       "base_iso2": "DZ",
       "continent_label": "Africa",
-      "controller_feature_count": 30,
+      "controller_feature_count": 32,
       "display_name": "Italian Algeria",
       "entry_kind": "scenario_subject",
       "feature_count": 32,
@@ -108791,10 +108808,10 @@
     "RFA": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 46,
+      "controller_feature_count": 47,
       "display_name": "Russian Anarchy",
       "entry_kind": "scenario_country",
-      "feature_count": 46,
+      "feature_count": 47,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -108807,7 +108824,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 46
+        "manual_reviewed": 47
       },
       "rule_sources": [
         "tno_1962_rfa_manual_override"
@@ -108894,10 +108911,10 @@
     "RKM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 767,
+      "controller_feature_count": 768,
       "display_name": "Reichskommissariat Moskowien",
       "entry_kind": "scenario_country",
-      "feature_count": 767,
+      "feature_count": 768,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108912,7 +108929,7 @@
       "provenance_iso2": "RU",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 767
+        "manual_reviewed": 768
       },
       "rule_sources": [
         "tno_baseline_rkm"
@@ -108964,10 +108981,10 @@
     "RKNO": {
       "base_iso2": "NO",
       "continent_label": "Europe",
-      "controller_feature_count": 12,
+      "controller_feature_count": 21,
       "display_name": "Reichskommissariat Norwegen",
       "entry_kind": "scenario_country",
-      "feature_count": 12,
+      "feature_count": 21,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -108982,7 +108999,7 @@
       "provenance_iso2": "NO",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 12
+        "manual_reviewed": 21
       },
       "rule_sources": [
         "tno_baseline_rkno"
@@ -109967,10 +109984,10 @@
     "TOM": {
       "base_iso2": "RU",
       "continent_label": "Europe",
-      "controller_feature_count": 23,
+      "controller_feature_count": 25,
       "display_name": "Tomsk",
       "entry_kind": "scenario_country",
-      "feature_count": 23,
+      "feature_count": 25,
       "hidden_from_country_list": false,
       "historical_fidelity": "tno_baseline",
       "historical_fidelity_summary": [
@@ -109983,7 +110000,7 @@
       "provenance_iso2": "RU",
       "quality": "approx_existing_geometry",
       "quality_breakdown": {
-        "approx_existing_geometry": 23
+        "approx_existing_geometry": 25
       },
       "rule_sources": [
         "tno_1962_russia_tom"
@@ -110035,7 +110052,7 @@
     "TUR": {
       "base_iso2": "TR",
       "continent_label": "Asia",
-      "controller_feature_count": 111,
+      "controller_feature_count": 118,
       "display_name": "Turkey",
       "entry_kind": "",
       "feature_count": 118,
@@ -110921,16 +110938,16 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "70bb7fe1019f8dd023bd3f9e32cc39f3be60319124c99814302a4fb0ef440228",
+  "snapshot_fingerprint": "1f52ed8a973ea06fbc269b846e437519f98015eccf013bd91fceffc2ceba1afd",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "build_snapshot_sha256": "e621e9de65958221f9a8f0d12726e91e1b275ea7246636da28a529c83b926b4a",
-    "detail_chunk_manifest_sha256": "8b8dbdcbb1dd17760df55baa4ea7a3c11fdf4d8ef820755307ea483d3265c619",
-    "runtime_bootstrap_topology_sha256": "ed1a4e6298beadd4bdb353de56f5d99c6d869391bdd8d79322397e65951e174c",
-    "runtime_topology_sha256": "d64671953bd9815d58b6f2f734223b0d1c5a7a01a1229235e0552a6d068b7521"
+    "build_snapshot_sha256": "0613441bb7a07c73e255cc0896fc176a43d46db3bfafef964428b07794af25ac",
+    "detail_chunk_manifest_sha256": "fac341b6092cccf66dc72093f8204843024f1c78c0563bb5914ce1a85a7f0949",
+    "runtime_bootstrap_topology_sha256": "8d3dd5c35578c72cf7fcf03bb673b7e83e0acb7a2246c2d44477e2b830eafaea",
+    "runtime_topology_sha256": "b587bba2ca3d7505fe137030e25f592e88038682c34095e884e71ebf56b69c1e"
   },
   "summary": {
-    "approximate_count": 859,
+    "approximate_count": 861,
     "belarus_hybrid_feature_count": 0,
     "blocker_count": 0,
     "changed_feature_count": 2032,
@@ -110943,16 +110960,16 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12697,
+    "feature_count": 12710,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9369,
+    "manual_reviewed_feature_count": 9380,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
-      "approx_existing_geometry": 919,
+      "approx_existing_geometry": 921,
       "direct_country_copy": 2578,
-      "manual_reviewed": 9369
+      "manual_reviewed": 9380
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
@@ -110961,9 +110978,9 @@
       "controller_rule": 0,
       "direct_active_owner": 4354,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6236,
+      "manual_rule": 6239,
       "scenario_generated": 445,
-      "tno_reichskommissariat_baseline": 1828
+      "tno_reichskommissariat_baseline": 1838
     },
     "synthetic_count": 492,
     "synthetic_owner_feature_count": 492,

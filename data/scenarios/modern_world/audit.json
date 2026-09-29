@@ -1,43 +1,15 @@
 {
   "artifact_counts": {
-    "feature_count": 22969,
-    "water_count": 0,
-    "chunk_count": 0
+    "chunk_count": 0,
+    "feature_count": 22948,
+    "water_count": 0
   },
   "diagnostics": {
     "baseline_hash": "5946572179432085d2b3df10c1703c818ac6645a788313af23bf13877015e230",
     "canonical_country_count": 202,
     "detail_topology_feature_count": 22969,
-    "note": "Canonical modern-world baseline with vanilla palette colors.",
-    "palette_id": "hoi4_vanilla",
-    "primary_country_count": 209,
-    "removed_stale_assignment_count": 430,
-    "removed_stale_assignment_sample": [
-      "RUS+99?",
-      "RUS-2167",
-      "RUS-2379",
-      "RUS-2380",
-      "RUS-2382",
-      "RUS-2386",
-      "RUS-2396",
-      "RUS-2397",
-      "RUS-2398",
-      "RUS-2399",
-      "RUS-2400",
-      "RUS-2401",
-      "RUS-2402",
-      "RUS-2403",
-      "RUS-2602",
-      "RUS-2603",
-      "RUS-2605",
-      "RUS-2606",
-      "RUS-2610",
-      "RUS-2612"
-    ],
-    "source": "generated_from_canonical_baseline",
     "geometry_rebuild": {
       "canonical_source_feature_count": 23426,
-      "repaired_geometry_count": 2057,
       "dropped_degenerate_ids": [
         "RU_ARCTIC_FB_893",
         "RU_ARCTIC_FB_1944",
@@ -552,6 +524,36 @@
         "GB_SHELL_FB_322",
         "GB_SHELL_FB_325"
       ],
+      "neutral_antarctic_feature_ids": [
+        "AQ_AAT_EAST",
+        "AQ_AAT_WEST",
+        "AQ_ADELIE",
+        "AQ_MARIE_BYRD",
+        "AQ_PEN_EAST",
+        "AQ_PEN_OVERLAP_CORE",
+        "AQ_PEN_OVERLAP_EAST",
+        "AQ_PEN_OVERLAP_WEST",
+        "AQ_PEN_WEST",
+        "AQ_QML",
+        "AQ_ROSS"
+      ],
+      "recovered_microstates": [
+        "VA"
+      ],
+      "repaired_geometry_count": 2057,
+      "restored_source_islands": [
+        {
+          "bounds": [
+            -56.24326171874999,
+            46.752832031249994,
+            -56.137353515624994,
+            46.811083984374996
+          ],
+          "country_code": "PM",
+          "feature_id": "PM",
+          "source": "ne_50m_admin_0_countries"
+        }
+      ],
       "retained_primary_component_ids": [
         "AE_PRIMARY_GAP_4",
         "CN_PRIMARY_GAP_2",
@@ -608,51 +610,49 @@
         "UA_PRIMARY_GAP_1",
         "VN_PRIMARY_GAP_6"
       ],
-      "recovered_microstates": [
-        "VA"
-      ],
-      "restored_source_islands": [
-        {
-          "feature_id": "PM",
-          "country_code": "PM",
-          "source": "ne_50m_admin_0_countries",
-          "bounds": [
-            -56.24326171874999,
-            46.752832031249994,
-            -56.137353515624994,
-            46.811083984374996
-          ]
-        }
-      ],
-      "neutral_antarctic_feature_ids": [
-        "AQ_AAT_EAST",
-        "AQ_AAT_WEST",
-        "AQ_ADELIE",
-        "AQ_MARIE_BYRD",
-        "AQ_PEN_EAST",
-        "AQ_PEN_OVERLAP_CORE",
-        "AQ_PEN_OVERLAP_EAST",
-        "AQ_PEN_OVERLAP_WEST",
-        "AQ_PEN_WEST",
-        "AQ_QML",
-        "AQ_ROSS"
-      ],
       "retention_policy": "canonical runtime plus primary detached components with <5% existing coverage; preserve interior holes"
-    }
+    },
+    "note": "Canonical modern-world baseline with vanilla palette colors.",
+    "palette_id": "hoi4_vanilla",
+    "primary_country_count": 209,
+    "removed_stale_assignment_count": 430,
+    "removed_stale_assignment_sample": [
+      "RUS+99?",
+      "RUS-2167",
+      "RUS-2379",
+      "RUS-2380",
+      "RUS-2382",
+      "RUS-2386",
+      "RUS-2396",
+      "RUS-2397",
+      "RUS-2398",
+      "RUS-2399",
+      "RUS-2400",
+      "RUS-2401",
+      "RUS-2402",
+      "RUS-2403",
+      "RUS-2602",
+      "RUS-2603",
+      "RUS-2605",
+      "RUS-2606",
+      "RUS-2610",
+      "RUS-2612"
+    ],
+    "source": "generated_from_canonical_baseline"
   },
   "generated_at": "2026-09-27T13:55:57.885587+00:00",
   "owner_bucket_mismatch_count": 0,
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "modern_world",
-  "snapshot_fingerprint": "29b510d35b0d1f35a78415a2af186eaa9456b7b6e67ab69cdf4f6bc5959c1e98",
+  "snapshot_fingerprint": "0191f7ddc6dbc9ac7d977e8df8efff4e7bd6372d42682805b255007f2f7f9caf",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
+    "build_snapshot_sha256": "994c448cd02959e3cb0f3e241441b332094fcb2bbde843a9eb7ddcf8e7f8bb74",
     "canonical_runtime_topology_sha256": "e4a9046db2c70895427a9d190cba67bfe4e7dd7a853eefaaaefb2b083ff3208f",
-    "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a",
     "reviewed_island_source_sha256": "5fed433373581fa648920435f937d95f2d3c0200e067409c6478dcdf1b853139",
-    "runtime_topology_sha256": "b432ab5515d4339892d12b362f2885339162c38a435d84239addf658da516d79",
-    "build_snapshot_sha256": "c315a790bd1be38fe6393be1c470b4a208d3475ca3d0e70ccad4e0f2054f0179"
+    "runtime_topology_sha256": "000d37d2735fb80e6f03e9ef2ef1034f4a2bad659aeeab34978eed0fd196a03b",
+    "unquantized_country_source_sha256": "8dcc3f2137b3e25c323eba84baf2cc24495c9bb61eb0f10c727fbd3b7786870a"
   },
   "summary": {
     "approximate_count": 0,
@@ -663,18 +663,18 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 22969,
+    "feature_count": 22948,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 202,
     "quality_counts": {
-      "direct_country_copy": 22969
+      "direct_country_copy": 22948
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "canonical_baseline": 22969
+      "canonical_baseline": 22948
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,
