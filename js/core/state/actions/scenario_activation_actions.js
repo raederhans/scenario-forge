@@ -488,7 +488,7 @@ export function captureScenarioActivationState(target) {
 export function commitScenarioActivationState(target, patch) {
   assertStateTarget(target);
   validateCompletePatch(patch);
-  const riverPaint = normalizeRiverPaintState(patch.riverPaint);
+  const riverPaint = normalizeRiverPaintState(structuredClone(patch.riverPaint));
   target.activeScenarioId = patch.activeScenarioId;
   target.scenarioBorderMode = patch.scenarioBorderMode;
   target.activeScenarioManifest = patch.activeScenarioManifest;

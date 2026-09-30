@@ -309,6 +309,28 @@ test("incomplete scenario activation patches fail before writing any staged fiel
   }
 });
 
+test("river activation owns its input and invalid paint fails before any state write", async () => {
+  const { commitScenarioActivationState } = await import("../js/core/state/actions/scenario_activation_actions.js");
+  const { makeFixture } = await import("./helpers/river_paint_fixture.mjs");
+  const { state } = await makeFixture();
+  const patch = { ...createAuthorityPatch(ACTIVATION_KEYS), useDefaultRuntimePoliticalTopology: false,
+    riverPaint: structuredClone(state.riverPaint) };
+  const target = {};
+  commitScenarioActivationState(target, patch);
+  const inputPoint = patch.riverPaint.pack.parents[0].cells[0].geometry.coordinates[0][0];
+  const ownedPoint = target.riverPaint.pack.parents[0].cells[0].geometry.coordinates[0][0];
+  inputPoint[0] = 99;
+  assert.notEqual(ownedPoint[0], inputPoint[0]);
+  assert.equal(Object.isFrozen(inputPoint), false);
+  assert.equal(Object.isFrozen(ownedPoint), true);
+  const before = { activeScenarioId: "unchanged", riverPaint: state.riverPaint };
+  const invalidTarget = { ...before };
+  assert.throws(() => commitScenarioActivationState(invalidTarget, {
+    ...patch, riverPaint: { schemaVersion: 99 },
+  }), /unsupported paint state/);
+  assert.deepEqual(invalidTarget, before);
+});
+
 test("scenario activation commit preserves legacy shallow-copy isolation for mutable collections", async () => {
   const {
     commitScenarioActivationState,

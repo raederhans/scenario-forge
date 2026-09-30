@@ -5,7 +5,7 @@ import { normalizeRiverPartitionPack, normalizeRiverPaintState, verifyRiverParti
   getRiverParentCompatibility, getRiverPartitionIndex, getEditedRiverParentIds } from '../js/core/river_paint/partition_model.js';
 import { canonicalRiverGeometry, riverGeometryFingerprint } from '../js/core/river_paint/geometry_identity.js';
 import { applyFeaturePaintState } from '../js/core/state/color_state.js';
-import { applyRiverCellPaintState, restoreRiverPaintOverridesState } from '../js/core/state/actions/river_paint_actions.js';
+import { applyRiverCellPaintState, restoreRiverPaintOverridesState, setRiverPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { getMapDataBoundary } from '../js/core/map_data_boundary.js';
 import { verifyApprovedRiverPack, loadRiverPaintPilot } from '../js/core/river_paint/pilot_loader.js';
 
@@ -28,6 +28,19 @@ test('normalization owns immutable geometry without freezing the caller input', 
   assert.equal(Object.isFrozen(normalized.parents[0].cells[0].geometry.coordinates[0]), true);
   assert.equal(normalizeRiverPartitionPack(normalized), normalized);
   assert.equal(getRiverPartitionIndex(normalized), getRiverPartitionIndex(normalized));
+});
+
+test('river action owns imported paint and rejects invalid edits without writes', async () => {
+  const { state, cells } = await makeFixture();
+  const raw = structuredClone(state.riverPaint);
+  setRiverPaintState(state, raw);
+  raw.pack.parents[0].cells[0].geometry.coordinates[0][0][0] = 99;
+  assert.notEqual(state.riverPaint.pack.parents[0].cells[0].geometry.coordinates[0][0][0], 99);
+  const before = state.riverPaint;
+  assert.throws(() => applyRiverCellPaintState(state, { toString: () => cells[0].id }, '#0000ff'), /not available/);
+  assert.throws(() => applyRiverCellPaintState(state, cells[0].id, 'invalid'), /invalid edit color/);
+  assert.throws(() => setRiverPaintState(state, { schemaVersion: 99 }), /unsupported/);
+  assert.equal(state.riverPaint, before);
 });
 
 test('geometry identity ignores ring rotation and direction, not source changes', async () => {

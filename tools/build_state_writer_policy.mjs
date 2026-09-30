@@ -5626,9 +5626,11 @@ export function isDelegationOnlyStateWriterCandidate({
     && actionDelegations.length > 0;
 }
 
-// A registered action delegates its only target effect to the exact imported
-// paint implementation. Project the reachable assignment into its logical
-// action binding without adding another runtime write. The deletion branch in
+// A registered action delegates its paint effects to the exact imported
+// paint implementation. Project the reachable assignments into its logical
+// action binding without adding another runtime write. The river helper's
+// source receipt proves that it copies overrides before deleting child colors;
+// the resulting paint object is assigned only to the target. The deletion branch in
 // the implementation requires remove=true, which this three-argument call
 // never supplies.
 export function projectPalettePaintActionCandidate(scannedCandidates, {
@@ -5654,6 +5656,8 @@ export function projectPalettePaintActionCandidate(scannedCandidates, {
     finding.unsupported, finding.sourceFingerprint,
   ].join("|")).sort();
   const expectedEffects = [
+    "unsupported|riverPaint|riverPaint|true|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+    "assign|riverPaint|riverPaint|false|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
     "assign|visualOverrides|visualOverrides|false|480611b47858cfa78e28a67a707381b5650bdb07cc4344ac8c8feb58c2889b88",
     "assign|visualOverrides|visualOverrides.*|false|91883c994dfd68079ce6f9b74f8e9ef0e10a4b08c27d21eeaaa2b663be690cd0",
     "delete|visualOverrides|visualOverrides.*|false|0732c3c19a5f7f84ee8a1d733333d1ccdc637b56ebf3b8ee7a0b2cb123bdba18",
@@ -5704,7 +5708,10 @@ export function projectPalettePaintActionCandidate(scannedCandidates, {
     enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: receipt.exportName, ordinal: 0 }] }),
     sourceFingerprint: receipt.callFingerprint,
   };
-  return { path: receipt.modulePath, surface: "production", binding, findings: [finding], delegationOnly: false };
+  return {
+    path: receipt.modulePath, surface: "production", binding, delegationOnly: false,
+    findings: [finding, { ...finding, key: "riverPaint", pathSegments: ["riverPaint"], dynamic: false }],
+  };
 }
 
 export async function resolveCachedStateWriterRepositoryScan({

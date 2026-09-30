@@ -112,7 +112,7 @@ python -m unittest tests.test_data_catalog_contract -q
 ```
 
 The native browser cases exercise the real toolbar, real-map click transactions,
-undo, project import/export and exact canvas pixels using Paris geometry. Browser
+undo, project import/export and exact canvas pixels across all six pilot parents. Browser
 success must be reported from an actual run, not inferred from node tests.
 
 Out of scope: global activation, arbitrary river or freehand cuts, TNO/HGO/HOI4
@@ -162,3 +162,45 @@ Earlier development evidence reported six diagnostics from the separate full
 passing quick-policy suite or final-head CI result; the current integration
 comparison above establishes the broader remaining validation gap. Architecture
 boundaries and the state-write allowlist remain required independently.
+
+## Reviewed state-contract repair (2026-09-30)
+
+The former source receipts were traced to `b5411546`. Each changed function or
+module was compared against that exact reviewed source, including borrowed input
+flows, cache publication and the river model's copy-before-delete behavior.
+Current receipts cover the merged projection/water/background caches, physical
+style fields, city labels, and the river click/hover/legend/paint integration.
+Read-site receipts follow the shared-lake selector's new function, and render
+signature receipts describe the actual joined fields. Conservative scan findings
+and counts are checked as well as source identity; a regression now exercises
+that deeper discovery path for the affected readers.
+
+The palette action projects both `visualOverrides` and `riverPaint` assignments.
+Its river helper dependency is pinned from the registered receipt, so replacing
+that helper or dropping caller-provided dependency metadata cannot bypass the
+proof. No mutation wildcard, timeout, or console exception was added. Scenario
+activation normalizes a detached river input before its first target write.
+Worker request bookkeeping similarly owns its small metadata snapshot before
+attaching its promise. These avoid granting unknown calls or local bookkeeping
+write authority over borrowed input.
+
+The full scan also exposed an omitted river action module registration and two
+hover-carrier receipts. The river action exports now enter the same explicit
+P4.4 catalog as the existing editing actions; all live action modules receive
+source validation and deep non-target parameter checks in the quick suite.
+River import owns its input snapshot, and edit IDs/colors cross helper boundaries
+as scalars. The reviewed hover carrier still delegates water/special-region
+fields to their existing owner, alongside its new river hover field.
+
+Fresh evidence: the final repaired quick suite passed 502/502, activation/river
+behavior passed 36/36, raster behavior passed 21/21, and the focused TNO Golden
+Demo passed locally. Its earlier CI pending-state failure was not reproduced,
+so local success is not a claim that cloud timing is resolved. Native browser
+acceptance now checks all 31 cells across Paris, Rouen, Stendal, Jerichower Land,
+Dubna and Yaroslavl. Subpixel slivers are sampled at cell-fit zoom; a separate
+parent overview verifies identical PNG output and no extra path builds after
+the editing tool and river display are hidden. Real-map click/undo/import/export
+also passed. The first complete scan attempt stopped at the now-repaired hover
+carrier; it did not produce a complete historical-policy verdict. A committed-head
+full diagnostic and final-head CI remain separate gates; the quick suite does not
+substitute for either result.

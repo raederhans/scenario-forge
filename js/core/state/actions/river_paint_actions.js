@@ -9,7 +9,7 @@ function requireState(target) {
 
 export function setRiverPaintState(target, value) {
   requireState(target);
-  const next = normalizeRiverPaintState(value);
+  const next = normalizeRiverPaintState(structuredClone(value));
   target.riverPaint = next;
   return next;
 }
@@ -22,14 +22,17 @@ export function setRiverPaintEditModeState(target, enabled) {
 
 export function applyRiverCellPaintState(target, cellId, color, { remove = false } = {}) {
   requireState(target);
+  if (typeof cellId !== 'string') throw new Error('River partition is not available in the current scenario');
+  const editCellId = String(cellId);
   const pack = getActiveRiverPack(target.riverPaint, target.activeScenarioId, target.scenarioBaselineHash || '');
-  const cell = getRiverPartitionIndex(pack)?.cells.get(cellId);
+  const cell = getRiverPartitionIndex(pack)?.cells.get(editCellId);
   if (!cell) throw new Error('River partition is not available in the current scenario');
   const parent = target.landIndex?.get(cell.parentId);
   if (getRiverParentCompatibility(pack, parent, cell.parentId).status !== 'ready') {
     throw new Error('River partition parent geometry is not ready');
   }
-  const result = applyRiverCellOverride(target.riverPaint, cellId, color, { remove });
+  const editColor = remove ? null : String(color || '');
+  const result = applyRiverCellOverride(target.riverPaint, editCellId, editColor, { remove });
   if (result.changed) target.riverPaint = result.paint;
   return result;
 }

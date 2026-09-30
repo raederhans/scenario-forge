@@ -871,6 +871,7 @@ test("P4.4 action modules admit every direct export only at the P4.4 boundary", 
     "js/core/state/actions/appearance_visibility_actions.js",
     "js/core/state/actions/export_workbench_actions.js",
     "js/core/state/actions/intensity_field_actions.js",
+    "js/core/state/actions/river_paint_actions.js",
     "js/core/state/actions/special_zone_actions.js",
     "js/core/state/actions/strategic_overlay_actions.js",
     "js/core/state/actions/transport_actions.js",
@@ -1635,7 +1636,8 @@ test("click selection actions have one registry owner and one source-bound trans
     ));
     assert.ok(proof, key);
     assert.equal(proof.retiredMutationSites.length, retiredCount);
-    assert.equal(rendererSource.split(actionCall).length - 1, 1);
+    const clickComposition = rendererSource.slice(rendererSource.indexOf("function getClickSelectionTransactionOwner("), rendererSource.indexOf("\nfunction ", rendererSource.indexOf("function getClickSelectionTransactionOwner(") + 1));
+    assert.equal(clickComposition.split(actionCall).length - 1, 1);
     assert.equal(
       createHash("sha256").update(actionCall).digest("hex"),
       proof.replacementActionSourceFingerprint,
@@ -2469,6 +2471,35 @@ test("render pass signature reader accepts reviewed joins and rejects state writ
       discoverStateWriterBindingsForSource(modulePath, changed, "production", { scanAllParameters: true }),
       (error) => error?.code === "state-target-pure-reader-contract-violation",
     );
+  }
+});
+
+test("every live action module retains its source and export contract", async () => {
+  const directory = "js/core/state/actions/";
+  for (const name of fs.readdirSync(directory).filter((name) => name.endsWith(".js"))) {
+    const filePath = directory + name;
+    assert.deepEqual(validateStateActionModuleSource(
+      fs.readFileSync(filePath, "utf8"), { filePath },
+    ), [], filePath);
+    await discoverStateWriterBindingsForSource(
+      filePath, fs.readFileSync(filePath, "utf8"), "production", { scanAllParameters: true },
+    );
+  }
+});
+
+test("reviewed river and cache readers retain exact conservative scan receipts", async () => {
+  for (const modulePath of [
+    "js/core/renderer/geometry_raster_runtime_owner.js",
+    "js/core/state_defaults.js",
+    "js/core/legend_state_normalizers.js",
+    "js/core/renderer/city_label_text_model.js",
+    "js/core/renderer/scenario_region_overlay_render_owner.js",
+    "js/core/renderer/transient_overlay_render_owner.js",
+  ]) {
+    // Discovery also checks each conservative finding and its count; source
+    // fingerprint inspection alone cannot establish that the scan is current.
+    await discoverStateWriterBindingsForSource(modulePath, fs.readFileSync(modulePath, "utf8"),
+      "production", { scanAllParameters: true });
   }
 });
 
@@ -3682,6 +3713,10 @@ test("imported activation calls preserve exact paint projection and detached evi
     operation: "assign",
     key: "visualOverrides",
     pathSegments: ["visualOverrides", "*"],
+  }, {
+    operation: "assign",
+    key: "riverPaint",
+    pathSegments: ["riverPaint"],
   }]);
 
   const actionSource = fs.readFileSync(receipts.eviction.modulePath, "utf8");
@@ -3749,6 +3784,19 @@ test("imported activation receipts reject refreshed wrong bindings, changed call
       : fs.readFileSync(modulePath, "utf8"),
   }).violations;
   assert.ok(calleeViolations.some(({ code }) => code === "state-action-imported-target-effect-drift"));
+
+  const partitionPath = "js/core/river_paint/partition_model.js";
+  const partitionSource = fs.readFileSync(partitionPath, "utf8");
+  const mutatedPartition = partitionSource.replace(
+    "export function clearRiverCellOverrides(paint, featureIds) {",
+    "export function clearRiverCellOverrides(paint, featureIds) {\n  paint.overrides.unreviewed = '#000000';",
+  );
+  assert.notEqual(mutatedPartition, partitionSource);
+  for (const candidate of [paint, { ...paint, dependencyFingerprints: {} }]) {
+    assert.ok(inspectStateActionImportedCallReceipt(candidate, {
+      readSource: modulePath => modulePath === partitionPath ? mutatedPartition : fs.readFileSync(modulePath, "utf8"),
+    }).violations.some(({ code }) => code === "state-action-imported-call-dependency-drift"));
+  }
 
   const readerPath = eviction.calleeModulePath;
   const readerSource = fs.readFileSync(readerPath, "utf8");

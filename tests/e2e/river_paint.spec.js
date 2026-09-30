@@ -97,7 +97,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   await page.screenshot({ path: testInfo.outputPath('river-pilot-map.png') });
 });
 
-test('native canvas renders real Paris cells and PNG pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
+test('native canvas renders all six pilot parents and PNG pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   await gotoApp(page, '/?ui_shell=1', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
@@ -106,36 +106,53 @@ test('native canvas renders real Paris cells and PNG pixels follow state after t
     const { RIVER_PAINT_PILOT } = await load('./js/core/river_paint/pilot_manifest.js');
     const { normalizeRiverPaintState } = await load('./js/core/river_paint/partition_model.js');
     const { createRiverPaintRenderOwner } = await load('./js/core/river_paint/render_owner.js');
-    const pack = await loadRiverPaintPilot({}); const parent = pack.parents.find(p => p.parentId === 'FR_ARR_75001');
-    const feature = { type: 'Feature', id: parent.parentId, properties: { id: parent.parentId, cntr_code: 'FR' }, geometry: parent.parentGeometry };
-    const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
-      activeScenarioManifest: { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt },
-      riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, editMode: true, overrides: {} }),
-      landData: { features: [feature] }, landIndex: new Map([[feature.id, feature]]), sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {} };
-    const colors = ['#12ab34', '#bd24ce', '#2358ab'];
-    parent.cells.forEach((c, i) => { state.riverPaint.overrides[c.id] = colors[i]; });
-    const canvas = document.createElement('canvas'); canvas.width = canvas.height = 600;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const projection = d3.geoMercator().fitExtent([[20, 20], [580, 580]], feature);
-    const path = d3.geoPath(projection, ctx);
-    const owner = createRiverPaintRenderOwner({ state, getContext: () => ctx, getPath: () => path, getProjectionKey: () => 'paris' });
-    const sample = c => {
-      const f = { type: 'Feature', geometry: c.geometry };
-      const [[x0, y0], [x1, y1]] = d3.geoBounds(f);
-      for (let y = 1; y < 50; y++) for (let x = 1; x < 50; x++) {
-        const point = [x0 + (x1 - x0) * x / 50, y0 + (y1 - y0) * y / 50];
-        if (!d3.geoContains(f, point)) continue;
-        const p = projection(point), pixel = ctx.getImageData(Math.floor(p[0]), Math.floor(p[1]), 1, 1).data;
-        const hex = '#' + [...pixel.slice(0, 3)].map(n => n.toString(16).padStart(2, '0')).join('');
-        if (hex === state.riverPaint.overrides[c.id] && pixel[3] === 255) return hex;
-      }
-      return null;
-    };
-    owner.draw(1); const initial = parent.cells.map(sample); const png = canvas.toDataURL('image/png');
-    const builds = owner.diagnostics().builds;
-    state.riverPaint.editMode = false; state.showRivers = false; ctx.clearRect(0, 0, 600, 600); owner.draw(1);
-    return { initial, colors, samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
+    const pack = await loadRiverPaintPilot({});
+    return pack.parents.map(parent => {
+      const feature = { type: 'Feature', id: parent.parentId, properties: { id: parent.parentId, cntr_code: 'FR' }, geometry: parent.parentGeometry };
+      const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
+        activeScenarioManifest: { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt },
+        riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, editMode: true, overrides: {} }),
+        landData: { features: [feature] }, landIndex: new Map([[feature.id, feature]]), sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {} };
+      const palette = ['#12ab34', '#bd24ce', '#2358ab', '#df8021', '#16a5b9', '#ab344f', '#8b751d', '#753fce', '#3c6855'];
+      const colors = parent.cells.map((_, i) => palette[i]);
+      parent.cells.forEach((c, i) => { state.riverPaint.overrides[c.id] = colors[i]; });
+      const canvas = document.createElement('canvas'); canvas.width = canvas.height = 600;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const projection = d3.geoMercator().fitExtent([[20, 20], [580, 580]], feature);
+      const path = d3.geoPath(projection, ctx);
+      const owner = createRiverPaintRenderOwner({ state, getContext: () => ctx, getPath: () => path, getProjectionKey: () => projection.scale() + ':' + projection.translate().join(',') });
+      const sample = c => {
+        const f = { type: 'Feature', geometry: c.geometry };
+        const [[x0, y0], [x1, y1]] = d3.geoBounds(f);
+        for (let y = 1; y < 50; y++) for (let x = 1; x < 50; x++) {
+          const point = [x0 + (x1 - x0) * x / 50, y0 + (y1 - y0) * y / 50];
+          if (!d3.geoContains(f, point)) continue;
+          const p = projection(point), pixel = ctx.getImageData(Math.floor(p[0]), Math.floor(p[1]), 1, 1).data;
+          const hex = '#' + [...pixel.slice(0, 3)].map(n => n.toString(16).padStart(2, '0')).join('');
+          if (hex === state.riverPaint.overrides[c.id] && pixel[3] === 255) return hex;
+        }
+        return null;
+      };
+      // Fit each cell for the pixel assertion: several valid river slivers are
+      // smaller than a full opaque pixel at a parent-wide overview.
+      const initial = parent.cells.map(cell => {
+        projection.fitExtent([[20, 20], [580, 580]], { type: 'Feature', geometry: cell.geometry });
+        ctx.clearRect(0, 0, 600, 600); owner.draw(1);
+        return sample(cell);
+      });
+      projection.fitExtent([[20, 20], [580, 580]], feature);
+      ctx.clearRect(0, 0, 600, 600); owner.draw(1); const png = canvas.toDataURL('image/png');
+      const builds = owner.diagnostics().builds;
+      state.riverPaint.editMode = false; state.showRivers = false; ctx.clearRect(0, 0, 600, 600); owner.draw(1);
+      return { parentId: parent.parentId, initial, colors, samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
+    });
   });
-  expect(result.initial).toEqual(result.colors); expect(result.samePng).toBe(true); expect(result.noReproject).toBe(true);
-  await testInfo.attach('paris-bank-pixels.png', { body: Buffer.from(result.png.split(',')[1], 'base64'), contentType: 'image/png' });
+  expect(result).toHaveLength(6);
+  expect(result.reduce((n, parent) => n + parent.colors.length, 0)).toBe(31);
+  for (const parent of result) {
+    expect(parent.initial, parent.parentId).toEqual(parent.colors);
+    expect(parent.samePng, parent.parentId).toBe(true);
+    expect(parent.noReproject, parent.parentId).toBe(true);
+    await testInfo.attach(`${parent.parentId}-bank-pixels.png`, { body: Buffer.from(parent.png.split(',')[1], 'base64'), contentType: 'image/png' });
+  }
 });
