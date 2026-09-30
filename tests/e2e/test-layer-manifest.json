@@ -164,6 +164,13 @@
       "ownerHint": "map-runtime"
     },
     {
+      "specPath": "tests/e2e/river_paint.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "renderer-runtime",
+      "ownerHint": "renderer-runtime"
+    },
+    {
       "specPath": "tests/e2e/sample_guide_deeplink.spec.js",
       "primaryLayer": "feature",
       "executionMode": "browser",

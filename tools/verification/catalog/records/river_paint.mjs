@@ -21,7 +21,7 @@ export function createRiverPaintRecords(existingRecords) {
     sourceRefs: ['tools/build_river_partitions.py', 'tests/test_river_partitions.py', 'tests/fixtures/river_paint/stendal.json',
       'data/river_partitions/modern_world_pilot.json'] },
   { ...shared, id: 'e2e:tests/e2e/river_paint.spec.js', selectorOrder: start + 2,
-    commandRef: 'npx playwright test --config=playwright.config.cjs tests/e2e/river_paint.spec.js --workers=1', sourceRefs: ['tests/e2e/river_paint.spec.js'],
+    commandRef: 'node tools/e2e_layering.mjs run-spec tests/e2e/river_paint.spec.js', sourceRefs: ['tests/e2e/river_paint.spec.js'],
     tiers: ['regression'], cost: 'heavy', resourceLocks: ['browser-dev-server', 'playwright-browser', '.runtime-output'],
     executionOwners: ['main-thread'], profiles: ['full'], entrypointPolicyIndex: 0 }];
 }

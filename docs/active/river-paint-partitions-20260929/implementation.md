@@ -120,6 +120,19 @@ packs, automatic sliver merging, migration across changed geometry baselines,
 and changing administrative or scenario ownership. The pilot is not a survey-
 grade river boundary dataset. No source geography is overwritten.
 
+## Integration verification (2026-09-30)
+
+The Pages runtime allowlist includes the approved pilot sidecar. The river
+browser spec is registered in the regression layer and import graph, its
+verification route uses the standard layer runner, and the geometry tests are
+registered with the geospatial dependency group. The temporary development
+workflow has been removed; maintained repository verification owns the checks.
+
+Fresh local results: 31 river node tests, 16 geometry tests, 64 Pages packaging
+tests, 71 E2E structural-tooling tests and both river browser cases passed.
+The Pages build and layer, import-graph and verification-route checks passed.
+These results do not substitute for required checks on the final PR head.
+
 ## Historical policy proof limitation
 
 The full `check_state_writer_policy.mjs` historical proof is already fail-closed
