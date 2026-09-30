@@ -133,11 +133,32 @@ tests, 71 E2E structural-tooling tests and both river browser cases passed.
 The Pages build and layer, import-graph and verification-route checks passed.
 These results do not substitute for required checks on the final PR head.
 
+The subsequent affected-contract run exposed legacy test harnesses missing the
+new river imports and static assertions still extracting the pre-wrapper
+political pass. Those checks now use the actual runtime and base pass, retaining
+their existing ordering assertions. Export additionally verifies that loading
+river partitions block political/border output before canvas allocation.
+Previously omitted Arctic/water tests now have geospatial dependency and route
+registration. The river aggregate is a PR-level check, preserving bounded local
+owner feedback. Fresh repaired suites passed 175 Node contracts, 105 runner
+contracts, 9 Python renderer boundaries and 26 source-built Pages contracts.
+
+Merge remains gated by state-policy validation. On 2026-09-30 the 500-test quick
+policy suite passed 463 and failed 37. A controlled comparison replacing the 22
+modified existing JavaScript files with `origin/main@bfedc6b8` sources, keeping
+the test environment unchanged, passed 470 and failed 30. This is a source
+comparison, not a claim that every file was a clean main checkout. The seven
+additional failing cases concern click-selection ownership, quick-fill reader
+dependencies, chunk publication, activation/paint projection and reference
+assignment copying. No policy fingerprints or acceptance rules were relaxed.
+Before merging, audit and repair the current source-bound contracts, rerun
+their negative-mutation tests, and require all protected checks on the final head.
+
 ## Historical policy proof limitation
 
-The full `check_state_writer_policy.mjs` historical proof is already fail-closed
-at the base snapshot: `political_path_cache_owner.js` and `render_cache_owner.js`
-factory/source fingerprints drift from their archived borrowed-effect contract.
-Restoring the base `map_renderer.js` reproduces the same six diagnostics. This
-change does not relax or regenerate that historical contract. Current
-architecture boundaries and the state-write allowlist remain required.
+Earlier development evidence reported six diagnostics from the separate full
+`check_state_writer_policy.mjs` historical proof, including archived effects for
+`political_path_cache_owner.js` and `render_cache_owner.js`. That report is not a
+passing quick-policy suite or final-head CI result; the current integration
+comparison above establishes the broader remaining validation gap. Architecture
+boundaries and the state-write allowlist remain required independently.

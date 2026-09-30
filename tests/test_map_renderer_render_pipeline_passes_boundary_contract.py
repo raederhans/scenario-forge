@@ -277,7 +277,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         )[1].split("\n  function recordPoliticalRasterWorkerSnapshot", 1)[0]
         self.assertIn("const fineBaselineMismatch = helper.getPoliticalPassFineBaselineMismatch(transform);", partial_repaint_body)
         self.assertIn("return fallback(fineBaselineMismatch);", partial_repaint_body)
-        political_draw_body = political_pass_owner_content.split("function drawPoliticalPass(", 1)[1].split(
+        political_draw_body = political_pass_owner_content.split("function drawBasePoliticalPass(", 1)[1].split(
             "\n  return Object.freeze",
             1,
         )[0]
@@ -453,6 +453,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
                 source = visual_effects_owner_content
             elif function_name == "drawPoliticalPass":
                 source = political_pass_owner_content
+                function_name = "drawBasePoliticalPass"
             elif function_name in {
                 "drawContextBasePass",
                 "drawContextMarkersPass",

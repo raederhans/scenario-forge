@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "../js/core/renderer/export_render_budget.js";
+import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
 
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const start = source.indexOf("let exportRenderInProgress = false;");
@@ -24,6 +25,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
   let allocatedCanvases = 0;
   const context = vm.createContext({
     runtimeState,
+    getRiverPaintRuntime,
     EXPORT_RENDER_BUDGET_BYTES,
     estimateExportRenderBytes: (input) => budgetExceeded
       ? EXPORT_RENDER_BUDGET_BYTES + 1
@@ -91,6 +93,23 @@ for (const politicalStatus of ["pending", "error"]) {
     assert.deepEqual(h.calls, ["contours-ready", `political-${politicalStatus}`]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.runtimeState.dpr, 1);
+  });
+}
+
+for (const passName of ["political", "borders"]) {
+  test(`${passName} export rejects loading river partitions before allocation or cache mutation`, () => {
+    const h = harness();
+    const runtime = getRiverPaintRuntime(h.runtimeState);
+    runtime.enable(() => new Promise(() => {}));
+    try {
+      assert.throws(() => h.run([passName], { pixelRatio: 2 }), /River partitions are still loading/);
+      assert.equal(h.allocatedCanvases(), 0);
+      assert.deepEqual(h.calls, []);
+      assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+      assert.equal(h.runtimeState.dpr, 1);
+    } finally {
+      runtime.cancel();
+    }
   });
 }
 

@@ -6,6 +6,7 @@ import { parse } from "acorn";
 import { createRevisionedLegendColorReader, LegendManager } from "../js/core/legend_manager.js";
 import { setResolvedColorForFeature, bumpColorRevision, replaceResolvedColorsState } from "../js/core/state/color_state.js";
 import { createCountryFillPaletteOwner } from "../js/core/renderer/country_fill_palette_owner.js";
+import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
 
 function rendererFunction(name, globals) {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
@@ -69,6 +70,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
   const contourNotifications = [], borderInvalidations = [];
   const refresh = rendererFunction("refreshResolvedColorsForFeatures", {
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
+    getRiverPaintRuntime,
     getCountryFillPaletteOwner: () => palette,
     getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: (ids) => {
       // The extracted transaction owns publication order; the contour runtime

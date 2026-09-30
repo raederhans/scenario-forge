@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { parse } from "acorn";
+import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
 import {
   collectSpatialGridCandidates,
   createHitResult,
@@ -177,6 +178,7 @@ function createRendererHitHarness({ cacheEnabled, candidatesByKey }) {
     return candidatesByKey[`${type}:${radius}`] || [];
   };
   const scope = vm.createContext({
+    getRiverPaintRuntime,
     runtimeState: {
       landData: { features: [] }, spatialItems: [{}], waterSpatialItems: [{}], specialSpatialItems: [{}],
       showWaterRegions: true, showScenarioSpecialRegions: true,

@@ -1,5 +1,17 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
+  ...[
+    ["arctic_recovery", "python -m unittest tests.test_arctic_recovery -q", "map_builder/processors/arctic_recovery.py"],
+    ["polar_asset_repair", "python -m unittest tests.test_polar_asset_repair -q", "tools/rebuild_polar_assets.py"],
+    ["rebuild_water_geometry", "python -m pytest tests/test_rebuild_water_geometry.py -q", "tools/rebuild_water_geometry.py"],
+  ].map(([name, commandRef, source]) => ({
+    id: `python:${name.replaceAll("_", "-")}`, commandRef,
+    sourceRefs: [`tests/test_${name}.py`, source],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo"], executionOwners: ["main-thread"],
+    profiles: ["full"], platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  })),
   {
     id: "python:water-display-lods",
     commandRef: "python -m unittest tests.test_water_display_lods -q",

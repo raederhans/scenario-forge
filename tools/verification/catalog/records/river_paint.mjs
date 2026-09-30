@@ -3,7 +3,7 @@ export function createRiverPaintRecords(existingRecords) {
   const start = Math.max(0, ...existingRecords.map(r => r.selectorOrder || 0)) + 1;
   const shared = { ownerHints: ['renderer-runtime'], domains: ['renderer-runtime'], tiers: ['contract'], cost: 'fast',
     resourceLocks: [], executionOwners: ['child-safe'], profiles: ['pr-fast'], platforms: ['all'],
-    entrypointPolicyIndex: 5, verificationOrder: null, verification: null, selector: {} };
+    entrypointPolicyIndex: 4, verificationOrder: null, verification: null, selector: {} };
   return [{ ...shared, id: 'node:test:node:river-paint', commandRef: 'test:node:river-paint', selectorOrder: start,
     sourceRefs: ['js/core/river_paint/editor_owner.js', 'js/core/river_paint/geometry_identity.js', 'js/core/river_paint/partition_model.js', 'js/core/river_paint/pilot_loader.js', 'js/core/river_paint/pilot_manifest.js', 'js/core/river_paint/render_owner.js', 'js/core/river_paint/runtime.js', 'js/core/state/actions/river_paint_actions.js',
       'js/core/map_renderer.js', 'js/core/map_data_boundary.js', 'js/core/history_manager.js',
