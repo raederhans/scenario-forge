@@ -191,6 +191,25 @@ test("geometry and fitting run in bounded deferred tasks while repaint stays fre
   assert.equal(owner.getDiagnostics().pendingFits, 0);
 });
 
+test("deferred preparation batches countries without one repaint per worker request", () => {
+  const callbacks = [], messages = [];
+  let invalidations = 0;
+  const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), helperOptions: {
+    nowMs: () => 0,
+    scheduleWork: (callback) => callbacks.push(callback),
+    onInvalidate: () => { invalidations += 1; },
+    createWorker: () => ({ postMessage: (message) => messages.push(message), terminate() {} }),
+  } });
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 8, "one bounded batch prepares multiple worker requests");
+  assert.equal(invalidations, 1, "preparation shares one repaint across the batch");
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 12, "pending worker requests are not queued again");
+  assert.equal(invalidations, 2);
+});
+
 test("actual layout can render a complete projected country using measured glyph bounds", () => {
   const { owner, context } = createHarness({ names: ["TEST"], realLayout: true });
   assert.equal(owner.drawCountryLabels(1), 1);

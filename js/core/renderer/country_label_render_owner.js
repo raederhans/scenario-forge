@@ -424,13 +424,22 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
         if (latestSource?.sourceToken !== geometry.sourceToken || latestSource.revision !== geometry.revision) return;
         const target = getContext();
         if (!target) return;
-        const { entry, text, key } = nextPreparation;
         const start = nowMs();
-        if (!entry.polygons) projectEntry(entry, projection, 12);
-        if (entry.polygons && entry.bounds && nowMs() - start < 12 && !entry.fits.has(key)) {
-          target.save();
-          try { prepareFit(entry, target, text, key, isChinese, font); }
-          finally { target.restore(); }
+        let prepared = 0;
+        let remaining = 12;
+        // Share one budget and repaint across several countries. One repaint
+        // per country used to double the frames needed for worker completion.
+        for (const { entry, text, key } of pending) {
+          if (entry.workerPending.has(key) || entry.fits.has(key)) continue;
+          if (prepared && (remaining <= 0 || prepared >= 8)) break;
+          if (!entry.polygons) projectEntry(entry, projection, Math.max(0, remaining));
+          if (entry.polygons && entry.bounds && nowMs() - start < 12) {
+            target.save();
+            try { prepareFit(entry, target, text, key, isChinese, font); }
+            finally { target.restore(); }
+          }
+          prepared += 1;
+          remaining = 12 - (nowMs() - start);
         }
         helpers.onInvalidate?.();
       });
