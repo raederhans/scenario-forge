@@ -44177,7 +44177,7 @@
     },
     {
       "path": "app/js/core/map_renderer.js",
-      "size_bytes": 619315,
+      "size_bytes": 620021,
       "source_kind": "dist"
     },
     {
@@ -44237,7 +44237,7 @@
     },
     {
       "path": "app/js/core/map_renderer/public.js",
-      "size_bytes": 2264,
+      "size_bytes": 2301,
       "source_kind": "dist"
     },
     {
@@ -44557,7 +44557,7 @@
     },
     {
       "path": "app/js/core/renderer/country_label_render_owner.js",
-      "size_bytes": 21549,
+      "size_bytes": 22622,
       "source_kind": "dist"
     },
     {
@@ -45912,7 +45912,7 @@
     },
     {
       "path": "app/js/ui/toolbar.js",
-      "size_bytes": 126998,
+      "size_bytes": 127285,
       "source_kind": "dist"
     },
     {
@@ -46772,12 +46772,12 @@
       {
         "file_count": 328,
         "id": "startup-critical",
-        "size_bytes": 28055268
+        "size_bytes": 28057084
       },
       {
         "file_count": 116,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3684929
+        "size_bytes": 3685216
       },
       {
         "file_count": 824,
@@ -51379,7 +51379,7 @@
               {
                 "column": 1,
                 "kind": "export-named-source",
-                "line": 15409,
+                "line": 15423,
                 "local": true,
                 "reference": "./map_renderer/render_pass_catalog.js",
                 "resolved_path": "app/js/core/map_renderer/render_pass_catalog.js"
@@ -63341,7 +63341,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 32,
+                "line": 33,
                 "local": true,
                 "reference": "../core/history_manager.js",
                 "resolved_path": "app/js/core/history_manager.js"
@@ -63349,7 +63349,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 33,
+                "line": 34,
                 "local": true,
                 "reference": "../core/state/index.js",
                 "resolved_path": "app/js/core/state/index.js"
@@ -63357,7 +63357,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 34,
+                "line": 35,
                 "local": true,
                 "reference": "../core/state/actions/export_workbench_actions.js",
                 "resolved_path": "app/js/core/state/actions/export_workbench_actions.js"
@@ -63365,7 +63365,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 35,
+                "line": 36,
                 "local": true,
                 "reference": "../core/palette_manager.js",
                 "resolved_path": "app/js/core/palette_manager.js"
@@ -63373,7 +63373,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 40,
+                "line": 41,
                 "local": true,
                 "reference": "../core/export_artifact_package.js",
                 "resolved_path": "app/js/core/export_artifact_package.js"
@@ -63381,7 +63381,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 41,
+                "line": 42,
                 "local": true,
                 "reference": "../core/scenario_resources.js",
                 "resolved_path": "app/js/core/scenario_resources.js"
@@ -63389,7 +63389,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 42,
+                "line": 43,
                 "local": true,
                 "reference": "./i18n.js",
                 "resolved_path": "app/js/ui/i18n.js"
@@ -63397,7 +63397,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 43,
+                "line": 44,
                 "local": true,
                 "reference": "./toast.js",
                 "resolved_path": "app/js/ui/toast.js"
@@ -63405,7 +63405,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 44,
+                "line": 45,
                 "local": true,
                 "reference": "./app_dialog.js",
                 "resolved_path": "app/js/ui/app_dialog.js"
@@ -63413,7 +63413,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 45,
+                "line": 46,
                 "local": true,
                 "reference": "./ui_surface_url_state.js",
                 "resolved_path": "app/js/ui/ui_surface_url_state.js"
@@ -63421,7 +63421,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 46,
+                "line": 47,
                 "local": true,
                 "reference": "../core/sample_project_import_workflow.js",
                 "resolved_path": "app/js/core/sample_project_import_workflow.js"
@@ -63429,7 +63429,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 47,
+                "line": 48,
                 "local": true,
                 "reference": "../core/sample_project_registry.js",
                 "resolved_path": "app/js/core/sample_project_registry.js"
@@ -63437,7 +63437,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 48,
+                "line": 49,
                 "local": true,
                 "reference": "./ui_contract.js",
                 "resolved_path": "app/js/ui/ui_contract.js"
@@ -63445,7 +63445,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 57,
+                "line": 58,
                 "local": true,
                 "reference": "../core/dirty_state.js",
                 "resolved_path": "app/js/core/dirty_state.js"
@@ -63453,7 +63453,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 58,
+                "line": 59,
                 "local": true,
                 "reference": "./toolbar/export_failure_handler.js",
                 "resolved_path": "app/js/ui/toolbar/export_failure_handler.js"
@@ -63461,7 +63461,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 62,
+                "line": 63,
                 "local": true,
                 "reference": "./toolbar/export_artifact_model.js",
                 "resolved_path": "app/js/ui/toolbar/export_artifact_model.js"
@@ -63469,7 +63469,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 77,
+                "line": 78,
                 "local": true,
                 "reference": "./toolbar/ocean_lake_controls_controller.js",
                 "resolved_path": "app/js/ui/toolbar/ocean_lake_controls_controller.js"
@@ -63477,7 +63477,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 78,
+                "line": 79,
                 "local": true,
                 "reference": "./toolbar/export_workbench_controller.js",
                 "resolved_path": "app/js/ui/toolbar/export_workbench_controller.js"
@@ -63485,7 +63485,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 90,
+                "line": 91,
                 "local": true,
                 "reference": "./toolbar/palette_library_panel.js",
                 "resolved_path": "app/js/ui/toolbar/palette_library_panel.js"
@@ -63493,7 +63493,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 91,
+                "line": 92,
                 "local": true,
                 "reference": "../core/palette_library_operation.js",
                 "resolved_path": "app/js/core/palette_library_operation.js"
@@ -63501,7 +63501,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 92,
+                "line": 93,
                 "local": true,
                 "reference": "../core/palette_library_state_access.js",
                 "resolved_path": "app/js/core/palette_library_state_access.js"
@@ -63509,7 +63509,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 93,
+                "line": 94,
                 "local": true,
                 "reference": "./toolbar/appearance_controls_controller.js",
                 "resolved_path": "app/js/ui/toolbar/appearance_controls_controller.js"
@@ -63517,7 +63517,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 94,
+                "line": 95,
                 "local": true,
                 "reference": "./toolbar/scenario_context_bar_controller.js",
                 "resolved_path": "app/js/ui/toolbar/scenario_context_bar_controller.js"
@@ -63525,7 +63525,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 95,
+                "line": 96,
                 "local": true,
                 "reference": "./toolbar/scenario_guide_popover.js",
                 "resolved_path": "app/js/ui/toolbar/scenario_guide_popover.js"
@@ -63533,7 +63533,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 96,
+                "line": 97,
                 "local": true,
                 "reference": "./toolbar/sample_project_banner_controller.js",
                 "resolved_path": "app/js/ui/toolbar/sample_project_banner_controller.js"
@@ -63541,7 +63541,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 100,
+                "line": 101,
                 "local": true,
                 "reference": "./toolbar/special_zone_editor.js",
                 "resolved_path": "app/js/ui/toolbar/special_zone_editor.js"
@@ -63549,7 +63549,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 101,
+                "line": 102,
                 "local": true,
                 "reference": "./toolbar/special_zones_workbench_controller.js",
                 "resolved_path": "app/js/ui/toolbar/special_zones_workbench_controller.js"
@@ -63557,7 +63557,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 102,
+                "line": 103,
                 "local": true,
                 "reference": "./toolbar/transport_workbench_controller.js",
                 "resolved_path": "app/js/ui/toolbar/transport_workbench_controller.js"
@@ -63565,7 +63565,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 106,
+                "line": 107,
                 "local": true,
                 "reference": "./toolbar/workspace_chrome_support_surface_controller.js",
                 "resolved_path": "app/js/ui/toolbar/workspace_chrome_support_surface_controller.js"
@@ -63573,7 +63573,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 107,
+                "line": 108,
                 "local": true,
                 "reference": "../core/hgo_runtime_asset_loader.js",
                 "resolved_path": "app/js/core/hgo_runtime_asset_loader.js"
@@ -63581,7 +63581,7 @@
               {
                 "column": 1,
                 "kind": "import-declaration",
-                "line": 108,
+                "line": 109,
                 "local": true,
                 "reference": "./toolbar/hgo_runtime_preview_controller.js",
                 "resolved_path": "app/js/ui/toolbar/hgo_runtime_preview_controller.js"
@@ -67153,15 +67153,15 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3279186,
+        "deferred_graph_bytes": 3279473,
         "deferred_graph_file_count": 145,
         "deferred_module_count": 143,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5773968,
+        "initial_graph_bytes": 5775784,
         "initial_graph_file_count": 359,
         "initial_module_count": 345,
         "initial_resource_count": 14,
-        "initial_script_bytes": 4651266,
+        "initial_script_bytes": 4653082,
         "initial_script_count": 347,
         "module_count": 488,
         "registry_resolved_dynamic_expression_count": 2,
@@ -67374,7 +67374,7 @@
           },
           {
             "path": "app/js/core/map_renderer.js",
-            "size_bytes": 619315
+            "size_bytes": 620021
           },
           {
             "path": "app/js/core/map_renderer/canvas_layer_manager.js",
@@ -67414,7 +67414,7 @@
           },
           {
             "path": "app/js/core/map_renderer/public.js",
-            "size_bytes": 2264
+            "size_bytes": 2301
           },
           {
             "path": "app/js/core/map_renderer/render_invalidation_catalog.js",
@@ -67642,7 +67642,7 @@
           },
           {
             "path": "app/js/core/renderer/country_label_render_owner.js",
-            "size_bytes": 21549
+            "size_bytes": 22622
           },
           {
             "path": "app/js/core/renderer/country_label_source.js",
@@ -68385,7 +68385,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3577658
+        "size_bytes": 3579474
       },
       {
         "basis": "startup-resource-graph",
@@ -68647,7 +68647,7 @@
           },
           {
             "path": "app/js/ui/toolbar.js",
-            "size_bytes": 126998
+            "size_bytes": 127285
           },
           {
             "path": "app/js/ui/toolbar/appearance_border_owner.js",
@@ -68930,7 +68930,7 @@
             "size_bytes": 20597
           }
         ],
-        "size_bytes": 2729471
+        "size_bytes": 2729758
       },
       {
         "basis": "deferred-resource-graph",
@@ -70153,7 +70153,7 @@
     {
       "file_count": 9267,
       "path": "app",
-      "size_bytes": 829558718
+      "size_bytes": 829560821
     },
     {
       "file_count": 59,
@@ -70186,5 +70186,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 858997480
+  "total_bytes": 858999583
 }

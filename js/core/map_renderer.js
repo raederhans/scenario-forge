@@ -52,7 +52,7 @@ import {
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
 import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
-import { createCountryLabelRenderOwner } from "./renderer/country_label_render_owner.js";
+import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
@@ -12983,6 +12983,20 @@ function composeRenderPassesToTarget(
 
 let exportRenderInProgress = false;
 
+async function ensureCountryLabelsReadyForExport(passNames) {
+  if (!passNames.includes("labels")) return;
+  await waitForCountryLabelsForExport({
+    isDisabled: () => isHgoRuntimePreviewReady() || runtimeState.styleConfig?.countryLabels?.enabled === false,
+    prepareSource: () => getCountryLabelSourceOwner().prepare(),
+    getSource: () => getCountryLabelSourceOwner().getSource(),
+    getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
+    requestRender: () => {
+      invalidateRenderPasses("labels", "country-label-export");
+      requestRendererRender("country-label-export", { flush: false });
+    },
+  });
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   const width = Number(runtimeState.colorCanvas?.width || 0);
@@ -15421,6 +15435,7 @@ export {
   getPaintContourDiagnostics,
   getPoliticalBorderDiagnostics,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   // Core render lifecycle facade.
   initMap,
   setMapData,

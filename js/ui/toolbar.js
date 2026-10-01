@@ -27,6 +27,7 @@ import {
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
@@ -2457,6 +2458,7 @@ function initToolbar({ render } = {}) {
       bakeCtx.drawImage(compositeCanvas, 0, 0);
     } else {
       if (bakePassNames.length) {
+        await ensureCountryLabelsReadyForExport(bakePassNames);
         const passCanvas = renderExportPassesToCanvas(bakePassNames);
         if (passCanvas) {
           bakeCtx.drawImage(passCanvas, 0, 0);
@@ -2534,6 +2536,7 @@ function initToolbar({ render } = {}) {
       ...exportUi,
       visibility: exportUi.visibility,
     }, RENDER_PASS_NAMES).filter((passName) => exportUi.textVisibility?.["render-labels"] || passName !== "labels");
+    await ensureCountryLabelsReadyForExport(passNames);
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
@@ -2566,6 +2569,7 @@ function initToolbar({ render } = {}) {
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);
+      await ensureCountryLabelsReadyForExport(model?.passNames || []);
       const canvas = renderExportPassesToCanvas(model?.passNames || [], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);
@@ -2573,6 +2577,7 @@ function initToolbar({ render } = {}) {
       return canvas;
     }
     if (normalizedSourceId === "render-labels") {
+      await ensureCountryLabelsReadyForExport(["labels"]);
       const canvas = renderExportPassesToCanvas(["labels"], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", "Render-pass label canvas unavailable.");

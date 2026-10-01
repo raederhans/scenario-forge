@@ -36,6 +36,7 @@ EXPECTED_PUBLIC_EXPORTS = {
     "deleteSelectedOperationalLine",
     "deleteSelectedUnitCounter",
     "ensurePaintContoursReady",
+    "ensureCountryLabelsReadyForExport",
     "finishOperationGraphicDraw",
     "finishOperationalLineDraw",
     "finishSpecialZoneDraw",

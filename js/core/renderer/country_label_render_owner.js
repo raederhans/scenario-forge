@@ -483,3 +483,30 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
       lastLabels: diagnostics.lastLabels.map((label) => ({ ...label, bounds: { ...label.bounds } })) }),
   };
 }
+
+// Export callers must yield to the same source/layout workers as the screen.
+// Keep preparation failures explicit rather than exporting an incomplete label pass.
+export async function waitForCountryLabelsForExport({
+  prepareSource, getSource, getDiagnostics, requestRender, isDisabled,
+  wait = () => new Promise((resolve) => setTimeout(resolve, 16)),
+  now = () => performance.now(), timeoutMs = 30000,
+}) {
+  if (isDisabled()) return;
+  const started = now();
+  await prepareSource();
+  requestRender();
+  for (;;) {
+    if (isDisabled()) return;
+    const source = getSource();
+    if (source.status === "disabled") return;
+    const layout = getDiagnostics();
+    if (source.status === "error" || layout.workerErrors > 0) {
+      throw new Error(source.error || "Country names failed to prepare for export.");
+    }
+    if (source.status === "ready" && layout.pendingFits === 0) return;
+    if (now() - started >= timeoutMs) {
+      throw new Error("Country names are still preparing; try exporting again when the labels are ready.");
+    }
+    await wait();
+  }
+}
