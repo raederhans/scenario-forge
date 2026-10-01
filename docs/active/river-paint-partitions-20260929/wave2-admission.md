@@ -17,6 +17,16 @@ picker/Undo/Redo browser regression passed. Pages rebuilt at 819.37 MiB under
 refreshed. A deeper temporary output path hit Windows path limits; the shorter
 runtime path completed successfully without changing build behavior.
 
+CI on `712f65b1` exposed the 13 existing borrowed-callback/owner receipt
+failures as a required gate. The old renderer digest matches `3f27e311`;
+reviewing its diff to current source shows country-label/export integration
+and the river location/cell entrypoints, without changes to the audited
+callback injections. Only those 13 exact renderer digests were refreshed.
+All 76 borrowed-effect behavior tests then passed, including mutation
+rejection. The other two baseline pure-reader receipt failures from the
+earlier broad quick suite remain outside this repair; no full-suite PASS is
+claimed. Runtime code and Pages artifacts are unchanged by this repair.
+
 ## Candidate scope
 
 | River | Source parents partitioned | Cells in broad audit | Selected next sites |
