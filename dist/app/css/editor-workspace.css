@@ -137,6 +137,13 @@
 .editor-workspace #paletteGrid > :nth-child(n + 4) { display: none; }
 .editor-workspace .dock-group-mode { width: auto; min-width: 0; }
 .editor-workspace .dock-group-mode .dock-segmented-control { width: auto; min-width: 0; grid-template-columns: auto; }
+.editor-workspace #riverPaintLocationSelect { width: 150px; max-width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
+.editor-workspace #riverPaintLocationSelect[hidden] { display: none; }
+.editor-workspace .dock-group-mode { position: relative; }
+.editor-workspace #riverCellPicker { position: absolute; bottom: calc(100% + 16px); left: 0; width: 256px; padding: 12px; display: grid; gap: 8px; background: var(--bg-surface, #fff); border: 1px solid var(--border-subtle); border-radius: 12px; box-shadow: 0 8px 24px #0002; }
+.editor-workspace #riverCellPicker[hidden] { display: none; }
+.editor-workspace #riverCellSelect { width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
+.editor-workspace #riverCellPreview { width: 100%; height: 104px; background: #f8fafc; border-radius: 6px; }
 .editor-workspace #transportProjectSection { padding: 12px 0; border: 0; box-shadow: none; background: transparent; }
 .editor-workspace #transportProjectSection .sidebar-section-description { display: none; }
 .editor-workspace #transportProjectSection > summary { font-size: 13px; }
@@ -170,4 +177,22 @@
   .editor-project-bar #scenarioGuideBtn { display: none; }
   .editor-project-bar .editor-scenario-menu > summary { padding: 8px 5px; font-size: 12px; }
   .editor-workspace .bottom-dock-primary { flex-wrap: wrap; justify-content: center; }
+}
+.palette-country-editor {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color, #d1d5db);
+}
+.palette-country-color-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.palette-country-color-row input[type="color"] {
+  width: 40px;
+  height: 32px;
+  padding: 2px;
 }

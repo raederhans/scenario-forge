@@ -93,6 +93,8 @@ import {
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
 import { createPaletteLibraryOperation } from "../core/palette_library_operation.js";
+import { createPaletteCountryEditor } from "./toolbar/palette_country_editor.js";
+import { getPaletteCountryTargets } from "../core/palette_country_targets.js";
 import { createPaletteLibraryStateAccess } from "../core/palette_library_state_access.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
@@ -117,6 +119,7 @@ function composePaletteLibraryOperation() {
   const owner = createPaletteLibraryOperation({
     getApplyTarget: stateAccess.getApplyTarget,
     getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
+    getCountryFeatureIds: (code) => [...(getPaletteCountryTargets(runtimeState).get(code) || [])],
     applyFeatureColor: stateAccess.applyFeatureColor,
     applyOwnerColor: stateAccess.applyOwnerColor,
     captureHistoryState,
@@ -1597,6 +1600,20 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
 
+  const paletteCountryEditor = createPaletteCountryEditor({
+    state: runtimeState,
+    host: paletteLibraryPanel,
+    applyColor: (color, countryCode) => {
+      if (!countryCode) return { status: "no-target" };
+      const result = applyPaletteLibraryOperation(color, { countryCode });
+      if (result.status === "applied") {
+        addRecentColor(result.color);
+        updateSwatchUI();
+        if (render) render();
+      }
+      return result;
+    },
+  });
   const paletteLibraryPanelController = createPaletteLibraryPanelController({
     themeSelect,
     paletteLibraryToggle,
@@ -1623,7 +1640,10 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);
   registerRuntimeHook(state, "renderPaletteFn", renderPalette);
 
-  registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
+  registerRuntimeHook(state, "updatePaletteLibraryUIFn", () => {
+    renderPaletteLibrary();
+    paletteCountryEditor.render();
+  });
 
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
@@ -1636,6 +1656,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);
 
   function updateSwatchUI() {
+    paletteCountryEditor.render();
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
       if (swatch.dataset.color === runtimeState.selectedColor) {

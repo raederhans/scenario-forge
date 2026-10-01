@@ -7,6 +7,16 @@ The independent worktree fast-forwarded to that main commit, then started
 for new projects and preserves the original pack for saved projects. Primary
 checkout WIP remains untouched. Remote delivery is subject to PR checks.
 
+PR: https://github.com/raederhans/scenario-forge/pull/194. The implementation
+commit is `ed4443fe`; current main `18f1a078` (palette PR #193) is integrated
+without source conflicts. Integration checks cover the shared toolbar as well
+as river behavior and the regenerated Pages output.
+Integrated acceptance: 39 river tests, 6 palette tests and the actual 43-cell
+picker/Undo/Redo browser regression passed. Pages rebuilt at 819.37 MiB under
+`.runtime/pw2/`, published registry check passed, and tracked dist mirrors were
+refreshed. A deeper temporary output path hit Windows path limits; the shorter
+runtime path completed successfully without changing build behavior.
+
 ## Candidate scope
 
 | River | Source parents partitioned | Cells in broad audit | Selected next sites |

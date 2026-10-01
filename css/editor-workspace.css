@@ -178,3 +178,21 @@
   .editor-project-bar .editor-scenario-menu > summary { padding: 8px 5px; font-size: 12px; }
   .editor-workspace .bottom-dock-primary { flex-wrap: wrap; justify-content: center; }
 }
+.palette-country-editor {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border-color, #d1d5db);
+}
+.palette-country-color-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+.palette-country-color-row input[type="color"] {
+  width: 40px;
+  height: 32px;
+  padding: 2px;
+}
