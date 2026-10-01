@@ -98,6 +98,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
 });
 
 test('wave 2 picker reaches every cell and actual toolbar undo/redo preserves each transaction', async ({ page }, testInfo) => {
+  // JUSTIFY: 43 real picker edits plus 86 toolbar Undo/Redo clicks render the map; measured 84-108s locally including startup.
   test.setTimeout(180_000);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
