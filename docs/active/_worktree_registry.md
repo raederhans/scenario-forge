@@ -619,3 +619,11 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Managed checkout: `C:/Users/raede/.codex/worktrees/palette-country-integration/mapcreator`; root owns commit, build, push and merge.
 - Scope: explicit country-tag recoloring, undo/redo and save coverage, palette-source request ordering, variant keyboard application, and matching Pages assets.
 - Primary checkout and unrelated registry WIP are preserved. Local validation: 70 palette and river UI tests; publication checks and merge receipt are recorded in PR #193 (https://github.com/raederhans/scenario-forge/pull/193). Retain this checkout for build evidence under `.runtime/reports/generated/palette-integration/`.
+
+## River wave3 offline integration 2026-10-01
+
+- Branch: `codex/river-wave3-integration`; base `2da4db61`. Integration checkout: `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator`.
+- Root owns integration, Git operations and adaptive checks; outputs `.runtime/rv3/`, no browser server for this offline acceptance.
+- Integrated deliveries: Europe `cdfedb34` (6f5a), China `9a664cbe` (edea), east `ec275ef5` (f7ce), tooling `2e44f94e` (b5dc). Retain all four clean worktrees for ignored atlas/audit evidence.
+- Scope: offline tool and selections; 307 initial parents reduced to 302 after full-map contour verification. No runtime admission. Details and remaining gates: `river-wave3/integration.md`.
+- Preserve primary checkout WIP. Final push and merge receipt is the PR for this branch; do not infer merged status from this registry.
