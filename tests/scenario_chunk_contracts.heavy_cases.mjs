@@ -852,7 +852,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const mainSource = readRepoFile("js", "main.js");
     const benchmarkSource = readRepoFile("ops", "browser-mcp", "editor-performance-benchmark.py");
     const playwrightAppPathsSource = readRepoFile("tests", "e2e", "support", "playwright-app-paths.js");
-    const politicalOwnerDrawSource = extractRendererFunction(politicalPassOwnerSource, "drawPoliticalPass");
+    const politicalOwnerDrawSource = extractRendererFunction(politicalPassOwnerSource, "drawBasePoliticalPass");
     const politicalBackgroundEffectSource = extractRendererFunction(rendererSource, "drawPoliticalPassBackground");
     const politicalFineLoopSource = extractRendererFunction(politicalPartialOwnerSource, "drawPoliticalFineFeatureLoop");
     const transformedPassDiagnosticsOwnerSource = extractRendererFunction(
@@ -1605,7 +1605,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const viewportSource = extractRendererFunction(politicalPartialOwnerSource, "resolvePoliticalPassViewport");
     const packetSource = extractRendererFunction(rendererSource, "buildPoliticalPassWorkerPacket");
     const requestSource = extractRendererFunction(politicalPartialOwnerSource, "requestPoliticalPassWorker");
-    const ownerDrawSource = extractRendererFunction(politicalPassOwnerSource, "drawPoliticalPass");
+    const ownerDrawSource = extractRendererFunction(politicalPassOwnerSource, "drawBasePoliticalPass");
 
     assert.ok(rendererSource.includes("function getTransformBucketSignature("));
     assert.ok(identitySource.includes("const [canvasWidth, canvasHeight] = helper.getLogicalCanvasDimensions();"));

@@ -1,3 +1,5 @@
+import { getRiverPaintRuntime } from "../river_paint/runtime.js";
+import { setRiverPaintState } from "../state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../map_editing_policy.js";
 import { normalizeQuickFillScope } from "../quick_fill_hierarchy.js";
 import {
@@ -150,6 +152,8 @@ function createScenarioLifecycleRuntime({
     ensureSovereigntyState({ force: true });
     runtimeState.parentBordersVisible = false;
     runtimeState.visualOverrides = {};
+    getRiverPaintRuntime(runtimeState).cancel();
+    setRiverPaintState(runtimeState, null);
     runtimeState.sovereignBaseColors = { ...(runtimeState.scenarioFixedOwnerColors || {}) };
 
     runtimeState.activeSovereignCode = runtimeState.mapSemanticMode === "blank"
@@ -267,6 +271,8 @@ function createScenarioLifecycleRuntime({
     runtimeState.sovereigntyByFeatureId = {};
     runtimeState.sovereigntyInitialized = false;
     runtimeState.visualOverrides = {};
+    getRiverPaintRuntime(runtimeState).cancel();
+    setRiverPaintState(runtimeState, null);
     const defaults = syncResolvedDefaultCountryPalette({ overwriteCountryPalette: false });
     runtimeState.sovereignBaseColors = { ...(defaults || runtimeState.resolvedDefaultCountryPalette || defaultCountryPalette) };
 

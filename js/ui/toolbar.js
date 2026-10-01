@@ -1,3 +1,6 @@
+import { createRiverPaintControls } from "./river_paint_controls.js";
+import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
+import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
@@ -24,6 +27,7 @@ import {
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
@@ -1364,6 +1368,15 @@ function initToolbar({ render } = {}) {
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  const riverPaintControls = createRiverPaintControls({
+    state: runtimeState,
+    button: document.getElementById("riverPaintToggleBtn"),
+    statusNode: document.getElementById("riverPaintStatus"),
+    rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
+    render: () => { if (typeof render === "function") render(); },
+    markDirty,
+    announce: (message) => showToast(message),
+  });
   const refreshPaintModeUi = () => {
     runtimeState.paintMode = normalizePaintMode(runtimeState.paintMode);
     runtimeState.ui.politicalEditingExpanded = false;
@@ -1377,6 +1390,7 @@ function initToolbar({ render } = {}) {
     if (paintGranularitySelect) {
       paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     }
+    riverPaintControls.sync();
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
     refreshDynamicBorderStatus();
@@ -2825,7 +2839,10 @@ function initToolbar({ render } = {}) {
         tone: "warning",
       });
       if (!confirmed) return;
-      const featureIds = Object.keys(runtimeState.visualOverrides || {});
+      const featureIds = [...new Set([
+        ...Object.keys(runtimeState.visualOverrides || {}),
+        ...getEditedRiverParentIds(runtimeState.riverPaint),
+      ])];
       const ownerCodes = Array.from(new Set([
         ...Object.keys(runtimeState.sovereignBaseColors || {}),
       ]));
@@ -2835,6 +2852,7 @@ function initToolbar({ render } = {}) {
       });
       runtimeState.colors = {};
       runtimeState.visualOverrides = {};
+      clearAllRiverPaintOverridesState(runtimeState);
       runtimeState.sovereignBaseColors = {};
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();

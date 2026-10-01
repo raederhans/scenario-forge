@@ -1,3 +1,5 @@
+import { collectRiverCellIdsForParents, getRiverPartitionIndex } from "./river_paint/partition_model.js";
+import { restoreRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { coalesceQuickFillGesture } from "./history_quick_fill_gesture.js";
 import { state as runtimeState } from "./state.js";
 import {
@@ -68,6 +70,7 @@ function flushHistoryRender(reason = "history-apply") {
 
 function captureHistoryState({
   featureIds = [],
+  riverCellIds = [],
   waterRegionIds = [],
   specialRegionIds = [],
   ownerCodes = [],
@@ -88,6 +91,9 @@ function captureHistoryState({
   if (ids.length) {
     snapshot.visualOverrides = captureEntries(runtimeState.visualOverrides || {}, ids);
   }
+
+  const riverIds = uniqueKeys([...riverCellIds, ...collectRiverCellIdsForParents(runtimeState.riverPaint, ids)]);
+  if (riverIds.length) snapshot.riverPaintOverrides = captureEntries(runtimeState.riverPaint?.overrides || {}, riverIds);
 
   if (waterIds.length) {
     snapshot.waterRegionOverrides = captureEntries(runtimeState.waterRegionOverrides || {}, waterIds);
@@ -220,9 +226,13 @@ function getFeatureColorHistoryIds(entry) {
   for (const snapshot of [entry?.before, entry?.after]) {
     if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) return null;
     for (const [key, values] of Object.entries(snapshot)) {
-      if (key !== "visualOverrides") return null;
+      if (key !== "visualOverrides" && key !== "riverPaintOverrides") return null;
       if (!values || typeof values !== "object" || Array.isArray(values)) return null;
-      Object.keys(values).forEach((id) => ids.add(id));
+      for (const id of Object.keys(values)) {
+        const parent = key === "riverPaintOverrides" ? getRiverPartitionIndex(runtimeState.riverPaint?.pack)?.cells.get(id)?.parentId : id;
+        if (!parent) return null;
+        ids.add(parent);
+      }
     }
   }
   return ids.size ? Array.from(ids) : null;
@@ -320,6 +330,7 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   runtimeState.sovereignBaseColors = runtimeState.sovereignBaseColors || {};
   runtimeState.countryPalette = runtimeState.countryPalette || {};
 
+  restoreRiverPaintOverridesState(runtimeState, snapshot.riverPaintOverrides);
   applyEntries(runtimeState.visualOverrides, snapshot.visualOverrides);
   applyEntries(runtimeState.waterRegionOverrides, snapshot.waterRegionOverrides);
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);

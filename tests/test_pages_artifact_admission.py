@@ -265,11 +265,14 @@ from tests import test_ui_rework_plan03_support_transport_contract as plan03
 roots = {
     module.PAGES_DIST_ROOT
     for module in (
-        scenario_text, selection, shell_builder, frontend, i18n,
+        scenario_text, shell_builder, frontend, i18n,
         startup, support, toolbar, plan02, plan03,
     )
 }
 assert len(roots) == 1
+# Selection ownership now checks source boundaries, not a Pages artifact.
+assert selection.DEV_WORKSPACE_JS == selection.REPO_ROOT / "js" / "ui" / "dev_workspace.js"
+assert selection.SELECTION_OWNERSHIP_CONTROLLER_JS == selection.REPO_ROOT / "js" / "ui" / "dev_workspace" / "selection_ownership_controller.js"
 print(roots.pop())
 """,
             ],

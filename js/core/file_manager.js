@@ -1,3 +1,5 @@
+import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
+import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
@@ -602,7 +604,8 @@ class FileManager {
     // export 的职责是把当前 runtimeState 收敛成稳定 schema。
     // 这里宁可集中做一次 normalize，也不要让读取方承担多套历史字段和 UI 派生状态。
     const payload = {
-      schemaVersion: 22,
+      schemaVersion: appState.riverPaint?.pack ? 23 : 22,
+      ...(appState.riverPaint?.pack ? { riverPaint: normalizeRiverPaintState(appState.riverPaint) } : {}),
       sovereignBaseColors: appState.sovereignBaseColors || {},
       visualOverrides: appState.visualOverrides || {},
       waterRegionOverrides: appState.waterRegionOverrides || {},
@@ -776,6 +779,7 @@ class FileManager {
       throw new Error("Invalid project file");
     }
     let data = migrateImportedProjectData(rawData);
+    if (data.riverPaint != null) data.riverPaint = normalizeRiverPaintState(data.riverPaint);
 
     // import 是旧 schema、缺省字段和 UI/场景派生状态重新归一化的唯一入口。
     // 回调拿到的必须已经是可直接进入运行时的稳定形态，避免把兼容判断分散到各个调用点。
@@ -967,6 +971,13 @@ class FileManager {
     const { notifySuccess, notifyError } = resolveProjectImportObservers(observers);
     try {
       const data = FileManager.normalizeImportedProjectData(payload);
+      if (data.riverPaint?.pack) {
+        await verifyApprovedRiverPack(data.riverPaint.pack);
+        if (data.scenario?.id !== data.riverPaint.pack.sceneId
+          || data.scenario?.baselineHash !== data.riverPaint.pack.source.baselineHash) {
+          throw new Error("Saved river partitions do not match the project scenario baseline");
+        }
+      }
       let importResult = null;
       if (typeof callback === "function") {
         // callback 负责把归一化后的项目状态真正接到运行时；

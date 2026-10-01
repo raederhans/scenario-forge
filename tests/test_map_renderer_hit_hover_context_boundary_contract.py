@@ -94,7 +94,7 @@ class MapRendererHitHoverContextBoundaryContractTest(unittest.TestCase):
 
         for token in [
             "function hasHoverIds() {",
-            "setHoveredFeatureIdsState(state, { landId, waterId, specialId });",
+            "setHoveredFeatureIdsState(state, { landId, riverCellId, waterId, specialId });",
             "const throttleMs = Number(state.MOUSE_THROTTLE_MS || 0);",
             "const lastMouseMoveTime = Number(state.lastMouseMoveTime || 0);",
             "setLastMouseMoveTimeState(state, now);",

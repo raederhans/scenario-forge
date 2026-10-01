@@ -582,3 +582,24 @@ test("owner source stays import-free and excludes renderer state, DOM, D3, canva
     assert.equal(source.includes(forbidden), false, `owner should exclude ${forbidden}`);
   }
 });
+
+
+test("partition surfaces draw after fine/worker base passes, never on HGO skip", () => {
+  for (const options of [{ workerEnabled: false }, { bitmapResult: {}, bitmapDrawn: true }]) {
+    const calls = [];
+    const { owner, events } = createHarness({ ...options, overrides: { effects: {
+      drawPoliticalPartitions: k => calls.push({ k, previous: events.map(eventName) }),
+    } } });
+    const result = owner.drawPoliticalPass(3);
+    assert.equal(result.committed, true);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].k, 3);
+    assert.equal(calls[0].previous.at(-1), 'result');
+  }
+  let called = false;
+  const { owner } = createHarness({ hgoReady: true, overrides: { effects: {
+    drawPoliticalPartitions: () => { called = true; },
+  } } });
+  assert.equal(owner.drawPoliticalPass(2), undefined);
+  assert.equal(called, false);
+});

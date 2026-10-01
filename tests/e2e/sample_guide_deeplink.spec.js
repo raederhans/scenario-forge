@@ -3,6 +3,7 @@ const {
   gotoApp,
   waitForShellReady,
   waitForScenarioApplyIdle,
+  waitForProjectImportCompletion,
   readSmokeFailureSnapshot,
   writeFailureContextArtifact,
 } = require("./support/playwright-app");
@@ -364,7 +365,13 @@ test("@golden-demo sample guide card opens export from the TNO sample deeplink",
     await waitForShellReady(page, { timeout: 120000, requireCanvas: true });
     await expect(page.locator("#scenarioGuidePopover")).toBeVisible({ timeout: 30000 });
 
-    await waitForScenarioApplyIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
+    // A fresh navigation starts with no imports. Default TNO startup can be idle
+    // before the sample import begins; wait for that actual project operation.
+    await waitForProjectImportCompletion(page, {
+      initialImportStartCount: 0,
+      initialImportApplyCount: 0,
+      expectedFileName: "tno-1962-atlantropa-briefing.project.json",
+    }, { timeout: 120000 });
     await expect.poll(() => readSampleDeeplinkState(page), { timeout: 30000 }).toMatchObject({
       activeScenarioId: "tno_1962",
       status: "success",

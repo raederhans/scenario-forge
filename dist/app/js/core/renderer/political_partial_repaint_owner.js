@@ -526,6 +526,7 @@ export function createPoliticalPartialRepaintOwner({
             transform,
             metricsCollector: partialFeatureMetrics,
           });
+          effects.drawPartitionForParent?.(feature, transform.k);
         });
       });
     } finally {

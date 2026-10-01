@@ -1,3 +1,4 @@
+import { createRiverPaintEditorOwner } from "../js/core/river_paint/editor_owner.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import vm from "node:vm";
@@ -24,6 +25,7 @@ function fixture() {
   const calls = [];
   let ids = ["a", "b"];
   const context = vm.createContext({
+    getRiverPaintEditorOwner: () => createRiverPaintEditorOwner({ state: runtime }),
     runtimeState: runtime, brushSession: session, LAND_FILL_COLOR: "#eeeeee",
     getFeatureCountryCodeNormalized: () => "DE", requestLeafDetailPromotion: () => true,
     resolveInteractionTargetIds: () => ids, getSafeCanvasColor: (color) => color,

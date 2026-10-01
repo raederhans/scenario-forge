@@ -2,7 +2,7 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 671
+- entries: 672
 
 ## Counts by role
 
@@ -46,6 +46,7 @@
 | quick_fill_china_reference | 1 |
 | quick_fill_prefecture_crosswalk | 1 |
 | releasable_catalog | 1 |
+| river_partitions | 1 |
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
 | scenario_registry | 1 |
@@ -134,6 +135,7 @@
 | manifest_output:quick_fill/china_prefecture_crosswalk.v1.json | data/quick_fill/china_prefecture_crosswalk.v1.json | quick_fill_prefecture_crosswalk | json | json | schema://quick_fill/prefecture_crosswalk/v1 | data/manifest.json::outputs::quick_fill/china_prefecture_crosswalk.v1.json::sha256 | default | quick_fill_hierarchy |  |
 | manifest_output:quick_fill/reference/china-pca-2017.json | data/quick_fill/reference/china-pca-2017.json | quick_fill_china_reference | json | json | schema://quick_fill/china_reference/v1 | data/manifest.json::outputs::quick_fill/reference/china-pca-2017.json::sha256 | default | quick_fill_hierarchy | china_pca_2017_quick_fill_reference |
 | releasable_catalog | data/releasables/hoi4_vanilla.internal.phase1.catalog.json | releasable_catalog | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.releasable_catalog |  |
+| river_partitions:modern_world_pilot | data/river_partitions/modern_world_pilot.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_pilot |  |
 | ru_city_overrides | data/ru_city_overrides.geojson | city_overrides | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.ru_city_overrides |  |
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |
 | scenario_registry | data/scenarios/index.json | scenario_registry | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.scenario_registry |  |

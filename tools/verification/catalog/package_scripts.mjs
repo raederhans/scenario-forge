@@ -357,5 +357,7 @@ export const PACKAGE_SCRIPTS = {
     "test:python:quick-fill": "python -m unittest tests.test_quick_fill_hierarchy -v",
     "audit:quick-fill": "node tools/audit_quick_fill.mjs",
     "build:quick-fill": "python tools/build_quick_fill_hierarchy.py && python tools/register_quick_fill_assets.py && python tools/build_data_catalog.py",
-    "verify:quick-fill-data": "python tools/build_quick_fill_hierarchy.py --check && python -m unittest tests.test_quick_fill_hierarchy"
-  };
+    "verify:quick-fill-data": "python tools/build_quick_fill_hierarchy.py --check && python -m unittest tests.test_quick_fill_hierarchy",
+    "test:node:river-paint": "node --test tests/river_paint_history_import.test.mjs tests/river_paint_model.test.mjs tests/river_paint_runtime.test.mjs tests/river_paint_ui_render.test.mjs",
+    "test:python:river-partitions": "npm run python -- -m unittest tests.test_river_partitions -q"
+};
