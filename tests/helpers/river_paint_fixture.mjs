@@ -8,6 +8,7 @@ export const rectangle = (x0, y0, x1, y1) => ({ type: 'Polygon',
 export const feature = (id, geometry) => ({ type: 'Feature', id,
   properties: { id, cntr_code: 'FR', name: id }, geometry });
 export const realPilot = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_pilot.json', import.meta.url)));
+export const realWave2 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave2.json', import.meta.url)));
 export async function makeFixture({ installed = true, baseline = 'fixture-baseline' } = {}) {
   const parent = rectangle(0, 0, 2, 2), neighbor = rectangle(2, 0, 3, 2);
   const neighborNoded = { type: 'Polygon', coordinates: [[[2, 0], [2, 1], [2, 2], [3, 2], [3, 0], [2, 0]]] };

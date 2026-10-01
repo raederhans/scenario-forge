@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, d3, realPilot, captureCells, feature } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, d3, realPilot, realWave2, captureCells, feature } from './helpers/river_paint_fixture.mjs';
 import { createRiverCellPicker } from '../js/ui/river_cell_picker.js';
 import { createRiverPaintEditorOwner } from '../js/core/river_paint/editor_owner.js';
 import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
@@ -26,9 +26,10 @@ function pickerNodes() {
   return Object.fromEntries(['panel', 'select', 'preview', 'applyButton', 'title', 'closeButton', 'caption'].map(key => [key, element()]));
 }
 
-test('all 31 real cells are selectable, previewed and painted independently through the editor owner', async () => {
+for (const [count, readPack] of [[31, realPilot], [43, realWave2]])
+test(`all ${count} real cells are selectable, previewed and painted independently through the editor owner`, async () => {
   const { state } = await makeFixture();
-  state.riverPaint = normalizeRiverPaintState({ schemaVersion: 1, pack: realPilot(), editMode: true });
+  state.riverPaint = normalizeRiverPaintState({ schemaVersion: 1, pack: readPack(), editMode: true });
   const pack = state.riverPaint.pack;
   state.scenarioBaselineHash = pack.source.baselineHash;
   state.activeScenarioManifest = { version: 2, generated_at: '2026-09-27T13:55:57.885587+00:00' };
@@ -56,12 +57,12 @@ test('all 31 real cells are selectable, previewed and painted independently thro
       assert.deepEqual(Object.keys(entries.at(-1).before.riverPaintOverrides), [cell.id]);
     }
   }
-  assert.equal(entries.length, 31);
+  assert.equal(entries.length, count);
   state.currentTool = 'eraser'; nodes.applyButton.listeners.click();
-  assert.equal(Object.keys(state.riverPaint.overrides).length, 30);
+  assert.equal(Object.keys(state.riverPaint.overrides).length, count - 1);
   state.riverPaint.editMode = false; picker.sync();
   assert.equal(nodes.panel.hidden, true); nodes.applyButton.listeners.click();
-  assert.equal(entries.length, 32);
+  assert.equal(entries.length, count + 1);
   picker.dispose();
 });
 

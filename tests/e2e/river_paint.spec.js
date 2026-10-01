@@ -87,7 +87,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   timings.roundtripMs = Date.now() - startedAt;
   await testInfo.attach('river-phase-timings.json', { body: JSON.stringify(timings, null, 2), contentType: 'application/json' });
   await testInfo.attach('river-map-roundtrip.json', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
-  expect(result.parentCount).toBe(6); expect(result.cellCount).toBe(31);
+  expect(result.parentCount).toBe(12); expect(result.cellCount).toBe(43);
   expect(result.historyCount).toBe(2); expect(result.schema).toBe(23);
   for (const key of ['painted', 'undone', 'redone', 'noChildLandIds', 'referenceUnchanged', 'exportedCanvas', 'reloadedPaint']) expect(result[key], key).toBe(true);
   expect(['committed', 'committed-with-warnings']).toContain(result.importStatus);
@@ -97,7 +97,53 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   await page.screenshot({ path: testInfo.outputPath('river-pilot-map.png') });
 });
 
-test('native canvas renders all six pilot parents and PNG pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
+test('wave 2 picker reaches every cell and actual toolbar undo/redo preserves each transaction', async ({ page }, testInfo) => {
+  // JUSTIFY: 43 real picker edits plus 86 toolbar Undo/Redo clicks render the map; measured 84-108s locally including startup.
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
+  await waitForAppInteractive(page);
+  await page.locator('#riverPaintToggleBtn').click();
+  await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
+  await waitForRenderIdle(page);
+  await page.locator('#toolFillBtn').click();
+  const parents = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+  expect(parents).toHaveLength(12);
+  const readPaint = () => page.evaluate(async () => {
+    const { state } = await import(new URL('./js/core/state.js', location.href));
+    return { ...state.riverPaint.overrides };
+  });
+  const painted = [];
+  for (const parent of parents) {
+    await page.locator('#riverPaintLocationSelect').selectOption(parent);
+    await expect(page.locator('#riverCellPicker')).toBeVisible();
+    const cells = await page.locator('#riverCellSelect option').evaluateAll(options => options.map(o => o.value));
+    for (const cell of cells) {
+      await page.locator('#riverCellSelect').selectOption(cell);
+      expect(Object.keys(await readPaint())).toHaveLength(painted.length);
+      await page.locator('#riverCellApplyBtn').click();
+      painted.push(cell);
+      expect(Object.keys(await readPaint()).sort()).toEqual([...painted].sort());
+    }
+  }
+  expect(painted).toHaveLength(43);
+  const saved = await readPaint();
+  await page.screenshot({ path: testInfo.outputPath('wave2-picker.png') });
+  for (let count = 42; count >= 0; count--) {
+    await page.locator('#undoBtn').click();
+    expect(Object.keys(await readPaint())).toHaveLength(count);
+  }
+  for (let count = 1; count <= 43; count++) {
+    await page.locator('#redoBtn').click();
+    expect(Object.keys(await readPaint())).toHaveLength(count);
+  }
+  expect(await readPaint()).toEqual(saved);
+  await page.locator('#riverPaintToggleBtn').click();
+  await expect(page.locator('#riverCellPicker')).toBeHidden();
+  expect(await readPaint()).toEqual(saved);
+});
+
+test('native canvas renders all twelve pilot parents and PNG pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   await gotoApp(page, '/?ui_shell=1', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
@@ -147,8 +193,8 @@ test('native canvas renders all six pilot parents and PNG pixels follow state af
       return { parentId: parent.parentId, initial, colors, samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
     });
   });
-  expect(result).toHaveLength(6);
-  expect(result.reduce((n, parent) => n + parent.colors.length, 0)).toBe(31);
+  expect(result).toHaveLength(12);
+  expect(result.reduce((n, parent) => n + parent.colors.length, 0)).toBe(43);
   for (const parent of result) {
     expect(parent.initial, parent.parentId).toEqual(parent.colors);
     expect(parent.samePng, parent.parentId).toBe(true);

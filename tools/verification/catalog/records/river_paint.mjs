@@ -15,7 +15,7 @@ export function createRiverPaintRecords(existingRecords) {
       'js/core/map_renderer/click_selection_transaction_owner.js', 'js/core/map_renderer/map_hover_interaction_owner.js',
       'js/core/renderer/transient_overlay_render_owner.js', 'js/core/renderer/fill_target_policy.js',
       'tests/river_paint_history_import.test.mjs', 'tests/river_paint_model.test.mjs', 'tests/river_paint_runtime.test.mjs', 'tests/river_paint_ui_render.test.mjs', 'tests/helpers/river_paint_fixture.mjs',
-      'data/river_partitions/modern_world_pilot.json', 'tools/verification/catalog/records/river_paint.mjs'] },
+      'data/river_partitions/modern_world_pilot.json', 'data/river_partitions/modern_world_wave2.json', 'tools/verification/catalog/records/river_paint.mjs'] },
   { ...shared, id: 'local:river-paint:generator', commandRef: 'python -m unittest tests.test_river_partitions -q', selectorOrder: start + 1,
     ownerHints: ['geo-contract'], domains: ['geo-contract'],
     sourceRefs: ['tools/build_river_partitions.py', 'tests/test_river_partitions.py', 'tests/fixtures/river_paint/stendal.json',

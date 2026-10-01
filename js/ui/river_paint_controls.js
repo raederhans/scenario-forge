@@ -3,6 +3,12 @@ import { loadRiverPaintPilot } from '../core/river_paint/pilot_loader.js';
 import { RIVER_PAINT_PILOT } from '../core/river_paint/pilot_manifest.js';
 
 const PILOT_LOCATIONS = [
+  ['PL_POW_1661', 'Opole · Oder', '奥波莱 · 奥德河'],
+  ['PL_POW_0264', 'Wrocław · Oder', '弗罗茨瓦夫 · 奥德河'],
+  ['CN_CITY_17275852B1441354643708', 'Luzhou · Yangtze', '泸州 · 长江'],
+  ['CN_CITY_17275852B17052950603257', 'Yichang · Yangtze', '宜昌 · 长江'],
+  ['CN_CITY_17275852B84192730453130', 'Lanzhou · Yellow River', '兰州 · 黄河'],
+  ['CN_CITY_17275852B72607841305823', 'Wuhai · Yellow River', '乌海 · 黄河'],
   ['FR_ARR_75001', 'Paris · Seine', '巴黎 · 塞纳河'],
   ['FR_ARR_76003', 'Rouen · Seine', '鲁昂 · 塞纳河'],
   ['DEE0D', 'Stendal · Elbe', '施滕达尔 · 易北河'],
@@ -35,8 +41,8 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const description = !supported
       ? (zh() ? '试点仅支持 Modern World。' : 'Pilot available in Modern World only.')
       : info.error ? (zh() ? `沿河分区未就绪：${info.error}` : `River partitions unavailable: ${info.error}`)
-      : (zh() ? '局部试点：巴黎、鲁昂、Stendal、Jerichower Land、Dubna、Yaroslavl。关闭工具不会清除已填颜色。'
-        : 'Local pilot: Paris, Rouen, Stendal, Jerichower Land, Dubna and Yaroslavl. Turning off the tool preserves paint.');
+      : (zh() ? '选择已加载的沿河试点。旧项目保留原试点范围；关闭工具不会清除已填颜色。'
+        : 'Choose a loaded river pilot. Existing projects retain their original coverage. Turning off the tool preserves paint.');
     button.title = description;
     button.setAttribute('aria-label', `${label}. ${description}`);
     if (statusNode) statusNode.textContent = description;

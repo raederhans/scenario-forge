@@ -1,6 +1,12 @@
 # Worktree Registry
 
+## 2026-10-01 第二批沿河地点准入
+
+`codex/river-wave2-admission` 接入 12 地、43 分区的新包，保留旧包认证及旧项目范围。新增奥波莱、弗罗茨瓦夫、泸州、宜昌、兰州、乌海；不改变原行政 ID。39 项专项测试、19 项数据目录检查、真实页面全部分区填色及 43 次撤销/重做、像素和项目导入导出验证通过。Pages 构建和新资产发布检查通过，产物保留在独立工作树 `.runtime/reports/generated/river-next/pages-wave2/`。最终提交、PR 检查及合并状态以 Git / GitHub 回执为准。主目录及其他工作树继续保持原所有权。
+
 ## 2026-10-01 沿河试点定位与小分区操作
+
+PR [#192](https://github.com/raederhans/scenario-forge/pull/192) 全部检查通过，于 2026-10-01 合并为 `81532208`；独立工作树已快进同步。后续分支为 `codex/river-wave2-admission`，已生成奥德河、长江、黄河六个新增地点的候选包：合计 12 地、43 分区，原六地记录保持一致，尚未启用新包。范围、复现命令、兼容边界与验收要求见 [下一批准入记录](river-paint-partitions-20260929/wave2-admission.md)。工作树继续保留候选审计及图像证据。
 
 `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 在 `codex/river-pilot-navigation` 上交付六地定位、分区列表及放大预览，提交 `1cec53b7`、`9bb07a53`。用户已授权推送和合并，然后开始下一批河段；本轮整合 `origin/main@e25b89ca` 的国家标签与地理修复，保留主目录及其他工作树改动。31 个分区的真实界面填色、连续撤销和重做证据保留在 `.runtime/browser/river-pilot-qa/`。该工作树继续用于合并后同步和下一批数据准入；最终远端状态以 PR 回执为准。
 

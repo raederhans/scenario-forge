@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, realPilot, d3 } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, rectangle, realPilot, realWave2, d3 } from './helpers/river_paint_fixture.mjs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState, verifyRiverPartitionFingerprints,
   getRiverParentCompatibility, getRiverPartitionIndex, getEditedRiverParentIds } from '../js/core/river_paint/partition_model.js';
 import { canonicalRiverGeometry, riverGeometryFingerprint } from '../js/core/river_paint/geometry_identity.js';
@@ -28,6 +28,19 @@ test('normalization owns immutable geometry without freezing the caller input', 
   assert.equal(Object.isFrozen(normalized.parents[0].cells[0].geometry.coordinates[0]), true);
   assert.equal(normalizeRiverPartitionPack(normalized), normalized);
   assert.equal(getRiverPartitionIndex(normalized), getRiverPartitionIndex(normalized));
+});
+
+test('wave 2 authenticates 43 cells while preserving all original parent records', async () => {
+  const old = await verifyApprovedRiverPack(realPilot());
+  const pack = await verifyApprovedRiverPack(realWave2());
+  assert.equal(pack.parents.length, 12); assert.equal(pack.support.length, 18);
+  assert.equal(pack.parents.reduce((n, p) => n + p.cells.length, 0), 43);
+  await verifyRiverPartitionFingerprints(pack);
+  for (const parent of old.parents) assert.deepEqual(pack.parents.find(p => p.parentId === parent.parentId), parent);
+  const forged = realWave2(); forged.source.riverNames = ['forged'];
+  await assert.rejects(verifyApprovedRiverPack(forged), /integrity/);
+  const swapped = realWave2(); swapped.packId = old.packId;
+  await assert.rejects(verifyApprovedRiverPack(swapped), /integrity/);
 });
 
 test('river action owns imported paint and rejects invalid edits without writes', async () => {
@@ -79,10 +92,10 @@ test('normalization cannot authenticate a forged area-preserving geometry', asyn
 test('approved loader uses the catalog URL and propagates abort and HTTP failure', async () => {
   const signal = new AbortController().signal;
   const pack = await loadRiverPaintPilot({ signal, fetchImpl: async (url, options) => {
-    assert.equal(url, 'data/river_partitions/modern_world_pilot.json'); assert.equal(options.signal, signal);
-    return { ok: true, text: async () => JSON.stringify(realPilot()) };
+    assert.equal(url, 'data/river_partitions/modern_world_wave2.json'); assert.equal(options.signal, signal);
+    return { ok: true, text: async () => JSON.stringify(realWave2()) };
   } });
-  assert.equal(pack.parents.length, 6);
+  assert.equal(pack.parents.length, 12);
   await assert.rejects(loadRiverPaintPilot({ fetchImpl: async () => ({ ok: false, status: 503 }) }), /503/);
   await assert.rejects(loadRiverPaintPilot({ fetchImpl: async () => ({ ok: true, text: async () => 'x'.repeat(2000001) }) }), /budget/);
 });
