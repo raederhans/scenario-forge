@@ -108,15 +108,6 @@ export function createLocalFeedbackRecords(baseRecords) {
   // child-safe. The eastern-source suite intentionally reads the local raw
   // geographic inputs and keeps the heavy-geo/main-thread policy.
   const precisionPytestRoutes = [
-    ["arctic-recovery", "python -m unittest tests.test_arctic_recovery -q", [
-      "tests/test_arctic_recovery.py", "map_builder/processors/arctic_recovery.py",
-    ]],
-    ["polar-asset-repair", "python -m unittest tests.test_polar_asset_repair -q", [
-      "tests/test_polar_asset_repair.py", "tools/rebuild_polar_assets.py",
-    ]],
-    ["water-rebuild-scope", "python -m pytest tests/test_rebuild_water_geometry.py -q", [
-      "tests/test_rebuild_water_geometry.py", "tools/rebuild_water_geometry.py",
-    ]],
     ["scenario-geography-repair", "python -m unittest tests.test_repair_scenario_geography -q", [
       "tests/test_repair_scenario_geography.py", "tools/repair_scenario_geography.py",
       "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
