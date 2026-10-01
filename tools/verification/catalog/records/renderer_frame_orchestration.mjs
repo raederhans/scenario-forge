@@ -1,6 +1,35 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const RENDERER_FRAME_ORCHESTRATION_RECORDS = [
   {
+    "id": "direct:country-label-contracts",
+    "commandRef": "node --test tests/country_label_source_behavior.test.mjs tests/country_label_layout_behavior.test.mjs tests/country_label_render_owner_behavior.test.mjs tests/country_label_style_behavior.test.mjs",
+    "sourceRefs": [
+      "js/core/renderer/country_label_source.js",
+      "js/core/renderer/country_label_geometry.js",
+      "js/core/renderer/country_label_layout.js",
+      "js/core/renderer/country_label_render_owner.js",
+      "js/core/renderer/country_label_layout_worker.js",
+      "js/workers/country_label_geometry.worker.js",
+      "tests/country_label_source_behavior.test.mjs",
+      "tests/country_label_layout_behavior.test.mjs",
+      "tests/country_label_render_owner_behavior.test.mjs",
+      "tests/country_label_style_behavior.test.mjs"
+    ],
+    "ownerHints": ["renderer-runtime"],
+    "domains": ["renderer-runtime"],
+    "tiers": ["contract"],
+    "cost": "fast",
+    "resourceLocks": [],
+    "executionOwners": ["child-safe"],
+    "profiles": ["pr-fast"],
+    "platforms": ["all"],
+    "entrypointPolicyIndex": 5,
+    "verificationOrder": null,
+    "selectorOrder": 391,
+    "verification": null,
+    "selector": {}
+  },
+  {
     "id": "node:test:node:cached-pass-compositor-owner",
     "commandRef": "test:node:cached-pass-compositor-owner",
     "sourceRefs": [
