@@ -32,6 +32,9 @@ export function createBrushInteractionSessionOwner(runtimeState, {
       startX: Number(event?.clientX || 0),
       startY: Number(event?.clientY || 0),
       visitedFeatureIds: new Set(),
+      visitedRiverCellIds: new Set(),
+      affectedRiverCellIds: new Set(),
+      riverParentIds: new Set(),
       visitedWaterRegionIds: new Set(),
       visitedSpecialRegionIds: new Set(),
       affectedFeatureIds: new Set(),
@@ -57,7 +60,8 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     const featureIds = Array.from(current.affectedFeatureIds);
     const waterRegionIds = Array.from(current.affectedWaterRegionIds);
     const specialRegionIds = Array.from(current.affectedSpecialRegionIds);
-    const after = captureHistoryState({ featureIds, waterRegionIds, specialRegionIds });
+    const riverCellIds = Array.from(current.affectedRiverCellIds || []);
+    const after = captureHistoryState({ featureIds, waterRegionIds, specialRegionIds, ...(riverCellIds.length ? { riverCellIds } : {}) });
     pushHistoryEntry({
       kind: runtimeState.currentTool === "eraser" ? "brush-erase" : "brush-fill",
       before: current.before,
@@ -71,7 +75,7 @@ export function createBrushInteractionSessionOwner(runtimeState, {
     }
     markDirty("brush-stroke");
     refreshSidebarAfterPaint({
-      featureIds,
+      featureIds: [...new Set([...featureIds, ...(current.riverParentIds || [])])],
       waterRegionIds,
       specialRegionIds,
     });

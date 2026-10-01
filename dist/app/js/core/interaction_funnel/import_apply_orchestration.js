@@ -1,3 +1,4 @@
+import { isRiverPaintSourceCompatible } from '../river_paint/pilot_manifest.js';
 import { restoreProjectImportFields as restoreScenarioPresentationImportFields } from "../state/actions/scenario_presentation_actions.js";
 import { restoreProjectImportFields as restoreUiVisibilityImportFields } from "../state/actions/ui_visibility_actions.js";
 import { restoreProjectImportFields as restoreAppearancePresetImportFields } from "../state/actions/appearance_preset_actions.js";
@@ -66,6 +67,11 @@ export async function prepareImportedProjectState({
     scenarioCountriesByTag: preparedScenario.staged.countryMap,
   } : { activeScenarioId: "", activeScenarioManifest: null, scenarioBaselineOwnersByFeatureId: {},
     scenarioCountriesByTag: {}, scenarioReleasableIndex: null };
+  if (data.riverPaint?.pack && (data.riverPaint.pack.sceneId !== scenarioState.activeScenarioId
+    || data.riverPaint.pack.source.baselineHash !== scenarioState.scenarioBaselineHash
+    || !isRiverPaintSourceCompatible(data.riverPaint.pack, scenarioState.activeScenarioManifest))) {
+    throw new Error("River partitions require their exact source baseline and geometry build; migration is not automatic");
+  }
   debugState.importPhase = "migration";
   const scenarioImportValidFeatureIds = getScenarioImportValidFeatureIds(state, preparedScenario);
   let migrationSummary = null;

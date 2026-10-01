@@ -150,6 +150,13 @@
       ],
       "owner": "XIK"
     },
+    "GF_PRIMARY": {
+      "controller": "GY",
+      "cores": [
+        "GY"
+      ],
+      "owner": "GY"
+    },
     "NO_PRIMARY_GAP_15": {
       "controller": "RKNO",
       "cores": [

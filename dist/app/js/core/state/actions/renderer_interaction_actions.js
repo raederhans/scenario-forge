@@ -101,6 +101,7 @@ export function setInteractionInfrastructureStateFields(
 export function clearClickHoveredIdState(target) {
   assertStateTarget(target);
   target.hoveredId = null;
+  target.hoveredRiverCellId = null;
 }
 
 export function setClickHoverOverlayDirtyState(target, dirty) {
@@ -133,12 +134,14 @@ export function setHoveredFeatureIdsState(
   target,
   {
     landId = null,
+    riverCellId = null,
     waterId = null,
     specialId = null,
   } = {},
 ) {
   assertStateTarget(target);
   target.hoveredId = landId;
+  target.hoveredRiverCellId = landId ? riverCellId : null;
   setScenarioHoverRegionIdsState(target, { waterId, specialId });
 }
 

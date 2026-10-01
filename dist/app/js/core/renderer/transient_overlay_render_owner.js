@@ -14,6 +14,7 @@ export function createTransientOverlayRenderOwner(runtimeState, {
   getActiveFacilityHighlightEntry,
   buildFacilityEntryKey,
   waterHighlightDisplay = createWaterHighlightDisplay(),
+  getRiverCellFeature = () => null,
 }) {
   function renderSpecialZoneEditorOverlay() {
     if (!rendererSurfaceHost.getSpecialZoneEditorGroup() || !rendererSurfaceHost.getPathSvg()) return;
@@ -107,11 +108,13 @@ export function createTransientOverlayRenderOwner(runtimeState, {
       return;
     }
 
+    const riverCell = runtimeState.hoveredRiverCellId ? getRiverCellFeature(runtimeState.hoveredRiverCellId) : null;
+    const riverHover = riverCell?.properties?.__riverParentId === runtimeState.hoveredId ? riverCell : null;
     const feature = runtimeState.hoveredSpecialRegionId
       ? runtimeState.specialRegionsById.get(runtimeState.hoveredSpecialRegionId)
       : runtimeState.hoveredWaterRegionId
         ? runtimeState.waterRegionsById.get(runtimeState.hoveredWaterRegionId)
-        : (runtimeState.hoveredId ? runtimeState.landIndex.get(runtimeState.hoveredId) : null);
+        : (riverHover || (runtimeState.hoveredId ? runtimeState.landIndex.get(runtimeState.hoveredId) : null));
     const data = feature && (
       (!runtimeState.hoveredSpecialRegionId || isSpecialRegionEnabled(feature))
       && (!runtimeState.hoveredWaterRegionId || isWaterRegionEnabled(feature))

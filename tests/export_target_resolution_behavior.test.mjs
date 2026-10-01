@@ -202,6 +202,7 @@ for (const pixelRatio of [null, 2]) {
     const context = vm.createContext({
       ensureScenarioPoliticalDetailForExport: async () => events.push("detail-ready"),
       ensurePaintContoursReady: async () => events.push("contours-ready"),
+      ensureCountryLabelsReadyForExport: async () => events.push("labels-ready"),
       resolveExportPassSequence: () => ["background", "labels"],
       RENDER_PASS_NAMES: ["background", "labels"],
       SVG_ANNOTATION_VIEWPORT_SELECTOR: ".annotation-layer",
@@ -218,7 +219,7 @@ for (const pixelRatio of [null, 2]) {
     assert.equal(h.allocatedCanvases(), 1);
     assert.equal(result.width, pixelRatio === null ? 100 : 200);
     assert.deepEqual(result.overlays, [".annotation-layer", ".special-zones-layer"]);
-    assert.deepEqual(events, ["detail-ready", "contours-ready"]);
+    assert.deepEqual(events, ["detail-ready", "contours-ready", "labels-ready"]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.visibleCache.canvases.background.overlays, undefined);
     const rasterOnly = await context.buildComposite({ textVisibility: {} }, dimensions);
