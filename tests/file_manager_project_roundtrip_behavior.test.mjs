@@ -451,6 +451,16 @@ test("project roundtrip preserves lake opt-in and old projects default to displa
   }
 });
 
+test("project roundtrip preserves country label visibility", () => {
+  for (const enabled of [false, true]) {
+    const payload = FileManager.buildProjectPayload({ styleConfig: { countryLabels: { enabled } } });
+    const imported = FileManager.normalizeImportedProjectData(JSON.parse(JSON.stringify(payload)));
+    const target = { styleConfig: createDefaultStyleConfig() };
+    restoreImportedStyleConfigState(target, imported.styleConfig);
+    assert.equal(target.styleConfig.countryLabels.enabled, enabled);
+  }
+});
+
 test("project roundtrip retains display quality and political border choices with safe legacy defaults", () => {
   for (const quality of ["performance", "balanced", "high"]) {
     const payload = FileManager.buildProjectPayload({ styleConfig: {

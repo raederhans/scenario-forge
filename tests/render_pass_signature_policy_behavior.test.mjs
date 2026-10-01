@@ -50,6 +50,15 @@ const invalidationCases = [
   ["borders", "sovereigntyRevision"],
 ];
 
+test("country label visibility invalidates labels without invalidating political fill", () => {
+  const { state, policy } = createHarness();
+  const labels = policy.getRenderPassSignature("labels");
+  const political = policy.getRenderPassSignature("political");
+  state.styleConfig.countryLabels = { enabled: false };
+  assert.notEqual(policy.getRenderPassSignature("labels"), labels);
+  assert.equal(policy.getRenderPassSignature("political"), political);
+});
+
 test('a political border source publication invalidates only the border signature', () => {
   let revision=0;
   const {policy}=createHarness({getPoliticalBorderRevision:()=>revision});

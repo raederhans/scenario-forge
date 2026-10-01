@@ -649,6 +649,7 @@ class FileManager {
         ocean: appState.styleConfig?.ocean || null,
         lakes: normalizeLakeStyleConfig(appState.styleConfig?.lakes),
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
+        countryLabels: { enabled: appState.styleConfig?.countryLabels?.enabled !== false },
         strategicValues: normalizeStrategicValuesStyle(appState.styleConfig?.strategicValues),
         urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
