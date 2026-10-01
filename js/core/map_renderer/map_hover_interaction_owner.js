@@ -61,6 +61,7 @@ function getTooltipPayload(event, text) {
 function normalizeHoverIds(ids = {}) {
   return {
     landId: ids.landId || null,
+    riverCellId: ids.riverCellId || null,
     waterId: ids.waterId || null,
     specialId: ids.specialId || null,
   };
@@ -69,7 +70,8 @@ function normalizeHoverIds(ids = {}) {
 function getNextHoverIds(hit = {}) {
   const id = hit.id || null;
   return normalizeHoverIds({
-    landId: hit.targetType === "land" ? id : null,
+    landId: hit.targetType === "land" && !hit.riverBlockedReason ? id : null,
+    riverCellId: hit.targetType === "land" ? hit.riverCellId || null : null,
     waterId: hit.targetType === "water" ? id : null,
     specialId: hit.targetType === "special" ? id : null,
   });
@@ -111,8 +113,8 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
   function hasHoverIds() {
     return Boolean(state.hoveredId || state.hoveredWaterRegionId || state.hoveredSpecialRegionId);
   }
-  function setHoverIds({ landId = null, waterId = null, specialId = null } = {}) {
-    setHoveredFeatureIdsState(state, { landId, waterId, specialId });
+  function setHoverIds({ landId = null, riverCellId = null, waterId = null, specialId = null } = {}) {
+    setHoveredFeatureIdsState(state, { landId, riverCellId, waterId, specialId });
   }
   function getHoveredFacilityEntry() { return hoveredFacilityEntry; }
   function setHoveredFacilityEntry(entry) { hoveredFacilityEntry = entry || null; }
@@ -121,7 +123,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     const entry = hoveredFacilityEntry || getterApi.getSelectedFacilityEntry();
     return [
       getterApi.getOverlayProjectionSignature(), String(state.renderPhase || renderPhaseIdle),
-      String(state.hoveredId || ""), String(state.hoveredWaterRegionId || ""), String(state.hoveredSpecialRegionId || ""),
+      String(state.hoveredId || ""), String(state.hoveredRiverCellId || ""), String(state.hoveredWaterRegionId || ""), String(state.hoveredSpecialRegionId || ""),
       helperApi.getFacilityKey(entry), Number(entry?.projectedPoint?.[0] || 0).toFixed(1), Number(entry?.projectedPoint?.[1] || 0).toFixed(1),
     ].join("::");
   }
@@ -266,6 +268,7 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
   function updateHoverIds(hit) {
     const nextHoverIds = getNextHoverIds(hit);
     if (nextHoverIds.landId !== (state.hoveredId || null)
+      || nextHoverIds.riverCellId !== (state.hoveredRiverCellId || null)
       || nextHoverIds.waterId !== (state.hoveredWaterRegionId || null)
       || nextHoverIds.specialId !== (state.hoveredSpecialRegionId || null)) {
       setHoverIds(nextHoverIds);

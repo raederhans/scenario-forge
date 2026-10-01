@@ -281,6 +281,7 @@ jobs:
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
+            .runtime/tests/playwright/**/*-failure-context.json
 
       - name: Run Golden Demo E2E
         if: inputs.profile == 'demo' || inputs.run-golden-demo
@@ -304,6 +305,7 @@ jobs:
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
+            .runtime/tests/playwright/**/*-failure-context.json
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'

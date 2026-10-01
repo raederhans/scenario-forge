@@ -30,6 +30,7 @@ import {
   resetStrategicOverlayEditorState,
 } from "./state/strategic_overlay_state.js";
 import { resetDevTransientImportState } from "./state/dev_state.js";
+import { normalizeRiverPaintState } from "./river_paint/partition_model.js";
 import { prepareImportedProjectState, commitImportedProjectPatch } from "./interaction_funnel/import_apply_orchestration.js";
 import {
   applyTransportCountryOverlayState,
@@ -245,6 +246,7 @@ function stageImportedProjectPatch(data, preparedImport) {
     ...(data.sovereignBaseColors || {}),
   };
   draft.visualOverrides = data.visualOverrides || {};
+  draft.riverPaint = normalizeRiverPaintState(data.riverPaint);
 
   draft.waterRegionOverrides = data.waterRegionOverrides || {};
   draft.specialRegionOverrides = {};

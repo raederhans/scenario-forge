@@ -1,3 +1,4 @@
+import { clearRiverCellOverrides, createDefaultRiverPaintState } from "../river_paint/partition_model.js";
 import { normalizeHexColor } from "../color_hex_utils.js";
 // Color/palette state defaults.
 // 这里收口渲染颜色、palette 选择、preset 编辑和 inspector 展开状态，
@@ -16,6 +17,7 @@ export function createDefaultColorState() {
     sovereignBaseColors: {},
     // Subdivision-level explicit color overrides keyed by feature ID.
     visualOverrides: {},
+    riverPaint: createDefaultRiverPaintState(),
     waterRegionOverrides: {},
     specialRegionOverrides: {},
     sovereigntyByFeatureId: {},
@@ -341,6 +343,8 @@ export function applyFeaturePaintState(target, featureIds, value, { remove = fal
   // Validate the entire request before the first mutation.
   target.visualOverrides = target.visualOverrides && typeof target.visualOverrides === "object" && !Array.isArray(target.visualOverrides)
     ? target.visualOverrides : {};
+  const cleared = clearRiverCellOverrides(target.riverPaint, ids);
+  if (cleared.changedCellIds.length) target.riverPaint = cleared.paint;
   for (const id of ids) {
     if (remove) {
       delete target.visualOverrides[id];
