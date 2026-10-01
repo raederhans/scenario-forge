@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-01 沿河试点定位与小分区操作
+
+`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 在 `codex/river-pilot-navigation` 上交付六地定位、分区列表及放大预览，提交 `1cec53b7`、`9bb07a53`。用户已授权推送和合并，然后开始下一批河段；本轮整合 `origin/main@e25b89ca` 的国家标签与地理修复，保留主目录及其他工作树改动。31 个分区的真实界面填色、连续撤销和重做证据保留在 `.runtime/browser/river-pilot-qa/`。该工作树继续用于合并后同步和下一批数据准入；最终远端状态以 PR 回执为准。
+
 ## 2026-09-30 沿河填色试点整合
 
 `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 接手云端分支 `codex/river-paint-partitions-p0-p2` 和 [PR #189](https://github.com/raederhans/scenario-forge/pull/189)，基于 `origin/main@bfedc6b8`。本地整合提交 `eab92f54` 修复 Pages 资源打包、浏览器清单、依赖图和验证路由，并完成沿河功能、几何、Pages 及浏览器验证。主目录 `main@28310add` 的既有未归属改动保留；本工作树作为同步后的独立入口及 `.runtime/reports/generated/river-integration/` 验证证据载体继续保留。最终检查、合并提交和主线状态以 PR 回执及 Git 为准，不能用旧开发运行结果替代最终提交的 required checks。
