@@ -15,6 +15,7 @@ const PILOT_LOCATIONS = [
 // scenario or turns an unavailable half-cell click into an entire-parent edit.
 export function createRiverPaintControls({ state, button, statusNode = null, locationSelect = null,
   focusParent = () => false,
+  onLocation = () => {}, onSync = () => {},
   rebuildGeometry, render = () => {}, markDirty = () => {}, announce = () => {},
   loadPack = loadRiverPaintPilot, runtime = getRiverPaintRuntime(state),
 } = {}) {
@@ -58,6 +59,7 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
         locationSelect.dataset.optionsKey = key;
       }
     }
+    onSync();
   }
   function navigate() {
     if (disposed || locationSelect?.disabled || !locationSelect?.value) return;
@@ -67,6 +69,9 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const allowed = runtime.getActivePack()?.parents.some(parent => parent.parentId === id);
     if (!state.riverPaint?.editMode || !allowed || !focusParent(id)) {
       announce(zh() ? '当前无法定位这个试点。' : 'This pilot cannot be located right now.');
+    } else {
+      const location = PILOT_LOCATIONS.find(([key]) => key === id);
+      onLocation(id, location ? { en: location[1], zh: location[2] } : null);
     }
   }
   async function toggle() {

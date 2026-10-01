@@ -1,4 +1,5 @@
 import { createRiverPaintControls } from "./river_paint_controls.js";
+import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
@@ -14,6 +15,7 @@ import {
   autoFillMap,
   getZoomPercent,
   focusRiverPaintParentById,
+  applyRiverPaintCellById,
   invalidateOceanBackgroundVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
@@ -1369,12 +1371,26 @@ function initToolbar({ render } = {}) {
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  const riverCellPicker = createRiverCellPicker({
+    state: runtimeState,
+    panel: document.getElementById("riverCellPicker"),
+    select: document.getElementById("riverCellSelect"),
+    preview: document.getElementById("riverCellPreview"),
+    applyButton: document.getElementById("riverCellApplyBtn"),
+    title: document.getElementById("riverCellPickerTitle"),
+    closeButton: document.getElementById("riverCellCloseBtn"),
+    caption: document.getElementById("riverCellPreviewCaption"),
+    applyCell: applyRiverPaintCellById,
+    announce: message => showToast(message),
+  });
   const riverPaintControls = createRiverPaintControls({
     state: runtimeState,
     button: document.getElementById("riverPaintToggleBtn"),
     statusNode: document.getElementById("riverPaintStatus"),
     locationSelect: document.getElementById("riverPaintLocationSelect"),
     focusParent: focusRiverPaintParentById,
+    onLocation: riverCellPicker.open,
+    onSync: riverCellPicker.sync,
     rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
     render: () => { if (typeof render === "function") render(); },
     markDirty,

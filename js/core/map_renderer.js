@@ -12566,6 +12566,16 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
 }
 
+function applyRiverPaintCellById(parentId, cellId) {
+  if (runtimeState.startupReadonly || runtimeState.isEditingPreset || !runtimeState.riverPaint?.editMode) return false;
+  const runtime = getRiverPaintRuntime(runtimeState);
+  const pack = runtime.getActivePack();
+  const cell = runtime.getCellFeature(cellId);
+  if (!pack || cell?.properties?.__riverParentId !== parentId) return false;
+  return getRiverPaintEditorOwner().handleClick({ id: parentId, targetType: 'land',
+    riverCellId: cellId, riverPackId: pack.packId });
+}
+
 function focusRiverPaintParentById(id) {
   const parent = getRiverPaintRuntime(runtimeState).getActivePack()?.parents
     .find(entry => entry.parentId === id);
@@ -15457,6 +15467,7 @@ export {
   isOpenOceanOverlayActive,
   focusWaterRegionById,
   focusRiverPaintParentById,
+  applyRiverPaintCellById,
   renderExportPassesToCanvas,
   captureRenderSnapshot,
 

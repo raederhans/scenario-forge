@@ -318,3 +318,29 @@ example a parent-local cell list with map highlighting), then verify every cell
 can be deliberately selected and painted without changing the opposite bank.
 Do not discard positive-area fragments or infer usability from canvas-only
 tests. The broader 113-parent pack remains inactive.
+
+## Explicit tiny-cell selection, 2026-10-01
+
+The location picker now opens a transient cell selector. Its overview highlights
+the selected cell within the parent and marks its position with a ring; a second
+preview fits that cell alone, including subpixel fragments. Selection is read-only.
+An explicit Apply current tool button delegates fill, erase and eyedropper to the
+existing river editor owner and history path. Closing the panel does not change
+paint. Mode-off, readonly startup or a replaced/unavailable pack invalidates the
+transient selection. The canonical data and 50x map zoom limit are unchanged.
+
+In-app browser verification used the actual selects and Apply button for all 31
+cells: each action added exactly one expected override and one history entry.
+All 31 Undo steps reduced counts one at a time to zero, and all 31 Redo steps
+restored them. Erase removed one cell; Undo restored it; eyedropper added no
+history; mode-off hid the panel and retained all 31 overrides. No warning/error
+logs were returned for this test page. Evidence:
+`.runtime/browser/river-pilot-qa/picker-transactions.json` and `cell-picker.png`.
+
+Nine focused UI/render Node tests pass, including all 31 real geometries through
+the picker and editor owner, finite enlarged previews, selection without paint,
+and stale/readonly/unsupported-tool rejection. The existing 26 model/runtime/
+history tests also passed during this follow-up. Syntax and diff checks passed.
+This removes the tiny-cell selection blocker through an explicit alternate UI;
+it does not make direct canvas clicking reliable on subpixel targets. Broader
+river admission and cloud CI remain separate next steps.

@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, d3 } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, d3, realPilot, captureCells, feature } from './helpers/river_paint_fixture.mjs';
+import { createRiverCellPicker } from '../js/ui/river_cell_picker.js';
+import { createRiverPaintEditorOwner } from '../js/core/river_paint/editor_owner.js';
+import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import { createRiverPaintControls } from '../js/ui/river_paint_controls.js';
 import { createRiverPaintRenderOwner } from '../js/core/river_paint/render_owner.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
@@ -13,6 +16,69 @@ function buttonFixture() {
     setAttribute(key, value) { attrs[key] = value; },
     addEventListener(key, fn) { listeners[key] = fn; }, removeEventListener(key) { delete listeners[key]; } };
 }
+
+function pickerNodes() {
+  const element = () => ({ ...buttonFixture(), value: '', children: [],
+    ownerDocument: { createElement: () => element(), createElementNS: () => element() },
+    replaceChildren(...children) { this.children = children; },
+    append(child) { this.children.push(child); },
+  });
+  return Object.fromEntries(['panel', 'select', 'preview', 'applyButton', 'title', 'closeButton', 'caption'].map(key => [key, element()]));
+}
+
+test('all 31 real cells are selectable, previewed and painted independently through the editor owner', async () => {
+  const { state } = await makeFixture();
+  state.riverPaint = normalizeRiverPaintState({ schemaVersion: 1, pack: realPilot(), editMode: true });
+  const pack = state.riverPaint.pack;
+  state.scenarioBaselineHash = pack.source.baselineHash;
+  state.activeScenarioManifest = { version: 2, generated_at: '2026-09-27T13:55:57.885587+00:00' };
+  state.landData = { type: 'FeatureCollection', features: pack.parents.map(p => feature(p.parentId, p.parentGeometry)) };
+  state.landIndex = new Map(state.landData.features.map(f => [f.id, f]));
+  const entries = [];
+  const editor = createRiverPaintEditorOwner({ state, captureHistoryState: captureCells(state),
+    commitHistoryEntry: entry => entries.push(entry), refreshParents() {}, markDirty() {}, addRecentColor() {}, selectColor() {} });
+  const nodes = pickerNodes();
+  const picker = createRiverCellPicker({ state, ...nodes, d3,
+    applyCell: (id, riverCellId) => editor.handleClick({ id, riverCellId, riverPackId: pack.packId }) });
+  for (const parent of pack.parents) {
+    picker.open(parent.parentId);
+    assert.equal(nodes.panel.hidden, false);
+    assert.equal(nodes.select.children.length, parent.cells.length);
+    for (const cell of parent.cells) {
+      const before = { ...state.riverPaint.overrides };
+      nodes.select.value = cell.id; nodes.select.listeners.change();
+      assert.deepEqual(state.riverPaint.overrides, before, 'selection is read-only');
+      assert.equal(nodes.preview.children.length, 2);
+      const detailPath = nodes.preview.children[1].children[0].attrs.d;
+      assert.ok(detailPath.length > 0 && !/NaN|Infinity/.test(detailPath), 'tiny geometry has a finite magnified preview');
+      nodes.applyButton.listeners.click();
+      assert.deepEqual(state.riverPaint.overrides, { ...before, [cell.id]: '#0000ff' });
+      assert.deepEqual(Object.keys(entries.at(-1).before.riverPaintOverrides), [cell.id]);
+    }
+  }
+  assert.equal(entries.length, 31);
+  state.currentTool = 'eraser'; nodes.applyButton.listeners.click();
+  assert.equal(Object.keys(state.riverPaint.overrides).length, 30);
+  state.riverPaint.editMode = false; picker.sync();
+  assert.equal(nodes.panel.hidden, true); nodes.applyButton.listeners.click();
+  assert.equal(entries.length, 32);
+  picker.dispose();
+});
+
+test('cell picker rejects stale packs, readonly startup, country fill and unsupported tools', async () => {
+  const { state, pack } = await makeFixture(); const nodes = pickerNodes();
+  let livePack = pack, applied = 0;
+  const picker = createRiverCellPicker({ state, ...nodes, d3,
+    runtime: { getActivePack: () => livePack }, applyCell: () => { applied++; return true; } });
+  picker.open('P'); state.interactionGranularity = 'country'; nodes.applyButton.listeners.click();
+  state.interactionGranularity = 'subdivision'; state.currentTool = 'brush'; nodes.applyButton.listeners.click();
+  state.currentTool = 'fill'; state.startupReadonly = true; nodes.applyButton.listeners.click();
+  assert.equal(applied, 0); assert.equal(nodes.panel.hidden, true);
+  state.startupReadonly = false; picker.open('P'); livePack = { ...pack };
+  nodes.applyButton.listeners.click(); assert.equal(applied, 0); assert.equal(nodes.panel.hidden, true);
+  picker.open('P'); nodes.closeButton.listeners.click(); assert.equal(nodes.panel.hidden, true);
+  picker.dispose(); assert.deepEqual(nodes.select.listeners, {});
+});
 
 test('pilot navigation follows loaded parents, recentres repeatedly and never edits paint', () => {
   const state = { activeScenarioId: 'modern_world', riverPaint: { editMode: false }, currentLanguage: 'en' };

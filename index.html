@@ -2380,6 +2380,14 @@
                   <button id="riverPaintToggleBtn" type="button" class="dock-segment-btn" aria-pressed="false" aria-describedby="riverPaintStatus">River cells</button>
                   <span id="riverPaintStatus" class="visually-hidden" role="status" aria-live="polite"></span>
                   <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river pilot" hidden disabled></select>
+                  <section id="riverCellPicker" hidden aria-labelledby="riverCellPickerTitle">
+                    <strong id="riverCellPickerTitle">River cells</strong>
+                    <select id="riverCellSelect" class="dock-select" aria-label="Choose river cell"></select>
+                    <svg id="riverCellPreview" viewBox="0 0 240 104" role="img"></svg>
+                    <small id="riverCellPreviewCaption"></small>
+                    <button id="riverCellApplyBtn" type="button" class="dock-segment-btn">Apply current tool</button>
+                    <button id="riverCellCloseBtn" type="button" class="dock-segment-btn">Close</button>
+                  </section>
                 </div>
               </div>
 
