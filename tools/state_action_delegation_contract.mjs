@@ -8615,6 +8615,14 @@ const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
   ],
 ]);
 
+function expectedActionBorrowedResultPaths(modulePath, exportName) {
+  if (modulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
+    && exportName === "applyScenarioChunkOptionalLayerState") return [["externalEffect", "payload"]];
+  if (modulePath !== RIVER_PAINT_ACTION_MODULE_PATH) return [];
+  if (["setRiverPaintState", "setRiverPaintEditModeState"].includes(exportName)) return [[]];
+  return exportName === "applyRiverCellPaintState" ? [["paint"]] : [];
+}
+
 function freezeDelegationEntry({
   modulePath,
   exportName,
@@ -8628,9 +8636,8 @@ function freezeDelegationEntry({
     exportName: normalizedExportName,
     targetArgumentIndex: Number(targetArgumentIndex),
     borrowedResultPaths: Object.freeze(
-      normalizedModulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
-        && normalizedExportName === "applyScenarioChunkOptionalLayerState"
-        ? [Object.freeze(["externalEffect", "payload"])] : [],
+      expectedActionBorrowedResultPaths(normalizedModulePath, normalizedExportName)
+        .map((segments) => Object.freeze(segments)),
     ),
     readOnlyArgumentIndexes:
       STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID.get(
@@ -13803,8 +13810,7 @@ export function validateStateActionDelegationContract(
         seenReadOnlyIndexes.add(readOnlyArgumentIndex);
       }
     }
-    const expectedBorrowedResultPaths = modulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
-      && exportName === "applyScenarioChunkOptionalLayerState" ? [["externalEffect", "payload"]] : [];
+    const expectedBorrowedResultPaths = expectedActionBorrowedResultPaths(modulePath, exportName);
     if (JSON.stringify(entry.borrowedResultPaths || []) !== JSON.stringify(expectedBorrowedResultPaths)) {
       violations.push(createViolation("state-action-contract-borrowed-result-paths-invalid", { index, modulePath, exportName }));
     }
@@ -14264,7 +14270,158 @@ function isAllowedDomainActionDynamicSite(entry = {}, site = {}) {
   );
 }
 
-function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader = false) {
+// Reviewed reads, shallow copies and borrowed returns; actual assignments remain in grants.
+const riverActionDiagnosticReceipts = [
+  {
+    "id": "applyRiverCellPaintState",
+    "modulePath": "js/core/state/actions/river_paint_actions.js",
+    "sourceFingerprints": {
+      "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
+      "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+      "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78"
+    },
+    "sites": [
+      {
+        "line": 30,
+        "column": 18,
+        "reason": "unsupported-call-mutation",
+        "operation": "unsupported",
+        "key": "landIndex",
+        "sourceFingerprint": "b104a76076e9e4181126317ff727e94ea3fdef74e172de1e965c2839cf929d14",
+        "expression": "target.landIndex?.get(cell.parentId)"
+      },
+      {
+        "line": 30,
+        "column": 40,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "0330dedc64f07d10de2e193253e2b38c78a2df600e70f4a72dd8d0e10e06a9a8",
+        "expression": "cell.parentId"
+      },
+      {
+        "line": 37,
+        "column": 10,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "f6a214f7a5fcda0c2cee9660b7fc29f5649e3c68aad48e20e950137c98913a68",
+        "expression": "result"
+      }
+    ]
+  },
+  {
+    "id": "clearAllRiverPaintOverridesState",
+    "modulePath": "js/core/state/actions/river_paint_actions.js",
+    "sourceFingerprints": {
+      "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
+      "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+      "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78"
+    },
+    "sites": [
+      {
+        "line": 65,
+        "column": 28,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "riverPaint",
+        "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+        "expression": "target.riverPaint"
+      }
+    ]
+  },
+  {
+    "id": "restoreRiverPaintOverridesState",
+    "modulePath": "js/core/state/actions/river_paint_actions.js",
+    "sourceFingerprints": {
+      "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
+      "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+      "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78"
+    },
+    "sites": [
+      {
+        "line": 53,
+        "column": 26,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "riverPaint",
+        "sourceFingerprint": "13dfa3d8c6ef3bb80a0a3e769e92f5b564c445e112aa5d40053758e133399e14",
+        "expression": "target.riverPaint.overrides"
+      },
+      {
+        "line": 58,
+        "column": 28,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "riverPaint",
+        "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+        "expression": "target.riverPaint"
+      }
+    ]
+  },
+  {
+    "id": "setRiverPaintEditModeState",
+    "modulePath": "js/core/state/actions/river_paint_actions.js",
+    "sourceFingerprints": {
+      "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
+      "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+      "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78"
+    },
+    "sites": [
+      {
+        "line": 19,
+        "column": 29,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "*",
+        "sourceFingerprint": "60908e8f302e90990d5118826e9ddd43ad4d313a5bfd2b3ac8021e72c57c8cbb",
+        "expression": "target.riverPaint || createDefaultRiverPaintState()"
+      },
+      {
+        "line": 20,
+        "column": 10,
+        "reason": "state-alias-escape",
+        "operation": "unsupported",
+        "key": "riverPaint",
+        "sourceFingerprint": "56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+        "expression": "target.riverPaint"
+      }
+    ]
+  }
+];
+const riverSiteIdentity = site => JSON.stringify([site.line, site.column, site.reason, site.operation, site.key, site.sourceFingerprint]);
+export function inspectRiverActionDiagnosticReceipt(id, { binding, readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8") } = {}) {
+  const entry = typeof id === "string" && riverActionDiagnosticReceipts.find(entry => entry.id === id);
+  const violations = [];
+  if (!entry) return { violations: [{ code: "river-action-receipt-unknown" }] };
+  try {
+    for (const [modulePath, expected] of Object.entries(entry.sourceFingerprints)) {
+      if (createHash("sha256").update(String(readSource(modulePath)).replace(/\r\n?/g, "\n")).digest("hex") !== expected) {
+        violations.push({ code: "river-action-receipt-source-drift", modulePath });
+      }
+    }
+    const source = String(readSource(entry.modulePath)).replace(/\r\n?/g, "\n");
+    const ast = parseModuleSource(source);
+    const fn = ast.body.find(node => node.type === "ExportNamedDeclaration" && node.declaration?.id?.name === id)?.declaration;
+    if (!fn || fn.params[0]?.name !== "target") violations.push({ code: "river-action-receipt-binding-drift" });
+    for (const site of entry.sites) {
+      let matches = 0;
+      if (fn) walkSyntaxTree(fn, node => {
+        if (node.loc?.start.line === site.line && node.loc.start.column + 1 === site.column
+          && source.slice(node.start, node.end) === site.expression) matches += 1;
+      });
+      if (!matches) violations.push({ code: "river-action-receipt-expression-drift" });
+    }
+    const actual = (binding?.grants || []).flatMap(grant => grant.unsupportedSites || []).map(riverSiteIdentity).sort();
+    const expected = entry.sites.map(riverSiteIdentity).sort();
+    if (!binding || binding.functionName !== id || binding.parameterName !== "target"
+      || binding.parameterIndex !== 0 || binding.parameterPath !== "$"
+      || JSON.stringify(actual) !== JSON.stringify(expected)) violations.push({ code: "river-action-receipt-sites-drift" });
+  } catch (error) { violations.push({ code: "river-action-receipt-unavailable", message: error.message }); }
+  return { violations, acceptedDiagnosticCount: violations.length ? 0 : entry.sites.length };
+}
+
+function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader = false, acceptedRiverReceipt = false) {
   return (binding.grants || []).reduce(
     (count, grant) =>
       count
@@ -14276,7 +14433,7 @@ function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader
         (site) => !isAllowedDomainActionDynamicSite(entry, site),
       ).length
       + (grant.ambiguousSites || []).length
-      + (grant.unsupportedSites || []).filter(site => !(
+      + (grant.unsupportedSites || []).filter(site => !acceptedRiverReceipt && !(
         acceptedImportedReader
         && entry.modulePath === STATE_ACTION_IMPORTED_CALL_RECEIPTS.eviction.modulePath
         && entry.exportName === STATE_ACTION_IMPORTED_CALL_RECEIPTS.eviction.exportName
@@ -14418,8 +14575,13 @@ export function validateStateActionPolicyBindings(
             }),
           );
         }
+        const riverReceipt = entry.modulePath === RIVER_PAINT_ACTION_MODULE_PATH
+          && riverActionDiagnosticReceipts.some(receipt => receipt.id === entry.exportName)
+          ? inspectRiverActionDiagnosticReceipt(entry.exportName, { binding }) : null;
+        if (riverReceipt) violations.push(...riverReceipt.violations);
         const diagnosticCount = bindingDiagnosticCount(
           binding, entry, acceptedImportedCalls.get(entry.exportName) === true,
+          riverReceipt?.violations.length === 0,
         );
         if (diagnosticCount > 0) {
           violations.push(

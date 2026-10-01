@@ -117,7 +117,6 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
       getObjectIdentityToken(state.scenarioRuntimeTopologyData || state.runtimePoliticalTopology),
       getObjectIdentityToken(state.scenarioBaselineOwnersByFeatureId),
       state.sovereigntyRevision, state.scenarioShellOverlayRevision, state.mapSemanticMode,
-      state.scenarioOwnershipColorMode,
       paintSignature, state.strategicChoroplethMetric,
       getObjectIdentityToken(state.scenarioStrategicValuesData),
       getWholeLayerIdentity("water", state.scenarioWaterRegionsData),

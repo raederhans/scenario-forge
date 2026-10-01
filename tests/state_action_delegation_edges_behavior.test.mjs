@@ -3300,6 +3300,27 @@ test("chunk publication actions accept borrowed payloads and retain external-eff
   assert.ok(validateStateActionDelegationContract([{...entry, borrowedResultPaths: []}]).length);
 });
 
+test("river action results retain canonical paint aliases without tainting scalar results", () => {
+  const modulePath = "js/core/state/actions/river_paint_actions.js";
+  const prefix = 'import { state as runtimeState } from "./state.js"; '
+    + 'import { setRiverPaintState, setRiverPaintEditModeState, applyRiverCellPaintState } from "./state/actions/river_paint_actions.js";';
+  const scan = tail => scanStateMutations(prefix + tail, {
+    filePath: "js/core/river_action_fixture.js",
+    bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+  });
+  assert.deepEqual(scan('const result = applyRiverCellPaintState(runtimeState,"cell","#123456"); Boolean(result.changed);'), []);
+  for (const tail of [
+    'const result = setRiverPaintState(runtimeState,{schemaVersion:1,pack:null,overrides:{}}); result.overrides.cell = "#123456";',
+    'const result = setRiverPaintEditModeState(runtimeState,true); result.overrides.cell = "#123456";',
+    'const result = applyRiverCellPaintState(runtimeState,"cell","#123456"); result.paint.pack.parents.push({});',
+    'const {paint} = applyRiverCellPaintState(runtimeState,"cell","#123456"); leak(paint);',
+  ]) assert.ok(scan(tail).length, tail);
+  for (const exportName of ["setRiverPaintState", "setRiverPaintEditModeState", "applyRiverCellPaintState"]) {
+    const entry = STATE_ACTION_DELEGATION_CONTRACT.find(entry => entry.modulePath === modulePath && entry.exportName === exportName);
+    assert.ok(validateStateActionDelegationContract([{ ...entry, borrowedResultPaths: [] }]).length, exportName);
+  }
+});
+
 test("imported pure-reader proofs reject stale bindings, dependency drift, taint effects, and borrowed results", () => {
   const modulePath = "js/core/renderer/render_pass_signature_policy.js";
   const dependencyPath = "js/core/renderer/urban_city_policy.js";
@@ -3839,4 +3860,119 @@ test("paint projection fails closed when the imported callee's recorded target e
     () => projectPalettePaintActionCandidate(candidates),
     (error) => error?.code === "state-action-imported-target-effects-drift",
   );
+});
+
+
+test("river live actions retain assignments and admit only exact diagnostic receipts", async () => {
+  const { buildStateWriterBindingGrants } = await import("../tools/build_state_writer_policy.mjs");
+  const { buildCanonicalStateKeyAuthorityIndex } = await import("../tools/state_writer_policy.mjs");
+  const { validateStateActionPolicyBindings, inspectRiverActionDiagnosticReceipt } = await import("../tools/state_action_delegation_contract.mjs");
+  const modulePath = "js/core/state/actions/river_paint_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const { bindingInventories } = await discoverStateWriterBindingsForSource(modulePath, source, "production", { includeInventories: true });
+  const bindings = bindingInventories.map(inventory => ({ ...inventory.binding, authority: "domain-action",
+    grants: buildStateWriterBindingGrants(inventory.findings, modulePath, buildCanonicalStateKeyAuthorityIndex(), "production") }));
+  const validate = bindings => validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings }], { modulePaths: [modulePath] });
+  assert.deepEqual(validate(bindings), []);
+  assert.deepEqual(bindingInventories.map(i => [i.binding.functionName, i.findings.filter(f => !f.unsupported && f.operation === "assign").length,
+    i.findings.filter(f => f.unsupported).length]), [
+    ["applyRiverCellPaintState", 1, 3], ["clearAllRiverPaintOverridesState", 1, 1], ["restoreRiverPaintOverridesState", 1, 2],
+    ["setRiverPaintEditModeState", 1, 2], ["setRiverPaintState", 1, 0],
+  ]);
+  const binding = bindings.find(b => b.functionName === "applyRiverCellPaintState");
+  for (const changed of [
+    source.replace("../../river_paint/partition_model.js", "../../river_paint/fake.js"),
+    source.replace("const editCellId = String(cellId);", "const editCellId = String(cellId); const getRiverPartitionIndex = unknown;"),
+    source.replace("const editCellId = String(cellId);", "const editCellId = String(cellId); getRiverPartitionIndex = unknown;"),
+    source.replace("const editCellId = String(cellId);", "const editCellId = String(cellId); getRiverPartitionIndex(target.riverPaint.pack);"),
+    source.replace("const editCellId = String(cellId);", "const editCellId = String(cellId); target.bootPhase = 'bad';"),
+  ]) assert.ok(inspectRiverActionDiagnosticReceipt(binding.functionName, { binding,
+    readSource: p => p === modulePath ? changed : fs.readFileSync(p, "utf8") }).violations.length);
+
+  assert.ok(inspectRiverActionDiagnosticReceipt({ id: binding.functionName }, { binding }).violations.length);
+  for (const change of ["drop", "duplicate", "fingerprint", "alias", "dynamic", "ambiguous"]) {
+    const forged = structuredClone(bindings), target = forged.find(b => b.functionName === binding.functionName);
+    const grant = target.grants.find(g => g.unsupportedSites.length);
+    if (change === "drop") grant.unsupportedSites.pop();
+    if (change === "duplicate") grant.unsupportedSites.push(grant.unsupportedSites[0]);
+    if (change === "fingerprint") grant.unsupportedSites[0].sourceFingerprint = "0".repeat(64);
+    if (change === "alias") grant.aliasSites.push({ alias: "unknown", key: "riverPaint" });
+    if (change === "dynamic") grant.dynamicSites.push({ operation: "assign", key: "riverPaint", pathPattern: "*" });
+    if (change === "ambiguous") grant.ambiguousSites.push({ reason: "ambiguous-alias-flow" });
+    assert.ok(validate(forged).length, change);
+  }
+  for (const changedPath of [modulePath, "js/core/river_paint/partition_model.js", "js/core/river_paint/geometry_identity.js"]) {
+    assert.ok(inspectRiverActionDiagnosticReceipt(binding.functionName, { binding,
+      readSource: p => fs.readFileSync(p, "utf8") + (p === changedPath ? "\nunknown(target);" : "") }).violations.length);
+  }
+});
+
+test("river owner live evidence retains complete raw findings and action edges", async () => {
+  const { STATE_RIVER_OWNER_SOURCE_RECEIPTS, inspectRiverOwnerSourceEvidence,
+    STATE_BORROWED_RUNTIME_CONTRACT, inspectStateBorrowedRuntimeSources } = await import("../tools/state_borrowed_effect_contract.mjs");
+  const runtime = STATE_BORROWED_RUNTIME_CONTRACT.find(entry => entry.getterExportName === "getRiverPaintRuntime");
+  assert.deepEqual(inspectStateBorrowedRuntimeSources(runtime).violations, []);
+  for (const modulePath of [...new Set(STATE_RIVER_OWNER_SOURCE_RECEIPTS.map(entry => entry.modulePath))]) {
+    const source = fs.readFileSync(modulePath, "utf8");
+    const { bindingInventories } = await discoverStateWriterBindingsForSource(modulePath, source, "production", { includeInventories: true });
+    assert.equal(bindingInventories.length, modulePath.endsWith("/runtime.js") ? 2 : 1);
+    assert.deepEqual(inspectRiverOwnerSourceEvidence(modulePath, { inventories: bindingInventories }).violations, []);
+    for (const change of ["drop-site", "new-write", "drop-edge", "new-edge"]) {
+      const changed = structuredClone(bindingInventories);
+      if (change === "drop-site") changed[0].findings.pop();
+      if (change === "new-write") changed[0].findings.push({ operation: "assign", key: "bootPhase" });
+      if (change === "drop-edge") { if (!changed[0].actionDelegations.length) continue; changed[0].actionDelegations.pop(); }
+      if (change === "new-edge") changed[0].actionDelegations.push({ actionExportName: "setBootStateFields" });
+      assert.ok(inspectRiverOwnerSourceEvidence(modulePath, { inventories: changed }).violations.length, change);
+    }
+    for (const suffix of ["\nstate.bootPhase = 'bad';", "\nsetRiverPaintState(state, {});", "\ngetRiverPaintRuntime(state);"]) {
+      await assert.rejects(discoverStateWriterBindingsForSource(modulePath, source + suffix, "production", { includeInventories: true }),
+        error => error.code === "river-owner-source-evidence-invalid");
+    }
+    const dependency = "js/core/river_paint/geometry_identity.js";
+    assert.ok(inspectRiverOwnerSourceEvidence(modulePath, { inventories: bindingInventories,
+      readSource: p => fs.readFileSync(p, "utf8") + (p === dependency ? "\nunknown();" : "") }).violations.length);
+  }
+  assert.throws(() => { runtime.sourceFingerprints[runtime.factoryModulePath] = "forged"; }, TypeError);
+  assert.throws(() => runtime.methodArgumentCounts.surfaces.push(2), TypeError);
+  const runtimeSource = fs.readFileSync(runtime.factoryModulePath, "utf8");
+  assert.ok(inspectStateBorrowedRuntimeSources(runtime, { readSource: p => p === runtime.factoryModulePath
+    ? runtimeSource.replace("runtimes.get(state)", "runtimes.get(otherState)") : fs.readFileSync(p, "utf8") }).violations.length);
+});
+
+test("river helper and runtime geometry aliases remain observable mutations", () => {
+  const prefix = [
+    'import { state as runtimeState } from "./state.js";',
+    'import { getActiveRiverPack, getRiverPartitionIndex, getRiverParentCompatibility, applyRiverCellOverride } from "./river_paint/partition_model.js";',
+    'import { getRiverPaintRuntime, createRiverPaintRuntime } from "./river_paint/runtime.js";',
+  ].join("\n") + "\n";
+  const scan = tail => scanStateMutations(prefix + tail, { filePath: "js/core/river_fixture.js",
+    bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }], derivedAliasTaintMode: "strict" });
+  for (const tail of [
+    "getActiveRiverPack(runtimeState.riverPaint, 's', '').parents[0].parentGeometry.coordinates = [];",
+    "getRiverPartitionIndex(runtimeState.riverPaint.pack).cells.clear();",
+    "const index = getRiverPartitionIndex(runtimeState.riverPaint.pack); delete index.parents.get('x').parentGeometry;",
+    "getRiverParentCompatibility(runtimeState.riverPaint.pack, feature, 'x').parent.parentGeometry.coordinates.push([]);",
+    "applyRiverCellOverride(runtimeState.riverPaint, 'x', '#ffffff', {}).paint.pack.parents = [];",
+    "getRiverPaintRuntime(runtimeState).surfaces()[0].geometry.coordinates.push([]);",
+    "const runtime = getRiverPaintRuntime(runtimeState); delete runtime.getCellFeature('x').geometry;",
+    "const runtime = createRiverPaintRuntime(runtimeState); runtime.getActivePack().parents = [];",
+    "getRiverPaintRuntime(runtimeState).getParentFeature(feature).geometry.coordinates = [];",
+  ]) {
+    const findings = scan(tail);
+    assert.ok(findings.some(f => f.operation !== "unsupported" || ["unsupported-call-mutation", "ambiguous-alias-flow"].includes(f.reason)), tail);
+  }
+  for (const tail of [
+    "const index = getRiverPartitionIndex(localPack); index.cells.get = unknown; index.cells.get(runtimeState);",
+    "Map.prototype.get = unknown; getRiverPartitionIndex(localPack).cells.get(runtimeState);",
+    "const index = getRiverPartitionIndex(localPack); index.parents.has = unknown; index.parents.has(runtimeState);",
+    "const runtime = createRiverPaintRuntime(localState, { geoContains: mutator }); runtime.refineHit(runtimeState, []);",
+    "const runtime = getRiverPaintRuntime(localState); runtime[method](runtimeState);",
+    "function test(getRiverPaintRuntime) { getRiverPaintRuntime(runtimeState).surfaces(runtimeState); } test(unknown);",
+    "function test(getRiverPartitionIndex) { getRiverPartitionIndex(runtimeState.riverPaint.pack); } test(unknown);",
+    "let runtime = getRiverPaintRuntime(localState); runtime = unknown; runtime.surfaces(runtimeState);",
+    "getRiverPartitionIndex(...runtimeState.values);",
+    "getRiverPartitionIndex?.(runtimeState.riverPaint.pack);",
+    "getRiverPartitionIndex(runtimeState.riverPaint.pack, extra);",
+  ]) assert.ok(scan(tail).some(f => f.reason === "state-alias-escape" || f.reason === "unsupported-call-mutation"), tail);
 });

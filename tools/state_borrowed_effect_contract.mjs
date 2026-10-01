@@ -95,6 +95,22 @@ const definitions = [
     }
   }
 ];
+// Cached indexes and immutable-looking pack projections still share canonical geometry.
+for (const [exportName, argumentCount, borrowedArgumentIndexes, borrowedResultPaths, optionsArgumentIndex] of [
+  ["getActiveRiverPack", 3, [0, 1, 2], [[]], null],
+  ["getRiverPartitionIndex", 1, [0], [[]], null],
+  ["getRiverParentCompatibility", 3, [0, 1, 2], [["parent"]], null],
+  ["applyRiverCellOverride", 4, [0, 1, 2, 3], [["paint"]], 3],
+]) definitions.push({
+  modulePath: "js/core/river_paint/partition_model.js", exportName, argumentCount,
+  borrowedArgumentIndexes, borrowedResultPaths, optionsArgumentIndex,
+  allowedOptionNames: optionsArgumentIndex === null ? [] : ["remove"],
+  callbackOptionNames: [], callbackBorrowedParameterIndexes: {},
+  sourceFingerprint: "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+  dependencyFingerprints: {
+    "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
+  },
+});
 export const STATE_BORROWED_EFFECT_CONTRACT = Object.freeze(definitions.map(entry => Object.freeze({
   ...entry,
   borrowedArgumentIndexes: Object.freeze(entry.borrowedArgumentIndexes),
@@ -112,7 +128,9 @@ export function findStateBorrowedEffectContractEntry(modulePath, exportName) {
   return STATE_BORROWED_EFFECT_CONTRACT.find(entry => entry.modulePath === normalizedPath && entry.exportName === exportName) || null;
 }
 
-export function inspectStateBorrowedEffectSource(source, entry) {
+export function inspectStateBorrowedEffectSource(source, entry, {
+  readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8"),
+} = {}) {
   const violations = [];
   const expected = findStateBorrowedEffectContractEntry(entry?.modulePath, entry?.exportName);
   if (!expected || JSON.stringify(entry) !== JSON.stringify(expected)) {
@@ -133,7 +151,7 @@ export function inspectStateBorrowedEffectSource(source, entry) {
   }
   for (const [modulePath, expectedFingerprint] of Object.entries(expected.dependencyFingerprints)) {
     try {
-      const dependencySource = readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8");
+      const dependencySource = readSource(modulePath);
       if (fingerprint(dependencySource) !== expectedFingerprint) {
         violations.push({ code: "borrowed-effect-dependency-mismatch", modulePath });
       }
@@ -872,9 +890,110 @@ const borrowedRuntimeDefinition = {
     }
   ]
 };
+const riverBorrowedRuntimeDefinition = {
+  "factoryModulePath": "js/core/river_paint/runtime.js",
+  "factoryExportName": "createRiverPaintRuntime",
+  "getterExportName": "getRiverPaintRuntime",
+  "factorySourceFingerprint": "d72dac9e287df4b37604a7212892601ccb0ef637147051ac229cad33b5e28f60",
+  "sourceFingerprints": {
+    "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
+    "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+    "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
+    "js/core/river_paint/pilot_manifest.js": "736f589aa59c4fc40c3766d6754331d4489ad5cc05bcb8031f4267168d9aadd0",
+    "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b"
+  },
+  "borrowedLocalStorage": [
+    {
+      "functionName": "createRiverPaintRuntime",
+      "bindingName": "cellFeatures",
+      "paths": [
+        []
+      ]
+    },
+    {
+      "functionName": "createRiverPaintRuntime",
+      "bindingName": "pinnedCache",
+      "paths": [
+        []
+      ]
+    },
+    {
+      "functionName": "createRiverPaintRuntime",
+      "bindingName": "surfaceCache",
+      "paths": [
+        []
+      ]
+    }
+  ],
+  "borrowedResultPathsByMethod": {
+    "getActivePack": [
+      []
+    ],
+    "getCellFeature": [
+      []
+    ],
+    "getParentFeature": [
+      []
+    ],
+    "pinCollection": [
+      []
+    ],
+    "surfaces": [
+      []
+    ],
+    "refineHit": [
+      []
+    ]
+  },
+  "methodArgumentCounts": {
+    "getActivePack": [
+      0
+    ],
+    "getCellFeature": [
+      1
+    ],
+    "getParentFeature": [
+      1
+    ],
+    "pinCollection": [
+      1
+    ],
+    "surfaces": [
+      0,
+      1
+    ],
+    "refineHit": [
+      2
+    ],
+    "diagnostics": [
+      0
+    ],
+    "expandDirtyIds": [
+      1
+    ],
+    "assertReadyForExport": [
+      0
+    ],
+    "enable": [
+      1
+    ],
+    "setMode": [
+      1
+    ],
+    "cancel": [
+      0
+    ]
+  },
+  "borrowedPublicExports": []
+};
 const freezeBorrowedPaths = paths => Object.freeze(paths.map(path => Object.freeze([...path])));
-export const STATE_BORROWED_RUNTIME_CONTRACT = Object.freeze([Object.freeze({
+export const STATE_BORROWED_RUNTIME_CONTRACT = Object.freeze([borrowedRuntimeDefinition, riverBorrowedRuntimeDefinition].map(borrowedRuntimeDefinition => Object.freeze({
   ...borrowedRuntimeDefinition,
+  ...(borrowedRuntimeDefinition.sourceFingerprints ? {
+    sourceFingerprints: Object.freeze(borrowedRuntimeDefinition.sourceFingerprints),
+    methodArgumentCounts: Object.freeze(Object.fromEntries(Object.entries(borrowedRuntimeDefinition.methodArgumentCounts)
+      .map(([method, counts]) => [method, Object.freeze(counts)]))),
+  } : {}),
   borrowedLocalStorage: Object.freeze(borrowedRuntimeDefinition.borrowedLocalStorage.map(storage => Object.freeze({
     ...storage, paths: freezeBorrowedPaths(storage.paths),
   }))),
@@ -883,7 +1002,7 @@ export const STATE_BORROWED_RUNTIME_CONTRACT = Object.freeze([Object.freeze({
   borrowedPublicExports: Object.freeze(borrowedRuntimeDefinition.borrowedPublicExports.map(entry => Object.freeze({
     ...entry, paths: freezeBorrowedPaths(entry.paths),
   }))),
-})]);
+})));
 
 export function inspectStateBorrowedRuntimeSources(entry, {
   readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8"),
@@ -892,6 +1011,30 @@ export function inspectStateBorrowedRuntimeSources(entry, {
     && candidate.factoryExportName === entry?.factoryExportName);
   if (!expected || JSON.stringify(entry) !== JSON.stringify(expected)) {
     return { violations: [{ code: "borrowed-runtime-unknown-contract" }] };
+  }
+  if (expected.getterExportName === "getRiverPaintRuntime") {
+    const violations = [];
+    try {
+      for (const [modulePath, expectedFingerprint] of Object.entries(expected.sourceFingerprints)) {
+        if (fingerprint(readSource(modulePath)) !== expectedFingerprint) violations.push({ code: "borrowed-runtime-source-mismatch", modulePath });
+      }
+      const source = readSource(expected.factoryModulePath).replace(/\r\n?/g, "\n");
+      const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+      const declarations = ast.body.map(node => node.declaration || node);
+      const factory = declarations.find(node => node.id?.name === expected.factoryExportName);
+      const getter = declarations.find(node => node.id?.name === expected.getterExportName);
+      const cache = declarations.find(node => node.type === "VariableDeclaration" && node.kind === "const"
+        && node.declarations.length === 1 && node.declarations[0].id.name === "runtimes");
+      if (!factory || fingerprint(source.slice(factory.start, factory.end).trim()) !== expected.factorySourceFingerprint
+        || factory.params[0]?.name !== "state" || factory.params.length !== 2
+        || !cache || cache.declarations[0].init?.type !== "NewExpression"
+        || cache.declarations[0].init.callee.name !== "WeakMap" || cache.declarations[0].init.arguments.length
+        || !getter || getter.params.length !== 1 || getter.params[0].name !== "state"
+        || source.slice(getter.body.start, getter.body.end).replace(/\s+/g, " ") !== "{ if (!runtimes.has(state)) runtimes.set(state, createRiverPaintRuntime(state)); return runtimes.get(state); }") {
+        violations.push({ code: "borrowed-runtime-factory-getter-shape-mismatch" });
+      }
+    } catch (error) { violations.push({ code: "borrowed-runtime-source-unavailable", message: error.message }); }
+    return { violations };
   }
   // Reuse the complete chunk/assembly source receipt and production-consumer
   // discovery; export names alone never authorize a public borrowed result.
@@ -1069,5 +1212,96 @@ export function inspectStateBorrowedScopedOperationSources(entry, {
   } catch (error) {
     violations.push({ code: "borrowed-scoped-operation-source-unavailable", message: error.message });
   }
+  return { violations };
+}
+
+// Complete live evidence only: no finding is removed and no pure-reader claim is made.
+const riverOwnerSourceFingerprints = Object.freeze({
+  "js/core/river_paint/editor_owner.js": "e40ba9ec9a296c24a506f8f672a50eea40a48360ea61d8d9855092420b1f3b02",
+  "js/core/map_data_boundary.js": "326ba03c0a42d58950019c857fe8b70eedd6decab59ac480b1da7cbef3f21147",
+  "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
+  "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
+  "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
+  "js/core/feature_identity_shared.js": "87740ee4f95f77350073884c812865264b9e5eae2e0bfeec88d066648c2bcf0a",
+  "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5",
+  "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
+  "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
+  "js/core/river_paint/pilot_manifest.js": "736f589aa59c4fc40c3766d6754331d4489ad5cc05bcb8031f4267168d9aadd0",
+  "js/core/river_paint/render_owner.js": "49750e3e9b3117b0c68124fb67bdc80b6f975fbdd0e49e4224087ecf8ebd70ce"
+});
+export const STATE_RIVER_OWNER_SOURCE_RECEIPTS = Object.freeze([
+  {
+    "modulePath": "js/core/river_paint/editor_owner.js",
+    "functionName": "createRiverPaintEditorOwner",
+    "parameterName": "state",
+    "parameterIndex": 0,
+    "parameterPath": "$/property:state",
+    "findingsFingerprint": "9523b3d3e157d6174806b20ce87dbe1ac143ca95f4cbc28450f4b8bba72375df",
+    "actionDelegationsFingerprint": "402aa89a6d87c455794c79adfc69f9792e6c3a1a45a66cdc4737e734f908aa2a",
+    "findingCount": 5,
+    "actionDelegationCount": 1
+  },
+  {
+    "modulePath": "js/core/river_paint/render_owner.js",
+    "functionName": "createRiverPaintRenderOwner",
+    "parameterName": "state",
+    "parameterIndex": 0,
+    "parameterPath": "$/property:state",
+    "findingsFingerprint": "50203d3ea1c969bebc7387df92aa44a35344aae127f64ae3da054a38b5b1e4b3",
+    "actionDelegationsFingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "findingCount": 7,
+    "actionDelegationCount": 0
+  },
+  {
+    "modulePath": "js/core/river_paint/runtime.js",
+    "functionName": "createRiverPaintRuntime",
+    "parameterName": "state",
+    "parameterIndex": 0,
+    "parameterPath": "$",
+    "findingsFingerprint": "2ff97c6077431ed6ce7b033fd680ad0c81836a82a383b97a267a2137a1aec48e",
+    "actionDelegationsFingerprint": "24a693d5505854ff9ae9adea4bec39e527db0893130de6cfbfb6245f8be0abb8",
+    "findingCount": 29,
+    "actionDelegationCount": 3
+  },
+  {
+    "modulePath": "js/core/river_paint/runtime.js",
+    "functionName": "getRiverPaintRuntime",
+    "parameterName": "state",
+    "parameterIndex": 0,
+    "parameterPath": "$",
+    "findingsFingerprint": "023d30270d0ea1283000616b1c45ce52876c20340ca2622167dc74756d7ca039",
+    "actionDelegationsFingerprint": "ab107ffbc257a97496db700fdda043c02ee7cdfa0ffaa50b4817812448068d51",
+    "findingCount": 32,
+    "actionDelegationCount": 3
+  }
+].map(Object.freeze));
+
+export function inspectRiverOwnerSourceEvidence(modulePath, {
+  inventories,
+  readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8"),
+} = {}) {
+  const entries = typeof modulePath === "string" && STATE_RIVER_OWNER_SOURCE_RECEIPTS.filter(entry => entry.modulePath === modulePath);
+  if (!entries?.length) return { violations: [{ code: "river-owner-receipt-unknown" }] };
+  const violations = [];
+  try {
+    for (const [dependencyPath, expected] of Object.entries(riverOwnerSourceFingerprints)) {
+      if (fingerprint(readSource(dependencyPath)) !== expected) violations.push({ code: "river-owner-source-drift", modulePath: dependencyPath });
+    }
+    if (!Array.isArray(inventories) || inventories.length !== entries.length) {
+      violations.push({ code: "river-owner-binding-count-drift" });
+    }
+    for (const entry of entries) {
+      const matches = (inventories || []).filter(inventory => inventory.binding?.functionName === entry.functionName);
+      const inventory = matches[0];
+      const binding = inventory?.binding;
+      if (matches.length !== 1 || binding?.kind !== "function-parameter"
+        || binding.parameterName !== entry.parameterName || binding.parameterIndex !== entry.parameterIndex
+        || binding.parameterPath !== entry.parameterPath
+        || fingerprint(JSON.stringify(inventory?.findings)) !== entry.findingsFingerprint
+        || fingerprint(JSON.stringify(inventory?.actionDelegations)) !== entry.actionDelegationsFingerprint) {
+        violations.push({ code: "river-owner-inventory-drift", functionName: entry.functionName });
+      }
+    }
+  } catch (error) { violations.push({ code: "river-owner-source-unavailable", message: error.message }); }
   return { violations };
 }

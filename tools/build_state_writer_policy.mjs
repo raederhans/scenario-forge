@@ -8,6 +8,8 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import {
+  STATE_RIVER_OWNER_SOURCE_RECEIPTS,
+  inspectRiverOwnerSourceEvidence,
   STATE_BORROWED_EFFECT_CONTRACT,
   STATE_BORROWED_CALLBACK_INJECTION_CONTRACT,
   STATE_BORROWED_RUNTIME_CONTRACT,
@@ -4687,6 +4689,25 @@ export async function discoverStateWriterBindingsForSource(
     return includeInventories
       ? { bindings: actionBindings, bindingInventories }
       : actionBindings;
+  }
+  const riverEntries = enforceCurrentContracts && STATE_RIVER_OWNER_SOURCE_RECEIPTS.filter(entry => entry.modulePath === relativePath);
+  if (riverEntries?.length) {
+    const riverBindings = allParameterDiscovery.bindings.filter(candidate => riverEntries.some(entry =>
+      entry.functionName === candidate.functionName && entry.parameterName === candidate.parameterName
+      && entry.parameterIndex === candidate.parameterIndex && entry.parameterPath === candidate.parameterPath)).map(createParameterBinding);
+    const bindingInventories = scanStateWriterBindingInventoriesBatch(source, relativePath, riverBindings,
+      normalizedDerivedAliasTaintMode, { scanner, recognizeCurrentContracts: true });
+    const evidence = inspectRiverOwnerSourceEvidence(relativePath, {
+      inventories: bindingInventories,
+      readSource: modulePath => modulePath === relativePath ? source : readFileSync(path.join(PROJECT_ROOT, modulePath), "utf8"),
+    });
+    if (evidence.violations.length) {
+      const error = new Error(`River owner live source evidence failed: ${relativePath}`);
+      error.code = "river-owner-source-evidence-invalid";
+      error.violations = evidence.violations;
+      throw error;
+    }
+    return includeInventories ? { bindings: riverBindings, bindingInventories } : riverBindings;
   }
   const pureReaderCandidateIdentities = enforceCurrentContracts
     ? buildStateTargetPureReaderCandidateIdentities({

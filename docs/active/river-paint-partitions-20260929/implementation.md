@@ -204,3 +204,73 @@ also passed. The first complete scan attempt stopped at the now-repaired hover
 carrier; it did not produce a complete historical-policy verdict. A committed-head
 full diagnostic and final-head CI remain separate gates; the quick suite does not
 substitute for either result.
+
+## Final-head follow-up (2026-10-01)
+
+On `9c1d4671`, GitHub fast verification, Quick Fill, all six scenario contracts,
+transport and performance checks passed. Golden Demo still failed: the fresh log
+shows `importing`, whereas the older failure showed `pending`. CPU throttling
+reproduced the same premature 30-second assertion; the sample subsequently
+finished importing. Scenario-idle readiness had accepted the default TNO startup
+before the separate sample project operation completed.
+
+The Golden Demo now uses the existing project-import completion helper with a
+zero counter baseline for its fresh navigation and the exact sample filename.
+Its readiness, assertion and overall budgets remain 120, 30 and 180 seconds.
+The workflow also uploads prefixed failure-context filenames emitted by the
+sample test. This is a readiness correction, not a loading-performance claim.
+
+The unchanged Golden Demo passed with both sample-file responses delayed by
+35 seconds in a temporary localhost wrapper (2.3 minutes for the test, within
+the existing total budget), including PNG export and subsequent switching.
+The broader CPU-throttle-4 rerun exceeded the overall 180-second budget after
+the new import-completion wait returned, so it is not recorded as a pass.
+Timeout guardrails, the 69-spec import graph and the focused CI DAG contract
+also passed. Diagnostic wrappers and logs stay under `.runtime`.
+
+The attempted P4.4 builder, using previous-policy revision
+`3fd7478a232132812d87c782e2504f6f594bc9c3` without refreshing frozen baselines,
+stopped before writing its snapshot: navigation still read the retired
+`scenarioOwnershipColorMode` state key. That stale signature input was removed;
+all 16 navigation behavior tests passed. No canonical policy JSON was changed.
+
+The verification catalog marks the complete state-writer policy proof as a
+heavy, main-thread, full-profile check; PR fast explicitly defers main-thread
+checks. The historical snapshot still predates the river writers/fields and has
+no passing full-checker result. This remains a separate validation gap, rather
+than a claim that quick tests prove historical admission. The earlier plan to
+migrate the whole snapshot is deferred to that dedicated workflow. Frozen
+baselines and required CI settings remain unchanged.
+
+For this feature, the immediate obligation is sound live admission of the new
+river helpers, action targets and runtime capability, including borrowed-result
+tracking and negative mutation tests. These checks must preserve raw findings,
+real state assignments and canonical action edges. Merge still requires all
+protected checks on the final PR head.
+
+## River live-contract evidence
+
+Four model helpers and the runtime getter/factory now preserve borrowed pack,
+index, parent, paint and geometry results. Runtime method receipts accept only
+immutable imported origins, fixed methods and exact argument shapes; custom
+geometry callbacks do not receive that receipt. Nested contract metadata is
+frozen. Index read exceptions are limited to the two reviewed production
+modules, so replaced Map methods cannot inherit a generic safe-read exception.
+
+All five river action targets pass discovery, grant construction and policy
+binding validation. Their five real `riverPaint` assignments remain recorded.
+Only the exact registered unsupported-site multiset is discounted; alias,
+dynamic and ambiguous diagnostics are not discounted. Four owner bindings keep
+their complete raw findings and action edges: editor 5/1, render 7/0, runtime
+factory 29/3 and runtime getter 32/3. Their current-source evidence checks every
+finding and edge plus the eleven local dependency modules. This owner evidence
+is not a claim that ambiguous findings vanished or the frozen policy snapshot
+was migrated. Historical scans do not acquire these current-source receipts.
+
+The focused borrowed-effect, action-delegation and borrowed-storage suites passed
+218/218. Three river-specific cases passed again after adding exact discovery
+counts and changed-import, shadowing, rebinding, duplicate-call and added-write
+assertions. Negative tests also exercise actual shared geometry mutations,
+Map mutation, missing/forged diagnostics, changed dependencies, altered runtime
+cache identity and mutable receipt metadata. Logs remain in `.runtime`.
+The final official quick policy runner passed 518/518 (exit 0, 16.43 seconds).

@@ -2402,6 +2402,11 @@ function analyzeBindingMutations(
       if (storage) return { status: "maybe", reference: null, borrowedPaths: storage.paths };
     }
     if (node.type === "CallExpression") {
+      const indexRead = riverRuntimeMethod(node) || provenRiverIndexRead(node);
+      if (indexRead) return indexRead.borrowedPaths.length
+        && (!indexRead.origin || referenceClassification(indexRead.origin, aliasRecords).status !== "none")
+        ? { status: "maybe", reference: null, borrowedPaths: indexRead.borrowedPaths }
+        : { status: "none", reference: null };
       const actionResultPaths = importedTargetDelegation(node)?.actionContract?.borrowedResultPaths;
       if (actionResultPaths?.length) return { status: "maybe", reference: null, borrowedPaths: actionResultPaths };
       const capabilityCall = provenBorrowedCapabilityCall(node);
@@ -3210,7 +3215,7 @@ function analyzeBindingMutations(
     if (event.type === "AssignmentExpression" && event.operator === "="
       && isProvenOwnerBorrowedStorageSlot(event.left)) return;
     if (event.type === "CallExpression" && isProvenOwnerBorrowedArrayAppend(event)) return;
-    if (event.type === "CallExpression" && (provenScopedBorrowedOperation(event) || provenScopedMembershipCall(event)
+    if (event.type === "CallExpression" && (riverRuntimeMethod(event) || provenRiverIndexRead(event) || provenScopedBorrowedOperation(event) || provenScopedMembershipCall(event)
       || provenBorrowedCapabilityCall(event) || provenOwnerBorrowedMapRead(event)
       || provenOwnerBorrowedArrayIteration(event, aliasRecords))) return;
     const resolveReference = (expression) =>
@@ -3645,7 +3650,8 @@ function analyzeBindingMutations(
       };
     }
     const borrowedEffectContract = findStateBorrowedEffectContractEntry(source, record.importedName);
-    if (borrowedEffectContract && (callNode.arguments || []).length !== 1) {
+    if (borrowedEffectContract && (borrowedEffectContract.optionsArgumentIndex === null
+      || (callNode.arguments || []).length !== 1)) {
       return isSanctionedBorrowedEffectCall(callNode, borrowedEffectContract)
         ? { targetArgumentIndex: -1, actionContract: null, borrowedEffectContract }
         : null;
@@ -3702,7 +3708,7 @@ function analyzeBindingMutations(
       if (importedDelegation.borrowedEffectContract) {
         const entry = importedDelegation.borrowedEffectContract;
         const options = node.arguments[entry.optionsArgumentIndex];
-        for (const property of options.properties) {
+        for (const property of options?.properties || []) {
           const indexes = entry.callbackBorrowedParameterIndexes?.[staticPropertyName(property.key, false)];
           if (!indexes) continue;
           const callback = directImmutableLocalHelperNode({
@@ -4276,9 +4282,41 @@ function analyzeBindingMutations(
       && isSanctionedMutationDelegatingOwnerGetterCall(record.init);
   }
 
+  function riverRuntimeOrigin(value, seen = new Set()) {
+    if (!recognizeCurrentContracts) return null;
+    value = unwrapChain(value);
+    if (value?.type === "Identifier") {
+      const record = analysis.resolveIdentifier(value);
+      if (!record || seen.has(record) || record.kind !== "variable" || record.declarationKind !== "const"
+        || isIdentityTransitionRecord(record)) return null;
+      return riverRuntimeOrigin(record.init, new Set([...seen, record]));
+    }
+    if (value?.type !== "CallExpression" || value.optional || value.callee.type !== "Identifier"
+      || value.arguments.some(argument => argument.type === "SpreadElement")) return null;
+    const record = analysis.resolveIdentifier(value.callee);
+    if (record?.kind !== "import" || record.importKind !== "ImportSpecifier" || isIdentityTransitionRecord(record)) return null;
+    return STATE_BORROWED_RUNTIME_CONTRACT.find(entry => entry.getterExportName
+      && entry.factoryModulePath === resolveProjectLocalImportPath(record.importSource)
+      && ((record.importedName === entry.getterExportName && value.arguments.length === 1)
+        || (record.importedName === entry.factoryExportName && (value.arguments.length === 1
+          || (value.arguments.length === 2 && value.arguments[1].type === "ObjectExpression" && value.arguments[1].properties.length === 0))))) || null;
+  }
+
+  function riverRuntimeMethod(node) {
+    const callee = unwrapChain(node?.callee);
+    if (node?.type !== "CallExpression" || node.optional || callee?.type !== "MemberExpression"
+      || callee.computed || node.arguments.some(argument => argument.type === "SpreadElement")) return null;
+    const entry = riverRuntimeOrigin(callee.object);
+    const method = callee.property.name;
+    return entry?.methodArgumentCounts[method]?.includes(node.arguments.length)
+      ? { entry, method, borrowedPaths: entry.borrowedResultPathsByMethod[method] || [] } : null;
+  }
+
   function borrowedOwnerMethodResultPaths(node) {
     function ownerContracts(value, seen) {
       value = unwrapChain(value);
+      const runtime = riverRuntimeOrigin(value);
+      if (runtime) return [runtime];
       const direct = mutationDelegatingOwnerGetterContracts(value);
       if (direct.length || value?.type !== "Identifier") return direct;
       const record = analysis.resolveIdentifier(value);
@@ -4312,6 +4350,38 @@ function analyzeBindingMutations(
     return resolve(node.callee);
   }
 
+  // Only the registered index factory creates these Maps. Reads preserve the
+  // borrowed geometry; mutators and extracted/rebound methods receive no grant.
+  function provenRiverIndexRead(node) {
+    // This read receipt is local to the audited modules. Replacing or escaping
+    // an index method anywhere in either module invalidates the whole receipt.
+    const runtimeReceipt = STATE_BORROWED_RUNTIME_CONTRACT.find(entry => entry.getterExportName === "getRiverPaintRuntime");
+    const expectedSource = [runtimeReceipt?.factoryModulePath, "js/core/state/actions/river_paint_actions.js"].includes(filePath)
+      && runtimeReceipt?.sourceFingerprints[filePath];
+    if (!recognizeCurrentContracts || !expectedSource
+      || createHash("sha256").update(normalizeJavaScriptSource(source)).digest("hex") !== expectedSource) return null;
+    const call = unwrapChain(node);
+    const member = unwrapChain(call?.callee);
+    if (call?.type !== "CallExpression" || call.optional || call.arguments.length !== 1
+      || call.arguments[0].type === "SpreadElement" || member?.type !== "MemberExpression"
+      || member.computed || !["get", "has"].includes(member.property.name)) return null;
+    const map = unwrapChain(member.object);
+    if (map?.type !== "MemberExpression" || map.computed
+      || !["parents", "cells", "support"].includes(map.property.name)) return null;
+    let origin = unwrapChain(map.object);
+    const seen = new Set();
+    while (origin?.type === "Identifier") {
+      const record = analysis.resolveIdentifier(origin);
+      if (!record || seen.has(record) || record.kind !== "variable" || record.declarationKind !== "const"
+        || isIdentityTransitionRecord(record)) return null;
+      seen.add(record);
+      origin = unwrapChain(record.init);
+    }
+    const helper = origin?.type === "CallExpression" && importedTargetDelegation(origin)?.borrowedEffectContract;
+    return helper?.modulePath === "js/core/river_paint/partition_model.js" && helper.exportName === "getRiverPartitionIndex"
+      ? { origin, borrowedPaths: member.property.name === "get" ? [[]] : [] } : null;
+  }
+
   function projectBorrowedClassification(borrowedPaths, path) {
     const remaining = [];
     for (const borrowed of borrowedPaths) {
@@ -4333,6 +4403,7 @@ function analyzeBindingMutations(
   function isSanctionedBorrowedEffectCall(node, entry) {
     if (node.optional || node.arguments.length !== entry.argumentCount
       || node.arguments.some(argument => argument.type === "SpreadElement")) return false;
+    if (entry.optionsArgumentIndex === null) return true;
     const options = unwrapChain(node.arguments[entry.optionsArgumentIndex]);
     if (options?.type !== "ObjectExpression") return false;
     return options.properties.every(property => {
@@ -5309,7 +5380,8 @@ function analyzeBindingMutations(
         && isSanctionedMutationDelegatingOwnerFactoryCall(node);
       const provenBorrowedArrayAppend = isProvenOwnerBorrowedArrayAppend(node);
       const provenCapabilityCall = provenBorrowedCapabilityCall(node);
-      const provenBorrowedMapRead = provenOwnerBorrowedMapRead(node);
+      const provenBorrowedMapRead = provenRiverIndexRead(node) || provenOwnerBorrowedMapRead(node);
+      const runtimeMethod = riverRuntimeMethod(node);
       const borrowedArrayIteration = provenOwnerBorrowedArrayIteration(node, aliasRecords);
       const localBorrowedHelper = directImmutableLocalHelperNode(node);
       let sanctionedImportedActionTarget = false;
@@ -5434,6 +5506,7 @@ function analyzeBindingMutations(
       if (scopedMembershipCall) for (const index of scopedMembershipCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (provenCapabilityCall) for (const index of provenCapabilityCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (provenBorrowedMapRead) delegatedArgumentIndexes.add(0);
+      if (runtimeMethod) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
       if (borrowedArrayIteration) delegatedArgumentIndexes.add(0);
       for (const index of borrowedOwnerMethodArgumentIndexes(node)) delegatedArgumentIndexes.add(index);
       if (
@@ -5448,7 +5521,7 @@ function analyzeBindingMutations(
       ) {
         delegatedArgumentIndexes.add(0);
       }
-      if (node.type === "CallExpression" && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !borrowedArrayIteration) {
+      if (node.type === "CallExpression" && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !runtimeMethod && !borrowedArrayIteration) {
         recordUnknownCallMutation(
           node,
           receiverClassification,
