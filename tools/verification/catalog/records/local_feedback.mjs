@@ -108,6 +108,25 @@ export function createLocalFeedbackRecords(baseRecords) {
   // child-safe. The eastern-source suite intentionally reads the local raw
   // geographic inputs and keeps the heavy-geo/main-thread policy.
   const precisionPytestRoutes = [
+    ["arctic-recovery", "python -m unittest tests.test_arctic_recovery -q", [
+      "tests/test_arctic_recovery.py", "map_builder/processors/arctic_recovery.py",
+    ]],
+    ["polar-asset-repair", "python -m unittest tests.test_polar_asset_repair -q", [
+      "tests/test_polar_asset_repair.py", "tools/rebuild_polar_assets.py",
+    ]],
+    ["water-rebuild-scope", "python -m pytest tests/test_rebuild_water_geometry.py -q", [
+      "tests/test_rebuild_water_geometry.py", "tools/rebuild_water_geometry.py",
+    ]],
+    ["scenario-geography-repair", "python -m unittest tests.test_repair_scenario_geography -q", [
+      "tests/test_repair_scenario_geography.py", "tools/repair_scenario_geography.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
+    ["canada-parallel-lod", "python -m unittest tests.test_canada_parallel_lod -q", [
+      "tests/test_canada_parallel_lod.py", "tools/scenario_chunk_assets.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
     ["reviewed-seam", "python -m pytest tests/test_reviewed_seam.py -q", [
       "tests/test_reviewed_seam.py", "map_builder/geo/reviewed_seam.py", "tools/repair_tno_poland_ukraine_seams.py",
     ]],
@@ -437,6 +456,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     id: "local:scenario-ownership-repairs",
     commandRef: "python -m unittest tests.test_tno_ownership_repairs -q",
     sourceRefs: ["data/scenario-rules/tno_1962.russia_ownership.manual.json",
+      "data/scenario-rules/tno_1962.decolonization.manual.json",
       "tools/patch_tno_1962_bundle.py", "tests/test_tno_ownership_repairs.py"],
     ownerHints: ["scenario-builder"], domains: ["scenario-build"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 9,

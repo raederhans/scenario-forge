@@ -83,7 +83,12 @@
       "tests/test_us_county_source.py",
       "tests/test_water_geometry.py",
       "tests/test_water_region_authority.py",
-      "tests/test_world_urban_lights_asset.py"
+      "tests/test_world_urban_lights_asset.py",
+      "tests/test_arctic_recovery.py",
+      "tests/test_canada_parallel_lod.py",
+      "tests/test_polar_asset_repair.py",
+      "tests/test_rebuild_water_geometry.py",
+      "tests/test_repair_scenario_geography.py"
     ]
   }
 }
