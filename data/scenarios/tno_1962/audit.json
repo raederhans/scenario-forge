@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 208,
-    "feature_count": 12710,
+    "feature_count": 12711,
     "water_count": 166
   },
   "controller_changes": [
@@ -18276,6 +18276,7 @@
     },
     "polar_materialization": {
       "classified_feature_ids": [
+        "GF_PRIMARY",
         "NO_PRIMARY_GAP_15",
         "NO_PRIMARY_GAP_16",
         "NO_PRIMARY_GAP_26",
@@ -106604,10 +106605,10 @@
     "GY": {
       "base_iso2": "GY",
       "continent_label": "South America",
-      "controller_feature_count": 10,
+      "controller_feature_count": 11,
       "display_name": "Guyana",
       "entry_kind": "scenario_country",
-      "feature_count": 10,
+      "feature_count": 11,
       "hidden_from_country_list": false,
       "historical_fidelity": "extended",
       "historical_fidelity_summary": [
@@ -106620,7 +106621,7 @@
       "provenance_iso2": "GY",
       "quality": "manual_reviewed",
       "quality_breakdown": {
-        "manual_reviewed": 10
+        "manual_reviewed": 11
       },
       "rule_sources": [
         "tno_1962_decolonization_gy"
@@ -110938,13 +110939,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "tno_1962",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "1f52ed8a973ea06fbc269b846e437519f98015eccf013bd91fceffc2ceba1afd",
+  "snapshot_fingerprint": "eca5e2432cfa56d2bfbdfbafc0f5b7a7820232483fdbe183a71992e0a152733e",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "build_snapshot_sha256": "0613441bb7a07c73e255cc0896fc176a43d46db3bfafef964428b07794af25ac",
-    "detail_chunk_manifest_sha256": "fac341b6092cccf66dc72093f8204843024f1c78c0563bb5914ce1a85a7f0949",
-    "runtime_bootstrap_topology_sha256": "8d3dd5c35578c72cf7fcf03bb673b7e83e0acb7a2246c2d44477e2b830eafaea",
-    "runtime_topology_sha256": "b587bba2ca3d7505fe137030e25f592e88038682c34095e884e71ebf56b69c1e"
+    "build_snapshot_sha256": "e48d9ec1448f86da565f8ecf28580ee91bafb63a696af381d6498ceee7b74b11",
+    "detail_chunk_manifest_sha256": "78e88a2f8fa7ff2399096676e8ed0225b8768119e158bbab39f033ce633eb8dd",
+    "runtime_bootstrap_topology_sha256": "72b6f9a87da4ca496648b9815c13124ee025948be99c4f2fee767717508355b5",
+    "runtime_topology_sha256": "6f27fce49c16e0b1f5d81de834dddd7693e787ff57d3de8f344dd288a4e34776"
   },
   "summary": {
     "approximate_count": 861,
@@ -110960,16 +110961,16 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12710,
+    "feature_count": 12711,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9380,
+    "manual_reviewed_feature_count": 9381,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
       "approx_existing_geometry": 921,
       "direct_country_copy": 2578,
-      "manual_reviewed": 9380
+      "manual_reviewed": 9381
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
@@ -110978,7 +110979,7 @@
       "controller_rule": 0,
       "direct_active_owner": 4354,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6239,
+      "manual_rule": 6240,
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1838
     },

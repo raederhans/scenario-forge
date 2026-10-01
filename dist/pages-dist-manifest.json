@@ -57,7 +57,7 @@
     },
     {
       "path": "app/data/europe_topology.runtime_political_v1.json",
-      "size_bytes": 32742132,
+      "size_bytes": 32763855,
       "source_kind": "generated_ignored"
     },
     {
@@ -37302,7 +37302,7 @@
     },
     {
       "path": "app/data/scenario-rules/tno_1962.decolonization.manual.json",
-      "size_bytes": 3108,
+      "size_bytes": 3434,
       "source_kind": "generated_ignored"
     },
     {
@@ -37362,7 +37362,7 @@
     },
     {
       "path": "app/data/scenarios/blank_base/runtime_topology.topo.json",
-      "size_bytes": 22997095,
+      "size_bytes": 23025453,
       "source_kind": "generated_ignored"
     },
     {
@@ -37402,7 +37402,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/chunks/political.coarse.r0c0.json.gz",
-      "size_bytes": 3677964,
+      "size_bytes": 3689296,
       "source_kind": "generated_ignored"
     },
     {
@@ -37502,7 +37502,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/chunks/political.detail.country.can.json.gz",
-      "size_bytes": 330881,
+      "size_bytes": 331319,
       "source_kind": "generated_ignored"
     },
     {
@@ -37877,7 +37877,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/chunks/political.detail.country.raj.json.gz",
-      "size_bytes": 357014,
+      "size_bytes": 357629,
       "source_kind": "generated_ignored"
     },
     {
@@ -38107,7 +38107,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/detail_chunks.manifest.json",
-      "size_bytes": 2701832,
+      "size_bytes": 2703099,
       "source_kind": "generated_ignored"
     },
     {
@@ -38132,7 +38132,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/locales.startup.json",
-      "size_bytes": 2159255,
+      "size_bytes": 2160878,
       "source_kind": "generated_ignored"
     },
     {
@@ -38172,7 +38172,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.en.json.gz",
-      "size_bytes": 6796181,
+      "size_bytes": 6796175,
       "source_kind": "generated_ignored"
     },
     {
@@ -38182,7 +38182,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1936/startup.bundle.zh.json.gz",
-      "size_bytes": 6796182,
+      "size_bytes": 6796176,
       "source_kind": "generated_ignored"
     },
     {
@@ -38202,7 +38202,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/chunks/political.coarse.r0c0.json.gz",
-      "size_bytes": 3677964,
+      "size_bytes": 3689296,
       "source_kind": "generated_ignored"
     },
     {
@@ -38292,7 +38292,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/chunks/political.detail.country.can.json.gz",
-      "size_bytes": 330881,
+      "size_bytes": 331319,
       "source_kind": "generated_ignored"
     },
     {
@@ -38637,7 +38637,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/chunks/political.detail.country.raj.json.gz",
-      "size_bytes": 357014,
+      "size_bytes": 357629,
       "source_kind": "generated_ignored"
     },
     {
@@ -38867,7 +38867,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/detail_chunks.manifest.json",
-      "size_bytes": 2696739,
+      "size_bytes": 2698006,
       "source_kind": "generated_ignored"
     },
     {
@@ -38892,7 +38892,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/locales.startup.json",
-      "size_bytes": 2159255,
+      "size_bytes": 2160878,
       "source_kind": "generated_ignored"
     },
     {
@@ -38932,7 +38932,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.en.json.gz",
-      "size_bytes": 6795109,
+      "size_bytes": 6795117,
       "source_kind": "generated_ignored"
     },
     {
@@ -38942,7 +38942,7 @@
     },
     {
       "path": "app/data/scenarios/hoi4_1939/startup.bundle.zh.json.gz",
-      "size_bytes": 6795109,
+      "size_bytes": 6795117,
       "source_kind": "generated_ignored"
     },
     {
@@ -38997,7 +38997,7 @@
     },
     {
       "path": "app/data/scenarios/modern_world/runtime_topology.topo.json",
-      "size_bytes": 32546550,
+      "size_bytes": 32568268,
       "source_kind": "generated_ignored"
     },
     {
@@ -39027,7 +39027,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json.gz",
-      "size_bytes": 15639436,
+      "size_bytes": 15657336,
       "source_kind": "generated_ignored"
     },
     {
@@ -39057,7 +39057,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.detail.country.aoi.json.gz",
-      "size_bytes": 26836,
+      "size_bytes": 27050,
       "source_kind": "generated_ignored"
     },
     {
@@ -39152,7 +39152,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.detail.country.can.json.gz",
-      "size_bytes": 339135,
+      "size_bytes": 339571,
       "source_kind": "generated_ignored"
     },
     {
@@ -39357,7 +39357,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.detail.country.gy.json.gz",
-      "size_bytes": 5552,
+      "size_bytes": 7781,
       "source_kind": "generated_ignored"
     },
     {
@@ -39657,7 +39657,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.detail.country.raj.json.gz",
-      "size_bytes": 265340,
+      "size_bytes": 265969,
       "source_kind": "generated_ignored"
     },
     {
@@ -40082,7 +40082,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/cores.by_feature.json",
-      "size_bytes": 411168,
+      "size_bytes": 411188,
       "source_kind": "generated_ignored"
     },
     {
@@ -40102,7 +40102,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/detail_chunks.manifest.json",
-      "size_bytes": 1738468,
+      "size_bytes": 1740541,
       "source_kind": "generated_ignored"
     },
     {
@@ -40142,7 +40142,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/locales.startup.json",
-      "size_bytes": 3841706,
+      "size_bytes": 3843329,
       "source_kind": "generated_ignored"
     },
     {
@@ -40152,12 +40152,12 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/mesh_pack.json",
-      "size_bytes": 5115546,
+      "size_bytes": 5125775,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/owners.by_feature.json",
-      "size_bytes": 384015,
+      "size_bytes": 384033,
       "source_kind": "generated_ignored"
     },
     {
@@ -40177,7 +40177,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
-      "size_bytes": 3764047,
+      "size_bytes": 3764106,
       "source_kind": "generated_ignored"
     },
     {
@@ -40192,12 +40192,12 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/scenario_manual_overrides.json",
-      "size_bytes": 33174,
+      "size_bytes": 33235,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/scenario_mutations.json",
-      "size_bytes": 321911,
+      "size_bytes": 321972,
       "source_kind": "generated_ignored"
     },
     {
@@ -40212,22 +40212,22 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json",
-      "size_bytes": 23444267,
+      "size_bytes": 23444414,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json.gz",
-      "size_bytes": 6534531,
+      "size_bytes": 6534592,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json",
-      "size_bytes": 23444267,
+      "size_bytes": 23444414,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json.gz",
-      "size_bytes": 6534531,
+      "size_bytes": 6534592,
       "source_kind": "generated_ignored"
     },
     {
@@ -46589,12 +46589,12 @@
     },
     {
       "path": "app/data/europe_topology.runtime_political_v1.json",
-      "size_bytes": 32742132,
+      "size_bytes": 32763855,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/modern_world/runtime_topology.topo.json",
-      "size_bytes": 32546550,
+      "size_bytes": 32568268,
       "source_kind": "generated_ignored"
     },
     {
@@ -46624,17 +46624,17 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.en.json",
-      "size_bytes": 23444267,
+      "size_bytes": 23444414,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/tno_1962/startup.bundle.zh.json",
-      "size_bytes": 23444267,
+      "size_bytes": 23444414,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/scenarios/blank_base/runtime_topology.topo.json",
-      "size_bytes": 22997095,
+      "size_bytes": 23025453,
       "source_kind": "generated_ignored"
     },
     {
@@ -46654,7 +46654,7 @@
     },
     {
       "path": "app/data/scenarios/tno_1962/chunks/political.coarse.r0c0.json.gz",
-      "size_bytes": 15639436,
+      "size_bytes": 15657336,
       "source_kind": "generated_ignored"
     },
     {
@@ -46702,12 +46702,12 @@
       {
         "file_count": 823,
         "id": "on-demand-product",
-        "size_bytes": 394663907
+        "size_bytes": 394685630
       },
       {
         "file_count": 8048,
         "id": "scenario-specific",
-        "size_bytes": 432093266
+        "size_bytes": 432210190
       },
       {
         "file_count": 4,
@@ -66323,7 +66323,7 @@
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 826616642,
+        "untraversed_dist_bytes": 826755289,
         "untraversed_dist_file_count": 8810,
         "untraversed_module_count": 0
       },
@@ -68098,7 +68098,7 @@
           },
           {
             "path": "app/data/europe_topology.runtime_political_v1.json",
-            "size_bytes": 32742132
+            "size_bytes": 32763855
           },
           {
             "path": "app/data/europe_urban.geojson",
@@ -68214,7 +68214,7 @@
             "size_bytes": 802059
           }
         ],
-        "size_bytes": 273749540
+        "size_bytes": 273771263
       },
       {
         "basis": "product-registry:editor-vendor-product",
@@ -68782,15 +68782,15 @@
           {
             "file_count": 584,
             "prefix": "app/data/scenarios/",
-            "size_bytes": 421193561
+            "size_bytes": 421310159
           },
           {
             "file_count": 10,
             "prefix": "app/data/scenario-rules/",
-            "size_bytes": 93653
+            "size_bytes": 93979
           }
         ],
-        "size_bytes": 421287214
+        "size_bytes": 421404138
       },
       {
         "basis": "product-registry:export-modules",
@@ -68985,7 +68985,7 @@
             ]
           },
           "owner": "scenario-runtime",
-          "size_bytes": 421287214
+          "size_bytes": 421404138
         },
         {
           "category": "scenario-specific",
@@ -69100,7 +69100,7 @@
             ]
           },
           "owner": "editor-data-runtime",
-          "size_bytes": 273749540
+          "size_bytes": 273771263
         },
         {
           "category": "on-demand-product",
@@ -69248,7 +69248,7 @@
     {
       "file_count": 9251,
       "path": "app",
-      "size_bytes": 829203764
+      "size_bytes": 829342411
     },
     {
       "file_count": 59,
@@ -69281,5 +69281,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 858609987
+  "total_bytes": 858748634
 }

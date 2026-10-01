@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-29T02:43:25.512929+00:00",
+  "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "outputs": {
     "city_aliases.json": {
       "alias_count": 189255,
@@ -127,8 +127,8 @@
       "world_bounds_geometries": 9
     },
     "europe_topology.runtime_political_v1.json": {
-      "arc_count": 150426,
-      "arc_point_count": 631942,
+      "arc_count": 150425,
+      "arc_point_count": 632481,
       "artifact_class": "publish",
       "description": "Unified runtime political topology consumed by the app and scenarios.",
       "has_computed_neighbors": true,
@@ -140,9 +140,9 @@
       "raw_world_bounds_geometries": 450,
       "role": "runtime_political_topology",
       "schema_ref": "schema://topology/runtime_political_v1",
-      "sha256": "b833908e74ecf8d1edce8ee8031feb8c230669674537d341fbaa4ef31e03491c",
+      "sha256": "43e307baa1b7ffa4b00774fdf12c7d96eb0cd0dd219c1c6990384da0c6cddbff",
       "simplification": "runtime_projection_v1",
-      "size_bytes": 32742132,
+      "size_bytes": 32763855,
       "target_zoom_range": [
         1.7,
         20

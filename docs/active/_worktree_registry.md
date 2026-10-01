@@ -592,3 +592,9 @@
 ## Polar sample baseline deployment follow-up 2026-09-29
 
 The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, based on `main@490583b6`. Root owns the scoped sample baseline and early CI gate fix, local publication test server, push/merge and deployment verification. Original polar repair is already merged as PR #187; its first deployment failed. Preserve primary checkout WIP and retain this checkout for evidence/reuse.
+
+## Scenario geography repair 2026-10-01
+
+- Branch: codex/scenario-geometry-repair; base bfedc6b8. Managed checkout C:/Users/raede/.codex/worktrees/scenario-geometry-repair/mapcreator.
+- Root owns canonical builds, browser server, commits, push and PR integration. Scope: Guiana/Somalia coverage, Kashmir duplicate placeholder, Canada 60N coarse/detail nodes.
+- Primary country-label/UI WIP preserved. Acceptance and final merge receipt: docs/active/scenario-geography-repair-20261001/.

@@ -1,7 +1,7 @@
 {
   "artifact_counts": {
     "chunk_count": 0,
-    "feature_count": 11321,
+    "feature_count": 11322,
     "water_count": 0
   },
   "diagnostics": {
@@ -18,34 +18,34 @@
   "profile": "lightweight_base",
   "reverse_coverage_gap_count": 0,
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "a304052c1aa83b2d8e326e6a5f4d009c45422bd4fd66a39cddb5c08b5daebc78",
+  "snapshot_fingerprint": "f3b3ed6ddfa71c96db4c59e9af33afc2aec66f7efcb5ba642c0768e2b1d8e1f9",
   "source": {
     "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "build_snapshot_sha256": "e706030c9f5ed328d32d9c73a0274c851882b02e96356b214800ea39f73294cb",
+    "build_snapshot_sha256": "b91dac38d5ddb5ca1a747bad594bcf70489a483fb78e833016f77b48d199b812",
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
-    "runtime_topology_sha256": "cac2fee5d568f5a3996d3bf4c146bebb23b53d5c7d671c9d98c50b387efe99b4"
+    "runtime_topology_sha256": "acd7ba81f35385fb5c1b461fc223bdbdc1fa540ecc0b17427eda711b5c11ca8f"
   },
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
-    "changed_feature_count": 11321,
+    "changed_feature_count": 11322,
     "controller_count": 0,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 11321,
+    "feature_count": 11322,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 0,
     "quality_counts": {
-      "ownerless_editable_topology": 11321
+      "ownerless_editable_topology": 11322
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "ownerless_editable_topology": 11321
+      "ownerless_editable_topology": 11322
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,
