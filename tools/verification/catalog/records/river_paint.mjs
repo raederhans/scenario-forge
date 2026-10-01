@@ -10,7 +10,7 @@ export function createRiverPaintRecords(existingRecords) {
       'js/core/file_manager.js', 'js/core/interaction_funnel.js', 'js/core/interaction_funnel/import_apply_orchestration.js',
       'js/core/state/color_state.js', 'js/core/state/actions/scenario_activation_actions.js',
       'js/core/scenario_apply_pipeline.js', 'js/core/scenario/lifecycle_runtime.js', 'js/core/legend_state_normalizers.js',
-      'js/ui/river_paint_controls.js', 'js/ui/toolbar.js', 'index.html',
+      'js/ui/river_paint_controls.js', 'js/ui/river_cell_picker.js', 'js/ui/toolbar.js', 'index.html',
       'js/core/renderer/political_partial_repaint_owner.js', 'js/core/renderer/political_pass_orchestrator_owner.js', 'tests/political_pass_orchestrator_owner_behavior.test.mjs', 'js/core/renderer/brush_interaction_session_owner.js',
       'js/core/map_renderer/click_selection_transaction_owner.js', 'js/core/map_renderer/map_hover_interaction_owner.js',
       'js/core/renderer/transient_overlay_render_owner.js', 'js/core/renderer/fill_target_policy.js',

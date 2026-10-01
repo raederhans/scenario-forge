@@ -47,6 +47,7 @@ export function createFillTargetPolicy(runtimeState, {
   function isBatchFillDoubleClickBaseEligible(hit, feature) {
     if (!hit?.id || !feature) return false;
     if (runtimeState.currentTool !== "fill") return false;
+    if (runtimeState.riverPaint?.editMode) return false;
     if (runtimeState.interactionGranularity !== "subdivision") return false;
     if (runtimeState.brushModeEnabled) return false;
     if (runtimeState.specialZoneEditor?.active) return false;

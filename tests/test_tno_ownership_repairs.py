@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from shapely.geometry import box, mapping
@@ -22,6 +23,24 @@ SCENARIO_DIR = Path(__file__).resolve().parents[1] / "data" / "scenarios" / "tno
 
 
 class TnoIberianAtlantropaOwnershipTest(unittest.TestCase):
+    def test_french_guiana_restoration_uses_recorded_guyana_identity(self) -> None:
+        from tools.patch_tno_1962_bundle import apply_regional_rules
+        rule_path = SCENARIO_DIR.parents[1] / "scenario-rules" / "tno_1962.decolonization.manual.json"
+        payload = json.loads(rule_path.read_text(encoding="utf-8"))
+        rule = next(row for row in payload["country_rules"] if row["tag"] == "GY")
+        owners = {"owners": {"GY_ADM1_GUY-671": "GY"}}
+        controllers = {"controllers": dict(owners["owners"])}
+        cores = {"cores": {"GY_ADM1_GUY-671": ["GY"]}}
+        selected = {**payload, "country_rules": [rule]}
+        with patch("tools.patch_tno_1962_bundle.load_json", return_value=selected), \
+             patch("tools.patch_tno_1962_bundle.load_hierarchy_groups", return_value={}), \
+             patch("tools.patch_tno_1962_bundle.load_palette_entries", return_value={}):
+            apply_regional_rules("decolonization", rule_path, {"countries": {}},
+                                 owners, controllers, cores, {})
+        self.assertEqual(owners["owners"], {"GY_ADM1_GUY-671": "GY", "GF_PRIMARY": "GY"})
+        self.assertEqual(controllers["controllers"], owners["owners"])
+        self.assertEqual(cores["cores"]["GF_PRIMARY"], ["GY"])
+
     def test_west_med_donor_states_and_balearics_use_iberian_owner(self) -> None:
         west_med = ATLANTROPA_REGION_CONFIGS["west_med"]
         iberian_states = {8446, 8447, 8448, 8452, 8453, 8455, 8456, 8457,

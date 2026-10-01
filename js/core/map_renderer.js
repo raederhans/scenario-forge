@@ -51,6 +51,8 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
+import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
+import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
@@ -12545,6 +12547,59 @@ function drawBlankFeatureLabelsPass(k, { interactive = false } = {}) {
   rendererSurfaceHost.getContext().restore();
 }
 
+let countryLabelSourceOwner = null;
+let countryLabelRenderOwner = null;
+
+function getCountryLabelSourceOwner() {
+  countryLabelSourceOwner ||= createCountryLabelSourceOwner({
+    state: runtimeState,
+    topojson: globalThis.topojson,
+    ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
+    getCountryName: (code) => {
+      const name = getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[code])
+        || runtimeState.countryNames?.[code] || code;
+      return t(name, "geo") || name;
+    },
+    onChange: () => {
+      invalidateRenderPasses("labels", "country-label-source");
+      requestRendererRender("country-label-source", { flush: false });
+    },
+  });
+  return countryLabelSourceOwner;
+}
+
+function getCountryLabelRenderOwner() {
+  if (countryLabelRenderOwner) return countryLabelRenderOwner;
+  countryLabelRenderOwner ||= createCountryLabelRenderOwner({
+    state: runtimeState,
+    getters: {
+      getContext: () => rendererSurfaceHost.getContext(),
+      getProjection: () => rendererSurfaceHost.getProjection(),
+      getProjectionIdentity: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+      getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+      getTransform: () => runtimeState.zoomTransform,
+      getLanguage: () => runtimeState.currentLanguage || "en",
+      getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
+    },
+    helpers: {
+      onInvalidate: () => {
+        invalidateRenderPasses("labels", "country-label-layout");
+        requestRendererRender("country-label-layout", { flush: false });
+      },
+    },
+  });
+  const refreshFonts = () => {
+    countryLabelRenderOwner?.clearTextCache();
+    invalidateRenderPasses("labels", "country-label-fonts");
+    requestRendererRender("country-label-fonts", { flush: false });
+  };
+  if (globalThis.document?.fonts) {
+    if (document.fonts.status === "loading") document.fonts.ready.then(refreshFonts);
+    document.fonts.addEventListener?.("loadingdone", refreshFonts);
+  }
+  return countryLabelRenderOwner;
+}
+
 function drawLabelsPass(k, { interactive = false } = {}) {
   if (isHgoRuntimePreviewReady()) {
     recordRenderPerfMetric("drawLabelsPass", 0, {
@@ -12561,6 +12616,12 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
   getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
   if (!interactive && !runtimeState.deferContextBasePass) {
+    if (runtimeState.styleConfig?.countryLabels?.enabled !== false) {
+      getCountryLabelSourceOwner().prepare();
+      const startedAt = nowMs();
+      getCountryLabelRenderOwner().drawCountryLabels(k, { occupiedBoxes });
+      recordRenderPerfMetric("countryLabels", nowMs() - startedAt, getCountryLabelRenderOwner().getDiagnostics());
+    }
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
     getPhysicalLayerRenderOwner().drawPhysicalRegionLabels(k, { occupiedBoxes });
   }
@@ -12954,11 +13015,34 @@ function composeRenderPassesToTarget(
 
 let exportRenderInProgress = false;
 
+async function ensureCountryLabelsReadyForExport(passNames) {
+  if (!passNames.includes("labels")) return;
+  await waitForCountryLabelsForExport({
+    isDisabled: () => isHgoRuntimePreviewReady() || runtimeState.styleConfig?.countryLabels?.enabled === false,
+    prepareSource: () => getCountryLabelSourceOwner().prepare(),
+    getSource: () => getCountryLabelSourceOwner().getSource(),
+    getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
+    requestRender: () => {
+      invalidateRenderPasses("labels", "country-label-export");
+      requestRendererRender("country-label-export", { flush: false });
+    },
+  });
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
+  if (passNames.includes("labels") && !isHgoRuntimePreviewReady()
+    && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
+    const sourceStatus = getCountryLabelSourceOwner().getSource().status;
+    const labelStatus = countryLabelRenderOwner?.getDiagnostics();
+    if (sourceStatus !== "disabled" && (sourceStatus !== "ready"
+      || !labelStatus || labelStatus.pendingFits > 0 || labelStatus.workerErrors > 0)) {
+      throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
+    }
+  }
   if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
     const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
     if (contourStatus === "building" || contourStatus === "error") {
@@ -15383,6 +15467,7 @@ export {
   getPaintContourDiagnostics,
   getPoliticalBorderDiagnostics,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   // Core render lifecycle facade.
   initMap,
   setMapData,

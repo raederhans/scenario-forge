@@ -1,3 +1,8 @@
+import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
+import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
+import { getRiverPaintRuntime } from "./river_paint/runtime.js";
+import { createRiverPaintRenderOwner } from "./river_paint/render_owner.js";
+import { createRiverPaintEditorOwner } from "./river_paint/editor_owner.js";
 import { decodeBathymetryTopology } from "./renderer/bathymetry_decode.js";
 import { createBathymetryWorkerClient } from "./bathymetry_worker_client.js";
 import { createBathymetryCoverageCompositor } from "./renderer/bathymetry_coverage_compositor.js";
@@ -46,6 +51,8 @@ import {
   getUrbanFeatureOwnerId,
 } from "./renderer/urban_adaptive_paint_model.js";
 import { createCityLabelTextModel } from "./renderer/city_label_text_model.js";
+import { createCountryLabelSourceOwner } from "./renderer/country_label_source.js";
+import { createCountryLabelRenderOwner, waitForCountryLabelsForExport } from "./renderer/country_label_render_owner.js";
 import { createUrbanLayerRenderOwner } from "./renderer/urban_layer_render_owner.js";
 // Hybrid canvas + SVG rendering engine.
 // 这个文件仍是渲染主控壳层：owner/facade 已经拆到子模块，但跨子系统的调度、
@@ -948,6 +955,7 @@ function getTransientOverlayRenderOwner() {
     getFeatureId,
     getActiveFacilityHighlightEntry,
     buildFacilityEntryKey,
+    getRiverCellFeature: id => getRiverPaintRuntime(runtimeState).getCellFeature(id),
   });
   return transientOverlayRenderOwner;
 }
@@ -2297,14 +2305,46 @@ function getPoliticalBorderDiagnostics() {
   return getPoliticalBorderRuntimeOwner().diagnostics();
 }
 
+let riverPaintRenderOwner = null;
+let riverPaintEditorOwner = null;
+function getRiverPaintRenderOwner() {
+  if (!riverPaintRenderOwner) riverPaintRenderOwner = createRiverPaintRenderOwner({
+    state: runtimeState,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPath: () => rendererSurfaceHost.getPathCanvas(),
+    getProjectionKey: getOverlayProjectionSignature,
+    isVisible: pathBoundsInScreen,
+    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric,
+    fallbackColor: LAND_FILL_COLOR,
+  });
+  return riverPaintRenderOwner;
+}
+function getRiverPaintEditorOwner() {
+  if (!riverPaintEditorOwner) riverPaintEditorOwner = createRiverPaintEditorOwner({
+    state: runtimeState, captureHistoryState, commitHistoryEntry,
+    refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
+    selectColor: color => {
+      setClickSelectedColorState(runtimeState, color);
+      runtimeState.updateSwatchUIFn?.();
+    },
+    announce: reason => showToast(runtimeState.currentLanguage === "zh"
+      ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
+      : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
+  });
+  return riverPaintEditorOwner;
+}
+
 let paintContourRuntimeOwner = null;
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
-      getFeatures: () => runtimeState.landData?.features,
+      getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
-      resolveBoundaryKey: (feature, id) => canonicalCountryCode(getDisplayOwnerCode(feature, id)),
+      resolveBoundaryKey: (feature, id) => {
+        const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+        return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
+      },
       getBoundaryRevision: () => [runtimeState.sovereigntyRevision, runtimeState.scenarioDataGeneration,
         runtimeState.scenarioShellOverlayRevision].join("|"),
       separatePoliticalBorders: () => separatesPoliticalBorders(runtimeState),
@@ -2312,9 +2352,11 @@ function getPaintContourRuntimeOwner() {
         && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
         && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
-      resolveColor: (feature, id) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
-        getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
-      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+      resolveColor: (feature, id) => (feature?.properties?.__riverParentId
+        ? getMapDataBoundary(runtimeState).paint.resolveRiverCellColor(id)
+        : getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
+          getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
+        })).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
         requestRendererRender(reason, { flush: false });
@@ -2325,6 +2367,7 @@ function getPaintContourRuntimeOwner() {
 }
 
 async function ensurePaintContoursReady() {
+  getRiverPaintRuntime(runtimeState).assertReadyForExport();
   if (!isHgoRuntimePreviewReady()) await getPaintContourRuntimeOwner().ensureReady();
 }
 
@@ -3048,6 +3091,7 @@ function getClickSelectionTransactionOwner() {
       dismissOnboardingHint,
       ensureLeafDetailReady,
       getFeatureCountryCodeNormalized,
+      handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
       getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
         getSafeColor: getSafeCanvasColor,
         getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
@@ -3384,6 +3428,7 @@ function getPoliticalPassOrchestratorOwner() {
       buildPoliticalRasterWorkerPacket: buildPoliticalPassWorkerPacket,
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
+      drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
   });
@@ -3538,6 +3583,7 @@ function getPoliticalPartialRepaintOwner() {
       clearPendingPoliticalColorEdit,
       setPassReferenceTransform,
       recordPassTiming,
+      drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
       commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
         renderDiag.politicalPass = politicalPassDiagnostics;
         publishRenderDiagnostics();
@@ -6496,6 +6542,7 @@ function rebuildPoliticalLandCollections() {
   atlantropaMs = nowMs() - atlantropaStartedAt;
 
   const interactiveStartedAt = nowMs();
+  fullCollection = getRiverPaintRuntime(runtimeState).pinCollection(fullCollection);
   const interactiveCollection = buildInteractiveLandData(fullCollection);
   interactiveMs = nowMs() - interactiveStartedAt;
   runtimeState.landDataFull = fullCollection;
@@ -7278,7 +7325,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
 
   bumpColorRevision(state);
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
-  if (getPaintContourRuntimeOwner().notifyPaintChanged(ids)) invalidateRenderPasses("borders", "paint-contours-colors");
+  if (getPaintContourRuntimeOwner().notifyPaintChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids))) invalidateRenderPasses("borders", "paint-contours-colors");
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
     inputLabel,
@@ -10032,7 +10079,7 @@ function getHitFromEvent(
     resolvedHit,
     candidateCollector,
   });
-  return resolvedHit;
+  return getRiverPaintRuntime(runtimeState).refineHit(resolvedHit, pointer.lonLat);
 }
 
 function clamp(value, min, max) {
@@ -12302,7 +12349,9 @@ function drawPoliticalWorkerBitmapResult(result, workerIdentity) {
   return getPoliticalPartialRepaintOwner().drawPoliticalWorkerBitmapResult(result, workerIdentity);
 }
 function drawPoliticalFeature(feature, index, options = {}) {
-  return getPoliticalPartialRepaintOwner().drawPoliticalFeature(feature, index, options);
+  const drawn = getPoliticalPartialRepaintOwner().drawPoliticalFeature(feature, index, options);
+  if (drawn) getRiverPaintRenderOwner().draw(options.k, getFeatureId(feature));
+  return drawn;
 }
 function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
   exactCompositeReuseOwner?.invalidate();
@@ -12498,6 +12547,59 @@ function drawBlankFeatureLabelsPass(k, { interactive = false } = {}) {
   rendererSurfaceHost.getContext().restore();
 }
 
+let countryLabelSourceOwner = null;
+let countryLabelRenderOwner = null;
+
+function getCountryLabelSourceOwner() {
+  countryLabelSourceOwner ||= createCountryLabelSourceOwner({
+    state: runtimeState,
+    topojson: globalThis.topojson,
+    ensureSources: (layers) => callRuntimeHook(runtimeState, "ensureScenarioNavigationSourcesFn", { layers }),
+    getCountryName: (code) => {
+      const name = getScenarioCountryDisplayName(runtimeState.scenarioCountriesByTag?.[code])
+        || runtimeState.countryNames?.[code] || code;
+      return t(name, "geo") || name;
+    },
+    onChange: () => {
+      invalidateRenderPasses("labels", "country-label-source");
+      requestRendererRender("country-label-source", { flush: false });
+    },
+  });
+  return countryLabelSourceOwner;
+}
+
+function getCountryLabelRenderOwner() {
+  if (countryLabelRenderOwner) return countryLabelRenderOwner;
+  countryLabelRenderOwner ||= createCountryLabelRenderOwner({
+    state: runtimeState,
+    getters: {
+      getContext: () => rendererSurfaceHost.getContext(),
+      getProjection: () => rendererSurfaceHost.getProjection(),
+      getProjectionIdentity: () => getProjectionGeometryGeneration(rendererSurfaceHost.getProjection()),
+      getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
+      getTransform: () => runtimeState.zoomTransform,
+      getLanguage: () => runtimeState.currentLanguage || "en",
+      getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
+    },
+    helpers: {
+      onInvalidate: () => {
+        invalidateRenderPasses("labels", "country-label-layout");
+        requestRendererRender("country-label-layout", { flush: false });
+      },
+    },
+  });
+  const refreshFonts = () => {
+    countryLabelRenderOwner?.clearTextCache();
+    invalidateRenderPasses("labels", "country-label-fonts");
+    requestRendererRender("country-label-fonts", { flush: false });
+  };
+  if (globalThis.document?.fonts) {
+    if (document.fonts.status === "loading") document.fonts.ready.then(refreshFonts);
+    document.fonts.addEventListener?.("loadingdone", refreshFonts);
+  }
+  return countryLabelRenderOwner;
+}
+
 function drawLabelsPass(k, { interactive = false } = {}) {
   if (isHgoRuntimePreviewReady()) {
     recordRenderPerfMetric("drawLabelsPass", 0, {
@@ -12514,6 +12616,12 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
   getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
   if (!interactive && !runtimeState.deferContextBasePass) {
+    if (runtimeState.styleConfig?.countryLabels?.enabled !== false) {
+      getCountryLabelSourceOwner().prepare();
+      const startedAt = nowMs();
+      getCountryLabelRenderOwner().drawCountryLabels(k, { occupiedBoxes });
+      recordRenderPerfMetric("countryLabels", nowMs() - startedAt, getCountryLabelRenderOwner().getDiagnostics());
+    }
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
     getPhysicalLayerRenderOwner().drawPhysicalRegionLabels(k, { occupiedBoxes });
   }
@@ -12875,10 +12983,34 @@ function composeRenderPassesToTarget(
 
 let exportRenderInProgress = false;
 
+async function ensureCountryLabelsReadyForExport(passNames) {
+  if (!passNames.includes("labels")) return;
+  await waitForCountryLabelsForExport({
+    isDisabled: () => isHgoRuntimePreviewReady() || runtimeState.styleConfig?.countryLabels?.enabled === false,
+    prepareSource: () => getCountryLabelSourceOwner().prepare(),
+    getSource: () => getCountryLabelSourceOwner().getSource(),
+    getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
+    requestRender: () => {
+      invalidateRenderPasses("labels", "country-label-export");
+      requestRendererRender("country-label-export", { flush: false });
+    },
+  });
+}
+
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
+  if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
+  if (passNames.includes("labels") && !isHgoRuntimePreviewReady()
+    && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
+    const sourceStatus = getCountryLabelSourceOwner().getSource().status;
+    const labelStatus = countryLabelRenderOwner?.getDiagnostics();
+    if (sourceStatus !== "disabled" && (sourceStatus !== "ready"
+      || !labelStatus || labelStatus.pendingFits > 0 || labelStatus.workerErrors > 0)) {
+      throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
+    }
+  }
   if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
     const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
     if (contourStatus === "building" || contourStatus === "error") {
@@ -13738,7 +13870,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     });
   }
 
-  const historyFeatureIds = Object.keys(runtimeState.visualOverrides || {});
+  const historyFeatureIds = [...new Set([...Object.keys(runtimeState.visualOverrides || {}), ...getEditedRiverParentIds(runtimeState.riverPaint)])];
   const historyOwnerCodes = Array.from(new Set([
     ...Object.keys(runtimeState.sovereignBaseColors || {}),
     ...Object.keys(nextCountryBaseColors || {}),
@@ -13754,6 +13886,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     })
     : null;
 
+  clearAllRiverPaintOverridesState(runtimeState);
   runtimeState.visualOverrides = {};
   runtimeState.sovereignBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
 
@@ -14728,7 +14861,9 @@ function mergeHistorySnapshot(target, snapshot) {
   Object.entries(snapshot).forEach(([section, patch]) => {
     if (!patch || typeof patch !== "object") return;
     target[section] = target[section] || {};
-    Object.assign(target[section], patch);
+    for (const [key, value] of Object.entries(patch)) {
+      if (!Object.hasOwn(target[section], key)) target[section][key] = value;
+    }
   });
 }
 
@@ -14765,6 +14900,8 @@ function applyBrushHit(hit) {
   if (!requestLeafDetailPromotion(countryCode, { announce: true })) {
     return false;
   }
+  const riverResult = getRiverPaintEditorOwner().handleBrush(hit, brushSession);
+  if (riverResult.consumed) return riverResult.changed;
   const targetIds = resolveInteractionTargetIds(feature, id);
   const selectedColor = getSafeCanvasColor(runtimeState.selectedColor, LAND_FILL_COLOR);
 
@@ -15298,6 +15435,7 @@ export {
   getPaintContourDiagnostics,
   getPoliticalBorderDiagnostics,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   // Core render lifecycle facade.
   initMap,
   setMapData,
