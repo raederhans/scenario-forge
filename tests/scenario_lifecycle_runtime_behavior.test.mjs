@@ -2733,3 +2733,18 @@ test("scenario data health keeps manifest totals for non-chunked topology checks
   assert.equal(health.runtimeFeatureCount, 900);
   assert.equal(health.severity, "error");
 });
+
+test('river paint is cleared on baseline reset and scenario exit before post effects', async () => {
+  const { makeFixture } = await import('./helpers/river_paint_fixture.mjs');
+  for (const method of ['resetToScenarioBaseline', 'clearActiveScenario']) {
+    const { state: source } = await makeFixture();
+    const runtimeState = createBaseState({ riverPaint: source.riverPaint });
+    let observed = null;
+    const lifecycle = createLifecycleRuntime(runtimeState, {
+      runPostScenarioResetEffects: () => { observed = runtimeState.riverPaint; },
+      runPostScenarioClearEffects: () => { observed = runtimeState.riverPaint; },
+    });
+    lifecycle[method]();
+    assert.deepEqual(observed, { schemaVersion: 1, editMode: false, pack: null, overrides: {} });
+  }
+});

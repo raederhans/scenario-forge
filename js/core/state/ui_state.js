@@ -283,6 +283,7 @@ export function createDefaultUiState() {
     dirtyRevision: 0,
     onboardingDismissed: false,
     hoveredId: null,
+    hoveredRiverCellId: null,
     hoveredWaterRegionId: null,
     hoveredSpecialRegionId: null,
     hoverOverlayDirty: true,

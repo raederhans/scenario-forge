@@ -8,6 +8,8 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import {
+  STATE_RIVER_OWNER_SOURCE_RECEIPTS,
+  inspectRiverOwnerSourceEvidence,
   STATE_BORROWED_EFFECT_CONTRACT,
   STATE_BORROWED_CALLBACK_INJECTION_CONTRACT,
   STATE_BORROWED_RUNTIME_CONTRACT,
@@ -4688,6 +4690,25 @@ export async function discoverStateWriterBindingsForSource(
       ? { bindings: actionBindings, bindingInventories }
       : actionBindings;
   }
+  const riverEntries = enforceCurrentContracts && STATE_RIVER_OWNER_SOURCE_RECEIPTS.filter(entry => entry.modulePath === relativePath);
+  if (riverEntries?.length) {
+    const riverBindings = allParameterDiscovery.bindings.filter(candidate => riverEntries.some(entry =>
+      entry.functionName === candidate.functionName && entry.parameterName === candidate.parameterName
+      && entry.parameterIndex === candidate.parameterIndex && entry.parameterPath === candidate.parameterPath)).map(createParameterBinding);
+    const bindingInventories = scanStateWriterBindingInventoriesBatch(source, relativePath, riverBindings,
+      normalizedDerivedAliasTaintMode, { scanner, recognizeCurrentContracts: true });
+    const evidence = inspectRiverOwnerSourceEvidence(relativePath, {
+      inventories: bindingInventories,
+      readSource: modulePath => modulePath === relativePath ? source : readFileSync(path.join(PROJECT_ROOT, modulePath), "utf8"),
+    });
+    if (evidence.violations.length) {
+      const error = new Error(`River owner live source evidence failed: ${relativePath}`);
+      error.code = "river-owner-source-evidence-invalid";
+      error.violations = evidence.violations;
+      throw error;
+    }
+    return includeInventories ? { bindings: riverBindings, bindingInventories } : riverBindings;
+  }
   const pureReaderCandidateIdentities = enforceCurrentContracts
     ? buildStateTargetPureReaderCandidateIdentities({
       relativePath,
@@ -5626,9 +5647,11 @@ export function isDelegationOnlyStateWriterCandidate({
     && actionDelegations.length > 0;
 }
 
-// A registered action delegates its only target effect to the exact imported
-// paint implementation. Project the reachable assignment into its logical
-// action binding without adding another runtime write. The deletion branch in
+// A registered action delegates its paint effects to the exact imported
+// paint implementation. Project the reachable assignments into its logical
+// action binding without adding another runtime write. The river helper's
+// source receipt proves that it copies overrides before deleting child colors;
+// the resulting paint object is assigned only to the target. The deletion branch in
 // the implementation requires remove=true, which this three-argument call
 // never supplies.
 export function projectPalettePaintActionCandidate(scannedCandidates, {
@@ -5654,6 +5677,8 @@ export function projectPalettePaintActionCandidate(scannedCandidates, {
     finding.unsupported, finding.sourceFingerprint,
   ].join("|")).sort();
   const expectedEffects = [
+    "unsupported|riverPaint|riverPaint|true|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+    "assign|riverPaint|riverPaint|false|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
     "assign|visualOverrides|visualOverrides|false|480611b47858cfa78e28a67a707381b5650bdb07cc4344ac8c8feb58c2889b88",
     "assign|visualOverrides|visualOverrides.*|false|91883c994dfd68079ce6f9b74f8e9ef0e10a4b08c27d21eeaaa2b663be690cd0",
     "delete|visualOverrides|visualOverrides.*|false|0732c3c19a5f7f84ee8a1d733333d1ccdc637b56ebf3b8ee7a0b2cb123bdba18",
@@ -5704,7 +5729,10 @@ export function projectPalettePaintActionCandidate(scannedCandidates, {
     enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: receipt.exportName, ordinal: 0 }] }),
     sourceFingerprint: receipt.callFingerprint,
   };
-  return { path: receipt.modulePath, surface: "production", binding, findings: [finding], delegationOnly: false };
+  return {
+    path: receipt.modulePath, surface: "production", binding, delegationOnly: false,
+    findings: [finding, { ...finding, key: "riverPaint", pathSegments: ["riverPaint"], dynamic: false }],
+  };
 }
 
 export async function resolveCachedStateWriterRepositoryScan({

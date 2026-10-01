@@ -189,7 +189,7 @@ test("P3.3a document locks the political-pass preflight and P3.3b seam", () => {
 
 test("implemented political owner keeps the frozen top-level orchestration order", () => {
   const ownerSource = readRepoFile(CANONICAL_OWNER_PATH);
-  const drawSource = extractFunctionSource(ownerSource, "drawPoliticalPass");
+  const drawSource = extractFunctionSource(ownerSource, "drawBasePoliticalPass");
   assertOrderedTokens(drawSource, [
     "if (isHgoRuntimePreviewReady())",
     'recordRenderPerfMetric("drawPoliticalPass", 0, {',
@@ -230,7 +230,7 @@ test("implemented political owner keeps the frozen top-level orchestration order
 
 test("worker identity, packet, bitmap, and partial algorithms live in the partial owner with root effects", () => {
   const rendererSource = readRepoFile(MAP_RENDERER_PATH);
-  const ownerSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawPoliticalPass");
+  const ownerSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawBasePoliticalPass");
   const partialOwnerSource = readRepoFile(PARTIAL_OWNER_PATH);
   const identitySource = extractFunctionSource(partialOwnerSource, "resolvePoliticalPassIdentity");
   const viewportSource = extractFunctionSource(partialOwnerSource, "resolvePoliticalPassViewport");
@@ -272,7 +272,7 @@ test("worker identity, packet, bitmap, and partial algorithms live in the partia
 });
 
 test("progressive recovery keeps pending edits and visible overrides ahead of coarse skip", () => {
-  const drawSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawPoliticalPass");
+  const drawSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawBasePoliticalPass");
   assert.match(
     drawSource,
     /const progressiveRecoveryCoarseSkipCandidate = \([\s\S]*?!!backgroundSummary\?\.progressive[\s\S]*?!backgroundSummary\?\.deferredFullCacheReady[\s\S]*?String\(backgroundSummary\?\.coarseUnderlay \|\| ""\) === "admin0"[\s\S]*?&& !pendingPoliticalColorEdit[\s\S]*?\);/,
@@ -321,7 +321,7 @@ test("fine drawing and diagnostics live in the partial owner while state writes 
   const diagnosticsSource = extractFunctionSource(partialOwnerSource, "publishPoliticalPassDiagnostics");
   const recoverySource = extractFunctionSource(rendererSource, "getPoliticalRecoveryQuality");
   const fineSource = extractFunctionSource(partialOwnerSource, "drawPoliticalFineFeatureLoop");
-  const ownerSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawPoliticalPass");
+  const ownerSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawBasePoliticalPass");
   assert.ok(diagnosticsSource.includes("effect.commitPoliticalPassDiagnostics({"));
   const recoveryQualityWrite = [
     "runtimeState.politicalRecoveryQuality",

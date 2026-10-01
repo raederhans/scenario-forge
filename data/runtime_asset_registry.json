@@ -647,6 +647,12 @@
       "role": "context_layer",
       "family_id": "physical_region_labels",
       "description": "Natural Earth bilingual physical reference labels"
+    },
+    "river_partitions:modern_world_pilot": {
+      "url": "data/river_partitions/modern_world_pilot.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed six-parent river-paint pilot bound to the Modern World baseline; independent from reference topology."
     }
   },
   "scenario_registry_key": "scenario_registry",

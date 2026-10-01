@@ -31,6 +31,7 @@ const patchedStateDefaultsSource = stateDefaultsSource
 const stateDefaultsDataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(patchedStateDefaultsSource)}`;
 const colorStateSource = await readFile(new URL("../js/core/state/color_state.js", import.meta.url), "utf8");
 const patchedColorStateSource = colorStateSource
+  .replace("../river_paint/partition_model.js", new URL("../js/core/river_paint/partition_model.js", import.meta.url).href)
   .replace("../state_defaults.js", stateDefaultsDataUrl)
   .replace("../color_hex_utils.js", colorHexUtilsDataUrl);
 const colorStateModule = await import(`data:text/javascript;charset=utf-8,${encodeURIComponent(patchedColorStateSource)}`);

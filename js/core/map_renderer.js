@@ -1,3 +1,8 @@
+import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
+import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
+import { getRiverPaintRuntime } from "./river_paint/runtime.js";
+import { createRiverPaintRenderOwner } from "./river_paint/render_owner.js";
+import { createRiverPaintEditorOwner } from "./river_paint/editor_owner.js";
 import { decodeBathymetryTopology } from "./renderer/bathymetry_decode.js";
 import { createBathymetryWorkerClient } from "./bathymetry_worker_client.js";
 import { createBathymetryCoverageCompositor } from "./renderer/bathymetry_coverage_compositor.js";
@@ -948,6 +953,7 @@ function getTransientOverlayRenderOwner() {
     getFeatureId,
     getActiveFacilityHighlightEntry,
     buildFacilityEntryKey,
+    getRiverCellFeature: id => getRiverPaintRuntime(runtimeState).getCellFeature(id),
   });
   return transientOverlayRenderOwner;
 }
@@ -2297,14 +2303,46 @@ function getPoliticalBorderDiagnostics() {
   return getPoliticalBorderRuntimeOwner().diagnostics();
 }
 
+let riverPaintRenderOwner = null;
+let riverPaintEditorOwner = null;
+function getRiverPaintRenderOwner() {
+  if (!riverPaintRenderOwner) riverPaintRenderOwner = createRiverPaintRenderOwner({
+    state: runtimeState,
+    getContext: () => rendererSurfaceHost.getContext(),
+    getPath: () => rendererSurfaceHost.getPathCanvas(),
+    getProjectionKey: getOverlayProjectionSignature,
+    isVisible: pathBoundsInScreen,
+    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric,
+    fallbackColor: LAND_FILL_COLOR,
+  });
+  return riverPaintRenderOwner;
+}
+function getRiverPaintEditorOwner() {
+  if (!riverPaintEditorOwner) riverPaintEditorOwner = createRiverPaintEditorOwner({
+    state: runtimeState, captureHistoryState, commitHistoryEntry,
+    refreshParents: refreshResolvedColorsForFeatures, markDirty, addRecentColor, nowMs,
+    selectColor: color => {
+      setClickSelectedColorState(runtimeState, color);
+      runtimeState.updateSwatchUIFn?.();
+    },
+    announce: reason => showToast(runtimeState.currentLanguage === "zh"
+      ? `沿河分区暂不可编辑：${reason}。未修改整块颜色。`
+      : `River cell not editable: ${reason}. The parent was not painted.`, { tone: "warning" }),
+  });
+  return riverPaintEditorOwner;
+}
+
 let paintContourRuntimeOwner = null;
 function getPaintContourRuntimeOwner() {
   if (!paintContourRuntimeOwner) {
     paintContourRuntimeOwner = createPaintContourRuntime({
       state: runtimeState,
-      getFeatures: () => runtimeState.landData?.features,
+      getFeatures: () => getRiverPaintRuntime(runtimeState).surfaces(),
       getFeatureId,
-      resolveBoundaryKey: (feature, id) => canonicalCountryCode(getDisplayOwnerCode(feature, id)),
+      resolveBoundaryKey: (feature, id) => {
+        const parent = getRiverPaintRuntime(runtimeState).getParentFeature(feature);
+        return canonicalCountryCode(getDisplayOwnerCode(parent, feature?.properties?.__riverParentId || id));
+      },
       getBoundaryRevision: () => [runtimeState.sovereigntyRevision, runtimeState.scenarioDataGeneration,
         runtimeState.scenarioShellOverlayRevision].join("|"),
       separatePoliticalBorders: () => separatesPoliticalBorders(runtimeState),
@@ -2312,9 +2350,11 @@ function getPaintContourRuntimeOwner() {
         && !isScenarioShellFeature(feature, id)
         && !isColorResolutionOceanFeature(feature, id, { isAtlantropaSeaFeature })
         && (!feature.properties?.atl_color_rule || feature.properties.atl_color_rule === "owner"),
-      resolveColor: (feature, id) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
-        getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
-      }).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
+      resolveColor: (feature, id) => (feature?.properties?.__riverParentId
+        ? getMapDataBoundary(runtimeState).paint.resolveRiverCellColor(id)
+        : getMapDataBoundary(runtimeState).paint.resolveFeatureColor(id, {
+          getBaseGroupCode: () => getMapDataBoundary(runtimeState).reference.getBaseGroupCode(feature),
+        })).color || (normalizeMapSemanticMode(runtimeState.mapSemanticMode) === "blank" ? "#d7d3c7" : LAND_FILL_COLOR),
       onChange: (reason) => {
         invalidateRenderPasses("borders", reason);
         requestRendererRender(reason, { flush: false });
@@ -2325,6 +2365,7 @@ function getPaintContourRuntimeOwner() {
 }
 
 async function ensurePaintContoursReady() {
+  getRiverPaintRuntime(runtimeState).assertReadyForExport();
   if (!isHgoRuntimePreviewReady()) await getPaintContourRuntimeOwner().ensureReady();
 }
 
@@ -3048,6 +3089,7 @@ function getClickSelectionTransactionOwner() {
       dismissOnboardingHint,
       ensureLeafDetailReady,
       getFeatureCountryCodeNormalized,
+      handleRiverPaintClick: hit => getRiverPaintEditorOwner().handleClick(hit),
       getFeaturePaintColor: (featureId) => getMapDataBoundary(runtimeState).paint.resolveFeatureColor(featureId, {
         getSafeColor: getSafeCanvasColor,
         getBaseGroupCode: (id) => getDisplayOwnerCode(runtimeState.landIndex?.get(id), id),
@@ -3384,6 +3426,7 @@ function getPoliticalPassOrchestratorOwner() {
       buildPoliticalRasterWorkerPacket: buildPoliticalPassWorkerPacket,
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
+      drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
   });
@@ -3538,6 +3581,7 @@ function getPoliticalPartialRepaintOwner() {
       clearPendingPoliticalColorEdit,
       setPassReferenceTransform,
       recordPassTiming,
+      drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
       commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
         renderDiag.politicalPass = politicalPassDiagnostics;
         publishRenderDiagnostics();
@@ -6496,6 +6540,7 @@ function rebuildPoliticalLandCollections() {
   atlantropaMs = nowMs() - atlantropaStartedAt;
 
   const interactiveStartedAt = nowMs();
+  fullCollection = getRiverPaintRuntime(runtimeState).pinCollection(fullCollection);
   const interactiveCollection = buildInteractiveLandData(fullCollection);
   interactiveMs = nowMs() - interactiveStartedAt;
   runtimeState.landDataFull = fullCollection;
@@ -7278,7 +7323,7 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
 
   bumpColorRevision(state);
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
-  if (getPaintContourRuntimeOwner().notifyPaintChanged(ids)) invalidateRenderPasses("borders", "paint-contours-colors");
+  if (getPaintContourRuntimeOwner().notifyPaintChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids))) invalidateRenderPasses("borders", "paint-contours-colors");
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
     startedAt: inputStartedAt,
     inputLabel,
@@ -10032,7 +10077,7 @@ function getHitFromEvent(
     resolvedHit,
     candidateCollector,
   });
-  return resolvedHit;
+  return getRiverPaintRuntime(runtimeState).refineHit(resolvedHit, pointer.lonLat);
 }
 
 function clamp(value, min, max) {
@@ -12302,7 +12347,9 @@ function drawPoliticalWorkerBitmapResult(result, workerIdentity) {
   return getPoliticalPartialRepaintOwner().drawPoliticalWorkerBitmapResult(result, workerIdentity);
 }
 function drawPoliticalFeature(feature, index, options = {}) {
-  return getPoliticalPartialRepaintOwner().drawPoliticalFeature(feature, index, options);
+  const drawn = getPoliticalPartialRepaintOwner().drawPoliticalFeature(feature, index, options);
+  if (drawn) getRiverPaintRenderOwner().draw(options.k, getFeatureId(feature));
+  return drawn;
 }
 function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
   exactCompositeReuseOwner?.invalidate();
@@ -12876,6 +12923,7 @@ function composeRenderPassesToTarget(
 let exportRenderInProgress = false;
 
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
+  if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
@@ -13738,7 +13786,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     });
   }
 
-  const historyFeatureIds = Object.keys(runtimeState.visualOverrides || {});
+  const historyFeatureIds = [...new Set([...Object.keys(runtimeState.visualOverrides || {}), ...getEditedRiverParentIds(runtimeState.riverPaint)])];
   const historyOwnerCodes = Array.from(new Set([
     ...Object.keys(runtimeState.sovereignBaseColors || {}),
     ...Object.keys(nextCountryBaseColors || {}),
@@ -13754,6 +13802,7 @@ function autoFillMap(mode = "region", { recordHistory = true, styleUpdates = nul
     })
     : null;
 
+  clearAllRiverPaintOverridesState(runtimeState);
   runtimeState.visualOverrides = {};
   runtimeState.sovereignBaseColors = sanitizeCountryColorMap(nextCountryBaseColors);
 
@@ -14728,7 +14777,9 @@ function mergeHistorySnapshot(target, snapshot) {
   Object.entries(snapshot).forEach(([section, patch]) => {
     if (!patch || typeof patch !== "object") return;
     target[section] = target[section] || {};
-    Object.assign(target[section], patch);
+    for (const [key, value] of Object.entries(patch)) {
+      if (!Object.hasOwn(target[section], key)) target[section][key] = value;
+    }
   });
 }
 
@@ -14765,6 +14816,8 @@ function applyBrushHit(hit) {
   if (!requestLeafDetailPromotion(countryCode, { announce: true })) {
     return false;
   }
+  const riverResult = getRiverPaintEditorOwner().handleBrush(hit, brushSession);
+  if (riverResult.consumed) return riverResult.changed;
   const targetIds = resolveInteractionTargetIds(feature, id);
   const selectedColor = getSafeCanvasColor(runtimeState.selectedColor, LAND_FILL_COLOR);
 

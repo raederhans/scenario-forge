@@ -231,6 +231,7 @@ test('staged project patch includes unchanged visibility values and leaves live 
     await import('../js/core/special_zone_layers.js'), await import('../js/core/state/dev_state.js'),
     await import('../js/core/state/strategic_overlay_state.js'),
     await import('../js/core/map_editing_policy.js'),
+    await import('../js/core/river_paint/partition_model.js'),
     { cloneImportedProjectValue: structuredClone, captureProjectImportState });
   const context = vm.createContext(globals);
   vm.runInContext(source.slice(fn.start, fn.end), context);
@@ -263,6 +264,7 @@ test('scenario project import retains staged owner colors and applies saved colo
     await import('../js/core/special_zone_layers.js'), await import('../js/core/state/dev_state.js'),
     await import('../js/core/state/strategic_overlay_state.js'),
     await import('../js/core/map_editing_policy.js'),
+    await import('../js/core/river_paint/partition_model.js'),
     { cloneImportedProjectValue: structuredClone, captureProjectImportState });
   const context = vm.createContext(globals);
   vm.runInContext(source.slice(fn.start, fn.end), context);
