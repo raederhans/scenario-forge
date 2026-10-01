@@ -2,7 +2,7 @@ import { RIVER_PAINT_PILOT } from '../js/core/river_paint/pilot_manifest.js';
 import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, feature, d3, captureCells, realPilot } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, rectangle, feature, d3, captureCells, realPilot, realWave2 } from './helpers/river_paint_fixture.mjs';
 import { getRiverPaintRuntime, createRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { applyFeaturePaintState } from '../js/core/state/color_state.js';
@@ -148,13 +148,23 @@ test('blocked, stale and mismatched-parent hits cannot write; eyedropper uses ch
 });
 
 
-test('same ownership hash cannot activate a pilot against a regenerated geometry build', async () => {
-  const pack = realPilot();
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2]])
+test(`${label}: saved pack is retained and a regenerated geometry build is rejected`, async () => {
+  const pack = readPack();
   const manifest = { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt };
   const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
-    activeScenarioManifest: manifest, riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, overrides: {} }) };
+    activeScenarioManifest: manifest,
+    landIndex: new Map(pack.parents.map(p => [p.parentId, feature(p.parentId, p.parentGeometry)])),
+    riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, overrides: {} }) };
   const runtime = createRiverPaintRuntime(state);
   assert.equal(runtime.getActivePack().packId, pack.packId);
+  const cellId = pack.parents[0].cells[0].id;
+  applyRiverCellPaintState(state, cellId, '#abcdef');
+  const saved = state.riverPaint.pack;
+  const enabled = await runtime.enable(() => { throw new Error('Saved pack must not be replaced'); });
+  assert.equal(enabled.ready, true); assert.equal(enabled.geometryChanged, false);
+  assert.equal(state.riverPaint.pack, saved);
+  assert.equal(state.riverPaint.overrides[cellId], '#abcdef');
   state.activeScenarioManifest = { ...manifest, generated_at: 'new-geometry-build' };
   assert.equal(runtime.getActivePack(), null);
   assert.throws(() => runtime.assertReadyForExport(), /geometry build/);

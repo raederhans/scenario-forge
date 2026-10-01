@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { state as appState } from '../js/core/state.js';
-import { makeFixture, realPilot } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, realPilot, realWave2 } from './helpers/river_paint_fixture.mjs';
 import { getRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { normalizeRiverPaintState, createDefaultRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
@@ -61,8 +61,9 @@ function projectFixture(pack) {
       overrides: { [pack.parents[0].cells[0].id]: '#123456' } }) };
 }
 
-test('self-contained approved project survives JSON and the real import commit without fetching geometry', async () => {
-  const pack = realPilot(); const state = projectFixture(pack);
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2]])
+test(`${label} self-contained project survives JSON and the real import commit without fetching geometry`, async () => {
+  const pack = readPack(); const state = projectFixture(pack);
   const payload = FileManager.buildProjectPayload(state);
   assert.equal(payload.schemaVersion, 23);
   assert.equal(payload.riverPaint.editMode, false);

@@ -899,7 +899,7 @@ const riverBorrowedRuntimeDefinition = {
     "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
     "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
     "js/core/river_paint/geometry_identity.js": "2e4562a87beecfb75273458038fb1d9cc9d092592551fbf2fef4e83af573ff78",
-    "js/core/river_paint/pilot_manifest.js": "736f589aa59c4fc40c3766d6754331d4489ad5cc05bcb8031f4267168d9aadd0",
+    "js/core/river_paint/pilot_manifest.js": "525aae32ec9d4f9b2e9216ceeef2ce88a003f1452359f266291315b4fc20dc49",
     "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b"
   },
   "borrowedLocalStorage": [
@@ -1226,7 +1226,7 @@ const riverOwnerSourceFingerprints = Object.freeze({
   "js/core/country_code_aliases.js": "b6320aff3f15a9bdec71b5fc4ea9549dd87aff50fec898f2a73aa3258b1daed5",
   "js/core/state/actions/river_paint_actions.js": "7b14e409523f8f5617ccb25af777c2e7de846b63f2364c0651145753e787144b",
   "js/core/river_paint/runtime.js": "5a7a14eb9ce15a5b24f207bba52898638c36c46faf91cc2316ef1007bace56a2",
-  "js/core/river_paint/pilot_manifest.js": "736f589aa59c4fc40c3766d6754331d4489ad5cc05bcb8031f4267168d9aadd0",
+  "js/core/river_paint/pilot_manifest.js": "525aae32ec9d4f9b2e9216ceeef2ce88a003f1452359f266291315b4fc20dc49",
   "js/core/river_paint/render_owner.js": "49750e3e9b3117b0c68124fb67bdc80b6f975fbdd0e49e4224087ecf8ebd70ce"
 });
 export const STATE_RIVER_OWNER_SOURCE_RECEIPTS = Object.freeze([

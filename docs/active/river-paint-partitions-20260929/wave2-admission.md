@@ -1,10 +1,11 @@
-# Wave 2 admission preflight
+# Wave 2 admission
 
 Prepared against main e25b89ca. PR #192 passed all checks and merged as
 `81532208179109bd81a797cd9d6e34088cf63ab6` at 2026-10-01 10:13:34 UTC.
 The independent worktree fast-forwarded to that main commit, then started
-`codex/river-wave2-admission`. Production still uses the original six-parent /
-31-cell pack. Primary checkout WIP remains untouched.
+`codex/river-wave2-admission`. This branch admits the 12-parent / 43-cell pack
+for new projects and preserves the original pack for saved projects. Primary
+checkout WIP remains untouched. Remote delivery is subject to PR checks.
 
 ## Candidate scope
 
@@ -16,9 +17,19 @@ The independent worktree fast-forwarded to that main commit, then started
 
 Each chosen new parent produces exactly two cells. Their smaller planar face share ranges from 34% to 46%; this is a source-plane ranking measure, not a geodesic area claim. All original positive-area fragments remain.
 
-The combined candidate contains 12 parents, 43 cells and 18 contour-support neighbors, 142150 bytes. All six original parent records compare equal, including their geometry and cell IDs. Python partition audits, frontend geometry fingerprints and finite D3 cell previews passed. The production loader correctly rejects this candidate because it is not yet admitted.
+The combined pack contains 12 parents, 43 cells and 18 contour-support neighbors, 142150 bytes. All six original parent records compare equal, including their geometry and cell IDs. Python partition audits, frontend geometry fingerprints and finite D3 cell previews passed. Both approved packs are authenticated against separate complete normalized-content digests; arbitrary or tampered packs remain rejected.
 
-Generated evidence remains under `.runtime/reports/generated/river-next/`: the three broad packs and audits; `modern_world_wave2.candidate.json`; `modern_world_wave2.candidate.audit.json`; `frontend-validation.json`. These are offline candidates, not production assets.
+Generated evidence remains under `.runtime/reports/generated/river-next/`: the three broad packs and audits; `modern_world_wave2.candidate.json`; `modern_world_wave2.candidate.audit.json`; `frontend-validation.json`. Only the bounded combined pack is copied to `data/river_partitions/modern_world_wave2.json`; broad packs remain offline.
+
+## Runtime acceptance
+
+- River Node suite: 39 passed, including legacy/new authentication, tamper rejection, saved-pack preservation, build mismatch rejection, import and all-cell picker/editor behavior.
+- Data catalog contract: 19 passed. Data health reports existing large-file warnings only; the new runtime asset is registered and cataloged.
+- Browser: real click transaction, Undo/Redo, JSON project roundtrip and export passed; all 43 cells produce their expected opaque Canvas pixels and unchanged PNG when the tool/river display is hidden.
+- Actual picker UI: all 12 locations and 43 cells selected and painted through buttons; 43 toolbar undos and 43 redos preserve exact overrides; mode-off retains paint. Screenshot and runner output are under `.runtime/tests/playwright-wave2-picker/` and `.runtime/tmp/wave2-picker.log`.
+- Pages build passed (819.36 MiB). The generated registry references only published files and includes the new payload with JSON content equal to the admitted asset. Retained artifact: `.runtime/reports/generated/river-next/pages-wave2/`.
+- Policy quick suite: 503/518 passed. The 15 failures reproduce against pre-wave2 source and concern stale renderer callback/pure-reader source receipts. The changed manifest's exact normalized-source receipt matches and the river borrowed-runtime proof reports no violations; unrelated policy contracts are not relaxed. This is not a full policy-suite pass.
+- No canonical land IDs, assignments, original pack records or source scenario topology are changed. Existing saved projects keep their embedded pack and coverage; they are not automatically upgraded.
 
 ## Implementation boundary
 
