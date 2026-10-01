@@ -1,32 +1,33 @@
 import { getRiverPaintRuntime } from '../core/river_paint/runtime.js';
 import { loadRiverPaintPilot } from '../core/river_paint/pilot_loader.js';
 import { RIVER_PAINT_PILOT } from '../core/river_paint/pilot_manifest.js';
-
-const PILOT_LOCATIONS = [
-  ['PL_POW_1661', 'Opole · Oder', '奥波莱 · 奥德河'],
-  ['PL_POW_0264', 'Wrocław · Oder', '弗罗茨瓦夫 · 奥德河'],
-  ['CN_CITY_17275852B1441354643708', 'Luzhou · Yangtze', '泸州 · 长江'],
-  ['CN_CITY_17275852B17052950603257', 'Yichang · Yangtze', '宜昌 · 长江'],
-  ['CN_CITY_17275852B84192730453130', 'Lanzhou · Yellow River', '兰州 · 黄河'],
-  ['CN_CITY_17275852B72607841305823', 'Wuhai · Yellow River', '乌海 · 黄河'],
-  ['FR_ARR_75001', 'Paris · Seine', '巴黎 · 塞纳河'],
-  ['FR_ARR_76003', 'Rouen · Seine', '鲁昂 · 塞纳河'],
-  ['DEE0D', 'Stendal · Elbe', '施滕达尔 · 易北河'],
-  ['DEE06', 'Jerichower Land · Elbe', '耶里肖地区 · 易北河'],
-  ['RU_RAY_50074027B53551011789267', 'Dubna · Volga', '杜布纳 · 伏尔加河'],
-  ['RU_RAY_50074027B57358126207690', 'Yaroslavl · Volga', '雅罗斯拉夫尔 · 伏尔加河'],
-];
+import { RIVER_PAINT_RIVERS, getRiverPaintLocations, filterRiverPaintLocations } from './river_paint_locations.js';
 
 // Optional pilot controls. Loading is cancellable and never changes the current
 // scenario or turns an unavailable half-cell click into an entire-parent edit.
 export function createRiverPaintControls({ state, button, statusNode = null, locationSelect = null,
+  navigationPanel = null, searchInput = null, riverSelect = null, resultsNode = null, locationButton = null,
   focusParent = () => false,
   onLocation = () => {}, onSync = () => {},
   rebuildGeometry, render = () => {}, markDirty = () => {}, announce = () => {},
   loadPack = loadRiverPaintPilot, runtime = getRiverPaintRuntime(state),
 } = {}) {
   let disposed = false;
+  let locations = [], selectedPack = null;
   const zh = () => state.currentLanguage === 'zh';
+  const availableNow = info => state.activeScenarioId === RIVER_PAINT_PILOT.sceneId
+    && !!state.riverPaint?.editMode && info.active && !info.pending && !state.startupReadonly;
+  function setOptions(select, options) {
+    if (!select) return;
+    const key = JSON.stringify(options);
+    if (select.dataset.optionsKey === key) return;
+    select.replaceChildren(...options.map(([value, text]) => {
+      const option = select.ownerDocument.createElement('option');
+      option.value = value; option.textContent = text; return option;
+    }));
+    select.dataset.optionsKey = key;
+    select.value = '';
+  }
   function sync() {
     if (!button || disposed) return;
     const info = runtime.diagnostics();
@@ -41,43 +42,84 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
     const description = !supported
       ? (zh() ? '试点仅支持 Modern World。' : 'Pilot available in Modern World only.')
       : info.error ? (zh() ? `沿河分区未就绪：${info.error}` : `River partitions unavailable: ${info.error}`)
-      : (zh() ? '选择已加载的沿河试点。旧项目保留原试点范围；关闭工具不会清除已填颜色。'
-        : 'Choose a loaded river pilot. Existing projects retain their original coverage. Turning off the tool preserves paint.');
+      : (zh() ? '搜索已加载的沿河地点，按河流筛选。旧项目保留原范围；关闭工具保留颜色。'
+        : 'Search loaded river locations or filter by river. Existing projects retain their coverage. Turning off the tool preserves paint.');
     button.title = description;
     button.setAttribute('aria-label', `${label}. ${description}`);
     if (statusNode) statusNode.textContent = description;
+    const pack = availableNow(info) ? runtime.getActivePack() : null;
+    const available = !!pack;
+    if (pack !== selectedPack) {
+      selectedPack = pack;
+      locations = getRiverPaintLocations(pack);
+      if (searchInput) searchInput.value = '';
+      if (riverSelect) riverSelect.value = '';
+    }
+    if (navigationPanel) {
+      navigationPanel.hidden = !available;
+      navigationPanel.setAttribute('aria-label', zh() ? '沿河地点' : 'River locations');
+    }
+    for (const node of [searchInput, riverSelect, locationSelect, resultsNode, locationButton]) {
+      if (node) node.hidden = !available;
+    }
+    if (searchInput) {
+      searchInput.disabled = !available;
+      const label = zh() ? '搜索地点名称或 ID' : 'Search location name or ID';
+      searchInput.setAttribute('aria-label', label);
+      searchInput.placeholder = label;
+    }
+    const language = zh() ? 'zh' : 'en';
+    const rivers = new Set(locations.flatMap(location => location.rivers));
+    if (riverSelect) {
+      const river = riverSelect.value;
+      const label = zh() ? '按河流筛选' : 'Filter by river';
+      riverSelect.setAttribute('aria-label', label);
+      riverSelect.title = label;
+      riverSelect.disabled = !available;
+      setOptions(riverSelect, [['', zh() ? '全部河流' : 'All rivers'],
+        ...Object.entries(RIVER_PAINT_RIVERS).filter(([key]) => rivers.has(key))
+          .map(([key, labels]) => [key, labels[language]])]);
+      riverSelect.value = rivers.has(river) ? river : '';
+    }
+    const matches = filterRiverPaintLocations(locations, { query: searchInput?.value, river: riverSelect?.value });
+    if (resultsNode) resultsNode.textContent = matches.length
+      ? (zh() ? `${matches.length} / ${locations.length} 个地点` : `${matches.length} / ${locations.length} locations`)
+      : (zh() ? '无匹配地点，请调整搜索或河流筛选。' : 'No matching locations. Adjust the search or river filter.');
     if (locationSelect) {
-      const available = enabled && info.active && !info.pending && !state.startupReadonly;
-      locationSelect.hidden = !available;
-      locationSelect.disabled = !available;
-      const label = zh() ? '定位沿河试点' : 'Go to river pilot';
+      const selectedId = locationSelect.value;
+      locationSelect.disabled = !available || !matches.length;
+      const label = zh() ? '定位沿河地点' : 'Go to river location';
       locationSelect.setAttribute('aria-label', label);
       locationSelect.title = label;
-      const ids = new Set(available ? runtime.getActivePack()?.parents.map(parent => parent.parentId) : []);
-      const options = [['', label], ...PILOT_LOCATIONS.filter(([id]) => ids.has(id))
-        .map(([id, en, cn]) => [id, zh() ? cn : en])];
-      const key = JSON.stringify(options);
-      if (locationSelect.dataset.optionsKey !== key) {
-        locationSelect.replaceChildren(...options.map(([value, text]) => {
-          const option = locationSelect.ownerDocument.createElement('option');
-          option.value = value; option.textContent = text; return option;
-        }));
-        locationSelect.dataset.optionsKey = key;
-      }
+      setOptions(locationSelect, [['', matches.length ? label : (zh() ? '无匹配地点' : 'No matching locations')],
+        ...matches.map(location => [location.id, location.labels[language]])]);
+      locationSelect.value = matches.some(location => location.id === selectedId) ? selectedId : '';
+    }
+    if (locationButton) {
+      locationButton.textContent = zh() ? '定位' : 'Go';
+      locationButton.setAttribute('aria-label', zh() ? '定位所选地点' : 'Go to selected location');
+      locationButton.disabled = !available || !locationSelect?.value;
     }
     onSync();
   }
   function navigate() {
-    if (disposed || locationSelect?.disabled || !locationSelect?.value) return;
+    if (disposed || locationSelect?.disabled) return;
+    if (!locationSelect?.value) {
+      if (locationButton) locationButton.disabled = true;
+      return;
+    }
     const id = locationSelect.value;
-    // Reset so selecting the same location again recentres a panned map.
-    locationSelect.value = '';
-    const allowed = runtime.getActivePack()?.parents.some(parent => parent.parentId === id);
-    if (!state.riverPaint?.editMode || !allowed || !focusParent(id)) {
-      announce(zh() ? '当前无法定位这个试点。' : 'This pilot cannot be located right now.');
+    // Retain the native select value so ArrowDown can reach the next option.
+    // The Go button recentres the same location after panning the map.
+    const info = runtime.diagnostics();
+    const pack = availableNow(info) ? runtime.getActivePack() : null;
+    const location = getRiverPaintLocations(pack).find(entry => entry.id === id);
+    if (pack !== selectedPack || !location || !focusParent(id)) {
+      sync();
+      announce(zh() ? '当前无法定位这个地点。' : 'This location cannot be located right now.');
     } else {
-      const location = PILOT_LOCATIONS.find(([key]) => key === id);
-      onLocation(id, location ? { en: location[1], zh: location[2] } : null);
+      if (locationButton) locationButton.disabled = false;
+      onLocation(id, location.labels);
     }
   }
   async function toggle() {
@@ -97,17 +139,23 @@ export function createRiverPaintControls({ state, button, statusNode = null, loc
       }
       markDirty('river-paint-enable');
       render();
-      announce(zh() ? '沿河试点已启用。选择试点地点，再分别点击河流两侧填色。'
-        : 'River pilot enabled. Choose a pilot location, then click each side to paint.');
+      announce(zh() ? '沿河填色已启用。搜索或选择地点，点击地图或使用分区预览填色。'
+        : 'River cells enabled. Search or choose a location, then paint on the map or use the cell preview.');
     } catch (failure) {
       if (!disposed) announce(zh() ? `无法启用沿河分区：${failure.message}` : `Cannot enable river partitions: ${failure.message}`);
     } finally { sync(); }
   }
   if (button) button.addEventListener('click', toggle);
   locationSelect?.addEventListener('change', navigate);
+  searchInput?.addEventListener('input', sync);
+  riverSelect?.addEventListener('change', sync);
+  locationButton?.addEventListener('click', navigate);
   sync();
   return Object.freeze({ sync, toggle,
     dispose() { disposed = true; button?.removeEventListener('click', toggle);
-      locationSelect?.removeEventListener('change', navigate); runtime.cancel(); },
+      locationSelect?.removeEventListener('change', navigate);
+      searchInput?.removeEventListener('input', sync);
+      locationButton?.removeEventListener('click', navigate);
+      riverSelect?.removeEventListener('change', sync); runtime.cancel(); },
   });
 }
