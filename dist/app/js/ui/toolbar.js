@@ -1,4 +1,5 @@
 import { createRiverPaintControls } from "./river_paint_controls.js";
+import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
@@ -13,6 +14,8 @@ import {
 import {
   autoFillMap,
   getZoomPercent,
+  focusRiverPaintParentById,
+  applyRiverPaintCellById,
   invalidateOceanBackgroundVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
@@ -90,6 +93,8 @@ import {
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
 import { createPaletteLibraryOperation } from "../core/palette_library_operation.js";
+import { createPaletteCountryEditor } from "./toolbar/palette_country_editor.js";
+import { getPaletteCountryTargets } from "../core/palette_country_targets.js";
 import { createPaletteLibraryStateAccess } from "../core/palette_library_state_access.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
@@ -114,6 +119,7 @@ function composePaletteLibraryOperation() {
   const owner = createPaletteLibraryOperation({
     getApplyTarget: stateAccess.getApplyTarget,
     getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
+    getCountryFeatureIds: (code) => [...(getPaletteCountryTargets(runtimeState).get(code) || [])],
     applyFeatureColor: stateAccess.applyFeatureColor,
     applyOwnerColor: stateAccess.applyOwnerColor,
     captureHistoryState,
@@ -1369,10 +1375,26 @@ function initToolbar({ render } = {}) {
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  const riverCellPicker = createRiverCellPicker({
+    state: runtimeState,
+    panel: document.getElementById("riverCellPicker"),
+    select: document.getElementById("riverCellSelect"),
+    preview: document.getElementById("riverCellPreview"),
+    applyButton: document.getElementById("riverCellApplyBtn"),
+    title: document.getElementById("riverCellPickerTitle"),
+    closeButton: document.getElementById("riverCellCloseBtn"),
+    caption: document.getElementById("riverCellPreviewCaption"),
+    applyCell: applyRiverPaintCellById,
+    announce: message => showToast(message),
+  });
   const riverPaintControls = createRiverPaintControls({
     state: runtimeState,
     button: document.getElementById("riverPaintToggleBtn"),
     statusNode: document.getElementById("riverPaintStatus"),
+    locationSelect: document.getElementById("riverPaintLocationSelect"),
+    focusParent: focusRiverPaintParentById,
+    onLocation: riverCellPicker.open,
+    onSync: riverCellPicker.sync,
     rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
     render: () => { if (typeof render === "function") render(); },
     markDirty,
@@ -1578,6 +1600,20 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
 
+  const paletteCountryEditor = createPaletteCountryEditor({
+    state: runtimeState,
+    host: paletteLibraryPanel,
+    applyColor: (color, countryCode) => {
+      if (!countryCode) return { status: "no-target" };
+      const result = applyPaletteLibraryOperation(color, { countryCode });
+      if (result.status === "applied") {
+        addRecentColor(result.color);
+        updateSwatchUI();
+        if (render) render();
+      }
+      return result;
+    },
+  });
   const paletteLibraryPanelController = createPaletteLibraryPanelController({
     themeSelect,
     paletteLibraryToggle,
@@ -1604,7 +1640,10 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);
   registerRuntimeHook(state, "renderPaletteFn", renderPalette);
 
-  registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
+  registerRuntimeHook(state, "updatePaletteLibraryUIFn", () => {
+    renderPaletteLibrary();
+    paletteCountryEditor.render();
+  });
 
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
@@ -1617,6 +1656,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);
 
   function updateSwatchUI() {
+    paletteCountryEditor.render();
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
       if (swatch.dataset.color === runtimeState.selectedColor) {

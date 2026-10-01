@@ -606,3 +606,10 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Branch: codex/scenario-geometry-repair; base bfedc6b8. Managed checkout C:/Users/raede/.codex/worktrees/scenario-geometry-repair/mapcreator.
 - Root owns canonical builds, browser server, commits, push and PR integration. Scope: Guiana/Somalia coverage, Kashmir duplicate placeholder, Canada 60N coarse/detail nodes.
 - Primary country-label/UI WIP preserved. Acceptance and final merge receipt: docs/active/scenario-geography-repair-20261001/.
+
+## Palette country color integration 2026-10-01
+
+- Branch: `codex/palette-country-color`; integrated base: `origin/main@81532208`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/palette-country-integration/mapcreator`; root owns commit, build, push and merge.
+- Scope: explicit country-tag recoloring, undo/redo and save coverage, palette-source request ordering, variant keyboard application, and matching Pages assets.
+- Primary checkout and unrelated registry WIP are preserved. Local validation: 70 palette and river UI tests; publication checks and merge receipt are recorded in PR #193 (https://github.com/raederhans/scenario-forge/pull/193). Retain this checkout for build evidence under `.runtime/reports/generated/palette-integration/`.

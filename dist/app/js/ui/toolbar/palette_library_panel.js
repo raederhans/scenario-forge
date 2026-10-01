@@ -247,6 +247,7 @@ function createPaletteLibraryPanelController({
   };
   let adaptivePaletteLibraryHeightFrame = 0;
   let activeRowKey = "";
+  let paletteSourceRequest = 0;
   let paletteLibraryGroupingControls = null;
 
   const ensurePaletteLibrarySectionState = (sourceId) => {
@@ -508,7 +509,6 @@ function createPaletteLibraryPanelController({
       button.classList.toggle("is-active", isActive);
       button.textContent = optionData.label;
       button.addEventListener("click", async () => {
-        if (isActive) return;
         await handlePaletteSourceChange(optionData.value);
       });
       paletteLibrarySources.appendChild(button);
@@ -626,6 +626,7 @@ function createPaletteLibraryPanelController({
 
   async function handlePaletteSourceChange(nextPaletteId) {
     const targetId = String(nextPaletteId || "").trim();
+    const request = ++paletteSourceRequest;
     if (!targetId || targetId === runtimeState.activePaletteId) {
       syncPaletteSourceControls();
       return;
@@ -633,8 +634,9 @@ function createPaletteLibraryPanelController({
     const didChange = await setActivePaletteSource(targetId, {
       syncUI: true,
       overwriteCountryPalette: false,
+      isCurrent: () => request === paletteSourceRequest,
     });
-    if (!didChange) {
+    if (!didChange && request === paletteSourceRequest) {
       syncPaletteSourceControls();
     }
   }
@@ -799,7 +801,7 @@ function createPaletteLibraryPanelController({
           return;
         }
         if (event.key === "Enter") {
-          const row = document.activeElement?.closest?.(".palette-library-row");
+          const row = document.activeElement?.closest?.(".palette-library-row, .palette-library-variant-btn");
           const color = row?.dataset?.color || "";
           if (color) {
             event.preventDefault();
