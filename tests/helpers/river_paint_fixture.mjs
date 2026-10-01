@@ -2,6 +2,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState } from '../../js/core/river_paint/partition_model.js';
 import { riverGeometryFingerprint } from '../../js/core/river_paint/geometry_identity.js';
+import { RIVER_PAINT_WAVE3 } from '../../js/core/river_paint/pilot_manifest.js';
 export const d3 = createRequire(import.meta.url)('../../vendor/d3.v7.min.js');
 export const rectangle = (x0, y0, x1, y1) => ({ type: 'Polygon',
   coordinates: [[[x0, y0], [x0, y1], [x1, y1], [x1, y0], [x0, y0]]] });
@@ -9,6 +10,22 @@ export const feature = (id, geometry) => ({ type: 'Feature', id,
   properties: { id, cntr_code: 'FR', name: id }, geometry });
 export const realPilot = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_pilot.json', import.meta.url)));
 export const realWave2 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave2.json', import.meta.url)));
+export const realWave3Text = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave3.json', import.meta.url), 'utf8');
+export const realWave3 = () => JSON.parse(realWave3Text());
+export function makeWave3Fixture({ installed = true } = {}) {
+  const pack = normalizeRiverPartitionPack(realWave3());
+  const features = [...pack.parents.map(p => feature(p.parentId, p.parentGeometry)),
+    ...pack.support.map(p => feature(p.parentId, p.geometry))];
+  const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash, sceneGeneration: 1,
+    activeScenarioManifest: { version: RIVER_PAINT_WAVE3.scenarioVersion, generated_at: RIVER_PAINT_WAVE3.scenarioGeneratedAt },
+    riverPaint: normalizeRiverPaintState(installed ? { schemaVersion: 1, pack, editMode: true, overrides: {} } : null),
+    landData: { type: 'FeatureCollection', features }, landIndex: new Map(features.map(f => [f.id, f])),
+    sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {}, currentTool: 'fill',
+    interactionGranularity: 'subdivision', selectedColor: '#0000ff', mapSemanticMode: 'political',
+    colorRevision: 0, currentLanguage: 'en' };
+  return { state, pack, cells: pack.parents[0].cells, parent: features[0],
+    hit: { id: features[0].id, targetType: 'land', feature: features[0] } };
+}
 export async function makeFixture({ installed = true, baseline = 'fixture-baseline' } = {}) {
   const parent = rectangle(0, 0, 2, 2), neighbor = rectangle(2, 0, 3, 2);
   const neighborNoded = { type: 'Polygon', coordinates: [[[2, 0], [2, 1], [2, 2], [3, 2], [3, 0], [2, 0]]] };

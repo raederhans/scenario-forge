@@ -2,7 +2,8 @@ import { RIVER_PAINT_PILOT } from '../js/core/river_paint/pilot_manifest.js';
 import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, feature, d3, captureCells, realPilot, realWave2 } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, makeWave3Fixture, rectangle, feature, d3, captureCells, realPilot, realWave2, realWave3, realWave3Text } from './helpers/river_paint_fixture.mjs';
+import { loadRiverPaintPilot } from '../js/core/river_paint/pilot_loader.js';
 import { getRiverPaintRuntime, createRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { applyFeaturePaintState } from '../js/core/state/color_state.js';
@@ -148,7 +149,7 @@ test('blocked, stale and mismatched-parent hits cannot write; eyedropper uses ch
 });
 
 
-for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2]])
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3]])
 test(`${label}: saved pack is retained and a regenerated geometry build is rejected`, async () => {
   const pack = readPack();
   const manifest = { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt };
@@ -170,4 +171,34 @@ test(`${label}: saved pack is retained and a regenerated geometry build is rejec
   assert.throws(() => runtime.assertReadyForExport(), /geometry build/);
   await assert.rejects(runtime.enable(async () => pack), /does not match/);
   assert.equal(state.riverPaint.pack.packId, pack.packId);
+});
+
+test('new project installs authenticated wave3 through the default loader and retains administrative IDs', async () => {
+  const { state, pack } = makeWave3Fixture({ installed: false });
+  const ids = [...state.landIndex.keys()]; const originalLand = state.landData;
+  const runtime = createRiverPaintRuntime(state, { geoContains: d3.geoContains }); let requests = 0;
+  const result = await runtime.enable(options => loadRiverPaintPilot({ ...options, fetchImpl: async url => {
+    requests++; assert.equal(url, 'data/river_partitions/modern_world_wave3.json');
+    return { ok: true, text: async () => realWave3Text() };
+  } }));
+  assert.equal(result.ready, true); assert.equal(result.geometryChanged, true); assert.equal(requests, 1);
+  assert.equal(runtime.getActivePack().packId, pack.packId);
+  assert.equal(runtime.surfaces().length, 905 + 108);
+  assert.deepEqual([...state.landIndex.keys()], ids); assert.equal(state.landData, originalLand);
+  runtime.assertReadyForExport();
+});
+
+test('wave3 load fails closed against a wrong baseline, version, missing or regenerated manifest', async () => {
+  for (const mutate of [
+    s => { s.scenarioBaselineHash = 'other-baseline'; },
+    s => { s.activeScenarioManifest.version++; },
+    s => { s.activeScenarioManifest.generated_at = 'new-build'; },
+    s => { s.activeScenarioManifest = null; },
+  ]) {
+    const { state, pack } = makeWave3Fixture({ installed: false }); mutate(state);
+    const runtime = createRiverPaintRuntime(state);
+    await assert.rejects(runtime.enable(async () => pack), /does not match/);
+    assert.equal(state.riverPaint.pack, null); assert.equal(runtime.diagnostics().pending, false);
+    assert.equal(runtime.diagnostics().status, 'error');
+  }
 });

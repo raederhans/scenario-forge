@@ -21,14 +21,25 @@ export const RIVER_PAINT_WAVE2 = Object.freeze({
   parentCount: 12,
   cellCount: 43,
 });
-export const APPROVED_RIVER_PACKS = Object.freeze([RIVER_PAINT_PILOT, RIVER_PAINT_WAVE2]);
+export const RIVER_PAINT_WAVE3 = Object.freeze({
+  sceneId: 'modern_world',
+  assetKey: 'river_partitions:modern_world_wave3',
+  packId: 'sha256:5a05c4173b95c642f970cfa556566eca4dae7929d04aa5d74490ab04d188b25a',
+  canonicalSha256: '0ec82d7f9c97e05507e858d762b6be93dc4b8b6aa0697e34f5cad58d2b056c18',
+  scenarioVersion: 2,
+  scenarioGeneratedAt: '2026-09-27T13:55:57.885587+00:00',
+  parentCount: 302,
+  cellCount: 905,
+});
+export const APPROVED_RIVER_PACKS = Object.freeze([RIVER_PAINT_PILOT, RIVER_PAINT_WAVE2, RIVER_PAINT_WAVE3]);
 
 // baseline_hash is an ownership digest, not a geometry digest. The reviewed
 // production pack is also tied to the generated scenario build. Synthetic
 // packs are used only by isolated tests; the loader/import boundary accepts
-// only the approved production pack.
+// only approved production packs.
 export function isRiverPaintSourceCompatible(pack, manifest) {
-  if (!pack || (pack.packId !== RIVER_PAINT_PILOT.packId && pack.packId !== RIVER_PAINT_WAVE2.packId)) return true;
-  return manifest?.version === RIVER_PAINT_PILOT.scenarioVersion
-    && manifest?.generated_at === RIVER_PAINT_PILOT.scenarioGeneratedAt;
+  const approved = APPROVED_RIVER_PACKS.find(entry => entry.packId === pack?.packId);
+  if (!approved) return true;
+  return manifest?.version === approved.scenarioVersion
+    && manifest?.generated_at === approved.scenarioGeneratedAt;
 }
