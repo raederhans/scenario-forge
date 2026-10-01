@@ -13,6 +13,7 @@ import {
 import {
   autoFillMap,
   getZoomPercent,
+  focusRiverPaintParentById,
   invalidateOceanBackgroundVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
@@ -1372,6 +1373,8 @@ function initToolbar({ render } = {}) {
     state: runtimeState,
     button: document.getElementById("riverPaintToggleBtn"),
     statusNode: document.getElementById("riverPaintStatus"),
+    locationSelect: document.getElementById("riverPaintLocationSelect"),
+    focusParent: focusRiverPaintParentById,
     rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
     render: () => { if (typeof render === "function") render(); },
     markDirty,

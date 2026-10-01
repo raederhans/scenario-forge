@@ -137,6 +137,8 @@
 .editor-workspace #paletteGrid > :nth-child(n + 4) { display: none; }
 .editor-workspace .dock-group-mode { width: auto; min-width: 0; }
 .editor-workspace .dock-group-mode .dock-segmented-control { width: auto; min-width: 0; grid-template-columns: auto; }
+.editor-workspace #riverPaintLocationSelect { width: 150px; max-width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
+.editor-workspace #riverPaintLocationSelect[hidden] { display: none; }
 .editor-workspace #transportProjectSection { padding: 12px 0; border: 0; box-shadow: none; background: transparent; }
 .editor-workspace #transportProjectSection .sidebar-section-description { display: none; }
 .editor-workspace #transportProjectSection > summary { font-size: 13px; }

@@ -283,3 +283,38 @@ ownership source-only test module, whose Pages dependency was retired in
 separately confirms that selection ownership keeps its source paths. The focused
 Pages admission and selection boundary suites passed 12/12. Required CI must
 run again on this test-only follow-up before merge.
+
+## Post-merge pilot usability, 2026-10-01
+
+PR #189 subsequently passed required checks and merged as `78a499a1`. The
+independent integration worktree was synchronized without modifying primary
+checkout WIP. Follow-up work is on `codex/river-pilot-navigation`.
+
+The pilot previously listed its six locations only in a tooltip and hidden
+status text. The dock now offers a bilingual location selector once the pilot
+is active and ready. Selecting a location centres its parent geometry through
+the existing zoom handler, retaining the 50x zoom cap. Navigation does not paint,
+add history entries, or alter canonical geometry. Re-selecting a location
+recentres it; unavailable scenes, loading and readonly startup hide the control.
+
+Local verification: all 33 river Node tests passed, including navigation,
+localization and lifecycle coverage. In-app browser checks exercised all six
+location choices, English/Chinese labels and hiding on disable. Actual mouse
+clicks painted the two Yaroslavl cells independently; Undo removed only the second
+paint. Existing history tests also verify Redo restoration. This is not proof of mouse reachability for all 31
+cells. Syntax and diff checks passed. The toolbar boundary suite passed 52/55;
+its three failures also reproduce against unmodified `78a499a1` source (texture
+clock hook, scenario context label and special-zone parent-group hook).
+
+At a 1280x720 viewport and maximum 50x zoom, Paris has a bank bounding box of
+about 13.2x6.6 CSS pixels. Five cells have both bounding-box dimensions below
+one pixel across Stendal, Jerichower Land and Dubna. These are geometric screen
+measurements, not raster visibility or hit-success guarantees. Evidence is in
+`.runtime/browser/river-pilot-qa/cell-screen-bounds.json` and
+`pilot-navigation.png`.
+
+Before broader activation, provide a bounded way to select tiny cells (for
+example a parent-local cell list with map highlighting), then verify every cell
+can be deliberately selected and painted without changing the opposite bank.
+Do not discard positive-area fragments or infer usability from canvas-only
+tests. The broader 113-parent pack remains inactive.

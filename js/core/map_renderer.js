@@ -12566,6 +12566,28 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   }
 }
 
+function focusRiverPaintParentById(id) {
+  const parent = getRiverPaintRuntime(runtimeState).getActivePack()?.parents
+    .find(entry => entry.parentId === id);
+  const projection = rendererSurfaceHost.getProjection();
+  const interactionRect = rendererSurfaceHost.getInteractionRect();
+  const zoomBehavior = rendererSurfaceHost.getZoomBehavior();
+  if (!parent || !projection || !interactionRect?.node() || !zoomBehavior
+    || !globalThis.d3?.geoPath || !(runtimeState.width > 0) || !(runtimeState.height > 0)) return false;
+  const bounds = globalThis.d3.geoPath(projection).bounds(parent.parentGeometry);
+  if (!bounds.flat().every(Number.isFinite)) return false;
+  const [[x0, y0], [x1, y1]] = bounds;
+  const scale = Math.max(MIN_ZOOM_SCALE, Math.min(MAX_ZOOM_SCALE,
+    runtimeState.width * 0.6 / Math.max(0.01, x1 - x0),
+    runtimeState.height * 0.6 / Math.max(0.01, y1 - y0)));
+  const nextTransform = globalThis.d3.zoomIdentity
+    .translate(runtimeState.width / 2, runtimeState.height / 2)
+    .scale(scale).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+  globalThis.d3.select(interactionRect.node()).transition().duration(420)
+    .call(zoomBehavior.transform, nextTransform);
+  return true;
+}
+
 function focusWaterRegionById(id) {
   const feature = runtimeState.waterRegionsById?.get(String(id || "").trim());
   const interactionRect = rendererSurfaceHost.getInteractionRect();
@@ -15434,6 +15456,7 @@ export {
   getEffectiveCityCollection,
   isOpenOceanOverlayActive,
   focusWaterRegionById,
+  focusRiverPaintParentById,
   renderExportPassesToCanvas,
   captureRenderSnapshot,
 

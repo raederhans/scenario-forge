@@ -73,6 +73,7 @@ export {
 
   // Viewport.
   focusWaterRegionById,
+  focusRiverPaintParentById,
   getZoomPercent,
   resetZoomToFit,
   setDebugMode,

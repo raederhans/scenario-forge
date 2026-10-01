@@ -14,6 +14,40 @@ function buttonFixture() {
     addEventListener(key, fn) { listeners[key] = fn; }, removeEventListener(key) { delete listeners[key]; } };
 }
 
+test('pilot navigation follows loaded parents, recentres repeatedly and never edits paint', () => {
+  const state = { activeScenarioId: 'modern_world', riverPaint: { editMode: false }, currentLanguage: 'en' };
+  const button = buttonFixture();
+  const locationSelect = { ...buttonFixture(), dataset: {}, value: '',
+    ownerDocument: { createElement: () => ({}) },
+    replaceChildren(...children) { this.options = children; },
+  };
+  let pending = false;
+  const parents = [{ parentId: 'FR_ARR_75001' }, { parentId: 'DEE0D' }];
+  const runtime = { diagnostics: () => ({ active: true, pending }),
+    getActivePack: () => ({ parents }), cancel() {} };
+  const visits = []; let edits = 0;
+  const controls = createRiverPaintControls({ state, button, locationSelect, runtime,
+    focusParent: id => { visits.push(id); return true; }, markDirty: () => edits++ });
+  assert.equal(locationSelect.hidden, true);
+  state.riverPaint.editMode = true; controls.sync();
+  assert.equal(locationSelect.hidden, false);
+  assert.deepEqual(locationSelect.options.map(option => option.value), ['', 'FR_ARR_75001', 'DEE0D']);
+  for (let i = 0; i < 2; i++) {
+    locationSelect.value = 'FR_ARR_75001'; locationSelect.listeners.change();
+    assert.equal(locationSelect.value, '');
+  }
+  assert.deepEqual(visits, ['FR_ARR_75001', 'FR_ARR_75001']);
+  assert.equal(edits, 0);
+  state.currentLanguage = 'zh'; controls.sync();
+  assert.equal(locationSelect.attrs['aria-label'], '定位沿河试点');
+  assert.equal(locationSelect.options[1].textContent, '巴黎 · 塞纳河');
+  pending = true; controls.sync(); assert.equal(locationSelect.disabled, true);
+  pending = false; state.startupReadonly = true; controls.sync(); assert.equal(locationSelect.hidden, true);
+  state.startupReadonly = false; state.activeScenarioId = 'tno_1962'; controls.sync();
+  assert.equal(locationSelect.hidden, true);
+  controls.dispose(); assert.deepEqual(locationSelect.listeners, {});
+});
+
 test('control is unavailable outside pilot scene and while startup is readonly', async () => {
   const { state } = await makeFixture(); const button = buttonFixture();
   const controls = createRiverPaintControls({ state, button, rebuildGeometry() {} });
