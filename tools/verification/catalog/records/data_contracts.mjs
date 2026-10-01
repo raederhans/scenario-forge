@@ -1,6 +1,33 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
   {
+    id: "python:arctic-recovery",
+    commandRef: "python -m unittest tests.test_arctic_recovery -q",
+    sourceRefs: ["tests/test_arctic_recovery.py", "map_builder/processors/arctic_recovery.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo"], executionOwners: ["main-thread"],
+    profiles: ["full"], platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  },
+  {
+    id: "python:polar-asset-repair",
+    commandRef: "python -m unittest tests.test_polar_asset_repair -q",
+    sourceRefs: ["tests/test_polar_asset_repair.py", "tools/rebuild_polar_assets.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo"], executionOwners: ["main-thread"],
+    profiles: ["full"], platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  },
+  {
+    id: "python:rebuild-water-geometry",
+    commandRef: "python -m pytest tests/test_rebuild_water_geometry.py -q",
+    sourceRefs: ["tests/test_rebuild_water_geometry.py", "tools/rebuild_water_geometry.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo"], executionOwners: ["main-thread"],
+    profiles: ["full"], platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  },
+  {
     id: "python:water-display-lods",
     commandRef: "python -m unittest tests.test_water_display_lods -q",
     sourceRefs: ["tests/test_water_display_lods.py", "tools/build_water_display_lods.py"],
