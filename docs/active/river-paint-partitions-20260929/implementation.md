@@ -274,3 +274,12 @@ assertions. Negative tests also exercise actual shared geometry mutations,
 Map mutation, missing/forged diagnostics, changed dependencies, altered runtime
 cache identity and mutable receipt metadata. Logs remain in `.runtime`.
 The final official quick policy runner passed 518/518 (exit 0, 16.43 seconds).
+
+On repair commit `15b42731`, cloud Golden Demo and smoke, all scenario contracts,
+transport, Quick Fill and performance passed. Fast verification reached a stale
+Pages admission test: its import-time root list still included the selection
+ownership source-only test module, whose Pages dependency was retired in
+`b5411546`. The admission test now checks the nine actual artifact consumers and
+separately confirms that selection ownership keeps its source paths. The focused
+Pages admission and selection boundary suites passed 12/12. Required CI must
+run again on this test-only follow-up before merge.
