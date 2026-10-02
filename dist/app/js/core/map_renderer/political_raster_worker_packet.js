@@ -19,6 +19,16 @@ export function collectRasterPolygonalGeometryParts(geometry) {
   return [];
 }
 
+export function projectCoordinateToWorkerPixel(point, projection, transform, dpr) {
+  if (!Array.isArray(point) || point.length < 2 || !projection) return null;
+  const projected = projection([Number(point[0]), Number(point[1])]);
+  if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return null;
+  const x = (Number(transform?.x || 0) + projected[0] * Number(transform?.k || 1)) * dpr;
+  const y = (Number(transform?.y || 0) + projected[1] * Number(transform?.k || 1)) * dpr;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return [Number(x.toFixed(3)), Number(y.toFixed(3))];
+}
+
 export function buildWorkerPixelRingsForGeometry(geometry, projectPoint) {
   if (typeof projectPoint !== "function") return [];
   const rings = [];

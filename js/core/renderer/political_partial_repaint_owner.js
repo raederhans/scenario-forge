@@ -19,6 +19,9 @@ export function createPoliticalPartialRepaintOwner({
   const getDebugMode = requireFunction(getters.getDebugMode, "getters.getDebugMode");
   const getDefaultTransform = requireFunction(getters.getDefaultTransform, "getters.getDefaultTransform");
   const getRenderPassCacheState = requireFunction(getters.getRenderPassCacheState, "getters.getRenderPassCacheState");
+  const hasInlinePoliticalPartitions = typeof getters.hasInlinePoliticalPartitions === "function"
+    ? getters.hasInlinePoliticalPartitions
+    : () => false;
 
   const requiredHelpers = [
     "nowMs",
@@ -30,6 +33,7 @@ export function createPoliticalPartialRepaintOwner({
     "getResolvedFeatureColor",
     "hashToColor",
     "buildWorkerPixelRingsForGeometry",
+    "projectCoordinateToWorkerPixel",
     "orderPoliticalShellUnderlayFirst",
     "shouldExcludePoliticalVisualFeature",
     "shouldSkipFeature",
@@ -173,22 +177,15 @@ export function createPoliticalPartialRepaintOwner({
     return landFillColor;
   }
 
-  function projectCoordinateToWorkerPixel(point, transform, dpr) {
-    if (!Array.isArray(point) || point.length < 2 || !surface.getProjection()) return null;
-    const projected = surface.getProjection()([Number(point[0]), Number(point[1])]);
-    if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return null;
-    const x = (Number(transform?.x || 0) + projected[0] * Number(transform?.k || 1)) * dpr;
-    const y = (Number(transform?.y || 0) + projected[1] * Number(transform?.k || 1)) * dpr;
-    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-    return [Number(x.toFixed(3)), Number(y.toFixed(3))];
-  }
-
   function buildPoliticalRasterWorkerPacket({
     visibleItems = null,
     transform = getDefaultTransform(),
     canvasWidth = 0,
     canvasHeight = 0,
   } = {}) {
+    if (hasInlinePoliticalPartitions()) {
+      return { packet: null, packetBuildMs: 0, reason: "inline-political-partitions" };
+    }
     const state = getRuntimeState();
     const startedAt = helper.nowMs();
     if (getDebugMode() !== "PROD" || !surface.getProjection()) {
@@ -211,7 +208,7 @@ export function createPoliticalPartialRepaintOwner({
       if (!feature?.geometry || helper.shouldExcludePoliticalVisualFeature(feature, id)) return;
       const rings = helper.buildWorkerPixelRingsForGeometry(
         feature.geometry,
-        (point) => projectCoordinateToWorkerPixel(point, transform, dpr),
+        (point) => helper.projectCoordinateToWorkerPixel(point, surface.getProjection(), transform, dpr),
       );
       if (!rings.length) return;
       const fillColor = getPoliticalFeatureFillColor(feature, id, Number(item?.drawOrder ?? index), canvasWidth);
@@ -517,7 +514,7 @@ export function createPoliticalPartialRepaintOwner({
       effect.withRenderTarget(passContext, () => {
         backgroundGroupCount = effect.drawPoliticalBackgroundFillsForEntries(redrawEntries);
         helper.orderPoliticalShellUnderlayFirst(redrawEntries).forEach(({ feature, index, path }) => {
-          drawPoliticalFeature(feature, index, {
+          const drawn = drawPoliticalFeature(feature, index, {
             k: transform.k,
             canvasWidth,
             canvasHeight,
@@ -526,7 +523,7 @@ export function createPoliticalPartialRepaintOwner({
             transform,
             metricsCollector: partialFeatureMetrics,
           });
-          effects.drawPartitionForParent?.(feature, transform.k);
+          if (drawn) effects.drawPartitionForParent?.(feature, transform.k);
         });
       });
     } finally {
@@ -695,7 +692,8 @@ export function createPoliticalPartialRepaintOwner({
   }
 
   function drawPoliticalFineFeatureLoop({ k, identity, viewport }) {
-    const workerFrame = getters.drawWorkerPoliticalFine?.();
+    const inlinePoliticalPartitions = hasInlinePoliticalPartitions();
+    const workerFrame = inlinePoliticalPartitions ? null : getters.drawWorkerPoliticalFine?.();
     if (workerFrame) return workerFrame;
     const state = getRuntimeState();
     const islandNeighbors = getDebugMode() === "ISLANDS" ? helper.getIslandNeighborGraph() : null;
@@ -726,7 +724,7 @@ export function createPoliticalPartialRepaintOwner({
         id: helper.getFeatureId(feature) || `feature-${index}`,
       }));
     helper.orderPoliticalShellUnderlayFirst(featureEntries).forEach(({ feature, drawOrder }) => {
-      drawPoliticalFeature(feature, drawOrder, {
+      const drawn = drawPoliticalFeature(feature, drawOrder, {
         k,
         canvasWidth: identity.canvasWidth,
         canvasHeight: identity.canvasHeight,
@@ -739,6 +737,7 @@ export function createPoliticalPartialRepaintOwner({
         countPathBuild: false,
         metricsCollector: featureMetrics,
       });
+      if (drawn && inlinePoliticalPartitions) effects.drawPartitionForParent?.(feature, k);
     });
     return featureMetrics;
   }

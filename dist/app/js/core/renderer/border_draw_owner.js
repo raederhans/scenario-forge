@@ -54,6 +54,7 @@ export function createBorderDrawOwner({
     buildCountryParentBorderMeshes = () => [],
     buildDetailAdmMeshSignature = () => ({ detailCountries: [], signature: "" }),
     drawScenarioCoastalAccentLayer = () => {},
+    drawRiverInternalContours = () => {},
     getCoastlineCollectionForZoom = () => [],
     getInternalBorderStrokeColor = (_countryCode, fallbackColor) => fallbackColor,
     getSafeCanvasColor = (value, fallbackColor) => value || fallbackColor,
@@ -434,6 +435,10 @@ export function createBorderDrawOwner({
     const paintAlpha = hasActiveScenario
       ? countryOpacity * 0.5
       : countryOpacity * (interactive ? 0.88 : 1);
+
+    drawRiverInternalContours({ k, interactive, color: empireColor, alpha: paintAlpha,
+      width: paintWidth, lineJoin: boundaryDefaultLineJoin, lineCap: boundaryDefaultLineCap,
+      miterLimit: boundaryDefaultMiterLimit });
 
     if (interactive) {
       const coastWidth = (coastWidthBase * 0.88) / kDenom;

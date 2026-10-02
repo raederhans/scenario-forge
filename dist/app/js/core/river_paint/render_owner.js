@@ -1,5 +1,6 @@
 import { getMapDataBoundary } from '../map_data_boundary.js';
 import { getRiverPaintRuntime } from './runtime.js';
+import { getRiverPartitionIndex } from './partition_model.js';
 
 // Sparse integration into the existing political pass, including its patch
 // surface. The authoritative geometry/colour model is shared with hit testing,
@@ -23,14 +24,17 @@ export function createRiverPaintRenderOwner({ state, getContext, getPath,
   }
   function draw(k = 1, parentId = null) {
     if (!isEnabled()) return 0;
-    const pack = runtime.getActivePack(), context = getContext(), path = getPath();
-    if (!pack || !context || !path) return 0;
+    const pack = runtime.getActivePack();
+    if (!pack) return 0;
+    const targetParent = parentId ? getRiverPartitionIndex(pack).parents.get(parentId) : null;
+    if (parentId && !targetParent) return 0;
+    const context = getContext(), path = getPath();
+    if (!context || !path) return 0;
     const key = getProjectionKey();
     if (projectionKey !== key) { projectionKey = key; paths = new WeakMap(); }
     const boundary = getMapDataBoundary(state);
     let rendered = 0;
-    for (const parent of pack.parents) {
-      if (parentId && parentId !== parent.parentId) continue;
+    for (const parent of parentId ? [targetParent] : pack.parents) {
       const feature = state.landIndex?.get(parent.parentId);
       if (!feature || !isVisible(feature)) continue;
       const children = parent.cells.map(cell => runtime.getCellFeature(cell.id));

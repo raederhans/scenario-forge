@@ -1,8 +1,8 @@
 # Worktree Registry
 
-## 2026-10-02 沿河外边界识别修复
+## 2026-10-02 沿河重叠地块与内部接缝修复
 
-`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 在 `codex/river-contour-repair` 上基于 `433e5b33` 修复浮点共线边的分段识别，并接入 382 父 / 1,199 分区的 Wave6 候选。旧 376 父记录和所有历史包认证保留；七个内部接缝重叠父继续暂缓。范围、独立审查、全图和浏览器证据见 [修复记录](river-wave6/context.md)。主工作区及其他工作树保持原所有权；本工作树及旧区域工作树为保存忽略的图集与几何审计而保留。最终提交、PR 检查、合并和发布以 Git / GitHub 回执为准。
+`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 使用 `codex/river-overlap-visibility`，基于 `bd6365ef` 修复七个重叠父地块的填色、命中及内部接缝可见性。前一轮 Wave6 经 PR #198 发布，覆盖 382 父 / 1,199 分区；Wave7 本地验收扩展至 389 父 / 1,276 分区，旧记录保持原样。覆盖顺序、轮廓遮挡和验收见 [重叠修复记录](river-overlap-repair/integration.md)。主工作区及其他工作树保持原所有权；本工作树及旧区域工作树为保存忽略的图集与几何审计而保留。最终提交、PR 检查、合并、发布和同步以 Git / GitHub 及 `.runtime/rv7/` 回执为准。
 
 ## 2026-10-01 第二批沿河地点准入
 

@@ -7,13 +7,14 @@ import { createPoliticalDerivedStateCache } from "../js/core/renderer/political_
 import { registerPoliticalGeometrySnapshot } from "../js/core/political_geometry_store.js";
 import { bumpColorRevision, replaceResolvedColorsState } from "../js/core/state/color_state.js";
 
-function rendererFunction(name, globals) {
+function rendererFunction(name, globals, includeFunctions = []) {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const declaration = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
-    .find((node) => node.type === "FunctionDeclaration" && node.id.name === name);
-  assert.ok(declaration, `${name} must remain a renderer function`);
+  const names = new Set([name, ...includeFunctions]);
+  const declarations = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .filter((node) => node.type === "FunctionDeclaration" && names.has(node.id.name));
+  assert.equal(declarations.length, names.size, `${name} and its dependencies must remain renderer functions`);
   const context = vm.createContext(globals);
-  vm.runInContext(source.slice(declaration.start, declaration.end), context);
+  vm.runInContext(declarations.map(node => source.slice(node.start, node.end)).join("\n"), context);
   return context[name];
 }
 
@@ -133,9 +134,10 @@ test("renderer full color rebuild refreshes its matching derived baseline", () =
     getPoliticalDerivedStateIdentity: () => identity,
     getCountryFillPaletteOwner: () => ({ invalidate() {} }),
     getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
+    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
     retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
     invalidateRenderPasses() {}, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
-  });
+  }, ["notifyPaintContourColorsChanged"]);
   const rebuilt = rebuild();
   assert.equal(state.colors, rebuilt);
   assert.equal(state.colorRevision, 9);
@@ -164,9 +166,10 @@ test("renderer empty or fallback color sources cannot certify a derived baseline
       getPoliticalDerivedStateIdentity: () => ["scene"],
       getCountryFillPaletteOwner: () => ({ invalidate() {} }),
       getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
+      getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
       retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
       invalidateRenderPasses() {}, recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
-    });
+    }, ["notifyPaintContourColorsChanged"]);
     rebuild();
     assert.equal(refreshes, 0, fallback ? "fallback land source" : "empty source");
   }

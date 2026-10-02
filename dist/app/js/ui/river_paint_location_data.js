@@ -1,13 +1,15 @@
 // Display metadata only; active pack parents own availability.
-// Existing wave5 labels retained; six wave6 labels use source names, reviewed
-// river associations and existing manual_geo_overrides/europe_geo_seeds only.
-// Joint admission scope: wave6-reviewed.json.
+// Existing wave5/6 labels retained; seven wave7 labels use source names and
+// reviewed wave5-review river associations. Unverified Chinese names stay empty.
+// Joint admission scope: wave7-reviewed.json.
 export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["AT121", "Mostviertel-Eisenwurzen", "AT", ["Danube"], ""]),
   Object.freeze(["AT124", "Waldviertel", "AT", ["Danube"], ""]),
   Object.freeze(["AT126", "Wiener Umland/Nordteil", "AT", ["Danube"], ""]),
   Object.freeze(["AT130", "Wien", "AT", ["Danube"], ""]),
   Object.freeze(["AT312", "Linz-Wels", "AT", ["Danube"], ""]),
+  Object.freeze(["BY_INT_GOMEL", "Gomel Interior", "BY", ["Dnieper"], ""]),
+  Object.freeze(["BY_INT_MOGILEV", "Mogilev Interior", "BY", ["Dnieper"], ""]),
   Object.freeze(["BY_RAY_67162791B1773631612848", "Dubrowna", "BY", ["Dnieper"], ""]),
   Object.freeze(["CH031", "Basel-Stadt", "CH", ["Rhine"], ""]),
   Object.freeze(["CH040", "Zürich", "CH", ["Rhine"], ""]),
@@ -289,6 +291,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["RO221", "Brăila", "RO", ["Danube"], ""]),
   Object.freeze(["RS110", "Београдска област", "RS", ["Danube"], ""]),
   Object.freeze(["RS123", "Јужнобачка област", "RS", ["Danube"], ""]),
+  Object.freeze(["RU_CITY_VOLGOGRAD", "Volgograd", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B10833307399195", "Kostroma", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B11359862812061", "Krasninsky District", "RU", ["Dnieper"], ""]),
   Object.freeze(["RU_RAY_50074027B12201890066789", "Samara", "RU", ["Volga"], ""]),
@@ -302,6 +305,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["RU_RAY_50074027B22241988675108", "Vorotynsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B22498534109926", "Ikryaninsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B22819891790259", "Tsimlyansky District", "RU", ["Don"], ""]),
+  Object.freeze(["RU_RAY_50074027B24471111608761", "Azovsky District", "RU", ["Don"], ""]),
   Object.freeze(["RU_RAY_50074027B28279959544204", "Yenotayevsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B3048202191929", "Penovsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B34532862724666", "Selizharovsky District", "RU", ["Volga"], ""]),
@@ -325,6 +329,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["RU_RAY_50074027B5102078213757", "Krasnoyarsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B51076628931359", "Staritsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B51169643005911", "Volzhsky District", "RU", ["Volga"], ""]),
+  Object.freeze(["RU_RAY_50074027B51726500082089", "Kalininsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B53231036069281", "Azov", "RU", ["Don"], ""]),
   Object.freeze(["RU_RAY_50074027B53245825740087", "Bagayevsky District", "RU", ["Don"], ""]),
   Object.freeze(["RU_RAY_50074027B53551011789267", "Dubna", "RU", ["Volga"], "杜布纳"]),
@@ -335,6 +340,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["RU_RAY_50074027B55465693339267", "Serafimovichsky District", "RU", ["Don"], ""]),
   Object.freeze(["RU_RAY_50074027B57067541625780", "городской округ Чебоксары", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B57358126207690", "Yaroslavl", "RU", ["Volga"], "雅罗斯拉夫尔"]),
+  Object.freeze(["RU_RAY_50074027B61241799946425", "Volgograd", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B61282999994048", "Safonovsky District", "RU", ["Dnieper"], ""]),
   Object.freeze(["RU_RAY_50074027B61660763245932", "Staromaynsky District", "RU", ["Volga"], ""]),
   Object.freeze(["RU_RAY_50074027B63773787473749", "Kholm-Zhirkovsky", "RU", ["Dnieper"], ""]),
@@ -376,6 +382,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["UA_RAY_74538382B23045356862491", "Dnipro", "UA", ["Dnieper"], ""]),
   Object.freeze(["UA_RAY_74538382B23530210512837", "Chyhyryn", "UA", ["Dnieper"], ""]),
   Object.freeze(["UA_RAY_74538382B42847215196778", "Petrykivka", "UA", ["Dnieper"], ""]),
+  Object.freeze(["UA_RAY_74538382B4751802602524", "Ivankiv", "UA", ["Dnieper"], ""]),
   Object.freeze(["UA_RAY_74538382B47612746607547", "Vyshhorod", "UA", ["Dnieper"], ""]),
   Object.freeze(["UA_RAY_74538382B5599119898653", "Solone", "UA", ["Dnieper"], ""]),
   Object.freeze(["UA_RAY_74538382B60890943260132", "Kyiv", "UA", ["Dnieper"], ""]),

@@ -677,6 +677,12 @@
       "role": "river_partitions",
       "family_id": "river_paint",
       "description": "Reviewed 382-parent Modern World river pack in lossless indexed transport; preserves all 376 wave5 parent records and excludes seven held internal-seam overlap candidates."
+    },
+    "river_partitions:modern_world_wave7": {
+      "url": "data/river_partitions/modern_world_wave7.transport.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 389-parent Modern World river pack in lossless indexed transport; preserves all 382 wave6 parent records and admits seven overlaps with ordered parent visibility and layered internal contours."
     }
   },
   "scenario_registry_key": "scenario_registry",

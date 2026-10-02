@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState } from '../../js/core/river_paint/partition_model.js';
 import { riverGeometryFingerprint } from '../../js/core/river_paint/geometry_identity.js';
-import { RIVER_PAINT_WAVE3, RIVER_PAINT_WAVE5, RIVER_PAINT_WAVE6 } from '../../js/core/river_paint/pilot_manifest.js';
+import { RIVER_PAINT_WAVE3, RIVER_PAINT_WAVE5, RIVER_PAINT_WAVE6, RIVER_PAINT_WAVE7 } from '../../js/core/river_paint/pilot_manifest.js';
 export const d3 = createRequire(import.meta.url)('../../vendor/d3.v7.min.js');
 export const rectangle = (x0, y0, x1, y1) => ({ type: 'Polygon',
   coordinates: [[[x0, y0], [x0, y1], [x1, y1], [x1, y0], [x0, y0]]] });
@@ -16,9 +16,12 @@ export const realWave5 = () => JSON.parse(readFileSync(new URL('../../data/river
 export const realWave5TransportText = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave5.transport.json', import.meta.url), 'utf8');
 export const realWave6 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave6.json', import.meta.url)));
 export const realWave6TransportText = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave6.transport.json', import.meta.url), 'utf8');
+export const realWave7 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave7.json', import.meta.url)));
+export const realWave7TransportText = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave7.transport.json', import.meta.url), 'utf8');
 export const makeWave3Fixture = options => makeApprovedFixture(realWave3(), RIVER_PAINT_WAVE3, options);
 export const makeWave5Fixture = options => makeApprovedFixture(realWave5(), RIVER_PAINT_WAVE5, options);
 export const makeWave6Fixture = options => makeApprovedFixture(realWave6(), RIVER_PAINT_WAVE6, options);
+export const makeWave7Fixture = options => makeApprovedFixture(realWave7(), RIVER_PAINT_WAVE7, options);
 function makeApprovedFixture(value, approved, { installed = true } = {}) {
   const pack = normalizeRiverPartitionPack(value);
   const features = [...pack.parents.map(p => feature(p.parentId, p.parentGeometry)),

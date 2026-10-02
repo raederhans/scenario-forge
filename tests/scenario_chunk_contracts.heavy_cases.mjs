@@ -1271,8 +1271,13 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         /function appendLandSpatialItemsRange\([\s\S]*?shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature[\s\S]*?if \(shouldExcludePoliticalVisualFeature\(feature, id\)\) continue;[\s\S]*?interactive: !shouldExcludePoliticalInteractionFeature\(feature, id\)/.test(spatialBuilderSource)
         && /shouldExcludePoliticalVisualFeature = shouldExcludePoliticalInteractionFeature/.test(spatialOwnerSource)
         && /shouldExcludePoliticalVisualFeature,/.test(spatialOwnerSource),
-      hitCanvasStillFiltersNonInteractiveSpatialItems:
-        /const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats\(\{[\s\S]*?overscanPx: HIT_CANVAS_VIEWPORT_OVERSCAN_PX,[\s\S]*?\}\);[\s\S]*?const visibleSpatialItems = visibleSpatialItemsResult\.items;[\s\S]*?visibleSpatialItems\.forEach\(\(item\) => \{[\s\S]*?shouldExcludePoliticalInteractionFeature\(item\.feature, item\.id\)/.test(rendererSource)
+      hitCanvasFiltersOrdinaryAndMasksRiverNonInteractiveSpatialItems:
+        (() => {
+          const body = extractRendererFunction(rendererSource, "drawHitCanvas");
+          return /const visibleSpatialItemsResult = collectVisibleLandSpatialItemsWithStats\(\{\s*overscanPx: HIT_CANVAS_VIEWPORT_OVERSCAN_PX,\s*\}\);/.test(body)
+            && /const riverVisible = hasVisibleRiverPartitions\(\);\s*const visibleSpatialItems = riverVisible\s*\? orderPoliticalShellUnderlayFirst\(visibleSpatialItemsResult\.items\)\s*: visibleSpatialItemsResult\.items;/.test(body)
+            && /visibleSpatialItems\.forEach\(\(item\) => \{\s*if \(!item\?\.feature\) return;\s*const excluded = shouldExcludePoliticalInteractionFeature\(item\.feature, item\.id\);\s*const key = excluded \? 0 : \(runtimeState\.idToKey\.get\(item\.id\) \|\| 0\);\s*if \(!riverVisible && \(!key \|\| excluded\)\) return;\s*fillHitFeature\(item\.feature, item\.id, key\);/.test(body);
+        })()
         && /collectVisibleSpatialItemsWithStats\(\{[\s\S]*?shouldIncludeItem:[\s\S]*?!shouldExcludePoliticalVisualFeature/.test(rendererSource),
       atlantropaScenarioLayerFeedsScenarioWaterPath:
         /function getScenarioAtlantropaRevisionToken\(counts = null\) \{[\s\S]*?runtimeState\.scenarioAtlantropaData[\s\S]*?water:\$\{counts \? counts\.water : buckets\.water\.length\}/.test(rendererSource)
@@ -1446,6 +1451,23 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     );
     harness.setMapSemanticMode("blank");
     assert.equal(harness.getRuntimePoliticalBaseCollection({ type: "FeatureCollection", features: [shellFeature] }).features.length, 1);
+
+    const fullSource = [detailFeature, primaryFallbackFeature, baseFeature, shellFeature];
+    const shuffled = [baseFeature, shellFeature, primaryFallbackFeature, detailFeature]
+      .map(feature => ({ id: feature.id, feature }));
+    harness.setPoliticalSourceFeatures(fullSource);
+    harness.setVisualOverrides({ [detailFeature.id]: "#ff00aa", [primaryFallbackFeature.id]: "#ff00aa" });
+    harness.setPendingColorEditIds([detailFeature.id]);
+    harness.setStablePaintOrderEnabled(true);
+    assert.deepEqual(Array.from(harness.orderPoliticalShellUnderlayFirst(shuffled), entry => entry.id),
+      [primaryFallbackFeature.id, shellFeature.id, detailFeature.id, baseFeature.id],
+      "river mode inherits complete source ranks without color/pending promotion");
+    assert.deepEqual(Array.from(harness.orderPoliticalShellUnderlayFirst([shuffled[0], shuffled[3]]), entry => entry.id),
+      [detailFeature.id, baseFeature.id], "visible subsets keep full-source rank");
+    harness.setStablePaintOrderEnabled(false);
+    assert.deepEqual(Array.from(harness.orderPoliticalShellUnderlayFirst(shuffled), entry => entry.id),
+      [shellFeature.id, baseFeature.id, primaryFallbackFeature.id, detailFeature.id],
+      "leaving river mode restores ordinary foreground promotion");
   });
 
   register(42, "post-edit visual override remains foreground after chunk promotion clears pending edit", () => {
@@ -1613,7 +1635,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     assert.ok(/viewport: \{[\s\S]*?width: canvasWidth,[\s\S]*?height: canvasHeight,[\s\S]*?right: canvasWidth,[\s\S]*?bottom: canvasHeight,[\s\S]*?\}/.test(identitySource));
     assert.ok(identitySource.includes('passSignature: helper.getRenderPassSignature("political", transform),'));
     assert.ok(/const screenRects = \[\{[\s\S]*?maxX: identity\.canvasWidth \+ politicalOverscanPx,[\s\S]*?maxY: identity\.canvasHeight \+ politicalOverscanPx/.test(viewportSource));
-    assert.match(ownerDrawSource, /const consumedBitmapResult = isExportRendering\(\)\s*\? null\s*: consumePoliticalRasterWorkerBitmapResult\(identity\.workerIdentity\);/);
+    assert.match(ownerDrawSource, /const inlinePoliticalPartitions = hasInlinePoliticalPartitions\(\);\s*const consumedBitmapResult = isExportRendering\(\) \|\| inlinePoliticalPartitions\s*\? null\s*: consumePoliticalRasterWorkerBitmapResult\(identity\.workerIdentity\);/);
+    assert.match(ownerDrawSource, /const packetState = !isExportRendering\(\) && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled\(\)\s*\? buildPoliticalRasterWorkerPacketEffect\(\{ identity, viewport \}\)/);
+    assert.match(ownerDrawSource, /if \(!isExportRendering\(\) && !inlinePoliticalPartitions\) requestPoliticalRasterWorkerPassEffect\(\{ identity, viewport, packetState \}\);/);
     assert.ok(
       ownerDrawSource.indexOf("const consumedBitmapResult = isExportRendering()")
         < ownerDrawSource.indexOf("const backgroundStartedAt = nowMs();"),

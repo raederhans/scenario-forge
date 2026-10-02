@@ -224,6 +224,29 @@ function createHarness({
   return { dependencies, events, owner, renderedIds };
 }
 
+test("inline river pass bypasses bitmap consumption, worker requests, progressive skip and trailing partitions", () => {
+  let inline = true;
+  const h = createHarness({
+    bitmapResult: { bitmap: true }, bitmapDrawn: true,
+    backgroundSummary: { ...DEFAULT_BACKGROUND, progressive: true,
+      deferredFullCacheReady: false, coarseUnderlay: "admin0" },
+    overrides: {
+      getters: { hasInlinePoliticalPartitions: () => inline },
+      effects: { drawPoliticalPartitions: () => { throw Error("inline cells must not paint again after all parents"); } },
+    },
+  });
+  assert.equal(h.owner.drawPoliticalPass(3).reason, "fine-feature-loop");
+  const names = h.events.map(eventName);
+  assert.ok(names.includes("fine-loop"));
+  for (const forbidden of ["consume-bitmap", "draw-bitmap", "build-packet", "request-worker", "foreground-override"]) {
+    assert.equal(names.includes(forbidden), false, forbidden);
+  }
+  inline = false;
+  h.dependencies.effects.drawPoliticalPartitions = () => {};
+  assert.equal(h.owner.drawPoliticalPass(3).reason, "political-raster-worker-bitmap",
+    "leaving inline mode restores ordinary worker consumption");
+});
+
 test("factory validates every dependency and freezes the exact public API", () => {
   for (const [groupName, names] of Object.entries(DEPENDENCY_NAMES)) {
     for (const missingName of names) {

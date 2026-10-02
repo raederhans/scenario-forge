@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { state as appState } from '../js/core/state.js';
-import { makeFixture, makeWave3Fixture, makeWave5Fixture, makeWave6Fixture, realWave5, realWave6, realPilot, realWave2, realWave3 } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, makeWave3Fixture, makeWave5Fixture, makeWave6Fixture, makeWave7Fixture, realWave5, realWave6, realWave7, realPilot, realWave2, realWave3 } from './helpers/river_paint_fixture.mjs';
 import { getRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { normalizeRiverPaintState, createDefaultRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
@@ -14,7 +14,7 @@ import { readRegisteredRuntimeHookSource, registerRuntimeHook } from '../js/core
 
 // Use production state authorities and scoped native mocks for singleton history.
 // Project serialization below needs no application singleton mutation at all.
-for (const [label, make] of [['synthetic', makeFixture], ['wave3', makeWave3Fixture], ['wave5', makeWave5Fixture], ['wave6', makeWave6Fixture]])
+for (const [label, make] of [['synthetic', makeFixture], ['wave3', makeWave3Fixture], ['wave5', makeWave5Fixture], ['wave6', makeWave6Fixture], ['wave7', makeWave7Fixture]])
 test(`${label}: real cell mutation undo/redo and same-color whole-parent fill restore sparse child edits`, async t => {
   const fixture = await make(); const parentId = fixture.parent.id;
   const saved = captureScenarioActivationState(appState);
@@ -63,7 +63,7 @@ function projectFixture(pack) {
       overrides: { [pack.parents[0].cells[0].id]: '#123456' } }) };
 }
 
-for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6]])
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
 test(`${label} self-contained project survives JSON and the real import commit without fetching geometry`, async () => {
   const pack = readPack(); const state = projectFixture(pack);
   const payload = FileManager.buildProjectPayload(state);
@@ -87,7 +87,7 @@ test(`${label} self-contained project survives JSON and the real import commit w
   assert.equal(old.schemaVersion, 22); assert.equal(Object.hasOwn(old, 'riverPaint'), false);
 });
 
-for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6]])
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
 test(`${label}: wrong project baseline and modified saved pack never reach the import commit`, async () => {
   const consoleError = console.error; console.error = () => {};
   try {

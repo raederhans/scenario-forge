@@ -34,6 +34,9 @@ export function createPoliticalPassOrchestratorOwner({
   const isExportRendering = typeof getters.isExportRendering === "function"
     ? getters.isExportRendering
     : () => false;
+  const hasInlinePoliticalPartitions = typeof getters.hasInlinePoliticalPartitions === "function"
+    ? getters.hasInlinePoliticalPartitions
+    : () => false;
   const resolvePoliticalPassIdentity = requireFunction(
     resolvers.resolvePoliticalPassIdentity,
     "resolvers.resolvePoliticalPassIdentity",
@@ -122,7 +125,8 @@ export function createPoliticalPassOrchestratorOwner({
       publishPoliticalPassDiagnostics({ identity, viewport });
     }
 
-    const consumedBitmapResult = isExportRendering()
+    const inlinePoliticalPartitions = hasInlinePoliticalPartitions();
+    const consumedBitmapResult = isExportRendering() || inlinePoliticalPartitions
       ? null
       : consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);
     if (
@@ -166,15 +170,16 @@ export function createPoliticalPassOrchestratorOwner({
       });
     }
 
-    const packetState = !isExportRendering() && isPoliticalRasterWorkerBitmapEnabled()
+    const packetState = !isExportRendering() && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()
       ? buildPoliticalRasterWorkerPacketEffect({ identity, viewport })
       : { packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" };
-    if (!isExportRendering()) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
+    if (!isExportRendering() && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
     recordPoliticalRasterWorkerSnapshot();
 
     const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit();
     const progressiveRecoveryCoarseSkipCandidate = (
-      !!backgroundSummary?.progressive
+      !inlinePoliticalPartitions
+      && !!backgroundSummary?.progressive
       && !backgroundSummary?.deferredFullCacheReady
       && String(backgroundSummary?.coarseUnderlay || "") === "admin0"
       && !pendingPoliticalColorEdit
@@ -233,7 +238,7 @@ export function createPoliticalPassOrchestratorOwner({
 
   function drawPoliticalPass(k) {
     const result = drawBasePoliticalPass(k);
-    if (result) effects.drawPoliticalPartitions?.(k);
+    if (result && !hasInlinePoliticalPartitions()) effects.drawPoliticalPartitions?.(k);
     return result;
   }
 
