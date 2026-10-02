@@ -4,19 +4,19 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 // One source-intersecting reviewed parent per named river. Whole-pack numerical
-// and geometry acceptance belongs to verify_contours.mjs, not 905 UI edits.
+// and geometry acceptance belongs to verify_contours.mjs, not one UI edit per cell.
 const RIVER_REPRESENTATIVES = [
-  ['Danube', 'RS123'], ['Dnieper', 'UA_RAY_74538382B89155529549277'],
-  ['Don', 'RU_RAY_50074027B55465693339267'], ['Elbe', 'DE600'],
-  ['Huang', 'CN_CITY_17275852B50024648693467'], ['Oder', 'CZ_ADM2_57006924B81305487356227'],
-  ['Rhine', 'DEA23'], ['Seine', 'FR_ARR_76003'],
-  ['Volga', 'RU_RAY_50074027B40605874483535'], ['Yangtze', 'CN_CITY_17275852B8285619165934'],
+  ['Danube', 'AT121'], ['Dnieper', 'UA_RAY_74538382B5599119898653'],
+  ['Don', 'RU_RAY_50074027B53245825740087'], ['Elbe', 'DEE05'],
+  ['Huang', 'CN_CITY_17275852B50024648693467'], ['Oder', 'PL_POW_0223'],
+  ['Rhine', 'DE714'], ['Seine', 'FR_ARR_92003'],
+  ['Volga', 'RU_RAY_50074027B19325401389824'], ['Yangtze', 'CN_CITY_17275852B8285619165934'],
 ];
 const LEGACY_REPRESENTATIVES = ['CN_CITY_17275852B1441354643708', 'DEE0D', 'FR_ARR_76003',
   'PL_POW_0264', 'RU_RAY_50074027B57358126207690'];
-const wave3Required = process.env.RIVER_WAVE3_E2E !== '0';
+const reviewedRequired = true;
 const reviewedIds = JSON.parse(fs.readFileSync(path.resolve(__dirname,
-  '../../tools/river_partitions/selections/wave3-reviewed.json'), 'utf8')).parents;
+  '../../tools/river_partitions/selections/wave5-reviewed.json'), 'utf8')).parents;
 
 async function activePackSummary(page) {
   return page.evaluate(async () => {
@@ -33,9 +33,9 @@ async function activePackSummary(page) {
 }
 
 function assertReviewedScope(summary) {
-  if (!wave3Required) return;
+  if (!reviewedRequired) return;
   expect(summary.parents.map(parent => parent.parentId).sort()).toEqual([...reviewedIds].sort());
-  expect(summary.parents.reduce((n, parent) => n + parent.cells.length, 0)).toBe(905);
+  expect(summary.parents.reduce((n, parent) => n + parent.cells.length, 0)).toBe(1164);
   for (const [, id] of RIVER_REPRESENTATIVES) expect(summary.parents.some(parent => parent.parentId === id), id).toBe(true);
 }
 
@@ -180,7 +180,7 @@ test('representative river picker and smallest fragment preserve toolbar undo/re
   const expanded = RIVER_REPRESENTATIVES.every(([, id]) => available.includes(id));
   const parents = expanded ? RIVER_REPRESENTATIVES.map(([, id]) => id) : LEGACY_REPRESENTATIVES.filter(id => available.includes(id));
   expect(parents.length).toBeGreaterThan(0);
-  if (wave3Required) expect(parents).toHaveLength(RIVER_REPRESENTATIVES.length);
+  if (reviewedRequired) expect(parents).toHaveLength(RIVER_REPRESENTATIVES.length);
   if (!parents.includes(summary.smallest.parentId)) parents.push(summary.smallest.parentId);
   const readPaint = () => page.evaluate(async () => {
     const { state } = await import(new URL('./js/core/state.js', location.href));
@@ -194,7 +194,7 @@ test('representative river picker and smallest fragment preserve toolbar undo/re
   await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
   await expect(page.locator('#riverPaintLocationGoBtn')).toBeDisabled();
   await search.fill('');
-  if (wave3Required) {
+  if (reviewedRequired) {
     for (const [river, id] of RIVER_REPRESENTATIVES) {
       await riverFilter.selectOption(river);
       await search.fill(id);
@@ -313,7 +313,7 @@ test('native canvas representative pixels follow state after tool and river disp
         colors: sampledCells.map(cell => state.riverPaint.overrides[cell.id]),
         samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
     });
-  }, { representatives: [...RIVER_REPRESENTATIVES.map(([, id]) => id), ...(wave3Required ? [] : LEGACY_REPRESENTATIVES)], requireReviewed: wave3Required });
+  }, { representatives: [...RIVER_REPRESENTATIVES.map(([, id]) => id), ...(reviewedRequired ? [] : LEGACY_REPRESENTATIVES)], requireReviewed: reviewedRequired });
   expect(result.length).toBeGreaterThan(0);
   expect(result.length).toBeLessThanOrEqual(RIVER_REPRESENTATIVES.length + LEGACY_REPRESENTATIVES.length + 1);
   for (const parent of result) {
@@ -327,7 +327,11 @@ test('native canvas representative pixels follow state after tool and river disp
   await testInfo.attach('river-pixel-sample.json', { body: JSON.stringify(result.map(({ png, ...evidence }) => evidence), null, 2), contentType: 'application/json' });
 });
 
-test('historical pilot and wave2 saved projects keep their authenticated scope through toolbar and reload', async ({ page }, testInfo) => {
+for (const [label, legacyPacks] of [
+  ['pilot and wave2', [['modern_world_pilot.json', 6, 31], ['modern_world_wave2.json', 12, 43]]],
+  ['wave3', [['modern_world_wave3.json', 302, 905]]],
+])
+test(`historical ${label} saved projects keep their authenticated scope through toolbar and reload`, async ({ page }, testInfo) => {
   // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
   test.setTimeout(120_000);
   const errors = []; page.on('pageerror', error => errors.push(error.message));
@@ -337,7 +341,7 @@ test('historical pilot and wave2 saved projects keep their authenticated scope t
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
   const defaultPack = await activePackSummary(page); assertReviewedScope(defaultPack);
   const legacyEvidence = [];
-  for (const [asset, parentCount, cellCount] of [['modern_world_pilot.json', 6, 31], ['modern_world_wave2.json', 12, 43]]) {
+  for (const [asset, parentCount, cellCount] of legacyPacks) {
     // FileManager and the real import funnel authenticate each embedded pack.
     // No loader stubbing, whitelist mutation or unsigned candidate injection.
     const result = await page.evaluate(async asset => {
@@ -346,7 +350,7 @@ test('historical pilot and wave2 saved projects keep their authenticated scope t
       const { FileManager } = await load('./js/core/file_manager.js');
       const { getRiverPaintRuntime } = await load('./js/core/river_paint/runtime.js');
       const { importProjectTextThroughFunnel } = await load('./js/core/interaction_funnel.js');
-      const pack = await (await fetch(`/data/river_partitions/${asset}`)).json();
+      const pack = await (await fetch(new URL(`data/river_partitions/${asset}`, location.href))).json();
       const cellId = pack.parents[0].cells[0].id;
       const payload = FileManager.buildProjectPayload(state);
       payload.riverPaint = { schemaVersion: 1, pack, editMode: true, overrides: { [cellId]: '#12ab34' } };
@@ -366,7 +370,9 @@ test('historical pilot and wave2 saved projects keep their authenticated scope t
     await expect(page.locator('#riverPaintLocationSelect option')).toHaveCount(parentCount + 1);
     const options = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
     expect(options.sort()).toEqual([...result.parents].sort());
-    await page.locator('#riverPaintSearchInput').fill('RS123');
+    const newlyAvailable = defaultPack.parents.find(parent => !result.parents.includes(parent.parentId));
+    expect(newlyAvailable).toBeTruthy();
+    await page.locator('#riverPaintSearchInput').fill(newlyAvailable.parentId);
     await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
     await page.locator('#riverPaintSearchInput').fill(result.parents[0]);
     const searched = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));

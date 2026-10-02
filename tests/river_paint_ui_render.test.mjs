@@ -30,7 +30,7 @@ function pickerNodes() {
 }
 
 const readSelection = name => JSON.parse(readFileSync(new URL(`../tools/river_partitions/selections/${name}.json`, import.meta.url)));
-const reviewedIds = () => readSelection('wave3-reviewed').parents;
+const reviewedIds = () => readSelection('wave5-reviewed').parents;
 function navigationNodes() {
   const elements = pickerNodes();
   return { button: buttonFixture(), navigationPanel: elements.panel, searchInput: elements.title,
@@ -52,13 +52,13 @@ function navigationHarness(pack = realWave2(), extra = {}) {
     replacePack(value) { livePack = value; }, setPending(value) { pending = value; }, loads: () => loads };
 }
 
-test('location metadata covers exactly the 302 reviewed parents and independently checked river associations', () => {
+test('location metadata covers exactly the 376 reviewed parents and independently checked river associations', () => {
   const ids = reviewedIds();
-  assert.equal(RIVER_PAINT_LOCATION_ROWS.length, 302);
+  assert.equal(RIVER_PAINT_LOCATION_ROWS.length, 376);
   assert.deepEqual(RIVER_PAINT_LOCATION_ROWS.map(row => row[0]).sort(), [...ids].sort());
   const locations = getRiverPaintLocations({ parents: ids.map(parentId => ({ parentId })) });
-  assert.equal(locations.length, 302);
-  assert.equal(new Set(locations.map(location => location.id)).size, 302);
+  assert.equal(locations.length, 376);
+  assert.equal(new Set(locations.map(location => location.id)).size, 376);
   const associations = new Map();
   const add = (id, river) => {
     if (!associations.has(id)) associations.set(id, new Set());
@@ -76,6 +76,9 @@ test('location metadata covers exactly the 302 reviewed parents and independentl
   for (const record of readSelection('eastern-europe').records) {
     if (['offline_candidate', 'existing_approved'].includes(record.status)) add(record.parentId, record.river);
   }
+  for (const record of readSelection('wave5-review').records) {
+    for (const river of record.rivers) add(record.parentId, river);
+  }
   const source = JSON.parse(readFileSync(new URL('../data/scenarios/modern_world/runtime_topology.topo.json', import.meta.url)));
   const properties = new Map(source.objects.political.geometries.map(g => [g.properties.id, g.properties]));
   for (const location of locations) {
@@ -89,7 +92,7 @@ test('location metadata covers exactly the 302 reviewed parents and independentl
   }
   assert.equal(new Set(locations.flatMap(location => location.rivers)).size, 10);
   const rhine = filterRiverPaintLocations(locations, { river: 'Rhine' });
-  assert.equal(rhine.length, 9); assert.deepEqual([...new Set(rhine.map(location => location.country))].sort(), ['CH', 'DE']);
+  assert.equal(rhine.length, 18); assert.deepEqual([...new Set(rhine.map(location => location.country))].sort(), ['CH', 'DE', 'NL']);
   assert.equal(filterRiverPaintLocations(locations, { query: '黄河' }).length, 103);
   assert.equal(filterRiverPaintLocations(locations, { query: 'Yellow River' }).length, 103);
   assert.equal(locations.find(location => location.id === 'FR_ARR_10002').zh, 'Nogent-sur-Seine', 'unverified translation falls back to the source name');
@@ -127,8 +130,8 @@ test('default 12 parents support name/ID search, empty results, cross-river filt
 
 test('every injected reviewed parent can be found, repeatedly located and opened in the tiny-cell picker', async () => {
   const { pack: sample, cells } = await makeFixture();
-  // Full 302-parent navigation fixture, with synthetic cell geometries. Production
-  // 905-cell geometry/click/contour acceptance belongs to the integration E2E lane.
+  // Full 376-parent navigation fixture, with synthetic cell geometries. Production
+  // 1164-cell geometry/click/contour acceptance belongs to the integration E2E lane.
   const pack = { parents: reviewedIds().map(parentId => ({ parentId,
     parentGeometry: sample.parents[0].parentGeometry,
     cells: cells.map((cell, index) => ({ ...cell, id: `fixture:${parentId}:${index}`,
@@ -140,7 +143,7 @@ test('every injected reviewed parent can be found, repeatedly located and opened
   h.controls.dispose();
   const controls = createRiverPaintControls({ state: h.state, ...h.nodes, runtime: h.runtime,
     focusParent: id => { h.visits.push(id); return true; }, onLocation: picker.open, onSync: picker.sync });
-  assert.equal(options(h.nodes.locationSelect).length, 302);
+  assert.equal(options(h.nodes.locationSelect).length, 376);
   assert.deepEqual(options(h.nodes.riverSelect).sort(), Object.keys(RIVER_PAINT_RIVERS).sort());
   for (const parent of pack.parents) {
     h.nodes.searchInput.value = parent.parentId; h.nodes.searchInput.listeners.input();
@@ -157,7 +160,7 @@ test('every injected reviewed parent can be found, repeatedly located and opened
     nodes.applyButton.listeners.click();
     assert.deepEqual(painted.at(-1), [parent.parentId, parent.cells[1].id]);
   }
-  assert.equal(h.visits.length, 604); assert.equal(painted.length, 302);
+  assert.equal(h.visits.length, 752); assert.equal(painted.length, 376);
   controls.dispose(); picker.dispose();
 });
 

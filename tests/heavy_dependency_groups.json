@@ -50,6 +50,7 @@
       "tests/test_regional_scenario_assets.py",
       "tests/test_reviewed_place_names.py",
       "tests/test_reviewed_seam.py",
+      "tests/test_river_coverage.py",
       "tests/test_river_partitions.py",
       "tests/test_russia_coverage.py",
       "tests/test_russia_source_dateline.py",
