@@ -1,8 +1,47 @@
 const { test, expect } = require('@playwright/test');
 const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('./support/playwright-app');
+const fs = require('node:fs');
+const path = require('node:path');
+
+// One source-intersecting reviewed parent per named river. Whole-pack numerical
+// and geometry acceptance belongs to verify_contours.mjs, not 905 UI edits.
+const RIVER_REPRESENTATIVES = [
+  ['Danube', 'RS123'], ['Dnieper', 'UA_RAY_74538382B89155529549277'],
+  ['Don', 'RU_RAY_50074027B55465693339267'], ['Elbe', 'DE600'],
+  ['Huang', 'CN_CITY_17275852B50024648693467'], ['Oder', 'CZ_ADM2_57006924B81305487356227'],
+  ['Rhine', 'DEA23'], ['Seine', 'FR_ARR_76003'],
+  ['Volga', 'RU_RAY_50074027B40605874483535'], ['Yangtze', 'CN_CITY_17275852B8285619165934'],
+];
+const LEGACY_REPRESENTATIVES = ['CN_CITY_17275852B1441354643708', 'DEE0D', 'FR_ARR_76003',
+  'PL_POW_0264', 'RU_RAY_50074027B57358126207690'];
+const wave3Required = process.env.RIVER_WAVE3_E2E !== '0';
+const reviewedIds = JSON.parse(fs.readFileSync(path.resolve(__dirname,
+  '../../tools/river_partitions/selections/wave3-reviewed.json'), 'utf8')).parents;
+
+async function activePackSummary(page) {
+  return page.evaluate(async () => {
+    const { state } = await import(new URL('./js/core/state.js', location.href));
+    const { getRiverPaintRuntime } = await import(new URL('./js/core/river_paint/runtime.js', location.href));
+    const pack = getRiverPaintRuntime(state).getActivePack();
+    if (!pack) throw new Error('Pack was not loaded by the real toolbar');
+    const parents = pack.parents.map(parent => ({ parentId: parent.parentId,
+      cells: parent.cells.map(cell => ({ id: cell.id, area: d3.geoArea(cell.geometry) })) }));
+    const smallest = parents.flatMap(parent => parent.cells.map(cell => ({ ...cell, parentId: parent.parentId })))
+      .sort((a, b) => a.area - b.area)[0];
+    return { packId: pack.packId, parents, smallest };
+  });
+}
+
+function assertReviewedScope(summary) {
+  if (!wave3Required) return;
+  expect(summary.parents.map(parent => parent.parentId).sort()).toEqual([...reviewedIds].sort());
+  expect(summary.parents.reduce((n, parent) => n + parent.cells.length, 0)).toBe(905);
+  for (const [, id] of RIVER_REPRESENTATIVES) expect(summary.parents.some(parent => parent.parentId === id), id).toBe(true);
+}
 
 test('river pilot UI, real click transaction, undo, file roundtrip and export share cell paint', async ({ page }, testInfo) => {
-  test.setTimeout(60_000);
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
+  test.setTimeout(120_000);
   const startedAt = Date.now(); const timings = {};
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -13,9 +52,26 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   // proves the final composed surface after the partition activation.
   await expect(page.locator('#riverPaintToggleBtn')).toBeEnabled();
   await page.locator('#riverPaintToggleBtn').click();
+  // Activation rebuilds full-map geometry before controls publish readiness.
+  await waitForRenderIdle(page);
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
   await waitForRenderIdle(page); timings.partitionReadyMs = Date.now() - startedAt;
+  assertReviewedScope(await activePackSummary(page));
+  const readiness = await page.evaluate(async () => {
+    const { state } = await import(new URL('./js/core/state.js', location.href));
+    const { getRiverPaintRuntime } = await import(new URL('./js/core/river_paint/runtime.js', location.href));
+    const { sameRiverParentGeometry } = await import(new URL('./js/core/river_paint/geometry_identity.js', location.href));
+    const pack = getRiverPaintRuntime(state).getActivePack();
+    return pack.support.filter(s => !sameRiverParentGeometry(state.landIndex.get(s.parentId)?.geometry, s.geometry)).map(s => {
+      const full = state.landDataFull?.features.find(f => (f.properties?.id || f.id) === s.parentId);
+      const live = state.landIndex.get(s.parentId);
+      return { id: s.parentId, indexed: !!live, full: !!full, properties: full?.properties, liveProperties: live?.properties,
+        fullMatches: sameRiverParentGeometry(full?.geometry,s.geometry), shellOwner: state.scenarioAutoShellOwnerByFeatureId?.[s.parentId] };
+    });
+  });
+  await testInfo.attach('river-support-readiness.json', { body: JSON.stringify(readiness,null,2), contentType: 'application/json' });
+  expect(readiness).toEqual([]);
   const result = await page.evaluate(async () => {
     const load = path => import(new URL(path, location.href).href);
     const { state } = await load('./js/core/state.js');
@@ -30,6 +86,9 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
     if (!pack) throw new Error('Pilot not installed by the actual toolbar');
     runtime.assertReadyForExport();
     const parent = pack.parents.find(p => p.parentId === 'RU_RAY_50074027B57358126207690');
+    if (parent?.cells.length !== 2) throw new Error('Stable two-bank reference parent changed');
+    const { APPROVED_RIVER_PACKS } = await load('./js/core/river_paint/pilot_manifest.js');
+    const approved = APPROVED_RIVER_PACKS.find(entry => entry.packId === pack.packId);
     const referenceBefore = JSON.stringify(getMapDataBoundary(state).reference.getScenarioAssignments());
     const sourceIds = [...state.landIndex.keys()];
     const innerPoint = cell => {
@@ -78,6 +137,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
     getRiverPaintRuntime(state).assertReadyForExport();
     return { parentCount: pack.parents.length, cellCount: pack.parents.reduce((n, p) => n + p.cells.length, 0),
       painted, clickEvidence, historyCount, undone, redone, schema: payload.schemaVersion,
+      approvedParentCount: approved?.parentCount, approvedCellCount: approved?.cellCount,
       noChildLandIds: sourceIds.every(id => !id.startsWith('river:')), graph,
       referenceUnchanged: referenceBefore === JSON.stringify(getMapDataBoundary(state).reference.getScenarioAssignments()),
       exportedCanvas: !!exportedCanvas?.width, importStatus: imported?.status,
@@ -87,7 +147,7 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   timings.roundtripMs = Date.now() - startedAt;
   await testInfo.attach('river-phase-timings.json', { body: JSON.stringify(timings, null, 2), contentType: 'application/json' });
   await testInfo.attach('river-map-roundtrip.json', { body: JSON.stringify(result, null, 2), contentType: 'application/json' });
-  expect(result.parentCount).toBe(12); expect(result.cellCount).toBe(43);
+  expect(result.parentCount).toBe(result.approvedParentCount); expect(result.cellCount).toBe(result.approvedCellCount);
   expect(result.historyCount).toBe(2); expect(result.schema).toBe(23);
   for (const key of ['painted', 'undone', 'redone', 'noChildLandIds', 'referenceUnchanged', 'exportedCanvas', 'reloadedPaint']) expect(result[key], key).toBe(true);
   expect(['committed', 'committed-with-warnings']).toContain(result.importStatus);
@@ -97,43 +157,93 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   await page.screenshot({ path: testInfo.outputPath('river-pilot-map.png') });
 });
 
-test('wave 2 picker reaches every cell and actual toolbar undo/redo preserves each transaction', async ({ page }, testInfo) => {
-  // JUSTIFY: 43 real picker edits plus 86 toolbar Undo/Redo clicks render the map; measured 84-108s locally including startup.
-  test.setTimeout(180_000);
+test('representative river picker and smallest fragment preserve toolbar undo/redo transactions', async ({ page }, testInfo) => {
+  // Bound UI work to two banks per representative plus the smallest fragment.
+  // The timeout covers startup, not an unbounded loop over expanded pack cells.
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
+  test.setTimeout(120_000);
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
   await waitForAppInteractive(page);
   await page.locator('#riverPaintToggleBtn').click();
+  // Activation rebuilds full-map geometry before controls publish readiness.
+  await waitForRenderIdle(page);
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
+  await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
   await waitForRenderIdle(page);
   await page.locator('#toolFillBtn').click();
-  const parents = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
-  expect(parents).toHaveLength(12);
+  const summary = await activePackSummary(page);
+  assertReviewedScope(summary);
+  const available = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+  expect(available.sort()).toEqual(summary.parents.map(parent => parent.parentId).sort());
+  const expanded = RIVER_REPRESENTATIVES.every(([, id]) => available.includes(id));
+  const parents = expanded ? RIVER_REPRESENTATIVES.map(([, id]) => id) : LEGACY_REPRESENTATIVES.filter(id => available.includes(id));
+  expect(parents.length).toBeGreaterThan(0);
+  if (wave3Required) expect(parents).toHaveLength(RIVER_REPRESENTATIVES.length);
+  if (!parents.includes(summary.smallest.parentId)) parents.push(summary.smallest.parentId);
   const readPaint = () => page.evaluate(async () => {
     const { state } = await import(new URL('./js/core/state.js', location.href));
     return { ...state.riverPaint.overrides };
   });
+  // Search and filter the real authenticated pack; empty results must not retain
+  // a navigable stale parent. Clear both before checking the complete scope.
+  const search = page.locator('#riverPaintSearchInput');
+  const riverFilter = page.locator('#riverPaintRiverSelect');
+  await search.fill('no-such-river-parent-000');
+  await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
+  await expect(page.locator('#riverPaintLocationGoBtn')).toBeDisabled();
+  await search.fill('');
+  if (wave3Required) {
+    for (const [river, id] of RIVER_REPRESENTATIVES) {
+      await riverFilter.selectOption(river);
+      await search.fill(id);
+      const ids = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+      expect(ids, river).toEqual([id]);
+      await search.fill('');
+    }
+  }
+  await riverFilter.selectOption('');
   const painted = [];
   for (const parent of parents) {
     await page.locator('#riverPaintLocationSelect').selectOption(parent);
+    await expect(page.locator('#riverPaintLocationSelect')).toHaveValue(parent);
+    await page.locator('#riverPaintLocationGoBtn').click();
     await expect(page.locator('#riverCellPicker')).toBeVisible();
     const cells = await page.locator('#riverCellSelect option').evaluateAll(options => options.map(o => o.value));
-    for (const cell of cells) {
+    const expected = summary.parents.find(entry => entry.parentId === parent).cells;
+    expect(cells.sort()).toEqual(expected.map(cell => cell.id).sort());
+    const chosen = [expected[0].id, expected[1].id];
+    if (summary.smallest.parentId === parent && !chosen.includes(summary.smallest.id)) chosen.push(summary.smallest.id);
+    for (const cell of chosen) {
       await page.locator('#riverCellSelect').selectOption(cell);
+      await expect(page.locator('#riverCellSelect')).toHaveValue(cell);
+      await expect(page.locator('#riverCellApplyBtn')).toBeEnabled();
+      const previewPaths = await page.locator('#riverCellPicker svg path').evaluateAll(paths => paths.map(p => p.getAttribute('d')));
+      expect(previewPaths.length).toBeGreaterThan(0);
+      expect(previewPaths.every(d => d && !/NaN|Infinity/.test(d)), cell).toBe(true);
       expect(Object.keys(await readPaint())).toHaveLength(painted.length);
+      await page.evaluate(async color => {
+        const { state } = await import(new URL('./js/core/state.js', location.href));
+        const { setClickSelectedColorState } = await import(new URL('./js/core/state/actions/renderer_interaction_actions.js', location.href));
+        setClickSelectedColorState(state, color);
+      }, painted.length % 2 ? '#bd24ce' : '#12ab34');
       await page.locator('#riverCellApplyBtn').click();
       painted.push(cell);
       expect(Object.keys(await readPaint()).sort()).toEqual([...painted].sort());
+      expect((await readPaint())[cell]).toBe(painted.length % 2 ? '#12ab34' : '#bd24ce');
     }
   }
-  expect(painted).toHaveLength(43);
+  expect(painted).toContain(summary.smallest.id);
+  await testInfo.attach('river-picker-sample.json', { body: JSON.stringify({ packId: summary.packId,
+    representatives: expanded ? RIVER_REPRESENTATIVES : parents, smallest: summary.smallest, painted }, null, 2), contentType: 'application/json' });
   const saved = await readPaint();
-  await page.screenshot({ path: testInfo.outputPath('wave2-picker.png') });
-  for (let count = 42; count >= 0; count--) {
+  await page.screenshot({ path: testInfo.outputPath('river-smallest-picker.png') });
+  for (let count = painted.length - 1; count >= 0; count--) {
     await page.locator('#undoBtn').click();
     expect(Object.keys(await readPaint())).toHaveLength(count);
   }
-  for (let count = 1; count <= 43; count++) {
+  for (let count = 1; count <= painted.length; count++) {
     await page.locator('#redoBtn').click();
     expect(Object.keys(await readPaint())).toHaveLength(count);
   }
@@ -141,26 +251,35 @@ test('wave 2 picker reaches every cell and actual toolbar undo/redo preserves ea
   await page.locator('#riverPaintToggleBtn').click();
   await expect(page.locator('#riverCellPicker')).toBeHidden();
   expect(await readPaint()).toEqual(saved);
+  expect(errors).toEqual([]);
 });
 
-test('native canvas renders all twelve pilot parents and PNG pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
+test('native canvas representative pixels follow state after tool and river display are hidden', async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   await gotoApp(page, '/?ui_shell=1', { waitUntil: 'domcontentloaded' });
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(async ({ representatives, requireReviewed }) => {
     const load = path => import(new URL(path, location.href).href);
     const { loadRiverPaintPilot } = await load('./js/core/river_paint/pilot_loader.js');
     const { RIVER_PAINT_PILOT } = await load('./js/core/river_paint/pilot_manifest.js');
     const { normalizeRiverPaintState } = await load('./js/core/river_paint/partition_model.js');
     const { createRiverPaintRenderOwner } = await load('./js/core/river_paint/render_owner.js');
     const pack = await loadRiverPaintPilot({});
-    return pack.parents.map(parent => {
+    if (requireReviewed && representatives.some(id => !pack.parents.some(parent => parent.parentId === id))) {
+      throw new Error('Wave3 representative parents are missing from the authenticated default pack');
+    }
+    const selected = pack.parents.filter(parent => representatives.includes(parent.parentId));
+    const smallest = pack.parents.flatMap(parent => parent.cells.map(cell => ({ parent, area: d3.geoArea(cell.geometry) })))
+      .sort((a, b) => a.area - b.area)[0].parent;
+    if (!selected.includes(smallest)) selected.push(smallest);
+    return selected.map(parent => {
       const feature = { type: 'Feature', id: parent.parentId, properties: { id: parent.parentId, cntr_code: 'FR' }, geometry: parent.parentGeometry };
       const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
         activeScenarioManifest: { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt },
         riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, editMode: true, overrides: {} }),
         landData: { features: [feature] }, landIndex: new Map([[feature.id, feature]]), sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {} };
       const palette = ['#12ab34', '#bd24ce', '#2358ab', '#df8021', '#16a5b9', '#ab344f', '#8b751d', '#753fce', '#3c6855'];
-      const colors = parent.cells.map((_, i) => palette[i]);
+      const colors = parent.cells.map((_, i) => palette[i % palette.length]);
+      const sampledCells = [...parent.cells].sort((a, b) => d3.geoArea(b.geometry) - d3.geoArea(a.geometry)).slice(0, 2);
       parent.cells.forEach((c, i) => { state.riverPaint.overrides[c.id] = colors[i]; });
       const canvas = document.createElement('canvas'); canvas.width = canvas.height = 600;
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -181,7 +300,7 @@ test('native canvas renders all twelve pilot parents and PNG pixels follow state
       };
       // Fit each cell for the pixel assertion: several valid river slivers are
       // smaller than a full opaque pixel at a parent-wide overview.
-      const initial = parent.cells.map(cell => {
+      const initial = sampledCells.map(cell => {
         projection.fitExtent([[20, 20], [580, 580]], { type: 'Feature', geometry: cell.geometry });
         ctx.clearRect(0, 0, 600, 600); owner.draw(1);
         return sample(cell);
@@ -190,15 +309,84 @@ test('native canvas renders all twelve pilot parents and PNG pixels follow state
       ctx.clearRect(0, 0, 600, 600); owner.draw(1); const png = canvas.toDataURL('image/png');
       const builds = owner.diagnostics().builds;
       state.riverPaint.editMode = false; state.showRivers = false; ctx.clearRect(0, 0, 600, 600); owner.draw(1);
-      return { parentId: parent.parentId, initial, colors, samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
+      return { parentId: parent.parentId, cellIds: sampledCells.map(cell => cell.id), initial,
+        colors: sampledCells.map(cell => state.riverPaint.overrides[cell.id]),
+        samePng: canvas.toDataURL('image/png') === png, noReproject: owner.diagnostics().builds === builds, png };
     });
-  });
-  expect(result).toHaveLength(12);
-  expect(result.reduce((n, parent) => n + parent.colors.length, 0)).toBe(43);
+  }, { representatives: [...RIVER_REPRESENTATIVES.map(([, id]) => id), ...(wave3Required ? [] : LEGACY_REPRESENTATIVES)], requireReviewed: wave3Required });
+  expect(result.length).toBeGreaterThan(0);
+  expect(result.length).toBeLessThanOrEqual(RIVER_REPRESENTATIVES.length + LEGACY_REPRESENTATIVES.length + 1);
   for (const parent of result) {
     expect(parent.initial, parent.parentId).toEqual(parent.colors);
     expect(parent.samePng, parent.parentId).toBe(true);
     expect(parent.noReproject, parent.parentId).toBe(true);
-    await testInfo.attach(`${parent.parentId}-bank-pixels.png`, { body: Buffer.from(parent.png.split(',')[1], 'base64'), contentType: 'image/png' });
+    if (result.indexOf(parent) < 3) {
+      await testInfo.attach(`${parent.parentId}-bank-pixels.png`, { body: Buffer.from(parent.png.split(',')[1], 'base64'), contentType: 'image/png' });
+    }
   }
+  await testInfo.attach('river-pixel-sample.json', { body: JSON.stringify(result.map(({ png, ...evidence }) => evidence), null, 2), contentType: 'application/json' });
+});
+
+test('historical pilot and wave2 saved projects keep their authenticated scope through toolbar and reload', async ({ page }, testInfo) => {
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
+  test.setTimeout(120_000);
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
+  await waitForAppInteractive(page);
+  await page.locator('#riverPaintToggleBtn').click();
+  await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
+  const defaultPack = await activePackSummary(page); assertReviewedScope(defaultPack);
+  const legacyEvidence = [];
+  for (const [asset, parentCount, cellCount] of [['modern_world_pilot.json', 6, 31], ['modern_world_wave2.json', 12, 43]]) {
+    // FileManager and the real import funnel authenticate each embedded pack.
+    // No loader stubbing, whitelist mutation or unsigned candidate injection.
+    const result = await page.evaluate(async asset => {
+      const load = path => import(new URL(path, location.href).href);
+      const { state } = await load('./js/core/state.js');
+      const { FileManager } = await load('./js/core/file_manager.js');
+      const { getRiverPaintRuntime } = await load('./js/core/river_paint/runtime.js');
+      const { importProjectTextThroughFunnel } = await load('./js/core/interaction_funnel.js');
+      const pack = await (await fetch(`/data/river_partitions/${asset}`)).json();
+      const cellId = pack.parents[0].cells[0].id;
+      const payload = FileManager.buildProjectPayload(state);
+      payload.riverPaint = { schemaVersion: 1, pack, editMode: true, overrides: { [cellId]: '#12ab34' } };
+      const imported = await importProjectTextThroughFunnel(JSON.stringify(payload), { fileName: asset });
+      getRiverPaintRuntime(state).assertReadyForExport();
+      const installed = getRiverPaintRuntime(state).getActivePack();
+      return { status: imported.status, expectedPackId: pack.packId, actualPackId: installed.packId,
+        cellId, overrides: { ...state.riverPaint.overrides },
+        parents: installed.parents.map(parent => parent.parentId),
+        cellCount: installed.parents.reduce((n, parent) => n + parent.cells.length, 0) };
+    }, asset);
+    expect(['committed', 'committed-with-warnings']).toContain(result.status);
+    expect(result.actualPackId).toBe(result.expectedPackId);
+    expect(result.parents).toHaveLength(parentCount); expect(result.cellCount).toBe(cellCount);
+    expect(result.overrides).toEqual({ [result.cellId]: '#12ab34' });
+    await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#riverPaintLocationSelect option')).toHaveCount(parentCount + 1);
+    const options = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+    expect(options.sort()).toEqual([...result.parents].sort());
+    await page.locator('#riverPaintSearchInput').fill('RS123');
+    await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
+    await page.locator('#riverPaintSearchInput').fill(result.parents[0]);
+    const searched = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+    expect(searched).toEqual([result.parents[0]]);
+    await page.locator('#riverPaintSearchInput').fill('');
+    await page.locator('#riverPaintToggleBtn').click();
+    await page.locator('#riverPaintToggleBtn').click();
+    expect((await activePackSummary(page)).packId).toBe(result.expectedPackId);
+    const reload = await page.evaluate(async () => {
+      const { state } = await import(new URL('./js/core/state.js', location.href));
+      const { FileManager } = await import(new URL('./js/core/file_manager.js', location.href));
+      const { importProjectTextThroughFunnel } = await import(new URL('./js/core/interaction_funnel.js', location.href));
+      const payload = FileManager.buildProjectPayload(state);
+      const result = await importProjectTextThroughFunnel(JSON.stringify(payload), { fileName: 'legacy-river-roundtrip.json' });
+      return { status: result.status, packId: state.riverPaint.pack.packId, overrides: { ...state.riverPaint.overrides } };
+    });
+    expect(['committed', 'committed-with-warnings']).toContain(reload.status);
+    expect(reload.packId).toBe(result.expectedPackId); expect(reload.overrides).toEqual(result.overrides);
+    legacyEvidence.push({ asset, ...result, reload });
+  }
+  await testInfo.attach('river-legacy-scope.json', { body: JSON.stringify(legacyEvidence, null, 2), contentType: 'application/json' });
+  expect(errors).toEqual([]);
 });

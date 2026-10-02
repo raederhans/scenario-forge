@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 69,
     "nodeCount": 85,
-    "reverseIndexKeyCount": 131,
+    "reverseIndexKeyCount": 134,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -1237,14 +1237,23 @@
     },
     "tests/e2e/river_paint.spec.js": {
       "directDependencies": [
+        "js/core/file_manager.js",
+        "js/core/interaction_funnel.js",
+        "js/core/river_paint/geometry_identity.js",
+        "js/core/river_paint/runtime.js",
         "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
         "tests/e2e/support/playwright-app.js"
       ],
       "transitiveDependencies": [
+        "js/core/file_manager.js",
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
+        "js/core/river_paint/geometry_identity.js",
+        "js/core/river_paint/runtime.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
         "tests/e2e/support/playwright-app.js",
@@ -1254,10 +1263,14 @@
         "tests/e2e/support/startup-paths.js"
       ],
       "repoImpact": [
+        "js/core/file_manager.js",
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
+        "js/core/river_paint/geometry_identity.js",
+        "js/core/river_paint/runtime.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
         "js/ui/sidebar.js"
       ]
     },
@@ -2150,6 +2163,9 @@
       "tests/e2e/dev/normal_visual_paths.dev.spec.js",
       "tests/e2e/dev/scenario_chunk_exact_after_settle_regression.dev.spec.js"
     ],
+    "js/core/file_manager.js": [
+      "tests/e2e/river_paint.spec.js"
+    ],
     "js/core/geometry_raster_worker_client.js": [
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
       "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
@@ -2331,6 +2347,12 @@
     "js/core/renderer/transport_facility_icons.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "js/core/river_paint/geometry_identity.js": [
+      "tests/e2e/river_paint.spec.js"
+    ],
+    "js/core/river_paint/runtime.js": [
+      "tests/e2e/river_paint.spec.js"
+    ],
     "js/core/scenario_dispatcher.js": [
       "tests/e2e/city_label_i18n_redraw.spec.js",
       "tests/e2e/city_lights_layer_regression.spec.js",
@@ -2510,7 +2532,8 @@
     ],
     "js/core/state/actions/renderer_interaction_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
-      "tests/e2e/ocean_geometry_contract.spec.js"
+      "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/river_paint.spec.js"
     ],
     "js/core/state/actions/scenario_presentation_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",

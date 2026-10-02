@@ -112,6 +112,19 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_all_registered_river_packs_are_published_with_registry_entries(self):
+        source_registry = json.loads((REPO_ROOT / "data/runtime_asset_registry.json").read_text(encoding="utf-8"))
+        published_registry = json.loads((PAGES_DIST_ROOT / "app/data/runtime_asset_registry.json").read_text(encoding="utf-8"))
+        packs = {key: asset for key, asset in source_registry["assets"].items() if key.startswith("river_partitions:")}
+        self.assertTrue(packs)
+        for key, asset in packs.items():
+            with self.subTest(asset=key):
+                self.assertIn(key, published_registry["assets"])
+                source = REPO_ROOT / asset["url"]
+                published = PAGES_DIST_ROOT / "app" / asset["url"]
+                self.assertTrue(published.is_file(), f"Missing published river pack: {key}")
+                self.assertEqual(json.loads(source.read_text(encoding="utf-8")), json.loads(published.read_text(encoding="utf-8")))
+
     def test_published_modern_world_keeps_renderable_runtime_topology(self):
         app_root = PAGES_DIST_ROOT / "app"
         manifest = json.loads((app_root / "data/scenarios/modern_world/manifest.json").read_text(encoding="utf-8"))

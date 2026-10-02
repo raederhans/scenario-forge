@@ -648,6 +648,12 @@
       "family_id": "physical_region_labels",
       "description": "Natural Earth bilingual physical reference labels"
     },
+    "river_partitions:modern_world_wave3": {
+      "url": "data/river_partitions/modern_world_wave3.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 302-parent Modern World river pack; preserves all twelve wave2 parent records and excludes the five deferred joint candidates."
+    },
     "river_partitions:modern_world_wave2": {
       "url": "data/river_partitions/modern_world_wave2.json",
       "role": "river_partitions",

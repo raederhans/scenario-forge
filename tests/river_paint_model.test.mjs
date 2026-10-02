@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, realPilot, realWave2, d3 } from './helpers/river_paint_fixture.mjs';
+import { readFileSync } from 'node:fs';
+import { makeFixture, rectangle, realPilot, realWave2, realWave3, realWave3Text, d3 } from './helpers/river_paint_fixture.mjs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState, verifyRiverPartitionFingerprints,
   getRiverParentCompatibility, getRiverPartitionIndex, getEditedRiverParentIds } from '../js/core/river_paint/partition_model.js';
 import { canonicalRiverGeometry, riverGeometryFingerprint } from '../js/core/river_paint/geometry_identity.js';
@@ -8,6 +9,7 @@ import { applyFeaturePaintState } from '../js/core/state/color_state.js';
 import { applyRiverCellPaintState, restoreRiverPaintOverridesState, setRiverPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { getMapDataBoundary } from '../js/core/map_data_boundary.js';
 import { verifyApprovedRiverPack, loadRiverPaintPilot } from '../js/core/river_paint/pilot_loader.js';
+import { APPROVED_RIVER_PACKS, isRiverPaintSourceCompatible } from '../js/core/river_paint/pilot_manifest.js';
 
 test('approved real pilot has six parents, 31 cells and 11 independently noded neighbors', async () => {
   const pack = await verifyApprovedRiverPack(realPilot());
@@ -56,6 +58,58 @@ test('river action owns imported paint and rejects invalid edits without writes'
   assert.equal(state.riverPaint, before);
 });
 
+test('wave3 authenticates exactly the reviewed scope with all wave2 parents unchanged', async () => {
+  const pack = await verifyApprovedRiverPack(realWave3());
+  const selection = JSON.parse(readFileSync(new URL('../tools/river_partitions/selections/wave3-reviewed.json', import.meta.url)));
+  assert.deepEqual(pack.parents.map(p => p.parentId).sort(), [...selection.parents].sort());
+  assert.equal(pack.parents.length, 302); assert.equal(pack.support.length, 108);
+  assert.equal(pack.parents.reduce((n, p) => n + p.cells.length, 0), 905);
+  assert.equal(await verifyRiverPartitionFingerprints(pack), pack);
+  for (const parent of realWave2().parents) {
+    assert.deepEqual(pack.parents.find(p => p.parentId === parent.parentId), parent);
+  }
+  const path = d3.geoPath(d3.geoEquirectangular());
+  for (const parent of pack.parents) {
+    for (const cell of parent.cells) {
+      const area = d3.geoArea(cell.geometry);
+      assert.ok(area > 0 && area < 2 * Math.PI, cell.id);
+      assert.ok(path(cell.geometry) && !/NaN|Infinity/.test(path(cell.geometry)), cell.id);
+    }
+  }
+});
+
+test('wave3 authentication rejects changed support, cells, provenance and unapproved identities', async () => {
+  const rotate = geometry => {
+    const ring = geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
+    ring.pop(); const first = ring.shift(); ring.push(first, ring[0]);
+    assert.notDeepEqual(first, ring[0]);
+  };
+  for (const mutate of [
+    p => rotate(p.support[0].geometry),
+    p => rotate(p.parents[0].cells[0].geometry),
+    p => { p.source.riverNames = ['FORGED']; },
+    p => { p.packId = realWave2().packId; },
+  ]) {
+    const raw = realWave3(); mutate(raw);
+    // Ring rotations preserve domain and fingerprint but change authenticated bytes.
+    normalizeRiverPartitionPack(raw);
+    await assert.rejects(verifyApprovedRiverPack(raw), /integrity/);
+  }
+  const unknown = realWave3(); unknown.packId = `sha256:${'f'.repeat(64)}`;
+  await assert.rejects(verifyApprovedRiverPack(unknown), /Unsupported/);
+});
+
+test('every approved pack requires its exact scenario version and generation', () => {
+  for (const approved of APPROVED_RIVER_PACKS) {
+    const pack = { packId: approved.packId };
+    const manifest = { version: approved.scenarioVersion, generated_at: approved.scenarioGeneratedAt };
+    assert.equal(isRiverPaintSourceCompatible(pack, manifest), true);
+    assert.equal(isRiverPaintSourceCompatible(pack, { ...manifest, version: manifest.version + 1 }), false);
+    assert.equal(isRiverPaintSourceCompatible(pack, { ...manifest, generated_at: 'new-build' }), false);
+    assert.equal(isRiverPaintSourceCompatible(pack, undefined), false);
+  }
+});
+
 test('geometry identity ignores ring rotation and direction, not source changes', async () => {
   const a = rectangle(0, 0, 2, 2), b = structuredClone(a);
   b.coordinates[0].reverse();
@@ -91,11 +145,19 @@ test('normalization cannot authenticate a forged area-preserving geometry', asyn
 
 test('approved loader uses the catalog URL and propagates abort and HTTP failure', async () => {
   const signal = new AbortController().signal;
+  const text = realWave3Text();
+  // Windows Git checkouts can turn the builder's final LF into CRLF.
+  assert.equal(text.replace(/\r\n/g, '\n').length, 1_993_389);
+  assert.equal(Buffer.byteLength(text, 'utf8'), text.length);
+  assert.ok(text.length <= 2_000_000);
   const pack = await loadRiverPaintPilot({ signal, fetchImpl: async (url, options) => {
-    assert.equal(url, 'data/river_partitions/modern_world_wave2.json'); assert.equal(options.signal, signal);
-    return { ok: true, text: async () => JSON.stringify(realWave2()) };
+    assert.equal(url, 'data/river_partitions/modern_world_wave3.json'); assert.equal(options.signal, signal);
+    assert.equal(options.cache, 'no-cache');
+    return { ok: true, text: async () => text };
   } });
-  assert.equal(pack.parents.length, 12);
+  assert.equal(pack.parents.length, 302);
+  const abort = new DOMException('Aborted', 'AbortError');
+  await assert.rejects(loadRiverPaintPilot({ fetchImpl: async () => { throw abort; } }), error => error === abort);
   await assert.rejects(loadRiverPaintPilot({ fetchImpl: async () => ({ ok: false, status: 503 }) }), /503/);
   await assert.rejects(loadRiverPaintPilot({ fetchImpl: async () => ({ ok: true, text: async () => 'x'.repeat(2000001) }) }), /budget/);
 });

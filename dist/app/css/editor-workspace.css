@@ -132,18 +132,27 @@
 .editor-workspace .editor-task-panel > .color-library-card { padding: 0; border: 0; background: none; }
 .editor-workspace .editor-task-panel .palette-grid { max-height: none; overflow: visible; }
 .editor-workspace #bottomDock { bottom: 16px; border-radius: 12px; gap: 8px; padding: 8px; width: min(820px, calc(100% - 24px)); max-width: calc(100% - 24px); }
+.editor-workspace #bottomDock:has(#riverPaintNavigation:not([hidden])) { overflow: visible; }
 .editor-workspace .bottom-dock-primary { flex-wrap: wrap; gap: 8px; }
 .editor-workspace #paletteGrid { grid-template-columns: repeat(3, 24px); }
 .editor-workspace #paletteGrid > :nth-child(n + 4) { display: none; }
 .editor-workspace .dock-group-mode { width: auto; min-width: 0; }
 .editor-workspace .dock-group-mode .dock-segmented-control { width: auto; min-width: 0; grid-template-columns: auto; }
-.editor-workspace #riverPaintLocationSelect { width: 150px; max-width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
-.editor-workspace #riverPaintLocationSelect[hidden] { display: none; }
-.editor-workspace .dock-group-mode { position: relative; }
-.editor-workspace #riverCellPicker { position: absolute; bottom: calc(100% + 16px); left: 0; width: 256px; padding: 12px; display: grid; gap: 8px; background: var(--bg-surface, #fff); border: 1px solid var(--border-subtle); border-radius: 12px; box-shadow: 0 8px 24px #0002; }
-.editor-workspace #riverCellPicker[hidden] { display: none; }
+.editor-workspace .dock-group-mode { position: static; }
+.editor-workspace #riverPaintNavigation { position: absolute; bottom: calc(100% + 16px); left: 50%; transform: translateX(-50%); width: min(320px, calc(100vw - 32px)); box-sizing: border-box; padding: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; max-height: min(560px, calc(100dvh - 240px)); overflow-y: auto; background: var(--bg-surface, #fff); border: 1px solid var(--border-subtle); border-radius: 12px; box-shadow: 0 8px 24px #0002; }
+.editor-workspace #riverPaintSearchInput { min-width: 0; width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-surface, #fff); color: var(--text-primary); font-size: 12px; }
+.editor-workspace :is(#riverPaintRiverSelect, #riverPaintLocationSelect) { width: 100%; min-width: 0; max-width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
+.editor-workspace :is(.river-paint-location-row, #riverPaintLocationResults, #riverCellPicker) { grid-column: 1 / -1; }
+.editor-workspace .river-paint-location-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.editor-workspace #riverPaintLocationResults { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+.editor-workspace #riverCellPicker { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border-subtle); }
+.editor-workspace #riverCellPickerTitle { font-size: 13px; overflow-wrap: anywhere; }
+.editor-workspace :is(#riverPaintNavigation, #riverPaintSearchInput, #riverPaintRiverSelect, #riverPaintLocationSelect, #riverPaintLocationGoBtn, #riverPaintLocationResults, #riverCellPicker)[hidden] { display: none; }
 .editor-workspace #riverCellSelect { width: 100%; background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; }
 .editor-workspace #riverCellPreview { width: 100%; height: 104px; background: #f8fafc; border-radius: 6px; }
+@media (max-width: 767px) {
+  .editor-workspace .dock-group-mode:has(#riverPaintToggleBtn:not(:disabled)) { display: flex !important; }
+}
 .editor-workspace #transportProjectSection { padding: 12px 0; border: 0; box-shadow: none; background: transparent; }
 .editor-workspace #transportProjectSection .sidebar-section-description { display: none; }
 .editor-workspace #transportProjectSection > summary { font-size: 13px; }
