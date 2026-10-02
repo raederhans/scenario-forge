@@ -28,7 +28,7 @@ import { separatesPoliticalBorders } from "./renderer/political_border_policy.js
 import { createPoliticalBorderRuntime } from "./renderer/political_border_runtime.js";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "./renderer/export_render_budget.js";
 import { createPhysicalIntensityInteractionOwner } from "./renderer/physical_intensity_interaction_owner.js";
-import { createPhysicalIntensityCompositor } from "./renderer/physical_intensity_compositor.js";
+import { createPhysicalIntensityCompositor, getEqualEarthIntensityRowBounds } from "./renderer/physical_intensity_compositor.js";
 import { createOperationGraphicsEditorRenderOwner } from "./renderer/operation_graphics_editor_render_owner.js";
 import { createStaticBorderMeshLifecycle, getSourceCountriesSignature, getCoastlineDecisionSignature } from "./renderer/static_border_mesh_lifecycle.js";
 import { createPoliticalPathCacheOwner } from "./renderer/political_path_cache_owner.js";
@@ -1997,6 +1997,7 @@ function getPhysicalLayerRenderOwner() {
     getContext: () => rendererSurfaceHost.getContext(),
     getProjection: () => rendererSurfaceHost.getProjection(),
     getProjectionKey: getProjectionRenderSignature,
+    getRowBounds: getEqualEarthIntensityRowBounds,
     withRenderTarget,
   });
   physicalLayerRenderOwner = createPhysicalLayerRenderOwner({

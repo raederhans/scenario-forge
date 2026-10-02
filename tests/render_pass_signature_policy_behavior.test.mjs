@@ -59,6 +59,46 @@ test("country label visibility invalidates labels without invalidating political
   assert.equal(policy.getRenderPassSignature("political"), political);
 });
 
+test("physical region name opacity invalidates labels only while names are enabled", () => {
+  const { state, policy } = createHarness();
+  state.showPhysical = true;
+  state.styleConfig.physical = { showRegionLabels: true, mode: "atlas_and_contours", opacity: 1 };
+  const labels = policy.getRenderPassSignature("labels");
+  state.styleConfig.physical.opacity = 0.5;
+  assert.notEqual(policy.getRenderPassSignature("labels"), labels);
+
+  state.styleConfig.physical.showRegionLabels = false;
+  const namesHidden = policy.getRenderPassSignature("labels");
+  state.styleConfig.physical.opacity = 0.25;
+  assert.equal(policy.getRenderPassSignature("labels"), namesHidden);
+});
+
+test("physical base tracks the selected atlas identity rather than unrelated context publications", () => {
+  const { state, policy } = createHarness();
+  state.showPhysical = true;
+  state.zoomTransform = { x: 0, y: 0, k: 1 };
+  state.physicalSemanticsData = { features: [{}] };
+  state.contextLayerExternalDataByName = {};
+  const signature = (k = 1) => policy.getRenderPassSignature("physicalBase", { x: 0, y: 0, k });
+  const overview = signature();
+  state.contextLayerRevision = Number(state.contextLayerRevision || 0) + 1;
+  state.contextLayerExternalDataByName.physical_region_labels = { features: [{}] };
+  assert.equal(signature(), overview);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [{}] };
+  assert.equal(signature(), overview, "dormant detail must not redraw the overview");
+  state.physicalSemanticsData = { features: [{}] };
+  assert.notEqual(signature(), overview, "same-size replacement must update the atlas");
+
+  const detail = signature(4);
+  state.contextLayerRevision++;
+  assert.equal(signature(4), detail);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [{}] };
+  assert.notEqual(signature(4), detail, "export/view transform selects the active detail identity");
+  const replacement = signature(4);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [] };
+  assert.notEqual(signature(4), replacement, "empty detail falls back to the current overview");
+});
+
 test('a political border source publication invalidates only the border signature', () => {
   let revision=0;
   const {policy}=createHarness({getPoliticalBorderRevision:()=>revision});
