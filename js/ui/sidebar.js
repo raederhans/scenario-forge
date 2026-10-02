@@ -615,6 +615,9 @@ function getOwnedVisibleFeatureIds(ownerCode) {
 }
 
 function initSidebar({ render } = {}) {
+  // Legacy sidebar restoration updates the URL before controls move into the
+  // workspace. Keep the requested section so its new property host can reopen.
+  const initialWorkspaceSearch = globalThis.location?.search || "";
   const list = document.getElementById("countryList");
   if (!list) return;
   // sidebar.js 仍然是右侧工作区的总装壳层：
@@ -1897,6 +1900,8 @@ function initSidebar({ render } = {}) {
     mutator?.(params);
     const nextQuery = params.toString();
     const nextUrl = `${globalThis.location.pathname}${nextQuery ? `?${nextQuery}` : ""}${globalThis.location.hash || ""}`;
+    const currentUrl = `${globalThis.location.pathname}${globalThis.location.search || ""}${globalThis.location.hash || ""}`;
+    if (nextUrl === currentUrl) return;
     globalThis.history.replaceState(globalThis.history.state, "", nextUrl);
   };
   const getScopeParamForTab = (tabId) => (String(tabId || "").trim().toLowerCase() === "project" ? "current-project" : "current-object");
@@ -3523,7 +3528,11 @@ function initSidebar({ render } = {}) {
       const id = String(button.dataset.inspectorTab || "").trim().toLowerCase();
       const isActive = id === activeId;
       button.classList.toggle("is-active", isActive);
-      button.setAttribute("aria-selected", isActive ? "true" : "false");
+      const stateAttribute = button.getAttribute("role") === "tab" ? "aria-selected" : "aria-pressed";
+      const obsoleteAttribute = stateAttribute === "aria-selected" ? "aria-pressed" : "aria-selected";
+      if (button.hasAttribute(obsoleteAttribute)) button.removeAttribute(obsoleteAttribute);
+      const stateValue = isActive ? "true" : "false";
+      if (button.getAttribute(stateAttribute) !== stateValue) button.setAttribute(stateAttribute, stateValue);
     });
     inspectorSidebarTabPanels.forEach((panel) => {
       const id = String(panel.dataset.inspectorPanel || "").trim().toLowerCase();
@@ -3957,8 +3966,12 @@ function initSidebar({ render } = {}) {
   refreshLegendEditor();
   renderScenarioAuditPanel();
   editorWorkspace = initEditorWorkspace({
+    initialSearch: initialWorkspaceSearch,
     revealProperties: () => {
       if (document.body.classList.contains("right-sidebar-collapsed")) setRightSidebarCollapsed(false);
+      if (globalThis.matchMedia("(max-width: 1023px)").matches) {
+        callRuntimeHook(state, "toggleRightPanelFn", true);
+      }
     },
     t,
     onNavigate: () => {

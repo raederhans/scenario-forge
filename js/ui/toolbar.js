@@ -45,6 +45,7 @@ import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { showAppDialog } from "./app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
 import { loadPublicSampleProjectIntoRuntime } from "../core/sample_project_import_workflow.js";
@@ -1687,6 +1688,7 @@ function initToolbar({ render } = {}) {
   }
   registerRuntimeHook(state, "updateSwatchUIFn", updateSwatchUI);
 
+  const toolGuidance = createToolGuidance({ state: runtimeState, t });
   function updateToolUI() {
     toolButtons.forEach((button) => {
       const isActive = button.dataset.tool === runtimeState.currentTool;
@@ -1706,6 +1708,7 @@ function initToolbar({ render } = {}) {
       brushModeBtn.setAttribute("aria-pressed", String(!!runtimeState.brushModeEnabled && !disableBrush));
     }
     setToolCursorClass();
+    toolGuidance.sync();
     updateDirtyIndicator();
   }
   registerRuntimeHook(state, "updateToolUIFn", updateToolUI);
@@ -2253,6 +2256,18 @@ function initToolbar({ render } = {}) {
     onClose: () => {
       closeScenarioGuidePopover({ restoreFocus: true });
     },
+  });
+
+  document.getElementById("scenarioGuideSelectCountryBtn")?.addEventListener("click", () => {
+    closeScenarioGuidePopover({ restoreFocus: false });
+    document.getElementById("editorObjects-countries")?.click();
+    if (globalThis.matchMedia("(max-width: 1023px)").matches) {
+      toggleLeftPanel(true);
+    } else if (document.body.classList.contains("left-sidebar-collapsed")) {
+      document.getElementById("leftSidebarCollapseBtn")?.click();
+    }
+    document.getElementById("countrySearch")?.focus({ preventScroll: true });
+    document.getElementById("countrySearch")?.scrollIntoView({ block: "nearest" });
   });
 
   bindDockPopoverDismiss();

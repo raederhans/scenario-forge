@@ -11,7 +11,7 @@ const ENHANCED_SELECT_SELECTOR = [
   ".special-zone-workbench-card select",
 ].join(",");
 
-const MIRRORED_LAYOUT_CLASSES = ["hidden", "mt-2"];
+const MIRRORED_LAYOUT_CLASSES = ["mt-2"];
 const surfaces = new WeakMap();
 let observer = null;
 let activeSurface = null;
@@ -38,6 +38,28 @@ function shouldEnhanceSelect(select) {
   return true;
 }
 
+function setPropertyIfChanged(node, name, value) {
+  if (node[name] !== value) node[name] = value;
+}
+
+function setAttributeIfChanged(node, name, value) {
+  if (node.getAttribute(name) === value) return;
+  if (value === null) node.removeAttribute(name);
+  else node.setAttribute(name, value);
+}
+
+function toggleClassIfChanged(node, name, enabled) {
+  if (node.classList.contains(name) !== enabled) node.classList.toggle(name, enabled);
+}
+
+function getLabelText(label) {
+  // 包裹 select 的 label 也包含增强外壳；菜单、选项和空结果提示不属于字段名称。
+  if (label.nodeType === 1 && (String(label.tagName).toLowerCase() === "select"
+    || label.classList.contains("app-select-shell"))) return "";
+  if (label.childNodes?.length) return Array.from(label.childNodes).map(getLabelText).join("");
+  return label.textContent || "";
+}
+
 function getSelectLabel(select) {
   const ariaLabel = String(select.getAttribute("aria-label") || "").trim();
   if (ariaLabel) return ariaLabel;
@@ -45,14 +67,17 @@ function getSelectLabel(select) {
   if (labelledBy) {
     const text = labelledBy
       .split(/\s+/)
-      .map((id) => document.getElementById(id)?.textContent || "")
+      .map((id) => {
+        const label = select.ownerDocument.getElementById(id);
+        return label ? getLabelText(label) : "";
+      })
       .join(" ")
       .trim();
     if (text) return text;
   }
   if (select.labels?.length) {
     const text = Array.from(select.labels)
-      .map((label) => label.textContent || "")
+      .map(getLabelText)
       .join(" ")
       .trim();
     if (text) return text;
@@ -72,7 +97,8 @@ function getSelectLabelTranslationKey(select) {
   if (labels.length !== 1) return "";
   const label = labels[0];
   return label.getAttribute("data-i18n")
-    || label.querySelector("[data-i18n]")?.getAttribute("data-i18n") || "";
+    || Array.from(label.querySelectorAll("[data-i18n]"))
+      .find((element) => !element.closest("select, .app-select-shell"))?.getAttribute("data-i18n") || "";
 }
 
 function closeSurface(surface, { restoreFocus = false } = {}) {
@@ -144,18 +170,18 @@ function filterSurfaceOptions(surface) {
       const groupMatches = child.dataset.searchLabel?.includes(query);
       let groupVisible = 0;
       child.querySelectorAll(".app-select-option").forEach((option) => {
-        option.hidden = !!query && !groupMatches && !option.dataset.searchLabel.includes(query);
+        setPropertyIfChanged(option, "hidden", !!query && !groupMatches && !option.dataset.searchLabel.includes(query));
         if (!option.hidden) groupVisible++;
       });
-      child.hidden = groupVisible === 0;
+      setPropertyIfChanged(child, "hidden", groupVisible === 0);
       visibleCount += groupVisible;
     } else if (child.classList.contains("app-select-option")) {
-      child.hidden = !!query && !child.dataset.searchLabel.includes(query);
+      setPropertyIfChanged(child, "hidden", !!query && !child.dataset.searchLabel.includes(query));
       if (!child.hidden) visibleCount++;
     }
   });
-  surface.noMatches.hidden = visibleCount > 0;
-  surface.noMatches.textContent = t("No matching options", "ui");
+  setPropertyIfChanged(surface.noMatches, "hidden", visibleCount > 0);
+  setPropertyIfChanged(surface.noMatches, "textContent", t("No matching options", "ui"));
 }
 
 function openSurface(surface) {
@@ -201,9 +227,9 @@ function selectOption(surface, value) {
 
 function syncMirroredClasses(select, surface) {
   MIRRORED_LAYOUT_CLASSES.forEach((className) => {
-    surface.shell.classList.toggle(className, select.classList.contains(className));
+    toggleClassIfChanged(surface.shell, className, select.classList.contains(className));
   });
-  surface.shell.classList.toggle("hidden", select.hidden || select.classList.contains("hidden"));
+  toggleClassIfChanged(surface.shell, "hidden", !!select.hidden || select.classList.contains("hidden"));
 }
 
 export function syncStyledSelect(select) {
@@ -215,19 +241,43 @@ function syncSurface(select) {
   if (!surface) return;
   syncMirroredClasses(select, surface);
   const selectedOption = select.selectedOptions?.[0] || select.options?.[select.selectedIndex] || null;
-  surface.text.textContent = selectedOption?.textContent?.trim() || "";
-  surface.button.disabled = !!select.disabled;
-  surface.button.title = select.title || "";
+  setPropertyIfChanged(surface.text, "textContent", selectedOption?.textContent?.trim() || "");
+  setPropertyIfChanged(surface.button, "disabled", !!select.disabled);
+  setPropertyIfChanged(surface.button, "title", select.title || "");
   const labelKey = getSelectLabelTranslationKey(select);
-  if (labelKey) surface.button.setAttribute("data-i18n-aria-label", labelKey);
-  else surface.button.removeAttribute("data-i18n-aria-label");
-  surface.button.setAttribute("aria-label", labelKey ? t(labelKey, "ui") : getSelectLabel(select));
-  surface.search.hidden = Array.from(select.options || []).filter((option) => !option.disabled && !option.parentElement?.disabled).length < SEARCH_OPTION_THRESHOLD;
-  surface.search.placeholder = t("Search options", "ui");
-  surface.search.setAttribute("aria-label", t("Search options", "ui"));
-  if (surface.search.hidden) surface.search.value = "";
-  // option 节点数量和禁用态可能由面板重新渲染，整表重建比增量补丁更贴近原生 select 真相源。
+  setAttributeIfChanged(surface.button, "data-i18n-aria-label", labelKey || null);
+  setAttributeIfChanged(surface.button, "aria-label", labelKey ? t(labelKey, "ui") : getSelectLabel(select));
+  const options = Array.from(select.options || []);
+  setPropertyIfChanged(surface.search, "hidden", options.filter((option) => !option.disabled && !option.parentElement?.disabled).length < SEARCH_OPTION_THRESHOLD);
+  const searchLabel = t("Search options", "ui");
+  setPropertyIfChanged(surface.search, "placeholder", searchLabel);
+  setAttributeIfChanged(surface.search, "aria-label", searchLabel);
+  if (surface.search.hidden) setPropertyIfChanged(surface.search, "value", "");
+  // 每次读取原生选项，只有结构、文本、值或禁用态改变时才重建，避免刷新移走正在聚焦的选项。
+  const optionState = (option) => [option.value, option.textContent || option.label || option.value, !!option.disabled];
+  const signature = JSON.stringify(Array.from(select.children || []).map((child) => {
+    const tag = String(child.tagName || "").toLowerCase();
+    if (tag === "option") return [tag, ...optionState(child)];
+    if (tag === "optgroup") return [tag, child.label, !!child.disabled,
+      Array.from(child.children || []).filter((option) => String(option.tagName).toLowerCase() === "option").map(optionState)];
+    return [tag];
+  }));
+  if (signature !== surface.optionSignature) {
+    rebuildSurfaceOptions(surface);
+    surface.optionSignature = signature;
+  }
+  surface.optionButtons.forEach((button, index) => {
+    const selected = !!options[index]?.selected;
+    setAttributeIfChanged(button, "aria-selected", selected ? "true" : "false");
+    toggleClassIfChanged(button, "is-selected", selected);
+  });
+  filterSurfaceOptions(surface);
+}
+
+function rebuildSurfaceOptions(surface) {
+  const { select } = surface;
   surface.list.replaceChildren();
+  surface.optionButtons = [];
   let optionIndex = 0;
   const appendOption = (option, parent, groupDisabled = false) => {
     const index = optionIndex++;
@@ -245,6 +295,7 @@ function syncSurface(select) {
     optionButton.dataset.searchLabel = optionButton.textContent.toLocaleLowerCase();
     optionButton.addEventListener("click", () => selectOption(surface, value));
     parent.appendChild(optionButton);
+    surface.optionButtons.push(optionButton);
   };
   Array.from(select.children || []).forEach((child) => {
     const tag = String(child.tagName || "").toLowerCase();
@@ -269,7 +320,6 @@ function syncSurface(select) {
       surface.list.appendChild(group);
     }
   });
-  filterSurfaceOptions(surface);
 }
 
 function enhanceSelect(select) {
@@ -381,17 +431,10 @@ function enhanceAll(root = document) {
   });
 }
 
-function handleMutation(mutation) {
-  if (String(mutation.target?.tagName || "").toLowerCase() === "select") {
-    if (surfaces.has(mutation.target)) {
-      syncSurface(mutation.target);
-    }
-    return;
-  }
-  const parentSelect = mutation.target?.parentElement?.closest?.("select");
-  if (parentSelect && surfaces.has(parentSelect)) {
-    syncSurface(parentSelect);
-  }
+function getMutationSelect(mutation) {
+  const target = isElement(mutation.target) ? mutation.target : mutation.target?.parentElement;
+  const select = target?.closest?.("select");
+  return select && surfaces.has(select) ? select : null;
 }
 
 export function initStyledSelects(root = document) {
@@ -399,12 +442,17 @@ export function initStyledSelects(root = document) {
   if (observer || !document.body) return;
   observer = new MutationObserver((mutations) => {
     let shouldScan = false;
+    const changedSelects = new Set();
     mutations.forEach((mutation) => {
-      handleMutation(mutation);
-      if (mutation.type === "childList") {
+      const select = getMutationSelect(mutation);
+      if (select) changedSelects.add(select);
+      if (mutation.type === "childList" && !select
+        && Array.from(mutation.addedNodes || []).some((node) => isElement(node)
+          && !node.closest?.(".app-select-shell"))) {
         shouldScan = true;
       }
     });
+    changedSelects.forEach(syncSurface);
     if (shouldScan) {
       // 动态面板经常先插入容器再填 select，微任务扫描可以等同一批 DOM 写入结束后统一增强。
       queueMicrotask(() => enhanceAll(document));
@@ -415,7 +463,7 @@ export function initStyledSelects(root = document) {
     subtree: true,
     characterData: true,
     attributes: true,
-    attributeFilter: ["class", "disabled", "hidden", "title", "aria-label", "aria-labelledby"],
+    attributeFilter: ["class", "disabled", "hidden", "title", "aria-label", "aria-labelledby", "data-i18n-aria-label", "label", "value", "selected"],
   });
   document.addEventListener("click", (event) => {
     if (!activeSurface) return;

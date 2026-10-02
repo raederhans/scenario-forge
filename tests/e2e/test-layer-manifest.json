@@ -59,6 +59,27 @@
       "ownerHint": "dev-workspace"
     },
     {
+      "specPath": "tests/e2e/editor_detail_polish.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/editor_refresh_motion.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
+      "specPath": "tests/e2e/editor_task_context.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "ui-rework",
+      "ownerHint": "ui-shell"
+    },
+    {
       "specPath": "tests/e2e/editor_workspace_renewal.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",

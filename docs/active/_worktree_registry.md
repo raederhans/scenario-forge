@@ -646,3 +646,11 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Root owns integration, port 8009 browser checks, Pages builds `.runtime/pw5`, Git and publication. Three scoped Sol lanes supplied coverage review, held-seam diagnosis and lossless transport; children did not commit.
 - Final reviewed candidate: 376 parents / 1,164 cells, with all previous 302 parent records unchanged. Source admission and remaining exclusions: `river-wave5/integration.md`.
 - Primary WIP and older regional atlas worktrees remain preserved. Final merge/push receipt is the branch PR, not this registry entry.
+
+## UI interaction polish integration 2026-10-02
+
+- Branch: `codex/ui-detail-polish-20261002`; base: `origin/main@d418eefa`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/ui-detail-integration/mapcreator`. Root owns integration, local server and verification processes.
+- Scope: editor navigation, focus/scroll retention, refresh/motion, bilingual guidance and related regression routing. Primary checkout mixed WIP is preserved; unrelated data, palette and physical renderer changes are excluded.
+- Local validation: 32 behavior tests, 22 translation-audit tests, 9 routing tests and 15 focused browser cases passed. The heading-language case explicitly waits for lazy locale hydration before exercising the toggle. Test-list coverage and route schema checks passed.
+- Retain this worktree for delivery verification and ignored evidence under `.runtime/tmp/ui-delivery/` and `.runtime/tests/playwright/ui-delivery*`. The associated PR is authoritative for remote checks and merge status.

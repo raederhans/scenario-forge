@@ -291,6 +291,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["urban-layer-render", "renderer-runtime", "js/core/renderer/urban_layer_render_owner.js", "tests/urban_layer_render_owner_behavior.test.mjs"],
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
     ["marine-label", "renderer-runtime", "js/core/renderer/marine_label_owner.js", "tests/marine_label_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["ui-i18n-refresh", "main-shell", "js/ui/i18n.js", "tests/ui_i18n_refresh_behavior.test.mjs", ["js/core/i18n_catalog.js"]],
+    ["styled-selects", "main-shell", "js/ui/styled_selects.js", "tests/styled_selects_behavior.test.mjs"],
     ["water-inspector-navigation", "sidebar-shell", "js/ui/sidebar/water_special_region_controller.js", "tests/water_inspector_navigation_behavior.test.mjs", ["js/ui/sidebar.js"]],
   ];
 

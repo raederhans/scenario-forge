@@ -432,6 +432,18 @@ export function createAppearanceControlsController({
     });
   };
 
+  const getTabArrowDirection = (button, key) => {
+    const isVertical = button.closest?.('[role="tablist"]')?.getAttribute("aria-orientation") === "vertical";
+    if (isVertical) {
+      if (key === "ArrowDown") return 1;
+      if (key === "ArrowUp") return -1;
+      return null;
+    }
+    if (key === "ArrowRight") return 1;
+    if (key === "ArrowLeft") return -1;
+    return null;
+  };
+
   const setAppearanceTab = (tabId = "borders") => {
     const normalizedTabId = String(tabId || "borders").trim().toLowerCase();
     appearanceTabButtons.forEach((button) => {
@@ -462,8 +474,8 @@ export function createAppearanceControlsController({
         : (currentIndex + direction + buttons.length) % buttons.length;
     const nextButton = buttons[nextIndex];
     if (!nextButton) return;
-    setAppearanceTab(nextButton.dataset.appearanceTab || "borders");
     nextButton.focus?.();
+    nextButton.click?.();
   };
 
   const setMapContentTab = (tabId = "ocean") => {
@@ -495,8 +507,8 @@ export function createAppearanceControlsController({
         : (currentIndex + direction + buttons.length) % buttons.length;
     const nextButton = buttons[nextIndex];
     if (!nextButton) return;
-    setMapContentTab(nextButton.dataset.mapContentTab || "ocean");
     nextButton.focus?.();
+    nextButton.click?.();
   };
 
   const syncUrbanConfig = () => {
@@ -654,12 +666,10 @@ export function createAppearanceControlsController({
         setAppearanceTab(button.dataset.appearanceTab || "borders");
       });
       button.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowRight") {
+        const arrowDirection = getTabArrowDirection(button, event.key);
+        if (arrowDirection !== null) {
           event.preventDefault();
-          moveAppearanceTabFocus(button, 1);
-        } else if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          moveAppearanceTabFocus(button, -1);
+          moveAppearanceTabFocus(button, arrowDirection);
         } else if (event.key === "Home") {
           event.preventDefault();
           moveAppearanceTabFocus(button, "first");
@@ -677,12 +687,10 @@ export function createAppearanceControlsController({
         setMapContentTab(button.dataset.mapContentTab || "ocean");
       });
       button.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowRight") {
+        const arrowDirection = getTabArrowDirection(button, event.key);
+        if (arrowDirection !== null) {
           event.preventDefault();
-          moveMapContentTabFocus(button, 1);
-        } else if (event.key === "ArrowLeft") {
-          event.preventDefault();
-          moveMapContentTabFocus(button, -1);
+          moveMapContentTabFocus(button, arrowDirection);
         } else if (event.key === "Home") {
           event.preventDefault();
           moveMapContentTabFocus(button, "first");
