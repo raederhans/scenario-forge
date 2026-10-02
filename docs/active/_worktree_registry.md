@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-02 沿河外边界识别修复
+
+`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 在 `codex/river-contour-repair` 上基于 `433e5b33` 修复浮点共线边的分段识别，并接入 382 父 / 1,199 分区的 Wave6 候选。旧 376 父记录和所有历史包认证保留；七个内部接缝重叠父继续暂缓。范围、独立审查、全图和浏览器证据见 [修复记录](river-wave6/context.md)。主工作区及其他工作树保持原所有权；本工作树及旧区域工作树为保存忽略的图集与几何审计而保留。最终提交、PR 检查、合并和发布以 Git / GitHub 回执为准。
+
 ## 2026-10-01 第二批沿河地点准入
 
 `codex/river-wave2-admission` 接入 12 地、43 分区的新包，保留旧包认证及旧项目范围。新增奥波莱、弗罗茨瓦夫、泸州、宜昌、兰州、乌海；不改变原行政 ID。39 项专项测试、19 项数据目录检查、真实页面全部分区填色及 43 次撤销/重做、像素和项目导入导出验证通过。Pages 构建和新资产发布检查通过，产物保留在独立工作树 `.runtime/reports/generated/river-next/pages-wave2/`。最终提交、PR 检查及合并状态以 Git / GitHub 回执为准。主目录及其他工作树继续保持原所有权。
