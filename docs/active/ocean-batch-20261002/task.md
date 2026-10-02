@@ -30,6 +30,8 @@ Node新进程各三轮，真实完整启动消息pack+structuredClone transfer+u
 
 最终Pages产物位于`.runtime/pages-ocean-performance-final/dist`，855,286,735bytes（815.66MiB），低于现有1GiB硬上限；对应65项Pages测试全部通过，新增worker codec资源在可达图内。未改tracked dist；采用主线既有artifact构建发布路径。所有本地构建/测试/浏览器服务均已结束。本节为提交前冻结结果，远端提交、required checks与合并状态以本分支GitHub PR及`.runtime/reports/generated/ocean-performance/`中的交付回执为准；工作树及忽略的实验/验证输出保留供复核，主目录WIP未触碰。
 
+交付PR为[#202](https://github.com/raederhans/scenario-forge/pull/202)，优化提交`f8334221`已推送。首轮CI中六场景strict、smoke、Pages产物验证通过，child-safe执行前因wave6/wave7 probe JSON未匹配验证路由而停止；已将两份真实fixture及marine runtime套件接入既有water geometry重检查路线，保持原执行所有权和资源锁。对整个PR文件清单重新选择后unmatched=0，两项路由行为检查通过；既有17项水域检查已证明该组合行为。最终合并和门禁状态以PR实时记录为准。
+
 ## 第七批：新增海域与可见对话协作（本地完成）
 
 用户继续授权新增，并要求可分派对话共同推进。沿用独立工作树，基线base246/TNO239、supplement98/shared207，累计73新区域全部保留。
