@@ -1,0 +1,779 @@
+[
+  {
+    "slug": "kilbrannan_sound",
+    "name": "Kilbrannan Sound",
+    "nameZh": "基尔布兰南海峡",
+    "recordId": "24238",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24238'",
+    "sourceRecordId": "mrgid_sr:24238",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.415143556567382,
+      55.56022240598146
+    ],
+    "land": [
+      -5.4670820127144415,
+      55.59574992816848
+    ]
+  },
+  {
+    "slug": "firth_of_clyde",
+    "name": "Firth of Clyde",
+    "nameZh": "克莱德湾",
+    "recordId": "24239",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24239'",
+    "sourceRecordId": "mrgid_sr:24239",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.290101077661149,
+      55.276718665904326
+    ],
+    "land": [
+      -5.272168766660829,
+      55.46265330166411
+    ]
+  },
+  {
+    "slug": "inner_seas_off_west_coast_scotland",
+    "name": "Inner Seas off the West Coast of Scotland",
+    "nameZh": "苏格兰西岸内海",
+    "recordId": "24234",
+    "waterType": "sea",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24234'",
+    "sourceRecordId": "mrgid_sr:24234",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -7.337344770459749,
+      55.99961461210584
+    ],
+    "land": [
+      -6.967572175698803,
+      56.49217035985685
+    ]
+  },
+  {
+    "slug": "little_minch",
+    "name": "Little Minch",
+    "nameZh": "小明奇海峡",
+    "recordId": "24242",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24242'",
+    "sourceRecordId": "mrgid_sr:24242",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -6.847074412001317,
+      57.528626873671286
+    ],
+    "land": [
+      -6.758273337552635,
+      57.44290063006298
+    ]
+  },
+  {
+    "slug": "firth_of_lorn",
+    "name": "Firth of Lorn",
+    "nameZh": "洛恩湾",
+    "recordId": "24240",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24240'",
+    "sourceRecordId": "mrgid_sr:24240",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.876056548926669,
+      56.249355508407916
+    ],
+    "land": [
+      -5.876056548926669,
+      56.33439102910288
+    ]
+  },
+  {
+    "slug": "sea_of_hebrides",
+    "name": "Sea of the Hebrides",
+    "nameZh": "赫布里底海",
+    "recordId": "24241",
+    "waterType": "sea",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24241'",
+    "sourceRecordId": "mrgid_sr:24241",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -6.921991157984493,
+      57.14421773512712
+    ],
+    "land": [
+      -7.221991157984493,
+      57.28421773512712
+    ]
+  },
+  {
+    "slug": "lough_foyle",
+    "name": "Lough Foyle",
+    "nameZh": "福伊尔湾",
+    "recordId": "24235",
+    "waterType": "estuary",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24235'",
+    "sourceRecordId": "mrgid_sr:24235",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -7.0752157417897115,
+      55.1134930862792
+    ],
+    "land": [
+      -7.0752157417897115,
+      55.04698793879384
+    ]
+  },
+  {
+    "slug": "sound_of_jura",
+    "name": "Sound of Jura",
+    "nameZh": "朱拉海峡",
+    "recordId": "24237",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24237'",
+    "sourceRecordId": "mrgid_sr:24237",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.885337752151483,
+      55.7107720198696
+    ],
+    "land": [
+      -5.963377984973021,
+      55.813540444044385
+    ]
+  },
+  {
+    "slug": "northern_minch",
+    "name": "Northern Minch",
+    "nameZh": "北明奇海峡",
+    "recordId": "24243",
+    "waterType": "channel",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24243'",
+    "sourceRecordId": "mrgid_sr:24243",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.797627521995664,
+      58.21506737574991
+    ],
+    "land": [
+      -5.64093577511867,
+      57.890129637589865
+    ]
+  },
+  {
+    "slug": "st_magnus_bay",
+    "name": "St. Magnus Bay",
+    "nameZh": "圣马格努斯湾",
+    "recordId": "24183",
+    "waterType": "bay",
+    "sourceLayer": "seavox_v19",
+    "sourceStandard": "marine_regions_seavox_v19",
+    "sourceQuery": "mrgid_sr='24183'",
+    "sourceRecordId": "mrgid_sr:24183",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -1.5717671269333422,
+      60.393828567362654
+    ],
+    "land": [
+      -1.5431838319448699,
+      60.482739994491034
+    ]
+  },
+  {
+    "slug": "gulf_of_kutch",
+    "name": "Gulf of Kutch",
+    "nameZh": "卡奇湾",
+    "recordId": "17457",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=17457",
+    "sourceRecordId": "mrgid:17457",
+    "regionGroup": "marine_detail",
+    "parentSlug": "arabian_sea",
+    "point": [
+      69.0185564722921,
+      22.694255271745334
+    ],
+    "land": [
+      69.06290729072909,
+      22.46292729413652
+    ]
+  },
+  {
+    "slug": "gulf_of_martaban",
+    "name": "Gulf of Martaban",
+    "nameZh": "莫塔马湾",
+    "recordId": "22290",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=22290",
+    "sourceRecordId": "mrgid:22290",
+    "regionGroup": "marine_detail",
+    "parentSlug": "andaman_sea",
+    "point": [
+      96.87578882451916,
+      15.888175814681853
+    ],
+    "land": [
+      97.56362080042524,
+      16.063801289314412
+    ]
+  },
+  {
+    "slug": "phang_nga_bay",
+    "name": "Phang Nga Bay",
+    "nameZh": "攀牙湾",
+    "recordId": "22447",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=22447",
+    "sourceRecordId": "mrgid:22447",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      98.69688084533814,
+      7.967473623636318
+    ],
+    "land": [
+      98.58585958595857,
+      7.967473623636318
+    ]
+  },
+  {
+    "slug": "tambalagam_bay",
+    "name": "Tambalagam Bay",
+    "nameZh": "坦巴拉加姆湾",
+    "recordId": "32543",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32543",
+    "sourceRecordId": "mrgid:32543",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      81.17899704182656,
+      8.516221860338366
+    ],
+    "land": [
+      81.18614386040676,
+      8.531042494550302
+    ]
+  },
+  {
+    "slug": "king_sound",
+    "name": "King Sound",
+    "nameZh": "金湾",
+    "recordId": "33014",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33014",
+    "sourceRecordId": "mrgid:33014",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      123.41118598880105,
+      -16.85526971962833
+    ],
+    "land": [
+      123.25029061075134,
+      -17.017514820064555
+    ]
+  },
+  {
+    "slug": "cockburn_sound",
+    "name": "Cockburn Sound",
+    "nameZh": "科伯恩湾",
+    "recordId": "32380",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32380",
+    "sourceRecordId": "mrgid:32380",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      115.72278498558725,
+      -32.18544874628501
+    ],
+    "land": [
+      115.77195924197054,
+      -32.20584365790398
+    ]
+  },
+  {
+    "slug": "spencer_gulf",
+    "name": "Spencer Gulf",
+    "nameZh": "斯宾塞湾",
+    "recordId": "17864",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=17864",
+    "sourceRecordId": "mrgid:17864",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      136.8279057065232,
+      -34.39718490128016
+    ],
+    "land": [
+      136.52365572994842,
+      -33.95553043743175
+    ]
+  },
+  {
+    "slug": "van_diemen_gulf",
+    "name": "Van Diemen Gulf",
+    "nameZh": "范迪门湾",
+    "recordId": "14930",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=14930",
+    "sourceRecordId": "mrgid:14930",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      131.78729593743088,
+      -11.838471201912176
+    ],
+    "land": [
+      131.8986606615384,
+      -12.230903151554921
+    ]
+  },
+  {
+    "slug": "melville_bay",
+    "name": "Melville Bay",
+    "nameZh": "梅尔维尔湾",
+    "recordId": "32384",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32384",
+    "sourceRecordId": "mrgid:32384",
+    "regionGroup": "marine_detail",
+    "parentSlug": "arafura_sea",
+    "point": [
+      136.6530339039678,
+      -12.134226238341551
+    ],
+    "land": [
+      136.59611465527541,
+      -12.156357922400177
+    ]
+  },
+  {
+    "slug": "port_darwin",
+    "name": "Port Darwin",
+    "nameZh": "达尔文港湾",
+    "recordId": "32868",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32868",
+    "sourceRecordId": "mrgid:32868",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      130.77919666243713,
+      -12.38856752093866
+    ],
+    "land": [
+      130.77154648409817,
+      -12.436160933397113
+    ]
+  },
+  {
+    "slug": "champion_bay",
+    "name": "Champion Bay",
+    "nameZh": "钱皮恩湾",
+    "recordId": "32439",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32439",
+    "sourceRecordId": "mrgid:32439",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      114.59114777199221,
+      -28.7661746547309
+    ],
+    "land": [
+      114.61089097652865,
+      -28.761625516159317
+    ]
+  },
+  {
+    "slug": "two_peoples_bay",
+    "name": "Two people's Bay",
+    "nameZh": "双人湾",
+    "recordId": "21543",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=21543",
+    "sourceRecordId": "mrgid:21543",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      118.19901417123046,
+      -34.95556836558699
+    ],
+    "land": [
+      118.19291333860942,
+      -34.926048122719465
+    ]
+  },
+  {
+    "slug": "ambaro_bay",
+    "name": "Ambaro Bay",
+    "nameZh": "安巴鲁湾",
+    "recordId": "32959",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32959",
+    "sourceRecordId": "mrgid:32959",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      48.67476287699586,
+      -13.31245836634835
+    ],
+    "land": [
+      48.72399751347898,
+      -13.414558136992408
+    ]
+  },
+  {
+    "slug": "khalij_tarut",
+    "name": "Tarut Bay",
+    "nameZh": "塔鲁特湾",
+    "recordId": "32980",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32980",
+    "sourceRecordId": "mrgid:32980",
+    "regionGroup": "marine_detail",
+    "parentSlug": "persian_gulf",
+    "point": [
+      50.13839835404442,
+      26.551072570209037
+    ],
+    "land": [
+      50.091888364113366,
+      26.45462300454105
+    ]
+  },
+  {
+    "slug": "adventure_bay",
+    "name": "Adventure Bay",
+    "nameZh": "探险湾",
+    "recordId": "32462",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32462",
+    "sourceRecordId": "mrgid:32462",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      147.36685167772993,
+      -43.299789526707336
+    ],
+    "land": [
+      147.32750800460877,
+      -43.32018665101302
+    ]
+  },
+  {
+    "slug": "balayan_bay",
+    "name": "Balayan Bay",
+    "nameZh": "巴拉延湾",
+    "recordId": "32947",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32947",
+    "sourceRecordId": "mrgid:32947",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      120.81516789084947,
+      13.818504121097122
+    ],
+    "land": [
+      120.91113888778871,
+      13.846935373901184
+    ]
+  },
+  {
+    "slug": "cleveland_bay",
+    "name": "Cleveland Bay",
+    "nameZh": "克利夫兰湾",
+    "recordId": "31575",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=31575",
+    "sourceRecordId": "mrgid:31575",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      146.9253132886788,
+      -19.217238945231724
+    ],
+    "land": [
+      146.9608734540389,
+      -19.290981436020235
+    ]
+  },
+  {
+    "slug": "corner_inlet",
+    "name": "Corner Inlet",
+    "nameZh": "科纳湾",
+    "recordId": "32722",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32722",
+    "sourceRecordId": "mrgid:32722",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      146.3439922532395,
+      -38.78130304313296
+    ],
+    "land": [
+      146.38777787717336,
+      -38.72076974814
+    ]
+  },
+  {
+    "slug": "disaster_bay",
+    "name": "Disaster Bay",
+    "nameZh": "迪萨斯特湾",
+    "recordId": "32379",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32379",
+    "sourceRecordId": "mrgid:32379",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      149.9820002570262,
+      -37.29923018189154
+    ],
+    "land": [
+      149.97780528635582,
+      -37.27313236292324
+    ]
+  },
+  {
+    "slug": "enshu_nada",
+    "name": "Enshu-nada",
+    "nameZh": "远州滩",
+    "recordId": "32816",
+    "waterType": "sea",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32816",
+    "sourceRecordId": "mrgid:32816",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      137.55697488889192,
+      34.480867159365296
+    ],
+    "land": [
+      137.5844059718241,
+      34.67996430247091
+    ]
+  },
+  {
+    "slug": "fife_bay",
+    "name": "Fife Bay",
+    "nameZh": "法伊夫湾",
+    "recordId": "33823",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33823",
+    "sourceRecordId": "mrgid:33823",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      150.0035583891635,
+      -10.60736920946004
+    ],
+    "land": [
+      150.01900090009002,
+      -10.599450116222757
+    ]
+  },
+  {
+    "slug": "halifax_bay",
+    "name": "Halifax Bay",
+    "nameZh": "哈利法克斯湾",
+    "recordId": "32377",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32377",
+    "sourceRecordId": "mrgid:32377",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      146.51174177900793,
+      -18.957509391289676
+    ],
+    "land": [
+      146.42910662768662,
+      -19.050980506154104
+    ]
+  },
+  {
+    "slug": "kerema_bay",
+    "name": "Kerema Bay",
+    "nameZh": "凯雷马湾",
+    "recordId": "33873",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33873",
+    "sourceRecordId": "mrgid:33873",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      145.7485134231542,
+      -7.961970513418825
+    ],
+    "land": [
+      145.73631072048005,
+      -7.945100368966798
+    ]
+  },
+  {
+    "slug": "manila_bay",
+    "name": "Manila Bay",
+    "nameZh": "马尼拉湾",
+    "recordId": "31579",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=31579",
+    "sourceRecordId": "mrgid:31579",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      120.76521379339827,
+      14.592664375848404
+    ],
+    "land": [
+      120.89499778164097,
+      14.727233414835768
+    ]
+  },
+  {
+    "slug": "nha_trang_bay",
+    "name": "Bay of Nha Trang",
+    "nameZh": "芽庄湾",
+    "recordId": "8902",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=8902",
+    "sourceRecordId": "mrgid:8902",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      109.21674321674051,
+      12.246377364603193
+    ],
+    "land": [
+      109.19246621129443,
+      12.233791323225493
+    ]
+  },
+  {
+    "slug": "sagami_bay",
+    "name": "Sagami Bay",
+    "nameZh": "相模湾",
+    "recordId": "26748",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=26748",
+    "sourceRecordId": "mrgid:26748",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      139.3164613942785,
+      35.133101422085
+    ],
+    "land": [
+      139.3015976500103,
+      35.287219030043104
+    ]
+  },
+  {
+    "slug": "tosa_bay",
+    "name": "Tosa Bay",
+    "nameZh": "土佐湾",
+    "recordId": "15313",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=15313",
+    "sourceRecordId": "mrgid:15313",
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      133.712777845954,
+      33.33857708242688
+    ],
+    "land": [
+      133.6404752712736,
+      33.518501058371136
+    ]
+  }
+]

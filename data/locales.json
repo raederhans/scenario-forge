@@ -294839,6 +294839,482 @@
     "Strait of Hormuz": {
       "en": "Strait of Hormuz",
       "zh": "霍尔木兹海峡"
+    },
+    "Bay of Fundy": {
+      "en": "Bay of Fundy",
+      "zh": "芬迪湾"
+    },
+    "Bismarck Sea": {
+      "en": "Bismarck Sea",
+      "zh": "俾斯麦海"
+    },
+    "Coastal Waters of Southeast Alaska and British Columbia": {
+      "en": "Coastal Waters of Southeast Alaska and British Columbia",
+      "zh": "阿拉斯加东南部与不列颠哥伦比亚沿岸水域"
+    },
+    "Davis Strait": {
+      "en": "Davis Strait",
+      "zh": "戴维斯海峡"
+    },
+    "Gulf of California": {
+      "en": "Gulf of California",
+      "zh": "加利福尼亚湾"
+    },
+    "Gulf of Maine": {
+      "en": "Gulf of Maine",
+      "zh": "缅因湾"
+    },
+    "Gulf of Panama": {
+      "en": "Gulf of Panama",
+      "zh": "巴拿马湾"
+    },
+    "Rio de la Plata": {
+      "en": "Rio de la Plata",
+      "zh": "拉普拉塔河口"
+    },
+    "Solomon Sea": {
+      "en": "Solomon Sea",
+      "zh": "所罗门海"
+    },
+    "Riiser-Larsen Sea": {
+      "en": "Riiser-Larsen Sea",
+      "zh": "里瑟-拉森海"
+    },
+    "Cooperation Sea": {
+      "en": "Cooperation Sea",
+      "zh": "合作海"
+    },
+    "Davis Sea": {
+      "en": "Davis Sea",
+      "zh": "戴维斯海"
+    },
+    "Lazarev Sea": {
+      "en": "Lazarev Sea",
+      "zh": "拉扎列夫海"
+    },
+    "Cosmonauts Sea": {
+      "en": "Cosmonauts Sea",
+      "zh": "宇航员海"
+    },
+    "Bellingshausen Sea": {
+      "en": "Bellingshausen Sea",
+      "zh": "别林斯高晋海"
+    },
+    "Amundsen Sea": {
+      "en": "Amundsen Sea",
+      "zh": "阿蒙森海"
+    },
+    "Mawson Sea": {
+      "en": "Mawson Sea",
+      "zh": "莫森海"
+    },
+    "Dumont d'Urville Sea": {
+      "en": "Dumont d'Urville Sea",
+      "zh": "迪维尔海"
+    },
+    "Somov Sea": {
+      "en": "Somov Sea",
+      "zh": "索莫夫海"
+    },
+    "White Sea": {
+      "en": "White Sea",
+      "zh": "白海"
+    },
+    "Iceland Sea": {
+      "en": "Iceland Sea",
+      "zh": "冰岛海"
+    },
+    "Lincoln Sea": {
+      "en": "Lincoln Sea",
+      "zh": "林肯海"
+    },
+    "Gulf of Mannar": {
+      "en": "Gulf of Mannar",
+      "zh": "马纳尔湾"
+    },
+    "Palk Strait and Palk Bay": {
+      "en": "Palk Strait and Palk Bay",
+      "zh": "保克海峡与保克湾"
+    },
+    "Lakshadweep Sea": {
+      "en": "Lakshadweep Sea",
+      "zh": "拉卡迪乌海"
+    },
+    "Bransfield Strait": {
+      "en": "Bransfield Strait",
+      "zh": "布兰斯菲尔德海峡"
+    },
+    "Drake Passage": {
+      "en": "Drake Passage",
+      "zh": "德雷克海峡"
+    },
+    "Tryoshnikova Gulf": {
+      "en": "Tryoshnikova Gulf",
+      "zh": "特里奥什尼科夫湾"
+    },
+    "Dornoch Firth": {
+      "en": "Dornoch Firth",
+      "zh": "多诺赫湾"
+    },
+    "Firth of Tay": {
+      "en": "Firth of Tay",
+      "zh": "泰湾"
+    },
+    "Tees Bay": {
+      "en": "Tees Bay",
+      "zh": "蒂斯湾"
+    },
+    "Bridlington Bay": {
+      "en": "Bridlington Bay",
+      "zh": "布里德灵顿湾"
+    },
+    "Westray Firth": {
+      "en": "Westray Firth",
+      "zh": "韦斯特雷海峡"
+    },
+    "Stronsay Firth": {
+      "en": "Stronsay Firth",
+      "zh": "斯特朗赛海峡"
+    },
+    "Scapa Flow": {
+      "en": "Scapa Flow",
+      "zh": "斯卡帕湾"
+    },
+    "Yell Sound": {
+      "en": "Yell Sound",
+      "zh": "耶尔海峡"
+    },
+    "Kilbrannan Sound": {
+      "en": "Kilbrannan Sound",
+      "zh": "基尔布兰南海峡"
+    },
+    "Firth of Clyde": {
+      "en": "Firth of Clyde",
+      "zh": "克莱德湾"
+    },
+    "Inner Seas off the West Coast of Scotland": {
+      "en": "Inner Seas off the West Coast of Scotland",
+      "zh": "苏格兰西岸内海"
+    },
+    "Little Minch": {
+      "en": "Little Minch",
+      "zh": "小明奇海峡"
+    },
+    "Firth of Lorn": {
+      "en": "Firth of Lorn",
+      "zh": "洛恩湾"
+    },
+    "Sea of the Hebrides": {
+      "en": "Sea of the Hebrides",
+      "zh": "赫布里底海"
+    },
+    "Lough Foyle": {
+      "en": "Lough Foyle",
+      "zh": "福伊尔湾"
+    },
+    "Sound of Jura": {
+      "en": "Sound of Jura",
+      "zh": "朱拉海峡"
+    },
+    "Northern Minch": {
+      "en": "Northern Minch",
+      "zh": "北明奇海峡"
+    },
+    "St. Magnus Bay": {
+      "en": "St. Magnus Bay",
+      "zh": "圣马格努斯湾"
+    },
+    "Gulf of Kutch": {
+      "en": "Gulf of Kutch",
+      "zh": "卡奇湾"
+    },
+    "Gulf of Martaban": {
+      "en": "Gulf of Martaban",
+      "zh": "莫塔马湾"
+    },
+    "Phang Nga Bay": {
+      "en": "Phang Nga Bay",
+      "zh": "攀牙湾"
+    },
+    "Tambalagam Bay": {
+      "en": "Tambalagam Bay",
+      "zh": "坦巴拉加姆湾"
+    },
+    "King Sound": {
+      "en": "King Sound",
+      "zh": "金湾"
+    },
+    "Cockburn Sound": {
+      "en": "Cockburn Sound",
+      "zh": "科伯恩湾"
+    },
+    "Spencer Gulf": {
+      "en": "Spencer Gulf",
+      "zh": "斯宾塞湾"
+    },
+    "Van Diemen Gulf": {
+      "en": "Van Diemen Gulf",
+      "zh": "范迪门湾"
+    },
+    "Melville Bay": {
+      "en": "Melville Bay",
+      "zh": "梅尔维尔湾"
+    },
+    "Port Darwin": {
+      "en": "Port Darwin",
+      "zh": "达尔文港湾"
+    },
+    "Champion Bay": {
+      "en": "Champion Bay",
+      "zh": "钱皮恩湾"
+    },
+    "Two people's Bay": {
+      "en": "Two people's Bay",
+      "zh": "双人湾"
+    },
+    "Ambaro Bay": {
+      "en": "Ambaro Bay",
+      "zh": "安巴鲁湾"
+    },
+    "Tarut Bay": {
+      "en": "Tarut Bay",
+      "zh": "塔鲁特湾"
+    },
+    "Adventure Bay": {
+      "en": "Adventure Bay",
+      "zh": "探险湾"
+    },
+    "Balayan Bay": {
+      "en": "Balayan Bay",
+      "zh": "巴拉延湾"
+    },
+    "Cleveland Bay": {
+      "en": "Cleveland Bay",
+      "zh": "克利夫兰湾"
+    },
+    "Corner Inlet": {
+      "en": "Corner Inlet",
+      "zh": "科纳湾"
+    },
+    "Disaster Bay": {
+      "en": "Disaster Bay",
+      "zh": "迪萨斯特湾"
+    },
+    "Enshu-nada": {
+      "en": "Enshu-nada",
+      "zh": "远州滩"
+    },
+    "Fife Bay": {
+      "en": "Fife Bay",
+      "zh": "法伊夫湾"
+    },
+    "Halifax Bay": {
+      "en": "Halifax Bay",
+      "zh": "哈利法克斯湾"
+    },
+    "Kerema Bay": {
+      "en": "Kerema Bay",
+      "zh": "凯雷马湾"
+    },
+    "Manila Bay": {
+      "en": "Manila Bay",
+      "zh": "马尼拉湾"
+    },
+    "Bay of Nha Trang": {
+      "en": "Bay of Nha Trang",
+      "zh": "芽庄湾"
+    },
+    "Sagami Bay": {
+      "en": "Sagami Bay",
+      "zh": "相模湾"
+    },
+    "Tosa Bay": {
+      "en": "Tosa Bay",
+      "zh": "土佐湾"
+    },
+    "Frobisher Bay": {
+      "en": "Frobisher Bay",
+      "zh": "弗罗比舍湾"
+    },
+    "Repulse Bay": {
+      "en": "Repulse Bay",
+      "zh": "里帕尔斯湾"
+    },
+    "Vestfjorden": {
+      "en": "Vestfjorden",
+      "zh": "韦斯特峡湾"
+    },
+    "Varangerfjorden": {
+      "en": "Varangerfjorden",
+      "zh": "瓦朗厄尔峡湾"
+    },
+    "Romsdalsfjord": {
+      "en": "Romsdalsfjord",
+      "zh": "鲁姆斯达尔峡湾"
+    },
+    "Storfjorden": {
+      "en": "Storfjorden",
+      "zh": "斯托尔峡湾"
+    },
+    "Strangford Lough": {
+      "en": "Strangford Lough",
+      "zh": "斯特兰福德湾"
+    },
+    "Cape Cod Bay": {
+      "en": "Cape Cod Bay",
+      "zh": "科德角湾"
+    },
+    "Massachusetts Bay": {
+      "en": "Massachusetts Bay",
+      "zh": "马萨诸塞湾"
+    },
+    "New York Bight": {
+      "en": "New York Bight",
+      "zh": "纽约湾曲"
+    },
+    "Rhode Island Sound": {
+      "en": "Rhode Island Sound",
+      "zh": "罗得岛湾"
+    },
+    "Gaspe Bay": {
+      "en": "Gaspe Bay",
+      "zh": "加斯佩湾"
+    },
+    "Bay of Campeche": {
+      "en": "Bay of Campeche",
+      "zh": "坎佩切湾"
+    },
+    "Gulf of Honduras": {
+      "en": "Gulf of Honduras",
+      "zh": "洪都拉斯湾"
+    },
+    "Gulf of Venezuela": {
+      "en": "Gulf of Venezuela",
+      "zh": "委内瑞拉湾"
+    },
+    "Gulf of Paria": {
+      "en": "Gulf of Paria",
+      "zh": "帕里亚湾"
+    },
+    "Gulf of Uraba": {
+      "en": "Gulf of Uraba",
+      "zh": "乌拉巴湾"
+    },
+    "Gulf of Batabano": {
+      "en": "Gulf of Batabano",
+      "zh": "巴塔瓦诺湾"
+    },
+    "Bay of Ilha Grande": {
+      "en": "Bay of Ilha Grande",
+      "zh": "大岛湾"
+    },
+    "Guanabara Bay": {
+      "en": "Guanabara Bay",
+      "zh": "瓜纳巴拉湾"
+    },
+    "Garretts Bight": {
+      "en": "Garretts Bight",
+      "zh": "加勒特湾"
+    },
+    "Mida Creek": {
+      "en": "Mida Creek",
+      "zh": "米达溪"
+    },
+    "Gharo Creek": {
+      "en": "Gharo Creek",
+      "zh": "加罗溪"
+    },
+    "Tudor Creek": {
+      "en": "Tudor Creek",
+      "zh": "都铎溪"
+    },
+    "Korangi Creek": {
+      "en": "Korangi Creek",
+      "zh": "科兰吉溪"
+    },
+    "Khawr al Hajar": {
+      "en": "Khawr al Hajar",
+      "zh": "哈贾尔湾"
+    },
+    "Minnie Bay": {
+      "en": "Minnie Bay",
+      "zh": "米妮湾"
+    },
+    "Ao Tang Khen": {
+      "en": "Ao Tang Khen",
+      "zh": "唐肯湾"
+    },
+    "Trou-aux-Biches": {
+      "en": "Trou-aux-Biches",
+      "zh": "特鲁欧比什湾"
+    },
+    "Ahipara Bay": {
+      "en": "Ahipara Bay",
+      "zh": "阿希帕拉湾"
+    },
+    "Bootless Inlet": {
+      "en": "Bootless Inlet",
+      "zh": "布特利斯湾"
+    },
+    "Gulf of Fonseca": {
+      "en": "Gulf of Fonseca",
+      "zh": "丰塞卡湾"
+    },
+    "Hauraki Gulf": {
+      "en": "Hauraki Gulf",
+      "zh": "豪拉基湾"
+    },
+    "Kaimana Bay": {
+      "en": "Kaimana Bay",
+      "zh": "凯马纳湾"
+    },
+    "Magdalena Bay": {
+      "en": "Magdalena Bay",
+      "zh": "马格达莱纳湾"
+    },
+    "Matsushima-wan": {
+      "en": "Matsushima-wan",
+      "zh": "松岛湾"
+    },
+    "Orokolo Bay": {
+      "en": "Orokolo Bay",
+      "zh": "奥罗科洛湾"
+    },
+    "Pegasus Bay": {
+      "en": "Pegasus Bay",
+      "zh": "佩加瑟斯湾"
+    },
+    "Baie de Saint-Vincent": {
+      "en": "Baie de Saint-Vincent",
+      "zh": "圣文森特湾"
+    },
+    "San Diego Bay": {
+      "en": "San Diego Bay",
+      "zh": "圣迭戈湾"
+    },
+    "Santa Monica Bay": {
+      "en": "Santa Monica Bay",
+      "zh": "圣莫尼卡湾"
+    },
+    "Bahía Sebastián Vizcaíno": {
+      "en": "Bahía Sebastián Vizcaíno",
+      "zh": "塞瓦斯蒂安比斯凯诺湾"
+    },
+    "Bahia Tenacatita": {
+      "en": "Bahia Tenacatita",
+      "zh": "特纳卡蒂塔湾"
+    },
+    "Todos os Santos Bay": {
+      "en": "Todos os Santos Bay",
+      "zh": "托多斯桑托斯湾"
+    },
+    "Tomales Bay": {
+      "en": "Tomales Bay",
+      "zh": "托马利斯湾"
+    },
+    "Teluk Wandamen": {
+      "en": "Teluk Wandamen",
+      "zh": "旺达门湾"
     }
   },
   "ui": {

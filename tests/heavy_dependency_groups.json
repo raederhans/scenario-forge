@@ -57,6 +57,7 @@
       "tests/test_scenario_spatial_chunk_assets.py",
       "tests/test_scenario_surface_constraints.py",
       "tests/test_source_coverage_repair.py",
+      "tests/test_sync_marine_refinement.py",
       "tests/test_tno_bundle_builder.py",
       "tests/test_tno_border_continuity.py",
       "tests/test_tno_east_europe_gaps.py",

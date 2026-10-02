@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-02 七批海域细化、体积与性能整合
+
+`C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域工作基于`f47b36f4`，正在整合当前远端主线。用户已授权完成体积、性能优化后合并推送；root唯一负责共享资产和Git整合。主目录及其他工作树的未归属改动保留，工作树与`.runtime`证据保留供复核。范围、验证和最终PR回执见[任务记录](ocean-batch-20261002/task.md)。
+
 ## 2026-09-30 沿河填色试点整合
 
 `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 接手云端分支 `codex/river-paint-partitions-p0-p2` 和 [PR #189](https://github.com/raederhans/scenario-forge/pull/189)，基于 `origin/main@bfedc6b8`。本地整合提交 `eab92f54` 修复 Pages 资源打包、浏览器清单、依赖图和验证路由，并完成沿河功能、几何、Pages 及浏览器验证。主目录 `main@28310add` 的既有未归属改动保留；本工作树作为同步后的独立入口及 `.runtime/reports/generated/river-integration/` 验证证据载体继续保留。最终检查、合并提交和主线状态以 PR 回执及 Git 为准，不能用旧开发运行结果替代最终提交的 required checks。
