@@ -1,7 +1,7 @@
 import { resolveDataAssetUrl } from '../runtime_asset_registry.js';
 import { normalizeRiverPartitionPack } from './partition_model.js';
 import { decodeRiverPartitionTransport } from './pack_transport.js';
-import { APPROVED_RIVER_PACKS, RIVER_PAINT_WAVE5 } from './pilot_manifest.js';
+import { APPROVED_RIVER_PACKS, RIVER_PAINT_WAVE6 } from './pilot_manifest.js';
 
 // File input is untrusted. Coordinate/hash self-consistency alone is not a
 // coverage proof: authenticate the complete offline-reviewed pack, including
@@ -20,7 +20,7 @@ export async function verifyApprovedRiverPack(value) {
 }
 
 export async function loadRiverPaintPilot({ signal, fetchImpl = globalThis.fetch } = {}) {
-  const response = await fetchImpl(resolveDataAssetUrl(RIVER_PAINT_WAVE5.assetKey), { signal, cache: 'no-cache' });
+  const response = await fetchImpl(resolveDataAssetUrl(RIVER_PAINT_WAVE6.assetKey), { signal, cache: 'no-cache' });
   if (!response.ok) throw new Error(`River partition load failed (${response.status})`);
   const text = await response.text();
   if (text.length > 2_000_000) throw new Error('River partition download exceeds the budget');

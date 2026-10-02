@@ -22,7 +22,7 @@
     },
     {
       "path": "app/data/CATALOG.json",
-      "size_bytes": 243758,
+      "size_bytes": 244106,
       "source_kind": "generated_ignored"
     },
     {
@@ -37286,13 +37286,18 @@
       "source_kind": "generated_ignored"
     },
     {
+      "path": "app/data/river_partitions/modern_world_wave6.transport.json",
+      "size_bytes": 1435961,
+      "source_kind": "generated_ignored"
+    },
+    {
       "path": "app/data/ru_city_overrides.geojson",
       "size_bytes": 179808,
       "source_kind": "generated_ignored"
     },
     {
       "path": "app/data/runtime_asset_registry.json",
-      "size_bytes": 24941,
+      "size_bytes": 25285,
       "source_kind": "generated_ignored"
     },
     {
@@ -44727,7 +44732,7 @@
     },
     {
       "path": "app/js/core/renderer/paint_contour_graph.js",
-      "size_bytes": 13275,
+      "size_bytes": 20664,
       "source_kind": "dist"
     },
     {
@@ -45207,7 +45212,7 @@
     },
     {
       "path": "app/js/core/river_paint/pilot_manifest.js",
-      "size_bytes": 2579,
+      "size_bytes": 3021,
       "source_kind": "dist"
     },
     {
@@ -45857,7 +45862,7 @@
     },
     {
       "path": "app/js/ui/river_paint_location_data.js",
-      "size_bytes": 33013,
+      "size_bytes": 33517,
       "source_kind": "dist"
     },
     {
@@ -46692,7 +46697,7 @@
     },
     {
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2298125,
+      "size_bytes": 2298362,
       "source_kind": "dist"
     },
     {
@@ -46811,23 +46816,23 @@
       "graph_scan_status": "complete",
       "publication_ownership_status": "complete",
       "status": "complete",
-      "untraversed_owned_file_count": 8814
+      "untraversed_owned_file_count": 8815
     },
     "categories": [
       {
         "file_count": 328,
         "id": "startup-critical",
-        "size_bytes": 28071763
+        "size_bytes": 28080286
       },
       {
         "file_count": 122,
         "id": "startup-deferred-runtime",
-        "size_bytes": 3745130
+        "size_bytes": 3745634
       },
       {
-        "file_count": 827,
+        "file_count": 828,
         "id": "on-demand-product",
-        "size_bytes": 398374018
+        "size_bytes": 399810216
       },
       {
         "file_count": 8048,
@@ -67413,22 +67418,22 @@
       ],
       "schema_version": 2,
       "summary": {
-        "deferred_graph_bytes": 3339387,
+        "deferred_graph_bytes": 3339891,
         "deferred_graph_file_count": 151,
         "deferred_module_count": 149,
         "deferred_resource_count": 2,
-        "initial_graph_bytes": 5786378,
+        "initial_graph_bytes": 5794901,
         "initial_graph_file_count": 359,
         "initial_module_count": 345,
         "initial_resource_count": 14,
-        "initial_script_bytes": 4657323,
+        "initial_script_bytes": 4665154,
         "initial_script_count": 347,
         "module_count": 494,
         "registry_resolved_dynamic_expression_count": 2,
         "registry_target_set_mismatch_count": 0,
         "unresolved_dynamic_expression_count": 0,
-        "untraversed_dist_bytes": 830443677,
-        "untraversed_dist_file_count": 8814,
+        "untraversed_dist_bytes": 831879875,
+        "untraversed_dist_file_count": 8815,
         "untraversed_module_count": 0
       },
       "unresolved_references": []
@@ -67442,7 +67447,7 @@
         "path_exceptions": [
           {
             "path": "app/data/CATALOG.json",
-            "size_bytes": 243758
+            "size_bytes": 244106
           },
           {
             "path": "app/data/city_lights/historical_1930_entries.json",
@@ -67454,11 +67459,11 @@
           },
           {
             "path": "app/data/runtime_asset_registry.json",
-            "size_bytes": 24941
+            "size_bytes": 25285
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 495962
+        "size_bytes": 496654
       },
       {
         "basis": "html-entrypoint",
@@ -68022,7 +68027,7 @@
           },
           {
             "path": "app/js/core/renderer/paint_contour_graph.js",
-            "size_bytes": 13275
+            "size_bytes": 20664
           },
           {
             "path": "app/js/core/renderer/paint_contour_mesh.js",
@@ -68362,7 +68367,7 @@
           },
           {
             "path": "app/js/core/river_paint/pilot_manifest.js",
-            "size_bytes": 2579
+            "size_bytes": 3021
           },
           {
             "path": "app/js/core/river_paint/render_owner.js",
@@ -68645,7 +68650,7 @@
             "size_bytes": 44342
           }
         ],
-        "size_bytes": 3583715
+        "size_bytes": 3591546
       },
       {
         "basis": "startup-resource-graph",
@@ -68907,7 +68912,7 @@
           },
           {
             "path": "app/js/ui/river_paint_location_data.js",
-            "size_bytes": 33013
+            "size_bytes": 33517
           },
           {
             "path": "app/js/ui/river_paint_locations.js",
@@ -69214,7 +69219,7 @@
             "size_bytes": 20597
           }
         ],
-        "size_bytes": 2789672
+        "size_bytes": 2790176
       },
       {
         "basis": "deferred-resource-graph",
@@ -69261,7 +69266,7 @@
       {
         "basis": "product-registry:editor-product-data",
         "category": "on-demand-product",
-        "file_count": 60,
+        "file_count": 61,
         "owner": "editor-data-runtime",
         "path_exceptions": [
           {
@@ -69398,12 +69403,12 @@
             "size_bytes": 802059
           },
           {
-            "file_count": 4,
+            "file_count": 5,
             "prefix": "app/data/river_partitions/",
-            "size_bytes": 3646354
+            "size_bytes": 5082315
           }
         ],
-        "size_bytes": 277417617
+        "size_bytes": 278853578
       },
       {
         "basis": "product-registry:editor-vendor-product",
@@ -69616,11 +69621,11 @@
           },
           {
             "path": "pages-dist-manifest.json",
-            "size_bytes": 2298125
+            "size_bytes": 2298362
           }
         ],
         "path_prefixes": [],
-        "size_bytes": 2298125
+        "size_bytes": 2298362
       },
       {
         "basis": "product-registry:render-handoff-contract-modules",
@@ -70045,7 +70050,7 @@
       }
     ],
     "product_inventory": {
-      "classified_file_count": 9340,
+      "classified_file_count": 9341,
       "exact_exclusions": [],
       "publication_ownership_status": "complete",
       "registry_rules": [
@@ -70244,7 +70249,7 @@
         },
         {
           "category": "on-demand-product",
-          "file_count": 60,
+          "file_count": 61,
           "id": "editor-product-data",
           "match": {
             "exact_paths": [
@@ -70266,6 +70271,7 @@
               "app/data/river_partitions/modern_world_wave2.json",
               "app/data/river_partitions/modern_world_wave3.json",
               "app/data/river_partitions/modern_world_wave5.transport.json",
+              "app/data/river_partitions/modern_world_wave6.transport.json",
               "app/data/global_rivers.geojson",
               "app/data/global_lakes.geojson",
               "app/data/europe_physical.geojson",
@@ -70293,7 +70299,7 @@
             ]
           },
           "owner": "editor-data-runtime",
-          "size_bytes": 277417617
+          "size_bytes": 278853578
         },
         {
           "category": "on-demand-product",
@@ -70398,11 +70404,11 @@
             "prefixes": []
           },
           "owner": "pages-release",
-          "size_bytes": 2298125
+          "size_bytes": 2298362
         }
       ],
       "status": "complete",
-      "total_file_count": 9340,
+      "total_file_count": 9341,
       "unknown_file_count": 0,
       "unknown_paths": []
     },
@@ -70411,15 +70417,15 @@
       "graph_scan_status": "complete",
       "registry_resolved_dynamic_expression_count": 2,
       "status": "complete",
-      "total_file_count": 9340,
+      "total_file_count": 9341,
       "traversed_file_count": 526,
       "unresolved_dynamic_expression_count": 0,
       "unresolved_reference_count": 0,
-      "untraversed_file_count": 8814,
-      "untraversed_owned_file_count": 8814
+      "untraversed_file_count": 8815,
+      "untraversed_owned_file_count": 8815
     },
     "schema_version": 2,
-    "untraversed_owned_file_count": 8814
+    "untraversed_owned_file_count": 8815
   },
   "required_files": [
     "index.html",
@@ -70439,9 +70445,9 @@
   },
   "top_level_directories": [
     {
-      "file_count": 9276,
+      "file_count": 9277,
       "path": "app",
-      "size_bytes": 833190029
+      "size_bytes": 834635017
     },
     {
       "file_count": 59,
@@ -70451,7 +70457,7 @@
     {
       "file_count": 1,
       "path": "pages-dist-manifest.json",
-      "size_bytes": 2298125
+      "size_bytes": 2298362
     },
     {
       "file_count": 1,
@@ -70474,5 +70480,5 @@
       "size_bytes": 0
     }
   ],
-  "total_bytes": 862642371
+  "total_bytes": 864087596
 }

@@ -41,7 +41,17 @@ export const RIVER_PAINT_WAVE5 = Object.freeze({
   "parentCount": 376,
   "cellCount": 1164
 });
-export const APPROVED_RIVER_PACKS = Object.freeze([RIVER_PAINT_PILOT, RIVER_PAINT_WAVE2, RIVER_PAINT_WAVE3, RIVER_PAINT_WAVE5]);
+export const RIVER_PAINT_WAVE6 = Object.freeze({
+  sceneId: 'modern_world',
+  assetKey: 'river_partitions:modern_world_wave6',
+  packId: 'sha256:c9fd0b6d42aa194868d52b2289f0b667080db54f191c660c933233e9583f9413',
+  canonicalSha256: 'cf6dd9ae9328e212dfd1864582389b4c61aa6310c2cf1c5d0011534460fb12b0',
+  scenarioVersion: 2,
+  scenarioGeneratedAt: '2026-09-27T13:55:57.885587+00:00',
+  parentCount: 382,
+  cellCount: 1199,
+});
+export const APPROVED_RIVER_PACKS = Object.freeze([RIVER_PAINT_PILOT, RIVER_PAINT_WAVE2, RIVER_PAINT_WAVE3, RIVER_PAINT_WAVE5, RIVER_PAINT_WAVE6]);
 
 // baseline_hash is an ownership digest, not a geometry digest. The reviewed
 // production pack is also tied to the generated scenario build. Synthetic
