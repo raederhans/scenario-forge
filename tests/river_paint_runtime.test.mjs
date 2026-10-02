@@ -12,6 +12,8 @@ import { createPaintContourGraphBuilder } from '../js/core/renderer/paint_contou
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
 import { createPaintContourRuntime } from '../js/core/renderer/paint_contour_runtime.js';
 import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_client.js';
+import { createPoliticalCollectionOwner } from '../js/core/renderer/political_collection_owner.js';
+import { fragmentCamouflageRules } from '../js/core/country_feature_policies.js';
 import { getMapDataBoundary } from '../js/core/map_data_boundary.js';
 
 test('point targeting distinguishes both banks while preserving canonical parent ID', async () => {
@@ -201,4 +203,35 @@ test('wave3 load fails closed against a wrong baseline, version, missing or rege
     assert.equal(state.riverPaint.pack, null); assert.equal(runtime.diagnostics().pending, false);
     assert.equal(runtime.diagnostics().status, 'error');
   }
+});
+
+
+test('reviewed contour neighbors retain pinned fragments through the interactive display filter', async () => {
+  const { state, pack } = makeWave3Fixture();
+  const previous = globalThis.d3; globalThis.d3 = d3;
+  try {
+    const ids = ['BY_INT_VITEBSK', 'RU_RAY_50074027B51726500082089', 'RU_RAY_50074027B64424707524567'];
+    const source = { type: 'FeatureCollection', features: ids.map(id => ({
+      type: 'Feature', id, properties: { id, cntr_code: id.startsWith('BY') ? 'BY' : 'RU', __source: 'detail' },
+      geometry: pack.support.find(p => p.parentId === id).parentGeometry,
+    })) };
+    const runtime = createRiverPaintRuntime(state);
+    const owner = createPoliticalCollectionOwner({ state, constants: { fragmentCamouflageRules }, helpers: {
+      getFeatureId: f => f.id, getDetailTier: () => '', getFeatureCountryCodeNormalized: f => f.properties.cntr_code,
+      isPoliticalInteractionRenderableFeature: () => true,
+    } });
+    const pinned = runtime.pinCollection(source);
+    for (const editing of [true, false]) {
+      runtime.setMode(editing);
+      const display = owner.buildInteractiveLandData(pinned);
+      for (const f of display.features) {
+        assert.equal(f.geometry, pack.support.find(p => p.parentId === f.id).geometry);
+        assert.equal(f.properties.__visualFragmentCamouflage, undefined);
+      }
+    }
+    state.riverPaint = null;
+    const ordinary = owner.buildInteractiveLandData(source);
+    assert.ok(ordinary.features.every(f => f.properties.__visualFragmentPrunedCount > 0));
+    assert.ok(source.features.every(f => !f.properties.__visualFragmentCamouflage));
+  } finally { globalThis.d3 = previous; }
 });

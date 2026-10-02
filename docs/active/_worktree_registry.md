@@ -627,3 +627,11 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Integrated deliveries: Europe `cdfedb34` (6f5a), China `9a664cbe` (edea), east `ec275ef5` (f7ce), tooling `2e44f94e` (b5dc). Retain all four clean worktrees for ignored atlas/audit evidence.
 - Scope: offline tool and selections; 307 initial parents reduced to 302 after full-map contour verification. No runtime admission. Details and remaining gates: `river-wave3/integration.md`.
 - Preserve primary checkout WIP. Final push and merge receipt is the PR for this branch; do not infer merged status from this registry.
+
+## River wave4 runtime integration 2026-10-02
+
+- Branch: `codex/river-wave4-integration`; base `b416e257`; checkout `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator`.
+- Root owns integration, localhost port 8009 browser checks, Pages builds under `.runtime/pw4b`, Git operations and final admission.
+- Deliveries: `0840` runtime cde83659, `f3b2` navigation42a61eeb, `909f` verification f0c58b9d. Retain original worktrees for ignored evidence; preserve primary WIP.
+- Scope: 302-parent authenticated default, searchable navigation, old-pack retention and full-map contour gates. Integration fixes/evidence: `river-wave4/integration.md`.
+- Final merge/push status is the PR receipt for this branch; this entry alone is not merge proof.

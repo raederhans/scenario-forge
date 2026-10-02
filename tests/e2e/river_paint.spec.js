@@ -14,7 +14,7 @@ const RIVER_REPRESENTATIVES = [
 ];
 const LEGACY_REPRESENTATIVES = ['CN_CITY_17275852B1441354643708', 'DEE0D', 'FR_ARR_76003',
   'PL_POW_0264', 'RU_RAY_50074027B57358126207690'];
-const wave3Required = process.env.RIVER_WAVE3_E2E === '1';
+const wave3Required = process.env.RIVER_WAVE3_E2E !== '0';
 const reviewedIds = JSON.parse(fs.readFileSync(path.resolve(__dirname,
   '../../tools/river_partitions/selections/wave3-reviewed.json'), 'utf8')).parents;
 
@@ -40,6 +40,7 @@ function assertReviewedScope(summary) {
 }
 
 test('river pilot UI, real click transaction, undo, file roundtrip and export share cell paint', async ({ page }, testInfo) => {
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
   test.setTimeout(120_000);
   const startedAt = Date.now(); const timings = {};
   const errors = []; page.on('pageerror', e => errors.push(e.message));
@@ -51,10 +52,26 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
   // proves the final composed surface after the partition activation.
   await expect(page.locator('#riverPaintToggleBtn')).toBeEnabled();
   await page.locator('#riverPaintToggleBtn').click();
+  // Activation rebuilds full-map geometry before controls publish readiness.
+  await waitForRenderIdle(page);
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
   await waitForRenderIdle(page); timings.partitionReadyMs = Date.now() - startedAt;
   assertReviewedScope(await activePackSummary(page));
+  const readiness = await page.evaluate(async () => {
+    const { state } = await import(new URL('./js/core/state.js', location.href));
+    const { getRiverPaintRuntime } = await import(new URL('./js/core/river_paint/runtime.js', location.href));
+    const { sameRiverParentGeometry } = await import(new URL('./js/core/river_paint/geometry_identity.js', location.href));
+    const pack = getRiverPaintRuntime(state).getActivePack();
+    return pack.support.filter(s => !sameRiverParentGeometry(state.landIndex.get(s.parentId)?.geometry, s.geometry)).map(s => {
+      const full = state.landDataFull?.features.find(f => (f.properties?.id || f.id) === s.parentId);
+      const live = state.landIndex.get(s.parentId);
+      return { id: s.parentId, indexed: !!live, full: !!full, properties: full?.properties, liveProperties: live?.properties,
+        fullMatches: sameRiverParentGeometry(full?.geometry,s.geometry), shellOwner: state.scenarioAutoShellOwnerByFeatureId?.[s.parentId] };
+    });
+  });
+  await testInfo.attach('river-support-readiness.json', { body: JSON.stringify(readiness,null,2), contentType: 'application/json' });
+  expect(readiness).toEqual([]);
   const result = await page.evaluate(async () => {
     const load = path => import(new URL(path, location.href).href);
     const { state } = await load('./js/core/state.js');
@@ -143,12 +160,15 @@ test('river pilot UI, real click transaction, undo, file roundtrip and export sh
 test('representative river picker and smallest fragment preserve toolbar undo/redo transactions', async ({ page }, testInfo) => {
   // Bound UI work to two banks per representative plus the smallest fragment.
   // The timeout covers startup, not an unbounded loop over expanded pack cells.
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
   test.setTimeout(120_000);
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
   await waitForAppInteractive(page);
   await page.locator('#riverPaintToggleBtn').click();
+  // Activation rebuilds full-map geometry before controls publish readiness.
+  await waitForRenderIdle(page);
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
   await waitForRenderIdle(page);
@@ -166,9 +186,29 @@ test('representative river picker and smallest fragment preserve toolbar undo/re
     const { state } = await import(new URL('./js/core/state.js', location.href));
     return { ...state.riverPaint.overrides };
   });
+  // Search and filter the real authenticated pack; empty results must not retain
+  // a navigable stale parent. Clear both before checking the complete scope.
+  const search = page.locator('#riverPaintSearchInput');
+  const riverFilter = page.locator('#riverPaintRiverSelect');
+  await search.fill('no-such-river-parent-000');
+  await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
+  await expect(page.locator('#riverPaintLocationGoBtn')).toBeDisabled();
+  await search.fill('');
+  if (wave3Required) {
+    for (const [river, id] of RIVER_REPRESENTATIVES) {
+      await riverFilter.selectOption(river);
+      await search.fill(id);
+      const ids = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+      expect(ids, river).toEqual([id]);
+      await search.fill('');
+    }
+  }
+  await riverFilter.selectOption('');
   const painted = [];
   for (const parent of parents) {
     await page.locator('#riverPaintLocationSelect').selectOption(parent);
+    await expect(page.locator('#riverPaintLocationSelect')).toHaveValue(parent);
+    await page.locator('#riverPaintLocationGoBtn').click();
     await expect(page.locator('#riverCellPicker')).toBeVisible();
     const cells = await page.locator('#riverCellSelect option').evaluateAll(options => options.map(o => o.value));
     const expected = summary.parents.find(entry => entry.parentId === parent).cells;
@@ -288,6 +328,7 @@ test('native canvas representative pixels follow state after tool and river disp
 });
 
 test('historical pilot and wave2 saved projects keep their authenticated scope through toolbar and reload', async ({ page }, testInfo) => {
+  // JUSTIFY: Full Modern World startup plus authenticated import/render work; bounded river-only UI scope.
   test.setTimeout(120_000);
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await gotoApp(page, '/?default_scenario=modern_world&startup_interaction=full&startup_worker=0&startup_cache=0', { waitUntil: 'domcontentloaded' });
@@ -322,8 +363,15 @@ test('historical pilot and wave2 saved projects keep their authenticated scope t
     expect(result.parents).toHaveLength(parentCount); expect(result.cellCount).toBe(cellCount);
     expect(result.overrides).toEqual({ [result.cellId]: '#12ab34' });
     await expect(page.locator('#riverPaintToggleBtn')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#riverPaintLocationSelect option')).toHaveCount(parentCount + 1);
     const options = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
     expect(options.sort()).toEqual([...result.parents].sort());
+    await page.locator('#riverPaintSearchInput').fill('RS123');
+    await expect(page.locator('#riverPaintLocationSelect')).toBeDisabled();
+    await page.locator('#riverPaintSearchInput').fill(result.parents[0]);
+    const searched = await page.locator('#riverPaintLocationSelect option').evaluateAll(options => options.map(o => o.value).filter(Boolean));
+    expect(searched).toEqual([result.parents[0]]);
+    await page.locator('#riverPaintSearchInput').fill('');
     await page.locator('#riverPaintToggleBtn').click();
     await page.locator('#riverPaintToggleBtn').click();
     expect((await activePackSummary(page)).packId).toBe(result.expectedPackId);

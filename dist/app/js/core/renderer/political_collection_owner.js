@@ -1,3 +1,5 @@
+import { getActiveRiverPack, getRiverPartitionIndex } from "../river_paint/partition_model.js";
+import { isRiverPaintSourceCompatible } from "../river_paint/pilot_manifest.js";
 import { inheritContourCoordinatePrecision } from "../paint_contour_source.js";
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "../political_geometry_store.js";
 
@@ -111,6 +113,15 @@ export function createPoliticalCollectionOwner({
 
   function applyFragmentCamouflageToFeature(feature) {
     if (feature?.geometry?.type !== "MultiPolygon") return feature;
+    // Reviewed river parents and contour neighbors were pinned before this
+    // display pass. Pruning their fragments would invalidate the shared seams
+    // and prevent saving/exporting the authenticated pack, even with tool off.
+    const riverPack = getActiveRiverPack(state?.riverPaint, state?.activeScenarioId, state?.scenarioBaselineHash || "");
+    if (riverPack && isRiverPaintSourceCompatible(riverPack, state?.activeScenarioManifest)) {
+      const index = getRiverPartitionIndex(riverPack), id = getFeatureId(feature);
+      const pinned = index.parents.get(id)?.parentGeometry || index.support.get(id)?.geometry;
+      if (pinned && feature.geometry === pinned) return feature;
+    }
     const polygonCoordinates = Array.isArray(feature.geometry.coordinates)
       ? feature.geometry.coordinates
       : [];

@@ -40,13 +40,19 @@ export function createRiverCellPicker({ state, panel, select, preview, applyButt
   function sync() {
     const parent = currentParent();
     panel.hidden = !parent;
-    if (!parent) { parentId = ''; cellId = ''; selectedPack = null; return; }
+    if (!parent) {
+      parentId = ''; parentLabels = null; cellId = ''; selectedPack = null;
+      select.replaceChildren(); select.disabled = true;
+      preview?.replaceChildren(); applyButton.disabled = true;
+      return;
+    }
     const cell = parent.cells.find(entry => entry.id === cellId);
     const parentLabel = parentLabels?.[zh() ? 'zh' : 'en'];
     title.textContent = parentLabel
       ? `${parentLabel} · ${parent.cells.length}`
       : (zh() ? `河岸分区 · ${parent.cells.length}` : `River cells · ${parent.cells.length}`);
     select.setAttribute('aria-label', zh() ? '选择河岸分区' : 'Choose river cell');
+    select.disabled = false;
     select.replaceChildren(...parent.cells.map((entry, index) => {
       const option = select.ownerDocument.createElement('option');
       option.value = entry.id;
