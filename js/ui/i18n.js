@@ -19,44 +19,43 @@ import {
 
 const state = runtimeState;
 
+function setLocalizedText(element, localizedText) {
+  const semanticChild = element.querySelector?.(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title");
+  const target = semanticChild || element;
+  if (target.textContent !== localizedText) target.textContent = localizedText;
+}
+
+function setLocalizedAttribute(element, name, localizedText) {
+  if (element.getAttribute(name) !== localizedText) element.setAttribute(name, localizedText);
+}
+
 function applyDeclarativeTranslationToElement(element) {
   if (!element?.getAttribute) return;
 
   // 这一层只负责把 data-i18n* 属性映射到 DOM，可见文本的业务决策仍留在 t()/catalog/runtime locale。
-  const applyTextValue = (localizedText) => {
-    const semanticChild = typeof element.querySelector === "function"
-      ? element.querySelector(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title")
-      : null;
-    if (semanticChild instanceof HTMLElement) {
-      semanticChild.textContent = localizedText;
-      return;
-    }
-    element.textContent = localizedText;
-  };
-
   const textKey = String(element.getAttribute("data-i18n") || "").trim();
-  if (textKey) {
-    applyTextValue(t(textKey, "ui"));
+  if (textKey && !element.dataset?.confirmState) {
+    setLocalizedText(element, t(textKey, "ui"));
   }
 
   const placeholderKey = String(element.getAttribute("data-i18n-placeholder") || "").trim();
   if (placeholderKey) {
-    element.setAttribute("placeholder", t(placeholderKey, "ui"));
+    setLocalizedAttribute(element, "placeholder", t(placeholderKey, "ui"));
   }
 
   const titleKey = String(element.getAttribute("data-i18n-title") || "").trim();
   if (titleKey) {
-    element.setAttribute("title", t(titleKey, "ui"));
+    setLocalizedAttribute(element, "title", t(titleKey, "ui"));
   }
 
   const ariaLabelKey = String(element.getAttribute("data-i18n-aria-label") || "").trim();
   if (ariaLabelKey) {
-    element.setAttribute("aria-label", t(ariaLabelKey, "ui"));
+    setLocalizedAttribute(element, "aria-label", t(ariaLabelKey, "ui"));
   }
 
   const altKey = String(element.getAttribute("data-i18n-alt") || "").trim();
   if (altKey) {
-    element.setAttribute("alt", t(altKey, "ui"));
+    setLocalizedAttribute(element, "alt", t(altKey, "ui"));
   }
 }
 
@@ -396,10 +395,7 @@ function updateUIText() {
     ["countryInspectorEmptyTitle", "Select a country to inspect"],
     ["countryInspectorEmptyHint", "Choose a country above, then use Active Owner and the Territories & Presets panel."],
     ["waterInspectorEmptyTitle", "Select a water region to inspect"],
-    ["waterInspectorEmptyHint", "Click a sea, lake, or strait on the map, or choose one from the list."],
     ["waterInspectorResultCount", "regions"],
-    ["specialRegionInspectorEmptyTitle", "Select a special region to inspect"],
-    ["specialRegionInspectorEmptyHint", "Click a drained basin or exposure zone on the map, or choose one from the list."],
     ["resetCountryColors", "Reset Country Colors"],
     ["clearWaterRegionColorBtn", "Clear Water Override"],
     ["applyWaterFamilyOverrideBtn", "Apply Current Color To Scope"],
@@ -485,16 +481,9 @@ function updateUIText() {
 
   uiMap.forEach(([id, label]) => {
     const el = document.getElementById(id);
-    if (el) {
-      const localizedText = t(label, "ui");
-      const semanticChild = typeof el.querySelector === "function"
-        ? el.querySelector(":scope > .sidebar-anchor-title, :scope > .sidebar-section-title, :scope > .sidebar-support-title, :scope > .sidebar-appendix-title, :scope > .sidebar-tool-title")
-        : null;
-      if (semanticChild instanceof HTMLElement) {
-        semanticChild.textContent = localizedText;
-      } else {
-        el.textContent = localizedText;
-      }
+    // 声明式 key 是当前节点的文案来源；旧 ID 映射只补尚未迁移的节点。
+    if (el && !String(el.getAttribute?.("data-i18n") || "").trim()) {
+      setLocalizedText(el, t(label, "ui"));
     }
   });
 
@@ -515,12 +504,10 @@ function updateUIText() {
     "updateToolUIFn",
     "updateHistoryUIFn",
     "updateZoomUIFn",
-    "updatePaintModeUIFn",
     "updateDevWorkspaceUIFn",
     "updateToolbarInputsFn",
     "updateTransportAppearanceUIFn",
     "updateFacilityInfoCardUiFn",
-    "refreshSampleProjectBannerFn",
     "syncDeveloperModeUiFn",
   ]);
 
@@ -577,7 +564,8 @@ function updateUIText() {
     if (!el) return;
     const translated = t(label, "ui");
     el.setAttribute("aria-label", translated);
-    el.setAttribute("title", translated);
+    if (el.dataset.editorTooltip) el.removeAttribute("title");
+    else el.setAttribute("title", translated);
   });
 
   const zoomPercentInput = document.getElementById("zoomPercentInput");
@@ -625,7 +613,7 @@ function updateUIText() {
   confirmableButtons.forEach(([id, idleLabel]) => {
     const button = document.getElementById(id);
     if (!button || button.dataset.confirmState) return;
-    button.textContent = t(idleLabel, "ui");
+    setLocalizedText(button, t(idleLabel, "ui"));
   });
 
   const leftPanelToggle = document.getElementById("leftPanelToggle");
@@ -671,13 +659,9 @@ async function toggleLanguage() {
   updateUIText();
   callRuntimeHook(state, "renderPaletteFn", runtimeState.currentPaletteTheme);
   callRuntimeHooks(state, [
-    "updateToolbarInputsFn",
     "renderCountryListFn",
     "renderPresetTreeFn",
     "updateParentBorderCountryListFn",
-    "updatePaintModeUIFn",
-    "updateDevWorkspaceUIFn",
-    "refreshSampleProjectBannerFn",
     "updateSpecialZoneEditorUIFn",
     "updateWaterInteractionUIFn",
     "renderWaterRegionListFn",

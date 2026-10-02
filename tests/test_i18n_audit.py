@@ -504,6 +504,82 @@ image.setAttribute("alt", "Landing runtime preview");
             self.assertIn("Landing preview", result["declarative_ui_keys"])
             self.assertIn("Landing runtime preview", result["uncovered_user_visible_literals"])
 
+    def test_collects_quoted_landing_keys_and_object_assign_additions(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "landing/app.js",
+                """
+const translations = {
+  en: {
+    "initialKey": "Initial English label",
+  },
+  zh: {
+    "initialKey": "初始标签",
+  },
+};
+Object.assign(translations.en, {
+  "libraryArtwork": "Vector artwork",
+  'libraryProject': 'Editable project',
+  nextStep: "Keep editing",
+});
+Object.assign(translations.en, { firstInline: "Inline label", "secondInline": "Another label" });
+Object.assign(translations.zh, { libraryArtwork: "矢量作品" });
+                """.strip(),
+            )
+            self._write_repo_file(
+                repo_root,
+                "landing/index.html",
+                '<span data-i18n="libraryArtwork">Vector artwork</span>',
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertEqual(
+                {"initialKey", "libraryArtwork", "libraryProject", "nextStep", "firstInline", "secondInline"},
+                set(result["landing_translation_keys"]),
+            )
+            self.assertIn("Vector artwork", result["covered_default_literals"])
+            self.assertNotIn("Vector artwork", result["uncovered_user_visible_literals"])
+            self.assertIn("Another label", result["landing_translation_default_values"])
+            self.assertNotIn("矢量作品", result["landing_translation_default_values"])
+
+    def test_landing_additions_do_not_hide_unknown_or_non_literal_translation_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            self._write_repo_file(
+                repo_root,
+                "landing/app.js",
+                """
+Object.assign(translations.en, { "coveredKey": "Translated English label", dynamicKey: getLabel(), prefixedKey: "Prefix " + getSuffix() });
+Object.assign(otherTranslations.en, { "otherObjectKey": "Other dictionary label" });
+Object.assign(translations.zh, { "chineseOnlyKey": "只有中文" });
+                """.strip(),
+            )
+            self._write_repo_file(
+                repo_root,
+                "landing/index.html",
+                """
+<span data-i18n="coveredKey">Translated English label</span>
+<span data-i18n="missingKey">Missing English label</span>
+<span data-i18n="dynamicKey">Dynamic English label</span>
+<span data-i18n="prefixedKey">Prefix requiring a dynamic suffix</span>
+<span data-i18n="otherObjectKey">Other dictionary label</span>
+<span data-i18n="chineseOnlyKey">English label without an English dictionary entry</span>
+                """.strip(),
+            )
+
+            result = collect_code_strings(repo_root)
+
+            self.assertEqual(["coveredKey"], result["landing_translation_keys"])
+            self.assertEqual(
+                {"missingKey", "dynamicKey", "prefixedKey", "otherObjectKey", "chineseOnlyKey"},
+                set(result["declarative_ui_keys"]) - set(result["landing_translation_keys"]),
+            )
+            self.assertIn("Other dictionary label", result["uncovered_user_visible_literals"])
+            self.assertIn("Missing English label", result["uncovered_user_visible_literals"])
+
     def test_collects_transport_descriptor_fields_as_ui_keys(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
@@ -531,7 +607,7 @@ const config = {
         i18n_js = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")
 
         self.assertIn('getAttribute("data-i18n-alt")', i18n_js)
-        self.assertIn('setAttribute("alt", t(altKey, "ui"))', i18n_js)
+        self.assertIn('setLocalizedAttribute(element, "alt", t(altKey, "ui"))', i18n_js)
         self.assertIn("[data-i18n-alt]", i18n_js)
 
     def test_transport_shell_copy_is_localized_and_transport_headings_are_wired(self) -> None:

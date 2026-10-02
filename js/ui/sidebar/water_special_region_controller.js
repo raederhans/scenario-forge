@@ -91,6 +91,10 @@ export function createWaterSpecialRegionController({
   let waterInspectorColorPickerOpen = false;
   let specialRegionColorPickerOpen = false;
   const waterInspectorDetail = waterInspectorEmpty?.closest?.("#waterInspectorDetail") || null;
+  const waterEmptyHint = waterInspectorEmpty?.querySelector?.("#waterInspectorEmptyHint");
+  const lakeSettingsButton = waterInspectorEmpty?.querySelector?.("#waterInspectorLakeSettingsBtn");
+  const specialEmptyTitle = specialRegionInspectorEmpty?.querySelector?.("#specialRegionInspectorEmptyTitle");
+  const specialEmptyHint = specialRegionInspectorEmpty?.querySelector?.("#specialRegionInspectorEmptyHint");
   const waterRowRefsById = new Map();
   const waterAggregateMemberIdsById = new Map();
   const specialRegionRowRefsById = new Map();
@@ -528,7 +532,17 @@ export function createWaterSpecialRegionController({
     return true;
   };
 
+  const renderWaterEmptyGuidance = () => {
+    const enabled = isLakeInteractionEnabled(runtimeState);
+    if (waterEmptyHint) {
+      waterEmptyHint.textContent = t(enabled
+        ? "Click a sea, lake, or strait on the map, or choose one from the list."
+        : "Choose a sea or strait from the map or list. To select lakes, first enable lake interaction in settings.", "ui");
+    }
+    if (lakeSettingsButton) lakeSettingsButton.hidden = enabled;
+  };
   const renderWaterInteractionUi = () => {
+    renderWaterEmptyGuidance();
     syncOpenOceanInspectorState();
     if (waterInspectorLakeInteractionToggle) {
       waterInspectorLakeInteractionToggle.checked = isLakeInteractionEnabled(runtimeState);
@@ -644,6 +658,7 @@ export function createWaterSpecialRegionController({
 
   const renderWaterInspectorDetail = (snapshot = null) => {
     if (!waterInspectorEmpty || !waterInspectorSelected) return;
+    renderWaterEmptyGuidance();
     const selectedId = ensureSelectedWaterRegion();
     const feature = selectedId ? runtimeState.waterRegionsById?.get(selectedId) : null;
     const isEmpty = !feature;
@@ -1073,6 +1088,15 @@ export function createWaterSpecialRegionController({
     const feature = selectedId ? runtimeState.specialRegionsById?.get(selectedId) : null;
     const isEmpty = !feature;
 
+    const hasChoices = getVisibleSpecialFeatures().length > 0;
+    if (specialEmptyTitle) specialEmptyTitle.textContent = t(hasChoices
+      ? "Select a special region to inspect" : "No special regions available", "ui");
+    if (specialEmptyHint) specialEmptyHint.textContent = t(hasChoices
+      ? "Click a drained basin or exposure zone on the map, or choose one from the list."
+      : runtimeState.activeScenarioId
+        ? "This scenario has no visible special regions. Check the visibility settings on the left."
+        : "Apply a scenario with special regions to inspect them here.", "ui");
+
     specialRegionInspectorEmpty.classList.toggle("hidden", !isEmpty);
     specialRegionInspectorSelected.classList.toggle("hidden", isEmpty);
 
@@ -1245,6 +1269,22 @@ export function createWaterSpecialRegionController({
 
 
   const bindEvents = () => {
+  if (lakeSettingsButton && !lakeSettingsButton.dataset.bound) {
+    lakeSettingsButton.addEventListener("click", () => {
+      const doc = lakeSettingsButton.ownerDocument;
+      doc.getElementById("editorObjects-water")?.click();
+      const filters = doc.getElementById("editorWaterFilters");
+      if (filters) filters.open = true;
+      if (doc.defaultView.matchMedia("(max-width: 1023px)").matches) {
+        runtimeState.toggleLeftPanelFn?.(true);
+      } else if (doc.body.classList.contains("left-sidebar-collapsed")) {
+        doc.getElementById("leftSidebarCollapseBtn")?.click();
+      }
+      waterInspectorLakeInteractionToggle?.focus({ preventScroll: true });
+      waterInspectorLakeInteractionToggle?.scrollIntoView({ block: "nearest" });
+    });
+    lakeSettingsButton.dataset.bound = "true";
+  }
   if (waterInspectorLakeInteractionToggle && !waterInspectorLakeInteractionToggle.dataset.bound) {
     waterInspectorLakeInteractionToggle.addEventListener("change", (event) => {
       runtimeState.styleConfig.lakes.interactive = !!event.target.checked;
