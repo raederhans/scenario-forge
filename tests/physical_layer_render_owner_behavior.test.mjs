@@ -93,6 +93,46 @@ test("DEM reuses fill paths with current intensity rather than cached style", ()
   assert.deepEqual(context.calls.filter(call=>call.type==='fill').map(call=>[call.path,call.alpha]),[[cached,.15],[cached,.3]]);
 });
 
+test("zero atlas alpha and zero DEM opacity bypass intensity compositing and feature work", () => {
+  const features = Array.from({ length: 1000 }, (_, index) => createAtlasFeature("forest", "semantic_overlay", `forest-${index}`));
+  const compositeCalls = [];
+  let boundsChecks = 0;
+  const h = createOwner({
+    atlasFeatures: features,
+    helperOverrides: {
+      paintWithPhysicalIntensity(channel, blendMode, draw) {
+        compositeCalls.push({ channel, blendMode });
+        return draw(blendMode);
+      },
+      pathBoundsInScreen() { boundsChecks += 1; return true; },
+    },
+  });
+  h.owner.drawPhysicalAtlasCollectionLayer({ features }, "semantic_overlay", h.state.styleConfig.physical, { baseOpacity: 0 });
+  assert.deepEqual(compositeCalls, []);
+  assert.equal(boundsChecks, 0);
+  assert.equal(h.helperCalls.includes("clip"), false);
+  assert.equal(h.context.calls.some((call) => call.type === "fill"), false);
+
+  h.owner.drawPhysicalAtlasCollectionLayer({ features: [features[0]] }, "semantic_overlay", h.state.styleConfig.physical, { baseOpacity: 0.5 });
+  assert.deepEqual(compositeCalls, [{ channel: "physicalAtlas", blendMode: "source-over" }]);
+  assert.deepEqual(h.context.calls.filter((call) => call.type === "fill").map((call) => call.alpha), [0.5]);
+  compositeCalls.length = 0;
+  boundsChecks = 0;
+  h.helperCalls.length = 0;
+  h.context.calls.length = 0;
+
+  h.state.contextLayerExternalDataByName = { physical_hillshade: { features: [{ properties: { shade: 1 } }] } };
+  h.state.styleConfig.physical.opacity = 0;
+  assert.equal(h.owner.drawPhysicalHillshadeLayer(4), 0);
+  h.state.styleConfig.physical.opacity = 1;
+  h.state.styleConfig.physical.landformIntensity = 0;
+  assert.equal(h.owner.drawPhysicalHillshadeLayer(4), 0);
+  assert.deepEqual(compositeCalls, []);
+  assert.equal(boundsChecks, 0);
+  assert.equal(h.helperCalls.includes("clip"), false);
+  assert.equal(h.context.calls.some((call) => call.type === "fill"), false);
+});
+
 function createContourFeature(id, elevation = 500) {
   return {
     id,
@@ -285,6 +325,31 @@ test("region names follow language, scale, class visibility and avoid mutual ove
   assert.equal(h.owner.drawPhysicalRegionLabels(1), 0);
 });
 
+test("region name opacity follows the physical layer opacity and zero opacity does not claim placements", () => {
+  const context = createCanvasContext();
+  const textCalls = [];
+  context.measureText = () => ({ width: 20 });
+  context.strokeText = (text) => textCalls.push({ type: "stroke", alpha: context.globalAlpha, text });
+  context.fillText = (text) => textCalls.push({ type: "fill", alpha: context.globalAlpha, text });
+  const h = createOwner({ context });
+  h.state.styleConfig.physical.showRegionLabels = true;
+  h.state.contextLayerExternalDataByName = { physical_region_labels: { features: [{
+    geometry: { coordinates: [0, 0] },
+    properties: { name_en: "Alps", atlas_class: "mountain", min_zoom: 2 },
+  }] } };
+
+  h.state.styleConfig.physical.opacity = 0.5;
+  assert.equal(h.owner.drawPhysicalRegionLabels(4), 1);
+  assert.deepEqual(textCalls.map(({ type, alpha }) => [type, alpha]), [["stroke", 0.4], ["fill", 0.4]]);
+
+  textCalls.length = 0;
+  const occupiedBoxes = [];
+  h.state.styleConfig.physical.opacity = 0;
+  assert.equal(h.owner.drawPhysicalRegionLabels(4, { occupiedBoxes }), 0);
+  assert.deepEqual(textCalls, []);
+  assert.deepEqual(occupiedBoxes, []);
+});
+
 test("physical owner respects pre-applied clip masks", () => {
   const semantic = createAtlasFeature("forest", "semantic_overlay", "semantic");
   const relief = createAtlasFeature("mountain", "relief_base", "relief");
@@ -332,9 +397,16 @@ test("physical contour collection batches colors and scales line width by zoom",
 });
 
 test("physical contour layer uses source-over and reports major and minor counts", () => {
+  const compositeCalls = [];
   const harness = createOwner({
     contourMajorFeatures: [createContourFeature("major-a", 500)],
     contourMinorFeatures: [createContourFeature("minor-a", 100)],
+    helperOverrides: {
+      paintWithPhysicalIntensity(channel, blendMode, draw) {
+        compositeCalls.push({ channel, blendMode });
+        return draw(blendMode);
+      },
+    },
   });
 
   harness.owner.drawPhysicalContourLayer(2);
@@ -342,9 +414,39 @@ test("physical contour layer uses source-over and reports major and minor counts
   const strokes = harness.context.calls.filter((call) => call.type === "stroke");
   assert.equal(strokes.length, 2);
   assert.ok(strokes.every((stroke) => stroke.composite === "source-over"));
+  assert.deepEqual(compositeCalls, [{ channel: "physicalContour", blendMode: "source-over" }]);
   assert.equal(harness.metrics.at(-1).name, "drawPhysicalContourLayer");
   assert.equal(harness.metrics.at(-1).details.majorFeatureCount, 1);
   assert.equal(harness.metrics.at(-1).details.minorFeatureCount, 1);
+});
+
+test("contour skip states preserve diagnostics without entering intensity compositing", () => {
+  const cases = [
+    ["hidden", (state) => { state.showPhysical = false; }],
+    ["atlas-only", (state) => { state.styleConfig.physical.mode = "atlas_only"; }],
+    ["no-data", (state) => { state.physicalContourMajorData = { type: "FeatureCollection", features: [] }; }],
+    ["total-opacity-zero", (state) => { state.styleConfig.physical.opacity = 0; }],
+    ["contour-opacity-zero", (state) => { state.styleConfig.physical.contourOpacity = 0; }],
+  ];
+  for (const [reason, configure] of cases) {
+    const compositeCalls = [];
+    const h = createOwner({
+      contourMajorFeatures: [createContourFeature("major")],
+      helperOverrides: {
+        paintWithPhysicalIntensity(channel, blendMode, draw) {
+          compositeCalls.push(channel);
+          return draw(blendMode);
+        },
+        shouldReportDeferredContextLayerGap: () => true,
+      },
+    });
+    configure(h.state);
+    h.owner.drawPhysicalContourLayer(2);
+    assert.deepEqual(compositeCalls, [], `${reason}: no compositor call`);
+    assert.equal(h.metrics.at(-1).name, "drawPhysicalContourLayer", `${reason}: skip metric retained`);
+    assert.equal(h.metrics.at(-1).details.skipped, true, `${reason}: skip recorded`);
+    if (reason === "no-data") assert.ok(h.helperCalls.includes("warn:physical-contours-major-missing"));
+  }
 });
 
 class AggregatePath {

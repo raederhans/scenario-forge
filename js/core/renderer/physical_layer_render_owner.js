@@ -52,6 +52,7 @@ export function createPhysicalLayerRenderOwner({
   function drawPhysicalAtlasCollectionLayer(
     atlasCollection, layerName, cfg, options = {}
   ) {
+    if (options.baseOpacity === 0) return 0;
     return paintWithPhysicalIntensity("physicalAtlas", options.blendMode || "source-over", (blendMode) =>
       drawPhysicalAtlasCollectionUnmasked(atlasCollection, layerName, cfg, { ...options, blendMode }));
   }
@@ -405,7 +406,7 @@ export function createPhysicalLayerRenderOwner({
 
   function drawPhysicalHillshadeLayer(k) {
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
-    if (!runtimeState.showPhysical || cfg.mode === "contours_only" || !cfg.hillshadeOpacity || k < 4) return 0;
+    if (!runtimeState.showPhysical || cfg.mode === "contours_only" || !cfg.hillshadeOpacity || cfg.opacity <= 0 || (cfg.landformIntensity ?? 1) <= 0 || k < 4) return 0;
     const features = runtimeState.contextLayerExternalDataByName?.physical_hillshade?.features;
     if (!features?.length) return 0;
     return paintWithPhysicalIntensity("physicalAtlas", "source-over", () => {
@@ -433,7 +434,7 @@ export function createPhysicalLayerRenderOwner({
 
   function drawPhysicalRegionLabels(k, { occupiedBoxes = [] } = {}) {
     const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
-    if (!runtimeState.showPhysical || !cfg.showRegionLabels || cfg.mode === "contours_only" || k < 2) return 0;
+    if (!runtimeState.showPhysical || !cfg.showRegionLabels || cfg.opacity <= 0 || cfg.mode === "contours_only" || k < 2) return 0;
     const features = runtimeState.contextLayerExternalDataByName?.physical_region_labels?.features || [];
     const context = getContext();
     const projection = getProjection();
@@ -443,7 +444,7 @@ export function createPhysicalLayerRenderOwner({
     const maxRank = Math.max(1, Math.floor(Math.log2(k)) + 1);
     context.save();
     context.globalCompositeOperation = "source-over";
-    context.globalAlpha = 0.8;
+    context.globalAlpha = 0.8 * cfg.opacity;
     context.font = `400 ${11.5 / k}px system-ui, sans-serif`;
     context.textAlign = "center";
     context.textBaseline = "middle";
@@ -469,13 +470,20 @@ export function createPhysicalLayerRenderOwner({
   }
 
   function drawPhysicalContourLayer(k, { interactive = false, clipAlreadyApplied = false } = {}) {
-    return paintWithPhysicalIntensity("physicalContour", "source-over", () =>
-      drawPhysicalContourLayerUnmasked(k, { interactive, clipAlreadyApplied }));
+    const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
+    const canDraw = runtimeState.showPhysical
+      && cfg.mode !== "atlas_only"
+      && Array.isArray(runtimeState.physicalContourMajorData?.features)
+      && runtimeState.physicalContourMajorData.features.length > 0
+      && cfg.opacity > 0
+      && cfg.contourOpacity > 0;
+    const draw = () => drawPhysicalContourLayerUnmasked(k, { interactive, clipAlreadyApplied, cfg });
+    return canDraw ? paintWithPhysicalIntensity("physicalContour", "source-over", draw) : draw();
   }
 
-  function drawPhysicalContourLayerUnmasked(k, { interactive = false, clipAlreadyApplied = false } = {}) {
+  function drawPhysicalContourLayerUnmasked(k, { interactive = false, clipAlreadyApplied = false, cfg: suppliedCfg } = {}) {
     const startedAt = nowMs();
-    const cfg = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
+    const cfg = suppliedCfg || normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical);
     const presetProfile = getPhysicalPresetRenderProfile(cfg);
     const zoomProfile = getContourZoomStyleProfile(k);
     const maskInfo = getPhysicalLandMaskInfo();
@@ -506,6 +514,20 @@ export function createPhysicalLayerRenderOwner({
         interactive: !!interactive,
         skipped: true,
         reason: shouldReportDeferredContextLayerGap("physical_contours_major") ? "no-data" : "pending-deferred-context",
+        maskSource: maskInfo.maskSource,
+        maskFeatureCount: maskInfo.maskFeatureCount,
+        maskArcRefEstimate: maskInfo.maskArcRefEstimate,
+      });
+      return;
+    }
+
+    if (cfg.opacity <= 0 || cfg.contourOpacity <= 0) {
+      collectContextMetric("drawPhysicalContourLayer", nowMs() - startedAt, {
+        featureCount: getFeatureCollectionFeatureCount(runtimeState.physicalContourMajorData)
+          + getFeatureCollectionFeatureCount(runtimeState.physicalContourMinorData),
+        interactive: !!interactive,
+        skipped: true,
+        reason: "opacity",
         maskSource: maskInfo.maskSource,
         maskFeatureCount: maskInfo.maskFeatureCount,
         maskArcRefEstimate: maskInfo.maskArcRefEstimate,

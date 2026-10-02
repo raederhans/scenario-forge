@@ -70,6 +70,46 @@ test("contours-only status uses the requested LOD and excludes dormant atlas dat
   assert.equal(buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical").summary, "Loading/settling");
 });
 
+test("physical status exposes requested detail failures while preserving overview availability", () => {
+  const state = createState({
+    showPhysical: true,
+    physicalSemanticsData: { features: [{}] },
+    contextLayerLoadStateByName: { physical_semantics: "loaded", physical_semantics_detail: "error" },
+    renderPerfMetrics: { drawPhysicalAtlasLayer: { renderedCount: 1 } },
+  });
+  const diagnostic = () => buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
+  assert.equal(diagnostic().severity, "warning");
+  assert.equal(diagnostic().summary, "Visible · 1 visible · 1 loaded · Regional detail: Load error");
+  state.zoomTransform.k = 1;
+  assert.equal(diagnostic().severity, "active");
+  assert.equal(diagnostic().summary, "Visible · 1 visible · 1 loaded");
+});
+
+test("physical status reports requested names and shade independently and ignores dormant failures", () => {
+  const state = createState({
+    showPhysical: true,
+    physicalSemanticsData: { features: [{}] },
+    styleConfig: { physical: { mode: "atlas_only", showRegionLabels: true, hillshadeOpacity: 0.1 } },
+    contextLayerLoadStateByName: {
+      physical_semantics: "loaded", physical_region_labels: "error", physical_hillshade: "loading",
+    },
+  });
+  const diagnostic = () => buildLayerStatusDiagnostics(state).find((entry) => entry.id === "physical");
+  assert.equal(diagnostic().severity, "warning");
+  assert.match(diagnostic().summary, /Physical region names: Load error/);
+  assert.match(diagnostic().summary, /Terrain shading: Loading\/settling/);
+  state.styleConfig.physical.showRegionLabels = false;
+  state.styleConfig.physical.hillshadeOpacity = 0;
+  assert.equal(diagnostic().summary, "Loaded · 1 loaded");
+  state.styleConfig.physical.mode = "contours_only";
+  state.styleConfig.physical.showRegionLabels = true;
+  state.styleConfig.physical.hillshadeOpacity = 0.1;
+  assert.equal(diagnostic().severity, "active");
+  assert.doesNotMatch(diagnostic().summary, /names|shading|detail/);
+  state.showPhysical = false;
+  assert.equal(diagnostic().summary, "Hidden");
+});
+
 test("layer diagnostics report loaded and visible counts from existing metrics", () => {
   const state = createState({
     urbanData: {
