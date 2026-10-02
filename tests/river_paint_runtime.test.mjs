@@ -2,7 +2,8 @@ import { RIVER_PAINT_PILOT } from '../js/core/river_paint/pilot_manifest.js';
 import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, rectangle, feature, d3, captureCells, realPilot } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, makeWave3Fixture, makeWave7Fixture, realWave5, realWave6, realWave7, realWave7TransportText, rectangle, feature, d3, captureCells, realPilot, realWave2, realWave3, realWave3Text } from './helpers/river_paint_fixture.mjs';
+import { loadRiverPaintPilot } from '../js/core/river_paint/pilot_loader.js';
 import { getRiverPaintRuntime, createRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
 import { applyFeaturePaintState } from '../js/core/state/color_state.js';
@@ -11,6 +12,8 @@ import { createPaintContourGraphBuilder } from '../js/core/renderer/paint_contou
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
 import { createPaintContourRuntime } from '../js/core/renderer/paint_contour_runtime.js';
 import { createPaintContourWorkerClient } from '../js/core/paint_contour_worker_client.js';
+import { createPoliticalCollectionOwner } from '../js/core/renderer/political_collection_owner.js';
+import { fragmentCamouflageRules } from '../js/core/country_feature_policies.js';
 import { getMapDataBoundary } from '../js/core/map_data_boundary.js';
 
 test('point targeting distinguishes both banks while preserving canonical parent ID', async () => {
@@ -148,16 +151,87 @@ test('blocked, stale and mismatched-parent hits cannot write; eyedropper uses ch
 });
 
 
-test('same ownership hash cannot activate a pilot against a regenerated geometry build', async () => {
-  const pack = realPilot();
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
+test(`${label}: saved pack is retained and a regenerated geometry build is rejected`, async () => {
+  const pack = readPack();
   const manifest = { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt };
   const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash,
-    activeScenarioManifest: manifest, riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, overrides: {} }) };
+    activeScenarioManifest: manifest,
+    landIndex: new Map(pack.parents.map(p => [p.parentId, feature(p.parentId, p.parentGeometry)])),
+    riverPaint: normalizeRiverPaintState({ schemaVersion: 1, pack, overrides: {} }) };
   const runtime = createRiverPaintRuntime(state);
   assert.equal(runtime.getActivePack().packId, pack.packId);
+  const cellId = pack.parents[0].cells[0].id;
+  applyRiverCellPaintState(state, cellId, '#abcdef');
+  const saved = state.riverPaint.pack;
+  const enabled = await runtime.enable(() => { throw new Error('Saved pack must not be replaced'); });
+  assert.equal(enabled.ready, true); assert.equal(enabled.geometryChanged, false);
+  assert.equal(state.riverPaint.pack, saved);
+  assert.equal(state.riverPaint.overrides[cellId], '#abcdef');
   state.activeScenarioManifest = { ...manifest, generated_at: 'new-geometry-build' };
   assert.equal(runtime.getActivePack(), null);
   assert.throws(() => runtime.assertReadyForExport(), /geometry build/);
   await assert.rejects(runtime.enable(async () => pack), /does not match/);
   assert.equal(state.riverPaint.pack.packId, pack.packId);
+});
+
+test('new project installs authenticated wave7 through compact transport and retains administrative IDs', async () => {
+  const { state, pack } = makeWave7Fixture({ installed: false });
+  const ids = [...state.landIndex.keys()]; const originalLand = state.landData;
+  const runtime = createRiverPaintRuntime(state, { geoContains: d3.geoContains }); let requests = 0;
+  const result = await runtime.enable(options => loadRiverPaintPilot({ ...options, fetchImpl: async url => {
+    requests++; assert.equal(url, 'data/river_partitions/modern_world_wave7.transport.json');
+    return { ok: true, text: async () => realWave7TransportText() };
+  } }));
+  assert.equal(result.ready, true); assert.equal(result.geometryChanged, true); assert.equal(requests, 1);
+  assert.equal(runtime.getActivePack().packId, pack.packId);
+  assert.equal(runtime.surfaces().length, 1276 + 104);
+  assert.deepEqual([...state.landIndex.keys()], ids); assert.equal(state.landData, originalLand);
+  runtime.assertReadyForExport();
+});
+
+test('wave3 load fails closed against a wrong baseline, version, missing or regenerated manifest', async () => {
+  for (const mutate of [
+    s => { s.scenarioBaselineHash = 'other-baseline'; },
+    s => { s.activeScenarioManifest.version++; },
+    s => { s.activeScenarioManifest.generated_at = 'new-build'; },
+    s => { s.activeScenarioManifest = null; },
+  ]) {
+    const { state, pack } = makeWave3Fixture({ installed: false }); mutate(state);
+    const runtime = createRiverPaintRuntime(state);
+    await assert.rejects(runtime.enable(async () => pack), /does not match/);
+    assert.equal(state.riverPaint.pack, null); assert.equal(runtime.diagnostics().pending, false);
+    assert.equal(runtime.diagnostics().status, 'error');
+  }
+});
+
+
+test('reviewed contour neighbors retain pinned fragments through the interactive display filter', async () => {
+  const { state, pack } = makeWave3Fixture();
+  const previous = globalThis.d3; globalThis.d3 = d3;
+  try {
+    const ids = ['BY_INT_VITEBSK', 'RU_RAY_50074027B51726500082089', 'RU_RAY_50074027B64424707524567'];
+    const source = { type: 'FeatureCollection', features: ids.map(id => ({
+      type: 'Feature', id, properties: { id, cntr_code: id.startsWith('BY') ? 'BY' : 'RU', __source: 'detail' },
+      geometry: pack.support.find(p => p.parentId === id).parentGeometry,
+    })) };
+    const runtime = createRiverPaintRuntime(state);
+    const owner = createPoliticalCollectionOwner({ state, constants: { fragmentCamouflageRules }, helpers: {
+      getFeatureId: f => f.id, getDetailTier: () => '', getFeatureCountryCodeNormalized: f => f.properties.cntr_code,
+      isPoliticalInteractionRenderableFeature: () => true,
+    } });
+    const pinned = runtime.pinCollection(source);
+    for (const editing of [true, false]) {
+      runtime.setMode(editing);
+      const display = owner.buildInteractiveLandData(pinned);
+      for (const f of display.features) {
+        assert.equal(f.geometry, pack.support.find(p => p.parentId === f.id).geometry);
+        assert.equal(f.properties.__visualFragmentCamouflage, undefined);
+      }
+    }
+    state.riverPaint = null;
+    const ordinary = owner.buildInteractiveLandData(source);
+    assert.ok(ordinary.features.every(f => f.properties.__visualFragmentPrunedCount > 0));
+    assert.ok(source.features.every(f => !f.properties.__visualFragmentCamouflage));
+  } finally { globalThis.d3 = previous; }
 });

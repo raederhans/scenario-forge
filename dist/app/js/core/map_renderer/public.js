@@ -68,11 +68,14 @@ export {
   rebuildStaticMeshes,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   renderLegend,
   RENDER_PASS_NAMES,
 
   // Viewport.
   focusWaterRegionById,
+  focusRiverPaintParentById,
+  applyRiverPaintCellById,
   getZoomPercent,
   resetZoomToFit,
   setDebugMode,

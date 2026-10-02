@@ -3,6 +3,9 @@ city_marker_visibility_regression.spec.js
 city_reveal_plan_regression.spec.js
 city_urban_rendering_regression.spec.js
 dev_workspace_render_boundary.spec.js
+editor_detail_polish.spec.js
+editor_refresh_motion.spec.js
+editor_task_context.spec.js
 editor_workspace_renewal.spec.js
 hoi4_rk_russia_regression.spec.js
 map_clarity.spec.js
@@ -12,7 +15,9 @@ ocean_geometry_contract.spec.js
 ownership_retirement.spec.js
 physical_layer_regression.spec.js
 review_regressions.spec.js
+river_contour_visibility.spec.js
 river_layer_regression.spec.js
+river_overlap_visibility.spec.js
 river_paint.spec.js
 scenario_boundary_regression.spec.js
 shortcut_history_render_boundary.spec.js

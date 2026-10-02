@@ -3,6 +3,7 @@
 export function createPaintContourMesh(graph, resolveColor, {
   resolveBoundaryKey = () => null,
   separatePoliticalBorders = () => false,
+  isArcEligible = () => true,
 } = {}) {
   const { featureIds, offsets, owners, coordinates } = graph;
   if (!(coordinates instanceof Float64Array) || !(offsets instanceof Uint32Array)
@@ -29,7 +30,6 @@ export function createPaintContourMesh(graph, resolveColor, {
       if (index === undefined) continue;
       const nextColor = normalize(resolveColor(id));
       const nextBoundaryKey = normalizeBoundaryKey(resolveBoundaryKey(id));
-      if (nextColor === colors[index] && nextBoundaryKey === boundaryKeys[index]) continue;
       colors[index] = nextColor;
       boundaryKeys[index] = nextBoundaryKey;
       for (const arc of incidents.get(id) || []) affected.add(arc);
@@ -40,6 +40,7 @@ export function createPaintContourMesh(graph, resolveColor, {
       const a = colors[owners[arc * 2]], b = colors[owners[arc * 2 + 1]];
       const ownerA = boundaryKeys[owners[arc * 2]], ownerB = boundaryKeys[owners[arc * 2 + 1]];
       const enabled = !!a && !!b && a !== b
+        && isArcEligible(featureIds[owners[arc * 2]], featureIds[owners[arc * 2 + 1]])
         && (!bordersSeparated || (!!ownerA && !!ownerB && ownerA === ownerB));
       if (enabled === active.has(arc)) continue;
       changed = true;

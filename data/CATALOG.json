@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generated_at": "2026-09-29T02:43:25.512929+00:00",
+  "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 672,
+    "entries": 677,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -42,7 +42,7 @@
       "quick_fill_china_reference": 1,
       "quick_fill_prefecture_crosswalk": 1,
       "releasable_catalog": 1,
-      "river_partitions": 1,
+      "river_partitions": 6,
       "runtime_asset_registry": 1,
       "runtime_political_topology": 1,
       "scenario_registry": 1,
@@ -71,12 +71,12 @@
       "bmp": 1,
       "geojson": 152,
       "javascript": 2,
-      "json": 344,
+      "json": 349,
       "topojson": 173
     },
     "by_read_mode": {
       "binary": 1,
-      "json": 669,
+      "json": 674,
       "module": 2
     }
   },
@@ -918,6 +918,71 @@
       "schemaRef": "schema://json/object/v1",
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.river_partitions:modern_world_pilot",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_wave2",
+      "url": "data/river_partitions/modern_world_wave2.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_wave2",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_wave3",
+      "url": "data/river_partitions/modern_world_wave3.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_wave3",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_wave5",
+      "url": "data/river_partitions/modern_world_wave5.transport.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_wave5",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_wave6",
+      "url": "data/river_partitions/modern_world_wave6.transport.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_wave6",
+      "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "river_partitions:modern_world_wave7",
+      "url": "data/river_partitions/modern_world_wave7.transport.json",
+      "role": "river_partitions",
+      "format": "json",
+      "schemaRef": "schema://json/object/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.river_partitions:modern_world_wave7",
       "cachePolicy": "default",
       "sourceId": "",
       "readMode": "json",

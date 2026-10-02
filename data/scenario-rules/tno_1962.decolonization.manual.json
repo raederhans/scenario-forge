@@ -65,7 +65,8 @@
       "historical_fidelity": "extended",
       "entry_kind": "scenario_country",
       "include_feature_prefixes": ["GY_ADM1_GUY-"],
-      "notes": "Guyana split out of residual British ownership as an independent state."
+      "include_feature_ids": ["GF_PRIMARY"],
+      "notes": "Guyana split out of residual British ownership as an independent state. Restore French Guiana under the same existing GY identity: the scenario's recorded TNO source (workshop 3583339918) assigns both state 310 (French SA) and state 687 (British Guyana) to GUY, with GUY cores. This preserves that source version rather than importing the newer GUC assignment."
     },
     {
       "rule_id": "tno_1962_belize_independent",

@@ -18,6 +18,7 @@
     </script>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/editor-workspace.css" />
+    <link rel="stylesheet" href="css/editor-tool-guidance.css" />
     <link rel="preload" href="data/scenarios/index.json" as="fetch" crossorigin />
     <link rel="modulepreload" href="js/main.js" />
   </head>
@@ -940,16 +941,16 @@
                         </div>
                         <div class="city-points-panel-stack">
                           <section class="appearance-control-card city-hierarchy-card" aria-labelledby="cityHierarchyTitle">
-                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="City hierarchy">City hierarchy</h4>
-                            <div class="city-symbol-legend" aria-label="City hierarchy" data-i18n-aria-label="City hierarchy">
-                              <span><i class="city-key-capital" aria-hidden="true">☆</i><span data-i18n="Capital">Capital</span></span>
-                              <span><i class="city-key metropolis" aria-hidden="true"></i><span data-i18n="Metropolis">Metropolis</span></span>
-                              <span><i class="city-key large" aria-hidden="true"></i><span data-i18n="Large city">Large city</span></span>
-                              <span><i class="city-key medium" aria-hidden="true"></i><span data-i18n="Medium city">Medium city</span></span>
-                              <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
-                              <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
-                            </div>
+                            <h4 id="cityHierarchyTitle" class="appearance-control-card-title" data-i18n="Display & style">Display &amp; style</h4>
                             <div class="appearance-control-card-stack">
+                              <label class="range-label" for="cityPointsTheme" data-i18n="Style">Style</label>
+                              <select id="cityPointsTheme" class="select-input">
+                                <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Graphite Signal</option>
+                                <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Cyan Beacon</option>
+                                <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Vermilion Ledger</option>
+                                <option id="optCityPointsThemeSlateBlue" value="slate_blue">Royal Violet</option>
+                                <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Night</option>
+                              </select>
                               <label class="range-label" for="cityPointsDensityPreset" data-i18n="Map detail">Map detail</label>
                               <select id="cityPointsDensityPreset" class="select-input">
                                 <option value="compact" data-i18n="Compact">Compact</option><option value="balanced" selected data-i18n="Standard">Standard</option><option value="detailed" data-i18n="Detailed">Detailed</option>
@@ -959,21 +960,23 @@
                                 <option value="metropolis" data-i18n="Metropolis">Metropolis</option><option value="large" data-i18n="Large city">Large city</option><option value="medium" data-i18n="Medium city">Medium city</option><option value="small" data-i18n="Small city">Small city</option><option value="town" selected data-i18n="Town">Town</option>
                               </select>
                             </div>
-                            <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
+                            <details class="city-hierarchy-help">
+                              <summary data-i18n="City hierarchy">City hierarchy</summary>
+                              <div class="city-symbol-legend" aria-label="City hierarchy" data-i18n-aria-label="City hierarchy">
+                                <span><i class="city-key-capital" aria-hidden="true">☆</i><span data-i18n="Capital">Capital</span></span>
+                                <span><i class="city-key metropolis" aria-hidden="true"></i><span data-i18n="Metropolis">Metropolis</span></span>
+                                <span><i class="city-key large" aria-hidden="true"></i><span data-i18n="Large city">Large city</span></span>
+                                <span><i class="city-key medium" aria-hidden="true"></i><span data-i18n="Medium city">Medium city</span></span>
+                                <span><i class="city-key small" aria-hidden="true"></i><span data-i18n="Small city">Small city</span></span>
+                                <span><i class="city-key town" aria-hidden="true"></i><span data-i18n="Town">Town</span></span>
+                              </div>
+                              <p id="cityPointsHierarchyHint" class="city-points-advanced-hint"></p>
+                            </details>
                           </section>
 
                           <section class="appearance-control-card city-points-style-card" aria-labelledby="lblCityPointsStyleGroup">
-                            <h4 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Style">Style</h4>
+                            <h4 id="lblCityPointsStyleGroup" class="appearance-control-card-title" data-i18n="Markers">Markers</h4>
                             <div class="appearance-control-card-stack">
-                              <div>
-                                <select id="cityPointsTheme" class="select-input" aria-labelledby="lblCityPointsStyleGroup">
-                                  <option id="optCityPointsThemeClassicGraphite" value="classic_graphite" selected>Graphite Signal</option>
-                                  <option id="optCityPointsThemeAtlasInk" value="atlas_ink">Cyan Beacon</option>
-                                  <option id="optCityPointsThemeParchmentSepia" value="parchment_sepia">Vermilion Ledger</option>
-                                  <option id="optCityPointsThemeSlateBlue" value="slate_blue">Royal Violet</option>
-                                  <option id="optCityPointsThemeIvoryOutline" value="ivory_outline">Ivory Night</option>
-                                </select>
-                              </div>
                               <div>
                                 <div class="range-row">
                                   <label id="lblCityPointsMarkerScale" class="range-label" for="cityPointsMarkerScale">Marker Scale</label>
@@ -2067,9 +2070,9 @@
                       </div>
                       <p id="appearancePresetSummary" class="panel-hint" data-i18n="0 presets">0 presets</p>
                       <p id="appearancePresetList" class="appearance-preset-list" data-preset-count="0" data-i18n="No appearance presets saved">No appearance presets saved</p>
-                      <div class="sidebar-equal-actions">
-                        <button id="appearancePresetApplyBtn" type="button" class="btn-secondary" disabled data-i18n="Apply">Apply</button>
-                        <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary" disabled data-i18n="Delete">Delete</button>
+                      <div class="preset-library-actions">
+                        <button id="appearancePresetApplyBtn" type="button" class="btn-primary" disabled data-i18n="Apply">Apply</button>
+                        <button id="appearancePresetDeleteBtn" type="button" class="btn-secondary preset-delete-action" disabled data-i18n="Delete">Delete</button>
                       </div>
                       <div class="sidebar-equal-actions">
                         <button id="appearancePresetImportBtn" type="button" class="btn-secondary" data-i18n="Import">Import</button>
@@ -2385,6 +2388,23 @@
                   </button>
                   <button id="riverPaintToggleBtn" type="button" class="dock-segment-btn" aria-pressed="false" aria-describedby="riverPaintStatus">River cells</button>
                   <span id="riverPaintStatus" class="visually-hidden" role="status" aria-live="polite"></span>
+                  <div id="riverPaintNavigation" role="group" aria-label="River locations" hidden>
+                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search location name or ID" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
+                    <select id="riverPaintRiverSelect" class="dock-select" aria-label="Filter by river" aria-controls="riverPaintLocationSelect" hidden disabled></select>
+                    <div class="river-paint-location-row">
+                      <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river location" aria-describedby="riverPaintLocationResults" hidden disabled></select>
+                      <button id="riverPaintLocationGoBtn" type="button" class="dock-segment-btn" aria-label="Go to selected location" hidden disabled>Go</button>
+                    </div>
+                    <small id="riverPaintLocationResults" role="status" aria-live="polite" aria-atomic="true"></small>
+                    <section id="riverCellPicker" hidden aria-labelledby="riverCellPickerTitle">
+                      <strong id="riverCellPickerTitle">River cells</strong>
+                      <select id="riverCellSelect" class="dock-select" aria-label="Choose river cell"></select>
+                      <svg id="riverCellPreview" viewBox="0 0 240 104" role="img"></svg>
+                      <small id="riverCellPreviewCaption"></small>
+                      <button id="riverCellApplyBtn" type="button" class="dock-segment-btn">Apply current tool</button>
+                      <button id="riverCellCloseBtn" type="button" class="dock-segment-btn">Close</button>
+                    </section>
+                  </div>
                 </div>
               </div>
 
@@ -2649,7 +2669,7 @@
             </div>
           </details>
 
-          <h2 id="waterInspectorHeading" class="visually-hidden">Water Regions</h2>
+          <h2 id="waterInspectorHeading" class="visually-hidden" data-i18n="Water Regions">Water Regions</h2>
           <details id="waterInspectorSection" class="card inspector-section sidebar-section-shell" aria-labelledby="waterInspectorHeading lblWaterInspector">
             <summary id="lblWaterInspector" class="sidebar-section-head">
               <span class="sidebar-section-title">Water Regions</span>
@@ -2709,8 +2729,8 @@
                   <div class="water-filter-field">
                     <label id="lblWaterSort" class="sidebar-field-label" for="waterInspectorSortSelect">Sort</label>
                     <select id="waterInspectorSortSelect" class="select-input">
-                      <option value="name">Name</option>
-                      <option value="type">Type</option>
+                      <option value="name" data-i18n="Name">Name</option>
+                      <option value="type" data-i18n="Type">Type</option>
                       <option value="group" data-i18n="Group">Group</option>
                       <option value="override" data-i18n="Has Override">Has Override</option>
                     </select>
@@ -2742,6 +2762,7 @@
                   <p id="waterInspectorEmptyHint" class="sidebar-tool-hint">
                     Click a sea, lake, or strait on the map, or choose one from the list.
                   </p>
+                  <button id="waterInspectorLakeSettingsBtn" class="btn-secondary" type="button" aria-controls="editorWaterFilters" data-i18n="Lake interaction settings" hidden>Lake interaction settings</button>
                 </div>
                 <div id="waterInspectorSelected" class="hidden">
                   <p id="waterInspectorDetailHint" class="sidebar-tool-hint mt-2 hidden"></p>
@@ -2872,7 +2893,7 @@
               <div id="legendEditorStack" class="inspector-panel-body inspector-stack"></div>
             </details>
 
-            <h2 id="frontlineProjectHeading" class="visually-hidden">Frontlines & Annotations</h2>
+            <h2 id="frontlineProjectHeading" class="visually-hidden" data-i18n="Frontlines & Annotations">Frontlines &amp; Annotations</h2>
             <details id="frontlineProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="frontlineProjectHeading lblFrontlineProject">
               <summary id="lblFrontlineProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Frontlines & Annotations">Frontlines & Annotations</span>
@@ -2912,7 +2933,7 @@
               </div>
             </details>
 
-            <h2 id="exportProjectHeading" class="visually-hidden">Export</h2>
+            <h2 id="exportProjectHeading" class="visually-hidden" data-i18n="Export">Export</h2>
             <details id="exportProjectSection" class="card inspector-section inspector-section-secondary sidebar-section-shell is-secondary" aria-labelledby="exportProjectHeading lblExportProject" open>
               <summary id="lblExportProject" class="sidebar-section-head">
                 <span class="sidebar-section-title is-secondary" data-i18n="Export">Export</span>
@@ -2940,7 +2961,7 @@
               </div>
             </details>
 
-            <h2 id="inspectorUtilitiesHeading" class="visually-hidden">Utilities</h2>
+            <h2 id="inspectorUtilitiesHeading" class="visually-hidden" data-i18n="Utilities">Utilities</h2>
             <details id="inspectorUtilitiesSection" class="card inspector-section sidebar-support-block" aria-labelledby="inspectorUtilitiesHeading lblInspectorUtilities">
               <summary id="lblInspectorUtilities" class="sidebar-support-head" data-i18n="Utilities">
                 <span class="sidebar-support-title">Utilities</span>
@@ -2993,7 +3014,7 @@
               </div>
             </details>
 
-            <h2 id="diagnosticsHeading" class="visually-hidden">Diagnostics</h2>
+            <h2 id="diagnosticsHeading" class="visually-hidden" data-i18n="Diagnostics">Diagnostics</h2>
             <details id="diagnosticsSection" class="card inspector-section dev-only sidebar-appendix-shell" aria-labelledby="diagnosticsHeading lblDiagnostics">
               <summary id="lblDiagnostics" class="sidebar-appendix-head">
                 <span class="sidebar-appendix-title">Diagnostics</span>
@@ -3443,7 +3464,8 @@
             </li>
             <li id="scenarioGuideStepSelect" class="scenario-guide-step">
               <strong data-i18n="2. Select the target country in Inspector">2. Select the target country in Inspector</strong>
-              <span class="scenario-guide-step-line" data-i18n="Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.">Open the right-side Inspector and confirm that the selected country is the one you actually want to edit.</span>
+              <span class="scenario-guide-step-line" data-i18n="Choose Objects → Countries on the left, select a country, then review its properties on the right.">Choose Objects → Countries on the left, select a country, then review its properties on the right.</span>
+              <button id="scenarioGuideSelectCountryBtn" class="btn-secondary scenario-guide-step-action" type="button" data-i18n="Go to country list">Go to country list</button>
             </li>
             <li id="scenarioGuideStepActive" class="scenario-guide-step">
               <strong data-i18n="3. Confirm HGO identity when needed">3. Confirm HGO identity when needed</strong>

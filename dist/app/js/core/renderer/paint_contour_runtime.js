@@ -8,6 +8,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
   resolveBoundaryKey = () => null,
   getBoundaryRevision = () => 0,
   separatePoliticalBorders = () => false,
+  isArcEligible = () => true,
   client = createPaintContourWorkerClient(),
   schedule = callback => setTimeout(callback, 0),
 } = {}) {
@@ -92,6 +93,7 @@ export function createPaintContourRuntime({ state, getFeatures, getFeatureId,
           return feature ? resolveBoundaryKey(feature, id) : null;
         },
         separatePoliticalBorders,
+        isArcEligible,
       });
       graphDiagnostics = graph.diagnostics;
       paintRevision = Number(state.colorRevision || 0);

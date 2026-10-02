@@ -3,6 +3,19 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { EXPORT_RENDER_BUDGET_BYTES, estimateExportRenderBytes } from "../js/core/renderer/export_render_budget.js";
+import { RENDER_PASS_OVERSCAN_RATIO_PER_SIDE, TRANSFORMED_FRAME_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
+
+test("river internal contours charge one border-sized RGBA scratch without changing the budget", () => {
+  const input = { width: 100, height: 80, pixelRatio: 2, passNames: ["borders", "borders"] };
+  const overscan = TRANSFORMED_FRAME_PASS_NAMES.includes("borders") ? RENDER_PASS_OVERSCAN_RATIO_PER_SIDE : 0;
+  const borderWidth = Math.floor((100 + 2 * Math.ceil(100 * overscan)) * 2);
+  const borderHeight = Math.floor((80 + 2 * Math.ceil(80 * overscan)) * 2);
+  assert.equal(estimateExportRenderBytes({ ...input, riverInternalContours: true })
+    - estimateExportRenderBytes(input), borderWidth * borderHeight * 4);
+  const noBorders = { ...input, passNames: ["political"] };
+  assert.equal(estimateExportRenderBytes({ ...noBorders, riverInternalContours: true }), estimateExportRenderBytes(noBorders));
+  assert.equal(EXPORT_RENDER_BUDGET_BYTES, 640 * 1024 * 1024);
+});
 import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
 
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
@@ -11,7 +24,9 @@ const end = source.indexOf("\nfunction composeTransformedFrameToBuffer(", start)
 assert.ok(start >= 0 && end > start);
 const exportSource = source.slice(start, end);
 
-function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false, contourStatus = "ready", politicalStatus = "ready", hgo = false } = {}) {
+function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false,
+  contourStatus = "ready", politicalStatus = "ready", hgo = false,
+  riverVisible = false, riverStatus = "ready", riverScratch = false } = {}) {
   const visibleCache = { canvases: { background: { width: 100, height: 50 } } };
   const runtimeState = {
     width: 100,
@@ -22,6 +37,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     zoomTransform: { k: 1, x: 0, y: 0 },
   };
   const calls = [];
+  const scratchDisposals = [];
   let allocatedCanvases = 0;
   const context = vm.createContext({
     runtimeState,
@@ -41,6 +57,16 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
       },
     },
     isHgoRuntimePreviewReady: () => hgo,
+    hasVisibleRiverPartitions: () => riverVisible,
+    getRiverInternalContourOwner: () => ({
+      diagnostics() { calls.push(`river-${riverStatus}`); return { status: riverStatus }; },
+    }),
+    riverContourRenderOwner: riverScratch ? {
+      dispose() {
+        calls.push("river-scratch-dispose");
+        scratchDisposals.push({ cache: runtimeState.renderPassCache, dpr: runtimeState.dpr });
+      },
+    } : null,
     getPaintContourRuntimeOwner: () => ({
       diagnostics() { calls.push(`contours-${contourStatus}`); return { status: contourStatus }; },
     }),
@@ -81,7 +107,44 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     createDefaultRenderPassCacheState: () => ({ canvases: {}, referenceTransforms: {} }),
   });
   vm.runInContext(exportSource, context);
-  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, allocatedCanvases: () => allocatedCanvases };
+  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, scratchDisposals,
+    allocatedCanvases: () => allocatedCanvases };
+}
+
+for (const riverStatus of ["idle", "partial", "error"]) {
+  test(`border export rejects ${riverStatus} river internal contours before allocation or cache mutation`, () => {
+    const h = harness({ riverVisible: true, riverStatus, riverScratch: true });
+    assert.throws(() => h.run(["borders"], { pixelRatio: 2 }), /River internal contours are not ready/);
+    assert.equal(h.allocatedCanvases(), 0);
+    assert.deepEqual(h.calls, ["contours-ready", `river-${riverStatus}`]);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.runtimeState.dpr, 1);
+    assert.equal(h.scratchDisposals.length, 0, "readiness failure preserves the current visible scratch");
+  });
+}
+
+test("border export without visible river partitions does not depend on local contour readiness", () => {
+  const h = harness({ riverStatus: "error" });
+  assert.equal(h.run(["borders"], { pixelRatio: 2 }).width, 200);
+  assert.deepEqual(h.calls, ["contours-ready", "political-ready", "render-borders-2", "draw-contours", "compose-200"]);
+});
+
+for (const [name, options, failure] of [
+  ["successful export", {}, null],
+  ["pass throw", { failPass: true }, /pass failed/],
+  ["composition failure", { failComposition: true }, /Export composition failed/],
+]) {
+  test(`target-resolution river export disposes scratch after restoring the visible cache on ${name}`, () => {
+    const h = harness({ riverVisible: true, riverScratch: true, ...options });
+    if (failure) assert.throws(() => h.run(["borders"], { pixelRatio: 2 }), failure);
+    else assert.equal(h.run(["borders"], { pixelRatio: 2 }).width, 200);
+    assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
+    assert.equal(h.runtimeState.dpr, 1);
+    assert.equal(h.scratchDisposals.length, 1);
+    assert.equal(h.scratchDisposals[0].cache, h.visibleCache, "cleanup follows cache restoration");
+    assert.equal(h.scratchDisposals[0].dpr, 1, "cleanup follows DPR restoration");
+    assert.equal(h.calls.at(-1), "river-scratch-dispose");
+  });
 }
 
 for (const politicalStatus of ["pending", "error"]) {
@@ -202,6 +265,7 @@ for (const pixelRatio of [null, 2]) {
     const context = vm.createContext({
       ensureScenarioPoliticalDetailForExport: async () => events.push("detail-ready"),
       ensurePaintContoursReady: async () => events.push("contours-ready"),
+      ensureCountryLabelsReadyForExport: async () => events.push("labels-ready"),
       resolveExportPassSequence: () => ["background", "labels"],
       RENDER_PASS_NAMES: ["background", "labels"],
       SVG_ANNOTATION_VIEWPORT_SELECTOR: ".annotation-layer",
@@ -218,7 +282,7 @@ for (const pixelRatio of [null, 2]) {
     assert.equal(h.allocatedCanvases(), 1);
     assert.equal(result.width, pixelRatio === null ? 100 : 200);
     assert.deepEqual(result.overlays, [".annotation-layer", ".special-zones-layer"]);
-    assert.deepEqual(events, ["detail-ready", "contours-ready"]);
+    assert.deepEqual(events, ["detail-ready", "contours-ready", "labels-ready"]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.visibleCache.canvases.background.overlays, undefined);
     const rasterOnly = await context.buildComposite({ textVisibility: {} }, dimensions);

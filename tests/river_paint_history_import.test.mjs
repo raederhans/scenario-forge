@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { state as appState } from '../js/core/state.js';
-import { makeFixture, realPilot } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, makeWave3Fixture, makeWave5Fixture, makeWave6Fixture, makeWave7Fixture, realWave5, realWave6, realWave7, realPilot, realWave2, realWave3 } from './helpers/river_paint_fixture.mjs';
 import { getRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { normalizeRiverPaintState, createDefaultRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
@@ -14,12 +14,14 @@ import { readRegisteredRuntimeHookSource, registerRuntimeHook } from '../js/core
 
 // Use production state authorities and scoped native mocks for singleton history.
 // Project serialization below needs no application singleton mutation at all.
-test('real cell mutation undo/redo and same-color whole-parent fill restore sparse child edits', async t => {
-  const fixture = await makeFixture();
+for (const [label, make] of [['synthetic', makeFixture], ['wave3', makeWave3Fixture], ['wave5', makeWave5Fixture], ['wave6', makeWave6Fixture], ['wave7', makeWave7Fixture]])
+test(`${label}: real cell mutation undo/redo and same-color whole-parent fill restore sparse child edits`, async t => {
+  const fixture = await make(); const parentId = fixture.parent.id;
   const saved = captureScenarioActivationState(appState);
   const oldRefresh = readRegisteredRuntimeHookSource(appState, 'refreshColorStateFn');
   const changed = { activeScenarioId: fixture.pack.sceneId, scenarioBaselineHash: fixture.pack.source.baselineHash,
     riverPaint: fixture.state.riverPaint, sovereignBaseColors: fixture.state.sovereignBaseColors,
+    activeScenarioManifest: fixture.state.activeScenarioManifest,
     visualOverrides: {}, mapSemanticMode: 'political' };
   restoreScenarioActivationState(appState, { values: { ...saved.values, ...changed },
     presentKeys: [...new Set([...saved.presentKeys, ...Object.keys(changed)])] });
@@ -36,13 +38,13 @@ test('real cell mutation undo/redo and same-color whole-parent fill restore spar
     assert.equal(appState.historyPast.length, 1);
     assert.equal(appState.riverPaint.overrides[cellId], '#0000ff');
     assert.equal(undoHistory(), true); assert.deepEqual(appState.riverPaint.overrides, {});
-    assert.deepEqual(refreshes.at(-1).featureIds, ['P']);
+    assert.deepEqual(refreshes.at(-1).featureIds, [parentId]);
     assert.equal(redoHistory(), true); assert.equal(appState.riverPaint.overrides[cellId], '#0000ff');
-    const before = captureHistoryState({ featureIds: ['P'] });
+    const before = captureHistoryState({ featureIds: [parentId] });
     assert.deepEqual(Object.keys(before).sort(), ['riverPaintOverrides', 'visualOverrides']);
     assert.equal(Object.values(before).some(section => section?.pack), false);
-    applyFeaturePaintState(appState, ['P'], '#ff0000');
-    pushHistoryEntry({ kind: 'whole-parent', before, after: captureHistoryState({ featureIds: ['P'] }) });
+    applyFeaturePaintState(appState, [parentId], '#ff0000');
+    pushHistoryEntry({ kind: 'whole-parent', before, after: captureHistoryState({ featureIds: [parentId] }) });
     assert.deepEqual(appState.riverPaint.overrides, {});
     undoHistory(); assert.equal(appState.riverPaint.overrides[cellId], '#0000ff');
     redoHistory(); assert.deepEqual(appState.riverPaint.overrides, {});
@@ -61,8 +63,9 @@ function projectFixture(pack) {
       overrides: { [pack.parents[0].cells[0].id]: '#123456' } }) };
 }
 
-test('self-contained approved project survives JSON and the real import commit without fetching geometry', async () => {
-  const pack = realPilot(); const state = projectFixture(pack);
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
+test(`${label} self-contained project survives JSON and the real import commit without fetching geometry`, async () => {
+  const pack = readPack(); const state = projectFixture(pack);
   const payload = FileManager.buildProjectPayload(state);
   assert.equal(payload.schemaVersion, 23);
   assert.equal(payload.riverPaint.editMode, false);
@@ -75,6 +78,8 @@ test('self-contained approved project survives JSON and the real import commit w
   });
   assert.equal(imported.status, 'committed'); assert.equal(called, 1);
   assert.deepEqual(state.riverPaint, payload.riverPaint);
+  assert.deepEqual(state.riverPaint.pack.parents.map(p => p.parentId), pack.parents.map(p => p.parentId));
+  assert.equal(state.riverPaint.pack.packId, pack.packId);
   assert.equal(state.riverPaint.overrides[pack.parents[0].cells[0].id], '#123456');
   assert.equal(Object.isFrozen(state.riverPaint.pack), true);
   state.riverPaint = createDefaultRiverPaintState();
@@ -82,15 +87,23 @@ test('self-contained approved project survives JSON and the real import commit w
   assert.equal(old.schemaVersion, 22); assert.equal(Object.hasOwn(old, 'riverPaint'), false);
 });
 
-test('wrong project baseline and modified saved pack never reach the import commit', async () => {
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
+test(`${label}: wrong project baseline and modified saved pack never reach the import commit`, async () => {
   const consoleError = console.error; console.error = () => {};
   try {
-    const pack = realPilot(); const state = projectFixture(pack);
+    const pack = readPack(); const state = projectFixture(pack);
     const payload = FileManager.buildProjectPayload(state); let called = 0;
     const wrongBaseline = structuredClone(payload); wrongBaseline.scenario.baselineHash = 'different';
     assert.equal(await FileManager.importProjectData(wrongBaseline, () => called++), false);
     const tampered = structuredClone(payload); tampered.riverPaint.pack.source.riverNames = ['forged'];
     assert.equal(await FileManager.importProjectData(tampered, () => called++), false);
+    for (const geometry of ['support', 'cell']) {
+      const changed = structuredClone(payload);
+      const target = geometry === 'support' ? changed.riverPaint.pack.support[0].geometry : changed.riverPaint.pack.parents[0].cells[0].geometry;
+      const ring = target.type === 'Polygon' ? target.coordinates[0] : target.coordinates[0][0];
+      ring.pop(); ring.push(ring.shift()); ring.push(ring[0]);
+      assert.equal(await FileManager.importProjectData(changed, () => called++), false);
+    }
     assert.equal(called, 0);
     assert.equal(state.riverPaint.pack.packId, pack.packId);
   } finally { console.error = consoleError; }

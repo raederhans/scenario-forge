@@ -109,6 +109,127 @@ test("native city layer control opens the right property panel and changes state
   await expect.poll(() => readState(page, "cityScale")).toBeCloseTo(after, 2);
 });
 
+test("extra layer and project entries reopen collapsed properties", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  const collapse = page.locator("#rightSidebarCollapseBtn");
+  const content = page.locator("#rightSidebarContent");
+  for (const [entry, property] of [
+    ["editorLayer-legend", "editorProperty-legend"],
+    ["editorLayer-annotations", "editorProperty-annotations"],
+    ["inspectorSidebarTabProject", "editorProperty-project"],
+  ]) {
+    await collapse.click();
+    await expect(collapse).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("body")).toHaveClass(/right-sidebar-collapsed/);
+    await page.locator(`#${entry}`).click();
+    await expect(collapse).toHaveAttribute("aria-expanded", "true");
+    await expect(content).toHaveAttribute("aria-hidden", "false");
+    await expect(content).not.toHaveAttribute("inert", "");
+    await expect(page.locator("body")).not.toHaveClass(/right-sidebar-collapsed/);
+    await expect(page.locator(`#${property}`)).toBeVisible();
+  }
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.locator("#leftPanelToggle").click();
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#editorLayer-legend").click();
+  await expect(page.locator("body")).toHaveClass(/right-drawer-open/);
+  await expect(page.locator("body")).not.toHaveClass(/left-drawer-open/);
+  await expect(page.locator("#editorProperty-legend")).toBeVisible();
+  await expect(page.locator("#rightSidebar")).toHaveJSProperty("inert", false);
+  await expect(page.locator("#leftSidebar")).toHaveJSProperty("inert", true);
+});
+
+test("vertical layer tabs switch properties with arrows and Home and End", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  const groups = page.locator('#editorTask-layers [role="tablist"]');
+  await expect(groups).toHaveCount(2);
+  const borders = page.locator("#appearanceTabBorders");
+  await borders.click();
+  await expect(borders.locator('xpath=..')).toHaveAttribute("aria-orientation", "vertical");
+  await borders.press("ArrowDown");
+  await expect(page.locator("#appearanceTabPhysical")).toBeFocused();
+  await expect(page.locator("#appearanceTabPhysical")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#editorProperty-data-appearance-panel-physical")).toBeVisible();
+  await expect(page.locator("#editorProperty-data-appearance-panel-borders")).toBeHidden();
+  await page.keyboard.press("End");
+  await expect(page.locator("#appearanceTabPresets")).toBeFocused();
+  await expect(page.locator("#appearanceTabPresets")).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#editorProperty-data-appearance-panel-presets")).toBeVisible();
+  await expect(page.locator("#editorProperty-data-appearance-panel-physical")).toBeHidden();
+  await page.keyboard.press("Home");
+  await expect(borders).toBeFocused();
+  await expect(borders).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#editorProperty-data-appearance-panel-borders")).toBeVisible();
+  await expect(page.locator("#editorProperty-data-appearance-panel-presets")).toBeHidden();
+  for (const group of await groups.all()) {
+    await expect(group).toHaveAttribute("aria-orientation", "vertical");
+    expect(await group.locator('[role="tab"][tabindex="0"]').count()).toBeGreaterThanOrEqual(1);
+  }
+});
+
+test("properties Back restores edited panels and their scroll positions", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 600 });
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  const content = page.locator("#rightSidebarContent");
+  const borders = page.locator("#appearanceTabBorders");
+  const cities = page.locator("#appearanceTabCityPoints");
+  const back = page.locator("#editorPropertiesBackBtn");
+  // Wait for the native scroll event before switching away from each panel.
+  const rememberScroll = async (offset) => content.evaluate(async (element, value) => {
+    element.scrollTop = value;
+    await new Promise(requestAnimationFrame);
+    return element.scrollTop;
+  }, offset);
+
+  await borders.click();
+  await page.locator("#lblInternalBorders").click();
+  await page.locator("#lblEmpireBorders").click();
+  const borderWidth = page.locator("#internalBorderWidth");
+  await expect(borderWidth).toBeVisible();
+  const originalWidth = await borderWidth.inputValue();
+  await borderWidth.focus();
+  await expect(borderWidth).toBeFocused();
+  await borderWidth.press("ArrowRight");
+  await expect(borderWidth).not.toHaveValue(originalWidth);
+  const editedWidth = await borderWidth.inputValue();
+  const borderScroll = await rememberScroll(180);
+  expect(borderScroll).toBeGreaterThan(0);
+  await borders.click();
+  await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(borderScroll);
+
+  await cities.click();
+  const cityScale = page.locator("#cityPointsMarkerScale");
+  await expect(cityScale).toBeVisible();
+  const originalScale = await cityScale.inputValue();
+  await cityScale.focus();
+  await expect(cityScale).toBeFocused();
+  await cityScale.press("ArrowRight");
+  await expect(cityScale).not.toHaveValue(originalScale);
+  const editedScale = await cityScale.inputValue();
+  const cityScroll = await rememberScroll(120);
+  expect(cityScroll).toBeGreaterThan(0);
+  await cities.click();
+  await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(cityScroll);
+
+  await page.locator("#inspectorSidebarTabProject").click();
+  await expect(page.locator("#editorProperty-project")).toBeVisible();
+  await back.click();
+  await expect(page.locator("#editorProperty-data-appearance-panel-citypoints")).toBeVisible();
+  await expect(page.locator("#editorProperty-project")).toBeHidden();
+  await expect(cityScale).toHaveValue(editedScale);
+  await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(cityScroll);
+  await back.click();
+  await expect(page.locator("#editorProperty-data-appearance-panel-borders")).toBeVisible();
+  await expect(page.locator("#editorProperty-data-appearance-panel-citypoints")).toBeHidden();
+  await expect(borderWidth).toHaveValue(editedWidth);
+  await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(borderScroll);
+});
+
 test("annotations mode enters and exits only through explicit controls", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await openWorkspace(page);
@@ -220,6 +341,32 @@ test("managed scenario disclosure survives selection and runtime refresh", async
   await expect(page.locator("#scenarioSelect")).toHaveValue(scenarioId);
 });
 
+test("scenario Escape closes the inner select before its disclosure and restores focus", async ({ page }) => {
+  await openWorkspace(page);
+  const disclosure = page.locator("#editorProjectBar .editor-scenario-menu");
+  const summary = disclosure.locator("summary");
+  await summary.click();
+  await expect(disclosure).toHaveJSProperty("open", true);
+  await summary.press("Escape");
+  await expect(disclosure).toHaveJSProperty("open", false);
+  await expect(summary).toBeFocused();
+
+  await summary.click();
+  const selectButton = page.locator("#scenarioSelectButton");
+  const selectMenu = page.locator("#scenarioSelectMenu");
+  await selectButton.click();
+  await expect(selectMenu).toBeVisible();
+  await expect(selectButton).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(selectMenu).toBeHidden();
+  await expect(selectButton).toHaveAttribute("aria-expanded", "false");
+  await expect(disclosure).toHaveJSProperty("open", true);
+  await expect(selectButton).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(disclosure).toHaveJSProperty("open", false);
+  await expect(summary).toBeFocused();
+});
+
 test("a live long water select supports keyboard search and native selection", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openWorkspace(page);
@@ -252,6 +399,196 @@ test("a live long water select supports keyboard search and native selection", a
   await search.press("Escape");
   await expect(trigger).toBeFocused();
   await expect(menu).toBeHidden();
+});
+
+test("mobile object expansion preserves the drawer and focus while selections open properties", async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 900 });
+  await openWorkspace(page);
+  const body = page.locator("body");
+  const expectLeftDrawer = async () => {
+    await expect(body).toHaveClass(/left-drawer-open/);
+    await expect(body).not.toHaveClass(/right-drawer-open/);
+  };
+  await page.locator("#leftPanelToggle").click();
+  await page.locator("#editorTaskObjectsBtn").click();
+  await expectLeftDrawer();
+
+  const collapsed = page.locator('#countryList .country-explorer-header[aria-expanded="false"]').first();
+  await expect(collapsed).toBeVisible();
+  const groupKey = await collapsed.getAttribute("data-inspector-group-key");
+  expect(groupKey).toBeTruthy();
+  const groupHeader = page.locator(`#countryList .country-explorer-header[data-inspector-group-key="${groupKey}"]`);
+  await groupHeader.click();
+  await expect(groupHeader).toHaveAttribute("aria-expanded", "true");
+  await expectLeftDrawer();
+  await expect(groupHeader).toBeFocused();
+  const group = page.locator("#countryList .country-explorer-group").filter({
+    has: page.locator(`.country-explorer-header[data-inspector-group-key="${groupKey}"]`),
+  });
+  const country = group.locator(".country-select-row").first();
+  const countryCode = await country.getAttribute("data-country-code");
+  const countryName = await country.locator(".country-select-title").textContent();
+  expect(countryCode).toBeTruthy();
+
+  // Discover an actual parent row through the same group controls the user uses.
+  const headers = page.locator("#countryList .country-explorer-header");
+  for (let index = 0; index < await headers.count(); index += 1) {
+    if (await page.locator("#countryList .country-children-toggle").count()) break;
+    const header = headers.nth(index);
+    if (await header.getAttribute("aria-expanded") === "false") await header.click();
+  }
+  const childrenToggle = page.locator("#countryList .country-children-toggle").first();
+  await expect(childrenToggle).toBeVisible();
+  const parentCode = await childrenToggle.locator("xpath=ancestor::div[contains(@class, 'country-select-row')][1]").getAttribute("data-country-code");
+  expect(parentCode).toBeTruthy();
+  const parentToggle = page.locator(`#countryList .country-select-row[data-country-code="${parentCode}"] .country-children-toggle`).first();
+  if (await parentToggle.getAttribute("aria-expanded") === "true") await parentToggle.click();
+  await expect(parentToggle).toHaveAttribute("aria-expanded", "false");
+  await parentToggle.click();
+  await expect(parentToggle).toHaveAttribute("aria-expanded", "true");
+  await expectLeftDrawer();
+  await expect(parentToggle).toBeFocused();
+
+  // A search result in a collapsed group makes the native owner rebuild the list on selection.
+  await groupHeader.click();
+  await expect(groupHeader).toHaveAttribute("aria-expanded", "false");
+  await page.locator("#countrySearch").fill(countryCode);
+  const countryButton = page.locator(`#countryList .country-select-row[data-country-code="${countryCode}"] .country-select-main-btn`).first();
+  await expect(countryButton).toBeVisible();
+  await countryButton.click();
+  await expect(body).toHaveClass(/right-drawer-open/);
+  await expect(body).not.toHaveClass(/left-drawer-open/);
+  const selectedName = page.locator("#editorProperty-countries .editor-selected-name");
+  await expect(selectedName).toBeVisible();
+  await expect(selectedName).toHaveText(countryName.trim());
+  await expect(page.locator("#editorProperty-countries #selectedCountryActionsSection")).toBeVisible();
+  await expect(countryButton).toHaveAttribute("aria-pressed", "true");
+  await expect.poll(() => readState(page, "selectedInspectorCountryCode")).toBe(countryCode);
+
+  await page.locator('[data-close-drawer="right"]').click();
+  await page.locator("#leftPanelToggle").click();
+  await page.locator("#editorObjects-water").click();
+  await expectLeftDrawer();
+  const waterButton = page.locator("#waterRegionList .inspector-item-btn").first();
+  await expect(waterButton).toBeVisible();
+  const waterId = await waterButton.getAttribute("data-region-id");
+  expect(waterId).toBeTruthy();
+  await waterButton.click();
+  await expect(body).toHaveClass(/right-drawer-open/);
+  await expect(body).not.toHaveClass(/left-drawer-open/);
+  await expect(page.locator("#editorProperty-water #waterInspectorDetail")).toBeVisible();
+  await expect(page.locator("#waterInspectorMetaList")).toContainText(waterId);
+  await expect.poll(() => readState(page, "selectedWaterRegionId")).toBe(waterId);
+});
+
+test("scenario summary resets its select and Tab departure closes the disclosure without stealing focus", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWorkspace(page);
+  const disclosure = page.locator("#editorProjectBar .editor-scenario-menu");
+  const summary = disclosure.locator("summary");
+  const selectButton = page.locator("#scenarioSelectButton");
+  const selectMenu = page.locator("#scenarioSelectMenu");
+  await summary.click();
+  await selectButton.click();
+  await expect(selectMenu).toBeVisible();
+  await expect(selectButton).toHaveAttribute("aria-expanded", "true");
+  await summary.click();
+  await expect(disclosure).toHaveJSProperty("open", false);
+  await expect(selectButton).toHaveAttribute("aria-expanded", "false");
+  await summary.click();
+  await expect(disclosure).toHaveJSProperty("open", true);
+  await expect(selectMenu).toBeHidden();
+  await expect(selectButton).toHaveAttribute("aria-expanded", "false");
+
+  const lastControl = disclosure.locator('button:visible:enabled:not([tabindex="-1"]), input:visible:enabled:not([tabindex="-1"])').last();
+  await lastControl.focus();
+  await expect(lastControl).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#workspaceSaveBtn")).toBeFocused();
+  await expect(disclosure).toHaveJSProperty("open", false);
+  await expect(selectButton).toHaveAttribute("aria-expanded", "false");
+});
+
+test("properties Back restores the layer task and its selected entry after visiting objects", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  for (const [entryId, propertyId, rememberedObject] of [
+    ["appearanceTabCityPoints", "editorProperty-data-appearance-panel-citypoints", "countries"],
+    ["editorLayer-legend", "editorProperty-legend", "water"],
+  ]) {
+    // Establish both a distinct object context and an already active Water
+    // context through real navigation before checking the resulting history.
+    await page.locator("#editorTaskObjectsBtn").click();
+    await page.locator(`#editorObjects-${rememberedObject}`).click();
+    await page.locator("#editorTaskLayersBtn").click();
+    const entry = page.locator(`#${entryId}`);
+    await entry.click();
+    await expect(page.locator(`#${propertyId}`)).toBeVisible();
+    await page.locator("#editorTaskObjectsBtn").click();
+    await expect(page.locator(`#editorProperty-${rememberedObject}`)).toBeVisible();
+    await expect(page.locator(`#editorObjects-${rememberedObject}`)).toHaveAttribute("aria-pressed", "true");
+    await page.locator("#editorObjects-water").click();
+    await expect(page.locator("#editorTask-objects")).toBeVisible();
+    await expect(page.locator("#editorProperty-water")).toBeVisible();
+    if (rememberedObject !== "water") {
+      // Objects restored Countries before the explicit Water click, so Back
+      // must visit that actual intermediate entry before returning to Layers.
+      await page.locator("#editorPropertiesBackBtn").click();
+      await expect(page.locator(`#editorProperty-${rememberedObject}`)).toBeVisible();
+      await expect(page.locator("#editorProperty-water")).toBeHidden();
+      await expect(page.locator("#editorTask-objects")).toBeVisible();
+      await expect(page.locator("#editorTask-layers")).toBeHidden();
+      await expect(page.locator("#editorTaskObjectsBtn")).toHaveAttribute("aria-pressed", "true");
+      await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "false");
+      await expect(page.locator(`#editorObjects-${rememberedObject}`)).toHaveAttribute("aria-pressed", "true");
+      await expect(page.locator("#editorPropertiesTitle")).toBeFocused();
+    }
+    await page.locator("#editorPropertiesBackBtn").click();
+    await expect(page.locator(`#${propertyId}`)).toBeVisible();
+    await expect(page.locator("#editorProperty-water")).toBeHidden();
+    await expect(page.locator("#editorTask-layers")).toBeVisible();
+    await expect(page.locator("#editorTask-objects")).toBeHidden();
+    await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("#editorTaskObjectsBtn")).toHaveAttribute("aria-pressed", "false");
+    await expect(entry).toBeVisible();
+    await expect(entry).toHaveAttribute(entryId === "appearanceTabCityPoints" ? "aria-selected" : "aria-pressed", "true");
+    await expect(page.locator("#editorPropertiesTitle")).toBeFocused();
+  }
+});
+
+test("legend URL reload restores its layer task and property without entering annotation mode", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.addInitScript(() => localStorage.setItem("map_lang", "en"));
+  await openWorkspace(page);
+  await page.locator("#editorTaskLayersBtn").click();
+  await page.locator("#editorLayer-legend").click();
+  await expect(page.locator("#editorProperty-legend")).toBeVisible();
+  await expect.poll(() => new URL(page.url()).searchParams.get("section")).toBe("legendProjectSection");
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await waitForAppInteractive(page);
+  await expect(page.locator("#editorTask-layers")).toBeVisible();
+  await expect(page.locator("#editorTaskLayersBtn")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#editorLayer-legend")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#editorProperty-legend")).toBeVisible();
+  await expect(page.locator("#editorProperty-countries")).toBeHidden();
+  await expect(page.locator("body")).not.toHaveClass(/frontline-mode-active/);
+
+  const generator = page.locator("#editorProperty-legend .legend-generator-card");
+  const modeTrigger = generator.locator(".app-select-button").first();
+  const continentTrigger = generator.locator(".app-select-button").nth(1);
+  await expect(modeTrigger).toBeVisible();
+  await expect(modeTrigger).toHaveAccessibleName("Generation Mode");
+  await modeTrigger.click();
+  await generator.getByRole("option", { name: "Continent Focus", exact: true }).click();
+  await expect(modeTrigger.locator(".app-select-text")).toHaveText("Continent Focus");
+  await expect(continentTrigger).toBeVisible();
+  await expect(continentTrigger).toHaveAccessibleName("Continent");
+  await page.locator("#btnToggleLang").click();
+  await expect.poll(() => readState(page, "currentLanguage")).toBe("zh");
+  await expect(modeTrigger).toHaveAccessibleName("生成模式");
+  await expect(continentTrigger).toBeVisible();
+  await expect(continentTrigger).toHaveAccessibleName("大洲");
 });
 
 test("workspace widths and mobile drawer have no horizontal page overflow", async ({ page }) => {

@@ -200,7 +200,8 @@ test("implemented political owner keeps the frozen top-level orchestration order
     'recordRenderPerfMetric("politicalPassVisibleItems", 0, {',
     "if (isRenderDiagnosticsEnabled())",
     "publishPoliticalPassDiagnostics({ identity, viewport });",
-    "const consumedBitmapResult = isExportRendering()",
+    "const inlinePoliticalPartitions = hasInlinePoliticalPartitions();",
+    "const consumedBitmapResult = isExportRendering() || inlinePoliticalPartitions",
     "? null",
     ": consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);",
     "drawPoliticalWorkerBitmapResult(consumedBitmapResult, identity.workerIdentity)",
@@ -211,9 +212,9 @@ test("implemented political owner keeps the frozen top-level orchestration order
     '"drawPoliticalBackgroundFillsPass"',
     "if (!hasPoliticalLandFeatures())",
     'reason: "missing-land-data"',
-    "const packetState = !isExportRendering() && isPoliticalRasterWorkerBitmapEnabled()",
+    "const packetState = !isExportRendering() && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()",
     "buildPoliticalRasterWorkerPacketEffect({ identity, viewport })",
-    "if (!isExportRendering()) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });",
+    "if (!isExportRendering() && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });",
     "recordPoliticalRasterWorkerSnapshot();",
     "const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit();",
     "const progressiveRecoveryCoarseSkipCandidate = (",
@@ -267,15 +268,17 @@ test("worker identity, packet, bitmap, and partial algorithms live in the partia
   assert.equal((ownerSource.match(/recordPoliticalRasterWorkerSnapshot\(\);/g) || []).length, 3);
   assert.match(
     ownerSource,
-    /: \{ packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" \};[\s\S]*?requestPoliticalRasterWorkerPassEffect\(/,
+    /: \{ packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" \};\s*if \(!isExportRendering\(\) && !inlinePoliticalPartitions\) requestPoliticalRasterWorkerPassEffect\(\{ identity, viewport, packetState \}\);/,
   );
+  assert.match(readRepoFile(CANONICAL_OWNER_PATH),
+    /const hasInlinePoliticalPartitions = typeof getters\.hasInlinePoliticalPartitions === "function"\s*\? getters\.hasInlinePoliticalPartitions\s*: \(\) => false;/);
 });
 
 test("progressive recovery keeps pending edits and visible overrides ahead of coarse skip", () => {
   const drawSource = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "drawBasePoliticalPass");
   assert.match(
     drawSource,
-    /const progressiveRecoveryCoarseSkipCandidate = \([\s\S]*?!!backgroundSummary\?\.progressive[\s\S]*?!backgroundSummary\?\.deferredFullCacheReady[\s\S]*?String\(backgroundSummary\?\.coarseUnderlay \|\| ""\) === "admin0"[\s\S]*?&& !pendingPoliticalColorEdit[\s\S]*?\);/,
+    /const progressiveRecoveryCoarseSkipCandidate = \(\s*!inlinePoliticalPartitions\s*&& !!backgroundSummary\?\.progressive\s*&& !backgroundSummary\?\.deferredFullCacheReady\s*&& String\(backgroundSummary\?\.coarseUnderlay \|\| ""\) === "admin0"\s*&& !pendingPoliticalColorEdit\s*\);/,
   );
   assert.match(
     drawSource,

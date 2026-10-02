@@ -4,6 +4,20 @@
 
 `C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域工作基于`f47b36f4`，正在整合当前远端主线。用户已授权完成体积、性能优化后合并推送；root唯一负责共享资产和Git整合。主目录及其他工作树的未归属改动保留，工作树与`.runtime`证据保留供复核。范围、验证和最终PR回执见[任务记录](ocean-batch-20261002/task.md)。
 
+## 2026-10-02 沿河重叠地块与内部接缝修复
+
+`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 使用 `codex/river-overlap-visibility`，基于 `bd6365ef` 修复七个重叠父地块的填色、命中及内部接缝可见性。前一轮 Wave6 经 PR #198 发布，覆盖 382 父 / 1,199 分区；Wave7 本地验收扩展至 389 父 / 1,276 分区，旧记录保持原样。覆盖顺序、轮廓遮挡和验收见 [重叠修复记录](river-overlap-repair/integration.md)。主工作区及其他工作树保持原所有权；本工作树及旧区域工作树为保存忽略的图集与几何审计而保留。最终提交、PR 检查、合并、发布和同步以 Git / GitHub 及 `.runtime/rv7/` 回执为准。
+
+## 2026-10-01 第二批沿河地点准入
+
+`codex/river-wave2-admission` 接入 12 地、43 分区的新包，保留旧包认证及旧项目范围。新增奥波莱、弗罗茨瓦夫、泸州、宜昌、兰州、乌海；不改变原行政 ID。39 项专项测试、19 项数据目录检查、真实页面全部分区填色及 43 次撤销/重做、像素和项目导入导出验证通过。Pages 构建和新资产发布检查通过，产物保留在独立工作树 `.runtime/reports/generated/river-next/pages-wave2/`。最终提交、PR 检查及合并状态以 Git / GitHub 回执为准。主目录及其他工作树继续保持原所有权。
+
+## 2026-10-01 沿河试点定位与小分区操作
+
+PR [#192](https://github.com/raederhans/scenario-forge/pull/192) 全部检查通过，于 2026-10-01 合并为 `81532208`；独立工作树已快进同步。后续分支为 `codex/river-wave2-admission`，已生成奥德河、长江、黄河六个新增地点的候选包：合计 12 地、43 分区，原六地记录保持一致，尚未启用新包。范围、复现命令、兼容边界与验收要求见 [下一批准入记录](river-paint-partitions-20260929/wave2-admission.md)。工作树继续保留候选审计及图像证据。
+
+`C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 在 `codex/river-pilot-navigation` 上交付六地定位、分区列表及放大预览，提交 `1cec53b7`、`9bb07a53`。用户已授权推送和合并，然后开始下一批河段；本轮整合 `origin/main@e25b89ca` 的国家标签与地理修复，保留主目录及其他工作树改动。31 个分区的真实界面填色、连续撤销和重做证据保留在 `.runtime/browser/river-pilot-qa/`。该工作树继续用于合并后同步和下一批数据准入；最终远端状态以 PR 回执为准。
+
 ## 2026-09-30 沿河填色试点整合
 
 `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 接手云端分支 `codex/river-paint-partitions-p0-p2` 和 [PR #189](https://github.com/raederhans/scenario-forge/pull/189)，基于 `origin/main@bfedc6b8`。本地整合提交 `eab92f54` 修复 Pages 资源打包、浏览器清单、依赖图和验证路由，并完成沿河功能、几何、Pages 及浏览器验证。主目录 `main@28310add` 的既有未归属改动保留；本工作树作为同步后的独立入口及 `.runtime/reports/generated/river-integration/` 验证证据载体继续保留。最终检查、合并提交和主线状态以 PR 回执及 Git 为准，不能用旧开发运行结果替代最终提交的 required checks。
@@ -600,3 +614,47 @@
 ## Polar sample baseline deployment follow-up 2026-09-29
 
 The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, based on `main@490583b6`. Root owns the scoped sample baseline and early CI gate fix, local publication test server, push/merge and deployment verification. Original polar repair is already merged as PR #187; its first deployment failed. Preserve primary checkout WIP and retain this checkout for evidence/reuse.
+
+## Scenario geography repair 2026-10-01
+
+- Branch: codex/scenario-geometry-repair; base bfedc6b8. Managed checkout C:/Users/raede/.codex/worktrees/scenario-geometry-repair/mapcreator.
+- Root owns canonical builds, browser server, commits, push and PR integration. Scope: Guiana/Somalia coverage, Kashmir duplicate placeholder, Canada 60N coarse/detail nodes.
+- Primary country-label/UI WIP preserved. Acceptance and final merge receipt: docs/active/scenario-geography-repair-20261001/.
+
+## Palette country color integration 2026-10-01
+
+- Branch: `codex/palette-country-color`; integrated base: `origin/main@81532208`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/palette-country-integration/mapcreator`; root owns commit, build, push and merge.
+- Scope: explicit country-tag recoloring, undo/redo and save coverage, palette-source request ordering, variant keyboard application, and matching Pages assets.
+- Primary checkout and unrelated registry WIP are preserved. Local validation: 70 palette and river UI tests; publication checks and merge receipt are recorded in PR #193 (https://github.com/raederhans/scenario-forge/pull/193). Retain this checkout for build evidence under `.runtime/reports/generated/palette-integration/`.
+
+## River wave3 offline integration 2026-10-01
+
+- Branch: `codex/river-wave3-integration`; base `2da4db61`. Integration checkout: `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator`.
+- Root owns integration, Git operations and adaptive checks; outputs `.runtime/rv3/`, no browser server for this offline acceptance.
+- Integrated deliveries: Europe `cdfedb34` (6f5a), China `9a664cbe` (edea), east `ec275ef5` (f7ce), tooling `2e44f94e` (b5dc). Retain all four clean worktrees for ignored atlas/audit evidence.
+- Scope: offline tool and selections; 307 initial parents reduced to 302 after full-map contour verification. No runtime admission. Details and remaining gates: `river-wave3/integration.md`.
+- Preserve primary checkout WIP. Final push and merge receipt is the PR for this branch; do not infer merged status from this registry.
+
+## River wave4 runtime integration 2026-10-02
+
+- Branch: `codex/river-wave4-integration`; base `b416e257`; checkout `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator`.
+- Root owns integration, localhost port 8009 browser checks, Pages builds under `.runtime/pw4b`, Git operations and final admission.
+- Deliveries: `0840` runtime cde83659, `f3b2` navigation42a61eeb, `909f` verification f0c58b9d. Retain original worktrees for ignored evidence; preserve primary WIP.
+- Scope: 302-parent authenticated default, searchable navigation, old-pack retention and full-map contour gates. Integration fixes/evidence: `river-wave4/integration.md`.
+- Final merge/push status is the PR receipt for this branch; this entry alone is not merge proof.
+
+## River wave5 coverage and transport 2026-10-02
+
+- Branch: `codex/river-wave5-expansion`; base `bb510a54`; same retained river integration checkout.
+- Root owns integration, port 8009 browser checks, Pages builds `.runtime/pw5`, Git and publication. Three scoped Sol lanes supplied coverage review, held-seam diagnosis and lossless transport; children did not commit.
+- Final reviewed candidate: 376 parents / 1,164 cells, with all previous 302 parent records unchanged. Source admission and remaining exclusions: `river-wave5/integration.md`.
+- Primary WIP and older regional atlas worktrees remain preserved. Final merge/push receipt is the branch PR, not this registry entry.
+
+## UI interaction polish integration 2026-10-02
+
+- Branch: `codex/ui-detail-polish-20261002`; base: `origin/main@d418eefa`.
+- Managed checkout: `C:/Users/raede/.codex/worktrees/ui-detail-integration/mapcreator`. Root owns integration, local server and verification processes.
+- Scope: editor navigation, focus/scroll retention, refresh/motion, bilingual guidance and related regression routing. Primary checkout mixed WIP is preserved; unrelated data, palette and physical renderer changes are excluded.
+- Local validation: 32 behavior tests, 22 translation-audit tests, 9 routing tests and 15 focused browser cases passed. The heading-language case explicitly waits for lazy locale hydration before exercising the toggle. Test-list coverage and route schema checks passed.
+- Retain this worktree for delivery verification and ignored evidence under `.runtime/tmp/ui-delivery/` and `.runtime/tests/playwright/ui-delivery*`. The associated PR is authoritative for remote checks and merge status.

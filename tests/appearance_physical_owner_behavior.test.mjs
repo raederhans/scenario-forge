@@ -120,6 +120,43 @@ test("physical sections follow mode while missing categories preserve their stor
   assert.equal(harness.nodes.physicalClassBadlands.disabled, false);
 });
 
+test("label-only physical classes remain configurable and report name coverage", () => {
+  const harness = createHarness([...PHYSICAL_NODE_IDS, "physicalClassBadlandsCoverage"], {
+    physicalSemanticsData: { features: [] },
+    contextLayerExternalDataByName: {
+      physical_region_labels: { features: [{ properties: { atlas_class: "badlands_canyon" } }] },
+    },
+  });
+  harness.owner.bindEvents();
+  harness.owner.renderPhysicalUi();
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, true);
+  harness.nodes.physicalRegionLabels.checked = true;
+  harness.nodes.physicalRegionLabels.dispatch("change");
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, false);
+  assert.equal(harness.nodes.physicalClassBadlandsCoverage.textContent, "1 ui:Labels");
+  harness.nodes.physicalClassBadlands.checked = false;
+  harness.nodes.physicalClassBadlands.dispatch("change");
+  assert.equal(harness.runtimeState.styleConfig.physical.atlasClassVisibility.badlands_canyon, false);
+  harness.nodes.physicalRegionLabels.checked = false;
+  harness.nodes.physicalRegionLabels.dispatch("change");
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, true);
+  assert.equal(harness.nodes.physicalClassBadlands.checked, false);
+});
+
+test("physical name coverage stays selectable until its data is known", () => {
+  const harness = createHarness([...PHYSICAL_NODE_IDS, "physicalClassBadlandsCoverage"], {
+    physicalSemanticsData: { features: [] },
+    styleConfig: { physical: createPhysicalConfig({ showRegionLabels: true }) },
+  });
+  harness.owner.renderPhysicalUi();
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, false);
+  assert.equal(harness.nodes.physicalClassBadlandsCoverage.textContent, "ui:Coverage loading");
+  harness.runtimeState.contextLayerExternalDataByName = { physical_region_labels: { features: [] } };
+  harness.owner.renderPhysicalUi();
+  assert.equal(harness.nodes.physicalClassBadlands.disabled, true);
+  assert.equal(harness.nodes.physicalClassBadlandsCoverage.textContent, "ui:No coverage in current data");
+});
+
 function createPhysicalConfig(overrides = {}) {
   return {
     preset: "balanced",

@@ -99,6 +99,10 @@ class TestElement {
   }
 
   replaceChildren(...nodes) {
+    const activeElement = globalThis.document?.activeElement;
+    if (activeElement && this.contains(activeElement)) {
+      globalThis.document.activeElement = globalThis.document.body;
+    }
     this.children.forEach((child) => {
       child.parentNode = null;
     });
@@ -146,6 +150,8 @@ class TestElement {
 
   focus() {
     this.dataset.focused = "true";
+    this.focusOptions = arguments[0];
+    if (globalThis.document) globalThis.document.activeElement = this;
   }
 
   blur() {
@@ -153,7 +159,21 @@ class TestElement {
   }
 
   getBoundingClientRect() {
-    return { left: 0, top: 0, width: 0, height: 0 };
+    return { left: 0, top: this.rectTop || 0, width: 0, height: 0 };
+  }
+
+  closest(selector) {
+    let node = this;
+    while (node) {
+      if (selector.startsWith(".") && node.className.split(/\s+/).includes(selector.slice(1))) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  contains(target) {
+    if (this === target) return true;
+    return (this.children || []).some((child) => child.contains(target));
   }
 
   querySelector(selector) {
@@ -166,10 +186,13 @@ class TestElement {
 }
 
 function createTestDocument() {
-  return {
+  const document = {
     createElement: (tagName) => new TestElement(tagName),
     createDocumentFragment: () => new TestElement("#fragment"),
   };
+  document.body = new TestElement("body");
+  document.activeElement = document.body;
+  return document;
 }
 
 function walk(node, visit) {
@@ -198,6 +221,7 @@ function findAll(root, predicate) {
 function datasetKeyFromSelector(selector) {
   return selector
     .slice(6, -1)
+    .split("=")[0]
     .replace(/-([a-z])/g, (_match, char) => char.toUpperCase());
 }
 
@@ -590,6 +614,61 @@ test("related country child rows hide releasable parent lists", () => {
     assert.match(renderedText, /东亚/);
     assert.match(renderedText, /tag CHI/);
     assert.doesNotMatch(renderedText, /可自以下母国释放/);
+  } finally {
+    globalThis.document = previousDocument;
+  }
+});
+
+test("intentional explorer and related-country toggles restore focus and preserve their scroll anchor", () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = createTestDocument();
+
+  try {
+    const harness = createHarness({
+      countryEntries: [{ code: "GER", displayName: "Germany" }],
+      countryTree: [{ id: "continent_europe", displayLabel: "Europe", countries: [{ code: "GER" }] }],
+      childSectionsByParent: new Map([["GER", [{
+        id: "releasables",
+        label: "Releasables",
+        states: [{ code: "CHI", displayName: "Nanjing China", releasable: true }],
+      }]]]),
+    });
+    harness.host.className = "editor-task-body";
+    harness.host.scrollTop = 100;
+    harness.runtimeState.countryGroupsData = { continents: [{ id: "continent_europe" }] };
+    harness.runtimeState.inspectorExpansionInitialized = true;
+    harness.controller.renderList();
+
+    const oldHeader = harness.host.querySelector(".country-explorer-header");
+    oldHeader.rectTop = 48;
+    oldHeader.focus();
+    oldHeader.click();
+
+    let nextHeader = harness.host.querySelector(".country-explorer-header");
+    assert.equal(globalThis.document.activeElement, nextHeader);
+    assert.deepEqual(nextHeader.focusOptions, { preventScroll: true });
+    assert.equal(harness.host.scrollTop, 52);
+    assert.equal(nextHeader.getAttribute("aria-expanded"), "true");
+
+    const oldToggle = harness.host.querySelector(".country-children-toggle");
+    oldToggle.rectTop = 31;
+    oldToggle.focus();
+    oldToggle.click();
+
+    const nextToggle = harness.host.querySelector(".country-children-toggle");
+    assert.equal(globalThis.document.activeElement, nextToggle);
+    assert.deepEqual(nextToggle.focusOptions, { preventScroll: true });
+    assert.equal(harness.host.scrollTop, 21);
+    assert.ok(harness.host.querySelector("[data-country-code]"));
+
+    harness.controller.renderList();
+    const refreshedToggle = harness.host.querySelector(".country-children-toggle");
+    assert.equal(globalThis.document.activeElement, refreshedToggle);
+    assert.deepEqual(refreshedToggle.focusOptions, { preventScroll: true });
+
+    globalThis.document.activeElement = globalThis.document.body;
+    harness.controller.renderList();
+    assert.equal(globalThis.document.activeElement, globalThis.document.body);
   } finally {
     globalThis.document = previousDocument;
   }

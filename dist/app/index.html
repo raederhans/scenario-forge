@@ -381,6 +381,12 @@
                 aria-labelledby="appearanceTabBorders"
               >
                 <h2 id="lblBordersPanel" class="section-header">Borders</h2>
+                <div class="mt-3">
+                  <label class="toggle-label">
+                    <input id="toggleCountryLabels" type="checkbox" class="checkbox-input" checked />
+                    <span data-i18n="Show country names">Show country names</span>
+                  </label>
+                </div>
                 <div class="border-control-row mt-3">
                   <label class="range-label" for="displayQuality" data-i18n="Display quality">Display quality</label>
                   <select id="displayQuality" class="select-input">
@@ -2377,6 +2383,25 @@
                     </svg>
                     <span data-i18n="Paint mode color">Color</span>
                   </button>
+                  <button id="riverPaintToggleBtn" type="button" class="dock-segment-btn" aria-pressed="false" aria-describedby="riverPaintStatus">River cells</button>
+                  <span id="riverPaintStatus" class="visually-hidden" role="status" aria-live="polite"></span>
+                  <div id="riverPaintNavigation" role="group" aria-label="River locations" hidden>
+                    <input id="riverPaintSearchInput" type="search" autocomplete="off" spellcheck="false" aria-label="Search location name or ID" aria-controls="riverPaintLocationSelect" aria-describedby="riverPaintLocationResults" hidden disabled>
+                    <select id="riverPaintRiverSelect" class="dock-select" aria-label="Filter by river" aria-controls="riverPaintLocationSelect" hidden disabled></select>
+                    <div class="river-paint-location-row">
+                      <select id="riverPaintLocationSelect" class="dock-select" aria-label="Go to river location" aria-describedby="riverPaintLocationResults" hidden disabled></select>
+                      <button id="riverPaintLocationGoBtn" type="button" class="dock-segment-btn" aria-label="Go to selected location" hidden disabled>Go</button>
+                    </div>
+                    <small id="riverPaintLocationResults" role="status" aria-live="polite" aria-atomic="true"></small>
+                    <section id="riverCellPicker" hidden aria-labelledby="riverCellPickerTitle">
+                      <strong id="riverCellPickerTitle">River cells</strong>
+                      <select id="riverCellSelect" class="dock-select" aria-label="Choose river cell"></select>
+                      <svg id="riverCellPreview" viewBox="0 0 240 104" role="img"></svg>
+                      <small id="riverCellPreviewCaption"></small>
+                      <button id="riverCellApplyBtn" type="button" class="dock-segment-btn">Apply current tool</button>
+                      <button id="riverCellCloseBtn" type="button" class="dock-segment-btn">Close</button>
+                    </section>
+                  </div>
                 </div>
               </div>
 

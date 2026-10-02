@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/tno_1962/audit.json",
-  "baseline_hash": "7b77774b2059f28df1696bed09fb39ddaf8b6e1299ecb94dfad1fe0487fc284d",
+  "baseline_hash": "7340d2c12600800bab822bfda02d8855686670e358a8d0a2b40a856a46080860",
   "bathymetry_topology_url": "data/scenarios/tno_1962/bathymetry.topo.json",
   "bookmark_date": "1962.1.1.12",
   "bookmark_description": "TNO_1962_DESC",
@@ -170,12 +170,12 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "176973a8a7a5414ff97587f89eaf5a9fbc058c40f6323691dda6a9f805082239",
+  "snapshot_fingerprint": "eee07b839eeb7793373b57fcbef9114e05e5923954480bd83a23c0ae62ee08c6",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "d4dce03474013fc57e9a8c37da02c3421b059fbd54b55d31549bd7e06c764448",
-    "runtime_bootstrap_topology_sha256": "8d3dd5c35578c72cf7fcf03bb673b7e83e0acb7a2246c2d44477e2b830eafaea",
-    "runtime_topology_sha256": "f635b0cb5f94861710138d92cf8c291d2080e502bb92d80d0b6a0436564b2aba"
+    "detail_chunk_manifest_sha256": "e21a24da0ed06e16f02cf34ee0760690b440bdf600d4aa9b5435c280fe1922b2",
+    "runtime_bootstrap_topology_sha256": "72b6f9a87da4ca496648b9815c13124ee025948be99c4f2fee767717508355b5",
+    "runtime_topology_sha256": "b208b54c86c8028fe4c5c73a35d6af418c15559f9a8ef6886ea5521084f402a6"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
@@ -212,16 +212,16 @@
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 12710,
+    "feature_count": 12711,
     "geometry_blocker_count": 0,
-    "manual_reviewed_feature_count": 9380,
+    "manual_reviewed_feature_count": 9381,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 606,
     "owner_count": 172,
     "quality_counts": {
       "approx_existing_geometry": 921,
       "direct_country_copy": 2578,
-      "manual_reviewed": 9380
+      "manual_reviewed": 9381
     },
     "scenario_atlantropa_feature_count": 726,
     "scenario_rule_blocker_count": 0,
@@ -230,7 +230,7 @@
       "controller_rule": 0,
       "direct_active_owner": 4354,
       "fallback_mapped_tag": 3,
-      "manual_rule": 6239,
+      "manual_rule": 6240,
       "scenario_generated": 445,
       "tno_reichskommissariat_baseline": 1838
     },

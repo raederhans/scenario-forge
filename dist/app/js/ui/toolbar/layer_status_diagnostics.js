@@ -24,7 +24,12 @@ import {
 } from "./layer_panel_contracts.js";
 import { normalizePhysicalStyleConfig } from "../../core/state_defaults.js";
 import { resolveContourLodRequest } from "../../core/renderer/physical_contour_lod_policy.js";
-import { resolvePhysicalAtlasCollection } from "../../core/renderer/physical_atlas_lod_policy.js";
+import {
+  getPhysicalPresentationLayerRequests,
+  PHYSICAL_ATLAS_DETAIL_LAYER,
+  resolvePhysicalAtlasCollection,
+  shouldRequestPhysicalAtlasDetail,
+} from "../../core/renderer/physical_atlas_lod_policy.js";
 
 const STATUS_SEVERITY = Object.freeze({
   ACTIVE: "active",
@@ -184,6 +189,20 @@ function buildEnabledSummary({
 
 function getPhysicalStatusInputs(state) {
   const cfg = normalizePhysicalStyleConfig(state.styleConfig?.physical);
+  const requestState = { showPhysical: state.showPhysical, zoomTransform: state.zoomTransform, styleConfig: { physical: cfg } };
+  const optionalLayers = [
+    ...(shouldRequestPhysicalAtlasDetail(requestState) ? [PHYSICAL_ATLAS_DETAIL_LAYER] : []),
+    ...getPhysicalPresentationLayerRequests(requestState),
+  ];
+  const optionalLabels = {
+    [PHYSICAL_ATLAS_DETAIL_LAYER]: "Regional detail",
+    physical_region_labels: "Physical region names",
+    physical_hillshade: "Terrain shading",
+  };
+  const resourceIssues = optionalLayers.map((name) => ({
+    label: optionalLabels[name],
+    loadStatus: getLoadStatus(state, [name]),
+  })).filter(({ loadStatus }) => loadStatus === "loading" || loadStatus === "error");
   const dataKeys = [];
   const loadKeys = [];
   const metricNames = [];
@@ -214,6 +233,7 @@ function getPhysicalStatusInputs(state) {
       : (getFeatureCollectionCount(resolvePhysicalAtlasCollection(state)) ?? 0) + (sumFeatureCounts(state, dataKeys) ?? 0),
     visibleCount: measuredCounts.length ? measuredCounts.reduce((total, count) => total + count, 0) : null,
     loadStatus: getLoadStatus(state, loadKeys),
+    resourceIssues,
   };
 }
 
@@ -229,12 +249,21 @@ function createLayerDiagnostic(definition, state, translate) {
   const physical = definition.id === "physical" ? getPhysicalStatusInputs(state || {}) : null;
   const loadedCount = physical ? physical.loadedCount : metricFeatureCount ?? dataFeatureCount;
   const visibleCount = physical ? physical.visibleCount : normalizeFiniteCount(metric?.visibleFeatureCount);
-  const loadStatus = physical ? physical.loadStatus : getLoadStatus(state || {}, definition.loadKeys);
+  const baseLoadStatus = physical ? physical.loadStatus : getLoadStatus(state || {}, definition.loadKeys);
+  const resourceIssues = physical?.resourceIssues || [];
+  const loadStatus = baseLoadStatus === "error" || resourceIssues.some((issue) => issue.loadStatus === "error")
+    ? "error" : resourceIssues.some((issue) => issue.loadStatus === "loading") ? "loading" : baseLoadStatus;
   const severity = !enabled
     ? STATUS_SEVERITY.MUTED
     : loadStatus === "error"
       ? STATUS_SEVERITY.WARNING
       : STATUS_SEVERITY.ACTIVE;
+  const summary = buildEnabledSummary({
+    enabled, loadedCount, visibleCount, loadStatus: baseLoadStatus, translate,
+  });
+  const resourceSummaries = !enabled ? [] : resourceIssues.map((issue) => (
+    `${translateUi(translate, issue.label)}: ${translateUi(translate, issue.loadStatus === "error" ? "Load error" : "Loading/settling")}`
+  ));
   return {
     id: definition.id,
     label: definition.label,
@@ -243,13 +272,7 @@ function createLayerDiagnostic(definition, state, translate) {
     visibleCount,
     loadStatus,
     severity,
-    summary: sanitizeLayerStatusText(buildEnabledSummary({
-      enabled,
-      loadedCount,
-      visibleCount,
-      loadStatus,
-      translate,
-    })),
+    summary: sanitizeLayerStatusText(joinStatusParts(summary, ...resourceSummaries)),
   };
 }
 

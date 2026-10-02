@@ -108,6 +108,16 @@ export function createLocalFeedbackRecords(baseRecords) {
   // child-safe. The eastern-source suite intentionally reads the local raw
   // geographic inputs and keeps the heavy-geo/main-thread policy.
   const precisionPytestRoutes = [
+    ["scenario-geography-repair", "python -m unittest tests.test_repair_scenario_geography -q", [
+      "tests/test_repair_scenario_geography.py", "tools/repair_scenario_geography.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
+    ["canada-parallel-lod", "python -m unittest tests.test_canada_parallel_lod -q", [
+      "tests/test_canada_parallel_lod.py", "tools/scenario_chunk_assets.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
     ["reviewed-seam", "python -m pytest tests/test_reviewed_seam.py -q", [
       "tests/test_reviewed_seam.py", "map_builder/geo/reviewed_seam.py", "tools/repair_tno_poland_ukraine_seams.py",
     ]],
@@ -281,6 +291,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["urban-layer-render", "renderer-runtime", "js/core/renderer/urban_layer_render_owner.js", "tests/urban_layer_render_owner_behavior.test.mjs"],
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
     ["marine-label", "renderer-runtime", "js/core/renderer/marine_label_owner.js", "tests/marine_label_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["ui-i18n-refresh", "main-shell", "js/ui/i18n.js", "tests/ui_i18n_refresh_behavior.test.mjs", ["js/core/i18n_catalog.js"]],
+    ["styled-selects", "main-shell", "js/ui/styled_selects.js", "tests/styled_selects_behavior.test.mjs"],
     ["water-inspector-navigation", "sidebar-shell", "js/ui/sidebar/water_special_region_controller.js", "tests/water_inspector_navigation_behavior.test.mjs", ["js/ui/sidebar.js"]],
   ];
 
@@ -437,6 +449,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     id: "local:scenario-ownership-repairs",
     commandRef: "python -m unittest tests.test_tno_ownership_repairs -q",
     sourceRefs: ["data/scenario-rules/tno_1962.russia_ownership.manual.json",
+      "data/scenario-rules/tno_1962.decolonization.manual.json",
       "tools/patch_tno_1962_bundle.py", "tests/test_tno_ownership_repairs.py"],
     ownerHints: ["scenario-builder"], domains: ["scenario-build"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 9,

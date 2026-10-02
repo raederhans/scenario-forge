@@ -32,7 +32,7 @@
     "data/europe_land_bg.geojson"
   ],
   "feature_counts": {
-    "land_features_inspected": 11321,
+    "land_features_inspected": 11322,
     "land_features_candidates": 3766,
     "land_features_clipped": 3764,
     "land_paths_available": 4776,
@@ -49,7 +49,7 @@
     "coastline_paths_dropped": 0
   },
   "counts": {
-    "land_features_inspected": 11321,
+    "land_features_inspected": 11322,
     "land_features_candidates": 3766,
     "land_features_clipped": 3764,
     "land_paths_available": 4776,

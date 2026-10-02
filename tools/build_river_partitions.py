@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import sys
 from typing import Any
 
 import shapely
@@ -20,9 +21,20 @@ from shapely.geometry import LineString, MultiLineString, Polygon, MultiPolygon,
 from shapely.geometry.polygon import orient
 from shapely.ops import polygonize_full, unary_union
 
+# Keep both direct script execution and package imports supported.
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from tools.river_partitions.admission import compare_packs, read_selections, validate_comparison_source
+
 SCHEMA_VERSION = 1
 ALGORITHM_VERSION = "river-joint-noding-v1"
 MAX_PARTS = 128
+
+
+class PartitionError(ValueError):
+    def __init__(self, code, message):
+        super().__init__(message)
+        self.code = code
 
 
 def _read(path: Path) -> Any:
@@ -152,12 +164,12 @@ def partition_parent(feature: dict, river_lines, *, max_parts=MAX_PARTS) -> tupl
     audit = {"parentId": parent_id, "status": "rejected"}
     try:
         if not parent_id:
-            raise ValueError("Missing parent ID")
+            raise PartitionError("missing_id", "Missing parent ID")
         original = shape(feature["geometry"])
         if not _polygons(original) or original.is_empty or not original.is_valid:
-            raise ValueError("Invalid/empty parent polygon; automatic repair is forbidden")
+            raise PartitionError("invalid_parent", "Invalid/empty parent polygon; automatic repair is forbidden")
         if not _coordinates_are_local(original):
-            raise ValueError("Date-line/polar domain is outside the v1 planar partition contract")
+            raise PartitionError("unsupported_domain", "Date-line/polar domain is outside the v1 planar partition contract")
         source_components = len(_polygons(original))
         # Node original linework with the original boundary exactly once.
         # Intersecting each river with the polygon first can manufacture almost-
@@ -168,7 +180,7 @@ def partition_parent(feature: dict, river_lines, *, max_parts=MAX_PARTS) -> tupl
         noded = unary_union([original.boundary, *crossing])
         faces, cuts, dangles, invalid = polygonize_full(noded)
         if not invalid.is_empty:
-            raise ValueError("Polygonization produced invalid ring linework")
+            raise PartitionError("invalid_linework", "Polygonization produced invalid ring linework")
         parts = []
         for face in faces.geoms:
             point = face.representative_point()
@@ -180,23 +192,23 @@ def partition_parent(feature: dict, river_lines, *, max_parts=MAX_PARTS) -> tupl
                 if outside.is_empty and not inside.is_empty:
                     parts.append(face)
                 elif not inside.is_empty:
-                    raise ValueError("Ambiguous original-domain membership for a narrow face")
+                    raise PartitionError("ambiguous_membership", "Ambiguous original-domain membership for a narrow face")
             elif original.covers(point):
                 parts.append(face)
         if len(parts) <= source_components:
             return None, {**audit, "status": "uncut", "sourceComponents": source_components,
                           "cutLineLength": cuts.length, "interiorDanglingLineLength": dangles.intersection(original).length}
         if len(parts) > max_parts:
-            raise ValueError(f"Partition exceeds {max_parts} faces; review rather than drop fragments")
+            raise PartitionError("face_budget", f"Partition exceeds {max_parts} faces; review rather than drop fragments")
         if any(part.is_empty or not part.is_valid or part.area <= 0 for part in parts):
-            raise ValueError("Invalid/zero-area partition face")
+            raise PartitionError("invalid_face", "Invalid/zero-area partition face")
         combined = unary_union(parts)
         difference = original.symmetric_difference(combined).area
         distance = original.hausdorff_distance(combined)
         overlap = sum(parts[i].intersection(parts[j]).area for i in range(len(parts)) for j in range(i))
         area_tolerance = max(1e-14, original.area * 1e-12)
         if difference > area_tolerance or overlap > area_tolerance or distance > 1e-9:
-            raise ValueError(f"Coverage check failed: difference={difference}, overlap={overlap}, distance={distance}")
+            raise PartitionError("coverage_overlap_distance", f"Coverage check failed: difference={difference}, overlap={overlap}, distance={distance}")
         parent_geometry = d3_geometry(original)
         cells = []
         for part in parts:
@@ -206,7 +218,7 @@ def partition_parent(feature: dict, river_lines, *, max_parts=MAX_PARTS) -> tupl
                           "geometry": cell_geometry, "geometryFingerprint": cell_fingerprint})
         cells.sort(key=lambda item: item["id"])
         if len({cell["id"] for cell in cells}) != len(cells):
-            raise ValueError("Cell identity collision at the declared coordinate identity grid")
+            raise PartitionError("identity_collision", "Cell identity collision at the declared coordinate identity grid")
         entry = {"parentId": parent_id, "parentGeometry": parent_geometry,
                  "parentFingerprint": geometry_fingerprint(parent_geometry), "cells": cells}
         audit.update(status="partitioned", sourceComponents=source_components, cells=len(cells),
@@ -216,7 +228,7 @@ def partition_parent(feature: dict, river_lines, *, max_parts=MAX_PARTS) -> tupl
                      cutLineLength=cuts.intersection(original).length, interiorDanglingLineLength=dangles.intersection(original).length)
         return entry, audit
     except (ValueError, TypeError, KeyError, shapely.errors.GEOSException) as exc:
-        return None, {**audit, "reason": str(exc)}
+        return None, {**audit, "reasonCode": getattr(exc, "code", "geometry_error"), "reason": str(exc)}
 
 
 def select_rivers(features: list[dict], names: list[str], include_lake_centerlines=False):
@@ -335,6 +347,7 @@ def node_contour_neighbors(land_features, entries):
         checks.append({"parentId": fid, "insertedVertices": inserted,
                        "symmetricDifferenceDegrees2": difference, "hausdorffDegrees": distance})
     support.sort(key=lambda item: item["parentId"])
+    checks.sort(key=lambda item: item["parentId"])
     return support, checks
 
 def build_pack(land_features: list[dict], river_lines, *, scene_id: str, source: dict,
@@ -342,13 +355,18 @@ def build_pack(land_features: list[dict], river_lines, *, scene_id: str, source:
     ids = [feature_id(f) for f in land_features]
     if not all(ids) or len(set(ids)) != len(ids):
         raise ValueError("Land inputs require unique nonempty IDs")
-    if parent_ids and parent_ids - set(ids):
+    if parent_ids is not None:
+        requested = list(parent_ids)
+        if not requested or any(not isinstance(fid, str) or not fid.strip() for fid in requested) or len(set(requested)) != len(requested):
+            raise ValueError("Requested parents require unique nonempty IDs and a nonempty scope")
+        parent_ids = set(requested)
+    if parent_ids is not None and parent_ids - set(ids):
         raise ValueError(f"Requested parents missing from input: {sorted(parent_ids - set(ids))}")
     entries, audits = [], []
     tree = shapely.STRtree(river_lines)
     for feature in land_features:
         fid = feature_id(feature)
-        if parent_ids and fid not in parent_ids:
+        if parent_ids is not None and fid not in parent_ids:
             continue
         props = feature.get("properties", {})
         if props.get("interactive") is False or props.get("render_as_base_geography") is True or "_FB_" in fid:
@@ -358,9 +376,10 @@ def build_pack(land_features: list[dict], river_lines, *, scene_id: str, source:
             geometry = shape(feature["geometry"])
             candidates = [river_lines[int(i)] for i in tree.query(geometry, predicate="intersects")]
         except (ValueError, TypeError, KeyError, shapely.errors.GEOSException) as exc:
-            audits.append({"parentId": fid, "status": "rejected", "reason": str(exc)})
+            audits.append({"parentId": fid, "status": "rejected", "reasonCode": "geometry_error", "reason": str(exc)})
             continue
         if not candidates:
+            audits.append({"parentId": fid, "status": "no_intersection"})
             continue
         entry, audit = partition_parent(feature, candidates)
         audits.append(audit)
@@ -369,6 +388,7 @@ def build_pack(land_features: list[dict], river_lines, *, scene_id: str, source:
             if len(entries) > max_parents:
                 raise ValueError(f"More than {max_parents} split parents; narrow the pilot scope")
     entries.sort(key=lambda p: p["parentId"])
+    audits.sort(key=lambda p: p["parentId"])
     support, support_checks = node_contour_neighbors(land_features, entries)
     identity = {"sceneId": scene_id, "algorithm": ALGORITHM_VERSION, "source": source,
                 "parents": [[p["parentId"], p["parentFingerprint"], [c["geometryFingerprint"] for c in p["cells"]]] for p in entries],
@@ -381,6 +401,14 @@ def build_pack(land_features: list[dict], river_lines, *, scene_id: str, source:
     report = {"schemaVersion": 1, "packId": pack_id, "source": source,
               "summary": dict(Counter(a["status"] for a in audits)),
               "parentCount": len(entries), "cellCount": sum(len(p["cells"]) for p in entries),
+              "requestedParentCount": len(parent_ids) if parent_ids is not None else None,
+              "examinedParentCount": len(audits), "excludedParentCount": len(audits) - len(entries),
+              "geometryIssues": dict(Counter(a["reasonCode"] for a in audits if a["status"] == "rejected")),
+              "lineworkDiagnostics": {
+                  "parentsWithCuts": sum(a.get("cutLineLength", 0) > 0 for a in audits),
+                  "parentsWithInteriorDangles": sum(a.get("interiorDanglingLineLength", 0) > 0 for a in audits),
+              },
+              "geographicAlignment": "not_evaluated; coverage checks do not prove real-world river alignment",
               "audit": audits, "supportCount": len(support), "supportChecks": support_checks, "shapelyVersion": shapely.__version__}
     return pack, report
 
@@ -389,8 +417,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--land", type=Path, required=True)
     parser.add_argument("--rivers", type=Path, default=Path("data/global_rivers.geojson"))
-    parser.add_argument("--river", action="append", required=True, dest="names")
+    parser.add_argument("--river", action="append", default=[], dest="names")
     parser.add_argument("--parent", action="append", default=[])
+    parser.add_argument("--selection", "--selection-file", action="append", type=Path, default=[],
+                        help="Schema-1 JSON parent/river selection with expected source digests; repeat for regional scopes")
+    parser.add_argument("--compare-against", type=Path, help="Require exact old parent geometry and cell identities to survive")
     parser.add_argument("--scene-id", required=True, help="Exact scenario ID; use modern_world for the modern map")
     parser.add_argument("--land-object", default="political")
     parser.add_argument("--base-commit", default="")
@@ -401,23 +432,73 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.max_parents <= 0:
         parser.error("--max-parents must be positive")
+    try:
+        return _run_build(args, parser)
+    except (ValueError, OSError) as exc:
+        parser.error(str(exc))
+
+
+def _run_build(args, parser):
+    audit_path = args.output.with_suffix(".audit.json")
+    if audit_path.resolve() == args.output.resolve():
+        raise ValueError("--output must differ from its .audit.json report path")
+    protected_inputs = [args.land, args.rivers, *args.selection]
+    if args.compare_against:
+        protected_inputs.append(args.compare_against)
+    if any(target.resolve() == path.resolve() for target in (args.output, audit_path) for path in protected_inputs):
+        raise ValueError("Output pack/audit must not overwrite a source, selection or comparison input")
     source = {"landPath": args.land.as_posix(), "landDigest": _digest(args.land.read_bytes()),
               "riverPath": args.rivers.as_posix(), "riverDigest": _digest(args.rivers.read_bytes()),
-              "riverNames": sorted(set(args.names)), "includeLakeCenterlines": args.include_lake_centerlines}
+              "includeLakeCenterlines": args.include_lake_centerlines}
     if args.base_commit:
         source["baseCommit"] = args.base_commit
     if args.baseline_hash:
         source["baselineHash"] = args.baseline_hash
+    # landObject participates in selection validation without changing legacy
+    # source metadata or pack identity for the default political object.
+    selection_source = {**source, "landObject": args.land_object}
+    parents, names = read_selections(args.selection, args.parent, args.names,
+                                    scene_id=args.scene_id, source=selection_source)
+    source["riverNames"] = names
+    if args.land_object != "political":
+        source["landObject"] = args.land_object
+    baseline = _read(args.compare_against) if args.compare_against else None
+    if baseline is not None:
+        validate_comparison_source(baseline, scene_id=args.scene_id, source=source)
+        if baseline["source"].get("landObject", "political") != args.land_object:
+            raise ValueError("Comparison source identity mismatch: landObject")
+        if not parents or {p["parentId"] for p in baseline["parents"]} - set(parents):
+            raise ValueError("Comparison requires an explicit scope including every old parent")
     land = decode_features(_read(args.land), args.land_object)
-    rivers = select_rivers(decode_features(_read(args.rivers), "rivers"), args.names, args.include_lake_centerlines)
+    rivers = select_rivers(decode_features(_read(args.rivers), "rivers"), names, args.include_lake_centerlines)
     pack, report = build_pack(land, rivers, scene_id=args.scene_id, source=source,
-                              parent_ids=set(args.parent) or None, max_parents=args.max_parents)
+                              parent_ids=set(parents) if parents else None, max_parents=args.max_parents)
+    report["selectionFiles"] = [path.as_posix() for path in args.selection]
+    if baseline is not None:
+        report["comparison"] = compare_packs(pack, baseline)
+    report["newParentCount"] = report["comparison"]["newParentCount"] if baseline is not None else None
+    report["oldParentCount"] = report["comparison"]["oldParentCount"] if baseline is not None else None
+    payload = (json.dumps(pack, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
+    report["packBytes"] = len(payload)
+    report["buildPassed"] = not report["geometryIssues"]
+    report["selectionComplete"] = report["excludedParentCount"] == 0
+    report["compatibilityPassed"] = report["comparison"]["passed"] if baseline is not None else None
+    report["candidateWritten"] = False
+    report["packPath"] = args.output.as_posix()
+    # Always retain the audit on compatibility failure, but never write the
+    # failing candidate over an existing output pack.
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(pack, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
-    audit_path = args.output.with_suffix(".audit.json")
+    if baseline is not None and not report["compatibilityPassed"]:
+        audit_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        parser.error(f"Old parent compatibility failed; audit: {audit_path}; candidate pack not written")
+    args.output.write_bytes(payload)
+    report["candidateWritten"] = True
     audit_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"pack": str(args.output), "audit": str(audit_path), **report["summary"],
-                      "parentCount": report["parentCount"], "cellCount": report["cellCount"]}))
+                      "parentCount": report["parentCount"], "cellCount": report["cellCount"],
+                      "supportCount": report["supportCount"], "packBytes": report["packBytes"],
+                      "newParentCount": report["newParentCount"], "oldParentCount": report["oldParentCount"],
+                      "geometryIssues": report["geometryIssues"], "compatibilityPassed": report["compatibilityPassed"]}))
 
 
 if __name__ == "__main__":

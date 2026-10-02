@@ -6,6 +6,9 @@ city_reveal_plan_regression.spec.js
 city_urban_rendering_regression.spec.js
 dev_workspace_i18n.spec.js
 dev_workspace_render_boundary.spec.js
+editor_detail_polish.spec.js
+editor_refresh_motion.spec.js
+editor_task_context.spec.js
 editor_workspace_renewal.spec.js
 hoi4_1939_ui_smoke.spec.js
 hoi4_rk_russia_regression.spec.js
@@ -20,7 +23,9 @@ physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js
 review_regressions.spec.js
+river_contour_visibility.spec.js
 river_layer_regression.spec.js
+river_overlap_visibility.spec.js
 river_paint.spec.js
 sample_guide_deeplink.spec.js
 scenario_apply_concurrency.spec.js

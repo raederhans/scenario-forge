@@ -1,3 +1,7 @@
+import { createRiverPaintControls } from "./river_paint_controls.js";
+import { createRiverCellPicker } from "./river_cell_picker.js";
+import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
+import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
 // Toolbar UI (Phase 13)
 import {
@@ -10,6 +14,8 @@ import {
 import {
   autoFillMap,
   getZoomPercent,
+  focusRiverPaintParentById,
+  applyRiverPaintCellById,
   invalidateOceanBackgroundVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
@@ -24,6 +30,8 @@ import {
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
+  setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
 import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
@@ -85,6 +93,8 @@ import {
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
 import { createPaletteLibraryOperation } from "../core/palette_library_operation.js";
+import { createPaletteCountryEditor } from "./toolbar/palette_country_editor.js";
+import { getPaletteCountryTargets } from "../core/palette_country_targets.js";
 import { createPaletteLibraryStateAccess } from "../core/palette_library_state_access.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
@@ -109,6 +119,7 @@ function composePaletteLibraryOperation() {
   const owner = createPaletteLibraryOperation({
     getApplyTarget: stateAccess.getApplyTarget,
     getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
+    getCountryFeatureIds: (code) => [...(getPaletteCountryTargets(runtimeState).get(code) || [])],
     applyFeatureColor: stateAccess.applyFeatureColor,
     applyOwnerColor: stateAccess.applyOwnerColor,
     captureHistoryState,
@@ -1364,6 +1375,36 @@ function initToolbar({ render } = {}) {
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  const riverCellPicker = createRiverCellPicker({
+    state: runtimeState,
+    panel: document.getElementById("riverCellPicker"),
+    select: document.getElementById("riverCellSelect"),
+    preview: document.getElementById("riverCellPreview"),
+    applyButton: document.getElementById("riverCellApplyBtn"),
+    title: document.getElementById("riverCellPickerTitle"),
+    closeButton: document.getElementById("riverCellCloseBtn"),
+    caption: document.getElementById("riverCellPreviewCaption"),
+    applyCell: applyRiverPaintCellById,
+    announce: message => showToast(message),
+  });
+  const riverPaintControls = createRiverPaintControls({
+    state: runtimeState,
+    button: document.getElementById("riverPaintToggleBtn"),
+    statusNode: document.getElementById("riverPaintStatus"),
+    navigationPanel: document.getElementById("riverPaintNavigation"),
+    searchInput: document.getElementById("riverPaintSearchInput"),
+    riverSelect: document.getElementById("riverPaintRiverSelect"),
+    resultsNode: document.getElementById("riverPaintLocationResults"),
+    locationButton: document.getElementById("riverPaintLocationGoBtn"),
+    locationSelect: document.getElementById("riverPaintLocationSelect"),
+    focusParent: focusRiverPaintParentById,
+    onLocation: riverCellPicker.open,
+    onSync: riverCellPicker.sync,
+    rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
+    render: () => { if (typeof render === "function") render(); },
+    markDirty,
+    announce: (message) => showToast(message),
+  });
   const refreshPaintModeUi = () => {
     runtimeState.paintMode = normalizePaintMode(runtimeState.paintMode);
     runtimeState.ui.politicalEditingExpanded = false;
@@ -1377,6 +1418,7 @@ function initToolbar({ render } = {}) {
     if (paintGranularitySelect) {
       paintGranularitySelect.value = runtimeState.interactionGranularity || "subdivision";
     }
+    riverPaintControls.sync();
     refreshPaintControlsLayout();
     refreshActiveSovereignLabel();
     refreshDynamicBorderStatus();
@@ -1563,6 +1605,20 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
 
+  const paletteCountryEditor = createPaletteCountryEditor({
+    state: runtimeState,
+    host: paletteLibraryPanel,
+    applyColor: (color, countryCode) => {
+      if (!countryCode) return { status: "no-target" };
+      const result = applyPaletteLibraryOperation(color, { countryCode });
+      if (result.status === "applied") {
+        addRecentColor(result.color);
+        updateSwatchUI();
+        if (render) render();
+      }
+      return result;
+    },
+  });
   const paletteLibraryPanelController = createPaletteLibraryPanelController({
     themeSelect,
     paletteLibraryToggle,
@@ -1589,7 +1645,10 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);
   registerRuntimeHook(state, "renderPaletteFn", renderPalette);
 
-  registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
+  registerRuntimeHook(state, "updatePaletteLibraryUIFn", () => {
+    renderPaletteLibrary();
+    paletteCountryEditor.render();
+  });
 
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
@@ -1602,6 +1661,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);
 
   function updateSwatchUI() {
+    paletteCountryEditor.render();
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
       if (swatch.dataset.color === runtimeState.selectedColor) {
@@ -2443,6 +2503,7 @@ function initToolbar({ render } = {}) {
       bakeCtx.drawImage(compositeCanvas, 0, 0);
     } else {
       if (bakePassNames.length) {
+        await ensureCountryLabelsReadyForExport(bakePassNames);
         const passCanvas = renderExportPassesToCanvas(bakePassNames);
         if (passCanvas) {
           bakeCtx.drawImage(passCanvas, 0, 0);
@@ -2520,6 +2581,7 @@ function initToolbar({ render } = {}) {
       ...exportUi,
       visibility: exportUi.visibility,
     }, RENDER_PASS_NAMES).filter((passName) => exportUi.textVisibility?.["render-labels"] || passName !== "labels");
+    await ensureCountryLabelsReadyForExport(passNames);
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
@@ -2552,6 +2614,7 @@ function initToolbar({ render } = {}) {
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);
+      await ensureCountryLabelsReadyForExport(model?.passNames || []);
       const canvas = renderExportPassesToCanvas(model?.passNames || [], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);
@@ -2559,6 +2622,7 @@ function initToolbar({ render } = {}) {
       return canvas;
     }
     if (normalizedSourceId === "render-labels") {
+      await ensureCountryLabelsReadyForExport(["labels"]);
       const canvas = renderExportPassesToCanvas(["labels"], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", "Render-pass label canvas unavailable.");
@@ -2825,7 +2889,10 @@ function initToolbar({ render } = {}) {
         tone: "warning",
       });
       if (!confirmed) return;
-      const featureIds = Object.keys(runtimeState.visualOverrides || {});
+      const featureIds = [...new Set([
+        ...Object.keys(runtimeState.visualOverrides || {}),
+        ...getEditedRiverParentIds(runtimeState.riverPaint),
+      ])];
       const ownerCodes = Array.from(new Set([
         ...Object.keys(runtimeState.sovereignBaseColors || {}),
       ]));
@@ -2835,6 +2902,7 @@ function initToolbar({ render } = {}) {
       });
       runtimeState.colors = {};
       runtimeState.visualOverrides = {};
+      clearAllRiverPaintOverridesState(runtimeState);
       runtimeState.sovereignBaseColors = {};
       refreshColorState({ renderNow: true });
       refreshActiveSovereignLabel();

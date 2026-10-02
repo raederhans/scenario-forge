@@ -10,6 +10,7 @@ import { normalizeHexColor } from "./palette_manager.js";
 export function createPaletteLibraryOperation({
   getApplyTarget,
   getOwnerFeatureIds,
+  getCountryFeatureIds = getOwnerFeatureIds,
   applyFeatureColor,
   applyOwnerColor,
   captureHistoryState,
@@ -30,6 +31,7 @@ export function createPaletteLibraryOperation({
     selectPaintColor,
     getApplyTarget,
     getOwnerFeatureIds,
+    getCountryFeatureIds,
     applyFeatureColor,
     applyOwnerColor,
   })) {
@@ -37,26 +39,30 @@ export function createPaletteLibraryOperation({
       throw new TypeError(`[palette_library_operation] ${name} must be a function`);
     }
   }
-  function applyColor(rawColor) {
+  function applyColor(rawColor, { countryCode = "" } = {}) {
     const color = normalizeHexColor(rawColor);
     if (!color) return { status: "invalid-color" };
-    const target = getApplyTarget();
+    const explicitCountry = String(countryCode || "").trim().toUpperCase();
+    const countryIds = explicitCountry ? getCountryFeatureIds(explicitCountry) : [];
+    if (explicitCountry && !countryIds.length) return { status: "no-target" };
+    const target = explicitCountry ? { type: "owner", ownerCode: explicitCountry } : getApplyTarget();
     if (!target) return { status: "no-target" };
 
     selectPaintColor(color);
     const isFeature = target.type === "feature";
-    const featureIds = isFeature
+    const featureIds = explicitCountry ? countryIds : isFeature
       ? target.featureIds
       : getOwnerFeatureIds(target.ownerCode);
-    const historyScope = isFeature
+    const historyScope = explicitCountry ? { featureIds, ownerCodes: [explicitCountry] } : isFeature
       ? { featureIds }
       : { ownerCodes: [target.ownerCode] };
-    const kind = isFeature ? "palette-library-apply-color" : "palette-library-apply-owner-color";
+    const kind = explicitCountry ? "palette-country-color" : isFeature ? "palette-library-apply-color" : "palette-library-apply-owner-color";
     const before = captureHistoryState(historyScope);
     if (isFeature) {
       applyFeatureColor(featureIds, color);
     } else {
       applyOwnerColor(target.ownerCode, color);
+      if (explicitCountry) applyFeatureColor(featureIds, color);
     }
 
     if (featureIds.length) {
@@ -71,7 +77,7 @@ export function createPaletteLibraryOperation({
       after: captureHistoryState(historyScope),
       meta: { affectsSovereignty: false },
     });
-    return { status: "applied", color, target };
+    return { status: "applied", color, target, ...(explicitCountry ? { featureCount: featureIds.length } : {}) };
   }
   return Object.freeze({ applyColor });
 }

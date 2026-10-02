@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/blank_base/audit.json",
-  "baseline_hash": "c4dd31360299a7815782e0f2387abff990453fcf05d22f66b0ef60b61d5077c0",
+  "baseline_hash": "9edd8e56c7809cfd2b4c561250527dcf3c90229926114cef11420b38f7e2beee",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Editable ownerless map canvas with full province geometry and no pre-assigned ownership, controllers, or cores.",
   "bookmark_name": "Blank Map",
@@ -32,11 +32,11 @@
   "runtime_topology_url": "data/scenarios/blank_base/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "a304052c1aa83b2d8e326e6a5f4d009c45422bd4fd66a39cddb5c08b5daebc78",
+  "snapshot_fingerprint": "f3b3ed6ddfa71c96db4c59e9af33afc2aec66f7efcb5ba642c0768e2b1d8e1f9",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
-    "runtime_topology_sha256": "cac2fee5d568f5a3996d3bf4c146bebb23b53d5c7d671c9d98c50b387efe99b4"
+    "runtime_topology_sha256": "acd7ba81f35385fb5c1b461fc223bdbdc1fa540ecc0b17427eda711b5c11ca8f"
   },
   "special_zone_layers_url": "data/scenarios/blank_base/special_zone_layers.json",
   "style_defaults": {
@@ -53,24 +53,24 @@
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
-    "changed_feature_count": 11321,
+    "changed_feature_count": 11322,
     "controller_count": 0,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 11321,
+    "feature_count": 11322,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 0,
     "quality_counts": {
-      "ownerless_editable_topology": 11321
+      "ownerless_editable_topology": 11322
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "ownerless_editable_topology": 11321
+      "ownerless_editable_topology": 11322
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

@@ -1,5 +1,15 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const UI_WORKBENCH_RECORDS = [
+  ...["editor_detail_polish", "editor_refresh_motion", "editor_task_context"].map((name, index) => ({
+    id: `e2e:tests/e2e/${name}.spec.js`,
+    commandRef: `node tools/e2e_layering.mjs run-spec tests/e2e/${name}.spec.js`,
+    sourceRefs: [`tests/e2e/${name}.spec.js`],
+    ownerHints: ["ui-shell"], domains: ["ui-rework"], tiers: ["regression"],
+    cost: "heavy", resourceLocks: ["browser-dev-server", "playwright-browser", ".runtime-output"],
+    executionOwners: ["main-thread"], profiles: ["full"], platforms: ["all"],
+    entrypointPolicyIndex: 0, verificationOrder: null, selectorOrder: 2000 + index,
+    verification: null, selector: {},
+  })),
   {
     "id": "direct-e2e:test:e2e:dev:stage5-visual-acceptance",
     "commandRef": "test:e2e:dev:stage5-visual-acceptance",

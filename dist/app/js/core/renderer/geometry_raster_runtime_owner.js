@@ -117,10 +117,11 @@ export function createGeometryRasterRuntimeOwner({ state, surface, helpers: h, e
     }
     const baseFrame = politicalFrame;
     const patch = planPoliticalRasterPatch(baseFrame, entries, description, h.getPoliticalEntryPixelBounds);
-    const task = { identity: String(description.identity), transform: description.transform,
+    // Worker bookkeeping owns its snapshot before attaching the request promise.
+    const task = structuredClone({ identity: String(description.identity), transform: description.transform,
       scenarioId: state.activeScenarioId, sceneGeneration: state.sceneGeneration,
       scenarioDataGeneration: state.scenarioDataGeneration, topologyRevision: state.topologyRevision,
-      colorRevision: state.colorRevision, projectionKey: description.projectionKey };
+      colorRevision: state.colorRevision, projectionKey: description.projectionKey });
     const patchInput = patch ? { renderRegion: patch.region, drawEntryIds: patch.drawEntryIds,
       patchBaseIdentity: baseFrame.identity } : {};
     let receivedResult = null;

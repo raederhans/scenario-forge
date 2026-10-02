@@ -1,5 +1,11 @@
 ## 第七批对话协作与所有权
 
+## 体积/性能与整合阶段
+
+工作树仍为独立ocean-batch-refinement；七批成果保存于fc878761。整合基线origin/main为faabcf81，远端严格required checks和admin保护生效。冲突元数据以当前main为起点，再执行水域专用sync；TNO通过transplant_water_features移入七批scenario_water，逐对象decoded_structure核对确认全部非水对象与当前main相等、全部水域与fc878761相等。紧凑序列化后整合TNO为104,193,959bytes，报告`.runtime/tmp/ocean-performance/merge-geometry.json`。两次直接写Git冲突文件遭Windows短暂文件占用，改用Git restore和项目已有atomic writer完成，无丢弃未归属内容。
+
+共享进程owner=root。命令`python -B tools/sync_marine_refinement.py`，cwd为此工作树；独占六场景元数据、startup bundles和TNO water chunks，日志`.runtime/reports/generated/ocean-performance/integration-sync.log`。成功条件exit0且后续strict契约通过；失败先检查日志，不并发或盲目重试。子代理只读归因与独占runtime实验，不操作此builder。后续尺寸优化生成与最终验证仍由root串行管理，输出集中于同一reports目录。浏览器/CI性能结果需在数据冻结后获取。
+
 第七批已本地完成。sync65010、31 Python source/geometry/authority、22 catalog/bootstrap/queue、六场景strict、catalog672及data_health均退出0；health保留13大文件提示。Node按原断言修正稳定probe后7项重跑全PASS（215.6秒），与原未受影响10项合计17项，当前70个不同目标测试全部通过。全部writer已结束，三研究对话均idle，未提交/发布。最终base292/TNO285、supplement144/shared253、9waterchunks、snapshot97,524,150bytes；准确启动体积与审核队列见task.md，既有5MB预算缺口及99.37MiB拓扑约束均保留。
 
 Node首轮17项中13通过、4项因同一个Khawr al Hajar probe的mask边界分类actual:null失败。原点[59.747091759789186,22.534764407538113]距实际land/ocean边界0.000815615度，落在validator既有0.001度不确定带；唯一水域命中与直接D3海陆判断均正确。root只读检查找到新点[59.74649175978919,22.534964407538112]，位于原candidate和两份admitted几何内部，距mask0.001369802度。三拓扑分别检查中心和四向一个base grid diagonal（0.000156137度）共15点，均保持唯一命中、陆地false、base ocean true及mask距离>0.001。仅更新共同fixture坐标，保留全部expectedLand/expectedOcean、生产几何及validator阈值；原失败日志与诊断、稳定点验证保留在wave7报告目录。重跑受点位影响的7项，其他10项原PASS继续有效。

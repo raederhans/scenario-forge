@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import test from "node:test";
-import { createCountryLabelRenderOwner, projectCountryLabelPolygons } from "../js/core/renderer/country_label_render_owner.js";
+import { createCountryLabelRenderOwner, projectCountryLabelPolygons, waitForCountryLabelsForExport } from "../js/core/renderer/country_label_render_owner.js";
 import { createCountryLabelLayoutWorkerHandler } from "../js/core/renderer/country_label_layout_worker.js";
 
 const vendor = await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8");
@@ -347,4 +347,33 @@ test("a stale idle callback cannot strand preparation after a projection change"
   callbacks.shift()();
   assert.equal(owner.getDiagnostics().fitBuilds, 1);
   assert.equal(owner.isReadyForCurrentView(), true);
+});
+
+test("export waits for country name source and layout workers", async () => {
+  let tick = 0, prepared = 0, requested = 0;
+  await waitForCountryLabelsForExport({
+    prepareSource: async () => { prepared += 1; },
+    getSource: () => ({ status: tick ? "ready" : "pending" }),
+    getDiagnostics: () => ({ workerErrors: 0, pendingFits: tick < 3 ? 1 : 0 }),
+    requestRender: () => { requested += 1; }, isDisabled: () => false,
+    wait: async () => { tick += 1; }, now: () => tick,
+  });
+  assert.equal(tick, 3);
+  assert.equal(prepared, 1);
+  assert.equal(requested, 1);
+});
+
+test("export preserves label failure and timeout guards and disabled bypass", async () => {
+  const options = { prepareSource: async () => {}, getSource: () => ({ status: "ready" }),
+    getDiagnostics: () => ({ workerErrors: 1, pendingFits: 0 }), requestRender: () => {},
+    isDisabled: () => false };
+  await assert.rejects(waitForCountryLabelsForExport(options), /failed to prepare/);
+  await assert.rejects(waitForCountryLabelsForExport({ ...options,
+    getSource: () => ({ status: "error", error: "source failed" }) }), /source failed/);
+  let tick = 0;
+  await assert.rejects(waitForCountryLabelsForExport({ ...options,
+    getDiagnostics: () => ({ workerErrors: 0, pendingFits: 1 }),
+    wait: async () => { tick++; }, now: () => tick, timeoutMs: 2 }), /still preparing/);
+  await waitForCountryLabelsForExport({ ...options, isDisabled: () => true,
+    prepareSource: () => { throw new Error("must not prepare disabled labels"); } });
 });
