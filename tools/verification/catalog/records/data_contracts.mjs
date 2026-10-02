@@ -1796,10 +1796,13 @@ export const DATA_CONTRACTS_RECORDS = [
   },
   {
     "id": "water:geometry-runtime-contract",
-    "commandRef": "node --test tests/water_geometry_runtime.test.mjs",
+    "commandRef": "node --test tests/water_geometry_runtime.test.mjs tests/marine_refinement_runtime.test.mjs",
     "sourceRefs": [
       "tools/check_water_geometry.mjs",
-      "tests/water_geometry_runtime.test.mjs"
+      "tests/water_geometry_runtime.test.mjs",
+      "tests/marine_refinement_runtime.test.mjs",
+      "tests/fixtures/ocean_wave6_probes.json",
+      "tests/fixtures/ocean_wave7_probes.json"
     ],
     "ownerHints": [
       "water-runtime"

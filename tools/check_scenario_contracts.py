@@ -40,7 +40,7 @@ from map_builder.contracts import (
 )
 from map_builder.io.writers import write_json_atomic
 from tools.build_startup_bootstrap_assets import build_startup_bootstrap_assets
-from tools.build_startup_bundle import build_startup_bundles
+from tools.build_startup_bundle import STARTUP_BUNDLE_VERSION, build_startup_bundles
 from tools.scenario_contract_paths import (
     TNO_ATLANTROPA_DONOR_LEDGER_FILENAME,
     TNO_COVERAGE_DERIVED_DIRNAME,
@@ -1090,6 +1090,7 @@ def apply_safe_scenario_contract_repairs(
         safe_fixes_applied.append("coverage_ledgers")
 
     if profile.expect_startup_assets:
+        manifest["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
         for language, field_name in SCENARIO_STARTUP_BUNDLE_MANIFEST_LANGUAGE_FIELDS.items():
             manifest[field_name] = f"data/scenarios/{scenario_id}/{SCENARIO_STARTUP_BUNDLE_FILENAMES_BY_LANGUAGE[language]}"
         write_json(manifest_path, manifest)

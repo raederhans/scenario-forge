@@ -904,10 +904,19 @@ MARINE_REGIONS_DATASET_META = {
         "license_url": MARINE_REGIONS_LICENSE_URL,
         "layer": "MarineRegions:iho",
     },
+    "world_bay_gulf": {
+        "dataset_name": "Marine Regions World Bay/Gulf",
+        "source_url": MARINE_REGIONS_SOURCES_URL,
+        "endpoint": MARINE_REGIONS_WFS_URL,
+        "gazetteer_url": "https://www.marineregions.org/",
+        "license_url": MARINE_REGIONS_LICENSE_URL,
+        "layer": "MarineRegions:world_bay_gulf",
+    },
 }
 MARINE_REGIONS_SOURCE_RECORD_ID_FIELDS_BY_LAYER = {
     "seavox_v19": ("mrgid_sr", "mrgid_l4", "mrgid_l3", "mrgid_l2", "mrgid_l1", "mrgid_r"),
     "iho": ("mrgid",),
+    "world_bay_gulf": ("mrgid",),
 }
 TNO_NAMED_MARGINAL_WATER_SPECS = (
     {
@@ -2604,12 +2613,17 @@ from map_builder.geo.marine_refinement import (
     tno_additional_specs, additional_snapshot_features, restore_ocean_parent_footprints,
     reconcile_marine_source_boundaries,
 )
-TNO_NAMED_MARGINAL_WATER_SPECS += tno_additional_specs()
+_additional_named_water_specs = tno_additional_specs()
+TNO_NAMED_MARGINAL_WATER_SPECS += _additional_named_water_specs
 # The coarse South China / archipelagic source overlaps these independently
 # named SeaVoX regions. Subtract explicit source footprints, never draw order.
 for _spec in TNO_NAMED_MARGINAL_WATER_SPECS:
     if _spec["id"] in {"tno_south_china_sea", "tno_banda_sea", "tno_java_sea", "tno_arafura_sea", "tno_timor_sea", "tno_caribbean_sea", "tno_gulf_of_mexico"}:
-        _spec["subtract_named_ids"] = (*_spec.get("subtract_named_ids", ()), *(s["id"] for s in tno_additional_specs()))
+        _spec["subtract_named_ids"] = (*_spec.get("subtract_named_ids", ()), *(s["id"] for s in _additional_named_water_specs))
+    # Keep existing children and derive new parent exclusions from their specs.
+    _additional_child_ids = tuple(s["id"] for s in _additional_named_water_specs if s.get("parent_id") == _spec["id"])
+    if _additional_child_ids:
+        _spec["subtract_named_ids"] = tuple(dict.fromkeys((*_spec.get("subtract_named_ids", ()), *_additional_child_ids)))
 
 TNO_BASE_GEOGRAPHY_WATER_CLONE_IDS = (
     "caspian_sea",

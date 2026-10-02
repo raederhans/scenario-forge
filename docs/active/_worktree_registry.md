@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-02 七批海域细化、体积与性能整合
+
+`C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域检查点`fc878761`已通过`61ab07bc`整合`faabcf81`主线。119个新增海域保留，启动gzip减少16.5%–17.0%，启动几何传输局部基准减少61.1%–67.6%；六场景strict、五项浏览器case和65项Pages测试通过，保留两项既有5MB预算失败。用户已授权优化后合并推送，root唯一负责Git交付；优化提交`f8334221`已推送，最终required checks与合并以[PR #202](https://github.com/raederhans/scenario-forge/pull/202)回执为准。主目录及其他工作树未归属改动保留，本工作树及`.runtime`实验/验证证据为后续复核保留。范围和验收见[任务记录](ocean-batch-20261002/task.md)。
+
 ## 2026-10-02 沿河重叠地块与内部接缝修复
 
 `C:/Users/raede/.codex/worktrees/river-paint-integration/mapcreator` 使用 `codex/river-overlap-visibility`，基于 `bd6365ef` 修复七个重叠父地块的填色、命中及内部接缝可见性。前一轮 Wave6 经 PR #198 发布，覆盖 382 父 / 1,199 分区；Wave7 本地验收扩展至 389 父 / 1,276 分区，旧记录保持原样。覆盖顺序、轮廓遮挡和验收见 [重叠修复记录](river-overlap-repair/integration.md)。主工作区及其他工作树保持原所有权；本工作树及旧区域工作树为保存忽略的图集与几何审计而保留。最终提交、PR 检查、合并、发布和同步以 Git / GitHub 及 `.runtime/rv7/` 回执为准。
