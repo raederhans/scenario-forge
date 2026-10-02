@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { makeFixture, rectangle, realPilot, realWave2, realWave3, realWave3Text, d3 } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, rectangle, realPilot, realWave2, realWave3, realWave3Text, realWave5, realWave5TransportText, d3 } from './helpers/river_paint_fixture.mjs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState, verifyRiverPartitionFingerprints,
   getRiverParentCompatibility, getRiverPartitionIndex, getEditedRiverParentIds } from '../js/core/river_paint/partition_model.js';
 import { canonicalRiverGeometry, riverGeometryFingerprint } from '../js/core/river_paint/geometry_identity.js';
@@ -99,6 +99,35 @@ test('wave3 authentication rejects changed support, cells, provenance and unappr
   await assert.rejects(verifyApprovedRiverPack(unknown), /Unsupported/);
 });
 
+test('wave5 downloads exact reviewed geometry with all wave3 records preserved in a smaller transport', async () => {
+  const canonical = realWave5(), text = realWave5TransportText();
+  const pack = await loadRiverPaintPilot({ fetchImpl: async () => ({ ok: true, text: async () => text }) });
+  assert.deepEqual(pack, normalizeRiverPartitionPack(canonical));
+  assert.equal(pack.parents.length, 376); assert.equal(pack.support.length, 111);
+  assert.equal(pack.parents.reduce((n, parent) => n + parent.cells.length, 0), 1164);
+  const reviewed = JSON.parse(readFileSync(new URL('../tools/river_partitions/selections/wave5-reviewed.json', import.meta.url)));
+  assert.deepEqual(pack.parents.map(p => p.parentId).sort(), [...reviewed.parents].sort());
+  assert.ok(text.length <= 2_000_000);
+  assert.ok(text.length < realWave3Text().length);
+  assert.equal(await verifyRiverPartitionFingerprints(pack), pack);
+  for (const previous of realWave3().parents) {
+    assert.deepEqual(pack.parents.find(p => p.parentId === previous.parentId), previous);
+  }
+  const path = d3.geoPath(d3.geoEquirectangular());
+  for (const parent of pack.parents) for (const cell of parent.cells) {
+    assert.ok(d3.geoArea(cell.geometry) > 0 && d3.geoArea(cell.geometry) < 2 * Math.PI, cell.id);
+    assert.ok(path(cell.geometry) && !/NaN|Infinity/.test(path(cell.geometry)), cell.id);
+  }
+  for (const mutate of [
+    p => { p.source.baseCommit = 'different-source'; },
+    p => { p.support[0].geometry.coordinates.reverse(); p.support[0].parentId += '-changed'; },
+    p => { p.parents[0].cells[0].id += '-changed'; },
+  ]) {
+    const changed = realWave5(); mutate(changed);
+    await assert.rejects(verifyApprovedRiverPack(changed));
+  }
+});
+
 test('every approved pack requires its exact scenario version and generation', () => {
   for (const approved of APPROVED_RIVER_PACKS) {
     const pack = { packId: approved.packId };
@@ -151,7 +180,7 @@ test('approved loader uses the catalog URL and propagates abort and HTTP failure
   assert.equal(Buffer.byteLength(text, 'utf8'), text.length);
   assert.ok(text.length <= 2_000_000);
   const pack = await loadRiverPaintPilot({ signal, fetchImpl: async (url, options) => {
-    assert.equal(url, 'data/river_partitions/modern_world_wave3.json'); assert.equal(options.signal, signal);
+    assert.equal(url, 'data/river_partitions/modern_world_wave5.transport.json'); assert.equal(options.signal, signal);
     assert.equal(options.cache, 'no-cache');
     return { ok: true, text: async () => text };
   } });

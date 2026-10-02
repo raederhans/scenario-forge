@@ -1,0 +1,4993 @@
+{
+  "schemaVersion": 1,
+  "sceneId": "modern_world",
+  "status": "reviewed_offline_pending_joint_full_map_gate",
+  "source": {
+    "landDigest": "sha256:917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
+    "riverDigest": "sha256:60dbebd1fc2d4f9ba8b6d5327a99960c6bfcbe9c6df1d5d4508d0b70fa950a04",
+    "includeLakeCenterlines": true
+  },
+  "baselinePackId": "sha256:5a05c4173b95c642f970cfa556566eca4dae7929d04aa5d74490ab04d188b25a",
+  "approvedParentCount": 302,
+  "newParentCount": 82,
+  "newCellCount": 338,
+  "combinedParentCount": 384,
+  "knownHeldExclusions": [
+    "CN_CITY_17275852B50201707862643",
+    "CN_CITY_17275852B68283317499250",
+    "CN_CITY_17275852B70463469741157",
+    "CN_CITY_17275852B83584927302596",
+    "NL226"
+  ],
+  "records": [
+    {
+      "parentId": "RO221",
+      "name": "Brăila",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        27.05607056070562,
+        44.75674505445055,
+        28.172081720817204,
+        45.49447635676357
+      ],
+      "centroid": [
+        27.673622481878972,
+        45.085671402195146
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.273598739491566e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.20908846007911341,
+        "minimumCellShare": 3.502684023618324e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 7,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "HU120",
+      "name": "Pest",
+      "country": "HU",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        18.703987039870412,
+        46.95084473944739,
+        20.072000720007196,
+        48.056573773737725
+      ],
+      "centroid": [
+        19.35090725968867,
+        47.415753696744446
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.756557239754932e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.15862669737021023,
+        "minimumCellShare": 0.0001432777917075844
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 10,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "AT121",
+      "name": "Mostviertel-Eisenwurzen",
+      "country": "AT",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        14.455944559445612,
+        47.71287777877778,
+        15.499954999549999,
+        48.3759680316803
+      ],
+      "centroid": [
+        15.001559951202093,
+        48.050344947654615
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.3515399656958156e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.12524204992670224,
+        "minimumCellShare": 0.12524204992670224
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 2,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE146",
+      "name": "Biberach",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        9.307893078930789,
+        47.959366825668255,
+        10.135901359013587,
+        48.287440275402744
+      ],
+      "centroid": [
+        9.771505501120147,
+        48.11025645122559
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.2609145378680324e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.10850956481525285,
+        "minimumCellShare": 0.10850956481525277
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 3,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "SK_ADM2_56367889B40480781512108",
+      "name": "District of Bratislava I",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        17.073170731707336,
+        48.13815817658177,
+        17.130771307713076,
+        48.17287494374945
+      ],
+      "centroid": [
+        17.099713477345862,
+        48.15119452112199
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.22307030729086058,
+        "minimumCellShare": 0.010554089709700228
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 4,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "SK_ADM2_56367889B51237059400968",
+      "name": "District of Bratislava IV",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 4,
+      "bounds": [
+        16.947169471694735,
+        48.13989401494014,
+        17.137971379713804,
+        48.26487437674378
+      ],
+      "centroid": [
+        17.024411093344998,
+        48.20602381177102
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07288830823824038,
+        "minimumCellShare": 0.00026874496103477
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 6,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "AT312",
+      "name": "Linz-Wels",
+      "country": "AT",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 4,
+      "bounds": [
+        13.735937359373594,
+        47.99929110791108,
+        14.527945279452808,
+        48.4731749797498
+      ],
+      "centroid": [
+        14.14606568960541,
+        48.23583898785539
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.7210425210776046e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.2327862426206569,
+        "minimumCellShare": 5.9982100554001983e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 7,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE279",
+      "name": "Neu-Ulm",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        9.991899918999195,
+        48.1138564395644,
+        10.279902799028008,
+        48.457552434524345
+      ],
+      "centroid": [
+        10.142742721726146,
+        48.29661784091954
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.882326298087495e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.03256503354118304,
+        "minimumCellShare": 0.03256503354118304
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 8,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "AT126",
+      "name": "Wiener Umland/Nordteil",
+      "country": "AT",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 5,
+      "bounds": [
+        15.715957159571616,
+        48.122535631356314,
+        16.97596975969759,
+        48.59641950319504
+      ],
+      "centroid": [
+        16.366387098290296,
+        48.343969946033795
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.268970443272263,
+        "minimumCellShare": 2.127400904415309e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 9,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE278",
+      "name": "Günzburg",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        10.135901359013587,
+        48.17113910539105,
+        10.567905679056793,
+        48.51483510035099
+      ],
+      "centroid": [
+        10.371564429930022,
+        48.357546804760986
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.0385711348158697e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.06438438363006503,
+        "minimumCellShare": 0.06438438363006688
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 10,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE228",
+      "name": "Passau, Landkreis",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        12.979929799297992,
+        48.29785530555306,
+        13.80793807938079,
+        48.752644955449554
+      ],
+      "centroid": [
+        13.356131552895345,
+        48.56149266991457
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.5240226575462543e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.4557462231679459,
+        "minimumCellShare": 0.0022076168432728816
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 12,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE21J",
+      "name": "Pfaffenhofen a. d. Ilm",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        11.287912879128811,
+        48.41589231392315,
+        11.719917199171988,
+        48.8099276212762
+      ],
+      "centroid": [
+        11.52678263364991,
+        48.59973358734852
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.0657581468206416e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.020269271273114536,
+        "minimumCellShare": 0.020269271273114554
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 1,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "AT124",
+      "name": "Waldviertel",
+      "country": "AT",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        14.707947079470813,
+        48.27008189181892,
+        15.931959319593204,
+        49.00607735577357
+      ],
+      "centroid": [
+        15.318318216589741,
+        48.64055010064917
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.8177468998645825e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.047478772766531875,
+        "minimumCellShare": 0.04747877276653193
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 2,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE21I",
+      "name": "Neuburg-Schrobenhausen",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        10.963909639096386,
+        48.4731749797498,
+        11.431914319143203,
+        48.81860681306814
+      ],
+      "centroid": [
+        11.194626715151042,
+        48.67228801189816
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.023096076392733e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.20748581389286586,
+        "minimumCellShare": 0.20748581389286594
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 3,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE223",
+      "name": "Straubing, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        12.511925119251202,
+        48.84117271172711,
+        12.655926559265595,
+        48.924492952929526
+      ],
+      "centroid": [
+        12.582863881736166,
+        48.87932019187449
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.2424279270326077e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.09189332294562252,
+        "minimumCellShare": 0.09189332294562252
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 4,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "DE238",
+      "name": "Regensburg, Landkreis",
+      "country": "DE",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        11.683916839168404,
+        48.77000333903338,
+        12.47592475924759,
+        49.21090628206282
+      ],
+      "centroid": [
+        12.12532405885182,
+        49.01829864026716
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.0869126779167182e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.35181123760952543,
+        "minimumCellShare": 0.35181123760952565
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 5,
+      "corridor": "Danube source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B21297633796285",
+      "name": "Oleshky",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 4,
+      "bounds": [
+        32.62892628926289,
+        46.270396102961016,
+        33.46413464134642,
+        46.81544934749347
+      ],
+      "centroid": [
+        33.02846940073161,
+        46.55493858949824
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.80526598614839e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 7.105427357601002e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.02935688813009832,
+        "minimumCellShare": 0.004076026709820414
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 6,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B61089393980714",
+      "name": "Kakhovka",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        33.17253172531727,
+        46.534243533435344,
+        34.16254162541625,
+        46.89182623526234
+      ],
+      "centroid": [
+        33.671197266993524,
+        46.703145569796604
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.5701957963021318e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04496069147753525,
+        "minimumCellShare": 0.044960691477535286
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 7,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B8704633300515",
+      "name": "Nikopol",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 3,
+      "bounds": [
+        34.03654036540365,
+        47.45944537845379,
+        34.64854648546486,
+        47.891669129691294
+      ],
+      "centroid": [
+        34.33080756210155,
+        47.67816793426633
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.826678979054979e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.021909789582099354,
+        "minimumCellShare": 0.0042841606089105595
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 10,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B71954626153569",
+      "name": "Tomakivka",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        34.48654486544865,
+        47.494162145621445,
+        34.99774997749978,
+        48.027064521645215
+      ],
+      "centroid": [
+        34.757820412149385,
+        47.75636428902865
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.920449878242366e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04006712401340336,
+        "minimumCellShare": 0.04006712401340334
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 11,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B5599119898653",
+      "name": "Solone",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        34.20214202142023,
+        47.84132981729816,
+        35.23175231752319,
+        48.257931023310235
+      ],
+      "centroid": [
+        34.699114503576936,
+        48.073284027726274
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.1290894274858e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.0656161755236132,
+        "minimumCellShare": 0.06561617552361326
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 12,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B62388892645700",
+      "name": "Myronivka",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        30.782107821078228,
+        49.488640419404206,
+        31.548915489154894,
+        50.06841043110431
+      ],
+      "centroid": [
+        31.20970044313625,
+        49.71472242665196
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.664603343001005e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07934604931095975,
+        "minimumCellShare": 0.07934604931095963
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 4,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "UA_RAY_74538382B4751802602524",
+      "name": "Ivankiv",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        29.532895328953288,
+        50.74712322923229,
+        30.688506885068847,
+        51.49700540005399
+      ],
+      "centroid": [
+        30.147126043298687,
+        51.09558348123888
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.2782617726278005e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0682486412620456,
+        "minimumCellShare": 0.06824864126204558
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 6,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "BY_INT_GOMEL",
+      "name": "Gomel Interior",
+      "country": "BY",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 15,
+      "bounds": [
+        27.185671856718585,
+        51.23142213122132,
+        31.77211772117721,
+        53.34046573665738
+      ],
+      "centroid": [
+        29.490133388774105,
+        52.24983531696688
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 3.552713678800501e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.19663028518103323,
+        "minimumCellShare": 1.1830976137875133e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 7,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "BY_INT_MOGILEV",
+      "name": "Mogilev Interior",
+      "country": "BY",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 17,
+      "bounds": [
+        28.092880928809308,
+        52.68605467554674,
+        32.70812708127082,
+        54.4583456394564
+      ],
+      "centroid": [
+        29.96365303818776,
+        53.57615713878454
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.3532608153797874e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.35021922736157185,
+        "minimumCellShare": 2.9789257552667136e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 8,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B64424707524567",
+      "name": "Smolensky District",
+      "country": "RU",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 8,
+      "bounds": [
+        31.31131311313115,
+        54.49479824498245,
+        32.34452344523447,
+        55.18566191161911
+      ],
+      "centroid": [
+        31.841037165242756,
+        54.862738750627386
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.978983856539175e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 3.552713678800501e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.2948979467641378,
+        "minimumCellShare": 7.793746298051408e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 10,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B69883291623230",
+      "name": "Kardymovsky District",
+      "country": "RU",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 5,
+      "bounds": [
+        32.13572135721358,
+        54.651023697236965,
+        32.78732787327874,
+        55.07630409504095
+      ],
+      "centroid": [
+        32.44239152982063,
+        54.87354343648717
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.456613030001666e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.09358529520799785,
+        "minimumCellShare": 0.0041322198963180574
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 11,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B1576720764455",
+      "name": "Yartsevsky District",
+      "country": "RU",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        32.41652416524167,
+        54.89577690576907,
+        33.06453064530646,
+        55.53803709837099
+      ],
+      "centroid": [
+        32.77278214892554,
+        55.20418728052785
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.906191334614785e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.04278972013931542,
+        "minimumCellShare": 0.042789720139315486
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 12,
+      "corridor": "Dnieper source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B24471111608761",
+      "name": "Azovsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 5,
+      "bounds": [
+        38.68418684186844,
+        46.56028110881108,
+        39.80019800198002,
+        47.23899390693906
+      ],
+      "centroid": [
+        39.2921444133245,
+        46.908597812775554
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.4414284748594875e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.07276135914420158,
+        "minimumCellShare": 7.222969578343594e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 1,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B53245825740087",
+      "name": "Bagayevsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 2,
+      "bounds": [
+        40.08460084600847,
+        47.09318348483485,
+        40.73620736207363,
+        47.44903034830348
+      ],
+      "centroid": [
+        40.410707478225525,
+        47.26323958009733
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.733248499370738e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.11461363501386489,
+        "minimumCellShare": 0.11461363501386487
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 2,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B40979258556268",
+      "name": "Семикаракорский район",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 7,
+      "bounds": [
+        40.606606066060664,
+        47.15393782737827,
+        41.39861398613988,
+        47.634765052650536
+      ],
+      "centroid": [
+        40.97938424058074,
+        47.438289288173706
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.017010027905111e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.060485163182673184,
+        "minimumCellShare": 1.4290033290155994e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 3,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B75402656675224",
+      "name": "Volgodonsk",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 2,
+      "bounds": [
+        42.02862028620288,
+        47.462917055170564,
+        42.38862388623886,
+        47.61219915399154
+      ],
+      "centroid": [
+        42.19260627547132,
+        47.5312597017053
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.3383404467755025e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02761344031020064,
+        "minimumCellShare": 0.027613440310200587
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 4,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B98786634162425",
+      "name": "Усть-Донецкий район",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 4,
+      "bounds": [
+        40.37980379803798,
+        47.44035115651157,
+        41.07461074610748,
+        47.91944254342543
+      ],
+      "centroid": [
+        40.75020621125324,
+        47.68692227826419
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.18418045037522e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.06417499292365851,
+        "minimumCellShare": 0.00016488434540932046
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 5,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B22819891790259",
+      "name": "Tsimlyansky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 6,
+      "bounds": [
+        41.71181711817118,
+        47.53582226622267,
+        42.7558275582756,
+        48.04963042030421
+      ],
+      "centroid": [
+        42.20574777887236,
+        47.79812923986075
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.171225198208565e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 7.105427357601002e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.06846644670691912,
+        "minimumCellShare": 3.034256758838385e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 7,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B99360860809249",
+      "name": "Bogucharsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 3,
+      "bounds": [
+        40.17820178201782,
+        49.57716817568176,
+        41.0458104581046,
+        50.12395725857259
+      ],
+      "centroid": [
+        40.57198236887149,
+        49.84798990801304
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.180399937828374e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.10978081877536869,
+        "minimumCellShare": 0.013821634559427089
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 8,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B66604107182111",
+      "name": "Ostrogozhsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 5,
+      "bounds": [
+        38.70938709387096,
+        50.61867119071191,
+        39.34659346593466,
+        51.26093138331383
+      ],
+      "centroid": [
+        39.0495680664055,
+        50.91214234169984
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.3305871161828353e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.06011833282936098,
+        "minimumCellShare": 5.629838142131587e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 10,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B97565558072550",
+      "name": "Kurkinsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 3,
+      "bounds": [
+        38.23778237782378,
+        53.29880561605616,
+        38.9469894698947,
+        53.63729409594096
+      ],
+      "centroid": [
+        38.578520900187264,
+        53.48936537621648
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.3776821480501744e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04033881773123054,
+        "minimumCellShare": 0.000573696036716307
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 11,
+      "corridor": "Don source corridor"
+    },
+    {
+      "parentId": "CZ_ADM2_57006924B40201864279221",
+      "name": "Náchod",
+      "country": "CZ",
+      "rivers": [
+        "Elbe"
+      ],
+      "cells": 3,
+      "bounds": [
+        15.795157951579512,
+        50.28886190261902,
+        16.428764287642878,
+        50.646444604446046
+      ],
+      "centroid": [
+        16.139120786132228,
+        50.46258518348783
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.118521435429357e-18,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.046799646549605424,
+        "minimumCellShare": 1.380375584531557e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\elbe.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 12,
+      "corridor": "Elbe source corridor"
+    },
+    {
+      "parentId": "DEE05",
+      "name": "Anhalt-Bitterfeld",
+      "country": "DE",
+      "rivers": [
+        "Elbe"
+      ],
+      "cells": 2,
+      "bounds": [
+        11.863918639186409,
+        51.5282504905049,
+        12.583925839258399,
+        52.10802050220501
+      ],
+      "centroid": [
+        12.151524189549448,
+        51.79310952623709
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.7076184216646695e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3134084300378276,
+        "minimumCellShare": 0.3134084300378276
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\elbe.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 1,
+      "corridor": "Elbe source corridor"
+    },
+    {
+      "parentId": "DEE0E",
+      "name": "Wittenberg",
+      "country": "DE",
+      "rivers": [
+        "Elbe"
+      ],
+      "cells": 3,
+      "bounds": [
+        12.295922959229586,
+        51.62545743857437,
+        13.159931599315996,
+        52.04205864458645
+      ],
+      "centroid": [
+        12.706757890434622,
+        51.81923978026187
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.3444106938820255e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3810697025070426,
+        "minimumCellShare": 4.400497960450019e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\elbe.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 2,
+      "corridor": "Elbe source corridor"
+    },
+    {
+      "parentId": "DE935",
+      "name": "Lüneburg, Landkreis",
+      "country": "DE",
+      "rivers": [
+        "Elbe"
+      ],
+      "cells": 5,
+      "bounds": [
+        10.063900639006391,
+        53.05058073080731,
+        11.179911799118003,
+        53.38559753397534
+      ],
+      "centroid": [
+        10.566373182913415,
+        53.23037678634384
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.204119722715186e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.2809491335957507e-14,
+        "secondaryCutFaceShare": 0.176106415065656,
+        "minimumCellShare": 2.413364688912159e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\elbe.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 3,
+      "corridor": "Elbe source corridor"
+    },
+    {
+      "parentId": "PL_POW_1603",
+      "name": "kędzierzyńsko-kozielski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 3,
+      "bounds": [
+        17.911979119791198,
+        50.16908905589055,
+        18.4159841598416,
+        50.42252145621457
+      ],
+      "centroid": [
+        18.16072288280043,
+        50.28572862038368
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.228875399876539e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.37424089022407553,
+        "minimumCellShare": 0.0002677431131707492
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 4,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "PL_POW_1609",
+      "name": "opolski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 5,
+      "bounds": [
+        17.479974799747993,
+        50.49542666726667,
+        18.343983439834403,
+        50.96236718567185
+      ],
+      "centroid": [
+        17.90277609377562,
+        50.71890267560912
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.754408521670997e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3678827832815441,
+        "minimumCellShare": 0.000427719806384001
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 5,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "PL_POW_1601",
+      "name": "brzeski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 5,
+      "bounds": [
+        17.191971919719208,
+        50.577011070110686,
+        17.767977679776806,
+        51.00402730627307
+      ],
+      "centroid": [
+        17.474278935718925,
+        50.7877756534082
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.754408521670997e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.22610873357721714,
+        "minimumCellShare": 0.0001728243330368978
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 6,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "PL_POW_0223",
+      "name": "wrocławski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 3,
+      "bounds": [
+        16.579965799657998,
+        50.81482092520925,
+        17.371973719737213,
+        51.27481809018089
+      ],
+      "centroid": [
+        16.970510077771593,
+        51.0170018123702
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.984442983884229e-18,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.2506973634204358,
+        "minimumCellShare": 0.0008873114463181952
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 7,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "PL_POW_0804",
+      "name": "nowosolski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 3,
+      "bounds": [
+        15.463954639546415,
+        51.64281582215823,
+        16.0039600396004,
+        52.04205864458645
+      ],
+      "centroid": [
+        15.748366105966605,
+        51.801232447231705
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.664455228996835e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3789005828670809,
+        "minimumCellShare": 0.00046267272529852455
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 10,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "PL_POW_0809",
+      "name": "zielonogórski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 3,
+      "bounds": [
+        15.067950679506794,
+        51.731343578435784,
+        16.0039600396004,
+        52.21390664206642
+      ],
+      "centroid": [
+        15.539846307554003,
+        51.98707733118353
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.664455228996835e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.4996654067430832,
+        "minimumCellShare": 0.0005088297465789398
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 11,
+      "corridor": "Oder source corridor"
+    },
+    {
+      "parentId": "CH040",
+      "name": "Zürich",
+      "country": "CH",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        8.371883718837182,
+        47.164352857528584,
+        8.983889838898392,
+        47.68857604176041
+      ],
+      "centroid": [
+        8.656063711215108,
+        47.4127393130795
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.4454180000410553e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.020011641676242198,
+        "minimumCellShare": 0.007196908599905158
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 4,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEB34",
+      "name": "Ludwigshafen am Rhein, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        8.299882998829986,
+        49.43135775357753,
+        8.47988479884799,
+        49.545923085230854
+      ],
+      "centroid": [
+        8.395883958839592,
+        49.480771285512844
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.5626063810947333e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03647348860543399,
+        "minimumCellShare": 0.03647348860543328
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 8,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEB39",
+      "name": "Worms, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        8.263882638826402,
+        49.58758320583205,
+        8.443884438844407,
+        49.73512946629465
+      ],
+      "centroid": [
+        8.332596701763201,
+        49.64825278344501
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.721552347170202e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.944109290391274e-15,
+        "secondaryCutFaceShare": 0.12250355770866878,
+        "minimumCellShare": 0.12250355770867098
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 10,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DE714",
+      "name": "Wiesbaden, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        8.119881198811981,
+        49.99724105841058,
+        8.371883718837182,
+        50.151730672306726
+      ],
+      "centroid": [
+        8.257506635216723,
+        50.07420090943767
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.917209860457518e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.055443967134560464,
+        "minimumCellShare": 0.05544396713456046
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 1,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEB17",
+      "name": "Mayen-Koblenz",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 4,
+      "bounds": [
+        7.0038700387003985,
+        50.16040986409864,
+        7.651876518765192,
+        50.479804122041216
+      ],
+      "centroid": [
+        7.33897028184177,
+        50.33028842725995
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.575333167888829e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.403876879179373e-14,
+        "secondaryCutFaceShare": 0.06160467656983501,
+        "minimumCellShare": 0.005515886309425755
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 2,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEA2C",
+      "name": "Rhein-Sieg-Kreis",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        6.859868598686006,
+        50.56138852488526,
+        7.651876518765192,
+        50.95368799387994
+      ],
+      "centroid": [
+        7.232688316455196,
+        50.7653043416202
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.9824636723897449e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.7763568394002505e-15,
+        "secondaryCutFaceShare": 0.28597218847830086,
+        "minimumCellShare": 0.2859721884783007
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 3,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEA14",
+      "name": "Krefeld, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        6.463864638646385,
+        51.28870479704797,
+        6.7158671586715855,
+        51.405005967059665
+      ],
+      "centroid": [
+        6.582110793685632,
+        51.349028617829134
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.5536491244391186e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 8.881784197001252e-16,
+        "secondaryCutFaceShare": 0.041966820501428796,
+        "minimumCellShare": 0.04196682050142871
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 4,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEA12",
+      "name": "Duisburg, Kreisfreie Stadt",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        6.643866438664389,
+        51.33210075600756,
+        6.823868238682394,
+        51.5508163891639
+      ],
+      "centroid": [
+        6.7317816035303215,
+        51.438548976861206
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.0252896582029223e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3138310423370127,
+        "minimumCellShare": 0.0001292938618662071
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 5,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "DEA1B",
+      "name": "Kleve",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        5.963459634596347,
+        51.36334584645847,
+        6.535865358653581,
+        51.88062567725676
+      ],
+      "centroid": [
+        6.267971631586717,
+        51.646908363235354
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.029166323499256e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 2.929642751054232e-14,
+        "secondaryCutFaceShare": 0.13191206709404574,
+        "minimumCellShare": 0.13191206709404574
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 6,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "NL224",
+      "name": "Zuidwest-Gelderland",
+      "country": "NL",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        5.023850238502405,
+        51.7400227702277,
+        5.7078570785707825,
+        51.97783262532626
+      ],
+      "centroid": [
+        5.330951954335184,
+        51.87028741861071
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.039207782327356e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.3510874934018831,
+        "minimumCellShare": 0.35108749340188317
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 7,
+      "corridor": "Rhine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_77003",
+      "name": "Provins",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 4,
+      "bounds": [
+        2.683826838268402,
+        48.20412003420033,
+        3.5478354783547843,
+        48.94011549815498
+      ],
+      "centroid": [
+        3.1471244433020145,
+        48.608200777274824
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.13675937551638329,
+        "minimumCellShare": 6.725427853225679e-07
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 9,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_94001",
+      "name": "Créteil",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 4,
+      "bounds": [
+        2.395823958239589,
+        48.686683097830965,
+        2.6118261182611775,
+        48.8099276212762
+      ],
+      "centroid": [
+        2.531759743826949,
+        48.76011813932657
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.683753385137379e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.025084437656489135,
+        "minimumCellShare": 0.009525975738755157
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 10,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_94003",
+      "name": "Haÿ-les-Roses",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 3,
+      "bounds": [
+        2.323823238232393,
+        48.719664026640274,
+        2.5038250382503975,
+        48.827286004860056
+      ],
+      "centroid": [
+        2.3882167393102645,
+        48.764420414472006
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.683753385137379e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.16833425188605478,
+        "minimumCellShare": 0.00458093802273651
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 11,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_92003",
+      "name": "Boulogne-Billancourt",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 2,
+      "bounds": [
+        2.1438214382143883,
+        48.80124842948429,
+        2.323823238232393,
+        48.858531095310965
+      ],
+      "centroid": [
+        2.2231691704672154,
+        48.8218856188562
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.776263578034403e-19,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0481230839353493,
+        "minimumCellShare": 0.04812308393534933
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 12,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_94002",
+      "name": "Nogent-sur-Marne",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 4,
+      "bounds": [
+        2.395823958239589,
+        48.78389004590046,
+        2.5758257582575936,
+        48.86721028710288
+      ],
+      "centroid": [
+        2.485678515321734,
+        48.823494444651764
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.977476254654662e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.021343696610315665,
+        "minimumCellShare": 0.016260162601645353
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 1,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_93003",
+      "name": "Saint-Denis",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 2,
+      "bounds": [
+        2.2878228782287806,
+        48.89845537755379,
+        2.4318243182432013,
+        48.97309642696426
+      ],
+      "centroid": [
+        2.3573180786752985,
+        48.93499382124041
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.09688196402590188,
+        "minimumCellShare": 0.09688196402590182
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 2,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "FR_ARR_95001",
+      "name": "Argenteuil",
+      "country": "FR",
+      "rivers": [
+        "Seine"
+      ],
+      "cells": 3,
+      "bounds": [
+        2.107821078210776,
+        48.9071345693457,
+        2.2878228782287806,
+        49.06336002160022
+      ],
+      "centroid": [
+        2.206409741822542,
+        48.99505491930985
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.2459925629395028e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.08335036252523234,
+        "minimumCellShare": 0.035460399026553194
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\seine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 3,
+      "corridor": "Seine source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B5102078213757",
+      "name": "Krasnoyarsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 3,
+      "bounds": [
+        47.81747817478177,
+        46.41447068670688,
+        48.98388983889839,
+        47.55318064980649
+      ],
+      "centroid": [
+        48.397036073240045,
+        46.88029180124968
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.586852815971487e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07065412976448202,
+        "minimumCellShare": 0.0002311371978214064
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 5,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B28279959544204",
+      "name": "Yenotayevsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 11,
+      "bounds": [
+        45.89865898658988,
+        46.55854527045271,
+        47.76707767077673,
+        47.91423502835029
+      ],
+      "centroid": [
+        46.834729307070205,
+        47.25874406912809
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.3481647439042566e-15,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.12000203309622627,
+        "minimumCellShare": 2.4010058649278883e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 6,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B72027623217592",
+      "name": "Chernoyarsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 8,
+      "bounds": [
+        44.96264962649627,
+        47.71982113221132,
+        46.29466294662947,
+        48.57385360453604
+      ],
+      "centroid": [
+        45.67597441002618,
+        48.15388229735784
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.0437056331563947e-15,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.08551720923672518,
+        "minimumCellShare": 0.0007720541615780678
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 7,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B44154738908147",
+      "name": "Svetloyarsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 2,
+      "bounds": [
+        43.850238502385025,
+        48.04963042030421,
+        45.06705067050672,
+        48.61551372513726
+      ],
+      "centroid": [
+        44.48360407604044,
+        48.31319512708768
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.7227972520794665e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.05933746990333216,
+        "minimumCellShare": 0.05933746990333222
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 8,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B61241799946425",
+      "name": "Volgograd",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 8,
+      "bounds": [
+        44.109441094410954,
+        48.40721312213121,
+        44.689046890468916,
+        48.889776185761846
+      ],
+      "centroid": [
+        44.44835551822693,
+        48.62819156439106
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.3337187064954466e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 7.105427357601002e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.15725488343043859,
+        "minimumCellShare": 4.525328013620811e-07
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 9,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_CITY_VOLGOGRAD",
+      "name": "Volgograd",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 22,
+      "bounds": [
+        44.109441094410954,
+        48.40721312213121,
+        44.689046890468916,
+        48.889776185761846
+      ],
+      "centroid": [
+        44.44084502746324,
+        48.63216494772738
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.552719191769646e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.15141470241593843,
+        "minimumCellShare": 2.551082585328601e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 10,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B39404018386654",
+      "name": "Saratov",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        45.80505805058053,
+        51.39285509855098,
+        46.20826208262085,
+        51.68274010440105
+      ],
+      "centroid": [
+        45.98616960187873,
+        51.55299567735003
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.233809483555895e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.08102266357262984,
+        "minimumCellShare": 0.005160754537900991
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 1,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B43084003717333",
+      "name": "Balakovsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 3,
+      "bounds": [
+        47.2558725587256,
+        51.60809905499055,
+        48.41868418684189,
+        52.27813266132661
+      ],
+      "centroid": [
+        47.90333333158538,
+        51.92189103297382
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.339613741798475e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02275823789478862,
+        "minimumCellShare": 0.0030245051366130345
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 3,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B68349842384732",
+      "name": "Volsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        46.723067230672314,
+        51.9101349293493,
+        47.99387993879941,
+        52.63745120151201
+      ],
+      "centroid": [
+        47.28555616185442,
+        52.26593886426812
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.486699640288139e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.03845897316138372,
+        "minimumCellShare": 6.192487274442371e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 4,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B51169643005911",
+      "name": "Volzhsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        49.631896318963186,
+        52.699941382413826,
+        50.69030690306903,
+        53.54529466294663
+      ],
+      "centroid": [
+        50.23439236446843,
+        53.090125956073834
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.0957092318355537e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.09851588962471669,
+        "minimumCellShare": 0.0002568102267533239
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 6,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B18920333631541",
+      "name": "Stavropolsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 9,
+      "bounds": [
+        48.94068940689408,
+        53.10959923499236,
+        50.04950049500496,
+        53.890726496264975
+      ],
+      "centroid": [
+        49.488838945013924,
+        53.553675139448835
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.238499300481593e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.36491729285620433,
+        "minimumCellShare": 6.430579020076787e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 8,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B64412298842231",
+      "name": "Cherdaklinsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        48.44748447484474,
+        53.87683978939789,
+        49.531095310953106,
+        54.62498612186123
+      ],
+      "centroid": [
+        48.86169149863182,
+        54.27192976079725
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.659522751641724e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 7.105427357601002e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07852080167751307,
+        "minimumCellShare": 5.998189005152966e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 11,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B61660763245932",
+      "name": "Staromaynsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 3,
+      "bounds": [
+        48.65628656286563,
+        54.354195337953385,
+        49.58509585095851,
+        54.8923052290523
+      ],
+      "centroid": [
+        49.17306383661709,
+        54.61335892187535
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.838075690598686e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.026947172395957175,
+        "minimumCellShare": 0.002217466014597721
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 12,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B20716795967188",
+      "name": "Morgaushsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        46.48546485464854,
+        55.81577123571235,
+        46.98586985869861,
+        56.22195741157411
+      ],
+      "centroid": [
+        46.75586435610609,
+        56.00706237815172
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.809982568726082e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03807736203428547,
+        "minimumCellShare": 7.232317807648492e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 5,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B93829822833305",
+      "name": "Zubtsovsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        34.306543065430674,
+        55.912978183781846,
+        35.48735487354875,
+        56.341730258302576
+      ],
+      "centroid": [
+        34.87237611206913,
+        56.13617532169918
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.4918777571979536e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07224349546124503,
+        "minimumCellShare": 8.124465928088083e-08
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 6,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B51726500082089",
+      "name": "Kalininsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 8,
+      "bounds": [
+        35.195751957519576,
+        56.371239510395114,
+        36.761767617676185,
+        57.11591416614165
+      ],
+      "centroid": [
+        35.895927896207056,
+        56.78200180163357
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.415445409605302e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.4571872410113392,
+        "minimumCellShare": 1.6851241688093256e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 9,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B3048202191929",
+      "name": "Penovsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        31.926919269192695,
+        56.610785203852046,
+        32.97812978129781,
+        57.25478123481234
+      ],
+      "centroid": [
+        32.48902542490239,
+        56.95188451330316
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.3046482217358175e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07120379255227077,
+        "minimumCellShare": 5.9238227248394694e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 10,
+      "corridor": "Volga source corridor"
+    },
+    {
+      "parentId": "RU_RAY_50074027B19325401389824",
+      "name": "Kineshma",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 2,
+      "bounds": [
+        42.064620646206464,
+        57.398855818558175,
+        42.2518225182252,
+        57.47523270632705
+      ],
+      "centroid": [
+        42.15842172036425,
+        57.43577596212176
+      ],
+      "status": "reviewed_offline_candidate",
+      "reason": "visible_component_crossing_or_distinct_bank_lobe; all_positive_faces_retained; geometry_identity_and_source_seam_checks_passed",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.204170427930421e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.08098789466439776,
+        "minimumCellShare": 0.08098789466439779
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 11,
+      "corridor": "Volga source corridor"
+    }
+  ],
+  "heldAfterVisualReview": [
+    {
+      "parentId": "RO317",
+      "name": "Teleorman",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        24.60804608046081,
+        43.619770929709304,
+        25.68805688056881,
+        44.511991845918445
+      ],
+      "centroid": [
+        25.196895161622912,
+        44.0307417274984
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 8.044780119842443e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04308537766704367,
+        "minimumCellShare": 0.043085377667043644
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 1
+    },
+    {
+      "parentId": "RO411",
+      "name": "Dolj",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 4,
+      "bounds": [
+        22.844028440284404,
+        43.70135533255332,
+        24.2480424804248,
+        44.716820772207726
+      ],
+      "centroid": [
+        23.608920661489034,
+        44.14262029222657
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.0706370565968264e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.06108938370336675,
+        "minimumCellShare": 8.129697990342483e-07
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 2
+    },
+    {
+      "parentId": "RO314",
+      "name": "Giurgiu",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        25.436054360543608,
+        43.685732787327865,
+        26.408064080640827,
+        44.54497277472775
+      ],
+      "centroid": [
+        25.877374969122453,
+        44.14480679513877
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 0.0,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04211065888656763,
+        "minimumCellShare": 0.042110658886567676
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 3
+    },
+    {
+      "parentId": "RO414",
+      "name": "Olt",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        23.88803888038882,
+        43.69441197911978,
+        24.896048960489622,
+        44.8886687696877
+      ],
+      "centroid": [
+        24.442016932207835,
+        44.26692849210983
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.5027042110649091e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04445336204547945,
+        "minimumCellShare": 0.04445336204547948
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 4
+    },
+    {
+      "parentId": "RO312",
+      "name": "Călăraşi",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 5,
+      "bounds": [
+        26.264062640626406,
+        44.03810797407975,
+        28.02808028080281,
+        44.58663289532895
+      ],
+      "centroid": [
+        27.02090031957567,
+        44.314091113590536
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.579216930713589e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04480575938893674,
+        "minimumCellShare": 0.00030030605866142594
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 5
+    },
+    {
+      "parentId": "RO413",
+      "name": "Mehedinţi",
+      "country": "RO",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        22.016020160201606,
+        44.0953906399064,
+        23.456034560345614,
+        45.110856079560804
+      ],
+      "centroid": [
+        22.781948937811894,
+        44.58747467149411
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.6631661325927638e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.050496563456903974,
+        "minimumCellShare": 0.022008795674874498
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 6
+    },
+    {
+      "parentId": "UA_RAY_74538382B44725547103458",
+      "name": "Reni",
+      "country": "UA",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        28.240482404824064,
+        45.208063027630274,
+        28.719287192871946,
+        45.56911740617407
+      ],
+      "centroid": [
+        28.511894778799608,
+        45.38204217913522
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.9038590148845458e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.06616027426703203,
+        "minimumCellShare": 0.06616027426703218
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 8
+    },
+    {
+      "parentId": "HU231",
+      "name": "Baranya",
+      "country": "HU",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 2,
+      "bounds": [
+        17.623976239762413,
+        45.739229565295645,
+        18.847988479884805,
+        46.41099900999011
+      ],
+      "centroid": [
+        18.20897072948611,
+        46.03201399957356
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.418583996272039e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.025594007846415124,
+        "minimumCellShare": 0.02559400784641503
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "SK_ADM2_56367889B27848609458937",
+      "name": "District of Komprno",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 9,
+      "bounds": [
+        17.717577175771765,
+        47.73891535415355,
+        18.53478534785347,
+        47.98540440104402
+      ],
+      "centroid": [
+        18.112448942706664,
+        47.84267482738213
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.1080885015980757e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07523882828787887,
+        "minimumCellShare": 2.4328532502773326e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 11
+    },
+    {
+      "parentId": "SK_ADM2_56367889B78366861694162",
+      "name": "District of Dunajskn Streda",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 5,
+      "bounds": [
+        17.245972459724612,
+        47.76842460624606,
+        17.890378903789042,
+        48.17287494374945
+      ],
+      "centroid": [
+        17.58477456439711,
+        47.975426211480645
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.2480833615181753e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 3.552713678800501e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.023407661346179467,
+        "minimumCellShare": 3.3605867846980166e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-01.png",
+      "visualPanel": 12
+    },
+    {
+      "parentId": "SK_ADM2_56367889B62553648042075",
+      "name": "District of Nova Zkmky",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 5,
+      "bounds": [
+        17.962379623796238,
+        47.75800957609577,
+        18.847988479884805,
+        48.2075917109171
+      ],
+      "centroid": [
+        18.35638436758929,
+        47.9901781822857
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.4059391671705779e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.026088991509413656,
+        "minimumCellShare": 1.9508388606983934e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 1
+    },
+    {
+      "parentId": "SK_ADM2_56367889B62094256812316",
+      "name": "District of Senec",
+      "country": "SK",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 3,
+      "bounds": [
+        17.188371883718844,
+        48.01144197641976,
+        17.530375303753033,
+        48.30827033570337
+      ],
+      "centroid": [
+        17.35269013121789,
+        48.179420885940566
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.7621744409962734e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 3.552713678800501e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.022922978198625255,
+        "minimumCellShare": 0.00013220941956799785
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 5
+    },
+    {
+      "parentId": "AT313",
+      "name": "Mühlviertel",
+      "country": "AT",
+      "rivers": [
+        "Danube"
+      ],
+      "cells": 6,
+      "bounds": [
+        13.735937359373594,
+        48.16419575195751,
+        14.959949599496014,
+        48.77000333903338
+      ],
+      "centroid": [
+        14.416880117018744,
+        48.456490684813225
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.976183039847454e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03324614220597581,
+        "minimumCellShare": 1.2152762574727765e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\danube.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-02.png",
+      "visualPanel": 11
+    },
+    {
+      "parentId": "UA_RAY_74538382B60808123109786",
+      "name": "Beryslav",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 3,
+      "bounds": [
+        32.81252812528126,
+        46.77205338853388,
+        33.838538385383856,
+        47.164352857528584
+      ],
+      "centroid": [
+        33.37945369383102,
+        46.9591409886144
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.674607035631277e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.08551322313237628,
+        "minimumCellShare": 0.004015049574226407
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 8
+    },
+    {
+      "parentId": "UA_RAY_74538382B3314448443504",
+      "name": "Kamianka Dniprovska",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 3,
+      "bounds": [
+        34.11574115741158,
+        47.31363495634956,
+        34.80694806948071,
+        47.57401071010709
+      ],
+      "centroid": [
+        34.484806846708864,
+        47.43892293155061
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.722324519953249e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04821761928340529,
+        "minimumCellShare": 0.006023858316190214
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-03.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "UA_RAY_74538382B32904543558628",
+      "name": "Verkhnodniprovsk",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        33.813338133381336,
+        48.41415647556475,
+        34.414544145441454,
+        48.86894612546125
+      ],
+      "centroid": [
+        34.11666427747836,
+        48.64045589407909
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.658804146437603e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.045290583174812056,
+        "minimumCellShare": 0.0452905831748124
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 1
+    },
+    {
+      "parentId": "UA_RAY_74538382B79975421345437",
+      "name": "Onufriivka",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        33.25533255332553,
+        48.664117199172,
+        33.97893978939791,
+        48.93837965979661
+      ],
+      "centroid": [
+        33.571333041135084,
+        48.811065697488814
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.767236952418763e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.026387660247304153,
+        "minimumCellShare": 0.026387660247304136
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 2
+    },
+    {
+      "parentId": "UA_RAY_74538382B332128375794",
+      "name": "Svitlovodsk",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 2,
+      "bounds": [
+        32.85932859328594,
+        48.792569237692376,
+        33.377733777337795,
+        49.16403864638646
+      ],
+      "centroid": [
+        33.12570820917263,
+        48.974877027599014
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.1368679355436857e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.020269464763465122,
+        "minimumCellShare": 0.020269464763465115
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 3
+    },
+    {
+      "parentId": "UA_RAY_74538382B76274417735531",
+      "name": "Obukhiv",
+      "country": "UA",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 3,
+      "bounds": [
+        30.62370623706238,
+        49.90003411034111,
+        31.113311133111353,
+        50.245465943659426
+      ],
+      "centroid": [
+        30.809844647715224,
+        50.033763160484405
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.151952219533239e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0692706834735646,
+        "minimumCellShare": 0.03056933180506064
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 5
+    },
+    {
+      "parentId": "BY_INT_VITEBSK",
+      "name": "Vitebsk Interior",
+      "country": "BY",
+      "rivers": [
+        "Dnieper"
+      ],
+      "cells": 36,
+      "bounds": [
+        26.210062100621002,
+        54.224007461074606,
+        31.156511565115665,
+        56.16120306903069
+      ],
+      "centroid": [
+        29.476667300122017,
+        54.84699080358125
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.0040389743573574e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03994545360680885,
+        "minimumCellShare": 0.00011863319727602765
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-04.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "RU_RAY_50074027B86355118616383",
+      "name": "Konstantinovsky District",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 8,
+      "bounds": [
+        40.88740887408875,
+        47.53582226622267,
+        41.78381783817838,
+        47.98714023940239
+      ],
+      "centroid": [
+        41.35420757388457,
+        47.74168832542984
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.728713893977637e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03395406141980063,
+        "minimumCellShare": 3.392727423990213e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 6
+    },
+    {
+      "parentId": "RU_RAY_50074027B82911601424103",
+      "name": "Подгоренский район",
+      "country": "RU",
+      "rivers": [
+        "Don"
+      ],
+      "cells": 5,
+      "bounds": [
+        39.2709927099271,
+        50.27150351903519,
+        40.106201062010626,
+        50.745387390873915
+      ],
+      "centroid": [
+        39.72380733519717,
+        50.491900476662885
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.9780082790871872e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.046757570182505155,
+        "minimumCellShare": 1.5639906786061207e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-05.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "PL_POW_0222",
+      "name": "wołowski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 9,
+      "bounds": [
+        16.399963999639994,
+        51.23142213122132,
+        16.8319683196832,
+        51.51089210692108
+      ],
+      "centroid": [
+        16.617585859514133,
+        51.37007971969174
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.135377157556518e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04552977310672974,
+        "minimumCellShare": 0.0003439303546674587
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 8
+    },
+    {
+      "parentId": "PL_POW_0204",
+      "name": "górowski",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 4,
+      "bounds": [
+        16.2559625596256,
+        51.48659036990371,
+        16.8319683196832,
+        51.78862624426243
+      ],
+      "centroid": [
+        16.552827066732217,
+        51.62869577619051
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.08455518072126e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 3.552713678800501e-15,
+        "secondaryCutFaceShare": 0.026167417071322523,
+        "minimumCellShare": 0.0023985114471735875
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "PL_POW_0805",
+      "name": "słubicki",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 13,
+      "bounds": [
+        14.527945279452808,
+        52.068096219962186,
+        15.03195031950321,
+        52.57496102061022
+      ],
+      "centroid": [
+        14.770926532794732,
+        52.3583673307208
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 5.566903817262603e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.022802306958371085,
+        "minimumCellShare": 1.4560514221534545e-07
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-06.png",
+      "visualPanel": 12
+    },
+    {
+      "parentId": "PL_POW_3206",
+      "name": "gryfiński",
+      "country": "PL",
+      "rivers": [
+        "Oder"
+      ],
+      "cells": 10,
+      "bounds": [
+        14.131941319413187,
+        52.68258299883,
+        14.887948879488789,
+        53.36823915039149
+      ],
+      "centroid": [
+        14.50108553736632,
+        53.02342311669018
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.24210330891056e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.021102455656105943,
+        "minimumCellShare": 5.851979898012112e-06
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\oder.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 1
+    },
+    {
+      "parentId": "CH055",
+      "name": "St. Gallen",
+      "country": "CH",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 4,
+      "bounds": [
+        8.803888038880388,
+        46.88488288182883,
+        9.631896318963186,
+        47.54970897308972
+      ],
+      "centroid": [
+        9.280137033904767,
+        47.23606158526688
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.895150143385726e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02024718128109487,
+        "minimumCellShare": 0.0011585247581155013
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 2
+    },
+    {
+      "parentId": "AT342",
+      "name": "Rheintal-Bodenseegebiet",
+      "country": "AT",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        9.523895238952406,
+        47.14699447394473,
+        9.991899918999195,
+        47.589633255332544
+      ],
+      "centroid": [
+        9.723940570482211,
+        47.38864346601285
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.5897707277131787e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.021827555407009955,
+        "minimumCellShare": 0.005383253072841035
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 3
+    },
+    {
+      "parentId": "FR_ARR_67005",
+      "name": "Sélestat-Erstein",
+      "country": "FR",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 5,
+      "bounds": [
+        7.183871838718403,
+        48.122535631356314,
+        7.759877598776001,
+        48.48185417154171
+      ],
+      "centroid": [
+        7.507934330902571,
+        48.3297033682681
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.549951708862754e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02114717054254127,
+        "minimumCellShare": 0.0013222408011437806
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 5
+    },
+    {
+      "parentId": "FR_ARR_67008",
+      "name": "Strasbourg",
+      "country": "FR",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 5,
+      "bounds": [
+        7.543875438754384,
+        48.4506090810908,
+        7.903879038790393,
+        48.70404148141482
+      ],
+      "centroid": [
+        7.717791463628935,
+        48.57562342491519
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.763918189589771e-17,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 8.881784197001252e-16,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.029630479343738265,
+        "minimumCellShare": 0.0004660697555103652
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 6
+    },
+    {
+      "parentId": "DEB3I",
+      "name": "Rhein-Pfalz-Kreis",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        8.263882638826402,
+        49.252566402664016,
+        8.515885158851603,
+        49.59452655926559
+      ],
+      "centroid": [
+        8.358721404277851,
+        49.41671809402258
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.2140353826406436e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.021528364418239847,
+        "minimumCellShare": 0.0022367290528106597
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 7
+    },
+    {
+      "parentId": "DE126",
+      "name": "Mannheim, Stadtkreis",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        8.407884078840794,
+        49.415735208352075,
+        8.587885878858799,
+        49.58758320583205
+      ],
+      "centroid": [
+        8.498089526349816,
+        49.50294793557027
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.0771958372106658e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.054891338451675036,
+        "minimumCellShare": 0.006760733585275404
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "DE717",
+      "name": "Groß-Gerau",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 3,
+      "bounds": [
+        8.299882998829986,
+        49.72645027450274,
+        8.623886238862383,
+        50.07014626946268
+      ],
+      "centroid": [
+        8.471305822960298,
+        49.90712227437399
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 2.6172640443800077e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.024333868271004786,
+        "minimumCellShare": 0.009210446298647383
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 11
+    },
+    {
+      "parentId": "DEB3J",
+      "name": "Mainz-Bingen",
+      "country": "DE",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 5,
+      "bounds": [
+        7.6878768787688045,
+        49.75769536495365,
+        8.407884078840794,
+        50.08576881468814
+      ],
+      "centroid": [
+        8.093167759744906,
+        49.91902695039589
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.412568923068687e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 1.7763568394002505e-15,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 2.6645352591003757e-15,
+        "secondaryCutFaceShare": 0.03533612934808413,
+        "minimumCellShare": 0.0020671467600194256
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-07.png",
+      "visualPanel": 12
+    },
+    {
+      "parentId": "NL226",
+      "name": "Arnhem/Nijmegen",
+      "country": "NL",
+      "rivers": [
+        "Rhine"
+      ],
+      "cells": 2,
+      "bounds": [
+        5.56385563855639,
+        51.74870196201961,
+        6.1758617586176,
+        52.08371876518764
+      ],
+      "centroid": [
+        5.896709738967042,
+        51.915607293403745
+      ],
+      "status": "held_after_visual_review",
+      "reason": "known_full_map_contour_exclusion",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.0473392986209973e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 9.769962616701378e-15,
+        "secondaryCutFaceShare": 0.34350323806065153,
+        "minimumCellShare": 0.34350323806065186
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\6f5a\\mapcreator\\.runtime\\river-eu\\rhine.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-08.png",
+      "visualPanel": 8
+    },
+    {
+      "parentId": "RU_RAY_50074027B15799201455367",
+      "name": "Narimanovsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 3,
+      "bounds": [
+        46.39906399063992,
+        46.070774691746905,
+        48.191881918819206,
+        46.872732013320146
+      ],
+      "centroid": [
+        47.33824563959053,
+        46.42598617349327
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.0384623933337722e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0564614080303078,
+        "minimumCellShare": 0.015629202653142306
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 4
+    },
+    {
+      "parentId": "RU_RAY_50074027B54184638100605",
+      "name": "Dubovsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        44.33264332643327,
+        48.93837965979661,
+        45.30465304653046,
+        49.7733179101791
+      ],
+      "centroid": [
+        44.772297772129036,
+        49.34978645190118
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.2289262218533742e-15,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.023694320435709248,
+        "minimumCellShare": 0.006955179004511574
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 11
+    },
+    {
+      "parentId": "RU_RAY_50074027B42088159596535",
+      "name": "Krasnoarmeysky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 4,
+      "bounds": [
+        45.07785077850778,
+        50.549237656376576,
+        46.071460714607156,
+        51.238365484654835
+      ],
+      "centroid": [
+        45.579934472111205,
+        50.927394731702044
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 4.977165598066269e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.04710067294602574,
+        "minimumCellShare": 0.0016831845697185472
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-09.png",
+      "visualPanel": 12
+    },
+    {
+      "parentId": "RU_RAY_50074027B65758721423350",
+      "name": "Voskresensky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        46.20106201062012,
+        51.731343578435784,
+        47.11187111871121,
+        52.12885056250563
+      ],
+      "centroid": [
+        46.668802193011445,
+        51.8904206837014
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.681781171171322e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.06201838673234599,
+        "minimumCellShare": 1.4068083146355405e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 2
+    },
+    {
+      "parentId": "RU_RAY_50074027B72026568542942",
+      "name": "Privolzhsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 8,
+      "bounds": [
+        48.307083070830714,
+        52.663488776887775,
+        49.127891278912784,
+        53.23457959679597
+      ],
+      "centroid": [
+        48.6940513771278,
+        52.94794668903447
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.328226245365563e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07717863344302477,
+        "minimumCellShare": 6.433129163575288e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 5
+    },
+    {
+      "parentId": "RU_RAY_50074027B58494309327601",
+      "name": "Tolyatti",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 3,
+      "bounds": [
+        49.19269192691928,
+        53.456766906669074,
+        49.77589775897761,
+        53.59736981369814
+      ],
+      "centroid": [
+        49.41405354315657,
+        53.52446663070059
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.3542504711270293e-18,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0706313033010402,
+        "minimumCellShare": 0.0012191405059417423
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 7
+    },
+    {
+      "parentId": "RU_RAY_50074027B68460090008050",
+      "name": "Sengileyevsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        48.28908289082892,
+        53.70499179191792,
+        49.070290702907045,
+        54.123328836288366
+      ],
+      "centroid": [
+        48.677872264044694,
+        53.90124978374738
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 9.939965517347105e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.03071955508879236,
+        "minimumCellShare": 7.850265887269248e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 9
+    },
+    {
+      "parentId": "RU_RAY_50074027B3936819954606",
+      "name": "городской округ Новоульяно",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 2,
+      "bounds": [
+        48.292682926829286,
+        54.04868778687786,
+        48.63108631086311,
+        54.24310168301683
+      ],
+      "centroid": [
+        48.45910295999241,
+        54.145437779991695
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.8995222061946038e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07522499372784783,
+        "minimumCellShare": 0.07522499372784781
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-10.png",
+      "visualPanel": 10
+    },
+    {
+      "parentId": "RU_RAY_50074027B87542455562769",
+      "name": "Spassky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        48.85788857888579,
+        54.56249594095941,
+        49.84429844298444,
+        55.2498879308793
+      ],
+      "centroid": [
+        49.380259867557214,
+        54.94940188068396
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.0413226190934006e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02537180144307836,
+        "minimumCellShare": 0.00015141846656371012
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 1
+    },
+    {
+      "parentId": "RU_RAY_50074027B50870378095529",
+      "name": "Kamsko-Ustyinsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        48.70668706687067,
+        55.04332316623167,
+        49.405094050940505,
+        55.50158449284494
+      ],
+      "centroid": [
+        49.045668994723364,
+        55.245655780908706
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.087700652080864e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 7.105427357601002e-15,
+        "secondaryCutFaceShare": 0.05640479396729074,
+        "minimumCellShare": 0.00022263450834716523
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 2
+    },
+    {
+      "parentId": "RU_RAY_50074027B23135564614213",
+      "name": "Laishevsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        48.95868958689587,
+        55.19954861848619,
+        49.95589955899561,
+        55.70120590405905
+      ],
+      "centroid": [
+        49.4286872367596,
+        55.46233689610404
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 7.351683764048587e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 1.0048591735576161e-14,
+        "secondaryCutFaceShare": 0.023888289469790523,
+        "minimumCellShare": 0.00045331404949558256
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 3
+    },
+    {
+      "parentId": "RU_RAY_50074027B65458030094261",
+      "name": "Mariinsko-Posadsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        47.554675546755476,
+        55.83486545765457,
+        48.065880658806606,
+        56.143844685446865
+      ],
+      "centroid": [
+        47.79831472178725,
+        55.993253053311506
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 3.858268956061228e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.0214959823273511,
+        "minimumCellShare": 0.0012009508058041629
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 4
+    },
+    {
+      "parentId": "RU_RAY_50074027B22385146451904",
+      "name": "городской округ Бор",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        43.73143731437315,
+        56.05705276752768,
+        45.27225272252724,
+        56.90761356313563
+      ],
+      "centroid": [
+        44.431490965069464,
+        56.42200247187322
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.766641283753594e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.02904295806617706,
+        "minimumCellShare": 0.00040205725478854984
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 7
+    },
+    {
+      "parentId": "RU_RAY_50074027B23588907409637",
+      "name": "Gorodetsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 5,
+      "bounds": [
+        43.27423274232743,
+        56.41289963099631,
+        43.97983979839799,
+        57.01176386463864
+      ],
+      "centroid": [
+        43.625193972917906,
+        56.71038790498661
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 1.1909960864753266e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.07596628699809096,
+        "minimumCellShare": 1.4938527957365274e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 8
+    },
+    {
+      "parentId": "RU_RAY_50074027B69214251360695",
+      "name": "Zavolzhsky District",
+      "country": "RU",
+      "rivers": [
+        "Volga"
+      ],
+      "cells": 6,
+      "bounds": [
+        41.56781567815679,
+        57.42662923229231,
+        42.55422554225544,
+        57.74081597515975
+      ],
+      "centroid": [
+        41.99595780647151,
+        57.5542286714491
+      ],
+      "status": "held_after_visual_review",
+      "reason": "source_cut_mainly_tracks_parent_boundary_or_small_peripheral_component",
+      "checks": {
+        "passed": true,
+        "allPositiveFacesValid": true,
+        "fingerprintsMatch": true,
+        "stableIdsUnderReverseLines": true,
+        "coverageDegrees2": 6.094842512627263e-16,
+        "overlapDegrees2": 0.0,
+        "hausdorffDegrees": 0.0,
+        "offSourceSeamLengthDegrees": 0.0,
+        "interiorDanglingLineLengthDegrees": 0.0,
+        "secondaryCutFaceShare": 0.05097859557484227,
+        "minimumCellShare": 1.8209629251838706e-05
+      },
+      "evidencePack": "C:\\Users\\raede\\.codex\\worktrees\\f7ce\\mapcreator\\.runtime\\river-east\\broad.json",
+      "visualEvidence": ".runtime/rv5-coverage/atlas-11.png",
+      "visualPanel": 12
+    }
+  ],
+  "interpretation": "Source planar geometry review only; no external geographic recency or runtime admission claim."
+}

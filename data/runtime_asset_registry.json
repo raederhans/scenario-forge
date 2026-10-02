@@ -665,6 +665,12 @@
       "role": "river_partitions",
       "family_id": "river_paint",
       "description": "Reviewed six-parent river-paint pilot bound to the Modern World baseline; independent from reference topology."
+    },
+    "river_partitions:modern_world_wave5": {
+      "url": "data/river_partitions/modern_world_wave5.transport.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 376-parent Modern World river pack in lossless indexed transport; preserves all 302 wave3 parent records."
     }
   },
   "scenario_registry_key": "scenario_registry",

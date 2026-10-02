@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { normalizeRiverPartitionPack, normalizeRiverPaintState } from '../../js/core/river_paint/partition_model.js';
 import { riverGeometryFingerprint } from '../../js/core/river_paint/geometry_identity.js';
-import { RIVER_PAINT_WAVE3 } from '../../js/core/river_paint/pilot_manifest.js';
+import { RIVER_PAINT_WAVE3, RIVER_PAINT_WAVE5 } from '../../js/core/river_paint/pilot_manifest.js';
 export const d3 = createRequire(import.meta.url)('../../vendor/d3.v7.min.js');
 export const rectangle = (x0, y0, x1, y1) => ({ type: 'Polygon',
   coordinates: [[[x0, y0], [x0, y1], [x1, y1], [x1, y0], [x0, y0]]] });
@@ -12,12 +12,16 @@ export const realPilot = () => JSON.parse(readFileSync(new URL('../../data/river
 export const realWave2 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave2.json', import.meta.url)));
 export const realWave3Text = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave3.json', import.meta.url), 'utf8');
 export const realWave3 = () => JSON.parse(realWave3Text());
-export function makeWave3Fixture({ installed = true } = {}) {
-  const pack = normalizeRiverPartitionPack(realWave3());
+export const realWave5 = () => JSON.parse(readFileSync(new URL('../../data/river_partitions/modern_world_wave5.json', import.meta.url)));
+export const realWave5TransportText = () => readFileSync(new URL('../../data/river_partitions/modern_world_wave5.transport.json', import.meta.url), 'utf8');
+export const makeWave3Fixture = options => makeApprovedFixture(realWave3(), RIVER_PAINT_WAVE3, options);
+export const makeWave5Fixture = options => makeApprovedFixture(realWave5(), RIVER_PAINT_WAVE5, options);
+function makeApprovedFixture(value, approved, { installed = true } = {}) {
+  const pack = normalizeRiverPartitionPack(value);
   const features = [...pack.parents.map(p => feature(p.parentId, p.parentGeometry)),
     ...pack.support.map(p => feature(p.parentId, p.geometry))];
   const state = { activeScenarioId: pack.sceneId, scenarioBaselineHash: pack.source.baselineHash, sceneGeneration: 1,
-    activeScenarioManifest: { version: RIVER_PAINT_WAVE3.scenarioVersion, generated_at: RIVER_PAINT_WAVE3.scenarioGeneratedAt },
+    activeScenarioManifest: { version: approved.scenarioVersion, generated_at: approved.scenarioGeneratedAt },
     riverPaint: normalizeRiverPaintState(installed ? { schemaVersion: 1, pack, editMode: true, overrides: {} } : null),
     landData: { type: 'FeatureCollection', features }, landIndex: new Map(features.map(f => [f.id, f])),
     sovereignBaseColors: { FR: '#ff0000' }, visualOverrides: {}, currentTool: 'fill',

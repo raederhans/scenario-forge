@@ -635,3 +635,10 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Deliveries: `0840` runtime cde83659, `f3b2` navigation42a61eeb, `909f` verification f0c58b9d. Retain original worktrees for ignored evidence; preserve primary WIP.
 - Scope: 302-parent authenticated default, searchable navigation, old-pack retention and full-map contour gates. Integration fixes/evidence: `river-wave4/integration.md`.
 - Final merge/push status is the PR receipt for this branch; this entry alone is not merge proof.
+
+## River wave5 coverage and transport 2026-10-02
+
+- Branch: `codex/river-wave5-expansion`; base `bb510a54`; same retained river integration checkout.
+- Root owns integration, port 8009 browser checks, Pages builds `.runtime/pw5`, Git and publication. Three scoped Sol lanes supplied coverage review, held-seam diagnosis and lossless transport; children did not commit.
+- Final reviewed candidate: 376 parents / 1,164 cells, with all previous 302 parent records unchanged. Source admission and remaining exclusions: `river-wave5/integration.md`.
+- Primary WIP and older regional atlas worktrees remain preserved. Final merge/push receipt is the branch PR, not this registry entry.
