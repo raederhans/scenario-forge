@@ -94,6 +94,141 @@ function nodeEdges(unmatched, diagnostics, accept = () => true, metric = 'nodedS
   return { shared, repaired, remaining };
 }
 
+// Input coordinates can differ by their floating representation error even
+// when they describe subdivisions of the same source line. Propagate one ULP
+// of input uncertainty through subtraction, multiplication and the determinant;
+// this is a numerical error bound, not a geographic snapping distance.
+const representationError = value => Math.max(Number.MIN_VALUE, Math.abs(value) * Number.EPSILON);
+function sourceCollinear(edge, point) {
+  const [a, b] = [edge.start, edge.end];
+  const error = representationError;
+  const difference = (x, y) => [x - y, error(x) + error(y) + error(x - y)];
+  const [dx, dxError] = difference(b[0], a[0]), [dy, dyError] = difference(b[1], a[1]);
+  const [px, pxError] = difference(point[0], a[0]), [py, pyError] = difference(point[1], a[1]);
+  const left = dx * py, right = dy * px, determinant = left - right;
+  const bound = Math.abs(dx) * pyError + Math.abs(py) * dxError + dxError * pyError
+    + Math.abs(dy) * pxError + Math.abs(px) * dyError + dyError * pxError
+    + error(left) + error(right) + error(determinant);
+  return Number.isFinite(bound) && Math.abs(determinant) <= bound;
+}
+
+function sourceEdgeQuery(edges, occupied) {
+  // Static x-interval tree: bbox queries retain ALL original owners, including
+  // edges consumed/rejected by earlier matching. No global proximity search.
+  const ordered = [...edges.values(), ...occupied.filter(edge => !edge.key)]
+    .filter(edge => Math.abs(edge.b[0] - edge.a[0]) <= 180 * SCALE)
+    .sort((a, b) => a.a[0] - b.a[0]);
+  let size = 1; while (size < ordered.length) size *= 2;
+  const maxima = new Float64Array(size * 2).fill(-Infinity);
+  ordered.forEach((edge, index) => { maxima[size + index] = edge.b[0]; });
+  for (let index = size - 1; index > 0; index -= 1) maxima[index] = Math.max(maxima[index * 2], maxima[index * 2 + 1]);
+  return (x0, y0, x1, y1) => {
+    const result = [];
+    function visit(node, lo, hi) {
+      if (lo >= ordered.length || ordered[lo].a[0] > x1 || maxima[node] < x0) return;
+      if (hi - lo === 1) {
+        const edge = ordered[lo];
+        if (Math.min(edge.a[1], edge.b[1]) <= y1 && Math.max(edge.a[1], edge.b[1]) >= y0) result.push(edge);
+        return;
+      }
+      const mid = (lo + hi) >>> 1;
+      visit(node * 2, lo, mid); visit(node * 2 + 1, mid, hi);
+    }
+    visit(1, 0, size);
+    return result;
+  };
+}
+
+function nodeSourceEdges(unmatched, diagnostics, precisions, originalEdges, occupiedSegments) {
+  // Exceeding this bounded fallback work leaves the original graph unchanged.
+  // It is not an input rejection or a relaxed geometric acceptance threshold.
+  const maxComparisonsPerGroup = 4096;
+  const buckets = new Map(), parents = unmatched.map((_, index) => index);
+  const find = index => { while (parents[index] !== index) { parents[index] = parents[parents[index]]; index = parents[index]; } return index; };
+  const compatible = (a, b) => sourceCollinear(a, b.start) && sourceCollinear(a, b.end)
+    && sourceCollinear(b, a.start) && sourceCollinear(b, a.end);
+  for (let index = 0; index < unmatched.length; index += 1) {
+    const edge = unmatched[index];
+    if (precisions.get(Math.abs(edge.members[0]) - 1) !== 7 || Math.abs(edge.b[0] - edge.a[0]) > 180 * SCALE) continue;
+    for (const identity of [edge.a, edge.b]) {
+      // The existing identity vertex supplies candidates only. Independently
+      // calculated cuts can differ along the same source line; the two complete
+      // source lines must still pass the floating collinearity bound below.
+      const key = keyOf(identity);
+      let bucket = buckets.get(key);
+      if (!bucket) buckets.set(key, bucket = []);
+      bucket.push(index);
+      diagnostics.sourceLineMaxBucket = Math.max(diagnostics.sourceLineMaxBucket, bucket.length);
+    }
+  }
+  for (const bucket of buckets.values()) {
+    if (bucket.length * (bucket.length - 1) / 2 > maxComparisonsPerGroup) {
+      diagnostics.sourceLineSkippedBuckets += 1; continue;
+    }
+    for (let i = 0; i < bucket.length; i += 1) for (let j = i + 1; j < bucket.length; j += 1) {
+      diagnostics.sourceLineComparisons += 1;
+      if (compatible(unmatched[bucket[i]], unmatched[bucket[j]])) parents[find(bucket[i])] = find(bucket[j]);
+    }
+  }
+  const groups = new Map();
+  unmatched.forEach((edge, index) => {
+    const root = find(index);
+    let group = groups.get(root);
+    if (!group) groups.set(root, group = []);
+    group.push(edge);
+  });
+  const shared = [], remaining = [], occupied = new Set(occupiedSegments);
+  let query = null;
+  for (const group of groups.values()) {
+    // Reject an approximate transitive chain: every source line in the group
+    // must agree directly with every other one before any interval is accepted.
+    if (group.length * (group.length - 1) / 2 > maxComparisonsPerGroup) {
+      diagnostics.sourceLineSkippedGroups += 1; remaining.push(...group); continue;
+    }
+    if (group.length < 2 || !group.some(e => e.members[0] > 0) || !group.some(e => e.members[0] < 0)
+      || !group.every((edge, index) => group.slice(index + 1).every(other => {
+        diagnostics.sourceLineComparisons += 1; return compatible(edge, other);
+      }))) {
+      remaining.push(...group); continue;
+    }
+    query ||= sourceEdgeQuery(originalEdges, occupiedSegments);
+    const xs = group.flatMap(edge => [edge.a[0], edge.b[0]]), ys = group.flatMap(edge => [edge.a[1], edge.b[1]]);
+    const blockers = query(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys))
+      .filter(edge => compatible(group[0], edge));
+    const candidates = new Set(group);
+    const useX = group[0].b[0] !== group[0].a[0], axis = useX ? 0 : 1;
+    const events = new Map();
+    const event = (point, original) => {
+      const t = point[axis];
+      if (!events.has(t)) events.set(t, { point, original, add: [], remove: [] });
+      return events.get(t);
+    };
+    for (const edge of new Set([...group, ...blockers])) {
+      event(edge.a, edge.start).add.push(edge);
+      event(edge.b, edge.end).remove.push(edge);
+    }
+    const ordered = [...events.keys()].sort((a, b) => a - b), active = new Set();
+    for (let i = 0; i < ordered.length - 1; i += 1) {
+      const current = events.get(ordered[i]), next = events.get(ordered[i + 1]);
+      for (const edge of current.remove) active.delete(edge);
+      for (const edge of current.add) active.add(edge);
+      const list = [...active].filter(edge => candidates.has(edge));
+      if (!list.length) continue;
+      const candidatePair = pairFor(list.flatMap(edge => edge.members));
+      const pair = candidatePair && ![...active].some(edge => occupied.has(edge))
+        ? pairFor([...active].flatMap(edge => edge.members || [])) : null;
+      if (pair) {
+        shared.push({ a: current.point, b: next.point, start: current.original, end: next.original, pair });
+        diagnostics.sourceNodedSharedSegments += 1;
+      } else {
+        for (const edge of list) remaining.push({ ...edge, a: current.point, b: next.point,
+          start: current.original, end: next.original });
+      }
+    }
+  }
+  return { shared, remaining };
+}
+
 function sharedSegments(edges, diagnostics, precisions) {
   const shared = [], unmatched = [];
   for (const edge of edges.values()) {
@@ -105,12 +240,14 @@ function sharedSegments(edges, diagnostics, precisions) {
   diagnostics.exactSharedSegments = shared.length;
   const exact = nodeEdges(unmatched, diagnostics);
   for (const edge of exact.shared) shared.push(edge);
+  const source = nodeSourceEdges(exact.remaining, diagnostics, precisions, edges, shared);
+  for (const edge of source.shared) shared.push(edge);
 
   // Cross-LOD joins are allowed ONLY by the actual coarse source's declared
   // coordinate grid. Fine/fine boundaries retain 1e-7 identity, even if close.
   // Compare unresolved edges at that grid, require two unique opposite sides,
   // and render the coarser line. Ambiguous overlaps are never welded.
-  const remaining = exact.remaining;
+  const remaining = source.remaining;
   const coarseEdges = remaining.filter(edge => precisions.get(Math.abs(edge.members[0]) - 1) === 4);
   let joinedSources = 0;
   if (coarseEdges.length) {
@@ -276,7 +413,9 @@ export function createPaintContourGraphBuilder() {
     patch(features = [], removedIds = []) { removedIds.forEach(remove); features.forEach(add); },
     finish() {
       const diagnostics = { featureCount: featureEdges.size, segmentCount: edges.size, invalidRings: [...invalidRingsById.values()].reduce((sum, count) => sum + count, 0),
-        ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0 };
+        ambiguousSegments: 0, exactSharedSegments: 0, nodedSharedSegments: 0, sourceNodedSharedSegments: 0,
+        sourceLineComparisons: 0, sourceLineMaxBucket: 0, sourceLineSkippedBuckets: 0, sourceLineSkippedGroups: 0,
+        quantizedSharedSegments: 0, ambiguousQuantizedSegments: 0, oneSidedSegments: 0 };
       return packChains(sharedSegments(edges, diagnostics, precisions), featureIds, diagnostics);
     },
   });

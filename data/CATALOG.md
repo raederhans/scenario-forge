@@ -2,7 +2,7 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 675
+- entries: 676
 
 ## Counts by role
 
@@ -46,7 +46,7 @@
 | quick_fill_china_reference | 1 |
 | quick_fill_prefecture_crosswalk | 1 |
 | releasable_catalog | 1 |
-| river_partitions | 4 |
+| river_partitions | 5 |
 | runtime_asset_registry | 1 |
 | runtime_political_topology | 1 |
 | scenario_registry | 1 |
@@ -139,6 +139,7 @@
 | river_partitions:modern_world_wave2 | data/river_partitions/modern_world_wave2.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave2 |  |
 | river_partitions:modern_world_wave3 | data/river_partitions/modern_world_wave3.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave3 |  |
 | river_partitions:modern_world_wave5 | data/river_partitions/modern_world_wave5.transport.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave5 |  |
+| river_partitions:modern_world_wave6 | data/river_partitions/modern_world_wave6.transport.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave6 |  |
 | ru_city_overrides | data/ru_city_overrides.geojson | city_overrides | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.ru_city_overrides |  |
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |
 | scenario_registry | data/scenarios/index.json | scenario_registry | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.scenario_registry |  |

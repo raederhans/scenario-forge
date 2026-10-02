@@ -1,7 +1,7 @@
 // Display metadata only; active pack parents own availability.
-// Existing wave3 labels retained; new labels use wave5-review records and
-// source-approved manual_geo_overrides/europe_geo_seeds translations only.
-// Joint admission scope: wave5-reviewed.json.
+// Existing wave5 labels retained; six wave6 labels use source names, reviewed
+// river associations and existing manual_geo_overrides/europe_geo_seeds only.
+// Joint admission scope: wave6-reviewed.json.
 export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["AT121", "Mostviertel-Eisenwurzen", "AT", ["Danube"], ""]),
   Object.freeze(["AT124", "Waldviertel", "AT", ["Danube"], ""]),
@@ -95,6 +95,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["CN_CITY_17275852B48866302661843", "Linxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B49737651735743", "Jurongxian", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B50024648693467", "Wulateqianqi", "CN", ["Huang"], ""]),
+  Object.freeze(["CN_CITY_17275852B50201707862643", "Zungeerqi", "CN", ["Huang"], "准格尔旗"]),
   Object.freeze(["CN_CITY_17275852B50263043640706", "Qingjianxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B50342463051977", "Honghu", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B52118529676113", "Zhongweixian", "CN", ["Huang"], ""]),
@@ -128,12 +129,14 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["CN_CITY_17275852B65261927384665", "Fanxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B6563591332882", "Hangjinhouqi", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B67045134559909", "Suijiangxian", "CN", ["Yangtze"], ""]),
+  Object.freeze(["CN_CITY_17275852B68283317499250", "Dalateqi", "CN", ["Huang"], "达拉特旗"]),
   Object.freeze(["CN_CITY_17275852B68532057450373", "Ezhou", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B68795699662733", "Huangpixian", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B69310239774277", "Jiujianxian", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B69361090867285", "Yuanquxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B69911371168899", "Qichunxian", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B70395773762989", "Wushanxian", "CN", ["Yangtze"], ""]),
+  Object.freeze(["CN_CITY_17275852B70463469741157", "Hequxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B71120154646141", "Lijinxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B71449682154252", "Pianguanxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B71560826208449", "Shenmuxian", "CN", ["Huang"], ""]),
@@ -154,6 +157,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["CN_CITY_17275852B8285619165934", "Shishou", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B82919928587081", "Maqinxian", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B83270265823441", "Badongxian", "CN", ["Yangtze"], ""]),
+  Object.freeze(["CN_CITY_17275852B83584927302596", "Baotou", "CN", ["Huang"], ""]),
   Object.freeze(["CN_CITY_17275852B84087342889910", "Wanxian", "CN", ["Yangtze"], ""]),
   Object.freeze(["CN_CITY_17275852B84192730453130", "Lanzhou", "CN", ["Huang"], "兰州"]),
   Object.freeze(["CN_CITY_17275852B84765963113471", "Yibinxian", "CN", ["Yangtze"], ""]),
@@ -224,6 +228,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["DEA11", "Düsseldorf, Kreisfreie Stadt", "DE", ["Rhine"], ""]),
   Object.freeze(["DEA12", "Duisburg, Kreisfreie Stadt", "DE", ["Rhine"], ""]),
   Object.freeze(["DEA14", "Krefeld, Kreisfreie Stadt", "DE", ["Rhine"], ""]),
+  Object.freeze(["DEA1B", "Kleve", "DE", ["Rhine"], ""]),
   Object.freeze(["DEA1F", "Wesel", "DE", ["Rhine"], ""]),
   Object.freeze(["DEA22", "Bonn, Kreisfreie Stadt", "DE", ["Rhine"], ""]),
   Object.freeze(["DEA23", "Köln, Kreisfreie Stadt", "DE", ["Rhine"], ""]),
@@ -266,6 +271,7 @@ export const RIVER_PAINT_LOCATION_ROWS = Object.freeze([
   Object.freeze(["HU110", "Budapest", "HU", ["Danube"], ""]),
   Object.freeze(["HU120", "Pest", "HU", ["Danube"], ""]),
   Object.freeze(["NL224", "Zuidwest-Gelderland", "NL", ["Rhine"], ""]),
+  Object.freeze(["NL226", "Arnhem/Nijmegen", "NL", ["Rhine"], ""]),
   Object.freeze(["PL_POW_0203", "głogowski", "PL", ["Oder"], ""]),
   Object.freeze(["PL_POW_0215", "oławski", "PL", ["Oder"], ""]),
   Object.freeze(["PL_POW_0223", "wrocławski", "PL", ["Oder"], ""]),

@@ -124,6 +124,7 @@ DATA_RUNTIME_FILES = (
     "river_partitions/modern_world_wave2.json",
     "river_partitions/modern_world_wave3.json",
     "river_partitions/modern_world_wave5.transport.json",
+    "river_partitions/modern_world_wave6.transport.json",
     "global_rivers.geojson",
     "global_lakes.geojson",
     "europe_physical.geojson",
