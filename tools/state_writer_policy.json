@@ -92128,6 +92128,170 @@
       ]
     },
     {
+      "path": "tests/palette_country_color_behavior.test.mjs",
+      "surface": "test",
+      "domain": "appearance",
+      "authority": "legacy-direct",
+      "migrationPhase": "P4.4",
+      "bindings": [
+        {
+          "id": "test-file-root:state",
+          "kind": "test-file-root",
+          "name": "state",
+          "authority": "test-fixture",
+          "grants": [
+            {
+              "domain": "appearance",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "object-assign"
+              ],
+              "keys": [],
+              "memberships": [
+                {
+                  "operation": "object-assign",
+                  "key": "*"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [
+                {
+                  "line": 41,
+                  "column": 3,
+                  "operation": "object-assign",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "2d1784aca3958e8112f2a501760314ba5bc01b0e61207745dd70adb31658f254"
+                },
+                {
+                  "line": 43,
+                  "column": 35,
+                  "operation": "object-assign",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "4bcee87e1a20528ce94dfd43fd1e9d962ecc7e4f22fa5525cde235b570704d57"
+                }
+              ],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "tests/palette_library_interaction_behavior.test.mjs",
+      "surface": "test",
+      "domain": "cross-domain",
+      "authority": "legacy-direct",
+      "migrationPhase": "P4.4",
+      "bindings": [
+        {
+          "id": "test-file-root:state",
+          "kind": "test-file-root",
+          "name": "state",
+          "authority": "test-fixture",
+          "grants": [
+            {
+              "domain": "appearance",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "object-assign"
+              ],
+              "keys": [],
+              "memberships": [
+                {
+                  "operation": "object-assign",
+                  "key": "*"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [
+                {
+                  "line": 14,
+                  "column": 5,
+                  "operation": "object-assign",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "2ee3be70ec8a2bc74ff539a12af2852b98125e6b9987ae4147ef7329c1d31948"
+                },
+                {
+                  "line": 64,
+                  "column": 5,
+                  "operation": "object-assign",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "4bcee87e1a20528ce94dfd43fd1e9d962ecc7e4f22fa5525cde235b570704d57"
+                }
+              ],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "color",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "activePaletteId",
+                "countryPalette",
+                "paletteMapCacheById",
+                "palettePackCacheById",
+                "paletteRegistry"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "activePaletteId"
+                },
+                {
+                  "operation": "assign",
+                  "key": "countryPalette"
+                },
+                {
+                  "operation": "assign",
+                  "key": "paletteMapCacheById"
+                },
+                {
+                  "operation": "assign",
+                  "key": "palettePackCacheById"
+                },
+                {
+                  "operation": "assign",
+                  "key": "paletteRegistry"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            },
+            {
+              "domain": "ui",
+              "migrationPhase": "P4.4",
+              "operations": [
+                "assign"
+              ],
+              "keys": [
+                "ui"
+              ],
+              "memberships": [
+                {
+                  "operation": "assign",
+                  "key": "ui"
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "path": "tests/palette_manager_i18n_behavior.test.mjs",
       "surface": "test",
       "domain": "cross-domain",

@@ -20,7 +20,9 @@ physical_layer_regression.spec.js
 physical_layer_runtime_contract.spec.js
 project_save_load_roundtrip.spec.js
 review_regressions.spec.js
+river_contour_visibility.spec.js
 river_layer_regression.spec.js
+river_overlap_visibility.spec.js
 river_paint.spec.js
 sample_guide_deeplink.spec.js
 scenario_apply_concurrency.spec.js

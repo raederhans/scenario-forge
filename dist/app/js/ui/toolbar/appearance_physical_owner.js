@@ -108,10 +108,15 @@ export function createAppearancePhysicalOwner({
   const nodes = collectPhysicalNodes(documentRef);
   let coverageCollection = null;
   let coverageCounts = {};
+  let labelCollection = null;
+  let labelCounts = {};
 
-  const renderClassCoverage = () => {
+  const renderClassCoverage = (physicalConfig) => {
     const collection = resolvePhysicalAtlasCollection(runtimeState);
     const loaded = Array.isArray(collection?.features);
+    const labels = runtimeState.contextLayerExternalDataByName?.physical_region_labels;
+    const namesEnabled = physicalConfig.showRegionLabels;
+    const namesLoaded = Array.isArray(labels?.features);
     if (collection !== coverageCollection) {
       coverageCollection = collection;
       coverageCounts = {};
@@ -120,18 +125,30 @@ export function createAppearancePhysicalOwner({
         coverageCounts[key] = (coverageCounts[key] || 0) + 1;
       }
     }
+    if (labels !== labelCollection) {
+      labelCollection = labels;
+      labelCounts = {};
+      for (const feature of labels?.features || []) {
+        const key = feature.properties?.atlas_class;
+        labelCounts[key] = (labelCounts[key] || 0) + 1;
+      }
+    }
     for (const [key, input] of Object.entries(nodes.physicalClassToggles)) {
       if (!input) continue;
       const count = coverageCounts[key] || 0;
-      input.disabled = loaded && count === 0;
+      const nameCount = namesEnabled ? labelCounts[key] || 0 : 0;
+      const coverageKnown = loaded && (!namesEnabled || namesLoaded);
+      input.disabled = coverageKnown && count === 0 && nameCount === 0;
       const row = input.closest?.("label");
       const swatch = row?.querySelector(".physical-class-swatch");
       if (swatch) swatch.style.backgroundColor = PHYSICAL_ATLAS_PALETTE[key];
       const coverage = documentRef.getElementById(`${PHYSICAL_CLASS_TOGGLE_IDS[key]}Coverage`);
       if (coverage) {
-        coverage.textContent = !loaded ? t("Coverage loading", "ui")
-          : count ? `${count.toLocaleString()} ${t("regions", "ui")}`
-            : t("No coverage in current data", "ui");
+        const parts = [];
+        if (count) parts.push(`${count.toLocaleString()} ${t("regions", "ui")}`);
+        if (nameCount) parts.push(`${nameCount.toLocaleString()} ${t("Labels", "ui")}`);
+        coverage.textContent = parts.length ? parts.join(" · ")
+          : t(coverageKnown ? "No coverage in current data" : "Coverage loading", "ui");
       }
     }
   };
@@ -243,7 +260,7 @@ export function createAppearancePhysicalOwner({
     Object.entries(nodes.physicalClassToggles).forEach(([key, element]) => {
       if (element) element.checked = physicalConfig.atlasClassVisibility?.[key] !== false;
     });
-    renderClassCoverage();
+    renderClassCoverage(physicalConfig);
     return physicalConfig;
   };
 
@@ -272,7 +289,7 @@ export function createAppearancePhysicalOwner({
         && typeof runtimeState.ensureContextLayerDataFn === "function") {
         void callCompatRuntimeHook(runtimeState, "ensureContextLayerDataFn", getPhysicalContextLayerRequests(runtimeState.styleConfig.physical), { reason, renderNow: true });
       }
-      if (reason === "physical-mode") renderPhysicalUi();
+      if (reason === "physical-mode" || reason === "physical-region-labels") renderPhysicalUi();
       renderDirty(reason);
     });
     element.dataset.bound = "true";

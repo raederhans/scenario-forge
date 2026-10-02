@@ -8,12 +8,14 @@ import { setResolvedColorForFeature, bumpColorRevision, replaceResolvedColorsSta
 import { createCountryFillPaletteOwner } from "../js/core/renderer/country_fill_palette_owner.js";
 import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
 
-function rendererFunction(name, globals) {
+function rendererFunction(name, globals, includeFunctions = []) {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const declaration = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
-    .find(node => node.type === "FunctionDeclaration" && node.id.name === name);
+  const names = new Set([name, ...includeFunctions]);
+  const declarations = parse(source, { ecmaVersion: "latest", sourceType: "module" }).body
+    .filter(node => node.type === "FunctionDeclaration" && names.has(node.id.name));
+  assert.equal(declarations.length, names.size);
   const context = vm.createContext(globals);
-  vm.runInContext(source.slice(declaration.start, declaration.end), context);
+  vm.runInContext(declarations.map(node => source.slice(node.start, node.end)).join("\n"), context);
   return context[name];
 }
 
@@ -72,6 +74,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
     getRiverPaintRuntime,
     getCountryFillPaletteOwner: () => palette,
+    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
     getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: (ids) => {
       // The extracted transaction owns publication order; the contour runtime
       // has its own behavior suite. Observe the actual committed colors here.
@@ -99,7 +102,7 @@ test("visible legend avoids feature scans until actual renderer color transactio
       assert.equal(dominantColors.get("BB"), "#445566", "unpainted country's palette is preserved");
       visibleColors = read(state);
     },
-  });
+  }, ["notifyPaintContourColorsChanged"]);
   refresh(["A"], { renderNow: true });
   assert.equal(state.colors, colors, "transaction mutates the existing table");
   assert.equal(state.colorRevision, 1, "color transaction commits before deferred presentation");

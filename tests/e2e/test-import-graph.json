@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 69,
-    "nodeCount": 85,
-    "reverseIndexKeyCount": 134,
+    "specCount": 71,
+    "nodeCount": 87,
+    "reverseIndexKeyCount": 139,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 64
+        "specCount": 65
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -71,6 +71,10 @@
         "specCount": 5
       },
       {
+        "dependency": "vendor/d3.v7.min.js",
+        "specCount": 5
+      },
+      {
         "dependency": "js/core/scenario_manager.js",
         "specCount": 4
       },
@@ -79,11 +83,7 @@
         "specCount": 4
       },
       {
-        "dependency": "js/ui/transport_workbench_carrier.js",
-        "specCount": 4
-      },
-      {
-        "dependency": "js/ui/transport_workbench_family_preview.js",
+        "dependency": "js/core/state/actions/renderer_interaction_actions.js",
         "specCount": 4
       }
     ]
@@ -1206,6 +1206,20 @@
         "js/ui/sidebar.js"
       ]
     },
+    "tests/e2e/river_contour_visibility.spec.js": {
+      "directDependencies": [
+        "js/core/river_paint/contour_render_owner.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/river_paint/contour_render_owner.js",
+        "vendor/d3.v7.min.js"
+      ],
+      "repoImpact": [
+        "js/core/river_paint/contour_render_owner.js",
+        "vendor/d3.v7.min.js"
+      ]
+    },
     "tests/e2e/river_layer_regression.spec.js": {
       "directDependencies": [
         "js/core/map_renderer.js",
@@ -1233,6 +1247,54 @@
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/river_overlap_visibility.spec.js": {
+      "directDependencies": [
+        "js/core/history_manager.js",
+        "js/core/map_renderer.js",
+        "js/core/river_paint/contour_render_owner.js",
+        "js/core/river_paint/internal_contour_owner.js",
+        "js/core/river_paint/runtime.js",
+        "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/fixtures/river_paint/overlap_visibility.json"
+      ],
+      "transitiveDependencies": [
+        "js/core/history_manager.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/river_paint/contour_render_owner.js",
+        "js/core/river_paint/internal_contour_owner.js",
+        "js/core/river_paint/runtime.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js",
+        "tests/fixtures/river_paint/overlap_visibility.json"
+      ],
+      "repoImpact": [
+        "js/core/history_manager.js",
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/river_paint/contour_render_owner.js",
+        "js/core/river_paint/internal_contour_owner.js",
+        "js/core/river_paint/runtime.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/core/state/actions/renderer_interaction_actions.js",
+        "js/core/state/actions/scenario_presentation_actions.js",
+        "js/ui/sidebar.js",
+        "tests/fixtures/river_paint/overlap_visibility.json"
       ]
     },
     "tests/e2e/river_paint.spec.js": {
@@ -2172,6 +2234,7 @@
     ],
     "js/core/history_manager.js": [
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/shortcut_history_render_boundary.spec.js"
     ],
     "js/core/interaction_funnel.js": [
@@ -2208,6 +2271,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2274,6 +2338,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2347,10 +2412,18 @@
     "js/core/renderer/transport_facility_icons.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
     ],
+    "js/core/river_paint/contour_render_owner.js": [
+      "tests/e2e/river_contour_visibility.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js"
+    ],
     "js/core/river_paint/geometry_identity.js": [
       "tests/e2e/river_paint.spec.js"
     ],
+    "js/core/river_paint/internal_contour_owner.js": [
+      "tests/e2e/river_overlap_visibility.spec.js"
+    ],
     "js/core/river_paint/runtime.js": [
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js"
     ],
     "js/core/scenario_dispatcher.js": [
@@ -2387,6 +2460,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2485,6 +2559,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2533,11 +2608,13 @@
     "js/core/state/actions/renderer_interaction_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
       "tests/e2e/ocean_geometry_contract.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js"
     ],
     "js/core/state/actions/scenario_presentation_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js",
-      "tests/e2e/marine_label_performance.spec.js"
+      "tests/e2e/marine_label_performance.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js"
     ],
     "js/core/state/actions/transport_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
@@ -2600,6 +2677,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2764,8 +2842,14 @@
     "tests/e2e/review_regressions.spec.js": [
       "tests/e2e/review_regressions.spec.js"
     ],
+    "tests/e2e/river_contour_visibility.spec.js": [
+      "tests/e2e/river_contour_visibility.spec.js"
+    ],
     "tests/e2e/river_layer_regression.spec.js": [
       "tests/e2e/river_layer_regression.spec.js"
+    ],
+    "tests/e2e/river_overlap_visibility.spec.js": [
+      "tests/e2e/river_overlap_visibility.spec.js"
     ],
     "tests/e2e/river_paint.spec.js": [
       "tests/e2e/river_paint.spec.js"
@@ -2870,6 +2954,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -2936,6 +3021,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -3002,6 +3088,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -3068,6 +3155,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -3145,6 +3233,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -3218,6 +3307,7 @@
       "tests/e2e/release/pages_public_release_gate.spec.js",
       "tests/e2e/review_regressions.spec.js",
       "tests/e2e/river_layer_regression.spec.js",
+      "tests/e2e/river_overlap_visibility.spec.js",
       "tests/e2e/river_paint.spec.js",
       "tests/e2e/sample_guide_deeplink.spec.js",
       "tests/e2e/scenario_apply_concurrency.spec.js",
@@ -3295,11 +3385,15 @@
     "tests/e2e/water_cache_strategy_regression.spec.js": [
       "tests/e2e/water_cache_strategy_regression.spec.js"
     ],
+    "tests/fixtures/river_paint/overlap_visibility.json": [
+      "tests/e2e/river_overlap_visibility.spec.js"
+    ],
     "vendor/d3.v7.min.js": [
       "tests/e2e/dev/latency_batches.dev.spec.js",
       "tests/e2e/dev/precision_foundation_patch.dev.spec.js",
       "tests/e2e/dev/precision_geometry_transfer.dev.spec.js",
-      "tests/e2e/dev/precision_scaling_packed.dev.spec.js"
+      "tests/e2e/dev/precision_scaling_packed.dev.spec.js",
+      "tests/e2e/river_contour_visibility.spec.js"
     ]
   },
   "unresolved": []

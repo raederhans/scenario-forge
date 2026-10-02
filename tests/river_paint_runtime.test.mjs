@@ -2,7 +2,7 @@ import { RIVER_PAINT_PILOT } from '../js/core/river_paint/pilot_manifest.js';
 import { normalizeRiverPaintState } from '../js/core/river_paint/partition_model.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeFixture, makeWave3Fixture, makeWave6Fixture, realWave5, realWave6, realWave6TransportText, rectangle, feature, d3, captureCells, realPilot, realWave2, realWave3, realWave3Text } from './helpers/river_paint_fixture.mjs';
+import { makeFixture, makeWave3Fixture, makeWave7Fixture, realWave5, realWave6, realWave7, realWave7TransportText, rectangle, feature, d3, captureCells, realPilot, realWave2, realWave3, realWave3Text } from './helpers/river_paint_fixture.mjs';
 import { loadRiverPaintPilot } from '../js/core/river_paint/pilot_loader.js';
 import { getRiverPaintRuntime, createRiverPaintRuntime } from '../js/core/river_paint/runtime.js';
 import { applyRiverCellPaintState } from '../js/core/state/actions/river_paint_actions.js';
@@ -151,7 +151,7 @@ test('blocked, stale and mismatched-parent hits cannot write; eyedropper uses ch
 });
 
 
-for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6]])
+for (const [label, readPack] of [['legacy', realPilot], ['wave2', realWave2], ['wave3', realWave3], ['wave5', realWave5], ['wave6', realWave6], ['wave7', realWave7]])
 test(`${label}: saved pack is retained and a regenerated geometry build is rejected`, async () => {
   const pack = readPack();
   const manifest = { version: RIVER_PAINT_PILOT.scenarioVersion, generated_at: RIVER_PAINT_PILOT.scenarioGeneratedAt };
@@ -175,17 +175,17 @@ test(`${label}: saved pack is retained and a regenerated geometry build is rejec
   assert.equal(state.riverPaint.pack.packId, pack.packId);
 });
 
-test('new project installs authenticated wave6 through compact transport and retains administrative IDs', async () => {
-  const { state, pack } = makeWave6Fixture({ installed: false });
+test('new project installs authenticated wave7 through compact transport and retains administrative IDs', async () => {
+  const { state, pack } = makeWave7Fixture({ installed: false });
   const ids = [...state.landIndex.keys()]; const originalLand = state.landData;
   const runtime = createRiverPaintRuntime(state, { geoContains: d3.geoContains }); let requests = 0;
   const result = await runtime.enable(options => loadRiverPaintPilot({ ...options, fetchImpl: async url => {
-    requests++; assert.equal(url, 'data/river_partitions/modern_world_wave6.transport.json');
-    return { ok: true, text: async () => realWave6TransportText() };
+    requests++; assert.equal(url, 'data/river_partitions/modern_world_wave7.transport.json');
+    return { ok: true, text: async () => realWave7TransportText() };
   } }));
   assert.equal(result.ready, true); assert.equal(result.geometryChanged, true); assert.equal(requests, 1);
   assert.equal(runtime.getActivePack().packId, pack.packId);
-  assert.equal(runtime.surfaces().length, 1199 + 106);
+  assert.equal(runtime.surfaces().length, 1276 + 104);
   assert.deepEqual([...state.landIndex.keys()], ids); assert.equal(state.landData, originalLand);
   runtime.assertReadyForExport();
 });

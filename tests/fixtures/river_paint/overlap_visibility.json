@@ -1,0 +1,516 @@
+{
+  "provenance": {
+    "sourceLandDigest": "sha256:917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
+    "landPath": "data/scenarios/modern_world/runtime_topology.topo.json",
+    "baselinePackId": "sha256:c9fd0b6d42aa194868d52b2289f0b667080db54f191c660c933233e9583f9413",
+    "canonicalCandidatePackId": "sha256:6794639e6f664ed2a1e5585264eebc04706329a8561b413148bd47ad792478ec",
+    "shapelyVersion": "2.1.2"
+  },
+  "method": "Independent planar GEOS visibility from canonical source order. Native pixels and spherical runtime hits are tested separately.",
+  "sourceOrderIds": [
+    "BY_RAY_67162791B10713618148259",
+    "BY_RAY_67162791B11584975294724",
+    "BY_RAY_67162791B14569635979911",
+    "BY_RAY_67162791B17030122378697",
+    "BY_RAY_67162791B26710857863794",
+    "BY_RAY_67162791B4778855273895",
+    "BY_RAY_67162791B52564132020414",
+    "BY_RAY_67162791B58533541453403",
+    "BY_RAY_67162791B72598168140482",
+    "BY_INT_BREST",
+    "BY_INT_GOMEL",
+    "BY_INT_MOGILEV",
+    "BY_INT_VITEBSK",
+    "BY_INT_MINSK",
+    "RU_RAY_50074027B53231036069281",
+    "RU_RAY_50074027B58613203253678",
+    "RU_RAY_50074027B53939252162264",
+    "RU_RAY_50074027B82541686322498",
+    "RU_RAY_50074027B19608634361445",
+    "RU_RAY_50074027B48200335175308",
+    "RU_RAY_50074027B35490494550404",
+    "RU_RAY_50074027B79449199028894",
+    "RU_RAY_50074027B15278437738801",
+    "RU_RAY_50074027B24471111608761",
+    "RU_RAY_50074027B71114579362546",
+    "RU_RAY_50074027B97827439207559",
+    "RU_RAY_50074027B44154738908147",
+    "RU_RAY_50074027B61241799946425",
+    "RU_RAY_50074027B12225471433206",
+    "RU_RAY_50074027B68742604318629",
+    "RU_RAY_50074027B60097792769672",
+    "RU_RAY_50074027B88958089507858",
+    "RU_RAY_50074027B54184638100605",
+    "RU_RAY_50074027B30801426940346",
+    "RU_RAY_50074027B91265302364221",
+    "RU_RAY_50074027B65236051616648",
+    "RU_RAY_50074027B98725284766499",
+    "RU_RAY_50074027B81144067595181",
+    "RU_RAY_50074027B18690673383913",
+    "RU_RAY_50074027B47797242403348",
+    "RU_RAY_50074027B80887817772253",
+    "RU_RAY_50074027B91883426895496",
+    "RU_RAY_50074027B91802635760870",
+    "RU_RAY_50074027B79231087292240",
+    "RU_RAY_50074027B51076628931359",
+    "RU_RAY_50074027B51726500082089",
+    "RU_RAY_50074027B77320350284147",
+    "RU_RAY_50074027B92690998673598",
+    "RU_RAY_50074027B53551011789267",
+    "RU_RAY_50074027B50111125626076",
+    "RU_RAY_50074027B48186281489768",
+    "RU_RAY_50074027B52176996438245",
+    "UA_RAY_74538382B36516129113863",
+    "UA_RAY_74538382B77165188287872",
+    "UA_RAY_74538382B14499181024319",
+    "UA_RAY_74538382B47612746607547",
+    "UA_RAY_74538382B66487059537692",
+    "UA_RAY_74538382B4751802602524",
+    "UA_RAY_74538382B10593574397068",
+    "UA_RAY_74538382B29600786349581",
+    "UA_RAY_74538382B40041339344288",
+    "UA_RAY_74538382B60921908613861",
+    "UA_RAY_74538382B68825553908118",
+    "UA_RAY_74538382B52142389762962",
+    "UA_RAY_74538382B57991939893011",
+    "RU_CITY_VOLGOGRAD"
+  ],
+  "points": [
+    {
+      "coordinates": [
+        28.976412238439266,
+        52.3091
+      ],
+      "expectedParentId": "BY_INT_GOMEL",
+      "expectedCellIds": [
+        "river:BY_INT_GOMEL:90a7c5a7ae7b085d"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "BY_INT_GOMEL",
+      "targetCellId": "river:BY_INT_GOMEL:90a7c5a7ae7b085d",
+      "distanceToCellBoundaryDegrees": 0.42920857779703664
+    },
+    {
+      "coordinates": [
+        31.52851528515285,
+        52.10107714877148
+      ],
+      "expectedParentId": "UA_RAY_74538382B77165188287872",
+      "expectedCellIds": [],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "BY_INT_GOMEL",
+      "distanceToTargetParentBoundaryDegrees": 0.001735838358385422
+    },
+    {
+      "coordinates": [
+        30.3743,
+        52.3885
+      ],
+      "expectedParentId": "BY_INT_GOMEL",
+      "expectedCellIds": [
+        "river:BY_INT_GOMEL:5638197c02150d7f",
+        "river:BY_INT_GOMEL:90a7c5a7ae7b085d"
+      ],
+      "cellBoundaryAmbiguous": true,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "BY_INT_GOMEL",
+      "seamPartIndex": 114,
+      "seamPartLengthDegrees": 0.06451356446515745
+    },
+    {
+      "coordinates": [
+        30.3348,
+        53.25475
+      ],
+      "expectedParentId": "BY_INT_MOGILEV",
+      "expectedCellIds": [
+        "river:BY_INT_MOGILEV:75128a63ce5b4d4d"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-seam-midpoint",
+      "targetParentId": "BY_INT_GOMEL",
+      "seamPartIndex": 1,
+      "seamPartLengthDegrees": 0.05284931409204687
+    },
+    {
+      "coordinates": [
+        29.605161197693057,
+        53.53850397803977
+      ],
+      "expectedParentId": "BY_INT_MOGILEV",
+      "expectedCellIds": [
+        "river:BY_INT_MOGILEV:75128a63ce5b4d4d"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "BY_INT_MOGILEV",
+      "targetCellId": "river:BY_INT_MOGILEV:75128a63ce5b4d4d",
+      "distanceToCellBoundaryDegrees": 0.27169312005596447
+    },
+    {
+      "coordinates": [
+        32.45363673148929,
+        53.66072791377914
+      ],
+      "expectedParentId": "RU_RAY_50074027B81144067595181",
+      "expectedCellIds": [],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "BY_INT_MOGILEV",
+      "distanceToTargetParentBoundaryDegrees": 0.009007945680001878
+    },
+    {
+      "coordinates": [
+        30.3819,
+        53.90035
+      ],
+      "expectedParentId": "BY_INT_MOGILEV",
+      "expectedCellIds": [
+        "river:BY_INT_MOGILEV:75128a63ce5b4d4d"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "BY_INT_MOGILEV",
+      "seamPartIndex": 54,
+      "seamPartLengthDegrees": 0.11681887689924235
+    },
+    {
+      "coordinates": [
+        30.279731243115336,
+        54.30212687599754
+      ],
+      "expectedParentId": "BY_INT_VITEBSK",
+      "expectedCellIds": [],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-seam-midpoint",
+      "targetParentId": "BY_INT_MOGILEV",
+      "seamPartIndex": 0,
+      "seamPartLengthDegrees": 0.013223988676412043
+    },
+    {
+      "coordinates": [
+        44.378475543835435,
+        48.67019263342634
+      ],
+      "expectedParentId": "RU_CITY_VOLGOGRAD",
+      "expectedCellIds": [
+        "river:RU_CITY_VOLGOGRAD:15d1d44c47b4d4f8"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_CITY_VOLGOGRAD",
+      "targetCellId": "river:RU_CITY_VOLGOGRAD:15d1d44c47b4d4f8",
+      "distanceToCellBoundaryDegrees": 0.028657694608609095
+    },
+    {
+      "coordinates": [
+        44.4917,
+        48.55955
+      ],
+      "expectedParentId": "RU_CITY_VOLGOGRAD",
+      "expectedCellIds": [
+        "river:RU_CITY_VOLGOGRAD:47e78d8b3c719a45"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_CITY_VOLGOGRAD",
+      "seamPartIndex": 12,
+      "seamPartLengthDegrees": 0.07978126346454867
+    },
+    {
+      "coordinates": [
+        39.19939954116525,
+        46.85624154891549
+      ],
+      "expectedParentId": "RU_RAY_50074027B24471111608761",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B24471111608761:7257623a81f89711"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_RAY_50074027B24471111608761",
+      "targetCellId": "river:RU_RAY_50074027B24471111608761:7257623a81f89711",
+      "distanceToCellBoundaryDegrees": 0.08912785227021829
+    },
+    {
+      "coordinates": [
+        39.494550000000004,
+        47.130449999999996
+      ],
+      "expectedParentId": "RU_RAY_50074027B24471111608761",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B24471111608761:7257623a81f89711"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B24471111608761",
+      "seamPartIndex": 8,
+      "seamPartLengthDegrees": 0.022501999911119903
+    },
+    {
+      "coordinates": [
+        35.75640333160868,
+        56.63074734497344
+      ],
+      "expectedParentId": "RU_RAY_50074027B51726500082089",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B51726500082089:f962de22e0edc968"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_RAY_50074027B51726500082089",
+      "targetCellId": "river:RU_RAY_50074027B51726500082089:f962de22e0edc968",
+      "distanceToCellBoundaryDegrees": 0.19076650130111641
+    },
+    {
+      "coordinates": [
+        36.082003818965546,
+        57.077399979290725
+      ],
+      "expectedParentId": "RU_RAY_50074027B48186281489768",
+      "expectedCellIds": [],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "RU_RAY_50074027B51726500082089",
+      "distanceToTargetParentBoundaryDegrees": 0.0026724984910269805
+    },
+    {
+      "coordinates": [
+        36.19345,
+        56.7956
+      ],
+      "expectedParentId": "RU_RAY_50074027B51726500082089",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B51726500082089:dc1a8211d54c7984",
+        "river:RU_RAY_50074027B51726500082089:f962de22e0edc968"
+      ],
+      "cellBoundaryAmbiguous": true,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B51726500082089",
+      "seamPartIndex": 31,
+      "seamPartLengthDegrees": 0.18104433158760058
+    },
+    {
+      "coordinates": [
+        44.579838481311654,
+        48.85505941859418
+      ],
+      "expectedParentId": "RU_RAY_50074027B61241799946425",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B61241799946425:53f44cb19aa6376e"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_RAY_50074027B61241799946425",
+      "targetCellId": "river:RU_RAY_50074027B61241799946425:53f44cb19aa6376e",
+      "distanceToCellBoundaryDegrees": 0.006030160400002371
+    },
+    {
+      "coordinates": [
+        44.399409071126684,
+        48.67399352086625
+      ],
+      "expectedParentId": "RU_CITY_VOLGOGRAD",
+      "expectedCellIds": [
+        "river:RU_CITY_VOLGOGRAD:15d1d44c47b4d4f8"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "RU_RAY_50074027B61241799946425",
+      "distanceToTargetParentBoundaryDegrees": 0.03818643601154258
+    },
+    {
+      "coordinates": [
+        44.56034195089991,
+        48.717477735950766
+      ],
+      "expectedParentId": "RU_RAY_50074027B61241799946425",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B61241799946425:9c6717f8bc1ae2c5"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B61241799946425",
+      "seamPartIndex": 1,
+      "seamPartLengthDegrees": 0.0013131541304413883
+    },
+    {
+      "coordinates": [
+        44.4917,
+        48.55955
+      ],
+      "expectedParentId": "RU_CITY_VOLGOGRAD",
+      "expectedCellIds": [
+        "river:RU_CITY_VOLGOGRAD:47e78d8b3c719a45"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B61241799946425",
+      "seamPartIndex": 10,
+      "seamPartLengthDegrees": 0.07978126346454867
+    },
+    {
+      "coordinates": [
+        30.28941608944499,
+        51.12627551075511
+      ],
+      "expectedParentId": "UA_RAY_74538382B4751802602524",
+      "expectedCellIds": [
+        "river:UA_RAY_74538382B4751802602524:962a7ec4549b9086"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "UA_RAY_74538382B4751802602524",
+      "targetCellId": "river:UA_RAY_74538382B4751802602524:962a7ec4549b9086",
+      "distanceToCellBoundaryDegrees": 0.09764699996870951
+    },
+    {
+      "coordinates": [
+        29.694845907540103,
+        50.768476657882154
+      ],
+      "expectedParentId": "UA_RAY_74538382B29600786349581",
+      "expectedCellIds": [],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "UA_RAY_74538382B4751802602524",
+      "distanceToTargetParentBoundaryDegrees": 0.0006089430030201731
+    },
+    {
+      "coordinates": [
+        30.521549999999998,
+        51.14435
+      ],
+      "expectedParentId": "UA_RAY_74538382B4751802602524",
+      "expectedCellIds": [
+        "river:UA_RAY_74538382B4751802602524:962a7ec4549b9086"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "UA_RAY_74538382B4751802602524",
+      "seamPartIndex": 15,
+      "seamPartLengthDegrees": 0.0583151781271417
+    },
+    {
+      "coordinates": [
+        39.740035861897084,
+        47.26329564395644
+      ],
+      "expectedParentId": "RU_RAY_50074027B53939252162264",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B53939252162264:7f168d5c50026125"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_RAY_50074027B53939252162264",
+      "targetCellId": "river:RU_RAY_50074027B53939252162264:7f168d5c50026125",
+      "distanceToCellBoundaryDegrees": 0.04191755484595697
+    },
+    {
+      "coordinates": [
+        39.54660723077819,
+        47.1730320493205
+      ],
+      "expectedParentId": "RU_RAY_50074027B24471111608761",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B24471111608761:b238eaaf53fc9828"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "RU_RAY_50074027B53939252162264",
+      "distanceToTargetParentBoundaryDegrees": 0.007539395095200253
+    },
+    {
+      "coordinates": [
+        39.64238081991333,
+        47.181405813445124
+      ],
+      "expectedParentId": "RU_RAY_50074027B53939252162264",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B53939252162264:eb26bde9ece5b85e"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B53939252162264",
+      "seamPartIndex": 0,
+      "seamPartLengthDegrees": 0.09638337372455191
+    },
+    {
+      "coordinates": [
+        39.58748081991333,
+        47.17145581344513
+      ],
+      "expectedParentId": "RU_RAY_50074027B24471111608761",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B24471111608761:7257623a81f89711",
+        "river:RU_RAY_50074027B24471111608761:b238eaaf53fc9828"
+      ],
+      "cellBoundaryAmbiguous": true,
+      "kind": "occluded-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B53939252162264",
+      "seamPartIndex": 2,
+      "seamPartLengthDegrees": 0.015205380189092841
+    },
+    {
+      "coordinates": [
+        36.4520237168545,
+        56.57780427504275
+      ],
+      "expectedParentId": "RU_RAY_50074027B91802635760870",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B91802635760870:d99f8d58eda64c71"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-cell-interior",
+      "targetParentId": "RU_RAY_50074027B91802635760870",
+      "targetCellId": "river:RU_RAY_50074027B91802635760870:d99f8d58eda64c71",
+      "distanceToCellBoundaryDegrees": 0.09076458629997682
+    },
+    {
+      "coordinates": [
+        36.29024527872182,
+        56.78042595509457
+      ],
+      "expectedParentId": "RU_RAY_50074027B51726500082089",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B51726500082089:f962de22e0edc968"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-parent-interior",
+      "targetParentId": "RU_RAY_50074027B91802635760870",
+      "distanceToTargetParentBoundaryDegrees": 0.0036353235727816656
+    },
+    {
+      "coordinates": [
+        36.428649965477035,
+        56.68375513142635
+      ],
+      "expectedParentId": "RU_RAY_50074027B91802635760870",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B91802635760870:d99f8d58eda64c71"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "visible-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B91802635760870",
+      "seamPartIndex": 3,
+      "seamPartLengthDegrees": 0.06846979787168661
+    },
+    {
+      "coordinates": [
+        37.049893004760285,
+        56.774666588782225
+      ],
+      "expectedParentId": "RU_RAY_50074027B50111125626076",
+      "expectedCellIds": [
+        "river:RU_RAY_50074027B50111125626076:eef36d88f034ee96"
+      ],
+      "cellBoundaryAmbiguous": false,
+      "kind": "occluded-seam-midpoint",
+      "targetParentId": "RU_RAY_50074027B91802635760870",
+      "seamPartIndex": 5,
+      "seamPartLengthDegrees": 0.02638216015200384
+    }
+  ]
+}

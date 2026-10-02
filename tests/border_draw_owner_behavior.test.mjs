@@ -134,6 +134,28 @@ function createOwner({ hgoVectorScene = false, interactive = false, helpers = {}
   return { owner, context, coastalAccentCalls, state };
 }
 
+test("river contours inherit paint contour style before global border strokes in settled and interactive passes", () => {
+  for (const interactive of [false, true]) {
+    for (const scenario of [false, true]) {
+      let h;
+      const calls = [];
+      h = createOwner({ interactive, helpers: { drawRiverInternalContours: options => {
+        assert.equal(h.context.strokes.length, 0, "river scratch must composite before global borders");
+        calls.push(options);
+      } } });
+      if (scenario) h.state.activeScenarioId = "river-scenario";
+      h.owner.drawHierarchicalBorders(2, { interactive });
+      assert.equal(calls.length, 1);
+      const { color, alpha, width, ...rest } = calls[0];
+      const paintStroke = h.context.strokes.find(stroke => stroke.strokeStyle === color);
+      assert.ok(paintStroke);
+      assert.equal(alpha, paintStroke.alpha);
+      assert.equal(width, paintStroke.lineWidth);
+      assert.deepEqual(rest, { k: 2, interactive, lineJoin: "round", lineCap: "round", miterLimit: 4 });
+    }
+  }
+});
+
 test("drawing requests detail cache reconciliation without writing renderer state", () => {
   const requests = [];
   const detailMeta = { signature: "zoom-5", detailCountries: ["AAA"] };

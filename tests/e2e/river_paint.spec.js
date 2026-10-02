@@ -3,18 +3,19 @@ const { gotoApp, waitForAppInteractive, waitForRenderIdle } = require('./support
 const fs = require('node:fs');
 const path = require('node:path');
 
-// The six repaired source-intersecting parents. Whole-pack numerical
+// The seven overlapping-source parents. Whole-pack numerical
 // and geometry acceptance belongs to verify_contours.mjs, not one UI edit per cell.
 const RIVER_REPRESENTATIVES = [
-  ['Huang', 'CN_CITY_17275852B50201707862643'], ['Huang', 'CN_CITY_17275852B70463469741157'],
-  ['Huang', 'CN_CITY_17275852B68283317499250'], ['Huang', 'CN_CITY_17275852B83584927302596'],
-  ['Rhine', 'DEA1B'], ['Rhine', 'NL226'],
+  ['Dnieper', 'BY_INT_GOMEL'], ['Dnieper', 'BY_INT_MOGILEV'],
+  ['Volga', 'RU_CITY_VOLGOGRAD'], ['Don', 'RU_RAY_50074027B24471111608761'],
+  ['Volga', 'RU_RAY_50074027B51726500082089'], ['Volga', 'RU_RAY_50074027B61241799946425'],
+  ['Dnieper', 'UA_RAY_74538382B4751802602524'],
 ];
 const LEGACY_REPRESENTATIVES = ['CN_CITY_17275852B1441354643708', 'DEE0D', 'FR_ARR_76003',
   'PL_POW_0264', 'RU_RAY_50074027B57358126207690'];
 const reviewedRequired = true;
 const reviewedIds = JSON.parse(fs.readFileSync(path.resolve(__dirname,
-  '../../tools/river_partitions/selections/wave6-reviewed.json'), 'utf8')).parents;
+  '../../tools/river_partitions/selections/wave7-reviewed.json'), 'utf8')).parents;
 
 async function activePackSummary(page) {
   return page.evaluate(async () => {
@@ -33,7 +34,7 @@ async function activePackSummary(page) {
 function assertReviewedScope(summary) {
   if (!reviewedRequired) return;
   expect(summary.parents.map(parent => parent.parentId).sort()).toEqual([...reviewedIds].sort());
-  expect(summary.parents.reduce((n, parent) => n + parent.cells.length, 0)).toBe(1199);
+  expect(summary.parents.reduce((n, parent) => n + parent.cells.length, 0)).toBe(1276);
   for (const [, id] of RIVER_REPRESENTATIVES) expect(summary.parents.some(parent => parent.parentId === id), id).toBe(true);
 }
 

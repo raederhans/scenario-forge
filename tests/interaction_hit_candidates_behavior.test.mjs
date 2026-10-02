@@ -179,6 +179,7 @@ function createRendererHitHarness({ cacheEnabled, candidatesByKey }) {
   };
   const scope = vm.createContext({
     getRiverPaintRuntime,
+    hasVisibleRiverPartitions: () => false,
     runtimeState: {
       landData: { features: [] }, spatialItems: [{}], waterSpatialItems: [{}], specialSpatialItems: [{}],
       showWaterRegions: true, showScenarioSpecialRegions: true,

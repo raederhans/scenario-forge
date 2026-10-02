@@ -157,11 +157,25 @@
       "ownerHint": "review-runtime"
     },
     {
+      "specPath": "tests/e2e/river_contour_visibility.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "renderer-runtime",
+      "ownerHint": "renderer-runtime"
+    },
+    {
       "specPath": "tests/e2e/river_layer_regression.spec.js",
       "primaryLayer": "regression",
       "executionMode": "browser",
       "domain": "map-layer",
       "ownerHint": "map-runtime"
+    },
+    {
+      "specPath": "tests/e2e/river_overlap_visibility.spec.js",
+      "primaryLayer": "regression",
+      "executionMode": "browser",
+      "domain": "renderer-runtime",
+      "ownerHint": "renderer-runtime"
     },
     {
       "specPath": "tests/e2e/river_paint.spec.js",

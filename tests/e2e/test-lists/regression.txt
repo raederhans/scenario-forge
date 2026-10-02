@@ -12,7 +12,9 @@ ocean_geometry_contract.spec.js
 ownership_retirement.spec.js
 physical_layer_regression.spec.js
 review_regressions.spec.js
+river_contour_visibility.spec.js
 river_layer_regression.spec.js
+river_overlap_visibility.spec.js
 river_paint.spec.js
 scenario_boundary_regression.spec.js
 shortcut_history_render_boundary.spec.js
