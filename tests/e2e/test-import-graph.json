@@ -2,53 +2,53 @@
   "schemaVersion": 1,
   "graphMode": "artifact-only",
   "summary": {
-    "specCount": 71,
-    "nodeCount": 87,
-    "reverseIndexKeyCount": 139,
+    "specCount": 74,
+    "nodeCount": 90,
+    "reverseIndexKeyCount": 142,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "js/core/map_renderer.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "js/core/scenario_dispatcher.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "js/core/state.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "js/ui/sidebar.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/playwright-app-paths.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/playwright-app.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/playwright-frontline-panel.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/playwright-project-import.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/playwright-web-server.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/startup-paths.js",
-        "specCount": 65
+        "specCount": 68
       },
       {
         "dependency": "tests/e2e/support/expectations/console-allowlist.js",
@@ -757,6 +757,83 @@
         "js/core/render_boundary.js",
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/editor_detail_polish.spec.js": {
+      "directDependencies": [
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/editor_refresh_motion.spec.js": {
+      "directDependencies": [
+        "js/core/state.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js"
+      ]
+    },
+    "tests/e2e/editor_task_context.spec.js": {
+      "directDependencies": [
+        "js/core/state.js",
+        "tests/e2e/support/playwright-app.js"
+      ],
+      "transitiveDependencies": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
+        "js/core/state.js",
+        "js/ui/sidebar.js",
+        "tests/e2e/support/playwright-app-paths.js",
+        "tests/e2e/support/playwright-app.js",
+        "tests/e2e/support/playwright-frontline-panel.js",
+        "tests/e2e/support/playwright-project-import.js",
+        "tests/e2e/support/playwright-web-server.js",
+        "tests/e2e/support/startup-paths.js"
+      ],
+      "repoImpact": [
+        "js/core/interaction_funnel.js",
+        "js/core/map_renderer.js",
+        "js/core/scenario_dispatcher.js",
         "js/core/state.js",
         "js/ui/sidebar.js"
       ]
@@ -2255,6 +2332,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -2322,6 +2402,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -2444,6 +2527,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -2543,6 +2629,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -2661,6 +2750,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -2796,6 +2888,15 @@
     ],
     "tests/e2e/dev/visual_owner_semantics.dev.spec.js": [
       "tests/e2e/dev/visual_owner_semantics.dev.spec.js"
+    ],
+    "tests/e2e/editor_detail_polish.spec.js": [
+      "tests/e2e/editor_detail_polish.spec.js"
+    ],
+    "tests/e2e/editor_refresh_motion.spec.js": [
+      "tests/e2e/editor_refresh_motion.spec.js"
+    ],
+    "tests/e2e/editor_task_context.spec.js": [
+      "tests/e2e/editor_task_context.spec.js"
     ],
     "tests/e2e/editor_workspace_renewal.spec.js": [
       "tests/e2e/editor_workspace_renewal.spec.js"
@@ -2938,6 +3039,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -3005,6 +3109,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -3072,6 +3179,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -3139,6 +3249,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -3217,6 +3330,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
@@ -3291,6 +3407,9 @@
       "tests/e2e/dev/tno_ready_state_contract.dev.spec.js",
       "tests/e2e/dev_workspace_i18n.spec.js",
       "tests/e2e/dev_workspace_render_boundary.spec.js",
+      "tests/e2e/editor_detail_polish.spec.js",
+      "tests/e2e/editor_refresh_motion.spec.js",
+      "tests/e2e/editor_task_context.spec.js",
       "tests/e2e/editor_workspace_renewal.spec.js",
       "tests/e2e/hoi4_1939_ui_smoke.spec.js",
       "tests/e2e/hoi4_rk_russia_regression.spec.js",
