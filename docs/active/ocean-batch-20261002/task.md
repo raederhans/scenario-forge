@@ -32,7 +32,9 @@ Node新进程各三轮，真实完整启动消息pack+structuredClone transfer+u
 
 交付PR为[#202](https://github.com/raederhans/scenario-forge/pull/202)，优化提交`f8334221`已推送。首轮CI中六场景strict、smoke、Pages产物验证通过，child-safe执行前因wave6/wave7 probe JSON未匹配验证路由而停止；已将两份真实fixture及marine runtime套件接入既有water geometry重检查路线，保持原执行所有权和资源锁。对整个PR文件清单重新选择后unmatched=0，两项路由行为检查通过；既有17项水域检查已证明该组合行为。最终合并和门禁状态以PR实时记录为准。
 
-本地执行同一PR的child-safe选择集，25个执行组中24通过，唯一失败为sync fixture已列入geo_stack但没有直接地理依赖导入。现给既有snapshot更新及新增海域测试补充Shapely零容差几何保留断言，保留独立面积常数断言；真实使用的依赖与分类一致，未改检查器或分组。分类检查90项通过，11项sync fixture测试通过；其他已通过执行组未受修改影响，不重复运行。
+本地执行同一PR的child-safe选择集，首次在第25个执行组失败后停止，之前24组通过，不能据此认定尚未执行的组已通过。首个失败为sync fixture已列入geo_stack但没有直接地理依赖导入；给既有snapshot更新及新增海域测试补充Shapely零容差几何保留断言，保留独立面积常数断言后，分类检查90项及11项sync fixture测试通过，未改检查器或分组。随后CI执行到验证框架自身测试，发现新增sync路由同时匹配整个TNO builder，改变了既有Stage C精确选择集；将新增路由限定在sync工具及其fixture，保留builder既有验证路线和精确断言。
+
+收窄路由后两个Stage C精确集合检查及700条schema检查通过，真实选择API确认sync工具/fixture分别仍选择同步测试、TNO builder单独变更不扩大该局部集合。重新绑定整个PR清单后unmatched=0，本地完整执行65个child-safe组全部通过（adaptive-v2.json/log）；62条main-thread命令按现有策略单列，不将defer计为通过，相关水域/场景/Pages/浏览器证明见前述实际运行结果。上一提交8f0b0302的远端性能门禁通过；最终提交仍须取得自己的全部必需门禁。
 
 ## 第七批：新增海域与可见对话协作（本地完成）
 

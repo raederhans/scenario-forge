@@ -495,7 +495,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ...editorCheckoutRecord,
     id: "local:python:sync-marine-refinement",
     commandRef: "python -m unittest tests.test_sync_marine_refinement -q",
-    sourceRefs: ["tools/sync_marine_refinement.py", "tools/patch_tno_1962_bundle.py", "tests/test_sync_marine_refinement.py"],
+    sourceRefs: ["tools/sync_marine_refinement.py", "tests/test_sync_marine_refinement.py"],
     ownerHints: ["geo-contract"], domains: ["geo-contract"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 14,
   };
