@@ -1,16 +1,34 @@
 # 批次状态
 
-## 体积、性能优化与主线整合（进行中）
+## 体积、性能优化与主线整合（提交前验收快照）
 
-用户已明确授权优化后合并推送。继续使用独立工作树，root 是唯一共享构建与 Git 整合负责人；三个只读子代理分别归因启动包、拓扑编码和运行时开销。保留七批累计119个新海域、292/285个水域及全部受保护几何，不通过精度降级或放宽预算换取结果。
+用户已明确授权优化后合并推送。继续使用独立工作树，root 是唯一共享构建与 Git 整合负责人；子代理分别研究编码方案、实现无损启动编码及验证真实Worker传输。保留七批累计119个新海域、292/285个水域及全部受保护几何，不通过精度降级或放宽预算换取结果。
 
 - [x] 核对优化前实物与现有加载合同：HOI4_1939 EN gzip 7,657,771 bytes，TNO EN gzip 7,404,790 bytes；TNO完整拓扑104,196,293 bytes。
 - [x] 核对远端与保护规则：origin/main已前进34提交至faabcf81，包含政治几何、河流和UI更新；主目录的其他WIP保持原样。
-- [ ] 保存七批成果的提交边界，按对象整合当前主线，重新生成交叠的派生元数据。
-- [ ] 实施有测量依据的体积和运行时优化，验证几何/行为保留与实际收益。
-- [ ] 完成相关数据、契约、启动和性能检查，经普通受保护PR合并推送并记录远端回执。
+- [x] 保存七批成果为fc878761，61ab07bc按对象整合faabcf81主线并重新生成交叠元数据；TNO非water对象与主线逐对象一致，water与七批检查点一致。
+- [x] 实施有测量依据的体积和运行时优化，验证几何/行为保留与实际收益。
+- [x] 完成相关数据、契约、启动和性能检查，准备经普通受保护PR交付。
 
 优化前记录和候选实验放在`.runtime/tmp/ocean-performance/`，最终验证输出放在`.runtime/reports/generated/ocean-performance/`。前面七批的验证只证明各批当时状态，不能替代整合提交的检查。
+
+启动包v6仅对base.topology_primary的整数二维弧采用跨弧首点差分、zigzag ULEB128及base64；Worker在任何TopoJSON消费者前还原标准Topology。保留弧顺序、拓扑引用、transform、全部坐标与metadata；不支持的输入维持标准表示，坏descriptor明确拒绝并进入既有恢复路径。另将三个startup READY消息整包接入可转移Float64几何buffer；旧chunk保持v1，startup使用v2，源对象不被detach。
+
+| 实际启动gzip，bytes | 优化前61ab07bc | 优化后 | 减少 |
+| --- | ---: | ---: | ---: |
+| HOI4 1936 EN / ZH | 7,659,733 / 7,659,734 | 6,394,906 / 6,394,908 | 16.513% |
+| HOI4 1939 EN / ZH | 7,657,773 / 7,657,773 | 6,393,344 / 6,393,344 | 16.512% |
+| TNO EN / ZH | 7,404,835 / 7,404,835 | 6,142,352 / 6,142,353 | 17.049% |
+
+六包还原后的全部base字段与scenario字段逐项等于61ab07bc；每包296,827弧、1,538,874点、292个基础water对象。JSON末尾换行按既有写入策略不进入gzip，其余字节一致。全量TNO拓扑仍104,193,959bytes（99.37MiB），无损排序/拓扑去重收益不足，未改其精度或引用。
+
+Node新进程各三轮，真实完整启动消息pack+structuredClone transfer+unpack中位数：HOI4 1939为1886.2→733.5ms（-61.1%），TNO为1788.5→579.1ms（-67.6%），12次均全响应deep equality通过。独立同进程三轮的最终生产磁盘decoder基准为313.326→210.726ms（含inflate+parse+恢复）；早期240ms原型不作为最终生产性能证据。这些是局部基准，不能代称浏览器整页启动提速比例。
+
+当前整合验证：17项water运行时通过；26项codec/cancellation/json/cache目标检查、8项真实Worker集成、5项JS磁盘codec、4项Python codec、3项恢复指标行为检查通过。启动/catalog两个完整模块共38项，36项通过，2项失败最终均为现有5,000,000byte预算（6,393,344/6,142,352bytes）。第一次完整检查发现的manifest v5/v6不一致已修复并通过相关fixture及实际清单复测。六场景strict全部OK；catalog677项、data health退出0，保留13条report-only大文件提示；依赖图、700条验证路由及架构边界通过。
+
+五个聚焦浏览器case最终通过：缺失runtime shell回退、owner healthgate失败后legacy重建、mask mismatch清理overlay、TNO默认可见图层、海域标签像素与重复计算。初跑两个失败保留在browser.log：marine测试需等待当前主线的国家标签异步准备，已采用正式导出就绪API；恢复已成功但metric只记rollback包装错误，现同时保留顶层与原healthgate cause，未改变恢复过程或放宽原断言。仅重跑受影响两例并通过。world/渤海各12次标签输出像素一致，geoContains重复调用为0。
+
+最终Pages产物位于`.runtime/pages-ocean-performance-final/dist`，855,286,735bytes（815.66MiB），低于现有1GiB硬上限；对应65项Pages测试全部通过，新增worker codec资源在可达图内。未改tracked dist；采用主线既有artifact构建发布路径。所有本地构建/测试/浏览器服务均已结束。本节为提交前冻结结果，远端提交、required checks与合并状态以本分支GitHub PR及`.runtime/reports/generated/ocean-performance/`中的交付回执为准；工作树及忽略的实验/验证输出保留供复核，主目录WIP未触碰。
 
 ## 第七批：新增海域与可见对话协作（本地完成）
 

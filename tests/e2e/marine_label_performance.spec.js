@@ -34,7 +34,8 @@ test("marine label redraw preserves pixels and records repeated geometry work", 
     }
     const result = await page.evaluate(async (view) => {
       const { state } = await import("/js/core/state.js");
-      const { renderExportPassesToCanvas } = await import("/js/core/map_renderer.js");
+      const { ensureCountryLabelsReadyForExport, renderExportPassesToCanvas } = await import("/js/core/map_renderer.js");
+      await ensureCountryLabelsReadyForExport(["labels"]);
       const originalContains = globalThis.d3.geoContains;
       let calls = 0;
       globalThis.d3.geoContains = (...args) => { calls += 1; return originalContains(...args); };

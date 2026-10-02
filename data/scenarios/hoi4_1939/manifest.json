@@ -90,7 +90,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "332563c8f0927a0227c5a9193fd57fc4257581182e584afdc9748f09a7313d5d",
+  "snapshot_fingerprint": "b9797bd2107a9644de13b78ee0cf1ea2def1e7e624651a0a8f5970888c332644",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "605fa74fbe2f1cc084e63666b6687ad7288140bd7c8e1aad144243d1a436ceff",
@@ -101,7 +101,7 @@
   "startup_bootstrap_strategy": "chunked-coarse-first",
   "startup_bundle_url_en": "data/scenarios/hoi4_1939/startup.bundle.en.json",
   "startup_bundle_url_zh": "data/scenarios/hoi4_1939/startup.bundle.zh.json",
-  "startup_bundle_version": 5,
+  "startup_bundle_version": 6,
   "startup_topology_url": "data/scenarios/hoi4_1939/runtime_topology.bootstrap.topo.json",
   "strategic_values_url": "data/scenarios/hoi4_1939/strategic_values.by_feature.json",
   "style_defaults": {

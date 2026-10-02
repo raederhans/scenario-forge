@@ -2,7 +2,7 @@
 
 ## 体积/性能与整合阶段
 
-工作树仍为独立ocean-batch-refinement；七批成果保存于fc878761。整合基线origin/main为faabcf81，远端严格required checks和admin保护生效。冲突元数据以当前main为起点，再执行水域专用sync；TNO通过transplant_water_features移入七批scenario_water，逐对象decoded_structure核对确认全部非水对象与当前main相等、全部水域与fc878761相等。紧凑序列化后整合TNO为104,193,959bytes，报告`.runtime/tmp/ocean-performance/merge-geometry.json`。两次直接写Git冲突文件遭Windows短暂文件占用，改用Git restore和项目已有atomic writer完成，无丢弃未归属内容。
+工作树仍为独立ocean-batch-refinement；七批成果保存于fc878761。整合基线origin/main为faabcf81，远端严格required checks和admin保护生效。冲突元数据以当前main为起点，再执行水域专用sync；TNO通过transplant_water_features移入七批scenario_water，逐对象decoded_structure核对确认全部非水对象与当前main相等、全部水域与fc878761相等。紧凑序列化后整合TNO为104,193,959bytes，报告`.runtime/tmp/ocean-performance/merge-geometry.json`。两次直接写Git冲突文件遇到Windows直接写入错误（具体占用原因未确认），改用Git restore和项目已有atomic writer完成，无丢弃未归属内容。
 
 共享进程owner=root。命令`python -B tools/sync_marine_refinement.py`，cwd为此工作树；独占六场景元数据、startup bundles和TNO water chunks，日志`.runtime/reports/generated/ocean-performance/integration-sync.log`。成功条件exit0且后续strict契约通过；失败先检查日志，不并发或盲目重试。子代理只读归因与独占runtime实验，不操作此builder。后续尺寸优化生成与最终验证仍由root串行管理，输出集中于同一reports目录。浏览器/CI性能结果需在数据冻结后获取。
 

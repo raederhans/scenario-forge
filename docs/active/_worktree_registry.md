@@ -2,7 +2,7 @@
 
 ## 2026-10-02 七批海域细化、体积与性能整合
 
-`C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域工作基于`f47b36f4`，正在整合当前远端主线。用户已授权完成体积、性能优化后合并推送；root唯一负责共享资产和Git整合。主目录及其他工作树的未归属改动保留，工作树与`.runtime`证据保留供复核。范围、验证和最终PR回执见[任务记录](ocean-batch-20261002/task.md)。
+`C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域检查点`fc878761`已通过`61ab07bc`整合`faabcf81`主线。119个新增海域保留，启动gzip减少16.5%–17.0%，启动几何传输局部基准减少61.1%–67.6%；六场景strict、五项浏览器case和65项Pages测试通过，保留两项既有5MB预算失败。用户已授权优化后合并推送，root唯一负责Git交付；最终required checks与合并以本分支GitHub PR回执为准。主目录及其他工作树未归属改动保留，本工作树及`.runtime`实验/验证证据为后续复核保留。范围和验收见[任务记录](ocean-batch-20261002/task.md)。
 
 ## 2026-10-02 沿河重叠地块与内部接缝修复
 
