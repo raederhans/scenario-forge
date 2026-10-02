@@ -32,6 +32,8 @@ Node新进程各三轮，真实完整启动消息pack+structuredClone transfer+u
 
 交付PR为[#202](https://github.com/raederhans/scenario-forge/pull/202)，优化提交`f8334221`已推送。首轮CI中六场景strict、smoke、Pages产物验证通过，child-safe执行前因wave6/wave7 probe JSON未匹配验证路由而停止；已将两份真实fixture及marine runtime套件接入既有water geometry重检查路线，保持原执行所有权和资源锁。对整个PR文件清单重新选择后unmatched=0，两项路由行为检查通过；既有17项水域检查已证明该组合行为。最终合并和门禁状态以PR实时记录为准。
 
+本地执行同一PR的child-safe选择集，25个执行组中24通过，唯一失败为sync fixture已列入geo_stack但没有直接地理依赖导入。现给既有snapshot更新及新增海域测试补充Shapely零容差几何保留断言，保留独立面积常数断言；真实使用的依赖与分类一致，未改检查器或分组。分类检查90项通过，11项sync fixture测试通过；其他已通过执行组未受修改影响，不重复运行。
+
 ## 第七批：新增海域与可见对话协作（本地完成）
 
 用户继续授权新增，并要求可分派对话共同推进。沿用独立工作树，基线base246/TNO239、supplement98/shared207，累计73新区域全部保留。

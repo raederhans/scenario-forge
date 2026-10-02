@@ -6,6 +6,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
+from shapely.geometry import shape
+
 from tools import sync_marine_refinement as sync
 from tools.patch_tno_1962_bundle import collect_marine_regions_source_record_ids
 
@@ -173,6 +175,8 @@ class SyncMarineRefinementTests(unittest.TestCase):
         snapshot = self.read("data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson")
         self.assertEqual(len(snapshot["features"]), 1)
         self.assertEqual(snapshot["features"][0]["properties"]["extension"], "retained")
+        self.assertTrue(shape(snapshot["features"][0]["geometry"]).equals_exact(
+            shape(self.feature["geometry"]), tolerance=0))
         for name in ("derived/water_regions.provenance.json", "water_regions.provenance.json"):
             provenance = sync.read(self.scenario / name)
             self.assertEqual(provenance["extension"], name)
@@ -208,6 +212,8 @@ class SyncMarineRefinementTests(unittest.TestCase):
         snapshot = self.read("data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson")
         self.assertEqual([f["properties"]["id"] for f in snapshot["features"]],
                          ["tno_fixture_sea", "tno_new_sea"])
+        self.assertTrue(shape(snapshot["features"][1]["geometry"]).equals_exact(
+            shape(addition["geometry"]), tolerance=0))
         provenance = sync.read(self.scenario / "water_regions.provenance.json")
         self.assertEqual(provenance["water_extracts"][0]["source_feature_count"], 1)
         self.assertEqual(provenance["water_extracts"][1]["source_feature_count"], 2)
