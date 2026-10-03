@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { applyBaseLocalizationSnapshot, setCurrentLanguage } from "../js/core/state/content_state.js";
 
 function makeNode(document, tagName = "div") {
   const classes = new Set();
@@ -383,13 +384,13 @@ test("long styled select searches groups and keeps native value and keyboard con
     const originalLanguage = state.currentLanguage;
     const originalLocales = state.locales;
     try {
-      state.currentLanguage = "zh";
-      state.locales = { ...originalLocales, ui: {
+      setCurrentLanguage(state, "zh");
+      applyBaseLocalizationSnapshot(state, { uiLocales: {
         ...originalLocales?.ui,
         "Actual field key": { en: "Field", zh: "字段" },
         "Search options": { en: "Search options", zh: "搜索选项" },
         "No matching options": { en: "No matching options", zh: "无匹配选项" },
-      } };
+      } });
       const buildsBeforeLanguage = list.writes.replaceChildren;
       syncStyledSelect(select);
       assert.equal(button.getAttribute("aria-label"), "字段");
@@ -417,8 +418,8 @@ test("long styled select searches groups and keeps native value and keyboard con
       assert.equal(dynamicSelect.dataset.appSelectEnhanced, "true", "new select containers are still enhanced after initialization");
       assert.equal(dynamicSelect.parentNode.children[1].getAttribute("aria-label"), "字段", "new selects read the current language even without a language change");
     } finally {
-      state.currentLanguage = originalLanguage;
-      state.locales = originalLocales;
+      setCurrentLanguage(state, originalLanguage);
+      applyBaseLocalizationSnapshot(state, { uiLocales: originalLocales.ui, geoLocales: originalLocales.geo });
     }
   } finally {
     globalThis.document = originalDocument;

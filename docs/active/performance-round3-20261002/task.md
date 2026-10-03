@@ -8,6 +8,8 @@
 
 隔离工作树继续保留原始 CPU、浏览器及构建证据；主目录和其他工作树 WIP 不变。
 
+CI Quick Fill 的状态写入检查发现 styled-select 和既有 UI i18n 测试直接修改应用单例。两者改用现有 `setCurrentLanguage` / `applyBaseLocalizationSnapshot` 初始化及恢复，保留行为断言；不修改写入白名单、policy 或扫描器。相关 6 项测试、状态写入检查与导入图已通过。
+
 整合后不再需要 classic/module 共用 topology codec，因此移除该新增全局包装，保留既有 ESM codec 的定长数组解包优化；避免留下无使用者的传输阈值和兼容分支。
 
 ## 原始实施阶段记录
