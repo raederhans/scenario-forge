@@ -1225,6 +1225,7 @@
     },
     "tests/e2e/release/pages_public_release_gate.spec.js": {
       "directDependencies": [
+        "js/core/interaction_funnel.js",
         "js/core/state.js",
         "tests/e2e/support/playwright-app.js",
         "tests/e2e/support/release-smoke.js"

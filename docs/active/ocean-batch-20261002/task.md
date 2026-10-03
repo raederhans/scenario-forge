@@ -1,5 +1,13 @@
 # 批次状态
 
+## 2026-10-03 Pages 在线示例启动后续修复（进行中）
+
+预算修复 PR #204 已按六项必需检查合并至 `3470fdfc`。部署 run37120067391 的源构建、产物检查和 Pages 发布成功，但最后线上 sample deeplink smoke 在 importing 状态超时，不能算整体部署验收通过。六个已发布启动 gzip 下载后与产物逐字节一致：HOI36 EN/ZH 4,962,999/4,963,000bytes，HOI39 4,961,158/4,961,158bytes，TNO 4,801,326/4,801,326bytes。Pages 重序列化使分发字节略大于源码 gzip；原5,000,000byte预算不变，线上最小余量37,000bytes。
+
+后续分支 `codex/pages-sample-startup-20261003` 基于该合并点，保留主目录WIP。调度状态没有证明死锁，本地限速可完成导入。实际CPU profile定位国家标签投影环分组的逐边嵌套检测热点；增加保守包围框剔除，保留原精确边界与奇偶判定。43项标签行为检查和12项release smoke helper检查通过。相同2倍CPU限速+网络配置单次前后采样：groupProjectedRings约2323→705ms，ringContains约2198→597ms；整页约61.9→63.2秒，网络/调度有波动，不宣称整页提速。补充线上失败日志的startupReadonly和project import phase，未改30秒断言、重试或allowlist。
+
+最终产物769.80MiB，localhost发布入口PASS（case39.5s），示例导入/Guide/导出/Project流程均成功；import graph生成并核对PASS，窄diff审查无material finding。所有本地server/profile已结束。工作树和runtime证据为复核保留；最终PR、必需检查、合并和线上smoke以GitHub回执为准。
+
 ## 2026-10-03 启动预算与部署失败修复（进行中）
 
 用户授权继续修复启动包预算和失败的部署，完成后合并推送。复用本工作树，新分支`codex/startup-budget-20261003`从已合并主线`14234669`开始；主工作区WIP保持原样。root唯一负责构建、测试、端口和Git交付。

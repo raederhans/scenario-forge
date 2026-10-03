@@ -86,6 +86,36 @@ test("projection streams split antimeridian exteriors and retain polygon holes",
   assert.equal(projected[0].length, 2);
 });
 
+test("ring grouping preserves nested islands, concave gaps and boundary containment", () => {
+  const rectangle = (x, y, size) => [[x, y], [x + size, y], [x + size, y + size], [x, y + size], [x, y]];
+  const exterior = rectangle(-20, -20, 20);
+  const hole = rectangle(-18, -18, 10);
+  const island = rectangle(-16, -16, 4);
+  const islandHole = rectangle(-15, -15, 1);
+  const concave = [[10, 0], [30, 0], [30, 4], [14, 4], [14, 20], [10, 20], [10, 0]];
+  const inConcaveGap = rectangle(20, 10, 2);
+  const onIncludedBoundary = rectangle(-20, -5, 1);
+  const onExcludedBoundary = rectangle(0, -5, 1);
+  const disjoint = Array.from({ length: 250 }, (_, index) => rectangle(100 + index * 3, -10, 1));
+  const input = [islandHole, inConcaveGap, ...disjoint, hole, onExcludedBoundary, concave, island, onIncludedBoundary, exterior];
+  const polygons = projectCountryLabelPolygons({}, { stream: (sink) => sink }, (_feature, sink) => {
+    // Model a projection emitting many rings within one clipped polygon.
+    sink.polygonStart();
+    for (const ring of input) {
+      sink.lineStart();
+      for (const [x, y] of ring) sink.point(x, y);
+      sink.lineEnd();
+    }
+    sink.polygonEnd();
+  });
+  assert.equal(polygons.length, disjoint.length + 5);
+  assert.deepEqual(polygons.find(([ring]) => ring[0][0] === -20), [exterior, hole, onIncludedBoundary]);
+  assert.deepEqual(polygons.find(([ring]) => ring[0][0] === -16), [island, islandHole]);
+  assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 10), [concave]);
+  assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 20), [inConcaveGap]);
+  assert.deepEqual(polygons.find(([ring]) => ring[0][0] === 0), [onExcludedBoundary]);
+});
+
 test("pan and zoom reuse map geometry and text fits while repainting transformed glyphs", () => {
   const { owner, state, context, setProjectionIdentity } = createHarness();
   const occupied = [];

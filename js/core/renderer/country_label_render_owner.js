@@ -8,11 +8,22 @@ const METRIC_FONT_SIZE = 100;
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const segmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null;
 
-function ringArea(ring) {
-  return Math.abs(ring.reduce((sum, point, index) => {
+function ringMetrics(ring) {
+  let sum = 0;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (let index = 0; index < ring.length; index += 1) {
+    const point = ring[index];
     const next = ring[(index + 1) % ring.length];
-    return sum + point[0] * next[1] - next[0] * point[1];
-  }, 0)) / 2;
+    sum += point[0] * next[1] - next[0] * point[1];
+    minX = Math.min(minX, point[0]);
+    minY = Math.min(minY, point[1]);
+    maxX = Math.max(maxX, point[0]);
+    maxY = Math.max(maxY, point[1]);
+  }
+  return { area: Math.abs(sum) / 2, minX, minY, maxX, maxY };
 }
 
 function ringContains(ring, [x, y]) {
@@ -28,13 +39,18 @@ function ringContains(ring, [x, y]) {
 function groupProjectedRings(rings) {
   // A clipped spherical polygon can emit several disjoint exterior rings in
   // one polygonStart/polygonEnd pair. Rebuild planar nesting before fitting.
-  const nodes = rings.map((ring) => ({ ring, area: ringArea(ring), parent: null, depth: 0 }))
+  const nodes = rings.map((ring) => ({ ring, ...ringMetrics(ring), parent: null, depth: 0 }))
     .filter((node) => node.area > 1e-8).sort((a, b) => b.area - a.area);
   for (let index = 0; index < nodes.length; index += 1) {
     const node = nodes[index];
+    const [x, y] = node.ring[0];
     for (let prior = index - 1; prior >= 0; prior -= 1) {
-      if (ringContains(nodes[prior].ring, node.ring[0])) {
-        node.parent = nodes[prior];
+      const candidate = nodes[prior];
+      // Most projected island rings are disjoint. Reject impossible containers
+      // before walking their edges; inclusive bounds retain exact boundary rules.
+      if (x < candidate.minX || x > candidate.maxX || y < candidate.minY || y > candidate.maxY) continue;
+      if (ringContains(candidate.ring, node.ring[0])) {
+        node.parent = candidate;
         node.depth = node.parent.depth + 1;
         break;
       }

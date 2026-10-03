@@ -48,11 +48,14 @@ async function readPublicReleaseGateState(page) {
   return page.evaluate(async () => {
     const stateModuleUrl = new URL("./js/core/state.js", globalThis.location.href).toString();
     const { state } = await import(stateModuleUrl);
+    const { getInteractionFunnelDebugState } = await import(new URL("./js/core/interaction_funnel.js", globalThis.location.href).toString());
     const scenarioSelect = document.querySelector("#scenarioSelect");
     return {
       activeScenarioId: String(state.activeScenarioId || ""),
       bootBlocking: state.bootBlocking === false ? false : !!state.bootBlocking,
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      startupReadonly: !!state.startupReadonly,
+      projectImport: getInteractionFunnelDebugState(),
       postReadyScheduler: state.renderPerfMetrics?.postReadySchedulerState || null,
       interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
       hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
