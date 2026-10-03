@@ -3546,7 +3546,10 @@ function getPoliticalBackgroundRenderOwner() {
     effects: {
       recordRenderPerfMetric,
       cancelDeferredWork,
-      scheduleDeferredWork,
+      scheduleDeferredWork: (callback, options) => scheduleDeferredWork(
+        (...args) => getRenderCacheOwner().withValidatedCache(() => callback(...args)),
+        options,
+      ),
       invalidateRenderPasses,
       recordProgressivePoliticalFullCacheReadyDiagnostics,
       requestRendererRender,
@@ -5538,7 +5541,7 @@ function drawScenarioReliefOverlaysPass(k) {
 }
 
 function getFeatureCountryCodeNormalized(feature) {
-  return canonicalCountryCode(getSharedFeatureCountryCode(feature));
+  return getSharedFeatureCountryCode(feature);
 }
 
 function getFeatureBorderMeshCountryCodeNormalized(feature) {
@@ -6459,7 +6462,7 @@ function evaluateSkipFeature(feature, canvasWidth, canvasHeight, { forceProd = f
       skip: false,
       reason: null,
       featureId,
-      countryCode: getFeatureCountryCodeNormalized(feature),
+      countryCode,
       bounds,
     };
   }

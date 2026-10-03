@@ -153,9 +153,10 @@ function buildGraph(args) {
       repoImpact: transitiveDependencies.filter((dependency) => !dependency.startsWith("tests/e2e/")),
     };
     for (const dependency of new Set([specPath, ...transitiveDependencies])) {
+      // Each spec visits a dependency once; order owners after all visits.
       const bucket = reverseIndex.get(dependency) || [];
       bucket.push(specPath);
-      reverseIndex.set(dependency, [...new Set(bucket)].sort());
+      reverseIndex.set(dependency, bucket);
     }
   }
 
@@ -163,6 +164,7 @@ function buildGraph(args) {
     [...reverseIndex.entries()]
       .filter(([dependency]) => dependency !== "")
       .sort(([left], [right]) => left.localeCompare(right))
+      .map(([dependency, owners]) => [dependency, owners.sort()])
   );
   const summary = {
     specCount: Object.keys(specs).length,

@@ -290,10 +290,11 @@ export function createPoliticalBackgroundRenderOwner({
 
   function getRetainedPoliticalBackgroundPathHandle(
     transform = state.zoomTransform || platform.d3?.zoomIdentity,
+    options,
   ) {
     return getRetainedPoliticalPathHandle(
       scenarioPoliticalBackgroundCache, getVisibleFrameIdentity(transform),
-      getPoliticalPathCacheSignature(transform),
+      getPoliticalPathCacheSignature(transform), options,
     );
   }
 
@@ -676,8 +677,14 @@ export function createPoliticalBackgroundRenderOwner({
     // A slice builds only the current stage; the owner publishes after all fences pass.
     const pathCacheHandle = deferredState.stage === "paths"
       ? getPoliticalPathCacheHandle(transform, { resetIfMismatch: true }) : null;
+    // A complete background already owns paths that may have left the bounded
+    // LRU. Chunk promotion changes membership/data generation, but paths with
+    // the same projection signature and geometry ref remain usable. Only this
+    // per-feature reuse crosses data generations; task/publication fences don't.
+    const retainedPathHandle = deferredState.stage === "paths"
+      ? getRetainedPoliticalBackgroundPathHandle(transform, { allowDataGenerationReuse: true }) : null;
     const result = advanceDeferredPoliticalBackgroundBuild(deferredState, {
-      transform, pathCacheHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
+      transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
       resolvePoliticalBackgroundEntryMeta, Path2D: platform.Path2D,
       withinBudget: (processedCount) => processedCount === 0 || (
@@ -689,12 +696,13 @@ export function createPoliticalBackgroundRenderOwner({
       cancelScenarioPoliticalBackgroundDeferredFullCache("geometry-changed");
       return false;
     }
-    const { processedCount, builtCount, reusedCount, pathlessCount } = result;
+    const { processedCount, builtCount, reusedCount, reusedPreviousCount, pathlessCount } = result;
 
     deferredState.sliceCount = Number(deferredState.sliceCount || 0) + 1;
     deferredState.processedCount = Number(deferredState.processedCount || 0) + processedCount;
     deferredState.builtPathCount = Number(deferredState.builtPathCount || 0) + builtCount;
     deferredState.reusedPathCount = Number(deferredState.reusedPathCount || 0) + reusedCount;
+    deferredState.reusedPreviousPathCount = Number(deferredState.reusedPreviousPathCount || 0) + reusedPreviousCount;
     deferredState.pathlessEntryCount = Number(deferredState.pathlessEntryCount || 0) + pathlessCount;
     recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheSlice", nowMs() - startedAt, {
       phase: "idle",
@@ -702,6 +710,7 @@ export function createPoliticalBackgroundRenderOwner({
       processedCount,
       builtPathCount: builtCount,
       reusedPathCount: reusedCount,
+      reusedPreviousPathCount: reusedPreviousCount,
       pathlessEntryCount: pathlessCount,
       remainingCount: deferredState.stage === "paths" ? Math.max(0, normalizedEntries.length - deferredState.index) : 0,
       stage: deferredState.stage,
@@ -757,6 +766,7 @@ export function createPoliticalBackgroundRenderOwner({
       groupCount: deferredState.groups.length,
       entryCount: normalizedEntries.length,
       reusedPathCount: deferredState.reusedPathCount,
+      reusedPreviousPathCount: deferredState.reusedPreviousPathCount,
       builtPathCount: deferredState.builtPathCount,
       pathlessEntryCount: deferredState.pathlessEntryCount,
       builtGroupMergeCount: deferredState.builtGroupMergeCount,
@@ -770,6 +780,7 @@ export function createPoliticalBackgroundRenderOwner({
       groupCount: finalized.groupCount,
       entryCount: finalized.entryCount,
       reusedPathCount: finalized.reusedPathCount,
+      reusedPreviousPathCount: finalized.reusedPreviousPathCount,
       builtPathCount: finalized.builtPathCount,
       pathlessEntryCount: finalized.pathlessEntryCount,
       builtGroupMergeCount: finalized.builtGroupMergeCount,
@@ -783,6 +794,7 @@ export function createPoliticalBackgroundRenderOwner({
       groupCount: Number(finalized?.groupCount || 0),
       builtPathCount: Number(deferredState.builtPathCount || 0),
       reusedPathCount: Number(deferredState.reusedPathCount || 0),
+      reusedPreviousPathCount: Number(deferredState.reusedPreviousPathCount || 0),
       pathlessEntryCount: Number(deferredState.pathlessEntryCount || 0),
       sliceCount: Number(deferredState.sliceCount || 0),
       activeScenarioId: String(getRuntimeState().activeScenarioId || ""),
@@ -1063,6 +1075,7 @@ export function createPoliticalBackgroundRenderOwner({
             groupCount,
             entryCount: Number(cachedFullPass.entryCount || 0),
             reusedPathCount: Number(cachedFullPass.reusedPathCount || 0),
+            reusedPreviousPathCount: Number(cachedFullPass.reusedPreviousPathCount || 0),
             builtPathCount: Number(cachedFullPass.builtPathCount || 0),
             pathlessEntryCount: Number(cachedFullPass.pathlessEntryCount || 0),
             reusedGroupMergeCount: Number(cachedFullPass.reusedGroupMergeCount || 0),

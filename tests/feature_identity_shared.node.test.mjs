@@ -2,10 +2,24 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
 import { runInNewContext } from "node:vm";
+import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
 
 const featureIdentity = await import("../js/core/feature_identity.js");
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const sharedSource = await readFile(new URL("../js/core/feature_identity_shared.js", import.meta.url), "utf8");
+
+test("country aliases preserve canonical, Unicode, and coercion behavior", () => {
+  for (const [input, expected] of [
+    ["UK", "GB"], ["EL", "GR"], ["GB", "GB"], ["2RA", "2RA"],
+    ["", ""], ["ZZ", "ZZ"], ["XX", "XX"], [" u-k\t", "GB"],
+    ["éL", "L"], ["ß", "SS"], ["ıe", "IE"], ["ｕｋ", ""],
+    ["中UK文", "GB"], [null, ""], [undefined, ""], [false, ""],
+    [0, ""], [42, "42"], [true, "TRUE"], [NaN, ""],
+    [{ toString: () => " el " }, "GR"], [["u", "k"], "GB"],
+  ]) {
+    assert.equal(normalizeCountryCodeAlias(input), expected);
+  }
+});
 
 test("shared script initializes its own identity API instead of reusing a stale global", () => {
   const sandbox = {

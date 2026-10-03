@@ -77,7 +77,7 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
     getPoliticalPathCacheHandle: (transform, { resetIfMismatch }) => {
       calls.push("path:prepare");
       assert.equal(resetIfMismatch, true);
-      const identity = `${state.activeScenarioId}:${state.sceneGeneration}:${state.scenarioDataGeneration}:${state.projectionRevision || 0}`;
+      const identity = `${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}`;
       if (preparedPathIdentity !== null && preparedPathIdentity !== identity) {
         pathCache.clear();
         calls.push("path:reset");
@@ -98,7 +98,8 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
     },
     isPoliticalFeaturePathEntryCurrent,
     getTransformSignature: (transform) => `transform:${transform.k}:${transform.x}:${transform.y}`,
-    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.scenarioDataGeneration}:${state.projectionRevision || 0}`,
+    // Production path identity tracks projection/topology roots, not chunk membership.
+    getPoliticalPathCacheSignature: () => `path:${state.activeScenarioId}:${state.sceneGeneration}:${state.projectionRevision || 0}`,
     getVisibleFrameIdentity: () => ({
       scenarioId: state.activeScenarioId,
       sceneGeneration: state.sceneGeneration,
@@ -192,6 +193,102 @@ function completeDeferred(fixture, { deadline = null } = {}) {
     fixture.pending.shift().callback(deadline);
   }
   assert.equal(fixture.pending.length, 0, "deferred work completes within bounded callbacks");
+}
+
+function drawDeferredFeatures(fixture) {
+  const visibleItems = fixture.state.landData.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  return fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+}
+
+test("deferred rebuild reuses retained geometry across chunk generations, camera and color changes without refilling LRU", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  const first = feature("duplicate", "AA");
+  const second = feature("duplicate", "BB");
+  const removed = feature("removed");
+  fixture.state.landData = { features: [first, second, removed] };
+  drawDeferredFeatures(fixture);
+  completeDeferred(fixture);
+  const previous = fixture.owner.getRetainedPoliticalBackgroundPathHandle();
+  const firstPath = previous.getPath(first, "duplicate");
+  const secondPath = previous.getPath(second, "duplicate");
+  assert.notEqual(firstPath, secondPath);
+  fixture.pathCache.clear();
+  fixture.calls.length = 0;
+  fixture.state.zoomTransform = { k: 2, x: 40, y: -20 };
+  fixture.state.dpr = 2;
+  fixture.state.landData = { features: [second, { ...first }, feature("new")] };
+  fixture.state.scenarioDataGeneration += 1;
+  assert.equal(fixture.owner.getRetainedPoliticalBackgroundPathHandle(), null,
+    "ordinary consumers retain the strict frame data-generation fence");
+  assert.equal(drawDeferredFeatures(fixture).deferredFullCacheScheduled, true);
+  fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  fixture.state.colors.duplicate = "#ff0000";
+  fixture.state.colorRevision += 1;
+  completeDeferred(fixture);
+  assert.deepEqual(fixture.calls.filter(call => call.startsWith("build:")), ["build:new"]);
+  assert.deepEqual([...fixture.pathCache.keys()], ["new"]);
+  const current = fixture.owner.getRetainedPoliticalBackgroundPathHandle();
+  assert.equal(current.getPath(first, "duplicate"), firstPath);
+  assert.equal(current.getPath(second, "duplicate"), secondPath);
+  assert.equal(current.getPath(removed, "removed"), null);
+  const completion = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete");
+  assert.equal(completion.reusedPreviousPathCount, 2);
+  assert.equal(completion.builtPathCount, 1);
+  const replay = drawDeferredFeatures(fixture);
+  assert.equal(replay.cacheHit, true);
+  assert.equal(replay.reusedPreviousPathCount, 2);
+  assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
+});
+
+for (const [label, change, expectedBuilds] of [
+  ["scenario", fixture => { fixture.state.activeScenarioId = "scenario-b"; }, 2],
+  ["scene", fixture => { fixture.state.sceneGeneration += 1; }, 2],
+  ["projection", fixture => { fixture.state.projectionRevision = 1; }, 2],
+  ["same-ID geometry in a new data generation", fixture => {
+    fixture.state.landData.features[0].geometry = { type: "Polygon" };
+    fixture.state.scenarioDataGeneration += 1;
+  }, 1],
+]) {
+  test(`deferred rebuild rejects retained paths after ${label} changes`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: [feature("a"), feature("b")] };
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    fixture.pathCache.clear();
+    fixture.calls.length = 0;
+    change(fixture);
+    fixture.state.zoomTransform = { k: 2, x: 0, y: 0 };
+    fixture.state.landData = { features: [...fixture.state.landData.features, feature("new")] };
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    assert.equal(fixture.calls.filter(call => call.startsWith("build:")).length, expectedBuilds + 1);
+    const completion = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete");
+    assert.equal(completion.reusedPreviousPathCount, 2 - expectedBuilds);
+  });
+}
+
+for (const interruption of ["geometry", "data generation"]) {
+  test(`retained paths with changed ${interruption} between deferred slices cannot publish`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: [feature("a"), feature("b")] };
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture);
+    fixture.pathCache.clear();
+    fixture.calls.length = 0;
+    fixture.state.zoomTransform = { k: 2, x: 0, y: 0 };
+    fixture.state.landData = { features: [...fixture.state.landData.features, feature("new")] };
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback({ timeRemaining: () => 0 });
+    assert.equal(fixture.pathCache.size, 0);
+    if (interruption === "geometry") fixture.state.landData.features[0].geometry = { type: "Polygon" };
+    else fixture.state.scenarioDataGeneration += 1;
+    completeDeferred(fixture);
+    assert.equal(fixture.calls.includes("repaint"), false);
+    assert.ok(fixture.metrics.some(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheCancel"
+      && metric.reason === (interruption === "geometry" ? "geometry-changed" : "scene-snapshot-mismatch")));
+  });
 }
 
 test("background pass fills sphere once before ocean style and delegated depth state", () => {
@@ -357,7 +454,8 @@ test("changed geometry generation still prepares and rebuilds stale paths", () =
     assert.equal(summary.cacheHit, false);
     assert.equal(summary.reusedPathCount, 0);
     assert.equal(summary.builtPathCount, 1);
-    assert.equal(fixture.calls.filter((call) => call === "path:reset").length, 1);
+    assert.equal(fixture.calls.filter((call) => call === "path:reset").length, 0,
+      "unchanged projection roots preserve the LRU while per-feature geometry validation rebuilds the replacement");
     assert.notEqual(fixture.pathCache.get("a").path, oldPath);
   }
 });

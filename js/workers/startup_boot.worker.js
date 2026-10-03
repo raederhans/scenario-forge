@@ -4,6 +4,7 @@ importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
+  new URL("../core/topology_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
 
@@ -367,22 +368,48 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
 }
 
 function postWorkerMessage(type, payload) {
-  if (type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
-    const field = payload.chunkPayload ? "chunkPayload" : "decodedCollections";
+  let message = { type, ...payload };
+  const transferables = [];
+  const field = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    ? "decodedCollections"
+    : type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+      ? "baseDecodedCollections"
+      : type === MESSAGE_TYPES.RUNTIME_CHUNK_READY
+        ? (payload.chunkPayload ? "chunkPayload" : "decodedCollections")
+        : null;
+  if (field && payload[field]) {
     const startedAt = nowMs();
     const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(payload[field]);
     if (transport.transferables.length) {
-      self.postMessage({ type, ...payload, [field]: null,
+      message = { ...message, [field]: null,
         geometryTransport: { field, payload: transport.payload },
-        metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
-      }, transport.transferables);
-      return;
+        metrics: { ...message.metrics, geometryPackingMs: nowMs() - startedAt },
+      };
+      transferables.push(...transport.transferables);
     }
   }
-  self.postMessage({
-    type,
-    ...payload,
-  });
+  const topology = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    ? payload.topologyPrimary
+    : type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+      ? payload.payload?.base?.topology_primary
+      : null;
+  if (topology?.arcs?.length) {
+    const startedAt = nowMs();
+    const packed = globalThis.__scenarioForgeTopologyTransferCodecShared.packTopologyForTransfer(topology, {
+      minCoordinateCount: 16_384,
+    });
+    if (packed) {
+      if (type === MESSAGE_TYPES.BASE_STARTUP_READY) {
+        message.topologyPrimary = packed.topology;
+      } else {
+        message.payload = { ...payload.payload, base: { ...payload.payload.base, topology_primary: packed.topology } };
+      }
+      message.topologyTransport = { encoding: "topology-f64-v1", arcs: packed.topologyArcs };
+      message.metrics = { ...message.metrics, topologyPackingMs: nowMs() - startedAt };
+      transferables.push(...packed.transfer);
+    }
+  }
+  self.postMessage(message, transferables);
 }
 
 function countObjectKeys(value) {

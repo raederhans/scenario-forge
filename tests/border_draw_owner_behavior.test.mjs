@@ -3,6 +3,49 @@ import test from "node:test";
 
 import { createBorderDrawOwner } from "../js/core/renderer/border_draw_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
+import { sanitizePolyline } from "../js/core/renderer/polyline_simplification_helpers.js";
+
+test("boundary filtering projects each sanitized point once and preserves threshold decisions", () => {
+  let projections = 0;
+  const projection = ([x, y]) => { projections += 1; return [x * x, y * 2]; };
+  const owner = createBorderDrawOwner({
+    state: {}, getters: { getProjection: () => projection },
+    helpers: { sanitizePolyline, isUsableMesh: value => !!value?.coordinates?.length },
+  });
+  const line = [[0, 0], [0, 0], null, [NaN, 1], [1, 0], [2, 3]];
+  const source = { type: "MultiLineString", coordinates: [line] };
+  // Projected line is (0,0), (1,0), (4,6): span 6, area 24, length 1 + sqrt(45).
+  const options = { simplifyDistancePx: 0.1, minSpanPx: 6, minAreaPx: 24, minLengthPx: 1 + Math.sqrt(45) };
+  assert.deepEqual(owner.buildRenderableBoundaryMesh(source, options)?.coordinates, [[[0, 0], [1, 0], [2, 3]]]);
+  assert.equal(projections, 3);
+  for (const key of ["minSpanPx", "minAreaPx", "minLengthPx"]) {
+    assert.equal(owner.buildRenderableBoundaryMesh(source, { ...options, [key]: options[key] + 0.000001 }), null);
+  }
+  const longLine = Array.from({ length: 1000 }, (_, index) => [index, index % 2]);
+  projections = 0;
+  assert.equal(owner.buildRenderableBoundaryMesh({ type: "MultiLineString", coordinates: [longLine] },
+    { simplifyDistancePx: 0.01 }).coordinates[0].length, 1000);
+  assert.equal(projections, 1000);
+});
+
+test("boundary projection reuse preserves missing projections, degenerate lines, and simplified endpoints", () => {
+  const createGeometryOwner = projection => createBorderDrawOwner({
+    state: {}, getters: { getProjection: () => projection },
+    helpers: { sanitizePolyline, isUsableMesh: value => !!value?.coordinates?.length },
+  });
+  const source = { type: "MultiLineString", coordinates: [[[0, 0], [1, 0], [2, 0], [3, 4]]] };
+  const partial = createGeometryOwner(([x, y]) => x === 1 ? null : x === 2 ? [Infinity, y] : [x, y]);
+  assert.deepEqual(partial.buildRenderableBoundaryMesh(source, { simplifyDistancePx: 2, minLengthPx: 5 }), source);
+  assert.equal(partial.buildRenderableBoundaryMesh(source, { simplifyDistancePx: 2, minLengthPx: 5.001 }), null);
+  const missing = createGeometryOwner(null);
+  assert.deepEqual(missing.buildRenderableBoundaryMesh(source, { simplifyDistancePx: 2 }), source);
+  assert.equal(missing.buildRenderableBoundaryMesh(source, { minLengthPx: 1 }), null);
+  const identity = createGeometryOwner(point => point);
+  const straight = { type: "MultiLineString", coordinates: [[[0, 0], [1, 0], [2, 0], [10, 0]]] };
+  assert.deepEqual(identity.buildRenderableBoundaryMesh(straight, { simplifyDistancePx: 3, angleThresholdDeg: 181 })?.coordinates,
+    [[[0, 0], [10, 0]]]);
+  assert.equal(identity.buildRenderableBoundaryMesh({ type: "MultiLineString", coordinates: [[[1, 1], [1, 1]]] }), null);
+});
 
 test("boundary and coastline geometry reuse follows projection and simplification, not paint or camera", () => {
   let projections = 0;
