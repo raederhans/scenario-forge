@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-03 启动包预算与 Pages 交付修复
+
+复用 `C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator`，当前分支 `codex/startup-budget-20261003`。修复提交 `e8609467` 将六个启动 gzip 无损压到原有 5,000,000byte 预算以内，同时修复旧性能基线对新版 wire 的读取和 Pages 陈旧断言；整合主线 `068f0b33` 的渲染性能更新，无产品代码冲突。55个 child-safe 检查组及本次相关数据、Pages、浏览器检查通过。主目录WIP保持原样，本工作树及 `.runtime/reports/generated/startup-budget/` 保留供复核。用户已授权合并推送，root为唯一Git交付负责人；最终必需检查、合并和部署结果以PR/run回执为准，详见[任务记录](ocean-batch-20261002/task.md)。
+
 ## 2026-10-02 七批海域细化、体积与性能整合
 
 `C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator` 使用分支 `codex/ocean-batch-refinement-20261002`，七批海域检查点`fc878761`已通过`61ab07bc`整合`faabcf81`主线。119个新增海域保留，启动gzip减少16.5%–17.0%，启动几何传输局部基准减少61.1%–67.6%；六场景strict、五项浏览器case和65项Pages测试通过，保留两项既有5MB预算失败。用户已授权优化后合并推送，root唯一负责Git交付；优化提交`f8334221`已推送，最终required checks与合并以[PR #202](https://github.com/raederhans/scenario-forge/pull/202)回执为准。主目录及其他工作树未归属改动保留，本工作树及`.runtime`实验/验证证据为后续复核保留。范围和验收见[任务记录](ocean-batch-20261002/task.md)。

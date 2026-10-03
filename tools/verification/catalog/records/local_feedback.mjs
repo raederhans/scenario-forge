@@ -214,7 +214,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],
     ["geometry-transfer-codec", "renderer-runtime", "js/core/geometry_transfer_codec_shared.js", "tests/geometry_transfer_codec_behavior.test.mjs", ["js/core/startup_worker_client.js", "js/workers/startup_boot.worker.js", "js/core/geometry_raster_worker_client.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["startup-worker-transfer", "startup", "js/core/startup_worker_client.js", "tests/startup_worker_transfer_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "js/core/geometry_transfer_codec_shared.js"]],
-    ["startup-topology-codec", "startup", "js/core/startup_topology_codec_shared.js", "tests/startup_topology_codec_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "tools/startup_topology_codec.py", "tools/build_startup_bundle.py"]],
+    ["startup-topology-codec", "startup", "js/core/startup_topology_codec_shared.js", "tests/startup_topology_codec_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/fixtures/startup_topology_v7.json"]],
     ["startup-scenario-boot-recovery", "startup", "js/bootstrap/startup_scenario_boot.js", "tests/startup_scenario_boot_recovery_behavior.test.mjs"],
     ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
     ["geometry-cache-budget", "renderer-runtime", "js/core/renderer/geometry_cache_budget.js", "tests/geometry_cache_budget_behavior.test.mjs", ["js/core/renderer/political_path_cache_owner.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
@@ -487,7 +487,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ...editorCheckoutRecord,
     id: "local:python:startup-topology-codec",
     commandRef: "python -m unittest tests.test_startup_topology_codec -q",
-    sourceRefs: ["tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/test_startup_topology_codec.py"],
+    sourceRefs: ["tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/test_startup_topology_codec.py", "tests/fixtures/startup_topology_v7.json"],
     ownerHints: ["startup"], domains: ["startup"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 13,
   };
@@ -499,8 +499,16 @@ export function createLocalFeedbackRecords(baseRecords) {
     ownerHints: ["geo-contract"], domains: ["geo-contract"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 14,
   };
+  const baselineStartupProjectionRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:perf-baseline-startup-projection",
+    commandRef: "python -m unittest tests.test_perf_baseline_startup_projection -q",
+    sourceRefs: ["tools/perf/project_baseline_startup.py", "tests/test_perf_baseline_startup_projection.py"],
+    ownerHints: ["perf"], domains: ["perf"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 15,
+  };
 
-  return [marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
+  return [baselineStartupProjectionRecord, marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,

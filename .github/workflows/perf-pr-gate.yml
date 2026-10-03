@@ -289,6 +289,8 @@ jobs:
           $baseEvidenceDir = Join-Path $env:GITHUB_WORKSPACE '.runtime/output/perf/perf-pr-gate-base-evidence'
           $projectionReceipt = Join-Path $env:GITHUB_WORKSPACE '.runtime/output/perf/perf-pr-gate-base-projection.json'
           $candidateHarness = Join-Path $env:GITHUB_WORKSPACE 'tools/perf/run_baseline.mjs'
+          $startupProjector = Join-Path $env:GITHUB_WORKSPACE 'tools/perf/project_baseline_startup.py'
+          $startupReceipt = Join-Path $env:GITHUB_WORKSPACE '.runtime/output/perf/perf-pr-gate-base-startup-projection.json'
           New-Item -ItemType Directory -Force -Path (Split-Path $baselineJson), $baselineRawDir, $baseEvidenceDir | Out-Null
 
           git cat-file -e "$baseSha^{commit}" 2>$null
@@ -315,6 +317,19 @@ jobs:
             git -C $baseWorktree restore --source=$candidateSha --staged --worktree -- $governedHeadInputs
             if ($LASTEXITCODE -ne 0) {
               throw 'Failed to project governed head inputs into the base worktree'
+            }
+
+            git -C $baseWorktree diff --quiet $candidateSha -- $governedHeadInputs
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Projected base inputs do not exactly match the candidate tree'
+            }
+            # 只为不能读取新 startup wire 的旧代码还原标准 TopoJSON；几何和 runtime 仍分别来自 candidate/base。
+            python $startupProjector --candidate-root $env:GITHUB_WORKSPACE --baseline-root $baseWorktree --scenarios tno_1962,hoi4_1939 --receipt $startupReceipt
+            if ($LASTEXITCODE -ne 0) { throw 'Failed to project compatible baseline startup inputs' }
+            $startupProjection = Get-Content -Raw $startupReceipt | ConvertFrom-Json
+            if ($startupProjection.changed_files.Count -gt 0) {
+              git -C $baseWorktree add -- $startupProjection.changed_files
+              if ($LASTEXITCODE -ne 0) { throw 'Failed to stage compatible baseline startup inputs' }
             }
 
             $projectedChangedFiles = @(
@@ -349,10 +364,14 @@ jobs:
               $projectedBaseSha = (git -C $baseWorktree rev-parse HEAD).Trim()
             }
 
-            git -C $baseWorktree diff --quiet $candidateSha -- $governedHeadInputs
+            $candidateInputDifferences = @(git -C $baseWorktree diff --name-only $candidateSha -- $governedHeadInputs)
             if ($LASTEXITCODE -ne 0) {
-              throw 'Projected base inputs do not exactly match the candidate tree'
+              throw 'Failed to enumerate candidate input differences'
             }
+            $unexpectedInputDifferences = @($candidateInputDifferences | Where-Object { $_ -notin $startupProjection.changed_files })
+            if ($unexpectedInputDifferences.Count -gt 0) { throw 'Projected base contains unexpected candidate input differences' }
+            python $startupProjector --candidate-root $env:GITHUB_WORKSPACE --baseline-root $baseWorktree --scenarios tno_1962,hoi4_1939 --receipt $startupReceipt --verify
+            if ($LASTEXITCODE -ne 0) { throw 'Baseline startup projection changed the candidate workload' }
             $projectedStatus = @(git -C $baseWorktree status --porcelain)
             if ($LASTEXITCODE -ne 0 -or $projectedStatus.Count -gt 0) {
               throw 'Projected base measurement tree is not clean'
@@ -363,6 +382,7 @@ jobs:
               projected_base_sha = $projectedBaseSha
               governed_head_inputs = $governedHeadInputs
               projected_changed_files = $projectedChangedFiles
+              startup_projection = $startupProjection
             } | ConvertTo-Json -Depth 5 | Set-Content -Path $projectionReceipt
 
             Push-Location $baseWorktree

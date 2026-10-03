@@ -53,6 +53,10 @@ async function readPublicReleaseGateState(page) {
       activeScenarioId: String(state.activeScenarioId || ""),
       bootBlocking: state.bootBlocking === false ? false : !!state.bootBlocking,
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      postReadyScheduler: state.renderPerfMetrics?.postReadySchedulerState || null,
+      interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
+      hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
+      renderPhase: String(state.renderPhase || ""),
       optionValues: Array.from(scenarioSelect?.options || []).map((option) => option.value),
       hgoPreviewEnabled: !!state.hgoRuntimePreview?.enabled,
       hasHgoRuntimeAssets: !!state.dataManifest?.assets?.hgo_runtime_manifest,
@@ -326,15 +330,26 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
     await waitForScenarioApplyIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
   });
   await expect(page.locator("#scenarioStatus")).toContainText("TNO 1962", { timeout: 30000 });
-  await expect.poll(() => readPublicReleaseGateState(page), { timeout: 30000 }).toMatchObject({
-    activeScenarioId: "tno_1962",
-    scenarioApplyInFlight: false,
-    sampleProjectDeeplink: {
-      status: "success",
-      sampleId: "tno-1962-atlantropa-briefing",
-      scenarioId: "tno_1962",
-    },
-  });
+  let lastReleaseGateState = null;
+  try {
+    await expect.poll(async () => {
+      lastReleaseGateState = await readPublicReleaseGateState(page);
+      return lastReleaseGateState;
+    }, { timeout: 30000 }).toMatchObject({
+      activeScenarioId: "tno_1962",
+      scenarioApplyInFlight: false,
+      sampleProjectDeeplink: {
+        status: "success",
+        sampleId: "tno-1962-atlantropa-briefing",
+        scenarioId: "tno_1962",
+      },
+    });
+  } catch (error) {
+    // Matching only the expected subset hides scheduler fields in Playwright's diff.
+    // Keep the last completed observation visible even if artifact upload is skipped.
+    console.log(JSON.stringify({ releaseGateState: lastReleaseGateState }, null, 2));
+    throw error;
+  }
 
   const releaseState = await readPublicReleaseGateState(page);
   expect(releaseState.optionValues).toContain("tno_1962");
@@ -375,7 +390,7 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
   const projectTab = page.locator("#inspectorSidebarTabProject");
   await expect(projectTab).toBeVisible({ timeout: 30000 });
   await projectTab.click();
-  await expect(projectTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 });
+  await expect(projectTab).toHaveAttribute("aria-pressed", "true", { timeout: 30000 });
   const sampleProjectBanner = page.locator("#sampleProjectBanner");
   await expect(sampleProjectBanner).toBeVisible({ timeout: 30000 });
   await expect(sampleProjectBanner).toContainText(/Sample loaded: TNO 1962 Atlantropa briefing/i);
