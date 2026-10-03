@@ -1,6 +1,9 @@
 # Task
 
-## Current status
+## 2026-10-03 Delivery
+三轮改动已提交并推送至 [PR #203](https://github.com/raederhans/scenario-forge/pull/203)。整合主线时启动传输采用 PR #202 的整消息格式，移除已无必要的 classic topology codec 包装。当前验收、保留工作树及风险见 [第三轮交付记录](../performance-round3-20261002/task.md)；远端检查和合并以 PR 回执为准。
+
+## Implementation-stage status
 第二轮本地实现与验证完成。复用隔离分支 codex/performance-round-20261002，保留上一轮7文件实现；所有改动尚未提交或发布。
 
 ## Checklist

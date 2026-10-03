@@ -661,4 +661,4 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 
 ## 2026-10-03 三轮性能优化交付
 
-`C:/Users/raede/.codex/worktrees/performance-round-20261002/mapcreator` 使用 `codex/performance-round-20261002`，整合主线 `14234669` 的整消息启动传输后交付三轮性能优化。用户已授权审核、合并、推送。主工作区及其他工作树 WIP 保留；本树保存 `.runtime/browser/`、CPU profiles 和对照报告，合并后继续保留供复核。实现与验证见 [任务记录](performance-round3-20261002/task.md)，最终提交和合并以该分支 PR 回执为准。
+`C:/Users/raede/.codex/worktrees/performance-round-20261002/mapcreator` 使用 `codex/performance-round-20261002`，整合主线 `14234669` 的整消息启动传输后交付三轮性能优化。用户已授权审核、合并、推送。主工作区及其他工作树 WIP 保留；本树保存 `.runtime/browser/`、CPU profiles 和对照报告，合并后继续保留供复核。实现与验证见 [任务记录](performance-round3-20261002/task.md)，最终提交和合并以 [PR #203](https://github.com/raederhans/scenario-forge/pull/203) 回执为准。
