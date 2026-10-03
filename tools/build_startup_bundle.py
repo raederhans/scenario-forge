@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
 
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
-from tools.startup_topology_codec import encode_topology
+from tools.startup_topology_codec import encode_startup_topology
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
     SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
@@ -23,7 +23,7 @@ from map_builder.contracts import (
 )
 
 SUPPORTED_LANGUAGES = SCENARIO_LOCALE_LANGUAGES
-STARTUP_BUNDLE_VERSION = 6
+STARTUP_BUNDLE_VERSION = 7
 STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
 STARTUP_RUNTIME_POLITICAL_META_ENCODING = "feature-index-v1"
@@ -696,12 +696,12 @@ def build_startup_bundle_payload(
         raise ValueError("Scenario manifest is missing scenario_id.")
 
     topology_primary = _read_json(topology_primary_path)
-    slim_topology_primary = encode_topology(build_slim_startup_primary_topology(topology_primary))
+    slim_topology_primary = encode_startup_topology(build_slim_startup_primary_topology(topology_primary))
     full_runtime_topology = _read_json(full_runtime_topology_path)
     runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
     runtime_political_meta = build_runtime_political_meta(full_runtime_topology)
     runtime_feature_ids = list(runtime_political_meta.get("featureIds", []))
-    runtime_shell_topology = build_startup_runtime_shell(runtime_bootstrap_topology)
+    runtime_shell_topology = encode_startup_topology(build_startup_runtime_shell(runtime_bootstrap_topology))
     countries_payload = _read_json(countries_path)
     owners_payload = _read_json(owners_path)
     # controllers.by_feature.json is retired from the formal scenario contract.

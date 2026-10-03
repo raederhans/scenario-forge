@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import base64
 import copy
+import gzip
+import json
 import struct
 import sys
 import unittest
@@ -13,9 +15,12 @@ if str(ROOT) not in sys.path:
 
 from tools.startup_topology_codec import (
     ENCODING,
+    COMPACT_ENCODING,
+    REFERENCE_ENCODING,
     _append_varint,
     decode_topology,
     encode_topology,
+    encode_startup_topology,
 )
 
 
@@ -68,6 +73,68 @@ def _encoded_from_delta_arcs(arcs: list[list[list[int]]]) -> dict:
 
 
 class StartupTopologyCodecTest(unittest.TestCase):
+    def test_v7_fixed_wire_is_lossless_for_closed_arcs_and_nested_signed_references(self) -> None:
+        fixture = json.loads((ROOT / "tests/fixtures/startup_topology_v7.json").read_text(encoding="utf-8"))
+        source = fixture["source"]
+        before = copy.deepcopy(source)
+        encoded = encode_startup_topology(source)
+        wire_before = copy.deepcopy(encoded)
+        self.assertEqual(encoded["arcs_encoding"]["encoding"], COMPACT_ENCODING)
+        self.assertEqual(encoded["arc_references_encoding"]["encoding"], REFERENCE_ENCODING)
+        self.assertEqual(decode_topology(encoded), source)
+        self.assertEqual(decode_topology(fixture["encoded"]), source)
+        self.assertEqual(source, before)
+        self.assertEqual(encoded, wire_before, "decoding must not mutate the wire input")
+
+    def test_v7_unsupported_coordinate_encoding_preserves_standard_arcs_and_signed_references(self) -> None:
+        source = _source_topology()
+        source.pop("transform")
+        encoded = encode_startup_topology(source)
+        self.assertNotIn("arcs_encoding", encoded)
+        self.assertIn("arc_references_encoding", encoded)
+        self.assertEqual(decode_topology(encoded), source)
+        for value in (None, [], {"type": "FeatureCollection"}):
+            self.assertIs(encode_startup_topology(value), value)
+
+    def test_v7_rejects_malformed_closed_flags_gzip_and_delta_lengths(self) -> None:
+        encoded = encode_startup_topology(_source_topology())
+        mutations = (
+            ("closed_gzip_base64", gzip.compress(b"\x80", mtime=0), "unused closed flags"),
+            ("closed_gzip_base64", gzip.compress(b"\x04", mtime=0), "invalid closed arc"),
+            ("closed_gzip_base64", gzip.compress(b"\x00\x00", mtime=0), "decoded length"),
+            ("lengths_gzip_base64", b"not gzip", "gzip is invalid"),
+        )
+        for field, data, message in mutations:
+            with self.subTest(field=field, message=message):
+                candidate = copy.deepcopy(encoded)
+                candidate["arcs_encoding"][field] = base64.b64encode(data).decode("ascii")
+                with self.assertRaisesRegex(ValueError, message):
+                    decode_topology(candidate)
+        for delta_bytes in (-1, True, encoded["arcs_encoding"]["point_count"] * 10 + 1):
+            candidate = copy.deepcopy(encoded)
+            candidate["arcs_encoding"]["delta_bytes"] = delta_bytes
+            with self.assertRaisesRegex(ValueError, "delta_bytes is invalid"):
+                decode_topology(candidate)
+
+    def test_v7_rejects_conflicting_out_of_range_and_trailing_arc_references(self) -> None:
+        encoded = encode_startup_topology(_source_topology())
+        conflicting = copy.deepcopy(encoded)
+        conflicting["objects"]["water_regions"]["geometries"][0]["arcs"] = [0]
+        with self.assertRaisesRegex(ValueError, "conflicting arc references"):
+            decode_topology(conflicting)
+        for field, data, size_field, message in (
+            ("refs_gzip_base64", b"\x06\x02", None, "reference index out of range"),
+            ("signs_gzip_base64", b"\x80", None, "unused reference signs"),
+            ("refs_gzip_base64", b"\x00\x02\x00", "refs_bytes", "trailing bytes"),
+        ):
+            with self.subTest(field=field, message=message):
+                candidate = copy.deepcopy(encoded)
+                candidate["arc_references_encoding"][field] = base64.b64encode(gzip.compress(data, mtime=0)).decode("ascii")
+                if size_field:
+                    candidate["arc_references_encoding"][size_field] = len(data)
+                with self.assertRaisesRegex(ValueError, message):
+                    decode_topology(candidate)
+
     def test_encode_decode_is_lossless_and_preserves_topology_metadata(self) -> None:
         source = _source_topology()
         encoded = encode_topology(source)

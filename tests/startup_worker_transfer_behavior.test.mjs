@@ -12,6 +12,12 @@ const topojson = require("../vendor/topojson-client.min.js");
 // Run classic scripts in the worker's own realm: a separate VM context would
 // make plain fixture objects fail the codec's Object.prototype check.
 if (!isMainThread) {
+  if (workerData.disableNativeDecompression) {
+    globalThis.DecompressionStream = undefined;
+    // Node's classic-script VM cannot import ESM without extra runtime flags;
+    // use the decoder's existing vendored-module hook in this worker realm.
+    globalThis.__scenarioForgeFflate = await import("../vendor/fflate.browser.js");
+  }
   globalThis.self = globalThis;
   globalThis.location = { href: workerUrl.href, origin: "https://fixture.test" };
   let packedSource = null;
@@ -111,7 +117,7 @@ if (!isMainThread) {
     };
   }
 
-  async function withWorker(resources, run) {
+  async function withWorker(resources, run, { disableNativeDecompression = false } = {}) {
     const originalWorker = globalThis.Worker;
     const originalLocation = globalThis.location;
     let adapter;
@@ -123,7 +129,7 @@ if (!isMainThread) {
         this.responses = [];
         this.audits = new Map();
         this.auditWaiters = new Map();
-        this.thread = new ThreadWorker(new URL(import.meta.url), { workerData: { resources } });
+        this.thread = new ThreadWorker(new URL(import.meta.url), { workerData: { resources, disableNativeDecompression } });
         this.thread.on("message", (message) => {
           if (message.testTransferAudit) {
             this.audits.set(message.taskId, message);
@@ -307,6 +313,43 @@ if (!isMainThread) {
         type: "STARTUP_BUNDLE_READY", requestType: "LOAD_STARTUP_BUNDLE", field: "message", encoding: "geo-f64-v2",
       });
       assert.deepEqual(resources, before);
+    });
+  });
+
+  for (const fallback of [false, true]) {
+    test(`v7 encoded base and runtime restore exact TopoJSON before real worker transfer with ${fallback ? "fallback" : "native"} gzip`, async () => {
+      const fixture = JSON.parse(readFileSync(new URL("./fixtures/startup_topology_v7.json", import.meta.url), "utf8"));
+      const resources = makeResources();
+      resources["/bundle.json"].version = 7;
+      resources["/bundle.json"].base.topology_primary = structuredClone(fixture.encoded);
+      resources["/bundle.json"].scenario.runtime_topology_bootstrap = structuredClone(fixture.encoded);
+      const before = structuredClone(resources);
+      const expectedBundle = structuredClone(resources["/bundle.json"]);
+      expectedBundle.base.topology_primary = fixture.source;
+      expectedBundle.scenario.runtime_topology_bootstrap = fixture.source;
+      await withWorker(resources, async (adapter) => {
+        const result = await readyCases[1].load();
+        assert.deepEqual(result.payload, expectedBundle);
+        assert.deepEqual(result.baseDecodedCollections, expectedCollections(fixture.source));
+        assert.deepEqual(result.runtimeDecodedCollections, expectedCollections(fixture.source, true));
+        assert.equal(adapter().responses.at(-1).type, "STARTUP_BUNDLE_READY");
+        assert.deepEqual(resources, before);
+      }, { disableNativeDecompression: fallback });
+    });
+  }
+
+  test("v7 malformed runtime references reject without emitting startup-ready", async () => {
+    const fixture = JSON.parse(readFileSync(new URL("./fixtures/startup_topology_v7.json", import.meta.url), "utf8"));
+    const resources = makeResources(5);
+    resources["/bundle.json"].version = 7;
+    resources["/bundle.json"].scenario.runtime_topology_bootstrap = fixture.encoded;
+    fixture.encoded.objects.political.arcs = [];
+    await withWorker(resources, async (adapter) => {
+      await assert.rejects(client.loadStartupBundleViaWorker({
+        startupBundleUrl: "/bundle.json", scenarioId: "transfer-fixture", timeoutMs: 2000,
+      }), /conflicting arc references/);
+      assert.equal(adapter().responses.at(-1).type, "ERROR");
+      assert.ok(adapter().responses.every((response) => response.type !== "STARTUP_BUNDLE_READY"));
     });
   });
 

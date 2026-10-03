@@ -1,0 +1,270 @@
+{
+  "source": {
+    "type": "Topology",
+    "transform": {
+      "scale": [
+        0.1,
+        0.1
+      ],
+      "translate": [
+        -180,
+        -90
+      ],
+      "vendor": "preserved"
+    },
+    "bbox": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "source": {
+      "citation": "海域 🌊"
+    },
+    "arcs": [
+      [
+        [
+          12,
+          -5
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          -2,
+          3
+        ],
+        [
+          -2,
+          -3
+        ]
+      ],
+      [
+        [
+          15,
+          -7
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      [],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "objects": {
+      "🌊": {
+        "type": "GeometryCollection",
+        "computed_neighbors": [
+          []
+        ],
+        "geometries": [
+          {
+            "type": "LineString",
+            "id": "line",
+            "arcs": [
+              0,
+              -1,
+              1
+            ]
+          },
+          {
+            "type": "MultiLineString",
+            "arcs": [
+              [
+                1,
+                -2
+              ],
+              [],
+              [
+                3
+              ]
+            ]
+          },
+          {
+            "type": "MultiPolygon",
+            "arcs": [
+              [
+                [
+                  0,
+                  -2
+                ],
+                []
+              ],
+              [],
+              [
+                [
+                  3,
+                  -4
+                ]
+              ]
+            ]
+          },
+          {
+            "type": "GeometryCollection",
+            "geometries": [
+              {
+                "type": "Point",
+                "coordinates": [
+                  2,
+                  3
+                ],
+                "properties": {
+                  "arcs": [
+                    99
+                  ]
+                }
+              },
+              {
+                "type": "LineString",
+                "arcs": []
+              }
+            ]
+          }
+        ]
+      },
+      "political": {
+        "type": "Polygon",
+        "arcs": [
+          [
+            0,
+            -2
+          ],
+          [],
+          [
+            -4
+          ]
+        ],
+        "properties": {
+          "arcs": [
+            "opaque"
+          ],
+          "label": "海域"
+        },
+        "computed_neighbors": [
+          []
+        ]
+      },
+      "": {
+        "type": "LineString",
+        "arcs": [
+          3,
+          -1
+        ]
+      }
+    }
+  },
+  "encoded": {
+    "type": "Topology",
+    "transform": {
+      "scale": [
+        0.1,
+        0.1
+      ],
+      "translate": [
+        -180,
+        -90
+      ],
+      "vendor": "preserved"
+    },
+    "bbox": [
+      -180,
+      -90,
+      180,
+      90
+    ],
+    "source": {
+      "citation": "海域 🌊"
+    },
+    "objects": {
+      "🌊": {
+        "type": "GeometryCollection",
+        "computed_neighbors": [
+          []
+        ],
+        "geometries": [
+          {
+            "type": "LineString",
+            "id": "line",
+            "arcs": null
+          },
+          {
+            "type": "MultiLineString",
+            "arcs": null
+          },
+          {
+            "type": "MultiPolygon",
+            "arcs": null
+          },
+          {
+            "type": "GeometryCollection",
+            "geometries": [
+              {
+                "type": "Point",
+                "coordinates": [
+                  2,
+                  3
+                ],
+                "properties": {
+                  "arcs": [
+                    99
+                  ]
+                }
+              },
+              {
+                "type": "LineString",
+                "arcs": null
+              }
+            ]
+          }
+        ]
+      },
+      "political": {
+        "type": "Polygon",
+        "arcs": null,
+        "properties": {
+          "arcs": [
+            "opaque"
+          ],
+          "label": "海域"
+        },
+        "computed_neighbors": [
+          []
+        ]
+      },
+      "": {
+        "type": "LineString",
+        "arcs": null
+      }
+    },
+    "arcs_encoding": {
+      "encoding": "topology-delta-zigzag-closed-gzip-v2",
+      "arc_count": 4,
+      "point_count": 8,
+      "delta_bytes": 12,
+      "lengths_gzip_base64": "H4sIAAAAAAACCmNhYGBgYoAAEA0AxlG4fhAAAAA=",
+      "closed_gzip_base64": "H4sIAAAAAAACCuMEAClX3qsBAAAA",
+      "deltas_gzip_base64": "H4sIAAAAAAACCpPg5GBgZmNjZmCS5QMAfR2tfgwAAAA="
+    },
+    "arc_references_encoding": {
+      "encoding": "topology-arc-references-delta-sign-gzip-v1",
+      "reference_count": 15,
+      "container_count": 18,
+      "refs_bytes": 15,
+      "lengths_bytes": 18,
+      "refs_gzip_base64": "H4sIAAAAAAACCmNgYmFlYGJgYGFlYmFgYAUA6Y8YSw8AAAA=",
+      "lengths_gzip_base64": "H4sIAAAAAAACCmNjYWBiYwMRLCwMDEwsDCwAkm1PRBIAAAA=",
+      "signs_gzip_base64": "H4sIAAAAAAACCpsWAgCOqsQKAgAAAA=="
+    }
+  }
+}

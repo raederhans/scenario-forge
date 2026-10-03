@@ -473,19 +473,14 @@ async function handleLoadStartupBundle(message) {
       `[startup_worker] Startup bundle scenario mismatch. Expected "${expectedScenarioId}" but received "${scenarioId}".`
     );
   }
-  let topologyPrimary = payload.base?.topology_primary || null;
-  if (topologyPrimary && Object.hasOwn(topologyPrimary, "arcs_encoding")) {
-    const startupTopologyCodec = globalThis.__scenarioForgeStartupTopologyCodecShared;
-    if (typeof startupTopologyCodec?.decodeTopology !== "function") {
-      throw new Error("[startup_worker] Startup topology codec failed to initialize.");
-    }
-    topologyPrimary = startupTopologyCodec.decodeTopology(topologyPrimary);
-    if (!payload.base || typeof payload.base !== "object") {
-      throw new Error("[startup_worker] Startup bundle base section is missing.");
-    }
-    payload.base.topology_primary = topologyPrimary;
+  const startupTopologyCodec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+  if (typeof startupTopologyCodec?.decodeStartupTopology !== "function") {
+    throw new Error("[startup_worker] Startup topology codec failed to initialize.");
   }
-  const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  const topologyPrimary = await startupTopologyCodec.decodeStartupTopology(payload.base?.topology_primary || null);
+  const runtimeTopology = await startupTopologyCodec.decodeStartupTopology(payload.scenario?.runtime_topology_bootstrap || null);
+  if (payload.base) payload.base.topology_primary = topologyPrimary;
+  if (payload.scenario) payload.scenario.runtime_topology_bootstrap = runtimeTopology;
   const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   if (!topologyPrimary?.objects?.political) {

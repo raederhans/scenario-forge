@@ -53,6 +53,10 @@ async function readPublicReleaseGateState(page) {
       activeScenarioId: String(state.activeScenarioId || ""),
       bootBlocking: state.bootBlocking === false ? false : !!state.bootBlocking,
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
+      postReadyScheduler: state.renderPerfMetrics?.postReadySchedulerState || null,
+      interactionInfrastructureBuildInFlight: !!state.interactionInfrastructureBuildInFlight,
+      hitCanvasBuildScheduled: !!state.hitCanvasBuildScheduled,
+      renderPhase: String(state.renderPhase || ""),
       optionValues: Array.from(scenarioSelect?.options || []).map((option) => option.value),
       hgoPreviewEnabled: !!state.hgoRuntimePreview?.enabled,
       hasHgoRuntimeAssets: !!state.dataManifest?.assets?.hgo_runtime_manifest,
@@ -375,7 +379,7 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
   const projectTab = page.locator("#inspectorSidebarTabProject");
   await expect(projectTab).toBeVisible({ timeout: 30000 });
   await projectTab.click();
-  await expect(projectTab).toHaveAttribute("aria-selected", "true", { timeout: 30000 });
+  await expect(projectTab).toHaveAttribute("aria-pressed", "true", { timeout: 30000 });
   const sampleProjectBanner = page.locator("#sampleProjectBanner");
   await expect(sampleProjectBanner).toBeVisible({ timeout: 30000 });
   await expect(sampleProjectBanner).toContainText(/Sample loaded: TNO 1962 Atlantropa briefing/i);

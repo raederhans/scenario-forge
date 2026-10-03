@@ -403,6 +403,21 @@ class PerfGateContractTest(unittest.TestCase):
             "git -C $baseWorktree diff --quiet $candidateSha -- $governedHeadInputs",
             same_runner_step,
         )
+        self.assertIn("'tools/perf/project_baseline_startup.py'", same_runner_step)
+        self.assertIn("$startupProjection.changed_files", same_runner_step)
+        self.assertIn("startup_projection = $startupProjection", same_runner_step)
+        self.assertIn("--receipt $startupReceipt --verify", same_runner_step)
+        self.assertIn("$_ -notin $startupProjection.changed_files", same_runner_step)
+        self.assertNotIn("'js/workers/startup_boot.worker.js'", same_runner_step)
+        self.assertNotIn("'tools/build_startup_bundle.py'", same_runner_step)
+        self.assertLess(
+            same_runner_step.index("diff --quiet $candidateSha -- $governedHeadInputs"),
+            same_runner_step.index("python $startupProjector"),
+        )
+        self.assertLess(
+            same_runner_step.index("--receipt $startupReceipt --verify"),
+            same_runner_step.index("npm ci"),
+        )
         self.assertIn("git -C $baseWorktree status --porcelain", same_runner_step)
         self.assertNotIn("restore --source=$diffHeadSha", same_runner_step)
         self.assertIn("$baseEvidenceDir", same_runner_step)

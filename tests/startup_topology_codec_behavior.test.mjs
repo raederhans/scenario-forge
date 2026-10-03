@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import { gunzipSync, gzipSync } from "node:zlib";
+import "../js/core/json_resource_decoder_shared.js";
 
 const require = createRequire(import.meta.url);
 const codec = require("../js/core/startup_topology_codec_shared.js");
+const v7Fixture = JSON.parse(readFileSync(new URL("./fixtures/startup_topology_v7.json", import.meta.url), "utf8"));
 
 const fixture = {
   type: "Topology",
@@ -138,4 +142,82 @@ test("startup topology codec rejects predictor overflow and overlong varints", (
     .concat([bytes.subarray(0, 0), Buffer.from([0x80, 0x80, 0x80, 0x80, 0x80]), bytes.subarray(2)])
     .toString("base64");
   assert.throws(() => codec.decodeTopology(overlong), /varint exceeds uint32/);
+});
+
+for (const fallback of [false, true]) {
+  test(`v7 restores Python wire closed arcs and nested signed references via ${fallback ? "fallback" : "native"} gzip`, async () => {
+    const native = globalThis.DecompressionStream;
+    if (fallback) globalThis.DecompressionStream = undefined;
+    try {
+      const input = structuredClone(v7Fixture.encoded);
+      const decoded = await codec.decodeStartupTopology(input);
+      assert.deepEqual(decoded, v7Fixture.source);
+      assert.deepEqual(input, v7Fixture.encoded, "decoding must not mutate wire metadata or references");
+      assert.deepEqual(decoded.objects.political.properties.arcs, ["opaque"]);
+      assert.equal(Object.hasOwn(decoded, "arc_references_encoding"), false);
+    } finally {
+      globalThis.DecompressionStream = native;
+    }
+  });
+}
+
+test("async startup decoder preserves legacy identity and accepts v6 arcs", async () => {
+  const legacy = structuredClone(v7Fixture.source);
+  assert.equal(await codec.decodeStartupTopology(legacy), legacy);
+  assert.equal(await codec.decodeStartupTopology(null), null);
+  assert.deepEqual(await codec.decodeStartupTopology(fixture), codec.decodeTopology(fixture));
+});
+
+function setGzip(descriptor, key, bytes) {
+  descriptor[key] = gzipSync(Buffer.from(bytes)).toString("base64");
+}
+
+test("v7 rejects malformed counts, closed flags and corrupted gzip", async () => {
+  for (const [mutate, message] of [
+    [(value) => { value.arcs_encoding.delta_bytes = 1_000; }, /delta_bytes is invalid/],
+    [(value) => { value.arcs_encoding.arc_count = 0; }, /nonzero/],
+    [(value) => { setGzip(value.arcs_encoding, "closed_gzip_base64", [0x80]); }, /unused closed flags/],
+    [(value) => { setGzip(value.arcs_encoding, "closed_gzip_base64", [0x04]); }, /invalid closed arc/],
+    [(value) => { setGzip(value.arcs_encoding, "closed_gzip_base64", [0, 0]); }, /declared limit/],
+    [(value) => { value.arcs_encoding.lengths_gzip_base64 = "%%%="; }, /base64/],
+    [(value) => {
+      const bytes = Buffer.from(value.arcs_encoding.deltas_gzip_base64, "base64");
+      bytes[bytes.length - 8] ^= 0xff;
+      value.arcs_encoding.deltas_gzip_base64 = bytes.toString("base64");
+    }, /decompress/i],
+  ]) {
+    const value = structuredClone(v7Fixture.encoded);
+    mutate(value);
+    await assert.rejects(codec.decodeStartupTopology(value), message);
+  }
+});
+
+test("v7 rejects conflicting references, invalid indices, unused signs and trailing bytes", async () => {
+  for (const [mutate, message] of [
+    [(value) => { value.arc_references_encoding.encoding = "future"; }, /reference encoding/],
+    [(value) => { value.objects.political.arcs = []; }, /conflicting arc references/],
+    [(value) => {
+      const size = value.arc_references_encoding.refs_bytes;
+      setGzip(value.arc_references_encoding, "refs_gzip_base64", [8, ...Array(size - 1).fill(0)]);
+    }, /reference index out of range/],
+    [(value) => {
+      const descriptor = value.arc_references_encoding;
+      const size = Math.ceil(descriptor.reference_count / 8);
+      setGzip(descriptor, "signs_gzip_base64", [...Array(size - 1).fill(0), 0x80]);
+    }, /unused reference signs/],
+    [(value) => {
+      const descriptor = value.arc_references_encoding;
+      descriptor.reference_count += 1;
+    }, /count|limit|length/],
+    [(value) => {
+      const descriptor = value.arc_references_encoding;
+      const bytes = gunzipSync(Buffer.from(descriptor.refs_gzip_base64, "base64"));
+      descriptor.refs_bytes += 1;
+      setGzip(descriptor, "refs_gzip_base64", [...bytes, 0]);
+    }, /trailing bytes/],
+  ]) {
+    const value = structuredClone(v7Fixture.encoded);
+    mutate(value);
+    await assert.rejects(codec.decodeStartupTopology(value), message);
+  }
 });

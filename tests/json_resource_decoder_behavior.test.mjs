@@ -63,6 +63,58 @@ function gzipSync(content) {
   return zlib.gzipSync(buf);
 }
 
+function createBoundedDecoder(native) {
+  const context = vm.createContext({
+    TextDecoder, Uint8Array, ArrayBuffer, Blob, Response, TypeError, Error,
+    DecompressionStream: native, __scenarioForgeFflate: fflate,
+  });
+  vm.runInContext(sharedSource, context);
+  return context.__scenarioForgeJsonResourceDecoderShared;
+}
+
+for (const fallback of [false, true]) {
+  test(`bounded gzip accepts exact and spare capacity and rejects oversize via ${fallback ? "fallback" : "native"}`, async () => {
+    const decoder = createBoundedDecoder(fallback ? undefined : DecompressionStream);
+    await checkBounded(decoder);
+  });
+}
+
+async function checkBounded(decoder) {
+  const bytes = Buffer.from("海域 🌊");
+  const compressed = gzipSync(bytes);
+  for (const limit of [bytes.length, bytes.length + 5]) {
+    assert.deepEqual(Buffer.from(await decoder.decompressGzip(compressed, { maxOutputBytes: limit })), bytes);
+  }
+  assert.equal((await decoder.decompressGzip(gzipSync(""), { maxOutputBytes: 0 })).byteLength, 0);
+  for (const limit of [bytes.length - 1, -1, NaN, 1.5]) {
+    await assert.rejects(decoder.decompressGzip(compressed, { maxOutputBytes: limit }), /declared limit/);
+  }
+  const forgedTrailer = gzipSync(Buffer.alloc(8192, 97));
+  forgedTrailer.writeUInt32LE(8, forgedTrailer.length - 4);
+  await assert.rejects(decoder.decompressGzip(forgedTrailer, { maxOutputBytes: 8 }), /decompress/i);
+}
+
+test("native bounded gzip cancels an oversized stream and never retries through fallback", async () => {
+  let canceled = false;
+  let fallbackCalls = 0;
+  class OversizedDecompressionStream {
+    constructor() {
+      return {
+        writable: new WritableStream(),
+        readable: new ReadableStream({
+          start(controller) { controller.enqueue(new Uint8Array(9)); },
+          cancel() { canceled = true; },
+        }),
+      };
+    }
+  }
+  const decoder = createBoundedDecoder(OversizedDecompressionStream);
+  decoder.setFallbackGunzip(() => { fallbackCalls++; return new Uint8Array(0); });
+  await assert.rejects(decoder.decompressGzip(gzipSync("1234"), { maxOutputBytes: 4 }), /declared limit/);
+  assert.equal(canceled, true);
+  assert.equal(fallbackCalls, 0);
+});
+
 function createMockResponse({
   ok = true,
   status = 200,

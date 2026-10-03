@@ -170,7 +170,7 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "47a9197019069a9c4d9a5837b668701ee867fb2e79b8b64484bd8ffdc0458eeb",
+  "snapshot_fingerprint": "a4cdc54d1e78d32cf428b9cf55ac2fa2cb6a1c6b919bf7930f257c39c0c71e49",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "e21a24da0ed06e16f02cf34ee0760690b440bdf600d4aa9b5435c280fe1922b2",
@@ -181,7 +181,7 @@
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
   "startup_bundle_url_en": "data/scenarios/tno_1962/startup.bundle.en.json",
   "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json",
-  "startup_bundle_version": 6,
+  "startup_bundle_version": 7,
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
   "style_defaults": {
     "atlantropa_salt_flat": {

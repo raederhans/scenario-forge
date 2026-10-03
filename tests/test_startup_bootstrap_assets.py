@@ -17,7 +17,7 @@ from tools import (
     generate_startup_support_whitelist,
     materialize_startup_support_candidate,
 )
-from tools.startup_topology_codec import decode_topology
+from tools.startup_topology_codec import COMPACT_ENCODING, REFERENCE_ENCODING, decode_topology
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -150,6 +150,14 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
             for object_name in ("land_mask", "context_land_mask", "scenario_water"):
                 self.assertIn(object_name, runtime_objects)
             self.assertGreater(len(bundle["scenario"]["runtime_political_meta"]["featureIds"]), 0)
+
+    def test_all_published_startup_bundles_stay_within_gzip_budget(self) -> None:
+        root = Path(__file__).resolve().parents[1] / "data" / "scenarios"
+        for scenario_id in ("hoi4_1936", "hoi4_1939", "tno_1962"):
+            for language in build_startup_bundle.SUPPORTED_LANGUAGES:
+                with self.subTest(scenario_id=scenario_id, language=language):
+                    path = root / scenario_id / f"startup.bundle.{language}.json.gz"
+                    self.assertLess(path.stat().st_size, build_startup_bundle.STARTUP_BUNDLE_GZIP_BUDGET_BYTES)
 
     def test_chunked_startup_bundle_builders_pass_detail_manifest_source(self) -> None:
         hoi4_builder = (Path(__file__).resolve().parents[1] / "tools" / "build_hoi4_scenario.py").read_text(encoding="utf-8")
@@ -515,14 +523,17 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 },
             )
             bundle_payload = json.loads(output_en_path.read_text(encoding="utf-8"))
-            self.assertEqual(bundle_payload["version"], 6)
+            self.assertEqual(bundle_payload["version"], 7)
             encoded_topology = bundle_payload["base"]["topology_primary"]
             self.assertNotIn("arcs", encoded_topology)
             self.assertEqual(encoded_topology["arcs_encoding"]["arc_count"], 1)
+            self.assertEqual(encoded_topology["arcs_encoding"]["encoding"], COMPACT_ENCODING)
+            self.assertEqual(encoded_topology["arc_references_encoding"]["encoding"], REFERENCE_ENCODING)
             decoded_topology = decode_topology(encoded_topology)
             self.assertEqual(decoded_topology["arcs"], [[[12, -5], [4, 0]]])
             self.assertEqual(decoded_topology["transform"], encoded_topology["transform"])
-            self.assertEqual(decoded_topology["objects"], encoded_topology["objects"])
+            self.assertEqual(decoded_topology["objects"]["political"]["geometries"][0]["arcs"], [[0]])
+            self.assertIsNone(encoded_topology["objects"]["political"]["geometries"][0]["arcs"])
             self.assertEqual(result["report"]["startup_primary_slimming"]["after_arc_count"], 1)
             self.assertEqual(bundle_payload["manifest_subset"]["source"], generated_manifest["source"])
             self.assertEqual(
