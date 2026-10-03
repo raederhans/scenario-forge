@@ -426,9 +426,21 @@ function enhanceSelect(select) {
 
 function enhanceAll(root = document) {
   if (!root?.querySelectorAll) return;
+  if (root.matches?.(ENHANCED_SELECT_SELECTOR)) enhanceSelect(root);
   root.querySelectorAll(ENHANCED_SELECT_SELECTOR).forEach((select) => {
     enhanceSelect(select);
   });
+}
+
+function scanAddedRoots(roots) {
+  const connectedRoots = new Set([...roots].filter((root) => root.isConnected));
+  const outermostRoots = [];
+  connectedRoots.forEach((root) => {
+    let ancestor = root.parentElement;
+    while (ancestor && !connectedRoots.has(ancestor)) ancestor = ancestor.parentElement;
+    if (!ancestor) outermostRoots.push(root);
+  });
+  outermostRoots.forEach((root) => enhanceAll(root));
 }
 
 function getMutationSelect(mutation) {
@@ -440,22 +452,29 @@ function getMutationSelect(mutation) {
 export function initStyledSelects(root = document) {
   enhanceAll(root);
   if (observer || !document.body) return;
+  const pendingRoots = new Set();
+  let scanScheduled = false;
   observer = new MutationObserver((mutations) => {
-    let shouldScan = false;
     const changedSelects = new Set();
     mutations.forEach((mutation) => {
       const select = getMutationSelect(mutation);
       if (select) changedSelects.add(select);
-      if (mutation.type === "childList" && !select
-        && Array.from(mutation.addedNodes || []).some((node) => isElement(node)
-          && !node.closest?.(".app-select-shell"))) {
-        shouldScan = true;
+      if (mutation.type === "childList" && !select) {
+        Array.from(mutation.addedNodes || []).forEach((node) => {
+          if (isElement(node) && !node.closest?.(".app-select-shell")) pendingRoots.add(node);
+        });
       }
     });
     changedSelects.forEach(syncSurface);
-    if (shouldScan) {
+    if (pendingRoots.size && !scanScheduled) {
       // 动态面板经常先插入容器再填 select，微任务扫描可以等同一批 DOM 写入结束后统一增强。
-      queueMicrotask(() => enhanceAll(document));
+      scanScheduled = true;
+      queueMicrotask(() => {
+        const roots = [...pendingRoots];
+        pendingRoots.clear();
+        scanScheduled = false;
+        scanAddedRoots(roots);
+      });
     }
   });
   observer.observe(document.body, {

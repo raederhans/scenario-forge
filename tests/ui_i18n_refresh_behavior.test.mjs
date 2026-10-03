@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { applyBaseLocalizationSnapshot, setCurrentLanguage } from "../js/core/state/content_state.js";
 
 import { state } from "../js/core/state.js";
 import { readRegisteredRuntimeHookSource, registerRuntimeHook } from "../js/core/state/index.js";
@@ -41,16 +42,16 @@ function mount(t, nodes = new Map()) {
     getElementById: (id) => nodes.get(id) || null,
     querySelectorAll: () => [...nodes.values()].filter((node) => node.matches()),
   };
-  state.currentLanguage = "zh";
-  state.locales = { ui: {
+  setCurrentLanguage(state, "zh");
+  applyBaseLocalizationSnapshot(state, { uiLocales: {
     Tools: { en: "Tools", zh: "工具" },
     Borders: { en: "Borders", zh: "边界" },
     "Reset Country Colors": { en: "Reset Country Colors", zh: "重置国家颜色" },
-  } };
+  } });
   t.after(() => {
     globalThis.document = originalDocument;
-    state.currentLanguage = originalLanguage;
-    state.locales = originalLocales;
+    setCurrentLanguage(state, originalLanguage);
+    applyBaseLocalizationSnapshot(state, { uiLocales: originalLocales.ui, geoLocales: originalLocales.geo });
   });
 }
 
@@ -74,11 +75,11 @@ test("declarative refresh avoids equal DOM writes while translating new nodes an
   node.children.push(dynamicChild);
   applyDeclarativeTranslations(node);
   assert.equal(dynamicChild.textContent, "边界");
-  state.locales.ui.Tools.zh = "绘图工具";
+  applyBaseLocalizationSnapshot(state, { uiLocales: { ...state.locales.ui, Tools: { ...state.locales.ui.Tools, zh: "绘图工具" } } });
   applyDeclarativeTranslations(node);
   assert.equal(node.textContent, "绘图工具");
   assert.equal(node.getAttribute("placeholder"), "绘图工具");
-  state.currentLanguage = "en";
+  setCurrentLanguage(state, "en");
   applyDeclarativeTranslations(dynamicChild);
   assert.equal(dynamicChild.textContent, "Borders");
 });
@@ -133,10 +134,9 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   fileName.dataset.projectFileState = "selected";
   mount(t, new Map([["countrySearch", search], ["projectFileName", fileName]]));
   const originalStorage = globalThis.localStorage;
-  const originalScenario = state.activeScenarioId;
   const persisted = [];
   globalThis.localStorage = { setItem: (...args) => persisted.push(args) };
-  state.activeScenarioId = "";
+  assert.equal(state.activeScenarioId, "", "isolated test starts without an active scenario");
   const calls = new Map();
   const hookNames = [
     "updatePaintModeUIFn", "refreshSampleProjectBannerFn", "updateToolbarInputsFn", "updateDevWorkspaceUIFn",
@@ -149,7 +149,6 @@ test("language toggle refreshes each directly scheduled UI hook once and retains
   t.after(() => {
     originals.forEach(([name, callback]) => registerRuntimeHook(state, name, callback));
     globalThis.localStorage = originalStorage;
-    state.activeScenarioId = originalScenario;
   });
   updateUIText();
   for (const name of hookNames.slice(0, 4)) assert.equal(calls.get(name), 1, `${name} in updateUIText`);

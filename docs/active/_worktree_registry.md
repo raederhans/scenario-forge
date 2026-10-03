@@ -658,3 +658,7 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Scope: editor navigation, focus/scroll retention, refresh/motion, bilingual guidance and related regression routing. Primary checkout mixed WIP is preserved; unrelated data, palette and physical renderer changes are excluded.
 - Local validation: 32 behavior tests, 22 translation-audit tests, 9 routing tests and 15 focused browser cases passed. The heading-language case explicitly waits for lazy locale hydration before exercising the toggle. Test-list coverage and route schema checks passed.
 - Retain this worktree for delivery verification and ignored evidence under `.runtime/tmp/ui-delivery/` and `.runtime/tests/playwright/ui-delivery*`. The associated PR is authoritative for remote checks and merge status.
+
+## 2026-10-03 三轮性能优化交付
+
+`C:/Users/raede/.codex/worktrees/performance-round-20261002/mapcreator` 使用 `codex/performance-round-20261002`，整合主线 `14234669` 的整消息启动传输后交付三轮性能优化。用户已授权审核、合并、推送。主工作区及其他工作树 WIP 保留；本树保存 `.runtime/browser/`、CPU profiles 和对照报告，合并后继续保留供复核。实现与验证见 [任务记录](performance-round3-20261002/task.md)，最终提交和合并以 [PR #203](https://github.com/raederhans/scenario-forge/pull/203) 回执为准。

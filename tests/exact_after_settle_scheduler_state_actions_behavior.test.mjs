@@ -300,8 +300,13 @@ test("pan, hidden or absent urban data, and disabled reuse retain the existing s
 test("async pass preparation preserves the visible frame and waits before pass draw or completion", async () => {
   let resolvePreparation;
   let ready = false;
+  const preparationEpochs = [];
   const preparation = new Promise((resolve) => { resolvePreparation = () => { ready = true; resolve(); }; });
-  const h = createHarness({ prepareRenderPassAsync: (pass) => pass === "political" && !ready ? preparation : null });
+  const h = createHarness({ prepareRenderPassAsync: (pass) => {
+    if (pass !== "political") return null;
+    preparationEpochs.push(h.events.filter((event) => event === "invalidate:political:exact-after-settle-political").length);
+    return ready ? null : preparation;
+  } });
   try {
     h.scheduler.scheduleExactAfterSettleRefresh(h.profile);
     h.runTimer(); h.runNextFrame(); h.runNextFrame(); h.runNextFrame("exact-after-settle-pass-political");
@@ -310,11 +315,14 @@ test("async pass preparation preserves the visible frame and waits before pass d
     assert.equal(h.events.includes("prepare:political"), false);
     assert.equal(h.events.includes("request-render:exact-after-settle:true"), false);
     assert.equal(h.frameTasks.length, 0);
+    assert.deepEqual(preparationEpochs, [1], "preparation must observe the invalidated snapshot epoch");
     resolvePreparation(); await Promise.resolve();
     h.runNextFrame("exact-after-settle-pass-political");
     assert.equal(h.events.includes("prepare:political"), true);
+    assert.deepEqual(preparationEpochs, [1, 1], "retry must preserve the prepared snapshot epoch");
     h.runNextFrame("exact-after-settle-pass-borders");
     assert.equal(h.runtimeState.exactAfterSettleController.phase, "awaiting-paint");
+    assert.equal(h.events.filter((event) => event === "invalidate:political:exact-after-settle-political").length, 1);
   } finally { h.restore(); }
 });
 

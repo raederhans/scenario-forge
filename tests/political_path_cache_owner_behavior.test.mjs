@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
+import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
 
 const item = (id, x = 50, drawOrder = 0) => ({
   id, minX: x, maxX: x, minY: 50, maxY: 50, drawOrder,
@@ -11,6 +12,7 @@ const item = (id, x = 50, drawOrder = 0) => ({
 });
 
 function fixture(t, options = {}) {
+  const { scheduleDeferredWork = null, ...ownerOptions } = options;
   const originalPath = globalThis.Path2D;
   globalThis.Path2D = class { constructor(path) { this.value = path; } };
   t.after(() => { globalThis.Path2D = originalPath; });
@@ -40,11 +42,11 @@ function fixture(t, options = {}) {
     getViewportRenderSignature: () => h.viewport,
     getRenderPassCacheState: () => h.cache,
     cancelDeferredWork: (handle) => { h.cancelled.push(handle); h.timers.delete(handle); },
-    scheduleDeferredWork: (callback, options) => {
+    scheduleDeferredWork: scheduleDeferredWork || ((callback, options) => {
       const handle = ++h.serial;
       h.timers.set(handle, { callback, options });
       return handle;
-    },
+    }),
     incrementPerfCounter: (name) => { h.counters[name] = (h.counters[name] || 0) + 1; },
     recordRenderPerfMetric: (...args) => h.metrics.push(args),
     areZoomTransformsEquivalent: (left, right) => !!left && left.k === right.k && left.x === right.x && left.y === right.y,
@@ -54,7 +56,7 @@ function fixture(t, options = {}) {
     collectLandSpatialItemsForProjectedRects: () => h.candidates,
     nowMs: () => h.time,
     RENDER_PHASE_IDLE: "idle",
-    ...options,
+    ...ownerOptions,
   });
   h.tick = (deadline = null) => {
     const [handle, timer] = h.timers.entries().next().value;
@@ -153,6 +155,63 @@ test("validated handle avoids repeated cache normalization within one synchronou
   const nextHandle = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
   assert.notEqual(nextHandle.signature, handle.signature);
   assert.ok(cacheReads > readsBefore);
+});
+
+test("deferred warmup scopes counted path builds to one synchronous slice", (t) => {
+  const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+  const factoryStart = rendererSource.indexOf("function getPoliticalBackgroundRenderOwner() {");
+  const factoryEnd = rendererSource.indexOf("\nfunction ", factoryStart + 1);
+  assert.ok(factoryStart >= 0 && factoryEnd > factoryStart, "political background owner factory exists");
+  const factorySource = rendererSource.slice(factoryStart, factoryEnd);
+  const scheduleExpression = factorySource.match(/scheduleDeferredWork:\s*([\s\S]*?),\s*invalidateRenderPasses\b/)?.[1];
+  assert.ok(scheduleExpression, "scheduler injection expression is present in the owner factory");
+  let h;
+  let cacheOwner;
+  let validations = 0;
+  const state = {};
+  cacheOwner = createRenderCacheOwner({
+    state,
+    helpers: {
+      ensureRenderPassCacheState: () => {
+        validations += 1;
+        state.renderPassCache ||= h.cache;
+        return state.renderPassCache;
+      },
+    },
+  });
+  const scheduleDeferredWork = vm.runInNewContext(`(${scheduleExpression})`, {
+    scheduleDeferredWork: (callback, options) => {
+      const handle = ++h.serial;
+      h.timers.set(handle, { callback, options });
+      return handle;
+    },
+    getRenderCacheOwner: () => cacheOwner,
+  });
+  h = fixture(t, {
+    getRenderPassCacheState: () => cacheOwner.getRenderPassCacheState(),
+    incrementPerfCounter: (name) => {
+      const cache = cacheOwner.getRenderPassCacheState();
+      cache.perfCounters ||= {};
+      cache.perfCounters[name] = (cache.perfCounters[name] || 0) + 1;
+    },
+    scheduleDeferredWork,
+  });
+  h.candidates = { items: Array.from({ length: 25 }, (_, index) => item(`warm-${index}`)) };
+
+  assert.equal(h.owner.schedulePoliticalPathWarmup(), true);
+  validations = 0;
+  h.tick();
+  assert.equal(validations, 1, "all counted builds in a slice share one cache validation");
+  assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 24);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 24);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 1);
+
+  validations = 0;
+  h.tick();
+  assert.equal(validations, 1, "the next deferred slice validates its cache again");
+  assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 25);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 25);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 2);
 });
 
 test("cached paths stream the exact canvas coordinates for decimals, holes, parts and antimeridian clipping", (t) => {
