@@ -330,15 +330,26 @@ async function runPublicReleaseGateAttempt(page, { consoleIssues, networkFailure
     await waitForScenarioApplyIdle(page, { scenarioId: "tno_1962", timeout: 120000 });
   });
   await expect(page.locator("#scenarioStatus")).toContainText("TNO 1962", { timeout: 30000 });
-  await expect.poll(() => readPublicReleaseGateState(page), { timeout: 30000 }).toMatchObject({
-    activeScenarioId: "tno_1962",
-    scenarioApplyInFlight: false,
-    sampleProjectDeeplink: {
-      status: "success",
-      sampleId: "tno-1962-atlantropa-briefing",
-      scenarioId: "tno_1962",
-    },
-  });
+  let lastReleaseGateState = null;
+  try {
+    await expect.poll(async () => {
+      lastReleaseGateState = await readPublicReleaseGateState(page);
+      return lastReleaseGateState;
+    }, { timeout: 30000 }).toMatchObject({
+      activeScenarioId: "tno_1962",
+      scenarioApplyInFlight: false,
+      sampleProjectDeeplink: {
+        status: "success",
+        sampleId: "tno-1962-atlantropa-briefing",
+        scenarioId: "tno_1962",
+      },
+    });
+  } catch (error) {
+    // Matching only the expected subset hides scheduler fields in Playwright's diff.
+    // Keep the last completed observation visible even if artifact upload is skipped.
+    console.log(JSON.stringify({ releaseGateState: lastReleaseGateState }, null, 2));
+    throw error;
+  }
 
   const releaseState = await readPublicReleaseGateState(page);
   expect(releaseState.optionValues).toContain("tno_1962");
