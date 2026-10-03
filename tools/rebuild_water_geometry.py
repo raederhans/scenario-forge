@@ -83,6 +83,21 @@ def _select_tno_water_rebuild_scope(features, originals):
     return changed, preserved
 
 
+def _prepare_tno_marine_additions(additions, originals):
+    """Keep existing detailed waters before subtracting a new broader source.
+
+    For example, the Alaska/BC source contains Salish Sea. If its untrimmed
+    footprint is subtracted first, the established sea is lost before the
+    shared seam ownership rules can protect it.
+    """
+    added_ids = {f["properties"]["id"] for f in additions}
+    reconciled = reconcile_marine_source_boundaries({"type": "FeatureCollection", "features": [
+        *(f for feature_id, f in originals.items() if feature_id not in added_ids),
+        *additions,
+    ]})
+    return [f for f in reconciled["features"] if f["properties"]["id"] in added_ids]
+
+
 def repair_tno_water_precision(stage_root):
     """Recompile only TNO water that cannot safely retain its old encoded arcs."""
     stage_root = stage_root.resolve()
@@ -179,6 +194,7 @@ def rebuild(stage_root, *, refine_marine=False):
         # scenario coast keep their IDs and footprints except these exact cuts.
         additions = additional_snapshot_features()
         originals = {f["properties"]["id"]: deepcopy(f) for f in current_water["features"]}
+        additions = _prepare_tno_marine_additions(additions, originals)
         added_ids = {f["properties"]["id"] for f in additions}
         supplement = unary_union([shape(f["geometry"]) for f in additions])
         for feature in current_water["features"]:

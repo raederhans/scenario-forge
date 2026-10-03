@@ -17,6 +17,7 @@ from tools import (
     generate_startup_support_whitelist,
     materialize_startup_support_candidate,
 )
+from tools.startup_topology_codec import decode_topology
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -435,11 +436,12 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 {
                     "type": "Topology",
                     "objects": {
-                        "political": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": []}]},
+                        "political": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": [[0]]}]},
                         "water_regions": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "W-1"}, "arcs": []}]},
                         "special_zones": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "SZ-1"}, "arcs": []}]},
                     },
-                    "arcs": [],
+                    "arcs": [[[12, -5], [4, 0]]],
+                    "transform": {"scale": [0.1, 0.1], "translate": [-180.0, -90.0]},
                 },
             )
             _write_json(
@@ -503,6 +505,7 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
             )
 
             generated_manifest = json.loads(scenario_manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(generated_manifest["startup_bundle_version"], build_startup_bundle.STARTUP_BUNDLE_VERSION)
             self.assertEqual(
                 generated_manifest["source"],
                 {
@@ -512,6 +515,15 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 },
             )
             bundle_payload = json.loads(output_en_path.read_text(encoding="utf-8"))
+            self.assertEqual(bundle_payload["version"], 6)
+            encoded_topology = bundle_payload["base"]["topology_primary"]
+            self.assertNotIn("arcs", encoded_topology)
+            self.assertEqual(encoded_topology["arcs_encoding"]["arc_count"], 1)
+            decoded_topology = decode_topology(encoded_topology)
+            self.assertEqual(decoded_topology["arcs"], [[[12, -5], [4, 0]]])
+            self.assertEqual(decoded_topology["transform"], encoded_topology["transform"])
+            self.assertEqual(decoded_topology["objects"], encoded_topology["objects"])
+            self.assertEqual(result["report"]["startup_primary_slimming"]["after_arc_count"], 1)
             self.assertEqual(bundle_payload["manifest_subset"]["source"], generated_manifest["source"])
             self.assertEqual(
                 (output_en_path.with_suffix(".json.gz")).read_bytes(),

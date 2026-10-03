@@ -6,7 +6,7 @@ import "../js/core/geometry_transfer_codec_shared.js";
 
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const codecSource = await readFile(new URL("../js/core/geometry_transfer_codec_shared.js", import.meta.url), "utf8");
-const topologyCodecSource = await readFile(new URL("../js/core/topology_transfer_codec_shared.js", import.meta.url), "utf8");
+const topologyCodecSource = await readFile(new URL("../js/core/startup_topology_codec_shared.js", import.meta.url), "utf8");
 
 function createWorkerHarness({ feature = () => null, fetchResource = null, onPostMessage = null } = {}) {
   const posted = [];
@@ -37,8 +37,8 @@ function createWorkerHarness({ feature = () => null, fetchResource = null, onPos
       if (urls.some((url) => String(url).includes("geometry_transfer_codec_shared.js"))) {
         vm.runInContext(codecSource, context, { filename: "geometry_transfer_codec_shared.js" });
       }
-      if (urls.some((url) => String(url).includes("topology_transfer_codec_shared.js"))) {
-        vm.runInContext(topologyCodecSource, context, { filename: "topology_transfer_codec_shared.js" });
+      if (urls.some((url) => String(url).includes("startup_topology_codec_shared.js"))) {
+        vm.runInContext(topologyCodecSource, context, { filename: "startup_topology_codec_shared.js" });
       }
       context.__scenarioForgeFeatureIdentityShared = {
         defaultCountryCodeNormalizer: (value) => String(value || "").toUpperCase(),
@@ -206,7 +206,7 @@ function decodeFixtureFeatureCollection(_topology, object) {
   };
 }
 
-test("large base and startup-bundle geometry use field-specific transfers without detaching source topology", async () => {
+test("large base and startup-bundle geometry use whole-message transfers without detaching source topology", async () => {
   const baseTopology = makeTopology("base-large");
   const runtimeTopology = makeTopology("runtime-large", 9_000);
   const startupBundle = {
@@ -237,12 +237,13 @@ test("large base and startup-bundle geometry use field-specific transfers withou
   } });
   await flushWorker();
 
-  const baseReply = posted[0];
+  const baseWire = posted[0];
+  const baseReply = { ...baseWire, ...globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(structuredClone(baseWire.geometryTransport.payload)), metrics: baseWire.metrics };
   assert.equal(baseReply.type, "BASE_STARTUP_READY");
   assert.equal(baseReply.taskId, "large-base-transfer");
-  assert.equal(baseReply.decodedCollections, null);
-  assert.equal(baseReply.geometryTransport.field, "decodedCollections");
-  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v1");
+  assert.equal(baseWire.decodedCollections, undefined);
+  assert.equal(baseReply.geometryTransport.field, "message");
+  assert.equal(baseReply.geometryTransport.payload.encoding, "geo-f64-v2");
   assert.equal(transferLists[0].length, 2);
   assert.equal(transferLists[0][0], baseReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(transferLists[0][1], baseReply.geometryTransport.payload.lengths.buffer);
@@ -260,12 +261,13 @@ test("large base and startup-bundle geometry use field-specific transfers withou
   } });
   await flushWorker();
 
-  const bundleReply = posted[1];
+  const bundleWire = posted[1];
+  const bundleReply = { ...bundleWire, ...globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(structuredClone(bundleWire.geometryTransport.payload)), metrics: bundleWire.metrics };
   assert.equal(bundleReply.type, "STARTUP_BUNDLE_READY");
   assert.equal(bundleReply.taskId, "large-bundle-transfer");
-  assert.equal(bundleReply.baseDecodedCollections, null);
-  assert.equal(bundleReply.geometryTransport.field, "baseDecodedCollections");
-  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v1");
+  assert.equal(bundleWire.baseDecodedCollections, undefined);
+  assert.equal(bundleReply.geometryTransport.field, "message");
+  assert.equal(bundleReply.geometryTransport.payload.encoding, "geo-f64-v2");
   assert.equal(transferLists[1].length, 2);
   assert.equal(transferLists[1][0], bundleReply.geometryTransport.payload.coordinates.buffer);
   assert.equal(typeof bundleReply.metrics.geometryPackingMs, "number");
@@ -359,12 +361,12 @@ test("large worker replies cross a real structured transfer and restore through 
         String(url).includes("base-only") ? topologyOnly : startupBundle,
       ) }),
       onPostMessage(message, transferables) {
-        assert.equal(transferables.length, (message.geometryTransport ? 2 : 0) + (message.topologyTransport ? 3 : 0));
+        assert.equal(transferables.length, message.geometryTransport ? 2 : 0);
         assert.ok(transferables.every((buffer) => buffer.byteLength > 0));
         const transferredMessage = structuredClone(message, { transfer: transferables });
         assert.ok(transferables.every((buffer) => buffer.byteLength === 0));
         if (corruptNextTopology) {
-          transferredMessage.topologyTransport.encoding = "unsupported";
+          transferredMessage.geometryTransport.payload.encoding = "unsupported";
           corruptNextTopology = false;
         }
         FakeWorker.instance.onmessage({ data: transferredMessage });
@@ -381,7 +383,7 @@ test("large worker replies cross a real structured transfer and restore through 
       needLocales: false,
       needGeoAliases: false,
     });
-    assert.equal(workerHarness.posted[0].geometryTransport.field, "decodedCollections");
+    assert.equal(workerHarness.posted[0].geometryTransport.field, "message");
     assert.equal(workerHarness.posted[0].topologyTransport, undefined, "cached raw topology must not be retransmitted");
     assert.deepEqual(baseResult.decodedCollections.landData, decodeFixtureFeatureCollection(baseTopology, baseTopology.objects.political));
     assert.equal(baseResult.decodedCollections.landData.features[0].geometry.coordinates[0].length, 10_000);
@@ -393,9 +395,9 @@ test("large worker replies cross a real structured transfer and restore through 
       startupBundleUrl: "/startup-bundle.json",
       scenarioId: "client-transfer-fixture",
     });
-    assert.equal(workerHarness.posted[1].geometryTransport.field, "baseDecodedCollections");
-    assert.equal(workerHarness.transferLists[1].length, 5, "both transfer formats share one postMessage");
-    assert.equal(workerHarness.posted[1].topologyTransport.encoding, "topology-f64-v1");
+    assert.equal(workerHarness.posted[1].geometryTransport.field, "message");
+    assert.equal(workerHarness.transferLists[1].length, 2, "all startup geometries and arcs share one transport");
+    assert.equal(workerHarness.posted[1].geometryTransport.payload.encoding, "geo-f64-v2");
     assert.deepEqual(bundleResult.baseDecodedCollections.landData, decodeFixtureFeatureCollection(baseTopology, baseTopology.objects.political));
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0].length, 10_000);
     assert.equal(bundleResult.baseDecodedCollections.landData.features[0].geometry.coordinates[0][1][0], 1.123456789012345);
@@ -405,20 +407,19 @@ test("large worker replies cross a real structured transfer and restore through 
     assert.equal(bundleResult.payload.base.topology_primary.objects.political.geometries[0].coordinates[0].length, 10_000);
     assert.equal(bundleResult.payload.scenario.runtime_topology_bootstrap.objects.political.geometries[0].coordinates[0].length, 9_000);
     assert.deepEqual(bundleResult.payload.base.topology_primary, sourceSnapshot);
-    assert.equal(typeof bundleResult.metrics.topologyUnpackingMs, "number");
-    assert.equal(typeof bundleResult.metrics.topologyPackingMs, "number");
+    assert.equal(typeof bundleResult.metrics.geometryPackingMs, "number");
 
     const loadTopologyOnly = () => startupWorkerClient.loadBaseStartupViaWorker({
       topologyUrl: "/base-only.json", needLocales: false, needGeoAliases: false,
     });
     const topologyResult = await loadTopologyOnly();
-    assert.equal(workerHarness.posted[2].geometryTransport, undefined);
-    assert.equal(workerHarness.transferLists[2].length, 3);
+    assert.equal(workerHarness.posted[2].geometryTransport.payload.encoding, "geo-f64-v2");
+    assert.equal(workerHarness.transferLists[2].length, 2);
     assert.deepEqual(topologyResult.topologyPrimary, topologyOnly);
-    assert.equal(typeof topologyResult.metrics.topologyUnpackingMs, "number");
+    assert.equal(typeof topologyResult.metrics.geometryUnpackingMs, "number");
 
     corruptNextTopology = true;
-    await assert.rejects(loadTopologyOnly(), /Unsupported topology transport encoding/);
+    await assert.rejects(loadTopologyOnly(), /Unsupported geometry transport encoding/);
     assert.deepEqual((await loadTopologyOnly()).topologyPrimary, topologyOnly, "a failed response must not poison later tasks");
     assert.deepEqual(baseTopology, sourceSnapshot, "transfer must only detach newly allocated buffers");
   } finally {

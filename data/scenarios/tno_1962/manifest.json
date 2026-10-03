@@ -170,17 +170,18 @@
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "eca5e2432cfa56d2bfbdfbafc0f5b7a7820232483fdbe183a71992e0a152733e",
+  "snapshot_fingerprint": "47a9197019069a9c4d9a5837b668701ee867fb2e79b8b64484bd8ffdc0458eeb",
   "source": {
-    "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "detail_chunk_manifest_sha256": "78e88a2f8fa7ff2399096676e8ed0225b8768119e158bbab39f033ce633eb8dd",
+    "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
+    "detail_chunk_manifest_sha256": "e21a24da0ed06e16f02cf34ee0760690b440bdf600d4aa9b5435c280fe1922b2",
     "runtime_bootstrap_topology_sha256": "72b6f9a87da4ca496648b9815c13124ee025948be99c4f2fee767717508355b5",
-    "runtime_topology_sha256": "6f27fce49c16e0b1f5d81de834dddd7693e787ff57d3de8f344dd288a4e34776"
+    "runtime_topology_sha256": "b208b54c86c8028fe4c5c73a35d6af418c15559f9a8ef6886ea5521084f402a6"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",
   "startup_bundle_url_en": "data/scenarios/tno_1962/startup.bundle.en.json",
   "startup_bundle_url_zh": "data/scenarios/tno_1962/startup.bundle.zh.json",
+  "startup_bundle_version": 6,
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
   "style_defaults": {
     "atlantropa_salt_flat": {
@@ -238,11 +239,11 @@
     "synthetic_owner_feature_count": 492,
     "tno_bathymetry_band_count": 94,
     "tno_bathymetry_contour_count": 77,
-    "tno_named_marginal_water_count": 130,
+    "tno_named_marginal_water_count": 249,
     "tno_reichskommissariat_count": 8,
     "tno_relief_overlay_count": 25,
     "tno_special_region_count": 0,
-    "tno_water_region_count": 166,
+    "tno_water_region_count": 285,
     "topology_blocker_count": 0
   },
   "version": 2,

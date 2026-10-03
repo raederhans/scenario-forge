@@ -1,5 +1,7 @@
 # 当前上下文
 
+2026-10-03 进入用户授权的审核合并阶段，root 为唯一 integration/CI owner。命令在当前隔离工作树执行；本地输出 `.runtime/tmp/performance-merge/`。不启动其他工作树测试或服务。CI 由本次 PR 启动，只跟踪该 PR 最终 head；全部 required checks 成功后正常合并，不绕过保护。工作树保留性能证据，不清理。后面的测量记录是原始阶段历史。
+
 - 工作区：C:/Users/raede/.codex/worktrees/performance-round-20261002/mapcreator，codex/performance-round-20261002。
 - 保留前两轮未提交修改；第二轮 JS 快照 `.runtime/tmp/performance-round3/baseline/js`，数据未改变。
 - round3_tail_profile 分析单次 exact CPU；round2_shared_base_design 转向政治背景/cache 结构；round2_exact_render 转向 bootstrap→full runtime 复用。

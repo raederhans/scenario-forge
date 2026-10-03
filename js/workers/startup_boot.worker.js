@@ -3,8 +3,8 @@
 importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
+  new URL("../core/startup_topology_codec_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
-  new URL("../core/topology_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
 
@@ -368,48 +368,27 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
 }
 
 function postWorkerMessage(type, payload) {
-  let message = { type, ...payload };
-  const transferables = [];
-  const field = type === MESSAGE_TYPES.BASE_STARTUP_READY
-    ? "decodedCollections"
-    : type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
-      ? "baseDecodedCollections"
-      : type === MESSAGE_TYPES.RUNTIME_CHUNK_READY
-        ? (payload.chunkPayload ? "chunkPayload" : "decodedCollections")
-        : null;
-  if (field && payload[field]) {
+  const startupReady = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+    || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY;
+  if (startupReady || type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
+    const field = startupReady ? "message" : (payload.chunkPayload ? "chunkPayload" : "decodedCollections");
     const startedAt = nowMs();
-    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(payload[field]);
-    if (transport.transferables.length) {
-      message = { ...message, [field]: null,
-        geometryTransport: { field, payload: transport.payload },
-        metrics: { ...message.metrics, geometryPackingMs: nowMs() - startedAt },
-      };
-      transferables.push(...transport.transferables);
-    }
-  }
-  const topology = type === MESSAGE_TYPES.BASE_STARTUP_READY
-    ? payload.topologyPrimary
-    : type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
-      ? payload.payload?.base?.topology_primary
-      : null;
-  if (topology?.arcs?.length) {
-    const startedAt = nowMs();
-    const packed = globalThis.__scenarioForgeTopologyTransferCodecShared.packTopologyForTransfer(topology, {
-      minCoordinateCount: 16_384,
+    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
+      includeTopologyArcs: startupReady,
     });
-    if (packed) {
-      if (type === MESSAGE_TYPES.BASE_STARTUP_READY) {
-        message.topologyPrimary = packed.topology;
-      } else {
-        message.payload = { ...payload.payload, base: { ...payload.payload.base, topology_primary: packed.topology } };
-      }
-      message.topologyTransport = { encoding: "topology-f64-v1", arcs: packed.topologyArcs };
-      message.metrics = { ...message.metrics, topologyPackingMs: nowMs() - startedAt };
-      transferables.push(...packed.transfer);
+    if (transport.transferables.length) {
+      self.postMessage({ type, ...(startupReady ? { taskId: payload.taskId } : { ...payload, [field]: null }),
+        geometryTransport: { field, payload: transport.payload },
+        metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
+      }, transport.transferables);
+      return;
     }
   }
-  self.postMessage(message, transferables);
+  self.postMessage({
+    type,
+    ...payload,
+  });
 }
 
 function countObjectKeys(value) {
@@ -494,7 +473,18 @@ async function handleLoadStartupBundle(message) {
       `[startup_worker] Startup bundle scenario mismatch. Expected "${expectedScenarioId}" but received "${scenarioId}".`
     );
   }
-  const topologyPrimary = payload.base?.topology_primary || null;
+  let topologyPrimary = payload.base?.topology_primary || null;
+  if (topologyPrimary && Object.hasOwn(topologyPrimary, "arcs_encoding")) {
+    const startupTopologyCodec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+    if (typeof startupTopologyCodec?.decodeTopology !== "function") {
+      throw new Error("[startup_worker] Startup topology codec failed to initialize.");
+    }
+    topologyPrimary = startupTopologyCodec.decodeTopology(topologyPrimary);
+    if (!payload.base || typeof payload.base !== "object") {
+      throw new Error("[startup_worker] Startup bundle base section is missing.");
+    }
+    payload.base.topology_primary = topologyPrimary;
+  }
   const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
   const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();

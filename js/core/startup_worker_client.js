@@ -1,6 +1,5 @@
 import { createWorkerTaskClient } from "./worker_task_client.js";
 import "./geometry_transfer_codec_shared.js";
-import { unpackTopologyFromTransfer } from "./topology_transfer_codec.js";
 
 const STARTUP_WORKER_URL = new URL("../workers/startup_boot.worker.js", import.meta.url);
 const STARTUP_WORKER_TIMEOUT_MS = 20_000;
@@ -29,31 +28,12 @@ const startupWorkerTaskClient = createWorkerTaskClient({
   createTaskId: (type) => `${type}:${Date.now()}:${++taskCounter}`,
   resolveTimeoutMs: resolveTaskTimeoutMs,
   resolveMessage: (message) => {
-    if (message.geometryTransport) {
-      const startedAt = performance.now();
-      const { field, payload } = message.geometryTransport;
-      const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
-      message = { ...message, [field]: value, geometryTransport: undefined,
-        metrics: { ...message.metrics, geometryUnpackingMs: performance.now() - startedAt } };
-    }
-    if (message.topologyTransport) {
-      const startedAt = performance.now();
-      if (message.topologyTransport.encoding !== "topology-f64-v1") {
-        throw new Error("Unsupported topology transport encoding.");
-      }
-      if (message.type === MESSAGE_TYPES.BASE_STARTUP_READY) {
-        message = { ...message, topologyPrimary: unpackTopologyFromTransfer(message.topologyPrimary, message.topologyTransport.arcs) };
-      } else if (message.type === MESSAGE_TYPES.STARTUP_BUNDLE_READY) {
-        message = { ...message, payload: { ...message.payload, base: { ...message.payload.base,
-          topology_primary: unpackTopologyFromTransfer(message.payload.base.topology_primary, message.topologyTransport.arcs),
-        } } };
-      } else {
-        throw new Error("Unexpected topology transport response.");
-      }
-      message = { ...message, topologyTransport: undefined,
-        metrics: { ...message.metrics, topologyUnpackingMs: performance.now() - startedAt } };
-    }
-    return message;
+    if (!message.geometryTransport) return message;
+    const startedAt = performance.now();
+    const { field, payload } = message.geometryTransport;
+    const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
+    return { ...message, ...(field === "message" ? value : { [field]: value }), geometryTransport: undefined,
+      metrics: { ...message.metrics, geometryUnpackingMs: performance.now() - startedAt } };
   },
   createMessageError: (message) => {
     const error = new Error(message.message || `Startup worker failed during ${message.stage || "unknown"}.`);

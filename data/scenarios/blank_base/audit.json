@@ -20,7 +20,7 @@
   "scenario_id": "blank_base",
   "snapshot_fingerprint": "f3b3ed6ddfa71c96db4c59e9af33afc2aec66f7efcb5ba642c0768e2b1d8e1f9",
   "source": {
-    "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
+    "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "build_snapshot_sha256": "b91dac38d5ddb5ca1a747bad594bcf70489a483fb78e833016f77b48d199b812",
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
     "runtime_topology_sha256": "acd7ba81f35385fb5c1b461fc223bdbdc1fa540ecc0b17427eda711b5c11ca8f"

@@ -1,0 +1,1200 @@
+[
+  {
+    "slug": "frobisher_bay",
+    "name": "Frobisher Bay",
+    "nameZh": "弗罗比舍湾",
+    "recordId": "23370",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=23370",
+    "sourceRecordId": "mrgid:23370",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -65.44292808315262,
+      62.25648532647058
+    ],
+    "land": [
+      -65.21527794693903,
+      61.92221566156612
+    ]
+  },
+  {
+    "slug": "repulse_bay",
+    "name": "Repulse Bay",
+    "nameZh": "里帕尔斯湾",
+    "recordId": "17823",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=17823",
+    "sourceRecordId": "mrgid:17823",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean",
+      "tno_western_arctic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -85.75920613664185,
+      66.33689410838402
+    ],
+    "land": [
+      -85.77963742886152,
+      66.50833912391236
+    ]
+  },
+  {
+    "slug": "vestfjorden",
+    "name": "Vestfjorden",
+    "nameZh": "韦斯特峡湾",
+    "recordId": "18664",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18664",
+    "sourceRecordId": "mrgid:18664",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      13.193480541825306,
+      67.53837886428552
+    ],
+    "land": [
+      13.010030713661756,
+      67.8960835980256
+    ]
+  },
+  {
+    "slug": "varangerfjorden",
+    "name": "Varangerfjorden",
+    "nameZh": "瓦朗厄尔峡湾",
+    "recordId": "32695",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32695",
+    "sourceRecordId": "mrgid:32695",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_eastern_arctic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      30.780049401180083,
+      70.03192424893301
+    ],
+    "land": [
+      30.83850106079715,
+      69.80400269099815
+    ]
+  },
+  {
+    "slug": "romsdalsfjord",
+    "name": "Romsdalsfjord",
+    "nameZh": "鲁姆斯达尔峡湾",
+    "recordId": "32914",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32914",
+    "sourceRecordId": "mrgid:32914",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      7.3673845867855485,
+      62.63131066143255
+    ],
+    "land": [
+      7.3441614848367305,
+      62.55563279063772
+    ]
+  },
+  {
+    "slug": "storfjorden_svalbard",
+    "name": "Storfjorden",
+    "nameZh": "斯托尔峡湾",
+    "recordId": "33048",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33048",
+    "sourceRecordId": "mrgid:33048",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_eastern_arctic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      19.784047228621745,
+      77.76022905027631
+    ],
+    "land": [
+      19.645330173762456,
+      78.52043597832363
+    ]
+  },
+  {
+    "slug": "strangford_lough",
+    "name": "Strangford Lough",
+    "nameZh": "斯特兰福德湾",
+    "recordId": "7932",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=7932",
+    "sourceRecordId": "mrgid:7932",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -5.58635388295024,
+      54.489371337008464
+    ],
+    "land": [
+      -5.552556255625566,
+      54.489371337008464
+    ]
+  },
+  {
+    "slug": "cape_cod_bay",
+    "name": "Cape Cod Bay",
+    "nameZh": "科德角湾",
+    "recordId": "17487",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=17487",
+    "sourceRecordId": "mrgid:17487",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "massachusetts_bay",
+    "point": [
+      -70.32317131708467,
+      41.91135652861138
+    ],
+    "land": [
+      -70.3564987517903,
+      41.75009428331278
+    ]
+  },
+  {
+    "slug": "massachusetts_bay",
+    "name": "Massachusetts Bay",
+    "nameZh": "马萨诸塞湾",
+    "recordId": "18882",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18882",
+    "sourceRecordId": "mrgid:18882",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -70.78336025648508,
+      42.404038811494516
+    ],
+    "land": [
+      -70.88084367585768,
+      42.494488838883875
+    ]
+  },
+  {
+    "slug": "new_york_bight",
+    "name": "New York Bight",
+    "nameZh": "纽约湾曲",
+    "recordId": "24648",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=24648",
+    "sourceRecordId": "mrgid:24648",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -73.64234672750057,
+      40.22393128639676
+    ],
+    "land": [
+      -73.67644118243294,
+      40.57744623821531
+    ]
+  },
+  {
+    "slug": "rhode_island_sound",
+    "name": "Rhode Island Sound",
+    "nameZh": "罗得岛湾",
+    "recordId": "18947",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18947",
+    "sourceRecordId": "mrgid:18947",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -71.41431735810302,
+      41.27936692115967
+    ],
+    "land": [
+      -71.4908515551624,
+      41.36795362763601
+    ]
+  },
+  {
+    "slug": "gaspe_bay",
+    "name": "Gaspe Bay",
+    "nameZh": "加斯佩湾",
+    "recordId": "24627",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=24627",
+    "sourceRecordId": "mrgid:24627",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "gulf_of_st_lawrence",
+    "point": [
+      -64.21080650957741,
+      48.717662403608074
+    ],
+    "land": [
+      -64.23492880100073,
+      48.66763907455242
+    ]
+  },
+  {
+    "slug": "bay_of_campeche",
+    "name": "Bay of Campeche",
+    "nameZh": "坎佩切湾",
+    "recordId": "18005",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18005",
+    "sourceRecordId": "mrgid:18005",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean",
+      "tno_west_central_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "gulf_of_mexico",
+    "point": [
+      -94.6761900854584,
+      22.040370683268453
+    ],
+    "land": [
+      -97.3115047357882,
+      21.563217925627985
+    ]
+  },
+  {
+    "slug": "gulf_of_honduras",
+    "name": "Gulf of Honduras",
+    "nameZh": "洪都拉斯湾",
+    "recordId": "19265",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19265",
+    "sourceRecordId": "mrgid:19265",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_west_central_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "caribbean_sea",
+    "point": [
+      -87.7063447311912,
+      16.313996259451475
+    ],
+    "land": [
+      -87.72315884662473,
+      15.913367543638211
+    ]
+  },
+  {
+    "slug": "gulf_of_venezuela",
+    "name": "Gulf of Venezuela",
+    "nameZh": "委内瑞拉湾",
+    "recordId": "17610",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=17610",
+    "sourceRecordId": "mrgid:17610",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_west_central_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -70.75521980412947,
+      11.718401879271376
+    ],
+    "land": [
+      -70.64153843162785,
+      11.246910957919813
+    ]
+  },
+  {
+    "slug": "gulf_of_paria",
+    "name": "Gulf of Paria",
+    "nameZh": "帕里亚湾",
+    "recordId": "19269",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19269",
+    "sourceRecordId": "mrgid:19269",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_west_central_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "caribbean_sea",
+    "point": [
+      -62.0950586405177,
+      10.326322249858155
+    ],
+    "land": [
+      -62.11443182199605,
+      10.647721577953314
+    ]
+  },
+  {
+    "slug": "gulf_of_uraba",
+    "name": "Gulf of Uraba",
+    "nameZh": "乌拉巴湾",
+    "recordId": "21433",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=21433",
+    "sourceRecordId": "mrgid:21433",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_west_central_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -76.9584733231931,
+      8.39341636208822
+    ],
+    "land": [
+      -76.88232394071274,
+      8.506212019798435
+    ]
+  },
+  {
+    "slug": "gulf_of_batabano",
+    "name": "Gulf of Batabano",
+    "nameZh": "巴塔瓦诺湾",
+    "recordId": "8901",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=8901",
+    "sourceRecordId": "mrgid:8901",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_northwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "caribbean_sea",
+    "point": [
+      -82.2589158390509,
+      21.998093615947866
+    ],
+    "land": [
+      -82.08223899092843,
+      22.36447523181705
+    ]
+  },
+  {
+    "slug": "bay_of_ilha_grande",
+    "name": "Bay of Ilha Grande",
+    "nameZh": "大岛湾",
+    "recordId": "19521",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19521",
+    "sourceRecordId": "mrgid:19521",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -44.47665688223969,
+      -23.15337775374734
+    ],
+    "land": [
+      -44.36124327872708,
+      -23.161131334934186
+    ]
+  },
+  {
+    "slug": "guanabara_bay",
+    "name": "Guanabara Bay",
+    "nameZh": "瓜纳巴拉湾",
+    "recordId": "19046",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19046",
+    "sourceRecordId": "mrgid:19046",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_atlantic_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -43.07951739871873,
+      -22.72277975454224
+    ],
+    "land": [
+      -43.032304230423044,
+      -22.72277975454224
+    ]
+  },
+  {
+    "slug": "garretts_bight",
+    "name": "Garretts Bight",
+    "nameZh": "加勒特湾",
+    "recordId": "32374",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32374",
+    "sourceRecordId": "mrgid:32374",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      147.12126942687016,
+      -43.338646048881834
+    ],
+    "land": [
+      147.17471647164717,
+      -43.37910862044665
+    ]
+  },
+  {
+    "slug": "mida_creek",
+    "name": "Mida Creek",
+    "nameZh": "米达溪",
+    "recordId": "15203",
+    "waterType": "estuary",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=15203",
+    "sourceRecordId": "mrgid:15203",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_western_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      39.968932245250215,
+      -3.3688986850485776
+    ],
+    "land": [
+      39.953024087779696,
+      -3.3630770329910398
+    ]
+  },
+  {
+    "slug": "gharo_creek",
+    "name": "Gharo Creek",
+    "nameZh": "加罗溪",
+    "recordId": "22585",
+    "waterType": "estuary",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=22585",
+    "sourceRecordId": "mrgid:22585",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_western_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      67.25611666007677,
+      24.742826121042498
+    ],
+    "land": [
+      67.26092475331791,
+      24.757782214523257
+    ]
+  },
+  {
+    "slug": "tudor_creek",
+    "name": "Tudor Creek",
+    "nameZh": "都铎溪",
+    "recordId": "20572",
+    "waterType": "estuary",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=20572",
+    "sourceRecordId": "mrgid:20572",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_western_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      39.654764812705075,
+      -4.0265282655761725
+    ],
+    "land": [
+      39.672773006533525,
+      -4.007856121421843
+    ]
+  },
+  {
+    "slug": "korangi_creek",
+    "name": "Korangi Creek",
+    "nameZh": "科兰吉溪",
+    "recordId": "22486",
+    "waterType": "estuary",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=22486",
+    "sourceRecordId": "mrgid:22486",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_western_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      67.10404572022459,
+      24.782825375524553
+    ],
+    "land": [
+      67.11144366378706,
+      24.80583747823068
+    ]
+  },
+  {
+    "slug": "khawr_al_hajar",
+    "name": "Khawr al Hajar",
+    "nameZh": "哈贾尔湾",
+    "recordId": "21149",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=21149",
+    "sourceRecordId": "mrgid:21149",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_western_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      59.74649175978919,
+      22.534964407538112
+    ],
+    "land": [
+      59.75797479747974,
+      22.528549744974473
+    ]
+  },
+  {
+    "slug": "minnie_bay",
+    "name": "Minnie Bay",
+    "nameZh": "米妮湾",
+    "recordId": "22477",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=22477",
+    "sourceRecordId": "mrgid:22477",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_eastern_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      92.70650112382732,
+      11.653672826891526
+    ],
+    "land": [
+      92.71792990333766,
+      11.64774775132431
+    ]
+  },
+  {
+    "slug": "ao_tang_khen",
+    "name": "Ao Tang Khen",
+    "nameZh": "唐肯湾",
+    "recordId": "32987",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32987",
+    "sourceRecordId": "mrgid:32987",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_eastern_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      98.41075739213494,
+      7.812928314150001
+    ],
+    "land": [
+      98.40744835634473,
+      7.828150133827596
+    ]
+  },
+  {
+    "slug": "trou_aux_biches",
+    "name": "Trou-aux-Biches",
+    "nameZh": "特鲁欧比什湾",
+    "recordId": "20571",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=20571",
+    "sourceRecordId": "mrgid:20571",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southern_indian_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      57.53561505490233,
+      -20.038653566660155
+    ],
+    "land": [
+      57.54681728071606,
+      -20.047588370161105
+    ]
+  },
+  {
+    "slug": "ahipara_bay",
+    "name": "Ahipara Bay",
+    "nameZh": "阿希帕拉湾",
+    "recordId": "32666",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32666",
+    "sourceRecordId": "mrgid:32666",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      173.135044767235,
+      -35.097106547836496
+    ],
+    "land": [
+      173.17360262092373,
+      -35.137086004367035
+    ]
+  },
+  {
+    "slug": "bootless_inlet",
+    "name": "Bootless Inlet",
+    "nameZh": "布特利斯湾",
+    "recordId": "19885",
+    "waterType": "inlet",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19885",
+    "sourceRecordId": "mrgid:19885",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.0005,
+    "oceanClipIds": [
+      "tno_west_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      147.24748515289988,
+      -9.533774002855562
+    ],
+    "land": [
+      147.2504431100187,
+      -9.521505942604572
+    ]
+  },
+  {
+    "slug": "gulf_of_fonseca",
+    "name": "Gulf of Fonseca",
+    "nameZh": "丰塞卡湾",
+    "recordId": "21633",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=21633",
+    "sourceRecordId": "mrgid:21633",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_east_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -87.56057215935878,
+      13.176892094905618
+    ],
+    "land": [
+      -87.46723723911762,
+      13.215602541982747
+    ]
+  },
+  {
+    "slug": "hauraki_gulf",
+    "name": "Hauraki Gulf",
+    "nameZh": "豪拉基湾",
+    "recordId": "16473",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=16473",
+    "sourceRecordId": "mrgid:16473",
+    "sourceFeatureCount": 5,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      175.1180258906008,
+      -36.52963974893091
+    ],
+    "land": [
+      175.16551755175522,
+      -36.753821978883934
+    ]
+  },
+  {
+    "slug": "kaimana_bay",
+    "name": "Kaimana Bay",
+    "nameZh": "凯马纳湾",
+    "recordId": "33867",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33867",
+    "sourceRecordId": "mrgid:33867",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_west_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      133.75047599659698,
+      -3.681612643495532
+    ],
+    "land": [
+      133.74440911504368,
+      -3.6564503894661575
+    ]
+  },
+  {
+    "slug": "magdalena_bay",
+    "name": "Magdalena Bay",
+    "nameZh": "马格达莱纳湾",
+    "recordId": "18526",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18526",
+    "sourceRecordId": "mrgid:18526",
+    "sourceFeatureCount": 15,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -111.97652312437205,
+      24.6300610375076
+    ],
+    "land": [
+      -111.96022464473141,
+      24.5077819681968
+    ]
+  },
+  {
+    "slug": "matsushima_bay",
+    "name": "Matsushima-wan",
+    "nameZh": "松岛湾",
+    "recordId": "32777",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32777",
+    "sourceRecordId": "mrgid:32777",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      141.0937937377557,
+      38.31566701651891
+    ],
+    "land": [
+      141.05966364697744,
+      38.29296078607859
+    ]
+  },
+  {
+    "slug": "orokolo_bay",
+    "name": "Orokolo Bay",
+    "nameZh": "奥罗科洛湾",
+    "recordId": "33865",
+    "waterType": "gulf",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33865",
+    "sourceRecordId": "mrgid:33865",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_west_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      145.26030640585043,
+      -7.883609459762766
+    ],
+    "land": [
+      145.27872955989875,
+      -7.850180253312186
+    ]
+  },
+  {
+    "slug": "pegasus_bay",
+    "name": "Pegasus Bay",
+    "nameZh": "佩加瑟斯湾",
+    "recordId": "32406",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32406",
+    "sourceRecordId": "mrgid:32406",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_southwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      172.97221723007817,
+      -43.391048215731175
+    ],
+    "land": [
+      172.74492258731482,
+      -43.323712545002365
+    ]
+  },
+  {
+    "slug": "saint_vincent_bay",
+    "name": "Baie de Saint-Vincent",
+    "nameZh": "圣文森特湾",
+    "recordId": "32395",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32395",
+    "sourceRecordId": "mrgid:32395",
+    "sourceFeatureCount": 4,
+    "sourceSimplifyDegrees": 0.004,
+    "oceanClipIds": [
+      "tno_southwest_pacific_ocean"
+    ],
+    "regionGroup": "marine_detail",
+    "parentSlug": "coral_sea",
+    "point": [
+      166.08675933288137,
+      -22.019070559849393
+    ],
+    "land": [
+      166.12738415507405,
+      -22.038898649865
+    ]
+  },
+  {
+    "slug": "san_diego_bay",
+    "name": "San Diego Bay",
+    "nameZh": "圣迭戈湾",
+    "recordId": "19179",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19179",
+    "sourceRecordId": "mrgid:19179",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -117.13559971948779,
+      32.668598956008026
+    ],
+    "land": [
+      -117.1137409511807,
+      32.6988185384014
+    ]
+  },
+  {
+    "slug": "santa_monica_bay",
+    "name": "Santa Monica Bay",
+    "nameZh": "圣莫尼卡湾",
+    "recordId": "32749",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32749",
+    "sourceRecordId": "mrgid:32749",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -118.5756089871514,
+      33.95078517161004
+    ],
+    "land": [
+      -118.58732427148927,
+      34.0358157060627
+    ]
+  },
+  {
+    "slug": "sebastian_vizcaino_bay",
+    "name": "Bahía Sebastián Vizcaíno",
+    "nameZh": "塞瓦斯蒂安比斯凯诺湾",
+    "recordId": "32393",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=32393",
+    "sourceRecordId": "mrgid:32393",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -114.65271547303036,
+      28.316619963147463
+    ],
+    "land": [
+      -114.71541424202643,
+      27.796536510405133
+    ]
+  },
+  {
+    "slug": "tenacatita_bay",
+    "name": "Bahia Tenacatita",
+    "nameZh": "特纳卡蒂塔湾",
+    "recordId": "21526",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=21526",
+    "sourceRecordId": "mrgid:21526",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_east_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -104.82579065696287,
+      19.267135696591016
+    ],
+    "land": [
+      -104.83032055125014,
+      19.295317147748786
+    ]
+  },
+  {
+    "slug": "todos_santos_bay",
+    "name": "Todos os Santos Bay",
+    "nameZh": "托多斯桑托斯湾",
+    "recordId": "18585",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=18585",
+    "sourceRecordId": "mrgid:18585",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -116.68997934115738,
+      31.80732836844052
+    ],
+    "land": [
+      -116.70065961977782,
+      31.7408840474023
+    ]
+  },
+  {
+    "slug": "tomales_bay",
+    "name": "Tomales Bay",
+    "nameZh": "托马利斯湾",
+    "recordId": "19238",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=19238",
+    "sourceRecordId": "mrgid:19238",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_northeast_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      -122.93359760628614,
+      38.20197174132648
+    ],
+    "land": [
+      -122.91769625707597,
+      38.215711425954176
+    ]
+  },
+  {
+    "slug": "wandamen_bay",
+    "name": "Teluk Wandamen",
+    "nameZh": "旺达门湾",
+    "recordId": "33449",
+    "waterType": "bay",
+    "sourceLayer": "world_bay_gulf",
+    "sourceStandard": "marine_regions_world_bay_gulf",
+    "sourceQuery": "mrgid=33449",
+    "sourceRecordId": "mrgid:33449",
+    "sourceFeatureCount": 1,
+    "sourceSimplifyDegrees": 0.005,
+    "oceanClipIds": [
+      "tno_west_central_pacific_ocean"
+    ],
+    "regionGroup": "marine_macro",
+    "parentSlug": "",
+    "point": [
+      134.44922748668438,
+      -2.682152744917707
+    ],
+    "land": [
+      134.39445457064517,
+      -2.699190452204412
+    ]
+  }
+]

@@ -213,6 +213,9 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["geometry-raster-runtime", "renderer-runtime", "js/core/renderer/geometry_raster_runtime_owner.js", "tests/geometry_raster_runtime_owner_behavior.test.mjs"],
     ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],
     ["geometry-transfer-codec", "renderer-runtime", "js/core/geometry_transfer_codec_shared.js", "tests/geometry_transfer_codec_behavior.test.mjs", ["js/core/startup_worker_client.js", "js/workers/startup_boot.worker.js", "js/core/geometry_raster_worker_client.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
+    ["startup-worker-transfer", "startup", "js/core/startup_worker_client.js", "tests/startup_worker_transfer_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "js/core/geometry_transfer_codec_shared.js"]],
+    ["startup-topology-codec", "startup", "js/core/startup_topology_codec_shared.js", "tests/startup_topology_codec_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "tools/startup_topology_codec.py", "tools/build_startup_bundle.py"]],
+    ["startup-scenario-boot-recovery", "startup", "js/bootstrap/startup_scenario_boot.js", "tests/startup_scenario_boot_recovery_behavior.test.mjs"],
     ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
     ["geometry-cache-budget", "renderer-runtime", "js/core/renderer/geometry_cache_budget.js", "tests/geometry_cache_budget_behavior.test.mjs", ["js/core/renderer/political_path_cache_owner.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
@@ -480,7 +483,24 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 12,
   };
 
-  return [physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
+  const startupTopologyCodecRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:startup-topology-codec",
+    commandRef: "python -m unittest tests.test_startup_topology_codec -q",
+    sourceRefs: ["tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/test_startup_topology_codec.py"],
+    ownerHints: ["startup"], domains: ["startup"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 13,
+  };
+  const marineSyncRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:sync-marine-refinement",
+    commandRef: "python -m unittest tests.test_sync_marine_refinement -q",
+    sourceRefs: ["tools/sync_marine_refinement.py", "tests/test_sync_marine_refinement.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 14,
+  };
+
+  return [marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,
