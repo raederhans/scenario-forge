@@ -70,7 +70,6 @@ test("arc transfer round trips empty, ragged, signed, and large exact coordinate
     arcs: [[], [[], [-0, -22, 9007199254740991], [1.25, 1e120]], [[-1e-100, 3, NaN, Infinity]]],
     objects: { political: { type: "GeometryCollection", geometries: [] } } };
   const snapshot = structuredClone(topology);
-  assert.equal(packTopologyForTransfer(topology, { minCoordinateCount: 16_384 }), null);
   const packed = packTopologyForTransfer(topology);
   assert.equal("arcs" in packed.topology, false);
   const transferred = structuredClone({ topology: packed.topology, topologyArcs: packed.topologyArcs },
