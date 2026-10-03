@@ -24,18 +24,20 @@ export function createDeferredPoliticalBackgroundBuildState(identity, transform,
     processedCount: 0,
     builtPathCount: 0,
     reusedPathCount: 0,
+    reusedPreviousPathCount: 0,
     pathlessEntryCount: 0,
   };
 }
 
 export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
-  transform, pathCacheHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
+  transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
   getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
   resolvePoliticalBackgroundEntryMeta, Path2D, withinBudget,
 }) {
   let processedCount = 0;
   let builtCount = 0;
   let reusedCount = 0;
+  let reusedPreviousCount = 0;
   let pathlessCount = 0;
   while (deferredState.stage !== "ready" && withinBudget(processedCount)) {
     if (deferredState.stage === "paths") {
@@ -51,19 +53,21 @@ export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
         pathlessCount += 1;
         continue;
       }
-      const cachedEntry = pathCacheHandle?.valid ? pathCacheHandle.map?.get(featureId) : null;
+      const retainedPath = retainedPathHandle?.getPath(entry.feature, featureId) || null;
+      const cachedEntry = !retainedPath && pathCacheHandle?.valid ? pathCacheHandle.map?.get(featureId) : null;
       const hadCachedPath = isPoliticalFeaturePathEntryCurrent(cachedEntry, entry.feature);
-      const pathEntry = hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(entry.feature, {
+      const pathEntry = retainedPath ? null : hadCachedPath ? cachedEntry : getPoliticalFeaturePathEntry(entry.feature, {
         featureId, transform, allowBuild: true, countBuild: true,
         validatedHandle: pathCacheHandle,
       });
-      const path = pathEntry?.path || null;
+      const path = retainedPath || pathEntry?.path || null;
       const resolvedEntry = { feature: entry.feature, geometryRef: entry.feature.geometry, path, id: featureId };
       deferredState.resolvedEntries.push(resolvedEntry);
       addRetainedPoliticalPath(deferredState.pathIndex, featureId, resolvedEntry);
       if (path) {
-        if (hadCachedPath) reusedCount += 1;
+        if (retainedPath || hadCachedPath) reusedCount += 1;
         else builtCount += 1;
+        if (retainedPath) reusedPreviousCount += 1;
       } else pathlessCount += 1;
       continue;
     }
@@ -93,7 +97,7 @@ export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
       const item = deferredState.resolvedEntries[deferredState.index++];
       processedCount += 1;
       if (item.feature.geometry !== item.geometryRef) {
-        return { processedCount, builtCount, reusedCount, pathlessCount, geometryChanged: true };
+        return { processedCount, builtCount, reusedCount, reusedPreviousCount, pathlessCount, geometryChanged: true };
       }
       continue;
     }
@@ -127,7 +131,7 @@ export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
       deferredState.mergeCurrent = null;
     }
   }
-  return { processedCount, builtCount, reusedCount, pathlessCount, geometryChanged: false };
+  return { processedCount, builtCount, reusedCount, reusedPreviousCount, pathlessCount, geometryChanged: false };
 }
 
 export function buildDeferredPoliticalBackgroundCachePatch(deferredState, identity) {
@@ -144,7 +148,7 @@ export function buildDeferredPoliticalBackgroundCachePatch(deferredState, identi
     fullPassGroupCount: deferredState.groups.length,
     fullPassEntryCount: deferredState.entries.length,
     fullPassReusedPathCount: deferredState.reusedPathCount,
-    fullPassReusedPreviousPathCount: 0,
+    fullPassReusedPreviousPathCount: deferredState.reusedPreviousPathCount,
     fullPassBuiltPathCount: deferredState.builtPathCount,
     fullPassPathlessEntryCount: deferredState.pathlessEntryCount,
     fullPassReusedGroupMergeCount: 0,
@@ -181,13 +185,16 @@ export function buildRetainedPoliticalPathIndex(groups) {
   return index;
 }
 
-export function getRetainedPoliticalPathHandle(cache, identity, pathCacheSignature) {
+export function getRetainedPoliticalPathHandle(cache, identity, pathCacheSignature, {
+  allowDataGenerationReuse = false,
+} = {}) {
   const index = cache.fullPassPathIndex;
   if (!(index instanceof Map) || !index.size) return null;
   if (cache.fullPassPathCacheSignature !== pathCacheSignature
     || cache.fullPassScenarioId !== identity.scenarioId
     || cache.fullPassSceneGeneration !== identity.sceneGeneration
-    || cache.fullPassScenarioDataGeneration !== identity.scenarioDataGeneration) return null;
+    || (!allowDataGenerationReuse
+      && cache.fullPassScenarioDataGeneration !== identity.scenarioDataGeneration)) return null;
   // Geometry identity is checked on each lookup, including duplicate IDs.
   return {
     getPath(feature, id) {

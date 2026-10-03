@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { applyBaseLocalizationSnapshot, setCurrentLanguage } from "../js/core/state/content_state.js";
 
 function makeNode(document, tagName = "div") {
   const classes = new Set();
@@ -12,6 +13,11 @@ function makeNode(document, tagName = "div") {
     tagName: tagName.toUpperCase(),
     ownerDocument: document,
     children: [],
+    get isConnected() {
+      let current = this;
+      while (current?.parentNode) current = current.parentNode;
+      return current === document.body;
+    },
     get childNodes() { return this.children; },
     dataset: {},
     style: { setProperty() {} },
@@ -58,14 +64,22 @@ function makeNode(document, tagName = "div") {
     },
     replaceChildren(...children) { recordWrite("replaceChildren"); this.children = []; this.append(...children); },
     querySelectorAll(selector) {
+      this.querySelectorAllCalls = (this.querySelectorAllCalls || 0) + 1;
       const results = [];
+      const matches = (node) => selector.includes("select")
+        && node.tagName === "SELECT" && node.classList.contains("select-input");
       const visit = (parent) => parent.children.forEach((child) => {
         if (selector === ".app-select-option" && child.classList.contains("app-select-option")) results.push(child);
         if (selector === "[data-i18n]" && child.getAttribute("data-i18n")) results.push(child);
+        if (matches(child)) results.push(child);
         visit(child);
       });
       visit(this);
       return results;
+    },
+    matches(selector) {
+      return selector.includes("select.select-input")
+        && this.tagName === "SELECT" && this.classList.contains("select-input");
     },
     querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
     closest(selector) {
@@ -81,7 +95,10 @@ function makeNode(document, tagName = "div") {
     },
     focus() { document.activeElement = this; },
     getBoundingClientRect() { return { left: 20, top: 20, bottom: 58, width: 180 }; },
-    contains(target) { return this === target || this.children.some((child) => child.contains(target)); },
+    contains(target) {
+      this.containsCalls = (this.containsCalls || 0) + 1;
+      return this === target || this.children.some((child) => child.contains(target));
+    },
   };
   node._listeners = listeners;
   node.writes = writes;
@@ -309,17 +326,71 @@ test("long styled select searches groups and keeps native value and keyboard con
     await Promise.resolve();
     assert.equal(scans, scansBeforeOwnMutation, "menu rebuild mutations do not rescan the document");
 
+    const unrelatedPanel = makeNode(document);
+    document.body.appendChild(unrelatedPanel);
+    mutationCallback([{ type: "childList", target: document.body, addedNodes: [unrelatedPanel] }]);
+    await Promise.resolve();
+    assert.equal(scans, scansBeforeOwnMutation, "unrelated DOM updates do not trigger a full document scan");
+
+    const makeDynamicSelect = () => {
+      const dynamicSelect = makeNode(document, "select");
+      dynamicSelect.classList.add("select-input");
+      dynamicSelect.setAttribute("data-i18n-aria-label", "Actual field key");
+      const dynamicOption = makeNode(document, "option");
+      dynamicOption.value = "dynamic";
+      dynamicOption.textContent = "Dynamic option";
+      dynamicSelect.appendChild(dynamicOption);
+      Object.defineProperty(dynamicSelect, "options", { get: () => dynamicSelect.children });
+      Object.defineProperty(dynamicSelect, "selectedOptions", { get: () => [dynamicOption] });
+      return dynamicSelect;
+    };
+    const directSelect = makeDynamicSelect();
+    document.body.appendChild(directSelect);
+    mutationCallback([{ type: "childList", target: document.body, addedNodes: [directSelect] }]);
+    await Promise.resolve();
+    assert.equal(directSelect.dataset.appSelectEnhanced, "true", "a directly inserted select root is enhanced");
+    assert.equal(scans, scansBeforeOwnMutation, "incremental enhancement does not query the document");
+
+    const nestedContainer = makeNode(document);
+    const nestedChild = makeNode(document);
+    const nestedSelect = makeDynamicSelect();
+    nestedContainer.appendChild(nestedChild);
+    nestedChild.appendChild(nestedSelect);
+    document.body.appendChild(nestedContainer);
+    mutationCallback([{ type: "childList", target: document.body, addedNodes: [nestedContainer, nestedChild] }]);
+    await Promise.resolve();
+    assert.equal(nestedContainer.querySelectorAllCalls, 1, "the outermost added root is scanned once");
+    assert.equal(nestedChild.querySelectorAllCalls || 0, 0, "an added child root is covered by its ancestor scan");
+    assert.equal(nestedSelect.dataset.appSelectEnhanced, "true", "a select under deduplicated roots is enhanced");
+
+    const siblingRoots = Array.from({ length: 64 }, () => makeNode(document));
+    document.body.append(...siblingRoots);
+    mutationCallback([{ type: "childList", target: document.body, addedNodes: siblingRoots }]);
+    await Promise.resolve();
+    const siblingContainsCalls = siblingRoots.reduce((total, root) => total + (root.containsCalls || 0), 0);
+    assert.ok(siblingContainsCalls <= siblingRoots.length * 2,
+      "batch root deduplication uses linear parent walks instead of pairwise contains comparisons");
+
+    const removedSelect = makeDynamicSelect();
+    document.body.appendChild(removedSelect);
+    mutationCallback([{ type: "childList", target: document.body, addedNodes: [removedSelect] }]);
+    document.body.children.splice(document.body.children.indexOf(removedSelect), 1);
+    removedSelect.parentNode = null;
+    removedSelect.parentElement = null;
+    await Promise.resolve();
+    assert.notEqual(removedSelect.dataset.appSelectEnhanced, "true", "a root removed before the microtask is skipped");
+
     const { state } = await import("../js/core/state.js");
     const originalLanguage = state.currentLanguage;
     const originalLocales = state.locales;
     try {
-      state.currentLanguage = "zh";
-      state.locales = { ...originalLocales, ui: {
+      setCurrentLanguage(state, "zh");
+      applyBaseLocalizationSnapshot(state, { uiLocales: {
         ...originalLocales?.ui,
         "Actual field key": { en: "Field", zh: "字段" },
         "Search options": { en: "Search options", zh: "搜索选项" },
         "No matching options": { en: "No matching options", zh: "无匹配选项" },
-      } };
+      } });
       const buildsBeforeLanguage = list.writes.replaceChildren;
       syncStyledSelect(select);
       assert.equal(button.getAttribute("aria-label"), "字段");
@@ -333,24 +404,22 @@ test("long styled select searches groups and keeps native value and keyboard con
       assert.equal(button.children[0].textContent, "翻译后的 Alpha");
       assert.equal(list.children[0].children[1].textContent, "翻译后的 Alpha", "translated option text reaches the menu");
 
-      const dynamicSelect = makeNode(document, "select");
-      dynamicSelect.classList.add("select-input");
-      dynamicSelect.setAttribute("data-i18n-aria-label", "Actual field key");
-      const dynamicOption = addOption(dynamicSelect, "dynamic", "新选项");
+      const dynamicSelect = makeDynamicSelect();
+      const dynamicOption = dynamicSelect.children[0];
+      dynamicOption.textContent = "新选项";
       dynamicOption.selected = true;
-      Object.defineProperty(dynamicSelect, "options", { get: () => dynamicSelect.children });
-      Object.defineProperty(dynamicSelect, "selectedOptions", { get: () => [dynamicOption] });
       const dynamicContainer = makeNode(document);
-      dynamicContainer.appendChild(dynamicSelect);
       document.body.appendChild(dynamicContainer);
       selects.push(dynamicSelect);
       mutationCallback([{ type: "childList", target: document.body, addedNodes: [dynamicContainer] }]);
+      dynamicContainer.appendChild(dynamicSelect);
+      mutationCallback([{ type: "childList", target: dynamicContainer, addedNodes: [dynamicSelect] }]);
       await Promise.resolve();
       assert.equal(dynamicSelect.dataset.appSelectEnhanced, "true", "new select containers are still enhanced after initialization");
       assert.equal(dynamicSelect.parentNode.children[1].getAttribute("aria-label"), "字段", "new selects read the current language even without a language change");
     } finally {
-      state.currentLanguage = originalLanguage;
-      state.locales = originalLocales;
+      setCurrentLanguage(state, originalLanguage);
+      applyBaseLocalizationSnapshot(state, { uiLocales: originalLocales.ui, geoLocales: originalLocales.geo });
     }
   } finally {
     globalThis.document = originalDocument;

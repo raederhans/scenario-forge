@@ -147,6 +147,10 @@ export function createBorderDrawOwner({
     if (sanitized.length <= 2 || !projection) return sanitized;
 
     const projected = sanitized.map((point) => projection(point));
+    return declutterPolylineWithProjection(sanitized, projected, minDistancePx, angleThresholdDeg).line;
+  }
+
+  function declutterPolylineWithProjection(sanitized, projected, minDistancePx, angleThresholdDeg) {
     const keptIndices = [0];
 
     for (let index = 1; index < sanitized.length - 1; index += 1) {
@@ -170,20 +174,30 @@ export function createBorderDrawOwner({
 
     keptIndices.push(sanitized.length - 1);
     const result = [];
+    const resultProjected = [];
     keptIndices.forEach((index) => {
       const point = sanitized[index];
       if (!point) return;
       const previousPoint = result[result.length - 1];
       if (previousPoint && previousPoint[0] === point[0] && previousPoint[1] === point[1]) return;
       result.push(point);
+      resultProjected.push(projected[index]);
     });
-    return result.length >= 2 ? result : sanitized.slice(0, 2);
+    return result.length >= 2
+      ? { line: result, projected: resultProjected }
+      : { line: sanitized.slice(0, 2), projected: projected.slice(0, 2) };
   }
 
   function getProjectedPolylineMetrics(line) {
     const sanitized = sanitizePolyline(line);
     const projection = getProjection();
-    if (sanitized.length < 2 || !projection) {
+    return measureProjectedPolyline(sanitized.length >= 2 && projection
+      ? sanitized.map((point) => projection(point))
+      : []);
+  }
+
+  function measureProjectedPolyline(projectedPoints) {
+    if (projectedPoints.length < 2) {
       return {
         lengthPx: 0,
         bboxAreaPx: 0,
@@ -196,8 +210,7 @@ export function createBorderDrawOwner({
     let maxY = -Infinity;
     let lengthPx = 0;
     let previousProjected = null;
-    sanitized.forEach((point) => {
-      const projected = projection(point);
+    projectedPoints.forEach((projected) => {
       if (!projected || !Number.isFinite(projected[0]) || !Number.isFinite(projected[1])) return;
       minX = Math.min(minX, projected[0]);
       minY = Math.min(minY, projected[1]);
@@ -239,15 +252,20 @@ export function createBorderDrawOwner({
     return cachedMeshGeometry(mesh, cacheKey, () => {
       const nextCoordinates = mesh.coordinates
         .map((line) => {
-          const simplified = simplifyDistancePx > 0
-            ? declutterProjectedPolyline(line, simplifyDistancePx, angleThresholdDeg)
-            : sanitizePolyline(line);
-          if (!Array.isArray(simplified) || simplified.length < 2) return null;
-          const metrics = getProjectedPolylineMetrics(simplified);
+          const sanitized = sanitizePolyline(line);
+          if (sanitized.length < 2) return null;
+          const projection = getProjection();
+          const projected = projection ? sanitized.map((point) => projection(point)) : [];
+          // Simplification and filtering share this projection, including any
+          // non-finite points, so the existing metric accumulation order stays intact.
+          const result = simplifyDistancePx > 0 && sanitized.length > 2 && projection
+            ? declutterPolylineWithProjection(sanitized, projected, simplifyDistancePx, angleThresholdDeg)
+            : { line: sanitized, projected };
+          const metrics = measureProjectedPolyline(result.projected);
           if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
           if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
           if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
-          return simplified;
+          return result.line;
         })
         .filter((line) => Array.isArray(line) && line.length >= 2);
       if (!nextCoordinates.length) return null;
