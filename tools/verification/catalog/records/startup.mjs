@@ -229,6 +229,7 @@ export const STARTUP_RECORDS = [
       "js/core/sample_export_recommendation.js",
       "js/core/sample_project_import_workflow.js",
       "js/core/sample_project_registry.js",
+      "js/core/sample_project_url.js",
       "js/core/state/index.js",
       "js/ui/toolbar/export_workbench_controller.js",
       "js/ui/toolbar/sample_project_banner_controller.js",

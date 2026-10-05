@@ -97,6 +97,7 @@ function createOwnerHarness({
   scheduler = createSchedulerRecorder(),
   helpers = createHelpers(),
   startupUiBootstrapPromise = null,
+  startupSampleProjectId = "",
 } = {}) {
   const ownerHelpers = {
     ...helpers,
@@ -104,6 +105,7 @@ function createOwnerHarness({
   const owner = createStartupReadyHandoffOwner({
     runtimeState: targetRuntime,
     postReadyScheduler: scheduler,
+    startupSampleProjectId,
     effects: {
       commitUiHydrationState: helpers.commitUiHydrationState
         || ((patch) => setUiHydrationState(targetRuntime, patch)),
@@ -417,6 +419,150 @@ test("startDeferredFullInteractionInfrastructureBuild defers until detail is com
     buildHitCanvas: false,
     mode: "full",
   }]);
+});
+
+test("explicit startup sample holds optional tasks before module or UI readiness and through import", () => {
+  const { owner, targetRuntime, scheduler } = createOwnerHarness({
+    startupSampleProjectId: "tno-1962-atlantropa-briefing",
+    targetRuntime: createTargetRuntime({ showPhysical: true, styleConfig: { physical: { mode: "atlas_and_contours" } } }),
+  });
+  owner.startDeferredFullInteractionInfrastructureBuild();
+  owner.schedulePostReadyHydration();
+  owner.schedulePostReadyDeferredContextWarmup();
+  assert.equal(scheduler.tasks.length, 5);
+  const assertTaskGates = (expected, message) => {
+    for (const task of scheduler.tasks) assert.equal(task.options.canStart(), expected, `${message}: ${task.key}`);
+  };
+  assertTaskGates(false, "URL intent must reserve priority before sample state exists");
+  for (const uiStatus of ["pending", "ready"]) {
+    targetRuntime.uiHydrationStatus = uiStatus;
+    for (const status of ["pending", "loading", "importing"]) {
+      targetRuntime.sampleProjectDeeplink = { sampleId: "tno-1962-atlantropa-briefing", status };
+      assertTaskGates(false, `${uiStatus} UI and ${status} sample must reserve priority`);
+    }
+  }
+  targetRuntime.sampleProjectDeeplink = { sampleId: "another-sample", status: "success" };
+  assertTaskGates(false, "an unrelated sample must not satisfy startup intent");
+  targetRuntime.uiHydrationStatus = "failed";
+  assertTaskGates(true, "UI failure must release optional work");
+});
+
+test("startup settlement releases queued work before canStart polling and stays released for later samples", () => {
+  for (const release of ["success", "error", "ui-failed"]) {
+    const { owner, targetRuntime, scheduler } = createOwnerHarness({ startupSampleProjectId: "initial-sample",
+      targetRuntime: createTargetRuntime({ showPhysical: true, styleConfig: { physical: { mode: "atlas_and_contours" } } }),
+    });
+    owner.startDeferredFullInteractionInfrastructureBuild();
+    owner.schedulePostReadyHydration();
+    owner.schedulePostReadyDeferredContextWarmup();
+    // Do not poll canStart until after the startup onSettled entry observes
+    // success, import/module-load error, or failed UI bootstrap.
+    targetRuntime.sampleProjectDeeplink = { sampleId: "initial-sample", status: release === "ui-failed" ? "pending" : release };
+    if (release === "ui-failed") targetRuntime.uiHydrationStatus = "failed";
+    assert.equal(owner.markStartupSampleSettled(), true);
+    assert.equal(scheduler.tasks.length, 5, "settlement must not schedule extra work");
+    targetRuntime.uiHydrationStatus = "ready";
+    for (const status of ["loading", "success", "error"]) {
+      targetRuntime.sampleProjectDeeplink = { sampleId: "second-sample", status };
+      for (const task of scheduler.tasks) {
+        assert.equal(task.options.canStart(), true, `${release} must remain released during second sample ${status}: ${task.key}`);
+      }
+    }
+
+    owner.reset();
+    // An old settlement callback must neither restore tasks nor latch the
+    // terminal state from the previous owner lifecycle after reset.
+    targetRuntime.sampleProjectDeeplink = { sampleId: "initial-sample", status: "success" };
+    assert.equal(owner.markStartupSampleSettled(), false);
+    assert.equal(scheduler.tasks.length, 5);
+    targetRuntime.sampleProjectDeeplink.status = "pending";
+    owner.startDeferredFullInteractionInfrastructureBuild();
+    owner.schedulePostReadyHydration();
+    owner.schedulePostReadyDeferredContextWarmup();
+    for (const task of scheduler.tasks.slice(5)) {
+      assert.equal(task.options.canStart(), false, `reset must reserve the new pending request: ${task.key}`);
+    }
+  }
+});
+
+test("sample settlement releases the queue without replacing stale scene work", () => {
+  const { owner, targetRuntime, scheduler } = createOwnerHarness({
+    startupSampleProjectId: "tno-1962-atlantropa-briefing",
+    targetRuntime: createTargetRuntime({ activeScenarioId: "tno_1962", currentScenarioApplyRequestId: 1,
+      renderTransactionDiagnostics: { scenarioApplyEpoch: 4 } }),
+  });
+  owner.startDeferredFullInteractionInfrastructureBuild();
+  owner.schedulePostReadyHydration();
+  assert.equal(owner.markStartupSampleSettled(), false);
+  targetRuntime.sampleProjectDeeplink = { sampleId: "tno-1962-atlantropa-briefing", status: "error" };
+  assert.equal(owner.markStartupSampleSettled(), true, "unchanged error path releases queued work");
+  assert.equal(scheduler.tasks.length, 3);
+  for (const task of scheduler.tasks) {
+    assert.equal(task.options.canStart(), true);
+    assert.equal(task.options.isCurrent(), true);
+  }
+  targetRuntime.sampleProjectDeeplink.status = "success";
+  targetRuntime.renderTransactionDiagnostics.scenarioApplyEpoch = 5;
+  assert.equal(owner.markStartupSampleSettled(), true);
+  assert.equal(scheduler.tasks[0].options.isCurrent(), false);
+  assert.equal(scheduler.tasks[2].options.isCurrent(), false);
+  assert.equal(scheduler.tasks[1].options.isCurrent(), true, "localization remains page scoped");
+  assert.equal(scheduler.tasks[1].options.canStart(), true);
+  assert.equal(scheduler.tasks.length, 3, "import epoch change must not rearm scene work");
+  assert.equal(owner.markStartupSampleSettled(), true);
+  assert.equal(scheduler.tasks.length, 3, "repeated settlement must not duplicate work");
+  targetRuntime.activeScenarioId = "modern_world";
+  targetRuntime.currentScenarioApplyRequestId = 2;
+  assert.equal(owner.markStartupSampleSettled(), true);
+  assert.equal(scheduler.tasks[0].options.isCurrent(), false);
+  assert.equal(scheduler.tasks.length, 3, "scenario replacement must not rearm scene work");
+  owner.reset();
+  assert.equal(owner.markStartupSampleSettled(), false, "reset must not revive previous boot work");
+});
+
+test("real scheduler runs explicit sample before queued infrastructure, hydration and optional warmup", async () => {
+  const targetRuntime = createTargetRuntime({ uiHydrationStatus: "ready", showPhysical: true,
+    styleConfig: { physical: { mode: "atlas_and_contours" } } });
+  const scheduler = createPostReadyScheduler({ targetState: targetRuntime });
+  const order = [];
+  let finishInfrastructure;
+  const completed = new Promise((resolve) => { finishInfrastructure = resolve; });
+  let finishHydration;
+  const hydrated = new Promise((resolve) => { finishHydration = resolve; });
+  let finishLocalization;
+  const localized = new Promise((resolve) => { finishLocalization = resolve; });
+  let finishContext;
+  const contextLoaded = new Promise((resolve) => { finishContext = resolve; });
+  let finishContours;
+  const contoursLoaded = new Promise((resolve) => { finishContours = resolve; });
+  const { owner } = createOwnerHarness({ targetRuntime, startupSampleProjectId: "sample", scheduler: {
+    scheduleTask: (key, callback, options) => scheduler.scheduleTask(key, callback, {
+      ...options, delayMs: 0, retryDelayMs: 120, idleQuietMs: 0,
+    }),
+  }, helpers: createHelpers({ overrides: {
+    buildInteractionInfrastructureAfterStartup: async () => { order.push("infrastructure"); finishInfrastructure(); },
+    ensureActiveScenarioBundleHydrated: async () => { order.push("hydration"); finishHydration(); },
+    ensureFullLocalizationDataReady: async () => { order.push("localization"); finishLocalization(); },
+    ensureContextLayerDataReady: async (layers) => {
+      if (layers.includes("physical-contours-set")) { order.push("contours"); finishContours(); }
+      else { order.push("context"); finishContext(); }
+    },
+  } }) });
+  try {
+    owner.startDeferredFullInteractionInfrastructureBuild();
+    owner.schedulePostReadyHydration();
+    owner.schedulePostReadyDeferredContextWarmup();
+    scheduler.scheduleTask("startup-sample-project-import", async () => {
+      order.push("sample");
+      targetRuntime.sampleProjectDeeplink = { sampleId: "sample", status: "success" };
+      owner.markStartupSampleSettled();
+    }, { idleQuietMs: 0 });
+    await Promise.all([completed, hydrated, localized, contextLoaded, contoursLoaded]);
+    assert.equal(order[0], "sample");
+    assert.deepEqual(order.slice(1).sort(), ["context", "contours", "hydration", "infrastructure", "localization"]);
+  } finally {
+    scheduler.reset("test-cleanup");
+  }
 });
 
 test("startDeferredFullInteractionInfrastructureBuild catches build rejection with reason", async () => {

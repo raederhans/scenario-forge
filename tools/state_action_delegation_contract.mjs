@@ -7160,11 +7160,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/main.js",
     compositionExportName: "getStartupReadyHandoffOwner",
     compositionSourceFingerprint:
-      "671db953deac93bd1e92ad8d8c11dfda2bf87f617ba5ed99c634aab0f6ce24e8",
+      "2933ff5a168f3c91b13d8fbe378c23e87691118bcfc58a09066af82d0c5f8c32",
     factoryModulePath: "js/bootstrap/startup_ready_handoff.js",
     factoryExportName: "createStartupReadyHandoffOwner",
     factorySourceFingerprint:
-      "e7f5b49434e742cf1a040860704a9ee982ed9c2c338ff01348b5a7724660faa4",
+      "ed5191eef11ff927c24bc93ebf084ad080d987e04089797266b4da31fd0e952b",
     ownerBindingName: "startupReadyHandoffOwner",
     methods: [
       "beginUiHydration",
@@ -7174,6 +7174,7 @@ freezeMutationDelegatingOwnerEntry({
       "markUiHydrationReady",
       "scheduleReadyPostBootWork",
       "startDeferredFullInteractionInfrastructureBuild",
+      "markStartupSampleSettled",
       "schedulePostReadyHydration",
       "schedulePostReadyPoliticalReconcile",
       "schedulePostReadyDeferredContextWarmup",

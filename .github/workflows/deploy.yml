@@ -33,6 +33,13 @@ jobs:
       - name: Checkout artifact verifier
         if: github.event_name != 'workflow_dispatch' || inputs.artifact_only
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /tools/pages_artifact_admission.py
+            /tools/pages_artifact_root.py
+            /tools/pages_artifact_shadow.py
 
       - name: Download verified dist artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
@@ -101,6 +108,15 @@ jobs:
 
       - name: Checkout release smoke tests
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /package.json
+            /package-lock.json
+            /playwright.config.cjs
+            /tests/e2e/release/
+            /tests/e2e/support/
 
       - name: Setup Node for release smoke
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -128,7 +144,21 @@ jobs:
           done
 
       - name: Smoke deployed Pages URL
+        id: pages_smoke
         env:
           SCENARIO_FORGE_PAGES_URL: ${{ steps.deployment.outputs.page_url }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ steps.deployment.outputs.page_url }}
         run: npm run test:e2e:pages-public-release-gate
+
+      - name: Upload deployed Pages failure evidence
+        if: failure() && steps.pages_smoke.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pages-deployed-failure-evidence
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            .runtime/reports/test-timings.ndjson
+            .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/tests/playwright/

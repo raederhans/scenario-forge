@@ -192,6 +192,7 @@ jobs:
         run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Verify and exercise the Pages artifact
+        id: pages_checks
         if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
@@ -209,6 +210,20 @@ jobs:
           npm run test:e2e:pages-public-release-gate
           node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --grep 'editing baseline fast hoi4_1936.*roundtrip only' --workers=1 --retries=0
           python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
+
+      - name: Upload Pages artifact failure evidence
+        if: failure() && steps.pages_checks.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pages-artifact-failure-evidence
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            .runtime/pages-release/server.log
+            .runtime/reports/test-timings.ndjson
+            .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/tests/playwright/
 
       - name: Upload Pages artifact admission
         if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only

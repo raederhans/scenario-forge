@@ -54,8 +54,12 @@ export function scheduleStartupSampleProjectDeeplink({
     : {};
   postReadyScheduler.scheduleTask(
     STARTUP_SAMPLE_PROJECT_TASK_KEY,
-    async () => {
-      await loadPublicSampleProjectIntoRuntime(sampleId, { targetState, helpers });
+    async (task) => {
+      try {
+        await loadPublicSampleProjectIntoRuntime(sampleId, { targetState, helpers });
+      } finally {
+        if (!task || task.isCurrent()) helpers.onSettled?.();
+      }
     },
     {
       ...scheduleOptions,

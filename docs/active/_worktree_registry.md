@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-05 Pages 发布与示例启动优化
+
+复用 `C:/Users/raede/.codex/worktrees/pr-delivery-lanes/mapcreator`，当前分支为 `codex/pages-delivery-optimization`，基于已发布主线 `06d09474`。root 负责 Git、构建和全部现场测试；修改 Pages 检出范围、失败证据与显式示例启动时的可选任务顺序。主目录 WIP 保持原样，上一任务的本地收尾笔记单独保留。验证与交付状态见 [pages-delivery-optimization/task.md](pages-delivery-optimization/task.md)。
+
 ## 2026-10-05 PR 验证分流与双端上线
 
 `C:/Users/raede/.codex/worktrees/pr-delivery-lanes/mapcreator` 使用 `codex/pr-delivery-lanes`，基于 `475bbbd8` 完成交付计划、局部 UI 分流、Pages 源码检查和性能观察通道。用户已授权第四步及本地/GitHub 上线，root 为唯一 Git 整合负责人；主工作区仍有其他任务 WIP，本次仅同步交付体系涉及的文件。required 检查、合并与部署以 PR/run 回执为准；工作树保留用于回归验证和上线核对。记录见 [pr-delivery-lanes/task.md](pr-delivery-lanes/task.md)。
