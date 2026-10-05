@@ -95,6 +95,7 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
 
   function drawCityLabelsFromEntries(labelEntries, {
     config, scale, occupiedBoxes = [], labelBudget, layoutOnly = false, reusePlacement = false,
+    labelOpacity = 1, capitalLabelOpacity = labelOpacity,
   } = {}) {
     const preferredPlacements = new Map();
     if (Array.isArray(labelEntries)) {
@@ -110,7 +111,6 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
     const baseFontPx = Number(config?.labelSize) || 11;
     const maxLabels = Number.isFinite(labelBudget) ? Math.max(0, Math.floor(labelBudget)) : Infinity;
     context.save();
-    context.globalAlpha = 1;
     context.textBaseline = "middle";
     context.lineJoin = "round";
     for (const entry of labelEntries) {
@@ -118,6 +118,8 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       const visualEntry = helpers.getCityVisualCapitalState(entry, config)
         ? entry
         : { ...entry, isCapital: false, markerSizePx: null };
+      const opacity = helpers.clamp(Number(visualEntry.isCapital ? capitalLabelOpacity : labelOpacity), 0, 1);
+      if (!Number.isFinite(opacity) || opacity < 0.05) continue;
       const rankOffset = { metropolis: 1, large: 0, medium: -0.5, small: -1, town: -1.5 }[visualEntry.settlementRank];
       const tierOffset = visualEntry.isCapital ? 1 : (rankOffset ?? (visualEntry.cityTier === "major" ? 0 : -1));
       const fontPx = helpers.clamp(baseFontPx + tierOffset, 7, 23);
@@ -132,9 +134,11 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       const labelMinZoom = helpers.getCityLabelMinZoom(visualEntry, config);
       if (!text || !entry.screenPoint || scale < labelMinZoom) continue;
       const markerSizePx = Number(visualEntry.markerSizePx || helpers.getCityMarkerSizePx(visualEntry, config));
-      // Even the smallest sprite is 18px wide; keep its own label clear of it.
-      const offsetPx = Math.max(12, markerSizePx + 4);
-      const verticalOffsetPx = Math.max(fontPx + 2, markerSizePx + 6);
+      // Marker sizes are diameters. Match the sprite's radius plus its 1px
+      // antialiasing margin, leaving 2px between its box and the label box.
+      const markerHalfSizePx = Math.ceil(Math.max(1.5, markerSizePx / 2) + 1);
+      const offsetPx = markerHalfSizePx + 4;
+      const verticalOffsetPx = markerHalfSizePx + (fontPx + 4) / 2 + 2;
       const metrics = context.measureText(text);
       const candidates = buildCityLabelPlacementCandidates(visualEntry, {
         textWidthPx: metrics.width * scale,
@@ -158,6 +162,7 @@ export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {
       entry.acceptedLabelPlacement = acceptedPlacement.id;
       labelCount += 1;
       if (layoutOnly) continue;
+      context.globalAlpha = opacity;
       const labelStyle = helpers.getCityLabelRenderStyle(visualEntry, config);
       context.textAlign = acceptedPlacement.textAlign;
       context.shadowColor = labelStyle.shadowColor;

@@ -5,7 +5,7 @@ const MAX_SEEDS_PER_POLYGON = 12;
 const MAX_CANDIDATES_PER_POLYGON = 32;
 const MAX_FIT_CANDIDATES = 20;
 const DEFAULT_MAX_GRID_SIZE = 32;
-const MAX_GLYPH_ANGLE = 75 * Math.PI / 180;
+const MAX_GLYPH_ANGLE = 30 * Math.PI / 180;
 const TAU = Math.PI * 2;
 
 function finiteNumber(value, fallback = 0) {
@@ -22,6 +22,20 @@ function normalizeMultiPolygon(coordinates) {
   return coordinates;
 }
 
+export function filterCountryLabelHoles(polygons, minHoleArea = 0) {
+  const normalized = normalizeMultiPolygon(polygons);
+  const threshold = Math.max(0, finiteNumber(minHoleArea));
+  if (!threshold) return normalized;
+  return normalized.map((polygon) => [polygon[0], ...polygon.slice(1).filter((ring) => {
+    let twiceArea = 0;
+    for (let index = 0, prior = ring.length - 1; index < ring.length; prior = index++) {
+      if (!isPosition(ring[index]) || !isPosition(ring[prior])) return true;
+      twiceArea += ring[prior][0] * ring[index][1] - ring[index][0] * ring[prior][1];
+    }
+    return Math.abs(twiceArea) / 2 >= threshold;
+  })]);
+}
+
 function preparePolygon(ringsInput, polygonIndex) {
   if (!Array.isArray(ringsInput) || ringsInput.length === 0) return null;
   const rings = [];
@@ -31,6 +45,8 @@ function preparePolygon(ringsInput, polygonIndex) {
   let maxY = -Infinity;
   let vertexCount = 0;
   let polygonArea = 0;
+  let centerWeightX = 0;
+  let centerWeightY = 0;
 
   for (const inputRing of ringsInput) {
     if (!Array.isArray(inputRing) || inputRing.length < 3) continue;
@@ -51,14 +67,28 @@ function preparePolygon(ringsInput, polygonIndex) {
       rings.push(ring);
       vertexCount += ring.length;
       let twiceArea = 0;
-      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) twiceArea += ring[j].x * ring[i].y - ring[i].x * ring[j].y;
+      let momentX = 0;
+      let momentY = 0;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const cross = ring[j].x * ring[i].y - ring[i].x * ring[j].y;
+        twiceArea += cross;
+        momentX += (ring[j].x + ring[i].x) * cross;
+        momentY += (ring[j].y + ring[i].y) * cross;
+      }
       const ringArea = Math.abs(twiceArea) / 2;
-      polygonArea += rings.length === 1 ? ringArea : -ringArea;
+      const weight = rings.length === 1 ? ringArea : -ringArea;
+      polygonArea += weight;
+      if (Math.abs(twiceArea) > 1e-12) {
+        centerWeightX += weight * momentX / (3 * twiceArea);
+        centerWeightY += weight * momentY / (3 * twiceArea);
+      }
     }
   }
 
   if (!rings.length || !(maxX > minX) || !(maxY > minY)) return null;
-  return { polygonIndex, rings, minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY, vertexCount, area: Math.max(0, polygonArea) };
+  return { polygonIndex, rings, minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY, vertexCount, area: Math.max(0, polygonArea),
+    centerX: polygonArea > 1e-12 ? centerWeightX / polygonArea : (minX + maxX) / 2,
+    centerY: polygonArea > 1e-12 ? centerWeightY / polygonArea : (minY + maxY) / 2 };
 }
 
 function pointInRings(x, y, rings) {
@@ -237,18 +267,22 @@ function traceGridPath(component, grid, seed, angle, curvature = 0) {
   return makeCandidate(component, points, kind, { clearance, angle, curvature });
 }
 
-function rectangleCandidates(component) {
+function rectangleCandidates(component, options) {
   const { minX, minY, maxX, maxY, width, height } = component;
   const centerX = (minX + maxX) / 2;
   const centerY = (minY + maxY) / 2;
   const candidates = [];
   const count = 32;
   const baseClearance = Math.min(width, height) / 2;
-  for (const offset of [0, -0.16 * height, 0.16 * height]) {
+  for (const offset of [0, -0.16 * height, 0.16 * height, -0.3 * height, 0.3 * height]) {
     const y = centerY + offset;
-    candidates.push(makeCandidate(component, [{ x: minX, y }, { x: maxX, y }], "horizontal", { clearance: baseClearance }));
+    candidates.push(makeCandidate(component, [{ x: minX, y }, { x: maxX, y }], "horizontal", {
+      clearance: Math.min(width / 2, y - minY, maxY - y),
+    }));
   }
-  for (const degrees of [-75, -60, -45, -30, -15, 15, 30, 45, 60, 75]) {
+  const degreesList = Math.max(width, height) / Math.min(width, height) >= 2.5
+    ? [-15, 15, -30, 30] : [-15, 15];
+  for (const degrees of degreesList) {
     const radians = degrees * Math.PI / 180;
     const half = Math.min(
       Math.abs(Math.cos(radians)) < 1e-8 ? Infinity : (width / 2) / Math.abs(Math.cos(radians)),
@@ -260,23 +294,25 @@ function rectangleCandidates(component) {
       { x: centerX + Math.cos(radians) * safeHalf, y: centerY + Math.sin(radians) * safeHalf },
     ], "tilted", { clearance: baseClearance, angle: radians }));
   }
-  for (const sign of [-1, 1]) {
+  for (const sign of options.allowArcs ? [-1, 1] : []) {
     const points = [];
     for (let index = 0; index <= count; index += 1) {
       const distance = -width / 2 + (width * index) / count;
-      const curvature = sign * 0.3 / width;
+      const curvature = sign * 0.24 / width;
       points.push({
         x: centerX + Math.sin(curvature * distance) / curvature,
         y: centerY - (Math.cos(curvature * distance) - 1) / curvature,
       });
     }
-    candidates.push(makeCandidate(component, points, "arc", { clearance: baseClearance, curvature: sign * 0.3 }));
+    candidates.push(makeCandidate(component, points, "arc", { clearance: baseClearance, curvature: sign * 0.24 }));
   }
-  return candidates.filter(Boolean);
+  const valid = candidates.filter(Boolean);
+  return options.allowArcs ? [valid[0], ...valid.filter((candidate) => candidate.kind === "arc"),
+    ...valid.slice(1).filter((candidate) => candidate.kind !== "arc")] : valid;
 }
 
 function generateComponentCandidates(component, options) {
-  if (isAxisAlignedRectangle(component)) return rectangleCandidates(component);
+  if (isAxisAlignedRectangle(component)) return rectangleCandidates(component, options);
   const grid = rasterComponent(component, options.maxGridSize);
   const seedCandidates = [];
   for (let row = 0; row < grid.ny; row += 1) {
@@ -360,9 +396,14 @@ function generateComponentCandidates(component, options) {
     covarianceXY += dx * dy;
   }
   const principalAxis = 0.5 * Math.atan2(2 * covarianceXY, covarianceXX - covarianceYY);
-  const orientationDegrees = new Set([-75, -45, -15, 0, 15, 45, 75]);
-  for (const offset of [-20, -10, 0, 10, 20]) {
-    const degrees = Math.max(-75, Math.min(75, Math.round(principalAxis * 180 / Math.PI + offset)));
+  const covarianceTrace = covarianceXX + covarianceYY;
+  const covarianceSpan = Math.hypot(covarianceXX - covarianceYY, 2 * covarianceXY);
+  const elongated = covarianceTrace + covarianceSpan >= 6.25 * Math.max(1e-8, covarianceTrace - covarianceSpan);
+  const orientationDegrees = new Set([0, -15, 15]);
+  if (elongated) {
+    orientationDegrees.add(-30);
+    orientationDegrees.add(30);
+    const degrees = Math.max(-30, Math.min(30, Math.round(principalAxis * 180 / Math.PI)));
     orientationDegrees.add(degrees);
   }
 
@@ -372,9 +413,11 @@ function generateComponentCandidates(component, options) {
       const candidate = traceGridPath(component, grid, seed, degrees * Math.PI / 180, 0);
       if (candidate) generated.push(candidate);
     }
-    for (const degrees of [principalAxis * 180 / Math.PI]) {
-      const clampedDegrees = Math.max(-75, Math.min(75, degrees));
-      for (const curvature of [-0.3, 0.3]) {
+    for (const degrees of options.allowArcs ? new Set([0, principalAxis * 180 / Math.PI]) : []) {
+      // Preserve the glyph-angle budget for a gentle bend, rather than
+      // spending it on the baseline's principal-axis tilt.
+      const clampedDegrees = Math.max(-3, Math.min(3, degrees));
+      for (const curvature of [-0.24, 0.24]) {
         const candidate = traceGridPath(component, grid, seed, clampedDegrees * Math.PI / 180, curvature);
         if (candidate) generated.push(candidate);
       }
@@ -392,32 +435,53 @@ function generateComponentCandidates(component, options) {
   }
   const rankedCandidates = [...unique.values()].sort((a, b) => {
     const maxDimension = Math.max(component.width, component.height);
-    return b.length * (0.7 + 0.3 * b.clearance / maxDimension) - a.length * (0.7 + 0.3 * a.clearance / maxDimension);
+    const score = (candidate) => {
+      const center = candidate.points[Math.floor(candidate.points.length / 2)];
+      const distance = Math.hypot((center.x - component.centerX) / component.width, (center.y - component.centerY) / component.height);
+      return candidate.length * (0.7 + 0.3 * candidate.clearance / maxDimension) * (1 - Math.min(0.25, distance * 0.2));
+    };
+    return score(b) - score(a);
   });
   const buckets = new Map();
   for (const candidate of rankedCandidates) {
     const angleBand = Math.round((candidate.angle * 180 / Math.PI) / 15) * 15;
-    const key = candidate.kind === "horizontal" ? "horizontal" : `${candidate.kind}:${angleBand}`;
+    const key = candidate.kind === "horizontal" ? "horizontal" : candidate.kind === "arc"
+      ? `arc:${Math.sign(candidate.curvature)}` : `${candidate.kind}:${angleBand}`;
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(candidate);
   }
-  const tiltedBands = [-15, 15, -30, 30, -45, 45, -60, 60, -75, 75, 0];
-  const arcBands = [0, -15, 15, -30, 30, -45, 45, -60, 60, -75, 75];
-  const orderedKeys = ["horizontal", ...tiltedBands.map((angle) => `tilted:${angle}`), ...arcBands.flatMap((angle) => [`arc:${angle}`, `arc:${angle + 1}`, `arc:${angle - 1}`])];
+  const horizontalPositions = [];
+  const nearbyPositions = [];
+  const positionSeparation = Math.min(component.width, component.height) * 0.12;
+  for (const candidate of buckets.get("horizontal") || []) {
+    const center = candidate.points[Math.floor(candidate.points.length / 2)];
+    const distinct = horizontalPositions.every((prior) => {
+      const other = prior.points[Math.floor(prior.points.length / 2)];
+      return Math.hypot(center.x - other.x, center.y - other.y) >= positionSeparation;
+    });
+    (distinct ? horizontalPositions : nearbyPositions).push(candidate);
+  }
+  buckets.set("horizontal", [...horizontalPositions, ...nearbyPositions]);
+  // Reserve several different horizontal positions before spending the bounded
+  // budget on orientations. Angle diversity alone cannot recover a collision.
+  const orderedKeys = options.allowArcs
+    ? ["horizontal", "arc:-1", "arc:1", "horizontal", "horizontal", "tilted:-15", "tilted:15", "horizontal", "tilted:-30", "tilted:30", "tilted:0"]
+    : ["horizontal", "horizontal", "horizontal", "tilted:-15", "horizontal", "tilted:15", "horizontal", "tilted:-30", "tilted:30", "tilted:0"];
   const selected = [];
-  let rank = 0;
+  const cursors = new Map();
   while (selected.length < MAX_CANDIDATES_PER_POLYGON) {
     let added = false;
     for (const key of orderedKeys) {
       const group = buckets.get(key);
+      const rank = cursors.get(key) || 0;
       if (group && rank < group.length) {
         selected.push(group[rank]);
+        cursors.set(key, rank + 1);
         added = true;
         if (selected.length >= MAX_CANDIDATES_PER_POLYGON) break;
       }
     }
     if (!added) break;
-    rank += 1;
   }
   return selected;
 }
@@ -443,7 +507,7 @@ function interleavePolygonCandidates(groups, limit) {
 export function buildCountryLabelCandidates(polygons, options = {}) {
   const maxCandidates = Math.max(1, Math.min(128, Math.floor(finiteNumber(options.maxCandidates, DEFAULT_MAX_CANDIDATES))));
   const maxGridSize = Math.max(12, Math.min(MAX_GRID_SIZE, Math.floor(finiteNumber(options.maxGridSize, DEFAULT_MAX_GRID_SIZE))));
-  const rankedComponents = normalizeMultiPolygon(polygons)
+  const rankedComponents = filterCountryLabelHoles(polygons, options.minHoleArea)
     .map((polygon, index) => preparePolygon(polygon, index))
     .filter(Boolean)
     .sort((a, b) => b.area - a.area || b.width * b.height - a.width * a.height);
@@ -451,7 +515,7 @@ export function buildCountryLabelCandidates(polygons, options = {}) {
   const components = rankedComponents
     .filter((component, index) => index === 0 || (largestArea > 0 && component.area >= largestArea * 0.03))
     .slice(0, MAX_POLYGONS);
-  const groups = components.map((component) => generateComponentCandidates(component, { maxGridSize }));
+  const groups = components.map((component) => generateComponentCandidates(component, { maxGridSize, allowArcs: options.allowArcs === true }));
   const candidates = interleavePolygonCandidates(groups, maxCandidates);
   return candidates.map((candidate, candidateIndex) => ({ ...candidate, candidateIndex }));
 }
@@ -609,11 +673,11 @@ function envelopeInside(component, origin, angle, minX, maxX, minY, maxY, epsilo
   return corners;
 }
 
-function layoutAtSize(candidate, metrics, component, fontSize, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle) {
+function layoutAtSize(candidate, metrics, component, fontSize, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle, offset = 0) {
   const logicalWidth = metrics.reduce((sum, glyph) => sum + glyph.advance * fontSize, 0) + Math.max(0, metrics.length - 1) * tracking * fontSize;
   if (logicalWidth > candidate.length + 1e-8) return null;
   const padding = glyphPadding * fontSize;
-  let cursor = (candidate.length - logicalWidth) / 2;
+  let cursor = (candidate.length - logicalWidth) / 2 + offset;
   const glyphs = [];
   const angles = [];
   const allCorners = [];
@@ -621,6 +685,12 @@ function layoutAtSize(candidate, metrics, component, fontSize, tracking, glyphPa
   for (const metric of metrics) {
     const origin = pathPointAt(candidate, cursor);
     if (!Number.isFinite(origin.angle) || Math.abs(origin.angle) > maxGlyphAngle + 1e-8) return null;
+    if (!metric.text.trim()) {
+      glyphs.push({ text: metric.text, x: origin.x, y: origin.y, angle: origin.angle,
+        box: { x: origin.x, y: origin.y, w: 0, h: 0, corners: [] } });
+      cursor += (metric.advance + tracking) * fontSize;
+      continue;
+    }
     const minX = -metric.left * fontSize - padding;
     const maxX = metric.right * fontSize + padding;
     const minY = -metric.ascent * fontSize - padding;
@@ -657,6 +727,7 @@ function layoutAtSize(candidate, metrics, component, fontSize, tracking, glyphPa
   for (let index = 1; index < angles.length; index += 1) {
     if (Math.abs(angles[index] - angles[index - 1]) > maxAdjacentAngle + 1e-8) return null;
   }
+  if (!allCorners.length) return null;
   const bounds = {
     minX: Math.min(...allCorners.map((point) => point.x)),
     minY: Math.min(...allCorners.map((point) => point.y)),
@@ -666,31 +737,180 @@ function layoutAtSize(candidate, metrics, component, fontSize, tracking, glyphPa
   return { glyphs, bounds, fontSize, angles };
 }
 
-function resultScore(candidate, layout) {
+function labelLine(metrics, start, end) {
+  const line = metrics.slice(start, end);
+  // Keep the source text, including separators, without expanding blank tails.
+  for (let index = line.length - 1; index >= 0 && !line[index].text.trim(); index -= 1) {
+    line[index] = { ...line[index], advance: 0 };
+  }
+  return line;
+}
+
+function twoLabelLines(metrics, tracking) {
+  const text = metrics.map((metric) => metric.text).join("");
+  let split = -1;
+  if (/\p{Script=Han}/u.test(text) && metrics.length >= 6) {
+    const suffix = ["无政府地区", "无政府地带", "专员辖区", "军事指挥部", "共和国", "合众国", "自治领", "联邦", "王国", "帝国"].find((suffix) => text.endsWith(suffix));
+    const colonialPrefix = /^(意属|法属|英属|德属)/u.test(text);
+    const suffixStart = suffix ? text.length - suffix.length : colonialPrefix ? 2 : -1;
+    split = suffixStart >= 2 ? metrics.findIndex((_metric, index) => metrics.slice(0, index).map((metric) => metric.text).join("").length === suffixStart)
+      : Math.floor(metrics.length / 2);
+  } else if (!/\p{Script=Han}/u.test(text)) {
+    let bestDifference = Infinity;
+    for (let index = 1; index < metrics.length - 1; index += 1) {
+      if (metrics[index].text.trim()) continue;
+      const first = metrics.slice(0, index).reduce((sum, metric) => sum + metric.advance + tracking, 0);
+      const second = metrics.slice(index + 1).reduce((sum, metric) => sum + metric.advance + tracking, 0);
+      if (first > 0 && second > 0 && Math.abs(first - second) < bestDifference) {
+        split = index + 1;
+        bestDifference = Math.abs(first - second);
+      }
+    }
+  }
+  if (split <= 0 || split >= metrics.length) return null;
+  return [labelLine(metrics, 0, split), labelLine(metrics, split, metrics.length)];
+}
+
+function threeEnglishLabelLines(metrics, tracking) {
+  if (metrics.some((metric) => /\p{Script=Han}/u.test(metric.text))) return [];
+  const prefix = [0];
+  const trailingBlankAdvance = [0];
+  const breaks = [];
+  for (let index = 0; index < metrics.length; index += 1) {
+    prefix.push(prefix[index] + metrics[index].advance + tracking);
+    trailingBlankAdvance.push(metrics[index].text.trim() ? 0 : trailingBlankAdvance[index] + metrics[index].advance);
+    if (index > 0 && !metrics[index].text.trim() && metrics[index + 1]?.text.trim()) breaks.push(index + 1);
+  }
+  if (breaks.length < 2) return [];
+  const total = prefix.at(-1);
+  const lineWidth = (start, end) => prefix[end] - prefix[start] - trailingBlankAdvance[end] - tracking;
+  // Only three first-cut proposals, each with one balanced remaining cut.
+  // This stays linear in text length rather than enumerating every word pair.
+  const firstCuts = [];
+  for (const candidate of breaks.slice(0, -1)) {
+    firstCuts.push(candidate);
+    firstCuts.sort((a, b) => Math.abs(prefix[a] - total / 3) - Math.abs(prefix[b] - total / 3) || a - b);
+    firstCuts.length = Math.min(3, firstCuts.length);
+  }
+  return firstCuts.map((first) => {
+    let second = -1;
+    for (const candidate of breaks) {
+      if (candidate <= first) continue;
+      const width = Math.max(lineWidth(first, candidate), lineWidth(candidate, metrics.length));
+      const previousWidth = second < 0 ? Infinity : Math.max(lineWidth(first, second), lineWidth(second, metrics.length));
+      if (width < previousWidth) second = candidate;
+    }
+    return [labelLine(metrics, 0, first), labelLine(metrics, first, second), labelLine(metrics, second, metrics.length)];
+  }).sort((a, b) => {
+    const width = (lines) => Math.max(...lines.map((line) => line.reduce((sum, metric) => sum + metric.advance + tracking, 0)));
+    return width(a) - width(b);
+  });
+}
+
+function layoutLabelLines(candidate, lines, component, fontSize, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle, allowPositionShift) {
+  const maxWidth = Math.max(...lines.map((line) => line.reduce((sum, metric) => sum + metric.advance, 0) + Math.max(0, line.length - 1) * tracking)) * fontSize;
+  const slack = Math.max(0, candidate.length - maxWidth);
+  const lineInk = lines.map((line) => {
+    const visible = line.filter((metric) => metric.text.trim());
+    return { ascent: Math.max(0, ...visible.map((metric) => metric.ascent)),
+      descent: Math.max(0, ...visible.map((metric) => metric.descent)) };
+  });
+  const spacing = Math.max(1.2, ...lineInk.map((ink) => ink.ascent + ink.descent + glyphPadding * 2 + 0.15)) * fontSize;
+  const centers = lines.map((_line, index) => (index - (lines.length - 1) / 2) * spacing);
+  const top = Math.min(...lineInk.map((ink, index) => centers[index] - (ink.ascent + ink.descent) * fontSize / 2));
+  const bottom = Math.max(...lineInk.map((ink, index) => centers[index] + (ink.ascent + ink.descent) * fontSize / 2));
+  const blockOffset = (top + bottom) / 2;
+  const first = candidate.points[0];
+  const last = candidate.points.at(-1);
+  const angle = candidate.kind === "tilted" ? Math.atan2(last.y - first.y, last.x - first.x) : 0;
+  const offsets = allowPositionShift && candidate.kind === "horizontal" ? [0, -0.2 * slack, 0.2 * slack] : [0];
+  // Prefer optical centering, but retain the original baseline as a second
+  // placement in irregular regions where shifting the ink crosses a boundary.
+  const placements = (candidate.kind === "arc" ? [false] : [true, false])
+    .flatMap((centered) => offsets.map((offset) => ({ centered, offset })));
+  for (const { centered, offset } of placements) {
+    const layouts = lines.map((line, index) => {
+      // Candidates mark the visual center, not the alphabetic baseline. Center
+      // each visible line and then the whole block; blank glyph metrics do not
+      // affect its height. Tilted straight lines shift along their normal.
+      const ink = lineInk[index];
+      const baseline = centered ? centers[index] - blockOffset + (ink.ascent - ink.descent) * fontSize / 2 : centers[index];
+      const path = baseline ? { ...candidate, points: candidate.points.map((point) => ({
+        x: point.x - Math.sin(angle) * baseline, y: point.y + Math.cos(angle) * baseline,
+      })) } : candidate;
+      return layoutAtSize(path, line, component, fontSize, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle, offset);
+    });
+    if (layouts.some((layout) => !layout)) continue;
+    return { fontSize, lineCount: lines.length, glyphs: layouts.flatMap((layout) => layout.glyphs),
+      angles: layouts.flatMap((layout) => layout.angles),
+      bounds: {
+        minX: Math.min(...layouts.map((layout) => layout.bounds.minX)), minY: Math.min(...layouts.map((layout) => layout.bounds.minY)),
+        maxX: Math.max(...layouts.map((layout) => layout.bounds.maxX)), maxY: Math.max(...layouts.map((layout) => layout.bounds.maxY)),
+      } };
+  }
+  return null;
+}
+
+function resultScore(candidate, layout, component, gentleArc = false) {
   const maxAngle = layout.angles.reduce((value, angle) => Math.max(value, Math.abs(angle)), 0);
   const bend = layout.angles.length ? Math.max(...layout.angles) - Math.min(...layout.angles) : 0;
-  const anglePenalty = 0.12 * (maxAngle / (Math.PI / 2));
-  const bendPenalty = 0.08 * (bend / (Math.PI / 3));
-  const kindPenalty = candidate.kind === "horizontal" ? 0 : candidate.kind === "tilted" ? 0.001 : 0.002;
-  return layout.fontSize * (1 - anglePenalty - bendPenalty) - kindPenalty;
+  const anglePenalty = (gentleArc ? 0.06 : 0.28) * (maxAngle / MAX_GLYPH_ANGLE);
+  const bendPenalty = (gentleArc ? 0.04 : 0.15) * (bend / (Math.PI / 3));
+  const kindPenalty = candidate.kind === "horizontal" || gentleArc ? 0 : candidate.kind === "tilted" ? 0.12 : 0.2;
+  const wrapPenalty = Math.max(0, layout.lineCount - 1) * 0.1;
+  const centerX = (layout.bounds.minX + layout.bounds.maxX) / 2;
+  const centerY = (layout.bounds.minY + layout.bounds.maxY) / 2;
+  const centerDistance = Math.hypot((centerX - component.centerX) / (component.width / 2),
+    (centerY - component.centerY) / (component.height / 2));
+  const centerPenalty = Math.min(1, centerDistance) * 0.16;
+  const margin = Math.min(layout.bounds.minX - component.minX, component.maxX - layout.bounds.maxX,
+    layout.bounds.minY - component.minY, component.maxY - layout.bounds.maxY);
+  const insetPenalty = 0.06 * (1 - Math.max(0, Math.min(1, margin / (layout.fontSize * 0.5))));
+  const clearancePenalty = Number.isFinite(candidate.clearance)
+    ? 0.04 * (1 - Math.max(0, Math.min(1, candidate.clearance / (layout.fontSize * 1.2)))) : 0;
+  return layout.fontSize * (1 - anglePenalty - bendPenalty - kindPenalty - wrapPenalty - centerPenalty - insetPenalty - clearancePenalty
+    + (gentleArc ? 0.06 : 0));
+}
+
+function layoutWithTracking(candidate, lines, component, fontSize, options) {
+  const availableTracking = Math.min(...lines.map((line) => line.length > 1
+    ? (candidate.length * 0.78 / fontSize - line.reduce((sum, glyph) => sum + glyph.advance, 0)) / (line.length - 1)
+    : options.tracking));
+  const tracking = Math.max(options.tracking, Math.min(options.maxTracking, availableTracking));
+  for (const spacing of tracking > options.tracking + 1e-8 ? [tracking, options.tracking] : [options.tracking]) {
+    const layout = layoutLabelLines(candidate, lines, component, fontSize, spacing, options.glyphPadding,
+      options.maxGlyphAngle, options.maxBendAngle, options.maxAdjacentAngle, options.allowPositionShift);
+    if (layout) return { ...layout, tracking: spacing };
+  }
+  return null;
 }
 
 export function fitCountryLabel(candidates, options = {}) {
   if (!Array.isArray(candidates) || candidates.length === 0 || !Array.isArray(options.glyphs) || options.glyphs.length === 0) return null;
-  const rawPolygons = normalizeMultiPolygon(options.polygons);
+  const minHoleArea = Math.max(0, finiteNumber(options.minHoleArea));
+  const originalPolygons = normalizeMultiPolygon(options.polygons);
+  const rawPolygons = filterCountryLabelHoles(originalPolygons, minHoleArea);
   if (!rawPolygons.length) return null;
   const metrics = options.glyphs.map(glyphMetric);
   const minFontSize = Math.max(0, finiteNumber(options.minFontSize, 1));
   const maxFontSize = Math.max(minFontSize, finiteNumber(options.maxFontSize, minFontSize));
   const tracking = finiteNumber(options.tracking, 0);
+  const maxTracking = Math.max(tracking, Math.min(0.24, finiteNumber(options.maxTracking, tracking)));
   const glyphPadding = Math.max(0, finiteNumber(options.glyphPadding, 0));
-  const maxGlyphAngle = Math.max(0, Math.min(MAX_GLYPH_ANGLE, finiteNumber(options.maxTiltDegrees, 75) * Math.PI / 180));
+  const maxGlyphAngle = Math.max(0, Math.min(MAX_GLYPH_ANGLE, finiteNumber(options.maxTiltDegrees, 30) * Math.PI / 180));
   const maxBendAngle = Math.max(0, Math.min(Math.PI / 3, finiteNumber(options.maxBendDegrees, 60) * Math.PI / 180));
   const maxAdjacentAngle = Math.max(0, Math.min(Math.PI / 3, finiteNumber(options.maxAdjacentAngleDegrees, 12) * Math.PI / 180));
   const iterations = Math.max(2, Math.min(10, Math.floor(finiteNumber(options.iterations, 5))));
   const searchSteps = Math.max(2, Math.min(12, Math.floor(finiteNumber(options.searchSteps, 8))));
   const unitAdvance = metrics.reduce((sum, glyph) => sum + glyph.advance, 0) + Math.max(0, metrics.length - 1) * tracking;
+  const wrappedLines = options.allowMultiline === true ? twoLabelLines(metrics, tracking) : null;
+  const threeLineOptions = options.allowMultiline === true ? threeEnglishLabelLines(metrics, tracking) : [];
+  const readableFontSize = Math.max(minFontSize, finiteNumber(options.readableFontSize, 10));
+  const preferGentleArcs = options.preferGentleArcs === true;
+  const minArcComponentArea = Math.max(0, finiteNumber(options.minArcComponentArea));
+  const visibleGlyphCount = metrics.filter((metric) => metric.text.trim()).length;
   const preferredCandidateIndex = Number.isInteger(options.preferredCandidateIndex) ? options.preferredCandidateIndex : -1;
+  const maxAlternatives = Math.max(0, Math.min(3, Math.floor(finiteNumber(options.maxAlternatives, 0))));
   const prepared = new Map();
   const validCandidates = candidates.slice(0, MAX_FIT_CANDIDATES);
   for (const candidate of validCandidates) {
@@ -703,60 +923,166 @@ export function fitCountryLabel(candidates, options = {}) {
   }
 
   const fits = [];
-  for (let candidateIndex = 0; candidateIndex < validCandidates.length; candidateIndex += 1) {
-    const candidate = validCandidates[candidateIndex];
-    const component = prepared.get(Math.floor(finiteNumber(candidate?.polygonIndex, -1)));
-    if (!component || !Array.isArray(candidate.points) || candidate.points.length < 2) continue;
-    const path = { ...candidate, length: pathLength(candidate.points) };
-    if (!(path.length > 0)) continue;
-    if (!(unitAdvance > 0)) continue;
-    const highAllowed = Math.min(maxFontSize, path.length / unitAdvance);
-    if (highAllowed < minFontSize) continue;
-    let best = null;
-    let low = minFontSize;
-    let high = highAllowed;
-    let priorFailure = highAllowed;
-    for (let probe = 0; probe <= searchSteps; probe += 1) {
-      const size = highAllowed - ((highAllowed - minFontSize) * probe) / searchSteps;
-      const attempt = layoutAtSize(path, metrics, component, size, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle);
-      if (attempt) {
-        best = attempt;
-        low = size;
-        high = priorFailure;
-        break;
+  for (const lines of [[metrics], ...(wrappedLines ? [wrappedLines] : []), ...threeLineOptions]) {
+    for (let candidateIndex = 0; candidateIndex < validCandidates.length; candidateIndex += 1) {
+      const candidate = validCandidates[candidateIndex];
+      if (candidate?.kind === "arc" && options.allowArcs !== true) continue;
+      const component = prepared.get(Math.floor(finiteNumber(candidate?.polygonIndex, -1)));
+      if (!component || !Array.isArray(candidate.points) || candidate.points.length < 2) continue;
+      // A readable overseas line must not suppress the mainland's wrapping.
+      if (lines.length > 1 && fits.some((fit) => fit.polygonIndex === component.polygonIndex
+        && fit.lineCount < lines.length && fit.fontSize >= readableFontSize)) continue;
+      const path = { ...candidate, length: pathLength(candidate.points) };
+      if (!(path.length > 0) || !(unitAdvance > 0)) continue;
+      if (lines.length > 1 && candidate.kind !== "horizontal") continue;
+      const arc = candidate.kind === "arc";
+      const layoutOptions = { tracking, maxTracking, glyphPadding, allowPositionShift: options.allowPositionShift === true,
+        maxGlyphAngle: arc ? Math.min(maxGlyphAngle, Math.max(0, finiteNumber(options.maxArcTiltDegrees, 30)) * Math.PI / 180) : maxGlyphAngle,
+        maxBendAngle: arc ? Math.min(maxBendAngle, Math.max(0, finiteNumber(options.maxArcBendDegrees, 60)) * Math.PI / 180) : maxBendAngle,
+        maxAdjacentAngle };
+      const longestLineAdvance = Math.max(...lines.map((line) => line.reduce((sum, metric) => sum + metric.advance, 0) + Math.max(0, line.length - 1) * tracking));
+      const highAllowed = Math.min(maxFontSize, path.length / longestLineAdvance);
+      if (highAllowed < minFontSize) continue;
+      let best = null;
+      let low = minFontSize;
+      let high = highAllowed;
+      let priorFailure = highAllowed;
+      for (let probe = 0; probe <= searchSteps; probe += 1) {
+        const size = highAllowed - ((highAllowed - minFontSize) * probe) / searchSteps;
+        const attempt = layoutWithTracking(path, lines, component, size, layoutOptions);
+        if (attempt) {
+          best = attempt;
+          low = size;
+          high = priorFailure;
+          break;
+        }
+        priorFailure = size;
       }
-      priorFailure = size;
-    }
-    if (!best) continue;
-    for (let iteration = 0; iteration < iterations && high - low > 1e-6; iteration += 1) {
-      const mid = (low + high) / 2;
-      const attempt = layoutAtSize(path, metrics, component, mid, tracking, glyphPadding, maxGlyphAngle, maxBendAngle, maxAdjacentAngle);
-      if (attempt) {
-        low = mid;
-        best = attempt;
-      } else {
-        high = mid;
+      if (!best) continue;
+      for (let iteration = 0; iteration < iterations && high - low > 1e-6; iteration += 1) {
+        const mid = (low + high) / 2;
+        const attempt = layoutWithTracking(path, lines, component, mid, layoutOptions);
+        if (attempt) {
+          low = mid;
+          best = attempt;
+        } else {
+          high = mid;
+        }
       }
+      const fit = {
+        candidateIndex,
+        candidateKind: candidate.kind || "horizontal",
+        score: resultScore(candidate, best, component),
+        gentleArcScore: preferGentleArcs && arc && lines.length === 1 && visibleGlyphCount >= 4
+          && component.area >= minArcComponentArea && component.width >= best.fontSize * 8
+          && component.height >= best.fontSize * 3
+          ? resultScore(candidate, best, component, true) : undefined,
+        fontSize: best.fontSize,
+        glyphs: best.glyphs,
+        bounds: best.bounds,
+        lineCount: best.lineCount,
+        tracking: best.tracking,
+        minHoleArea: rawPolygons[component.polygonIndex].length !== originalPolygons[component.polygonIndex].length ? minHoleArea : 0,
+        polygonIndex: component.polygonIndex,
+      };
+      fits.push(fit);
     }
-    const fit = {
-      candidateIndex,
-      candidateKind: candidate.kind || "horizontal",
-      score: resultScore(candidate, best),
-      fontSize: best.fontSize,
-      glyphs: best.glyphs,
-      bounds: best.bounds,
-      polygonIndex: component.polygonIndex,
-    };
-    fits.push(fit);
-    if (fit.candidateKind === "horizontal" && fit.fontSize >= maxFontSize - 1e-6 && fit.glyphs.every((glyph) => Math.abs(glyph.angle) < 1e-8) && (preferredCandidateIndex < 0 || preferredCandidateIndex === candidateIndex)) return fit;
   }
 
   if (!fits.length) return null;
-  fits.sort((a, b) => b.score - a.score || b.fontSize - a.fontSize || a.candidateIndex - b.candidateIndex);
-  if (preferredCandidateIndex >= 0) {
-    const preferred = fits.find((fit) => fit.candidateIndex === preferredCandidateIndex);
-    const tolerance = Math.max(0, finiteNumber(options.preferredTolerance, 0.35));
-    if (preferred && preferred.fontSize >= fits[0].fontSize - tolerance) return preferred;
+  // Keep independent, bounded placements for each significant territory.
+  const byComponent = new Map();
+  for (const fit of fits) {
+    if (!byComponent.has(fit.polygonIndex)) byComponent.set(fit.polygonIndex, []);
+    byComponent.get(fit.polygonIndex).push(fit);
   }
-  return fits[0];
+  const componentFits = [...byComponent.values()].map((group) => selectComponentFit(group, {
+    readableFontSize, preferredCandidateIndex, maxAlternatives,
+    preferredTolerance: options.preferredTolerance,
+    component: prepared.get(group[0].polygonIndex),
+  })).sort((a, b) => Number(b.fontSize >= readableFontSize) - Number(a.fontSize >= readableFontSize)
+    || prepared.get(b.polygonIndex).area - prepared.get(a.polygonIndex).area
+    || a.polygonIndex - b.polygonIndex).slice(0, MAX_POLYGONS);
+  const selected = componentFits[0];
+  return maxAlternatives ? { ...selected, componentFits } : selected;
+}
+
+function translatedFit(fit, component, dx, dy) {
+  const epsilon = Math.max(component.width, component.height, 1) * 1e-10;
+  const glyphs = [];
+  for (const glyph of fit.glyphs) {
+    const origin = { x: glyph.x + dx, y: glyph.y + dy };
+    if (!glyph.text.trim()) {
+      glyphs.push({ ...glyph, ...origin, box: { ...glyph.box, x: glyph.box.x + dx, y: glyph.box.y + dy } });
+      continue;
+    }
+    const cos = Math.cos(glyph.angle), sin = Math.sin(glyph.angle);
+    const local = glyph.box.corners.map(corner => ({
+      x: (corner.x - glyph.x) * cos + (corner.y - glyph.y) * sin,
+      y: -(corner.x - glyph.x) * sin + (corner.y - glyph.y) * cos,
+    }));
+    const corners = envelopeInside(component, origin, glyph.angle,
+      Math.min(...local.map(p => p.x)), Math.max(...local.map(p => p.x)),
+      Math.min(...local.map(p => p.y)), Math.max(...local.map(p => p.y)), epsilon);
+    if (!corners) return null;
+    glyphs.push({ ...glyph, ...origin, box: { ...glyph.box, x: glyph.box.x + dx, y: glyph.box.y + dy, corners } });
+  }
+  return { ...fit, glyphs, bounds: { minX: fit.bounds.minX + dx, maxX: fit.bounds.maxX + dx,
+    minY: fit.bounds.minY + dy, maxY: fit.bounds.maxY + dy } };
+}
+
+function selectComponentFit(fits, { readableFontSize, preferredCandidateIndex, maxAlternatives, preferredTolerance, component }) {
+  const readableFits = fits.filter((fit) => fit.fontSize >= readableFontSize);
+  const eligible = readableFits.length ? readableFits : fits;
+  const largestReadableFont = readableFits.length ? Math.max(...readableFits.map((fit) => fit.fontSize)) : Infinity;
+  const eligibleFits = eligible.map(({ gentleArcScore, ...fit }) => ({ ...fit,
+    score: Number.isFinite(gentleArcScore) && fit.fontSize >= largestReadableFont * 0.94 ? gentleArcScore : fit.score,
+  }));
+  eligibleFits.sort((a, b) => b.score - a.score || b.fontSize - a.fontSize || a.candidateIndex - b.candidateIndex);
+  let selected = eligibleFits[0];
+  if (preferredCandidateIndex >= 0) {
+    const preferred = eligibleFits.find((fit) => fit.candidateIndex === preferredCandidateIndex);
+    const tolerance = Math.max(0, finiteNumber(preferredTolerance, 0.35));
+    if (preferred && preferred.fontSize >= eligibleFits[0].fontSize - tolerance
+      && preferred.score >= eligibleFits[0].score - tolerance) selected = preferred;
+  }
+  if (!maxAlternatives) return selected;
+  // Retain a few independently validated positions during preparation. Drawing
+  // can try these cached fits without repeating polygon containment or fitting.
+  const alternatives = [];
+  const shifted = [[0, -1.25], [0, 1.25], [-1.5, 0], [1.5, 0], [-2.5, -2.5], [2.5, 2.5], [-2.5, 2.5], [2.5, -2.5]]
+    .map(([x, y]) => translatedFit(selected, component, x * selected.fontSize, y * selected.fontSize)).filter(Boolean);
+  const pool = [...shifted.slice(0, 2), ...eligibleFits.filter(fit => fit !== selected), ...shifted.slice(2)];
+  const delta = fit => ({ x: (fit.bounds.minX + fit.bounds.maxX - selected.bounds.minX - selected.bounds.maxX) / 2,
+    y: (fit.bounds.minY + fit.bounds.maxY - selected.bounds.minY - selected.bounds.maxY) / 2 });
+  while (pool.length && alternatives.length < maxAlternatives) {
+    // After one direction succeeds, try the opposite side before filling the
+    // remaining slot. Coastlines and holes may legitimately prevent that side.
+    const first = alternatives[0] && delta(alternatives[0]);
+    let index = alternatives.length === 1 ? pool.findIndex(fit => {
+      const offset = delta(fit); return first.x * offset.x + first.y * offset.y < 0;
+    }) : 0;
+    if (alternatives.length === 2) {
+      // The last retry provides distance from crowded central positions,
+      // rather than repeating another nearby candidate in the same cluster.
+      let separation = -Infinity;
+      pool.forEach((fit, candidateIndex) => {
+        if (fit.fontSize < selected.fontSize * 0.75) return;
+        const offset = delta(fit);
+        const distance = Math.min(...[selected, ...alternatives].map(prior => {
+          const other = delta(prior); return Math.hypot(offset.x - other.x, offset.y - other.y);
+        }));
+        if (distance > separation) { separation = distance; index = candidateIndex; }
+      });
+    }
+    const [fit] = pool.splice(index >= 0 ? index : 0, 1);
+    if (fit === selected || fit.fontSize < selected.fontSize * 0.75) continue;
+    const distinct = [selected, ...alternatives].every((prior) => {
+      const dx = (fit.bounds.minX + fit.bounds.maxX - prior.bounds.minX - prior.bounds.maxX) / 2;
+      const dy = (fit.bounds.minY + fit.bounds.maxY - prior.bounds.minY - prior.bounds.maxY) / 2;
+      return Math.hypot(dx, dy) >= Math.min(fit.fontSize, prior.fontSize);
+    });
+    if (distinct) alternatives.push(fit);
+  }
+  return { ...selected, alternatives };
 }

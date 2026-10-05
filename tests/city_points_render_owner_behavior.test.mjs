@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import { createCityPointsRenderOwner } from "../js/core/renderer/city_points_render_owner.js";
 import { createCityLabelOwner } from "../js/core/renderer/city_label_owner.js";
 import { normalizeCityLayerStyleConfig } from "../js/core/state_defaults.js";
+import { getMapLabelHierarchy } from "../js/core/renderer/map_label_hierarchy.js";
+import { claimScreenLabelPlacement } from "../js/core/renderer/screen_label_placement.js";
 
 const markerTokens = {
   baseShadow: "rgba(0, 0, 0, 0.2)",
@@ -253,6 +255,7 @@ test("city labels pass draws markers before delegating labels", () => {
         featureCount: 1,
         visibleFeatureCount: 1,
         labelCount: 1,
+        hierarchy: getMapLabelHierarchy(2, harness.state),
       },
     });
   } finally {
@@ -294,6 +297,118 @@ test("labels pass shares actual marker bounds and forwards the successful-label 
   const markersOnly = [];
   harness.owner.drawLabelsPass(2, { occupiedBoxes: markersOnly });
   assert.equal(markersOnly.length, 2, "transport labels still avoid markers when city names are hidden");
+});
+
+test("overview reservation uses actual marker bounds without drawing or reserving city text", (t) => {
+  t.after(installCanvasFactory());
+  const entry = { id: "capital", anchor: [40, 50], screenPoint: [80, 100], isCapital: true, markerSizePx: 10 };
+  const harness = createCityPointsHarness({ markerEntries: [entry], labelEntries: [entry] });
+  const occupiedBoxes = [];
+  harness.owner.reserveCityMarkerBoxes(2, occupiedBoxes);
+  assert.equal(occupiedBoxes.length, 1);
+  const reservedBox = { ...occupiedBoxes[0] };
+  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 0);
+  assert.equal(harness.labelCalls.length, 0);
+  const countryBox = { x: 10, y: 20, w: 30, h: 10 };
+  occupiedBoxes.push(countryBox);
+  harness.owner.drawLabelsPass(2, { occupiedBoxes, markersReserved: true });
+  assert.equal(occupiedBoxes.length, 2, "markers are not claimed twice");
+  assert.ok(harness.labelCalls[0].options.occupiedBoxes.includes(countryBox));
+  const { args: [, x, y, width, height] } = harness.context.calls.find((call) => call.type === "drawImage");
+  assert.deepEqual(reservedBox, {
+    x: entry.screenPoint[0] + (x - entry.anchor[0]) * 2,
+    y: entry.screenPoint[1] + (y - entry.anchor[1]) * 2,
+    w: width * 2, h: height * 2,
+  });
+  harness.state.showCityPoints = false;
+  const hiddenBoxes = [];
+  harness.owner.reserveCityMarkerBoxes(2, hiddenBoxes);
+  assert.equal(hiddenBoxes.length, 0);
+});
+
+test("distant ordinary city names can hide while their markers and hover targets remain", (t) => {
+  t.after(installCanvasFactory());
+  const entry = { id: "ordinary-city", anchor: [40, 50], screenPoint: [50, 50], markerSizePx: 6,
+    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } } };
+  const harness = createCityPointsHarness({ markerEntries: [entry], labelEntries: [entry], pointer: () => [50, 50],
+    drawLabels(_entries, options) {
+      assert.equal(options.labelOpacity, 0);
+      assert.equal(options.capitalLabelOpacity, 0.5);
+      return 0;
+    },
+  });
+  harness.state.zoomTransform.k = 1.8;
+  const occupiedBoxes = [];
+  harness.owner.drawLabelsPass(1.8, { occupiedBoxes });
+  assert.equal(harness.context.calls.filter((call) => call.type === "drawImage").length, 1);
+  assert.equal(occupiedBoxes.length, 1, "the marker alone retains its geographic footprint");
+  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 0);
+  assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" })?.id, entry.id);
+});
+
+test("overview capitals keep their near-marker position through country placement without duplicate boxes", (t) => {
+  t.after(installCanvasFactory());
+  const entries = [
+    { id: "capital", isCapital: true, markerSizePx: 10, anchor: [40, 50], screenPoint: [80, 100] },
+    { id: "ordinary", anchor: [150, 50], screenPoint: [300, 100] },
+  ];
+  const draws = [];
+  const harness = createCityPointsHarness({ markerEntries: entries,
+    buildCityRevealPlan: () => ({ markerEntries: entries, labelEntries: entries, labelBudget: 1 }),
+    drawLabels(candidates, options, context) {
+      context.measureText = () => ({ width: 20 });
+      context.strokeText = () => {};
+      context.fillText = (...args) => draws.push(args);
+      return createCityLabelOwner({
+        getters: { getContext: () => context, getViewportSize: () => ({ width: 500, height: 300 }) },
+        helpers: {
+          clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+          getCityVisualCapitalState: (entry, config) => !!entry.isCapital && config.showCapitalOverlay !== false,
+          getCityDisplayLabel: () => "Capital", formatCityMapLabel: (text) => text,
+          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: (entry) => entry.markerSizePx || 12,
+          getCityLabelRenderStyle: () => ({}),
+        },
+      }).drawCityLabelsFromEntries(candidates, options);
+    },
+  });
+  const occupiedBoxes = [];
+  const overviewLayout = harness.owner.reserveOverviewLabelBoxes(2, occupiedBoxes);
+  assert.equal(draws.length, 0, "reservation measures but does not draw text");
+  assert.equal(overviewLayout.capitalBoxes.length, 1);
+  assert.equal(entries[0].acceptedLabelPlacement, "right");
+  assert.equal(entries[1].acceptedLabelPlacement, undefined, "ordinary names do not reserve overview space");
+  const clearCountryBox = { x: 170, y: 140, w: 100, h: 20 };
+  assert.equal(claimScreenLabelPlacement([
+    { id: "over-capital", box: { ...overviewLayout.capitalBoxes[0] } },
+    { id: "country-center", box: clearCountryBox },
+  ], occupiedBoxes).id, "country-center");
+  harness.owner.drawLabelsPass(2, { occupiedBoxes, overviewLayout });
+  assert.equal(entries[0].acceptedLabelPlacement, "right", "country placement cannot push the capital across its star");
+  assert.equal(draws.length, 1, "the shared label budget includes capitals");
+  assert.equal(draws[0][1], 45, "10px screen offset at 2x remains beside the star");
+  assert.equal(occupiedBoxes.length, 4, "two markers, one country and one capital; no duplicate reservations");
+  assert.ok(occupiedBoxes.includes(clearCountryBox));
+  assert.equal(harness.renderMetrics.at(-1).detail.labelCount, 1);
+  harness.state.showCityPoints = false;
+  assert.equal(harness.owner.reserveOverviewLabelBoxes(2, []), null);
+});
+
+test("overview country titles displace ordinary markers and their labels while capitals keep priority", (t) => {
+  t.after(installCanvasFactory());
+  const capital = { id: "capital", isCapital: true, markerSizePx: 10, anchor: [40, 50], screenPoint: [80, 100] };
+  const city = { id: "ordinary", anchor: [150, 50], screenPoint: [300, 100],
+    feature: { type: "Feature", properties: { __city_host_feature_id: "LAND1" } } };
+  const harness = createCityPointsHarness({ markerEntries: [capital, city], labelEntries: [capital, city], pointer: () => city.screenPoint });
+  const boxes = [];
+  const reservation = harness.owner.reserveOverviewLabelBoxes(2, boxes);
+  assert.equal(boxes.length, 1, "only the capital marker reserves space ahead of country titles");
+  boxes.push({ x: 290, y: 90, w: 40, h: 20 });
+  harness.owner.drawLabelsPass(2, { occupiedBoxes: boxes, overviewLayout: reservation });
+  assert.equal(harness.context.calls.filter(call => call.type === "drawImage").length, 1, "the covered ordinary marker is omitted");
+  assert.deepEqual(harness.labelCalls.at(-1).entries, [], "a hidden marker cannot leave a floating city name");
+  assert.equal(harness.owner.getHoveredCityTooltipEntry({ type: "mousemove" }, { targetType: "land", id: "LAND1" }), null);
+  harness.owner.drawLabelsPass(4, { occupiedBoxes: [] });
+  assert.equal(harness.labelCalls.at(-1).entries.length, 2, "detail view restores the ordinary city policy");
 });
 
 test("city hover prefers higher-priority scenario entries without bestPriority errors", () => {
@@ -364,7 +479,7 @@ test("markers depend on policy with consistent interactive and settled density w
           clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
           getCityVisualCapitalState: (entry) => !!entry.isCapital,
           getCityDisplayLabel: () => "City", formatCityMapLabel: (text) => text,
-          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: () => 6,
+          getCityLabelMinZoom: () => 0, getCityMarkerSizePx: () => 12,
           getCityLabelRenderStyle: () => ({}),
         },
       }).drawCityLabelsFromEntries(candidates, options);

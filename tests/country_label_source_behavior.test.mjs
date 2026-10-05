@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { Worker as NodeWorker } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
 import { createCountryLabelSourceOwner } from '../js/core/renderer/country_label_source.js';
+import { mergeCountryLabelGroups } from '../js/core/renderer/country_label_geometry.js';
 
 const sandbox = {};
 vm.runInNewContext(readFileSync(new URL('../vendor/topojson-client.min.js', import.meta.url), 'utf8'), sandbox);
@@ -23,10 +24,112 @@ function fixture(extra = {}, helpers = {}) {
     sovereignBaseColors: { AAA: '#123456', BBB: '#123456' },
     scenarioBundleCacheById: { history: bundle }, ...extra };
   const owner = createCountryLabelSourceOwner({ state, topojson, geoArea: sandbox.d3.geoArea,
+    geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
     yieldTask: () => Promise.resolve(),
     getCountryName: code => state.scenarioCountriesByTag[code]?.[state.currentLanguage], ...helpers });
   return { owner, state, bundle, payload };
 }
+
+for (const transpose of [false, true]) {
+  test(`exact ${transpose ? 'horizontal' : 'vertical'} coarse borders dissolve detail subsegments without changing source geometry`, async () => {
+    const rectangle = (x, y, width, height) => {
+      const points = [[x, y], [x, y + height], [x + width, y + height], [x + width, y], [x, y]];
+      return { type: 'Feature', properties: {}, geometry: { type: 'Polygon',
+        coordinates: [transpose ? points.map(([a, b]) => [b, a]) : points] } };
+    };
+    const members = [rectangle(0, 0, 1, 3), rectangle(1, 0, 1, 1), rectangle(1, 1, 1, 2)];
+    members.forEach((member, i) => { member.properties.detail_tier = i === 0 ? 'coarse' : 'fine'; });
+    const original = JSON.stringify(members);
+    const [record] = await mergeCountryLabelGroups([['AAA', members]], {
+      topojson, geoArea: sandbox.d3.geoArea, geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+    });
+    assert.equal(record.geometry.coordinates.length, 1);
+    for (const point of [[0.5, 0.5], [1.5, 0.5], [1.5, 2.5]]) {
+      assert.equal(sandbox.d3.geoContains(record.geometry, transpose ? [...point].reverse() : point), true);
+    }
+    assert.equal(JSON.stringify(members), original);
+  });
+}
+
+test('exact axial endpoint splitting preserves a real narrow gap and detached land', async () => {
+  const gap = 1e-8;
+  const members = [feature('mainland', 0, 'AA', { detail_tier: 'coarse' }),
+    feature('other-side', 1 + gap, 'AA', { detail_tier: 'fine' }), feature('island', 4)];
+  const original = JSON.stringify(members);
+  const [record] = await mergeCountryLabelGroups([['AAA', members]], {
+    topojson, geoArea: sandbox.d3.geoArea, geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+  });
+  assert.equal(record.geometry.coordinates.length, 3);
+  assert.equal(sandbox.d3.geoContains(record.geometry, [1 + gap / 2, 0.5]), false);
+  assert.equal(sandbox.d3.geoContains(record.geometry, [3, 0.5]), false);
+  assert.equal(JSON.stringify(members), original);
+});
+
+test('same-direction axial coastlines retain their original segmentation', async () => {
+  const members = [
+    { ...feature('long-edge', 0), geometry: { type: 'Polygon', coordinates: [[[0, 0], [0, 3], [1, 3], [1, 0], [0, 0]]] } },
+    { ...feature('same-side-edge', 0), geometry: { type: 'Polygon', coordinates: [[[0.5, 1], [0.5, 2], [1, 2], [1, 1], [0.5, 1]]] } },
+  ];
+  const original = JSON.stringify(members);
+  await mergeCountryLabelGroups([['AAA', members]], {
+    topojson: { merge(topology) {
+      assert.equal(topology.arcs.length, 8);
+      assert.ok(topology.arcs.some(arc => arc[0][0] === 1 && arc[1][0] === 1
+        && Math.min(arc[0][1], arc[1][1]) === 0 && Math.max(arc[0][1], arc[1][1]) === 3));
+      return { type: 'MultiPolygon', coordinates: [members[0].geometry.coordinates] };
+    } }, geoArea: sandbox.d3.geoArea,
+  });
+  assert.equal(JSON.stringify(members), original);
+});
+
+test('stitched merge groups restore separate exteriors, true holes and nested land without dropping the group', async () => {
+  const exterior = [[10, 0], [10, 8], [18, 8], [18, 0], [10, 0]];
+  const hole = [[12, 2], [12, 6], [16, 6], [16, 2], [12, 2]];
+  const island = [[13, 3], [13, 5], [15, 5], [15, 3], [13, 3]];
+  const merged = { type: 'MultiPolygon', coordinates: [[ring(0, 0), exterior.reverse(), hole, island.reverse()]] };
+  const original = JSON.stringify(merged);
+  const [record] = await mergeCountryLabelGroups([['AAA', [feature('one', 0), feature('two', 1)]]], {
+    topojson: { merge: () => merged }, geoArea: sandbox.d3.geoArea,
+    geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+  });
+  assert.equal(record.geometry.coordinates.length, 3);
+  for (const p of [[0.5, 0.5], [11, 1], [14, 4]]) assert.equal(sandbox.d3.geoContains(record.geometry, p), true);
+  for (const p of [[12.5, 2.5], [5, 0.5], [19, 4]]) assert.equal(sandbox.d3.geoContains(record.geometry, p), false);
+  const expected = { type: 'MultiPolygon', coordinates: [[ring(0, 0)], [[...exterior].reverse(), [...hole].reverse()], [[...island].reverse()]] };
+  assert.ok(Math.abs(sandbox.d3.geoArea(record.geometry) - sandbox.d3.geoArea(expected)) < 1e-10);
+  assert.equal(JSON.stringify(merged), original);
+});
+
+test('stitched ring nesting preserves dateline holes, inner islands and a separate mainland', async () => {
+  const exterior = [[170, -6], [170, 6], [-170, 6], [-170, -6], [170, -6]];
+  const hole = [[175, -3], [175, 3], [-175, 3], [-175, -3], [175, -3]];
+  const island = [[178, -1], [178, 1], [-178, 1], [-178, -1], [178, -1]];
+  const merged = { type: 'MultiPolygon', coordinates: [[ring(0, 0), hole, island, exterior]] };
+  const [record] = await mergeCountryLabelGroups([['AAA', [feature('one', 0), feature('two', 1)]]], {
+    topojson: { merge: () => merged }, geoArea: sandbox.d3.geoArea,
+    geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+  });
+  assert.equal(record.geometry.coordinates.length, 3);
+  for (const p of [[0.5, 0.5], [172, 0], [-172, 0], [179, 0], [-179, 0]]) assert.equal(sandbox.d3.geoContains(record.geometry, p), true, p.join(','));
+  for (const p of [[176, 0], [-176, 0], [160, 0], [180, 4.5]]) {
+    assert.equal(sandbox.d3.geoContains(record.geometry, p), p[1] === 4.5, p.join(','));
+  }
+  assert.ok(sandbox.d3.geoArea(record.geometry) < 0.1);
+});
+
+test('merged nesting uses spherical edges for a high-latitude hole beyond the vertex latitude bounds', async () => {
+  const exterior = [[-20, 60], [-20, 70], [20, 70], [20, 60], [-20, 60]];
+  const hole = [[-1, 70.3], [-1, 70.7], [1, 70.7], [1, 70.3], [-1, 70.3]];
+  assert.equal(sandbox.d3.geoContains({ type: 'Polygon', coordinates: [exterior] }, [0, 70.5]), true);
+  const [record] = await mergeCountryLabelGroups([['AAA', [feature('one', 0), feature('two', 1)]]], {
+    topojson: { merge: () => ({ type: 'MultiPolygon', coordinates: [[exterior, hole]] }) },
+    geoArea: sandbox.d3.geoArea, geoContains: sandbox.d3.geoContains, geoBounds: sandbox.d3.geoBounds,
+  });
+  assert.equal(record.geometry.coordinates.length, 1);
+  assert.equal(record.geometry.coordinates[0].length, 2);
+  assert.equal(sandbox.d3.geoContains(record.geometry, [0, 70.5]), false);
+  assert.equal(sandbox.d3.geoContains(record.geometry, [0, 65]), true);
+});
 
 function nodeWorkerAdapter(log) {
   const worker = new NodeWorker(`

@@ -1437,6 +1437,48 @@ class PagesDistStartupShellTest(unittest.TestCase):
             )
             self.assertEqual(node["dynamic_imports"], [])
 
+    def test_map_label_fonts_have_exact_on_demand_vendor_inventory_ownership(self) -> None:
+        font_paths = (
+            "app/vendor/fonts/README.md",
+            "app/vendor/fonts/ebgaramond/EBGaramond-500.woff2",
+            "app/vendor/fonts/ebgaramond/OFL.txt",
+            "app/vendor/fonts/notoserifsc/NotoSerifSC-400.woff2",
+            "app/vendor/fonts/notoserifsc/OFL.txt",
+        )
+        css_path = "app/css/map-label-fonts.css"
+        graph = {
+            "entrypoints": [{"path": "app/index.html", "resource_references": [css_path]}],
+            "summary": {},
+            "initial_resource_paths": [css_path],
+            "deferred_resource_paths": [],
+            "nodes": [],
+            "unresolved_references": [],
+        }
+        records = [{"path": path, "size_bytes": 1} for path in (*font_paths, css_path)]
+        inventory = build_pages_dist.build_pages_reachability_inventory(records, module_graph=graph)
+        self.assertEqual(inventory["admission"]["status"], "complete")
+        self.assertEqual(inventory["product_inventory"]["unknown_file_count"], 0)
+        self.assertEqual(inventory["untraversed_owned_file_count"], 5)
+        self.assertEqual(
+            next(item for item in inventory["categories"] if item["id"] == "on-demand-product")["file_count"],
+            5,
+        )
+        for path in font_paths:
+            with self.subTest(path=path):
+                self.assertEqual(
+                    build_pages_dist._classify_pages_dist_path(path, graph),
+                    ("on-demand-product", "editor-vendor", "product-registry:editor-vendor-product"),
+                )
+        self.assertEqual(
+            build_pages_dist._classify_pages_dist_path(css_path, graph),
+            ("startup-critical", "editor-startup", "startup-resource-graph"),
+        )
+        self.assertEqual(
+            build_pages_dist._classify_pages_dist_path("app/vendor/fonts/unregistered.woff2", graph),
+            ("unknown", "unclassified", "no-declarative-owner"),
+            "the exact font list must not admit arbitrary files in the fonts directory",
+        )
+
     def test_pages_dist_inventory_rejects_orphan_and_typo_counterexamples(self) -> None:
         empty_graph = {
             "schema_version": build_pages_dist.PAGES_REACHABILITY_SCHEMA_VERSION,
