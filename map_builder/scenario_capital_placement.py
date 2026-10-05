@@ -9,6 +9,8 @@ from shapely.geometry import Point, shape
 from shapely.ops import nearest_points
 from topojson.utils import serialize_as_geojson
 
+from map_builder.json_source import read_json_source
+
 # The coarse UAE coastline omits Abu Dhabi island; the Macau passthrough shell
 # overlaps the coarse China polygon. These reviewed cartographic exceptions are
 # bounded to the named city, not permissions to move any capital across borders.
@@ -16,7 +18,7 @@ CARTOGRAPHIC_SNAP_LIMITS_KM = {"CITY::ne::1159150565": 12, "CITY::ne::1159149085
 
 
 def read_political_features(path: Path) -> list[dict]:
-    topology = json.loads(path.read_text(encoding="utf-8"))
+    topology = read_json_source(path)
     features = []
     for name in ("political", "scenario_atlantropa"):
         if name not in topology.get("objects", {}):

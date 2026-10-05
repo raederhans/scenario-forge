@@ -17,3 +17,5 @@
 - 全局 mixed-LOD 验证覆盖 196 个独立详情分片维度，所有状态覆盖完整源；最终编码回退不改变任何坐标、feature 或详情分片。stage/canonical strict、精确保留、catalog/data health 和路由检查通过。新 Pages 构建在 `.runtime/tmp/europe-integration-20261005/pages`，不改 tracked dist。
 - 最终发布 artifact 使用 `pages-final`（815,707,977 B）；完整 Pages suite 67 PASS。早期 `pages` 根含独立 hero 临时生成物，不作为最终发布证据。最终 TNO Playwright smoke PASS，端口 8009 的任务服务器已结束。
 - 合并提交 `f211cfce308d6b7794f1711818e117a5cf75368e` 已推送，PR 为 https://github.com/raederhans/scenario-forge/pull/211 。创建 API 曾返回 502，但只读回查证明 PR 已实际建立，因此没有重复创建。最终 `pr:plan` 发现的 5 个 legacy source 工具路由已补齐；Russia audit 新增 main() gzip-only fixture，计划的 unmatched 和 route gaps 均为空。两个 coarse 测试明确校验 Shapely 消费结果及真实 bounds，并保持 geo_stack 依赖归类。
+- `9303f9926` 的远端性能、transport、scenario matrix、Pages、浏览器 smoke 和 Golden Demo 均通过；PR Verify Required 因 city-label 测试仍直接读取 plain runtime 而失败。已将该测试和剩余两个 water runtime 读取入口接入已有 helper，分别 3 / 11 项通过。
+- 补跑计划内剩余 52 条 Python 命令，49 条直接通过，定位并修复 3 处失败：恢复 runtime gzip 流损坏校验；把 gzip 支持放入首都几何共用 reader 并恢复 repair 的原调用契约；启动阶段静态断言同时要求 main 已有的 sample guard 和 detail 条件。修复后 Russia validation 20 项、首都及启动边界组合 60 项通过。未运行整个高内存 TNO builder suite，只运行计划指定的 3 个方法。

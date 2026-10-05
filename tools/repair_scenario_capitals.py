@@ -16,9 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from map_builder.io.writers import write_json_atomic
-from map_builder.json_source import read_json_source
 from map_builder.scenario_capital_rules import REVIEWED_CAPITALS, apply_reviewed_capitals
-from map_builder.scenario_capital_placement import place_capital_markers
+from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
 from map_builder.scenario_city_overrides_composer import extract_city_assets_payload
 from tools.check_scenario_contracts import _build_snapshot_for_scenario, _refresh_audit_payload
 
@@ -70,15 +69,7 @@ def repair_scenario(scenario_id, city_rows, *, geometry_cache=None, dry_run=Fals
                 raise ValueError("Geometry cache is permitted only with --dry-run")
             features = read(cache_path)["features"]
         else:
-            topology = read_json_source(directory / "runtime_topology.topo.json")
-            from topojson.utils import serialize_as_geojson
-            features = []
-            for object_name in ("political", "scenario_atlantropa"):
-                if object_name in topology.get("objects", {}):
-                    collection = serialize_as_geojson(topology, objectname=object_name)
-                    if isinstance(collection, str):
-                        collection = json.loads(collection)
-                    features.extend(collection.get("features", []))
+            features = read_political_features(directory / "runtime_topology.topo.json")
         conflicts = place_capital_markers(payload, countries, owners, features)
     payload.setdefault("audit", {})["capital_territory_conflicts"] = conflicts
     changed = [tag for tag in countries if (

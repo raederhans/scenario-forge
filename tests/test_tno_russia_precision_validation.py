@@ -269,6 +269,17 @@ def test_complete_stage_passes(base_scenario):
     assert result['nonselected_coarse_seam_limitations'] == []
 
 
+def test_complete_stage_accepts_gzip_only_runtime_topology(base_scenario):
+    baseline, runtime, candidate_dir = complete_stage(base_scenario)
+    raw = runtime.read_bytes()
+    runtime.unlink()
+    runtime.with_name(runtime.name + '.gz').write_bytes(gzip.compress(raw))
+
+    result = validate(baseline, runtime, candidate_dir)
+
+    assert result['status'] == 'PASS'
+
+
 def test_inherited_invalid_coarse_is_reported_only_when_unchanged(base_scenario):
     result = validate(*complete_stage(base_scenario, inherited_invalid=True))
     limitations = result['nonselected_coarse_seam_limitations']

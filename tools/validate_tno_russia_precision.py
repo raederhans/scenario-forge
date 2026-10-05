@@ -49,10 +49,14 @@ def validate(baseline_dir, candidate_runtime, candidate_dir=None):
         if candidate_runtime_expected.read_bytes() != candidate_runtime_actual.read_bytes():
             raise ValueError('candidate_runtime bytes do not match candidate_dir/runtime_topology.topo.json')
         for compressed in candidate_dir.rglob('*.json.gz'):
-            if compressed.name == 'runtime_topology.topo.json.gz':
-                continue
             source = Path(str(compressed)[:-3])
-            if not source.exists() or gzip.decompress(compressed.read_bytes()) != source.read_bytes():
+            decompressed = gzip.decompress(compressed.read_bytes())
+            # The runtime topology may be stored as a gzip-only canonical
+            # source. Always validate its gzip stream, and compare with the
+            # plain representation when one is also present.
+            if (source.exists() and decompressed != source.read_bytes()) or (
+                not source.exists() and compressed.name != 'runtime_topology.topo.json.gz'
+            ):
                 raise ValueError(f'stale compressed stage artifact: {compressed.name}')
 
     old_raw = read(baseline_dir / 'runtime_topology.topo.json')
