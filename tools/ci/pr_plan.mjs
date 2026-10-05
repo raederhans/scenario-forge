@@ -31,7 +31,16 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
   // Source-only changes validate their live reference graph. Changes to packaging,
   // public assets or dependencies still exercise the complete built artifact.
-  const pagesFull = full || controlPlane || dependencyChange || matches([
+  // These renderer contracts compare built mirrors byte-for-byte. Supply a fresh
+  // artifact before selecting them instead of comparing against historical dist.
+  const rendererMirrorRelevant = matches([
+    "js/core/map_renderer.js",
+    "js/core/map_renderer/draw_canvas_orchestration_owner.js",
+    "js/core/map_renderer/transformed_frame_compositor_owner.js",
+    "js/core/renderer/cached_pass_compositor_owner.js",
+    "tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
+  ]);
+  const pagesFull = full || controlPlane || dependencyChange || rendererMirrorRelevant || matches([
     "data/**", "dist/**", "vendor/**", "landing/**", "index.html", "app.js", "styles.css",
     "tools/build_pages_dist.py", "tools/pages_*", "tools/app_entry_resolver.py",
     "tools/check_pages_source_graph.py", "tools/build_landing_*", "tools/runtime_json_packing.py",

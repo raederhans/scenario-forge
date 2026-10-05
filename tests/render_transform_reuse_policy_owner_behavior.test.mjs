@@ -77,6 +77,16 @@ function createRequiredPassReferences() {
   );
 }
 
+test("exact recovery requires active passes only and still rejects a missing active pass", () => {
+  const activePassNames = ["background", "political", "contextScenario", "borders", "labels"];
+  const cache = { canvases: { background: {}, political: {}, contextScenario: {} } };
+  const references = { background: { k: 1 }, political: { k: 1 }, contextScenario: { k: 1 } };
+  const { owner, referenceTransforms } = createOwner({ cache, references, activePassNames });
+  assert.equal(owner.shouldStartExactAfterSettleFastPath(), true);
+  delete referenceTransforms.contextScenario;
+  assert.equal(owner.shouldStartExactAfterSettleFastPath(), false);
+});
+
 test("getContextBaseZoomBucketId classifies low mid and high zoom buckets", () => {
   const { owner } = createOwner();
 

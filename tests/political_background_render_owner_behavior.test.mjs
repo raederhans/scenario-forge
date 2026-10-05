@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 
 import { createPoliticalBackgroundRenderOwner } from "../js/core/renderer/political_background_render_owner.js";
 import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
+import { getProjectedPathResourceAccounting } from "../js/core/renderer/projected_path_resource_accounting.js";
 
 class FakePath2D {
   constructor() {
@@ -17,7 +19,12 @@ class FakePath2D {
 FakePath2D.addPathCallCount = 0;
 
 
-function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
+function createFixture({
+  progressiveLimit = 2400,
+  withPath2D = true,
+  mergedPathBudgetBytes,
+  resourceBudget = createRuntimeResourceBudget(),
+} = {}) {
   const calls = [];
   const pending = [];
   const cancelled = [];
@@ -154,6 +161,8 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
     applyOceanClipMask: () => calls.push("ocean:clip"),
     drawOceanStyle: () => calls.push("ocean:style"),
     warn: (message) => calls.push(`warn:${message}`),
+    resourceBudget,
+    politicalPathResourceAccounting: getProjectedPathResourceAccounting(resourceBudget),
   };
   const owner = createPoliticalBackgroundRenderOwner({
     surface,
@@ -174,12 +183,14 @@ function createFixture({ progressiveLimit = 2400, withPath2D = true } = {}) {
       renderPhaseIdle: "idle",
       politicalRecoveryQualityProgressive: "progressive",
       progressiveBackgroundExactEntryLimit: progressiveLimit,
+      politicalBackgroundMergedPathBudgetBytes: mergedPathBudgetBytes,
       oceanMaskModeTopology: "topology_ocean",
       oceanDepthMaskGrayMap: { min: 28, neutral: 128, max: 232 },
     },
   });
   return {
     owner, state, calls, pending, cancelled, pathCache, renderCache, context, metrics, surface, filledPaths,
+    resourceBudget,
     setMaskResult: (value) => { maskResult = value; },
   };
 }
@@ -623,6 +634,119 @@ test("scenario underlay fills warm and cold paths as one compound path and reuse
   assert.equal(recolored.deferredFullCacheReady, true);
   assert.equal(recolored.groupCount, 2, "deferred completion recomputes changed colors instead of publishing the scheduling snapshot");
   assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
+});
+
+test("synchronous merge admission bounds retained copies and keeps compound-fill semantics", () => {
+  const fixture = createFixture({ mergedPathBudgetBytes: 256 });
+  const entries = [
+    feature("a1", "O1"), feature("a2", "O1"),
+    feature("b1", "O2"), feature("b2", "O2"),
+  ].map((item) => ({ feature: item, id: item.properties.id }));
+  fixture.state.landDataFull = { features: entries.map((entry) => entry.feature) };
+  FakePath2D.addPathCallCount = 0;
+
+  const first = fixture.owner.drawPoliticalBackgroundFillsForEntries(entries, {
+    useFullPassCache: true,
+    returnSummary: true,
+  });
+  assert.equal(first.builtGroupMergeCount, 1, "only one extra merge fits the independent path budget");
+  assert.equal(fixture.filledPaths.length, 2);
+  assert.deepEqual(fixture.filledPaths.map((path) => path.paths.length), [2, 2],
+    "a rejected retained merge is rebuilt transiently so each color group still receives one compound fill");
+  assert.equal(FakePath2D.addPathCallCount, 4);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1280,
+    "unique original paths plus the one retained merged path are counted once");
+
+  fixture.filledPaths.length = 0;
+  const replay = fixture.owner.drawPoliticalBackgroundFillsForEntries(entries, {
+    useFullPassCache: true,
+    returnSummary: true,
+  });
+  assert.equal(replay.cacheHit, true);
+  assert.deepEqual(fixture.filledPaths.map((path) => path.paths.length), [2, 2]);
+  assert.equal(FakePath2D.addPathCallCount, 6, "only the non-retained group is rebuilt for this frame");
+
+  fixture.owner.releaseScenarioPoliticalBackgroundCache();
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0, "root-scene release drops retained-path accounting");
+});
+
+test("deferred merge admission shares the budget and cancellation releases pending paths", () => {
+  const makeVisibleItems = (fixture) => fixture.state.landData.features.map((item, drawOrder) => ({
+    id: item.properties.id, feature: item, drawOrder, minX: 0, minY: 0, maxX: 1, maxY: 1,
+  }));
+  const fixture = createFixture({ progressiveLimit: 1, mergedPathBudgetBytes: 256 });
+  fixture.state.landData.features = [
+    feature("a1", "O1"), feature("a2", "O1"),
+    feature("b1", "O2"), feature("b2", "O2"),
+  ];
+  fixture.state.landDataFull = { features: fixture.state.landData.features };
+  fixture.owner.drawPoliticalBackgroundFills({ visibleItems: makeVisibleItems(fixture), returnSummary: true });
+  fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 256,
+    "the pending artifact reports the one path retained by its first slice");
+  for (let index = 0; index < 8; index += 1) {
+    fixture.pending.shift().callback({ timeRemaining: () => 0 });
+  }
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 1280,
+    "pending accounting includes unique original paths and an in-progress merged copy");
+  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cancel");
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+  assert.equal(fixture.cancelled.length, 1);
+
+  const completed = createFixture({ progressiveLimit: 1, mergedPathBudgetBytes: 256 });
+  completed.state.landData.features = [
+    feature("a1", "O1"), feature("a2", "O1"),
+    feature("b1", "O2"), feature("b2", "O2"),
+  ];
+  completed.state.landDataFull = { features: completed.state.landData.features };
+  const visibleItems = makeVisibleItems(completed);
+  completed.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
+  completeDeferred(completed);
+  const mergeMetric = completed.metrics.find((metric) => (
+    metric.name === "scenarioPoliticalBackgroundDeferredFullCacheBuild"
+  ));
+  assert.equal(mergeMetric.builtGroupMergeCount, 1);
+  completed.filledPaths.length = 0;
+  const replay = completed.owner.drawPoliticalBackgroundFillsForEntries(
+    visibleItems.map(({ feature: item, id }) => ({ feature: item, id })),
+    { useFullPassCache: true, returnSummary: true },
+  );
+  assert.equal(replay.cacheHit, true);
+  assert.deepEqual(completed.filledPaths.map((path) => path.paths.length), [2, 2]);
+  assert.equal(completed.resourceBudget.snapshot().categories.projectedPaths, 1280);
+});
+
+test("deferred recolor releases discarded merged paths before another idle slice", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData.features = [feature("a"), feature("b")];
+  fixture.state.landDataFull = { features: fixture.state.landData.features };
+  drawDeferredFeatures(fixture);
+  const deadline = { timeRemaining: () => 0 };
+  for (let index = 0; index < 20 && fixture.resourceBudget.snapshot().categories.projectedPaths !== 768; index += 1) {
+    assert.ok(fixture.pending.length);
+    fixture.pending.shift().callback(deadline);
+  }
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 768,
+    "the pending artifact retains two original paths and one merged copy");
+
+  fixture.state.colors.a = "#abcdef";
+  fixture.state.colorRevision += 1;
+  for (let index = 0; index < 20; index += 1) {
+    assert.ok(fixture.pending.length);
+    fixture.pending.shift().callback(deadline);
+    const slice = fixture.metrics.findLast((metric) => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+    if (slice?.stage === "ready") break;
+  }
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 512,
+    "regroup drops the old merged copy while retaining both original paths");
+  assert.ok(fixture.pending.length, "the recolored groups have not been rebuilt yet");
+  fixture.state.renderPhase = "interactive";
+  fixture.pending.shift().callback(deadline);
+  assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 512,
+    "waiting for idle does not retain the discarded merge in accounting");
+  assert.equal(fixture.calls.includes("repaint"), false);
+  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cleanup");
+  assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
 });
 
 test("stale deferred work cancels without invalidation, diagnostics, or repaint", () => {

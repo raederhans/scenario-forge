@@ -728,6 +728,7 @@ test("source-bound political background owner proves exact facade methods withou
     "drawBackgroundPass",
     "drawPoliticalBackgroundFills",
     "drawPoliticalBackgroundFillsForEntries",
+    "releaseScenarioPoliticalBackgroundCache",
   ]);
   assert.deepEqual(inspectStateMutationDelegatingOwnerSources({
     compositionSource: fs.readFileSync(entry.compositionModulePath, "utf8"),
@@ -3130,6 +3131,14 @@ test("registered validation scopes retain callback writes and borrowed cache esc
     derivedAliasTaintMode: "strict",
   });
   assert.equal(scanScope("getRenderCacheOwner().withValidatedCache(() => 1);").findings.some(row => row.reason === "unsupported-call-mutation"), false);
+  const cacheOwnerEntry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ factoryExportName }) => factoryExportName === "createRenderCacheOwner",
+  );
+  for (const method of ["syncSurfaceResourceAccounting", "retainSurfaceCacheForScope", "releaseSurfaceCache", "releaseInactivePassSurfaces"]) {
+    assert.ok(cacheOwnerEntry.methods.includes(method), `cache lifecycle method is registered: ${method}`);
+    assert.equal(scanScope(`getRenderCacheOwner().${method}();`).findings.some(row => row.reason === "unsupported-call-mutation"), false);
+    assert.ok(scanScope(`getRenderCacheOwner().${method}((runtimeState.bootPhase = 'bad'));`).findings.some(row => row.key === "bootPhase"));
+  }
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(() => { runtimeState.bootPhase = 'bad'; });").findings.some(row => row.key === "bootPhase"));
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => { cache.dirty = {}; });").findings.some(row => row.unsupported));
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => leak(cache));").findings.some(row => row.reason === "state-alias-escape"));

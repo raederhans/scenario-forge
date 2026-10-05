@@ -3050,11 +3050,11 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "0b2fed7dcec68c3cfcb8c92d33ebfe8de3a8638d2f06e09cd314a0ef0c3f4fe9",
+  "sourceFingerprint": "647262675b2aea219e46ba3a26020824a77fb0918f74d6442b3a1e77f331b4fb",
   "dependencyFingerprints": {
     "js/core/renderer/object_identity.js": "8b3b177452d5e824e7f8e99ed3f8dbbbf281c7004ad4e30890215c64a86f6bcf",
     "js/core/renderer/physical_atlas_lod_policy.js": "0f156bd94fd3bbd25212dfa121385a0114e7719840c6f83f87209b9a95fa5bed",
-    "js/core/renderer/urban_city_policy.js": "c9eb1a32d083980063fd52c1c3952722d64b75bed13d25186bcf75c35ad90fc3"
+    "js/core/renderer/urban_city_policy.js": "19b0d1f539bb37abae6b7117e5b989d5d446f6f27e17fc9ea1f696ead70b19ab"
   },
   "reviewedImportedReadCalls": [
     { "callFingerprint": "a8f39579848df5cc2940c56fffbede34fd44a34a34aa676dacaaa5236ae9795f", "modulePath": "js/core/renderer/urban_city_policy.js", "exportName": "getUrbanCityRenderPassSignatureParts", "localName": "getUrbanCityRenderPassSignatureParts" },
@@ -3073,6 +3073,38 @@ freezeStateTargetPureReaderEntry({
     "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f"
   ],
   "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "a5618c2ee37d810f021e4cbbab1fb9d997d81d60e4b5245ef90729ff94149c18",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "63171d1e563ed893a68782a4a0ec6057a8bb70e0724680801a78a132c702aa6f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "railStationsMajorData",
+      "sourceFingerprint": "854ed69075614c016ee952a0be3bff358bf5169e84a32845baa8a64b8d04266f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getTransportPresentationSignatureParts\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "ade2393265a3c66d744bfb8d1d4b47f9e0707ebead3b11fd23c036c0d7bc7157",
+      "count": 1
+    },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
       "reason": "state-alias-escape",
@@ -6322,7 +6354,7 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   "factoryModulePath": "js/core/renderer/projected_geographic_path_cache.js",
   "factoryExportName": "createProjectedGeographicPathCache",
   "borrowedMethodArgumentIndexes": { "getPath": [0] },
-  "factorySourceFingerprint": "5b27591435f382eabd0914b628c7673afb3a1df896a1be9fa767a2dbde4f5d36",
+  "factorySourceFingerprint": "cfa9f46f8c8c9d6928386a9621429969b50d2e763875f82312c50b76087bb936",
   "ownerBindingName": "geographicPathCache",
   "methods": [
     "getPath",
@@ -6634,7 +6666,7 @@ freezeMutationDelegatingOwnerEntry({
   "compositionSourceFingerprint": "cf4648c87226489ac0cbd8d94197dba295482737cd2ba535ef1d75aad98948b1",
   "factoryModulePath": "js/core/renderer/political_path_cache_owner.js",
   "factoryExportName": "createPoliticalPathCacheOwner",
-  "factorySourceFingerprint": "0b829bb0c135344374312216fb8d8d92036189c1009579819f0146ba0c831746",
+  "factorySourceFingerprint": "05c2f7db79b0f475dfc017f2ddcf7e44132d7ade7b53d5bbbee759d18a89e751",
   "ownerBindingName": "owner",
   "methods": [
     "getPoliticalPathCacheSignature",
@@ -6801,10 +6833,10 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
     "compositionModulePath": "js/core/map_renderer.js",
     "compositionExportName": "getRenderCacheOwner",
-    "compositionSourceFingerprint": "f9e6134fee02281e43d48d388d37bcdb3b6767d7fd5f228f76d8e2b91cbacfe0",
+    "compositionSourceFingerprint": "d5024703e0a88416d3ceb4c1d3056b1c5a66fb61a807cc365951bda2d17011b8",
     "factoryModulePath": "js/core/renderer/render_cache_owner.js",
     "factoryExportName": "createRenderCacheOwner",
-    "factorySourceFingerprint": "ee1438998757b3a5f4247750df17333b61329adaae7b2e683e0b1ec03fe5f21a",
+    "factorySourceFingerprint": "4d2e96462037df701f7fe2fc2f6017630ba27ee91a6bb548d4111b76caa6889b",
     "ownerBindingName": "renderCacheOwner",
     "methods": [
       "canDrawInteractionComposite",
@@ -6828,7 +6860,11 @@ freezeMutationDelegatingOwnerEntry({
       "invalidateRenderPasses",
       "resizeRenderPassCanvases",
       "setPassFullReferenceTransform",
-      "setPassReferenceTransform"
+      "setPassReferenceTransform",
+      "syncSurfaceResourceAccounting",
+      "retainSurfaceCacheForScope",
+      "releaseSurfaceCache",
+      "releaseInactivePassSurfaces",
     ],
     "borrowedCallbackMethods": ["withValidatedCache"],
     "actionExports": []
@@ -7043,17 +7079,18 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalBackgroundRenderOwner",
     compositionSourceFingerprint:
-      "66647b4738595eed8483556cf27809b712080ebc5c9b859bc6d7cdb57d7b730c",
+      "d1223d88e573fe6a1bf807989893ce91ccf5bd11ec6974bd20ac4370958b8c2f",
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "50cf823f03070be392fe5663847d2ad73faf1d643a9244db6cae41c7e055c278",
+      "007e7a33979dd087334a75f9f09b750be7375514a71e28df7c35b934c4c6c333",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",
       "drawBackgroundPass",
       "drawPoliticalBackgroundFills",
       "drawPoliticalBackgroundFillsForEntries",
+      "releaseScenarioPoliticalBackgroundCache",
     ],
     actionExports: [],
   }),

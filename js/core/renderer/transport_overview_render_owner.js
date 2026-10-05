@@ -94,7 +94,8 @@ export function createTransportOverviewRenderOwner({
       if (batch.scenarioId !== runtimeState.activeScenarioId
         || batch.sceneGeneration !== runtimeState.sceneGeneration
         || batch.scenarioDataGeneration !== runtimeState.scenarioDataGeneration) continue;
-      if (batch.options.familyId === "airport" ? !runtimeState.showAirports : !runtimeState.showPorts) continue;
+      const visibilityField = { airport: "showAirports", port: "showPorts", road: "showRoad", rail: "showRail" }[batch.options.familyId];
+      if (!runtimeState[visibilityField]) continue;
       const entries = batch.entries.map((entry) => ({
         ...entry,
         screenX: entry.x * transform.k + transform.x,
@@ -102,12 +103,78 @@ export function createTransportOverviewRenderOwner({
         screenScale: transform.k,
       }));
       const startedAt = nowMs();
-      const count = drawTransportFacilityLabels(entries, { ...batch.options, k, occupiedBoxes });
+      const count = batch.kind === "line"
+        ? drawTransportLineLabels(entries, { ...batch.options, k, occupiedBoxes })
+        : drawTransportFacilityLabels(entries, { ...batch.options, k, occupiedBoxes });
       labelCount += count;
       collectContextMetric(`${batch.metricName}Labels`, nowMs() - startedAt, {
         labelCount: count, candidateCount: entries.length, skipped: false,
       });
     }
+    return labelCount;
+  }
+
+  function queueTransportLineLabels(metricName, entries, options) {
+    if (!entries.length) return;
+    pendingLabelBatches.push({
+      kind: "line",
+      metricName,
+      entries,
+      ...getTransportFacilityLabelBatchIdentity(runtimeState),
+      options,
+    });
+  }
+
+  function drawTransportLineLabels(entries, { familyId, labelColor, secondaryLabelColor, k, occupiedBoxes }) {
+    const config = getTransportOverviewFamilyConfig(familyId);
+    const strategy = resolveTransportOverviewLineStrategy(familyId, config, {
+      scale: k,
+      visualMode: getTransportOverviewVisualMode(),
+    });
+    if (!config.labelsEnabled || !strategy.labelsEnabled) return 0;
+    const zoomConfig = getTransportOverviewLabelZoomConfig(familyId, config.labelDensity);
+    const isPrimary = (entry) => familyId === "rail" ? entry.lineClass === "mainline" : entry.priority >= 4;
+    const candidates = selectTransportOverviewLabelEntries(entries, {
+      gridSize: getTransportLineLabelGridSize(config.labelDensity),
+      isVisible: (entry) => k >= (isPrimary(entry) ? zoomConfig.nationalLabelScale : zoomConfig.regionalLabelScale)
+        && (entry.projectedLength == null || entry.projectedLength * entry.screenScale >= entry.minimumScreenLength),
+      compare: (left, right) => (familyId === "rail"
+        ? Number(isPrimary(right)) - Number(isPrimary(left))
+        : right.priority - left.priority) || (Number(right.projectedLength || 0) - Number(left.projectedLength || 0)),
+      getBucketParts: familyId === "rail" ? (entry) => [entry.lineClass] : () => [],
+    });
+    let labelCount = 0;
+    context.save();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    for (const entry of candidates) {
+      const primary = isPrimary(entry);
+      const screenFontSize = primary ? 10.5 : 9.5;
+      const zoomScale = entry.screenScale;
+      context.font = `${primary ? 600 : 500} ${screenFontSize / zoomScale}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
+      const screenWidth = typeof context.measureText === "function"
+        ? Number(context.measureText(entry.label)?.width || 0) * zoomScale
+        : entry.label.length * screenFontSize * 0.58;
+      // Include the screen-pixel halo in the centered label's shared collision box.
+      const placement = claimScreenLabelPlacement([{
+        worldX: entry.x,
+        worldY: entry.y,
+        box: {
+          x: entry.screenX - screenWidth / 2 - 1.5,
+          y: entry.screenY - screenFontSize / 2 - 1.5,
+          w: screenWidth + 3,
+          h: screenFontSize + 3,
+        },
+      }], occupiedBoxes);
+      if (!placement) continue;
+      context.lineWidth = 3 / zoomScale;
+      context.strokeStyle = familyId === "rail" ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.88)";
+      context.fillStyle = primary ? labelColor : secondaryLabelColor;
+      context.strokeText(entry.label, placement.worldX, placement.worldY);
+      context.fillText(entry.label, placement.worldX, placement.worldY);
+      labelCount += 1;
+    }
+    context.restore();
     return labelCount;
   }
 
@@ -708,8 +775,8 @@ function selectTransportOverviewLabelEntries(candidates, {
     .sort(compare)
     .forEach((entry) => {
       const bucketKey = [
-        Math.round(entry.x / gridSize),
-        Math.round(entry.y / gridSize),
+        Math.round((entry.screenX ?? entry.x) / gridSize),
+        Math.round((entry.screenY ?? entry.y) / gridSize),
         ...getBucketParts(entry),
       ].join(":");
       if (usedBuckets.has(bucketKey)) return;
@@ -720,6 +787,7 @@ function selectTransportOverviewLabelEntries(candidates, {
 }
 
 function drawRailwaysLayer(k, { interactive = false } = {}) {
+  pendingLabelBatches = pendingLabelBatches.filter((batch) => batch.metricName !== "drawRailwaysLayer");
   syncRenderTargets();
   const startedAt = nowMs();
   const visible = !!runtimeState.showTransport && !!runtimeState.showRail;
@@ -796,12 +864,12 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     if (!Array.isArray(anchorProjected) || anchorProjected.length < 2 || !Number.isFinite(anchorProjected[0]) || !Number.isFinite(anchorProjected[1])) return;
     const projectedLines = projectTransportLineGeometry(feature.geometry, projection);
     const projectedLength = measureProjectedLineSetLength(projectedLines);
-    const minimumProjectedLength = lineClass === "mainline" ? 110 : lineClass === "regional" ? 72 : 58;
-    if (projectedLength < minimumProjectedLength) return;
+    const minimumScreenLength = lineClass === "mainline" ? 110 : lineClass === "regional" ? 72 : 58;
     labelCandidates.push({
       label,
       lineClass,
       projectedLength,
+      minimumScreenLength,
       x: anchorProjected[0],
       y: anchorProjected[1],
     });
@@ -834,21 +902,6 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
       interactive: !!interactive,
       skipped: true,
       reason: visible ? "no-data" : "hidden",
-    });
-  }
-  const labelZoomConfig = getTransportOverviewLabelZoomConfig("rail", railConfig.labelDensity);
-  const labelsEnabled = !!railConfig.labelsEnabled && strategy.labelsEnabled;
-  let visibleLabelEntries = [];
-  if (labelsEnabled) {
-    const gridSize = getTransportLineLabelGridSize(railConfig.labelDensity);
-    visibleLabelEntries = selectTransportOverviewLabelEntries(labelCandidates, {
-      gridSize,
-      isVisible: (entry) => entry.lineClass === "mainline" ? k >= labelZoomConfig.nationalLabelScale : k >= labelZoomConfig.regionalLabelScale,
-      compare: (left, right) => {
-        if (left.lineClass !== right.lineClass) return left.lineClass === "mainline" ? -1 : 1;
-        return right.projectedLength - left.projectedLength;
-      },
-      getBucketParts: (entry) => [entry.lineClass],
     });
   }
   const visibleFeatureCount = featuresByClass.mainline.length + featuresByClass.regional.length + featuresByClass.secondary.length;
@@ -905,27 +958,17 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
     widthFloorPx: 1.05,
   });
 
-  let labelCount = 0;
-  if (visibleLabelEntries.length) {
-    context.save();
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    visibleLabelEntries.forEach((entry) => {
-      context.font = `${entry.lineClass === "mainline" ? 600 : 500} ${entry.lineClass === "mainline" ? 10.5 : 9.5}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
-      context.lineWidth = 3;
-      context.strokeStyle = "rgba(255,255,255,0.9)";
-      context.fillStyle = visualStyle.mainlineStroke;
-      context.strokeText(entry.label, entry.x, entry.y);
-      context.fillText(entry.label, entry.x, entry.y);
-      labelCount += 1;
-    });
-    context.restore();
-  }
+  queueTransportLineLabels("drawRailwaysLayer", labelCandidates, {
+    familyId: "rail",
+    labelColor: visualStyle.mainlineStroke,
+    secondaryLabelColor: visualStyle.mainlineStroke,
+  });
 
   collectContextMetric("drawRailwaysLayer", nowMs() - startedAt, {
     featureCount,
     visibleFeatureCount,
-    labelCount,
+    labelCount: 0,
+    labelsDeferred: true,
     interactive: !!interactive,
     skipped: false,
   });
@@ -933,6 +976,7 @@ function drawRailwaysLayer(k, { interactive = false } = {}) {
 }
 
 function drawRoadsLayer(k, { interactive = false } = {}) {
+  pendingLabelBatches = pendingLabelBatches.filter((batch) => batch.kind !== "line" || batch.options.familyId !== "road");
   syncRenderTargets();
   const startedAt = nowMs();
   const visible = !!runtimeState.showTransport && !!runtimeState.showRoad;
@@ -1064,11 +1108,8 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
     widthFloorPx: 1.1,
   });
 
-  const labelZoomConfig = getTransportOverviewLabelZoomConfig("road", roadConfig.labelDensity);
   const labelsEnabled = !!roadConfig.labelsEnabled && strategy.labelsEnabled && typeof projection === "function";
-  let labelCount = 0;
   if (labelsEnabled) {
-    const gridSize = getTransportLineLabelGridSize(roadConfig.labelDensity);
     const labelCandidates = [];
     Object.entries(featuresByClass).forEach(([roadClass, features]) => {
       features.forEach((feature) => {
@@ -1084,48 +1125,30 @@ function drawRoadsLayer(k, { interactive = false } = {}) {
         if (!Array.isArray(anchorProjected) || anchorProjected.length < 2 || !Number.isFinite(anchorProjected[0]) || !Number.isFinite(anchorProjected[1])) return;
         const projectedLines = projectTransportLineGeometry(feature.geometry, projection);
         const projectedLength = measureProjectedLineSetLength(projectedLines);
-        const minimumProjectedLength = roadClass === "motorway" ? 120 : roadClass === "trunk" ? 88 : 70;
-        if (projectedLength < minimumProjectedLength) return;
+        const minimumScreenLength = roadClass === "motorway" ? 120 : roadClass === "trunk" ? 88 : 70;
         labelCandidates.push({
           label,
           roadClass,
           projectedLength,
+          minimumScreenLength,
           x: anchorProjected[0],
           y: anchorProjected[1],
           priority: getRoadLabelClassPriority(roadClass),
         });
       });
     });
-    const visibleLabelEntries = selectTransportOverviewLabelEntries(labelCandidates, {
-      gridSize,
-      isVisible: (entry) => entry.priority >= 4 ? k >= labelZoomConfig.nationalLabelScale : k >= labelZoomConfig.regionalLabelScale,
-      compare: (left, right) => {
-        if (left.priority !== right.priority) return right.priority - left.priority;
-        return right.projectedLength - left.projectedLength;
-      },
+    queueTransportLineLabels("drawRoadsLayer", labelCandidates, {
+      familyId: "road",
+      labelColor: visualStyle.motorwayStroke,
+      secondaryLabelColor: visualStyle.trunkStroke,
     });
-    if (visibleLabelEntries.length) {
-      context.save();
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      visibleLabelEntries.forEach((entry) => {
-        const isMotorway = entry.roadClass === "motorway";
-        context.font = `${isMotorway ? 600 : 500} ${isMotorway ? 10.5 : 9.5}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
-        context.lineWidth = 3;
-        context.strokeStyle = "rgba(255,255,255,0.88)";
-        context.fillStyle = isMotorway ? visualStyle.motorwayStroke : visualStyle.trunkStroke;
-        context.strokeText(entry.label, entry.x, entry.y);
-        context.fillText(entry.label, entry.x, entry.y);
-        labelCount += 1;
-      });
-      context.restore();
-    }
   }
 
   collectContextMetric("drawRoadsLayer", nowMs() - startedAt, {
     featureCount,
     visibleFeatureCount,
-    labelCount,
+    labelCount: 0,
+    labelsDeferred: true,
     interactive: !!interactive,
     skipped: false,
   });
@@ -1260,6 +1283,7 @@ function drawCountryRailwaysLayer(k, { interactive = false } = {}) {
 }
 
 function drawCountryRoadsLayer(k, { interactive = false } = {}) {
+  pendingLabelBatches = pendingLabelBatches.filter((batch) => batch.metricName !== "drawCountryRoadsLayer");
   syncRenderTargets();
   const startedAt = nowMs();
   const overlayState = getTransportCountryOverlayStateForFamily("road");
@@ -1366,11 +1390,8 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
     opacity: visualStyle.motorwayOpacity,
   }, { baseOpacity: baseRoadOpacity, strategy, k, widthFloorPx: 1.1 });
 
-  const labelZoomConfig = getTransportOverviewLabelZoomConfig("road", roadConfig.labelDensity);
   const labelsEnabled = !!roadConfig.labelsEnabled && strategy.labelsEnabled && typeof projection === "function";
-  let labelCount = 0;
   if (labelsEnabled && Array.isArray(labelCollection?.features) && labelCollection.features.length) {
-    const gridSize = getTransportLineLabelGridSize(roadConfig.labelDensity);
     const labelCandidates = labelCollection.features
       .map((feature) => {
         const properties = feature?.properties || {};
@@ -1388,33 +1409,18 @@ function drawCountryRoadsLayer(k, { interactive = false } = {}) {
           y: anchorProjected[1],
         };
       })
-      .filter(Boolean)
-    const visibleLabelEntries = selectTransportOverviewLabelEntries(labelCandidates, {
-      gridSize,
-      isVisible: (entry) => entry.priority >= 4 ? k >= labelZoomConfig.nationalLabelScale : k >= labelZoomConfig.regionalLabelScale,
-      compare: (left, right) => right.priority - left.priority,
+      .filter(Boolean);
+    queueTransportLineLabels("drawCountryRoadsLayer", labelCandidates, {
+      familyId: "road",
+      labelColor: visualStyle.motorwayStroke,
+      secondaryLabelColor: visualStyle.trunkStroke,
     });
-    if (visibleLabelEntries.length) {
-      context.save();
-      context.textAlign = "center";
-      context.textBaseline = "middle";
-      visibleLabelEntries.forEach((entry) => {
-        const isMotorway = entry.priority >= 4;
-        context.font = `${isMotorway ? 600 : 500} ${isMotorway ? 10.5 : 9.5}px "IBM Plex Sans", "Noto Sans JP", sans-serif`;
-        context.lineWidth = 3;
-        context.strokeStyle = "rgba(255,255,255,0.88)";
-        context.fillStyle = isMotorway ? visualStyle.motorwayStroke : visualStyle.trunkStroke;
-        context.strokeText(entry.label, entry.x, entry.y);
-        context.fillText(entry.label, entry.x, entry.y);
-        labelCount += 1;
-      });
-      context.restore();
-    }
   }
   collectContextMetric("drawCountryRoadsLayer", nowMs() - startedAt, {
     featureCount,
     visibleFeatureCount,
-    labelCount,
+    labelCount: 0,
+    labelsDeferred: true,
     interactive: !!interactive,
     skipped: false,
   });

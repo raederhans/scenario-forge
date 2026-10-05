@@ -210,7 +210,7 @@ test("P2.1 drawCanvas orchestration owner owns frame branch selection", () => {
     "function drawCanvasFrame(options)",
     "const includeSummary = options?.includeSummary === true;",
     "getRenderPhase() === renderPhaseInteracting && getFirstVisibleFramePainted()",
-    "const useTransformedFrame = currentPhase === renderPhaseInteracting",
+    "const useTransformedFrame = !effects.requiresExactFrame?.() && (currentPhase === renderPhaseInteracting",
     "drawTransformedFrameFromCaches",
     "drawLastGoodFrameFallback",
     "drawBaseVisibleFrameFallback",

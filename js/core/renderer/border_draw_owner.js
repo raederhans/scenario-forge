@@ -104,6 +104,11 @@ export function createBorderDrawOwner({
     return !isHgoVectorSceneActive();
   }
 
+  function getProjectionScale(k = 1) {
+    const scale = Number(k);
+    return Number.isFinite(scale) && scale > 0 ? scale : 1;
+  }
+
   function getScreenSpaceTurnAngleDeg(previousPoint, currentPoint, nextPoint) {
     if (!previousPoint || !currentPoint || !nextPoint) return 180;
     const ax = currentPoint[0] - previousPoint[0];
@@ -114,8 +119,7 @@ export function createBorderDrawOwner({
     const bLength = Math.hypot(bx, by);
     if (!(aLength > 0) || !(bLength > 0)) return 180;
     const cosine = clamp((ax * bx + ay * by) / (aLength * bLength), -1, 1);
-    const interiorAngleDeg = Math.acos(cosine) * (180 / Math.PI);
-    return Math.abs(180 - interiorAngleDeg);
+    return Math.acos(cosine) * (180 / Math.PI);
   }
 
   function drawMeshCollection(meshCollection, strokeStyle, lineWidth, options = {}) {
@@ -141,16 +145,17 @@ export function createBorderDrawOwner({
     });
   }
 
-  function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {
+  function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg, k = 1) {
     const sanitized = sanitizePolyline(line);
     const projection = getProjection();
     if (sanitized.length <= 2 || !projection) return sanitized;
 
+    const minDistanceProjected = minDistancePx / getProjectionScale(k);
     const projected = sanitized.map((point) => projection(point));
-    return declutterPolylineWithProjection(sanitized, projected, minDistancePx, angleThresholdDeg).line;
+    return declutterPolylineWithProjection(sanitized, projected, minDistanceProjected, angleThresholdDeg).line;
   }
 
-  function declutterPolylineWithProjection(sanitized, projected, minDistancePx, angleThresholdDeg) {
+  function declutterPolylineWithProjection(sanitized, projected, minDistanceProjected, angleThresholdDeg) {
     const keptIndices = [0];
 
     for (let index = 1; index < sanitized.length - 1; index += 1) {
@@ -166,7 +171,7 @@ export function createBorderDrawOwner({
         projectedPoint[1] - previousKeptProjected[1],
       );
       const turnAngleDeg = getScreenSpaceTurnAngleDeg(previousKeptProjected, projectedPoint, nextProjected);
-      if (distancePx < minDistancePx && turnAngleDeg < angleThresholdDeg) {
+      if (distancePx < minDistanceProjected && turnAngleDeg < angleThresholdDeg) {
         continue;
       }
       keptIndices.push(index);
@@ -246,9 +251,22 @@ export function createBorderDrawOwner({
     minSpanPx = 0,
     minAreaPx = 0,
     angleThresholdDeg = coastlineViewSimplifyCollinearAngleDeg,
+    k = 1,
   } = {}) {
     if (!isUsableMesh(mesh)) return null;
-    const cacheKey = ["boundary", simplifyDistancePx, minLengthPx, minSpanPx, minAreaPx, angleThresholdDeg].join("|");
+    const projectionScale = getProjectionScale(k);
+    const simplifyDistanceProjected = simplifyDistancePx / projectionScale;
+    const minLengthProjected = minLengthPx / projectionScale;
+    const minSpanProjected = minSpanPx / projectionScale;
+    const minAreaProjected = minAreaPx / (projectionScale * projectionScale);
+    const cacheKey = [
+      "boundary",
+      simplifyDistanceProjected,
+      minLengthProjected,
+      minSpanProjected,
+      minAreaProjected,
+      angleThresholdDeg,
+    ].join("|");
     return cachedMeshGeometry(mesh, cacheKey, () => {
       const nextCoordinates = mesh.coordinates
         .map((line) => {
@@ -259,12 +277,12 @@ export function createBorderDrawOwner({
           // Simplification and filtering share this projection, including any
           // non-finite points, so the existing metric accumulation order stays intact.
           const result = simplifyDistancePx > 0 && sanitized.length > 2 && projection
-            ? declutterPolylineWithProjection(sanitized, projected, simplifyDistancePx, angleThresholdDeg)
+            ? declutterPolylineWithProjection(sanitized, projected, simplifyDistanceProjected, angleThresholdDeg)
             : { line: sanitized, projected };
           const metrics = measureProjectedPolyline(result.projected);
-          if (minLengthPx > 0 && metrics.lengthPx < minLengthPx) return null;
-          if (minSpanPx > 0 && metrics.maxSpanPx < minSpanPx) return null;
-          if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaPx) return null;
+          if (minLengthPx > 0 && metrics.lengthPx < minLengthProjected) return null;
+          if (minSpanPx > 0 && metrics.maxSpanPx < minSpanProjected) return null;
+          if (minAreaPx > 0 && metrics.bboxAreaPx < minAreaProjected) return null;
           return result.line;
         })
         .filter((line) => Array.isArray(line) && line.length >= 2);
@@ -282,15 +300,16 @@ export function createBorderDrawOwner({
       : k < coastlineLodMidZoomMax
         ? coastlineViewSimplifyMidMinDistancePx
         : 0;
+    const minDistanceProjected = minDistancePx / getProjectionScale(k);
     const projection = getProjection();
     if (!(minDistancePx > 0) || !Array.isArray(collection) || !collection.length || !projection) {
       return collection;
     }
     return collection.map((mesh) => {
       if (!isUsableMesh(mesh)) return mesh;
-      return cachedMeshGeometry(mesh, ["coast", minDistancePx, coastlineViewSimplifyCollinearAngleDeg].join("|"), () => {
+      return cachedMeshGeometry(mesh, ["coast", minDistanceProjected, coastlineViewSimplifyCollinearAngleDeg].join("|"), () => {
         const nextCoordinates = mesh.coordinates
-          .map((line) => declutterProjectedPolyline(line, minDistancePx, coastlineViewSimplifyCollinearAngleDeg))
+          .map((line) => declutterProjectedPolyline(line, minDistancePx, coastlineViewSimplifyCollinearAngleDeg, k))
           .filter((line) => Array.isArray(line) && line.length >= 2);
         if (!nextCoordinates.length) return mesh;
         return {
@@ -310,6 +329,7 @@ export function createBorderDrawOwner({
           minLengthPx: 22,
           minSpanPx: 5,
           minAreaPx: 20,
+          k: zoom,
         });
       }
       if (zoom < 2.4) {
@@ -318,11 +338,13 @@ export function createBorderDrawOwner({
           minLengthPx: 14,
           minSpanPx: 3,
           minAreaPx: 10,
+          k: zoom,
         });
       }
       return (mesh) => buildRenderableBoundaryMesh(mesh, {
         simplifyDistancePx: 0.75,
         minLengthPx: 4,
+        k: zoom,
       });
     }
     if (kind === "internal-province") {
@@ -332,6 +354,7 @@ export function createBorderDrawOwner({
           minLengthPx: 16,
           minSpanPx: 4,
           minAreaPx: 12,
+          k: zoom,
         });
       }
       if (zoom < 1.9) {
@@ -339,11 +362,13 @@ export function createBorderDrawOwner({
           simplifyDistancePx: 1.6,
           minLengthPx: 10,
           minSpanPx: 2,
+          k: zoom,
         });
       }
       return (mesh) => buildRenderableBoundaryMesh(mesh, {
         simplifyDistancePx: 0.6,
         minLengthPx: 4,
+        k: zoom,
       });
     }
     if (kind === "empire") {
@@ -351,12 +376,14 @@ export function createBorderDrawOwner({
         return (mesh) => buildRenderableBoundaryMesh(mesh, {
           simplifyDistancePx: 1.8,
           minLengthPx: 6,
+          k: zoom,
         });
       }
       if (zoom < 2.2) {
         return (mesh) => buildRenderableBoundaryMesh(mesh, {
           simplifyDistancePx: 1.1,
           minLengthPx: 4,
+          k: zoom,
         });
       }
       return null;
@@ -369,6 +396,7 @@ export function createBorderDrawOwner({
           simplifyDistancePx: 2.4,
           minLengthPx: 14,
           minSpanPx: 3,
+          k: zoom,
         });
       }
       if (zoom < coastlineLodMidZoomMax) {
@@ -376,6 +404,7 @@ export function createBorderDrawOwner({
           simplifyDistancePx: 1.2,
           minLengthPx: 8,
           minSpanPx: 2,
+          k: zoom,
         });
       }
     }

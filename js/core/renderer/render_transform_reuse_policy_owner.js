@@ -255,7 +255,7 @@ export function createRenderTransformReusePolicyOwner({
     const activePassNames = getActiveRenderPassNames();
     if (!Array.isArray(activePassNames) || !activePassNames.length || activePassNames.includes("hgoPreview")) return false;
     const cache = getRenderPassCacheState();
-    return exactAfterSettleFastPathRequiredPassNames.every((passName) => (
+    return exactAfterSettleFastPathRequiredPassNames.filter((passName) => activePassNames.includes(passName)).every((passName) => (
       !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName)
     ));
   }

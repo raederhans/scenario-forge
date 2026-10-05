@@ -107,13 +107,32 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   }
 
   function getTransportPresentationSignatureParts() {
+    const dataParts = [];
+    if (runtimeState.showTransport) {
+      const overlayState = runtimeState.transportCountryOverlayState;
+      for (const [family, visible, field, layer] of [
+        ["road", runtimeState.showRoad, "roadsData", "roads"],
+        ["rail", runtimeState.showRail, "railwaysData", "railways"],
+        ["airport", runtimeState.showAirports, "airportsData", "airports"],
+        ["port", runtimeState.showPorts, "portsData", "ports"],
+      ]) {
+        if (!visible) continue;
+        const familyOverlay = overlayState?.overlaysByFamily?.[family];
+        const overlay = familyOverlay?.status === "ready" ? familyOverlay
+          : overlayState?.status === "ready" && overlayState.family === family ? overlayState : null;
+        dataParts.push(getObjectIdentityToken(runtimeState[field]),
+          getObjectIdentityToken(overlay?.collectionsByLayer?.[layer]));
+        if (family === "rail") dataParts.push(getObjectIdentityToken(runtimeState.railStationsMajorData),
+          getObjectIdentityToken(overlay?.collectionsByLayer?.rail_stations_major));
+      }
+    }
     return [
       runtimeState.showTransport ? "transport:on" : "transport:off",
       runtimeState.showRoad ? "road:on" : "road:off",
       runtimeState.showAirports ? "airports:on" : "airports:off",
       runtimeState.showPorts ? "ports:on" : "ports:off",
       runtimeState.showRail ? "rail:on" : "rail:off",
-      `context:${Number(runtimeState.contextLayerRevision || 0)}`,
+      ...dataParts,
       `scene:${Number(runtimeState.sceneGeneration || 0)}`,
       `scenario-data:${Number(runtimeState.scenarioDataGeneration || 0)}`,
       `language:${String(runtimeState.currentLanguage || "en")}`,

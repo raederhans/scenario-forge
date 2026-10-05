@@ -4,6 +4,26 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { coversViewport, getSurfaceCoverage, intersectCoverage, transformCoverage } from "../js/core/renderer/cached_surface_coverage.js";
 import { createRenderPipelinePassesOwner } from "../js/core/renderer/render_pipeline_passes.js";
+
+test("idle preparation never resurrects a disabled pass, including explicitly requested passes", () => {
+  const painted = [];
+  const active = ["background", "political"];
+  const cache = { dirty: {}, signatures: {}, reasons: {}, canvases: {}, counters: {} };
+  const owner = createRenderPipelinePassesOwner({
+    state: { zoomTransform: { x: 0, y: 0, k: 1 } },
+    helpers: {
+      getActiveRenderPassNames: () => active,
+      getRenderPassCacheState: () => cache,
+      getRenderPassSignature: () => "new",
+      renderPassToCache: (name) => painted.push(name),
+    },
+  });
+  assert.equal(owner.ensureIdleRenderPasses({}), true);
+  assert.deepEqual(painted, active);
+  painted.length = 0;
+  assert.equal(owner.ensureIdleRenderPasses({}, ["physicalBase", "political"]), true);
+  assert.deepEqual(painted, ["political"]);
+});
 import { createInteractionBorderSnapshotOwner } from "../js/core/renderer/interaction_border_snapshot_owner.js";
 import { bindRenderBoundary, requestRender, markRenderBoundaryFlushed } from "../js/core/render_boundary.js";
 

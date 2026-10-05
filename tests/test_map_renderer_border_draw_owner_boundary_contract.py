@@ -54,7 +54,7 @@ class MapRendererBorderDrawOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("getPaintContourMeshes: () => getPaintContourRuntimeOwner().getMeshes(),", renderer_content)
         self.assertNotIn("state.cachedScenarioOpeningOwnerBorders", owner_content)
         self.assertIn("function drawMeshCollection(meshCollection, strokeStyle, lineWidth, options = {}) {", owner_content)
-        self.assertIn("function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg) {", owner_content)
+        self.assertIn("function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg, k = 1) {", owner_content)
         self.assertIn("function getProjectedPolylineMetrics(line) {", owner_content)
         self.assertIn("function buildRenderableBoundaryMesh(mesh, {", owner_content)
         self.assertIn("function getViewportAwareCoastlineCollection(collection, k) {", owner_content)

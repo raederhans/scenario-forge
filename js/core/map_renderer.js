@@ -42,6 +42,8 @@ import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_o
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
+import { createLabelDrawSnapshotOwner } from "./renderer/label_draw_snapshot.js";
+import { pageResourceBudget } from "./runtime_resource_budget.js";
 import { createBorderMeshWorkerRuntime } from "./renderer/border_mesh_worker_runtime.js";
 import { createBorderMeshWorkerClient } from "./border_mesh_worker_client.js";
 import { getProjectionGeometryGeneration } from "./renderer/projection_geometry_identity.js";
@@ -76,6 +78,8 @@ import {
   normalizeOperationGraphicOpacity,
   getOperationGraphicEditorMidpoints,
   getOperationGraphicLabelAnchor,
+  createProjectedOperationGraphicPath,
+  projectOperationGraphicSegments,
   DEFAULT_OPERATION_GRAPHIC_KIND,
   DEFAULT_OPERATIONAL_LINE_KIND,
   OPERATION_GRAPHIC_STYLE_PRESETS,
@@ -329,6 +333,7 @@ import {
   projectCoordinateToWorkerPixel,
 } from "./map_renderer/political_raster_worker_packet.js";
 import {
+  filterEnabledRenderPassNames,
   INTERACTION_COMPOSITE_PASS_NAMES,
   RENDER_PASS_NAMES,
   RENDER_PASS_OVERSCAN_RATIO_PER_SIDE,
@@ -349,6 +354,7 @@ import { createDayNightRuntimeOwner } from "./renderer/day_night_runtime_owner.j
 import { createContextPassOrchestratorOwner } from "./renderer/context_pass_orchestrator_owner.js";
 import { createPoliticalPassOrchestratorOwner } from "./renderer/political_pass_orchestrator_owner.js";
 import { createPoliticalBackgroundRenderOwner } from "./renderer/political_background_render_owner.js";
+import { getProjectedPathResourceAccounting } from "./renderer/projected_path_resource_accounting.js";
 import { createPoliticalPartialRepaintOwner } from "./renderer/political_partial_repaint_owner.js";
 import { createRenderPerfMetricsRuntimeOwner } from "./renderer/render_perf_metrics_runtime_owner.js";
 import { createRenderCacheOwner } from "./renderer/render_cache_owner.js";
@@ -705,6 +711,8 @@ let geometryRasterRuntimeOwner = null;
 let politicalEntriesInvalidationEpoch = 0;
 let overviewFrameOwner = null;
 let navigationSceneOwner = null;
+const labelDrawSnapshotOwner = createLabelDrawSnapshotOwner();
+let navigationExactRefreshNeeded = false;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
 let contourHostFillColorCache = new WeakMap();
@@ -2594,6 +2602,7 @@ function getRenderCacheOwner() {
     },
     getters: {
       getContext: () => rendererSurfaceHost.getContext?.() || null,
+      getActiveInteractionCompositePassNames,
     },
     helpers: {
       cloneZoomTransform,
@@ -2669,6 +2678,7 @@ function getTransformedFrameCompositorOwner() {
       getCurrentTransform: () => runtimeState.zoomTransform || globalThis.d3.zoomIdentity,
       getRenderPassCacheSnapshot: getRenderPassCacheState,
       getActiveTransformedFramePassNames,
+      getActiveInteractionCompositePassNames,
       getRenderPhase: () => runtimeState.renderPhase,
       getDeferExactAfterSettle: () => runtimeState.deferExactAfterSettle,
       getActiveScenarioId: () => runtimeState.activeScenarioId,
@@ -2693,6 +2703,7 @@ function getTransformedFrameCompositorOwner() {
       drawInteractionComposite,
       composeRenderPassesToTarget,
       drawTransformedPass,
+      drawInteractionLabels: (transform) => replayNavigationLabels(transform),
       drawInteractionBorderSnapshot,
       drawBordersPass,
       blitCompositeBufferToMain,
@@ -2703,7 +2714,7 @@ function getTransformedFrameCompositorOwner() {
       invalidateInteractionComposite,
       buildInteractionComposite,
       ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
-        timings, isHgoRuntimePreviewReady() ? ["hgoPreview"] : INTERACTION_COMPOSITE_PASS_NAMES,
+        timings, isHgoRuntimePreviewReady() ? ["hgoPreview"] : getActiveInteractionCompositePassNames(),
       ),
       canDrawInteractionComposite,
       setPendingExactPoliticalFastFrame: (value) => {
@@ -3564,6 +3575,8 @@ function getPoliticalBackgroundRenderOwner() {
       applyOceanClipMask,
       drawOceanStyle,
       warn: (...args) => globalThis.console?.warn?.(...args),
+      resourceBudget: pageResourceBudget,
+      politicalPathResourceAccounting: getProjectedPathResourceAccounting(pageResourceBudget),
     },
     platform: {
       d3: globalThis.d3,
@@ -3720,6 +3733,7 @@ function getRenderPipelinePassesOwner() {
       rebuildResolvedColors,
       getRenderPassCacheState,
       getRenderPassSignature,
+      getActiveRenderPassNames,
       incrementPerfCounter,
       recordRenderPerfMetric,
       renderPassToCache,
@@ -3753,6 +3767,11 @@ function getDrawCanvasOrchestrationOwner() {
       nowMs,
     },
     effects: {
+      beforeFrame: reconcileRenderFrameResources,
+      afterFrame: () => {
+        getRenderCacheOwner().syncSurfaceResourceAccounting();
+        syncVisibleSurfaceResourceAccounting();
+      },
       ensureLayerDataFromTopology: () => {
         ensureLayerDataFromTopology();
         // Cached viewport frames also need to select the current contour pack.
@@ -3762,7 +3781,10 @@ function getDrawCanvasOrchestrationOwner() {
           ensurePhysicalAtlasDetailForView();
         }
       },
-      prepareAsyncFrame: () => getGeometryRasterRuntimeOwner().prepareFrame(),
+      prepareAsyncFrame: () => navigationExactRefreshNeeded
+        ? !!getGeometryRasterRuntimeOwner().preparePolitical({ force: true })
+        : getGeometryRasterRuntimeOwner().prepareFrame(),
+      requiresExactFrame: () => navigationExactRefreshNeeded,
       withValidatedCache: (callback) => getRenderCacheOwner().withValidatedCache(callback),
       incrementPerfCounter,
       clearPoliticalPatchOverlayIfStale,
@@ -3771,7 +3793,12 @@ function getDrawCanvasOrchestrationOwner() {
       drawTransformedFrameFromCaches,
       drawLastGoodFrameFallback,
       drawOverviewFrameFallback,
-      drawNavigationFrame: (transform) => !exportRenderInProgress && !!navigationSceneOwner?.draw(transform),
+      drawNavigationFrame: (transform) => {
+        const drawn = !exportRenderInProgress && !!navigationSceneOwner?.draw(transform);
+        navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
+          && !isHgoRuntimePreviewReady() && !exportRenderInProgress;
+        return drawn;
+      },
       noteMissingVisibleFrameSkippedDuringInteraction,
       drawBaseVisibleFrameFallback,
       resetContextBreakdownForExactFrame,
@@ -4460,7 +4487,9 @@ function getRenderPassLayout(passName) {
 function resizeRenderPassCanvases(passNames = RENDER_PASS_NAMES) {
   overviewFrameOwner?.clear();
   exactCompositeReuseOwner?.invalidate();
-  return getRenderCacheOwner().resizeRenderPassCanvases(passNames);
+  const active = getActiveRenderPassNames();
+  const selected = passNames.filter((name) => active.includes(name));
+  if (selected.length) return getRenderCacheOwner().resizeRenderPassCanvases(selected);
 }
 
 function ensureRenderPassCanvas(passName) {
@@ -4545,8 +4574,11 @@ function captureLastGoodFrame(reason = "frame", transform = runtimeState.zoomTra
   if (reason === "exact-frame") {
     if (!navigationSceneOwner?.isReady()) getOverviewFrameOwner().capture(targetCanvas, transform, runtimeState.dpr);
   }
-  if (!exportRenderInProgress) getNavigationSceneOwner().captureDetail(targetCanvas, transform, runtimeState.dpr, {
+  if (!exportRenderInProgress && reason === "exact-frame") getNavigationSceneOwner().captureDetail(targetCanvas, transform, runtimeState.dpr, {
     completeExact: reason === "exact-frame" && !!committedFrameIdentity.metadata?.fullPoliticalReady,
+    drawBase: (target) => composeRenderPassesToTarget(target,
+      getActiveRenderPassNames().filter((name) => name !== "labels" && name !== "textureLabels"),
+      transform, { requireAllPasses: true }).ok,
   });
   return true;
 }
@@ -4583,6 +4615,12 @@ function getNavigationSceneOwner() {
       getCachedWaterPath: (feature, parts) => getScenarioRegionOverlayRenderOwner().getCachedWaterFeaturePath(feature, parts),
       getCachedLandPath: (feature, featureId) => getPoliticalFeaturePathEntry(feature, { featureId, allowBuild: false })?.path,
       getOceanBaseFillColor, landFill: LAND_FILL_COLOR,
+      canDrawLabels: (transform) => canReplayNavigationLabels(transform),
+      drawLabels: (transform) => replayNavigationLabels(transform),
+      getDetailIdentity: (reference) => JSON.stringify([
+        getCommittedFrameKeySignature(getCommittedFrameIdentity(reference).commitKey),
+        getActiveRenderPassNames().map((name) => [name, getRenderPassSignature(name, reference)]),
+      ]),
     },
   });
   return navigationSceneOwner;
@@ -4719,6 +4757,11 @@ function drawLastGoodFrameFallback(currentTransform = runtimeState.zoomTransform
     });
     return false;
   };
+  const cssRatio = currentTransform.k / referenceTransform.k;
+  const pixelRatio = cssRatio * runtimeState.dpr / Number(frame.dpr || 1);
+  if (!(cssRatio >= 0.8 && cssRatio <= 1.25 && pixelRatio > 0 && pixelRatio <= 1.5)) {
+    return reject("raster-quality");
+  }
   if (String(frame.scenarioId || "") !== identity.scenarioId) {
     return reject("scenario-mismatch");
   }
@@ -8377,11 +8420,30 @@ function getHgoRuntimePreviewVisibilitySignature() {
 }
 
 function getActiveRenderPassNames() {
-  return getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames();
+  return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());
 }
 
 function getActiveTransformedFramePassNames() {
-  return getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames();
+  return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames());
+}
+
+function filterCurrentEnabledRenderPasses(passNames) {
+  return filterEnabledRenderPassNames(passNames, {
+    showPhysical: !!runtimeState.showPhysical,
+    physicalMode: normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical).mode,
+    showUrban: !!runtimeState.showUrban,
+    showRivers: !!runtimeState.showRivers,
+    showTransport: !!runtimeState.showTransport,
+    showStrategicResourceMarkers: !!runtimeState.showStrategicResourceMarkers,
+    showCityPoints: !!runtimeState.showCityPoints,
+    textureMode: normalizeTextureMode(runtimeState.styleConfig?.texture?.mode),
+    dayNightEnabled: !!getDayNightStyleConfig().enabled,
+  });
+}
+
+function getActiveInteractionCompositePassNames() {
+  const active = getActiveRenderPassNames();
+  return INTERACTION_COMPOSITE_PASS_NAMES.filter((name) => active.includes(name));
 }
 
 function getHgoRuntimePreviewProjectionOptions(overrides = {}) {
@@ -12576,7 +12638,7 @@ function drawLineEffectsPass(k, options = undefined) {
 }
 
 function drawTextureLabelEffectsPass(k) {
-  return getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k);
+  return recordLabelPass("textureLabels", () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k));
 }
 
 function drawContextBasePass(k, options = undefined) {
@@ -12713,6 +12775,36 @@ function getCountryLabelRenderOwner() {
 }
 
 function drawLabelsPass(k, { interactive = false } = {}) {
+  return recordLabelPass("labels", () => drawLabelsPassContent(k, { interactive }));
+}
+
+function recordLabelPass(passName, draw) {
+  if (exportRenderInProgress) return draw();
+  const context = rendererSurfaceHost.getContext();
+  const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
+  return labelDrawSnapshotOwner.capture(passName, context, {
+    transform, dpr: runtimeState.dpr, layout: getRenderPassLayout(passName),
+    signature: getRenderPassSignature(passName, transform),
+  }, (recordingContext) => withRenderTarget(recordingContext, draw));
+}
+
+function getNavigationLabelPassNames() {
+  return getActiveRenderPassNames().filter((name) => name === "labels" || name === "textureLabels");
+}
+
+function canReplayNavigationLabels(transform) {
+  const cache = getRenderPassCacheState();
+  const names = getNavigationLabelPassNames();
+  return names.every((name) => !cache.dirty[name]) && labelDrawSnapshotOwner.canReplay(names,
+    rendererSurfaceHost.getContext(), transform, runtimeState.dpr, getRenderPassSignature);
+}
+
+function replayNavigationLabels(transform) {
+  return labelDrawSnapshotOwner.replay(getNavigationLabelPassNames(), rendererSurfaceHost.getContext(),
+    transform, runtimeState.dpr, getRenderPassSignature);
+}
+
+function drawLabelsPassContent(k, { interactive = false } = {}) {
   if (isHgoRuntimePreviewReady()) {
     recordRenderPerfMetric("drawLabelsPass", 0, {
       interactive: !!interactive,
@@ -13001,14 +13093,15 @@ function canDrawTransformedPass(passName, cache = getRenderPassCacheState(), { a
 }
 
 function canBuildInteractionComposite(cache = getRenderPassCacheState()) {
-  return INTERACTION_COMPOSITE_PASS_NAMES.every((passName) => canDrawTransformedPass(passName, cache));
+  return getActiveInteractionCompositePassNames().every((passName) => canDrawTransformedPass(passName, cache));
 }
 
 function buildInteractionComposite(currentTransform, timings) {
   if (!rendererSurfaceHost.getContext()?.canvas || !canBuildInteractionComposite(getRenderPassCacheState())) return false;
   const cache = getRenderPassCacheState();
   const identity = getVisibleFrameIdentity(currentTransform);
-  const coverage = getCachedPassCompositorOwner().getCompositeCoverage(INTERACTION_COMPOSITE_PASS_NAMES, currentTransform);
+  const passNames = getActiveInteractionCompositePassNames();
+  const coverage = getCachedPassCompositorOwner().getCompositeCoverage(passNames, currentTransform);
   if (!coversViewport(coverage, identity.pixelWidth / identity.dpr, identity.pixelHeight / identity.dpr)) return false;
   const compositeCanvas = ensureInteractionCompositeCanvas();
   const compositeContext = compositeCanvas.getContext("2d");
@@ -13018,7 +13111,7 @@ function buildInteractionComposite(currentTransform, timings) {
   const startedAt = nowMs();
   compositeContext.setTransform(1, 0, 0, 1, 0, 0);
   compositeContext.clearRect(0, 0, compositeCanvas.width, compositeCanvas.height);
-  const result = composeRenderPassesToTarget(compositeContext, INTERACTION_COMPOSITE_PASS_NAMES, currentTransform, {
+  const result = composeRenderPassesToTarget(compositeContext, passNames, currentTransform, {
     requireAllPasses: true, targetOffsetX: layout.offsetX, targetOffsetY: layout.offsetY,
   });
   if (!result.ok) return false;
@@ -13048,7 +13141,7 @@ function buildInteractionComposite(currentTransform, timings) {
   recordRenderPerfMetric("interactionCompositeBuild", nowMs() - startedAt, {
     phase: String(runtimeState.renderPhase || ""),
     activeScenarioId: String(runtimeState.activeScenarioId || ""),
-    passCount: INTERACTION_COMPOSITE_PASS_NAMES.length,
+    passCount: passNames.length,
   });
   return true;
 }
@@ -13154,6 +13247,7 @@ async function ensureCountryLabelsReadyForExport(passNames) {
 }
 
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
+  passNames = filterCurrentEnabledRenderPasses(passNames);
   if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
@@ -13233,6 +13327,8 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   // An export has its own pixel density and pass canvases. Keep the visible frame's
   // cache object intact, including its reference transforms and water-layer cache.
   const visibleCache = runtimeState.renderPassCache;
+  const releaseVisibleScope = getRenderCacheOwner().retainSurfaceCacheForScope(visibleCache);
+  const previousExportState = exportRenderInProgress;
   const visibleDpr = runtimeState.dpr;
   const transform = runtimeState.zoomTransform || globalThis.d3.zoomIdentity;
   const requestedPasses = new Set(passNames);
@@ -13251,9 +13347,13 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     const result = composeRenderPassesToTarget(exportContext, passNames, transform, { requireAllPasses: true });
     if (!result.ok) throw new Error(`Export composition failed: ${result.reason}.`);
   } finally {
+    const exportCache = runtimeState.renderPassCache;
     commitRenderPassCacheState(runtimeState, visibleCache);
     runtimeState.dpr = visibleDpr;
-    exportRenderInProgress = false;
+    getRenderCacheOwner().releaseSurfaceCache(exportCache);
+    releaseVisibleScope();
+    getRenderCacheOwner().syncSurfaceResourceAccounting();
+    exportRenderInProgress = previousExportState;
     riverContourRenderOwner?.dispose();
   }
   return exportCanvas;
@@ -13299,6 +13399,41 @@ function promoteDeferredColorRenderToIdle() {
     reason: String(getRenderPassCacheState().reasons?.political || ""),
   });
   return true;
+}
+
+let previousActiveRenderPassSignature = "";
+let previousRenderSceneKey = "";
+const visibleSurfaceResourceOwner = Symbol("renderer-visible-surfaces");
+function syncVisibleSurfaceResourceAccounting() {
+  const surfaces = new Set([
+    rendererSurfaceHost.getMapCanvas(), rendererSurfaceHost.getHitCanvas(),
+    rendererSurfaceHost.getPoliticalPatchCanvas(), rendererSurfaceHost.getInteractionOverlayCanvas(),
+    ...Object.values(rendererSurfaceHost.getCanvasLayers() || {}).map((layer) => layer?.canvas),
+  ].filter(Boolean));
+  const bytes = [...surfaces].reduce((sum, canvas) => sum + canvas.width * canvas.height * 4, 0);
+  pageResourceBudget.update(visibleSurfaceResourceOwner, { bitmaps: bytes });
+}
+function reconcileRenderFrameResources() {
+  navigationExactRefreshNeeded = false;
+  const sceneKey = JSON.stringify([runtimeState.activeScenarioId, runtimeState.sceneGeneration,
+    getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())]);
+  if (sceneKey !== previousRenderSceneKey) {
+    previousRenderSceneKey = sceneKey;
+    politicalBackgroundRenderOwner?.releaseScenarioPoliticalBackgroundCache("root-scene-change");
+    labelDrawSnapshotOwner.clear();
+    navigationSceneOwner?.clear();
+  }
+  const activePassNames = getActiveRenderPassNames();
+  const activeSignature = activePassNames.join("|");
+  if (activeSignature !== previousActiveRenderPassSignature) {
+    previousActiveRenderPassSignature = activeSignature;
+    exactCompositeReuseOwner?.invalidate();
+    invalidateInteractionComposite("active-passes");
+    clearLastGoodFrame("active-passes");
+    navigationSceneOwner?.clear();
+    labelDrawSnapshotOwner.clear();
+  }
+  if (getRenderCacheOwner().releaseInactivePassSurfaces(activePassNames)) exactCompositeReuseOwner?.invalidate();
 }
 
 function drawCanvas() {
@@ -13682,16 +13817,12 @@ function getProjectedPoint(coord) {
 }
 
 function projectStrategicPoints(points = []) {
-  return points.map((point) => getProjectedPoint(point)).filter(Boolean);
+  const segments = projectOperationGraphicSegments(points, rendererSurfaceHost.getProjection(), globalThis.d3);
+  return segments.reduce((best, segment) => segment.length > best.length ? segment : best, []);
 }
 
 function createOperationGraphicPath(points = [], { closed = false, curved = true } = {}) {
-  const projected = projectStrategicPoints(points);
-  if (projected.length < (closed ? 3 : 2) || !globalThis.d3?.line) return "";
-  const curve = closed
-    ? (curved ? globalThis.d3.curveCatmullRomClosed.alpha(0.5) : globalThis.d3.curveLinearClosed)
-    : (curved ? globalThis.d3.curveCatmullRom.alpha(0.5) : globalThis.d3.curveLinear);
-  return globalThis.d3.line().curve(curve)(projected) || "";
+  return createProjectedOperationGraphicPath(points, rendererSurfaceHost.getProjection(), globalThis.d3, { closed, curved });
 }
 
 function getOperationGraphicById(id) {

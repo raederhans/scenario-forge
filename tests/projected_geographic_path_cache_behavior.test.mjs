@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createProjectedGeographicPathCache } from "../js/core/renderer/projected_geographic_path_cache.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 
@@ -55,4 +56,36 @@ test("missing Path2D or projection allows the existing Canvas path fallback", ()
   const cache = createProjectedGeographicPathCache({ getProjection: () => null, geoPath: d3.geoPath, Path2DClass: RecordingPath });
   assert.equal(cache.getPath(geometry()), null);
   assert.equal(createProjectedGeographicPathCache({ Path2DClass: null }).getPath(geometry()), null);
+});
+
+test("projected path retention is LRU bounded, reports bytes, and skips oversized paths", () => {
+  const resourceBudget = createRuntimeResourceBudget();
+  const projection = d3.geoMercator();
+  const cache = createProjectedGeographicPathCache({
+    getProjection: () => projection,
+    geoPath: d3.geoPath,
+    Path2DClass: RecordingPath,
+    pathCacheBudget: 512,
+    resourceBudget,
+  });
+  const firstGeometry = geometry();
+  const firstPath = cache.getPath(firstGeometry);
+  assert.equal(resourceBudget.snapshot().categories.projectedPaths, 320);
+  cache.getPath(geometry());
+  assert.equal(cache.getStats().entries, 1);
+  assert.equal(cache.getStats().estimatedBytes, 320);
+  assert.notEqual(cache.getPath(firstGeometry), firstPath, "the least-recent geometry was evicted before rebuilding");
+
+  const largeGeometry = {
+    type: "LineString",
+    coordinates: Array.from({ length: 100 }, (_, index) => [index, index % 3]),
+  };
+  const largeFirst = cache.getPath(largeGeometry);
+  const largeSecond = cache.getPath(largeGeometry);
+  assert.notEqual(largeSecond, largeFirst, "oversized paths remain transient");
+  assert.ok(cache.getStats().oversizedSkips > 0);
+  assert.equal(cache.getStats().estimatedBytes, 320);
+
+  cache.reset();
+  assert.equal(resourceBudget.snapshot().ownerCount, 0);
 });

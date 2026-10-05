@@ -443,6 +443,7 @@ test("appearance transport summary exposes pure display formatters", () => {
 
 function createRecordingCanvasContext() {
   const calls = [];
+  let currentFont = "10px sans-serif";
   const context = {
     calls,
     save: () => calls.push({ type: "save" }),
@@ -453,6 +454,7 @@ function createRecordingCanvasContext() {
     stroke: () => calls.push({ type: "stroke" }),
     strokeText: (text, x, y) => calls.push({ type: "strokeText", text, x, y }),
     fillText: (text, x, y) => calls.push({ type: "fillText", text, x, y }),
+    measureText: (text) => ({ width: String(text).length * Number(currentFont.match(/([\d.]+)px/)[1]) * 0.58 }),
     setLineDash: (value) => calls.push({ type: "setLineDash", value: [...value] }),
     set globalAlpha(value) { calls.push({ type: "globalAlpha", value }); },
     set strokeStyle(value) { calls.push({ type: "strokeStyle", value }); },
@@ -462,7 +464,7 @@ function createRecordingCanvasContext() {
     set lineJoin(value) { calls.push({ type: "lineJoin", value }); },
     set textAlign(value) { calls.push({ type: "textAlign", value }); },
     set textBaseline(value) { calls.push({ type: "textBaseline", value }); },
-    set font(value) { calls.push({ type: "font", value }); },
+    set font(value) { currentFont = value; calls.push({ type: "font", value }); },
   };
   return context;
 }
@@ -659,11 +661,15 @@ test("transport overview road labels use ref/name fields and report labelCount",
   const zoom = 4;
   const { context, metrics, owner } = createLineRenderOwnerHarness({ k: zoom, roadLabelsEnabled: true });
   owner.drawRoadsLayer(zoom);
+  assert.equal(context.calls.some((call) => call.type === "fillText"), false);
+  owner.drawPendingLabels(zoom);
 
   assert.ok(context.calls.some((call) => call.type === "fillText" && call.text === "A1"), "road labels should draw from ref/name fields");
   const roadMetric = metrics.findLast((entry) => entry.name === "drawRoadsLayer");
   assert.equal(roadMetric?.detail?.visibleFeatureCount, 2);
-  assert.equal(roadMetric?.detail?.labelCount, 1);
+  assert.equal(roadMetric?.detail?.labelCount, 0);
+  assert.equal(roadMetric?.detail?.labelsDeferred, true);
+  assert.equal(metrics.findLast((entry) => entry.name === "drawRoadsLayerLabels")?.detail?.labelCount, 1);
 });
 
 
@@ -845,11 +851,13 @@ test("country road overlay consumes road_labels sidecar on the main map", () => 
   };
 
   owner.drawRoadsLayer(zoom);
+  owner.drawPendingLabels(zoom);
 
   assert.ok(context.calls.some((call) => call.type === "fillText" && call.text === "E35"), "country road labels should render from the road_labels sidecar");
   const countryRoadMetric = metrics.findLast((entry) => entry.name === "drawCountryRoadsLayer");
   assert.equal(countryRoadMetric?.detail?.visibleFeatureCount, 1);
-  assert.equal(countryRoadMetric?.detail?.labelCount, 1);
+  assert.equal(countryRoadMetric?.detail?.labelCount, 0);
+  assert.equal(metrics.findLast((entry) => entry.name === "drawCountryRoadsLayerLabels")?.detail?.labelCount, 1);
 });
 
 test("country overlay apply preserves overlays for other transport families", () => {
@@ -919,10 +927,11 @@ test("country road sidecar labels without class stay below national label priori
   };
 
   owner.drawRoadsLayer(zoom);
+  owner.drawPendingLabels(zoom);
 
   assert.equal(context.calls.some((call) => call.type === "fillText" && call.text === "B532"), false);
   assert.ok(context.calls.some((call) => call.type === "fillText" && call.text === "A5"));
-  assert.equal(metrics.findLast((entry) => entry.name === "drawCountryRoadsLayer")?.detail?.labelCount, 1);
+  assert.equal(metrics.findLast((entry) => entry.name === "drawCountryRoadsLayerLabels")?.detail?.labelCount, 1);
 });
 
 test("country rail overlay consumes rail_stations_major sidecar with pack-scoped hover keys", () => {
@@ -1040,4 +1049,143 @@ test("facility hover semantic dedupe keeps pack-scoped keys and prefers country 
   assert.match(mapRendererSource, /function buildFacilityEntrySemanticKey\(entry\) \{[\s\S]*return `\$\{familyId\}:stable:\$\{stableId\}`;/);
   assert.match(mapRendererSource, /dedupeFacilityHoverEntriesBySemanticKey\([\s\S]*getFacilityEntryHitPriority\(entry\) >= getFacilityEntryHitPriority\(existing\)/);
   assert.match(mapRendererSource, /visibleFacilityHoverEntriesByFamily\[normalizedFamilyId\] = dedupeFacilityHoverEntriesBySemanticKey/);
+});
+
+
+function lineLabelFeature(family, label, x = 0, y = 0, length = 0.6, secondary = false) {
+  return {
+    type: "Feature",
+    geometry: { type: "LineString", coordinates: [[x, y], [x + length, y]] },
+    properties: family === "road"
+      ? { class: secondary ? "trunk" : "motorway", reveal_rank: 1, ref: label }
+      : { class: secondary ? "regional" : "mainline", reveal_rank: 1, name: label },
+  };
+}
+
+test("road and rail labels keep screen font and halo sizes at k2 and k8", () => {
+  for (const family of ["road", "rail"]) {
+    for (const k of [2, 8]) {
+      const { owner, context, appRuntime } = createLineRenderOwnerHarness({ k, roadLabelsEnabled: true, railLabelsEnabled: true });
+      appRuntime[family === "road" ? "roadsData" : "railwaysData"].features = [
+        lineLabelFeature(family, "Primary", 0, 0),
+        lineLabelFeature(family, "Secondary", 0, 2, 0.6, true),
+      ];
+      owner[family === "road" ? "drawRoadsLayer" : "drawRailwaysLayer"](k);
+      assert.equal(context.calls.some((call) => call.type === "fillText"), false);
+      const firstLabelCall = context.calls.length;
+      const boxes = [];
+      assert.equal(owner.drawPendingLabels(k, { occupiedBoxes: boxes }), k === 2 ? 1 : 2);
+      const labelCalls = context.calls.slice(firstLabelCall);
+      const screenSizes = labelCalls.filter((call) => call.type === "font").map((call) => Number(call.value.match(/([\d.]+)px/)[1]) * k);
+      assert.deepEqual(screenSizes, k === 2 ? [10.5] : [10.5, 9.5]);
+      assert.ok(labelCalls.filter((call) => call.type === "lineWidth").every((call) => call.value * k === 3));
+      assertClose(boxes[0].w, "Primary".length * 10.5 * 0.58 + 3);
+      assertClose(boxes[0].h, 13.5);
+    }
+  }
+});
+
+test("line length admission and density use screen units when cached candidates zoom", () => {
+  for (const family of ["road", "rail"]) {
+    const { owner, context, appRuntime } = createLineRenderOwnerHarness({ k: 2, roadLabelsEnabled: true, railLabelsEnabled: true });
+    const dataKey = family === "road" ? "roadsData" : "railwaysData";
+    appRuntime[dataKey].features = [
+      lineLabelFeature(family, "Long", 0, 0, 0.6),
+      lineLabelFeature(family, "Short", 0, 2, 0.2),
+      lineLabelFeature(family, "Neighbor", 0.2, 0, 0.6),
+    ];
+    owner[family === "road" ? "drawRoadsLayer" : "drawRailwaysLayer"](2);
+    assert.equal(owner.drawPendingLabels(2), 1, "40 screen pixels is below admission and nearby anchors share a screen grid cell");
+    assert.deepEqual(context.calls.filter((call) => call.type === "fillText").map((call) => call.text), ["Long"]);
+    context.calls.length = 0;
+    appRuntime.zoomTransform = { x: 20, y: 30, k: 8 };
+    const boxes = [];
+    assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: boxes }), 3, "cached candidates recheck 160px admission and screen grid separation");
+    assert.deepEqual(context.calls.filter((call) => call.type === "fillText").map((call) => call.text), ["Long", "Neighbor", "Short"]);
+    assertClose(boxes[0].x + boxes[0].w / 2, 20);
+    assertClose(boxes[0].y + boxes[0].h / 2, 30);
+  }
+});
+
+test("road and rail candidates share occupancy with each other and city labels", () => {
+  const { owner, context, appRuntime, metrics } = createLineRenderOwnerHarness({ k: 8, roadLabelsEnabled: true, railLabelsEnabled: true });
+  appRuntime.roadsData.features = [lineLabelFeature("road", "A1")];
+  appRuntime.railwaysData.features = [lineLabelFeature("rail", "Mainline")];
+  owner.drawRoadsLayer(8);
+  owner.drawRailwaysLayer(8);
+  const boxes = [];
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: boxes }), 1);
+  assert.deepEqual(context.calls.filter((call) => call.type === "fillText").map((call) => call.text), ["A1"]);
+  assert.equal(metrics.findLast((entry) => entry.name === "drawRailwaysLayerLabels").detail.labelCount, 0);
+  assert.equal(boxes.length, 1);
+  context.calls.length = 0;
+  const cityBox = { x: -10, y: -8, w: 20, h: 16 };
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: [cityBox] }), 0);
+  assert.equal(context.calls.some((call) => call.type === "fillText"), false);
+  owner.resetLabelCandidates();
+  owner.drawRailwaysLayer(8);
+  owner.drawRoadsLayer(8);
+  assert.equal(owner.drawPendingLabels(8), 1);
+  assert.deepEqual(context.calls.filter((call) => call.type === "fillText").map((call) => call.text), ["Mainline"]);
+});
+
+test("line candidates refresh once per layer and clear when disabled or interacting", () => {
+  for (const family of ["road", "rail"]) {
+    const { owner, appRuntime, metrics } = createLineRenderOwnerHarness({ k: 8, roadLabelsEnabled: true, railLabelsEnabled: true });
+    appRuntime[family === "road" ? "roadsData" : "railwaysData"].features = [lineLabelFeature(family, "Line")];
+    const drawLayer = owner[family === "road" ? "drawRoadsLayer" : "drawRailwaysLayer"];
+    drawLayer(8);
+    drawLayer(8);
+    assert.equal(owner.drawPendingLabels(8), 1);
+    assert.equal(metrics.filter((entry) => entry.name === (family === "road" ? "drawRoadsLayerLabels" : "drawRailwaysLayerLabels")).length, 1);
+    appRuntime.styleConfig.transportOverview[family].labelsEnabled = false;
+    assert.equal(owner.drawPendingLabels(8), 0);
+    appRuntime.styleConfig.transportOverview[family].labelsEnabled = true;
+    appRuntime[family === "road" ? "showRoad" : "showRail"] = false;
+    assert.equal(owner.drawPendingLabels(8), 0);
+    appRuntime[family === "road" ? "showRoad" : "showRail"] = true;
+    drawLayer(8, { interactive: true });
+    assert.equal(owner.drawPendingLabels(8), 0);
+    drawLayer(8);
+    appRuntime.activeScenarioId = "changed";
+    assert.equal(owner.drawPendingLabels(8), 0);
+    owner.resetLabelCandidates();
+    assert.equal(owner.drawPendingLabels(8), 0);
+  }
+});
+
+
+test("country road sidecar labels defer, resize and share occupancy across cached draws", () => {
+  const { owner, context, appRuntime } = createLineRenderOwnerHarness({ k: 2, roadLabelsEnabled: true });
+  appRuntime.roadsData.features = [];
+  appRuntime.transportCountryOverlayState = {
+    status: "ready",
+    activePackId: "germany_road",
+    family: "road",
+    collectionsByLayer: {
+      roads: { type: "FeatureCollection", features: [lineLabelFeature("road", "")] },
+      road_labels: { type: "FeatureCollection", features: [
+        { type: "Feature", geometry: { type: "Point", coordinates: [0, 0] }, properties: { ref: "A1", class: "motorway" } },
+        { type: "Feature", geometry: { type: "Point", coordinates: [0.2, 0] }, properties: { ref: "A2", class: "motorway" } },
+      ] },
+    },
+  };
+  owner.drawRoadsLayer(2);
+  owner.drawRoadsLayer(2);
+  assert.equal(context.calls.some((call) => call.type === "fillText"), false);
+  context.calls.length = 0;
+  assert.equal(owner.drawPendingLabels(2), 1);
+  assertClose(Number(context.calls.find((call) => call.type === "font").value.match(/([\d.]+)px/)[1]) * 2, 10.5);
+  assertClose(context.calls.find((call) => call.type === "lineWidth").value * 2, 3);
+  context.calls.length = 0;
+  appRuntime.zoomTransform = { k: 8 };
+  assert.equal(owner.drawPendingLabels(8), 2);
+  assert.ok(context.calls.filter((call) => call.type === "font").every((call) => Number(call.value.match(/([\d.]+)px/)[1]) * 8 === 10.5));
+  assert.ok(context.calls.filter((call) => call.type === "lineWidth").every((call) => call.value * 8 === 3));
+  assert.equal(owner.drawPendingLabels(8, { occupiedBoxes: [{ x: -10, y: -8, w: 20, h: 16 }] }), 1);
+  owner.drawRoadsLayer(8, { interactive: true });
+  assert.equal(owner.drawPendingLabels(8), 0, "interactive pass clears both global and sidecar pending candidates");
+  owner.drawRoadsLayer(8);
+  appRuntime.showRoad = false;
+  assert.equal(owner.drawPendingLabels(8), 0);
 });

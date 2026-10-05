@@ -60,7 +60,7 @@ class DrawCanvasOrchestrationOwnerBoundaryContract(unittest.TestCase):
     def test_owner_is_import_free_and_has_json_safe_boundary(self):
         owner = read(OWNER_JS)
         self.assertIn("export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {}, effects = {} } = {})", owner)
-        self.assertIn("return Object.freeze({\n    drawCanvasFrame,\n  });", owner)
+        self.assertRegex(owner, r"return Object\.freeze\(\{\s*drawCanvasFrame,?\s*\}\);")
         self.assertIn("function drawCanvasFrame(options)", owner)
         self.assertIn("const includeSummary = options?.includeSummary === true;", owner)
         self.assertNotIn("function drawCanvasFrame(options = {})", owner)
