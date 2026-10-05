@@ -479,6 +479,29 @@ test("contour merge injections bind LOD ranking and reject a changed transitive 
   }
 });
 
+test("political callback receipts reject writes in river compatibility and geometry dependencies", () => {
+  const read = name => readFileSync(new URL(`../${name}`, import.meta.url), "utf8");
+  const cases = [
+    ["js/core/river_paint/partition_model.js", "export function getRiverPartitionIndex(pack) {", "pack.parents.length = 0;"],
+    ["js/core/river_paint/geometry_identity.js", "function canonicalRing(ring) {", "ring.length = 0;"],
+    ["js/core/river_paint/pilot_manifest.js", "export function isRiverPaintSourceCompatible(pack, manifest) {", "pack.packId = 'changed';"],
+  ];
+  for (const name of ["buildInteractiveLandData", "shouldExcludePoliticalVisualFeature"]) {
+    const entry = STATE_BORROWED_CALLBACK_INJECTION_CONTRACT.find(item => item.parameterName === name);
+    for (const [dependency, original, write] of cases) {
+      assert.ok(entry.sourceFingerprints[dependency]);
+      const modified = read(dependency).replace(original, `${original} ${write}`);
+      assert.notEqual(modified, read(dependency));
+      const checked = inspectStateBorrowedCallbackInjectionSources(entry, {
+        productionModulePaths: [],
+        readSource: path => path === dependency ? modified : read(path),
+      });
+      assert.ok(checked.violations.some(item => item.code === "borrowed-callback-injection-source-mismatch"
+        && item.modulePath === dependency));
+    }
+  }
+});
+
 test("contour precision publication preserves deeply frozen borrowed payloads and result aliases", async () => {
   const { buildMergedScenarioChunkLayerPayloads } = await import("../js/core/scenario/chunk_layer_payloads.js");
   const { mergeScenarioChunkPayloads, mergeScenarioChunkPayloadsForViewport } = await import("../js/core/scenario_chunk_manager.js");
