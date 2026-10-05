@@ -1,4 +1,6 @@
 const visibleFrameIdentitySource = readRepoFile("js", "core", "renderer", "visible_frame_identity_policy.js").replace(/^  /gm, "");
+import { createRequire } from "node:module";
+import "../js/core/scenario_chunk_format_shared.js";
 import {
   test,
   assert,
@@ -25,6 +27,10 @@ import {
   getPolygonCoordinateSets,
   getRingSignedArea,
 } from "./helpers/scenario_chunk_contract_support.mjs";
+import { readJsonSource } from "./helpers/read_json_source.mjs";
+
+const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
 
 const scenarioRegionOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_region_overlay_render_owner.js");
 const scenarioReliefOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_relief_overlay_render_owner.js");
@@ -57,11 +63,11 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     for (const scenarioId of ["tno_1962", "hoi4_1939"]) {
       const chunkManifest = JSON.parse(readRepoFile("data", "scenarios", scenarioId, "detail_chunks.manifest.json"));
       const bootstrapTopology = JSON.parse(readRepoFile("data", "scenarios", scenarioId, "runtime_topology.bootstrap.topo.json"));
-      const runtimeTopology = JSON.parse(readRepoFile("data", "scenarios", scenarioId, "runtime_topology.topo.json"));
+      const runtimeTopology = readJsonSource(new URL(`../data/scenarios/${scenarioId}/runtime_topology.topo.json`, import.meta.url));
       const bootstrapPoliticalCount = bootstrapTopology.objects?.political?.geometries?.length || 0;
       const runtimePoliticalCount = runtimeTopology.objects?.political?.geometries?.length || 0;
       const coarseChunk = chunkManifest.chunks.find((chunk) => chunk.id === "political.coarse.r0c0");
-      const coarsePayload = readManifestChunkPayload(coarseChunk);
+      const coarsePayload = decodeScenarioChunkPayload(readManifestChunkPayload(coarseChunk), topojson);
 
       assert.ok(bootstrapPoliticalCount > 0, `${scenarioId} bootstrap political geometry must exist`);
       assert.ok(runtimePoliticalCount > 0, `${scenarioId} runtime political geometry must exist`);
@@ -1322,7 +1328,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       strictCheckerValidatesDetailFeatureBounds:
         /def _validate_detail_chunk_feature_bounds\(/.test(checkScenarioContractsSource)
         && /require_precise_chunk_manifest = target_dir\.name == "tno_1962"/.test(checkScenarioContractsSource)
-        && /feature_bounds must be present for political detail chunks/.test(checkScenarioContractsSource)
+        && /feature_bounds must be present for political chunks/.test(checkScenarioContractsSource)
         && /feature_bounds length must match non-empty payload feature bounds/.test(checkScenarioContractsSource)
         && /feature_bounds\[\{index\}\] must match payload geometry bounds/.test(checkScenarioContractsSource),
       strictCheckerSeparatesAtlantropaCoarseAndDetailCoverage:
@@ -1543,7 +1549,10 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
     const visualRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
     const interactionRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
-    const coarsePoliticalChunk = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "chunks", "political.coarse.r0c0.json"));
+    const coarsePoliticalChunk = decodeScenarioChunkPayload(
+      JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "chunks", "political.coarse.r0c0.json")),
+      topojson,
+    );
     const countries = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "countries.json")).countries || {};
     const ownersByFeature = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "owners.by_feature.json"));
     const arcticShells = (coarsePoliticalChunk.features || [])

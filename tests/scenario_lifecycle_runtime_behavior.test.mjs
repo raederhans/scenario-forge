@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { readJsonSource } from "./helpers/read_json_source.mjs";
 
 import { createScenarioLifecycleRuntime } from "../js/core/scenario/lifecycle_runtime.js";
 import { createScenarioApplyPipeline } from "../js/core/scenario_apply_pipeline.js";
@@ -657,6 +658,9 @@ function createRawStrategicValuesPayload() {
 }
 
 async function readJsonFixture(path) {
+  if (path.endsWith("/runtime_topology.topo.json") || path.endsWith("/runtime_topology.topo.json.gz")) {
+    return readJsonSource(new URL(path, import.meta.url));
+  }
   return JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
 }
 

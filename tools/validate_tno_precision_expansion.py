@@ -4,9 +4,13 @@ import shapely
 from shapely.geometry import shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from map_builder.json_source import read_json_source, resolve_json_source_path
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
+from tools.scenario_chunk_format import decode_political_chunk
 
 def read(p):
+    if Path(p).name in {'runtime_topology.topo.json', 'runtime_topology.topo.json.gz'}:
+        return read_json_source(p)
     return json.loads(p.read_text(encoding='utf-8'))
 
 def fid(g):
@@ -21,14 +25,17 @@ def meta(g):
 def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=None, *,
              target_feature_ids=None):
     if candidate_dir:
-        candidate_runtime_expected = candidate_dir / 'runtime_topology.topo.json'
+        candidate_runtime_expected = resolve_json_source_path(candidate_dir / 'runtime_topology.topo.json')
         if not candidate_runtime_expected.exists():
             raise ValueError('candidate_dir provided but missing runtime_topology.topo.json')
-        if candidate_runtime_expected.read_bytes() != candidate_runtime.read_bytes():
+        candidate_runtime_actual = resolve_json_source_path(candidate_runtime)
+        if candidate_runtime_expected.read_bytes() != candidate_runtime_actual.read_bytes():
             raise ValueError('candidate_runtime bytes do not match candidate_dir/runtime_topology.topo.json')
         # Finalizing startup bundles/audit can leave an earlier compressed
         # sibling stale. HTTP clients prefer that sibling over the JSON file.
         for compressed in candidate_dir.rglob('*.json.gz'):
+            if compressed.name == 'runtime_topology.topo.json.gz':
+                continue
             source = Path(str(compressed)[:-3])
             if not source.exists() or gzip.decompress(compressed.read_bytes()) != source.read_bytes():
                 raise ValueError(f'stale compressed stage artifact: {compressed.name}')
@@ -201,7 +208,10 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
                 changed_chunks.append(c['id'])
 
             if c['layer'] == 'political' and c['lod'] in lod:
-                for f in json.loads(raw)['features']:
+                chunk_payload = json.loads(raw)
+                if isinstance(chunk_payload, dict) and chunk_payload.get('type') == 'Topology':
+                    chunk_payload = decode_political_chunk(chunk_payload)
+                for f in chunk_payload['features']:
                     i = fid(f)
                     if i in all_lod_ids[c['lod']] or i not in b:
                         raise ValueError('duplicate or unknown political LOD ID')
@@ -294,7 +304,7 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
                 raise ValueError(f'baseline owner domain changed for {single_tag}')
 
     sizes = {
-        'baseline_raw': len((baseline_dir / 'runtime_topology.topo.json').read_bytes()) if (baseline_dir / 'runtime_topology.topo.json').exists() else None,
+        'baseline_raw': len(resolve_json_source_path(baseline_dir / 'runtime_topology.topo.json').read_bytes()) if resolve_json_source_path(baseline_dir / 'runtime_topology.topo.json').exists() and not str(resolve_json_source_path(baseline_dir / 'runtime_topology.topo.json')).endswith('.gz') else None,
         'candidate_raw': len(candidate_runtime.read_bytes()) if candidate_runtime.exists() else None,
         'baseline_gz': len((baseline_dir / 'runtime_topology.topo.json.gz').read_bytes()) if (baseline_dir / 'runtime_topology.topo.json.gz').exists() else None,
         'candidate_gz': Path(str(candidate_runtime) + '.gz').stat().st_size if Path(str(candidate_runtime) + '.gz').exists() else None,

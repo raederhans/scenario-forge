@@ -2358,7 +2358,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
 });
 }
 
-test("local projection selects the Stage C startup support sentinels without promoting heavy geo", () => {
+test("local projection retains Stage C and coarse wire sentinels while enforcing the edit budget", () => {
   const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8")).scripts;
   const selectorRoutes = buildRouteIndex();
   const binding = prepareRepositoryVerificationCatalogBinding({
@@ -2392,6 +2392,7 @@ test("local projection selects the Stage C startup support sentinels without pro
 
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef), [
     "python -m pytest tests/test_tno_sov_residuals.py -q",
+    "python -m unittest tests.test_coarse_wire_assets tests.test_scenario_chunk_format_contracts -q",
     expectedCommand,
     "python -m unittest tests.test_tno_ownership_repairs -q",
   ]);
@@ -2404,17 +2405,24 @@ test("local projection selects the Stage C startup support sentinels without pro
   for (const entry of projected.matchedByFile) {
     assert.ok(entry.matchedRouteIds.includes("direct:tno-startup-support-output-identity"));
   }
-  assert.deepEqual(plan.routeGaps, []);
+  assert.deepEqual(plan.routeGaps.map((entry) => entry.code).sort(), [
+    "adaptive-edit-command-budget-exceeded",
+    "adaptive-edit-process-group-budget-exceeded",
+    "adaptive-edit-runtime-budget-exceeded",
+    "adaptive-edit-cost-budget-exceeded",
+  ].sort());
   assert.deepEqual(
     plan.selectedLeaves.map((entry) => entry.leafId).sort(),
     [
       ...methods.map((method) => `python-unittest:${process.platform === "win32" ? method.toLowerCase() : method}`),
       "python-pytest:tests/test_tno_sov_residuals.py",
+      "python-unittest:tests.test_coarse_wire_assets",
+      "python-unittest:tests.test_scenario_chunk_format_contracts",
       "python-unittest:tests.test_tno_ownership_repairs",
     ].sort(),
   );
-  assert.equal(plan.executionCommands.length, 3);
-  assert.equal(adaptivePlanningExitCode(projected, plan), 0);
+  assert.equal(plan.executionCommands.length, 0);
+  assert.equal(adaptivePlanningExitCode(projected, plan), 2);
 });
 
 test("local projection preserves SOV coverage and rejects the expanded Stage C edit budget", () => {
@@ -2455,19 +2463,21 @@ test("local projection preserves SOV coverage and rejects the expanded Stage C e
   assert.deepEqual(projected.recommendedCommands.map((entry) => entry.commandRef).sort(), [
     "node --test tests/transport_capability_maturity_projection_behavior.test.mjs",
     "python -m pytest tests/test_tno_sov_residuals.py -q",
+    "python -m unittest tests.test_coarse_wire_assets tests.test_scenario_chunk_format_contracts -q",
     "python -m unittest tests.test_content_addressed_artifact_cache tests.test_scenario_build_session -q",
     "python -m unittest tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_build_startup_support_stage_admits_and_records_content_addressed_identity tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_startup_support_stage_restores_matching_content_addressed_artifact tests.test_tno_bundle_builder.TnoBundleBuilderTest.test_startup_support_rollback_failure_preserves_backup_and_raises_fatal_error -q",
     "python -m unittest tests.test_tno_ownership_repairs -q",
   ].sort());
-  // The bundle patcher now also owns SOV retirement. Keep that behavior coverage
-  // and reject an oversized edit lane rather than silently dropping the leaf.
+  // Keep SOV retirement and coarse wire coverage when the bundle patcher changes;
+  // the edit lane must reject the oversized plan without dropping those leaves.
   assert.deepEqual(plan.routeGaps.map((entry) => entry.code).sort(), [
     "adaptive-edit-command-budget-exceeded",
     "adaptive-edit-process-group-budget-exceeded",
     "adaptive-edit-runtime-budget-exceeded",
     "adaptive-edit-cost-budget-exceeded",
+    "adaptive-edit-leaf-budget-exceeded",
   ].sort());
-  assert.equal(plan.selectedLeaves.length, 8);
+  assert.equal(plan.selectedLeaves.length, 10);
   assert.equal(plan.executionCommands.length, 0);
   assert.equal(adaptivePlanningExitCode(projected, plan), 2);
 });

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import gzip
 import json
 from pathlib import Path
 import tempfile
@@ -9,13 +10,32 @@ from unittest.mock import patch
 
 from map_builder.scenario_capital_rules import apply_reviewed_capitals
 from map_builder.scenario_city_overrides_composer import build_capital_overrides_payload_from_capital_hints
-from map_builder.scenario_capital_placement import place_capital_markers
+from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
 
 TNO_CITY_ROWS = {f"CITY::ne::{ne_id}": {"id": f"CITY::ne::{ne_id}"}
                  for ne_id in ("1159151523", "1159150965", "1159151567")}
 
 
 class ScenarioCapitalRulesTest(unittest.TestCase):
+    def test_capital_geometry_reader_accepts_gzip_only_topology(self):
+        ring = [[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]
+        topology = {"type": "Topology", "arcs": [ring], "objects": {
+            name: {"type": "GeometryCollection", "geometries": [{
+                "type": "Polygon", "arcs": [[0]], "properties": {"id": name},
+            }]} for name in ("political", "scenario_atlantropa")
+        }}
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "runtime_topology.topo.json"
+            path.with_suffix(path.suffix + ".gz").write_bytes(
+                gzip.compress(json.dumps(topology).encode("utf-8")))
+            features = read_political_features(path)
+        self.assertEqual([feature["properties"]["id"] for feature in features],
+                         ["political", "scenario_atlantropa"])
+        for feature in features:
+            self.assertEqual(feature["geometry"]["type"], "Polygon")
+            self.assertEqual([[list(point) for point in exterior]
+                              for exterior in feature["geometry"]["coordinates"]], [ring])
+
     def test_modern_small_territories_have_explicit_capital_decisions(self):
         countries = {tag: {} for tag in ("PM", "SH", "AQ", "HM", "IO", "TF")}
         result = apply_reviewed_capitals({}, countries, {}, scenario_id="modern_world", strict=True)

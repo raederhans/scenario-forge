@@ -10,6 +10,7 @@ from shapely.geometry import Point, box, mapping, shape
 from shapely.ops import nearest_points, unary_union
 from topojson.utils import serialize_as_geojson
 
+from map_builder.json_source import read_json_source
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -235,6 +236,11 @@ TRACKED_SEAM_PAIRS = [
     ("tno_arafura_sea", "tno_timor_sea"),
 ]
 def _load_json(path: Path) -> dict:
+    if path.name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        payload = read_json_source(path)
+        if not isinstance(payload, dict):
+            raise ValueError(f"Expected JSON object in {path}, got {type(payload).__name__}.")
+        return payload
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     if not isinstance(payload, dict):

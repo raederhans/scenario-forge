@@ -18,6 +18,7 @@ import numpy as np
 import shapely
 from shapely.geometry import LineString, mapping, shape
 
+from map_builder.json_source import json_source_sha256, read_json_source
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
 from map_builder.io.writers import write_json_atomic
 
@@ -25,12 +26,11 @@ SPLIT = re.compile(r"__tno1962_\d+$")
 
 
 def read(path):
-    return json.loads(Path(path).read_text(encoding="utf-8"))
+    return read_json_source(path)
 
 
 def digest(path):
-    with Path(path).open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+    return json_source_sha256(path)
 
 
 def parent_id(feature_id):

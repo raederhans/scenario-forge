@@ -30,7 +30,8 @@ function createContext() {
   };
 }
 
-function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], realLayout = false, helperOptions = {} } = {}) {
+function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], realLayout = false,
+  viewportWidth = 800, helperOptions = {} } = {}) {
   const context = createContext();
   const state = { styleConfig: {}, zoomTransform: { x: 0, y: 0, k: 1 }, language: "en" };
   const projection = { stream: (sink) => sink };
@@ -65,7 +66,7 @@ function createHarness({ names = ["AB"], fontSizes = [12], alternatives = [], re
   const owner = createCountryLabelRenderOwner({ state, helpers, getters: {
     getContext: () => context, getProjection: () => projection,
     getProjectionIdentity: () => projectionIdentity, getCountryLabelSource: () => source,
-    getViewportSize: () => ({ width: 800, height: 700 }),
+    getViewportSize: () => ({ width: viewportWidth, height: 700 }),
     getTransform: () => state.zoomTransform, getLanguage: () => state.language,
   } });
   return { owner, state, source, context, fitCalls, timers, setProjectionIdentity(value) { projectionIdentity = value; } };
@@ -471,6 +472,30 @@ test("delayed zoom-band workers preserve safe same-text labels while readiness s
   assert.equal(owner.drawCountryLabels(1.2), 0, "a prior language must not appear as a pending fallback");
 });
 
+test("offscreen projection skips worker preparation until panning into view", () => {
+  const callbacks = [], messages = [];
+  let worker;
+  const { owner, state } = createHarness({ helperOptions: {
+    onInvalidate() {}, scheduleWork: (callback) => callbacks.push(callback),
+    createWorker: () => (worker = { postMessage: (message) => messages.push(message), terminate() {} }),
+  } });
+  state.zoomTransform.x = -1000;
+  owner.drawCountryLabels(1);
+  callbacks.shift()();
+  assert.equal(messages.length, 0, "offscreen geometry does not occupy the serial worker queue");
+  assert.equal(owner.isReadyForCurrentView(), true, "an offscreen country has no pending fit for this view");
+
+  state.zoomTransform.x = 0;
+  owner.drawCountryLabels(1);
+  assert.equal(callbacks.length, 1, "panning into view schedules its fit");
+  callbacks.shift()();
+  assert.equal(messages.length, 1);
+  assert.equal(owner.isReadyForCurrentView(), false);
+  worker.onmessage({ data: createCountryLabelLayoutWorkerHandler()(messages.shift()) });
+  assert.equal(owner.drawCountryLabels(1), 1);
+  assert.equal(owner.isReadyForCurrentView(), true);
+});
+
 test("zoom fallback cannot retain a fit that discarded a hole significant in the new band", () => {
   const callbacks = [], messages = [];
   let worker;
@@ -541,7 +566,7 @@ test("deferred preparation batches countries and bounds the serial worker queue"
   const callbacks = [], messages = [];
   let invalidations = 0;
   let worker;
-  const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), helperOptions: {
+  const { owner } = createHarness({ names: Array.from({ length: 12 }, (_, i) => `C${i}`), viewportWidth: 2400, helperOptions: {
     nowMs: () => 0,
     scheduleWork: (callback) => callbacks.push(callback),
     onInvalidate: () => { invalidations += 1; },

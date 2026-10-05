@@ -547,7 +547,7 @@ function buildSegmentIndex(component, indexSize = 24) {
       }
     }
   }
-  return { ...component, segments, rows, cells, indexSize };
+  return { ...component, segments, rows, cells, indexSize, boundaryRows: [] };
 }
 
 function pointOnSegment(point, a, b, epsilon) {
@@ -561,10 +561,16 @@ function pointOnSegment(point, a, b, epsilon) {
 function pointInIndexedRegion(x, y, component, epsilon) {
   if (x <= component.minX || x >= component.maxX || y <= component.minY || y >= component.maxY) return false;
   const row = Math.max(0, Math.min(component.indexSize - 1, Math.floor(((y - component.minY) / component.height) * component.indexSize)));
-  const boundaryIds = new Set();
-  for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
-    const bucket = component.rows[row + rowOffset];
-    if (bucket) for (const id of bucket) boundaryIds.add(id);
+  let boundaryIds = component.boundaryRows[row];
+  if (!boundaryIds) {
+    const ids = new Set();
+    for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
+      const bucket = component.rows[row + rowOffset];
+      if (bucket) for (const id of bucket) ids.add(id);
+    }
+    // This component's index is immutable for the fit. Reuse the same ordered
+    // boundary candidates across glyph corners and font-size probes.
+    boundaryIds = component.boundaryRows[row] = [...ids];
   }
   for (const id of boundaryIds) {
     const segment = component.segments[id];

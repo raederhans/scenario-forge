@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.precision_build_graph import BuildGraph, BuildStage
+from tools.scenario_chunk_format import decode_political_chunk
 
 from shapely import coverage_invalid_edges, coverage_is_valid, coverage_simplify, orient_polygons
 from shapely.geometry import shape, mapping
@@ -221,7 +222,7 @@ def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protec
     if len(coarse) != 1:
         raise ValueError("Pilot requires exactly one complete political coarse base")
     base_meta = coarse[0]
-    base_payload = load_json(source_path(source_root, base_meta["url"]))
+    base_payload = decode_political_chunk(load_json(source_path(source_root, base_meta["url"])))
     base_features = base_payload["features"]
     by_id = {feature_id(f): i for i, f in enumerate(base_features)}
     if len(by_id) != len(base_features):

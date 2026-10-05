@@ -87,6 +87,12 @@ class DisplayLodTests(unittest.TestCase):
             self.assertIs(protected, features)
 
     def test_staged_manifest_family_hash_bounds_and_source_bytes(self):
+        self._assert_staged_manifest_family()
+
+    def test_staged_overlay_accepts_topology_coarse_wire(self):
+        self._assert_staged_manifest_family(coarse_topology=True)
+
+    def _assert_staged_manifest_family(self, coarse_topology=False):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder) / "source"
             prefix = Path("data/scenarios/pilot")
@@ -98,7 +104,11 @@ class DisplayLodTests(unittest.TestCase):
             chunks = []
             for lod in ["coarse", "detail"]:
                 url = (prefix / "chunks" / (lod + ".json.gz")).as_posix()
-                (root / url).write_bytes(gzip.compress(raw, mtime=0))
+                wire = raw
+                if coarse_topology and lod == "coarse":
+                    from tools.scenario_chunk_format import feature_collection_to_topology
+                    wire = json.dumps(feature_collection_to_topology(payload)).encode()
+                (root / url).write_bytes(gzip.compress(wire, mtime=0))
                 chunks.append({"id": f"political.{lod}.test", "layer": "political", "lod": lod, "url": url,
                                "min_zoom": 0 if lod == "coarse" else 1.35, "max_zoom": 1.35 if lod == "coarse" else 99,
                                "global_coverage": lod == "coarse", "bounds": [0, 0, 2, 1], "country_codes": ["X"]})

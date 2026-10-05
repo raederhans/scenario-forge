@@ -118,6 +118,29 @@ export function createLocalFeedbackRecords(baseRecords) {
       "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
       "data/europe_topology.runtime_political_v1.json",
     ]],
+    ["remaining-europe-seam", "python -m pytest tests/test_tno_remaining_europe_seams.py -q", [
+      "tests/test_tno_remaining_europe_seams.py", "tools/repair_tno_remaining_europe_seams.py",
+      "tools/repair_specs/tno_remaining_europe_20261005.json", "tools/repair_tno_balkan_anatolia_seams.py",
+      "map_builder/geo/measurement.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+    ]],
+    ["mixed-lod-coverage", "python -m pytest tests/test_mixed_lod_coverage.py -q", [
+      "tests/test_mixed_lod_coverage.py", "tools/validate_mixed_lod_coverage.py",
+    ]],
+    ["political-coarse-shared-lod", "python -m pytest tests/test_political_coarse_shared_lod.py -q", [
+      "tests/test_political_coarse_shared_lod.py", "tools/scenario_chunk_assets.py",
+    ]],
+    ["levant-seam", "python -m pytest tests/test_tno_levant_seams.py -q", [
+      "tests/test_tno_levant_seams.py", "tools/repair_tno_levant_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+      "map_builder/geo/measurement.py", "tools/audit_tno_east_europe_gaps.py",
+    ]],
+    ["balkan-anatolia-seam", "python -m pytest tests/test_tno_balkan_anatolia_seams.py -q", [
+      "tests/test_tno_balkan_anatolia_seams.py", "tools/repair_tno_balkan_anatolia_seams.py",
+      "map_builder/geo/measurement.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+    ]],
+    ["slovakia-ukraine-seam", "python -m pytest tests/test_tno_slovakia_ukraine_seams.py -q", [
+      "tests/test_tno_slovakia_ukraine_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+      "map_builder/geo/measurement.py",
+    ]],
     ["reviewed-seam", "python -m pytest tests/test_reviewed_seam.py -q", [
       "tests/test_reviewed_seam.py", "map_builder/geo/reviewed_seam.py", "tools/repair_tno_poland_ukraine_seams.py",
     ]],
@@ -181,7 +204,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     commandRef: "python -m pytest tests/test_tno_eastern_precision_sources.py -q",
     sourceRefs: [
       "tests/test_tno_eastern_precision_sources.py", "tools/prepare_tno_eastern_precision_sources.py",
-      "data/scenarios/tno_1962/runtime_topology.topo.json", "data/poland_powiaty.geojson",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz", "data/poland_powiaty.geojson",
       "data/geoBoundaries-UKR-ADM2.geojson", "data/geoBoundaries-BLR-ADM2.geojson", "data/europe_topology.highres.json",
     ],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],

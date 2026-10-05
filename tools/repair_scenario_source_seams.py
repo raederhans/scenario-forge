@@ -12,6 +12,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import box
 from map_builder.geo.source_coverage_repair import repair_source_coverage
+from map_builder.json_source import read_json_source
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry, replace_regional_geometry
 from map_builder.io.writers import write_json_atomic
 
@@ -22,7 +23,7 @@ def prepare(scenario_dir, source_path, feature_prefix, output):
         raise ValueError("Prepare into a separate candidate path")
     manifest = json.loads((scenario_dir / 'manifest.json').read_text(encoding='utf-8'))
     runtime = scenario_dir / Path(manifest['runtime_topology_url']).name
-    original = json.loads(runtime.read_text(encoding='utf-8'))
+    original = read_json_source(runtime)
     absolute = _absolute_topology(original)
     rows = absolute['objects']['political']['geometries']
     selected = {str(g['properties']['id']): g for g in rows if str(g['properties']['id']).startswith(feature_prefix)}

@@ -2,10 +2,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { readJsonSource } from "./helpers/read_json_source.mjs";
 const require = createRequire(import.meta.url);
 const topojson = require("../vendor/topojson-client.min.js");
 const d3 = require("../vendor/d3.v7.min.js");
-const read = (path) => JSON.parse(fs.readFileSync(new URL(path, import.meta.url), "utf8"));
+const read = (path) => path.includes("/runtime_topology.topo.json")
+  ? readJsonSource(new URL(path, import.meta.url))
+  : JSON.parse(fs.readFileSync(new URL(path, import.meta.url), "utf8"));
 const wave6Waters = read("./fixtures/ocean_wave6_probes.json");
 const wave7Waters = read("./fixtures/ocean_wave7_probes.json");
 const acceptedWaveWaters = [...wave6Waters, ...wave7Waters];

@@ -3,6 +3,7 @@
 importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
+  new URL("../core/scenario_chunk_format_shared.js", self.location.href).href,
   new URL("../core/startup_topology_codec_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
@@ -633,9 +634,13 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
   if (chunkType && chunkType !== "runtime-topology") {
     const chunkResult = await fetchJsonResource(chunkUrl, chunkType || "scenarioChunk", { signal });
     throwIfAborted(signal);
+    const chunkPayload = chunkType === "scenario-chunk" && chunkResult.payload?.type === "Topology"
+      ? globalThis.__scenarioForgeScenarioChunkFormatShared.decodeScenarioChunkPayload(chunkResult.payload, self.topojson)
+      : chunkResult.payload;
+    throwIfAborted(signal);
     postWorkerMessage(MESSAGE_TYPES.RUNTIME_CHUNK_READY, {
       taskId,
-      chunkPayload: chunkResult.payload || null,
+      chunkPayload: chunkPayload || null,
       metrics: {
         totalMs: nowMs() - startedAt,
         chunkPayload: chunkResult.metrics || null,

@@ -112,6 +112,32 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_chunked_gzip_runtime_exclusion_and_unpublished_url_stripping(self) -> None:
+        from unittest.mock import patch
+        runtime = REPO_ROOT / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            scenarios = app / "data/scenarios"
+            scenario = scenarios / "gzip_fixture"
+            scenario.mkdir(parents=True)
+            runtime_url = "data/scenarios/gzip_fixture/runtime_topology.topo.json.gz"
+            payload = {"detail_chunk_manifest_url": "data/scenarios/gzip_fixture/detail_chunks.manifest.json", "runtime_topology_url": runtime_url}
+            (scenario / "manifest.json").write_text(json.dumps(payload), encoding="utf-8")
+            bundle = scenario / "startup.bundle.en.json"
+            bundle.write_text(json.dumps({"manifest_subset": payload}), encoding="utf-8")
+            bundle.with_suffix(".json.gz").write_bytes(gzip.compress(bundle.read_bytes(), mtime=0))
+            policy = build_pages_dist.build_pages_production_publication_policy(scenarios)
+            for path in (runtime_url, runtime_url.removesuffix(".gz")):
+                self.assertFalse(policy.allows(path))
+                self.assertFalse(policy.allows("app/" + path))
+            self.assertTrue(policy.allows("data/scenarios/gzip_fixture/runtime_topology.bootstrap.topo.json"))
+            with patch.object(build_pages_dist, "APP_DIST_ROOT", app):
+                build_pages_dist.strip_scenario_publish_audit_urls(scenarios)
+            self.assertNotIn("runtime_topology_url", json.loads((scenario / "manifest.json").read_text(encoding="utf-8")))
+            self.assertNotIn("runtime_topology_url", json.loads(bundle.read_text(encoding="utf-8"))["manifest_subset"])
+            self.assertEqual(json.loads(gzip.decompress(bundle.with_suffix(".json.gz").read_bytes())), json.loads(bundle.read_bytes()))
+
     def test_all_registered_river_packs_are_published_with_registry_entries(self):
         source_registry = json.loads((REPO_ROOT / "data/runtime_asset_registry.json").read_text(encoding="utf-8"))
         published_registry = json.loads((PAGES_DIST_ROOT / "app/data/runtime_asset_registry.json").read_text(encoding="utf-8"))
@@ -627,7 +653,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                     self.assertEqual(payload["territory_tags"], [])
                 else:
                     self.assertIn(f"data/scenarios/{scenario_id}/manifest.json", payload["source_files"])
-                    self.assertIn(f"data/scenarios/{scenario_id}/runtime_topology.topo.json", payload["source_files"])
+                    scenario_manifest = json.loads((REPO_ROOT / "data/scenarios" / scenario_id / "manifest.json").read_text(encoding="utf-8"))
+                    self.assertIn(scenario_manifest["runtime_topology_url"], payload["source_files"])
                     self.assertIn(f"data/scenarios/{scenario_id}/owners.by_feature.json", payload["source_files"])
                     self.assertIn(f"data/scenarios/{scenario_id}/countries.json", payload["source_files"])
                     self.assertFalse(payload["selection_policy"]["blank_canvas"])
@@ -1141,7 +1168,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
         self.assertEqual(
             nodes_by_path["app/js/workers/startup_boot.worker.js"]["resource_references"],
-            ["app/js/core/feature_identity_shared.js", "app/js/core/geometry_transfer_codec_shared.js", "app/js/core/json_resource_decoder_shared.js", "app/js/core/startup_topology_codec_shared.js", "app/vendor/topojson-client.min.js"],
+            ["app/js/core/feature_identity_shared.js", "app/js/core/geometry_transfer_codec_shared.js", "app/js/core/json_resource_decoder_shared.js", "app/js/core/scenario_chunk_format_shared.js", "app/js/core/startup_topology_codec_shared.js", "app/vendor/topojson-client.min.js"],
         )
 
     def test_pages_module_graph_uses_acorn_for_imports_exports_templates_comments_and_regex(self) -> None:

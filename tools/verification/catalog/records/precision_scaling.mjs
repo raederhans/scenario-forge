@@ -80,7 +80,7 @@ export function createPrecisionScalingRecords(existingRecords) {
     ...[
       ["precision_shard_lod", "tools/scenario_chunk_assets.py"],
       ["scenario_topology_decode", "tools/scenario_topology_decode.py", "tools/regional_scenario_assets.py", "tools/scenario_chunk_assets.py", "tools/build_landing_hero_cartography.py", "tools/build_landing_europe_1936_showcase.py"],
-      ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py"],
+      ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py", "map_builder/geo/measurement.py", "tests/fixtures/geos_segmentize_collapse.json"],
       ["tno_major_country_precision", "tools/prepare_tno_major_country_precision.py"],
       ["us_county_source", "tools/prepare_us_county_source.py"],
       ["us_county_seams", "tools/prepare_us_county_seams.py"],
@@ -181,6 +181,40 @@ export function createPrecisionScalingRecords(existingRecords) {
     commandRef: "python -m unittest tests.test_pages_source_graph -q",
     sourceRefs: ["tools/check_pages_source_graph.py", "tools/build_pages_dist.py", "tests/test_pages_source_graph.py"],
     ownerHints: ["deploy-runtime"], domains: ["pages-dist"], selectorOrder: start + records.length,
+  });
+  const wireRoutes = [
+    ["codec", "geo-contract", "python -m unittest tests.test_scenario_chunk_format tests.test_lossless_topology -q", [
+      "tools/scenario_chunk_format.py", "tools/lossless_topology.py", "tests/test_scenario_chunk_format.py", "tests/test_lossless_topology.py",
+    ]],
+    ["builder", "geo-contract", "python -m unittest tests.test_coarse_wire_assets tests.test_scenario_chunk_format_contracts -q", [
+      "tools/scenario_chunk_assets.py", "tools/regional_scenario_assets.py", "tools/patch_tno_1962_bundle.py", "tests/test_coarse_wire_assets.py",
+      "tools/check_scenario_contracts.py", "tools/validate_mixed_lod_coverage.py", "tests/test_scenario_chunk_format_contracts.py",
+    ]],
+    ["loader", "scenario-runtime", "node --test tests/scenario_chunk_topology_format_behavior.test.mjs", [
+      "js/core/scenario_chunk_format_shared.js", "js/core/scenario/bundle_loader.js", "js/workers/startup_boot.worker.js", "tests/scenario_chunk_topology_format_behavior.test.mjs",
+    ]],
+  ];
+  for (const [id, domain, commandRef, sourceRefs] of wireRoutes) records.push({
+    ...records[0], id: "local:topology-wire:" + id, commandRef, sourceRefs,
+    ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
+  });
+  // The discovered unittest entrypoints retain their standalone commands beside
+  // the combined wire-builder and pytest routes.
+  for (const [id, testModule] of [
+    ["builder-coarse", "test_coarse_wire_assets"],
+    ["builder-contracts", "test_scenario_chunk_format_contracts"],
+    ["shared-lod", "test_political_coarse_shared_lod"],
+  ]) records.push({
+    ...records[0], id: "local:topology-wire:" + id,
+    commandRef: "python -m unittest tests." + testModule + " -q",
+    sourceRefs: ["tests/" + testModule + ".py", "tools/scenario_chunk_assets.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
+  records.push({
+    ...records[0], id: "local:topology-wire:runtime-source",
+    commandRef: "python -m unittest tests.test_runtime_topology_source -q",
+    sourceRefs: ["map_builder/json_source.py", "map_builder/io/readers.py", "tests/test_runtime_topology_source.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
   return records;
 }

@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readJsonSource } from './helpers/read_json_source.mjs';
 import test from 'node:test';
 import { createCityLabelTextModel } from '../js/core/renderer/city_label_text_model.js';
 import { createUrbanCityPolicyOwner } from '../js/core/renderer/urban_city_policy.js';
 
-const read = path => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'));
+const read = path => readJsonSource(new URL(path, import.meta.url));
 const base = { ...read('../data/locales.json').geo, ...read('../data/city_aliases.json').geo };
 const patch = read('../data/scenarios/tno_1962/geo_locale_patch.json').geo;
 const world = read('../data/world_cities.geojson');

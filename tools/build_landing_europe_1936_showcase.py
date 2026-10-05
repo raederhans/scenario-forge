@@ -16,12 +16,11 @@ from shapely.geometry import GeometryCollection, box, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from shapely.validation import make_valid
-
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from map_builder.json_source import read_json_source
 from tools.scenario_topology_decode import topology_object_to_geojson
 
 LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
@@ -264,6 +263,11 @@ def projection_bounds_for_bbox(bbox: tuple[float, float, float, float]) -> tuple
 
 
 def read_json(path: Path) -> dict:
+    if path.name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        payload = read_json_source(path)
+        if not isinstance(payload, dict):
+            raise ValueError(f"Expected JSON object in {path}")
+        return payload
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     if not isinstance(payload, dict):

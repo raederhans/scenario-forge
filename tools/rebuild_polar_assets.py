@@ -18,6 +18,7 @@ import shapely
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from map_builder.json_source import json_source_sha256, read_json_source, write_runtime_topology_source
 from map_builder.processors.arctic_recovery import (
     AREA_EPSILON, _read, decoded_structure, polygonal, recover_arctic,
 )
@@ -33,11 +34,30 @@ FORBIDDEN_BLANK_PROPERTIES = {
 
 
 def read(path):
+    if Path(path).name in {'runtime_topology.topo.json', 'runtime_topology.topo.json.gz'}:
+        return read_json_source(path)
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
 
 
 def write(path, payload):
     path = Path(path)
+    if path.name == 'runtime_topology.topo.json':
+        actual_path = write_runtime_topology_source(path.parent, payload)
+        try:
+            scenario_relative = path.parent.resolve().relative_to((ROOT / 'data/scenarios').resolve())
+        except ValueError:
+            return actual_path
+        manifest_path = path.parent / 'manifest.json'
+        if manifest_path.exists():
+            manifest = read(manifest_path)
+            actual_url = (actual_path.resolve().relative_to(ROOT).as_posix())
+            manifest['runtime_topology_url'] = actual_url
+            digest = json_source_sha256(actual_path)
+            if not isinstance(manifest.get('source'), dict):
+                raise ValueError(f'Missing runtime source metadata in {manifest_path}')
+            manifest['source']['runtime_topology_sha256'] = digest
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        return actual_path
     path.parent.mkdir(parents=True, exist_ok=True)
     data = json.dumps(payload, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
     path.write_bytes(data)

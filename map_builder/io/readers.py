@@ -9,6 +9,7 @@ import geopandas as gpd
 from map_builder import config as cfg
 from map_builder.geo.utils import clip_to_map_bounds, pick_column
 from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_vector_archive
+from map_builder.json_source import read_json_bytes, resolve_json_source_path
 
 JSON_ENCODINGS = ("utf-8", "utf-8-sig")
 
@@ -17,7 +18,7 @@ def read_json_strict(path: Path, *, encodings: tuple[str, ...] = JSON_ENCODINGS)
     last_error: Exception | None = None
     for encoding in encodings:
         try:
-            return json.loads(path.read_text(encoding=encoding))
+            return json.loads(read_json_bytes(path).decode(encoding))
         except FileNotFoundError:
             raise
         except json.JSONDecodeError as exc:
@@ -41,7 +42,7 @@ def read_json_optional(
     default: object = None,
     encodings: tuple[str, ...] = JSON_ENCODINGS,
 ) -> object:
-    if path is None or not path.exists():
+    if path is None or not resolve_json_source_path(path).exists():
         return default
     try:
         return read_json_strict(path, encodings=encodings)

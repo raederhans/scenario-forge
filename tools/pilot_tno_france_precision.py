@@ -15,6 +15,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import mapping, box
 
+from map_builder.json_source import read_json_source
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.processors.france import apply_france_master_precision
@@ -42,7 +43,7 @@ def prepare_candidate(master_path: Path, scenario_dir: Path, output_path: Path, 
         raise ValueError("Use a new candidate path outside the scenario and master inputs")
     if read_json_strict(scenario_dir / "manifest.json").get("scenario_id") != "tno_1962":
         raise ValueError("This pilot applies only to the reviewed TNO 1962 scenario")
-    baseline = read_json_strict(baseline_path)
+    baseline = read_json_source(baseline_path)
     absolute = _absolute_topology(baseline)
     master = _absolute_topology(read_json_strict(master_path))
     master_fr = [g for g in master["objects"]["political"]["geometries"] if g.get("properties", {}).get("id", "").startswith("FR_ARR_")]

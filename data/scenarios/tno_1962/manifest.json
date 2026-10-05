@@ -165,17 +165,17 @@
   },
   "runtime_bootstrap_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
   "runtime_meta_url": "data/scenarios/tno_1962/runtime_meta.json",
-  "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",
+  "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
   "scenario_atlantropa_metadata_url": "data/scenarios/tno_1962/scenario_atlantropa_metadata.json",
   "scenario_atlantropa_topology_url": "data/scenarios/tno_1962/scenario_atlantropa.topo.json",
   "scenario_contract_profile": "tno_full",
   "scenario_id": "tno_1962",
-  "snapshot_fingerprint": "a4cdc54d1e78d32cf428b9cf55ac2fa2cb6a1c6b919bf7930f257c39c0c71e49",
+  "snapshot_fingerprint": "570d5f8c6ab50b12123f8a443df16d193d1810db38bda490389791bfcb10f379",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
-    "detail_chunk_manifest_sha256": "e21a24da0ed06e16f02cf34ee0760690b440bdf600d4aa9b5435c280fe1922b2",
-    "runtime_bootstrap_topology_sha256": "72b6f9a87da4ca496648b9815c13124ee025948be99c4f2fee767717508355b5",
-    "runtime_topology_sha256": "b208b54c86c8028fe4c5c73a35d6af418c15559f9a8ef6886ea5521084f402a6"
+    "detail_chunk_manifest_sha256": "41a7eff1700d4e6d0b88ce498bd25ed45ffb561a7c7dc7bf8767a3277365c226",
+    "runtime_bootstrap_topology_sha256": "778d8bf0739545699e84b5a5b99decbec670752d1f36ef142ac8399e4e923119",
+    "runtime_topology_sha256": "2de31f99fdf3ccf6d037d2af394d714bc202ced9e3d76ec483105f48ec13ec20"
   },
   "special_regions_url": "data/scenarios/tno_1962/special_regions.geojson",
   "special_zone_layers_url": "data/scenarios/tno_1962/special_zone_layers.json",

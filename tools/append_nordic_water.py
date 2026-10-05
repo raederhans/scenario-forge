@@ -20,6 +20,7 @@ from pathlib import Path
 import geopandas as gpd
 from shapely.geometry import mapping
 
+from map_builder.json_source import json_source_sha256, read_json_source
 from map_builder.geo.spherical_safety import _topology_feature_collection
 from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.water_region_authority import compile_named_water_regions
@@ -36,11 +37,13 @@ INPUT_PATHS = (
 
 
 def input_identity():
-    return {relative: hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
-            for relative in INPUT_PATHS}
+    return {relative: json_source_sha256(ROOT / relative) if relative.endswith("runtime_topology.topo.json")
+            else hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() for relative in INPUT_PATHS}
 
 
 def read(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 

@@ -739,7 +739,8 @@ class PagesProductionPublicationPolicy:
                 return False
             if relative_path in SCENARIO_EXCLUDED_RELATIVE_FILES:
                 return False
-            if relative_path in self.chunked_scenario_full_topology_paths:
+            full_topology_path = relative_path.with_suffix("") if relative_path.name == "runtime_topology.topo.json.gz" else relative_path
+            if full_topology_path in self.chunked_scenario_full_topology_paths:
                 return False
             return True
 

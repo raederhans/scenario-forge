@@ -22,6 +22,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import mapping
 
+from map_builder.json_source import json_source_sha256, read_json_source, resolve_json_source_path
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
@@ -41,6 +42,8 @@ PROFILES = {
 
 
 def file_digest(path):
+    if Path(path).name == "runtime_topology.topo.json":
+        return json_source_sha256(path)
     with Path(path).open("rb") as handle:
         return hashlib.file_digest(handle, "sha256").hexdigest()
 
@@ -267,7 +270,8 @@ def prepare(scenario_dir, data_root, output_root, countries, *, lineage_paths=No
         raise ValueError("select_unique_supported_countries")
     if read_json_strict(scenario_dir / "manifest.json").get("scenario_id") != "tno_1962":
         raise ValueError("requires_tno_1962")
-    baseline = read_json_strict(scenario_dir / "runtime_topology.topo.json")
+    baseline_path = resolve_json_source_path(scenario_dir / "runtime_topology.topo.json")
+    baseline = read_json_source(baseline_path)
     absolute = _absolute_topology(baseline)
     rows = absolute["objects"]["political"]["geometries"]
     owners = read_json_strict(scenario_dir / "owners.by_feature.json")["owners"]
@@ -277,8 +281,8 @@ def prepare(scenario_dir, data_root, output_root, countries, *, lineage_paths=No
         profile = PROFILES[country]
         target_ids = geographic_target_ids(rows, country)
         report = {"country": country, "status": "blocked", "release_ready": False, "profile": profile,
-                  "baseline_runtime": str(scenario_dir / "runtime_topology.topo.json"),
-                  "baseline_sha256": file_digest(scenario_dir / "runtime_topology.topo.json"),
+                  "baseline_runtime": str(baseline_path),
+                  "baseline_sha256": file_digest(baseline_path),
                   "baseline_target_ids": target_ids, "baseline_target_features": len(target_ids),
                   "baseline_owner_counts": dict(Counter(owners.get(fid, "MISSING") for fid in target_ids)),
                   "split_child_ids": [fid for fid in target_ids if "__" in fid],

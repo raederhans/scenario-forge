@@ -6,10 +6,18 @@ from __future__ import annotations
 import argparse
 import copy
 import json
+import sys
 from collections import Counter
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
+
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from map_builder.json_source import read_json_source, resolve_json_source_path, write_runtime_topology_source
 
 
 ATLANTROPA_OBJECT_NAME = "scenario_atlantropa"
@@ -34,7 +42,7 @@ def utc_timestamp() -> str:
 
 
 def load_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return read_json_source(path)
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -291,9 +299,16 @@ def migrate_scenario(scenario_dir: Path) -> dict[str, Any]:
     manifest = load_json(scenario_dir / "manifest.json")
     scenario_id = str(manifest.get("scenario_id") or scenario_dir.name).strip() or scenario_dir.name
 
-    runtime_path = scenario_dir / "runtime_topology.topo.json"
+    runtime_url = str(manifest.get("runtime_topology_url") or "").strip()
+    relative = PurePosixPath(runtime_url).relative_to(PurePosixPath("data/scenarios") / scenario_id) if runtime_url else PurePosixPath("runtime_topology.topo.json")
+    runtime_path = scenario_dir.joinpath(*relative.parts).resolve()
+    if not runtime_path.is_relative_to(scenario_dir):
+        raise ValueError(f"Runtime topology URL escapes scenario directory: {runtime_url}")
+    runtime_path = resolve_json_source_path(runtime_path)
     runtime_payload, atlantropa_geometries = split_topology_payload(load_json(runtime_path))
-    write_json(runtime_path, runtime_payload)
+    runtime_path = write_runtime_topology_source(scenario_dir, runtime_payload)
+    manifest["runtime_topology_url"] = f"data/scenarios/{scenario_id}/{runtime_path.name}"
+    write_json(scenario_dir / "manifest.json", manifest)
 
     bootstrap_path = scenario_dir / "runtime_topology.bootstrap.topo.json"
     if bootstrap_path.exists():

@@ -12,6 +12,7 @@ from shapely.geometry import LineString, Polygon, shape
 from topojson import Topology
 
 from tools import build_scenario_chunk_assets, scenario_chunk_assets
+from tools.scenario_chunk_format import decode_political_chunk
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -116,7 +117,8 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
             )
             chunk_path = REPO_ROOT.joinpath(*str(coarse_chunk["url"]).split("/"))
             payload = json.loads(chunk_path.read_text(encoding="utf-8"))
-            features = payload.get("features")
+            expanded_payload = decode_political_chunk(payload)
+            features = expanded_payload.get("features")
             self.assertIsInstance(features, list)
             assert isinstance(features, list)
 
@@ -125,7 +127,7 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 self.assertIsInstance(diagnostics, dict)
                 assert isinstance(diagnostics, dict)
 
-                payload_cost = scenario_chunk_assets._summarize_payload_geometry_cost(payload)
+                payload_cost = scenario_chunk_assets._summarize_payload_geometry_cost(expanded_payload)
                 payload_byte_size = scenario_chunk_assets._minified_json_byte_size(payload)
                 payload_bounds = scenario_chunk_assets._build_feature_bounds_summary(
                     features,
@@ -137,6 +139,10 @@ class ScenarioChunkAssetsTest(unittest.TestCase):
                 self.assertEqual(coarse_chunk.get("byte_size"), chunk_path.stat().st_size)
                 self.assertEqual(coarse_chunk.get("sha256"), build_scenario_chunk_assets.sha256_path(chunk_path))
                 self.assertEqual(coarse_chunk.get("byte_size"), payload_byte_size)
+                if payload.get("type") == "Topology":
+                    self.assertEqual(coarse_chunk.get("data_format"), "topojson")
+                    self.assertEqual(coarse_chunk.get("cache_byte_size"),
+                                     scenario_chunk_assets._minified_json_byte_size(expanded_payload))
                 self.assertEqual(coarse_chunk.get("coord_count"), payload_cost["coord_count"])
                 self.assertEqual(coarse_chunk.get("part_count"), payload_cost["part_count"])
                 self.assertEqual(coarse_chunk.get("estimated_path_cost"), payload_cost["estimated_path_cost"])

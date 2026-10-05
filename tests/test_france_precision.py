@@ -1,11 +1,13 @@
 import unittest
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import geopandas as gpd
 from shapely.geometry import Polygon, box
 from shapely import coverage_is_valid
 
+from map_builder.json_source import read_json_source
 from map_builder.processors.france import (
     _source_arrondissement_layer,
     apply_france_master_precision,
@@ -103,8 +105,7 @@ class FrancePrecisionTests(unittest.TestCase):
     def test_real_tno_fr_ids_restore_against_source_and_check_coverage(self):
         from tools.build_na_detail_topology import _topology_object_to_gdf
 
-        with open("data/scenarios/tno_1962/runtime_topology.topo.json", encoding="utf-8") as handle:
-            topology = json.load(handle)
+        topology = read_json_source(Path("data/scenarios/tno_1962/runtime_topology.topo.json"))
         runtime = _topology_object_to_gdf(topology, "political")
         existing = runtime[runtime["id"].astype(str).str.startswith("FR_ARR_")].copy()
         source = _source_arrondissement_layer()

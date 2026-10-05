@@ -9,7 +9,7 @@ from tools.scenario_chunk_assets import _optimize_political_coarse_payload, _bui
 
 
 class ExplicitPrecisionLodTest(unittest.TestCase):
-    def test_explicit_id_partial_owner_preserves_selected_and_leaves_unselected_legacy(self):
+    def test_explicit_id_partial_owner_preserves_selected_and_neighbor_interfaces(self):
         # 3 features: A1 (selected), A2 (non-selected, same owner), B1 (non-selected, different owner)
         # We need them to share boundaries. A1 shares with A2 and B1.
 
@@ -34,16 +34,14 @@ class ExplicitPrecisionLodTest(unittest.TestCase):
         )
 
         coarse = [shape(f['geometry']) for f in result['features']]
-        # A1 shouldn't be simplified along its shared boundaries, A2 and B1 get simplified independently.
-
-        # Check that A1 geometry is untouched (except for possible ring orientation by orient_polygons)
-        # We compare the shapes to ignore ring orientation.
-        self.assertTrue(shape(result['features'][0]['geometry']).equals(shape(mapping(geometries[0]))))
-
-        # B1 should be simplified
-        self.assertLess(get_num_coordinates(coarse[2]), get_num_coordinates(geometries[2]))
-        # A2 should also be simplified since it's legacy
-        self.assertLess(get_num_coordinates(coarse[1]), get_num_coordinates(geometries[1]))
+        # Explicit precision declarations still permit joint simplification
+        # inside a load shard; its external boundary and every mixed union stay exact.
+        self.assertTrue(union_all(coarse[:2]).equals(union_all(geometries[:2])))
+        self.assertTrue(coarse[2].equals(geometries[2]))
+        for first, second in itertools.product([False, True], repeat=2):
+            mixed = [geometries[i] if (first if i < 2 else second) else coarse[i] for i in range(3)]
+            self.assertTrue(coverage_is_valid(mixed))
+            self.assertTrue(union_all(mixed).equals(union_all(geometries)))
 
     def test_explicit_id_mixed_owner_lod_seam(self):
         # >=2 adjacent explicitly selected regions, DIFFERENT owners, differing 3-letter cntr_code
@@ -97,9 +95,8 @@ class ExplicitPrecisionLodTest(unittest.TestCase):
 
         # RU_RAY_123 should be untouched
         self.assertTrue(shape(result['features'][0]['geometry']).equals(shape(geometry)))
-        # OTHER_1 should be simplified
-        simplified_other = shape(result['features'][1]['geometry'])
-        self.assertLess(get_num_coordinates(simplified_other), get_num_coordinates(shape(geometry)))
+        # The duplicate overlaps the explicit feature: retain both participants.
+        self.assertTrue(shape(result['features'][1]['geometry']).equals(shape(geometry)))
 
     @patch('tools.scenario_chunk_assets._write_json')
     @patch('tools.scenario_chunk_assets._write_minified_json')

@@ -28,6 +28,7 @@ from map_builder.geo.marine_refinement import (
 )
 from shapely.geometry import mapping
 from shapely.ops import unary_union
+from map_builder.json_source import json_source_sha256, read_json_source
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_PATHS = (
@@ -41,11 +42,13 @@ INPUT_PATHS = (
 
 
 def input_identity():
-    return {relative: hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
-            for relative in INPUT_PATHS}
+    return {relative: json_source_sha256(ROOT / relative) if relative.endswith("runtime_topology.topo.json")
+            else hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() for relative in INPUT_PATHS}
 
 
 def read(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 

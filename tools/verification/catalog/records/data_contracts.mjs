@@ -342,7 +342,7 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "verify:tno-polar-coverage",
     "sourceRefs": [
       "tools/validate_tno_water_geometries.py",
-      "data/scenarios/tno_1962/runtime_topology.topo.json",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
       "data/scenarios/tno_1962/water_regions.geojson"
     ],
     "ownerHints": [
@@ -381,7 +381,7 @@ export const DATA_CONTRACTS_RECORDS = [
     "sourceRefs": [
       "tools/validate_tno_water_geometries.py",
       "data/scenarios/tno_1962/water_regions.geojson",
-      "data/scenarios/tno_1962/runtime_topology.topo.json",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
       "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
       "data/scenarios/tno_1962/detail_chunks.manifest.json",
       "data/scenarios/tno_1962/chunks/water"
@@ -619,7 +619,8 @@ export const DATA_CONTRACTS_RECORDS = [
     "id": "python-heavy:geo_stack:tests/test_scenario_chunk_assets.py",
     "commandRef": "python -m unittest tests.test_scenario_chunk_assets -q",
     "sourceRefs": [
-      "tests/test_scenario_chunk_assets.py"
+      "tests/test_scenario_chunk_assets.py",
+      "tools/build_scenario_chunk_assets.py"
     ],
     "ownerHints": [
       "geo-contract"
@@ -689,7 +690,8 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "python -m unittest tests.test_tno_bundle_builder -q",
     "sourceRefs": [
       "tests/test_tno_bundle_builder.py",
-      "tools/patch_tno_1962_bundle.py"
+      "tools/patch_tno_1962_bundle.py",
+      "tools/extract_scenario_atlantropa.py"
     ],
     "ownerHints": [
       "geo-contract"
@@ -1655,7 +1657,10 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "python -m unittest tests.test_startup_bootstrap_assets -q",
     "sourceRefs": [
       "tests/test_startup_bootstrap_assets.py",
-      "tools/build_startup_bootstrap_assets.py"
+      "tools/build_startup_bootstrap_assets.py",
+      "tools/audit_startup_support_family.py",
+      "tools/build_scenario_chunk_assets.py",
+      "tools/extract_scenario_atlantropa.py"
     ],
     "ownerHints": [
       "geo-contract"
@@ -1683,6 +1688,78 @@ export const DATA_CONTRACTS_RECORDS = [
     "entrypointPolicyIndex": 0,
     "verificationOrder": null,
     "selectorOrder": 1037,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:materialize-polar-scenarios-gzip",
+    "commandRef": "python -m pytest tests/test_materialize_polar_scenarios.py -q",
+    "sourceRefs": [
+      "tests/test_materialize_polar_scenarios.py",
+      "tools/materialize_polar_scenarios.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
+    "verification": null,
+    "selector": {}
+  },
+  {
+    "id": "python:build-tno-1962-russia-audit-gzip",
+    "commandRef": "python -m unittest tests.test_tno_1962_russia_audit_gzip_source -q",
+    "sourceRefs": [
+      "tests/test_tno_1962_russia_audit_gzip_source.py",
+      "tools/build_tno_1962_russia_audit.py"
+    ],
+    "ownerHints": [
+      "geo-contract"
+    ],
+    "domains": [
+      "geo-contract"
+    ],
+    "tiers": [
+      "heavy"
+    ],
+    "cost": "heavy",
+    "resourceLocks": [
+      "heavy-geo",
+      ".runtime-output"
+    ],
+    "executionOwners": [
+      "main-thread"
+    ],
+    "profiles": [
+      "full"
+    ],
+    "platforms": [
+      "all"
+    ],
+    "entrypointPolicyIndex": 0,
+    "verificationOrder": null,
+    "selectorOrder": null,
     "verification": null,
     "selector": {}
   },

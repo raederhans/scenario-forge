@@ -38,6 +38,7 @@ from map_builder.contracts import (
     resolve_scenario_contract_profile,
     sha256_path,
 )
+from map_builder.json_source import read_json_source, resolve_json_source_path, json_source_sha256
 from map_builder.io.writers import write_json_atomic
 from tools.build_startup_bootstrap_assets import build_startup_bootstrap_assets
 from tools.build_startup_bundle import STARTUP_BUNDLE_VERSION, build_startup_bundles
@@ -49,6 +50,7 @@ from tools.scenario_contract_paths import (
     TNO_GEOMETRY_DROP_AUDIT_FILENAME,
 )
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
+from tools.scenario_chunk_format import decode_political_chunk
 
 DEFAULT_SCENARIOS_ROOT = PROJECT_ROOT / "data/scenarios"
 IGNORED_DIR_NAMES = {"expectations"}
@@ -227,7 +229,7 @@ def build_scenario_report(scenario_dir: Path, strict: bool) -> dict[str, Any]:
 
 def load_json(path: Path) -> dict:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return read_json_source(path)
     except FileNotFoundError:
         raise
     except json.JSONDecodeError as exc:
@@ -255,7 +257,24 @@ def write_json(path: Path, payload: object) -> None:
     )
 
 
+def _runtime_topology_source_path(scenario_dir: Path, manifest: dict[str, Any]) -> Path:
+    value = str(manifest.get("runtime_topology_url") or "").strip()
+    if not value:
+        return resolve_json_source_path(scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME).resolve()
+    scenario_id = str(manifest.get("scenario_id") or scenario_dir.name).strip() or scenario_dir.name
+    prefix = PurePosixPath("data/scenarios") / scenario_id
+    try:
+        relative = PurePosixPath(value).relative_to(prefix)
+    except ValueError as exc:
+        raise ValueError(f"manifest.runtime_topology_url must point inside {prefix}/. Found {value!r}.") from exc
+    path = scenario_dir.joinpath(*relative.parts).resolve()
+    if not path.is_relative_to(scenario_dir.resolve()):
+        raise ValueError(f"manifest.runtime_topology_url must stay inside its scenario directory. Found {value!r}.")
+    return resolve_json_source_path(path)
+
+
 def _load_optional_json(path: Path) -> dict[str, Any] | None:
+    path = resolve_json_source_path(path)
     if not path.exists():
         return None
     payload = load_json(path)
@@ -488,7 +507,7 @@ def _collect_snapshot_inputs(
         "owners.by_feature.json": scenario_dir / "owners.by_feature.json",
         "cores.by_feature.json": scenario_dir / "cores.by_feature.json",
         "water_regions.geojson": scenario_dir / "water_regions.geojson",
-        "runtime_topology.topo.json": scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME,
+        "runtime_topology.topo.json": _runtime_topology_source_path(scenario_dir, manifest),
         "geo_locale_patch.json": scenario_dir / "geo_locale_patch.json",
     }
     manifest_input_fields = {
@@ -519,7 +538,7 @@ def _collect_snapshot_inputs(
     input_sha: dict[str, str] = {}
     for name, path in paths.items():
         if path.exists():
-            input_sha[name] = _sha256_path(path)
+            input_sha[name] = json_source_sha256(path) if name == SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME else _sha256_path(path)
     return input_sha
 
 
@@ -561,7 +580,7 @@ def _compose_snapshot_payload(
 ) -> dict[str, Any]:
     scenario_id = str(manifest.get("scenario_id") or scenario_dir.name).strip() or scenario_dir.name
     profile = resolve_scenario_contract_profile(scenario_id)
-    runtime_path = scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME
+    runtime_path = _runtime_topology_source_path(scenario_dir, manifest)
     water_path = scenario_dir / "water_regions.geojson"
     detail_chunk_manifest_path = scenario_dir / "detail_chunks.manifest.json"
     summary = manifest.get("summary") if isinstance(manifest.get("summary"), dict) else {}
@@ -662,9 +681,19 @@ def _load_chunk_feature_index(
         if chunk_path is None or not chunk_path.exists():
             continue
         chunk_payload = _load_optional_json(chunk_path) or {}
-        features = chunk_payload.get("features") if isinstance(chunk_payload.get("features"), list) else []
         chunk_id = str(chunk.get("id") or chunk_path.stem).strip()
         chunk_lod = str(chunk.get("lod") or "").strip()
+        if chunk_layer == "political" and chunk_lod == "coarse":
+            if chunk_payload.get("type") == "Topology":
+                try:
+                    decoded = decode_political_chunk(chunk_payload)
+                except ValueError as exc:
+                    raise ValueError(f"Invalid political coarse chunk {chunk_id} at {chunk_path}: {exc}") from exc
+            else:
+                decoded = chunk_payload
+            features = decoded.get("features") if isinstance(decoded.get("features"), list) else []
+        else:
+            features = chunk_payload.get("features") if isinstance(chunk_payload.get("features"), list) else []
         for feature in features:
             if not isinstance(feature, dict):
                 continue
@@ -813,7 +842,7 @@ def _build_atlantropa_donor_ledger(
         "scenario_id": scenario_dir.name,
         "generated_at": str(manifest.get("generated_at") or "").strip(),
         "source": {
-            "runtime_topology_sha256": _sha256_path(scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME),
+            "runtime_topology_sha256": json_source_sha256(_runtime_topology_source_path(scenario_dir, manifest)),
             "scenario_atlantropa_metadata_sha256": _sha256_path(metadata_path) if metadata_path.exists() else "",
             "detail_chunk_manifest_sha256": _sha256_path(detail_manifest_path) if detail_manifest_path.exists() else "",
         },
@@ -970,7 +999,7 @@ def write_tno_coverage_ledgers(
 ) -> dict[str, str]:
     if scenario_dir.name != "tno_1962":
         return {}
-    runtime_payload = load_json(scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME)
+    runtime_payload = load_json(_runtime_topology_source_path(scenario_dir, manifest))
     derived_dir = scenario_dir / TNO_COVERAGE_DERIVED_DIRNAME
     derived_dir.mkdir(parents=True, exist_ok=True)
     ledger_path = derived_dir / TNO_ATLANTROPA_DONOR_LEDGER_FILENAME
@@ -1010,7 +1039,7 @@ def apply_safe_scenario_contract_repairs(
     generated_at = str(manifest.get("generated_at") or "").strip()
     if not generated_at:
         raise ValueError("manifest.generated_at is required for --write-safe repairs.")
-    runtime_topology_path = scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME
+    runtime_topology_path = _runtime_topology_source_path(scenario_dir, manifest)
     if not runtime_topology_path.exists():
         raise FileNotFoundError(f"Missing runtime topology for safe repair: {runtime_topology_path}")
 
@@ -1034,10 +1063,8 @@ def apply_safe_scenario_contract_repairs(
         )
         safe_fixes_applied.append("geo_locale_patch_inputs")
 
-    runtime_topology_url = str(
-        manifest.get("runtime_topology_url")
-        or f"data/scenarios/{scenario_id}/{SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME}"
-    ).strip()
+    runtime_relative_path = runtime_topology_path.relative_to(scenario_dir.resolve()).as_posix()
+    runtime_topology_url = f"data/scenarios/{scenario_id}/{runtime_relative_path}"
     manifest["runtime_topology_url"] = runtime_topology_url
 
     if profile.expect_runtime_bootstrap or profile.expect_startup_assets:
@@ -1120,7 +1147,7 @@ def apply_safe_scenario_contract_repairs(
     manifest["source"] = {
         **(manifest.get("source") if isinstance(manifest.get("source"), dict) else {}),
         "base_topology_sha256": _sha256_path(PROJECT_ROOT / "data" / "europe_topology.json"),
-        "runtime_topology_sha256": _sha256_path(runtime_topology_path),
+        "runtime_topology_sha256": json_source_sha256(runtime_topology_path),
     }
     runtime_bootstrap_path = scenario_dir / SCENARIO_CHECKPOINT_RUNTIME_BOOTSTRAP_FILENAME
     if runtime_bootstrap_path.exists():
@@ -1713,6 +1740,7 @@ def validate_locale_patch(
 
 
 def _load_required_local_json(path: Path, errors: list[str]) -> dict | None:
+    path = resolve_json_source_path(path)
     if not path.exists():
         errors.append(f"Required file is missing: {path}")
         return None
@@ -1927,7 +1955,7 @@ def _bounds_area_for_contract(bounds: list[float]) -> float:
     return max(0.0, float(bounds[2]) - float(bounds[0])) * max(0.0, float(bounds[3]) - float(bounds[1]))
 
 
-def _normalize_manifest_feature_bounds(raw_bounds: Any) -> list[float] | None:
+def _normalize_manifest_feature_bounds(raw_bounds: Any, *, allow_zero_area: bool = False) -> list[float] | None:
     if not isinstance(raw_bounds, list) or len(raw_bounds) != 4:
         return None
     try:
@@ -1938,7 +1966,7 @@ def _normalize_manifest_feature_bounds(raw_bounds: Any) -> list[float] | None:
         return None
     if not all(-90.0 <= bounds[index] <= 90.0 for index in (1, 3)):
         return None
-    if _bounds_area_for_contract(bounds) <= 0:
+    if _bounds_area_for_contract(bounds) <= 0 and not allow_zero_area:
         return None
     return bounds
 
@@ -1950,38 +1978,101 @@ def _validate_detail_chunk_feature_bounds(
     errors: list[str],
     *,
     required: bool,
+    chunk_kind: str = "detail",
+    include_zero_area: bool = False,
 ) -> None:
     raw_feature_bounds = chunk.get("feature_bounds")
     if not isinstance(raw_feature_bounds, list) or not raw_feature_bounds:
         if required:
-            errors.append(f"detail chunk {chunk_id} feature_bounds must be present for political detail chunks.")
+            errors.append(f"{chunk_kind} chunk {chunk_id} feature_bounds must be present for political chunks.")
         return
     manifest_bounds: list[list[float]] = []
     for index, raw_bounds in enumerate(raw_feature_bounds):
-        normalized_bounds = _normalize_manifest_feature_bounds(raw_bounds)
+        normalized_bounds = _normalize_manifest_feature_bounds(raw_bounds, allow_zero_area=include_zero_area)
         if normalized_bounds is None:
-            errors.append(f"detail chunk {chunk_id} feature_bounds[{index}] must be a valid non-empty bbox.")
+            errors.append(f"{chunk_kind} chunk {chunk_id} feature_bounds[{index}] must be a valid non-empty bbox.")
             continue
         manifest_bounds.append(normalized_bounds)
     expected_bounds = [
         bounds
         for feature in features
         for bounds in [_feature_bounds_for_contract(feature)]
-        if _bounds_area_for_contract(bounds) > 0
+        if include_zero_area or _bounds_area_for_contract(bounds) > 0
     ]
     if len(manifest_bounds) != len(expected_bounds):
         errors.append(
-            f"detail chunk {chunk_id} feature_bounds length must match non-empty payload feature bounds. "
+            f"{chunk_kind} chunk {chunk_id} feature_bounds length must match non-empty payload feature bounds. "
             f"manifest={len(manifest_bounds)} actual={len(expected_bounds)}."
         )
     for index, expected_bounds_entry in enumerate(expected_bounds[:len(manifest_bounds)]):
         manifest_bounds_entry = manifest_bounds[index]
         if any(abs(manifest_bounds_entry[axis] - expected_bounds_entry[axis]) > 1e-7 for axis in range(4)):
             errors.append(
-                f"detail chunk {chunk_id} feature_bounds[{index}] must match payload geometry bounds. "
+                f"{chunk_kind} chunk {chunk_id} feature_bounds[{index}] must match payload geometry bounds. "
                 f"manifest={manifest_bounds_entry} actual={expected_bounds_entry}."
             )
             break
+
+
+def _validate_political_coarse_chunk(
+    chunk_id: str,
+    chunk: dict[str, Any],
+    chunk_path: Path,
+    errors: list[str],
+) -> list[dict[str, Any]] | None:
+    payload = _load_required_local_json(chunk_path, errors)
+    if payload is None:
+        return None
+    data_format = chunk.get("data_format", "geojson")
+    expected_type = {"geojson": "FeatureCollection", "topojson": "Topology"}.get(data_format)
+    if expected_type is None:
+        errors.append(f"coarse political chunk {chunk_id} data_format must be 'geojson' or 'topojson'.")
+        return None
+    if not isinstance(payload, dict) or payload.get("type") != expected_type:
+        errors.append(
+            f"coarse political chunk {chunk_id} data_format {data_format!r} must match payload type {expected_type!r}."
+        )
+        return None
+    try:
+        decoded = decode_political_chunk(payload)
+    except ValueError as exc:
+        errors.append(f"coarse political chunk {chunk_id} has invalid {data_format} format: {exc}.")
+        return None
+    features = decoded.get("features") if isinstance(decoded, dict) else None
+    if not isinstance(features, list):
+        errors.append(f"coarse political chunk {chunk_id} must decode to a FeatureCollection with features.")
+        return None
+    expected_feature_count = chunk.get("feature_count")
+    try:
+        expected_feature_count_int = int(expected_feature_count)
+    except (TypeError, ValueError):
+        errors.append(f"coarse political chunk {chunk_id} feature_count must be an integer.")
+    else:
+        if expected_feature_count_int != len(features):
+            errors.append(
+                f"coarse political chunk {chunk_id} feature_count must match decoded payload feature length. "
+                f"manifest={expected_feature_count_int} actual={len(features)}."
+            )
+    _validate_detail_chunk_feature_bounds(
+        chunk_id, chunk, features, errors, required=True, chunk_kind="coarse political", include_zero_area=True
+    )
+    if data_format == "topojson":
+        try:
+            expanded_size = len(json.dumps(decoded, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8"))
+        except (TypeError, ValueError) as exc:
+            errors.append(f"coarse political chunk {chunk_id} decoded FeatureCollection is not compact-JSON serializable: {exc}.")
+        else:
+            try:
+                cache_size = int(chunk.get("cache_byte_size"))
+            except (TypeError, ValueError):
+                errors.append(f"coarse political chunk {chunk_id} cache_byte_size must cover the decoded FeatureCollection.")
+            else:
+                if cache_size < expanded_size:
+                    errors.append(
+                        f"coarse political chunk {chunk_id} cache_byte_size must be at least the compact decoded FeatureCollection size. "
+                        f"manifest={cache_size} actual={expanded_size}."
+                    )
+    return features
 
 
 def _collect_feature_ids_from_geojson(path: Path, errors: list[str]) -> set[str]:
@@ -2035,7 +2126,7 @@ def _validate_source_metadata(
         errors.append(f"manifest.source is missing required sha fields in strict mode: {missing}.")
     base_topology_path = PROJECT_ROOT / "data" / "europe_topology.json"
     actual_by_field = {
-        "runtime_topology_sha256": _sha256_path(runtime_topology_path),
+        "runtime_topology_sha256": json_source_sha256(runtime_topology_path),
     }
     if base_topology_path.exists():
         actual_by_field["base_topology_sha256"] = _sha256_path(base_topology_path)
@@ -2289,6 +2380,9 @@ def _validate_detail_chunk_manifest(
                         f"atl_render_layer={expected_field_rule[0]!r} atl_color_rule={expected_field_rule[1]!r}; "
                         f"got atl_render_layer={render_layer!r} atl_color_rule={color_rule!r}."
                     )
+        if chunk_layer == "political" and chunk_lod == "coarse":
+            _validate_political_coarse_chunk(chunk_id, chunk, chunk_path, errors)
+            continue
         if (
             chunk_layer == "political"
             and chunk_lod == "detail"
@@ -2776,8 +2870,18 @@ def validate_strict_bundle_contract(
     # 不只看 manifest 存在，还要核对 owners / cores / runtime topology / chunk metadata
     # 之间是否还能互相解释同一份场景真相。
     required_filenames = _required_profile_filenames(target_dir.name, manifest)
+    try:
+        runtime_topology_path = _runtime_topology_source_path(target_dir, manifest)
+    except ValueError as exc:
+        errors.append(str(exc))
+        return
+    if str(manifest.get("runtime_topology_url") or "").strip():
+        _resolve_scenario_url(target_dir, manifest["runtime_topology_url"], errors, "runtime_topology_url")
     required_payloads = {
-        filename: _load_required_local_json(target_dir / filename, errors)
+        filename: _load_required_local_json(
+            runtime_topology_path if filename == SCENARIO_CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME else target_dir / filename,
+            errors,
+        )
         for filename in required_filenames
         if filename.endswith(".json")
     }
@@ -2954,14 +3058,14 @@ def validate_strict_bundle_contract(
             if not re.fullmatch(r"#[0-9a-fA-F]{6}", str(fill_color or "").strip()):
                 errors.append(f"manifest.style_defaults.{style_key}.fillColor must be a hex color.")
 
-    runtime_political_feature_ids = _extract_runtime_political_feature_ids(runtime_payload, errors, target_dir / "runtime_topology.topo.json")
+    runtime_political_feature_ids = _extract_runtime_political_feature_ids(runtime_payload, errors, runtime_topology_path)
     runtime_atlantropa_feature_ids = set()
     if target_dir.name == "tno_1962":
         runtime_atlantropa_feature_ids = _validate_runtime_atlantropa_layer(
             runtime_payload,
             owner_ids=owner_ids,
             errors=errors,
-            runtime_path=target_dir / "runtime_topology.topo.json",
+            runtime_path=runtime_topology_path,
         )
         _validate_atlantropa_publish_mirror(
             target_dir,
@@ -2977,7 +3081,6 @@ def validate_strict_bundle_contract(
         rows = runtime_payload.get("objects", {}).get("political", {}).get("geometries", [])
         if len(rows) != len(runtime_political_feature_ids):
             errors.append("Ownerless blank_base political geometry IDs must be nonempty and unique.")
-    runtime_topology_path = target_dir / "runtime_topology.topo.json"
     bootstrap_topology_path = None
     source_bootstrap_topology_path = None
     detail_chunk_manifest_path = None

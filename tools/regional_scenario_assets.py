@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import gzip
-import hashlib
 import json
 import shutil
 import tempfile
@@ -18,13 +17,18 @@ if str(ROOT) not in sys.path:
 import geopandas as gpd
 from shapely.geometry import shape
 from tools.scenario_topology_decode import topology_object_to_geojson
+from tools.lossless_topology import compact_large_runtime_topology
 
 from map_builder.geo.topology import compute_neighbor_graph
+from map_builder.json_source import (
+    json_source_sha256, read_json_source,
+    resolve_json_source_path, write_runtime_topology_source,
+)
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets, _resolve_feature_owner_bucket
 
 
 def _read(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return read_json_source(path)
 
 
 def _features(path: Path) -> dict[str, dict[str, Any]]:
@@ -71,7 +75,7 @@ def _local_path(directory: Path, url: str, scenario_id: str) -> Path:
 
 
 def _digest(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return json_source_sha256(path)
 
 
 def _same_geometry(left: dict, right: dict) -> bool:
@@ -82,6 +86,10 @@ def _same_geometry(left: dict, right: dict) -> bool:
 
 
 def _copy_gzip(path: Path) -> None:
+    if path.suffix == ".gz":
+        # A canonical compressed source is already gzip, never a sidecar input.
+        read_json_source(path)
+        return
     gz = Path(str(path) + ".gz")
     with path.open("rb") as source, gzip.GzipFile(filename=str(gz), mode="wb", compresslevel=9, mtime=0) as target:
         shutil.copyfileobj(source, target)
@@ -111,7 +119,7 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
     expected_prefix = f"data/scenarios/{scenario_id}/"
     if not runtime_url.startswith(expected_prefix):
         raise ValueError("runtime_topology_url must be inside data/scenarios/<scenario_id>/")
-    old_runtime_path = _local_path(baseline, runtime_url, scenario_id)
+    old_runtime_path = resolve_json_source_path(_local_path(baseline, runtime_url, scenario_id))
     old = _features(old_runtime_path)
     new = _features(candidate_runtime)
     old_ids = set(old)
@@ -163,9 +171,6 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
     staging = Path(tempfile.mkdtemp(prefix=f".{output.name}.staging-", dir=staging_parent))
     try:
         shutil.copytree(baseline, staging, dirs_exist_ok=True)
-        target_runtime = _local_path(staging, runtime_url, scenario_id)
-        target_runtime.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(candidate_runtime, target_runtime)
         if candidate_owners_path:
             shutil.copy2(Path(candidate_owners_path), staging / "owners.by_feature.json")
         old_owners = _read(baseline / "owners.by_feature.json").get("owners", {}) if (baseline / "owners.by_feature.json").exists() else {}
@@ -257,12 +262,14 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
                   "old_runtime_sha256": _digest(old_runtime_path), "candidate_runtime_sha256": _digest(candidate_runtime),
                   "directly_affected_owner_chunks": sorted(affected_owners - {""}), "status": "staged",
                   "release_ready": False, "remaining_stages": ["scenario_semantic_and_boundary_validation", "startup_bootstrap_and_bundles", "snapshot_fingerprint_and_audit", "browser_runtime_validation"]}
-        _copy_gzip(target_runtime)
         manifest_payload = _read(staging / "manifest.json")
-        candidate_payload = _read(target_runtime)
+        candidate_payload = _read(candidate_runtime)
         candidate_payload["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(
             gpd.GeoDataFrame.from_features(list(new.values()), crs="EPSG:4326"))
-        target_runtime.write_text(json.dumps(candidate_payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
+        candidate_payload = compact_large_runtime_topology(candidate_payload, allow_gzip_storage=True)
+        target_runtime = write_runtime_topology_source(staging, candidate_payload)
+        runtime_url = expected_prefix + target_runtime.name
+        manifest_payload["runtime_topology_url"] = runtime_url
         layer_payloads = {}
         for layer, field in {"water": "water_regions_url", "special": "special_regions_url", "relief": "relief_overlays_url", "cities": "city_overrides_url"}.items():
             if manifest_payload.get(field):

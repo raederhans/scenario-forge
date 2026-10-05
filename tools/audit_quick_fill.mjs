@@ -10,11 +10,17 @@ import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feat
 import { normalizeCountryCodeAlias } from "../js/core/country_code_aliases.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const read = (relative) => {
-  const bytes = readFileSync(path.join(root, relative));
-  return JSON.parse(relative.endsWith(".gz") ? gunzipSync(bytes).toString("utf8") : bytes.toString("utf8"));
+const actualPath = (relative) => {
+  const requested = path.join(root, relative);
+  return path.basename(requested) === "runtime_topology.topo.json" && !existsSync(requested) && existsSync(`${requested}.gz`)
+    ? `${requested}.gz` : requested;
 };
-const hash = (relative) => createHash("sha256").update(readFileSync(path.join(root, relative))).digest("hex");
+const read = (relative) => {
+  const source = actualPath(relative);
+  const bytes = readFileSync(source);
+  return JSON.parse(source.endsWith(".gz") ? gunzipSync(bytes).toString("utf8") : bytes.toString("utf8"));
+};
+const hash = (relative) => createHash("sha256").update(readFileSync(actualPath(relative))).digest("hex");
 const idOf = (feature) => String(feature?.properties?.id || feature?.id || "").trim();
 const countryOf = (feature) => normalizeCountryCodeAlias(String(feature?.properties?.cntr_code || "").trim().toUpperCase());
 const hierarchy = read("data/hierarchy.json");

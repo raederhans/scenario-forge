@@ -8,6 +8,7 @@ from pathlib import Path
 from shapely.geometry import Point, shape
 from shapely.ops import nearest_points, unary_union
 from topojson.utils import serialize_as_geojson
+from map_builder.json_source import json_source_sha256, read_json_source
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -371,7 +372,7 @@ def _load_scenario_water_features():
 
 
 def _load_runtime_water_features():
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     feature_collection = serialize_as_geojson(payload, objectname="scenario_water")
     return feature_collection.get("features", [])
 
@@ -383,18 +384,18 @@ def _load_runtime_bootstrap_water_features():
 
 
 def _load_runtime_political_features():
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     feature_collection = serialize_as_geojson(payload, objectname="political")
     return feature_collection.get("features", [])
 
 
 def _load_runtime_topology_feature_collection(object_name):
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     return serialize_as_geojson(payload, objectname=object_name)
 
 
 def _load_runtime_topology_feature_collections_for_d3(object_names):
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     return _topology_objects_to_feature_collections_for_d3(payload, object_names)
 
 
@@ -2071,7 +2072,7 @@ def test_tno_manifest_and_startup_bundles_reflect_current_water_bootstrap():
         (STARTUP_BUNDLE_EN_PATH, STARTUP_BUNDLE_EN_GZIP_PATH),
         (STARTUP_BUNDLE_ZH_PATH, STARTUP_BUNDLE_ZH_GZIP_PATH),
     )
-    expected_runtime_sha = _sha256_path(RUNTIME_WATER_PATH)
+    expected_runtime_sha = json_source_sha256(RUNTIME_WATER_PATH)
     expected_bootstrap_sha = _sha256_path(RUNTIME_BOOTSTRAP_WATER_PATH)
     expected_detail_manifest_sha = _sha256_path(DETAIL_CHUNK_MANIFEST_PATH)
     expected_named_marginal_count = len(tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS)

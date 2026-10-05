@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 from typing import Callable, Iterable
+from map_builder.json_source import resolve_json_source_path
 
 from map_builder.contracts import (
     SCENARIO_COUNTRIES_STAGE_ARTIFACTS,
@@ -173,7 +174,7 @@ def all_checkpoint_files_exist(checkpoint_dir: Path, filenames: Iterable[str]) -
 
 
 def require_directory_files(base_dir: Path, filenames: Iterable[str], *, label: str) -> None:
-    missing = [filename for filename in filenames if not (base_dir / filename).exists()]
+    missing = [filename for filename in filenames if not resolve_json_source_path(base_dir / filename).exists()]
     if missing:
         sample = ", ".join(missing[:8])
         if len(missing) > 8:

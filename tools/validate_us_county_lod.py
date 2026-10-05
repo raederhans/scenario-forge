@@ -14,6 +14,8 @@ from pathlib import Path
 import shapely
 from shapely.geometry import shape
 
+from tools.scenario_chunk_format import decode_political_chunk
+
 
 def read(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
@@ -96,7 +98,10 @@ def load_chunk(stage_dir, scenario_id, entry):
     compressed = Path(str(path) + ".gz")
     if compressed.exists() and gzip.decompress(compressed.read_bytes()) != raw:
         raise ValueError(f"stale compressed chunk: {entry['id']}")
-    features = json.loads(raw)["features"]
+    chunk_payload = json.loads(raw)
+    if isinstance(chunk_payload, dict) and chunk_payload.get("type") == "Topology":
+        chunk_payload = decode_political_chunk(chunk_payload)
+    features = chunk_payload["features"]
     if len(features) != entry["feature_count"]:
         raise ValueError(f"chunk feature count mismatch: {entry['id']}")
     return features

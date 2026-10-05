@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 from tools.regional_scenario_assets import build_regional_scenario_assets, _copy_gzip
 from tools.prepare_tno_russia_precision import read, safe_output
 from map_builder.io.writers import write_json_atomic
+from map_builder.json_source import read_json_source
 
 
 def peak_memory():
@@ -78,7 +79,14 @@ def finalize_stage(output):
         if Path(str(output / name) + ".gz").exists():
             _copy_gzip(output / name)
     for path in output.rglob("*.json.gz"):
-        if gzip.decompress(path.read_bytes()) != Path(str(path)[:-3]).read_bytes():
+        plain = Path(str(path)[:-3])
+        if not plain.exists() and path.name == "runtime_topology.topo.json.gz":
+            manifest_runtime = str(manifest.get("runtime_topology_url") or "")
+            if Path(manifest_runtime).name != path.name:
+                raise ValueError(f"Unreferenced canonical gzip after finalization: {path}")
+            read_json_source(path)
+            continue
+        if gzip.decompress(path.read_bytes()) != plain.read_bytes():
             raise ValueError(f"Stale gzip after finalization: {path}")
     return fixes
 

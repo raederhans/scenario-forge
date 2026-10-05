@@ -235,7 +235,8 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
                 r'task\.throwIfStale\(\);\s*return buildInteractionInfrastructureAfterStartup\(\{\s*'
                 r'taskContext: task,\s*chunked: true,\s*buildHitCanvas: false,\s*mode: "full",.*?'
                 r'\}, scopedTaskOptions\(\{\s*'
-                r'canStart: \(\) => !targetRuntime\.detailDeferred \|\| !!targetRuntime\.detailPromotionCompleted,',
+                r'canStart: \(\) => !hasPendingStartupSample\(\)\s*'
+                r'&& \(!targetRuntime\.detailDeferred \|\| !!targetRuntime\.detailPromotionCompleted\),',
                 re.S,
             ),
         )

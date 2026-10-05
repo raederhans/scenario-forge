@@ -13,6 +13,59 @@ from tools.political_detail_partition import partition_political_detail_features
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_source_hash_uses_manifest_gzip_runtime_url_and_stored_bytes(self):
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            scenario = app / "data/scenarios/test"
+            scenario.mkdir(parents=True)
+            plain = scenario / "runtime_topology.topo.json"
+            plain.write_bytes(b'{ "different": "plain topology" }')
+            compressed = plain.with_name(plain.name + ".gz")
+            encoded = gzip.compress(b'{"type":"Topology","objects":{},"arcs":[]}', mtime=0)
+            compressed.write_bytes(encoded)
+            old = "a" * 64
+            manifest = {"runtime_topology_url": "data/scenarios/test/runtime_topology.topo.json.gz", "source": {"runtime_topology_sha256": old}}
+            (scenario / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            bundle = scenario / "startup.bundle.en.json"
+            bundle.write_text(json.dumps({"source": {"runtime_topology_sha256": old}}), encoding="utf-8")
+            pack_published_runtime_data(app)
+            expected = hashlib.sha256(encoded).hexdigest()
+            self.assertEqual(json.loads((scenario / "manifest.json").read_bytes())["source"]["runtime_topology_sha256"], expected)
+            self.assertEqual(json.loads(bundle.read_bytes())["source"]["runtime_topology_sha256"], expected)
+            self.assertEqual(compressed.read_bytes(), encoded)
+            plain.unlink()
+            pack_published_runtime_data(app)
+            self.assertEqual(json.loads(bundle.read_bytes())["source"]["runtime_topology_sha256"], expected)
+
+    def test_topology_wire_keeps_expanded_geojson_cache_weight(self):
+        runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            scenario = app / 'data/scenarios/test'
+            (scenario / 'chunks').mkdir(parents=True)
+            payload = {'type': 'Topology', 'arcs': [[[0, 0], [1, 0], [0, 1], [0, 0]]],
+                       'objects': {'political': {'type': 'GeometryCollection', 'geometries': [
+                           {'type': 'Polygon', 'properties': {'id': 'a'}, 'arcs': [[0]]}]}}}
+            path = scenario / 'chunks/political.coarse.world.json'
+            raw = json.dumps(payload).encode()
+            path.write_bytes(raw)
+            metadata = {'id': 'political.coarse.world', 'layer': 'political', 'lod': 'coarse',
+                        'url': 'data/scenarios/test/chunks/political.coarse.world.json',
+                        'data_format': 'topojson', 'cache_byte_size': 71_262_910}
+            manifest = scenario / 'detail_chunks.manifest.json'
+            manifest.write_text(json.dumps({'chunks': [metadata]}))
+            pack_published_runtime_data(app)
+            actual = json.loads(manifest.read_bytes())['chunks'][0]
+            decoded = gzip.decompress((app / actual['url']).read_bytes())
+            self.assertEqual(json.loads(decoded), payload)
+            self.assertEqual(actual['decoded_byte_size'], len(decoded))
+            self.assertEqual(actual['cache_byte_size'], 71_262_910)
+            self.assertEqual(actual['data_format'], 'topojson')
+            self.assertLess(actual['byte_size'], actual['cache_byte_size'])
+
     def test_portable_gzip_has_fixed_mtime_and_os_header(self):
         raw = b'{"geometry":{"type":"Point","coordinates":[1.25,-0.0]}}'
         native_compress = gzip.compress

@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import test from "node:test";
 import { validateWaterGeometry } from "../tools/check_water_geometry.mjs";
+import { readJsonSource } from "./helpers/read_json_source.mjs";
 import {
   getFeatureId,
   getManifestChunksByLayer,
@@ -282,7 +283,7 @@ test("final detail topology keeps the base and wave 7 water contract", () => {
 });
 
 test("final TNO runtime topology excludes Antarctic land and keeps polar/dateline continuity", () => {
-  const topology = JSON.parse(fs.readFileSync(new URL("../data/scenarios/tno_1962/runtime_topology.topo.json", import.meta.url), "utf8"));
+  const topology = readJsonSource(new URL("../data/scenarios/tno_1962/runtime_topology.topo.json", import.meta.url));
   const result = validateWaterGeometry(topology, {
     objectName: "scenario_water",
     land: { topology, objectName: "land_mask" },
@@ -329,7 +330,7 @@ test("final TNO runtime topology excludes Antarctic land and keeps polar/datelin
 test("final TNO water chunks exactly preserve source and runtime geometry before their merged payload overrides topology", () => {
   const chunkManifest = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "detail_chunks.manifest.json"));
   const source = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "water_regions.geojson"));
-  const topology = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "runtime_topology.topo.json"));
+  const topology = readJsonSource(new URL("../data/scenarios/tno_1962/runtime_topology.topo.json", import.meta.url));
   const runtime = topojson.feature(topology, topology.objects.scenario_water);
   const waterChunks = getManifestChunksByLayer(chunkManifest, "water");
 

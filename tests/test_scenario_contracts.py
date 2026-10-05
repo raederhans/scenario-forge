@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import gzip
 import json
 import tempfile
 import unittest
@@ -218,6 +219,70 @@ def _write_strict_bundle_files(
 
 
 class ScenarioContractTest(unittest.TestCase):
+    def test_runtime_gzip_source_uses_manifest_identity_in_staging_directory(self) -> None:
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            staging = Path(temporary) / "staging"
+            staging.mkdir()
+            source = staging / "runtime_topology.topo.json.gz"
+            encoded = gzip.compress(b'{"type":"Topology","objects":{},"arcs":[]}', mtime=0)
+            source.write_bytes(encoded)
+            manifest = {"scenario_id": "tno_1962", "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json.gz"}
+            self.assertEqual(check_scenario_contracts._runtime_topology_source_path(staging, manifest), source.resolve())
+            self.assertEqual(check_scenario_contracts._collect_snapshot_inputs(staging, manifest)["runtime_topology.topo.json"], hashlib.sha256(encoded).hexdigest())
+
+    def test_gzip_only_runtime_strict_snapshot_and_safe_repair_use_stored_source(self) -> None:
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary, mock.patch.object(check_scenario_contracts, "PROJECT_ROOT", Path(temporary)):
+            scenario_dir = _create_scenario_dir(Path(temporary), "strict_gzip")
+            _write_strict_bundle_files(scenario_dir, owners={"F-1": "AAA"}, cores={"F-1": ["AAA"]}, runtime_feature_ids=["F-1"])
+            plain = scenario_dir / "runtime_topology.topo.json"
+            encoded = gzip.compress(plain.read_bytes(), mtime=0)
+            compressed = plain.with_name(plain.name + ".gz")
+            compressed.write_bytes(encoded)
+            plain.unlink()
+            manifest_path = scenario_dir / "manifest.json"
+            manifest = check_scenario_contracts.load_json(manifest_path)
+            manifest["runtime_topology_url"] = "data/scenarios/strict_gzip/runtime_topology.topo.json.gz"
+            manifest["source"]["runtime_topology_sha256"] = hashlib.sha256(encoded).hexdigest()
+            _write_json(manifest_path, manifest)
+            snapshot = check_scenario_contracts._build_snapshot_for_scenario(scenario_dir, manifest)
+            self.assertEqual(snapshot["input_sha"]["runtime_topology.topo.json"], hashlib.sha256(encoded).hexdigest())
+            manifest["snapshot_fingerprint"] = snapshot["snapshot_fingerprint"]
+            _write_json(manifest_path, manifest)
+            check_scenario_contracts._refresh_audit_payload(scenario_dir, manifest, snapshot_payload=snapshot)
+            errors = check_scenario_contracts.validate_publish_bundle_dir(scenario_dir)
+            self.assertEqual(errors, [])
+            check_scenario_contracts.apply_safe_scenario_contract_repairs(scenario_dir, rebuild_chunk_assets=False)
+            repaired = check_scenario_contracts.load_json(manifest_path)
+            self.assertEqual(repaired["runtime_topology_url"], manifest["runtime_topology_url"])
+            self.assertEqual(repaired["source"]["runtime_topology_sha256"], hashlib.sha256(encoded).hexdigest())
+            self.assertFalse(plain.exists())
+            self.assertEqual(compressed.read_bytes(), encoded)
+            # A declared URL must name the actual stored file, even though logical readers can resolve gzip-only storage.
+            repaired["runtime_topology_url"] = repaired["runtime_topology_url"].removesuffix(".gz")
+            _write_json(manifest_path, repaired)
+            errors = check_scenario_contracts.validate_publish_bundle_dir(scenario_dir)
+            self.assertTrue(any("runtime_topology_url points to a missing file" in error for error in errors), errors)
+            check_scenario_contracts.apply_safe_scenario_contract_repairs(scenario_dir, rebuild_chunk_assets=False)
+            self.assertEqual(check_scenario_contracts.load_json(manifest_path)["runtime_topology_url"], manifest["runtime_topology_url"])
+
+    def test_explicit_missing_or_corrupt_gzip_runtime_fails_closed(self) -> None:
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            scenario_dir = Path(temporary)
+            plain = scenario_dir / "runtime_topology.topo.json"
+            _write_json(plain, {"type": "Topology", "objects": {}, "arcs": []})
+            compressed = plain.with_name(plain.name + ".gz")
+            with self.assertRaises(FileNotFoundError):
+                check_scenario_contracts.load_json(compressed)
+            compressed.write_bytes(b"invalid gzip")
+            with self.assertRaises(gzip.BadGzipFile):
+                check_scenario_contracts.load_json(compressed)
+
     def test_safe_repair_uses_explicit_frozen_locales_when_requested(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             scenario_dir = Path(directory) / "tno_1962"

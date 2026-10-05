@@ -79,8 +79,9 @@ def select_editor_files(entries: dict[str, dict], read_json) -> tuple[set[str], 
     if len(manifests) != len(public_ids) or len(set(manifests)) != len(manifests):
         raise ValueError("Public editor scenario manifest mapping is incomplete")
     chunked = frozenset(
-        Path(p).parent.relative_to("data/scenarios") / "runtime_topology.topo.json"
+        Path(p).parent.relative_to("data/scenarios") / filename
         for p in manifests if read_json(p).get("detail_chunk_manifest_url")
+        for filename in ("runtime_topology.topo.json", "runtime_topology.topo.json.gz")
     )
     policy = pages.PagesProductionPublicationPolicy(chunked)
 

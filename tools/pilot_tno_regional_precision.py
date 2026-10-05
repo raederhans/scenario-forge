@@ -15,6 +15,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import box
 
+from map_builder.json_source import read_json_source
 from map_builder.geo.regional_boundary_alignment import align_regional_boundaries
 from map_builder.geo.scenario_surface_constraints import constrain_candidate_surface_geometry
 from map_builder.io.readers import read_json_strict
@@ -242,7 +243,7 @@ def prepare_candidate(scenario_dir: Path, replacement_geojson: Path, output: Pat
     }:
         raise ValueError("Replacement GeoJSON must use WGS84 / EPSG:4326.")
     replacements = gpd.GeoDataFrame.from_features(collection["features"], crs="EPSG:4326")
-    candidate, report = _assemble_candidate(read_json_strict(baseline_path), replacements, source_countries,
+    candidate, report = _assemble_candidate(read_json_source(baseline_path), replacements, source_countries,
                                           boundary_tolerance=boundary_tolerance,
                                           retained_enclave_countries=retained_enclave_countries,
                                           frozen_domain_owners=(read_json_strict(scenario_dir / "owners.by_feature.json")["owners"]

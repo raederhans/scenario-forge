@@ -28,7 +28,7 @@
   },
   "source_files": [
     "data/scenarios/tno_1962/manifest.json",
-    "data/scenarios/tno_1962/runtime_topology.topo.json",
+    "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
     "data/scenarios/tno_1962/owners.by_feature.json",
     "data/scenarios/tno_1962/countries.json",
     "data/scenarios/tno_1962/capital_defaults.partial.json",

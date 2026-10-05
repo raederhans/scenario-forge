@@ -44,7 +44,10 @@ from map_builder.geo.water_region_authority import compile_named_water_regions
 from map_builder.geo.water_validation import validate_water_runtime
 from map_builder.geo.utils import build_named_topology
 from map_builder.io.readers import read_json_strict
-from map_builder.io.writers import write_json_atomic
+from map_builder.io.writers import write_bytes_atomic, write_json_atomic
+from map_builder.json_source import (
+    json_source_sha256, portable_gzip_bytes, read_json_bytes, resolve_json_source_path, write_runtime_topology_source,
+)
 from map_builder.content_addressed_artifact_cache import (
     ArtifactCacheError,
     ContentAddressedArtifactCache,
@@ -100,6 +103,7 @@ from map_builder.contracts import (
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
+from tools.lossless_topology import compact_large_runtime_topology
 from tools.build_startup_bundle import build_startup_bundles
 from tools.atlantropa_coastline import build_scenario_coastline_geometry, build_atlantropa_land_reference
 from tools.atlantropa_geometry_quality import (
@@ -6407,13 +6411,13 @@ def rebuild_published_scenario_chunk_assets(scenario_dir: Path, checkpoint_dir: 
             layer_payloads[layer_key] = load_json(payload_path)
 
     runtime_topology_payload = load_checkpoint_json(checkpoint_dir, "runtime_topology.topo.json")
-    runtime_topology_url = str(
-        manifest_payload.get("runtime_topology_url")
-        or f"data/scenarios/{SCENARIO_ID}/runtime_topology.topo.json"
-    ).strip()
-    runtime_topology_path = ROOT.joinpath(*Path(runtime_topology_url).parts)
-    runtime_topology_path.parent.mkdir(parents=True, exist_ok=True)
-    write_json(runtime_topology_path, runtime_topology_payload)
+    runtime_topology_path = write_runtime_topology_source(scenario_dir, runtime_topology_payload)
+    runtime_topology_url = f"data/scenarios/{SCENARIO_ID}/{runtime_topology_path.name}"
+    manifest_payload["runtime_topology_url"] = runtime_topology_url
+    manifest_payload["source"] = {
+        **manifest_payload.get("source", {}),
+        "runtime_topology_sha256": json_source_sha256(runtime_topology_path),
+    }
     scenario_atlantropa_topology_payload = load_checkpoint_json(
         checkpoint_dir,
         SCENARIO_ATLANTROPA_TOPOLOGY_FILENAME,
@@ -6468,12 +6472,16 @@ def _copy_existing_scenario_files_to_checkpoint(
     filenames: tuple[str, ...],
 ) -> None:
     for filename in filenames:
-        source_path = scenario_dir / filename
+        source_path = resolve_json_source_path(scenario_dir / filename)
         if not source_path.exists():
             continue
         target_path = checkpoint_dir / filename
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source_path, target_path)
+        if filename == CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME:
+            target_path.write_bytes(read_json_bytes(source_path))
+        else:
+            shutil.copy2(source_path, target_path)
+    _normalize_plain_runtime_checkpoint_manifest(checkpoint_dir)
 
 
 def rebuild_checkpoint_water_runtime_from_scenario(scenario_dir: Path, checkpoint_dir: Path) -> dict:
@@ -6976,6 +6984,88 @@ def ensure_legacy_capital_hints_checkpoint(checkpoint_dir: Path) -> None:
     shutil.copy2(city_overrides_path, capital_hints_path)
 
 
+def _bind_runtime_source_payload(payload: dict, runtime_url: str, runtime_sha256: str, *, filename: str) -> dict:
+    payload = copy.deepcopy(payload)
+    payload["source"] = {**payload.get("source", {}), "runtime_topology_sha256": runtime_sha256}
+    if filename == "manifest.json":
+        payload["runtime_topology_url"] = runtime_url
+    elif filename == "audit.json":
+        if "runtime_topology_path" in payload:
+            payload["runtime_topology_path"] = runtime_url
+    else:
+        subset = payload.get("manifest_subset")
+        if isinstance(subset, dict):
+            subset["runtime_topology_url"] = runtime_url
+            subset["source"] = {**subset.get("source", {}), "runtime_topology_sha256": runtime_sha256}
+    return payload
+
+
+def _sync_published_json_gzip(path: Path) -> None:
+    sidecar = path.with_name(path.name + ".gz")
+    if sidecar.exists() or path.name in {CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME}:
+        write_bytes_atomic(sidecar, portable_gzip_bytes(path.read_bytes()))
+
+
+def _refresh_rebound_runtime_snapshot(directory: Path, manifest: dict, runtime_sha256: str) -> None:
+    snapshot_path = directory / "build_snapshot.json"
+    if not snapshot_path.exists():
+        return
+    # Rebinding changes only source storage and startup metadata. Preserve the
+    # frozen geometry/counts and refresh precisely these byte identities before
+    # the publish validator reads the checkpoint snapshot.
+    from map_builder.contracts import build_scenario_snapshot_payload
+
+    previous = load_json(snapshot_path)
+    input_sha = {**previous.get("input_sha", {}), CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME: runtime_sha256}
+    output_sha = dict(previous.get("output_sha", {}))
+    for filename in (CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME):
+        for name in (filename, filename + ".gz"):
+            path = directory / name
+            if path.exists():
+                output_sha[name] = json_source_sha256(path)
+    snapshot = build_scenario_snapshot_payload(
+        scenario_id=str(previous["scenario_id"]), profile_id=str(previous["profile"]),
+        input_sha=input_sha, output_sha=output_sha,
+        feature_count=int(previous.get("feature_count", 0)), water_count=int(previous.get("water_count", 0)),
+        chunk_count=int(previous.get("chunk_count", 0)), generated_at=str(previous.get("generated_at", "")),
+        environment=previous.get("environment"), durations=previous.get("durations"), report_paths=previous.get("report_paths"),
+        contract_version=previous["contract_version"], builder_version=previous["builder_version"],
+    )
+    write_json(snapshot_path, snapshot)
+    _sync_published_json_gzip(snapshot_path)
+    manifest["snapshot_fingerprint"] = snapshot["snapshot_fingerprint"]
+    write_json(directory / "manifest.json", manifest)
+    _sync_published_json_gzip(directory / "manifest.json")
+    audit_path = directory / "audit.json"
+    if audit_path.exists():
+        audit = load_json(audit_path)
+        audit["snapshot_fingerprint"] = snapshot["snapshot_fingerprint"]
+        audit["source"] = {**audit.get("source", {}), "build_snapshot_sha256": json_source_sha256(snapshot_path)}
+        write_json(audit_path, audit)
+        _sync_published_json_gzip(audit_path)
+
+
+def _normalize_plain_runtime_checkpoint_manifest(checkpoint_dir: Path) -> None:
+    runtime_path = checkpoint_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME
+    manifest_path = checkpoint_dir / "manifest.json"
+    if not runtime_path.exists() or not manifest_path.exists():
+        return
+    manifest = load_json(manifest_path)
+    runtime_url = str(manifest.get("runtime_topology_url") or "")
+    if not runtime_url.endswith(CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME + ".gz"):
+        return
+    runtime_sha256 = json_source_sha256(runtime_path)
+    manifest = _bind_runtime_source_payload(manifest, runtime_url[:-3], runtime_sha256, filename="manifest.json")
+    write_json(manifest_path, manifest)
+    _sync_published_json_gzip(manifest_path)
+    for filename in ("audit.json", CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME):
+        path = checkpoint_dir / filename
+        if path.exists():
+            write_json(path, _bind_runtime_source_payload(load_json(path), runtime_url[:-3], runtime_sha256, filename=filename))
+            _sync_published_json_gzip(path)
+    _refresh_rebound_runtime_snapshot(checkpoint_dir, manifest, runtime_sha256)
+
+
 def hydrate_publish_checkpoint_from_scenario(
     scenario_dir: Path,
     checkpoint_dir: Path,
@@ -6987,10 +7077,14 @@ def hydrate_publish_checkpoint_from_scenario(
         target_path = checkpoint_dir / filename
         if target_path.exists():
             continue
-        source_path = scenario_dir / filename
+        source_path = resolve_json_source_path(scenario_dir / filename)
         if source_path.exists():
             target_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source_path, target_path)
+            if filename == CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME:
+                target_path.write_bytes(read_json_bytes(source_path))
+            else:
+                shutil.copy2(source_path, target_path)
+    _normalize_plain_runtime_checkpoint_manifest(checkpoint_dir)
     ensure_legacy_capital_hints_checkpoint(checkpoint_dir)
 
 
@@ -7566,7 +7660,7 @@ def compact_written_json_hash(payload: object) -> str:
 
 
 def file_content_hash(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return json_source_sha256(path)
 
 
 def normalize_tag(raw: object) -> str:
@@ -11552,7 +11646,7 @@ def apply_runtime_shell_feature_flags(political_gdf: gpd.GeoDataFrame) -> gpd.Ge
 
 def load_existing_scenario_runtime_shell_fragment_gdf(scenario_dir: Path) -> gpd.GeoDataFrame:
     runtime_topology_path = scenario_dir / "runtime_topology.topo.json"
-    if not runtime_topology_path.exists():
+    if not resolve_json_source_path(runtime_topology_path).exists():
         return gpd.GeoDataFrame([], geometry="geometry", crs="EPSG:4326")
     topology_payload = load_json(runtime_topology_path)
     political_gdf = topology_object_to_gdf(topology_payload, "political")
@@ -12930,7 +13024,7 @@ def build_runtime_topology_payload(
         topo_dict["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(political_out)
     else:
         topo_dict["objects"]["political"]["computed_neighbors"] = []
-    return topo_dict
+    return compact_large_runtime_topology(topo_dict, allow_gzip_storage=True)
 
 
 def validate_runtime_topology_water_outputs(
@@ -14212,6 +14306,55 @@ def detect_unsynced_manual_edits(
     )
 
 
+def _publish_tno_checkpoint_bundle(
+    scenario_dir: Path,
+    checkpoint_dir: Path,
+    publish_scope: str,
+    *,
+    load_checkpoint_json,
+    write_json,
+) -> None:
+    """Keep checkpoints plain while publishing the canonical storage format."""
+    filenames = resolve_scenario_publish_filenames(publish_scope)
+    runtime_path = None
+    if CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME in filenames:
+        runtime_path = write_runtime_topology_source(
+            scenario_dir, load_checkpoint_json(checkpoint_dir, CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME),
+        )
+    else:
+        existing_runtime = resolve_json_source_path(scenario_dir / CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME)
+        if existing_runtime.exists():
+            runtime_path = existing_runtime
+    runtime_url = f"data/scenarios/{SCENARIO_ID}/{runtime_path.name}" if runtime_path is not None else ""
+    runtime_sha256 = json_source_sha256(runtime_path) if runtime_path is not None else ""
+    binding_filenames = {"manifest.json", "audit.json", CHECKPOINT_STARTUP_BUNDLE_EN_FILENAME, CHECKPOINT_STARTUP_BUNDLE_ZH_FILENAME}
+
+    def write_published_json(path: Path, payload: dict) -> None:
+        if runtime_path is not None:
+            if path.name == CHECKPOINT_RUNTIME_TOPOLOGY_FILENAME:
+                return
+            if path.name in binding_filenames:
+                payload = _bind_runtime_source_payload(payload, runtime_url, runtime_sha256, filename=path.name)
+        write_json(path, payload)
+        if runtime_path is not None and path.name in binding_filenames:
+            _sync_published_json_gzip(path)
+
+    scenario_bundle_platform.publish_checkpoint_bundle(
+        scenario_dir, checkpoint_dir, publish_scope,
+        load_checkpoint_json=load_checkpoint_json, write_json=write_published_json,
+    )
+    if runtime_path is not None:
+        # Narrow polar-runtime publishes omit these files from their checkpoint
+        # scope but must still bind the existing manifest to the new source.
+        for filename in binding_filenames:
+            path = scenario_dir / filename
+            if filename not in filenames and path.exists():
+                write_published_json(path, load_json(path))
+        manifest_path = scenario_dir / "manifest.json"
+        if manifest_path.exists():
+            _refresh_rebound_runtime_snapshot(scenario_dir, load_json(manifest_path), runtime_sha256)
+
+
 def _build_bundle_publish_service_kwargs(
     *,
     publish_scope: str,
@@ -14234,7 +14377,7 @@ def _build_bundle_publish_service_kwargs(
         "validate_geo_locale_checkpoint": validate_geo_locale_checkpoint,
         "require_startup_stage_checkpoints": scenario_bundle_platform.require_startup_stage_checkpoints,
         "detect_unsynced_manual_edits": detect_unsynced_manual_edits,
-        "publish_checkpoint_bundle": scenario_bundle_platform.publish_checkpoint_bundle,
+        "publish_checkpoint_bundle": _publish_tno_checkpoint_bundle,
         "load_checkpoint_json": load_checkpoint_json,
         "write_json": write_json,
         "resolve_publish_filenames": resolve_scenario_publish_filenames,
@@ -14757,6 +14900,9 @@ def main() -> None:
                 scenario_dir,
                 checkpoint_dir,
             )
+            apply_safe_scenario_contract_repairs(scenario_dir, rebuild_chunk_assets=False)
+            for filename in ("manifest.json", "audit.json", "build_snapshot.json"):
+                _sync_published_json_gzip(scenario_dir / filename)
             print_bundle_summary(state)
 
 
