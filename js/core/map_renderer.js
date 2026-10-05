@@ -1,3 +1,4 @@
+import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
 import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
 import { getRiverPaintRuntime } from "./river_paint/runtime.js";
@@ -12685,6 +12686,12 @@ function getCountryLabelRenderOwner() {
       getTransform: () => runtimeState.zoomTransform,
       getLanguage: () => runtimeState.currentLanguage || "en",
       getCountryLabelSource: () => getCountryLabelSourceOwner().getSource(),
+      getCountryLabelColors: (code) => {
+        const luminance = getCanvasColorRelativeLuminance(getAdmin0BackgroundFillColor(code));
+        return Number.isFinite(luminance) && luminance < 0.18
+          ? { fill: "#f4f1e7", stroke: "rgba(16, 24, 32, 0.5)" }
+          : { fill: "#172b35", stroke: "rgba(255, 252, 241, 0.4)" };
+      },
     },
     helpers: {
       onInvalidate: () => {
@@ -12719,13 +12726,25 @@ function drawLabelsPass(k, { interactive = false } = {}) {
   if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
     drawOrdinaryMarineLabels(k, occupiedBoxes);
   }
-  getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
+  // Keep capitals beside their symbols. Overview country titles take priority
+  // over ordinary city names; regional views favor the whole city layer.
+  const countryLabelsFirst = !interactive && !runtimeState.deferContextBasePass
+    && getMapLabelHierarchy(k, runtimeState).preferCountries;
+  let overviewLayout = null;
+  if (countryLabelsFirst) {
+    overviewLayout = getCityPointsRenderOwner().reserveOverviewLabelBoxes(k, occupiedBoxes);
+  } else {
+    getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });
+  }
   if (!interactive && !runtimeState.deferContextBasePass) {
     if (runtimeState.styleConfig?.countryLabels?.enabled !== false) {
       getCountryLabelSourceOwner().prepare();
       const startedAt = nowMs();
       getCountryLabelRenderOwner().drawCountryLabels(k, { occupiedBoxes });
       recordRenderPerfMetric("countryLabels", nowMs() - startedAt, getCountryLabelRenderOwner().getDiagnostics());
+    }
+    if (countryLabelsFirst) {
+      getCityPointsRenderOwner().drawLabelsPass(k, { occupiedBoxes, overviewLayout });
     }
     getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });
     getPhysicalLayerRenderOwner().drawPhysicalRegionLabels(k, { occupiedBoxes });

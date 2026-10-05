@@ -1,4 +1,4 @@
-import { buildCountryLabelCandidates, fitCountryLabel } from "./country_label_layout.js";
+import { buildCountryLabelCandidates, filterCountryLabelHoles, fitCountryLabel } from "./country_label_layout.js";
 
 export function createCountryLabelLayoutWorkerHandler() {
   let generation = null;
@@ -9,15 +9,25 @@ export function createCountryLabelLayoutWorkerHandler() {
       countries = new Map();
     }
     let record = countries.get(countryCode);
-    const candidateBuilt = !record;
     if (!record) {
-      record = { polygons, candidates: buildCountryLabelCandidates(polygons) };
+      record = { polygons, candidateSets: new Map() };
       countries.set(countryCode, record);
     }
-    const fit = record.candidates.length ? fitCountryLabel(record.candidates, {
+    const fitPolygons = filterCountryLabelHoles(record.polygons, options?.minHoleArea);
+    // Thresholds retaining the same rings share candidates, including adjacent
+    // zoom bands. Raw geometry remains intact for stricter future fits.
+    const key = `${options?.allowArcs === true}:${fitPolygons.map((polygon) => polygon.length).join(",")}`;
+    const candidateBuilt = !record.candidateSets.has(key);
+    if (candidateBuilt) {
+      record.candidateSets.set(key, buildCountryLabelCandidates(fitPolygons, { allowArcs: options?.allowArcs === true }));
+      while (record.candidateSets.size > 4) record.candidateSets.delete(record.candidateSets.keys().next().value);
+    }
+    const candidates = record.candidateSets.get(key);
+    const fit = candidates.length ? fitCountryLabel(candidates, {
       ...options, polygons: record.polygons,
     }) : null;
-    return { requestId, generation, countryCode, fit, candidateBuilt, candidateCount: record.candidates.length };
+    return { requestId, generation, countryCode, fit, candidateBuilt, candidateCount: candidates.length,
+      cachedCandidateSets: record.candidateSets.size };
   };
 }
 
