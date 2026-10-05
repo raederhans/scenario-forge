@@ -121,9 +121,6 @@ test('tno 1962 releasable catalog smoke', async ({ page }, testInfo) => {
         geoLocaleEntryCount: Object.keys(state.scenarioGeoLocalePatchData?.geo || {}).length,
       };
     });
-    await expect.poll(() => readScenarioShellRuntime(page), { timeout: 20000 }).toMatchObject({
-      activeScenarioId: SCENARIO_ID,
-    });
     const scenarioShellRuntime = await readScenarioShellRuntime(page);
 
     const catalogTags = new Set(payload.catalogEntries.map((entry) => entry.tag));

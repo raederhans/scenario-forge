@@ -291,6 +291,8 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "commandRef": "verify:perf-gate-contract",
     "sourceRefs": [
       ".github/workflows/perf-pr-gate.yml",
+      ".github/workflows/perf-measure.yml",
+      "tools/ci/perf_policy.mjs",
       "requirements-perf.lock.txt",
       "docs/perf/baseline_2026-07-30-ratification.json",
       "ops/browser-mcp/editor-performance-benchmark.py",

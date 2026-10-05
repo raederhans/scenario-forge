@@ -147,7 +147,7 @@ test("physical layer source contracts stay wired to the expected renderer and st
       && /function prepareExactAfterSettlePassesInSlices\(generation, plan\) \{[\s\S]*?if \(runtimeState\.renderPhase !== renderPhaseIdle\)[\s\S]*?if \(!isExactAfterSettleIdentityCurrent\(activeController\)\)[\s\S]*?const nextPlan = passName === "political"[\s\S]*?invalidateExactAfterSettlePoliticalPass\(generation, activePlan\)/.test(exactSchedulerSource),
     exactAfterSettlePublishesOnlyAfterCurrentPassesComplete:
       /function completeScheduledExactAfterSettleRefreshPlan[\s\S]*?isExactAfterSettleGenerationCurrent\(generation, "applying"\)[\s\S]*?isExactAfterSettleIdentityCurrent\(controller\)[\s\S]*?completeExactAfterSettleControllerApplyState[\s\S]*?setDeferExactAfterSettleState\(runtimeState, false\);/.test(exactSchedulerSource)
-      && /const preparation = prepareRenderPassAsync\(passName\);[\s\S]*?Promise.resolve\(preparation\).then[\s\S]*?isExactAfterSettleGenerationCurrent\(generation, "applying"\)[\s\S]*?enqueueNextPass\(index, activePlan\)/.test(exactSchedulerSource),
+      && /const preparation = prepareRenderPassAsync\(passName\);[\s\S]*?Promise.resolve\(preparation\).then[\s\S]*?isExactAfterSettleGenerationCurrent\(generation, "applying"\)[\s\S]*?enqueueNextPass\(index, nextPlan\)/.test(exactSchedulerSource),
     hasMountainMultiplier:
       /if \(normalized === "mountain_high_relief"\) return 1\.18;/.test(rendererSource),
     hasMountainHillsMultiplier:

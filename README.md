@@ -51,6 +51,8 @@ On Windows, with Python 3 installed and the required runtime assets present, run
 
 The launcher prints the local editor URL. See [local development](docs/local-development.md) for setup, runtime assets, backend previews, and development commands.
 
+Before committing or opening a PR, use `npm run pr:plan` and follow [development and delivery](docs/development-and-delivery.md) for scoped verification.
+
 ## Availability and sources
 
 The public editor includes the five baselines above. HGO 1936 is a developer/local preview; Cloud Saves and community features require the local backend preview. Roads and rail are the strongest public transport layers; other transport and thematic families have varying preview coverage.

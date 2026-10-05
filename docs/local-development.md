@@ -1,5 +1,7 @@
 # Local development
 
+For scoped tests, pushing a feature branch and PR checks, start with [Development and delivery](development-and-delivery.md) / [开发与交付](development-and-delivery.zh-CN.md).
+
 ## Editor
 
 Prerequisites:

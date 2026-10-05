@@ -19,8 +19,10 @@ jobs:
     outputs:
       run_fast: ${{ steps.plan.outputs.run_fast }}
       run_smoke: ${{ steps.plan.outputs.run_smoke }}
+      smoke_mode: ${{ steps.plan.outputs.smoke_mode }}
       run_demo: ${{ steps.plan.outputs.run_demo }}
       run_pages: ${{ steps.plan.outputs.run_pages }}
+      pages_mode: ${{ steps.plan.outputs.pages_mode }}
       scenario_ids: ${{ steps.plan.outputs.scenario_ids }}
       run_transport: ${{ steps.plan.outputs.run_transport }}
       perf_mode: ${{ steps.plan.outputs.perf_mode }}
@@ -50,10 +52,27 @@ jobs:
         id: plan
         env:
           PR_LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          set -euo pipefail
+          # Use the specified event base/head, matching the perf gate classifier.
+          # Empty/unreadable manifests retain conservative measurement planning.
+          : > .runtime/tmp/pr-base-package.json
+          : > .runtime/tmp/pr-head-package.json
+          if grep -Fxq 'package.json' .runtime/tmp/pr-changed-files.txt; then
+            if ! git show "${BASE_SHA}:package.json" > .runtime/tmp/pr-base-package.json 2>/dev/null; then
+              : > .runtime/tmp/pr-base-package.json
+            fi
+            if ! git show "${HEAD_SHA}:package.json" > .runtime/tmp/pr-head-package.json 2>/dev/null; then
+              : > .runtime/tmp/pr-head-package.json
+            fi
+          fi
           node tools/ci/pr_plan.mjs \
             --changed-files .runtime/tmp/pr-changed-files.txt \
             --labels "$PR_LABELS" \
+            --base-package-file .runtime/tmp/pr-base-package.json \
+            --head-package-file .runtime/tmp/pr-head-package.json \
             --json-out .runtime/reports/generated/pr-plan.json \
             --github-output "$GITHUB_OUTPUT"
           cat .runtime/reports/generated/pr-plan.json >> "$GITHUB_STEP_SUMMARY"
@@ -66,11 +85,13 @@ jobs:
 
   pr-verify-fast:
     needs: ["pr-plan"]
+    if: needs.pr-plan.outputs.run_fast == 'true'
     uses: ./.github/workflows/verify-shared.yml
     with:
       profile: pr-fast
       run-e2e-smoke: false
       run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}
+      run-pages-source-check: ${{ needs.pr-plan.outputs.pages_mode == 'source' }}
 
   pr-verify-smoke:
     needs: ["pr-plan"]
@@ -79,6 +100,7 @@ jobs:
     with:
       profile: pr-smoke
       run-e2e-smoke: true
+      smoke-mode: ${{ needs.pr-plan.outputs.smoke_mode }}
       run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}
 
   pr-verify-required:
@@ -97,14 +119,18 @@ jobs:
           const actualJobs = Object.keys(needs).sort();
           const dependencySetMatches = JSON.stringify(actualJobs) === JSON.stringify([...expectedJobs].sort());
           const planPassed = needs["pr-plan"]?.result === "success";
-          const fastPassed = needs["pr-verify-fast"]?.result === "success";
+          const fastResult = needs["pr-verify-fast"]?.result;
+          const plannedFast = needs["pr-plan"]?.outputs?.run_fast;
+          const fastAccepted = plannedFast === "true"
+            ? fastResult === "success"
+            : plannedFast === "false" && fastResult === "skipped";
           const smokeResult = needs["pr-verify-smoke"]?.result;
           const plannedSmoke = needs["pr-plan"]?.outputs?.run_smoke;
           const smokeAccepted = plannedSmoke === "true"
             ? smokeResult === "success"
             : plannedSmoke === "false" && (smokeResult === "success" || smokeResult === "skipped");
           for (const job of expectedJobs) console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
-          if (!dependencySetMatches || !planPassed || !fastPassed || !smokeAccepted) {
+          if (!dependencySetMatches || !planPassed || !fastAccepted || !smokeAccepted) {
             console.error("Required PR verification failed.");
             process.exit(1);
           }

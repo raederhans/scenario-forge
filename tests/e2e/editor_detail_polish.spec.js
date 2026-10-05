@@ -6,7 +6,8 @@ test.setTimeout(60_000);
 async function openWorkspace(page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.addInitScript(() => localStorage.setItem("map_lang", "zh"));
-  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  // These workspace controls do not need the default scenario's chunk loading.
+  await gotoApp(page, "/?default_scenario=none", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await expect(page.locator("#editorProjectBar")).toHaveAttribute("data-ready", "true");
 }
@@ -33,10 +34,19 @@ test("water filters show complete default values and lake settings guide without
   }
   await expect(page.locator("#waterInspectorSortSelect option[value=name]")).toHaveText("名称");
   await expect(page.locator("#waterInspectorSortSelect option[value=type]")).toHaveText("类型");
+});
+
+test("lake interaction toggles update guidance and keep translated settings navigation on compact viewport", async ({ page }) => {
+  await openWorkspace(page);
+  await page.locator("#editorObjects-water").click();
+  const settings = page.locator("#waterInspectorLakeSettingsBtn");
+  const lake = page.locator("#waterInspectorLakeInteractionToggle");
+  await settings.click();
   await lake.check();
   await expect(settings).toBeHidden();
   await expect(page.locator("#waterInspectorEmptyHint")).not.toContainText("先在设置中");
   await lake.uncheck();
+  await expect(lake).not.toBeChecked();
   await page.locator("#btnToggleLang").click();
   await expect(settings).toHaveText("Lake interaction settings");
   await expect(page.locator("#waterInspectorEmptyHint")).toContainText("first enable lake interaction");

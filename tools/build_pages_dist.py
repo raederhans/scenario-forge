@@ -2001,7 +2001,16 @@ def build_pages_module_graph(
     dist_root: Path | None = None,
     available_paths: set[str] | None = None,
     dynamic_import_registry: tuple[dict, ...] | list[dict] | None = None,
+    source_texts: dict[str, str] | None = None,
 ) -> dict:
+    """Build the release graph, or inspect a caller-owned virtual source tree.
+
+    Source mode checks all published JS/MJS, including landing and vendor code;
+    callers supply the complete filename inventory and code/entrypoint texts.
+    The default artifact mode retains its existing editor graph boundary.
+    """
+    if source_texts is not None and available_paths is None:
+        raise ValueError("Source graph requires an explicit virtual file inventory")
     selected_dist_root = (dist_root or DIST_ROOT).resolve()
     selected_available_paths = (
         set(available_paths)
@@ -2011,7 +2020,11 @@ def build_pages_module_graph(
     module_paths = sorted(
         path
         for path in selected_available_paths
-        if path.startswith("app/js/") and path.endswith(".js")
+        if (
+            path.endswith((".js", ".mjs"))
+            if source_texts is not None
+            else path.startswith("app/js/") and path.endswith(".js")
+        )
     )
     nodes_by_path: dict[str, dict] = {}
     unresolved_references: list[dict[str, object]] = []
@@ -2026,7 +2039,10 @@ def build_pages_module_graph(
             str(declaration["source_binding"])
         )
     module_sources = {
-        module_path: (selected_dist_root / module_path).read_text(encoding="utf-8")
+        module_path: (
+            source_texts[module_path] if source_texts is not None
+            else (selected_dist_root / module_path).read_text(encoding="utf-8")
+        )
         for module_path in module_paths
     }
     extracted_modules = _extract_module_reference_groups(
@@ -2271,7 +2287,8 @@ def build_pages_module_graph(
     for entrypoint_id, html_path in PAGES_HTML_ENTRYPOINTS:
         resolved_references: set[str] = set()
         html_file = selected_dist_root / html_path
-        if not html_file.is_file():
+        html_exists = html_path in source_texts if source_texts is not None else html_file.is_file()
+        if not html_exists:
             unresolved_references.append(
                 {
                     "source": html_path,
@@ -2281,7 +2298,7 @@ def build_pages_module_graph(
                 }
             )
         else:
-            html_text = html_file.read_text(encoding="utf-8")
+            html_text = source_texts[html_path] if source_texts is not None else html_file.read_text(encoding="utf-8")
             for reference_record in _extract_html_resource_references(html_text):
                 reference = str(reference_record["reference"])
                 is_local, target = _resolve_dist_reference(

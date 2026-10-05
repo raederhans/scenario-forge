@@ -1,17 +1,20 @@
 # verify:core
 
-`verify:core` 默认运行明确归属为 child-safe、无资源锁且非 heavy 的核心检查。它按顺序执行，并在遇到第一个失败项时停止。日常局部修改优先使用已有目标测试或 `verify:edit`；核心计划用于验证框架或相应跨模块改动。
+`verify:core` 默认运行明确归属为 child-safe、无资源锁且非 heavy 的核心检查。它按顺序执行，并在遇到第一个失败项时停止。日常交付先用只读 `npm run pr:plan`，具体操作见[开发与交付](../development-and-delivery.zh-CN.md)。局部修改优先使用已有目标测试或 `verify:edit`；核心计划用于验证框架或相应跨模块改动。
 
 ## PR 与合并后验证
 
 - 日常修改仍优先运行相关目标检查或 `verify:edit` / `verify:impact`。PR 不再默认把所有浏览器、Pages、剧本和完整性能验证叠加到同一条阻塞路径。
 - `pr-verify` 先运行轻量 `PR Plan`。Planner 只读取 PR changed-files 和 CI intent labels，然后决定是否需要 smoke、Golden Demo、Pages mirror、剧本合同、Transport 与性能测量。Planner 本身不下载完整仓库数据。
-- `pr-verify-fast` 始终保留，负责 affected child-safe contracts 和 verification control-plane guardrails。Pages mirror rebuild 仅在 planner 判定 delivery surface 相关时运行。
-- `pr-verify-smoke` 只在 runtime/UI/E2E 相关改动或 `ci:full` 时启动。Golden Demo 进一步只在 public-sample 相关改动或 `ci:full` 时运行。计划性跳过 smoke 是成功状态，不再被 `PR Verify Required` 当作失败。
+- 普通说明文档可跳过 `pr-verify-fast` 的完整 checkout 和依赖安装；涉及行为的改动仍执行 affected child-safe contracts 和 verification control-plane guardrails。`PR Verify Required` 必须收到明确的计划和相符的成功/跳过结果，缺失计划或意外跳过仍失败。
+- Pages 分为 `none`、`source`、`full`：普通 JS/CSS 改动只验证当前源码的入口和引用图；资源、数据、依赖、入口 HTML、发布构建器或 CI 策略变化构建完整产物。源码检查不证明最终压缩数据、发布产物或线上行为；部署仍完整构建并验收实际产物。
+- `pr-verify-smoke` 在 runtime/UI/E2E 相关改动或 `ci:full` 时启动。只有 `perf_policy.mjs` 明确登记的局部 UI 文件及其配套测试/说明组合可使用聚焦 shell/editor 检查；混入其他文件恢复完整 smoke。Golden Demo 在 public-sample、PR 策略相关改动或 `ci:full` 时运行。
 - Scenario Contract Matrix 继续保留三个既有 required check 名称。每个 matrix job 先读取 planner 结果，只有被选中的剧本才 checkout 完整仓库、安装依赖并运行 strict contract。未受影响的剧本在 checkout 前快速成功，从而兼容现有 branch protection。
 - Transport required check 同样保留原检查名。Transport 无关 PR 在完整 checkout 前快速成功；相关 PR 才进入 manifest 和 unit contract。
+- Scenario 与 Transport 在 PR 中验证合并候选，不再由每次 `main` push 重复触发全量检查；两个工作流都保留 `workflow_dispatch` 全量入口。`main` 的 Pages 构建、产物准入和部署后检查继续执行。
 - Adaptive selector 仍对 verification/workflow 等控制平面保持 fail-closed。普通未注册文档与非 runtime reference assets 作为 advisory；新增 renderer、UI、map-builder、scenario-data 和 CI planner 文件可先由目录 ownership 映射到已有 domain routes。自动 ownership 如果无法解析出任何真实 route，仍保持 unmatched 并阻断，不会静默放行。
 - PR 性能验证分为 `skip`、`sample`、`strict` 三档。无性能相关改动为 `skip`；普通 runtime/data PR 默认 `sample`，只对 HOI4 1939 candidate 生成独立 measurement-only evidence，不做 regression verdict，也不再生成同-runner base；`ci:perf-strict`、`ci:full`、定时和手动性能运行使用 `strict`，继续测 TNO 1962 与 HOI4 1939，并保留 same-runner base/candidate 对照与 enforced regressions。
+- 已登记的局部 UI 组合使用独立 `perf-observation` 采样，失败仍可见，但 `perf-gate` 只校验该豁免的有效性，不等待观察任务。其余需要性能测量的改动仍等待 required measurement。两条通道复用 `perf-measure.yml`，严格模式及采样协议不变。分类缺失/矛盾或 required measurement 失败都不能放行。
 - `ci:perf-expected` 表示本次改动预期改变性能特征。普通 PR 仍保留 sampled evidence，但不因性能 delta 阻断。若同时显式添加 `ci:perf-strict`，strict 优先。
 - 当前标准性能 role contract 仍固定为每个被测剧本 3 次预热、5 次 measured runs。因此 `sample` 的主要降本来自只运行一个代表剧本和移除同-runner base measurement，而不是降低样本协议。Nightly/manual strict 保持完整可比较性。
 - PR 更新继续自动取消同一 PR 的过时验证。现有 required check 名称保持稳定，P1-P3 本身不要求放松 branch protection。

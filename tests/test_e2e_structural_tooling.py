@@ -518,8 +518,10 @@ process.stdout.write(JSON.stringify(ignores));
         workflow = (REPO_ROOT / ".github" / "workflows" / "scenario-contract-matrix.yml").read_text(encoding="utf-8")
         transport_workflow = (REPO_ROOT / ".github" / "workflows" / "transport-contract-required.yml").read_text(encoding="utf-8")
 
-        self.assertIn("  push:", workflow)
-        self.assertIn("      - main", workflow)
+        for contract_workflow in (workflow, transport_workflow):
+            self.assertNotIn("  push:", contract_workflow)
+            self.assertIn("  workflow_dispatch:", contract_workflow)
+            self.assertIn("  pull_request:", contract_workflow)
         self.assertIn("Scenario Contract Plan", workflow)
         self.assertIn("Transport Contract Plan", transport_workflow)
         self.assertIn("sparse-checkout:", workflow)
@@ -1307,7 +1309,11 @@ const cases = [
     name: 'perf gate workflow routes to its contract without claiming a live runtime delta',
     changedFiles: ['.github/workflows/perf-pr-gate.yml'],
     expectedCommands: ['verify:perf-gate-contract'],
-    exactCommands: ['verify:perf-gate-contract', 'node --test tests/precision_foundation_ci_behavior.test.mjs'],
+    exactCommands: [
+      'verify:perf-gate-contract',
+      'node --test tests/precision_foundation_ci_behavior.test.mjs',
+      'node --test tests/pr_ci_plan_behavior.test.mjs tests/pr_delivery_lanes_behavior.test.mjs tests/perf_observation_gate_behavior.test.mjs',
+    ],
     exactExecutionOwners: ['child-safe'],
     exactResourceLocks: [],
     exactMainThreadCommands: [],
@@ -1940,6 +1946,7 @@ jobs:
                     for job, result in zip(job_names, result_matrix, strict=True)
                 }
                 needs["pr-plan"]["outputs"]["run_smoke"] = "true"
+                needs["pr-plan"]["outputs"]["run_fast"] = "true"
                 completed = run_command(
                     "node",
                     "-e",
@@ -1962,6 +1969,7 @@ jobs:
             job: {"result": "success", "outputs": {}}
             for job in ("pr-plan", "pr-verify-fast", "pr-verify-smoke")
         }
+        valid_needs["pr-plan"]["outputs"] = {"run_smoke": "true", "run_fast": "true"}
         cases = {
             "missing": json.dumps({job: result for job, result in valid_needs.items() if job != "pr-verify-smoke"}),
             "extra": json.dumps({**valid_needs, "SecurityScan": {"result": "success", "outputs": {}}}),
@@ -1988,12 +1996,16 @@ jobs:
                     if step.get("name") == "Build and check Pages artifact for relevant PR changes")
         body = "\n".join(str(line) for line in step["lines"])
         self.assertIn("if: inputs.profile == 'pr-fast'", body)
-        pattern = re.search(r"grep -Eq '([^']+)'", body).group(1)
-        for changed in ["js/core/renderer/render_cache_owner.js", "tools/build_pages_dist.py",
-                        "dist/app/js/core/history_manager.js", "data/scenarios/index.json"]:
-            self.assertRegex(changed, pattern)
-        for changed in ["docs/notes.md", "tests/history_feature_color_refresh_behavior.test.mjs"]:
-            self.assertNotRegex(changed, pattern)
+        self.assertIn("inputs.run-pages-check", body)
+        # Classification lives in pr_plan, not a second shell path table that
+        # could silently suppress an explicitly requested full artifact check.
+        self.assertNotIn("grep -Eq", body)
+        source_step = next(step for step in parse_job_steps(parse_workflow_job_blocks(workflow)["verify"])
+                           if step.get("name") == "Check Pages source references without building artifacts")
+        source_body = "\n".join(str(line) for line in source_step["lines"])
+        self.assertIn("inputs.run-pages-source-check", source_body)
+        self.assertIn("python tools/check_pages_source_graph.py", source_body)
+        self.assertNotIn("build_pages_dist.py", source_body)
         self.assertIn("python tools/build_pages_dist.py", body)
         self.assertIn('python tools/build_pages_dist.py --output-root "$artifact_root"', body)
         self.assertIn("tests.test_pages_dist_startup_shell", body)

@@ -2460,6 +2460,21 @@ test("render pass signature reader accepts reviewed joins and rejects state writ
   const modulePath = "js/core/renderer/render_pass_signature_policy.js";
   const source = fs.readFileSync(modulePath, "utf8");
   assert.deepEqual(await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true }), []);
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath);
+  for (const [dependencyPath, marker, mutation] of [
+    ["js/core/renderer/physical_atlas_lod_policy.js", "export function resolvePhysicalAtlasCollection(state = {}) {", "state.physicalSemanticsData = null;"],
+    ["js/core/renderer/object_identity.js", 'export function getObjectIdentityToken(value, prefix = "obj") {', "value.changed = true;"],
+  ]) {
+    const dependencySource = fs.readFileSync(dependencyPath, "utf8");
+    assert.ok(dependencySource.includes(marker), dependencyPath);
+    const inspection = inspectStateTargetPureReaderFunctionSource(source, entry, {
+      readSource: path => path === dependencyPath
+        ? dependencySource.replace(marker, `${marker}\n${mutation}`)
+        : fs.readFileSync(path, "utf8"),
+    });
+    assert.ok(inspection.violations.some(({ code, dependencyName }) =>
+      code === "state-target-pure-reader-dependency-source-drift" && dependencyName === dependencyPath));
+  }
   for (const changed of [
     source.replace('const transformSignature =', 'runtimeState.colorRevision = 99;\n    const transformSignature ='),
     source.replace('].join("::")', '].push("mutation")'),
