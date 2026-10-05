@@ -28,7 +28,7 @@ PR routing considers the entire change set; mixed changes retain the broader che
 | Scope | PR checks |
 | --- | --- |
 | README / ordinary Markdown only | Classification and required aggregation remain; test setup, browser and Pages builds are skipped. `docs/testing` is excluded from this exemption. |
-| Registered local UI | Affected contracts, five focused browser tests and Pages source references. Performance sampling remains visible as an observation that the merge gate does not wait for. |
+| Registered local UI | Affected contracts, six focused browser tests and Pages source references. Performance sampling remains visible as an observation that the merge gate does not wait for. |
 | Other JS/CSS runtime | Affected contracts, existing smoke, source references and applicable required performance measurement. |
 | Data, dependencies, entries, packaging or CI routing | Full Pages artifact checks and other checks required for the scope. `ci:full` forces full PR routing; `ci:perf-strict` forces strict performance measurement. |
 

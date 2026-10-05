@@ -301,12 +301,16 @@ jobs:
         with:
           name: smoke-timing-and-failure-context
           if-no-files-found: ignore
+          include-hidden-files: true
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
+            .runtime/tests/playwright/**/error-context.md
+            .runtime/tests/playwright/**/test-failed-*.png
+            .runtime/tests/playwright/**/trace.zip
 
       - name: Run Golden Demo E2E
         if: inputs.profile == 'demo' || inputs.run-golden-demo
@@ -325,6 +329,7 @@ jobs:
         with:
           name: demo-timing-and-failure-context
           if-no-files-found: ignore
+          include-hidden-files: true
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/test-timings-summary.json
