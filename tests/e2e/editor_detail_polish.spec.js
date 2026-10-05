@@ -6,7 +6,8 @@ test.setTimeout(60_000);
 async function openWorkspace(page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.addInitScript(() => localStorage.setItem("map_lang", "zh"));
-  await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+  // These workspace controls do not need the default scenario's chunk loading.
+  await gotoApp(page, "/?default_scenario=none", { waitUntil: "domcontentloaded" });
   await waitForAppInteractive(page);
   await expect(page.locator("#editorProjectBar")).toHaveAttribute("data-ready", "true");
 }
