@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { classifyPerformance } from "./perf_policy.mjs";
+import { classifyPerformance, isBoundedUiChange, isOrdinaryDocumentation, packageChangeRequiresPerformance } from "./perf_policy.mjs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -8,10 +8,12 @@ export const SCENARIO_CONTRACT_IDS = Object.freeze([
   "blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962",
 ]);
 
-export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
+export function planPullRequest({ changedFiles = [], labels = [], packageRequiresPerf = true } = {}) {
   const files = [...new Set(changedFiles.map(normalize).filter(Boolean))].sort();
   const labelSet = new Set(labels.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean));
   const full = labelSet.has("ci:full");
+  const docsOnly = files.length > 0 && files.every(isOrdinaryDocumentation);
+  const boundedUi = isBoundedUiChange(files);
 
   const matches = (patterns) => files.some((file) => patterns.some((pattern) => (
     pattern.endsWith("/**") ? file.startsWith(pattern.slice(0, -2)) :
@@ -22,15 +24,28 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
   )));
 
   const runtimeRelevant = matches(["js/**", "css/**", "index.html", "vendor/**", "landing/**"]);
-  const browserRelevant = runtimeRelevant || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
-  const pagesRelevant = runtimeRelevant || matches(["data/**", "tools/build_pages_dist.py", "tools/pages_*", ".github/workflows/verify-shared.yml"]);
+  const controlPlane = matches(["tools/ci/**", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
+  const dependencyChange = matches(["package.json", "package-lock.json"])
+    || files.some((file) => /^requirements[^/]*\.txt$/u.test(file));
+  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange
+    || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
+  // Source-only changes validate their live reference graph. Changes to packaging,
+  // public assets or dependencies still exercise the complete built artifact.
+  const pagesFull = full || controlPlane || dependencyChange || matches([
+    "data/**", "dist/**", "vendor/**", "landing/**", "index.html", "app.js", "styles.css",
+    "tools/build_pages_dist.py", "tools/pages_*", "tools/app_entry_resolver.py",
+    "tools/check_pages_source_graph.py", "tools/build_landing_*", "tools/runtime_json_packing.py",
+    "tests/test_pages*", "tests/test_landing*",
+  ]);
+  const pagesMode = pagesFull ? "full" : runtimeRelevant ? "source" : "none";
+  const smokeMode = full || browserRelevant ? (!full && boundedUi ? "ui" : "full") : "none";
   const publicSampleRelevant = matches([
     "js/bootstrap/startup_sample_project_deeplink.js",
     "js/core/sample_project_import_workflow.js",
     "js/core/sample_project_registry.js",
     "landing/**",
     "tests/e2e/sample_guide_deeplink.spec.js",
-    ".github/workflows/pr-verify.yml",
+    "tools/ci/**", ".github/workflows/pr-verify.yml",
     ".github/workflows/verify-shared.yml",
   ]);
 
@@ -56,31 +71,48 @@ export function planPullRequest({ changedFiles = [], labels = [] } = {}) {
     ".github/workflows/transport-contract-required.yml",
   ]);
 
-  const performance = classifyPerformance({ changedFiles: files, labels: [...labelSet] });
+  const performance = classifyPerformance({ changedFiles: files, labels: [...labelSet], packageRequiresPerf });
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     changedFiles: files,
     labels: [...labelSet].sort(),
-    runFast: true,
-    runSmoke: full || browserRelevant,
+    riskTier: full || controlPlane || dependencyChange ? "integration" : docsOnly ? "docs" : boundedUi ? "ui" : "affected",
+    runFast: full || !docsOnly,
+    runSmoke: smokeMode !== "none",
+    smokeMode,
     runDemo: full || publicSampleRelevant,
-    runPages: full || pagesRelevant,
+    runPages: pagesMode === "full",
+    pagesMode,
+    runPagesSource: pagesMode === "source",
     scenarioIds: [...scenarioIds].sort(),
     runTransport: full || transportRelevant,
     perfMode: performance.perf_mode,
+    perfRequired: performance.required_for_merge,
+    perfDiagnostic: performance.diagnostic_only,
     expectedPerformanceChange: labelSet.has("ci:perf-expected"),
+    reasons: {
+      fast: docsOnly && !full ? "Ordinary documentation only; no test environment is needed." : "Run affected contracts and reject unresolved verification coverage.",
+      smoke: smokeMode === "ui" ? "All behavioral changes belong to the bounded UI scope; run focused shell and editor checks."
+        : smokeMode === "full" ? "Runtime, browser support, dependencies or CI policy require the shared smoke suite." : "No browser behavior selected.",
+      pages: pagesMode === "full" ? "Delivery inputs, assets, dependencies or CI policy require a full Pages artifact."
+        : pagesMode === "source" ? "Validate the current source reference graph without rebuilding unchanged data." : "No Pages inputs selected.",
+      performance: performance.diagnostic_only ? "Bounded UI change: candidate sampling is diagnostic and does not delay the merge gate."
+        : performance.required_for_merge ? "Performance measurement must complete before the required gate succeeds." : "No performance measurement selected.",
+    },
   };
 }
 
 function parseArgs(argv) {
-  const args = { changedFiles: null, labels: "", jsonOut: null, githubOutput: null };
+  const args = { changedFiles: null, labels: "", jsonOut: null, githubOutput: null, basePackageFile: null, headPackageFile: null };
   for (let i = 0; i < argv.length; i += 1) {
     const value = argv[i];
     if (value === "--changed-files") args.changedFiles = argv[++i];
     else if (value === "--labels") args.labels = argv[++i] || "";
     else if (value === "--json-out") args.jsonOut = argv[++i];
     else if (value === "--github-output") args.githubOutput = argv[++i];
+    else if (value === "--base-package-file") args.basePackageFile = argv[++i];
+    else if (value === "--head-package-file") args.headPackageFile = argv[++i];
     else throw new Error(`unknown argument: ${value}`);
   }
   return args;
@@ -92,7 +124,16 @@ function main() {
     ? fs.readFileSync(args.changedFiles, "utf8").split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
     : [];
   const labels = String(args.labels || "").split(",").map((entry) => entry.trim()).filter(Boolean);
-  const plan = planPullRequest({ changedFiles, labels });
+  let packageRequiresPerf = true;
+  if (changedFiles.some((file) => normalize(file) === "package.json")) {
+    try {
+      packageRequiresPerf = packageChangeRequiresPerformance({
+        basePackageText: fs.readFileSync(args.basePackageFile, "utf8"),
+        headPackageText: fs.readFileSync(args.headPackageFile, "utf8"),
+      });
+    } catch { /* Missing/unreadable manifests keep the conservative default. */ }
+  }
+  const plan = planPullRequest({ changedFiles, labels, packageRequiresPerf });
   const json = `${JSON.stringify(plan, null, 2)}\n`;
   if (args.jsonOut) {
     fs.mkdirSync(path.dirname(args.jsonOut), { recursive: true });
@@ -104,8 +145,10 @@ function main() {
     const lines = [
       `run_fast=${plan.runFast}`,
       `run_smoke=${plan.runSmoke}`,
+      `smoke_mode=${plan.smokeMode}`,
       `run_demo=${plan.runDemo}`,
       `run_pages=${plan.runPages}`,
+      `pages_mode=${plan.pagesMode}`,
       `scenario_ids=${JSON.stringify(plan.scenarioIds)}`,
       `run_transport=${plan.runTransport}`,
       `perf_mode=${plan.perfMode}`,

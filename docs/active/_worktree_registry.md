@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-05 PR 验证分流与双端上线
+
+`C:/Users/raede/.codex/worktrees/pr-delivery-lanes/mapcreator` 使用 `codex/pr-delivery-lanes`，基于 `475bbbd8` 完成交付计划、局部 UI 分流、Pages 源码检查和性能观察通道。用户已授权第四步及本地/GitHub 上线，root 为唯一 Git 整合负责人；主工作区仍有其他任务 WIP，本次仅同步交付体系涉及的文件。required 检查、合并与部署以 PR/run 回执为准；工作树保留用于回归验证和上线核对。记录见 [pr-delivery-lanes/task.md](pr-delivery-lanes/task.md)。
+
 ## 2026-10-03 启动包预算与 Pages 交付修复
 
 复用 `C:/Users/raede/.codex/worktrees/ocean-batch-refinement/mapcreator`，当前分支 `codex/pages-sample-startup-20261003`（后续分支，基于已合并 PR #204 的 `3470fdfc`）。修复提交 `e8609467` 将六个启动 gzip 无损压到原有 5,000,000byte 预算以内，同时修复旧性能基线对新版 wire 的读取和 Pages 陈旧断言；整合主线 `068f0b33` 的渲染性能更新，无产品代码冲突。55个 child-safe 检查组及本次相关数据、Pages、浏览器检查通过。主目录WIP保持原样，本工作树及 `.runtime/reports/generated/startup-budget/` 保留供复核。用户已授权合并推送，root为唯一Git交付负责人；最终必需检查、合并和部署结果以PR/run回执为准，六个线上包均低于5MB，最小余量37,000bytes；上一部署实际已发布，但在线示例导入smoke失败，后续修复标签轮廓分组CPU热点。详见[任务记录](ocean-batch-20261002/task.md)。
