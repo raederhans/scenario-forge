@@ -5,6 +5,7 @@ import vm from "node:vm";
 import { parse } from "acorn";
 import { createExactCompositeReuseOwner } from "../js/core/renderer/exact_composite_reuse_owner.js";
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
+import { filterEnabledRenderPassNames } from "../js/core/map_renderer/render_pass_catalog.js";
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
 function realFunction(name, globals) {
@@ -119,6 +120,7 @@ test("actual export remains a separate pass composition after exact buffer reuse
   let prepared = 0;
   const exportGlobals = {
     exportRenderInProgress: false,
+    filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
     runtimeState: h.state, getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
       assert.equal(exportGlobals.exportRenderInProgress, true);
       prepared++;
@@ -138,6 +140,7 @@ test("export restores its prior rendering mode when pass preparation throws", ()
   for (const previous of [false, true]) {
     const h = harness();
     const globals = { runtimeState: h.state, exportRenderInProgress: previous,
+      filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
       getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
         assert.equal(globals.exportRenderInProgress, true);
         throw new Error("pass preparation failed");
@@ -180,6 +183,7 @@ test("actual transformed-owner buffer injection invalidates prior exact pixels",
     INTERACTION_COMPOSITE_PASS_NAMES: names, RENDER_PHASE_IDLE: "idle",
     RENDER_PHASE_INTERACTING: "interacting", RENDER_PHASE_SETTLING: "settling",
     getRenderPassCacheState: () => h.cache,
+    getActiveInteractionCompositePassNames: () => names,
     createTransformedFrameCompositorOwner: options => options.effects,
   });
   const shared = getTransformed().ensureCompositeBufferCanvas();
@@ -196,6 +200,7 @@ test("actual resize facade invalidates even when dimensions return to the same v
   h.render(names);
   const resize = realFunction("resizeRenderPassCanvases", {
     exactCompositeReuseOwner: h.owner, RENDER_PASS_NAMES: names,
+    getActiveRenderPassNames: () => names,
     overviewFrameOwner: { clear() { overviewClears += 1; } },
     getRenderCacheOwner: () => ({ resizeRenderPassCanvases() { h.cache.canvases.overlay.pixels = [null, null]; } }),
   });
