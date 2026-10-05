@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
 
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from tools.startup_topology_codec import encode_startup_topology
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_STARTUP_GEO_ALIASES_FILENAME,
     SCENARIO_CHECKPOINT_STARTUP_LOCALES_FILENAME,
@@ -22,7 +23,7 @@ from map_builder.contracts import (
 )
 
 SUPPORTED_LANGUAGES = SCENARIO_LOCALE_LANGUAGES
-STARTUP_BUNDLE_VERSION = 5
+STARTUP_BUNDLE_VERSION = 7
 STARTUP_BOOTSTRAP_STRATEGY = "chunked-coarse-first"
 STARTUP_BUNDLE_GZIP_BUDGET_BYTES = 5_000_000
 STARTUP_RUNTIME_POLITICAL_META_ENCODING = "feature-index-v1"
@@ -211,6 +212,17 @@ def _gzip_bytes(raw: bytes) -> bytes:
 
 def _json_size_bytes(payload: object) -> int:
     return len(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+
+
+def _startup_topology_arc_count(topology: object) -> int:
+    if not isinstance(topology, dict):
+        return 0
+    arcs = topology.get("arcs")
+    if isinstance(arcs, list):
+        return len(arcs)
+    descriptor = topology.get("arcs_encoding")
+    count = descriptor.get("arc_count") if isinstance(descriptor, dict) else None
+    return count if type(count) is int and count >= 0 else 0
 
 
 def _extract_language_entry(value: object, language: str) -> object:
@@ -684,12 +696,12 @@ def build_startup_bundle_payload(
         raise ValueError("Scenario manifest is missing scenario_id.")
 
     topology_primary = _read_json(topology_primary_path)
-    slim_topology_primary = build_slim_startup_primary_topology(topology_primary)
+    slim_topology_primary = encode_startup_topology(build_slim_startup_primary_topology(topology_primary))
     full_runtime_topology = _read_json(full_runtime_topology_path)
     runtime_bootstrap_topology = _read_json(runtime_bootstrap_topology_path)
     runtime_political_meta = build_runtime_political_meta(full_runtime_topology)
     runtime_feature_ids = list(runtime_political_meta.get("featureIds", []))
-    runtime_shell_topology = build_startup_runtime_shell(runtime_bootstrap_topology)
+    runtime_shell_topology = encode_startup_topology(build_startup_runtime_shell(runtime_bootstrap_topology))
     countries_payload = _read_json(countries_path)
     owners_payload = _read_json(owners_path)
     # controllers.by_feature.json is retired from the formal scenario contract.
@@ -897,8 +909,8 @@ def build_startup_primary_slimming_report(source_topology_primary: dict, slim_to
         "before_bytes": before_bytes,
         "after_bytes": after_bytes,
         "bytes_saved": max(0, before_bytes - after_bytes),
-        "before_arc_count": len(source_topology_primary.get("arcs", []) if isinstance(source_topology_primary, dict) else []),
-        "after_arc_count": len(slim_topology_primary.get("arcs", []) if isinstance(slim_topology_primary, dict) else []),
+        "before_arc_count": _startup_topology_arc_count(source_topology_primary),
+        "after_arc_count": _startup_topology_arc_count(slim_topology_primary),
         "before_object_names": sorted(source_objects.keys()) if isinstance(source_objects, dict) else [],
         "after_object_names": sorted(slim_objects.keys()) if isinstance(slim_objects, dict) else [],
         "removed_objects": sorted(
@@ -989,7 +1001,7 @@ def build_startup_bundle_report(
             "after_bytes": _json_size_bytes(slim_topology_primary) if isinstance(slim_topology_primary, dict) else 0,
             "bytes_saved": 0,
             "before_arc_count": 0,
-            "after_arc_count": len(slim_topology_primary.get("arcs", [])) if isinstance(slim_topology_primary, dict) else 0,
+            "after_arc_count": _startup_topology_arc_count(slim_topology_primary),
             "before_object_names": [],
             "after_object_names": sorted((slim_topology_primary.get("objects") or {}).keys()) if isinstance(slim_topology_primary, dict) else [],
             "removed_objects": [],
@@ -1215,6 +1227,7 @@ def build_startup_bundles(
 
     manifest_source = build_manifest_source_metadata(payload_by_language[SUPPORTED_LANGUAGES[0]]["source"])
     scenario_manifest["source"] = manifest_source
+    scenario_manifest["startup_bundle_version"] = STARTUP_BUNDLE_VERSION
     stable_manifest = json.loads(json.dumps(scenario_manifest, ensure_ascii=False, sort_keys=True))
     write_json_atomic(
         scenario_manifest_path,

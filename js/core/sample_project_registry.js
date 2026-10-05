@@ -3,8 +3,11 @@ import {
   normalizeSampleExportRecommendation,
 } from "./sample_export_recommendation.js";
 
-export const SAMPLE_PROJECT_QUERY_PARAM = "sample";
-export const LEGACY_SAMPLE_PROJECT_QUERY_PARAM = "sample_project";
+export {
+  getSampleProjectIdFromUrl,
+  SAMPLE_PROJECT_QUERY_PARAM,
+  LEGACY_SAMPLE_PROJECT_QUERY_PARAM,
+} from "./sample_project_url.js";
 export const SAMPLE_PROJECT_MANIFEST_URL = "../assets/sample-runs.json";
 export const SAMPLE_PROJECT_ASSET_BASE_URL = "../assets/sample-projects/";
 export const LANDING_SAMPLE_PROJECT_PREFIX = "./assets/sample-projects/";
@@ -90,17 +93,6 @@ async function fetchTextResource(url, { fetchImpl }) {
     );
   }
   return response.text();
-}
-
-export function getSampleProjectIdFromUrl({
-  search = globalThis.location?.search || "",
-  searchParamsCtor = globalThis.URLSearchParams,
-} = {}) {
-  if (typeof searchParamsCtor !== "function") return null;
-  const params = new searchParamsCtor(search);
-  const rawSampleId = params.get(SAMPLE_PROJECT_QUERY_PARAM) || params.get(LEGACY_SAMPLE_PROJECT_QUERY_PARAM);
-  const normalizedId = normalizeSampleProjectId(rawSampleId);
-  return normalizedId || null;
 }
 
 export function resolveSampleProjectFileName(projectUrl) {

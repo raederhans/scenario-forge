@@ -25,9 +25,35 @@ export function getPhysicalIntensityBounds(values) {
   ];
 }
 
+// Equal Earth's unrotated inverse latitude depends only on the screen row. Keep
+// the full longitude span (including the date line); other orientations and
+// non-axis-aligned canvas transforms must use the full sampling path.
+// The caller supplies this only for the renderer's known Equal Earth projection.
+export function getEqualEarthIntensityRowBounds({ projection, matrix, bounds, height }) {
+  const rotation = projection.rotate?.();
+  if (!rotation || rotation[1] !== 0 || rotation[2] !== 0
+    || projection.angle?.() !== 0 || matrix.b !== 0 || matrix.c !== 0
+    || !Number.isFinite(bounds[1]) || !Number.isFinite(bounds[3])) return null;
+  const { a, d, e, f } = matrix;
+  const determinant = a * d;
+  if (!determinant || ![a, d, e, f, determinant].every(Number.isFinite)) return null;
+  let first = height, last = 0;
+  for (let row = 0; row < height; row += 1) {
+    const lat = Number(projection.invert([(d * (0.5 - e)) / determinant, (a * (row + 0.5 - f)) / determinant])?.[1]);
+    if (!Number.isFinite(lat)) continue;
+    if (lat >= bounds[1] && lat <= bounds[3]) {
+      first = Math.min(first, row);
+      last = row + 1;
+    }
+  }
+  // Use the actual inverse, including its behavior beyond the sphere. Pixel
+  // sampling and the coordinate cache both retain these double-precision values.
+  return last ? [first, last] : [0, 0];
+}
+
 // Only alpha is modulated. A neutral field is byte-for-byte unchanged, zero
 // removes the layer locally, and two doubles opacity up to the canvas limit.
-export function multiplyPhysicalAlpha(image, { projection, matrix, sample, coordinates = null, bounds = null }) {
+export function multiplyPhysicalAlpha(image, { projection, matrix, sample, coordinates = null, bounds = null, offsetY = 0 }) {
   const { a, b, c, d, e, f } = matrix;
   const determinant = a * d - b * c;
   if (!determinant || typeof projection?.invert !== "function") return [];
@@ -41,7 +67,7 @@ export function multiplyPhysicalAlpha(image, { projection, matrix, sample, coord
     let lat = coordinates?.[cacheIndex + 1];
     if (lon === undefined || lon === Infinity) {
       const x = index % image.width + 0.5 - e;
-      const y = Math.floor(index / image.width) + 0.5 - f;
+      const y = Math.floor(index / image.width) + offsetY + 0.5 - f;
       const position = projection.invert([(d * x - c * y) / determinant, (a * y - b * x) / determinant]);
       lon = Number(position?.[0]);
       lat = Number(position?.[1]);
@@ -56,7 +82,7 @@ export function multiplyPhysicalAlpha(image, { projection, matrix, sample, coord
     if (multiplier === 1) continue;
     pixels[alphaIndex] = Math.round(Math.min(255, pixels[alphaIndex] * multiplier));
     const x = index % image.width;
-    const y = Math.floor(index / image.width);
+    const y = Math.floor(index / image.width) + offsetY;
     const previous = runs.at(-1);
     if (previous && previous[1] === y && previous[0] + previous[2] === x) previous[2] += 1;
     else runs.push([x, y, 1]);
@@ -64,7 +90,7 @@ export function multiplyPhysicalAlpha(image, { projection, matrix, sample, coord
   return runs;
 }
 
-export function createPhysicalIntensityCompositor({ state, getContext, getProjection, getProjectionKey, withRenderTarget, createCanvas = () => document.createElement("canvas") }) {
+export function createPhysicalIntensityCompositor({ state, getContext, getProjection, getProjectionKey, withRenderTarget, getRowBounds = () => null, createCanvas = () => document.createElement("canvas") }) {
   let canvas = null;
   let coordinateKey = "";
   let coordinates = null;
@@ -77,26 +103,39 @@ export function createPhysicalIntensityCompositor({ state, getContext, getProjec
     const target = getContext();
     const projection = getProjection();
     if (!target?.canvas || typeof projection?.invert !== "function") return draw(blendMode);
-    canvas ||= createCanvas();
     const { width, height } = target.canvas;
+    const matrix = target.getTransform();
+    const [firstRow, lastRow] = getRowBounds({ projection, matrix, bounds, height }) || [0, height];
+    const readHeight = lastRow - firstRow;
+    if (!readHeight) return draw(blendMode);
+    canvas ||= createCanvas();
     if (canvas.width !== width) canvas.width = width;
     if (canvas.height !== height) canvas.height = height;
     const scratch = canvas.getContext("2d", { willReadFrequently: true });
-    const matrix = target.getTransform();
     scratch.resetTransform();
     scratch.clearRect(0, 0, width, height);
     scratch.setTransform(matrix);
     const result = withRenderTarget(scratch, () => draw("source-over"));
-    const key = [width, height, matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f, getProjectionKey()].join("|");
+    if (result === 0) {
+      if (width * height > 2_000_000) { canvas.width = 1; canvas.height = 1; }
+      return result;
+    }
+    const key = [width, height, firstRow, readHeight, matrix.a, matrix.b, matrix.c, matrix.d, matrix.e, matrix.f, getProjectionKey()].join("|");
     if (key !== coordinateKey) {
       coordinateKey = key;
-      // Bound retained inverse-projection storage to 16 MB. Large exports
-      // still sample every output pixel, without keeping a second large cache.
-      coordinates = width * height <= 2_000_000 ? new Float32Array(width * height * 2).fill(Infinity) : null;
+      // Keep cold and cached samples at the same precision as projection.invert.
+      // Keep the existing two-million-pixel cache coverage for broad edits;
+      // doubles cap retained storage at 32 MB, usually much less after cropping.
+      coordinates = width * readHeight <= 2_000_000 ? new Float64Array(width * readHeight * 2).fill(Infinity) : null;
     }
-    const image = scratch.getImageData(0, 0, width, height);
-    const runs = multiplyPhysicalAlpha(image, { projection, matrix, coordinates, bounds,
+    const image = scratch.getImageData(0, firstRow, width, readHeight);
+    const runs = multiplyPhysicalAlpha(image, { projection, matrix, coordinates, bounds, offsetY: firstRow,
       sample: (lon, lat) => sampleIntensityField(state.intensityFields, channelId, lon, lat) });
+    if (!runs.length) {
+      draw(blendMode);
+      if (width * height > 2_000_000) { canvas.width = 1; canvas.height = 1; }
+      return result;
+    }
     // Render untouched pixels directly, preserving the native per-feature blend
     // and avoiding an RGBA readback round-trip outside the edited footprint.
     target.save();
@@ -107,11 +146,7 @@ export function createPhysicalIntensityCompositor({ state, getContext, getProjec
     target.setTransform(matrix);
     draw(blendMode);
     target.restore();
-    if (!runs.length) {
-      if (width * height > 2_000_000) { canvas.width = 1; canvas.height = 1; }
-      return result;
-    }
-    scratch.putImageData(image, 0, 0);
+    scratch.putImageData(image, 0, firstRow);
     target.save();
     target.resetTransform();
     target.beginPath();

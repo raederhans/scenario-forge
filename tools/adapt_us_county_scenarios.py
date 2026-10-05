@@ -22,6 +22,7 @@ if str(ROOT) not in sys.path:
 import shapely
 from shapely.geometry import mapping, shape, MultiPolygon
 from shapely.ops import polygonize
+from map_builder.json_source import read_json_source
 from tools.stage_us_county_scenario import baseline_surface
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
 
@@ -32,6 +33,8 @@ PILOT_PARENTS = {"US_CNTY_26163", "US_CNTY_36029"}
 
 
 def read(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 

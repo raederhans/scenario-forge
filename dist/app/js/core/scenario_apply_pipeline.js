@@ -1,3 +1,4 @@
+import { createDefaultRiverPaintState } from "./river_paint/partition_model.js";
 // Scenario apply pipeline.
 // 这个模块只负责“准备 staged apply runtimeState”和“把 staged runtimeState 落到 runtime runtimeState”。
 // scenario_manager.js 继续保留事务协调、回滚、post-apply、入口控制。
@@ -472,6 +473,7 @@ function createScenarioApplyPipeline({
       sovereigntyByFeatureId: staged.resolvedOwners,
       sovereigntyInitialized: false,
       visualOverrides: {},
+      riverPaint: createDefaultRiverPaintState(),
       scenarioGeneratedColorTags: staged.scenarioGeneratedColorTags || [],
       scenarioFixedOwnerColors: fixedOwnerColors,
       sovereignBaseColors: fixedOwnerColors,

@@ -13,12 +13,16 @@ import {
 } from "../js/bootstrap/startup_sample_project_deeplink.js";
 import { registerRuntimeHook } from "../js/core/state/index.js";
 import {
+  getSampleProjectIdFromUrl,
+  SAMPLE_PROJECT_QUERY_PARAM,
+  LEGACY_SAMPLE_PROJECT_QUERY_PARAM,
   loadPublicSampleProjectList,
   loadSampleProjectText,
   resolvePublicSampleProjectListFromManifest,
   resolveSampleProjectFromManifest,
   SampleProjectLoadError,
 } from "../js/core/sample_project_registry.js";
+import * as sampleProjectUrl from "../js/core/sample_project_url.js";
 import { createUiSurfaceUrlState } from "../js/ui/ui_surface_url_state.js";
 import {
   collectSampleExportRecommendationIssues,
@@ -220,6 +224,23 @@ async function importProjectPayload(payload) {
     globalThis.FileReader = previousFileReader;
   }
 }
+
+test("lightweight sample URL module preserves the registry API and parsing rules", () => {
+  assert.equal(getSampleProjectIdFromUrl, sampleProjectUrl.getSampleProjectIdFromUrl);
+  assert.equal(SAMPLE_PROJECT_QUERY_PARAM, sampleProjectUrl.SAMPLE_PROJECT_QUERY_PARAM);
+  assert.equal(LEGACY_SAMPLE_PROJECT_QUERY_PARAM, sampleProjectUrl.LEGACY_SAMPLE_PROJECT_QUERY_PARAM);
+  for (const [search, expected] of [
+    ["", null],
+    ["?sample=%20TNO-1962-ATLANTROPA-BRIEFING%20", "tno-1962-atlantropa-briefing"],
+    ["?sample_project=LEGACY", "legacy"],
+    ["?sample=first&sample_project=second", "first"],
+    ["?sample=&sample_project=fallback", "fallback"],
+    ["?sample=%20%20&sample_project=legacy", null],
+  ]) {
+    assert.equal(getSampleProjectIdFromUrl({ search }), expected);
+  }
+  assert.equal(getSampleProjectIdFromUrl({ search: "?sample=known", searchParamsCtor: null }), null);
+});
 
 function assertSampleProjectError(callback, expectedCode) {
   assert.throws(
@@ -534,6 +555,25 @@ test("sample startup import failures record state without duplicate sample toast
   assert.equal(targetState.sampleProjectDeeplink.sampleId, "tno-1962-atlantropa-briefing");
   assert.equal(targetState.sampleProjectDeeplink.scenarioId, "tno_1962");
   assert.equal(targetState.sampleProjectDeeplink.errorCode, "sample-project-import-failed");
+});
+
+test("unknown startup sample settles with visible error and cancelled tasks do not resume background work", async () => {
+  for (const isCurrent of [true, false]) {
+    const targetState = { bootPhase: "ready", uiHydrationStatus: "ready" };
+    let scheduledCallback;
+    const settlements = [];
+    scheduleStartupSampleProjectDeeplink({ targetState, postReadyScheduler: {
+      scheduleTask: (_key, callback) => { scheduledCallback = callback; },
+    }, helpers: {
+      search: "?sample=unknown-public-sample",
+      fetchImpl: async () => ({ ok: true, json: async () => readJson(SAMPLE_RUNS_PATH) }),
+      onSettled: () => settlements.push(targetState.sampleProjectDeeplink.status),
+    } });
+    await scheduledCallback({ isCurrent: () => isCurrent });
+    assert.equal(targetState.sampleProjectDeeplink.status, "error");
+    assert.ok(targetState.sampleProjectDeeplink.errorMessage);
+    assert.deepEqual(settlements, isCurrent ? ["error"] : []);
+  }
 });
 
 test("sample startup deeplink stays fail-closed until both map and UI are ready", () => {

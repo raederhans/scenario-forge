@@ -79,8 +79,12 @@ LANDING_EN_TRANSLATIONS_BLOCK_RE = re.compile(
     r"""\ben\s*:\s*\{(?P<body>.*?)\n\s*\},\s*\n\s*zh\s*:""",
     re.DOTALL,
 )
+LANDING_EN_TRANSLATIONS_ASSIGN_RE = re.compile(
+    r"""\bObject\.assign\(\s*translations\.en\s*,\s*\{(?P<body>(?:[^{}"']|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')*)\}\s*\)""",
+    re.DOTALL,
+)
 LANDING_TRANSLATION_ENTRY_RE = re.compile(
-    r"""^\s*(?P<key>[A-Za-z][A-Za-z0-9_]*)\s*:\s*(?:\n\s*)?(['"])(?P<text>(?:\\.|(?!\2).)*)\2""",
+    r"""(?:^|,)\s*(?:(?P<key>[A-Za-z][A-Za-z0-9_]*)|(?P<key_quote>['"])(?P<quoted_key>(?:\\.|(?!(?P=key_quote)).)*)(?P=key_quote))\s*:\s*(?P<text_quote>['"])(?P<text>(?:\\.|(?!(?P=text_quote)).)*)(?P=text_quote)(?=\s*(?:,|\Z))""",
     re.MULTILINE | re.DOTALL,
 )
 
@@ -555,14 +559,15 @@ def collect_code_strings(repo_root: Path) -> dict:
                 dynamic_config_keys.add(value)
 
         if source_scope == "landing" and path.name == "app.js":
-            for block_match in LANDING_EN_TRANSLATIONS_BLOCK_RE.finditer(content):
-                for match in LANDING_TRANSLATION_ENTRY_RE.finditer(block_match.group("body")):
-                    key = decode_js_string(match.group("key"))
-                    text = decode_js_string(match.group("text"))
-                    if key:
-                        landing_translation_keys.add(key)
-                    if text and is_user_visible_candidate(text):
-                        landing_translation_default_values.add(text)
+            for block_pattern in (LANDING_EN_TRANSLATIONS_BLOCK_RE, LANDING_EN_TRANSLATIONS_ASSIGN_RE):
+                for block_match in block_pattern.finditer(content):
+                    for match in LANDING_TRANSLATION_ENTRY_RE.finditer(block_match.group("body")):
+                        key = decode_js_string(match.group("key") or match.group("quoted_key"))
+                        text = decode_js_string(match.group("text"))
+                        if key:
+                            landing_translation_keys.add(key)
+                        if text and is_user_visible_candidate(text):
+                            landing_translation_default_values.add(text)
 
         for match in GEO_T_CALL_RE.finditer(content):
             value = decode_js_string(match.group("text"))

@@ -67,7 +67,7 @@ test("kernel preserves cross-country shared arcs and policy changes", () => {
 
 test("arc transfer round trips empty, ragged, signed, and large exact coordinates", () => {
   const topology = { type: "Topology", transform: { scale: [0.1, 1], translate: [5, -5] },
-    arcs: [[], [[], [-0, -22, 9007199254740991], [1.25, 1e120]], [[-1e-100, 3]]],
+    arcs: [[], [[], [-0, -22, 9007199254740991], [1.25, 1e120]], [[-1e-100, 3, NaN, Infinity]]],
     objects: { political: { type: "GeometryCollection", geometries: [] } } };
   const snapshot = structuredClone(topology);
   const packed = packTopologyForTransfer(topology);

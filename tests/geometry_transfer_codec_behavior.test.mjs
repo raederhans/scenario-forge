@@ -47,3 +47,41 @@ test("large repeated geometry and mixed null removal updates roundtrip without d
   assert.deepEqual(unpack(structuredClone(result.payload, { transfer: result.transferables })), input);
   assert.equal(geometry.coordinates[0].length, 10_000);
 });
+
+test("startup v2 transfers topology arcs and nested points while preserving opaque members", async () => {
+  const topology = {
+    type: "Topology", transform: { scale: [0.01, 0.02], translate: [-180, -90] },
+    arcs: [[], [[-0, 1], [2, -3, 4], [5, 6]], [[1.2345678901234567, -1e-20]]],
+    coordinates: ["foreign topology metadata"],
+    objects: { mixed: { type: "GeometryCollection", geometries: [
+      { type: "Point", coordinates: [123, 456], properties: { type: "Point", coordinates: ["opaque"] } },
+      { type: "Polygon", arcs: [[1, -3]], properties: { id: "water" } },
+    ] } },
+  };
+  const envelope = { taskId: "startup", payload: { base: { topology_primary: topology } },
+    baseDecodedCollections: { waterRegionsData: shapes }, metrics: { decodeMs: 7 } };
+  const before = structuredClone(envelope);
+  const encoded = pack(envelope, { minCoordinateCount: 0, includeTopologyArcs: true });
+  assert.equal(encoded.payload.encoding, "geo-f64-v2");
+  const { port1, port2 } = new MessageChannel();
+  try {
+    const received = new Promise((resolve) => port2.once("message", resolve));
+    port1.postMessage(encoded.payload, encoded.transferables);
+    assert.ok(encoded.transferables.every((buffer) => buffer.byteLength === 0));
+    assert.deepEqual(unpack(await received), before);
+    assert.deepEqual(envelope, before);
+  } finally { port1.close(); port2.close(); }
+});
+
+test("v1 keeps topology arcs opaque and invalid v2 coordinates retain the ordinary path", () => {
+  const topology = { type: "Topology", arcs: [[[1, 2], [3, 4]]], objects: {} };
+  const old = pack({ topology, decoded: shapes }, { minCoordinateCount: 0 });
+  assert.equal(old.payload.encoding, "geo-f64-v1");
+  assert.deepEqual(old.payload.value.topology.arcs, topology.arcs);
+  assert.deepEqual(unpack(structuredClone(old.payload)), { topology, decoded: shapes });
+  for (const value of [topology, { ...topology, arcs: [[[1, "2"]]] }]) {
+    const result = pack(value, { includeTopologyArcs: true });
+    assert.equal(result.payload, value);
+    assert.deepEqual(result.transferables, []);
+  }
+});

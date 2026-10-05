@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { runOptionalStartupTask } from "../js/bootstrap/startup_lazy_module_loader.js";
+import { replaceSampleProjectDeeplinkState } from "../js/core/state/actions/boot_actions.js";
 import { fileURLToPath } from "node:url";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -9,6 +11,68 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..
 function readRepoFile(...segments) {
   return readFileSync(path.join(REPO_ROOT, ...segments), "utf8");
 }
+
+test("startup sample callbacks mark terminal state and ordinary startup does not load the module", async () => {
+  const mainSource = readRepoFile("js", "main.js");
+  const source = mainSource.slice(mainSource.indexOf("async function tryScheduleStartupSampleProjectDeeplink()"),
+    mainSource.indexOf("function getStartupReadyHandoffOwner()"));
+  const createAttempt = new Function("dependencies", `
+    const { startupSampleProjectId, state, startupSampleProjectDeeplinkModuleLoader,
+      runOptionalStartupTask, replaceSampleProjectDeeplinkState, callRuntimeHook, console,
+      getStartupReadyHandoffOwner, postReadyScheduler, t } = dependencies;
+    ${source}
+    return tryScheduleStartupSampleProjectDeeplink;
+  `);
+  for (const sampleId of [null, "unknown-public-sample"]) {
+    const state = {};
+    let loadCount = 0;
+    const bannerStates = [];
+    const settledStates = [];
+    const attempt = createAttempt({ startupSampleProjectId: sampleId, state,
+      startupSampleProjectDeeplinkModuleLoader: { loadModuleOnce: async () => {
+        loadCount += 1;
+        throw new Error("module load failed");
+      } }, runOptionalStartupTask, replaceSampleProjectDeeplinkState,
+      getStartupReadyHandoffOwner: () => ({ markStartupSampleSettled() {
+        settledStates.push(state.sampleProjectDeeplink);
+      } }),
+      callRuntimeHook: (_state, hook, snapshot) => {
+        assert.equal(hook, "refreshSampleProjectBannerFn");
+        bannerStates.push(snapshot);
+      }, console: { warn() {} },
+    });
+    assert.equal(await attempt(), false);
+    assert.equal(loadCount, sampleId ? 1 : 0);
+    if (sampleId) {
+      assert.equal(state.sampleProjectDeeplink.status, "error");
+      assert.equal(state.sampleProjectDeeplink.sampleId, sampleId);
+      assert.equal(state.sampleProjectDeeplink.errorMessage, "module load failed");
+      assert.deepEqual(bannerStates, [state.sampleProjectDeeplink]);
+      assert.deepEqual(settledStates, [state.sampleProjectDeeplink], "module failure marks settlement after publishing error");
+    } else {
+      assert.deepEqual(bannerStates, []);
+      assert.deepEqual(settledStates, []);
+      assert.equal(state.sampleProjectDeeplink, undefined);
+    }
+  }
+  const state = {};
+  const settledStates = [];
+  const attempt = createAttempt({ startupSampleProjectId: "sample", state, postReadyScheduler: {}, t: (key) => key,
+    startupSampleProjectDeeplinkModuleLoader: { loadModuleOnce: async () => ({
+      tryScheduleStartupSampleProjectDeeplink: ({ helpers }) => {
+        state.sampleProjectDeeplink = { sampleId: "sample", status: "success" };
+        helpers.onSettled();
+        return true;
+      },
+    }) }, runOptionalStartupTask, replaceSampleProjectDeeplinkState,
+    getStartupReadyHandoffOwner: () => ({ markStartupSampleSettled() {
+      settledStates.push(state.sampleProjectDeeplink);
+    } }),
+    callRuntimeHook() {}, console: { warn() {} },
+  });
+  assert.equal(await attempt(), true);
+  assert.deepEqual(settledStates, [state.sampleProjectDeeplink], "import callback marks the initial terminal state");
+});
 
 test("main imports and creates the startup ready handoff owner", () => {
   const mainSource = readRepoFile("js", "main.js");

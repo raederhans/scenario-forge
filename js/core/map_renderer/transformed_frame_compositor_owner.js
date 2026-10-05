@@ -27,6 +27,8 @@ export function createTransformedFrameCompositorOwner({
   effects = {},
 } = {}) {
   const interactionCompositePassNames = requirePassNames(constants.interactionCompositePassNames);
+  const getActiveInteractionCompositePassNames = getters.getActiveInteractionCompositePassNames
+    || (() => interactionCompositePassNames);
   const renderPhaseIdle = requireString(constants.renderPhaseIdle, "constants.renderPhaseIdle");
   const renderPhaseInteracting = requireString(
     constants.renderPhaseInteracting,
@@ -171,7 +173,7 @@ export function createTransformedFrameCompositorOwner({
         })
         : composeRenderPassesToTarget(
           bufferContext,
-          interactionCompositePassNames,
+          getActiveInteractionCompositePassNames(),
           currentTransform,
           { requireAllPasses: true },
         ).ok;
@@ -187,7 +189,9 @@ export function createTransformedFrameCompositorOwner({
         drawBordersPass(k, { interactive: !!interactiveBorders });
         bufferContext.setTransform(1, 0, 0, 1, 0, 0);
       }
-      ok = drawTransformedPass("labels", currentTransform);
+      ok = effects.drawInteractionLabels
+        ? effects.drawInteractionLabels(currentTransform)
+        : drawTransformedPass("labels", currentTransform);
     });
     if (!ok) return false;
     blitCompositeBufferToMain(bufferCanvas);
@@ -200,8 +204,10 @@ export function createTransformedFrameCompositorOwner({
     if (effects.ensureTransformedPassCoverage?.(timings) === false) return false;
     const cache = getRenderPassCacheSnapshot();
     const activeTransformedPassNames = getActiveTransformedFramePassNames();
+    const activeInteractionPassNames = getActiveInteractionCompositePassNames();
     const transformedPasses = activeTransformedPassNames.filter((passName) => (
-      !interactionCompositePassNames.includes(passName) && passName !== "labels"
+      !activeInteractionPassNames.includes(passName) && passName !== "labels"
+        && !(effects.drawInteractionLabels && passName === "textureLabels")
     ));
     const initialRenderPhase = getRenderPhase();
     const allowDirtyFastFrame = initialRenderPhase === renderPhaseSettling
@@ -251,7 +257,7 @@ export function createTransformedFrameCompositorOwner({
     const canBuildCompositeNow = true;
     const canDrawDirtyInteractionPasses = allowDirtyFastFrame
       && !canReuseComposite
-      && interactionCompositePassNames.every((passName) => canDrawTransformedPass(passName, cache, {
+      && activeInteractionPassNames.every((passName) => canDrawTransformedPass(passName, cache, {
         allowDirty: true,
       }));
     const compositeReady = canReuseComposite

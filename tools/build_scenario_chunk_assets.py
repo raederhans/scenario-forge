@@ -11,6 +11,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from map_builder.contracts import sha256_path
+from map_builder.json_source import read_json_source, resolve_json_source_path
 from map_builder.io.writers import write_json_atomic
 from map_builder.scenario_context import ensure_path_within_allowed_bases, resolve_repo_path
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
@@ -19,7 +20,7 @@ DEFAULT_RUNTIME_POLITICAL_URL = "data/europe_topology.runtime_political_v1.json"
 
 
 def _read_json(path: Path) -> dict:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return read_json_source(path)
 
 
 def _resolve_scenario_manifest_url(scenario_dir: Path, raw_url: object, *, field_name: str) -> Path | None:
@@ -77,8 +78,10 @@ def main() -> int:
             runtime_topology_url,
             field_name="runtime_topology_url",
         )
-        if runtime_topology_path.exists():
-            runtime_topology_payload = _read_json(runtime_topology_path)
+        runtime_topology_path = resolve_json_source_path(runtime_topology_path)
+        runtime_topology_payload = _read_json(runtime_topology_path)
+        runtime_topology_url = f"data/scenarios/{scenario_dir.name}/{runtime_topology_path.relative_to(scenario_dir).as_posix()}"
+        manifest_payload["runtime_topology_url"] = runtime_topology_url
     startup_topology_payload = None
     startup_topology_url = str(
         manifest_payload.get("runtime_bootstrap_topology_url")

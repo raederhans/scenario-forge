@@ -1581,138 +1581,138 @@
         ]
       }
     ],
+    "relief": [
+      {
+        "chunk_ids": [
+          "relief.coarse.r0c0"
+        ],
+        "lod": "coarse",
+        "max_zoom": 1.7,
+        "min_zoom": 0.0
+      },
+      {
+        "chunk_ids": [
+          "relief.detail.r0c2"
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
+      },
+      {
+        "chunk_ids": [
+          "relief.detail.r1c1"
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
+      },
+      {
+        "chunk_ids": [
+          "relief.detail.r1c2"
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
+      }
+    ],
     "scenario_atlantropa": [
       {
-        "lod": "coarse",
-        "min_zoom": 0.0,
-        "max_zoom": 1.7,
         "chunk_ids": [
           "scenario_atlantropa.coarse.r0c0"
-        ]
+        ],
+        "lod": "coarse",
+        "max_zoom": 1.7,
+        "min_zoom": 0.0
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "scenario_atlantropa.detail.r1c1"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "scenario_atlantropa.detail.r1c2"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       }
     ],
     "water": [
       {
-        "lod": "coarse",
-        "min_zoom": 0.0,
-        "max_zoom": 1.7,
         "chunk_ids": [
           "water.coarse.r0c0"
-        ]
+        ],
+        "lod": "coarse",
+        "max_zoom": 1.7,
+        "min_zoom": 0.0
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r0c0"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r0c1"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r0c2"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r0c3"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r1c0"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r1c1"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r1c2"
-        ]
+        ],
+        "lod": "detail",
+        "max_zoom": 99.0,
+        "min_zoom": 1.7
       },
       {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
         "chunk_ids": [
           "water.detail.r1c3"
-        ]
-      }
-    ],
-    "relief": [
-      {
-        "lod": "coarse",
-        "min_zoom": 0.0,
-        "max_zoom": 1.7,
-        "chunk_ids": [
-          "relief.coarse.r0c0"
-        ]
-      },
-      {
+        ],
         "lod": "detail",
-        "min_zoom": 1.7,
         "max_zoom": 99.0,
-        "chunk_ids": [
-          "relief.detail.r0c2"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "relief.detail.r1c1"
-        ]
-      },
-      {
-        "lod": "detail",
-        "min_zoom": 1.7,
-        "max_zoom": 99.0,
-        "chunk_ids": [
-          "relief.detail.r1c2"
-        ]
+        "min_zoom": 1.7
       }
     ]
   }

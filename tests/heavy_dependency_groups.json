@@ -53,6 +53,7 @@
       "tests/test_regional_scenario_assets.py",
       "tests/test_reviewed_place_names.py",
       "tests/test_reviewed_seam.py",
+      "tests/test_river_coverage.py",
       "tests/test_river_partitions.py",
       "tests/test_russia_coverage.py",
       "tests/test_russia_source_dateline.py",
@@ -61,6 +62,7 @@
       "tests/test_scenario_spatial_chunk_assets.py",
       "tests/test_scenario_surface_constraints.py",
       "tests/test_source_coverage_repair.py",
+      "tests/test_sync_marine_refinement.py",
       "tests/test_tno_bundle_builder.py",
       "tests/test_tno_border_continuity.py",
       "tests/test_tno_balkan_anatolia_seams.py",
@@ -95,7 +97,9 @@
       "tests/test_us_county_source.py",
       "tests/test_water_geometry.py",
       "tests/test_water_region_authority.py",
-      "tests/test_world_urban_lights_asset.py"
+      "tests/test_world_urban_lights_asset.py",
+      "tests/test_canada_parallel_lod.py",
+      "tests/test_repair_scenario_geography.py"
     ]
   }
 }

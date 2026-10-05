@@ -235094,13 +235094,13 @@
   "reverse_coverage_gap_count": 0,
   "scenario_id": "hoi4_1939",
   "scenario_rule_blockers": [],
-  "snapshot_fingerprint": "bcec50b4accc298b5d1174d911bee8d29ecc80acef517940e8d095499b5755dc",
+  "snapshot_fingerprint": "0b0afd5c86a2d4cfc6c01ecd541963d144e50676e935a65cdf538cc7a51d6c32",
   "source": {
-    "base_topology_sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
-    "build_snapshot_sha256": "653da2877798af7bcb434f800576dfcb4ae99b5d8dadc6bd6cac012ffe3c6a3c",
-    "detail_chunk_manifest_sha256": "c17c4626c62f57911bbfd5c8a7e756879a8b6da9e3e4afd40332b11f859fdf32",
+    "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
+    "build_snapshot_sha256": "0941c453174282493f959dce8581d7391c7dc4631c0ded53be63a1d5989bf3eb",
+    "detail_chunk_manifest_sha256": "605fa74fbe2f1cc084e63666b6687ad7288140bd7c8e1aad144243d1a436ceff",
     "runtime_bootstrap_topology_sha256": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "runtime_topology_sha256": "b833908e74ecf8d1edce8ee8031feb8c230669674537d341fbaa4ef31e03491c"
+    "runtime_topology_sha256": "43e307baa1b7ffa4b00774fdf12c7d96eb0cd0dd219c1c6990384da0c6cddbff"
   },
   "summary": {
     "approximate_count": 457,

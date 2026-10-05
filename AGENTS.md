@@ -33,6 +33,13 @@
 - 检查已充分证明当前声明后停止；不重复未受新改动影响的检查，不为普通改动生成完整证据包。
 - 不扩大 console、timeout 或 route allowlist 来掩盖真实失败。
 
+## 提交与 PR
+
+- 交付前运行 `npm run pr:plan`：只读查看本分支相对 `origin/main` 的已提交差异、未提交改动、建议的本地检查和预计 CI。它不 fetch、不执行测试，也不表示检查通过。
+- 按计划运行本次所需的目标检查；覆盖缺口先补齐。`verify:edit` 用于局部反馈，`verify:commit` 用于提交前组合检查；不要把 `verify:pr`、nightly 或 release 作为每次推送功能分支的固定前置条件。
+- 推送功能分支、PR 合并、部署分别汇报。PR 等待最终提交的 required checks；计划中的 deferred/diagnostic 不是已通过。遵守既有推送、合并和生产发布授权。
+- 具体用法见 [开发与交付](docs/development-and-delivery.zh-CN.md)。
+
 ## 汇报
 
 - 最终说明改动结果、涉及文件、实际运行的检查及重要验证缺口。

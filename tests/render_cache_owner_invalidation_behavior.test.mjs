@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
+import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
 
 test("synchronous validated cache scopes share one validation, revalidate replacements and end on throw", () => {
   const state = { renderPassCache: {} };
@@ -377,4 +379,306 @@ test("factory freezes its exact public API", () => {
   const { owner } = createOwner();
 
   assert.equal(Object.isFrozen(owner), true);
+});
+
+
+function createSurfaceOwner({
+  cache = createRenderPassCache(),
+  getterOverrides = {},
+  budget = createRuntimeResourceBudget(),
+} = {}) {
+  const state = { renderPassCache: cache, width: 20, height: 10, dpr: 1 };
+  const owner = createRenderCacheOwner({
+    state,
+    resourceBudget: budget,
+    constants: {
+      renderPassNames: RENDER_PASS_NAMES,
+      interactionCompositePassNames: INTERACTION_COMPOSITE_PASS_NAMES,
+    },
+    getters: {
+      getContext: () => ({ canvas: { width: state.width, height: state.height } }),
+      ...getterOverrides,
+    },
+    helpers: {
+      ensureRenderPassCacheState: (target) => target.renderPassCache,
+      cloneZoomTransform,
+      getTransformSignature: (transform) => JSON.stringify(transform),
+      getVisibleFrameIdentity: () => ({
+        scenarioId: "base", sceneGeneration: 2, scenarioDataGeneration: 3, selectionVersion: 1,
+        contextFlagSignature: "flags", topologyRevision: 4, colorRevision: 5, dpr: 1,
+        pixelWidth: state.width, pixelHeight: state.height,
+      }),
+      areZoomTransformsEquivalent: (left, right) => JSON.stringify(left) === JSON.stringify(right),
+      withRenderTarget: (_context, callback) => callback(),
+      prepareTargetContext: () => 1,
+    },
+  });
+  return { owner, state, budget };
+}
+
+function withSurfaceDocument(callback) {
+  const previous = globalThis.document;
+  globalThis.document = { createElement: (tag) => {
+    assert.equal(tag, "canvas");
+    return { width: 1, height: 1, getContext: () => ({}) };
+  } };
+  try { return callback(); } finally { globalThis.document = previous; }
+}
+
+test("surface accounting covers every internal canvas and deduplicates repeated references", () => {
+  const shared = { width: 10, height: 5 };
+  const layer = { width: 8, height: 4 };
+  const lastGood = { width: 6, height: 3 };
+  const interaction = { width: 4, height: 2 };
+  const buffer = { width: 2, height: 1 };
+  const border = { width: 3, height: 2 };
+  const cache = createRenderPassCache({
+    canvases: { political: shared, contextBase: shared },
+    contextScenarioLayerCache: { water: { canvas: layer }, duplicate: { canvas: shared } },
+    lastGoodFrame: { canvas: lastGood },
+    interactionComposite: { canvas: interaction },
+    compositeBuffer: { canvas: buffer },
+    borderSnapshot: { canvas: border },
+  });
+  const { owner, budget } = createSurfaceOwner({ cache });
+  assert.equal(owner.syncSurfaceResourceAccounting(), (50 + 32 + 18 + 8 + 2 + 6) * 4);
+  assert.equal(budget.snapshot().categories.bitmaps, 464);
+  assert.equal(budget.snapshot().ownerCount, 1);
+  const revision = budget.snapshot().revision;
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(budget.snapshot().revision, revision);
+  shared.width = 20;
+  assert.equal(owner.syncSurfaceResourceAccounting(), 664);
+  const exportCanvas = { width: 100, height: 100 };
+  cache.exportCanvas = exportCanvas;
+  assert.equal(owner.releaseSurfaceCache(cache), true);
+  assert.deepEqual([shared, layer, lastGood, interaction, buffer, border].map((canvas) => [canvas.width, canvas.height]),
+    [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]);
+  assert.deepEqual([exportCanvas.width, exportCanvas.height], [100, 100]);
+  assert.equal(budget.snapshot().estimatedBytes, 0);
+  assert.equal(budget.snapshot().ownerCount, 0);
+});
+
+test("allocation and resizing keep pass, scenario, snapshot and composite estimates current", () => withSurfaceDocument(() => {
+  const cache = createRenderPassCache({
+    lastGoodFrame: { canvas: null }, interactionComposite: { canvas: null }, compositeBuffer: { canvas: null },
+  });
+  const { owner, state, budget } = createSurfaceOwner({ cache });
+  owner.ensureRenderPassCanvas("political");
+  assert.equal(budget.snapshot().categories.bitmaps, 800);
+  owner.scenarioLayerCache.render("water", { x: 0, y: 0, k: 1 }, { draw: () => 1, getSignature: () => "water" });
+  assert.equal(budget.snapshot().categories.bitmaps, 1600);
+  owner.ensureLastGoodFrameCanvas();
+  owner.ensureInteractionCompositeCanvas();
+  owner.ensureCompositeBufferCanvas();
+  assert.equal(budget.snapshot().categories.bitmaps, 4000);
+  state.width = 40;
+  owner.resizeRenderPassCanvases(["political"]);
+  assert.equal(budget.snapshot().categories.bitmaps, 4800);
+  owner.scenarioLayerCache.render("water", { x: 0, y: 0, k: 1 }, { draw: () => 1, getSignature: () => "resized" });
+  owner.ensureLastGoodFrameCanvas();
+  owner.ensureInteractionCompositeCanvas();
+  owner.ensureCompositeBufferCanvas();
+  assert.equal(budget.snapshot().categories.bitmaps, 8000);
+  const oldWater = cache.contextScenarioLayerCache.water.canvas;
+  owner.clearRenderPassReferenceTransforms();
+  assert.deepEqual([oldWater.width, oldWater.height], [0, 0]);
+  assert.equal(budget.snapshot().categories.bitmaps, 6400);
+}));
+
+test("inactive passes release backing and identity, then reactivate with a fresh dirty surface", () => withSurfaceDocument(() => {
+  const political = { width: 20, height: 10 };
+  const scenario = { width: 20, height: 10 };
+  const water = { width: 20, height: 10 };
+  const cache = createRenderPassCache({
+    canvases: { political, contextScenario: scenario },
+    layouts: { political: {}, contextScenario: {} },
+    signatures: { political: "political", contextScenario: "scenario" },
+    referenceTransforms: { political: { k: 1 }, contextScenario: { k: 1 } },
+    fullReferenceTransforms: { contextScenario: { k: 1 } },
+    contextScenarioLayerCache: { water: { canvas: water, signature: "water", referenceTransform: { k: 1 } } },
+  });
+  const { owner, budget } = createSurfaceOwner({ cache });
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(owner.releaseInactivePassSurfaces(["political"]), true);
+  assert.deepEqual([scenario.width, scenario.height, water.width, water.height], [0, 0, 0, 0]);
+  assert.equal(cache.canvases.political, political);
+  assert.equal(cache.canvases.contextScenario, undefined);
+  assert.equal(cache.signatures.contextScenario, undefined);
+  assert.equal(cache.layouts.contextScenario, undefined);
+  assert.equal(cache.referenceTransforms.contextScenario, undefined);
+  assert.equal(cache.fullReferenceTransforms.contextScenario, undefined);
+  assert.deepEqual(cache.contextScenarioLayerCache, {});
+  assert.equal(cache.dirty.contextScenario, true);
+  assert.equal(cache.reasons.contextScenario, "pass-inactive");
+  assert.equal(cache.interactionComposite.valid, false);
+  assert.equal(cache.interactionComposite.reason, "pass-inactive");
+  assert.equal(cache.lastGoodFrame.stale, true);
+  assert.equal(budget.snapshot().categories.bitmaps, 800);
+  assert.equal(owner.releaseInactivePassSurfaces(["political"]), false);
+  assert.equal(owner.releaseInactivePassSurfaces(["political", "contextScenario"]), false);
+  const reactivated = owner.ensureRenderPassCanvas("contextScenario");
+  assert.notEqual(reactivated, scenario);
+  assert.deepEqual([reactivated.width, reactivated.height], [20, 10]);
+  assert.equal(cache.dirty.contextScenario, true, "allocating a surface does not publish rendered coverage");
+  assert.equal(budget.snapshot().categories.bitmaps, 1600);
+}));
+
+test("root replacement releases old surfaces while protecting aliases in the new root", () => {
+  const shared = { width: 20, height: 10 };
+  const stale = { width: 10, height: 10 };
+  const old = createRenderPassCache({ canvases: { political: shared, contextBase: stale } });
+  const { owner, state, budget } = createSurfaceOwner({ cache: old });
+  owner.syncSurfaceResourceAccounting();
+  const replacement = createRenderPassCache({ canvases: { political: shared } });
+  state.renderPassCache = replacement;
+  assert.equal(owner.getRenderPassCacheState(), replacement);
+  assert.deepEqual([stale.width, stale.height], [0, 0]);
+  assert.deepEqual([shared.width, shared.height], [20, 10]);
+  assert.deepEqual(old.canvases, {});
+  assert.equal(budget.snapshot().categories.bitmaps, 800);
+  state.renderPassCache = createRenderPassCache();
+  owner.syncSurfaceResourceAccounting();
+  assert.deepEqual([shared.width, shared.height], [0, 0]);
+  assert.equal(budget.snapshot().estimatedBytes, 0);
+});
+
+test("nested export retention keeps visible surfaces accounted through restore and thrown rendering", () => {
+  const visibleCanvas = { width: 20, height: 10 };
+  const visible = createRenderPassCache({ canvases: { political: visibleCanvas } });
+  const { owner, state, budget } = createSurfaceOwner({ cache: visible });
+  owner.syncSurfaceResourceAccounting();
+  const endOuter = owner.retainSurfaceCacheForScope(visible);
+  const endInner = owner.retainSurfaceCacheForScope(visible);
+  const temporaryCanvas = { width: 40, height: 20 };
+  const temporary = createRenderPassCache({ canvases: { political: temporaryCanvas } });
+  const exportCanvas = { width: 40, height: 20 };
+  assert.throws(() => {
+    try {
+      state.renderPassCache = temporary;
+      assert.equal(owner.syncSurfaceResourceAccounting(), 4000);
+      assert.equal(owner.releaseSurfaceCache(visible), false, "retained visible root cannot be released by a temporary root cleanup");
+      endInner();
+      assert.equal(budget.snapshot().categories.bitmaps, 4000);
+      throw Error("export draw failed");
+    } finally {
+      state.renderPassCache = visible;
+      owner.releaseSurfaceCache(temporary);
+      endOuter();
+      endOuter();
+    }
+  }, /export draw failed/);
+  assert.deepEqual([visibleCanvas.width, visibleCanvas.height], [20, 10]);
+  assert.deepEqual([temporaryCanvas.width, temporaryCanvas.height], [0, 0]);
+  assert.deepEqual([exportCanvas.width, exportCanvas.height], [40, 20]);
+  assert.equal(budget.snapshot().categories.bitmaps, 800);
+  assert.equal(state.renderPassCache, visible);
+});
+
+test("ending an abandoned retention scope releases the former root exactly once", () => {
+  const visibleCanvas = { width: 20, height: 10 };
+  const visible = createRenderPassCache({ canvases: { political: visibleCanvas } });
+  const { owner, state, budget } = createSurfaceOwner({ cache: visible });
+  const end = owner.retainSurfaceCacheForScope(visible);
+  state.renderPassCache = createRenderPassCache();
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(budget.snapshot().categories.bitmaps, 800);
+  end();
+  end();
+  assert.deepEqual([visibleCanvas.width, visibleCanvas.height], [0, 0]);
+  assert.equal(budget.snapshot().estimatedBytes, 0);
+});
+
+test("root release clears only unshared political path LRUs and preserves visible export aliases", () => {
+  const visible = createRenderPassCache();
+  const { owner, state, budget } = createSurfaceOwner({ cache: visible });
+  const pathOwner = createPoliticalPathCacheOwner({}, {
+    rendererSurfaceHost: { getProjection: () => null },
+    getRenderPassCacheState: () => state.renderPassCache,
+    cloneZoomTransform: (transform) => ({ ...transform }),
+    recordRenderPerfMetric: () => {},
+    resourceBudget: budget,
+  });
+  const addPathCacheEntry = (key) => {
+    const handle = pathOwner.getPoliticalPathCacheHandle(
+      { k: 1, x: 0, y: 0 },
+      { resetIfMismatch: true },
+    );
+    handle.map.set(key, { path: {}, estimatedBytes: 512 });
+    return handle.map;
+  };
+
+  const visiblePaths = addPathCacheEntry("visible");
+  assert.equal(budget.snapshot().categories.projectedPaths, 512);
+  const endVisibleRetention = owner.retainSurfaceCacheForScope(visible);
+
+  const temporary = createRenderPassCache();
+  state.renderPassCache = temporary;
+  owner.syncSurfaceResourceAccounting();
+  const temporaryPaths = addPathCacheEntry("temporary");
+  assert.notEqual(temporaryPaths, visiblePaths);
+  assert.equal(budget.snapshot().categories.projectedPaths, 1024);
+
+  state.renderPassCache = visible;
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(temporaryPaths.size, 0, "restoring the visible root releases the abandoned export LRU");
+  assert.equal(visiblePaths.size, 1);
+  assert.equal(budget.snapshot().categories.projectedPaths, 512);
+
+  const visibleAlias = createRenderPassCache({ politicalPathCache: visiblePaths });
+  state.renderPassCache = visibleAlias;
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(visiblePaths.size, 1, "a new root alias cannot clear paths still held by the visible root");
+  state.renderPassCache = visible;
+  owner.syncSurfaceResourceAccounting();
+  endVisibleRetention();
+  assert.equal(budget.snapshot().categories.projectedPaths, 512);
+
+  state.renderPassCache = createRenderPassCache();
+  owner.syncSurfaceResourceAccounting();
+  assert.equal(visiblePaths.size, 0, "replacing the final root clears its unshared LRU");
+  assert.equal(budget.snapshot().categories.projectedPaths, undefined);
+});
+
+test("interaction signatures and invalidation use the current active pass list", () => {
+  let active = ["political"];
+  const cache = createRenderPassCache({
+    signatures: { political: "P", contextScenario: "S" },
+    referenceTransforms: { political: { k: 1, x: 0, y: 0 }, contextScenario: { k: 1, x: 0, y: 0 } },
+  });
+  const { owner } = createSurfaceOwner({ cache, getterOverrides: {
+    getActiveInteractionCompositePassNames: () => active,
+  } });
+  const transform = { x: 0, y: 0, k: 1 };
+  Object.assign(cache.interactionComposite, { canvas: { width: 20, height: 10 }, dpr: 1, pixelWidth: 20, pixelHeight: 10, referenceTransform: transform });
+  const signature = owner.getInteractionCompositeSignature();
+  cache.interactionComposite.signature = signature;
+  assert.equal(owner.canDrawInteractionComposite(transform), true);
+  assert.ok(signature.startsWith("political@P@"));
+  assert.equal(signature.includes("contextScenario"), false);
+  owner.invalidateRenderPasses(["contextScenario"], "inactive-data");
+  assert.equal(cache.interactionComposite.valid, true);
+  cache.signatures.contextScenario = "S2";
+  assert.equal(owner.getInteractionCompositeSignature(), signature);
+  assert.equal(owner.canDrawInteractionComposite(transform), true, "inactive signatures and dirty bits do not reject active composite reuse");
+  active = ["political", "contextScenario"];
+  assert.ok(owner.getInteractionCompositeSignature().includes("contextScenario@S2@"));
+  assert.equal(owner.canDrawInteractionComposite(transform), false, "enabling a pass changes the composite signature");
+  cache.interactionComposite.valid = true;
+  owner.invalidateRenderPasses(["contextScenario"], "active-data");
+  assert.equal(cache.interactionComposite.valid, false);
+});
+
+test("zero-sized composite backings cannot claim explicit viewport coverage", () => {
+  const transform = { x: 0, y: 0, k: 1 };
+  const cache = createRenderPassCache();
+  const { owner } = createSurfaceOwner({ cache });
+  Object.assign(cache.interactionComposite, {
+    canvas: { width: 0, height: 0 },
+    coverage: { minX: 0, minY: 0, maxX: 20, maxY: 10 },
+    referenceTransform: transform, dpr: 1, pixelWidth: 20, pixelHeight: 10,
+  });
+  cache.interactionComposite.signature = owner.getInteractionCompositeSignature();
+  assert.equal(owner.canDrawInteractionComposite(transform), false);
+  assert.equal(cache.interactionComposite.reason, "coverage-mismatch");
 });

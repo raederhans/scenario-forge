@@ -7,6 +7,7 @@ import json
 import re
 from pathlib import Path
 
+from map_builder.json_source import portable_gzip_bytes
 from tools.political_detail_partition import (
     feature_bounds, geometry_coordinates, geometry_part_count,
     partition_political_detail_features, political_detail_chunk_ids,
@@ -19,14 +20,6 @@ _JSON_SUFFIXES = {".json", ".geojson", ".topojson"}
 def compact_json_bytes(raw: bytes) -> bytes:
     # Keep number spelling, escapes, Unicode and whitespace inside strings exact.
     return _JSON_TOKEN_OR_SPACE.sub(lambda match: match[1] or b"", raw)
-
-
-def portable_gzip_bytes(raw: bytes) -> bytes:
-    encoded = gzip.compress(raw, compresslevel=6, mtime=0)
-    # Python 3.11/3.12 delegates mtime=0 to zlib, leaking its platform OS byte.
-    # Match Python 3.13's portable header so chunk digests and startup manifests
-    # do not change between Windows and Linux. Deflate data and CRC stay intact.
-    return encoded[:9] + b"\xff" + encoded[10:]
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -148,13 +141,15 @@ def _refresh_scenario_source_hashes(app_root: Path) -> None:
             continue
         paths = {
             "base_topology_sha256": app_root / "data/europe_topology.json",
-            "runtime_topology_sha256": manifest_path.parent / "runtime_topology.topo.json",
             "runtime_bootstrap_topology_sha256": manifest_path.parent / "runtime_topology.bootstrap.topo.json",
             "detail_chunk_manifest_sha256": manifest_path.parent / "detail_chunks.manifest.json",
             "countries_sha256": manifest_path.parent / "countries.json",
             "owners_sha256": manifest_path.parent / "owners.by_feature.json",
             "cores_sha256": manifest_path.parent / "cores.by_feature.json",
         }
+        runtime_url = str(manifest.get("runtime_topology_url") or "").strip()
+        if runtime_url:
+            paths["runtime_topology_sha256"] = _local_data_path(app_root, runtime_url)
         hashes = {key: hashlib.sha256(path.read_bytes()).hexdigest() for key, path in paths.items() if path.is_file()}
         # Replace only digest string tokens. Geometry and numeric tokens in the
         # startup bundle stay byte exact, including beyond float precision.
@@ -238,6 +233,9 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
     # Existing startup sidecars must exactly match any newly compacted plain
     # payload. Keep the plain startup fallback until its contract is migrated.
     for path in sorted(data_root.rglob("*.json.gz")):
+        # A compressed canonical runtime is a source, not a regenerated sidecar.
+        if path.name == "runtime_topology.topo.json.gz":
+            continue
         plain = path.with_suffix("")
         if plain.is_file() and plain.resolve() not in excluded:
             path.write_bytes(portable_gzip_bytes(plain.read_bytes()))

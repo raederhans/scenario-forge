@@ -103,7 +103,7 @@ export function createPrecisionScalingRecords(existingRecords) {
   const foundationRoutes = [
     ["ci", "test-routing", "node --test tests/precision_foundation_ci_behavior.test.mjs", [
       "tools/ci/perf_policy.mjs", "tools/ci/pr_plan.mjs", "tests/precision_foundation_ci_behavior.test.mjs",
-      ".github/workflows/pr-verify.yml", ".github/workflows/perf-pr-gate.yml",
+      ".github/workflows/pr-verify.yml", ".github/workflows/perf-pr-gate.yml", ".github/workflows/perf-measure.yml",
     ]],
     ["patch", "renderer-runtime", "node --test tests/precision_foundation_patch_behavior.test.mjs", [
       "js/core/renderer/political_raster_patch_plan.js", "js/core/renderer/geometry_raster_runtime_owner.js",
@@ -160,6 +160,28 @@ export function createPrecisionScalingRecords(existingRecords) {
     commandRef: "node tools/probe_transport_lifetime.mjs --report-dir .runtime/reports/generated/transport-lifetime",
     sourceRefs: ["tools/probe_transport_lifetime.mjs"], selectorOrder: start + records.length,
   });
+  records.push({ ...records[0], id: "local:pr-delivery:plan",
+    commandRef: "node --test tests/pr_delivery_plan_behavior.test.mjs",
+    sourceRefs: ["tools/ci/pr_delivery_plan.mjs", "tests/pr_delivery_plan_behavior.test.mjs"],
+    ownerHints: ["test-routing"], domains: ["test-routing"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:pr-delivery:lanes",
+    commandRef: "node --test tests/pr_ci_plan_behavior.test.mjs tests/pr_delivery_lanes_behavior.test.mjs tests/perf_observation_gate_behavior.test.mjs",
+    sourceRefs: ["tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", ".github/workflows/pr-verify.yml",
+      ".github/workflows/verify-shared.yml", ".github/workflows/perf-pr-gate.yml", ".github/workflows/perf-measure.yml",
+      "tests/pr_ci_plan_behavior.test.mjs", "tests/pr_delivery_lanes_behavior.test.mjs", "tests/perf_observation_gate_behavior.test.mjs"],
+    ownerHints: ["test-routing"], domains: ["test-routing"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:pages-source:graph",
+    commandRef: "verify:pages-source-graph",
+    sourceRefs: ["tools/check_pages_source_graph.py", "tools/build_pages_dist.py", "tools/app_entry_resolver.py"],
+    ownerHints: ["deploy-runtime"], domains: ["pages-dist"], selectorOrder: start + records.length,
+  });
+  records.push({ ...records[0], id: "local:pages-source:contract",
+    commandRef: "python -m unittest tests.test_pages_source_graph -q",
+    sourceRefs: ["tools/check_pages_source_graph.py", "tools/build_pages_dist.py", "tests/test_pages_source_graph.py"],
+    ownerHints: ["deploy-runtime"], domains: ["pages-dist"], selectorOrder: start + records.length,
+  });
   const wireRoutes = [
     ["codec", "geo-contract", "python -m unittest tests.test_scenario_chunk_format tests.test_lossless_topology -q", [
       "tools/scenario_chunk_format.py", "tools/lossless_topology.py", "tests/test_scenario_chunk_format.py", "tests/test_lossless_topology.py",
@@ -175,6 +197,24 @@ export function createPrecisionScalingRecords(existingRecords) {
   for (const [id, domain, commandRef, sourceRefs] of wireRoutes) records.push({
     ...records[0], id: "local:topology-wire:" + id, commandRef, sourceRefs,
     ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
+  });
+  // The discovered unittest entrypoints retain their standalone commands beside
+  // the combined wire-builder and pytest routes.
+  for (const [id, testModule] of [
+    ["builder-coarse", "test_coarse_wire_assets"],
+    ["builder-contracts", "test_scenario_chunk_format_contracts"],
+    ["shared-lod", "test_political_coarse_shared_lod"],
+  ]) records.push({
+    ...records[0], id: "local:topology-wire:" + id,
+    commandRef: "python -m unittest tests." + testModule + " -q",
+    sourceRefs: ["tests/" + testModule + ".py", "tools/scenario_chunk_assets.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
+  });
+  records.push({
+    ...records[0], id: "local:topology-wire:runtime-source",
+    commandRef: "python -m unittest tests.test_runtime_topology_source -q",
+    sourceRefs: ["map_builder/json_source.py", "map_builder/io/readers.py", "tests/test_runtime_topology_source.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], selectorOrder: start + records.length,
   });
   return records;
 }

@@ -8,6 +8,7 @@ from pathlib import Path
 from shapely.geometry import Point, shape
 from shapely.ops import nearest_points, unary_union
 from topojson.utils import serialize_as_geojson
+from map_builder.json_source import json_source_sha256, read_json_source
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -371,7 +372,7 @@ def _load_scenario_water_features():
 
 
 def _load_runtime_water_features():
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     feature_collection = serialize_as_geojson(payload, objectname="scenario_water")
     return feature_collection.get("features", [])
 
@@ -383,18 +384,18 @@ def _load_runtime_bootstrap_water_features():
 
 
 def _load_runtime_political_features():
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     feature_collection = serialize_as_geojson(payload, objectname="political")
     return feature_collection.get("features", [])
 
 
 def _load_runtime_topology_feature_collection(object_name):
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     return serialize_as_geojson(payload, objectname=object_name)
 
 
 def _load_runtime_topology_feature_collections_for_d3(object_names):
-    payload = json.loads(RUNTIME_WATER_PATH.read_text(encoding="utf-8"))
+    payload = read_json_source(RUNTIME_WATER_PATH)
     return _topology_objects_to_feature_collections_for_d3(payload, object_names)
 
 
@@ -1399,10 +1400,27 @@ def test_tno_water_family_refinement_terminal_source_reviews_exit_actionable_que
         generated_at="2026-06-02T00:00:00Z",
     )
 
-    # New source-backed siblings have not undergone a child-source terminal
-    # review. Keep them visible as follow-up work instead of declaring closure.
+    # Source-backed macro siblings still need child-source review. Existing
+    # detail children belong to those families, not the macro backlog queue.
     from map_builder.geo.marine_refinement import tno_additional_specs
-    expected_remaining_backlog_ids = {spec["id"] for spec in tno_additional_specs()}
+    additional_specs = tno_additional_specs()
+    parents_with_children = {
+        feature["properties"]["parent_id"]
+        for feature in water_payload["features"]
+        if feature["properties"].get("parent_id")
+    }
+    expected_remaining_backlog_ids = {
+        spec["id"] for spec in additional_specs
+        if spec["region_group"] == "marine_macro" and spec["id"] not in parents_with_children
+    }
+    detail_ids = {
+        spec["id"] for spec in additional_specs if spec["region_group"] == "marine_detail"
+    }
+    north_sea_detail_ids = {
+        spec["id"] for spec in additional_specs if spec.get("parent_id") == "tno_north_sea"
+    }
+    assert len(north_sea_detail_ids) == 8
+    assert parents_with_children.isdisjoint(expected_remaining_backlog_ids)
     assert len(reviewed_ids) == 44
     assert reviewed_ids <= {item["id"] for item in report["terminal_public_source_candidates"]}
     reviewed_rows = [row for row in report["families"] if row["id"] in reviewed_ids]
@@ -1412,8 +1430,24 @@ def test_tno_water_family_refinement_terminal_source_reviews_exit_actionable_que
     assert reviewed_ids.isdisjoint({item["id"] for item in report["high_precision_split_candidates"]})
     assert reviewed_ids.isdisjoint({item["id"] for item in report["source_replacement_candidates"]})
     assert {item["id"] for item in report["backlog_candidates"]} == expected_remaining_backlog_ids
+    assert detail_ids.isdisjoint({item["id"] for item in report["backlog_candidates"]})
     assert report["summary"]["terminal_public_source_candidate_count"] == len(reviewed_ids)
-    assert report["summary"]["high_precision_split_candidate_count"] == 0
+    # New detailed coastlines need their own child-source review. Their
+    # admission must not fabricate a terminal review to keep this queue empty.
+    expected_high_precision_ids = {
+        "tno_davis_strait",
+        "tno_coastal_waters_of_southeast_alaska_and_british_columbia",
+        # The Antarctic expansion shifts the population percentile threshold;
+        # Kara's existing detailed geometry now also warrants child-source review.
+        "tno_kara_sea",
+        # Wave 7 adds two detailed coastlines (18,899 / 11,103 vertices)
+        # without reviewed child partitions; retain them in the review queue.
+        "tno_vestfjorden",
+        "tno_frobisher_bay",
+    }
+    actual_high_precision_ids = {item["id"] for item in report["high_precision_split_candidates"]}
+    assert actual_high_precision_ids == expected_high_precision_ids, actual_high_precision_ids
+    assert report["summary"]["high_precision_split_candidate_count"] == len(expected_high_precision_ids)
     assert report["summary"]["backlog_candidate_count"] == len(expected_remaining_backlog_ids)
 
 
@@ -2038,7 +2072,7 @@ def test_tno_manifest_and_startup_bundles_reflect_current_water_bootstrap():
         (STARTUP_BUNDLE_EN_PATH, STARTUP_BUNDLE_EN_GZIP_PATH),
         (STARTUP_BUNDLE_ZH_PATH, STARTUP_BUNDLE_ZH_GZIP_PATH),
     )
-    expected_runtime_sha = _sha256_path(RUNTIME_WATER_PATH)
+    expected_runtime_sha = json_source_sha256(RUNTIME_WATER_PATH)
     expected_bootstrap_sha = _sha256_path(RUNTIME_BOOTSTRAP_WATER_PATH)
     expected_detail_manifest_sha = _sha256_path(DETAIL_CHUNK_MANIFEST_PATH)
     expected_named_marginal_count = len(tno_bundle.TNO_NAMED_MARGINAL_WATER_SPECS)

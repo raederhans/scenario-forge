@@ -773,6 +773,140 @@ def _simplify_political_coarse_geometry(geometry: dict[str, Any] | None) -> dict
     return mapping(simplified)
 
 
+def _polygon_rings(geometry: dict[str, Any]) -> list:
+    if geometry.get("type") == "Polygon":
+        return geometry.get("coordinates") or []
+    if geometry.get("type") == "MultiPolygon":
+        return [ring for polygon in geometry.get("coordinates") or [] for ring in polygon]
+    return []
+
+
+def _canada_parallel_edges(feature: dict[str, Any]) -> list:
+    """The reviewed territorial/provincial seam, including quantized 60N."""
+    if not _feature_id(feature, 0).startswith("CA_FED_"):
+        return []
+    return [(a, b) for ring in _polygon_rings(feature.get("geometry") or {})
+            for a, b in zip(ring, ring[1:])
+            if a[1] == b[1] and abs(a[1] - 60.0) < 0.01 and a[0] != b[0]]
+
+
+def _map_polygon_rings(geometry: dict[str, Any], transform) -> dict[str, Any]:
+    if geometry.get("type") == "Polygon":
+        coordinates = [transform(ring) for ring in geometry["coordinates"]]
+    elif geometry.get("type") == "MultiPolygon":
+        coordinates = [[transform(ring) for ring in polygon] for polygon in geometry["coordinates"]]
+    else:
+        return geometry
+    return {**geometry, "coordinates": coordinates}
+
+
+def _normalize_canada_parallel_boundary_nodes(feature_collection: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Node both sides from existing source vertices without moving the seam.
+
+    Equal planar lines with different segment endpoints are different great-circle
+    paths in D3. Union the source nodes at this reviewed parallel for detail and
+    fallback geometry; coarse must retain these exact nodes after simplification.
+    """
+    features = _feature_collection_features(feature_collection)
+    nodes_by_latitude: dict[float, set[float]] = defaultdict(set)
+    for feature in features:
+        for a, b in _canada_parallel_edges(feature):
+            nodes_by_latitude[a[1]].update((a[0], b[0]))
+    if not nodes_by_latitude:
+        return feature_collection
+
+    def node_ring(ring):
+        output = []
+        for a, b in zip(ring, ring[1:]):
+            output.append(list(a))
+            if a[1] == b[1] and a[1] in nodes_by_latitude:
+                middle = sorted(x for x in nodes_by_latitude[a[1]] if min(a[0], b[0]) < x < max(a[0], b[0]))
+                if b[0] < a[0]:
+                    middle.reverse()
+                output.extend([x, a[1]] for x in middle)
+        return output + [list(ring[-1])] if ring else []
+
+    normalized = [
+        {**feature, "geometry": _map_polygon_rings(feature["geometry"], node_ring)}
+        if _canada_parallel_edges(feature) else feature
+        for feature in features
+    ]
+    return {**feature_collection, "features": normalized}
+
+
+def _retain_canada_parallel_boundary_nodes(feature: dict[str, Any], geometry: dict[str, Any]) -> dict[str, Any]:
+    edges = _canada_parallel_edges(feature)
+    if not edges:
+        return geometry
+    nodes = {tuple(point) for edge in edges for point in edge}
+    # Restore the original endpoints as well as interior nodes. Rounding even
+    # an endpoint would separate a coarse polygon from its exact detail neighbour.
+    exact_by_rounded = {tuple(round(value, POLITICAL_COARSE_ROUND_DECIMALS) for value in point): point
+                        for point in nodes}
+
+    def retain_ring(ring):
+        restored = [exact_by_rounded.get(tuple(point), tuple(point)) for point in ring]
+        output = []
+        for a, b in zip(restored, restored[1:]):
+            output.append(list(a))
+            if a in nodes and b in nodes and a[1] == b[1]:
+                middle = sorted(point for point in nodes if point[1] == a[1]
+                                and min(a[0], b[0]) < point[0] < max(a[0], b[0]))
+                if b[0] < a[0]:
+                    middle.reverse()
+                output.extend(list(point) for point in middle)
+        return output + [list(restored[-1])] if restored else []
+
+    return _map_polygon_rings(geometry, retain_ring)
+
+
+def normalize_canada_topology(topology: dict[str, Any]) -> dict[str, Any]:
+    """Return an exact, bounded 60N node repair for the runtime fallback too.
+
+    Decode only Canadian features without implicit winding/validity repair.
+    Re-encode only changed polygons, preserving every property, object and
+    neighbour record. Untouched coordinates are never requantized.
+    """
+    from copy import deepcopy
+    from map_builder.processors.arctic_recovery import decoded_structure
+    from map_builder.regional_geometry import (
+        _absolute_topology, _compact_arcs, _encode_exact_coverage, _offset_arcs,
+    )
+
+    candidates = [item for item in topology.get("objects", {}).get("political", {}).get("geometries", [])
+                  if str((item.get("properties") or {}).get("id", "")).startswith("CA_FED_")]
+    if not candidates:
+        return deepcopy(topology)
+    result = _absolute_topology(topology)
+    rows = result["objects"]["political"]["geometries"]
+    features = []
+    for row in rows:
+        if not str((row.get("properties") or {}).get("id", "")).startswith("CA_FED_"):
+            continue
+        decoded = decoded_structure(result, row)
+        if decoded.get("type") not in POLITICAL_COARSE_SIMPLIFY_GEOMETRY_TYPES:
+            continue
+        features.append({"type": "Feature", "properties": row["properties"],
+                         "geometry": {"type": decoded["type"], "coordinates": decoded["coordinates"]}})
+    normalized = _normalize_canada_parallel_boundary_nodes({"type": "FeatureCollection", "features": features})
+    changes = {original["properties"]["id"]: shape(updated["geometry"])
+               for original, updated in zip(features, normalized["features"])
+               if original["geometry"] != updated["geometry"]}
+    if not changes:
+        return deepcopy(topology)
+    encoded = _encode_exact_coverage(list(changes), list(changes.values()))
+    offset = len(result["arcs"])
+    result["arcs"].extend(encoded["arcs"])
+    replacements = {item["properties"]["id"]: item
+                    for item in encoded["objects"]["political"]["geometries"]}
+    for row in rows:
+        replacement = replacements.get((row.get("properties") or {}).get("id"))
+        if replacement:
+            row.update(type=replacement["type"], arcs=_offset_arcs(replacement["arcs"], offset))
+    _compact_arcs(result)
+    return result
+
+
 def _shared_fr_arr_simplified_geometries(
     features: list[dict[str, Any]],
     *,
@@ -915,7 +1049,7 @@ def _optimize_political_coarse_payload(
         "atl_geometry_role",
         "atl_join_mode",
     )
-    source_features = payload.get("features") or []
+    source_features = _normalize_canada_parallel_boundary_nodes(payload).get("features") or []
     # A complete map names actual independently replaceable detail shards.
     # Preserve each shard envelope exactly; only its internal shared edges may
     # move. This also protects source gaps/water and inter-shard interfaces.
@@ -993,6 +1127,8 @@ def _optimize_political_coarse_payload(
                 {"geometry": _simplify_political_coarse_geometry(original_geometry)},
                 decimals=POLITICAL_COARSE_ROUND_DECIMALS,
             )
+            if isinstance(geometry, dict):
+                geometry = _retain_canada_parallel_boundary_nodes(feature, geometry)
         optimized_features.append(
             {
                 "type": "Feature",
@@ -1419,7 +1555,9 @@ def _build_political_chunk_payloads(
     # coarse 使用 startup/runtime 中可渲染的全局集合，detail 再按 owner 拆分；
     # 这样首屏能快速显示整体政治面，缩放后再加载国家级细节。
     startup_feature_collection = _topology_object_to_feature_collection(startup_topology_payload, "political")
-    runtime_feature_collection = _topology_object_to_feature_collection(runtime_topology_payload, "political")
+    runtime_feature_collection = _normalize_canada_parallel_boundary_nodes(
+        _topology_object_to_feature_collection(runtime_topology_payload, "political")
+    )
     coarse_feature_collection = _resolve_political_coarse_feature_collection(
         startup_feature_collection=startup_feature_collection,
         runtime_feature_collection=runtime_feature_collection,
@@ -1503,6 +1641,8 @@ def _build_political_chunk_payloads(
                 if reusable_political_chunks and cid in reusable_political_chunks
             ]
             if (
+                not any(_canada_parallel_edges(feature) for _feature_id, feature, _bounds in entries)
+                and
                 len(reusable_entries) == len(expected_chunk_ids)
                 and _reusable_detail_entries_match_owner(
                     scenario_dir,

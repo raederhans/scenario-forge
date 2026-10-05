@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
 import shapely
 from shapely.geometry import GeometryCollection, box, mapping, shape
 
+from map_builder.json_source import read_json_source
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
 from tools.scenario_chunk_format import decode_political_chunk
 
@@ -47,6 +48,8 @@ def mixed_coverage_sets(before, after, *, domain, additions):
 
 
 def read(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 

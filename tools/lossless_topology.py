@@ -398,6 +398,7 @@ def compact_large_runtime_topology(
     topology: dict[str, Any],
     *,
     max_bytes: int = 100 * 1024 * 1024,
+    allow_gzip_storage: bool = False,
 ) -> dict[str, Any]:
     """Losslessly compact an oversized runtime topology or require splitting."""
     if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes < 0:
@@ -416,11 +417,34 @@ def compact_large_runtime_topology(
     if source_size < max_bytes:
         return topology
 
+    if allow_gzip_storage:
+        from map_builder.json_source import portable_gzip_bytes
+
+        raw = json.dumps(topology, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        # A storage limit does not require topology rewriting when gzip fits.
+        # Preserve the validated arc identities, ring boundaries and references;
+        # repeated sharing passes can change merge stitching despite retaining
+        # every feature coordinate and mesh segment.
+        if len(raw) < max_bytes or len(portable_gzip_bytes(raw)) < max_bytes:
+            return topology
+        del raw
+
     candidate, _ = optimize_topology(topology, preserve_arc_identity=True)
     candidate_size = compact_size(candidate)
     chosen = candidate if candidate_size < source_size else topology
     chosen_size = min(candidate_size, source_size)
     if chosen_size >= max_bytes:
+        if allow_gzip_storage:
+            from map_builder.json_source import portable_gzip_bytes
+
+            raw = json.dumps(chosen, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
+            stored_size = len(portable_gzip_bytes(raw))
+            if stored_size < max_bytes:
+                return chosen
+            raise ValueError(
+                f"lossless runtime topology gzip storage is {stored_size} bytes (limit {max_bytes}); "
+                "split the payload instead of reducing coordinate precision"
+            )
         raise ValueError(
             f"lossless runtime topology is {chosen_size} bytes (limit {max_bytes}); "
             "split the payload instead of reducing coordinate precision"

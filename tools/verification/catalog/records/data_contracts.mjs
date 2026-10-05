@@ -342,7 +342,7 @@ export const DATA_CONTRACTS_RECORDS = [
     "commandRef": "verify:tno-polar-coverage",
     "sourceRefs": [
       "tools/validate_tno_water_geometries.py",
-      "data/scenarios/tno_1962/runtime_topology.topo.json",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
       "data/scenarios/tno_1962/water_regions.geojson"
     ],
     "ownerHints": [
@@ -381,7 +381,7 @@ export const DATA_CONTRACTS_RECORDS = [
     "sourceRefs": [
       "tools/validate_tno_water_geometries.py",
       "data/scenarios/tno_1962/water_regions.geojson",
-      "data/scenarios/tno_1962/runtime_topology.topo.json",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
       "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",
       "data/scenarios/tno_1962/detail_chunks.manifest.json",
       "data/scenarios/tno_1962/chunks/water"
@@ -1796,10 +1796,13 @@ export const DATA_CONTRACTS_RECORDS = [
   },
   {
     "id": "water:geometry-runtime-contract",
-    "commandRef": "node --test tests/water_geometry_runtime.test.mjs",
+    "commandRef": "node --test tests/water_geometry_runtime.test.mjs tests/marine_refinement_runtime.test.mjs",
     "sourceRefs": [
       "tools/check_water_geometry.mjs",
-      "tests/water_geometry_runtime.test.mjs"
+      "tests/water_geometry_runtime.test.mjs",
+      "tests/marine_refinement_runtime.test.mjs",
+      "tests/fixtures/ocean_wave6_probes.json",
+      "tests/fixtures/ocean_wave7_probes.json"
     ],
     "ownerHints": [
       "water-runtime"

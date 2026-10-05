@@ -13,12 +13,15 @@ import math
 from pathlib import Path
 
 from shapely.geometry import Point, shape
+from map_builder.json_source import read_json_source
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / '.runtime/tmp/us-county-upgrade/source-national-verified/counties.geojson'
 
 
 def read(path):
+    if Path(path).name in {'runtime_topology.topo.json', 'runtime_topology.topo.json.gz'}:
+        return read_json_source(path)
     return json.loads(Path(path).read_text(encoding='utf-8'))
 
 

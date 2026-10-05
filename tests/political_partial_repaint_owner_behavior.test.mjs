@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { projectCoordinateToWorkerPixel } from "../js/core/map_renderer/political_raster_worker_packet.js";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
@@ -6,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import { createPoliticalPartialRepaintOwner } from "../js/core/renderer/political_partial_repaint_owner.js";
 import { isPoliticalFeaturePathEntryCurrent } from "../js/core/renderer/political_path_cache_owner.js";
+import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feature_policy.js";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -67,6 +69,7 @@ function createHarness(overrides = {}) {
     getResolvedFeatureColor: () => "#654321",
     hashToColor: () => "#abcdef",
     buildWorkerPixelRingsForGeometry: () => [[[1, 2], [3, 4], [1, 2]]],
+    projectCoordinateToWorkerPixel,
     orderPoliticalShellUnderlayFirst: (items) => [...items],
     shouldExcludePoliticalVisualFeature: () => false,
     shouldSkipFeature: () => false,
@@ -158,6 +161,76 @@ function createHarness(overrides = {}) {
   });
   return { owner, state, cache, context, events, feature, transform, path, workerMetrics };
 }
+
+test("inline river full and partial loops replay intersecting parent units in global source order", () => {
+  let h;
+  let policy;
+  const candidates = [];
+  const paths = new Map();
+  h = createHarness({
+    getters: {
+      hasInlinePoliticalPartitions: () => true,
+      drawWorkerPoliticalFine: () => { throw Error("inline parents must bypass worker fine frames"); },
+    },
+    helpers: {
+      orderPoliticalShellUnderlayFirst: (entries) => policy.orderPoliticalShellUnderlayFirst(entries),
+      collectLandSpatialItemsForProjectedRects: () => ({ items: candidates, overflow: false }),
+      getPoliticalPathCacheHandle: () => ({ valid: true, map: paths }),
+      shouldExcludePoliticalVisualFeature: (feature) => feature.hidden === true,
+    },
+    effects: { drawPartitionForParent: (feature, k) => {
+      h.events.push(["cells", feature.id, k], ["contour", feature.id, k]);
+    } },
+  });
+  const lower = h.feature;
+  const upper = { id: "upper", geometry: {} };
+  const third = { id: "third", geometry: {} };
+  const underlay = { id: "primary", properties: { __source: "primary" }, geometry: {} };
+  const hidden = { id: "hidden", geometry: {}, hidden: true };
+  h.state.landData.features = [lower, underlay, upper, hidden, third];
+  h.state.visualOverrides = { "land-1": "#ff0000" };
+  for (const [drawOrder, feature] of h.state.landData.features.entries()) {
+    h.state.landIndex.set(feature.id, feature);
+    paths.set(feature.id, { path: { id: feature.id }, geometryRef: feature.geometry });
+    candidates.unshift({ id: feature.id, feature, drawOrder });
+  }
+  policy = createPoliticalFeaturePolicy(h.state, {
+    getFeatureId: (feature) => feature?.id || "",
+    getSafeCanvasColor: (color, fallback) => color || fallback,
+    hasPendingPoliticalColorEdit: () => true,
+    getRenderPassCacheState: () => ({ pendingPoliticalColorEditIds: new Set(["land-1"]) }),
+    isStablePaintOrderEnabled: () => true,
+  });
+  const units = () => h.events.filter((event) => Array.isArray(event)
+    && ["fill", "cells", "contour"].includes(event[0]))
+    .map(([kind, value]) => `${kind}:${value?.id || value}`);
+  const expected = ["primary", "land-1", "upper", "third"]
+    .flatMap((id) => [`fill:${id}`, `cells:${id}`, `contour:${id}`]);
+  const identity = { transform: h.transform, canvasWidth: 100, canvasHeight: 100 };
+  const metrics = h.owner.drawPoliticalFineFeatureLoop({ k: 1, identity, viewport: { visibleItems: candidates } });
+  assert.equal(metrics.renderedCount, 4);
+  assert.deepEqual(units(), expected);
+  h.events.length = 0;
+  assert.equal(h.owner.tryPartialPoliticalPassRepaint(h.transform, "next", {}), true);
+  assert.deepEqual(units(), expected, "a dirty lower face replays every upper face that intersects its dirty area");
+  assert.equal(h.events.find((event) => event[0] === "clear-pending")[1].renderedIds.has("hidden"), false);
+});
+
+test("inline river mode blocks direct worker packets before any geometry serialization", () => {
+  let inline = true;
+  const h = createHarness({
+    getters: { hasInlinePoliticalPartitions: () => inline },
+    helpers: { buildWorkerPixelRingsForGeometry: () => {
+      if (inline) throw Error("river parent units cannot be represented by base-only packets");
+      return [[[0, 0], [1, 1], [0, 0]]];
+    } },
+  });
+  assert.deepEqual(h.owner.buildPoliticalRasterWorkerPacket(), {
+    packet: null, packetBuildMs: 0, reason: "inline-political-partitions",
+  });
+  inline = false;
+  assert.equal(h.owner.buildPoliticalRasterWorkerPacket().reason, "ok");
+});
 
 test("accepted worker fine frame bypasses synchronous geometry and preserves its result", () => {
   const result = { fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["land-1"]) };

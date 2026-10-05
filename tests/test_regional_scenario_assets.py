@@ -13,7 +13,9 @@ from topojson import Topology
 
 from tools.regional_scenario_assets import build_regional_scenario_assets
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
-from tools.build_tno_russia_precision_assets import sizes
+from tools.build_tno_russia_precision_assets import finalize_stage, sizes
+from tools.regional_scenario_assets import _copy_gzip
+from map_builder.json_source import read_json_source, write_runtime_topology_source
 
 
 def _runtime(features, *, extra=None):
@@ -25,6 +27,72 @@ def _f(fid, x):
 
 
 class RegionalScenarioAssetsTest(unittest.TestCase):
+    def test_strict_and_optional_readers_accept_canonical_fallback(self):
+        from map_builder.io.readers import read_json_optional, read_json_strict
+        with tempfile.TemporaryDirectory() as d:
+            plain = Path(d) / "runtime_topology.topo.json"
+            compressed = plain.with_name(plain.name + ".gz")
+            compressed.write_bytes(gzip.compress(b'\xef\xbb\xbf{"ok":true}'))
+            self.assertEqual(read_json_strict(plain), {"ok": True})
+            self.assertEqual(read_json_optional(plain), {"ok": True})
+            with self.assertRaisesRegex(ValueError, "parse JSON"):
+                read_json_strict(plain, encodings=("utf-8",))
+            compressed.write_bytes(b'{}')
+            self.assertIsNone(read_json_optional(plain))
+
+    def test_gzip_only_runtime_updates_manifest_and_survives_finalization(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            baseline, candidate = self._fixture(root)
+            old_plain = baseline / "runtime_topology.topo.json"
+            old_gz = old_plain.with_name(old_plain.name + ".gz")
+            old_gz.write_bytes(gzip.compress(old_plain.read_bytes()))
+            old_plain.unlink()
+            manifest = read_json_source(baseline / "manifest.json")
+            manifest["runtime_topology_url"] += ".gz"
+            (baseline / "manifest.json").write_text(json.dumps(manifest))
+            payload = read_json_source(candidate)
+            payload["padding"] = "same precise coordinates" * 200
+            candidate_gz = candidate.with_name(candidate.name + ".gz")
+            candidate_gz.write_bytes(gzip.compress(json.dumps(payload).encode("utf-8")))
+            output = root / "out"
+            with patch("tools.regional_scenario_assets.write_runtime_topology_source",
+                       side_effect=lambda directory, value: write_runtime_topology_source(directory, value, max_bytes=600)):
+                build_regional_scenario_assets(baseline_dir=baseline, candidate_runtime_path=candidate_gz, output_dir=output)
+            manifest = read_json_source(output / "manifest.json")
+            runtime = output / "runtime_topology.topo.json.gz"
+            self.assertEqual(manifest["runtime_topology_url"], "data/scenarios/demo/" + runtime.name)
+            self.assertEqual(manifest["source"]["runtime_topology_sha256"], hashlib.sha256(runtime.read_bytes()).hexdigest())
+            self.assertFalse((output / "runtime_topology.topo.json").exists())
+            self.assertEqual(read_json_source(runtime)["arcs"], payload["arcs"])
+            self.assertIn("computed_neighbors", read_json_source(runtime)["objects"]["political"])
+            _copy_gzip(runtime)
+            self.assertFalse(runtime.with_name(runtime.name + ".gz").exists())
+            with (patch("tools.check_scenario_contracts.apply_safe_scenario_contract_repairs", return_value=[]),
+                  patch("tools.check_scenario_contracts._build_snapshot_for_scenario", return_value={"snapshot_fingerprint": "test"}),
+                  patch("tools.check_scenario_contracts._refresh_audit_payload")):
+                finalize_stage(output)
+            self.assertEqual(read_json_source(runtime)["arcs"], payload["arcs"])
+
+    def test_gzip_baseline_can_return_to_small_plain_canonical_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            baseline, candidate = self._fixture(root)
+            plain = baseline / "runtime_topology.topo.json"
+            compressed = plain.with_name(plain.name + ".gz")
+            compressed.write_bytes(gzip.compress(plain.read_bytes()))
+            plain.unlink()
+            manifest = read_json_source(baseline / "manifest.json")
+            manifest["runtime_topology_url"] += ".gz"
+            (baseline / "manifest.json").write_text(json.dumps(manifest))
+            output = root / "out"
+            build_regional_scenario_assets(baseline_dir=baseline, candidate_runtime_path=candidate, output_dir=output)
+            manifest = read_json_source(output / "manifest.json")
+            self.assertEqual(manifest["runtime_topology_url"], "data/scenarios/demo/runtime_topology.topo.json")
+            plain = output / "runtime_topology.topo.json"
+            self.assertEqual(manifest["source"]["runtime_topology_sha256"], hashlib.sha256(plain.read_bytes()).hexdigest())
+            self.assertEqual(plain.read_bytes(), gzip.decompress(plain.with_name(plain.name + ".gz").read_bytes()))
+
     def test_size_report_compresses_shared_files_once_and_remeasures_changes(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

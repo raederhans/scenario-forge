@@ -5,6 +5,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
+from map_builder.json_source import json_source_sha256, resolve_json_source_path
 from map_builder.contracts import (
     SCENARIO_CHECKPOINT_GEO_LOCALE_FILENAME,
     SCENARIO_GEO_LOCALE_PATCH_FILENAMES_BY_LANGUAGE,
@@ -137,6 +138,8 @@ def _hash_inputs(paths: list[Path], *, scenario_dir: Path) -> dict[str, object]:
     entries: dict[str, object] = {}
     for path in paths:
         resolved = path.resolve()
+        if resolved.name == "runtime_topology.topo.json":
+            resolved = resolve_json_source_path(resolved)
         label = _relative_label(resolved, scenario_dir=scenario_dir)
         if not resolved.exists():
             entries[label] = {"exists": False}
@@ -151,7 +154,7 @@ def _hash_inputs(paths: list[Path], *, scenario_dir: Path) -> dict[str, object]:
         entries[label] = {
             "exists": True,
             "kind": "file",
-            "sha256": _sha256_path(resolved),
+            "sha256": json_source_sha256(resolved) if resolved.name == "runtime_topology.topo.json.gz" else _sha256_path(resolved),
             "size": resolved.stat().st_size,
         }
     return entries

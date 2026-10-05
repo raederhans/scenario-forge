@@ -1,0 +1,1975 @@
+{
+  "schemaVersion": 1,
+  "status": "offline-reviewed-candidates-not-enabled",
+  "sceneId": "modern_world",
+  "baseCommit": "2da4db61c3533f621afe2be0fe6ff494d567eb92",
+  "source": {
+    "landPath": "data/scenarios/modern_world/runtime_topology.topo.json",
+    "landDigest": "sha256:917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
+    "riverPath": "data/global_rivers.geojson",
+    "riverDigest": "sha256:60dbebd1fc2d4f9ba8b6d5327a99960c6bfcbe9c6df1d5d4508d0b70fa950a04",
+    "includeLakeCenterlines": true,
+    "baseCommit": "2da4db61c3533f621afe2be0fe6ff494d567eb92",
+    "riverNames": [
+      "Danube",
+      "Elbe",
+      "Oder",
+      "Rhine",
+      "Seine"
+    ],
+    "baselineHash": "7ee2527fd2eef0f5f50356a3e41089499f08c0573b642be295453389fbdc8966"
+  },
+  "candidate": {
+    "path": ".runtime/river-eu/europe.candidate.json",
+    "packId": "sha256:2fa1cb8655636f54dc81eef28794cc44d4c75d4b208fa037edf289fedf5f454d",
+    "parentCount": 60,
+    "cellCount": 151,
+    "supportCount": 64,
+    "bytes": 781876
+  },
+  "interpretation": {
+    "candidate": "Geometry, source alignment, deterministic IDs and overlay review passed; main conversation still owns runtime admission.",
+    "repair": "Overlay shows border-line precision or inadequate useful cross-bank geometry; retained offline, never truncated.",
+    "nextReview": "Geometry passed; listed for the next visual review, not approved.",
+    "excludedUncut": "Current source does not close a complete cut; original parent remains intact.",
+    "corridor": "Geographic planning label from parent location; not a measured river chainage or guarantee of gap-free coverage."
+  },
+  "generatorCommand": {
+    "executable": "python",
+    "script": "tools/build_river_partitions.py",
+    "land": "data/scenarios/modern_world/runtime_topology.topo.json",
+    "rivers": "data/global_rivers.geojson",
+    "sceneId": "modern_world",
+    "riverNames": [
+      "Danube",
+      "Elbe",
+      "Oder",
+      "Rhine",
+      "Seine"
+    ],
+    "includeLakeCenterlines": true,
+    "baseCommit": "2da4db61c3533f621afe2be0fe6ff494d567eb92",
+    "baselineHash": "7ee2527fd2eef0f5f50356a3e41089499f08c0573b642be295453389fbdc8966",
+    "maxParents": 60,
+    "parentIds": [
+      "AT130",
+      "CH031",
+      "CH052",
+      "CZ_ADM2_57006924B13920789422451",
+      "CZ_ADM2_57006924B25962740711880",
+      "CZ_ADM2_57006924B28286346415780",
+      "CZ_ADM2_57006924B32813693256962",
+      "CZ_ADM2_57006924B46613202139284",
+      "CZ_ADM2_57006924B57972685793284",
+      "CZ_ADM2_57006924B5960993849333",
+      "CZ_ADM2_57006924B81305487356227",
+      "CZ_ADM2_57006924B9167412778740",
+      "CZ_ADM2_57006924B9844142294582",
+      "CZ_ADM2_57006924B98928131689088",
+      "DE137",
+      "DE144",
+      "DE145",
+      "DE149",
+      "DE211",
+      "DE222",
+      "DE224",
+      "DE226",
+      "DE232",
+      "DE277",
+      "DE27D",
+      "DE600",
+      "DEA11",
+      "DEA1F",
+      "DEA22",
+      "DEA23",
+      "DEB11",
+      "DEB35",
+      "DEB38",
+      "DED21",
+      "DED2E",
+      "DED2F",
+      "DEE01",
+      "DEE03",
+      "DEE0C",
+      "FR_ARR_10002",
+      "FR_ARR_10003",
+      "FR_ARR_21003",
+      "FR_ARR_27001",
+      "FR_ARR_77002",
+      "FR_ARR_77004",
+      "FR_ARR_78001",
+      "FR_ARR_78003",
+      "FR_ARR_91002",
+      "FR_ARR_92002",
+      "HU110",
+      "NL226",
+      "PL_POW_0203",
+      "PL_POW_0215",
+      "PL_POW_0802",
+      "PL_POW_1605",
+      "PL_POW_2411",
+      "PL_POW_3262",
+      "RS110",
+      "RS123",
+      "SK_ADM2_56367889B61252856682831"
+    ],
+    "output": ".runtime/river-eu/europe.candidate.json"
+  },
+  "rivers": [
+    {
+      "river": "Seine",
+      "sourceFeatures": [
+        {
+          "properties": {
+            "name": "Seine",
+            "name_en": "Seine",
+            "featurecla": "River",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_399"
+          },
+          "bounds": [
+            0.4932,
+            47.5126,
+            4.7126,
+            49.5272
+          ]
+        }
+      ],
+      "lineComponents": 1,
+      "summary": {
+        "candidate": 10,
+        "next_review": 12,
+        "legacy": 2,
+        "excluded": 1
+      },
+      "selectedParents": [
+        {
+          "parentId": "FR_ARR_10002",
+          "sourceName": "Nogent-sur-Seine",
+          "countryCode": "FR",
+          "corridor": "上游 Montbard–Troyes–Nogent",
+          "selectionReason": "补上 Troyes 与 Paris 走廊间的多次进出段；5面及原洞全部保留。",
+          "cells": 5,
+          "smallestFacePlanarShare": 0.00012008757042400498,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_10003",
+          "sourceName": "Troyes",
+          "countryCode": "FR",
+          "corridor": "上游 Montbard–Troyes–Nogent",
+          "selectionReason": "上游中心城镇段；主体跨岸并保留边缘小片。",
+          "cells": 5,
+          "smallestFacePlanarShare": 0.00036106296938148675,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_21003",
+          "sourceName": "Montbard",
+          "countryCode": "FR",
+          "corridor": "上游 Montbard–Troyes–Nogent",
+          "selectionReason": "上游 Montbard–Troyes–Nogent的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.32572249690088634,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_27001",
+          "sourceName": "Andelys",
+          "countryCode": "FR",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "selectionReason": "下游 Paris 西侧–Rouen 走廊的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.0006944444444442687,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_77002",
+          "sourceName": "Melun",
+          "countryCode": "FR",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "selectionReason": "上中游连接段，保留4面而非简化为二分。",
+          "cells": 4,
+          "smallestFacePlanarShare": 0.0012817480442695445,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_77004",
+          "sourceName": "Fontainebleau",
+          "countryCode": "FR",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "selectionReason": "中游 Fontainebleau–Paris 都市走廊的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.006933997485076872,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_78001",
+          "sourceName": "Mantes-la-Jolie",
+          "countryCode": "FR",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "selectionReason": "下游 Paris 西侧–Rouen 走廊的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.025509911860342814,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_78003",
+          "sourceName": "Saint-Germain-en-Laye",
+          "countryCode": "FR",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "selectionReason": "Paris 西侧弯曲河段，3面均保留。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.08425801819072096,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_91002",
+          "sourceName": "Évry",
+          "countryCode": "FR",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "selectionReason": "中游 Fontainebleau–Paris 都市走廊的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.00993264496912814,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "FR_ARR_92002",
+          "sourceName": "Nanterre",
+          "countryCode": "FR",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "selectionReason": "下游 Paris 西侧–Rouen 走廊的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.20625202176762159,
+          "visualEvidence": ".runtime/river-eu/seine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        }
+      ],
+      "repairBeforeAdmission": [],
+      "excludedUncut": [
+        {
+          "parentId": "FR_ARR_76002",
+          "sourceName": "Havre",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        }
+      ],
+      "existingApprovedParentIds": [
+        "FR_ARR_75001",
+        "FR_ARR_76003"
+      ],
+      "nextReview": [
+        {
+          "parentId": "FR_ARR_21002",
+          "sourceName": "Dijon",
+          "corridor": "上游 Montbard–Troyes–Nogent",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_27002",
+          "sourceName": "Bernay",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_51002",
+          "sourceName": "Épernay",
+          "corridor": "上游 Montbard–Troyes–Nogent",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_77003",
+          "sourceName": "Provins",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_91003",
+          "sourceName": "Palaiseau",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_92003",
+          "sourceName": "Boulogne-Billancourt",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_93003",
+          "sourceName": "Saint-Denis",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_94001",
+          "sourceName": "Créteil",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_94002",
+          "sourceName": "Nogent-sur-Marne",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_94003",
+          "sourceName": "Haÿ-les-Roses",
+          "corridor": "中游 Fontainebleau–Paris 都市走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_95001",
+          "sourceName": "Argenteuil",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_95003",
+          "sourceName": "Pontoise",
+          "corridor": "下游 Paris 西侧–Rouen 走廊",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        }
+      ]
+    },
+    {
+      "river": "Elbe",
+      "sourceFeatures": [
+        {
+          "properties": {
+            "name": "Elbe",
+            "name_en": "Elbe",
+            "featurecla": "River",
+            "scalerank": 5,
+            "min_zoom": 4.7,
+            "id": "river_636"
+          },
+          "bounds": [
+            9.819,
+            50.0212,
+            15.9321,
+            53.5498
+          ]
+        }
+      ],
+      "lineComponents": 9,
+      "summary": {
+        "repair": 1,
+        "candidate": 16,
+        "next_review": 9,
+        "excluded": 2,
+        "legacy": 2
+      },
+      "selectedParents": [
+        {
+          "parentId": "DE600",
+          "sourceName": "Hamburg",
+          "countryCode": "DE",
+          "corridor": "下游 Stendal–Hamburg",
+          "selectionReason": "下游港城多支源线/重复边界进出，5面；源线内部悬支未补长。",
+          "cells": 5,
+          "smallestFacePlanarShare": 0.0001505907808422341,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DED21",
+          "sourceName": "Dresden, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "中游 Dresden–Magdeburg的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.4002623506239652,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DED2E",
+          "sourceName": "Meißen",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "中游 Dresden–Magdeburg的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.38640940074280555,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DED2F",
+          "sourceName": "Sächsische Schweiz-Osterzgebirge",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "中游 Dresden–Magdeburg的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.27598299982794133,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEE01",
+          "sourceName": "Dessau-Roßlau, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "中游 Dresden–Magdeburg的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.4400953688550563,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEE03",
+          "sourceName": "Magdeburg, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "中游 Dresden–Magdeburg的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3485089145789666,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEE0C",
+          "sourceName": "Salzlandkreis",
+          "countryCode": "DE",
+          "corridor": "中游 Dresden–Magdeburg",
+          "selectionReason": "补上 Dessau–Magdeburg 走廊；3面含边缘小片。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.010568745603920284,
+          "visualEvidence": ".runtime/river-eu/elbe-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B5960993849333",
+          "sourceName": "Ústí nad Labem",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2494218429479458,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B57972685793284",
+          "sourceName": "Děčín",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.16372262724849818,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B28286346415780",
+          "sourceName": "Litoměřice",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.41550842270617155,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B46613202139284",
+          "sourceName": "Mělník",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.399076483378623,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B98928131689088",
+          "sourceName": "Hradec Králové",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2639527957016362,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B32813693256962",
+          "sourceName": "Pardubice",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.31200764547120874,
+          "visualEvidence": ".runtime/river-eu/elbe-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B9844142294582",
+          "sourceName": "Nymburk",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.20495096141314822,
+          "visualEvidence": ".runtime/river-eu/elbe-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B25962740711880",
+          "sourceName": "Kolín",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.25798023483016,
+          "visualEvidence": ".runtime/river-eu/elbe-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B9167412778740",
+          "sourceName": "Prague-East",
+          "countryCode": "CZ",
+          "corridor": "上游捷克段",
+          "selectionReason": "上游捷克段的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.1245220304681203,
+          "visualEvidence": ".runtime/river-eu/elbe-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        }
+      ],
+      "repairBeforeAdmission": [
+        {
+          "parentId": "DE40F",
+          "sourceName": "Prignitz",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "河线沿既有边界反复进出；新增面主要为边界窄条，需核对源精度。"
+        }
+      ],
+      "excludedUncut": [
+        {
+          "parentId": "DED53",
+          "sourceName": "Nordsachsen",
+          "corridor": "中游 Dresden–Magdeburg",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B50363024387408",
+          "sourceName": "Trutnov",
+          "corridor": "上游捷克段",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        }
+      ],
+      "existingApprovedParentIds": [
+        "DEE06",
+        "DEE0D"
+      ],
+      "nextReview": [
+        {
+          "parentId": "DE80O",
+          "sourceName": "Ludwigslust-Parchim",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE933",
+          "sourceName": "Harburg",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE934",
+          "sourceName": "Lüchow-Dannenberg",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE935",
+          "sourceName": "Lüneburg, Landkreis",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEE05",
+          "sourceName": "Anhalt-Bitterfeld",
+          "corridor": "中游 Dresden–Magdeburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEE07",
+          "sourceName": "Börde",
+          "corridor": "中游 Dresden–Magdeburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEE0E",
+          "sourceName": "Wittenberg",
+          "corridor": "中游 Dresden–Magdeburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEF06",
+          "sourceName": "Herzogtum Lauenburg",
+          "corridor": "下游 Stendal–Hamburg",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B40201864279221",
+          "sourceName": "Náchod",
+          "corridor": "上游捷克段",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        }
+      ]
+    },
+    {
+      "river": "Oder",
+      "sourceFeatures": [
+        {
+          "properties": {
+            "name": "Oder",
+            "name_en": "Oder",
+            "featurecla": "River",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_622"
+          },
+          "bounds": [
+            14.1235,
+            49.6256,
+            18.351,
+            53.5982
+          ]
+        }
+      ],
+      "lineComponents": 1,
+      "summary": {
+        "next_review": 24,
+        "repair": 2,
+        "candidate": 8,
+        "legacy": 2,
+        "excluded": 1
+      },
+      "selectedParents": [
+        {
+          "parentId": "PL_POW_0203",
+          "sourceName": "głogowski",
+          "countryCode": "PL",
+          "corridor": "中游 Wrocław–Krosno",
+          "selectionReason": "中游 Wrocław–Krosno的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3906644366926556,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "PL_POW_0215",
+          "sourceName": "oławski",
+          "countryCode": "PL",
+          "corridor": "中游 Wrocław–Krosno",
+          "selectionReason": "中游 Wrocław–Krosno的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.4371771979931965,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "PL_POW_0802",
+          "sourceName": "krośnieński",
+          "countryCode": "PL",
+          "corridor": "中游 Wrocław–Krosno",
+          "selectionReason": "中游 Wrocław–Krosno的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3726877919280231,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "PL_POW_1605",
+          "sourceName": "krapkowicki",
+          "countryCode": "PL",
+          "corridor": "上游捷克–Opole",
+          "selectionReason": "上游捷克–Opole的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.017694669071418413,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "PL_POW_2411",
+          "sourceName": "raciborski",
+          "countryCode": "PL",
+          "corridor": "上游捷克–Opole",
+          "selectionReason": "捷波过渡段；4面含多次入出的小面。",
+          "cells": 4,
+          "smallestFacePlanarShare": 0.001144907703728535,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "PL_POW_3262",
+          "sourceName": "Szczecin",
+          "countryCode": "PL",
+          "corridor": "下游德波边界–Szczecin",
+          "selectionReason": "下游城市主体跨岸段，替代把德波边界窄条冒充主体分区的做法。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3475110782158524,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B81305487356227",
+          "sourceName": "Nový Jičín",
+          "countryCode": "CZ",
+          "corridor": "上游捷克–Opole",
+          "selectionReason": "上游捷克–Opole的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.36602727231028853,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B13920789422451",
+          "sourceName": "Ostrava-City",
+          "countryCode": "CZ",
+          "corridor": "上游捷克–Opole",
+          "selectionReason": "上游城市跨岸段；3面保留，衔接捷波走廊。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.0036242884114262236,
+          "visualEvidence": ".runtime/river-eu/oder-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        }
+      ],
+      "repairBeforeAdmission": [
+        {
+          "parentId": "DE409",
+          "sourceName": "Märkisch-Oderland",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "德波边界反复交叉；6面主要为单侧窄条，不能据此声称跨岸主体分区。"
+        },
+        {
+          "parentId": "PL_POW_3206",
+          "sourceName": "gryfiński",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "10面沿德波边界挤成窄条；需边界与河线精度协调，禁止删除小面。"
+        }
+      ],
+      "excludedUncut": [
+        {
+          "parentId": "CZ_ADM2_57006924B13474079400168",
+          "sourceName": "Opava",
+          "corridor": "上游捷克–Opole",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        }
+      ],
+      "existingApprovedParentIds": [
+        "PL_POW_0264",
+        "PL_POW_1661"
+      ],
+      "nextReview": [
+        {
+          "parentId": "DE403",
+          "sourceName": "Frankfurt (Oder), Kreisfreie Stadt",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE40C",
+          "sourceName": "Oder-Spree",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE40I",
+          "sourceName": "Uckermark",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0204",
+          "sourceName": "górowski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0209",
+          "sourceName": "legnicki",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0211",
+          "sourceName": "lubiński",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0218",
+          "sourceName": "średzki",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0220",
+          "sourceName": "trzebnicki",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0222",
+          "sourceName": "wołowski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0223",
+          "sourceName": "wrocławski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0801",
+          "sourceName": "gorzowski",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0804",
+          "sourceName": "nowosolski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0805",
+          "sourceName": "słubicki",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0807",
+          "sourceName": "sulęciński",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0809",
+          "sourceName": "zielonogórski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_0812",
+          "sourceName": "wschowski",
+          "corridor": "中游 Wrocław–Krosno",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_1601",
+          "sourceName": "brzeski",
+          "corridor": "上游捷克–Opole",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_1603",
+          "sourceName": "kędzierzyńsko-kozielski",
+          "corridor": "上游捷克–Opole",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_1609",
+          "sourceName": "opolski",
+          "corridor": "上游捷克–Opole",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_2415",
+          "sourceName": "wodzisławski",
+          "corridor": "上游捷克–Opole",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_3204",
+          "sourceName": "goleniowski",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_3210",
+          "sourceName": "myśliborski",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "PL_POW_3211",
+          "sourceName": "policki",
+          "corridor": "下游德波边界–Szczecin",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "CZ_ADM2_57006924B63031935780571",
+          "sourceName": "Karviná",
+          "corridor": "上游捷克–Opole",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        }
+      ]
+    },
+    {
+      "river": "Rhine",
+      "sourceFeatures": [
+        {
+          "properties": {
+            "name": "Rhein",
+            "name_en": "Rhine",
+            "featurecla": "River",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_392"
+          },
+          "bounds": [
+            8.7102,
+            46.6227,
+            9.6498,
+            47.6707
+          ]
+        },
+        {
+          "properties": {
+            "name": "Rhein",
+            "name_en": "Rhine",
+            "featurecla": "Lake Centerline",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_394"
+          },
+          "bounds": [
+            8.8811,
+            47.5112,
+            9.5543,
+            47.6955
+          ]
+        },
+        {
+          "properties": {
+            "name": "Rhin",
+            "name_en": "Rhine",
+            "featurecla": "River",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_396"
+          },
+          "bounds": [
+            7.5112,
+            47.5445,
+            8.8811,
+            48.9654
+          ]
+        },
+        {
+          "properties": {
+            "name": "Rhine",
+            "name_en": "Rhine",
+            "featurecla": "River",
+            "scalerank": 4,
+            "min_zoom": 4.0,
+            "id": "river_619"
+          },
+          "bounds": [
+            4.9854,
+            48.9654,
+            8.5044,
+            51.9006
+          ]
+        }
+      ],
+      "lineComponents": 7,
+      "summary": {
+        "repair": 4,
+        "candidate": 10,
+        "next_review": 42,
+        "excluded": 2
+      },
+      "selectedParents": [
+        {
+          "parentId": "CH031",
+          "sourceName": "Basel-Stadt",
+          "countryCode": "CH",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "selectionReason": "上游 Alpine/High/Upper Rhine的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2831423593500846,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "CH052",
+          "sourceName": "Schaffhausen",
+          "countryCode": "CH",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "selectionReason": "High Rhine 局部跨岸面可辨，2面完整保留；不据此声称沿国界全部覆盖。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.01694441580102727,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEA11",
+          "sourceName": "Düsseldorf, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "下游 Bonn–Netherlands",
+          "selectionReason": "下游城市反复进出，5面可辨；小面放大已审。",
+          "cells": 5,
+          "smallestFacePlanarShare": 0.014831494912471503,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEA1F",
+          "sourceName": "Wesel",
+          "countryCode": "DE",
+          "corridor": "下游 Bonn–Netherlands",
+          "selectionReason": "下游 Bonn–Netherlands的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.42176230486094324,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEA22",
+          "sourceName": "Bonn, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "下游 Bonn–Netherlands",
+          "selectionReason": "下游 Bonn–Netherlands的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2558433217739488,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEA23",
+          "sourceName": "Köln, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "下游 Bonn–Netherlands",
+          "selectionReason": "下游 Bonn–Netherlands的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.003818470533942202,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEB11",
+          "sourceName": "Koblenz, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Upper/Middle Rhine",
+          "selectionReason": "中游 Upper/Middle Rhine的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3395929330981616,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEB35",
+          "sourceName": "Mainz, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Upper/Middle Rhine",
+          "selectionReason": "中游 Upper/Middle Rhine的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.04521240401170141,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DEB38",
+          "sourceName": "Speyer, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "中游 Upper/Middle Rhine",
+          "selectionReason": "Upper Rhine 城镇跨岸及再次入出段；3面全部保留。",
+          "cells": 3,
+          "smallestFacePlanarShare": 0.026024878797844066,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "NL226",
+          "sourceName": "Arnhem/Nijmegen",
+          "countryCode": "NL",
+          "corridor": "下游 Bonn–Netherlands",
+          "selectionReason": "下游荷兰入口，主体跨岸；源数据未延伸到完整入海支流。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.34350323806065186,
+          "visualEvidence": ".runtime/river-eu/rhine-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        }
+      ],
+      "repairBeforeAdmission": [
+        {
+          "parentId": "AT342",
+          "sourceName": "Rheintal-Bodenseegebiet",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "奥瑞边界两次切入形成局部窄条；需确认源精度与边界用途。"
+        },
+        {
+          "parentId": "CH055",
+          "sourceName": "St. Gallen",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "瑞奥边界与河线错位产生多条窄面；缺少可用主体跨岸分区。"
+        },
+        {
+          "parentId": "DE122",
+          "sourceName": "Karlsruhe, Stadtkreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "河线几乎平行贴合父界，仅有0.85%窄条；暂缓。"
+        },
+        {
+          "parentId": "FR_ARR_67008",
+          "sourceName": "Strasbourg",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "法德边界附近5面主要为单侧窄条；需源精度审查。"
+        }
+      ],
+      "excludedUncut": [
+        {
+          "parentId": "CH056",
+          "sourceName": "Graubünden",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        },
+        {
+          "parentId": "NL33A",
+          "sourceName": "Zuidoost-Zuid-Holland",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        }
+      ],
+      "existingApprovedParentIds": [],
+      "nextReview": [
+        {
+          "parentId": "CH032",
+          "sourceName": "Basel-Landschaft",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "CH033",
+          "sourceName": "Aargau",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "CH040",
+          "sourceName": "Zürich",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "CH057",
+          "sourceName": "Thurgau",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE123",
+          "sourceName": "Karlsruhe, Landkreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE124",
+          "sourceName": "Rastatt",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE126",
+          "sourceName": "Mannheim, Stadtkreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE128",
+          "sourceName": "Rhein-Neckar-Kreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE132",
+          "sourceName": "Breisgau-Hochschwarzwald",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE134",
+          "sourceName": "Ortenaukreis",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE138",
+          "sourceName": "Konstanz",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE139",
+          "sourceName": "Lörrach",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE13A",
+          "sourceName": "Waldshut",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE147",
+          "sourceName": "Bodenseekreis",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE714",
+          "sourceName": "Wiesbaden, Kreisfreie Stadt",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE715",
+          "sourceName": "Bergstraße",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE717",
+          "sourceName": "Groß-Gerau",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE71D",
+          "sourceName": "Rheingau-Taunus-Kreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA12",
+          "sourceName": "Duisburg, Kreisfreie Stadt",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA14",
+          "sourceName": "Krefeld, Kreisfreie Stadt",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA1B",
+          "sourceName": "Kleve",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA1C",
+          "sourceName": "Mettmann",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA1D",
+          "sourceName": "Rhein-Kreis Neuss",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA24",
+          "sourceName": "Leverkusen, Kreisfreie Stadt",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA27",
+          "sourceName": "Rhein-Erft-Kreis",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEA2C",
+          "sourceName": "Rhein-Sieg-Kreis",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB12",
+          "sourceName": "Ahrweiler",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB17",
+          "sourceName": "Mayen-Koblenz",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB18",
+          "sourceName": "Neuwied",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB1A",
+          "sourceName": "Rhein-Lahn-Kreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB1D",
+          "sourceName": "Rhein-Hunsrück-Kreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB34",
+          "sourceName": "Ludwigshafen am Rhein, Kreisfreie Stadt",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB39",
+          "sourceName": "Worms, Kreisfreie Stadt",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB3B",
+          "sourceName": "Alzey-Worms",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB3E",
+          "sourceName": "Germersheim",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB3I",
+          "sourceName": "Rhein-Pfalz-Kreis",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DEB3J",
+          "sourceName": "Mainz-Bingen",
+          "corridor": "中游 Upper/Middle Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_67002",
+          "sourceName": "Haguenau-Wissembourg",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_67005",
+          "sourceName": "Sélestat-Erstein",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_68002",
+          "sourceName": "Colmar-Ribeauvillé",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "FR_ARR_68004",
+          "sourceName": "Mulhouse",
+          "corridor": "上游 Alpine/High/Upper Rhine",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "NL224",
+          "sourceName": "Zuidwest-Gelderland",
+          "corridor": "下游 Bonn–Netherlands",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        }
+      ]
+    },
+    {
+      "river": "Danube",
+      "sourceFeatures": [
+        {
+          "properties": {
+            "name": "Donau",
+            "name_en": "Danube",
+            "featurecla": "River",
+            "scalerank": 2,
+            "min_zoom": 2.1,
+            "id": "river_397"
+          },
+          "bounds": [
+            8.1792,
+            47.9171,
+            17.2064,
+            49.0275
+          ]
+        },
+        {
+          "properties": {
+            "name": "Danube",
+            "name_en": "Danube",
+            "featurecla": "River",
+            "scalerank": 2,
+            "min_zoom": 2.1,
+            "id": "river_1273"
+          },
+          "bounds": [
+            17.2064,
+            43.6503,
+            28.747,
+            48.0611
+          ]
+        }
+      ],
+      "lineComponents": 7,
+      "summary": {
+        "next_review": 50,
+        "candidate": 16,
+        "excluded": 2,
+        "repair": 4
+      },
+      "selectedParents": [
+        {
+          "parentId": "AT130",
+          "sourceName": "Wien",
+          "countryCode": "AT",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.30721267069713454,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE137",
+          "sourceName": "Tuttlingen",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3890922632260976,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE144",
+          "sourceName": "Ulm, Stadtkreis",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2145083280749688,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE145",
+          "sourceName": "Alb-Donau-Kreis",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.19491064061222596,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE149",
+          "sourceName": "Sigmaringen",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3278074093509806,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE211",
+          "sourceName": "Ingolstadt, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.49209819982792147,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE222",
+          "sourceName": "Passau, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.3776817979175204,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE224",
+          "sourceName": "Deggendorf",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.46692628592392443,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE226",
+          "sourceName": "Kelheim",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.27744492198260207,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE232",
+          "sourceName": "Regensburg, Kreisfreie Stadt",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.37680259947968814,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE277",
+          "sourceName": "Dillingen a.d. Donau",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.4729032864265426,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "DE27D",
+          "sourceName": "Donau-Ries",
+          "countryCode": "DE",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "上游 Germany–Austria的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.20455784331443616,
+          "visualEvidence": ".runtime/river-eu/danube-supplement-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "HU110",
+          "sourceName": "Budapest",
+          "countryCode": "HU",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "selectionReason": "中游 Slovakia–Hungary–Serbia的城镇/沿河连接父域；主体跨岸可辨，保留全部正面积面。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.2595201964095963,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "RS110",
+          "sourceName": "Београдска област",
+          "countryCode": "RS",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "selectionReason": "中游首都区与 Sava 汇入用途；只按 Danube 主线切割，Sava 叠加只作上下文。",
+          "cells": 4,
+          "smallestFacePlanarShare": 0.000669637786538211,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "RS123",
+          "sourceName": "Јужнобачка област",
+          "countryCode": "RS",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "selectionReason": "中游 Novi Sad 所在父域，5面含沿河重复进出；保留可辨岸侧带及小面。",
+          "cells": 5,
+          "smallestFacePlanarShare": 0.002104341903788289,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-2.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B61252856682831",
+          "sourceName": "District of Bratislava II",
+          "countryCode": "SK",
+          "corridor": "上游 Germany–Austria",
+          "selectionReason": "跨国都市节点；保留可辨岸侧面，不改国界或归属。",
+          "cells": 2,
+          "smallestFacePlanarShare": 0.09538734743179743,
+          "visualEvidence": ".runtime/river-eu/danube-atlas-1.png",
+          "auditEvidence": ".runtime/river-eu/all-parent-checks.json"
+        }
+      ],
+      "repairBeforeAdmission": [
+        {
+          "parentId": "RO225",
+          "sourceName": "Tulcea",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "河口只有沿北边界小条，不能称为三角洲多支覆盖。"
+        },
+        {
+          "parentId": "RO314",
+          "sourceName": "Giurgiu",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "罗保边界长条为主，暂不能证明有意义的跨岸主体。"
+        },
+        {
+          "parentId": "RO413",
+          "sourceName": "Mehedinţi",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "罗塞边界弯道连续薄条；需核对真实河道与边界。"
+        },
+        {
+          "parentId": "RS221",
+          "sourceName": "Борска област",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "铁门附近国际边界局部切入，主体仍单侧；需精度审查。"
+        }
+      ],
+      "excludedUncut": [
+        {
+          "parentId": "DE136",
+          "sourceName": "Schwarzwald-Baar-Kreis",
+          "corridor": "上游 Germany–Austria",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        },
+        {
+          "parentId": "UA_RAY_74538382B95291552499633",
+          "sourceName": "Izmali",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "源线端点/悬线未闭合成完整切割，保留原父地块。"
+        }
+      ],
+      "existingApprovedParentIds": [],
+      "nextReview": [
+        {
+          "parentId": "AT121",
+          "sourceName": "Mostviertel-Eisenwurzen",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT124",
+          "sourceName": "Waldviertel",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT126",
+          "sourceName": "Wiener Umland/Nordteil",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT127",
+          "sourceName": "Wiener Umland/Südteil",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT311",
+          "sourceName": "Innviertel",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT312",
+          "sourceName": "Linz-Wels",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "AT313",
+          "sourceName": "Mühlviertel",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "BG311",
+          "sourceName": "Видин",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "BG325",
+          "sourceName": "Силистра",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE146",
+          "sourceName": "Biberach",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE219",
+          "sourceName": "Eichstätt",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE21I",
+          "sourceName": "Neuburg-Schrobenhausen",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE21J",
+          "sourceName": "Pfaffenhofen a. d. Ilm",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE223",
+          "sourceName": "Straubing, Kreisfreie Stadt",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE228",
+          "sourceName": "Passau, Landkreis",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE22B",
+          "sourceName": "Straubing-Bogen",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE238",
+          "sourceName": "Regensburg, Landkreis",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE278",
+          "sourceName": "Günzburg",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "DE279",
+          "sourceName": "Neu-Ulm",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HR025",
+          "sourceName": "Osječko-baranjska županija",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HR026",
+          "sourceName": "Vukovarsko-srijemska županija",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU120",
+          "sourceName": "Pest",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU211",
+          "sourceName": "Fejér",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU212",
+          "sourceName": "Komárom-Esztergom",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU221",
+          "sourceName": "Győr-Moson-Sopron",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU231",
+          "sourceName": "Baranya",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU233",
+          "sourceName": "Tolna",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "HU331",
+          "sourceName": "Bács-Kiskun",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO221",
+          "sourceName": "Brăila",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO223",
+          "sourceName": "Constanţa",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO224",
+          "sourceName": "Galaţi",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO312",
+          "sourceName": "Călăraşi",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO315",
+          "sourceName": "Ialomiţa",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO317",
+          "sourceName": "Teleorman",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO411",
+          "sourceName": "Dolj",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO414",
+          "sourceName": "Olt",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RO422",
+          "sourceName": "Caraş-Severin",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS121",
+          "sourceName": "Западнобачка област",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS122",
+          "sourceName": "Јужнобанатска област",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS126",
+          "sourceName": "Средњобанатска област",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS127",
+          "sourceName": "Сремска област",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS222",
+          "sourceName": "Браничевска област",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "RS227",
+          "sourceName": "Подунавска област",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B62553648042075",
+          "sourceName": "District of Nova Zkmky",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B62094256812316",
+          "sourceName": "District of Senec",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B78366861694162",
+          "sourceName": "District of Dunajskn Streda",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B27848609458937",
+          "sourceName": "District of Komprno",
+          "corridor": "中游 Slovakia–Hungary–Serbia",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B40480781512108",
+          "sourceName": "District of Bratislava I",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "SK_ADM2_56367889B51237059400968",
+          "sourceName": "District of Bratislava IV",
+          "corridor": "上游 Germany–Austria",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        },
+        {
+          "parentId": "UA_RAY_74538382B44725547103458",
+          "sourceName": "Reni",
+          "corridor": "下游 Iron Gates–delta",
+          "reason": "下一层储备；几何通过，尚未视觉准入。"
+        }
+      ]
+    }
+  ]
+}

@@ -12,6 +12,7 @@ const importedScripts = new Map([
   ["feature_identity_shared.js", source("../js/core/feature_identity_shared.js")],
   ["json_resource_decoder_shared.js", source("../js/core/json_resource_decoder_shared.js")],
   ["scenario_chunk_format_shared.js", source("../js/core/scenario_chunk_format_shared.js")],
+  ["startup_topology_codec_shared.js", source("../js/core/startup_topology_codec_shared.js")],
   ["geometry_transfer_codec_shared.js", source("../js/core/geometry_transfer_codec_shared.js")],
   ["topojson-client.min.js", source("../vendor/topojson-client.min.js")],
 ]);

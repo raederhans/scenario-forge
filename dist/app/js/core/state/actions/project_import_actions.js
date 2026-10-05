@@ -75,6 +75,7 @@ export function captureProjectImportState(target) {
     unitCounters: target.unitCounters,
     unitCountersDirty: target.unitCountersDirty,
     visualOverrides: target.visualOverrides,
+    riverPaint: target.riverPaint,
     waterRegionOverrides: target.waterRegionOverrides,
   };
 }

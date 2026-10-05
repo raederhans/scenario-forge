@@ -8,3 +8,11 @@
 - 运行材料：`.runtime/tmp/europe-integration-20261005/`；日志/报告：`.runtime/reports/generated/europe-integration-20261005/`。
 - 长进程约定：主代理单 owner，所有 builder/Pages/checks 在本工作区串行使用各自命名 output/log；退出 0 且相应断言通过为成功条件，非零先分析再有限修复，不重复同假设失败。子代理不得启动相同构建或端口。
 - Worktree 保留原因：后续整合验证仍依赖本地修复候选、数据基线与恢复材料；不在交付中丢弃这些 ignored 证据。
+
+- 已固定的本次修复提交：`d1a032e1f2435c13afc4e590df3b9b573ac918b9`。当前正在 merge `a1be99c6d`，尚未推送。
+- main 的 6 个政治面更新、新增 `GF_PRIMARY`、119 个新增水域及 71 个水域修改与欧洲修复一起精确保留，证明在 `candidate.exact-proof-and-size.json`。最终采用默认 protected-domain sharing 候选，不采用放宽 water arc 身份或单次引用拼接实验。
+- 完整 runtime 候选 112,964,375 B；后续以确定性 gzip 保存源文件，manifest URL 和 source hash 指向实际存储字节。标准 checkpoint 仍可为 plain JSON；Python canonical readers 和旧审计入口支持 gzip，Pages 延续 chunked scenario 不发布完整 runtime 的策略。
+- 新共享 helper 位于 `map_builder/json_source.py`（纯标准库）。构建/Python reader、严格契约/Pages、旧审计与测试消费者分别由范围明确的子代理编辑；主代理仍独占 Git、canonical data 整合和长验证。
+- 最终 stage 已整合 canonical：gzip 34,479,976 B，解压 112,964,820 B；完整 source 的 arc 分割与首轮 vendor PASS 候选相同，仅重算 political.computed_neighbors。第二次 compact 曾造成 7 个 mask merge 失败，已改为 gzip 可存储时保留输入，并回退 stage 的该次编码变化；最终 vendor 624/624 PASS。
+- 全局 mixed-LOD 验证覆盖 196 个独立详情分片维度，所有状态覆盖完整源；最终编码回退不改变任何坐标、feature 或详情分片。stage/canonical strict、精确保留、catalog/data health 和路由检查通过。新 Pages 构建在 `.runtime/tmp/europe-integration-20261005/pages`，不改 tracked dist。
+- 最终发布 artifact 使用 `pages-final`（815,707,977 B）；完整 Pages suite 67 PASS。早期 `pages` 根含独立 hero 临时生成物，不作为最终发布证据。最终 TNO Playwright smoke PASS，端口 8009 的任务服务器已结束。

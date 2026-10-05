@@ -2964,7 +2964,7 @@ function collectFailures() {
     "function drawCanvasFrame(options)",
     "const includeSummary = options?.includeSummary === true;",
     "getRenderPhase() === renderPhaseInteracting && getFirstVisibleFramePainted()",
-    "const useTransformedFrame = currentPhase === renderPhaseInteracting",
+    "const useTransformedFrame = !effects.requiresExactFrame?.() && (currentPhase === renderPhaseInteracting",
     "drawTransformedFrameFromCaches",
     "drawLastGoodFrameFallback",
     "drawBaseVisibleFrameFallback",
@@ -5501,7 +5501,7 @@ function collectFailures() {
         "function getVisualEffectsPassOwner() {",
         "return getVisualEffectsPassOwner().drawEffectsPass(k, options);",
         "return getVisualEffectsPassOwner().drawLineEffectsPass(k, options);",
-        "return getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k);",
+        "return recordLabelPass(\"textureLabels\", () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k));",
         "return getVisualEffectsPassOwner().drawDayNightPass(k, options);",
       ],
       rendererForbiddenTokens: [

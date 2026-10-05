@@ -10,6 +10,7 @@ export function createPoliticalFeaturePolicy(runtimeState, {
   isInteractiveAtlantropaBooleanWeldIslandFeature,
   isScenarioAtlantropaVisible,
   isBaseGeographyScenarioFeature,
+  isStablePaintOrderEnabled = () => false,
 }) {
   function isScenarioShellFeature(feature, featureId = null) {
     if (String(feature?.properties?.scenario_helper_kind || "").trim().toLowerCase() === "shell_fallback") {
@@ -77,7 +78,54 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     });
   }
 
+  let stableDrawOrderCache = null;
+
+  function getStableDrawOrderCache() {
+    const features = runtimeState.landData?.features;
+    const source = Array.isArray(features) ? features : null;
+    const revision = [runtimeState.topologyRevision, runtimeState.scenarioDataGeneration,
+      runtimeState.sceneGeneration, runtimeState.activeScenarioId].join("|");
+    if (stableDrawOrderCache?.features === source
+      && stableDrawOrderCache.length === (source?.length || 0)
+      && stableDrawOrderCache.revision === revision) return stableDrawOrderCache;
+    const byFeature = new WeakMap();
+    const byId = new Map();
+    const underlay = [];
+    const detail = [];
+    (source || []).forEach((feature) => {
+      const id = String(getFeatureId(feature) || "").trim();
+      (isPoliticalUnderlayFeature(feature, id) ? underlay : detail).push({ feature, id });
+    });
+    [...underlay, ...detail].forEach(({ feature, id }, index) => {
+      if (feature && typeof feature === "object") byFeature.set(feature, index);
+      if (id && !byId.has(id)) byId.set(id, index);
+    });
+    stableDrawOrderCache = { features: source, length: source?.length || 0, revision,
+      byFeature, byId, underlayCount: underlay.length };
+    return stableDrawOrderCache;
+  }
+
+  function getStablePoliticalDrawRank(entryOrFeature) {
+    const feature = entryOrFeature?.feature || entryOrFeature;
+    const cache = getStableDrawOrderCache();
+    const directRank = feature && typeof feature === "object" ? cache.byFeature.get(feature) : undefined;
+    if (directRank !== undefined) return directRank;
+    const id = String(entryOrFeature?.id || getFeatureId(feature) || "").trim();
+    const sourceRank = id ? cache.byId.get(id) : undefined;
+    if (sourceRank !== undefined) return sourceRank;
+    // Unknown parents stay behind known parents of their tier, independent of
+    // the visible subset's order. Never treat a subset index as source rank.
+    return isPoliticalUnderlayFeature(feature, id) ? -1 : cache.underlayCount - 0.5;
+  }
+
   function orderPoliticalShellUnderlayFirst(entries = []) {
+    if (isStablePaintOrderEnabled()) {
+      return entries.map((entry) => ({ entry, rank: getStablePoliticalDrawRank(entry),
+        id: String(entry?.id || getFeatureId(entry?.feature || entry) || "") }))
+        .sort((left, right) => left.rank - right.rank
+          || (left.id < right.id ? -1 : left.id > right.id ? 1 : 0))
+        .map(({ entry }) => entry);
+    }
     const underlayEntries = [];
     const detailEntries = [];
     const foregroundEntries = [];
@@ -205,6 +253,7 @@ export function createPoliticalFeaturePolicy(runtimeState, {
     isScenarioShellFeature,
     hasVisiblePoliticalForegroundColorOverride,
     orderPoliticalShellUnderlayFirst,
+    getStablePoliticalDrawRank,
     shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature,
     getAtlantropaGeometryRole,
     getAtlantropaJoinMode,

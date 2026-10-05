@@ -552,6 +552,7 @@ export function createCountryInspectorController({
       forceExpanded ||
       runtimeState.expandedInspectorReleaseParents.has(countryState.code)
     );
+    let childrenToggle = null;
 
     const row = document.createElement("div");
     row.className = "country-select-row";
@@ -610,23 +611,28 @@ export function createCountryInspectorController({
       childrenMeta.appendChild(metaCopy);
 
       if (!hideExpandToggle) {
-        const toggleBtn = document.createElement("button");
-        toggleBtn.type = "button";
-        toggleBtn.className = "country-action-btn country-children-toggle";
-        toggleBtn.textContent = isExpanded ? "v" : ">";
-        toggleBtn.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
-        toggleBtn.setAttribute("aria-expanded", String(isExpanded));
-        toggleBtn.addEventListener("click", (event) => {
+        childrenToggle = document.createElement("button");
+        childrenToggle.type = "button";
+        childrenToggle.className = "country-action-btn country-children-toggle";
+        childrenToggle.textContent = isExpanded ? "v" : ">";
+        childrenToggle.setAttribute("aria-label", `${childCount} ${t("Related Countries", "ui")}`);
+        childrenToggle.setAttribute("aria-expanded", String(isExpanded));
+        childrenToggle.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
+          const previousToggleTop = childrenToggle.getBoundingClientRect().top;
           if (runtimeState.expandedInspectorReleaseParents.has(countryState.code)) {
             runtimeState.expandedInspectorReleaseParents.delete(countryState.code);
           } else {
             runtimeState.expandedInspectorReleaseParents.add(countryState.code);
           }
-          renderList();
+          renderList({
+            restoreFocus: { type: "children", countryCode: countryState.code },
+            anchorCountryCode: countryState.code,
+            previousAnchorTop: previousToggleTop,
+          });
         });
-        childrenMeta.appendChild(toggleBtn);
+        childrenMeta.appendChild(childrenToggle);
       }
     }
 
@@ -659,6 +665,7 @@ export function createCountryInspectorController({
           swatch,
           title,
           meta,
+          childrenToggle,
           showRelationMeta,
         });
       }
@@ -699,6 +706,7 @@ export function createCountryInspectorController({
         swatch,
         title,
         meta,
+        childrenToggle,
         showRelationMeta,
       });
     }
@@ -962,12 +970,40 @@ export function createCountryInspectorController({
     }
   };
 
-  const keepGroupHeaderAtSameScrollPosition = (groupKey, previousHeaderTop = null) => {
-    if (!list || !groupKey || previousHeaderTop == null) return;
-    const nextHeader = list.querySelector(`[data-inspector-group-key="${groupKey}"]`);
-    if (!nextHeader) return;
-    const nextHeaderTop = nextHeader.getBoundingClientRect().top;
-    list.scrollTop += nextHeaderTop - previousHeaderTop;
+  const getInspectorScrollContainer = () => list?.closest?.(".editor-task-body") || list;
+
+  const keepInspectorAnchorAtSamePosition = (nextElement, previousTop = null) => {
+    if (!nextElement || previousTop == null) return;
+    const scrollContainer = getInspectorScrollContainer();
+    if (!scrollContainer) return;
+    const nextTop = nextElement.getBoundingClientRect().top;
+    scrollContainer.scrollTop += nextTop - previousTop;
+  };
+
+  const restoreInspectorFocus = (target) => {
+    if (!target) return;
+    let element = null;
+    if (target.type === "group") {
+      element = list?.querySelector(`[data-inspector-group-key="${target.groupKey}"]`);
+    } else if (target.type === "children") {
+      const refs = countryRowRefsByCode.get(normalizeCountryCode(target.countryCode)) || [];
+      element = refs.find((ref) => ref.childrenToggle)?.childrenToggle || null;
+    }
+    element?.focus?.({ preventScroll: true });
+  };
+
+  const getInspectorFocusTarget = () => {
+    const activeElement = globalThis.document?.activeElement;
+    if (!activeElement || !list?.contains?.(activeElement)) return null;
+    if (activeElement.classList?.contains("country-explorer-header")) {
+      const groupKey = activeElement.dataset?.inspectorGroupKey;
+      return groupKey ? { type: "group", groupKey } : null;
+    }
+    if (activeElement.classList?.contains("country-children-toggle")) {
+      const countryCode = activeElement.closest?.(".country-select-row")?.dataset?.countryCode;
+      return countryCode ? { type: "children", countryCode } : null;
+    }
+    return null;
   };
 
   const renderGroupedCountryExplorer = (countryStates) => {
@@ -1010,7 +1046,11 @@ export function createCountryInspectorController({
       header.addEventListener("click", () => {
         const previousHeaderTop = header.getBoundingClientRect().top;
         setInspectorContinentExpandedState(runtimeState, groupKey, !isOpen);
-        renderList({ anchorGroupKey: groupKey, previousHeaderTop });
+        renderList({
+          anchorGroupKey: groupKey,
+          previousHeaderTop,
+          restoreFocus: { type: "group", groupKey },
+        });
       });
 
       const heading = document.createElement("div");
@@ -1092,7 +1132,14 @@ export function createCountryInspectorController({
     scheduleAdaptiveInspectorHeights();
   };
 
-  const renderList = ({ anchorGroupKey = "", previousHeaderTop = null } = {}) => {
+  const renderList = ({
+    anchorGroupKey = "",
+    previousHeaderTop = null,
+    restoreFocus = null,
+    anchorCountryCode = "",
+    previousAnchorTop = null,
+  } = {}) => {
+    const preservedFocusTarget = getInspectorFocusTarget();
     incrementSidebarCounter?.("fullListRenders");
     updateScenarioInspectorLayout();
     const term = getSearchTerm();
@@ -1119,9 +1166,19 @@ export function createCountryInspectorController({
       renderCountrySearchResults(visibleCountryStates, term, priorityOrderMap);
     } else {
       renderGroupedCountryExplorer(topLevelCountryStates);
-      keepGroupHeaderAtSameScrollPosition(anchorGroupKey, previousHeaderTop);
+      const nextHeader = anchorGroupKey
+        ? list.querySelector(`[data-inspector-group-key="${anchorGroupKey}"]`)
+        : null;
+      keepInspectorAnchorAtSamePosition(nextHeader, previousHeaderTop);
     }
 
+    if (anchorCountryCode && previousAnchorTop != null) {
+      const refs = countryRowRefsByCode.get(normalizeCountryCode(anchorCountryCode)) || [];
+      keepInspectorAnchorAtSamePosition(
+        refs.find((ref) => ref.childrenToggle)?.childrenToggle || null,
+        previousAnchorTop,
+      );
+    }
     renderCountryInspectorDetail();
     if (typeof runtimeState.renderPresetTreeFn === "function") {
       runtimeState.renderPresetTreeFn();
@@ -1130,6 +1187,7 @@ export function createCountryInspectorController({
       runtimeState.updateWorkspaceStatusFn();
     }
     scheduleAdaptiveInspectorHeights();
+    restoreInspectorFocus(restoreFocus || preservedFocusTarget);
   };
 
   const refreshCountryRows = ({

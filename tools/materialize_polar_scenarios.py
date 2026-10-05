@@ -11,6 +11,7 @@ import gzip
 from pathlib import Path
 from typing import Mapping
 
+from map_builder.json_source import read_json_source
 from map_builder.contracts import sha256_json_stable
 from tools.check_scenario_contracts import (
     apply_safe_scenario_contract_repairs,
@@ -40,7 +41,7 @@ def refresh_scenario(
     if blank and assignments:
         raise ValueError("blank_base must remain ownerless")
 
-    topology = load_json(scenario_dir / "runtime_topology.topo.json")
+    topology = read_json_source(scenario_dir / "runtime_topology.topo.json")
     geometries = topology["objects"]["political"]["geometries"]
     feature_ids = [row["properties"]["id"] for row in geometries]
     if len(feature_ids) != len(set(feature_ids)):

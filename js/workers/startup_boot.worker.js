@@ -4,6 +4,7 @@ importScripts(
   new URL("../core/feature_identity_shared.js", self.location.href).href,
   new URL("../core/json_resource_decoder_shared.js", self.location.href).href,
   new URL("../core/scenario_chunk_format_shared.js", self.location.href).href,
+  new URL("../core/startup_topology_codec_shared.js", self.location.href).href,
   new URL("../core/geometry_transfer_codec_shared.js", self.location.href).href,
   new URL("../../vendor/topojson-client.min.js", self.location.href).href
 );
@@ -368,12 +369,17 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
 }
 
 function postWorkerMessage(type, payload) {
-  if (type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
-    const field = payload.chunkPayload ? "chunkPayload" : "decodedCollections";
+  const startupReady = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
+    || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY;
+  if (startupReady || type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
+    const field = startupReady ? "message" : (payload.chunkPayload ? "chunkPayload" : "decodedCollections");
     const startedAt = nowMs();
-    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(payload[field]);
+    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
+      includeTopologyArcs: startupReady,
+    });
     if (transport.transferables.length) {
-      self.postMessage({ type, ...payload, [field]: null,
+      self.postMessage({ type, ...(startupReady ? { taskId: payload.taskId } : { ...payload, [field]: null }),
         geometryTransport: { field, payload: transport.payload },
         metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
       }, transport.transferables);
@@ -468,8 +474,14 @@ async function handleLoadStartupBundle(message) {
       `[startup_worker] Startup bundle scenario mismatch. Expected "${expectedScenarioId}" but received "${scenarioId}".`
     );
   }
-  const topologyPrimary = payload.base?.topology_primary || null;
-  const runtimeTopology = payload.scenario?.runtime_topology_bootstrap || null;
+  const startupTopologyCodec = globalThis.__scenarioForgeStartupTopologyCodecShared;
+  if (typeof startupTopologyCodec?.decodeStartupTopology !== "function") {
+    throw new Error("[startup_worker] Startup topology codec failed to initialize.");
+  }
+  const topologyPrimary = await startupTopologyCodec.decodeStartupTopology(payload.base?.topology_primary || null);
+  const runtimeTopology = await startupTopologyCodec.decodeStartupTopology(payload.scenario?.runtime_topology_bootstrap || null);
+  if (payload.base) payload.base.topology_primary = topologyPrimary;
+  if (payload.scenario) payload.scenario.runtime_topology_bootstrap = runtimeTopology;
   const runtimePoliticalMetaPayload = normalizeRuntimePoliticalMetaPayload(payload?.scenario?.runtime_political_meta || null);
   const bootstrapStrategy = String(payload?.scenario?.bootstrap_strategy || "").trim();
   if (!topologyPrimary?.objects?.political) {

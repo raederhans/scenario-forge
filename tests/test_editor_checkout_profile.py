@@ -38,6 +38,23 @@ def editor_fixture():
 
 
 class EditorCheckoutProfileTests(unittest.TestCase):
+    def test_gzip_chunked_runtime_excludes_then_restores_explicit_source_reference(self):
+        entries, payloads = editor_fixture()
+        plain = "data/scenarios/hoi4_1936/runtime_topology.topo.json"
+        compressed = plain + ".gz"
+        entries[compressed] = {**entries[plain], "path": compressed}
+        manifest = payloads["data/scenarios/hoi4_1936/manifest.json"]
+        manifest.pop("topology_url")
+        selected, _ = profile.select_editor_files(entries, payloads.__getitem__)
+        self.assertNotIn(plain, selected)
+        self.assertNotIn(compressed, selected)
+        manifest["topology_url"] = compressed
+        del entries[plain]
+        selected, refs = profile.select_editor_files(entries, payloads.__getitem__)
+        self.assertIn(compressed, selected)
+        self.assertNotIn(plain, selected)
+        self.assertIn(compressed, refs["data/scenarios/hoi4_1936/manifest.json"])
+
     def test_source_metadata_closure_restores_full_topology_and_audit(self):
         entries, payloads = editor_fixture()
         selected, refs = profile.select_editor_files(entries, payloads.__getitem__)

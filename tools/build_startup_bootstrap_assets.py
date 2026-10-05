@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder.json_source import resolve_json_source_path
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 from map_builder.contracts import (
@@ -485,6 +486,7 @@ def build_runtime_bootstrap_topology_asset(
     full_runtime_topology_path: Path,
     runtime_bootstrap_output_path: Path,
 ) -> dict[str, object]:
+    full_runtime_topology_path = resolve_json_source_path(full_runtime_topology_path)
     full_runtime_topology = read_json_strict(full_runtime_topology_path)
     runtime_bootstrap_topology = build_bootstrap_runtime_topology(full_runtime_topology)
     _write_minified_json(runtime_bootstrap_output_path, runtime_bootstrap_topology)
@@ -509,6 +511,7 @@ def build_startup_support_assets(
     base_topology = read_json_strict(base_topology_path)
     full_locales = read_json_strict(full_locales_path)
     full_geo_aliases = read_json_strict(full_geo_aliases_path)
+    full_runtime_topology_path = resolve_json_source_path(full_runtime_topology_path)
     full_runtime_topology = read_json_strict(full_runtime_topology_path)
     scenario_geo_patch = read_json_strict(scenario_geo_patch_path)
     resolved_startup_support_whitelist_path = resolve_startup_support_whitelist_path(

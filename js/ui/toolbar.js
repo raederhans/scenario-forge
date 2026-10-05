@@ -1,4 +1,5 @@
 import { createRiverPaintControls } from "./river_paint_controls.js";
+import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
 import { clearAllRiverPaintOverridesState } from "../core/state/actions/river_paint_actions.js";
 import { normalizePaintMode } from "../core/map_editing_policy.js";
@@ -13,6 +14,8 @@ import {
 import {
   autoFillMap,
   getZoomPercent,
+  focusRiverPaintParentById,
+  applyRiverPaintCellById,
   invalidateOceanBackgroundVisualState,
   invalidateOceanCoastalAccentVisualState,
   invalidateOceanVisualState,
@@ -27,6 +30,7 @@ import {
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
   ensurePaintContoursReady,
+  ensureCountryLabelsReadyForExport,
   setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
@@ -41,6 +45,7 @@ import { buildExportArtifactPackage } from "../core/export_artifact_package.js";
 import { ensureActiveScenarioOptionalLayerLoaded, ensureScenarioPoliticalDetailForExport } from "../core/scenario_resources.js";
 import { getDirectGeoLabel, toggleLanguage, updateUIText, t } from "./i18n.js";
 import { showToast } from "./toast.js";
+import { createToolGuidance } from "./toolbar/tool_guidance.js";
 import { showAppDialog } from "./app_dialog.js";
 import { createUiSurfaceUrlState } from "./ui_surface_url_state.js";
 import { loadPublicSampleProjectIntoRuntime } from "../core/sample_project_import_workflow.js";
@@ -89,6 +94,8 @@ import {
 } from "./toolbar/export_workbench_controller.js";
 import { createPaletteLibraryPanelController, selectPalettePaintColor } from "./toolbar/palette_library_panel.js";
 import { createPaletteLibraryOperation } from "../core/palette_library_operation.js";
+import { createPaletteCountryEditor } from "./toolbar/palette_country_editor.js";
+import { getPaletteCountryTargets } from "../core/palette_country_targets.js";
 import { createPaletteLibraryStateAccess } from "../core/palette_library_state_access.js";
 import { createAppearanceControlsController } from "./toolbar/appearance_controls_controller.js";
 import { createScenarioContextBarController } from "./toolbar/scenario_context_bar_controller.js";
@@ -113,6 +120,7 @@ function composePaletteLibraryOperation() {
   const owner = createPaletteLibraryOperation({
     getApplyTarget: stateAccess.getApplyTarget,
     getOwnerFeatureIds: stateAccess.getOwnerFeatureIds,
+    getCountryFeatureIds: (code) => [...(getPaletteCountryTargets(runtimeState).get(code) || [])],
     applyFeatureColor: stateAccess.applyFeatureColor,
     applyOwnerColor: stateAccess.applyOwnerColor,
     captureHistoryState,
@@ -1368,10 +1376,31 @@ function initToolbar({ render } = {}) {
     }
   };
   registerRuntimeHook(state, "updateDynamicBorderStatusUIFn", refreshDynamicBorderStatus);
+  const riverCellPicker = createRiverCellPicker({
+    state: runtimeState,
+    panel: document.getElementById("riverCellPicker"),
+    select: document.getElementById("riverCellSelect"),
+    preview: document.getElementById("riverCellPreview"),
+    applyButton: document.getElementById("riverCellApplyBtn"),
+    title: document.getElementById("riverCellPickerTitle"),
+    closeButton: document.getElementById("riverCellCloseBtn"),
+    caption: document.getElementById("riverCellPreviewCaption"),
+    applyCell: applyRiverPaintCellById,
+    announce: message => showToast(message),
+  });
   const riverPaintControls = createRiverPaintControls({
     state: runtimeState,
     button: document.getElementById("riverPaintToggleBtn"),
     statusNode: document.getElementById("riverPaintStatus"),
+    navigationPanel: document.getElementById("riverPaintNavigation"),
+    searchInput: document.getElementById("riverPaintSearchInput"),
+    riverSelect: document.getElementById("riverPaintRiverSelect"),
+    resultsNode: document.getElementById("riverPaintLocationResults"),
+    locationButton: document.getElementById("riverPaintLocationGoBtn"),
+    locationSelect: document.getElementById("riverPaintLocationSelect"),
+    focusParent: focusRiverPaintParentById,
+    onLocation: riverCellPicker.open,
+    onSync: riverCellPicker.sync,
     rebuildGeometry: () => setMapData({ refitProjection: false, resetZoom: false }),
     render: () => { if (typeof render === "function") render(); },
     markDirty,
@@ -1577,6 +1606,20 @@ function initToolbar({ render } = {}) {
   }
   runtimeState.parentBordersVisible = runtimeState.parentBordersVisible !== false;
 
+  const paletteCountryEditor = createPaletteCountryEditor({
+    state: runtimeState,
+    host: paletteLibraryPanel,
+    applyColor: (color, countryCode) => {
+      if (!countryCode) return { status: "no-target" };
+      const result = applyPaletteLibraryOperation(color, { countryCode });
+      if (result.status === "applied") {
+        addRecentColor(result.color);
+        updateSwatchUI();
+        if (render) render();
+      }
+      return result;
+    },
+  });
   const paletteLibraryPanelController = createPaletteLibraryPanelController({
     themeSelect,
     paletteLibraryToggle,
@@ -1603,7 +1646,10 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);
   registerRuntimeHook(state, "renderPaletteFn", renderPalette);
 
-  registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);
+  registerRuntimeHook(state, "updatePaletteLibraryUIFn", () => {
+    renderPaletteLibrary();
+    paletteCountryEditor.render();
+  });
 
   function renderSpecialZoneEditorUI() {
     if (toggleWaterRegions) toggleWaterRegions.checked = !!runtimeState.showWaterRegions;
@@ -1616,6 +1662,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateSpecialZoneEditorUIFn", renderSpecialZoneEditorUI);
 
   function updateSwatchUI() {
+    paletteCountryEditor.render();
     const swatches = document.querySelectorAll(".color-swatch");
     swatches.forEach((swatch) => {
       if (swatch.dataset.color === runtimeState.selectedColor) {
@@ -1641,6 +1688,7 @@ function initToolbar({ render } = {}) {
   }
   registerRuntimeHook(state, "updateSwatchUIFn", updateSwatchUI);
 
+  const toolGuidance = createToolGuidance({ state: runtimeState, t });
   function updateToolUI() {
     toolButtons.forEach((button) => {
       const isActive = button.dataset.tool === runtimeState.currentTool;
@@ -1660,6 +1708,7 @@ function initToolbar({ render } = {}) {
       brushModeBtn.setAttribute("aria-pressed", String(!!runtimeState.brushModeEnabled && !disableBrush));
     }
     setToolCursorClass();
+    toolGuidance.sync();
     updateDirtyIndicator();
   }
   registerRuntimeHook(state, "updateToolUIFn", updateToolUI);
@@ -2209,6 +2258,18 @@ function initToolbar({ render } = {}) {
     },
   });
 
+  document.getElementById("scenarioGuideSelectCountryBtn")?.addEventListener("click", () => {
+    closeScenarioGuidePopover({ restoreFocus: false });
+    document.getElementById("editorObjects-countries")?.click();
+    if (globalThis.matchMedia("(max-width: 1023px)").matches) {
+      toggleLeftPanel(true);
+    } else if (document.body.classList.contains("left-sidebar-collapsed")) {
+      document.getElementById("leftSidebarCollapseBtn")?.click();
+    }
+    document.getElementById("countrySearch")?.focus({ preventScroll: true });
+    document.getElementById("countrySearch")?.scrollIntoView({ block: "nearest" });
+  });
+
   bindDockPopoverDismiss();
   globalThis.requestAnimationFrame(() => {
     globalThis.requestAnimationFrame(() => {
@@ -2457,6 +2518,7 @@ function initToolbar({ render } = {}) {
       bakeCtx.drawImage(compositeCanvas, 0, 0);
     } else {
       if (bakePassNames.length) {
+        await ensureCountryLabelsReadyForExport(bakePassNames);
         const passCanvas = renderExportPassesToCanvas(bakePassNames);
         if (passCanvas) {
           bakeCtx.drawImage(passCanvas, 0, 0);
@@ -2534,6 +2596,7 @@ function initToolbar({ render } = {}) {
       ...exportUi,
       visibility: exportUi.visibility,
     }, RENDER_PASS_NAMES).filter((passName) => exportUi.textVisibility?.["render-labels"] || passName !== "labels");
+    await ensureCountryLabelsReadyForExport(passNames);
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
       throw createExportError("invalid-params", "Composite export canvas unavailable.");
@@ -2566,6 +2629,7 @@ function initToolbar({ render } = {}) {
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);
+      await ensureCountryLabelsReadyForExport(model?.passNames || []);
       const canvas = renderExportPassesToCanvas(model?.passNames || [], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);
@@ -2573,6 +2637,7 @@ function initToolbar({ render } = {}) {
       return canvas;
     }
     if (normalizedSourceId === "render-labels") {
+      await ensureCountryLabelsReadyForExport(["labels"]);
       const canvas = renderExportPassesToCanvas(["labels"], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", "Render-pass label canvas unavailable.");

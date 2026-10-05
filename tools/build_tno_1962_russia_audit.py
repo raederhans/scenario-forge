@@ -11,6 +11,7 @@ import sys
 import geopandas as gpd
 import pandas as pd
 from shapely.ops import unary_union
+from map_builder.json_source import read_json_source
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -381,7 +382,7 @@ def main() -> int:
     tno_context = load_hgo_context(tno_root)
     palette_entries = load_palette_entries()
 
-    runtime_gdf = topology_object_to_gdf(load_json(SCENARIO_DIR / "runtime_topology.topo.json"), "political")
+    runtime_gdf = topology_object_to_gdf(read_json_source(SCENARIO_DIR / "runtime_topology.topo.json"), "political")
     runtime_gdf = runtime_gdf.loc[runtime_gdf["id"].astype(str).isin(set(scenario_owners.keys()))].copy()
     runtime_gdf["feature_id"] = runtime_gdf["id"].astype(str)
     runtime_gdf["owner_tag"] = runtime_gdf["feature_id"].map(scenario_owners)

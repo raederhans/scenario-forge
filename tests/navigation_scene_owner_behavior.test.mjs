@@ -2,6 +2,55 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createNavigationSceneOwner } from "../js/core/renderer/navigation_scene_owner.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+
+test("detail owns a bounded base-only composite; visible screenshots never seed the world", () => {
+  const budget = createRuntimeResourceBudget();
+  const canvases = [];
+  const f = fixture({}, { resourceBudget: budget, createCanvas: () => {
+    const canvas = { width: 0, height: 0, getContext: () => ({ canvas }) };
+    canvases.push(canvas); return canvas;
+  } });
+  f.frame.captureWholeScene = () => assert.fail("a viewport composite cannot seed the global raster");
+  const source = { width: 800, height: 600 };
+  const transform = { x: 0, y: 0, k: 1 };
+  assert.equal(f.owner.captureDetail(source, transform, 2, { completeExact: true }), false);
+  assert.equal(canvases.length, 0);
+  assert.equal(f.owner.captureDetail(source, transform, 2, { completeExact: true,
+    drawBase: (context) => context.canvas !== source }), true);
+  f.owner.draw(transform);
+  assert.equal(f.calls.draw[0][3].detailSource, canvases[0]);
+  assert.equal(budget.snapshot().categories.bitmaps, 800 * 600 * 4);
+  assert.equal(f.owner.captureDetail({ width: 10000, height: 10000 }, transform, 2,
+    { completeExact: true, drawBase: () => assert.fail("oversized") }), false);
+  assert.equal(canvases[0].width, 800);
+  f.owner.clear();
+  assert.equal(canvases[0].width, 0);
+  assert.equal(budget.snapshot().estimatedBytes, 0);
+  assert.equal(source.width, 800);
+});
+
+test("label preflight rejects before painting and detail uses its own data-generation identity", () => {
+  const f = fixture({}, { createCanvas: () => {
+    const canvas = { width: 0, height: 0, getContext: () => ({ canvas }) }; return canvas;
+  } });
+  const transform = { x: 0, y: 0, k: 2 };
+  let revision = 1;
+  f.helpers.getDetailIdentity = () => revision;
+  f.helpers.canDrawLabels = () => false;
+  f.helpers.drawLabels = () => true;
+  f.owner.captureDetail({ width: 800, height: 600 }, transform, 2,
+    { completeExact: true, drawBase: () => true });
+  assert.equal(f.owner.draw(transform), false);
+  assert.equal(f.calls.draw.length, 0);
+  f.helpers.canDrawLabels = () => true;
+  assert.equal(f.owner.draw(transform), true);
+  const old = f.calls.draw[0][3].detailSource;
+  revision++;
+  f.owner.draw(transform);
+  assert.equal(f.calls.draw[1][3].detailSource, undefined);
+  assert.equal(old.width, 0);
+});
 
 function feature(id) {
   return { type: "Feature", id, geometry: { type: "Polygon", coordinates: [] } };

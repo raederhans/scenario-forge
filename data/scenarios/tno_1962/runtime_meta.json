@@ -1,6 +1,6 @@
 {
   "coverage_ledger_hashes": {
-    "atlantropa_donor_ledger": "80c0815656dd38106b541e4da5ea7a86d7fdf7c65ccb87d748f9b8f1ae9c1499",
+    "atlantropa_donor_ledger": "b27ae0e1422a77aa3c96cc6ac0153bb82b8d23e4f2bc4347b72ee9df17ecf241",
     "geometry_drop_audit": "92eb9483f35ac36bb0e65e610d6d880b4dc0065736340acc6037f7326496e0f8"
   },
   "coverage_ledger_paths": {
@@ -31,7 +31,7 @@
     "scenario_special_land",
     "scenario_water"
   ],
-  "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json",
+  "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json.gz",
   "scenario_atlantropa_chunk_count": 3,
   "scenario_id": "tno_1962",
   "startup_topology_url": "data/scenarios/tno_1962/runtime_topology.bootstrap.topo.json",

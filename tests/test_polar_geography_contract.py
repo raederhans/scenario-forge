@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 
 from map_builder.processors.arctic_recovery import _read
+from map_builder.json_source import read_json_source
 from map_builder.regional_geometry import _absolute_topology
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +26,7 @@ class PolarGeographyContract(unittest.TestCase):
                   for sid in ('modern_world', 'hoi4_1936', 'hoi4_1939', 'tno_1962', 'blank_base')]
         for sid, path in paths:
             with self.subTest(scenario=sid):
-                topology = _absolute_topology(json.loads(path.read_text(encoding='utf-8')))
+                topology = _absolute_topology(read_json_source(path) if path.name == 'runtime_topology.topo.json' else json.loads(path.read_text(encoding='utf-8')))
                 rows = topology['objects']['political']['geometries']
                 by_id = {row['properties']['id']: row for row in rows}
                 self.assertEqual(len(by_id), len(rows))

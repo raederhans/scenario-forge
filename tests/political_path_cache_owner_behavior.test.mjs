@@ -4,6 +4,9 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
+import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { getProjectedPathResourceAccounting } from "../js/core/renderer/projected_path_resource_accounting.js";
 
 const item = (id, x = 50, drawOrder = 0) => ({
   id, minX: x, maxX: x, minY: 50, maxY: 50, drawOrder,
@@ -11,6 +14,7 @@ const item = (id, x = 50, drawOrder = 0) => ({
 });
 
 function fixture(t, options = {}) {
+  const { scheduleDeferredWork = null, ...ownerOptions } = options;
   const originalPath = globalThis.Path2D;
   globalThis.Path2D = class { constructor(path) { this.value = path; } };
   t.after(() => { globalThis.Path2D = originalPath; });
@@ -33,6 +37,7 @@ function fixture(t, options = {}) {
   h.path = h.makePath((feature, context) => {
     h.builds.push(feature.id); h.time += h.pathCost; context.value = `path:${feature.id}`;
   });
+  h.resourceBudget = options.resourceBudget || createRuntimeResourceBudget();
   h.owner = createPoliticalPathCacheOwner(h.state, {
     rendererSurfaceHost: { getPathCanvas: () => h.path, getProjection: () => h.projection },
     getPoliticalPassStaticSignature: (transform) => `static:${transform.k}:${transform.x}:${transform.y}`,
@@ -40,11 +45,11 @@ function fixture(t, options = {}) {
     getViewportRenderSignature: () => h.viewport,
     getRenderPassCacheState: () => h.cache,
     cancelDeferredWork: (handle) => { h.cancelled.push(handle); h.timers.delete(handle); },
-    scheduleDeferredWork: (callback, options) => {
+    scheduleDeferredWork: scheduleDeferredWork || ((callback, options) => {
       const handle = ++h.serial;
       h.timers.set(handle, { callback, options });
       return handle;
-    },
+    }),
     incrementPerfCounter: (name) => { h.counters[name] = (h.counters[name] || 0) + 1; },
     recordRenderPerfMetric: (...args) => h.metrics.push(args),
     areZoomTransformsEquivalent: (left, right) => !!left && left.k === right.k && left.x === right.x && left.y === right.y,
@@ -54,7 +59,8 @@ function fixture(t, options = {}) {
     collectLandSpatialItemsForProjectedRects: () => h.candidates,
     nowMs: () => h.time,
     RENDER_PHASE_IDLE: "idle",
-    ...options,
+    resourceBudget: h.resourceBudget,
+    ...ownerOptions,
   });
   h.tick = (deadline = null) => {
     const [handle, timer] = h.timers.entries().next().value;
@@ -78,6 +84,67 @@ test("path budget evicts least-recent paths while returning usable transient ove
   assert.equal(h.cache.politicalPathCache.has("giant"), false);
   assert.equal(h.cache.politicalPathCache.getStats().estimatedBytes, 512);
   assert.ok(h.owner.getPoliticalFeaturePathEntry(b, options)?.path, "evicted geometry rebuilds on demand");
+});
+
+test("projected path accounting deduplicates LRU and group references and releases on eviction/reset", (t) => {
+  const h = fixture(t, { pathCacheBudget: 512 });
+  const groupOwner = Symbol("full-pass-group");
+  const accounting = getProjectedPathResourceAccounting(h.resourceBudget);
+  const options = { allowBuild: true };
+  const featureA = item("a").feature;
+  const featureB = item("b").feature;
+  const featureC = item("c").feature;
+  const a = h.owner.getPoliticalFeaturePathEntry(featureA, options);
+  accounting.retain(groupOwner, a.path, a.estimatedBytes);
+  h.owner.getPoliticalFeaturePathEntry(featureB, options);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+
+  const beforeHit = h.resourceBudget.snapshot().revision;
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(featureA, options).path, a.path);
+  assert.equal(h.resourceBudget.snapshot().revision, beforeHit, "cache hits do not rescan or republish retained paths");
+  h.owner.getPoliticalFeaturePathEntry(featureB, options);
+
+  h.owner.getPoliticalFeaturePathEntry(featureC, options);
+  assert.deepEqual([...h.cache.politicalPathCache.keys()], ["b", "c"]);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 768,
+    "the group keeps the evicted A path accounted alongside the two LRU entries");
+  accounting.release(groupOwner, a.path);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+
+  h.owner.invalidatePoliticalPathCache("test-reset");
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined,
+    "reset releases the remaining LRU references");
+});
+
+test("warmup paths are accounted when retained and released by cache invalidation", (t) => {
+  const h = fixture(t, { pathCacheBudget: 1024 });
+  h.owner.schedulePoliticalPathWarmup();
+  h.tick();
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+  h.owner.invalidatePoliticalPathCache("warmup-reset");
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined);
+});
+
+test("recreated cache owners release the previous accounted map before replacing it", (t) => {
+  const h = fixture(t, { pathCacheBudget: 1024 });
+  h.owner.getPoliticalFeaturePathEntry(item("a").feature, { allowBuild: true });
+  const previousMap = h.cache.politicalPathCache;
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 256);
+
+  const replacementOwner = createPoliticalPathCacheOwner(h.state, {
+    rendererSurfaceHost: { getProjection: () => h.projection },
+    getRenderPassCacheState: () => h.cache,
+    cloneZoomTransform: (transform) => ({ ...transform }),
+    recordRenderPerfMetric: () => {},
+    resourceBudget: h.resourceBudget,
+  });
+  const replacement = replacementOwner.getPoliticalPathCacheHandle(
+    h.state.zoomTransform,
+    { resetIfMismatch: true },
+  );
+  assert.notEqual(replacement.map, previousMap);
+  assert.equal(previousMap.size, 0);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined);
 });
 
 test("cache mismatch reads are non-destructive; preparation preserves map identity and snapshots transforms", (t) => {
@@ -153,6 +220,63 @@ test("validated handle avoids repeated cache normalization within one synchronou
   const nextHandle = h.owner.getPoliticalPathCacheHandle(undefined, { resetIfMismatch: true });
   assert.notEqual(nextHandle.signature, handle.signature);
   assert.ok(cacheReads > readsBefore);
+});
+
+test("deferred warmup scopes counted path builds to one synchronous slice", (t) => {
+  const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
+  const factoryStart = rendererSource.indexOf("function getPoliticalBackgroundRenderOwner() {");
+  const factoryEnd = rendererSource.indexOf("\nfunction ", factoryStart + 1);
+  assert.ok(factoryStart >= 0 && factoryEnd > factoryStart, "political background owner factory exists");
+  const factorySource = rendererSource.slice(factoryStart, factoryEnd);
+  const scheduleExpression = factorySource.match(/scheduleDeferredWork:\s*([\s\S]*?),\s*invalidateRenderPasses\b/)?.[1];
+  assert.ok(scheduleExpression, "scheduler injection expression is present in the owner factory");
+  let h;
+  let cacheOwner;
+  let validations = 0;
+  const state = {};
+  cacheOwner = createRenderCacheOwner({
+    state,
+    helpers: {
+      ensureRenderPassCacheState: () => {
+        validations += 1;
+        state.renderPassCache ||= h.cache;
+        return state.renderPassCache;
+      },
+    },
+  });
+  const scheduleDeferredWork = vm.runInNewContext(`(${scheduleExpression})`, {
+    scheduleDeferredWork: (callback, options) => {
+      const handle = ++h.serial;
+      h.timers.set(handle, { callback, options });
+      return handle;
+    },
+    getRenderCacheOwner: () => cacheOwner,
+  });
+  h = fixture(t, {
+    getRenderPassCacheState: () => cacheOwner.getRenderPassCacheState(),
+    incrementPerfCounter: (name) => {
+      const cache = cacheOwner.getRenderPassCacheState();
+      cache.perfCounters ||= {};
+      cache.perfCounters[name] = (cache.perfCounters[name] || 0) + 1;
+    },
+    scheduleDeferredWork,
+  });
+  h.candidates = { items: Array.from({ length: 25 }, (_, index) => item(`warm-${index}`)) };
+
+  assert.equal(h.owner.schedulePoliticalPathWarmup(), true);
+  validations = 0;
+  h.tick();
+  assert.equal(validations, 1, "all counted builds in a slice share one cache validation");
+  assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 24);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 24);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 1);
+
+  validations = 0;
+  h.tick();
+  assert.equal(validations, 1, "the next deferred slice validates its cache again");
+  assert.equal(h.cache.perfCounters.politicalPathCacheBuild, 25);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupBuild, 25);
+  assert.equal(h.cache.perfCounters.politicalPathWarmupSlices, 2);
 });
 
 test("cached paths stream the exact canvas coordinates for decimals, holes, parts and antimeridian clipping", (t) => {

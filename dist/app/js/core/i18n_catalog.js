@@ -2,6 +2,8 @@
 // Keep this file data-only so runtime helpers and translation tools share one source.
 
 export const UI_COPY_CATALOG = Object.freeze({
+  "Country names": { zh: "国家名称", en: "Country names" },
+  "Show country names": { zh: "显示国家名称", en: "Show country names" },
   "Display quality": { zh: "显示画质", en: "Display quality" },
   "High clarity": { zh: "高清", en: "High clarity" },
   "Balanced quality": { zh: "均衡", en: "Balanced quality" },
@@ -14,6 +16,10 @@ export const UI_COPY_CATALOG = Object.freeze({
   "No reference regions were recolored.": { zh: "没有参考区域被重新着色。", en: "No reference regions were recolored." },
   "Capital": { zh: "首都", en: "Capital" },
   "Loaded": { zh: "已加载", en: "Loaded" },
+  "Regional detail": { zh: "区域细节", en: "Regional detail" },
+  "Physical region names": { zh: "地貌区域名称", en: "Physical region names" },
+  "Terrain shading": { zh: "地形阴影", en: "Terrain shading" },
+  "Load error": { zh: "加载失败", en: "Load error" },
   "visible": { zh: "个可见", en: "visible" },
   "Enabled · waiting for data": { zh: "已启用 · 等待数据", en: "Enabled · waiting for data" },
   "Find source region": { zh: "查找来源区域", en: "Find source region" },

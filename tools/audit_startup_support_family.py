@@ -3,20 +3,21 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder.json_source import read_json_source, resolve_json_source_path
 from tools import build_startup_bootstrap_assets
 
 DEFAULT_REPORT_DIR = ROOT / ".runtime" / "reports" / "generated" / "scenarios"
 
 
 def _read_json(path: Path) -> dict:
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    payload = read_json_source(path)
     if not isinstance(payload, dict):
         raise TypeError(f"Expected JSON object at {path}")
     return payload
@@ -41,7 +42,15 @@ def audit_startup_support_family(
     resolved_base_topology_path = (base_topology_path or (ROOT / "data" / "europe_topology.json")).resolve()
     resolved_full_locales_path = (full_locales_path or (ROOT / "data" / "locales.json")).resolve()
     resolved_full_geo_aliases_path = (full_geo_aliases_path or (ROOT / "data" / "geo_aliases.json")).resolve()
-    resolved_full_runtime_topology_path = (full_runtime_topology_path or (scenario_dir / "runtime_topology.topo.json")).resolve()
+    runtime_source = full_runtime_topology_path
+    if runtime_source is None:
+        runtime_url = str(scenario_manifest.get("runtime_topology_url") or "").strip()
+        scenario_id = str(scenario_manifest.get("scenario_id") or scenario_dir.name).strip() or scenario_dir.name
+        relative = PurePosixPath(runtime_url).relative_to(PurePosixPath("data/scenarios") / scenario_id) if runtime_url else PurePosixPath("runtime_topology.topo.json")
+        runtime_source = scenario_dir.joinpath(*relative.parts)
+        if not runtime_source.resolve().is_relative_to(scenario_dir):
+            raise ValueError(f"Runtime topology URL escapes scenario directory: {runtime_url}")
+    resolved_full_runtime_topology_path = resolve_json_source_path(runtime_source.resolve())
     resolved_startup_support_whitelist_path = build_startup_bootstrap_assets.resolve_startup_support_whitelist_path(
         scenario_dir / "locales.startup.json",
         startup_support_whitelist_path.resolve() if startup_support_whitelist_path else None,

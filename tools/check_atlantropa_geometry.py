@@ -9,6 +9,7 @@ from shapely.geometry import shape
 from shapely.errors import GEOSException
 from shapely.ops import unary_union
 from topojson.utils import serialize_as_geojson
+from map_builder.json_source import read_json_source
 
 
 AREA_EPSILON = 1e-12  # square degrees; predicate tolerance, never a component filter
@@ -16,6 +17,8 @@ ATL_PREFIXES = ("ATLPRV_", "ATLISL_", "ATLWLD_", "ATLSHL_", "ATLSEA_", "ATLISRC_
 
 
 def read_json(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(Path(path).read_text(encoding="utf-8-sig"))
 
 

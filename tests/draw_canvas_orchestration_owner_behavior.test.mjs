@@ -49,6 +49,7 @@ function createHarness({
   idlePassesReady = true,
   overview = false,
   navigation = null,
+  requiresExactFrame = false,
 } = {}) {
   const calls = [];
   let currentPhase = phase;
@@ -67,6 +68,7 @@ function createHarness({
     },
   });
   const effects = {
+    requiresExactFrame: () => requiresExactFrame,
     ...(prepareAsyncFrame ? { prepareAsyncFrame: () => {
       calls.push(["prepareAsyncFrame"]);
       return prepareAsyncFrame({ phase: currentPhase, deferExact: currentDeferExact });
@@ -177,6 +179,26 @@ test("valid overview publishes during coverage recovery without blocking on fine
   assert.ok(names(calls).includes("commitLastFrame"));
   for(const name of ["drawTransformedFrameFromCaches","ensureIdleRenderPasses","captureLastGoodFrame"])
     assert.ok(!names(calls).includes(name),name);
+});
+
+test("quality-rejected navigation can prepare and publish exact work during an active gesture", () => {
+  const { owner, calls } = createHarness({ phase: "interacting", firstVisible: true,
+    navigation: () => false, transformed: true, requiresExactFrame: true });
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "exact");
+  assert.ok(names(calls).includes("ensureIdleRenderPasses"));
+  assert.ok(names(calls).includes("composeCachedPasses"));
+  assert.ok(!names(calls).includes("drawTransformedFrameFromCaches"));
+  assert.equal(calls.find(([name]) => name === "captureLastGoodFrame")[1], "exact-frame");
+});
+
+test("quality-rejected navigation waits without publishing partial pixels then resumes exact", () => {
+  let pending = true;
+  const { owner, calls } = createHarness({ phase: "interacting", firstVisible: true,
+    navigation: () => false, requiresExactFrame: true, prepareAsyncFrame: () => pending });
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).status, "waiting-worker");
+  assert.ok(!names(calls).includes("composeCachedPasses"));
+  pending = false;
+  assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "exact");
 });
 
 test("navigation frame presents requested transform before topology, worker and coverage work", () => {

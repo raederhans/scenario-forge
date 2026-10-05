@@ -8,7 +8,7 @@ function city(id, x, properties = {}) {
     properties: { __city_base_tier: "minor", ...properties } };
 }
 
-function plan(features, config = {}, activeScenarioId = "") {
+function plan(features, config = {}, activeScenarioId = "", scale = 12, projectToScreen = (anchor) => anchor) {
   const profile = { groupKey: "country", countryTier: "A", countryTierRank: 5 };
   const helpers = {
     ...cityPolicy,
@@ -19,14 +19,24 @@ function plan(features, config = {}, activeScenarioId = "") {
     getCityCountryProfileIndex: () => new Map([["country", profile]]),
     getCityFeatureKey: (feature) => feature.id,
     getCityInterpolatedRevealBucket: (entry, scale) => cityPolicy.getCityRevealBucket(entry, cityPolicy.getCityRevealPhase(scale).id),
-    getCityScreenPoint: (anchor) => anchor,
+    getCityScreenPoint: projectToScreen,
     getCityViewportCenterDistanceNorm: () => 0,
     isCityAnchorInViewport: () => true,
   };
   const owner = createUrbanCityPolicyOwner({ state: { activeScenarioId },
     caches: { urbanFeatureIndexCache: {} }, helpers });
-  return owner.buildCityRevealPlan({ features }, 12, {}, config);
+  return owner.buildCityRevealPlan({ features }, scale, {}, config);
 }
+
+test("crossing the local detail threshold does not remove already separated major cities", () => {
+  const features = [0, 10].map((x, i) => city(`c${i}`, x,
+    { __city_base_tier: "major", __city_settlement_rank: "large" }));
+  for (const scale of [3.0499, 3.05, 3.0501, 3.1, 4, 4.8, 12]) {
+    const result = plan(features, { densityPreset: "balanced" }, "", scale,
+      ([x, y]) => [x * scale, y * scale]);
+    assert.deepEqual(result.markerEntries.map((entry) => entry.cityId), ["c0", "c1"], `scale ${scale}`);
+  }
+});
 
 test("explicit settlement rank wins over population and capital size is independent", () => {
   const explicit = city("explicit", 0, { settlement_rank: "town", __city_settlement_rank: "medium", __city_population: 10_000_000 });

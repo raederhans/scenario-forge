@@ -40,7 +40,7 @@ test("required aggregator refuses accidentally skipped planned smoke", () => {
   const source = fs.readFileSync(".github/workflows/pr-verify.yml", "utf8").replace(/\r\n/g, "\n");
   const script = source.split("node <<'NODE'\n")[1].split("\n          NODE")[0];
   function run(planned, smoke) {
-    const needs = { "pr-plan": { result: "success", outputs: { run_smoke: planned } }, "pr-verify-fast": { result: "success" }, "pr-verify-smoke": { result: smoke } };
+    const needs = { "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: planned } }, "pr-verify-fast": { result: "success" }, "pr-verify-smoke": { result: smoke } };
     let code = 0;
     vm.runInNewContext(script, { console: { log() {}, error() {} }, process: { env: { REQUIRED_RESULTS: JSON.stringify(needs) }, exit(value) { code = value; } } });
     return code;

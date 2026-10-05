@@ -6,7 +6,8 @@ import {
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
 import { RENDER_PASS_NAMES, VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
 import { resolveContourLodRequest } from './physical_contour_lod_policy.js';
-import { isPhysicalAtlasDetailScale } from './physical_atlas_lod_policy.js';
+import { resolvePhysicalAtlasCollection } from './physical_atlas_lod_policy.js';
+import { getObjectIdentityToken } from './object_identity.js';
 import { getRiverZoomBucket } from './river_layer_render_owner.js';
 
 // Keep pass identities tied to the fields that the pass actually paints.  The
@@ -164,6 +165,13 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     }
     if (passName === "physicalBase") {
       const maskInfo = getPhysicalLandMaskInfo();
+      // Atlas publications replace the collection. Unrelated context loads
+      // (including contour LOD and names) must not invalidate this fill pass.
+      const atlas = resolvePhysicalAtlasCollection({
+        zoomTransform: transform,
+        physicalSemanticsData: runtimeState.physicalSemanticsData,
+        contextLayerExternalDataByName: runtimeState.contextLayerExternalDataByName,
+      });
       return [
         transformSignature,
         getPassTopologyRevision(passName),
@@ -172,7 +180,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`,
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `field:${Number(intensityFields.channels.physicalAtlas?.revision || 0)}`,
-        `atlas-detail:${isPhysicalAtlasDetailScale({ zoomTransform: transform }) && !!runtimeState.contextLayerExternalDataByName?.physical_semantics_detail?.features?.length}:${Number(runtimeState.contextLayerRevision || 0)}`,
+        `atlas:${getObjectIdentityToken(atlas, "physical-atlas")}`,
         stableJson(getPhysicalBaseStyleSignature(runtimeState.styleConfig?.physical || {})),
       ].join("::");
     }
@@ -275,15 +283,17 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       ].join("::");
     }
     if (passName === "labels") {
+      const physicalStyle = normalizePhysicalStyleConfig(runtimeState.styleConfig?.physical || {});
       return [
         transformSignature,
-        `physical-labels:${!!runtimeState.showPhysical}:${!!runtimeState.styleConfig?.physical?.showRegionLabels}:${runtimeState.styleConfig?.physical?.mode}`,
+        `physical-labels:${!!runtimeState.showPhysical}:${!!runtimeState.styleConfig?.physical?.showRegionLabels}:${runtimeState.styleConfig?.physical?.mode}:${runtimeState.showPhysical && physicalStyle.showRegionLabels ? physicalStyle.opacity : "inactive"}`,
         stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
+        runtimeState.styleConfig?.countryLabels?.enabled !== false ? "country-labels:on" : "country-labels:off",
         runtimeState.showWaterRegions ? "marine:on" : "marine:off",
         runtimeState.showOpenOceanRegions || runtimeState.allowOpenOceanPaint ? "open-ocean-labels:on" : "open-ocean-labels:off",
         `marine-selected:${String(runtimeState.selectedWaterRegionId || "")}`,

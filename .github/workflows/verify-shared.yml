@@ -23,6 +23,14 @@ on:
         required: false
         type: boolean
         default: true
+      run-pages-source-check:
+        required: false
+        type: boolean
+        default: false
+      smoke-mode:
+        required: false
+        type: string
+        default: full
 
 permissions:
   contents: read
@@ -44,11 +52,24 @@ jobs:
         shell: bash
         env:
           VERIFY_PROFILE: ${{ inputs.profile }}
+          SMOKE_MODE: ${{ inputs.smoke-mode }}
         run: |
           case "$VERIFY_PROFILE" in
             full|pr-fast|pr-smoke|demo|deploy-minimal) ;;
             *) echo "::error::unknown verification profile: $VERIFY_PROFILE"; exit 2 ;;
           esac
+          case "$SMOKE_MODE" in
+            full|ui) ;;
+            *) echo "::error::unknown smoke mode: $SMOKE_MODE"; exit 2 ;;
+          esac
+          if [ "$SMOKE_MODE" = "ui" ] && [ "$VERIFY_PROFILE" != "pr-smoke" ]; then
+            echo "::error::focused UI smoke requires the pr-smoke profile"
+            exit 2
+          fi
+          if [ "${{ inputs.run-pages-source-check }}" = "true" ] && { [ "$VERIFY_PROFILE" != "pr-fast" ] || [ "${{ inputs.run-pages-check }}" = "true" ]; }; then
+            echo "::error::source Pages checks require pr-fast without a full Pages build"
+            exit 2
+          fi
           if [ "${{ inputs.run-golden-demo }}" = "true" ] && [ "$VERIFY_PROFILE" != "pr-smoke" ]; then
             echo "::error::run-golden-demo requires the pr-smoke profile"
             exit 2
@@ -113,19 +134,18 @@ jobs:
           test -s "$changed_files" || { echo "::error::verification selector received an empty changed-file set"; exit 1; }
           node tools/select_verification_targets.mjs --changed-files-list "$changed_files" --json-out .runtime/reports/generated/verification-selector-explain.json --md-out .runtime/reports/generated/verification-selector-explain.md
 
+      - name: Check Pages source references without building artifacts
+        if: inputs.profile == 'pr-fast' && inputs.run-pages-source-check
+        run: python tools/check_pages_source_graph.py
+
       - name: Build and check Pages artifact for relevant PR changes
         if: inputs.profile == 'pr-fast' && inputs.run-pages-check
         shell: bash
         run: |
-          changed_files=.runtime/tmp/verification-selector-changed-files.txt
-          if grep -Eq '^(js/|css/|vendor/|landing/|data/|dist/|index\.html$|app\.js$|styles\.css$|tools/(build_pages_dist|pages_|app_entry_resolver)|\.github/workflows/verify-shared\.yml$)' "$changed_files"; then
-            artifact_root=.runtime/pages-pr/dist
-            python tools/build_pages_dist.py --output-root "$artifact_root"
-            SCENARIO_FORGE_PAGES_ARTIFACT_ROOT="$artifact_root" python -m unittest tests.test_pages_dist_startup_shell -q
-            echo "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=$artifact_root" >> "$GITHUB_ENV"
-          else
-            echo "No Pages source, builder or artifact changes; artifact rebuild is not required."
-          fi
+          artifact_root=.runtime/pages-pr/dist
+          python tools/build_pages_dist.py --output-root "$artifact_root"
+          SCENARIO_FORGE_PAGES_ARTIFACT_ROOT="$artifact_root" python -m unittest tests.test_pages_dist_startup_shell -q
+          echo "SCENARIO_FORGE_PAGES_ARTIFACT_ROOT=$artifact_root" >> "$GITHUB_ENV"
 
       - name: Cache Playwright browsers
         if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke' || inputs.profile == 'demo'
@@ -172,6 +192,7 @@ jobs:
         run: python -m unittest tests.test_pages_dist_startup_shell -q
 
       - name: Verify and exercise the Pages artifact
+        id: pages_checks
         if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
         env:
           SCENARIO_FORGE_PAGES_ARTIFACT_ROOT: .runtime/pages-release/dist
@@ -189,6 +210,20 @@ jobs:
           npm run test:e2e:pages-public-release-gate
           node node_modules/@playwright/test/cli.js test tests/e2e/project_save_load_roundtrip.spec.js --grep 'editing baseline fast hoi4_1936.*roundtrip only' --workers=1 --retries=0
           python tools/pages_artifact_admission.py --artifact-root .runtime/pages-release/dist --run-id github-${{ github.run_id }}-${{ github.run_attempt }} --public-smoke passed --receipt-out .runtime/pages-release/receipt.json --summary-out .runtime/pages-release/summary.json
+
+      - name: Upload Pages artifact failure evidence
+        if: failure() && steps.pages_checks.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pages-artifact-failure-evidence
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            .runtime/pages-release/server.log
+            .runtime/reports/test-timings.ndjson
+            .runtime/reports/generated/failure-context-index.ndjson
+            .runtime/tests/playwright/
 
       - name: Upload Pages artifact admission
         if: inputs.profile == 'deploy-minimal' && inputs.pages-artifact-only
@@ -220,6 +255,7 @@ jobs:
         with:
           name: verification-selector-evidence
           if-no-files-found: ignore
+          include-hidden-files: true
           path: |
             .runtime/reports/generated/verification-selector-explain.*
             .runtime/reports/generated/verification-selector-execution.*
@@ -263,8 +299,12 @@ jobs:
         run: python tools/check_scenario_contracts.py --strict --scenario-dir data/scenarios/tno_1962 --report-path .runtime/reports/generated/tno_1962.strict_contract_report.json
 
       - name: Run smoke E2E
-        if: (inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke'
+        if: ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke') && inputs.smoke-mode == 'full'
         run: npm run test:e2e:smoke
+
+      - name: Run focused UI E2E
+        if: inputs.profile == 'pr-smoke' && inputs.smoke-mode == 'ui'
+        run: node node_modules/@playwright/test/cli.js test tests/e2e/main_shell_i18n.spec.js tests/e2e/editor_detail_polish.spec.js --workers=1 --retries=0
 
       - name: Write smoke timing summary
         if: always() && ((inputs.profile == 'full' && inputs.run-e2e-smoke) || inputs.profile == 'pr-smoke')
@@ -276,12 +316,16 @@ jobs:
         with:
           name: smoke-timing-and-failure-context
           if-no-files-found: ignore
+          include-hidden-files: true
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
+            .runtime/tests/playwright/**/error-context.md
+            .runtime/tests/playwright/**/test-failed-*.png
+            .runtime/tests/playwright/**/trace.zip
 
       - name: Run Golden Demo E2E
         if: inputs.profile == 'demo' || inputs.run-golden-demo
@@ -300,12 +344,17 @@ jobs:
         with:
           name: demo-timing-and-failure-context
           if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 7
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
+            .runtime/tests/playwright/**/error-context.md
+            .runtime/tests/playwright/**/test-failed-*.png
+            .runtime/tests/playwright/**/trace.zip
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'

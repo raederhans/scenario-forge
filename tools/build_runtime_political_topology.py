@@ -27,6 +27,8 @@ from map_builder.geo.local_canonicalization import (
 from map_builder.geo.topology import build_political_only_topology
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
+from tools.repair_scenario_geography import repair_placeholder_frame
+from tools.scenario_chunk_assets import normalize_canada_topology
 from map_builder.processors.detail_shell_coverage import (
     append_shell_coverage_gap_fragments,
     collect_shell_coverage_gaps,
@@ -654,6 +656,7 @@ def _compose_political_features(
     runtime_gdf = _prune_political_columns(runtime_gdf)
     runtime_gdf = runtime_gdf.reset_index(drop=True)
     runtime_gdf = _dedupe_feature_ids(runtime_gdf)
+    runtime_gdf = repair_placeholder_frame(runtime_gdf)
     if runtime_gdf["id"].duplicated().any():
         raise ValueError("Runtime political topology still contains duplicate feature ids.")
     return runtime_gdf
@@ -678,6 +681,10 @@ def _write_output_topology(
             temp_path,
             quantization=cfg.RUNTIME_POLITICAL_TOPOLOGY_QUANTIZATION,
         )
+        topology = read_json_strict(temp_path)
+        normalized = normalize_canada_topology(topology)
+        if normalized != topology:
+            write_json_atomic(temp_path, normalized)
         temp_path.replace(output_path)
     finally:
         temp_path.unlink(missing_ok=True)
@@ -818,6 +825,7 @@ def main() -> None:
         runtime_political = _clip_ru_managed_detail_to_land(runtime_political, primary_land)
         runtime_political = _prune_political_columns(runtime_political)
         runtime_political = _dedupe_feature_ids(runtime_political)
+        runtime_political = repair_placeholder_frame(runtime_political)
         _write_output_topology(
             output_path=args.output_topology,
             political=runtime_political,

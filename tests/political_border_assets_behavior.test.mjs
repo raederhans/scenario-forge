@@ -39,7 +39,9 @@ test('current TNO political mesh retains every known Swiss seam segment across c
   const graph=features=>buildPaintContourGraph(features.map(f=>({id:featureId(f),geometry:f.geometry,
     coordinatePrecision:getContourCoordinatePrecision(f.geometry)})));
   const detailedEdges=graphEdges(graph(detail));
-  assert.equal(detailedEdges.size,8);
+  // Current manifest geometry includes 14 seam segments for these four features.
+  // Keep the exact fixture count and verify every segment against the mesh below.
+  assert.equal(detailedEdges.size,14);
   assert.ok(graphEdges(graph(coarse.features)).size<detailedEdges.size,'fixture still reproduces the source LOD mismatch');
   const pack=read(manifest.mesh_pack_url);
   const state={activeScenarioId:'tno_1962',activeScenarioManifest:manifest,activeScenarioMeshPack:pack,

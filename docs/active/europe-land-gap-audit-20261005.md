@@ -120,4 +120,3 @@ TNO 的 complete scenario 抑制现代 primary promotion；同 ID 的 detail 会
 - 完整候选的 regional chunks、startup bundles、gzip、snapshot 已重建，`check_scenario_contracts.py --strict` 通过；这只证明资源契约，不证明混合 LOD 无洞。
 - localhost 稳定帧确认原始 SK/UA 缺口。由于混合 LOD 未通过，未将候选换入正式数据，也没有运行候选上色/撤销验收；未声明浏览器端修复成功。
 - 正式数据、catalog 和 dist 未改，因此没有把 catalog/部署检查当成这批候选的通过证明。没有提交、推送或发布。
-

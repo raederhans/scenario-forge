@@ -193,6 +193,31 @@ class LosslessTopologyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "split the payload"):
                 compact_large_runtime_topology(topology, max_bytes=candidate_size)
 
+    def test_gzip_storage_is_explicit_and_returns_standard_topology(self):
+        topology = {"type": "Topology", "objects": {}, "arcs": [], "padding": "x" * 2000}
+        with patch("tools.lossless_topology.optimize_topology", return_value=(deepcopy(topology), {})):
+            with self.assertRaisesRegex(ValueError, "split the payload"):
+                compact_large_runtime_topology(topology, max_bytes=200)
+            result = compact_large_runtime_topology(topology, max_bytes=200, allow_gzip_storage=True)
+            self.assertIs(result, topology)
+            with self.assertRaisesRegex(ValueError, "gzip storage"):
+                compact_large_runtime_topology(topology, max_bytes=1, allow_gzip_storage=True)
+
+    def test_gzip_storage_repeated_calls_preserve_arc_identity_without_optimization(self):
+        ring = [[0, 0], [1.1234567890123, 0], [1, 1], [0, 0]]
+        topology = {"type": "Topology", "objects": {
+            "land_mask": {"type": "MultiPolygon", "arcs": [[[0]], [[1]]]},
+            "context_land_mask": {"type": "MultiPolygon", "arcs": [[[2]], [[-4]]]},
+        }, "arcs": [deepcopy(ring) for _ in range(4)], "padding": "x" * 2000}
+        original = deepcopy(topology)
+        with patch("tools.lossless_topology.optimize_topology", side_effect=AssertionError("must preserve source arcs")) as optimize:
+            first = compact_large_runtime_topology(topology, max_bytes=300, allow_gzip_storage=True)
+            second = compact_large_runtime_topology(first, max_bytes=300, allow_gzip_storage=True)
+        self.assertIs(first, topology)
+        self.assertIs(second, topology)
+        self.assertEqual(second, original)
+        optimize.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

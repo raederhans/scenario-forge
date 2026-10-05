@@ -15,6 +15,7 @@ from pathlib import Path
 
 import numpy as np
 from shapely.geometry import box
+from map_builder.json_source import read_json_source
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -178,7 +179,7 @@ def classify_candidate(*, configured_role: str | None, spatial_relation: str,
 
 
 def build_inventory(context: dict, baseline_dir: Path) -> dict:
-    topology = builder.load_json(baseline_dir / "runtime_topology.topo.json")
+    topology = read_json_source(baseline_dir / "runtime_topology.topo.json")
     localization_labels = english_state_localization_index(Path(context["root"]))
     by_province, by_state, land_by_province = current_attribution_index(topology)
     # The frozen scenario political layer has retired original island IDs.

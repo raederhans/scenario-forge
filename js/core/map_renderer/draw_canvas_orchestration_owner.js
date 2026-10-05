@@ -160,6 +160,7 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
         ? createSummary({ status: "skipped-not-ready", frameMode: "none" })
         : undefined;
     }
+    effects.beforeFrame?.();
 
     // A ready navigation frame can cover the requested transform before fine
     // topology and worker preparation. Color edits may require exact rendering.
@@ -189,9 +190,9 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
     const currentPhase = getRenderPhase();
     const currentDeferExactAfterSettle = !!getDeferExactAfterSettle();
     const frameTimings = {};
-    const useTransformedFrame = currentPhase === renderPhaseInteracting
+    const useTransformedFrame = !effects.requiresExactFrame?.() && (currentPhase === renderPhaseInteracting
       || currentPhase === renderPhaseSettling
-      || (currentPhase === renderPhaseIdle && currentDeferExactAfterSettle);
+      || (currentPhase === renderPhaseIdle && currentDeferExactAfterSettle));
     let drewFrame = false;
     let usedLastGoodFallback = false;
     let usedBaseVisibleFallback = false;
@@ -308,12 +309,11 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
   }
 
   function drawCanvasFrame(options) {
-    return typeof effects.withValidatedCache === "function"
-      ? effects.withValidatedCache(() => drawCanvasFrameCore(options))
-      : drawCanvasFrameCore(options);
+    try {
+      return typeof effects.withValidatedCache === "function"
+        ? effects.withValidatedCache(() => drawCanvasFrameCore(options))
+        : drawCanvasFrameCore(options);
+    } finally { effects.afterFrame?.(); }
   }
-
-  return Object.freeze({
-    drawCanvasFrame,
-  });
+  return Object.freeze({ drawCanvasFrame });
 }

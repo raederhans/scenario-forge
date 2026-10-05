@@ -28,6 +28,7 @@ from map_builder.geo.marine_refinement import (
 )
 from shapely.geometry import mapping
 from shapely.ops import unary_union
+from map_builder.json_source import json_source_sha256, read_json_source
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT_PATHS = (
@@ -41,11 +42,13 @@ INPUT_PATHS = (
 
 
 def input_identity():
-    return {relative: hashlib.sha256((ROOT / relative).read_bytes()).hexdigest()
-            for relative in INPUT_PATHS}
+    return {relative: json_source_sha256(ROOT / relative) if relative.endswith("runtime_topology.topo.json")
+            else hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() for relative in INPUT_PATHS}
 
 
 def read(path):
+    if Path(path).name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -81,6 +84,21 @@ def _select_tno_water_rebuild_scope(features, originals):
                or _needs_water_precision_rebuild(feature)]
     preserved = set(originals) - {feature["properties"]["id"] for feature in changed}
     return changed, preserved
+
+
+def _prepare_tno_marine_additions(additions, originals):
+    """Keep existing detailed waters before subtracting a new broader source.
+
+    For example, the Alaska/BC source contains Salish Sea. If its untrimmed
+    footprint is subtracted first, the established sea is lost before the
+    shared seam ownership rules can protect it.
+    """
+    added_ids = {f["properties"]["id"] for f in additions}
+    reconciled = reconcile_marine_source_boundaries({"type": "FeatureCollection", "features": [
+        *(f for feature_id, f in originals.items() if feature_id not in added_ids),
+        *additions,
+    ]})
+    return [f for f in reconciled["features"] if f["properties"]["id"] in added_ids]
 
 
 def repair_tno_water_precision(stage_root):
@@ -179,6 +197,7 @@ def rebuild(stage_root, *, refine_marine=False):
         # scenario coast keep their IDs and footprints except these exact cuts.
         additions = additional_snapshot_features()
         originals = {f["properties"]["id"]: deepcopy(f) for f in current_water["features"]}
+        additions = _prepare_tno_marine_additions(additions, originals)
         added_ids = {f["properties"]["id"] for f in additions}
         supplement = unary_union([shape(f["geometry"]) for f in additions])
         for feature in current_water["features"]:

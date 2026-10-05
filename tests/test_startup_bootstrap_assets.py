@@ -17,6 +17,7 @@ from tools import (
     generate_startup_support_whitelist,
     materialize_startup_support_candidate,
 )
+from tools.startup_topology_codec import COMPACT_ENCODING, REFERENCE_ENCODING, decode_topology
 
 
 def _write_json(path: Path, payload: object) -> None:
@@ -29,6 +30,84 @@ def _sha256_path(path: Path) -> str:
 
 
 class StartupBootstrapAssetsTest(unittest.TestCase):
+    def test_chunk_builder_preserves_gzip_runtime_url_and_reads_gzip_only(self) -> None:
+        from unittest.mock import patch
+        from tools import build_scenario_chunk_assets as builder
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            root = Path(temporary)
+            scenario = root / "data/scenarios/gzip_fixture"
+            scenario.mkdir(parents=True)
+            topology = {"type": "Topology", "objects": {"political": {"type": "GeometryCollection", "geometries": []}}, "arcs": []}
+            (scenario / "runtime_topology.topo.json.gz").write_bytes(gzip.compress(json.dumps(topology).encode(), mtime=0))
+            for suffix in (".json", ".json.gz"):
+                with self.subTest(manifest_suffix=suffix):
+                    _write_json(scenario / "manifest.json", {"scenario_id": "gzip_fixture", "runtime_topology_url": "data/scenarios/gzip_fixture/runtime_topology.topo" + suffix})
+                    with patch.object(builder, "PROJECT_ROOT", root), patch("sys.argv", ["chunks", "--scenario-dir", str(scenario)]), patch.object(builder, "build_and_write_scenario_chunk_assets") as build:
+                        self.assertEqual(builder.main(), 0)
+                    self.assertEqual(build.call_args.kwargs["runtime_topology_payload"], topology)
+                    self.assertEqual(build.call_args.kwargs["runtime_topology_url"], "data/scenarios/gzip_fixture/runtime_topology.topo.json.gz")
+                    self.assertEqual(json.loads((scenario / "manifest.json").read_bytes())["runtime_topology_url"], "data/scenarios/gzip_fixture/runtime_topology.topo.json.gz")
+
+    def test_atlantropa_migration_reads_and_rewrites_gzip_canonical_source(self) -> None:
+        from unittest.mock import patch
+        from tools import extract_scenario_atlantropa as extractor
+        from map_builder.json_source import read_json_source, write_runtime_topology_source
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            scenario = Path(temporary) / "staging"
+            scenario.mkdir()
+            _write_json(scenario / "manifest.json", {"scenario_id": "tno_1962", "runtime_topology_url": "data/scenarios/tno_1962/runtime_topology.topo.json.gz"})
+            topology = {"type": "Topology", "padding": "x" * 5000, "objects": {"political": {"type": "GeometryCollection", "geometries": [
+                {"type": "Polygon", "properties": {"id": "F-1"}, "arcs": [[0]]},
+                {"type": "Polygon", "properties": {"id": "ATLISL_TEST"}, "arcs": [[0]]},
+            ]}}, "arcs": [[[0, 0], [1, 0], [0, 0]]]}
+            compressed = scenario / "runtime_topology.topo.json.gz"
+            compressed.write_bytes(gzip.compress(json.dumps(topology).encode(), mtime=0))
+            with patch.object(extractor, "write_runtime_topology_source", side_effect=lambda directory, payload: write_runtime_topology_source(directory, payload, max_bytes=1024)):
+                metadata = extractor.migrate_scenario(scenario)
+            self.assertEqual(metadata["feature_count"], 1)
+            rewritten = read_json_source(compressed)
+            self.assertEqual(rewritten["objects"]["political"]["geometries"][0]["properties"]["id"], "F-1")
+            self.assertEqual(rewritten["objects"]["scenario_atlantropa"]["geometries"][0]["properties"]["id"], "ATLISL_TEST")
+            self.assertEqual(rewritten["arcs"], topology["arcs"])
+            self.assertFalse(compressed.with_suffix("").exists())
+            self.assertEqual(json.loads((scenario / "manifest.json").read_bytes())["runtime_topology_url"], "data/scenarios/tno_1962/runtime_topology.topo.json.gz")
+
+    def test_gzip_only_runtime_builds_bootstrap_and_startup_support(self) -> None:
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            root = Path(temporary)
+            scenario = root / "data/scenarios/gzip_fixture"
+            scenario.mkdir(parents=True)
+            topology = {"type": "Topology", "objects": {"political": {"type": "GeometryCollection", "geometries": []}, "scenario_coastline": {"type": "LineString", "arcs": [0]}}, "arcs": [[[1, 2], [3, 4]]]}
+            compressed = scenario / "runtime_topology.topo.json.gz"
+            compressed.write_bytes(gzip.compress(json.dumps(topology).encode(), mtime=0))
+            _write_json(scenario / "manifest.json", {"scenario_id": "gzip_fixture", "runtime_topology_url": "data/scenarios/gzip_fixture/runtime_topology.topo.json.gz"})
+            _write_json(root / "base.json", {"type": "Topology", "objects": {}, "arcs": []})
+            _write_json(root / "locales.json", {"ui": {"ok": "OK"}, "geo": {"A": {"en": "A"}}})
+            _write_json(root / "aliases.json", {"alias_to_stable_key": {"alias-A": "A"}})
+            _write_json(scenario / "geo_locale_patch.json", {"scenario_id": "gzip_fixture", "geo": {"A": {"en": "A"}}})
+            for path in (compressed, compressed.with_suffix("")):
+                with self.subTest(runtime_path=path):
+                    result = build_startup_bootstrap_assets.build_startup_bootstrap_assets(
+                        base_topology_path=root / "base.json", full_locales_path=root / "locales.json", full_geo_aliases_path=root / "aliases.json",
+                        full_runtime_topology_path=path, scenario_geo_patch_path=scenario / "geo_locale_patch.json",
+                        runtime_bootstrap_output_path=scenario / "runtime_topology.bootstrap.topo.json",
+                        startup_locales_output_path=scenario / "locales.startup.json", startup_geo_aliases_output_path=scenario / "geo_aliases.startup.json",
+                    )
+                    shell = json.loads((scenario / "runtime_topology.bootstrap.topo.json").read_bytes())
+                    self.assertEqual(shell["arcs"], topology["arcs"])
+                    self.assertEqual(shell["objects"]["scenario_coastline"], topology["objects"]["scenario_coastline"])
+                    self.assertEqual(result["startup_geo_entry_count"], 1)
+            report = audit_startup_support_family.audit_startup_support_family(
+                scenario_dir=scenario, base_topology_path=root / "base.json", full_locales_path=root / "locales.json", full_geo_aliases_path=root / "aliases.json", report_path=root / "audit.json",
+            )
+            self.assertEqual(report["startup_locales"]["geo_key_count_after"], 1)
+
     def test_bootstrap_preserves_dedicated_coastline_arcs_and_transform(self) -> None:
         full = {
             "objects": {
@@ -149,6 +228,14 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
             for object_name in ("land_mask", "context_land_mask", "scenario_water"):
                 self.assertIn(object_name, runtime_objects)
             self.assertGreater(len(bundle["scenario"]["runtime_political_meta"]["featureIds"]), 0)
+
+    def test_all_published_startup_bundles_stay_within_gzip_budget(self) -> None:
+        root = Path(__file__).resolve().parents[1] / "data" / "scenarios"
+        for scenario_id in ("hoi4_1936", "hoi4_1939", "tno_1962"):
+            for language in build_startup_bundle.SUPPORTED_LANGUAGES:
+                with self.subTest(scenario_id=scenario_id, language=language):
+                    path = root / scenario_id / f"startup.bundle.{language}.json.gz"
+                    self.assertLess(path.stat().st_size, build_startup_bundle.STARTUP_BUNDLE_GZIP_BUDGET_BYTES)
 
     def test_chunked_startup_bundle_builders_pass_detail_manifest_source(self) -> None:
         hoi4_builder = (Path(__file__).resolve().parents[1] / "tools" / "build_hoi4_scenario.py").read_text(encoding="utf-8")
@@ -435,11 +522,12 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 {
                     "type": "Topology",
                     "objects": {
-                        "political": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": []}]},
+                        "political": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "AAA-1"}, "arcs": [[0]]}]},
                         "water_regions": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "W-1"}, "arcs": []}]},
                         "special_zones": {"type": "GeometryCollection", "geometries": [{"type": "Polygon", "properties": {"id": "SZ-1"}, "arcs": []}]},
                     },
-                    "arcs": [],
+                    "arcs": [[[12, -5], [4, 0]]],
+                    "transform": {"scale": [0.1, 0.1], "translate": [-180.0, -90.0]},
                 },
             )
             _write_json(
@@ -503,6 +591,7 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
             )
 
             generated_manifest = json.loads(scenario_manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(generated_manifest["startup_bundle_version"], build_startup_bundle.STARTUP_BUNDLE_VERSION)
             self.assertEqual(
                 generated_manifest["source"],
                 {
@@ -512,6 +601,18 @@ class StartupBootstrapAssetsTest(unittest.TestCase):
                 },
             )
             bundle_payload = json.loads(output_en_path.read_text(encoding="utf-8"))
+            self.assertEqual(bundle_payload["version"], 7)
+            encoded_topology = bundle_payload["base"]["topology_primary"]
+            self.assertNotIn("arcs", encoded_topology)
+            self.assertEqual(encoded_topology["arcs_encoding"]["arc_count"], 1)
+            self.assertEqual(encoded_topology["arcs_encoding"]["encoding"], COMPACT_ENCODING)
+            self.assertEqual(encoded_topology["arc_references_encoding"]["encoding"], REFERENCE_ENCODING)
+            decoded_topology = decode_topology(encoded_topology)
+            self.assertEqual(decoded_topology["arcs"], [[[12, -5], [4, 0]]])
+            self.assertEqual(decoded_topology["transform"], encoded_topology["transform"])
+            self.assertEqual(decoded_topology["objects"]["political"]["geometries"][0]["arcs"], [[0]])
+            self.assertIsNone(encoded_topology["objects"]["political"]["geometries"][0]["arcs"])
+            self.assertEqual(result["report"]["startup_primary_slimming"]["after_arc_count"], 1)
             self.assertEqual(bundle_payload["manifest_subset"]["source"], generated_manifest["source"])
             self.assertEqual(
                 (output_en_path.with_suffix(".json.gz")).read_bytes(),

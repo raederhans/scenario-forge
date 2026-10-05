@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -40,6 +41,113 @@ class QuietStaticHandler(SimpleHTTPRequestHandler):
 
 
 class ArtifactReleaseWorkflowTests(unittest.TestCase):
+    def copy_sparse_checkout(self, job_name: str, destination: Path) -> None:
+        from tests.test_e2e_structural_tooling import parse_workflow_job_blocks, parse_job_steps
+
+        workflow = (REPO_ROOT / ".github/workflows/deploy.yml").read_text(encoding="utf-8")
+        checkout = next(
+            step for step in parse_job_steps(parse_workflow_job_blocks(workflow)[job_name])
+            if "uses: actions/checkout@" in "\n".join(step["lines"])
+        )
+        lines = checkout["lines"]
+        self.assertIn("sparse-checkout-cone-mode: false", "\n".join(lines))
+        start = next(index for index, line in enumerate(lines) if line.strip() == "sparse-checkout: |")
+        indent = len(lines[start]) - len(lines[start].lstrip())
+        patterns = []
+        for line in lines[start + 1:]:
+            if line.strip() and len(line) - len(line.lstrip()) <= indent:
+                break
+            if line.strip():
+                patterns.append(line.strip())
+        self.assertTrue(patterns)
+        for pattern in patterns:
+            self.assertTrue(pattern.startswith("/"), pattern)
+            relative = Path(pattern.strip("/"))
+            self.assertNotIn("..", relative.parts)
+            source = REPO_ROOT / relative
+            target = destination / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if source.is_dir():
+                shutil.copytree(source, target)
+            else:
+                shutil.copy2(source, target)
+
+    def test_sparse_verifier_executes_admission_without_product_sources(self) -> None:
+        with runtime_temp_directory() as tmp_dir:
+            root = Path(tmp_dir)
+            self.copy_sparse_checkout("build", root)
+            artifact = root / ".runtime/pages-release/dist"
+            write_fixture_artifact(artifact)
+            receipt = admission.build_admission_receipt(
+                artifact, run_id="sparse-checkout", public_smoke="passed",
+                source_identity={"gitSha": "a" * 40, "gitTree": "b" * 40},
+                builder_identity={"path": admission.BUILDER_PATH, "sha256": "c" * 64},
+                repo_root=root,
+            )
+            receipt_path = root / ".runtime/pages-release/receipt.json"
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            self.assertFalse((root / "data").exists())
+            self.assertFalse((root / "js").exists())
+            result = subprocess.run(
+                [sys.executable, "-B", "tools/pages_artifact_admission.py", "--artifact-root",
+                 ".runtime/pages-release/dist", "--verify-receipt", str(receipt_path),
+                 "--expected-source-sha", "a" * 40],
+                cwd=root, capture_output=True, encoding="utf-8", check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(json.loads(result.stdout)["publicSmoke"], "passed")
+
+    def test_sparse_smoke_loads_real_spec_and_never_starts_local_server(self) -> None:
+        with runtime_temp_directory() as tmp_dir:
+            root = Path(tmp_dir)
+            self.copy_sparse_checkout("deploy", root)
+            env = {
+                **os.environ,
+                "NODE_PATH": str(REPO_ROOT / "node_modules"),
+                "PLAYWRIGHT_TEST_BASE_URL": "http://127.0.0.1:4175/",
+                "SCENARIO_FORGE_PAGES_URL": "http://127.0.0.1:4175/",
+                "npm_lifecycle_event": "test:e2e:pages-public-release-gate",
+            }
+            config_check = subprocess.run(
+                ["node", "-e", "const assert = require('node:assert/strict'); "
+                 "assert.equal(require('./playwright.config.cjs').webServer, undefined)"],
+                cwd=root, env=env, capture_output=True, encoding="utf-8", check=False,
+            )
+            self.assertEqual(config_check.returncode, 0, config_check.stdout + config_check.stderr)
+            result = subprocess.run(
+                ["node", str(REPO_ROOT / "node_modules/@playwright/test/cli.js"), "test",
+                 "tests/e2e/release/pages_public_release_gate.spec.js", "--list"],
+                cwd=root, env=env, capture_output=True, encoding="utf-8", check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("public Pages release gate", result.stdout)
+            self.assertIn("Total: 1 test", result.stdout)
+            self.assertFalse((root / "tools/dev_server.py").exists())
+            self.assertFalse((root / "data").exists())
+            self.assertFalse((root / "dist").exists())
+
+    def test_release_failures_upload_hidden_playwright_evidence_at_both_stages(self) -> None:
+        from tests.test_e2e_structural_tooling import parse_workflow_job_blocks, parse_job_steps
+
+        for workflow_name, job, check_name, upload_name, check_id in (
+            ("verify-shared.yml", "verify", "Verify and exercise the Pages artifact",
+             "Upload Pages artifact failure evidence", "pages_checks"),
+            ("deploy.yml", "deploy", "Smoke deployed Pages URL",
+             "Upload deployed Pages failure evidence", "pages_smoke"),
+        ):
+            with self.subTest(workflow=workflow_name):
+                workflow = (REPO_ROOT / ".github/workflows" / workflow_name).read_text(encoding="utf-8")
+                steps = parse_job_steps(parse_workflow_job_blocks(workflow)[job])
+                names = [step["name"] for step in steps]
+                check = steps[names.index(check_name)]
+                upload = steps[names.index(upload_name)]
+                self.assertLess(names.index(check_name), names.index(upload_name))
+                self.assertIn(f"id: {check_id}", "\n".join(check["lines"]))
+                body = "\n".join(upload["lines"])
+                self.assertIn(f"failure() && steps.{check_id}.outcome == 'failure'", body)
+                self.assertIn("include-hidden-files: true", body)
+                self.assertIn(".runtime/tests/playwright/", body)
+
     def test_source_artifact_is_default_and_verifies_before_upload(self) -> None:
         from tests.test_e2e_structural_tooling import (
             parse_workflow_dispatch_inputs, parse_workflow_job_blocks, parse_job_steps, parse_step_run,

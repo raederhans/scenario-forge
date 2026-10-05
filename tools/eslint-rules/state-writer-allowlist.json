@@ -106,6 +106,8 @@
     "tests/dev_workspace_selection_ownership_behavior.test.mjs",
     "tests/file_manager_project_roundtrip_behavior.test.mjs",
     "tests/legend_manager_generation_behavior.test.mjs",
+    "tests/palette_country_color_behavior.test.mjs",
+    "tests/palette_library_interaction_behavior.test.mjs",
     "tests/palette_manager_i18n_behavior.test.mjs",
     "tests/project_support_diagnostics_controller_behavior.test.mjs",
     "tests/render_transaction_diagnostics_behavior.test.mjs",

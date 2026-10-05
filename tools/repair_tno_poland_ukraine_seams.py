@@ -12,6 +12,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import Point, box
 
+from map_builder.json_source import read_json_source
 from map_builder.geo.reviewed_seam import partition_reviewed_seam
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry, replace_regional_geometry
 
@@ -121,7 +122,7 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError(args.output)
-    baseline = json.loads((args.baseline_dir / 'runtime_topology.topo.json').read_text(encoding='utf-8'))
+    baseline = read_json_source(args.baseline_dir / 'runtime_topology.topo.json')
     owners = json.loads((args.baseline_dir / 'owners.by_feature.json').read_text(encoding='utf-8'))['owners']
     candidate, report = build_candidate(baseline, owners)
     args.output.parent.mkdir(parents=True, exist_ok=True)

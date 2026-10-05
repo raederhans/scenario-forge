@@ -1,12 +1,86 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs";
+import path from "node:path";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 import { planPullRequest, SCENARIO_CONTRACT_IDS } from "../tools/ci/pr_plan.mjs";
+import { packageChangeRequiresPerformance } from "../tools/ci/perf_policy.mjs";
+
+test("shared package policy exempts only isolated test and verification scripts", () => {
+  const base = { name: "fixture", scripts: { "test:isolated": "node test.mjs", "perf:gate": "node tools/perf/run.mjs" } };
+  const requiresPerf = (head, previous = base) => packageChangeRequiresPerformance({
+    basePackageText: typeof previous === "string" ? previous : JSON.stringify(previous),
+    headPackageText: typeof head === "string" ? head : JSON.stringify(head),
+  });
+  const cases = [
+    [{ ...base, scripts: { ...base.scripts, "test:isolated": "node other.mjs" } }, false],
+    [{ ...base, scripts: { ...base.scripts, "verify:new": "node checker.mjs" } }, false],
+    [{ ...base, scripts: { "perf:gate": base.scripts["perf:gate"] } }, false],
+    [{ ...base, scripts: { ...base.scripts, "test:isolated": "node BENCHMARK.mjs" } }, true],
+    [{ ...base, scripts: { ...base.scripts, "perf:gate": "node changed.mjs" } }, true],
+    [{ ...base, scripts: { ...base.scripts, preinstall: "node setup.mjs" } }, true],
+    [{ ...base, scripts: { ...base.scripts, "pretest:isolated": "node setup.mjs" } }, true],
+    [{ ...base, dependencies: { example: "1" } }, true],
+    [{ ...base, engines: { node: ">=22" } }, true],
+    [{ ...base, unknown: true }, true],
+    [{ ...base, scripts: [] }, true],
+    [{ ...base, scripts: { "test:isolated": null } }, true],
+    ["{invalid", true], ["null", true], [{ name: "missing scripts" }, true],
+  ];
+  for (const [head, expected] of cases) assert.equal(requiresPerf(head), expected, JSON.stringify(head));
+  for (const command of ["npm run test:isolated", "npm run TEST:ISOLATED"]) {
+    const referenced = { ...base, scripts: { ...base.scripts, "perf:gate": command } };
+    assert.equal(requiresPerf({ ...referenced, scripts: { ...referenced.scripts, "test:isolated": "node changed.mjs" } }, referenced), true);
+  }
+  assert.equal(packageChangeRequiresPerformance({}), true);
+  assert.equal(requiresPerf(base, "{invalid"), true);
+});
+
+test("PR planner accepts shared package exemption but defaults conservatively", () => {
+  assert.equal(planPullRequest({ changedFiles: ["package.json"] }).perfRequired, true);
+  const exempt = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false });
+  assert.equal(exempt.perfMode, "skip");
+  assert.equal(exempt.perfRequired, false);
+  assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:perf-strict"] }).perfMode, "strict");
+  assert.equal(planPullRequest({ changedFiles: ["package.json", "package-lock.json"], packageRequiresPerf: false }).perfRequired, true);
+});
+
+test("planner CLI shares manifest exemption and missing or invalid files stay conservative", (t) => {
+  const repoRoot = fileURLToPath(new URL("../", import.meta.url));
+  const runtime = path.join(repoRoot, ".runtime", "tmp");
+  fs.mkdirSync(runtime, { recursive: true });
+  const cwd = fs.mkdtempSync(path.join(runtime, "pr-plan-cli-"));
+  t.after(() => {
+    assert.equal(path.dirname(cwd), runtime);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  });
+  fs.writeFileSync(path.join(cwd, "changes.txt"), "package.json\n");
+  fs.writeFileSync(path.join(cwd, "base.json"), JSON.stringify({ scripts: { "test:isolated": "node old.mjs" } }));
+  fs.writeFileSync(path.join(cwd, "head.json"), JSON.stringify({ scripts: { "test:isolated": "node changed.mjs" } }));
+  const invoke = (extraArgs = []) => {
+    const result = spawnSync(process.execPath, [path.join(repoRoot, "tools/ci/pr_plan.mjs"),
+      "--changed-files", "changes.txt", ...extraArgs], { cwd, encoding: "utf8", shell: false });
+    assert.equal(result.status, 0, result.stderr);
+    return JSON.parse(result.stdout);
+  };
+  const manifestArgs = ["--base-package-file", "base.json", "--head-package-file", "head.json"];
+  assert.equal(invoke(manifestArgs).perfMode, "skip");
+  assert.equal(invoke().perfRequired, true);
+  assert.equal(invoke(["--base-package-file", "missing.json", "--head-package-file", "head.json"]).perfRequired, true);
+  assert.equal(invoke(["--base-package-file", "base.json"]).perfRequired, true);
+  fs.writeFileSync(path.join(cwd, "head.json"), "");
+  assert.equal(invoke(manifestArgs).perfRequired, true);
+  fs.writeFileSync(path.join(cwd, "head.json"), "{invalid");
+  assert.equal(invoke(manifestArgs).perfRequired, true);
+  fs.writeFileSync(path.join(cwd, "head.json"), JSON.stringify({ scripts: { "test:isolated": "node changed.mjs" }, dependencies: { example: "1" } }));
+  assert.equal(invoke(manifestArgs).perfRequired, true);
+});
 
 test("docs-only changes keep heavyweight PR lanes off", () => {
   const plan = planPullRequest({ changedFiles: ["docs/active/example/plan.md"] });
-  assert.equal(plan.runFast, true);
+  assert.equal(plan.runFast, false);
   assert.equal(plan.runSmoke, false);
   assert.equal(plan.runDemo, false);
   assert.equal(plan.runPages, false);
@@ -15,10 +89,27 @@ test("docs-only changes keep heavyweight PR lanes off", () => {
   assert.equal(plan.perfMode, "skip");
 });
 
-test("runtime changes select smoke, Pages and sampled performance", () => {
-  const plan = planPullRequest({ changedFiles: ["js/core/map_renderer.js"] });
+test("renderer mirror contracts receive a freshly built Pages artifact", () => {
+  for (const file of [
+    "js/core/map_renderer.js",
+    "js/core/map_renderer/draw_canvas_orchestration_owner.js",
+    "js/core/map_renderer/transformed_frame_compositor_owner.js",
+    "js/core/renderer/cached_pass_compositor_owner.js",
+    "tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
+  ]) {
+    const plan = planPullRequest({ changedFiles: [file] });
+    assert.equal(plan.pagesMode, "full", file);
+    assert.equal(plan.runPages, true, file);
+    assert.equal(plan.runPagesSource, false, file);
+  }
+});
+
+test("runtime changes select smoke, source references and required sampled performance", () => {
+  const plan = planPullRequest({ changedFiles: ["js/core/renderer/navigation_frame_owner.js"] });
   assert.equal(plan.runSmoke, true);
-  assert.equal(plan.runPages, true);
+  assert.equal(plan.runPages, false);
+  assert.equal(plan.pagesMode, "source");
+  assert.equal(plan.perfRequired, true);
   assert.equal(plan.perfMode, "sample");
 });
 
@@ -26,7 +117,7 @@ test("PR control-plane changes force browser smoke and Golden Demo", () => {
   const plan = planPullRequest({ changedFiles: [".github/workflows/pr-verify.yml"] });
   assert.equal(plan.runSmoke, true);
   assert.equal(plan.runDemo, true);
-  assert.equal(plan.runPages, false);
+  assert.equal(plan.runPages, true);
 });
 
 test("one scenario change selects only its strict contract job", () => {

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 import { createPoliticalPatchPreviewBudget } from "../js/core/renderer/political_patch_preview_budget.js";
 import { createContextLayerRenderScheduler } from "../js/core/renderer/context_layer_render_scheduler.js";
+import { CANVAS_LAYER_NAMES, clearCanvasLayer, getCanvasLayer } from "../js/core/map_renderer/canvas_layer_manager.js";
 const pointFeature = (count = 5) => ({ geometry: { type: "Polygon", coordinates: [Array.from({ length: count }, (_, i) => [i, 0])] } });
 
 test("small previews fit; bulk rejection never traverses geometry", () => {
@@ -70,11 +71,13 @@ test("new scene replaces old batch while stale callbacks cannot cancel new work"
 });
 
 const source = fs.readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-function previewFixture() {
+function previewFixture({ riverVisible = false } = {}) {
   let clock = 0;
   const features = new Map(), calls = [], metrics = [], cache = {};
   const budget = createPoliticalPatchPreviewBudget({ now: () => clock });
   const scope = {
+    riverVisible,
+    hasVisibleRiverPartitions: () => scope.riverVisible,
     politicalPatchPreviewBudget: budget,
     rendererSurfaceHost: { getPoliticalPatchContext: () => ({ canvas: {}, save() {}, restore() {} }), getProjection: () => ({}), getPathCanvas: () => ({}) },
     normalizePoliticalColorEditIds: (ids) => [...new Set(ids)], nowMs: () => clock,
@@ -94,6 +97,64 @@ function previewFixture() {
   vm.createContext(scope); vm.runInContext(body, scope);
   return { scope, features, calls, metrics, budget, paint: (ids) => scope.paintPoliticalPatchOverlayForIds(ids) };
 }
+test("river-enabled preview clears prior overlay pixels and defers before resolving any feature", () => {
+  const f = previewFixture({ riverVisible: true });
+  const canvas = { width: 2, height: 1, pixels: ["old-color", "old-undo-preview"] };
+  const clears = [], transforms = [];
+  const context = { globalCompositeOperation: "multiply", globalAlpha: 0.5, shadowBlur: 8, filter: "blur(2px)",
+    setTransform: (...args) => transforms.push(args),
+    clearRect: (...args) => { clears.push(args); canvas.pixels.fill(null); } };
+  canvas.getContext = () => context;
+  f.scope.rendererSurfaceHost.getCanvasLayers = () => ({ [CANVAS_LAYER_NAMES.politicalPatch]: { canvas } });
+  Object.assign(f.scope, { CANVAS_LAYER_NAMES, clearCanvasLayer, getCanvasLayer });
+  const cache = f.scope.getRenderPassCacheState();
+  cache.pendingPoliticalPatchOverlayTransformSignature = "stale-view";
+  const clear = source.slice(source.indexOf("function clearPoliticalPatchOverlay("),
+    source.indexOf("\nfunction clearPoliticalPatchOverlayIfStale("));
+  vm.runInContext(clear, f.scope);
+  f.features.set("a", { get geometry() { throw new Error("river preview must not inspect geometry"); } });
+  assert.equal(f.paint(["a", "a"]), false);
+  assert.deepEqual(canvas.pixels, [null, null]);
+  assert.deepEqual(clears, [[0, 0, 2, 1]]);
+  assert.deepEqual(transforms, [[1, 0, 0, 1, 0, 0]]);
+  assert.equal(context.globalCompositeOperation, "source-over"); assert.equal(context.globalAlpha, 1);
+  assert.equal(context.shadowBlur, 0); assert.equal(context.filter, "none");
+  assert.equal(cache.pendingPoliticalPatchOverlayTransformSignature, "");
+  assert.equal(f.calls.some(([type]) => type === "resolve" || type === "draw" || type === "first-pixel"), false);
+  assert.equal(f.budget.isDeferred(), true);
+  const deferred = f.metrics.find(([name]) => name === "politicalPatchOverlayDeferred")[2];
+  assert.equal(deferred.reason, "river-parent-order"); assert.equal(deferred.requestedFeatureCount, 1);
+  assert.equal(deferred.candidateFeatureCount, 0);
+  assert.equal(f.metrics.find(([name]) => name === "politicalPatchOverlayClear")[2].reason, "pending-edit-deferred");
+  assert.equal(f.paint([]), false); assert.equal(f.budget.isDeferred(), false);
+  assert.equal(clears.length, 2);
+});
+
+test("a queued brush preview with river partitions preserves dirty IDs and requests exact rendering", () => {
+  const f = previewFixture({ riverVisible: true }), cache = f.scope.getRenderPassCacheState();
+  const session = {}, requests = [];
+  let callback;
+  f.scope.brushSession = session;
+  f.scope.requestAnimationFrame = fn => { callback = fn; return 1; };
+  f.scope.cancelAnimationFrame = () => {};
+  f.scope.hasPendingPoliticalColorEdit = () => cache.pendingPoliticalColorEditIds?.size > 0;
+  f.scope.requestRendererRender = reason => requests.push(reason);
+  const helpers = source.slice(source.indexOf("function cancelScheduledBrushPatchPreview()"),
+    source.indexOf("\nfunction paintPoliticalPatchOverlayForIds("));
+  vm.runInContext(`let brushPatchPreviewFrame = null, brushPatchPreviewCancel = null;
+    let brushPatchPreviewSession = null, brushPatchPreviewTransformSignature = "";\n${helpers}`, f.scope);
+  cache.pendingPoliticalColorEditInputLabel = "brush-fill-feature-color";
+  cache.pendingPoliticalColorEditIds = new Set(["a", "b"]);
+  f.scope.scheduleBrushPatchPreview(); callback();
+  assert.deepEqual(requests, ["brush-preview-deferred"]);
+  assert.deepEqual([...cache.pendingPoliticalColorEditIds], ["a", "b"]);
+  assert.deepEqual(f.calls, [["clear", "pending-edit-deferred"]]);
+  assert.equal(f.budget.isDeferred(), true);
+  const deferred = f.metrics.find(([name]) => name === "politicalPatchOverlayDeferred")[2];
+  assert.equal(deferred.reason, "river-parent-order");
+  assert.equal(deferred.inputLabel, "brush-fill-feature-color"); assert.equal(deferred.requestedFeatureCount, 2);
+});
+
 test("production preview rejects a bulk edit before ID resolution and keeps old preview from surviving undo", () => {
   const f = previewFixture(); assert.equal(f.paint(Array.from({ length: 1000 }, (_, i) => `id${i}`)), false);
   assert.equal(f.calls.filter(([type]) => type === "resolve" || type === "draw").length, 0);

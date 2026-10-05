@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "sceneId": "modern_world",
+  "source": {
+    "landDigest": "sha256:917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
+    "riverDigest": "sha256:60dbebd1fc2d4f9ba8b6d5327a99960c6bfcbe9c6df1d5d4508d0b70fa950a04",
+    "includeLakeCenterlines": true
+  },
+  "parents": [
+    "CN_CITY_17275852B1441354643708",
+    "CN_CITY_17275852B17052950603257",
+    "CN_CITY_17275852B72607841305823",
+    "CN_CITY_17275852B84192730453130",
+    "DEE06",
+    "DEE0D",
+    "FR_ARR_75001",
+    "FR_ARR_76003",
+    "PL_POW_0264",
+    "PL_POW_1661",
+    "RU_RAY_50074027B53551011789267",
+    "RU_RAY_50074027B57358126207690"
+  ],
+  "rivers": [
+    "Elbe",
+    "Huang",
+    "Oder",
+    "Seine",
+    "Volga",
+    "Yangtze"
+  ]
+}

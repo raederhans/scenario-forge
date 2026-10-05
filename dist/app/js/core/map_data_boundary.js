@@ -1,3 +1,4 @@
+import { getActiveRiverPack, getRiverPartitionIndex } from "./river_paint/partition_model.js";
 import { getCountryCode, getFeatureId } from "./feature_identity.js";
 import { normalizeCountryCodeAlias } from "./country_code_aliases.js";
 
@@ -101,6 +102,14 @@ export function getMapDataBoundary(source) {
   });
 
   const paint = Object.freeze({
+    resolveRiverCellColor(cellId, options = {}) {
+      const pack = getActiveRiverPack(source.riverPaint, source.activeScenarioId, source.scenarioBaselineHash || "");
+      const cell = getRiverPartitionIndex(pack)?.cells.get(String(cellId || ""));
+      if (!cell) return { color: null, source: "", cellId, featureId: "", groupCode: "" };
+      const parent = paint.resolveFeatureColor(cell.parentId, options);
+      const override = defaultSafeColor(ownValue(source.riverPaint?.overrides, cell.id), "");
+      return { ...parent, cellId: cell.id, ...(override ? { color: override, source: "riverPaint.overrides" } : {}) };
+    },
     resolveFeatureColor(featureId, { getSafeColor = defaultSafeColor, getBaseGroupCode = null } = {}) {
       const id = text(featureId);
       const safe = typeof getSafeColor === "function" ? getSafeColor : defaultSafeColor;

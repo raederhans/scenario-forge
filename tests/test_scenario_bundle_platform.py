@@ -174,6 +174,17 @@ class ScenarioBundlePlatformTest(unittest.TestCase):
             self.assertTrue((scenario_dir / "runtime_topology.topo.json").exists())
             self.assertFalse((scenario_dir / "manifest.json").exists())
 
+    def test_required_runtime_source_accepts_only_canonical_gzip_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            directory = Path(tmp_dir)
+            (directory / "runtime_topology.topo.json.gz").write_bytes(b"gzip-source")
+            scenario_bundle_platform.require_directory_files(
+                directory, ["runtime_topology.topo.json"], label="runtime",
+            )
+            (directory / "other.json.gz").write_bytes(b"gzip-source")
+            with self.assertRaisesRegex(FileNotFoundError, "other.json"):
+                scenario_bundle_platform.require_directory_files(directory, ["other.json"], label="other")
+
     def test_publish_checkpoint_bundle_scenario_data_copies_derived_support_files(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
@@ -184,6 +195,7 @@ class ScenarioBundlePlatformTest(unittest.TestCase):
             _write_json(checkpoint_dir / "owners.by_feature.json", {"owners": {"F-1": "AAA"}})
             _write_json(checkpoint_dir / "controllers.by_feature.json", {"controllers": {"F-1": "AAA"}})
             _write_json(checkpoint_dir / "cores.by_feature.json", {"cores": {"F-1": ["AAA"]}})
+            _write_json(checkpoint_dir / "strategic_values.by_feature.json", {"strategic_values": {}})
             _write_json(checkpoint_dir / "manifest.json", {"summary": {"feature_count": 1}})
             _write_json(checkpoint_dir / "audit.json", {"ok": True})
             _write_json(checkpoint_dir / "special_regions.geojson", {"type": "FeatureCollection", "features": []})

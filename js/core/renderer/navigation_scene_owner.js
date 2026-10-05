@@ -4,16 +4,26 @@ import { createNavigationFrameOwner } from "./navigation_frame_owner.js";
 import { getObjectIdentityToken } from "./object_identity.js";
 import { getProjectionGeometryGeneration } from "./projection_geometry_identity.js";
 import { isScenarioPoliticalBaseChunk } from "../scenario_chunk_manager.js";
+import { pageResourceBudget } from "../runtime_resource_budget.js";
 
 // Navigation owns a small, whole-scene raster. Viewport chunk promotion is not
 // a paint edit, and must not discard the only frame that covers a fast pan.
 export function createNavigationSceneOwner(state, { surface, helpers: h, createFrameOwner = createNavigationFrameOwner,
   createWorkerClient = createGeometryRasterWorkerClient,
+  createCanvas = () => document.createElement("canvas"),
+  resourceBudget = pageResourceBudget,
   yieldTask = () => globalThis.scheduler?.yield ? globalThis.scheduler.yield() : new Promise((resolve) => setTimeout(resolve, 0)),
 }) {
   let paintRevision = null;
   let paintSignature = "";
   let detailedFrame = null;
+  const detailOwner = Symbol("navigation-base-detail");
+  const maxDetailBytes = 32 * 1024 * 1024;
+  function clearDetail() {
+    if (detailedFrame) { detailedFrame.source.width = 0; detailedFrame.source.height = 0; }
+    detailedFrame = null;
+    resourceBudget.release(detailOwner);
+  }
   let requestedIdentity = "";
   let sourceRequest = null;
   let sourcePayloads = null;
@@ -287,27 +297,51 @@ export function createNavigationSceneOwner(state, { surface, helpers: h, createF
     }
   }
 
-  function captureDetail(source, transform, dpr, { completeExact = false } = {}) {
-    detailedFrame = { source, transform: { x: transform.x, y: transform.y, k: transform.k }, dpr, identity: getIdentity() };
-    if (completeExact && !frame.isReady() && globalThis.d3?.geoPath && surface.getProjection()) {
-      const bounds = globalThis.d3.geoPath(surface.getProjection()).bounds({ type: "Sphere" });
-      if (frame.captureWholeScene?.(source, transform, dpr, bounds)) return;
+  function captureDetail(source, transform, dpr, { completeExact = false, drawBase = null } = {}) {
+    // Source supplies dimensions only. Copying the visible screenshot would
+    // bake text into both the detail and the whole-world navigation raster.
+    if (!completeExact || typeof drawBase !== "function" || !(transform?.k > 0) || !(dpr > 0)) return false;
+    const bytes = Number(source?.width) * Number(source?.height) * 4;
+    if (!Number.isSafeInteger(bytes) || bytes <= 0 || bytes > maxDetailBytes) return false;
+    // Release the replaceable detail before allocating its successor; retained
+    // detail never exceeds the local cap and the visible complete frame stays intact.
+    clearDetail();
+    const canvas = createCanvas();
+    canvas.width = source.width; canvas.height = source.height;
+    const context = canvas.getContext("2d");
+    if (!context) { canvas.width = 0; canvas.height = 0; return false; }
+    resourceBudget.update(detailOwner, { bitmaps: bytes });
+    try {
+      if (drawBase(context) !== true) { canvas.width = 0; canvas.height = 0; resourceBudget.release(detailOwner); return false; }
+    } catch (error) {
+      canvas.width = 0; canvas.height = 0; resourceBudget.release(detailOwner);
+      throw error;
     }
+    detailedFrame = { source: canvas, transform: { x: transform.x, y: transform.y, k: transform.k }, dpr,
+      identity: getIdentity(), detailIdentity: h.getDetailIdentity?.(transform) };
+    // A global raster must not inherit viewport-only context layers; the
+    // cooperative world renderer remains its one consistent source.
     prepare();
+    return true;
   }
 
   function draw(transform) {
+    if (detailedFrame && (detailedFrame.identity !== getIdentity()
+      || h.getDetailIdentity && detailedFrame.detailIdentity !== h.getDetailIdentity(detailedFrame.transform))) clearDetail();
     const detail = detailedFrame?.identity === getIdentity() ? detailedFrame : null;
-    return frame.draw(surface.getContext(), transform, state.dpr || 1, {
+    if (h.canDrawLabels && !h.canDrawLabels(transform)) return false;
+    const drawn = frame.draw(surface.getContext(), transform, state.dpr || 1, {
       detailSource: detail?.source,
       detailTransform: detail?.transform,
       detailDpr: detail?.dpr,
     });
+    if (!drawn) return false;
+    return h.drawLabels ? h.drawLabels(transform) : true;
   }
 
   return Object.freeze({ prepare, prewarm, draw, captureDetail, isReady: frame.isReady,
     clear() {
-      frame.clear(); requestedIdentity = ""; detailedFrame = null;
+      frame.clear(); requestedIdentity = ""; clearDetail();
       sourceRequest = null; sourcePayloads = null; failedSourceIdentity = ""; prewarmedSourceIdentity = "";
     } });
 }

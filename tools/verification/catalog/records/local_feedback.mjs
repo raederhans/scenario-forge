@@ -108,6 +108,16 @@ export function createLocalFeedbackRecords(baseRecords) {
   // child-safe. The eastern-source suite intentionally reads the local raw
   // geographic inputs and keeps the heavy-geo/main-thread policy.
   const precisionPytestRoutes = [
+    ["scenario-geography-repair", "python -m unittest tests.test_repair_scenario_geography -q", [
+      "tests/test_repair_scenario_geography.py", "tools/repair_scenario_geography.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
+    ["canada-parallel-lod", "python -m unittest tests.test_canada_parallel_lod -q", [
+      "tests/test_canada_parallel_lod.py", "tools/scenario_chunk_assets.py",
+      "tools/rebuild_scenario_geography.py", "tools/build_runtime_political_topology.py",
+      "data/europe_topology.runtime_political_v1.json",
+    ]],
     ["remaining-europe-seam", "python -m pytest tests/test_tno_remaining_europe_seams.py -q", [
       "tests/test_tno_remaining_europe_seams.py", "tools/repair_tno_remaining_europe_seams.py",
       "tools/repair_specs/tno_remaining_europe_20261005.json", "tools/repair_tno_balkan_anatolia_seams.py",
@@ -194,7 +204,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     commandRef: "python -m pytest tests/test_tno_eastern_precision_sources.py -q",
     sourceRefs: [
       "tests/test_tno_eastern_precision_sources.py", "tools/prepare_tno_eastern_precision_sources.py",
-      "data/scenarios/tno_1962/runtime_topology.topo.json", "data/poland_powiaty.geojson",
+      "data/scenarios/tno_1962/runtime_topology.topo.json.gz", "data/poland_powiaty.geojson",
       "data/geoBoundaries-UKR-ADM2.geojson", "data/geoBoundaries-BLR-ADM2.geojson", "data/europe_topology.highres.json",
     ],
     ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
@@ -226,6 +236,9 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["geometry-raster-runtime", "renderer-runtime", "js/core/renderer/geometry_raster_runtime_owner.js", "tests/geometry_raster_runtime_owner_behavior.test.mjs"],
     ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],
     ["geometry-transfer-codec", "renderer-runtime", "js/core/geometry_transfer_codec_shared.js", "tests/geometry_transfer_codec_behavior.test.mjs", ["js/core/startup_worker_client.js", "js/workers/startup_boot.worker.js", "js/core/geometry_raster_worker_client.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
+    ["startup-worker-transfer", "startup", "js/core/startup_worker_client.js", "tests/startup_worker_transfer_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "js/core/geometry_transfer_codec_shared.js"]],
+    ["startup-topology-codec", "startup", "js/core/startup_topology_codec_shared.js", "tests/startup_topology_codec_behavior.test.mjs", ["js/workers/startup_boot.worker.js", "tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/fixtures/startup_topology_v7.json"]],
+    ["startup-scenario-boot-recovery", "startup", "js/bootstrap/startup_scenario_boot.js", "tests/startup_scenario_boot_recovery_behavior.test.mjs"],
     ["geometry-raster-worker-kernel", "renderer-runtime", "js/core/renderer/geometry_raster_worker_kernel.js", "tests/geometry_raster_worker_kernel_behavior.test.mjs"],
     ["geometry-cache-budget", "renderer-runtime", "js/core/renderer/geometry_cache_budget.js", "tests/geometry_cache_budget_behavior.test.mjs", ["js/core/renderer/political_path_cache_owner.js", "js/core/renderer/geometry_raster_worker_kernel.js"]],
     ["pixel-ratio-policy", "renderer-runtime", "js/core/renderer/pixel_ratio_policy.js", "tests/pixel_ratio_policy_behavior.test.mjs"],
@@ -238,6 +251,14 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
     ["bathymetry-geometry", "renderer-runtime", "js/core/renderer/bathymetry_geometry.js", "tests/bathymetry_geometry_behavior.test.mjs"],
     ["projected-geographic-path-cache", "renderer-runtime", "js/core/renderer/projected_geographic_path_cache.js", "tests/projected_geographic_path_cache_behavior.test.mjs"],
+    ["navigation-frame", "renderer-runtime", "js/core/renderer/navigation_frame_owner.js", "tests/navigation_frame_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["navigation-scene", "renderer-runtime", "js/core/renderer/navigation_scene_owner.js", "tests/navigation_scene_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["overview-frame", "renderer-runtime", "js/core/renderer/overview_frame_owner.js", "tests/overview_frame_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["label-draw-snapshot", "renderer-runtime", "js/core/renderer/label_draw_snapshot.js", "tests/label_draw_snapshot_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["cached-surface-coverage", "renderer-runtime", "js/core/renderer/cached_surface_coverage.js", "tests/cached_surface_coverage_behavior.test.mjs", ["js/core/renderer/render_pipeline_passes.js", "js/core/map_renderer.js"]],
+    ["render-pass-visibility", "renderer-runtime", "js/core/map_renderer/render_pass_visibility_policy.js", "tests/render_pass_catalog_behavior.test.mjs", ["js/core/map_renderer/render_pass_catalog.js"]],
+    ["render-cache-surface-resources", "renderer-runtime", "js/core/renderer/render_cache_surface_resources.js", "tests/render_cache_owner_invalidation_behavior.test.mjs", ["js/core/renderer/render_cache_owner.js"]],
+    ["city-hierarchy-policy", "renderer-runtime", "js/core/renderer/urban_city_policy.js", "tests/city_hierarchy_policy_behavior.test.mjs", ["js/core/renderer/city_reveal_policy.js"]],
     ["physical-contour-lod", "renderer-runtime", "js/core/renderer/physical_contour_lod_policy.js", "tests/physical_contour_lod_policy_behavior.test.mjs"],
     ["fill-target-policy", "renderer-runtime", "js/core/renderer/fill_target_policy.js", "tests/fill_target_policy_behavior.test.mjs"],
     ["visible-frame-identity-policy", "renderer-runtime", "js/core/renderer/visible_frame_identity_policy.js", "tests/visible_frame_identity_policy_behavior.test.mjs"],
@@ -284,7 +305,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["physical-atlas-lod", "renderer-runtime", "js/core/renderer/physical_atlas_lod_policy.js", "tests/physical_atlas_lod_policy_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
     ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
-    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
+    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs", ["js/core/renderer/projected_path_resource_accounting.js"]],
     // Shared-cache changes run the actual region/relief/cache assembly suite.
     ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs", [
       "js/core/renderer/render_cache_owner.js", "js/core/renderer/render_cache_validation_scope.js",
@@ -304,6 +325,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["urban-layer-render", "renderer-runtime", "js/core/renderer/urban_layer_render_owner.js", "tests/urban_layer_render_owner_behavior.test.mjs"],
     ["visible-frame-diagnostics", "renderer-runtime", "js/core/renderer/visible_frame_diagnostics_owner.js", "tests/visible_frame_diagnostics_owner_behavior.test.mjs"],
     ["marine-label", "renderer-runtime", "js/core/renderer/marine_label_owner.js", "tests/marine_label_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["ui-i18n-refresh", "main-shell", "js/ui/i18n.js", "tests/ui_i18n_refresh_behavior.test.mjs", ["js/core/i18n_catalog.js"]],
+    ["styled-selects", "main-shell", "js/ui/styled_selects.js", "tests/styled_selects_behavior.test.mjs"],
     ["water-inspector-navigation", "sidebar-shell", "js/ui/sidebar/water_special_region_controller.js", "tests/water_inspector_navigation_behavior.test.mjs", ["js/ui/sidebar.js"]],
   ];
 
@@ -460,6 +483,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     id: "local:scenario-ownership-repairs",
     commandRef: "python -m unittest tests.test_tno_ownership_repairs -q",
     sourceRefs: ["data/scenario-rules/tno_1962.russia_ownership.manual.json",
+      "data/scenario-rules/tno_1962.decolonization.manual.json",
       "tools/patch_tno_1962_bundle.py", "tests/test_tno_ownership_repairs.py"],
     ownerHints: ["scenario-builder"], domains: ["scenario-build"],
     selectorOrder: editorCheckoutRecord.selectorOrder + 9,
@@ -490,7 +514,32 @@ export function createLocalFeedbackRecords(baseRecords) {
     selectorOrder: editorCheckoutRecord.selectorOrder + 12,
   };
 
-  return [physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
+  const startupTopologyCodecRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:startup-topology-codec",
+    commandRef: "python -m unittest tests.test_startup_topology_codec -q",
+    sourceRefs: ["tools/startup_topology_codec.py", "tools/build_startup_bundle.py", "tests/test_startup_topology_codec.py", "tests/fixtures/startup_topology_v7.json"],
+    ownerHints: ["startup"], domains: ["startup"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 13,
+  };
+  const marineSyncRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:sync-marine-refinement",
+    commandRef: "python -m unittest tests.test_sync_marine_refinement -q",
+    sourceRefs: ["tools/sync_marine_refinement.py", "tests/test_sync_marine_refinement.py"],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 14,
+  };
+  const baselineStartupProjectionRecord = {
+    ...editorCheckoutRecord,
+    id: "local:python:perf-baseline-startup-projection",
+    commandRef: "python -m unittest tests.test_perf_baseline_startup_projection -q",
+    sourceRefs: ["tools/perf/project_baseline_startup.py", "tests/test_perf_baseline_startup_projection.py"],
+    ownerHints: ["perf"], domains: ["perf"],
+    selectorOrder: editorCheckoutRecord.selectorOrder + 15,
+  };
+
+  return [baselineStartupProjectionRecord, marineSyncRecord, startupTopologyCodecRecord, physicalDetailRecord, bathymetryBuilderRecord, ...actionRecords, ...borderRecords, countryInspectorRecord,
     ...pythonRecords, ...precisionPytestRecords, ...ownerRecords, ...testRecords, editorCheckoutRecord,
     historyColorRecord, runtimeInputRecord, inputEvidenceRecord,
     startupLifecycleRecord, projectImportLifecycleRecord, projectImportRecoveryRecord,

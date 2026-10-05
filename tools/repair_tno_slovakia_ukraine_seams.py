@@ -25,6 +25,7 @@ import geopandas as gpd
 import shapely
 from shapely.geometry import Point, box
 
+from map_builder.json_source import read_json_source
 from map_builder.coverage_validation import coverage_is_valid_exact
 from map_builder.geo.measurement import densify_for_measurement
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry, replace_regional_geometry
@@ -328,7 +329,7 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     output, report_path = _output_paths(args.output)
-    baseline = json.loads((args.baseline_dir / 'runtime_topology.topo.json').read_text(encoding='utf-8'))
+    baseline = read_json_source(args.baseline_dir / 'runtime_topology.topo.json')
     owners = json.loads((args.baseline_dir / 'owners.by_feature.json').read_text(encoding='utf-8'))['owners']
     source, source_metadata = _read_reviewed_source(args.source)
     candidate, report = build_candidate(baseline, owners, source)

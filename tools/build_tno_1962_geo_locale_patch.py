@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from map_builder.json_source import read_json_source
 from map_builder.io.readers import read_json_strict
 from map_builder.io.writers import write_json_atomic
 
@@ -36,6 +37,8 @@ def normalize_text(value: object) -> str:
 
 
 def read_json(path: Path) -> object:
+    if path.name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        return read_json_source(path)
     return read_json_strict(path)
 
 

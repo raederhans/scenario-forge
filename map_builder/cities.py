@@ -21,11 +21,12 @@ from map_builder.city_contract import validate_city_features
 from map_builder.io.fetch import fetch_or_cache_binary
 from map_builder.io.readers import load_populated_places, read_json_optional
 from map_builder.io.writers import write_json_atomic
+from map_builder.json_source import read_json_source, resolve_json_source_path
 from map_builder.scenario_city_overrides_composer import (
     compose_city_overrides_payload,
 )
 from map_builder.scenario_capital_rules import apply_reviewed_capitals
-from map_builder.scenario_capital_placement import place_capital_markers, read_political_features
+from map_builder.scenario_capital_placement import place_capital_markers
 
 
 GEONAMES_COLUMNS = [
@@ -6158,10 +6159,20 @@ def emit_default_scenario_city_assets(output_dir: Path, world_cities: gpd.GeoDat
             scenario_id=scenario_id,
         )
         runtime_topology_path = scenario_dir / "runtime_topology.topo.json"
-        if runtime_topology_path.exists() and owners_by_feature:
+        resolved_runtime_topology_path = resolve_json_source_path(runtime_topology_path)
+        if resolved_runtime_topology_path.exists() and owners_by_feature:
+            topology = read_json_source(runtime_topology_path)
+            from topojson.utils import serialize_as_geojson
+            runtime_features = []
+            for object_name in ("political", "scenario_atlantropa"):
+                if object_name in topology.get("objects", {}):
+                    collection = serialize_as_geojson(topology, objectname=object_name)
+                    if isinstance(collection, str):
+                        collection = json.loads(collection)
+                    runtime_features.extend(collection.get("features", []))
             conflicts = place_capital_markers(
                 overrides_payload, countries, owners_by_feature,
-                read_political_features(runtime_topology_path),
+                runtime_features,
             )
             overrides_payload["audit"]["capital_territory_conflicts"] = conflicts
         reviewed_entries = {

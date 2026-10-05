@@ -13,6 +13,32 @@ from tools.political_detail_partition import partition_political_detail_features
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_source_hash_uses_manifest_gzip_runtime_url_and_stored_bytes(self):
+        runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app = Path(temporary)
+            scenario = app / "data/scenarios/test"
+            scenario.mkdir(parents=True)
+            plain = scenario / "runtime_topology.topo.json"
+            plain.write_bytes(b'{ "different": "plain topology" }')
+            compressed = plain.with_name(plain.name + ".gz")
+            encoded = gzip.compress(b'{"type":"Topology","objects":{},"arcs":[]}', mtime=0)
+            compressed.write_bytes(encoded)
+            old = "a" * 64
+            manifest = {"runtime_topology_url": "data/scenarios/test/runtime_topology.topo.json.gz", "source": {"runtime_topology_sha256": old}}
+            (scenario / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            bundle = scenario / "startup.bundle.en.json"
+            bundle.write_text(json.dumps({"source": {"runtime_topology_sha256": old}}), encoding="utf-8")
+            pack_published_runtime_data(app)
+            expected = hashlib.sha256(encoded).hexdigest()
+            self.assertEqual(json.loads((scenario / "manifest.json").read_bytes())["source"]["runtime_topology_sha256"], expected)
+            self.assertEqual(json.loads(bundle.read_bytes())["source"]["runtime_topology_sha256"], expected)
+            self.assertEqual(compressed.read_bytes(), encoded)
+            plain.unlink()
+            pack_published_runtime_data(app)
+            self.assertEqual(json.loads(bundle.read_bytes())["source"]["runtime_topology_sha256"], expected)
+
     def test_topology_wire_keeps_expanded_geojson_cache_weight(self):
         runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
         runtime.mkdir(parents=True, exist_ok=True)

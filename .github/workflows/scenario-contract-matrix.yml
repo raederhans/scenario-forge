@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
-  push:
-    branches:
-      - main
+  # PR checks cover the merge candidate; manual runs retain a full audit entry.
+  # Do not repeat all scenarios automatically after every main merge.
 
 permissions:
   contents: read

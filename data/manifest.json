@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-29T02:43:25.512929+00:00",
+  "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "outputs": {
     "city_aliases.json": {
       "alias_count": 189255,
@@ -35,8 +35,8 @@
       "size_bytes": 19049
     },
     "europe_topology.json": {
-      "arc_count": 244972,
-      "arc_point_count": 1305691,
+      "arc_count": 296827,
+      "arc_point_count": 1538874,
       "artifact_class": "derived",
       "description": "Primary political topology emitted by the coarse GIS pipeline.",
       "has_computed_neighbors": true,
@@ -55,9 +55,9 @@
       "raw_world_bounds_geometries": 0,
       "role": "primary_topology",
       "schema_ref": "schema://topology/political_bundle_v1",
-      "sha256": "d82227d24f39a8a455a2b58541c7dcb77f8da3daa22838385248d8aa7364f5ce",
+      "sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
       "simplification": "coarse_publish_v1",
-      "size_bytes": 18591301,
+      "size_bytes": 21884375,
       "target_zoom_range": [
         0,
         1.7
@@ -96,8 +96,8 @@
       "world_bounds_geometries": 1
     },
     "europe_topology.na_v2.json": {
-      "arc_count": 371638,
-      "arc_point_count": 1752215,
+      "arc_count": 423493,
+      "arc_point_count": 1985398,
       "artifact_class": "derived",
       "description": "Current detail political topology used for runtime enrichment.",
       "has_computed_neighbors": true,
@@ -116,9 +116,9 @@
       "raw_world_bounds_geometries": 42,
       "role": "detail_topology_na_v2",
       "schema_ref": "schema://topology/detail_political_bundle_v2",
-      "sha256": "334446a5ebcc291e4e64b5d3d1c2831984956d0720a2821f512bcde8a440f8e6",
+      "sha256": "e6b33ee367436ef38df1f21d4e191e50f54b8c2902f1baa2ce96f13e2c2bfc1a",
       "simplification": "detail_publish_v2",
-      "size_bytes": 80385719,
+      "size_bytes": 90318930,
       "target_zoom_range": [
         1.7,
         20
@@ -127,8 +127,8 @@
       "world_bounds_geometries": 9
     },
     "europe_topology.runtime_political_v1.json": {
-      "arc_count": 150426,
-      "arc_point_count": 631942,
+      "arc_count": 150425,
+      "arc_point_count": 632481,
       "artifact_class": "publish",
       "description": "Unified runtime political topology consumed by the app and scenarios.",
       "has_computed_neighbors": true,
@@ -140,9 +140,9 @@
       "raw_world_bounds_geometries": 450,
       "role": "runtime_political_topology",
       "schema_ref": "schema://topology/runtime_political_v1",
-      "sha256": "b833908e74ecf8d1edce8ee8031feb8c230669674537d341fbaa4ef31e03491c",
+      "sha256": "43e307baa1b7ffa4b00774fdf12c7d96eb0cd0dd219c1c6990384da0c6cddbff",
       "simplification": "runtime_projection_v1",
-      "size_bytes": 32742132,
+      "size_bytes": 32763855,
       "target_zoom_range": [
         1.7,
         20
@@ -221,6 +221,25 @@
       "simplification": "preserve_topology_0.005_degrees_existing_named_geometries_preserved",
       "size_bytes": 2381103,
       "type": "geojson"
+    },
+    "global_physical_semantics.detail.topo.json": {
+      "arc_count": 8452,
+      "arc_point_count": 46869,
+      "artifact_class": "publish",
+      "description": "Alps 2019 land-cover detail; overview elsewhere",
+      "object_names": [
+        "physical_semantics"
+      ],
+      "owner": "tools.build_physical_detail",
+      "role": "physical_semantics_detail",
+      "schema_ref": "schema://topojson/topology/v1",
+      "sha256": "b185b564f4fa73acbcd30fc117535686d4564f218aed56e7586cc37c6464f827",
+      "size_bytes": 1139530,
+      "target_zoom_range": [
+        4,
+        20
+      ],
+      "type": "topology"
     },
     "global_physical_semantics.topo.json": {
       "arc_count": 5991,
@@ -389,13 +408,13 @@
     "locales.json": {
       "artifact_class": "publish",
       "description": "Published locale bundle for UI and geo labels.",
-      "geo_entry_count": 73684,
+      "geo_entry_count": 73828,
       "owner": "init_map_data.hierarchy_locales",
       "role": "locales",
-      "sha256": "aac63a847cea56383ea6a944c3a321aee255f8903cc1e5ee01c4242edfbb1f67",
-      "size_bytes": 8467060,
+      "sha256": "374772a49eaf218f8955f39ba6bcc3bef3680e7a54485df371bf8cfc9e007d46",
+      "size_bytes": 8502370,
       "type": "locales",
-      "ui_entry_count": 1870
+      "ui_entry_count": 2044
     },
     "marine_regions.refined.source.geojson": {
       "artifact_class": "derived",
@@ -403,8 +422,8 @@
       "owner": "tools/build_marine_refinement_sources.py",
       "role": "marine_refinement_source",
       "schema_ref": "schema://geojson/feature_collection/v1",
-      "sha256": "b81de47c67949111ab74fa0c9cde068a24b60c612bff2ea0c9afc2d7b4f4f505",
-      "size_bytes": 20594569,
+      "sha256": "0952b1b42f9f5fefe68011cfeb0359520f7e412b0432acd4ce0d6056c43611ff",
+      "size_bytes": 27909996,
       "type": "geojson"
     },
     "palette-maps/hgo.audit.json": {
@@ -602,6 +621,40 @@
       "sha256": "52388b21bfb0150155a7729d85852bf6463698ae56df17c106cf0c71cc105a83",
       "size_bytes": 235007,
       "type": "palette_pack"
+    },
+    "physical_hillshade.alps.topo.json": {
+      "arc_count": 6912,
+      "arc_point_count": 24688,
+      "artifact_class": "publish",
+      "description": "Alps ETOPO 2022 DEM illumination pilot, opt-in",
+      "object_names": [
+        "physical_hillshade"
+      ],
+      "owner": "tools.build_physical_presentation",
+      "role": "physical_hillshade",
+      "schema_ref": "schema://topojson/topology/v1",
+      "sha256": "3b00da5c185fe4c1fb39c18059cb8805226ef8f3c96309d21adb36e4dca2c636",
+      "size_bytes": 589742,
+      "target_zoom_range": [
+        4,
+        20
+      ],
+      "type": "topology"
+    },
+    "physical_region_labels.geojson": {
+      "artifact_class": "publish",
+      "description": "Natural Earth bilingual physical reference labels",
+      "feature_count": 419,
+      "owner": "tools.build_physical_presentation",
+      "role": "physical_region_labels",
+      "schema_ref": "schema://geojson/feature_collection/point/v1",
+      "sha256": "c47ad8c0c5a448c3883224e6bee948e86f10f0958b9c67029984a4a6e03277c0",
+      "size_bytes": 133923,
+      "target_zoom_range": [
+        2,
+        20
+      ],
+      "type": "geojson"
     },
     "quick_fill/china_prefecture_crosswalk.v1.json": {
       "artifact_class": "derived",
@@ -853,59 +906,6 @@
       "sha256": "7ae6c36d667a787e7b52421ba5515ff850719850622ea12a0c55ccd7359fd30e",
       "size_bytes": 24980735,
       "type": "world_cities"
-    },
-    "global_physical_semantics.detail.topo.json": {
-      "role": "physical_semantics_detail",
-      "artifact_class": "publish",
-      "owner": "tools.build_physical_detail",
-      "description": "Alps 2019 land-cover detail; overview elsewhere",
-      "size_bytes": 1139530,
-      "sha256": "b185b564f4fa73acbcd30fc117535686d4564f218aed56e7586cc37c6464f827",
-      "schema_ref": "schema://topojson/topology/v1",
-      "target_zoom_range": [
-        4,
-        20
-      ],
-      "type": "topology",
-      "object_names": [
-        "physical_semantics"
-      ],
-      "arc_count": 8452,
-      "arc_point_count": 46869
-    },
-    "physical_hillshade.alps.topo.json": {
-      "role": "physical_hillshade",
-      "artifact_class": "publish",
-      "owner": "tools.build_physical_presentation",
-      "description": "Alps ETOPO 2022 DEM illumination pilot, opt-in",
-      "size_bytes": 589742,
-      "sha256": "3b00da5c185fe4c1fb39c18059cb8805226ef8f3c96309d21adb36e4dca2c636",
-      "schema_ref": "schema://topojson/topology/v1",
-      "target_zoom_range": [
-        4,
-        20
-      ],
-      "type": "topology",
-      "object_names": [
-        "physical_hillshade"
-      ],
-      "arc_count": 6912,
-      "arc_point_count": 24688
-    },
-    "physical_region_labels.geojson": {
-      "role": "physical_region_labels",
-      "artifact_class": "publish",
-      "owner": "tools.build_physical_presentation",
-      "description": "Natural Earth bilingual physical reference labels",
-      "size_bytes": 133923,
-      "sha256": "c47ad8c0c5a448c3883224e6bee948e86f10f0958b9c67029984a4a6e03277c0",
-      "schema_ref": "schema://geojson/feature_collection/point/v1",
-      "target_zoom_range": [
-        2,
-        20
-      ],
-      "type": "geojson",
-      "feature_count": 419
     }
   },
   "runtime_asset_registry": {

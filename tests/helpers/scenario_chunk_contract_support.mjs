@@ -479,6 +479,8 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
     "hasPoliticalForegroundColorOverride",
     "isPendingPoliticalColorEditFeature",
     "isPoliticalForegroundFeature",
+    "getStableDrawOrderCache",
+    "getStablePoliticalDrawRank",
     "orderPoliticalShellUnderlayFirst",
     "shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature",
     "isBaseGeographyScenarioFeature",
@@ -502,6 +504,9 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
       },
     };
     const getFeatureId = (feature) => String(feature?.properties?.id || feature?.id || "").trim();
+    let stableDrawOrderCache = null;
+    let stablePaintOrderEnabled = false;
+    const isStablePaintOrderEnabled = () => stablePaintOrderEnabled;
     const getSafeCanvasColor = (value, fallback = null) => (typeof value === "string" && value.trim() ? value : fallback);
     const debugMode = "PROD";
     const LAND_FILL_COLOR = "#f0f0f0";
@@ -551,12 +556,15 @@ function createRendererShellPolicyHarness(rendererSource, politicalPartialOwnerS
       isPendingPoliticalColorEditFeature,
       isPoliticalForegroundFeature,
       orderPoliticalShellUnderlayFirst,
+      getStablePoliticalDrawRank,
       shouldExcludeRuntimeOnlyShellFallbackPoliticalFeature,
       isPoliticalVisualRenderableFeature,
       isPoliticalInteractionRenderableFeature,
       getRuntimePoliticalBaseCollection,
       getPoliticalFeatureFillColor,
       setColors: (value) => { runtimeState.colors = value || {}; },
+      setStablePaintOrderEnabled: (value) => { stablePaintOrderEnabled = !!value; },
+      setPoliticalSourceFeatures: (features) => { runtimeState.landData = { features }; },
       setMapSemanticMode: (value) => { runtimeState.mapSemanticMode = value; },
       setVisualOverrides: (value) => {
         runtimeState.visualOverrides = value || {};

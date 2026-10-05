@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { parse } from "acorn";
 import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass_signature_policy.js";
 import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
+import { commitPhysicalContourDisplayState } from "../js/core/state/actions/content_load_actions.js";
 
 function createHarness(overrides = {}) {
   const state = {
@@ -57,6 +58,46 @@ test("country label visibility invalidates labels without invalidating political
   state.styleConfig.countryLabels = { enabled: false };
   assert.notEqual(policy.getRenderPassSignature("labels"), labels);
   assert.equal(policy.getRenderPassSignature("political"), political);
+});
+
+test("physical region name opacity invalidates labels only while names are enabled", () => {
+  const { state, policy } = createHarness();
+  state.showPhysical = true;
+  state.styleConfig.physical = { showRegionLabels: true, mode: "atlas_and_contours", opacity: 1 };
+  const labels = policy.getRenderPassSignature("labels");
+  state.styleConfig.physical.opacity = 0.5;
+  assert.notEqual(policy.getRenderPassSignature("labels"), labels);
+
+  state.styleConfig.physical.showRegionLabels = false;
+  const namesHidden = policy.getRenderPassSignature("labels");
+  state.styleConfig.physical.opacity = 0.25;
+  assert.equal(policy.getRenderPassSignature("labels"), namesHidden);
+});
+
+test("physical base tracks the selected atlas identity rather than unrelated context publications", () => {
+  const { state, policy } = createHarness();
+  state.showPhysical = true;
+  state.zoomTransform = { x: 0, y: 0, k: 1 };
+  state.physicalSemanticsData = { features: [{}] };
+  state.contextLayerExternalDataByName = {};
+  const signature = (k = 1) => policy.getRenderPassSignature("physicalBase", { x: 0, y: 0, k });
+  const overview = signature();
+  state.contextLayerRevision = Number(state.contextLayerRevision || 0) + 1;
+  state.contextLayerExternalDataByName.physical_region_labels = { features: [{}] };
+  assert.equal(signature(), overview);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [{}] };
+  assert.equal(signature(), overview, "dormant detail must not redraw the overview");
+  state.physicalSemanticsData = { features: [{}] };
+  assert.notEqual(signature(), overview, "same-size replacement must update the atlas");
+
+  const detail = signature(4);
+  state.contextLayerRevision++;
+  assert.equal(signature(4), detail);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [{}] };
+  assert.notEqual(signature(4), detail, "export/view transform selects the active detail identity");
+  const replacement = signature(4);
+  state.contextLayerExternalDataByName.physical_semantics_detail = { features: [] };
+  assert.notEqual(signature(4), replacement, "empty detail falls back to the current overview");
 });
 
 test('a political border source publication invalidates only the border signature', () => {
@@ -164,7 +205,6 @@ test("transport presentation changes invalidate shared labels without invalidati
     (state) => { state.showAirports = true; },
     (state) => { state.showPorts = true; },
     (state) => { state.currentLanguage = "zh"; },
-    (state) => { state.contextLayerRevision = 9; },
     (state) => { state.sceneGeneration = 2; },
     (state) => { state.scenarioDataGeneration = 2; },
     (state) => { state.styleConfig.transportOverview = { airport: { labelSize: 14 } }; },
@@ -175,6 +215,39 @@ test("transport presentation changes invalidate shared labels without invalidati
     assert.equal(policy.getRenderPassSignature("political"), before.political);
     assert.notEqual(policy.getRenderPassSignature("contextMarkers"), before.contextMarkers);
     assert.notEqual(policy.getRenderPassSignature("labels"), before.labels);
+  }
+});
+
+test("contour-only publications leave transport and label caches intact", () => {
+  for (const showTransport of [false, true]) {
+    const { state, policy } = createHarness();
+    Object.assign(state, { showTransport, showRoad: true, roadsData: { features: [{}] } });
+    const before = Object.fromEntries(["contextBase", "contextMarkers", "labels"].map((name) =>
+      [name, policy.getRenderPassSignature(name)]));
+    commitPhysicalContourDisplayState(state, { major: { features: [{}] } });
+    assert.notEqual(policy.getRenderPassSignature("contextBase"), before.contextBase);
+    assert.equal(policy.getRenderPassSignature("contextMarkers"), before.contextMarkers);
+    assert.equal(policy.getRenderPassSignature("labels"), before.labels);
+    state.roadsData = { features: [{}] };
+    for (const name of ["contextMarkers", "labels"]) {
+      if (showTransport) assert.notEqual(policy.getRenderPassSignature(name), before[name]);
+      else assert.equal(policy.getRenderPassSignature(name), before[name]);
+    }
+  }
+});
+
+test("visible transport overlays and rail stations invalidate cached labels", () => {
+  const { state, policy } = createHarness();
+  Object.assign(state, { showTransport: true, showRail: true,
+    transportCountryOverlayState: { overlaysByFamily: { rail: { status: "ready", collectionsByLayer: {} } } } });
+  for (const publish of [
+    () => { state.railStationsMajorData = { features: [{}] }; },
+    () => { state.transportCountryOverlayState.overlaysByFamily.rail.collectionsByLayer.railways = { features: [{}] }; },
+    () => { state.transportCountryOverlayState.overlaysByFamily.rail.status = "idle"; },
+  ]) {
+    const before = policy.getRenderPassSignature("labels");
+    publish();
+    assert.notEqual(policy.getRenderPassSignature("labels"), before);
   }
 });
 

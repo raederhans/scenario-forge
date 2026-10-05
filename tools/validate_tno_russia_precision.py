@@ -4,11 +4,14 @@ import shapely
 from shapely.geometry import shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from map_builder.json_source import read_json_source, resolve_json_source_path
 from map_builder.coverage_validation import coverage_is_valid_exact
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
 from tools.scenario_chunk_format import decode_political_chunk
 
 def read(p):
+    if Path(p).name in {'runtime_topology.topo.json', 'runtime_topology.topo.json.gz'}:
+        return read_json_source(p)
     return json.loads(p.read_text(encoding='utf-8'))
 
 def fid(g):
@@ -39,12 +42,15 @@ def lod_coordinates_identical(runtime, lods):
 
 def validate(baseline_dir, candidate_runtime, candidate_dir=None):
     if candidate_dir:
-        candidate_runtime_expected = candidate_dir / 'runtime_topology.topo.json'
+        candidate_runtime_expected = resolve_json_source_path(candidate_dir / 'runtime_topology.topo.json')
         if not candidate_runtime_expected.exists():
             raise ValueError('candidate_dir provided but missing runtime_topology.topo.json')
-        if candidate_runtime_expected.read_bytes() != candidate_runtime.read_bytes():
+        candidate_runtime_actual = resolve_json_source_path(candidate_runtime)
+        if candidate_runtime_expected.read_bytes() != candidate_runtime_actual.read_bytes():
             raise ValueError('candidate_runtime bytes do not match candidate_dir/runtime_topology.topo.json')
         for compressed in candidate_dir.rglob('*.json.gz'):
+            if compressed.name == 'runtime_topology.topo.json.gz':
+                continue
             source = Path(str(compressed)[:-3])
             if not source.exists() or gzip.decompress(compressed.read_bytes()) != source.read_bytes():
                 raise ValueError(f'stale compressed stage artifact: {compressed.name}')

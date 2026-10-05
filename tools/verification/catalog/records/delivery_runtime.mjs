@@ -188,6 +188,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "docs/active/recovery-followup-20260908/context.md",
       "docs/active/recovery-followup-20260908/task.md",
       "tools/build_pages_dist.py",
+      "vendor/fonts",
       "tools/pages_artifact_admission.py",
       "tools/pages_artifact_root.py",
       "tools/pages_artifact_shadow.py",
@@ -291,6 +292,8 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "commandRef": "verify:perf-gate-contract",
     "sourceRefs": [
       ".github/workflows/perf-pr-gate.yml",
+      ".github/workflows/perf-measure.yml",
+      "tools/ci/perf_policy.mjs",
       "requirements-perf.lock.txt",
       "docs/perf/baseline_2026-07-30-ratification.json",
       "ops/browser-mcp/editor-performance-benchmark.py",

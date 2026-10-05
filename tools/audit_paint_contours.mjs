@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Real geometry acceptance. Separate processes release the large geometry index
 // between scenarios. This is not a screen-pixel or ownership-identity audit.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
+import { gunzipSync } from 'node:zlib';
 import { performance } from 'node:perf_hooks';
 import { buildPaintContourGraph, createPaintContourGraphBuilder } from '../js/core/renderer/paint_contour_graph.js';
 import { createPoliticalFeaturePolicy } from '../js/core/renderer/political_feature_policy.js';
@@ -12,7 +13,13 @@ import { registerContourSourcePrecision, getContourCoordinatePrecision } from '.
 import { createPaintContourMesh } from '../js/core/renderer/paint_contour_mesh.js';
 const root = '.runtime/reports/p3b-geometry';
 mkdirSync(root, { recursive: true });
-const read = path => JSON.parse(readFileSync(path, 'utf8'));
+const actualJsonPath = path => path.endsWith('/runtime_topology.topo.json') && !existsSync(path) && existsSync(`${path}.gz`)
+  ? `${path}.gz` : path;
+const read = path => {
+  const source = actualJsonPath(path);
+  const bytes = readFileSync(source);
+  return JSON.parse(source.endsWith('.gz') ? gunzipSync(bytes).toString('utf8') : bytes.toString('utf8'));
+};
 const context = { exports: {} }; context.module = { exports: context.exports };
 vm.runInNewContext(readFileSync('vendor/topojson-client.min.js', 'utf8'), context);
 const topo = context.exports;

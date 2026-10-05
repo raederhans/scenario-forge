@@ -17,6 +17,7 @@ from pyproj import CRS, Transformer
 from shapely.geometry import box, mapping
 from shapely.ops import transform
 
+from map_builder.json_source import read_json_source
 from map_builder.coverage_validation import coverage_is_valid_exact
 from map_builder.geo.measurement import densify_for_measurement
 from map_builder.io.writers import write_json_atomic
@@ -77,7 +78,7 @@ def metrics(geometry, *, max_segment_length_degrees=MEASUREMENT_SEGMENT_LENGTH_D
 
 def load_window(path, bounds, *, surfaces=True):
     """Decode actual runtime coordinates without repair, rounding or buffering."""
-    topology = _absolute_topology(json.loads(Path(path).read_text(encoding="utf-8")))
+    topology = _absolute_topology(read_json_source(path))
     extent = box(*bounds)
     rows = {}
     for row in topology["objects"]["political"]["geometries"]:

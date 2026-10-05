@@ -210,6 +210,7 @@ export function createDefaultStyleConfig() {
       scenarioShallowContourFadeEndZoom: 3.1,
     },
     lakes: createDefaultLakeStyleConfig(),
+    countryLabels: { enabled: true },
     cityPoints: {
       ...createDefaultCityLayerStyleConfig(),
     },
@@ -283,6 +284,7 @@ export function createDefaultUiState() {
     dirtyRevision: 0,
     onboardingDismissed: false,
     hoveredId: null,
+    hoveredRiverCellId: null,
     hoveredWaterRegionId: null,
     hoveredSpecialRegionId: null,
     hoverOverlayDirty: true,
@@ -515,6 +517,11 @@ export function restoreImportedStyleConfigState(
       ...((imported.ocean && typeof imported.ocean === "object") ? imported.ocean : {}),
     },
     lakes: normalizeLakeStyle(imported.lakes),
+    countryLabels: {
+      enabled: typeof imported.countryLabels?.enabled === "boolean"
+        ? imported.countryLabels.enabled
+        : currentStyleConfig.countryLabels?.enabled !== false,
+    },
     cityPoints: imported.cityPoints && typeof imported.cityPoints === "object"
       ? normalizeCityLayerStyle({
           ...(currentStyleConfig.cityPoints || defaults.cityPoints),

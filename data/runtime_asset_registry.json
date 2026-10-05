@@ -648,11 +648,41 @@
       "family_id": "physical_region_labels",
       "description": "Natural Earth bilingual physical reference labels"
     },
+    "river_partitions:modern_world_wave3": {
+      "url": "data/river_partitions/modern_world_wave3.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 302-parent Modern World river pack; preserves all twelve wave2 parent records and excludes the five deferred joint candidates."
+    },
+    "river_partitions:modern_world_wave2": {
+      "url": "data/river_partitions/modern_world_wave2.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed twelve-parent Modern World river pack; retains all original pilot cells and adds Oder, Yangtze and Yellow River sites."
+    },
     "river_partitions:modern_world_pilot": {
       "url": "data/river_partitions/modern_world_pilot.json",
       "role": "river_partitions",
       "family_id": "river_paint",
       "description": "Reviewed six-parent river-paint pilot bound to the Modern World baseline; independent from reference topology."
+    },
+    "river_partitions:modern_world_wave5": {
+      "url": "data/river_partitions/modern_world_wave5.transport.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 376-parent Modern World river pack in lossless indexed transport; preserves all 302 wave3 parent records."
+    },
+    "river_partitions:modern_world_wave6": {
+      "url": "data/river_partitions/modern_world_wave6.transport.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 382-parent Modern World river pack in lossless indexed transport; preserves all 376 wave5 parent records and excludes seven held internal-seam overlap candidates."
+    },
+    "river_partitions:modern_world_wave7": {
+      "url": "data/river_partitions/modern_world_wave7.transport.json",
+      "role": "river_partitions",
+      "family_id": "river_paint",
+      "description": "Reviewed 389-parent Modern World river pack in lossless indexed transport; preserves all 382 wave6 parent records and admits seven overlaps with ordered parent visibility and layered internal contours."
     }
   },
   "scenario_registry_key": "scenario_registry",

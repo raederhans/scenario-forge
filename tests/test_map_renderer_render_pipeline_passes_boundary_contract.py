@@ -86,7 +86,7 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             renderer_content,
         )
         self.assertIn(
-            "function drawTextureLabelEffectsPass(k) {\n  return getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k);\n}",
+            'function drawTextureLabelEffectsPass(k) {\n  return recordLabelPass("textureLabels", () => getVisualEffectsPassOwner().drawTextureLabelEffectsPass(k));\n}',
             renderer_content,
         )
         self.assertIn(
@@ -308,7 +308,8 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             "        && isBootInteractionReady() && !hasPendingPoliticalColorEdit()",
             renderer_content,
         )
-        self.assertIn("const requestedPassNames = Array.isArray(passNames) ? new Set(passNames.filter(Boolean)) : null;", owner_content)
+        self.assertIn("const activePassNames = getActiveRenderPassNames();", owner_content)
+        self.assertIn("!Array.isArray(activePassNames) || activePassNames.includes(name)", owner_content)
         self.assertIn("detectContextScenarioReasonMismatch({ cache, renderPerf: state.renderPerfMetrics || {} });", owner_content)
         self.assertIn('from "../renderer/exact_after_settle_pass_catalog.js";', exact_plan_content)
         self.assertNotIn("const EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES = new Set", exact_plan_content)
@@ -377,12 +378,12 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
             'const HGO_RUNTIME_PREVIEW_TRANSFORMED_FRAME_PASS_NAMES = Object.freeze([\n  "hgoPreview",\n]);',
             hgo_preview_owner_content,
         )
-        self.assertIn("return getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames();", renderer_content)
+        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());", renderer_content)
         self.assertIn(
             "return isReady() ? HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES : vectorRenderPassNames;",
             hgo_preview_owner_content,
         )
-        self.assertIn("return getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames();", renderer_content)
+        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames());", renderer_content)
         self.assertIn(
             "return isReady() ? HGO_RUNTIME_PREVIEW_TRANSFORMED_FRAME_PASS_NAMES : vectorTransformedFramePassNames;",
             hgo_preview_owner_content,
@@ -462,7 +463,8 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
                 source = context_pass_owner_content
             else:
                 source = renderer_content
-            pass_body = source.split(f"function {function_name}(", 1)[1].split("\n  function ", 1)[0].split("\nfunction ", 1)[0]
+            implementation_name = "drawLabelsPassContent" if function_name == "drawLabelsPass" else function_name
+            pass_body = source.split(f"function {implementation_name}(", 1)[1].split("\n  function ", 1)[0].split("\nfunction ", 1)[0]
             if function_name in {
                 "drawContextBasePass",
                 "drawContextMarkersPass",

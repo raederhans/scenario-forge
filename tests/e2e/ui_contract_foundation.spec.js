@@ -11,7 +11,7 @@ test("ui contract foundation exposes shared rules and focus helpers", async ({ p
   test.setTimeout(60_000);
 
   try {
-    await gotoApp(page, "/", { waitUntil: "domcontentloaded" });
+    await gotoApp(page, "/?default_scenario=none", { waitUntil: "domcontentloaded" });
     await waitForAppInteractive(page, { timeout: 45_000 });
     await page.waitForFunction(() => !!document.querySelector("#toastViewport"), { timeout: 15_000 });
 

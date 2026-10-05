@@ -13,6 +13,7 @@ from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 from shapely.validation import make_valid
 from topojson.utils import serialize_as_geojson
+from map_builder.json_source import read_json_source
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +109,11 @@ class Canvas:
 
 
 def read_json(path: Path) -> dict:
+    if path.name in {"runtime_topology.topo.json", "runtime_topology.topo.json.gz"}:
+        payload = read_json_source(path)
+        if not isinstance(payload, dict):
+            raise ValueError(f"Expected JSON object in {path}")
+        return payload
     with path.open("r", encoding="utf-8") as handle:
         payload = json.load(handle)
     if not isinstance(payload, dict):

@@ -728,6 +728,7 @@ test("source-bound political background owner proves exact facade methods withou
     "drawBackgroundPass",
     "drawPoliticalBackgroundFills",
     "drawPoliticalBackgroundFillsForEntries",
+    "releaseScenarioPoliticalBackgroundCache",
   ]);
   assert.deepEqual(inspectStateMutationDelegatingOwnerSources({
     compositionSource: fs.readFileSync(entry.compositionModulePath, "utf8"),
@@ -2460,6 +2461,21 @@ test("render pass signature reader accepts reviewed joins and rejects state writ
   const modulePath = "js/core/renderer/render_pass_signature_policy.js";
   const source = fs.readFileSync(modulePath, "utf8");
   assert.deepEqual(await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true }), []);
+  const entry = STATE_TARGET_PURE_READER_CONTRACT.find(candidate => candidate.modulePath === modulePath);
+  for (const [dependencyPath, marker, mutation] of [
+    ["js/core/renderer/physical_atlas_lod_policy.js", "export function resolvePhysicalAtlasCollection(state = {}) {", "state.physicalSemanticsData = null;"],
+    ["js/core/renderer/object_identity.js", 'export function getObjectIdentityToken(value, prefix = "obj") {', "value.changed = true;"],
+  ]) {
+    const dependencySource = fs.readFileSync(dependencyPath, "utf8");
+    assert.ok(dependencySource.includes(marker), dependencyPath);
+    const inspection = inspectStateTargetPureReaderFunctionSource(source, entry, {
+      readSource: path => path === dependencyPath
+        ? dependencySource.replace(marker, `${marker}\n${mutation}`)
+        : fs.readFileSync(path, "utf8"),
+    });
+    assert.ok(inspection.violations.some(({ code, dependencyName }) =>
+      code === "state-target-pure-reader-dependency-source-drift" && dependencyName === dependencyPath));
+  }
   for (const changed of [
     source.replace('const transformSignature =', 'runtimeState.colorRevision = 99;\n    const transformSignature ='),
     source.replace('].join("::")', '].push("mutation")'),
@@ -3115,6 +3131,14 @@ test("registered validation scopes retain callback writes and borrowed cache esc
     derivedAliasTaintMode: "strict",
   });
   assert.equal(scanScope("getRenderCacheOwner().withValidatedCache(() => 1);").findings.some(row => row.reason === "unsupported-call-mutation"), false);
+  const cacheOwnerEntry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ factoryExportName }) => factoryExportName === "createRenderCacheOwner",
+  );
+  for (const method of ["syncSurfaceResourceAccounting", "retainSurfaceCacheForScope", "releaseSurfaceCache", "releaseInactivePassSurfaces"]) {
+    assert.ok(cacheOwnerEntry.methods.includes(method), `cache lifecycle method is registered: ${method}`);
+    assert.equal(scanScope(`getRenderCacheOwner().${method}();`).findings.some(row => row.reason === "unsupported-call-mutation"), false);
+    assert.ok(scanScope(`getRenderCacheOwner().${method}((runtimeState.bootPhase = 'bad'));`).findings.some(row => row.key === "bootPhase"));
+  }
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(() => { runtimeState.bootPhase = 'bad'; });").findings.some(row => row.key === "bootPhase"));
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => { cache.dirty = {}; });").findings.some(row => row.unsupported));
   assert.ok(scanScope("getRenderCacheOwner().withValidatedCache(cache => leak(cache));").findings.some(row => row.reason === "state-alias-escape"));

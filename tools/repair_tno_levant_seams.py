@@ -21,6 +21,7 @@ from shapely.geometry import Point, box
 from shapely.ops import transform
 from pyproj import CRS, Transformer
 
+from map_builder.json_source import json_source_sha256, read_json_source, resolve_json_source_path
 from map_builder.coverage_validation import coverage_is_valid_exact
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry, replace_regional_geometry
 from tools.repair_tno_slovakia_ukraine_seams import _merge_precision_ids, _overlap_diagnostic, _polygonal
@@ -239,13 +240,13 @@ def main():
         raise ValueError('Candidate output must be inside this workspace .runtime')
     if output == report_path or output.exists() or report_path.exists():
         raise FileExistsError('Candidate and report paths must both be new')
-    topology_path = (args.topology or args.scenario_dir / 'runtime_topology.topo.json').resolve()
-    baseline = json.loads(topology_path.read_text(encoding='utf-8'))
+    topology_path = resolve_json_source_path((args.topology or args.scenario_dir / 'runtime_topology.topo.json').resolve())
+    baseline = read_json_source(topology_path)
     owners = json.loads((args.scenario_dir / 'owners.by_feature.json').read_text(encoding='utf-8'))['owners']
     source, protected_water, identities = read_reviewed_sources(args.source_dir)
     candidate, report = build_candidate(baseline, owners, source, protected_water=protected_water)
     report['sources'] = identities
-    report['input_topology'] = dict(path=str(topology_path), sha256=hashlib.sha256(topology_path.read_bytes()).hexdigest())
+    report['input_topology'] = dict(path=str(topology_path), sha256=json_source_sha256(topology_path))
     report['replay_argv'] = ['node', 'tools/run_python.mjs', 'tools/repair_tno_levant_seams.py',
         '--scenario-dir', str(args.scenario_dir.resolve()), '--topology', str(topology_path),
         '--source-dir', str(args.source_dir.resolve()), '--output', str(output)]

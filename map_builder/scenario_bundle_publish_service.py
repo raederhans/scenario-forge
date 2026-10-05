@@ -5,6 +5,7 @@ from typing import Callable, Iterable, Mapping
 
 from map_builder import scenario_bundle_platform
 from map_builder.scenario_build_session import record_published_target
+from map_builder.json_source import resolve_json_source_path
 
 
 def plan_publish_scenario_build_in_locked_session(
@@ -123,6 +124,8 @@ def publish_scenario_build_in_locked_session(
         load_checkpoint_json=load_checkpoint_json,
         write_json=write_json,
     )
+    publish_plan["publishedPaths"] = [resolve_json_source_path(path) for path in publish_plan["publishedPaths"]]
+    publish_plan["publishedFiles"] = [path.relative_to(scenario_dir).as_posix() for path in publish_plan["publishedPaths"]]
     record_published_target(
         build_dir=checkpoint_dir,
         target=publish_scope,
