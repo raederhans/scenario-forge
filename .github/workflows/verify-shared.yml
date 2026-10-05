@@ -345,12 +345,16 @@ jobs:
           name: demo-timing-and-failure-context
           if-no-files-found: ignore
           include-hidden-files: true
+          retention-days: 7
           path: |
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/test-timings-summary.json
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/**/failure-context.json
             .runtime/tests/playwright/**/*-failure-context.json
+            .runtime/tests/playwright/**/error-context.md
+            .runtime/tests/playwright/**/test-failed-*.png
+            .runtime/tests/playwright/**/trace.zip
 
       - name: Upload deploy dist artifact
         if: inputs.profile == 'deploy-minimal'

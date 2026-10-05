@@ -1877,6 +1877,12 @@ const page = {
         demo_spec = (REPO_ROOT / "tests/e2e/sample_guide_deeplink.spec.js").read_text(encoding="utf-8")
         self.assertEqual(demo_spec.count("@golden-demo"), 1)
         self.assertIn("name: demo-timing-and-failure-context", shared_workflow)
+        demo_upload = shared_workflow.split("- name: Upload Demo timing and failure-context artifacts\n", 1)[1].split("\n      - name:", 1)[0]
+        self.assertIn("if: always() && (inputs.profile == 'demo' || inputs.run-golden-demo)", demo_upload)
+        self.assertIn("include-hidden-files: true", demo_upload)
+        self.assertIn("retention-days: 7", demo_upload)
+        for failure_path in ("error-context.md", "test-failed-*.png", "trace.zip"):
+            self.assertIn(f".runtime/tests/playwright/**/{failure_path}", demo_upload)
         self.assertIn(".runtime/reports/generated/test-timings-summary.json", shared_workflow)
         self.assertIn(".runtime/tests/playwright/**/failure-context.json", shared_workflow)
 
