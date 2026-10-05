@@ -89,8 +89,23 @@ test("docs-only changes keep heavyweight PR lanes off", () => {
   assert.equal(plan.perfMode, "skip");
 });
 
+test("renderer mirror contracts receive a freshly built Pages artifact", () => {
+  for (const file of [
+    "js/core/map_renderer.js",
+    "js/core/map_renderer/draw_canvas_orchestration_owner.js",
+    "js/core/map_renderer/transformed_frame_compositor_owner.js",
+    "js/core/renderer/cached_pass_compositor_owner.js",
+    "tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
+  ]) {
+    const plan = planPullRequest({ changedFiles: [file] });
+    assert.equal(plan.pagesMode, "full", file);
+    assert.equal(plan.runPages, true, file);
+    assert.equal(plan.runPagesSource, false, file);
+  }
+});
+
 test("runtime changes select smoke, source references and required sampled performance", () => {
-  const plan = planPullRequest({ changedFiles: ["js/core/map_renderer.js"] });
+  const plan = planPullRequest({ changedFiles: ["js/core/renderer/navigation_frame_owner.js"] });
   assert.equal(plan.runSmoke, true);
   assert.equal(plan.runPages, false);
   assert.equal(plan.pagesMode, "source");

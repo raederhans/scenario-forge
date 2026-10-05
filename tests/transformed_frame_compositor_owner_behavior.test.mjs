@@ -31,6 +31,19 @@ function createBufferContext(calls) {
   };
 }
 
+test("interaction label replay failure never blits a partially composed buffer", () => {
+  const f = createHarness({ effects: { drawInteractionLabels: () => false } });
+  assert.equal(f.owner.composeTransformedFrameToBuffer(f.runtime.currentTransform, []), false);
+  assert.ok(!f.calls.some(([name]) => name === "blitCompositeBufferToMain"));
+  assert.ok(!f.calls.some(([name, pass]) => name === "drawTransformedPass" && pass === "labels"));
+});
+
+test("direct interaction composition uses the same enabled pass subset", () => {
+  const f = createHarness({ getters: { getActiveInteractionCompositePassNames: () => ["base"] } });
+  f.owner.composeTransformedFrameToBuffer(f.runtime.currentTransform, [], { useInteractionComposite: false });
+  assert.deepEqual(f.calls.find(([name]) => name === "composeRenderPassesToTarget")[2], ["base"]);
+});
+
 function createHarness(overrides = {}) {
   const calls = [];
   const metrics = [];

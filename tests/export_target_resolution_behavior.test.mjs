@@ -17,6 +17,9 @@ test("river internal contours charge one border-sized RGBA scratch without chang
   assert.equal(EXPORT_RENDER_BUDGET_BYTES, 640 * 1024 * 1024);
 });
 import { getRiverPaintRuntime } from "../js/core/river_paint/runtime.js";
+import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { filterEnabledRenderPassNames } from "../js/core/map_renderer/render_pass_catalog.js";
 
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const start = source.indexOf("let exportRenderInProgress = false;");
@@ -38,9 +41,16 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
   };
   const calls = [];
   const scratchDisposals = [];
+  const resourceBudget = createRuntimeResourceBudget();
+  const renderCacheOwner = createRenderCacheOwner({ state: runtimeState, resourceBudget,
+    constants: { renderPassNames: ["background", "borders"] },
+    helpers: { ensureRenderPassCacheState: (state) => state.renderPassCache } });
+  renderCacheOwner.syncSurfaceResourceAccounting();
   let allocatedCanvases = 0;
   const context = vm.createContext({
     runtimeState,
+    getRenderCacheOwner: () => renderCacheOwner,
+    filterCurrentEnabledRenderPasses: (names) => filterEnabledRenderPassNames(names),
     getRiverPaintRuntime,
     EXPORT_RENDER_BUDGET_BYTES,
     estimateExportRenderBytes: (input) => budgetExceeded
@@ -107,7 +117,7 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
     createDefaultRenderPassCacheState: () => ({ canvases: {}, referenceTransforms: {} }),
   });
   vm.runInContext(exportSource, context);
-  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, scratchDisposals,
+  return { run: context.renderExportPassesToCanvas, runtimeState, visibleCache, calls, scratchDisposals, resourceBudget,
     allocatedCanvases: () => allocatedCanvases };
 }
 
@@ -156,8 +166,18 @@ for (const politicalStatus of ["pending", "error"]) {
     assert.deepEqual(h.calls, ["contours-ready", `political-${politicalStatus}`]);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.runtimeState.dpr, 1);
+    assert.equal(h.visibleCache.canvases.background.width, 100);
+    assert.equal(h.resourceBudget.snapshot().categories.bitmaps, 100 * 50 * 4);
   });
 }
+
+test("disabled export passes use the active set and temporary surfaces leave only visible bytes", () => {
+  const h = harness();
+  const output = h.run(["background", "effects", "physicalBase"], { pixelRatio: 2 });
+  assert.equal(output.width, 200);
+  assert.deepEqual(h.calls, ["render-background-2", "draw-source", "compose-200"]);
+  assert.equal(h.resourceBudget.snapshot().categories.bitmaps, 100 * 50 * 4);
+});
 
 for (const passName of ["political", "borders"]) {
   test(`${passName} export rejects loading river partitions before allocation or cache mutation`, () => {
@@ -219,6 +239,8 @@ for (const [name, options, message] of [
     assert.throws(() => h.run(["background"], { pixelRatio: 2 }), message);
     assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
     assert.equal(h.runtimeState.dpr, 1);
+    assert.equal(h.visibleCache.canvases.background.width, 100);
+    assert.equal(h.resourceBudget.snapshot().categories.bitmaps, 100 * 50 * 4);
   });
 }
 

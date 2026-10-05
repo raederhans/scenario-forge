@@ -27,9 +27,17 @@ test("retains one wider accepted overview instead of recapturing detailed views"
   assert.equal(f.owner.capture(f.context.canvas,{x:-500,y:-300,k:2},1),false);
   assert.equal(f.canvases.length,1);
   f.events.length=0;
-  assert.equal(f.owner.draw(f.context,{x:-250,y:-150,k:1.5},1),true);
-  assert.deepEqual(f.events,["save","identity","clear",["translate",-250,-150],["scale",1.5,1.5],"draw","restore"]);
+  assert.equal(f.owner.draw(f.context,{x:-100,y:-60,k:1.2},1),true);
+  assert.deepEqual(f.events,["save","identity","clear",["translate",-100,-60],["scale",1.2,1.2],"draw","restore"]);
   assert.equal(f.budget.snapshot().categories.bitmaps,2400000);
+});
+
+test("overview screenshots cannot bypass the navigation text scale limit", () => {
+  const f = fixture();
+  f.owner.capture(f.context.canvas, { x: 0, y: 0, k: 1 }, 1);
+  f.events.length = 0;
+  assert.equal(f.owner.draw(f.context, { x: -500, y: -300, k: 2 }, 1), false);
+  assert.deepEqual(f.events, []);
 });
 
 test("coverage failure never clears the visible target, and valid later coverage remains reusable", () => {
@@ -54,7 +62,7 @@ test("DPR mismatch is rejected and full coverage accounts for physical pixels", 
   const f=fixture(); f.owner.capture(f.context.canvas,{x:0,y:0,k:1},2); f.events.length=0;
   assert.equal(f.owner.draw(f.context,{x:0,y:0,k:1},1),false);
   assert.deepEqual(f.events,[]);
-  assert.equal(f.owner.draw(f.context,{x:-125,y:-75,k:1.5},2),true);
+  assert.equal(f.owner.draw(f.context,{x:-50,y:-30,k:1.2},2),true);
 });
 
 test("fine quality replaces a coarse overview at the same zoom when the quality identity changes", () => {

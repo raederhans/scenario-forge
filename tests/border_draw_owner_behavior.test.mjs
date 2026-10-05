@@ -47,7 +47,7 @@ test("boundary projection reuse preserves missing projections, degenerate lines,
   assert.equal(identity.buildRenderableBoundaryMesh({ type: "MultiLineString", coordinates: [[[1, 1], [1, 1]]] }), null);
 });
 
-test("boundary and coastline geometry reuse follows projection and simplification, not paint or camera", () => {
+test("boundary and coastline geometry reuse follows projection and exact thresholds, not paint state", () => {
   let projections = 0;
   const projection = (point) => { projections += 1; return point; };
   const state = {};
@@ -62,8 +62,12 @@ test("boundary and coastline geometry reuse follows projection and simplificatio
   state.zoomTransform = { x: 200, y: -50, k: 1.2 };
   state.dpr = 2;
   assert.equal(owner.buildRenderableBoundaryMesh(source, options), first);
-  assert.equal(owner.getViewportAwareCoastlineCollection([source], 1.2)[0], coast);
-  assert.equal(projections, count);
+  const coastAtZoom = owner.getViewportAwareCoastlineCollection([source], 1.2)[0];
+  assert.notEqual(coastAtZoom, coast);
+  const coastZoomProjectionCount = projections;
+  assert.equal(owner.getViewportAwareCoastlineCollection([source], 1.2)[0], coastAtZoom);
+  assert.equal(projections, coastZoomProjectionCount);
+  assert.ok(coastZoomProjectionCount > count);
   assert.notEqual(owner.buildRenderableBoundaryMesh(source, { ...options, minLengthPx: 20 }), first);
   assert.notEqual(owner.getViewportAwareCoastlineCollection([source], 2)[0], coast);
   markProjectionGeometryChanged(projection);
@@ -71,6 +75,80 @@ test("boundary and coastline geometry reuse follows projection and simplificatio
   assert.notEqual(owner.getViewportAwareCoastlineCollection([source], 1)[0], coast);
   const replaced = { ...source, coordinates: [[[0, 0], [200, 0]]] };
   assert.notEqual(owner.buildRenderableBoundaryMesh(replaced, options), first);
+});
+
+test("screen-space decluttering removes straight vertices and preserves cusps", () => {
+  const owner = createBorderDrawOwner({
+    state: {},
+    getters: { getProjection: () => (point) => point },
+    helpers: { sanitizePolyline: (line) => line },
+  });
+  const straight = [[0, 0], [1, 0], [2, 0], [3, 0]];
+  const cusp = [[0, 0], [1, 0], [0, 0], [3, 0]];
+
+  assert.deepEqual(owner.declutterProjectedPolyline(straight, 3.6, 4), [[0, 0], [3, 0]]);
+  assert.deepEqual(owner.declutterProjectedPolyline(cusp, 3.6, 4), cusp);
+});
+
+test("boundary length, span, and area filters use zoom-scaled screen thresholds", () => {
+  const owner = createBorderDrawOwner({
+    state: {},
+    getters: { getProjection: () => (point) => point },
+    helpers: { isUsableMesh: (value) => !!value?.coordinates?.length },
+  });
+  const boundary = {
+    type: "MultiLineString",
+    coordinates: [
+      [[0, 0], [1.29, 0]],
+      [[0, 0], [3, 0]],
+    ],
+  };
+  const localAt3 = owner.getBoundaryMeshTransform("internal-local", 3);
+  const localAt32 = owner.getBoundaryMeshTransform("internal-local", 3.2);
+  const boundaryAt3 = localAt3(boundary);
+  const boundaryAt32 = localAt32(boundary);
+  assert.deepEqual(boundaryAt3.coordinates, [[[0, 0], [3, 0]]]);
+  assert.deepEqual(boundaryAt32.coordinates, boundary.coordinates);
+  assert.notEqual(boundaryAt32, boundaryAt3);
+
+  const smallArea = {
+    type: "MultiLineString",
+    coordinates: [[[0, 0], [0.99, 0], [0.99, 0.99], [0, 0.99], [0, 0]]],
+  };
+  const filterOptions = { minSpanPx: 3, minAreaPx: 10, k: 3 };
+  assert.equal(owner.buildRenderableBoundaryMesh(smallArea, filterOptions), null);
+  assert.deepEqual(
+    owner.buildRenderableBoundaryMesh(smallArea, { ...filterOptions, k: 3.2 }).coordinates,
+    smallArea.coordinates,
+  );
+});
+
+test("coastline simplification and filtering follow screen thresholds near zoom 3", () => {
+  const owner = createBorderDrawOwner({
+    state: {},
+    getters: { getProjection: () => (point) => point },
+    helpers: { isUsableMesh: (value) => !!value?.coordinates?.length },
+  });
+  const coastline = { type: "MultiLineString", coordinates: [[[0, 0], [7, 0]]] };
+  const coastlineAt3 = owner.getBoundaryMeshTransform("coastline", 3)(coastline);
+  assert.deepEqual(coastlineAt3.coordinates, coastline.coordinates);
+
+  const thresholdCoastline = { type: "MultiLineString", coordinates: [[[0, 0], [2.55, 0]]] };
+  const coastlineAt3_0 = owner.getBoundaryMeshTransform("coastline", 3)(thresholdCoastline);
+  const coastlineAt3_19 = owner.getBoundaryMeshTransform("coastline", 3.19)(thresholdCoastline);
+  assert.equal(coastlineAt3_0, null);
+  assert.deepEqual(coastlineAt3_19.coordinates, thresholdCoastline.coordinates);
+  assert.equal(owner.getBoundaryMeshTransform("coastline", 3.2), null);
+
+  const detailedCoastline = {
+    type: "MultiLineString",
+    coordinates: [[[0, 0], [0.59, 0], [7, 0]]],
+  };
+  const viewAt3 = owner.getViewportAwareCoastlineCollection([detailedCoastline], 3)[0];
+  const viewAt3_19 = owner.getViewportAwareCoastlineCollection([detailedCoastline], 3.19)[0];
+  assert.deepEqual(viewAt3.coordinates, [[[0, 0], [7, 0]]]);
+  assert.deepEqual(viewAt3_19.coordinates, detailedCoastline.coordinates);
+  assert.equal(owner.getViewportAwareCoastlineCollection([detailedCoastline], 3.2)[0], detailedCoastline);
 });
 
 const mesh = { type: "MultiLineString", coordinates: [[[0, 0], [100, 100]]] };

@@ -85,6 +85,8 @@ export const RENDERER_LAYERS_RECORDS = [
     "commandRef": "test:node:political-background-render-owner",
     "sourceRefs": [
       "js/core/renderer/political_background_render_owner.js",
+      "js/core/renderer/projected_path_resource_accounting.js",
+      "js/core/renderer/political_background_build_helpers.js",
       "tests/political_background_render_owner_behavior.test.mjs"
     ],
     "ownerHints": ["renderer-runtime"],
@@ -106,6 +108,8 @@ export const RENDERER_LAYERS_RECORDS = [
     "commandRef": "test:node:political-background-render-owner",
     "sourceRefs": [
       "js/core/renderer/political_background_render_owner.js",
+      "js/core/renderer/projected_path_resource_accounting.js",
+      "js/core/renderer/political_background_build_helpers.js",
       "package.json",
       "tests/political_background_render_owner_behavior.test.mjs"
     ],

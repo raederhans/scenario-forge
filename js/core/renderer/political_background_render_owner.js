@@ -1,4 +1,16 @@
-import { addRetainedPoliticalPath, advanceDeferredPoliticalBackgroundBuild, buildDeferredPoliticalBackgroundCachePatch, buildPoliticalBackgroundColorSignature, buildRetainedPoliticalPathIndex, createDeferredPoliticalBackgroundBuildState, createPoliticalBackgroundCacheState, getRetainedPoliticalPathHandle } from "./political_background_build_helpers.js";
+import {
+  addRetainedPoliticalPath,
+  advanceDeferredPoliticalBackgroundBuild,
+  buildDeferredPoliticalBackgroundCachePatch,
+  buildPoliticalBackgroundColorSignature,
+  buildRetainedPoliticalPathIndex,
+  createDeferredPoliticalBackgroundBuildState,
+  createPoliticalBackgroundCacheState,
+  createPoliticalBackgroundPathAccounting,
+  finalizePoliticalBackgroundGroups,
+  getRetainedPoliticalPathHandle,
+  POLITICAL_BACKGROUND_MERGED_PATH_BUDGET,
+} from "./political_background_build_helpers.js";
 
 function requireFunction(candidate, label) {
   if (typeof candidate !== "function") {
@@ -74,6 +86,8 @@ export function createPoliticalBackgroundRenderOwner({
     applyOceanClipMask,
     drawOceanStyle,
     warn,
+    resourceBudget,
+    politicalPathResourceAccounting,
   } = effects;
   [
     getAtlantropaSeaPoliticalFillColor, getFeatureId, getSafeCanvasColor,
@@ -94,6 +108,8 @@ export function createPoliticalBackgroundRenderOwner({
     getIntensityFieldMaskOwner, applyOceanClipMask, drawOceanStyle,
     warn,
   ].forEach((candidate, index) => requireFunction(candidate, `dependency[${index}]`));
+  requireFunction(resourceBudget?.update, "effects.resourceBudget.update");
+  requireFunction(resourceBudget?.release, "effects.resourceBudget.release");
   const LAND_FILL_COLOR = String(constants.landFillColor || "#d8d2c4");
   const RENDER_PHASE_IDLE = String(constants.renderPhaseIdle || "idle");
   const POLITICAL_RECOVERY_QUALITY_PROGRESSIVE = String(
@@ -108,6 +124,10 @@ export function createPoliticalBackgroundRenderOwner({
   const POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS = Number(
     constants.deferredFullCacheTimeoutMs,
   ) || 60;
+  const configuredMergedPathBudget = Number(constants.politicalBackgroundMergedPathBudgetBytes);
+  const POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES = Number.isSafeInteger(configuredMergedPathBudget)
+    ? Math.max(0, configuredMergedPathBudget)
+    : POLITICAL_BACKGROUND_MERGED_PATH_BUDGET;
   const SCENARIO_BACKGROUND_MERGE_MAX_AREA = Number(
     constants.scenarioBackgroundMergeMaxArea,
   ) || Math.PI * 2;
@@ -124,6 +144,11 @@ export function createPoliticalBackgroundRenderOwner({
     return createPoliticalBackgroundCacheState(overrides);
   }
 
+  const updatePathAccounting = createPoliticalBackgroundPathAccounting(resourceBudget, politicalPathResourceAccounting);
+  function updatePoliticalBackgroundPathResourceAccounting() {
+    return updatePathAccounting(scenarioPoliticalBackgroundCache, scenarioPoliticalBackgroundDeferredFullCacheState);
+  }
+
   function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified") {
     if (scenarioPoliticalBackgroundDeferredFullCacheHandle) {
       cancelDeferredWork(scenarioPoliticalBackgroundDeferredFullCacheHandle);
@@ -132,12 +157,20 @@ export function createPoliticalBackgroundRenderOwner({
       || !!scenarioPoliticalBackgroundDeferredFullCacheHandle;
     scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
     scenarioPoliticalBackgroundDeferredFullCacheState = null;
+    updatePoliticalBackgroundPathResourceAccounting();
     if (hadState) {
       recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheCancel", 0, {
         reason: String(reason || "unspecified"),
         activeScenarioId: String(state.activeScenarioId || ""),
       });
     }
+  }
+
+  function releaseScenarioPoliticalBackgroundCache(reason = "root-scene-release") {
+    cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
+    scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
+    updatePoliticalBackgroundPathResourceAccounting();
+    return true;
   }
 
   function shouldUseScenarioPoliticalBackgroundMerge() {
@@ -258,12 +291,18 @@ export function createPoliticalBackgroundRenderOwner({
     let groupCount = 0;
     (Array.isArray(groups) ? groups : []).forEach((group) => {
       const fillColor = String(group?.fillColor || "").trim() || LAND_FILL_COLOR;
-      const mergedPath = group?.mergedPath || null;
       const groupEntries = Array.isArray(group?.entries) ? group.entries.filter(Boolean) : [];
+      let mergedPath = group?.mergedPath || null;
       if (!groupEntries.length && !mergedPath) {
         return;
       }
       surface.getContext().fillStyle = fillColor;
+      if (!mergedPath && group?.requiresMergedFill && platform.Path2D
+        && typeof platform.Path2D.prototype?.addPath === "function"
+        && groupEntries.every((entry) => entry?.path)) {
+        mergedPath = new platform.Path2D();
+        groupEntries.forEach((entry) => mergedPath.addPath(entry.path));
+      }
       if (mergedPath) {
         surface.getContext().fill(mergedPath);
         groupCount += 1;
@@ -306,6 +345,7 @@ export function createPoliticalBackgroundRenderOwner({
       allowBuildPaths = false,
       previousFullPassEntries = null,
       previousFullPassGroups = null,
+      retainMergedPaths = false,
     } = {},
   ) {
     const groupedEntries = new Map();
@@ -364,56 +404,9 @@ export function createPoliticalBackgroundRenderOwner({
       });
     });
 
-    const groups = [];
-    let reusedGroupMergeCount = 0;
-    let builtGroupMergeCount = 0;
-
-    groupedEntries.forEach(({ fillColor, entries: groupEntries }, groupKey) => {
-      const resolvedEntries = Array.isArray(groupEntries) ? groupEntries.filter(Boolean) : [];
-      if (!resolvedEntries.length) return;
-      let mergedPath = null;
-
-      const previousGroup = previousFullPassGroups?.get(groupKey);
-      const isMultiPath = resolvedEntries.length > 1;
-      const exactMatch = isMultiPath
-        && previousGroup
-        && previousGroup.mergedPath
-        && previousGroup.fillColor === fillColor
-        && previousGroup.entries.length === resolvedEntries.length
-        && resolvedEntries.every((item, idx) => {
-          const prevItem = previousGroup.entries[idx];
-          return (
-            prevItem
-            && prevItem.feature === item.feature
-            && prevItem.geometryRef === item.geometryRef
-            && prevItem.path === item.path
-            && item.path != null
-          );
-        });
-
-      if (exactMatch) {
-        mergedPath = previousGroup.mergedPath;
-        reusedGroupMergeCount += 1;
-      } else if (resolvedEntries.length === 1 && resolvedEntries[0]?.path) {
-        mergedPath = resolvedEntries[0].path;
-      } else if (
-        isMultiPath
-        && platform.Path2D
-        && typeof platform.Path2D.prototype?.addPath === "function"
-        && resolvedEntries.every((item) => item?.path)
-      ) {
-        mergedPath = new platform.Path2D();
-        resolvedEntries.forEach((item) => {
-          mergedPath.addPath(item.path);
-        });
-        builtGroupMergeCount += 1;
-      }
-      groups.push({
-        groupKey,
-        fillColor,
-        mergedPath,
-        entries: resolvedEntries,
-      });
+    const { groups, reusedGroupMergeCount, builtGroupMergeCount } = finalizePoliticalBackgroundGroups(groupedEntries, {
+      previousFullPassGroups, retainMergedPaths, Path2D: platform.Path2D,
+      mergedPathBudgetBytes: POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES,
     });
 
     return {
@@ -559,6 +552,7 @@ export function createPoliticalBackgroundRenderOwner({
       allowBuildPaths: true,
       previousFullPassEntries,
       previousFullPassGroups,
+      retainMergedPaths: true,
     });
     scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState({
       ...scenarioPoliticalBackgroundCache,
@@ -582,6 +576,7 @@ export function createPoliticalBackgroundRenderOwner({
       fullPassGroups: resolvedGroups.groups,
       fullPassPathIndex: buildRetainedPoliticalPathIndex(resolvedGroups.groups),
     });
+    updatePoliticalBackgroundPathResourceAccounting();
     const { groups: resolvedPaths, ...buildMetrics } = resolvedGroups;
     recordRenderPerfMetric(metricName, nowMs() - startedAt, {
       ...buildMetrics,
@@ -637,6 +632,7 @@ export function createPoliticalBackgroundRenderOwner({
     scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
     if (!deferredState || !Array.isArray(deferredState.entries) || !deferredState.entries.length) {
       scenarioPoliticalBackgroundDeferredFullCacheState = null;
+      updatePoliticalBackgroundPathResourceAccounting();
       return false;
     }
     if (!isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(deferredState)) {
@@ -646,6 +642,7 @@ export function createPoliticalBackgroundRenderOwner({
     const normalizedEntries = deferredState.entries;
     if (isScenarioPoliticalBackgroundFullPassCacheKeyReady(deferredState.fullPassCacheKey)) {
       scenarioPoliticalBackgroundDeferredFullCacheState = null;
+      updatePoliticalBackgroundPathResourceAccounting();
       return false;
     }
     const cache = getRenderPassCacheState();
@@ -687,6 +684,7 @@ export function createPoliticalBackgroundRenderOwner({
       transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
       getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
       resolvePoliticalBackgroundEntryMeta, Path2D: platform.Path2D,
+      mergedPathBudgetBytes: POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES,
       withinBudget: (processedCount) => processedCount === 0 || (
         nowMs() - startedAt < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS
         && (!deadline || typeof deadline.timeRemaining !== "function" || deadline.timeRemaining() > 0)
@@ -697,6 +695,7 @@ export function createPoliticalBackgroundRenderOwner({
       return false;
     }
     const { processedCount, builtCount, reusedCount, reusedPreviousCount, pathlessCount } = result;
+    updatePoliticalBackgroundPathResourceAccounting();
 
     deferredState.sliceCount = Number(deferredState.sliceCount || 0) + 1;
     deferredState.processedCount = Number(deferredState.processedCount || 0) + processedCount;
@@ -754,8 +753,11 @@ export function createPoliticalBackgroundRenderOwner({
       deferredState.groups = [];
       deferredState.groupIterator = null;
       deferredState.mergeCurrent = null;
+      deferredState.retainedMergedPathBytes = 0;
+      deferredState.builtGroupMergeCount = 0;
       deferredState.index = 0;
       deferredState.stage = "groups";
+      updatePoliticalBackgroundPathResourceAccounting();
       scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
         runScenarioPoliticalBackgroundDeferredFullCacheSlice,
         { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
@@ -800,6 +802,7 @@ export function createPoliticalBackgroundRenderOwner({
       activeScenarioId: String(getRuntimeState().activeScenarioId || ""),
     });
     scenarioPoliticalBackgroundDeferredFullCacheState = null;
+    updatePoliticalBackgroundPathResourceAccounting();
     invalidateRenderPasses("political", "progressive-political-full-cache-ready");
     recordProgressivePoliticalFullCacheReadyDiagnostics(getRuntimeState(), {
       entryCount: normalizedEntries.length, groupCount: Number(finalized?.groupCount || 0), builtPathCount: Number(deferredState.builtPathCount || 0), reusedPathCount: Number(deferredState.reusedPathCount || 0), pathlessEntryCount: Number(deferredState.pathlessEntryCount || 0), sliceCount: Number(deferredState.sliceCount || 0),
@@ -843,6 +846,7 @@ export function createPoliticalBackgroundRenderOwner({
         String(reason || "progressive-recovery"),
       ),
     };
+    updatePoliticalBackgroundPathResourceAccounting();
     scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
       runScenarioPoliticalBackgroundDeferredFullCacheSlice,
       { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
@@ -923,6 +927,7 @@ export function createPoliticalBackgroundRenderOwner({
         cacheKey,
         entries: [],
       });
+      updatePoliticalBackgroundPathResourceAccounting();
       recordRenderPerfMetric("drawScenarioPoliticalBackgroundEntries", nowMs() - startedAt, {
         cacheHit: false,
         entryCount: 0,
@@ -1367,6 +1372,7 @@ export function createPoliticalBackgroundRenderOwner({
     drawPoliticalBackgroundFillsForEntries,
     getRetainedPoliticalBackgroundPathHandle,
     cancelScenarioPoliticalBackgroundDeferredFullCache,
+    releaseScenarioPoliticalBackgroundCache,
     shouldFallbackScenarioPoliticalBackgroundMergeShape,
   });
 }

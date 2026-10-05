@@ -4,7 +4,7 @@ import test from "node:test";
 import { createNavigationFrameOwner } from "../js/core/renderer/navigation_frame_owner.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 
-function fixture({ softLimitBytes = 16 * 1024 * 1024 } = {}) {
+function fixture({ softLimitBytes = 16 * 1024 * 1024, qualityLimits } = {}) {
   const jobs = new Map();
   const canvases = [];
   const paint = [];
@@ -39,6 +39,7 @@ function fixture({ softLimitBytes = 16 * 1024 * 1024 } = {}) {
     cancel: (timer) => jobs.delete(timer),
     now: () => time,
     resourceBudget: budget,
+    qualityLimits,
     recordMetric: (name, duration, details) => metrics.push({ name, duration, details }),
   });
   const destinationCalls = [];
@@ -199,9 +200,9 @@ test("detail overlay maps its reference viewport onto the target before restore"
   f.flushAll();
   const detail = { width: 1000, height: 600 };
   assert.equal(f.owner.draw(f.destination, { x: 40, y: -20, k: 2 }, 2, {
-    detailSource: detail, detailTransform: { x: 100, y: 50, k: 4 }, detailDpr: 1,
+    detailSource: detail, detailTransform: { x: 50, y: 25, k: 2.5 }, detailDpr: 2,
   }), true);
-  assert.deepEqual(f.destinationCalls[6], ["setTransform", 1, 0, 0, 1, -20, -90]);
+  assert.deepEqual(f.destinationCalls[6], ["setTransform", 0.8, 0, 0, 0.8, 0, -80]);
   assert.deepEqual(f.destinationCalls[7], ["drawImage", detail, 0, 0]);
   assert.deepEqual(f.destinationCalls[8], ["restore"]);
 });
@@ -223,9 +224,8 @@ test("invalid identity leaves destination untouched and clear releases retained 
   assert.equal(f.budget.snapshot().ownerCount, 0);
 });
 
-test("invalid geometry or shared resource pressure prevents allocation", () => {
+test("invalid geometry prevents allocation without changing shared budget limits", () => {
   const f = fixture({ softLimitBytes: 1024 });
-  assert.equal(f.prepare(), false);
   assert.equal(f.prepare({ bounds: [[0, 0], [0, 10]] }), false);
   assert.equal(f.canvases.length, 0);
 });
@@ -275,3 +275,202 @@ test("unavailable worker falls back to existing sliced drawing without publishin
   assert.equal(f.metrics.at(-1).details.mode, "main-fallback");
 });
 
+
+
+test("world device-pixel magnification is decided before destination clearing", () => {
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 5.12 }, 1), true, "exactly 2x is admitted");
+  assert.equal(f.metrics.at(-1).details.worldMagnification, 2);
+  f.destinationCalls.length = 0;
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 5.12001 }, 1), false);
+  assert.deepEqual(f.destinationCalls, []);
+  assert.equal(f.metrics.at(-1).details.reason, "raster-quality");
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 3 }, 2), false, "higher DPR exceeds the same device-pixel ceiling");
+  assert.deepEqual(f.destinationCalls, []);
+  assert.equal(f.owner.isReady(), true, "quality rejection does not evict the bounded world frame");
+});
+
+test("a sharp detail can replace blurry world pixels only with full target coverage", () => {
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  const detail = { width: 800, height: 600 };
+  const transform = { x: 0, y: 0, k: 8 };
+  assert.equal(f.owner.draw(f.destination, transform, 1, {
+    detailSource: detail, detailTransform: transform, detailDpr: 1,
+  }), true);
+  assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [["drawImage", detail, 0, 0]]);
+  assert.equal(f.metrics.at(-1).details.detailOnly, true);
+  assert.equal(f.metrics.at(-1).details.worldQualityOK, false);
+  f.destinationCalls.length = 0;
+  for (const partial of [{ width: 799, height: 600 }, { width: 800, height: 599 }]) {
+    assert.equal(f.owner.draw(f.destination, transform, 1, {
+      detailSource: partial, detailTransform: transform, detailDpr: 1,
+    }), false);
+    assert.deepEqual(f.destinationCalls, []);
+    assert.equal(f.metrics.at(-1).details.detailQualityOK, true);
+    assert.equal(f.metrics.at(-1).details.detailCoversViewport, false);
+  }
+  for (const x of [-1, 1]) {
+    assert.equal(f.owner.draw(f.destination, { ...transform, x }, 1, {
+      detailSource: detail, detailTransform: transform, detailDpr: 1,
+    }), false, "an uncovered edge cannot be filled by low-quality world pixels");
+    assert.deepEqual(f.destinationCalls, []);
+  }
+  assert.equal(f.owner.draw(f.destination, { ...transform, x: -10 }, 1, {
+    detailSource: { width: 820, height: 600 }, detailTransform: transform, detailDpr: 1,
+  }), true, "oversized detail coverage tolerates pan while covering every target pixel");
+});
+
+test("detail CSS ratio and device-pixel magnification enforce independent quality bounds", () => {
+  for (const ratio of [0.8, 1.25]) {
+    const f = fixture();
+    f.prepare();
+    f.flushAll();
+    const detail = { width: 1000, height: 750 };
+    assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 8 }, 1, {
+      detailSource: detail, detailTransform: { x: 0, y: 0, k: 8 / ratio }, detailDpr: 1,
+    }), true);
+    assert.equal(f.metrics.at(-1).details.detailCssScaleRatio, ratio);
+  }
+  for (const ratio of [0.799, 1.251, 0.5, 2]) {
+    const f = fixture();
+    f.prepare();
+    f.flushAll();
+    assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 8 }, 1, {
+      detailSource: { width: 4000, height: 4000 }, detailTransform: { x: 0, y: 0, k: 8 / ratio }, detailDpr: 1,
+    }), false, "large coverage does not admit a detail with an excessive CSS scale change");
+    assert.deepEqual(f.destinationCalls, []);
+  }
+  for (const [dpr, expected] of [[1.5, true], [1.501, false], [2, false]]) {
+    const f = fixture();
+    f.prepare();
+    f.flushAll();
+    assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 8 }, dpr, {
+      detailSource: { width: 800, height: 600 }, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: 1,
+    }), expected);
+    if (!expected) assert.deepEqual(f.destinationCalls, []);
+  }
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 8 }, 2, {
+    detailSource: { width: 800, height: 600 }, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: 2,
+  }), true, "equal source and target DPR avoids device-pixel enlargement");
+});
+
+test("world quality allows sharp partial details and skips unqualified overlays", () => {
+  const transform = { x: 0, y: 0, k: 1 };
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  const detail = { width: 100, height: 100 };
+  assert.equal(f.owner.draw(f.destination, transform, 1, {
+    detailSource: detail, detailTransform: transform, detailDpr: 1,
+  }), true);
+  assert.equal(f.destinationCalls.filter(([kind]) => kind === "drawImage").length, 2);
+  f.destinationCalls.length = 0;
+  assert.equal(f.owner.draw(f.destination, transform, 1, {
+    detailSource: detail, detailTransform: { ...transform, k: 2 }, detailDpr: 1,
+  }), true);
+  assert.deepEqual(f.destinationCalls.filter(([kind]) => kind === "drawImage"), [["drawImage", f.canvases[0], 0, 0]]);
+  assert.equal(f.metrics.at(-1).details.detail, false);
+});
+
+test("invalid transforms, DPR, dimensions and overflow never mutate the destination", () => {
+  const f = fixture();
+  f.prepare();
+  f.flushAll();
+  for (const transform of [
+    { x: NaN, y: 0, k: 1 }, { x: 0, y: Infinity, k: 1 }, { x: 0, y: 0, k: 0 },
+    { x: 0, y: 0, k: -1 }, { x: 0, y: 0, k: Infinity }, { x: 1e308, y: 0, k: 1e308 },
+  ]) {
+    assert.equal(f.owner.draw(f.destination, transform, 1), false);
+    assert.deepEqual(f.destinationCalls, []);
+  }
+  for (const dpr of [0, -1, NaN, Infinity]) {
+    assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 1 }, dpr), false);
+    assert.deepEqual(f.destinationCalls, []);
+  }
+  for (const options of [
+    { detailSource: { width: 0, height: 600 }, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: 1 },
+    { detailSource: { width: 800, height: Infinity }, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: 1 },
+    { detailSource: { width: 800, height: 600 }, detailTransform: { x: NaN, y: 0, k: 8 }, detailDpr: 1 },
+    { detailSource: { width: 800, height: 600 }, detailTransform: { x: 0, y: 0, k: 0 }, detailDpr: 1 },
+    { detailSource: { width: 800, height: 600 }, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: NaN },
+    { detailSource: { width: 800, height: 600 }, detailTransform: { x: 1e308, y: 0, k: 8 }, detailDpr: 2 },
+    { detailSource: f.destination.canvas, detailTransform: { x: 0, y: 0, k: 8 }, detailDpr: 1 },
+  ]) {
+    assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 8 }, 2, options), false);
+    assert.deepEqual(f.destinationCalls, []);
+  }
+});
+
+test("capture rejects malformed or nonfinite coverage without allocation", () => {
+  const f = fixture();
+  const source = { width: 800, height: 600 };
+  for (const bounds of [[], [null, null], [[0, 0], [NaN, 10]], [[10, 10], [0, 0]], [[0, 0], [0, 10]]]) {
+    assert.equal(f.owner.captureWholeScene(source, { x: 0, y: 0, k: 1 }, 1, bounds), false);
+  }
+  assert.equal(f.owner.captureWholeScene({ width: Infinity, height: 600 }, { x: 0, y: 0, k: 1 }, 1, [[0, 0], [100, 100]]), false);
+  assert.equal(f.canvases.length, 0);
+});
+
+test("quality thresholds can be made stricter without changing coverage requirements", () => {
+  const f = fixture({ qualityLimits: {
+    worldMaxDevicePixelMagnification: 1,
+    detailMinCssScaleRatio: 0.95, detailMaxCssScaleRatio: 1.05,
+    detailMaxDevicePixelMagnification: 1.2,
+  } });
+  f.prepare();
+  f.flushAll();
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 3 }, 1), false);
+  assert.deepEqual(f.destinationCalls, []);
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 3 }, 1, {
+    detailSource: { width: 800, height: 600 }, detailTransform: { x: 0, y: 0, k: 3 }, detailDpr: 1,
+  }), true);
+  assert.equal(f.metrics.at(-1).details.detailOnly, true);
+  assert.throws(() => fixture({ qualityLimits: { worldMaxDevicePixelMagnification: Infinity } }), /quality limits/);
+});
+
+test("required pass pressure does not evict navigation or prevent bounded sliced preparation", () => {
+  const f = fixture({ softLimitBytes: 1024 });
+  const requiredOwner = Symbol("required-pass-canvases");
+  f.budget.update(requiredOwner, { bitmaps: 8 * 1024 * 1024 });
+  assert.equal(f.budget.snapshot().pressure, true);
+  assert.equal(f.prepare({ bounds: [[0, 0], [100, 100]], maxDimension: 100000 }), true);
+  assert.deepEqual([f.canvases[0].width, f.canvases[0].height], [1024, 1024]);
+  f.flushAll();
+  assert.equal(f.owner.isReady(), true);
+  assert.equal(f.budget.snapshot().categories.bitmaps, 12 * 1024 * 1024);
+  assert.equal(f.budget.snapshot().softLimitBytes, 1024);
+  assert.equal(f.budget.snapshot().pressure, true, "navigation does not conceal whole-page pressure");
+  assert.equal(f.owner.draw(f.destination, { x: 0, y: 0, k: 1 }, 1), true);
+  assert.equal(f.owner.isReady(), true);
+  assert.equal(f.prepare(), false);
+  assert.equal(f.canvases.length, 1);
+  f.owner.clear();
+  assert.equal(f.budget.snapshot().categories.bitmaps, 8 * 1024 * 1024);
+});
+
+test("worker publication and fallback survive required-pass pressure within the navigation cap", async () => {
+  for (const workerFails of [false, true]) {
+    const f = fixture({ softLimitBytes: 1024 });
+    f.budget.update(Symbol("required-passes"), { bitmaps: 8 * 1024 * 1024 });
+    let closed = 0;
+    assert.equal(f.prepare({ renderRaster: async () => workerFails ? null : { bitmap: { close: () => closed++ } } }), true);
+    await new Promise((resolve) => setImmediate(resolve));
+    if (workerFails) {
+      assert.equal(f.owner.isReady(), false);
+      f.flushAll();
+    }
+    assert.equal(f.owner.isReady(), true);
+    assert.equal(closed, workerFails ? 0 : 1);
+    const navigationBytes = f.canvases.reduce((sum, canvas) => sum + canvas.width * canvas.height * 4, 0);
+    assert.ok(navigationBytes <= 8 * 1024 * 1024);
+    assert.equal(f.budget.snapshot().categories.bitmaps, 8 * 1024 * 1024 + navigationBytes);
+    assert.equal(f.budget.snapshot().softLimitBytes, 1024);
+  }
+});

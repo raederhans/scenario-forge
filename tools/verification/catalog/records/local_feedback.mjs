@@ -228,6 +228,14 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["bathymetry-style-policy", "renderer-runtime", "js/core/renderer/bathymetry_style_policy.js", "tests/bathymetry_style_policy_behavior.test.mjs"],
     ["bathymetry-geometry", "renderer-runtime", "js/core/renderer/bathymetry_geometry.js", "tests/bathymetry_geometry_behavior.test.mjs"],
     ["projected-geographic-path-cache", "renderer-runtime", "js/core/renderer/projected_geographic_path_cache.js", "tests/projected_geographic_path_cache_behavior.test.mjs"],
+    ["navigation-frame", "renderer-runtime", "js/core/renderer/navigation_frame_owner.js", "tests/navigation_frame_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["navigation-scene", "renderer-runtime", "js/core/renderer/navigation_scene_owner.js", "tests/navigation_scene_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["overview-frame", "renderer-runtime", "js/core/renderer/overview_frame_owner.js", "tests/overview_frame_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["label-draw-snapshot", "renderer-runtime", "js/core/renderer/label_draw_snapshot.js", "tests/label_draw_snapshot_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["cached-surface-coverage", "renderer-runtime", "js/core/renderer/cached_surface_coverage.js", "tests/cached_surface_coverage_behavior.test.mjs", ["js/core/renderer/render_pipeline_passes.js", "js/core/map_renderer.js"]],
+    ["render-pass-visibility", "renderer-runtime", "js/core/map_renderer/render_pass_visibility_policy.js", "tests/render_pass_catalog_behavior.test.mjs", ["js/core/map_renderer/render_pass_catalog.js"]],
+    ["render-cache-surface-resources", "renderer-runtime", "js/core/renderer/render_cache_surface_resources.js", "tests/render_cache_owner_invalidation_behavior.test.mjs", ["js/core/renderer/render_cache_owner.js"]],
+    ["city-hierarchy-policy", "renderer-runtime", "js/core/renderer/urban_city_policy.js", "tests/city_hierarchy_policy_behavior.test.mjs", ["js/core/renderer/city_reveal_policy.js"]],
     ["physical-contour-lod", "renderer-runtime", "js/core/renderer/physical_contour_lod_policy.js", "tests/physical_contour_lod_policy_behavior.test.mjs"],
     ["fill-target-policy", "renderer-runtime", "js/core/renderer/fill_target_policy.js", "tests/fill_target_policy_behavior.test.mjs"],
     ["visible-frame-identity-policy", "renderer-runtime", "js/core/renderer/visible_frame_identity_policy.js", "tests/visible_frame_identity_policy_behavior.test.mjs"],
@@ -274,7 +282,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["physical-atlas-lod", "renderer-runtime", "js/core/renderer/physical_atlas_lod_policy.js", "tests/physical_atlas_lod_policy_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["physical-intensity-preview", "renderer-runtime", "js/core/renderer/physical_intensity_preview_owner.js", "tests/physical_intensity_preview_owner_behavior.test.mjs"],
     ["political-feature-policy", "renderer-runtime", "js/core/renderer/political_feature_policy.js", "tests/political_feature_policy_behavior.test.mjs"],
-    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs"],
+    ["political-path-cache", "renderer-runtime", "js/core/renderer/political_path_cache_owner.js", "tests/political_path_cache_owner_behavior.test.mjs", ["js/core/renderer/projected_path_resource_accounting.js"]],
     // Shared-cache changes run the actual region/relief/cache assembly suite.
     ["scenario-region-overlay-render", "renderer-runtime", "js/core/renderer/scenario_region_overlay_render_owner.js", "tests/scenario_region_overlay_render_owner_behavior.test.mjs", [
       "js/core/renderer/render_cache_owner.js", "js/core/renderer/render_cache_validation_scope.js",

@@ -59,8 +59,11 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         renderer = MAP_RENDERER.read_text(encoding="utf-8")
         owner = OWNER.read_text(encoding="utf-8")
         partial_owner = PARTIAL_OWNER.read_text(encoding="utf-8")
-        self.assertRegex(owner, r'import \{[^}]+\} from "\./political_background_build_helpers\.js";')
-        self.assertEqual(len(re.findall(r"^import\s", owner, re.MULTILINE)), 1)
+        imports = re.findall(r'^\s*import\s[\s\S]*?\bfrom\s+"([^"]+)";', owner, re.MULTILINE)
+        self.assertCountEqual(imports, [
+            "./political_background_build_helpers.js",
+        ])
+        self.assertIn("politicalPathResourceAccounting: getProjectedPathResourceAccounting(pageResourceBudget)", renderer)
         for forbidden in ("runtimeState", "document.", "window.", "globalThis", "from \"../map_renderer"):
             self.assertNotIn(forbidden, owner)
         for symbol in (

@@ -319,11 +319,13 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && cityPointsRenderOwnerSource.includes('recordInteractionDurationMetric("interactionHoverCityProbeDuration"'),
       interactionCompositeUsesSingleMainPassCache:
         renderPassCatalogSource.includes("export const INTERACTION_COMPOSITE_PASS_NAMES = [")
+        && /function getActiveInteractionCompositePassNames\(\) \{\s*const active = getActiveRenderPassNames\(\);\s*return INTERACTION_COMPOSITE_PASS_NAMES\.filter\(\(name\) => active\.includes\(name\)\);/.test(rendererSource)
+        && /createTransformedFrameCompositorOwner\(\{[\s\S]*?getters: \{[\s\S]*?getActiveInteractionCompositePassNames,/.test(rendererSource)
         && rendererSource.includes('recordRenderPerfMetric("interactionCompositeBuild"')
         && rendererSource.includes('recordRenderPerfMetric("interactionCompositeContinuityReuse"')
         && renderCacheOwnerSource.includes("function getInteractionCompositeReuseDecision(")
         && renderCacheOwnerSource.includes('new Set(["selection-version-mismatch", "topology-revision-mismatch"])')
-        && /function composeTransformedFrameToBuffer\([\s\S]*?useInteractionComposite = true[\s\S]*?allowInteractionCompositeContinuity = false[\s\S]*?drawInteractionComposite\(currentTransform, \{[\s\S]*?allowSelectionTopologyContinuity: allowInteractionCompositeContinuity[\s\S]*?composeRenderPassesToTarget\([\s\S]*?interactionCompositePassNames[\s\S]*?drawInteractionBorderSnapshot\(currentTransform\)/.test(transformedFrameCompositorOwnerSource),
+        && /function composeTransformedFrameToBuffer\([\s\S]*?useInteractionComposite = true[\s\S]*?allowInteractionCompositeContinuity = false[\s\S]*?drawInteractionComposite\(currentTransform, \{[\s\S]*?allowSelectionTopologyContinuity: allowInteractionCompositeContinuity[\s\S]*?composeRenderPassesToTarget\([\s\S]*?getActiveInteractionCompositePassNames\(\)[\s\S]*?drawInteractionBorderSnapshot\(currentTransform\)/.test(transformedFrameCompositorOwnerSource),
       continuityFrameSkipsBaseFillDuringInteraction:
         rendererSource.includes("const CONTINUITY_FRAME_MAX_STALE_AGE_MS = 1500;")
         && /function invalidateLastGoodFrame\(reason = "visual-invalidation"\) \{[\s\S]*?frame\.stale = true;/.test(renderCacheOwnerSource)

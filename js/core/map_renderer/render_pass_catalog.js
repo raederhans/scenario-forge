@@ -59,3 +59,5 @@ export const TRANSFORMED_FRAME_PASS_NAMES = [
 ];
 
 export const RENDER_PASS_OVERSCAN_RATIO_PER_SIDE = 0.15;
+
+export { filterEnabledRenderPassNames } from "./render_pass_visibility_policy.js";
