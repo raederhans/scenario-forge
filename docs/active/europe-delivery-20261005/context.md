@@ -16,3 +16,4 @@
 - 最终 stage 已整合 canonical：gzip 34,479,976 B，解压 112,964,820 B；完整 source 的 arc 分割与首轮 vendor PASS 候选相同，仅重算 political.computed_neighbors。第二次 compact 曾造成 7 个 mask merge 失败，已改为 gzip 可存储时保留输入，并回退 stage 的该次编码变化；最终 vendor 624/624 PASS。
 - 全局 mixed-LOD 验证覆盖 196 个独立详情分片维度，所有状态覆盖完整源；最终编码回退不改变任何坐标、feature 或详情分片。stage/canonical strict、精确保留、catalog/data health 和路由检查通过。新 Pages 构建在 `.runtime/tmp/europe-integration-20261005/pages`，不改 tracked dist。
 - 最终发布 artifact 使用 `pages-final`（815,707,977 B）；完整 Pages suite 67 PASS。早期 `pages` 根含独立 hero 临时生成物，不作为最终发布证据。最终 TNO Playwright smoke PASS，端口 8009 的任务服务器已结束。
+- 合并提交 `f211cfce308d6b7794f1711818e117a5cf75368e` 已推送，PR 为 https://github.com/raederhans/scenario-forge/pull/211 。创建 API 曾返回 502，但只读回查证明 PR 已实际建立，因此没有重复创建。最终 `pr:plan` 发现的 5 个 legacy source 工具路由已补齐；Russia audit 新增 main() gzip-only fixture，计划的 unmatched 和 route gaps 均为空。两个 coarse 测试明确校验 Shapely 消费结果及真实 bounds，并保持 geo_stack 依赖归类。

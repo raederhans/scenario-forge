@@ -6,6 +6,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from shapely.geometry import shape
+
 from tools import check_scenario_contracts, validate_mixed_lod_coverage
 from tools.scenario_chunk_format import feature_collection_to_topology
 
@@ -43,7 +45,7 @@ class ScenarioChunkFormatContractTests(unittest.TestCase):
             self.assertEqual(errors, [])
 
         rows = validate_mixed_lod_coverage.feature_rows(topology, "coarse")
-        self.assertAlmostEqual(rows["land"].area, 1.0)
+        self.assertTrue(rows["land"].equals_exact(shape(collection["features"][0]["geometry"]), 0))
 
     def test_coarse_contract_rejects_format_mismatch_and_understated_cache(self):
         collection = collection_with_polygon("land", [[[0, 0], [2, 0], [2, 1], [0, 0]]])

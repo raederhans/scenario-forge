@@ -5,6 +5,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from shapely.geometry import shape
+
 from tools import scenario_chunk_assets as assets
 from tools.scenario_chunk_format import decode_political_chunk
 
@@ -48,7 +50,9 @@ class CoarseWireAssetsTest(unittest.TestCase):
                 expanded = decode_political_chunk(actual)
                 self.assertEqual(entry["data_format"], "topojson")
                 self.assertEqual(entry["feature_count"], len(expanded["features"]))
-                self.assertEqual(len(entry["feature_bounds"]), len(expanded["features"]))
+                self.assertEqual(entry["feature_bounds"], [
+                    list(shape(feature["geometry"]).bounds) for feature in expanded["features"]
+                ])
                 self.assertEqual(entry["cache_byte_size"], assets._minified_json_byte_size(expanded))
                 self.assertGreater(entry["cache_byte_size"], entry["decoded_byte_size"])
                 self.assertEqual(entry["byte_size"], entry["decoded_byte_size"])
