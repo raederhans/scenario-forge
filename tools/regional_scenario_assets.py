@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
 import geopandas as gpd
 from shapely.geometry import shape
 from tools.scenario_topology_decode import topology_object_to_geojson
+from tools.lossless_topology import compact_large_runtime_topology
 
 from map_builder.geo.topology import compute_neighbor_graph
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets, _resolve_feature_owner_bucket
@@ -262,6 +263,7 @@ def build_regional_scenario_assets(*, baseline_dir: Path | str, candidate_runtim
         candidate_payload = _read(target_runtime)
         candidate_payload["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(
             gpd.GeoDataFrame.from_features(list(new.values()), crs="EPSG:4326"))
+        candidate_payload = compact_large_runtime_topology(candidate_payload)
         target_runtime.write_text(json.dumps(candidate_payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False), encoding="utf-8")
         layer_payloads = {}
         for layer, field in {"water": "water_regions_url", "special": "special_regions_url", "relief": "relief_overlays_url", "cities": "city_overrides_url"}.items():

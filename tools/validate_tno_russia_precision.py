@@ -6,6 +6,7 @@ from shapely.geometry import shape
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from map_builder.coverage_validation import coverage_is_valid_exact
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
+from tools.scenario_chunk_format import decode_political_chunk
 
 def read(p):
     return json.loads(p.read_text(encoding='utf-8'))
@@ -214,7 +215,7 @@ def validate(baseline_dir, candidate_runtime, candidate_dir=None):
                 changed_chunks.append(c['id'])
 
             if c['layer'] == 'political' and c['lod'] in lod:
-                for f in json.loads(raw)['features']:
+                for f in decode_political_chunk(json.loads(raw))['features']:
                     i = fid(f)
                     if i in all_lod_ids[c['lod']] or i not in b:
                         raise ValueError('duplicate or unknown political LOD ID')
@@ -230,7 +231,7 @@ def validate(baseline_dir, candidate_runtime, candidate_dir=None):
                             if not cg.is_valid or not b[i].is_valid:
                                 if old_coarse_features is None:
                                     old_coarse_features = {
-                                        fid(feature): feature for feature in read(baseline_chunk)['features']
+                                        fid(feature): feature for feature in decode_political_chunk(read(baseline_chunk))['features']
                                     }
                                 previous = old_coarse_features.get(i)
                                 if previous is None or previous['geometry'] != f['geometry']:

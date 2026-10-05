@@ -15,6 +15,8 @@ from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
 from tools.scenario_topology_decode import topology_object_to_geojson
+from tools.scenario_chunk_format import feature_collection_to_topology
+from tools.lossless_topology import optimize_topology
 
 DEFAULT_RENDER_BUDGET_HINTS = {
     "max_required_chunks": 6,
@@ -45,6 +47,7 @@ POLITICAL_COARSE_LOD_DIAGNOSTIC_TIER = "political-coarse-simplified-v1"
 POLITICAL_COARSE_SIMPLIFY_TOLERANCE = 0.01
 POLITICAL_COARSE_ROUND_DECIMALS = 4
 POLITICAL_COARSE_SIMPLIFY_GEOMETRY_TYPES = {"Polygon", "MultiPolygon"}
+POLITICAL_COARSE_TOPOLOGY_MIN_BYTES = 1024 * 1024
 FR_SHARED_COVERAGE_TIER = "fr-arr-shared-coverage-v1"
 
 # Whole-feature spatial splitting is shared with the dependency-light Pages build.
@@ -518,6 +521,24 @@ def _minified_json_byte_size(payload: dict[str, Any]) -> int:
     return len((json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8"))
 
 
+def _encode_political_coarse_wire(payload: dict[str, Any]) -> tuple[dict[str, Any], int]:
+    """Share exact coordinates on the wire; consumers still cache GeoJSON.
+
+    Unlike the full runtime topology, this topology never reaches mesh/merge
+    consumers. Both chunk loaders decode it before caching, so its arc identity
+    is disposable. Keep small chunks and non-beneficial conversions unchanged.
+    """
+    expanded_bytes = _minified_json_byte_size(payload)
+    if expanded_bytes < POLITICAL_COARSE_TOPOLOGY_MIN_BYTES:
+        return payload, expanded_bytes
+    topology, _ = optimize_topology(
+        feature_collection_to_topology(payload), preserve_arc_identity=False,
+    )
+    if _minified_json_byte_size(topology) >= expanded_bytes:
+        return payload, expanded_bytes
+    return topology, expanded_bytes
+
+
 def _build_chunk_cost_summary(payload: dict[str, Any], chunk_path: Path) -> dict[str, Any]:
     geometry_cost = _summarize_payload_geometry_cost(payload)
     byte_size = int(chunk_path.stat().st_size) if chunk_path.exists() else len(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
@@ -895,6 +916,32 @@ def _optimize_political_coarse_payload(
         "atl_join_mode",
     )
     source_features = payload.get("features") or []
+    # A complete map names actual independently replaceable detail shards.
+    # Preserve each shard envelope exactly; only its internal shared edges may
+    # move. This also protects source gaps/water and inter-shard interfaces.
+    global_shared = bool(owner_buckets_by_feature_id) and all(
+        _feature_id(feature, index) in owner_buckets_by_feature_id
+        for index, feature in enumerate(source_features) if isinstance(feature, dict)
+    )
+    if global_shared:
+        candidates = [(index, feature) for index, feature in enumerate(source_features)
+                      if isinstance(feature, dict)]
+        shared_geometries, applied = _shared_coverage_simplified_geometries(
+            candidates, owner_buckets_by_feature_id, allow_partial=True,
+        )
+        if diagnostics is not None:
+            diagnostics.update(fr_shared_coverage_applied=False,
+                regional_shared_coverage_applied=applied,
+                regional_shared_coverage_eligible_count=len(shared_geometries),
+                regional_shared_coverage_retained_count=len(candidates)-len(shared_geometries),
+                global_shard_coverage_applied=applied)
+        return {"type": "FeatureCollection", "features": [
+            {"type": "Feature", "properties": {
+                key: (feature.get("properties") or {})[key] for key in property_whitelist
+                if (feature.get("properties") or {}).get(key) not in (None, "")},
+             "geometry": shared_geometries.get(index, feature.get("geometry"))}
+            for index, feature in candidates
+        ]}
     shared_fr_geometries, shared_fr_applied = _shared_fr_arr_simplified_geometries(
         source_features,
         owner_buckets_by_feature_id=owner_buckets_by_feature_id,
@@ -1186,6 +1233,8 @@ def _build_chunk_payloads_for_feature_collection(
                 chunk_path = scenario_dir / "chunks" / chunk_filename
                 chunk_payload = _normalize_chunk_atlantropa_features_for_d3(chunk_payload)
                 lod_diagnostics = None
+                chunk_data_format = "geojson"
+                cache_byte_size = None
                 if layer_key == "political" and spec["lod"] == "coarse":
                     # LOD diagnostics 必须围绕最终写盘 payload 计算；这样 manifest
                     # 的 byte/hash/coord 预算和浏览器真实读取的 coarse 文件一致。
@@ -1215,12 +1264,32 @@ def _build_chunk_payloads_for_feature_collection(
                         lod_diagnostics["regional_shared_coverage_applied"] = optimization_diagnostics["regional_shared_coverage_applied"]
                         for key in ("regional_shared_coverage_eligible_count", "regional_shared_coverage_retained_count"):
                             lod_diagnostics[key] = optimization_diagnostics[key]
-                    _write_minified_json(chunk_path, chunk_payload)
+                    if "global_shard_coverage_applied" in optimization_diagnostics:
+                        lod_diagnostics.update(
+                            tier="political-coarse-shared-shards-v2", round_decimals=None,
+                            global_shard_coverage_applied=optimization_diagnostics["global_shard_coverage_applied"],
+                            shared_coverage_eligible_count=optimization_diagnostics["regional_shared_coverage_eligible_count"],
+                            shared_coverage_retained_count=optimization_diagnostics["regional_shared_coverage_retained_count"],
+                        )
+                    wire_payload, cache_byte_size = _encode_political_coarse_wire(chunk_payload)
+                    if wire_payload is not chunk_payload:
+                        chunk_data_format = "topojson"
+                        lod_diagnostics["expanded_geojson_byte_size"] = cache_byte_size
+                        lod_diagnostics["wire_byte_size"] = _minified_json_byte_size(wire_payload)
+                        lod_diagnostics["optimized_byte_size"] = lod_diagnostics["wire_byte_size"]
+                        lod_diagnostics["byte_size_reduction"] = max(
+                            0, lod_diagnostics["source_byte_size"] - lod_diagnostics["wire_byte_size"],
+                        )
+                    _write_minified_json(chunk_path, wire_payload)
                 elif layer_key == "water":
                     _write_minified_json(chunk_path, chunk_payload)
                 else:
                     _write_json(chunk_path, chunk_payload)
                 chunk_cost_summary = _build_chunk_cost_summary(chunk_payload, chunk_path)
+                if cache_byte_size is not None:
+                    # Cache accounting uses the expanded representation, not the
+                    # smaller transport format or compressed HTTP response.
+                    chunk_cost_summary["cache_byte_size"] = cache_byte_size
                 payload_features = chunk_payload.get("features") if isinstance(chunk_payload, dict) else None
                 payload_feature_count = len(payload_features) if isinstance(payload_features, list) else 0
                 include_feature_bounds = (
@@ -1248,7 +1317,7 @@ def _build_chunk_payloads_for_feature_collection(
                     "priority": 100 if layer_key == "political" and spec["lod"] == "coarse" else (90 if layer_key == "political" else (1 if spec["lod"] == "coarse" else 2)),
                     "feature_count": payload_feature_count,
                     **chunk_cost_summary,
-                    "data_format": "geojson",
+                    "data_format": chunk_data_format,
                     "global_coverage": bool(spec["global_coverage"]),
                     "country_codes": chunk_country_codes,
                     **({"feature_bounds": feature_bounds_summary} if feature_bounds_summary else {}),
@@ -1417,9 +1486,6 @@ def _build_political_chunk_payloads(
                 feature_id: feature_shard_buckets.get(feature_id, f"feature:{feature_id}")
                 for index, feature in enumerate(coarse_feature_collection.get("features") or [])
                 for feature_id in [_feature_id(feature, index)]
-                if feature_id.startswith("FR_ARR_")
-                or str((feature.get("properties") or {}).get("cntr_code", "")).upper() in precision_source_countries
-                or feature_id in political_precision_feature_ids
             },
         )
         all_chunks.extend(chunks)

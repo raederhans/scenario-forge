@@ -9,6 +9,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools.validate_tno_precision_expansion import validate
+from tools.scenario_chunk_format import feature_collection_to_topology
 
 def create_mock_topojson():
     return {
@@ -85,6 +86,30 @@ def test_validation_success():
         assert result['status'] == 'PASS'
         assert result['target_count'] == 1
         assert result['percountry_coverage_candidate']['GB'] is True
+
+def test_validation_decodes_topojson_political_coarse_chunk():
+    runtime_tmp = Path(__file__).resolve().parents[1] / '.runtime' / 'tmp'
+    runtime_tmp.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=runtime_tmp) as d:
+        base, cand = create_valid_env(d)
+        manifest_path = cand / 'detail_chunks.manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        coarse_entry = manifest['chunks'][0]
+        coarse_path = cand / 'c1.json'
+        collection = json.loads(coarse_path.read_text())
+        collection['type'] = 'FeatureCollection'
+        for feature in collection['features']:
+            feature['type'] = 'Feature'
+        raw = json.dumps(feature_collection_to_topology(collection)).encode()
+        coarse_path.write_bytes(raw)
+        (cand / 'c1.json.gz').write_bytes(gzip.compress(raw))
+        coarse_entry['byte_size'] = len(raw)
+        coarse_entry['sha256'] = hashlib.sha256(raw).hexdigest()
+        coarse_entry['data_format'] = 'topojson'
+        manifest_path.write_text(json.dumps(manifest))
+
+        result = validate(base, cand / 'runtime_topology.topo.json', ['GB'], cand)
+        assert result['status'] == 'PASS'
 
 def test_missing_stage_file():
     with TemporaryDirectory() as d:

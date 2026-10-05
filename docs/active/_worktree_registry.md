@@ -596,3 +596,6 @@
 ## Polar sample baseline deployment follow-up 2026-09-29
 
 The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, based on `main@490583b6`. Root owns the scoped sample baseline and early CI gate fix, local publication test server, push/merge and deployment verification. Original polar repair is already merged as PR #187; its first deployment failed. Preserve primary checkout WIP and retain this checkout for evidence/reuse.
+# 2026-10-05 欧洲修复交付
+
+`codex/europe-land-gaps` 位于 `C:/Users/raede/.codex/worktrees/europe-land-gaps/mapcreator`，当前由本对话整合 owner 交付欧洲及相邻区域的地块修复和无损资产压缩。主工作区的其他 WIP 保留。阶段、Git 回执及验证以 [交付记录](europe-delivery-20261005/task.md) 为准；本工作树暂时保留以保存 ignored 基线及恢复证据。

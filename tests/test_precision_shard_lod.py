@@ -13,7 +13,7 @@ from tools.scenario_chunk_assets import (
 )
 
 
-@pytest.mark.parametrize("explicit_ids", [False, True])
+@pytest.mark.parametrize("explicit_ids", [False, True, None])
 def test_actual_builder_preserves_each_detail_shard_boundary(tmp_path: Path, explicit_ids):
     ids = ["US_CNTY_01001", "US_CNTY_01003", "US_CNTY_01005"]
     topology = {
@@ -27,7 +27,7 @@ def test_actual_builder_preserves_each_detail_shard_boundary(tmp_path: Path, exp
             {"type": "Polygon", "arcs": [[index]], "properties": {"id": fid, "cntr_code": "US"}}
             for index, fid in enumerate(ids)
         ]}},
-        **({"political_precision_feature_ids": ids} if explicit_ids else {"political_precision_source_countries": ["US"]}),
+        **({} if explicit_ids is None else {"political_precision_feature_ids": ids} if explicit_ids else {"political_precision_source_countries": ["US"]}),
     }
     source = _topology_object_to_feature_collection(topology, "political")
     owners = dict.fromkeys(ids, "US")

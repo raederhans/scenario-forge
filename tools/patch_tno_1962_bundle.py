@@ -100,6 +100,7 @@ from map_builder.contracts import (
 from scenario_builder.hoi4.audit import read_bmp24
 from tools.build_tno_1962_geo_locale_patch import build_patch as build_tno_geo_locale_patch
 from tools.build_startup_bootstrap_assets import build_bootstrap_runtime_topology, build_startup_bootstrap_assets
+from tools.lossless_topology import compact_large_runtime_topology
 from tools.build_startup_bundle import build_startup_bundles
 from tools.atlantropa_coastline import build_scenario_coastline_geometry, build_atlantropa_land_reference
 from tools.atlantropa_geometry_quality import (
@@ -12916,7 +12917,7 @@ def build_runtime_topology_payload(
         topo_dict["objects"]["political"]["computed_neighbors"] = compute_neighbor_graph(political_out)
     else:
         topo_dict["objects"]["political"]["computed_neighbors"] = []
-    return topo_dict
+    return compact_large_runtime_topology(topo_dict)
 
 
 def validate_runtime_topology_water_outputs(

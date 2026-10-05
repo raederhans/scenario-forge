@@ -5,6 +5,7 @@ from shapely.geometry import shape
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from map_builder.regional_geometry import _absolute_topology, _decode_geometry
+from tools.scenario_chunk_format import decode_political_chunk
 
 def read(p):
     return json.loads(p.read_text(encoding='utf-8'))
@@ -201,7 +202,10 @@ def validate(baseline_dir, candidate_runtime, source_countries, candidate_dir=No
                 changed_chunks.append(c['id'])
 
             if c['layer'] == 'political' and c['lod'] in lod:
-                for f in json.loads(raw)['features']:
+                chunk_payload = json.loads(raw)
+                if isinstance(chunk_payload, dict) and chunk_payload.get('type') == 'Topology':
+                    chunk_payload = decode_political_chunk(chunk_payload)
+                for f in chunk_payload['features']:
                     i = fid(f)
                     if i in all_lod_ids[c['lod']] or i not in b:
                         raise ValueError('duplicate or unknown political LOD ID')

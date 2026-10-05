@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 
 from shapely.geometry import Polygon, box
 
+from tools.scenario_chunk_format import feature_collection_to_topology
 from tools.validate_us_county_lod import load_chunk, validate_lod_sets
 
 
@@ -72,6 +73,24 @@ class CountyLodTests(unittest.TestCase):
             entry["url"] = "data/scenarios/test/../outside.json"
             with self.assertRaisesRegex(ValueError, "escapes candidate"):
                 load_chunk(root, "test", entry)
+
+    def test_load_chunk_decodes_topojson_political_payload(self):
+        runtime_tmp = Path(__file__).resolve().parents[1] / ".runtime" / "tmp"
+        runtime_tmp.mkdir(parents=True, exist_ok=True)
+        topology = feature_collection_to_topology({"type": "FeatureCollection", "features": [{
+            "type": "Feature", "properties": {"id": "US_CNTY_1"},
+            "geometry": {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]},
+        }]})
+        raw = json.dumps(topology).encode()
+        with TemporaryDirectory(dir=runtime_tmp) as directory:
+            root = Path(directory)
+            (root / "chunk.json").write_bytes(raw)
+            entry = {"id": "coarse", "url": "data/scenarios/test/chunk.json",
+                     "byte_size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
+                     "feature_count": 1}
+            features = load_chunk(root, "test", entry)
+            self.assertEqual(features[0]["properties"]["id"], "US_CNTY_1")
+            self.assertEqual(features[0]["geometry"]["type"], "Polygon")
 
 
 if __name__ == "__main__":

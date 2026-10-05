@@ -108,6 +108,29 @@ export function createLocalFeedbackRecords(baseRecords) {
   // child-safe. The eastern-source suite intentionally reads the local raw
   // geographic inputs and keeps the heavy-geo/main-thread policy.
   const precisionPytestRoutes = [
+    ["remaining-europe-seam", "python -m pytest tests/test_tno_remaining_europe_seams.py -q", [
+      "tests/test_tno_remaining_europe_seams.py", "tools/repair_tno_remaining_europe_seams.py",
+      "tools/repair_specs/tno_remaining_europe_20261005.json", "tools/repair_tno_balkan_anatolia_seams.py",
+      "map_builder/geo/measurement.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+    ]],
+    ["mixed-lod-coverage", "python -m pytest tests/test_mixed_lod_coverage.py -q", [
+      "tests/test_mixed_lod_coverage.py", "tools/validate_mixed_lod_coverage.py",
+    ]],
+    ["political-coarse-shared-lod", "python -m pytest tests/test_political_coarse_shared_lod.py -q", [
+      "tests/test_political_coarse_shared_lod.py", "tools/scenario_chunk_assets.py",
+    ]],
+    ["levant-seam", "python -m pytest tests/test_tno_levant_seams.py -q", [
+      "tests/test_tno_levant_seams.py", "tools/repair_tno_levant_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+      "map_builder/geo/measurement.py", "tools/audit_tno_east_europe_gaps.py",
+    ]],
+    ["balkan-anatolia-seam", "python -m pytest tests/test_tno_balkan_anatolia_seams.py -q", [
+      "tests/test_tno_balkan_anatolia_seams.py", "tools/repair_tno_balkan_anatolia_seams.py",
+      "map_builder/geo/measurement.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+    ]],
+    ["slovakia-ukraine-seam", "python -m pytest tests/test_tno_slovakia_ukraine_seams.py -q", [
+      "tests/test_tno_slovakia_ukraine_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
+      "map_builder/geo/measurement.py",
+    ]],
     ["reviewed-seam", "python -m pytest tests/test_reviewed_seam.py -q", [
       "tests/test_reviewed_seam.py", "map_builder/geo/reviewed_seam.py", "tools/repair_tno_poland_ukraine_seams.py",
     ]],

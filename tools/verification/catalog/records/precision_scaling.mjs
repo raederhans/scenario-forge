@@ -80,7 +80,7 @@ export function createPrecisionScalingRecords(existingRecords) {
     ...[
       ["precision_shard_lod", "tools/scenario_chunk_assets.py"],
       ["scenario_topology_decode", "tools/scenario_topology_decode.py", "tools/regional_scenario_assets.py", "tools/scenario_chunk_assets.py", "tools/build_landing_hero_cartography.py", "tools/build_landing_europe_1936_showcase.py"],
-      ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py"],
+      ["tno_east_europe_gaps", "tools/audit_tno_east_europe_gaps.py", "map_builder/geo/measurement.py", "tests/fixtures/geos_segmentize_collapse.json"],
       ["tno_major_country_precision", "tools/prepare_tno_major_country_precision.py"],
       ["us_county_source", "tools/prepare_us_county_source.py"],
       ["us_county_seams", "tools/prepare_us_county_seams.py"],
@@ -159,6 +159,22 @@ export function createPrecisionScalingRecords(existingRecords) {
   records.push({ ...records[6], id: "local:precision-transport:native-browser",
     commandRef: "node tools/probe_transport_lifetime.mjs --report-dir .runtime/reports/generated/transport-lifetime",
     sourceRefs: ["tools/probe_transport_lifetime.mjs"], selectorOrder: start + records.length,
+  });
+  const wireRoutes = [
+    ["codec", "geo-contract", "python -m unittest tests.test_scenario_chunk_format tests.test_lossless_topology -q", [
+      "tools/scenario_chunk_format.py", "tools/lossless_topology.py", "tests/test_scenario_chunk_format.py", "tests/test_lossless_topology.py",
+    ]],
+    ["builder", "geo-contract", "python -m unittest tests.test_coarse_wire_assets tests.test_scenario_chunk_format_contracts -q", [
+      "tools/scenario_chunk_assets.py", "tools/regional_scenario_assets.py", "tools/patch_tno_1962_bundle.py", "tests/test_coarse_wire_assets.py",
+      "tools/check_scenario_contracts.py", "tools/validate_mixed_lod_coverage.py", "tests/test_scenario_chunk_format_contracts.py",
+    ]],
+    ["loader", "scenario-runtime", "node --test tests/scenario_chunk_topology_format_behavior.test.mjs", [
+      "js/core/scenario_chunk_format_shared.js", "js/core/scenario/bundle_loader.js", "js/workers/startup_boot.worker.js", "tests/scenario_chunk_topology_format_behavior.test.mjs",
+    ]],
+  ];
+  for (const [id, domain, commandRef, sourceRefs] of wireRoutes) records.push({
+    ...records[0], id: "local:topology-wire:" + id, commandRef, sourceRefs,
+    ownerHints: [domain], domains: [domain], selectorOrder: start + records.length,
   });
   return records;
 }

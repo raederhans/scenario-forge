@@ -49,6 +49,7 @@ from tools.scenario_contract_paths import (
     TNO_GEOMETRY_DROP_AUDIT_FILENAME,
 )
 from tools.scenario_chunk_assets import build_and_write_scenario_chunk_assets
+from tools.scenario_chunk_format import decode_political_chunk
 
 DEFAULT_SCENARIOS_ROOT = PROJECT_ROOT / "data/scenarios"
 IGNORED_DIR_NAMES = {"expectations"}
@@ -662,9 +663,19 @@ def _load_chunk_feature_index(
         if chunk_path is None or not chunk_path.exists():
             continue
         chunk_payload = _load_optional_json(chunk_path) or {}
-        features = chunk_payload.get("features") if isinstance(chunk_payload.get("features"), list) else []
         chunk_id = str(chunk.get("id") or chunk_path.stem).strip()
         chunk_lod = str(chunk.get("lod") or "").strip()
+        if chunk_layer == "political" and chunk_lod == "coarse":
+            if chunk_payload.get("type") == "Topology":
+                try:
+                    decoded = decode_political_chunk(chunk_payload)
+                except ValueError as exc:
+                    raise ValueError(f"Invalid political coarse chunk {chunk_id} at {chunk_path}: {exc}") from exc
+            else:
+                decoded = chunk_payload
+            features = decoded.get("features") if isinstance(decoded.get("features"), list) else []
+        else:
+            features = chunk_payload.get("features") if isinstance(chunk_payload.get("features"), list) else []
         for feature in features:
             if not isinstance(feature, dict):
                 continue
@@ -1926,7 +1937,7 @@ def _bounds_area_for_contract(bounds: list[float]) -> float:
     return max(0.0, float(bounds[2]) - float(bounds[0])) * max(0.0, float(bounds[3]) - float(bounds[1]))
 
 
-def _normalize_manifest_feature_bounds(raw_bounds: Any) -> list[float] | None:
+def _normalize_manifest_feature_bounds(raw_bounds: Any, *, allow_zero_area: bool = False) -> list[float] | None:
     if not isinstance(raw_bounds, list) or len(raw_bounds) != 4:
         return None
     try:
@@ -1937,7 +1948,7 @@ def _normalize_manifest_feature_bounds(raw_bounds: Any) -> list[float] | None:
         return None
     if not all(-90.0 <= bounds[index] <= 90.0 for index in (1, 3)):
         return None
-    if _bounds_area_for_contract(bounds) <= 0:
+    if _bounds_area_for_contract(bounds) <= 0 and not allow_zero_area:
         return None
     return bounds
 
@@ -1949,38 +1960,101 @@ def _validate_detail_chunk_feature_bounds(
     errors: list[str],
     *,
     required: bool,
+    chunk_kind: str = "detail",
+    include_zero_area: bool = False,
 ) -> None:
     raw_feature_bounds = chunk.get("feature_bounds")
     if not isinstance(raw_feature_bounds, list) or not raw_feature_bounds:
         if required:
-            errors.append(f"detail chunk {chunk_id} feature_bounds must be present for political detail chunks.")
+            errors.append(f"{chunk_kind} chunk {chunk_id} feature_bounds must be present for political chunks.")
         return
     manifest_bounds: list[list[float]] = []
     for index, raw_bounds in enumerate(raw_feature_bounds):
-        normalized_bounds = _normalize_manifest_feature_bounds(raw_bounds)
+        normalized_bounds = _normalize_manifest_feature_bounds(raw_bounds, allow_zero_area=include_zero_area)
         if normalized_bounds is None:
-            errors.append(f"detail chunk {chunk_id} feature_bounds[{index}] must be a valid non-empty bbox.")
+            errors.append(f"{chunk_kind} chunk {chunk_id} feature_bounds[{index}] must be a valid non-empty bbox.")
             continue
         manifest_bounds.append(normalized_bounds)
     expected_bounds = [
         bounds
         for feature in features
         for bounds in [_feature_bounds_for_contract(feature)]
-        if _bounds_area_for_contract(bounds) > 0
+        if include_zero_area or _bounds_area_for_contract(bounds) > 0
     ]
     if len(manifest_bounds) != len(expected_bounds):
         errors.append(
-            f"detail chunk {chunk_id} feature_bounds length must match non-empty payload feature bounds. "
+            f"{chunk_kind} chunk {chunk_id} feature_bounds length must match non-empty payload feature bounds. "
             f"manifest={len(manifest_bounds)} actual={len(expected_bounds)}."
         )
     for index, expected_bounds_entry in enumerate(expected_bounds[:len(manifest_bounds)]):
         manifest_bounds_entry = manifest_bounds[index]
         if any(abs(manifest_bounds_entry[axis] - expected_bounds_entry[axis]) > 1e-7 for axis in range(4)):
             errors.append(
-                f"detail chunk {chunk_id} feature_bounds[{index}] must match payload geometry bounds. "
+                f"{chunk_kind} chunk {chunk_id} feature_bounds[{index}] must match payload geometry bounds. "
                 f"manifest={manifest_bounds_entry} actual={expected_bounds_entry}."
             )
             break
+
+
+def _validate_political_coarse_chunk(
+    chunk_id: str,
+    chunk: dict[str, Any],
+    chunk_path: Path,
+    errors: list[str],
+) -> list[dict[str, Any]] | None:
+    payload = _load_required_local_json(chunk_path, errors)
+    if payload is None:
+        return None
+    data_format = chunk.get("data_format", "geojson")
+    expected_type = {"geojson": "FeatureCollection", "topojson": "Topology"}.get(data_format)
+    if expected_type is None:
+        errors.append(f"coarse political chunk {chunk_id} data_format must be 'geojson' or 'topojson'.")
+        return None
+    if not isinstance(payload, dict) or payload.get("type") != expected_type:
+        errors.append(
+            f"coarse political chunk {chunk_id} data_format {data_format!r} must match payload type {expected_type!r}."
+        )
+        return None
+    try:
+        decoded = decode_political_chunk(payload)
+    except ValueError as exc:
+        errors.append(f"coarse political chunk {chunk_id} has invalid {data_format} format: {exc}.")
+        return None
+    features = decoded.get("features") if isinstance(decoded, dict) else None
+    if not isinstance(features, list):
+        errors.append(f"coarse political chunk {chunk_id} must decode to a FeatureCollection with features.")
+        return None
+    expected_feature_count = chunk.get("feature_count")
+    try:
+        expected_feature_count_int = int(expected_feature_count)
+    except (TypeError, ValueError):
+        errors.append(f"coarse political chunk {chunk_id} feature_count must be an integer.")
+    else:
+        if expected_feature_count_int != len(features):
+            errors.append(
+                f"coarse political chunk {chunk_id} feature_count must match decoded payload feature length. "
+                f"manifest={expected_feature_count_int} actual={len(features)}."
+            )
+    _validate_detail_chunk_feature_bounds(
+        chunk_id, chunk, features, errors, required=True, chunk_kind="coarse political", include_zero_area=True
+    )
+    if data_format == "topojson":
+        try:
+            expanded_size = len(json.dumps(decoded, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8"))
+        except (TypeError, ValueError) as exc:
+            errors.append(f"coarse political chunk {chunk_id} decoded FeatureCollection is not compact-JSON serializable: {exc}.")
+        else:
+            try:
+                cache_size = int(chunk.get("cache_byte_size"))
+            except (TypeError, ValueError):
+                errors.append(f"coarse political chunk {chunk_id} cache_byte_size must cover the decoded FeatureCollection.")
+            else:
+                if cache_size < expanded_size:
+                    errors.append(
+                        f"coarse political chunk {chunk_id} cache_byte_size must be at least the compact decoded FeatureCollection size. "
+                        f"manifest={cache_size} actual={expanded_size}."
+                    )
+    return features
 
 
 def _collect_feature_ids_from_geojson(path: Path, errors: list[str]) -> set[str]:
@@ -2288,6 +2362,9 @@ def _validate_detail_chunk_manifest(
                         f"atl_render_layer={expected_field_rule[0]!r} atl_color_rule={expected_field_rule[1]!r}; "
                         f"got atl_render_layer={render_layer!r} atl_color_rule={color_rule!r}."
                     )
+        if chunk_layer == "political" and chunk_lod == "coarse":
+            _validate_political_coarse_chunk(chunk_id, chunk, chunk_path, errors)
+            continue
         if (
             chunk_layer == "political"
             and chunk_lod == "detail"

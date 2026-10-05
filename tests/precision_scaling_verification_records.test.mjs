@@ -9,7 +9,10 @@ import { reconcileVerificationRouteAuthority } from "../tools/test_route_registr
 test("precision routes append unique executable targets without modifying existing records", () => {
   const existing = Object.freeze([Object.freeze({ id: "old", selectorOrder: 2000 })]);
   const routes = createPrecisionScalingRecords(existing);
-  assert.equal(routes.length, 35);
+  assert.equal(routes.length, 38);
+  assert.deepEqual(routes.slice(-3).map((r) => r.id), [
+    "local:topology-wire:codec", "local:topology-wire:builder", "local:topology-wire:loader",
+  ]);
   assert.equal(routes[6].id, "local:precision-scaling:native-browser", "existing selector order is unchanged");
   assert.equal(new Set(routes.map((r) => r.id)).size, routes.length);
   for (const [i, record] of routes.entries()) {
