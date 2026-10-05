@@ -1,4 +1,6 @@
 const visibleFrameIdentitySource = readRepoFile("js", "core", "renderer", "visible_frame_identity_policy.js").replace(/^  /gm, "");
+import { createRequire } from "node:module";
+import "../js/core/scenario_chunk_format_shared.js";
 import {
   test,
   assert,
@@ -26,6 +28,9 @@ import {
   getRingSignedArea,
 } from "./helpers/scenario_chunk_contract_support.mjs";
 import { readJsonSource } from "./helpers/read_json_source.mjs";
+
+const topojson = createRequire(import.meta.url)("../vendor/topojson-client.min.js");
+const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
 
 const scenarioRegionOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_region_overlay_render_owner.js");
 const scenarioReliefOverlayOwnerSource = readRepoFile("js", "core", "renderer", "scenario_relief_overlay_render_owner.js");
@@ -62,7 +67,7 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
       const bootstrapPoliticalCount = bootstrapTopology.objects?.political?.geometries?.length || 0;
       const runtimePoliticalCount = runtimeTopology.objects?.political?.geometries?.length || 0;
       const coarseChunk = chunkManifest.chunks.find((chunk) => chunk.id === "political.coarse.r0c0");
-      const coarsePayload = readManifestChunkPayload(coarseChunk);
+      const coarsePayload = decodeScenarioChunkPayload(readManifestChunkPayload(coarseChunk), topojson);
 
       assert.ok(bootstrapPoliticalCount > 0, `${scenarioId} bootstrap political geometry must exist`);
       assert.ok(runtimePoliticalCount > 0, `${scenarioId} runtime political geometry must exist`);
@@ -1544,7 +1549,10 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
     const rendererSource = readRepoFile("js", "core", "map_renderer.js");
     const visualRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalVisualRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
     const interactionRenderableBody = politicalFeaturePolicySource.match(/function isPoliticalInteractionRenderableFeature\(feature, featureId = null\) \{[\s\S]*?\n\}/)?.[0] || "";
-    const coarsePoliticalChunk = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "chunks", "political.coarse.r0c0.json"));
+    const coarsePoliticalChunk = decodeScenarioChunkPayload(
+      JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "chunks", "political.coarse.r0c0.json")),
+      topojson,
+    );
     const countries = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "countries.json")).countries || {};
     const ownersByFeature = JSON.parse(readRepoFile("data", "scenarios", "tno_1962", "owners.by_feature.json"));
     const arcticShells = (coarsePoliticalChunk.features || [])

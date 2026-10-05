@@ -1,11 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import '../js/core/scenario_chunk_format_shared.js';
 import { buildPaintContourGraph } from '../js/core/renderer/paint_contour_graph.js';
 import { registerContourSourcePrecision, getContourCoordinatePrecision } from '../js/core/paint_contour_source.js';
 import { createPoliticalBorderRuntime } from '../js/core/renderer/political_border_runtime.js';
 
 const read = path => JSON.parse(fs.readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
+const topojson = createRequire(import.meta.url)('../vendor/topojson-client.min.js');
+const { decodeScenarioChunkPayload } = globalThis.__scenarioForgeScenarioChunkFormatShared;
 const featureId = feature => String(feature.properties?.id ?? feature.id);
 const pointKey = point => point.map(n => Math.round(n * 1e7)).join(',');
 const edgeKey = (a,b) => [pointKey(a),pointKey(b)].sort().join('|');
@@ -25,7 +29,7 @@ test('current TNO political mesh retains every known Swiss seam segment across c
   const chunks=read(manifest.detail_chunk_manifest_url).chunks;
   const selected=new Set(['AT342','CH055','CH070','ITC41']);
   const coarseChunk=chunks.find(c=>c.layer==='political'&&c.lod==='coarse');
-  const coarse=read(coarseChunk.url);
+  const coarse=decodeScenarioChunkPayload(read(coarseChunk.url),topojson);
   coarse.features=coarse.features.filter(f=>selected.has(featureId(f)));
   registerContourSourcePrecision(coarse,coarseChunk);
   const detail=[];
@@ -42,7 +46,8 @@ test('current TNO political mesh retains every known Swiss seam segment across c
   // Current manifest geometry includes 14 seam segments for these four features.
   // Keep the exact fixture count and verify every segment against the mesh below.
   assert.equal(detailedEdges.size,14);
-  assert.ok(graphEdges(graph(coarse.features)).size<detailedEdges.size,'fixture still reproduces the source LOD mismatch');
+  assert.deepEqual(graphEdges(graph(coarse.features)),detailedEdges,
+    'repaired coarse geometry must preserve all 14 detailed Swiss seam segments');
   const pack=read(manifest.mesh_pack_url);
   const state={activeScenarioId:'tno_1962',activeScenarioManifest:manifest,activeScenarioMeshPack:pack,
     mapSemanticMode:'political',landData:coarse};
