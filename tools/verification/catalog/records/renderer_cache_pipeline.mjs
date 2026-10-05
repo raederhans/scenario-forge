@@ -705,6 +705,7 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
     "sourceRefs": [
       "js/core/map_renderer.js",
       "js/core/renderer/render_cache_owner.js",
+      "js/core/renderer/render_cache_surface_resources.js",
       "tests/test_map_renderer_render_cache_owner_boundary_contract.py",
       "docs/active/renderer-runtime-context-render-cache-read-model-p1-2-20260709.md",
       "package.json"

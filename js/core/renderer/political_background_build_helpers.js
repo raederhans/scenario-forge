@@ -1,4 +1,19 @@
 // Pure build bookkeeping for the deferred political full pass. Publication stays with the owner.
+import { getGeometryRetentionWeights } from "./geometry_cache_budget.js";
+
+export const POLITICAL_BACKGROUND_MERGED_PATH_BUDGET = 8 * 1024 * 1024;
+
+export function estimatePoliticalBackgroundMergedPathBytes(entries) {
+  if (!Array.isArray(entries) || !entries.length) return 0;
+  return 256 + entries.reduce((total, entry) => (
+    total + Math.max(0, getGeometryRetentionWeights(entry?.feature).path - 256)
+  ), 0);
+}
+
+export function estimatePoliticalBackgroundOriginalPathBytes(feature) {
+  return getGeometryRetentionWeights(feature).path;
+}
+
 export function createDeferredPoliticalBackgroundBuildState(identity, transform, entries, startedAt, reason) {
   return {
     fullPassCacheKey: identity.fullPassCacheKey,
@@ -18,6 +33,7 @@ export function createDeferredPoliticalBackgroundBuildState(identity, transform,
     groupIterator: null,
     mergeCurrent: null,
     builtGroupMergeCount: 0,
+    retainedMergedPathBytes: 0,
     startedAt,
     reason,
     sliceCount: 0,
@@ -33,6 +49,7 @@ export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
   transform, pathCacheHandle, retainedPathHandle, getFeatureId, isPoliticalFeaturePathEntryCurrent,
   getPoliticalFeaturePathEntry, addRetainedPoliticalPath,
   resolvePoliticalBackgroundEntryMeta, Path2D, withinBudget,
+  mergedPathBudgetBytes = POLITICAL_BACKGROUND_MERGED_PATH_BUDGET,
 }) {
   let processedCount = 0;
   let builtCount = 0;
@@ -110,11 +127,20 @@ export function advanceDeferredPoliticalBackgroundBuild(deferredState, {
       }
       const group = next.value[1];
       group.mergedPath = group.entries.length === 1 ? group.entries[0].path : null;
-      if (group.entries.length > 1 && group.allPaths && Path2D
-        && typeof Path2D.prototype?.addPath === "function") {
+      const canCompoundFill = group.entries.length > 1 && group.allPaths && Path2D
+        && typeof Path2D.prototype?.addPath === "function";
+      group.requiresMergedFill = canCompoundFill;
+      const mergedPathEstimatedBytes = canCompoundFill
+        ? estimatePoliticalBackgroundMergedPathBytes(group.entries)
+        : 0;
+      group.mergedPathEstimatedBytes = mergedPathEstimatedBytes;
+      if (canCompoundFill
+        && deferredState.retainedMergedPathBytes + mergedPathEstimatedBytes <= mergedPathBudgetBytes) {
         group.mergedPath = new Path2D();
+        deferredState.retainedMergedPathBytes += mergedPathEstimatedBytes;
         deferredState.mergeCurrent = { group, index: 0 };
       } else {
+        group.mergedPath = null;
         delete group.allPaths;
         deferredState.groups.push(group);
       }
@@ -244,3 +270,138 @@ export function createPoliticalBackgroundCacheState(overrides = {}) {
   };
 }
 
+// Both cache artifacts share this injected accounting port with the feature LRU.
+export function createPoliticalBackgroundPathAccounting(resourceBudget, politicalPathResourceAccounting) {
+  for (const method of ["batch", "retain", "release", "getEstimatedBytes"]) {
+    if (typeof politicalPathResourceAccounting?.[method] !== "function") {
+      throw new TypeError(`effects.politicalPathResourceAccounting.${method} must be a function.`);
+    }
+  }
+  const politicalBackgroundPathResourceOwner = Symbol("political-background-merged-paths");
+  let retainedPoliticalBackgroundOriginalPaths = new Map();
+  function update(cache, pendingState) {
+    const groups = [
+      ...(Array.isArray(cache.fullPassGroups)
+        ? cache.fullPassGroups : []),
+      ...(Array.isArray(pendingState?.groups)
+        ? pendingState.groups : []),
+    ];
+    if (pendingState?.mergeCurrent?.group) groups.push(pendingState.mergeCurrent.group);
+    const originalPaths = new Map();
+    const mergedPaths = new Map();
+    const addOriginalPath = (entry) => {
+      if (!entry?.path) return;
+      const estimatedBytes = estimatePoliticalBackgroundOriginalPathBytes(entry.feature);
+      originalPaths.set(entry.path, Math.max(estimatedBytes, originalPaths.get(entry.path) || 0));
+    };
+    groups.forEach((group) => (Array.isArray(group?.entries) ? group.entries : []).forEach(addOriginalPath));
+    (Array.isArray(pendingState?.resolvedEntries) ? pendingState.resolvedEntries : []).forEach(addOriginalPath);
+    groups.forEach((group) => {
+      const path = group?.mergedPath;
+      if (!path || originalPaths.has(path) || mergedPaths.has(path)) return;
+      const estimate = Number(group.mergedPathEstimatedBytes)
+        || estimatePoliticalBackgroundMergedPathBytes(group.entries);
+      mergedPaths.set(path, estimate);
+    });
+    politicalPathResourceAccounting.batch(() => {
+      for (const [path, previousBytes] of retainedPoliticalBackgroundOriginalPaths) {
+        const nextBytes = originalPaths.get(path);
+        if (nextBytes === undefined || nextBytes !== previousBytes) {
+          politicalPathResourceAccounting.release(politicalBackgroundPathResourceOwner, path);
+        }
+      }
+      for (const [path, nextBytes] of originalPaths) {
+        const previousBytes = retainedPoliticalBackgroundOriginalPaths.get(path);
+        if (previousBytes === undefined || previousBytes !== nextBytes) {
+          politicalPathResourceAccounting.retain(politicalBackgroundPathResourceOwner, path, nextBytes);
+        }
+      }
+    });
+    retainedPoliticalBackgroundOriginalPaths = originalPaths;
+    const mergedBytes = [...mergedPaths.values()].reduce((total, bytes) => total + bytes, 0);
+    if (mergedBytes > 0) {
+      resourceBudget.update(politicalBackgroundPathResourceOwner, { projectedPaths: mergedBytes });
+    } else {
+      resourceBudget.release(politicalBackgroundPathResourceOwner);
+    }
+    return politicalPathResourceAccounting.getEstimatedBytes() + mergedBytes;
+  }
+
+  return update;
+}
+
+export function finalizePoliticalBackgroundGroups(groupedEntries, {
+  previousFullPassGroups, retainMergedPaths, Path2D,
+  mergedPathBudgetBytes = POLITICAL_BACKGROUND_MERGED_PATH_BUDGET,
+}) {
+  const groups = [];
+  let reusedGroupMergeCount = 0;
+  let builtGroupMergeCount = 0;
+  let retainedMergedPathBytes = 0;
+  const retainedMergedPaths = new Set();
+  const tryRetainMergedPath = (path, estimatedBytes) => {
+    if (path && retainedMergedPaths.has(path)) return true;
+    if (retainedMergedPathBytes + estimatedBytes > mergedPathBudgetBytes) return false;
+    if (path) retainedMergedPaths.add(path);
+    retainedMergedPathBytes += estimatedBytes;
+    return true;
+  };
+
+  groupedEntries.forEach(({ fillColor, entries: groupEntries }, groupKey) => {
+    const resolvedEntries = Array.isArray(groupEntries) ? groupEntries.filter(Boolean) : [];
+    if (!resolvedEntries.length) return;
+    let mergedPath = null;
+
+    const previousGroup = previousFullPassGroups?.get(groupKey);
+    const isMultiPath = resolvedEntries.length > 1;
+    const canCompoundFill = isMultiPath
+      && Path2D
+      && typeof Path2D.prototype?.addPath === "function"
+      && resolvedEntries.every((item) => item?.path);
+    const mergedPathEstimatedBytes = canCompoundFill
+      ? estimatePoliticalBackgroundMergedPathBytes(resolvedEntries)
+      : 0;
+    const exactMatch = isMultiPath
+      && previousGroup
+      && previousGroup.mergedPath
+      && previousGroup.fillColor === fillColor
+      && previousGroup.entries.length === resolvedEntries.length
+      && resolvedEntries.every((item, idx) => {
+        const prevItem = previousGroup.entries[idx];
+        return (
+          prevItem
+          && prevItem.feature === item.feature
+          && prevItem.geometryRef === item.geometryRef
+          && prevItem.path === item.path
+          && item.path != null
+        );
+      });
+
+    if (exactMatch) {
+      if (retainMergedPaths
+        && tryRetainMergedPath(previousGroup.mergedPath, mergedPathEstimatedBytes)) {
+        mergedPath = previousGroup.mergedPath;
+        reusedGroupMergeCount += 1;
+      }
+    } else if (resolvedEntries.length === 1 && resolvedEntries[0]?.path) {
+      mergedPath = resolvedEntries[0].path;
+    } else if (canCompoundFill && retainMergedPaths
+      && tryRetainMergedPath(null, mergedPathEstimatedBytes)) {
+      mergedPath = new Path2D();
+      resolvedEntries.forEach((item) => {
+        mergedPath.addPath(item.path);
+      });
+      builtGroupMergeCount += 1;
+    }
+    groups.push({
+      groupKey,
+      fillColor,
+      mergedPath,
+      mergedPathEstimatedBytes,
+      requiresMergedFill: canCompoundFill,
+      entries: resolvedEntries,
+    });
+  });
+
+  return { groups, reusedGroupMergeCount, builtGroupMergeCount };
+}

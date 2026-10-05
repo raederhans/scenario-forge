@@ -216,7 +216,9 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("return applyRenderPassInvalidationEffects(getRenderCacheOwner().invalidateAllRenderPasses(reason));", renderer_content)
         self.assertIn("const mutation = getRenderCacheOwner().clearRenderPassReferenceTransforms(passNames);", renderer_content)
         self.assertIn("return getRenderCacheOwner().getRenderPassLayout(passName);", renderer_content)
-        self.assertIn("return getRenderCacheOwner().resizeRenderPassCanvases(passNames);", renderer_content)
+        self.assertIn("const active = getActiveRenderPassNames();", renderer_content)
+        self.assertIn("const selected = passNames.filter((name) => active.includes(name));", renderer_content)
+        self.assertIn("if (selected.length) return getRenderCacheOwner().resizeRenderPassCanvases(selected);", renderer_content)
         self.assertIn("return getRenderCacheOwner().ensureRenderPassCanvas(passName);", renderer_content)
         self.assertIn("return getRenderCacheOwner().ensureLastGoodFrameCanvas();", renderer_content)
         self.assertIn("return getRenderCacheOwner().ensureInteractionCompositeCanvas();", renderer_content)
@@ -236,11 +238,11 @@ class MapRendererRenderCacheOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn('import { createRenderCacheValidationScope } from "./render_cache_validation_scope.js";', owner_content)
         self.assertIn("function composeRenderCacheValidationScope(state, ensureRenderPassCacheState, cloneZoomTransform, renderPassNames)", owner_content)
         self.assertIn("const owner = createRenderCacheValidationScope({", owner_content)
-        self.assertIn("const { getRenderPassCacheState, withValidatedCache } = composeRenderCacheValidationScope(", owner_content)
+        self.assertIn("const { getRenderPassCacheState: getValidatedCacheState, withValidatedCache } = composeRenderCacheValidationScope(", owner_content)
         self.assertIn("ensure: () => ensureRenderPassCacheState(state, { cloneZoomTransform, renderPassNames }),", owner_content)
         self.assertRegex(
             owner_content,
-            r"const \{ getRenderPassCacheState, withValidatedCache \} = composeRenderCacheValidationScope\(\s*"
+            r"const \{ getRenderPassCacheState: getValidatedCacheState, withValidatedCache \} = composeRenderCacheValidationScope\(\s*"
             r"state,\s*ensureRenderPassCacheState, cloneZoomTransform, renderPassNames,\s*\);",
         )
         self.assertIn("getRoot: () => state.renderPassCache,", owner_content)

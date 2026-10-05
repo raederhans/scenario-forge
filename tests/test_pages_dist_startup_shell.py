@@ -2058,7 +2058,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertIn("targetContext.putImageData(imageData, 0, 0);", hgo_preview_commit_source)
         self.assertNotIn("projectionTransform: null,", pass_body)
         self.assertIn('const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES = Object.freeze([\n  "hgoPreview",\n]);', hgo_preview_owner_source)
-        self.assertIn("return getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames();", source)
+        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());", source)
         self.assertIn(
             "return isReady() ? HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES : vectorRenderPassNames;",
             hgo_preview_owner_source,

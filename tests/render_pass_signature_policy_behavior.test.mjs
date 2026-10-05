@@ -4,6 +4,7 @@ import fs from "node:fs";
 import { parse } from "acorn";
 import { createRenderPassSignaturePolicy } from "../js/core/renderer/render_pass_signature_policy.js";
 import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
+import { commitPhysicalContourDisplayState } from "../js/core/state/actions/content_load_actions.js";
 
 function createHarness(overrides = {}) {
   const state = {
@@ -204,7 +205,6 @@ test("transport presentation changes invalidate shared labels without invalidati
     (state) => { state.showAirports = true; },
     (state) => { state.showPorts = true; },
     (state) => { state.currentLanguage = "zh"; },
-    (state) => { state.contextLayerRevision = 9; },
     (state) => { state.sceneGeneration = 2; },
     (state) => { state.scenarioDataGeneration = 2; },
     (state) => { state.styleConfig.transportOverview = { airport: { labelSize: 14 } }; },
@@ -215,6 +215,39 @@ test("transport presentation changes invalidate shared labels without invalidati
     assert.equal(policy.getRenderPassSignature("political"), before.political);
     assert.notEqual(policy.getRenderPassSignature("contextMarkers"), before.contextMarkers);
     assert.notEqual(policy.getRenderPassSignature("labels"), before.labels);
+  }
+});
+
+test("contour-only publications leave transport and label caches intact", () => {
+  for (const showTransport of [false, true]) {
+    const { state, policy } = createHarness();
+    Object.assign(state, { showTransport, showRoad: true, roadsData: { features: [{}] } });
+    const before = Object.fromEntries(["contextBase", "contextMarkers", "labels"].map((name) =>
+      [name, policy.getRenderPassSignature(name)]));
+    commitPhysicalContourDisplayState(state, { major: { features: [{}] } });
+    assert.notEqual(policy.getRenderPassSignature("contextBase"), before.contextBase);
+    assert.equal(policy.getRenderPassSignature("contextMarkers"), before.contextMarkers);
+    assert.equal(policy.getRenderPassSignature("labels"), before.labels);
+    state.roadsData = { features: [{}] };
+    for (const name of ["contextMarkers", "labels"]) {
+      if (showTransport) assert.notEqual(policy.getRenderPassSignature(name), before[name]);
+      else assert.equal(policy.getRenderPassSignature(name), before[name]);
+    }
+  }
+});
+
+test("visible transport overlays and rail stations invalidate cached labels", () => {
+  const { state, policy } = createHarness();
+  Object.assign(state, { showTransport: true, showRail: true,
+    transportCountryOverlayState: { overlaysByFamily: { rail: { status: "ready", collectionsByLayer: {} } } } });
+  for (const publish of [
+    () => { state.railStationsMajorData = { features: [{}] }; },
+    () => { state.transportCountryOverlayState.overlaysByFamily.rail.collectionsByLayer.railways = { features: [{}] }; },
+    () => { state.transportCountryOverlayState.overlaysByFamily.rail.status = "idle"; },
+  ]) {
+    const before = policy.getRenderPassSignature("labels");
+    publish();
+    assert.notEqual(policy.getRenderPassSignature("labels"), before);
   }
 });
 

@@ -5,6 +5,8 @@ import vm from "node:vm";
 import { createPoliticalPathCacheOwner } from "../js/core/renderer/political_path_cache_owner.js";
 import { markProjectionGeometryChanged } from "../js/core/renderer/projection_geometry_identity.js";
 import { createRenderCacheOwner } from "../js/core/renderer/render_cache_owner.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { getProjectedPathResourceAccounting } from "../js/core/renderer/projected_path_resource_accounting.js";
 
 const item = (id, x = 50, drawOrder = 0) => ({
   id, minX: x, maxX: x, minY: 50, maxY: 50, drawOrder,
@@ -35,6 +37,7 @@ function fixture(t, options = {}) {
   h.path = h.makePath((feature, context) => {
     h.builds.push(feature.id); h.time += h.pathCost; context.value = `path:${feature.id}`;
   });
+  h.resourceBudget = options.resourceBudget || createRuntimeResourceBudget();
   h.owner = createPoliticalPathCacheOwner(h.state, {
     rendererSurfaceHost: { getPathCanvas: () => h.path, getProjection: () => h.projection },
     getPoliticalPassStaticSignature: (transform) => `static:${transform.k}:${transform.x}:${transform.y}`,
@@ -56,6 +59,7 @@ function fixture(t, options = {}) {
     collectLandSpatialItemsForProjectedRects: () => h.candidates,
     nowMs: () => h.time,
     RENDER_PHASE_IDLE: "idle",
+    resourceBudget: h.resourceBudget,
     ...ownerOptions,
   });
   h.tick = (deadline = null) => {
@@ -80,6 +84,67 @@ test("path budget evicts least-recent paths while returning usable transient ove
   assert.equal(h.cache.politicalPathCache.has("giant"), false);
   assert.equal(h.cache.politicalPathCache.getStats().estimatedBytes, 512);
   assert.ok(h.owner.getPoliticalFeaturePathEntry(b, options)?.path, "evicted geometry rebuilds on demand");
+});
+
+test("projected path accounting deduplicates LRU and group references and releases on eviction/reset", (t) => {
+  const h = fixture(t, { pathCacheBudget: 512 });
+  const groupOwner = Symbol("full-pass-group");
+  const accounting = getProjectedPathResourceAccounting(h.resourceBudget);
+  const options = { allowBuild: true };
+  const featureA = item("a").feature;
+  const featureB = item("b").feature;
+  const featureC = item("c").feature;
+  const a = h.owner.getPoliticalFeaturePathEntry(featureA, options);
+  accounting.retain(groupOwner, a.path, a.estimatedBytes);
+  h.owner.getPoliticalFeaturePathEntry(featureB, options);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+
+  const beforeHit = h.resourceBudget.snapshot().revision;
+  assert.equal(h.owner.getPoliticalFeaturePathEntry(featureA, options).path, a.path);
+  assert.equal(h.resourceBudget.snapshot().revision, beforeHit, "cache hits do not rescan or republish retained paths");
+  h.owner.getPoliticalFeaturePathEntry(featureB, options);
+
+  h.owner.getPoliticalFeaturePathEntry(featureC, options);
+  assert.deepEqual([...h.cache.politicalPathCache.keys()], ["b", "c"]);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 768,
+    "the group keeps the evicted A path accounted alongside the two LRU entries");
+  accounting.release(groupOwner, a.path);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+
+  h.owner.invalidatePoliticalPathCache("test-reset");
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined,
+    "reset releases the remaining LRU references");
+});
+
+test("warmup paths are accounted when retained and released by cache invalidation", (t) => {
+  const h = fixture(t, { pathCacheBudget: 1024 });
+  h.owner.schedulePoliticalPathWarmup();
+  h.tick();
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 512);
+  h.owner.invalidatePoliticalPathCache("warmup-reset");
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined);
+});
+
+test("recreated cache owners release the previous accounted map before replacing it", (t) => {
+  const h = fixture(t, { pathCacheBudget: 1024 });
+  h.owner.getPoliticalFeaturePathEntry(item("a").feature, { allowBuild: true });
+  const previousMap = h.cache.politicalPathCache;
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, 256);
+
+  const replacementOwner = createPoliticalPathCacheOwner(h.state, {
+    rendererSurfaceHost: { getProjection: () => h.projection },
+    getRenderPassCacheState: () => h.cache,
+    cloneZoomTransform: (transform) => ({ ...transform }),
+    recordRenderPerfMetric: () => {},
+    resourceBudget: h.resourceBudget,
+  });
+  const replacement = replacementOwner.getPoliticalPathCacheHandle(
+    h.state.zoomTransform,
+    { resetIfMismatch: true },
+  );
+  assert.notEqual(replacement.map, previousMap);
+  assert.equal(previousMap.size, 0);
+  assert.equal(h.resourceBudget.snapshot().categories.projectedPaths, undefined);
 });
 
 test("cache mismatch reads are non-destructive; preparation preserves map identity and snapshots transforms", (t) => {
