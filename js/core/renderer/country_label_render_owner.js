@@ -589,7 +589,10 @@ export function createCountryLabelRenderOwner({ state = {}, getters = {}, helper
           if (entry.workerPending.has(key) || entry.fits.has(key) || entry.workerPending.size >= MAX_CACHED_FITS) continue;
           if (prepared && (remaining <= 0 || prepared >= 8)) break;
           if (!entry.polygons) projectEntry(entry, projection, Math.max(0, remaining));
-          if (entry.polygons && entry.bounds && nowMs() - start < 12) {
+          const box = entry.bounds ? screenBox(entry.bounds, transform, 0) : null;
+          const inViewport = box && !(box.x + box.w < 2 || box.y + box.h < 2
+            || box.x > viewport.width - 2 || box.y > viewport.height - 2);
+          if (entry.polygons && inViewport && nowMs() - start < 12) {
             target.save();
             try { prepareFit(entry, target, text, key, isChinese, font, zoomBand); }
             finally { target.restore(); }

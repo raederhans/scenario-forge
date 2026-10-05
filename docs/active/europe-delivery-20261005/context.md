@@ -22,3 +22,5 @@
 - `1df6430aa` 的远端 fast suite 在旧 Swiss fixture 停止：它既直接访问 coarse.features，又要求 coarse 比 detail 少边。测试现经生产 chunk decoder 解码，并要求修复后的 coarse/detail 完整 14 段精确相等，保留每段 mesh 覆盖及 promotion 稳定性断言；目标测试通过。
 - 同次远端 Golden Demo 的 country-label readiness 超时使导出终止，继而等待下载超时；trace 确认不是单纯漏收 download 事件。相同产品代码/数据此前 CI 已通过，本地保持原测试和全部超时的重现运行也通过（1.5 分钟）。未放宽 gate；最终提交仍需远端 Golden Demo 真正通过。
 - 后续 Node 目标预跑定位剩余两个 coarse reader 和 Stage C 计划旧预期；计划断言现在保留新增 coarse wire 测试并验证超预算时拒绝执行，全部 105 项 runner 测试通过。仅缺 acorn 的两个本地测试在按 lockfile 安装依赖后分别 11 / 3 项通过；其他后续 CI 目标通过。附带 Windows 专项中 power-scheme journal 的 File.Replace 报 IOException（84 PASS / 1 FAIL），不在 Linux required CI 范围，保留为本机验证缺口，未更改电源配置或专项断言。
+- `37e811905` 的远端 fast 全部契约及性能通过，但 Golden Demo 再次在国家名称准备阶段超时。CPU2x 诊断证明 source 稳定后 171 个标签持续推进，没有 worker error 或缓存反复失效。修复两处重复工作：continuation 对投影完成但视口外的国家不提交文字拟合；同一 fit 内复用不可变空间索引相邻行的有序边界集合，避免每个字形角点重新构造 Set。
+- 布局 39 项及 render owner 33 项通过，包含 offscreen→pan 恢复与原队列/时间预算断言。24 组复杂几何的基线/优化完整 fit 对象精确相等，同输入交错计时合计 273.47 ms→91.25 ms（局部 microbenchmark，不等同完整页面提速）。优化后的 CPU2x Golden Demo 保持原断言及超时通过（2.4 分钟）；171 国布局准备从约 34 秒降至约 15 秒，整页时间另含 source 建立、地图渲染和样例切换。所有 30s/20s/180s 限制未改，仍需最终远端检查。
