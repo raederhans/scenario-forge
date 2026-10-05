@@ -240,6 +240,7 @@ jobs:
         with:
           name: verification-selector-evidence
           if-no-files-found: ignore
+          include-hidden-files: true
           path: |
             .runtime/reports/generated/verification-selector-explain.*
             .runtime/reports/generated/verification-selector-execution.*

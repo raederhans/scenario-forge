@@ -1309,7 +1309,11 @@ const cases = [
     name: 'perf gate workflow routes to its contract without claiming a live runtime delta',
     changedFiles: ['.github/workflows/perf-pr-gate.yml'],
     expectedCommands: ['verify:perf-gate-contract'],
-    exactCommands: ['verify:perf-gate-contract', 'node --test tests/precision_foundation_ci_behavior.test.mjs'],
+    exactCommands: [
+      'verify:perf-gate-contract',
+      'node --test tests/precision_foundation_ci_behavior.test.mjs',
+      'node --test tests/pr_ci_plan_behavior.test.mjs tests/pr_delivery_lanes_behavior.test.mjs tests/perf_observation_gate_behavior.test.mjs',
+    ],
     exactExecutionOwners: ['child-safe'],
     exactResourceLocks: [],
     exactMainThreadCommands: [],

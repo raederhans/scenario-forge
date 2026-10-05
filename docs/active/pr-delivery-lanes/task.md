@@ -11,6 +11,9 @@ The new UI command resolves to five tests in two spec files (`--list` only). No 
 
 - [x] Remove duplicate Scenario/Transport full checks after main merges; retain manual full audit and required PR checks. Seven lane tests, eight scenario/transport planner contracts and six-workflow actionlint passed.
 - [ ] Commit and push this system, then validate and merge its PR.
-- [ ] Confirm final Pages deployment and install the same system in the daily local checkout without disturbing unrelated WIP.
+- [x] Install the system in the daily local checkout without disturbing unrelated WIP. Scoped merge preserved six overlapping files, including README, WGI/HDI script additions, asset declarations and the worktree registry. Local script/route checks and seven source-graph fixture tests passed.
+- [ ] Confirm final required checks, protected merge and Pages deployment.
 
-Remote CI and timing: pending rollout. Branch protection is unchanged.
+Remote rollout is tracked in PR #206. Initial hosted full Pages, smoke/Golden Demo, Scenario and Transport checks passed. The adaptive structural suite caught an outdated exact-command fixture; its expected set now includes the new delivery lane regression. Selector artifact upload now includes the explicitly listed hidden `.runtime` evidence files.
+
+Temporary PR #207 (do not merge) probes the UI lane. Its hosted plan selected `smokeMode=ui`, `pagesMode=source`, `perfRequired=false`; `perf-gate` succeeded while observation was still running. Full probe completion and deployment are pending. Branch protection remains unchanged.
