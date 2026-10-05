@@ -85,9 +85,9 @@ class MapRendererUrbanCityPolicyBoundaryContractTest(unittest.TestCase):
 
         self.assertIn("export function createCityPointsRenderOwner({", city_points_owner_content)
         self.assertIn("function getCityLayerRenderState(k, { interactive = false, cacheHoverEntries = false } = {}) {", city_points_owner_content)
-        self.assertIn("function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false, occupiedBoxes, layoutOnly = false } = {}) {", city_points_owner_content)
+        self.assertIn("function drawCityMarkersFromEntries(markerEntries, { config, scale, opacity, interactive = false, occupiedBoxes, layoutOnly = false, avoidCollisions = false } = {}) {", city_points_owner_content)
         self.assertIn("function drawCityPointsLayer(k, { interactive = false } = {}) {", city_points_owner_content)
-        self.assertIn("function drawLabelsPass(k, { interactive = false, occupiedBoxes = [] } = {}) {", city_points_owner_content)
+        self.assertIn("function drawLabelsPass(k, { interactive = false, occupiedBoxes = [], markersReserved = false, overviewLayout = null } = {}) {", city_points_owner_content)
         self.assertIn("function getHoveredCityEntryFromEvent(event) {", city_points_owner_content)
         self.assertIn("getHoverEntryHitPriority = () => 0,", city_points_owner_content)
         self.assertIn("getPointer = () => null,", city_points_owner_content)

@@ -29,7 +29,9 @@ class MapRendererCityLabelOwnerBoundaryContractTest(unittest.TestCase):
         self.assertIn("function drawLabelsPass(k, { interactive = false } = {}) {", renderer_content)
         self.assertIn("getCityPointsRenderOwner().drawLabelsPass(k, { interactive, occupiedBoxes });", renderer_content)
         self.assertIn("getTransportOverviewRenderOwner().drawPendingLabels(k, { occupiedBoxes });", renderer_content)
-        self.assertIn("const labelCount = drawCityLabelsFromEntries(renderState.labelEntries, {", city_points_owner_content)
+        self.assertIn("labelCount = drawCityLabelsFromEntries(renderState.labelEntries, labelOptions);", city_points_owner_content)
+        self.assertIn("drawCityLabelsFromEntries(overviewLayout.capitalEntries", city_points_owner_content)
+        self.assertIn("drawCityLabelsFromEntries(ordinaryEntries", city_points_owner_content)
 
         self.assertIn("export function createCityLabelOwner({ constants = {}, getters = {}, helpers = {} } = {}) {", owner_content)
         self.assertIn("function drawCityLabelsFromEntries(labelEntries, {", owner_content)

@@ -16,6 +16,7 @@ function eligible(feature) {
 }
 
 export function createCountryLabelSourceOwner({ state, topojson = globalThis.topojson, geoArea = globalThis.d3?.geoArea,
+  geoContains = globalThis.d3?.geoContains, geoBounds = globalThis.d3?.geoBounds,
   ensureSources, getCountryName = code => state.countryNames?.[code] || code,
   isEligible = () => true, onChange = () => {},
   createWorker = () => new Worker(new URL('../../workers/country_label_geometry.worker.js', import.meta.url), { type: 'module' }),
@@ -29,7 +30,7 @@ export function createCountryLabelSourceOwner({ state, topojson = globalThis.top
   async function buildGroups(groups, c, signal, client) {
     const isCurrent = () => !disposed && !signal.aborted && context().identity === c.identity;
     if (!isWorkerSupported()) return mergeCountryLabelGroups([...groups], {
-      topology: c.chunked ? null : c.topology, topojson, geoArea, yieldTask, isCurrent });
+      topology: c.chunked ? null : c.topology, topojson, geoArea, geoContains, geoBounds, yieldTask, isCurrent });
     const entries = [...groups].flatMap(([countryCode, members]) => members.map(feature => ({ countryCode, feature })));
     const pack = batch => globalThis.__scenarioForgeGeometryTransferCodecShared.pack(batch, { minCoordinateCount: 0 });
     const transport = await packGeometryCooperatively(entries, { signal, yieldTask, pack });
