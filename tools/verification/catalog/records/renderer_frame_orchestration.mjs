@@ -2,18 +2,20 @@
 export const RENDERER_FRAME_ORCHESTRATION_RECORDS = [
   {
     "id": "direct:country-label-contracts",
-    "commandRef": "node --test tests/country_label_source_behavior.test.mjs tests/country_label_layout_behavior.test.mjs tests/country_label_render_owner_behavior.test.mjs tests/country_label_style_behavior.test.mjs",
+    "commandRef": "node --test tests/country_label_source_behavior.test.mjs tests/country_label_layout_behavior.test.mjs tests/country_label_render_owner_behavior.test.mjs tests/country_label_style_behavior.test.mjs tests/map_label_hierarchy_behavior.test.mjs",
     "sourceRefs": [
       "js/core/renderer/country_label_source.js",
       "js/core/renderer/country_label_geometry.js",
       "js/core/renderer/country_label_layout.js",
       "js/core/renderer/country_label_render_owner.js",
       "js/core/renderer/country_label_layout_worker.js",
+      "js/core/renderer/map_label_hierarchy.js",
       "js/workers/country_label_geometry.worker.js",
       "tests/country_label_source_behavior.test.mjs",
       "tests/country_label_layout_behavior.test.mjs",
       "tests/country_label_render_owner_behavior.test.mjs",
-      "tests/country_label_style_behavior.test.mjs"
+      "tests/country_label_style_behavior.test.mjs",
+      "tests/map_label_hierarchy_behavior.test.mjs"
     ],
     "ownerHints": ["renderer-runtime"],
     "domains": ["renderer-runtime"],

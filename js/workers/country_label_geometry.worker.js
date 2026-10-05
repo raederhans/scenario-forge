@@ -17,6 +17,7 @@ self.onmessage = async ({ data }) => {
       arcs: unpackCountryLabelTransport(data.arcTransport)[0].coordinates, objects: {} } : null;
     const records = await mergeCountryLabelGroups([...groups], {
       topology, topojson: globalThis.topojson, geoArea: globalThis.d3.geoArea,
+      geoContains: globalThis.d3.geoContains, geoBounds: globalThis.d3.geoBounds,
     });
     const packed = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(records);
     self.postMessage({ type: 'RESULT', taskId, result: packed.payload }, packed.transferables);
