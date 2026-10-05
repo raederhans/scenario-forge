@@ -223,7 +223,7 @@ test("collisions try cached alternative positions and reserve only the accepted 
 
 test("macro label orchestration reserves capitals then countries then other city text; detail prioritizes cities", async () => {
   const renderer = await readFile(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
-  const code = renderer.slice(renderer.indexOf("function drawLabelsPass(k,"), renderer.indexOf("function focusWaterRegionById("));
+  const code = renderer.slice(renderer.indexOf("function drawLabelsPassContent(k,"), renderer.indexOf("function focusWaterRegionById("));
   const events = [];
   const runtimeState = { styleConfig: {}, deferContextBasePass: false };
   const countryBox = { x: 20, y: 20, w: 50, h: 12 };
@@ -250,15 +250,15 @@ test("macro label orchestration reserves capitals then countries then other city
   vm.runInNewContext(code, scope);
   for (const k of [1, 2, 2.5, 3]) {
     events.length = 0;
-    scope.drawLabelsPass(k);
+    scope.drawLabelsPassContent(k);
     assert.deepEqual(events, ["capitals", "countries", "cities"]);
   }
   events.length = 0;
-  scope.drawLabelsPass(4);
+  scope.drawLabelsPassContent(4);
   assert.deepEqual(events, ["cities", "countries"]);
   events.length = 0;
   runtimeState.styleConfig.countryLabels = { enabled: false };
-  scope.drawLabelsPass(1);
+  scope.drawLabelsPassContent(1);
   assert.deepEqual(events, ["cities"]);
 });
 

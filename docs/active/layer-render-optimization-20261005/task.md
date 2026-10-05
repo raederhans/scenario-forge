@@ -1,7 +1,7 @@
 # Task
 
 ## Status
-Implementation and delivery review are complete in the isolated `codex/layer-render-optimization` worktree, based on `origin/main@06d09474`. The user authorized push and PR merge. Final remote CI and merge are established by the branch PR receipt.
+Implementation and delivery review are complete in the isolated `codex/layer-render-optimization` worktree. The latest `origin/main@a0476c9c` country/city label changes were merged and their snapshot integration reviewed. The user authorized push and PR merge. Final remote CI and merge are established by PR #209's receipt.
 
 ## Delivered scope
 - Correct border angles and scale screen-space declutter thresholds; keep latest-main single-projection reuse.
@@ -27,6 +27,8 @@ Evidence root: `.runtime/tmp/layer-render-delivery/` in the managed worktree.
 - Final isolated Pages build: 769.86 MiB at `.runtime/tmp/layer-render-delivery/pages-final`; all 9 mirror/inventory tests passed. Pages startup suite passed 64/65 initially; its remaining old wrapper-text assertion was updated to the visibility-filter wrapper, and the single affected case passed on rerun. No runtime source changed after the final build.
 - `verify:commit` stopped at planning because several cross-module suites are not eligible for its local edit mode. It did not run tests. The corresponding direct behavior, architecture and artifact checks above were executed; remote required CI remains mandatory.
 - Final `pr:plan` has no unmatched paths or route gaps; it requests full smoke, a fresh Pages artifact and required sampled performance.
+- The first remote run passed smoke/Golden Demo and sampled performance, but fast verification exposed missing active-pass dependencies in the exact-composite VM fixture. The fixture was repaired; its exact-composite/export/transformed-frame combination passed all 54 tests.
+- Latest-main label integration passed 171 of 172 tests initially. The upstream orchestration fixture was adapted to the extracted label-content function, retaining its capital/country/city ordering assertions; all 32 country-label render tests then passed. Architecture boundaries passed after the main merge. Final-head remote checks remain required.
 
 ## Browser evidence and limits
 Final integrated source was reloaded in the in-app browser on localhost:8008. TNO 1962 was checked at 305%, 366% and 800%; CDP confirmed actual zoom and presented exact-frame transforms, city off/on worked, and no warning/error logs were captured. Screenshot and final transform evidence are under `.runtime/browser/layer-render-delivery/`. The temporary tab and root-owned server were closed.
