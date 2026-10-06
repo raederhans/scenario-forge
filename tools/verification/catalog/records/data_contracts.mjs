@@ -916,6 +916,8 @@ export const DATA_CONTRACTS_RECORDS = [
       "tools/build_thematic_layers.py",
       "map_builder/thematic_layer_contracts.py",
       "map_builder/thematic_wgi_ingest.py",
+      "map_builder/thematic_hdi_ingest.py",
+      "map_builder/thematic_population_ingest.py",
       "map_builder/contracts.py",
       "map_builder/runtime_asset_registry.py",
       "data/thematic_layers",
@@ -923,6 +925,8 @@ export const DATA_CONTRACTS_RECORDS = [
       "data/runtime_asset_registry.json",
       "tests/test_thematic_layer_contracts.py",
       "tests/test_thematic_wgi_source_ingest.py",
+      "tests/test_thematic_hdi_source_ingest.py",
+      "tests/test_thematic_population_source_ingest.py",
       "tests/fixtures/thematic_wgi_2024_minimal.csv"
     ],
     "ownerHints": [

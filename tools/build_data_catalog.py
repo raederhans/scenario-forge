@@ -608,7 +608,7 @@ def build_catalog_payload() -> dict[str, Any]:
                 "url": asset_url,
                 "role": str(asset_spec.get("role") or manifest_meta.get("role") or ""),
                 "format": _detect_format(asset_url, manifest_meta),
-                "schemaRef": _derive_generic_schema_ref(asset_url, manifest_meta),
+                "schemaRef": str(asset_spec.get("schema_ref") or _derive_generic_schema_ref(asset_url, manifest_meta)),
                 "hashRef": (
                     _manifest_ref(relative_path_inside_data, "sha256")
                     if relative_path_inside_data in manifest_outputs

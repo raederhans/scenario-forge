@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "layer_id": "population_wdi_population_v1",
+  "theme": "population",
+  "title": "WDI Population",
+  "description": "Official WDI 2023 country population total, density, urban share, age-65-plus share and fertility values.",
+  "geometry_kind": "admin0",
+  "metric_ids": [
+    "wdi_population_total",
+    "wdi_population_density",
+    "wdi_urban_population_share",
+    "wdi_population_65_plus_share",
+    "wdi_total_fertility_rate"
+  ],
+  "period": {
+    "kind": "year",
+    "year": 2023,
+    "label": "2023",
+    "basis": "World Development Indicators"
+  },
+  "coverage_scope": {
+    "geography_level": "admin0",
+    "join_key_type": "iso_a3",
+    "feature_count": 216,
+    "source_year": 2023
+  },
+  "source_policy": "real_source_cache_only",
+  "status": "experimental",
+  "paths": {
+    "metrics": "data/thematic_layers/population/wdi_population_v1/metrics.admin0.json",
+    "build_audit": "data/thematic_layers/population/wdi_population_v1/build_audit.json",
+    "source_recipes": [
+      "data/thematic_layers/source_recipes/wdi_population_v1.manual.json"
+    ]
+  },
+  "provenance": [
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.POP.TOTL",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.POP.TOTL",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.POP.TOTL, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.POP.TOTL.json",
+      "source_sha256": "587c59b22666e2a49013390678c4eda802a9a4728da497f7776c8b6f92472f3e",
+      "source_size_bytes": 53368,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      }
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/EN.POP.DNST",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/EN.POP.DNST?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/EN.POP.DNST",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "EN.POP.DNST",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, EN.POP.DNST, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/EN.POP.DNST.json",
+      "source_sha256": "483df304cb8c43f8f821e675c6c93e5029e06f77c0dafdfb8c00ac1e44bc678b",
+      "source_size_bytes": 64423,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      }
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.URB.TOTL.IN.ZS",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.URB.TOTL.IN.ZS",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.URB.TOTL.IN.ZS, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.URB.TOTL.IN.ZS.json",
+      "source_sha256": "038baef679625666bde02899b20026592eab93a008572159f5f847f3b447166a",
+      "source_size_bytes": 63099,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      }
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.POP.65UP.TO.ZS",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.65UP.TO.ZS?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.POP.65UP.TO.ZS",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.POP.65UP.TO.ZS",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.POP.65UP.TO.ZS, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.POP.65UP.TO.ZS.json",
+      "source_sha256": "c9cc6eec326e6bdcd31638bb3c8ad89e8f970abffc4c17b5a01b3c05fa3c26d2",
+      "source_size_bytes": 66439,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      }
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.DYN.TFRT.IN",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.DYN.TFRT.IN",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.DYN.TFRT.IN",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.DYN.TFRT.IN, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.DYN.TFRT.IN.json",
+      "source_sha256": "48ddd89e98d9764a59a19162c628c245e2bb9b034e36afe47406b17513b61deb",
+      "source_size_bytes": 60018,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      }
+    }
+  ],
+  "license": {
+    "fixture_data": "none",
+    "source_metadata": [
+      "CC BY 4.0"
+    ],
+    "attribution_required": true
+  },
+  "normalization": {
+    "method": "official_raw_values_with_auxiliary_project_linear_scaling",
+    "range": [
+      0,
+      100
+    ],
+    "formulas": {
+      "wdi_population_total": "clamp(raw / 1500000000 * 100, 0, 100)",
+      "wdi_population_density": "clamp(raw / 1000 * 100, 0, 100)",
+      "wdi_urban_population_share": "raw",
+      "wdi_population_65_plus_share": "raw",
+      "wdi_total_fertility_rate": "clamp(raw / 8 * 100, 0, 100)"
+    },
+    "raw_value_policy": "Preserve every finite valid source value without rounding or clipping.",
+    "missing_value_policy": "Only JSON null or an absent country observation is source_gap; malformed source values fail the build.",
+    "notes": [
+      "Auxiliary normalized values are project linear scalings, not World Bank scores or front-end bins."
+    ]
+  },
+  "feature_counts": {
+    "features": 216,
+    "complete": 215,
+    "partial": 1,
+    "missing": 0
+  },
+  "build_audit_path": "data/thematic_layers/population/wdi_population_v1/build_audit.json",
+  "generated_at": "2026-10-05T00:00:00Z",
+  "build_command": "python tools/build_thematic_layers.py --include-population-real",
+  "runtime_consumer": {
+    "status": "main_map_ready",
+    "entry": "thematic_wgi_runtime",
+    "supports_main_map_render": true,
+    "data_version": "wdi-2026-07-13:2023",
+    "supported_metrics": [
+      "wdi_population_total",
+      "wdi_population_density",
+      "wdi_urban_population_share",
+      "wdi_population_65_plus_share",
+      "wdi_total_fertility_rate"
+    ],
+    "supported_scenarios": [
+      "modern_world",
+      "hoi4_1936",
+      "hoi4_1939",
+      "tno_1962"
+    ],
+    "country_code_mapping": "data/thematic_layers/wgi_country_code_mapping.json",
+    "method": "Official World Development Indicators 2023 country population, density, urban share, age-65-plus share and fertility raw values; main-map colors use raw-value bins. Auxiliary 0-100 values are project linear scalings, not World Bank scores. Historical scenarios show baseline-owner 2023 references, not historical population estimates. Country density is not a population raster.",
+    "historical_reference_policy": {
+      "mode": "baseline_owner_reference_mapping",
+      "reference_year": 2023,
+      "supported_scenarios": [
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ],
+      "join_method": "Baseline owner tag -> explicit scenarioCountriesByTag[tag].base_iso2 -> existing ISO2-to-ISO3 mapping -> official WDI country value.",
+      "unknown_mapping_policy": "Leave unmapped owners blank; do not infer from tags, parent countries, or modern feature geography.",
+      "interpretation": "2023 country reference values, not observed historical or subnational measurements; no historical population totals or population raster are computed.",
+      "historical_measurement": false
+    }
+  },
+  "limitations": [
+    "Country-level values do not measure individual historical or subnational regions.",
+    "Historical scenarios use 2023 baseline-owner reference values; no historical totals are calculated.",
+    "Country population density is not a GHSL/WorldPop raster or spatial population estimate.",
+    "Auxiliary normalized values are project linear scalings, not World Bank scores; map bins use raw values.",
+    "Channel Islands composite is excluded rather than split across Jersey and Guernsey.",
+    "Countries without an existing runtime mapping retain source values but may have no map match: GIB"
+  ]
+}

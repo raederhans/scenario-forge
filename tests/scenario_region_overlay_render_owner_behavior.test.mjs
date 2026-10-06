@@ -6,6 +6,8 @@ import { createScenarioReliefOverlayRenderOwner } from "../js/core/renderer/scen
 import { readFileSync } from "node:fs";
 import { createScenarioRegionOverlayRenderOwner } from "../js/core/renderer/scenario_region_overlay_render_owner.js";
 import { createScenarioWaterCachePolicyOwner } from "../js/core/renderer/scenario_water_cache_policy_owner.js";
+import { isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "../js/core/population_spatial_view_model.js";
+import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION, POPULATION_YEAR } from "../js/core/population_spatial_data.js";
 
 function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudget, actualWaterPolicy = false, oceanSurfacePattern = null } = {}) {
   const events = [];
@@ -107,6 +109,8 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     shouldExcludePoliticalVisualFeature: (feature) => feature.id === "relief",
     shouldSkipFeature: () => false,
     getResolvedFeatureColor: () => "#abcdef",
+    getPopulationUnestimatedOverlayColor: () => state.activeScenarioId === "tno_1962" && isPopulationActive(state)
+      ? POPULATION_UNESTIMATED_COLOR : null,
     LAND_FILL_COLOR: "#f0f0f0",
     getPoliticalFeaturePathEntry: (feature) => ({ path: feature.id }),
     getEffectiveWaterRegionFeatures: () => { waterWork.effectiveCollections += 1; return waterFeatures; },
@@ -475,6 +479,43 @@ test("Atlantropa land-like overlays stay between water highlight and special wit
   assert.equal(h.main.fillStyle, "#aabbcc");
   assert.equal(h.metrics.at(-1).atlantropaLandLikeRenderedCount, 2);
 });
+
+for (const mode of ["density", "heatmap"]) {
+  test(`TNO ${mode} marks Atlantropa land and shoal unestimated while water and visibility keep existing behavior`, (t) => {
+    const h = harness(t, { mode: "direct" });
+    h.state.showScenarioAtlantropa = true;
+    h.state.activeScenarioId = "tno_1962";
+    h.state.activeScenarioManifest = { source: { runtime_topology_sha256: "geometry-current" } };
+    h.state.styleConfig = { population: { enabled: true, mode, dataVersion: POPULATION_DATA_VERSION } };
+    h.state.populationRuntime = { status: "ready", data: {
+      layerId: POPULATION_LAYER_ID, dataVersion: POPULATION_DATA_VERSION, year: POPULATION_YEAR,
+      scenarioId: "tno_1962", geometryVersion: "geometry-current",
+    } };
+    h.state.colors = { land: "#ff0000", shoal: "#00ff00" };
+    const fills = [];
+    const fill = h.main.fill;
+    h.main.fill = function(path) { fills.push({ path, color: this.fillStyle }); fill(path); };
+    h.draw();
+    assert.deepEqual(fills.filter(({ path }) => ["land", "shoal"].includes(path)), [
+      { path: "land", color: POPULATION_UNESTIMATED_COLOR },
+      { path: "shoal", color: POPULATION_UNESTIMATED_COLOR },
+    ]);
+    assert.ok(fills.some(({ path, color }) => typeof path !== "string" && color === "#123456"), "source water retains its live ocean fill");
+    fills.length = 0;
+    h.state.showScenarioAtlantropa = false;
+    h.draw();
+    assert.equal(fills.filter(({ path }) => ["land", "shoal"].includes(path)).length, 0);
+    h.state.showScenarioAtlantropa = true;
+    h.state.populationRuntime.status = "loading";
+    fills.length = 0; h.draw();
+    assert.deepEqual(fills.filter(({ path }) => ["land", "shoal"].includes(path)), [
+      { path: "land", color: "#ff0000" }, { path: "shoal", color: "#00ff00" },
+    ], "inactive population data keeps the original atlas palette");
+    h.state.showWaterRegions = false;
+    fills.length = 0; h.draw();
+    assert.equal(fills.length, 0, "population does not force the overlay on when its water-region pass is hidden");
+  });
+}
 
 test("renderer wires projection and adaptive resets to the same overlay owner", () => {
   const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");

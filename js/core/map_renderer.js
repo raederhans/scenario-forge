@@ -1,4 +1,9 @@
 import { getMapLabelHierarchy } from "./renderer/map_label_hierarchy.js";
+import { getThematicWgiLegend, getThematicWgiSignature, isThematicWgiActive } from "./thematic_wgi_view_model.js";
+import { getPopulationLegend, getPopulationSignature, isPopulationRequested, isPopulationActive, POPULATION_UNESTIMATED_COLOR } from "./population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot, ensurePopulationHeatmapData } from "./population_spatial_runtime.js";
+import { samplePopulationDensityLonLat } from "./population_spatial_data.js";
+import { createPopulationHeatmapRenderOwner, getPopulationViewportDetailTileIds } from "./renderer/population_heatmap_render_owner.js";
 import { clearAllRiverPaintOverridesState } from "./state/actions/river_paint_actions.js";
 import { getEditedRiverParentIds } from "./river_paint/partition_model.js";
 import { getRiverPaintRuntime } from "./river_paint/runtime.js";
@@ -1016,6 +1021,7 @@ function getLegendControlOwner() {
     getLegendModel: (uniqueColors, labels) => ({
       colors: Array.isArray(uniqueColors) ? uniqueColors : readLegendColors(state),
       specialZoneLegendLayers: LegendManager.getSpecialZoneLayers(runtimeState),
+      thematicLegend: getPopulationLegend(runtimeState) || getThematicWgiLegend(runtimeState),
       labelMap: labels || LegendManager.getLabels(state),
       activeScenarioId: runtimeState.activeScenarioId,
       hasScenarioVisualEdits: !!runtimeState.activeScenarioId && (
@@ -2056,6 +2062,79 @@ function getPhysicalLayerRenderOwner() {
   return physicalLayerRenderOwner;
 }
 
+let populationHeatmapRenderOwner = null;
+
+function applyPopulationLandClipMask() {
+  if (runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length) return false;
+  if (!applyPhysicalLandClipMask()) return false;
+  if (runtimeState.activeScenarioId === "tno_1962") {
+    // The real-world source cannot estimate Atlantropa land or shoals. Exclude
+    // these outlines even when a coarse source pixel straddles the real coast.
+    const excluded = (runtimeState.scenarioAtlantropaData?.features || []).filter((feature) =>
+      ["land", "shoal"].includes(getAtlantropaRenderLayer(feature)));
+    if (excluded.length) {
+      const context = rendererSurfaceHost.getContext();
+      context.beginPath();
+      context.rect(-1e7, -1e7, 2e7, 2e7);
+      rendererSurfaceHost.getPathCanvas()({ type: "FeatureCollection", features: excluded });
+      context.clip("evenodd");
+    }
+  }
+  return true;
+}
+
+function getPopulationHeatmapRenderOwner() {
+  if (!populationHeatmapRenderOwner) populationHeatmapRenderOwner = createPopulationHeatmapRenderOwner({
+    state: runtimeState,
+    getters: {
+      getContext: () => rendererSurfaceHost.getContext(),
+      getProjection: () => rendererSurfaceHost.getProjection(),
+      getProjectionKey: getProjectionRenderSignature,
+      getSnapshot: () => getPopulationHeatmapSnapshot(runtimeState),
+      sampleDensity: samplePopulationDensityLonLat,
+      isRequested: () => isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
+      getMaskInfo: () => runtimeState.activeScenarioId === "tno_1962" && !runtimeState.scenarioAtlantropaData?.features?.length
+        ? { collection: null, maskSource: "atlantropa-unavailable" } : getPhysicalLandMaskInfo(),
+      isExportRendering: () => exportRenderInProgress,
+    },
+    helpers: { applyLandMask: applyPopulationLandClipMask, recordMetric: recordRenderPerfMetric, nowMs },
+  });
+  return populationHeatmapRenderOwner;
+}
+
+export function getPopulationHeatmapRenderReadiness() {
+  return getPopulationHeatmapRenderOwner().getReadiness();
+}
+
+export function assertPopulationHeatmapReadyForExport() {
+  return getPopulationHeatmapRenderOwner().assertReadyForExport();
+}
+
+function preparePopulationViewportData() {
+  const detailTileIds = getPopulationViewportDetailTileIds(runtimeState, { projection: rendererSurfaceHost.getProjection() });
+  return ensurePopulationHeatmapData(runtimeState, { detailTileIds, onChange: () => {
+    invalidateRenderPasses(["populationHeatmap"], "population-tiles-ready");
+    requestRendererRender("population-tiles-ready");
+    callRuntimeHook(runtimeState, "updateSpecialZoneEditorUIFn");
+  } });
+}
+
+export async function ensurePopulationHeatmapReadyForExport() {
+  if (isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap") {
+    await preparePopulationViewportData();
+    const snapshot = getPopulationHeatmapSnapshot(runtimeState);
+    if (snapshot.refinementStatus === "failed") throw new Error(`Population heatmap detail loading failed: ${snapshot.error || "unknown error"}.`);
+  }
+  return assertPopulationHeatmapReadyForExport();
+}
+
+function drawPopulationHeatmapPass(k) {
+  if (!exportRenderInProgress && isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap") {
+    void preparePopulationViewportData();
+  }
+  return getPopulationHeatmapRenderOwner().draw(k);
+}
+
 function getScenarioReliefOverlayRenderOwner() {
   if (scenarioReliefOverlayRenderOwner) {
     return scenarioReliefOverlayRenderOwner;
@@ -2326,6 +2405,7 @@ let riverInternalContourOwner = null;
 let riverContourRenderOwner = null;
 function hasVisibleRiverPartitions() {
   return debugMode === "PROD" && !runtimeState.strategicChoroplethMetric
+    && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState)
     && !!getRiverPaintRuntime(runtimeState).getActivePack();
 }
 function getRiverPaintRenderOwner() {
@@ -2335,7 +2415,7 @@ function getRiverPaintRenderOwner() {
     getPath: () => rendererSurfaceHost.getPathCanvas(),
     getProjectionKey: getOverlayProjectionSignature,
     isVisible: pathBoundsInScreen,
-    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric,
+    isEnabled: () => debugMode === "PROD" && !runtimeState.strategicChoroplethMetric && !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState),
     fallbackColor: LAND_FILL_COLOR,
   });
   return riverPaintRenderOwner;
@@ -2430,9 +2510,11 @@ function getPaintContourRuntimeOwner() {
 }
 
 async function ensurePaintContoursReady() {
-  getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  const riverPartitionsRequired = !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState);
+  if (riverPartitionsRequired) getRiverPaintRuntime(runtimeState).assertReadyForExport();
   if (!isHgoRuntimePreviewReady()) await Promise.all([
-    getPaintContourRuntimeOwner().ensureReady(), getRiverInternalContourOwner().ensureReady(),
+    getPaintContourRuntimeOwner().ensureReady(),
+    ...(riverPartitionsRequired ? [getRiverInternalContourOwner().ensureReady()] : []),
   ]);
 }
 
@@ -3699,6 +3781,7 @@ function getRenderPipelinePassesOwner() {
       drawBackgroundPass,
       drawPhysicalBasePass,
       drawPoliticalPass,
+      drawPopulationHeatmapPass,
       drawHgoPreviewPass,
       drawContextBasePass,
       drawContextScenarioPass,
@@ -5029,6 +5112,7 @@ function getScenarioWaterVisualRevisionToken({ effectiveWaterFeatureCount = null
     `water-effective:${resolvedWaterFeatureCount}`,
     `water-scenario:${getFeatureCollectionFeatureCount(runtimeState.scenarioWaterRegionsData)}`,
     `water-atlantropa:${atlantropaRevisionToken}`,
+    `population:${getPopulationSignature(runtimeState)}`,
     `water-overrides:${stableJson(runtimeState.waterRegionOverrides || {})}`,
     runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",
     runtimeState.showOpenOceanRegions ? "open-ocean:on" : "open-ocean:off",
@@ -8438,6 +8522,7 @@ function filterCurrentEnabledRenderPasses(passNames) {
     showCityPoints: !!runtimeState.showCityPoints,
     textureMode: normalizeTextureMode(runtimeState.styleConfig?.texture?.mode),
     dayNightEnabled: !!getDayNightStyleConfig().enabled,
+    populationHeatmapEnabled: isPopulationRequested(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap",
   });
 }
 
@@ -9340,6 +9425,9 @@ function flushPendingIndexUiRefresh() {
     runtimeState.renderCountryListFn();
     refreshedScopes.push("country");
   }
+  if (pending.renderCountryList && (runtimeState.styleConfig?.thematic?.enabled === true || runtimeState.styleConfig?.population?.enabled === true)) {
+    callRuntimeHook(runtimeState, "updateSpecialZoneEditorUIFn");
+  }
   if (pending.renderWaterRegionList && typeof runtimeState.renderWaterRegionListFn === "function") {
     runtimeState.renderWaterRegionListFn();
     refreshedScopes.push("water");
@@ -9895,7 +9983,7 @@ function getPoliticalDerivedStateIdentity() {
     runtimeState.mapSemanticMode, runtimeState.sovereigntyRevision,
     runtimeState.scenarioShellOverlayRevision, runtimeState.showScenarioAtlantropa,
     runtimeState.runtimePoliticalMetaSeed, runtimeState.scenarioStrategicValuesRevision,
-    runtimeState.strategicChoroplethMetric, JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
+    runtimeState.strategicChoroplethMetric, getThematicWgiSignature(runtimeState), getPopulationSignature(runtimeState), JSON.stringify(normalizeStrategicValuesStyle(runtimeState.styleConfig?.strategicValues)), getOceanBaseFillColor(),
     runtimeState.landIndex,
     runtimeState.width, runtimeState.height];
 }
@@ -12593,6 +12681,8 @@ function getScenarioRegionOverlayRenderOwner() {
       shouldSkipFeature,
       pathBoundsInScreen,
       getResolvedFeatureColor,
+      getPopulationUnestimatedOverlayColor: () => runtimeState.activeScenarioId === "tno_1962" && isPopulationActive(runtimeState)
+        ? POPULATION_UNESTIMATED_COLOR : null,
       LAND_FILL_COLOR,
       getPoliticalFeaturePathEntry,
       getScenarioWaterVisualRevisionToken,
@@ -13248,7 +13338,11 @@ async function ensureCountryLabelsReadyForExport(passNames) {
 
 function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   passNames = filterCurrentEnabledRenderPasses(passNames);
-  if (passNames.includes("political") || passNames.includes("borders")) getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  if (passNames.includes("populationHeatmap")) assertPopulationHeatmapReadyForExport();
+  const riverPartitionsRequired = !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState);
+  if (riverPartitionsRequired && (passNames.includes("political") || passNames.includes("borders"))) {
+    getRiverPaintRuntime(runtimeState).assertReadyForExport();
+  }
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
@@ -13266,7 +13360,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
     if (contourStatus === "building" || contourStatus === "error") {
       throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
     }
-    if (hasVisibleRiverPartitions() && getRiverInternalContourOwner().diagnostics().status !== "ready") {
+    if (riverPartitionsRequired && hasVisibleRiverPartitions() && getRiverInternalContourOwner().diagnostics().status !== "ready") {
       throw new Error("River internal contours are not ready; prepare contours before exporting borders.");
     }
     const politicalStatus = getPoliticalBorderRuntimeOwner().diagnostics().status;

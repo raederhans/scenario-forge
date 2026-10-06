@@ -2169,6 +2169,47 @@
                 hidden
               >
                 <h2 id="lblThematicLayersPanel" class="section-header" data-i18n="Thematic Layers">Thematic Layers</h2>
+                <section id="populationSpatialPanel" class="appearance-control-card" aria-labelledby="populationSpatialTitle">
+                  <h3 id="populationSpatialTitle" data-i18n="Population distribution">Population distribution</h3>
+                  <label class="toggle-label"><input id="togglePopulation" type="checkbox" class="checkbox-input"/><span data-i18n="Show population distribution">Show population distribution</span></label>
+                  <label for="populationMode" class="range-label" data-i18n="Population display">Population display</label>
+                  <select id="populationMode" class="select-input">
+                    <option value="density" data-i18n="Parcel density">Parcel density</option>
+                    <option value="heatmap" data-i18n="Continuous heatmap">Continuous heatmap</option>
+                  </select>
+                  <label for="populationOpacity" class="range-label"><span data-i18n="Opacity">Opacity</span><output id="populationOpacityValue" for="populationOpacity">80%</output></label>
+                  <input id="populationOpacity" type="range" min="0" max="100" value="80"/>
+                  <p id="populationStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <button id="populationRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
+                  <p id="populationReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <details><summary data-i18n="Density legend and source">Density legend and source</summary>
+                    <p class="hint" data-i18n="persons/km²">persons/km²</p>
+                    <div id="populationLegend" class="thematic-wgi-legend" hidden></div>
+                    <p id="populationSourceNote" class="city-points-advanced-hint"></p>
+                  </details>
+                  <details><summary data-i18n="Population statistics">Population statistics</summary>
+                    <label for="populationSummaryScope" class="range-label" data-i18n="Summary scope">Summary scope</label>
+                    <select id="populationSummaryScope" class="select-input"></select>
+                    <p id="populationSummary" class="city-points-advanced-hint" role="status"></p>
+                    <button id="populationSummarizeSelection" type="button" class="btn-secondary" data-i18n="Summarize selected parcels">Summarize selected parcels</button>
+                    <button id="populationExportStats" type="button" class="btn-secondary" data-i18n="Export parcel statistics (CSV)">Export parcel statistics (CSV)</button>
+                  </details>
+                </section>
+                <section id="thematicWgiPanel" class="appearance-control-card" aria-labelledby="thematicWgiTitle">
+                  <h3 id="thematicWgiTitle" data-i18n="Country indicators">Country indicators</h3>
+                  <label for="thematicWgiMetric" class="range-label" data-i18n="Indicator">Indicator</label>
+                  <select id="thematicWgiMetric" class="select-input" aria-describedby="thematicWgiStatus">
+                    <option value="wgi_government_effectiveness_score_0_100" data-i18n="Government effectiveness">Government effectiveness</option>
+                    <option value="wgi_rule_of_law_score_0_100" data-i18n="Rule of law">Rule of law</option>
+                  </select>
+                  <label class="toggle-label"><input id="toggleThematicWgi" type="checkbox" class="checkbox-input"/><span data-i18n="Show thematic shading">Show thematic shading</span></label>
+                  <p id="thematicWgiStatus" class="layer-status-strip" role="status" aria-live="polite"></p>
+                  <p id="thematicWgiReferenceNote" class="city-points-advanced-hint" hidden></p>
+                  <button id="thematicWgiRetry" type="button" class="btn-secondary" hidden data-i18n="Retry">Retry</button>
+                  <div id="thematicWgiLegend" class="thematic-wgi-legend" hidden></div>
+                  <p id="thematicWgiCoverage" class="city-points-advanced-hint"></p>
+                  <p class="city-points-advanced-hint" data-i18n="Hover a region to inspect its country indicator. This is not a local measurement.">Hover a region to inspect its country indicator. This is not a local measurement.</p>
+                </section>
                 <section id="strategicValuesPanel" class="appearance-control-card strategic-values-panel" aria-labelledby="strategicValuesTitle">
                   <div class="strategic-values-heading"><h3 id="strategicValuesTitle" data-i18n="Scenario strategic data">Scenario strategic data</h3><button id="strategicValuesLoad" type="button" class="btn-secondary" data-i18n="Load data">Load data</button></div>
                   <p id="strategicValuesStatus" class="layer-status-strip" role="status" aria-live="polite"></p>

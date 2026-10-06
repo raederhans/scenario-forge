@@ -6,6 +6,9 @@ from pathlib import Path
 from unittest import mock
 
 from map_builder.thematic_wgi_ingest import (
+    DEFAULT_WGI_SOURCE_CACHE_PATH,
+    DIMENSION_SHEETS,
+    DIMENSION_TO_METRIC_ID,
     WGI_AUDIT_RELATIVE_PATH,
     WGI_COMPOSITE_METRIC_ID,
     WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID,
@@ -14,6 +17,11 @@ from map_builder.thematic_wgi_ingest import (
     WGI_METRICS_RELATIVE_PATH,
     WGI_RECIPE_RELATIVE_PATH,
     WGI_RULE_OF_LAW_METRIC_ID,
+    WGI_RUNTIME_METRIC_IDS,
+    WGI_RUNTIME_SCENARIO_IDS,
+    WGI_RUNTIME_DATA_VERSION,
+    WGI_RUNTIME_METHOD,
+    build_wgi_historical_reference_policy,
     build_wgi_real_source_payloads,
     source_code_to_join_key,
 )
@@ -36,6 +44,106 @@ def _feature_by_join_key(metrics_payload: dict, join_key: str) -> dict:
 
 
 class ThematicWgiSourceIngestTest(unittest.TestCase):
+    @unittest.skipUnless(DEFAULT_WGI_SOURCE_CACHE_PATH.is_file(), "Official WGI workbook cache is not available")
+    def test_official_workbook_passes_through_all_six_dimensions_and_uncertainty(self) -> None:
+        from openpyxl import load_workbook
+
+        payloads = build_wgi_real_source_payloads(DEFAULT_WGI_SOURCE_CACHE_PATH)
+        features = {feature["join_key"]: feature for feature in payloads[WGI_METRICS_RELATIVE_PATH]["features"]}
+        audit = payloads[WGI_AUDIT_RELATIVE_PATH]["coverage_summary"]["dimensions"]
+        workbook = load_workbook(DEFAULT_WGI_SOURCE_CACHE_PATH, read_only=True, data_only=True)
+        source_join_keys = set()
+        try:
+            for sheet_name, dimension in DIMENSION_SHEETS.items():
+                rows = workbook[sheet_name].iter_rows(values_only=True)
+                headers = next(rows)
+                selected_rows = mapped_rows = observed_rows = 0
+                for cells in rows:
+                    source = dict(zip(headers, cells))
+                    if source["Year"] != 2024:
+                        continue
+                    selected_rows += 1
+                    join_key = source_code_to_join_key(source["Economy (code)"])
+                    if join_key is None:
+                        continue
+                    mapped_rows += 1
+                    source_join_keys.add(join_key)
+                    metric = features[join_key]["values"][DIMENSION_TO_METRIC_ID[dimension]]
+                    raw_score = source["Governance score (0-100)"]
+                    expected_score = round(raw_score, 6) if isinstance(raw_score, (int, float)) else None
+                    self.assertEqual(metric["raw_value"], expected_score)
+                    self.assertEqual(metric["normalized_value"], expected_score)
+                    self.assertEqual(metric["source_status"], "observed" if expected_score is not None else "source_gap")
+                    observed_rows += expected_score is not None
+                    expected_uncertainty = {
+                        "number_of_sources": source["Number of sources"],
+                        "score_standard_error": source["Standard error (gov. score)"],
+                        "score_confidence_interval_90": {
+                            "lower": source["Lower threshold (90% conf. int. score)"],
+                            "upper": source["Upper threshold (90% conf. int. score)"],
+                        },
+                        "estimate": source["Governance estimate (approx. -2.5 to +2.5)"],
+                        "estimate_standard_error": source["Standard error (estimate)"],
+                        "estimate_confidence_interval_90": {
+                            "lower": source["Lower threshold (90% conf. int. estimate)"],
+                            "upper": source["Upper threshold (90% conf. int. estimate)"],
+                        },
+                    }
+                    def rounded(value):
+                        if isinstance(value, dict):
+                            return {key: rounded(item) for key, item in value.items()}
+                        return round(value, 6) if isinstance(value, (int, float)) else None
+                    self.assertEqual(metric["uncertainty"], rounded(expected_uncertainty))
+                self.assertEqual(audit[dimension]["selected_source_rows"], selected_rows)
+                self.assertEqual(audit[dimension]["source_rows_mapped"], mapped_rows)
+                self.assertEqual(audit[dimension]["observed"], observed_rows)
+        finally:
+            workbook.close()
+        self.assertEqual(set(features), source_join_keys)
+        self.assertEqual(len(WGI_RUNTIME_METRIC_IDS), 6)
+        self.assertNotIn(WGI_COMPOSITE_METRIC_ID, WGI_RUNTIME_METRIC_IDS)
+        for feature in features.values():
+            values = feature["values"]
+            ge = values[WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID]["raw_value"]
+            rl = values[WGI_RULE_OF_LAW_METRIC_ID]["raw_value"]
+            expected = round((ge + rl) / 2, 6) if ge is not None and rl is not None else None
+            self.assertEqual(values[WGI_COMPOSITE_METRIC_ID]["raw_value"], expected)
+
+    def test_six_dimensions_use_source_union_and_audit_each_dimension(self) -> None:
+        rows = ["Economy (name),Economy (code),Year,Governance dimension,Governance score (0-100),Number of sources"]
+        for index, (sheet, dimension) in enumerate(DIMENSION_SHEETS.items()):
+            rows.append(f"United States,USA,2024,{sheet},{70 + index},10")
+        rows.extend([
+            "Canada,CAN,2024,va,64,8",
+            "Mexico,MEX,2024,pv,,7",
+            "World,WLD,2024,rq,60,9",
+            "Unknown,ZZZ,2024,cc,50,6",
+        ])
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "six-dimensions.csv"
+            path.write_text("\n".join(rows), encoding="utf-8")
+            payloads = build_wgi_real_source_payloads(path)
+        metrics = payloads[WGI_METRICS_RELATIVE_PATH]
+        audit = payloads[WGI_AUDIT_RELATIVE_PATH]["coverage_summary"]["dimensions"]
+        self.assertEqual({feature["join_key"] for feature in metrics["features"]}, {"USA", "CAN", "MEX"})
+        self.assertEqual(_feature_by_join_key(metrics, "USA")["coverage_status"], "complete")
+        canada = _feature_by_join_key(metrics, "CAN")
+        self.assertEqual(canada["coverage_status"], "partial")
+        self.assertEqual(canada["values"][WGI_COMPOSITE_METRIC_ID]["source_status"], "source_gap")
+        mexico = _feature_by_join_key(metrics, "MEX")
+        political_stability = mexico["values"][DIMENSION_TO_METRIC_ID["political_stability"]]
+        self.assertEqual(political_stability["source_status"], "source_gap")
+        self.assertEqual(political_stability["uncertainty"]["number_of_sources"], 7)
+        self.assertEqual(mexico["coverage_status"], "missing")
+        self.assertEqual(audit["voice_and_accountability"]["source_rows_mapped"], 2)
+        self.assertEqual(audit["political_stability"]["source_rows_with_missing_score"], 1)
+        self.assertEqual(audit["regulatory_quality"]["source_rows_dropped_aggregate"], 1)
+        self.assertEqual(audit["control_of_corruption"]["source_rows_unmatched"], 1)
+        for dimension, counts in audit.items():
+            self.assertEqual(counts["selected_source_rows"], counts["source_rows_mapped"] + counts["source_rows_unmatched"] + counts["source_rows_dropped_aggregate"])
+            self.assertEqual(counts["observed"] + counts["source_gap"], 3)
+            self.assertEqual(counts["source_rows_mapped"] + counts["missing_source_rows"], 3)
+
     def _build_fixture_payloads(self) -> dict[str, dict]:
         with mock.patch("urllib.request.urlopen") as urlopen:
             payloads = build_wgi_real_source_payloads(
@@ -70,6 +178,15 @@ class ThematicWgiSourceIngestTest(unittest.TestCase):
         self.assertEqual(manifest["source_policy"], "real_source_cache_only")
         self.assertEqual(manifest["coverage_scope"]["join_key_type"], "iso_a3")
         self.assertEqual(recipe["download_policy"]["network_allowed"], False)
+        self.assertEqual(manifest["runtime_consumer"]["supported_metrics"], list(WGI_RUNTIME_METRIC_IDS))
+        self.assertEqual(recipe["runtime_selection"]["supported_metrics"], list(WGI_RUNTIME_METRIC_IDS))
+        for selection in (manifest["runtime_consumer"], recipe["runtime_selection"]):
+            self.assertEqual(selection["supported_scenarios"], list(WGI_RUNTIME_SCENARIO_IDS))
+            self.assertEqual(selection["data_version"], WGI_RUNTIME_DATA_VERSION)
+            self.assertEqual(selection["method"], WGI_RUNTIME_METHOD)
+            self.assertEqual(selection["historical_reference_policy"], build_wgi_historical_reference_policy())
+            self.assertEqual(selection["historical_reference_policy"]["reference_year"], 2024)
+            self.assertFalse(selection["historical_reference_policy"]["historical_measurement"])
 
     def test_wgi_ingest_builds_government_effectiveness_rule_of_law_and_composite(self) -> None:
         metrics = self._build_fixture_payloads()[WGI_METRICS_RELATIVE_PATH]

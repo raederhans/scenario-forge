@@ -4,6 +4,8 @@ import {
 import { replaceStartupBootCacheState } from "./actions/boot_actions.js";
 import { commitPhysicalContourDisplayState } from "./actions/content_load_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "./actions/scenario_chunk_promotion_actions.js";
+import { createDefaultThematicWgiRuntimeState } from "./actions/thematic_wgi_actions.js";
+import { createDefaultPopulationRuntimeState } from "./actions/population_spatial_actions.js";
 
 // Content/data state defaults.
 // 这里收口 localization、topology、context layer 和底图数据默认 shape，
@@ -64,6 +66,8 @@ export function createDefaultContentState() {
     specialZonesExternalData: null,
     contextLayerExternalDataByName: {},
     contextLayerRevision: 0,
+    thematicWgiRuntime: createDefaultThematicWgiRuntimeState(),
+    populationRuntime: createDefaultPopulationRuntimeState(),
     contextLayerLoadStateByName: createDefaultContextLayerLoadStateByName(),
     contextLayerLoadErrorByName: {},
     contextLayerLoadPromiseByName: {},

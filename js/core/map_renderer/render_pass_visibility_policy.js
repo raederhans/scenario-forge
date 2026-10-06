@@ -10,8 +10,10 @@ export function filterEnabledRenderPassNames(passNames, {
   showCityPoints = false,
   textureMode = "none",
   dayNightEnabled = false,
+  populationHeatmapEnabled = false,
 } = {}) {
   const enabled = {
+    populationHeatmap: populationHeatmapEnabled,
     physicalBase: showPhysical && physicalMode !== "contours_only",
     contextBase: showPhysical || showUrban || showRivers,
     contextMarkers: showTransport || showStrategicResourceMarkers || showCityPoints,

@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { FileManager } from "../js/core/file_manager.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "../js/core/population_spatial_view_model.js";
+import { THEMATIC_INDICATORS } from "../js/core/thematic_indicator_catalog.js";
 import { createDefaultStyleConfig, restoreImportedStyleConfigState } from "../js/core/state/ui_state.js";
 import {
   getInteractionFunnelDebugState,
@@ -458,6 +461,72 @@ test("project roundtrip preserves country label visibility", () => {
     const target = { styleConfig: createDefaultStyleConfig() };
     restoreImportedStyleConfigState(target, imported.styleConfig);
     assert.equal(target.styleConfig.countryLabels.enabled, enabled);
+  }
+});
+
+test("project roundtrip persists thematic selection without embedding transient observations", async () => {
+  const selections = [...THEMATIC_INDICATORS.map((metric) => metric.id), "future-wgi-metric"]
+    .flatMap((metricId) => [normalizeThematicWgiStyle({ metricId }).dataVersion, "future-wgi-release"]
+      .map((dataVersion) => ({ metricId, dataVersion })));
+  for (const selection of selections) {
+    const thematic = normalizeThematicWgiStyle({ enabled: true, ...selection });
+    const payload = FileManager.buildProjectPayload({ activeScenarioId: "modern_world",
+      styleConfig: { thematic }, thematicWgiRuntime: { status: "ready", data: { byIsoA3: { AAA: 0, BBB: null } } } });
+    assert.deepEqual(payload.styleConfig.thematic, thematic);
+    assert.equal(Object.hasOwn(payload, "thematicWgiRuntime"), false);
+    assert.equal(JSON.stringify(payload).includes("byIsoA3"), false);
+    const result = await importProjectPayload(payload);
+    assert.equal(result.errors.length, 0);
+    const target = { styleConfig: createDefaultStyleConfig() };
+    restoreImportedStyleConfigState(target, result.callbacks[0].styleConfig);
+    assert.deepEqual(target.styleConfig.thematic, thematic);
+    delete payload.styleConfig.thematic;
+    const legacy = FileManager.normalizeImportedProjectData(payload);
+    restoreImportedStyleConfigState(target, legacy.styleConfig);
+    assert.deepEqual(target.styleConfig.thematic, normalizeThematicWgiStyle());
+  }
+});
+
+test("import style restore clears previous thematic enablement when old projects omit it", () => {
+  const target = { styleConfig: { ...createDefaultStyleConfig(), thematic: normalizeThematicWgiStyle({ enabled: true }) } };
+  restoreImportedStyleConfigState(target, {});
+  assert.deepEqual(target.styleConfig.thematic, normalizeThematicWgiStyle());
+});
+
+test("population project roundtrip saves style selection and excludes statistics and raster runtime", async () => {
+  for (const mode of ["density", "heatmap"]) {
+    const population = normalizePopulationStyle({ enabled: true, mode, opacity: 0.42 });
+    const payload = FileManager.buildProjectPayload({ activeScenarioId: "tno_1962", styleConfig: { population },
+      populationRuntime: { status: "ready", data: { byFeatureId: { A: { population: 0 }, B: { population: null } }, raster: { overview: "transient pixels" } } } });
+    assert.deepEqual(payload.styleConfig.population, population);
+    assert.equal(Object.hasOwn(payload, "populationRuntime"), false);
+    assert.equal(JSON.stringify(payload).includes("byFeatureId"), false);
+    assert.equal(JSON.stringify(payload).includes("transient pixels"), false);
+    const result = await importProjectPayload(payload);
+    assert.equal(result.errors.length, 0);
+    const target = { styleConfig: createDefaultStyleConfig() };
+    restoreImportedStyleConfigState(target, result.callbacks[0].styleConfig);
+    assert.deepEqual(target.styleConfig.population, population);
+    delete payload.styleConfig.population;
+    restoreImportedStyleConfigState(target, FileManager.normalizeImportedProjectData(payload).styleConfig);
+    assert.deepEqual(target.styleConfig.population, normalizePopulationStyle());
+  }
+});
+
+test("project import through the actual funnel publishes thematic selection to runtime style", async () => {
+  const previousStyleConfig = state.styleConfig;
+  try {
+    for (const { id: metricId } of THEMATIC_INDICATORS) {
+      const thematic = normalizeThematicWgiStyle({ enabled: true, metricId });
+      await importProjectThroughFunnelPayload({ schemaVersion: 13, colors: {},
+        styleConfig: { thematic }, layerVisibility: { showTransport: false } });
+      assert.deepEqual(state.styleConfig.thematic, thematic);
+    }
+    await importProjectThroughFunnelPayload({ schemaVersion: 13, colors: {},
+      layerVisibility: { showTransport: false } });
+    assert.deepEqual(state.styleConfig.thematic, normalizeThematicWgiStyle());
+  } finally {
+    state.styleConfig = previousStyleConfig;
   }
 });
 

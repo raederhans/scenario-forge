@@ -24,14 +24,82 @@
   ],
   "coverage_summary": {
     "features": 215,
-    "complete": 213,
-    "partial": 2,
+    "complete": 208,
+    "partial": 7,
     "missing": 0,
     "selected_year": 2024,
     "join_key_type": "iso_a3",
-    "metric_count": 3,
+    "metric_count": 7,
     "source_rows_unmatched": 0,
-    "source_rows_dropped_aggregate": 0
+    "source_rows_dropped_aggregate": 0,
+    "dimensions": {
+      "government_effectiveness": {
+        "metric_id": "wgi_government_effectiveness_score_0_100",
+        "selected_source_rows": 213,
+        "source_rows_mapped": 213,
+        "observed": 213,
+        "source_gap": 2,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 2,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      },
+      "rule_of_law": {
+        "metric_id": "wgi_rule_of_law_score_0_100",
+        "selected_source_rows": 215,
+        "source_rows_mapped": 215,
+        "observed": 215,
+        "source_gap": 0,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 0,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      },
+      "voice_and_accountability": {
+        "metric_id": "wgi_voice_and_accountability_score_0_100",
+        "selected_source_rows": 210,
+        "source_rows_mapped": 210,
+        "observed": 210,
+        "source_gap": 5,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 5,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      },
+      "political_stability": {
+        "metric_id": "wgi_political_stability_score_0_100",
+        "selected_source_rows": 215,
+        "source_rows_mapped": 215,
+        "observed": 215,
+        "source_gap": 0,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 0,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      },
+      "regulatory_quality": {
+        "metric_id": "wgi_regulatory_quality_score_0_100",
+        "selected_source_rows": 213,
+        "source_rows_mapped": 213,
+        "observed": 213,
+        "source_gap": 2,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 2,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      },
+      "control_of_corruption": {
+        "metric_id": "wgi_control_of_corruption_score_0_100",
+        "selected_source_rows": 215,
+        "source_rows_mapped": 215,
+        "observed": 215,
+        "source_gap": 0,
+        "source_rows_with_missing_score": 0,
+        "missing_source_rows": 0,
+        "source_rows_unmatched": 0,
+        "source_rows_dropped_aggregate": 0
+      }
+    }
   },
   "missing_join_keys": [],
   "unmatched_source_rows": [],
@@ -152,6 +220,234 @@
       ]
     },
     {
+      "metric_id": "wgi_voice_and_accountability_score_0_100",
+      "bottom": [
+        {
+          "join_key": "ERI",
+          "name": "Eritrea",
+          "normalized_value": 16.772369
+        },
+        {
+          "join_key": "AFG",
+          "name": "Afghanistan",
+          "normalized_value": 19.247333
+        },
+        {
+          "join_key": "MMR",
+          "name": "Myanmar",
+          "normalized_value": 19.663801
+        },
+        {
+          "join_key": "TKM",
+          "name": "Turkmenistan",
+          "normalized_value": 21.091509
+        },
+        {
+          "join_key": "PRK",
+          "name": "Korea, Dem. People's Rep.",
+          "normalized_value": 22.06435
+        }
+      ],
+      "top": [
+        {
+          "join_key": "NOR",
+          "name": "Norway",
+          "normalized_value": 90.618972
+        },
+        {
+          "join_key": "DNK",
+          "name": "Denmark",
+          "normalized_value": 90.015415
+        },
+        {
+          "join_key": "FIN",
+          "name": "Finland",
+          "normalized_value": 89.29112
+        },
+        {
+          "join_key": "SWE",
+          "name": "Sweden",
+          "normalized_value": 87.089942
+        },
+        {
+          "join_key": "NZL",
+          "name": "New Zealand",
+          "normalized_value": 86.415042
+        }
+      ]
+    },
+    {
+      "metric_id": "wgi_political_stability_score_0_100",
+      "bottom": [
+        {
+          "join_key": "YEM",
+          "name": "Yemen, Rep.",
+          "normalized_value": 18.910356
+        },
+        {
+          "join_key": "MLI",
+          "name": "Mali",
+          "normalized_value": 23.344776
+        },
+        {
+          "join_key": "SYR",
+          "name": "Syrian Arab Republic",
+          "normalized_value": 25.443941
+        },
+        {
+          "join_key": "SOM",
+          "name": "Federal Republic of Somalia",
+          "normalized_value": 27.237398
+        },
+        {
+          "join_key": "AFG",
+          "name": "Afghanistan",
+          "normalized_value": 28.225857
+        }
+      ],
+      "top": [
+        {
+          "join_key": "LIE",
+          "name": "Liechtenstein",
+          "normalized_value": 92.923528
+        },
+        {
+          "join_key": "AND",
+          "name": "Andorra",
+          "normalized_value": 92.264894
+        },
+        {
+          "join_key": "FSM",
+          "name": "Micronesia, Fed. Sts.",
+          "normalized_value": 91.507706
+        },
+        {
+          "join_key": "TUV",
+          "name": "Tuvalu",
+          "normalized_value": 90.983257
+        },
+        {
+          "join_key": "CYM",
+          "name": "Cayman Islands",
+          "normalized_value": 90.847019
+        }
+      ]
+    },
+    {
+      "metric_id": "wgi_regulatory_quality_score_0_100",
+      "bottom": [
+        {
+          "join_key": "ERI",
+          "name": "Eritrea",
+          "normalized_value": 22.762197
+        },
+        {
+          "join_key": "SYR",
+          "name": "Syrian Arab Republic",
+          "normalized_value": 23.35977
+        },
+        {
+          "join_key": "SSD",
+          "name": "South Sudan",
+          "normalized_value": 24.431549
+        },
+        {
+          "join_key": "VEN",
+          "name": "Venezuela, RB",
+          "normalized_value": 24.848624
+        },
+        {
+          "join_key": "PRK",
+          "name": "Korea, Dem. People's Rep.",
+          "normalized_value": 25.304626
+        }
+      ],
+      "top": [
+        {
+          "join_key": "SGP",
+          "name": "Singapore",
+          "normalized_value": 88.489348
+        },
+        {
+          "join_key": "FIN",
+          "name": "Finland",
+          "normalized_value": 85.830277
+        },
+        {
+          "join_key": "DNK",
+          "name": "Denmark",
+          "normalized_value": 85.312767
+        },
+        {
+          "join_key": "NZL",
+          "name": "New Zealand",
+          "normalized_value": 83.953086
+        },
+        {
+          "join_key": "LUX",
+          "name": "Luxembourg",
+          "normalized_value": 83.860952
+        }
+      ]
+    },
+    {
+      "metric_id": "wgi_control_of_corruption_score_0_100",
+      "bottom": [
+        {
+          "join_key": "SSD",
+          "name": "South Sudan",
+          "normalized_value": 6.061704
+        },
+        {
+          "join_key": "SOM",
+          "name": "Federal Republic of Somalia",
+          "normalized_value": 11.701147
+        },
+        {
+          "join_key": "SYR",
+          "name": "Syrian Arab Republic",
+          "normalized_value": 13.411284
+        },
+        {
+          "join_key": "YEM",
+          "name": "Yemen, Rep.",
+          "normalized_value": 14.742134
+        },
+        {
+          "join_key": "ERI",
+          "name": "Eritrea",
+          "normalized_value": 14.797647
+        }
+      ],
+      "top": [
+        {
+          "join_key": "DNK",
+          "name": "Denmark",
+          "normalized_value": 94.156834
+        },
+        {
+          "join_key": "FIN",
+          "name": "Finland",
+          "normalized_value": 92.226018
+        },
+        {
+          "join_key": "LUX",
+          "name": "Luxembourg",
+          "normalized_value": 88.656893
+        },
+        {
+          "join_key": "CHE",
+          "name": "Switzerland",
+          "normalized_value": 88.484008
+        },
+        {
+          "join_key": "SGP",
+          "name": "Singapore",
+          "normalized_value": 87.692639
+        }
+      ]
+    },
+    {
       "metric_id": "wgi_state_capacity_composite_0_100",
       "bottom": [
         {
@@ -212,6 +508,10 @@
   "normalization_summary": {
     "government_effectiveness": "WGI Governance score (0-100) passthrough.",
     "rule_of_law": "WGI Governance score (0-100) passthrough.",
+    "voice_and_accountability": "WGI Governance score (0-100) passthrough.",
+    "political_stability": "WGI Governance score (0-100) passthrough.",
+    "regulatory_quality": "WGI Governance score (0-100) passthrough.",
+    "control_of_corruption": "WGI Governance score (0-100) passthrough.",
     "state_capacity_composite": "Project-defined mean of government effectiveness and rule of law when both are observed.",
     "missing_value_policy": "Null raw_value and normalized_value for source_gap or partial_source_gap.",
     "uncertainty_policy": "Preserve source metric standard errors and 90% confidence intervals; do not infer composite uncertainty."
@@ -225,7 +525,7 @@
     "attribution_required": true
   },
   "warnings": [
-    "2 features have partial source coverage."
+    "7 features have partial source coverage."
   ],
   "fixture_notice": {
     "enabled": false,

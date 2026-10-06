@@ -3,11 +3,15 @@
   "layer_id": "political_wgi_state_capacity_v1",
   "theme": "political",
   "title": "WGI Governance Proxy",
-  "description": "World Bank WGI 2024 admin0 Government Effectiveness and Rule of Law scores with a project-defined state-capacity proxy.",
+  "description": "World Bank WGI 2024 admin0 scores for all six official governance dimensions with a project-defined Government Effectiveness and Rule of Law state-capacity proxy.",
   "geometry_kind": "admin0",
   "metric_ids": [
     "wgi_government_effectiveness_score_0_100",
     "wgi_rule_of_law_score_0_100",
+    "wgi_voice_and_accountability_score_0_100",
+    "wgi_political_stability_score_0_100",
+    "wgi_regulatory_quality_score_0_100",
+    "wgi_control_of_corruption_score_0_100",
     "wgi_state_capacity_composite_0_100"
   ],
   "period": {
@@ -46,13 +50,17 @@
       "selected_year": 2024,
       "license": "Creative Commons Attribution 4.0",
       "citation": "World Bank Worldwide Governance Indicators Data Catalog entry.",
-      "selection_rule": "Use 2024 rows from official ge and rl sheets; mean the two 0-100 scores only for the project-defined proxy when both source scores are present.",
+      "selection_rule": "Use 2024 rows from all six official WGI sheets; mean Government Effectiveness and Rule of Law 0-100 scores only for the project-defined proxy when both source scores are present.",
       "source_cache_path": ".runtime/source-cache/thematic/wgi/WGI_2025_Revision_Governance_Estimates_and_Absolute_Scores_1996_2024.xlsx",
       "source_sha256": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
       "source_size_bytes": 10423344,
       "official_dimensions": {
         "government_effectiveness": "Government Effectiveness",
-        "rule_of_law": "Rule of Law"
+        "rule_of_law": "Rule of Law",
+        "voice_and_accountability": "Voice and Accountability",
+        "political_stability": "Political Stability and Absence of Violence/Terrorism",
+        "regulatory_quality": "Regulatory Quality",
+        "control_of_corruption": "Control of Corruption"
       },
       "uncertainty_fields_preserved": [
         "number_of_sources",
@@ -82,23 +90,54 @@
   },
   "feature_counts": {
     "features": 215,
-    "complete": 213,
-    "partial": 2,
+    "complete": 208,
+    "partial": 7,
     "missing": 0
   },
   "build_audit_path": "data/thematic_layers/political/wgi_state_capacity_v1/build_audit.json",
   "generated_at": "2026-06-22T00:00:00Z",
   "build_command": "python tools/build_thematic_layers.py --include-wgi-real",
   "runtime_consumer": {
-    "status": "catalog_only",
-    "entry": "thematic_layer_catalog",
-    "supports_main_map_render": false
+    "status": "main_map_ready",
+    "entry": "thematic_wgi_runtime",
+    "supports_main_map_render": true,
+    "data_version": "wgi-2025-revision-v7:2024",
+    "supported_metrics": [
+      "wgi_government_effectiveness_score_0_100",
+      "wgi_rule_of_law_score_0_100",
+      "wgi_voice_and_accountability_score_0_100",
+      "wgi_political_stability_score_0_100",
+      "wgi_regulatory_quality_score_0_100",
+      "wgi_control_of_corruption_score_0_100"
+    ],
+    "supported_scenarios": [
+      "modern_world",
+      "hoi4_1936",
+      "hoi4_1939",
+      "tno_1962"
+    ],
+    "country_code_mapping": "data/thematic_layers/wgi_country_code_mapping.json",
+    "method": "Official 2024 scores for all six WGI dimensions passed through on the 0-100 scale; modern_world uses geographic country codes, while supported historical scenarios use baseline owner reference mapping; no project composite or historical measurement.",
+    "historical_reference_policy": {
+      "mode": "baseline_owner_reference_mapping",
+      "reference_year": 2024,
+      "supported_scenarios": [
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ],
+      "join_method": "Baseline owner tag -> scenarioCountriesByTag[tag].base_iso2 (explicit two-letter ISO2) -> existing ISO2-to-ISO3 mapping -> official WGI country/economy score.",
+      "unknown_mapping_policy": "Leave unmapped owners blank; do not infer from tags, parent countries, or modern feature geography.",
+      "interpretation": "2024 governance reference values mapped to scenario baseline owners; not observed governance measurements for historical years.",
+      "historical_measurement": false
+    }
   },
   "limitations": [
     "WGI scores are country/economy-level governance indicators and are not subnational topology measures.",
     "The state-capacity proxy is a project-defined two-indicator mean, not an official World Bank index or rating.",
     "WGI includes uncertainty; source metric standard errors and 90% confidence intervals are preserved in metrics.admin0.json.",
     "Rows without explicit join keys stay out of the metric payload and are reported in build_audit.",
-    "The layer is catalog-only until a later UI/runtime rendering phase accepts it."
+    "Main-map rendering uses all six official 2024 WGI dimension scores; supported historical scenarios show baseline owner reference mappings, not historical measurements. The project-defined proxy remains catalog metadata.",
+    "Historical scenario owners without an explicit two-letter base_iso2 in the existing ISO2-to-ISO3 mapping remain blank; tags, parent countries, and modern feature geography are not fallback sources."
   ]
 }

@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "layer_id": "social_human_development_v1",
+  "generated_at": "2026-10-05T00:00:00Z",
+  "builder": {
+    "tool": "tools/build_thematic_layers.py",
+    "command": "python tools/build_thematic_layers.py --include-hdi-real",
+    "ingest_module": "map_builder.thematic_hdi_ingest"
+  },
+  "source_inputs": [
+    {
+      "source_id": "undp_hdr_2025",
+      "name": "UNDP Human Development Reports",
+      "url": "https://hdr.undp.org/data-center/documentation-and-downloads",
+      "source_package_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+      "technical_notes_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Technical_Notes.pdf",
+      "release": "Human Development Report 2025",
+      "version": "2025",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "selected_year": 2023,
+      "license": "CC BY 3.0 IGO",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/igo/",
+      "terms_url": "https://hdr.undp.org/terms-use",
+      "citation": "United Nations Development Programme, Human Development Report 2025, composite indices complete time series.",
+      "selection_rule": "Use country ISO3 rows and the five pinned 2023 columns; exclude all ZZ aggregate rows and never fill from another report edition.",
+      "source_cache_path": ".runtime/source-cache/thematic/undp/HDR25_Composite_indices_complete_time_series.csv",
+      "source_sha256": "61ed82e5b66c88dfca8ff9fac775c63981ecab6a254862af97acacc41c143117",
+      "source_size_bytes": 2001263,
+      "source_encoding": "cp1252",
+      "recipe_path": "data/thematic_layers/source_recipes/undp_hdi_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    }
+  ],
+  "coverage_summary": {
+    "features": 195,
+    "complete": 193,
+    "partial": 2,
+    "missing": 0,
+    "selected_year": 2023,
+    "join_key_type": "iso_a3",
+    "source_rows": 206,
+    "metric_count": 5,
+    "metrics": {
+      "undp_hdi": {
+        "observed": 193,
+        "source_gap": 2
+      },
+      "undp_life_expectancy": {
+        "observed": 195,
+        "source_gap": 0
+      },
+      "undp_expected_schooling": {
+        "observed": 195,
+        "source_gap": 0
+      },
+      "undp_mean_schooling": {
+        "observed": 193,
+        "source_gap": 2
+      },
+      "undp_gni_per_capita": {
+        "observed": 193,
+        "source_gap": 2
+      }
+    },
+    "source_rows_unmatched": 0,
+    "source_rows_dropped_aggregate": 11
+  },
+  "missing_join_keys": [],
+  "unmatched_source_rows": [],
+  "dropped_aggregate_rows": [
+    {
+      "source_name": "Very high human development",
+      "source_code": "ZZA.VHHD",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:197",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "High human development",
+      "source_code": "ZZB.HHD",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:198",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Medium human development",
+      "source_code": "ZZC.MHD",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:199",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Low human development",
+      "source_code": "ZZD.LHD",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:200",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Arab States",
+      "source_code": "ZZE.AS",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:201",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "East Asia and the Pacific",
+      "source_code": "ZZF.EAP",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:202",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Europe and Central Asia",
+      "source_code": "ZZG.ECA",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:203",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Latin America and the Caribbean",
+      "source_code": "ZZH.LAC",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:204",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "ZZI.SA",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:205",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "Sub-Saharan Africa",
+      "source_code": "ZZJ.SSA",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:206",
+      "reason": "aggregate_row"
+    },
+    {
+      "source_name": "World",
+      "source_code": "ZZK.WORLD",
+      "year": 2023,
+      "source_row_ref": "HDR25_Composite_indices_complete_time_series.csv:row:207",
+      "reason": "aggregate_row"
+    }
+  ],
+  "outliers": [],
+  "normalization_summary": {
+    "method": "official_raw_values_with_auxiliary_goalpost_normalized_values",
+    "range": [
+      0,
+      100
+    ],
+    "technical_notes_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Technical_Notes.pdf",
+    "technical_notes_page": 2,
+    "formulas": {
+      "undp_hdi": "raw * 100",
+      "undp_life_expectancy": "clamp((raw - 20) / (85 - 20) * 100, 0, 100)",
+      "undp_expected_schooling": "clamp(raw / 18 * 100, 0, 100)",
+      "undp_mean_schooling": "clamp(raw / 15 * 100, 0, 100)",
+      "undp_gni_per_capita": "clamp(log(raw / 100) / log(75000 / 100) * 100, 0, 100)"
+    },
+    "raw_value_policy": "Preserve every finite valid source value without rounding or clipping.",
+    "notes": [
+      "Auxiliary normalized values preserve the existing 0-100 data contract for other consumers; main-map colors use raw-value bins.",
+      "HDI raw-value bins use official thresholds at 0.55, 0.7 and 0.8; component bins use fixed cartographic ranges and are not official UNDP categories.",
+      "The auxiliary normalization is a project transformation of the attributed UNDP source values; it does not change raw values."
+    ],
+    "missing_value_policy": "Missing, unknown or invalid source values remain null; never reconstruct HDI or fill from another edition."
+  },
+  "license_summary": {
+    "fixture_data": "none",
+    "source_metadata": [
+      "CC BY 3.0 IGO"
+    ],
+    "attribution_required": true
+  },
+  "warnings": [
+    "2 countries have partial source coverage."
+  ],
+  "fixture_notice": {
+    "enabled": false,
+    "reason": "Built from the pinned official UNDP HDR 2025 local CSV cache."
+  }
+}

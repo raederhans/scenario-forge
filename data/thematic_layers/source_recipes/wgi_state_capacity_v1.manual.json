@@ -22,26 +22,70 @@
       "temporal_coverage": "1996-2024",
       "license": "Creative Commons Attribution 4.0",
       "citation": "World Bank Worldwide Governance Indicators Data Catalog entry.",
-      "selection_rule": "Use 2024 country/economy rows from official ge and rl sheets; derive a project proxy only when both scores exist."
+      "selection_rule": "Use 2024 country/economy rows from all six official WGI sheets; derive the project proxy only when Government Effectiveness and Rule of Law scores both exist."
     }
   ],
   "metric_selection": {
     "year": 2024,
     "source_sheets": {
       "ge": "government_effectiveness",
-      "rl": "rule_of_law"
+      "rl": "rule_of_law",
+      "va": "voice_and_accountability",
+      "pv": "political_stability",
+      "rq": "regulatory_quality",
+      "cc": "control_of_corruption"
     },
     "official_dimensions": {
       "government_effectiveness": "Government Effectiveness",
-      "rule_of_law": "Rule of Law"
+      "rule_of_law": "Rule of Law",
+      "voice_and_accountability": "Voice and Accountability",
+      "political_stability": "Political Stability and Absence of Violence/Terrorism",
+      "regulatory_quality": "Regulatory Quality",
+      "control_of_corruption": "Control of Corruption"
     },
     "metrics": [
       "wgi_government_effectiveness_score_0_100",
       "wgi_rule_of_law_score_0_100",
+      "wgi_voice_and_accountability_score_0_100",
+      "wgi_political_stability_score_0_100",
+      "wgi_regulatory_quality_score_0_100",
+      "wgi_control_of_corruption_score_0_100",
       "wgi_state_capacity_composite_0_100"
     ],
     "project_defined_metrics": {
       "wgi_state_capacity_composite_0_100": "Mean of Government Effectiveness and Rule of Law when both source scores are observed."
+    }
+  },
+  "runtime_selection": {
+    "data_version": "wgi-2025-revision-v7:2024",
+    "supported_metrics": [
+      "wgi_government_effectiveness_score_0_100",
+      "wgi_rule_of_law_score_0_100",
+      "wgi_voice_and_accountability_score_0_100",
+      "wgi_political_stability_score_0_100",
+      "wgi_regulatory_quality_score_0_100",
+      "wgi_control_of_corruption_score_0_100"
+    ],
+    "supported_scenarios": [
+      "modern_world",
+      "hoi4_1936",
+      "hoi4_1939",
+      "tno_1962"
+    ],
+    "country_code_mapping": "data/thematic_layers/wgi_country_code_mapping.json",
+    "method": "Official 2024 scores for all six WGI dimensions passed through on the 0-100 scale; modern_world uses geographic country codes, while supported historical scenarios use baseline owner reference mapping; no project composite or historical measurement.",
+    "historical_reference_policy": {
+      "mode": "baseline_owner_reference_mapping",
+      "reference_year": 2024,
+      "supported_scenarios": [
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ],
+      "join_method": "Baseline owner tag -> scenarioCountriesByTag[tag].base_iso2 (explicit two-letter ISO2) -> existing ISO2-to-ISO3 mapping -> official WGI country/economy score.",
+      "unknown_mapping_policy": "Leave unmapped owners blank; do not infer from tags, parent countries, or modern feature geography.",
+      "interpretation": "2024 governance reference values mapped to scenario baseline owners; not observed governance measurements for historical years.",
+      "historical_measurement": false
     }
   },
   "join_key_policy": {

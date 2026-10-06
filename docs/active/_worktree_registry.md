@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-06 人口空间与国家专题整合
+
+`C:/Users/raede/.codex/worktrees/population-thematic-integration/mapcreator` 使用 `codex/population-thematic-20261006`，从 `origin/main@926ee96f` 提取本对话人口空间与国家专题改动，并按最新完整边界重建四个场景的地块统计。用户已授权合并推送；root 是唯一 Git 和现场检查负责人，原主目录混合 WIP 保留。工作树保留忽略的构建缓存、验证日志和数据审计，最终推送、required checks 与合并以 GitHub 回执为准。记录见 [人口专题整合](population-thematic-integration-20261006/task.md)。
+
 ## 2026-10-05 Pages 发布与示例启动优化
 
 复用 `C:/Users/raede/.codex/worktrees/pr-delivery-lanes/mapcreator`，当前分支为 `codex/pages-delivery-optimization`，基于已发布主线 `06d09474`。root 负责 Git、构建和全部现场测试；修改 Pages 检出范围、失败证据与显式示例启动时的可选任务顺序。主目录 WIP 保持原样，上一任务的本地收尾笔记单独保留。验证与交付状态见 [pages-delivery-optimization/task.md](pages-delivery-optimization/task.md)。

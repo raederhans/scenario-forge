@@ -1,3 +1,9 @@
+import { drawThematicWgiExportLegend } from "../core/renderer/thematic_wgi_export_legend.js";
+import { drawPopulationExportLegend } from "../core/renderer/population_export_legend.js";
+import { ensurePopulationData } from "../core/population_spatial_runtime.js";
+import { isPopulationActive, getPopulationSignature, getPopulationViewModel } from "../core/population_spatial_view_model.js";
+import { ensureThematicWgiData } from "../core/thematic_wgi_runtime.js";
+import { isThematicWgiRequested, isThematicWgiActive, getThematicWgiSignature } from "../core/thematic_wgi_view_model.js";
 import { createRiverPaintControls } from "./river_paint_controls.js";
 import { createRiverCellPicker } from "./river_cell_picker.js";
 import { getEditedRiverParentIds } from "../core/river_paint/partition_model.js";
@@ -29,6 +35,8 @@ import {
   setZoomPercent,
   RENDER_PASS_NAMES,
   renderExportPassesToCanvas,
+  assertPopulationHeatmapReadyForExport,
+  ensurePopulationHeatmapReadyForExport,
   ensurePaintContoursReady,
   ensureCountryLabelsReadyForExport,
   setMapData,
@@ -2297,6 +2305,11 @@ function initToolbar({ render } = {}) {
       ? renderPassCache.signatures
       : {};
     const dirtyRevision = Number(runtimeState.dirtyRevision || 0);
+    const thematicDependencies = [
+      `thematic:${getThematicWgiSignature(runtimeState)}`,
+      `population:${getPopulationSignature(runtimeState)}`,
+      `thematicLanguage:${runtimeState.currentLanguage || "en"}`,
+    ];
     const zoomTransform = runtimeState.zoomTransform && typeof runtimeState.zoomTransform === "object"
       ? runtimeState.zoomTransform
       : { k: 1, x: 0, y: 0 };
@@ -2307,6 +2320,7 @@ function initToolbar({ render } = {}) {
     ];
     if (layerId === "color") {
       return [
+        ...thematicDependencies,
         getExportBakeVisibilitySignature(exportUi),
         `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
         `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
@@ -2340,6 +2354,7 @@ function initToolbar({ render } = {}) {
       ];
     }
     return [
+      ...thematicDependencies,
       getExportBakeVisibilitySignature(exportUi),
       `colorRevision:${Number(runtimeState.colorRevision) || 0}`,
       `topologyRevision:${Number(runtimeState.topologyRevision) || 0}`,
@@ -2477,9 +2492,30 @@ function initToolbar({ render } = {}) {
     return true;
   };
 
+  const ensureThematicWgiReadyForExport = async (passNames) => {
+    const population = getPopulationViewModel(runtimeState);
+    if (population.enabled && population.supported && (passNames.includes("political") || passNames.includes("populationHeatmap"))) {
+      await ensurePopulationData(runtimeState, { onChange: () => runtimeState.refreshColorStateFn?.({ renderNow: false }) });
+      if (!isPopulationActive(runtimeState)) throw createExportError("invalid-params", runtimeState.currentLanguage === "zh"
+        ? "人口数据不可用。请重试加载或关闭人口图层后导出。" : "Population data is unavailable. Retry or turn off the population layer before export.");
+      if (population.mode === "heatmap" && passNames.includes("populationHeatmap")) {
+        await ensurePopulationHeatmapReadyForExport();
+        assertPopulationHeatmapReadyForExport();
+      }
+    }
+    if (!passNames.includes("political") || !isThematicWgiRequested(runtimeState)) return;
+    await ensureThematicWgiData(runtimeState, {
+      onChange: () => runtimeState.refreshColorStateFn?.({ renderNow: false }),
+    });
+    if (!isThematicWgiActive(runtimeState)) {
+      throw createExportError("invalid-params", runtimeState.currentLanguage === "zh"
+        ? "专题数据不可用。请重试加载或关闭专题着色后再导出。"
+        : "Thematic data is unavailable. Retry loading or turn off thematic shading before export.");
+    }
+  };
+
   const bakeLayer = async (layerId, exportUiOverride = null) => {
     await ensureScenarioPoliticalDetailForExport();
-    await ensurePaintContoursReady();
     const exportUi = exportUiOverride && typeof exportUiOverride === "object"
       ? exportUiOverride
       : ensureExportWorkbenchUiState();
@@ -2487,6 +2523,12 @@ function initToolbar({ render } = {}) {
     if (!["color", "line", "text", "composite"].includes(normalizedLayerId)) {
       throw new Error(`Unsupported bake layer: ${layerId}`);
     }
+    const bakePassNames = getBakePassNamesForLayer(normalizedLayerId, exportUi, {
+      resolvePassSequence: resolveExportPassSequence,
+      renderPassNames: RENDER_PASS_NAMES,
+    });
+    await ensureThematicWgiReadyForExport(bakePassNames);
+    await ensurePaintContoursReady();
     const width = runtimeState.colorCanvas?.width || runtimeState.lineCanvas?.width || 0;
     const height = runtimeState.colorCanvas?.height || runtimeState.lineCanvas?.height || 0;
     const dependencies = getLayerDependencyRevision(normalizedLayerId, exportUi);
@@ -2509,10 +2551,6 @@ function initToolbar({ render } = {}) {
     if (!bakeCtx) {
       throw new Error("Canvas bake context unavailable.");
     }
-    const bakePassNames = getBakePassNamesForLayer(normalizedLayerId, exportUi, {
-      resolvePassSequence: resolveExportPassSequence,
-      renderPassNames: RENDER_PASS_NAMES,
-    });
     if (normalizedLayerId === "composite") {
       const compositeCanvas = await buildCompositeSourceCanvas(exportUi);
       bakeCtx.drawImage(compositeCanvas, 0, 0);
@@ -2532,6 +2570,7 @@ function initToolbar({ render } = {}) {
       if (normalizedLayerId === "text" && exportUi.textVisibility?.["special-zones"]) {
         await drawSvgLayerToCanvas(bakeCanvas, bakeCtx, { onlyViewportSelector: ".special-zones-layer" });
       }
+      if (bakePassNames.includes("political")) { drawThematicWgiExportLegend(bakeCanvas, runtimeState); drawPopulationExportLegend(bakeCanvas, runtimeState); }
     }
     const version = cacheEntry ? Number(cacheEntry.version || 0) + 1 : 1;
     exportBakeCache.set(normalizedLayerId, {
@@ -2591,11 +2630,12 @@ function initToolbar({ render } = {}) {
 
   const buildCompositeSourceCanvas = async (exportUi, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
-    await ensurePaintContoursReady();
     const passNames = resolveExportPassSequence({
       ...exportUi,
       visibility: exportUi.visibility,
     }, RENDER_PASS_NAMES).filter((passName) => exportUi.textVisibility?.["render-labels"] || passName !== "labels");
+    await ensureThematicWgiReadyForExport(passNames);
+    await ensurePaintContoursReady();
     await ensureCountryLabelsReadyForExport(passNames);
     const compositeCanvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
     if (!compositeCanvas) {
@@ -2620,22 +2660,27 @@ function initToolbar({ render } = {}) {
       }
       await drawSvgLayerToCanvas(workingCanvas, workingCtx, { onlyViewportSelector: ".special-zones-layer" });
     }
+    if (passNames.includes("political")) { drawThematicWgiExportLegend(workingCanvas, runtimeState); drawPopulationExportLegend(workingCanvas, runtimeState); }
     return workingCanvas;
   };
 
   const buildSingleExportSourceCanvas = async (exportUi, sourceId, dimensions = null) => {
     await ensureScenarioPoliticalDetailForExport();
-    await ensurePaintContoursReady();
     const normalizedSourceId = String(sourceId || "").trim();
     if (EXPORT_MAIN_LAYER_MODEL_BY_ID.has(normalizedSourceId)) {
       const model = EXPORT_MAIN_LAYER_MODEL_BY_ID.get(normalizedSourceId);
-      await ensureCountryLabelsReadyForExport(model?.passNames || []);
-      const canvas = renderExportPassesToCanvas(model?.passNames || [], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
+      const passNames = model?.passNames || [];
+      await ensureThematicWgiReadyForExport(passNames);
+      await ensurePaintContoursReady();
+      await ensureCountryLabelsReadyForExport(passNames);
+      const canvas = renderExportPassesToCanvas(passNames, dimensions ? { pixelRatio: dimensions.pixelRatio } : {});
       if (!canvas) {
         throw createExportError("invalid-params", `Layer export canvas unavailable for ${normalizedSourceId}.`);
       }
+      if (passNames.includes("political")) { drawThematicWgiExportLegend(canvas, runtimeState); drawPopulationExportLegend(canvas, runtimeState); }
       return canvas;
     }
+    await ensurePaintContoursReady();
     if (normalizedSourceId === "render-labels") {
       await ensureCountryLabelsReadyForExport(["labels"]);
       const canvas = renderExportPassesToCanvas(["labels"], dimensions ? { pixelRatio: dimensions.pixelRatio } : {});

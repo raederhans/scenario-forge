@@ -8,6 +8,7 @@ export const EXACT_AFTER_SETTLE_DEFERRED_PASS_NAMES = new Set([
 
 export const EXACT_AFTER_SETTLE_ALWAYS_TARGET_PASSES = [
   "political",
+  "populationHeatmap",
   "borders",
   "labels",
   "textureLabels",

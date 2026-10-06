@@ -1,4 +1,6 @@
 import { getMapDataBoundary } from "./map_data_boundary.js";
+import { resolveThematicWgiFeatureColor } from "./thematic_wgi_view_model.js";
+import { resolvePopulationFeatureColor, normalizePopulationStyle, isPopulationActive, POPULATION_MISSING_COLOR } from "./population_spatial_view_model.js";
 import { normalizeStrategicValuesStyle, getStrategicValuesColorStops } from "./strategic_values_view_model.js";
 import {
   buildStrategicChoroplethColorInput,
@@ -93,6 +95,20 @@ function resolveFeatureColor(featureId, ctx = {}) {
       ownerCode: "",
     };
   }
+
+  if (isPopulationActive(runtimeState) && runtimeState.styleConfig.population.mode === "heatmap") {
+    return { color: POPULATION_MISSING_COLOR, source: "population:heatmap-base", featureId: id, ownerCode: "" };
+  }
+  const populationColor = resolvePopulationFeatureColor(runtimeState, feature || { id });
+  if (populationColor) {
+    const opacity = normalizePopulationStyle(runtimeState.styleConfig?.population).opacity;
+    return {
+      color: opacity < 1 ? mixHexColor(POPULATION_MISSING_COLOR, populationColor, opacity) : populationColor,
+      source: "population:density", featureId: id, ownerCode: "",
+    };
+  }
+  const thematicColor = resolveThematicWgiFeatureColor(runtimeState, feature);
+  if (thematicColor) return { color: thematicColor, source: "thematic:wgi", featureId: id, ownerCode: "" };
 
   const strategicColor = resolveStrategicChoroplethColor(id, ctx, getSafeColor);
   if (strategicColor) {

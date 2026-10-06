@@ -32,6 +32,7 @@ import {
 import {
   buildLayerStatusDiagnostics,
 } from "../js/ui/toolbar/layer_status_diagnostics.js";
+import { normalizeThematicWgiStyle } from "../js/core/thematic_wgi_view_model.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
@@ -107,7 +108,7 @@ test("transport contract support status is derived from the transport capability
   });
 });
 
-test("thematic panel contracts expose a read-only catalog preview surface", () => {
+test("thematic contracts expose admitted main-map capabilities beside read-only fixtures", () => {
   const thematicContracts = listThematicLayerPanelContracts();
   const catalogContract = thematicContracts.find((contract) => contract.id === "thematic");
   const layerContracts = thematicContracts.filter((contract) => contract.id.startsWith("thematic-layer:"));
@@ -119,24 +120,69 @@ test("thematic panel contracts expose a read-only catalog preview surface", () =
   assert.equal(catalogContract.supportsRuntimePreview, true);
   assert.equal(catalogContract.renderOwner, null);
   assert.equal(getLayerStatusAnchorById("thematic"), "");
-  assert.equal(getLayerPanelDisabledReason(catalogContract, { translate: (key) => key }), "Runtime rendering disabled");
+  assert.equal(getLayerPanelDisabledReason(catalogContract, { translate: (key) => key }), "");
 
   assert.equal(layerContracts.length, thematicIndex.layers.length);
   layerContracts.forEach((contract) => {
     assert.equal(contract.group, "thematic");
     assert.equal(contract.panelId, "mapContentPanelThematic");
-    assert.equal(contract.supportsMainOverview, false);
     assert.equal(contract.supportsRuntimePreview, true);
-    assert.equal(contract.renderOwner, null);
     assert.equal(contract.defaultVisible, false);
     assert.equal(contract.hiddenByDefault, true);
-    assert.equal(contract.requiredRuntimeKeys.includes("thematic_layer_catalog"), true);
   });
   const wgiContract = layerContracts.find((contract) => contract.id === "thematic-layer:political_wgi_state_capacity_v1");
   assert.equal(wgiContract.sourcePolicy, "real_source_cache_only");
+  assert.equal(wgiContract.label, "WGI governance · Scenario reference");
+  assert.equal(wgiContract.supportsMainOverview, true);
+  assert.equal(wgiContract.renderOwner, "color_resolver");
+  assert.equal(wgiContract.stateOwner, "thematic_wgi_owner");
+  assert.equal(wgiContract.requiredRuntimeKeys.includes("thematicWgiRuntime"), true);
+  assert.equal(getLayerPanelUnsupportedReason(wgiContract, { translate: (key) => key }), "Country indicators are not supported on the current basemap.");
   layerContracts
-    .filter((contract) => contract !== wgiContract)
-    .forEach((contract) => assert.equal(contract.sourcePolicy, "fixture_only"));
+    .filter((contract) => !contract.supportsMainOverview)
+    .forEach((contract) => {
+      assert.equal(contract.sourcePolicy, "fixture_only");
+      assert.equal(contract.supportsMainOverview, false);
+      assert.equal(contract.renderOwner, null);
+      assert.equal(contract.requiredRuntimeKeys.includes("thematic_layer_catalog"), true);
+      assert.equal(getLayerPanelDisabledReason(contract, { translate: (key) => key }), "Runtime rendering disabled");
+    });
+  const style = normalizeThematicWgiStyle({ enabled: true });
+  const ready = {
+    activeScenarioId: "modern_world",
+    styleConfig: { thematic: style },
+    thematicWgiRuntime: { status: "ready", data: {
+      layerId: style.layerId, metricId: style.metricId, dataVersion: style.dataVersion,
+      supportedScenarios: ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"],
+    } },
+  };
+  assert.equal(wgiContract.enabled(ready), true);
+  for (const activeScenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
+    assert.equal(wgiContract.enabled({ ...ready, activeScenarioId }), true);
+  }
+  for (const activeScenarioId of ["blank_base", "hgo"]) {
+    assert.equal(wgiContract.enabled({ ...ready, activeScenarioId }), false);
+  }
+  assert.equal(wgiContract.enabled({ ...ready, thematicWgiRuntime: { status: "loading" } }), false);
+  assert.equal(wgiContract.enabled({ ...ready, styleConfig: { thematic: { ...style, enabled: false } } }), false);
+  const ruleOfLawStyle = normalizeThematicWgiStyle({ enabled: true, metricId: "wgi_rule_of_law_score_0_100" });
+  const ruleOfLawReady = {
+    ...ready,
+    styleConfig: { thematic: ruleOfLawStyle },
+    thematicWgiRuntime: { status: "ready", data: {
+      layerId: ruleOfLawStyle.layerId, metricId: ruleOfLawStyle.metricId, dataVersion: ruleOfLawStyle.dataVersion,
+    } },
+  };
+  const hdiContract = layerContracts.find((contract) => contract.id === "thematic-layer:social_human_development_v1");
+  assert.equal(hdiContract.supportsMainOverview, true);
+  const hdiStyle = normalizeThematicWgiStyle({ enabled: true, metricId: "undp_hdi" });
+  const hdiReady = { ...ready, styleConfig: { thematic: hdiStyle },
+    thematicWgiRuntime: { status: "ready", data: { ...hdiStyle, supportedScenarios: ["modern_world"] } } };
+  assert.equal(hdiContract.enabled(hdiReady), true);
+  assert.equal(wgiContract.enabled(hdiReady), false);
+  assert.equal(hdiContract.enabled(ready), false);
+  assert.equal(wgiContract.enabled(ruleOfLawReady), true);
+  assert.equal(wgiContract.enabled({ ...ruleOfLawReady, thematicWgiRuntime: ready.thematicWgiRuntime }), false);
 });
 
 test("layer panel contract module stays read-only and renderer-free", () => {

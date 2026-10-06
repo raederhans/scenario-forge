@@ -44,6 +44,7 @@ function createHarness(overrides = {}) {
 const invalidationCases = [
   ["background", "topologyRevision"], ["physicalBase", "showPhysical"],
   ["political", "colorRevision"], ["hgoPreview", "width"],
+  ["populationHeatmap", "topologyRevision"],
   ["effects", "topologyRevision"], ["lineEffects", "topologyRevision"],
   ["contextBase", "contextLayerRevision"], ["contextMarkers", "cityLayerRevision"],
   ["labels", "scenarioStrategicValuesRevision"], ["contextScenario", "scenarioReliefOverlayRevision"],
@@ -276,6 +277,19 @@ test("sea name toggle invalidates labels without repainting the ocean background
   state.styleConfig.ocean.showRegionNames = true;
   assert.notEqual(policy.getRenderPassSignature("labels"), labels);
   assert.equal(policy.getRenderPassSignature("background"), background);
+});
+
+test("population changes invalidate cached Atlantropa context fills as well as political fills", () => {
+  const { state, policy } = createHarness();
+  state.activeScenarioId = "tno_1962";
+  const original = policy.getRenderPassSignature("contextScenario");
+  state.styleConfig.population = { enabled: true, mode: "density" };
+  const population = policy.getRenderPassSignature("contextScenario");
+  assert.notEqual(population, original);
+  state.populationRuntime = { status: "ready", revision: 1 };
+  assert.notEqual(policy.getRenderPassSignature("contextScenario"), population);
+  state.styleConfig.population.enabled = false;
+  assert.equal(policy.getRenderPassSignature("contextScenario"), original);
 });
 
 test("every catalog pass reads its live invalidation input and ignores unrelated UI state", () => {

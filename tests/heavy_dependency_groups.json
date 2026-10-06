@@ -39,6 +39,7 @@
       "tests/test_political_display_lods.py",
       "tests/test_political_coarse_shared_lod.py",
       "tests/test_political_topology_gap_contract.py",
+      "tests/test_population_spatial.py",
       "tests/test_precision_foundation_build.py",
       "tests/test_precision_shard_lod.py",
       "tests/test_rebuild_atlantropa_stage.py",

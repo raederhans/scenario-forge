@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Population spatial features",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "layer_id",
+    "data_version",
+    "source_epoch",
+    "scenario_id",
+    "geometry_version",
+    "feature_count",
+    "features"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "layer_id": {
+      "const": "population_ghsl_2020_v1"
+    },
+    "data_version": {
+      "const": "ghsl-r2023a-e2020-v1"
+    },
+    "source_epoch": {
+      "const": 2020
+    },
+    "scenario_id": {
+      "enum": [
+        "modern_world",
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ]
+    },
+    "geometry_version": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "feature_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "features": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "population",
+          "land_area_km2",
+          "density",
+          "coverage_fraction",
+          "status",
+          "source_epoch"
+        ],
+        "properties": {
+          "population": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "land_area_km2": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "density": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "coverage_fraction": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "source_epoch": {
+            "const": 2020
+          },
+          "overlap_fraction": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "partial_coverage",
+              "no_data",
+              "invalid_geometry",
+              "overlapping_geometry",
+              "unestimated_scenario_land",
+              "water_not_applicable"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

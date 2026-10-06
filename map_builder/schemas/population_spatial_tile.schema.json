@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Population spatial count tile",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "layer_id",
+    "data_version",
+    "source_epoch",
+    "crs",
+    "bounds",
+    "width",
+    "height",
+    "cell_size_m",
+    "cells"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "layer_id": {
+      "const": "population_ghsl_2020_v1"
+    },
+    "data_version": {
+      "const": "ghsl-r2023a-e2020-v1"
+    },
+    "source_epoch": {
+      "const": 2020
+    },
+    "crs": {
+      "const": "ESRI:54009"
+    },
+    "bounds": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "number"
+      }
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cell_size_m": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "prefixItems": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "number",
+            "minimum": 0
+          },
+          {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        ]
+      }
+    }
+  }
+}

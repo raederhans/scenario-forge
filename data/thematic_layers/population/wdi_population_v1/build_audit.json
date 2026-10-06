@@ -1,0 +1,2471 @@
+{
+  "schema_version": 1,
+  "layer_id": "population_wdi_population_v1",
+  "generated_at": "2026-10-05T00:00:00Z",
+  "builder": {
+    "tool": "tools/build_thematic_layers.py",
+    "command": "python tools/build_thematic_layers.py --include-population-real",
+    "ingest_module": "map_builder.thematic_population_ingest"
+  },
+  "source_inputs": [
+    {
+      "source_id": "world_bank_country_metadata",
+      "url": "https://api.worldbank.org/v2/country?format=json&per_page=400",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/countries.json",
+      "source_sha256": "d29d57f8adf954c5e2a1520a02fb2c7b45575d8db3bd327a9dff47d66914231c",
+      "source_size_bytes": 113590,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": "400",
+        "total": 295
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.POP.TOTL",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.POP.TOTL",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.POP.TOTL",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.POP.TOTL, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.POP.TOTL.json",
+      "source_sha256": "587c59b22666e2a49013390678c4eda802a9a4728da497f7776c8b6f92472f3e",
+      "source_size_bytes": 53368,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/EN.POP.DNST",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/EN.POP.DNST?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/EN.POP.DNST",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "EN.POP.DNST",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, EN.POP.DNST, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/EN.POP.DNST.json",
+      "source_sha256": "483df304cb8c43f8f821e675c6c93e5029e06f77c0dafdfb8c00ac1e44bc678b",
+      "source_size_bytes": 64423,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.URB.TOTL.IN.ZS?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.URB.TOTL.IN.ZS",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.URB.TOTL.IN.ZS",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.URB.TOTL.IN.ZS, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.URB.TOTL.IN.ZS.json",
+      "source_sha256": "038baef679625666bde02899b20026592eab93a008572159f5f847f3b447166a",
+      "source_size_bytes": 63099,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.POP.65UP.TO.ZS",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.POP.65UP.TO.ZS?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.POP.65UP.TO.ZS",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.POP.65UP.TO.ZS",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.POP.65UP.TO.ZS, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.POP.65UP.TO.ZS.json",
+      "source_sha256": "c9cc6eec326e6bdcd31638bb3c8ad89e8f970abffc4c17b5a01b3c05fa3c26d2",
+      "source_size_bytes": 66439,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    },
+    {
+      "source_id": "world_bank_wdi_population",
+      "name": "World Bank World Development Indicators",
+      "url": "https://data.worldbank.org/indicator/SP.DYN.TFRT.IN",
+      "source_package_url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.TFRT.IN?format=json&date=2023&per_page=400&source=2",
+      "metadata_url": "https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SP.DYN.TFRT.IN",
+      "release": "World Development Indicators",
+      "version": "2026-07-13",
+      "selected_year": 2023,
+      "indicator_code": "SP.DYN.TFRT.IN",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "terms_url": "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets",
+      "citation": "World Bank, World Development Indicators, SP.DYN.TFRT.IN, 2023; updated 2026-07-13.",
+      "selection_rule": "Complete source-2 API page for 2023, pinned to revision 2026-07-13; classify with official country metadata and exclude aggregates and CHI.",
+      "source_cache_path": ".runtime/source-cache/thematic/wdi-population/SP.DYN.TFRT.IN.json",
+      "source_sha256": "48ddd89e98d9764a59a19162c628c245e2bb9b034e36afe47406b17513b61deb",
+      "source_size_bytes": 60018,
+      "api_metadata": {
+        "page": 1,
+        "pages": 1,
+        "per_page": 400,
+        "total": 265,
+        "sourceid": "2",
+        "lastupdated": "2026-07-13"
+      },
+      "recipe_path": "data/thematic_layers/source_recipes/wdi_population_v1.manual.json",
+      "source_policy": "real_source_cache_only",
+      "status": "local_cache_observed"
+    }
+  ],
+  "coverage_summary": {
+    "features": 216,
+    "complete": 215,
+    "partial": 1,
+    "missing": 0,
+    "selected_year": 2023,
+    "version": "2026-07-13",
+    "join_key_type": "iso_a3",
+    "source_rows": 1325,
+    "metric_count": 5,
+    "metrics": {
+      "wdi_population_total": {
+        "observed": 216,
+        "source_gap": 0
+      },
+      "wdi_population_density": {
+        "observed": 215,
+        "source_gap": 1
+      },
+      "wdi_urban_population_share": {
+        "observed": 216,
+        "source_gap": 0
+      },
+      "wdi_population_65_plus_share": {
+        "observed": 216,
+        "source_gap": 0
+      },
+      "wdi_total_fertility_rate": {
+        "observed": 216,
+        "source_gap": 0
+      }
+    },
+    "country_metadata_rows": 295,
+    "country_metadata_countries": 217,
+    "country_metadata_aggregates": 78,
+    "source_rows_unmatched": 5,
+    "source_rows_dropped_aggregate": 240,
+    "runtime_unmapped_join_keys": [
+      "GIB"
+    ]
+  },
+  "missing_join_keys": [],
+  "unmatched_source_rows": [
+    {
+      "source_name": "Channel Islands",
+      "source_code": "CHI",
+      "source_iso2": "JG",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:88",
+      "reason": "Channel_Islands_composite_has_no_single_ISO3_target"
+    },
+    {
+      "source_name": "Channel Islands",
+      "source_code": "CHI",
+      "source_iso2": "JG",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:88",
+      "reason": "Channel_Islands_composite_has_no_single_ISO3_target"
+    },
+    {
+      "source_name": "Channel Islands",
+      "source_code": "CHI",
+      "source_iso2": "JG",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:88",
+      "reason": "Channel_Islands_composite_has_no_single_ISO3_target"
+    },
+    {
+      "source_name": "Channel Islands",
+      "source_code": "CHI",
+      "source_iso2": "JG",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:88",
+      "reason": "Channel_Islands_composite_has_no_single_ISO3_target"
+    },
+    {
+      "source_name": "Channel Islands",
+      "source_code": "CHI",
+      "source_iso2": "JG",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:88",
+      "reason": "Channel_Islands_composite_has_no_single_ISO3_target"
+    }
+  ],
+  "dropped_aggregate_rows": [
+    {
+      "source_name": "Africa Eastern and Southern",
+      "source_code": "AFE",
+      "source_iso2": "ZH",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:1",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Western and Central",
+      "source_code": "AFW",
+      "source_iso2": "ZI",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:2",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Arab World",
+      "source_code": "ARB",
+      "source_iso2": "1A",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:3",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Caribbean small states",
+      "source_code": "CSS",
+      "source_iso2": "S3",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:4",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Central Europe and the Baltics",
+      "source_code": "CEB",
+      "source_iso2": "B8",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:5",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Early-demographic dividend",
+      "source_code": "EAR",
+      "source_iso2": "V2",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:6",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific",
+      "source_code": "EAS",
+      "source_iso2": "Z4",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:7",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (excluding high income)",
+      "source_code": "EAP",
+      "source_iso2": "4E",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:8",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (IDA & IBRD countries)",
+      "source_code": "TEA",
+      "source_iso2": "T4",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:9",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Euro area",
+      "source_code": "EMU",
+      "source_iso2": "XC",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:10",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia",
+      "source_code": "ECS",
+      "source_iso2": "Z7",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:11",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (excluding high income)",
+      "source_code": "ECA",
+      "source_iso2": "7E",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:12",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (IDA & IBRD countries)",
+      "source_code": "TEC",
+      "source_iso2": "T7",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:13",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "European Union",
+      "source_code": "EUU",
+      "source_iso2": "EU",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:14",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Heavily indebted poor countries (HIPC)",
+      "source_code": "HPC",
+      "source_iso2": "XE",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:15",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "High income",
+      "source_code": "HIC",
+      "source_iso2": "XD",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:16",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IBRD only",
+      "source_code": "IBD",
+      "source_iso2": "XF",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:17",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA & IBRD total",
+      "source_code": "IBT",
+      "source_iso2": "ZT",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:18",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA blend",
+      "source_code": "IDB",
+      "source_iso2": "XH",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:19",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA only",
+      "source_code": "IDX",
+      "source_iso2": "XI",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:20",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA total",
+      "source_code": "IDA",
+      "source_iso2": "XG",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:21",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Late-demographic dividend",
+      "source_code": "LTE",
+      "source_iso2": "V3",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:22",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean ",
+      "source_code": "LCN",
+      "source_iso2": "ZJ",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:23",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean (excluding high income)",
+      "source_code": "LAC",
+      "source_iso2": "XJ",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:24",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & the Caribbean (IDA & IBRD countries)",
+      "source_code": "TLA",
+      "source_iso2": "T2",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:25",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Least developed countries: UN classification",
+      "source_code": "LDC",
+      "source_iso2": "XL",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:26",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low & middle income",
+      "source_code": "LMY",
+      "source_iso2": "XO",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:27",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low income",
+      "source_code": "LIC",
+      "source_iso2": "XM",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:28",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Lower middle income",
+      "source_code": "LMC",
+      "source_iso2": "XN",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:29",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan",
+      "source_code": "MEA",
+      "source_iso2": "ZQ",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:30",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+      "source_code": "MNA",
+      "source_iso2": "XQ",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:31",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+      "source_code": "TMN",
+      "source_iso2": "T3",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:32",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle income",
+      "source_code": "MIC",
+      "source_iso2": "XP",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:33",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "North America",
+      "source_code": "NAC",
+      "source_iso2": "XU",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:34",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Not classified",
+      "source_code": "INX",
+      "source_iso2": "XY",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:35",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "OECD members",
+      "source_code": "OED",
+      "source_iso2": "OE",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:36",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Other small states",
+      "source_code": "OSS",
+      "source_iso2": "S4",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:37",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pacific island small states",
+      "source_code": "PSS",
+      "source_iso2": "S2",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:38",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Post-demographic dividend",
+      "source_code": "PST",
+      "source_iso2": "V4",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:39",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pre-demographic dividend",
+      "source_code": "PRE",
+      "source_iso2": "V1",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:40",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Small states",
+      "source_code": "SST",
+      "source_iso2": "S1",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:41",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "SAS",
+      "source_iso2": "8S",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:42",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia (IDA & IBRD)",
+      "source_code": "TSA",
+      "source_iso2": "T5",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:43",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa ",
+      "source_code": "SSF",
+      "source_iso2": "ZG",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:44",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (excluding high income)",
+      "source_code": "SSA",
+      "source_iso2": "ZF",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:45",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (IDA & IBRD countries)",
+      "source_code": "TSS",
+      "source_iso2": "T6",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:46",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Upper middle income",
+      "source_code": "UMC",
+      "source_iso2": "XT",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:47",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "World",
+      "source_code": "WLD",
+      "source_iso2": "1W",
+      "metric_id": "wdi_population_total",
+      "year": 2023,
+      "source_row_ref": "SP.POP.TOTL.json:row:48",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Eastern and Southern",
+      "source_code": "AFE",
+      "source_iso2": "ZH",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:1",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Western and Central",
+      "source_code": "AFW",
+      "source_iso2": "ZI",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:2",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Arab World",
+      "source_code": "ARB",
+      "source_iso2": "1A",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:3",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Caribbean small states",
+      "source_code": "CSS",
+      "source_iso2": "S3",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:4",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Central Europe and the Baltics",
+      "source_code": "CEB",
+      "source_iso2": "B8",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:5",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Early-demographic dividend",
+      "source_code": "EAR",
+      "source_iso2": "V2",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:6",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific",
+      "source_code": "EAS",
+      "source_iso2": "Z4",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:7",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (excluding high income)",
+      "source_code": "EAP",
+      "source_iso2": "4E",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:8",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (IDA & IBRD countries)",
+      "source_code": "TEA",
+      "source_iso2": "T4",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:9",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Euro area",
+      "source_code": "EMU",
+      "source_iso2": "XC",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:10",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia",
+      "source_code": "ECS",
+      "source_iso2": "Z7",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:11",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (excluding high income)",
+      "source_code": "ECA",
+      "source_iso2": "7E",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:12",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (IDA & IBRD countries)",
+      "source_code": "TEC",
+      "source_iso2": "T7",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:13",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "European Union",
+      "source_code": "EUU",
+      "source_iso2": "EU",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:14",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Heavily indebted poor countries (HIPC)",
+      "source_code": "HPC",
+      "source_iso2": "XE",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:15",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "High income",
+      "source_code": "HIC",
+      "source_iso2": "XD",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:16",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IBRD only",
+      "source_code": "IBD",
+      "source_iso2": "XF",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:17",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA & IBRD total",
+      "source_code": "IBT",
+      "source_iso2": "ZT",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:18",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA blend",
+      "source_code": "IDB",
+      "source_iso2": "XH",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:19",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA only",
+      "source_code": "IDX",
+      "source_iso2": "XI",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:20",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA total",
+      "source_code": "IDA",
+      "source_iso2": "XG",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:21",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Late-demographic dividend",
+      "source_code": "LTE",
+      "source_iso2": "V3",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:22",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean ",
+      "source_code": "LCN",
+      "source_iso2": "ZJ",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:23",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean (excluding high income)",
+      "source_code": "LAC",
+      "source_iso2": "XJ",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:24",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & the Caribbean (IDA & IBRD countries)",
+      "source_code": "TLA",
+      "source_iso2": "T2",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:25",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Least developed countries: UN classification",
+      "source_code": "LDC",
+      "source_iso2": "XL",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:26",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low & middle income",
+      "source_code": "LMY",
+      "source_iso2": "XO",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:27",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low income",
+      "source_code": "LIC",
+      "source_iso2": "XM",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:28",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Lower middle income",
+      "source_code": "LMC",
+      "source_iso2": "XN",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:29",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan",
+      "source_code": "MEA",
+      "source_iso2": "ZQ",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:30",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+      "source_code": "MNA",
+      "source_iso2": "XQ",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:31",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+      "source_code": "TMN",
+      "source_iso2": "T3",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:32",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle income",
+      "source_code": "MIC",
+      "source_iso2": "XP",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:33",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "North America",
+      "source_code": "NAC",
+      "source_iso2": "XU",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:34",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Not classified",
+      "source_code": "INX",
+      "source_iso2": "XY",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:35",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "OECD members",
+      "source_code": "OED",
+      "source_iso2": "OE",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:36",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Other small states",
+      "source_code": "OSS",
+      "source_iso2": "S4",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:37",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pacific island small states",
+      "source_code": "PSS",
+      "source_iso2": "S2",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:38",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Post-demographic dividend",
+      "source_code": "PST",
+      "source_iso2": "V4",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:39",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pre-demographic dividend",
+      "source_code": "PRE",
+      "source_iso2": "V1",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:40",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Small states",
+      "source_code": "SST",
+      "source_iso2": "S1",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:41",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "SAS",
+      "source_iso2": "8S",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:42",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia (IDA & IBRD)",
+      "source_code": "TSA",
+      "source_iso2": "T5",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:43",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa ",
+      "source_code": "SSF",
+      "source_iso2": "ZG",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:44",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (excluding high income)",
+      "source_code": "SSA",
+      "source_iso2": "ZF",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:45",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (IDA & IBRD countries)",
+      "source_code": "TSS",
+      "source_iso2": "T6",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:46",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Upper middle income",
+      "source_code": "UMC",
+      "source_iso2": "XT",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:47",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "World",
+      "source_code": "WLD",
+      "source_iso2": "1W",
+      "metric_id": "wdi_population_density",
+      "year": 2023,
+      "source_row_ref": "EN.POP.DNST.json:row:48",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Eastern and Southern",
+      "source_code": "AFE",
+      "source_iso2": "ZH",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:1",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Western and Central",
+      "source_code": "AFW",
+      "source_iso2": "ZI",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:2",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Arab World",
+      "source_code": "ARB",
+      "source_iso2": "1A",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:3",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Caribbean small states",
+      "source_code": "CSS",
+      "source_iso2": "S3",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:4",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Central Europe and the Baltics",
+      "source_code": "CEB",
+      "source_iso2": "B8",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:5",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Early-demographic dividend",
+      "source_code": "EAR",
+      "source_iso2": "V2",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:6",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific",
+      "source_code": "EAS",
+      "source_iso2": "Z4",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:7",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (excluding high income)",
+      "source_code": "EAP",
+      "source_iso2": "4E",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:8",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (IDA & IBRD countries)",
+      "source_code": "TEA",
+      "source_iso2": "T4",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:9",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Euro area",
+      "source_code": "EMU",
+      "source_iso2": "XC",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:10",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia",
+      "source_code": "ECS",
+      "source_iso2": "Z7",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:11",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (excluding high income)",
+      "source_code": "ECA",
+      "source_iso2": "7E",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:12",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (IDA & IBRD countries)",
+      "source_code": "TEC",
+      "source_iso2": "T7",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:13",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "European Union",
+      "source_code": "EUU",
+      "source_iso2": "EU",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:14",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Heavily indebted poor countries (HIPC)",
+      "source_code": "HPC",
+      "source_iso2": "XE",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:15",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "High income",
+      "source_code": "HIC",
+      "source_iso2": "XD",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:16",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IBRD only",
+      "source_code": "IBD",
+      "source_iso2": "XF",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:17",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA & IBRD total",
+      "source_code": "IBT",
+      "source_iso2": "ZT",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:18",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA blend",
+      "source_code": "IDB",
+      "source_iso2": "XH",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:19",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA only",
+      "source_code": "IDX",
+      "source_iso2": "XI",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:20",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA total",
+      "source_code": "IDA",
+      "source_iso2": "XG",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:21",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Late-demographic dividend",
+      "source_code": "LTE",
+      "source_iso2": "V3",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:22",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean ",
+      "source_code": "LCN",
+      "source_iso2": "ZJ",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:23",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean (excluding high income)",
+      "source_code": "LAC",
+      "source_iso2": "XJ",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:24",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & the Caribbean (IDA & IBRD countries)",
+      "source_code": "TLA",
+      "source_iso2": "T2",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:25",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Least developed countries: UN classification",
+      "source_code": "LDC",
+      "source_iso2": "XL",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:26",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low & middle income",
+      "source_code": "LMY",
+      "source_iso2": "XO",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:27",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low income",
+      "source_code": "LIC",
+      "source_iso2": "XM",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:28",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Lower middle income",
+      "source_code": "LMC",
+      "source_iso2": "XN",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:29",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan",
+      "source_code": "MEA",
+      "source_iso2": "ZQ",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:30",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+      "source_code": "MNA",
+      "source_iso2": "XQ",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:31",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+      "source_code": "TMN",
+      "source_iso2": "T3",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:32",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle income",
+      "source_code": "MIC",
+      "source_iso2": "XP",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:33",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "North America",
+      "source_code": "NAC",
+      "source_iso2": "XU",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:34",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Not classified",
+      "source_code": "INX",
+      "source_iso2": "XY",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:35",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "OECD members",
+      "source_code": "OED",
+      "source_iso2": "OE",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:36",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Other small states",
+      "source_code": "OSS",
+      "source_iso2": "S4",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:37",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pacific island small states",
+      "source_code": "PSS",
+      "source_iso2": "S2",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:38",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Post-demographic dividend",
+      "source_code": "PST",
+      "source_iso2": "V4",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:39",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pre-demographic dividend",
+      "source_code": "PRE",
+      "source_iso2": "V1",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:40",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Small states",
+      "source_code": "SST",
+      "source_iso2": "S1",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:41",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "SAS",
+      "source_iso2": "8S",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:42",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia (IDA & IBRD)",
+      "source_code": "TSA",
+      "source_iso2": "T5",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:43",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa ",
+      "source_code": "SSF",
+      "source_iso2": "ZG",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:44",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (excluding high income)",
+      "source_code": "SSA",
+      "source_iso2": "ZF",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:45",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (IDA & IBRD countries)",
+      "source_code": "TSS",
+      "source_iso2": "T6",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:46",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Upper middle income",
+      "source_code": "UMC",
+      "source_iso2": "XT",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:47",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "World",
+      "source_code": "WLD",
+      "source_iso2": "1W",
+      "metric_id": "wdi_urban_population_share",
+      "year": 2023,
+      "source_row_ref": "SP.URB.TOTL.IN.ZS.json:row:48",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Eastern and Southern",
+      "source_code": "AFE",
+      "source_iso2": "ZH",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:1",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Western and Central",
+      "source_code": "AFW",
+      "source_iso2": "ZI",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:2",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Arab World",
+      "source_code": "ARB",
+      "source_iso2": "1A",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:3",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Caribbean small states",
+      "source_code": "CSS",
+      "source_iso2": "S3",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:4",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Central Europe and the Baltics",
+      "source_code": "CEB",
+      "source_iso2": "B8",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:5",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Early-demographic dividend",
+      "source_code": "EAR",
+      "source_iso2": "V2",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:6",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific",
+      "source_code": "EAS",
+      "source_iso2": "Z4",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:7",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (excluding high income)",
+      "source_code": "EAP",
+      "source_iso2": "4E",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:8",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (IDA & IBRD countries)",
+      "source_code": "TEA",
+      "source_iso2": "T4",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:9",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Euro area",
+      "source_code": "EMU",
+      "source_iso2": "XC",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:10",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia",
+      "source_code": "ECS",
+      "source_iso2": "Z7",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:11",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (excluding high income)",
+      "source_code": "ECA",
+      "source_iso2": "7E",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:12",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (IDA & IBRD countries)",
+      "source_code": "TEC",
+      "source_iso2": "T7",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:13",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "European Union",
+      "source_code": "EUU",
+      "source_iso2": "EU",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:14",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Heavily indebted poor countries (HIPC)",
+      "source_code": "HPC",
+      "source_iso2": "XE",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:15",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "High income",
+      "source_code": "HIC",
+      "source_iso2": "XD",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:16",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IBRD only",
+      "source_code": "IBD",
+      "source_iso2": "XF",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:17",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA & IBRD total",
+      "source_code": "IBT",
+      "source_iso2": "ZT",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:18",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA blend",
+      "source_code": "IDB",
+      "source_iso2": "XH",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:19",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA only",
+      "source_code": "IDX",
+      "source_iso2": "XI",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:20",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA total",
+      "source_code": "IDA",
+      "source_iso2": "XG",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:21",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Late-demographic dividend",
+      "source_code": "LTE",
+      "source_iso2": "V3",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:22",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean ",
+      "source_code": "LCN",
+      "source_iso2": "ZJ",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:23",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean (excluding high income)",
+      "source_code": "LAC",
+      "source_iso2": "XJ",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:24",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & the Caribbean (IDA & IBRD countries)",
+      "source_code": "TLA",
+      "source_iso2": "T2",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:25",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Least developed countries: UN classification",
+      "source_code": "LDC",
+      "source_iso2": "XL",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:26",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low & middle income",
+      "source_code": "LMY",
+      "source_iso2": "XO",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:27",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low income",
+      "source_code": "LIC",
+      "source_iso2": "XM",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:28",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Lower middle income",
+      "source_code": "LMC",
+      "source_iso2": "XN",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:29",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan",
+      "source_code": "MEA",
+      "source_iso2": "ZQ",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:30",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+      "source_code": "MNA",
+      "source_iso2": "XQ",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:31",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+      "source_code": "TMN",
+      "source_iso2": "T3",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:32",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle income",
+      "source_code": "MIC",
+      "source_iso2": "XP",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:33",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "North America",
+      "source_code": "NAC",
+      "source_iso2": "XU",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:34",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Not classified",
+      "source_code": "INX",
+      "source_iso2": "XY",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:35",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "OECD members",
+      "source_code": "OED",
+      "source_iso2": "OE",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:36",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Other small states",
+      "source_code": "OSS",
+      "source_iso2": "S4",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:37",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pacific island small states",
+      "source_code": "PSS",
+      "source_iso2": "S2",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:38",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Post-demographic dividend",
+      "source_code": "PST",
+      "source_iso2": "V4",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:39",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pre-demographic dividend",
+      "source_code": "PRE",
+      "source_iso2": "V1",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:40",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Small states",
+      "source_code": "SST",
+      "source_iso2": "S1",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:41",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "SAS",
+      "source_iso2": "8S",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:42",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia (IDA & IBRD)",
+      "source_code": "TSA",
+      "source_iso2": "T5",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:43",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa ",
+      "source_code": "SSF",
+      "source_iso2": "ZG",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:44",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (excluding high income)",
+      "source_code": "SSA",
+      "source_iso2": "ZF",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:45",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (IDA & IBRD countries)",
+      "source_code": "TSS",
+      "source_iso2": "T6",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:46",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Upper middle income",
+      "source_code": "UMC",
+      "source_iso2": "XT",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:47",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "World",
+      "source_code": "WLD",
+      "source_iso2": "1W",
+      "metric_id": "wdi_population_65_plus_share",
+      "year": 2023,
+      "source_row_ref": "SP.POP.65UP.TO.ZS.json:row:48",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Eastern and Southern",
+      "source_code": "AFE",
+      "source_iso2": "ZH",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:1",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Africa Western and Central",
+      "source_code": "AFW",
+      "source_iso2": "ZI",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:2",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Arab World",
+      "source_code": "ARB",
+      "source_iso2": "1A",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:3",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Caribbean small states",
+      "source_code": "CSS",
+      "source_iso2": "S3",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:4",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Central Europe and the Baltics",
+      "source_code": "CEB",
+      "source_iso2": "B8",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:5",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Early-demographic dividend",
+      "source_code": "EAR",
+      "source_iso2": "V2",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:6",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific",
+      "source_code": "EAS",
+      "source_iso2": "Z4",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:7",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (excluding high income)",
+      "source_code": "EAP",
+      "source_iso2": "4E",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:8",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "East Asia & Pacific (IDA & IBRD countries)",
+      "source_code": "TEA",
+      "source_iso2": "T4",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:9",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Euro area",
+      "source_code": "EMU",
+      "source_iso2": "XC",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:10",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia",
+      "source_code": "ECS",
+      "source_iso2": "Z7",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:11",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (excluding high income)",
+      "source_code": "ECA",
+      "source_iso2": "7E",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:12",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Europe & Central Asia (IDA & IBRD countries)",
+      "source_code": "TEC",
+      "source_iso2": "T7",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:13",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "European Union",
+      "source_code": "EUU",
+      "source_iso2": "EU",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:14",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Heavily indebted poor countries (HIPC)",
+      "source_code": "HPC",
+      "source_iso2": "XE",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:15",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "High income",
+      "source_code": "HIC",
+      "source_iso2": "XD",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:16",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IBRD only",
+      "source_code": "IBD",
+      "source_iso2": "XF",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:17",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA & IBRD total",
+      "source_code": "IBT",
+      "source_iso2": "ZT",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:18",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA blend",
+      "source_code": "IDB",
+      "source_iso2": "XH",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:19",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA only",
+      "source_code": "IDX",
+      "source_iso2": "XI",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:20",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "IDA total",
+      "source_code": "IDA",
+      "source_iso2": "XG",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:21",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Late-demographic dividend",
+      "source_code": "LTE",
+      "source_iso2": "V3",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:22",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean ",
+      "source_code": "LCN",
+      "source_iso2": "ZJ",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:23",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & Caribbean (excluding high income)",
+      "source_code": "LAC",
+      "source_iso2": "XJ",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:24",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Latin America & the Caribbean (IDA & IBRD countries)",
+      "source_code": "TLA",
+      "source_iso2": "T2",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:25",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Least developed countries: UN classification",
+      "source_code": "LDC",
+      "source_iso2": "XL",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:26",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low & middle income",
+      "source_code": "LMY",
+      "source_iso2": "XO",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:27",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Low income",
+      "source_code": "LIC",
+      "source_iso2": "XM",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:28",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Lower middle income",
+      "source_code": "LMC",
+      "source_iso2": "XN",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:29",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan",
+      "source_code": "MEA",
+      "source_iso2": "ZQ",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:30",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (excluding high income)",
+      "source_code": "MNA",
+      "source_iso2": "XQ",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:31",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle East, North Africa, Afghanistan & Pakistan (IDA & IBRD)",
+      "source_code": "TMN",
+      "source_iso2": "T3",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:32",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Middle income",
+      "source_code": "MIC",
+      "source_iso2": "XP",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:33",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "North America",
+      "source_code": "NAC",
+      "source_iso2": "XU",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:34",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Not classified",
+      "source_code": "INX",
+      "source_iso2": "XY",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:35",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "OECD members",
+      "source_code": "OED",
+      "source_iso2": "OE",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:36",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Other small states",
+      "source_code": "OSS",
+      "source_iso2": "S4",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:37",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pacific island small states",
+      "source_code": "PSS",
+      "source_iso2": "S2",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:38",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Post-demographic dividend",
+      "source_code": "PST",
+      "source_iso2": "V4",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:39",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Pre-demographic dividend",
+      "source_code": "PRE",
+      "source_iso2": "V1",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:40",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Small states",
+      "source_code": "SST",
+      "source_iso2": "S1",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:41",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia",
+      "source_code": "SAS",
+      "source_iso2": "8S",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:42",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "South Asia (IDA & IBRD)",
+      "source_code": "TSA",
+      "source_iso2": "T5",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:43",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa ",
+      "source_code": "SSF",
+      "source_iso2": "ZG",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:44",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (excluding high income)",
+      "source_code": "SSA",
+      "source_iso2": "ZF",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:45",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Sub-Saharan Africa (IDA & IBRD countries)",
+      "source_code": "TSS",
+      "source_iso2": "T6",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:46",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "Upper middle income",
+      "source_code": "UMC",
+      "source_iso2": "XT",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:47",
+      "reason": "country_metadata_region_NA_aggregate"
+    },
+    {
+      "source_name": "World",
+      "source_code": "WLD",
+      "source_iso2": "1W",
+      "metric_id": "wdi_total_fertility_rate",
+      "year": 2023,
+      "source_row_ref": "SP.DYN.TFRT.IN.json:row:48",
+      "reason": "country_metadata_region_NA_aggregate"
+    }
+  ],
+  "outliers": [],
+  "normalization_summary": {
+    "method": "official_raw_values_with_auxiliary_project_linear_scaling",
+    "range": [
+      0,
+      100
+    ],
+    "formulas": {
+      "wdi_population_total": "clamp(raw / 1500000000 * 100, 0, 100)",
+      "wdi_population_density": "clamp(raw / 1000 * 100, 0, 100)",
+      "wdi_urban_population_share": "raw",
+      "wdi_population_65_plus_share": "raw",
+      "wdi_total_fertility_rate": "clamp(raw / 8 * 100, 0, 100)"
+    },
+    "raw_value_policy": "Preserve every finite valid source value without rounding or clipping.",
+    "missing_value_policy": "Only JSON null or an absent country observation is source_gap; malformed source values fail the build.",
+    "notes": [
+      "Auxiliary normalized values are project linear scalings, not World Bank scores or front-end bins."
+    ]
+  },
+  "license_summary": {
+    "fixture_data": "none",
+    "source_metadata": [
+      "CC BY 4.0"
+    ],
+    "attribution_required": true
+  },
+  "warnings": [
+    "1 countries have partial source coverage.",
+    "Channel Islands composite excluded; no island-level population is inferred.",
+    "Source values without existing runtime mapping: GIB"
+  ],
+  "fixture_notice": {
+    "enabled": false,
+    "reason": "Built from five official WDI 2023 API caches with the same pinned revision."
+  }
+}

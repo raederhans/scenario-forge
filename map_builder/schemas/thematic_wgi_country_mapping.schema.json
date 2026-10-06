@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema://mapcreator/thematic_wgi_country_mapping/v1",
+  "type": "object",
+  "required": ["schema_version", "source", "policy", "supplemental_mappings", "by_iso_a2"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "source": {"type": "string", "minLength": 1},
+    "policy": {"type": "string", "minLength": 1},
+    "supplemental_mappings": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[A-Z]{2}$"},
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "by_iso_a2": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[A-Z]{2}$"},
+      "additionalProperties": {"type": "string", "pattern": "^[A-Z]{3}$"}
+    }
+  },
+  "additionalProperties": false
+}

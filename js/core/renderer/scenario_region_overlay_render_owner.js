@@ -27,6 +27,7 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
   shouldSkipFeature,
   pathBoundsInScreen,
   getResolvedFeatureColor,
+  getPopulationUnestimatedOverlayColor = () => null,
   LAND_FILL_COLOR,
   getPoliticalFeaturePathEntry,
   getScenarioWaterVisualRevisionToken,
@@ -208,6 +209,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
     }
     const transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity;
     const [canvasWidth, canvasHeight] = getLogicalCanvasDimensions();
+    const populationColor = getSafeCanvasColor(getPopulationUnestimatedOverlayColor(), null);
+    const unestimatedFeatures = populationColor ? new Set([...buckets.land, ...buckets.shoal]) : null;
     overlayFeatures.forEach((feature, index) => {
       const id = getSharedFeatureId(feature) || `atlantropa-overlay-${index}`;
       if (!id) return;
@@ -215,7 +218,8 @@ export function createScenarioRegionOverlayRenderOwner(runtimeState, {
       if (shouldSkipFeature(feature, canvasWidth, canvasHeight)) return;
       if (!pathBoundsInScreen(feature)) return;
       const fillColor =
-        getSafeCanvasColor(runtimeState.colors?.[id], null)
+        (unestimatedFeatures?.has(feature) ? populationColor : null)
+        || getSafeCanvasColor(runtimeState.colors?.[id], null)
         || getSafeCanvasColor(getResolvedFeatureColor(feature, id), null)
         || LAND_FILL_COLOR;
       const cachedPath = getPoliticalFeaturePathEntry(feature, {

@@ -1,3 +1,6 @@
+import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
+import { getPopulationSignature } from "../population_spatial_view_model.js";
+import { getPopulationHeatmapSnapshot } from "../population_spatial_runtime.js";
 import {
   normalizeIntensityFieldsState, normalizePhysicalStyleConfig,
   normalizeTextureStyleConfig, normalizeUrbanStyleConfig,
@@ -148,6 +151,8 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       getDebugMode(),
       runtimeState.topologyBundleMode || "single",
       runtimeState.strategicChoroplethMetric || "",
+      getThematicWgiSignature(runtimeState),
+      getPopulationSignature(runtimeState),
       runtimeState.scenarioStrategicValuesRevision || 0,
       stableJson(runtimeState.styleConfig?.strategicValues || {}),
     ].join("::");
@@ -170,6 +175,17 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   function getRenderPassSignature(passName, transform = runtimeState.zoomTransform || globalThis.d3?.zoomIdentity) {
     const transformSignature = getRenderPassTransformSignature(passName, transform);
     const intensityFields = normalizeIntensityFieldsState(runtimeState.intensityFields);
+    if (passName === "populationHeatmap") {
+      const snapshot = getPopulationHeatmapSnapshot(runtimeState);
+      const maskInfo = getPhysicalLandMaskInfo();
+      return [transformSignature, getViewportRenderSignature(), runtimeState.dpr,
+        getPassTopologyRevision(passName), getPopulationSignature(runtimeState),
+        snapshot.status, snapshot.version, snapshot.revision,
+        getObjectIdentityToken(rendererSurfaceHost.getProjection()),
+        getScenarioRuntimeTopologySignatureToken(),
+        `mask:${maskInfo.maskSource}:${maskInfo.maskFeatureCount}`,
+        getScenarioOverlaySignatureToken()].join("::");
+    }
     if (passName === "background") {
       const { showRegionNames: _showRegionNames, ...oceanPaintStyle } = runtimeState.styleConfig?.ocean || {};
       return [
@@ -331,6 +347,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.activeScenarioId || "",
         getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.scenarioReliefOverlayRevision || 0,
+        getPopulationSignature(runtimeState),
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
         `scenario-overlays:${getScenarioOverlaySignatureToken()}`,
         runtimeState.showWaterRegions ? "scenario-water:on" : "scenario-water:off",

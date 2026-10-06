@@ -255,3 +255,29 @@ test("unchanged visible legend header avoids repeated text writes but language a
   assert.equal(writes, 2);
   assert.ok(h.element().className.includes("is-collapsed"));
 });
+
+
+test("population thematic legend replaces paint categories and refreshes source and reference notes", (t) => {
+  const h = harness(t);
+  h.model.colors = [];
+  h.model.thematicLegend = { title: "Population density · 2020",
+    entries: [{ color: "#ffffb2", label: "0–1" }, { color: "#bd0026", label: "5000+" }],
+    note: "Persons per square kilometre", referenceNote: "2020 reference on historical borders", source: "GHSL 1 km" };
+  h.render();
+  assert.equal(h.element().hidden, false);
+  assert.deepEqual(h.labels(), ["0–1", "5000+"]);
+  assert.equal(h.body().querySelector(".map-legend-section-title").textContent, "Population density · 2020");
+  assert.deepEqual(h.body().querySelectorAll(".city-points-advanced-hint").map(node => node.textContent),
+    ["Persons per square kilometre", "2020 reference on historical borders", "GHSL 1 km"]);
+  const rebuilds = h.body().rebuilds;
+  h.render();
+  assert.equal(h.body().rebuilds, rebuilds);
+  h.model.thematicLegend.referenceNote = "Modern boundaries";
+  h.render();
+  assert.equal(h.body().rebuilds, rebuilds + 1);
+  h.model.thematicLegend = null;
+  h.model.colors = ["#ff0000"];
+  h.render();
+  assert.deepEqual(h.labels(), ["Red"]);
+  assert.equal(h.body().querySelector(".map-legend-section-title"), null);
+});

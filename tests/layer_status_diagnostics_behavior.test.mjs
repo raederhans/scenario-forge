@@ -4,6 +4,9 @@ import test from "node:test";
 import {
   THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON,
   THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON,
+  THEMATIC_WGI_MAIN_MAP_SUPPORT_LABEL,
+  THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL,
+  THEMATIC_MAIN_MAP_SUPPORT_LABEL,
 } from "../js/core/thematic_layer_catalog.js";
 import {
   createDefaultContentState,
@@ -325,6 +328,44 @@ test("thematic catalog diagnostic reports read-only fixture preview state", () =
     thematicCatalogPreview: preview,
   });
   assert.ok(diagnostics.find((entry) => entry.id === "thematic"));
+});
+
+test("thematic catalog diagnostics use the shared country-indicators label for either admitted source family", () => {
+  assert.equal(THEMATIC_WGI_MAIN_MAP_SUPPORT_LABEL, "WGI governance · Scenario reference");
+  assert.equal(THEMATIC_HDI_MAIN_MAP_SUPPORT_LABEL, "UNDP human development · Scenario reference");
+  assert.equal(THEMATIC_MAIN_MAP_SUPPORT_LABEL, "Country indicators · Scenario reference");
+  for (const layerId of ["political_wgi_state_capacity_v1", "social_human_development_v1"]) {
+    const diagnostic = buildThematicCatalogDiagnostic({ thematicCatalogPreview: {
+      status: "ready",
+      layers: [{ layerId, supportsMainMapRender: true, manifestLoaded: true,
+        realSourceStatus: THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON }],
+    } }, { translate: (key) => key });
+    assert.equal(diagnostic.summary.includes(THEMATIC_MAIN_MAP_SUPPORT_LABEL), true);
+    assert.equal(diagnostic.summary.includes("Runtime rendering disabled"), false);
+    assert.equal(diagnostic.enabled, false);
+    assert.equal(diagnostic.visibleCount, 0);
+  }
+});
+
+test("mixed thematic-family diagnostics translate shared support while retaining fixture and source boundaries", () => {
+  const diagnostic = buildThematicCatalogDiagnostic({ thematicCatalogPreview: {
+    status: "ready",
+    layers: [
+      { supportsMainMapRender: true, manifestLoaded: true, hiddenByDefault: true,
+        realSourceStatus: THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON },
+      { supportsMainMapRender: true, manifestLoaded: true, hiddenByDefault: true,
+        realSourceStatus: THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON },
+      { fixtureOnly: true, manifestLoaded: true, hiddenByDefault: true,
+        realSourceStatus: THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON },
+    ],
+  } }, { translate: (key) => key === THEMATIC_MAIN_MAP_SUPPORT_LABEL ? "国家指标 · 剧本参考" : key });
+  assert.equal(diagnostic.loadedCount, 3);
+  assert.equal(diagnostic.visibleCount, 0);
+  assert.ok(diagnostic.summary.includes("国家指标 · 剧本参考"));
+  assert.ok(diagnostic.summary.includes("Fixture only"));
+  assert.ok(diagnostic.summary.includes(THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON));
+  assert.ok(diagnostic.summary.includes(THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON));
+  assert.equal(diagnostic.summary.includes("Runtime rendering disabled"), false);
 });
 
 test("layer diagnostics keep text clean and do not mutate default state", () => {

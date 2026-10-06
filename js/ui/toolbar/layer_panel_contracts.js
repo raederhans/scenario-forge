@@ -9,6 +9,8 @@ import {
   listDefaultThematicLayerSummaries,
   THEMATIC_LAYER_RENDER_DISABLED_REASON,
 } from "../../core/thematic_layer_catalog.js";
+import { isThematicWgiActive } from "../../core/thematic_wgi_view_model.js";
+import { isPopulationActive } from "../../core/population_spatial_view_model.js";
 
 const CONTRACT_GROUPS = Object.freeze(["appearance", "map-content", "transport", "workbench", "thematic"]);
 const WORKBENCH_ONLY_REASON = "Available in Transport Workbench only";
@@ -268,30 +270,32 @@ function createThematicCatalogPanelContract() {
     requiredRuntimeKeys: ["thematic_layer_catalog"],
     dataKeys: ["thematic_layer_catalog"],
     loadKeys: ["thematic_layer_catalog"],
-    disabledReasonProvider: ({ translate } = {}) => translateUi(translate, THEMATIC_LAYER_RENDER_DISABLED_REASON),
   });
 }
 
 function createThematicLayerPanelContract(layer) {
+  const admitted = layer.supportsMainMapRender === true;
   return createLayerPanelContract({
     id: `thematic-layer:${layer.layerId}`,
     familyId: "thematic",
     label: layer.title || layer.layerId,
     group: "thematic",
     panelId: THEMATIC_PANEL_ID,
-    stateOwner: "thematic_layer_catalog_preview",
+    stateOwner: admitted ? "thematic_wgi_owner" : "thematic_layer_catalog_preview",
     dataOwner: `thematic_layer:${layer.layerId}`,
-    renderOwner: null,
+    renderOwner: admitted ? "color_resolver" : null,
     statusProviderId: "thematic-layer",
-    supportsMainOverview: false,
+    supportsMainOverview: admitted,
     supportsRuntimePreview: true,
     defaultVisible: layer.defaultVisible,
     hiddenByDefault: layer.hiddenByDefault,
-    requiredRuntimeKeys: ["thematic_layer_catalog", `thematic_layer:${layer.layerId}`],
-    dataKeys: ["thematic_layer_catalog", `thematic_layer:${layer.layerId}`],
+    requiredRuntimeKeys: admitted ? ["styleConfig.thematic", "thematicWgiRuntime"]
+      : ["thematic_layer_catalog", `thematic_layer:${layer.layerId}`],
+    dataKeys: admitted ? ["thematicWgiRuntime.data"] : ["thematic_layer_catalog", `thematic_layer:${layer.layerId}`],
     loadKeys: ["thematic_layer_catalog", `thematic_layer:${layer.layerId}`],
-    enabled: () => false,
-    disabledReasonProvider: ({ translate } = {}) => translateUi(translate, THEMATIC_LAYER_RENDER_DISABLED_REASON),
+    enabled: admitted ? (state) => state?.styleConfig?.thematic?.layerId === layer.layerId && isThematicWgiActive(state) : () => false,
+    disabledReasonProvider: ({ translate } = {}) => translateUi(translate, admitted ? "Off" : THEMATIC_LAYER_RENDER_DISABLED_REASON),
+    unsupportedReasonProvider: admitted ? ({ translate } = {}) => translateUi(translate, "Country indicators are not supported on the current basemap.") : null,
     theme: layer.theme,
     geometryKind: layer.geometryKind,
     sourcePolicy: layer.sourcePolicy,
@@ -358,6 +362,15 @@ export function listTransportLayerPanelContracts() {
 export function listThematicLayerPanelContracts() {
   return [
     createThematicCatalogPanelContract(),
+    createLayerPanelContract({
+      id: "population-spatial", familyId: "thematic", label: "Population distribution", group: "thematic",
+      panelId: THEMATIC_PANEL_ID, anchorId: "populationSpatialPanel", stateOwner: "population_spatial_owner",
+      dataOwner: "population_spatial_manifest", renderOwner: "population_heatmap_render_owner",
+      statusProviderId: "population-spatial", supportsMainOverview: true, supportsRuntimePreview: true,
+      defaultVisible: false, hiddenByDefault: true,
+      requiredRuntimeKeys: ["styleConfig.population", "populationRuntime"], dataKeys: ["populationRuntime.data"],
+      loadKeys: ["population_spatial_manifest"], enabled: isPopulationActive,
+    }),
     ...listDefaultThematicLayerSummaries().map(createThematicLayerPanelContract),
   ].map(cloneContract);
 }

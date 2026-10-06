@@ -295318,6 +295318,119 @@
     }
   },
   "ui": {
+    "Population coverage": { "en": "Population coverage", "zh": "人口数据覆盖率" },
+    "Population distribution": {
+      "en": "Population distribution",
+      "zh": "人口空间分布"
+    },
+    "Show population distribution": {
+      "en": "Show population distribution",
+      "zh": "显示人口分布"
+    },
+    "Population display": {
+      "en": "Population display",
+      "zh": "人口显示方式"
+    },
+    "Parcel density": {
+      "en": "Parcel density",
+      "zh": "地块人口密度"
+    },
+    "Continuous heatmap": {
+      "en": "Continuous heatmap",
+      "zh": "连续人口热力"
+    },
+    "Density legend and source": {
+      "en": "Density legend and source",
+      "zh": "密度图例与来源"
+    },
+    "Population statistics": {
+      "en": "Population statistics",
+      "zh": "人口统计"
+    },
+    "Summary scope": {
+      "en": "Summary scope",
+      "zh": "汇总范围"
+    },
+    "All mapped parcels": {
+      "en": "All mapped parcels",
+      "zh": "全部映射地块"
+    },
+    "Selected parcels": {
+      "en": "Selected parcels",
+      "zh": "已选地块"
+    },
+    "Summarize selected parcels": {
+      "en": "Summarize selected parcels",
+      "zh": "汇总当前选区"
+    },
+    "Export parcel statistics (CSV)": {
+      "en": "Export parcel statistics (CSV)",
+      "zh": "导出地块统计 CSV"
+    },
+    "Population layer is off.": {
+      "en": "Population layer is off.",
+      "zh": "人口图层已关闭。"
+    },
+    "Population is unavailable on this basemap.": {
+      "en": "Population is unavailable on this basemap.",
+      "zh": "当前底图不支持人口空间图层。"
+    },
+    "Population data is ready to load.": {
+      "en": "Population data is ready to load.",
+      "zh": "人口数据待加载。"
+    },
+    "Loading population data…": {
+      "en": "Loading population data…",
+      "zh": "正在加载人口数据…"
+    },
+    "Population data loaded.": {
+      "en": "Population data loaded.",
+      "zh": "人口数据已加载。"
+    },
+    "Population data could not be loaded. Retry.": {
+      "en": "Population data could not be loaded. Retry.",
+      "zh": "人口数据加载失败，请重试。"
+    },
+    "Saved population data version is unavailable.": {
+      "en": "Saved population data version is unavailable.",
+      "zh": "保存的人口数据版本不可用。"
+    },
+    "GHSL 2020 · 1 km source grid. Land area excludes mapped lakes; small parcels are area-weighted estimates.": {
+      "en": "GHSL 2020 · 1 km source grid. Land area excludes mapped lakes; small parcels are area-weighted estimates.",
+      "zh": "GHSL 2020 · 1 公里源栅格。陆地面积扣除已映射湖泊，小地块按相交面积估算。"
+    },
+    "Estimated population": {
+      "en": "Estimated population",
+      "zh": "估计人口"
+    },
+    "Known population (incomplete)": {
+      "en": "Known population (incomplete)",
+      "zh": "已知人口（覆盖不完整）"
+    },
+    "Mapped parcels": {
+      "en": "Mapped parcels",
+      "zh": "有数值地块"
+    },
+    "Population density": {
+      "en": "Population density",
+      "zh": "人口密度"
+    },
+    "persons/km²": {
+      "en": "persons/km²",
+      "zh": "人／平方公里"
+    },
+    "Population heatmap could not be loaded. Retry.": {
+      "en": "Population heatmap could not be loaded. Retry.",
+      "zh": "人口热力加载失败，请重试。"
+    },
+    "Loading population heatmap…": {
+      "en": "Loading population heatmap…",
+      "zh": "正在加载人口热力…"
+    },
+    "Showing overview; refining this view…": {
+      "en": "Showing overview; refining this view…",
+      "zh": "已显示全局概览，正在细化当前视野…"
+    },
     "Landform strength": {"en": "Landform strength", "zh": "地形强度"},
     "Land cover strength": {"en": "Land cover strength", "zh": "地表覆被强度"},
     "Physical region names": {"en": "Physical region names", "zh": "地貌区域名称"},
