@@ -5,6 +5,7 @@ import { createOceanRenderOwner } from "../js/core/renderer/ocean_render_owner.j
 
 function createCanvasContext() {
   const calls = [];
+  const stack = [];
   return {
     calls,
     fillStyle: "",
@@ -21,9 +22,12 @@ function createCanvasContext() {
     },
     restore() {
       calls.push({ type: "restore" });
+      Object.assign(this, stack.pop());
     },
     save() {
       calls.push({ type: "save" });
+      stack.push({ fillStyle: this.fillStyle, globalAlpha: this.globalAlpha, lineWidth: this.lineWidth,
+        strokeStyle: this.strokeStyle, lineCap: this.lineCap, lineJoin: this.lineJoin });
     },
     stroke(path) {
       calls.push({
@@ -130,6 +134,7 @@ function createOwner({
         },
       ],
       getOceanStyleConfig: () => oceanStyle,
+      getPhysicalLandMaskInfo: () => ({ collection: { type: "FeatureCollection", features: [createFeature(0)] } }),
       getProjectedLineDensityStats: (line) => ({ density: line[0][0] === 0 ? 5 : 0 }),
       getSafeCanvasColor: (value, fallback) => value || fallback,
       getScenarioCoastalAccentLineWidth: () => 2,
@@ -335,6 +340,74 @@ test("ocean owner suppresses coastal accents for HGO vector scenes", () => {
   assert.equal(harness.helperCalls.some((call) => call.type === "clip-atlantropa"), false);
   assert.equal(harness.pathCalls.length, 0);
   assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 0);
+});
+
+test("coastal transition uses physical land exclusion and conservative Atlantropa clipping for every coastline source", () => {
+  for (const coastlineSource of ["global", "scenario"]) {
+    for (const mode of ["topology_ocean", "sphere_minus_land"]) {
+      const events = [];
+      const harness = createOwner({ coastlineSource, helperOverrides: {
+        resolveOceanMask: () => ({ mode }),
+        applyOceanClipMask: (selectedMode) => events.push(["ocean-mask", selectedMode]),
+        clipOutAtlantropaAccentRegions: () => events.push(["atlantropa"]),
+      } });
+      harness.context.globalAlpha = 0.4;
+      harness.context.strokeStyle = "#333333";
+      harness.context.lineWidth = 0.9;
+      const drawn = harness.owner.drawCoastalTransition(2, { lineWidth: 0.9, buildPath: () => events.push(["build-path"]) });
+      assert.equal(drawn, true);
+      assert.deepEqual(events, [
+        ["ocean-mask", "sphere_minus_land"],
+        ["atlantropa"],
+        ["build-path"],
+      ]);
+      const stroke = harness.context.calls.find(call => call.type === "stroke");
+      assert.equal(stroke.strokeStyle, "#d7ebf5");
+      assert.equal(stroke.alpha, 0.75 * 0.13);
+      assert.equal(stroke.lineWidth, 2);
+      assert.equal(harness.context.globalAlpha, 0.4);
+      assert.equal(harness.context.strokeStyle, "#333333");
+      assert.equal(harness.context.lineWidth, 0.9);
+    }
+  }
+});
+
+test("coastal transition keeps a narrow screen-space extension across zooms", () => {
+  for (const k of [1, 2, 4, 8]) {
+    const harness = createOwner();
+    harness.owner.drawCoastalTransition(k, { lineWidth: 1.2 / k, buildPath: () => {} });
+    const stroke = harness.context.calls.find(call => call.type === "stroke");
+    assert.ok(Math.abs(stroke.lineWidth * k - 3.4) < 0.0001);
+  }
+});
+
+test("coastal transition rejects disabled or unusable requests before clipping or geometry", () => {
+  for (const state of [
+    { styleConfig: { coastlines: { opacity: 0 } } },
+    { activeScenarioManifest: { scenario_contract_profile: "hgo_vector" } },
+    { activeScenarioManifest: { performance_hints: { hgo_vector_scene_default: true } } },
+  ]) {
+    const harness = createOwner({ state });
+    assert.equal(harness.owner.drawCoastalTransition(2, { lineWidth: 1, buildPath: () => assert.fail("unexpected geometry") }), false);
+    assert.deepEqual(harness.helperCalls, []);
+    assert.deepEqual(harness.context.calls, []);
+  }
+  for (const options of [{}, { lineWidth: 0, buildPath: () => assert.fail("unexpected geometry") }]) {
+    const harness = createOwner();
+    assert.equal(harness.owner.drawCoastalTransition(2, options), false);
+    assert.deepEqual(harness.helperCalls, []);
+  }
+});
+
+test("coastal transition fails closed when no usable physical land mask exists", () => {
+  for (const maskInfo of [null, { collection: null }, { collection: null, maskSource: "none:rejected" }]) {
+    const harness = createOwner({ helperOverrides: { getPhysicalLandMaskInfo: () => maskInfo } });
+    assert.equal(harness.owner.drawCoastalTransition(2, {
+      lineWidth: 1, buildPath: () => assert.fail("unexpected geometry"),
+    }), false);
+    assert.deepEqual(harness.helperCalls, []);
+    assert.deepEqual(harness.context.calls, []);
+  }
 });
 
 for (const [method, paintType, visibilityHelper, metricName] of [

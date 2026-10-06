@@ -3225,8 +3225,8 @@ details.card[open] > summary::after {
   min-height: 0;
   height: 100%;
   background:
-    radial-gradient(circle at 50% 30%, rgba(70, 109, 160, 0.14), rgba(10, 18, 32, 0.94) 70%),
-    #091322;
+    radial-gradient(ellipse at 50% 35%, rgba(112, 148, 172, 0.14), rgba(8, 18, 30, 0.26) 72%),
+    #142333;
   overflow: hidden;
   padding: 0;
 }
@@ -3244,10 +3244,15 @@ details.card[open] > summary::after {
   height: auto;
   transform-origin: 0 0;
   will-change: transform;
-  background-color: #091322;
+  /* A stationary drafting surface, visible only outside the opaque map. */
+  background-color: #142333;
   background-image:
-    radial-gradient(circle at 50% 30%, rgba(70, 109, 160, 0.14), rgba(10, 18, 32, 0.94) 70%);
-  background-size: 100% 100%;
+    radial-gradient(ellipse at 50% 35%, rgba(112, 148, 172, 0.14), rgba(8, 18, 30, 0.26) 72%),
+    radial-gradient(circle, rgba(175, 202, 218, 0.2) 0.7px, transparent 1px),
+    linear-gradient(rgba(172, 195, 209, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(172, 195, 209, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px, 120px 120px, 120px 120px;
+  background-position: center;
   border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 18px;
   overflow: hidden;
