@@ -1,3 +1,4 @@
+import { drawWorldFrame } from "./world_frame_render.js";
 import {
   addRetainedPoliticalPath,
   advanceDeferredPoliticalBackgroundBuild,
@@ -1280,33 +1281,7 @@ export function createPoliticalBackgroundRenderOwner({
   }
 
   function drawBackgroundPass() {
-    const context = surface.getContext();
-    const state = getRuntimeState();
-    const k = Math.max(0.0001, Number(state.zoomTransform?.k) || 1);
-    const dpr = Math.max(0.1, Number(state.dpr) || 1);
-    const oceanFillColor = getOceanBaseFillColor();
-    context.save();
-    try {
-      // Canvas shadows use backing pixels, while strokes use projected units.
-      // Keep both quiet at every zoom and when export temporarily raises DPR.
-      context.shadowColor = "rgba(2, 8, 16, 0.38)";
-      context.shadowBlur = 12 * dpr;
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 3 * dpr;
-      surface.getContext().fillStyle = oceanFillColor;
-      surface.getContext().beginPath();
-      surface.getPathCanvas()({ type: "Sphere" });
-      surface.getContext().fill();
-      context.shadowColor = "transparent";
-      context.shadowBlur = 0;
-      context.shadowOffsetY = 0;
-      context.strokeStyle = "rgba(181, 206, 218, 0.46)";
-      context.lineWidth = 0.9 / k;
-      context.lineJoin = "round";
-      context.stroke();
-    } finally {
-      context.restore();
-    }
+    drawWorldFrame(surface, getRuntimeState(), getOceanBaseFillColor());
 
     // The opaque sphere already covers every projected ocean polygon with
     // this same color. Reprojecting the coastline here adds no visible layer.
