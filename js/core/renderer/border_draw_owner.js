@@ -53,6 +53,7 @@ export function createBorderDrawOwner({
     clamp = (value, min, max) => Math.min(max, Math.max(min, value)),
     buildCountryParentBorderMeshes = () => [],
     buildDetailAdmMeshSignature = () => ({ detailCountries: [], signature: "" }),
+    drawCoastalTransition = () => false,
     drawScenarioCoastalAccentLayer = () => {},
     drawRiverInternalContours = () => {},
     getCoastlineCollectionForZoom = () => [],
@@ -143,6 +144,29 @@ export function createBorderDrawOwner({
       pathCanvas(renderMesh);
       context.stroke();
     });
+  }
+
+  function drawCoastlineCollection(meshCollection, strokeStyle, lineWidth, k, { transformMesh = null } = {}) {
+    const context = getContext();
+    const pathCanvas = getPathCanvas();
+    if (!context || typeof pathCanvas !== "function" || !meshCollection?.length) return;
+    const meshes = meshCollection
+      .map((mesh) => mesh && transformMesh ? transformMesh(mesh) : mesh)
+      .filter((mesh) => isUsableMesh(mesh));
+    if (!meshes.length) return;
+    const buildPath = () => {
+      context.beginPath();
+      meshes.forEach((mesh) => pathCanvas(mesh));
+    };
+    // Clipping must precede path construction. Canvas save/restore preserves
+    // the current path, so the fine stroke can reuse the transition geometry.
+    if (!drawCoastalTransition(k, { lineWidth, buildPath })) buildPath();
+    context.strokeStyle = strokeStyle;
+    context.lineWidth = lineWidth;
+    context.lineJoin = boundaryDefaultLineJoin;
+    context.lineCap = boundaryDefaultLineCap;
+    context.miterLimit = boundaryDefaultMiterLimit;
+    context.stroke();
   }
 
   function declutterProjectedPolyline(line, minDistancePx, angleThresholdDeg, k = 1) {
@@ -489,7 +513,7 @@ export function createBorderDrawOwner({
 
     if (interactive) {
       const coastWidth = (coastWidthBase * 0.88) / kDenom;
-      const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines();
+      const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines() && coastOpacity > 0;
       const coastlineLow = drawCanonicalCoastlines
         ? (
           state.cachedCoastlinesLow?.length
@@ -505,7 +529,7 @@ export function createBorderDrawOwner({
 
       if (drawCanonicalCoastlines) {
         context.globalAlpha = coastOpacity * 0.78;
-        drawMeshCollection(coastlineLow, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
+        drawCoastlineCollection(coastlineLow, coastColor, coastWidth, k, { transformMesh: coastlineMeshTransform });
       }
 
       context.globalAlpha = 1.0;
@@ -569,7 +593,7 @@ export function createBorderDrawOwner({
       detailAdmBorderMinWidth,
       internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
     ) * detailAdmBorderWidthScale / kDenom;
-    const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines();
+    const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines() && coastOpacity > 0;
     const coastlineCollection = drawCanonicalCoastlines
       ? getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k)
       : null;
@@ -651,7 +675,7 @@ export function createBorderDrawOwner({
 
     if (drawCanonicalCoastlines) {
       context.globalAlpha = coastAlpha;
-      drawMeshCollection(coastlineCollection, coastColor, coastWidth, { transformMesh: coastlineMeshTransform });
+      drawCoastlineCollection(coastlineCollection, coastColor, coastWidth, k, { transformMesh: coastlineMeshTransform });
       drawScenarioCoastalAccentLayer(k, { interactive });
     }
 

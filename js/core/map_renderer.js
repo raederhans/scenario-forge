@@ -1957,6 +1957,7 @@ function getOceanRenderOwner() {
     helpers: {
       applyBathymetryCoverageExclusionMask,
       applyOceanClipMask,
+      getPhysicalLandMaskInfo,
       clamp,
       clipOutAtlantropaAccentRegions,
       doesOceanStyleRequireBathymetry,
@@ -2491,6 +2492,7 @@ function getBorderDrawOwner() {
       buildDetailAdmMeshSignature,
       clamp,
       drawScenarioCoastalAccentLayer,
+      drawCoastalTransition,
       getCoastlineCollectionForZoom,
       getInternalBorderStrokeColor,
       getSafeCanvasColor,
@@ -10810,6 +10812,10 @@ function drawScenarioCoastalAccentOverlays(k, { interactive = false } = {}) {
 
 function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
   return getOceanRenderOwner().drawScenarioCoastalAccentLayer(k, { interactive });
+}
+
+function drawCoastalTransition(k, options) {
+  return getOceanRenderOwner().drawCoastalTransition(k, options);
 }
 
 function resolveOceanMask() {

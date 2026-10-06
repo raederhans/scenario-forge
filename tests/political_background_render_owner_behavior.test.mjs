@@ -59,6 +59,7 @@ function createFixture({
     canvas: { width: 800, height: 400 },
     beginPath: () => calls.push("beginPath"),
     fill: (path) => { filledPaths.push(path); calls.push(path ? "fill:path" : "fill"); },
+    stroke: () => calls.push("stroke"),
     save: () => calls.push("save"),
     restore: () => calls.push("restore"),
     setTransform: () => calls.push("setTransform"),
@@ -307,10 +308,44 @@ test("background pass fills sphere once before ocean style and delegated depth s
   fixture.state.oceanData = feature("ocean");
   fixture.owner.drawBackgroundPass();
   assert.deepEqual(fixture.calls, [
-    "fillStyle:#001122", "beginPath", "path:Sphere", "fill",
+    "save", "fillStyle:#001122", "beginPath", "path:Sphere", "fill", "stroke", "restore",
     "ocean:style", "commit:intensity",
   ]);
   assert.equal(fixture.state.intensityFields.normalized, true);
+});
+
+test("world frame retains its screen width and shadow scale across zoom and export DPR", () => {
+  for (const [k, dpr] of [[1, 1], [4, 2], [0.5, 3]]) {
+    const fixture = createFixture();
+    fixture.state.zoomTransform.k = k;
+    fixture.state.dpr = dpr;
+    const original = {
+      shadowColor: "#123456", shadowBlur: 2, shadowOffsetX: 1, shadowOffsetY: 1,
+      strokeStyle: "#654321", lineWidth: 7, lineJoin: "bevel",
+    };
+    const keys = Object.keys(original);
+    const snapshot = () => Object.fromEntries(keys.map(key => [key, fixture.context[key]]));
+    const stack = [];
+    const fills = [];
+    const strokes = [];
+    Object.assign(fixture.context, original);
+    fixture.context.save = () => stack.push(snapshot());
+    fixture.context.restore = () => Object.assign(fixture.context, stack.pop());
+    fixture.context.fill = () => fills.push(snapshot());
+    fixture.context.stroke = () => strokes.push(snapshot());
+
+    fixture.owner.drawBackgroundPass();
+
+    assert.equal(fills.length, 1, "the world silhouette is filled only once");
+    assert.equal(strokes.length, 1, "the same silhouette receives one fine rim");
+    assert.equal(fills[0].shadowBlur / dpr, 12);
+    assert.equal(fills[0].shadowOffsetY / dpr, 3);
+    assert.equal(strokes[0].lineWidth * k, 0.9);
+    assert.equal(strokes[0].shadowColor, "transparent", "the fine rim does not cast a second shadow");
+    assert.equal(strokes[0].shadowBlur, 0);
+    assert.deepEqual(snapshot(), original, "frame styles do not leak into subsequent map layers");
+    assert.equal(stack.length, 0);
+  }
 });
 
 test("ocean base never reprojects redundant ocean polygons after camera, color, DPR or source changes", () => {
@@ -815,6 +850,7 @@ test("background sphere drawing failures propagate without running later ocean e
   const fixture = createFixture();
   fixture.surface.getPathCanvas = () => () => { throw new Error("sphere projection failed"); };
   assert.throws(() => fixture.owner.drawBackgroundPass(), /sphere projection failed/);
+  assert.equal(fixture.calls.at(-1), "restore");
   assert.equal(fixture.calls.includes("ocean:style"), false);
   assert.equal(fixture.calls.includes("commit:intensity"), false);
 });

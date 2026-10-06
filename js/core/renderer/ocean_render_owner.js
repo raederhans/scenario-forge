@@ -14,6 +14,7 @@ export function createOceanRenderOwner({
     COASTLINE_LOD_LOW_ZOOM_MAX = 1.8,
     COASTLINE_LOD_MID_ZOOM_MAX = 3.2,
     OCEAN_MASK_MODE_BATHYMETRY = "bathymetry_features",
+    OCEAN_MASK_MODE_SPHERE_MINUS_LAND = "sphere_minus_land",
     OCEAN_MASK_MODE_TOPOLOGY = "topology_ocean",
     TNO_COASTAL_ACCENT_COLOR = "rgba(214, 232, 244, 0.88)",
   } = constants;
@@ -39,6 +40,7 @@ export function createOceanRenderOwner({
     getBathymetryPresetProfile = () => ({}),
     getCoastlineCollectionForZoom = () => [],
     getOceanStyleConfig = () => ({}),
+    getPhysicalLandMaskInfo = () => ({ collection: null }),
     publishBathymetryVisibility = () => {},
     paintGlobalBathymetry = (draw) => draw(),
     getProjectedGeographicPath = () => null,
@@ -66,6 +68,42 @@ export function createOceanRenderOwner({
       ? manifest.performance_hints
       : {};
     return performanceHints.hgo_vector_scene_default === true;
+  }
+
+  function drawCoastalTransition(k, { lineWidth = 0, buildPath } = {}) {
+    const context = getContext();
+    if (!context || typeof buildPath !== "function" || !(lineWidth > 0)
+      || isHgoVectorSceneActive()) return false;
+    const coastStyle = runtimeState.styleConfig?.coastlines || {};
+    const opacity = clamp(
+      Number.isFinite(Number(coastStyle.opacity)) ? Number(coastStyle.opacity) : 0.8,
+      0,
+      1
+    );
+    if (!(opacity > 0)) return false;
+    // The generic ocean clip can fall back to ocean-only or sphere-only when
+    // no land mask is usable; that fallback cannot prove a sea-side transition.
+    if (!getPhysicalLandMaskInfo()?.collection) return false;
+    const zoom = Number.isFinite(Number(k)) && Number(k) > 0 ? Number(k) : 1;
+    context.save();
+    try {
+      // Topology ocean can still cover scenario reclaimed land. Use the
+      // current physical land exclusion and conservatively suppress Atlantropa
+      // even when the fine coastline comes from dedicated scenario geometry.
+      applyOceanClipMask(OCEAN_MASK_MODE_SPHERE_MINUS_LAND);
+      clipOutAtlantropaAccentRegions();
+      context.strokeStyle = "#d7ebf5";
+      context.globalAlpha = opacity * 0.13;
+      // The water clip keeps only the sea half of this narrow screen-space rim.
+      context.lineWidth = lineWidth + (2.2 / zoom);
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      buildPath();
+      context.stroke();
+    } finally {
+      context.restore();
+    }
+    return true;
   }
 
   function drawBathymetryBands(collection, oceanStyle) {
@@ -351,6 +389,7 @@ export function createOceanRenderOwner({
     drawBathymetryBands,
     drawBathymetryContours,
     drawCoastalAccentStrokeBuckets,
+    drawCoastalTransition,
     drawOceanStyle,
     drawScenarioCoastalAccentLayer,
     drawScenarioCoastalAccentOverlays,
