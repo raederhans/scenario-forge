@@ -1,3 +1,4 @@
+import { drawWorldFrame } from "./world_frame_render.js";
 import {
   addRetainedPoliticalPath,
   advanceDeferredPoliticalBackgroundBuild,
@@ -1280,11 +1281,7 @@ export function createPoliticalBackgroundRenderOwner({
   }
 
   function drawBackgroundPass() {
-    const oceanFillColor = getOceanBaseFillColor();
-    surface.getContext().fillStyle = oceanFillColor;
-    surface.getContext().beginPath();
-    surface.getPathCanvas()({ type: "Sphere" });
-    surface.getContext().fill();
+    drawWorldFrame(surface, getRuntimeState(), getOceanBaseFillColor());
 
     // The opaque sphere already covers every projected ocean polygon with
     // this same color. Reprojecting the coastline here adds no visible layer.

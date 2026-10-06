@@ -62,6 +62,7 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         imports = re.findall(r'^\s*import\s[\s\S]*?\bfrom\s+"([^"]+)";', owner, re.MULTILINE)
         self.assertCountEqual(imports, [
             "./political_background_build_helpers.js",
+            "./world_frame_render.js",
         ])
         self.assertIn("politicalPathResourceAccounting: getProjectedPathResourceAccounting(pageResourceBudget)", renderer)
         for forbidden in ("runtimeState", "document.", "window.", "globalThis", "from \"../map_renderer"):
@@ -125,10 +126,13 @@ class PoliticalBackgroundRenderOwnerBoundaryContractTest(unittest.TestCase):
         owner = OWNER.read_text(encoding="utf-8")
         background = owner[owner.index("function drawBackgroundPass()") :]
         cursor = -1
-        for token in ('{ type: "Sphere" }', "surface.getContext().fill();", "drawOceanStyle();", "drawOceanDepthMaskLayer();"):
+        for token in ('drawWorldFrame(surface, getRuntimeState(), getOceanBaseFillColor());', "drawOceanStyle();", "drawOceanDepthMaskLayer();"):
             cursor = background.find(token, cursor + 1)
             self.assertGreaterEqual(cursor, 0, token)
         self.assertNotIn("state.oceanData", background)
+        frame = (OWNER.parent / "world_frame_render.js").read_text(encoding="utf-8")
+        self.assertIn('{ type: "Sphere" }', frame)
+        self.assertIn("surface.getContext().fill();", frame)
         progressive = owner[owner.index("if (useProgressiveRecovery)") : owner.index("    return drawPoliticalBackgroundFillsForEntries(visibleEntries", owner.index("if (useProgressiveRecovery)"))]
         self.assertNotIn("drawAdmin0BackgroundFills(", progressive)
         cursor = -1

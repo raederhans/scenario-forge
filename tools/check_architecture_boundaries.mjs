@@ -5758,10 +5758,11 @@ function collectFailures() {
 
   for (const rule of ownershipRules) {
     const ownerSource = sources[rule.ownerPath];
-    // This owner delegates pure deferred-build bookkeeping to one local helper;
+    // This owner delegates deferred-build bookkeeping and isolated frame drawing;
     // all other imports and host/runtime dependencies remain forbidden.
     const forbiddenSource = rule.ownerPath === FILES.politicalBackgroundRenderOwner
       ? ownerSource.replace(/^import \{[^;]*\} from "\.\/political_background_build_helpers\.js";\r?\n/m, "")
+        .replace(/^import \{ drawWorldFrame \} from "\.\/world_frame_render\.js";\r?\n/m, "")
       : ownerSource;
     for (const token of rule.ownerTokens) {
       if (!ownerSource.includes(token)) {
