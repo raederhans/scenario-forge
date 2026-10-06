@@ -2292,6 +2292,25 @@ details.appearance-subsection > *:not(summary),
   gap: 12px;
 }
 
+.thematic-wgi-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin-top: 12px;
+  font-size: 0.78rem;
+}
+
+.thematic-wgi-legend[hidden] {
+  display: none;
+}
+
+.thematic-wgi-legend > p {
+  grid-column: 1 / -1;
+  margin: 2px 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
 .appearance-preset-list {
   min-height: 34px;
   max-height: 118px;

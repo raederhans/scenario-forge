@@ -264,7 +264,19 @@
       "required": ["status"],
       "properties": {
         "status": {
-          "enum": ["not_wired", "catalog_only", "runtime_ready"]
+          "enum": ["not_wired", "catalog_only", "runtime_ready", "main_map_ready"]
+        },
+        "supported_metrics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "\\S"}
+        },
+        "supported_scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "\\S"}
         }
       },
       "additionalProperties": true

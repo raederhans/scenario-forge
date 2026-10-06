@@ -37,24 +37,55 @@ WGI_RECIPE_RELATIVE_PATH = "thematic_layers/source_recipes/wgi_state_capacity_v1
 
 WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID = "wgi_government_effectiveness_score_0_100"
 WGI_RULE_OF_LAW_METRIC_ID = "wgi_rule_of_law_score_0_100"
+WGI_VOICE_AND_ACCOUNTABILITY_METRIC_ID = "wgi_voice_and_accountability_score_0_100"
+WGI_POLITICAL_STABILITY_METRIC_ID = "wgi_political_stability_score_0_100"
+WGI_REGULATORY_QUALITY_METRIC_ID = "wgi_regulatory_quality_score_0_100"
+WGI_CONTROL_OF_CORRUPTION_METRIC_ID = "wgi_control_of_corruption_score_0_100"
 WGI_COMPOSITE_METRIC_ID = "wgi_state_capacity_composite_0_100"
-WGI_METRIC_IDS = (
+WGI_RUNTIME_DATA_VERSION = "wgi-2025-revision-v7:2024"
+WGI_COUNTRY_MAPPING_RELATIVE_PATH = "thematic_layers/wgi_country_code_mapping.json"
+WGI_RUNTIME_METRIC_IDS = (
     WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID,
     WGI_RULE_OF_LAW_METRIC_ID,
+    WGI_VOICE_AND_ACCOUNTABILITY_METRIC_ID,
+    WGI_POLITICAL_STABILITY_METRIC_ID,
+    WGI_REGULATORY_QUALITY_METRIC_ID,
+    WGI_CONTROL_OF_CORRUPTION_METRIC_ID,
+)
+WGI_RUNTIME_SCENARIO_IDS = ("modern_world", "hoi4_1936", "hoi4_1939", "tno_1962")
+WGI_RUNTIME_METHOD = (
+    "Official 2024 scores for all six WGI dimensions passed through on the 0-100 scale; "
+    "modern_world uses geographic country codes, while supported historical scenarios use "
+    "baseline owner reference mapping; no project composite or historical measurement."
+)
+WGI_METRIC_IDS = (
+    *WGI_RUNTIME_METRIC_IDS,
     WGI_COMPOSITE_METRIC_ID,
 )
 
 DIMENSION_SHEETS = {
     "ge": "government_effectiveness",
     "rl": "rule_of_law",
+    "va": "voice_and_accountability",
+    "pv": "political_stability",
+    "rq": "regulatory_quality",
+    "cc": "control_of_corruption",
 }
 DIMENSION_TO_METRIC_ID = {
     "government_effectiveness": WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID,
     "rule_of_law": WGI_RULE_OF_LAW_METRIC_ID,
+    "voice_and_accountability": WGI_VOICE_AND_ACCOUNTABILITY_METRIC_ID,
+    "political_stability": WGI_POLITICAL_STABILITY_METRIC_ID,
+    "regulatory_quality": WGI_REGULATORY_QUALITY_METRIC_ID,
+    "control_of_corruption": WGI_CONTROL_OF_CORRUPTION_METRIC_ID,
 }
 WGI_OFFICIAL_DIMENSIONS = {
     "government_effectiveness": "Government Effectiveness",
     "rule_of_law": "Rule of Law",
+    "voice_and_accountability": "Voice and Accountability",
+    "political_stability": "Political Stability and Absence of Violence/Terrorism",
+    "regulatory_quality": "Regulatory Quality",
+    "control_of_corruption": "Control of Corruption",
 }
 
 SOURCE_CODE_TO_ISO_A3 = {
@@ -365,10 +396,10 @@ def _read_csv_rows(path: Path) -> Iterable[tuple[str, dict[str, Any], int]]:
         for row_number, row in enumerate(reader, start=2):
             dimension_value = _normalize_header(_select_field(row, ("Governance dimension", "dimension")))
             dimension = ""
-            if "government effectiveness" in dimension_value or dimension_value == "ge":
-                dimension = "government_effectiveness"
-            elif "rule of law" in dimension_value or dimension_value == "rl":
-                dimension = "rule_of_law"
+            for sheet_name, candidate in DIMENSION_SHEETS.items():
+                if dimension_value in {sheet_name, candidate} or _normalize_header(WGI_OFFICIAL_DIMENSIONS[candidate]) in dimension_value:
+                    dimension = candidate
+                    break
             yield dimension, row, row_number
 
 
@@ -551,30 +582,20 @@ def build_admin_metrics_payload(
         ge_observation = by_join_key[join_key].get("government_effectiveness")
         rl_observation = by_join_key[join_key].get("rule_of_law")
         values = {
-            WGI_GOVERNMENT_EFFECTIVENESS_METRIC_ID: (
-                _observed_metric_payload(ge_observation)
-                if ge_observation
+            metric_id: (
+                _observed_metric_payload(by_join_key[join_key][dimension])
+                if dimension in by_join_key[join_key]
                 else _missing_metric_payload(
                     year=selected_year,
                     source_status="source_gap",
-                    notes="WGI government effectiveness source row is missing.",
+                    notes=f"WGI {dimension.replace('_', ' ')} source row is missing.",
                 )
-            ),
-            WGI_RULE_OF_LAW_METRIC_ID: (
-                _observed_metric_payload(rl_observation)
-                if rl_observation
-                else _missing_metric_payload(
-                    year=selected_year,
-                    source_status="source_gap",
-                    notes="WGI rule of law source row is missing.",
-                )
-            ),
-            WGI_COMPOSITE_METRIC_ID: _composite_metric_payload(
-                ge_observation,
-                rl_observation,
-                selected_year=selected_year,
-            ),
+            )
+            for dimension, metric_id in DIMENSION_TO_METRIC_ID.items()
         }
+        values[WGI_COMPOSITE_METRIC_ID] = _composite_metric_payload(
+            ge_observation, rl_observation, selected_year=selected_year,
+        )
         missing_count = sum(1 for value in values.values() if value["raw_value"] is None)
         coverage_status = "complete"
         if missing_count == len(values):
@@ -653,6 +674,18 @@ def _outlier_payload(metrics_payload: dict[str, Any], metric_id: str, *, limit: 
     }
 
 
+def build_wgi_historical_reference_policy() -> dict[str, Any]:
+    return {
+        "mode": "baseline_owner_reference_mapping",
+        "reference_year": WGI_SELECTED_YEAR,
+        "supported_scenarios": list(WGI_RUNTIME_SCENARIO_IDS[1:]),
+        "join_method": "Baseline owner tag -> scenarioCountriesByTag[tag].base_iso2 (explicit two-letter ISO2) -> existing ISO2-to-ISO3 mapping -> official WGI country/economy score.",
+        "unknown_mapping_policy": "Leave unmapped owners blank; do not infer from tags, parent countries, or modern feature geography.",
+        "interpretation": "2024 governance reference values mapped to scenario baseline owners; not observed governance measurements for historical years.",
+        "historical_measurement": False,
+    }
+
+
 def build_wgi_recipe_payload(generated_at: str) -> dict[str, Any]:
     return {
         "schema_version": 1,
@@ -678,17 +711,25 @@ def build_wgi_recipe_payload(generated_at: str) -> dict[str, Any]:
                 "temporal_coverage": "1996-2024",
                 "license": WGI_LICENSE,
                 "citation": WGI_CITATION,
-                "selection_rule": "Use 2024 country/economy rows from official ge and rl sheets; derive a project proxy only when both scores exist.",
+                "selection_rule": "Use 2024 country/economy rows from all six official WGI sheets; derive the project proxy only when Government Effectiveness and Rule of Law scores both exist.",
             }
         ],
         "metric_selection": {
             "year": WGI_SELECTED_YEAR,
-            "source_sheets": {"ge": "government_effectiveness", "rl": "rule_of_law"},
+            "source_sheets": DIMENSION_SHEETS,
             "official_dimensions": WGI_OFFICIAL_DIMENSIONS,
             "metrics": list(WGI_METRIC_IDS),
             "project_defined_metrics": {
                 WGI_COMPOSITE_METRIC_ID: "Mean of Government Effectiveness and Rule of Law when both source scores are observed."
             },
+        },
+        "runtime_selection": {
+            "data_version": WGI_RUNTIME_DATA_VERSION,
+            "supported_metrics": list(WGI_RUNTIME_METRIC_IDS),
+            "supported_scenarios": list(WGI_RUNTIME_SCENARIO_IDS),
+            "country_code_mapping": data_url(WGI_COUNTRY_MAPPING_RELATIVE_PATH),
+            "method": WGI_RUNTIME_METHOD,
+            "historical_reference_policy": build_wgi_historical_reference_policy(),
         },
         "join_key_policy": {
             "join_key_type": "iso_a3",
@@ -715,7 +756,7 @@ def build_manifest_payload(
         "layer_id": WGI_LAYER_ID,
         "theme": "political",
         "title": "WGI Governance Proxy",
-        "description": "World Bank WGI 2024 admin0 Government Effectiveness and Rule of Law scores with a project-defined state-capacity proxy.",
+        "description": "World Bank WGI 2024 admin0 scores for all six official governance dimensions with a project-defined Government Effectiveness and Rule of Law state-capacity proxy.",
         "geometry_kind": "admin0",
         "metric_ids": list(WGI_METRIC_IDS),
         "period": {
@@ -752,7 +793,7 @@ def build_manifest_payload(
                 "selected_year": WGI_SELECTED_YEAR,
                 "license": WGI_LICENSE,
                 "citation": WGI_CITATION,
-                "selection_rule": "Use 2024 rows from official ge and rl sheets; mean the two 0-100 scores only for the project-defined proxy when both source scores are present.",
+                "selection_rule": "Use 2024 rows from all six official WGI sheets; mean Government Effectiveness and Rule of Law 0-100 scores only for the project-defined proxy when both source scores are present.",
                 "source_cache_path": signature.repo_relative_path,
                 "source_sha256": signature.sha256,
                 "source_size_bytes": signature.size_bytes,
@@ -785,16 +826,23 @@ def build_manifest_payload(
         "generated_at": generated_at,
         "build_command": "python tools/build_thematic_layers.py --include-wgi-real",
         "runtime_consumer": {
-            "status": "catalog_only",
-            "entry": "thematic_layer_catalog",
-            "supports_main_map_render": False,
+            "status": "main_map_ready",
+            "entry": "thematic_wgi_runtime",
+            "supports_main_map_render": True,
+            "data_version": WGI_RUNTIME_DATA_VERSION,
+            "supported_metrics": list(WGI_RUNTIME_METRIC_IDS),
+            "supported_scenarios": list(WGI_RUNTIME_SCENARIO_IDS),
+            "country_code_mapping": data_url(WGI_COUNTRY_MAPPING_RELATIVE_PATH),
+            "method": WGI_RUNTIME_METHOD,
+            "historical_reference_policy": build_wgi_historical_reference_policy(),
         },
         "limitations": [
             "WGI scores are country/economy-level governance indicators and are not subnational topology measures.",
             "The state-capacity proxy is a project-defined two-indicator mean, not an official World Bank index or rating.",
             "WGI includes uncertainty; source metric standard errors and 90% confidence intervals are preserved in metrics.admin0.json.",
             "Rows without explicit join keys stay out of the metric payload and are reported in build_audit.",
-            "The layer is catalog-only until a later UI/runtime rendering phase accepts it.",
+            "Main-map rendering uses all six official 2024 WGI dimension scores; supported historical scenarios show baseline owner reference mappings, not historical measurements. The project-defined proxy remains catalog metadata.",
+            "Historical scenario owners without an explicit two-letter base_iso2 in the existing ISO2-to-ISO3 mapping remain blank; tags, parent countries, and modern feature geography are not fallback sources.",
         ],
     }
 
@@ -809,6 +857,24 @@ def build_audit_payload(
     generated_at: str,
     accessed_at: str,
 ) -> dict[str, Any]:
+    dimension_coverage: dict[str, dict[str, Any]] = {}
+    for dimension, metric_id in DIMENSION_TO_METRIC_ID.items():
+        metrics = [feature["values"][metric_id] for feature in metrics_payload["features"]]
+        source_rows_mapped = sum("source_row_ref" in metric for metric in metrics)
+        unmatched = sum(row.dimension == dimension for row in unmatched_rows)
+        aggregate = sum(row.dimension == dimension for row in aggregate_rows)
+        observed = sum(metric["source_status"] == "observed" for metric in metrics)
+        dimension_coverage[dimension] = {
+            "metric_id": metric_id,
+            "selected_source_rows": source_rows_mapped + unmatched + aggregate,
+            "source_rows_mapped": source_rows_mapped,
+            "observed": observed,
+            "source_gap": len(metrics) - observed,
+            "source_rows_with_missing_score": source_rows_mapped - observed,
+            "missing_source_rows": len(metrics) - source_rows_mapped,
+            "source_rows_unmatched": unmatched,
+            "source_rows_dropped_aggregate": aggregate,
+        }
     warnings: list[str] = []
     if unmatched_rows:
         warnings.append(f"{len(unmatched_rows)} WGI source rows were not mapped to ISO_A3 join keys.")
@@ -847,14 +913,14 @@ def build_audit_payload(
             "metric_count": len(WGI_METRIC_IDS),
             "source_rows_unmatched": len(unmatched_rows),
             "source_rows_dropped_aggregate": len(aggregate_rows),
+            "dimensions": dimension_coverage,
         },
         "missing_join_keys": [],
         "unmatched_source_rows": [_source_row_payload(row) for row in unmatched_rows],
         "dropped_aggregate_rows": [_source_row_payload(row) for row in aggregate_rows],
         "outliers": [_outlier_payload(metrics_payload, metric_id) for metric_id in WGI_METRIC_IDS],
         "normalization_summary": {
-            "government_effectiveness": "WGI Governance score (0-100) passthrough.",
-            "rule_of_law": "WGI Governance score (0-100) passthrough.",
+            **{dimension: "WGI Governance score (0-100) passthrough." for dimension in DIMENSION_TO_METRIC_ID},
             "state_capacity_composite": "Project-defined mean of government effectiveness and rule of law when both are observed.",
             "missing_value_policy": "Null raw_value and normalized_value for source_gap or partial_source_gap.",
             "uncertainty_policy": "Preserve source metric standard errors and 90% confidence intervals; do not infer composite uncertainty.",

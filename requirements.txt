@@ -12,3 +12,4 @@ topojson
 pandas
 scipy
 rasterio
+exactextract==0.3.0

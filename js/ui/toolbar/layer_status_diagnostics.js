@@ -14,6 +14,7 @@ import {
   THEMATIC_LAYER_RENDER_DISABLED_REASON,
   THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON,
   THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON,
+  THEMATIC_MAIN_MAP_SUPPORT_LABEL,
 } from "../../core/thematic_layer_catalog.js";
 import {
   getLayerPanelContractById,
@@ -435,7 +436,8 @@ export function buildThematicCatalogDiagnostic({
       `${loadedManifestCount} ${translateUi(translate, "manifests")}`,
       fixtureOnlyCount > 0 ? translateUi(translate, "Fixture only") : "",
       hiddenByDefaultCount > 0 ? translateUi(translate, "Hidden by default") : "",
-      translateUi(translate, THEMATIC_LAYER_RENDER_DISABLED_REASON),
+      translateUi(translate, layers.some((layer) => layer.supportsMainMapRender)
+        ? THEMATIC_MAIN_MAP_SUPPORT_LABEL : THEMATIC_LAYER_RENDER_DISABLED_REASON),
       hasRealSourceNotIngested ? translateUi(translate, THEMATIC_REAL_SOURCE_NOT_INGESTED_REASON) : "",
       hasRealSourceDerivedMetadata ? translateUi(translate, THEMATIC_REAL_SOURCE_DERIVED_METADATA_REASON) : "",
     );

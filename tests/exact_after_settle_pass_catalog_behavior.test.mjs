@@ -28,6 +28,7 @@ const EXPECTED_DEFERRED_PASS_NAMES = [
 
 const EXPECTED_ALWAYS_TARGET_PASSES = [
   "political",
+  "populationHeatmap",
   "borders",
   "labels",
   "textureLabels",

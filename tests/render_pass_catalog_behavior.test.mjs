@@ -15,6 +15,7 @@ const EXPECTED_RENDER_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "hgoPreview",
   "contextBase",
   "contextScenario",
@@ -31,6 +32,7 @@ const EXPECTED_TRANSFORM_REUSED_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "hgoPreview",
   "contextBase",
   "contextScenario",
@@ -44,6 +46,7 @@ const EXPECTED_INTERACTION_COMPOSITE_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "contextBase",
   "contextScenario",
   "effects",
@@ -56,6 +59,7 @@ const EXPECTED_TRANSFORMED_FRAME_PASS_NAMES = [
   "background",
   "physicalBase",
   "political",
+  "populationHeatmap",
   "hgoPreview",
   "contextBase",
   "contextScenario",
@@ -133,4 +137,13 @@ test("enabled loading layers remain required and contour-only keeps its contour 
   assert.ok(!active.includes("effects"));
   assert.deepEqual(filterEnabledRenderPassNames(["effects", "lineEffects", "textureLabels"], { textureMode: "paper" }), ["effects"]);
   assert.deepEqual(filterEnabledRenderPassNames(["effects", "lineEffects", "textureLabels"], { textureMode: "draft_grid" }), ["lineEffects"]);
+});
+
+
+test("population heatmap visibility requires the explicit switch, including loading data", () => {
+  assert.ok(!filterEnabledRenderPassNames(RENDER_PASS_NAMES).includes("populationHeatmap"));
+  const enabled = filterEnabledRenderPassNames(RENDER_PASS_NAMES, { populationHeatmapEnabled: true });
+  assert.equal(enabled.indexOf("populationHeatmap"), enabled.indexOf("political") + 1);
+  assert.ok(enabled.indexOf("populationHeatmap") < enabled.indexOf("borders"));
+  assert.ok(filterEnabledRenderPassNames(INTERACTION_COMPOSITE_PASS_NAMES, { populationHeatmapEnabled: true }).includes("populationHeatmap"));
 });

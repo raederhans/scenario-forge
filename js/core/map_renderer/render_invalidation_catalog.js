@@ -12,6 +12,7 @@ export const PASS_RESOURCE_MAP = Object.freeze({
   background: Object.freeze(["backgroundBuffer"]),
   physicalBase: Object.freeze(["physicalBaseBuffer"]),
   political: Object.freeze(["politicalBaseBuffer", "hitIndex"]),
+  populationHeatmap: Object.freeze(["populationHeatmapBuffer"]),
   hgoPreview: Object.freeze(["hgoPreviewBuffer"]),
   contextBase: Object.freeze(["contextBaseBuffer"]),
   contextScenario: Object.freeze(["contextScenarioBuffer"]),

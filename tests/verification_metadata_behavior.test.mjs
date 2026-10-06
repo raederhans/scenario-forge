@@ -53,6 +53,39 @@ import {
 
 const REPO_ROOT = process.cwd();
 
+test("WGI, UNDP and WDI thematic sources, observations and behavior tests select the dedicated child-safe route", () => {
+  const routes = buildRouteIndex();
+  const route = routes.find((entry) => entry.id === "node:test:node:thematic-wgi");
+  assert.ok(route);
+  assert.equal(route.commandRef, "test:node:thematic-wgi");
+  assert.equal(route.executionOwner, "child-safe");
+  assert.deepEqual(route.resourceLocks, []);
+  const files = [
+    "tests/thematic_hdi_data_behavior.test.mjs", "tests/thematic_hdi_rendering_behavior.test.mjs",
+    "tests/thematic_population_data_behavior.test.mjs", "tests/thematic_population_rendering_behavior.test.mjs",
+    "js/core/thematic_population_data.js",
+    "data/thematic_layers/population/wdi_population_v1/manifest.json",
+    "data/thematic_layers/population/wdi_population_v1/metrics.admin0.json",
+    "js/core/thematic_hdi_data.js", "js/core/thematic_indicator_catalog.js",
+    "data/thematic_layers/social/human_development_v1/manifest.json",
+    "data/thematic_layers/social/human_development_v1/metrics.admin0.json",
+    "tests/thematic_wgi_data_behavior.test.mjs", "tests/thematic_wgi_runtime_behavior.test.mjs",
+    "tests/thematic_wgi_owner_behavior.test.mjs", "tests/thematic_wgi_rendering_behavior.test.mjs",
+    "js/core/thematic_wgi_data.js", "js/core/thematic_wgi_runtime.js",
+    "js/core/thematic_wgi_view_model.js", "js/core/state/actions/thematic_wgi_actions.js",
+    "js/ui/toolbar/thematic_wgi_owner.js", "js/core/renderer/thematic_wgi_export_legend.js",
+    "data/thematic_layers/wgi_country_code_mapping.json",
+    "data/thematic_layers/political/wgi_state_capacity_v1/manifest.json",
+    "data/thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json",
+  ];
+  for (const file of files) {
+    const recommendation = buildRepositoryRecommendation([file]);
+    assert.deepEqual(recommendation.unmatchedChangedFiles, [], file);
+    assert.ok(recommendation.recommendedCommands.some((command) => command.commandRef === route.commandRef), file);
+    assert.deepEqual(buildExecutionPlan(recommendation).routeGaps, [], file);
+  }
+});
+
 test("HOI4 manual rules select the existing scenario checks without a route gap", () => {
   const report = buildRepositoryRecommendation(["data/scenario-rules/hoi4_1936.manual.json"]);
   const plan = buildExecutionPlan(report);

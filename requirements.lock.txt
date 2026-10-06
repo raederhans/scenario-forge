@@ -7,6 +7,7 @@ cligj==0.7.2
 colorama==0.4.6
 contourpy==1.3.3
 cycler==0.12.1
+exactextract==0.3.0
 fonttools==4.62.1
 geopandas==1.1.3
 idna==3.11

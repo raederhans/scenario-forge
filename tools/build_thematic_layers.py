@@ -27,11 +27,32 @@ from map_builder.thematic_layer_contracts import (
 from map_builder.thematic_wgi_ingest import (
     DEFAULT_WGI_SOURCE_CACHE_PATH,
     WGI_AUDIT_RELATIVE_PATH,
+    WGI_COUNTRY_MAPPING_RELATIVE_PATH,
+    WGI_RUNTIME_METRIC_IDS,
+    WGI_RUNTIME_SCENARIO_IDS,
+    WGI_RUNTIME_METHOD,
+    build_wgi_historical_reference_policy,
     WGI_LAYER_ID,
     WGI_MANIFEST_RELATIVE_PATH,
     WGI_METRICS_RELATIVE_PATH,
     WGI_RECIPE_RELATIVE_PATH as WGI_REAL_RECIPE_RELATIVE_PATH,
+    WGI_RUNTIME_DATA_VERSION,
     build_wgi_real_source_payloads,
+)
+from map_builder.thematic_hdi_ingest import (
+    DEFAULT_HDI_SOURCE_CACHE_PATH,
+    HDI_LAYER_ID as HDI_REAL_LAYER_ID,
+    HDI_MANIFEST_RELATIVE_PATH as HDI_REAL_MANIFEST_RELATIVE_PATH,
+    HDI_METRICS_RELATIVE_PATH as HDI_REAL_METRICS_RELATIVE_PATH,
+    HDI_OUTPUT_PATHS as HDI_REAL_OUTPUT_PATHS,
+    build_hdi_real_source_payloads,
+    hdi_runtime_selection,
+)
+from map_builder.thematic_population_ingest import (
+    DEFAULT_POPULATION_SOURCE_CACHE_DIR, POPULATION_LAYER_ID,
+    POPULATION_MANIFEST_RELATIVE_PATH, POPULATION_METRICS_RELATIVE_PATH,
+    POPULATION_OUTPUT_PATHS, build_population_real_source_payloads,
+    population_runtime_selection,
 )
 
 
@@ -142,6 +163,28 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_WGI_SOURCE_CACHE_PATH,
         help="Local WGI .xlsx or .csv cache path used only with --include-wgi-real.",
+    )
+    parser.add_argument(
+        "--include-hdi-real",
+        action="store_true",
+        help="Regenerate only the UNDP HDR 2025 real-source layer and its registrations from the local cache.",
+    )
+    parser.add_argument(
+        "--hdi-source-cache-path",
+        type=Path,
+        default=DEFAULT_HDI_SOURCE_CACHE_PATH,
+        help="Local HDR 2025 CSV cache path used with --include-hdi-real.",
+    )
+    parser.add_argument(
+        "--include-population-real",
+        action="store_true",
+        help="Regenerate only the pinned WDI population layer and registrations from local API caches.",
+    )
+    parser.add_argument(
+        "--population-source-cache-dir",
+        type=Path,
+        default=DEFAULT_POPULATION_SOURCE_CACHE_DIR,
+        help="Local complete WDI API JSON cache directory used with --include-population-real.",
     )
     parser.add_argument(
         "--skip-runtime-registry",
@@ -444,6 +487,34 @@ def build_wgi_index_entry(manifest: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_hdi_index_entry(manifest: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "layer_id": HDI_REAL_LAYER_ID,
+        "theme": "social",
+        "title": manifest["title"],
+        "description": manifest["description"],
+        "geometry_kind": "admin0",
+        "manifest_path": data_url(HDI_REAL_MANIFEST_RELATIVE_PATH),
+        "status": manifest["status"],
+        "source_policy": manifest["source_policy"],
+        "coverage_scope": f"{manifest['feature_counts']['features']} admin0 ISO_A3 source-cache features",
+        "default_visible": False,
+        "default_style": {"renderer": "choropleth", "palette": "plasma_0_100", "opacity": 0.72, "neutral_value": None},
+    }
+
+
+def build_population_index_entry(manifest: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "layer_id": POPULATION_LAYER_ID, "theme": "population",
+        "title": manifest["title"], "description": manifest["description"],
+        "geometry_kind": "admin0", "manifest_path": data_url(POPULATION_MANIFEST_RELATIVE_PATH),
+        "status": manifest["status"], "source_policy": manifest["source_policy"],
+        "coverage_scope": f"{manifest['feature_counts']['features']} admin0 ISO_A3 source-cache features",
+        "default_visible": False,
+        "default_style": {"renderer": "choropleth", "palette": "viridis_0_100", "opacity": 0.72, "neutral_value": None},
+    }
+
+
 def build_index_payload(generated_at: str, *, extra_layers: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     layers = [
         {
@@ -646,11 +717,35 @@ def load_existing_wgi_payloads() -> dict[str, dict[str, Any]]:
     return payloads
 
 
+def load_existing_hdi_payloads() -> dict[str, dict[str, Any]]:
+    existing_paths = {path: data_path(path) for path in HDI_REAL_OUTPUT_PATHS if data_path(path).is_file()}
+    if not existing_paths:
+        return {}
+    missing_paths = [path for path in HDI_REAL_OUTPUT_PATHS if path not in existing_paths]
+    if missing_paths:
+        raise FileNotFoundError("UNDP HDI real-source outputs are incomplete; missing: " + ", ".join(missing_paths))
+    return {path: read_json(existing_paths[path]) for path in HDI_REAL_OUTPUT_PATHS}
+
+
+def load_existing_population_payloads() -> dict[str, dict[str, Any]]:
+    existing_paths = {path: data_path(path) for path in POPULATION_OUTPUT_PATHS if data_path(path).is_file()}
+    if not existing_paths:
+        return {}
+    missing_paths = [path for path in POPULATION_OUTPUT_PATHS if path not in existing_paths]
+    if missing_paths:
+        raise FileNotFoundError("WDI population real-source outputs are incomplete; missing: " + ", ".join(missing_paths))
+    return {path: read_json(existing_paths[path]) for path in POPULATION_OUTPUT_PATHS}
+
+
 def build_payloads(
     generated_at: str,
     *,
     wgi_payloads: dict[str, dict[str, Any]] | None = None,
     include_existing_wgi: bool = False,
+    hdi_payloads: dict[str, dict[str, Any]] | None = None,
+    include_existing_hdi: bool = True,
+    population_payloads: dict[str, dict[str, Any]] | None = None,
+    include_existing_population: bool = True,
 ) -> dict[str, dict[str, Any]]:
     state_metrics = admin_metrics_payload(
         layer_id="political_state_capacity_demo",
@@ -676,6 +771,14 @@ def build_payloads(
     extra_layers: list[dict[str, Any]] = []
     if wgi_payloads and WGI_MANIFEST_RELATIVE_PATH in wgi_payloads:
         extra_layers.append(build_wgi_index_entry(wgi_payloads[WGI_MANIFEST_RELATIVE_PATH]))
+    if hdi_payloads is None and include_existing_hdi:
+        hdi_payloads = load_existing_hdi_payloads()
+    if hdi_payloads and HDI_REAL_MANIFEST_RELATIVE_PATH in hdi_payloads:
+        extra_layers.append(build_hdi_index_entry(hdi_payloads[HDI_REAL_MANIFEST_RELATIVE_PATH]))
+    if population_payloads is None and include_existing_population:
+        population_payloads = load_existing_population_payloads()
+    if population_payloads and POPULATION_MANIFEST_RELATIVE_PATH in population_payloads:
+        extra_layers.append(build_population_index_entry(population_payloads[POPULATION_MANIFEST_RELATIVE_PATH]))
 
     payloads: dict[str, dict[str, Any]] = {
         INDEX_RELATIVE_PATH: build_index_payload(generated_at, extra_layers=extra_layers),
@@ -686,6 +789,10 @@ def build_payloads(
     }
     if wgi_payloads:
         payloads.update(wgi_payloads)
+    if hdi_payloads:
+        payloads.update(hdi_payloads)
+    if population_payloads:
+        payloads.update(population_payloads)
 
     payloads[STATE_MANIFEST_RELATIVE_PATH] = manifest_payload(
         layer_id="political_state_capacity_demo",
@@ -862,25 +969,30 @@ def runtime_asset_registry_entry(relative_path: str, *, role: str, metadata: dic
     }
 
 
-def update_runtime_asset_registry(payloads: dict[str, dict[str, Any]]) -> None:
+def update_runtime_asset_registry(payloads: dict[str, dict[str, Any]], *, only_layer_ids: set[str] | None = None) -> None:
     registry_path = DATA_ROOT / "runtime_asset_registry.json"
     registry = read_json(registry_path)
     assets = registry.setdefault("assets", {})
     if not isinstance(assets, dict):
         raise ValueError("data/runtime_asset_registry.json assets must be an object.")
 
-    assets["thematic_layer_catalog"] = runtime_asset_registry_entry(
-        INDEX_RELATIVE_PATH,
-        role="thematic_layer_catalog",
-        metadata={
-            "layer_count": len(payloads[INDEX_RELATIVE_PATH]["layers"]),
-            "publish_scope": THEMATIC_RUNTIME_PUBLISH_SCOPE,
-            "runtime_readiness": THEMATIC_RUNTIME_READINESS,
-        },
-    )
-    manifest_keys: dict[str, str] = {}
+    if only_layer_ids is not None and "thematic_layer_catalog" in assets:
+        assets["thematic_layer_catalog"]["metadata"]["layer_count"] = len(payloads[INDEX_RELATIVE_PATH]["layers"])
+    else:
+        assets["thematic_layer_catalog"] = runtime_asset_registry_entry(
+            INDEX_RELATIVE_PATH,
+            role="thematic_layer_catalog",
+            metadata={
+                "layer_count": len(payloads[INDEX_RELATIVE_PATH]["layers"]),
+                "publish_scope": THEMATIC_RUNTIME_PUBLISH_SCOPE,
+                "runtime_readiness": THEMATIC_RUNTIME_READINESS,
+            },
+        )
+    manifest_keys: dict[str, str] = dict(registry.get("thematic_layer_manifest_keys", {})) if only_layer_ids is not None else {}
     for layer in payloads[INDEX_RELATIVE_PATH]["layers"]:
         layer_id = str(layer["layer_id"])
+        if only_layer_ids is not None and layer_id not in only_layer_ids:
+            continue
         asset_key = f"thematic_layer:{layer_id}"
         manifest_path = str(layer["manifest_path"]).removeprefix("data/")
         manifest = payloads.get(manifest_path)
@@ -895,10 +1007,54 @@ def update_runtime_asset_registry(payloads: dict[str, dict[str, Any]]) -> None:
                 "theme": manifest["theme"],
                 "geometry_kind": manifest["geometry_kind"],
                 "publish_scope": THEMATIC_RUNTIME_PUBLISH_SCOPE,
-                "runtime_readiness": THEMATIC_RUNTIME_READINESS,
+                "runtime_readiness": manifest.get("runtime_consumer", {}).get("status", THEMATIC_RUNTIME_READINESS),
+                **({
+                    "data_version": WGI_RUNTIME_DATA_VERSION,
+                    "supported_metrics": list(WGI_RUNTIME_METRIC_IDS),
+                    "supported_scenarios": list(WGI_RUNTIME_SCENARIO_IDS),
+                    "method": WGI_RUNTIME_METHOD,
+                    "historical_reference_policy": build_wgi_historical_reference_policy(),
+                } if layer_id == WGI_LAYER_ID else hdi_runtime_selection() if layer_id == HDI_REAL_LAYER_ID
+                   else population_runtime_selection() if layer_id == POPULATION_LAYER_ID else {}),
             },
         )
         manifest_keys[layer_id] = asset_key
+
+    if WGI_LAYER_ID in manifest_keys and (only_layer_ids is None or WGI_LAYER_ID in only_layer_ids):
+        for asset_key, relative_path, role, schema_ref in (
+            ("thematic_wgi_metrics", WGI_METRICS_RELATIVE_PATH, "thematic_admin_metrics", "map_builder/schemas/thematic_admin_metrics.schema.json"),
+            ("thematic_wgi_country_mapping", WGI_COUNTRY_MAPPING_RELATIVE_PATH, "thematic_country_mapping", "map_builder/schemas/thematic_wgi_country_mapping.schema.json"),
+        ):
+            assets[asset_key] = runtime_asset_registry_entry(
+                relative_path,
+                role=role,
+                metadata={
+                    "layer_id": WGI_LAYER_ID,
+                    "data_version": WGI_RUNTIME_DATA_VERSION,
+                    "supported_metrics": list(WGI_RUNTIME_METRIC_IDS),
+                    "supported_scenarios": list(WGI_RUNTIME_SCENARIO_IDS),
+                    "method": WGI_RUNTIME_METHOD,
+                    "historical_reference_policy": build_wgi_historical_reference_policy(),
+                    "runtime_readiness": "main_map_ready",
+                },
+            )
+            assets[asset_key]["schema_ref"] = schema_ref
+
+    if HDI_REAL_LAYER_ID in manifest_keys and (only_layer_ids is None or HDI_REAL_LAYER_ID in only_layer_ids):
+        assets["thematic_hdi_metrics"] = runtime_asset_registry_entry(
+            HDI_REAL_METRICS_RELATIVE_PATH,
+            role="thematic_admin_metrics",
+            metadata={"layer_id": HDI_REAL_LAYER_ID, **hdi_runtime_selection(), "runtime_readiness": "main_map_ready"},
+        )
+        assets["thematic_hdi_metrics"]["schema_ref"] = "map_builder/schemas/thematic_admin_metrics.schema.json"
+
+    if POPULATION_LAYER_ID in manifest_keys and (only_layer_ids is None or POPULATION_LAYER_ID in only_layer_ids):
+        assets["thematic_population_metrics"] = runtime_asset_registry_entry(
+            POPULATION_METRICS_RELATIVE_PATH,
+            role="thematic_admin_metrics",
+            metadata={"layer_id": POPULATION_LAYER_ID, **population_runtime_selection(), "runtime_readiness": "main_map_ready"},
+        )
+        assets["thematic_population_metrics"]["schema_ref"] = "map_builder/schemas/thematic_admin_metrics.schema.json"
 
     registry["thematic_layer_index_key"] = "thematic_layer_catalog"
     registry["thematic_layer_manifest_keys"] = manifest_keys
@@ -994,17 +1150,39 @@ def manifest_refresh_paths_for_payloads(payloads: dict[str, dict[str, Any]]) -> 
 
 def main() -> None:
     args = parse_args()
-    wgi_payloads: dict[str, dict[str, Any]] | None = None
+    requested_payloads: dict[str, dict[str, Any]] = {}
+    entries: list[dict[str, Any]] = []
     if args.include_wgi_real:
         wgi_payloads = build_wgi_real_source_payloads(
             args.wgi_source_cache_path,
             generated_at=args.generated_at,
         )
-    payloads = build_payloads(
-        args.generated_at,
-        wgi_payloads=wgi_payloads,
-        include_existing_wgi=not args.include_wgi_real,
-    )
+        requested_payloads.update(wgi_payloads)
+        entries.append(build_wgi_index_entry(wgi_payloads[WGI_MANIFEST_RELATIVE_PATH]))
+    if args.include_hdi_real:
+        hdi_payloads = build_hdi_real_source_payloads(args.hdi_source_cache_path, generated_at=args.generated_at)
+        requested_payloads.update(hdi_payloads)
+        entries.append(build_hdi_index_entry(hdi_payloads[HDI_REAL_MANIFEST_RELATIVE_PATH]))
+    if getattr(args, "include_population_real", False):
+        population_payloads = build_population_real_source_payloads(args.population_source_cache_dir, generated_at=args.generated_at)
+        requested_payloads.update(population_payloads)
+        entries.append(build_population_index_entry(population_payloads[POPULATION_MANIFEST_RELATIVE_PATH]))
+    only_layer_ids = {entry["layer_id"] for entry in entries} if entries else None
+    if entries:
+        # Patch only the requested real layers; preserve unrelated catalog entries and files.
+        index = read_json(data_path(INDEX_RELATIVE_PATH))
+        for entry in entries:
+            matches = [i for i, layer in enumerate(index["layers"]) if layer["layer_id"] == entry["layer_id"]]
+            if matches:
+                index["layers"][matches[0]] = entry
+            else:
+                index["layers"].append(entry)
+        payloads = {INDEX_RELATIVE_PATH: index, **requested_payloads}
+    else:
+        payloads = build_payloads(
+            args.generated_at,
+            include_existing_wgi=True,
+        )
     errors = validate_payloads(payloads)
     if errors:
         raise SystemExit("\n".join(errors))
@@ -1013,7 +1191,7 @@ def main() -> None:
         write_json(data_path(relative_path), payloads[relative_path])
 
     if not args.skip_runtime_registry:
-        update_runtime_asset_registry(payloads)
+        update_runtime_asset_registry(payloads, only_layer_ids=only_layer_ids)
     if not args.skip_data_manifest:
         refresh_data_manifest(manifest_refresh_paths_for_payloads(payloads))
 

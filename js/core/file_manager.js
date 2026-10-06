@@ -3,6 +3,8 @@ import { verifyApprovedRiverPack } from "./river_paint/pilot_loader.js";
 import { normalizePaintMode } from "./map_editing_policy.js";
 import { normalizeRenderingStyleConfig } from "./renderer/display_quality_policy.js";
 import { normalizeStrategicValuesStyle } from "./strategic_values_view_model.js";
+import { normalizeThematicWgiStyle } from "./thematic_wgi_view_model.js";
+import { normalizePopulationStyle } from "./population_spatial_view_model.js";
 import { normalizeQuickFillScope } from "./quick_fill_hierarchy.js";
 // Project file manager (Phase 13)
 import {
@@ -651,6 +653,8 @@ class FileManager {
         cityPoints: normalizeCityLayerStyleConfig(appState.styleConfig?.cityPoints),
         countryLabels: { enabled: appState.styleConfig?.countryLabels?.enabled !== false },
         strategicValues: normalizeStrategicValuesStyle(appState.styleConfig?.strategicValues),
+        thematic: normalizeThematicWgiStyle(appState.styleConfig?.thematic),
+        population: normalizePopulationStyle(appState.styleConfig?.population),
         urban: normalizeUrbanStyleConfig(appState.styleConfig?.urban),
         physical: normalizePhysicalStyleConfig(appState.styleConfig?.physical),
         transportOverview: normalizeTransportOverviewStyleConfig(appState.styleConfig?.transportOverview),
@@ -840,6 +844,8 @@ class FileManager {
     data.styleConfig.lakes = normalizeLakeStyleConfig(data.styleConfig.lakes);
     data.styleConfig.cityPoints = normalizeCityLayerStyleConfig(data.styleConfig.cityPoints);
     data.styleConfig.strategicValues = normalizeStrategicValuesStyle(data.styleConfig.strategicValues);
+    data.styleConfig.thematic = normalizeThematicWgiStyle(data.styleConfig.thematic);
+    data.styleConfig.population = normalizePopulationStyle(data.styleConfig.population);
     data.styleConfig.urban = normalizeUrbanStyleConfig(data.styleConfig.urban);
     data.styleConfig.physical = normalizePhysicalStyleConfig(data.styleConfig.physical);
     data.intensityFields = migrateLegacyPhysicalIntensityField(

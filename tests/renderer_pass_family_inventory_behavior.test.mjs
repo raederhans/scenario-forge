@@ -86,7 +86,7 @@ function collectStaticImports(modulePath) {
 }
 
 test("inventory shape, enums, records, and nested arrays are frozen", () => {
-  assert.equal(RENDER_PASS_FAMILY_INVENTORY.length, 13);
+  assert.equal(RENDER_PASS_FAMILY_INVENTORY.length, 14);
   assert.equal(Object.isFrozen(RENDER_PASS_FAMILY_INVENTORY), true);
   for (const [values, expected] of ENUM_CONTRACTS) {
     assert.equal(Object.isFrozen(values), true);
@@ -119,9 +119,9 @@ test("inventory exactly matches the canonical runtime pass universe and order", 
   const inventoryNames = RENDER_PASS_FAMILY_INVENTORY.map((record) => record.passName);
   const idleNames = idleDefinitions.map((definition) => definition.passName);
 
-  assert.equal(new Set(inventoryNames).size, 13);
-  assert.equal(new Set(idleNames).size, 13);
-  assert.equal(new Set(secondaryNames).size, 13);
+  assert.equal(new Set(inventoryNames).size, 14);
+  assert.equal(new Set(idleNames).size, 14);
+  assert.equal(new Set(secondaryNames).size, 14);
   assert.deepEqual(inventoryNames, idleNames);
   assert.deepEqual([...inventoryNames].sort(), [...secondaryNames].sort());
   assert.notDeepEqual(secondaryNames, idleNames, "the secondary catalog keeps its known local order difference");
@@ -132,6 +132,7 @@ test("inventory exactly matches the canonical runtime pass universe and order", 
 
 test("family and planned-phase membership stays binding", () => {
   const namesFor = (key, value) => RENDER_PASS_FAMILY_INVENTORY.filter((record) => record[key] === value).map((record) => record.passName);
+  assert.deepEqual(namesFor("familyId", "political"), ["political", "populationHeatmap"]);
   assert.deepEqual(namesFor("familyId", "visual-effects"), ["effects", "lineEffects", "dayNight", "textureLabels"]);
   assert.deepEqual(namesFor("plannedPhase", "P3.1"), ["effects", "lineEffects", "dayNight", "textureLabels"]);
   assert.deepEqual(namesFor("familyId", "context"), ["contextBase", "contextScenario", "contextMarkers"]);
@@ -141,7 +142,7 @@ test("family and planned-phase membership stays binding", () => {
   assert.deepEqual(namesFor("plannedPhase", "P3.4"), ["background"]);
   assert.deepEqual(namesFor("plannedPhase", "P3.5"), []);
   assert.deepEqual(namesFor("plannedPhase", "hold"), ["borders"]);
-  assert.deepEqual(namesFor("plannedPhase", "existing-delegated"), ["physicalBase", "hgoPreview"]);
+  assert.deepEqual(namesFor("plannedPhase", "existing-delegated"), ["physicalBase", "populationHeatmap", "hgoPreview"]);
   assert.deepEqual(namesFor("plannedPhase", "future-review"), ["labels"]);
   assert.deepEqual(namesFor("implementationStatus", "thin-wrapper"), ["borders", "labels"]);
   assert.deepEqual(namesFor("implementationStatus", "owned-p3"), [
@@ -158,7 +159,50 @@ test("family and planned-phase membership stays binding", () => {
   assert.deepEqual(namesFor("implementationStatus", "hold"), []);
 });
 
-test("all 13 records resolve entry hosts and reviewed dependency anchors", () => {
+test("population heatmap inventory binds its raster owner, composition order, and export gate", () => {
+  const population = RENDER_PASS_FAMILY_INVENTORY.find((record) => record.passName === "populationHeatmap");
+  assert.equal(population.familyId, "political");
+  assert.equal(population.entryFunction, "drawPopulationHeatmapPass");
+  assert.equal(population.implementationStatus, "delegated-existing");
+  assert.equal(population.riskTier, "high");
+  assert.equal(population.perfSensitivity, "high");
+  assert.deepEqual(population.existingDependencyOwners, [
+    "js/core/renderer/population_heatmap_render_owner.js",
+    "js/core/population_spatial_runtime.js",
+    "js/core/population_spatial_data.js",
+    "js/core/population_spatial_view_model.js",
+  ]);
+  assert.deepEqual(population.browserLanes, []);
+  assert.match(population.notes, /dedicated browser lane gap/);
+  assert.match(population.notes, /statistics remain offline sidecar data/);
+
+  const passCatalog = readText("js", "core", "map_renderer", "render_pass_catalog.js");
+  for (const name of [
+    "RENDER_PASS_NAMES",
+    "TRANSFORM_REUSED_RENDER_PASS_NAMES",
+    "INTERACTION_COMPOSITE_PASS_NAMES",
+    "TRANSFORMED_FRAME_PASS_NAMES",
+  ]) {
+    const block = passCatalog.match(new RegExp(`export const ${name} = (?:new Set\\()?\\[([\\s\\S]*?)\\]`));
+    assert.ok(block, `${name} should retain an explicit pass list`);
+    const passes = [...block[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]);
+    assert.equal(passes.indexOf("populationHeatmap"), passes.indexOf("political") + 1,
+      `${name} should composite population immediately after political`);
+    if (passes.includes("borders")) {
+      assert.ok(passes.indexOf("populationHeatmap") < passes.indexOf("borders"), `${name} should preserve visible borders`);
+    }
+  }
+  const visibilityPolicy = readText("js", "core", "map_renderer", "render_pass_visibility_policy.js");
+  assert.match(visibilityPolicy, /populationHeatmap:\s*populationHeatmapEnabled/);
+  const settleCatalog = readText("js", "core", "renderer", "exact_after_settle_pass_catalog.js");
+  assert.match(settleCatalog, /EXACT_AFTER_SETTLE_ALWAYS_TARGET_PASSES = \[\s*"political",\s*"populationHeatmap",\s*"borders"/);
+  const entryHost = readText(...population.entryHostPath.split("/"));
+  assert.match(entryHost, /function drawPopulationHeatmapPass\(k\) \{[\s\S]{0,400}return getPopulationHeatmapRenderOwner\(\)\.draw\(k\)/);
+  assert.match(entryHost, /sampleDensity:\s*samplePopulationDensityLonLat/);
+  assert.match(entryHost, /if \(passNames\.includes\("populationHeatmap"\)\) assertPopulationHeatmapReadyForExport\(\)/);
+});
+
+test("all 14 records resolve entry hosts and reviewed dependency anchors", () => {
   const transportOwnerSource = readText("js", "core", "renderer", "transport_overview_render_owner.js");
   const uiStateSource = readText("js", "core", "state", "ui_state.js");
   assert.match(transportOwnerSource, /ensureTransportOverviewStyleConfigState\(runtimeState\)/);

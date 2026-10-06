@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "recipe_id": "undp_hdi_v1",
+  "title": "UNDP HDR 2025 real-source recipe",
+  "source_family": "UNDP Human Development Index",
+  "phase": "real_source_cache_v1",
+  "source_policy": "real_source_cache_only",
+  "generated_at": "2026-10-05T00:00:00Z",
+  "download_policy": {
+    "network_allowed": false,
+    "default_builder_downloads": false,
+    "source_cache_path": ".runtime/source-cache/thematic/undp/HDR25_Composite_indices_complete_time_series.csv"
+  },
+  "official_sources": [
+    {
+      "source_id": "undp_hdr_2025",
+      "name": "UNDP Human Development Reports",
+      "url": "https://hdr.undp.org/data-center/documentation-and-downloads",
+      "source_package_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+      "technical_notes_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Technical_Notes.pdf",
+      "release": "Human Development Report 2025",
+      "version": "2025",
+      "accessed_at": "2026-10-05T00:00:00Z",
+      "selected_year": 2023,
+      "license": "CC BY 3.0 IGO",
+      "license_url": "https://creativecommons.org/licenses/by/3.0/igo/",
+      "terms_url": "https://hdr.undp.org/terms-use",
+      "citation": "United Nations Development Programme, Human Development Report 2025, composite indices complete time series.",
+      "selection_rule": "Use country ISO3 rows and the five pinned 2023 columns; exclude all ZZ aggregate rows and never fill from another report edition.",
+      "source_cache_path": ".runtime/source-cache/thematic/undp/HDR25_Composite_indices_complete_time_series.csv",
+      "source_sha256": "61ed82e5b66c88dfca8ff9fac775c63981ecab6a254862af97acacc41c143117",
+      "source_size_bytes": 2001263,
+      "source_encoding": "cp1252"
+    }
+  ],
+  "metric_selection": {
+    "year": 2023,
+    "metrics": {
+      "undp_hdi": {
+        "source_column": "hdi_2023",
+        "unit": "index_0_1"
+      },
+      "undp_life_expectancy": {
+        "source_column": "le_2023",
+        "unit": "years"
+      },
+      "undp_expected_schooling": {
+        "source_column": "eys_2023",
+        "unit": "years"
+      },
+      "undp_mean_schooling": {
+        "source_column": "mys_2023",
+        "unit": "years"
+      },
+      "undp_gni_per_capita": {
+        "source_column": "gnipc_2023",
+        "unit": "usd_2021_ppp"
+      }
+    }
+  },
+  "normalization": {
+    "method": "official_raw_values_with_auxiliary_goalpost_normalized_values",
+    "range": [
+      0,
+      100
+    ],
+    "technical_notes_url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Technical_Notes.pdf",
+    "technical_notes_page": 2,
+    "formulas": {
+      "undp_hdi": "raw * 100",
+      "undp_life_expectancy": "clamp((raw - 20) / (85 - 20) * 100, 0, 100)",
+      "undp_expected_schooling": "clamp(raw / 18 * 100, 0, 100)",
+      "undp_mean_schooling": "clamp(raw / 15 * 100, 0, 100)",
+      "undp_gni_per_capita": "clamp(log(raw / 100) / log(75000 / 100) * 100, 0, 100)"
+    },
+    "raw_value_policy": "Preserve every finite valid source value without rounding or clipping.",
+    "notes": [
+      "Auxiliary normalized values preserve the existing 0-100 data contract for other consumers; main-map colors use raw-value bins.",
+      "HDI raw-value bins use official thresholds at 0.55, 0.7 and 0.8; component bins use fixed cartographic ranges and are not official UNDP categories.",
+      "The auxiliary normalization is a project transformation of the attributed UNDP source values; it does not change raw values."
+    ],
+    "missing_value_policy": "Missing, unknown or invalid source values remain null; never reconstruct HDI or fill from another edition."
+  },
+  "runtime_selection": {
+    "data_version": "undp-hdr-2025:2023",
+    "supported_metrics": [
+      "undp_hdi",
+      "undp_life_expectancy",
+      "undp_expected_schooling",
+      "undp_mean_schooling",
+      "undp_gni_per_capita"
+    ],
+    "supported_scenarios": [
+      "modern_world",
+      "hoi4_1936",
+      "hoi4_1939",
+      "tno_1962"
+    ],
+    "country_code_mapping": "data/thematic_layers/wgi_country_code_mapping.json",
+    "method": "Official UNDP HDR 2025 country values for 2023 passed through as raw values; main-map colors use raw-value bins, with official HDI thresholds at 0.55, 0.7 and 0.8. Component bins are fixed cartographic ranges, not official UNDP categories. Auxiliary normalized values use HDI x 100 and the report's dimension goalposts on a clipped 0-100 scale for other consumers. Modern World uses geographic country codes; historical scenarios use baseline owner reference mapping.",
+    "historical_reference_policy": {
+      "mode": "baseline_owner_reference_mapping",
+      "reference_year": 2023,
+      "supported_scenarios": [
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ],
+      "join_method": "Baseline owner tag -> scenarioCountriesByTag[tag].base_iso2 (explicit two-letter ISO2) -> existing ISO2-to-ISO3 mapping -> official UNDP country value.",
+      "unknown_mapping_policy": "Leave unmapped owners blank; do not infer from tags, parent countries, or modern feature geography.",
+      "interpretation": "2023 human development reference values mapped to scenario baseline owners; not observed measurements for historical years.",
+      "historical_measurement": false
+    }
+  },
+  "join_key_policy": {
+    "join_key_type": "iso_a3",
+    "aggregate_prefix": "ZZ",
+    "unmatched_rows_are_audited": true,
+    "name_fuzzy_matching": false
+  },
+  "missing_value_policy": "Missing, unknown or invalid source values remain null; never reconstruct HDI or fill from another edition."
+}

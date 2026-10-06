@@ -1,4 +1,6 @@
 import { createStrategicValuesOwner } from "./strategic_values_owner.js";
+import { createThematicWgiOwner } from "./thematic_wgi_owner.js";
+import { createPopulationSpatialOwner } from "./population_spatial_owner.js";
 import { normalizeDisplayQuality } from "../../core/renderer/display_quality_policy.js";
 import {
   URBAN_ADAPTIVE_TINT_DEFAULT_COLOR,
@@ -235,6 +237,14 @@ export function createAppearanceControlsController({
     }
   };
   thematicLayerPreviewController = createThematicLayerPreviewController({ t });
+  const thematicWgiOwner = createThematicWgiOwner({
+    runtimeState, t, markDirty,
+    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+  });
+  const populationSpatialOwner = createPopulationSpatialOwner({
+    runtimeState, t, markDirty,
+    refreshColorState: (options) => runtimeState.refreshColorStateFn?.(options),
+  });
   void thematicLayerPreviewController.load().then(() => renderLayerStatusSummaries());
   const appearanceTabButtons = Array.from(document.querySelectorAll("[data-appearance-tab]"));
   const appearanceTabPanels = Array.from(document.querySelectorAll("[data-appearance-panel]"));
@@ -596,6 +606,8 @@ export function createAppearanceControlsController({
     // 这样 transport/city/physical 的派生状态不会被后面的简单 DOM 赋值覆盖回旧值。
     cityPointsOwner.renderCityPointsUi();
     strategicValuesOwner.render();
+    thematicWgiOwner.render();
+    populationSpatialOwner.render();
     renderBorderUi();
     if (toggleUrban) toggleUrban.checked = !!runtimeState.showUrban;
     physicalOwner.renderPhysicalUi();

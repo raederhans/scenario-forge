@@ -60,12 +60,48 @@
       "layer_id": "political_wgi_state_capacity_v1",
       "theme": "political",
       "title": "WGI Governance Proxy",
-      "description": "World Bank WGI 2024 admin0 Government Effectiveness and Rule of Law scores with a project-defined state-capacity proxy.",
+      "description": "World Bank WGI 2024 admin0 scores for all six official governance dimensions with a project-defined Government Effectiveness and Rule of Law state-capacity proxy.",
       "geometry_kind": "admin0",
       "manifest_path": "data/thematic_layers/political/wgi_state_capacity_v1/manifest.json",
       "status": "experimental",
       "source_policy": "real_source_cache_only",
       "coverage_scope": "215 admin0 ISO_A3 source-cache features",
+      "default_visible": false,
+      "default_style": {
+        "renderer": "choropleth",
+        "palette": "viridis_0_100",
+        "opacity": 0.72,
+        "neutral_value": null
+      }
+    },
+    {
+      "layer_id": "social_human_development_v1",
+      "theme": "social",
+      "title": "UNDP Human Development",
+      "description": "Official UNDP HDR 2025 country HDI, life expectancy, schooling and GNI per capita values for 2023.",
+      "geometry_kind": "admin0",
+      "manifest_path": "data/thematic_layers/social/human_development_v1/manifest.json",
+      "status": "experimental",
+      "source_policy": "real_source_cache_only",
+      "coverage_scope": "195 admin0 ISO_A3 source-cache features",
+      "default_visible": false,
+      "default_style": {
+        "renderer": "choropleth",
+        "palette": "plasma_0_100",
+        "opacity": 0.72,
+        "neutral_value": null
+      }
+    },
+    {
+      "layer_id": "population_wdi_population_v1",
+      "theme": "population",
+      "title": "WDI Population",
+      "description": "Official WDI 2023 country population total, density, urban share, age-65-plus share and fertility values.",
+      "geometry_kind": "admin0",
+      "manifest_path": "data/thematic_layers/population/wdi_population_v1/manifest.json",
+      "status": "experimental",
+      "source_policy": "real_source_cache_only",
+      "coverage_scope": "216 admin0 ISO_A3 source-cache features",
       "default_visible": false,
       "default_style": {
         "renderer": "choropleth",

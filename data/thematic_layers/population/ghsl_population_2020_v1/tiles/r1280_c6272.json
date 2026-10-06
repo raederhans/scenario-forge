@@ -1,0 +1,1 @@
+{"schema_version":1,"layer_id":"population_ghsl_2020_v1","data_version":"ghsl-r2023a-e2020-v1","source_epoch":2020,"crs":"ESRI:54009","bounds":[13319000.0,1960000.0,13959000.0,2600000.0],"width":128,"height":128,"cell_size_m":5000,"cells":[[2044,0.0,18.0],[2045,0.0,9.0],[2172,0.0,13.0],[2173,0.0,20.0]]}

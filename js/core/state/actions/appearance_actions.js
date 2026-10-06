@@ -4,7 +4,7 @@ export const APPEARANCE_STYLE_GROUP_KEYS = Object.freeze([
   "rendering",
   "ocean", "lakes", "internalBorders", "empireBorders", "coastlines",
   "parentBorders", "physical", "urban", "cityPoints", "countryLabels", "strategicValues", "rivers",
-  "texture", "dayNight", "transportOverview",
+  "texture", "dayNight", "transportOverview", "thematic", "population",
 ]);
 
 function assertTarget(target) {

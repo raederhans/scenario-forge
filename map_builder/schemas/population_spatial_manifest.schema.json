@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Population spatial global layer",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "layer_id",
+    "data_version",
+    "period",
+    "source",
+    "source_policy",
+    "provenance",
+    "runtime_consumer",
+    "scenarios",
+    "raster",
+    "audit_url"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "layer_id": {
+      "const": "population_ghsl_2020_v1"
+    },
+    "data_version": {
+      "const": "ghsl-r2023a-e2020-v1"
+    },
+    "source_policy": {
+      "const": "real_source_cache_only"
+    },
+    "period": {
+      "type": "object",
+      "required": [
+        "year"
+      ],
+      "properties": {
+        "year": {
+          "const": 2020
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "product",
+        "release",
+        "epoch",
+        "resolution_m",
+        "unit",
+        "url",
+        "sha256",
+        "raster_header"
+      ],
+      "properties": {
+        "epoch": {
+          "const": 2020
+        },
+        "resolution_m": {
+          "enum": [
+            100,
+            1000
+          ]
+        },
+        "unit": {
+          "const": "persons"
+        },
+        "release": {
+          "const": "R2023A"
+        }
+      }
+    },
+    "scenarios": {
+      "type": "object",
+      "required": [
+        "modern_world",
+        "hoi4_1936",
+        "hoi4_1939",
+        "tno_1962"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "geometry_version",
+          "features_url",
+          "feature_count",
+          "core_feature_count",
+          "extra_feature_count"
+        ]
+      }
+    },
+    "raster": {
+      "type": "object",
+      "required": [
+        "overview_url",
+        "detail_tiles",
+        "source_resolution_m",
+        "overview_resolution_m",
+        "detail_resolution_m",
+        "cell_fields",
+        "area_method"
+      ]
+    }
+  }
+}

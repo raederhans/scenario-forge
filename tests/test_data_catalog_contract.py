@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
+from unittest import mock
 
 from tools.build_data_catalog import (
     build_catalog_markdown,
@@ -21,7 +22,7 @@ CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP = REPO_ROOT / "landing" / "app.js"
-EXPECTED_SCHEMA_REF_COUNT = 31
+EXPECTED_SCHEMA_REF_COUNT = 36
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -86,10 +87,47 @@ class DataCatalogContractTest(unittest.TestCase):
         self.assertEqual(schema_counts["schema://hgo/runtime_seed/v1"], 1)
         self.assertEqual(schema_counts["schema://bitmap/bmp_rgb24/v1"], 1)
         self.assertEqual(schema_counts["schema://thematic/layer_index/v1"], 1)
-        self.assertEqual(schema_counts["schema://thematic/layer_manifest/v1"], 4)
-        self.assertEqual(schema_counts["schema://thematic/admin_metrics/v1"], 3)
+        self.assertEqual(schema_counts["schema://thematic/layer_manifest/v1"], 6)
+        self.assertEqual(schema_counts["schema://thematic/admin_metrics/v1"], 2)
+        self.assertEqual(schema_counts["map_builder/schemas/thematic_admin_metrics.schema.json"], 3)
+        self.assertEqual(schema_counts["map_builder/schemas/thematic_wgi_country_mapping.schema.json"], 1)
         self.assertEqual(schema_counts["schema://thematic/grid_rle/v1"], 1)
-        self.assertEqual(schema_counts["schema://thematic/build_audit/v1"], 4)
+        self.assertEqual(schema_counts["schema://thematic/build_audit/v1"], 6)
+
+    def test_catalog_contains_population_real_source_assets(self) -> None:
+        entries = {entry["url"]: entry for entry in self._load_catalog()["entries"]}
+        root = "thematic_layers/population/wdi_population_v1"
+        expected = {
+            f"{root}/manifest.json": "schema://thematic/layer_manifest/v1",
+            f"{root}/metrics.admin0.json": "map_builder/schemas/thematic_admin_metrics.schema.json",
+            f"{root}/build_audit.json": "schema://thematic/build_audit/v1",
+            "thematic_layers/source_recipes/wdi_population_v1.manual.json": "schema://json/object/v1",
+        }
+        for path, schema in expected.items():
+            with self.subTest(path=path):
+                entry = entries[f"data/{path}"]
+                self.assertEqual(entry["schemaRef"], schema)
+                self.assertEqual(entry["hashRef"], f"data/manifest.json::outputs::{path}::sha256")
+        self.assertIn("thematic_layer:population_wdi_population_v1", entries[f"data/{root}/manifest.json"]["aliases"])
+
+    def test_catalog_contains_hdi_real_source_assets(self) -> None:
+        entries = {entry["key"]: entry for entry in self._load_catalog()["entries"]}
+        root = "thematic_layers/social/human_development_v1"
+        expected = {
+            f"manifest_output:{root}/manifest.json": (f"{root}/manifest.json", "schema://thematic/layer_manifest/v1"),
+            "thematic_hdi_metrics": (f"{root}/metrics.admin0.json", "map_builder/schemas/thematic_admin_metrics.schema.json"),
+            f"manifest_output:{root}/build_audit.json": (f"{root}/build_audit.json", "schema://thematic/build_audit/v1"),
+            "manifest_output:thematic_layers/source_recipes/undp_hdi_v1.manual.json": (
+                "thematic_layers/source_recipes/undp_hdi_v1.manual.json", "schema://json/object/v1"),
+        }
+        for key, (path, schema) in expected.items():
+            with self.subTest(key=key):
+                entry = entries[key]
+                self.assertEqual(entry["url"], f"data/{path}")
+                self.assertEqual(entry["schemaRef"], schema)
+                self.assertEqual(entry["hashRef"], f"data/manifest.json::outputs::{path}::sha256")
+                self.assertEqual(sum(row["url"] == entry["url"] for row in entries.values()), 1)
+        self.assertIn("thematic_layer:social_human_development_v1", entries[f"manifest_output:{root}/manifest.json"]["aliases"])
 
     def test_catalog_contains_wgi_state_capacity_assets(self) -> None:
         payload = self._load_catalog()
@@ -100,10 +138,10 @@ class DataCatalogContractTest(unittest.TestCase):
                 "thematic_layer_manifest",
                 "schema://thematic/layer_manifest/v1",
             ),
-            "manifest_output:thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json": (
+            "thematic_wgi_metrics": (
                 "data/thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json",
                 "thematic_admin_metrics",
-                "schema://thematic/admin_metrics/v1",
+                "map_builder/schemas/thematic_admin_metrics.schema.json",
             ),
             "manifest_output:thematic_layers/political/wgi_state_capacity_v1/build_audit.json": (
                 "data/thematic_layers/political/wgi_state_capacity_v1/build_audit.json",
@@ -128,6 +166,45 @@ class DataCatalogContractTest(unittest.TestCase):
             "thematic_layer:political_wgi_state_capacity_v1",
             entries["manifest_output:thematic_layers/political/wgi_state_capacity_v1/manifest.json"].get("aliases") or [],
         )
+        self.assertIn(
+            "manifest_output:thematic_layers/political/wgi_state_capacity_v1/metrics.admin0.json",
+            entries["thematic_wgi_metrics"].get("aliases") or [],
+        )
+        mapping = entries["thematic_wgi_country_mapping"]
+        self.assertEqual(mapping["url"], "data/thematic_layers/wgi_country_code_mapping.json")
+        self.assertEqual(mapping["role"], "thematic_country_mapping")
+        self.assertEqual(mapping["schemaRef"], "map_builder/schemas/thematic_wgi_country_mapping.schema.json")
+        self.assertEqual(mapping["owner"], "runtime_asset_registry.assets.thematic_wgi_country_mapping")
+        self.assertEqual(mapping["readMode"], "json")
+        self.assertEqual(mapping["hashRef"], "")
+        for runtime_key in ("thematic_wgi_metrics", "thematic_wgi_country_mapping"):
+            url = entries[runtime_key]["url"]
+            self.assertEqual(sum(row["url"] == url for row in payload["entries"]), 1)
+
+    def test_catalog_preserves_explicit_runtime_schema_ref_when_manifest_alias_is_merged(self) -> None:
+        relative_path = "thematic_layers/fixture_explicit_schema.json"
+        explicit_schema = "schema://fixture/explicit_runtime/v1"
+        registry = {
+            "assets": {
+                "fixture_explicit_schema": {
+                    "url": f"data/{relative_path}",
+                    "role": "fixture_metadata",
+                    "schema_ref": explicit_schema,
+                },
+            },
+        }
+        outputs = {relative_path: {
+            "role": "fixture_metadata", "owner": "fixture_builder", "schema_ref": "schema://json/object/v1",
+        }}
+        with mock.patch("tools.build_data_catalog.load_runtime_asset_registry", return_value=registry), \
+                mock.patch("tools.build_data_catalog._load_manifest_outputs", return_value=outputs):
+            payload = build_catalog_payload()
+        matching_entries = [entry for entry in payload["entries"] if entry["url"] == f"data/{relative_path}"]
+        self.assertEqual(len(matching_entries), 1)
+        entry = matching_entries[0]
+        self.assertEqual(entry["key"], "fixture_explicit_schema")
+        self.assertEqual(entry["schemaRef"], explicit_schema)
+        self.assertIn(f"manifest_output:{relative_path}", entry["aliases"])
 
     def test_landing_catalog_count_matches_checked_in_catalog(self) -> None:
         payload = self._load_catalog()

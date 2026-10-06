@@ -152,7 +152,7 @@ export const PACKAGE_SCRIPTS = {
     "test:py:hgo-runtime-seed": "npm run python -- -m unittest tests.test_hgo_runtime_seed_builder -q",
     "test:py:hgo-runtime-assets": "npm run python -- -m unittest tests.test_hgo_runtime_seed_builder -q",
     "test:py:hgo-runtime-assets-contract": "npm run python -- -m unittest tests.test_data_manifest_contract tests.test_data_catalog_contract -q",
-    "test:py:thematic-layer-contracts": "npm run python -- -m unittest tests.test_thematic_layer_contracts tests.test_thematic_wgi_source_ingest -q",
+    "test:py:thematic-layer-contracts": "npm run python -- -m unittest tests.test_thematic_layer_contracts tests.test_thematic_wgi_source_ingest tests.test_thematic_hdi_source_ingest tests.test_thematic_population_source_ingest -q",
     "smoke:hgo-runtime-source": "npm run python -- tools/build_hgo_runtime_seed.py",
     "build:hgo-runtime-assets": "npm run python -- tools/build_hgo_runtime_assets.py",
     "spike:hgo-runtime-lod": "node tools/spike_hgo_runtime_lod_assets.mjs",
@@ -303,8 +303,8 @@ export const PACKAGE_SCRIPTS = {
     "verify:supervisor-contracts": "npm run verify:supervisor-schemas && npm run test:node:supervisor-contracts && npm run test:node:supervisor-routing",
     "test:node:verify-core-runner": "node --test tests/verify_core_runner_behavior.test.mjs tests/verify_commit_runner_behavior.test.mjs",
     "test:node:verification-profile": "node --test tests/verification_profile_behavior.test.mjs",
-  "test:node:verification-metadata": "node --test tests/verification_metadata_behavior.test.mjs",
-  "test:node:catalog-projection-history": "node --test tests/catalog_projection_shadow_behavior.test.mjs",
+    "test:node:verification-metadata": "node --test tests/verification_metadata_behavior.test.mjs",
+    "test:node:catalog-projection-history": "node --test tests/catalog_projection_shadow_behavior.test.mjs",
     "test:node:verification-script-portfolio": "node --test tests/verification_script_portfolio_behavior.test.mjs",
     "test:node:renderer-pass-family-inventory": "node --test tests/renderer_pass_family_inventory_behavior.test.mjs",
     "test:node:visual-effects-pass-owner": "node --test tests/visual_effects_pass_owner_behavior.test.mjs",
@@ -361,5 +361,9 @@ export const PACKAGE_SCRIPTS = {
     "build:quick-fill": "python tools/build_quick_fill_hierarchy.py && python tools/register_quick_fill_assets.py && python tools/build_data_catalog.py",
     "verify:quick-fill-data": "python tools/build_quick_fill_hierarchy.py --check && python -m unittest tests.test_quick_fill_hierarchy",
     "test:node:river-paint": "node --test tests/river_paint_history_import.test.mjs tests/river_paint_model.test.mjs tests/river_paint_runtime.test.mjs tests/river_paint_ui_render.test.mjs",
-    "test:python:river-partitions": "npm run python -- -m unittest tests.test_river_partitions -q"
+    "test:python:river-partitions": "npm run python -- -m unittest tests.test_river_partitions -q",
+    "test:node:thematic-wgi": "node --test tests/thematic_wgi_data_behavior.test.mjs tests/thematic_wgi_runtime_behavior.test.mjs tests/thematic_wgi_owner_behavior.test.mjs tests/thematic_wgi_rendering_behavior.test.mjs tests/thematic_hdi_data_behavior.test.mjs tests/thematic_hdi_rendering_behavior.test.mjs tests/thematic_population_data_behavior.test.mjs tests/thematic_population_rendering_behavior.test.mjs",
+    "build:population-spatial": "npm run python -- tools/build_population_spatial.py --download && npm run python -- tools/register_population_spatial_assets.py",
+    "test:node:population-spatial": "node --test tests/population_spatial_data_behavior.test.mjs tests/population_spatial_runtime_behavior.test.mjs tests/population_spatial_view_model_behavior.test.mjs tests/population_spatial_integration_behavior.test.mjs tests/population_heatmap_render_behavior.test.mjs",
+    "test:py:population-spatial": "npm run python -- -m unittest tests.test_population_spatial -q"
 };
