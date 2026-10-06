@@ -80,6 +80,7 @@ test("export artifact model projects deterministic canvas and pass inputs", () =
     "background",
     "physicalBase",
     "political",
+    "populationHeatmap",
     "effects",
     "dayNight",
   ]);

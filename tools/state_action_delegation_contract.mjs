@@ -390,6 +390,16 @@ const SPECIAL_ZONE_ACTION_EXPORT_NAMES = Object.freeze([
 
 const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
   Object.freeze({
+    modulePath: "js/core/state/actions/thematic_wgi_actions.js",
+    exportNames: Object.freeze(["setThematicWgiRuntimeState", "resetThematicWgiRuntimeState", "setThematicWgiStyleState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: "js/core/state/actions/population_spatial_actions.js",
+    exportNames: Object.freeze(["setPopulationRuntimeState", "resetPopulationRuntimeState", "setPopulationStyleState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
     modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
     exportNames: Object.freeze(["applyPaletteFeatureColorState", "applyPaletteOwnerColorState"]),
     introducedInPhase: "P4.4",
@@ -646,6 +656,8 @@ const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
 ]);
 
 const STATE_ACTION_READ_ONLY_EXPORT_NAMES_BY_MODULE = new Map([
+  ["js/core/state/actions/thematic_wgi_actions.js", new Set(["createDefaultThematicWgiRuntimeState"])],
+  ["js/core/state/actions/population_spatial_actions.js", new Set(["createDefaultPopulationRuntimeState"])],
   [PROJECT_IMPORT_ACTION_MODULE_PATH, new Set(["captureProjectImportState"])],
   [
     APPEARANCE_ACTION_MODULE_PATH,
@@ -874,6 +886,71 @@ function scenarioDetailConservativeFinding(
 }
 
 export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
+  // Fresh scalar style fields; indicator lookup borrows only fixed metadata.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/thematic_wgi_view_model.js",
+  "functionName": "normalizeThematicWgiStyle",
+  "targetParameterName": "raw",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "85300d3110d88552672b007a59a64e3c9aed1556ff73f1665cc948413fc3506c",
+  "dependencyFingerprints": {
+    "js/core/thematic_indicator_catalog.js": "fb5b549f69592af019b1ddae00f04183ba4c6df1a7add8d6b61f20798976d3ef",
+    "js/core/thematic_wgi_data.js": "f578bbdedb1d33621218f5a0a5ab3aa94581283a30e0ac4ac89b8bad73a2a2b1",
+    "js/core/thematic_hdi_data.js": "e789423aeb32a155ce95092092212826f9528d168c952659fbf305bbc731e44b",
+    "js/core/thematic_population_data.js": "ed4092e1fa8ca995dc231935a0b25487b9b807fdca8c8fd1a65ff0453b05a612"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizeThematicWgiStyle\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c643069f52f32fef5a396d71d81cd402db9c57f249df18c68828d02b5b7e3497",
+      "count": 1
+    }
+  ]
+}),
+  // Returns fresh scalar style fields; the borrowed input is only read.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/core/population_spatial_view_model.js",
+  "functionName": "normalizePopulationStyle",
+  "targetParameterName": "raw",
+  "targetParameterIndex": 0,
+  "targetParameterPath": "$",
+  "importedArgumentCount": 1,
+  "allowBorrowedTarget": true,
+  "sourceFingerprint": "38370f537afc79316125cd6be068cd83c6b0711396b77929d72f487473e51f44",
+  "dependencyFingerprints": {
+    "js/core/population_spatial_data.js": "b872def03e03ec6faca6b7c0c567735d27e6bd47b5fc2c52c3b1b7369e5c315d"
+  },
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePopulationStyle\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "142bc6331e6ebc189bb84324769eb53d0931dd563b0624250026a8fc31495a01",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePopulationStyle\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "800fea2ffeb65ac28d9b78e99bc2a46e139f34c24125b9ca18e840fd3821364f",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"normalizePopulationStyle\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "f2ed3d0bba4499738d1312fb55d47bbec7193bd986714f209ab24490e499ce2d",
+      "count": 1
+    }
+  ]
+}),
   freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/renderer/static_border_mesh_lifecycle.js",
   "functionName": "getCoastlineDecisionSignature",
@@ -2874,7 +2951,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "7d32ae0b30487eb72702a66fa17ac953eec5b80ec0db2269010f339317aadbd8",
+  "sourceFingerprint": "07f932226535b41d81efb3d95a8a02171e9161cb3b495c407c2668ea931153a0",
   "reviewedReadSiteFingerprints": [],
   "conservativeFindings": [
     {
@@ -2940,8 +3017,25 @@ freezeStateTargetPureReaderEntry({
       "key": "*",
       "sourceFingerprint": "aa214ea38326805d95661c3ad1643cc07f88e2bae0438ac0448a66d93335ca6e",
       "count": 3
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createVisibleFrameIdentityPolicy\",\"ordinal\":0},{\"name\":\"getVisibleContextFlagSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 2
     }
   ]
+ ,
+  "dependencyFingerprints": {
+    "js/core/thematic_wgi_view_model.js": "b90990ae93e185e0acb2aaa66fcb0386d6517292e0a5c6a52a488521efe3fe3a",
+    "js/core/thematic_wgi_data.js": "f578bbdedb1d33621218f5a0a5ab3aa94581283a30e0ac4ac89b8bad73a2a2b1",
+    "js/core/thematic_indicator_catalog.js": "fb5b549f69592af019b1ddae00f04183ba4c6df1a7add8d6b61f20798976d3ef",
+    "js/core/population_spatial_view_model.js": "50b0c7811d8cd850e433c6231713181dc62dd0273e6d9cbf22b28cef927b7f75",
+    "js/core/population_spatial_data.js": "b872def03e03ec6faca6b7c0c567735d27e6bd47b5fc2c52c3b1b7369e5c315d",
+    "js/core/renderer/object_identity.js": "8b3b177452d5e824e7f8e99ed3f8dbbbf281c7004ad4e30890215c64a86f6bcf"
+  }
 }),
   freezeStateTargetPureReaderEntry({
   // The district adapter normalizes into fresh records and builds a fresh Map;
@@ -3040,6 +3134,9 @@ freezeStateTargetPureReaderEntry({
   "conservativeFindings": []
 }),
   // Reviewed cache-key construction: no writes to the supplied runtime state.
+  // Thematic/population signatures serialize scalar identity fields. Heatmap
+  // snapshots retain shared raster references; this owner reads only their
+  // status/version/revision, never returning or mutating the shared payload.
   // Atlas selection borrows a collection only for a scalar identity token;
   // object_identity stores tokens in its own WeakMap without mutating the input.
   // Label normalization reads physical style, adding its third audited use.
@@ -3050,11 +3147,17 @@ freezeStateTargetPureReaderEntry({
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
   "importedArgumentCount": 2,
-  "sourceFingerprint": "647262675b2aea219e46ba3a26020824a77fb0918f74d6442b3a1e77f331b4fb",
+  "sourceFingerprint": "8cbffd5609503e6d3aff02836b88ff692551a1b5f7dea31498d7fe7bd4eb6708",
   "dependencyFingerprints": {
     "js/core/renderer/object_identity.js": "8b3b177452d5e824e7f8e99ed3f8dbbbf281c7004ad4e30890215c64a86f6bcf",
     "js/core/renderer/physical_atlas_lod_policy.js": "0f156bd94fd3bbd25212dfa121385a0114e7719840c6f83f87209b9a95fa5bed",
-    "js/core/renderer/urban_city_policy.js": "19b0d1f539bb37abae6b7117e5b989d5d446f6f27e17fc9ea1f696ead70b19ab"
+    "js/core/renderer/urban_city_policy.js": "19b0d1f539bb37abae6b7117e5b989d5d446f6f27e17fc9ea1f696ead70b19ab",
+    "js/core/thematic_wgi_view_model.js": "b90990ae93e185e0acb2aaa66fcb0386d6517292e0a5c6a52a488521efe3fe3a",
+    "js/core/thematic_wgi_data.js": "f578bbdedb1d33621218f5a0a5ab3aa94581283a30e0ac4ac89b8bad73a2a2b1",
+    "js/core/thematic_indicator_catalog.js": "fb5b549f69592af019b1ddae00f04183ba4c6df1a7add8d6b61f20798976d3ef",
+    "js/core/population_spatial_view_model.js": "50b0c7811d8cd850e433c6231713181dc62dd0273e6d9cbf22b28cef927b7f75",
+    "js/core/population_spatial_data.js": "b872def03e03ec6faca6b7c0c567735d27e6bd47b5fc2c52c3b1b7369e5c315d",
+    "js/core/population_spatial_runtime.js": "63b8be8874c238792efd8c58fb3db679b5327f8844d723a7bdffa9f0dadfadff"
   },
   "reviewedImportedReadCalls": [
     { "callFingerprint": "a8f39579848df5cc2940c56fffbede34fd44a34a34aa676dacaaa5236ae9795f", "modulePath": "js/core/renderer/urban_city_policy.js", "exportName": "getUrbanCityRenderPassSignatureParts", "localName": "getUrbanCityRenderPassSignatureParts" },
@@ -3062,15 +3165,16 @@ freezeStateTargetPureReaderEntry({
   ],
   "reviewedReadSiteFingerprints": [
     "02b018cf2b26229f1b9a0264026233559370c64f3ad9bd6cbc044584b0ba3e64",
-    "f38922bf2ac55c279fc4f7e5d23f4cbe80872d898fcc3a76e5682bef064d1af4",
+    "c7fa70cfc7fd931b30a8b05a4b19014eb01485918aa3ca47986349721b935b14",
     "8c596cad67dd1ca874baee21cc5d4189f488d30d293b30462ac9711d172fa539",
     "bcfb7aa852bf80f48e6895aa34f3d389a41944d8166ea58b58fbe15d4ee445e4",
     "649a631808e219f64f8c15f28dd2e05b159de8621abeaedf4ae517eb36dd7840",
     "e0d5ceebd0b9df96fa634a9896c139f85fce6990da48c497569586800db8c480",
     "91363a7f9f173374e5f818b9c02011588651581239b87c9c4ae409fa795cfa26",
     "0f5857dad6947040430f92b3ecc62a49bb6baa7d1f7b6e1187ccea489c5a396d",
-    "713d9ad0482a9dc81c4873c99f2af571f7de9d6d1cc8c9c004ce3e9ef578eb2c",
-    "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f"
+    "46883ffc4b7059c6523b455d25343e35911f9dd9b6f0c1d04856c3cd5f825b60",
+    "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f",
+    "66713bce2ae0b234bcfedf235a76f5c6b052f7574f27d525e91d01ef523e320a"
   ],
   "conservativeFindings": [
     {
@@ -3198,7 +3302,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "f38922bf2ac55c279fc4f7e5d23f4cbe80872d898fcc3a76e5682bef064d1af4",
+      "sourceFingerprint": "c7fa70cfc7fd931b30a8b05a4b19014eb01485918aa3ca47986349721b935b14",
       "count": 1
     },
     {
@@ -3391,7 +3495,7 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
-      "count": 2
+      "count": 5
     },
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
@@ -3406,7 +3510,7 @@ freezeStateTargetPureReaderEntry({
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
       "key": "*",
-      "sourceFingerprint": "713d9ad0482a9dc81c4873c99f2af571f7de9d6d1cc8c9c004ce3e9ef578eb2c",
+      "sourceFingerprint": "46883ffc4b7059c6523b455d25343e35911f9dd9b6f0c1d04856c3cd5f825b60",
       "count": 1
     },
     {
@@ -3495,6 +3599,30 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "*",
       "sourceFingerprint": "382590ab224b6950247cbac8be5d2c57d67d8890654f695a7a37800e2a90193f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getPoliticalPassStaticSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+      "count": 2
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "dpr",
+      "sourceFingerprint": "ad456d64e06ff0e7618971233519f5b886f21cdd093c953d3af47a7c20671e3c",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createRenderPassSignaturePolicy\",\"ordinal\":0},{\"name\":\"getRenderPassSignature\",\"ordinal\":0}]}",
+      "reason": "unsupported-call-mutation",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "66713bce2ae0b234bcfedf235a76f5c6b052f7574f27d525e91d01ef523e320a",
       "count": 1
     }
   ]
@@ -3665,7 +3793,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "0b829bb0c135344374312216fb8d8d92036189c1009579819f0146ba0c831746",
+  "sourceFingerprint": "05c2f7db79b0f475dfc017f2ddcf7e44132d7ade7b53d5bbbee759d18a89e751",
   "conservativeFindings": [
     {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createPoliticalPathCacheOwner\",\"ordinal\":0},{\"name\":\"getPoliticalPathCacheSignature\",\"ordinal\":0}]}",
@@ -3990,7 +4118,7 @@ freezeStateTargetPureReaderEntry({
   "targetParameterName": "runtimeState",
   "targetParameterIndex": 0,
   "targetParameterPath": "$",
-  "sourceFingerprint": "619d346e5027e33e10f98b3235a80df394c7cbf96ddc7c3e6f429d1727bcb849",
+  "sourceFingerprint": "a835fb7848dc8c869117882d46b4de7e05468b95a6981559e5701bd5e4f3f7b4",
   "dependencyFingerprints": {
     "js/core/renderer/effective_water_regions.js": "354e9ae4b3206edd2b279f9e16fe469f1277e92a3c899503a84c41862edfe7c9",
     "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -6745,10 +6873,10 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getScenarioRegionOverlayRenderOwner",
-  "compositionSourceFingerprint": "a8bcc747759fca60504a94d5a383dc83d6e873cecee03fa661d3add93ffc5d76",
+  "compositionSourceFingerprint": "ef27dc29f1479db89c72ba3eb83ff7c65a1e94a09c3932cc0e56b8663cc56331",
   "factoryModulePath": "js/core/renderer/scenario_region_overlay_render_owner.js",
   "factoryExportName": "createScenarioRegionOverlayRenderOwner",
-  "factorySourceFingerprint": "619d346e5027e33e10f98b3235a80df394c7cbf96ddc7c3e6f429d1727bcb849",
+  "factorySourceFingerprint": "a835fb7848dc8c869117882d46b4de7e05468b95a6981559e5701bd5e4f3f7b4",
   "ownerBindingName": "scenarioRegionOverlayRenderOwner",
   "methods": [
     "drawScenarioRegionOverlaysPass",
@@ -7083,7 +7211,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "007e7a33979dd087334a75f9f09b750be7375514a71e28df7c35b934c4c6c333",
+      "705179f17692e47a736c4edfd5d8748050553eaaed3e246701de7d39edf0732b",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",

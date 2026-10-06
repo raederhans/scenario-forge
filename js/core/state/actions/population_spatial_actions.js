@@ -11,7 +11,7 @@ export function setPopulationRuntimeState(target, { status, data = null, error =
   if (!target || typeof target !== "object" || Array.isArray(target)) {
     throw new TypeError("[population_spatial_actions] target must be an object");
   }
-  if (!["idle", "loading", "ready", "failed"].includes(status)) {
+  if (status !== "idle" && status !== "loading" && status !== "ready" && status !== "failed") {
     throw new RangeError(`[population_spatial_actions] unknown status: ${status}`);
   }
   target.populationRuntime = {

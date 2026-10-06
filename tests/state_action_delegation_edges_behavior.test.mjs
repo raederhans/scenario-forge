@@ -4000,3 +4000,88 @@ test("river helper and runtime geometry aliases remain observable mutations", ()
     "getRiverPartitionIndex(runtimeState.riverPaint.pack, extra);",
   ]) assert.ok(scan(tail).some(f => f.reason === "state-alias-escape" || f.reason === "unsupported-call-mutation"), tail);
 });
+
+
+
+test("thematic and population action registrations preserve exact exports and non-target protection", async () => {
+  for (const [file, prefix, normalizer] of [
+    ["population_spatial_actions.js", "Population", "normalizePopulationStyle"],
+    ["thematic_wgi_actions.js", "ThematicWgi", "normalizeThematicWgiStyle"],
+  ]) {
+    const modulePath = "js/core/state/actions/" + file;
+    const source = fs.readFileSync(modulePath, "utf8");
+    assert.deepEqual(validateStateActionModuleSource(source, { filePath: modulePath }), []);
+    const entries = STATE_ACTION_DELEGATION_CONTRACT.filter((entry) => entry.modulePath === modulePath);
+    assert.deepEqual(entries.map((entry) => entry.exportName), [
+      "set" + prefix + "RuntimeState", "reset" + prefix + "RuntimeState", "set" + prefix + "StyleState",
+    ]);
+    const bindings = await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true });
+    assert.deepEqual(bindings.map((binding) => binding.functionName).sort(), entries.map((entry) => entry.exportName).sort());
+    assert.ok(bindings.every((binding) => binding.parameterName === "target" && binding.parameterIndex === 0));
+    const call = normalizer + "(raw)";
+    const mutated = source.replace(call, "(raw.enabled = true, " + call + ")");
+    assert.notEqual(mutated, source);
+    await assert.rejects(discoverStateWriterBindingsForSource(modulePath, mutated, "production", { scanAllParameters: true }),
+      (error) => error.code === "state-action-non-target-parameter-mutation");
+  }
+});
+
+test("thematic and population runtimes reject unknown statuses without changing targets or valid behavior", async () => {
+  const { setPopulationRuntimeState } = await import("../js/core/state/actions/population_spatial_actions.js");
+  const { setThematicWgiRuntimeState } = await import("../js/core/state/actions/thematic_wgi_actions.js");
+  for (const [setRuntime, field] of [[setPopulationRuntimeState, "populationRuntime"], [setThematicWgiRuntimeState, "thematicWgiRuntime"]]) {
+    for (const status of [undefined, null, "unknown", "READY", 0, {}, ["ready"]]) {
+      const runtime = Object.freeze({ status: "ready", data: Object.freeze({ value: 42 }), error: "", revision: 7 });
+      const target = Object.freeze({ [field]: runtime, marker: "preserved" });
+      assert.throws(() => setRuntime(target, { status }), { name: "RangeError" });
+      assert.equal(target[field], runtime);
+      assert.deepEqual(target, { [field]: runtime, marker: "preserved" });
+    }
+    for (const status of ["idle", "loading", "ready", "failed"]) {
+      const data = Object.freeze({ value: 42 });
+      const target = { [field]: { revision: 7 } };
+      const next = setRuntime(target, { status, data, error: "example" });
+      assert.equal(next, target[field]);
+      assert.deepEqual(next, { status, data, error: "example", revision: 8 });
+      assert.equal(next.data, data);
+    }
+  }
+});
+
+test("thematic and population read receipts bind dependencies and keep borrowed snapshots explicit", async () => {
+  const { normalizePopulationStyle } = await import("../js/core/population_spatial_view_model.js");
+  const { normalizeThematicWgiStyle } = await import("../js/core/thematic_wgi_view_model.js");
+  const populationRaw = Object.freeze({ enabled: true, mode: "heatmap", opacity: 1.5, dataVersion: "source-v1" });
+  const thematicRaw = Object.freeze({ enabled: true, layerId: "layer", metricId: "metric", dataVersion: "source-v1" });
+  for (const [modulePath, normalizer, raw, expected] of [
+    ["js/core/population_spatial_view_model.js", normalizePopulationStyle, populationRaw,
+      { enabled: true, mode: "heatmap", opacity: 1, dataVersion: "source-v1" }],
+    ["js/core/thematic_wgi_view_model.js", normalizeThematicWgiStyle, thematicRaw, thematicRaw],
+  ]) {
+    const normalized = normalizer(raw);
+    assert.deepEqual(normalized, expected);
+    assert.notEqual(normalized, raw);
+    const entry = STATE_TARGET_PURE_READER_CONTRACT.find((entry) => entry.modulePath === modulePath);
+    assert.equal(entry.functionName, normalizer.name);
+    assert.equal(entry.allowBorrowedTarget, true);
+    assert.deepEqual(inspectStateTargetPureReaderFunctionSource(fs.readFileSync(modulePath, "utf8"), entry).violations, []);
+  }
+  for (const modulePath of ["js/core/renderer/visible_frame_identity_policy.js", "js/core/renderer/render_pass_signature_policy.js"]) {
+    const source = fs.readFileSync(modulePath, "utf8");
+    const entry = STATE_TARGET_PURE_READER_CONTRACT.find((candidate) => candidate.modulePath === modulePath);
+    assert.deepEqual(await discoverStateWriterBindingsForSource(modulePath, source, "production", { scanAllParameters: true }), []);
+    // The runtime snapshot keeps raster references; it is not an imported
+    // reader with an asserted detached result. Only scalar signature use is reviewed.
+    assert.equal(entry.reviewedImportedReadCalls.some((site) => site.exportName === "getPopulationHeatmapSnapshot"), false);
+    for (const dependencyPath of ["js/core/thematic_wgi_view_model.js", "js/core/population_spatial_view_model.js",
+      ...(modulePath.includes("render_pass_signature") ? ["js/core/population_spatial_runtime.js"] : [])]) {
+      assert.ok(entry.dependencyFingerprints[dependencyPath], dependencyPath);
+      const changed = fs.readFileSync(dependencyPath, "utf8") + "\n// changed dependency fixture\n";
+      const inspection = inspectStateTargetPureReaderFunctionSource(source, entry, {
+        readSource: (path) => path === dependencyPath ? changed : fs.readFileSync(path, "utf8"),
+      });
+      assert.ok(inspection.violations.some((violation) => violation.code === "state-target-pure-reader-dependency-source-drift"
+        && violation.dependencyName === dependencyPath), dependencyPath);
+    }
+  }
+});

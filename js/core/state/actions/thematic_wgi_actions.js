@@ -7,7 +7,7 @@ export function createDefaultThematicWgiRuntimeState() {
 
 export function setThematicWgiRuntimeState(target, { status, data = null, error = "" }) {
   if (!target || typeof target !== "object") throw new TypeError("[thematic_wgi_actions] target must be an object");
-  if (!["idle", "loading", "ready", "failed"].includes(status)) {
+  if (status !== "idle" && status !== "loading" && status !== "ready" && status !== "failed") {
     throw new RangeError(`[thematic_wgi_actions] unknown status: ${status}`);
   }
   target.thematicWgiRuntime = {
