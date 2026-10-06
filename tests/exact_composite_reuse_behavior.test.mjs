@@ -6,6 +6,8 @@ import { parse } from "acorn";
 import { createExactCompositeReuseOwner } from "../js/core/renderer/exact_composite_reuse_owner.js";
 import { createCachedPassCompositorOwner } from "../js/core/renderer/cached_pass_compositor_owner.js";
 import { filterEnabledRenderPassNames } from "../js/core/map_renderer/render_pass_catalog.js";
+import { isThematicWgiActive } from "../js/core/thematic_wgi_view_model.js";
+import { isPopulationActive } from "../js/core/population_spatial_view_model.js";
 const source = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
 function realFunction(name, globals) {
@@ -119,6 +121,7 @@ test("actual export remains a separate pass composition after exact buffer reuse
   h.render(names); h.render(names);
   let prepared = 0;
   const exportGlobals = {
+    isThematicWgiActive, isPopulationActive,
     exportRenderInProgress: false,
     filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
     runtimeState: h.state, getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
@@ -140,6 +143,7 @@ test("export restores its prior rendering mode when pass preparation throws", ()
   for (const previous of [false, true]) {
     const h = harness();
     const globals = { runtimeState: h.state, exportRenderInProgress: previous,
+      isThematicWgiActive, isPopulationActive,
       filterCurrentEnabledRenderPasses: filterEnabledRenderPassNames,
       getRenderPipelinePassesOwner: () => ({ ensureIdleRenderPasses() {
         assert.equal(globals.exportRenderInProgress, true);

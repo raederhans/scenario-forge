@@ -13,8 +13,7 @@ import {
   getThematicWgiFeatureInspection, getThematicWgiViewModel,
 } from "../js/core/thematic_wgi_view_model.js";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
-import { getTooltipText } from "../js/core/i18n.js";
-import { state as runtimeState } from "../js/core/state.js";
+import { createTooltipFixture } from "./helpers/isolated_tooltip_fixture.mjs";
 import { drawThematicWgiExportLegend } from "../js/core/renderer/thematic_wgi_export_legend.js";
 
 const fetchJson = async (path) => {
@@ -40,14 +39,8 @@ function fixture(metricId = "wdi_population_total", scenarioId = "modern_world")
     scenarioBaselineOwnersByFeatureId: { sample: "GER" }, scenarioCountriesByTag: { GER: { base_iso2: "DE" } } };
 }
 const feature = { id: "sample", properties: { ISO_A2: "AT" } };
-const TOOLTIP_KEYS = ["activeScenarioId", "currentLanguage", "styleConfig", "thematicWgiRuntime",
-  "scenarioBaselineOwnersByFeatureId", "scenarioCountriesByTag"];
 function tooltipFor(state, row = feature) {
-  const previous = Object.fromEntries(TOOLTIP_KEYS.map((key) => [key, runtimeState[key]]));
-  try {
-    Object.assign(runtimeState, Object.fromEntries(TOOLTIP_KEYS.map((key) => [key, state[key]])));
-    return getTooltipText(row);
-  } finally { Object.assign(runtimeState, previous); }
+  return createTooltipFixture(state).getTooltipText(row);
 }
 function exportedLegend(state) {
   const texts = [], swatches = [];

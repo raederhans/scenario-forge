@@ -10,8 +10,7 @@ import {
   getThematicWgiColor, THEMATIC_WGI_COLORS,
 } from "../js/core/thematic_wgi_view_model.js";
 import { drawThematicWgiExportLegend } from "../js/core/renderer/thematic_wgi_export_legend.js";
-import { state as runtimeState } from "../js/core/state.js";
-import { getTooltipText } from "../js/core/i18n.js";
+import { createTooltipFixture } from "./helpers/isolated_tooltip_fixture.mjs";
 
 const ruleOfLawId = "wgi_rule_of_law_score_0_100";
 const fetchJson = async (path) => {
@@ -172,46 +171,38 @@ test("export key includes same bins, year, interpretation and attribution as map
 
 test("hover exposes country score uncertainty and distinguishes missing data in both languages", () => {
   const values = fixture();
-  const previous = Object.fromEntries(Object.keys(values).map((key) => [key, runtimeState[key]]));
-  Object.assign(runtimeState, values);
-  try {
-    const english = getTooltipText(feature("US"));
-    assert.match(english, /Government effectiveness · 2024:/);
-    assert.match(english, /90% confidence interval: [\d.]+–[\d.]+/);
-    assert.match(english, /Country\/economy score · World Bank WGI/);
-    runtimeState.currentLanguage = "zh";
-    assert.match(getTooltipText(feature("US")), /90% 置信区间:/);
-    assert.match(getTooltipText(feature("NC")), /来源缺失/);
-    assert.doesNotMatch(getTooltipText(feature("NC")), /置信区间/);
-    runtimeState.styleConfig.thematic.enabled = false;
-    assert.doesNotMatch(getTooltipText(feature("US")), /World Bank WGI/);
-  } finally {
-    Object.assign(runtimeState, previous);
-  }
+  const { getTooltipText } = createTooltipFixture(values);
+  const english = getTooltipText(feature("US"));
+  assert.match(english, /Government effectiveness · 2024:/);
+  assert.match(english, /90% confidence interval: [\d.]+–[\d.]+/);
+  assert.match(english, /Country\/economy score · World Bank WGI/);
+  values.currentLanguage = "zh";
+  assert.match(getTooltipText(feature("US")), /90% 置信区间:/);
+  assert.match(getTooltipText(feature("NC")), /来源缺失/);
+  assert.doesNotMatch(getTooltipText(feature("NC")), /置信区间/);
+  values.styleConfig.thematic.enabled = false;
+  assert.doesNotMatch(getTooltipText(feature("US")), /World Bank WGI/);
+
 });
 
 test("Rule of Law hover uses selected score, uncertainty and English/Chinese labels", () => {
   const values = fixture();
   values.styleConfig.thematic.metricId = ruleOfLawId;
   values.thematicWgiRuntime.data = ruleOfLawData;
-  const previous = Object.fromEntries(Object.keys(values).map((key) => [key, runtimeState[key]]));
-  Object.assign(runtimeState, values);
-  try {
-    const usa = ruleOfLawData.byIsoA3.USA;
-    const interval = usa.uncertainty.score_confidence_interval_90;
-    assert.notDeepEqual(interval, data.byIsoA3.USA.uncertainty.score_confidence_interval_90);
-    const english = getTooltipText(feature("US"));
-    assert.ok(english.includes(`Rule of law · 2024: ${usa.value.toFixed(1)} / 100`));
-    assert.ok(english.includes(`90% confidence interval: ${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
-    assert.doesNotMatch(english, /Government effectiveness/);
-    runtimeState.currentLanguage = "zh";
-    const chinese = getTooltipText(feature("US"));
-    assert.ok(chinese.includes(`法治 · 2024: ${usa.value.toFixed(1)} / 100`));
-    assert.ok(chinese.includes(`90% 置信区间: ${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
-    assert.doesNotMatch(chinese, /政府效能/);
-  } finally {
-    Object.assign(runtimeState, previous);
-  }
+  const { getTooltipText } = createTooltipFixture(values);
+  const usa = ruleOfLawData.byIsoA3.USA;
+  const interval = usa.uncertainty.score_confidence_interval_90;
+  assert.notDeepEqual(interval, data.byIsoA3.USA.uncertainty.score_confidence_interval_90);
+  const english = getTooltipText(feature("US"));
+  assert.ok(english.includes(`Rule of law · 2024: ${usa.value.toFixed(1)} / 100`));
+  assert.ok(english.includes(`90% confidence interval: ${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
+  assert.doesNotMatch(english, /Government effectiveness/);
+  values.currentLanguage = "zh";
+  const chinese = getTooltipText(feature("US"));
+  assert.ok(chinese.includes(`法治 · 2024: ${usa.value.toFixed(1)} / 100`));
+  assert.ok(chinese.includes(`90% 置信区间: ${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
+  assert.doesNotMatch(chinese, /政府效能/);
+
 });
 
 test("historical mapping follows immutable baseline owners and explicit ISO2 references only", () => {
@@ -343,28 +334,24 @@ for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
 
 test("new official dimensions expose their own score and uncertainty in bilingual historical hover", async () => {
   const values = historicalFixture();
-  const previous = Object.fromEntries(Object.keys(values).map((key) => [key, runtimeState[key]]));
-  Object.assign(runtimeState, values);
-  try {
-    for (const metric of THEMATIC_WGI_METRICS.slice(2)) {
-      const payload = await loadThematicWgiData({ fetchJson, metricId: metric.id, scenarioId: values.activeScenarioId });
-      runtimeState.styleConfig = { thematic: normalizeThematicWgiStyle({ enabled: true, metricId: metric.id }) };
-      runtimeState.thematicWgiRuntime = { status: "ready", data: payload, revision: 1 };
-      const observation = payload.byIsoA3.DEU;
-      const interval = observation.uncertainty.score_confidence_interval_90;
-      for (const language of ["en", "zh"]) {
-        runtimeState.currentLanguage = language;
-        const tooltip = getTooltipText(feature("PL"));
-        const label = language === "zh" ? metric.labelZh : metric.labelEn;
-        assert.ok(tooltip.includes(`${label} · 2024: ${observation.value.toFixed(1)} / 100`));
-        assert.ok(tooltip.includes(`${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
-        assert.ok(tooltip.includes(`${observation.name} (DEU)`));
-        assert.ok(tooltip.includes(getThematicWgiLegend(runtimeState).referenceNote));
-      }
+  const { getTooltipText } = createTooltipFixture(values);
+  for (const metric of THEMATIC_WGI_METRICS.slice(2)) {
+    const payload = await loadThematicWgiData({ fetchJson, metricId: metric.id, scenarioId: values.activeScenarioId });
+    values.styleConfig = { thematic: normalizeThematicWgiStyle({ enabled: true, metricId: metric.id }) };
+    values.thematicWgiRuntime = { status: "ready", data: payload, revision: 1 };
+    const observation = payload.byIsoA3.DEU;
+    const interval = observation.uncertainty.score_confidence_interval_90;
+    for (const language of ["en", "zh"]) {
+      values.currentLanguage = language;
+      const tooltip = getTooltipText(feature("PL"));
+      const label = language === "zh" ? metric.labelZh : metric.labelEn;
+      assert.ok(tooltip.includes(`${label} · 2024: ${observation.value.toFixed(1)} / 100`));
+      assert.ok(tooltip.includes(`${interval.lower.toFixed(1)}–${interval.upper.toFixed(1)}`));
+      assert.ok(tooltip.includes(`${observation.name} (DEU)`));
+      assert.ok(tooltip.includes(getThematicWgiLegend(values).referenceNote));
     }
-  } finally {
-    Object.assign(runtimeState, previous);
   }
+
 });
 
 test("long official export titles wrap without squeezing or overlapping reference notes and bins", async () => {
@@ -409,42 +396,52 @@ test("TNO water, special land and real Atlantropa features do not receive WGI or
 
 test("historical legend, hover and wrapped export explain the 2024 reference in both languages", () => {
   const values = historicalFixture();
-  const previous = Object.fromEntries(Object.keys(values).map((key) => [key, runtimeState[key]]));
-  Object.assign(runtimeState, values);
-  try {
-    for (const language of ["en", "zh"]) {
-      runtimeState.currentLanguage = values.currentLanguage = language;
-      const legend = getThematicWgiLegend(values);
-      const view = getThematicWgiViewModel(values);
-      const note = language === "zh" ? "2024 参考映射，非剧本年代测量值。"
-        : "2024 reference mapping, not a measurement for the scenario year.";
-      assert.equal(view.historicalReference, true);
-      assert.equal(view.referenceNote, note);
-      assert.equal(legend.referenceNote, note);
-      const tooltip = getTooltipText(feature("PL"));
-      assert.ok(tooltip.includes(note));
-      assert.ok(tooltip.includes(`${data.byIsoA3.DEU.name} (DEU)`));
-      assert.ok(tooltip.includes(`${data.byIsoA3.DEU.value.toFixed(1)} / 100`));
-      const texts = [];
-      const context = { save() {}, restore() {}, setTransform() {}, fillRect() {}, strokeRect() {},
-        measureText: (text) => ({ width: text.length * 11 }),
-        fillText: (text) => texts.push(text) };
-      assert.equal(drawThematicWgiExportLegend({ width: 2000, height: 1200, getContext: () => context }, values), true);
-      const noteIndex = texts.indexOf(legend.note);
-      assert.equal(texts.slice(0, noteIndex).join(language === "zh" ? "" : " "), legend.title);
-      assert.equal(texts.slice(noteIndex + 1, -8).join(language === "zh" ? "" : " "), note);
-      for (const text of [legend.note, legend.source, ...legend.entries.map((entry) => entry.label)]) {
-        assert.ok(texts.includes(text));
-      }
+  const { getTooltipText } = createTooltipFixture(values);
+  for (const language of ["en", "zh"]) {
+    values.currentLanguage = language;
+    const legend = getThematicWgiLegend(values);
+    const view = getThematicWgiViewModel(values);
+    const note = language === "zh" ? "2024 参考映射，非剧本年代测量值。"
+      : "2024 reference mapping, not a measurement for the scenario year.";
+    assert.equal(view.historicalReference, true);
+    assert.equal(view.referenceNote, note);
+    assert.equal(legend.referenceNote, note);
+    const tooltip = getTooltipText(feature("PL"));
+    assert.ok(tooltip.includes(note));
+    assert.ok(tooltip.includes(`${data.byIsoA3.DEU.name} (DEU)`));
+    assert.ok(tooltip.includes(`${data.byIsoA3.DEU.value.toFixed(1)} / 100`));
+    const texts = [];
+    const context = { save() {}, restore() {}, setTransform() {}, fillRect() {}, strokeRect() {},
+      measureText: (text) => ({ width: text.length * 11 }),
+      fillText: (text) => texts.push(text) };
+    assert.equal(drawThematicWgiExportLegend({ width: 2000, height: 1200, getContext: () => context }, values), true);
+    const noteIndex = texts.indexOf(legend.note);
+    assert.equal(texts.slice(0, noteIndex).join(language === "zh" ? "" : " "), legend.title);
+    assert.equal(texts.slice(noteIndex + 1, -8).join(language === "zh" ? "" : " "), note);
+    for (const text of [legend.note, legend.source, ...legend.entries.map((entry) => entry.label)]) {
+      assert.ok(texts.includes(text));
     }
-    runtimeState.scenarioCountriesByTag = { GER: { base_iso2: "DEU" } };
-    const unmatched = getTooltipText(feature("PL"));
-    assert.match(unmatched, /未匹配／未覆盖/);
-    assert.doesNotMatch(unmatched, /参考国家\/经济体:|参考国家：|\(DEU\)/);
-    values.activeScenarioId = "modern_world";
-    assert.equal(getThematicWgiViewModel(values).historicalReference, false);
-    assert.equal(getThematicWgiLegend(values).referenceNote, "");
-  } finally {
-    Object.assign(runtimeState, previous);
   }
+  values.scenarioCountriesByTag = { GER: { base_iso2: "DEU" } };
+  const unmatched = getTooltipText(feature("PL"));
+  assert.match(unmatched, /未匹配／未覆盖/);
+  assert.doesNotMatch(unmatched, /参考国家\/经济体:|参考国家：|\(DEU\)/);
+  values.activeScenarioId = "modern_world";
+  assert.equal(getThematicWgiViewModel(values).historicalReference, false);
+  assert.equal(getThematicWgiLegend(values).referenceNote, "");
+
+});
+
+
+test("tooltip fixture realms retain independent language and indicator state", () => {
+  const englishState = fixture();
+  const chineseState = fixture();
+  chineseState.currentLanguage = "zh";
+  const english = createTooltipFixture(englishState);
+  const chinese = createTooltipFixture(chineseState);
+  assert.match(english.getTooltipText(feature("US")), /Government effectiveness · 2024:/);
+  assert.match(chinese.getTooltipText(feature("US")), /政府效能 · 2024:/);
+  chineseState.styleConfig.thematic.enabled = false;
+  assert.doesNotMatch(chinese.getTooltipText(feature("US")), /World Bank WGI/);
+  assert.match(english.getTooltipText(feature("US")), /Country\/economy score · World Bank WGI/);
 });

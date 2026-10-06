@@ -11,8 +11,7 @@ import {
   getThematicWgiFeatureInspection, getThematicWgiViewModel,
 } from "../js/core/thematic_wgi_view_model.js";
 import { resolveFeatureColor } from "../js/core/color_resolver.js";
-import { getTooltipText } from "../js/core/i18n.js";
-import { state as runtimeState } from "../js/core/state.js";
+import { createTooltipFixture } from "./helpers/isolated_tooltip_fixture.mjs";
 import { drawThematicWgiExportLegend } from "../js/core/renderer/thematic_wgi_export_legend.js";
 
 const fetchJson = async (path) => {
@@ -39,41 +38,35 @@ test("HDI uses exact official category cutoffs and distinct missing/unmatched co
 });
 
 test("every UNDP indicator renders raw units and its own year, source and bins across four scenarios", () => {
-  const keys = ["activeScenarioId", "currentLanguage", "styleConfig", "thematicWgiRuntime",
-    "scenarioBaselineOwnersByFeatureId", "scenarioCountriesByTag"];
-  const previous = Object.fromEntries(keys.map((key) => [key, runtimeState[key]]));
-  try {
-    for (const { id } of THEMATIC_HDI_METRICS) {
-      const metric = getThematicIndicator(id);
-      for (const scene of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"]) {
-        const state = fixture(id, scene);
-        const observation = getThematicWgiFeatureInspection(state, feature);
-        assert.equal(observation.joinKey, scene === "modern_world" ? "AUT" : "DEU");
-        assert.equal(observation.value, dataByMetric.get(id).byIsoA3[observation.joinKey].value);
-        assert.equal(resolveFeatureColor("sample", { state, feature }).color, getThematicWgiColor(observation));
-        assert.equal(state.visualOverrides.sample, "#123456");
-        Object.assign(runtimeState, Object.fromEntries(keys.map((key) => [key, state[key]])));
-        const tooltip = getTooltipText(feature);
-        assert.match(tooltip, /2023/);
-        assert.match(tooltip, /UNDP HDR 2025/);
-        assert.doesNotMatch(tooltip, /2024|World Bank|\/ 100|confidence interval/);
-        if (metric.unit === "years") assert.match(tooltip, /\d+\.\d years/);
-        if (metric.unit === "usd_2021_ppp") assert.match(tooltip, /2021 PPP \$/);
-        const legend = getThematicWgiLegend(state);
-        assert.equal(legend.entries.length, metric.colors.length + 2);
-        assert.equal(legend.binCount, id === "undp_hdi" ? 4 : 5);
-        assert.equal(legend.referenceNote.includes("2023"), scene !== "modern_world");
-        const texts = [], swatches = [];
-        const ctx = { save() {}, restore() {}, setTransform() {}, strokeRect() {},
-          measureText: (text) => ({ width: text.length * 6 }),
-          fillRect() { swatches.push(this.fillStyle); }, fillText(text) { texts.push(text); } };
-        drawThematicWgiExportLegend({ width: 2000, height: 1200, getContext: () => ctx }, state);
-        assert.ok(texts.includes(metric.attribution));
-        for (const label of metric.labels) assert.ok(texts.includes(label));
-        assert.equal(swatches.length, metric.colors.length + 3); // background + bins + two missing states
-      }
+  for (const { id } of THEMATIC_HDI_METRICS) {
+    const metric = getThematicIndicator(id);
+    for (const scene of ["modern_world", "hoi4_1936", "hoi4_1939", "tno_1962"]) {
+      const state = fixture(id, scene);
+      const observation = getThematicWgiFeatureInspection(state, feature);
+      assert.equal(observation.joinKey, scene === "modern_world" ? "AUT" : "DEU");
+      assert.equal(observation.value, dataByMetric.get(id).byIsoA3[observation.joinKey].value);
+      assert.equal(resolveFeatureColor("sample", { state, feature }).color, getThematicWgiColor(observation));
+      assert.equal(state.visualOverrides.sample, "#123456");
+      const tooltip = createTooltipFixture(state).getTooltipText(feature);
+      assert.match(tooltip, /2023/);
+      assert.match(tooltip, /UNDP HDR 2025/);
+      assert.doesNotMatch(tooltip, /2024|World Bank|\/ 100|confidence interval/);
+      if (metric.unit === "years") assert.match(tooltip, /\d+\.\d years/);
+      if (metric.unit === "usd_2021_ppp") assert.match(tooltip, /2021 PPP \$/);
+      const legend = getThematicWgiLegend(state);
+      assert.equal(legend.entries.length, metric.colors.length + 2);
+      assert.equal(legend.binCount, id === "undp_hdi" ? 4 : 5);
+      assert.equal(legend.referenceNote.includes("2023"), scene !== "modern_world");
+      const texts = [], swatches = [];
+      const ctx = { save() {}, restore() {}, setTransform() {}, strokeRect() {},
+        measureText: (text) => ({ width: text.length * 6 }),
+        fillRect() { swatches.push(this.fillStyle); }, fillText(text) { texts.push(text); } };
+      drawThematicWgiExportLegend({ width: 2000, height: 1200, getContext: () => ctx }, state);
+      assert.ok(texts.includes(metric.attribution));
+      for (const label of metric.labels) assert.ok(texts.includes(label));
+      assert.equal(swatches.length, metric.colors.length + 3); // background + bins + two missing states
     }
-  } finally { Object.assign(runtimeState, previous); }
+  }
 });
 
 test("UNDP mapping follows actual historical owner groups and leaves unknown/special surfaces alone", async () => {
