@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-07 基础数据性能优化整合
+
+`C:/Users/raede/.codex/worktrees/base-data-perf-integration/mapcreator` 使用 `codex/base-data-performance-20261007`，基于 `origin/main@5dd62b73e` 提取三批性能优化。保留主线无损启动传输、TopoJSON 粗层和地理修复，并重新应用严格覆盖约束的显示优化。root 独占 Git、产物构建和浏览器验证；主目录混合 WIP 保留原状。本工作树保留 `.runtime/tmp/base-data-delivery/` 中的输入备份、构建和验收证据，最终推送、required checks、合并与部署以 GitHub 回执为准。记录见 [性能整合](base-data-performance-20261007/task.md)。
+
 ## 2026-10-06 人口空间与国家专题整合
 
 `C:/Users/raede/.codex/worktrees/population-thematic-integration/mapcreator` 使用 `codex/population-thematic-20261006`，从 `origin/main@926ee96f` 提取本对话人口空间与国家专题改动，并按最新完整边界重建四个场景的地块统计。用户已授权合并推送；root 是唯一 Git 和现场检查负责人，原主目录混合 WIP 保留。工作树保留忽略的构建缓存、验证日志和数据审计，最终推送、required checks 与合并以 GitHub 回执为准。记录见 [人口专题整合](population-thematic-integration-20261006/task.md)。

@@ -1,12 +1,14 @@
 import gzip
 import hashlib
 import json
+import shutil
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 from math import sin
 from shapely.geometry import Polygon, mapping, shape
+from shapely.errors import GEOSException
 from shapely.ops import unary_union
 from tools.build_political_display_lods import simplify_coverage_features, cached_simplify_coverage_features, build_overlay, coordinate_count
 
@@ -36,6 +38,8 @@ class DisplayLodTests(unittest.TestCase):
         result, report = simplify_coverage_features(features, .02, ["a"])
         self.assertEqual(result, features)
         self.assertEqual(report["status"], "unchanged")
+        self.assertEqual([item["retention_reason"] for item in report["feature_diagnostics"]],
+                         ["protected", "no-point-reduction"])
 
     def test_overlapping_invalid_coverage_falls_back_without_repair(self):
         features = fixture()
@@ -52,11 +56,67 @@ class DisplayLodTests(unittest.TestCase):
         result, report = simplify_coverage_features(features, .02)
         self.assertEqual(report["status"], "simplified")
         self.assertEqual(set(report["retained_exact_ids"]), {"overlap-a", "overlap-b"})
+        costs = report["retention_costs"]
+        overlap_cost = next(item for item in costs if item["reason"] == "invalid-coverage-boundary")
+        self.assertEqual(overlap_cost["feature_count"], 2)
+        self.assertEqual(overlap_cost["coordinate_count"], 2 * coordinate_count(invalid))
         self.assertIs(result[2], features[2])
         self.assertIs(result[3], features[3])
         self.assertLess(report["output_points"], report["input_points"])
         self.assertTrue(unary_union([shape(f["geometry"]) for f in result[:2]]).equals(
             unary_union([shape(f["geometry"]) for f in features[:2]])))
+
+    def test_retention_diagnostics_record_actual_branches_and_coordinate_costs(self):
+        features = fixture()
+        extras = [
+            ("invalid", mapping(Polygon([(10, 0), (11, 1), (10, 1), (11, 0), (10, 0)]))),
+            ("date", mapping(Polygon([(-179, 0), (179, 0), (179, 1), (-179, 1)]))),
+            ("protected", mapping(Polygon([(20, 0), (21, 0), (21, 1), (20, 1)]))),
+            ("point", {"type": "Point", "coordinates": [30, 0]}),
+        ]
+        features.extend({"type": "Feature", "properties": {"id": fid}, "geometry": geometry}
+                        for fid, geometry in extras)
+        result, report = simplify_coverage_features(features, .02, ["protected"])
+        self.assertEqual(report["status"], "simplified")
+        self.assertEqual([item["retention_reason"] for item in report["feature_diagnostics"][2:]],
+                         ["invalid-geometry", "dateline", "protected", "non-polygon"])
+        self.assertTrue(all(item["retained_exact"] for item in report["feature_diagnostics"][2:]))
+        self.assertTrue(all(not item["retained_exact"] and item["retention_reason"] is None
+                            for item in report["feature_diagnostics"][:2]))
+        self.assertEqual(sum(item["input_points"] for item in report["feature_diagnostics"]), report["input_points"])
+        self.assertEqual(sum(item["output_points"] for item in report["feature_diagnostics"]), report["output_points"])
+        self.assertEqual(sum(item["coordinate_count"] for item in report["retention_costs"]),
+                         sum(coordinate_count(feature["geometry"]) for feature in features[2:]))
+        self.assertEqual(report["retention_costs"], sorted(report["retention_costs"],
+                         key=lambda item: (-item["coordinate_count"], item["reason"])))
+        self.assertTrue(all(result[i] is features[i] for i in range(2, len(features))))
+
+    def test_zero_tolerance_and_limit_fallback_have_branch_diagnostics(self):
+        features = fixture()
+        self.assertEqual({item["retention_reason"] for item in simplify_coverage_features(features, 0)[1]["feature_diagnostics"]},
+                         {"zero-tolerance"})
+        with patch("tools.build_political_display_lods.coverage_simplify", return_value=[Polygon(), Polygon()]):
+            result, report = simplify_coverage_features(features, .02)
+        self.assertIs(result, features)
+        self.assertEqual({item["retention_reason"] for item in report["feature_diagnostics"]}, {"deviation-or-topology-limit"})
+        self.assertEqual(report["retention_costs"], [{"reason": "deviation-or-topology-limit", "feature_count": 2,
+                                                   "coordinate_count": report["input_points"]}])
+
+    def test_whole_group_union_failure_falls_back_after_valid_subcoverage(self):
+        features = fixture()
+        source_union = unary_union([shape(f["geometry"]) for f in features])
+        other_union = Polygon([(10, 0), (11, 0), (11, 1), (10, 1)])
+        for final_union in (other_union, GEOSException("retained-neighbour union failed")):
+            with self.subTest(final_union=type(final_union).__name__):
+                with patch("tools.build_political_display_lods.unary_union",
+                           side_effect=[source_union, source_union, source_union, final_union]):
+                    result, report = simplify_coverage_features(features, .02)
+                self.assertIs(result, features)
+                self.assertEqual(report["status"], "fallback")
+                self.assertEqual(report["reason"], "whole-group-coverage-check-failed")
+                self.assertEqual(report["output_points"], report["input_points"])
+                self.assertEqual({item["retention_reason"] for item in report["feature_diagnostics"]},
+                                 {"whole-group-coverage-check-failed"})
 
     def test_dateline_and_zero_tolerance_do_not_simplify(self):
         features = [{"type": "Feature", "properties": {"id": "date"}, "geometry": mapping(Polygon([(-179, 0), (179, 0), (179, 1), (-179, 1)]))}]
@@ -149,6 +209,35 @@ class DisplayLodTests(unittest.TestCase):
             self.assertEqual(warm_report["build_graph"]["cache_hits"], 2)
             self.assertFalse(uncached_report["build_graph"]["enabled"])
             self.assertFalse(warm_report["build_graph"]["release_approved"])
+            # Overlay payloads become the source's derived files after promotion;
+            # detail bytes continue to come from the original source authority.
+            shutil.copytree(output / "data", root / "data", dirs_exist_ok=True)
+            rebuilt = Path(folder) / "rebuilt"
+            build_overlay(root, "pilot", rebuilt, use_cache=False)
+            rebuilt_manifest = json.loads((rebuilt / prefix / "detail_chunks.manifest.json").read_text())
+            self.assertEqual(len({c["id"] for c in rebuilt_manifest["chunks"]}), len(rebuilt_manifest["chunks"]))
+            self.assertEqual([c for c in rebuilt_manifest["chunks"] if c["lod"] == "regional"], [regional])
+            self.assertEqual(next(c for c in rebuilt_manifest["chunks"] if c["lod"] == "detail")["min_zoom"], 4.0)
+            # A derived variant that no longer reduces points must leave the
+            # original detail eligible at the original regional entry zoom.
+            with patch("tools.build_political_display_lods.simplify_coverage_features",
+                       side_effect=lambda features, *_: (features, {"status": "unchanged", "reason": "no-point-reduction"})):
+                no_variant = Path(folder) / "no-variant"
+                build_overlay(root, "pilot", no_variant, use_cache=False)
+            no_variant_manifest = json.loads((no_variant / prefix / "detail_chunks.manifest.json").read_text())
+            self.assertFalse(any(c["lod"] == "regional" for c in no_variant_manifest["chunks"]))
+            restored_detail = next(c for c in no_variant_manifest["chunks"] if c["lod"] == "detail")
+            self.assertEqual(restored_detail["min_zoom"], regional["min_zoom"])
+            self.assertNotIn("lod_group_id", restored_detail)
+            promoted_manifest = json.loads((directory / "detail_chunks.manifest.json").read_text())
+            unrelated = {**regional, "id": "political.regional.unrelated"}
+            unrelated.pop("lod_group_id")
+            promoted_manifest["chunks"].append(unrelated)
+            (directory / "detail_chunks.manifest.json").write_text(json.dumps(promoted_manifest))
+            unrelated_output = Path(folder) / "unrelated"
+            build_overlay(root, "pilot", unrelated_output, use_cache=False)
+            unrelated_manifest = json.loads((unrelated_output / prefix / "detail_chunks.manifest.json").read_text())
+            self.assertIn(unrelated, unrelated_manifest["chunks"])
             with self.assertRaises(ValueError): build_overlay(root, "pilot", root)
             with self.assertRaises(ValueError): build_overlay(root, "../pilot", output)
 
