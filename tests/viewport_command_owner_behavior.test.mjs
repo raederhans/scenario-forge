@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 import { createViewportCommandOwner } from "../js/core/renderer/viewport_command_owner.js";
+import { createZoomInteractionLifecycleOwner } from "../js/core/renderer/zoom_interaction_lifecycle_owner.js";
 
 function createTransform(label) {
   return { label, x: 0, y: 0, k: 1 };
@@ -320,6 +323,83 @@ test("enforceZoomConstraints asks d3 to translate by zero", () => {
   owner.enforceZoomConstraints();
 
   assert.deepEqual(calls.translateBy, [[0, 0]]);
+});
+
+test("suppressed constraint correction keeps real D3 state without drawing and later zoom still renders", () => {
+  const vendor = { navigator: { maxTouchPoints: 0 }, setTimeout, clearTimeout };
+  vm.runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), vendor);
+  const d3 = vendor.d3;
+  for (const suppressRender of [false, true]) {
+    const initial = d3.zoomIdentity.translate(1500, 1200);
+    const state = { width: 800, height: 600, zoomTransform: initial };
+    const node = { __zoom: initial, addEventListener() {}, removeEventListener() {} };
+    const frames = [];
+    const draws = [];
+    const snapshots = [];
+    const refreshes = [];
+    let behavior;
+    const lifecycle = createZoomInteractionLifecycleOwner({
+      getters: {
+        getD3: () => d3,
+        getWidth: () => state.width,
+        getHeight: () => state.height,
+        getInteractionRect: () => ({ node: () => node }),
+        getZoomTransform: () => state.zoomTransform,
+        getPendingZoomTransform: () => state.pending,
+        getZoomGestureStartTransform: () => state.gestureStart,
+        isZoomRenderScheduled: () => state.scheduled,
+      },
+      helpers: { requestAnimationFrame: (callback) => frames.push(callback) },
+      effects: {
+        setZoomBehavior: (value) => { behavior = value; },
+        setPendingZoomTransform: (value) => { state.pending = value; },
+        setZoomRenderScheduled: (value) => { state.scheduled = value; },
+        setZoomGestureStartTransform: (value) => { state.gestureStart = value; },
+        captureInteractionBorderSnapshot: (value) => snapshots.push(value),
+        scheduleScenarioChunkRefresh: (value) => refreshes.push(value),
+        updateMap: (value) => {
+          state.zoomTransform = value;
+          draws.push(value);
+        },
+      },
+    });
+    lifecycle.initZoom();
+    const owner = createViewportCommandOwner({
+      state,
+      getters: {
+        getD3: () => d3,
+        getZoomBehavior: () => behavior,
+        getInteractionRect: () => ({ node: () => node }),
+        calculatePanExtent: () => [[0, 0], [400, 300]],
+      },
+      effects: { setZoomTransform: (value) => { state.zoomTransform = value; } },
+    });
+    owner.updateZoomTranslateExtent();
+    // This is an actual out-of-bounds correction, not an identity no-op.
+    const expected = behavior.constrain()(initial, [[0, 0], [800, 600]], [[0, 0], [400, 300]]);
+    assert.notEqual(expected.x, initial.x);
+    owner.enforceZoomConstraints({ suppressRender });
+    assert.equal(node.__zoom.x, expected.x);
+    assert.equal(node.__zoom.y, expected.y);
+    assert.equal(node.__zoom.k, expected.k);
+    assert.equal(state.zoomTransform, node.__zoom);
+    const correctionDraws = suppressRender ? 0 : 1;
+    assert.equal(draws.length, correctionDraws);
+    assert.equal(snapshots.length, correctionDraws);
+    assert.equal(refreshes.length, correctionDraws);
+    assert.equal(state.pending, null);
+    assert.equal(state.scheduled, false);
+
+    owner.zoomByStep(1);
+    assert.equal(node.__zoom.k, 1.2);
+    assert.equal(state.zoomTransform, node.__zoom);
+    assert.equal(draws.length, correctionDraws + 1);
+    assert.equal(snapshots.length, correctionDraws + 1);
+    assert.equal(refreshes.length, correctionDraws + 1);
+    for (const frame of frames) frame();
+    assert.equal(draws.length, correctionDraws + 1, "stale zoom frames must not redraw");
+    lifecycle.dispose();
+  }
 });
 
 test("command wrappers noop without d3 selection inputs", () => {

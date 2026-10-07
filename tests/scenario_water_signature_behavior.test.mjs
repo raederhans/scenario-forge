@@ -5,6 +5,7 @@ import vm from "node:vm";
 import { parse } from "acorn";
 import { resolveEffectiveWaterRegionFeatures } from "../js/core/renderer/effective_water_regions.js";
 import { createSourceMetricsCache } from "../js/core/renderer/source_metrics_cache.js";
+import { getPopulationSignature } from "../js/core/population_spatial_view_model.js";
 
 const rendererSource = readFileSync(new URL("../js/core/map_renderer.js", import.meta.url), "utf8");
 const identitySource = readFileSync(new URL("../js/core/renderer/object_identity.js", import.meta.url), "utf8")
@@ -48,6 +49,7 @@ export function createHarness(source = rendererSource) {
     getLakeStyleConfig: () => ({ opacity: 1 }),
     getScenarioSpecialVisualRevisionToken: () => "special",
     getScenarioReliefVisualRevisionToken: () => "relief",
+    getPopulationSignature,
   });
   vm.runInContext(identitySource + "\n" + functions.map((node) => source.slice(node.start, node.end)).join("\n"), context);
   for (const [name, key] of [["getEffectiveWaterRegionFeatures", "water"], ["getEffectiveAtlantropaFeatures", "buckets"],
@@ -63,7 +65,7 @@ const atlantropa = "scenario-atlantropa:4:features:2:water:1:land:1:shoal:0:reli
 const surface = "tno|runtime-tag:scenario-runtime-topology:1:na|na|na|na|na|detail-phase:single/detail-pending/detail-idle"
   + "|mask-tag:scenarioLandMask:scenario-mask:2:1:na:d3-valid|water-ref:scenario-water:3|lakes-ref:global-lakes:none|water-tag:features:3"
   + `|water-mode:combined|atlantropa:${atlantropa}`;
-const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|water-overrides:{}`
+const suffix = `|water-effective:3|water-scenario:1|water-atlantropa:${atlantropa}|population:${getPopulationSignature({})}|water-overrides:{}`
   + "|scenario-water:on|open-ocean:off|open-ocean-select:off|open-ocean-paint:off"
   + '|ocean-fill:#ocean|lake-fill:#lake|lake-style:{"opacity":1}|ocean-surface:{}|bathymetry:|ocean-depth:0';
 
@@ -80,6 +82,20 @@ test("standalone surface and Atlantropa calls keep their no-argument semantics",
   assert.equal(h.surface(), surface);
   assert.equal(h.context.getScenarioAtlantropaRevisionToken(), atlantropa);
   assert.equal(h.water(), surface + suffix);
+});
+
+test("surface revision lookup avoids water preparation when an explicit tag exists", () => {
+  const h = createHarness();
+  h.state.scenarioWaterOverlayVersionTag = " prepared-water-v2 ";
+  const first = h.surface();
+  assert.match(first, /water-tag:prepared-water-v2\|/);
+  assert.equal(h.calls.water, 0);
+  h.state.scenarioWaterOverlayVersionTag = "prepared-water-v3";
+  assert.notEqual(h.surface(), first);
+  assert.equal(h.calls.water, 0);
+  h.state.scenarioWaterOverlayVersionTag = " ";
+  assert.match(h.surface(), /water-tag:features:3\|/);
+  assert.equal(h.calls.water, 1, "untagged data still derives its effective count");
 });
 
 test("water selection invalidates the composite while fill reuse survives selection and clearing", () => {

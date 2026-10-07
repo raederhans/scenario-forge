@@ -415,6 +415,126 @@ test("spherical diagnostics cache d3 results by geo object identity", () => {
   assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
 });
 
+test("spherical diagnostics share geometry across wrappers and invalidate on revision", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner, harnessStore } = createHarness({ d3: diagnostics.d3 });
+  const geometry = createPolygon([10, 0]);
+  const first = owner.getSphericalGeometryDiagnostics(createFeature("A", geometry));
+  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("B", geometry)), first);
+  assert.equal(owner.getSphericalGeometryDiagnostics(geometry), first);
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+
+  geometry.coordinates[0][0][0] = 999;
+  harnessStore.contextLayerRevision = 1;
+  assert.equal(owner.getSphericalGeometryDiagnostics(geometry).invalid, true);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+  assert.equal(owner.getSphericalGeometryDiagnostics(createFeature("A", createPolygon([10, 0]))).invalid, false);
+  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+});
+
+test("water part info shares geometry across wrappers without IDs", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const geometry = { type: "MultiPolygon", coordinates: [
+    createPolygon([999, 0]).coordinates, createPolygon([10, 0]).coordinates, createPolygon([20, 0]).coordinates,
+  ] };
+  const first = createFeature("", geometry);
+  const second = { ...first, properties: { name: "new wrapper" } };
+  const info = owner.collectSafeWaterRegionGeometryPartsInfo(first);
+  const firstSanitized = owner.sanitizeWaterRegionFeature(first);
+  assert.equal(owner.collectSafeWaterRegionGeometryPartsInfo(second), info);
+  const secondSanitized = owner.sanitizeWaterRegionFeature(second);
+  assert.equal(secondSanitized.properties, second.properties);
+  assert.equal(secondSanitized.geometry, firstSanitized.geometry);
+  assert.deepEqual(diagnostics.calls, { geoArea: 3, geoBounds: 3 });
+});
+
+test("sanitized feature and sequence reuse rebind current properties and top-level metadata", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const feature = createFeature("WATER", { type: "MultiPolygon", coordinates: [
+    createPolygon([999, 0]).coordinates, createPolygon([10, 0]).coordinates,
+  ] });
+  const [first] = owner.sanitizeWaterRegionFeatures([feature]);
+  feature.properties.name = "changed in place";
+  assert.equal(owner.sanitizeWaterRegionFeature(feature).properties.name, "changed in place");
+  assert.equal(owner.sanitizeWaterRegionFeatures([feature])[0].properties.name, "changed in place");
+  feature.properties = { id: "WATER", name: "updated" };
+  feature.bbox = [1, 2, 3, 4];
+  const direct = owner.sanitizeWaterRegionFeature(feature);
+  const [sequence] = owner.sanitizeWaterRegionFeatures([feature]);
+  for (const sanitized of [direct, sequence]) {
+    assert.equal(sanitized.geometry, first.geometry);
+    assert.equal(sanitized.properties, feature.properties);
+    assert.equal(sanitized.bbox, feature.bbox);
+  }
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+});
+
+test("replacing a feature geometry cannot poison the cached geometry or decoded snapshot", () => {
+  const diagnostics = createD3Diagnostics();
+  const { owner } = createHarness({ d3: diagnostics.d3 });
+  const originalGeometry = createPolygon([10, 0]);
+  const feature = createFeature("WATER", originalGeometry);
+  owner.sanitizeWaterRegionFeatures([feature]);
+  feature.geometry = createPolygon([999, 0]);
+  const wrapper = createFeature("WATER", originalGeometry);
+  assert.equal(owner.sanitizeWaterRegionFeature(wrapper), wrapper);
+  const decoded = createFeature("WATER", structuredClone(originalGeometry));
+  assert.equal(owner.sanitizeWaterRegionFeatures([decoded])[0].geometry, originalGeometry);
+  assert.deepEqual(diagnostics.calls, { geoArea: 1, geoBounds: 1 });
+  assert.equal(owner.sanitizeWaterRegionFeature(feature), null);
+  assert.deepEqual(diagnostics.calls, { geoArea: 2, geoBounds: 2 });
+});
+
+test("real D3 water reuse preserves holes and antimeridian geometry and rejects changed hole coordinates", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const { runInNewContext } = await import("node:vm");
+  const context = {};
+  runInNewContext(await readFile(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), context);
+  const d3 = context.d3;
+  const diagnosticCalls = { geoArea: 0, geoBounds: 0 };
+  const { owner, calls } = createHarness({ d3: {
+    geoArea(value) { diagnosticCalls.geoArea += 1; return d3.geoArea(value); },
+    geoBounds(value) { diagnosticCalls.geoBounds += 1; return d3.geoBounds(value); },
+  } });
+  const holed = { type: "Polygon", coordinates: [
+    [[-10, -10], [-10, 10], [10, 10], [10, -10], [-10, -10]],
+    [[-2, -2], [2, -2], [2, 2], [-2, 2], [-2, -2]],
+  ] };
+  const antimeridian = { type: "Polygon", coordinates: [
+    [[170, -10], [170, 10], [-170, 10], [-170, -10], [170, -10]],
+  ] };
+  const reversed = { type: "Polygon", coordinates: [holed.coordinates[0].slice().reverse()] };
+  const original = createFeature("WATER", { type: "GeometryCollection", geometries: [holed, antimeridian, reversed] });
+  const [first] = owner.sanitizeWaterRegionFeatures([original]);
+  assert.equal(first.geometry.type, "MultiPolygon");
+  assert.deepEqual(first.geometry.coordinates, [holed.coordinates, antimeridian.coordinates]);
+  assert.equal(d3.geoContains(first, [0, 0]), false, "the lake hole must remain empty");
+  assert.equal(d3.geoContains(first, [5, 0]), true);
+  assert.equal(d3.geoContains(first, [179, 0]), true);
+  assert.deepEqual(diagnosticCalls, { geoArea: 3, geoBounds: 3 });
+
+  const wrapper = { ...original, properties: { id: "WATER", name: "current" } };
+  assert.equal(owner.sanitizeWaterRegionFeature(wrapper).geometry, first.geometry);
+  const decoded = structuredClone(wrapper);
+  const [reused] = owner.sanitizeWaterRegionFeatures([decoded]);
+  assert.equal(reused.geometry, first.geometry);
+  assert.equal(reused.properties, decoded.properties);
+  assert.deepEqual(diagnosticCalls, { geoArea: 3, geoBounds: 3 });
+  owner.computeProjectedFeatureBounds(first);
+  owner.computeProjectedFeatureBounds(reused);
+  assert.equal(calls.pathBounds, 1, "sanitized geometry identity must retain projected bounds");
+
+  const changed = structuredClone(decoded);
+  changed.geometry.geometries[0].coordinates[1][1][0] = 3;
+  const [updated] = owner.sanitizeWaterRegionFeatures([changed]);
+  assert.notEqual(updated.geometry, first.geometry);
+  assert.equal(updated.geometry.coordinates[0][1][1][0], 3);
+  assert.equal(d3.geoContains(updated, [0, 0]), false);
+  assert.deepEqual(diagnosticCalls, { geoArea: 6, geoBounds: 6 });
+});
+
 test("spherical diagnostics mark world bounds and excessive sphere area invalid", () => {
   const diagnostics = createD3Diagnostics();
   const { owner } = createHarness({ d3: diagnostics.d3 });

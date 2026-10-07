@@ -173,7 +173,8 @@ export function createDeferredDetailPromotionOwner({
     }
 
     runtimeState.detailPromotionInFlight = true;
-    let staleScene = false;
+    const includeRuntimePolitical = shouldAdoptDeferredRuntimePoliticalTopology();
+    let staleRequest = false;
     try {
       const {
         topologyDetail,
@@ -182,18 +183,23 @@ export function createDeferredDetailPromotionOwner({
         detailSourceUsed,
       } = await loadDeferredDetailBundle({
         detailSourceKey: runtimeState.detailSourceRequested,
+        includeRuntimePolitical,
       });
 
+      if (!isScenarioRefreshSceneCurrent(previousRefreshState, captureScenarioRefreshState())
+        || includeRuntimePolitical !== shouldAdoptDeferredRuntimePoliticalTopology()) {
+        staleRequest = true;
+        return false;
+      }
       if (!topologyDetail) {
         runtimeState.detailDeferred = false;
         console.warn("[main] Detail promotion skipped: no detail topology was loaded.");
         return false;
       }
-
-      if (!isScenarioRefreshSceneCurrent(previousRefreshState, captureScenarioRefreshState())) {
-        staleScene = true;
-        return false;
-      }
+      // Chunk promotions and edits may have completed while detail was loading.
+      // Diff this commit against the current scene, not those already-applied
+      // changes; the request snapshot above still rejects outgoing scenes.
+      const commitRefreshState = captureScenarioRefreshState();
       const previousRuntimePoliticalTopology = runtimeState.runtimePoliticalTopology;
       runtimeState.topologyDetail = topologyDetail;
       if (shouldAdoptDeferredRuntimePoliticalTopology()) {
@@ -217,7 +223,7 @@ export function createDeferredDetailPromotionOwner({
       );
       if (applyMapData) {
         const refreshMode = applyDetailPromotionMapRefresh({
-          interactionLevel, deferInteractionInfrastructure, previousRefreshState,
+          interactionLevel, deferInteractionInfrastructure, previousRefreshState: commitRefreshState,
         });
         mapDataRefreshed = refreshMode !== "none" && refreshMode !== "background" && refreshMode !== "style";
         if (!suppressRender) {
@@ -239,7 +245,7 @@ export function createDeferredDetailPromotionOwner({
       return false;
     } finally {
       runtimeState.detailPromotionInFlight = false;
-      if (staleScene && !runtimeState.startupReadonly) scheduleDeferredDetailPromotion(renderDispatcher);
+      if (staleRequest && !runtimeState.startupReadonly) scheduleDeferredDetailPromotion(renderDispatcher);
     }
   }
 

@@ -6,6 +6,14 @@ import { fileURLToPath } from "node:url";
 
 import { createScenarioStartupHydrationController } from "../js/core/scenario/startup_hydration.js";
 import { createScenarioBootstrapBundleFromCache } from "../js/core/scenario/bundle_loader.js";
+import { buildMergedScenarioChunkLayerPayloads } from "../js/core/scenario/chunk_layer_payloads.js";
+import {
+  areScenarioFeatureCollectionsEquivalent,
+  normalizeScenarioFeatureCollection,
+} from "../js/core/scenario/pure_helpers.js";
+import { commitScenarioPoliticalChunkPayloadState } from "../js/core/state/actions/scenario_chunk_promotion_actions.js";
+import { createPoliticalCollectionOwner } from "../js/core/renderer/political_collection_owner.js";
+import { createPoliticalFeaturePolicy } from "../js/core/renderer/political_feature_policy.js";
 import {
   createStartupScenarioBootstrapCacheKey,
   createStartupScenarioBootstrapCoreCacheKey,
@@ -530,6 +538,98 @@ test("startup hydration filters runtime-only shell fallback from mixed political
   } finally {
     globalThis.topojson = originalTopojson;
   }
+});
+
+function createCompletePoliticalHydrationFixture() {
+  const feature = (id, properties = {}) => ({ type: "Feature", id,
+    properties: { id, cntr_code: "RU", ...properties },
+    geometry: { type: "Point", coordinates: [55, 74] } });
+  const shell = feature("RU_ARCTIC_FB_ALT_001", {
+    scenario_helper_kind: "shell_fallback", render_as_base_geography: false, interactive: false,
+  });
+  const base = { type: "FeatureCollection", features: [feature("RU_DETAIL_001"), shell] };
+  const detail = { type: "FeatureCollection", features: [feature("RU_DETAIL_001", { detail: true })] };
+  const bundle = { manifest: { scenario_id: "tno_1962", map_mode: "ownership" }, bundleLevel: "full",
+    chunkRegistry: { byLayer: { political: [
+      { id: "base", lod: "coarse", globalCoverage: true }, { id: "detail", lod: "detail" },
+    ] } } };
+  const chunks = { loadedChunkIds: ["base"], payloadByChunkId: {
+    base: { layerKey: "political", payload: base }, detail: { layerKey: "political", payload: detail },
+  } };
+  const merge = () => buildMergedScenarioChunkLayerPayloads(bundle, chunks, {
+    nextSignatures: { political: chunks.loadedChunkIds.join("|") },
+    mergeScenarioChunkPayloads: () => assert.fail("complete source must use its geometry store"),
+    mergeScenarioChunkPayloadsForViewport: () => assert.fail("complete source must not project a subset"),
+  }).mergedLayerPayloads;
+  let merged = merge();
+  const state = { activeScenarioId: "tno_1962", mapSemanticMode: "ownership",
+    scenarioPoliticalChunkData: merged.political };
+  const commit = (payload) => {
+    commitScenarioPoliticalChunkPayloadState(state, { payload: normalizeScenarioFeatureCollection(payload) });
+    return true;
+  };
+  const controller = createMinimalHydrationController(state, {
+    normalizeScenarioFeatureCollection,
+    areScenarioFeatureCollectionsEquivalent,
+    getScenarioRuntimeMergedLayerPayloads: () => merged,
+    hasScenarioMergedLayerPayload: (payloads, key) => Object.hasOwn(payloads, key),
+    applyScenarioPoliticalChunkPayload: (_bundle, payload) => commit(payload),
+  });
+  return { state, bundle, shell, base, controller,
+    zoom() { chunks.loadedChunkIds = ["base", "detail"]; merged = merge(); commit(merged.political); },
+    setMerged(payloads) { merged = payloads; },
+  };
+}
+
+for (const order of [["hydrate", "zoom"], ["zoom", "hydrate"]]) {
+  test(`complete political shell coverage survives ${order.join(" then ")} and remains visual only`, () => {
+    const f = createCompletePoliticalHydrationFixture();
+    for (const step of order) {
+      if (step === "hydrate") assert.equal(f.controller.hydrateActiveScenarioBundle(f.bundle), true);
+      else f.zoom();
+      assert.equal(f.state.scenarioPoliticalChunkData.globalCoverage, true);
+      assert.deepEqual(f.state.scenarioPoliticalChunkData.features.map((entry) => entry.id).sort(),
+        ["RU_ARCTIC_FB_ALT_001", "RU_DETAIL_001"]);
+    }
+    const getFeatureId = (entry) => entry.properties.id;
+    const getFeatureCountryCodeNormalized = (entry) => entry.properties.cntr_code;
+    const policy = createPoliticalFeaturePolicy(f.state, {
+      getFeatureId, getFeatureCountryCodeNormalized,
+      isAtlantropaFieldDrivenFeature: () => false,
+      isInteractiveAtlantropaBooleanWeldIslandFeature: () => false,
+      isBaseGeographyScenarioFeature: (entry) => entry.properties.render_as_base_geography === true,
+    });
+    const owner = createPoliticalCollectionOwner({ state: f.state, helpers: {
+      getFeatureId, getFeatureCountryCodeNormalized,
+      isPoliticalInteractionRenderableFeature: policy.isPoliticalInteractionRenderableFeature,
+    } });
+    const full = owner.composePoliticalFeatureCollections(null, f.state.scenarioPoliticalChunkData);
+    assert.deepEqual(full.features.map(getFeatureId).sort(), ["RU_ARCTIC_FB_ALT_001", "RU_DETAIL_001"]);
+    const shell = full.features.find((entry) => getFeatureId(entry) === f.shell.id);
+    assert.equal(policy.shouldExcludePoliticalVisualFeature(shell), false);
+    assert.equal(policy.isPoliticalInteractionRenderableFeature(shell), false);
+    assert.deepEqual(owner.buildInteractiveLandData(full).features.map(getFeatureId), ["RU_DETAIL_001"]);
+    assert.equal(full.features.find((entry) => getFeatureId(entry) === "RU_DETAIL_001").properties.detail, true);
+    assert.equal(f.base.features.length, 2, "hydration must not filter the borrowed source in place");
+  });
+}
+
+test("hydration requires an explicit complete merged source to preserve political shells", () => {
+  for (const globalCoverage of [undefined, false, "true", 1]) {
+    const f = createCompletePoliticalHydrationFixture();
+    f.setMerged({ political: { ...f.base, globalCoverage } });
+    assert.equal(f.controller.hydrateActiveScenarioBundle(f.bundle), true);
+    assert.deepEqual(f.state.scenarioPoliticalChunkData.features.map((entry) => entry.id), ["RU_DETAIL_001"]);
+  }
+  const f = createCompletePoliticalHydrationFixture();
+  const decoded = { ...f.base, globalCoverage: true };
+  const controller = createMinimalHydrationController(f.state, {
+    normalizeScenarioFeatureCollection,
+    getScenarioDecodedCollection: (_bundle, key) => key === "politicalData" ? decoded : null,
+  });
+  assert.equal(controller.hydrateActiveScenarioBundle(f.bundle), true);
+  assert.deepEqual(f.state.scenarioPoliticalChunkData.features.map((entry) => entry.id), ["RU_DETAIL_001"],
+    "a runtime decoded collection is not a complete merged chunk source");
 });
 
 test("startup scenario cache keys change when source sha metadata changes", () => {

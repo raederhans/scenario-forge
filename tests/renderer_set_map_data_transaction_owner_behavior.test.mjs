@@ -186,6 +186,7 @@ test("default transaction runs exact effects and payloads", () => {
     interactiveCollection: { features: [{ id: "a" }] },
   }]);
   assert.deepEqual(harness.callsByName("fitProjection")[0].args, [{ skipSpatialIndex: false }]);
+  assert.deepEqual(harness.callsByName("enforceZoomConstraints")[0].args, [{ suppressRender: false }]);
   assert.deepEqual(harness.callsByName("beginStagedMapDataWarmup")[0].args, [100]);
 
   const metricCalls = harness.callsByName("recordRenderPerfMetric");
@@ -255,6 +256,7 @@ test("suppressRender=true skips staged warmup render and first paint metric", ()
   const summary = harness.owner.runSetMapDataTransaction({ suppressRender: true });
 
   assert.equal(summary.options.suppressRender, true);
+  assert.deepEqual(harness.callsByName("enforceZoomConstraints")[0].args, [{ suppressRender: true }]);
   assert.equal(summary.staged, false);
   assert.equal(harness.callsByName("beginStagedMapDataWarmup").length, 0);
   assert.equal(harness.callsByName("render").length, 0);

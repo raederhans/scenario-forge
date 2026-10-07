@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { createNavigationSceneOwner } from "../js/core/renderer/navigation_scene_owner.js";
 import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
+import { createGeometryRasterWorkerClient } from "../js/core/geometry_raster_worker_client.js";
 
 test("detail owns a bounded base-only composite; visible screenshots never seed the world", () => {
   const budget = createRuntimeResourceBudget();
@@ -446,7 +447,7 @@ test("early prefetch survives paint changes and retains evicted inputs until app
   assert.deepEqual(bundle.chunkPayloadCacheById, {});
 }));
 
-test("navigation worker receives canonical ordered paints and compound water geometry then is disposed", () => withGeoPath(async () => {
+test("navigation worker receives canonical ordered paints and compound water geometry then releases on clear", () => withGeoPath(async () => {
   let packet, requestSignal, disposed = 0, yields = 0;
   const result = { bitmap: {} };
   const f = fixture({}, {
@@ -467,8 +468,182 @@ test("navigation worker receives canonical ordered paints and compound water geo
   assert.equal(packet.entries[2].feature.geometry.geometries.length, 2);
   assert.equal(new Set(packet.entries.map(e => e.id)).size, packet.entries.length);
   assert.equal(requestSignal, signal);
+  assert.equal(disposed, 0);
+  f.owner.clear();
   assert.equal(disposed, 1);
   assert.ok(yields > 0);
+}));
+
+test("completed navigation jobs reuse acknowledged geometry across paint edits, temporary allocations and undo", () => withGeoPath(async () => {
+  const messages = [], metrics = [];
+  let creations = 0, terminations = 0;
+  const budget = createRuntimeResourceBudget({ softLimitBytes: 10000 });
+  const other = Symbol("other-worker"), destination = Symbol("navigation-destination"), edit = Symbol("edit-transient");
+  budget.update(other, { workerGeometry: 4000 });
+  budget.update(destination, { bitmaps: 800 });
+  const f = fixture({}, { resourceBudget: budget, yieldTask: async () => {},
+    createWorkerClient: (options) => createGeometryRasterWorkerClient({ ...options,
+      onMetric: (name, ms, details) => { metrics.push([name, details]); options.onMetric(name, ms, details); },
+      isSupported: () => true,
+      createWorker: () => {
+        creations++;
+        const worker = { terminate() { terminations++; }, postMessage(message) {
+          messages.push(message);
+          const retained = message.packet.navigationRetentionBudgetBytes;
+          const geometryBytes = Math.floor(retained * 2 / 3);
+          setImmediate(() => worker.onmessage({ data: { taskId: message.taskId,
+            result: { bitmap: { close() {} }, renderedCount: message.packet.entries.length, cacheBudget: {
+              geometry: { estimatedBytes: geometryBytes }, paths: { estimatedBytes: retained - geometryBytes },
+            } } } }));
+        } };
+        return worker;
+      },
+    }),
+  });
+  const run = async () => {
+    f.owner.prepare();
+    const options = f.calls.prepare.at(-1);
+    return options.renderRaster({ width: 20, height: 10, bounds: options.bounds, signal: new AbortController().signal });
+  };
+  await run();
+  const originalIdentity = messages[0].packet.sceneKey;
+  assert.equal(budget.snapshot().estimatedBytes, 7800);
+  budget.update(edit, { decodeTransient: 1200 });
+  assert.equal(budget.snapshot().pressure, false);
+  assert.equal(terminations, 0);
+  f.state.visualOverrides = { "global-land": "#f00" }; f.state.colorRevision++;
+  await run();
+  assert.equal(budget.snapshot().pressure, false);
+  budget.release(edit);
+  f.state.visualOverrides = {}; f.state.colorRevision++;
+  await run();
+  assert.equal(creations, 1);
+  assert.equal(terminations, 0);
+  assert.equal(messages[1].packet.sceneKey, originalIdentity);
+  assert.equal(messages[1].packet.resetGeometry, false);
+  assert.deepEqual(messages[1].packet.geometryTransport.batches, []);
+  assert.deepEqual(messages[2].packet.geometryTransport.batches, []);
+  assert.deepEqual(messages.slice(0, 3).map(({ packet }) => packet.navigationRetentionBudgetBytes), [2200, 1600, 2200]);
+  assert.deepEqual(metrics.filter(([name]) => name === "geometryWorkerRoundTrip").map(([, details]) => details.geometryUploads), [4, 0, 0]);
+  f.state.sceneGeneration++;
+  await run();
+  assert.equal(creations, 2);
+  assert.equal(terminations, 1);
+  assert.equal(messages[3].packet.resetGeometry, true);
+  const sceneRelease = f.calls.metrics.find(([name]) => name === "navigationWorkerRelease")[2];
+  assert.equal(sceneRelease.reason, "scene");
+  assert.equal(sceneRelease.retainedBytes, 3000);
+  assert.equal(sceneRelease.sharedResources.estimatedBytes, 7800);
+  assert.equal(sceneRelease.sharedResources.pressure, false);
+  assert.equal(sceneRelease.sharedResources.categories.workerSurfaces, 800);
+  f.owner.dispose();
+  assert.equal(terminations, 2);
+  assert.equal(budget.snapshot().ownerCount, 2);
+  assert.equal(budget.snapshot().estimatedBytes, 4800);
+  budget.release(other); budget.release(destination);
+  assert.equal(budget.snapshot().ownerCount, 0);
+  assert.deepEqual(f.calls.metrics.filter(([name]) => name === "navigationWorkerRelease")
+    .map(([, , details]) => details.reason), ["scene", "dispose"]);
+  f.owner.prepare();
+  assert.equal(creations, 2);
+}));
+
+for (const reason of ["clear", "failure", "pressure", "cancel"]) {
+  test(`navigation retained worker releases on ${reason} without double disposal`, () => withGeoPath(async () => {
+    let created = 0, disposed = 0;
+    const budget = createRuntimeResourceBudget({ softLimitBytes: 1000 });
+    const f = fixture({}, { resourceBudget: budget, yieldTask: async () => {},
+      createWorkerClient: () => { created++; return { available: () => true, dispose: () => disposed++,
+        request: async (_packet, { signal }) => {
+          if (reason === "cancel") controller.abort();
+          return reason === "failure" ? null : { bitmap: { close() {} } };
+        } }; },
+    });
+    const controller = new AbortController();
+    f.owner.prepare();
+    const options = f.calls.prepare.at(-1);
+    await options.renderRaster({ width: 20, height: 10, bounds: options.bounds, signal: controller.signal });
+    if (reason === "pressure") budget.update(Symbol("other"), { bitmaps: 1000 });
+    if (reason === "clear") f.owner.clear();
+    assert.equal(created, 1);
+    assert.equal(disposed, 1);
+    const releases = f.calls.metrics.filter(([name]) => name === "navigationWorkerRelease");
+    assert.equal(releases.length, 1);
+    assert.equal(releases[0][2].reason, reason);
+    assert.equal(releases[0][2].retainedBytes, 0);
+    assert.equal(releases[0][2].sharedResources.pressure, reason === "pressure");
+    if (reason === "pressure") {
+      assert.equal(releases[0][2].sharedResources.estimatedBytes, 1000);
+      assert.equal(releases[0][2].sharedResources.categories.bitmaps, 1000);
+    }
+    f.owner.clear(); f.owner.dispose();
+    assert.equal(disposed, 1);
+    assert.equal(f.calls.metrics.filter(([name]) => name === "navigationWorkerRelease").length, 1);
+  }));
+}
+
+test("cancelled late navigation completion cannot release a newer lease or close its bitmap", () => withGeoPath(async () => {
+  const completions = [], disposals = [0, 0];
+  let created = 0;
+  const f = fixture({}, { yieldTask: async () => {},
+    createWorkerClient: () => {
+      const index = created++;
+      return { available: () => true, dispose: () => { disposals[index]++; },
+        request: () => new Promise((resolve) => completions.push(resolve)) };
+    },
+  });
+  f.owner.prepare();
+  const old = f.calls.prepare.at(-1), controller = new AbortController();
+  const pending = old.renderRaster({ width: 20, height: 10, bounds: old.bounds, signal: controller.signal });
+  await new Promise(setImmediate);
+  controller.abort();
+  f.state.visualOverrides = { changed: "#123" }; f.state.colorRevision++;
+  f.owner.prepare();
+  const next = f.calls.prepare.at(-1);
+  const current = next.renderRaster({ width: 20, height: 10, bounds: next.bounds, signal: new AbortController().signal });
+  await new Promise(setImmediate);
+  const newerBitmap = { close: () => assert.fail("old finalization must not close current bitmap") };
+  completions[1]({ bitmap: newerBitmap }); await current;
+  completions[0]({ bitmap: { close() {} } }); await pending;
+  assert.deepEqual(disposals, [1, 0]);
+  assert.deepEqual(f.calls.metrics.filter(([name]) => name === "navigationWorkerRelease")
+    .map(([, , details]) => details.reason), ["cancel"]);
+  f.owner.clear();
+  assert.deepEqual(disposals, [1, 1]);
+  assert.deepEqual(f.calls.metrics.filter(([name]) => name === "navigationWorkerRelease")
+    .map(([, , details]) => details.reason), ["cancel", "clear"]);
+}));
+
+test("navigation uses half the free capacity after recovering only its own reports and reserving the next surface", () => withGeoPath(async () => {
+  const budget = createRuntimeResourceBudget({ softLimitBytes: 5000 });
+  const other = Symbol("other-worker"), own = Symbol("navigation-worker");
+  budget.update(other, { workerGeometry: 1500 });
+  const capacities = [];
+  const f = fixture({}, { resourceBudget: budget, yieldTask: async () => {},
+    createWorkerClient: ({ onMetric }) => ({ available: () => true,
+      dispose: () => budget.release(own),
+      request: async (packet) => {
+        capacities.push(packet.navigationRetentionBudgetBytes);
+        budget.update(own, { workerGeometry: 500, projectedPaths: 200, workerSurfaces: 800 });
+        onMetric("geometryWorkerRoundTrip", 0, { cacheBudget: {
+          geometry: { estimatedBytes: 500 }, paths: { estimatedBytes: 200 } } });
+        return { bitmap: { close() {} } };
+      },
+    }),
+  });
+  const run = async (color) => {
+    f.state.visualOverrides = { changed: color }; f.state.colorRevision++;
+    f.owner.prepare();
+    const options = f.calls.prepare.at(-1);
+    await options.renderRaster({ width: 20, height: 10, bounds: options.bounds, signal: new AbortController().signal });
+  };
+  await run("red"); await run("blue");
+  budget.update(other, { workerGeometry: 2200 });
+  await run("green");
+  assert.deepEqual(capacities, [1350, 1350, 1000]);
+  f.owner.dispose();
+  assert.equal(budget.snapshot().categories.workerGeometry, 2200);
+  assert.equal(budget.snapshot().ownerCount, 1);
 }));
 
 

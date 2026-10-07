@@ -368,24 +368,34 @@ function normalizeRuntimePoliticalMetaPayload(meta) {
   };
 }
 
-function postWorkerMessage(type, payload) {
+function postWorkerMessage(type, payload, { signal = null } = {}) {
+  throwIfAborted(signal);
   const startupReady = type === MESSAGE_TYPES.BASE_STARTUP_READY
     || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY
     || type === MESSAGE_TYPES.SCENARIO_RUNTIME_BOOTSTRAP_READY;
+  const allowCloneFallback = type === MESSAGE_TYPES.BASE_STARTUP_READY
+    || type === MESSAGE_TYPES.STARTUP_BUNDLE_READY;
   if (startupReady || type === MESSAGE_TYPES.RUNTIME_CHUNK_READY) {
     const field = startupReady ? "message" : (payload.chunkPayload ? "chunkPayload" : "decodedCollections");
     const startedAt = nowMs();
-    const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
-      includeTopologyArcs: startupReady,
-    });
-    if (transport.transferables.length) {
-      self.postMessage({ type, ...(startupReady ? { taskId: payload.taskId } : { ...payload, [field]: null }),
-        geometryTransport: { field, payload: transport.payload },
-        metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
-      }, transport.transferables);
-      return;
+    try {
+      const transport = globalThis.__scenarioForgeGeometryTransferCodecShared.pack(startupReady ? payload : payload[field], {
+        includeTopologyArcs: startupReady,
+      });
+      throwIfAborted(signal);
+      if (transport.transferables.length) {
+        self.postMessage({ type, ...(startupReady ? { taskId: payload.taskId } : { ...payload, [field]: null }),
+          geometryTransport: { field, payload: transport.payload },
+          metrics: { ...payload.metrics, geometryPackingMs: nowMs() - startedAt },
+        }, transport.transferables);
+        return;
+      }
+    } catch (error) {
+      if (!allowCloneFallback || isAbortError(error) || signal?.aborted) throw error;
+      // Packing and transfer only touch new buffers, so the original reply stays usable.
     }
   }
+  throwIfAborted(signal);
   self.postMessage({
     type,
     ...payload,
@@ -645,7 +655,7 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
         totalMs: nowMs() - startedAt,
         chunkPayload: chunkResult.metrics || null,
       },
-    });
+    }, { signal });
     return;
   }
   const runtimeTopologyResult = await fetchJsonResource(runtimeTopologyUrl, "runtimePoliticalTopology", { signal });
@@ -681,7 +691,7 @@ async function handleDecodeRuntimeChunk(message, { signal = null } = {}) {
         buildMs: metaCompletedAt - metaStartedAt,
       },
     },
-  });
+  }, { signal });
 }
 
 async function dispatchMessage(message) {

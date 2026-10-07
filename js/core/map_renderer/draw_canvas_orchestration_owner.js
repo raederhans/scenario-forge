@@ -1,3 +1,5 @@
+import { createFrameSummary as createSummary } from "./frame_summary.js";
+
 function requireFunction(candidate, label) {
   if (typeof candidate !== "function") {
     throw new TypeError(`${label} must be a function.`);
@@ -32,31 +34,6 @@ function validateConstants(constants) {
     renderPhaseInteracting: requireConstant(renderPhaseInteracting, "constants.renderPhaseInteracting"),
     renderPhaseSettling: requireConstant(renderPhaseSettling, "constants.renderPhaseSettling"),
   };
-}
-
-function cloneJsonSafeTimings(timings) {
-  return Object.freeze(Object.fromEntries(
-    Object.entries(timings || {}).map(([key, value]) => [
-      key,
-      typeof value === "number" ? value : String(value),
-    ]),
-  ));
-}
-
-function createSummary({ status, frameMode, totalMs = 0, timings = {}, branch = {} }) {
-  return Object.freeze({
-    status,
-    frameMode,
-    drewFrame: Boolean(branch.drewFrame),
-    usedTransformedFrame: Boolean(branch.useTransformedFrame),
-    usedLastGoodFallback: Boolean(branch.usedLastGoodFallback),
-    usedBaseVisibleFallback: Boolean(branch.usedBaseVisibleFallback),
-    keptPreviousPixels: Boolean(branch.keptPreviousPixels),
-    drewExactFrame: Boolean(branch.drewExactFrame),
-    skippedCapture: Boolean(branch.skippedCapture),
-    totalMs: Math.max(0, Number(totalMs || 0)),
-    timings: cloneJsonSafeTimings(timings),
-  });
 }
 
 export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {}, effects = {} } = {}) {
@@ -150,6 +127,23 @@ export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {
   function waitingWorkerResult(includeSummary) {
     const navigationResult = drawNavigationFrame(includeSummary, { waitingWorker: true });
     if (navigationResult !== null) return includeSummary ? navigationResult : undefined;
+    if (getFirstVisibleFramePainted()) {
+      const transform = getEffectiveZoomTransform();
+      const startedAt = nowMs();
+      // These fallbacks validate identity, raster quality and complete coverage
+      // before touching visible pixels. Reuse does not complete pending exact
+      // work, and must never become a new last-good capture.
+      const overviewDrawn = !!effects.drawOverviewFrameFallback?.(transform);
+      if (overviewDrawn || drawLastGoodFrameFallback(transform)) {
+        const frameMode = overviewDrawn ? "overview" : "last-good";
+        const totalMs = Math.max(0, nowMs() - startedAt);
+        commitLastFrame({ phase: getRenderPhase(), totalMs, timings: {}, transform,
+          frameMode, presented: true });
+        incrementPerfCounter("frames");
+        return includeSummary ? createSummary({ status: "waiting-worker", frameMode, totalMs,
+          branch: { drewFrame: true, usedLastGoodFallback: true, skippedCapture: true } }) : undefined;
+      }
+    }
     return includeSummary ? createSummary({ status: "waiting-worker", frameMode: "previous-pixels" }) : undefined;
   }
 

@@ -5075,8 +5075,6 @@ function isScenarioWaterTopologyExclusiveMode() {
 function getScenarioSurfaceVersionParts(waterFeatureCount = null, atlantropaCounts = null) {
   const maskInfo = getPhysicalLandMaskInfo();
   const runtimeTopologyRef = runtimeState.scenarioRuntimeTopologyData || runtimeState.runtimePoliticalTopology || null;
-  const effectiveWaterFeatureCount = Number(waterFeatureCount
-    ?? getEffectiveWaterRegionFeatures().length);
   const signal = [
     String(runtimeState.activeScenarioId || ""),
     `runtime-tag:${String(runtimeState.scenarioRuntimeTopologyVersionTag || "").trim() || `${getObjectIdentityToken(runtimeTopologyRef, "scenario-runtime-topology")}:${getScenarioRuntimeTopologySignatureToken()}`}`,
@@ -5084,7 +5082,7 @@ function getScenarioSurfaceVersionParts(waterFeatureCount = null, atlantropaCoun
     `mask-tag:${String(runtimeState.scenarioContextLandMaskVersionTag || runtimeState.scenarioLandMaskVersionTag || "").trim() || `${maskInfo.maskSource}:${getObjectIdentityToken(maskInfo.collection, "scenario-mask")}:${maskInfo.maskFeatureCount}:${maskInfo.maskArcRefEstimate ?? "na"}:${maskInfo.maskQualityToken || "unchecked"}`}`,
     `water-ref:${getObjectIdentityToken(runtimeState.scenarioWaterRegionsData, "scenario-water")}`,
     `lakes-ref:${getObjectIdentityToken(runtimeState.contextLayerExternalDataByName?.lakes, "global-lakes")}`,
-    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${effectiveWaterFeatureCount}`}`,
+    `water-tag:${String(runtimeState.scenarioWaterOverlayVersionTag || "").trim() || `features:${Number(waterFeatureCount ?? getEffectiveWaterRegionFeatures().length)}`}`,
     `water-mode:${getScenarioWaterRegionsMode()}`,
   ];
   // Allocate identity tokens in the same order as the standalone surface signal.
@@ -7496,6 +7494,8 @@ function retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColo
 
 function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, inputStartedAt = 0, inputLabel = "", coalescePatchPreview = false } = {}) {
 
+  const previousColors = runtimeState.colors;
+  const previousColorRevision = Number(runtimeState.colorRevision || 0);
   ensureSovereigntyState();
   const cache = getRenderPassCacheState();
   const pendingRenderIds = new Set();
@@ -7508,19 +7508,35 @@ function refreshResolvedColorsForFeatures(featureIds, { renderNow = false, input
   }
 
   const ids = normalizePoliticalColorEditIds(featureIds);
+  let canRefreshDerivedColors = true;
   ids.forEach((id) => {
     const feature = findResolvedColorFeatureById(id);
     if (!feature) {
+      canRefreshDerivedColors = false;
       setResolvedColorForFeature(state, id, null);
       return;
     }
     const resolved = getResolvedFeatureColor(feature, id);
+    if (!resolved) canRefreshDerivedColors = false;
     setResolvedColorForFeature(state, id, resolved);
     cache.partialPoliticalDirtyIds.add(id);
     pendingRenderIds.add(id);
   });
 
+  canRefreshDerivedColors = canRefreshDerivedColors && runtimeState.colors === previousColors
+    && Number(runtimeState.colorRevision || 0) === previousColorRevision;
   bumpColorRevision(state);
+  if (canRefreshDerivedColors) {
+    // Keep a valid paint transaction on the same published geometry baseline.
+    politicalDerivedStateCache.refreshColors({
+      identity: getPoliticalDerivedStateIdentity(),
+      collection: runtimeState.landDataFull,
+      previousColors,
+      previousColorRevision,
+      colors: runtimeState.colors,
+      colorRevision: runtimeState.colorRevision,
+    });
+  }
   getCountryFillPaletteOwner().notifyColorsChanged(ids);
   notifyPaintContourColorsChanged(getRiverPaintRuntime(runtimeState).expandDirtyIds(ids));
   if (!markPendingPoliticalColorEdit(Array.from(pendingRenderIds), {
@@ -15430,8 +15446,8 @@ function getZoomPercent() {
   return getViewportReadModelOwner().getZoomPercent();
 }
 
-function enforceZoomConstraints() {
-  return getViewportCommandOwner().enforceZoomConstraints();
+function enforceZoomConstraints(options) {
+  return getViewportCommandOwner().enforceZoomConstraints(options);
 }
 
 function fitProjection({ skipSpatialIndex = false } = {}) {
