@@ -35,3 +35,5 @@ Pages artifact 构建、startup shell 与 renderer inventory 检查已全部通�
 较新主线的数据更大，重复编辑时共享压力仍可能淘汰导航保留项，不能沿用旧工作区“上传量减半”的测量到新主线；本次仅声明生命周期/预算正确及实际功能验证，后续性能收益以匹配当前输入的测量为准。
 
 最终真实快捷键 delivery 流程已完成，含 HOI4 切换到当前完整帧。`benchmark-integrated-ui.json` 无页面异常，记录一次 resetScenarioChunkRequests 取消 outgoing bundle 时的 AbortError 警告；chunk_payload_loader / chunk_runtime / scenario_apply_pipeline 均相对主线未改动，incoming 场景最终 idle/current-frame 确认通过。未新增 console allowlist 或放宽检查。
+
+PR #214 首轮 CI 发现验证清单仍引用整合时已弃用的 `startup_response_transport.test.mjs`；主线已采用 `geo-f64-v2` 和既有 whole-message transfer 测试。移除这一悬空清单项，保留 startup-worker-transfer、geometry-transfer-codec 与新增取消/回退行为覆盖；随后重新检查验证清单、规划中的实际测试路径和相关行为测试，并等待修正提交的远端必需检查。
