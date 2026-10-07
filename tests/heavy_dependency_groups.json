@@ -62,6 +62,7 @@
       "tests/test_scenario_chunk_format_contracts.py",
       "tests/test_scenario_spatial_chunk_assets.py",
       "tests/test_scenario_surface_constraints.py",
+      "tests/test_scenario_world_display_lod.py",
       "tests/test_source_coverage_repair.py",
       "tests/test_sync_marine_refinement.py",
       "tests/test_tno_1962_russia_audit_gzip_source.py",

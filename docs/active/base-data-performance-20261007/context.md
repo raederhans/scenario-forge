@@ -37,3 +37,7 @@ Pages artifact 构建、startup shell 与 renderer inventory 检查已全部通�
 最终真实快捷键 delivery 流程已完成，含 HOI4 切换到当前完整帧。`benchmark-integrated-ui.json` 无页面异常，记录一次 resetScenarioChunkRequests 取消 outgoing bundle 时的 AbortError 警告；chunk_payload_loader / chunk_runtime / scenario_apply_pipeline 均相对主线未改动，incoming 场景最终 idle/current-frame 确认通过。未新增 console allowlist 或放宽检查。
 
 PR #214 首轮 CI 发现验证清单仍引用整合时已弃用的 `startup_response_transport.test.mjs`；主线已采用 `geo-f64-v2` 和既有 whole-message transfer 测试。移除这一悬空清单项，保留 startup-worker-transfer、geometry-transfer-codec 与新增取消/回退行为覆盖；随后重新检查验证清单、规划中的实际测试路径和相关行为测试，并等待修正提交的远端必需检查。
+
+第二轮 CI 通过该位置后发现新的 world LOD 测试缺少重依赖分组登记；已按其 Shapely 导入加入既有 `geo_stack` 分组。root 在交付工作树独占执行 `node tools/run_adaptive_tests.mjs --history-base origin/main --execute --defer-main-thread`，使用既有 Pages artifact、独立 pycache 和本次 runtime 输出；无本地浏览器/构建并发，成功条件为全部选中的 child-safe 检查完成且退出码 0。最终远端检查仍须绑定后续提交。
+
+该测试同时登记到现有几何契约路由。扩展检查发现水域缓存静态契约仍匹配旧的 `parts` 引用和仅整组可见时取缓存的写法；更新为防御性部件快照及优先复用身份/投影合格的完整路径，保持逐部分/Canvas 回退约束。相关行为与场景契约 125/125 通过；完整受影响检查最终退出 0，共执行 145 条命令，56 条 main-thread 命令依既有策略延后，不将其计作本轮已通过。结果为 `affected-contracts.json`，前次失败日志保留。

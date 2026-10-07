@@ -129,6 +129,9 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["political-coarse-shared-lod", "python -m pytest tests/test_political_coarse_shared_lod.py -q", [
       "tests/test_political_coarse_shared_lod.py", "tools/scenario_chunk_assets.py",
     ]],
+    ["scenario-world-display-lod", "python -m unittest tests.test_scenario_world_display_lod -q", [
+      "tests/test_scenario_world_display_lod.py", "tools/scenario_chunk_assets.py", "tools/build_political_display_lods.py",
+    ]],
     ["levant-seam", "python -m pytest tests/test_tno_levant_seams.py -q", [
       "tests/test_tno_levant_seams.py", "tools/repair_tno_levant_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
       "map_builder/geo/measurement.py", "tools/audit_tno_east_europe_gaps.py",
