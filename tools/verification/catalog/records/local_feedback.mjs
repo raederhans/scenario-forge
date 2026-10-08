@@ -129,6 +129,9 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["political-coarse-shared-lod", "python -m pytest tests/test_political_coarse_shared_lod.py -q", [
       "tests/test_political_coarse_shared_lod.py", "tools/scenario_chunk_assets.py",
     ]],
+    ["scenario-world-display-lod", "python -m unittest tests.test_scenario_world_display_lod -q", [
+      "tests/test_scenario_world_display_lod.py", "tools/scenario_chunk_assets.py", "tools/build_political_display_lods.py",
+    ]],
     ["levant-seam", "python -m pytest tests/test_tno_levant_seams.py -q", [
       "tests/test_tno_levant_seams.py", "tools/repair_tno_levant_seams.py", "tools/repair_tno_slovakia_ukraine_seams.py",
       "map_builder/geo/measurement.py", "tools/audit_tno_east_europe_gaps.py",
@@ -232,6 +235,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["projected-geometry-bounds", "renderer-runtime", "js/core/renderer/projected_geometry_bounds_owner.js", "tests/projected_geometry_bounds_owner_behavior.test.mjs"],
     ["political-collection-geometry-cache", "renderer-runtime", "js/core/renderer/political_collection_owner.js", "tests/political_collection_geometry_cache_behavior.test.mjs"],
     ["political-derived-state-cache", "renderer-runtime", "js/core/renderer/political_derived_state_cache.js", "tests/political_derived_state_cache_behavior.test.mjs", ["js/core/map_renderer.js"]],
+    ["context-layer-derived-cache", "renderer-runtime", "js/core/renderer/context_layer_resolver.js", "tests/context_layer_derived_cache_behavior.test.mjs", ["js/core/state/context_layer_revision.js", "js/core/state/content_state.js", "js/core/state/actions/content_load_actions.js"]],
     ["political-geometry-store", "renderer-runtime", "js/core/political_geometry_store.js", "tests/political_geometry_store_behavior.test.mjs", ["js/core/scenario/chunk_layer_payloads.js", "js/core/renderer/political_collection_owner.js", "js/core/renderer/political_derived_state_cache.js"]],
     ["geometry-raster-runtime", "renderer-runtime", "js/core/renderer/geometry_raster_runtime_owner.js", "tests/geometry_raster_runtime_owner_behavior.test.mjs"],
     ["geometry-raster-worker-client", "renderer-runtime", "js/core/geometry_raster_worker_client.js", "tests/geometry_raster_worker_client_behavior.test.mjs"],

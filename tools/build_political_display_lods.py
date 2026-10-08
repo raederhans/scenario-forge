@@ -28,6 +28,7 @@ from tools.precision_build_graph import BuildGraph, BuildStage
 from tools.scenario_chunk_format import decode_political_chunk
 
 from shapely import coverage_invalid_edges, coverage_is_valid, coverage_simplify, orient_polygons
+from shapely.errors import ShapelyError
 from shapely.geometry import shape, mapping
 from shapely.ops import unary_union
 
@@ -69,28 +70,53 @@ def simplify_coverage_features(features, tolerance, protected_ids=()):
     report = {"input_points": before, "output_points": before, "max_deviation_degrees": 0.0,
               "status": "unchanged", "reason": "no-eligible-interior"}
     protected = set(protected_ids)
+    retention_reasons = {i: "protected" if ids[i] in protected else "non-polygon"
+                         for i, feature in enumerate(features)
+                         if ids[i] in protected or (feature.get("geometry") or {}).get("type") not in ("Polygon", "MultiPolygon")}
+    def finish(result, *, exact_reason, **updates):
+        # Attribute only branches actually taken. An unchanged eligible feature
+        # does not establish whether its perimeter, topology or error bound was
+        # the limiting factor, so do not infer a more specific geometric cause.
+        diagnostics, costs = [], {}
+        for i, (original, output) in enumerate(zip(features, result)):
+            retained = original is output
+            reason = retention_reasons.get(i, exact_reason) if retained else None
+            input_points = coordinate_count(original.get("geometry"))
+            output_points = coordinate_count(output.get("geometry"))
+            diagnostics.append({"id": ids[i], "input_points": input_points, "output_points": output_points,
+                                "retained_exact": retained, "retention_reason": reason})
+            if retained:
+                cost = costs.setdefault(reason, {"reason": reason, "feature_count": 0, "coordinate_count": 0})
+                cost["feature_count"] += 1
+                cost["coordinate_count"] += input_points
+        return result, {**report, **updates, "feature_diagnostics": diagnostics,
+                        "retention_costs": sorted(costs.values(), key=lambda item: (-item["coordinate_count"], item["reason"]))}
     indexes = [i for i, f in enumerate(features) if ids[i] not in protected
                and (f.get("geometry") or {}).get("type") in ("Polygon", "MultiPolygon")]
     if not indexes or tolerance == 0:
-        return features, report
+        return finish(features, exact_reason="zero-tolerance" if tolerance == 0 else "no-eligible-interior")
     geometry_by_index = {i: shape(features[i]["geometry"]) for i in indexes}
     invalid_ids = {i for i, g in geometry_by_index.items() if g.is_empty or not g.is_valid}
     dateline_ids = {i for i, g in geometry_by_index.items() if i not in invalid_ids and g.bounds[2] - g.bounds[0] > 180}
+    retention_reasons.update({i: "invalid-geometry" for i in invalid_ids})
+    retention_reasons.update({i: "dateline" for i in dateline_ids})
     indexes = [i for i in indexes if i not in invalid_ids | dateline_ids]
     # Preserve problematic features verbatim. Their neighbours' exposed edges
     # become the boundary of the remaining subcoverage and cannot simplify.
     # This does not repair inputs or relax coverage validity or error limits.
     if indexes:
         edges = coverage_invalid_edges([geometry_by_index[i] for i in indexes])
-        invalid_ids.update(i for i, edge in zip(indexes, edges) if not edge.is_empty)
+        boundary_invalid_ids = {i for i, edge in zip(indexes, edges) if not edge.is_empty}
+        retention_reasons.update({i: "invalid-coverage-boundary" for i in boundary_invalid_ids})
+        invalid_ids.update(boundary_invalid_ids)
         indexes = [i for i in indexes if i not in invalid_ids]
     report["retained_exact_ids"] = [ids[i] for i in sorted(invalid_ids | dateline_ids)]
     if not indexes:
         reason = "invalid-source-coverage" if invalid_ids else "dateline-needs-spherical-review"
-        return features, {**report, "status": "fallback", "reason": reason}
+        return finish(features, exact_reason=reason, status="fallback", reason=reason)
     originals = [geometry_by_index[i] for i in indexes]
     if not coverage_is_valid(originals):
-        return features, {**report, "status": "fallback", "reason": "invalid-source-coverage"}
+        return finish(features, exact_reason="invalid-source-coverage", status="fallback", reason="invalid-source-coverage")
     source_union = unary_union(originals)
     # GEOS' area-based tolerance is not a Hausdorff bound. Tighten its input
     # tolerance when necessary; never raise the requested output error bound.
@@ -107,7 +133,7 @@ def simplify_coverage_features(features, tolerance, protected_ids=()):
             simplified, deviation = candidate, measured
             break
     else:
-        return features, {**report, "status": "fallback", "reason": "deviation-or-topology-limit"}
+        return finish(features, exact_reason="deviation-or-topology-limit", status="fallback", reason="deviation-or-topology-limit")
     result = list(features)
     for index, original, geom in zip(indexes, originals, simplified):
         if geom.equals_exact(original, 0):
@@ -118,9 +144,27 @@ def simplify_coverage_features(features, tolerance, protected_ids=()):
         result[index] = replacement
     after = sum(coordinate_count(f.get("geometry")) for f in result)
     if after >= before:
-        return features, {**report, "reason": "no-point-reduction"}
-    return result, {**report, "output_points": after, "max_deviation_degrees": deviation,
-                    "status": "simplified", "reason": "shared-interiors-only"}
+        return finish(features, exact_reason="no-point-reduction", reason="no-point-reduction")
+    # The eligible subcoverage can be equal while its union with retained
+    # neighbours changes through GEOS noding. Compare the whole valid polygon
+    # group, including protected/dateline/invalid-boundary neighbours. Invalid
+    # geometries are incomparable but remain verbatim, as before.
+    try:
+        comparable_indexes = [i for i, feature in enumerate(features)
+                              if (feature.get("geometry") or {}).get("type") in ("Polygon", "MultiPolygon")
+                              and shape(feature["geometry"]).is_valid]
+        whole_source = unary_union([shape(features[i]["geometry"]) for i in comparable_indexes])
+        whole_result = unary_union([shape(result[i]["geometry"]) for i in comparable_indexes])
+        whole_coverage_equal = (whole_source.equals(whole_result)
+                                and whole_source.boundary.equals(whole_result.boundary))
+    except (ShapelyError, ValueError, TypeError):
+        whole_coverage_equal = False
+    if not whole_coverage_equal:
+        retention_reasons.update({i: "whole-group-coverage-check-failed" for i in range(len(features))})
+        return finish(features, exact_reason="whole-group-coverage-check-failed",
+                      status="fallback", reason="whole-group-coverage-check-failed")
+    return finish(result, exact_reason="shared-interior-unchanged", output_points=after,
+                  max_deviation_degrees=deviation, status="simplified", reason="shared-interiors-only")
 
 
 def cached_simplify_coverage_features(features, tolerance, protected_ids, *, cache_root, stage_name):
@@ -232,6 +276,18 @@ def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protec
     if selected_ids - {c["id"] for c in all_details}:
         raise ValueError("Unknown requested detail chunk")
     details = [c for c in all_details if not selected_ids or c["id"] in selected_ids]
+    regional_ids = {detail["id"].replace("political.detail.", "political.regional.", 1): detail["id"]
+                    for detail in details}
+    previous_regional = {chunk["lod_group_id"]: chunk for chunk in manifest["chunks"]
+                         if chunk.get("layer") == "political" and chunk.get("lod") == "regional"
+                         and chunk["id"] in regional_ids
+                         and regional_ids.get(chunk["id"]) == chunk.get("lod_group_id")}
+    # Rebuild selected derived families, preserving their original regional
+    # entry zoom rather than inheriting the raised detail entry zoom.
+    manifest["chunks"] = [chunk for chunk in manifest["chunks"]
+                          if not (chunk.get("layer") == "political" and chunk.get("lod") == "regional"
+                                  and chunk["id"] in regional_ids
+                                  and regional_ids.get(chunk["id"]) == chunk.get("lod_group_id"))]
     seen, reports, variants = set(), [], []
     new_base = list(base_features)
     for detail in details:
@@ -249,14 +305,19 @@ def build_overlay(source_root, scenario_id, output_root, *, chunk_ids=(), protec
             for fid, feature in zip(ids, world):
                 new_base[by_id[fid]] = feature
         reports.append({"chunk_id": detail["id"], "world": world_report, "regional": regional_report})
+        previous = previous_regional.get(detail["id"])
+        regional_min_zoom = previous["min_zoom"] if previous else detail.get("min_zoom", 1.35)
         if regional_report["status"] != "simplified":
+            if previous:
+                detail["min_zoom"] = regional_min_zoom
+                detail.pop("lod_group_id", None)
             continue
         regional_id = detail["id"].replace("political.detail.", "political.regional.", 1)
         url = (prefix / "chunks" / (regional_id + ".json")).as_posix()
         raw = write_json(output_root / url, {**payload, "features": regional})
         variant = describe_chunk(detail, regional, url, raw)
         variant.update(id=regional_id, lod="regional", lod_group_id=detail["id"],
-                       min_zoom=detail.get("min_zoom", 1.35), max_zoom=4.5)
+                       min_zoom=regional_min_zoom, max_zoom=4.5)
         # Same family IDs and original detail bytes. Overlap is intentional.
         detail.update(lod_group_id=detail["id"], min_zoom=4.0)
         variants.append(variant)

@@ -48,7 +48,48 @@ test("deferred detail skips a malformed candidate and accepts the next political
     assert.equal(result.topologyDetail, valid);
     assert.equal(result.topologyBundleMode, "composite");
     assert.equal(result.detailSourceUsed, "na_v1");
+    assert.equal(result.runtimePoliticalRequested, true);
+    assert.ok(calls.includes("runtime-political"));
     assert.deepEqual(calls.filter((url) => url !== "runtime-political"), [sources.na_v2, sources.na_v1]);
+  });
+});
+
+test("scenario-owned deferred detail skips the global runtime request without labeling it requested", async () => {
+  const valid = { type: "Topology", objects: { political: { type: "GeometryCollection",
+    geometries: [{ id: "detail", type: "Polygon", arcs: [[0]] }] } }, arcs: [[[0, 0], [1, 0]]] };
+  const runtime = { objects: { political: { geometries: [{ id: "global" }] } } };
+  await withFakeLoader({ [sources.na_v2]: valid, "runtime-political": runtime }, async (d3Client, calls) => {
+    const partial = await loadDeferredDetailBundle({ d3Client, runtimePoliticalUrl: "runtime-political",
+      includeRuntimePolitical: false });
+    assert.equal(partial.topologyDetail, valid);
+    assert.equal(partial.topologyBundleMode, "composite");
+    assert.equal(partial.runtimePoliticalTopology, null);
+    assert.equal(partial.runtimePoliticalRequested, false);
+    assert.deepEqual(calls, [sources.na_v2]);
+
+    const full = await loadDeferredDetailBundle({ d3Client, runtimePoliticalUrl: "runtime-political" });
+    assert.equal(full.topologyDetail, valid);
+    assert.equal(full.runtimePoliticalTopology, runtime);
+    assert.equal(full.runtimePoliticalRequested, true);
+    assert.equal(calls.filter(url => url === "runtime-political").length, 1,
+      "a partial result cannot satisfy a later default runtime demand");
+  });
+});
+
+test("concurrent deferred detail demands do not share a result missing the requested runtime", async () => {
+  const valid = { type: "Topology", objects: { political: { type: "GeometryCollection",
+    geometries: [{ id: "detail", type: "Polygon", arcs: [[0]] }] } }, arcs: [[[0, 0], [1, 0]]] };
+  const runtime = { objects: { political: { geometries: [{ id: "global" }] } } };
+  await withFakeLoader({ [sources.na_v2]: valid, "runtime-political": runtime }, async (d3Client, calls) => {
+    const [partial, full] = await Promise.all([
+      loadDeferredDetailBundle({ d3Client, runtimePoliticalUrl: "runtime-political", includeRuntimePolitical: false }),
+      loadDeferredDetailBundle({ d3Client, runtimePoliticalUrl: "runtime-political" }),
+    ]);
+    assert.equal(partial.topologyDetail, valid);
+    assert.equal(full.topologyDetail, valid);
+    assert.equal(partial.runtimePoliticalTopology, null);
+    assert.equal(full.runtimePoliticalTopology, runtime);
+    assert.equal(calls.filter(url => url === "runtime-political").length, 1);
   });
 });
 

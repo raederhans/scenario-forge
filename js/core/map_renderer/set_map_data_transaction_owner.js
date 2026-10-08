@@ -163,7 +163,7 @@ export function createSetMapDataTransactionOwner({
     }
     if (resetZoom) {
       runEffect("resetZoomToFit");
-      runEffect("enforceZoomConstraints");
+      runEffect("enforceZoomConstraints", { suppressRender });
     } else {
       runEffect("setHitCanvasDirty", true);
     }

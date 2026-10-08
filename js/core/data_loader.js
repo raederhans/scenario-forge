@@ -1511,6 +1511,7 @@ export async function loadDeferredDetailBundle({
   detailSourceKey = null,
   detailSourceKeys = null,
   runtimePoliticalUrl = RUNTIME_POLITICAL_URL,
+  includeRuntimePolitical = true,
 } = {}) {
   if (!d3Client || typeof d3Client.json !== "function") {
     throw new Error("d3.json is not available. Ensure D3 is loaded before calling loadDeferredDetailBundle().");
@@ -1532,8 +1533,8 @@ export async function loadDeferredDetailBundle({
   ].filter((key) => key && Object.prototype.hasOwnProperty.call(DETAIL_SOURCES, key))));
 
   // deferred bundle 是启动后补细节的第二阶段：
-  // 一边补 detail topology，一边补 runtime political overlay，
-  // 两者都允许单独失败，不把整次补细节链直接炸掉。
+  // 补 detail topology；只有调用方需要时才并行补 global runtime overlay。
+  // 两者都允许单独失败，省略 runtime 的结果只满足本次显式需求。
   const [{ topology: topologyDetail, sourceKey: detailSourceUsed }, runtimePoliticalTopology] =
     await Promise.all([
       loadDetailTopologyWithFallback({
@@ -1541,15 +1542,18 @@ export async function loadDeferredDetailBundle({
         detailSource,
         candidateKeys: orderedDetailSourceKeys,
       }),
-      d3Client.json(runtimePoliticalUrl).catch((err) => {
-        console.warn("Runtime political topology missing or invalid during deferred load.", err);
-        return null;
-      }),
+      includeRuntimePolitical
+        ? d3Client.json(runtimePoliticalUrl).catch((err) => {
+          console.warn("Runtime political topology missing or invalid during deferred load.", err);
+          return null;
+        })
+        : Promise.resolve(null),
     ]);
 
   return {
     topologyDetail,
     runtimePoliticalTopology,
+    runtimePoliticalRequested: includeRuntimePolitical,
     topologyBundleMode: topologyDetail ? "composite" : "single",
     detailSourceUsed: detailSourceUsed || resolvedKey,
   };

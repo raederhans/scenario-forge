@@ -6,6 +6,7 @@ import unittest
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "draw_canvas_orchestration_owner.js"
+SUMMARY_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "frame_summary.js"
 PUBLIC_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "public.js"
 STATE_WRITE_ALLOWLIST = REPO_ROOT / "tools" / "eslint-rules" / "state-writer-allowlist.json"
 ARCHITECTURE_TOOL = REPO_ROOT / "tools" / "check_architecture_boundaries.mjs"
@@ -57,20 +58,27 @@ class DrawCanvasOrchestrationOwnerBoundaryContract(unittest.TestCase):
             if "drawcanvas" in compact and ("orchestration" in compact or "orchestrator" in compact):
                 self.assertNotRegex(stem, r"(?:^|_)(?:owner|helper|controller|adapter)(?:_|$)", relative)
 
-    def test_owner_is_import_free_and_has_json_safe_boundary(self):
+    def test_owner_imports_only_pure_summary_and_has_json_safe_boundary(self):
         owner = read(OWNER_JS)
+        summary = read(SUMMARY_JS)
         self.assertIn("export function createDrawCanvasOrchestrationOwner({ constants = {}, getters = {}, effects = {} } = {})", owner)
         self.assertRegex(owner, r"return Object\.freeze\(\{\s*drawCanvasFrame,?\s*\}\);")
         self.assertIn("function drawCanvasFrame(options)", owner)
         self.assertIn("const includeSummary = options?.includeSummary === true;", owner)
         self.assertNotIn("function drawCanvasFrame(options = {})", owner)
-        self.assertIn("function cloneJsonSafeTimings(timings)", owner)
-        self.assertIn("timings: cloneJsonSafeTimings(timings)", owner)
+        self.assertIn("function cloneJsonSafeTimings(timings)", summary)
+        self.assertIn("timings: cloneJsonSafeTimings(timings)", summary)
+        self.assertIn("export function createFrameSummary(", summary)
+        self.assertIn("createSummary({", owner)
         self.assertIn("getRenderPhase() === renderPhaseInteracting && getFirstVisibleFramePainted()", owner)
         self.assertNotIn("effectOrder", owner)
         self.assertNotIn("getterOrder", owner)
         self.assertNotIn("createTrace", owner)
-        self.assertNotRegex(owner, r"(?m)^\s*import\s")
+        self.assertEqual(
+            re.findall(r"(?m)^import .*;$", owner),
+            ['import { createFrameSummary as createSummary } from "./frame_summary.js";'],
+        )
+        self.assertNotRegex(summary, r"(?m)^\s*import\s")
         forbidden_tokens = [
             "map_renderer.js",
             "RendererRuntimeContext",
@@ -85,6 +93,7 @@ class DrawCanvasOrchestrationOwnerBoundaryContract(unittest.TestCase):
         ]
         for token in forbidden_tokens:
             self.assertNotIn(token, owner)
+            self.assertNotIn(token, summary)
         self.assertLessEqual(len(owner.splitlines()), 320)
 
     def test_map_renderer_is_thin_wrapper_and_composition_root(self):

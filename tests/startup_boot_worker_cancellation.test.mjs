@@ -2,13 +2,15 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
+import { gzipSync } from "node:zlib";
 import "../js/core/geometry_transfer_codec_shared.js";
 
 const workerSource = await readFile(new URL("../js/workers/startup_boot.worker.js", import.meta.url), "utf8");
 const codecSource = await readFile(new URL("../js/core/geometry_transfer_codec_shared.js", import.meta.url), "utf8");
+const chunkFormatSource = await readFile(new URL("../js/core/scenario_chunk_format_shared.js", import.meta.url), "utf8");
 const topologyCodecSource = await readFile(new URL("../js/core/startup_topology_codec_shared.js", import.meta.url), "utf8");
 
-function createWorkerHarness({ feature = () => null, fetchResource = null, onPostMessage = null } = {}) {
+function createWorkerHarness({ feature = () => null, fetchResource = null, onPostMessage = null, failTransfer = false, structuredTransfer = false, geometryCodec = null } = {}) {
   const posted = [];
   const transferLists = [];
   const pendingFetches = new Map();
@@ -18,13 +20,23 @@ function createWorkerHarness({ feature = () => null, fetchResource = null, onPos
       origin: "https://example.test",
     },
     postMessage(message, transferables = []) {
-      posted.push(message);
+      if (failTransfer && transferables.length) {
+        structuredClone(message, { transfer: transferables });
+        throw new DOMException("fixture transfer failure after buffer detachment", "DataCloneError");
+      }
+      posted.push(structuredTransfer ? structuredClone(message, { transfer: transferables }) : message);
       transferLists.push(transferables);
       onPostMessage?.(message, transferables);
     },
   };
   const context = {
     AbortController,
+    ArrayBuffer,
+    Uint8Array,
+    TextDecoder,
+    TextEncoder,
+    Response,
+    DecompressionStream,
     DOMException,
     Error,
     String,
@@ -39,6 +51,12 @@ function createWorkerHarness({ feature = () => null, fetchResource = null, onPos
       }
       if (urls.some((url) => String(url).includes("startup_topology_codec_shared.js"))) {
         vm.runInContext(topologyCodecSource, context, { filename: "startup_topology_codec_shared.js" });
+      }
+      if (urls.some((url) => String(url).includes("scenario_chunk_format_shared.js"))) {
+        vm.runInContext(chunkFormatSource, context, { filename: "scenario_chunk_format_shared.js" });
+      }
+      if (geometryCodec) {
+        context.__scenarioForgeGeometryTransferCodecShared = geometryCodec(context.__scenarioForgeGeometryTransferCodecShared);
       }
       context.__scenarioForgeFeatureIdentityShared = {
         defaultCountryCodeNormalizer: (value) => String(value || "").toUpperCase(),
@@ -426,4 +444,221 @@ test("large worker replies cross a real structured transfer and restore through 
     startupWorkerClient?.terminateStartupWorker();
     globalThis.Worker = originalWorker;
   }
+});
+
+
+function largeArcTopology() {
+  return {
+    type: "Topology",
+    transform: { scale: [0.00001, 0.00001], translate: [0, 0] },
+    arcs: [Array.from({ length: 8_192 }, (_, index) => [index + 0.0000000001, index ? -index : 0])],
+    objects: { political: { type: "GeometryCollection", geometries: [{
+      type: "Polygon", arcs: [[0]], id: "A", properties: { name: "测试", coordinates: [1, 2] },
+    }] } },
+  };
+}
+
+function decodeArcFeatureCollection(topology, object) {
+  return { type: "FeatureCollection", features: object.geometries.map((geometry) => ({
+    type: "Feature", id: geometry.id, properties: geometry.properties,
+    geometry: { type: "Polygon", coordinates: [topology.arcs[0]] },
+  })) };
+}
+
+function restoreWorkerResponse(message) {
+  if (!message.geometryTransport) return message;
+  const { field, payload } = message.geometryTransport;
+  const value = globalThis.__scenarioForgeGeometryTransferCodecShared.unpack(payload);
+  return { ...message, ...(field === "message" ? value : { [field]: value }) };
+}
+
+test("startup bundle transfers raw arcs and decoded coordinates through the mainline whole-message protocol", async () => {
+  const topology = largeArcTopology();
+  const sourceSnapshot = structuredClone(topology);
+  const payload = { scenario_id: "fixture", base: { topology_primary: topology },
+    scenario: { runtime_topology_bootstrap: topology, countries: { countries: { A: {} } }, geo_locale_patch: { A: "测试" } } };
+  const { posted, transferLists, self } = createWorkerHarness({
+    feature: decodeArcFeatureCollection, structuredTransfer: true,
+    fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(payload) }),
+  });
+  self.onmessage({ data: { type: "LOAD_STARTUP_BUNDLE", taskId: "large-bundle", startupBundleUrl: "/bundle.json", scenarioId: "fixture" } });
+  await flushWorker();
+  assert.equal(posted.length, 1);
+  const reply = posted[0];
+  assert.equal(reply.type, "STARTUP_BUNDLE_READY");
+  assert.equal(reply.startupTransport, undefined);
+  assert.equal(reply.geometryTransport.field, "message");
+  assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(reply.payload, undefined, "raw topologies only occur in the packed whole-message payload");
+  assert.equal(reply.baseDecodedCollections, undefined);
+  assert.equal(reply.runtimeDecodedCollections, undefined);
+  assert.equal(reply.geometryTransport.payload.value.payload.base.topology_primary.arcs.length, 2, "raw arcs only retain their offsets in the packed value");
+  assert.equal(transferLists[0].length, 2);
+  assert.ok(transferLists[0].every((buffer) => buffer.byteLength === 0));
+  const restored = restoreWorkerResponse(reply);
+  assert.deepEqual(restored.payload, payload);
+  assert.deepEqual(restored.baseDecodedCollections.landData, decodeArcFeatureCollection(topology, topology.objects.political));
+  assert.deepEqual(restored.runtimeDecodedCollections.politicalData, decodeArcFeatureCollection(topology, topology.objects.political));
+  assert.deepEqual(restored.runtimePoliticalMeta.featureIds, ["A"]);
+  assert.deepEqual(topology, sourceSnapshot, "only newly allocated buffers may be detached");
+});
+
+for (const type of ["LOAD_BASE_STARTUP", "LOAD_STARTUP_BUNDLE"]) {
+  for (const failure of ["transfer", "packing"]) {
+    test(`${type} retains ordinary clone recovery after ${failure} failure`, async () => {
+      const topology = largeArcTopology();
+      const payload = type === "LOAD_STARTUP_BUNDLE"
+        ? { scenario_id: "fixture", base: { topology_primary: topology }, scenario: {} }
+        : topology;
+      const { posted, transferLists, self } = createWorkerHarness({
+        feature: decodeArcFeatureCollection, structuredTransfer: true,
+        failTransfer: failure === "transfer",
+        geometryCodec: failure === "packing" ? () => ({ pack() { throw new Error("fixture packing failure"); } }) : null,
+        fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(payload) }),
+      });
+      self.onmessage({ data: { type, taskId: "fallback", topologyUrl: "/base.json", startupBundleUrl: "/bundle.json", scenarioId: "fixture", needLocales: false, needGeoAliases: false } });
+      await flushWorker();
+      assert.equal(posted.length, 1);
+      assert.equal(posted[0].type, type === "LOAD_BASE_STARTUP" ? "BASE_STARTUP_READY" : "STARTUP_BUNDLE_READY");
+      assert.equal(posted[0].geometryTransport, undefined);
+      assert.equal(posted[0].startupTransport, undefined);
+      assert.deepEqual(type === "LOAD_BASE_STARTUP" ? posted[0].topologyPrimary : posted[0].payload.base.topology_primary, topology);
+      const collections = type === "LOAD_BASE_STARTUP" ? posted[0].decodedCollections : posted[0].baseDecodedCollections;
+      assert.deepEqual(collections.landData, decodeArcFeatureCollection(topology, topology.objects.political));
+      assert.equal(transferLists[0].length, 0);
+    });
+  }
+}
+
+test("runtime bootstrap retains mainline whole-message transfer and runtime chunks retain geometry-only transfer", async () => {
+  const topology = largeArcTopology();
+  const { posted, transferLists, self } = createWorkerHarness({
+    feature: decodeArcFeatureCollection, structuredTransfer: true,
+    fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(topology) }),
+  });
+  for (const [type, taskId] of [["LOAD_SCENARIO_RUNTIME_BOOTSTRAP", "bootstrap"], ["DECODE_RUNTIME_CHUNK", "chunk"]]) {
+    self.onmessage({ data: { type, taskId, runtimeTopologyUrl: "/topology.json" } });
+  }
+  await flushWorker();
+  assert.equal(posted.length, 2);
+  for (let index = 0; index < posted.length; index += 1) {
+    const reply = posted[index];
+    assert.equal(reply.startupTransport, undefined);
+    assert.equal(reply.metrics.startupPackingMs, undefined);
+    assert.equal(transferLists[index].length, 2);
+    assert.ok(transferLists[index].every((buffer) => buffer.byteLength === 0));
+    assert.ok(Number.isFinite(reply.metrics.geometryPackingMs));
+    const restored = restoreWorkerResponse(reply);
+    assert.deepEqual(restored.runtimePoliticalTopology, topology);
+    assert.deepEqual(restored.decodedCollections.politicalData, decodeArcFeatureCollection(topology, topology.objects.political));
+    if (reply.type === "SCENARIO_RUNTIME_BOOTSTRAP_READY") {
+      assert.equal(reply.geometryTransport.field, "message");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v2");
+    } else {
+      assert.equal(reply.geometryTransport.field, "decodedCollections");
+      assert.equal(reply.geometryTransport.payload.encoding, "geo-f64-v1");
+      assert.equal(reply.decodedCollections, null);
+      assert.deepEqual(reply.runtimePoliticalTopology, topology, "raw runtime chunk topology retains its ordinary clone path");
+    }
+  }
+});
+
+test("cancelled large runtime geometry never posts or transfers a response", async () => {
+  let finishBody;
+  const { posted, transferLists, self } = createWorkerHarness({
+    fetchResource: async () => ({ ok: true, text: () => new Promise((resolve) => { finishBody = resolve; }) }),
+  });
+  self.onmessage({ data: { type: "DECODE_RUNTIME_CHUNK", taskId: "cancel-large", chunkType: "political", chunkUrl: "/large.json" } });
+  await flushWorker();
+  self.onmessage({ data: { type: "CANCEL_TASK", taskId: "cancel-large" } });
+  finishBody(JSON.stringify(decodeArcFeatureCollection(largeArcTopology(), largeArcTopology().objects.political)));
+  await flushWorker();
+  assert.equal(posted.length, 0);
+  assert.equal(transferLists.length, 0);
+});
+
+test("runtime geometry transfer proceeds while an unrelated startup fetch is pending", async () => {
+  const collection = decodeArcFeatureCollection(largeArcTopology(), largeArcTopology().objects.political);
+  const { pendingFetches, posted, transferLists, self } = createWorkerHarness({
+    structuredTransfer: true,
+    fetchResource: (url, options) => String(url).includes("slow")
+      ? new Promise((_resolve, reject) => {
+        pendingFetches.set(String(url), { signal: options.signal, reject });
+      })
+      : Promise.resolve({ ok: true, text: async () => JSON.stringify(collection) }),
+  });
+  self.onmessage({ data: { type: "LOAD_BASE_STARTUP", taskId: "pending-startup", topologyUrl: "/slow-base.json", needLocales: false, needGeoAliases: false } });
+  await flushWorker();
+  self.onmessage({ data: { type: "DECODE_RUNTIME_CHUNK", taskId: "runtime-independent", chunkType: "political", chunkUrl: "/large.json" } });
+  await flushWorker();
+  assert.equal(posted.length, 1);
+  assert.equal(posted[0].taskId, "runtime-independent");
+  assert.equal(posted[0].startupTransport, undefined);
+  assert.equal(posted[0].geometryTransport.field, "chunkPayload");
+  assert.equal(transferLists[0].length, 2);
+  assert.ok(transferLists[0].every((buffer) => buffer.byteLength === 0));
+  pendingFetches.get("https://example.test/slow-base.json").reject(new Error("fixture completed pending fetch"));
+  await flushWorker();
+  assert.equal(posted.length, 2);
+  assert.equal(posted[1].taskId, "pending-startup");
+});
+
+for (const chunkType of ["political", "runtime-topology"]) {
+  test(`${chunkType} cancellation observed after packing suppresses transfer`, async () => {
+    const topology = largeArcTopology();
+    const payload = chunkType === "runtime-topology" ? topology : decodeArcFeatureCollection(topology, topology.objects.political);
+    const { posted, transferLists, self } = createWorkerHarness({
+      feature: decodeArcFeatureCollection,
+      geometryCodec: (codec) => ({ pack(value, options) {
+        const packed = codec.pack(value, options);
+        assert.ok(packed.transferables.length);
+        self.onmessage({ data: { type: "CANCEL_TASK", taskId: "cancel-packed" } });
+        return packed;
+      } }),
+      fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(payload) }),
+    });
+    self.onmessage({ data: { type: "DECODE_RUNTIME_CHUNK", taskId: "cancel-packed", chunkType, chunkUrl: "/large.json", runtimeTopologyUrl: "/large.json" } });
+    await flushWorker();
+    assert.equal(posted.length, 0);
+    assert.equal(transferLists.length, 0);
+  });
+}
+
+test("gzip-only startup bundle loads its explicit resource and retains Float64 transfer", { timeout: 2_000 }, async () => {
+  const topology = largeArcTopology();
+  const payload = { scenario_id: "gzip-fixture", base: { topology_primary: topology }, scenario: { runtime_topology_bootstrap: null } };
+  const compressed = gzipSync(JSON.stringify(payload));
+  const urls = [];
+  let resolveResponse;
+  const responseReady = new Promise((resolve) => { resolveResponse = resolve; });
+  const { posted, transferLists, self } = createWorkerHarness({
+    feature: decodeArcFeatureCollection, structuredTransfer: true,
+    onPostMessage: () => resolveResponse(),
+    fetchResource: async (url) => {
+      urls.push(String(url));
+      return { ok: true, arrayBuffer: async () => compressed.buffer.slice(compressed.byteOffset, compressed.byteOffset + compressed.byteLength) };
+    },
+  });
+  self.onmessage({ data: { type: "LOAD_STARTUP_BUNDLE", taskId: "gzip-startup", startupBundleUrl: "/startup.bundle.json.gz", scenarioId: "gzip-fixture" } });
+  await responseReady;
+  assert.deepEqual(urls, ["https://example.test/startup.bundle.json.gz"]);
+  assert.equal(posted.length, 1);
+  assert.equal(posted[0].type, "STARTUP_BUNDLE_READY");
+  assert.equal(posted[0].geometryTransport.payload.encoding, "geo-f64-v2");
+  assert.equal(transferLists[0].length, 2);
+  assert.deepEqual(restoreWorkerResponse(posted[0]).payload, payload);
+});
+
+test("scenario topology chunks still decode to GeoJSON before geometry transfer", async () => {
+  const topology = largeArcTopology();
+  const { posted, self } = createWorkerHarness({
+    feature: decodeArcFeatureCollection, structuredTransfer: true,
+    fetchResource: async () => ({ ok: true, text: async () => JSON.stringify(topology) }),
+  });
+  self.onmessage({ data: { type: "DECODE_RUNTIME_CHUNK", taskId: "scenario-chunk", chunkType: "scenario-chunk", chunkUrl: "/chunk.topo.json" } });
+  await flushWorker();
+  assert.equal(posted.length, 1);
+  assert.equal(posted[0].type, "RUNTIME_CHUNK_READY");
+  assert.equal(posted[0].geometryTransport.field, "chunkPayload");
+  assert.deepEqual(restoreWorkerResponse(posted[0]).chunkPayload, decodeArcFeatureCollection(topology, topology.objects.political));
 });

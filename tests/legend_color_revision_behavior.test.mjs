@@ -72,6 +72,8 @@ test("visible legend avoids feature scans until actual renderer color transactio
   const contourNotifications = [], borderInvalidations = [];
   const refresh = rendererFunction("refreshResolvedColorsForFeatures", {
     state, runtimeState: state, setResolvedColorForFeature, bumpColorRevision,
+    politicalDerivedStateCache: { refreshColors: () => false },
+    getPoliticalDerivedStateIdentity: () => [],
     getRiverPaintRuntime,
     getCountryFillPaletteOwner: () => palette,
     getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),

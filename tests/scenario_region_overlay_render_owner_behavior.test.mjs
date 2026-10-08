@@ -13,6 +13,7 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
   const events = [];
   const metrics = [];
   const coverageCalls = [];
+  const waterJobs = [];
   const waterWork = { effectiveCollections: 0, atlantropaBuckets: 0, signatures: 0 };
   const context = (name) => Object.fromEntries(
     ["save", "restore", "setTransform", "drawImage", "translate", "scale", "fill", "stroke", "beginPath", "closePath", "clip", "moveTo", "lineTo", "setLineDash"]
@@ -89,10 +90,13 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
     isWaterRegionRenderable: () => true,
     getWaterRegionDefaultStyle: () => ({ opacity: 0.6 }),
     collectSafeWaterRegionGeometryParts: (feature) => feature.parts,
-    projectedGeoBoundsInScreen: (bounds) => { events.push(["cull", state.zoomTransform.k, bounds]); return !!bounds && visible; },
+    projectedGeoBoundsInScreen: (bounds) => { events.push(["cull", state.zoomTransform.k, bounds]); return !!bounds && visible && bounds.part?.visible !== false; },
     computeProjectedGeoBounds: (part) => { events.push(["bounds", projection, part.id]); return boundsAvailable ? { minX: 0, minY: 0, maxX: 10, maxY: 10, part, projection } : null; },
     getWaterRegionColor: () => "#123456",
     getOceanSurfacePattern: () => oceanSurfacePattern,
+    scheduleWaterWork: (callback) => { const job = { callback, canceled: false }; waterJobs.push(job); return job; },
+    cancelWaterWork: (job) => { job.canceled = true; },
+    requestRender: (reason) => events.push(["requestRender", reason]),
     getScenarioWaterVisualRevisionToken: () => { waterWork.signatures += 1; return revision; },
     isWaterRegionEnabled: () => true,
     isMacroOceanWaterRegion: (feature) => !!feature.macro,
@@ -129,7 +133,9 @@ function harness(t, { mode = "reuse", noLayerContext = false, waterPathCacheBudg
       ? waterPolicy.shouldUseDirectScenarioWaterDraw(signals)
       : adaptiveDirect,
   });
-  return { owner, reliefOwner, cacheOwner, state, water, waterWork, get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
+  return { owner, reliefOwner, cacheOwner, state, water, waterWork, waterJobs,
+    runWaterJobs: () => { while (waterJobs.length) { const job = waterJobs.shift(); if (!job.canceled) job.callback(); } },
+    get layout() { return cacheOwner.getRenderPassLayout("contextScenario"); }, events, metrics, coverageCalls, main, draw: () => owner.drawScenarioRegionOverlaysPass(state.zoomTransform.k),
     setNoLayerContext: (value) => { noLayerContext = value; },
     setBoundsAvailable: (value) => { boundsAvailable = value; }, setVisible: (value) => { visible = value; },
     replaceWaterPart: () => { water.parts = [{ id: "replacement" }]; },
@@ -219,6 +225,76 @@ test("whole water paths replace duplicate component retention without eviction",
   assert.equal(metric.pathCacheBudget.estimatedBytes, 264);
   assert.equal(metric.pathCacheBudget.evictions, 0);
   assert.equal(h.events.filter((event) => event[0] === "pathSvg").length, 1);
+});
+
+test("world-cached complete water path serves a subset view without reprojection in warmup or draw", t => {
+  const h = harness(t, { mode: "direct" });
+  const parts = [{ id: "a" }, { id: "b" }];
+  h.water.parts = parts;
+  h.draw();
+  const complete = h.owner.getCachedWaterFeaturePath(h.water, parts);
+  assert.ok(complete);
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 2);
+  h.state.firstVisibleFramePainted = true;
+  h.state.zoomTransform = { k: 5.6, x: -100, y: -200 };
+  parts[1].visible = false;
+  h.events.length = 0;
+  assert.equal(h.owner.prepareVisibleWaterPaths(), true);
+  assert.equal(h.waterJobs.length, 0);
+  h.draw();
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 0);
+  assert.ok(h.events.some(event => event[1] === "fill" && event[2] === complete));
+});
+
+test("subset view without a complete retained path prepares and draws only visible parts", t => {
+  const h = harness(t, { mode: "direct" });
+  h.water.parts = [{ id: "visible" }, { id: "offscreen", visible: false }];
+  h.state.firstVisibleFramePainted = true;
+  assert.equal(h.owner.prepareVisibleWaterPaths(), false);
+  h.runWaterJobs();
+  assert.deepEqual(h.events.filter(event => event[0] === "pathSvg").map(event => event[2]), ["visible"]);
+  assert.equal(h.owner.getCachedWaterFeaturePath(h.water, h.water.parts), null);
+  h.events.length = 0;
+  assert.equal(h.owner.prepareVisibleWaterPaths(), true);
+  h.draw();
+  assert.equal(h.events.filter(event => event[0] === "pathSvg").length, 0);
+  assert.ok(h.events.some(event => event[1] === "fill" && event[2]?.path === "projection-1:visible"));
+});
+
+for (const staleCause of ["parts", "projection"]) {
+  test(`subset view rejects a whole water path with changed ${staleCause}`, t => {
+    const h = harness(t, { mode: "direct" });
+    h.water.parts = [{ id: "a" }, { id: "b" }];
+    h.draw();
+    const complete = h.owner.getCachedWaterFeaturePath(h.water, h.water.parts);
+    h.state.firstVisibleFramePainted = true;
+    h.water.parts[1].visible = false;
+    if (staleCause === "parts") h.water.parts[1] = { id: "replacement", visible: false };
+    else h.setProjection("projection-2");
+    assert.equal(h.owner.getCachedWaterFeaturePath(h.water, h.water.parts), null);
+    h.events.length = 0;
+    assert.equal(h.owner.prepareVisibleWaterPaths(), false);
+    h.runWaterJobs();
+    assert.deepEqual(h.events.filter(event => event[0] === "pathSvg").map(event => event.slice(1)),
+      [[staleCause === "projection" ? "projection-2" : "projection-1", "a"]]);
+    h.draw();
+    assert.equal(h.events.some(event => event[1] === "fill" && event[2] === complete), false);
+  });
+}
+
+test("an oversized unretained whole water path cannot bypass subset cache admission", t => {
+  const h = harness(t, { mode: "direct", waterPathCacheBudget: 1 });
+  h.water.parts = [{ id: "a" }, { id: "b" }];
+  h.draw();
+  assert.equal(h.owner.getCachedWaterFeaturePath(h.water, h.water.parts), null);
+  h.water.parts[1].visible = false;
+  h.state.firstVisibleFramePainted = true;
+  h.events.length = 0;
+  assert.equal(h.owner.prepareVisibleWaterPaths(), true);
+  assert.equal(h.waterJobs.length, 0);
+  assert.equal(h.metrics.at(-1).reason, "over-budget");
+  h.draw();
+  assert.deepEqual(h.events.filter(event => event[0] === "pathSvg").map(event => event[2]), ["a"]);
 });
 
 test("water cache reuses the same view but repaints changed transforms without rebuilding paths", (t) => {

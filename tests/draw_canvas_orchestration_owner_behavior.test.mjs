@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { createDrawCanvasOrchestrationOwner } from "../js/core/map_renderer/draw_canvas_orchestration_owner.js";
+import { createOverviewFrameOwner } from "../js/core/renderer/overview_frame_owner.js";
+import { createRuntimeResourceBudget } from "../js/core/runtime_resource_budget.js";
 
 const CONSTANTS = Object.freeze({
   renderPhaseIdle: "idle",
@@ -48,6 +50,8 @@ function createHarness({
   prepareAsyncFrame = null,
   idlePassesReady = true,
   overview = false,
+  overviewDraw = null,
+  effectiveZoomTransform = null,
   navigation = null,
   requiresExactFrame = false,
 } = {}) {
@@ -56,7 +60,7 @@ function createHarness({
   let currentDeferExact = deferExact;
   let currentFirstVisible = firstVisible;
   let currentRawTransform = { x: 12, y: 34, k: 2 };
-  const effectiveTransform = { x: 90, y: 80, k: 3 };
+  const effectiveTransform = effectiveZoomTransform || { x: 90, y: 80, k: 3 };
   const times = [...nowValues];
   let nowCallIndex = 0;
   const mutators = Object.freeze({
@@ -163,6 +167,10 @@ function createHarness({
     },
   };
   if (overview) effects.drawOverviewFrameFallback = () => { calls.push(["drawOverviewFrameFallback"]); return true; };
+  if (overviewDraw) effects.drawOverviewFrameFallback = (transform) => {
+    calls.push(["drawOverviewFrameFallback", transform]);
+    return overviewDraw(transform);
+  };
   if (navigation) effects.drawNavigationFrame = (transform) => {
     calls.push(["drawNavigationFrame", transform]);
     return navigation({ phase: currentPhase, deferExact: currentDeferExact });
@@ -280,13 +288,112 @@ test("pending async preparation retains existing pixels without composing or com
   assert.equal(waiting.status, "waiting-worker");
   assert.equal(waiting.frameMode, "previous-pixels");
   assert.equal(waiting.drewFrame, false);
-  assert.deepEqual(names(calls), ["isFrameSurfaceReady", "ensureLayerDataFromTopology", "promoteDeferredColorRenderToIdle", "prepareAsyncFrame"]);
+  assert.deepEqual(names(calls), ["isFrameSurfaceReady", "ensureLayerDataFromTopology", "promoteDeferredColorRenderToIdle", "prepareAsyncFrame",
+    "getFirstVisibleFramePainted", "getEffectiveZoomTransform", "nowMs", "drawLastGoodFrameFallback"]);
   pending = false; calls.length = 0;
   const ready = owner.drawCanvasFrame(SUMMARY_OPTIONS);
   assert.equal(ready.frameMode, "exact");
   assert.equal(names(calls).includes("composeCachedPasses"), true);
   assert.equal(names(calls).includes("commitLastFrame"), true);
 });
+
+function createWaitingOverviewFixture({ captured = true, referenceK = 5 } = {}) {
+  let identity = "scene-a:color-1";
+  const events = [];
+  const context = {
+    canvas: { width: 1000, height: 600 },
+    save: () => events.push("save"), restore: () => events.push("restore"),
+    setTransform: (...args) => events.push(["setTransform", ...args]),
+    clearRect: () => events.push("clear"),
+    translate: (...args) => events.push(["translate", ...args]),
+    scale: (...args) => events.push(["scale", ...args]),
+    drawImage: () => events.push("draw"),
+  };
+  const cache = createOverviewFrameOwner({
+    getIdentity: () => identity,
+    resourceBudget: createRuntimeResourceBudget({ softLimitBytes: 64 * 1024 * 1024 }),
+    createCanvas: () => ({ width: 0, height: 0, getContext: () => ({ drawImage() {} }) }),
+  });
+  if (captured) cache.capture(context.canvas, { x: 0, y: 0, k: referenceK }, 1);
+  const target = { x: -20, y: -12, k: 5.656854249492381 };
+  return { events, target, draw: (transform) => cache.draw(context, transform, 1),
+    setIdentity: (next) => { identity = next; } };
+}
+
+for (const entry of ["async-prepare", "idle-passes"]) {
+  test(`${entry} wait presents a guarded current-view overview without completing pending exact work`, () => {
+    const fixture = createWaitingOverviewFixture();
+    let pending = true;
+    const { owner, calls } = createHarness({
+      phase: "idle", firstVisible: true, navigation: () => false,
+      overviewDraw: fixture.draw, effectiveZoomTransform: fixture.target,
+      ...(entry === "async-prepare" ? { prepareAsyncFrame: () => pending } : { idlePassesReady: false }),
+    });
+    const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+    assert.equal(summary.status, "waiting-worker");
+    assert.equal(summary.frameMode, "overview");
+    assert.equal(summary.drewFrame, true);
+    assert.equal(summary.drewExactFrame, false);
+    assert.equal(summary.skippedCapture, true);
+    assert.equal(pending, true);
+    assert.ok(fixture.events.includes("draw"));
+    assert.deepEqual(fixture.events.find((event) => event[0] === "translate"), ["translate", -20, -12]);
+    assert.deepEqual(fixture.events.find((event) => event[0] === "scale"),
+      ["scale", fixture.target.k / 5, fixture.target.k / 5]);
+    assert.deepEqual(calls.find(([name]) => name === "commitLastFrame")[1], {
+      phase: "idle", totalMs: summary.totalMs,
+      timings: {}, transform: fixture.target, frameMode: "overview", presented: true,
+    });
+    for (const name of ["composeCachedPasses", "captureLastGoodFrame", "markFirstVisibleFramePainted",
+      "finalizePendingExactAfterSettleRefreshAfterPaint", "abortPendingExactAfterSettleRefreshAfterPaint"])
+      assert.ok(!names(calls).includes(name), name);
+    if (entry === "async-prepare") {
+      assert.ok(!names(calls).includes("cancelPoliticalPathWarmup"));
+      pending = false;
+      calls.length = 0;
+      assert.equal(owner.drawCanvasFrame(SUMMARY_OPTIONS).frameMode, "exact");
+      assert.ok(names(calls).includes("finalizePendingExactAfterSettleRefreshAfterPaint"));
+    }
+  });
+
+  for (const rejection of ["missing", "scene", "color", "startup-k1"]) {
+    test(`${entry} wait preserves old pixels when cached overview fails ${rejection} guard`, () => {
+      const fixture = createWaitingOverviewFixture({ captured: rejection !== "missing",
+        referenceK: rejection === "startup-k1" ? 1 : 5 });
+      if (rejection === "scene") fixture.setIdentity("scene-b:color-1");
+      if (rejection === "color") fixture.setIdentity("scene-a:color-2");
+      const { owner, calls } = createHarness({
+        phase: "idle", firstVisible: true, navigation: () => false,
+        overviewDraw: fixture.draw, effectiveZoomTransform: fixture.target,
+        ...(entry === "async-prepare" ? { prepareAsyncFrame: () => true } : { idlePassesReady: false }),
+      });
+      const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+      assert.equal(summary.status, "waiting-worker");
+      assert.equal(summary.frameMode, "previous-pixels");
+      assert.equal(summary.drewFrame, false);
+      assert.deepEqual(fixture.events, []);
+      for (const name of ["commitLastFrame", "composeCachedPasses", "captureLastGoodFrame",
+        "finalizePendingExactAfterSettleRefreshAfterPaint"])
+        assert.ok(!names(calls).includes(name), name);
+    });
+  }
+
+  test(`${entry} wait falls through rejected overview to the existing last-good guard`, () => {
+    const { owner, calls, effectiveTransform } = createHarness({
+      firstVisible: true, navigation: () => false, overviewDraw: () => false, lastGood: true,
+      ...(entry === "async-prepare" ? { prepareAsyncFrame: () => true } : { idlePassesReady: false }),
+    });
+    const summary = owner.drawCanvasFrame(SUMMARY_OPTIONS);
+    assert.equal(summary.frameMode, "last-good");
+    assert.equal(summary.status, "waiting-worker");
+    assert.equal(summary.drewExactFrame, false);
+    assert.deepEqual(calls.find(([name]) => name === "drawLastGoodFrameFallback"),
+      ["drawLastGoodFrameFallback", effectiveTransform]);
+    assert.deepEqual(calls.find(([name]) => name === "commitLastFrame")[1].transform, effectiveTransform);
+    for (const name of ["captureLastGoodFrame", "finalizePendingExactAfterSettleRefreshAfterPaint"])
+      assert.ok(!names(calls).includes(name), name);
+  });
+}
 
 test("exact idle success preserves order and final frames counter", () => {
   const { calls, owner, rawTransform } = createHarness({ phase: "idle", exact: true });

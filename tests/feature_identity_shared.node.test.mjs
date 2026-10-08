@@ -21,6 +21,24 @@ test("country aliases preserve canonical, Unicode, and coercion behavior", () =>
   }
 });
 
+test("canonical country fast path preserves aliases and permissive input normalization", () => {
+  const cases = [
+    ["DE", "DE"], ["TNO", "TNO"], ["2RA", "2RA"], ["UK", "GB"], ["EL", "GR"],
+    [" uk ", "GB"], ["e-l", "GR"], ["u_k", "GB"], ["ß", "SS"], ["éFR", "FR"],
+    ["\u00a0de\n", "DE"], ["", ""], ["!_", ""], [null, ""], [undefined, ""],
+    [false, ""], [0, ""], [NaN, ""], [123, "123"], [true, "TRUE"],
+    ["DE\n", "DE"], ["constructor", "CONSTRUCTOR"], ["ZZ", "ZZ"],
+  ];
+  for (const [value, expected] of cases) assert.equal(normalizeCountryCodeAlias(value), expected);
+  let conversions = 0;
+  assert.equal(normalizeCountryCodeAlias({ toString() { conversions += 1; return " uk "; } }), "GB");
+  assert.equal(conversions, 1);
+  assert.equal(featureIdentity.normalizeFeatureCountryCode("ZZ"), "");
+  assert.equal(featureIdentity.normalizeFeatureCountryCode("ZZ", { allowReserved: true }), "ZZ");
+  assert.equal(featureIdentity.normalizeFeatureCountryCode("123"), "");
+  assert.equal(featureIdentity.normalizeFeatureCountryCode("2RA"), "2RA");
+});
+
 test("shared script initializes its own identity API instead of reusing a stale global", () => {
   const sandbox = {
     __scenarioForgeFeatureIdentityShared: { getFeatureId: () => "stale-id" },

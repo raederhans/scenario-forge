@@ -15,8 +15,9 @@ from shapely.geometry import LineString, MultiLineString, mapping, shape
 from shapely.ops import unary_union
 from shapely.validation import explain_validity
 from tools.scenario_topology_decode import topology_object_to_geojson
-from tools.scenario_chunk_format import feature_collection_to_topology
+from tools.scenario_chunk_format import decode_political_chunk, feature_collection_to_topology
 from tools.lossless_topology import optimize_topology
+from tools.build_political_display_lods import feature_id as display_feature_id, simplify_coverage_features
 
 DEFAULT_RENDER_BUDGET_HINTS = {
     "max_required_chunks": 6,
@@ -49,6 +50,8 @@ POLITICAL_COARSE_ROUND_DECIMALS = 4
 POLITICAL_COARSE_SIMPLIFY_GEOMETRY_TYPES = {"Polygon", "MultiPolygon"}
 POLITICAL_COARSE_TOPOLOGY_MIN_BYTES = 1024 * 1024
 FR_SHARED_COVERAGE_TIER = "fr-arr-shared-coverage-v1"
+TNO_WORLD_DISPLAY_LOD_TIER = "tno-world-shared-interiors-v1"
+TNO_WORLD_DISPLAY_LOD_TOLERANCE = 0.02
 
 # Whole-feature spatial splitting is shared with the dependency-light Pages build.
 from tools.political_detail_partition import (
@@ -1538,6 +1541,174 @@ def _reusable_detail_entries_match_owner(
     return seen_feature_ids == expected_feature_ids
 
 
+def _apply_tno_world_display_lod(
+    *, scenario_dir: Path, all_chunks: list[dict[str, Any]],
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    """Reuse exact detail load-unit membership to simplify the existing world file.
+
+    Detail payloads supply IDs and order only; source geometry and metadata come
+    from coarse. The shared-interior simplifier retains each group's perimeter.
+    """
+    diagnostics: dict[str, Any] = {
+        "tier": TNO_WORLD_DISPLAY_LOD_TIER,
+        "tolerance": TNO_WORLD_DISPLAY_LOD_TOLERANCE,
+        "status": "unchanged", "processed_group_count": 0,
+        "fallback_group_count": 0, "simplified_group_count": 0,
+        "changed_feature_count": 0, "groups": [],
+    }
+    coarse_entries = [chunk for chunk in all_chunks
+                      if chunk.get("layer") == "political" and chunk.get("lod") == "coarse"
+                      and chunk.get("global_coverage") is True]
+    if len(coarse_entries) != 1:
+        diagnostics.update(status="fallback", reason="expected-one-global-political-coarse")
+        return None, diagnostics
+    coarse = coarse_entries[0]
+    scenario_root = scenario_dir.resolve()
+
+    def read_features(chunk: dict[str, Any]) -> tuple[Path, dict[str, Any], list[str], dict[str, Any]]:
+        url = _normalize_relative_url(chunk.get("url"))
+        prefix = "data/scenarios/tno_1962/"
+        if not url.startswith(prefix):
+            raise ValueError(f"World display asset URL must start with {prefix}: {url}")
+        path = (scenario_root / url[len(prefix):]).resolve()
+        if not path.is_relative_to(scenario_root) or path.suffix != ".json":
+            raise ValueError(f"World display asset path escapes scenario or is not JSON: {url}")
+        wire_payload = json.loads(path.read_text(encoding="utf-8"))
+        payload = decode_political_chunk(wire_payload)
+        if not isinstance(payload.get("features"), list):
+            raise ValueError(f"World display asset is not a FeatureCollection: {url}")
+        features = payload["features"]
+        if any(not isinstance(feature, dict) or feature.get("type") != "Feature"
+               or not isinstance(feature.get("geometry"), dict)
+               or not isinstance(feature.get("properties", {}), (dict, type(None))) for feature in features):
+            raise ValueError(f"Invalid world display feature: {url}")
+        ids = [display_feature_id(feature) for feature in features]
+        return path, payload, ids, wire_payload
+
+    input_errors = (OSError, ValueError, TypeError, KeyError, GEOSException)
+    try:
+        coarse_path, payload, coarse_ids, source_wire = read_features(coarse)
+        if len(coarse_ids) != len(set(coarse_ids)):
+            raise ValueError("Duplicate coarse feature IDs")
+        if not isinstance(coarse.get("lod_diagnostics", {}), dict):
+            raise ValueError("Coarse lod_diagnostics must be an object")
+        previous_lod = coarse.get("lod_diagnostics") or {}
+        prior_world_stage = previous_lod.get("world_display_stage") or {}
+        if not isinstance(prior_world_stage, dict):
+            raise ValueError("Coarse world_display_stage must be an object")
+        for field in ("coord_count", "byte_size", "estimated_path_cost"):
+            if f"source_{field}" in previous_lod and (
+                type(previous_lod[f"source_{field}"]) is not int or previous_lod[f"source_{field}"] < 0
+            ):
+                raise ValueError(f"Coarse source_{field} must be a nonnegative integer")
+    except input_errors as exc:
+        diagnostics.update(status="fallback", reason="invalid-coarse-input", error=str(exc))
+        return None, diagnostics
+    source_features = payload["features"]
+    coarse_by_id = dict(zip(coarse_ids, source_features))
+    groups = []
+    membership_count: dict[str, int] = defaultdict(int)
+    for chunk in all_chunks:
+        if chunk.get("layer") != "political" or chunk.get("lod") != "detail":
+            continue
+        group_report = {"chunk_id": chunk.get("id"), "status": "fallback"}
+        diagnostics["groups"].append(group_report)
+        try:
+            detail_path, _detail_payload, ids, _detail_wire = read_features(chunk)
+            if detail_path == coarse_path:
+                raise ValueError("A detail shard aliases the coarse file")
+            for feature_id in ids:
+                membership_count[feature_id] += 1
+            if len(ids) != len(set(ids)):
+                raise ValueError("Duplicate detail feature IDs")
+            groups.append((ids, group_report))
+        except input_errors as exc:
+            group_report.update(reason="invalid-detail-input", error=str(exc))
+
+    replacements = {}
+    for ids, group_report in groups:
+        missing = [feature_id for feature_id in ids if feature_id not in coarse_by_id]
+        if missing or any(membership_count[feature_id] != 1 for feature_id in ids):
+            group_report.update(reason="unmatched-or-repeated-shard-ids", unmatched_id_count=len(missing))
+            continue
+        members = [coarse_by_id[feature_id] for feature_id in ids]
+        diagnostics["processed_group_count"] += 1
+        try:
+            simplified, report = simplify_coverage_features(members, TNO_WORLD_DISPLAY_LOD_TOLERANCE)
+            if (len(simplified) != len(members)
+                    or [display_feature_id(feature) for feature in simplified] != ids
+                    or any(output.get("properties") != original.get("properties")
+                           for original, output in zip(members, simplified))):
+                raise ValueError("World display simplifier changed membership, order or properties")
+        except input_errors as exc:
+            group_report.update(reason="invalid-group-result", error=str(exc))
+            continue
+        group_report.update({key: report[key] for key in
+                             ("status", "reason", "input_points", "output_points", "retention_costs")
+                             if key in report})
+        if report.get("status") != "simplified":
+            continue
+        if (_summarize_payload_geometry_cost({"features": simplified})["coord_count"]
+                >= _summarize_payload_geometry_cost({"features": members})["coord_count"]):
+            group_report.update(status="unchanged", reason="no-point-reduction")
+            continue
+        changed = {}
+        for feature_id, original, output in zip(ids, members, simplified):
+            if output is original or json.dumps(output.get("geometry"), sort_keys=True) == json.dumps(original["geometry"], sort_keys=True):
+                continue
+            replacement = {**original, "geometry": output["geometry"]}
+            if "bbox" in original:
+                replacement["bbox"] = _feature_bounds(replacement)
+            changed[feature_id] = replacement
+        replacements.update(changed)
+        if changed:
+            diagnostics["simplified_group_count"] += 1
+    diagnostics["fallback_group_count"] = sum(group["status"] == "fallback" for group in diagnostics["groups"])
+    diagnostics["changed_feature_count"] = len(replacements)
+    before = {**_summarize_payload_geometry_cost(payload), "byte_size": coarse_path.stat().st_size,
+              "wire_byte_size": coarse_path.stat().st_size,
+              "expanded_geojson_byte_size": _minified_json_byte_size(payload)}
+    result = {**payload, "features": [replacements.get(feature_id, feature)
+                                     for feature_id, feature in zip(coarse_ids, source_features)]}
+    if replacements:
+        try:
+            wire_payload, cache_byte_size = _encode_political_coarse_wire(result)
+        except input_errors as exc:
+            diagnostics.update(status="fallback", reason="invalid-world-output", error=str(exc))
+            return None, diagnostics
+        _write_minified_json(coarse_path, wire_payload)
+        diagnostics["status"] = "simplified"
+    else:
+        # A mainline shared-coverage pass may already have removed all eligible
+        # points. Do not re-encode or rewrite its existing transport in that case.
+        wire_payload, cache_byte_size = source_wire, _minified_json_byte_size(result)
+    cost = _build_chunk_cost_summary(result, coarse_path)
+    cost["cache_byte_size"] = cache_byte_size
+    after = {**_summarize_payload_geometry_cost(result), "byte_size": cost["byte_size"],
+             "wire_byte_size": cost["byte_size"], "expanded_geojson_byte_size": cache_byte_size}
+    diagnostics.update(before=before, after=after)
+    stage = {key: diagnostics[key] for key in
+             ("tier", "tolerance", "status", "before", "after", "processed_group_count",
+              "fallback_group_count", "simplified_group_count", "changed_feature_count")}
+    stage["previous"] = prior_world_stage.get("previous", {
+        key: value for key, value in previous_lod.items() if key != "world_display_stage"
+    })
+    final_lod = {**previous_lod, "world_display_stage": stage,
+                 "wire_byte_size": after["wire_byte_size"],
+                 "expanded_geojson_byte_size": after["expanded_geojson_byte_size"]}
+    for field in ("feature_count", "coord_count", "part_count", "byte_size", "estimated_path_cost"):
+        final_lod[f"optimized_{field}"] = after[field]
+    for field, reduction in (("coord_count", "coord_reduction"), ("byte_size", "byte_size_reduction"),
+                             ("estimated_path_cost", "estimated_path_cost_reduction")):
+        if f"source_{field}" in previous_lod:
+            final_lod[reduction] = max(0, previous_lod[f"source_{field}"] - after[field])
+    updated = {**coarse, **cost, "feature_count": len(source_features),
+               "data_format": "topojson" if wire_payload.get("type") == "Topology" else "geojson",
+               "feature_bounds": _build_feature_bounds_summary(result["features"], include_zero_area=True),
+               "lod_diagnostics": final_lod}
+    return updated, diagnostics
+
+
 def _build_political_chunk_payloads(
     *,
     scenario_id: str,
@@ -1708,6 +1879,12 @@ def _build_political_chunk_payloads(
                     "chunk_ids": [chunk_id],
                 })
 
+    if scenario_id == "tno_1962":
+        updated_coarse, _world_diagnostics = _apply_tno_world_display_lod(
+            scenario_dir=scenario_dir, all_chunks=all_chunks,
+        )
+        if updated_coarse is not None:
+            all_chunks = [updated_coarse if chunk["id"] == updated_coarse["id"] else chunk for chunk in all_chunks]
     return all_chunks, lod_layers
 
 

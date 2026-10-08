@@ -1,3 +1,8 @@
+import {
+  getContextCollectionRevision, getContextGeometryRevision, getContextTopologyObjectStamp,
+  getStartupContextCollection,
+} from "../state/context_layer_revision.js";
+
 export function createContextLayerResolverOwner({
   runtimeState,
   caches = {},
@@ -8,6 +13,10 @@ export function createContextLayerResolverOwner({
     layerResolverCache = null,
   } = caches;
   const layerSourceStamps = new Map();
+  // Scene selection may change while shared TopoJSON stays the same. Keep its
+  // geographic derivations weakly owned by the source, separate from publication.
+  const decodedCollectionsByTopology = new WeakMap();
+  const collectionDerivations = new WeakMap();
   let politicalSourceStamp = null;
   const contextLayerFields = {
     ocean: "oceanData",
@@ -39,9 +48,17 @@ export function createContextLayerResolverOwner({
     if (!topology?.objects || !globalThis.topojson) return null;
     const object = topology.objects[layerName];
     if (!object) return null;
+    const stamp = getTopologyObjectStamp(topology, object);
+    const byObject = decodedCollectionsByTopology.get(topology);
+    const cached = byObject?.get(object);
+    if (cached && stamp.every((value, index) => value === cached.stamp[index])) return cached.collection;
     try {
-      const collection = globalThis.topojson.feature(topology, object);
+      const collection = getStartupContextCollection(runtimeState, topology, object, stamp)
+        || globalThis.topojson.feature(topology, object);
       if (!collection || !Array.isArray(collection.features)) return null;
+      const nextByObject = byObject || new WeakMap();
+      nextByObject.set(object, { stamp, collection });
+      if (!byObject) decodedCollectionsByTopology.set(topology, nextByObject);
       return collection;
     } catch (error) {
       console.warn(`${layerDiagPrefix} Failed to decode layer "${layerName}":`, error);
@@ -49,11 +66,29 @@ export function createContextLayerResolverOwner({
     }
   }
 
+  function getTopologyObjectStamp(topology, object) {
+    return getContextTopologyObjectStamp(runtimeState, topology, object, globalThis.topojson?.feature);
+  }
+
+  function getCollectionDerivations(collection) {
+    const stamp = [collection.features, collection.features?.length,
+      getContextGeometryRevision(runtimeState), getContextCollectionRevision(runtimeState, collection),
+      globalThis.d3?.geoBounds];
+    let cached = collectionDerivations.get(collection);
+    if (!cached || !stamp.every((value, index) => value === cached.stamp[index])) {
+      cached = { stamp };
+      collectionDerivations.set(collection, cached);
+    }
+    return cached;
+  }
+
   // layer score 用于比较 primary/detail 数据源覆盖质量：
   // normalizedArea 体现地理覆盖范围，densityBoost 体现要素密度，
   // 两者合成后写入 layerDataDiagnostics.*Score，便于定位来源切换原因。
   function computeLayerCoverageScore(collection) {
     if (!collection?.features?.length || !globalThis.d3?.geoBounds) return 0;
+    const cached = getCollectionDerivations(collection);
+    if (cached.coverageScore !== undefined) return cached.coverageScore;
     try {
       const [[minLon, minLat], [maxLon, maxLat]] = globalThis.d3.geoBounds(collection);
       if (![minLon, minLat, maxLon, maxLat].every(Number.isFinite)) return 0;
@@ -62,7 +97,9 @@ export function createContextLayerResolverOwner({
       const height = Math.max(0, maxLat - minLat);
       const normalizedArea = clamp((width * height) / (360 * 180), 0, 1);
       const densityBoost = Math.min(1, Math.log10(collection.features.length + 1) / 4);
-      return clamp(normalizedArea * 0.8 + densityBoost * 0.2, 0, 1);
+      const score = clamp(normalizedArea * 0.8 + densityBoost * 0.2, 0, 1);
+      cached.coverageScore = score;
+      return score;
     } catch (_error) {
       return 0;
     }
@@ -124,10 +161,13 @@ export function createContextLayerResolverOwner({
     if (!features.length) {
       return createUrbanLayerCapability();
     }
+    const cached = getCollectionDerivations(collection);
+    if (cached.urbanCapability) return cached.urbanCapability;
 
     let missingStableIdCount = 0;
     let missingOwnerCount = 0;
     let corruptBoundsCount = 0;
+    let boundsComplete = true;
 
     features.forEach((feature) => {
       if (!getUrbanFeatureStableId(feature)) {
@@ -137,6 +177,7 @@ export function createContextLayerResolverOwner({
         missingOwnerCount += 1;
       }
       const bounds = getUrbanFeatureGeoBounds(feature);
+      if (!bounds) boundsComplete = false;
       if (
         bounds
         && (bounds.width >= urbanCorruptBoundsWidthDeg || bounds.height >= urbanCorruptBoundsHeightDeg)
@@ -160,6 +201,7 @@ export function createContextLayerResolverOwner({
       && capability.hasOwnerMeta
       && !capability.hasCorruptBounds;
     capability.unavailableReason = getUrbanCapabilityUnavailableReason(capability);
+    if (boundsComplete) cached.urbanCapability = capability;
     return capability;
   }
 
@@ -441,12 +483,17 @@ export function createContextLayerResolverOwner({
       const specialOverride = layerName === "special_zones" ? runtimeState.specialZonesExternalData : null;
       const stamp = [
         primaryObject ? primaryTopology : null, primaryObject,
+        ...(primaryObject ? getTopologyObjectStamp(primaryTopology, primaryObject) : []),
         detailObject ? detailTopology : null, detailObject,
-        externalCollection, specialOverride, contextRevision, activeScenarioId,
+        ...(detailObject ? getTopologyObjectStamp(detailTopology, detailObject) : []),
+        externalCollection, externalCollection?.features, externalCollection?.features?.length,
+        specialOverride, specialOverride?.features, specialOverride?.features?.length,
+        contextRevision, globalThis.d3?.geoBounds, activeScenarioId,
         runtimeState.topologyBundleMode,
       ];
       const previousStamp = layerSourceStamps.get(layerName);
-      if (previousStamp && stamp.every((value, index) => value === previousStamp[index])) continue;
+      if (previousStamp && stamp.length === previousStamp.length
+        && stamp.every((value, index) => value === previousStamp[index])) continue;
 
       const collection = resolveContextLayerData(layerName);
       runtimeState[stateField] = collection;

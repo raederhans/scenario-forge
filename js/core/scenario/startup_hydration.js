@@ -527,10 +527,11 @@ function createScenarioStartupHydrationController({
     if (mergedPoliticalPayload !== undefined) {
       let mergedPoliticalPayloadDecision = { hasPayload: true, payload: null };
       if (mergedPoliticalPayload !== null) {
-        mergedPoliticalPayloadDecision = getPromotablePoliticalPayloadDecision(
-          mergedPoliticalPayload,
-          mapSemanticMode
-        );
+        // A complete chunk source owns its visual shell underlays. Filtering
+        // them only during hydration makes the result depend on zoom order.
+        mergedPoliticalPayloadDecision = mergedPoliticalPayload.globalCoverage === true
+          ? { hasPayload: true, payload: normalizeScenarioFeatureCollection(mergedPoliticalPayload) }
+          : getPromotablePoliticalPayloadDecision(mergedPoliticalPayload, mapSemanticMode);
       }
       nextScenarioPoliticalPayload = mergedPoliticalPayloadDecision.payload;
     }

@@ -95,15 +95,18 @@ test("ownership, shell and metadata revisions retain geometry/semantic refresh",
   }
 });
 
-function bootstrapFixture() {
+function bootstrapFixture({ useRealRefresh = false } = {}) {
   const f = fixture(); f.state.topologyDetail = null; f.state.detailDeferred = true;
   let resolveLoad;
   const load = new Promise(resolve => { resolveLoad = resolve; });
-  const calls = [], queued = [];
+  const calls = [], queued = [], loadRequests = [];
   const scope = { console: { warn() {}, info() {} }, isScenarioRefreshSceneCurrent,
     captureScenarioRefreshState: () => captureScenarioRefreshState(f.state, 1),
-    refreshMapDataForScenarioApply: (options) => { calls.push(["refresh", options]); return { mode: "background" }; },
-    setMapData: () => calls.push(["setMapData"]), loadDeferredDetailBundle: () => load,
+    refreshMapDataForScenarioApply: (options) => {
+      calls.push(["refresh", options]);
+      return useRealRefresh ? f.runtime.refreshMapDataForScenarioApply(options) : { mode: "background" };
+    },
+    setMapData: () => calls.push(["setMapData"]), loadDeferredDetailBundle: options => { loadRequests.push({ ...options }); return load; },
     refreshScenarioShellOverlays: () => calls.push(["shell"]), refreshScenarioDataHealth() {},
     setDefaultRuntimePoliticalTopologyState() {}, patchScenarioChunkLoadState() {},
     getDeferredPromotionDelay: () => 10, setTimeout: fn => { queued.push(fn); return 1; },
@@ -115,7 +118,7 @@ function bootstrapFixture() {
   const owner = scope.createDeferredDetailPromotionOwner({ runtimeState: f.state, helpers: {
     schedulePostReadyPoliticalReconcile: () => calls.push(["reconcile"]), canRunPostReadyIdleWork: () => true,
   } });
-  return { ...f, owner, calls, queued, resolveLoad };
+  return { ...f, owner, calls, queued, loadRequests, resolveLoad };
 }
 test("real deferred bootstrap passes pre-change snapshot, skips shell and political reconcile for background arrival", async () => {
   const f = bootstrapFixture();
@@ -134,4 +137,115 @@ test("outgoing scene async detail completion cannot mutate incoming topology or 
   assert.equal(await request, false);
   assert.equal(f.state.topologyDetail, null); assert.equal(f.state.runtimePoliticalTopology, previousRuntime);
   assert.equal(f.calls.length, 0); assert.equal(f.state.detailPromotionInFlight, false);
+});
+
+test("detail commit does not replay political chunk and paint updates completed during its load", async () => {
+  const f = bootstrapFixture({ useRealRefresh: true });
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  assert.equal(f.loadRequests[0].includeRuntimePolitical, false);
+  const promoted = { features: [{ id: "arrived", properties: { id: "arrived" } }] };
+  f.state.scenarioPoliticalChunkData = promoted;
+  f.state.landDataFull = promoted;
+  f.state.landIndex = new Map([["arrived", promoted.features[0]]]);
+  f.state.topologyRevision++;
+  f.state.colorRevision++;
+  const current = f.capture();
+  f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: topology(), topologyBundleMode: "composite" });
+  assert.equal(await request, true);
+  const previous = f.calls.find(([name]) => name === "refresh")[1].previousRefreshState;
+  assert.deepEqual(previous.political, current.political);
+  assert.equal(previous.colorRevision, current.colorRevision);
+  assert.equal(f.state.landDataFull, promoted);
+  assert.ok(!f.names().includes("rebuildPrimaryPoliticalDerivedState"));
+  assert.ok(!f.names().includes("markRendererTopologyChanged"));
+  assert.ok(f.names().includes("rebuildStaticMeshes"));
+  assert.ok(!f.calls.some(([name]) => name === "reconcile"));
+});
+
+test("detail commit still rebuilds political state when this commit supplies its missing authority", async () => {
+  const f = bootstrapFixture({ useRealRefresh: true });
+  f.state.scenarioRuntimeTopologyData = null;
+  f.state.runtimePoliticalTopology = null;
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  assert.equal(f.loadRequests[0].includeRuntimePolitical, true);
+  const incoming = topology();
+  f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: incoming, topologyBundleMode: "composite" });
+  assert.equal(await request, true);
+  assert.equal(f.state.runtimePoliticalTopology, incoming);
+  assert.ok(f.names().includes("rebuildPrimaryPoliticalDerivedState"));
+  assert.ok(f.calls.some(([name]) => name === "reconcile"));
+});
+
+test("detail completion from an earlier apply of the same scenario stays rejected", async () => {
+  const f = bootstrapFixture({ useRealRefresh: true });
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  f.state.sceneGeneration++;
+  f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: topology() });
+  assert.equal(await request, false);
+  assert.equal(f.state.topologyDetail, null);
+  assert.equal(f.calls.length, 0);
+  assert.equal(f.names().length, 0);
+});
+
+test("base-map deferred detail retains its global runtime demand and adoption", async () => {
+  const f = bootstrapFixture();
+  f.state.activeScenarioId = "";
+  f.state.runtimePoliticalTopology = null;
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  assert.equal(f.loadRequests[0].includeRuntimePolitical, true);
+  const incoming = topology();
+  f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: incoming, topologyBundleMode: "composite" });
+  assert.equal(await request, true);
+  assert.equal(f.state.runtimePoliticalTopology, incoming);
+  assert.ok(f.calls.some(([name]) => name === "setMapData"));
+});
+
+test("runtime demand changes during detail loading reject both obsolete partial and full results", async () => {
+  for (const initiallyOwned of [true, false]) {
+    const f = bootstrapFixture();
+    if (!initiallyOwned) f.state.runtimePoliticalTopology = null;
+    const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+    assert.equal(f.loadRequests[0].includeRuntimePolitical, !initiallyOwned);
+    const current = initiallyOwned ? null : topology();
+    f.state.runtimePoliticalTopology = current;
+    f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: topology(), topologyBundleMode: "composite" });
+    assert.equal(await request, false);
+    assert.equal(f.state.runtimePoliticalTopology, current);
+    assert.equal(f.state.topologyDetail, null);
+    assert.equal(f.state.detailPromotionCompleted, undefined);
+    assert.equal(f.state.detailDeferred, true);
+    assert.equal(f.calls.length, 0);
+    assert.equal(f.queued.length, 1, "retry recomputes the new scene's demand");
+  }
+});
+
+test("same-scene authority replacement preserves the current authority while accepting independent detail", async () => {
+  const f = bootstrapFixture();
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  const current = topology();
+  f.state.runtimePoliticalTopology = current;
+  f.resolveLoad({ topologyDetail: topology(), runtimePoliticalTopology: null, topologyBundleMode: "composite" });
+  assert.equal(await request, true);
+  assert.equal(f.state.runtimePoliticalTopology, current);
+  assert.ok(!f.calls.some(([name]) => name === "shell"));
+});
+
+test("loaded detail keeps its scenario authority and does not request another deferred bundle", async () => {
+  const f = bootstrapFixture();
+  const detail = topology(), authority = f.state.runtimePoliticalTopology;
+  f.state.topologyDetail = detail;
+  assert.equal(await f.owner.ensureDetailTopologyReady({ suppressRender: true }), true);
+  assert.equal(f.loadRequests.length, 0);
+  assert.equal(f.state.topologyDetail, detail);
+  assert.equal(f.state.runtimePoliticalTopology, authority);
+});
+
+test("an outgoing scene's failed detail load cannot clear the incoming scene's deferred flag", async () => {
+  const f = bootstrapFixture();
+  const request = f.owner.ensureDetailTopologyReady({ suppressRender: true });
+  f.state.sceneGeneration++;
+  f.resolveLoad({ topologyDetail: null, runtimePoliticalTopology: null });
+  assert.equal(await request, false);
+  assert.equal(f.state.detailDeferred, true);
+  assert.equal(f.calls.length, 0);
 });
