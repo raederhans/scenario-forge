@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-09 共享政治层 ID 栅格
+
+`C:/Users/raede/.codex/worktrees/political-id-raster-prototype/mapcreator`、`codex/political-id-raster-prototype` 基于 `98425dcc` 完成 1936／1939／TNO 共用的可选 ID 栅格显示、缓存、预生成资产与保守拾取。用户已授权审核、优化、合并和推送；root 独占 Git 与现场验证，主目录未归属改动不纳入交付。两个审核发现已修复并复核，默认仍需 `political_id_raster=1`，未宣称整体性能或画质门槛通过。代码和验证范围见 [栅格记录](political-id-raster-prototype/task.md)。最终提交、required checks 与合并以该分支 GitHub PR 回执为准；工作树保留 `.runtime` 中未发布的试验瓦片、项目文件和浏览器测量证据，便于继续研究重采样画质。
+
 ## 2026-10-09 全工作区对账与归档（覆盖下方历史拓扑）
 
 主目录已从 `f47b36f41` 快进到 `ab915f9ee`；原 1,015 项混合 WIP 经逐文件备份和内容核对后保留在固定恢复引用中。15 个旧工作树完整同卷归档，包含约 42.86 GiB 的 ignored `.runtime` 证据；36 个已覆盖或临时探针本地分支、27 个远端分支在保存恢复引用后清理。64 个历史 stash 保留。旧路径和下方“仍保留工作树”的描述仅表示历史状态，当前恢复位置及每项证据见 [工作区同步记录](workspace-reconciliation-20261009/context.md)。

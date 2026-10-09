@@ -595,6 +595,12 @@ test("owner remains import-free and avoids DOM, globals, and worker singleton st
   }
 });
 
+test('selected ID raster leaves partial paint completion to the full political pass', () => {
+  const h = createHarness({ getters: { isPoliticalIdRasterSelected: () => true } });
+  assert.equal(h.owner.tryPartialPoliticalPassRepaint(h.transform, 'next', {}), false);
+  assert.deepEqual(h.events, []);
+});
+
 test('partial repaint draws bank surfaces inside the existing dirty rectangle after the parent', () => {
   let h;
   h = createHarness({ effects: { drawPartitionForParent: (feature, k) => h.events.push(['river-cells', feature.id, k]) } });

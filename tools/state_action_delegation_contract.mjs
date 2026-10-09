@@ -1395,7 +1395,7 @@ export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
   "targetParameterName": "state",
   "targetParameterIndex": 0,
   "targetParameterPath": "$/property:state",
-  "sourceFingerprint": "17c1168b33789a4844f42ecb13a05b04e2b7a1145a9a6a8b9f760b7f7f58fc38",
+  "sourceFingerprint": "4ce88e909fbf6bb75b9db66fb82217332c27b777b96ba6fd250466433b59767e",
   "localFunctionFingerprints": {},
   "conservativeFindings": [
     {
@@ -5653,7 +5653,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/core/map_renderer.js", bindingIdentity: RETIRED_CORE_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    currentSourceFingerprint: "48c6084a4963688ffca887ded83e584c97fbf3b98003102cd07b97d640c91675",
+    currentSourceFingerprint: "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 3, "622061d65a1cac3cc053ad5d57320b6625611fce0a169d9be6569ac9ade357c0"],
       ["color", "P4.4", "assign", "featureOverrides", 4, "2b49424706a23f675add6c116fff341ca7c167193a80b2bf06a89f298af07b87"],
@@ -6010,7 +6010,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "b17371bb30556b5e5736f3b52d0ccbf284e5e7d1975fd64ea11c0b70de5ee470",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "48c6084a4963688ffca887ded83e584c97fbf3b98003102cd07b97d640c91675",
+    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|sovereignBaseColors",
@@ -6027,7 +6027,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "1f35c44f87b5bd5e23d3c733a3c560aa224244cf5c50aacff6ffa47943c660af",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "48c6084a4963688ffca887ded83e584c97fbf3b98003102cd07b97d640c91675",
+    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|visualOverrides",
@@ -6044,7 +6044,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "9f3cd6152efd6c2659c2854a85b921c468824cbb5d621ab61832980b95de5cf1",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "48c6084a4963688ffca887ded83e584c97fbf3b98003102cd07b97d640c91675",
+    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|resolveSpecialZoneParentGroupTargetIdsFn",
@@ -6061,7 +6061,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "922f400af35f30ecdb8098901b0deacfeeac53a40393cf88b0bc04638291db99",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "48c6084a4963688ffca887ded83e584c97fbf3b98003102cd07b97d640c91675",
+    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|syncDayNightClockTimerFn",
@@ -6745,10 +6745,10 @@ export const STATE_MUTATION_DELEGATING_OWNER_CONTRACT = Object.freeze([
   freezeMutationDelegatingOwnerEntry({
   "compositionModulePath": "js/core/map_renderer.js",
   "compositionExportName": "getGeometryRasterRuntimeOwner",
-  "compositionSourceFingerprint": "b805a18ecc115601a4755cd8654db70a4639296f82d96d9df9d6552d96b35f8d",
+  "compositionSourceFingerprint": "137bc5d5925bf3fdc7abe00d0aff9fcbdc98af96c839e9906440448d1358b84b",
   "factoryModulePath": "js/core/renderer/geometry_raster_runtime_owner.js",
   "factoryExportName": "createGeometryRasterRuntimeOwner",
-  "factorySourceFingerprint": "17c1168b33789a4844f42ecb13a05b04e2b7a1145a9a6a8b9f760b7f7f58fc38",
+  "factorySourceFingerprint": "4ce88e909fbf6bb75b9db66fb82217332c27b777b96ba6fd250466433b59767e",
   "ownerBindingName": "geometryRasterRuntimeOwner",
   "methods": [
     "prepareFrame",
@@ -7376,11 +7376,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalPartialRepaintOwner",
     compositionSourceFingerprint:
-      "4e96df5742b5b0ce11e8aafb1b273a2e1d0a685d7dd13e4adf5ed9b564bc242f",
+      "d8bce2085331bf612ddbc62a9e5df5c02340f18007f5038010372322cfecc6bb",
     factoryModulePath: "js/core/renderer/political_partial_repaint_owner.js",
     factoryExportName: "createPoliticalPartialRepaintOwner",
     factorySourceFingerprint:
-      "2d9f8485d502e2ef990d094d86c3604b94aa2ca3819b0f8a20184fc611bb9c19",
+      "27e45ea5268bc09525ebfb5f01edb1f928d9857c16ec4819029a4a062a226a2c",
     ownerBindingName: "politicalPartialRepaintOwner",
     methods: [
       "buildPoliticalRasterWorkerPacket",

@@ -112,6 +112,8 @@ function createHarness({
   diagnosticsEnabled = true,
   hasLand = true,
   workerEnabled = true,
+  idRasterSelected = false,
+  idRasterMetrics = null,
   pendingEdit = false,
   foregroundOverride = false,
   bitmapResult = null,
@@ -145,6 +147,10 @@ function createHarness({
       isPoliticalRasterWorkerBitmapEnabled: () => {
         events.push("worker-enabled");
         return workerEnabled;
+      },
+      isPoliticalIdRasterSelected: () => {
+        events.push("id-raster-selected");
+        return idRasterSelected;
       },
       hasPendingPoliticalColorEdit: () => {
         events.push("pending-edit");
@@ -207,6 +213,10 @@ function createHarness({
       drawPoliticalFineFeatureLoop: (payload) => {
         events.push(["fine-loop", payload]);
         return resolvedFineMetrics;
+      },
+      drawPoliticalIdRasterFine: (payload) => {
+        events.push(["id-raster-fine", payload]);
+        return idRasterMetrics;
       },
       clearPendingPoliticalColorEdit: (payload) => events.push(["clear-pending", payload]),
     },
@@ -274,6 +284,7 @@ test("worker bitmap success short-circuits before background and preserves snaps
     "metric",
     "diagnostics-enabled",
     "diagnostics",
+    "id-raster-selected",
     "consume-bitmap",
     "draw-bitmap",
     "worker-snapshot",
@@ -313,6 +324,7 @@ test("rejected bitmap continues through background before the missing-land resul
     "metric",
     "diagnostics-enabled",
     "diagnostics",
+    "id-raster-selected",
     "consume-bitmap",
     "draw-bitmap",
     "now",
@@ -598,5 +610,58 @@ test("partition surfaces draw after fine/worker base passes", () => {
     assert.equal(calls.length, 1);
     assert.equal(calls[0].k, 3);
     assert.equal(calls[0].previous.at(-1), 'result');
+  }
+});
+
+test("selected ID raster keeps background order, skips legacy worker scheduling, and clears successful rendered IDs", () => {
+  const renderedIds = new Set(["id-a", "id-b"]);
+  const metrics = { fillMs: 3, strokeMs: 2, renderedCount: 2, renderedIds };
+  const { events, owner } = createHarness({
+    idRasterSelected: true,
+    idRasterMetrics: metrics,
+    bitmapResult: { bitmapId: "legacy" },
+    overrides: {
+      getters: { isPoliticalRasterWorkerBitmapEnabled: () => { throw Error("legacy flag should not be read"); } },
+    },
+  });
+  const result = owner.drawPoliticalPass(3);
+  const names = events.map(eventName);
+  assert.ok(names.indexOf("background") < names.indexOf("id-raster-fine"));
+  assert.ok(names.indexOf("id-raster-fine") < names.indexOf("result"));
+  for (const forbidden of ["consume-bitmap", "draw-bitmap", "build-packet", "request-worker", "fine-loop"]) {
+    assert.equal(names.includes(forbidden), false, forbidden);
+  }
+  const cleared = events.find((event) => eventName(event) === "clear-pending");
+  assert.equal(cleared[1].renderedIds, renderedIds);
+  assert.equal(cleared[1].paintSource, "political-id-raster");
+  assert.equal(result.reason, "political-id-raster");
+  assert.equal(result.politicalDataStage, "fine");
+});
+
+test("selected but unavailable ID raster skips legacy worker and falls through to vector/coarse rendering", () => {
+  const progressive = { ...DEFAULT_BACKGROUND, progressive: true, deferredFullCacheReady: false, coarseUnderlay: "admin0" };
+  const empty = createHarness({ idRasterSelected: true, idRasterMetrics: null, backgroundSummary: progressive });
+  const result = empty.owner.drawPoliticalPass(3);
+  assert.equal(empty.events.some((event) => eventName(event) === "id-raster-fine"), true);
+  assert.equal(empty.events.some((event) => eventName(event) === "fine-loop"), false);
+  assert.equal(empty.events.some((event) => eventName(event) === "request-worker"), false);
+  assert.equal(result.reason, "progressive-coarse-underlay");
+
+  const fallback = createHarness({ idRasterSelected: true, idRasterMetrics: {}, workerEnabled: true });
+  assert.equal(fallback.owner.drawPoliticalPass(3).reason, "fine-feature-loop");
+  assert.equal(fallback.events.some((event) => eventName(event) === "fine-loop"), true);
+  assert.equal(fallback.events.some((event) => eventName(event) === "request-worker"), false);
+});
+
+test("export and inline river passes never invoke the ID raster producer", () => {
+  for (const overrides of [
+    { getters: { isExportRendering: () => true } },
+    { getters: { hasInlinePoliticalPartitions: () => true } },
+  ]) {
+    const h = createHarness({ idRasterSelected: true, idRasterMetrics: { fillMs: 1, strokeMs: 1, renderedCount: 1 }, overrides });
+    const result = h.owner.drawPoliticalPass(3);
+    assert.equal(h.events.some((event) => eventName(event) === "id-raster-fine"), false);
+    assert.equal(result.reason, "fine-feature-loop");
+    assert.equal(h.events.some((event) => eventName(event) === "fine-loop"), true);
   }
 });
