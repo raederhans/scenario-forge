@@ -107,7 +107,6 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "js/core/renderer/viewport_resize_lifecycle_owner.js",
       "js/core/map_renderer/scenario_refresh_runtime.js",
       "js/core/map_renderer/exact_after_settle_scheduler.js",
-      "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
       ".github/workflows/pr-verify.yml",
       ".github/workflows/verify-shared.yml",
       "package.json"

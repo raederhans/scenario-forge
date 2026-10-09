@@ -2110,13 +2110,6 @@ def _validate_source_metadata(
         errors.append("manifest.source must be an object in strict mode.")
         return
     required_sha_fields = ["base_topology_sha256", "runtime_topology_sha256"]
-    hgo_source_paths: dict[str, Path] = {}
-    if target_dir.name == "hgo_1936":
-        hgo_source_paths = {
-            "hgo_seed_sha256": PROJECT_ROOT / "data" / "hgo_runtime" / "seed.json",
-            "hgo_provinces_bmp_sha256": PROJECT_ROOT / "data" / "hgo_runtime" / "provinces.bmp",
-        }
-        required_sha_fields.extend(hgo_source_paths)
     if bootstrap_topology_path is not None:
         required_sha_fields.append("runtime_bootstrap_topology_sha256")
     if detail_chunk_manifest_path is not None:
@@ -2136,11 +2129,6 @@ def _validate_source_metadata(
         actual_by_field["runtime_bootstrap_topology_sha256"] = _sha256_path(bootstrap_topology_path)
     if detail_chunk_manifest_path is not None:
         actual_by_field["detail_chunk_manifest_sha256"] = _sha256_path(detail_chunk_manifest_path)
-    for field, path in hgo_source_paths.items():
-        if path.exists():
-            actual_by_field[field] = _sha256_path(path)
-        else:
-            errors.append(f"HGO source file is missing in strict mode: {path}.")
     for field, actual_sha in actual_by_field.items():
         expected_sha = str(source.get(field) or "").strip()
         if expected_sha and expected_sha != actual_sha:

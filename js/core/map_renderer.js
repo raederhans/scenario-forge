@@ -310,7 +310,6 @@ import {
   collectSpatialItemsForProjectedRects,
   collectVisibleSpatialItemsWithStats,
 } from "./renderer/spatial_query_index.js";
-import { createHgoRuntimePreviewRenderOwner } from "./map_renderer/hgo_runtime_preview_render_owner.js";
 import { createSetMapDataTransactionOwner } from "./map_renderer/set_map_data_transaction_owner.js";
 import { createRenderRequestBoundaryOwner } from "./map_renderer/render_request_boundary_owner.js";
 import { createRenderPhaseLifecycleOwner } from "./map_renderer/render_phase_lifecycle_owner.js";
@@ -895,9 +894,6 @@ function getRenderPassSignaturePolicy() {
       getViewportRenderSignature,
       getPhysicalLandMaskInfo,
       getScenarioRuntimeTopologySignatureToken,
-      getHgoRuntimePreviewVisibilitySignature,
-      getHgoRuntimePreviewProjectionOptions,
-      isHgoRuntimePreviewReady,
       rendererSurfaceHost,
       getContextBaseZoomBucketId,
       shouldRefreshContextBaseForColorChanges,
@@ -947,7 +943,6 @@ let renderPhaseLifecycleOwner = null;
 let hitCanvasSchedulingOwner = null;
 let visibleFrameDiagnosticsOwner = null;
 let intensityFieldMaskOwner = null;
-let hgoRuntimePreviewRenderOwner = null;
 let legendControlOwner = null;
 let selectionOverlayOwner = null;
 let transientOverlayRenderOwner = null;
@@ -1506,7 +1501,6 @@ function getMapHoverInteractionOwner() {
     constants: { hoverSnapPx: HIT_SNAP_RADIUS_HOVER_PX, renderPhaseIdle: RENDER_PHASE_IDLE },
     getters: {
       nowMs,
-      inspectHgoRuntimePreviewFromEvent,
       getHitFromEvent,
       getHoveredFacilityEntryFromEvent,
       isFacilityDetailsSurfaceActive,
@@ -2513,7 +2507,7 @@ function getPaintContourRuntimeOwner() {
 async function ensurePaintContoursReady() {
   const riverPartitionsRequired = !isThematicWgiActive(runtimeState) && !isPopulationActive(runtimeState);
   if (riverPartitionsRequired) getRiverPaintRuntime(runtimeState).assertReadyForExport();
-  if (!isHgoRuntimePreviewReady()) await Promise.all([
+  await Promise.all([
     getPaintContourRuntimeOwner().ensureReady(),
     ...(riverPartitionsRequired ? [getRiverInternalContourOwner().ensureReady()] : []),
   ]);
@@ -2770,7 +2764,6 @@ function getTransformedFrameCompositorOwner() {
       getZoomGestureScaleDelta: () => runtimeState.zoomGestureScaleDelta,
       getZoomGestureEndedAt: () => runtimeState.zoomGestureEndedAt,
       getDpr: () => runtimeState.dpr,
-      isHgoRuntimePreviewReady,
     },
     helpers: {
       nowMs,
@@ -2791,14 +2784,13 @@ function getTransformedFrameCompositorOwner() {
       drawInteractionBorderSnapshot,
       drawBordersPass,
       blitCompositeBufferToMain,
-      resetMainCanvas,
       setInteractionCompositeRejectedReason: (reason) => {
         getRenderPassCacheState().interactionComposite.rejectedReason = reason;
       },
       invalidateInteractionComposite,
       buildInteractionComposite,
       ensureTransformedPassCoverage: (timings) => getRenderPipelinePassesOwner().ensureTransformedPassCoverage(
-        timings, isHgoRuntimePreviewReady() ? ["hgoPreview"] : getActiveInteractionCompositePassNames(),
+        timings, getActiveInteractionCompositePassNames(),
       ),
       canDrawInteractionComposite,
       setPendingExactPoliticalFastFrame: (value) => {
@@ -2948,14 +2940,12 @@ function getViewportReadModelOwner() {
           ? identity.translate(x, y) : identity || null;
       },
       getPanContentBoundsSnapshots: () => {
-        if (isHgoRuntimePreviewReady()) return [snapshotBounds(getProjectedHgoRuntimePreviewBounds())];
         const features = runtimeState.landData?.features;
         if (!rendererSurfaceHost.getPathSvg() || !Array.isArray(features) || !features.length) return [];
         const [width, height] = getLogicalCanvasDimensions();
         return snapshotFeatureBounds(features.filter((feature) => !shouldSkipFeature(feature, width, height, { forceProd: true })));
       },
       getProjectedRenderableContentBoundsSnapshots: () => {
-        if (isHgoRuntimePreviewReady()) return [snapshotBounds(getProjectedHgoRuntimePreviewBounds())];
         const features = runtimeState.landData?.features;
         if (!Array.isArray(features) || !features.length || Number(runtimeState.width || 0) <= 0 || Number(runtimeState.height || 0) <= 0) return [];
         const [width, height] = getLogicalCanvasDimensions();
@@ -3257,7 +3247,6 @@ function getClickSelectionTransactionOwner() {
       getSpecialRegionColor,
       getWaterRegionColor,
       handleSpecialZoneMembershipClick,
-      inspectHgoRuntimePreviewFromEvent,
       isDoubleClickBatchEligible,
       isFacilityDetailsSurfaceActive,
       isMacroOceanWaterRegion,
@@ -3336,26 +3325,6 @@ function getIntensityFieldMaskOwner() {
   return intensityFieldMaskOwner;
 }
 
-function getHgoRuntimePreviewRenderOwner() {
-  if (hgoRuntimePreviewRenderOwner) {
-    return hgoRuntimePreviewRenderOwner;
-  }
-  hgoRuntimePreviewRenderOwner = createHgoRuntimePreviewRenderOwner({
-    runtimeState,
-    renderPassNames: RENDER_PASS_NAMES,
-    transformedFramePassNames: TRANSFORMED_FRAME_PASS_NAMES,
-    getProjection: () => rendererSurfaceHost.getProjection(),
-    getMapSvg: () => rendererSurfaceHost.getMapSvg(),
-    getTargetCanvas: () => rendererSurfaceHost.getContext()?.canvas || null,
-    callRuntimeHook,
-    createHitResult,
-    resetCanvasContext,
-    recordRenderPerfMetric,
-    nowMs,
-  });
-  return hgoRuntimePreviewRenderOwner;
-}
-
 function getVisualEffectsPassOwner() {
   if (visualEffectsPassOwner) {
     return visualEffectsPassOwner;
@@ -3369,7 +3338,6 @@ function getVisualEffectsPassOwner() {
       getViewportSize: () => ({ width: runtimeState.width, height: runtimeState.height }),
       getTextureStyleConfig,
       isBootInteractionReady,
-      isHgoRuntimePreviewReady,
     },
     helpers: {
       clamp,
@@ -3436,7 +3404,6 @@ function getContextPassOrchestratorOwner() {
   }
   contextPassOrchestratorOwner = createContextPassOrchestratorOwner({
     getters: {
-      isHgoRuntimePreviewReady,
       getDeferContextBasePass: () => runtimeState.deferContextBasePass,
     },
     resolvers: {
@@ -3476,7 +3443,7 @@ function getGeometryRasterRuntimeOwner() {
     surface: rendererSurfaceHost,
     helpers: {
       pointRadius: PATH_POINT_RADIUS,
-      isEnabled: () => geometryWorkerEnabled && isBootInteractionReady() && debugMode === "PROD" && !isHgoRuntimePreviewReady()
+      isEnabled: () => geometryWorkerEnabled && isBootInteractionReady() && debugMode === "PROD"
         && !isPoliticalRasterWorkerBitmapEnabled() && !hasVisibleRiverPartitions(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
@@ -3555,7 +3522,6 @@ function getPoliticalPassOrchestratorOwner() {
   }
   politicalPassOrchestratorOwner = createPoliticalPassOrchestratorOwner({
     getters: {
-      isHgoRuntimePreviewReady,
       isRenderDiagnosticsEnabled: () => renderDiag.enabled,
       hasPoliticalLandFeatures: () => !!runtimeState.landData?.features?.length,
       isPoliticalRasterWorkerBitmapEnabled,
@@ -3784,7 +3750,6 @@ function getRenderPipelinePassesOwner() {
       drawPhysicalBasePass,
       drawPoliticalPass,
       drawPopulationHeatmapPass,
-      drawHgoPreviewPass,
       drawContextBasePass,
       drawContextScenarioPass,
       drawEffectsPass,
@@ -3881,7 +3846,7 @@ function getDrawCanvasOrchestrationOwner() {
       drawNavigationFrame: (transform) => {
         const drawn = !exportRenderInProgress && !!navigationSceneOwner?.draw(transform);
         navigationExactRefreshNeeded = !drawn && !!runtimeState.firstVisibleFramePainted
-          && !isHgoRuntimePreviewReady() && !exportRenderInProgress;
+          && !exportRenderInProgress;
         return drawn;
       },
       noteMissingVisibleFrameSkippedDuringInteraction,
@@ -6077,7 +6042,6 @@ function getPassCounterNames(passName) {
   if (passName === "background") return ["backgroundPassRenders"];
   if (passName === "physicalBase") return ["contextPassRenders", "physicalBasePassRenders"];
   if (passName === "political") return ["politicalPassRenders"];
-  if (passName === "hgoPreview") return ["hgoPreviewPassRenders"];
   if (passName === "effects") return ["effectsPassRenders"];
   if (passName === "contextBase") return ["contextPassRenders", "contextBasePassRenders"];
   if (passName === "contextScenario") return ["contextPassRenders", "contextScenarioPassRenders"];
@@ -8513,20 +8477,12 @@ function invalidateBorderCache() {
   });
 }
 
-function isHgoRuntimePreviewReady() {
-  return getHgoRuntimePreviewRenderOwner().isReady();
-}
-
-function getHgoRuntimePreviewVisibilitySignature() {
-  return getHgoRuntimePreviewRenderOwner().getVisibilitySignature();
-}
-
 function getActiveRenderPassNames() {
-  return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());
+  return filterCurrentEnabledRenderPasses(RENDER_PASS_NAMES);
 }
 
 function getActiveTransformedFramePassNames() {
-  return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames());
+  return filterCurrentEnabledRenderPasses(TRANSFORMED_FRAME_PASS_NAMES);
 }
 
 function filterCurrentEnabledRenderPasses(passNames) {
@@ -8549,15 +8505,6 @@ function getActiveInteractionCompositePassNames() {
   return INTERACTION_COMPOSITE_PASS_NAMES.filter((name) => active.includes(name));
 }
 
-function getHgoRuntimePreviewProjectionOptions(overrides = {}) {
-  return getHgoRuntimePreviewRenderOwner().getProjectionOptions(overrides);
-}
-
-registerRuntimeHook(runtimeState, "getHgoRuntimePreviewProjectionOptionsFn", getHgoRuntimePreviewProjectionOptions);
-
-function inspectHgoRuntimePreviewFromEvent(event, { eventType = "unknown" } = {}) {
-  return getHgoRuntimePreviewRenderOwner().inspectFromEvent(event, { eventType });
-}
 
 function keyToHitColor(key) {
   const value = Math.max(0, Math.min(0xffffff, Number(key) || 0));
@@ -12737,10 +12684,6 @@ function drawScenarioRegionOverlaysPass(k) {
   return getScenarioRegionOverlayRenderOwner().drawScenarioRegionOverlaysPass(k);
 }
 
-function drawHgoPreviewPass() {
-  return getHgoRuntimePreviewRenderOwner().drawPreviewPass();
-}
-
 function drawEffectsPass(k, options = undefined) {
   return getVisualEffectsPassOwner().drawEffectsPass(k, options);
 }
@@ -12773,14 +12716,6 @@ function drawDayNightPass(k, options = undefined) {
 }
 
 function drawBordersPass(k, { interactive = false } = {}) {
-  if (isHgoRuntimePreviewReady()) {
-    recordRenderPerfMetric("drawBordersPass", 0, {
-      interactive: !!interactive,
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    });
-    return;
-  }
   if (!runtimeState.landData?.features?.length) return;
   drawHierarchicalBorders(k, { interactive });
 }
@@ -12917,14 +12852,6 @@ function replayNavigationLabels(transform) {
 }
 
 function drawLabelsPassContent(k, { interactive = false } = {}) {
-  if (isHgoRuntimePreviewReady()) {
-    recordRenderPerfMetric("drawLabelsPass", 0, {
-      interactive: !!interactive,
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    });
-    return;
-  }
   drawBlankFeatureLabelsPass(k, { interactive });
   const occupiedBoxes = [];
   if (shouldShowMarineRegionNames(runtimeState.styleConfig, interactive)) {
@@ -13347,7 +13274,7 @@ let exportRenderInProgress = false;
 async function ensureCountryLabelsReadyForExport(passNames) {
   if (!passNames.includes("labels")) return;
   await waitForCountryLabelsForExport({
-    isDisabled: () => isHgoRuntimePreviewReady() || runtimeState.styleConfig?.countryLabels?.enabled === false,
+    isDisabled: () => runtimeState.styleConfig?.countryLabels?.enabled === false,
     prepareSource: () => getCountryLabelSourceOwner().prepare(),
     getSource: () => getCountryLabelSourceOwner().getSource(),
     getDiagnostics: () => getCountryLabelRenderOwner().getDiagnostics(),
@@ -13368,7 +13295,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
   const width = Number(runtimeState.colorCanvas?.width || 0);
   const height = Number(runtimeState.colorCanvas?.height || 0);
   if (!width || !height) return null;
-  if (passNames.includes("labels") && !isHgoRuntimePreviewReady()
+  if (passNames.includes("labels")
     && runtimeState.styleConfig?.countryLabels?.enabled !== false) {
     const sourceStatus = getCountryLabelSourceOwner().getSource().status;
     const labelStatus = countryLabelRenderOwner?.getDiagnostics();
@@ -13377,7 +13304,7 @@ function renderExportPassesToCanvas(passNames, { pixelRatio = null } = {}) {
       throw new Error("Country names are still preparing or failed to prepare; wait for labels before exporting, or disable country names.");
     }
   }
-  if (passNames.includes("borders") && !isHgoRuntimePreviewReady()) {
+  if (passNames.includes("borders")) {
     const contourStatus = getPaintContourRuntimeOwner().diagnostics().status;
     if (contourStatus === "building" || contourStatus === "error") {
       throw new Error(`Paint contours are ${contourStatus}; prepare contours before exporting borders.`);
@@ -14728,17 +14655,7 @@ function normalizeDevInteractionHit(hit = null) {
     viaSnap: !!hit.viaSnap,
     strict: !!hit.strict,
   };
-  if (targetType === "hgo") {
-    const hgoRuntime = normalizeHgoRuntimeHitPayload(hit.hgoRuntime);
-    if (hgoRuntime) {
-      normalized.hgoRuntime = hgoRuntime;
-    }
-  }
   return normalized;
-}
-
-function normalizeHgoRuntimeHitPayload(payload = null) {
-  return getHgoRuntimePreviewRenderOwner().normalizeHitPayload(payload);
 }
 
 function getDevInteractionHitSignature(hit = null) {
@@ -15416,10 +15333,6 @@ function captureRenderSnapshot() {
 
 function updateMap(transform) {
   return getRendererViewportUpdateOwner().updateMap(transform);
-}
-
-function getProjectedHgoRuntimePreviewBounds() {
-  return getHgoRuntimePreviewRenderOwner().getProjectedBounds();
 }
 
 function getProjectedRenderableContentBounds() {

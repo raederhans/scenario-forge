@@ -70,7 +70,6 @@ class MapRendererCityLabelOwnerBoundaryContractTest(unittest.TestCase):
         )
 
         for token in [
-            "getHgoRuntimePreviewVisibilitySignature()",
             'runtimeState.showBlankFeatureLabels ? "blank-feature-labels:on" : "blank-feature-labels:off"',
             '...getUrbanCityRenderPassSignatureParts(runtimeState, "labels")',
             "stableJson(normalizeCityLayerStyleConfig(runtimeState.styleConfig?.cityPoints || {}))",

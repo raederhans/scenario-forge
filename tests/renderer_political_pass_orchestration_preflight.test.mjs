@@ -191,8 +191,6 @@ test("implemented political owner keeps the frozen top-level orchestration order
   const ownerSource = readRepoFile(CANONICAL_OWNER_PATH);
   const drawSource = extractFunctionSource(ownerSource, "drawBasePoliticalPass");
   assertOrderedTokens(drawSource, [
-    "if (isHgoRuntimePreviewReady())",
-    'recordRenderPerfMetric("drawPoliticalPass", 0, {',
     "const identity = resolvePoliticalPassIdentity(k);",
     "recordPoliticalRasterWorkerSnapshot();",
     "const viewport = resolvePoliticalPassViewport(identity);",
@@ -352,7 +350,7 @@ test("fine drawing and diagnostics live in the partial owner while state writes 
     'reason: "fine-feature-loop"',
   ], "fine political result");
   assert.equal((ownerSource.match(/return createPoliticalPassDrawResult\(/g) || []).length, 4);
-  assert.equal((maskStringAndCommentContent(ownerSource).match(/^\s*return;\s*$/gm) || []).length, 1);
+  assert.equal((maskStringAndCommentContent(ownerSource).match(/^\s*return;\s*$/gm) || []).length, 0);
 });
 
 test("P3.3b installs one canonical owner and keeps protected architecture surfaces independent", () => {

@@ -404,17 +404,8 @@ test("first-frame resource allowlist keeps startup visual work to the baseline",
     "borderBuffer",
     "interactionOverlay",
   ]);
-  assert.deepEqual(getFirstFrameTargetResources({ hgoPreviewDirty: true }), [
-    "backgroundBuffer",
-    "physicalBaseBuffer",
-    "politicalBaseBuffer",
-    "hitIndex",
-    "borderBuffer",
-    "interactionOverlay",
-    "hgoPreviewBuffer",
-  ]);
-  assert.deepEqual(
-    resolveFirstFrameTargetResources(["contextBaseBuffer", "labelBuffer", "politicalBaseBuffer"], { hgoPreviewDirty: false }),
+ assert.deepEqual(
+    resolveFirstFrameTargetResources(["contextBaseBuffer", "labelBuffer", "politicalBaseBuffer"]),
     ["backgroundBuffer", "physicalBaseBuffer", "politicalBaseBuffer", "hitIndex", "borderBuffer", "interactionOverlay"],
   );
   const plan = createScenarioChunkPromotionRefreshPlan({
@@ -435,27 +426,6 @@ test("first-frame resource allowlist keeps startup visual work to the baseline",
     "physicalBase",
     "political",
     "borders",
-  ]);
-  const hgoPlan = createScenarioChunkPromotionRefreshPlan({
-    hasPoliticalChange: true,
-    firstFrameOnly: true,
-    hgoPreviewDirty: true,
-  });
-  assert.deepEqual(hgoPlan.renderer.frameGraphInvalidation.targetResources, [
-    "backgroundBuffer",
-    "physicalBaseBuffer",
-    "politicalBaseBuffer",
-    "hitIndex",
-    "borderBuffer",
-    "interactionOverlay",
-    "hgoPreviewBuffer",
-  ]);
-  assert.deepEqual(resolveFrameGraphInvalidationExecutionPlan(hgoPlan.renderer.frameGraphInvalidation).invalidationTargetPasses, [
-    "background",
-    "physicalBase",
-    "political",
-    "borders",
-    "hgoPreview",
   ]);
 });
 

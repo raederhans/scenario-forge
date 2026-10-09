@@ -86,7 +86,6 @@ async function capture(page, key) {
   return page.evaluate(async (frameKey) => {
     const { state } = await import("/js/core/state.js");
     const { RENDER_PASS_NAMES, projectGeoToScreen } = await import("/js/core/map_renderer.js");
-    const { createHgoRuntimePreviewRenderOwner } = await import("/js/core/map_renderer/hgo_runtime_preview_render_owner.js");
     const { isRenderTransactionDiagnosticsEnabled } = await import("/js/core/renderer/render_transaction_diagnostics.js");
     const cache = state.renderPassCache;
     const canvas = document.getElementById("map-canvas");
@@ -109,7 +108,7 @@ async function capture(page, key) {
       globalThis.__normalVisualFrames ||= {};
       globalThis.__normalVisualFrames[frameKey] = pixels;
     }
-    const activePasses = createHgoRuntimePreviewRenderOwner({ runtimeState: state, renderPassNames: RENDER_PASS_NAMES }).getActiveRenderPassNames();
+    const activePasses = RENDER_PASS_NAMES;
     const bundle = state.scenarioBundleCacheById?.[state.activeScenarioId] || {};
     const chunks = state.runtimeChunkLoadState || {};
     const promotionSnapshot = (value) => value ? Object.fromEntries([

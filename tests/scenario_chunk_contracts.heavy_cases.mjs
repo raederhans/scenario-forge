@@ -773,8 +773,10 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && !/export const FIRST_FRAME_BASE_TARGET_RESOURCES = Object\.freeze\(\[[^\]]*?"contextBaseBuffer"/.test(renderInvalidationCatalogSource)
         && !/export const FIRST_FRAME_BASE_TARGET_RESOURCES = Object\.freeze\(\[[^\]]*?"contextScenarioBuffer"/.test(renderInvalidationCatalogSource)
         && !/export const FIRST_FRAME_BASE_TARGET_RESOURCES = Object\.freeze\(\[[^\]]*?"dayNightBuffer"/.test(renderInvalidationCatalogSource)
-        && /createScenarioChunkPromotionRefreshPlan\(\{[\s\S]*?firstFrameOnly = false,[\s\S]*?hgoPreviewDirty = false,[\s\S]*?const targetResources = firstFrameOnly[\s\S]*?resolveFirstFrameTargetResources/.test(scenarioRefreshPlansSource)
-        && /function refreshMapDataForScenarioChunkPromotion\(options = \{\}\) \{[\s\S]*?firstFrameOnly: !!options\.firstFrameOnly,[\s\S]*?hgoPreviewDirty: !!options\.hgoPreviewDirty/.test(scenarioRendererBridgeSource)
+        && /createScenarioChunkPromotionRefreshPlan\(\{[\s\S]*?firstFrameOnly = false,[\s\S]*?const targetResources = firstFrameOnly[\s\S]*?resolveFirstFrameTargetResources/.test(scenarioRefreshPlansSource)
+        && !/\bhgoPreviewDirty\b/.test(scenarioRefreshPlansSource)
+        && /function refreshMapDataForScenarioChunkPromotion\(options = \{\}\) \{[\s\S]*?firstFrameOnly: !!options\.firstFrameOnly,/.test(scenarioRendererBridgeSource)
+        && !/\bhgoPreviewDirty\b/.test(scenarioRendererBridgeSource)
         && /function applyScenarioPoliticalChunkPayload\([\s\S]*?firstFrameOnly = false,[\s\S]*?refreshMapDataForScenarioChunkPromotion\(\{[\s\S]*?firstFrameOnly,/.test(chunkRuntimeSource)
         && /applyScenarioPoliticalChunkPayload\(bundle, mergedLayerPayloads\.political \|\| null, \{[\s\S]*?firstFrameOnly: !!allowStartupInitialVisual/.test(chunkRuntimeSource),
       chunkSelectionCarriesCostFieldsAndSums:

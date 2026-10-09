@@ -31,7 +31,6 @@ test("sea-name setting invalidates labels without repainting the ocean backgroun
   const policy = createRenderPassSignaturePolicy(state, {
     getTransformSignature: () => "view",
     shouldEnableContextBaseTransformReuse: () => false,
-    getHgoRuntimePreviewVisibilitySignature: () => "none",
     stableJson: JSON.stringify,
   });
   const labelsBefore = policy.getRenderPassSignature("labels");

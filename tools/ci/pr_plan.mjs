@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 
 const normalize = (value) => String(value || "").replaceAll("\\", "/").trim();
 export const SCENARIO_CONTRACT_IDS = Object.freeze([
-  "blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962",
+  "blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962",
 ]);
 
 export function planPullRequest({ changedFiles = [], labels = [], packageRequiresPerf = true } = {}) {
@@ -24,6 +24,12 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
   )));
 
   const runtimeRelevant = matches(["js/**", "css/**", "index.html", "vendor/**", "landing/**"]);
+  const isNativeFile = (file) => file.startsWith("apps/hgo/") || file === ".github/workflows/hgo-native.yml";
+  const nativeOnly = files.some(isNativeFile) && files.every((file) => isNativeFile(file) || isOrdinaryDocumentation(file));
+  const hgoRelevant = files.some(isNativeFile) || matches([
+    "js/core/hgo_project_routing.js", "js/core/file_manager.js", "index.html",
+    "tests/hgo_project_routing_behavior.test.mjs", "tools/build_pages_dist.py",
+  ]);
   const controlPlane = matches(["tools/ci/**", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
   const dependencyChange = matches(["package.json", "package-lock.json"])
     || files.some((file) => /^requirements[^/]*\.txt$/u.test(file));
@@ -87,7 +93,8 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     changedFiles: files,
     labels: [...labelSet].sort(),
     riskTier: full || controlPlane || dependencyChange ? "integration" : docsOnly ? "docs" : boundedUi ? "ui" : "affected",
-    runFast: full || !docsOnly,
+    runFast: full || (!docsOnly && !nativeOnly),
+    runHgo: full || controlPlane || hgoRelevant,
     runSmoke: smokeMode !== "none",
     smokeMode,
     runDemo: full || publicSampleRelevant,
@@ -101,7 +108,8 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     perfDiagnostic: performance.diagnostic_only,
     expectedPerformanceChange: labelSet.has("ci:perf-expected"),
     reasons: {
-      fast: docsOnly && !full ? "Ordinary documentation only; no test environment is needed." : "Run affected contracts and reject unresolved verification coverage.",
+      fast: nativeOnly && !full ? "Independent HGO changes use the native app verification job."
+        : docsOnly && !full ? "Ordinary documentation only; no test environment is needed." : "Run affected contracts and reject unresolved verification coverage.",
       smoke: smokeMode === "ui" ? "All behavioral changes belong to the bounded UI scope; run focused shell and editor checks."
         : smokeMode === "full" ? "Runtime, browser support, dependencies or CI policy require the shared smoke suite." : "No browser behavior selected.",
       pages: pagesMode === "full" ? "Delivery inputs, assets, dependencies or CI policy require a full Pages artifact."
@@ -153,6 +161,7 @@ function main() {
   if (args.githubOutput) {
     const lines = [
       `run_fast=${plan.runFast}`,
+      `run_hgo=${plan.runHgo}`,
       `run_smoke=${plan.runSmoke}`,
       `smoke_mode=${plan.smokeMode}`,
       `run_demo=${plan.runDemo}`,

@@ -9,6 +9,7 @@ function element(dataset = {}) {
   return {
     dataset, hidden: false, textContent: "",
     classList: {
+      add(name) { classes.add(name); },
       toggle(name, active) { active ? classes.add(name) : classes.delete(name); },
       contains(name) { return classes.has(name); },
     },
@@ -16,7 +17,7 @@ function element(dataset = {}) {
   };
 }
 
-test("quick guide follows scenario identity while HGO reference remains selectable", () => {
+test("main quick guide remains independent while the HGO guide links to its own editor", () => {
   const state = { activeScenarioId: "tno_1962" };
   const identity = element();
   const ownerHeading = element();
@@ -45,15 +46,16 @@ test("quick guide follows scenario identity while HGO reference remains selectab
   assert.equal(editHeading.textContent, "4. 编辑、调整样式并保存");
   state.activeScenarioId = "hgo_1936";
   controller.syncScenarioGuideTriggerButtons();
-  assert.equal(identity.hidden, false);
-  assert.equal(identity.classList.contains("hidden"), false);
-  assert.equal(ownerHeading["data-i18n"], "4. Set the active owner");
-  assert.equal(editHeading.textContent, "5. 编辑、调整样式并保存");
+  assert.equal(identity.hidden, true);
+  assert.equal(identity.classList.contains("hidden"), true);
+  assert.equal(ownerHeading["data-i18n"], "3. Set the active owner");
+  assert.equal(editHeading.textContent, "4. 编辑、调整样式并保存");
   state.activeScenarioId = "";
   controller.renderScenarioGuideSection("hgo");
   assert.equal(identity.hidden, true);
   assert.equal(hgoPanel.hidden, false);
   assert.equal(hgoNav["aria-selected"], "true");
+  assert.ok(html.includes('href="apps/hgo/index.html"'), "HGO entry navigates to the independent app");
 });
 
 test("new workspace labels agree across runtime and manual catalogs without changing generic Color", () => {

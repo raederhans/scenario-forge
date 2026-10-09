@@ -1,1 +1,0 @@
-"""HGO scenario builder adapters."""

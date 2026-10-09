@@ -144,21 +144,6 @@
       "role": "hgo_identity_aliases",
       "family_id": "hgo"
     },
-    "hgo_runtime_manifest": {
-      "url": "data/hgo_runtime/manifest.json",
-      "role": "hgo_runtime_manifest",
-      "family_id": "hgo"
-    },
-    "hgo_runtime_seed": {
-      "url": "data/hgo_runtime/seed.json",
-      "role": "hgo_runtime_seed",
-      "family_id": "hgo"
-    },
-    "hgo_runtime_provinces_bmp": {
-      "url": "data/hgo_runtime/provinces.bmp",
-      "role": "hgo_runtime_raster",
-      "family_id": "hgo"
-    },
     "releasable_catalog": {
       "url": "data/releasables/hoi4_vanilla.internal.phase1.catalog.json",
       "role": "releasable_catalog"

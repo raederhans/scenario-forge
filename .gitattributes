@@ -12,8 +12,6 @@ data/locales.json text eol=lf
 data/palette-maps/*.json text eol=lf
 data/palettes/*.json text eol=lf
 data/hgo_catalogs/hgo_identity_aliases.json text eol=lf
-data/hgo_runtime/*.json text eol=lf
-data/hgo_runtime/*.bmp binary
 data/thematic_layers/**/*.json text eol=lf
 data/scenarios/index.json text eol=lf
 data/scenarios/**/*.json text eol=lf
@@ -75,3 +73,13 @@ docs/active/**/*.md text eol=lf
 docs/archive/**/*.md text eol=lf
 tests/landing_showcase_view_behavior.test.mjs text eol=lf
 tools/svgo.landing.config.mjs text eol=lf
+
+# Independent HGO Pages package contains byte-verified native assets.
+dist/hgo/**/*.json text eol=lf
+dist/hgo/**/*.js text eol=lf
+dist/hgo/**/*.css text eol=lf
+dist/hgo/index.html text eol=lf
+dist/hgo/**/*.gz binary
+data/city_aliases.json text eol=lf
+data/hierarchy.json text eol=lf
+data/quick_fill/china_prefecture_crosswalk.v1.json text eol=lf

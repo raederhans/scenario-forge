@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { runInNewContext } from "node:vm";
 
 import { planPullRequest, SCENARIO_CONTRACT_IDS } from "../tools/ci/pr_plan.mjs";
 import { packageChangeRequiresPerformance } from "../tools/ci/perf_policy.mjs";
@@ -72,6 +73,12 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   assert.equal(invoke(["--base-package-file", "base.json"]).perfRequired, true);
   fs.writeFileSync(path.join(cwd, "head.json"), "");
   assert.equal(invoke(manifestArgs).perfRequired, true);
+  fs.writeFileSync(path.join(cwd, "changes.txt"), "apps/hgo/src/main.js\n");
+  assert.equal(invoke(["--github-output", "outputs.txt"]).runHgo, true);
+  const outputs = fs.readFileSync(path.join(cwd, "outputs.txt"), "utf8");
+  assert.match(outputs, /^run_hgo=true$/m);
+  assert.match(outputs, /^run_fast=false$/m);
+  fs.writeFileSync(path.join(cwd, "changes.txt"), "package.json\n");
   fs.writeFileSync(path.join(cwd, "head.json"), "{invalid");
   assert.equal(invoke(manifestArgs).perfRequired, true);
   fs.writeFileSync(path.join(cwd, "head.json"), JSON.stringify({ scripts: { "test:isolated": "node changed.mjs" }, dependencies: { example: "1" } }));
@@ -81,12 +88,74 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
 test("docs-only changes keep heavyweight PR lanes off", () => {
   const plan = planPullRequest({ changedFiles: ["docs/active/example/plan.md"] });
   assert.equal(plan.runFast, false);
+  assert.equal(plan.runHgo, false);
   assert.equal(plan.runSmoke, false);
   assert.equal(plan.runDemo, false);
   assert.equal(plan.runPages, false);
   assert.equal(plan.runTransport, false);
   assert.deepEqual(plan.scenarioIds, []);
   assert.equal(plan.perfMode, "skip");
+});
+
+test("native-only changes select HGO without main project verification", () => {
+  for (const changedFiles of [
+    ["apps/hgo/src/main.js"],
+    ["apps/hgo/assets/default/manifest.json", "apps/hgo/package.json", "docs/active/hgo/plan.md"],
+    [".github/workflows/hgo-native.yml", "README.md"],
+  ]) {
+    const plan = planPullRequest({ changedFiles });
+    assert.equal(plan.runHgo, true);
+    for (const key of ["runFast", "runSmoke", "runDemo", "runPages", "runPagesSource", "runTransport", "perfRequired"]) assert.equal(plan[key], false, key);
+    assert.equal(plan.perfMode, "skip");
+    assert.deepEqual(plan.scenarioIds, []);
+  }
+});
+
+test("mixed changes retain main routes while bridge and CI policy changes also verify HGO", () => {
+  const main = planPullRequest({ changedFiles: ["js/core/map_renderer.js"] });
+  const mixed = planPullRequest({ changedFiles: ["apps/hgo/src/main.js", "js/core/map_renderer.js"] });
+  for (const key of ["runFast", "runSmoke", "runPages", "perfMode"]) assert.equal(mixed[key], main[key]);
+  assert.equal(mixed.runHgo, true);
+  assert.equal(planPullRequest({ changedFiles: ["apps/hgo/src/main.js", "tests/unrelated.test.mjs"] }).runFast, true);
+  for (const file of ["js/core/hgo_project_routing.js", "js/core/file_manager.js", "index.html", "tools/build_pages_dist.py", ".github/workflows/pr-verify.yml"]) {
+    const plan = planPullRequest({ changedFiles: [file] });
+    assert.equal(plan.runHgo, true, file);
+    assert.equal(plan.runFast, true, file);
+  }
+  const full = planPullRequest({ changedFiles: ["apps/hgo/src/main.js"], labels: ["ci:full"] });
+  assert.equal(full.runHgo, true);
+  assert.equal(full.runFast, true);
+  assert.equal(full.runSmoke, true);
+  assert.equal(full.perfMode, "strict");
+});
+
+test("PR workflow calls native verification once and requires exactly the planned native result", () => {
+  const workflow = fs.readFileSync(new URL("../.github/workflows/pr-verify.yml", import.meta.url), "utf8");
+  const native = fs.readFileSync(new URL("../.github/workflows/hgo-native.yml", import.meta.url), "utf8");
+  assert.match(native, /^  workflow_call:/m);
+  assert.doesNotMatch(native, /^  pull_request:/m);
+  assert.match(native, /^  push:/m);
+  assert.match(native, /^  workflow_dispatch:/m);
+  assert.match(workflow, /run_hgo: \$\{\{ steps\.plan\.outputs\.run_hgo \}\}/);
+  assert.match(workflow, /pr-verify-hgo:\s+needs: \["pr-plan"\]\s+if: needs\.pr-plan\.outputs\.run_hgo == 'true'\s+uses: \.\/\.github\/workflows\/hgo-native\.yml/);
+  assert.match(workflow, /needs: \["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"\]/);
+  const script = workflow.match(/node <<'NODE'\r?\n([\s\S]*?)\r?\n\s+NODE/)[1];
+  const accepted = (planned, result, omit = false) => {
+    const needs = {
+      "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: planned } },
+      "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+      ...(!omit ? { "pr-verify-hgo": { result } } : {}),
+    };
+    let exitCode = 0;
+    runInNewContext(script, { console: { log() {}, error() {} }, process: { env: { REQUIRED_RESULTS: JSON.stringify(needs) }, exit(code) { exitCode = code; } } });
+    return exitCode === 0;
+  };
+  assert.equal(accepted("true", "success"), true);
+  assert.equal(accepted("false", "skipped"), true);
+  for (const result of ["failure", "cancelled", "skipped", undefined]) assert.equal(accepted("true", result), false);
+  assert.equal(accepted("true", "success", true), false);
+  assert.equal(accepted(undefined, "skipped"), false);
+  assert.equal(accepted("false", "success"), false);
 });
 
 test("renderer mirror contracts receive a freshly built Pages artifact", () => {

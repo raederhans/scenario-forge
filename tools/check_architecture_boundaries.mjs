@@ -86,7 +86,6 @@ const FILES = Object.freeze({
   exactAfterSettleScheduler: "js/core/map_renderer/exact_after_settle_scheduler.js",
   exactAfterSettleRefreshPlans: "js/core/map_renderer/exact_after_settle_refresh_plans.js",
   exactAfterSettlePassCatalog: "js/core/renderer/exact_after_settle_pass_catalog.js",
-  hgoPreviewRenderOwner: "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
   renderTransactionDiagnostics: "js/core/renderer/render_transaction_diagnostics.js",
   renderCacheOwner: "js/core/renderer/render_cache_owner.js",
   renderTransformReusePolicyOwner: "js/core/renderer/render_transform_reuse_policy_owner.js",
@@ -225,7 +224,6 @@ const LINE_BUDGETS = Object.freeze({
   [FILES.scenarioVisualInvalidationExecutor]: 260,
   [FILES.exactAfterSettleScheduler]: 760,
   [FILES.exactAfterSettlePassCatalog]: 120,
-  [FILES.hgoPreviewRenderOwner]: 280,
   // Water cache reuse guards belong to the existing cache and transform owners.
   [FILES.renderCacheOwner]: 727,
   [FILES.renderTransformReusePolicyOwner]: 274,
@@ -467,7 +465,6 @@ function collectFailures() {
   const exactAfterSettleScheduler = readProjectFile(FILES.exactAfterSettleScheduler);
   const exactAfterSettleRefreshPlans = readProjectFile(FILES.exactAfterSettleRefreshPlans);
   const exactAfterSettlePassCatalog = readProjectFile(FILES.exactAfterSettlePassCatalog);
-  const hgoPreviewRenderOwner = readProjectFile(FILES.hgoPreviewRenderOwner);
   const renderTransactionDiagnostics = readProjectFile(FILES.renderTransactionDiagnostics);
   const renderCacheOwner = readProjectFile(FILES.renderCacheOwner);
   const renderTransformReusePolicyOwner = readProjectFile(FILES.renderTransformReusePolicyOwner);
@@ -606,7 +603,6 @@ function collectFailures() {
     [FILES.exactAfterSettleScheduler]: exactAfterSettleScheduler,
     [FILES.exactAfterSettleRefreshPlans]: exactAfterSettleRefreshPlans,
     [FILES.exactAfterSettlePassCatalog]: exactAfterSettlePassCatalog,
-    [FILES.hgoPreviewRenderOwner]: hgoPreviewRenderOwner,
     [FILES.renderTransactionDiagnostics]: renderTransactionDiagnostics,
     [FILES.renderCacheOwner]: renderCacheOwner,
     [FILES.renderTransformReusePolicyOwner]: renderTransformReusePolicyOwner,
@@ -2691,7 +2687,6 @@ function collectFailures() {
     "\"withRenderTarget\"",
     "\"getRenderPassLayout\"",
     "passCanvas.getContext(\"2d\")",
-    "Math.max(0.0001, Number(transform?.k || 1))",
     "drawResult = drawFn(k);",
     "Object.freeze([...(trace?.effectOrder || [])])",
   ]) {
@@ -4467,7 +4462,6 @@ function collectFailures() {
     "getHitFromEvent(event,",
     "runtimeState.hoveredId =",
     "hoveredFacilityEntry =",
-    "inspectHgoRuntimePreviewFromEvent(event",
   ]) {
     if (hoverWrapperSource.includes(token)) {
       failures.push(`${FILES.renderer} handleMouseMove wrapper must not keep old P48 hover body token: ${token}`);
@@ -4507,7 +4501,6 @@ function collectFailures() {
     "./map_renderer/scenario_refresh_runtime.js",
     "./renderer/canvas_color_helpers.js",
     "./map_renderer/exact_after_settle_scheduler.js",
-    "./map_renderer/hgo_runtime_preview_render_owner.js",
     "./renderer/renderer_surface_lifecycle_owner.js",
     "./renderer/renderer_projection_path_owner.js",
     "./renderer/renderer_svg_surface_lifecycle_owner.js",
@@ -4530,7 +4523,6 @@ function collectFailures() {
     FILES.exactAfterSettleScheduler,
     FILES.exactAfterSettleRefreshPlans,
     FILES.exactAfterSettlePassCatalog,
-    FILES.hgoPreviewRenderOwner,
     FILES.renderCacheOwner,
     FILES.renderTransformReusePolicyOwner,
     FILES.projectedGeometryBoundsOwner,
@@ -4654,7 +4646,6 @@ function collectFailures() {
     "const PASS_RESOURCE_MAP = Object.freeze({",
     "const RESOURCE_PASS_MAP = Object.freeze(",
     "const FIRST_FRAME_BASE_TARGET_RESOURCES = Object.freeze([",
-    "const FIRST_FRAME_HGO_TARGET_RESOURCES = Object.freeze([",
     "const UNSUPPORTED_FRAME_GRAPH_INVALIDATION_INPUT_KEYS = Object.freeze([",
     "function getTargetResourcesForPasses(",
     "function getTargetPassesForResources(",
@@ -4715,7 +4706,7 @@ function collectFailures() {
       failures.push(`${FILES.renderTransformReusePolicyOwner} exact fast-path list must include ${passName}.`);
     }
   }
-  for (const passName of ["borders", "labels", "hgoPreview"]) {
+  for (const passName of ["borders", "labels"]) {
     if (exactFastPathRequiredPassListSource.includes(`"${passName}"`)) {
       failures.push(`${FILES.renderTransformReusePolicyOwner} exact fast-path list must not include ${passName}.`);
     }
@@ -4800,7 +4791,6 @@ function collectFailures() {
   const viewportUpdateWrapperSource = sliceBetween(
     renderer,
     "function updateMap(transform)",
-    "function getProjectedHgoRuntimePreviewBounds()",
   );
   const zoomInteractionLifecycleFactorySource = sliceBetween(
     renderer,
@@ -5164,27 +5154,7 @@ function collectFailures() {
         "export function getExactAfterSettleDprRestorePasses(",
       ],
     },
-    {
-      ownerPath: FILES.hgoPreviewRenderOwner,
-      ownerTokens: [
-        "function drawPreviewPass() {",
-        "function inspectFromEvent(event, { eventType = \"unknown\" } = {}) {",
-        "function getProjectedBounds() {",
-        "const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES = Object.freeze([",
-      ],
-      rendererRequiredTokens: [
-        "let hgoRuntimePreviewRenderOwner = null;",
-        "createHgoRuntimePreviewRenderOwner({",
-        "return getHgoRuntimePreviewRenderOwner().inspectFromEvent(event, { eventType });",
-        "getHgoRuntimePreviewRenderOwner().drawPreviewPass();",
-      ],
-      rendererForbiddenTokens: [
-        "function renderHgoRuntimePreviewIfReady(",
-        "const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES =",
-        "function getHgoRuntimePreviewCanvasPointFromEvent(",
-        "const HGO_RUNTIME_PREVIEW_PROJECTION_NAME =",
-      ],
-    },
+
     {
       ownerPath: FILES.renderCacheOwner,
       ownerTokens: [
@@ -5593,7 +5563,6 @@ function collectFailures() {
         "tryPartialPoliticalPassRepaint,",
       ],
       rendererForbiddenTokens: [
-        "function drawPoliticalPass(k) {\n  if (isHgoRuntimePreviewReady())",
       ],
     },
     {
@@ -5678,7 +5647,6 @@ function collectFailures() {
       ownerTokens: [
         "export const IDLE_RENDER_PASS_DEFINITIONS = [",
         'passName: "background", drawKey: "drawBackgroundPass"',
-        'passName: "hgoPreview", drawKey: "drawHgoPreviewPass"',
         'passName: "contextScenario", drawKey: "drawContextScenarioPass"',
         'passName: "textureLabels", drawKey: "drawTextureLabelEffectsPass"',
       ],
@@ -5689,7 +5657,6 @@ function collectFailures() {
       rendererForbiddenPath: FILES.renderPipelinePasses,
       rendererForbiddenTokens: [
         '["background", (k) => drawBackgroundPass(k)],',
-        '["hgoPreview", (k) => drawHgoPreviewPass(k)],',
         '["contextScenario", (k) => drawContextScenarioPass(k)],',
         '["textureLabels", (k) => drawTextureLabelEffectsPass(k)],',
       ],
@@ -5724,7 +5691,6 @@ function collectFailures() {
         "export const RESOURCE_PASS_MAP = Object.freeze(",
         "export const DEFAULT_RENDER_INVALIDATION_PASSES = [",
         "export const FIRST_FRAME_BASE_TARGET_RESOURCES = Object.freeze([",
-        "export const FIRST_FRAME_HGO_TARGET_RESOURCES = Object.freeze([",
         "export const UNSUPPORTED_RENDER_PASS_INPUT_KEYS = Object.freeze([",
         "export function getTargetResourcesForPasses(",
         "export function getTargetPassesForResources(",

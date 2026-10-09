@@ -187,7 +187,7 @@ test("map_renderer imports wires and delegates viewport updates through the owne
   const updateMapWrapperSource = sliceBetween(
     rendererSource,
     "function updateMap(transform)",
-    "function getProjectedHgoRuntimePreviewBounds()",
+    "function getProjectedRenderableContentBounds()",
   );
   const zoomLifecycleFactorySource = sliceBetween(
     rendererSource,

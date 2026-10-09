@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191e22">
+  <title>HGO Atlas · Scenario Forge</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="back-link" href="../../index.html" id="back-link" aria-label="返回 Scenario Forge">↗ <span>Scenario Forge</span></a>
+    <div class="identity"><span class="wordmark">HGO<span class="identity-dot">.</span></span><span class="edition" data-i18n="edition">原生地图工坊</span></div>
+    <nav class="file-actions" aria-label="Project">
+      <span id="dirty-indicator" class="save-state" aria-live="polite"></span>
+      <button id="open-button" disabled data-i18n="open">打开</button>
+      <button id="save-button" disabled data-i18n="save">保存项目</button>
+      <button id="export-button" class="button-accent" disabled data-i18n="export">导出 PNG ↗</button>
+      <button id="language-button" class="language-button" aria-label="Switch to English">EN</button>
+    </nav>
+    <input id="project-file" type="file" accept=".json,application/json" hidden>
+  </header>
+  <main class="workspace">
+    <section class="map-stage" aria-label="HGO map">
+      <canvas id="map-canvas" tabindex="0" aria-label="地图：拖动平移，滚轮缩放，点击选择州"></canvas>
+      <canvas id="overlay-canvas" aria-hidden="true"></canvas>
+      <div class="map-heading"><span class="eyebrow">HISTORIC GEOGRAPHIC OVERHAUL</span><span data-i18n="mapCaption">每一片陆地与海洋，皆可创作。</span></div>
+      <div class="tool-rail" role="toolbar" aria-label="Map tools">
+        <button id="tool-select" data-tool="select" disabled aria-pressed="true" title="选择 (V)"><span aria-hidden="true">↖</span><span class="tool-label" data-i18n="select">选择</span><kbd>V</kbd></button>
+        <button id="tool-paint" data-tool="paint" disabled aria-pressed="false" title="绘制 (B)"><span aria-hidden="true">◩</span><span class="tool-label" data-i18n="paint">绘制</span><kbd>B</kbd></button>
+        <button id="tool-pan" data-tool="pan" disabled aria-pressed="false" title="平移 (H)"><span aria-hidden="true">✥</span><span class="tool-label" data-i18n="pan">平移</span><kbd>H</kbd></button>
+        <span class="rail-divider"></span>
+        <button id="undo-button" disabled title="撤销 (Ctrl+Z)"><span aria-hidden="true">↶</span><span class="tool-label" data-i18n="undo">撤销</span></button>
+        <button id="redo-button" disabled title="重做 (Ctrl+Shift+Z)"><span aria-hidden="true">↷</span><span class="tool-label" data-i18n="redo">重做</span></button>
+      </div>
+      <div class="zoom-controls" role="group" aria-label="Map zoom">
+        <button id="zoom-out" disabled aria-label="缩小">−</button><output id="zoom-value">—</output><button id="zoom-in" disabled aria-label="放大">+</button><button id="fit-button" disabled data-i18n="fit">全图</button>
+      </div>
+      <div id="load-panel" class="load-panel" role="status" aria-live="polite">
+        <span class="eyebrow">HGO / NATIVE ATLAS</span><h1 id="load-title">正在展开地图</h1><p id="load-detail">加载原生省份与州数据…</p>
+        <div id="load-progress" class="load-progress" aria-hidden="true"></div>
+        <div class="load-actions"><button id="cancel-load" data-i18n="cancel">取消</button><button id="retry-load" hidden data-i18n="retry">重新加载</button></div>
+      </div>
+    </section>
+    <aside class="inspector" aria-label="Map editor">
+      <section class="search-section">
+        <label class="section-label" for="state-search" data-i18n="findPlace">寻找一片地方</label>
+        <div class="search-field"><span aria-hidden="true">⌕</span><input id="state-search" type="search" autocomplete="off" disabled placeholder="州名、实体或 ID" aria-controls="search-results"></div>
+        <div id="search-results" class="search-results" aria-live="polite"></div>
+      </section>
+      <section class="color-section">
+        <div class="section-heading"><h2 data-i18n="colorHeading">绘制颜色</h2><span class="small-index">01</span></div>
+        <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled><span class="color-mark">●</span></div>
+        <div id="color-swatches" class="swatches" aria-label="Color palette"></div>
+        <button id="paint-selection" class="button-dark full-width" disabled data-i18n="applyColor">为所选州上色</button>
+      </section>
+      <section class="selection-section">
+        <div class="section-heading"><h2 data-i18n="selectionHeading">当前选择</h2><button id="clear-selection" class="text-button" disabled data-i18n="clear">清除</button></div>
+        <div id="selection-empty" class="selection-empty"><span class="empty-symbol" aria-hidden="true">⊹</span><p data-i18n="selectionEmpty">点击地图，选择一个州。</p><small data-i18n="multiHint">Shift + 点击可多选 · 海域同样可编辑</small></div>
+        <div id="selection-detail" hidden>
+          <div class="selected-title"><span id="selected-swatch"></span><h3 id="selected-name"></h3></div>
+          <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">参考实体</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
+          <label for="label-input" class="field-label" data-i18n="mapLabel">地图标签</label><div class="label-control"><input id="label-input" maxlength="200" disabled><button id="label-button" disabled data-i18n="apply">应用</button></div>
+          <p class="field-hint" data-i18n="labelHint">留空恢复原名。参考实体保持只读。</p>
+        </div>
+      </section>
+      <section class="layer-section">
+        <div class="section-heading"><h2 data-i18n="mapLayers">地图显示</h2><span class="small-index">02</span></div>
+        <label class="layer-toggle"><span data-i18n="borders">州边界</span><input id="layer-borders" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+        <label class="layer-toggle"><span data-i18n="labels">地名标签</span><input id="layer-labels" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+        <label class="layer-toggle"><span data-i18n="cities">原生城市</span><input id="layer-cities" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+      </section>
+      <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · H 平移 · 0 全图。拖动平移，滚轮缩放；Ctrl/⌘ + Z 撤销，Shift + Z 重做；Ctrl/⌘ + S 保存。</p></details>
+      <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span></footer>
+    </aside>
+  </main>
+  <footer class="statusbar"><span class="status-led" id="status-led"></span><span id="status-text" role="status" aria-live="polite">正在加载…</span><span id="dataset-stats"></span></footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

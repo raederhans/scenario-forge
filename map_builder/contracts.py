@@ -541,30 +541,6 @@ DATA_ARTIFACT_SPECS: tuple[DataArtifactSpec, ...] = (
         description="Historic Geographical Overhaul manually reviewed identity alias catalog.",
     ),
     DataArtifactSpec(
-        path="hgo_runtime/manifest.json",
-        role="hgo_runtime_manifest",
-        artifact_class=ARTIFACT_CLASS_DERIVED,
-        owner="tools.build_hgo_runtime_assets",
-        description="Historic Geographical Overhaul independent runtime asset manifest.",
-        schema_ref="schema://hgo/runtime_manifest/v1",
-    ),
-    DataArtifactSpec(
-        path="hgo_runtime/seed.json",
-        role="hgo_runtime_seed",
-        artifact_class=ARTIFACT_CLASS_DERIVED,
-        owner="tools.build_hgo_runtime_assets",
-        description="Historic Geographical Overhaul independent runtime seed built from mod source.",
-        schema_ref="schema://hgo/runtime_seed/v1",
-    ),
-    DataArtifactSpec(
-        path="hgo_runtime/provinces.bmp",
-        role="hgo_runtime_raster",
-        artifact_class=ARTIFACT_CLASS_DERIVED,
-        owner="tools.build_hgo_runtime_assets",
-        description="Historic Geographical Overhaul province-color raster used by the independent runtime preview.",
-        schema_ref="schema://bitmap/bmp_rgb24/v1",
-    ),
-    DataArtifactSpec(
         path="js/core/city_lights_modern_asset.js",
         role="modern_city_lights_asset",
         artifact_class=ARTIFACT_CLASS_PUBLISH,
@@ -910,16 +886,6 @@ SCENARIO_PROFILE_LIGHTWEIGHT_BASE = ScenarioContractProfile(
     expect_audit=True,
     startup_support_base_topology="data/europe_topology.json",
 )
-SCENARIO_PROFILE_HGO_VECTOR = ScenarioContractProfile(
-    profile_id="hgo_vector",
-    gate_mode="shadow",
-    expect_runtime_topology=True,
-    expect_runtime_bootstrap=False,
-    expect_chunk_assets=False,
-    expect_startup_assets=False,
-    expect_audit=True,
-    startup_support_base_topology="data/europe_topology.json",
-)
 
 
 def resolve_scenario_publish_filenames(scope: str) -> tuple[str, ...]:
@@ -937,12 +903,12 @@ def normalize_scenario_contract_tag(raw_value: object) -> str:
 
 def resolve_scenario_contract_profile(scenario_id: str) -> ScenarioContractProfile:
     normalized = str(scenario_id or "").strip().lower()
+    if normalized.startswith("hgo_"):
+        raise ValueError("HGO uses the independent apps/hgo native dataset contract")
     # profile 决定 strict checker 对一个 scenario 期待哪些产物。
     # 这里保持“按 scenario 家族分合同”，这样 builder 和 checker 可以共用同一套分流规则。
     if normalized == "tno_1962":
         return SCENARIO_PROFILE_TNO_FULL
-    if normalized.startswith("hgo_"):
-        return SCENARIO_PROFILE_HGO_VECTOR
     if normalized.startswith("hoi4_"):
         return SCENARIO_PROFILE_HOI4_CHUNKED
     if normalized in {"blank_base", "modern_world"}:

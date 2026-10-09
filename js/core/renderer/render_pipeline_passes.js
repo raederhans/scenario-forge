@@ -45,18 +45,6 @@ export function createRenderPipelinePassesOwner({
     });
   }
 
-  function getHgoPreviewVisibilityTokenFromSignature(signature) {
-    return String(signature || "")
-      .split("::")
-      .find((part) => part === "hgo:on" || part === "hgo:off") || "";
-  }
-
-  function didHgoPreviewVisibilityTokenChange(previousSignature, nextSignature) {
-    const previousToken = getHgoPreviewVisibilityTokenFromSignature(previousSignature);
-    const nextToken = getHgoPreviewVisibilityTokenFromSignature(nextSignature);
-    return !!previousToken && !!nextToken && previousToken !== nextToken;
-  }
-
   function shouldDeferExactAfterSettlePassForCriticalPaint(passName, cache = getRenderPassCacheState()) {
     if (!exactAfterSettleDeferredPassNames.has(passName)) return false;
     const controller = getExactAfterSettleControllerState();
@@ -70,13 +58,9 @@ export function createRenderPipelinePassesOwner({
   function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings, cache = getRenderPassCacheState()) {
     const nextSignature = getRenderPassSignature(passName, transform);
     const previousSignature = String(cache.signatures[passName] || "");
-    const hgoPreviewVisibilityChanged = passName === "contextScenario"
-      && didHgoPreviewVisibilityTokenChange(previousSignature, nextSignature);
     if (previousSignature !== nextSignature) {
       cache.dirty[passName] = true;
-      if (hgoPreviewVisibilityChanged) {
-        cache.reasons[passName] = "hgo-runtime-preview";
-      } else if (!cache.reasons[passName] || cache.reasons[passName] === "init") {
+      if (!cache.reasons[passName] || cache.reasons[passName] === "init") {
         cache.reasons[passName] = "signature";
       }
       if (passName === "contextScenario") {
@@ -84,7 +68,6 @@ export function createRenderPipelinePassesOwner({
           activeScenarioId: String(state.activeScenarioId || ""),
           previousSignature,
           nextSignature,
-          hgoPreviewVisibilityChanged,
         });
       }
     }

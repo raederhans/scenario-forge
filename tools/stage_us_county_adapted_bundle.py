@@ -39,7 +39,7 @@ from tools.regional_scenario_assets import _copy_gzip
 from tools.precision_build_support import assert_gzip_matches, PhaseRecorder, cached_json_result, hash_json, sha256_file
 from tools.pages_artifact_root import resolve_runtime_path
 
-SCENARIOS = {'blank_base', 'hgo_1936', 'hoi4_1936', 'hoi4_1939', 'tno_1962'}
+SCENARIOS = {'blank_base', 'hoi4_1936', 'hoi4_1939', 'tno_1962'}
 SIDECARS = {'strategic_values.by_feature.json', 'victory_points.json', 'city_overrides.json',
             'capital_hints.json', 'scenario_mutations.json'}
 DERIVED = {'audit.json', 'build_snapshot.json', 'runtime_meta.json', 'detail_chunks.manifest.json',
@@ -85,7 +85,7 @@ def project_migration_contract(sid, crosswalk, source_hash, target_hash):
     """Scope importer lookup to reviewed namespaces, including retained identities."""
     if sid not in SCENARIOS or not source_hash or not target_hash or source_hash == target_hash:
         raise ValueError('Migration requires supported scenario and distinct baseline hashes')
-    prefixes = ('HGO-',) if sid == 'hgo_1936' else ('US_CNTY_', 'US_ZN_')
+    prefixes = ('US_CNTY_', 'US_ZN_')
     scoped = {}
     for old, children in crosswalk.items():
         if old.startswith(prefixes):

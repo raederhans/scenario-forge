@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-07 HGO 独立原生编辑器
+
+实施工作区 `C:/Users/raede/.codex/worktrees/hgo-native-editor/mapcreator` 保留原始改动及现场证据；审核整合使用 `C:/Users/raede/.codex/worktrees/hgo-reviewed-integration/mapcreator`、分支 `codex/hgo-reviewed-integration`，基于最新主线整合人口专题及地理缓存优化。用户已授权审核、合并、推送，root 为唯一 Git 和共享验证负责人。审核发现已修复；状态权限采用经过逐项证明的精确退役，不扩大冻结基线。实现提交 `96014184a5c761f4c4d9c7c1a4d9f38d413fd51e` 已推送；[PR #215](https://github.com/raederhans/scenario-forge/pull/215) 记录最终 required checks 和受保护合并回执。全仓库存重建的既有债与本次 required checks 分别记录。两处 HGO 工作区保留忽略的源数据、浏览器与治理证明，供恢复和审计；主工作区及其他 worktree 未归属 WIP 保留。详见 [HGO 任务记录](hgo-native-editor/task.md)。
+
 ## 2026-10-07 基础数据性能优化整合
 
 `C:/Users/raede/.codex/worktrees/base-data-perf-integration/mapcreator` 使用 `codex/base-data-performance-20261007`，基于 `origin/main@5dd62b73e` 提取三批性能优化。保留主线无损启动传输、TopoJSON 粗层和地理修复，并重新应用严格覆盖约束的显示优化。root 独占 Git、产物构建和浏览器验证；主目录混合 WIP 保留原状。本工作树保留 `.runtime/tmp/base-data-delivery/` 中的输入备份、构建和验收证据，最终推送、required checks、合并与部署以 GitHub 回执为准。记录见 [性能整合](base-data-performance-20261007/task.md)。

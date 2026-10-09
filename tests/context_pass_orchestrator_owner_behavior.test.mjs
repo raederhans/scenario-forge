@@ -27,7 +27,6 @@ const MARKERS_SNAPSHOT = Object.freeze({
 
 const DEPENDENCY_NAMES = Object.freeze({
   getters: Object.freeze([
-    "isHgoRuntimePreviewReady",
     "getDeferContextBasePass",
   ]),
   resolvers: Object.freeze([
@@ -57,7 +56,6 @@ const DEPENDENCY_NAMES = Object.freeze({
 
 function createHarness({
   defer = false,
-  hgoReady = false,
   overrides = {},
 } = {}) {
   const events = [];
@@ -65,10 +63,6 @@ function createHarness({
   let nowIndex = 0;
   const dependencies = {
     getters: {
-      isHgoRuntimePreviewReady: () => {
-        events.push("hgo-ready");
-        return hgoReady;
-      },
       getDeferContextBasePass: () => {
         events.push("get-defer");
         return defer;
@@ -142,33 +136,11 @@ test("factory validates every dependency and freezes the exact public API", () =
   ]);
 });
 
-test("all context passes preserve the HGO skip before sessions and layer reads", () => {
-  for (const [methodName, metricName] of [
-    ["drawContextBasePass", "drawContextBasePass"],
-    ["drawContextMarkersPass", "drawContextMarkersPass"],
-    ["drawContextScenarioPass", "drawContextScenarioPass"],
-  ]) {
-    const { events, owner } = createHarness({ hgoReady: true });
-    assert.equal(owner[methodName](2, { interactive: true }), undefined);
-    assert.deepEqual(events, [
-      "now",
-      "hgo-ready",
-      "now",
-      ["perf-metric", metricName, 12, {
-        interactive: true,
-        skipped: true,
-        reason: "hgo-runtime-preview",
-      }],
-    ]);
-  }
-});
-
 test("context base deferred path preserves metric order and payloads", () => {
   const { events, owner } = createHarness({ defer: true });
   owner.drawContextBasePass(3);
   assert.deepEqual(events, [
     "now",
-    "hgo-ready",
     "begin-session",
     "get-defer",
     "resolve-base",
@@ -229,7 +201,6 @@ test("context base normal path preserves draw order and keeps snapshots lazy", (
     owner.drawContextBasePass(5, { interactive });
     assert.deepEqual(events, [
       "now",
-      "hgo-ready",
       "begin-session",
       "get-defer",
       ["physical", 5, { interactive }],
@@ -250,7 +221,6 @@ test("context markers deferred path preserves exact metric order and payloads", 
   owner.drawContextMarkersPass(7);
   assert.deepEqual(events, [
     "now",
-    "hgo-ready",
     "begin-session",
     "get-defer",
     "resolve-markers",
@@ -313,7 +283,6 @@ test("context markers preserve normal layer order and draw city points only inte
     ];
     assert.deepEqual(events, [
       "now",
-      "hgo-ready",
       "begin-session",
       "get-defer",
       ...expectedLayers,
@@ -332,7 +301,6 @@ test("context scenario preserves region then relief order and final timing", () 
   owner.drawContextScenarioPass(13, { interactive: true });
   assert.deepEqual(events, [
     "now",
-    "hgo-ready",
     "begin-session",
     ["scenario-region", 13],
     ["scenario-relief", 13],
@@ -357,7 +325,6 @@ test("session cleanup preserves original error propagation and omits final timin
   assert.throws(() => drawHarness.owner.drawContextBasePass(1), drawError);
   assert.deepEqual(drawHarness.events, [
     "now",
-    "hgo-ready",
     "begin-session",
     "get-defer",
     ["physical", 1, { interactive: false }],
@@ -377,7 +344,7 @@ test("session cleanup preserves original error propagation and omits final timin
     },
   });
   assert.throws(() => beginHarness.owner.drawContextScenarioPass(1), beginError);
-  assert.deepEqual(beginHarness.events, ["now", "hgo-ready", "begin-throws"]);
+  assert.deepEqual(beginHarness.events, ["now", "begin-throws"]);
 
   const endError = new Error("end failed");
   const endHarness = createHarness({
@@ -393,7 +360,6 @@ test("session cleanup preserves original error propagation and omits final timin
   assert.throws(() => endHarness.owner.drawContextScenarioPass(1), endError);
   assert.deepEqual(endHarness.events, [
     "now",
-    "hgo-ready",
     "begin-session",
     ["scenario-region", 1],
     ["scenario-relief", 1],
@@ -416,7 +382,6 @@ test("marker and scenario effect failures close their sessions at the exact fail
   assert.throws(() => markerHarness.owner.drawContextMarkersPass(2), markerError);
   assert.deepEqual(markerHarness.events, [
     "now",
-    "hgo-ready",
     "begin-session",
     "get-defer",
     ["roads", 2, { interactive: false }],
@@ -438,7 +403,6 @@ test("marker and scenario effect failures close their sessions at the exact fail
   assert.throws(() => regionHarness.owner.drawContextScenarioPass(3), regionError);
   assert.deepEqual(regionHarness.events, [
     "now",
-    "hgo-ready",
     "begin-session",
     "region-throws",
     "end-session",
@@ -458,7 +422,6 @@ test("marker and scenario effect failures close their sessions at the exact fail
   assert.throws(() => reliefHarness.owner.drawContextScenarioPass(4), reliefError);
   assert.deepEqual(reliefHarness.events, [
     "now",
-    "hgo-ready",
     "begin-session",
     ["scenario-region", 4],
     "relief-throws",

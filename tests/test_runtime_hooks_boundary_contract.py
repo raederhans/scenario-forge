@@ -14,7 +14,6 @@ STATE_BUS_JS = REPO_ROOT / "js" / "core" / "state" / "bus.js"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 CLICK_SELECTION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "click_selection_transaction_owner.js"
 RENDER_RUNTIME_BINDING_JS = REPO_ROOT / "js" / "bootstrap" / "render_runtime_binding.js"
-HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "hgo_runtime_preview_render_owner.js"
 MAP_HOVER_INTERACTION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "map_hover_interaction_owner.js"
 SAMPLE_PROJECT_IMPORT_WORKFLOW_JS = REPO_ROOT / "js" / "core" / "sample_project_import_workflow.js"
 
@@ -51,8 +50,6 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         self.assertIn('registerRuntimeHook(state, "updateScenarioContextBarFn", refreshScenarioContextBar);', toolbar_content)
         self.assertIn('registerRuntimeHook(state, "triggerScenarioGuideFn", triggerScenarioGuide);', toolbar_content)
         self.assertIn('registerRuntimeHook(state, "refreshSampleProjectBannerFn", refreshSampleProjectSurfaces);', toolbar_content)
-        self.assertIn('registerRuntimeHook(state, "renderHgoRuntimePreviewFn", (options = {}) => (', toolbar_content)
-        self.assertIn('registerRuntimeHook(state, "inspectHgoRuntimePreviewPointFn", (x, y, options = {}) => (', toolbar_content)
         self.assertIn('registerRuntimeHook(state, "renderCountryListFn", withEditorSelection(renderList));', sidebar_content)
         self.assertIn('registerRuntimeHook(state, "refreshCountryListRowsFn", withEditorSelection(refreshCountryRows));', sidebar_content)
         self.assertIn('registerRuntimeHook(state, "renderWaterRegionListFn", withEditorSelection(renderWaterRegionList));', sidebar_content)
@@ -97,92 +94,6 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         self.assertIn('registerRuntimeHook(state, "refreshSampleProjectBannerFn", refreshSampleProjectSurfaces);', toolbar_content)
         self.assertIn("export function resolveSampleProjectBannerView", controller_content)
 
-    def test_hgo_runtime_preview_hooks_are_registered_for_renderer_mode(self):
-        config_content = STATE_CONFIG_JS.read_text(encoding="utf-8")
-        toolbar_content = TOOLBAR_JS.read_text(encoding="utf-8")
-        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
-        click_owner_content = CLICK_SELECTION_OWNER_JS.read_text(encoding="utf-8")
-        hgo_preview_owner_content = HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS.read_text(encoding="utf-8")
-        hover_owner_content = MAP_HOVER_INTERACTION_OWNER_JS.read_text(encoding="utf-8")
-
-        for hook_name in [
-            "setHgoRuntimePreviewEnabledFn",
-            "toggleHgoRuntimePreviewFn",
-            "syncHgoRuntimePreviewUiFn",
-            "getHgoRuntimePreviewProjectionOptionsFn",
-            "renderHgoRuntimePreviewFn",
-            "inspectHgoRuntimePreviewPointFn",
-        ]:
-            self.assertIn(f'"{hook_name}"', config_content)
-
-        self.assertIn(
-            'renderOptions: () => callRuntimeHook(state, "getHgoRuntimePreviewProjectionOptionsFn") || {},',
-            toolbar_content,
-        )
-        self.assertIn('callRuntimeHook(runtimeState, "renderHgoRuntimePreviewFn"', hgo_preview_owner_content)
-        self.assertIn('callRuntimeHook(runtimeState, "inspectHgoRuntimePreviewPointFn"', hgo_preview_owner_content)
-        self.assertIn(
-            'hgoRuntimePreviewController?.renderPreview?.(options) || null',
-            toolbar_content,
-        )
-        self.assertIn(
-            'hgoRuntimePreviewController?.inspectPoint?.(x, y, options) || null',
-            toolbar_content,
-        )
-        self.assertIn("function getHgoRuntimePreviewProjectionOptions(overrides = {})", renderer_content)
-        self.assertIn("HGO_DEFAULT_TARGET_PROJECTION", hgo_preview_owner_content)
-        self.assertIn("HGO_SOURCE_PROJECTION", hgo_preview_owner_content)
-        self.assertIn(
-            'registerRuntimeHook(runtimeState, "getHgoRuntimePreviewProjectionOptionsFn", getHgoRuntimePreviewProjectionOptions);',
-            renderer_content,
-        )
-        self.assertIn("projectionPixelRatio: runtimeState.dpr,", hgo_preview_owner_content)
-        self.assertIn("projectionTransform: runtimeState.zoomTransform || null,", hgo_preview_owner_content)
-        self.assertIn("function drawHgoPreviewPass()", renderer_content)
-        self.assertIn('renderIfReady("hgo-preview-pass"', hgo_preview_owner_content)
-        self.assertIn("targetCanvas,", hgo_preview_owner_content)
-        self.assertIn("...getProjectionOptions(options),", hgo_preview_owner_content)
-        self.assertIn("function inspectHgoRuntimePreviewFromEvent(", renderer_content)
-        self.assertIn("function normalizeHitPayload(", hgo_preview_owner_content)
-        self.assertIn('if (targetType === "hgo") {', renderer_content)
-        self.assertIn("normalized.hgoRuntime = hgoRuntime;", renderer_content)
-        self.assertIn('requestInteractionRender("hgo-runtime-preview-click");', click_owner_content)
-
-        hgo_hit_start = hgo_preview_owner_content.index('id: `hgo:province:${resolved.provinceId}`')
-        hgo_hit_end = hgo_preview_owner_content.index("hgoRuntime: Object.freeze({", hgo_hit_start)
-        hgo_hit_body = hgo_preview_owner_content[hgo_hit_start:hgo_hit_end]
-        self.assertIn('targetType: "hgo",', hgo_hit_body)
-        self.assertIn("countryCode: ownerTag,", hgo_hit_body)
-        self.assertIn('hitSource: "hgo-runtime-preview",', hgo_hit_body)
-
-        # HGO 预览必须作为 render pass 参与合成；drawCanvas 末尾不能再直写主 canvas。
-        draw_start = renderer_content.index("function drawCanvas() {")
-        draw_end = renderer_content.index("function readRenderPerfMetricDuration(", draw_start)
-        draw_body = renderer_content[draw_start:draw_end]
-        self.assertNotIn('renderHgoRuntimePreviewIfReady("draw-canvas");', draw_body)
-        self.assertNotIn("preferLastGoodFrameForHgoPreview", draw_body)
-
-        hover_start = renderer_content.index("function handleMouseMove(event) {")
-        hover_end = renderer_content.index("function addRecentColor(color) {", hover_start)
-        hover_body = renderer_content[hover_start:hover_end]
-        self.assertIn("getMapHoverInteractionOwner().scheduleMouseMove(event);", hover_body)
-        self.assertIn('"inspectHgoRuntimePreviewFromEvent"', hover_owner_content)
-        self.assertIn('getterApi.inspectHgoRuntimePreviewFromEvent(event, { eventType: "hover" });', hover_owner_content)
-        self.assertIn('if (hgoRuntimeHover?.active) {', hover_owner_content)
-        self.assertIn('return clearHoverForExclusiveMode("hgo-runtime-hover", hgoHit, hgoHit ? "pointer" : "");', hover_owner_content)
-
-        click_start = click_owner_content.index("async function handleClick(event, _interactionContext = null) {")
-        click_end = click_owner_content.index("const clickedFacilityEntry = getHoveredFacilityEntryFromEvent(event);", click_start)
-        click_body = click_owner_content[click_start:click_end]
-        self.assertIn('inspectHgoRuntimePreviewFromEvent(event, { eventType: "click" });', click_body)
-        self.assertIn("if (hgoRuntimeClick.active) {", click_body)
-        self.assertIn("updateDevSelectedHit(hgoRuntimeClick.hit?.id ? hgoRuntimeClick.hit : null);", click_body)
-        self.assertEqual(
-            renderer_content.count(
-                "return getClickSelectionTransactionOwner().handleClick(event, interactionContext);"
-            ),
-            1,
-        )
 
     def test_physical_intensity_tool_hook_is_registered_for_renderer_mode(self):
         config_content = STATE_CONFIG_JS.read_text(encoding="utf-8")

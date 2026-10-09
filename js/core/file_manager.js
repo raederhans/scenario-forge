@@ -39,6 +39,7 @@ import {
   listTransportOverviewCapabilityFamilyIds,
 } from "./transport_capability_registry.js";
 import { clearDirty } from "./dirty_state.js";
+import { projectEditor, routeHgoProject } from "./hgo_project_routing.js";
 import { buildExportArtifactManifest } from "./export_artifact_package.js";
 import { LegendManager } from "./legend_manager.js";
 import {
@@ -977,6 +978,7 @@ class FileManager {
   static async importProjectData(payload, callback, observers = {}, options = {}) {
     const { notifySuccess, notifyError } = resolveProjectImportObservers(observers);
     try {
+      if (projectEditor(payload) !== "main") return await routeHgoProject(payload);
       const data = FileManager.normalizeImportedProjectData(payload);
       if (data.riverPaint?.pack) {
         await verifyApprovedRiverPack(data.riverPaint.pack);

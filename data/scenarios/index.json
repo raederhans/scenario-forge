@@ -8,21 +8,13 @@
     "hoi4_1939",
     "tno_1962"
   ],
-  "developer_preview_ids": [
-    "hgo_1936"
-  ],
+  "developer_preview_ids": [],
   "scenarios": [
     {
       "scenario_id": "blank_base",
       "display_name": "Blank Map",
       "manifest_url": "data/scenarios/blank_base/manifest.json",
       "audit_url": "data/scenarios/blank_base/audit.json"
-    },
-    {
-      "scenario_id": "hgo_1936",
-      "display_name": "HGO 1936",
-      "manifest_url": "data/scenarios/hgo_1936/manifest.json",
-      "audit_url": "data/scenarios/hgo_1936/audit.json"
     },
     {
       "scenario_id": "hoi4_1936",

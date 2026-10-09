@@ -17,7 +17,6 @@ const RENDER_PASSES = [
   "background",
   "physicalBase",
   "political",
-  "hgoPreview",
   "contextBase",
   "contextScenario",
   "effects",
@@ -121,30 +120,17 @@ test("deferred pass set excludes background and physical base", () => {
 });
 
 test("target pass policy ignores dirty passes outside the active idle list", () => {
-  const activeVectorPasses = RENDER_PASSES.filter((passName) => passName !== "hgoPreview");
+  const activeVectorPasses = RENDER_PASSES.filter((passName) => passName !== "contextBase");
   const targetPasses = resolveExactAfterSettleTargetPasses({
     renderPassNames: RENDER_PASSES,
     idleRenderPassNames: activeVectorPasses,
-    dirtyPassNames: ["hgoPreview", "political"],
+    dirtyPassNames: ["contextBase", "political"],
     physicalExactRefreshPasses: [],
     exactRefreshApplied: true,
   });
 
   assert.deepEqual(targetPasses.exactTargetPasses, ["political", "borders"]);
   assert.deepEqual(targetPasses.deferredExactTargetPasses, ["textureLabels", "labels"]);
-  assert.equal(targetPasses.exactTargetPasses.includes("hgoPreview"), false);
-  assert.equal(targetPasses.deferredExactTargetPasses.includes("hgoPreview"), false);
-});
-
-test("target pass policy keeps HGO preview when it is the active dirty pass", () => {
-  const targetPasses = resolveExactAfterSettleTargetPasses({
-    renderPassNames: RENDER_PASSES,
-    idleRenderPassNames: ["hgoPreview"],
-    dirtyPassNames: ["hgoPreview", "political"],
-    physicalExactRefreshPasses: [],
-    exactRefreshApplied: false,
-  });
-
-  assert.deepEqual(targetPasses.exactTargetPasses, ["hgoPreview"]);
-  assert.deepEqual(targetPasses.deferredExactTargetPasses, []);
+  assert.equal(targetPasses.exactTargetPasses.includes("contextBase"), false);
+  assert.equal(targetPasses.deferredExactTargetPasses.includes("contextBase"), false);
 });

@@ -2292,6 +2292,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
       "node --test tests/render_pass_signature_policy_behavior.test.mjs",
     ] : []),
     "node --test tests/render_snapshot_behavior.test.mjs",
+    ...(includeRenderer ? ["node --test tests/state_target_private_cache_contract_behavior.test.mjs"] : []),
     "python -m unittest tests.test_map_renderer_render_snapshot_boundary_contract -q",
     ...(includeRenderer ? ["test:node:ownership-retirement", "test:node:startup-lifecycle"] : []),
   ];
@@ -2344,6 +2345,7 @@ test(`local projection preserves exact test routes with renderer scope ${include
       "node-test:tests/startup_data_pipeline_lifecycle_behavior.test.mjs",
       "node-test:tests/startup_interaction_lifecycle_behavior.test.mjs",
       "node-test:tests/startup_ready_handoff_behavior.test.mjs",
+      "node-test:tests/state_target_private_cache_contract_behavior.test.mjs",
       "node-test:tests/toolbar_render_scheduler_behavior.test.mjs",
       "node-test:tests/visual_brush_transaction_behavior.test.mjs",
     ] : []),

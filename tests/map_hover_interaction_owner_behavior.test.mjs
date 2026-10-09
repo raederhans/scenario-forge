@@ -27,7 +27,7 @@ function createHarness(overrides = {}) {
   let globalHost = clock;
   const state = { lastMouseMoveTime: 0, MOUSE_THROTTLE_MS: 16, landData: {}, renderPhase: "idle",
     hoveredId: null, hoveredWaterRegionId: null, hoveredSpecialRegionId: null, ...overrides };
-  const data = { now: 100, hit: {}, facility: null, city: null, detailsActive: false, block: false, selected: null, hgo: null };
+  const data = { now: 100, hit: {}, facility: null, city: null, detailsActive: false, block: false, selected: null };
   const surfaces = { tooltip: { style: {} }, rect: { style(key, value) { calls.push([key, value]); } } };
   const owner = createMapHoverInteractionOwner({
     state,
@@ -35,7 +35,6 @@ function createHarness(overrides = {}) {
     constants: { hoverSnapPx: 9, renderPhaseIdle: "idle" },
     getters: {
       getGlobal: () => globalHost, nowMs: () => data.now,
-      inspectHgoRuntimePreviewFromEvent: () => data.hgo,
       getHitFromEvent: (event, options) => { calls.push(["hit", options, event]); data.onHit?.(); return data.hit; },
       getFeatureForHit: createFeatureLookup(state),
       getHoveredFacilityEntryFromEvent: () => data.facility,
@@ -117,15 +116,14 @@ test("no hover data stops before event resolution", () => {
   assert.equal(h.state.lastMouseMoveTime, 100); assert.deepEqual(h.calls, []);
 });
 
-test("special-zone editor and HGO exclusive hover clear underlying targets", () => {
-  for (const mode of ["editor", "hgo"]) {
-    const h = createHarness({ hoveredId: "old", specialZoneEditor: { active: mode === "editor" } });
+test("special-zone editor exclusive hover clears underlying targets", () => {
+  {
+    const h = createHarness({ hoveredId: "old", specialZoneEditor: { active: true } });
     h.owner.setHoveredFacilityEntry({ familyId: "port", stableId: "old" });
-    h.data.hgo = mode === "hgo" ? { active: true, hit: { id: "hgo" } } : null;
-    assert.equal(h.move().branch, mode === "editor" ? "special-zone-editor" : "hgo-runtime-hover");
+    assert.equal(h.move().branch, "special-zone-editor");
     assert.equal(h.state.hoveredId, null); assert.equal(h.owner.getHoveredFacilityEntry(), null);
     assert.equal(h.state.tooltipPendingState.visible, false);
-    assert.equal(h.state.devHoverHit?.id || null, mode === "hgo" ? "hgo" : null);
+    assert.equal(h.state.devHoverHit?.id || null, null);
     h.flush(); assert.equal(h.surfaces.tooltip.style.opacity, "0");
   }
 });

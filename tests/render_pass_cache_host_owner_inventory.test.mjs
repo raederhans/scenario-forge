@@ -3,6 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { IDLE_RENDER_PASS_DEFINITIONS } from "../js/core/renderer/render_pipeline_catalog.js";
+import { RENDER_PASS_NAMES } from "../js/core/map_renderer/render_pass_catalog.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -139,7 +141,7 @@ test("P51 owner contains host setup and excludes cache commit ownership", () => 
     "\"withRenderTarget\"",
     "\"getRenderPassLayout\"",
     "passCanvas.getContext(\"2d\")",
-    "Math.max(0.0001, Number(transform?.k || 1))",
+    "k = runEffect(trace, \"prepareTargetContext\", passContext, transform, layout);",
     "drawResult = drawFn(k);",
     "return Object.freeze({",
     "prepareRenderPassHost,",
@@ -159,6 +161,8 @@ test("P51 owner contains host setup and excludes cache commit ownership", () => 
     "recordRenderPerfMetric",
     "getPassCounterNames",
     "incrementPerfCounter",
+    "hgoPreview",
+    "normalizeTransformScale",
   ]) {
     assertExcludes(ownerSource, token, "P51 owner must avoid cache commit/accounting token");
   }
@@ -169,11 +173,11 @@ test("render pass drawing functions and pipeline injection remain in place", () 
   const renderPipelinePassesSource = readRepoFile(RENDER_PIPELINE_PASSES_PATH);
   const renderPipelineCatalogSource = readRepoFile(RENDER_PIPELINE_CATALOG_PATH);
 
-  for (const drawKey of [
+  const drawKeys = [
     "drawBackgroundPass",
     "drawPhysicalBasePass",
     "drawPoliticalPass",
-    "drawHgoPreviewPass",
+    "drawPopulationHeatmapPass",
     "drawContextBasePass",
     "drawContextScenarioPass",
     "drawEffectsPass",
@@ -183,7 +187,15 @@ test("render pass drawing functions and pipeline injection remain in place", () 
     "drawContextMarkersPass",
     "drawTextureLabelEffectsPass",
     "drawLabelsPass",
-  ]) {
+  ];
+  assert.deepEqual(IDLE_RENDER_PASS_DEFINITIONS.map(({ drawKey }) => drawKey), drawKeys,
+    "idle pipeline must retain the complete current draw-key inventory");
+  assert.deepEqual(IDLE_RENDER_PASS_DEFINITIONS.map(({ passName }) => passName).sort(), [...RENDER_PASS_NAMES].sort(),
+    "idle pipeline must cover every current render pass exactly once");
+  assert.equal(RENDER_PASS_NAMES.includes("hgoPreview"), false, "embedded HGO preview pass is retired");
+  assertExcludes(renderPipelineCatalogSource, "drawHgoPreviewPass", "idle pipeline must not restore embedded HGO preview drawing");
+  assertExcludes(rendererSource, "drawHgoPreviewPass", "renderer must not restore embedded HGO preview drawing");
+  for (const drawKey of drawKeys) {
     assertIncludes(renderPipelineCatalogSource, `drawKey: "${drawKey}"`, "render pipeline catalog must keep draw key");
     assertIncludes(rendererSource, `function ${drawKey}`, "map_renderer must keep render pass drawing function");
   }

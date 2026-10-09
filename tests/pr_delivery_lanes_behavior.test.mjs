@@ -56,8 +56,9 @@ function runRequiredGate(overrides = {}) {
   const source = fs.readFileSync(new URL("../.github/workflows/pr-verify.yml", import.meta.url), "utf8").replaceAll("\r\n", "\n");
   const script = source.split("node <<'NODE'\n")[1].split("\n          NODE")[0];
   const needs = {
-    "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true" } },
+    "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true", run_hgo: "true" } },
     "pr-verify-fast": { result: "success" }, "pr-verify-smoke": { result: "success" },
+    "pr-verify-hgo": { result: "success" },
     ...overrides,
   };
   let code = 0;
@@ -70,17 +71,48 @@ function runRequiredGate(overrides = {}) {
 test("required gate accepts explicit docs exemption but rejects missing or failed planned jobs", () => {
   assert.equal(runRequiredGate(), 0);
   assert.equal(runRequiredGate({
-    "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false" } },
+    "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "false" } },
     "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+    "pr-verify-hgo": { result: "skipped" },
   }), 0);
   for (const result of ["skipped", "failure", "cancelled", undefined]) {
     assert.equal(runRequiredGate({ "pr-verify-fast": { result } }), 1, result);
     assert.equal(runRequiredGate({ "pr-verify-smoke": { result } }), 1, result);
+    assert.equal(runRequiredGate({ "pr-verify-hgo": { result } }), 1, result);
   }
-  for (const outputs of [{}, { run_fast: "false" }, { run_fast: "true", run_smoke: "invalid" }]) {
+  for (const outputs of [{}, { run_fast: "false", run_hgo: "true" }, { run_fast: "true", run_smoke: "invalid", run_hgo: "true" }]) {
     assert.equal(runRequiredGate({ "pr-plan": { result: "success", outputs } }), 1);
   }
-  assert.equal(runRequiredGate({ "pr-plan": { result: "failure", outputs: { run_fast: "false", run_smoke: "false" } } }), 1);
+  assert.equal(runRequiredGate({
+    "pr-plan": { result: "failure", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "false" } },
+    "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+    "pr-verify-hgo": { result: "skipped" },
+  }), 1);
+});
+
+test("required gate accepts native-only success and requires explicit HGO plans and results", () => {
+  assert.equal(runRequiredGate({
+    "pr-plan": { result: "success", outputs: { run_fast: "false", run_smoke: "false", run_hgo: "true" } },
+    "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
+  }), 0);
+  for (const run_hgo of [undefined, "invalid", "", true, false]) {
+    assert.equal(runRequiredGate({
+      "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true", run_hgo } },
+    }), 1, `invalid HGO plan: ${run_hgo}`);
+  }
+  for (const result of ["success", "failure", "cancelled", undefined]) {
+    assert.equal(runRequiredGate({
+      "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true", run_hgo: "false" } },
+      "pr-verify-hgo": { result },
+    }), 1, `unplanned HGO result: ${result}`);
+  }
+  for (const run_hgo of ["true", "false"]) {
+    assert.equal(runRequiredGate({
+      "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "true", run_hgo } },
+      "pr-verify-hgo": undefined,
+    }), 1, `missing HGO dependency with plan: ${run_hgo}`);
+  }
+  assert.equal(runRequiredGate({ "unexpected-job": { result: "success" } }), 1);
 });
 
 test("hosted workflows consume the planned lanes and keep release artifact checks", () => {

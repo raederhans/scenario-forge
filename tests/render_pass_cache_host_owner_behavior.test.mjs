@@ -285,38 +285,6 @@ test("prepares target inside render target and returns draw result unchanged", (
   ]);
 });
 
-test("hgoPreview keeps current scale normalization floor and skips target preparation", () => {
-  const events = [];
-  const { owner } = createOwner({ events, prepareK: 99 });
-  const drawnScales = [];
-
-  const first = owner.prepareRenderPassHost({
-    passName: "hgoPreview",
-    transform: { k: 0.000001 },
-    drawFn: (k) => {
-      drawnScales.push(k);
-      return "first";
-    },
-  });
-  const second = owner.prepareRenderPassHost({
-    passName: "hgoPreview",
-    transform: { k: 0 },
-    drawFn: (k) => {
-      drawnScales.push(k);
-      return "second";
-    },
-  });
-
-  assert.equal(first.k, 0.0001);
-  assert.equal(first.drawResult, "first");
-  assert.equal(second.k, 1);
-  assert.equal(second.drawResult, "second");
-  assert.deepEqual(drawnScales, [0.0001, 1]);
-  assert.equal(first.effectOrder.includes("prepareTargetContext"), false);
-  assert.equal(second.effectOrder.includes("prepareTargetContext"), false);
-  assert.deepEqual(first.getterOrder, ["getRenderPassLayout"]);
-});
-
 test("requires declared dependencies and draw callback", () => {
   assert.throws(
     () => createRenderPassCacheHostOwner({

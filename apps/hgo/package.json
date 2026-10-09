@@ -1,0 +1,15 @@
+{
+  "name": "scenario-forge-hgo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent native-pixel HGO atlas editor",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/engine*.test.mjs tests/ui*.test.mjs",
+    "test:python": "python -B -m unittest discover -s tests -p test_*.py",
+    "check": "node tools/check_boundary.mjs",
+    "build": "python -B tools/build_app.py",
+    "validate:data": "python -B tools/validate_dataset.py assets/default"
+  }
+}

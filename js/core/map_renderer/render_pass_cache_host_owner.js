@@ -48,10 +48,6 @@ function createSummary({
   });
 }
 
-function normalizeTransformScale(transform) {
-  return Math.max(0.0001, Number(transform?.k || 1));
-}
-
 export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = {}) {
   const effectApi = Object.fromEntries(
     REQUIRED_EFFECT_NAMES.map((name) => [name, requireFunction(effects, name, "effects")]),
@@ -122,9 +118,7 @@ export function createRenderPassCacheHostOwner({ effects = {}, getters = {} } = 
 
     // host owner 只准备 canvas/context/scale，并把真实绘制交回 drawFn；提交与缓存 accounting 留给后续 owner。
     runEffect(trace, "withRenderTarget", passContext, () => {
-      k = normalizedPassName === "hgoPreview"
-        ? normalizeTransformScale(transform)
-        : runEffect(trace, "prepareTargetContext", passContext, transform, layout);
+      k = runEffect(trace, "prepareTargetContext", passContext, transform, layout);
       trace.effectOrder.push("drawFn");
       drawInvoked = true;
       drawResult = drawFn(k);

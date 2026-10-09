@@ -1128,6 +1128,37 @@
         "dist/pages-dist-manifest.json"
       ],
       "regressionExpectation": "Public sample changes must keep sample contracts, landing showcase tests, and canonical landing map asset parity green, then reserve a browser lane for visible Guide deeplink behavior."
+    },
+    {
+      "id": "hgo-native",
+      "summary": "Independent HGO pixel editor, native dataset and project handoff boundary.",
+      "ownerHints": ["hgo-native"],
+      "typicalSourceGlobs": [
+        "apps/hgo/**",
+        "js/core/hgo_project_routing.js",
+        "tests/hgo_project_routing_behavior.test.mjs",
+        "tests/test_hgo_independence.py",
+        "tools/verification/catalog/records/hgo_native.mjs",
+        ".github/workflows/hgo-native.yml"
+      ],
+      "preferredChildSafeChecks": [
+        "npm run test:node:hgo-native",
+        "npm run test:py:hgo-native",
+        "npm run test:node:hgo-project-routing",
+        "python -B -m unittest tests.test_hgo_independence -q"
+      ],
+      "preferredMainThreadChecks": [],
+      "mainRiskSignals": [
+        "native pixels or editable water states change during source interpretation",
+        "main and native runtime dependencies cross their boundary",
+        "native project handoff or document revision validation drifts"
+      ],
+      "evidenceArtifacts": [
+        "apps/hgo/assets/default/manifest.json",
+        "apps/hgo/assets/default/provenance.json",
+        "stdout HGO native contract reports"
+      ],
+      "regressionExpectation": "Run native dataset, engine and handoff contracts for HGO changes; use the native WebGL browser flow when interaction or rendering changes. Common-base scenario checks remain owned by their own domains."
     }
   ]
 }

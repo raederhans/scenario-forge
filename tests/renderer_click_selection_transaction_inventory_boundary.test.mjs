@@ -406,7 +406,6 @@ test("transaction owner keeps the global branch spine and branch-local order", (
     step.syncReadOnly("data availability guard", "if (!state.landData && !state.waterRegionsData && !state.scenarioSpecialRegionsData) return;"),
     step.syncEffectful("brush click suppression", "if (consumeSuppressedBrushClick()) return;"),
     step.syncEffectful("onboarding hint dismissal", "dismissOnboardingHint();"),
-    step.syncReadOnly("HGO click admission", "const hgoRuntimeClick = inspectHgoRuntimePreviewFromEvent(event, { eventType: \"click\" });"),
     step.syncReadOnly("facility admission", "const clickedFacilityEntry = getHoveredFacilityEntryFromEvent(event);"),
     step.syncReadOnly("root hit resolution", "const hit = getHitFromEvent(event, {"),
     step.syncReadOnly("scalar hit projection", "const resolvedHit = {"),

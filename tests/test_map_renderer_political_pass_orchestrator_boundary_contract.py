@@ -159,9 +159,10 @@ class MapRendererPoliticalPassOrchestratorBoundaryContractTest(unittest.TestCase
 
     def test_inventory_records_p3_3b_ownership_without_moving_the_entry_host(self):
         inventory = PASS_INVENTORY.read_text(encoding="utf-8")
-        political_start = inventory.index('passName: "political"')
-        political_end = inventory.index('passName: "hgoPreview"', political_start)
-        political = inventory[political_start:political_end]
+        records = re.findall(r"^  freezeRecord\(\{\n(.*?)^  \}\),", inventory, re.MULTILINE | re.DOTALL)
+        political_records = [record for record in records if re.search(r'^    passName: "political",$', record, re.MULTILINE)]
+        self.assertEqual(len(political_records), 1, "inventory must contain exactly one political pass record")
+        political = political_records[0]
         self.assertIn('implementationStatus: "owned-p3"', political)
         self.assertIn('entryHostPath: "js/core/map_renderer.js"', political)
         self.assertIn('plannedPhase: "P3.3b"', political)

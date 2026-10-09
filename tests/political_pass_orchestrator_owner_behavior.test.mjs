@@ -52,7 +52,6 @@ const DEFAULT_BACKGROUND = Object.freeze({
 
 const DEPENDENCY_NAMES = Object.freeze({
   getters: Object.freeze([
-    "isHgoRuntimePreviewReady",
     "isRenderDiagnosticsEnabled",
     "hasPoliticalLandFeatures",
     "isPoliticalRasterWorkerBitmapEnabled",
@@ -110,7 +109,6 @@ function eventName(event) {
 }
 
 function createHarness({
-  hgoReady = false,
   diagnosticsEnabled = true,
   hasLand = true,
   workerEnabled = true,
@@ -136,10 +134,6 @@ function createHarness({
   let nowIndex = 0;
   const dependencies = {
     getters: {
-      isHgoRuntimePreviewReady: () => {
-        events.push("hgo-ready");
-        return hgoReady;
-      },
       isRenderDiagnosticsEnabled: () => {
         events.push("diagnostics-enabled");
         return diagnosticsEnabled;
@@ -269,24 +263,11 @@ test("factory validates every dependency and freezes the exact public API", () =
   assert.deepEqual(Object.keys(owner), ["drawPoliticalPass"]);
 });
 
-test("HGO skip records the exact metric and returns before frame resolution", () => {
-  const { events, owner } = createHarness({ hgoReady: true });
-  assert.equal(owner.drawPoliticalPass(2), undefined);
-  assert.deepEqual(events, [
-    "hgo-ready",
-    ["metric", "drawPoliticalPass", 0, {
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    }],
-  ]);
-});
-
 test("worker bitmap success short-circuits before background and preserves snapshot order", () => {
   const bitmap = Object.freeze({ bitmapId: "accepted-17" });
   const { events, owner } = createHarness({ bitmapResult: bitmap, bitmapDrawn: true });
   const result = owner.drawPoliticalPass(3);
   assert.deepEqual(events.map(eventName), [
-    "hgo-ready",
     "resolve-identity",
     "worker-snapshot",
     "resolve-viewport",
@@ -298,13 +279,13 @@ test("worker bitmap success short-circuits before background and preserves snaps
     "worker-snapshot",
     "result",
   ]);
-  assert.deepEqual(events[4], ["metric", "politicalPassVisibleItems", 0, {
+  assert.deepEqual(events[3], ["metric", "politicalPassVisibleItems", 0, {
     visibleItemCount: 4,
     visitedBuckets: 9,
     candidateCount: 6,
   }]);
-  assert.equal(events[6][1].identity, IDENTITY_CAPSULE);
-  assert.equal(events[6][1].viewport, VIEWPORT_CAPSULE);
+  assert.equal(events[5][1].identity, IDENTITY_CAPSULE);
+  assert.equal(events[5][1].viewport, VIEWPORT_CAPSULE);
   assert.deepEqual(result, {
     committed: true,
     reason: "political-raster-worker-bitmap",
@@ -326,7 +307,6 @@ test("rejected bitmap continues through background before the missing-land resul
   });
   const result = owner.drawPoliticalPass(3);
   assert.deepEqual(events.map(eventName), [
-    "hgo-ready",
     "resolve-identity",
     "worker-snapshot",
     "resolve-viewport",
@@ -607,7 +587,7 @@ test("owner source stays import-free and excludes renderer state, DOM, D3, canva
 });
 
 
-test("partition surfaces draw after fine/worker base passes, never on HGO skip", () => {
+test("partition surfaces draw after fine/worker base passes", () => {
   for (const options of [{ workerEnabled: false }, { bitmapResult: {}, bitmapDrawn: true }]) {
     const calls = [];
     const { owner, events } = createHarness({ ...options, overrides: { effects: {
@@ -619,10 +599,4 @@ test("partition surfaces draw after fine/worker base passes, never on HGO skip",
     assert.equal(calls[0].k, 3);
     assert.equal(calls[0].previous.at(-1), 'result');
   }
-  let called = false;
-  const { owner } = createHarness({ hgoReady: true, overrides: { effects: {
-    drawPoliticalPartitions: () => { called = true; },
-  } } });
-  assert.equal(owner.drawPoliticalPass(2), undefined);
-  assert.equal(called, false);
 });

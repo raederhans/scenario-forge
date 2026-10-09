@@ -70,7 +70,6 @@ class MapRendererHitHoverContextBoundaryContractTest(unittest.TestCase):
             "hoverSnapPx: HIT_SNAP_RADIUS_HOVER_PX,",
             "renderPhaseIdle: RENDER_PHASE_IDLE",
             "nowMs,",
-            "inspectHgoRuntimePreviewFromEvent,",
             "getHitFromEvent,",
             "getHoveredFacilityEntryFromEvent,",
             "isFacilityDetailsSurfaceActive,",

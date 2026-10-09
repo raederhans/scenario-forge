@@ -21,6 +21,7 @@ const translations = {
     heroBody:
       "Build alternate histories, redraw borders, and bring your world into focus. A political map editor, right in your browser.",
     heroPrimaryCta: "Start creating",
+    hgoEditor: "HGO editor",
     heroSecondaryCta: "Explore the maps ↓",
     productPreviewLabel: "Scenario Forge generated cartography preview",
     productStageLabel: "Scenario Forge / Generated atlas",
@@ -252,7 +253,7 @@ const translations = {
       "Edit ownership, control, frontlines, and special regions across five public baselines.",
     featurePointPalettes:
       "Five named baselines are available in the public demo.",
-    featurePointExport: "HGO 1936 remains a developer/local preview.",
+    featurePointExport: "HGO opens in its own native-pixel editor, with editable sea regions.",
     featureGroupTwoTitle: "Cartographic control",
     featureGroupTwoBody:
       "Set palettes, borders, labels, and legends. Arrange layers to bring the right details forward.",
@@ -367,6 +368,7 @@ const translations = {
     heroBody:
       "选择历史或架空剧本，重绘疆界，添加地理细节。在浏览器里，把你的世界变成地图。",
     heroPrimaryCta: "开始制图",
+    hgoEditor: "HGO 独立编辑器",
     heroSecondaryCta: "看看示例地图 ↓",
     productPreviewLabel: "Scenario Forge 生成式制图预览",
     productStageLabel: "Scenario Forge / 生成图集",
@@ -563,7 +565,7 @@ const translations = {
     featureGroupOneTitle: "政治状态",
     featureGroupOneBody: "在五个公开底图中，编辑归属、控制区、前线与特殊区域。",
     featurePointPalettes: "当前 Demo 提供 5 个命名公开基线。",
-    featurePointExport: "HGO 1936 保持开发/本地预览状态。",
+    featurePointExport: "HGO 使用独立的原生像素编辑器，海域同样可编辑。",
     featureGroupTwoTitle: "制图控制",
     featureGroupTwoBody: "调整配色、边界、标签与图例，以图层顺序突出重要细节。",
     featurePointUndo: "编辑会话支持 80 步撤销与重做。",

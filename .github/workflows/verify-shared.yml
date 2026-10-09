@@ -237,6 +237,38 @@ jobs:
         if: inputs.profile == 'full'
         run: python -m unittest discover -s tests -p "test_*.py"
 
+      - name: Prepare exact state retirement history
+        if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome == 'success'
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import { execFileSync, spawnSync } from 'node:child_process';
+          const selection = JSON.parse(fs.readFileSync('.runtime/reports/generated/verification-selector-explain.json', 'utf8'));
+          const command = 'node --test tests/state_target_private_cache_contract_behavior.test.mjs';
+          if (!selection.recommendedCommands.some(entry => entry.commandRef === command)) {
+            console.log('Historical retirement proof is not selected.');
+            process.exit(0);
+          }
+          const { STATE_CAPABILITY_RETIREMENT_CONTRACT } = await import('./tools/state_action_delegation_contract.mjs');
+          const requirements = new Map();
+          for (const { previousSourceRevision: revision, modulePath } of STATE_CAPABILITY_RETIREMENT_CONTRACT) {
+            if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error('Retirement history requires an exact commit.');
+            const paths = requirements.get(revision) || new Set(['tools/state_writer_policy.json']);
+            paths.add(modulePath);
+            requirements.set(revision, paths);
+          }
+          for (const [revision, paths] of requirements) {
+            if (spawnSync('git', ['cat-file', '-e', `${revision}^{commit}`], { stdio: 'ignore' }).status !== 0) {
+              execFileSync('git', ['fetch', '--no-tags', '--filter=blob:none', '--depth=1', 'origin', revision], { stdio: 'inherit' });
+            }
+            // Materialize only the pinned proof inputs; unrelated historical assets stay unfetched.
+            for (const sourcePath of paths) {
+              execFileSync('git', ['cat-file', '-s', `${revision}:${sourcePath}`], { stdio: 'ignore' });
+            }
+          }
+          console.log(`Prepared retirement proof inputs from ${requirements.size} exact commits.`);
+          NODE
+
       - name: Run affected child-safe contracts
         if: always() && inputs.profile == 'pr-fast' && steps.selector.outcome != 'skipped'
         run: |

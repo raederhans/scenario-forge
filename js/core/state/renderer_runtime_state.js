@@ -188,7 +188,6 @@ export function createDefaultRenderPassCacheState() {
     dirty: {
       background: true,
       political: true,
-      hgoPreview: true,
       effects: true,
       contextBase: true,
       contextScenario: true,
@@ -198,7 +197,6 @@ export function createDefaultRenderPassCacheState() {
     reasons: {
       background: "init",
       political: "init",
-      hgoPreview: "init",
       effects: "init",
       contextBase: "init",
       contextScenario: "init",
@@ -216,7 +214,6 @@ export function createDefaultRenderPassCacheState() {
       backgroundPassRenders: 0,
       physicalBasePassRenders: 0,
       politicalPassRenders: 0,
-      hgoPreviewPassRenders: 0,
       effectsPassRenders: 0,
       contextPassRenders: 0,
       contextBasePassRenders: 0,

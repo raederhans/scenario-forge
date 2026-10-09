@@ -7,14 +7,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "js/core/renderer/political_partial_repaint_owner.js",
       "tests/political_partial_repaint_owner_behavior.test.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -29,14 +41,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "package.json",
       "tests/political_partial_repaint_owner_behavior.test.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -60,14 +84,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "tools/check_architecture_boundaries.mjs",
       "tools/renderer_pass_family_inventory.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -90,14 +126,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "js/core/renderer/world_frame_render.js",
       "tests/political_background_render_owner_behavior.test.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -115,14 +163,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "package.json",
       "tests/political_background_render_owner_behavior.test.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -146,14 +206,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "tools/check_architecture_boundaries.mjs",
       "tools/renderer_pass_family_inventory.mjs"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": null,
@@ -361,143 +433,6 @@ export const RENDERER_LAYERS_RECORDS = [
     "entrypointPolicyIndex": 4,
     "verificationOrder": null,
     "selectorOrder": 232,
-    "verification": null,
-    "selector": {}
-  },
-  {
-    "id": "node:test:node:hgo-projection-model",
-    "commandRef": "test:node:hgo-projection-model",
-    "sourceRefs": [
-      "tests/hgo_projection_model.node.test.mjs",
-      "js/core/hgo_projection_model.js"
-    ],
-    "ownerHints": [
-      "renderer-runtime"
-    ],
-    "domains": [
-      "renderer-runtime"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 234,
-    "verification": null,
-    "selector": {}
-  },
-  {
-    "id": "node:test:node:hgo-raster-renderer",
-    "commandRef": "test:node:hgo-raster-renderer",
-    "sourceRefs": [
-      "tests/hgo_raster_renderer.node.test.mjs",
-      "js/core/hgo_raster_renderer.js",
-      "js/core/hgo_runtime_asset_loader.js"
-    ],
-    "ownerHints": [
-      "renderer-runtime"
-    ],
-    "domains": [
-      "renderer-runtime"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 235,
-    "verification": null,
-    "selector": {}
-  },
-  {
-    "id": "node:test:node:hgo-runtime-index",
-    "commandRef": "test:node:hgo-runtime-index",
-    "sourceRefs": [
-      "tests/hgo_runtime_index.node.test.mjs",
-      "js/core/hgo_runtime_index.js"
-    ],
-    "ownerHints": [
-      "renderer-runtime"
-    ],
-    "domains": [
-      "renderer-runtime"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 233,
-    "verification": null,
-    "selector": {}
-  },
-  {
-    "id": "node:test:node:hgo-runtime-preview",
-    "commandRef": "test:node:hgo-runtime-preview",
-    "sourceRefs": [
-      "tests/hgo_runtime_preview.node.test.mjs",
-      "tests/hgo_runtime_preview_toolbar.node.test.mjs",
-      "js/core/hgo_runtime_preview.js",
-      "js/core/map_renderer/hgo_runtime_preview_frame_commit.js",
-      "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
-      "js/ui/toolbar/hgo_runtime_preview_controller.js"
-    ],
-    "ownerHints": [
-      "renderer-runtime"
-    ],
-    "domains": [
-      "renderer-runtime"
-    ],
-    "tiers": [
-      "contract"
-    ],
-    "cost": "fast",
-    "resourceLocks": [],
-    "executionOwners": [
-      "child-safe"
-    ],
-    "profiles": [
-      "pr-fast"
-    ],
-    "platforms": [
-      "all"
-    ],
-    "entrypointPolicyIndex": 4,
-    "verificationOrder": null,
-    "selectorOrder": 236,
     "verification": null,
     "selector": {}
   },
@@ -1597,14 +1532,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "tests/visual_effects_pass_owner_behavior.test.mjs",
       "package.json"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": 129,
     "selectorOrder": 380,
@@ -1629,14 +1576,26 @@ export const RENDERER_LAYERS_RECORDS = [
       "tests/test_map_renderer_render_pipeline_passes_boundary_contract.py",
       "package.json"
     ],
-    "ownerHints": ["renderer-runtime"],
-    "domains": ["renderer-runtime"],
-    "tiers": ["contract"],
+    "ownerHints": [
+      "renderer-runtime"
+    ],
+    "domains": [
+      "renderer-runtime"
+    ],
+    "tiers": [
+      "contract"
+    ],
     "cost": "fast",
     "resourceLocks": [],
-    "executionOwners": ["child-safe"],
-    "profiles": ["pr-fast"],
-    "platforms": ["all"],
+    "executionOwners": [
+      "child-safe"
+    ],
+    "profiles": [
+      "pr-fast"
+    ],
+    "platforms": [
+      "all"
+    ],
     "entrypointPolicyIndex": 4,
     "verificationOrder": 130,
     "selectorOrder": 381,

@@ -22,7 +22,7 @@ CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP = REPO_ROOT / "landing" / "app.js"
-EXPECTED_SCHEMA_REF_COUNT = 36
+EXPECTED_SCHEMA_REF_COUNT = 33
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -83,9 +83,9 @@ class DataCatalogContractTest(unittest.TestCase):
         self.assertEqual(schema_counts["schema://topojson/line_collection/railways_v1"], 66)
         self.assertIn("schema://transport/carrier_payload/v1", schema_counts)
         self.assertIn("schema://transport/provenance_payload/v1", schema_counts)
-        self.assertEqual(schema_counts["schema://hgo/runtime_manifest/v1"], 1)
-        self.assertEqual(schema_counts["schema://hgo/runtime_seed/v1"], 1)
-        self.assertEqual(schema_counts["schema://bitmap/bmp_rgb24/v1"], 1)
+        self.assertNotIn("schema://hgo/runtime_manifest/v1", schema_counts)
+        self.assertNotIn("schema://hgo/runtime_seed/v1", schema_counts)
+        self.assertNotIn("schema://bitmap/bmp_rgb24/v1", schema_counts)
         self.assertEqual(schema_counts["schema://thematic/layer_index/v1"], 1)
         self.assertEqual(schema_counts["schema://thematic/layer_manifest/v1"], 6)
         self.assertEqual(schema_counts["schema://thematic/admin_metrics/v1"], 2)
@@ -268,44 +268,6 @@ class DataCatalogContractTest(unittest.TestCase):
             if not key.startswith("manifest_output:"):
                 self.assertIn(f"manifest_output:{url.removeprefix('data/')}", entries[key].get("aliases") or [])
 
-    def test_catalog_contains_hgo_independent_runtime_assets(self) -> None:
-        payload = self._load_catalog()
-        entries = {entry["key"]: entry for entry in payload.get("entries") or []}
-        expected = {
-            "hgo_runtime_manifest": (
-                "data/hgo_runtime/manifest.json",
-                "hgo_runtime_manifest",
-                "json",
-                "json",
-                "schema://hgo/runtime_manifest/v1",
-            ),
-            "hgo_runtime_seed": (
-                "data/hgo_runtime/seed.json",
-                "hgo_runtime_seed",
-                "json",
-                "json",
-                "schema://hgo/runtime_seed/v1",
-            ),
-            "hgo_runtime_provinces_bmp": (
-                "data/hgo_runtime/provinces.bmp",
-                "hgo_runtime_raster",
-                "bmp",
-                "binary",
-                "schema://bitmap/bmp_rgb24/v1",
-            ),
-        }
-
-        for key, (url, role, file_format, read_mode, schema_ref) in expected.items():
-            with self.subTest(key=key):
-                self.assertIn(key, entries)
-                self.assertEqual(entries[key]["url"], url)
-                self.assertEqual(entries[key]["role"], role)
-                self.assertEqual(entries[key]["format"], file_format)
-                self.assertEqual(entries[key]["readMode"], read_mode)
-                self.assertEqual(entries[key]["schemaRef"], schema_ref)
-                self.assertEqual(entries[key]["owner"], "tools.build_hgo_runtime_assets")
-                self.assertEqual(entries[key]["hashRef"], f"data/manifest.json::outputs::{url.removeprefix('data/')}::sha256")
-                self.assertIn(f"manifest_output:{url.removeprefix('data/')}", entries[key].get("aliases") or [])
 
     def test_catalog_keeps_hgo_tier_a_checked_in_surface_clean(self) -> None:
         payload = self._load_catalog()

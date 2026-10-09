@@ -12,7 +12,7 @@ function createHarness(overrides = {}) {
     topologyRevision: 1, styleConfig: {},
     intensityFields: { channels: { urbanGlow: { revision: 7 } } },
   };
-  const live = { reuse: false, projection: {}, ready: false, debug: false, colorSensitive: false, visibility: "hgo-visibility" };
+  const live = { reuse: false, projection: {}, debug: false, colorSensitive: false };
   const calls = [];
   const dependencies = {
     getTransformSignature: (t) => { calls.push("transform"); return `${t?.k}:${t?.x}:${t?.y}`; },
@@ -22,9 +22,9 @@ function createHarness(overrides = {}) {
     getViewportRenderSignature: () => `${state.width}:${state.height}`,
     getPhysicalLandMaskInfo: () => ({ maskSource: "land", maskFeatureCount: 3 }),
     getScenarioRuntimeTopologySignatureToken: () => "topology",
-    getHgoRuntimePreviewVisibilitySignature: () => live.visibility,
-    getHgoRuntimePreviewProjectionOptions: () => ({ projectionName: "mercator", sourceProjection: "geo" }),
-    isHgoRuntimePreviewReady: () => live.ready,
+
+
+
     rendererSurfaceHost: { getProjection: () => live.projection },
     getContextBaseZoomBucketId: (k) => Math.floor(k),
     shouldRefreshContextBaseForColorChanges: () => live.colorSensitive,
@@ -43,7 +43,7 @@ function createHarness(overrides = {}) {
 
 const invalidationCases = [
   ["background", "topologyRevision"], ["physicalBase", "showPhysical"],
-  ["political", "colorRevision"], ["hgoPreview", "width"],
+  ["political", "colorRevision"],
   ["populationHeatmap", "topologyRevision"],
   ["effects", "topologyRevision"], ["lineEffects", "topologyRevision"],
   ["contextBase", "contextLayerRevision"], ["contextMarkers", "cityLayerRevision"],
@@ -316,28 +316,6 @@ test("only contextBase can reuse a viewport signature across a pan, while zoom b
   assert.notEqual(policy.getRenderPassSignature("contextBase"), before.contextBase);
   live.reuse = false;
   assert.equal(policy.getRenderPassTransformSignature("contextBase"), "3:50:80");
-});
-
-test("HGO identity distinguishes readiness, projection availability and live dimensions", () => {
-  const { state, live, policy } = createHarness();
-  state.hgoRuntimePreview = { status: "ready", summary: { province_count: 9, state_count: 4, country_count: 2 } };
-  const before = policy.getRenderPassSignature("hgoPreview");
-  assert.match(before, /^hgo:off::ready::2\.00::800::600::2:10:20::mercator::geo::seed:9:4:2$/);
-  live.ready = true;
-  live.projection = null;
-  assert.match(policy.getRenderPassSignature("hgoPreview"), /^hgo:on::.*::projection:none::/);
-});
-
-test("HGO visibility invalidates exactly its seven dependent passes", () => {
-  const { state, live, policy } = createHarness();
-  const dependentPasses = new Set(["political", "contextBase", "contextMarkers", "labels", "contextScenario", "textureLabels", "borders"]);
-  const before = Object.fromEntries(RENDER_PASS_NAMES.map(pass => [pass, policy.getRenderPassSignature(pass)]));
-  live.visibility = "hgo-visible";
-  for (const pass of RENDER_PASS_NAMES) {
-    assert.equal(policy.getRenderPassSignature(pass) !== before[pass], dependentPasses.has(pass), pass);
-  }
-  state.colorRevision = 3;
-  assert.match(policy.getRenderPassSignature("political"), /^3::hgo-visible::/);
 });
 
 test("context color sensitivity and nested state replacements are evaluated per call", () => {

@@ -251,9 +251,8 @@ export function createRenderTransformReusePolicyOwner({
   function shouldStartExactAfterSettleFastPath() {
     if (state.deferContextBasePass) return false;
     // Sliced recovery does not require long-lived contextBase transform reuse.
-    // HGO owns a separate surface pipeline, even when old vector caches remain.
     const activePassNames = getActiveRenderPassNames();
-    if (!Array.isArray(activePassNames) || !activePassNames.length || activePassNames.includes("hgoPreview")) return false;
+    if (!Array.isArray(activePassNames) || !activePassNames.length) return false;
     const cache = getRenderPassCacheState();
     return exactAfterSettleFastPathRequiredPassNames.filter((passName) => activePassNames.includes(passName)).every((passName) => (
       !!cache.canvases?.[passName] && !!getPassReferenceTransform(passName)

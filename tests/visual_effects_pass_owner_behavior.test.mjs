@@ -39,7 +39,6 @@ function createContext(events, { throwOnFill = false, throwOnPath = false } = {}
 function createHarness({
   textureMode = "paper",
   bootReady = true,
-  hgoReady = false,
   throwOnFill = false,
   throwOnPath = false,
 } = {}) {
@@ -102,10 +101,7 @@ function createHarness({
         events.push("boot-ready");
         return bootReady;
       },
-      isHgoRuntimePreviewReady: () => {
-        events.push("hgo-ready");
-        return hgoReady;
-      },
+
     },
     helpers: {
       clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
@@ -149,7 +145,7 @@ test("factory validates every runtime port and freezes the public API", () => {
   const dependencyNames = {
     getters: [
       "getContext", "getPathCanvas", "getPathSvg", "getProjection", "getViewportSize",
-      "getTextureStyleConfig", "isBootInteractionReady", "isHgoRuntimePreviewReady",
+      "getTextureStyleConfig", "isBootInteractionReady",
     ],
     helpers: ["clamp", "getDashPattern", "getSafeBlendMode", "getSafeCanvasColor", "normalizeTextureMode"],
     effects: ["requestTextureRerender", "drawDayNightRuntimePass", "recordRenderPerfMetric"],
@@ -192,7 +188,7 @@ test("pass facades preserve readiness, mode selection, and day-night delegation"
   assert.deepEqual(dayNight.events, [["day-night-runtime", 12, { interactive: true }]]);
 });
 
-test("graticule lines and labels retain line-before-label drawing and HGO suppression", () => {
+test("graticule lines and labels retain line-before-label drawing", () => {
   const harness = createHarness({ textureMode: "graticule" });
   harness.owner.drawLineEffectsPass(4, { interactive: true });
   const lastStrokeIndex = harness.events.findLastIndex((event) => event === "stroke");
@@ -203,12 +199,6 @@ test("graticule lines and labels retain line-before-label drawing and HGO suppre
   assert.equal(harness.events.filter((event) => event === "save").length,
     harness.events.filter((event) => event === "restore").length);
 
-  const hgo = createHarness({ textureMode: "graticule", hgoReady: true });
-  hgo.owner.drawTextureLabelEffectsPass(8);
-  assert.deepEqual(hgo.events, [
-    "hgo-ready",
-    ["metric", "drawTextureLabelEffectsPass", 0, { skipped: true, reason: "hgo-runtime-preview" }],
-  ]);
 });
 
 test("paper asset, pattern, and noise caches keep identity until explicit raster invalidation", () => {

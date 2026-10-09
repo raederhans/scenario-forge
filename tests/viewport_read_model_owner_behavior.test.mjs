@@ -66,7 +66,6 @@ function createCompositionHarness() {
       return { x, y, k: 1 };
     },
   };
-  let hgoReady = false;
   let capturedOptions = null;
   const context = {
     MAP_PAN_PADDING_PX: 50,
@@ -89,8 +88,8 @@ function createCompositionHarness() {
       calls.renderable += 1;
       return [featureB];
     },
-    isHgoRuntimePreviewReady: () => hgoReady,
-    getProjectedHgoRuntimePreviewBounds: () => ({ minX: 1, minY: 2, maxX: 3, maxY: 4 }),
+
+
     createViewportReadModelOwner: (options) => {
       capturedOptions = options;
       return createViewportReadModelOwner(options);
@@ -111,7 +110,6 @@ function createCompositionHarness() {
     featureB,
     getCapturedOptions: () => capturedOptions,
     getOwner: () => context.globalThis.getViewportReadModelOwner(),
-    setHgoReady: (value) => { hgoReady = Boolean(value); },
   };
 }
 
@@ -121,8 +119,7 @@ function createHarness({
   pathSvg = null,
   zoomIdentity = createZoomIdentity(),
   landFeatures = [],
-  hgoReady = false,
-  hgoBounds = null,
+  contentBounds = null,
   logicalCanvasDimensions = [800, 600],
   projectedBoundsById = {},
   renderableLandFeatures = null,
@@ -152,7 +149,7 @@ function createHarness({
     };
   };
   const getPanContentBoundsSnapshots = () => {
-    if (hgoReady && hgoBounds) return [{ ...hgoBounds }];
+    if (contentBounds) return [{ ...contentBounds }];
     if (!pathSvg) return [];
     return landFeatures
       .filter((feature) => {
@@ -171,7 +168,7 @@ function createHarness({
       .filter(Boolean);
   };
   const getProjectedRenderableContentBoundsSnapshots = () => {
-    if (hgoReady && hgoBounds) return [{ ...hgoBounds }];
+    if (contentBounds) return [{ ...contentBounds }];
     if (modelState.width <= 0 || modelState.height <= 0 || !landFeatures.length) return [];
     const renderable = renderableLandFeatures
       ? renderableLandFeatures(logicalCanvasDimensions[0], logicalCanvasDimensions[1], { forceProd: true })
@@ -280,10 +277,10 @@ test("calculatePanExtent returns padded fallback when path or land is unavailabl
   );
 });
 
-test("calculatePanExtent uses HGO runtime preview bounds when ready", () => {
-  const hgoBounds = { minX: 10, minY: 20, maxX: 110, maxY: 220, width: 100, height: 200 };
+test("calculatePanExtent uses supplied content bounds", () => {
+  const contentBounds = { minX: 10, minY: 20, maxX: 110, maxY: 220, width: 100, height: 200 };
 
-  assert.deepEqual(createHarness({ hgoReady: true, hgoBounds }).owner.calculatePanExtent(), [[-40, -30], [160, 270]]);
+  assert.deepEqual(createHarness({ contentBounds }).owner.calculatePanExtent(), [[-40, -30], [160, 270]]);
 });
 
 test("calculatePanExtent uses projected feature bounds and skip decisions for land features", () => {
@@ -303,12 +300,12 @@ test("calculatePanExtent uses projected feature bounds and skip decisions for la
   assert.deepEqual(calls.skipped.map((entry) => entry.id), ["A", "B", "SKIP"]);
 });
 
-test("getProjectedRenderableContentBounds returns HGO bounds and null for missing inputs", () => {
-  const hgoBounds = { minX: 1, minY: 2, maxX: 3, maxY: 4, width: 2, height: 2 };
+test("getProjectedRenderableContentBounds returns supplied bounds and null for missing inputs", () => {
+  const contentBounds = { minX: 1, minY: 2, maxX: 3, maxY: 4, width: 2, height: 2 };
 
   assert.deepEqual(
-    createHarness({ hgoReady: true, hgoBounds }).owner.getProjectedRenderableContentBounds(),
-    hgoBounds,
+    createHarness({ contentBounds }).owner.getProjectedRenderableContentBounds(),
+    contentBounds,
   );
   assert.equal(createHarness({ landFeatures: [] }).owner.getProjectedRenderableContentBounds(), null);
   assert.equal(
@@ -440,14 +437,6 @@ test("map_renderer composes viewport reads through numeric snapshots and live va
   harness.context.rendererSurfaceHost.getProjection = () => null;
   assert.equal(owner.getProjectionRenderSignature(), "projection:na");
 
-  harness.setHgoReady(true);
-  assert.deepEqual(owner.calculatePanExtent(), [[-49, -48], [53, 54]]);
-  assert.deepEqual(
-    owner.getProjectedRenderableContentBounds(),
-    { minX: 1, minY: 2, maxX: 3, maxY: 4, width: 2, height: 2 },
-  );
-
-  harness.setHgoReady(false);
   harness.context.runtimeState.landData = { features: [] };
   assert.equal(owner.getCenteredFitZoomTransform(), harness.context.globalThis.d3.zoomIdentity);
   assert.deepEqual(harness.calls.translated, []);

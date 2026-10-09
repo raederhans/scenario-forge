@@ -24,7 +24,7 @@ const RECORD_KEYS = [
 ];
 const ARRAY_FIELDS = ["stateReadClass", "stateWriteClass", "existingDependencyOwners", "browserLanes"];
 const SCALAR_ENUM_FIELDS = [
-  ["familyId", RENDER_PASS_FAMILY_IDS, ["foundation", "political", "hgo-preview", "context", "visual-effects", "borders", "labels"]],
+  ["familyId", RENDER_PASS_FAMILY_IDS, ["foundation", "political", "context", "visual-effects", "borders", "labels"]],
   ["implementationStatus", RENDER_PASS_IMPLEMENTATION_STATUS_IDS, ["inline", "thin-wrapper", "delegated-existing", "owned-p3", "hold"]],
   ["plannedPhase", RENDER_PASS_PLANNED_PHASE_IDS, ["P3.1", "P3.2", "P3.3a", "P3.3b", "P3.4", "P3.5", "existing-delegated", "hold", "future-review"]],
   ["riskTier", RENDER_PASS_RISK_TIER_IDS, ["low", "medium", "high"]],
@@ -39,8 +39,6 @@ const ENUM_CONTRACTS = [
 const STATIC_IMPORTS_BY_MODULE = new Map();
 const DEPENDENCY_IMPORT_HOST_OVERRIDES = new Map([
   [
-    "js/core/map_renderer/hgo_runtime_preview_frame_commit.js",
-    "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
   ],
 ]);
 
@@ -86,7 +84,7 @@ function collectStaticImports(modulePath) {
 }
 
 test("inventory shape, enums, records, and nested arrays are frozen", () => {
-  assert.equal(RENDER_PASS_FAMILY_INVENTORY.length, 14);
+  assert.equal(RENDER_PASS_FAMILY_INVENTORY.length, 13);
   assert.equal(Object.isFrozen(RENDER_PASS_FAMILY_INVENTORY), true);
   for (const [values, expected] of ENUM_CONTRACTS) {
     assert.equal(Object.isFrozen(values), true);
@@ -119,9 +117,9 @@ test("inventory exactly matches the canonical runtime pass universe and order", 
   const inventoryNames = RENDER_PASS_FAMILY_INVENTORY.map((record) => record.passName);
   const idleNames = idleDefinitions.map((definition) => definition.passName);
 
-  assert.equal(new Set(inventoryNames).size, 14);
-  assert.equal(new Set(idleNames).size, 14);
-  assert.equal(new Set(secondaryNames).size, 14);
+  assert.equal(new Set(inventoryNames).size, 13);
+  assert.equal(new Set(idleNames).size, 13);
+  assert.equal(new Set(secondaryNames).size, 13);
   assert.deepEqual(inventoryNames, idleNames);
   assert.deepEqual([...inventoryNames].sort(), [...secondaryNames].sort());
   assert.notDeepEqual(secondaryNames, idleNames, "the secondary catalog keeps its known local order difference");
@@ -142,7 +140,7 @@ test("family and planned-phase membership stays binding", () => {
   assert.deepEqual(namesFor("plannedPhase", "P3.4"), ["background"]);
   assert.deepEqual(namesFor("plannedPhase", "P3.5"), []);
   assert.deepEqual(namesFor("plannedPhase", "hold"), ["borders"]);
-  assert.deepEqual(namesFor("plannedPhase", "existing-delegated"), ["physicalBase", "populationHeatmap", "hgoPreview"]);
+  assert.deepEqual(namesFor("plannedPhase", "existing-delegated"), ["physicalBase", "populationHeatmap"]);
   assert.deepEqual(namesFor("plannedPhase", "future-review"), ["labels"]);
   assert.deepEqual(namesFor("implementationStatus", "thin-wrapper"), ["borders", "labels"]);
   assert.deepEqual(namesFor("implementationStatus", "owned-p3"), [
@@ -202,7 +200,7 @@ test("population heatmap inventory binds its raster owner, composition order, an
   assert.match(entryHost, /if \(passNames\.includes\("populationHeatmap"\)\) assertPopulationHeatmapReadyForExport\(\)/);
 });
 
-test("all 14 records resolve entry hosts and reviewed dependency anchors", () => {
+test("all 13 records resolve entry hosts and reviewed dependency anchors", () => {
   const transportOwnerSource = readText("js", "core", "renderer", "transport_overview_render_owner.js");
   const uiStateSource = readText("js", "core", "state", "ui_state.js");
   assert.match(transportOwnerSource, /ensureTransportOverviewStyleConfigState\(runtimeState\)/);
@@ -231,21 +229,14 @@ test("all 14 records resolve entry hosts and reviewed dependency anchors", () =>
     RENDER_PASS_FAMILY_INVENTORY.find((record) => record.passName === "physicalBase")
       .existingDependencyOwners.includes("js/core/renderer/physical_layer_render_owner.js"),
   );
-  assert.ok(
-    RENDER_PASS_FAMILY_INVENTORY.find((record) => record.passName === "hgoPreview")
-      .existingDependencyOwners.includes("js/core/map_renderer/hgo_runtime_preview_render_owner.js"),
-  );
 });
 
-test("browser lanes resolve to package scripts and preserve the known HGO gap", () => {
+test("browser lanes resolve to package scripts", () => {
   const packageScripts = JSON.parse(readText("package.json")).scripts;
   for (const record of RENDER_PASS_FAMILY_INVENTORY) {
     assert.equal(new Set(record.browserLanes).size, record.browserLanes.length);
     for (const lane of record.browserLanes) assert.equal(typeof packageScripts[lane], "string", `${lane} should be a package script`);
   }
-  const hgo = RENDER_PASS_FAMILY_INVENTORY.find((record) => record.passName === "hgoPreview");
-  assert.deepEqual(hgo.browserLanes, []);
-  assert.match(hgo.notes, /dedicated browser lane gap/);
   assert.deepEqual(
     RENDER_PASS_FAMILY_INVENTORY.find((record) => record.passName === "textureLabels").browserLanes,
     ["test:e2e:layer:regression"],

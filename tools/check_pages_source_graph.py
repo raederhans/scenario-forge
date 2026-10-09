@@ -55,6 +55,18 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
     for name in pages.APP_SHARED_DIRS:
         tree(root / name, f"app/{name}")
     add(editor, "app/index.html")
+    hgo = root / "apps/hgo"
+    add(hgo / "index.html", "hgo/index.html")
+    add(hgo / "styles.css", "hgo/styles.css")
+    tree(hgo / "src", "hgo/src")
+    manifest_path = hgo / "assets/default/manifest.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        add(manifest_path, "hgo/assets/default/manifest.json")
+        for entry in manifest["assets"].values():
+            add(manifest_path.parent / entry["url"], f"hgo/assets/default/{entry['url']}")
+        provenance = manifest["source"]["provenanceUrl"]
+        add(manifest_path.parent / provenance, f"hgo/assets/default/{provenance}")
     for name in pages.DATA_RUNTIME_FILES:
         add(root / "data" / name, f"app/data/{name}")
     for name in pages.DATA_RUNTIME_DIRS:
@@ -63,8 +75,6 @@ def build_source_inventory(root: Path) -> dict[str, Path]:
         add(root / "data/hgo_catalogs" / name, f"app/data/hgo_catalogs/{name}")
     for tier in pages.HGO_IDENTITY_FLAG_TIERS:
         tree(root / "data/hgo_catalogs/flags_png" / tier, f"app/data/hgo_catalogs/flags_png/{tier}")
-    for name in pages.PAGES_HGO_RUNTIME_FILES:
-        add(root / "data/hgo_runtime" / name, f"app/data/hgo_runtime/{name}")
     policy = pages.build_pages_production_publication_policy(root / "data/scenarios")
     for name in ("scenarios", "transport_layers"):
         tree(root / "data" / name, f"app/data/{name}", lambda path: policy.allows(path.relative_to(root)))
@@ -121,6 +131,10 @@ def check_source_graph(root: Path = ROOT, *, dynamic_import_registry=None) -> di
         for target, source in inventory.items()
         if Path(target).suffix.lower() in {".html", ".js", ".mjs", ".css"}
     }
+    if "app/index.html" in texts:
+        texts["app/index.html"] = texts["app/index.html"].replace('href="apps/hgo/index.html"', 'href="../hgo/"')
+    if "hgo/index.html" in texts:
+        texts["hgo/index.html"] = texts["hgo/index.html"].replace('href="../../index.html"', 'href="../app/"')
     graph = pages.build_pages_module_graph(
         available_paths=available, source_texts=texts,
         dynamic_import_registry=dynamic_import_registry,

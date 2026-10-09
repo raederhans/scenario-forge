@@ -980,13 +980,13 @@ export function createCountryInspectorController({
     scrollContainer.scrollTop += nextTop - previousTop;
   };
 
-  const restoreInspectorFocus = (target) => {
-    if (!target) return;
+  const restoreInspectorFocus = (focusTarget) => {
+    if (!focusTarget) return;
     let element = null;
-    if (target.type === "group") {
-      element = list?.querySelector(`[data-inspector-group-key="${target.groupKey}"]`);
-    } else if (target.type === "children") {
-      const refs = countryRowRefsByCode.get(normalizeCountryCode(target.countryCode)) || [];
+    if (focusTarget.type === "group") {
+      element = list?.querySelector(`[data-inspector-group-key="${focusTarget.groupKey}"]`);
+    } else if (focusTarget.type === "children") {
+      const refs = countryRowRefsByCode.get(normalizeCountryCode(focusTarget.countryCode)) || [];
       element = refs.find((ref) => ref.childrenToggle)?.childrenToggle || null;
     }
     element?.focus?.({ preventScroll: true });

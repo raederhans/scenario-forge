@@ -55,7 +55,7 @@ Before committing or opening a PR, use `npm run pr:plan` and follow [development
 
 ## Availability and sources
 
-The public editor includes the five baselines above. HGO 1936 is a developer/local preview; Cloud Saves and community features require the local backend preview. Roads and rail are the strongest public transport layers; other transport and thematic families have varying preview coverage.
+The main editor includes the five baselines above. [HGO has a separate native-pixel editor](apps/hgo/README.md), with editable sea regions and its own loading, project files, renderer and checks. Cloud Saves and community features require the local backend preview. Roads and rail are the strongest public transport layers; other transport and thematic families have varying preview coverage.
 
 Code and documentation use the [MIT License](LICENSE). Third-party datasets and derived maps retain their source-specific terms. Consult the [source ledger](data/source_ledger.json) and the map metadata ([TNO](landing/assets/work-alt-history-med.json), [HOI4 comparison](landing/assets/work-scenario-switch-europe.json)) before reusing data-derived assets.
 
