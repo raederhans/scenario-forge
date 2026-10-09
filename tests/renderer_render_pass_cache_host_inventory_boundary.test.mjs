@@ -107,7 +107,7 @@ const RENDER_PASS_CACHE_HOST_OWNER_TOKENS = Object.freeze([
   "\"withRenderTarget\"",
   "\"getRenderPassLayout\"",
   "passCanvas.getContext(\"2d\")",
-  "Math.max(0.0001, Number(transform?.k || 1))",
+  "k = runEffect(trace, \"prepareTargetContext\", passContext, transform, layout);",
   "drawResult = drawFn(k);",
   "Object.freeze([...(trace?.effectOrder || [])])",
 ]);
@@ -216,6 +216,8 @@ test("P51 host owner owns only pass cache host setup", () => {
     "schedulePoliticalPathWarmup",
     "drawCanvas",
     "buildHitCanvas",
+    "hgoPreview",
+    "normalizeTransformScale",
   ]) {
     assertExcludes(ownerSource, token, "P51 owner must avoid cache commit or broad lifecycle token");
   }
