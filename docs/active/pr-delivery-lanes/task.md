@@ -10,9 +10,9 @@ The new UI command resolves to five tests in two spec files (`--list` only). No 
 ## Step 4 and rollout
 
 - [x] Remove duplicate Scenario/Transport full checks after main merges; retain manual full audit and required PR checks. Seven lane tests, eight scenario/transport planner contracts and six-workflow actionlint passed.
-- [ ] Commit and push this system, then validate and merge its PR.
+- [x] Commit and push this system, then validate and merge its PR.
 - [x] Install the system in the daily local checkout without disturbing unrelated WIP. Scoped merge preserved six overlapping files, including README, WGI/HDI script additions, asset declarations and the worktree registry. Local script/route checks and seven source-graph fixture tests passed.
-- [ ] Confirm final required checks, protected merge and Pages deployment.
+- [x] Confirm final required checks, protected merge and Pages deployment.
 
 Remote rollout is tracked in PR #206. Initial hosted full Pages, smoke/Golden Demo, Scenario and Transport checks passed. The adaptive structural suite caught an outdated exact-command fixture; its expected set now includes the new delivery lane regression. Selector artifact upload now includes the explicitly listed hidden `.runtime` evidence files.
 
@@ -31,3 +31,13 @@ All six required checks passed on `23abde42` (formal run `37264848965`); the fin
 The six-case UI probe passed on `0dec0cc8` (`37265982600`), with a three-second source check and 3.9-minute browser execution; #207 is closed and its worktree archived. Formal fast, performance and contracts passed, but the full smoke twice hit a duplicate 20-second TNO state-read deadline. Trace shows the read returned the correct scenario after 21.74 seconds, while the strict scenario-id/apply-idle wait had already passed. A pure UI contract test also unnecessarily booted TNO. The final smoke repair preserves state/UI assertions while removing that duplicate poll and selecting a scenario-free UI setup.
 
 The repaired full smoke passed locally: four cases, two workers, zero retries, 51.6 seconds. TNO retained scenario ID and shell-owner assertions with zero console or network issues. Only these two test preparation/waiting paths changed; the six-case UI lane and renderer code are unchanged.
+
+## Final rollout receipt
+
+- PR [#206](https://github.com/raederhans/scenario-forge/pull/206) merged through protected main at `06d09474deeb2df53b7f476fb91fef40d14139b7`; all six required checks passed on source head `eafbd1a5aa47c921341fd273f616be448820928c`. No protection or administrator bypass was used.
+- Final PR verification passed all 207 selected child-safe execution groups, smoke and Golden Demo. Deferred groups are not claimed executed.
+- Probe #207 passed all six focused UI cases and the three-second source graph check; its performance gate completed while observation continued. The probe was closed without merging and its worktree archived.
+- [Pages deployment](https://github.com/raederhans/scenario-forge/actions/runs/37269018822) attempt 2 passed source-artifact admission, two save/reload cases, publication and the actual deployed URL smoke. The receipt binds the artifact to the merge SHA.
+- Attempt 1 observed sample import pending behind the full interaction infrastructure task. One diagnostic rerun of the same SHA passed. This records an intermittent queue-delay failure; it does not claim a scheduler performance fix. Timeouts, retries and assertions were preserved.
+- The delivery system and smoke fixes are installed in the daily checkout. Its existing HEAD `f47b36f413ec4787042cbe12420122ed2135d180`, index and unrelated WIP remain intact; baseline-specific source-proof/fixture updates were not copied onto the older local product baseline. No whole-workspace acceptance is claimed.
+- The formal worktree is retained for ignored recovery backups and CI receipts under `.runtime/reports/generated/pr-delivery-rollout/`. This final status is a local closeout note, not an additional release commit.

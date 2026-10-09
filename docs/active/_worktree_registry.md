@@ -1,5 +1,11 @@
 # Worktree Registry
 
+## 2026-10-09 全工作区对账与归档（覆盖下方历史拓扑）
+
+主目录已从 `f47b36f41` 快进到 `ab915f9ee`；原 1,015 项混合 WIP 经逐文件备份和内容核对后保留在固定恢复引用中。15 个旧工作树完整同卷归档，包含约 42.86 GiB 的 ignored `.runtime` 证据；36 个已覆盖或临时探针本地分支、27 个远端分支在保存恢复引用后清理。64 个历史 stash 保留。旧路径和下方“仍保留工作树”的描述仅表示历史状态，当前恢复位置及每项证据见 [工作区同步记录](workspace-reconciliation-20261009/context.md)。
+
+剩余有效候选仅在 `C:/Users/raede/.codex/worktrees/workspace-recovery-20261009/mapcreator`、`codex/workspace-recovery-20261009` 中整合：WGI 导航缓存数据身份，以及 South Asia / Blank Base 地块恢复。主目录保持已交付版本，候选的提交、检查、合并状态见 [处理状态](workspace-reconciliation-20261009/task.md)。本轮归档完整保留文件，没有将旧 WIP 全量回放，也没有通过清理动作改变远端 main。
+
 ## 2026-10-07 HGO 独立原生编辑器
 
 实施工作区 `C:/Users/raede/.codex/worktrees/hgo-native-editor/mapcreator` 保留原始改动及现场证据；审核整合使用 `C:/Users/raede/.codex/worktrees/hgo-reviewed-integration/mapcreator`、分支 `codex/hgo-reviewed-integration`，基于最新主线整合人口专题及地理缓存优化。用户已授权审核、合并、推送，root 为唯一 Git 和共享验证负责人。审核发现已修复；状态权限采用经过逐项证明的精确退役，不扩大冻结基线。实现提交 `96014184a5c761f4c4d9c7c1a4d9f38d413fd51e` 已推送；[PR #215](https://github.com/raederhans/scenario-forge/pull/215) 记录最终 required checks 和受保护合并回执。全仓库存重建的既有债与本次 required checks 分别记录。两处 HGO 工作区保留忽略的源数据、浏览器与治理证明，供恢复和审计；主工作区及其他 worktree 未归属 WIP 保留。详见 [HGO 任务记录](hgo-native-editor/task.md)。
