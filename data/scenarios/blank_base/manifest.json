@@ -1,6 +1,6 @@
 {
   "audit_url": "data/scenarios/blank_base/audit.json",
-  "baseline_hash": "9edd8e56c7809cfd2b4c561250527dcf3c90229926114cef11420b38f7e2beee",
+  "baseline_hash": "112726925d1778cd8f0626bd45bf2ae206a56acf7f1abab9e36b3a99f2cce0f3",
   "bookmark_date": "2026.1.1.12",
   "bookmark_description": "Editable ownerless map canvas with full province geometry and no pre-assigned ownership, controllers, or cores.",
   "bookmark_name": "Blank Map",
@@ -18,7 +18,7 @@
     "GB",
     "FR"
   ],
-  "generated_at": "2026-06-17T00:00:00.000Z",
+  "generated_at": "2026-10-09T04:45:08.827883+00:00",
   "map_mode": "blank",
   "owners_url": "data/scenarios/blank_base/owners.by_feature.json",
   "palette_id": "hoi4_vanilla",
@@ -32,11 +32,46 @@
   "runtime_topology_url": "data/scenarios/blank_base/runtime_topology.topo.json",
   "scenario_contract_profile": "lightweight_base",
   "scenario_id": "blank_base",
-  "snapshot_fingerprint": "f3b3ed6ddfa71c96db4c59e9af33afc2aec66f7efcb5ba642c0768e2b1d8e1f9",
+  "snapshot_fingerprint": "181d1c57403a7239d8a7a2beb2bf1beb22717cc865750b47f34370b35715a056",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
+    "ownerless_restoration_sources": [
+      {
+        "path": "data/ne_10m_admin_1_states_provinces.shp",
+        "sha256": "c6f5c8b4b1320d9417033762419c6df1eb423989cd880fba78ea0b1e3522cbe4"
+      },
+      {
+        "path": "data/geoBoundaries-IND-ADM2.geojson",
+        "sha256": "8bef6929fd65432e7dc775e7c44473e84efff064ebddbfd6b834e6291546db40"
+      },
+      {
+        "path": "data/europe_topology.json",
+        "sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7"
+      },
+      {
+        "path": "data/global_lakes.geojson",
+        "sha256": "3e9b2dac45850639a6d3fd03b0a7bee5a585f8b9d93f4b5041012c1ff20c110b"
+      },
+      {
+        "path": "data/ne_10m_admin_1_states_provinces.dbf",
+        "sha256": "445a8a9bea889634faf0af18081830df0b05b8471fc6af8dc42aecdd7a71bba1"
+      },
+      {
+        "path": "data/ne_10m_admin_1_states_provinces.shx",
+        "sha256": "37a9e2bc79ed31d3bdea3cb62d928f77281a1c88d645cd33430231c75dbcf350"
+      },
+      {
+        "path": "data/ne_10m_admin_1_states_provinces.prj",
+        "sha256": "a02a27b1d1982c8516d83398e85a3c8b1aef1713c13ef4d84d7bde17430c07c4"
+      },
+      {
+        "path": "data/ne_10m_admin_1_states_provinces.cpg",
+        "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+      }
+    ],
     "ownerless_topology_source": "data/scenarios/modern_world/runtime_topology.topo.json",
-    "runtime_topology_sha256": "acd7ba81f35385fb5c1b461fc223bdbdc1fa540ecc0b17427eda711b5c11ca8f"
+    "ownerless_topology_source_sha256": "917320332f37571d2fa1cca21881e0b5fc2cc9ede4966abe914a1e9259eabf1e",
+    "runtime_topology_sha256": "8de345d7caecbc627c0892a348f05c237795a4a469c57648b6db017c9ecee812"
   },
   "special_zone_layers_url": "data/scenarios/blank_base/special_zone_layers.json",
   "style_defaults": {
@@ -53,24 +88,24 @@
   "summary": {
     "approximate_count": 0,
     "blocker_count": 0,
-    "changed_feature_count": 11322,
+    "changed_feature_count": 23127,
     "controller_count": 0,
     "controller_rule_count": 0,
     "critical_region_check_count": 0,
     "critical_unresolved_count": 0,
     "failed_region_check_count": 0,
-    "feature_count": 11322,
+    "feature_count": 23127,
     "geometry_blocker_count": 0,
     "manual_reviewed_feature_count": 0,
     "manual_reviewed_region_count": 0,
     "owner_controller_split_feature_count": 0,
     "owner_count": 0,
     "quality_counts": {
-      "ownerless_editable_topology": 11322
+      "ownerless_editable_topology": 23127
     },
     "scenario_rule_blocker_count": 0,
     "source_counts": {
-      "ownerless_editable_topology": 11322
+      "ownerless_editable_topology": 23127
     },
     "synthetic_count": 0,
     "synthetic_owner_feature_count": 0,

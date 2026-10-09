@@ -3,6 +3,7 @@
     "description": "Tests that import geospatial/scientific packages (geopandas/shapely/rasterio/numpy family).",
     "patterns": [
       "tests/test_arctic_recovery.py",
+      "tests/test_blank_base_rebuild.py",
       "tests/test_atlantropa_coastline.py",
       "tests/test_atlantropa_geometry_quality.py",
       "tests/test_atlantropa_identity.py",

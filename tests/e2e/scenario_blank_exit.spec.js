@@ -188,6 +188,7 @@ async function getBlankStateSnapshot(page) {
       mapSemanticMode: String(state.mapSemanticMode || ''),
       activeSovereignCode: String(state.activeSovereignCode || ''),
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
+      visualOverrideCount: Object.keys(state.visualOverrides || {}).length,
       controllerCount: 0,
       landFeatureCount: Array.isArray(state.landData?.features) ? state.landData.features.length : 0,
       runtimeFeatureCount: Number(state.runtimePoliticalTopology?.objects?.political?.geometries?.length || 0),
@@ -238,19 +239,20 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
   await ensureScenario(page, 'tno_1962');
   await clearScenario(page);
 
+  await waitForDetailTopologySettled(page, { reason: 'scenario-blank-exit:baseline-clear' });
+  await flushPendingRender(page);
+  await waitForRenderIdle(page, { scenarioId: '', timeout: 60_000, requireInfra: true });
   const clearedBaselineState = await getBlankStateSnapshot(page);
   expect(clearedBaselineState).toMatchObject({
     activeScenarioId: '',
     mapSemanticMode: 'blank',
     activeSovereignCode: '',
     sovereigntyCount: 0,
+    visualOverrideCount: 0,
     controllerCount: 0,
     hasScenarioGeoLocalePatch: false,
     hasScenarioCityOverrides: false,
   });
-  await waitForDetailTopologySettled(page, { reason: 'scenario-blank-exit:baseline-clear' });
-  await flushPendingRender(page);
-  await waitForRenderIdle(page, { scenarioId: '', timeout: 60_000, requireInfra: true });
   const clearedBaselinePixels = await captureCanvasSample(page);
 
   await ensureScenario(page, 'tno_1962');
@@ -262,6 +264,7 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
     mapSemanticMode: 'blank',
     activeSovereignCode: '',
     sovereigntyCount: 0,
+    visualOverrideCount: 0,
     controllerCount: 0,
     showBlankFeatureLabels: false,
     showCityPoints: false,
@@ -280,22 +283,23 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
   const blankScenarioPixels = await captureCanvasSample(page);
 
   const manualPaint = await page.evaluate(async () => {
-    const { render } = await import('/js/core/map_renderer.js');
+    const { refreshResolvedColorsForFeatures } = await import('/js/core/map_renderer.js');
     const { state } = await import('/js/core/state.js');
-    const { getFeatureOwnerCode, getFeatureId, setFeatureOwnerCode } = await import('/js/core/sovereignty_manager.js');
+    const { getFeatureOwnerCode, getFeatureId } = await import('/js/core/sovereignty_manager.js');
+    const { applyFeaturePaintState } = await import('/js/core/state/color_state.js');
     const { buildTooltipModel } = await import('/js/ui/i18n.js');
     const targetFeature = Array.isArray(state.landData?.features)
       ? state.landData.features.find((feature) => {
         const featureId = getFeatureId(feature);
-        return !!featureId;
+        return featureId === 'IN_ADM2_76128533B4839184447445';
       })
       : null;
     if (!targetFeature) {
-      throw new Error('No editable feature found for blank map paint regression.');
+      throw new Error('Restored Udupi feature was not loaded for blank map paint regression.');
     }
     const featureId = getFeatureId(targetFeature);
-    const changed = setFeatureOwnerCode(featureId, 'US');
-    render();
+    const changed = applyFeaturePaintState(state, [featureId], '#12ab34').includes(featureId);
+    refreshResolvedColorsForFeatures([featureId], { renderNow: true });
     const tooltipModel = buildTooltipModel(targetFeature);
     return {
       changed,
@@ -305,6 +309,8 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
       tooltipCountryCode: String(tooltipModel?.countryCode || ''),
       tooltipCountryDisplayName: String(tooltipModel?.countryDisplayName || ''),
       ownerCode: getFeatureOwnerCode(featureId, { skipEnsure: false }),
+      paintColor: state.visualOverrides[featureId],
+      resolvedColor: state.colors[featureId],
       sovereigntyCount: Object.keys(state.sovereigntyByFeatureId || {}).length,
       mapSemanticMode: String(state.mapSemanticMode || ''),
     };
@@ -315,8 +321,10 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
   expect(manualPaint.tooltipRegionName).toBe(manualPaint.featureName);
   expect(manualPaint.tooltipCountryCode).toBe('');
   expect(manualPaint.tooltipCountryDisplayName).toBe('');
-  expect(manualPaint.ownerCode).toBe('US');
-  expect(manualPaint.sovereigntyCount).toBe(1);
+  expect(manualPaint.ownerCode).toBe('');
+  expect(manualPaint.paintColor).toBe('#12ab34');
+  expect(manualPaint.resolvedColor).toBe('#12ab34');
+  expect(manualPaint.sovereigntyCount).toBe(0);
   expect(manualPaint.mapSemanticMode).toBe('blank');
 
   await resetScenario(page);
@@ -327,6 +335,7 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
     mapSemanticMode: 'blank',
     activeSovereignCode: '',
     sovereigntyCount: 0,
+    visualOverrideCount: 0,
     controllerCount: 0,
     showBlankFeatureLabels: false,
     showCityPoints: false,
@@ -345,11 +354,11 @@ test('blank_base stays ownerless editable and exiting scenarios returns to the c
   await ensureScenario(page, 'tno_1962');
   await clearScenario(page);
 
-  await expect.poll(() => getBlankStateSnapshot(page), { timeout: 30000 }).toEqual(clearedBaselineState);
   await page.waitForTimeout(1200);
   await waitForDetailTopologySettled(page, { reason: 'scenario-blank-exit:final-clear' });
   await flushPendingRender(page);
   await waitForRenderIdle(page, { scenarioId: '', timeout: 60_000, requireInfra: true });
+  await expect.poll(() => getBlankStateSnapshot(page), { timeout: 30000 }).toEqual(clearedBaselineState);
 
   const clearedBlankPixels = await captureCanvasSample(page);
   const blankCanvasDelta = countChangedPixels(clearedBaselinePixels, clearedBlankPixels, 10);

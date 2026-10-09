@@ -9,13 +9,17 @@ from map_builder.geo.utils import pick_column
 from map_builder.io.fetch import fetch_ne_zip, fetch_or_load_geojson
 
 
-def _rep_points(gdf: gpd.GeoDataFrame) -> gpd.GeoSeries:
-    gdf_ll = gdf
-    if gdf_ll.crs is None:
-        gdf_ll = gdf_ll.set_crs("EPSG:4326", allow_override=True)
-    elif gdf_ll.crs.to_epsg() != 4326:
-        gdf_ll = gdf_ll.to_crs("EPSG:4326")
-    return gdf_ll.geometry.representative_point()
+DEFERRED_ISLAND_SHAPE_IDS = {
+    "76128533B28397307540277",  # North & Middle Andaman
+    "76128533B22587307937261",  # South Andaman
+    "76128533B33103505211400",  # Nicobars
+    "76128533B41477629049356",  # Lakshadweep
+}
+
+
+def exclude_deferred_island_districts(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Exclude the reviewed source island districts without culling mainland."""
+    return gdf.loc[~gdf["shapeID"].astype(str).isin(DEFERRED_ISLAND_SHAPE_IDS)].copy()
 
 
 def apply_south_asia_replacement(hybrid_gdf: gpd.GeoDataFrame, land_gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -51,10 +55,7 @@ def apply_south_asia_replacement(hybrid_gdf: gpd.GeoDataFrame, land_gdf: gpd.Geo
 
     ind_gdf["adm1_name"] = ""
 
-    # Island cull using representative points (Andaman/Nicobar + Lakshadweep)
-    reps = _rep_points(ind_gdf)
-    keep_mask = ~((reps.x > 88.0) & (reps.y < 15.0)) & ~((reps.x < 75.0) & (reps.y < 14.0))
-    ind_gdf = ind_gdf.loc[keep_mask].copy()
+    ind_gdf = exclude_deferred_island_districts(ind_gdf)
 
     # Spatial join ADM2 -> ADM1 to derive state names
     try:

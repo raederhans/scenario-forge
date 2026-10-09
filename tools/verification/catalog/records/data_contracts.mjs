@@ -1,5 +1,17 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DATA_CONTRACTS_RECORDS = [
+  {
+    id: "python:blank-base-rebuild",
+    commandRef: "python -m unittest tests.test_blank_base_rebuild -q",
+    sourceRefs: [
+      "tests/test_blank_base_rebuild.py", "tools/build_blank_base_scenario.py",
+      "map_builder/processors/south_asia.py",
+    ],
+    ownerHints: ["geo-contract"], domains: ["geo-contract"], tiers: ["heavy"],
+    cost: "heavy", resourceLocks: ["heavy-geo"], executionOwners: ["main-thread"],
+    profiles: ["full"], platforms: ["all"], entrypointPolicyIndex: 0,
+    verificationOrder: null, selectorOrder: null, verification: null, selector: {},
+  },
   ...[
     ["arctic_recovery", "python -m unittest tests.test_arctic_recovery -q", "map_builder/processors/arctic_recovery.py"],
     ["polar_asset_repair", "python -m unittest tests.test_polar_asset_repair -q", "tools/rebuild_polar_assets.py"],

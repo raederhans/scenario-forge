@@ -3,7 +3,7 @@
   "scenario": {
     "id": "blank_base",
     "version": 2,
-    "baselineHash": "9edd8e56c7809cfd2b4c561250527dcf3c90229926114cef11420b38f7e2beee",
+    "baselineHash": "112726925d1778cd8f0626bd45bf2ae206a56acf7f1abab9e36b3a99f2cce0f3",
     "viewMode": "ownership"
   },
   "mapSemanticMode": "ownership",
