@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 74,
     "nodeCount": 90,
-    "reverseIndexKeyCount": 141,
+    "reverseIndexKeyCount": 142,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -1503,6 +1503,7 @@
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
         "js/core/state.js",
+        "js/core/state/color_state.js",
         "js/ui/i18n.js",
         "tests/e2e/support/playwright-app.js"
       ],
@@ -1512,6 +1513,7 @@
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
         "js/core/state.js",
+        "js/core/state/color_state.js",
         "js/ui/i18n.js",
         "js/ui/sidebar.js",
         "tests/e2e/support/playwright-app-paths.js",
@@ -1527,6 +1529,7 @@
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
         "js/core/state.js",
+        "js/core/state/color_state.js",
         "js/ui/i18n.js",
         "js/ui/sidebar.js"
       ]
@@ -2705,6 +2708,9 @@
     ],
     "js/core/state/actions/ui_visibility_actions.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
+    ],
+    "js/core/state/color_state.js": [
+      "tests/e2e/scenario_blank_exit.spec.js"
     ],
     "js/core/state/content_state.js": [
       "tests/e2e/dev/shared_labels_runtime.dev.spec.js"
