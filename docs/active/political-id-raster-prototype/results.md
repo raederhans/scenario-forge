@@ -64,6 +64,8 @@
 
 [PR #217](https://github.com/raederhans/scenario-forge/pull/217) 首轮浏览器 smoke、Pages 构建检查、性能门禁、transport、剧本契约和 Quick Fill 通过。快速契约检查发现 renderer 改动对应的当前源码指纹未同步；复核状态权限不变后，仅刷新两个契约文件中的 25 项当前指纹。历史权限证据、冻结基线和检测规则均未调整。85 项相关契约测试通过，含恢复旧写权限、错误借用边界等反向用例；输出为 `review-source-proofs.log`。补充提交仍须通过其自身的 required CI。
 
+后续 CI 通过源码证明，另发现剧本 chunk 契约仍匹配旧 producer 门控结构。同步该断言，继续要求导出／inline river 不进入交互 producer，并要求 ID producer 与旧 Worker 互斥；viewport 与 pass signature 身份断言保留。94 项剧本和政治层编排行为检查通过（与前述 renderer 批次有重叠，不累计为独立用例），输出为 `review-scenario-gating.log`。最终合并仍以最新提交的远端门禁为准。
+
 ## 第 1–6 步历史结果
 
 以下为上一批结果，其阶段范围与计时不代表上述最新版本。
