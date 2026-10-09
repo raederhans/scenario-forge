@@ -62,6 +62,8 @@
 
 审核输出保留为 `.runtime/reports/generated/political-id-raster/review-{targets,metadata,boundaries}.log`；此前完整应用浏览器证据仍适用，当前修复没有改变像素生成或 canonical 编辑格式。最终推送、检查与合并状态以 GitHub PR 回执为准，不用本地报告代替。
 
+[PR #217](https://github.com/raederhans/scenario-forge/pull/217) 首轮浏览器 smoke、Pages 构建检查、性能门禁、transport、剧本契约和 Quick Fill 通过。快速契约检查发现 renderer 改动对应的当前源码指纹未同步；复核状态权限不变后，仅刷新两个契约文件中的 25 项当前指纹。历史权限证据、冻结基线和检测规则均未调整。85 项相关契约测试通过，含恢复旧写权限、错误借用边界等反向用例；输出为 `review-source-proofs.log`。补充提交仍须通过其自身的 required CI。
+
 ## 第 1–6 步历史结果
 
 以下为上一批结果，其阶段范围与计时不代表上述最新版本。

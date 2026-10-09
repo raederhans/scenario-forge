@@ -40,6 +40,7 @@ No commits, push, merge or deployment. Default enablement remains evidence gated
 - [x] Add regressions for immediate disposal and validly encoded assets with wrong size/origin.
 - [x] Complete scope review and direct checks: 200 renderer tests, 118 metadata tests, 13 Python boundaries, architecture and Pages source references.
 - [x] Split the new local test route into bounded groups; preserve the existing whole-workspace edit-budget rejection as a planning limitation.
+- [x] Refresh current-source proof fingerprints after CI identified drift; 85 authority/borrowed-effect contract tests pass without changing historical permissions or frozen baselines.
 
 Remote delivery: commit and push this feature branch, then use its GitHub PR for final-head required checks and merge. Verify the merge commit on remote main before reporting completion. Git receipts are the authority for this phase; this checklist records preparation, not future CI success. The worktree remains available for its ignored pilot and browser evidence.
 
