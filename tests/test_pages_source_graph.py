@@ -33,6 +33,9 @@ class PagesSourceGraphTests(unittest.TestCase):
         self.write("js/feature.mjs", "export const value = 1;")
         self.write("js/lazy.js", "export default 1;")
         self.write("data/CATALOG.json", "{}")
+        self.write("apps/hgo/index.html", '<script type="module" src="./src/main.js"></script><link href="./styles.css" rel="stylesheet">')
+        self.write("apps/hgo/src/main.js", 'export const title = "原生地图";')
+        self.write("apps/hgo/styles.css", "body { color: white; }")
 
     def write(self, name, source):
         path = self.root / name
@@ -46,8 +49,12 @@ class PagesSourceGraphTests(unittest.TestCase):
         before = {p.relative_to(self.root): (p.read_bytes(), p.stat().st_mtime_ns) for p in self.root.rglob("*") if p.is_file()}
         result = self.check()
         self.assertEqual("pass", result["status"], result)
-        self.assertEqual(5, result["javascript_file_count"])
-        self.assertEqual(2, result["css_file_count"])
+        self.assertEqual(6, result["javascript_file_count"])
+        self.assertEqual(3, result["css_file_count"])
+        self.assertEqual(
+            ["hgo/src/main.js", "hgo/styles.css"],
+            next(entry for entry in result["entrypoints"] if entry["id"] == "hgo")["resource_references"],
+        )
         after = {p.relative_to(self.root): (p.read_bytes(), p.stat().st_mtime_ns) for p in self.root.rglob("*") if p.is_file()}
         self.assertEqual(before, after)
         self.assertFalse((self.root / "dist").exists())
@@ -61,6 +68,9 @@ class PagesSourceGraphTests(unittest.TestCase):
             ("landing/theme.css", "theme.css"),
             ("landing/assets/地图.svg", "assets/地图.svg"),
             ("data/CATALOG.json", "app/data/CATALOG.json"),
+            ("apps/hgo/index.html", "hgo/index.html"),
+            ("apps/hgo/src/main.js", "hgo/src/main.js"),
+            ("apps/hgo/styles.css", "hgo/styles.css"),
         ]
         for source, target in cases:
             with self.subTest(source=source):

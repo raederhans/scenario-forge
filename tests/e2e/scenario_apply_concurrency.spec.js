@@ -262,12 +262,12 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
     );
     globalThis.__scenarioTestJsonDelays = {
       ...(globalThis.__scenarioTestJsonDelays || {}),
-      "data/scenarios/hgo_1936/manifest.json": 500,
+      "data/scenarios/hoi4_1936/manifest.json": 500,
       "data/scenarios/blank_base/manifest.json": 900,
     };
     const { applyScenarioByIdCommand } = await import("/js/core/scenario_dispatcher.js");
     const { state } = await import("/js/core/state.js");
-    ["hgo_1936", "blank_base", "modern_world"].forEach((scenarioId) => {
+    ["hoi4_1936", "blank_base", "modern_world"].forEach((scenarioId) => {
       if (state.scenarioBundleCacheById && typeof state.scenarioBundleCacheById === "object") {
         delete state.scenarioBundleCacheById[scenarioId];
       }
@@ -278,6 +278,29 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
       showToastOnComplete: false,
     };
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    // Observe these three events as they occur: a public scenario may emit
+    // enough renderer diagnostics to evict them from the bounded history.
+    const observations = { blankBaseCommitted: false, staleBlankBaseSkipped: false, modernDrainComplete: false };
+    const diagnosticSnapshots = diagnosticsBefore.snapshots;
+    const originalPush = diagnosticSnapshots.push;
+    Object.defineProperty(diagnosticSnapshots, "push", {
+      configurable: true,
+      value(...snapshots) {
+        for (const snapshot of snapshots) {
+          if (Number(snapshot.sequence || 0) <= sequenceStart) continue;
+          observations.blankBaseCommitted ||= snapshot.phase === "scenario-apply-target-committed"
+            && snapshot.requestedScenarioId === "blank_base";
+          observations.staleBlankBaseSkipped ||= snapshot.phase === "scenario-apply-stale-callback-skipped"
+            && snapshot.expectedScenarioId === "blank_base"
+            && snapshot.extra?.callbackPhase === "commit-start"
+            && snapshot.extra?.resolution === "skipped-stale-request";
+          observations.modernDrainComplete ||= snapshot.phase === "scenario-apply-queue-drain-complete"
+            && snapshot.requestedScenarioId === "modern_world"
+            && snapshot.extra?.finalActiveScenarioId === "modern_world";
+        }
+        return originalPush.apply(this, snapshots);
+      },
+    });
     const waitForQueueDrainStarted = async (scenarioId, timeoutMs = 60_000) => {
       const startedAt = Date.now();
       while (true) {
@@ -295,15 +318,18 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
         await sleep(25);
       }
     };
-    const first = applyScenarioByIdCommand("hgo_1936", commandOptions);
-    await sleep(30);
-    const second = applyScenarioByIdCommand("blank_base", commandOptions);
-    const middleStarted = await waitForQueueDrainStarted("blank_base");
-    const third = applyScenarioByIdCommand("modern_world", commandOptions);
-    const results = await Promise.allSettled([first, second, third]);
-    const diagnostics = globalThis.__scenarioForgeRenderTransactions || {};
-    const snapshots = Array.isArray(diagnostics.snapshots) ? diagnostics.snapshots : [];
-    const recentSnapshots = snapshots.filter((snapshot) => Number(snapshot.sequence || 0) > sequenceStart);
+    let middleStarted;
+    let results;
+    try {
+      const first = applyScenarioByIdCommand("hoi4_1936", commandOptions);
+      await sleep(30);
+      const second = applyScenarioByIdCommand("blank_base", commandOptions);
+      middleStarted = await waitForQueueDrainStarted("blank_base");
+      const third = applyScenarioByIdCommand("modern_world", commandOptions);
+      results = await Promise.allSettled([first, second, third]);
+    } finally {
+      delete diagnosticSnapshots.push;
+    }
     return {
       middleStarted,
       results: results.map((result) => ({
@@ -313,28 +339,14 @@ test('scenario apply is single-flight and english ui uses entry.en overrides', a
       })),
       activeScenarioId: String(state.activeScenarioId || ""),
       scenarioApplyInFlight: !!state.scenarioApplyInFlight,
-      blankBaseCommitted: recentSnapshots.some((snapshot) => (
-        snapshot.phase === "scenario-apply-target-committed"
-        && snapshot.requestedScenarioId === "blank_base"
-      )),
-      staleBlankBaseSkipped: recentSnapshots.some((snapshot) => (
-        snapshot.phase === "scenario-apply-stale-callback-skipped"
-        && snapshot.expectedScenarioId === "blank_base"
-        && snapshot.extra?.callbackPhase === "commit-start"
-        && snapshot.extra?.resolution === "skipped-stale-request"
-      )),
-      modernDrainComplete: recentSnapshots.some((snapshot) => (
-        snapshot.phase === "scenario-apply-queue-drain-complete"
-        && snapshot.requestedScenarioId === "modern_world"
-        && snapshot.extra?.finalActiveScenarioId === "modern_world"
-      )),
+      ...observations,
     };
   });
 
   expect(middleStartedResult.middleStarted).toBe(true);
   expect(middleStartedResult.results.every((result) => result.status === "fulfilled")).toBe(true);
   expect(middleStartedResult.results.map((result) => result.valueScenarioId)).toEqual([
-    "hgo_1936",
+    "hoi4_1936",
     "modern_world",
     "modern_world",
   ]);

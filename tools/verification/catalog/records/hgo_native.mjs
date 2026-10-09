@@ -8,7 +8,7 @@ export function createHgoNativeRecords(existingRecords) {
     ["data", "test:py:hgo-native", ["apps/hgo/tools", "apps/hgo/assets", "apps/hgo/requirements.txt", "apps/hgo/tests/test_dataset.py", "apps/hgo/tests/test_build_app.py"]],
     ["routing", "test:node:hgo-project-routing", ["js/core/hgo_project_routing.js", "js/core/file_manager.js", "apps/hgo/src/integration/handoff.js", "tests/hgo_project_routing_behavior.test.mjs", "tools/verification/catalog/records/hgo_native.mjs"]],
   ].map(([id, commandRef, sourceRefs], index) => ({
-    id: `local:hgo-native:${id}`, commandRef, sourceRefs,
+    id: commandRef.startsWith("test:node:") ? `node:${commandRef}` : `local:hgo-native:${id}`, commandRef, sourceRefs,
     ownerHints: ["hgo-native"], domains: ["hgo-native"], tiers: ["contract"], cost: "fast",
     resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"], platforms: ["all"],
     entrypointPolicyIndex: 5, verificationOrder: null, selectorOrder: start + index,

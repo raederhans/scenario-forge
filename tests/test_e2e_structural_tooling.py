@@ -78,7 +78,7 @@ def parse_workflow_job_blocks(workflow: str) -> dict[str, str]:
 
 def parse_required_pr_workflow_jobs(workflow: str) -> dict[str, str]:
     jobs = parse_workflow_job_blocks(workflow)
-    expected_jobs = {"pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-required"}
+    expected_jobs = {"pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo", "pr-verify-required"}
     if set(jobs) != expected_jobs:
         raise AssertionError(f"workflow job set mismatch: expected {sorted(expected_jobs)}, found {sorted(jobs)}")
     return jobs
@@ -1848,13 +1848,16 @@ const page = {
         self.assertRegex(jobs["pr-verify-smoke"], r"(?m)^      profile: pr-smoke$")
         self.assertIn("run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}", jobs["pr-verify-smoke"])
         self.assertIn("run-pages-check: ${{ needs.pr-plan.outputs.run_pages == 'true' }}", jobs["pr-verify-fast"])
+        self.assertEqual(parse_job_scalar(jobs["pr-verify-hgo"], "needs"), ["pr-plan"])
+        self.assertEqual(parse_job_scalar(jobs["pr-verify-hgo"], "uses"), "./.github/workflows/hgo-native.yml")
+        self.assertRegex(jobs["pr-verify-hgo"], r"(?m)^    if: needs\.pr-plan\.outputs\.run_hgo == 'true'$")
 
         required_job = jobs["pr-verify-required"]
         self.assertEqual(parse_job_scalar(required_job, "name"), "PR Verify Required")
         self.assertEqual(parse_job_scalar(required_job, "if"), "always()")
         self.assertEqual(
             parse_job_scalar(required_job, "needs"),
-            ["pr-plan", "pr-verify-fast", "pr-verify-smoke"],
+            ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"],
         )
         self.assertEqual(parse_job_scalar(required_job, "runs-on"), "ubuntu-latest")
         self.assertIsNone(parse_job_scalar(required_job, "uses"))
@@ -1942,7 +1945,7 @@ jobs:
         workflow = (REPO_ROOT / ".github" / "workflows" / "pr-verify.yml").read_text(encoding="utf-8")
         required_job = parse_workflow_job_blocks(workflow)["pr-verify-required"]
         script = extract_required_aggregator_script(required_job)
-        job_names = ["pr-plan", "pr-verify-fast", "pr-verify-smoke"]
+        job_names = ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"]
         result_states = ["success", "failure", "cancelled", "skipped"]
 
         for result_matrix in itertools.product(result_states, repeat=len(job_names)):
@@ -1953,6 +1956,7 @@ jobs:
                 }
                 needs["pr-plan"]["outputs"]["run_smoke"] = "true"
                 needs["pr-plan"]["outputs"]["run_fast"] = "true"
+                needs["pr-plan"]["outputs"]["run_hgo"] = "true"
                 completed = run_command(
                     "node",
                     "-e",
@@ -1964,6 +1968,7 @@ jobs:
                     result_by_job["pr-plan"] == "success"
                     and result_by_job["pr-verify-fast"] == "success"
                     and result_by_job["pr-verify-smoke"] == "success"
+                    and result_by_job["pr-verify-hgo"] == "success"
                 )
                 self.assertEqual(completed.returncode == 0, should_pass, completed.stdout + completed.stderr)
 
@@ -1973,15 +1978,22 @@ jobs:
         script = extract_required_aggregator_script(required_job)
         valid_needs = {
             job: {"result": "success", "outputs": {}}
-            for job in ("pr-plan", "pr-verify-fast", "pr-verify-smoke")
+            for job in ("pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo")
         }
-        valid_needs["pr-plan"]["outputs"] = {"run_smoke": "true", "run_fast": "true"}
+        valid_needs["pr-plan"]["outputs"] = {"run_smoke": "true", "run_fast": "true", "run_hgo": "true"}
         cases = {
-            "missing": json.dumps({job: result for job, result in valid_needs.items() if job != "pr-verify-smoke"}),
+            **{
+                f"missing-{missing_job}": json.dumps({job: result for job, result in valid_needs.items() if job != missing_job})
+                for missing_job in valid_needs
+            },
             "extra": json.dumps({**valid_needs, "SecurityScan": {"result": "success", "outputs": {}}}),
             "unknown-result": json.dumps({
                 **valid_needs,
                 "pr-verify-smoke": {"result": "timed_out", "outputs": {}},
+            }),
+            "unknown-hgo-result": json.dumps({
+                **valid_needs,
+                "pr-verify-hgo": {"result": "timed_out", "outputs": {}},
             }),
             "malformed-json": "{",
         }
@@ -2602,7 +2614,7 @@ if (lines[0].specPath !== 'tests/e2e/ui_contract_foundation.spec.js') {
 
 
 class ScenarioContractMatrixRoutingTests(unittest.TestCase):
-    SCENARIOS = ["blank_base", "hgo_1936", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"]
+    SCENARIOS = ["blank_base", "hoi4_1936", "hoi4_1939", "modern_world", "tno_1962"]
 
     def test_pr_planners_read_name_only_tree_diff_without_pr_files_api(self):
         for workflow_name in (
@@ -2675,6 +2687,10 @@ class ScenarioContractMatrixRoutingTests(unittest.TestCase):
         self.assertIn("  strict-scenario-contract-review:", workflow)
         for scenario in self.SCENARIOS:
             self.assertIn(f"          - {scenario}\n", workflow)
+        required_job = parse_workflow_job_blocks(workflow)["strict-scenario-contract-review"]
+        matrix = re.search(r"^        scenario_id:\n((?:          - [a-z0-9_]+\n)+)", required_job, re.MULTILINE)
+        self.assertIsNotNone(matrix)
+        self.assertEqual(sorted(re.findall(r"          - ([a-z0-9_]+)", matrix.group(1))), self.SCENARIOS)
         self.assertIn("Fast success for scenario-unrelated changes", workflow)
         self.assertIn("group: scenario-contract-${{ github.event_name }}-${{ github.ref }}", workflow)
         self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", workflow)
