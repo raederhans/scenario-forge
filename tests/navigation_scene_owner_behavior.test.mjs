@@ -308,6 +308,25 @@ test("scene, projection, water and style edits each invalidate identity", () => 
   change(() => { f.state.styleConfig.ocean.fillColor = "#654321"; });
 });
 
+test("thematic WGI readiness and data revisions invalidate the cached navigation scene", () => withGeoPath(() => {
+  const f = fixture({
+    styleConfig: { ocean: { fillColor: "#123456" }, thematic: { enabled: true } },
+    thematicWgiRuntime: { status: "loading", revision: 3 },
+  });
+  const style = f.state.styleConfig;
+  f.owner.prepare();
+  assert.equal(f.calls.prepare.length, 1);
+
+  f.state.thematicWgiRuntime.status = "ready";
+  f.owner.prepare();
+  assert.equal(f.calls.prepare.length, 2, "loaded indicator data must request a fresh navigation raster");
+
+  f.state.thematicWgiRuntime.revision++;
+  f.owner.prepare();
+  assert.equal(f.calls.prepare.length, 3, "a refreshed indicator revision must invalidate that raster again");
+  assert.strictEqual(f.state.styleConfig, style, "runtime invalidation does not depend on a style edit");
+}));
+
 test("shared lakes remain visible while scenario lakes obey the water toggle", () => withGeoPath(() => {
   const f = fixture({ showWaterRegions: false });
   f.owner.prepare();
