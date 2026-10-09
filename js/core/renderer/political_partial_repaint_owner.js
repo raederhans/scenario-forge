@@ -336,6 +336,7 @@ export function createPoliticalPartialRepaintOwner({
   }
 
   function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
+    if (getters.isPoliticalIdRasterSelected?.()) return false;
     const state = getRuntimeState();
     const cache = getRenderPassCacheState();
     const dirtyIds = Array.from(cache.partialPoliticalDirtyIds || []).filter(Boolean);

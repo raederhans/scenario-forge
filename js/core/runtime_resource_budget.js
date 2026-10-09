@@ -4,6 +4,7 @@ export const RUNTIME_RESOURCE_SOFT_LIMIT_BYTES = 256 * 1024 * 1024;
 export const RESOURCE_CATEGORIES = Object.freeze([
   "inFlight", "decodeTransient", "mainChunkPayload", "mainGeometry",
   "workerGeometry", "projectedPaths", "workerSurfaces", "bitmaps", "transport",
+  "rasterTiles", "gpuTextures",
 ]);
 
 export function createRuntimeResourceBudget({ softLimitBytes = RUNTIME_RESOURCE_SOFT_LIMIT_BYTES } = {}) {

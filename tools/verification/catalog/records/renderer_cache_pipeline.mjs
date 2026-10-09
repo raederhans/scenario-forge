@@ -1,5 +1,64 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
+const politicalIdRasterRoute = {
+  ownerHints: ["renderer-runtime"], domains: ["renderer-runtime"], tiers: ["contract"],
+  cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+  platforms: ["all"], entrypointPolicyIndex: 5,
+  verificationOrder: null, verification: null, selector: {},
+};
+
 export const RENDERER_CACHE_PIPELINE_RECORDS = [
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:political-id-raster-data", selectorOrder: 5000,
+    commandRef: "node --test tests/political_id_raster_source_behavior.test.mjs tests/political_id_raster_cache_behavior.test.mjs tests/political_id_raster_coordinates_behavior.test.mjs tests/political_id_raster_identity_behavior.test.mjs tests/political_id_raster_pick_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/renderer/political_id_raster_source.js",
+      "js/core/renderer/political_id_raster_cache.js",
+      "js/core/renderer/political_id_raster_coordinates.js",
+      "js/core/renderer/political_id_raster_identity.js",
+      "js/core/renderer/political_id_raster_pick.js",
+      "tests/political_id_raster_source_behavior.test.mjs",
+      "tests/political_id_raster_cache_behavior.test.mjs",
+      "tests/political_id_raster_coordinates_behavior.test.mjs",
+      "tests/political_id_raster_identity_behavior.test.mjs",
+      "tests/political_id_raster_pick_behavior.test.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:political-id-raster-build", selectorOrder: 5001,
+    commandRef: "node --test tests/political_id_raster_tile_behavior.test.mjs tests/political_id_raster_worker_client_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/renderer/political_id_raster_tile.js",
+      "js/core/political_id_raster_worker_client.js",
+      "js/workers/political_id_raster.worker.js",
+      "tests/political_id_raster_tile_behavior.test.mjs",
+      "tests/political_id_raster_worker_client_behavior.test.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
+    id: "local:renderer:political-id-raster-runtime", selectorOrder: 5002,
+    commandRef: "node --test tests/political_id_raster_runtime_owner_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs tests/political_id_raster_assets_behavior.test.mjs tests/political_id_raster_pilot_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs",
+    sourceRefs: [
+      "js/core/map_renderer.js",
+      "js/core/renderer/political_partial_repaint_owner.js",
+      "js/core/renderer/political_pass_orchestrator_owner.js",
+      "js/core/renderer/political_id_raster_runtime_owner.js",
+      "js/core/renderer/political_id_raster_assets.js",
+      "js/core/renderer/political_id_raster_gpu.js",
+      "tests/political_id_raster_runtime_owner_behavior.test.mjs",
+      "tests/political_id_raster_runtime_assets_behavior.test.mjs",
+      "tests/political_id_raster_assets_behavior.test.mjs",
+      "tests/political_id_raster_pilot_behavior.test.mjs",
+      "tests/political_partial_repaint_owner_behavior.test.mjs",
+      "tests/political_pass_orchestrator_owner_behavior.test.mjs",
+      "tests/renderer_political_pass_orchestration_preflight.test.mjs",
+      "tools/prototypes/political-id-raster",
+    ],
+    // These routes cover source/coverage and main-app producer gating. Real Canvas/WebGL pixels and
+    // timing still require the standalone browser harness described in README.
+  },
   {
     "id": "node:test:node:exact-after-settle-pass-catalog",
     "commandRef": "test:node:exact-after-settle-pass-catalog",

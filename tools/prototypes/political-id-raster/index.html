@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Political ID raster · 局部原型</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { font-family: system-ui, sans-serif; color: #202e35; background: #f3f5f4; }
+  body { margin: 24px auto; max-width: 1500px; padding: 0 20px; }
+  h1 { font-size: 23px; margin-bottom: 8px; }
+  p { max-width: 960px; line-height: 1.65; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0; }
+  button, select, input { font: inherit; padding: 7px; }
+  button { cursor: pointer; }
+  .maps { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  figure { margin: 0; min-width: 0; }
+  figcaption { font-weight: 600; margin-bottom: 8px; }
+  canvas { width: 100%; display: block; background: #aadaff; border: 1px solid #bcc9cb; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; background: white; padding: 16px; }
+  #status { min-height: 1.5em; }
+  [hidden] { display: none !important; }
+  .maps.single { grid-template-columns: 1fr; max-width: 850px; }
+  @media (max-width: 850px) { .maps { grid-template-columns: 1fr; } }
+</style>
+<h1>政治填色 · ID 栅格局部原型</h1>
+<p>同一份矢量几何与颜色状态，对照 Canvas 和 ID 瓦片。点击地块后可改色、撤销。这里只验证固定视图下的政治填色；完整剧本加载、边界、标注与河流仍由现有应用负责。</p>
+<div class="controls">
+  <label>样本 <select id="scenario"><option value="hoi4_1939">HOI4 1939</option><option value="hoi4_1936">HOI4 1936</option><option value="tno_1962">TNO 1962</option><option value="synthetic">孔洞 / 细条 / 重叠</option></select></label>
+  <label>像素倍率 <select id="dpr"><option value="1">1×</option><option value="2">2×</option></select></label>
+  <button id="load">加载样本</button>
+  <label>显示 <select id="mode"><option value="both">并排对照</option><option value="canvas">Canvas</option><option value="raster">ID 栅格</option></select></label>
+  <label>颜色 <input id="color" type="color" value="#d64f46"></label>
+  <button id="paint">应用颜色</button><button id="undo">撤销</button>
+  <button id="suite">运行三剧本验证</button><button id="download" disabled>下载结果</button>
+</div>
+<p id="status" role="status">准备加载</p>
+<div class="maps" id="maps"><figure id="native-panel"><figcaption>Canvas · 缓存矢量路径</figcaption><canvas id="native" width="720" height="480"></canvas></figure><figure id="raster-panel"><figcaption>ID 瓦片 · GPU 查颜色表</figcaption><canvas id="raster" width="720" height="480"></canvas></figure></div>
+<p id="selection">点击地图选择地块。</p>
+<details><summary>测量结果与样本范围</summary><pre id="result">尚未运行</pre></details>
+<script src="../../../vendor/d3.v7.min.js"></script>
+<script src="../../../vendor/topojson-client.min.js"></script>
+<script type="module" src="prototype.js"></script>
+</html>

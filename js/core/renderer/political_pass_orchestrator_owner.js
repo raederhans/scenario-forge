@@ -33,6 +33,9 @@ export function createPoliticalPassOrchestratorOwner({
   const hasInlinePoliticalPartitions = typeof getters.hasInlinePoliticalPartitions === "function"
     ? getters.hasInlinePoliticalPartitions
     : () => false;
+  const isPoliticalIdRasterSelected = typeof getters.isPoliticalIdRasterSelected === "function"
+    ? getters.isPoliticalIdRasterSelected
+    : () => false;
   const resolvePoliticalPassIdentity = requireFunction(
     resolvers.resolvePoliticalPassIdentity,
     "resolvers.resolvePoliticalPassIdentity",
@@ -90,6 +93,9 @@ export function createPoliticalPassOrchestratorOwner({
     effects.drawPoliticalFineFeatureLoop,
     "effects.drawPoliticalFineFeatureLoop",
   );
+  const drawPoliticalIdRasterFine = typeof effects.drawPoliticalIdRasterFine === "function"
+    ? effects.drawPoliticalIdRasterFine
+    : () => null;
   const clearPendingPoliticalColorEdit = requireFunction(
     effects.clearPendingPoliticalColorEdit,
     "effects.clearPendingPoliticalColorEdit",
@@ -114,8 +120,10 @@ export function createPoliticalPassOrchestratorOwner({
       publishPoliticalPassDiagnostics({ identity, viewport });
     }
 
+    const exportRendering = isExportRendering();
     const inlinePoliticalPartitions = hasInlinePoliticalPartitions();
-    const consumedBitmapResult = isExportRendering() || inlinePoliticalPartitions
+    const idRasterSelected = !exportRendering && !inlinePoliticalPartitions && isPoliticalIdRasterSelected();
+    const consumedBitmapResult = exportRendering || inlinePoliticalPartitions || idRasterSelected
       ? null
       : consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);
     if (
@@ -159,11 +167,44 @@ export function createPoliticalPassOrchestratorOwner({
       });
     }
 
-    const packetState = !isExportRendering() && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()
+    if (idRasterSelected) {
+      const idRasterMetrics = drawPoliticalIdRasterFine({ k, identity, viewport });
+      if (idRasterMetrics && typeof idRasterMetrics === "object"
+        && Object.hasOwn(idRasterMetrics, "renderedIds")
+        && Number.isFinite(Number(idRasterMetrics.fillMs))
+        && Number.isFinite(Number(idRasterMetrics.strokeMs))
+        && Number.isFinite(Number(idRasterMetrics.renderedCount))) {
+        recordRenderPerfMetric("drawPoliticalFeatureFillLoop", Number(idRasterMetrics.fillMs || 0), {
+          renderedCount: Number(idRasterMetrics.renderedCount || 0),
+          visibleItemCount: viewport.visibleItemCount,
+          source: "political-id-raster",
+        });
+        recordRenderPerfMetric("drawPoliticalFeatureStrokeLoop", Number(idRasterMetrics.strokeMs || 0), {
+          renderedCount: Number(idRasterMetrics.renderedCount || 0),
+          visibleItemCount: viewport.visibleItemCount,
+          source: "political-id-raster",
+        });
+        if (!exportRendering) {
+          clearPendingPoliticalColorEdit({
+            renderedCount: Number(idRasterMetrics.renderedCount || 0),
+            renderedIds: idRasterMetrics.renderedIds,
+            paintSource: "political-id-raster",
+          });
+        }
+        return createPoliticalPassDrawResult(identity.sceneIdentity, {
+          politicalDataStage: "fine",
+          fullPoliticalReady: true,
+          finePoliticalCacheReady: true,
+          reason: "political-id-raster",
+        });
+      }
+    }
+
+    const packetState = !idRasterSelected && !exportRendering && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()
       ? buildPoliticalRasterWorkerPacketEffect({ identity, viewport })
       : { packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" };
-    if (!isExportRendering() && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
-    recordPoliticalRasterWorkerSnapshot();
+    if (!idRasterSelected && !exportRendering && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });
+    if (!idRasterSelected) recordPoliticalRasterWorkerSnapshot();
 
     const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit();
     const progressiveRecoveryCoarseSkipCandidate = (
@@ -210,7 +251,7 @@ export function createPoliticalPassOrchestratorOwner({
       renderedCount: Number(featureMetrics.renderedCount || 0),
       visibleItemCount: viewport.visibleItemCount,
     });
-    if (!isExportRendering()) {
+    if (!exportRendering) {
       clearPendingPoliticalColorEdit({
         renderedCount: Number(featureMetrics.renderedCount || 0),
         renderedIds: featureMetrics.renderedIds,

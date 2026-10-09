@@ -1,0 +1,46 @@
+# Status — stages 1–11
+
+- [x] Stage 1: isolated baseline at 98425dcc; fixture and measurement contract fixed.
+- [x] Stage 1: real sample baseline measurements captured.
+- [x] Stage 2: derived geometry/palette source and behavior tests.
+- [x] Stage 3: local ID/coverage tile renderer and browser harness.
+- [x] Stage 3: real browser quality, palette/undo, cold/warm cost and memory report.
+- [x] Stages 1–3: focused verification, PR planning and final scope review.
+- [x] Stages 1–3: close owned browser/server processes; retain report and screenshots.
+- [x] Stage 4: opt-in main-app political fine pass, single producer, complete-frame and latest-palette guards, existing vector fallback.
+- [x] Stage 4: preserve canonical editing, picking, river partition ordering, project persistence and export.
+- [x] Stage 5: projected-space multilevel tiles, cancellable Worker, bounded CPU LRU and GPU admission.
+- [x] Stage 5: local old/new bounds invalidation, complete contributors, stable IDs and selective GPU retention.
+- [x] Stage 6: actual app edit/undo/redo/save/reimport/export and all three scenarios.
+- [x] Stage 6: corrected native baseline, cold/warm measurements, pan/zoom reuse, context loss and unsupported GPU.
+- [x] Stage 6: 135 Node tests and 8 Python boundary tests, architecture/import graph/route checks.
+- [x] Stage 6 decision: retain opt-in; measured fractional-scale quality does not meet the provisional gate.
+- [x] Stages 4–6: final PR plan and scope review; close owned browser/server and confirm port released.
+
+User permits a small raster quality reduction. The six fixed-view prototype cases
+passed the separate approximate-quality criteria. The new runtime fractional-scale
+and full TNO views exceed that gate, so `political_id_raster=1` is required and
+default rendering stays unchanged. See results.md for measurements and limits.
+
+## Authorized follow-on: stages 7–11
+
+- [x] 7: compare actual-app native partial repaint and ID rendering; attribute fractional-scale quality loss.
+- [x] 8: bounded projected-path reuse, measured gutter policy and stable display coordinates.
+- [x] 9: versioned prebuilt tile codec, reproducible pilot builder and stable geometry/ordering identities.
+- [x] 10: conservative CPU interior picking with exact existing selection fallback.
+- [x] 11: asset-first tile loading, bounded persistent cache, revisit/failure/integration evidence.
+- [x] Focused behavior, browser and repository routing checks; update results and close owned processes.
+
+No commits, push, merge or deployment. Default enablement remains evidence gated.
+
+## Authorized review and delivery
+
+- [x] Inspect current main/worktree ownership and protected merge requirements.
+- [x] Review runtime assets and Worker/GPU boundaries; fix and re-review two P2 findings.
+- [x] Add regressions for immediate disposal and validly encoded assets with wrong size/origin.
+- [x] Complete scope review and direct checks: 200 renderer tests, 118 metadata tests, 13 Python boundaries, architecture and Pages source references.
+- [x] Split the new local test route into bounded groups; preserve the existing whole-workspace edit-budget rejection as a planning limitation.
+
+Remote delivery: commit and push this feature branch, then use its GitHub PR for final-head required checks and merge. Verify the merge commit on remote main before reporting completion. Git receipts are the authority for this phase; this checklist records preparation, not future CI success. The worktree remains available for its ignored pilot and browser evidence.
+
+The preceding no-push statement records the stages 7–11 handoff; the latest user request authorizes this delivery phase. Deployment verification is separate.

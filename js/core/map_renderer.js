@@ -45,6 +45,7 @@ import { createPoliticalDerivedStateCache } from "./renderer/political_derived_s
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
+import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
 import { createLabelDrawSnapshotOwner } from "./renderer/label_draw_snapshot.js";
@@ -712,6 +713,7 @@ let staticMeshCache = {
 };
 let countryFillPaletteOwner = null;
 let geometryRasterRuntimeOwner = null;
+let politicalIdRasterRuntimeOwner = null;
 let politicalEntriesInvalidationEpoch = 0;
 let overviewFrameOwner = null;
 let navigationSceneOwner = null;
@@ -719,6 +721,9 @@ const labelDrawSnapshotOwner = createLabelDrawSnapshotOwner();
 let navigationExactRefreshNeeded = false;
 let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
+// Explicit opt-in until whole-application cold/warm and visual gates support a
+// default change. Scenario loading, editing and export have no separate format.
+const politicalIdRasterEnabled = new URLSearchParams(globalThis.location?.search || "").get("political_id_raster") === "1";
 let contourHostFillColorCache = new WeakMap();
 let staticMeshSourceCountries = {
   primary: new Set(),
@@ -3437,6 +3442,77 @@ function getContextPassOrchestratorOwner() {
   return contextPassOrchestratorOwner;
 }
 
+function isPoliticalIdRasterSelected() {
+  return politicalIdRasterEnabled && !exportRenderInProgress && debugMode === "PROD"
+    && isBootInteractionReady() && runtimeState.firstVisibleFramePainted
+    && !runtimeState.startupReadonly && !runtimeState.startupReadonlyUnlockInFlight
+    && !hasVisibleRiverPartitions()
+    && ["hoi4_1936", "hoi4_1939", "tno_1962"].includes(runtimeState.activeScenarioId);
+}
+
+function getPoliticalIdRasterRuntimeOwner() {
+  politicalIdRasterRuntimeOwner ||= createPoliticalIdRasterRuntimeOwner({
+    state: runtimeState,
+    surface: rendererSurfaceHost,
+    resourceBudget: pageResourceBudget,
+    helpers: {
+      isEnabled: isPoliticalIdRasterSelected,
+      getFeatureId,
+      getBounds: (feature, id) => getProjectedFeatureBounds(feature, { featureId: id }),
+      getLayout: () => getRenderPassLayout("political"),
+      hasStroke: feature => !isAtlantropaSeaFeature(feature),
+      getAssetSceneKey: () => runtimeState.activeScenarioId,
+      getAssetManifestUrl: () => new URLSearchParams(globalThis.location?.search || "").get("political_id_assets")
+        || runtimeState.activeScenarioManifest?.political_id_raster_manifest_url || "",
+      getChangedColorIds: () => {
+        const cache = getRenderPassCacheState();
+        return cache.reasons?.political === "refresh-colors" && cache.partialPoliticalDirtyIds?.size
+          ? Array.from(cache.partialPoliticalDirtyIds) : null;
+      },
+      resolveColor: (feature, id) => {
+        const color = globalThis.d3.color(getPoliticalPartialRepaintOwner().getPoliticalFeatureFillColor(feature, id, 0));
+        if (!color || color.opacity !== 1) throw new Error("Political ID raster requires opaque feature fills.");
+        return color.formatHex();
+      },
+      getFeatures: () => {
+        const layout = getRenderPassLayout("political");
+        return orderPoliticalShellUnderlayFirst((runtimeState.landData?.features || []).map((feature, drawOrder) => ({
+          feature, drawOrder, id: getFeatureId(feature),
+        })).filter(({ feature, id }) => id && feature.geometry && !shouldExcludePoliticalVisualFeature(feature, id)
+          && !shouldSkipFeature(feature, layout.paddedWidth, layout.paddedHeight))).map(entry => entry.feature);
+      },
+      getSourceIdentity: () => {
+        const layout = getRenderPassLayout("political");
+        const foreground = new Set(Object.keys(runtimeState.visualOverrides || {})
+          .filter(id => !!getSafeCanvasColor(runtimeState.visualOverrides[id], null)));
+        if (hasPendingPoliticalColorEdit()) {
+          for (const id of getRenderPassCacheState().pendingPoliticalColorEditIds || []) foreground.add(id);
+        }
+        return {
+          sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
+          projectionKey: String(getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())),
+          coverageKey: [runtimeState.mapSemanticMode,
+            runtimeState.scenarioShellOverlayRevision].join(":"),
+          version: [getObjectIdentityToken(runtimeState.landData?.features), runtimeState.topologyRevision,
+            runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
+            layout.paddedWidth, layout.paddedHeight,
+            [...foreground].sort().join(",")].join(":"),
+          colorVersion: [runtimeState.colorRevision, getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+          colorScope: [getObjectIdentityToken(runtimeState.colors), getOceanBaseFillColor()].join(":"),
+        };
+      },
+    },
+    effects: {
+      recordMetric: recordRenderPerfMetric,
+      requestRender: reason => {
+        invalidateRenderPasses(["political"], reason);
+        requestRendererRender(reason, { visual: true });
+      },
+    },
+  });
+  return politicalIdRasterRuntimeOwner;
+}
+
 function getGeometryRasterRuntimeOwner() {
   geometryRasterRuntimeOwner ||= createGeometryRasterRuntimeOwner({
     state: runtimeState,
@@ -3445,6 +3521,7 @@ function getGeometryRasterRuntimeOwner() {
       pointRadius: PATH_POINT_RADIUS,
       isEnabled: () => geometryWorkerEnabled && isBootInteractionReady() && debugMode === "PROD"
         && !isPoliticalRasterWorkerBitmapEnabled() && !hasVisibleRiverPartitions(),
+      isPoliticalEnabled: () => !isPoliticalIdRasterSelected(),
       getPoliticalLayout: () => getRenderPassLayout("political"),
       getPoliticalSignature: () => getRenderPassSignature("political", runtimeState.zoomTransform),
       // All supported political edits invalidate their pass. Collection identities
@@ -3528,6 +3605,7 @@ function getPoliticalPassOrchestratorOwner() {
       hasPendingPoliticalColorEdit,
       isExportRendering: () => exportRenderInProgress,
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
+      isPoliticalIdRasterSelected,
     },
     resolvers: {
       resolvePoliticalPassIdentity,
@@ -3549,6 +3627,7 @@ function getPoliticalPassOrchestratorOwner() {
       buildPoliticalRasterWorkerPacket: buildPoliticalPassWorkerPacket,
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
+      drawPoliticalIdRasterFine: () => getPoliticalIdRasterRuntimeOwner().draw(),
       drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
@@ -3657,6 +3736,7 @@ function getPoliticalPartialRepaintOwner() {
     getters: {
       drawWorkerPoliticalFine: () => hasVisibleRiverPartitions() ? null : getGeometryRasterRuntimeOwner().drawPolitical(),
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
+      isPoliticalIdRasterSelected,
       getRuntimeState: () => runtimeState,
       getDebugMode: () => debugMode,
       getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
@@ -9163,6 +9243,21 @@ function getLandHitFromPointer(
 
   const strictCandidates = candidateCollector
     ? candidateCollector.land(0) : collectGridCandidates(pointer.px, pointer.py, 0);
+  // A display ID can accelerate a unique interior only. Geographic containment
+  // and the existing rank/filter policy still decide the hit; overlaps, brush,
+  // seams and stale/missing raster coverage continue through the normal path.
+  if (hitMode !== "canvas" && !runtimeState.brushModeEnabled && isPoliticalIdRasterSelected()
+    && ["click", "dblclick", "hover"].includes(eventType) && strictCandidates.length === 1) {
+    const raster = politicalIdRasterRuntimeOwner?.queryPoint({ x: pointer.px, y: pointer.py });
+    if (raster?.kind === "interior" && raster.primaryId === strictCandidates[0]?.item?.id) {
+      const verified = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" })
+        .find(candidate => candidate.containsGeo);
+      if (verified) {
+        recordRenderPerfMetric("politicalIdRasterPick", 0, { id: raster.primaryId, verified: true });
+        return toHitResult(verified, { viaSnap: false, strict: true, zoomK: pointer.zoomK, targetType: "land" });
+      }
+    }
+  }
   if (eventType === "hover" && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     return strictHoverHit
@@ -15569,6 +15664,8 @@ function resetRendererTransactionState({
   hitCanvasDirty = false,
 } = {}) {
   contextLayerRenderScheduler.reset();
+  politicalIdRasterRuntimeOwner?.dispose();
+  politicalIdRasterRuntimeOwner = null;
   paintContourRuntimeOwner?.dispose();
   riverInternalContourOwner?.dispose();
   riverInternalContourOwner = null;
@@ -15749,10 +15846,19 @@ export { RENDER_PASS_NAMES } from "./map_renderer/render_pass_catalog.js";
 // Read existing owners only: observing completion must never schedule work.
 export function getRendererAsyncWorkStatus() {
   return {
-    geometryPendingCount: geometryRasterRuntimeOwner?.getPendingWorkCount() || 0,
+    geometryPendingCount: (geometryRasterRuntimeOwner?.getPendingWorkCount() || 0)
+      + (politicalIdRasterRuntimeOwner?.getPendingWorkCount() || 0),
     borderScheduled: (staticBorderMeshLifecycle?.hasPendingWork() || paintContourRuntimeOwner?.hasPendingWork()) || false,
     exactPending: !!runtimeState.deferExactAfterSettle || !!runtimeState.exactAfterSettleHandle,
   };
+}
+
+export function getPoliticalIdRasterDiagnostics() {
+  return politicalIdRasterRuntimeOwner?.getDiagnostics() || { selected: isPoliticalIdRasterSelected(), pending: 0 };
+}
+
+export async function capturePoliticalIdRasterAssets() {
+  return politicalIdRasterRuntimeOwner?.exportAssets() || [];
 }
 
 export {

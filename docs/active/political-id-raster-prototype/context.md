@@ -1,0 +1,71 @@
+# Execution context
+
+## Historical stages 1–3
+
+2026-10-09 — User authorized the first three steps of the research plan. Main agent owns integration and all live browser/server/benchmark processes. Work is isolated from the primary checkout in `C:/Users/raede/.codex/worktrees/political-id-raster-prototype/mapcreator`.
+
+Current decision: prototype stores integer categorical IDs plus sparse source-over coverage contributors for antialiased pixels. This is a candidate to preserve native edges without averaging IDs; it must be measured, not assumed faster. Fixed view/projection/DPR/stroke generation is explicit. No production imports of the prototype will be added.
+
+Live process contract: owner /root; workdir is this worktree. Server command `C:/Users/raede/AppData/Local/Programs/Python/Python312/python.exe -m http.server 8008 --bind 127.0.0.1`, launched hidden via PowerShell Start-Process, stdout/stderr `.runtime/tmp/political-id-server.{out,err}.log`, PID `.runtime/tmp/political-id-server.pid`. Port 8008 was checked unused before launch. Success is HTTP 200 for the prototype; stop the recorded PID after checks or an irrecoverable server error.
+
+Browser: `playwright-cli -s=political-id-prototype open http://127.0.0.1:8008/tools/prototypes/political-id-raster/ --config .runtime/browser/political-id-config.json`. One isolated Chromium session, 1500x1000 viewport; artifacts `.runtime/browser/political-id-raster/`, JSON result `.runtime/reports/generated/political-id-raster/`. Serial focused checks, no broad app巡检; at most 5 screenshots. Each active measurement batch is bounded to 120 seconds. Stop on report completion/error; close only this task-owned browser session. Non-owner agents may inspect saved outputs, never run or poll these processes.
+
+Actual browser launch added `--browser chrome`: bundled Chromium was unavailable, installed Chrome succeeded without installation. Server PID 25900; CLI browser daemon PID 67276. The server and this named session are owned exclusively by /root.
+
+Completed focused integration commands: 33 adapter/kernel tests; 74 tests from `node --test tests/verification_metadata_behavior.test.mjs tests/renderer_pass_family_inventory_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs` (owner /root, exec session 95583, exited 0 after ~30s); `node tools/verification/script_portfolio.mjs check`; `node tools/select_verification_targets.mjs --check`. Their summaries are in results.md. No other agent launched a live process.
+
+The user allowed small quality loss during implementation. Keep strict-failure first-run.json, then validated-run.json with six cases and explicit approximate criteria. Rendering backend AA differences remain; tile clipping differences are removed by one bounded-region bake followed by exact splitting. Geometry-only checks added after the measured run passed at both DPRs and are retained separately in geometry-check.json. Browser fallback-check.json covers WebGL2 creation failure. Results are local prototype evidence, not production latency or CI acceptance.
+
+Closeout: named Playwright session closed; owned server PID 25900 identity checked and stopped; port 8008 no longer listening. Server log had no HTTP 4xx/5xx or traceback. Two screenshots retained. All source changes are confined to this worktree; no data assets, production imports, commits, pushes or deployment changes.
+
+Adapter and coverage kernel: 29 targeted Node tests passed. Main owns GPU module and browser integration. Source adapter uses published geometry versions to detect reuse of feature wrappers; single-ID color resolution uses a retained ID index. All projection/pixel/stroke changes require a rebuild in this prototype.
+
+Primary checkout is at the baseline commit with no tracked modifications when isolation began. Dependencies may be borrowed through a worktree-local node_modules junction; never modify the primary dependency directory.
+
+## Stages 4–6 live validation
+
+Owner remains /root. Workdir is this worktree; reuse isolated session `political-id-prototype`, installed Chrome, the existing config and artifact directories. Existing Playwright interaction/export checks and deterministic Canvas/GPU measurements make this isolated Chrome session appropriate. Server command: Python312 `tools/dev_server.py --port 8008 /app/`, with `MAPCREATOR_OPEN_BROWSER=0`; start hidden only after checking port free. Logs `.runtime/tmp/political-id-server.{out,err}.log`, PID `.runtime/tmp/political-id-server.pid`. No external URLs. Success is completed targeted reports without relevant page errors; stop on report completion or irrecoverable failure. Each browser batch <=120 seconds; screenshots <=5. Other agents own only static/Node work and may read saved evidence. Stop the exact recorded server and session at closeout. Actual PID: server 71776, browser CLI daemon 32252. Initial navigation preceded server readiness and was retried after port 8008 started listening.
+
+## Stages 4–6 completion
+
+Integrated main-app opt-in `political_id_raster=1`, complete-frame guards, latest-palette commit, a single fine producer, projected-space multilevel tiles, local invalidation, Worker construction and CPU/GPU budgets. No asset, project-format or picking changes. Palette updates share frozen source containers and use caller-owned dirty IDs only within the same color scope. An initial new override can change foreground order and invalidate local geometry; repeated recoloring does not.
+
+Final runtime comparison uses an accelerated native Canvas (`willReadFrequently: false`) and 10 alternating warm AB/BA pairs. Early `stage6-runtime.json` used a readback-oriented reference context; keep it as superseded evidence. Use `stage6-runtime-final.json` for the reported 0.1–0.3 ms ID / 0.7–1.35 ms full native fill medians. This does not establish whole-app FPS, input latency or an advantage over the existing partial repaint.
+
+The real app passed edit, undo/redo, downloaded-project reimport and native 2× export checks; explicit scenario loads covered all three IDs. One URL used a nonexistent 1939 sample name and opened TNO, so its report is correctly identified as TNO. Latest complete-app repeated recoloring had zero tile builds/uploads; first foreground promotion rebuilt/uploaded one tile. Browser capability interception verified vector editing with WebGL2 unavailable. Four real Worker/GPU fixture runs recovered from context loss without geometry rebuild and released all owned tile/GPU retention on dispose.
+
+Final verification: 135 Node tests and 8 Python boundary tests passed, plus architecture boundaries, test import graph, verification route schema and script portfolio checks. Updated PR plan has 30 workspace paths, no committed diff, no unmatched file or route gap. Predicted smoke/Pages/performance CI remains unrun; the plan is not CI acceptance. No commit, push or deployment.
+
+Default-off decision: fractional-scale DPR 1 fixtures and the complete TNO view exceed the provisional approximate-quality gate. CPU/GPU figures are explicit-array/texture/surface estimates, not measured heap or driver VRAM. Prebuilt assets and raster picking remain deferred. Detailed measurements and file names are in results.md.
+
+Closeout: named Playwright session closed successfully; daemon PID 32252 is absent. Server PID 71776 command identity was checked and the owned process stopped; port 8008 has no listener. Three stage-6 screenshots retained alongside the two historical screenshots. Final app console log has no relevant warning/error. Runtime outputs remain under `.runtime/`; all source changes remain in the isolated worktree.
+
+## Stages 7–11 execution contract
+
+2026-10-09: explicit authorization for steps 7–11. /root owns integration, canonical coordinates, main-app picking bridge, builder, documentation and all live processes. raster_asset_store owns only the new asset codec/store and its tests; raster_kernel_reuse owns worker/client/kernel and corresponding tests; raster_cpu_pick owns only the new pure picking module and tests. Other WIP is preserved. Subagents run short isolated Node checks, never browser/server/benchmarks.
+
+Reuse the stage-6 server/session/config at localhost:8008 after checking no listener. /root starts Python312 tools/dev_server.py --port 8008 /app/ hidden, with browser auto-open disabled; exact PID recorded in .runtime/tmp/political-id-server.pid, logs in the same directory. Single installed-Chrome session political-id-prototype, deterministic Canvas/WebGL checks and actual UI input; each batch <=120 seconds, at most five additional screenshots, outputs .runtime/reports/generated/political-id-raster/. Stop on completion or irrecoverable failure and close only recorded owned processes. No production calls, no broad browser sweep.
+
+## Stages 7–11 completion
+
+Completed stable EqualEarth world coordinates, bounded Worker path reuse, stable-ID asset encoding and geometry identities, two-LOD pilot capture/materialization, conservative CPU interior picking, IndexedDB LRU and explicit manifest loading. Three scenarios each have 32 pilot tiles under .runtime. Current shared scenario/vector/canonical editing and export contracts remain intact. Optional asset loading uses the existing post-first-visible renderer; geometry-free startup is not implemented.
+
+Final verification: 167 targeted Node tests, 8 Python boundary tests, architecture boundaries, test import graph, verification routes and script portfolio passed. Actual application checks cover native partial repaint versus ID recoloring, drag/batch edits, raster interior picking, undo/redo, project save/reimport and native 2x export. Revisit produced 16 IDB hits with zero builds; a cold-cache two-LOD 1939 pilot produced 32 manifest hits with zero builds. Quota/blocked storage failures are injected-backend evidence. An early sample-import race invalidated stage7-app-id-first.json; the corrected run and current final console have no corresponding error/warning.
+
+Retain default off. Native partial repaint and ID commit medians are 1.0 ms and 1.1 ms for different local stages, not whole-app latency evidence. Final RGBA fractional resampling remains the dominant measured quality loss; the full 1939 app at 130% exceeds the provisional visual gate. See results.md for exact values, resource-accounting limits and evidence paths. No commit, push, merge, deployment or dependency/data change.
+
+Closeout: named Playwright session political-id-prototype closed successfully; browser daemon PID 42288 is absent. Server PID 74168 command identity was checked before stopping; both owned processes are absent and port 8008 has no listener. One stage-11 screenshot retained under .runtime/browser/political-id-raster/. All changes remain in this isolated worktree.
+
+## Review and delivery authorization
+
+User subsequently authorized review, optimization, merge and push. /root remains sole Git and live-test owner; two read-only reviewers covered runtime assets/identity and Worker/tile/GPU/cache respectively. Remote main was fetched and remains 98425dcc, equal to this worktree base. Primary checkout is clean and will not receive uncommitted changes. Protected main requires final-head transport, three scenario, perf-gate and PR Verify Required checks; no bypass or force push.
+
+Two confirmed P2 findings were fixed and re-reviewed: a deferred worker creation/dispatch could survive immediate disposal, and a structurally valid asset for the wrong region could permanently disable the runtime owner. Lifetime cancellation plus deferred-creation gating closes both disposal windows; asset region mismatch now falls back to Worker while preserving strict final-region validation. Four added regression cases passed (13 Worker-client tests and 11 runtime-asset tests in the focused runs); both reviewers confirmed closure without repeating those tests.
+
+Submission verification contract: /root runs npm run verify:commit from this worktree, with output .runtime/reports/generated/political-id-raster/review-verify-commit.log and Python bytecode under .runtime/python/pycache. No browser, server or shared port is requested by this child-safe combination. Success is exit 0; stop and diagnose the first failing command rather than widening an allowlist. Other agents may read completed output only. Future GitHub CI is separately owned and observed by /root; local checks do not establish remote acceptance.
+
+The first submission plan stopped before running tests because the modified political partial/orchestrator bridge tests had PR coverage but no eligible local entrypoint. Extended the existing new raster route with those integration source files and their three actual target test files; no existing route, threshold or required check was removed. Retry uses the same owner/command contract, saved as review-verify-commit-final.log.
+
+The full-workspace verify:commit plan exceeded the existing local edit budget (30 commands / 72 leaves). It did not run tests and is not reported as passing. Split only the new raster route into data, build and runtime groups; planning each corresponding module now returns exit 0 without gaps. Whole-workspace verification remains a PR responsibility. Direct local verification under /root: the 14 raster/producer target files plus geometry runtime and resource budget behavior tests, verification metadata/portfolio tests, architecture boundaries and Pages source graph. Logs use review-targets.log / review-metadata.log / review-boundaries.log in the existing report directory; no server or browser is started. Stop on failure and preserve output. Route schema (736), import graph (74) and script portfolio already pass.
+
+Direct checks completed: 200 renderer/ID/resource tests, 118 verification metadata/portfolio tests, 13 Python boundaries, architecture and Pages source graph all passed. No local live process remains. Production enablement stays off; current user authorization is for protected PR delivery of the opt-in implementation, not a claim of end-to-end speedup or separate deployment verification. Retain this worktree for its ignored pilot files and evidence. Commit/push/CI/merge receipts are checked live through Git/GitHub; the latest receipt can be saved under .runtime/reports/generated/political-id-raster/.

@@ -198,8 +198,10 @@ test("implemented political owner keeps the frozen top-level orchestration order
     'recordRenderPerfMetric("politicalPassVisibleItems", 0, {',
     "if (isRenderDiagnosticsEnabled())",
     "publishPoliticalPassDiagnostics({ identity, viewport });",
+    "const exportRendering = isExportRendering();",
     "const inlinePoliticalPartitions = hasInlinePoliticalPartitions();",
-    "const consumedBitmapResult = isExportRendering() || inlinePoliticalPartitions",
+    "const idRasterSelected = !exportRendering && !inlinePoliticalPartitions && isPoliticalIdRasterSelected();",
+    "const consumedBitmapResult = exportRendering || inlinePoliticalPartitions || idRasterSelected",
     "? null",
     ": consumePoliticalRasterWorkerBitmapResult(identity.workerIdentity);",
     "drawPoliticalWorkerBitmapResult(consumedBitmapResult, identity.workerIdentity)",
@@ -210,10 +212,13 @@ test("implemented political owner keeps the frozen top-level orchestration order
     '"drawPoliticalBackgroundFillsPass"',
     "if (!hasPoliticalLandFeatures())",
     'reason: "missing-land-data"',
-    "const packetState = !isExportRendering() && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()",
+    "if (idRasterSelected) {",
+    "const idRasterMetrics = drawPoliticalIdRasterFine({ k, identity, viewport });",
+    'reason: "political-id-raster"',
+    "const packetState = !idRasterSelected && !exportRendering && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()",
     "buildPoliticalRasterWorkerPacketEffect({ identity, viewport })",
-    "if (!isExportRendering() && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });",
-    "recordPoliticalRasterWorkerSnapshot();",
+    "if (!idRasterSelected && !exportRendering && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });",
+    "if (!idRasterSelected) recordPoliticalRasterWorkerSnapshot();",
     "const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit();",
     "const progressiveRecoveryCoarseSkipCandidate = (",
     "const visiblePoliticalForegroundColorOverride = progressiveRecoveryCoarseSkipCandidate",
@@ -266,7 +271,7 @@ test("worker identity, packet, bitmap, and partial algorithms live in the partia
   assert.equal((ownerSource.match(/recordPoliticalRasterWorkerSnapshot\(\);/g) || []).length, 3);
   assert.match(
     ownerSource,
-    /: \{ packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" \};\s*if \(!isExportRendering\(\) && !inlinePoliticalPartitions\) requestPoliticalRasterWorkerPassEffect\(\{ identity, viewport, packetState \}\);/,
+    /: \{ packet: null, packetBuildMs: 0, reason: "bitmap-flag-disabled" \};\s*if \(!idRasterSelected && !exportRendering && !inlinePoliticalPartitions\) requestPoliticalRasterWorkerPassEffect\(\{ identity, viewport, packetState \}\);/,
   );
   assert.match(readRepoFile(CANONICAL_OWNER_PATH),
     /const hasInlinePoliticalPartitions = typeof getters\.hasInlinePoliticalPartitions === "function"\s*\? getters\.hasInlinePoliticalPartitions\s*: \(\) => false;/);
@@ -349,7 +354,7 @@ test("fine drawing and diagnostics live in the partial owner while state writes 
     'politicalDataStage: "fine"',
     'reason: "fine-feature-loop"',
   ], "fine political result");
-  assert.equal((ownerSource.match(/return createPoliticalPassDrawResult\(/g) || []).length, 4);
+  assert.equal((ownerSource.match(/return createPoliticalPassDrawResult\(/g) || []).length, 5);
   assert.equal((maskStringAndCommentContent(ownerSource).match(/^\s*return;\s*$/gm) || []).length, 0);
 });
 
