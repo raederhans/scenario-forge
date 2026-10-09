@@ -4,6 +4,8 @@
 
 五个功能阶段已实现；用户于 2026-10-09 授权审核、合并和推送。当前在 `C:/Users/raede/.codex/worktrees/hgo-reviewed-integration/mapcreator`、分支 `codex/hgo-reviewed-integration` 整合最新主线。三项审核发现已修复，精确 HGO 权限退役已在整合源码上核验并落盘。**当前状态为审核整合中，等待最终 required checks 与合并回执**。先前全量库存重建的 815 项失败仍作为历史证据保留，不冒充已经清零；本次以不增加既有治理违规的严格缩窄证明完成 HGO 退役。主工作区未被写入。
 
+Delivery checkpoint: implementation commit `96014184a5c761f4c4d9c7c1a4d9f38d413fd51e` is pushed. [PR #215](https://github.com/raederhans/scenario-forge/pull/215) is the authoritative receipt for final-head required checks and protected merge. This checked-in record describes local acceptance before those hosted checks finish; it is not a deployment receipt.
+
 ## Checklist
 
 - [x] Independent source builder/validator and native core assets.

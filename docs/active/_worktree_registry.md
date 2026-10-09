@@ -2,7 +2,7 @@
 
 ## 2026-10-07 HGO 独立原生编辑器
 
-实施工作区 `C:/Users/raede/.codex/worktrees/hgo-native-editor/mapcreator` 保留原始改动及现场证据；审核整合使用 `C:/Users/raede/.codex/worktrees/hgo-reviewed-integration/mapcreator`、分支 `codex/hgo-reviewed-integration`，基于最新主线整合人口专题及地理缓存优化。用户已授权审核、合并、推送，root 为唯一 Git 和共享验证负责人。三项审核发现已修复；状态权限采用经过逐项证明的精确退役，不扩大冻结基线。全仓库存重建的既有债与本次 required checks 分别记录。主工作区及其他 worktree 未归属 WIP 保留；最终提交、检查与合并以 GitHub 回执为准。详见 [HGO 任务记录](hgo-native-editor/task.md)。
+实施工作区 `C:/Users/raede/.codex/worktrees/hgo-native-editor/mapcreator` 保留原始改动及现场证据；审核整合使用 `C:/Users/raede/.codex/worktrees/hgo-reviewed-integration/mapcreator`、分支 `codex/hgo-reviewed-integration`，基于最新主线整合人口专题及地理缓存优化。用户已授权审核、合并、推送，root 为唯一 Git 和共享验证负责人。审核发现已修复；状态权限采用经过逐项证明的精确退役，不扩大冻结基线。实现提交 `96014184a5c761f4c4d9c7c1a4d9f38d413fd51e` 已推送；[PR #215](https://github.com/raederhans/scenario-forge/pull/215) 记录最终 required checks 和受保护合并回执。全仓库存重建的既有债与本次 required checks 分别记录。两处 HGO 工作区保留忽略的源数据、浏览器与治理证明，供恢复和审计；主工作区及其他 worktree 未归属 WIP 保留。详见 [HGO 任务记录](hgo-native-editor/task.md)。
 
 ## 2026-10-07 基础数据性能优化整合
 
