@@ -176,7 +176,7 @@ test("actual transformed-owner buffer injection invalidates prior exact pixels",
   const h = harness(), names = ["base", "overlay"];
   h.render(names);
   const noops = Object.fromEntries([
-    "getActiveTransformedFramePassNames", "isHgoRuntimePreviewReady", "nowMs", "canDrawTransformedPass",
+    "getActiveTransformedFramePassNames", "nowMs", "canDrawTransformedPass",
     "getInteractionCompositeReuseDecision", "resetCanvasContext", "withRenderTarget", "drawInteractionComposite",
     "composeRenderPassesToTarget", "drawTransformedPass", "drawInteractionBorderSnapshot", "drawBordersPass",
     "resetMainCanvas", "invalidateInteractionComposite", "buildInteractionComposite", "canDrawInteractionComposite",

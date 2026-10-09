@@ -1,0 +1,4 @@
+* text=auto eol=lf
+# Transport hashes require identical bytes on Windows and Linux.
+assets/**/*.json text eol=lf
+assets/**/*.gz binary

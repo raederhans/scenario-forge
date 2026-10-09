@@ -16,8 +16,6 @@ POLITICAL_BACKGROUND_RENDER_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / 
 EXACT_AFTER_SETTLE_PASS_CATALOG_JS = REPO_ROOT / "js" / "core" / "renderer" / "exact_after_settle_pass_catalog.js"
 EXACT_AFTER_SETTLE_PLANS_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "exact_after_settle_refresh_plans.js"
 EXACT_AFTER_SETTLE_SCHEDULER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "exact_after_settle_scheduler.js"
-HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "hgo_runtime_preview_render_owner.js"
-HGO_RUNTIME_PREVIEW_FRAME_COMMIT_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "hgo_runtime_preview_frame_commit.js"
 DRAW_CANVAS_ORCHESTRATION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "draw_canvas_orchestration_owner.js"
 RENDER_PASS_COMMIT_ACCOUNTING_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "render_pass_commit_accounting_owner.js"
 RENDER_PASS_CATALOG_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "render_pass_catalog.js"
@@ -203,7 +201,6 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         )
         self.assertIn("resolveExactAfterSettleTargetPasses", exact_scheduler_content)
         self.assertIn("drawContextScenarioPass,", renderer_content)
-        self.assertIn("drawHgoPreviewPass,", renderer_content)
         self.assertIn("drawTextureLabelEffectsPass,", renderer_content)
         self.assertIn("getContextScenarioReuseDecision,", renderer_content)
         self.assertIn("tryPartialPoliticalPassRepaint,", renderer_content)
@@ -246,20 +243,16 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIn("function getIdleRenderPassDefinitions() {", owner_content)
         self.assertIn("IDLE_RENDER_PASS_DEFINITIONS.map", owner_content)
         self.assertNotIn('["background", (k) => drawBackgroundPass(k)],', owner_content)
-        self.assertNotIn('["hgoPreview", (k) => drawHgoPreviewPass(k)],', owner_content)
         self.assertNotIn('["contextScenario", (k) => drawContextScenarioPass(k)],', owner_content)
         self.assertNotIn('["textureLabels", (k) => drawTextureLabelEffectsPass(k)],', owner_content)
         self.assertIn("export const IDLE_RENDER_PASS_DEFINITIONS = [", pipeline_catalog_content)
         self.assertIn('passName: "background", drawKey: "drawBackgroundPass"', pipeline_catalog_content)
-        self.assertIn('passName: "hgoPreview", drawKey: "drawHgoPreviewPass"', pipeline_catalog_content)
         self.assertIn('passName: "contextScenario", drawKey: "drawContextScenarioPass"', pipeline_catalog_content)
         self.assertIn('passName: "textureLabels", drawKey: "drawTextureLabelEffectsPass"', pipeline_catalog_content)
         self.assertIn("function shouldDeferExactAfterSettlePassForCriticalPaint(passName", owner_content)
         self.assertIn("function prepareIdleRenderPassDefinition(passName, drawFn, transform, timings", owner_content)
         self.assertIn('recordRenderPerfMetric("contextScenarioSignatureChanged"', owner_content)
         self.assertIn('recordRenderPerfMetric("contextScenarioReuseSkipped"', owner_content)
-        self.assertIn("function didHgoPreviewVisibilityTokenChange(previousSignature, nextSignature)", owner_content)
-        self.assertIn('cache.reasons[passName] = "hgo-runtime-preview";', owner_content)
         self.assertIn('tryPartialPoliticalPassRepaint(transform, nextSignature, timings)', owner_content)
         self.assertIn("function getPoliticalPassFineBaselineMismatch(", renderer_content)
         visible_frame_policy_content = (
@@ -343,153 +336,6 @@ class MapRendererRenderPipelinePassesBoundaryContractTest(unittest.TestCase):
         self.assertIn('.attr("stroke-linecap", "round")', hover_overlay_body)
         self.assertIn('runtimeState.hoveredWaterRegionId ? 1.25 : 1.45', hover_overlay_body)
 
-    def test_hgo_preview_ready_replaces_normal_overlay_passes(self):
-        renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")
-        visual_effects_owner_content = VISUAL_EFFECTS_PASS_OWNER_JS.read_text(encoding="utf-8")
-        context_pass_owner_content = CONTEXT_PASS_ORCHESTRATOR_OWNER_JS.read_text(encoding="utf-8")
-        political_pass_owner_content = POLITICAL_PASS_ORCHESTRATOR_OWNER_JS.read_text(encoding="utf-8")
-        draw_canvas_owner_content = DRAW_CANVAS_ORCHESTRATION_OWNER_JS.read_text(encoding="utf-8")
-        hgo_preview_owner_content = HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS.read_text(encoding="utf-8")
-        hgo_preview_commit_content = HGO_RUNTIME_PREVIEW_FRAME_COMMIT_JS.read_text(encoding="utf-8")
-        render_pass_commit_owner_content = RENDER_PASS_COMMIT_ACCOUNTING_OWNER_JS.read_text(encoding="utf-8")
-        render_pass_catalog_content = RENDER_PASS_CATALOG_JS.read_text(encoding="utf-8")
-        self.assertIn("function getHgoRuntimePreviewVisibilitySignature() {", renderer_content)
-        hgo_preview_pass_body = hgo_preview_owner_content.split("function drawPreviewPass()", 1)[1].split(
-            "\n\n  function normalizeHitPayload",
-            1,
-        )[0]
-        hgo_preview_commit_body = hgo_preview_commit_content.split("function drawPreviewPass()", 1)[1].split(
-            "\n\n  return Object.freeze",
-            1,
-        )[0]
-        self.assertIn("return frameCommitter.drawPreviewPass();", hgo_preview_pass_body)
-        self.assertIn('renderFrame: (targetCanvas) => renderIfReady("hgo-preview-pass", {', hgo_preview_owner_content)
-        self.assertLess(
-            hgo_preview_commit_body.index("if (!isReady())"),
-            hgo_preview_commit_body.index("const targetCanvas = getTargetCanvas();"),
-        )
-        self.assertLess(
-            hgo_preview_commit_body.index("getFrameRejectionReason(rendered, stats)"),
-            hgo_preview_commit_body.index("resetCanvasContext(targetContext, targetCanvas.width, targetCanvas.height);"),
-        )
-        self.assertNotIn("projectionTransform: null", hgo_preview_owner_content)
-        self.assertIn('const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES = Object.freeze([\n  "hgoPreview",\n]);', hgo_preview_owner_content)
-        self.assertIn(
-            'const HGO_RUNTIME_PREVIEW_TRANSFORMED_FRAME_PASS_NAMES = Object.freeze([\n  "hgoPreview",\n]);',
-            hgo_preview_owner_content,
-        )
-        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());", renderer_content)
-        self.assertIn(
-            "return isReady() ? HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES : vectorRenderPassNames;",
-            hgo_preview_owner_content,
-        )
-        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveTransformedFramePassNames());", renderer_content)
-        self.assertIn(
-            "return isReady() ? HGO_RUNTIME_PREVIEW_TRANSFORMED_FRAME_PASS_NAMES : vectorTransformedFramePassNames;",
-            hgo_preview_owner_content,
-        )
-        interaction_composite_body = render_pass_catalog_content.split("export const INTERACTION_COMPOSITE_PASS_NAMES = [", 1)[1].split(
-            "];",
-            1,
-        )[0]
-        self.assertNotIn('"hgoPreview"', interaction_composite_body)
-        self.assertIn("const activeRenderPassNames = getActiveRenderPassNames();", draw_canvas_owner_content)
-        self.assertIn("ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false", draw_canvas_owner_content)
-        self.assertIn("requestRenderContinuation: (reason) => queueMicrotask(() => requestRendererRender(reason))", renderer_content)
-        self.assertIn("drewExactFrame = !!composeCachedPasses(activeRenderPassNames);", draw_canvas_owner_content)
-        self.assertIn("function getProjectedHgoRuntimePreviewBounds() {", renderer_content)
-        self.assertIn("function getProjectedBounds() {", hgo_preview_owner_content)
-        viewport_owner_content = VIEWPORT_READ_MODEL_OWNER_JS.read_text(encoding="utf-8")
-        render_pass_commit_body = render_pass_commit_owner_content.split("function commitRenderPass({", 1)[1].split(
-            "\n  return Object.freeze",
-            1,
-        )[0]
-        self.assertLess(
-            render_pass_commit_body.index("drawResult.committed === false"),
-            render_pass_commit_body.index('"setPassReferenceTransform"'),
-        )
-        self.assertIn('"renderPassCommitSkipped"', render_pass_commit_body)
-        self.assertIn("cache.politicalPassDataStage = politicalDataStage;", render_pass_commit_body)
-        self.assertIn("cache.politicalPassFineCacheReady = politicalFineCacheReady;", render_pass_commit_body)
-        self.assertIn("if (politicalFineCacheReady) {", render_pass_commit_body)
-        self.assertIn('"clearPassFullReferenceTransforms"', render_pass_commit_body)
-        self.assertLess(
-            render_pass_commit_body.index("if (politicalFineCacheReady) {"),
-            render_pass_commit_body.index("cache.partialPoliticalDirtyIds.clear();"),
-        )
-        self.assertIn("function getProjectedRenderableContentBounds()", viewport_owner_content)
-        viewport_factory = renderer_content.split("function getViewportReadModelOwner()", 1)[1].split(
-            "function getViewportCommandOwner()", 1,
-        )[0]
-        self.assertIn('readBoundsSnapshots("getProjectedRenderableContentBoundsSnapshots")', viewport_owner_content)
-        for getter in ["getPanContentBoundsSnapshots", "getProjectedRenderableContentBoundsSnapshots"]:
-            getter_body = viewport_factory.split(getter + ": () => {", 1)[1].split("const features", 1)[0]
-            self.assertIn("if (isHgoRuntimePreviewReady()) return [snapshotBounds(getProjectedHgoRuntimePreviewBounds())];", getter_body)
-        self.assertIn("return getViewportReadModelOwner().getProjectedRenderableContentBounds();", renderer_content)
-        viewport_command_owner_content = VIEWPORT_COMMAND_OWNER_JS.read_text(encoding="utf-8")
-        pan_extent_body = renderer_content.split("function calculatePanExtent()", 1)[1].split(
-            "\n\nfunction updateZoomTranslateExtent",
-            1,
-        )[0]
-        self.assertIn("return getViewportReadModelOwner().calculatePanExtent();", pan_extent_body)
-        reset_zoom_body = viewport_command_owner_content.split("function resetZoomToFit(", 1)[1].split(
-            "\n\n  function zoomByStep",
-            1,
-        )[0]
-        self.assertIn("return getViewportCommandOwner().resetZoomToFit({ centerContent, centerX, centerY, animate });", renderer_content)
-        self.assertLess(
-            reset_zoom_body.index("updateZoomTranslateExtent();"),
-            reset_zoom_body.index("const transform = centerContent"),
-        )
-        for function_name in (
-            "drawPoliticalPass",
-            "drawContextBasePass",
-            "drawContextMarkersPass",
-            "drawContextScenarioPass",
-            "drawTextureLabelEffectsPass",
-            "drawBordersPass",
-            "drawLabelsPass",
-        ):
-            if function_name == "drawTextureLabelEffectsPass":
-                source = visual_effects_owner_content
-            elif function_name == "drawPoliticalPass":
-                source = political_pass_owner_content
-                function_name = "drawBasePoliticalPass"
-            elif function_name in {
-                "drawContextBasePass",
-                "drawContextMarkersPass",
-                "drawContextScenarioPass",
-            }:
-                source = context_pass_owner_content
-            else:
-                source = renderer_content
-            implementation_name = "drawLabelsPassContent" if function_name == "drawLabelsPass" else function_name
-            pass_body = source.split(f"function {implementation_name}(", 1)[1].split("\n  function ", 1)[0].split("\nfunction ", 1)[0]
-            if function_name in {
-                "drawContextBasePass",
-                "drawContextMarkersPass",
-                "drawContextScenarioPass",
-            }:
-                self.assertIn(
-                    f'if (recordHgoSkip("{function_name}", startedAt, interactive)) return;',
-                    pass_body,
-                )
-                continue
-            self.assertRegex(
-                pass_body,
-                re.compile(
-                    r"if \(isHgoRuntimePreviewReady\(\)\) \{[\s\S]*?"
-                    r'reason: "hgo-runtime-preview"[\s\S]*?'
-                    r"return;",
-                    re.S,
-                ),
-            )
-        record_hgo_skip_body = context_pass_owner_content.split("function recordHgoSkip(", 1)[1].split(
-            "\n\n  function drawContextBasePass",
-            1,
-        )[0]
-        self.assertIn("if (!isHgoRuntimePreviewReady()) return false;", record_hgo_skip_body)
-        self.assertIn('reason: "hgo-runtime-preview"', record_hgo_skip_body)
 
     def test_empty_click_clears_water_and_special_selection(self):
         owner_content = CLICK_SELECTION_OWNER_JS.read_text(encoding="utf-8")

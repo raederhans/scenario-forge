@@ -496,7 +496,15 @@ export function createContextLayerResolverOwner({
         && stamp.every((value, index) => value === previousStamp[index])) continue;
 
       const collection = resolveContextLayerData(layerName);
-      runtimeState[stateField] = collection;
+      switch (stateField) {
+        case "oceanData": runtimeState.oceanData = collection; break;
+        case "landBgData": runtimeState.landBgData = collection; break;
+        case "waterRegionsData": runtimeState.waterRegionsData = collection; break;
+        case "riversData": runtimeState.riversData = collection; break;
+        case "urbanData": runtimeState.urbanData = collection; break;
+        case "physicalData": runtimeState.physicalData = collection; break;
+        case "specialZonesData": runtimeState.specialZonesData = collection; break;
+      }
       layerSourceStamps.set(layerName, stamp);
       contextChanged = true;
       if (layerName === "water_regions") {

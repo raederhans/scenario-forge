@@ -274,7 +274,7 @@ const SERVICE_NAMES = [
   "commitHistoryEntry", "dismissOnboardingHint", "ensureLeafDetailReady", "getFeatureCountryCodeNormalized",
   "getFeaturePaintColor", "getHitFromEvent", "getHoveredFacilityEntryFromEvent", "getIntensityFieldTool",
   "getSafeCanvasColor", "getSpecialRegionColor", "getWaterRegionColor", "handleSpecialZoneMembershipClick",
-  "inspectHgoRuntimePreviewFromEvent", "isDoubleClickBatchEligible", "isFacilityDetailsSurfaceActive",
+  "isDoubleClickBatchEligible", "isFacilityDetailsSurfaceActive",
   "isMacroOceanWaterRegion", "isOpenOceanPaintEnabled", "markDirty",
   "noteRenderAction", "nowMs", "placeUnitCounterFromEvent", "queueTooltipUpdate",
   "refreshSidebarAfterPaint",
@@ -334,7 +334,6 @@ function createTransactionHarness({ state: stateOverrides = {}, services: servic
     getIntensityFieldTool: () => ({ active: false }),
     getSafeCanvasColor: (value) => value,
     handleSpecialZoneMembershipClick: () => false,
-    inspectHgoRuntimePreviewFromEvent: () => ({ active: false, hit: null }),
     isDoubleClickBatchEligible: () => false,
     isFacilityDetailsSurfaceActive: () => false,
     isMacroOceanWaterRegion: () => false,
@@ -475,31 +474,7 @@ test("startup readonly prevents the event and blocks with no later side effects"
   ]);
 });
 
-test("HGO preview and facility-card hits retain their isolated early-return funnels", async () => {
-  const hgo = await createTransactionOwner({
-    services: {
-      inspectHgoRuntimePreviewFromEvent: () => {
-        hgo.trace.push(["inspectHgoRuntimePreviewFromEvent"]);
-        return { active: true, hit: { id: "hgo-1" } };
-      },
-    },
-  });
-  await hgo.owner.handleClick({
-    preventDefault() { hgo.trace.push(["preventDefault"]); },
-  });
-  assert.deepEqual(traceNames(hgo.trace), [
-    "dismissOnboardingHint",
-    "inspectHgoRuntimePreviewFromEvent",
-    "preventDefault",
-    "updateDevSelectedHit",
-    "clearClickHoverIds",
-    "queueTooltipUpdate",
-    "setClickHoverOverlayDirty",
-    "renderHoverOverlayIfNeeded",
-    "requestInteractionRender",
-    "noteRenderAction",
-  ]);
-  assert.equal(traceNames(hgo.trace).includes("getHitFromEvent"), false);
+test("facility-card hits retain their isolated early-return funnel", async () => {
 
   const facilityEntry = { id: "facility-1", familyId: "airbase" };
   const facility = await createTransactionOwner({
@@ -722,23 +697,6 @@ test("land eyedropper samples persistent paint even with a partial group and a h
   await harness.owner.handleClick({});
   assert.deepEqual(harness.trace.find(([name]) => name === "setClickSelectedColor"), ["setClickSelectedColor", "#00ff00", { updateSwatch: true }]);
   assert.equal(traceNames(harness.trace).includes("warnIncompletePaintTargets"), false);
-});
-
-test("an early HGO inspection failure propagates before hover or render effects", async () => {
-  const failure = new Error("HGO inspection failed");
-  const harness = await createTransactionOwner({
-    services: {
-      inspectHgoRuntimePreviewFromEvent: () => {
-        harness.trace.push(["inspectHgoRuntimePreviewFromEvent"]);
-        throw failure;
-      },
-    },
-  });
-  await assert.rejects(harness.owner.handleClick({}), failure);
-  assert.deepEqual(traceNames(harness.trace), [
-    "dismissOnboardingHint",
-    "inspectHgoRuntimePreviewFromEvent",
-  ]);
 });
 
 test("factory rejects missing ports and invalid constant values", async () => {

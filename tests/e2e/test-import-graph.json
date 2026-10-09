@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 74,
     "nodeCount": 90,
-    "reverseIndexKeyCount": 142,
+    "reverseIndexKeyCount": 141,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -361,7 +361,6 @@
       "directDependencies": [
         "js/core/feature_identity.js",
         "js/core/map_renderer.js",
-        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
         "js/core/renderer/render_transaction_diagnostics.js",
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
@@ -373,7 +372,6 @@
         "js/core/feature_identity.js",
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
-        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
         "js/core/renderer/render_transaction_diagnostics.js",
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
@@ -390,7 +388,6 @@
         "js/core/feature_identity.js",
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
-        "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
         "js/core/renderer/render_transaction_diagnostics.js",
         "js/core/scenario_dispatcher.js",
         "js/core/sovereignty_manager.js",
@@ -2454,9 +2451,6 @@
       "tests/e2e/ui_rework_mainline_shell_sidebar.spec.js",
       "tests/e2e/ui_rework_support_transport_hardening.spec.js",
       "tests/e2e/water_cache_strategy_regression.spec.js"
-    ],
-    "js/core/map_renderer/hgo_runtime_preview_render_owner.js": [
-      "tests/e2e/dev/normal_visual_paths.dev.spec.js"
     ],
     "js/core/render_boundary.js": [
       "tests/e2e/dev_workspace_render_boundary.spec.js",

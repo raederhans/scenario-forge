@@ -7,7 +7,7 @@ import {
   registerOwnedRuntimeHook, readRuntimeHook, subscribeStateBusEvent, off, STATE_BUS_EVENTS,
 } from "../js/core/state/index.js";
 
-for (const name of ["updateScenarioUIFn", "setHgoRuntimePreviewEnabledFn"]) {
+for (const name of ["updateScenarioUIFn", "noteFirstVisibleFramePaintedFn"]) {
   test(`${name}: old cleanup preserves replacement, including reused callbacks`, () => {
     const target = {};
     let calls = 0;
@@ -42,7 +42,7 @@ test("notification disposal leaves independent observers and absent notification
 
 test("required commands fail when absent, preserve arguments/results/errors, and reject notifications", () => {
   const target = {};
-  const name = "setHgoRuntimePreviewEnabledFn";
+  const name = "noteFirstVisibleFramePaintedFn";
   assert.throws(() => callRequiredRuntimeHook(target, name), /not registered/);
   assert.throws(() => callRequiredRuntimeHook(target, "updateScenarioUIFn"), /must be a handler/);
   assert.throws(() => registerOwnedRuntimeHook(target, "unknown", () => {}), /Unknown/);
@@ -122,7 +122,7 @@ function createControlsFixture() {
     getScenarioFatalRecoveryState: () => null,
     formatScenarioFatalRecoveryMessage: () => "",
     formatScenarioStatusText: () => { renders++; return "ready"; },
-    formatScenarioAuditText: () => "", areHgoRuntimePreviewAssetsAvailable: () => true,
+    formatScenarioAuditText: () => "",
     t: value => value, showToast: (...args) => toasts.push(args), resetZoomToFit() {},
     clearActiveScenarioCommand() { cleared++; state.activeScenarioId = ""; }, resetScenarioToBaselineCommand() {},
     applyScenarioByIdCommand: async id => { applied.push(id); state.activeScenarioId = id; },
@@ -132,6 +132,22 @@ function createControlsFixture() {
   return { init: context.initScenarioControls, state, nodes, document, pending, applied, toasts, cleared: () => cleared, renders: () => renders };
 }
 const flush = () => new Promise(resolve => setImmediate(resolve));
+
+test("scenario picker exposes only registered main-editor scenarios", async () => {
+  const f = createControlsFixture();
+  const dispose = f.init();
+  f.pending.forEach(resolve => resolve());
+  await flush();
+  assert.deepEqual(f.nodes.scenarioSelect.children.map(option => option.value), ["", "alpha", "beta"]);
+  assert.deepEqual(f.nodes.scenarioSelectMenu.children.map(option => option.dataset.value), ["", "alpha", "beta"]);
+  f.state.activeScenarioId = "alpha";
+  f.nodes.clearScenarioBtn.dispatchEvent(new Event("click"));
+  await flush();
+  assert.equal(f.cleared(), 1);
+  assert.equal(f.state.activeScenarioId, "");
+  assert.deepEqual(f.toasts, []);
+  dispose();
+});
 
 test("real scenario owner reinitializes DOM listeners and old release cannot detach the new hook", async () => {
   const f = createControlsFixture();
@@ -159,56 +175,4 @@ test("real scenario owner reinitializes DOM listeners and old release cannot det
   f.pending.forEach(resolve => resolve());
   await flush();
   assert.equal(f.renders(), before, "disposed owner ignores DOM, hooks, and late registry completion");
-});
-
-test("real scenario owner reports missing required preview command instead of claiming success", async () => {
-  const f = createControlsFixture();
-  const dispose = f.init();
-  f.state.activeScenarioId = "alpha";
-  f.nodes.scenarioSelect.value = "__hgo_runtime_preview__";
-  f.nodes.applyScenarioBtn.dispatchEvent(new Event("click"));
-  await flush();
-  assert.equal(f.toasts.length, 1);
-  assert.match(f.toasts[0][0], /Required runtime hook is not registered/);
-  assert.deepEqual(f.applied, []);
-  assert.equal(f.cleared(), 0);
-  assert.equal(f.state.activeScenarioId, "alpha");
-  dispose();
-  f.pending.forEach(resolve => resolve());
-  await flush();
-});
-
-test("disposed scenario owner does not resume a pending preview command into a scenario apply", async () => {
-  const f = createControlsFixture();
-  f.state.hgoRuntimePreview = { enabled: true };
-  let resolvePreview;
-  const release = registerOwnedRuntimeHook(f.state, "setHgoRuntimePreviewEnabledFn",
-    () => new Promise(resolve => { resolvePreview = resolve; }));
-  const dispose = f.init();
-  f.nodes.scenarioSelect.value = "beta";
-  f.nodes.applyScenarioBtn.dispatchEvent(new Event("click"));
-  assert.equal(typeof resolvePreview, "function");
-  dispose();
-  resolvePreview();
-  f.pending.forEach(resolve => resolve());
-  await flush();
-  assert.deepEqual(f.applied, []);
-  assert.equal(f.renders(), 0);
-  release();
-});
-
-test("scenario exit reports missing required preview handler and preserves current scenario", async () => {
-  const f = createControlsFixture();
-  f.state.activeScenarioId = "alpha";
-  f.state.hgoRuntimePreview = { enabled: true };
-  const dispose = f.init();
-  f.nodes.clearScenarioBtn.dispatchEvent(new Event("click"));
-  await flush();
-  assert.equal(f.toasts.length, 1);
-  assert.match(f.toasts[0][0], /Required runtime hook is not registered/);
-  assert.equal(f.cleared(), 0);
-  assert.equal(f.state.activeScenarioId, "alpha");
-  dispose();
-  f.pending.forEach(resolve => resolve());
-  await flush();
 });

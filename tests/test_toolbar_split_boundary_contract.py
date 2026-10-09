@@ -16,7 +16,6 @@ PALETTE_LIBRARY_PANEL_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "palette_librar
 SCENARIO_CONTEXT_BAR_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "scenario_context_bar_controller.js"
 SCENARIO_GUIDE_POPOVER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "scenario_guide_popover.js"
 SCENARIO_CONTROLS_JS = REPO_ROOT / "js" / "ui" / "scenario_controls.js"
-HGO_RUNTIME_PREVIEW_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "hgo_runtime_preview_controller.js"
 SPECIAL_ZONE_EDITOR_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zone_editor.js"
 SPECIAL_ZONES_WORKBENCH_CONTROLLER_JS = REPO_ROOT / "js" / "ui" / "toolbar" / "special_zones_workbench_controller.js"
 STYLE_CSS = REPO_ROOT / "css" / "style.css"
@@ -130,8 +129,6 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("createTransportWorkbenchController", content)
         self.assertIn('./toolbar/workspace_chrome_support_surface_controller.js', content)
         self.assertIn("createWorkspaceChromeSupportSurfaceController", content)
-        self.assertIn('./toolbar/hgo_runtime_preview_controller.js', content)
-        self.assertIn("createHgoRuntimePreviewToolbarController", content)
         self.assertIn('./ui_surface_url_state.js', content)
         self.assertIn("createUiSurfaceUrlState", content)
         self.assertIn('./toolbar/appearance_controls_controller.js', content)
@@ -202,7 +199,13 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         content = TOOLBAR_JS.read_text(encoding="utf-8")
 
         self.assertIn('registerRuntimeHook(state, "updatePaletteSourceUIFn", syncPaletteSourceControls);', content)
-        self.assertIn('registerRuntimeHook(state, "updatePaletteLibraryUIFn", renderPaletteLibrary);', content)
+        self.assertIn(
+            'registerRuntimeHook(state, "updatePaletteLibraryUIFn", () => {\n'
+            '    renderPaletteLibrary();\n'
+            '    paletteCountryEditor.render();\n'
+            '  });',
+            content,
+        )
         self.assertIn('registerRuntimeHook(state, "renderPaletteFn", renderPalette);', content)
         self.assertIn("bindPaletteLibraryPanelEvents();", content)
         self.assertIn("syncPaletteLibraryPanelVisibility();", content)
@@ -253,7 +256,7 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn('id: "effects"', owner_content)
         self.assertIn('id: "labels"', owner_content)
         self.assertIn('passNames: ["background"]', owner_content)
-        self.assertIn('passNames: ["physicalBase", "political"]', owner_content)
+        self.assertIn('passNames: ["physicalBase", "political", "populationHeatmap"]', owner_content)
         self.assertIn('passNames: ["contextBase", "contextScenario"]', owner_content)
         self.assertIn('passNames: ["effects", "lineEffects", "contextMarkers", "dayNight", "borders", "textureLabels"]', owner_content)
 
@@ -349,8 +352,11 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("const triggerScenarioGuide = () => {", owner_content)
         self.assertIn("const bindScenarioContextBarEvents = () => {", owner_content)
         self.assertIn("const bindResponsiveChromeLayout = () => {", owner_content)
-        self.assertIn('const scenarioViewLabel = String(runtimeState.scenarioViewMode || "ownership") === "frontline"', owner_content)
-        self.assertIn("${scenarioViewLabel}", owner_content)
+        self.assertIn("const modeLabel = getPaintModeLabel();", owner_content)
+        self.assertIn("scenarioContextModeText.textContent = modeLabel;", owner_content)
+        self.assertIn('scenarioContextModeText.setAttribute("title", `${translateUi("Mode")}: ${modeLabel}`);', owner_content)
+        self.assertNotIn("scenarioViewMode", owner_content)
+        self.assertNotIn("scenarioContextModeText.textContent =", toolbar_content)
         self.assertIn("refreshWorkspaceStatus();", owner_content)
         self.assertIn("bindScenarioContextBarEvents();", toolbar_content)
         self.assertIn("bindResponsiveChromeLayout();", toolbar_content)
@@ -458,31 +464,6 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("resolveSpecialZoneTopologyFingerprint(state)", scenario_resources_content)
         self.assertIn("SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES.LOAD_FAILED", scenario_resources_content)
 
-    def test_hgo_preview_entry_is_owned_by_scenario_selector(self):
-        scenario_controls = SCENARIO_CONTROLS_JS.read_text(encoding="utf-8")
-        hgo_controller = HGO_RUNTIME_PREVIEW_CONTROLLER_JS.read_text(encoding="utf-8")
-        toolbar = TOOLBAR_JS.read_text(encoding="utf-8")
-
-        self.assertIn('const HGO_RUNTIME_PREVIEW_OPTION_VALUE = "__hgo_runtime_preview__";', scenario_controls)
-        self.assertIn("areHgoRuntimePreviewAssetsAvailable", scenario_controls)
-        self.assertIn("buildHgoRuntimePreviewOptionPayload", scenario_controls)
-        self.assertIn('"setHgoRuntimePreviewEnabledFn"', scenario_controls)
-        self.assertIn("clearActiveScenarioCommand({", scenario_controls)
-        self.assertIn('markDirtyReason: ""', scenario_controls)
-        self.assertIn('import { resetZoomToFit } from "../core/map_renderer/public.js";', scenario_controls)
-        self.assertIn("centerContent: true", scenario_controls)
-        self.assertIn("centerX: true", scenario_controls)
-        self.assertIn("centerY: true", scenario_controls)
-        self.assertLess(
-            scenario_controls.index('await callRequiredRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", true);'),
-            scenario_controls.index("resetZoomToFit({"),
-        )
-        self.assertIn("createButton = false", hgo_controller)
-        self.assertIn(
-            "const previewButton = button || (createButton ? createPreviewButton(documentRef, anchorButton) : null);",
-            hgo_controller,
-        )
-        self.assertNotIn('id = "hgoRuntimePreviewBtn"', toolbar)
 
     def test_special_zone_workbench_gates_members_and_style_on_active_layer(self):
         owner_content = SPECIAL_ZONES_WORKBENCH_CONTROLLER_JS.read_text(encoding="utf-8")
@@ -528,7 +509,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("membershipTool,", brush_content)
         self.assertIn('brushMode: getSpecialZoneMembershipBrushMode()', brush_content)
         self.assertIn("refreshSpecialZonesWorkbenchUi();", renderer_content)
-        self.assertIn("runtimeState.resolveSpecialZoneParentGroupTargetIdsFn = resolveSpecialZoneParentGroupTargetIds;", renderer_content)
+        self.assertIn('registerRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", resolveSpecialZoneParentGroupTargetIds);', renderer_content)
+        self.assertNotIn("runtimeState.resolveSpecialZoneParentGroupTargetIdsFn =", renderer_content)
+        self.assertIn('resolveParentGroupTargetIds = (featureId) => callRuntimeHook(null, "resolveSpecialZoneParentGroupTargetIdsFn", featureId) ?? [],', owner_content)
+        self.assertIn("return featureId ? resolveParentGroupTargetIds(featureId) : [];", owner_content)
         self.assertIn("getParentGroupFeatureIds", owner_content)
         self.assertIn("special-zone-members-add-parent-group", owner_content)
 
@@ -1177,7 +1161,10 @@ class ToolbarSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("const renderTextureModePanels = (mode = runtimeState.styleConfig.texture?.mode || \"none\") => {", owner_content)
         self.assertIn("const renderTextureUI = () => {", owner_content)
         self.assertIn("const renderDayNightUI = () => {", owner_content)
-        self.assertIn("runtimeState.syncDayNightClockTimerFn?.();", owner_content)
+        self.assertIn('import { callRuntimeHook } from "../../core/state/index.js";', owner_content)
+        self.assertIn('syncDayNightClockTimer = () => callRuntimeHook(null, "syncDayNightClockTimerFn"),', owner_content)
+        self.assertIn("    syncDayNightClockTimer();\n  };", owner_content)
+        self.assertNotIn("runtimeState.syncDayNightClockTimerFn", owner_content)
         self.assertIn("const updateTextureStyle = (mutate, { historyKind = \"texture-style\", commitHistory = false, renderReason = \"texture-style\" } = {}) => {", owner_content)
         self.assertIn("const bindTextureRange = (element, handler) => {", owner_content)
         self.assertIn("bindTextureRange(nodes.textureGraticuleColor,", owner_content)

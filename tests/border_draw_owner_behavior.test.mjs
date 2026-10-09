@@ -189,19 +189,12 @@ function createContextRecorder() {
   };
 }
 
-function createOwner({ hgoVectorScene = false, interactive = false, helpers = {} } = {}) {
+function createOwner({ interactive = false, helpers = {} } = {}) {
   const context = createContextRecorder();
   const coastalAccentCalls = [];
   const state = {
     activeScenarioId: "",
-    activeScenarioManifest: hgoVectorScene
-      ? {
-        scenario_contract_profile: "hgo_vector",
-        performance_hints: {
-          hgo_vector_scene_default: true,
-        },
-      }
-      : null,
+    activeScenarioManifest: null,
     scenarioBorderMode: "canonical",
     cachedCountryBorders: [mesh],
     cachedCoastlines: [mesh],
@@ -314,16 +307,6 @@ test("border styles retain normal and interactive opacity and width", () => {
     nearlyEqual(country.lineWidth, countryWidth);
     nearlyEqual(coast.lineWidth, coastWidth);
     if (!interactive) assert.equal(context.strokes.find(stroke => stroke.strokeStyle === "#111111").alpha, 0);
-  }
-});
-
-test("HGO vector scenes suppress canonical coastlines in both passes", () => {
-  for (const interactive of [false, true]) {
-    const { owner, context, coastalAccentCalls } = createOwner({ hgoVectorScene: true, interactive });
-    owner.drawHierarchicalBorders(2, { interactive });
-    assert.ok(context.strokes.find(stroke => stroke.strokeStyle === "#222222"));
-    assert.equal(context.strokes.find(stroke => stroke.strokeStyle === "#333333"), undefined);
-    if (!interactive) assert.equal(coastalAccentCalls.length, 0);
   }
 });
 
@@ -443,12 +426,12 @@ test("missing physical land masks skip the halo while preserving fine coastlines
   assert.equal(coastalAccentCalls.length, 1);
 });
 
-test("zero-opacity, missing, and HGO coastlines never request a transition", () => {
-  for (const reason of ["zero-opacity", "missing", "hgo"]) {
+test("zero-opacity and missing coastlines never request a transition", () => {
+  for (const reason of ["zero-opacity", "missing"]) {
     for (const interactive of [false, true]) {
       let transitions = 0;
       const { owner, context, state, coastalAccentCalls } = createOwner({
-        interactive, hgoVectorScene: reason === "hgo", helpers: {
+        interactive, helpers: {
           drawCoastalTransition: () => { transitions += 1; return false; },
           ...(reason === "missing" ? { getCoastlineCollectionForZoom: () => [] } : {}),
         },

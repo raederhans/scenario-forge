@@ -323,25 +323,6 @@ test("coastal accent batching clips global coastlines and skips duplicate scenar
   }
 });
 
-test("ocean owner suppresses coastal accents for HGO vector scenes", () => {
-  const harness = createOwner({
-    state: {
-      activeScenarioManifest: {
-        scenario_contract_profile: "hgo_vector",
-        performance_hints: {
-          hgo_vector_scene_default: true,
-        },
-      },
-    },
-  });
-
-  harness.owner.drawScenarioCoastalAccentLayer(1, { interactive: false });
-
-  assert.equal(harness.helperCalls.some((call) => call.type === "clip-atlantropa"), false);
-  assert.equal(harness.pathCalls.length, 0);
-  assert.equal(harness.context.calls.filter((call) => call.type === "stroke").length, 0);
-});
-
 test("coastal transition uses physical land exclusion and conservative Atlantropa clipping for every coastline source", () => {
   for (const coastlineSource of ["global", "scenario"]) {
     for (const mode of ["topology_ocean", "sphere_minus_land"]) {
@@ -384,8 +365,6 @@ test("coastal transition keeps a narrow screen-space extension across zooms", ()
 test("coastal transition rejects disabled or unusable requests before clipping or geometry", () => {
   for (const state of [
     { styleConfig: { coastlines: { opacity: 0 } } },
-    { activeScenarioManifest: { scenario_contract_profile: "hgo_vector" } },
-    { activeScenarioManifest: { performance_hints: { hgo_vector_scene_default: true } } },
   ]) {
     const harness = createOwner({ state });
     assert.equal(harness.owner.drawCoastalTransition(2, { lineWidth: 1, buildPath: () => assert.fail("unexpected geometry") }), false);

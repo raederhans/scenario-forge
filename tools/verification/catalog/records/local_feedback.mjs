@@ -57,8 +57,6 @@ export function createLocalFeedbackRecords(baseRecords) {
   // Previously unregistered Python package entrypoints discovered independently.
   const pythonCoverageRoutes = [
     ["test:py:tno-water-repair-contracts", ["tests/test_tno_water_owners_consistency.py", "tests/test_tno_bundle_builder.py"]],
-    ["test:py:hgo-runtime-seed", ["tests/test_hgo_runtime_seed_builder.py"]],
-    ["test:py:hgo-runtime-assets-contract", ["tests/test_data_manifest_contract.py", "tests/test_data_catalog_contract.py"]],
     ...[
       ["test_france_lod_contract", ["tools/scenario_chunk_assets.py"]],
       ["test_france_precision", ["map_builder/processors/france.py"]],
@@ -287,6 +285,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["command-supersession-contracts", "test-routing", "tests/contracts/command_supersession_contracts.mjs", "tests/command_supersession_contracts.test.mjs"],
     ["state-action-source-contracts", "state-ownership", "tests/contracts/state_action_source_boundary_contracts.mjs", "tests/state_action_source_boundary_contracts.test.mjs"],
     ["state-borrowed-effect-contract", "state-ownership", "tools/state_borrowed_effect_contract.mjs", "tests/state_borrowed_effect_contract_behavior.test.mjs", ["tools/state_writer_inventory.mjs"]],
+    ["state-target-private-cache-contract", "state-ownership", "tools/state_action_delegation_contract.mjs", "tests/state_target_private_cache_contract_behavior.test.mjs", ["tools/state_writer_inventory.mjs", "tools/build_state_writer_policy.mjs", "js/core/renderer/political_feature_policy.js", "js/core/map_renderer.js", "js/core/feature_identity.js", "js/core/feature_identity_shared.js"]],
     ["state-owner-borrowed-storage", "state-ownership", "tools/state_action_delegation_contract.mjs", "tests/state_owner_borrowed_storage_behavior.test.mjs", ["tools/state_writer_inventory.mjs", "tools/state_borrowed_effect_contract.mjs", "js/core/renderer/border_mesh_owner.js", "js/core/renderer/city_lights_render_owner.js", "js/core/renderer/political_path_cache_owner.js", "js/core/scenario/chunk_runtime.js", "js/core/scenario_resources.js"]],
     ["worker-task-client", "renderer-runtime", "js/core/worker_task_client.js", "tests/worker_task_client_behavior.test.mjs"],
     ["border-mesh-worker-runtime", "renderer-runtime", "js/core/renderer/border_mesh_worker_runtime.js", "tests/border_mesh_worker_runtime_behavior.test.mjs", ["js/core/state/actions/renderer_cache_actions.js"]],

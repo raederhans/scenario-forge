@@ -91,20 +91,6 @@ export function createBorderDrawOwner({
     return result;
   }
 
-  function isHgoVectorSceneActive() {
-    const manifest = state?.activeScenarioManifest || {};
-    const profile = String(manifest.scenario_contract_profile || "").trim();
-    if (profile === "hgo_vector") return true;
-    const performanceHints = manifest.performance_hints && typeof manifest.performance_hints === "object"
-      ? manifest.performance_hints
-      : {};
-    return performanceHints.hgo_vector_scene_default === true;
-  }
-
-  function shouldDrawCanonicalCoastlines() {
-    return !isHgoVectorSceneActive();
-  }
-
   function getProjectionScale(k = 1) {
     const scale = Number(k);
     return Number.isFinite(scale) && scale > 0 ? scale : 1;
@@ -513,7 +499,7 @@ export function createBorderDrawOwner({
 
     if (interactive) {
       const coastWidth = (coastWidthBase * 0.88) / kDenom;
-      const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines() && coastOpacity > 0;
+      const drawCanonicalCoastlines = coastOpacity > 0;
       const coastlineLow = drawCanonicalCoastlines
         ? (
           state.cachedCoastlinesLow?.length
@@ -593,7 +579,7 @@ export function createBorderDrawOwner({
       detailAdmBorderMinWidth,
       internalWidthBase * 0.42 * (0.72 + 0.40 * t) * lowZoomWidthScale
     ) * detailAdmBorderWidthScale / kDenom;
-    const drawCanonicalCoastlines = shouldDrawCanonicalCoastlines() && coastOpacity > 0;
+    const drawCanonicalCoastlines = coastOpacity > 0;
     const coastlineCollection = drawCanonicalCoastlines
       ? getViewportAwareCoastlineCollection(getCoastlineCollectionForZoom(k), k)
       : null;

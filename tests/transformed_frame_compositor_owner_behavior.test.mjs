@@ -57,7 +57,6 @@ function createHarness(overrides = {}) {
     zoomGestureScaleDelta: 0.25,
     zoomGestureEndedAt: 1234,
     dpr: 2,
-    hgoReady: false,
   };
   const cache = {
     dirty: {},
@@ -107,7 +106,7 @@ function createHarness(overrides = {}) {
       getZoomGestureScaleDelta: () => runtimeSnapshot.zoomGestureScaleDelta,
       getZoomGestureEndedAt: () => runtimeSnapshot.zoomGestureEndedAt,
       getDpr: () => runtimeSnapshot.dpr,
-      isHgoRuntimePreviewReady: () => runtimeSnapshot.hgoReady,
+
     },
     helpers: {
       nowMs: () => behavior.nowValues.shift() ?? 120,
@@ -249,7 +248,6 @@ test("factory validates its bounded dependencies and freezes the API", () => {
     ["getters", "getZoomGestureScaleDelta"],
     ["getters", "getZoomGestureEndedAt"],
     ["getters", "getDpr"],
-    ["getters", "isHgoRuntimePreviewReady"],
     ["helpers", "nowMs"],
     ["helpers", "canDrawTransformedPass"],
     ["helpers", "getInteractionCompositeReuseDecision"],
@@ -262,7 +260,6 @@ test("factory validates its bounded dependencies and freezes the API", () => {
     ["effects", "drawInteractionBorderSnapshot"],
     ["effects", "drawBordersPass"],
     ["effects", "blitCompositeBufferToMain"],
-    ["effects", "resetMainCanvas"],
     ["effects", "setInteractionCompositeRejectedReason"],
     ["effects", "invalidateInteractionComposite"],
     ["effects", "buildInteractionComposite"],
@@ -391,49 +388,14 @@ test("buffer composition stops when the composite canvas has no 2D context", () 
   assert.deepEqual(callNames(harness), ["ensureCompositeBufferCanvas", "buffer.getContext"]);
 });
 
-test("transformed frame preflights every pass before the HGO canvas reset", () => {
+test("transformed preflight failure preserves the visible canvas", () => {
   const harness = createHarness();
-  harness.runtime.hgoReady = true;
-  harness.cache.dirty.context = true;
-  harness.runtime.renderPhase = "settling";
-  const timings = {};
-
-  assert.equal(harness.owner.drawTransformedFrameFromCaches(timings), true);
-  const names = callNames(harness);
-  const preflightIndexes = names
-    .map((name, index) => (name === "canDrawTransformedPass" ? index : -1))
-    .filter((index) => index >= 0);
-  assert.equal(preflightIndexes.length, harness.behavior.activePassNames.length);
-  assert.ok(Math.max(...preflightIndexes) < names.indexOf("resetMainCanvas"));
-  assert.deepEqual(
-    harness.calls.filter(([name]) => name === "drawTransformedPass").map(([, passName]) => passName),
-    harness.behavior.activePassNames,
-  );
-  assert.equal(timings.usedDirtyFastFramePasses, "context");
-  assert.deepEqual(harness.counters, ["transformedFrames"]);
-  assert.equal(harness.metrics.some(({ name }) => name === "settleFastFrame"), false);
-});
-
-test("HGO preflight failure preserves the visible canvas", () => {
-  const harness = createHarness();
-  harness.runtime.hgoReady = true;
   harness.behavior.drawablePasses.set("political", false);
 
   assert.equal(harness.owner.drawTransformedFrameFromCaches({}), false);
   assert.equal(callNames(harness).includes("resetMainCanvas"), false);
   assert.equal(callNames(harness).includes("drawTransformedPass"), false);
   assert.deepEqual(harness.counters, []);
-});
-
-test("HGO transformed draw failure records its reason and skips counters", () => {
-  const harness = createHarness();
-  harness.runtime.hgoReady = true;
-  harness.behavior.drawPassResults.set("political", false);
-
-  assert.equal(harness.owner.drawTransformedFrameFromCaches({}), false);
-  assert.deepEqual(harness.counters, []);
-  assert.equal(harness.metrics.at(-1).name, "transformedFrameBufferComposeFailure");
-  assert.equal(harness.metrics.at(-1).details.reason, "hgo-runtime-preview");
 });
 
 test("rejected reuse writes the reason before invalidation and permits a copy-only composite build during input", () => {

@@ -178,8 +178,8 @@ function getExpectedLandingStats() {
   for (const scenarioId of PUBLIC_SCENARIO_IDS) {
     assert.ok(scenarioIds.has(scenarioId), `missing public scenario baseline: ${scenarioId}`);
   }
-  assert.deepEqual(scenarioIndex.developer_preview_ids, ["hgo_1936"]);
-  assert.ok(scenarioIds.has("hgo_1936"), "HGO 1936 should stay available as a developer/local preview");
+  assert.deepEqual(scenarioIndex.developer_preview_ids, []);
+  assert.equal(scenarioIds.has("hgo_1936"), false, "Native HGO must not enter the common-base scenario index");
 
   return new Map([
     [

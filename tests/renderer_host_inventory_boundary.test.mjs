@@ -78,7 +78,6 @@ test("renderer host imports current owner and runtime modules", () => {
     "createScenarioRefreshRuntime",
     "createExactAfterSettleScheduler",
     "CANVAS_LAYER_NAMES",
-    "createHgoRuntimePreviewRenderOwner",
     "createSpatialIndexRuntimeOwner",
     "./map_renderer/render_pass_catalog.js",
   ];

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import struct
 import unittest
 from pathlib import Path
 
@@ -29,8 +28,6 @@ RUNTIME_ASSET_REGISTRY_SOURCE = REPO_ROOT / "data" / "runtime_asset_registry.jso
 RUNTIME_ASSET_REGISTRY_JS = REPO_ROOT / "js" / "core" / "runtime_asset_registry.js"
 HISTORICAL_1930_CITY_LIGHTS_ASSET = REPO_ROOT / "js" / "core" / "city_lights_historical_1930_asset.js"
 HISTORICAL_1930_CITY_LIGHTS_ENTRIES = REPO_ROOT / "data" / "city_lights" / "historical_1930_entries.json"
-HGO_RUNTIME_SEED = REPO_ROOT / "data" / "hgo_runtime" / "seed.json"
-HGO_RUNTIME_RASTER = REPO_ROOT / "data" / "hgo_runtime" / "provinces.bmp"
 
 
 def _resolve_manifest_output_path(relative_path: str) -> Path:
@@ -45,27 +42,6 @@ def _resolve_runtime_asset_path(relative_path: str) -> Path:
     return REPO_ROOT / "data" / relative_path
 
 
-def _read_bmp_rgb_keys(path: Path) -> set[int]:
-    data = path.read_bytes()
-    if data[:2] != b"BM":
-        raise AssertionError(f"{path} is not a BMP file")
-    pixel_offset = struct.unpack_from("<I", data, 10)[0]
-    width = struct.unpack_from("<i", data, 18)[0]
-    height_raw = struct.unpack_from("<i", data, 22)[0]
-    bits_per_pixel = struct.unpack_from("<H", data, 28)[0]
-    compression = struct.unpack_from("<I", data, 30)[0]
-    if width <= 0 or height_raw == 0 or bits_per_pixel != 24 or compression != 0:
-        raise AssertionError(f"{path} must be an uncompressed RGB24 BMP")
-    height = abs(height_raw)
-    row_stride = ((width * 3 + 3) // 4) * 4
-    rgb_keys: set[int] = set()
-    for row_index in range(height):
-        row_start = pixel_offset + row_index * row_stride
-        row = data[row_start:row_start + width * 3]
-        for pixel_index in range(0, len(row), 3):
-            blue, green, red = row[pixel_index], row[pixel_index + 1], row[pixel_index + 2]
-            rgb_keys.add((red << 16) | (green << 8) | blue)
-    return rgb_keys
 
 
 class DataManifestContractTest(unittest.TestCase):
@@ -161,9 +137,9 @@ class DataManifestContractTest(unittest.TestCase):
         self.assertEqual(assets.get("transport_catalog:road", {}).get("url"), "data/transport_layers/global_road/catalog.json")
         self.assertEqual(assets.get("hgo_flags_png_manifest", {}).get("url"), "data/hgo_catalogs/hgo_flags.png_manifest.json")
         self.assertEqual(assets.get("hgo_identity_aliases", {}).get("url"), "data/hgo_catalogs/hgo_identity_aliases.json")
-        self.assertEqual(assets.get("hgo_runtime_manifest", {}).get("url"), "data/hgo_runtime/manifest.json")
-        self.assertEqual(assets.get("hgo_runtime_seed", {}).get("url"), "data/hgo_runtime/seed.json")
-        self.assertEqual(assets.get("hgo_runtime_provinces_bmp", {}).get("url"), "data/hgo_runtime/provinces.bmp")
+        self.assertNotIn("hgo_runtime_manifest", assets)
+        self.assertNotIn("hgo_runtime_seed", assets)
+        self.assertNotIn("hgo_runtime_provinces_bmp", assets)
         self.assertNotIn("hgo_flags_index", assets)
         self.assertIn('resolveDataAssetUrl("world_cities")', loader_source)
         self.assertIn('resolveDataAssetUrl("locales")', loader_source)
@@ -326,44 +302,7 @@ class DataManifestContractTest(unittest.TestCase):
         )
         self.assertTrue(any("$.aliases" in error for error in type_errors), type_errors)
 
-    def test_manifest_output_hashes_cover_hgo_runtime_assets(self) -> None:
-        manifest = json.loads(DATA_MANIFEST.read_text(encoding="utf-8"))
-        outputs = manifest.get("outputs") or {}
-        expected = {
-            "hgo_runtime/manifest.json": "hgo_runtime_manifest",
-            "hgo_runtime/seed.json": "hgo_runtime_seed",
-            "hgo_runtime/provinces.bmp": "hgo_runtime_raster",
-        }
 
-        for relative_path, role in expected.items():
-            with self.subTest(relative_path=relative_path):
-                metadata = outputs.get(relative_path) or {}
-                output_path = REPO_ROOT / "data" / relative_path
-                self.assertTrue(output_path.is_file())
-                self.assertEqual(metadata.get("role"), role)
-                self.assertEqual(metadata.get("owner"), "tools.build_hgo_runtime_assets")
-                self.assertEqual(metadata.get("size_bytes"), output_path.stat().st_size)
-                self.assertEqual(metadata.get("sha256"), hashlib.sha256(output_path.read_bytes()).hexdigest())
-                self.assertTrue(str(metadata.get("schema_ref") or "").startswith("schema://"))
-
-        raster_metadata = outputs["hgo_runtime/provinces.bmp"]
-        self.assertEqual(raster_metadata.get("width"), 5120)
-        self.assertEqual(raster_metadata.get("height"), 2560)
-        self.assertEqual(raster_metadata.get("bits_per_pixel"), 24)
-        self.assertEqual(raster_metadata.get("compression"), 0)
-
-    def test_hgo_runtime_raster_colors_resolve_against_seed(self) -> None:
-        seed = json.loads(HGO_RUNTIME_SEED.read_text(encoding="utf-8"))
-        seed_rgb_keys = {
-            int(province["rgb_key"])
-            for province in (seed.get("provinces") or {}).values()
-            if "rgb_key" in province
-        }
-        raster_rgb_keys = _read_bmp_rgb_keys(HGO_RUNTIME_RASTER)
-        unresolved_rgb_keys = sorted(raster_rgb_keys - seed_rgb_keys)
-
-        self.assertGreater(len(raster_rgb_keys), 20_000)
-        self.assertEqual(unresolved_rgb_keys, [])
 
     def test_historical_1930_city_lights_source_refs_are_repo_relative(self) -> None:
         asset_source = HISTORICAL_1930_CITY_LIGHTS_ASSET.read_text(encoding="utf-8")

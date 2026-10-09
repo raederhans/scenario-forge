@@ -289,22 +289,8 @@ process.stdout.write(JSON.stringify(getEffectiveScenarioHierarchyFromInputs(base
         bundle.write(self.baseline / 'runtime_topology.topo.json', self.topology)
         bundle.write(self.baseline / 'owners.by_feature.json', {'owners': self.assignments['owners']})
         self.bind()
-        self.sid = 'hgo_1936'
-        self.output = self.output.with_name(self.sid)
-        self.manifest.update(scenario_id=self.sid, runtime_topology_url=f'data/scenarios/{self.sid}/runtime_topology.topo.json')
-        self.report['scenario_id'] = self.sid
-        # HGO has its own feature namespace; retain its historical properties.
-        def hgo_ids(value):
-            return json.loads(json.dumps(value).replace('US_ZN_01_001', 'HGO-S261'))
-        self.topology, self.overlay, self.report, self.assignments, self.manifest = map(hgo_ids,
-            (self.topology, self.overlay, self.report, self.assignments, self.manifest))
-        bundle.write(self.baseline / 'runtime_topology.topo.json', self.topology)
-        for key in ('owners', 'cores'):
-            bundle.write(self.baseline / f'{key}.by_feature.json', {key: self.assignments[key]})
-        bundle.write(self.baseline / 'manifest.json', self.manifest)
-        self.bind()
         result = self.stage()
-        self.assertFalse(result['chunked'])
+        self.assertTrue(result['chunked'])
         self.assertEqual(bundle.read(self.output / 'owners.by_feature.json')['owners']['ATL_AUX'], 'CAN')
         self.assertEqual(bundle.read(self.output / 'manifest.json')['summary']['feature_count'], 5)
         self.output = self.root / 'second' / self.sid
@@ -358,8 +344,7 @@ process.stdout.write(JSON.stringify(results));
 '''
         cases = []
         for sid, old, retained in [('hoi4_1936', 'US_ZN_01_001', 'US_CNTY_01003'),
-                                    ('blank_base', 'US_CNTY_01001', 'US_ZN_01_003'),
-                                    ('hgo_1936', 'HGO-S1', 'HGO-S12')]:
+                                    ('blank_base', 'US_CNTY_01001', 'US_ZN_01_003')]:
             children = [old + '__county_overlay_01001', old + '__county_overlay_residual']
             crosswalk = {old: children, retained: [retained], 'CAN-1': ['CAN-1']}
             contract = bundle.project_migration_contract(sid, crosswalk, 'source', 'target')
@@ -380,6 +365,8 @@ process.stdout.write(JSON.stringify(results));
             self.assertEqual(result['data']['customPresets']['test'][0]['ids'], [*children, retained, 'CAN-1'])
         with self.assertRaisesRegex(ValueError, 'distinct baseline hashes'):
             bundle.project_migration_contract('blank_base', {}, 'same', 'same')
+        with self.assertRaisesRegex(ValueError, 'supported scenario'):
+            bundle.project_migration_contract('hgo_1936', {'HGO-S1': ['HGO-S1']}, 'source', 'target')
         with self.assertRaisesRegex(ValueError, 'outside reviewed namespace'):
             bundle.project_migration_contract('hoi4_1936', {'CAN-1': ['CAN-1__child']}, 'source', 'target')
 

@@ -27,8 +27,6 @@ LANDING_ASSETS = REPO_ROOT / "landing" / "assets"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
 DRAW_CANVAS_ORCHESTRATION_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "draw_canvas_orchestration_owner.js"
 CACHED_PASS_COMPOSITOR_OWNER_JS = REPO_ROOT / "js" / "core" / "renderer" / "cached_pass_compositor_owner.js"
-HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "hgo_runtime_preview_render_owner.js"
-HGO_RUNTIME_PREVIEW_FRAME_COMMIT_JS = REPO_ROOT / "js" / "core" / "map_renderer" / "hgo_runtime_preview_frame_commit.js"
 DIST_ROOT_INDEX = PAGES_DIST_ROOT / "index.html"
 DIST_APP_JS = PAGES_DIST_ROOT / "app.js"
 DIST_STYLES_CSS = PAGES_DIST_ROOT / "styles.css"
@@ -112,6 +110,43 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_native_hgo_has_closed_assets_and_separate_navigation(self):
+        native = PAGES_DIST_ROOT / "hgo"
+        self.assertTrue((native / "index.html").is_file())
+        self.assertIn('href="../app/"', (native / "index.html").read_text(encoding="utf-8"))
+        self.assertIn('href="../hgo/"', DIST_APP_INDEX.read_text(encoding="utf-8"))
+        self.assertIn('href="./hgo/"', DIST_ROOT_INDEX.read_text(encoding="utf-8"))
+        dataset = json.loads((native / "assets/default/manifest.json").read_bytes())
+        self.assertEqual(dataset["format"], "hgo-native-dataset")
+        self.assertEqual(dataset["coordinateSpace"]["kind"], "pixel")
+        for asset in dataset["assets"].values():
+            data = (native / "assets/default" / asset["url"]).read_bytes()
+            self.assertEqual(len(data), asset["byteLength"])
+            self.assertEqual(hashlib.sha256(data).hexdigest(), asset["sha256"])
+        self.assertFalse((native / "tools").exists())
+        self.assertFalse((native / "tests").exists())
+        self.assertFalse((PAGES_DIST_ROOT / "app/data/hgo_runtime").exists())
+        self.assertFalse((PAGES_DIST_ROOT / "app/data/scenarios/hgo_1936").exists())
+
+    def test_native_and_main_module_graphs_do_not_import_each_other(self):
+        manifest = json.loads(DIST_MANIFEST.read_bytes())
+        inventory = manifest["reachability_inventory"]
+        graph = inventory["module_graph"]
+        self.assertIn("hgo", [entry["id"] for entry in graph["entrypoints"]])
+        self.assertEqual(graph["unresolved_references"], [])
+        native_nodes = [node for node in graph["nodes"] if node["path"].startswith("hgo/")]
+        self.assertTrue(native_nodes)
+        for node in graph["nodes"]:
+            for reference in node["static_imports"] + node["dynamic_imports"] + node["resource_references"]:
+                if node["path"].startswith("hgo/"):
+                    self.assertTrue(reference.startswith("hgo/"), (node["path"], reference))
+                elif node["path"].startswith("app/js/"):
+                    self.assertFalse(reference.startswith("hgo/"), (node["path"], reference))
+        native_rule = next(rule for rule in inventory["product_inventory"]["registry_rules"]
+                           if rule["id"] == "hgo-native-editor")
+        self.assertEqual(native_rule["category"], "on-demand-product")
+        self.assertEqual(native_rule["owner"], "hgo-native-editor")
+
     def test_chunked_gzip_runtime_exclusion_and_unpublished_url_stripping(self) -> None:
         from unittest.mock import patch
         runtime = REPO_ROOT / ".runtime/tmp"
@@ -1175,6 +1210,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             dist_root = Path(tmpdir)
             source_paths = {
+                "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                "hgo/src/main.js": "export const native = true;",
                 "index.html": '<script type="module" src="./app/js/main.js"></script>',
                 "app/index.html": '<script type="module" src="./js/main.js"></script>',
                 "app/js/main.js": r'''
@@ -1251,6 +1288,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             dist_root = Path(tmpdir)
             source_paths = {
+                "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                "hgo/src/main.js": "export const native = true;",
                 "index.html": '<script type="module" src="./app/js/main.js"></script>',
                 "app/index.html": '''
                     <script data-src="./js/data-only.js" src="./js/main.js"></script>
@@ -1289,6 +1328,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             dist_root = Path(tmpdir)
             source_paths = {
+                "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                "hgo/src/main.js": "export const native = true;",
                 "index.html": '<script type="module" src="./app/js/main.js"></script>',
                 "app/index.html": '<script type="module" src="./js/main.js"></script>',
                 "app/js/main.js": """
@@ -1323,7 +1364,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
         self.assertTrue(all(record["line"] > 0 and record["column"] > 0 for record in unresolved_dynamic))
         records = [
             {"path": path, "size_bytes": len(source_paths[path].encode("utf-8")), "source_kind": "dist"}
-            for path in ("index.html", "app/index.html", "app/js/main.js")
+            for path in ("index.html", "app/index.html", "app/js/main.js", "hgo/index.html", "hgo/src/main.js")
         ]
         with self.assertRaisesRegex(
             ValueError,
@@ -1344,6 +1385,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                   Promise.all(RENAMED_RUNTIME_TARGETS.map((target) => loadModule(target)));
             """
             source_paths = {
+                "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                "hgo/src/main.js": "export const native = true;",
                 "index.html": '<script type="module" src="./app/js/main.js"></script>',
                 "app/index.html": '<script type="module" src="./js/main.js"></script>',
                 "app/js/main.js": 'import "./bootstrap/deferred_ui_bootstrap.js";',
@@ -1409,6 +1452,8 @@ class PagesDistStartupShellTest(unittest.TestCase):
                 dist_root = Path(tmpdir)
                 runtime_literal_source = ", ".join(json.dumps(value) for value in case["runtime_literals"])
                 source_paths = {
+                    "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                    "hgo/src/main.js": "export const native = true;",
                     "index.html": '<script type="module" src="./app/js/main.js"></script>',
                     "app/index.html": '<script type="module" src="./js/main.js"></script>',
                     "app/js/main.js": 'import "./bootstrap/deferred_ui_bootstrap.js";',
@@ -1632,6 +1677,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "data/scenarios/tno_1962/audit.json",
             "data/scenarios/tno_1962/derived/marine_regions_named_waters.snapshot.geojson",
             "data/scenarios/hgo_1936/manifest.json",
+            "data/scenarios/hgo_1936/runtime_topology.topo.json.gz",
             "data/scenarios/tno_1962/runtime_topology.topo.json",
             "data/transport_layers/japan_industrial_zones/industrial_zones.open.geojson",
             "data/transport_layers/global_road/shards/w120_w090/roads.topo.json",
@@ -1651,6 +1697,9 @@ class PagesDistStartupShellTest(unittest.TestCase):
         )
 
         for path in (
+            "hgo/index.html",
+            "hgo/src/main.js",
+            "hgo/assets/default/manifest.json",
             "data/scenarios/tno_1962/derived/atlantropa_donor_ledger.json",
             "data/scenarios/tno_1962/derived/geometry_drop_audit.json",
             "data/transport_layers/global_road/catalog.json",
@@ -1681,10 +1730,33 @@ class PagesDistStartupShellTest(unittest.TestCase):
             sorted(rejected_dist_paths),
         )
 
+    def test_pages_scenario_index_excludes_retired_scenarios_without_preview_label(self) -> None:
+        from unittest.mock import patch
+
+        runtime = REPO_ROOT / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            app_root = Path(temporary)
+            scenarios = app_root / "data/scenarios"
+            scenarios.mkdir(parents=True)
+            index_path = scenarios / "index.json"
+            index_path.write_text(json.dumps({"scenarios": [
+                {"scenario_id": "hgo_1936", "manifest_url": "data/scenarios/hgo_1936/manifest.json"},
+                {"scenario_id": "modern_world", "manifest_url": "data/scenarios/modern_world/manifest.json"},
+            ]}), encoding="utf-8")
+            with patch.object(build_pages_dist, "APP_DIST_ROOT", app_root):
+                build_pages_dist.strip_scenario_publish_audit_urls(scenarios)
+            payload = json.loads(index_path.read_text(encoding="utf-8"))
+
+        self.assertEqual([entry["scenario_id"] for entry in payload["scenarios"]], ["modern_world"])
+        self.assertEqual(payload["pages_dist_policy"]["local_preview_scenario_ids"], [])
+
     def test_pages_dist_manifest_payload_rejects_missing_static_import(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             dist_root = Path(tmpdir)
             source_paths = {
+                "hgo/index.html": '<script type="module" src="./src/main.js"></script>',
+                "hgo/src/main.js": "export const native = true;",
                 "index.html": '<script type="module" src="./app/js/main.js"></script>',
                 "app/index.html": '<script type="module" src="./js/main.js"></script>',
                 "app/js/main.js": 'import "./missing.js";',
@@ -2104,44 +2176,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             re.compile(r"\.work-card__media\s*\{[^}]*aspect-ratio:\s*16\s*/\s*9;", re.S),
         )
 
-    def test_hgo_runtime_preview_renders_through_dedicated_pass(self) -> None:
-        source = MAP_RENDERER_JS.read_text(encoding="utf-8")
-        draw_canvas_owner_source = DRAW_CANVAS_ORCHESTRATION_OWNER_JS.read_text(encoding="utf-8")
-        hgo_preview_owner_source = HGO_RUNTIME_PREVIEW_RENDER_OWNER_JS.read_text(encoding="utf-8")
-        hgo_preview_commit_source = HGO_RUNTIME_PREVIEW_FRAME_COMMIT_JS.read_text(encoding="utf-8")
-        start = source.index("function drawCanvas(")
-        end = source.index("function readRenderPerfMetricDuration", start)
-        body = source[start:end]
-        pass_start = hgo_preview_owner_source.index("function drawPreviewPass(")
-        pass_end = hgo_preview_owner_source.index("function normalizeHitPayload(", pass_start)
-        pass_body = hgo_preview_owner_source[pass_start:pass_end]
-
-        # Pages 构建会复制源码 drawCanvas；这里把 HGO preview pass 合同纳入 Pages shell 验证。
-        self.assertNotIn("preferLastGoodFrameForHgoPreview", body)
-        self.assertNotIn('renderHgoRuntimePreviewIfReady("draw-canvas")', body)
-        self.assertIn("return frameCommitter.drawPreviewPass();", pass_body)
-        self.assertIn('renderFrame: (targetCanvas) => renderIfReady("hgo-preview-pass", {', hgo_preview_owner_source)
-        self.assertIn("const rendered = renderFrame(targetCanvas);", hgo_preview_commit_source)
-        self.assertIn("low-resolved-pixel-ratio", hgo_preview_commit_source)
-        self.assertIn("resetCanvasContext(targetContext, targetCanvas.width, targetCanvas.height);", hgo_preview_commit_source)
-        self.assertIn("targetContext.putImageData(imageData, 0, 0);", hgo_preview_commit_source)
-        self.assertNotIn("projectionTransform: null,", pass_body)
-        self.assertIn('const HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES = Object.freeze([\n  "hgoPreview",\n]);', hgo_preview_owner_source)
-        self.assertIn("return filterCurrentEnabledRenderPasses(getHgoRuntimePreviewRenderOwner().getActiveRenderPassNames());", source)
-        self.assertIn(
-            "return isReady() ? HGO_RUNTIME_PREVIEW_RENDER_PASS_NAMES : vectorRenderPassNames;",
-            hgo_preview_owner_source,
-        )
-        self.assertIn("const activeRenderPassNames = getActiveRenderPassNames();", draw_canvas_owner_source)
-        self.assertIn(
-            "ensureIdleRenderPasses(frameTimings, activeRenderPassNames) === false",
-            draw_canvas_owner_source,
-        )
-        self.assertIn(
-            "getRenderPipelinePassesOwner().ensureIdleRenderPasses(frameTimings, activeRenderPassNames);",
-            source,
-        )
-        self.assertIn("drewExactFrame = !!composeCachedPasses(activeRenderPassNames);", draw_canvas_owner_source)
 
     def test_cached_pass_compositor_owner_is_in_the_pages_module_graph(self) -> None:
         renderer_source = MAP_RENDERER_JS.read_text(encoding="utf-8").replace("\r\n", "\n")
@@ -2676,9 +2710,7 @@ class PagesDistStartupShellTest(unittest.TestCase):
             sorted(top_level_directories, key=lambda record: (-int(record["size_bytes"]), str(record["path"]))),
         )
         self.assertIn("app/data/CATALOG.json", required_files)
-        expected_hgo_runtime_paths = tuple(
-            f"app/data/hgo_runtime/{file_name}" for file_name in build_pages_dist.PAGES_HGO_RUNTIME_FILES
-        )
+        self.assertFalse(any(path.startswith("app/data/hgo_runtime/") for path in required_files))
         expected_landing_asset_paths = (
             "assets/product-workspace.webp",
             "assets/hero-cartography.svg",
@@ -2751,7 +2783,6 @@ class PagesDistStartupShellTest(unittest.TestCase):
             "app/data/hgo_catalogs/hgo_place_names.json",
             "app/data/hgo_catalogs/hgo_flags.png_manifest.json",
             "app/data/hgo_catalogs/hgo_identity_aliases.json",
-            *expected_hgo_runtime_paths,
             "app/data/hgo_catalogs/flags_png/small/AB/ABK.png",
             "app/data/hgo_catalogs/flags_png/medium/AB/ABK.png",
             "app/data/city_lights/historical_1930_entries.json",
@@ -2964,17 +2995,17 @@ class PagesDistStartupShellTest(unittest.TestCase):
 
         self.assertEqual(
             registry.get("pages_dist_policy", {}).get("removed_unpublished_asset_keys"),
-            sorted(unpublished_assets),
+            ["city_lights:modern:source_descriptor"],
         )
         self.assertEqual(
             data_manifest.get("runtime_asset_registry", {}).get("pages_dist_policy", {}).get("removed_unpublished_asset_keys"),
-            sorted(unpublished_assets),
+            ["city_lights:modern:source_descriptor"],
         )
         for output_key in local_preview_outputs:
             with self.subTest(output_key=output_key):
                 self.assertNotIn(output_key, data_manifest.get("outputs", {}))
         self.assertTrue(
-            local_preview_outputs.issubset(
+            local_preview_outputs.isdisjoint(
                 set(data_manifest.get("pages_dist_policy", {}).get("removed_unpublished_output_keys", []))
             )
         )
@@ -3113,12 +3144,12 @@ class PagesDistStartupShellTest(unittest.TestCase):
         scenario_ids = [entry.get("scenario_id") for entry in scenario_index.get("scenarios", [])]
 
         self.assertEqual(scenario_index.get("public_baseline_ids"), public_baseline_ids)
-        self.assertEqual(scenario_index.get("developer_preview_ids"), ["hgo_1936"])
+        self.assertEqual(scenario_index.get("developer_preview_ids"), [])
         self.assertEqual(sorted(scenario_ids), sorted(public_baseline_ids))
         self.assertNotIn("hgo_1936", scenario_ids)
         self.assertEqual(
             scenario_index.get("pages_dist_policy", {}).get("local_preview_scenario_ids"),
-            ["hgo_1936"],
+            [],
         )
         for entry in scenario_index.get("scenarios", []):
             manifest_url = entry.get("manifest_url")

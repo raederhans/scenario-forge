@@ -20,10 +20,6 @@ export function createContextPassOrchestratorOwner({
   helpers = {},
   effects = {},
 } = {}) {
-  const isHgoRuntimePreviewReady = requireFunction(
-    getters.isHgoRuntimePreviewReady,
-    "getters.isHgoRuntimePreviewReady",
-  );
   const getDeferContextBasePass = requireFunction(
     getters.getDeferContextBasePass,
     "getters.getDeferContextBasePass",
@@ -90,19 +86,8 @@ export function createContextPassOrchestratorOwner({
     "effects.drawScenarioReliefOverlaysPass",
   );
 
-  function recordHgoSkip(metricName, startedAt, interactive) {
-    if (!isHgoRuntimePreviewReady()) return false;
-    recordRenderPerfMetric(metricName, nowMs() - startedAt, {
-      interactive: !!interactive,
-      skipped: true,
-      reason: "hgo-runtime-preview",
-    });
-    return true;
-  }
-
   function drawContextBasePass(k, { interactive = false } = {}) {
     const startedAt = nowMs();
-    if (recordHgoSkip("drawContextBasePass", startedAt, interactive)) return;
     let deferred = false;
     beginContextMetricSession();
     try {
@@ -162,7 +147,6 @@ export function createContextPassOrchestratorOwner({
 
   function drawContextMarkersPass(k, { interactive = false } = {}) {
     const startedAt = nowMs();
-    if (recordHgoSkip("drawContextMarkersPass", startedAt, interactive)) return;
     let deferred = false;
     beginContextMetricSession();
     try {
@@ -218,7 +202,6 @@ export function createContextPassOrchestratorOwner({
 
   function drawContextScenarioPass(k, { interactive = false } = {}) {
     const startedAt = nowMs();
-    if (recordHgoSkip("drawContextScenarioPass", startedAt, interactive)) return;
     beginContextMetricSession();
     try {
       drawScenarioRegionOverlaysPass(k);

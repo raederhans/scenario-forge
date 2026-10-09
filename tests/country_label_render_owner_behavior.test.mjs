@@ -231,7 +231,7 @@ test("macro label orchestration reserves capitals then countries then other city
   const markerBox = { x: 80, y: 20, w: 8, h: 8 };
   const capitalBox = { x: 90, y: 20, w: 45, h: 12 };
   const overviewLayout = { capitalBoxes: [capitalBox] };
-  const scope = { runtimeState, getMapLabelHierarchy, isHgoRuntimePreviewReady: () => false, recordRenderPerfMetric() {},
+  const scope = { runtimeState, getMapLabelHierarchy, recordRenderPerfMetric() {},
     drawBlankFeatureLabelsPass() {}, shouldShowMarineRegionNames: () => false, nowMs: () => 0,
     getCityPointsRenderOwner: () => ({
       reserveOverviewLabelBoxes(_k, boxes) { events.push("capitals"); boxes.push(markerBox, capitalBox); return overviewLayout; },

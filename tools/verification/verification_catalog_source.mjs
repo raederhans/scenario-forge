@@ -1,4 +1,5 @@
 import { createRiverPaintRecords } from "./catalog/records/river_paint.mjs";
+import { createHgoNativeRecords } from "./catalog/records/hgo_native.mjs";
 import { deepFreeze, normalizeVerificationMetadataSource, verificationMetadataSourceDigest, gatePolicyAuthorityDigest } from "./catalog/normalization.mjs";
 import { projectGatePolicySignals } from "./catalog/gate_policy_signals.mjs";
 import { PACKAGE_SCRIPTS } from "./catalog/package_scripts.mjs";
@@ -55,6 +56,7 @@ AUTHORED_VERIFICATION_METADATA.records.push(...createQuickFillRecords(AUTHORED_V
 AUTHORED_VERIFICATION_METADATA.records.push(...createOwnershipRetirementRecords(AUTHORED_VERIFICATION_METADATA.records));
 
 AUTHORED_VERIFICATION_METADATA.records.push(...createRiverPaintRecords(AUTHORED_VERIFICATION_METADATA.records));
+AUTHORED_VERIFICATION_METADATA.records.push(...createHgoNativeRecords(AUTHORED_VERIFICATION_METADATA.records));
 
 export const VERIFICATION_METADATA_SOURCE = deepFreeze(
   normalizeVerificationMetadataSource(AUTHORED_VERIFICATION_METADATA),

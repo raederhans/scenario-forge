@@ -30,7 +30,7 @@ function createOwner({
   cache: cacheOverrides = {},
   references = {},
   heavyScenario = true,
-  activePassNames = RENDER_PASS_NAMES.filter((passName) => passName !== "hgoPreview"),
+  activePassNames = RENDER_PASS_NAMES,
 } = {}) {
   const state = {
     width: 1000,
@@ -223,7 +223,7 @@ test("ready ordinary maps can schedule sliced recovery while contextBase transfo
   }
 });
 
-test("HGO and unavailable active pipelines cannot reuse stale vector surfaces for sliced recovery", () => {
+test("unavailable active pipelines cannot reuse stale vector surfaces for sliced recovery", () => {
   const withoutActivePipeline = createRenderTransformReusePolicyOwner({
     getters: {
       getRenderPassCacheState: () => ({ canvases: createRequiredPassCanvases() }),
@@ -231,7 +231,7 @@ test("HGO and unavailable active pipelines cannot reuse stale vector surfaces fo
     },
   });
   assert.equal(withoutActivePipeline.shouldStartExactAfterSettleFastPath(), false);
-  for (const activePassNames of [["hgoPreview"], [...EXACT_FAST_PATH_REQUIRED_PASS_NAMES, "hgoPreview"], [], null]) {
+  for (const activePassNames of [[], null]) {
     const { owner } = createOwner({
       activePassNames,
       cache: { canvases: createRequiredPassCanvases() },
@@ -290,7 +290,7 @@ test("shouldStartExactAfterSettleFastPath requires ready cached pass surfaces wi
 
   const canvasesWithoutExcludedPasses = createRequiredPassCanvases();
   const referencesWithoutExcludedPasses = createRequiredPassReferences();
-  for (const excludedPassName of ["borders", "labels", "hgoPreview"]) {
+  for (const excludedPassName of ["borders", "labels"]) {
     assert.equal(canvasesWithoutExcludedPasses[excludedPassName], undefined);
     assert.equal(referencesWithoutExcludedPasses[excludedPassName], undefined);
   }

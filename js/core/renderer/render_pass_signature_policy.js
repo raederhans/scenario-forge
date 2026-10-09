@@ -65,9 +65,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
   getViewportRenderSignature,
   getPhysicalLandMaskInfo,
   getScenarioRuntimeTopologySignatureToken,
-  getHgoRuntimePreviewVisibilitySignature,
-  getHgoRuntimePreviewProjectionOptions,
-  isHgoRuntimePreviewReady,
   rendererSurfaceHost,
   getContextBaseZoomBucketId,
   shouldRefreshContextBaseForColorChanges,
@@ -222,24 +219,7 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "political") {
       return [
         runtimeState.colorRevision || 0,
-        getHgoRuntimePreviewVisibilitySignature(),
         getPoliticalPassStaticSignature(transform),
-      ].join("::");
-    }
-    if (passName === "hgoPreview") {
-      const preview = runtimeState.hgoRuntimePreview || {};
-      const summary = preview.summary || {};
-      const hgoProjectionOptions = getHgoRuntimePreviewProjectionOptions();
-      return [
-        isHgoRuntimePreviewReady() ? "hgo:on" : "hgo:off",
-        String(preview.status || ""),
-        Number(runtimeState.dpr || 1).toFixed(2),
-        Number(runtimeState.width || 0),
-        Number(runtimeState.height || 0),
-        rendererSurfaceHost.getProjection() ? transformSignature : "projection:none",
-        hgoProjectionOptions.projectionName,
-        hgoProjectionOptions.sourceProjection,
-        `seed:${Number(summary.provinceCount || summary.province_count || 0)}:${Number(summary.stateCount || summary.state_count || 0)}:${Number(summary.countryCount || summary.country_count || 0)}`,
       ].join("::");
     }
     if (passName === "effects") {
@@ -262,7 +242,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
       const baseSignatureParts = [
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-base:deferred" : "context-base:ready",
         `bucket:${zoomBucket}`,
         runtimeState.showPhysical ? "physical:on" : "physical:off",
@@ -307,7 +286,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         transformSignature,
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.deferContextBasePass ? "context-markers:deferred" : "context-markers:ready",
         runtimeState.showCityPoints ? "cities:on" : "cities:off",
         runtimeState.showStrategicResourceMarkers ? "strategic-resources:on" : "strategic-resources:off",
@@ -325,7 +303,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         stableJson(runtimeState.styleConfig?.physical?.atlasClassVisibility || {}),
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         `marine-data:${String(runtimeState.waterRegionsDataToken || "")}:${String(runtimeState.scenarioWaterOverlayVersionTag || "")}`,
         runtimeState.styleConfig?.ocean?.showRegionNames === true ? "marine-labels:on" : "marine-labels:off",
         runtimeState.styleConfig?.countryLabels?.enabled !== false ? "country-labels:on" : "country-labels:off",
@@ -345,7 +322,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         transformSignature,
         getPassTopologyRevision(passName),
         runtimeState.activeScenarioId || "",
-        getHgoRuntimePreviewVisibilitySignature(),
         runtimeState.scenarioReliefOverlayRevision || 0,
         getPopulationSignature(runtimeState),
         `scenario-topology:${getScenarioRuntimeTopologySignatureToken()}`,
@@ -362,7 +338,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
     if (passName === "textureLabels") {
       return [
         transformSignature,
-        getHgoRuntimePreviewVisibilitySignature(),
         getPassTopologyRevision(passName),
         stableJson(normalizeTextureStyleConfig(runtimeState.styleConfig?.texture || {})),
       ].join("::");
@@ -378,7 +353,6 @@ export function createRenderPassSignaturePolicy(runtimeState, {
         runtimeState.showWaterRegions ? "water:on" : "water:off",
         runtimeState.showScenarioAtlantropa !== false ? "atlantropa:on" : "atlantropa:off",
         getScenarioOverlaySignatureToken(),
-        getHgoRuntimePreviewVisibilitySignature(),
         getPassTopologyRevision(passName),
         getBorderAppearanceRevision(),
         getPaintContourRevision(),

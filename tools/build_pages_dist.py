@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from tools.runtime_json_packing import pack_published_runtime_data
+from apps.hgo.tools.build_app import build_app as build_hgo_app
 from tools.app_entry_resolver import (
     repo_display_path,
     resolve_editor_entry_path,
@@ -53,6 +54,7 @@ PAGES_MODULE_ENTRYPOINT = "app/js/main.js"
 PAGES_HTML_ENTRYPOINTS = (
     ("landing", "index.html"),
     ("editor", "app/index.html"),
+    ("hgo", "hgo/index.html"),
 )
 
 
@@ -104,6 +106,9 @@ REQUIRED_DIST_FILES = (
     "app/js/main.js",
     "app/data/CATALOG.json",
     "app/data/scenarios/index.json",
+    "hgo/index.html",
+    "hgo/src/main.js",
+    "hgo/assets/default/manifest.json",
 )
 DATA_RUNTIME_FILES = (
     "CATALOG.json",
@@ -161,16 +166,12 @@ HGO_IDENTITY_RUNTIME_FILES = (
     "hgo_place_names.json",
     "hgo_identity_aliases.json",
 )
-HGO_RUNTIME_FILES = (
-    "manifest.json",
-    "seed.json",
-    "provinces.bmp",
-)
-PAGES_HGO_RUNTIME_FILES: tuple[str, ...] = ()
 HGO_IDENTITY_FLAG_TIERS = ("small", "medium")
 PAGES_CITY_ALIAS_STABLE_KEY_LIMIT = 2500
 PAGES_CITY_ALIAS_ENTRY_LIMIT = PAGES_CITY_ALIAS_STABLE_KEY_LIMIT
-PAGES_LOCAL_PREVIEW_SCENARIO_IDS = {"hgo_1936"}
+PAGES_LOCAL_PREVIEW_SCENARIO_IDS: set[str] = set()
+# Retired embedded scenarios must remain excluded even after leaving the preview catalog.
+PAGES_RETIRED_SCENARIO_IDS = {"hgo_1936"}
 SCENARIO_EXCLUDED_DIR_NAMES = {"derived"}
 SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES = {
     Path("tno_1962") / "derived" / "atlantropa_donor_ledger.json",
@@ -207,11 +208,7 @@ LF_NORMALIZED_ROOT_DIST_PATHS = {
 }
 LF_NORMALIZED_ROOT_ASSET_SUFFIXES = {".json"}
 LF_NORMALIZED_APP_SUFFIXES = {".css", ".geojson", ".html", ".js", ".json", ".md", ".svg", ".txt"}
-BYTE_EXACT_APP_DATA_PATHS = {
-    Path("app") / "data" / "hgo_runtime" / file_name
-    for file_name in PAGES_HGO_RUNTIME_FILES
-    if file_name.endswith(".json")
-}
+BYTE_EXACT_APP_DATA_PATHS: set[Path] = set()
 # Runtime coverage metadata and provenance snapshots share these ledger hashes.
 # Keep their source bytes intact when compacting the rest of the delivery data.
 BYTE_EXACT_APP_DATA_PATHS.update({
@@ -512,13 +509,6 @@ SCENARIO_PRODUCT_MODULE_PATHS = (
     "app/js/bootstrap/deferred_detail_promotion.js",
     "app/js/bootstrap/startup_scenario_boot.js",
     "app/js/core/hgo_identity_resolver.js",
-    "app/js/core/hgo_projection_model.js",
-    "app/js/core/hgo_raster_renderer.js",
-    "app/js/core/hgo_runtime_asset_loader.js",
-    "app/js/core/hgo_runtime_index.js",
-    "app/js/core/hgo_runtime_preview.js",
-    "app/js/core/map_renderer/hgo_runtime_preview_frame_commit.js",
-    "app/js/core/map_renderer/hgo_runtime_preview_render_owner.js",
     "app/js/core/map_renderer/scenario_refresh_plans.js",
     "app/js/core/map_renderer/scenario_refresh_runtime.js",
     "app/js/core/map_renderer/scenario_visual_invalidation_executor.js",
@@ -566,12 +556,18 @@ SCENARIO_PRODUCT_MODULE_PATHS = (
     "app/js/core/state/actions/scenario_transaction_rollback_actions.js",
     "app/js/core/state/scenario_runtime_state.js",
     "app/js/ui/scenario_controls.js",
-    "app/js/ui/toolbar/hgo_runtime_preview_controller.js",
     "app/js/ui/toolbar/scenario_context_bar_controller.js",
     "app/js/ui/toolbar/scenario_guide_popover.js",
 )
 
 PAGES_PRODUCT_INVENTORY_RULES = (
+    {
+        "id": "hgo-native-editor",
+        "category": "on-demand-product",
+        "owner": "hgo-native-editor",
+        "override_reachability": True,
+        "prefixes": ("hgo/",),
+    },
     {
         "id": "developer-modules",
         "category": "developer-only",
@@ -604,13 +600,12 @@ PAGES_PRODUCT_INVENTORY_RULES = (
         ),
     },
     {
-        "id": "hgo-runtime-data",
+        "id": "hgo-reference-data",
         "category": "scenario-specific",
-        "owner": "hgo-scenario-runtime",
+        "owner": "hgo-identity",
         "override_reachability": True,
         "prefixes": (
             "app/data/hgo_catalogs/",
-            "app/data/hgo_runtime/",
         ),
     },
     {
@@ -729,7 +724,7 @@ class PagesProductionPublicationPolicy:
             relative_path = Path(*parts[2:])
             if not relative_path.parts:
                 return False
-            if relative_path.parts[0] in PAGES_LOCAL_PREVIEW_SCENARIO_IDS:
+            if relative_path.parts[0] in PAGES_LOCAL_PREVIEW_SCENARIO_IDS | PAGES_RETIRED_SCENARIO_IDS:
                 return False
             if relative_path in SCENARIO_PUBLISHED_DERIVED_RELATIVE_FILES:
                 return True
@@ -996,6 +991,8 @@ def build_editor_dist(editor_entry: Path) -> None:
     target_index = APP_DIST_ROOT / "index.html"
     shutil.copy2(editor_entry, target_index)
     inject_editor_noindex(target_index)
+    write_text_lf(target_index, target_index.read_text(encoding="utf-8").replace(
+        'href="apps/hgo/index.html"', 'href="../hgo/"'))
 
 
 def copy_scenario_runtime_data() -> None:
@@ -1053,7 +1050,7 @@ def strip_scenario_publish_audit_urls(scenarios_dir: Path) -> None:
                 for scenario in scenarios:
                     if isinstance(scenario, dict):
                         scenario.pop("audit_url", None)
-                        if str(scenario.get("scenario_id") or "").strip() in PAGES_LOCAL_PREVIEW_SCENARIO_IDS:
+                        if str(scenario.get("scenario_id") or "").strip() in PAGES_LOCAL_PREVIEW_SCENARIO_IDS | PAGES_RETIRED_SCENARIO_IDS:
                             continue
                     published_scenarios.append(scenario)
                 payload["scenarios"] = published_scenarios
@@ -1693,11 +1690,6 @@ def copy_hgo_identity_runtime_data() -> None:
     )
 
 
-def copy_hgo_runtime_data() -> None:
-    for file_name in PAGES_HGO_RUNTIME_FILES:
-        copy_relative_file(f"data/hgo_runtime/{file_name}")
-
-
 def copy_runtime_data() -> None:
     for relative_file in DATA_RUNTIME_FILES:
         if relative_file == "city_aliases.json":
@@ -1707,7 +1699,6 @@ def copy_runtime_data() -> None:
     for directory_name in DATA_RUNTIME_DIRS:
         copy_tree_contents(ROOT / "data" / directory_name, APP_DIST_ROOT / "data" / directory_name)
     copy_hgo_identity_runtime_data()
-    copy_hgo_runtime_data()
     copy_scenario_runtime_data()
     copy_transport_runtime_data()
     prune_dist_data_manifest_to_published_files()
@@ -2013,7 +2004,7 @@ def build_pages_module_graph(
 
     Source mode checks all published JS/MJS, including landing and vendor code;
     callers supply the complete filename inventory and code/entrypoint texts.
-    The default artifact mode retains its existing editor graph boundary.
+    Artifact mode tracks the main editor and the independent HGO entrypoint.
     """
     if source_texts is not None and available_paths is None:
         raise ValueError("Source graph requires an explicit virtual file inventory")
@@ -2029,7 +2020,7 @@ def build_pages_module_graph(
         if (
             path.endswith((".js", ".mjs"))
             if source_texts is not None
-            else path.startswith("app/js/") and path.endswith(".js")
+            else path.startswith(("app/js/", "hgo/src/")) and path.endswith(".js")
         )
     )
     nodes_by_path: dict[str, dict] = {}
@@ -2932,6 +2923,7 @@ def main(argv: list[str] | None = None) -> None:
     reset_dist()
     build_landing_dist(landing_entry)
     build_editor_dist(editor_entry)
+    build_hgo_app(ROOT / "apps" / "hgo", DIST_ROOT / "hgo", main_url="../app/")
     copy_runtime_data()
     write_nojekyll()
     validate_required_dist_files()

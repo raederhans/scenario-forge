@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1370,
+    "entries": 1367,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -20,9 +20,6 @@
       "hgo_flags_png_manifest": 1,
       "hgo_identity_aliases": 1,
       "hgo_place_names": 1,
-      "hgo_runtime_manifest": 1,
-      "hgo_runtime_raster": 1,
-      "hgo_runtime_seed": 1,
       "hgo_tier_a_catalog": 1,
       "hierarchy": 1,
       "historical_1930_city_lights_asset": 1,
@@ -75,15 +72,13 @@
       "world_urban_lights": 1
     },
     "by_format": {
-      "bmp": 1,
       "geojson": 152,
       "javascript": 2,
-      "json": 1042,
+      "json": 1040,
       "topojson": 173
     },
     "by_read_mode": {
-      "binary": 1,
-      "json": 1367,
+      "json": 1365,
       "module": 2
     }
   },
@@ -492,51 +487,6 @@
       "readMode": "json",
       "aliases": [
         "manifest_output:hgo_catalogs/index.json"
-      ]
-    },
-    {
-      "key": "hgo_runtime_manifest",
-      "url": "data/hgo_runtime/manifest.json",
-      "role": "hgo_runtime_manifest",
-      "format": "json",
-      "schemaRef": "schema://hgo/runtime_manifest/v1",
-      "hashRef": "data/manifest.json::outputs::hgo_runtime/manifest.json::sha256",
-      "owner": "tools.build_hgo_runtime_assets",
-      "cachePolicy": "no-cache",
-      "sourceId": "",
-      "readMode": "json",
-      "aliases": [
-        "manifest_output:hgo_runtime/manifest.json"
-      ]
-    },
-    {
-      "key": "hgo_runtime_provinces_bmp",
-      "url": "data/hgo_runtime/provinces.bmp",
-      "role": "hgo_runtime_raster",
-      "format": "bmp",
-      "schemaRef": "schema://bitmap/bmp_rgb24/v1",
-      "hashRef": "data/manifest.json::outputs::hgo_runtime/provinces.bmp::sha256",
-      "owner": "tools.build_hgo_runtime_assets",
-      "cachePolicy": "default",
-      "sourceId": "",
-      "readMode": "binary",
-      "aliases": [
-        "manifest_output:hgo_runtime/provinces.bmp"
-      ]
-    },
-    {
-      "key": "hgo_runtime_seed",
-      "url": "data/hgo_runtime/seed.json",
-      "role": "hgo_runtime_seed",
-      "format": "json",
-      "schemaRef": "schema://hgo/runtime_seed/v1",
-      "hashRef": "data/manifest.json::outputs::hgo_runtime/seed.json::sha256",
-      "owner": "tools.build_hgo_runtime_assets",
-      "cachePolicy": "default",
-      "sourceId": "",
-      "readMode": "json",
-      "aliases": [
-        "manifest_output:hgo_runtime/seed.json"
       ]
     },
     {

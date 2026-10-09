@@ -1480,7 +1480,6 @@ const EXPECTED_LAZY_STATE_KEYS_BY_AUTHORITY = Object.freeze({
     "colorCanvas",
     "colorCtx",
     "debugMode",
-    "hgoRuntimePreview",
     "interactionOverlayCanvas",
     "interactionOverlayCtx",
     "lineCanvas",
@@ -1491,6 +1490,7 @@ const EXPECTED_LAZY_STATE_KEYS_BY_AUTHORITY = Object.freeze({
     "projectedBoundsDiagnostics",
     "renderPerfMetrics",
     "renderPerfMetricSequence",
+    "renderTransactionDiagnostics",
     "scenarioWaterCacheCoverageAlgo",
     "scenarioWaterCacheMode",
     "waterCacheCoverageAlgo",
@@ -3685,17 +3685,19 @@ test("default state ownership remains complete after retired fields are removed"
 
   assert.equal(report.factoryGroups.length, 16);
   assert.equal(report.explicitKeys.length, 9);
-  assert.equal(report.preCompatKeyCount, 398);
-  assert.equal(report.compatibilityHookCount, 87);
+  assert.equal(report.preCompatKeyCount, 400);
+  assert.equal(report.compatibilityHookCount, 81);
   assert.equal(report.compatibilityHooks.includes("clearExportBakeCacheFn"), false);
-  assert.equal(report.postCompatKeyCount, 485);
+  assert.equal(report.compatibilityHooks.some((key) => key.includes("HgoRuntimePreview")), false);
+  assert.equal(report.authorityOnlyLazyKeys.includes("hgoRuntimePreview"), false);
+  assert.equal(report.postCompatKeyCount, 481);
   assert.ok(report.authorityOnlyLazyKeys.includes("scenarioAtlantropaRevision"));
   assert.deepEqual(
     report.authorityOnlyLazyKeys.filter((key) => key.startsWith("uiHydration")),
     ["uiHydrationError", "uiHydrationStatus", "uiHydrationUpdatedAt"],
   );
   assert.deepEqual(report.collisions, []);
-  assert.equal(report.actualFacadeKeyCount, 485);
+  assert.equal(report.actualFacadeKeyCount, 481);
   assert.deepEqual(report.unownedActualFacadeKeys, []);
   assert.deepEqual(report.registeredKeysMissingFromFacade, []);
 });

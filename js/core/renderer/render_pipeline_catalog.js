@@ -3,7 +3,6 @@ export const IDLE_RENDER_PASS_DEFINITIONS = [
   { passName: "physicalBase", drawKey: "drawPhysicalBasePass" },
   { passName: "political", drawKey: "drawPoliticalPass" },
   { passName: "populationHeatmap", drawKey: "drawPopulationHeatmapPass" },
-  { passName: "hgoPreview", drawKey: "drawHgoPreviewPass" },
   { passName: "contextBase", drawKey: "drawContextBasePass" },
   { passName: "contextScenario", drawKey: "drawContextScenarioPass" },
   { passName: "effects", drawKey: "drawEffectsPass" },

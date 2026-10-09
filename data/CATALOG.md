@@ -2,7 +2,7 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 1370
+- entries: 1367
 
 ## Counts by role
 
@@ -24,9 +24,6 @@
 | hgo_flags_png_manifest | 1 |
 | hgo_identity_aliases | 1 |
 | hgo_place_names | 1 |
-| hgo_runtime_manifest | 1 |
-| hgo_runtime_raster | 1 |
-| hgo_runtime_seed | 1 |
 | hgo_tier_a_catalog | 1 |
 | hierarchy | 1 |
 | historical_1930_city_lights_asset | 1 |
@@ -111,9 +108,6 @@
 | hgo_identity_aliases | data/hgo_catalogs/hgo_identity_aliases.json | hgo_identity_aliases | json | json | schema://json/object/v1 | data/manifest.json::outputs::hgo_catalogs/hgo_identity_aliases.json::sha256 | default | hgo_identity_aliases.manual_review |  |
 | hgo_place_names | data/hgo_catalogs/hgo_place_names.json | hgo_place_names | json | json | schema://json/object/v1 | data/manifest.json::outputs::hgo_catalogs/hgo_place_names.json::sha256 | default | tools.build_hgo_name_catalog |  |
 | hgo_tier_a_catalog | data/hgo_catalogs/index.json | hgo_tier_a_catalog | json | json | schema://json/object/v1 | data/manifest.json::outputs::hgo_catalogs/index.json::sha256 | default | tools.build_hgo_flag_index |  |
-| hgo_runtime_manifest | data/hgo_runtime/manifest.json | hgo_runtime_manifest | json | json | schema://hgo/runtime_manifest/v1 | data/manifest.json::outputs::hgo_runtime/manifest.json::sha256 | no-cache | tools.build_hgo_runtime_assets |  |
-| hgo_runtime_provinces_bmp | data/hgo_runtime/provinces.bmp | hgo_runtime_raster | bmp | binary | schema://bitmap/bmp_rgb24/v1 | data/manifest.json::outputs::hgo_runtime/provinces.bmp::sha256 | default | tools.build_hgo_runtime_assets |  |
-| hgo_runtime_seed | data/hgo_runtime/seed.json | hgo_runtime_seed | json | json | schema://hgo/runtime_seed/v1 | data/manifest.json::outputs::hgo_runtime/seed.json::sha256 | default | tools.build_hgo_runtime_assets |  |
 | manifest_output:hierarchy.json | data/hierarchy.json | hierarchy | json | json | schema://json/object/v1 | data/manifest.json::outputs::hierarchy.json::sha256 | default | init_map_data.hierarchy_locales |  |
 | city_lights:historical_1930:exclusions | data/historical_city_lights_1930_exclusions.json | city_lights_source | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.city_lights:historical_1930:exclusions |  |
 | locales | data/locales.json | locales | json | json | schema://json/object/v1 | data/manifest.json::outputs::locales.json::sha256 | default | init_map_data.hierarchy_locales |  |

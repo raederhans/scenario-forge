@@ -119,8 +119,6 @@ import {
   TRANSPORT_WORKBENCH_INSPECTOR_TABS,
 } from "./toolbar/transport_workbench_controller.js";
 import { createWorkspaceChromeSupportSurfaceController } from "./toolbar/workspace_chrome_support_surface_controller.js";
-import { createHgoRuntimePreviewLoaders } from "../core/hgo_runtime_asset_loader.js";
-import { createHgoRuntimePreviewToolbarController } from "./toolbar/hgo_runtime_preview_controller.js";
 const state = runtimeState;
 
 function composePaletteLibraryOperation() {
@@ -501,7 +499,6 @@ function initToolbar({ render } = {}) {
     runtimeState.ui.responsiveChromeTier = nextTier;
   };
   applyResponsiveChromeDefaults();
-  let hgoRuntimePreviewController = null;
 
   const persistDeveloperMode = () => {
     try {
@@ -545,7 +542,6 @@ function initToolbar({ render } = {}) {
         devWorkspaceToggleBtn.click();
       }
     }
-    hgoRuntimePreviewController?.sync?.();
   };
 
   const setDeveloperMode = (nextValue) => {
@@ -565,21 +561,6 @@ function initToolbar({ render } = {}) {
       runtimeState.ui.developerMode = storedDeveloperMode === "true";
     }
   } catch {}
-  const hgoRuntimePreviewLoaders = createHgoRuntimePreviewLoaders({
-    d3Client: globalThis.d3,
-    fetchImpl: globalThis.fetch,
-  });
-  hgoRuntimePreviewController = createHgoRuntimePreviewToolbarController({
-    runtimeState,
-    anchorButton: developerModeBtn,
-    canvas: runtimeState.colorCanvas || document.getElementById("colorCanvas"),
-    loadSeed: hgoRuntimePreviewLoaders.loadSeed,
-    loadRaster: hgoRuntimePreviewLoaders.loadRaster,
-    renderOptions: () => callRuntimeHook(state, "getHgoRuntimePreviewProjectionOptionsFn") || {},
-    restorePreviewTarget: render,
-    storage: globalThis.localStorage,
-    documentRef: document,
-  });
   updateLanguageToggleUi();
   syncDeveloperModeUi();
 
@@ -842,21 +823,6 @@ function initToolbar({ render } = {}) {
     setDeveloperMode(false);
     return false;
   });
-  registerRuntimeHook(state, "setHgoRuntimePreviewEnabledFn", (nextEnabled) => (
-    hgoRuntimePreviewController?.setEnabled?.(nextEnabled)
-  ));
-  registerRuntimeHook(state, "toggleHgoRuntimePreviewFn", () => (
-    hgoRuntimePreviewController?.toggle?.()
-  ));
-  registerRuntimeHook(state, "syncHgoRuntimePreviewUiFn", () => (
-    hgoRuntimePreviewController?.sync?.()
-  ));
-  registerRuntimeHook(state, "renderHgoRuntimePreviewFn", (options = {}) => (
-    hgoRuntimePreviewController?.renderPreview?.(options) || null
-  ));
-  registerRuntimeHook(state, "inspectHgoRuntimePreviewPointFn", (x, y, options = {}) => (
-    hgoRuntimePreviewController?.inspectPoint?.(x, y, options) || null
-  ));
 
   const syncExportPreviewSourceOptions = () => {
     return exportWorkbenchController?.syncExportPreviewSourceOptions();

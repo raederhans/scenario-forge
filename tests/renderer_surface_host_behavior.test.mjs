@@ -115,7 +115,6 @@ test("renderer owner wiring remains lazy and preserves live host and global read
     ProjectedGeometryBoundsOwner: { getProjection: "Projection", getPathCanvas: "PathCanvas", getPathSvg: "PathSvg" },
     SpatialIndexRuntimeOwner: { getPathSvg: "PathSvg" },
     IntensityFieldMaskOwner: { getProjection: "Projection" },
-    HgoRuntimePreviewRenderOwner: { getProjection: "Projection", getMapSvg: "MapSvg", getTargetCanvas: "TargetCanvas" },
     StrategicOverlayHelpersOwner: { getStrategicDefs: "StrategicDefs", getOperationalLinesGroup: "OperationalLinesGroup", getOperationGraphicsGroup: "OperationGraphicsGroup", getUnitCountersGroup: "UnitCountersGroup", getSpecialZonesGroup: "SpecialZonesGroup", getSpecialZoneEditorGroup: "SpecialZoneEditorGroup" },
     RenderCacheOwner: { getContext: "Context" },
     ViewportReadModelOwner: {},

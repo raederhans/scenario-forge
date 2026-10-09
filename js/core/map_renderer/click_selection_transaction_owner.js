@@ -105,7 +105,6 @@ const CLICK_SELECTION_SERVICE_NAMES = Object.freeze([
   "getSpecialRegionColor",
   "getWaterRegionColor",
   "handleSpecialZoneMembershipClick",
-  "inspectHgoRuntimePreviewFromEvent",
   "isDoubleClickBatchEligible",
   "isFacilityDetailsSurfaceActive",
   "isMacroOceanWaterRegion",
@@ -154,7 +153,7 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
   const getSelectedFacilityEntry = requireFunction(getters.getSelectedFacilityEntry, "getters.getSelectedFacilityEntry");
   const handleRiverPaintClick = typeof services.handleRiverPaintClick === "function" ? services.handleRiverPaintClick : () => false;
   const { clearClickHoverIds, consumeSuppressedBrushClick, removeClickCountryColors, removeClickWaterRegionOverride, setClickActiveSovereignCode, setClickCountryColors, setClickHoverOverlayDirty, setClickSelectedColor, setClickSelectedSpecialRegionId, setClickSelectedWaterRegionId, setFacilityInfoCardExpanded, setHoveredFacilityEntry, setSelectedFacilityEntry, togglePresetRegion } = requirePorts(effects, CLICK_SELECTION_ACTION_NAMES, "effects");
-  const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, inspectHgoRuntimePreviewFromEvent, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
+  const { appendOperationalLineVertexFromEvent, appendOperationGraphicVertexFromEvent, appendSpecialZoneVertexFromEvent, applyFacilityInfoCardState, applyFeatureVisualOverrideTransaction, applyVisualSubdivisionFill, applyWaterRegionFill, blockStartupReadonlyInteraction, captureHistoryState, commitHistoryEntry, dismissOnboardingHint, ensureLeafDetailReady, getFeatureCountryCodeNormalized, getFeaturePaintColor, getHitFromEvent, getHoveredFacilityEntryFromEvent, getIntensityFieldTool, getSafeCanvasColor, getSpecialRegionColor, getWaterRegionColor, handleSpecialZoneMembershipClick, isDoubleClickBatchEligible, isFacilityDetailsSurfaceActive, isMacroOceanWaterRegion, isOpenOceanPaintEnabled, markDirty, noteRenderAction, nowMs, placeUnitCounterFromEvent, queueTooltipUpdate, refreshSidebarAfterPaint, refreshSpecialRegionSidebarRowsNow, refreshWaterRegionSidebarRowsNow, renderHoverOverlayIfNeeded, requestInteractionRender, resolveInteractionTargetIds, shouldBlockUnderlyingSelectionForFacility, shouldRequireLeafDetail, syncInspectorCountryToLandSelection, toggleFeatureInDevSelection, updateDevSelectedHit, warnIncompletePaintTargets } = requirePorts(services, CLICK_SELECTION_SERVICE_NAMES, "services");
 
   async function handleClick(event, _interactionContext = null) {
     let state = getClickState();
@@ -184,19 +183,6 @@ export function createClickSelectionTransactionOwner({ constants = {}, getters =
     }
     if (state.unitCounterEditor?.active) {
       placeUnitCounterFromEvent(event);
-      return;
-    }
-
-    const hgoRuntimeClick = inspectHgoRuntimePreviewFromEvent(event, { eventType: "click" });
-    if (hgoRuntimeClick.active) {
-      if (event?.preventDefault) event.preventDefault();
-      updateDevSelectedHit(hgoRuntimeClick.hit?.id ? hgoRuntimeClick.hit : null);
-      clearClickHoverIds();
-      queueTooltipUpdate({ visible: false });
-      setClickHoverOverlayDirty(true);
-      renderHoverOverlayIfNeeded({ eventType: "hgo-runtime-preview-click" });
-      requestInteractionRender("hgo-runtime-preview-click");
-      noteRenderAction(hgoRuntimeClick.hit?.id ? "hgo-runtime-preview-select" : "hgo-runtime-preview-empty", actionStart);
       return;
     }
 

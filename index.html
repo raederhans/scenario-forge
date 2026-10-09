@@ -60,6 +60,7 @@
             <div class="sidebar-details-body">
               <div id="scenarioStatus" class="body-text visually-hidden">No scenario active</div>
               <div id="scenarioAuditHint" class="body-text visually-hidden hidden">Coverage report unavailable</div>
+              <a id="hgoEditorLink" class="btn-secondary" href="apps/hgo/index.html" data-i18n="Open HGO editor">Open HGO editor</a>
               <label id="lblScenarioSelect" class="visually-hidden" for="scenarioSelect">Scenario</label>
               <select id="scenarioSelect" name="scenario-select" autocomplete="off" class="select-input scenario-select-native" aria-hidden="true" tabindex="-1">
                 <option id="optScenarioNone" value="">None</option>
@@ -3539,19 +3540,19 @@
 
         <section id="scenarioGuideSectionHgo" class="scenario-guide-manual-section hidden" data-guide-panel="hgo" role="tabpanel" aria-labelledby="scenarioGuideTabHgo scenarioGuideHgoTitle" hidden>
           <h4 id="scenarioGuideHgoTitle" class="scenario-guide-manual-title" data-i18n="HGO and identity">HGO and identity</h4>
-          <p class="scenario-guide-manual-lead" data-i18n="Use this section when the scenario uses HGO source data, HGO flags, or HGO country-name variants.">Use this section when the scenario uses HGO source data, HGO flags, or HGO country-name variants.</p>
+          <p class="scenario-guide-manual-lead" data-i18n="Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.">Edit HGO maps in the separate editor, or review HGO names and flags in the Inspector.</p>
           <div class="scenario-guide-tool-accordion">
             <details class="scenario-guide-tool-panel" open>
               <summary class="scenario-guide-tool-summary">
-                <span class="scenario-guide-tool-title" data-i18n="HGO runtime preview">HGO runtime preview</span>
-                <span class="scenario-guide-tool-summary-copy" data-i18n="Check the donor geography before editing.">Check the donor geography before editing.</span>
+                <span class="scenario-guide-tool-title" data-i18n="HGO editor">HGO editor</span>
+                <span class="scenario-guide-tool-summary-copy" data-i18n="A dedicated workspace for HGO maps.">A dedicated workspace for HGO maps.</span>
               </summary>
               <div class="scenario-guide-tool-body">
-                <p data-i18n="HGO preview helps you inspect the HGO source layer beside the active scenario map. It is best used before ownership, label, or color decisions.">HGO preview helps you inspect the HGO source layer beside the active scenario map. It is best used before ownership, label, or color decisions.</p>
+                <p data-i18n="Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.">Select a land or sea state to change its color or label. Undo changes, save your HGO project, or export a PNG.</p>
+                <p><a href="apps/hgo/index.html" data-i18n="Open HGO editor">Open HGO editor</a></p>
                 <ul class="scenario-guide-tool-steps">
-                  <li><strong data-i18n="Use when">Use when</strong><span data-i18n="You need to compare the active map against HGO geography or confirm that the selected feature belongs to the expected source region.">You need to compare the active map against HGO geography or confirm that the selected feature belongs to the expected source region.</span></li>
-                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Apply the HGO-backed scenario, open the preview, select the target country, then read the Inspector before changing anything.">Apply the HGO-backed scenario, open the preview, select the target country, then read the Inspector before changing anything.</span></li>
-                  <li><strong data-i18n="Check">Check</strong><span data-i18n="The selected country, owner tag, and visible boundary should describe the same place before you edit.">The selected country, owner tag, and visible boundary should describe the same place before you edit.</span></li>
+                  <li><strong data-i18n="Order">Order</strong><span data-i18n="Open the editor, select a state on the map or through search, then edit its color or label.">Open the editor, select a state on the map or through search, then edit its color or label.</span></li>
+                  <li><strong data-i18n="Save">Save</strong><span data-i18n="HGO projects open in the HGO editor. Save the current workspace before switching editors.">HGO projects open in the HGO editor. Save the current workspace before switching editors.</span></li>
                 </ul>
               </div>
             </details>

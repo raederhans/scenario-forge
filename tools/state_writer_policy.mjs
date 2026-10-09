@@ -191,7 +191,6 @@ const LAZY_STATE_KEY_DOMAINS = Object.freeze({
   currentScenarioApplyTargetId: Object.freeze(["scenario", "P4.2"]),
   debugMode: Object.freeze(["renderer", "P4.3"]),
   devWorkspaceTagPopoverDismissHandler: Object.freeze(["dev", "P4.4"]),
-  hgoRuntimePreview: Object.freeze(["renderer", "P4.3"]),
   inspectorHighlightFeatureIds: Object.freeze(["color", "P4.4"]),
   inspectorHighlightGroupMode: Object.freeze(["color", "P4.4"]),
   inspectorHighlightLabel: Object.freeze(["color", "P4.4"]),
@@ -290,7 +289,6 @@ export function classifyStateWriterFallbackAuthority(relativePath = "") {
   if (
     normalizedPath.includes("/renderer/")
     || normalizedPath.includes("map_renderer")
-    || normalizedPath.includes("hgo_runtime")
   ) {
     return {
       domain: "renderer",

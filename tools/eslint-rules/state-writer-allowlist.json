@@ -6,7 +6,6 @@
     "js/bootstrap/ui_shell_debug_seed.js",
     "js/core/history_manager.js",
     "js/core/interaction_funnel.js",
-    "js/core/hgo_runtime_preview.js",
     "js/core/legend_manager.js",
     "js/core/logic.js",
     "js/core/map_renderer.js",

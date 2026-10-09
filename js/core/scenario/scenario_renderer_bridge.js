@@ -41,7 +41,6 @@ function refreshMapDataForScenarioChunkPromotion(options = {}) {
     changedLayerKeys: options.changedLayerKeys,
     hasPoliticalChange,
     firstFrameOnly: !!options.firstFrameOnly,
-    hgoPreviewDirty: !!options.hgoPreviewDirty,
   });
   return runRendererScenarioChunkPromotionRefresh({
     ...options,

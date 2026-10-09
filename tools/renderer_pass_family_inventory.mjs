@@ -1,7 +1,6 @@
 export const RENDER_PASS_FAMILY_IDS = Object.freeze([
   "foundation",
   "political",
-  "hgo-preview",
   "context",
   "visual-effects",
   "borders",
@@ -154,25 +153,6 @@ export const RENDER_PASS_FAMILY_INVENTORY = Object.freeze([
     notes: "dedicated browser lane gap; targeted behavior contracts cover projected source-raster density, bounded viewport refinement and raster cache, land and TNO masks, transformed reuse, and export readiness; population statistics remain offline sidecar data",
   }),
   freezeRecord({
-    passName: "hgoPreview",
-    familyId: "hgo-preview",
-    entryFunction: "drawHgoPreviewPass",
-    implementationStatus: "delegated-existing",
-    entryHostPath: "js/core/map_renderer.js",
-    plannedPhase: "existing-delegated",
-    riskTier: "medium",
-    stateReadClass: ["viewport", "scenario", "map-data", "interaction", "render-cache"],
-    stateWriteClass: ["pass-surface", "owner-cache", "diagnostics"],
-    canvasOrSvg: "canvas",
-    existingDependencyOwners: [
-      "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
-      "js/core/map_renderer/hgo_runtime_preview_frame_commit.js",
-    ],
-    browserLanes: [],
-    perfSensitivity: "high",
-    notes: "dedicated browser lane gap; static and contract evidence only",
-  }),
-  freezeRecord({
     passName: "contextBase",
     familyId: "context",
     entryFunction: "drawContextBasePass",
@@ -287,7 +267,7 @@ export const RENDER_PASS_FAMILY_INVENTORY = Object.freeze([
     ],
     browserLanes: ["test:e2e:layer:regression", "test:e2e:tno-contracts"],
     perfSensitivity: "high",
-    notes: "HGO and data guards remain in the wrapper; border draw reaches ocean coastal accents through its injected helper",
+    notes: "Data guards remain in the wrapper; border draw reaches ocean coastal accents through its injected helper",
   }),
   freezeRecord({
     passName: "contextMarkers",

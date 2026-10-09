@@ -73,10 +73,6 @@ export function createTransformedFrameCompositorOwner({
     "getters.getZoomGestureEndedAt",
   );
   const getDpr = requireFunction(getters.getDpr, "getters.getDpr");
-  const isHgoRuntimePreviewReady = requireFunction(
-    getters.isHgoRuntimePreviewReady,
-    "getters.isHgoRuntimePreviewReady",
-  );
 
   const nowMs = requireFunction(helpers.nowMs, "helpers.nowMs");
   const canDrawTransformedPass = requireFunction(
@@ -118,7 +114,6 @@ export function createTransformedFrameCompositorOwner({
     effects.blitCompositeBufferToMain,
     "effects.blitCompositeBufferToMain",
   );
-  const resetMainCanvas = requireFunction(effects.resetMainCanvas, "effects.resetMainCanvas");
   const setInteractionCompositeRejectedReason = requireFunction(
     effects.setInteractionCompositeRejectedReason,
     "effects.setInteractionCompositeRejectedReason",
@@ -219,28 +214,6 @@ export function createTransformedFrameCompositorOwner({
       allowDirty: allowDirtyFastFrame,
     }))) {
       return false;
-    }
-    if (isHgoRuntimePreviewReady()) {
-      resetMainCanvas();
-      const drewHgoPreviewFrame = activeTransformedPassNames.every((passName) => (
-        drawTransformedPass(passName, currentTransform)
-      ));
-      if (!drewHgoPreviewFrame) {
-        recordRenderPerfMetric("transformedFrameBufferComposeFailure", 0, {
-          phase: String(getRenderPhase() || ""),
-          activeScenarioId: String(getActiveScenarioId() || ""),
-          allowDirtyFastFrame,
-          usedDirtyInteractionPasses: false,
-          reason: "hgo-runtime-preview",
-        });
-        return false;
-      }
-      if (dirtyFastFramePassNames.length) {
-        timings.usedDirtyFastFramePasses = dirtyFastFramePassNames.join(",");
-      }
-      recordPassTiming(timings, "hgoPreviewTransformedFrame", compositeStart);
-      incrementPerfCounter("transformedFrames");
-      return true;
     }
     const compositeReuseDecision = getInteractionCompositeReuseDecision(currentTransform, cache, {
       allowSelectionTopologyContinuity: getRenderPhase() === renderPhaseInteracting,

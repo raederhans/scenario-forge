@@ -2952,333 +2952,6 @@
       ]
     },
     {
-      "path": "js/core/hgo_runtime_index.js",
-      "surface": "production",
-      "domain": "renderer",
-      "authority": "legacy-target",
-      "migrationPhase": "P4.3",
-      "bindings": [
-        {
-          "id": "parameter:buildResolvedProvince:0:f980a917b31b:130:62",
-          "kind": "function-parameter",
-          "name": "state",
-          "functionName": "buildResolvedProvince",
-          "parameterName": "state",
-          "parameterIndex": 0,
-          "parameterPath": "$/property:state",
-          "locator": {
-            "line": 130,
-            "column": 62
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 133,
-                  "column": 5,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "4ba69735ca53765ed6a709edb56c6ea236b7193a3b29a6b390c346f0f4340e4e"
-                },
-                {
-                  "line": 136,
-                  "column": 14,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "dd365b33b96d65c424db9ed1984df2cc1dc4e773f3fa38e375404386c5356a53"
-                },
-                {
-                  "line": 137,
-                  "column": 15,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "ab1a1500fd183468e616dfbb7df6e63dcb7c2e499a46648f29791930f123e272"
-                },
-                {
-                  "line": 138,
-                  "column": 20,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "fc8469ba526819851dce93fca60fdc806bb1e994b8a07824c85f78dab3f84d7f"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "path": "js/core/hgo_runtime_preview.js",
-      "surface": "production",
-      "domain": "renderer",
-      "authority": "legacy-direct",
-      "migrationPhase": "P4.3",
-      "bindings": [
-        {
-          "id": "parameter:createHgoRuntimePreviewController:0:09fc96082d34:146:9",
-          "kind": "function-parameter",
-          "name": "runtimeState",
-          "functionName": "createHgoRuntimePreviewController",
-          "parameterName": "runtimeState",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 146,
-            "column": 9
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [
-                "assign",
-                "object-assign"
-              ],
-              "keys": [
-                "hgoRuntimePreview"
-              ],
-              "memberships": [
-                {
-                  "operation": "assign",
-                  "key": "hgoRuntimePreview",
-                  "mutationSites": [
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"ensureHgoRuntimePreviewState\",\"ordinal\":0}]}",
-                      "sourceFingerprint": "99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8",
-                      "occurrenceIndex": 0
-                    }
-                  ]
-                },
-                {
-                  "operation": "object-assign",
-                  "key": "hgoRuntimePreview",
-                  "mutationSites": [
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"ensureHgoRuntimePreviewState\",\"ordinal\":0}]}",
-                      "sourceFingerprint": "46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5",
-                      "occurrenceIndex": 0
-                    }
-                  ]
-                }
-              ],
-              "aliasSites": [
-                {
-                  "alias": "runtimeState",
-                  "aliasChain": [
-                    "runtimeState"
-                  ],
-                  "operation": "object-assign",
-                  "key": "hgoRuntimePreview",
-                  "line": 49,
-                  "column": 5,
-                  "sourceFingerprint": "46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5"
-                },
-                {
-                  "alias": "runtimeState",
-                  "aliasChain": [
-                    "runtimeState"
-                  ],
-                  "operation": "assign",
-                  "key": "hgoRuntimePreview",
-                  "line": 51,
-                  "column": 5,
-                  "sourceFingerprint": "99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8"
-                }
-              ],
-              "dynamicSites": [
-                {
-                  "line": 49,
-                  "column": 5,
-                  "operation": "object-assign",
-                  "key": "hgoRuntimePreview",
-                  "pathPattern": "hgoRuntimePreview.*",
-                  "sourceFingerprint": "46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5"
-                }
-              ],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 30,
-                  "column": 69,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "8b4748096c9b63d7388a0fbe953381eef772069243960b741e0f3541240273db"
-                },
-                {
-                  "line": 35,
-                  "column": 5,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "073c1634c496cdb649d1afe0a312bbb4b7e1741b271542e4a436c3b8824b1761"
-                },
-                {
-                  "line": 37,
-                  "column": 14,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "a2f8e7a5907eee5fe0ddd1c6dc57fdaa9aa9224c48dddd22654879e4a007cbc2"
-                },
-                {
-                  "line": 38,
-                  "column": 20,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "931737ee869fbc1dc12f8f6111771eaee5a6559a597b97d7ce1d88623f910e7a"
-                },
-                {
-                  "line": 39,
-                  "column": 20,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "4487dd17fdaa8cd83cc62b0ca0d04b58f6251a9a0209497f07ae8267d4d8046c"
-                },
-                {
-                  "line": 53,
-                  "column": 10,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "hgoRuntimePreview",
-                  "sourceFingerprint": "99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:ensureHgoRuntimePreviewState:0:09fc96082d34:43:53",
-          "kind": "function-parameter",
-          "name": "runtimeState",
-          "functionName": "ensureHgoRuntimePreviewState",
-          "parameterName": "runtimeState",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 43,
-            "column": 53
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [
-                "assign",
-                "object-assign"
-              ],
-              "keys": [
-                "hgoRuntimePreview"
-              ],
-              "memberships": [
-                {
-                  "operation": "assign",
-                  "key": "hgoRuntimePreview",
-                  "mutationSites": [
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"ensureHgoRuntimePreviewState\",\"ordinal\":0}]}",
-                      "sourceFingerprint": "99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8",
-                      "occurrenceIndex": 0
-                    }
-                  ]
-                },
-                {
-                  "operation": "object-assign",
-                  "key": "hgoRuntimePreview",
-                  "mutationSites": [
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"ensureHgoRuntimePreviewState\",\"ordinal\":0}]}",
-                      "sourceFingerprint": "46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5",
-                      "occurrenceIndex": 0
-                    }
-                  ]
-                }
-              ],
-              "aliasSites": [],
-              "dynamicSites": [
-                {
-                  "line": 49,
-                  "column": 5,
-                  "operation": "object-assign",
-                  "key": "hgoRuntimePreview",
-                  "pathPattern": "hgoRuntimePreview.*",
-                  "sourceFingerprint": "46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5"
-                }
-              ],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 30,
-                  "column": 69,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "8b4748096c9b63d7388a0fbe953381eef772069243960b741e0f3541240273db"
-                },
-                {
-                  "line": 35,
-                  "column": 5,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "073c1634c496cdb649d1afe0a312bbb4b7e1741b271542e4a436c3b8824b1761"
-                },
-                {
-                  "line": 37,
-                  "column": 14,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "a2f8e7a5907eee5fe0ddd1c6dc57fdaa9aa9224c48dddd22654879e4a007cbc2"
-                },
-                {
-                  "line": 38,
-                  "column": 20,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "931737ee869fbc1dc12f8f6111771eaee5a6559a597b97d7ce1d88623f910e7a"
-                },
-                {
-                  "line": 39,
-                  "column": 20,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "4487dd17fdaa8cd83cc62b0ca0d04b58f6251a9a0209497f07ae8267d4d8046c"
-                },
-                {
-                  "line": 53,
-                  "column": 10,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "hgoRuntimePreview",
-                  "sourceFingerprint": "99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
       "path": "js/core/history_manager.js",
       "surface": "production",
       "domain": "cross-domain",
@@ -13662,87 +13335,6 @@
                   "operation": "unsupported",
                   "key": "*",
                   "sourceFingerprint": "d2b609a93e83bbd402fad9c99c9713b673211db1ea045133102240831f4f18f0"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "path": "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
-      "surface": "production",
-      "domain": "cross-domain",
-      "authority": "legacy-target",
-      "migrationPhase": "multi-phase",
-      "bindings": [
-        {
-          "id": "parameter:createHgoRuntimePreviewRenderOwner:0:c2ad6df5da0f:37:9",
-          "kind": "function-parameter",
-          "name": "runtimeState",
-          "functionName": "createHgoRuntimePreviewRenderOwner",
-          "parameterName": "runtimeState",
-          "parameterIndex": 0,
-          "parameterPath": "$/property:runtimeState",
-          "locator": {
-            "line": 37,
-            "column": 9
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "content",
-              "migrationPhase": "P4.2",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 66,
-                  "column": 29,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "dpr",
-                  "sourceFingerprint": "ad456d64e06ff0e7618971233519f5b886f21cdd093c953d3af47a7c20671e3c"
-                }
-              ]
-            },
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 67,
-                  "column": 28,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "e58b748023bfc9f77b1b3c0a6d183cd3ff9060f7c08f5deeaca1f03f3d5fe052"
-                },
-                {
-                  "line": 74,
-                  "column": 28,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7"
-                },
-                {
-                  "line": 104,
-                  "column": 25,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7"
                 }
               ]
             }
@@ -45112,8 +44704,6 @@
                 "assign"
               ],
               "keys": [
-                "countryBaseColors",
-                "featureOverrides",
                 "mapSemanticMode",
                 "runtimePoliticalMetaSeed",
                 "sovereignBaseColors",
@@ -45122,14 +44712,6 @@
                 "visualOverrides"
               ],
               "memberships": [
-                {
-                  "operation": "assign",
-                  "key": "countryBaseColors"
-                },
-                {
-                  "operation": "assign",
-                  "key": "featureOverrides"
-                },
                 {
                   "operation": "assign",
                   "key": "mapSemanticMode"
@@ -45405,8 +44987,6 @@
                 "assign"
               ],
               "keys": [
-                "countryBaseColors",
-                "featureOverrides",
                 "mapSemanticMode",
                 "sovereignBaseColors",
                 "sovereigntyByFeatureId",
@@ -45414,14 +44994,6 @@
                 "visualOverrides"
               ],
               "memberships": [
-                {
-                  "operation": "assign",
-                  "key": "countryBaseColors"
-                },
-                {
-                  "operation": "assign",
-                  "key": "featureOverrides"
-                },
                 {
                   "operation": "assign",
                   "key": "mapSemanticMode"
@@ -46698,14 +46270,6 @@
                 "visualOverrides"
               ],
               "memberships": [
-                {
-                  "operation": "assign",
-                  "key": "countryBaseColors"
-                },
-                {
-                  "operation": "assign",
-                  "key": "featureOverrides"
-                },
                 {
                   "operation": "assign",
                   "key": "mapSemanticMode"
@@ -86718,95 +86282,6 @@
       ]
     },
     {
-      "path": "js/ui/toolbar/hgo_runtime_preview_controller.js",
-      "surface": "production",
-      "domain": "renderer",
-      "authority": "legacy-target",
-      "migrationPhase": "P4.3",
-      "bindings": [
-        {
-          "id": "parameter:createHgoRuntimePreviewToolbarController:0:c2ad6df5da0f:71:9",
-          "kind": "function-parameter",
-          "name": "runtimeState",
-          "functionName": "createHgoRuntimePreviewToolbarController",
-          "parameterName": "runtimeState",
-          "parameterIndex": 0,
-          "parameterPath": "$/property:runtimeState",
-          "locator": {
-            "line": 71,
-            "column": 9
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 43,
-                  "column": 53,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7"
-                },
-                {
-                  "line": 74,
-                  "column": 63,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:syncButton:1:09fc96082d34:42:78",
-          "kind": "function-parameter",
-          "name": "runtimeState",
-          "functionName": "syncButton",
-          "parameterName": "runtimeState",
-          "parameterIndex": 1,
-          "parameterPath": "$",
-          "locator": {
-            "line": 42,
-            "column": 78
-          },
-          "authority": "legacy-target",
-          "grants": [
-            {
-              "domain": "renderer",
-              "migrationPhase": "P4.3",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 43,
-                  "column": 53,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
       "path": "js/ui/toolbar/intensity_field_editor_section.js",
       "surface": "production",
       "domain": "cross-domain",
@@ -93937,10 +93412,8 @@
       "ensureContextLayerDataFn",
       "ensureDetailTopologyFn",
       "ensureFullLocalizationDataReadyFn",
-      "getHgoRuntimePreviewProjectionOptionsFn",
       "getStrategicOverlayPerfCountersFn",
       "getViewportGeoBoundsFn",
-      "inspectHgoRuntimePreviewPointFn",
       "openExportWorkbenchFn",
       "openScenarioVisualAdjustmentsFn",
       "openTransportWorkbenchFn",
@@ -93955,7 +93428,6 @@
       "refreshWaterRegionListRowsFn",
       "releaseDeferredContextBasePassFn",
       "renderCountryListFn",
-      "renderHgoRuntimePreviewFn",
       "renderNowFn",
       "renderPaletteFn",
       "renderPresetTreeFn",
@@ -93970,17 +93442,14 @@
       "runZoomStepFn",
       "scheduleScenarioChunkRefreshFn",
       "setDevWorkspaceExpandedFn",
-      "setHgoRuntimePreviewEnabledFn",
       "setIntensityFieldToolFn",
       "setStartupReadonlyStateFn",
       "showOnboardingHintFn",
       "showToastFn",
       "syncDeveloperModeUiFn",
       "syncFacilityInfoCardVisibilityFn",
-      "syncHgoRuntimePreviewUiFn",
       "toggleDeveloperModeFn",
       "toggleDockFn",
-      "toggleHgoRuntimePreviewFn",
       "toggleLeftPanelFn",
       "toggleRightPanelFn",
       "triggerScenarioGuideFn",
@@ -107121,12 +106590,16 @@
     "retiredLegacySemanticAuthority": {
       "bindings": [
         "js/core/dirty_state.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-direct",
+        "js/core/hgo_runtime_index.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildResolvedProvince\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/interaction_funnel.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"resolveImportedTransportCountryOverlayPackIds\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"getExplicitScenarioCountryDisplayName\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"getUniqueColors\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"pickWeightedEntries\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setLabel\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/map_renderer.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewRenderOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/map_renderer/renderer_runtime_context.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createRenderCacheReadModel\",\"parameterName\":\"\",\"parameterIndex\":1,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/map_renderer/scenario_refresh_runtime.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"analyzeScenarioPoliticalDerivedStateCoverage\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/core/map_renderer/scenario_refresh_runtime.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"getScenarioChunkSelectionDiagnostics\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
@@ -107174,6 +106647,8 @@
         "js/ui/sidebar/strategic_overlay/unit_counter_catalog_helper.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setUnitCounterLibraryVariant\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/ui/sidebar/strategic_overlay/unit_counter_modal_helper.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setUnitCounterEditorModalState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/ui/toolbar/export_workbench_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureExportWorkbenchUiState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
+        "js/ui/toolbar/hgo_runtime_preview_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewToolbarController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
+        "js/ui/toolbar/hgo_runtime_preview_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"syncButton\",\"parameterName\":\"\",\"parameterIndex\":1,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/ui/toolbar/sample_project_banner_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createSampleProjectBannerController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/ui/toolbar/sample_project_banner_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createSampleProjectGuideCardController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
         "js/ui/toolbar/sample_project_banner_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"resolveSampleProjectGuideContext\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|legacy-target",
@@ -107192,6 +106667,10 @@
         "js/bootstrap/startup_ready_handoff.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createStartupReadyHandoffOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|scenario|P4.2|assign|runtimeChunkLoadState",
         "js/bootstrap/ui_shell_boot.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"runUiShellDebugBoot\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:targetState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|boot|P4.1|assign|uiShellDebug",
         "js/bootstrap/ui_shell_debug_seed.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"applyUiShellDebugTerritorySeed\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|boot|P4.1|assign|uiShellDebugTerritorySeeded",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|assign|hgoRuntimePreview",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|assign|hgoRuntimePreview",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview",
         "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|assign|appearancePresets",
         "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|assign|intensityFields",
         "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|frontlineOverlayDirty",
@@ -107646,6 +107125,8 @@
       "aliasSites": [
         "js/bootstrap/startup_ready_handoff.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createStartupReadyHandoffOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|scenario|P4.2|loadState|[\"targetRuntime\",\"loadState\"]|assign|runtimeChunkLoadState|3066c035673fbd0363fc55f997774c37f5bb1b565ba38995aa0bfcfb3983a7a1",
         "js/bootstrap/startup_ready_handoff.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createStartupReadyHandoffOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|scenario|P4.2|loadState|[\"targetRuntime\",\"loadState\"]|assign|runtimeChunkLoadState|ce8771d67c26e6af86af9fd3dcaf71b84dfd88a8cd2452299149273141de86ff",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|runtimeState|[\"runtimeState\"]|assign|hgoRuntimePreview|99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|runtimeState|[\"runtimeState\"]|object-assign|hgoRuntimePreview|46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5",
         "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|cursor|[\"cursor\"]|assign|styleConfig|ef140d4bdc781eaa3a016c3aa6a3df4f10d8e8d56e954ddcedcc1779fe3a2109",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setLabel\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|labels|[\"labels\"]|assign|legendLabels|9479ce359c9426d5780d8eab0d04bb4df664b11ba9b431421767a53689689f9f",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setLabel\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|labels|[\"labels\"]|delete|legendLabels|c4ace399aec672a9f6749bc5a018fd52f870813b6f7eb172cb8e5d4c3927c7df",
@@ -107814,6 +107295,8 @@
         "js/ui/toolbar/transport_workbench_state_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createTransportWorkbenchStateOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|uiState|[\"uiState\"]|delete|transportWorkbenchUi|05b4837575aae41070f599339cd74b48351302c73937864b956d5048f7ceb208"
       ],
       "dynamicSites": [
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview|hgoRuntimePreview.*|46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview|hgoRuntimePreview.*|46c23281df400406b3868e69bcef1b11bc04d0a8ea9197022d452bc05dc366d5",
         "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|styleConfig|styleConfig.*|ef140d4bdc781eaa3a016c3aa6a3df4f10d8e8d56e954ddcedcc1779fe3a2109",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setLabel\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|legendLabels|legendLabels.*|9479ce359c9426d5780d8eab0d04bb4df664b11ba9b431421767a53689689f9f",
         "js/core/legend_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setLabel\",\"parameterName\":\"\",\"parameterIndex\":2,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|legendLabels|legendLabels.*|c4ace399aec672a9f6749bc5a018fd52f870813b6f7eb172cb8e5d4c3927c7df",
@@ -108783,8 +108266,18 @@
         "js/core/dirty_state.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|cross-domain|multi-phase|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
         "js/core/dirty_state.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|cross-domain|multi-phase|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
         "js/core/file_manager.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildProjectPayload\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|state-alias-escape|unsupported|specialZoneLayers|6566a8cdc284d401b11a8424dd45bc0d70485fcb024bcfea18c2f0882ec1cbf6",
+        "js/core/hgo_runtime_index.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildResolvedProvince\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|4ba69735ca53765ed6a709edb56c6ea236b7193a3b29a6b390c346f0f4340e4e",
+        "js/core/hgo_runtime_index.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildResolvedProvince\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|ab1a1500fd183468e616dfbb7df6e63dcb7c2e499a46648f29791930f123e272",
+        "js/core/hgo_runtime_index.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildResolvedProvince\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|dd365b33b96d65c424db9ed1984df2cc1dc4e773f3fa38e375404386c5356a53",
+        "js/core/hgo_runtime_index.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"buildResolvedProvince\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|fc8469ba526819851dce93fca60fdc806bb1e994b8a07824c85f78dab3f84d7f",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|073c1634c496cdb649d1afe0a312bbb4b7e1741b271542e4a436c3b8824b1761",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|4487dd17fdaa8cd83cc62b0ca0d04b58f6251a9a0209497f07ae8267d4d8046c",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|685a50f9ac6d6349de05ca5d763b7cea78de8912a0162c864324142afcec0261",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|6bd52b204f5b4cffb267597f37d0fa62bae229341394dfec0e5d42439d8b722c",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|8b4748096c9b63d7388a0fbe953381eef772069243960b741e0f3541240273db",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|931737ee869fbc1dc12f8f6111771eaee5a6559a597b97d7ce1d88623f910e7a",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|a2f8e7a5907eee5fe0ddd1c6dc57fdaa9aa9224c48dddd22654879e4a007cbc2",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|hgoRuntimePreview|99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|2312c68e7b7aa20307cf1bf0c8ff7d9bafed6fee105fda32878a87440b6b946b",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|2ac49451c5f0c5ce6123975db54cf73135dfa125c5ba76075535a4d31624b1c8",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|4192cfe5dbc1b877ad0241a9e26f685029d13eeb6a7f843f5ae89aa77593a39c",
@@ -108793,8 +108286,14 @@
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|afedd4b62679ad3a6bf40a6f88bd46d9529d51c6910024c3cb17fb1edbbf11a1",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|d024c9658fb42b4f64214da79f60cc71f13d7b7cbf2be63e82d7e87dc7609c95",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|faa247c26465beb61448e112e709d436af09127304919f5a3a0aeb7761b99d1d",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|073c1634c496cdb649d1afe0a312bbb4b7e1741b271542e4a436c3b8824b1761",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|4487dd17fdaa8cd83cc62b0ca0d04b58f6251a9a0209497f07ae8267d4d8046c",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|685a50f9ac6d6349de05ca5d763b7cea78de8912a0162c864324142afcec0261",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|6bd52b204f5b4cffb267597f37d0fa62bae229341394dfec0e5d42439d8b722c",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|8b4748096c9b63d7388a0fbe953381eef772069243960b741e0f3541240273db",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|931737ee869fbc1dc12f8f6111771eaee5a6559a597b97d7ce1d88623f910e7a",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|a2f8e7a5907eee5fe0ddd1c6dc57fdaa9aa9224c48dddd22654879e4a007cbc2",
+        "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|hgoRuntimePreview|99d655e864f11492155e32632f58283837a975f8bcc362b63750bd74c995e7c8",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|2312c68e7b7aa20307cf1bf0c8ff7d9bafed6fee105fda32878a87440b6b946b",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|2ac49451c5f0c5ce6123975db54cf73135dfa125c5ba76075535a4d31624b1c8",
         "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|unsupported-call-mutation|unsupported|*|4192cfe5dbc1b877ad0241a9e26f685029d13eeb6a7f843f5ae89aa77593a39c",
@@ -112025,6 +111524,10 @@
         "js/core/map_renderer/exact_after_settle_scheduler.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createExactAfterSettleScheduler\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|eb1fc915624b20ae8496a6ca8bd4b18f3073180fc6bae244f9abd678ba3f51a8",
         "js/core/map_renderer/exact_after_settle_scheduler.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createExactAfterSettleScheduler\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|exactAfterSettleController|64879f7d6b960a01909762d911a32d4582c20010c5641ee90278b644a9e3b525",
         "js/core/map_renderer/exact_after_settle_scheduler.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createExactAfterSettleScheduler\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|exactAfterSettleController|7b20a577ca3b5e636dce3e2d19ed08b5e1d7b0aab1b4cc38e2c152c5e3ae063c",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewRenderOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|content|P4.2|state-alias-escape|unsupported|dpr|ad456d64e06ff0e7618971233519f5b886f21cdd093c953d3af47a7c20671e3c",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewRenderOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewRenderOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+        "js/core/map_renderer/hgo_runtime_preview_render_owner.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewRenderOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|e58b748023bfc9f77b1b3c0a6d183cd3ff9060f7c08f5deeaca1f03f3d5fe052",
         "js/core/map_renderer/renderer_runtime_context.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createRenderCacheReadModel\",\"parameterName\":\"\",\"parameterIndex\":1,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
         "js/core/map_renderer/scenario_refresh_runtime.js|{\"kind\":\"function-local\",\"name\":\"runtimeState\",\"functionName\":\"createScenarioRefreshRuntime\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|scenario|P4.2|state-alias-escape|unsupported|*|09e5f9637ba47e173761557ea138c181aa5f67b31a7385f40b2ce08a2d4f3504",
         "js/core/map_renderer/scenario_refresh_runtime.js|{\"kind\":\"function-local\",\"name\":\"runtimeState\",\"functionName\":\"createScenarioRefreshRuntime\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|scenario|P4.2|state-alias-escape|unsupported|*|09e5f9637ba47e173761557ea138c181aa5f67b31a7385f40b2ce08a2d4f3504",
@@ -112913,6 +112416,9 @@
         "js/ui/toolbar/export_workbench_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureExportWorkbenchUiState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|state-alias-escape|unsupported|exportWorkbenchUi|e75f95c59867f4d7d7db752f393ed742054f97251b0d93dfc1a394ae2181899d",
         "js/ui/toolbar/export_workbench_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"resolveExportWorkbenchSampleContext\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|state-alias-escape|unsupported|*|a926520d2164a4e9cbaf4edff0c629de4166c0b165e5a2a8850b15c743794dd5",
         "js/ui/toolbar/export_workbench_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"resolveExportWorkbenchSampleContext\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|state-alias-escape|unsupported|*|a926520d2164a4e9cbaf4edff0c629de4166c0b165e5a2a8850b15c743794dd5",
+        "js/ui/toolbar/hgo_runtime_preview_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewToolbarController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+        "js/ui/toolbar/hgo_runtime_preview_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewToolbarController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
+        "js/ui/toolbar/hgo_runtime_preview_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"syncButton\",\"parameterName\":\"\",\"parameterIndex\":1,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|state-alias-escape|unsupported|*|2e51c4d469637774e394d4d8cf5c379bebc66669a88c5e54a716cd9277c294c7",
         "js/ui/toolbar/intensity_field_editor_section.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createIntensityFieldEditorSection\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|state-alias-escape|unsupported|intensityFields|00c77b0847e15fd470bdad5f4172e4f93f9a32a71533d98d23cd0f975f130516",
         "js/ui/toolbar/intensity_field_editor_section.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createIntensityFieldEditorSection\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|state-alias-escape|unsupported|intensityFields|00c77b0847e15fd470bdad5f4172e4f93f9a32a71533d98d23cd0f975f130516",
         "js/ui/toolbar/intensity_field_editor_section.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createIntensityFieldEditorSection\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|state-alias-escape|unsupported|intensityFields|00c77b0847e15fd470bdad5f4172e4f93f9a32a71533d98d23cd0f975f130516",
@@ -113320,6 +112826,82 @@
           "retiredInPhase": "P4.1",
           "recordedInPhase": "P4.2a",
           "backfilled": true
+        },
+        {
+          "retiredMembershipIdentity": "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|assign|hgoRuntimePreview",
+          "retiredCallerPath": "js/core/hgo_runtime_preview.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+          "retiredMutationSiteFingerprint": "08f9f1508b91acaee0bb2366144eb2520796fd5838bbb738c0bb328b7a466522",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "ff4d1b9ff2661924940428e64ada8721339170c440daf01ca36cb9099d63fd63",
+          "previousSourceRevision": "a91cb74e170ecd1e4f441420f16bffcb9a931fd9",
+          "previousSourceFingerprint": "c0792ce9fa4db88d9db8bd755389e69a41bc3d4c8a1461f95e7d9a8966a007ef",
+          "currentSourceFingerprint": "",
+          "domain": "renderer",
+          "migrationPhase": "P4.3",
+          "operation": "assign",
+          "key": "hgoRuntimePreview",
+          "retiredInPhase": "P4.4",
+          "recordedInPhase": "P4.4",
+          "backfilled": false
+        },
+        {
+          "retiredMembershipIdentity": "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview",
+          "retiredCallerPath": "js/core/hgo_runtime_preview.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createHgoRuntimePreviewController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+          "retiredMutationSiteFingerprint": "1d44d558d0d273ac6ed6973a7e4978e987f0f8857f69218af55253b4a2b1f9da",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "fc6fc4ded936018871d2c60d837528af2ff8803251c3068018dcbcaf38691d06",
+          "previousSourceRevision": "a91cb74e170ecd1e4f441420f16bffcb9a931fd9",
+          "previousSourceFingerprint": "c0792ce9fa4db88d9db8bd755389e69a41bc3d4c8a1461f95e7d9a8966a007ef",
+          "currentSourceFingerprint": "",
+          "domain": "renderer",
+          "migrationPhase": "P4.3",
+          "operation": "object-assign",
+          "key": "hgoRuntimePreview",
+          "retiredInPhase": "P4.4",
+          "recordedInPhase": "P4.4",
+          "backfilled": false
+        },
+        {
+          "retiredMembershipIdentity": "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|assign|hgoRuntimePreview",
+          "retiredCallerPath": "js/core/hgo_runtime_preview.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+          "retiredMutationSiteFingerprint": "08f9f1508b91acaee0bb2366144eb2520796fd5838bbb738c0bb328b7a466522",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "e4005a4c03f722fe7f54429aa3ab4c36b86ea030590a533407fa6624ff0f82b3",
+          "previousSourceRevision": "a91cb74e170ecd1e4f441420f16bffcb9a931fd9",
+          "previousSourceFingerprint": "c0792ce9fa4db88d9db8bd755389e69a41bc3d4c8a1461f95e7d9a8966a007ef",
+          "currentSourceFingerprint": "",
+          "domain": "renderer",
+          "migrationPhase": "P4.3",
+          "operation": "assign",
+          "key": "hgoRuntimePreview",
+          "retiredInPhase": "P4.4",
+          "recordedInPhase": "P4.4",
+          "backfilled": false
+        },
+        {
+          "retiredMembershipIdentity": "js/core/hgo_runtime_preview.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|renderer|P4.3|object-assign|hgoRuntimePreview",
+          "retiredCallerPath": "js/core/hgo_runtime_preview.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"ensureHgoRuntimePreviewState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+          "retiredMutationSiteFingerprint": "1d44d558d0d273ac6ed6973a7e4978e987f0f8857f69218af55253b4a2b1f9da",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "5759a45641890ead492304f27f69d8e34b3682891a450dfcac7f5196477f2399",
+          "previousSourceRevision": "a91cb74e170ecd1e4f441420f16bffcb9a931fd9",
+          "previousSourceFingerprint": "c0792ce9fa4db88d9db8bd755389e69a41bc3d4c8a1461f95e7d9a8966a007ef",
+          "currentSourceFingerprint": "",
+          "domain": "renderer",
+          "migrationPhase": "P4.3",
+          "operation": "object-assign",
+          "key": "hgoRuntimePreview",
+          "retiredInPhase": "P4.4",
+          "recordedInPhase": "P4.4",
+          "backfilled": false
         },
         {
           "retiredMembershipIdentity": "js/core/history_manager.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|appearance|P4.4|assign|appearancePresets",
@@ -113780,34 +113362,53 @@
         },
         {
           "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
-          "callerPath": "js/core/interaction_funnel/import_apply_orchestration.js",
-          "callerBindingId": "parameter:commitImportedProjectPatch:0:09fc96082d34:28:59",
-          "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitImportedProjectPatch\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitImportedProjectPatch\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyImportedProjectState\",\"ordinal\":0}]}",
-          "retiredMutationSiteFingerprint": "c13320ff49285bdf10ef1c9eb390906438ae0d6fdd95377be6c4fab21edbd4bb",
-          "retiredMutationSiteCount": 1,
-          "proofPrecision": "explicit-cross-file",
           "retiredCallerPath": "js/core/interaction_funnel.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "afbb90876c24c33da99712a7d6ed5c90a6e8307ee09301857a91867e9a517483",
+          "retiredMutationSiteFingerprint": "c13320ff49285bdf10ef1c9eb390906438ae0d6fdd95377be6c4fab21edbd4bb",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "9586bfb529283f43d302d0a1cb79f4351fb6a70eaa049f0fcd548d825496feb4",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "fae753db6c3958f519e0ed470919c4b3d0d3bdd16024702508e716cb9decb92a",
+          "currentSourceFingerprint": "07c4a97947532f264837c82aaa5aff39f3630213eba9f35f5e5c6387c4ef6850",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "countryBaseColors",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "restoreProjectImportFields",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "3a0197c4817865e4a8a81ce971a5b938f4f5b83135c45eda2d54d66b9127fb9a",
-          "occurrenceIndex": 0,
-          "start": 2555,
-          "end": 2607,
-          "line": 32,
-          "column": 3,
-          "sourceFingerprint": "027f290c51cfbc082ba9460e3fba0653ba03d70c890c5e3d75037cdfba0113f4",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
+            "callerPath": "js/core/interaction_funnel/import_apply_orchestration.js",
+            "callerBindingId": "parameter:commitImportedProjectPatch:0:09fc96082d34:28:59",
+            "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitImportedProjectPatch\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitImportedProjectPatch\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyImportedProjectState\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "c13320ff49285bdf10ef1c9eb390906438ae0d6fdd95377be6c4fab21edbd4bb",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "explicit-cross-file",
+            "retiredCallerPath": "js/core/interaction_funnel.js",
+            "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "crossFileMigrationContractIdentity": "afbb90876c24c33da99712a7d6ed5c90a6e8307ee09301857a91867e9a517483",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "countryBaseColors",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "restoreProjectImportFields",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "3a0197c4817865e4a8a81ce971a5b938f4f5b83135c45eda2d54d66b9127fb9a",
+            "occurrenceIndex": 0,
+            "start": 2555,
+            "end": 2607,
+            "line": 32,
+            "column": 3,
+            "sourceFingerprint": "027f290c51cfbc082ba9460e3fba0653ba03d70c890c5e3d75037cdfba0113f4",
+            "retiredInPhase": "P4.4",
+            "recordedInPhase": "P4.4",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|customPresets",
@@ -113904,34 +113505,53 @@
         },
         {
           "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
-          "callerPath": "js/core/interaction_funnel/import_apply_orchestration.js",
-          "callerBindingId": "parameter:commitImportedProjectPatch:0:09fc96082d34:28:59",
-          "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitImportedProjectPatch\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitImportedProjectPatch\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyImportedProjectState\",\"ordinal\":0}]}",
-          "retiredMutationSiteFingerprint": "cc961e711ddd9c3178e35e37e288fbd0fb60b17c042c62f1a6e1eacf8927891b",
-          "retiredMutationSiteCount": 1,
-          "proofPrecision": "explicit-cross-file",
           "retiredCallerPath": "js/core/interaction_funnel.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "5c81815f62e2139aa7486b5e96fca11b256651716e8aeef8c2a9783b25db4cee",
+          "retiredMutationSiteFingerprint": "cc961e711ddd9c3178e35e37e288fbd0fb60b17c042c62f1a6e1eacf8927891b",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "f8936510529e1ec6cfeed775ec3085ac3b7f9afa2fcfc725b8501a1258c0df6b",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "fae753db6c3958f519e0ed470919c4b3d0d3bdd16024702508e716cb9decb92a",
+          "currentSourceFingerprint": "07c4a97947532f264837c82aaa5aff39f3630213eba9f35f5e5c6387c4ef6850",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "featureOverrides",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "restoreProjectImportFields",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "3a0197c4817865e4a8a81ce971a5b938f4f5b83135c45eda2d54d66b9127fb9a",
-          "occurrenceIndex": 0,
-          "start": 2555,
-          "end": 2607,
-          "line": 32,
-          "column": 3,
-          "sourceFingerprint": "027f290c51cfbc082ba9460e3fba0653ba03d70c890c5e3d75037cdfba0113f4",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
+            "callerPath": "js/core/interaction_funnel/import_apply_orchestration.js",
+            "callerBindingId": "parameter:commitImportedProjectPatch:0:09fc96082d34:28:59",
+            "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitImportedProjectPatch\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitImportedProjectPatch\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"applyImportedProjectState\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "cc961e711ddd9c3178e35e37e288fbd0fb60b17c042c62f1a6e1eacf8927891b",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "explicit-cross-file",
+            "retiredCallerPath": "js/core/interaction_funnel.js",
+            "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "crossFileMigrationContractIdentity": "5c81815f62e2139aa7486b5e96fca11b256651716e8aeef8c2a9783b25db4cee",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "featureOverrides",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "restoreProjectImportFields",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "3a0197c4817865e4a8a81ce971a5b938f4f5b83135c45eda2d54d66b9127fb9a",
+            "occurrenceIndex": 0,
+            "start": 2555,
+            "end": 2607,
+            "line": 32,
+            "column": 3,
+            "sourceFingerprint": "027f290c51cfbc082ba9460e3fba0653ba03d70c890c5e3d75037cdfba0113f4",
+            "retiredInPhase": "P4.4",
+            "recordedInPhase": "P4.4",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/interaction_funnel.js|{\"kind\":\"module\",\"name\":\"state\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|inspectorExpansionInitialized",
@@ -120252,31 +119872,50 @@
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
-          "callerPath": "js/core/scenario_rollback.js",
-          "callerBindingId": "module:runtimeState",
-          "callerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+          "retiredCallerPath": "js/core/scenario_rollback.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
           "retiredMutationSiteFingerprint": "7e055462841e1458080efbdc2f78f9b8d4663f09144a147ce3ec2d23ec938ef4",
           "retiredMutationSiteCount": 1,
-          "proofPrecision": "historical-backfill",
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "2f95eff2ddd5e3fd092abd35a41739280aacda3cd9b280c7b49b3b45402baab0",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "0ad27d710f78d6d1af7a0e145b20d835a89d4d8c363996031b9197acb783b04d",
+          "currentSourceFingerprint": "726af223b3c721a3989a79a9841e7b1095c9868380a87a030919b65c4fd7b757",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "countryBaseColors",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "restoreScenarioActivationBeforeColorDirtyState",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "7af32b224f0e68f932590d402e5a684f25195813759fb79c0511496712c38800",
-          "occurrenceIndex": 0,
-          "start": 23625,
-          "end": 23729,
-          "line": 620,
-          "column": 3,
-          "sourceFingerprint": "2bce769c8760f7d648e46116e801fa829e0c7b700e085c396a39f428790c407a",
           "retiredInPhase": "P4.2a",
           "recordedInPhase": "P4.2a",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
+            "callerPath": "js/core/scenario_rollback.js",
+            "callerBindingId": "module:runtimeState",
+            "callerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "7e055462841e1458080efbdc2f78f9b8d4663f09144a147ce3ec2d23ec938ef4",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "historical-backfill",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "countryBaseColors",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "restoreScenarioActivationBeforeColorDirtyState",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "7af32b224f0e68f932590d402e5a684f25195813759fb79c0511496712c38800",
+            "occurrenceIndex": 0,
+            "start": 23625,
+            "end": 23729,
+            "line": 620,
+            "column": 3,
+            "sourceFingerprint": "2bce769c8760f7d648e46116e801fa829e0c7b700e085c396a39f428790c407a",
+            "retiredInPhase": "P4.2a",
+            "recordedInPhase": "P4.2a",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|currentPaletteTheme",
@@ -120392,31 +120031,50 @@
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
-          "callerPath": "js/core/scenario_rollback.js",
-          "callerBindingId": "module:runtimeState",
-          "callerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+          "retiredCallerPath": "js/core/scenario_rollback.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
           "retiredMutationSiteFingerprint": "e7c60c422368b2a17945bb601d2da99ea4584b9af6dd8aac27752faff285def7",
           "retiredMutationSiteCount": 1,
-          "proofPrecision": "historical-backfill",
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "3384ac4a9e9632cfdff66d617ab14a38e5f77e812c849d6bf5005ea865f5cfd1",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "0ad27d710f78d6d1af7a0e145b20d835a89d4d8c363996031b9197acb783b04d",
+          "currentSourceFingerprint": "726af223b3c721a3989a79a9841e7b1095c9868380a87a030919b65c4fd7b757",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "featureOverrides",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "restoreScenarioActivationBeforeColorDirtyState",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "7af32b224f0e68f932590d402e5a684f25195813759fb79c0511496712c38800",
-          "occurrenceIndex": 0,
-          "start": 23625,
-          "end": 23729,
-          "line": 620,
-          "column": 3,
-          "sourceFingerprint": "2bce769c8760f7d648e46116e801fa829e0c7b700e085c396a39f428790c407a",
           "retiredInPhase": "P4.2a",
           "recordedInPhase": "P4.2a",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
+            "callerPath": "js/core/scenario_rollback.js",
+            "callerBindingId": "module:runtimeState",
+            "callerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"restoreScenarioApplyRollbackSnapshot\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "e7c60c422368b2a17945bb601d2da99ea4584b9af6dd8aac27752faff285def7",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "historical-backfill",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "featureOverrides",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "restoreScenarioActivationBeforeColorDirtyState",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "7af32b224f0e68f932590d402e5a684f25195813759fb79c0511496712c38800",
+            "occurrenceIndex": 0,
+            "start": 23625,
+            "end": 23729,
+            "line": 620,
+            "column": 3,
+            "sourceFingerprint": "2bce769c8760f7d648e46116e801fa829e0c7b700e085c396a39f428790c407a",
+            "retiredInPhase": "P4.2a",
+            "recordedInPhase": "P4.2a",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|fixedPaletteColorsByIso2",
@@ -125403,65 +125061,103 @@
         },
         {
           "retiredMembershipIdentity": "js/core/state/scenario_runtime_state.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
-          "callerPath": "js/core/scenario_apply_pipeline.js",
-          "callerBindingId": "parameter:createScenarioApplyPipeline:0:c2ad6df5da0f:251:9",
-          "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createScenarioApplyPipeline\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioApplyPipeline\",\"ordinal\":0},{\"name\":\"commitScenarioActivationState\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioActivationRuntimeState\",\"ordinal\":0}]}",
-          "retiredMutationSiteFingerprint": "b46a44720e0ec3cd8e578a54940f31f324e571ded485a8f81c183321a6122327",
-          "retiredMutationSiteCount": 1,
-          "proofPrecision": "explicit-cross-file",
           "retiredCallerPath": "js/core/state/scenario_runtime_state.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "cd9c1743b71d5cb0e0f5369040d3f13e512581133c97228fb190b1ab857141bd",
+          "retiredMutationSiteFingerprint": "b46a44720e0ec3cd8e578a54940f31f324e571ded485a8f81c183321a6122327",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "8f5182b998711b94320a2a7250a75c5e287ffe62bfa32ae5529aef73f5397c1e",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "df76adb9559656969205bebc59ce0c9e47fe361a2deaf176ffa9f4552491d6c2",
+          "currentSourceFingerprint": "df76adb9559656969205bebc59ce0c9e47fe361a2deaf176ffa9f4552491d6c2",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "countryBaseColors",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "commitScenarioActivationState",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "37355224e3abcd656ea1792fa5fee2e664a10039a3d17227e560e593c2cba1fc",
-          "occurrenceIndex": 0,
-          "start": 22547,
-          "end": 22660,
-          "line": 597,
-          "column": 5,
-          "sourceFingerprint": "48de10ee32e9c2cb07dee776e315e5bf98c22ac658d90af9180f76712616a22a",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/state/scenario_runtime_state.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|countryBaseColors",
+            "callerPath": "js/core/scenario_apply_pipeline.js",
+            "callerBindingId": "parameter:createScenarioApplyPipeline:0:c2ad6df5da0f:251:9",
+            "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createScenarioApplyPipeline\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioApplyPipeline\",\"ordinal\":0},{\"name\":\"commitScenarioActivationState\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioActivationRuntimeState\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "b46a44720e0ec3cd8e578a54940f31f324e571ded485a8f81c183321a6122327",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "explicit-cross-file",
+            "retiredCallerPath": "js/core/state/scenario_runtime_state.js",
+            "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "crossFileMigrationContractIdentity": "cd9c1743b71d5cb0e0f5369040d3f13e512581133c97228fb190b1ab857141bd",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "countryBaseColors",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "commitScenarioActivationState",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "37355224e3abcd656ea1792fa5fee2e664a10039a3d17227e560e593c2cba1fc",
+            "occurrenceIndex": 0,
+            "start": 22547,
+            "end": 22660,
+            "line": 597,
+            "column": 5,
+            "sourceFingerprint": "48de10ee32e9c2cb07dee776e315e5bf98c22ac658d90af9180f76712616a22a",
+            "retiredInPhase": "P4.4",
+            "recordedInPhase": "P4.4",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/state/scenario_runtime_state.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
-          "callerPath": "js/core/scenario_apply_pipeline.js",
-          "callerBindingId": "parameter:createScenarioApplyPipeline:0:c2ad6df5da0f:251:9",
-          "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createScenarioApplyPipeline\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioApplyPipeline\",\"ordinal\":0},{\"name\":\"commitScenarioActivationState\",\"ordinal\":0}]}",
-          "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioActivationRuntimeState\",\"ordinal\":0}]}",
-          "retiredMutationSiteFingerprint": "884d762d7374d64f0154c2d77489522fde8877308de06a503fe754d7997cc6d6",
-          "retiredMutationSiteCount": 1,
-          "proofPrecision": "explicit-cross-file",
           "retiredCallerPath": "js/core/state/scenario_runtime_state.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "0b2f4e5c3df879ef6acbb00f76cf72cef55e0df36bbf260230b7769fa03199ce",
+          "retiredMutationSiteFingerprint": "884d762d7374d64f0154c2d77489522fde8877308de06a503fe754d7997cc6d6",
+          "retiredMutationSiteCount": 1,
+          "proofPrecision": "explicit-capability-retirement",
+          "capabilityRetirementContractIdentity": "ca295f6ab37903dc952c22747c9804d181965923182b5bc23edc2bd8dea0100d",
+          "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
+          "previousSourceFingerprint": "df76adb9559656969205bebc59ce0c9e47fe361a2deaf176ffa9f4552491d6c2",
+          "currentSourceFingerprint": "df76adb9559656969205bebc59ce0c9e47fe361a2deaf176ffa9f4552491d6c2",
           "domain": "color",
           "migrationPhase": "P4.4",
           "operation": "assign",
           "key": "featureOverrides",
-          "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
-          "actionExportName": "commitScenarioActivationState",
-          "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "37355224e3abcd656ea1792fa5fee2e664a10039a3d17227e560e593c2cba1fc",
-          "occurrenceIndex": 0,
-          "start": 22547,
-          "end": 22660,
-          "line": 597,
-          "column": 5,
-          "sourceFingerprint": "48de10ee32e9c2cb07dee776e315e5bf98c22ac658d90af9180f76712616a22a",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
-          "backfilled": false
+          "backfilled": false,
+          "previousActionProof": {
+            "retiredMembershipIdentity": "js/core/state/scenario_runtime_state.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|featureOverrides",
+            "callerPath": "js/core/scenario_apply_pipeline.js",
+            "callerBindingId": "parameter:createScenarioApplyPipeline:0:c2ad6df5da0f:251:9",
+            "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createScenarioApplyPipeline\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioApplyPipeline\",\"ordinal\":0},{\"name\":\"commitScenarioActivationState\",\"ordinal\":0}]}",
+            "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"commitScenarioActivationRuntimeState\",\"ordinal\":0}]}",
+            "retiredMutationSiteFingerprint": "884d762d7374d64f0154c2d77489522fde8877308de06a503fe754d7997cc6d6",
+            "retiredMutationSiteCount": 1,
+            "proofPrecision": "explicit-cross-file",
+            "retiredCallerPath": "js/core/state/scenario_runtime_state.js",
+            "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+            "crossFileMigrationContractIdentity": "0b2f4e5c3df879ef6acbb00f76cf72cef55e0df36bbf260230b7769fa03199ce",
+            "domain": "color",
+            "migrationPhase": "P4.4",
+            "operation": "assign",
+            "key": "featureOverrides",
+            "actionModulePath": "js/core/state/actions/scenario_activation_actions.js",
+            "actionExportName": "commitScenarioActivationState",
+            "targetArgumentIndex": 0,
+            "actionCallEdgeIdentity": "37355224e3abcd656ea1792fa5fee2e664a10039a3d17227e560e593c2cba1fc",
+            "occurrenceIndex": 0,
+            "start": 22547,
+            "end": 22660,
+            "line": 597,
+            "column": 5,
+            "sourceFingerprint": "48de10ee32e9c2cb07dee776e315e5bf98c22ac658d90af9180f76712616a22a",
+            "retiredInPhase": "P4.4",
+            "recordedInPhase": "P4.4",
+            "backfilled": false
+          }
         },
         {
           "retiredMembershipIdentity": "js/core/state/scenario_runtime_state.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"commitScenarioActivationRuntimeState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|assign|mapSemanticMode",

@@ -10,7 +10,6 @@ const EXPECTED_IDLE_RENDER_PASS_NAMES = [
   "physicalBase",
   "political",
   "populationHeatmap",
-  "hgoPreview",
   "contextBase",
   "contextScenario",
   "effects",

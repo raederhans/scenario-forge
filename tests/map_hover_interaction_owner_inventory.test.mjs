@@ -116,7 +116,6 @@ test("map_renderer keeps handleMouseMove wrapper and delegates to P48 owner", ()
     "getHitFromEvent(event,",
     stateWritePrefix("hoveredId"),
     "hoveredFacilityEntry =",
-    "inspectHgoRuntimePreviewFromEvent(event",
   ]) {
     assertExcludes(wrapperSource, token, "handleMouseMove wrapper must not keep old hover body token");
   }

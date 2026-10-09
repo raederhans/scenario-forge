@@ -16,7 +16,6 @@ const EXPECTED_RENDER_PASS_NAMES = [
   "physicalBase",
   "political",
   "populationHeatmap",
-  "hgoPreview",
   "contextBase",
   "contextScenario",
   "effects",
@@ -33,7 +32,6 @@ const EXPECTED_TRANSFORM_REUSED_PASS_NAMES = [
   "physicalBase",
   "political",
   "populationHeatmap",
-  "hgoPreview",
   "contextBase",
   "contextScenario",
   "effects",
@@ -60,7 +58,6 @@ const EXPECTED_TRANSFORMED_FRAME_PASS_NAMES = [
   "physicalBase",
   "political",
   "populationHeatmap",
-  "hgoPreview",
   "contextBase",
   "contextScenario",
   "effects",
@@ -118,7 +115,7 @@ test("render pass overscan ratio stays unchanged", () => {
 
 test("disabled effects and context passes leave the required painter order intact", () => {
   assert.deepEqual(filterEnabledRenderPassNames(RENDER_PASS_NAMES), [
-    "background", "political", "hgoPreview", "contextScenario", "borders", "labels",
+    "background", "political", "contextScenario", "borders", "labels",
   ]);
   assert.deepEqual(filterEnabledRenderPassNames(INTERACTION_COMPOSITE_PASS_NAMES), [
     "background", "political", "contextScenario",

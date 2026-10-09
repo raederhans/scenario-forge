@@ -11,7 +11,7 @@ import { POPULATION_LAYER_ID, POPULATION_DATA_VERSION } from "../js/core/populat
 import {
   DEFAULT_RENDER_INVALIDATION_PASSES,
   FIRST_FRAME_BASE_TARGET_RESOURCES,
-  FIRST_FRAME_HGO_TARGET_RESOURCES,
+
   PASS_RESOURCE_MAP,
   RESOURCE_PASS_MAP,
   UNSUPPORTED_RENDER_PASS_INPUT_KEYS,
@@ -70,23 +70,21 @@ test("default visual invalidation and first-frame catalogs keep current members"
     "borderBuffer",
     "interactionOverlay",
   ]);
-  assert.deepEqual(FIRST_FRAME_HGO_TARGET_RESOURCES, ["hgoPreviewBuffer"]);
 });
 
 test("first-frame helpers keep baseline resources narrow", () => {
-  assert.deepEqual(getFirstFrameTargetResources({ hgoPreviewDirty: true }), [
+  assert.deepEqual(getFirstFrameTargetResources(), [
     "backgroundBuffer",
     "physicalBaseBuffer",
     "politicalBaseBuffer",
     "hitIndex",
     "borderBuffer",
     "interactionOverlay",
-    "hgoPreviewBuffer",
+
   ]);
   assert.deepEqual(
     resolveFirstFrameTargetResources(
       ["contextBaseBuffer", "labelBuffer", "politicalBaseBuffer"],
-      { hgoPreviewDirty: false },
     ),
     ["backgroundBuffer", "physicalBaseBuffer", "politicalBaseBuffer", "hitIndex", "borderBuffer", "interactionOverlay"],
   );

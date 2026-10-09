@@ -60,20 +60,9 @@ export function createOceanRenderOwner({
     sortBathymetryFeaturesForFill = (collection) => Array.isArray(collection?.features) ? collection.features : [],
   } = helpers;
 
-  function isHgoVectorSceneActive() {
-    const manifest = runtimeState?.activeScenarioManifest || {};
-    const profile = String(manifest.scenario_contract_profile || "").trim();
-    if (profile === "hgo_vector") return true;
-    const performanceHints = manifest.performance_hints && typeof manifest.performance_hints === "object"
-      ? manifest.performance_hints
-      : {};
-    return performanceHints.hgo_vector_scene_default === true;
-  }
-
   function drawCoastalTransition(k, { lineWidth = 0, buildPath } = {}) {
     const context = getContext();
-    if (!context || typeof buildPath !== "function" || !(lineWidth > 0)
-      || isHgoVectorSceneActive()) return false;
+    if (!context || typeof buildPath !== "function" || !(lineWidth > 0)) return false;
     const coastStyle = runtimeState.styleConfig?.coastlines || {};
     const opacity = clamp(
       Number.isFinite(Number(coastStyle.opacity)) ? Number(coastStyle.opacity) : 0.8,
@@ -265,7 +254,6 @@ export function createOceanRenderOwner({
 
   function drawScenarioCoastalAccentLayer(k, { interactive = false } = {}) {
     const context = getContext();
-    if (isHgoVectorSceneActive()) return;
     if (!context || !isScenarioCoastalAccentEnabled()) return;
     const coastlineDecision = resolveCoastlineTopologySource();
     const usesScenarioCoastlineSource = coastlineDecision?.source === "scenario";

@@ -87,17 +87,6 @@ export function createRiverLayerRenderOwner({
     return RIVER_ZOOM_STYLE_FACTORS[getRiverZoomBucket(k)];
   }
 
-  function isHgoVectorSceneActive() {
-    const manifest = runtimeState?.activeScenarioManifest || {};
-    const profile = String(manifest.scenario_contract_profile || "").trim();
-    if (profile === "hgo_vector") return true;
-    const performanceHints = manifest.performance_hints && typeof manifest.performance_hints === "object"
-      ? manifest.performance_hints
-      : {};
-    if (performanceHints.hgo_vector_scene_default === true) return true;
-    return String(runtimeState?.activeScenarioId || "").trim() === "hgo_1936";
-  }
-
   function getRiverClassKind(feature) {
     const props = feature?.properties || {};
     const featureClass = String(props.featurecla || props.FEATURECLA || "").trim().toLowerCase();
@@ -186,15 +175,6 @@ export function createRiverLayerRenderOwner({
     const context = getContext();
     const pathCanvas = getPathCanvas();
     const featureCount = getFeatureCollectionFeatureCount(runtimeState.riversData);
-    if (isHgoVectorSceneActive()) {
-      collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
-        featureCount,
-        interactive: !!interactive,
-        skipped: true,
-        reason: "hgo-vector-scene",
-      });
-      return;
-    }
     if (!runtimeState.showRivers || !runtimeState.riversData?.features?.length || !context || !pathCanvas) {
       collectContextMetric("drawRiversLayer", nowMs() - startedAt, {
         featureCount,

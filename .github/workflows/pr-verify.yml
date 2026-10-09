@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run_fast: ${{ steps.plan.outputs.run_fast }}
+      run_hgo: ${{ steps.plan.outputs.run_hgo }}
       run_smoke: ${{ steps.plan.outputs.run_smoke }}
       smoke_mode: ${{ steps.plan.outputs.smoke_mode }}
       run_demo: ${{ steps.plan.outputs.run_demo }}
@@ -103,10 +104,15 @@ jobs:
       smoke-mode: ${{ needs.pr-plan.outputs.smoke_mode }}
       run-golden-demo: ${{ needs.pr-plan.outputs.run_demo == 'true' }}
 
+  pr-verify-hgo:
+    needs: ["pr-plan"]
+    if: needs.pr-plan.outputs.run_hgo == 'true'
+    uses: ./.github/workflows/hgo-native.yml
+
   pr-verify-required:
     name: PR Verify Required
     if: always()
-    needs: ["pr-plan", "pr-verify-fast", "pr-verify-smoke"]
+    needs: ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"]
     runs-on: ubuntu-latest
     steps:
       - name: Require planned PR verification results
@@ -115,7 +121,7 @@ jobs:
         run: |
           node <<'NODE'
           const needs = JSON.parse(process.env.REQUIRED_RESULTS);
-          const expectedJobs = ["pr-plan", "pr-verify-fast", "pr-verify-smoke"];
+          const expectedJobs = ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"];
           const actualJobs = Object.keys(needs).sort();
           const dependencySetMatches = JSON.stringify(actualJobs) === JSON.stringify([...expectedJobs].sort());
           const planPassed = needs["pr-plan"]?.result === "success";
@@ -129,8 +135,13 @@ jobs:
           const smokeAccepted = plannedSmoke === "true"
             ? smokeResult === "success"
             : plannedSmoke === "false" && (smokeResult === "success" || smokeResult === "skipped");
+          const hgoResult = needs["pr-verify-hgo"]?.result;
+          const plannedHgo = needs["pr-plan"]?.outputs?.run_hgo;
+          const hgoAccepted = plannedHgo === "true"
+            ? hgoResult === "success"
+            : plannedHgo === "false" && hgoResult === "skipped";
           for (const job of expectedJobs) console.log(`${job}: ${needs[job]?.result ?? "missing"}`);
-          if (!dependencySetMatches || !planPassed || !fastAccepted || !smokeAccepted) {
+          if (!dependencySetMatches || !planPassed || !fastAccepted || !smokeAccepted || !hgoAccepted) {
             console.error("Required PR verification failed.");
             process.exit(1);
           }

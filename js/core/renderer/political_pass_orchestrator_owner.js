@@ -11,10 +11,6 @@ export function createPoliticalPassOrchestratorOwner({
   helpers = {},
   effects = {},
 } = {}) {
-  const isHgoRuntimePreviewReady = requireFunction(
-    getters.isHgoRuntimePreviewReady,
-    "getters.isHgoRuntimePreviewReady",
-  );
   const isRenderDiagnosticsEnabled = requireFunction(
     getters.isRenderDiagnosticsEnabled,
     "getters.isRenderDiagnosticsEnabled",
@@ -104,13 +100,6 @@ export function createPoliticalPassOrchestratorOwner({
   }
 
   function drawBasePoliticalPass(k) {
-    if (isHgoRuntimePreviewReady()) {
-      recordRenderPerfMetric("drawPoliticalPass", 0, {
-        skipped: true,
-        reason: "hgo-runtime-preview",
-      });
-      return;
-    }
 
     const identity = resolvePoliticalPassIdentity(k);
     recordPoliticalRasterWorkerSnapshot();

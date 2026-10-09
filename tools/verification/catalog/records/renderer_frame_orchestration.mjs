@@ -642,7 +642,6 @@ export const RENDERER_FRAME_ORCHESTRATION_RECORDS = [
       "js/core/renderer/render_pipeline_catalog.js",
       "js/core/map_renderer/render_pass_catalog.js",
       "js/core/map_renderer.js",
-      "js/core/map_renderer/hgo_runtime_preview_render_owner.js",
       "js/core/renderer/transport_overview_render_owner.js",
       "js/core/state/ui_state.js",
       "docs/archive/renderer-pass-family-p3-20260713/plan.md",

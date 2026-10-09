@@ -165,7 +165,7 @@ def prepare_profile(repo: Path, sha: str) -> dict:
         "profile": PROFILE,
         "source": {"commit": sha, "gitTree": git(repo, "rev-parse", f"{sha}^{{tree}}").decode().strip()},
         "scope": "Public scenario UI/owner editing with existing runtime assets; fast HOI4 1936 and Modern World roundtrip acceptance",
-        "unsupported": ["HGO local preview", "full transport workbench payloads", "raw data rebuilding", "Pages build/release", "P4 history qualification"],
+        "unsupported": ["HGO independent editor", "full transport workbench payloads", "raw data rebuilding", "Pages build/release", "P4 history qualification"],
         "metadataReferences": refs,
         "measurement": "Git tree logical blob bytes; shared Git objects/history and download volume are unchanged",
         "totals": {key: {"files": len(rows), "bytes": sum(row["bytes"] for row in rows)} for key, rows in groups.items()},

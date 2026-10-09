@@ -55,7 +55,7 @@
 
 ## 可用范围与数据来源
 
-公开编辑器提供上面的五个底图。HGO 1936 属于开发/本地预览；Cloud Saves 与社区功能需要本地后端预览。公路和铁路是当前最成熟的公开交通图层，其他交通与专题数据的预览覆盖程度不同。
+主编辑器提供上面的五个底图。[HGO 使用独立的原生像素编辑器](apps/hgo/README.zh-CN.md)，保留可编辑海域，并拥有自己的加载、项目文件、渲染和检查体系。Cloud Saves 与社区功能需要本地后端预览。公路和铁路是当前最成熟的公开交通图层，其他交通与专题数据的预览覆盖程度不同。
 
 代码与文档采用 [MIT 许可证](LICENSE)。第三方数据及衍生地图保留各自的来源条款；复用数据衍生资产前，请查看[数据来源账本](data/source_ledger.json)和地图元数据（[TNO](landing/assets/work-alt-history-med.json)、[HOI4 对照](landing/assets/work-scenario-switch-europe.json)）。
 

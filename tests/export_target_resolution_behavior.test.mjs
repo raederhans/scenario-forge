@@ -44,7 +44,7 @@ assert.ok(start >= 0 && end > start);
 const exportSource = source.slice(start, end);
 
 function harness({ failPass = false, failComposition = false, screenDpr = 1, budgetExceeded = false,
-  contourStatus = "ready", politicalStatus = "ready", hgo = false,
+  contourStatus = "ready", politicalStatus = "ready",
   riverVisible = false, riverStatus = "ready", riverScratch = false } = {}) {
   const visibleCache = { canvases: { background: { width: 100, height: 50 } } };
   const runtimeState = {
@@ -84,7 +84,6 @@ function harness({ failPass = false, failComposition = false, screenDpr = 1, bud
         };
       },
     },
-    isHgoRuntimePreviewReady: () => hgo,
     hasVisibleRiverPartitions: () => riverVisible,
     getRiverInternalContourOwner: () => ({
       diagnostics() { calls.push(`river-${riverStatus}`); return { status: riverStatus }; },
@@ -285,13 +284,6 @@ for (const contourStatus of ["ready", "empty"]) {
     assert.equal(h.runtimeState.dpr, 1);
   });
 }
-
-test("HGO vector export does not depend on the separate land-contour worker", () => {
-  const h = harness({ hgo: true, contourStatus: "error" });
-  assert.ok(h.run(["borders"], { pixelRatio: 2 }));
-  assert.deepEqual(h.calls, ["render-borders-2", "draw-contours", "compose-200"]);
-  assert.equal(h.runtimeState.renderPassCache, h.visibleCache);
-});
 
 const toolbarSource = readFileSync(new URL("../js/ui/toolbar.js", import.meta.url), "utf8");
 const compositeStart = toolbarSource.indexOf("  const buildCompositeSourceCanvas = async");

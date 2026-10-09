@@ -10,7 +10,6 @@ const TOOLTIP_OFFSET_PX = 12;
 
 const REQUIRED_GETTER_NAMES = Object.freeze([
   "nowMs",
-  "inspectHgoRuntimePreviewFromEvent",
   "getHitFromEvent",
   "getFeatureForHit",
   "getHoveredFacilityEntryFromEvent",
@@ -294,12 +293,6 @@ export function createMapHoverInteractionOwner({ state = {}, surfaceHost, consta
     }
     if (state.specialZoneEditor?.active) {
       return clearHoverForExclusiveMode("special-zone-editor");
-    }
-
-    const hgoRuntimeHover = getterApi.inspectHgoRuntimePreviewFromEvent(event, { eventType: "hover" });
-    if (hgoRuntimeHover?.active) {
-      const hgoHit = hgoRuntimeHover.hit?.id ? hgoRuntimeHover.hit : null;
-      return clearHoverForExclusiveMode("hgo-runtime-hover", hgoHit, hgoHit ? "pointer" : "");
     }
 
     if (isReducedHoverPhase()) {
