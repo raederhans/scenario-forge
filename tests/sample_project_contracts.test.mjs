@@ -415,6 +415,13 @@ test("public sample list resolver keeps manifest validation separate from public
     scenario_id: "hgo_1936",
     project_url: "./assets/sample-projects/blank-base-starter.project.json",
   });
+  assertSampleProjectError(
+    () => resolvePublicSampleProjectListFromManifest(manifestWithHiddenHgo),
+    "private-sample-scenario",
+  );
+  // Exercise generic preview filtering with an explicit fixture declaration;
+  // the retired embedded HGO scenario is no longer a live preview entry.
+  manifestWithHiddenHgo.developer_preview_exclusions = ["hgo_1936"];
   const filteredList = resolvePublicSampleProjectListFromManifest(manifestWithHiddenHgo);
   assert.equal(filteredList.some((entry) => entry.id === "hgo-preview-valid"), false);
 

@@ -966,7 +966,7 @@ test("landing sample runs resolve checked-in assets and evidence markers", () =>
       `${assetRoot} sample guide note missing`,
     );
     assert.deepEqual(sampleRunsManifest.public_scenario_ids, PUBLIC_SCENARIO_IDS);
-    assert.deepEqual(sampleRunsManifest.developer_preview_exclusions, ["hgo_1936"]);
+    assert.deepEqual(sampleRunsManifest.developer_preview_exclusions, []);
     assert.equal(sampleRunsManifest.project_schema_version, 22);
     assert.deepEqual(
       [...sampleProjectListLinks.keys()].sort(),

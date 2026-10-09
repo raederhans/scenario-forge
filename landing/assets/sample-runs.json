@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-23",
+  "updated_at": "2026-10-09",
   "project_schema_version": 22,
   "public_scenario_ids": [
     "blank_base",
@@ -9,9 +9,7 @@
     "hoi4_1939",
     "tno_1962"
   ],
-  "developer_preview_exclusions": [
-    "hgo_1936"
-  ],
+  "developer_preview_exclusions": [],
   "sample_projects": [
     {
       "id": "blank-base-starter",
