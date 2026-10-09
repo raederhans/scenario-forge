@@ -66,6 +66,8 @@
 
 后续 CI 通过源码证明，另发现剧本 chunk 契约仍匹配旧 producer 门控结构。同步该断言，继续要求导出／inline river 不进入交互 producer，并要求 ID producer 与旧 Worker 互斥；viewport 与 pass signature 身份断言保留。94 项剧本和政治层编排行为检查通过（与前述 renderer 批次有重叠，不累计为独立用例），输出为 `review-scenario-gating.log`。最终合并仍以最新提交的远端门禁为准。
 
+最后补齐验证运行器精确清单中的新增 runtime 命令及 7 个测试 leaf；保留原有预算拒绝和精确覆盖断言。105 项 core／commit runner 测试通过。按 CI 执行报告补跑尚未执行的尾段，17 条命令全部通过，另 7 条未受影响的检查复用此前本地通过结果；覆盖 viewport／视觉效果、其余 renderer 边界、结构工具、supervisor 契约与 E2E 清单。日志为 `review-runner-routing.log` 和 `review-ci-tail.log`。
+
 ## 第 1–6 步历史结果
 
 以下为上一批结果，其阶段范围与计时不代表上述最新版本。
