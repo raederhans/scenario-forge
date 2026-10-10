@@ -32,29 +32,34 @@ const PUBLIC_BASE_URL = EXPLICIT_PUBLIC_BASE_URL
   || (ALLOW_DEFAULT_DEPLOYED_URL ? DEFAULT_DEPLOYED_PAGES_URL : "");
 
 for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
-  test(`public Pages raster timeout recovery ${scenarioId}`, async ({}, testInfo) => {
-    // JUSTIFY: cold startup, three 1500ms deadlines, cooldown, exact zoom frames and edit/history.
-    test.setTimeout(120000);
-    const { verifyRasterIntegrationCase } = await import("../../../tools/verify_political_id_raster_integration.mjs");
-    await verifyRasterIntegrationCase({
-      baseUrl: publicUrl("app/"), scenarioId, dpr: scenarioId === "tno_1962" ? 2 : 1,
-      published: true, recoverAssets: true,
-      exerciseBrush: scenarioId !== "tno_1962",
-      output: testInfo.outputPath("raster-recovery"),
+  test.describe.serial(`public Pages raster ${scenarioId}`, () => {
+    let check;
+    test.afterAll(async () => {
+      test.setTimeout(30000);
+      await check?.close();
+    });
+    test("cold startup and native references", async ({}, testInfo) => {
+      // JUSTIFY: one cold scenario startup and two complete native reference views.
+      test.setTimeout(120000);
+      const { createRasterIntegrationCheck } = await import("../../../tools/verify_political_id_raster_integration.mjs");
+      check = await createRasterIntegrationCheck({
+        baseUrl: publicUrl("app/"), scenarioId, dpr: scenarioId === "tno_1962" ? 2 : 1,
+        published: true, recoverAssets: true, output: testInfo.outputPath("raster-recovery"),
+      });
+      await check.prepare();
+    });
+    test("timeout recovery and exact zoom", async () => {
+      // JUSTIFY: three original asset deadlines, failed first cooldown probe and two exact zoom frames.
+      test.setTimeout(120000);
+      await check.recoverAndZoom();
+    });
+    test("paint and continuous brush history", async () => {
+      // JUSTIFY: real paint, a 41-step stroke, undo/redo and complete edited-frame pixel parity.
+      test.setTimeout(120000);
+      await check.edit();
     });
   });
 }
-
-test("public Pages raster continuous brush tno_1962", async ({}, testInfo) => {
-  // JUSTIFY: cold DPR2 startup, asset preparation, a continuous stroke, history and exact edited pixels.
-  test.setTimeout(120000);
-  const { verifyRasterIntegrationCase } = await import("../../../tools/verify_political_id_raster_integration.mjs");
-  await verifyRasterIntegrationCase({
-    baseUrl: publicUrl("app/"), scenarioId: "tno_1962", dpr: 2,
-    published: true, interactionOnly: true,
-    output: testInfo.outputPath("raster-brush"),
-  });
-});
 
 if (!PUBLIC_BASE_URL) {
   throw new Error(
