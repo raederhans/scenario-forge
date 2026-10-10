@@ -109,6 +109,8 @@ node tools/build_political_id_raster_assets.mjs --base-url http://127.0.0.1:8008
 
 固定配方为 1280×900、DPR 1/2、100%/130%，使用减少动画设置且等待目标缩放及完整覆盖。生成文件只写三个场景的 `political_id_raster/` 和启动配置；会清理该生成目录中不再引用的哈希瓦片。它是有限世界视图/LOD 覆盖，不是任意屏幕与缩放的全覆盖。更新后按 `data/AGENTS.md` 生成 catalog 并构建 Pages。
 
+生成器最后通过 `refresh_political_id_raster_snapshot.py` 刷新对应 build snapshot 与 manifest/audit 的完整性指针，保留原有语义审计结果。修改启动语言包后也必须同步这组指针，并运行该场景的 `check_scenario_contracts.py --strict`，不能仅靠 Pages 文件存在性检查。
+
 在最终 Pages 产物上验收（预先运行该产物的 localhost 静态服务器）：
 
 ```powershell

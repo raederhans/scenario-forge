@@ -16,6 +16,7 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
       "js/ui/toolbar/political_raster_trial_control.js",
       "tests/political_id_raster_trial_behavior.test.mjs",
       "tools/build_political_id_raster_assets.mjs",
+      "tools/refresh_political_id_raster_snapshot.py",
       "tools/political_id_raster_app_session.mjs",
       "tools/verify_political_id_raster_integration.mjs",
     ],

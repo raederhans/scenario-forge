@@ -790,7 +790,7 @@
   "sources": [
     {
       "path": "data/scenarios/hoi4_1936/manifest.json",
-      "sha256": "ab708d6b5ba0130344c668098a70f10690658cb371313659f9f3045a138ebf37"
+      "sha256": "5d41cba4f40be7cc815ca86cae1d5aa9c3ffc02fac1a01ff91f8ad3ebaae03e6"
     },
     {
       "path": "data/scenarios/hoi4_1936/detail_chunks.manifest.json",

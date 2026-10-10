@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
+import { spawnSync } from "node:child_process";
 import { openRasterApp, selectRasterScenario, captureRasterView } from "./political_id_raster_app_session.mjs";
 import { decodePoliticalIdRasterAsset } from "../js/core/renderer/political_id_raster_assets.js";
 
@@ -57,18 +58,6 @@ for (const id of ids) {
     manifest.tiles.push({ identity, url: `./${name}`, byteLength: buffer.length,
       compression: "gzip", compressedByteLength: compressed.length, sha256: payloadHash });
   }
-  const inputPaths = ["manifest.json", "detail_chunks.manifest.json", "runtime_topology.bootstrap.topo.json"];
-  manifest.sources = [];
-  for (const name of inputPaths) {
-    try {
-      const bytes = await fs.readFile(path.join(scenarioDir, name));
-      // The scenario manifest gains only a derived URL below; bind its semantic
-      // inputs independently from the generated output registration.
-      const content = name === "manifest.json" ? (() => { const value = JSON.parse(bytes); delete value.political_id_raster_manifest_url; return Buffer.from(JSON.stringify(value)); })() : bytes;
-      manifest.sources.push({ path: `data/scenarios/${id}/${name}`, sha256: sha(content) });
-    } catch (error) { if (error.code !== "ENOENT") throw error; }
-  }
-  await fs.writeFile(path.join(output, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
   const retained = new Set(manifest.tiles.map(tile => tile.url.slice(2)));
   for (const entry of await fs.readdir(output, { withFileTypes: true })) {
     if (entry.isFile() && /^[0-9a-f]{64}\.pidr\.gz$/.test(entry.name) && !retained.has(entry.name)) {
@@ -89,5 +78,21 @@ for (const id of ids) {
     await fs.writeFile(bundlePath, bytes);
     await fs.writeFile(`${bundlePath}.gz`, gzipSync(bytes, { level: 9 }));
   }
+  const refreshed = spawnSync(process.execPath, [path.join(root, "tools/run_python.mjs"),
+    path.join(root, "tools/refresh_political_id_raster_snapshot.py"), "--scenario", id],
+  { cwd: root, stdio: "inherit" });
+  if (refreshed.error || refreshed.status !== 0) throw new Error(`Scenario snapshot refresh failed: ${id}`, { cause: refreshed.error });
+  manifest.sources = [];
+  for (const name of ["manifest.json", "detail_chunks.manifest.json", "runtime_topology.bootstrap.topo.json"]) {
+    const bytes = await fs.readFile(path.join(scenarioDir, name));
+    // Bind semantic inputs, excluding derived registration and snapshot pointers.
+    const content = name === "manifest.json" ? (() => {
+      const value = JSON.parse(bytes);
+      delete value.political_id_raster_manifest_url; delete value.snapshot_fingerprint;
+      return Buffer.from(JSON.stringify(value));
+    })() : bytes;
+    manifest.sources.push({ path: `data/scenarios/${id}/${name}`, sha256: sha(content) });
+  }
+  await fs.writeFile(path.join(output, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
   console.log(JSON.stringify({ scenario: id, tiles: manifest.tiles.length, compressedBytes, output }));
 }

@@ -62,8 +62,10 @@ Local items 1–3 are complete; see integration-results.zh-CN.md. Six Pages-arti
 The user now authorizes committing this batch, creating a PR, merging after required checks, deploying Pages, and verifying all three published scenarios. Earlier no-deployment statements describe the preceding implementation turn.
 
 - [x] Refresh remote main and ownership; preserve primary architecture work and prototype evidence.
-- [ ] Commit only this worktree's scoped changes and push the feature branch; attach the PR.
+- [x] Commit only this worktree's scoped changes and push the feature branch; attach the PR.
 - [ ] Resolve any final-head CI findings, wait for every required check, and merge normally.
 - [ ] Confirm the merge SHA's Pages deployment and hosted source/asset identity.
 - [ ] Verify the published entry, assets, zoom quality and editing for all three scenarios.
 - [ ] Report receipts, remaining limits and an executable follow-on plan; retain the worktree for evidence.
+
+Implementation commit `9279755b87036bef7ce46f99b2f54dac7a84ffa2` is pushed. PR #218: https://github.com/raederhans/scenario-forge/pull/218 . Current root observes this PR's final-head checks; merge and deployment are pending.
