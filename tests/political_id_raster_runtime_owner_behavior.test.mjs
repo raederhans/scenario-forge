@@ -496,3 +496,28 @@ test("post-frame history identity changes refresh before refining the latest sou
   assert.equal(f.owner.draw(), null);
   assert.equal(f.owner.getDiagnostics().displayState, "precise");
 });
+
+test('native partial feedback coalesces edits and finishes with a full native frame without tile rebuilds', async t => {
+  const f = fixture({ transform: { x: 200.25, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  await new Promise(resolve => setTimeout(resolve, 15));
+  f.owner.draw();
+  assert.equal(f.owner.hasNativeFrame(), true);
+  const builds = f.requests.length;
+  f.identity.colorVersion++;
+  f.owner.noteNativePartialRepaint();
+  f.owner.noteNativePartialRepaint();
+  assert.equal(f.owner.hasNativeFrame(), true);
+  assert.equal(f.owner.getDiagnostics().refinementPending, true);
+  assert.equal(f.owner.getDiagnostics().displayState, 'accelerated');
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 1);
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().displayState, 'precise');
+  assert.equal(f.requests.length, builds);
+  f.owner.noteNativePartialRepaint(); f.owner.dispose();
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 1);
+  assert.equal(f.owner.hasNativeFrame(), false);
+});

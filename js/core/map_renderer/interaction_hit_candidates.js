@@ -197,7 +197,7 @@ function findFirstContainingCandidate(
             containsGeoCount: 1,
             eventType,
             targetType,
-            fastPath: "hover-first-containing",
+            fastPath: `${eventType}-first-containing`,
           });
         }
         return {
@@ -216,7 +216,7 @@ function findFirstContainingCandidate(
       containsGeoCount: 0,
       eventType,
       targetType,
-      fastPath: "hover-first-containing",
+      fastPath: `${eventType}-first-containing`,
     });
   }
   return null;

@@ -5653,7 +5653,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/core/map_renderer.js", bindingIdentity: RETIRED_CORE_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    currentSourceFingerprint: "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
+    currentSourceFingerprint: "1d9b23e76380725458ee1c0d088934efde2414256740c74094e056f8bc3d73bb",
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 3, "622061d65a1cac3cc053ad5d57320b6625611fce0a169d9be6569ac9ade357c0"],
       ["color", "P4.4", "assign", "featureOverrides", 4, "2b49424706a23f675add6c116fff341ca7c167193a80b2bf06a89f298af07b87"],
@@ -6010,7 +6010,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "b17371bb30556b5e5736f3b52d0ccbf284e5e7d1975fd64ea11c0b70de5ee470",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
+    "currentSourceFingerprint": "1d9b23e76380725458ee1c0d088934efde2414256740c74094e056f8bc3d73bb",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|sovereignBaseColors",
@@ -6027,7 +6027,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "1f35c44f87b5bd5e23d3c733a3c560aa224244cf5c50aacff6ffa47943c660af",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
+    "currentSourceFingerprint": "1d9b23e76380725458ee1c0d088934efde2414256740c74094e056f8bc3d73bb",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|visualOverrides",
@@ -6044,7 +6044,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "9f3cd6152efd6c2659c2854a85b921c468824cbb5d621ab61832980b95de5cf1",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
+    "currentSourceFingerprint": "1d9b23e76380725458ee1c0d088934efde2414256740c74094e056f8bc3d73bb",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|resolveSpecialZoneParentGroupTargetIdsFn",
@@ -6061,7 +6061,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "922f400af35f30ecdb8098901b0deacfeeac53a40393cf88b0bc04638291db99",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
+    "currentSourceFingerprint": "1d9b23e76380725458ee1c0d088934efde2414256740c74094e056f8bc3d73bb",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|syncDayNightClockTimerFn",
@@ -7376,11 +7376,11 @@ freezeMutationDelegatingOwnerEntry({
     compositionModulePath: "js/core/map_renderer.js",
     compositionExportName: "getPoliticalPartialRepaintOwner",
     compositionSourceFingerprint:
-      "d8bce2085331bf612ddbc62a9e5df5c02340f18007f5038010372322cfecc6bb",
+      "7781d3fa62c0419f4be02085d0307bcc884e41dc169411a99edbcf393a1b50a1",
     factoryModulePath: "js/core/renderer/political_partial_repaint_owner.js",
     factoryExportName: "createPoliticalPartialRepaintOwner",
     factorySourceFingerprint:
-      "27e45ea5268bc09525ebfb5f01edb1f928d9857c16ec4819029a4a062a226a2c",
+      "adfeac39a9c2ffe002cc9177c08f250534e361f8de73ad901cc652bd9dea2cab",
     ownerBindingName: "politicalPartialRepaintOwner",
     methods: [
       "buildPoliticalRasterWorkerPacket",

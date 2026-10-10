@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-10 栅格交互与恢复补充
+
+同一隔离工作树继续在 `codex/political-raster-interaction-20261010` 上完成用户追加的拾取与连续拖刷优化，并修复 PR #219 新发布门禁暴露的问题。基于 `cb881cdfc`；PR #219 已合并但其 Pages 发布失败，线上仍为 `a9ee29072`。root 独占修改、运行检查与交付，其他对话改动保留。最终发布回执见任务记录，不能以合并代替上线成功。
+
 ## 2026-10-10 栅格资产恢复与发布回归
 
 继续使用本对话的 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`，新分支 `codex/political-raster-recovery-20261010` 基于已发布 `a9ee29072`。root 独占运行时修改、测试、Git 与发布。范围为连续资产超时后的有界恢复和三个剧本的真实发布回归；主目录架构整理及 prototype 工作树不写入。沿用原任务记录与本地证据。

@@ -39,10 +39,22 @@ for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
     await verifyRasterIntegrationCase({
       baseUrl: publicUrl("app/"), scenarioId, dpr: scenarioId === "tno_1962" ? 2 : 1,
       published: true, recoverAssets: true,
+      exerciseBrush: scenarioId !== "tno_1962",
       output: testInfo.outputPath("raster-recovery"),
     });
   });
 }
+
+test("public Pages raster continuous brush tno_1962", async ({}, testInfo) => {
+  // JUSTIFY: cold DPR2 startup, asset preparation, a continuous stroke, history and exact edited pixels.
+  test.setTimeout(120000);
+  const { verifyRasterIntegrationCase } = await import("../../../tools/verify_political_id_raster_integration.mjs");
+  await verifyRasterIntegrationCase({
+    baseUrl: publicUrl("app/"), scenarioId: "tno_1962", dpr: 2,
+    published: true, interactionOnly: true,
+    output: testInfo.outputPath("raster-brush"),
+  });
+});
 
 if (!PUBLIC_BASE_URL) {
   throw new Error(
