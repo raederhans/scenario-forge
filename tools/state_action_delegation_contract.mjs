@@ -5653,7 +5653,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/core/map_renderer.js", bindingIdentity: RETIRED_CORE_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    currentSourceFingerprint: "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
+    currentSourceFingerprint: "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 3, "622061d65a1cac3cc053ad5d57320b6625611fce0a169d9be6569ac9ade357c0"],
       ["color", "P4.4", "assign", "featureOverrides", 4, "2b49424706a23f675add6c116fff341ca7c167193a80b2bf06a89f298af07b87"],
@@ -5697,7 +5697,7 @@ const retiredCapabilityModules = [
   {
     modulePath: "js/ui/toolbar.js", bindingIdentity: RETIRED_UI_STATE_BINDING_IDENTITY,
     previousSourceFingerprint: "00dfde193d7ba0604a8e92d42c35a2be84c305f902a5446d82cfb4253d996593",
-    currentSourceFingerprint: "cc659a22e497d5dccc0538a8bc23678bdb4d376cf36c98aa84a6b65b6bd65e3b",
+    currentSourceFingerprint: "18a8111167ef853e6b2764bbdc7ea75f83570c73fa12c2db2073a8158013bf66",
     memberships: [
       ["color", "P4.4", "assign", "countryBaseColors", 1, "b3d94dd835d9fc7a693173b1a3b0aac1abbedd283efece1e261068d91dbcee14"],
       ["color", "P4.4", "assign", "featureOverrides", 1, "50b3642d6751bc6ded3dcbcadd0ca9d4fcb17475f7fabf175e2fefc2178b03b4"],
@@ -6010,7 +6010,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "b17371bb30556b5e5736f3b52d0ccbf284e5e7d1975fd64ea11c0b70de5ee470",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
+    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|sovereignBaseColors",
@@ -6027,7 +6027,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "1f35c44f87b5bd5e23d3c733a3c560aa224244cf5c50aacff6ffa47943c660af",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
+    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|color|P4.4|delete|visualOverrides",
@@ -6044,7 +6044,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "9f3cd6152efd6c2659c2854a85b921c468824cbb5d621ab61832980b95de5cf1",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
+    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|resolveSpecialZoneParentGroupTargetIdsFn",
@@ -6061,7 +6061,7 @@ const additionalRetiredAuthorityEntries = [
     "retiredMutationSiteFingerprint": "922f400af35f30ecdb8098901b0deacfeeac53a40393cf88b0bc04638291db99",
     "previousSourceRevision": "1afa55b745400c80612566078a3d0bbe5e77a18a",
     "previousSourceFingerprint": "3e2f19b18a1e9d1877a10405ac23bc4010bd6f6306bd89f6c114bdadea035dc3",
-    "currentSourceFingerprint": "145cc1ce6305ecf70d3e01f7c0f292832ee622f85cec044d9a47557951cc8732",
+    "currentSourceFingerprint": "c3ed746de323160ea48351b054a89ce69e4523e6f92c9320919b00f12600b30d",
     "allowReadReferences": true,
     "retirementKind": "direct-authority",
     "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|syncDayNightClockTimerFn",

@@ -148,6 +148,24 @@
       "url": "data/releasables/hoi4_vanilla.internal.phase1.catalog.json",
       "role": "releasable_catalog"
     },
+    "political_id_raster:hoi4_1936": {
+      "url": "data/scenarios/hoi4_1936/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "schema_ref": "schema://political-id-raster/manifest/v1",
+      "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
+    },
+    "political_id_raster:hoi4_1939": {
+      "url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "schema_ref": "schema://political-id-raster/manifest/v1",
+      "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
+    },
+    "political_id_raster:tno_1962": {
+      "url": "data/scenarios/tno_1962/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "schema_ref": "schema://political-id-raster/manifest/v1",
+      "description": "Optional compressed ID tiles for the experimental political renderer; limited world-view LOD coverage."
+    },
     "scenario_registry": {
       "url": "data/scenarios/index.json",
       "role": "scenario_registry",

@@ -2,7 +2,7 @@
   "version": 1,
   "generated_at": "2026-10-01T02:49:46.447775+00:00",
   "counts": {
-    "entries": 1367,
+    "entries": 1370,
     "by_role": {
       "bathymetry_topology": 1,
       "build_manifest": 1,
@@ -35,6 +35,7 @@
       "physical_region_labels": 1,
       "physical_semantics_detail": 1,
       "physical_semantics_topology": 1,
+      "political_id_raster_manifest": 3,
       "population_spatial_audit": 1,
       "population_spatial_features": 4,
       "population_spatial_manifest": 1,
@@ -74,11 +75,11 @@
     "by_format": {
       "geojson": 152,
       "javascript": 2,
-      "json": 1040,
+      "json": 1043,
       "topojson": 173
     },
     "by_read_mode": {
-      "json": 1365,
+      "json": 1368,
       "module": 2
     }
   },
@@ -972,6 +973,32 @@
       "aliases": []
     },
     {
+      "key": "political_id_raster:hoi4_1936",
+      "url": "data/scenarios/hoi4_1936/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "format": "json",
+      "schemaRef": "schema://political-id-raster/manifest/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.political_id_raster:hoi4_1936",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "political_id_raster:hoi4_1939",
+      "url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "format": "json",
+      "schemaRef": "schema://political-id-raster/manifest/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.political_id_raster:hoi4_1939",
+      "cachePolicy": "no-cache",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
       "key": "scenario_registry",
       "url": "data/scenarios/index.json",
       "role": "scenario_registry",
@@ -980,6 +1007,19 @@
       "hashRef": "",
       "owner": "runtime_asset_registry.assets.scenario_registry",
       "cachePolicy": "default",
+      "sourceId": "",
+      "readMode": "json",
+      "aliases": []
+    },
+    {
+      "key": "political_id_raster:tno_1962",
+      "url": "data/scenarios/tno_1962/political_id_raster/manifest.json",
+      "role": "political_id_raster_manifest",
+      "format": "json",
+      "schemaRef": "schema://political-id-raster/manifest/v1",
+      "hashRef": "",
+      "owner": "runtime_asset_registry.assets.political_id_raster:tno_1962",
+      "cachePolicy": "no-cache",
       "sourceId": "",
       "readMode": "json",
       "aliases": []

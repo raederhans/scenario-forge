@@ -4,6 +4,8 @@ export {
   // App bootstrap and render lifecycle.
   buildInteractionInfrastructureAfterStartup,
   initMap,
+  getPoliticalIdRasterDiagnostics,
+  setPoliticalIdRasterTrialEnabled,
   getPopulationHeatmapRenderReadiness,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,

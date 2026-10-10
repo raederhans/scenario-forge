@@ -48,3 +48,13 @@ The user subsequently authorized the remaining three stages, retaining the small
 ## Follow-on authorization: stages 7–11
 
 The user authorized all five next steps and bounded delegation. Preserve vector geometry, scenario contracts and canonical editing/export. Complete stage 7 actual-application comparison and error attribution; stage 8 projected-path reuse and measured seam/scale refinements; stage 9 stable world coordinates and a reproducible two-level 1939 asset pilot with 1936/TNO compatibility; stage 10 conservative CPU picking; stage 11 asset-first tile reuse and persistent storage integrated with the existing deferred-vector mechanism. Asset errors, incompatible geometry/ordering, missing coverage and ambiguous picking fall back to the current path. Experimental generated assets stay in .runtime until production asset admission is separately justified. Do not claim startup or interaction gains from isolated full-topology fixtures.
+
+## 2026-10-10: authorized integration items 1–3
+
+Work from published abf6a1a6 in isolated codex/political-raster-integration. Preserve the primary checkout and prototype worktree.
+
+1. Add a discoverable experimental preference, effective state/reason diagnostics, startup activation, and per-view preparation/CPU-submission timing. Keep opt-in and canonical edits unchanged; presentation requires separate evidence.
+2. Build bounded compressed assets reproducibly from the live application producer; register them in scenario manifests and Pages/catalog validation. Prove all three scenarios load published assets with an empty test cache.
+3. Add bounded idle exact refinement for fractional-scale display; retain raster during preparation/interaction, current-frame cancellation and native export. Compare settled pixels and exercise actual editing for all scenarios.
+
+Acceptance: targeted policy/storage/runtime tests, source/build boundary checks, source-built Pages asset integrity, three-scenario browser checks for toggle, actual producer, cold manifest hits, fractional zoom refinement, paint/history, and no new console/network errors. Record timings honestly; no end-to-end speed claim from partial metrics. No production deployment authorized in this turn.

@@ -146,5 +146,6 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2
+  "version": 2,
+  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json"
 }

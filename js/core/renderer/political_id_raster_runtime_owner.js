@@ -29,7 +29,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
   assetStore = globalThis.indexedDB ? createPoliticalIdRasterAssetStore() : null,
   identityBuilder = createPoliticalIdRasterIdentityBuilder(), canonicalCoordinates = true, gutter = 0,
-  assetTimeoutMs = 1500,
+  assetTimeoutMs = 1500, refineAfterMs = null,
 }) {
   const worker = client || createPoliticalIdRasterWorkerClient();
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
@@ -37,7 +37,45 @@ export function createPoliticalIdRasterRuntimeOwner({
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
   let consecutiveAssetTimeouts = 0;
   let pathCacheEstimatedBytes = 0;
-  const manifestController = new AbortController();
+  let manifestController = new AbortController();
+  let displayState = "preparing", reason = "awaiting-coverage";
+  let viewKey = "", refinedViewKey = "", refinementTimer = null;
+  let viewStartedAt = 0, firstRasterReadyMs = null, lastDrawTotalMs = 0, nativeRefinements = 0;
+  function cancelRefinement() { if (refinementTimer !== null) clearTimeout(refinementTimer); refinementTimer = null; }
+  function updateViewIdentity() {
+    const next = JSON.stringify([namespace, sourceVersion, snapshot.paletteRevision, state.dpr,
+      state.zoomTransform.x, state.zoomTransform.y, state.zoomTransform.k,
+      plan.width, plan.height, plan.outputX, plan.outputY, plan.scale]);
+    if (next !== viewKey) {
+      cancelRefinement(); viewKey = next; refinedViewKey = "";
+      viewStartedAt = performance.now(); firstRasterReadyMs = null;
+    }
+  }
+  function scheduleRefinement() {
+    if (!(Number.isFinite(refineAfterMs) && refineAfterMs >= 0) || refinementTimer !== null
+      || (Math.abs(plan.scale - 1) < 1e-6 && Number.isInteger(plan.outputX) && Number.isInteger(plan.outputY))) return;
+    const scheduledKey = viewKey;
+    const transform = { ...state.zoomTransform };
+    const identity = { ...rawIdentity };
+    refinementTimer = setTimeout(() => {
+      refinementTimer = null;
+      if (disposed || !h.isEnabled() || viewKey !== scheduledKey
+        || ["x", "y", "k"].some(key => state.zoomTransform[key] !== transform[key])) return;
+      const current = h.getSourceIdentity();
+      if (["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].some(key => current[key] !== identity[key])) {
+        // History completion can clear pending foreground IDs after the frame.
+        // Refresh the live source and schedule its refinement instead of leaving
+        // this otherwise idle view permanently in approximate display.
+        e.requestRender("political-id-raster-refinement-refresh");
+        return;
+      }
+      // Refinement never rebuilds ID tiles: the existing vector producer draws
+      // the current visible political pass at the exact device-pixel scale.
+      refinedViewKey = scheduledKey;
+      nativeRefinements++;
+      e.requestRender("political-id-raster-refine");
+    }, refineAfterMs);
+  }
   const source = createPoliticalIdRasterSource({ getId: h.getFeatureId,
     getBounds: (feature, id) => {
       const bounds = h.getBounds(feature, id);
@@ -144,14 +182,17 @@ export function createPoliticalIdRasterRuntimeOwner({
     const urlValue = h.getAssetManifestUrl?.();
     if (!assetStore || !urlValue) return;
     if (manifestKey === urlValue) return manifestPromise;
+    manifestController.abort();
+    manifestController = new AbortController();
     manifestKey = urlValue;
     manifestPromise = (async () => {
       const url = new URL(urlValue, globalThis.location.href);
       if (url.origin !== globalThis.location.origin || !['http:', 'https:'].includes(url.protocol)) {
         throw new Error('Political ID manifest must be same-origin.');
       }
-      const response = await fetch(url, { signal: AbortSignal.any([manifestController.signal,
-        AbortSignal.timeout(assetTimeoutMs)]), mode: 'same-origin' });
+      // This shared request belongs to the owner, not the first tile's deadline.
+      // A slow manifest can finish after that tile falls back to the Worker.
+      const response = await fetch(url, { signal: manifestController.signal, mode: 'same-origin' });
       if (!response.ok || (response.url && new URL(response.url).origin !== url.origin)) throw new Error('Political ID manifest unavailable.');
       if (Number(response.headers.get('content-length')) > 1024 * 1024) throw new Error('Political ID manifest exceeds 1 MiB.');
       const reader = response.body.getReader(), chunks = [];
@@ -172,7 +213,9 @@ export function createPoliticalIdRasterRuntimeOwner({
       const manifest = JSON.parse(text);
       if (disposed || manifestKey !== urlValue) return;
       assetStore.registerManifest({ ...manifest, tiles: manifest.tiles?.map(tile => ({ ...tile, url: new URL(tile.url, url).href })) });
-    })().catch(error => { assetError = String(error.message || error); });
+      assetError = "";
+      consecutiveAssetTimeouts = 0;
+    })().catch(error => { if (!disposed && manifestKey === urlValue) assetError = String(error.message || error); });
     return manifestPromise;
   }
 
@@ -216,10 +259,11 @@ export function createPoliticalIdRasterRuntimeOwner({
           if (!matchesTileRegion(tile, packet)) {
             throw new Error("Political ID asset does not match its requested region.");
           }
+          assetError = "";
           return { tile, built: false, identity };
         }
       } finally { stats.assetLookupMs += performance.now() - lookupStarted; }
-    } catch (error) { assetError = String(error.message || error); }
+    } catch (error) { if (!task.controller.signal.aborted) assetError = String(error.message || error); }
     if (task.controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
     return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true, identity };
   }
@@ -267,7 +311,7 @@ export function createPoliticalIdRasterRuntimeOwner({
             const save = assetStore.save(identity, tile, { codeToId: maps.codeToId, signal });
             account();
             return save;
-          }); } catch (error) { assetError = String(error.message || error); }
+          }); } catch (error) { if (!task.controller.signal.aborted) assetError = String(error.message || error); }
         }
       }
       account();
@@ -301,20 +345,23 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   function draw() {
-    if (!usable()) return null;
+    const drawStartedAt = performance.now();
+    if (!usable()) { displayState = "fallback"; reason = failed ? "producer-error" : "unavailable"; return null; }
     try {
       syncSource();
-      if (!updatePlan()) { stats.fallbacks++; return null; }
+      if (!updatePlan()) { stats.fallbacks++; displayState = "fallback"; reason = "view-budget"; return null; }
+      updateViewIdentity();
+      if (refinedViewKey === viewKey) { displayState = "precise"; reason = "idle-refinement"; return null; }
       // Probe availability before spending CPU time building unavailable output.
-      if (!ensureGpu()) return null;
+      if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return null; }
       const tiles = plan.tiles.map(tile => cache.get(tile.key));
-      if (tiles.some(tile => !tile)) { stats.fallbacks++; pump(); return null; }
+      if (tiles.some(tile => !tile)) { stats.fallbacks++; displayState = "preparing"; reason = "awaiting-coverage"; pump(); return null; }
       // Padded edge textures are accounted by the GPU owner. This admission
       // estimate bounds one allocation before uploading; no driver-VRAM claim.
       const estimate = tiles.reduce((sum, tile) => sum + tile.codes.byteLength
         + Math.ceil(Math.max(1, tile.edgeIds.length) / 1024) * 1024 * 8, 0)
         + plan.width * plan.height * 4 + Math.ceil(snapshot.palette.length / 4096) * 4096;
-      if (estimate > GPU_LIMIT) { stats.fallbacks++; return null; }
+      if (estimate > GPU_LIMIT) { stats.fallbacks++; displayState = "fallback"; reason = "gpu-budget"; return null; }
       const startedAt = performance.now();
       gpu.setPalette(snapshot.palette, `${namespace}:${snapshot.paletteRevision}`);
       gpu.setTiles(tiles);
@@ -332,12 +379,17 @@ export function createPoliticalIdRasterRuntimeOwner({
         density: plan.density, originX: plan.originX, originY: plan.originY, width: plan.width, height: plan.height,
       })).map(entry => entry.id));
       stats.commits++;
+      displayState = "accelerated"; reason = "coverage-ready";
+      if (firstRasterReadyMs === null) firstRasterReadyMs = performance.now() - viewStartedAt;
+      scheduleRefinement();
       committedPlan = { plan, epoch, version: sourceVersion, dpr: state.dpr,
         transform: { ...state.zoomTransform }, rawIdentity: { ...rawIdentity }, fittedProjectionKey };
       stats.cacheHits += tiles.length;
       stats.lastCommitMs = performance.now() - startedAt;
       account();
+      lastDrawTotalMs = performance.now() - drawStartedAt;
       e.recordMetric?.("politicalIdRasterCommit", stats.lastCommitMs, {
+        drawTotalMs: lastDrawTotalMs, firstRasterReadyMs, phase: "cpu-submission-not-presentation",
         tileCount: tiles.length, level: plan.level, renderedCount: renderedIds.size,
         cpuBytes: cache.getStats().cpuBytes, ...gpu.getStats(),
       });
@@ -349,6 +401,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       cache.clear();
       account();
       stats.fallbacks++;
+      displayState = "fallback"; reason = "producer-error";
       return null;
     }
   }
@@ -384,8 +437,10 @@ export function createPoliticalIdRasterRuntimeOwner({
     },
     getPendingWorkCount: () => active ? 1 : 0,
     getDiagnostics: () => ({ ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
-      pending: active ? 1 : 0, failed, selected: h.isEnabled(),
+      pending: active ? 1 : 0, failed, selected: h.isEnabled(), displayState, reason,
+      firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null,
       sceneKey: snapshot?.sceneKey || "", level: plan?.level ?? null,
+      view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
       paletteRevision: snapshot?.paletteRevision ?? 0, geometryRevision: snapshot?.geometryRevision ?? 0,
       assets: assetStore?.stats() || null, identity: identityBuilder.getStats(), assetError, assetTimeout,
       pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
@@ -394,6 +449,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     dispose() {
       if (disposed) return;
       disposed = true;
+      cancelRefinement();
       cancel();
       worker.dispose();
       releaseGpu();

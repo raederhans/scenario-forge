@@ -637,3 +637,24 @@ test("a cancelled identity that resolves late starts no manifest lookup, asset l
   assert.equal(f.cache.peek(latestRequest.packet.key)?.marker, "latest-identity");
   assert.equal(f.owner.getDiagnostics().failed, "");
 });
+
+
+test("a slow shared manifest survives tile fallback and remains cancellable by its owner", async t => {
+  const priorFetch = globalThis.fetch, priorLocation = globalThis.location;
+  let resolveManifest, manifestSignal, registrations = 0;
+  globalThis.location = { href: "http://localhost/app/", origin: "http://localhost" };
+  globalThis.fetch = (_url, { signal }) => { manifestSignal = signal; return new Promise(resolve => { resolveManifest = resolve; }); };
+  const f = fixture({ assetTimeoutMs: 10 });
+  t.after(() => { f.owner.dispose(); globalThis.fetch = priorFetch;
+    if (priorLocation === undefined) delete globalThis.location; else globalThis.location = priorLocation; });
+  f.helpers.getAssetManifestUrl = () => "data/manifest.json";
+  f.assetStore.registerManifest = () => { registrations++; };
+  f.owner.draw();
+  await waitFor(() => f.requests.length === 1, "tile deadline must still fall back to the Worker");
+  assert.equal(f.owner.getDiagnostics().assetTimeout, true);
+  assert.equal(manifestSignal.aborted, false, "the shared manifest is not poisoned by a tile deadline");
+  resolveManifest(new Response(JSON.stringify({ schemaVersion: 1, tiles: [] })));
+  await waitFor(() => registrations === 1, "late manifest remains useful to later tiles");
+  assert.equal(f.owner.getDiagnostics().assetError, "");
+  f.owner.dispose(); assert.equal(manifestSignal.aborted, true);
+});
