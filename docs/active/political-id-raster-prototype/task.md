@@ -15,6 +15,9 @@ The user's delayed clarification also authorizes picking and continuous brush op
 - [x] Repair full-frame readiness and remove redundant cold setup in the release verifier; prove the three scenarios again.
 - [x] Measure fixed ON/OFF point selection, real recolor and brush paths before changing product behavior.
 - [x] Improve verified picking and repeated brush work while preserving exact IDs, priority, color sets and history.
+- [x] PR #220 final head `52a59202` passed all six required checks and merged normally as `181a973fc` at 14:37:16 UTC; other worktrees remain untouched.
+- [ ] Deliver the bounded, same-page release phases after run38060336698 exposed total-case timeout overruns; preserve all quality, recovery and editing assertions.
+- [x] All nine local stages passed with full tracing; sparse release checkout discovers all10 cases. Asset and interaction behavior and exact pixels remain covered, with bounded cleanup and no owned server left running.
 - [ ] Validate and deliver the follow-up PR through required checks, merge and exact hosted verification.
 
 - [x] Stage 1: isolated baseline at 98425dcc; fixture and measurement contract fixed.

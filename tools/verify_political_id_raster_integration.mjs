@@ -187,7 +187,7 @@ async function verifyRecovery(page, scenarioId) {
   return { injected: await page.evaluate(() => window.__rasterAssetFaults), protectedState, recovered };
 }
 
-export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1,
+export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 1,
   output = ".runtime/browser/raster-integration", published = false, recoverAssets = false,
   exerciseBrush = true, interactionOnly = false }) {
   if (!baseUrl) throw new Error("--base-url is required");
@@ -198,11 +198,29 @@ export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1
   // Disable them for the paired OFF frame so the oracle is native Canvas.
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
+  const startupStarted = performance.now();
   const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, enabled: null, published, holdRasterAssets: recoverAssets });
   const { page } = session;
-  const report = { scenarioId, dpr, baseUrl, views: [] };
-  const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);
-  try {
+  const report = { scenarioId, dpr, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
+  async function runPhase(name, action) {
+    const started = performance.now();
+    const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);
+    try {
+      await action();
+      report.completedStages.push(name);
+    } catch (error) {
+      report.passed = false; report.error = String(error.stack || error); report.failedStage = name;
+      try { report.failureDiagnostics = await page.evaluate(() => ({ raster: window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
+        phase: window.__rasterTask.state.renderPhase, scenario: window.__rasterTask.state.activeScenarioId,
+        status: document.querySelector("#politicalRasterTrialStatus")?.textContent })); } catch { /* browser watchdog */ }
+      throw error;
+    } finally {
+      clearTimeout(watchdog);
+      report.timings[name] = performance.now() - started;
+      console.log(JSON.stringify({ rasterPhase: name, scenarioId, dpr, durationMs: report.timings[name], failed: report.failedStage === name }));
+    }
+  }
+  async function prepareNativeReferences() {
     assert.equal(await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().requested), false);
     assert.equal(session.network.length, 0, "default-off must not download raster assets");
     await toggle(page, false);
@@ -215,6 +233,8 @@ export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1
       await page.waitForFunction(value => Math.abs(window.__rasterTask.state.zoomTransform.k - value / 100) < 1e-7, zoom);
       await compareSettledPixels(page, zoom, { captureReference: true });
     }
+  }
+  async function verifyRecoveryAndZoom() {
     await toggle(page, true);
     if (recoverAssets) report.recovery = await verifyRecovery(page, scenarioId);
     await waitRasterView(page, scenarioId);
@@ -231,6 +251,8 @@ export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1
       report.views.push({ zoom, diagnostics, pixels });
       assert.equal(pixels.changed, 0, "settled political pixels must match native reference");
     }
+  }
+  async function verifyEditing() {
     report.edit = await editHistory(page);
     if (exerciseBrush) report.brush = await brushHistory(page);
     report.status = await page.locator("#politicalRasterTrialStatus").textContent();
@@ -262,23 +284,35 @@ export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1
     assert.equal(report.editedPixels.changed, 0, 'paint and brush must retain exact native pixels');
     assert.deepEqual(session.errors, []);
     report.passed = true;
-  } catch (error) {
-    report.passed = false; report.error = String(error.stack || error);
-    try { report.failureDiagnostics = await page.evaluate(() => ({ raster: window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
-      phase: window.__rasterTask.state.renderPhase, scenario: window.__rasterTask.state.activeScenarioId,
-      status: document.querySelector("#politicalRasterTrialStatus")?.textContent })); } catch { /* browser watchdog */ }
-    throw error;
-  } finally {
-    clearTimeout(watchdog);
+  }
+  async function close() {
+    await session.browser.close();
+    report.passed = report.passed === true;
     report.network = session.network; report.warnings = session.warnings; report.errors = session.errors;
+    await fs.mkdir(output, { recursive: true });
     await fs.writeFile(path.join(output, `${scenarioId}-dpr${dpr}.json`), JSON.stringify(report, null, 2) + "\n");
     console.log(JSON.stringify({ scenarioId, dpr, passed: report.passed, error: report.error,
       recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
         recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
-      views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })), edit: report.edit, brush: report.brush }));
-    await session.browser.close();
+      views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })),
+      edit: report.edit, brush: report.brush, editedPixels: report.editedPixels, completedStages: report.completedStages, timings: report.timings }));
   }
-  return report;
+  return { session, report, close,
+    prepare: () => runPhase("native-reference", prepareNativeReferences),
+    recoverAndZoom: () => runPhase("recovery-zoom", verifyRecoveryAndZoom),
+    edit: () => runPhase("editing-history", verifyEditing) };
+}
+
+export async function verifyRasterIntegrationCase(options) {
+  const check = await createRasterIntegrationCheck(options);
+  const watchdog = setTimeout(() => { void check.session.browser.close(); }, 120000);
+  try {
+    await check.prepare(); await check.recoverAndZoom(); await check.edit();
+    return check.report;
+  } finally {
+    clearTimeout(watchdog);
+    await check.close();
+  }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
