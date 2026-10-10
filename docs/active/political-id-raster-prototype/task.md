@@ -1,5 +1,15 @@
 # Status — stages 1–11
 
+## 2026-10-10 asset recovery and release regression
+
+The user authorizes bounded recovery after consecutive asset timeouts, regression checks for all three scenarios, PR, protected merge and Pages deployment. Work continues only in the owned integration worktree on `codex/political-raster-recovery-20261010`, based on `a9ee29072`; primary architecture WIP and earlier evidence remain untouched.
+
+- [x] Reproduce the permanent timeout bypass and establish the recovery boundary.
+- [x] Add demand-driven cooldown probing, explicit timeout/error diagnostics and focused regression cases.
+- [x] Wire the real three-scenario recovery path into artifact and deployed release checks.
+- [ ] Verify local behavior, artifact delivery and final-head required CI; create and merge the scoped PR.
+- [ ] Confirm the exact Pages deployment, hosted recovery and editing/quality; report remaining limits.
+
 - [x] Stage 1: isolated baseline at 98425dcc; fixture and measurement contract fixed.
 - [x] Stage 1: real sample baseline measurements captured.
 - [x] Stage 2: derived geometry/palette source and behavior tests.
@@ -63,9 +73,11 @@ The user now authorizes committing this batch, creating a PR, merging after requ
 
 - [x] Refresh remote main and ownership; preserve primary architecture work and prototype evidence.
 - [x] Commit only this worktree's scoped changes and push the feature branch; attach the PR.
-- [ ] Resolve any final-head CI findings, wait for every required check, and merge normally.
-- [ ] Confirm the merge SHA's Pages deployment and hosted source/asset identity.
-- [ ] Verify the published entry, assets, zoom quality and editing for all three scenarios.
-- [ ] Report receipts, remaining limits and an executable follow-on plan; retain the worktree for evidence.
+- [x] Resolve any final-head CI findings, wait for every required check, and merge normally.
+- [x] Confirm the merge SHA's Pages deployment and hosted source/asset identity.
+- [x] Verify the published entry, assets, zoom quality and editing for all three scenarios.
+- [x] Report receipts, remaining limits and an executable follow-on plan; retain the worktree for evidence.
 
-Implementation commit `9279755b87036bef7ce46f99b2f54dac7a84ffa2` is pushed. PR #218: https://github.com/raederhans/scenario-forge/pull/218 . Current root observes this PR's final-head checks; merge and deployment are pending.
+PR #218 (https://github.com/raederhans/scenario-forge/pull/218) merged final head `dcda61dafb2db64b8136f5766716212065408ac0` after 18 checks and all six required gates succeeded (one optional observation skipped). Merge commit: `a9ee29072020fad200cd52b10200e5e8de51391c`, 2026-10-10 12:03:52 UTC. Pages run 38050609688 and deployment 6980551347 succeeded for this exact merge at 12:15:52 UTC, including hosted smoke.
+
+Published verification: five scenario/DPR cases passed initially; TNO DPR 2 hit the existing consecutive asset timeout breaker and failed the strict asset-error assertion. The identical single-case recheck passed without code, assertion or deadline changes. Across the six passing results, both zoom levels match native settled political pixels exactly and real fill/undo/redo pass. The saved-preference Chinese TNO startup and UI zoom input also pass. Keep the original failed report; intermittent asset timeout recovery is the first follow-on item, not a claim of a fully stable cold path or overall speedup. Release report and remaining plan: `.runtime/reports/generated/raster-release/release-report.zh-CN.md` and `remaining-plan.zh-CN.md`. All owned test browsers/processes closed; retain this worktree for evidence.

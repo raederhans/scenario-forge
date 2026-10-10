@@ -29,13 +29,14 @@ export function createPoliticalIdRasterRuntimeOwner({
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
   assetStore = globalThis.indexedDB ? createPoliticalIdRasterAssetStore() : null,
   identityBuilder = createPoliticalIdRasterIdentityBuilder(), canonicalCoordinates = true, gutter = 0,
-  assetTimeoutMs = 1500, refineAfterMs = null,
+  assetTimeoutMs = 1500, assetRetryAfterMs = 5000, refineAfterMs = null,
 }) {
   const worker = client || createPoliticalIdRasterWorkerClient();
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
   let codeToId = new Map(), idToCode = new Map(), tileIdentities = new WeakMap();
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
   let consecutiveAssetTimeouts = 0;
+  let nextAssetProbeAt = 0, assetFailureKind = "", assetFailureOperation = "";
   let pathCacheEstimatedBytes = 0;
   let manifestController = new AbortController();
   let displayState = "preparing", reason = "awaiting-coverage";
@@ -89,7 +90,25 @@ export function createPoliticalIdRasterRuntimeOwner({
   const stats = { builds: 0, cacheHits: 0, staleResults: 0, commits: 0, fallbacks: 0,
     geometryInvalidations: 0, contextLosses: 0, coldBuildMs: 0, lastCommitMs: 0,
     assetHits: 0, pathBuilds: 0, pathCacheHits: 0, pickInteriors: 0, pickFallbacks: 0,
-    identityMs: 0, assetLookupMs: 0 };
+    identityMs: 0, assetLookupMs: 0, assetTimeouts: 0, assetErrors: 0,
+    assetProbes: 0, assetRecoveries: 0, assetBypasses: 0 };
+
+  function recordAssetFailure(error, operation, probe = false) {
+    assetFailureKind = error.name === "TimeoutError" ? "timeout" : "error";
+    assetFailureOperation = operation;
+    assetError = String(error.message || error);
+    if (assetFailureKind === "timeout") {
+      assetTimeout = true;
+      stats.assetTimeouts++;
+      if (operation === "load") consecutiveAssetTimeouts++;
+    } else stats.assetErrors++;
+    if (operation === "load" && (probe || consecutiveAssetTimeouts >= 3)) {
+      nextAssetProbeAt = performance.now() + assetRetryAfterMs;
+    }
+  }
+  function clearAssetFailure() {
+    assetError = ""; assetFailureKind = ""; assetFailureOperation = "";
+  }
 
   function account() {
     const retained = cache.getStats();
@@ -213,9 +232,10 @@ export function createPoliticalIdRasterRuntimeOwner({
       const manifest = JSON.parse(text);
       if (disposed || manifestKey !== urlValue) return;
       assetStore.registerManifest({ ...manifest, tiles: manifest.tiles?.map(tile => ({ ...tile, url: new URL(tile.url, url).href })) });
-      assetError = "";
+      clearAssetFailure();
       consecutiveAssetTimeouts = 0;
-    })().catch(error => { if (!disposed && manifestKey === urlValue) assetError = String(error.message || error); });
+      nextAssetProbeAt = 0;
+    })().catch(error => { if (!disposed && manifestKey === urlValue) recordAssetFailure(error, "manifest"); });
     return manifestPromise;
   }
 
@@ -224,22 +244,28 @@ export function createPoliticalIdRasterRuntimeOwner({
     const signal = AbortSignal.any([task.controller.signal, controller.signal]);
     let timeout, onAbort;
     const interrupted = new Promise((_, reject) => {
-      onAbort = () => reject(new DOMException('Asset operation interrupted.', 'AbortError'));
+      onAbort = () => reject(signal.reason);
       if (signal.aborted) onAbort(); else signal.addEventListener('abort', onAbort, { once: true });
-      timeout = setTimeout(() => { assetTimeout = true; consecutiveAssetTimeouts++; controller.abort(); }, assetTimeoutMs);
+      timeout = setTimeout(() => controller.abort(new DOMException("Asset operation timed out.", "TimeoutError")), assetTimeoutMs);
     });
     try {
       const value = await Promise.race([interrupted, Promise.resolve().then(() => {
         signal.throwIfAborted();
         return callback(signal);
       })]);
-      consecutiveAssetTimeouts = 0;
       return value;
     } finally { clearTimeout(timeout); signal.removeEventListener('abort', onAbort); }
   }
 
   async function resolveTile(packet, task, maps) {
-    if (!assetStore || consecutiveAssetTimeouts >= 3) return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true };
+    const probe = consecutiveAssetTimeouts >= 3;
+    if (!assetStore || (probe && performance.now() < nextAssetProbeAt)) {
+      if (assetStore) stats.assetBypasses++;
+      return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true };
+    }
+    // The existing serial pump allows one demand-driven probe after cooldown.
+    // Covered views create no retry timers or background network work.
+    if (probe) { task.assetProbe = true; stats.assetProbes++; }
     let identity = null;
     try {
       const identityStarted = performance.now();
@@ -251,19 +277,28 @@ export function createPoliticalIdRasterRuntimeOwner({
       const lookupStarted = performance.now();
       try {
         // Prebuilt manifests are explicit; ordinary sessions issue no speculative requests.
+        const failuresBefore = assetStore.stats().failures;
         const tile = await assetOperation(task, async signal => {
           await registerManifest();
           return assetStore.load(identity, { idToCode: maps.idToCode, signal });
         });
+        task.controller.signal.throwIfAborted();
         if (tile) {
           if (!matchesTileRegion(tile, packet)) {
             throw new Error("Political ID asset does not match its requested region.");
           }
-          assetError = "";
+          clearAssetFailure();
+          consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0;
+          if (probe) stats.assetRecoveries++;
           return { tile, built: false, identity };
         }
+        const assets = assetStore.stats();
+        if (assets.failures > failuresBefore) throw new Error(assets.lastError?.message || "Asset lookup failed.");
+        // A genuine coverage miss completed normally; it is not a timeout.
+        // Keep a real earlier error visible until a validated asset is admitted.
+        consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0;
       } finally { stats.assetLookupMs += performance.now() - lookupStarted; }
-    } catch (error) { if (!task.controller.signal.aborted) assetError = String(error.message || error); }
+    } catch (error) { if (!task.controller.signal.aborted) recordAssetFailure(error, "load", probe); }
     if (task.controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
     return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true, identity };
   }
@@ -311,7 +346,7 @@ export function createPoliticalIdRasterRuntimeOwner({
             const save = assetStore.save(identity, tile, { codeToId: maps.codeToId, signal });
             account();
             return save;
-          }); } catch (error) { if (!task.controller.signal.aborted) assetError = String(error.message || error); }
+          }); } catch (error) { if (!task.controller.signal.aborted) recordAssetFailure(error, "save"); }
         }
       }
       account();
@@ -443,6 +478,10 @@ export function createPoliticalIdRasterRuntimeOwner({
       view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
       paletteRevision: snapshot?.paletteRevision ?? 0, geometryRevision: snapshot?.geometryRevision ?? 0,
       assets: assetStore?.stats() || null, identity: identityBuilder.getStats(), assetError, assetTimeout,
+      assetFailureKind, assetFailureOperation,
+      assetRecovery: { consecutiveTimeouts: consecutiveAssetTimeouts,
+        state: consecutiveAssetTimeouts < 3 ? "ready" : active?.assetProbe ? "probing" : "cooldown",
+        retryInMs: Math.max(0, nextAssetProbeAt - performance.now()) },
       pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
       accounting: "typed-array-texture-and-surface-estimates-excludes-JS-and-driver" }),
     loseContextForValidation: () => gpu?.loseContextForValidation(),

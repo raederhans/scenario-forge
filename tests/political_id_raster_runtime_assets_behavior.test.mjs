@@ -7,6 +7,100 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+async function openTimeoutCircuit(t) {
+  let now = 0;
+  t.mock.method(performance, "now", () => now);
+  const f = fixture({
+    transform: { x: 0, y: 200, k: 1 }, width: 4000, height: 100, assetTimeoutMs: 10,
+    features: [feature("stable-a", { minX: -700, minY: -300, maxX: 4400, maxY: 100 })],
+    load: (_identity, { signal }) => new Promise((_resolve, reject) => {
+      signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+    }),
+  });
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  for (let index = 0; index < 3; index++) {
+    await waitFor(() => f.requests.length === index + 1, "timed-out tile must fall back");
+    assert.equal(f.assetStore.loads.length, index + 1);
+    f.requests[index].resolve(makeTile(f.requests[index].packet));
+  }
+  await waitFor(() => f.requests.length === 4, "cooldown must continue with the Worker");
+  assert.equal(f.assetStore.loads.length, 3);
+  assert.equal(f.owner.getDiagnostics().assetTimeouts, 3);
+  assert.equal(f.owner.getDiagnostics().assetFailureKind, "timeout");
+  assert.equal(f.owner.getDiagnostics().assetRecovery.state, "cooldown");
+  return { f, advance: value => { now += value; } };
+}
+
+test("three consecutive timeouts recover through one bounded probe without rebuilding the owner", async (t) => {
+  const { f, advance } = await openTimeoutCircuit(t);
+  advance(4999);
+  f.requests[3].resolve(makeTile(f.requests[3].packet));
+  await waitFor(() => f.requests.length === 5, "cooldown must not start early");
+  assert.equal(f.assetStore.loads.length, 3);
+  assert.equal(f.owner.getDiagnostics().assetProbes, 0);
+  f.assetStore.setLoad(async () => makeTile(f.identityBuilder.calls.at(-1).descriptor, { marker: "recovered" }));
+  advance(1);
+  f.requests[4].resolve(makeTile(f.requests[4].packet));
+  await waitFor(() => f.owner.getPendingWorkCount() === 0, "recovered assets complete the same view");
+  const d = f.owner.getDiagnostics();
+  assert.equal(d.assetProbes, 1);
+  assert.equal(d.assetRecoveries, 1);
+  assert.ok(d.assetHits > 0);
+  assert.equal(d.assetBypasses, 2);
+  assert.equal(d.assetError, "");
+  assert.equal(d.assetFailureKind, "");
+  assert.equal(d.assetRecovery.state, "ready");
+  assert.equal(d.assetTimeouts, 3, "historical timeouts stay observable");
+  assert.equal(d.failed, "");
+  assert.ok(f.owner.draw(), "the recovered frame is complete and drawable");
+});
+
+test("a failed recovery probe keeps real errors visible and waits for another cooldown", async (t) => {
+  const { f, advance } = await openTimeoutCircuit(t);
+  f.assetStore.setLoad(async () => {
+    const descriptor = f.identityBuilder.calls.at(-1).descriptor;
+    return makeTile({ ...descriptor, originX: descriptor.originX + 1 });
+  });
+  advance(5000);
+  f.requests[3].resolve(makeTile(f.requests[3].packet));
+  await waitFor(() => f.requests.length === 5, "invalid probe coverage falls back to the Worker");
+  assert.equal(f.owner.getDiagnostics().assetProbes, 1);
+  assert.equal(f.owner.getDiagnostics().assetRecoveries, 0);
+  assert.equal(f.owner.getDiagnostics().assetFailureKind, "error");
+  assert.match(f.owner.getDiagnostics().assetError, /requested region/);
+  assert.equal(f.owner.getDiagnostics().assetErrors, 1);
+  f.requests[4].resolve(makeTile(f.requests[4].packet));
+  await waitFor(() => f.requests.length === 6, "fallback continues during the renewed cooldown");
+  assert.equal(f.assetStore.loads.length, 4, "bad service cannot cause per-tile probing");
+  advance(4999);
+  f.requests[5].resolve(makeTile(f.requests[5].packet));
+  await waitFor(() => f.requests.length === 7, "the probe delay remains enforced");
+  assert.equal(f.assetStore.loads.length, 4);
+  assert.equal(f.owner.getDiagnostics().failed, "");
+});
+
+test("disposing an in-flight recovery probe aborts it without admitting a late tile", async (t) => {
+  const { f, advance } = await openTimeoutCircuit(t);
+  const pending = deferred();
+  let probeSignal;
+  f.assetStore.setLoad((_id, { signal }) => { probeSignal = signal; return pending.promise; });
+  advance(5000);
+  f.requests[3].resolve(makeTile(f.requests[3].packet));
+  await waitFor(() => !!probeSignal, "one recovery probe begins");
+  const descriptor = f.identityBuilder.calls.at(-1).descriptor;
+  assert.equal(f.owner.getDiagnostics().assetProbes, 1);
+  f.owner.dispose();
+  assert.equal(probeSignal.aborted, true);
+  pending.resolve(makeTile(descriptor));
+  await drain();
+  assert.equal(f.cache.getStats().tileCount, 0);
+  assert.equal(f.owner.getDiagnostics().assetRecoveries, 0);
+  assert.equal(f.owner.getDiagnostics().assetTimeouts, 3);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+});
+
+
 async function drain(turns = 6) {
   for (let index = 0; index < turns; index += 1) await tick();
 }
@@ -212,6 +306,7 @@ function fixture({
   width = 100,
   height = 100,
   assetTimeoutMs = 1500,
+  assetRetryAfterMs = 5000,
   load = async () => null,
   assetStore: injectedAssetStore = null,
 } = {}) {
@@ -261,6 +356,7 @@ function fixture({
     identityBuilder,
     canonicalCoordinates,
     assetTimeoutMs,
+    assetRetryAfterMs,
   });
   return {
     owner,
@@ -589,6 +685,8 @@ test("a never-settling asset save times out, releases the pump, and still commit
   assert.equal(f.cache.getStats().tileCount, expected.tiles.length);
   assert.equal(f.owner.getDiagnostics().assetTimeout, true);
   assert.equal(f.owner.getDiagnostics().failed, "");
+  assert.equal(f.owner.getDiagnostics().assetFailureOperation, "save");
+  assert.equal(f.owner.getDiagnostics().assetRecovery.state, "ready", "optional saves cannot disable asset reads");
   assert.ok(f.owner.draw(), "the complete CPU tile set remains drawable after save timeouts");
   assert.equal(f.gpus[0].draws.length, 1);
   assert.equal(f.metrics.at(-1)[0], "politicalIdRasterCommit");

@@ -117,6 +117,8 @@ jobs:
             /playwright.config.cjs
             /tests/e2e/release/
             /tests/e2e/support/
+            /tools/verify_political_id_raster_integration.mjs
+            /tools/political_id_raster_app_session.mjs
 
       - name: Setup Node for release smoke
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
