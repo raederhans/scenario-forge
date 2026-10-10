@@ -413,9 +413,9 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
         && /const taskKey = "secondary-spatial-index";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(rendererSource)
         && /const taskKey = "deferred-heavy-border-meshes";[\s\S]*?recordInteractionRecoveryTaskMetric\(taskKey,/.test(staticBorderMeshLifecycleSource),
       hoverStrictHitUsesFirstContainingFastPath:
-        /function findFirstContainingCandidate\([\s\S]*?eventType = "hover",[\s\S]*?targetType = "unknown",[\s\S]*?fastPath: "hover-first-containing"/.test(interactionHitCandidateSource)
+        /function findFirstContainingCandidate\([\s\S]*?eventType = "hover",[\s\S]*?targetType = "unknown",[\s\S]*?fastPath: `\$\{eventType\}-first-containing`/.test(interactionHitCandidateSource)
         && /function findFirstContainingCandidate\(candidates, lonLat,[\s\S]*?findFirstContainingHitCandidate\(candidates, lonLat,[\s\S]*?recordInteractionDurationMetric,/.test(rendererSource)
-        && /eventType === "hover" && !enableSnap[\s\S]*?findFirstContainingCandidate\(strictCandidates, pointer\.lonLat, \{ eventType, targetType: "land" \}\)/.test(rendererSource),
+        && /\(eventType === "hover" \|\| eventType === "brush"\) && !enableSnap[\s\S]*?findFirstContainingCandidate\(strictCandidates, pointer\.lonLat, \{ eventType, targetType: "land" \}\)/.test(rendererSource),
       exactAfterSettleRefreshLeavesContextScenarioOutsidePhysicalRefreshPasses:
         /function getPhysicalExactRefreshPasses\(\) \{[\s\S]*?\["physicalBase", "political", "contextBase", "borders"\][\s\S]*?\["political", "contextBase", "borders"\][\s\S]*?return passes;[\s\S]*?\}/.test(rendererSource)
         && /function applyExactAfterSettleRefreshPlan[\s\S]*?invalidateRenderPasses\(\["physicalBase", "contextBase"\], "physical-visible-exact"\);[\s\S]*?invalidateRenderPasses\(getPhysicalExactRefreshPasses\(\), reuseDecision\.reason \|\| "context-base-exact"\);/.test(exactSchedulerSource),
