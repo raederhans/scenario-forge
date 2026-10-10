@@ -1,8 +1,14 @@
 # Worktree Registry
 
+## 2026-10-10 栅格资产恢复与发布回归
+
+继续使用本对话的 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`，新分支 `codex/political-raster-recovery-20261010` 基于已发布 `a9ee29072`。root 独占运行时修改、测试、Git 与发布。范围为连续资产超时后的有界恢复和三个剧本的真实发布回归；主目录架构整理及 prototype 工作树不写入。沿用原任务记录与本地证据。
+
 ## 2026-10-10 栅格试用正式整合
 
 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`、`codex/political-raster-integration` 基于已发布 `abf6a1a6` 交付试用入口、三个正式剧本共 282 个压缩资产及缩放后的精确细化。root 独占提交、PR、合并、部署跟踪和线上验收；用户已明确授权这条交付链。主目录 `codex/architecture-simplification-20261010` 的未提交改动和 prototype 工作树均保留，不从中抽取文件。保留本工作树的 ignored 构建、浏览器和测量证据；当前检查、PR 与部署回执见 [任务记录](political-id-raster-prototype/task.md)，本条登记不替代远端成功回执。
+
+本轮 [PR #218](https://github.com/raederhans/scenario-forge/pull/218) 已在最终提交全部必需检查通过后合并为 `a9ee29072`，对应 Pages 工作流 38050609688 及部署 6980551347 已成功。六个线上剧本/DPR 组合取得通过结果，其中 TNO DPR 2 首轮资产超时、同条件复测通过，原始失败保留；中文自动启用及 UI 缩放通过。仅本工作树快进到该合并，主目录 WIP 保留。详见任务文件及 ignored 发布报告；此段为合并后的本地交接记录。
 
 ## 2026-10-09 共享政治层 ID 栅格
 

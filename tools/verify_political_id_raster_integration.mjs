@@ -1,16 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
 import { openRasterApp, waitRasterView } from "./political_id_raster_app_session.mjs";
-
-const flags = new Map();
-for (let i = 2; i < process.argv.length; i += 2) flags.set(process.argv[i], process.argv[i + 1]);
-const baseUrl = flags.get("--base-url"), output = path.resolve(flags.get("--output") || ".runtime/browser/raster-integration");
-if (!baseUrl) throw new Error("--base-url is required");
-const ids = flags.has("--scenario") ? [flags.get("--scenario")] : ["hoi4_1936", "hoi4_1939", "tno_1962"];
-const dprs = flags.has("--dpr") ? [Number(flags.get("--dpr"))] : [1, 2];
-const published = flags.get("--published") === "true";
-await fs.mkdir(output, { recursive: true });
 
 async function settled(page, precise = false) {
   await page.waitForFunction(needPrecise => {
@@ -123,13 +115,48 @@ async function editHistory(page) {
   return { paintedIds: Object.keys(painted).filter(id => painted[id] !== before[id]), undo: true, redo: true, ...input };
 }
 
-for (const scenarioId of ids) for (const dpr of dprs) {
+async function verifyRecovery(page, scenarioId) {
+  await page.waitForFunction(() => {
+    const d = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
+    return window.__rasterAssetFaults.aborted >= 3 && d.assetRecovery?.consecutiveTimeouts >= 3;
+  }, null, { timeout: 30000 });
+  const protectedState = await page.evaluate(() => {
+    // Startup promotion can cancel obsolete requests. Release the fault only
+    // when the current owner has actually reached its timeout protection.
+    window.__rasterAssetFaults.active = false;
+    return window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
+  });
+  assert.equal(protectedState.failed, "");
+  assert.equal(protectedState.assetFailureKind, "timeout");
+  await waitRasterView(page, scenarioId); await settled(page, true);
+  await page.waitForFunction(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assetRecovery.retryInMs === 0);
+  if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
+  await page.locator("#zoomPercentInput").fill("130%");
+  await page.locator("#zoomPercentInput").press("Enter");
+  await page.waitForFunction(() => Math.abs(window.__rasterTask.state.zoomTransform.k - 1.3) < 1e-7);
+  await waitRasterView(page, scenarioId); await settled(page, true);
+  const recovered = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+  assert.ok(recovered.assetProbes >= 1, "the same owner must probe after cooldown");
+  assert.ok(recovered.assetRecoveries >= 1, "a probe must admit a validated asset");
+  assert.ok(recovered.assetHits > 0);
+  assert.equal(recovered.assetErrors, 0, "real asset failures must not be hidden by later recovery");
+  assert.equal(recovered.assets.failures, 0);
+  assert.equal(recovered.assetError, ""); assert.equal(recovered.failed, "");
+  assert.equal(recovered.assetRecovery.state, "ready");
+  return { injected: await page.evaluate(() => window.__rasterAssetFaults), protectedState, recovered };
+}
+
+export async function verifyRasterIntegrationCase({ baseUrl, scenarioId, dpr = 1,
+  output = ".runtime/browser/raster-integration", published = false, recoverAssets = false }) {
+  if (!baseUrl) throw new Error("--base-url is required");
+  output = path.resolve(output);
+  await fs.mkdir(output, { recursive: true });
   const referenceUrl = new URL(baseUrl);
   // The opt-in producer already excludes these alternative bitmap producers.
   // Disable them for the paired OFF frame so the oracle is native Canvas.
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
-  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, enabled: null, published });
+  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, enabled: null, published, holdRasterAssets: recoverAssets });
   const { page } = session;
   const report = { scenarioId, dpr, baseUrl, views: [] };
   const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);
@@ -138,6 +165,7 @@ for (const scenarioId of ids) for (const dpr of dprs) {
     assert.equal(session.network.length, 0, "default-off must not download raster assets");
     await settled(page);
     await toggle(page, true);
+    if (recoverAssets) report.recovery = await verifyRecovery(page, scenarioId);
     await waitRasterView(page, scenarioId);
     for (const zoom of [100, 130]) {
       await page.evaluate(value => window.__rasterTask.renderer.setZoomPercent(value), zoom);
@@ -163,18 +191,33 @@ for (const scenarioId of ids) for (const dpr of dprs) {
     assert.deepEqual(report.preference, { saved: true, forcedOff: false });
     if (dpr === 1) await page.screenshot({ path: path.join(output, `${scenarioId}.png`) });
     assert.deepEqual(session.errors, []);
-    report.network = session.network; report.warnings = session.warnings;
     report.passed = true;
   } catch (error) {
     report.passed = false; report.error = String(error.stack || error);
-    try { report.failureDiagnostics = await page.evaluate(() => ({ raster: window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(),
+    try { report.failureDiagnostics = await page.evaluate(() => ({ raster: window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
       phase: window.__rasterTask.state.renderPhase, scenario: window.__rasterTask.state.activeScenarioId,
       status: document.querySelector("#politicalRasterTrialStatus")?.textContent })); } catch { /* browser watchdog */ }
     throw error;
   } finally {
     clearTimeout(watchdog);
+    report.network = session.network; report.warnings = session.warnings; report.errors = session.errors;
     await fs.writeFile(path.join(output, `${scenarioId}-dpr${dpr}.json`), JSON.stringify(report, null, 2) + "\n");
-    console.log(JSON.stringify({ scenarioId, dpr, passed: report.passed, error: report.error, views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })), edit: report.edit }));
+    console.log(JSON.stringify({ scenarioId, dpr, passed: report.passed, error: report.error,
+      recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
+        recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
+      views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })), edit: report.edit }));
     await session.browser.close();
   }
+  return report;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  const flags = new Map();
+  for (let i = 2; i < process.argv.length; i += 2) flags.set(process.argv[i], process.argv[i + 1]);
+  const ids = flags.has("--scenario") ? [flags.get("--scenario")] : ["hoi4_1936", "hoi4_1939", "tno_1962"];
+  const dprs = flags.has("--dpr") ? [Number(flags.get("--dpr"))] : [1, 2];
+  for (const scenarioId of ids) for (const dpr of dprs) await verifyRasterIntegrationCase({
+    baseUrl: flags.get("--base-url"), scenarioId, dpr, output: flags.get("--output"),
+    published: flags.get("--published") === "true", recoverAssets: flags.get("--recover") === "true",
+  });
 }

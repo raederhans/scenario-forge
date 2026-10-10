@@ -4,7 +4,7 @@
   "summary": {
     "specCount": 74,
     "nodeCount": 90,
-    "reverseIndexKeyCount": 142,
+    "reverseIndexKeyCount": 143,
     "topSharedDependencies": [
       {
         "dependency": "js/core/interaction_funnel.js",
@@ -1225,7 +1225,8 @@
         "js/core/interaction_funnel.js",
         "js/core/state.js",
         "tests/e2e/support/playwright-app.js",
-        "tests/e2e/support/release-smoke.js"
+        "tests/e2e/support/release-smoke.js",
+        "tools/verify_political_id_raster_integration.mjs"
       ],
       "transitiveDependencies": [
         "js/core/interaction_funnel.js",
@@ -1239,14 +1240,16 @@
         "tests/e2e/support/playwright-project-import.js",
         "tests/e2e/support/playwright-web-server.js",
         "tests/e2e/support/release-smoke.js",
-        "tests/e2e/support/startup-paths.js"
+        "tests/e2e/support/startup-paths.js",
+        "tools/verify_political_id_raster_integration.mjs"
       ],
       "repoImpact": [
         "js/core/interaction_funnel.js",
         "js/core/map_renderer.js",
         "js/core/scenario_dispatcher.js",
         "js/core/state.js",
-        "js/ui/sidebar.js"
+        "js/ui/sidebar.js",
+        "tools/verify_political_id_raster_integration.mjs"
       ]
     },
     "tests/e2e/review_regressions.spec.js": {
@@ -3507,6 +3510,9 @@
     ],
     "tests/fixtures/river_paint/overlap_visibility.json": [
       "tests/e2e/river_overlap_visibility.spec.js"
+    ],
+    "tools/verify_political_id_raster_integration.mjs": [
+      "tests/e2e/release/pages_public_release_gate.spec.js"
     ],
     "vendor/d3.v7.min.js": [
       "tests/e2e/dev/latency_batches.dev.spec.js",

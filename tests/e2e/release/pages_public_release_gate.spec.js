@@ -31,6 +31,19 @@ const ALLOW_DEFAULT_DEPLOYED_URL = process.env.SCENARIO_FORGE_ALLOW_DEFAULT_PAGE
 const PUBLIC_BASE_URL = EXPLICIT_PUBLIC_BASE_URL
   || (ALLOW_DEFAULT_DEPLOYED_URL ? DEFAULT_DEPLOYED_PAGES_URL : "");
 
+for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
+  test(`public Pages raster timeout recovery ${scenarioId}`, async ({}, testInfo) => {
+    // JUSTIFY: cold startup, three 1500ms deadlines, cooldown, exact zoom frames and edit/history.
+    test.setTimeout(120000);
+    const { verifyRasterIntegrationCase } = await import("../../../tools/verify_political_id_raster_integration.mjs");
+    await verifyRasterIntegrationCase({
+      baseUrl: publicUrl("app/"), scenarioId, dpr: scenarioId === "tno_1962" ? 2 : 1,
+      published: true, recoverAssets: true,
+      output: testInfo.outputPath("raster-recovery"),
+    });
+  });
+}
+
 if (!PUBLIC_BASE_URL) {
   throw new Error(
     "Set SCENARIO_FORGE_PAGES_URL or PLAYWRIGHT_TEST_BASE_URL before running the Pages release gate. "
