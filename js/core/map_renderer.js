@@ -3752,6 +3752,7 @@ function getPoliticalPartialRepaintOwner() {
       drawWorkerPoliticalFine: () => hasVisibleRiverPartitions() ? null : getGeometryRasterRuntimeOwner().drawPolitical(),
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
       isPoliticalIdRasterSelected,
+      hasNativePoliticalIdRasterFrame: () => politicalIdRasterRuntimeOwner?.hasNativeFrame() === true,
       getRuntimeState: () => runtimeState,
       getDebugMode: () => debugMode,
       getDefaultTransform: () => runtimeState.zoomTransform || globalThis.d3?.zoomIdentity,
@@ -3807,6 +3808,9 @@ function getPoliticalPartialRepaintOwner() {
       setPassReferenceTransform,
       recordPassTiming,
       drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
+      onPartialRepaint: () => {
+        if (isPoliticalIdRasterSelected()) politicalIdRasterRuntimeOwner?.noteNativePartialRepaint();
+      },
       commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
         renderDiag.politicalPass = politicalPassDiagnostics;
         publishRenderDiagnostics();
@@ -9273,7 +9277,7 @@ function getLandHitFromPointer(
       }
     }
   }
-  if (eventType === "hover" && !enableSnap) {
+  if ((eventType === "hover" || eventType === "brush") && !enableSnap) {
     const strictHoverHit = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     return strictHoverHit
       ? toHitResult(strictHoverHit, {
@@ -9284,16 +9288,16 @@ function getLandHitFromPointer(
       })
       : createHitResult();
   }
-  const strictRanked = rankCandidates(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
-  if (strictRanked.length > 0) {
-    const strictContainsGeo = strictRanked.find((candidate) => candidate.containsGeo);
+  // The first containing item in canonical priority order is the same winner
+  // as ranking every containment result; lower-priority geometry need not run.
+  if (strictCandidates.length > 0) {
+    const strictContainsGeo = findFirstContainingCandidate(strictCandidates, pointer.lonLat, { eventType, targetType: "land" });
     if (strictContainsGeo) {
       if (hitMode === "auto" && eventType !== "compat") {
-        const strictIds = new Set(strictRanked.map((candidate) => candidate.item.id));
-        const strictMatchCount = strictRanked.filter((candidate) => candidate.containsGeo).length;
+        const strictIds = new Set(strictCandidates.map((candidate) => candidate.item.id));
         const hitFromCanvas = getValidatedCanvasHit(event, strictIds, {
           forceBuild:
-            strictMatchCount > 1
+            strictCandidates.length > 1
             && (eventType === "click" || eventType === "dblclick" || eventType === "compat"),
         });
         if (hitFromCanvas.id === strictContainsGeo.item.id) {

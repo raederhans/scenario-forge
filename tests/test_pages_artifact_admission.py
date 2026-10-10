@@ -121,7 +121,8 @@ class ArtifactReleaseWorkflowTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("public Pages release gate", result.stdout)
-            self.assertIn("Total: 4 tests", result.stdout)
+            self.assertIn("Total: 5 tests", result.stdout)
+            self.assertIn("public Pages raster continuous brush tno_1962", result.stdout)
             for scenario in ("hoi4_1936", "hoi4_1939", "tno_1962"):
                 self.assertIn(f"public Pages raster timeout recovery {scenario}", result.stdout)
             for helper in ("verify_political_id_raster_integration.mjs", "political_id_raster_app_session.mjs"):

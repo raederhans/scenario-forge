@@ -100,6 +100,53 @@ test("disposing an in-flight recovery probe aborts it without admitting a late t
   assert.equal(f.owner.getPendingWorkCount(), 0);
 });
 
+for (const recovers of [true, false]) {
+  test(`covered Worker view bounds idle probes and ${recovers ? 'recovers after a failed probe' : 'stops when service stays unavailable'}`, async t => {
+    const { f, advance } = await openTimeoutCircuit(t);
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    while (f.owner.getPendingWorkCount()) {
+      const pending = f.requests.find(request => !request.settled);
+      if (pending) pending.resolve(makeTile(pending.packet));
+      await drain();
+    }
+    f.owner.draw();
+    const workerCount = f.requests.length;
+    const tileCount = f.cache.getStats().tileCount;
+    assert.equal(f.owner.getDiagnostics().assetRecovery.scheduled, true);
+    advance(5000); t.mock.timers.tick(5000); await drain();
+    assert.equal(f.assetStore.loads.length, 4);
+    t.mock.timers.tick(10); await drain();
+    assert.equal(f.owner.getDiagnostics().assetTimeouts, 4);
+    assert.equal(f.cache.getStats().tileCount, tileCount, 'failed probe retains the usable Worker frame');
+    assert.equal(f.requests.length, workerCount, 'failed probe does not rebuild existing coverage');
+    if (recovers) f.assetStore.setLoad(async () => makeTile(f.identityBuilder.calls.at(-1).descriptor));
+    advance(5000); t.mock.timers.tick(5000); await drain();
+    if (!recovers) { t.mock.timers.tick(10); await drain(); }
+    assert.equal(f.owner.getDiagnostics().assetProbes, 2);
+    assert.equal(f.owner.getDiagnostics().assetRecoveries, recovers ? 1 : 0);
+    assert.equal(f.owner.getDiagnostics().assetRecovery.scheduled, false);
+    advance(60000); t.mock.timers.tick(60000); await drain();
+    assert.equal(f.assetStore.loads.length, 5, 'idle retry work is bounded per view');
+    assert.equal(f.requests.length, workerCount);
+    assert.ok(f.owner.draw());
+  });
+}
+
+test('disposing covered recovery cancels the pending timer', async t => {
+  const { f, advance } = await openTimeoutCircuit(t);
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  while (f.owner.getPendingWorkCount()) {
+    const pending = f.requests.find(request => !request.settled);
+    if (pending) pending.resolve(makeTile(pending.packet));
+    await drain();
+  }
+  assert.equal(f.owner.getDiagnostics().assetRecovery.scheduled, true);
+  f.owner.dispose();
+  advance(5000); t.mock.timers.tick(5000); await drain();
+  assert.equal(f.assetStore.loads.length, 3);
+  assert.equal(f.owner.getDiagnostics().assetRecovery.scheduled, false);
+});
+
 
 async function drain(turns = 6) {
   for (let index = 0; index < turns; index += 1) await tick();

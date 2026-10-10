@@ -18,12 +18,13 @@ export async function openRasterApp(baseUrl, { dpr = 1, build = false, scenarioI
       if (language) localStorage.setItem("map_lang", language);
       // Faults exist only in this isolated test context; production deadlines
       // and recovery policy remain untouched.
-      const faults = window.__rasterAssetFaults = { active: holdRasterAssets, intercepted: 0, aborted: 0 };
+      const faults = window.__rasterAssetFaults = { active: holdRasterAssets, recoveryTimeouts: 0, intercepted: 0, aborted: 0 };
       const fetchActual = globalThis.fetch.bind(globalThis);
       if (holdRasterAssets) globalThis.fetch = (input, options = {}) => {
         const url = new URL(input instanceof Request ? input.url : input, location.href);
-        if (faults.active && url.pathname.includes("/political_id_raster/")
+        if ((faults.active || faults.recoveryTimeouts > 0) && url.pathname.includes("/political_id_raster/")
           && url.pathname.endsWith(".pidr.gz")) {
+          if (!faults.active) faults.recoveryTimeouts--;
           faults.intercepted++;
           return new Promise((_resolve, reject) => {
             const signal = options.signal || (input instanceof Request ? input.signal : null);

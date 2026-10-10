@@ -22,7 +22,6 @@ export function createPoliticalPartialRepaintOwner({
   const hasInlinePoliticalPartitions = typeof getters.hasInlinePoliticalPartitions === "function"
     ? getters.hasInlinePoliticalPartitions
     : () => false;
-
   const requiredHelpers = [
     "nowMs",
     "getFeatureId",
@@ -68,7 +67,6 @@ export function createPoliticalPartialRepaintOwner({
     name,
     requireFunction(helpers[name], `helpers.${name}`),
   ]));
-
   const requiredEffects = [
     "incrementPerfCounter",
     "recordRenderPerfMetric",
@@ -336,7 +334,8 @@ export function createPoliticalPartialRepaintOwner({
   }
 
   function tryPartialPoliticalPassRepaint(transform, nextSignature, timings) {
-    if (getters.isPoliticalIdRasterSelected?.()) return false;
+    // Native feedback retains the ordinary fine-baseline and dirty-rectangle guards.
+    if (getters.isPoliticalIdRasterSelected?.() && !getters.hasNativePoliticalIdRasterFrame?.()) return false;
     const state = getRuntimeState();
     const cache = getRenderPassCacheState();
     const dirtyIds = Array.from(cache.partialPoliticalDirtyIds || []).filter(Boolean);
@@ -554,6 +553,7 @@ export function createPoliticalPartialRepaintOwner({
         pathCacheMisses,
         pathCacheMissRatio: Number(pathCacheMissRatio.toFixed(4)),
       });
+      effects.onPartialRepaint?.();
       return true;
     };
     }

@@ -10,6 +10,13 @@ The user authorizes bounded recovery after consecutive asset timeouts, regressio
 - [ ] Verify local behavior, artifact delivery and final-head required CI; create and merge the scoped PR.
 - [ ] Confirm the exact Pages deployment, hosted recovery and editing/quality; report remaining limits.
 
+The user's delayed clarification also authorizes picking and continuous brush optimization in this batch. PR219 merged but its new artifact release gate stopped deployment (1939 pixel comparison, TNO DPR2 total duration); preserve that evidence and repair the gate without relaxing quality/deadlines. Continue on codex/political-raster-interaction-20261010, based on the merged source. Public deployment remains the previous version until a successful follow-up release. The candidate now bounds idle recovery to two probes per view, preserves canonical first-containing picks, coalesces native brush feedback into an exact final frame, and expands release coverage to five cases (separate DPR2 TNO recovery and continuous editing). The full combined TNO browser check passed, but exceeded the release case total budget, so the cases are split without extending deadlines.
+
+- [x] Repair full-frame readiness and remove redundant cold setup in the release verifier; prove the three scenarios again.
+- [x] Measure fixed ON/OFF point selection, real recolor and brush paths before changing product behavior.
+- [x] Improve verified picking and repeated brush work while preserving exact IDs, priority, color sets and history.
+- [ ] Validate and deliver the follow-up PR through required checks, merge and exact hosted verification.
+
 - [x] Stage 1: isolated baseline at 98425dcc; fixture and measurement contract fixed.
 - [x] Stage 1: real sample baseline measurements captured.
 - [x] Stage 2: derived geometry/palette source and behavior tests.

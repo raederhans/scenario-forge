@@ -37,17 +37,24 @@ export function createPoliticalIdRasterRuntimeOwner({
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
   let consecutiveAssetTimeouts = 0;
   let nextAssetProbeAt = 0, assetFailureKind = "", assetFailureOperation = "";
+  let assetRecoveryTimer = null, coveredAssetProbes = 0;
   let pathCacheEstimatedBytes = 0;
   let manifestController = new AbortController();
   let displayState = "preparing", reason = "awaiting-coverage";
   let viewKey = "", refinedViewKey = "", refinementTimer = null;
+  let nativePartialPending = false, forceNativeRefinement = false;
   let viewStartedAt = 0, firstRasterReadyMs = null, lastDrawTotalMs = 0, nativeRefinements = 0;
-  function cancelRefinement() { if (refinementTimer !== null) clearTimeout(refinementTimer); refinementTimer = null; }
+  function cancelRefinement() {
+    if (refinementTimer !== null) clearTimeout(refinementTimer);
+    refinementTimer = null; nativePartialPending = false;
+  }
+  function cancelAssetRecovery() { if (assetRecoveryTimer !== null) clearTimeout(assetRecoveryTimer); assetRecoveryTimer = null; }
   function updateViewIdentity() {
     const next = JSON.stringify([namespace, sourceVersion, snapshot.paletteRevision, state.dpr,
       state.zoomTransform.x, state.zoomTransform.y, state.zoomTransform.k,
       plan.width, plan.height, plan.outputX, plan.outputY, plan.scale]);
     if (next !== viewKey) {
+      cancelAssetRecovery(); coveredAssetProbes = 0;
       cancelRefinement(); viewKey = next; refinedViewKey = "";
       viewStartedAt = performance.now(); firstRasterReadyMs = null;
     }
@@ -75,6 +82,20 @@ export function createPoliticalIdRasterRuntimeOwner({
       refinedViewKey = scheduledKey;
       nativeRefinements++;
       e.requestRender("political-id-raster-refine");
+    }, refineAfterMs);
+  }
+  function noteNativePartialRepaint() {
+    if (disposed || !h.isEnabled() || !(Number.isFinite(refineAfterMs) && refineAfterMs >= 0)) return;
+    cancelRefinement();
+    nativePartialPending = true;
+    displayState = "accelerated"; reason = "native-partial-feedback";
+    refinementTimer = setTimeout(() => {
+      refinementTimer = null; nativePartialPending = false;
+      if (disposed || !h.isEnabled()) return;
+      // Coalesce a stroke's local feedback, then redraw the exact native pass.
+      // Clipped antialiasing edges cannot be treated as a final full-frame oracle.
+      forceNativeRefinement = true;
+      e.requestRender("political-id-raster-partial-refine");
     }, refineAfterMs);
   }
   const source = createPoliticalIdRasterSource({ getId: h.getFeatureId,
@@ -108,6 +129,27 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
   function clearAssetFailure() {
     assetError = ""; assetFailureKind = ""; assetFailureOperation = "";
+  }
+
+  function scheduleCoveredAssetRecovery() {
+    if (!usable() || active || consecutiveAssetTimeouts < 3 || coveredAssetProbes >= 2 || assetRecoveryTimer !== null
+      || !plan?.tiles.some(tile => cache.peek(tile.key))) return;
+    // Worker coverage must not leave the circuit open forever. At most two
+    // idle probes per view share the serial producer and the original deadline.
+    assetRecoveryTimer = setTimeout(() => {
+      assetRecoveryTimer = null;
+      if (!usable() || active) return;
+      try {
+        syncSource();
+        if (!updatePlan()) return;
+        updateViewIdentity();
+        pump(true);
+      } catch (error) {
+        failed = String(error?.message || error);
+        cancel();
+        e.requestRender("political-id-raster-recovery-fallback");
+      }
+    }, Math.max(0, nextAssetProbeAt - performance.now()));
   }
 
   function account() {
@@ -263,8 +305,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (assetStore) stats.assetBypasses++;
       return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true };
     }
-    // The existing serial pump allows one demand-driven probe after cooldown.
-    // Covered views create no retry timers or background network work.
+    // Both demand and bounded idle probes use the same serial pump.
     if (probe) { task.assetProbe = true; stats.assetProbes++; }
     let identity = null;
     try {
@@ -288,7 +329,7 @@ export function createPoliticalIdRasterRuntimeOwner({
             throw new Error("Political ID asset does not match its requested region.");
           }
           clearAssetFailure();
-          consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0;
+          consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0; cancelAssetRecovery();
           if (probe) stats.assetRecoveries++;
           return { tile, built: false, identity };
         }
@@ -296,20 +337,27 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (assets.failures > failuresBefore) throw new Error(assets.lastError?.message || "Asset lookup failed.");
         // A genuine coverage miss completed normally; it is not a timeout.
         // Keep a real earlier error visible until a validated asset is admitted.
-        consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0;
+        consecutiveAssetTimeouts = 0; nextAssetProbeAt = 0; cancelAssetRecovery();
       } finally { stats.assetLookupMs += performance.now() - lookupStarted; }
     } catch (error) { if (!task.controller.signal.aborted) recordAssetFailure(error, "load", probe); }
     if (task.controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
+    if (task.existingTile) return { tile: task.existingTile, reused: true };
     return { tile: await worker.request(packet, { signal: task.controller.signal }), built: true, identity };
   }
 
-  function pump() {
+  function pump(probeCovered = false) {
     if (!usable() || active || !plan || !snapshot) return;
-    const descriptor = plan.tiles.find(tile => !cache.peek(tile.key) && !attempted.has(tile.key));
-    if (!descriptor) return;
+    let descriptor = plan.tiles.find(tile => !cache.peek(tile.key) && !attempted.has(tile.key));
+    let existingTile = null;
+    if (!descriptor && probeCovered && consecutiveAssetTimeouts >= 3 && coveredAssetProbes < 2
+      && performance.now() >= nextAssetProbeAt) {
+      descriptor = plan.tiles.find(tile => cache.peek(tile.key));
+      if (descriptor) { existingTile = cache.peek(descriptor.key); coveredAssetProbes++; }
+    }
+    if (!descriptor) { scheduleCoveredAssetRecovery(); return; }
     attempted.add(descriptor.key);
     const controller = new AbortController();
-    const task = { controller, epoch, descriptor };
+    const task = { controller, epoch, descriptor, existingTile };
     const entries = snapshot.entries.filter(entry => intersectsTile(entry.bounds, descriptor, 4 + state.dpr))
       .map(entry => ({ ...entry, strokeCode: h.hasStroke?.(entry.feature) === false ? 0 : entry.code }));
     // Bound D3's resampling error in physical raster pixels at every LOD.
@@ -321,8 +369,8 @@ export function createPoliticalIdRasterRuntimeOwner({
     const maps = { codeToId, idToCode };
     active = task;
     account();
-    task.promise = resolveTile(packet, task, maps).then(async ({ tile, built, identity }) => {
-      if (disposed || controller.signal.aborted) return;
+    task.promise = resolveTile(packet, task, maps).then(async ({ tile, built, identity, reused }) => {
+      if (disposed || controller.signal.aborted || reused) return;
       // Re-read live geometry identity before accepting asynchronous data. Color
       // edits need not cancel a geometry build: the latest palette is used at draw.
       syncSource();
@@ -386,6 +434,10 @@ export function createPoliticalIdRasterRuntimeOwner({
       syncSource();
       if (!updatePlan()) { stats.fallbacks++; displayState = "fallback"; reason = "view-budget"; return null; }
       updateViewIdentity();
+      if (forceNativeRefinement) {
+        forceNativeRefinement = false; refinedViewKey = viewKey; nativeRefinements++;
+      }
+      scheduleCoveredAssetRecovery();
       if (refinedViewKey === viewKey) { displayState = "precise"; reason = "idle-refinement"; return null; }
       // Probe availability before spending CPU time building unavailable output.
       if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return null; }
@@ -462,7 +514,8 @@ export function createPoliticalIdRasterRuntimeOwner({
     return query;
   }
 
-  return Object.freeze({ draw, queryPoint,
+  return Object.freeze({ draw, queryPoint, noteNativePartialRepaint,
+    hasNativeFrame: () => !disposed && (displayState === "precise" || nativePartialPending),
     async exportAssets() {
       if (disposed || !snapshot) return [];
       return cache.entries().flatMap(([, tile]) => {
@@ -481,6 +534,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       assetFailureKind, assetFailureOperation,
       assetRecovery: { consecutiveTimeouts: consecutiveAssetTimeouts,
         state: consecutiveAssetTimeouts < 3 ? "ready" : active?.assetProbe ? "probing" : "cooldown",
+        scheduled: assetRecoveryTimer !== null, coveredProbes: coveredAssetProbes,
         retryInMs: Math.max(0, nextAssetProbeAt - performance.now()) },
       pathCacheEstimatedBytes, canonicalCoordinates: !!coordinates, gutter,
       accounting: "typed-array-texture-and-surface-estimates-excludes-JS-and-driver" }),
@@ -489,6 +543,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       if (disposed) return;
       disposed = true;
       cancelRefinement();
+      cancelAssetRecovery();
       cancel();
       worker.dispose();
       releaseGpu();

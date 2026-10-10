@@ -180,6 +180,7 @@ function createRendererHitHarness({ cacheEnabled, candidatesByKey }) {
   const scope = vm.createContext({
     getRiverPaintRuntime,
     hasVisibleRiverPartitions: () => false,
+    isPoliticalIdRasterSelected: () => false,
     runtimeState: {
       landData: { features: [] }, spatialItems: [{}], waterSpatialItems: [{}], specialSpatialItems: [{}],
       showWaterRegions: true, showScenarioSpecialRegions: true,
@@ -251,3 +252,29 @@ test("hover avoids event candidate caching and keeps its existing lightweight me
   assert.deepEqual(h.gridCalls, ["special:0", "land:0", "water:0"]);
   assert.equal(h.metrics.filter((entry) => entry[0] === "interactionHitCandidateCount").length, 0);
 });
+
+for (const eventType of ['click', 'brush']) {
+  test(`${eventType} first containment preserves overlap, hole and malformed-geometry priority`, () => {
+    const candidates = [
+      makeCandidate('primary', { bboxArea: 1 }),
+      makeCandidate('detail-z', { source: 'detail', bboxArea: 30 }),
+      makeCandidate('detail-a', { source: 'detail', bboxArea: 30 }),
+      makeCandidate('hole', { source: 'detail', bboxArea: 2, contains: false }),
+      makeCandidate('broken', { source: 'detail', bboxArea: 1 }),
+    ];
+    candidates[4].item.feature.properties.broken = true;
+    const geoContains = feature => {
+      if (feature.properties.broken) throw Error('malformed');
+      return feature.properties.contains;
+    };
+    const oracle = rankCandidates(candidates, [0, 0], { geoContains }).find(c => c.containsGeo);
+    let checks = 0;
+    const winner = findFirstContainingCandidate(candidates, [0, 0], { eventType,
+      geoContains: feature => { checks++; return geoContains(feature); } });
+    assert.equal(winner.item.id, 'detail-a');
+    assert.deepEqual(winner, oracle);
+    assert.equal(checks, 3, 'lower-priority containing geometries are never evaluated');
+    candidates.forEach(c => { c.item.feature.properties.contains = false; });
+    assert.equal(findFirstContainingCandidate(candidates, [0, 0], { geoContains }), null);
+  });
+}

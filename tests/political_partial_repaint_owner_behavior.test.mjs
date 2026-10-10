@@ -601,6 +601,20 @@ test('selected ID raster leaves partial paint completion to the full political p
   assert.deepEqual(h.events, []);
 });
 
+test('refined ID raster reuses native partial repaint with all baseline guards', () => {
+  const getters = { isPoliticalIdRasterSelected: () => true, hasNativePoliticalIdRasterFrame: () => true };
+  let refinements = 0;
+  const h = createHarness({ getters, effects: { onPartialRepaint: () => refinements++ } });
+  assert.equal(h.owner.tryPartialPoliticalPassRepaint(h.transform, 'next', {}), true);
+  assert.equal(h.cache.reasons.political, 'partial-repaint');
+  assert.equal(h.cache.dirty.political, false);
+  assert.equal(refinements, 1);
+  const stale = createHarness({ getters, helpers: { getPoliticalPassFineBaselineMismatch: () => 'scene-mismatch' } });
+  assert.equal(stale.owner.tryPartialPoliticalPassRepaint(stale.transform, 'next', {}), false);
+  assert.equal(stale.cache.dirty.political, true);
+  assert.equal(stale.events.some(event => Array.isArray(event) && event[0] === 'clearRect'), false);
+});
+
 test('partial repaint draws bank surfaces inside the existing dirty rectangle after the parent', () => {
   let h;
   h = createHarness({ effects: { drawPartitionForParent: (feature, k) => h.events.push(['river-cells', feature.id, k]) } });
