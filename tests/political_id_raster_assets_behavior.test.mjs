@@ -170,6 +170,8 @@ test('no manifest performs no fetch; registered assets fetch once then use persi
   assert.equal(store.registerManifest({ schemaVersion: POLITICAL_ID_RASTER_ASSET_SCHEMA_VERSION,
     tiles: [{ identity: 'manifest', url: 'tile.bin', byteLength: buffer.byteLength }] }), 1);
   assert.equal((await store.load('manifest', { idToCode })).codes[0], 10);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(store.stats().pendingWrites, 0);
   assert.equal((await store.load('manifest', { idToCode })).codes[0], 10);
   assert.equal(requests, 1); assert.equal(store.stats().manifestHits, 1); assert.equal(store.stats().indexedDBHits, 1);
 });
@@ -248,4 +250,63 @@ test('abort propagates for fetch and queued backend work, exposes pending counts
   assert.equal(writes, 1); assert.equal(backendStore.stats().pendingWrites, 0);
   assert.equal(backendStore.stats().pendingBytes, 0);
   assert.equal(backendStore.stats().memoryEntries, 1);
+});
+
+
+test('compressed publication validates bytes and supports both static gzip and HTTP decoding', async () => {
+  const { gzipSync } = await import('node:zlib');
+  const { createHash } = await import('node:crypto');
+  const payload = encode(), compressed = gzipSync(new Uint8Array(payload));
+  const entry = { identity: 'geometry:v1:tile:0', url: './one.pidr.gz', byteLength: payload.byteLength,
+    compression: 'gzip', compressedByteLength: compressed.length, sha256: createHash('sha256').update(new Uint8Array(payload)).digest('hex') };
+  for (const httpDecoded of [false, true]) {
+    const store = createStore({ fetchImpl: async () => new Response(httpDecoded ? payload : compressed,
+      { headers: { 'content-length': String(compressed.length), ...(httpDecoded ? { 'content-encoding': 'gzip' } : {}) } }) });
+    store.registerManifest({ schemaVersion: 1, tiles: [entry] });
+    assert.deepEqual((await store.load(entry.identity, { idToCode })).codes, decode(payload).codes);
+    assert.equal(store.stats().manifestHits, 1); store.dispose();
+  }
+  for (const wrong of [{ sha256: '0'.repeat(64) }, { byteLength: payload.byteLength - 1 }, { compressedByteLength: compressed.length + 1 }]) {
+    const store = createStore({ fetchImpl: async () => new Response(compressed) });
+    store.registerManifest({ schemaVersion: 1, tiles: [{ ...entry, ...wrong }] });
+    assert.equal(await store.load(entry.identity, { idToCode }), null);
+    assert.equal(store.stats().manifestHits, 0); store.dispose();
+  }
+});
+
+
+test('manifest pixels do not await disk writes and pending persistence is bounded and cancellable', async () => {
+  let writes = 0, reads = 0, writeSignal;
+  const payloads = new Map([['a', encode('a')], ['b', encode('b')]]);
+  const backend = { read: async () => { reads++; return null; }, writeBounded: (_entry, _limit, signal) => {
+    writes++; writeSignal = signal;
+    return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(Object.assign(new Error('cancelled'), { name: 'AbortError' })), { once: true }));
+  } };
+  const store = createStore({ backend, fetchImpl: async url => response(payloads.get(new URL(url, "http://localhost/").pathname.slice(1))) });
+  store.registerManifest({ schemaVersion: 1, tiles: [...payloads].map(([identity, bytes]) => ({ identity, url: `/${identity}`, byteLength: bytes.byteLength })) });
+  assert.ok(await store.load('a', { idToCode }));
+  assert.equal(writes, 1); assert.equal(store.stats().pendingWrites, 1);
+  assert.ok(await store.load('b', { idToCode }));
+  assert.equal(reads, 1, 'a queued disk write must not block the next published tile');
+  assert.equal(writes, 1, 'do not accumulate background write buffers');
+  assert.equal(store.stats().pendingBytes, payloads.get('a').byteLength);
+  store.dispose();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(writeSignal.aborted, true); assert.equal(store.stats().pendingWrites, 0);
+  assert.equal(store.stats().pendingBytes, 0); assert.equal(store.stats().failures, 0);
+});
+
+
+test('slow optional disk lookup yields to a published tile without a producer failure', async () => {
+  let readSignal;
+  const payload = encode('published');
+  const store = createStore({ backend: { read: (_id, _limit, signal) => {
+    readSignal = signal;
+    return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(Object.assign(new Error('cancelled'), { name: 'AbortError' })), { once: true }));
+  }, writeBounded: async () => true }, fetchImpl: async () => response(payload) });
+  store.registerManifest({ schemaVersion: 1, tiles: [{ identity: 'published', url: '/published', byteLength: payload.byteLength }] });
+  assert.ok(await store.load('published', { idToCode }));
+  assert.equal(readSignal.aborted, true);
+  assert.equal(store.stats().cacheReadTimeouts, 1); assert.equal(store.stats().manifestHits, 1);
+  assert.equal(store.stats().failures, 0); store.dispose();
 });

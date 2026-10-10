@@ -86,6 +86,7 @@ function fixture({
   createGpu = null,
   resourceBudget = null,
   resolveColor = item => item.color,
+  refineAfterMs = null,
 } = {}) {
   const state = { zoomTransform: { ...transform }, dpr: 1 };
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
@@ -118,7 +119,7 @@ function fixture({
     client,
     cache,
     createGpu: createGpu || gpuHarness.createGpu,
-    resourceBudget,
+    resourceBudget, refineAfterMs,
   });
   return {
     owner, state, identity, features, setFeatures(next) { features = next; }, h, layout,
@@ -451,4 +452,47 @@ test("local geometry invalidation retains unaffected GPU tile objects during reb
   assert.ok(committedSet.includes(rebuiltOld));
   assert.ok(committedSet.includes(rebuiltNew));
   assert.ok(!committedSet.includes(oldTile), "the invalidated old GPU tile is replaced");
+});
+
+
+test("fractional display refines only its current view and preserves cached geometry", async t => {
+  const f = fixture({ transform: { x: 200.25, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const builds = f.requests.length;
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.ok(f.renders.includes("political-id-raster-refine"));
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().displayState, "precise");
+  assert.equal(f.requests.length, builds);
+  f.identity.colorVersion++;
+  assert.ok(f.owner.draw(), "new palette gets immediate raster feedback before refinement");
+  assert.equal(f.owner.getDiagnostics().displayState, "accelerated");
+});
+
+test("obsolete view and disposed owners cannot schedule exact refinement", async t => {
+  const f = fixture({ transform: { x: 200, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  f.state.zoomTransform.x++;
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.renders.filter(reason => reason === "political-id-raster-refine").length, 0);
+  f.owner.draw(); f.owner.dispose();
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.renders.filter(reason => reason === "political-id-raster-refine").length, 0);
+});
+
+
+test("post-frame history identity changes refresh before refining the latest source", async t => {
+  const f = fixture({ transform: { x: 200, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  f.identity.version++;
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.ok(f.renders.includes("political-id-raster-refinement-refresh"));
+  assert.equal(f.owner.getDiagnostics().nativeRefinements, 0);
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().displayState, "precise");
 });

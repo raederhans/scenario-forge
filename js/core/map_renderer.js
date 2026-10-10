@@ -45,6 +45,7 @@ import { createPoliticalDerivedStateCache } from "./renderer/political_derived_s
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
+import { readPoliticalIdRasterPreference, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
 import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
@@ -723,7 +724,7 @@ let borderMeshWorkerRuntime = null;
 const geometryWorkerEnabled = new URLSearchParams(globalThis.location?.search || "").get("geometry_worker") !== "0";
 // Explicit opt-in until whole-application cold/warm and visual gates support a
 // default change. Scenario loading, editing and export have no separate format.
-const politicalIdRasterEnabled = new URLSearchParams(globalThis.location?.search || "").get("political_id_raster") === "1";
+let politicalIdRasterActivationKey = "";
 let contourHostFillColorCache = new WeakMap();
 let staticMeshSourceCountries = {
   primary: new Set(),
@@ -3442,12 +3443,23 @@ function getContextPassOrchestratorOwner() {
   return contextPassOrchestratorOwner;
 }
 
-function isPoliticalIdRasterSelected() {
-  return politicalIdRasterEnabled && !exportRenderInProgress && debugMode === "PROD"
-    && isBootInteractionReady() && runtimeState.firstVisibleFramePainted
-    && !runtimeState.startupReadonly && !runtimeState.startupReadonlyUnlockInFlight
-    && !hasVisibleRiverPartitions()
-    && ["hoi4_1936", "hoi4_1939", "tno_1962"].includes(runtimeState.activeScenarioId);
+function getPoliticalIdRasterEligibilityReason() {
+  return getPoliticalIdRasterEligibility({ requested: readPoliticalIdRasterPreference(), exporting: exportRenderInProgress,
+    debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
+    readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
+    riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
+}
+
+function isPoliticalIdRasterSelected() { return getPoliticalIdRasterEligibilityReason() === "eligible"; }
+
+export function setPoliticalIdRasterTrialEnabled(enabled) {
+  writePoliticalIdRasterPreference(!!enabled);
+  politicalIdRasterRuntimeOwner?.dispose();
+  politicalIdRasterRuntimeOwner = null;
+  politicalIdRasterActivationKey = "";
+  invalidateRenderPasses(["political"], "political-id-raster-preference");
+  requestRendererRender("political-id-raster-preference", { visual: true });
+  publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
 }
 
 function getPoliticalIdRasterRuntimeOwner() {
@@ -3455,6 +3467,7 @@ function getPoliticalIdRasterRuntimeOwner() {
     state: runtimeState,
     surface: rendererSurfaceHost,
     resourceBudget: pageResourceBudget,
+    refineAfterMs: 180,
     helpers: {
       isEnabled: isPoliticalIdRasterSelected,
       getFeatureId,
@@ -3462,8 +3475,10 @@ function getPoliticalIdRasterRuntimeOwner() {
       getLayout: () => getRenderPassLayout("political"),
       hasStroke: feature => !isAtlantropaSeaFeature(feature),
       getAssetSceneKey: () => runtimeState.activeScenarioId,
-      getAssetManifestUrl: () => new URLSearchParams(globalThis.location?.search || "").get("political_id_assets")
-        || runtimeState.activeScenarioManifest?.political_id_raster_manifest_url || "",
+      getAssetManifestUrl: () => {
+        const override = new URLSearchParams(globalThis.location?.search || "").get("political_id_assets");
+        return override === "0" ? "" : override || runtimeState.activeScenarioManifest?.political_id_raster_manifest_url || "";
+      },
       getChangedColorIds: () => {
         const cache = getRenderPassCacheState();
         return cache.reasons?.political === "refresh-colors" && cache.partialPoliticalDirtyIds?.size
@@ -14193,7 +14208,13 @@ function render() {
     if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
+  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}` : "";
+  if (rasterActivation !== politicalIdRasterActivationKey) {
+    politicalIdRasterActivationKey = rasterActivation;
+    invalidateRenderPasses(["political"], "political-id-raster-activation");
+  }
   drawCanvas();
+  publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
   if (runtimeState.renderPhase === RENDER_PHASE_IDLE) {
     scheduleHitCanvasBuildIfNeeded();
   }
@@ -15854,7 +15875,12 @@ export function getRendererAsyncWorkStatus() {
 }
 
 export function getPoliticalIdRasterDiagnostics() {
-  return politicalIdRasterRuntimeOwner?.getDiagnostics() || { selected: isPoliticalIdRasterSelected(), pending: 0 };
+  const reason = getPoliticalIdRasterEligibilityReason();
+  const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
+  return { ...current, requested: readPoliticalIdRasterPreference(), selected: reason === "eligible",
+    pending: current?.pending || 0,
+    displayState: reason === "off" ? "off" : reason !== "eligible" ? "fallback" : current?.displayState || "preparing",
+    reason: reason === "eligible" ? current?.reason || "awaiting-render" : reason };
 }
 
 export async function capturePoliticalIdRasterAssets() {

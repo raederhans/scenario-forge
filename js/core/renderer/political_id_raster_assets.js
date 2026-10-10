@@ -5,6 +5,7 @@ const HEADER_BYTES = 48;
 const EDGE_FLAG = 0x80000000;
 const MAX_CODE = EDGE_FLAG - 1;
 const DEFAULT_MAX_BYTES = 64 * 1024 * 1024;
+const PERSISTENT_READ_BUDGET_MS = 100;
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf-8', { fatal: true });
 
@@ -306,6 +307,28 @@ async function responseBuffer(response, byteLength, signal) {
   finally { reader.releaseLock(); }
 }
 
+async function readManifestPayload(response, entry, signal) {
+  if (entry.compression !== "gzip") return responseBuffer(response, entry.byteLength, signal);
+  if (!response?.ok) throw new Error("Asset fetch failed.");
+  const httpDecoded = /gzip/i.test(response.headers?.get?.("content-encoding") || "");
+  const announced = response.headers?.get?.("content-length");
+  if (announced != null && Number(announced) !== entry.compressedByteLength) invalid("Compressed asset Content-Length mismatch.");
+  // Browsers transparently decode HTTP Content-Encoding. Explicit .gz static
+  // files without that header are decoded here; never decompress twice.
+  const bytes = await responseBuffer(new Response(response.body), httpDecoded ? entry.byteLength : entry.compressedByteLength, signal);
+  let payload = bytes;
+  if (!httpDecoded) {
+    if (typeof DecompressionStream !== "function") throw new Error("Gzip assets require DecompressionStream.");
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+    payload = await responseBuffer(new Response(stream), entry.byteLength, signal);
+  }
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", payload);
+  const hash = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, "0")).join("");
+  if (hash !== entry.sha256) invalid("Asset payload digest mismatch.");
+  checkAbort(signal);
+  return payload;
+}
+
 /** Optional persistent coverage cache. No registered manifest means no network. */
 export function createPoliticalIdRasterAssetStore({
   indexedDB = globalThis.indexedDB, fetchImpl = globalThis.fetch,
@@ -318,7 +341,7 @@ export function createPoliticalIdRasterAssetStore({
   let manifest = new Map(), disposed = false, memoryBytes = 0, serial = Promise.resolve(), sequence = 0;
   const controllers = new Set();
   const counts = { memoryHits: 0, indexedDBHits: 0, manifestHits: 0, misses: 0, saves: 0,
-    failures: 0, evictions: 0, pendingReads: 0, pendingWrites: 0, pendingBytes: 0, lastError: null };
+    failures: 0, evictions: 0, cacheReadTimeouts: 0, pendingReads: 0, pendingWrites: 0, pendingBytes: 0, lastError: null };
   function recordError(error) { counts.failures += 1; counts.lastError = { name: error.name, message: String(error.message) }; }
   function remember(identity, payload) {
     const previous = memory.get(identity);
@@ -360,6 +383,21 @@ export function createPoliticalIdRasterAssetStore({
       recordError(error); return false;
     }
   }
+  function persistManifestInBackground(identity, payload) {
+    // Display validated coverage immediately. Retain at most one optional write
+    // buffer; a slow disk must not stall tile admission or queue more buffers.
+    if (!persistent || counts.pendingWrites || payload.byteLength > maxBytes) return;
+    const operation = operationSignal();
+    counts.pendingWrites += 1;
+    counts.pendingBytes += payload.byteLength;
+    void persist(identity, payload, operation.signal).catch(error => {
+      if (error.name !== 'AbortError') recordError(error);
+    }).finally(() => {
+      counts.pendingWrites -= 1;
+      counts.pendingBytes -= payload.byteLength;
+      operation.release();
+    });
+  }
   return {
     registerManifest(value) {
       if (disposed) throw abortError();
@@ -372,7 +410,12 @@ export function createPoliticalIdRasterAssetStore({
         const url = manifestUrl(entry.url, baseUrl);
         bytes += textEncoder.encode(entry.identity + url).length + 16;
         if (bytes > maxBytes) invalid('Manifest exceeds byte budget.');
-        next.set(entry.identity, { url, byteLength: entry.byteLength });
+        if (entry.compression != null && entry.compression !== "gzip") invalid("Unsupported asset compression.");
+        if (entry.compression === "gzip" && (!Number.isSafeInteger(entry.compressedByteLength)
+          || entry.compressedByteLength <= 0 || entry.compressedByteLength > maxBytes
+          || !/^[a-f0-9]{64}$/.test(entry.sha256 || ""))) invalid("Invalid compressed asset metadata.");
+        next.set(entry.identity, { url, byteLength: entry.byteLength,
+          compression: entry.compression, compressedByteLength: entry.compressedByteLength, sha256: entry.sha256 });
       }
       manifest = next;
       return manifest.size;
@@ -391,34 +434,38 @@ export function createPoliticalIdRasterAssetStore({
           } catch (error) { recordError(error); }
           memory.delete(identity); memoryBytes -= cached.byteLength;
         }
-        if (persistent) {
+        const entry = manifest.get(identity);
+        if (persistent && !(counts.pendingWrites && entry)) {
+          const cacheController = new AbortController();
+          const cacheSignal = AbortSignal.any([operation.signal, cacheController.signal]);
+          // A published tile has a network source. Do not make a slow optional
+          // disk lookup consume the producer's entire display deadline.
+          const timer = entry ? setTimeout(() => cacheController.abort(), PERSISTENT_READ_BUDGET_MS) : null;
           try {
-            const payload = await abortable(queue(() => { checkAbort(operation.signal); return persistent.read(identity, maxBytes, operation.signal); }), operation.signal);
+            const payload = await abortable(queue(() => { checkAbort(cacheSignal); return persistent.read(identity, maxBytes, cacheSignal); }), cacheSignal);
             checkAbort(operation.signal);
             if (payload) {
               const tile = decode(payload);
               if (tile) { remember(identity, payload); counts.indexedDBHits += 1; return tile; }
             }
           } catch (error) {
-            if (error.name === 'AbortError') throw error;
-            recordError(error);
-          }
+            if (error.name === 'AbortError') {
+              if (operation.signal.aborted || !cacheController.signal.aborted) throw error;
+              counts.cacheReadTimeouts += 1;
+            } else recordError(error);
+          } finally { if (timer !== null) clearTimeout(timer); }
         }
-        const entry = manifest.get(identity);
         if (entry && fetchImpl) {
           try {
             const response = await abortable(Promise.resolve(fetchImpl(entry.url, { signal: operation.signal, credentials: 'same-origin', mode: 'same-origin' })), operation.signal);
             // Redirects must retain the same origin as the registered asset URL.
             if (response.url) manifestUrl(response.url, baseUrl ?? 'http://localhost/');
-            const payload = await responseBuffer(response, entry.byteLength, operation.signal);
+            const payload = await readManifestPayload(response, entry, operation.signal);
             checkAbort(operation.signal);
             const tile = decode(payload);
             if (tile) {
               remember(identity, payload);
-              counts.pendingWrites += 1;
-              counts.pendingBytes += payload.byteLength;
-              try { await persist(identity, payload, operation.signal); }
-              finally { counts.pendingWrites -= 1; counts.pendingBytes -= payload.byteLength; }
+              persistManifestInBackground(identity, payload);
               counts.manifestHits += 1;
               return tile;
             }

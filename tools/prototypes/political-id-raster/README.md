@@ -78,7 +78,7 @@ CLI 验证 offset、总长度及每个资产 payload，用 identity SHA-256 生�
 
 纯 query 模块的 `density` 表示坐标密度；owner 使用 `samplesPerPixel=1/plan.scale` 判断实际采样质量，避免把固定世界坐标中的低密度误判为屏幕上的低分辨率。实测已有 26 次 raster interior query 通过；真实应用点击 `KAZ-3206`、改色、撤销和重做保持正确，孔洞等边界由 Node 行为测试覆盖。
 
-## 当前证据与限制
+## 原型阶段证据与限制（2026-10-09）
 
 gutter 2 / 4 与 Canvas 高平滑没有有效改善边缘质量，默认仍为 gutter 0、显式低平滑。主要损失来自最终 RGBA 重采样；固定坐标映射使 100% 视图也可能处于 fractional scale。当前 DPR 1 尚未通过平均最大通道误差 ≤0.75/255、大误差像素比例 ≤0.2% 的 gate，因此默认关闭不变。固定视图近似通过不能代替多级运行时画质证据。
 
@@ -93,3 +93,32 @@ node --test tests/political_id_raster_coordinates_behavior.test.mjs tests/politi
 ```
 
 固定视图、阶段运行时及整合证据见 [阶段结果](../../../docs/active/political-id-raster-prototype/results.md)。所有一次性输出放在 `.runtime/`。本地检查与报告不代表 CI 或部署已通过，数据库及浏览器页面的清理以各次报告为准。
+
+
+## 正式应用试用整合（2026-10-10）
+
+当前试用入口位于 **图层 → 边界 → 渲染试验 → 栅格加速（试用）**。默认关闭，浏览器记住选择；URL `political_id_raster=1/0` 优先于已保存偏好。状态显示准备、栅格显示、精确显示或兼容回退。导航停止后，分数缩放视口通过既有原生政治绘制路径恢复精确画质；新视口、颜色、历史操作与场景变更都会使旧细化计划失效。
+
+三个正式剧本的 `political_id_raster/manifest.json` 及 `.pidr.gz` 已登记在场景和启动包、runtime registry 中。资产包含稳定 ID 与覆盖度，不保存颜色；gzip 大小、解压大小、SHA-256、场景、投影和几何 identity 均校验。只有选择试用才读取。磁盘缓存是可选加速，发布瓦片不会等待后台写盘；最多一个待写缓冲，慢磁盘读取让出给发布资源。缺失视口或资产错误仍回退已有 Worker/原生路径。
+
+从实际应用生产者再生成资产（先按项目方式启动 localhost server，单一 owner 串行运行）：
+
+```powershell
+node tools/build_political_id_raster_assets.mjs --base-url http://127.0.0.1:8008/app/
+```
+
+固定配方为 1280×900、DPR 1/2、100%/130%，使用减少动画设置且等待目标缩放及完整覆盖。生成文件只写三个场景的 `political_id_raster/` 和启动配置；会清理该生成目录中不再引用的哈希瓦片。它是有限世界视图/LOD 覆盖，不是任意屏幕与缩放的全覆盖。更新后按 `data/AGENTS.md` 生成 catalog 并构建 Pages。
+
+生成器最后通过 `refresh_political_id_raster_snapshot.py` 刷新对应 build snapshot 与 manifest/audit 的完整性指针，保留原有语义审计结果。修改启动语言包后也必须同步这组指针，并运行该场景的 `check_scenario_contracts.py --strict`，不能仅靠 Pages 文件存在性检查。
+
+在最终 Pages 产物上验收（预先运行该产物的 localhost 静态服务器）：
+
+```powershell
+node tools/verify_political_id_raster_integration.mjs --base-url http://127.0.0.1:8009/app/ --output .runtime/browser/raster-integration/pages
+```
+
+检查真实控件、空缓存资产命中、精确静止像素、实际填色和历史操作。OFF 参考禁用其他几何 bitmap 生产者，确保比较对象是原生 Canvas；ON 生产者本身已排除它们。像素观测耗时不等于显示器呈现延迟，不用于声称整体加速。首屏矢量加载、导出与 canonical 数据格式保持既有路径。
+
+本轮结果见 [整合验收](../../../docs/active/political-id-raster-prototype/integration-results.zh-CN.md)。是否发布以独立 GitHub 回执为准。
+
+用户授权线上验收后，可用同一验证器传入 `--base-url https://raederhans.github.io/scenario-forge/app/ --published true`。该开关只允许此正式应用入口；资产生成仍只允许 localhost。浏览器使用临时独立存储，试用及填色不会修改其他用户的数据。

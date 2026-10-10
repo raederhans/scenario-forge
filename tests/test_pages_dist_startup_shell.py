@@ -3531,6 +3531,45 @@ class PagesDistStartupShellTest(unittest.TestCase):
             finally:
                 build_pages_dist.DIST_ROOT = previous_dist_root
 
+    def test_political_raster_dist_checks_payloads_and_rejects_corruption(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            previous = build_pages_dist.APP_DIST_ROOT
+            build_pages_dist.APP_DIST_ROOT = Path(directory)
+            try:
+                payload = b"political raster fixture"
+                digest = hashlib.sha256(payload).hexdigest()
+                tile_path = Path(directory) / f"{digest}.pidr.gz"
+                compressed = gzip.compress(payload, mtime=0)
+                tile_path.write_bytes(compressed)
+                tile = {"identity": "political-id-raster:v1:" + "0" * 64,
+                        "url": f"./{digest}.pidr.gz", "compression": "gzip", "sha256": digest,
+                        "byteLength": len(payload), "compressedByteLength": len(compressed)}
+                manifest_path = Path(directory) / "manifest.json"
+                manifest = {"schemaVersion": 1, "scenarioId": "sample", "tiles": [tile]}
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "sample")
+                with self.assertRaises(ValueError):
+                    build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "other")
+                tile["byteLength"] -= 1
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "sample")
+                tile["byteLength"] += 1
+                tile["url"] = "../outside.pidr.gz"
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "sample")
+                tile["url"] = f"./{digest}.pidr.gz"
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+                tile_path.write_bytes(compressed[:-1])
+                with self.assertRaises(ValueError):
+                    build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "sample")
+                tile_path.unlink()
+                with self.assertRaises(FileNotFoundError):
+                    build_pages_dist.validate_dist_political_id_raster_manifest("manifest.json", "sample")
+            finally:
+                build_pages_dist.APP_DIST_ROOT = previous
+
     def test_pages_scenario_url_probe_rejects_empty_manifest_url(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             previous_app_dist_root = build_pages_dist.APP_DIST_ROOT

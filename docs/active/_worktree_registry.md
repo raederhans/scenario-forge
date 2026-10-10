@@ -1,5 +1,9 @@
 # Worktree Registry
 
+## 2026-10-10 栅格试用正式整合
+
+`C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`、`codex/political-raster-integration` 基于已发布 `abf6a1a6` 交付试用入口、三个正式剧本共 282 个压缩资产及缩放后的精确细化。root 独占提交、PR、合并、部署跟踪和线上验收；用户已明确授权这条交付链。主目录 `codex/architecture-simplification-20261010` 的未提交改动和 prototype 工作树均保留，不从中抽取文件。保留本工作树的 ignored 构建、浏览器和测量证据；当前检查、PR 与部署回执见 [任务记录](political-id-raster-prototype/task.md)，本条登记不替代远端成功回执。
+
 ## 2026-10-09 共享政治层 ID 栅格
 
 `C:/Users/raede/.codex/worktrees/political-id-raster-prototype/mapcreator`、`codex/political-id-raster-prototype` 基于 `98425dcc` 完成 1936／1939／TNO 共用的可选 ID 栅格显示、缓存、预生成资产与保守拾取。用户已授权审核、优化、合并和推送；root 独占 Git 与现场验证，主目录未归属改动不纳入交付。两个审核发现已修复并复核，默认仍需 `political_id_raster=1`，未宣称整体性能或画质门槛通过。代码和验证范围见 [栅格记录](political-id-raster-prototype/task.md)。最终提交、required checks 与合并以该分支 GitHub PR 回执为准；工作树保留 `.runtime` 中未发布的试验瓦片、项目文件和浏览器测量证据，便于继续研究重采样画质。

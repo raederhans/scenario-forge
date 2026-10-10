@@ -1,3 +1,4 @@
+import { bindPoliticalRasterTrialControl } from "./toolbar/political_raster_trial_control.js";
 import { drawThematicWgiExportLegend } from "../core/renderer/thematic_wgi_export_legend.js";
 import { drawPopulationExportLegend } from "../core/renderer/population_export_legend.js";
 import { ensurePopulationData } from "../core/population_spatial_runtime.js";
@@ -18,6 +19,8 @@ import {
   normalizeLakeStyleConfig,
 } from "../core/state.js";
 import {
+  getPoliticalIdRasterDiagnostics,
+  setPoliticalIdRasterTrialEnabled,
   autoFillMap,
   getZoomPercent,
   focusRiverPaintParentById,
@@ -207,6 +210,7 @@ const EXPORT_MAX_CONCURRENT_JOBS = 1;
 
 
 function initToolbar({ render } = {}) {
+  bindPoliticalRasterTrialControl({ getDiagnostics: getPoliticalIdRasterDiagnostics, setEnabled: setPoliticalIdRasterTrialEnabled, t });
   // toolbar.js 保留的是壳层接线职责：集中拿 DOM、拼 controller、注册 runtime hooks。
   // 各个面板自身的业务逻辑应继续留在子 controller，避免再把 owner 逻辑回流到这个大文件。
   const OCEAN_ADVANCED_PRESETS = new Set([

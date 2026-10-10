@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import hashlib
+import re
 import json
 import os
 import posixpath
@@ -1113,6 +1114,39 @@ def _require_dist_url(url: str, *, source: str, missing: list[str], required: bo
         missing.append(f"{source}: {url}")
 
 
+def validate_dist_political_id_raster_manifest(url: str, scenario_id: str) -> None:
+    """Validate the compressed payloads admitted to Pages, not just URLs."""
+    manifest_path = _dist_path_for_app_url(url)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("schemaVersion") != 1 or manifest.get("scenarioId") != scenario_id:
+        raise ValueError(f"Invalid political raster manifest: {url}")
+    tiles = manifest.get("tiles")
+    if not isinstance(tiles, list) or not tiles:
+        raise ValueError(f"Empty political raster manifest: {url}")
+    identities = set()
+    for tile in tiles:
+        identity = tile.get("identity", "")
+        digest = tile.get("sha256", "")
+        if (not re.fullmatch(r"political-id-raster:v1:[0-9a-f]{64}", identity)
+                or identity in identities or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                or tile.get("compression") != "gzip"
+                or tile.get("url") != f"./{digest}.pidr.gz"):
+            raise ValueError(f"Invalid political raster tile metadata: {url}")
+        identities.add(identity)
+        byte_length = tile.get("byteLength")
+        compressed_length = tile.get("compressedByteLength")
+        if (not isinstance(byte_length, int) or not 0 < byte_length <= 64 * 1024 * 1024
+                or not isinstance(compressed_length, int) or not 0 < compressed_length <= 64 * 1024 * 1024):
+            raise ValueError(f"Invalid political raster byte budget: {url}")
+        tile_path = manifest_path.parent / f"{digest}.pidr.gz"
+        if tile_path.stat().st_size != compressed_length:
+            raise ValueError(f"Political raster compressed size mismatch: {tile_path}")
+        with gzip.open(tile_path, "rb") as handle:
+            payload = handle.read(byte_length + 1)
+        if len(payload) != byte_length or hashlib.sha256(payload).hexdigest() != digest:
+            raise ValueError(f"Political raster payload integrity mismatch: {tile_path}")
+
+
 def validate_dist_scenario_startup_urls() -> None:
     """Fail Pages builds when published scenario metadata points at absent files."""
     scenarios_dir = APP_DIST_ROOT / "data" / "scenarios"
@@ -1149,6 +1183,9 @@ def validate_dist_scenario_startup_urls() -> None:
         for field_name, value in list(manifest.items()):
             if field_name.endswith("_url") and isinstance(value, str) and value.startswith("data/scenarios/"):
                 _require_dist_url(value, source=f"{scenario_id}.manifest.{field_name}", missing=missing)
+        raster_manifest_url = str(manifest.get("political_id_raster_manifest_url") or "").strip()
+        if raster_manifest_url and _dist_path_for_app_url(raster_manifest_url).is_file():
+            validate_dist_political_id_raster_manifest(raster_manifest_url, scenario_id)
         detail_manifest_url = str(manifest.get("detail_chunk_manifest_url") or "").strip()
         detail_manifest_path = _dist_path_for_app_url(detail_manifest_url)
         if detail_manifest_path.is_file():

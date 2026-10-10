@@ -295318,6 +295318,16 @@
     }
   },
   "ui": {
+    "Rendering experiment": {"en": "Rendering experiment", "zh": "渲染试验"},
+    "Raster acceleration (experimental)": {"en": "Raster acceleration (experimental)", "zh": "栅格加速（试用）"},
+    "For 1936, 1939 and TNO. Detail is restored after navigation.": {"en": "For 1936, 1939 and TNO. Detail is restored after navigation.", "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。"},
+    "Raster trial is off": {"en": "Raster trial is off", "zh": "栅格试用已关闭"},
+    "Preparing the map": {"en": "Preparing the map", "zh": "正在准备地图"},
+    "Available in 1936, 1939 and TNO": {"en": "Available in 1936, 1939 and TNO", "zh": "适用于 1936、1939 和 TNO"},
+    "Preparing accelerated display": {"en": "Preparing accelerated display", "zh": "正在准备加速显示"},
+    "Accelerated display": {"en": "Accelerated display", "zh": "正在使用栅格显示"},
+    "Precise display restored": {"en": "Precise display restored", "zh": "已恢复精确显示"},
+    "Using compatible display": {"en": "Using compatible display", "zh": "正在使用兼容显示"},
     "Population coverage": { "en": "Population coverage", "zh": "人口数据覆盖率" },
     "Population distribution": {
       "en": "Population distribution",

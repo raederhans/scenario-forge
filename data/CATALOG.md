@@ -2,7 +2,7 @@
 
 - generated_at: 2026-10-01T02:49:46.447775+00:00
 - version: 1
-- entries: 1367
+- entries: 1370
 
 ## Counts by role
 
@@ -39,6 +39,7 @@
 | physical_region_labels | 1 |
 | physical_semantics_detail | 1 |
 | physical_semantics_topology | 1 |
+| political_id_raster_manifest | 3 |
 | population_spatial_audit | 1 |
 | population_spatial_features | 4 |
 | population_spatial_manifest | 1 |
@@ -144,7 +145,10 @@
 | river_partitions:modern_world_wave7 | data/river_partitions/modern_world_wave7.transport.json | river_partitions | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.river_partitions:modern_world_wave7 |  |
 | ru_city_overrides | data/ru_city_overrides.geojson | city_overrides | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.ru_city_overrides |  |
 | manifest_output:runtime_asset_registry.json | data/runtime_asset_registry.json | runtime_asset_registry | json | json | schema://json/object/v1 | data/manifest.json::outputs::runtime_asset_registry.json::sha256 | default | data/runtime_asset_registry.json |  |
+| political_id_raster:hoi4_1936 | data/scenarios/hoi4_1936/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1936 |  |
+| political_id_raster:hoi4_1939 | data/scenarios/hoi4_1939/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:hoi4_1939 |  |
 | scenario_registry | data/scenarios/index.json | scenario_registry | json | json | schema://json/object/v1 |  | default | runtime_asset_registry.assets.scenario_registry |  |
+| political_id_raster:tno_1962 | data/scenarios/tno_1962/political_id_raster/manifest.json | political_id_raster_manifest | json | json | schema://political-id-raster/manifest/v1 |  | no-cache | runtime_asset_registry.assets.political_id_raster:tno_1962 |  |
 | special_zones | data/special_zones.geojson | special_zones | geojson | json | schema://geojson/feature_collection/v1 |  | default | runtime_asset_registry.assets.special_zones |  |
 | thematic_layer_catalog | data/thematic_layers/index.json | thematic_layer_catalog | json | json | schema://thematic/layer_index/v1 | data/manifest.json::outputs::thematic_layers/index.json::sha256 | default | tools.build_thematic_layers |  |
 | manifest_output:thematic_layers/political/state_capacity_demo/build_audit.json | data/thematic_layers/political/state_capacity_demo/build_audit.json | thematic_build_audit | json | json | schema://thematic/build_audit/v1 | data/manifest.json::outputs::thematic_layers/political/state_capacity_demo/build_audit.json::sha256 | no-cache | tools.build_thematic_layers |  |

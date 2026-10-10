@@ -21,18 +21,18 @@
     "context_lod.manifest.json": "2eafd5ec5dcb282453489bc269e73245a8d7ebf9d8753af23b1d8b35b63ab8b5",
     "detail_chunks.manifest.json": "e5e9940ef2f90f666e3c70b96fda1253091dc6d266197cf02fde75a0a15a14dc",
     "geo_aliases.startup.json": "5099db2bc732828485ac7ddc1e033b1b7bf97dddabee934f14d3f06216a8e57c",
-    "locales.startup.json": "1b4722d3c5d65bdce519cee24d373db7b332f5add9e18a094a994306efb6ccd9",
+    "locales.startup.json": "7229faf6fea6de55826cd714cc19eb47cf8146f95a6fa5a788b623eef6b47feb",
     "mesh_pack.json": "89a9727dd442e0a3fd66358e536af78f891c4a843d03033730050caa749f6e7f",
     "runtime_meta.json": "b85bca547d417ee93eeb400776bcbe90c05e8d1ca92966f8da4d970cb5f6c270",
     "runtime_topology.bootstrap.topo.json": "a44d353a482271c8cd0cabfcd2a49848634074b5305772158faeb9ab48190972",
-    "startup.bundle.en.json": "8f668c1cf6c9fc99820527477e113178b5e77e510041a4702fb8436d1c9d252c",
-    "startup.bundle.en.json.gz": "6fc061d9bc49192abca63d5ee5b1f1da07d75ced7b26e14d0b4ab3cee0c03db5",
-    "startup.bundle.zh.json": "5c9e34f6c5566071914ef0a95a21a747c1274c0aae328c66381a53d790791c59",
-    "startup.bundle.zh.json.gz": "e50b08572c7ec5b323b95256cf760cf39786451e2b2c8fd2d14a8ce00ee60c6d"
+    "startup.bundle.en.json": "cd572a9e8e431903f1553d88ebfdaaf79771923ba95598322c8bae9aa03a303b",
+    "startup.bundle.en.json.gz": "462f70d3e7571cd6b67a43f4f5c222229b764e793fed2ff595a6719ac5b41d74",
+    "startup.bundle.zh.json": "a433d76f9476eb1e61e6d748553ae8e721ee931ac9535f5231e41fa227e61354",
+    "startup.bundle.zh.json.gz": "cab149680f0338be2ee97186d13c00cd4983a4c47708cfa4700b1933e0cf05d3"
   },
   "profile": "hoi4_chunked",
   "report_paths": {},
   "scenario_id": "hoi4_1936",
-  "snapshot_fingerprint": "42d201f23dd1fe2bb8c27264692192658aa33ea75f79cc434d0bf1f7b2147669",
+  "snapshot_fingerprint": "f0121d3cd5f1a15b8c0fbb9e4119627770f527722b964404594f12c950f65f81",
   "water_count": 0
 }

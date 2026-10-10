@@ -22,7 +22,7 @@ CATALOG_JSON = REPO_ROOT / "data" / "CATALOG.json"
 CATALOG_MD = REPO_ROOT / "data" / "CATALOG.md"
 LANDING_INDEX = REPO_ROOT / "landing" / "index.html"
 LANDING_APP = REPO_ROOT / "landing" / "app.js"
-EXPECTED_SCHEMA_REF_COUNT = 33
+EXPECTED_SCHEMA_REF_COUNT = 34
 
 
 class DataCatalogContractTest(unittest.TestCase):
@@ -77,6 +77,7 @@ class DataCatalogContractTest(unittest.TestCase):
         self.assertEqual(payload.get("counts", {}).get("entries"), len(entries))
         self.assertEqual(len(schema_counts), EXPECTED_SCHEMA_REF_COUNT)
         self.assertEqual(schema_counts["schema://city_lights/source_descriptor/v1"], 1)
+        self.assertEqual(schema_counts["schema://political-id-raster/manifest/v1"], 3)
         self.assertEqual(schema_counts["schema://transport/manifest/v1"], 138)
         self.assertEqual(schema_counts["schema://transport/build_audit/v1"], 130)
         self.assertEqual(schema_counts["schema://topojson/line_collection/roads_v1"], 94)

@@ -45,3 +45,27 @@ No commits, push, merge or deployment. Default enablement remains evidence gated
 Remote delivery: commit and push this feature branch, then use its GitHub PR for final-head required checks and merge. Verify the merge commit on remote main before reporting completion. Git receipts are the authority for this phase; this checklist records preparation, not future CI success. The worktree remains available for its ignored pilot and browser evidence.
 
 The preceding no-push statement records the stages 7–11 handoff; the latest user request authorizes this delivery phase. Deployment verification is separate.
+
+## 2026-10-10 integration
+
+- [x] Isolate worktree at published base; leave other chat WIP untouched.
+- [x] Trial preference, actual state diagnostics, startup preparation and timings.
+- [x] Reproducible compressed asset builder, manifests, catalog and Pages checks.
+- [x] Fractional zoom exact refinement with cancellation and bounded scheduling.
+- [x] Three-scenario browser/targeted regression and artifact validation.
+- [x] Results, limitations and clean process handoff.
+
+Local items 1–3 are complete; see integration-results.zh-CN.md. Six Pages-artifact browser cases and saved-preference Chinese startup passed. TNO DPR 2 retained one observed timeout/Worker fallback; no blanket zero-build or speedup claim. No commit, push, PR, merge or production deployment in this integration turn. Owned browser contexts and both servers are closed.
+
+## Authorized production delivery — 2026-10-10
+
+The user now authorizes committing this batch, creating a PR, merging after required checks, deploying Pages, and verifying all three published scenarios. Earlier no-deployment statements describe the preceding implementation turn.
+
+- [x] Refresh remote main and ownership; preserve primary architecture work and prototype evidence.
+- [x] Commit only this worktree's scoped changes and push the feature branch; attach the PR.
+- [ ] Resolve any final-head CI findings, wait for every required check, and merge normally.
+- [ ] Confirm the merge SHA's Pages deployment and hosted source/asset identity.
+- [ ] Verify the published entry, assets, zoom quality and editing for all three scenarios.
+- [ ] Report receipts, remaining limits and an executable follow-on plan; retain the worktree for evidence.
+
+Implementation commit `9279755b87036bef7ce46f99b2f54dac7a84ffa2` is pushed. PR #218: https://github.com/raederhans/scenario-forge/pull/218 . Current root observes this PR's final-head checks; merge and deployment are pending.

@@ -9,6 +9,20 @@ const politicalIdRasterRoute = {
 export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
+    id: "local:renderer:political-id-raster-trial", selectorOrder: 5003,
+    commandRef: "node --test tests/political_id_raster_trial_behavior.test.mjs",
+    sourceRefs: [
+      "js/core/renderer/political_id_raster_trial.js",
+      "js/ui/toolbar/political_raster_trial_control.js",
+      "tests/political_id_raster_trial_behavior.test.mjs",
+      "tools/build_political_id_raster_assets.mjs",
+      "tools/refresh_political_id_raster_snapshot.py",
+      "tools/political_id_raster_app_session.mjs",
+      "tools/verify_political_id_raster_integration.mjs",
+    ],
+  },
+  {
+    ...politicalIdRasterRoute,
     id: "local:renderer:political-id-raster-data", selectorOrder: 5000,
     commandRef: "node --test tests/political_id_raster_source_behavior.test.mjs tests/political_id_raster_cache_behavior.test.mjs tests/political_id_raster_coordinates_behavior.test.mjs tests/political_id_raster_identity_behavior.test.mjs tests/political_id_raster_pick_behavior.test.mjs",
     sourceRefs: [

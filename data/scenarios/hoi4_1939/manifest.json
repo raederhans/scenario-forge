@@ -90,7 +90,7 @@
   "runtime_topology_url": "data/scenarios/hoi4_1939/runtime_topology.topo.json",
   "scenario_contract_profile": "hoi4_chunked",
   "scenario_id": "hoi4_1939",
-  "snapshot_fingerprint": "0b0afd5c86a2d4cfc6c01ecd541963d144e50676e935a65cdf538cc7a51d6c32",
+  "snapshot_fingerprint": "453dad3bc10161b6926db3e73d8f5bd1c3f7d8ff77311abf129f6abfb016e04e",
   "source": {
     "base_topology_sha256": "75ee6aef7e8dd2368e940ce357bd79e5a337cdc9ac7b1dacd4cdb36af5257ec7",
     "detail_chunk_manifest_sha256": "605fa74fbe2f1cc084e63666b6687ad7288140bd7c8e1aad144243d1a436ceff",
@@ -146,5 +146,6 @@
     "synthetic_owner_feature_count": 23,
     "topology_blocker_count": 0
   },
-  "version": 2
+  "version": 2,
+  "political_id_raster_manifest_url": "data/scenarios/hoi4_1939/political_id_raster/manifest.json"
 }
