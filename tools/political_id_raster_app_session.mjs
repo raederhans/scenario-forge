@@ -1,6 +1,6 @@
 import { chromium } from "playwright";
 
-export async function openRasterApp(baseUrl, { dpr = 1, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false } = {}) {
+export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false } = {}) {
   const url = new URL(baseUrl);
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
   const publishedTarget = url.origin === "https://raederhans.github.io" && url.pathname === "/scenario-forge/app/";
@@ -11,7 +11,7 @@ export async function openRasterApp(baseUrl, { dpr = 1, build = false, scenarioI
   if (build) url.searchParams.set("political_id_assets", "0");
   const browser = await chromium.launch({ headless: true });
   try {
-    const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: dpr, reducedMotion: "reduce" });
+    const context = await browser.newContext({ viewport, deviceScaleFactor: dpr, reducedMotion: "reduce" });
     const page = await context.newPage();
     await page.addInitScript(({ savedPreference, language, holdRasterAssets }) => {
       if (savedPreference !== null) localStorage.setItem("scenario-forge-political-id-raster", savedPreference ? "1" : "0");

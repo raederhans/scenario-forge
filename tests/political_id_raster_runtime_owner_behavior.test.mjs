@@ -470,6 +470,18 @@ test("fractional display refines only its current view and preserves cached geom
   assert.equal(f.owner.getDiagnostics().displayState, "accelerated");
 });
 
+test("pixel-aligned coverage still finishes with the configured exact native pass", async t => {
+  const f = fixture({ transform: { x: 200, y: 200, k: 1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const builds = f.requests.length;
+  assert.equal(f.owner.getDiagnostics().refinementPending, true);
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().displayState, "precise");
+  assert.equal(f.requests.length, builds, "exact refinement does not rebuild valid aligned coverage");
+});
+
 test("obsolete view and disposed owners cannot schedule exact refinement", async t => {
   const f = fixture({ transform: { x: 200, y: 200, k: 1.1 }, refineAfterMs: 5 });
   t.after(() => f.owner.dispose());
@@ -521,3 +533,78 @@ test('native partial feedback coalesces edits and finishes with a full native fr
   assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 1);
   assert.equal(f.owner.hasNativeFrame(), false);
 });
+
+test('held brush keeps native local feedback and schedules one exact frame after release', async t => {
+  const f = fixture({ transform: { x: 200.25, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
+  let brushing = true;
+  f.h.isBrushActive = () => brushing;
+  f.identity.colorVersion++;
+  for (let index = 0; index < 3; index++) {
+    f.owner.noteNativePartialRepaint();
+    await new Promise(resolve => setTimeout(resolve, 15));
+  }
+  assert.equal(f.owner.hasNativeFrame(), true);
+  assert.equal(f.owner.getDiagnostics().refinementPending, false, 'no timer polls a held gesture');
+  assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 0);
+  brushing = false;
+  f.owner.finishNativePartialRepaint();
+  assert.equal(f.owner.getDiagnostics().refinementPending, true);
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.renders.filter(reason => reason === 'political-id-raster-partial-refine').length, 1);
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.owner.getDiagnostics().displayState, 'precise');
+  f.owner.finishNativePartialRepaint();
+  assert.equal(f.owner.getDiagnostics().refinementPending, false);
+});
+
+test('exact edit completion prepares invalidated coverage before leaving and returning to the view', async t => {
+  const f = fixture({ transform: { x: 200.25, y: 200, k: 1.1 }, refineAfterMs: 5 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
+  const builds = f.requests.length;
+  f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+  f.identity.version++;
+  f.owner.noteNativePartialRepaint();
+  await new Promise(resolve => setTimeout(resolve, 15));
+  assert.equal(f.owner.draw(), null, 'the exact native frame stays selected');
+  assert.equal(f.owner.getPendingWorkCount(), 1, 'the edit reports its replacement tile as pending');
+  const readyRenders = f.renders.filter(reason => reason === 'political-id-raster-ready').length;
+  await resolveAll(f);
+  assert.equal(f.requests.length, builds + 1);
+  assert.equal(f.renders.filter(reason => reason === 'political-id-raster-ready').length, readyRenders,
+    'preparing geometry must not redraw an already exact, unchanged native frame');
+  assert.equal(f.owner.draw(), null);
+  const originalX = f.state.zoomTransform.x;
+  f.state.zoomTransform.x += 600;
+  f.owner.draw(); await resolveAll(f); f.owner.draw();
+  const prepared = f.requests.length;
+  f.state.zoomTransform.x = originalX;
+  assert.ok(f.owner.draw());
+  assert.equal(f.requests.length, prepared, 'returning to edited coverage has no deferred rebuild');
+});
+
+for (const [name, change] of [
+  ['palette', f => { f.identity.colorVersion++; }],
+  ['camera', f => { f.state.zoomTransform.x++; }],
+  ['oversized viewport', f => { f.layout.pixelWidth = 2 ** 20; f.owner.draw(); }],
+]) {
+  test(`coverage completion still requests a frame after a concurrent ${name} change`, async t => {
+    const f = fixture({ transform: { x: 200.25, y: 200, k: 1.1 }, refineAfterMs: 5 });
+    t.after(() => f.owner.dispose());
+    f.owner.draw(); await resolveAll(f); f.owner.draw();
+    await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
+    f.features[0].geometry = { type: 'Polygon', coordinates: [] };
+    f.identity.version++;
+    f.owner.noteNativePartialRepaint();
+    await new Promise(resolve => setTimeout(resolve, 15)); f.owner.draw();
+    const readyRenders = f.renders.filter(reason => reason === 'political-id-raster-ready').length;
+    change(f);
+    await resolveAll(f);
+    assert.equal(f.owner.getDiagnostics().failed, '');
+    assert.equal(f.renders.filter(reason => reason === 'political-id-raster-ready').length, readyRenders + 1);
+  });
+}

@@ -187,9 +187,9 @@ async function verifyRecovery(page, scenarioId) {
   return { injected: await page.evaluate(() => window.__rasterAssetFaults), protectedState, recovered };
 }
 
-export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 1,
+export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 1, viewport = { width: 1280, height: 900 },
   output = ".runtime/browser/raster-integration", published = false, recoverAssets = false,
-  exerciseBrush = true, interactionOnly = false }) {
+  exerciseBrush = true, interactionOnly = false, requirePrebuiltAssets = true }) {
   if (!baseUrl) throw new Error("--base-url is required");
   output = path.resolve(output);
   await fs.mkdir(output, { recursive: true });
@@ -199,9 +199,9 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   referenceUrl.searchParams.set("geometry_worker", "0");
   referenceUrl.searchParams.set("political_raster_worker_bitmap", "0");
   const startupStarted = performance.now();
-  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, enabled: null, published, holdRasterAssets: recoverAssets });
+  const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: null, published, holdRasterAssets: recoverAssets });
   const { page } = session;
-  const report = { scenarioId, dpr, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
+  const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
   async function runPhase(name, action) {
     const started = performance.now();
     const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);
@@ -210,9 +210,17 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       report.completedStages.push(name);
     } catch (error) {
       report.passed = false; report.error = String(error.stack || error); report.failedStage = name;
-      try { report.failureDiagnostics = await page.evaluate(() => ({ raster: window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
-        phase: window.__rasterTask.state.renderPhase, scenario: window.__rasterTask.state.activeScenarioId,
-        status: document.querySelector("#politicalRasterTrialStatus")?.textContent })); } catch { /* browser watchdog */ }
+      try { report.failureDiagnostics = await page.evaluate(() => {
+        const { renderer, state: s } = window.__rasterTask;
+        return { raster: renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
+          phase: s.renderPhase, scenario: s.activeScenarioId, isInteracting: s.isInteracting,
+          dirty: s.renderPassCache?.dirty, background: s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass,
+          deferExactAfterSettle: s.deferExactAfterSettle, exactAfterSettleHandle: s.exactAfterSettleHandle,
+          activePostReadyTaskKey: s.activePostReadyTaskKey, scenarioApplyInFlight: s.scenarioApplyInFlight,
+          chunks: Object.fromEntries(["pendingReason", "refreshScheduled", "promotionScheduled", "pendingPromotion",
+            "pendingInfraPromotion", "promotionCommitInFlight"].map(key => [key, s.runtimeChunkLoadState?.[key]])),
+          status: document.querySelector("#politicalRasterTrialStatus")?.textContent };
+      }); } catch { /* browser watchdog */ }
       throw error;
     } finally {
       clearTimeout(watchdog);
@@ -245,7 +253,8 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       await page.waitForFunction(value => Math.abs(window.__rasterTask.state.zoomTransform.k - value / 100) < 1e-7, zoom);
       await waitRasterView(page, scenarioId); await settled(page, true);
       const diagnostics = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
-      assert.ok(diagnostics.assetHits > 0, "must use pregenerated coverage");
+      if (requirePrebuiltAssets) assert.ok(diagnostics.assetHits > 0, "must use pregenerated coverage");
+      else assert.ok(diagnostics.assetHits + diagnostics.builds > 0, "the viewport must have validated asset or Worker coverage");
       assert.equal(diagnostics.failed, ""); assert.equal(diagnostics.assetError, "");
       const pixels = await compareSettledPixels(page, zoom);
       report.views.push({ zoom, diagnostics, pixels });

@@ -3470,6 +3470,7 @@ function getPoliticalIdRasterRuntimeOwner() {
     refineAfterMs: 180,
     helpers: {
       isEnabled: isPoliticalIdRasterSelected,
+      isBrushActive: () => !!brushSession,
       getFeatureId,
       getBounds: (feature, id) => getProjectedFeatureBounds(feature, { featureId: id }),
       getLayout: () => getRenderPassLayout("political"),
@@ -15267,7 +15268,10 @@ function executeDoubleClickBatchFill(feature, featureId, event = null) {
 function composeBrushInteractionSessionOwner() {
   const owner = createBrushInteractionSessionOwner(runtimeState, {
     getBrushSession: () => brushSession,
-    setBrushSession: (session) => { brushSession = session; },
+    setBrushSession: (session) => {
+      brushSession = session;
+      if (!session) politicalIdRasterRuntimeOwner?.finishNativePartialRepaint();
+    },
     suppressNextClick: () => { suppressNextClickAfterBrush = true; },
     getContext: () => rendererSurfaceHost.getContext(),
     nowMs,
