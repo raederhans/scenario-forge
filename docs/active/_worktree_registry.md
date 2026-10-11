@@ -1,8 +1,8 @@
 # Worktree Registry
 
-## 2026-10-11 栅格编辑后导航与视口验证
+## 2026-10-11 资产缓存与 TNO 大视口精修
 
-复用 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`，分支 `codex/raster-edit-navigation-20261011` 基于已发布 `74df7c100`。root 独占 Git、localhost8008 及串行浏览器验证；主目录架构 WIP 和旧 prototype 不变。本轮减少拖刷中的重复精修，在编辑完成时补齐当前视图，并验证不同视口/DPR、缓存复用与预算。试用继续默认关闭；提交、CI、合并和部署以当前任务记录与 GitHub 回执为准。
+复用 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`，分支 `codex/raster-cache-native-20261011`，基于已发布 PR #222 合并 `64b1ef685`。本轮授权解决资产／缓存超时与 TNO 大视口原生精修，保留现有超时和精确画质标准，并完成三个剧本验证、PR、保护分支合并、Pages 与线上验收。本地16项发布回归、两个分数DPR视口、209项行为、539项状态策略和14项Python检查通过。root 独占 Git 与后续发布；本轮浏览器和8008服务已关闭，CI与线上验证待完成。主目录架构 WIP、旧 prototype、上一批关闭记录与 ignored 证据均保留；试用继续默认关闭。
 
 ## 2026-10-10 栅格交互与恢复补充
 

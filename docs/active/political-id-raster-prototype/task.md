@@ -1,5 +1,13 @@
 # Status — stages 1–11
 
+## 2026-10-11 cache deadlines and large TNO native completion
+
+- [x] Preserve the published baseline and other worktrees; reproduce large native TNO failure.
+- [x] Move asset/cache I/O off the render thread; retain100ms cache/1500ms owner deadlines, observable timeout history and bounded recovery/persistence.
+- [x] Complete large TNO native refinement within the existing30s settle gate, preserving exact output and budget fallback.
+- [x] Verify three scenarios, fractional DPR revisits and large TNO zoom/edit/history; retain before/after evidence.
+- [ ] Create PR, pass final-head required checks, merge normally and confirm Pages plus hosted behavior.
+
 ## 2026-10-10 asset recovery and release regression
 
 The user authorizes bounded recovery after consecutive asset timeouts, regression checks for all three scenarios, PR, protected merge and Pages deployment. Work continues only in the owned integration worktree on `codex/political-raster-recovery-20261010`, based on `a9ee29072`; primary architecture WIP and earlier evidence remain untouched.
@@ -98,4 +106,6 @@ Published verification: five scenario/DPR cases passed initially; TNO DPR 2 hit 
 - [x] Reproduce post-edit navigation cost against published74df7c; separate first feedback, exact completion, navigation and full workload.
 - [x] Implement the smallest supported improvement with exact pixels, selection and history preserved.
 - [x] Validate representative viewport/DPR cold/revisit behavior and bounded retained memory; keep default-off. Preserve the failed large TNO native-settle case as an explicit limitation.
-- [ ] Complete scoped checks, PR, final-head required checks, normal merge and exact Pages/hosted verification.
+- [x] Complete scoped checks, PR, final-head required checks, normal merge and exact Pages/hosted verification.
+
+PR #222 merged as `64b1ef685` after all six required contexts passed. Pages run38106022579 and deployment6990163526 succeeded: artifact10, save/load2 and hosted10 checks pass; both extra fractional-DPR hosted cases also pass. The trial remains default-off. Recovered asset/cache timeouts and the failed large-TNO native completion are explicit follow-on work; see `.runtime/reports/generated/raster-navigation/release-report.zh-CN.md`. Owned live processes are closed; this worktree retains only local closeout records and ignored evidence after the published product commit.

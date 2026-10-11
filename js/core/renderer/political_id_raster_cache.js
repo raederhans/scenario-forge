@@ -197,5 +197,5 @@ export function createPoliticalIdRasterCache({ maxBytes = 48 * 1024 * 1024 } = {
     return [...cache.entries()].map(([key, entry]) => [key, entry.tile]);
   }
 
-  return Object.freeze({ get, peek, set, invalidate, clear, getStats, entries });
+  return Object.freeze({ maxBytes, get, peek, set, invalidate, clear, getStats, entries });
 }

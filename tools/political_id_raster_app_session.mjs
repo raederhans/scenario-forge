@@ -18,26 +18,29 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       if (language) localStorage.setItem("map_lang", language);
       // Faults exist only in this isolated test context; production deadlines
       // and recovery policy remain untouched.
-      const faults = window.__rasterAssetFaults = { active: holdRasterAssets, recoveryTimeouts: 0, intercepted: 0, aborted: 0 };
-      const fetchActual = globalThis.fetch.bind(globalThis);
-      if (holdRasterAssets) globalThis.fetch = (input, options = {}) => {
-        const url = new URL(input instanceof Request ? input.url : input, location.href);
-        if ((faults.active || faults.recoveryTimeouts > 0) && url.pathname.includes("/political_id_raster/")
-          && url.pathname.endsWith(".pidr.gz")) {
+      window.__rasterAssetFaults = { active: holdRasterAssets && sessionStorage.getItem('raster-release-faults-complete') !== '1', recoveryTimeouts: 0, intercepted: 0, aborted: 0 };
+    }, { savedPreference, language, holdRasterAssets });
+    if (holdRasterAssets) {
+      const held = new Set();
+      // Intercept at the context boundary so the same deadline/cancellation
+      // assertion covers both page and dedicated-worker asset reads.
+      await context.route("**/political_id_raster/*.pidr.gz", async route => {
+        const hold = await page.evaluate(() => {
+          const faults = window.__rasterAssetFaults;
+          if (!faults.active && faults.recoveryTimeouts <= 0) return false;
           if (!faults.active) faults.recoveryTimeouts--;
           faults.intercepted++;
-          return new Promise((_resolve, reject) => {
-            const signal = options.signal || (input instanceof Request ? input.signal : null);
-            if (!signal) { reject(new Error("Fault injection requires an abortable asset request")); return; }
-            const abort = () => { faults.aborted++; reject(signal.reason); };
-            if (signal.aborted) abort(); else signal.addEventListener("abort", abort, { once: true });
-          });
-        }
-        return fetchActual(input, options);
-      };
-    }, { savedPreference, language, holdRasterAssets });
+          return true;
+        });
+        if (hold) held.add(route.request());
+        else await route.continue();
+      });
+      context.on("requestfailed", request => {
+        if (held.delete(request)) void page.evaluate(() => { window.__rasterAssetFaults.aborted++; }).catch(() => {});
+      });
+    }
     const errors = [], network = [], warnings = [];
-    page.on("response", response => {
+    context.on("response", response => {
       if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);
       if (response.url().includes("/political_id_raster/")) network.push({ url: response.url(), status: response.status(),
         contentEncoding: response.headers()["content-encoding"] || "", contentLength: response.headers()["content-length"] || "" });

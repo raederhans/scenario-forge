@@ -31,8 +31,10 @@ const ALLOW_DEFAULT_DEPLOYED_URL = process.env.SCENARIO_FORGE_ALLOW_DEFAULT_PAGE
 const PUBLIC_BASE_URL = EXPLICIT_PUBLIC_BASE_URL
   || (ALLOW_DEFAULT_DEPLOYED_URL ? DEFAULT_DEPLOYED_PAGES_URL : "");
 
-for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
-  test.describe.serial(`public Pages raster ${scenarioId}`, () => {
+const rasterProfiles = ["hoi4_1936", "hoi4_1939", "tno_1962"].map(scenarioId => ({ scenarioId }));
+rasterProfiles.push({ scenarioId: "tno_1962", expectNativeBudgetFallback: true, viewport: { width: 1920, height: 1080 } });
+for (const { scenarioId, viewport, expectNativeBudgetFallback = false } of rasterProfiles) {
+  test.describe.serial(`public Pages raster ${scenarioId}${expectNativeBudgetFallback ? " large native fallback" : ""}`, () => {
     let check;
     test.afterAll(async () => {
       test.setTimeout(30000);
@@ -44,7 +46,8 @@ for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
       const { createRasterIntegrationCheck } = await import("../../../tools/verify_political_id_raster_integration.mjs");
       check = await createRasterIntegrationCheck({
         baseUrl: publicUrl("app/"), scenarioId, dpr: scenarioId === "tno_1962" ? 2 : 1,
-        published: true, recoverAssets: true, output: testInfo.outputPath("raster-recovery"),
+        published: true, recoverAssets: !expectNativeBudgetFallback, viewport, expectNativeBudgetFallback,
+        output: testInfo.outputPath("raster-recovery"),
       });
       await check.prepare();
     });
@@ -57,6 +60,11 @@ for (const scenarioId of ["hoi4_1936", "hoi4_1939", "tno_1962"]) {
       // JUSTIFY: real paint, a 41-step stroke, undo/redo and complete edited-frame pixel parity.
       test.setTimeout(120000);
       await check.edit();
+    });
+    if (!expectNativeBudgetFallback) test("persistent cache revisit", async () => {
+      // JUSTIFY: same-context scenario restart, persisted coverage and unchanged exact-settle/memory gates.
+      test.setTimeout(120000);
+      await check.revisit();
     });
   });
 }

@@ -327,16 +327,37 @@ test("in-flight work from a changed scene or projection cannot enter the cache",
 });
 
 test("a tile rejected by the CPU budget is attempted once, not pumped forever", async (t) => {
-  const f = fixture({ cache: createPoliticalIdRasterCache({ maxBytes: 0 }) });
+  const f = fixture({ cache: createPoliticalIdRasterCache({ maxBytes: 512 * 512 * 4 + 4 }) });
   t.after(() => f.owner.dispose());
   f.owner.draw();
   assert.equal(f.requests.length, 1);
-  f.requests[0].resolve(makeTile(f.requests[0].packet, "too-large"));
+  f.requests[0].resolve({ ...makeTile(f.requests[0].packet, "too-large"),
+    codes: new Uint32Array(512 * 512), edgeIds: new Uint32Array(1), edgeWeights: new Float32Array(1) });
   await tick();
   assert.equal(f.cache.getStats().tileCount, 0);
   assert.equal(f.owner.getPendingWorkCount(), 0);
   for (let index = 0; index < 5; index += 1) assert.equal(f.owner.draw(), null);
   assert.equal(f.requests.length, 1);
+  assert.equal(f.owner.getDiagnostics().displayState, "fallback");
+  assert.equal(f.owner.getDiagnostics().reason, "cpu-budget");
+});
+
+test("an oversized view is rejected before production and a smaller view can still accelerate", async t => {
+  const f = fixture({ width: 600, height: 100, transform: { x: 0, y: 200, k: 1 },
+    cache: createPoliticalIdRasterCache({ maxBytes: 2 * 512 * 512 * 4 }) });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f);
+  assert.equal(f.owner.draw(), null);
+  assert.equal(f.requests.length, 0);
+  assert.equal(f.owner.getDiagnostics().displayState, "fallback");
+  assert.equal(f.owner.getDiagnostics().reason, "view-budget");
+  const count = f.requests.length;
+  f.owner.draw(); await tick(); assert.equal(f.requests.length, count);
+  f.layout.pixelWidth = 100; f.state.zoomTransform.x = 200;
+  f.owner.draw(); await resolveAll(f);
+  assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().displayState, "accelerated");
+  assert.ok(f.cache.getStats().cpuBytes <= f.cache.maxBytes);
 });
 
 test("GPU creation failure returns fallback and stops requesting raster work", (t) => {
@@ -495,11 +516,12 @@ test("obsolete view and disposed owners cannot schedule exact refinement", async
 });
 
 
-test("post-frame history identity changes refresh before refining the latest source", async t => {
+for (const change of ["history", "camera"]) test(`post-frame ${change} changes refresh before refining the latest source`, async t => {
   const f = fixture({ transform: { x: 200, y: 200, k: 1.1 }, refineAfterMs: 5 });
   t.after(() => f.owner.dispose());
   f.owner.draw(); await resolveAll(f); f.owner.draw();
-  f.identity.version++;
+  if (change === "history") f.identity.version++;
+  else f.state.zoomTransform.y += 1e-6;
   await new Promise(resolve => setTimeout(resolve, 15));
   assert.ok(f.renders.includes("political-id-raster-refinement-refresh"));
   assert.equal(f.owner.getDiagnostics().nativeRefinements, 0);

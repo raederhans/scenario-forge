@@ -27,16 +27,19 @@ export function createPoliticalIdRasterRuntimeOwner({
   state, surface, helpers: h, effects: e,
   client = null, cache = createPoliticalIdRasterCache(),
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
-  assetStore = globalThis.indexedDB ? createPoliticalIdRasterAssetStore() : null,
+  assetStore = undefined,
   identityBuilder = createPoliticalIdRasterIdentityBuilder(), canonicalCoordinates = true, gutter = 0,
   assetTimeoutMs = 1500, assetRetryAfterMs = 5000, refineAfterMs = null,
 }) {
   const worker = client || createPoliticalIdRasterWorkerClient();
+  if (assetStore === undefined) assetStore = globalThis.indexedDB
+    ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
   let codeToId = new Map(), idToCode = new Map(), tileIdentities = new WeakMap();
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
   let consecutiveAssetTimeouts = 0;
   let nextAssetProbeAt = 0, assetFailureKind = "", assetFailureOperation = "";
+  let lastAssetFailure = null;
   let assetRecoveryTimer = null, coveredAssetProbes = 0;
   let pathCacheEstimatedBytes = 0;
   let manifestController = new AbortController();
@@ -71,11 +74,11 @@ export function createPoliticalIdRasterRuntimeOwner({
     const identity = { ...rawIdentity };
     refinementTimer = setTimeout(() => {
       refinementTimer = null;
-      if (disposed || !h.isEnabled() || viewKey !== scheduledKey
-        || ["x", "y", "k"].some(key => state.zoomTransform[key] !== transform[key])) return;
+      if (disposed || !h.isEnabled() || viewKey !== scheduledKey) return;
       const current = h.getSourceIdentity();
-      if (["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].some(key => current[key] !== identity[key])) {
-        // History completion can clear pending foreground IDs after the frame.
+      if (["x", "y", "k"].some(key => state.zoomTransform[key] !== transform[key])
+        || ["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].some(key => current[key] !== identity[key])) {
+        // A final camera tick or history cleanup can change state after the frame.
         // Refresh the live source and schedule its refinement instead of leaving
         // this otherwise idle view permanently in approximate display.
         e.requestRender("political-id-raster-refinement-refresh");
@@ -125,6 +128,8 @@ export function createPoliticalIdRasterRuntimeOwner({
     assetFailureKind = error.name === "TimeoutError" ? "timeout" : "error";
     assetFailureOperation = operation;
     assetError = String(error.message || error);
+    lastAssetFailure = { kind: assetFailureKind, operation, phase: active?.assetPhase || operation,
+      durationMs: performance.now() - (active?.assetOperationStartedAt || performance.now()) };
     if (assetFailureKind === "timeout") {
       assetTimeout = true;
       stats.assetTimeouts++;
@@ -239,6 +244,9 @@ export function createPoliticalIdRasterRuntimeOwner({
       width: layout.pixelWidth ?? Math.floor(layout.paddedWidth * state.dpr),
       height: layout.pixelHeight ?? Math.floor(layout.paddedHeight * state.dpr),
       offsetX: layout.offsetX || 0, offsetY: layout.offsetY || 0 });
+    // Direct IDs alone must leave room for exact edge coverage. Do not build a
+    // complete view that cannot coexist in the unchanged CPU cache budget.
+    if (plan && plan.width * plan.height * 4 >= cache.maxBytes) plan = null;
     const key = plan?.tiles.map(tile => tile.key).join("|") || "";
     if (key !== planKey) { attempted = new Set(); planKey = key; }
     // An obsolete view can finish only its current tile. There is no old-view
@@ -289,6 +297,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   async function assetOperation(task, callback) {
+    task.assetOperationStartedAt = performance.now();
     const controller = new AbortController();
     const signal = AbortSignal.any([task.controller.signal, controller.signal]);
     let timeout, onAbort;
@@ -316,6 +325,10 @@ export function createPoliticalIdRasterRuntimeOwner({
     if (probe) { task.assetProbe = true; stats.assetProbes++; }
     let identity = null;
     try {
+      // Start the existing worker while geometry is hashed, overlapping module
+      // loading without extending the following asset deadline.
+      const workerReady = Promise.resolve().then(() => worker.prepare?.()).then(
+        () => ({ ready: true }), error => ({ ready: false, error }));
       const identityStarted = performance.now();
       identity = await identityBuilder.identify({ sceneKey: h.getAssetSceneKey?.() || snapshot.sceneKey,
         descriptor: packet, projectionOptions: packet.projectionOptions, entries: packet.entries,
@@ -327,7 +340,12 @@ export function createPoliticalIdRasterRuntimeOwner({
         // Prebuilt manifests are explicit; ordinary sessions issue no speculative requests.
         const failuresBefore = assetStore.stats().failures;
         const tile = await assetOperation(task, async signal => {
+          task.assetPhase = "manifest";
           await registerManifest();
+          task.assetPhase = "read";
+          const startup = await workerReady;
+          signal.throwIfAborted();
+          if (!startup.ready) throw startup.error;
           return assetStore.load(identity, { idToCode: maps.idToCode, signal });
         });
         task.controller.signal.throwIfAborted();
@@ -398,6 +416,7 @@ export function createPoliticalIdRasterRuntimeOwner({
         if (built && consecutiveAssetTimeouts === 0) {
           // Serial pumping also bounds encoded buffers waiting for persistence to one tile.
           try { await assetOperation(task, signal => {
+            task.assetPhase = "save";
             const save = assetStore.save(identity, tile, { codeToId: maps.codeToId, signal });
             account();
             return save;
@@ -462,7 +481,15 @@ export function createPoliticalIdRasterRuntimeOwner({
       // Probe availability before spending CPU time building unavailable output.
       if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return null; }
       const tiles = plan.tiles.map(tile => cache.get(tile.key));
-      if (tiles.some(tile => !tile)) { stats.fallbacks++; displayState = "preparing"; reason = "awaiting-coverage"; pump(); return null; }
+      if (tiles.some(tile => !tile)) {
+        // Actual edge coverage can exceed the CPU budget even when the pixel
+        // plan fits. Exhausted coverage must not remain permanently preparing.
+        const exhausted = !active && plan.tiles.every(tile => cache.peek(tile.key) || attempted.has(tile.key));
+        stats.fallbacks++; displayState = exhausted ? "fallback" : "preparing";
+        reason = exhausted ? "cpu-budget" : "awaiting-coverage";
+        if (!exhausted) pump();
+        return null;
+      }
       // Padded edge textures are accounted by the GPU owner. This admission
       // estimate bounds one allocation before uploading; no driver-VRAM claim.
       const estimate = tiles.reduce((sum, tile) => sum + tile.codes.byteLength
@@ -552,6 +579,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
       paletteRevision: snapshot?.paletteRevision ?? 0, geometryRevision: snapshot?.geometryRevision ?? 0,
       assets: assetStore?.stats() || null, identity: identityBuilder.getStats(), assetError, assetTimeout,
+      lastAssetFailure: lastAssetFailure && { ...lastAssetFailure },
       assetFailureKind, assetFailureOperation,
       assetRecovery: { consecutiveTimeouts: consecutiveAssetTimeouts,
         state: consecutiveAssetTimeouts < 3 ? "ready" : active?.assetProbe ? "probing" : "cooldown",

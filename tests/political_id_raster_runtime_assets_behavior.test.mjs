@@ -739,6 +739,36 @@ test("a never-settling asset save times out, releases the pump, and still commit
   assert.equal(f.metrics.at(-1)[0], "politicalIdRasterCommit");
 });
 
+test("worker preparation failures remain handled when identity work is cancelled", async () => {
+  const f = fixture();
+  const identity = deferred();
+  f.identityBuilder.identify = () => identity.promise;
+  f.client.prepare = () => Promise.reject(new Error("worker startup failed"));
+  f.owner.draw();
+  await drain();
+  f.owner.dispose();
+  identity.resolve("cancelled");
+  await drain();
+  assert.equal(f.manifestUrlReads, 0);
+  assert.equal(f.assetStore.loads.length, 0);
+  assert.equal(f.requests.length, 0);
+});
+
+test("worker preparation keeps the asset deadline and cannot start a late cancelled read", async t => {
+  const f = fixture({ assetTimeoutMs: 10 });
+  const startup = deferred();
+  f.client.prepare = () => startup.promise;
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  await waitFor(() => f.requests.length === 1, "preparation must not extend the asset deadline");
+  assert.equal(f.owner.getDiagnostics().assetTimeouts, 1);
+  assert.equal(f.assetStore.loads.length, 0);
+  startup.resolve();
+  await drain();
+  assert.equal(f.assetStore.loads.length, 0, "expired preparation cannot dispatch stale I/O");
+  assert.equal(f.requests.length, 1);
+});
+
 test("a cancelled identity that resolves late starts no manifest lookup, asset load, or stale worker request", async (t) => {
   const f = fixture();
   const lateIdentity = deferred();

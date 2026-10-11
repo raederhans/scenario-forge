@@ -334,6 +334,7 @@ export function createPoliticalIdRasterAssetStore({
   indexedDB = globalThis.indexedDB, fetchImpl = globalThis.fetch,
   maxBytes = DEFAULT_MAX_BYTES, memoryMaxBytes = 0,
   baseUrl = globalThis.location?.href, dbName = 'political-id-raster-assets-v1', backend,
+  onStats = () => {},
 } = {}) {
   validateBudget(maxBytes); validateBudget(memoryMaxBytes, 'memoryMaxBytes');
   const persistent = backend ?? (indexedDB ? createIndexedDbBackend(indexedDB, dbName) : null);
@@ -342,7 +343,9 @@ export function createPoliticalIdRasterAssetStore({
   const controllers = new Set();
   const counts = { memoryHits: 0, indexedDBHits: 0, manifestHits: 0, misses: 0, saves: 0,
     failures: 0, evictions: 0, cacheReadTimeouts: 0, pendingReads: 0, pendingWrites: 0, pendingBytes: 0, lastError: null };
-  function recordError(error) { counts.failures += 1; counts.lastError = { name: error.name, message: String(error.message) }; }
+  const stats = () => ({ ...counts, lastError: counts.lastError && { ...counts.lastError },
+    memoryBytes, memoryEntries: memory.size, manifestEntries: manifest.size, maxBytes, memoryMaxBytes, disposed });
+  function recordError(error) { counts.failures += 1; counts.lastError = { name: error.name, message: String(error.message) }; onStats(stats()); }
   function remember(identity, payload) {
     const previous = memory.get(identity);
     if (previous) { memoryBytes -= previous.byteLength; memory.delete(identity); }
@@ -396,6 +399,7 @@ export function createPoliticalIdRasterAssetStore({
       counts.pendingWrites -= 1;
       counts.pendingBytes -= payload.byteLength;
       operation.release();
+      onStats(stats());
     });
   }
   return {
@@ -503,7 +507,6 @@ export function createPoliticalIdRasterAssetStore({
       for (const controller of controllers) controller.abort();
       memory.clear(); memoryBytes = 0; manifest.clear(); persistent?.close?.();
     },
-    stats() { return { ...counts, lastError: counts.lastError && { ...counts.lastError },
-      memoryBytes, memoryEntries: memory.size, manifestEntries: manifest.size, maxBytes, memoryMaxBytes, disposed }; },
+    stats,
   };
 }
