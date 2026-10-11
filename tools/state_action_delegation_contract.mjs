@@ -7361,7 +7361,7 @@ freezeMutationDelegatingOwnerEntry({
     factoryModulePath: "js/core/renderer/political_background_render_owner.js",
     factoryExportName: "createPoliticalBackgroundRenderOwner",
     factorySourceFingerprint:
-      "38f4d6c92d8cc27b2e4d9fd8c8c014e2b8eb86f78a06503e6cc1185b99a4a3ff",
+      "702b48a2ccd6bcfc23fa840fa6ce2957885979c567b461f22885a319430d13bb",
     ownerBindingName: "politicalBackgroundRenderOwner",
     methods: [
       "cancelScenarioPoliticalBackgroundDeferredFullCache",

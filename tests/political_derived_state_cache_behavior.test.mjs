@@ -177,6 +177,47 @@ test("renderer empty or fallback color sources cannot certify a derived baseline
   }
 });
 
+test("identical color rebuilds retain the palette identity while real additions, removals and recolors invalidate political pixels", () => {
+  const a = { id: "a" }, b = { id: "b" };
+  const collection = { features: [a, b] };
+  const originalColors = { a: "red", b: "blue" };
+  const state = { landDataFull: collection, landData: collection, colors: originalColors, colorRevision: 8 };
+  const resolved = { ...originalColors };
+  const invalidations = [], refreshes = [];
+  const rebuild = rendererFunction("rebuildResolvedColors", {
+    state, runtimeState: state, nowMs: () => 1, ensureSovereigntyState() {},
+    normalizeColorStateForRender(target) { target.colors = { ...target.colors }; },
+    sanitizeColorMap() {}, sanitizeCountryColorMap() {},
+    getResolvedColorSourceFeatures: () => state.landDataFull.features,
+    getResolvedColorSourceName: () => "landDataFull", getFeatureId: feature => feature.id,
+    getResolvedFeatureColor: (_feature, id) => resolved[id], replaceResolvedColorsState, bumpColorRevision,
+    politicalDerivedStateCache: { refreshColors: value => refreshes.push(value) },
+    getPoliticalDerivedStateIdentity: () => ["scene"], getCountryFillPaletteOwner: () => ({ invalidate() {} }),
+    getPaintContourRuntimeOwner: () => ({ notifyPaintChanged: () => false }),
+    getRiverInternalContourOwner: () => ({ notifyPaintChanged: () => false }),
+    retargetPendingPoliticalColorEditRevisionAfterColorRebuild() {},
+    invalidateRenderPasses: passes => invalidations.push([...passes]),
+    recordColorRebuildDiagnostics() {}, recordRenderPerfMetric() {},
+  }, ["notifyPaintContourColorsChanged"]);
+  assert.equal(rebuild(), originalColors, "normalization must not replace an identical resolved palette");
+  assert.equal(state.colorRevision, 8);
+  assert.equal(invalidations.flat().includes("political"), false);
+  assert.equal(refreshes.at(-1).colors, originalColors);
+  for (const mutate of [
+    () => { resolved.a = "green"; },
+    () => { collection.features.push({ id: "c" }); resolved.c = "yellow"; },
+    () => { collection.features = collection.features.filter(feature => feature.id !== "b"); },
+  ]) {
+    const previous = state.colors, revision = state.colorRevision;
+    invalidations.length = 0;
+    mutate(); rebuild();
+    assert.notEqual(state.colors, previous);
+    assert.equal(state.colorRevision, revision + 1);
+    assert.equal(invalidations.flat().includes("political"), true);
+  }
+  assert.deepEqual(Object.keys(state.colors), ["a", "c"]);
+});
+
 function partialColorHarness({ beforeRefresh = () => {}, resolveColor = (_feature, id) => `paint-${id}` } = {}) {
   const features = Array.from({ length: 40 }, (_, i) => ({ id: `f${i}`, bounds: {
     minX: i * 3, minY: 1, maxX: i * 3 + 2, maxY: 3, area: 4,

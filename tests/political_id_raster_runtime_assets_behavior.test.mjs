@@ -516,6 +516,64 @@ async function settleOneWorker(f, options = {}) {
   return request;
 }
 
+test("asset I/O maps only tile contributors while preserving edge IDs and global palette codes", async t => {
+  const f = fixture({ canonicalCoordinates: false, features: [
+    feature("stable-a", { minX: -160, minY: -160, maxX: -140, maxY: -140 }),
+    feature("edge-only", { minX: 2, minY: -160, maxX: 3, maxY: -140 }),
+    feature("distant", { minX: 10000, minY: 10000, maxX: 10010, maxY: 10010 }),
+  ] });
+  t.after(() => f.owner.dispose());
+  f.owner.draw();
+  await drain();
+  assert.deepEqual(f.identityBuilder.calls[0].entries.map(entry => entry.id), ["stable-a", "edge-only"]);
+  assert.deepEqual([...f.assetStore.loads[0].idToCode], [["stable-a", 1], ["edge-only", 2]],
+    "each Worker read must avoid cloning unrelated scene IDs");
+  await settleOneWorker(f, { edge: true });
+  const saved = f.assetStore.saves[0];
+  assert.deepEqual([...saved.options.codeToId], [[1, "stable-a"], [2, "edge-only"]]);
+  const remapped = decodePoliticalIdRasterAsset(saved.buffer, {
+    identity: saved.identity, idToCode: new Map([["stable-a", 17], ["edge-only", 29]]),
+  });
+  assert.deepEqual([...remapped.edgeIds], [2, 17, 29]);
+  assert.deepEqual([...remapped.edgeWeights], [...saved.tile.edgeWeights]);
+  assert.ok(f.owner.draw());
+  assert.deepEqual(f.owner.queryPoint({ x: -150, y: -150 }).ids, ["stable-a"]);
+});
+
+test("activation prepares coverage without drawing over the current native frame", async t => {
+  const f = fixture();
+  t.after(() => f.owner.dispose());
+  assert.equal(f.owner.prepare(), true);
+  await drain();
+  assert.equal(f.owner.getPendingWorkCount(), 1);
+  assert.equal(f.owner.getDiagnostics().commits, 0);
+  assert.equal(f.blits.length, 0);
+  assert.equal(f.gpus[0].draws.length, 0);
+  assert.deepEqual(f.renders, []);
+  await settleOneWorker(f);
+  assert.equal(f.owner.getPendingWorkCount(), 0);
+  assert.deepEqual(f.renders, ["political-id-raster-ready"]);
+  assert.equal(f.blits.length, 0, "asset completion must wait for the renderer-owned target");
+  assert.ok(f.owner.draw());
+  assert.equal(f.blits.length, 1);
+  assert.equal(f.owner.getDiagnostics().commits, 1);
+});
+
+test("activation preparation retains budget and producer failure fallbacks without painting", t => {
+  const oversized = fixture({ width: 7680, height: 4320 });
+  const broken = fixture();
+  t.after(() => { oversized.owner.dispose(); broken.owner.dispose(); });
+  assert.equal(oversized.owner.prepare(), false);
+  assert.equal(oversized.owner.getDiagnostics().reason, "view-budget");
+  assert.equal(oversized.requests.length, 0);
+  assert.equal(oversized.gpus.length, 0);
+  broken.helpers.getSourceIdentity = () => { throw new Error("source failed"); };
+  assert.equal(broken.owner.prepare(), false);
+  assert.equal(broken.owner.getDiagnostics().failed, "source failed");
+  assert.equal(broken.owner.getDiagnostics().reason, "producer-error");
+  assert.equal(broken.blits.length, 0);
+});
+
 test("an asset hit commits from CPU data without invoking the worker", async (t) => {
   const f = fixture({ projectionMode: "canonical", features: [
     feature("stable-a", { minX: -160, minY: -160, maxX: -140, maxY: -140 }),

@@ -7121,8 +7121,14 @@ function rebuildResolvedColors() {
     }
   });
 
-  replaceResolvedColorsState(state, nextColors);
-  bumpColorRevision(state);
+  // A startup reconciliation may resolve the exact same complete palette.
+  // Preserve its identity so pending coverage and the current political pass
+  // are not invalidated merely because a new table was allocated.
+  const colorIds = Object.keys(nextColors);
+  const colorsChanged = !previousColors || Object.keys(previousColors).length !== colorIds.length
+    || colorIds.some((id) => previousColors[id] !== nextColors[id]);
+  replaceResolvedColorsState(state, colorsChanged ? nextColors : previousColors);
+  if (colorsChanged) bumpColorRevision(state);
   if (colorSourceFeatures === runtimeState.landDataFull?.features) {
     politicalDerivedStateCache.refreshColors({
       identity: getPoliticalDerivedStateIdentity(), collection: runtimeState.landDataFull,
@@ -7133,7 +7139,8 @@ function rebuildResolvedColors() {
   getCountryFillPaletteOwner().invalidate();
   notifyPaintContourColorsChanged();
   retargetPendingPoliticalColorEditRevisionAfterColorRebuild(previousColorRevision);
-  invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
+  if (colorsChanged) invalidateRenderPasses(["physicalBase", "political", "contextBase"], "rebuild-colors");
+  else invalidateRenderPasses(["physicalBase", "contextBase"], "rebuild-colors");
   recordColorRebuildDiagnostics(runtimeState, {
     phase: "color-rebuild-complete", previousColorRevision, sourceFeatureCount: colorSourceFeatures.length, resolvedColorCount: Object.keys(nextColors).length, sourceName: getResolvedColorSourceName(),
   });
@@ -7141,8 +7148,9 @@ function rebuildResolvedColors() {
     featureCount: Object.keys(nextColors).length,
     sourceFeatureCount: colorSourceFeatures.length,
     source: getResolvedColorSourceName(),
+    colorsChanged,
   });
-  return nextColors;
+  return runtimeState.colors;
 }
 
 function getResolvedColorSourceFeatures() {
@@ -14216,7 +14224,10 @@ function render() {
   const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}` : "";
   if (rasterActivation !== politicalIdRasterActivationKey) {
     politicalIdRasterActivationKey = rasterActivation;
-    invalidateRenderPasses(["political"], "political-id-raster-activation");
+    // Preserve the current native frame while the initial assets load. The
+    // producer invalidates this pass when complete coverage becomes available.
+    if (rasterActivation) getPoliticalIdRasterRuntimeOwner().prepare();
+    else invalidateRenderPasses(["political"], "political-id-raster-activation");
   }
   drawCanvas();
   publishPoliticalIdRasterStatus(getPoliticalIdRasterDiagnostics());
