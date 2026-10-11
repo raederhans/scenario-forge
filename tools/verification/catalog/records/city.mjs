@@ -43,6 +43,7 @@ export const CITY_RECORDS = [
     commandRef: "node --test tests/scenario_capitals_behavior.test.mjs",
     sourceRefs: [
       "tests/scenario_capitals_behavior.test.mjs", "tools/repair_scenario_capitals.py",
+      "js/core/scenario_localization_state.js",
       "js/core/data_loader.js", "js/core/renderer/urban_city_policy.js",
       "js/core/renderer/city_label_text_model.js",
       "data/scenarios/modern_world/city_overrides.json", "data/scenarios/hoi4_1936/city_overrides.json",
@@ -50,7 +51,7 @@ export const CITY_RECORDS = [
     ],
     ownerHints: ["map-city"], domains: ["city-runtime"], tiers: ["contract"],
     cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
-    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 411,
+    platforms: ["all"], entrypointPolicyIndex: 5, verificationOrder: null, selectorOrder: 411,
     verification: null, selector: {},
   },
   {

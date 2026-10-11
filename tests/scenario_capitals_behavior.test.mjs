@@ -20,6 +20,59 @@ const baseLocalization = mergeCityLocalizationData({
   cityAliases: read("../data/city_aliases.json"),
 });
 
+function cityNamePatchFixture(localState) {
+  const source = readFileSync(new URL("../js/core/scenario_localization_state.js", import.meta.url), "utf8")
+    .replace(/^import[\s\S]*?;\r?\n/gm, "").replace(/^export /gm, "");
+  return vm.runInNewContext(`${source}\nbuildScenarioCityNameSyncPatch`, {
+    runtimeState: localState, buildCityLocalizationPatch, normalizeCityText,
+    applyScenarioChunkCityExternalEffectState, console, globalThis: {},
+  });
+}
+
+test("city name lookup preserves first source order across IDs, aliases, duplicates and missing keys", () => {
+  const features = [
+    { properties: { __city_id: "early", __city_stable_key: " shared ", host_feature_id: "EARLY" } },
+    { properties: { id: " late ", stable_key: "shared", host_feature_id: "LATE" } },
+    { id: "shared", properties: { host_feature_id: "DUPLICATE" } },
+    { id: "fallback", properties: { host_feature_id: "FALLBACK" } },
+  ];
+  const cities = {
+    conflicting: { city_id: "late", stable_key: "shared", display_name: { en: "First match" } },
+    duplicate: { city_id: " shared ", display_name: { zh: "最早匹配" } },
+    fallback: { city_id: "fallback", display_name: { en: "Fallback ID" } },
+    missing: { city_id: "unknown", stable_key: "", display_name: { en: "Missing" } },
+    empty: { display_name: { en: "No keys" } },
+  };
+  const patch = cityNamePatchFixture({ worldCitiesData: { features }, scenarioCityOverridesData: { cities } });
+  assert.deepEqual(JSON.parse(JSON.stringify(patch().geo)), {
+    EARLY: { zh: "最早匹配" }, FALLBACK: { en: "Fallback ID" },
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(patch({ scenarioGeoPatch: { EARLY: { en: "Explicit" } } }).geo)), {
+    FALLBACK: { en: "Fallback ID" },
+  });
+});
+
+test("city name synchronization indexes one batch and refreshes after in-place source ID changes", () => {
+  let propertyReads = 0;
+  const features = Array.from({ length: 500 }, (_, i) => {
+    const properties = { __city_id: `city-${i}`, host_feature_id: `HOST-${i}` };
+    return { get properties() { propertyReads++; return properties; } };
+  });
+  const cities = Object.fromEntries(Array.from({ length: 200 }, (_, i) => [i, {
+    city_id: `city-${300 + i}`, display_name: { en: `Name ${i}` },
+  }]));
+  const patch = cityNamePatchFixture({ worldCitiesData: { features }, scenarioCityOverridesData: { cities } });
+  const result = patch();
+  assert.equal(Object.keys(result.geo).length, 200);
+  assert.ok(propertyReads <= 500 + 2 * 200, `one source scan per batch, observed ${propertyReads} feature reads`);
+  features[499].properties.__city_id = "replacement-city";
+  propertyReads = 0;
+  const refreshed = patch();
+  assert.equal(refreshed.geo["HOST-499"], undefined, "a later sync must not retain the old city ID");
+  assert.equal(Object.keys(refreshed.geo).length, 199);
+  assert.ok(propertyReads <= 500 + 2 * 200);
+});
+
 test("scenario name synchronization never maps distant capitals into Russian city polygons", () => {
   // Execute the real module against a process-local fixture. The synthetic
   // polygon must not become a direct write to the application singleton.

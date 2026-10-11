@@ -23,19 +23,39 @@ function getScenarioOverrideLocaleEntry(overrideEntry) {
   return Object.keys(localeEntry).length ? localeEntry : null;
 }
 
-function getScenarioOverrideSourceCityFeature(overrideEntry) {
+function buildScenarioOverrideSourceCityIndex(overrideEntries) {
+  const matches = new Map();
+  for (const entry of overrideEntries) {
+    const cityId = normalizeCityText(entry?.city_id);
+    const stableKey = normalizeCityText(entry?.stable_key);
+    if (cityId) matches.set(cityId, null);
+    if (stableKey) matches.set(stableKey, null);
+  }
+  let remaining = matches.size;
   const features = Array.isArray(runtimeState.worldCitiesData?.features) ? runtimeState.worldCitiesData.features : [];
-  if (!features.length) return null;
-  const candidates = new Set([
-    normalizeCityText(overrideEntry?.city_id),
-    normalizeCityText(overrideEntry?.stable_key),
-  ].filter(Boolean));
-  if (!candidates.size) return null;
-  return features.find((feature) => {
+  for (let index = 0; index < features.length && remaining > 0; index += 1) {
+    const feature = features[index];
     const props = feature?.properties || {};
-    return candidates.has(normalizeCityText(props.__city_id || props.id || feature?.id))
-      || candidates.has(normalizeCityText(props.__city_stable_key || props.stable_key));
-  }) || null;
+    const cityId = normalizeCityText(props.__city_id || props.id || feature?.id);
+    const stableKey = normalizeCityText(props.__city_stable_key || props.stable_key);
+    if (matches.has(cityId) && !matches.get(cityId)) {
+      matches.set(cityId, { feature, index });
+      remaining -= 1;
+    }
+    if (matches.has(stableKey) && !matches.get(stableKey)) {
+      matches.set(stableKey, { feature, index });
+      remaining -= 1;
+    }
+  }
+  return matches;
+}
+
+function getScenarioOverrideSourceCityFeature(overrideEntry, sourceCityIndex) {
+  const byId = sourceCityIndex.get(normalizeCityText(overrideEntry?.city_id));
+  const byAlias = sourceCityIndex.get(normalizeCityText(overrideEntry?.stable_key));
+  // Either key can match first in source order, including an alias before an ID.
+  if (byId && (!byAlias || byId.index <= byAlias.index)) return byId.feature;
+  return byAlias?.feature || null;
 }
 
 function getFeaturePointCoordinates(feature) {
@@ -104,11 +124,13 @@ function buildScenarioCityNameSyncPatch({ baseGeoLocales = {}, scenarioGeoPatch 
   const conflicts = [];
   let preservedExplicitPatchCount = 0;
   const overrideEntries = Object.values(runtimeState.scenarioCityOverridesData?.cities || {});
+  let sourceCityIndex;
 
   overrideEntries.forEach((overrideEntry) => {
     const localeEntry = getScenarioOverrideLocaleEntry(overrideEntry);
     if (!localeEntry?.en && !localeEntry?.zh) return;
-    const sourceFeature = getScenarioOverrideSourceCityFeature(overrideEntry);
+    sourceCityIndex ||= buildScenarioOverrideSourceCityIndex(overrideEntries);
+    const sourceFeature = getScenarioOverrideSourceCityFeature(overrideEntry, sourceCityIndex);
     if (!sourceFeature) return;
 
     const sourceProps = sourceFeature?.properties || {};
