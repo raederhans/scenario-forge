@@ -814,6 +814,61 @@ test("a cancelled identity that resolves late starts no manifest lookup, asset l
 });
 
 
+test("persisted coverage is admitted before requesting a network manifest", async t => {
+  const priorFetch = globalThis.fetch;
+  let fetches = 0;
+  globalThis.fetch = () => { fetches++; throw new Error("manifest should not be needed for this hit"); };
+  const f = fixture();
+  t.after(() => { f.owner.dispose(); globalThis.fetch = priorFetch; });
+  f.helpers.getAssetManifestUrl = () => "data/manifest.json";
+  f.assetStore.setLoad(async (_identity, { cacheMode }) => {
+    assert.equal(cacheMode, "only");
+    return makeTile(f.identityBuilder.calls.at(-1).descriptor, { marker: "persisted" });
+  });
+  f.owner.draw(); await drain();
+  assert.equal(f.owner.getDiagnostics().assetHits, 1);
+  assert.equal(f.owner.getDiagnostics().assetTimeouts, 0);
+  assert.equal(f.requests.length, 0);
+  assert.equal(fetches, 0);
+});
+
+test("a cold cache miss fetches the manifest then loads the asset without a second disk probe", async t => {
+  const priorFetch = globalThis.fetch, priorLocation = globalThis.location;
+  let fetches = 0;
+  globalThis.location = { href: "http://localhost/app/", origin: "http://localhost" };
+  globalThis.fetch = async () => { fetches++; return new Response(JSON.stringify({ schemaVersion: 1, tiles: [] })); };
+  const f = fixture();
+  t.after(() => { f.owner.dispose(); globalThis.fetch = priorFetch;
+    if (priorLocation === undefined) delete globalThis.location; else globalThis.location = priorLocation; });
+  f.helpers.getAssetManifestUrl = () => "data/manifest.json";
+  f.assetStore.setLoad(async (_identity, { cacheMode }) => cacheMode === "only"
+    ? null : makeTile(f.identityBuilder.calls.at(-1).descriptor, { marker: "network" }));
+  f.owner.draw(); await drain();
+  assert.deepEqual(f.assetStore.loads.map(call => call.cacheMode), ["only", "skip"]);
+  assert.equal(f.owner.getDiagnostics().assetHits, 1);
+  assert.equal(f.requests.length, 0);
+  assert.equal(fetches, 1);
+});
+
+test("a timed-out cache probe cannot start a late manifest request or extend the owner deadline", async t => {
+  const priorFetch = globalThis.fetch;
+  let fetches = 0;
+  globalThis.fetch = () => { fetches++; throw new Error("cancelled cache probe must not fetch"); };
+  const pending = deferred(), f = fixture({ assetTimeoutMs: 10 });
+  t.after(() => { f.owner.dispose(); globalThis.fetch = priorFetch; });
+  f.helpers.getAssetManifestUrl = () => "data/manifest.json";
+  f.assetStore.setLoad(() => pending.promise);
+  f.owner.draw();
+  await waitFor(() => f.requests.length === 1, "cache probe shares the existing deadline");
+  assert.equal(f.assetStore.loads[0].cacheMode, "only");
+  assert.equal(f.assetStore.loads[0].signal.aborted, true);
+  assert.equal(f.owner.getDiagnostics().assetTimeouts, 1);
+  pending.resolve(null); await drain();
+  assert.equal(fetches, 0);
+  assert.equal(f.assetStore.loads.length, 1);
+  assert.equal(f.requests.length, 1);
+});
+
 test("a slow shared manifest survives tile fallback and remains cancellable by its owner", async t => {
   const priorFetch = globalThis.fetch, priorLocation = globalThis.location;
   let resolveManifest, manifestSignal, registrations = 0;

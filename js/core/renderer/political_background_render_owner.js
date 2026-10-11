@@ -152,9 +152,9 @@ export function createPoliticalBackgroundRenderOwner({
 
   function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified", { force = false } = {}) {
     const pending = scenarioPoliticalBackgroundDeferredFullCacheState;
-    // Palette refreshes during startup must not discard already-built geometry.
+    // Palette/detail refreshes must not discard geometry that is still current.
     // The publication fence below recomputes colors and regroups before commit.
-    if (!force && (reason === "rebuild-colors" || reason === "refresh-colors") && pending
+    if (!force && ["rebuild-colors", "refresh-colors", "deferred-detail-scoped-refresh", "detail-topology-promoted"].includes(reason) && pending
       && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(pending)
       && pending.pathCacheSignature === getPoliticalPathCacheSignature(pending.transform)
       && pending.resolvedEntries.every(entry => entry.feature.geometry === entry.geometryRef)) return false;

@@ -424,13 +424,14 @@ export function createPoliticalIdRasterAssetStore({
       manifest = next;
       return manifest.size;
     },
-    async load(identity, { idToCode, signal } = {}) {
+    async load(identity, { idToCode, signal, cacheMode = 'normal' } = {}) {
       validateIdentity(identity);
+      if (!['normal', 'only', 'skip'].includes(cacheMode)) throw new TypeError('Invalid asset cache mode.');
       const operation = operationSignal(signal);
       counts.pendingReads += 1;
       const decode = (payload) => decodePoliticalIdRasterAsset(payload, { identity, idToCode, maxBytes });
       try {
-        const cached = memory.get(identity);
+        const cached = cacheMode !== 'skip' && memory.get(identity);
         if (cached) {
           try {
             const tile = decode(cached);
@@ -439,12 +440,13 @@ export function createPoliticalIdRasterAssetStore({
           memory.delete(identity); memoryBytes -= cached.byteLength;
         }
         const entry = manifest.get(identity);
-        if (persistent && !(counts.pendingWrites && entry)) {
+        if (persistent && cacheMode !== 'skip' && !(counts.pendingWrites && entry)) {
           const cacheController = new AbortController();
           const cacheSignal = AbortSignal.any([operation.signal, cacheController.signal]);
           // A published tile has a network source. Do not make a slow optional
           // disk lookup consume the producer's entire display deadline.
-          const timer = entry ? setTimeout(() => cacheController.abort(), PERSISTENT_READ_BUDGET_MS) : null;
+          const timer = entry || cacheMode === 'only'
+            ? setTimeout(() => cacheController.abort(), PERSISTENT_READ_BUDGET_MS) : null;
           try {
             const payload = await abortable(queue(() => { checkAbort(cacheSignal); return persistent.read(identity, maxBytes, cacheSignal); }), cacheSignal);
             checkAbort(operation.signal);
@@ -459,6 +461,7 @@ export function createPoliticalIdRasterAssetStore({
             } else recordError(error);
           } finally { if (timer !== null) clearTimeout(timer); }
         }
+        if (cacheMode === 'only') return null;
         if (entry && fetchImpl) {
           try {
             const response = await abortable(Promise.resolve(fetchImpl(entry.url, { signal: operation.signal, credentials: 'same-origin', mode: 'same-origin' })), operation.signal);

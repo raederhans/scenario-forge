@@ -115,11 +115,12 @@ test("asset proxy uses the same worker, forwards cancellation and receives backg
   const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
   client.assetStore.registerManifest({ schemaVersion: 1, tiles: [] });
   const controller = new AbortController();
-  const pending = client.assetStore.load("first", { idToCode: new Map([["a", 1]]), signal: controller.signal });
+  const pending = client.assetStore.load("first", { idToCode: new Map([["a", 1]]), signal: controller.signal, cacheMode: "only" });
   await new Promise(resolve => setImmediate(resolve));
   const worker = harness.workers[0], task = worker.messages[0];
   assert.equal(task.type, "LOAD_POLITICAL_ID_ASSET");
   assert.equal(task.idToCode.get("a"), 1);
+  assert.equal(task.cacheMode, "only");
   assert.equal(client.assetStore.stats().pendingReads, 1);
   controller.abort();
   await assert.rejects(pending, { name: "AbortError" });
@@ -161,7 +162,8 @@ test("worker asset reads validate one manifest revision, transfer coverage and a
     buildTile: () => { throw new Error("assets must not rebuild geometry"); },
     createAssetStore: () => ({
       registerManifest: value => calls.push(value),
-      load: async (identity, { idToCode, signal }) => {
+      load: async (identity, { idToCode, signal, cacheMode }) => {
+        assert.equal(cacheMode, "only");
         assert.equal(idToCode.get("a"), 1); readSignal = signal;
         if (identity === "held") await new Promise(resolve => { release = resolve; });
         return tile;
@@ -169,7 +171,7 @@ test("worker asset reads validate one manifest revision, transfer coverage and a
       stats: () => ({ indexedDBHits: 1 }), dispose: () => calls.push("disposed"),
     }),
   });
-  const data = { type: "LOAD_POLITICAL_ID_ASSET", manifest: { schemaVersion: 1, tiles: [] }, manifestRevision: 1, idToCode: new Map([["a", 1]]) };
+  const data = { type: "LOAD_POLITICAL_ID_ASSET", manifest: { schemaVersion: 1, tiles: [] }, manifestRevision: 1, idToCode: new Map([["a", 1]]), cacheMode: "only" };
   runtime.handleMessage({ ...data, taskId: "ready", identity: "ready" });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(sent[0].message.value, tile);
