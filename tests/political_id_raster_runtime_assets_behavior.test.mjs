@@ -7,6 +7,74 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+test("release gate follows real timeout protection without waiting for delayed browser abort events", async t => {
+  const { releaseRasterAssetFaultsWhenProtected } = await import("../tools/verify_political_id_raster_integration.mjs");
+  const priorWindow = globalThis.window, priorStorage = globalThis.sessionStorage;
+  t.after(() => {
+    if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow;
+    if (priorStorage === undefined) delete globalThis.sessionStorage; else globalThis.sessionStorage = priorStorage;
+  });
+  const stored = new Map();
+  globalThis.sessionStorage = { setItem: (key, value) => stored.set(key, value) };
+  let diagnostics = { assetTimeouts: 3, assetProbes: 0, assetRecovery: { consecutiveTimeouts: 3 } };
+  const faults = { active: true, intercepted: 4, aborted: 2, recoveryTimeouts: 0 };
+  globalThis.window = { __rasterAssetFaults: faults,
+    __rasterTask: { renderer: { getPoliticalIdRasterDiagnostics: () => diagnostics } } };
+  assert.equal(releaseRasterAssetFaultsWhenProtected(), true);
+  assert.equal(faults.active, false);
+  assert.equal(faults.recoveryTimeouts, 1);
+  assert.equal(faults.protectedState, diagnostics);
+  assert.equal(faults.protectedState.assetProbes, 0);
+  assert.equal(stored.get("raster-release-faults-complete"), "1");
+  faults.recoveryTimeouts = 0;
+  diagnostics = { assetTimeouts: 4, assetProbes: 1, assetRecovery: { consecutiveTimeouts: 4 } };
+  assert.equal(releaseRasterAssetFaultsWhenProtected(), true);
+  assert.equal(faults.recoveryTimeouts, 0, "a repeated observer must not fail the second recovery probe too");
+  assert.equal(faults.protectedState.assetProbes, 0, "the initial protection snapshot remains fixed");
+});
+
+test("release gate requires both injected requests and three actual consecutive owner timeouts", async t => {
+  const { releaseRasterAssetFaultsWhenProtected } = await import("../tools/verify_political_id_raster_integration.mjs");
+  const priorWindow = globalThis.window;
+  t.after(() => { if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow; });
+  for (const [intercepted, consecutiveTimeouts] of [[4, 2], [2, 3]]) {
+    const faults = { active: true, intercepted, aborted: 4, recoveryTimeouts: 0 };
+    globalThis.window = { __rasterAssetFaults: faults,
+      __rasterTask: { renderer: { getPoliticalIdRasterDiagnostics: () => ({ assetRecovery: { consecutiveTimeouts } }) } } };
+    assert.equal(releaseRasterAssetFaultsWhenProtected(), false);
+    assert.equal(faults.active, true);
+    assert.equal(faults.protectedState, undefined);
+    assert.equal(faults.recoveryTimeouts, 0);
+  }
+});
+
+test("pixel capture rechecks native completion atomically and returns real mismatches without retrying", async t => {
+  const { readSettledRasterFrame } = await import("../tools/verify_political_id_raster_integration.mjs");
+  const priorWindow = globalThis.window, priorDocument = globalThis.document;
+  t.after(() => {
+    if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow;
+    if (priorDocument === undefined) delete globalThis.document; else globalThis.document = priorDocument;
+  });
+  let captures = 0, color = 1;
+  const state = { renderPhase: "idle", zoomTransform: { x: 0, y: 0, k: 1 },
+    renderPerfMetrics: { drawPoliticalBackgroundFillsPass: { progressive: true, deferredFullCacheReady: false } },
+    renderPassCache: { dirty: { political: false }, signatures: { political: "frame" },
+      canvases: { political: { width: 1, height: 1 } } } };
+  globalThis.window = { __rasterTask: { state,
+    renderer: { getPoliticalIdRasterDiagnostics: () => ({ requested: false, displayState: "precise" }) } } };
+  globalThis.document = { createElement: () => ({ getContext: () => ({ drawImage() {},
+    getImageData: () => { captures++; return { width: 1, height: 1, data: Uint8ClampedArray.of(color, 0, 0, 255) }; } }) }) };
+  assert.equal(readSettledRasterFrame({ zoom: 100, captureReference: true }), false);
+  assert.equal(captures, 0, "a coarse frame must never become the reference after an earlier ready check");
+  state.renderPerfMetrics.drawPoliticalBackgroundFillsPass.deferredFullCacheReady = true;
+  const reference = readSettledRasterFrame({ zoom: 100, captureReference: true });
+  assert.equal(reference.background.deferredFullCacheReady, true);
+  color = 2;
+  const comparison = readSettledRasterFrame({ zoom: 100 });
+  assert.equal(comparison.changed, 1, "a completed but different frame must fail the unchanged zero-pixel assertion");
+  assert.equal(captures, 2);
+});
+
 async function openTimeoutCircuit(t) {
   let now = 0;
   t.mock.method(performance, "now", () => now);

@@ -838,6 +838,32 @@ test("deferred merge admission shares the budget and cancellation releases pendi
   assert.equal(completed.resourceBudget.snapshot().categories.projectedPaths, 1280);
 });
 
+for (const refresh of ["palette-before-groups", "revision-after-merge"]) {
+  test(`deferred ${refresh} does not rebuild groups that already match the final palette`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData.features = [feature("a"), feature("b")];
+    fixture.state.landDataFull = { features: fixture.state.landData.features };
+    drawDeferredFeatures(fixture);
+    const deadline = { timeRemaining: () => 0 };
+    FakePath2D.addPathCallCount = 0;
+    if (refresh === "palette-before-groups") {
+      fixture.pending.shift().callback(deadline);
+      fixture.state.colors.a = fixture.state.colors.b = "#abcdef";
+    } else {
+      for (let index = 0; index < 20 && fixture.resourceBudget.snapshot().categories.projectedPaths !== 768; index += 1) {
+        fixture.pending.shift().callback(deadline);
+      }
+      assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 768);
+    }
+    fixture.state.colorRevision += 1;
+    drawDeferredFeatures(fixture);
+    completeDeferred(fixture, { deadline });
+    assert.equal(FakePath2D.addPathCallCount, 2, "each original path is merged exactly once");
+    assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+    assert.equal(fixture.resourceBudget.snapshot().categories.projectedPaths, 768);
+  });
+}
+
 test("deferred recolor releases discarded merged paths before another idle slice", () => {
   const fixture = createFixture({ progressiveLimit: 1 });
   fixture.state.landData.features = [feature("a"), feature("b")];
