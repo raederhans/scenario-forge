@@ -184,6 +184,27 @@ export function buildDeferredPoliticalBackgroundCachePatch(deferredState, identi
   };
 }
 
+export function refreshDeferredPoliticalBackgroundGroups(deferredState, identity) {
+  // Compare the actual yielded build, not its scheduling snapshot: colors may
+  // have changed before grouping, or while individual groups were being built.
+  const builtColors = new Map();
+  for (const group of deferredState.groups) {
+    for (const entry of group.entries) builtColors.set(entry, `${group.groupKey}::${entry.id}`);
+  }
+  const builtSignature = deferredState.resolvedEntries.map((entry) => builtColors.get(entry)).join("|");
+  deferredState.fullPassCacheKey = identity.fullPassCacheKey;
+  if (builtColors.size === deferredState.entries.length && builtSignature === identity.colorSignature) return false;
+  deferredState.groupMap = new Map();
+  deferredState.groups = [];
+  deferredState.groupIterator = null;
+  deferredState.mergeCurrent = null;
+  deferredState.retainedMergedPathBytes = 0;
+  deferredState.builtGroupMergeCount = 0;
+  deferredState.index = 0;
+  deferredState.stage = "groups";
+  return true;
+}
+
 export function buildPoliticalBackgroundColorSignature(entries, useScenarioBackgroundMerge, resolveMeta) {
   return (Array.isArray(entries) ? entries : [])
     .map((entry) => {

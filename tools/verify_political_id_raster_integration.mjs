@@ -4,19 +4,55 @@ import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 import { openRasterApp, waitRasterView } from "./political_id_raster_app_session.mjs";
 
+export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
+  const needPrecise = !captureReference && precise;
+  const { renderer, state: s } = window.__rasterTask;
+  const d = renderer.getPoliticalIdRasterDiagnostics(), c = s.runtimeChunkLoadState || {};
+  const background = s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass;
+  const ready = (!needPrecise || d.displayState === "precise") && !d.pending && !d.refinementPending
+    && !s.renderPassCache?.dirty?.political
+    && !!background && (!background.progressive || background.deferredFullCacheReady)
+    && !s.scenarioApplyInFlight && !s.isInteracting && s.renderPhase === "idle"
+    && !s.deferExactAfterSettle && !s.exactAfterSettleHandle && !s.activePostReadyTaskKey
+    && !c.pendingReason && !c.refreshScheduled && !c.promotionScheduled
+    && !c.pendingPromotion && !c.pendingInfraPromotion && !c.promotionCommitInFlight;
+  if (!ready) return false;
+  if (settleOnly) return true;
+  const state = s;
+  // Readiness and pixels must describe one synchronous browser frame.
+  // Return a mismatching comparison immediately; never poll until pixels agree.
+  const canvas = state.renderPassCache.canvases.political;
+  const copy = document.createElement("canvas"); copy.width = canvas.width; copy.height = canvas.height;
+  const context = copy.getContext("2d", { willReadFrequently: true }); context.drawImage(canvas, 0, 0);
+  const pixels = context.getImageData(0, 0, copy.width, copy.height);
+  const frame = { transform: { ...state.zoomTransform }, signature: state.renderPassCache.signatures.political,
+    background: { ...state.renderPerfMetrics.drawPoliticalBackgroundFillsPass } };
+  if (captureReference) {
+    if (renderer.getPoliticalIdRasterDiagnostics().requested) throw new Error("Reference must use native rendering");
+    (window.__rasterReferences ||= new Map()).set(zoom, { pixels, frame });
+    return frame;
+  }
+  const expected = window.__rasterReferences.get(zoom);
+  if (!expected || canvas.width !== expected.pixels.width || canvas.height !== expected.pixels.height) throw new Error("View dimensions changed during comparison");
+  if (["x", "y", "k"].some(key => Math.abs(frame.transform[key] - expected.frame.transform[key]) > 1e-7)) {
+    throw new Error(`Native and raster references must describe the same view: ${JSON.stringify({ expected: expected.frame.transform, actual: frame.transform })}`);
+  }
+  const actual = pixels.data;
+  let total = 0, above32 = 0, maximum = 0, changed = 0;
+  for (let i = 0; i < actual.length; i += 4) {
+    let difference = 0;
+    for (let channel = 0; channel < 4; channel++) difference = Math.max(difference, Math.abs(actual[i + channel] - expected.pixels.data[i + channel]));
+    total += difference; if (difference) changed++; if (difference > 32) above32++; maximum = Math.max(maximum, difference);
+  }
+  return { referenceTransform: expected.frame.transform, currentTransform: frame.transform,
+    referenceBackground: expected.frame.background, currentBackground: frame.background,
+    referenceSignature: expected.frame.signature, currentSignature: frame.signature,
+    pixels: actual.length / 4, changed, maximum, meanMax: total / (actual.length / 4), above32Ratio: above32 / (actual.length / 4) };
+}
+
 async function settled(page, precise = false) {
-  await page.waitForFunction(needPrecise => {
-    const { renderer, state: s } = window.__rasterTask;
-    const d = renderer.getPoliticalIdRasterDiagnostics(), c = s.runtimeChunkLoadState || {};
-    const background = s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass;
-    return (!needPrecise || d.displayState === "precise") && !d.pending && !d.refinementPending
-      && !s.renderPassCache?.dirty?.political
-      && !!background && (!background.progressive || background.deferredFullCacheReady)
-      && !s.scenarioApplyInFlight && !s.isInteracting && s.renderPhase === "idle"
-      && !s.deferExactAfterSettle && !s.exactAfterSettleHandle && !s.activePostReadyTaskKey
-      && !c.pendingReason && !c.refreshScheduled && !c.promotionScheduled
-      && !c.pendingPromotion && !c.pendingInfraPromotion && !c.promotionCommitInFlight;
-  }, precise, { timeout: 30000 });
+  const ready = await page.waitForFunction(readSettledRasterFrame, { precise, settleOnly: true }, { timeout: 30000 });
+  await ready.dispose();
 }
 
 async function toggle(page, enabled) {
@@ -38,37 +74,8 @@ async function toggle(page, enabled) {
 }
 
 async function compareSettledPixels(page, zoom, { captureReference = false, precise = true } = {}) {
-  await settled(page, !captureReference && precise);
-  return page.evaluate(({ zoom, captureReference }) => {
-    const { state, renderer } = window.__rasterTask;
-    const canvas = state.renderPassCache.canvases.political;
-    const copy = document.createElement("canvas"); copy.width = canvas.width; copy.height = canvas.height;
-    const context = copy.getContext("2d", { willReadFrequently: true }); context.drawImage(canvas, 0, 0);
-    const pixels = context.getImageData(0, 0, copy.width, copy.height);
-    const frame = { transform: { ...state.zoomTransform }, signature: state.renderPassCache.signatures.political,
-      background: state.renderPerfMetrics.drawPoliticalBackgroundFillsPass };
-    if (captureReference) {
-      if (renderer.getPoliticalIdRasterDiagnostics().requested) throw new Error("Reference must use native rendering");
-      (window.__rasterReferences ||= new Map()).set(zoom, { pixels, frame });
-      return frame;
-    }
-    const expected = window.__rasterReferences.get(zoom);
-    if (!expected || canvas.width !== expected.pixels.width || canvas.height !== expected.pixels.height) throw new Error("View dimensions changed during comparison");
-    if (["x", "y", "k"].some(key => Math.abs(frame.transform[key] - expected.frame.transform[key]) > 1e-7)) {
-      throw new Error(`Native and raster references must describe the same view: ${JSON.stringify({ expected: expected.frame.transform, actual: frame.transform })}`);
-    }
-    const actual = pixels.data;
-    let total = 0, above32 = 0, maximum = 0, changed = 0;
-    for (let i = 0; i < actual.length; i += 4) {
-      let difference = 0;
-      for (let channel = 0; channel < 4; channel++) difference = Math.max(difference, Math.abs(actual[i + channel] - expected.pixels.data[i + channel]));
-      total += difference; if (difference) changed++; if (difference > 32) above32++; maximum = Math.max(maximum, difference);
-    }
-    return { referenceTransform: expected.frame.transform, currentTransform: frame.transform,
-      referenceBackground: expected.frame.background, currentBackground: frame.background,
-      referenceSignature: expected.frame.signature, currentSignature: frame.signature,
-      pixels: actual.length / 4, changed, maximum, meanMax: total / (actual.length / 4), above32Ratio: above32 / (actual.length / 4) };
-  }, { zoom, captureReference });
+  const frame = await page.waitForFunction(readSettledRasterFrame, { zoom, captureReference, precise }, { timeout: 30000 });
+  try { return await frame.jsonValue(); } finally { await frame.dispose(); }
 }
 
 async function editHistory(page, precise = true) {
@@ -156,21 +163,26 @@ async function brushHistory(page, precise = true) {
   return { paintedIds, pointerSteps: before.points.length, historyEntries: 1, undo: true, redo: true };
 }
 
+export function releaseRasterAssetFaultsWhenProtected() {
+  const faults = window.__rasterAssetFaults;
+  if (faults.protectedState) return true;
+  const d = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
+  if (faults.intercepted < 3 || !(d.assetRecovery?.consecutiveTimeouts >= 3)) return false;
+  // Browser requestfailed notifications can arrive after a recovery probe.
+  // Release atomically with the owner state, before spending that first probe.
+  faults.protectedState = d;
+  faults.active = false;
+  faults.recoveryTimeouts = 1;
+  sessionStorage.setItem('raster-release-faults-complete', '1');
+  return true;
+}
+
 async function verifyRecovery(page, scenarioId) {
-  await page.waitForFunction(() => {
-    const d = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
-    return window.__rasterAssetFaults.aborted >= 3 && d.assetRecovery?.consecutiveTimeouts >= 3;
-  }, null, { timeout: 30000 });
-  const protectedState = await page.evaluate(() => {
-    // Startup promotion can cancel obsolete requests. Release the fault only
-    // when the current owner has actually reached its timeout protection.
-    window.__rasterAssetFaults.active = false;
-    sessionStorage.setItem('raster-release-faults-complete', '1');
-    window.__rasterAssetFaults.recoveryTimeouts = 1;
-    return window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
-  });
+  await page.waitForFunction(releaseRasterAssetFaultsWhenProtected, null, { timeout: 30000 });
+  const protectedState = await page.evaluate(() => window.__rasterAssetFaults.protectedState);
   assert.equal(protectedState.failed, "");
   assert.equal(protectedState.assetFailureKind, "timeout");
+  assert.equal(protectedState.assetProbes, 0, "initial faults must end before the first recovery probe");
   // Even the first probe can time out. Covered Worker output must recover
   // without toggling the trial, reloading, or manufacturing more tile demand.
   await page.waitForFunction(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assetRecoveries >= 1,
@@ -178,6 +190,7 @@ async function verifyRecovery(page, scenarioId) {
   await waitRasterView(page, scenarioId); await settled(page, true);
   if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
   const recovered = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+  assert.ok(recovered.assetTimeouts >= protectedState.assetTimeouts + 1, "the first recovery probe must actually time out");
   assert.ok(recovered.assetProbes >= 2, "the same owner must recover after a failed probe");
   assert.ok(recovered.assetRecoveries >= 1, "a probe must admit a validated asset");
   assert.ok(recovered.assetHits > 0);

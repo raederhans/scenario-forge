@@ -10,6 +10,7 @@ import {
   createPoliticalBackgroundPathAccounting,
   finalizePoliticalBackgroundGroups,
   getRetainedPoliticalPathHandle,
+  refreshDeferredPoliticalBackgroundGroups,
   POLITICAL_BACKGROUND_MERGED_PATH_BUDGET,
 } from "./political_background_build_helpers.js";
 
@@ -747,23 +748,15 @@ export function createPoliticalBackgroundRenderOwner({
       return false;
     }
 
-    // The final identity check catches colors or membership changing while
-    // slices were yielding. Regroup the retained paths in future slices.
+    // Keep all publication fences. Regroup only if the completed groups differ
+    // from the final palette, not for a revision already reflected in the build.
     const currentIdentity = getScenarioPoliticalBackgroundFullPassIdentity(normalizedEntries, { transform });
     if (currentIdentity.pathCacheSignature !== deferredState.pathCacheSignature) {
       cancelScenarioPoliticalBackgroundDeferredFullCache("path-signature-changed");
       return false;
     }
-    if (currentIdentity.fullPassCacheKey !== deferredState.fullPassCacheKey) {
-      deferredState.fullPassCacheKey = currentIdentity.fullPassCacheKey;
-      deferredState.groupMap = new Map();
-      deferredState.groups = [];
-      deferredState.groupIterator = null;
-      deferredState.mergeCurrent = null;
-      deferredState.retainedMergedPathBytes = 0;
-      deferredState.builtGroupMergeCount = 0;
-      deferredState.index = 0;
-      deferredState.stage = "groups";
+    if (currentIdentity.fullPassCacheKey !== deferredState.fullPassCacheKey
+      && refreshDeferredPoliticalBackgroundGroups(deferredState, currentIdentity)) {
       updatePoliticalBackgroundPathResourceAccounting();
       scheduleNextDeferredFullCacheSlice();
       return false;
