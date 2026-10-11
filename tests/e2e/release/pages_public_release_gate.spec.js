@@ -61,11 +61,18 @@ for (const { scenarioId, viewport, expectNativeBudgetFallback = false } of raste
       test.setTimeout(120000);
       await check.edit();
     });
-    if (!expectNativeBudgetFallback) test("persistent cache revisit", async () => {
-      // JUSTIFY: same-context scenario restart, persisted coverage and unchanged exact-settle/memory gates.
-      test.setTimeout(120000);
-      await check.revisit();
-    });
+    if (!expectNativeBudgetFallback) {
+      test("normal startup cache baseline", async () => {
+        // JUSTIFY: normal scenario restart and durable writes after the earlier injected faults and zoom/edit coverage.
+        test.setTimeout(120000);
+        await check.warmCache();
+      });
+      test("persistent cache revisit", async () => {
+        // JUSTIFY: same-view scenario restart, actual persisted reads and unchanged exact-settle/memory gates.
+        test.setTimeout(120000);
+        await check.revisit();
+      });
+    }
   });
 }
 

@@ -55,6 +55,16 @@ async function settled(page, precise = false) {
   await ready.dispose();
 }
 
+export function assertRasterCacheRevisit(warm, revisit) {
+  assert.ok(warm?.storage.entries > 0 && warm.storage.bytes > 0, 'normal startup must persist real coverage before revisit');
+  for (const key of ['x', 'y', 'k', 'dpr']) {
+    const before = warm.diagnostics.view?.[key], after = revisit.diagnostics.view?.[key];
+    assert.ok(Number.isFinite(before) && Number.isFinite(after) && Math.abs(before - after) <= 1e-7,
+      `cache baseline and revisit must describe the same view (${key}: ${before} vs ${after})`);
+  }
+  assert.ok(revisit.diagnostics.assets.indexedDBHits > 0, 'revisit must actually read persisted coverage');
+}
+
 async function toggle(page, enabled) {
   const wasCollapsed = await page.evaluate(() => document.body.classList.contains("left-sidebar-collapsed"));
   if (wasCollapsed) await page.locator("#leftSidebarCollapseBtn").click();
@@ -330,7 +340,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.deepEqual(session.errors, []);
     report.passed = true;
   }
-  async function verifyCacheRevisit() {
+  async function readNormalStartupCache() {
     const url = new URL(page.url()); url.searchParams.set('political_id_raster', '1');
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
     await page.evaluate(async () => {
@@ -338,9 +348,13 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
         ...(await import(new URL('js/core/state.js', document.baseURI))) };
     });
     await waitRasterView(page, scenarioId); await settled(page, true);
+    await page.waitForFunction(() => {
+      const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;
+      return assets.pendingReads === 0 && assets.pendingWrites === 0;
+    }, null, { timeout: 30000 });
     const diagnostics = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
     assert.equal(diagnostics.failed, ''); assert.equal(diagnostics.assetError, '');
-    assert.ok(diagnostics.assets.indexedDBHits > 0, 'revisit must actually read persisted coverage');
+    assert.ok(diagnostics.assetHits > 0, 'normal startup must admit validated coverage');
     const storage = await page.evaluate(async () => {
       const db = await new Promise((resolve, reject) => { const q = indexedDB.open('political-id-raster-assets-v1'); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
       try { return await new Promise((resolve, reject) => {
@@ -355,7 +369,19 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       assert.ok((d.gpu?.gpuTextureBytes || 0) + (d.gpu?.outputSurfaceBytesEstimate || 0) <= 80 * 1024 * 1024);
     }
     assert.deepEqual(session.errors, []);
-    report.revisit = { diagnostics, storage };
+    return { diagnostics, storage };
+  }
+  async function warmNormalStartupCache() {
+    // The faulted recovery view and zoomed/edited coverage are not a normal
+    // startup cache baseline. Load that actual view and let its writes finish.
+    report.cacheWarm = await readNormalStartupCache();
+    assert.ok(report.cacheWarm.storage.entries > 0 && report.cacheWarm.storage.bytes > 0,
+      'normal startup must persist real coverage before revisit');
+  }
+  async function verifyCacheRevisit() {
+    assert.ok(report.cacheWarm, 'establish normal startup coverage before the warm revisit');
+    report.revisit = await readNormalStartupCache();
+    assertRasterCacheRevisit(report.cacheWarm, report.revisit);
   }
   async function close() {
     await session.browser.close();
@@ -367,14 +393,18 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
         recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
       views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })),
+      cacheWarm: report.cacheWarm && { view: report.cacheWarm.diagnostics.view, storage: report.cacheWarm.storage,
+        hits: report.cacheWarm.diagnostics.assetHits, indexedDBHits: report.cacheWarm.diagnostics.assets.indexedDBHits },
       revisit: report.revisit && { hits: report.revisit.diagnostics.assets.indexedDBHits,
-        timeouts: report.revisit.diagnostics.assetTimeouts, cacheReadTimeouts: report.revisit.diagnostics.assets.cacheReadTimeouts, storage: report.revisit.storage },
+        view: report.revisit.diagnostics.view, timeouts: report.revisit.diagnostics.assetTimeouts,
+        cacheReadTimeouts: report.revisit.diagnostics.assets.cacheReadTimeouts, storage: report.revisit.storage },
       edit: report.edit, brush: report.brush, editedPixels: report.editedPixels, completedStages: report.completedStages, timings: report.timings }));
   }
   return { session, report, close,
     prepare: () => runPhase("native-reference", prepareNativeReferences),
     recoverAndZoom: () => runPhase("recovery-zoom", verifyRecoveryAndZoom),
     edit: () => runPhase("editing-history", verifyEditing),
+    warmCache: () => runPhase("cache-warm", warmNormalStartupCache),
     revisit: () => runPhase("cache-revisit", verifyCacheRevisit) };
 }
 

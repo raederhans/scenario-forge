@@ -7,6 +7,20 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+test("cache release gate requires a persisted normal view, the same revisit view and real disk hits", async () => {
+  const { assertRasterCacheRevisit } = await import("../tools/verify_political_id_raster_integration.mjs");
+  const warm = { storage: { entries: 1, bytes: 1048744 }, diagnostics: { view: { x: 0, y: 0, k: 1, dpr: 2 } } };
+  const revisit = { diagnostics: { view: { x: 0, y: -4.263256414560601e-14, k: 1, dpr: 2 }, assets: { indexedDBHits: 1 } } };
+  assert.doesNotThrow(() => assertRasterCacheRevisit(warm, revisit));
+  assert.throws(() => assertRasterCacheRevisit({ ...warm, storage: { entries: 0, bytes: 0 } }, revisit), /persist real coverage/);
+  for (const [key, value] of [['y', -17.86018853108027], ['x', 1], ['k', 1.3], ['dpr', 1], ['k', NaN]]) {
+    const changed = { diagnostics: { ...revisit.diagnostics, view: { ...revisit.diagnostics.view, [key]: value } } };
+    assert.throws(() => assertRasterCacheRevisit(warm, changed), /same view/);
+  }
+  assert.throws(() => assertRasterCacheRevisit(warm, { diagnostics: { ...revisit.diagnostics,
+    assets: { indexedDBHits: 0, manifestHits: 30 } } }), /actually read persisted coverage/);
+});
+
 test("release gate follows real timeout protection without waiting for delayed browser abort events", async t => {
   const { releaseRasterAssetFaultsWhenProtected } = await import("../tools/verify_political_id_raster_integration.mjs");
   const priorWindow = globalThis.window, priorStorage = globalThis.sessionStorage;
