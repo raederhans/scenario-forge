@@ -1,5 +1,6 @@
 import "../../vendor/d3.v7.min.js";
 import { buildPoliticalIdRasterTile } from "../core/renderer/political_id_raster_tile.js";
+import { createPoliticalIdRasterAssetStore } from "../core/renderer/political_id_raster_assets.js";
 
 const d3 = globalThis.d3;
 
@@ -58,6 +59,7 @@ export function createPoliticalIdRasterWorkerRuntime({
   projectionApi = d3,
   pathCacheMaxEntries = 1024,
   pathCacheMaxEstimatedBytes = 16 * 1024 * 1024,
+  createAssetStore = createPoliticalIdRasterAssetStore,
 } = {}) {
   if (!Number.isSafeInteger(pathCacheMaxEntries) || pathCacheMaxEntries < 0
     || !Number.isSafeInteger(pathCacheMaxEstimatedBytes) || pathCacheMaxEstimatedBytes < 0) {
@@ -69,10 +71,12 @@ export function createPoliticalIdRasterWorkerRuntime({
   let cacheNamespace = null;
   let pathCache = new Map();
   let pathCacheEstimatedBytes = 0;
+  let assetStore = null, assetManifestRevision = -1;
 
   function dispose() {
     disposed = true;
-    for (const task of tasks.values()) task.cancelled = true;
+    for (const task of tasks.values()) { task.cancelled = true; task.controller.abort(); }
+    assetStore?.dispose();
     pathCache.clear();
     pathCacheEstimatedBytes = 0;
     cacheNamespace = null;
@@ -83,6 +87,25 @@ export function createPoliticalIdRasterWorkerRuntime({
     const isCancelled = () => task.cancelled;
     try {
       if (task.cancelled) return;
+      if (task.type === "LOAD_POLITICAL_ID_ASSET" || task.type === "SAVE_POLITICAL_ID_ASSET") {
+        // IDB events, gzip streaming and validation must not wait behind native
+        // map rendering on the UI thread. Reuse the existing serial worker.
+        assetStore ||= createAssetStore({ onStats: assets => {
+          if (!disposed) postMessage({ type: "ASSET_STATS", assets });
+        } });
+        if (task.manifest && task.manifestRevision !== assetManifestRevision) {
+          assetStore.registerManifest(task.manifest);
+          assetManifestRevision = task.manifestRevision;
+        }
+        const signal = task.controller.signal;
+        const value = task.type === "LOAD_POLITICAL_ID_ASSET"
+          ? await assetStore.load(task.identity, { idToCode: task.idToCode, signal })
+          : await assetStore.save(task.identity, task.tile, { codeToId: task.codeToId, signal });
+        if (!task.cancelled) postMessage({ type: "RESULT", taskId, value, assets: assetStore.stats(),
+          assetTiming: { startedAt: task.assetStartedAt, finishedAt: performance.timeOrigin + performance.now() } },
+          value?.codes ? [value.codes.buffer, value.edgeIds.buffer, value.edgeWeights.buffer] : []);
+        return;
+      }
       const density = Number(packet?.density);
       if (!Number.isFinite(density) || density <= 0) throw new RangeError("Invalid political ID raster density.");
       const projection = recreatePoliticalIdRasterProjection(packet.projectionOptions, density, projectionApi);
@@ -168,16 +191,16 @@ export function createPoliticalIdRasterWorkerRuntime({
     if (disposed) return;
     if (data.type === "CANCEL_TASK") {
       const task = tasks.get(taskId);
-      if (task) task.cancelled = true;
+      if (task) { task.cancelled = true; task.controller.abort(); }
       return;
     }
-    if (data.type !== "BUILD_POLITICAL_ID_TILE") {
+    if (!["BUILD_POLITICAL_ID_TILE", "LOAD_POLITICAL_ID_ASSET", "SAVE_POLITICAL_ID_ASSET"].includes(data.type)) {
       postMessage({ taskId, type: "ERROR", message: "Unsupported political ID raster task." });
       return;
     }
     const previous = tasks.get(taskId);
-    if (previous) previous.cancelled = true;
-    const task = { taskId, packet: data.packet || {}, cancelled: false };
+    if (previous) { previous.cancelled = true; previous.controller.abort(); }
+    const task = { ...data, taskId, packet: data.packet || {}, cancelled: false, controller: new AbortController() };
     tasks.set(taskId, task);
     queue = queue.then(() => run(task), () => run(task));
   }

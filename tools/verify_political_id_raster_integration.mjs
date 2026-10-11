@@ -37,8 +37,8 @@ async function toggle(page, enabled) {
   if (wasCollapsed) await page.locator("#leftSidebarCollapseBtn").click();
 }
 
-async function compareSettledPixels(page, zoom, { captureReference = false } = {}) {
-  await settled(page, !captureReference);
+async function compareSettledPixels(page, zoom, { captureReference = false, precise = true } = {}) {
+  await settled(page, !captureReference && precise);
   return page.evaluate(({ zoom, captureReference }) => {
     const { state, renderer } = window.__rasterTask;
     const canvas = state.renderPassCache.canvases.political;
@@ -71,7 +71,7 @@ async function compareSettledPixels(page, zoom, { captureReference = false } = {
   }, { zoom, captureReference });
 }
 
-async function editHistory(page) {
+async function editHistory(page, precise = true) {
   if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
   await page.locator("#paintModeVisualBtn").click();
   await page.locator("#toolFillBtn").click();
@@ -117,16 +117,16 @@ async function editHistory(page) {
   await page.waitForFunction(() => window.__rasterInputProbe.correctPixelMs !== null, null, { timeout: 10000 });
   const input = await page.evaluate(() => ({ correctPixelMs: window.__rasterInputProbe.correctPixelMs,
     measurement: "pointer event to expected paint color in canvas pixels at requestAnimationFrame; not display presentation" }));
-  await settled(page, true);
+  await settled(page, precise);
   const painted = await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides }));
-  await page.locator("#undoBtn").click(); await settled(page, true);
+  await page.locator("#undoBtn").click(); await settled(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), before);
-  await page.locator("#redoBtn").click(); await settled(page, true);
+  await page.locator("#redoBtn").click(); await settled(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), painted);
   return { paintedIds: Object.keys(painted).filter(id => painted[id] !== before[id]), undo: true, redo: true, ...input };
 }
 
-async function brushHistory(page) {
+async function brushHistory(page, precise = true) {
   await page.locator('#customColor').fill('#f0a322');
   await page.locator('#brushModeBtn').click();
   const before = await page.evaluate(() => {
@@ -140,7 +140,7 @@ async function brushHistory(page) {
   });
   await page.mouse.move(before.points[0].x, before.points[0].y); await page.mouse.down();
   for (const point of before.points.slice(1)) await page.mouse.move(point.x, point.y);
-  await page.mouse.up(); await settled(page, true);
+  await page.mouse.up(); await settled(page, precise);
   const after = await page.evaluate(() => ({ colors: { ...window.__rasterTask.state.visualOverrides },
     history: window.__rasterTask.state.historyPast.length, kind: window.__rasterTask.state.historyPast.at(-1)?.kind }));
   assert.equal(after.history, before.history + 1, 'one continuous stroke must create one history entry');
@@ -148,9 +148,9 @@ async function brushHistory(page) {
   const paintedIds = Object.keys(after.colors).filter(id => after.colors[id] !== before.colors[id]);
   assert.ok(paintedIds.length > 1, 'continuous stroke must paint multiple regions');
   assert.ok(paintedIds.every(id => after.colors[id] === '#f0a322'));
-  await page.locator('#undoBtn').click(); await settled(page, true);
+  await page.locator('#undoBtn').click(); await settled(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), before.colors);
-  await page.locator('#redoBtn').click(); await settled(page, true);
+  await page.locator('#redoBtn').click(); await settled(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), after.colors);
   await page.locator('#brushModeBtn').click();
   return { paintedIds, pointerSteps: before.points.length, historyEntries: 1, undo: true, redo: true };
@@ -165,6 +165,7 @@ async function verifyRecovery(page, scenarioId) {
     // Startup promotion can cancel obsolete requests. Release the fault only
     // when the current owner has actually reached its timeout protection.
     window.__rasterAssetFaults.active = false;
+    sessionStorage.setItem('raster-release-faults-complete', '1');
     window.__rasterAssetFaults.recoveryTimeouts = 1;
     return window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics();
   });
@@ -189,8 +190,9 @@ async function verifyRecovery(page, scenarioId) {
 
 export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 1, viewport = { width: 1280, height: 900 },
   output = ".runtime/browser/raster-integration", published = false, recoverAssets = false,
-  exerciseBrush = true, interactionOnly = false, requirePrebuiltAssets = true }) {
+  exerciseBrush = true, interactionOnly = false, requirePrebuiltAssets = true, expectNativeBudgetFallback = false }) {
   if (!baseUrl) throw new Error("--base-url is required");
+  if (expectNativeBudgetFallback && recoverAssets) throw new Error("Budget fallback cannot exercise asset recovery");
   output = path.resolve(output);
   await fs.mkdir(output, { recursive: true });
   const referenceUrl = new URL(baseUrl);
@@ -201,7 +203,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   const startupStarted = performance.now();
   const session = await openRasterApp(referenceUrl.href, { scenarioId, dpr, viewport, enabled: null, published, holdRasterAssets: recoverAssets });
   const { page } = session;
-  const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
+  const report = { scenarioId, dpr, viewport, requirePrebuiltAssets, expectNativeBudgetFallback, baseUrl, views: [], completedStages: [], timings: { startupMs: performance.now() - startupStarted } };
   async function runPhase(name, action) {
     const started = performance.now();
     const watchdog = setTimeout(() => { void session.browser.close(); }, 120000);
@@ -233,6 +235,12 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.equal(session.network.length, 0, "default-off must not download raster assets");
     await toggle(page, false);
     await settled(page);
+    if (expectNativeBudgetFallback) {
+      // The fit transform can lie just outside the large view's zoom constraint.
+      // Match the real 100% input path before capturing the 130% reference.
+      await page.evaluate(() => window.__rasterTask.renderer.setZoomPercent(100));
+      await settled(page);
+    }
     // Capture both complete native views once. Repeated OFF/ON cycles dispose
     // the owner and repeat cold loading, obscuring same-owner recovery and
     // consuming the release budget without adding coverage.
@@ -244,30 +252,45 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   }
   async function verifyRecoveryAndZoom() {
     await toggle(page, true);
-    if (recoverAssets) report.recovery = await verifyRecovery(page, scenarioId);
-    await waitRasterView(page, scenarioId);
+    if (recoverAssets) {
+      report.recovery = await verifyRecovery(page, scenarioId);
+      // Fault assertions are complete. Normal requests/revisits must not wait
+      // on the test runner's page-thread routing callback or bypass HTTP cache.
+      await session.context.unroute("**/political_id_raster/*.pidr.gz");
+    }
+    if (!expectNativeBudgetFallback) await waitRasterView(page, scenarioId);
     // Verify the already-covered 100% frame, then exercise the real zoom input.
     for (const zoom of interactionOnly ? [] : [100, 130]) {
       await page.locator("#zoomPercentInput").fill(`${zoom}%`);
       await page.locator("#zoomPercentInput").press("Enter");
       await page.waitForFunction(value => Math.abs(window.__rasterTask.state.zoomTransform.k - value / 100) < 1e-7, zoom);
-      await waitRasterView(page, scenarioId); await settled(page, true);
+      if (!expectNativeBudgetFallback) await waitRasterView(page, scenarioId);
+      await settled(page, !expectNativeBudgetFallback);
       const diagnostics = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
-      if (requirePrebuiltAssets) assert.ok(diagnostics.assetHits > 0, "must use pregenerated coverage");
+      if (expectNativeBudgetFallback) {
+        assert.equal(diagnostics.requested, true); assert.equal(diagnostics.displayState, "fallback");
+        assert.equal(diagnostics.reason, "view-budget");
+        assert.equal(diagnostics.builds, 0);
+        assert.equal(session.network.length, 0, "a rejected pixel plan must not download raster coverage");
+        assert.ok(diagnostics.cpuBytes <= 48 * 1024 * 1024); assert.equal(diagnostics.assetHits, 0);
+      } else if (requirePrebuiltAssets) assert.ok(diagnostics.assetHits > 0, "must use pregenerated coverage");
       else assert.ok(diagnostics.assetHits + diagnostics.builds > 0, "the viewport must have validated asset or Worker coverage");
       assert.equal(diagnostics.failed, ""); assert.equal(diagnostics.assetError, "");
-      const pixels = await compareSettledPixels(page, zoom);
+      const pixels = await compareSettledPixels(page, zoom, { precise: !expectNativeBudgetFallback });
       report.views.push({ zoom, diagnostics, pixels });
       assert.equal(pixels.changed, 0, "settled political pixels must match native reference");
     }
   }
   async function verifyEditing() {
-    report.edit = await editHistory(page);
-    if (exerciseBrush) report.brush = await brushHistory(page);
+    report.edit = await editHistory(page, !expectNativeBudgetFallback);
+    if (exerciseBrush) report.brush = await brushHistory(page, !expectNativeBudgetFallback);
     report.status = await page.locator("#politicalRasterTrialStatus").textContent();
     report.states = await page.evaluate(() => window.__rasterStates);
-    assert.ok(report.states.some(value => value.displayState === "accelerated"));
-    assert.ok(report.states.some(value => value.displayState === "precise"));
+    if (expectNativeBudgetFallback) assert.ok(report.states.some(value => value.displayState === "fallback"));
+    else {
+      assert.ok(report.states.some(value => value.displayState === "accelerated"));
+      assert.ok(report.states.some(value => value.displayState === "precise"));
+    }
     report.preference = await page.evaluate(async () => {
       const { readPoliticalIdRasterPreference } = await import(new URL("js/core/renderer/political_id_raster_trial.js", document.baseURI));
       return { saved: readPoliticalIdRasterPreference({ search: "" }), forcedOff: readPoliticalIdRasterPreference({ search: "?political_id_raster=0" }) };
@@ -294,22 +317,52 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.deepEqual(session.errors, []);
     report.passed = true;
   }
+  async function verifyCacheRevisit() {
+    const url = new URL(page.url()); url.searchParams.set('political_id_raster', '1');
+    await page.goto(url.href, { waitUntil: 'domcontentloaded' });
+    await page.evaluate(async () => {
+      window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
+        ...(await import(new URL('js/core/state.js', document.baseURI))) };
+    });
+    await waitRasterView(page, scenarioId); await settled(page, true);
+    const diagnostics = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+    assert.equal(diagnostics.failed, ''); assert.equal(diagnostics.assetError, '');
+    assert.ok(diagnostics.assets.indexedDBHits > 0, 'revisit must actually read persisted coverage');
+    const storage = await page.evaluate(async () => {
+      const db = await new Promise((resolve, reject) => { const q = indexedDB.open('political-id-raster-assets-v1'); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error); });
+      try { return await new Promise((resolve, reject) => {
+        const q = db.transaction('metadata', 'readonly').objectStore('metadata').getAll();
+        q.onsuccess = () => resolve({ entries: q.result.length, bytes: q.result.reduce((n, v) => n + v.byteLength, 0) }); q.onerror = () => reject(q.error);
+      }); } finally { db.close(); }
+    });
+    assert.ok(storage.bytes <= 64 * 1024 * 1024);
+    for (const d of [...report.views.map(view => view.diagnostics), diagnostics]) {
+      assert.ok(d.cpuBytes <= 48 * 1024 * 1024);
+      assert.ok(d.assets.memoryBytes <= d.assets.memoryMaxBytes);
+      assert.ok((d.gpu?.gpuTextureBytes || 0) + (d.gpu?.outputSurfaceBytesEstimate || 0) <= 80 * 1024 * 1024);
+    }
+    assert.deepEqual(session.errors, []);
+    report.revisit = { diagnostics, storage };
+  }
   async function close() {
     await session.browser.close();
     report.passed = report.passed === true;
     report.network = session.network; report.warnings = session.warnings; report.errors = session.errors;
     await fs.mkdir(output, { recursive: true });
     await fs.writeFile(path.join(output, `${scenarioId}-dpr${dpr}.json`), JSON.stringify(report, null, 2) + "\n");
-    console.log(JSON.stringify({ scenarioId, dpr, passed: report.passed, error: report.error,
+    console.log(JSON.stringify({ scenarioId, dpr, viewport, expectNativeBudgetFallback, passed: report.passed, error: report.error,
       recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
         recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
       views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })),
+      revisit: report.revisit && { hits: report.revisit.diagnostics.assets.indexedDBHits,
+        timeouts: report.revisit.diagnostics.assetTimeouts, cacheReadTimeouts: report.revisit.diagnostics.assets.cacheReadTimeouts, storage: report.revisit.storage },
       edit: report.edit, brush: report.brush, editedPixels: report.editedPixels, completedStages: report.completedStages, timings: report.timings }));
   }
   return { session, report, close,
     prepare: () => runPhase("native-reference", prepareNativeReferences),
     recoverAndZoom: () => runPhase("recovery-zoom", verifyRecoveryAndZoom),
-    edit: () => runPhase("editing-history", verifyEditing) };
+    edit: () => runPhase("editing-history", verifyEditing),
+    revisit: () => runPhase("cache-revisit", verifyCacheRevisit) };
 }
 
 export async function verifyRasterIntegrationCase(options) {

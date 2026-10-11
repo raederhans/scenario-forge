@@ -95,6 +95,96 @@ function projectionHarness() {
   return { values, api: { geoEqualEarth: () => projection } };
 }
 
+test("preparation starts one reusable worker without dispatching an asset or build", async () => {
+  const harness = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
+  await client.prepare();
+  assert.equal(harness.workers.length, 1);
+  assert.deepEqual(harness.workers[0].messages, []);
+  const pending = client.assetStore.load("prepared");
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(harness.workers.length, 1);
+  const worker = harness.workers[0];
+  worker.reply({ type: "RESULT", taskId: worker.messages[0].taskId, value: null });
+  assert.equal(await pending, null);
+  client.dispose();
+});
+
+test("asset proxy uses the same worker, forwards cancellation and receives background persistence statistics", async () => {
+  const harness = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
+  client.assetStore.registerManifest({ schemaVersion: 1, tiles: [] });
+  const controller = new AbortController();
+  const pending = client.assetStore.load("first", { idToCode: new Map([["a", 1]]), signal: controller.signal });
+  await new Promise(resolve => setImmediate(resolve));
+  const worker = harness.workers[0], task = worker.messages[0];
+  assert.equal(task.type, "LOAD_POLITICAL_ID_ASSET");
+  assert.equal(task.idToCode.get("a"), 1);
+  assert.equal(client.assetStore.stats().pendingReads, 1);
+  controller.abort();
+  await assert.rejects(pending, { name: "AbortError" });
+  assert.ok(worker.messages.some(message => message.type === "CANCEL_TASK" && message.taskId === task.taskId));
+  const ready = client.assetStore.load("second");
+  await new Promise(resolve => setImmediate(resolve));
+  const tile = { codes: new Uint32Array([1]), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  worker.reply({ taskId: worker.messages.at(-1).taskId, type: "RESULT", value: tile, assets: { indexedDBHits: 1, pendingWrites: 1, pendingBytes: 200 } });
+  assert.equal(await ready, tile);
+  assert.equal(client.assetStore.stats().pendingBytes, 200);
+  worker.reply({ type: "ASSET_STATS", assets: { pendingWrites: 0, pendingBytes: 0 } });
+  assert.equal(client.assetStore.stats().pendingBytes, 0);
+  assert.equal(client.assetStore.stats().indexedDBHits, 1);
+  assert.equal(harness.workers.length, 1);
+  client.dispose();
+  assert.equal(client.assetStore.stats().disposed, true);
+});
+
+test("asset save accounts for the caller-preserving tile copy and releases it on cancellation", async () => {
+  const harness = makeWorkerHarness();
+  const client = createPoliticalIdRasterWorkerClient({ createWorker: harness.createWorker, isSupported: () => true });
+  const tile = { codes: new Uint32Array([1, 2]), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  const saving = client.assetStore.save("tile", tile, { codeToId: new Map([[1, "a"], [2, "b"]]) });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(client.assetStore.stats().pendingBytes, 8);
+  assert.equal(harness.workers[0].messages[0].type, "SAVE_POLITICAL_ID_ASSET");
+  assert.deepEqual([...tile.codes], [1, 2]);
+  client.dispose();
+  await assert.rejects(saving, /disposed/);
+  assert.equal(client.assetStore.stats().pendingBytes, 0);
+});
+
+test("worker asset reads validate one manifest revision, transfer coverage and abort without late publication", async () => {
+  const sent = [], calls = [];
+  let readSignal, release;
+  const tile = { codes: new Uint32Array([1]), edgeIds: new Uint32Array(), edgeWeights: new Float32Array() };
+  const runtime = createPoliticalIdRasterWorkerRuntime({
+    postMessage: (message, transfer) => sent.push({ message, transfer }),
+    buildTile: () => { throw new Error("assets must not rebuild geometry"); },
+    createAssetStore: () => ({
+      registerManifest: value => calls.push(value),
+      load: async (identity, { idToCode, signal }) => {
+        assert.equal(idToCode.get("a"), 1); readSignal = signal;
+        if (identity === "held") await new Promise(resolve => { release = resolve; });
+        return tile;
+      },
+      stats: () => ({ indexedDBHits: 1 }), dispose: () => calls.push("disposed"),
+    }),
+  });
+  const data = { type: "LOAD_POLITICAL_ID_ASSET", manifest: { schemaVersion: 1, tiles: [] }, manifestRevision: 1, idToCode: new Map([["a", 1]]) };
+  runtime.handleMessage({ ...data, taskId: "ready", identity: "ready" });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(sent[0].message.value, tile);
+  assert.deepEqual(sent[0].transfer, [tile.codes.buffer, tile.edgeIds.buffer, tile.edgeWeights.buffer]);
+  runtime.handleMessage({ ...data, taskId: "cancelled", identity: "held" });
+  await new Promise(resolve => setImmediate(resolve));
+  runtime.handleMessage({ type: "CANCEL_TASK", taskId: "cancelled" });
+  assert.equal(readSignal.aborted, true);
+  release(); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(sent.length, 1, "cancelled coverage cannot publish");
+  assert.equal(calls.length, 1, "unchanged manifests are not rebuilt per tile");
+  assert.equal(runtime.getPendingTaskCount(), 0);
+  runtime.dispose(); assert.equal(calls.at(-1), "disposed");
+});
+
 test("worker runtime scales projection and bounds while preserving physical tile dimensions and origin", async () => {
   const harness = projectionHarness();
   const normalized = recreatePoliticalIdRasterProjection({

@@ -214,6 +214,66 @@ function drawDeferredFeatures(fixture) {
   return fixture.owner.drawPoliticalBackgroundFills({ visibleItems, returnSummary: true });
 }
 
+test("expired idle callbacks advance within the existing CPU budget without waiting for idle time", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback({ didTimeout: false, timeRemaining: () => 0 });
+  const idleSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.equal(idleSlice.processedCount, 1, "an exhausted ordinary idle callback still yields");
+  fixture.pending.shift().callback({ didTimeout: true, timeRemaining: () => 0 });
+  const expiredSlice = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheSlice");
+  assert.ok(expiredSlice.processedCount > 1, "timeout-triggered work must not starve at one entry per callback");
+  assert.ok(expiredSlice.processedCount <= 10, "the fixture advances one millisecond per budget check");
+  completeDeferred(fixture, { deadline: { didTimeout: true, timeRemaining: () => 0 } });
+  const completed = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete");
+  assert.equal(completed.entryCount, 100);
+  assert.equal(completed.pathlessEntryCount, 0);
+  assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
+});
+
+test("startup color invalidation preserves partial geometry and publishes the latest palette", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  const deadline = { didTimeout: true, timeRemaining: () => 0 };
+  fixture.pending.shift().callback(deadline);
+  const retainedPath = fixture.pathCache.get("region-0").path;
+  fixture.pathCache.clear();
+  const pending = fixture.pending[0];
+  fixture.state.colors["region-99"] = "#ff0000"; fixture.state.colorRevision++;
+  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("rebuild-colors");
+  drawDeferredFeatures(fixture);
+  assert.equal(fixture.pending.length, 1);
+  assert.equal(fixture.pending[0], pending, "a palette refresh must keep the current build progress");
+  completeDeferred(fixture, { deadline });
+  fixture.filledPaths.length = 0;
+  const result = drawDeferredFeatures(fixture);
+  assert.equal(result.deferredFullCacheReady, true);
+  assert.equal(result.groupCount, 2);
+  assert.ok(fixture.filledPaths.some(path => path.paths?.includes(retainedPath)), "LRU eviction cannot discard retained work");
+  assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
+});
+
+for (const field of ["sceneGeneration", "scenarioDataGeneration", "projectionRevision"]) {
+  test(`color invalidation still cancels partial geometry after ${field} changes`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: [feature("one"), feature("two")] };
+    drawDeferredFeatures(fixture);
+    fixture.state[field] = (fixture.state[field] || 0) + 1;
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("rebuild-colors");
+    assert.equal(fixture.cancelled.length, 1);
+  });
+}
+
+test("explicit background release cancels partial work even with a color reason", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: [feature("one"), feature("two")] };
+  drawDeferredFeatures(fixture);
+  fixture.owner.releaseScenarioPoliticalBackgroundCache("rebuild-colors");
+  assert.equal(fixture.cancelled.length, 1);
+});
+
 test("deferred rebuild reuses retained geometry across chunk generations, camera and color changes without refilling LRU", () => {
   const fixture = createFixture({ progressiveLimit: 1 });
   const first = feature("duplicate", "AA");

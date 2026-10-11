@@ -150,7 +150,14 @@ export function createPoliticalBackgroundRenderOwner({
     return updatePathAccounting(scenarioPoliticalBackgroundCache, scenarioPoliticalBackgroundDeferredFullCacheState);
   }
 
-  function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified") {
+  function cancelScenarioPoliticalBackgroundDeferredFullCache(reason = "unspecified", { force = false } = {}) {
+    const pending = scenarioPoliticalBackgroundDeferredFullCacheState;
+    // Palette refreshes during startup must not discard already-built geometry.
+    // The publication fence below recomputes colors and regroups before commit.
+    if (!force && (reason === "rebuild-colors" || reason === "refresh-colors") && pending
+      && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(pending)
+      && pending.pathCacheSignature === getPoliticalPathCacheSignature(pending.transform)
+      && pending.resolvedEntries.every(entry => entry.feature.geometry === entry.geometryRef)) return false;
     if (scenarioPoliticalBackgroundDeferredFullCacheHandle) {
       cancelDeferredWork(scenarioPoliticalBackgroundDeferredFullCacheHandle);
     }
@@ -168,7 +175,7 @@ export function createPoliticalBackgroundRenderOwner({
   }
 
   function releaseScenarioPoliticalBackgroundCache(reason = "root-scene-release") {
-    cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
+    cancelScenarioPoliticalBackgroundDeferredFullCache(reason, { force: true });
     scenarioPoliticalBackgroundCache = createScenarioPoliticalBackgroundCacheState();
     updatePoliticalBackgroundPathResourceAccounting();
     return true;
@@ -628,6 +635,12 @@ export function createPoliticalBackgroundRenderOwner({
       && String(state.transformSignature || "") === transformSignature;
   }
 
+  function scheduleNextDeferredFullCacheSlice() {
+    scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
+      runScenarioPoliticalBackgroundDeferredFullCacheSlice, { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
+    );
+  }
+
   function runScenarioPoliticalBackgroundDeferredFullCacheSlice(deadline = null) {
     const deferredState = scenarioPoliticalBackgroundDeferredFullCacheState;
     scenarioPoliticalBackgroundDeferredFullCacheHandle = null;
@@ -656,10 +669,7 @@ export function createPoliticalBackgroundRenderOwner({
       || !recoverySettled
       || cache.dirty?.political
     ) {
-      scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
-        runScenarioPoliticalBackgroundDeferredFullCacheSlice,
-        { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
-      );
+      scheduleNextDeferredFullCacheSlice();
       if (!recoverySettled && deferredState.stage === "ready") {
         recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred(deferredState);
       }
@@ -688,7 +698,9 @@ export function createPoliticalBackgroundRenderOwner({
       mergedPathBudgetBytes: POLITICAL_BACKGROUND_MERGED_PATH_BUDGET_BYTES,
       withinBudget: (processedCount) => processedCount === 0 || (
         nowMs() - startedAt < POLITICAL_DEFERRED_FULL_CACHE_CPU_BUDGET_MS
-        && (!deadline || typeof deadline.timeRemaining !== "function" || deadline.timeRemaining() > 0)
+        // Expired idle callbacks report zero idle time. Use the same bounded
+        // CPU slice so a busy frame cannot reduce a large rebuild to one entry.
+        && (!deadline || deadline.didTimeout || typeof deadline.timeRemaining !== "function" || deadline.timeRemaining() > 0)
       ),
     });
     if (result.geometryChanged) {
@@ -720,18 +732,12 @@ export function createPoliticalBackgroundRenderOwner({
     });
 
     if (deferredState.stage !== "ready") {
-      scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
-        runScenarioPoliticalBackgroundDeferredFullCacheSlice,
-        { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
-      );
+      scheduleNextDeferredFullCacheSlice();
       return builtCount > 0;
     }
 
     if (!isInteractionRecoverySettled({ quietMs: 600 })) {
-      scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
-        runScenarioPoliticalBackgroundDeferredFullCacheSlice,
-        { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
-      );
+      scheduleNextDeferredFullCacheSlice();
       recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred(deferredState);
       return false;
     }
@@ -759,10 +765,7 @@ export function createPoliticalBackgroundRenderOwner({
       deferredState.index = 0;
       deferredState.stage = "groups";
       updatePoliticalBackgroundPathResourceAccounting();
-      scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
-        runScenarioPoliticalBackgroundDeferredFullCacheSlice,
-        { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
-      );
+      scheduleNextDeferredFullCacheSlice();
       return false;
     }
     const finalized = {
@@ -834,9 +837,12 @@ export function createPoliticalBackgroundRenderOwner({
     const identity = fullPassIdentity || getScenarioPoliticalBackgroundFullPassIdentity(normalizedEntries, { transform });
     if (isScenarioPoliticalBackgroundFullPassCacheKeyReady(identity.fullPassCacheKey)) return false;
     if (
-      scenarioPoliticalBackgroundDeferredFullCacheState?.fullPassCacheKey === identity.fullPassCacheKey
+      scenarioPoliticalBackgroundDeferredFullCacheState?.pathCacheSignature === identity.pathCacheSignature
       && isScenarioPoliticalBackgroundDeferredFullCacheStateCurrent(scenarioPoliticalBackgroundDeferredFullCacheState, transform)
       && scenarioPoliticalBackgroundDeferredFullCacheHandle
+      && normalizedEntries.length === scenarioPoliticalBackgroundDeferredFullCacheState.entries.length
+      && normalizedEntries.every((entry, index) => entry.feature === scenarioPoliticalBackgroundDeferredFullCacheState.entries[index].feature
+        && entry.id === scenarioPoliticalBackgroundDeferredFullCacheState.entries[index].id)
     ) {
       return true;
     }
@@ -848,10 +854,7 @@ export function createPoliticalBackgroundRenderOwner({
       ),
     };
     updatePoliticalBackgroundPathResourceAccounting();
-    scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork(
-      runScenarioPoliticalBackgroundDeferredFullCacheSlice,
-      { timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS },
-    );
+    scheduleNextDeferredFullCacheSlice();
     recordRenderPerfMetric("scenarioPoliticalBackgroundDeferredFullCacheScheduled", 0, {
       phase: "deferred",
       recoveryQuality: POLITICAL_RECOVERY_QUALITY_PROGRESSIVE,
