@@ -645,8 +645,7 @@ export function createPoliticalBackgroundRenderOwner({
 
   function requestFreshPoliticalBackgroundPaths() {
     cancelScenarioPoliticalBackgroundDeferredFullCache("path-signature-changed");
-    // This view is still current, but its projected paths are not. A new normal
-    // pass must collect current entries and schedule the replacement build.
+    // Recollect entries for this current view after its projected paths change.
     const reason = "progressive-political-path-refresh";
     invalidateRenderPasses("political", reason);
     return requestRendererRender(reason, { flush: false, fallback: renderFallback });
@@ -664,9 +663,7 @@ export function createPoliticalBackgroundRenderOwner({
       cancelScenarioPoliticalBackgroundDeferredFullCache("scene-snapshot-mismatch");
       return false;
     }
-    if (deferredState.pathCacheSignature !== getPoliticalPathCacheSignature(deferredState.transform)) {
-      return requestFreshPoliticalBackgroundPaths();
-    }
+    if (deferredState.pathCacheSignature !== getPoliticalPathCacheSignature(deferredState.transform)) return requestFreshPoliticalBackgroundPaths();
     const normalizedEntries = deferredState.entries;
     if (isScenarioPoliticalBackgroundFullPassCacheKeyReady(deferredState.fullPassCacheKey)) {
       scenarioPoliticalBackgroundDeferredFullCacheState = null;
@@ -764,9 +761,7 @@ export function createPoliticalBackgroundRenderOwner({
     // Keep all publication fences. Regroup only if the completed groups differ
     // from the final palette, not for a revision already reflected in the build.
     const currentIdentity = getScenarioPoliticalBackgroundFullPassIdentity(normalizedEntries, { transform });
-    if (currentIdentity.pathCacheSignature !== deferredState.pathCacheSignature) {
-      return requestFreshPoliticalBackgroundPaths();
-    }
+    if (currentIdentity.pathCacheSignature !== deferredState.pathCacheSignature) return requestFreshPoliticalBackgroundPaths();
     if (currentIdentity.fullPassCacheKey !== deferredState.fullPassCacheKey
       && refreshDeferredPoliticalBackgroundGroups(deferredState, currentIdentity)) {
       updatePoliticalBackgroundPathResourceAccounting();

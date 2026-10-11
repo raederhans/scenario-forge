@@ -2,6 +2,8 @@
 
 ## Activation, tile I/O and native continuation — 2026-10-11
 
+PR228 is open. Its first head eb6e760f passes browser smoke but the architecture lane catches a four-line owner-budget overrun after the final native fix. The follow-up only tightens single-statement branch formatting and a comment; normalized syntax trees are identical,81 background tests and the architecture check pass, and the current factory fingerprint is refreshed. No budget or behavior changes; final-head CI remains required. All local servers/browser runs are closed.
+
 PR227 Pages38138287614 failed before deployment:17 of19 cases passed, TNO normal-startup cache warm exceeded the unchanged60s view gate, and its dependent revisit was skipped. Large TNO passed all three exact-frame/edit cases. Public baseline remains64b1ef685. The failed report has27 asset hits, two Worker-built tiles, one pending read and zero cache-read timeouts; main-thread result delivery reaches7206.7ms although Worker service peaks at332.5ms. Preserve `city-index-pages-failure.log` and `failed-release-38138287614/`.
 
 Root owns `codex/raster-startup-io-20261011`, based on eed60231ae2b41540529c60f7fe6a3d86f3c409c, in the existing integration checkout. Current changes prepare asynchronous coverage without a redundant activation repaint, send only each tile's contributors (including stroke margins and original global codes) to asset I/O, and retain identical complete palettes and revisions. Real recolors, additions and removals retain invalidation; other palette/contour and physical/context effects remain. Primary-checkout81 WIP entries remain untouched. Root is sole local browser/test/Git owner.
