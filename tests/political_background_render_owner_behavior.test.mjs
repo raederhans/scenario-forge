@@ -232,7 +232,8 @@ test("expired idle callbacks advance within the existing CPU budget without wait
   assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
 });
 
-for (const reason of ["rebuild-colors", "deferred-detail-scoped-refresh", "detail-topology-promoted"]) {
+for (const reason of ["rebuild-colors", "deferred-detail-scoped-refresh", "detail-topology-promoted",
+  "political-id-raster-ready", "political-id-raster-refine"]) {
   test(`startup ${reason} preserves partial geometry and publishes the latest palette`, () => {
     const fixture = createFixture({ progressiveLimit: 1 });
     fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
@@ -895,6 +896,26 @@ test("deferred recolor releases discarded merged paths before another idle slice
   assert.equal(fixture.calls.includes("repaint"), false);
   fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("test-cleanup");
   assert.equal(fixture.resourceBudget.snapshot().ownerCount, 0);
+});
+
+test("current deferred work requests a fresh pass when its path signature changes", () => {
+  const fixture = createFixture({ progressiveLimit: 1 });
+  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+  drawDeferredFeatures(fixture);
+  fixture.pending.shift().callback({ didTimeout: true, timeRemaining: () => 0 });
+  const oldPath = fixture.pathCache.get("region-0").path;
+  fixture.state.projectionRevision = 1;
+  fixture.calls.length = 0;
+  fixture.pending.shift().callback();
+  assert.equal(fixture.pending.length, 0, "cancel stale geometry before another build slice");
+  assert.equal(fixture.calls.some(call => call.startsWith("build:")), false);
+  assert.ok(fixture.calls.includes("invalidate:political:progressive-political-path-refresh"));
+  assert.equal(fixture.calls.filter(call => call === "repaint").length, 1);
+  assert.equal(fixture.metrics.some(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete"), false);
+  drawDeferredFeatures(fixture);
+  completeDeferred(fixture);
+  assert.notEqual(fixture.pathCache.get("region-0").path, oldPath);
+  assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
 });
 
 test("stale deferred work cancels without invalidation, diagnostics, or repaint", () => {

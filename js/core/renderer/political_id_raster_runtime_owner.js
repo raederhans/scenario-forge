@@ -35,7 +35,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   if (assetStore === undefined) assetStore = globalThis.indexedDB
     ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
-  let codeToId = new Map(), idToCode = new Map(), tileIdentities = new WeakMap();
+  let codeToId = new Map(), tileIdentities = new WeakMap();
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
   let manifestReadyKey = "";
   let consecutiveAssetTimeouts = 0;
@@ -219,7 +219,6 @@ export function createPoliticalIdRasterRuntimeOwner({
       }
       snapshot = next;
       codeToId = new Map(snapshot.entries.map(entry => [entry.code, entry.id]));
-      idToCode = new Map(snapshot.entries.map(entry => [entry.id, entry.code]));
       namespace = nextNamespace;
       sourceVersion = identity.version;
       paletteVersion = identity.colorVersion;
@@ -404,7 +403,12 @@ export function createPoliticalIdRasterRuntimeOwner({
       precision: coordinates.projectionOptions.precision / descriptor.density } : projectionOptions();
     const packet = { ...descriptor, entries, projectionOptions: options,
       geometryNamespace: namespace, gutter, strokeWidth: 0.75 * state.dpr };
-    const maps = { codeToId, idToCode };
+    // The validated identity covers exactly these contributors, including the
+    // stroke margin. Avoid copying unrelated scene IDs into every Worker task.
+    const maps = {
+      codeToId: new Map(entries.map(entry => [entry.code, entry.id])),
+      idToCode: new Map(entries.map(entry => [entry.id, entry.code])),
+    };
     active = task;
     account();
     task.promise = resolveTile(packet, task, maps).then(async ({ tile, built, identity, reused }) => {
@@ -471,6 +475,34 @@ export function createPoliticalIdRasterRuntimeOwner({
       e.requestRender("political-id-raster-context-lost");
     } });
     return gpu.isAvailable();
+  }
+
+  function failProducer(error) {
+    failed = String(error?.message || error);
+    cancel();
+    releaseGpu();
+    cache.clear();
+    account();
+    stats.fallbacks++;
+    displayState = "fallback"; reason = "producer-error";
+    return null;
+  }
+
+  function prepare() {
+    if (!usable()) { displayState = "fallback"; reason = failed ? "producer-error" : "unavailable"; return false; }
+    try {
+      syncSource();
+      if (!updatePlan()) { stats.fallbacks++; displayState = "fallback"; reason = "view-budget"; return false; }
+      updateViewIdentity();
+      if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return false; }
+      // Start the same bounded producer without repainting a still-current
+      // native frame. The ready callback requests the first accelerated draw.
+      pump();
+      if (!active && plan.tiles.every(tile => cache.peek(tile.key))) {
+        e.requestRender("political-id-raster-ready");
+      }
+      return true;
+    } catch (error) { failProducer(error); return false; }
   }
 
   function draw() {
@@ -542,14 +574,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       });
       return { fillMs: stats.lastCommitMs, strokeMs: 0, renderedCount: renderedIds.size, renderedIds };
     } catch (error) {
-      failed = String(error?.message || error);
-      cancel();
-      releaseGpu();
-      cache.clear();
-      account();
-      stats.fallbacks++;
-      displayState = "fallback"; reason = "producer-error";
-      return null;
+      return failProducer(error);
     }
   }
 
@@ -574,7 +599,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     return query;
   }
 
-  return Object.freeze({ draw, queryPoint, noteNativePartialRepaint,
+  return Object.freeze({ prepare, draw, queryPoint, noteNativePartialRepaint,
     finishNativePartialRepaint() { if (nativePartialPending) noteNativePartialRepaint(); },
     hasNativeFrame: () => !disposed && (displayState === "precise" || nativePartialPending),
     async exportAssets() {
