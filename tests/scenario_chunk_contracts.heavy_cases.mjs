@@ -925,12 +925,13 @@ export function registerScenarioChunkContractHeavyTests(register = defaultRegist
             && body.includes("isExactAfterSettleControllerActive()")
             && body.includes("cache.dirty?.political")
             && body.includes('cancelScenarioPoliticalBackgroundDeferredFullCache("scene-snapshot-mismatch");')
-            && body.includes("scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork")
+            && body.includes("scheduleNextDeferredFullCacheSlice();")
+            && /function scheduleNextDeferredFullCacheSlice\(\) \{\s*scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork\(\s*runScenarioPoliticalBackgroundDeferredFullCacheSlice,\s*\{ timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS \},\s*\);\s*\}/.test(politicalBackgroundOwnerSource)
             && body.includes("const recoverySettled = isInteractionRecoverySettled({ quietMs: 600 });")
             && /!recoverySettled[\s\S]*?deferredState\.stage === "ready"[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?const startedAt = nowMs\(\)[\s\S]*?advanceDeferredPoliticalBackgroundBuild\(/.test(body)
             && /getPoliticalFeaturePathEntry\([\s\S]*?allowBuild: true/.test(politicalBuildHelpersSource)
             && body.includes('if (deferredState.stage !== "ready")')
-            && /if \(!isInteractionRecoverySettled\(\{ quietMs: 600 \}\)\) \{[\s\S]*?scenarioPoliticalBackgroundDeferredFullCacheHandle = scheduleDeferredWork\([\s\S]*?runScenarioPoliticalBackgroundDeferredFullCacheSlice,[\s\S]*?\{ timeout: POLITICAL_DEFERRED_FULL_CACHE_TIMEOUT_MS \},[\s\S]*?\);[\s\S]*?recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);[\s\S]*?return false;[\s\S]*?\}/.test(body);
+            && /if \(!isInteractionRecoverySettled\(\{ quietMs: 600 \}\)\) \{\s*scheduleNextDeferredFullCacheSlice\(\);\s*recordScenarioPoliticalBackgroundDeferredFullCacheReadyRepaintDeferred\(deferredState\);\s*return false;\s*\}/.test(body);
         })()
         && /function drawScenarioPoliticalBackgroundFills\([\s\S]*?const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?politicalDirtyReason !== "refresh-colors"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?allowBuild: false[\s\S]*?const foregroundIds = new Set[\s\S]*?const underlayEntries = visibleEntries\.filter[\s\S]*?!foregroundIds\.has[\s\S]*?drawPoliticalBackgroundFillsForEntries\(underlayEntries,[\s\S]*?scheduleScenarioPoliticalBackgroundDeferredFullCache/.test(politicalBackgroundOwnerSource)
         && /const pendingPoliticalColorEdit = hasPendingPoliticalColorEdit\(\);[\s\S]*?const progressiveRecoveryCoarseSkipCandidate = \([\s\S]*?coarseUnderlay \|\| ""\) === "admin0"[\s\S]*?!pendingPoliticalColorEdit[\s\S]*?\);[\s\S]*?if \(progressiveRecoveryCoarseSkipCandidate && !visiblePoliticalForegroundColorOverride\)/.test(politicalOwnerDrawSource)
