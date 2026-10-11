@@ -7,8 +7,8 @@ The user authorizes bounded recovery after consecutive asset timeouts, regressio
 - [x] Reproduce the permanent timeout bypass and establish the recovery boundary.
 - [x] Add demand-driven cooldown probing, explicit timeout/error diagnostics and focused regression cases.
 - [x] Wire the real three-scenario recovery path into artifact and deployed release checks.
-- [ ] Verify local behavior, artifact delivery and final-head required CI; create and merge the scoped PR.
-- [ ] Confirm the exact Pages deployment, hosted recovery and editing/quality; report remaining limits.
+- [x] Verify local behavior, artifact delivery and final-head required CI; create and merge the scoped PR.
+- [x] Confirm the exact Pages deployment, hosted recovery and editing/quality; report remaining limits.
 
 The user's delayed clarification also authorizes picking and continuous brush optimization in this batch. PR219 merged but its new artifact release gate stopped deployment (1939 pixel comparison, TNO DPR2 total duration); preserve that evidence and repair the gate without relaxing quality/deadlines. Continue on codex/political-raster-interaction-20261010, based on the merged source. Public deployment remains the previous version until a successful follow-up release. The candidate now bounds idle recovery to two probes per view, preserves canonical first-containing picks, coalesces native brush feedback into an exact final frame, and expands release coverage to five cases (separate DPR2 TNO recovery and continuous editing). The full combined TNO browser check passed, but exceeded the release case total budget, so the cases are split without extending deadlines.
 
@@ -16,9 +16,11 @@ The user's delayed clarification also authorizes picking and continuous brush op
 - [x] Measure fixed ON/OFF point selection, real recolor and brush paths before changing product behavior.
 - [x] Improve verified picking and repeated brush work while preserving exact IDs, priority, color sets and history.
 - [x] PR #220 final head `52a59202` passed all six required checks and merged normally as `181a973fc` at 14:37:16 UTC; other worktrees remain untouched.
-- [ ] Deliver the bounded, same-page release phases after run38060336698 exposed total-case timeout overruns; preserve all quality, recovery and editing assertions.
+- [x] Deliver the bounded, same-page release phases after run38060336698 exposed total-case timeout overruns; preserve all quality, recovery and editing assertions.
 - [x] All nine local stages passed with full tracing; sparse release checkout discovers all10 cases. Asset and interaction behavior and exact pixels remain covered, with bounded cleanup and no owned server left running.
-- [ ] Validate and deliver the follow-up PR through required checks, merge and exact hosted verification.
+- [x] Validate and deliver the follow-up PR through required checks, merge and exact hosted verification.
+
+Final receipt: PR #221 head601d007577ec86eb01ea54f756de418314ef3875 passed all six required contexts and merged as74df7c10067b5dc39542f0893734b4282fb87b2f. Pages run38063247476 and deployment6983018421 succeeded at15:45:27UTC, including10 artifact and10 hosted checks. All three published scenarios recovered after the injected failed first probe, matched native100%/130% and edited pixels exactly, and passed real paint/41-step brush undo-redo. Seven hosted modules and all three manifests match the release; sampled compressed assets validate. Runtime gates use the same page through recovery and editing. Product speedup remains limited to earlier feedback/lower containment cost; full workload and post-edit navigation still need improvement. Final report: `.runtime/reports/generated/raster-interaction/release-report.zh-CN.md`. All task-owned test/server/watch processes are closed; keep this worktree for evidence. These final task-record updates are local handoff metadata, not additional product changes.
 
 - [x] Stage 1: isolated baseline at 98425dcc; fixture and measurement contract fixed.
 - [x] Stage 1: real sample baseline measurements captured.
@@ -91,3 +93,9 @@ The user now authorizes committing this batch, creating a PR, merging after requ
 PR #218 (https://github.com/raederhans/scenario-forge/pull/218) merged final head `dcda61dafb2db64b8136f5766716212065408ac0` after 18 checks and all six required gates succeeded (one optional observation skipped). Merge commit: `a9ee29072020fad200cd52b10200e5e8de51391c`, 2026-10-10 12:03:52 UTC. Pages run 38050609688 and deployment 6980551347 succeeded for this exact merge at 12:15:52 UTC, including hosted smoke.
 
 Published verification: five scenario/DPR cases passed initially; TNO DPR 2 hit the existing consecutive asset timeout breaker and failed the strict asset-error assertion. The identical single-case recheck passed without code, assertion or deadline changes. Across the six passing results, both zoom levels match native settled political pixels exactly and real fill/undo/redo pass. The saved-preference Chinese TNO startup and UI zoom input also pass. Keep the original failed report; intermittent asset timeout recovery is the first follow-on item, not a claim of a fully stable cold path or overall speedup. Release report and remaining plan: `.runtime/reports/generated/raster-release/release-report.zh-CN.md` and `remaining-plan.zh-CN.md`. All owned test browsers/processes closed; retain this worktree for evidence.
+# Follow-on authorized 2026-10-11
+
+- [x] Reproduce post-edit navigation cost against published74df7c; separate first feedback, exact completion, navigation and full workload.
+- [x] Implement the smallest supported improvement with exact pixels, selection and history preserved.
+- [x] Validate representative viewport/DPR cold/revisit behavior and bounded retained memory; keep default-off. Preserve the failed large TNO native-settle case as an explicit limitation.
+- [ ] Complete scoped checks, PR, final-head required checks, normal merge and exact Pages/hosted verification.

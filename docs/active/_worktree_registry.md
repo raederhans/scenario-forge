@@ -1,8 +1,12 @@
 # Worktree Registry
 
+## 2026-10-11 栅格编辑后导航与视口验证
+
+复用 `C:/Users/raede/.codex/worktrees/political-raster-integration/mapcreator`，分支 `codex/raster-edit-navigation-20261011` 基于已发布 `74df7c100`。root 独占 Git、localhost8008 及串行浏览器验证；主目录架构 WIP 和旧 prototype 不变。本轮减少拖刷中的重复精修，在编辑完成时补齐当前视图，并验证不同视口/DPR、缓存复用与预算。试用继续默认关闭；提交、CI、合并和部署以当前任务记录与 GitHub 回执为准。
+
 ## 2026-10-10 栅格交互与恢复补充
 
-同一隔离工作树已通过 PR #220 合并拾取、连续拖刷和覆盖视图的资产恢复，当前在 `codex/raster-release-budget-20261010`（基于 `181a973fc`）修复发布检查的总时长问题。PR #219、#220 的发布前门禁均拦住了部署，线上仍为 `a9ee29072`。三个剧本的同页冷启动、恢复缩放、编辑历史共九个阶段已在本地通过；root 独占交付，其他对话改动保留。最终发布回执见任务记录，不能以合并代替上线成功。
+同一隔离工作树通过 PR #219/#220 完成资产恢复、拾取和连续拖刷，通过 PR #221 将发布验证拆为同页有界阶段。当前分支 `codex/raster-release-budget-20261010` 保留最终发布 `74df7c100` 与 ignored 证据。前两次发布被门禁拦住的证据保留；最终 Pages run38063247476、deployment6983018421 于15:45:27UTC成功，产物10项和线上10项检查均通过。root 的临时测试、服务器和跟踪进程已结束，其他对话改动保留。本树仅保留本地发布回执记录更新；完整结果及剩余优化见任务记录和 `.runtime/reports/generated/raster-interaction/release-report.zh-CN.md`。
 
 ## 2026-10-10 栅格资产恢复与发布回归
 

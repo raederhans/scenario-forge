@@ -49,10 +49,13 @@ export function createPoliticalIdRasterRuntimeOwner({
     refinementTimer = null; nativePartialPending = false;
   }
   function cancelAssetRecovery() { if (assetRecoveryTimer !== null) clearTimeout(assetRecoveryTimer); assetRecoveryTimer = null; }
-  function updateViewIdentity() {
-    const next = JSON.stringify([namespace, sourceVersion, snapshot.paletteRevision, state.dpr,
+  function getViewIdentity() {
+    return JSON.stringify([namespace, sourceVersion, snapshot.paletteRevision, state.dpr,
       state.zoomTransform.x, state.zoomTransform.y, state.zoomTransform.k,
       plan.width, plan.height, plan.outputX, plan.outputY, plan.scale]);
+  }
+  function updateViewIdentity() {
+    const next = getViewIdentity();
     if (next !== viewKey) {
       cancelAssetRecovery(); coveredAssetProbes = 0;
       cancelRefinement(); viewKey = next; refinedViewKey = "";
@@ -60,8 +63,9 @@ export function createPoliticalIdRasterRuntimeOwner({
     }
   }
   function scheduleRefinement() {
-    if (!(Number.isFinite(refineAfterMs) && refineAfterMs >= 0) || refinementTimer !== null
-      || (Math.abs(plan.scale - 1) < 1e-6 && Number.isInteger(plan.outputX) && Number.isInteger(plan.outputY))) return;
+    // Pixel alignment does not make canonical tessellation identical to the
+    // native path; every configured view must finish with the exact producer.
+    if (!(Number.isFinite(refineAfterMs) && refineAfterMs >= 0) || refinementTimer !== null) return;
     const scheduledKey = viewKey;
     const transform = { ...state.zoomTransform };
     const identity = { ...rawIdentity };
@@ -89,6 +93,9 @@ export function createPoliticalIdRasterRuntimeOwner({
     cancelRefinement();
     nativePartialPending = true;
     displayState = "accelerated"; reason = "native-partial-feedback";
+    // A held brush keeps its local feedback; finish the exact full pass once
+    // the gesture owner closes the stroke, rather than between pointer moves.
+    if (h.isBrushActive?.()) return;
     refinementTimer = setTimeout(() => {
       refinementTimer = null; nativePartialPending = false;
       if (disposed || !h.isEnabled()) return;
@@ -411,7 +418,14 @@ export function createPoliticalIdRasterRuntimeOwner({
       // Complete one latest viewport before requesting a repaint, avoiding a
       // full vector redraw for every tile that becomes available.
       pump();
-      if (!active) e.requestRender("political-id-raster-ready");
+      if (!active) {
+        const current = h.getSourceIdentity();
+        const alreadyExact = plan && rawIdentity && !failed && !assetError && !task.assetProbe
+          && refinedViewKey === getViewIdentity()
+          && fittedProjectionKey === JSON.stringify(projectionOptions())
+          && ["sceneKey", "projectionKey", "coverageKey", "version", "colorVersion"].every(key => current[key] === rawIdentity[key]);
+        if (!alreadyExact) e.requestRender("political-id-raster-ready");
+      }
     });
   }
 
@@ -438,7 +452,13 @@ export function createPoliticalIdRasterRuntimeOwner({
         forceNativeRefinement = false; refinedViewKey = viewKey; nativeRefinements++;
       }
       scheduleCoveredAssetRecovery();
-      if (refinedViewKey === viewKey) { displayState = "precise"; reason = "idle-refinement"; return null; }
+      if (refinedViewKey === viewKey) {
+        displayState = "precise"; reason = "idle-refinement";
+        // Finish invalidated coverage for this exact view as part of the edit,
+        // so returning to it after a zoom does not inherit an unfinished tile.
+        pump();
+        return null;
+      }
       // Probe availability before spending CPU time building unavailable output.
       if (!ensureGpu()) { displayState = "fallback"; reason = "gpu-unavailable"; return null; }
       const tiles = plan.tiles.map(tile => cache.get(tile.key));
@@ -515,6 +535,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   }
 
   return Object.freeze({ draw, queryPoint, noteNativePartialRepaint,
+    finishNativePartialRepaint() { if (nativePartialPending) noteNativePartialRepaint(); },
     hasNativeFrame: () => !disposed && (displayState === "precise" || nativePartialPending),
     async exportAssets() {
       if (disposed || !snapshot) return [];
