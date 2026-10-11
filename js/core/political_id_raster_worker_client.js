@@ -71,9 +71,9 @@ export function createPoliticalIdRasterWorkerClient({
       manifest = value; manifestRevision++;
       return count;
     },
-    async load(identity, { idToCode, signal } = {}) {
+    async load(identity, { idToCode, signal, cacheMode = "normal" } = {}) {
       assetReads++;
-      try { return await assetRequest("LOAD_POLITICAL_ID_ASSET", { identity, idToCode }, signal); }
+      try { return await assetRequest("LOAD_POLITICAL_ID_ASSET", { identity, idToCode, cacheMode }, signal); }
       finally { assetReads--; }
     },
     async save(identity, tile, { codeToId, signal } = {}) {

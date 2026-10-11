@@ -2,6 +2,8 @@
 
 ## 2026-10-11 cache deadlines and large TNO native completion
 
+PR223 passed final-head checks and merged as84fa243937ef30dd182bbf52942f3b4bc8eb618f, but Pages run38120214850 blocked deployment at its artifact gate (15/16 passed). The published version remains64b1ef685. Follow-up branch `codex/raster-cache-revisit-20261011` reads bounded persisted coverage before an unready network manifest and preserves current native progress through two startup detail refreshes. All original deadlines, memory budgets and exact-pixel assertions remain unchanged. The final16-case local release gate passed in9.3m; IDB revisit hits2/4/2 and zero cache-read timeouts, with one recovered outer TNO timeout. Final-head CI and actual deployment must be repeated for this candidate.
+
 - [x] Preserve the published baseline and other worktrees; reproduce large native TNO failure.
 - [x] Move asset/cache I/O off the render thread; retain100ms cache/1500ms owner deadlines, observable timeout history and bounded recovery/persistence.
 - [x] Complete large TNO native refinement within the existing30s settle gate, preserving exact output and budget fallback.

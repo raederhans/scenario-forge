@@ -232,37 +232,64 @@ test("expired idle callbacks advance within the existing CPU budget without wait
   assert.equal(drawDeferredFeatures(fixture).deferredFullCacheReady, true);
 });
 
-test("startup color invalidation preserves partial geometry and publishes the latest palette", () => {
-  const fixture = createFixture({ progressiveLimit: 1 });
-  fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
-  drawDeferredFeatures(fixture);
-  const deadline = { didTimeout: true, timeRemaining: () => 0 };
-  fixture.pending.shift().callback(deadline);
-  const retainedPath = fixture.pathCache.get("region-0").path;
-  fixture.pathCache.clear();
-  const pending = fixture.pending[0];
-  fixture.state.colors["region-99"] = "#ff0000"; fixture.state.colorRevision++;
-  fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("rebuild-colors");
-  drawDeferredFeatures(fixture);
-  assert.equal(fixture.pending.length, 1);
-  assert.equal(fixture.pending[0], pending, "a palette refresh must keep the current build progress");
-  completeDeferred(fixture, { deadline });
-  fixture.filledPaths.length = 0;
-  const result = drawDeferredFeatures(fixture);
-  assert.equal(result.deferredFullCacheReady, true);
-  assert.equal(result.groupCount, 2);
-  assert.ok(fixture.filledPaths.some(path => path.paths?.includes(retainedPath)), "LRU eviction cannot discard retained work");
-  assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
-});
+for (const reason of ["rebuild-colors", "deferred-detail-scoped-refresh", "detail-topology-promoted"]) {
+  test(`startup ${reason} preserves partial geometry and publishes the latest palette`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: Array.from({ length: 100 }, (_, i) => feature(`region-${i}`)) };
+    drawDeferredFeatures(fixture);
+    const deadline = { didTimeout: true, timeRemaining: () => 0 };
+    fixture.pending.shift().callback(deadline);
+    const retainedPath = fixture.pathCache.get("region-0").path;
+    fixture.pathCache.clear();
+    const pending = fixture.pending[0];
+    fixture.state.colors["region-99"] = "#ff0000"; fixture.state.colorRevision++;
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
+    drawDeferredFeatures(fixture);
+    assert.equal(fixture.pending.length, 1);
+    assert.equal(fixture.pending[0], pending, "a refresh with current geometry must keep the build progress");
+    completeDeferred(fixture, { deadline });
+    fixture.filledPaths.length = 0;
+    const result = drawDeferredFeatures(fixture);
+    assert.equal(result.deferredFullCacheReady, true);
+    assert.equal(result.groupCount, 2);
+    assert.ok(fixture.filledPaths.some(path => path.paths?.includes(retainedPath)), "LRU eviction cannot discard retained work");
+    assert.ok(fixture.calls.includes("fillStyle:#ff0000"));
+  });
 
-for (const field of ["sceneGeneration", "scenarioDataGeneration", "projectionRevision"]) {
-  test(`color invalidation still cancels partial geometry after ${field} changes`, () => {
+  for (const field of ["sceneGeneration", "scenarioDataGeneration", "projectionRevision"]) {
+    test(`${reason} still cancels partial geometry after ${field} changes`, () => {
+      const fixture = createFixture({ progressiveLimit: 1 });
+      fixture.state.landData = { features: [feature("one"), feature("two")] };
+      drawDeferredFeatures(fixture);
+      fixture.state[field] = (fixture.state[field] || 0) + 1;
+      fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
+      assert.equal(fixture.cancelled.length, 1);
+    });
+  }
+
+  test(`${reason} cancels when already-built geometry changes`, () => {
     const fixture = createFixture({ progressiveLimit: 1 });
     fixture.state.landData = { features: [feature("one"), feature("two")] };
     drawDeferredFeatures(fixture);
-    fixture.state[field] = (fixture.state[field] || 0) + 1;
-    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache("rebuild-colors");
+    fixture.pending.shift().callback({ timeRemaining: () => 0 });
+    fixture.state.landData.features[0].geometry = { type: "Polygon" };
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
     assert.equal(fixture.cancelled.length, 1);
+    assert.equal(fixture.calls.includes("repaint"), false);
+  });
+
+  test(`${reason} reschedules changed membership before publishing`, () => {
+    const fixture = createFixture({ progressiveLimit: 1 });
+    fixture.state.landData = { features: [feature("one"), feature("two")] };
+    drawDeferredFeatures(fixture);
+    fixture.pending.shift().callback({ timeRemaining: () => 0 });
+    fixture.owner.cancelScenarioPoliticalBackgroundDeferredFullCache(reason);
+    fixture.state.landData.features.push(feature("three"));
+    drawDeferredFeatures(fixture);
+    assert.equal(fixture.cancelled.length, 1);
+    completeDeferred(fixture);
+    const complete = fixture.metrics.findLast(metric => metric.name === "scenarioPoliticalBackgroundDeferredFullCacheComplete");
+    assert.equal(complete.entryCount, 3);
   });
 }
 

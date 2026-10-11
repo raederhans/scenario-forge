@@ -310,3 +310,37 @@ test('slow optional disk lookup yields to a published tile without a producer fa
   assert.equal(store.stats().cacheReadTimeouts, 1); assert.equal(store.stats().manifestHits, 1);
   assert.equal(store.stats().failures, 0); store.dispose();
 });
+
+test('cache-only lookup stays bounded without a manifest and a subsequent network lookup skips the disk', async () => {
+  let readSignal, reads = 0, requests = 0;
+  const payload = encode('published');
+  const store = createStore({ backend: { read: (_id, _limit, signal) => {
+    reads++; readSignal = signal;
+    return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(Object.assign(new Error('cancelled'), { name: 'AbortError' })), { once: true }));
+  }, writeBounded: async () => true }, fetchImpl: async () => { requests++; return response(payload); } });
+  assert.equal(await store.load('published', { idToCode, cacheMode: 'only' }), null);
+  assert.equal(readSignal.aborted, true);
+  assert.equal(store.stats().cacheReadTimeouts, 1);
+  assert.equal(requests, 0);
+  store.registerManifest({ schemaVersion: 1, tiles: [{ identity: 'published', url: '/published', byteLength: payload.byteLength }] });
+  assert.ok(await store.load('published', { idToCode, cacheMode: 'skip' }));
+  assert.equal(reads, 1, 'a missed cache lookup must not be repeated before the network');
+  assert.equal(requests, 1);
+  assert.equal(store.stats().manifestHits, 1);
+  store.dispose();
+});
+
+test('cache-only lookup validates persisted coverage without fetching registered assets on a miss', async () => {
+  let requests = 0;
+  const backend = memoryBackend(), payload = encode('saved');
+  const store = createStore({ backend, fetchImpl: async () => { requests++; return response(payload); } });
+  await store.save('saved', tile(), { codeToId });
+  store.registerManifest({ schemaVersion: 1, tiles: [{ identity: 'missing', url: '/missing', byteLength: payload.byteLength }] });
+  assert.equal((await store.load('saved', { idToCode, cacheMode: 'only' })).codes[0], 10);
+  assert.equal(await store.load('missing', { idToCode, cacheMode: 'only' }), null);
+  assert.equal(requests, 0);
+  assert.equal(store.stats().indexedDBHits, 1);
+  assert.equal(store.stats().misses, 0, 'a cache-only probe is not a full asset miss');
+  await assert.rejects(store.load('saved', { idToCode, cacheMode: 'invalid' }), /Invalid asset cache mode/);
+  store.dispose();
+});

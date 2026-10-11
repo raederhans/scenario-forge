@@ -37,6 +37,7 @@ export function createPoliticalIdRasterRuntimeOwner({
   let coordinates = null, fittedProjectionKey = "", rawIdentity = null;
   let codeToId = new Map(), idToCode = new Map(), tileIdentities = new WeakMap();
   let committedPlan = null, manifestKey = "", manifestPromise = null, assetError = "", assetTimeout = false;
+  let manifestReadyKey = "";
   let consecutiveAssetTimeouts = 0;
   let nextAssetProbeAt = 0, assetFailureKind = "", assetFailureOperation = "";
   let lastAssetFailure = null;
@@ -254,8 +255,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     return plan;
   }
 
-  async function registerManifest() {
-    const urlValue = h.getAssetManifestUrl?.();
+  async function registerManifest(urlValue) {
     if (!assetStore || !urlValue) return;
     if (manifestKey === urlValue) return manifestPromise;
     manifestController.abort();
@@ -289,6 +289,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       const manifest = JSON.parse(text);
       if (disposed || manifestKey !== urlValue) return;
       assetStore.registerManifest({ ...manifest, tiles: manifest.tiles?.map(tile => ({ ...tile, url: new URL(tile.url, url).href })) });
+      manifestReadyKey = urlValue;
       clearAssetFailure();
       consecutiveAssetTimeouts = 0;
       nextAssetProbeAt = 0;
@@ -340,13 +341,25 @@ export function createPoliticalIdRasterRuntimeOwner({
         // Prebuilt manifests are explicit; ordinary sessions issue no speculative requests.
         const failuresBefore = assetStore.stats().failures;
         const tile = await assetOperation(task, async signal => {
-          task.assetPhase = "manifest";
-          await registerManifest();
           task.assetPhase = "read";
           const startup = await workerReady;
           signal.throwIfAborted();
           if (!startup.ready) throw startup.error;
-          return assetStore.load(identity, { idToCode: maps.idToCode, signal });
+          const manifestUrl = h.getAssetManifestUrl?.();
+          const readCacheFirst = !!manifestUrl && manifestReadyKey !== manifestUrl;
+          if (readCacheFirst) {
+            // A valid persisted tile must not depend on a fresh network manifest.
+            // The bounded cache probe and any subsequent fetch share this deadline.
+            task.assetPhase = "cache-read";
+            const cached = await assetStore.load(identity, { idToCode: maps.idToCode, signal, cacheMode: "only" });
+            signal.throwIfAborted();
+            if (cached) return cached;
+          }
+          task.assetPhase = "manifest";
+          await registerManifest(manifestUrl);
+          signal.throwIfAborted();
+          task.assetPhase = "read";
+          return assetStore.load(identity, { idToCode: maps.idToCode, signal, cacheMode: readCacheFirst ? "skip" : "normal" });
         });
         task.controller.signal.throwIfAborted();
         if (tile) {

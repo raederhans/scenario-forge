@@ -99,7 +99,7 @@ export function createPoliticalIdRasterWorkerRuntime({
         }
         const signal = task.controller.signal;
         const value = task.type === "LOAD_POLITICAL_ID_ASSET"
-          ? await assetStore.load(task.identity, { idToCode: task.idToCode, signal })
+          ? await assetStore.load(task.identity, { idToCode: task.idToCode, signal, cacheMode: task.cacheMode })
           : await assetStore.save(task.identity, task.tile, { codeToId: task.codeToId, signal });
         if (!task.cancelled) postMessage({ type: "RESULT", taskId, value, assets: assetStore.stats(),
           assetTiming: { startedAt: task.assetStartedAt, finishedAt: performance.timeOrigin + performance.now() } },
