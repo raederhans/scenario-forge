@@ -1,0 +1,109 @@
+name: Raster second-delivery pan comparison
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-part2-pan.yml]
+permissions:
+  contents: read
+jobs:
+  pan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REPORT: .runtime/reports/generated/raster-part2-pan
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 195f49919d274b21294ebf349794bcae16cff747
+          fetch-depth: 1
+          persist-credentials: false
+          show-progress: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+      - name: Build exact artifact
+        run: |
+          mkdir -p "$REPORT"
+          git rev-parse HEAD > "$REPORT/revision.txt"
+          npm ci --ignore-scripts > "$REPORT/install.log" 2>&1
+          npx playwright install --with-deps chromium > "$REPORT/browser-install.log" 2>&1
+          python tools/build_pages_dist.py --output-root .runtime/raster-part2-pan-dist > "$REPORT/build.log" 2>&1
+      - name: Compare native and both raster presentations with actual Shift-drag
+        run: |
+          set -euo pipefail
+          cat > .runtime/verify-pan.mjs <<'JS'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs/promises';
+          import {openRasterApp} from '../tools/political_id_raster_app_session.mjs';
+          import {settle,summarize} from '../tools/profile_political_raster.mjs';
+          const report={revision:'195f49919d274b21294ebf349794bcae16cff747',scenarioId:'tno_1962',passed:false,samples:[],
+            measurement:'Real 24-step Shift-drag; rAF gaps and input-to-settle include automation pacing. No timed pixel readback; not FPS/INP/presentation.'};
+          const session=await openRasterApp('http://127.0.0.1:8008/app/',{scenarioId:report.scenarioId,enabled:false});
+          const {page}=session;
+          const mode=async value=>{
+            await page.evaluate(value=>{const u=new URL(location.href);u.searchParams.set('political_raster_present',value==='full'?'full':'retained');history.replaceState(null,'',u);window.__rasterTask.renderer.setPoliticalRenderMode(value==='vector'?'vector':'raster');},value);
+            await settle(page);
+          };
+          try {
+            await settle(page);
+            if(await page.locator('#scenarioGuidePopover').isVisible())await page.locator('#scenarioGuideCloseBtn').click();
+            await page.evaluate(()=>window.__rasterTask.renderer.setZoomPercent(180));await settle(page);
+            const baseline=await page.evaluate(()=>({colors:{...window.__rasterTask.state.visualOverrides},history:window.__rasterTask.state.historyPast.length}));
+            for(const value of ['vector','full','retained']) {
+              await mode(value);
+              for(const dx of [60,-60]) {
+                const before=await page.evaluate(()=>({...window.__rasterTask.state.zoomTransform}));
+                const box=await page.locator('#mapContainer').boundingBox();
+                const x=box.x+box.width/2,y=box.y+box.height/2;
+                await page.mouse.move(x,y);await page.keyboard.down('Shift');
+                await page.evaluate(()=>{
+                  const p=window.__panProbe={started:null,previous:null,frames:[]};
+                  const begin=e=>{p.started=e.timeStamp;};p.begin=begin;
+                  document.addEventListener('pointerdown',begin,{capture:true,once:true});
+                  const poll=now=>{if(p.started!==null){if(p.previous!==null)p.frames.push(now-p.previous);p.previous=now;}p.raf=requestAnimationFrame(poll);};p.raf=requestAnimationFrame(poll);
+                });
+                try {
+                  await page.mouse.down();await page.mouse.move(x+dx,y,{steps:24});await page.mouse.up();await page.keyboard.up('Shift');
+                  await settle(page);
+                  const sample=await page.evaluate(()=>({elapsedMs:performance.now()-window.__panProbe.started,frames:window.__panProbe.frames,
+                    after:{...window.__rasterTask.state.zoomTransform},diagnostics:window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics(),
+                    document:{colors:{...window.__rasterTask.state.visualOverrides},history:window.__rasterTask.state.historyPast.length}}));
+                  assert.ok(Math.hypot(sample.after.x-before.x,sample.after.y-before.y)>1,'Shift-drag must change the camera');
+                  assert.deepEqual(sample.document,baseline,'navigation cannot mutate paint/history');
+                  if(value!=='vector'){assert.equal(sample.diagnostics.actualBackend,'raster');assert.equal(sample.diagnostics.nativeRefinements,0);}
+                  report.samples.push({mode:value,dx,before,...sample,frameSummary:summarize(sample.frames)});
+                } finally {
+                  await page.mouse.up();await page.keyboard.up('Shift');
+                  await page.evaluate(()=>{cancelAnimationFrame(window.__panProbe.raf);document.removeEventListener('pointerdown',window.__panProbe.begin,true);});
+                }
+              }
+            }
+            // Capture outside all timing blocks. No native-refined reference.
+            await page.evaluate(()=>{const c=window.__rasterTask.state.renderPassCache.canvases.political;window.__panReference=c.getContext('2d').getImageData(0,0,c.width,c.height);});
+            await mode('full');
+            report.pixels=await page.evaluate(()=>{const c=window.__rasterTask.state.renderPassCache.canvases.political,a=window.__panReference;
+              if(c.width!==a.width||c.height!==a.height)throw Error('pixel dimensions changed');
+              const b=c.getContext('2d').getImageData(0,0,c.width,c.height);let overTolerance=0,maxDelta=0;
+              for(let i=0;i<a.data.length;i+=4){let d=0;for(let j=0;j<4;j++)d=Math.max(d,Math.abs(a.data[i+j]-b.data[i+j]));maxDelta=Math.max(maxDelta,d);if(d>1)overTolerance++;}
+              return{overTolerance,maxDelta,pixels:c.width*c.height};});
+            assert.equal(report.pixels.overTolerance,0);assert.deepEqual(session.errors,[]);report.passed=true;
+          } catch(error){report.error=String(error.stack||error);process.exitCode=1;}
+          finally {
+            report.errors=session.errors;report.warnings=session.warnings;await session.browser.close();
+            await fs.writeFile(`${process.env.REPORT}/pan.json`,JSON.stringify(report,null,2));
+            console.log(JSON.stringify({passed:report.passed,pixels:report.pixels,samples:report.samples.map(s=>({mode:s.mode,dx:s.dx,elapsedMs:s.elapsedMs,frameSummary:s.frameSummary,cache:s.diagnostics.presentationCache})),error:report.error}));
+          }
+          JS
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-part2-pan-dist > "$REPORT/server.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do if curl --fail --silent http://127.0.0.1:8008/app/ >/dev/null; then break; fi; sleep 1; done
+          timeout 300s node .runtime/verify-pan.mjs > "$REPORT/pan.log" 2>&1 || { cat "$REPORT/pan.log"; exit 1; }
+          cat "$REPORT/pan.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-part2-pan-evidence
+          path: .runtime/reports/generated/raster-part2-pan/
+          retention-days: 7
+          if-no-files-found: error
