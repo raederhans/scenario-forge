@@ -1,0 +1,32 @@
+name: Raster R0-R2 locked test dependencies
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-r0-r2-dependencies.yml]
+permissions:
+  contents: read
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: b09a2e8e40895789924adee4305750fc642458d6
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /package.json
+            /package-lock.json
+      - name: Install only existing locked dependencies
+        run: |
+          npm ci --ignore-scripts
+          mkdir -p .runtime/locked-dependencies
+          tar -czf .runtime/locked-dependencies/node_modules.tar.gz node_modules
+          cp package-lock.json .runtime/locked-dependencies/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: raster-r0-r2-locked-dependencies
+          path: .runtime/locked-dependencies/
+          retention-days: 2
