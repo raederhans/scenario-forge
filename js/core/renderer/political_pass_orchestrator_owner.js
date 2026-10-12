@@ -4,7 +4,6 @@ function requireFunction(candidate, label) {
   }
   return candidate;
 }
-
 export function createPoliticalPassOrchestratorOwner({
   getters = {},
   resolvers = {},
@@ -100,13 +99,33 @@ export function createPoliticalPassOrchestratorOwner({
     effects.clearPendingPoliticalColorEdit,
     "effects.clearPendingPoliticalColorEdit",
   );
-
+  const counters = { passes: 0, rasterPrimaryPasses: 0, hybridRasterPasses: 0,
+    nativeBackgroundPasses: 0, nativeFinePasses: 0, nativeFallbackPasses: 0, nativePartialRepaints: 0 };
+  let lastBackend = "none", lastReason = "not-drawn";
+  const validRasterMetrics = metrics => metrics && typeof metrics === "object"
+    && Object.hasOwn(metrics, "renderedIds") && Number.isFinite(Number(metrics.fillMs))
+    && Number.isFinite(Number(metrics.strokeMs)) && Number.isFinite(Number(metrics.renderedCount));
+  function commitRaster(metrics, identity, viewport, primary) {
+    for (const [metric, value] of [["drawPoliticalFeatureFillLoop", metrics.fillMs], ["drawPoliticalFeatureStrokeLoop", metrics.strokeMs]]) {
+      recordRenderPerfMetric(metric, Number(value || 0), { renderedCount: Number(metrics.renderedCount || 0),
+        visibleItemCount: viewport.visibleItemCount, source: "political-id-raster" });
+    }
+    clearPendingPoliticalColorEdit({ renderedCount: Number(metrics.renderedCount || 0),
+      renderedIds: metrics.renderedIds, paintSource: "political-id-raster" });
+    counters[primary ? "rasterPrimaryPasses" : "hybridRasterPasses"]++;
+    lastBackend = primary ? "raster" : "hybrid-raster";
+    lastReason = primary ? "complete-raster-coverage" : "fine-raster-coverage";
+    if (primary) effects.cancelNativeBackgroundPreparation?.();
+    return createPoliticalPassDrawResult(identity.sceneIdentity, {
+      politicalDataStage: "fine", fullPoliticalReady: true, finePoliticalCacheReady: true,
+      reason: primary ? "political-id-raster-primary" : "political-id-raster",
+    });
+  }
   function resolveRecoveryQuality(backgroundSummary) {
     return String(backgroundSummary?.recoveryQuality || resolvePoliticalRecoveryQualityEffect());
   }
-
   function drawBasePoliticalPass(k) {
-
+    counters.passes++;
     const identity = resolvePoliticalPassIdentity(k);
     recordPoliticalRasterWorkerSnapshot();
     const viewport = resolvePoliticalPassViewport(identity);
@@ -119,7 +138,6 @@ export function createPoliticalPassOrchestratorOwner({
     if (isRenderDiagnosticsEnabled()) {
       publishPoliticalPassDiagnostics({ identity, viewport });
     }
-
     const exportRendering = isExportRendering();
     const inlinePoliticalPartitions = hasInlinePoliticalPartitions();
     const idRasterSelected = !exportRendering && !inlinePoliticalPartitions && isPoliticalIdRasterSelected();
@@ -131,6 +149,7 @@ export function createPoliticalPassOrchestratorOwner({
       && drawPoliticalWorkerBitmapResult(consumedBitmapResult, identity.workerIdentity)
     ) {
       recordPoliticalRasterWorkerSnapshot();
+      lastBackend = "worker-bitmap"; lastReason = "political-raster-worker-bitmap";
       return createPoliticalPassDrawResult(identity.sceneIdentity, {
         politicalDataStage: "fine",
         fullPoliticalReady: true,
@@ -138,7 +157,15 @@ export function createPoliticalPassOrchestratorOwner({
         reason: "political-raster-worker-bitmap",
       });
     }
-
+    const primaryRaster = idRasterSelected && getters.isPoliticalIdRasterPrimary?.() === true;
+    if (primaryRaster && hasPoliticalLandFeatures()) {
+      const metrics = drawPoliticalIdRasterFine({ k, identity, viewport });
+      if (validRasterMetrics(metrics)) return commitRaster(metrics, identity, viewport, true);
+      counters.nativeFallbackPasses++;
+    }
+    counters.nativeBackgroundPasses++;
+    lastBackend = "vector";
+    lastReason = primaryRaster ? "raster-unavailable" : exportRendering ? "export" : inlinePoliticalPartitions ? "river-partitions" : "native-policy";
     const backgroundStartedAt = nowMs();
     const backgroundSummary = drawPoliticalBackgroundFills({ identity, viewport });
     recordRenderPerfMetric(
@@ -166,38 +193,9 @@ export function createPoliticalPassOrchestratorOwner({
         reason: "missing-land-data",
       });
     }
-
-    if (idRasterSelected) {
-      const idRasterMetrics = drawPoliticalIdRasterFine({ k, identity, viewport });
-      if (idRasterMetrics && typeof idRasterMetrics === "object"
-        && Object.hasOwn(idRasterMetrics, "renderedIds")
-        && Number.isFinite(Number(idRasterMetrics.fillMs))
-        && Number.isFinite(Number(idRasterMetrics.strokeMs))
-        && Number.isFinite(Number(idRasterMetrics.renderedCount))) {
-        recordRenderPerfMetric("drawPoliticalFeatureFillLoop", Number(idRasterMetrics.fillMs || 0), {
-          renderedCount: Number(idRasterMetrics.renderedCount || 0),
-          visibleItemCount: viewport.visibleItemCount,
-          source: "political-id-raster",
-        });
-        recordRenderPerfMetric("drawPoliticalFeatureStrokeLoop", Number(idRasterMetrics.strokeMs || 0), {
-          renderedCount: Number(idRasterMetrics.renderedCount || 0),
-          visibleItemCount: viewport.visibleItemCount,
-          source: "political-id-raster",
-        });
-        if (!exportRendering) {
-          clearPendingPoliticalColorEdit({
-            renderedCount: Number(idRasterMetrics.renderedCount || 0),
-            renderedIds: idRasterMetrics.renderedIds,
-            paintSource: "political-id-raster",
-          });
-        }
-        return createPoliticalPassDrawResult(identity.sceneIdentity, {
-          politicalDataStage: "fine",
-          fullPoliticalReady: true,
-          finePoliticalCacheReady: true,
-          reason: "political-id-raster",
-        });
-      }
+    if (idRasterSelected && !primaryRaster) {
+      const metrics = drawPoliticalIdRasterFine({ k, identity, viewport });
+      if (validRasterMetrics(metrics)) return commitRaster(metrics, identity, viewport, false);
     }
 
     const packetState = !idRasterSelected && !exportRendering && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()
@@ -242,6 +240,7 @@ export function createPoliticalPassOrchestratorOwner({
       });
     }
 
+    counters.nativeFinePasses++;
     const featureMetrics = drawPoliticalFineFeatureLoop({ k, identity, viewport });
     recordRenderPerfMetric("drawPoliticalFeatureFillLoop", Number(featureMetrics.fillMs || 0), {
       renderedCount: Number(featureMetrics.renderedCount || 0),
@@ -272,5 +271,8 @@ export function createPoliticalPassOrchestratorOwner({
     return result;
   }
 
-  return Object.freeze({ drawPoliticalPass });
+  return Object.freeze({ drawPoliticalPass,
+    noteNativePartialRepaint() { counters.nativePartialRepaints++; lastBackend = "vector-partial"; lastReason = "partial-feedback"; },
+    getDiagnostics: () => ({ ...counters, lastBackend, lastReason }),
+  });
 }

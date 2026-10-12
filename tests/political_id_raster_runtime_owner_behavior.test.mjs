@@ -87,6 +87,7 @@ function fixture({
   resourceBudget = null,
   resolveColor = item => item.color,
   refineAfterMs = null,
+  displayMode = "hybrid",
 } = {}) {
   const state = { zoomTransform: { ...transform }, dpr: 1 };
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
@@ -119,7 +120,7 @@ function fixture({
     client,
     cache,
     createGpu: createGpu || gpuHarness.createGpu,
-    resourceBudget, refineAfterMs,
+    resourceBudget, refineAfterMs, displayMode,
   });
   return {
     owner, state, identity, features, setFeatures(next) { features = next; }, h, layout,
@@ -630,3 +631,35 @@ for (const [name, change] of [
     assert.equal(f.renders.filter(reason => reason === 'political-id-raster-ready').length, readyRenders + 1);
   });
 }
+
+test("persistent coverage stays raster after idle, palette edits and brush release without native refinement", async t => {
+  const f = fixture({ displayMode: "raster", refineAfterMs: 0 }); t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const builds = f.owner.getDiagnostics().builds;
+  const sequence = ["#aa0000", "#00aa00", "#0000aa", "#00aa00"];
+  for (const color of sequence) {
+    f.features[0].color = color; f.identity.colorVersion++;
+    assert.ok(f.owner.draw());
+    f.owner.noteNativePartialRepaint(); f.owner.finishNativePartialRepaint();
+    await new Promise(resolve => setTimeout(resolve, 5));
+    const d = f.owner.getDiagnostics();
+    assert.equal(d.displayState, "accelerated"); assert.equal(d.nativeRefinements, 0);
+    assert.equal(d.refinementPending, false); assert.equal(d.builds, builds);
+    assert.equal(f.owner.hasNativeFrame(), false);
+  }
+  assert.equal(f.renders.some(reason => /refine/.test(reason)), false);
+});
+
+test("persistent owner keeps geometry cancellation and unavailable-output fallback", async t => {
+  const f = fixture({ displayMode: "raster", refineAfterMs: 0 }); t.after(() => f.owner.dispose());
+  f.owner.draw(); const old = f.requests[0];
+  f.features[0] = { ...f.features[0], geometry: { type: "Polygon", coordinates: [[[0,0],[1,0],[0,1],[0,0]]] } };
+  f.identity.version++;
+  assert.equal(f.owner.draw(), null); assert.equal(old.signal.aborted, true);
+  await resolveAll(f); assert.ok(f.owner.draw());
+  f.state.zoomTransform.x += 20;
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().nativeRefinements, 0);
+  f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().contextLosses, 1);
+});

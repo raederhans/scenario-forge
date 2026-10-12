@@ -187,7 +187,7 @@ test("P3.3a document locks the political-pass preflight and P3.3b seam", () => {
   }
 });
 
-test("implemented political owner keeps the frozen top-level orchestration order", () => {
+test("political owner preserves legacy order after a gated complete-raster early pass", () => {
   const ownerSource = readRepoFile(CANONICAL_OWNER_PATH);
   const drawSource = extractFunctionSource(ownerSource, "drawBasePoliticalPass");
   assertOrderedTokens(drawSource, [
@@ -207,14 +207,17 @@ test("implemented political owner keeps the frozen top-level orchestration order
     "drawPoliticalWorkerBitmapResult(consumedBitmapResult, identity.workerIdentity)",
     "recordPoliticalRasterWorkerSnapshot();",
     'reason: "political-raster-worker-bitmap"',
+    "const primaryRaster = idRasterSelected && getters.isPoliticalIdRasterPrimary?.() === true;",
+    "if (primaryRaster && hasPoliticalLandFeatures())",
+    "if (validRasterMetrics(metrics)) return commitRaster(metrics, identity, viewport, true);",
     "const backgroundStartedAt = nowMs();",
     "const backgroundSummary = drawPoliticalBackgroundFills({ identity, viewport });",
     '"drawPoliticalBackgroundFillsPass"',
     "if (!hasPoliticalLandFeatures())",
     'reason: "missing-land-data"',
-    "if (idRasterSelected) {",
-    "const idRasterMetrics = drawPoliticalIdRasterFine({ k, identity, viewport });",
-    'reason: "political-id-raster"',
+    "if (idRasterSelected && !primaryRaster) {",
+    "const metrics = drawPoliticalIdRasterFine({ k, identity, viewport });",
+    "if (validRasterMetrics(metrics)) return commitRaster(metrics, identity, viewport, false);",
     "const packetState = !idRasterSelected && !exportRendering && !inlinePoliticalPartitions && isPoliticalRasterWorkerBitmapEnabled()",
     "buildPoliticalRasterWorkerPacketEffect({ identity, viewport })",
     "if (!idRasterSelected && !exportRendering && !inlinePoliticalPartitions) requestPoliticalRasterWorkerPassEffect({ identity, viewport, packetState });",
@@ -354,7 +357,10 @@ test("fine drawing and diagnostics live in the partial owner while state writes 
     'politicalDataStage: "fine"',
     'reason: "fine-feature-loop"',
   ], "fine political result");
-  assert.equal((ownerSource.match(/return createPoliticalPassDrawResult\(/g) || []).length, 5);
+  assert.equal((ownerSource.match(/return createPoliticalPassDrawResult\(/g) || []).length, 4);
+  const rasterCommit = extractFunctionSource(readRepoFile(CANONICAL_OWNER_PATH), "commitRaster");
+  assert.equal((rasterCommit.match(/return createPoliticalPassDrawResult\(/g) || []).length, 1);
+  assert.ok(rasterCommit.includes('paintSource: "political-id-raster"'));
   assert.equal((maskStringAndCommentContent(ownerSource).match(/^\s*return;\s*$/gm) || []).length, 0);
 });
 

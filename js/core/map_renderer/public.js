@@ -6,6 +6,7 @@ export {
   initMap,
   getPoliticalIdRasterDiagnostics,
   setPoliticalIdRasterTrialEnabled,
+  setPoliticalRenderMode,
   getPopulationHeatmapRenderReadiness,
   assertPopulationHeatmapReadyForExport,
   ensurePopulationHeatmapReadyForExport,

@@ -406,3 +406,35 @@ export function createPoliticalIdRasterSource({
 
   return Object.freeze({ publish, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
 }
+
+/** Complete display coverage: noninteractive support underneath the interactive fine pass.
+ * Different geometries for the same ID cannot silently stand in for one another.
+ * The caller applies the existing visual exclusion and painter-order policies.
+ */
+export function collectPoliticalRasterDisplayFeatures({ fullCollection, interactiveCollection, getId = getFeatureId }) {
+  const fine = readFeatures(interactiveCollection);
+  const full = fullCollection ? readFeatures(fullCollection) : fine;
+  const fineById = new Map(), seen = new Set();
+  const identify = feature => {
+    const id = normalizeFeatureId(getId(feature));
+    if (!id) throw new TypeError("Complete raster coverage requires stable feature IDs.");
+    return id;
+  };
+  for (const feature of fine) {
+    const id = identify(feature);
+    if (fineById.has(id)) throw new TypeError(`Duplicate interactive feature ID "${id}".`);
+    fineById.set(id, feature);
+  }
+  const support = [];
+  for (const feature of full) {
+    const id = identify(feature);
+    if (seen.has(id)) throw new TypeError(`Duplicate full feature ID "${id}".`);
+    seen.add(id);
+    const interactive = fineById.get(id);
+    if (interactive && interactive.geometry !== feature.geometry) {
+      throw new TypeError(`Conflicting display geometry for feature "${id}".`);
+    }
+    if (!interactive) support.push(feature);
+  }
+  return [...support, ...fine];
+}

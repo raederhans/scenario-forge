@@ -29,8 +29,10 @@ export function createPoliticalIdRasterRuntimeOwner({
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
   assetStore = undefined,
   identityBuilder = createPoliticalIdRasterIdentityBuilder(), canonicalCoordinates = true, gutter = 0,
-  assetTimeoutMs = 1500, assetRetryAfterMs = 5000, refineAfterMs = null,
+  assetTimeoutMs = 1500, assetRetryAfterMs = 5000, refineAfterMs = null, displayMode = "hybrid",
 }) {
+  if (!["raster", "hybrid"].includes(displayMode)) throw new TypeError("Invalid raster display mode.");
+  const persistent = displayMode === "raster";
   const worker = client || createPoliticalIdRasterWorkerClient();
   if (assetStore === undefined) assetStore = globalThis.indexedDB
     ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
@@ -67,6 +69,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     }
   }
   function scheduleRefinement() {
+    if (persistent) return;
     // Pixel alignment does not make canonical tessellation identical to the
     // native path; every configured view must finish with the exact producer.
     if (!(Number.isFinite(refineAfterMs) && refineAfterMs >= 0) || refinementTimer !== null) return;
@@ -93,6 +96,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     }, refineAfterMs);
   }
   function noteNativePartialRepaint() {
+    if (persistent) return;
     if (disposed || !h.isEnabled() || !(Number.isFinite(refineAfterMs) && refineAfterMs >= 0)) return;
     cancelRefinement();
     nativePartialPending = true;
@@ -601,7 +605,7 @@ export function createPoliticalIdRasterRuntimeOwner({
 
   return Object.freeze({ prepare, draw, queryPoint, noteNativePartialRepaint,
     finishNativePartialRepaint() { if (nativePartialPending) noteNativePartialRepaint(); },
-    hasNativeFrame: () => !disposed && (displayState === "precise" || nativePartialPending),
+    hasNativeFrame: () => !disposed && !persistent && (displayState === "precise" || nativePartialPending),
     async exportAssets() {
       if (disposed || !snapshot) return [];
       return cache.entries().flatMap(([, tile]) => {
@@ -610,7 +614,7 @@ export function createPoliticalIdRasterRuntimeOwner({
       });
     },
     getPendingWorkCount: () => active ? 1 : 0,
-    getDiagnostics: () => ({ ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
+    getDiagnostics: () => ({ displayMode, persistent, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
       pending: active ? 1 : 0, failed, selected: h.isEnabled(), displayState, reason,
       firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null,
       sceneKey: snapshot?.sceneKey || "", level: plan?.level ?? null,

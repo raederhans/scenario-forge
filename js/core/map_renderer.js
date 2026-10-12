@@ -45,7 +45,8 @@ import { createPoliticalDerivedStateCache } from "./renderer/political_derived_s
 import { getPoliticalGeometrySnapshot, registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";
 import { createCountryFillPaletteOwner } from "./renderer/country_fill_palette_owner.js";
 import { createGeometryRasterRuntimeOwner } from "./renderer/geometry_raster_runtime_owner.js";
-import { readPoliticalIdRasterPreference, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
+import { readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility, publishPoliticalIdRasterStatus } from "./renderer/political_id_raster_trial.js";
+import { collectPoliticalRasterDisplayFeatures } from "./renderer/political_id_raster_source.js";
 import { createPoliticalIdRasterRuntimeOwner } from "./renderer/political_id_raster_runtime_owner.js";
 import { createOverviewFrameOwner } from "./renderer/overview_frame_owner.js";
 import { createNavigationSceneOwner } from "./renderer/navigation_scene_owner.js";
@@ -3444,16 +3445,26 @@ function getContextPassOrchestratorOwner() {
 }
 
 function getPoliticalIdRasterEligibilityReason() {
-  return getPoliticalIdRasterEligibility({ requested: readPoliticalIdRasterPreference(), exporting: exportRenderInProgress,
+  return getPoliticalIdRasterEligibility({ requested: readPoliticalRenderPolicy().requested, exporting: exportRenderInProgress,
     debugMode, ready: isBootInteractionReady(), firstVisible: runtimeState.firstVisibleFramePainted,
     readonly: runtimeState.startupReadonly, unlocking: runtimeState.startupReadonlyUnlockInFlight,
     riverPartitions: hasVisibleRiverPartitions(), scenarioId: runtimeState.activeScenarioId });
 }
 
 function isPoliticalIdRasterSelected() { return getPoliticalIdRasterEligibilityReason() === "eligible"; }
+function isPoliticalIdRasterPrimary() { return readPoliticalRenderPolicy().persistent; }
+
+export function setPoliticalRenderMode(mode) {
+  writePoliticalRenderMode(mode);
+  resetPoliticalRasterPolicy();
+}
 
 export function setPoliticalIdRasterTrialEnabled(enabled) {
   writePoliticalIdRasterPreference(!!enabled);
+  resetPoliticalRasterPolicy();
+}
+
+function resetPoliticalRasterPolicy() {
   politicalIdRasterRuntimeOwner?.dispose();
   politicalIdRasterRuntimeOwner = null;
   politicalIdRasterActivationKey = "";
@@ -3468,6 +3479,7 @@ function getPoliticalIdRasterRuntimeOwner() {
     surface: rendererSurfaceHost,
     resourceBudget: pageResourceBudget,
     refineAfterMs: 180,
+    displayMode: isPoliticalIdRasterPrimary() ? "raster" : "hybrid",
     helpers: {
       isEnabled: isPoliticalIdRasterSelected,
       isBrushActive: () => !!brushSession,
@@ -3475,8 +3487,10 @@ function getPoliticalIdRasterRuntimeOwner() {
       getBounds: (feature, id) => getProjectedFeatureBounds(feature, { featureId: id }),
       getLayout: () => getRenderPassLayout("political"),
       hasStroke: feature => !isAtlantropaSeaFeature(feature),
-      getAssetSceneKey: () => runtimeState.activeScenarioId,
+      getAssetSceneKey: () => `${runtimeState.activeScenarioId}${isPoliticalIdRasterPrimary() ? ":complete-display-v1" : ""}`,
       getAssetManifestUrl: () => {
+        // Existing prebuilt assets cover only the fine pass, not its support background.
+        if (isPoliticalIdRasterPrimary()) return "";
         const override = new URLSearchParams(globalThis.location?.search || "").get("political_id_assets");
         return override === "0" ? "" : override || runtimeState.activeScenarioManifest?.political_id_raster_manifest_url || "";
       },
@@ -3492,7 +3506,10 @@ function getPoliticalIdRasterRuntimeOwner() {
       },
       getFeatures: () => {
         const layout = getRenderPassLayout("political");
-        return orderPoliticalShellUnderlayFirst((runtimeState.landData?.features || []).map((feature, drawOrder) => ({
+        const features = isPoliticalIdRasterPrimary() ? collectPoliticalRasterDisplayFeatures({
+          fullCollection: runtimeState.landDataFull, interactiveCollection: runtimeState.landData, getId: getFeatureId,
+        }) : runtimeState.landData?.features || [];
+        return orderPoliticalShellUnderlayFirst(features.map((feature, drawOrder) => ({
           feature, drawOrder, id: getFeatureId(feature),
         })).filter(({ feature, id }) => id && feature.geometry && !shouldExcludePoliticalVisualFeature(feature, id)
           && !shouldSkipFeature(feature, layout.paddedWidth, layout.paddedHeight))).map(entry => entry.feature);
@@ -3508,8 +3525,9 @@ function getPoliticalIdRasterRuntimeOwner() {
           sceneKey: [runtimeState.activeScenarioId, runtimeState.sceneGeneration].join(":"),
           projectionKey: String(getProjectionGeometryGeneration(rendererSurfaceHost.getProjection())),
           coverageKey: [runtimeState.mapSemanticMode,
-            runtimeState.scenarioShellOverlayRevision].join(":"),
-          version: [getObjectIdentityToken(runtimeState.landData?.features), runtimeState.topologyRevision,
+            runtimeState.scenarioShellOverlayRevision, isPoliticalIdRasterPrimary() ? "complete-display-v1" : "fine"].join(":"),
+          version: [getObjectIdentityToken(runtimeState.landData?.features),
+            isPoliticalIdRasterPrimary() ? getObjectIdentityToken(runtimeState.landDataFull?.features) : "fine", runtimeState.topologyRevision,
             runtimeState.scenarioDataGeneration, runtimeState.sovereigntyRevision,
             layout.paddedWidth, layout.paddedHeight,
             [...foreground].sort().join(",")].join(":"),
@@ -3622,6 +3640,7 @@ function getPoliticalPassOrchestratorOwner() {
       isExportRendering: () => exportRenderInProgress,
       hasInlinePoliticalPartitions: hasVisibleRiverPartitions,
       isPoliticalIdRasterSelected,
+      isPoliticalIdRasterPrimary,
     },
     resolvers: {
       resolvePoliticalPassIdentity,
@@ -3644,6 +3663,8 @@ function getPoliticalPassOrchestratorOwner() {
       requestPoliticalRasterWorkerPass: requestPoliticalPassWorker,
       drawPoliticalFineFeatureLoop,
       drawPoliticalIdRasterFine: () => getPoliticalIdRasterRuntimeOwner().draw(),
+      cancelNativeBackgroundPreparation: () => politicalBackgroundRenderOwner?.cancelScenarioPoliticalBackgroundDeferredFullCache(
+        "political-id-raster-primary", { force: true }),
       drawPoliticalPartitions: k => getRiverPaintRenderOwner().draw(k),
       clearPendingPoliticalColorEdit,
     },
@@ -3810,6 +3831,7 @@ function getPoliticalPartialRepaintOwner() {
       recordPassTiming,
       drawPartitionForParent: (feature, k) => getRiverPaintRenderOwner().draw(k, getFeatureId(feature)),
       onPartialRepaint: () => {
+        getPoliticalPassOrchestratorOwner().noteNativePartialRepaint();
         if (isPoliticalIdRasterSelected()) politicalIdRasterRuntimeOwner?.noteNativePartialRepaint();
       },
       commitPoliticalPassDiagnostics: (politicalPassDiagnostics) => {
@@ -14221,7 +14243,7 @@ function render() {
     if (setCanvasSize({ reason: "display-quality-change" })) markAllOverlaysDirty();
   }
   ensureResolvedColorsReadyForStableVisibleFrame("render");
-  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}` : "";
+  const rasterActivation = isPoliticalIdRasterSelected() ? `${runtimeState.activeScenarioId}:${runtimeState.sceneGeneration}:${readPoliticalRenderPolicy().effectiveMode}` : "";
   if (rasterActivation !== politicalIdRasterActivationKey) {
     politicalIdRasterActivationKey = rasterActivation;
     // Preserve the current native frame while the initial assets load. The
@@ -15896,7 +15918,11 @@ export function getRendererAsyncWorkStatus() {
 export function getPoliticalIdRasterDiagnostics() {
   const reason = getPoliticalIdRasterEligibilityReason();
   const current = politicalIdRasterRuntimeOwner?.getDiagnostics();
-  return { ...current, requested: readPoliticalIdRasterPreference(), selected: reason === "eligible",
+  const policy = readPoliticalRenderPolicy();
+  const passes = politicalPassOrchestratorOwner?.getDiagnostics() || {};
+  return { ...current, ...policy, passes,
+    actualBackend: passes.lastBackend || "none", sourceCoverage: policy.persistent ? "complete-display-v1" : "fine",
+    runtimeVersion: "raster-r0-r2-v1", selected: reason === "eligible",
     pending: current?.pending || 0,
     displayState: reason === "off" ? "off" : reason !== "eligible" ? "fallback" : current?.displayState || "preparing",
     reason: reason === "eligible" ? current?.reason || "awaiting-render" : reason };

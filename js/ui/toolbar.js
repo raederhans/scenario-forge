@@ -21,6 +21,7 @@ import {
 import {
   getPoliticalIdRasterDiagnostics,
   setPoliticalIdRasterTrialEnabled,
+  setPoliticalRenderMode,
   autoFillMap,
   getZoomPercent,
   focusRiverPaintParentById,
@@ -210,7 +211,7 @@ const EXPORT_MAX_CONCURRENT_JOBS = 1;
 
 
 function initToolbar({ render } = {}) {
-  bindPoliticalRasterTrialControl({ getDiagnostics: getPoliticalIdRasterDiagnostics, setEnabled: setPoliticalIdRasterTrialEnabled, t });
+  bindPoliticalRasterTrialControl({ getDiagnostics: getPoliticalIdRasterDiagnostics, setEnabled: setPoliticalIdRasterTrialEnabled, setMode: setPoliticalRenderMode, t });
   // toolbar.js 保留的是壳层接线职责：集中拿 DOM、拼 controller、注册 runtime hooks。
   // 各个面板自身的业务逻辑应继续留在子 controller，避免再把 owner 逻辑回流到这个大文件。
   const OCEAN_ADVANCED_PRESETS = new Set([

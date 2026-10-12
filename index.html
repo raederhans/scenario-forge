@@ -404,8 +404,16 @@
                     <input id="politicalRasterTrial" type="checkbox" class="checkbox-input" aria-describedby="politicalRasterTrialStatus" />
                     <span data-i18n="Raster acceleration (experimental)">Raster acceleration (experimental)</span>
                   </label>
+                  <label class="toggle-label mt-3" for="politicalRenderMode" data-i18n="Political display mode">Political display mode</label>
+                  <select id="politicalRenderMode" aria-describedby="politicalRenderBackend" class="select-input">
+                    <option value="auto" data-i18n="Automatic (native during evaluation)">Automatic (native during evaluation)</option>
+                    <option value="raster" data-i18n="Persistent raster candidate">Persistent raster candidate</option>
+                    <option value="vector" data-i18n="Native vector compatibility">Native vector compatibility</option>
+                    <option value="hybrid" data-i18n="Legacy hybrid comparison">Legacy hybrid comparison</option>
+                  </select>
+                  <p id="politicalRenderBackend" class="hint-text" role="status"></p>
                   <p id="politicalRasterTrialStatus" class="hint-text" role="status"></p>
-                  <p class="hint-text" data-i18n="For 1936, 1939 and TNO. Detail is restored after navigation.">For 1936, 1939 and TNO. Detail is restored after navigation.</p>
+                  <p class="hint-text" data-i18n="Persistent raster stays raster after navigation; legacy hybrid restores native detail.">Persistent raster stays raster after navigation; legacy hybrid restores native detail.</p>
                 </details>
                 <div class="appearance-subsection-stack mt-3">
                   <details class="appearance-mini-section">

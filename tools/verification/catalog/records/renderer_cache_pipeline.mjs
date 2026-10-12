@@ -19,6 +19,7 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
       "tools/refresh_political_id_raster_snapshot.py",
       "tools/political_id_raster_app_session.mjs",
       "tools/verify_political_id_raster_integration.mjs",
+      "tools/verify_political_raster_resident.mjs",
     ],
   },
   {
