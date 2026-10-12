@@ -1,0 +1,120 @@
+name: Raster second-delivery memory and final pixels
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-part2-memory.yml]
+permissions:
+  contents: write
+concurrency:
+  group: raster-part2-memory-owned
+  cancel-in-progress: false
+jobs:
+  memory-and-pixels:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      REPORT: .runtime/reports/generated/raster-part2-memory
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: codex/raster-r0-r2-20261012
+          fetch-depth: 7
+          show-progress: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+      - name: Verify released tile lifetime before publishing the owned fix
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = a16fdadd1f12b128af65397fa1bbdee6ff7640d1
+          mkdir -p "$REPORT"
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          git fetch --depth=1 origin "${{ github.sha }}"
+          git show "${{ github.sha }}:.github/raster-part2/memory.py" > .runtime/memory.py
+          python .runtime/memory.py
+          npm ci --ignore-scripts > "$REPORT/install.log" 2>&1
+          node --expose-gc --test tests/political_id_raster_display_cache_behavior.test.mjs > "$REPORT/gc.log" 2>&1 || { cat "$REPORT/gc.log"; exit 1; }
+          tail -12 "$REPORT/gc.log"
+          node --test tests/political_id_raster*.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs > "$REPORT/targeted.log" 2>&1 || { tail -100 "$REPORT/targeted.log"; exit 1; }
+          tail -12 "$REPORT/targeted.log"
+          npm run verify:architecture-boundaries > "$REPORT/architecture.log" 2>&1
+          python -m unittest tests.test_map_renderer_political_pass_orchestrator_boundary_contract -q
+          git diff --check
+          npm run pr:plan > "$REPORT/pr-plan.log" 2>&1
+          git add js/core/renderer/political_id_raster_display_cache.js tests/political_id_raster_display_cache_behavior.test.mjs docs/active/political-raster-part2-20261012.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(renderer): keep retained frame identities from owning evicted tile payloads'
+          git push origin HEAD:refs/heads/codex/raster-r0-r2-20261012
+          git rev-parse HEAD > "$REPORT/revision.txt"
+      - name: Build exact final candidate for pixel and lifecycle checks
+        run: |
+          npx playwright install --with-deps chromium > "$REPORT/browser-install.log" 2>&1
+          python tools/build_pages_dist.py --output-root .runtime/raster-part2-memory-dist > "$REPORT/build.log" 2>&1
+          tail -5 "$REPORT/build.log"
+      - name: Verify final-head pixels and history in three scenarios plus DPR2
+        run: |
+          set -euo pipefail
+          cat > .runtime/check-final-pixels.mjs <<'JS'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs/promises';
+          import { openRasterApp } from '../tools/political_id_raster_app_session.mjs';
+          import { settle } from '../tools/profile_political_raster.mjs';
+          import { editHistory, brushHistory } from '../tools/verify_political_id_raster_integration.mjs';
+          const reports=[];
+          const reportDir=process.env.REPORT;
+          async function mode(page,value) {
+            await page.evaluate(value=>{const u=new URL(location.href);u.searchParams.set('political_raster_present',value);history.replaceState(null,'',u);window.__rasterTask.renderer.setPoliticalRenderMode('raster');},value);
+            await settle(page);
+            assert.equal(await page.evaluate(()=>window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().actualBackend),'raster');
+          }
+          async function parity(page,label) {
+            await page.evaluate(()=>{const c=window.__rasterTask.state.renderPassCache.canvases.political;window.__memoryPixels=c.getContext('2d').getImageData(0,0,c.width,c.height);});
+            await mode(page,'full');
+            const result=await page.evaluate(()=>{const c=window.__rasterTask.state.renderPassCache.canvases.political,a=window.__memoryPixels;
+              if(c.width!==a.width||c.height!==a.height)throw Error('dimensions changed');
+              const b=c.getContext('2d').getImageData(0,0,c.width,c.height);let maxDelta=0,overTolerance=0;
+              for(let i=0;i<a.data.length;i+=4){let delta=0;for(let j=0;j<4;j++)delta=Math.max(delta,Math.abs(a.data[i+j]-b.data[i+j]));maxDelta=Math.max(maxDelta,delta);if(delta>1)overTolerance++;}
+              delete window.__memoryPixels;return{pixels:c.width*c.height,maxDelta,overTolerance};});
+            assert.equal(result.overTolerance,0,label);await mode(page,'retained');return{label,...result};
+          }
+          for(const [scenarioId,dpr] of [['hoi4_1939',1],['hoi4_1936',1],['tno_1962',1],['tno_1962',2]]) {
+            const r={scenarioId,dpr,passed:false,pixels:[]};reports.push(r);let session;
+            try {
+              session=await openRasterApp('http://127.0.0.1:8008/app/',{scenarioId,dpr,enabled:false});const{page}=session;await settle(page);
+              if(await page.locator('#scenarioGuidePopover').isVisible())await page.locator('#scenarioGuideCloseBtn').click();
+              await mode(page,'retained');r.initial=await page.evaluate(()=>window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+              for(const zoom of [100,130]) {
+                await page.evaluate(v=>window.__rasterTask.renderer.setZoomPercent(v),zoom);await settle(page);
+                r.pixels.push(await parity(page,`zoom-${zoom}`));
+              }
+              await page.locator('#paintModeVisualBtn').click();await page.locator('#toolFillBtn').click();
+              r.edit=await editHistory(page,false,settle);r.brush=await brushHistory(page,false,settle);
+              r.pixels.push(await parity(page,'edited-history'));
+              r.final=await page.evaluate(()=>window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+              const d=r.final;
+              assert.ok(d.cpuBytes<=48*1024*1024);
+              assert.ok(d.gpu.gpuTextureBytes+d.gpu.outputSurfaceBytesEstimate+(d.presentationCache?.retainedSurfaceBytes||0)<=80*1024*1024);
+              assert.equal(d.automaticRasterEnabled,false);assert.equal(d.nativeRefinements,0);
+              assert.deepEqual(session.errors,[]);r.passed=true;
+              console.log('PIXELS',JSON.stringify({scenarioId,dpr,passed:r.passed,pixels:r.pixels,presentation:d.presentation,retainedBytes:d.presentationCache?.retainedSurfaceBytes,gpu:d.gpu}));
+            } catch(error) {r.error=String(error.stack||error);console.log('PIXEL_FAILURE',JSON.stringify(r));throw error;}
+            finally {if(session)await session.browser.close();await fs.writeFile(`${reportDir}/final-pixels.json`,JSON.stringify(reports,null,2));}
+          }
+          JS
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-part2-memory-dist > "$REPORT/server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8008/app/ >/dev/null; then break; fi
+            sleep 1
+          done
+          timeout 720s node .runtime/check-final-pixels.mjs > "$REPORT/pixels.log" 2>&1 || { cat "$REPORT/pixels.log"; exit 1; }
+          cat "$REPORT/pixels.log"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-part2-memory-pixel-evidence
+          path: .runtime/reports/generated/raster-part2-memory/
+          retention-days: 7
+          if-no-files-found: error
