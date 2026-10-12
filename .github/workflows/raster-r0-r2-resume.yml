@@ -1,74 +1,36 @@
-name: Raster R0-R2 resume validation
+name: Raster R0-R2 evidence receipt
 on:
   push:
     branches: [codex/raster-r0-r2-bootstrap-20261012]
     paths: [.github/workflows/raster-r0-r2-resume.yml]
 permissions:
-  contents: read
-concurrency:
-  group: raster-r0-r2-owned-candidate
-  cancel-in-progress: false
+  actions: read
 jobs:
-  verify:
+  receipt:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      REPORT: .runtime/reports/generated/raster-r0-r2-resume
+    timeout-minutes: 3
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-        with:
-          ref: 3817897a94c8cd7857b073f6402be6ae3429e708
-          fetch-depth: 4
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: '20'
-      - name: Record environment and independent planning result
+      - name: Read completed pinned evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p "$REPORT/browser"
-          git update-ref refs/remotes/origin/main b09a2e8e40895789924adee4305750fc642458d6
-          git rev-parse HEAD > "$REPORT/revision.txt"
-          npm ci --ignore-scripts > "$REPORT/install.log" 2>&1
-          node --version
-          node --test tests/political_id_raster_source_behavior.test.mjs tests/political_id_raster_trial_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs > "$REPORT/targeted-tests.log" 2>&1
-          tail -12 "$REPORT/targeted-tests.log"
-          if npm run pr:plan > "$REPORT/pr-plan.log" 2>&1; then
-            echo passed > "$REPORT/planning-status.txt"
-          else
-            echo failed > "$REPORT/planning-status.txt"
-          fi
-          echo '=== PLANNING ==='
-          tail -60 "$REPORT/pr-plan.log"
-      - name: Prepare locked browser and pinned Pages artifact
-        run: |
-          npx playwright install --with-deps chromium > "$REPORT/browser-install.log" 2>&1
-          python tools/build_pages_dist.py --output-root .runtime/raster-r0-r2-resume-dist > "$REPORT/build.log" 2>&1
-          tail -5 "$REPORT/build.log"
-      - name: Exercise resident coverage and editing
-        run: |
-          set -uo pipefail
-          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-r0-r2-resume-dist > "$REPORT/server.log" 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
-          for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:8008/app/ > /dev/null; then break; fi
-            sleep 1
-          done
-          status=0
-          for scenario in hoi4_1939 hoi4_1936 tno_1962; do
-            timeout 360s node tools/verify_political_raster_resident.mjs --base-url http://127.0.0.1:8008/app/ --scenario "$scenario" --rounds 2 --revision "$(git rev-parse HEAD)" --output "$REPORT/browser" > "$REPORT/$scenario.log" 2>&1 || status=1
-            cat "$REPORT/$scenario.log"
-            if test -f "$REPORT/browser/$scenario.json"; then
-              node -e 'const r=require("./"+process.argv[1]); console.log(JSON.stringify({stage:r.stage,activationMs:r.activationMs,edit:r.edit,brush:r.brush,initial:r.initial,final:r.final,failureDiagnostics:r.failureDiagnostics,geometryComparison:r.geometryComparison,errors:r.errors},null,2))' "$REPORT/browser/$scenario.json"
-            fi
-            if test "$status" != 0; then break; fi
-          done
-          echo "$status" > "$REPORT/browser-exit-code.txt"
-          exit "$status"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: raster-r0-r2-resume-evidence
-          path: .runtime/reports/generated/raster-r0-r2-resume/
-          retention-days: 7
-          if-no-files-found: error
+          mkdir -p .runtime/input
+          gh run download 38204434010 --repo raederhans/scenario-forge --name raster-r0-r2-resume-evidence --dir .runtime/input
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('.runtime/input')
+          print('PINNED REVISION:', (root / 'revision.txt').read_text().strip())
+          print('PLANNING EXIT:', (root / 'planning-status.txt').read_text().strip())
+          print('BROWSER EXIT:', (root / 'browser-exit-code.txt').read_text().strip())
+          lines = (root / 'pr-plan.log').read_text().splitlines()
+          print('PLANNING SUMMARY:')
+          print('\n'.join(lines[:70]))
+          for scenario in ('hoi4_1939', 'hoi4_1936', 'tno_1962'):
+              r = json.loads((root / 'browser' / (scenario + '.json')).read_text())
+              assert r.get('passed') is True, scenario
+              fields = {key: r.get(key) for key in ('scenarioId', 'revision', 'environment', 'browserVersion', 'viewport', 'dpr', 'activationMs', 'stage', 'navigation', 'errors', 'warnings')}
+              fields['topLevelFields'] = list(r)
+              fields['samples'] = r.get('samples', [])
+              print(json.dumps(fields, ensure_ascii=False))
+          PY
