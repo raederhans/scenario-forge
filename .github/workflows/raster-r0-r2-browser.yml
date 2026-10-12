@@ -1,0 +1,53 @@
+name: Raster R0-R2 candidate browser
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-r0-r2-browser.yml]
+permissions:
+  contents: read
+concurrency:
+  group: raster-r0-r2-owned-candidate
+  cancel-in-progress: false
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: 8aab1720e832292511cb83046e414c3a8d951f2e
+          fetch-depth: 2
+      - name: Record exact candidate and resolve the planning base
+        run: |
+          mkdir -p .runtime/reports/generated/raster-r0-r2/browser
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          git rev-parse HEAD > .runtime/reports/generated/raster-r0-r2/candidate-commit.txt
+          npm ci --ignore-scripts
+          npm run pr:plan > .runtime/reports/generated/raster-r0-r2/pr-plan.log 2>&1
+      - name: Install locked Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build candidate Pages artifact
+        run: python tools/build_pages_dist.py --output-root .runtime/raster-r0-r2-dist
+      - name: Exercise persistent editing and paired same-document timing
+        run: |
+          set -euo pipefail
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-r0-r2-dist > .runtime/reports/generated/raster-r0-r2/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8008/app/ > /dev/null; then break; fi
+            sleep 1
+          done
+          status=0
+          for scenario in hoi4_1939 hoi4_1936 tno_1962; do
+            timeout 360s node tools/verify_political_raster_resident.mjs --base-url http://127.0.0.1:8008/app/ --scenario "$scenario" --rounds 2 --revision "$(git rev-parse HEAD)" --output .runtime/reports/generated/raster-r0-r2/browser > ".runtime/reports/generated/raster-r0-r2/$scenario.log" 2>&1 || status=1
+            cat ".runtime/reports/generated/raster-r0-r2/$scenario.log"
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-r0-r2-browser-evidence
+          path: .runtime/reports/generated/raster-r0-r2/
+          retention-days: 7
+          if-no-files-found: error
