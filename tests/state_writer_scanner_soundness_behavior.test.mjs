@@ -2142,7 +2142,7 @@ test("action binding discovery fails closed when a non-target parameter is mutat
 });
 
 test("paint delegation keeps its target effectful and binds read-only siblings to exact source", async () => {
-  const modulePath = "js/core/state/color_state.js";
+  const modulePath = "js/core/state/actions/visual_paint_actions.js";
   const source = await readFile(new URL("../" + modulePath, import.meta.url), "utf8");
   const binding = parameterBindingFor(source, "applyFeaturePaintState", "target");
   const inventory = scanStateMutationInventory(source, { filePath: modulePath, bindings: [binding] });
@@ -2150,21 +2150,31 @@ test("paint delegation keeps its target effectful and binds read-only siblings t
   for (const statement of ["featureIds.push('bad');", "value.changed = true;"]) {
     const marker = "if (!Array.isArray(featureIds))";
     assert.ok(source.includes(marker));
-    await assert.rejects(discoverStateWriterBindingsForSource(modulePath,
-      source.replace(marker, statement + " " + marker), "production", { scanAllParameters: true }),
-      error => error.code === "state-effectful-delegator-source-mismatch");
+    assert.ok((await validateStateActionNonTargetParameterMutations(modulePath,
+      source.replace(marker, statement + " " + marker))).length > 0);
   }
+  const facadePath = "js/core/state/color_state.js";
+  const facadeSource = await readFile(new URL("../" + facadePath, import.meta.url), "utf8");
+  const facadeBinding = parameterBindingFor(facadeSource, "applyFeaturePaintState", "target");
+  const facadeInventory = scanStateMutationInventory(facadeSource, { filePath: facadePath, bindings: [facadeBinding] });
+  assert.ok(facadeInventory.actionDelegations.some(edge => edge.actionModulePath === modulePath
+    && edge.actionExportName === "applyFeaturePaintState"));
+  const facadeMarker = "return applyVisualFeaturePaintState(target";
+  assert.ok(facadeSource.includes(facadeMarker));
+  await assert.rejects(discoverStateWriterBindingsForSource(facadePath,
+    facadeSource.replace(facadeMarker, "featureIds.push('bad'); " + facadeMarker), "production", { scanAllParameters: true }),
+    error => error.code === "state-effectful-delegator-source-mismatch");
   const actionPath = "js/core/state/actions/scenario_activation_actions.js";
   const actionSource = await readFile(new URL("../" + actionPath, import.meta.url), "utf8");
   for (const replacement of [
-    "applyFeaturePaintState(target, featureIds, color, {});",
+    "applyFeaturePaintState(featureIds, target, color);",
     "unknownPaintState(target, featureIds, color);",
     "featureIds.push('bad'); applyFeaturePaintState(target, featureIds, color);",
   ]) {
     const marker = "applyFeaturePaintState(target, featureIds, color);";
     assert.ok(actionSource.includes(marker));
     assert.ok((await validateStateActionNonTargetParameterMutations(actionPath,
-      actionSource.replace(marker, replacement))).length > 0);
+      actionSource.replace(marker, replacement))).length > 0, replacement);
   }
 });
 

@@ -111,6 +111,8 @@ const P4_4_NODE_ROUTE_SOURCE_REFS = Object.freeze([
   "tools/state_visual_paint_contract.mjs",
   "tools/state_governance_source_refresh.mjs",
   "tools/state_resource_origin_contract.mjs",
+  "tools/state_localization_borrow_contract.mjs",
+  "tools/state_political_cache_borrow_contract.mjs",
   "tools/state_writer_inventory.mjs",
   "js/core/map_renderer/exact_after_settle_scheduler.js",
   "js/core/state/actions/appearance_actions.js",

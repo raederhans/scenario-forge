@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { parse } from "acorn";
 import * as walk from "acorn-walk";
+import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources } from "./state_political_cache_borrow_contract.mjs";
+import { STATE_LOCALIZATION_BORROW_MODULE_PATH, inspectStateLocalizationBorrowSources } from "./state_localization_borrow_contract.mjs";
 import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
 import {
@@ -2180,6 +2182,8 @@ function analyzeBindingMutations(
     recognizeCurrentContracts = true,
     getBindingMutationAnalysisContextForScan = null,
     getSourceBoundOwnerProofPreparationForScan = null,
+    getPoliticalCacheProofForScan = null,
+    getLocalizationProofForScan = null,
   } = {},
 ) {
   const normalizedDerivedAliasTaintMode =
@@ -2392,6 +2396,9 @@ function analyzeBindingMutations(
     if (!node) {
       return { status: "none", reference: null };
     }
+    if (provenPoliticalCacheOperation(node)) return { status: "none", reference: null };
+    const localizationResult = provenLocalizationResult(node);
+    if (localizationResult) return localizationResult;
     const scopedOperation = provenScopedBorrowedOperation(node);
     if (scopedOperation) return scopedOperation.borrowedResultPaths.length
       ? { status: "maybe", reference: null, borrowedPaths: scopedOperation.borrowedResultPaths }
@@ -3212,6 +3219,8 @@ function analyzeBindingMutations(
   }
 
   function processEvent(event, aliasRecords) {
+    if (provenPoliticalCacheOperation(event)) return;
+    if (provenLocalizationMapCall(event)) return;
     if (event.type === "AssignmentExpression" && event.operator === "="
       && isProvenOwnerBorrowedStorageSlot(event.left)) return;
     if (event.type === "CallExpression" && isProvenOwnerBorrowedArrayAppend(event)) return;
@@ -4463,6 +4472,71 @@ function analyzeBindingMutations(
       && createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex") === entry.operationSourceFingerprint) || null;
   }
 
+  function provenPoliticalCacheOperation(node) {
+    if (!recognizeCurrentContracts || filePath !== POLITICAL_CACHE_RENDERER_PATH
+      || node?.type !== "CallExpression") return null;
+    const operation = getPoliticalCacheProofForScan()?.operationsByKey[`${node.start}:${node.end}`];
+    // Admit only exact private-baseline writes with scalar/undefined results.
+    // The read methods retain their diagnostics until result borrowers are proved.
+    return operation?.admitCall === true && !operation.borrowedResultPaths.length ? operation : null;
+  }
+
+  function localizationProof() {
+    // The borrowed origin is this exact imported state binding, not every
+    // independently scanned parameter in the two helpers.
+    return recognizeCurrentContracts && filePath === STATE_LOCALIZATION_BORROW_MODULE_PATH
+      && binding.kind === "module" && binding.name === "runtimeState"
+      && binding.importSource === "./state.js" && binding.importedName === "state"
+      ? getLocalizationProofForScan() : null;
+  }
+
+  function localizationOperation(node) {
+    return node && localizationProof()?.operations.get(`${node.start}:${node.end}`);
+  }
+
+  function localizationResultClassification(result) {
+    if (result?.kind === "private-map-capability") return {
+      status: "maybe", reference: null, borrowedPaths: [],
+      privateBorrowedStorage: result.storageIdentity,
+    };
+    if (result?.borrowedResultPaths) return {
+      status: "maybe", reference: null, borrowedPaths: result.borrowedResultPaths,
+    };
+    return result?.kind === "scalar" ? { status: "none", reference: null } : null;
+  }
+
+  function provenLocalizationResult(node) {
+    const proof = localizationProof();
+    if (!proof) return null;
+    const operation = localizationOperation(node);
+    if (operation) return localizationResultClassification(operation.result);
+    if (node.type !== "Identifier") return null;
+    const record = analysis.resolveIdentifier(node);
+    const local = record?.ownerNode && proof.bindings.get(`${record.ownerNode.start}:${record.ownerNode.end}`);
+    if (!local || local.name !== record.name) return null;
+    // This is an allocation capability, not a detached object or a root-state
+    // alias. Its lazy establishment and the closed lookup argument are source-bound.
+    return localizationResultClassification(local.provenance);
+  }
+
+  function provenLocalizationMapCall(node) {
+    const operation = node?.type === "CallExpression" && localizationOperation(node);
+    return operation && ["private-map-set", "private-map-get", "private-map-has"].includes(operation.kind)
+      ? operation : null;
+  }
+
+  function isProvenLocalizationReturn(expression, aliasRecords) {
+    const proof = localizationProof();
+    const expected = expression && proof?.returns.get(`${expression.start}:${expression.end}`);
+    if (!expected || currentExecutionFunction()?.id?.name !== expected.functionName) return false;
+    const classification = referenceClassification(expression, aliasRecords);
+    if (expected.result.kind === "private-map-capability") {
+      return classification.privateBorrowedStorage === expected.result.storageIdentity;
+    }
+    return Boolean(classification.borrowedPaths?.length
+      && expected.result.borrowedResultPaths?.some(path => path.length === 0));
+  }
+
   function provenScopedMembershipCall(node) {
     const callee = unwrapChain(node?.callee);
     if (node?.type !== "CallExpression" || node.optional || callee?.type !== "MemberExpression" || callee.computed
@@ -4597,6 +4671,7 @@ function analyzeBindingMutations(
   }
 
   function isProvenOwnerBorrowedReturn(expression, aliasRecords) {
+    if (isProvenLocalizationReturn(expression, aliasRecords)) return true;
     if (consumedBorrowedReturnFunctions.has(currentExecutionFunction())) return true;
     const allowed = provenOwnerBorrowedReturnPaths(currentExecutionFunction());
     const classification = referenceClassification(expression, aliasRecords);
@@ -5357,9 +5432,11 @@ function analyzeBindingMutations(
       return aliasRecords;
     }
     if (node.type === "CallExpression" || node.type === "NewExpression") {
+      const politicalCacheOperation = provenPoliticalCacheOperation(node);
+      const localizationMapCall = provenLocalizationMapCall(node);
       const scopedOperation = provenScopedBorrowedOperation(node);
       const scopedMembershipCall = provenScopedMembershipCall(node);
-      if (scopedOperation && node.callee.type === "MemberExpression") {
+      if ((scopedOperation || politicalCacheOperation || localizationMapCall) && node.callee.type === "MemberExpression") {
         processExpression(node.callee.object, aliasRecords, { suppressContainerEscape: true });
       } else processExpression(node.callee, aliasRecords);
       if (node.type === "CallExpression" && isBorrowedRuntimeHookValue(node.callee)) {
@@ -5424,6 +5501,8 @@ function analyzeBindingMutations(
         } else processExpression(argument, aliasRecords, {
           suppressContainerEscape: Boolean(
             scopedOperation || provenBorrowedArrayAppend
+            || politicalCacheOperation?.borrowedArgumentIndexes.includes(argumentIndex)
+            || Boolean(localizationMapCall)
             || provenDirectBorrowedCallbackInvocation(node)?.invocationBorrowedArgumentIndexes.includes(argumentIndex)
             || (localBorrowedHelper && !executionFunctionStack.includes(localBorrowedHelper)
               && localBorrowedHelper.params?.[argumentIndex]
@@ -5504,6 +5583,9 @@ function analyzeBindingMutations(
       if (provenBorrowedArrayAppend) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
       if (scopedOperation) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
       if (scopedMembershipCall) for (const index of scopedMembershipCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (politicalCacheOperation) for (const index of politicalCacheOperation.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (localizationMapCall) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
+      if (localizationOperation(node)?.kind === "lookup-helper-invocation") delegatedArgumentIndexes.add(1);
       if (provenCapabilityCall) for (const index of provenCapabilityCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (provenBorrowedMapRead) delegatedArgumentIndexes.add(0);
       if (runtimeMethod) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
@@ -5521,7 +5603,7 @@ function analyzeBindingMutations(
       ) {
         delegatedArgumentIndexes.add(0);
       }
-      if (node.type === "CallExpression" && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !runtimeMethod && !borrowedArrayIteration) {
+      if (node.type === "CallExpression" && !politicalCacheOperation && !localizationMapCall && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !runtimeMethod && !borrowedArrayIteration) {
         recordUnknownCallMutation(
           node,
           receiverClassification,
@@ -6967,6 +7049,28 @@ export function scanStateMutationInventory(
   }
   let bindingMutationAnalysisContext = null;
   let sourceBoundOwnerProofPreparation = null;
+  let politicalCacheProof;
+  let localizationProof;
+  const getLocalizationProofForScan = () => {
+    if (localizationProof === undefined) {
+      const receipt = recognizeCurrentContracts && filePath === STATE_LOCALIZATION_BORROW_MODULE_PATH
+        ? inspectStateLocalizationBorrowSources({ source: normalizedSource }).receipt : null;
+      localizationProof = receipt ? {
+        receipt,
+        operations: new Map(Object.values(receipt.operationsByKey).map(operation =>
+          [`${operation.expression.start}:${operation.expression.end}`, operation])),
+        bindings: new Map(receipt.localBindings.map(local => [`${local.declaration.start}:${local.declaration.end}`, local])),
+        returns: new Map(Object.entries(receipt.functions).flatMap(([functionName, entry]) => entry.returns.map(ret =>
+          [`${ret.expression.start}:${ret.expression.end}`, { ...ret, functionName }]))),
+      } : null;
+    }
+    return localizationProof;
+  };
+  const getPoliticalCacheProofForScan = () => {
+    if (politicalCacheProof === undefined) politicalCacheProof = recognizeCurrentContracts && filePath === POLITICAL_CACHE_RENDERER_PATH
+      ? inspectStatePoliticalCacheBorrowSources({ source: normalizedSource }).receipt : null;
+    return politicalCacheProof;
+  };
   const getBindingMutationAnalysisContextForScan = () => {
     if (
       analysisInstrumentation?.bindingMutationAnalysisContextMode
@@ -7013,6 +7117,8 @@ export function scanStateMutationInventory(
           recognizeCurrentContracts,
           getBindingMutationAnalysisContextForScan,
           getSourceBoundOwnerProofPreparationForScan,
+          getPoliticalCacheProofForScan,
+          getLocalizationProofForScan,
         },
       );
     });
