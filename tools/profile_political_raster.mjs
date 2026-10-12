@@ -13,8 +13,8 @@ export function summarize(values) {
   return { count:n, median:n%2 ? sorted[(n-1)/2] : (sorted[n/2-1]+sorted[n/2])/2,
     p95:sorted[Math.ceil(n*0.95)-1], max:sorted[n-1] };
 }
-async function settle(page) {
-  const handle = await page.waitForFunction(residentFrameReady, null, { timeout:30000 });
+export async function settle(page) {
+  const handle = await page.waitForFunction(residentFrameReady, undefined, { timeout:30000 });
   await handle.dispose();
 }
 async function mode(page, value) {

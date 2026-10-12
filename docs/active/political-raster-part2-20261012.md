@@ -25,3 +25,8 @@ Acceptance requires focused tests, architectural boundaries, three-scenario resi
 The interactive terminal and Python execution tools returned ClientError before any command ran in this conversation. No conclusion about the user's separately configured cloud workspace follows. Implementation and tests use the already connected repository and its isolated GitHub Actions bootstrap branch. No new cloud service, paid machine, credentials, main push, merge or deployment is created.
 
 Results are recorded separately after execution, pinned to their tested revision. This document does not predeclare tests successful.
+
+
+## Initial verification receipt
+
+Run 38217354006 committed runtime 250a17e392bec8862a716a828d0ba5ed3a51a166 after 243 focused Node cases, five Python boundaries, architecture and current source-family checks passed. The browser then stopped before any quality/timing sample: the new profiling wrapper passed null to a predicate whose default argument requires undefined. This is a harness bug, not a product or user-environment failure. Its correction changes the invocation and adds a regression; readiness and pixel tolerances remain unchanged. Additional coverage verifies that the optional retained surface cannot shrink the existing raster resource envelope.

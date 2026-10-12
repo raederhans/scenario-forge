@@ -687,3 +687,17 @@ test("resident presentation reuses stable RGBA and accounts its retained surface
   f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
   assert.equal(f.owner.getDiagnostics().presentationCache.fullUpdates, count + 1);
 });
+
+
+test("optional presentation budget falls back to full GPU without disabling valid raster", async t => {
+  const f = fixture({ displayMode: "raster", width:3800, height:2200 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const d = f.owner.getDiagnostics();
+  assert.equal(d.displayState, "accelerated");
+  assert.equal(d.presentation, "full-gpu");
+  assert.equal(d.presentationCache.retainedSurfaceBytes, 0);
+  assert.equal(d.reason, "coverage-ready");
+  assert.ok(d.gpu.outputSurfaceBytesEstimate < 80*1024*1024);
+  assert.equal(d.nativeRefinements,0);
+});

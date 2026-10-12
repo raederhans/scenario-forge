@@ -92,3 +92,17 @@ test("invalid frames and unavailable 2D surfaces fail closed", () => {
   assert.throws(() => cache.draw(f.input), /2D surface/);
   assert.equal(cache.getStats().retainedSurfaceBytes, 0);
 });
+
+
+test("profiling preserves the readiness function default state argument", async () => {
+  const { settle, summarize } = await import("../tools/profile_political_raster.mjs");
+  let disposed = false;
+  await settle({ waitForFunction: async (predicate, argument) => {
+    assert.equal(typeof predicate, "function");
+    assert.equal(argument, undefined, "null overrides the readiness predicate default state");
+    return { dispose() { disposed = true; } };
+  } });
+  assert.equal(disposed, true);
+  assert.deepEqual(summarize([4,1,3,2]), {count:4,median:2.5,p95:4,max:4});
+  assert.throws(() => summarize([]), /samples/);
+});
