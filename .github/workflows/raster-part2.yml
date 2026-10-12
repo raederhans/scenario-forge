@@ -1,0 +1,117 @@
+name: Raster second-delivery candidate
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-part2.yml]
+permissions:
+  contents: write
+concurrency:
+  group: raster-r0-r2-owned-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      REPORT: .runtime/reports/generated/raster-part2
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: codex/raster-r0-r2-20261012
+          fetch-depth: 5
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+      - name: Apply owned changes to the exact reviewed baseline
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 33b9f754d1e55298450ecca34e75d404b3f20906
+          mkdir -p "$REPORT/browser" .runtime/part2-payload
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          git fetch --depth=1 origin "${{ github.sha }}"
+          for file in display-cache.js cache-tests.mjs profile.mjs apply.py; do
+            git show "${{ github.sha }}:.github/raster-part2/$file" > ".runtime/part2-payload/$file"
+          done
+          git ls-files '**/AGENTS.md' > "$REPORT/nested-rules.txt"
+          python .runtime/part2-payload/apply.py
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('js/core/renderer/political_id_raster_runtime_owner.js')
+          s=p.read_text()
+          s=s.replace(' * (displayCache ? 2 : 1)', '')
+          old='      const startedAt = performance.now();\n      const paletteKey'
+          assert s.count(old)==1
+          s=s.replace(old, '''      // Keep legacy raster eligibility at large DPR: when the additional
+                // retained surface would exceed the existing cap, use full GPU output.
+                const useRetained = !!displayCache && estimate + plan.width * plan.height * 4 <= GPU_LIMIT;
+                if (!useRetained) displayCache?.reset();
+                const startedAt = performance.now();
+                const paletteKey''')
+          s=s.replace('      if (displayCache) frame = displayCache.draw', '      if (useRetained) frame = displayCache.draw')
+          s=s.replace('presentation: displayCache ? "retained-regions" : "full-gpu",', 'presentation: displayCache?.getStats().retainedSurfaceBytes ? "retained-regions" : "full-gpu",')
+          s=s.replace('gpuSubmitMs: presentation?.lastGpuMs ?? rasterDoneAt - tilesDoneAt,', 'gpuSubmitMs: useRetained ? presentation.lastGpuMs : rasterDoneAt - tilesDoneAt,')
+          s=s.replace('captureMs: presentation?.lastCaptureMs || 0,', 'captureMs: useRetained ? presentation.lastCaptureMs : 0,')
+          s=s.replace('// Include BOTH temporary GPU output and retained RGBA in the same\n        // unchanged 80 MiB admission limit, before either allocation.', '// Base full-GPU estimate; optional retained output is admitted separately\n        // against the unchanged 80 MiB limit before allocation.')
+          p.write_text(s)
+          p=Path('js/core/renderer/political_id_raster_gpu.js')
+          s=p.read_text()
+          old='      for (const [tile, resource] of resident) {\n        for (let unit = 0; unit < resource.textures.length; unit++) {'
+          assert s.count(old)==1
+          s=s.replace(old, '''      for (const [tile, resource] of resident) {
+                  const x = (tile.originX || 0) - originX, y = (tile.originY || 0) - originY;
+                  if (x >= width || y >= height || x + tile.width <= 0 || y + tile.height <= 0) continue;
+                  for (let unit = 0; unit < resource.textures.length; unit++) {''')
+          p.write_text(s)
+          p=Path('docs/active/political-raster-part2-20261012.md')
+          s=p.read_text().replace('Existing CPU/asset deadlines', 'If only the extra retained surface cannot fit, presentation uses the original full-GPU path instead of reducing raster eligibility. Existing CPU/asset deadlines')
+          p.write_text(s)
+          PY
+          git diff --check
+          npm ci --ignore-scripts > "$REPORT/install.log" 2>&1
+      - name: Focused renderer behavior and architecture
+        run: |
+          set -euo pipefail
+          node --test tests/political_id_raster*.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs > "$REPORT/targeted.log" 2>&1 || { tail -100 "$REPORT/targeted.log"; exit 1; }
+          tail -12 "$REPORT/targeted.log"
+          npm run verify:architecture-boundaries > "$REPORT/architecture.log" 2>&1 || { cat "$REPORT/architecture.log"; exit 1; }
+          python -m unittest tests.test_map_renderer_political_pass_orchestrator_boundary_contract -q
+          node --test --test-name-pattern='all remaining declared source-proof families' tests/state_target_private_cache_contract_behavior.test.mjs > "$REPORT/source-proofs.log" 2>&1 || { tail -80 "$REPORT/source-proofs.log"; exit 1; }
+          node tools/verification/script_portfolio.mjs check > "$REPORT/portfolio.log" 2>&1 || { cat "$REPORT/portfolio.log"; exit 1; }
+          node --check tools/profile_political_raster.mjs
+          npm run pr:plan > "$REPORT/pr-plan.log" 2>&1
+      - name: Publish isolated candidate only
+        run: |
+          set -euo pipefail
+          git add js/core/renderer/political_id_raster_display_cache.js js/core/renderer/political_id_raster_runtime_owner.js js/core/renderer/political_id_raster_gpu.js tests/political_id_raster_display_cache_behavior.test.mjs tests/political_id_raster_runtime_owner_behavior.test.mjs tools/profile_political_raster.mjs tools/verification/catalog/records/renderer_cache_pipeline.mjs docs/active/political-raster-part2-20261012.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'perf(renderer): retain bounded raster regions and separate pixel checks from profiling'
+          git push origin HEAD:refs/heads/codex/raster-r0-r2-20261012
+          git rev-parse HEAD > "$REPORT/revision.txt"
+          git diff --stat HEAD^ HEAD > "$REPORT/diff-stat.txt"
+      - name: Build candidate artifact and install locked browser
+        run: |
+          npx playwright install --with-deps chromium > "$REPORT/browser-install.log" 2>&1
+          python tools/build_pages_dist.py --output-root .runtime/raster-part2-dist > "$REPORT/build.log" 2>&1
+          tail -5 "$REPORT/build.log"
+      - name: Validate paired pixels and profile actual input without timed readback
+        run: |
+          set -euo pipefail
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-part2-dist > "$REPORT/server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8008/app/ >/dev/null; then break; fi
+            sleep 1
+          done
+          for scenario in hoi4_1939 hoi4_1936 tno_1962; do
+            timeout 420s node tools/profile_political_raster.mjs --base-url http://127.0.0.1:8008/app/ --scenario "$scenario" --revision "$(git rev-parse HEAD)" --output "$REPORT/browser" > "$REPORT/$scenario.log" 2>&1 || { cat "$REPORT/$scenario.log"; exit 1; }
+            cat "$REPORT/$scenario.log"
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-part2-candidate-evidence
+          path: .runtime/reports/generated/raster-part2/
+          retention-days: 7
+          if-no-files-found: error
