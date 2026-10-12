@@ -1,0 +1,34 @@
+name: Raster R0-R2 isolated baseline
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-r0-r2-bootstrap.yml]
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: b09a2e8e40895789924adee4305750fc642458d6
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Export tracked baseline without credentials or working files
+        run: |
+          mkdir -p .runtime/raster-r0-r2-bootstrap
+          git rev-parse HEAD > .runtime/raster-r0-r2-bootstrap/source-commit.txt
+          git archive --format=tar HEAD | gzip -1 > .runtime/raster-r0-r2-bootstrap/source.tar.gz
+          sha256sum .runtime/raster-r0-r2-bootstrap/source.tar.gz > .runtime/raster-r0-r2-bootstrap/source.sha256
+      - name: Run existing focused baseline tests
+        run: |
+          node --test tests/political_id_raster_runtime_owner_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs > .runtime/raster-r0-r2-bootstrap/node-baseline.log 2>&1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-r0-r2-pinned-baseline
+          path: .runtime/raster-r0-r2-bootstrap/
+          retention-days: 2
+          compression-level: 0
+          if-no-files-found: error
