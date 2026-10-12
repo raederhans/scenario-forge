@@ -313,10 +313,10 @@ test("complete display includes support coverage without copying geometry or cha
 });
 
 test("complete display refuses duplicate or conflicting identity instead of dropping background coverage", () => {
-  const fine = { id: "a", geometry: {} };
+  const fine = { id: "a", geometry: { type: "Point", coordinates: [0,0] } };
   const collect = full => collectPoliticalRasterDisplayFeatures({ fullCollection: { features: full }, interactiveCollection: { features: [fine] }, getId: f => f.id });
   assert.throws(() => collect([fine,fine]), /Duplicate full/);
-  assert.throws(() => collect([{ id: "a", geometry: {} }]), /Conflicting display geometry/);
+  assert.throws(() => collect([{ id: "a", geometry: { type: "Point", coordinates: [1,0] } }]), /Conflicting display geometry/);
   assert.throws(() => collect([{ geometry: {} }]), /stable feature IDs/);
   assert.deepEqual(collectPoliticalRasterDisplayFeatures({ interactiveCollection: { features: [fine] }, getId: f => f.id }), [fine]);
 });
@@ -333,4 +333,16 @@ test("replacing geometry inside unchanged bounds invalidates coverage while pure
   const colored = h.source.updateColors(["a"]);
   assert.equal(colored.geometryRevision, after.geometryRevision);
   assert.equal(colored.paletteRevision, after.paletteRevision + 1);
+});
+
+
+test("full and interactive wrappers with equal immutable geometry share canonical display identity", () => {
+  const geometry = { type: "Polygon", coordinates: [[[0,0],[2,0],[1,2],[0,0]]] };
+  const full = { id: "a", geometry };
+  const fine = { id: "a", geometry: structuredClone(geometry), properties: { role: "interactive" } };
+  const collect = () => collectPoliticalRasterDisplayFeatures({ fullCollection: { features: [full] }, interactiveCollection: { features: [fine] }, getId: f=>f.id });
+  assert.deepEqual(collect(), [fine]);
+  assert.deepEqual(collect(), [fine]);
+  fine.geometry = { type: "Polygon", coordinates: [[[0,0],[2,0],[1,1],[0,0]]] };
+  assert.throws(collect, /Conflicting display geometry/, "same bounds or ID must not admit changed coverage");
 });

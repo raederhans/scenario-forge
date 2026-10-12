@@ -702,3 +702,17 @@ test("persistent preference cannot override export, river partitions or missing 
     assert.equal(h.owner.getDiagnostics().rasterPrimaryPasses, 0);
   }
 });
+
+
+test("native export does not replace the last visible resident backend diagnostic", () => {
+  let exporting = false;
+  const h = createHarness({ idRasterSelected: true,
+    idRasterMetrics: { fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["a"]) },
+    overrides: { getters: { isPoliticalIdRasterPrimary: () => true, isExportRendering: () => exporting } } });
+  h.owner.drawPoliticalPass(3);
+  assert.equal(h.owner.getDiagnostics().lastBackend, "raster");
+  exporting = true;
+  h.owner.drawPoliticalPass(3);
+  assert.equal(h.owner.getDiagnostics().lastBackend, "raster");
+  assert.equal(h.owner.getDiagnostics().nativeFinePasses, 1);
+});

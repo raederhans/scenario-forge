@@ -164,8 +164,8 @@ export function createPoliticalPassOrchestratorOwner({
       counters.nativeFallbackPasses++;
     }
     counters.nativeBackgroundPasses++;
-    lastBackend = "vector";
-    lastReason = primaryRaster ? "raster-unavailable" : exportRendering ? "export" : inlinePoliticalPartitions ? "river-partitions" : "native-policy";
+    // Export draws into a separate target; it must not relabel the visible editor frame.
+    if (!exportRendering) { lastBackend = "vector"; lastReason = primaryRaster ? "raster-unavailable" : inlinePoliticalPartitions ? "river-partitions" : "native-policy"; }
     const backgroundStartedAt = nowMs();
     const backgroundSummary = drawPoliticalBackgroundFills({ identity, viewport });
     recordRenderPerfMetric(

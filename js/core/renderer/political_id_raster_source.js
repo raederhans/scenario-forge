@@ -407,8 +407,23 @@ export function createPoliticalIdRasterSource({
   return Object.freeze({ publish, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
 }
 
+// Full/fine state views may wrap or clone the same immutable geometry. Identity
+// alone is not a shape comparison. Cache exact JSON equality by both objects;
+// geometry changes still require replacement under the existing source contract.
+const displayGeometryEquivalence = new WeakMap();
+function equalDisplayGeometry(left, right) {
+  if (left === right) return true;
+  if (!left || !right || typeof left !== "object" || typeof right !== "object" || left.type !== right.type) return false;
+  let compared = displayGeometryEquivalence.get(left);
+  if (!compared) { compared = new WeakMap(); displayGeometryEquivalence.set(left, compared); }
+  if (compared.has(right)) return compared.get(right);
+  const same = JSON.stringify(left) === JSON.stringify(right);
+  compared.set(right, same);
+  return same;
+}
+
 /** Complete display coverage: noninteractive support underneath the interactive fine pass.
- * Different geometries for the same ID cannot silently stand in for one another.
+ * Different shapes for the same ID cannot silently stand in for one another.
  * The caller applies the existing visual exclusion and painter-order policies.
  */
 export function collectPoliticalRasterDisplayFeatures({ fullCollection, interactiveCollection, getId = getFeatureId }) {
@@ -431,7 +446,7 @@ export function collectPoliticalRasterDisplayFeatures({ fullCollection, interact
     if (seen.has(id)) throw new TypeError(`Duplicate full feature ID "${id}".`);
     seen.add(id);
     const interactive = fineById.get(id);
-    if (interactive && interactive.geometry !== feature.geometry) {
+    if (interactive && !equalDisplayGeometry(interactive.geometry, feature.geometry)) {
       throw new TypeError(`Conflicting display geometry for feature "${id}".`);
     }
     if (!interactive) support.push(feature);

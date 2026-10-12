@@ -92,6 +92,7 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
     samples: [], lifecycle: [], network: [] };
   let session;
   try {
+    report.stage = "startup";
     session = await openRasterApp(baseUrl, { scenarioId, enabled: false });
     const { page } = session;
     report.browser = session.browser.version();
@@ -101,18 +102,25 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
       return gl ? { renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) } : null;
     });
     await settle(page);
+    if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
     await page.locator("#paintModeVisualBtn").click(); await page.locator("#toolFillBtn").click();
     const baselineColors = await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides }));
     // Exercise a cold resident activation separately from warm timing.
+    report.stage = "resident-activation";
+    const activationStarted = performance.now();
     await setMode(page,"raster");
+    report.activationMs = performance.now() - activationStarted;
     report.initial = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+    report.stage = "resident-edit-history";
     const edit = await editHistory(page, false, settle);
+    report.stage = "resident-brush-history";
     const brush = await brushHistory(page, false, settle);
     report.lifecycle.push({ mode: "raster", edit, brush });
     assert.equal(brush.historyEntries,1); assert.equal(brush.pointerSteps,41);
     await page.locator("#undoBtn").click(); await settle(page);
     await page.locator("#undoBtn").click(); await settle(page);
     assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), baselineColors);
+    report.stage = "resident-navigation";
     for (const zoom of [130,100]) {
       await page.evaluate(value => window.__rasterTask.renderer.setZoomPercent(value), zoom); await settle(page);
       assert.equal(await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().actualBackend),"raster");
@@ -120,6 +128,7 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
     // Prime one foreground edit once. All later measurements use identical warm coverage/order.
     await paintProbe(page,"#e31ac4");
     for (const mode of [...Array.from({ length: rounds }, () => ["vector","raster"]).flat(), "hybrid"]) {
+      report.stage = `warm-${mode}-${report.samples.length}`;
       await setMode(page,mode);
       await paintProbe(page,"#cc9911");
       const before = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
@@ -145,13 +154,29 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
     if (output) await page.screenshot({ path: path.join(output,`${scenarioId}-resident.png`) });
     report.final = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
     assert.equal(report.final.actualBackend,"raster"); assert.equal(report.final.nativeRefinements,0);
-    assert.deepEqual(session.errors,[]); report.passed = true;
+    assert.deepEqual(session.errors,[]); report.stage = "complete"; report.passed = true;
   } catch(error) {
     report.error = String(error?.stack || error);
     if (session) {
       report.failureDiagnostics = await session.page.evaluate(() => ({ diagnostics: window.__rasterTask?.renderer.getPoliticalIdRasterDiagnostics(),
         bootPhase: window.__rasterTask?.state.bootPhase, dirty: window.__rasterTask?.state.renderPassCache?.dirty,
-        chunk: window.__rasterTask?.state.runtimeChunkLoadState })).catch(()=>null);
+        chunk: Object.fromEntries(["generation","pendingReason","refreshScheduled","promotionScheduled","promotionCommitInFlight","promotionCommitStatus"]
+          .map(key => [key,window.__rasterTask?.state.runtimeChunkLoadState?.[key]])) })).catch(()=>null);
+      if (/Conflicting display geometry/.test(report.failureDiagnostics?.diagnostics?.failed || "")) {
+        report.geometryComparison = await session.page.evaluate(async () => {
+          const { getFeatureId } = await import(new URL("js/core/feature_identity.js", document.baseURI));
+          const { state, renderer } = window.__rasterTask;
+          const id = /feature "([^"]+)"/.exec(renderer.getPoliticalIdRasterDiagnostics().failed)?.[1];
+          const full = state.landDataFull?.features.find(f => getFeatureId(f) === id);
+          const fine = state.landData?.features.find(f => getFeatureId(f) === id);
+          const a = JSON.stringify(full?.geometry), b = JSON.stringify(fine?.geometry);
+          let firstDifference = 0;
+          while (firstDifference < Math.min(a.length,b.length) && a[firstDifference] === b[firstDifference]) firstDifference++;
+          return { id, sameContents: a === b, fullLength:a.length, fineLength:b.length,
+            firstDifference, fullExcerpt:a.slice(Math.max(0,firstDifference-80),firstDifference+120),
+            fineExcerpt:b.slice(Math.max(0,firstDifference-80),firstDifference+120) };
+        }).catch(()=>null);
+      }
       if (output) await session.page.screenshot({ path: path.join(output,`${scenarioId}-failed.png`) }).catch(()=>{});
     }
   } finally {
