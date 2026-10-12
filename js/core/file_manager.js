@@ -13,25 +13,34 @@ import {
   normalizeDayNightStyleConfig,
   normalizeLakeStyleConfig,
   normalizeMapSemanticMode,
-  INTENSITY_FIELD_GRID,
-  normalizeAppearancePresetsState,
-  normalizeIntensityFieldsState,
-  normalizeIntensityPoint,
   normalizePhysicalStyleConfig,
-  normalizeReferenceImageState,
-  normalizeRiversStyleConfig,
   normalizeTransportOverviewStyleConfig,
   normalizeTransportWorkbenchPointDeltas,
   normalizeUrbanStyleConfig,
   normalizeTransportWorkbenchUiState,
   normalizeExportWorkbenchUiState,
   normalizeTextureStyleConfig,
+} from "./state_defaults.js";
+import {
+  INTENSITY_FIELD_GRID,
+  normalizeIntensityPoint,
+} from "./intensity_field.js";
+import {
+  normalizeAppearancePresetsState,
   serializeAppearancePresetsState,
+} from "./state/appearance_preset_state.js";
+import {
+  normalizeIntensityFieldsState,
   serializeIntensityFieldsState,
   updateIntensityFieldChannel,
-} from "./state.js";
+} from "./state/intensity_field_state.js";
+import {
+  normalizeOpenOceanLayerVisibility,
+  normalizeReferenceImageState,
+  normalizeRiversStyleConfig,
+} from "./state/ui_state.js";
 import { t } from "./i18n.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 import { migrateImportedProjectData } from "./sovereignty_manager.js";
 import { getTargetMainMapPackMeta } from "./transport_pack_resolver.js";
 import {
@@ -52,7 +61,6 @@ import {
   resolveSpecialZoneTopologyFingerprint,
   serializeSpecialZoneLayersState,
 } from "./special_zone_layers.js";
-import { normalizeOpenOceanLayerVisibility } from "./state/ui_state.js";
 import {
   captureUiVisibilityState,
   commitUiVisibilityState,

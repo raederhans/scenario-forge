@@ -5,7 +5,7 @@ import {
   setBootPreviewVisibleState,
   setBootStateFields,
 } from "../core/state/actions/boot_actions.js";
-import { callRuntimeHook } from "../core/state/index.js";
+import { callRuntimeHook } from "../core/state/runtime_hooks.js";
 import { getBootLanguage, nowMs } from "./startup_bootstrap_support.js";
 const state = runtimeState;
 

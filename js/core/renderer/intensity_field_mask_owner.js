@@ -1,7 +1,5 @@
-import {
-  INTENSITY_FIELD_GRID,
-  normalizeIntensityFieldsState,
-} from "../state.js";
+import { INTENSITY_FIELD_GRID } from "../intensity_field.js";
+import { normalizeIntensityFieldsState } from "../state/intensity_field_state.js";
 
 const DEFAULT_MASK_GRAY_MAP = Object.freeze({
   min: 32,

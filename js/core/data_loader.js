@@ -1379,24 +1379,22 @@ export async function loadStartupBootArtifacts({
     geoAliases: null,
   };
 
-  if (topologyCacheKey) {
-    try {
-      const cacheEntry = await readStartupCacheEntry(topologyCacheKey);
+  const topologyCacheRead = topologyCacheKey
+    ? readStartupCacheEntry(topologyCacheKey).then((cacheEntry) => {
       if (cacheEntry?.payload?.topologyPrimary) {
         topologyPrimary = cacheEntry.payload.topologyPrimary;
         startupBootCacheState.baseTopology = "hit";
       } else {
         startupBootCacheState.baseTopology = "miss";
       }
-    } catch (error) {
+    }).catch((error) => {
       console.warn("[data_loader] Startup base-topology cache read failed.", error);
       startupBootCacheState.baseTopology = "error";
-    }
-  }
+    })
+    : Promise.resolve();
 
-  if (localizationCacheKey) {
-    try {
-      const cacheEntry = await readStartupCacheEntry(localizationCacheKey);
+  const localizationCacheRead = localizationCacheKey
+    ? readStartupCacheEntry(localizationCacheKey).then((cacheEntry) => {
       if (cacheEntry?.payload?.locales && cacheEntry?.payload?.geoAliases) {
         locales = cacheEntry.payload.locales;
         geoAliases = cacheEntry.payload.geoAliases;
@@ -1404,11 +1402,13 @@ export async function loadStartupBootArtifacts({
       } else {
         startupBootCacheState.localization = "miss";
       }
-    } catch (error) {
+    }).catch((error) => {
       console.warn("[data_loader] Startup localization cache read failed.", error);
       startupBootCacheState.localization = "error";
-    }
-  }
+    })
+    : Promise.resolve();
+
+  await Promise.all([topologyCacheRead, localizationCacheRead]);
 
   if ((!topologyPrimary || !locales || !geoAliases || !decodedCollections) && workerEnabled) {
     try {

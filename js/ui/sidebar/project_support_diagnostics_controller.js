@@ -1,4 +1,4 @@
-import { setScenarioDiagnosticsState } from "../../core/state.js";
+import { setScenarioDiagnosticsState } from "../../core/state_catalog.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
 import {

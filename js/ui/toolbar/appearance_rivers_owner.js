@@ -1,4 +1,4 @@
-import { normalizeRiversStyleConfig } from "../../core/state.js";
+import { normalizeRiversStyleConfig } from "../../core/state/ui_state.js";
 import {
   patchAppearanceStyleGroupState,
   setAppearanceStyleGroupState,

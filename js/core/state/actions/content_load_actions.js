@@ -58,3 +58,10 @@ export function finishContextLayerLoad(target, layerName, { expectedPromise, can
   }
   return true;
 }
+
+export function setBaseCityLocalizationReadyState(target, ready = false) {
+  if (!target || typeof target !== "object") return false;
+  const nextReady = ready === true;
+  target.baseCityLocalizationReady = nextReady;
+  return nextReady;
+}

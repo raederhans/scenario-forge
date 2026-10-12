@@ -398,7 +398,8 @@ test("stale scenario apply callbacks are fenced at post-apply, optional layer, a
   ].forEach((token) => assert.ok(chunkRuntime.includes(token), `chunk_runtime should include ${token}`));
 
   assert.match(chunkRuntime, /import\s*\{[^}]*isPendingScenarioChunkPromotionCurrent[^}]*\}\s*from\s*"\.\/chunk_promotion_queries\.js"/);
-  assert.ok(chunkRuntime.includes("if (!isPendingScenarioChunkPromotionCurrent({"));
+  assert.ok(chunkRuntime.includes("const isPromotionCurrent = () => isPendingScenarioChunkPromotionCurrent({"));
+  assert.equal(chunkRuntime.match(/if \(!isPromotionCurrent\(\)\)/g)?.length, 5);
   assert.ok(
     extractFunctionBody(chunkQueries, "isPendingScenarioChunkPromotionCurrent").includes("pendingPromotion.scenarioApplyRequestId"),
     "the delegated chunk continuation fence must check the pending scenario request",

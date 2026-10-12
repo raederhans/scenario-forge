@@ -425,7 +425,7 @@ const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
   }),
   Object.freeze({
     modulePath: "js/core/state/actions/content_load_actions.js",
-    exportNames: Object.freeze(["finishBaseCitySupportLoad", "finishFullLocalizationLoad", "finishContextLayerLoad", "commitPhysicalContourDisplayState"]),
+    exportNames: Object.freeze(["finishBaseCitySupportLoad", "finishFullLocalizationLoad", "finishContextLayerLoad", "commitPhysicalContourDisplayState", "setBaseCityLocalizationReadyState"]),
     introducedInPhase: "P4.4",
   }),
   Object.freeze({
@@ -886,6 +886,237 @@ function scenarioDetailConservativeFinding(
 }
 
 export const STATE_TARGET_PURE_READER_CONTRACT = Object.freeze([
+  // Returns only a serialized key or null. The self-module source pin binds
+  // the three local layer constants; other controller edits require renewed
+  // review of this receipt, without granting purity to the controller itself.
+  freezeStateTargetPureReaderEntry({
+  "modulePath": "js/ui/toolbar/export_workbench_controller.js",
+  "functionName": "getExportPreviewSourceKey",
+  "targetParameterName": "state",
+  "sourceFingerprint": "62372d37f05176fdcb8274c8a7eaef0f5de0126b6f0eada5a56f182adf13e84f",
+  "localFunctionFingerprints": {
+    "resolveExportPassSequence": "858d11051d55ecd9dc36ab647b46adbd0f1b2e85c3ae6a02d1ffce870628ceff",
+    "normalizeExportWorkbenchLayerOrder": "d99a950347f0d4fbdc54cf8ba647d75665249661f46800d9d2af3026caa95652",
+    "normalizeExportWorkbenchVisibility": "69ff5e521c546b467d131e4f27cc82a9cfdf5f3a0d3f3422697cb3f10c6014fa"
+  },
+  "dependencyFingerprints": {
+    "js/ui/toolbar/export_workbench_controller.js": "741c5e5b9abfeb4f5caa92542b40b7916e364e2f068a02b25d7f6bb8c031f201"
+  },
+  "reviewedReadSiteFingerprints": [],
+  "conservativeFindings": [
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "activeScenarioId",
+      "sourceFingerprint": "7c3f07c9b2554939aa77bc94d7c6f409b41bd01549548a31573ba74e70dc603a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "renderTransactionDiagnostics",
+      "sourceFingerprint": "a7d147094296f2e701446d8987461541d74470f7909d966cfa72928de5be562d",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "sceneGeneration",
+      "sourceFingerprint": "f818ef843a2a713f33aa00eff13a61f361b0b63e11e13495dfa6d83bb6780c84",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "scenarioDataGeneration",
+      "sourceFingerprint": "8f1b09cd983b0fb42fd041070c997fbe3ead44b1a19ef8b37e0c10d5bfdeeea3",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "topologyRevision",
+      "sourceFingerprint": "5ac7948b3391086275c22999645ef3a38ce4a6c475436f3f3aa6525bb96ca2f9",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colorRevision",
+      "sourceFingerprint": "7957b3e0093c00c82803b130e63b4e63ada93552c947aab82791d128227ed063",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "dirtyRevision",
+      "sourceFingerprint": "7ad809542254f6ede8b2801c4749f23a0acc6728b4d97d2f662bd14555466164",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "width",
+      "sourceFingerprint": "9e38c6f400f83511051e6861e12f962cdbd2b032bb9ea48d683d2184977838c7",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "height",
+      "sourceFingerprint": "fd358cb4d2df3d3f04cb9d85fed19ea660ee574329770e4ad2f47ba195dc6c1f",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "dpr",
+      "sourceFingerprint": "a55fe7fe3cf392958f033ecbb15a4073e2c96918d91aa09f7a3e8b7d23a44425",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colorCanvas",
+      "sourceFingerprint": "ee669e059555b78dbe3bc54777003945c3a3f35f0cef02dd8d5e775571d13f05",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "colorCanvas",
+      "sourceFingerprint": "bf5604b945ebaef111cc6fde7b6714e68ba6a59d325bb80bc30918be13624372",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c394ce4a29f3f61bdfc8e5738b04bce79545ff4f9ef9360cbbc69a97f7a5121a",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "c982ba2ce7d2cb1387a6e6649c8ee467c220b977e50663256e52641d9be0e44c",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "25fe42fe74be93809b4efdd380d15cb89d3bc27502eca752ccd8b084c4ac4e81",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "styleConfig",
+      "sourceFingerprint": "a94eb17c7886af49719eb33a563ecabf0c5dc3c3d9500f96451e6a1161f29930",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":2}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "*",
+      "sourceFingerprint": "3d135e78d614964b195d8799a2a8c00f8ff8b547a88185481c2a001964800777",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":2}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "renderPassCache",
+      "sourceFingerprint": "3bc4dc7a28b6121c345d520ec6bb9a79405b7a68fba0802b236ad914a103835b",
+      "count": 1
+    },
+    {
+      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"getExportPreviewSourceKey\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":2}]}",
+      "reason": "state-alias-escape",
+      "operation": "unsupported",
+      "key": "renderPassCache",
+      "sourceFingerprint": "55926b9037ee2237a64491580854f43a602a97baa1264262fcb91f147237752f",
+      "count": 1
+    }
+  ]
+}),
+
+  // Country identity is a scalar; the exact Map lookup and identity helpers
+  // read borrowed features without publishing them or authorizing DOM effects.
+  freezeStateTargetPureReaderEntry({
+    modulePath: "js/ui/toolbar/quick_fill_level_controls.js",
+    functionName: "getQuickFillUiCountry",
+    targetParameterName: "state",
+    importedArgumentCount: 1,
+    sourceFingerprint: "b3077a0f086f0e2a1adedf22aa5d53a56eea8590c977b25c20baf30d35d56e04",
+    dependencyFingerprints: {
+      "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
+      "js/core/feature_identity_shared.js": "87740ee4f95f77350073884c812865264b9e5eae2e0bfeec88d066648c2bcf0a",
+      "js/core/country_code_aliases.js": "460311cf93c7ffc8004cabbee374a8a76c12fd37c3ab82524d527e7b919c2f67",
+    },
+    reviewedReadSiteFingerprints: ["4277e3721cc99c0f69ceb683cd2e4bf72a2f91cd78af87d6eb3b1f013e1db565"],
+    conservativeFindings: [
+      {
+        enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getQuickFillUiCountry","ordinal":0}]}',
+        reason: "unsupported-call-mutation", operation: "unsupported", key: "landIndex",
+        sourceFingerprint: "4277e3721cc99c0f69ceb683cd2e4bf72a2f91cd78af87d6eb3b1f013e1db565", count: 1,
+      },
+      {
+        enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getQuickFillUiCountry","ordinal":0}]}',
+        reason: "state-alias-escape", operation: "unsupported", key: "*",
+        sourceFingerprint: "4bd8d43bcb9609e2018d053b821df3548f555054d9de0acbdd8d14754c52eb0e", count: 1,
+      },
+    ],
+  }),
+  // Options and the UI model are fresh DTOs. Hierarchy helpers cache only in
+  // private WeakMaps; their borrowed snapshots never appear in this result.
+  freezeStateTargetPureReaderEntry({
+    modulePath: "js/ui/toolbar/quick_fill_level_controls.js",
+    functionName: "getQuickFillLevelModel",
+    targetParameterName: "state",
+    importedArgumentCount: 1,
+    sourceFingerprint: "20e751199ee71385a6587ead3e33d5b76e9aec8e9a0ba7fbb1d49771625f1509",
+    localFunctionFingerprints: {
+      getQuickFillUiCountry: "b3077a0f086f0e2a1adedf22aa5d53a56eea8590c977b25c20baf30d35d56e04",
+    },
+    dependencyFingerprints: {
+      "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
+      "js/core/feature_identity_shared.js": "87740ee4f95f77350073884c812865264b9e5eae2e0bfeec88d066648c2bcf0a",
+      "js/core/country_code_aliases.js": "460311cf93c7ffc8004cabbee374a8a76c12fd37c3ab82524d527e7b919c2f67",
+      "js/core/scenario_hierarchy.js": "dc144761d44906a21c1638bbe25729e23c869164a798b3bf98635391e863e7c9",
+      "js/core/quick_fill_hierarchy.js": "9bb402481f47b798971706c7fd5b08d42f1dd89e2e8e014c68f897027dd3b460",
+    },
+    conservativeFindings: [
+      {
+        enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getQuickFillLevelModel","ordinal":0}]}',
+        reason: "state-alias-escape", operation: "unsupported", key: "*",
+        sourceFingerprint: "4ba69735ca53765ed6a709edb56c6ea236b7193a3b29a6b390c346f0f4340e4e", count: 2,
+      },
+      {
+        enclosingFunctionIdentity: '{"kind":"function","ancestry":[{"name":"getQuickFillLevelModel","ordinal":0}]}',
+        reason: "state-alias-escape", operation: "unsupported", key: "batchFillScope",
+        sourceFingerprint: "40f6bd551ddb5ee1f0a5b8c36a96a359cf220128a0960cad61ce76b0ee6c7c9b", count: 1,
+      },
+    ],
+  }),
   // Fresh scalar style fields; indicator lookup borrows only fixed metadata.
   freezeStateTargetPureReaderEntry({
   "modulePath": "js/core/thematic_wgi_view_model.js",
@@ -8954,6 +9185,13 @@ const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
 function expectedActionBorrowedResultPaths(modulePath, exportName) {
   if (modulePath === SCENARIO_ACTIVATION_ACTION_MODULE_PATH
     && exportName === "applyScenarioChunkOptionalLayerState") return [["externalEffect", "payload"]];
+  for (const [actionModule, prefix] of [
+    ["thematic_wgi_actions", "ThematicWgi"],
+    ["population_spatial_actions", "Population"],
+  ]) {
+    if (modulePath === `js/core/state/actions/${actionModule}.js`
+      && [`set${prefix}RuntimeState`, `reset${prefix}RuntimeState`, `set${prefix}StyleState`].includes(exportName)) return [[]];
+  }
   if (modulePath !== RIVER_PAINT_ACTION_MODULE_PATH) return [];
   if (["setRiverPaintState", "setRiverPaintEditModeState"].includes(exportName)) return [[]];
   return exportName === "applyRiverCellPaintState" ? [["paint"]] : [];
@@ -9396,6 +9634,70 @@ export function findStateActionSuccessorProofContractEntry(
     && entry.replacementMembership
       === normalizeStateActionMembership(replacementMembership)
   ) || null;
+}
+
+// Reviewed carrier-only changes: the action owners, call sites, memberships and
+// retirement evidence stay frozen. Reconstructing the complete prior contract
+// prevents a new chain or an unreviewed source change from using these receipts.
+export const STATE_ACTION_SUCCESSOR_CARRIER_SOURCE_REFRESHES = Object.freeze([
+  Object.freeze({
+    modulePath: SCENARIO_PRESENTATION_ACTION_MODULE_PATH,
+    exportName: "restoreScenarioTransactionPresentationState",
+    functionName: "restoreScenarioPresentationStateFromValidated",
+    previousSourceRevision: "8d72cb86d736cae872a2f78d2fc36117389aa67e",
+    previousSourceFingerprint: "12dff0f3f892f7b45c6b34aa01d94717364958fd7790d9e0ff11cea41965aa61",
+    sourceFingerprint: "ce535eb79345fe8972e65f713bdca9fced9a76a4f0dbf62cb5bbf716c0e7d64c",
+  }),
+]);
+
+export function isStateActionSuccessorCarrierSourceRefresh(
+  previousProof,
+  currentProof,
+) {
+  const identityFields = [
+    "actionModulePath", "actionExportName", "targetArgumentIndex",
+    "domain", "migrationPhase", "operation", "key",
+  ];
+  if (identityFields.some((key) => previousProof?.[key] !== currentProof?.[key])) {
+    return false;
+  }
+  const contract = findStateActionSuccessorProofContractEntry(
+    currentProof?.actionModulePath,
+    currentProof?.actionExportName,
+    [currentProof?.domain, currentProof?.migrationPhase,
+      currentProof?.operation, currentProof?.key].join("|"),
+  );
+  if (!contract
+    || currentProof.successorProofContractIdentity !== contract.contractIdentity
+    || previousProof.successorProofContractIdentity === contract.contractIdentity) {
+    return false;
+  }
+  const previousCarriers = contract.carrierFunctions.map((carrier) => {
+    const receipt = STATE_ACTION_SUCCESSOR_CARRIER_SOURCE_REFRESHES.find((entry) =>
+      entry.modulePath === contract.modulePath
+      && entry.exportName === contract.exportName
+      && entry.functionName === carrier.functionName
+      && entry.sourceFingerprint === carrier.sourceFingerprint
+    );
+    return receipt
+      ? { ...carrier, sourceFingerprint: receipt.previousSourceFingerprint }
+      : carrier;
+  });
+  const previousContract = freezeActionSuccessorProofEntry({
+    ...contract,
+    carrierFunctions: previousCarriers,
+  });
+  if (previousProof.successorProofContractIdentity !== previousContract.contractIdentity
+    || previousContract.contractIdentity === contract.contractIdentity) {
+    return false;
+  }
+  const descriptors = (edges) => JSON.stringify(edges
+    .map((edge) => JSON.stringify(freezeActionSuccessorEdge(edge || {}))).sort());
+  const expected = descriptors(contract.successorEdges);
+  return [previousProof, currentProof].every((proof) =>
+    Array.isArray(proof.successorActionProofs)
+    && descriptors(proof.successorActionProofs) === expected
+  );
 }
 
 const CONTRACT_ENTRY_BY_ID = new Map(
@@ -11864,7 +12166,7 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
       replacementCallerBindingIdentity: createP44FunctionParameterBindingIdentity("createMapHoverInteractionOwner", "$/property:state"),
       replacementEnclosingFunctionIdentity: createP44FunctionIdentity("createMapHoverInteractionOwner", "setHoverIds"),
       actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH, actionExportName: "setHoveredFeatureIdsState", targetArgumentIndex: 0,
-      replacementActionSourceFingerprint: "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+      replacementActionSourceFingerprint: "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
     }),
     freezeCrossFileMigrationEntry({
       retiredCallerPath: "js/core/map_renderer.js",
@@ -11879,7 +12181,7 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
       replacementCallerBindingIdentity: createP44FunctionParameterBindingIdentity("createMapHoverInteractionOwner", "$/property:state"),
       replacementEnclosingFunctionIdentity: createP44FunctionIdentity("createMapHoverInteractionOwner", "setHoverIds"),
       actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH, actionExportName: "setHoveredFeatureIdsState", targetArgumentIndex: 0,
-      replacementActionSourceFingerprint: "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+      replacementActionSourceFingerprint: "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
     }),
     freezeCrossFileMigrationEntry({
       retiredCallerPath: "js/core/map_renderer.js",
@@ -11894,7 +12196,7 @@ export const STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT =
       replacementCallerBindingIdentity: createP44FunctionParameterBindingIdentity("createMapHoverInteractionOwner", "$/property:state"),
       replacementEnclosingFunctionIdentity: createP44FunctionIdentity("createMapHoverInteractionOwner", "setHoverIds"),
       actionModulePath: RENDERER_INTERACTION_ACTION_MODULE_PATH, actionExportName: "setHoveredFeatureIdsState", targetArgumentIndex: 0,
-      replacementActionSourceFingerprint: "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+      replacementActionSourceFingerprint: "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
     }),
     freezeCrossFileMigrationEntry({
       retiredCallerPath: "js/core/map_renderer.js",
@@ -13925,7 +14227,9 @@ export function inspectStateTargetPureReaderFunctionSource(
   // helpers are bound below. Any changed dependency requires renewed review.
   for (const [dependencyName, expected] of Object.entries(entry.dependencyFingerprints || {})) {
     try {
-      const actual = createHash("sha256").update(String(readSource(dependencyName)).replace(/\r\n?/g, "\n")).digest("hex");
+      const dependencySource = normalizeModulePath(dependencyName) === normalizeModulePath(entry.modulePath)
+        ? source : readSource(dependencyName);
+      const actual = createHash("sha256").update(String(dependencySource).replace(/\r\n?/g, "\n")).digest("hex");
       if (actual !== expected) violations.push(createViolation("state-target-pure-reader-dependency-source-drift", {
         modulePath: entry.modulePath, functionName: entry.functionName, dependencyName,
       }));
@@ -14774,38 +15078,111 @@ const riverActionDiagnosticReceipts = [
   }
 ];
 const riverSiteIdentity = site => JSON.stringify([site.line, site.column, site.reason, site.operation, site.key, site.sourceFingerprint]);
-export function inspectRiverActionDiagnosticReceipt(id, { binding, readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8") } = {}) {
-  const entry = typeof id === "string" && riverActionDiagnosticReceipts.find(entry => entry.id === id);
+// Runtime and style setters return their published objects. Keep those results
+// borrowed at callers; these receipts prove only the exact internal returns.
+const startupActionDiagnosticReceipts = [
+  ...[
+    {
+      prefix: "ThematicWgi", field: "thematicWgiRuntime", modulePath: "js/core/state/actions/thematic_wgi_actions.js",
+      sourceFingerprints: {
+        "js/core/state/actions/thematic_wgi_actions.js": "48eb6889e06d13ab5a9792f98e930786bd2645993075d8d5b1ad62aa3c5360ca",
+        "js/core/state/actions/appearance_actions.js": "af59e07bc7af4069e8a77ed7a400d68eea8907f342fbdde55f61ca6c557b1e47",
+        "js/core/thematic_wgi_view_model.js": "b90990ae93e185e0acb2aaa66fcb0386d6517292e0a5c6a52a488521efe3fe3a",
+      },
+      returns: [[19, "05dd6f3b92632125743bd12021e894abb79ec563aebbb2f2fd21862f03ce2c9c"],
+        [23, "1b66c83b79b2a6b230ae228f4364c1837d615f2b56442ef8ddc5256db3e96990"]],
+    },
+    {
+      prefix: "Population", field: "populationRuntime", modulePath: "js/core/state/actions/population_spatial_actions.js",
+      sourceFingerprints: {
+        "js/core/state/actions/population_spatial_actions.js": "9084a2a55573f592c99cab2e7873dc8ede3d7615c05f082f51b367fc63841618",
+        "js/core/state/actions/appearance_actions.js": "af59e07bc7af4069e8a77ed7a400d68eea8907f342fbdde55f61ca6c557b1e47",
+        "js/core/population_spatial_view_model.js": "50b0c7811d8cd850e433c6231713181dc62dd0273e6d9cbf22b28cef927b7f75",
+        "js/core/state/actions/thematic_wgi_actions.js": "48eb6889e06d13ab5a9792f98e930786bd2645993075d8d5b1ad62aa3c5360ca",
+        "js/core/state/actions/ui_visibility_actions.js": "a089d08c946fbfb18b8ce871916c3b234e4b910d040c2c77315ee38cf55c034b",
+      },
+      returns: [[21, "c4bef0111567abce85b14c47b6f3b52a9ce517603eefc37768af12bea3e4d5ff"],
+        [25, "a18d63aa7fa552102c91cf1a0f6202236b3c2c4a033573d1ba5d5aaecc6af670"]],
+    },
+  ].flatMap(({ prefix, field, modulePath, sourceFingerprints, returns }) => {
+    const setter = `set${prefix}RuntimeState`, reset = `reset${prefix}RuntimeState`;
+    const sites = returns.map(([line, sourceFingerprint], index) => ({
+      line, column: 10, reason: "state-alias-escape", operation: "unsupported", key: field, sourceFingerprint,
+      enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: index ? reset : setter, ordinal: 0 }] }),
+      expression: index ? `${setter}(target, { status: "idle" })` : `target.${field}`,
+    }));
+    return [setter, reset, `set${prefix}StyleState`].map(id => ({
+      id, modulePath, sourceFingerprints, sites: id === setter ? sites.slice(0, 1) : sites,
+    }));
+  }),
+  {
+    id: "commitPhysicalContourDisplayState", modulePath: "js/core/state/actions/content_load_actions.js",
+    // The observer writes private WeakMap metadata, not the borrowed target or
+    // collections. The callback's references are consumed only by this observer.
+    sourceFingerprints: {
+      "js/core/state/actions/content_load_actions.js": "36f08c5726daa80af87a7a809c4f2527b61479a59f3a14c7b2a3048bdbed5187",
+      "js/core/state/context_layer_revision.js": "e90e586335a2477d221e0f4f3fe6d3dd093cdd3fc78fe4e69ebe625ccb46670f",
+    },
+    sites: [
+      { line: 19, column: 35, reason: "state-alias-escape", operation: "unsupported", key: "*",
+        sourceFingerprint: "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c",
+        enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: "commitPhysicalContourDisplayState", ordinal: 0 }] }),
+        expression: "target" },
+      { line: 20, column: 28, reason: "state-alias-escape", operation: "unsupported", key: "*",
+        sourceFingerprint: "5f7e90c2ca270a5b85f121c7c66f9386549079c1e7fdd13fc0e4866a83db7c3f",
+        enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: "commitPhysicalContourDisplayState", ordinal: 0 }, { name: "<anonymous>", ordinal: 0 }] }),
+        expression: 'layer === "physical_contours_major"\n        ? target.physicalContourMajorData : target.physicalContourMinorData' },
+    ],
+  },
+];
+function inspectActionDiagnosticReceipt(entry, {
+  binding, readSource = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8"),
+}, { codePrefix, includeLocalHelpers = false }) {
   const violations = [];
-  if (!entry) return { violations: [{ code: "river-action-receipt-unknown" }] };
+  if (!entry) return { violations: [{ code: `${codePrefix}-unknown` }], acceptedDiagnosticCount: 0 };
   try {
     for (const [modulePath, expected] of Object.entries(entry.sourceFingerprints)) {
       if (createHash("sha256").update(String(readSource(modulePath)).replace(/\r\n?/g, "\n")).digest("hex") !== expected) {
-        violations.push({ code: "river-action-receipt-source-drift", modulePath });
+        violations.push({ code: `${codePrefix}-source-drift`, modulePath });
       }
     }
     const source = String(readSource(entry.modulePath)).replace(/\r\n?/g, "\n");
     const ast = parseModuleSource(source);
-    const fn = ast.body.find(node => node.type === "ExportNamedDeclaration" && node.declaration?.id?.name === id)?.declaration;
-    if (!fn || fn.params[0]?.name !== "target") violations.push({ code: "river-action-receipt-binding-drift" });
+    const fn = ast.body.find(node => node.type === "ExportNamedDeclaration" && node.declaration?.id?.name === entry.id)?.declaration;
+    if (!fn || fn.params[0]?.name !== "target") violations.push({ code: `${codePrefix}-binding-drift` });
     for (const site of entry.sites) {
       let matches = 0;
-      if (fn) walkSyntaxTree(fn, node => {
+      const enclosingName = includeLocalHelpers
+        ? JSON.parse(site.enclosingFunctionIdentity).ancestry[0].name : entry.id;
+      const siteScope = ast.body.find(node => node.type === "ExportNamedDeclaration"
+        && node.declaration?.id?.name === enclosingName)?.declaration;
+      if (siteScope) walkSyntaxTree(siteScope, node => {
         if (node.loc?.start.line === site.line && node.loc.start.column + 1 === site.column
           && source.slice(node.start, node.end) === site.expression) matches += 1;
       });
-      if (!matches) violations.push({ code: "river-action-receipt-expression-drift" });
+      if (!matches) violations.push({ code: `${codePrefix}-expression-drift` });
     }
     const actual = (binding?.grants || []).flatMap(grant => grant.unsupportedSites || []).map(riverSiteIdentity).sort();
     const expected = entry.sites.map(riverSiteIdentity).sort();
-    if (!binding || binding.functionName !== id || binding.parameterName !== "target"
+    if (!binding || binding.functionName !== entry.id || binding.parameterName !== "target"
+      || binding.kind !== "function-parameter" || binding.authority !== "domain-action"
       || binding.parameterIndex !== 0 || binding.parameterPath !== "$"
-      || JSON.stringify(actual) !== JSON.stringify(expected)) violations.push({ code: "river-action-receipt-sites-drift" });
-  } catch (error) { violations.push({ code: "river-action-receipt-unavailable", message: error.message }); }
+      || JSON.stringify(actual) !== JSON.stringify(expected)) violations.push({ code: `${codePrefix}-sites-drift` });
+  } catch (error) { violations.push({ code: `${codePrefix}-unavailable`, message: error.message }); }
   return { violations, acceptedDiagnosticCount: violations.length ? 0 : entry.sites.length };
 }
 
-function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader = false, acceptedRiverReceipt = false) {
+export function inspectRiverActionDiagnosticReceipt(id, options = {}) {
+  return inspectActionDiagnosticReceipt(typeof id === "string" && riverActionDiagnosticReceipts.find(entry => entry.id === id),
+    options, { codePrefix: "river-action-receipt" });
+}
+
+export function inspectStartupActionDiagnosticReceipt(modulePath, id, options = {}) {
+  return inspectActionDiagnosticReceipt(startupActionDiagnosticReceipts.find(entry => entry.modulePath === modulePath && entry.id === id),
+    options, { codePrefix: "startup-action-receipt", includeLocalHelpers: true });
+}
+
+function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader = false, acceptedDiagnosticReceipt = false) {
   return (binding.grants || []).reduce(
     (count, grant) =>
       count
@@ -14817,7 +15194,7 @@ function bindingDiagnosticCount(binding = {}, entry = {}, acceptedImportedReader
         (site) => !isAllowedDomainActionDynamicSite(entry, site),
       ).length
       + (grant.ambiguousSites || []).length
-      + (grant.unsupportedSites || []).filter(site => !acceptedRiverReceipt && !(
+      + (grant.unsupportedSites || []).filter(site => !acceptedDiagnosticReceipt && !(
         acceptedImportedReader
         && entry.modulePath === STATE_ACTION_IMPORTED_CALL_RECEIPTS.eviction.modulePath
         && entry.exportName === STATE_ACTION_IMPORTED_CALL_RECEIPTS.eviction.exportName
@@ -14963,9 +15340,12 @@ export function validateStateActionPolicyBindings(
           && riverActionDiagnosticReceipts.some(receipt => receipt.id === entry.exportName)
           ? inspectRiverActionDiagnosticReceipt(entry.exportName, { binding }) : null;
         if (riverReceipt) violations.push(...riverReceipt.violations);
+        const startupReceipt = startupActionDiagnosticReceipts.some(receipt => receipt.modulePath === entry.modulePath && receipt.id === entry.exportName)
+          ? inspectStartupActionDiagnosticReceipt(entry.modulePath, entry.exportName, { binding }) : null;
+        if (startupReceipt) violations.push(...startupReceipt.violations);
         const diagnosticCount = bindingDiagnosticCount(
           binding, entry, acceptedImportedCalls.get(entry.exportName) === true,
-          riverReceipt?.violations.length === 0,
+          riverReceipt?.violations.length === 0 || startupReceipt?.violations.length === 0,
         );
         if (diagnosticCount > 0) {
           violations.push(

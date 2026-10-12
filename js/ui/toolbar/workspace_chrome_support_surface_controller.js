@@ -1,4 +1,4 @@
-import { createQuickFillLevelControls, getQuickFillUiCountry } from "./quick_fill_level_controls.js";
+import { createQuickFillLevelControls, getQuickFillLevelModel, getQuickFillUiCountry } from "./quick_fill_level_controls.js";
 // Workspace chrome support-surface controller.
 // 这个模块负责 guide / dock support surface / URL restore / 全局 dismiss 这一层的 UI 外壳协调。
 // toolbar.js 继续保留 export workbench facade、special zone facade、drawer 切换和更高层的页面编排。
@@ -58,7 +58,9 @@ export function createWorkspaceChromeSupportSurfaceController({
 } = {}) {
   let dockPopoverCloseBound = false;
   const quickFillLevels = createQuickFillLevelControls({
-    state, container: dockQuickFillRow,
+    getModel: () => getQuickFillLevelModel(state),
+    getSelectLabel: () => String(state.currentLanguage || "en").startsWith("zh") ? "快速填色层级" : "Quick fill level",
+    container: dockQuickFillRow,
     onChange: (scope) => {
       setBatchFillScopeState(state, scope);
       refreshPaintModeUi();

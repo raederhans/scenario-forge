@@ -2,10 +2,10 @@ import {
   normalizeDayNightStyleConfig,
   normalizeTextureMode,
   normalizeTextureStyleConfig,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import { setAppearanceStyleGroupState } from "../../core/state/actions/appearance_actions.js";
-import { callRuntimeHook } from "../../core/state/index.js";
+import { callRuntimeHook } from "../../core/state/runtime_hooks.js";
 
 export const TEXTURE_STYLE_PATHS = Object.freeze([
   "styleConfig.texture.mode",

@@ -30,6 +30,7 @@ const P4_4_SOURCE_REFS = Object.freeze([
   "js/core/state/appearance_preset_state.js",
   "js/core/state/config.js",
   "js/core/state/index.js",
+  "js/core/state/runtime_hooks.js",
   "js/core/state/ui_state.js",
   "js/ui/shortcuts.js",
   "js/ui/sidebar/strategic_overlay_controller.js",
@@ -131,6 +132,7 @@ const P4_4_NODE_ROUTE_SOURCE_REFS = Object.freeze([
   "tools/state_writer_policy.mjs",
   "js/core/state/actions/special_zone_actions.js",
   "js/core/state/index.js",
+  "js/core/state/runtime_hooks.js",
   "js/ui/toolbar/special_zones_workbench_controller.js",
   "js/core/renderer/strategic_overlay_runtime_owner.js",
 ]);
@@ -179,6 +181,7 @@ export const STATE_OWNERSHIP_RECORDS = [
       "js/core/sample_project_import_workflow.js",
       "js/core/sample_project_registry.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/ui/toolbar/export_workbench_controller.js",
       "js/ui/toolbar/sample_project_banner_controller.js",
       "js/ui/ui_surface_url_state.js",
@@ -253,6 +256,7 @@ export const STATE_OWNERSHIP_RECORDS = [
       "js/core/scenario_rollback.js",
       "js/core/state.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/core/state/scenario_runtime_state.js",
       "js/core/scenario/chunk_runtime.js"
     ],
@@ -342,7 +346,8 @@ export const STATE_OWNERSHIP_RECORDS = [
       "js/core/scenario_resources.js",
       "js/core/scenario_rollback.js",
       "js/core/state.js",
-      "js/core/state/index.js"
+      "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js"
     ],
     "ownerHints": [
       "state-ownership"
@@ -393,6 +398,7 @@ export const STATE_OWNERSHIP_RECORDS = [
       "js/core/state/actions/scenario_health_actions.js",
       "js/core/state/actions/scenario_presentation_actions.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/core/state/scenario_runtime_state.js",
       "js/core/scenario/startup_hydration.js",
       "js/core/startup_cache.js",

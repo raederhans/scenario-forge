@@ -3676,7 +3676,7 @@ function analyzeBindingMutations(
         importedPureReaderContract,
       };
     }
-    if (source === "js/core/state/index.js") {
+    if (source === "js/core/state/index.js" || source === "js/core/state/runtime_hooks.js") {
       const targetArgumentIndex =
         IMPORTED_COMPAT_TARGET_HELPERS.get(record.importedName);
       return Number.isInteger(targetArgumentIndex)

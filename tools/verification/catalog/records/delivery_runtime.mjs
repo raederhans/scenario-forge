@@ -651,6 +651,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "js/core/dirty_state.js",
       "js/core/state.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/ui/sidebar/project_support_diagnostics_controller.js",
       "vendor/fflate.browser.js",
       "backend/backend_console_helpers.js"

@@ -7,6 +7,7 @@ import { isDeepStrictEqual } from "node:util";
 
 import {
   findStateActionCrossFileMigrationContractEntry,
+  isStateActionSuccessorCarrierSourceRefresh,
   findStateCapabilityRetirementContractEntry,
 } from "./state_action_delegation_contract.mjs";
 
@@ -313,12 +314,25 @@ export function validateCallerToActionLedgerHistoryTransition({
       previousPhase !== currentPhase;
     const observationRefresh =
       samePhaseObservationRefresh || crossPhaseObservationRefresh;
-    const expectedHistory = observationRefresh
-      ? structuredClone(previousEntry)
-      : previousEntry;
+    const expectedHistory = structuredClone(previousEntry);
     const actualHistory = observationRefresh
       ? structuredClone(currentEntry)
       : currentEntry;
+    const expectedProofs = Array.isArray(expectedHistory.functionProofs)
+      ? expectedHistory.functionProofs : [expectedHistory];
+    const actualProofs = Array.isArray(actualHistory.functionProofs)
+      ? actualHistory.functionProofs : [actualHistory];
+    for (const [index, proof] of expectedProofs.entries()) {
+      const actualProof = actualProofs[index];
+      if (actualProof && isStateActionSuccessorCarrierSourceRefresh(
+        { ...previousEntry, ...proof },
+        { ...currentEntry, ...actualProof },
+      )) {
+        // The complete old/new contracts and unchanged relay descriptors were
+        // checked. Keep comparing every other historical field below.
+        proof.successorProofContractIdentity = actualProof.successorProofContractIdentity;
+      }
+    }
     if (observationRefresh) {
       // The builder refreshes live source coordinates within the recording
       // phase and may refresh the action edge across phases. Snapshot

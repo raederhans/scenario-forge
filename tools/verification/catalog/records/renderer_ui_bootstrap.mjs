@@ -14,6 +14,7 @@ export const RENDERER_UI_BOOTSTRAP_RECORDS = [
       "js/core/state.js",
       "js/core/state/appearance_preset_state.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/core/state/intensity_field_state.js",
       "js/core/transport_capability_registry.js",
       "vendor/fflate.browser.js",

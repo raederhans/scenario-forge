@@ -780,7 +780,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
         )
 
     def test_promotion_commit_can_be_cancelled_by_runtime_hook(self):
-        self.assertIn('import { registerRuntimeHook } from "../state/index.js";', self.scenario_chunk_runtime_source)
+        self.assertIn('import { registerRuntimeHook } from "../state/runtime_hooks.js";', self.scenario_chunk_runtime_source)
         self.assertIn('function cancelScenarioChunkPromotionCommit(reason = "cancel")', self.scenario_chunk_runtime_source)
         self.assertRegex(
             self.scenario_chunk_runtime_source,
@@ -804,7 +804,11 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
 
         self.assertIn("applyScenarioPoliticalChunkPayload(", visual_slice)
         self.assertIn("await yieldToFrame();", visual_slice)
-        self.assertIn("isPendingScenarioChunkPromotionCurrent({", visual_slice)
+        self.assertIn("isPromotionCurrent()", visual_slice)
+        self.assertIn(
+            "const isPromotionCurrent = () => isPendingScenarioChunkPromotionCurrent({",
+            self.scenario_chunk_runtime_source,
+        )
         self.assertIn("canRollbackPromotionContinuation()", visual_slice)
         self.assertIn("restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);", visual_slice)
         self.assertIn(
@@ -816,7 +820,7 @@ class ScenarioChunkRefreshContractsTest(unittest.TestCase):
             visual_slice,
             re.compile(
                 r'await yieldToFrame\(\);.*?'
-                r'if \(!isPendingScenarioChunkPromotionCurrent.*?'
+                r'if \(!isPromotionCurrent\(\)\).*?'
                 r'setScenarioChunkPromotionRenderLockState\(runtimeState, previousRenderLock\);.*?'
                 r'if \(resolvedRenderNow !== false\) \{\s*'
                 r'requestRender\("scenario-chunk-promotion"\);',

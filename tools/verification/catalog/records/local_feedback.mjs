@@ -290,8 +290,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["worker-task-client", "renderer-runtime", "js/core/worker_task_client.js", "tests/worker_task_client_behavior.test.mjs"],
     ["border-mesh-worker-runtime", "renderer-runtime", "js/core/renderer/border_mesh_worker_runtime.js", "tests/border_mesh_worker_runtime_behavior.test.mjs", ["js/core/state/actions/renderer_cache_actions.js"]],
     ["renderer-cache-actions", "state-ownership", "js/core/state/actions/renderer_cache_actions.js", "tests/renderer_cache_actions_behavior.test.mjs"],
-    ["runtime-hook-compat", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_compat_behavior.test.mjs"],
-    ["runtime-hook-lifecycle", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_lifecycle_behavior.test.mjs", ["js/ui/scenario_controls.js"]],
+    ["runtime-hook-compat", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_compat_behavior.test.mjs", ["js/core/state/runtime_hooks.js"]],
+    ["runtime-hook-lifecycle", "state-ownership", "js/core/state/index.js", "tests/runtime_hook_lifecycle_behavior.test.mjs", ["js/ui/scenario_controls.js", "js/core/state/runtime_hooks.js"]],
     ["physical-contour-visible-set", "renderer-runtime", "js/core/renderer/physical_contour_visible_set_owner.js", "tests/physical_contour_visible_set_owner_behavior.test.mjs", ["js/core/map_renderer.js"]],
     ["projected-bounds-state-boundary", "state-ownership", "tools/check_architecture_boundaries.mjs", "tests/projected_bounds_state_boundary_behavior.test.mjs", ["js/core/renderer/projected_geometry_bounds_owner.js"]],
     ["renderer-object-identity", "renderer-runtime", "js/core/renderer/object_identity.js", "tests/scenario_water_signature_behavior.test.mjs", ["tests/physical_contour_lod_policy_behavior.test.mjs"]],
@@ -367,6 +367,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["render-dispatcher", "startup", "tests/render_dispatcher_behavior.test.mjs", ["js/bootstrap/startup_bootstrap_support.js", "js/core/render_boundary.js", "js/bootstrap/render_runtime_binding.js"]],
     ["exact-composite-reuse", "renderer-runtime", "tests/exact_composite_reuse_behavior.test.mjs", ["js/core/renderer/exact_composite_reuse_owner.js", "js/core/map_renderer.js", "js/core/renderer/cached_pass_compositor_owner.js"]],
     ["export-target-resolution", "renderer-runtime", "tests/export_target_resolution_behavior.test.mjs", ["js/core/renderer/export_render_budget.js", "js/core/map_renderer.js", "js/core/renderer/political_pass_orchestrator_owner.js", "js/ui/toolbar.js", "js/ui/toolbar/export_failure_handler.js"]],
+    ["quick-fill-state-boundary", "state-ownership", "tests/quick_fill_state_boundary_contract.test.mjs", ["js/ui/toolbar/quick_fill_level_controls.js", "js/ui/toolbar/workspace_chrome_support_surface_controller.js", "tools/state_action_delegation_contract.mjs"]],
+    ["export-preview-state-boundary", "state-ownership", "tests/export_preview_state_boundary_contract.test.mjs", ["js/ui/toolbar/export_workbench_controller.js", "tools/state_action_delegation_contract.mjs"]],
   ];
   const testRecords = localTestFiles.map(([id, domain, testFile, extraSources = []], index) => ({
     id: "local:test:" + id, commandRef: "node --test " + testFile,

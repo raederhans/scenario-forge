@@ -1,7 +1,7 @@
 import {
   normalizeTransportOverviewStyleConfig,
   resolveLinkedTransportOverviewScopeAndThreshold,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   getTransportCapabilityDefaultOverviewConfig,
   getTransportOverviewDataLayerKeys,

@@ -4,7 +4,7 @@ import {
 import {
   STATE_BUS_EVENTS,
   emitStateBusEvent,
-} from "../state/index.js";
+} from "../state/runtime_hooks.js";
 import {
   mergeScenarioStyleDefaultsState,
 } from "../state/actions/scenario_presentation_actions.js";

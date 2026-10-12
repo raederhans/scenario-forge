@@ -6,7 +6,7 @@ import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
   emitStateBusEvent,
-} from "../state/index.js";
+} from "../state/runtime_hooks.js";
 import {
   clearStartupReadonlyStateForReason,
   commitStartupReadonlyStateFields,

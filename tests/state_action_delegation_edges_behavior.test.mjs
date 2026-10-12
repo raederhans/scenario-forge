@@ -4085,3 +4085,154 @@ test("thematic and population read receipts bind dependencies and keep borrowed 
     }
   }
 });
+
+async function startupActionBindings(modulePath) {
+  const { buildStateWriterBindingGrants } = await import("../tools/build_state_writer_policy.mjs");
+  const { buildCanonicalStateKeyAuthorityIndex } = await import("../tools/state_writer_policy.mjs");
+  const { bindingInventories } = await discoverStateWriterBindingsForSource(
+    modulePath, fs.readFileSync(modulePath, "utf8"), "production",
+    { scanAllParameters: true, derivedAliasTaintMode: "strict", includeInventories: true },
+  );
+  return bindingInventories.map(({ binding, findings }) => ({
+    ...binding, authority: "domain-action",
+    grants: buildStateWriterBindingGrants(findings, modulePath, buildCanonicalStateKeyAuthorityIndex(), "production"),
+  }));
+}
+
+test("base-city readiness writes stay behind one canonical action without hiding caller writes", async () => {
+  const modulePath = "js/core/state/actions/content_load_actions.js";
+  const actionName = "setBaseCityLocalizationReadyState";
+  const bindings = await startupActionBindings(modulePath);
+  const action = bindings.find(binding => binding.functionName === actionName);
+  assert.ok(action);
+  assert.deepEqual(action.grants.flatMap(grant => grant.memberships), [
+    { operation: "assign", key: "baseCityLocalizationReady" },
+  ]);
+  assert.deepEqual(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings }], {
+    modulePaths: [modulePath],
+  }), []);
+
+  const contentPath = "js/core/state/content_state.js";
+  const contentSource = fs.readFileSync(contentPath, "utf8");
+  const discover = source => discoverStateWriterBindingsForSource(contentPath, source, "production", {
+    scanAllParameters: true, derivedAliasTaintMode: "strict", includeInventories: true,
+  });
+  const inventory = await discover(contentSource);
+  const readinessFindings = result => result.bindingInventories.flatMap(entry => entry.findings)
+    .filter(finding => finding.key === "baseCityLocalizationReady");
+  assert.deepEqual(readinessFindings(inventory), []);
+  const edges = inventory.bindingInventories.flatMap(entry => entry.actionDelegations)
+    .filter(edge => edge.actionExportName === actionName);
+  assert.deepEqual(edges.map(edge => [edge.functionName, edge.actionModulePath, edge.targetArgumentIndex]), [
+    ["commitBaseCitySupportData", modulePath, 0],
+    ["commitBaseCitySupportData", modulePath, 0],
+    ["hydrateStartupBaseContentState", modulePath, 0],
+  ]);
+
+  const bypassed = contentSource.replaceAll(`${actionName}(target, false)`, "target.baseCityLocalizationReady = false")
+    .replaceAll(`${actionName}(target, true)`, "target.baseCityLocalizationReady = true");
+  const writes = readinessFindings(await discover(bypassed));
+  assert.equal(writes.length, 3);
+  assert.ok(writes.every(finding => finding.operation === "assign"));
+});
+
+test("startup action receipts preserve writes and prove the exact borrowed internal sites", async () => {
+  const { inspectStartupActionDiagnosticReceipt } = await import("../tools/state_action_delegation_contract.mjs");
+  for (const [file, names] of [
+    ["thematic_wgi_actions", { setThematicWgiRuntimeState: 1, resetThematicWgiRuntimeState: 2, setThematicWgiStyleState: 2 }],
+    ["population_spatial_actions", { setPopulationRuntimeState: 1, resetPopulationRuntimeState: 2, setPopulationStyleState: 2 }],
+    ["content_load_actions", { commitPhysicalContourDisplayState: 2 }],
+  ]) {
+    const modulePath = `js/core/state/actions/${file}.js`;
+    const bindings = await startupActionBindings(modulePath);
+    assert.deepEqual(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings }], { modulePaths: [modulePath] }), []);
+    for (const [name, count] of Object.entries(names)) {
+      const binding = bindings.find(candidate => candidate.functionName === name);
+      assert.ok(binding.grants.some(grant => grant.memberships.length), name);
+      assert.equal(binding.grants.flatMap(grant => grant.unsupportedSites).length, count, name);
+      assert.deepEqual(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding }), {
+        violations: [], acceptedDiagnosticCount: count,
+      });
+    }
+  }
+});
+
+test("startup action receipts reject source changes, observer writes and forged sites", async () => {
+  const { inspectStartupActionDiagnosticReceipt } = await import("../tools/state_action_delegation_contract.mjs");
+  for (const [file, name, dependencyPath] of [
+    ["thematic_wgi_actions", "setThematicWgiStyleState", "js/core/state/actions/appearance_actions.js"],
+    ["population_spatial_actions", "setPopulationStyleState", "js/core/state/actions/thematic_wgi_actions.js"],
+    ["content_load_actions", "commitPhysicalContourDisplayState", "js/core/state/context_layer_revision.js"],
+  ]) {
+    const modulePath = `js/core/state/actions/${file}.js`;
+    const bindings = await startupActionBindings(modulePath);
+    const binding = bindings.find(candidate => candidate.functionName === name);
+    const source = fs.readFileSync(modulePath, "utf8");
+    const changedSources = file === "content_load_actions" ? [
+      source.replace('../context_layer_revision.js', '../fake_revision.js'),
+      source.replace('const changed = [];', 'const changed = []; const recordContextLayerPublication = unknown;'),
+      source.replace('layer => layer ===', 'layer => (target.physicalContourMajorData.features = [], layer) ==='),
+    ] : [
+      source.replace(/return target\.[A-Za-z]+;/, 'return target;'),
+      source.replace('return style;', 'unknown(target); return style;'),
+      source.replace('./appearance_actions.js', './fake_appearance_actions.js'),
+    ];
+    for (const changed of changedSources) {
+      assert.notEqual(changed, source);
+      assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding,
+        readSource: path => path === modulePath ? changed : fs.readFileSync(path, "utf8"),
+      }).violations.length);
+    }
+    assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding,
+      readSource: path => fs.readFileSync(path, "utf8") + (path === dependencyPath ? '\nunknown(target, collections);' : ''),
+    }).violations.length);
+    for (const change of ["drop", "duplicate", "fingerprint", "position", "key", "binding", "alias", "dynamic", "ambiguous"]) {
+      const forged = structuredClone(bindings);
+      const target = forged.find(candidate => candidate.functionName === name);
+      const grant = target.grants.find(candidate => candidate.unsupportedSites.length);
+      if (change === "drop") grant.unsupportedSites.pop();
+      if (change === "duplicate") grant.unsupportedSites.push({ ...grant.unsupportedSites[0] });
+      if (change === "fingerprint") grant.unsupportedSites[0].sourceFingerprint = "0".repeat(64);
+      if (change === "position") grant.unsupportedSites[0].line += 1;
+      if (change === "key") grant.unsupportedSites[0].key = "bootPhase";
+      if (change === "binding") target.parameterName = "other";
+      if (change === "alias") grant.aliasSites.push({ alias: "unknown", key: "bootPhase" });
+      if (change === "dynamic") grant.dynamicSites.push({ operation: "assign", key: "bootPhase", pathPattern: "*" });
+      if (change === "ambiguous") grant.ambiguousSites.push({ reason: "ambiguous-alias-flow" });
+      assert.ok(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings: forged }], { modulePaths: [modulePath] }).length, change);
+    }
+    assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, { id: name }, { binding }).violations.length);
+  }
+});
+
+test("startup action borrowed results keep caller writes and escapes observable", () => {
+  for (const [file, names] of [
+    ["thematic_wgi_actions", ["setThematicWgiRuntimeState", "resetThematicWgiRuntimeState", "setThematicWgiStyleState"]],
+    ["population_spatial_actions", ["setPopulationRuntimeState", "resetPopulationRuntimeState", "setPopulationStyleState"]],
+  ]) {
+    for (const exportName of names) {
+      const modulePath = `js/core/state/actions/${file}.js`;
+      const entry = STATE_ACTION_DELEGATION_CONTRACT.find(candidate => candidate.modulePath === modulePath && candidate.exportName === exportName);
+      assert.deepEqual(entry.borrowedResultPaths, [[]]);
+      for (const borrowedResultPaths of [[], [["data"]]]) {
+        assert.ok(validateStateActionDelegationContract([{ ...entry, borrowedResultPaths }]).length);
+      }
+      const prefix = 'import { state as runtimeState } from "./state.js"; '
+        + `import { ${exportName} as apply } from "./state/actions/${file}.js";`;
+      const call = exportName.startsWith("reset") ? "apply(runtimeState)" : 'apply(runtimeState, { status: "ready" })';
+      const scan = tail => scanStateMutations(prefix + tail, {
+        filePath: "js/core/startup_action_fixture.js",
+        bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+      });
+      assert.deepEqual(scan(`${call};`), []);
+      for (const tail of [
+        `const result = ${call}; result.enabled = true;`,
+        `const result = ${call}; result.data.features[0].geometry = {};`,
+        `const result = ${call}; leak(result);`,
+        `const { data } = ${call}; leak(data);`,
+      ]) assert.ok(scan(tail).length, `${exportName}: ${tail}`);
+    }
+  }
+  const contour = STATE_ACTION_DELEGATION_CONTRACT.find(entry => entry.exportName === "commitPhysicalContourDisplayState");
+  assert.deepEqual(contour.borrowedResultPaths, []);
+});

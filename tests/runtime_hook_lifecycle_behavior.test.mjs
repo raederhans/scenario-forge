@@ -5,7 +5,24 @@ import vm from "node:vm";
 import {
   callRequiredRuntimeHook, callRuntimeHook, registerRuntimeHook,
   registerOwnedRuntimeHook, readRuntimeHook, subscribeStateBusEvent, off, STATE_BUS_EVENTS,
-} from "../js/core/state/index.js";
+} from "../js/core/state/runtime_hooks.js";
+import * as facade from "../js/core/state/index.js";
+
+test("cross-entry ownership disposal and required commands share one registration", (t) => {
+  const name = "noteFirstVisibleFramePaintedFn";
+  t.after(() => registerRuntimeHook(null, name, null));
+  assert.throws(() => facade.callRequiredRuntimeHook(null, name), /not registered/);
+  const old = facade.registerOwnedRuntimeHook(null, name, () => "old");
+  const next = registerOwnedRuntimeHook(null, name, () => "next");
+  old();
+  assert.equal(facade.callRequiredRuntimeHook(null, name), "next");
+  assert.equal(callRequiredRuntimeHook(null, name), "next");
+  next();
+  assert.throws(() => facade.callRequiredRuntimeHook(null, name), /not registered/);
+  assert.throws(() => callRequiredRuntimeHook(null, name), /not registered/);
+  assert.deepEqual(facade.callRuntimeHook(null, "updateRecentUI"), []);
+  assert.deepEqual(callRuntimeHook(null, "updateRecentUI"), []);
+});
 
 for (const name of ["updateScenarioUIFn", "noteFirstVisibleFramePaintedFn"]) {
   test(`${name}: old cleanup preserves replacement, including reused callbacks`, () => {

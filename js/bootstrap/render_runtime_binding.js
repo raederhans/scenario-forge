@@ -5,7 +5,7 @@ import {
   flushRenderBoundary,
   markRenderBoundaryFlushed,
 } from "../core/render_boundary.js";
-import { registerRuntimeHook } from "../core/state/index.js";
+import { registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import { initPresetState } from "../core/preset_state.js";
 import { initToast, showToast } from "../ui/toast.js";
 

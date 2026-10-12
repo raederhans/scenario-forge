@@ -346,7 +346,8 @@ test("local owner feedback selects existing behavior without admitting broader r
       assert.deepEqual(local.localEntrypointRouteGaps, [], source);
       assert.deepEqual(local.recommendedCommands.map((entry) => entry.commandRef),
         [...((source === "js/ui/toolbar/workspace_chrome_support_surface_controller.js")
-          ? ["node --test tests/quick_fill_level_controls.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs"] : []),
+          ? ["node --test tests/quick_fill_level_controls.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs",
+            "node --test tests/quick_fill_state_boundary_contract.test.mjs"] : []),
           ...[testFile, ...additionalTests].map((file) => "node --test " + file)], source);
       for (const command of local.recommendedCommands) {
         assert.equal(command.executionOwner, "child-safe");

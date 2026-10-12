@@ -1,6 +1,6 @@
 // Appearance parent-border owner.
 // 父国界列表可能随场景反复刷新；这里把列表模型和 DOM 复用从总 controller 中收拢出来。
-import { PARENT_BORDER_STYLE_DEFAULTS } from "../../core/state.js";
+import { PARENT_BORDER_STYLE_DEFAULTS } from "../../core/state_defaults.js";
 import { setAppearanceVisibilityState } from "../../core/state/actions/appearance_visibility_actions.js";
 import {
   ensureAppearanceStyleConfigState,

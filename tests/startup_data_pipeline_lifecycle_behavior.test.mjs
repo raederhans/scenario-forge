@@ -4,6 +4,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import * as contentActions from "../js/core/state/content_state.js";
 import * as contentLoadActions from "../js/core/state/actions/content_load_actions.js";
+import { mergeCityLocalizationData } from "../js/core/data_loader.js";
 
 // Run the real owner with controlled resource IO; no DOM or network is needed.
 const source = readFileSync(new URL("../js/bootstrap/startup_data_pipeline.js", import.meta.url), "utf8")
@@ -27,7 +28,7 @@ function harness(overrides = {}, helperOverrides = {}) {
     ensureActiveScenarioOptionalLayersForVisibility: async () => {},
     emitStateBusEvent: () => events.push("ui-event"),
     STATE_BUS_EVENTS: {},
-    buildCityLocalizationPatch: () => ({}),
+    mergeCityLocalizationData,
     console: { info() {}, warn() {} },
     ...overrides,
   };
@@ -195,6 +196,108 @@ for (const resource of ["city", "localization"]) {
     assert.equal(resource === "city" ? state.baseCityDataPromise : state.baseLocalizationDataPromise, null);
     assert.notEqual(resource === "city" ? state.baseCityDataState : state.baseLocalizationDataState, "loading");
     assert.deepEqual(events, []);
+  });
+}
+
+test("full localization merges the latest city data and synchronizes the live scenario after a shared load", async () => {
+  const load = deferred();
+  const synced = [];
+  let loads = 0;
+  const { owner, state, events } = harness({
+    loadLocalizationData: () => { loads += 1; return load.promise; },
+    syncScenarioLocalizationState: (payload) => synced.push(payload),
+  });
+  state.baseCityAliasesData = { geo: { stale: { en: "Old city", zh: "旧城市" } } };
+  const old = owner.ensureFullLocalizationDataReady({ renderNow: false });
+  const current = owner.ensureFullLocalizationDataReady();
+
+  const cities = { type: "FeatureCollection", features: [{
+    type: "Feature",
+    properties: {
+      stable_key: "CITY::live",
+      __city_locale: { en: "Geometry name", zh: "几何名称" },
+      __city_aliases: ["Geometry alias"],
+    },
+    geometry: { type: "Point", coordinates: [103.8, 1.3] },
+  }] };
+  const aliases = {
+    geo: { "CITY::live": { en: "Alias name", zh: "别名" } },
+    alias_to_stable_key: { Shared: "CITY::live" },
+  };
+  const latestUi = { label: "Live UI" };
+  const scenarioGeo = { scenario: { en: "Scenario name", zh: "场景名称" } };
+  state.worldCitiesData = cities;
+  state.baseCityAliasesData = aliases;
+  state.locales = { ui: latestUi, geo: scenarioGeo };
+  state.activeScenarioId = "B";
+  state.scenarioCityOverridesData = { scenario_id: "B", cities: [] };
+  state.scenarioGeoLocalePatchData = { scenario_id: "B", geo: {} };
+  const result = {
+    locales: { geo: {
+      "CITY::live": { en: "Loaded name", zh: "文件名称" },
+      region: { en: "Region", zh: "地区" },
+    } },
+    geoAliases: { alias_to_stable_key: { Shared: "loaded", Region: "region" } },
+  };
+  const inputsBefore = structuredClone({ result, cities, aliases });
+  load.resolve(result);
+  assert.equal(await old, result);
+  assert.equal(await current, result);
+  assert.equal(loads, 1);
+  assert.deepEqual(state.baseGeoLocales, {
+    "CITY::live": { en: "Alias name", zh: "别名" },
+    region: { en: "Region", zh: "地区" },
+  });
+  assert.deepEqual(state.baseGeoAliasToStableKey, {
+    Shared: "CITY::live", Region: "region", "Geometry alias": "CITY::live",
+  });
+  assert.deepEqual(synced, [{
+    cityOverridesPayload: state.scenarioCityOverridesData,
+    geoLocalePatchPayload: state.scenarioGeoLocalePatchData,
+  }]);
+  assert.equal(state.locales.geo, scenarioGeo, "active scenario localization is synchronized separately");
+  assert.deepEqual(state.locales.ui, latestUi);
+  assert.notEqual(state.locales.ui, latestUi);
+  assert.deepEqual({ result, cities, aliases }, inputsBefore);
+  assert.equal(state.baseLocalizationDataPromise, null);
+  assert.equal(state.baseLocalizationDataState, "loaded");
+  assert.deepEqual(events, ["country-ui", "ui-event", "render"]);
+});
+
+for (const { label, result, ui, geo, aliasMap } of [
+  {
+    label: "object dictionaries",
+    result: { locales: { ui: { loaded: "Label" }, geo: { region: { en: "Region" } } }, geoAliases: { alias_to_stable_key: { Region: "region" } } },
+    ui: { loaded: "Label" }, geo: { region: { en: "Region" } }, aliasMap: { Region: "region" },
+  },
+  { label: "missing dictionaries", result: {}, ui: { fallback: "Current UI" }, geo: {}, aliasMap: {} },
+  {
+    label: "non-object dictionaries",
+    result: { locales: { ui: "invalid", geo: "invalid" }, geoAliases: { alias_to_stable_key: "invalid" } },
+    ui: { fallback: "Current UI" }, geo: {}, aliasMap: {},
+  },
+  {
+    label: "array dictionaries with existing object-spread semantics",
+    result: { locales: { ui: ["Label"], geo: [{ en: "Region" }] }, geoAliases: { alias_to_stable_key: ["region"] } },
+    ui: { 0: "Label" }, geo: { 0: { en: "Region" } }, aliasMap: { 0: "region" },
+  },
+]) {
+  test(`full localization preserves ${label} without an active scenario`, async () => {
+    const { owner, state, events } = harness({ loadLocalizationData: async () => result });
+    state.activeScenarioId = "";
+    state.locales.ui = { fallback: "Current UI" };
+    const inputBefore = structuredClone(result);
+    assert.equal(await owner.ensureFullLocalizationDataReady({ renderNow: false }), result);
+    assert.deepEqual(state.locales, { ui, geo });
+    assert.deepEqual(state.baseGeoLocales, geo);
+    assert.deepEqual(state.geoAliasToStableKey, aliasMap);
+    assert.deepEqual(state.baseGeoAliasToStableKey, aliasMap);
+    assert.notEqual(state.locales.geo, state.baseGeoLocales);
+    assert.notEqual(state.geoAliasToStableKey, state.baseGeoAliasToStableKey);
+    assert.deepEqual(result, inputBefore);
+    assert.equal(state.baseLocalizationLevel, "full");
+    assert.equal(state.baseLocalizationDataPromise, null);
+    assert.deepEqual(events, ["country-ui", "ui-event"]);
   });
 }
 

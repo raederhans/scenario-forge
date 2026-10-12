@@ -1,4 +1,4 @@
-import { normalizeReferenceImageState } from "../../core/state.js";
+import { normalizeReferenceImageState } from "../../core/state/ui_state.js";
 import {
   patchReferenceImageState,
   setReferenceImageState,

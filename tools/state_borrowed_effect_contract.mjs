@@ -180,8 +180,8 @@ const callbackInjectionDefinitions =[
     "implementationModulePath": "js/core/scenario_chunk_manager.js",
     "implementationExportName": "mergeScenarioChunkPayloads",
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario_chunk_manager.js": "600141575549766e7be14102def421dd86f8476174ee4fb59f0ebb14996281dc",
       "js/core/scenario/political_lod_policy.js": "2ddb65299ede3a51ce306f8e42bfa5b5710b0a7ac87c7eac8819142ee04a9c45",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -200,8 +200,8 @@ const callbackInjectionDefinitions =[
     "implementationModulePath": "js/core/scenario_chunk_manager.js",
     "implementationExportName": "mergeScenarioChunkPayloadsForViewport",
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario_chunk_manager.js": "600141575549766e7be14102def421dd86f8476174ee4fb59f0ebb14996281dc",
       "js/core/scenario/political_lod_policy.js": "2ddb65299ede3a51ce306f8e42bfa5b5710b0a7ac87c7eac8819142ee04a9c45",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -285,8 +285,8 @@ const callbackInjectionDefinitions =[
     ],
     "callbackReturnsBorrowed": false,
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario/shared.js": "827902ae4329606239ac8b42c7b36702c996fea4015bc35d59f8e4aa770db77d"
     }
   },
@@ -466,7 +466,7 @@ const callbackInjectionDefinitions =[
     "sourceFingerprints": {
       "js/core/renderer/city_lights_render_owner.js": "0cd18953a1a501db7c3ce0b39988082235bea5751d300ff1ca044c0c64966a1d",
       "js/core/map_renderer.js": "93c5f0e16585f8ff9916c3fe2d884c191aa9aa479b8967256e8be842e2893c81",
-      "js/core/state.js": "d5db7104a473a577bff27bdee57125982dc7b66f6bc14e76d0f87e3bb336aaef",
+      "js/core/state.js": "57545a3179581b1f4c0393754bc8db167d5cd01d8176e5726c054b5c6afe441b",
       "js/core/intensity_field.js": "f9bfad34368d667483e85ef831944ce1851ca47c96cdc73221c165c260f1293f",
       "js/core/state/intensity_field_state.js": "31631a55a3a26f9a3e1eda661c2bbf1477df2c5d53e8ef77c743fde813b7478d"
     }
@@ -600,8 +600,8 @@ const callbackInjectionDefinitions =[
       ]
     ],
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario/pure_helpers.js": "0c48e6f3a5138da08e2550700aa37af574be2fafda8f010e868908f82f218d8d"
     }
   },
@@ -622,8 +622,8 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": false,
     "invocationBorrowedResultPaths": [],
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario/pure_helpers.js": "0c48e6f3a5138da08e2550700aa37af574be2fafda8f010e868908f82f218d8d",
       "js/core/scenario_runtime_queries.js": "b4d1805c004e9f24fc757ab6d279f63eed0276fdbe104ceabf643b569e848e03",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
@@ -649,8 +649,8 @@ const callbackInjectionDefinitions =[
     "callbackReturnsBorrowed": false,
     "invocationBorrowedResultPaths": [],
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario/pure_helpers.js": "0c48e6f3a5138da08e2550700aa37af574be2fafda8f010e868908f82f218d8d"
     }
   },
@@ -773,12 +773,12 @@ const callbackInjectionDefinitions =[
       "Emit console.info for synchronized locale conflicts; the callback returns undefined"
     ],
     "sourceFingerprints": {
-      "js/core/scenario/chunk_runtime.js": "dba4786f02dd30a2aec378cb4379cdef7050b8db43757dcd1a00960dded525c9",
-      "js/core/scenario_resources.js": "a25c10176ae23a166ce3e7b6d29d6b0ba5bd8c4af75be58fea54bcc3bb4cce09",
+      "js/core/scenario/chunk_runtime.js": "0b7b6c0b19fd1624c7948daeedacb0ac4bd91db69679ab10e184522e0fc40a26",
+      "js/core/scenario_resources.js": "5b70fce59e381db2e7e8341d8d8dafe9d8ecdb38eaadb67cf1df06cf0c683fe8",
       "js/core/scenario_localization_state.js": "99387328d612404da12060cf8b888af73536beabc82d56ed7159b5d636b9bbcc",
-      "js/core/state.js": "d5db7104a473a577bff27bdee57125982dc7b66f6bc14e76d0f87e3bb336aaef",
+      "js/core/state.js": "57545a3179581b1f4c0393754bc8db167d5cd01d8176e5726c054b5c6afe441b",
       "js/core/state/actions/scenario_presentation_actions.js": "d7d718d9d3a177888cee6314f854cb1bda3f4c1f4591167115a125801dc4d066",
-      "js/core/data_loader.js": "264d6bebf4af717ad2c404ddac23380c21eb23ba318a32ebdc61f49d1c2793ac",
+      "js/core/data_loader.js": "1c1ec743924442370da388f32d599dcb172258a84184758093b989bc30bde605",
       "js/core/feature_identity.js": "ed2ea2ce3f63baaadf33360ecd0d84e722e5ba06042857e5b0b1516383fdca54",
       "js/core/feature_identity_shared.js": "87740ee4f95f77350073884c812865264b9e5eae2e0bfeec88d066648c2bcf0a",
       "js/core/country_code_aliases.js": "460311cf93c7ffc8004cabbee374a8a76c12fd37c3ab82524d527e7b919c2f67",
@@ -873,7 +873,7 @@ export function inspectStateBorrowedCallbackInjectionSources(entry, {
 const borrowedRuntimeDefinition = {
   "factoryModulePath": "js/core/scenario/chunk_runtime.js",
   "factoryExportName": "createScenarioChunkRuntimeController",
-  "factorySourceFingerprint": "50cb734238ae90342da6f9115e1f8c2708e1e4abb8701916b5c60270d885e079",
+  "factorySourceFingerprint": "9d4a8191ec4fdbacaf890fbc968b66820bbfc588df6a69c30e1dc966caa8a1d4",
   "borrowedLocalStorage": [
     {
       "functionName": "refreshActiveScenarioChunks",

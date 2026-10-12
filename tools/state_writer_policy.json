@@ -74301,511 +74301,6 @@
       ]
     },
     {
-      "path": "js/core/state/index.js",
-      "surface": "production",
-      "domain": "cross-domain",
-      "authority": "compat-facade",
-      "migrationPhase": "multi-phase",
-      "bindings": [
-        {
-          "id": "parameter:bindStateCompatSurface:0:09fc96082d34:263:48",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "bindStateCompatSurface",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 263,
-            "column": 48
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [
-                "define-property"
-              ],
-              "keys": [],
-              "memberships": [
-                {
-                  "operation": "define-property",
-                  "key": "*",
-                  "mutationSites": [
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"bindStateCompatSurface\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-                      "sourceFingerprint": "ab19ef6a81dc3c6b72e6adbcd76cbef42cebcb4358a4750a1b3bc66249d712af",
-                      "occurrenceIndex": 0
-                    },
-                    {
-                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"bindStateCompatSurface\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
-                      "sourceFingerprint": "121d5ae4e882ab22e55cc4972994df8111d5bb8019bd3677a29648dc51c21267",
-                      "occurrenceIndex": 0
-                    }
-                  ]
-                }
-              ],
-              "aliasSites": [],
-              "dynamicSites": [
-                {
-                  "line": 271,
-                  "column": 5,
-                  "operation": "define-property",
-                  "key": "*",
-                  "pathPattern": "*",
-                  "sourceFingerprint": "ab19ef6a81dc3c6b72e6adbcd76cbef42cebcb4358a4750a1b3bc66249d712af"
-                },
-                {
-                  "line": 284,
-                  "column": 5,
-                  "operation": "define-property",
-                  "key": "*",
-                  "pathPattern": "*",
-                  "sourceFingerprint": "121d5ae4e882ab22e55cc4972994df8111d5bb8019bd3677a29648dc51c21267"
-                }
-              ],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 95,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 264,
-                  "column": 66,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 265,
-                  "column": 12,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 267,
-                  "column": 21,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 293,
-                  "column": 29,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 298,
-                  "column": 10,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:callCompatRuntimeHook:0:09fc96082d34:237:66",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "callCompatRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 237,
-            "column": 66
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 242,
-                  "column": 10,
-                  "reason": "unsupported-call-mutation",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "17c3be15d89537caba795e7772e7715e8697801b9d5569a7c670a4b9d485c517"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:callRequiredRuntimeHook:0:09fc96082d34:208:68",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "callRequiredRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 208,
-            "column": 68
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 213,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:callRuntimeHook:0:09fc96082d34:219:60",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "callRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 219,
-            "column": 60
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 224,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:callRuntimeHooks:0:09fc96082d34:258:62",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "callRuntimeHooks",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 258,
-            "column": 62
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 260,
-                  "column": 64,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:captureCompatRuntimeHook:0:09fc96082d34:247:60",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "captureCompatRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 247,
-            "column": 60
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 254,
-                  "column": 34,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "f2579d976934c7888785842d8e5a48a140453222e5dbca50d5a1226cd63a8dc7"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:readRegisteredRuntimeHookSource:0:09fc96082d34:147:67",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "readRegisteredRuntimeHookSource",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 147,
-            "column": 67
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 152,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:readRuntimeHook:0:09fc96082d34:132:51",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "readRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 132,
-            "column": 51
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 137,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:registerOwnedRuntimeHook:0:09fc96082d34:187:66",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "registerOwnedRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 187,
-            "column": 66
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 152,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 195,
-                  "column": 23,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 202,
-                  "column": 27,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:registerRuntimeHook:0:09fc96082d34:162:61",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "registerRuntimeHook",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 162,
-            "column": 61
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 95,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                },
-                {
-                  "line": 167,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "parameter:registerRuntimeHookBusListener:0:09fc96082d34:90:76",
-          "kind": "function-parameter",
-          "name": "target",
-          "functionName": "registerRuntimeHookBusListener",
-          "parameterName": "target",
-          "parameterIndex": 0,
-          "parameterPath": "$",
-          "locator": {
-            "line": 90,
-            "column": 76
-          },
-          "authority": "compat-facade",
-          "grants": [
-            {
-              "domain": "cross-domain",
-              "migrationPhase": "multi-phase",
-              "operations": [],
-              "keys": [],
-              "memberships": [],
-              "aliasSites": [],
-              "dynamicSites": [],
-              "ambiguousSites": [],
-              "unsupportedSites": [
-                {
-                  "line": 95,
-                  "column": 26,
-                  "reason": "state-alias-escape",
-                  "operation": "unsupported",
-                  "key": "*",
-                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
       "path": "js/core/state/renderer_runtime_state.js",
       "surface": "production",
       "domain": "cross-domain",
@@ -75524,6 +75019,511 @@
                   "operation": "unsupported",
                   "key": "sidebarPerf",
                   "sourceFingerprint": "f5c40793a977bb9d2362b01181504ad5ff2268f0c719b805d10729a3b0eb38e3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "js/core/state/runtime_hooks.js",
+      "surface": "production",
+      "domain": "cross-domain",
+      "authority": "compat-facade",
+      "migrationPhase": "multi-phase",
+      "bindings": [
+        {
+          "id": "parameter:bindStateCompatSurface:0:09fc96082d34:253:48",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "bindStateCompatSurface",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 253,
+            "column": 48
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [
+                "define-property"
+              ],
+              "keys": [],
+              "memberships": [
+                {
+                  "operation": "define-property",
+                  "key": "*",
+                  "mutationSites": [
+                    {
+                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"bindStateCompatSurface\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
+                      "sourceFingerprint": "ab19ef6a81dc3c6b72e6adbcd76cbef42cebcb4358a4750a1b3bc66249d712af",
+                      "occurrenceIndex": 0
+                    },
+                    {
+                      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"bindStateCompatSurface\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":1}]}",
+                      "sourceFingerprint": "121d5ae4e882ab22e55cc4972994df8111d5bb8019bd3677a29648dc51c21267",
+                      "occurrenceIndex": 0
+                    }
+                  ]
+                }
+              ],
+              "aliasSites": [],
+              "dynamicSites": [
+                {
+                  "line": 261,
+                  "column": 5,
+                  "operation": "define-property",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "ab19ef6a81dc3c6b72e6adbcd76cbef42cebcb4358a4750a1b3bc66249d712af"
+                },
+                {
+                  "line": 274,
+                  "column": 5,
+                  "operation": "define-property",
+                  "key": "*",
+                  "pathPattern": "*",
+                  "sourceFingerprint": "121d5ae4e882ab22e55cc4972994df8111d5bb8019bd3677a29648dc51c21267"
+                }
+              ],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 88,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 254,
+                  "column": 66,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 255,
+                  "column": 12,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 257,
+                  "column": 21,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 283,
+                  "column": 29,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 288,
+                  "column": 10,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:callCompatRuntimeHook:0:09fc96082d34:227:66",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "callCompatRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 227,
+            "column": 66
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 232,
+                  "column": 10,
+                  "reason": "unsupported-call-mutation",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "17c3be15d89537caba795e7772e7715e8697801b9d5569a7c670a4b9d485c517"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:callRequiredRuntimeHook:0:09fc96082d34:198:68",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "callRequiredRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 198,
+            "column": 68
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 203,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:callRuntimeHook:0:09fc96082d34:209:60",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "callRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 209,
+            "column": 60
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 214,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:callRuntimeHooks:0:09fc96082d34:248:62",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "callRuntimeHooks",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 248,
+            "column": 62
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 250,
+                  "column": 64,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:captureCompatRuntimeHook:0:09fc96082d34:237:60",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "captureCompatRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 237,
+            "column": 60
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 244,
+                  "column": 34,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "f2579d976934c7888785842d8e5a48a140453222e5dbca50d5a1226cd63a8dc7"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:readRegisteredRuntimeHookSource:0:09fc96082d34:140:67",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "readRegisteredRuntimeHookSource",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 140,
+            "column": 67
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 145,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:readRuntimeHook:0:09fc96082d34:125:51",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "readRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 125,
+            "column": 51
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 130,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:registerOwnedRuntimeHook:0:09fc96082d34:177:66",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "registerOwnedRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 177,
+            "column": 66
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 145,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 185,
+                  "column": 23,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 192,
+                  "column": 27,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:registerRuntimeHook:0:09fc96082d34:155:61",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "registerRuntimeHook",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 155,
+            "column": 61
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 88,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                },
+                {
+                  "line": 160,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "parameter:registerRuntimeHookBusListener:0:09fc96082d34:83:76",
+          "kind": "function-parameter",
+          "name": "target",
+          "functionName": "registerRuntimeHookBusListener",
+          "parameterName": "target",
+          "parameterIndex": 0,
+          "parameterPath": "$",
+          "locator": {
+            "line": 83,
+            "column": 76
+          },
+          "authority": "compat-facade",
+          "grants": [
+            {
+              "domain": "cross-domain",
+              "migrationPhase": "multi-phase",
+              "operations": [],
+              "keys": [],
+              "memberships": [],
+              "aliasSites": [],
+              "dynamicSites": [],
+              "ambiguousSites": [],
+              "unsupportedSites": [
+                {
+                  "line": 88,
+                  "column": 26,
+                  "reason": "state-alias-escape",
+                  "operation": "unsupported",
+                  "key": "*",
+                  "sourceFingerprint": "34a04005bcaf206eec990bd9637d9fdb6725e0a0c0d4aebf003f17f4c956eb5c"
                 }
               ]
             }
@@ -115783,7 +115783,7 @@
         {
           "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|hoveredId",
           "callerPath": "js/core/map_renderer/map_hover_interaction_owner.js",
-          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:78:140",
+          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:79:140",
           "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createMapHoverInteractionOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
           "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createMapHoverInteractionOwner\",\"ordinal\":0},{\"name\":\"setHoverIds\",\"ordinal\":0}]}",
           "retiredEnclosingFunctionIdentities": [
@@ -115797,7 +115797,7 @@
           "proofPrecision": "explicit-cross-file-multi-function",
           "retiredCallerPath": "js/core/map_renderer.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "012a00b37f7c9e06d1bb60a9e02ba5533d920d828165a52dd66e3e882458e6f1",
+          "crossFileMigrationContractIdentity": "5c99e2dc6844682dcf61f6e1bfa93f936de5271e1339757d2de7e88220b7cac8",
           "domain": "ui",
           "migrationPhase": "P4.4",
           "operation": "assign",
@@ -115807,11 +115807,11 @@
           "targetArgumentIndex": 0,
           "actionCallEdgeIdentity": "e619fbd46c75502ce9fd6c3729ce355f8c9232d7b5945657a311b91a41d81fd0",
           "occurrenceIndex": 0,
-          "start": 3925,
-          "end": 3989,
-          "line": 113,
+          "start": 4109,
+          "end": 4186,
+          "line": 116,
           "column": 5,
-          "sourceFingerprint": "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+          "sourceFingerprint": "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
           "backfilled": false
@@ -115819,7 +115819,7 @@
         {
           "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|hoveredSpecialRegionId",
           "callerPath": "js/core/map_renderer/map_hover_interaction_owner.js",
-          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:78:140",
+          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:79:140",
           "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createMapHoverInteractionOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
           "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createMapHoverInteractionOwner\",\"ordinal\":0},{\"name\":\"setHoverIds\",\"ordinal\":0}]}",
           "retiredEnclosingFunctionIdentities": [
@@ -115833,7 +115833,7 @@
           "proofPrecision": "explicit-cross-file-multi-function",
           "retiredCallerPath": "js/core/map_renderer.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "d0faa77bc111f6978fef853ec39a1114948fd3daf6486dd887e9fed6b9f81559",
+          "crossFileMigrationContractIdentity": "bf28191c01f556f9e5da93a40ed639533511cfab3070ced2e71e3463f6a35343",
           "domain": "ui",
           "migrationPhase": "P4.4",
           "operation": "assign",
@@ -115843,15 +115843,15 @@
           "targetArgumentIndex": 0,
           "actionCallEdgeIdentity": "e619fbd46c75502ce9fd6c3729ce355f8c9232d7b5945657a311b91a41d81fd0",
           "occurrenceIndex": 0,
-          "start": 3925,
-          "end": 3989,
-          "line": 113,
+          "start": 4109,
+          "end": 4186,
+          "line": 116,
           "column": 5,
-          "sourceFingerprint": "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+          "sourceFingerprint": "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
           "successorActionProofs": [
             {
               "callerPath": "js/core/state/actions/renderer_interaction_actions.js",
-              "callerBindingId": "parameter:setHoveredFeatureIdsState:0:09fc96082d34:139:3",
+              "callerBindingId": "parameter:setHoveredFeatureIdsState:0:09fc96082d34:141:3",
               "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setHoveredFeatureIdsState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
               "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"setHoveredFeatureIdsState\",\"ordinal\":0}]}",
               "actionModulePath": "js/core/state/actions/scenario_presentation_actions.js",
@@ -115859,15 +115859,15 @@
               "targetArgumentIndex": 0,
               "actionCallEdgeIdentity": "5f785987cfaa27924ab1d5d44c966bb01a6f7e9e6618e7f9c8389b2f770e4e5e",
               "occurrenceIndex": 0,
-              "start": 3884,
-              "end": 3946,
-              "line": 142,
+              "start": 4003,
+              "end": 4065,
+              "line": 145,
               "column": 3,
               "sourceFingerprint": "e3463a5e9d61e6396d301ed94bee7a39a9d6b9637ab2d9bc9acb0a805a76dbc5",
               "terminalMembership": "ui|P4.4|assign|hoveredSpecialRegionId"
             }
           ],
-          "successorProofContractIdentity": "9e7bcc0079a0a72006128cb14f0faa9613644da4b39bad5a1b9ae76c77843898",
+          "successorProofContractIdentity": "2171dec55f425edc7a6d7be3d166f087bf10a9f9af0b2abd6a349f29bfc55872",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
           "backfilled": false
@@ -115875,7 +115875,7 @@
         {
           "retiredMembershipIdentity": "js/core/map_renderer.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|hoveredWaterRegionId",
           "callerPath": "js/core/map_renderer/map_hover_interaction_owner.js",
-          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:78:140",
+          "callerBindingId": "parameter:createMapHoverInteractionOwner:0:f980a917b31b:79:140",
           "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createMapHoverInteractionOwner\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
           "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createMapHoverInteractionOwner\",\"ordinal\":0},{\"name\":\"setHoverIds\",\"ordinal\":0}]}",
           "retiredEnclosingFunctionIdentities": [
@@ -115889,7 +115889,7 @@
           "proofPrecision": "explicit-cross-file-multi-function",
           "retiredCallerPath": "js/core/map_renderer.js",
           "retiredCallerBindingIdentity": "{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "crossFileMigrationContractIdentity": "15721efd42ffd9120684e08256c68f2ede1cc2111d48929a47bbde3de7c6ff56",
+          "crossFileMigrationContractIdentity": "39a9944b94e802076660920cfdf9416ec1f532cb1ffc8dbdd4ac72b2630f5b4f",
           "domain": "ui",
           "migrationPhase": "P4.4",
           "operation": "assign",
@@ -115899,15 +115899,15 @@
           "targetArgumentIndex": 0,
           "actionCallEdgeIdentity": "e619fbd46c75502ce9fd6c3729ce355f8c9232d7b5945657a311b91a41d81fd0",
           "occurrenceIndex": 0,
-          "start": 3925,
-          "end": 3989,
-          "line": 113,
+          "start": 4109,
+          "end": 4186,
+          "line": 116,
           "column": 5,
-          "sourceFingerprint": "fe643f1d784d04fdaad71a856bece9288bfe301d5f3394eecdc4fca887df04b2",
+          "sourceFingerprint": "35ec1489e49eefb8a920f05e4120dd7327e1841ad4d2539387cb983b5fa91dd8",
           "successorActionProofs": [
             {
               "callerPath": "js/core/state/actions/renderer_interaction_actions.js",
-              "callerBindingId": "parameter:setHoveredFeatureIdsState:0:09fc96082d34:139:3",
+              "callerBindingId": "parameter:setHoveredFeatureIdsState:0:09fc96082d34:141:3",
               "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"setHoveredFeatureIdsState\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
               "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"setHoveredFeatureIdsState\",\"ordinal\":0}]}",
               "actionModulePath": "js/core/state/actions/scenario_presentation_actions.js",
@@ -115915,15 +115915,15 @@
               "targetArgumentIndex": 0,
               "actionCallEdgeIdentity": "5f785987cfaa27924ab1d5d44c966bb01a6f7e9e6618e7f9c8389b2f770e4e5e",
               "occurrenceIndex": 0,
-              "start": 3884,
-              "end": 3946,
-              "line": 142,
+              "start": 4003,
+              "end": 4065,
+              "line": 145,
               "column": 3,
               "sourceFingerprint": "e3463a5e9d61e6396d301ed94bee7a39a9d6b9637ab2d9bc9acb0a805a76dbc5",
               "terminalMembership": "ui|P4.4|assign|hoveredWaterRegionId"
             }
           ],
-          "successorProofContractIdentity": "d294ac27e8e35cab314dfa3699e354598a60583209ffaa06370878971672abe9",
+          "successorProofContractIdentity": "df40146e9df196b475ed40532c5bc5a0327ff09dea31e3aed6d657e6aec1d78c",
           "retiredInPhase": "P4.4",
           "recordedInPhase": "P4.4",
           "backfilled": false
@@ -120710,7 +120710,7 @@
               "terminalMembership": "content|P4.2|assign|parentBordersVisible"
             }
           ],
-          "successorProofContractIdentity": "eff0dbfda7d7241f08b5bb9fd8046430bd087dd51b1d6ea4bfe72992ce6e5dfc"
+          "successorProofContractIdentity": "24b97b66a7bcf70de3549a40632ad632c0e943fc95470c7e428a2350e20050be"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|content|P4.2|assign|renderProfile",
@@ -120814,7 +120814,7 @@
               "terminalMembership": "renderer|P4.3|assign|parentBorderEnabledByCountry"
             }
           ],
-          "successorProofContractIdentity": "6e75272250f8dc8c2f19bdca95a476f9d866e27211f45cff5c5bbc20f46d8384"
+          "successorProofContractIdentity": "48bd65ad450917c59c0946def1ceb53922aeb62dd24f1c71a527ecb2f345ed5e"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|runtime-hooks|P4.5|assign|awaitInitialScenarioChunkVisualPromotionFn",
@@ -122318,7 +122318,7 @@
               "terminalMembership": "ui|P4.4|assign|showCityPoints"
             }
           ],
-          "successorProofContractIdentity": "05d401611cf4d6cb40f4b61c773cc5f1b26f75bdea35133dfb6216a12505410a"
+          "successorProofContractIdentity": "b2fd354200ea5983e99c88fddfe039bf2e86659c5f7e4ddd4a6f2bd8ffa33123"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|showScenarioReliefOverlays",
@@ -122366,7 +122366,7 @@
               "terminalMembership": "ui|P4.4|assign|showScenarioReliefOverlays"
             }
           ],
-          "successorProofContractIdentity": "c70e94f5133f645c0f680a810f192bf442cea69bb629620a94cb629a533b87de"
+          "successorProofContractIdentity": "b62fea76ec2b12c17a4a9f3dbbf255b76897d69f7159a645db5b7352efa25f03"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|showScenarioSpecialRegions",
@@ -122414,7 +122414,7 @@
               "terminalMembership": "ui|P4.4|assign|showScenarioSpecialRegions"
             }
           ],
-          "successorProofContractIdentity": "494098b70649af270bfd9596cb4f24d13f68e0baede56811b7a5f0286aeb065d"
+          "successorProofContractIdentity": "73a02489e7fe0cfbf976dfcae98873d05bdb67dbedae4d4d6ad447ecd26c6bf0"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|showStrategicResourceMarkers",
@@ -122462,7 +122462,7 @@
               "terminalMembership": "ui|P4.4|assign|showStrategicResourceMarkers"
             }
           ],
-          "successorProofContractIdentity": "62438f3eef1c515aeba2d630d116d843121cdb5bf1ec40e10e20567497424350"
+          "successorProofContractIdentity": "7d8baba10bd8e11faecf3e12ca19d176906839a79a92d32556d2046abcf753d3"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|showWaterRegions",
@@ -122510,7 +122510,7 @@
               "terminalMembership": "ui|P4.4|assign|showWaterRegions"
             }
           ],
-          "successorProofContractIdentity": "13650e87eb685aff307e79a9c0b44e23bb1975d33952212e9949b5576211f9bb"
+          "successorProofContractIdentity": "07eee7847d9c174b550b4b76fc866f8e63b33726f9a4441888059c96d4cc66d4"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|strategicChoroplethMetric",
@@ -122558,7 +122558,7 @@
               "terminalMembership": "ui|P4.4|assign|strategicChoroplethMetric"
             }
           ],
-          "successorProofContractIdentity": "b8836c1d8946f9d42322f6575d096ce0fbb992a1337ca5215fe5a22724e9f06f"
+          "successorProofContractIdentity": "21708ddda8617b592d086600460495b85940d017e836cab0b19fa9b1d980278b"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|styleConfig",
@@ -122623,7 +122623,7 @@
               "terminalMembership": "ui|P4.4|assign|styleConfig"
             }
           ],
-          "successorProofContractIdentity": "09ad90f18353f7d4a92d41d7760fc829c13daa4857aed5dd8c825cc134bdd211"
+          "successorProofContractIdentity": "bcb34d973a007d029fe08e3451398afde534b0dcd428729425ec46024f6d78bb"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario_rollback.js|{\"kind\":\"module\",\"name\":\"runtimeState\",\"functionName\":\"\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"\",\"importSource\":\"./state.js\",\"importedName\":\"state\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|ui",
@@ -122688,7 +122688,7 @@
               "terminalMembership": "ui|P4.4|define-property|ui"
             }
           ],
-          "successorProofContractIdentity": "459af0cce599a9668d92c77de91615677d49c213fb47b64a045bd22f6198b6de"
+          "successorProofContractIdentity": "a38f584b390e22bc53c217ee1bb23656739bafff4a6a678355987de219db49b8"
         },
         {
           "retiredMembershipIdentity": "js/core/scenario/bundle_runtime.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createScenarioBundleRuntimeController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:state\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|boot|P4.1|assign|startupBootCacheState",
@@ -128362,13 +128362,16 @@
         {
           "retiredMembershipIdentity": "js/ui/toolbar/appearance_controls_controller.js|{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createAppearanceControlsController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}|ui|P4.4|assign|showUrban",
           "callerPath": "js/ui/toolbar/appearance_controls_controller.js",
-          "callerBindingId": "parameter:createAppearanceControlsController:0:c2ad6df5da0f:70:4",
+          "callerBindingId": "parameter:createAppearanceControlsController:0:c2ad6df5da0f:75:4",
           "callerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createAppearanceControlsController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
-          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createAppearanceControlsController\",\"ordinal\":0},{\"name\":\"bindEvents\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":4}]}",
+          "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createAppearanceControlsController\",\"ordinal\":0},{\"name\":\"bindEvents\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":6}]}",
           "retiredEnclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createAppearanceControlsController\",\"ordinal\":0},{\"name\":\"bindEvents\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":4}]}",
           "retiredMutationSiteFingerprint": "c9ac70ed9df53b4100295ee1235f7e785c2d7e5a022c3908a794d257ca75f52f",
           "retiredMutationSiteCount": 1,
-          "proofPrecision": "exact-site",
+          "proofPrecision": "explicit-cross-file",
+          "retiredCallerPath": "js/ui/toolbar/appearance_controls_controller.js",
+          "retiredCallerBindingIdentity": "{\"kind\":\"function-parameter\",\"name\":\"\",\"functionName\":\"createAppearanceControlsController\",\"parameterName\":\"\",\"parameterIndex\":0,\"parameterPath\":\"$/property:runtimeState\",\"importSource\":\"\",\"importedName\":\"\",\"aliasSources\":[],\"aliasOperators\":[]}",
+          "crossFileMigrationContractIdentity": "9dd8702837a97fc04d1a03dee9060bf8e76fb7e2d67dab481f5b663dd88d7108",
           "domain": "ui",
           "migrationPhase": "P4.4",
           "operation": "assign",
@@ -128376,11 +128379,11 @@
           "actionModulePath": "js/core/state/actions/appearance_visibility_actions.js",
           "actionExportName": "setAppearanceVisibilityState",
           "targetArgumentIndex": 0,
-          "actionCallEdgeIdentity": "cbb316f1db1af02e9a567ab19217c8d1286104c9e21b4f6e9653bf91fe561446",
+          "actionCallEdgeIdentity": "9a2440f2c213f7cc22fe126d65f13a0e09bda9588bd79749af58d3416df25d0e",
           "occurrenceIndex": 0,
-          "start": 30785,
-          "end": 30862,
-          "line": 677,
+          "start": 33748,
+          "end": 33825,
+          "line": 739,
           "column": 9,
           "sourceFingerprint": "1e5cc0f4e430baa3f7f505fceb2b50c598396862cb65d36363a8f6dcff7b399d",
           "successorActionProofs": [

@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import unittest
 import subprocess
 
@@ -9,6 +10,7 @@ TOOLBAR_JS = REPO_ROOT / "js" / "ui" / "toolbar.js"
 SIDEBAR_JS = REPO_ROOT / "js" / "ui" / "sidebar.js"
 DEV_WORKSPACE_JS = REPO_ROOT / "js" / "ui" / "dev_workspace.js"
 STATE_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "index.js"
+STATE_RUNTIME_HOOKS_JS = REPO_ROOT / "js" / "core" / "state" / "runtime_hooks.js"
 STATE_CONFIG_JS = REPO_ROOT / "js" / "core" / "state" / "config.js"
 STATE_BUS_JS = REPO_ROOT / "js" / "core" / "state" / "bus.js"
 MAP_RENDERER_JS = REPO_ROOT / "js" / "core" / "map_renderer.js"
@@ -19,6 +21,33 @@ SAMPLE_PROJECT_IMPORT_WORKFLOW_JS = REPO_ROOT / "js" / "core" / "sample_project_
 
 
 class RuntimeHooksBoundaryContractTest(unittest.TestCase):
+    def test_lightweight_hooks_dependency_closure_is_only_config_and_bus(self):
+        # Follow static imports and reexports so a heavy transitive dependency also fails.
+        seen = set()
+        pending = [STATE_RUNTIME_HOOKS_JS]
+        while pending:
+            path = pending.pop().resolve()
+            if path in seen:
+                continue
+            seen.add(path)
+            source = path.read_text(encoding="utf-8")
+            specs = re.findall(r'(?:from\s*|import\s*)["\']([^"\']+)["\']', source)
+            self.assertNotRegex(source, r'\bimport\s*\(')
+            for spec in specs:
+                self.assertTrue(spec.startswith("."), f"Unexpected external dependency: {spec}")
+                pending.append((path.parent / spec).resolve())
+        self.assertEqual(seen, {STATE_RUNTIME_HOOKS_JS.resolve(), STATE_CONFIG_JS.resolve(), STATE_BUS_JS.resolve()})
+
+    def test_ordinary_consumers_use_lightweight_hooks_with_legacy_renderer_compatibility(self):
+        remaining = []
+        for path in (REPO_ROOT / "js").rglob("*.js"):
+            source = path.read_text(encoding="utf-8")
+            if re.search(r'\bimport\b[^;]*["\'][^"\']*state/index\.js["\']', source):
+                remaining.append(path.relative_to(REPO_ROOT).as_posix())
+        # chunk_runtime is migrated by the transaction owner in the coordinated task.
+        self.assertIn("js/core/map_renderer.js", remaining)
+        self.assertLessEqual(set(remaining), {"js/core/map_renderer.js", "js/core/scenario/chunk_runtime.js"})
+
     def test_state_index_keeps_runtime_hook_compat_surface(self):
         # Exercise the exported contract instead of pinning function declaration strings.
         result = subprocess.run(
@@ -61,7 +90,7 @@ class RuntimeHooksBoundaryContractTest(unittest.TestCase):
         self.assertIn('registerRuntimeHook(state, "setDevWorkspaceExpandedFn", (nextValue) => {', dev_workspace_content)
 
     def test_runtime_hook_helpers_coordinate_safe_calls(self):
-        index_content = STATE_INDEX_JS.read_text(encoding="utf-8")
+        index_content = STATE_RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
         bus_content = STATE_BUS_JS.read_text(encoding="utf-8")
         history_content = (REPO_ROOT / "js" / "core" / "history_manager.js").read_text(encoding="utf-8")
         i18n_content = (REPO_ROOT / "js" / "ui" / "i18n.js").read_text(encoding="utf-8")

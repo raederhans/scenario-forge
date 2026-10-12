@@ -35,6 +35,7 @@ import {
   expandStateActionMembershipsWithLegacyReplacements,
   findStateActionCrossFileMigrationContractEntry,
   findStateActionSuccessorProofContractEntry,
+  isStateActionSuccessorCarrierSourceRefresh,
   STATE_IMPORTED_BORROWED_PROJECTION_CONTRACT,
   inspectStateImportedBorrowedProjectionSource,
   getStateTargetPureReaderContractEntriesForModule,
@@ -3081,6 +3082,26 @@ export function buildCallerToActionLedger({
         liveEdge = successorEdges[0].edge;
         successorResolution = successorEdges[0].resolution;
       }
+      if (proof.successorProofContractIdentity
+        && proof.successorProofContractIdentity
+          !== successorResolution.successorProofContractIdentity) {
+        const currentProof = {
+          ...entry,
+          ...proof,
+          successorActionProofs: successorResolution.successorActionProofs,
+          successorProofContractIdentity: successorResolution.successorProofContractIdentity,
+        };
+        if (!isStateActionSuccessorCarrierSourceRefresh({ ...entry, ...proof }, currentProof)) {
+          missingProofs.push({
+            code: "caller-action-successor-contract-refresh-unproven",
+            retiredMembershipIdentity: entry.retiredMembershipIdentity,
+          });
+          continue;
+        }
+        // Only the reviewed carrier identity changes for earlier-phase proofs.
+        // Their observations and all retirement provenance remain frozen.
+        proof.successorProofContractIdentity = currentProof.successorProofContractIdentity;
+      }
       const refreshLiveObservation =
         previousPhase !== normalizedPhase
         || String(entry?.recordedInPhase || "") === normalizedPhase;
@@ -4117,7 +4138,9 @@ function isActionPath(relativePath) {
 }
 
 function isCompatFacadePath(relativePath) {
-  return normalizeRelativePath(relativePath) === "js/core/state/index.js";
+  const normalized = normalizeRelativePath(relativePath);
+  return normalized === "js/core/state/index.js"
+    || normalized === "js/core/state/runtime_hooks.js";
 }
 
 function borrowedMapStorageArgumentSites(relativePath, source, entry) {

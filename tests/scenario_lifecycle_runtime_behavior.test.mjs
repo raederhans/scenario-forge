@@ -291,9 +291,9 @@ test("scenario activation and exit force visual mode while preserving selection 
   });
   const lifecycle = createLifecycleRuntime(runtimeState);
   lifecycle.applyScenarioPaintMode();
-  assert.equal(runtimeState.paintMode, "visual");
-  assert.equal(runtimeState.interactionGranularity, "subdivision");
-  assert.equal(runtimeState.ui.politicalEditingExpanded, false);
+  assert.ok(runtimeState.paintMode === "visual");
+  assert.ok(runtimeState.interactionGranularity === "subdivision");
+  assert.ok(runtimeState.ui.politicalEditingExpanded === false);
   assert.deepEqual(runtimeState.scenarioPaintModeBeforeActivate, {
     paintMode: "visual",
     interactionGranularity: "country",
@@ -301,13 +301,13 @@ test("scenario activation and exit force visual mode while preserving selection 
     politicalEditingExpanded: false,
   });
   lifecycle.applyScenarioPaintMode();
-  assert.equal(runtimeState.scenarioPaintModeBeforeActivate.paintMode, "visual");
+  assert.ok(runtimeState.scenarioPaintModeBeforeActivate.paintMode === "visual");
   assert.deepEqual(updates, ["visual", "visual"]);
   lifecycle.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
-  assert.equal(runtimeState.paintMode, "visual");
-  assert.equal(runtimeState.interactionGranularity, "country");
-  assert.equal(runtimeState.batchFillScope, "country");
-  assert.equal(runtimeState.ui.politicalEditingExpanded, false);
+  assert.ok(runtimeState.paintMode === "visual");
+  assert.ok(runtimeState.interactionGranularity === "country");
+  assert.ok(runtimeState.batchFillScope === "country");
+  assert.ok(runtimeState.ui.politicalEditingExpanded === false);
   assert.equal(runtimeState.scenarioPaintModeBeforeActivate, null);
 });
 
@@ -780,8 +780,8 @@ test("scenario apply staging rejects unrenderable political runtime topology bef
     }, { syncPalette: false }),
     /runtime topology is not renderable/,
   );
-  assert.equal(runtimeState.activeScenarioId, "previous");
-  assert.equal(runtimeState.scenarioRuntimeTopologyData?.id, "scenario-runtime");
+  assert.ok(runtimeState.activeScenarioId === "previous");
+  assert.ok(runtimeState.scenarioRuntimeTopologyData?.id === "scenario-runtime");
 });
 
 test("scenario prepare leaves readiness, palette, and observer state unchanged", async () => {
@@ -913,7 +913,7 @@ test("scenario palette publication waits for a validated commit and rollback kee
         ...configurePaletteStage(),
         validateScenarioActivationCommitState: () => {
           phaseEvents.push("validate");
-          assert.equal(appState.currentPaletteTheme, "Palette Before");
+          assert.ok(appState.currentPaletteTheme === "Palette Before");
           assert.equal(defaultCountryPalette.AA, "#111111");
           assert.deepEqual(paletteEvents, []);
           return true;
@@ -939,7 +939,7 @@ test("scenario palette publication waits for a validated commit and rollback kee
         "library",
         "source",
       ]);
-      assert.equal(appState.currentPaletteTheme, "Palette After");
+      assert.ok(appState.currentPaletteTheme === "Palette After");
       assert.equal(defaultCountryPalette.AA, "#abcdef");
 
       paletteEvents.length = 0;
@@ -963,7 +963,7 @@ test("scenario palette publication waits for a validated commit and rollback kee
         ),
         /post-commit rollback/,
       );
-      assert.equal(appState.currentPaletteTheme, "Palette Before");
+      assert.ok(appState.currentPaletteTheme === "Palette Before");
       assert.equal(defaultCountryPalette.AA, "#111111");
       assert.deepEqual(paletteEvents, []);
     } finally {
@@ -1770,7 +1770,7 @@ test("scenario apply commit state does not reuse stale live topology for bad non
     scenarioManifest: { scenario_id: "sample" },
   });
 
-  assert.equal(runtimeState.activeScenarioId, "sample");
+  assert.ok(runtimeState.activeScenarioId === "sample");
   assert.equal(runtimeState.runtimePoliticalTopology, defaultTopologyAtCommit);
   assert.equal(runtimeState.scenarioRuntimeTopologyData, null);
 });
@@ -1797,10 +1797,10 @@ test("scenario apply normalizes bundled strategic values before commit", async (
   const staged = await pipeline.prepareScenarioApplyState(bundle, { syncPalette: false });
   pipeline.applyPreparedScenarioState(bundle, staged);
 
-  assert.equal(runtimeState.scenarioStrategicValuesData.bucketByFeature["POL-A"], "s1");
-  assert.equal(runtimeState.scenarioStrategicValuesData.victoryPointsByFeature["POL-A"][0].name, "Warsaw");
-  assert.equal(runtimeState.scenarioStrategicValuesData.resourcePoints.type, "FeatureCollection");
-  assert.equal(runtimeState.scenarioStrategicValuesRevision, 1);
+  assert.ok(runtimeState.scenarioStrategicValuesData.bucketByFeature["POL-A"] === "s1");
+  assert.ok(runtimeState.scenarioStrategicValuesData.victoryPointsByFeature["POL-A"][0].name === "Warsaw");
+  assert.ok(runtimeState.scenarioStrategicValuesData.resourcePoints.type === "FeatureCollection");
+  assert.ok(runtimeState.scenarioStrategicValuesRevision === 1);
 });
 
 test("scenario apply includes external political owner codes in canonical base colors", async () => {
@@ -1871,15 +1871,15 @@ test("scenario apply includes external political owner codes in canonical base c
 
   pipeline.applyPreparedScenarioState({ manifest: { scenario_id: "tno_sample" } }, staged);
 
-  assert.equal(runtimeState.sovereignBaseColors.AAA, "#111111");
-  assert.equal(runtimeState.sovereignBaseColors.GER, "#222222");
+  assert.ok(runtimeState.sovereignBaseColors.AAA === "#111111");
+  assert.ok(runtimeState.sovereignBaseColors.GER === "#222222");
   for (const code of ownerCodes) {
     assert.match(runtimeState.sovereignBaseColors[code], /^#[0-9a-f]{6}$/);
   }
-  assert.equal(runtimeState.sovereignBaseColors.CF, "#224466");
-  assert.equal(runtimeState.sovereignBaseColors.CM, "#335577");
-  assert.equal(runtimeState.sovereignBaseColors.MT, "#446688");
-  assert.equal(runtimeState.sovereignBaseColors.TW, "#557799");
+  assert.ok(runtimeState.sovereignBaseColors.CF === "#224466");
+  assert.ok(runtimeState.sovereignBaseColors.CM === "#335577");
+  assert.ok(runtimeState.sovereignBaseColors.MT === "#446688");
+  assert.ok(runtimeState.sovereignBaseColors.TW === "#557799");
   assert.deepEqual([...runtimeState.scenarioGeneratedColorTags].sort(), ["CG", "CY", "EH", "GA", "VA"]);
 });
 
@@ -2044,9 +2044,9 @@ test("blank scenario apply preserves ownerless editable runtime topology", async
   }, { syncPalette: false });
   pipeline.applyPreparedScenarioState({ manifest: { scenario_id: "blank_base", map_mode: "blank" } }, staged);
 
-  assert.equal(runtimeState.activeScenarioId, "blank_base");
+  assert.ok(runtimeState.activeScenarioId === "blank_base");
   assert.equal(runtimeState.runtimePoliticalTopology, ownerlessBlankTopology);
-  assert.equal(runtimeState.activeSovereignCode, "");
+  assert.ok(runtimeState.activeSovereignCode === "");
   assert.deepEqual(runtimeState.sovereigntyByFeatureId, {});
   assert.deepEqual(phaseEvents, [
     "validate:->blank_base",
@@ -2224,22 +2224,22 @@ test("scenario style defaults extend their baseline and stay scoped across scena
   assert.deepEqual(runtimeState.scenarioPresentationStyleBeforeActivate, {
     ocean: baselineStyle.ocean,
   });
-  assert.equal(runtimeState.styleConfig.ocean.extensionTone, "legacy-import");
+  assert.ok(runtimeState.styleConfig.ocean.extensionTone === "legacy-import");
 
   runtime.syncScenarioOceanFillForActivation(blankManifest);
   assert.deepEqual(runtimeState.scenarioPresentationStyleBeforeActivate, baselineStyle);
-  assert.equal(runtimeState.styleConfig.coastlines.extensionJoin, "round");
+  assert.ok(runtimeState.styleConfig.coastlines.extensionJoin === "round");
   assert.deepEqual(runtimeState.styleConfig.empireBorders.extensionDash, [2, 1]);
-  assert.equal(runtimeState.styleConfig.ocean.extensionTone, "legacy-import");
-  assert.equal(runtimeState.styleConfig.coastlines.width, 0.8);
-  assert.equal(runtimeState.styleConfig.empireBorders.opacity, 0.4);
-  assert.equal(runtimeState.styleConfig.ocean.fillColor, "#2d4769");
+  assert.ok(runtimeState.styleConfig.ocean.extensionTone === "legacy-import");
+  assert.ok(runtimeState.styleConfig.coastlines.width === 0.8);
+  assert.ok(runtimeState.styleConfig.empireBorders.opacity === 0.4);
+  assert.ok(runtimeState.styleConfig.ocean.fillColor === "#2d4769");
 
   runtime.syncScenarioOceanFillForActivation(tnoManifest);
   assert.deepEqual(runtimeState.styleConfig.coastlines, baselineStyle.coastlines);
   assert.deepEqual(runtimeState.styleConfig.empireBorders, baselineStyle.empireBorders);
-  assert.equal(runtimeState.styleConfig.ocean.extensionTone, "legacy-import");
-  assert.equal(runtimeState.styleConfig.ocean.fillColor, "#345678");
+  assert.ok(runtimeState.styleConfig.ocean.extensionTone === "legacy-import");
+  assert.ok(runtimeState.styleConfig.ocean.fillColor === "#345678");
 
   runtime.restoreScenarioOceanFillAfterExit();
   assert.deepEqual(runtimeState.styleConfig, baselineStyle);
@@ -2260,10 +2260,10 @@ test("clearActiveScenario restores deferred coarse baseline when detail topology
 
   runtime.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
 
-  assert.equal(runtimeState.activeScenarioId, "");
-  assert.equal(runtimeState.topologyBundleMode, "single");
-  assert.equal(runtimeState.detailDeferred, true);
-  assert.equal(runtimeState.detailPromotionCompleted, false);
+  assert.ok(runtimeState.activeScenarioId === "");
+  assert.ok(runtimeState.topologyBundleMode === "single");
+  assert.ok(runtimeState.detailDeferred === true);
+  assert.ok(runtimeState.detailPromotionCompleted === false);
   assert.deepEqual(runtimeState.runtimePoliticalTopology, runtimeState.defaultRuntimePoliticalTopology);
 });
 
@@ -2279,9 +2279,9 @@ test("clearActiveScenario keeps composite mode when baseline detail topology is 
 
   runtime.clearActiveScenario({ renderNow: false, markDirtyReason: "" });
 
-  assert.equal(runtimeState.topologyBundleMode, "composite");
-  assert.equal(runtimeState.detailDeferred, false);
-  assert.equal(runtimeState.detailPromotionCompleted, true);
+  assert.ok(runtimeState.topologyBundleMode === "composite");
+  assert.ok(runtimeState.detailDeferred === false);
+  assert.ok(runtimeState.detailPromotionCompleted === true);
 });
 
 test("clearActiveScenario restores exact health defaults before display restore and post-clear effects", () => {
