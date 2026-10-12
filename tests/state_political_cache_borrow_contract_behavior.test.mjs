@@ -39,6 +39,12 @@ test("political cache receipts distinguish private writes, shared diagnostics an
   assert.deepEqual(receipt.methods.derived.describe.resultStorage.valueBorrowedPaths, [[]]);
   assert.ok(receipt.diagnosticEffect.actions.includes("commitRenderPerfMetricState"));
   assert.equal(receipt.featureLookup.admitCall, false);
+  assert.equal(receipt.geometrySnapshots.consumers.length, 4);
+  assert.equal(receipt.geometrySnapshots.producers.length, 3);
+  assert.equal(receipt.geometrySnapshots.revisionReadsInvokeGetter, false);
+  assert.equal(receipt.geometrySnapshots.otherSnapshotFieldsMayBeBorrowed, true);
+  assert.deepEqual(receipt.geometrySnapshots.producers.map(entry => entry.revisionKind).sort(),
+    ["allocated-number", "forwarded-data-property", "forwarded-data-property"]);
   for (const operation of operations) {
     assert.ok(read(rendererPath).slice(operation.start, operation.end).startsWith(`politicalDerivedStateCache.${operation.method}(`));
     assert.ok(Object.isFrozen(operation));
@@ -68,11 +74,61 @@ test("cache source receipts bind geometry lookup, feature reader and the complet
     "js/core/political_geometry_store.js", "js/core/feature_identity.js", "js/core/feature_identity_shared.js",
     "js/core/country_code_aliases.js", "js/core/renderer/render_perf_metrics_runtime_owner.js",
     "js/core/state/actions/renderer_diagnostics_actions.js",
+    "js/core/renderer/political_collection_owner.js", "js/core/scenario/chunk_layer_payloads.js",
+    "js/bootstrap/deferred_ui_bootstrap.js", "js/core/data_service.js",
   ]) {
     const result = inspect({ readSource: path => path === file ? `${read(path)}\n// dependency drift\n` : read(path) });
     assert.equal(result.receipt, null, file);
     assert.ok(result.violations.some(violation => violation.modulePath === file), file);
   }
+});
+
+test("cache proof rejects new static, escaped, re-exported and computed geometry consumers", () => {
+  const { receipt } = inspect();
+  assert.ok(receipt);
+  const consumerPath = "js/core/unproved_geometry_consumer.js";
+  const sourcePaths = [...Object.keys(receipt.dependencies), consumerPath];
+  for (const source of [
+    'import { registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";',
+    'import * as sidecar from "./political_geometry_store.js";',
+    'import { getPoliticalGeometrySnapshot as readSnapshot } from "./political_geometry_store.js";',
+    'export * from "./political_geometry_store.js";',
+    'export { registerPoliticalGeometrySnapshot } from "./political_geometry_store.js";',
+    'import { getPoliticalGeometrySnapshot } from "/js/core/political_geometry_store.js";',
+    'import { getPoliticalGeometrySnapshot } from "./political_geometry_\\u0073tore.js";',
+    'import { getPoliticalGeometrySnapshot } from "./political_geometry_%73tore.js";',
+    'import("./political_geometry_store.js");',
+    'import(`./political_geometry_store.js`);',
+    'import(globalThis.unprovedModule);',
+    'import { getPoliticalGeometrySnapshot } from "./political_geometry_store.js?unproved";',
+    'import { getPoliticalGeometrySnapshot } from "./political_geometry_store.js#unproved";',
+  ]) {
+    const result = inspect({ sourcePaths, readSource: file => file === consumerPath ? source : read(file) });
+    assert.equal(result.receipt, null, source);
+    assert.ok(result.violations.some(item => item.modulePath === consumerPath), source);
+  }
+  const missing = inspect({ sourcePaths: sourcePaths.filter(file => !file.endsWith("political_collection_owner.js") && file !== consumerPath) });
+  assert.equal(missing.receipt, null);
+  assert.ok(missing.violations.some(item => item.code === "political-cache-geometry-consumer-set-drift"));
+});
+
+test("unproved snapshot revision getters can have effects during refreshColors", () => {
+  // The general sidecar API accepts this shape. Only the closed production
+  // producer/reader proof permits the scanner's refreshColors admission.
+  const state = { revisionReads: 0 };
+  const collection = { features: [] };
+  const colors = {};
+  const features = new Map();
+  registerPoliticalGeometrySnapshot(collection, {
+    get featuresById() { return features; },
+    get revision() { state.revisionReads++; return 7; },
+  });
+  const cache = createPoliticalDerivedStateCache({ getFeatureId: feature => feature.id });
+  cache.commit({ collection, colors, identity: ["scene"], colorRevision: 1 });
+  const before = state.revisionReads;
+  assert.equal(cache.refreshColors({ collection, identity: ["scene"], previousColors: colors,
+    previousColorRevision: 1, colors: {}, colorRevision: 2 }), true);
+  assert.equal(state.revisionReads, before + 1);
 });
 
 test("raster get updates LRU but peek and entries retain original tile aliases", () => {
