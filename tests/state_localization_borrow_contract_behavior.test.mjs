@@ -17,6 +17,7 @@ const providerSource = read(providerPath);
 const fingerprint = text => createHash("sha256").update(text).digest("hex");
 const indexName = "buildScenarioOverrideSourceCityIndex";
 const lookupName = "getScenarioOverrideSourceCityFeature";
+const coordinatesName = "getFeaturePointCoordinates";
 const inspect = options => inspectStateLocalizationBorrowSources({ readSource: read, ...options });
 const deepFreeze = value => {
   if (value && typeof value === "object" && !Object.isFrozen(value)) {
@@ -30,13 +31,13 @@ const replaceOnce = (input, before, after) => {
   return input.replace(before, after);
 };
 
-function fixture(runtimeState, selectedSource = source) {
+function fixture(runtimeState, selectedSource = source, globals = {}) {
   // Execute the inspected production module, with its actual imported normalizer.
-  // Other imports are unused by these two private functions. Nothing is exported
+  // Other imports are unused by these private functions. Nothing is exported
   // or changed in production merely to make the proof testable.
   const executable = selectedSource.replace(/^import[\s\S]*?;\n/gm, "").replace(/^export /gm, "");
-  return vm.runInNewContext(`"use strict";\n${executable}\n({ build: ${indexName}, lookup: ${lookupName} })`, {
-    runtimeState, normalizeCityText,
+  return vm.runInNewContext(`"use strict";\n${executable}\n({ build: ${indexName}, lookup: ${lookupName}, coordinates: ${coordinatesName}, distance: getAngularDistanceDegrees, resolve: resolveScenarioGeoFeatureIdForCityFeature })`, {
+    runtimeState, normalizeCityText, ...globals,
   });
 }
 
@@ -46,7 +47,7 @@ test("current sources yield exact allocation, entry, helper and provider receipt
   assert.equal(receipt.modulePath, modulePath);
   assert.equal(receipt.sourceFingerprint, fingerprint(source));
   assert.equal(receipt.coordinateSystem, "LF-normalized-UTF16");
-  assert.deepEqual(Object.keys(receipt.functions), [indexName, lookupName]);
+  assert.deepEqual(Object.keys(receipt.functions), [indexName, lookupName, coordinatesName]);
   assert.equal(receipt.functions[indexName].declaration.functionName, indexName);
   assert.equal(receipt.functions[indexName].returnProvenance.kind, "private-map-capability");
   assert.equal("borrowedResultPaths" in receipt.functions[indexName].returnProvenance, false,
@@ -97,7 +98,7 @@ test("every operation is keyed by its exact AST range, lexical scope and fingerp
   }
   walk(parse(source, { ecmaVersion: "latest", sourceType: "module" }));
   const operations = Object.values(receipt.operationsByKey);
-  assert.equal(operations.length, 36);
+  assert.equal(operations.length, 37);
   for (const [key, { expression }] of Object.entries(receipt.operationsByKey)) {
     assert.equal(key, expression.key);
     assert.ok(astNodes.has(`${expression.nodeType}@${expression.start}:${expression.end}`));
@@ -202,6 +203,78 @@ test("normalizer receipt retains coercion effects while describing string result
   assert.equal(inspect().receipt.normalizer.mayInvokeArgumentCoercion, true);
 });
 
+test("coordinate returns preserve their borrowed origin and exact closed consumer", () => {
+  const { receipt } = inspect();
+  const coordinates = receipt.functions[coordinatesName];
+  assert.deepEqual(coordinates.returnProvenance.borrowedResultPaths, [[]]);
+  assert.equal(coordinates.returnProvenance.origin.parameterIndex, 0);
+  assert.deepEqual(coordinates.returnProvenance.origin.propertyPaths,
+    [["geometry", "coordinates"], ["geometry", "coordinates", "0"]]);
+  assert.equal(coordinates.returnProvenance.origin.propertyReadsMayInvokeUserCode, true);
+  assert.equal(coordinates.returns.filter(item => item.result.type === "null").length, 2);
+  const borrowedReturns = coordinates.returns.filter(item => item.result.borrowedResultPaths);
+  assert.deepEqual(borrowedReturns.map(item => item.expression.source), ["geometry.coordinates", "geometry.coordinates[0]"]);
+  for (const item of borrowedReturns) {
+    assert.equal(source.slice(item.expression.start, item.expression.end), item.expression.source);
+    assert.equal(fingerprint(item.expression.source), item.expression.sourceFingerprint);
+    assert.equal(item.expression.functionName, coordinatesName);
+  }
+  assert.equal(receipt.consumerGraph.coordinatesCall.source, "getFeaturePointCoordinates(cityFeature)");
+  assert.equal(receipt.consumerGraph.coordinatesArgument.source, "cityFeature");
+  assert.equal(receipt.consumerGraph.coordinatesParameter.source, "feature");
+  const operation = Object.values(receipt.operationsByKey).find(item => item.kind === "coordinates-helper-invocation");
+  assert.deepEqual(operation.result.borrowedResultPaths, [[]]);
+  assert.ok(operation.effects.some(effect => effect.kind === "property-read" && effect.mayInvokeUserCode));
+  assert.equal("admitCall" in operation, false, "A borrowed return proof does not grant callback or getter purity");
+});
+
+test("production coordinate projection keeps Point and MultiPoint array identity", () => {
+  const { coordinates } = fixture({});
+  const point = { geometry: { type: "Point", coordinates: [10, 20] } };
+  const multiPoint = { geometry: { type: "MultiPoint", coordinates: [[30, 40], [50, 60]] } };
+  assert.equal(coordinates(point), point.geometry.coordinates);
+  assert.equal(coordinates(multiPoint), multiPoint.geometry.coordinates[0]);
+  coordinates(point)[0] = 11;
+  coordinates(multiPoint)[1] = 41;
+  assert.equal(point.geometry.coordinates[0], 11);
+  assert.equal(multiPoint.geometry.coordinates[0][1], 41);
+  assert.equal(coordinates(null), null);
+  assert.equal(coordinates({ geometry: { type: "Point", coordinates: [1] } }), null);
+  assert.equal(coordinates({ geometry: { type: "MultiPoint", coordinates: [] } }), null);
+  assert.equal(coordinates({ geometry: { type: "Polygon", coordinates: [[1, 2]] } }), null);
+});
+
+test("coordinate getters, numeric coercion and injected D3 callbacks keep observable effects", () => {
+  const polygon = { properties: { id: "region" }, geometry: { type: "Polygon" } };
+  const values = [10, 20];
+  let getters = 0;
+  let coercions = 0;
+  let callbackCalls = 0;
+  const city = { properties: { country_code: "RU" }, get geometry() {
+    getters++; return { type: "Point", coordinates: values };
+  } };
+  const { coordinates, distance, resolve } = fixture({ ruCityOverrides: { features: [polygon] } }, source, {
+    d3: {
+      geoCentroid(feature) { assert.equal(feature, polygon); return [10, 20]; },
+      geoContains(feature, point) {
+        callbackCalls++;
+        assert.equal(feature, polygon);
+        assert.equal(point, values);
+        point[0] = 12;
+        return true;
+      },
+    },
+  });
+  assert.equal(coordinates(city), values);
+  assert.equal(getters, 1);
+  const value = { valueOf() { coercions++; return 10; } };
+  assert.equal(distance([value, 20], [10, 20]), 0);
+  assert.ok(coercions > 0);
+  assert.equal(resolve(city), "region");
+  assert.equal(callbackCalls, 1);
+  assert.equal(values[0], 12, "The D3 callback receives the original coordinate array");
+});
+
 test("real localization writes and delegated actions remain outside the operation receipt", () => {
   const { receipt } = inspect();
   assert.deepEqual(receipt.unhandledStateEffects.filter(item => item.kind === "state-write").map(item => item.statePath), [
@@ -240,6 +313,12 @@ const sourceMutations = [
   ["shadow the normalizer in the helper", "const matches = new Map();",
     "const normalizeCityText = (value) => { runtimeState.normalizerEffect = value; return value; };\n  const matches = new Map();"],
   ["export the private index helper", `function ${indexName}(`, `export function ${indexName}(`],
+  ["write coordinate array before returning it", "return geometry.coordinates;", "geometry.coordinates[0] = 9; return geometry.coordinates;"],
+  ["replace coordinate helper provider", "getFeaturePointCoordinates(cityFeature)", "replacementCoordinates(cityFeature)"],
+  ["export the coordinate helper", `function ${coordinatesName}(`, `export function ${coordinatesName}(`],
+  ["add a coordinate helper consumer", "return geometry.coordinates;", "unknownConsumer(getFeaturePointCoordinates(feature)); return geometry.coordinates;"],
+  ["write through coordinate result", "const point = getFeaturePointCoordinates(cityFeature);", "const point = getFeaturePointCoordinates(cityFeature); point[0] = 9;"],
+  ["write coordinates in a callback", "const point = getFeaturePointCoordinates(cityFeature);", "const point = getFeaturePointCoordinates(cityFeature); [point].forEach((coordinates) => { coordinates[0] = 9; });"],
 ];
 for (const [name, before, after] of sourceMutations) {
   test(`receipt rejection: ${name}`, () => {

@@ -26,11 +26,13 @@ test("localization scanner discharges only private storage and follows the featu
   ]) {
     assert.ok(inventory.findings.some(finding => finding.reason === "state-alias-escape" && at(finding, source, expression)), expression);
   }
-  // The last case is inside the pre-existing forEach consumer. It became
-  // visible only after Map.get and the lookup helper retained the feature.
+  // The coordinate return is accounted for by an exact receipt. The consumer
+  // still receives a borrowed array, so the unknown D3 callback stays visible.
   for (const expression of ["geometry.coordinates", "geometry.coordinates[0]"]) {
-    assert.ok(inventory.findings.some(finding => finding.reason === "state-alias-escape" && at(finding, source, expression)), expression);
+    assert.ok(!inventory.findings.some(finding => finding.reason === "state-alias-escape" && at(finding, source, expression)), expression);
   }
+  assert.ok(inventory.findings.some(finding => finding.reason === "state-alias-escape" && at(finding, source, "point") && finding.line === 107));
+  assert.ok(inventory.findings.some(finding => finding.reason === "state-alias-escape" && at(finding, source, "feature") && finding.line === 103));
   assert.equal(inventory.findings.filter(finding => !finding.unsupported).length, 4);
   assert.ok(inventory.actionDelegations.some(edge => edge.actionExportName === "applyScenarioChunkCityExternalEffectState"));
 });
@@ -43,6 +45,8 @@ test("localization receipt drift restores conservative escapes for Map, helper-r
     ["const matches = new Map();", 'const matches = runtimeState.landIndex;'],
     ["return matches;", 'publish(matches); return matches;'],
     ['normalizeCityText(props.__city_id || props.id || feature?.id)', 'replacementNormalizer(props.__city_id || props.id || feature?.id)'],
+    ['const point = getFeaturePointCoordinates(cityFeature);', 'const point = getFeaturePointCoordinates(cityFeature); point[0] = 9;'],
+    ['const point = getFeaturePointCoordinates(cityFeature);', 'const point = getFeaturePointCoordinates(cityFeature); [point].forEach((item) => { item[0] = 9; });'],
   ];
   for (const [before, after] of variants) {
     assert.ok(source.includes(before), before);

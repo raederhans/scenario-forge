@@ -6,6 +6,7 @@ export const STATE_LOCALIZATION_BORROW_MODULE_PATH = "js/core/scenario_localizat
 const providerPath = "js/core/data_loader.js";
 const indexName = "buildScenarioOverrideSourceCityIndex";
 const lookupName = "getScenarioOverrideSourceCityFeature";
+const coordinatesName = "getFeaturePointCoordinates";
 const consumerName = "buildScenarioCityNameSyncPatch";
 const sourceFingerprints = Object.freeze({
   [STATE_LOCALIZATION_BORROW_MODULE_PATH]: "99387328d612404da12060cf8b888af73536beabc82d56ed7159b5d636b9bbcc",
@@ -106,6 +107,7 @@ export function inspectStateLocalizationBorrowSources({
     const describe = model.describe;
     const index = model.topFunction(indexName);
     const lookup = model.topFunction(lookupName);
+    const coordinates = model.topFunction(coordinatesName);
     const consumer = model.topFunction(consumerName);
     const normalizer = provider.topFunction("normalizeCityText");
     const normalizerImport = model.one(node => node.type === "ImportSpecifier"
@@ -128,6 +130,14 @@ export function inspectStateLocalizationBorrowSources({
     };
     const featureResult = (nullable = true) => ({
       kind: nullable ? "borrowed-feature-or-null" : "borrowed-feature-value", borrowedResultPaths: [[]], origin: featureOrigin,
+    });
+    const coordinatesResult = () => ({
+      kind: "borrowed-coordinates-or-null", borrowedResultPaths: [[]],
+      origin: {
+        parameter: describe(coordinates.params[0]), parameterIndex: 0,
+        propertyPaths: [["geometry", "coordinates"], ["geometry", "coordinates", "0"]],
+        propertyReadsMayInvokeUserCode: true,
+      },
     });
     const entryResult = () => ({
       kind: "map-entry-or-nullish", storageIdentity, borrowedResultPaths: [["feature"]],
@@ -193,6 +203,15 @@ export function inspectStateLocalizationBorrowSources({
     }
     operation(indexCall, "index-helper-invocation", mapResult(), [{ kind: "invoke-inspected-helper", functionIdentity: model.functionIdentity(index) }]);
     operation(lookupCall, "lookup-helper-invocation", featureResult(), [{ kind: "invoke-inspected-helper", functionIdentity: model.functionIdentity(lookup) }], { storageIdentity });
+    const coordinatesCall = model.one(node => node.type === "CallExpression" && node.callee.name === coordinatesName, "coordinates invocation");
+    if (model.topName(coordinatesCall) !== "resolveScenarioGeoFeatureIdForCityFeature"
+      || coordinatesCall.arguments.length !== 1 || coordinatesCall.arguments[0].name !== "cityFeature") {
+      throw new Error("Unexpected coordinate helper consumer");
+    }
+    operation(coordinatesCall, "coordinates-helper-invocation", coordinatesResult(), [
+      { kind: "invoke-inspected-helper", functionIdentity: model.functionIdentity(coordinates) },
+      { kind: "property-read", argumentIndex: 0, mayInvokeUserCode: true, mayThrow: true },
+    ]);
     operation(model.binding(indexName, "feature").init, "original-feature-read", featureResult(false), [
       { kind: "read-array-element", mayInvokeUserCode: true },
     ]);
@@ -220,12 +239,21 @@ export function inspectStateLocalizationBorrowSources({
       bindingReceipt(lookupName, "byId", entryResult()), bindingReceipt(lookupName, "byAlias", entryResult()),
       bindingReceipt(consumerName, "sourceFeature", featureResult()),
     ];
+    const returnResult = (fn, expression) => {
+      if (fn === index) return mapResult();
+      if (fn === lookup) return featureResult();
+      if (expression?.type === "Literal" && expression.value === null) return { kind: "scalar", type: "null" };
+      if (!["geometry.coordinates", "geometry.coordinates[0]"].includes(model.text(expression))) {
+        throw new Error("Unexpected coordinate return projection");
+      }
+      return coordinatesResult();
+    };
     const returns = fn => model.nodes.filter(node => node.type === "ReturnStatement" && model.topName(node) === fn.id.name)
-      .map(node => ({ statement: describe(node), expression: describe(node.argument), result: fn === index ? mapResult() : featureResult() }));
-    const functions = Object.fromEntries([index, lookup].map(fn => [fn.id.name, {
+      .map(node => ({ statement: describe(node), expression: describe(node.argument), result: returnResult(fn, node.argument) }));
+    const functions = Object.fromEntries([index, lookup, coordinates].map(fn => [fn.id.name, {
       declaration: describe(fn), functionIdentity: model.functionIdentity(fn),
       parameters: fn.params.map(describe), returns: returns(fn),
-      returnProvenance: fn === index ? mapResult() : featureResult(),
+      returnProvenance: fn === index ? mapResult() : fn === lookup ? featureResult() : coordinatesResult(),
     }]));
     const statePath = node => {
       if (node?.type === "Identifier" && node.name === "runtimeState") return [];
@@ -262,6 +290,8 @@ export function inspectStateLocalizationBorrowSources({
         publication: describe(model.expression(consumerName, "AssignmentExpression", "sourceCityIndex ||= buildScenarioOverrideSourceCityIndex(overrideEntries)")),
         publicationBinding: describe(model.binding(consumerName, "sourceCityIndex").id),
         lookupArgument: describe(lookupCall.arguments[1]), lookupParameter: describe(lookup.params[1]),
+        coordinatesCall: describe(coordinatesCall), coordinatesArgument: describe(coordinatesCall.arguments[0]),
+        coordinatesParameter: describe(coordinates.params[0]),
       },
       unhandledStateEffects,
       requiredRemainingAnalysis: { arguments: true, propertyGetters: true, coercionHooks: true, nestedCallbacks: true, unlistedOperations: true },
