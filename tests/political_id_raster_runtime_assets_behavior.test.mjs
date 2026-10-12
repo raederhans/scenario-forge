@@ -1028,3 +1028,38 @@ test("a slow shared manifest survives tile fallback and remains cancellable by i
   assert.equal(f.owner.getDiagnostics().assetError, "");
   f.owner.dispose(); assert.equal(manifestSignal.aborted, true);
 });
+
+
+test("late aborted requests cannot consume the intended first recovery-probe fault", async t => {
+  const { shouldHoldRasterAssetRequest } = await import("../tools/political_id_raster_app_session.mjs");
+  const priorWindow = globalThis.window;
+  t.after(() => { if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow; });
+  let current = { assetProbes: 0, assetTimeouts: 3 };
+  const faults = { active: false, recoveryTimeouts: 1, intercepted: 3,
+    protectedState: { assetProbes: 0, assetTimeouts: 3 } };
+  globalThis.window = { __rasterAssetFaults: faults,
+    __rasterTask: { renderer: { getPoliticalIdRasterDiagnostics: () => current } } };
+  assert.equal(shouldHoldRasterAssetRequest(), true, "a late old request remains held");
+  assert.equal(faults.recoveryTimeouts, 1, "request arrival is not a completed probe timeout");
+  current = { assetProbes: 1, assetTimeouts: 3 };
+  assert.equal(shouldHoldRasterAssetRequest(), true, "the actual first probe remains faulted");
+  assert.equal(faults.recoveryTimeouts, 1);
+  current = { assetProbes: 1, assetTimeouts: 4 };
+  assert.equal(shouldHoldRasterAssetRequest(), false, "a verified first timeout releases the next probe");
+  assert.equal(faults.recoveryTimeouts, 0);
+  current = { assetProbes: 2, assetTimeouts: 4 };
+  assert.equal(shouldHoldRasterAssetRequest(), false, "a second probe is not faulted again");
+});
+
+test("initial asset faults and disabled injection retain their explicit behavior", async t => {
+  const { shouldHoldRasterAssetRequest } = await import("../tools/political_id_raster_app_session.mjs");
+  const priorWindow = globalThis.window;
+  t.after(() => { if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow; });
+  const faults = { active: true, recoveryTimeouts: 0, intercepted: 0 };
+  globalThis.window = { __rasterAssetFaults: faults };
+  assert.equal(shouldHoldRasterAssetRequest(), true);
+  assert.equal(faults.intercepted, 1);
+  faults.active = false;
+  assert.equal(shouldHoldRasterAssetRequest(), false);
+  assert.equal(faults.intercepted, 1);
+});

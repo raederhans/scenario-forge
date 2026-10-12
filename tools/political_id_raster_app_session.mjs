@@ -1,5 +1,23 @@
 import { chromium } from "playwright";
 
+// Fault injection follows completed owner operations, not the arrival order
+// of browser requests. Late callbacks from an aborted request must not spend
+// the deliberately failed first recovery probe.
+export function shouldHoldRasterAssetRequest() {
+  const faults = window.__rasterAssetFaults;
+  if (faults.active) { faults.intercepted++; return true; }
+  if (faults.recoveryTimeouts <= 0) return false;
+  const current = window.__rasterTask?.renderer.getPoliticalIdRasterDiagnostics();
+  const protectedState = faults.protectedState;
+  if (protectedState && current?.assetProbes > protectedState.assetProbes
+    && current.assetTimeouts >= protectedState.assetTimeouts + 1) {
+    faults.recoveryTimeouts = 0;
+    return false;
+  }
+  faults.intercepted++;
+  return true;
+}
+
 export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280, height: 900 }, build = false, scenarioId = "", enabled = true, savedPreference = null, language = null, published = false, holdRasterAssets = false } = {}) {
   const url = new URL(baseUrl);
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
@@ -25,13 +43,7 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       // Intercept at the context boundary so the same deadline/cancellation
       // assertion covers both page and dedicated-worker asset reads.
       await context.route("**/political_id_raster/*.pidr.gz", async route => {
-        const hold = await page.evaluate(() => {
-          const faults = window.__rasterAssetFaults;
-          if (!faults.active && faults.recoveryTimeouts <= 0) return false;
-          if (!faults.active) faults.recoveryTimeouts--;
-          faults.intercepted++;
-          return true;
-        });
+        const hold = await page.evaluate(shouldHoldRasterAssetRequest);
         if (hold) held.add(route.request());
         else await route.continue();
       });

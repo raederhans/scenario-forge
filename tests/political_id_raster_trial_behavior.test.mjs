@@ -96,3 +96,15 @@ test("resident readiness requires complete raster output and does not accept a n
     assert.equal(residentFrameReady(s,{...d,...patch}),false);
   }
 });
+
+
+test("paired native and hybrid baselines wait for their real completed political producer", async () => {
+  const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
+  const s = { renderPhase:"idle", zoomTransform:{x:0,y:0,k:1},
+    renderPerfMetrics:{drawPoliticalBackgroundFillsPass:{progressive:true,deferredFullCacheReady:false}} };
+  assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),false);
+  s.renderPerfMetrics.drawPoliticalBackgroundFillsPass.deferredFullCacheReady=true;
+  assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),true);
+  assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"accelerated"}),false);
+  assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"precise"}),true);
+});

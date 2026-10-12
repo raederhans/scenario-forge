@@ -407,29 +407,55 @@ export function createPoliticalIdRasterSource({
   return Object.freeze({ publish, updateColors, getSnapshot, captureFrame, isFrameCurrent, dispose });
 }
 
-// Full/fine state views may wrap or clone the same immutable geometry. Identity
-// alone is not a shape comparison. Cache exact JSON equality by both objects;
-// geometry changes still require replacement under the existing source contract.
+// Full/fine views can wrap equal geometry, or deliberately prune tiny visual
+// fragments from the interactive geometry while native background retains them.
+// Compare immutable contents once per object pair; never turn arbitrary shape
+// conflicts into a successful complete-display claim.
 const displayGeometryEquivalence = new WeakMap();
-function equalDisplayGeometry(left, right) {
-  if (left === right) return true;
-  if (!left || !right || typeof left !== "object" || typeof right !== "object" || left.type !== right.type) return false;
+function compareDisplayGeometry(left, right) {
+  if (left === right) return "equal";
+  if (!left || !right || typeof left !== "object" || typeof right !== "object" || left.type !== right.type) return "different";
   let compared = displayGeometryEquivalence.get(left);
   if (!compared) { compared = new WeakMap(); displayGeometryEquivalence.set(left, compared); }
   if (compared.has(right)) return compared.get(right);
-  const same = JSON.stringify(left) === JSON.stringify(right);
-  compared.set(right, same);
-  return same;
+  let result = JSON.stringify(left) === JSON.stringify(right) ? "equal" : "different";
+  if (result !== "equal" && left.type === "MultiPolygon" && Array.isArray(left.coordinates) && Array.isArray(right.coordinates)
+    && left.coordinates.length > 0 && left.coordinates.length < right.coordinates.length) {
+    const fullComponents = new Set(right.coordinates.map(component => JSON.stringify(component)));
+    const fineComponents = left.coordinates.map(component => JSON.stringify(component));
+    if (new Set(fineComponents).size === fineComponents.length && fineComponents.every(component => fullComponents.has(component))) result = "pruned-subset";
+  }
+  compared.set(right, result);
+  return result;
+}
+const completeDisplayWrappers = new WeakMap();
+function completeDisplayFeature(fine, full, id) {
+  const comparison = compareDisplayGeometry(fine.geometry, full.geometry);
+  if (comparison === "equal") return fine;
+  const pruned = full.geometry?.coordinates?.length - fine.geometry?.coordinates?.length;
+  if (comparison !== "pruned-subset" || fine.properties?.__visualFragmentCamouflage !== true
+    || fine.properties?.__visualFragmentPrunedCount !== pruned) {
+    throw new TypeError(`Conflicting display geometry for feature "${id}".`);
+  }
+  let byFine = completeDisplayWrappers.get(full.geometry);
+  if (!byFine) { byFine = new WeakMap(); completeDisplayWrappers.set(full.geometry, byFine); }
+  let wrapped = byFine.get(fine);
+  if (!wrapped || wrapped.properties !== fine.properties) {
+    wrapped = { ...fine, geometry: full.geometry };
+    byFine.set(fine, wrapped);
+  }
+  return wrapped;
 }
 
-/** Complete display coverage: noninteractive support underneath the interactive fine pass.
- * Different shapes for the same ID cannot silently stand in for one another.
+/** Complete display coverage, with original canonical IDs and no editing authority.
+ * Known fragment pruning retains the full native background footprint. Precise
+ * picking still consumes the original interactive collection, never these wrappers.
  * The caller applies the existing visual exclusion and painter-order policies.
  */
 export function collectPoliticalRasterDisplayFeatures({ fullCollection, interactiveCollection, getId = getFeatureId }) {
   const fine = readFeatures(interactiveCollection);
   const full = fullCollection ? readFeatures(fullCollection) : fine;
-  const fineById = new Map(), seen = new Set();
+  const fineById = new Map(), seen = new Set(), completeById = new Map();
   const identify = feature => {
     const id = normalizeFeatureId(getId(feature));
     if (!id) throw new TypeError("Complete raster coverage requires stable feature IDs.");
@@ -446,10 +472,8 @@ export function collectPoliticalRasterDisplayFeatures({ fullCollection, interact
     if (seen.has(id)) throw new TypeError(`Duplicate full feature ID "${id}".`);
     seen.add(id);
     const interactive = fineById.get(id);
-    if (interactive && !equalDisplayGeometry(interactive.geometry, feature.geometry)) {
-      throw new TypeError(`Conflicting display geometry for feature "${id}".`);
-    }
-    if (!interactive) support.push(feature);
+    if (interactive) completeById.set(id, completeDisplayFeature(interactive, feature, id));
+    else support.push(feature);
   }
-  return [...support, ...fine];
+  return [...support, ...fine.map(feature => completeById.get(identify(feature)) || feature)];
 }

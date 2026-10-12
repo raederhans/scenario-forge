@@ -346,3 +346,24 @@ test("full and interactive wrappers with equal immutable geometry share canonica
   fine.geometry = { type: "Polygon", coordinates: [[[0,0],[2,0],[1,1],[0,0]]] };
   assert.throws(collect, /Conflicting display geometry/, "same bounds or ID must not admit changed coverage");
 });
+
+
+test("complete coverage preserves authenticated fragment-pruned background without changing interactive geometry", () => {
+  const polygon = x => [[[x,0],[x,1],[x+1,1],[x,0]]];
+  const full = { type:"Feature", properties:{id:"pruned"}, geometry:{type:"MultiPolygon",coordinates:[polygon(0),polygon(10)]} };
+  const fine = { ...full, properties:{...full.properties,__visualFragmentCamouflage:true,__visualFragmentPrunedCount:1},
+    geometry:{type:"MultiPolygon",coordinates:[structuredClone(full.geometry.coordinates[0])]} };
+  const collect = () => collectPoliticalRasterDisplayFeatures({fullCollection:[full],interactiveCollection:[fine],getId:f=>f.properties.id});
+  const result = collect();
+  assert.equal(result[0].properties.id,"pruned");
+  assert.equal(result[0].geometry,full.geometry);
+  assert.equal(fine.geometry.coordinates.length,1,"interactive geometry remains unchanged");
+  assert.equal(result[0],collect()[0],"derived wrapper is reused for immutable sources");
+  fine.properties = {...fine.properties,__visualFragmentPrunedCount:2};
+  assert.throws(collect,/Conflicting display geometry/);
+  fine.properties = {...fine.properties,__visualFragmentPrunedCount:1,__visualFragmentCamouflage:false};
+  assert.throws(collect,/Conflicting display geometry/);
+  fine.properties = {...fine.properties,__visualFragmentCamouflage:true};
+  fine.geometry = {type:"MultiPolygon",coordinates:[polygon(99)]};
+  assert.throws(collect,/Conflicting display geometry/,"a forged pruning label cannot admit another shape");
+});

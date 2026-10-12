@@ -8,13 +8,18 @@ import { editHistory, brushHistory } from "./verify_political_id_raster_integrat
 // This oracle observes the live raster, never waits for native exact pixels.
 export function residentFrameReady(s = window.__rasterTask.state, d = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics()) {
   const c = s.runtimeChunkLoadState || {};
+  const background = s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass;
+  const nativeReady = !!background && (!background.progressive || background.deferredFullCacheReady);
+  const backendReady = d.effectiveMode === "raster" ? d.actualBackend === "raster" && d.displayState === "accelerated"
+    && d.sourceCoverage === "complete-display-v1" && d.view
+    && ["x", "y", "k"].every(key => Math.abs(d.view[key] - s.zoomTransform[key]) < 1e-7)
+    : nativeReady && (d.effectiveMode !== "hybrid" || d.displayState === "precise");
   return !s.scenarioApplyInFlight && !s.startupReadonly && !s.isInteracting && s.renderPhase === "idle"
     && !s.deferExactAfterSettle && !s.exactAfterSettleHandle && !s.activePostReadyTaskKey
     && !s.renderPassCache?.dirty?.political && !c.pendingReason && !c.refreshScheduled && !c.promotionScheduled
     && !c.pendingPromotion && !c.pendingInfraPromotion && !c.promotionCommitInFlight
     && !d.failed && !d.pending && !d.refinementPending
-    && (d.effectiveMode !== "raster" || (d.actualBackend === "raster" && d.displayState === "accelerated"
-      && d.sourceCoverage === "complete-display-v1" && d.view && ["x", "y", "k"].every(key => Math.abs(d.view[key] - s.zoomTransform[key]) < 1e-7)));
+    && backendReady;
 }
 
 async function settle(page) {
@@ -42,6 +47,7 @@ function quantile(values, q) {
 
 async function paintProbe(page, color) {
   await page.locator("#customColor").fill(color);
+  const beforeColors = await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides }));
   const point = await page.evaluate(() => {
     const xy = window.__rasterTask.renderer.projectGeoToScreen(-110, 56);
     const rect = document.querySelector("#mapContainer").getBoundingClientRect();
@@ -80,7 +86,10 @@ async function paintProbe(page, color) {
     await page.mouse.click(point.x,point.y);
     await page.waitForFunction(() => window.__residentProbe.ms !== null, null, { timeout: 10000 });
     await settle(page);
-    return await page.evaluate(() => ({ ms: window.__residentProbe.ms, frames: window.__residentProbe.frames }));
+    const changedIds = await page.evaluate(({ beforeColors, color }) => Object.entries(window.__rasterTask.state.visualOverrides)
+      .filter(([id,value]) => value === color && beforeColors[id] !== value).map(([id]) => id), { beforeColors, color });
+    assert.equal(changedIds.length, 1, "a pixel-color match must also be a real single-feature canonical paint");
+    return { ...await page.evaluate(() => ({ ms: window.__residentProbe.ms, frames: window.__residentProbe.frames })), id: changedIds[0] };
   } finally {
     await page.evaluate(() => cancelAnimationFrame(window.__residentProbe?.raf));
   }
@@ -105,16 +114,18 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
     if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
     await page.locator("#paintModeVisualBtn").click(); await page.locator("#toolFillBtn").click();
     const baselineColors = await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides }));
+    if (output) await page.screenshot({ path: path.join(output,`${scenarioId}-native-initial.png`) });
     // Exercise a cold resident activation separately from warm timing.
     report.stage = "resident-activation";
     const activationStarted = performance.now();
     await setMode(page,"raster");
     report.activationMs = performance.now() - activationStarted;
     report.initial = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+    if (output) await page.screenshot({ path: path.join(output,`${scenarioId}-raster-initial.png`) });
     report.stage = "resident-edit-history";
-    const edit = await editHistory(page, false, settle);
+    const edit = report.edit = await editHistory(page, false, settle);
     report.stage = "resident-brush-history";
-    const brush = await brushHistory(page, false, settle);
+    const brush = report.brush = await brushHistory(page, false, settle);
     report.lifecycle.push({ mode: "raster", edit, brush });
     assert.equal(brush.historyEntries,1); assert.equal(brush.pointerSteps,41);
     await page.locator("#undoBtn").click(); await settle(page);
@@ -130,22 +141,24 @@ export async function verifyResidentScenario(baseUrl, { scenarioId = "hoi4_1939"
     for (const mode of [...Array.from({ length: rounds }, () => ["vector","raster"]).flat(), "hybrid"]) {
       report.stage = `warm-${mode}-${report.samples.length}`;
       await setMode(page,mode);
-      await paintProbe(page,"#cc9911");
+      await paintProbe(page,"#19a0a2");
       const before = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
       const input = [];
       for (const color of ["#ab1357","#31bb7d","#8a32c4","#317acd","#e31ac4","#cc9911"]) input.push(await paintProbe(page,color));
       const after = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
       const delta = Object.fromEntries(Object.entries(after.passes).filter(([,v]) => typeof v === "number")
         .map(([k,v]) => [k,v-(before.passes[k]||0)]));
+      report.samples.push({ mode, paintedIds: input.map(p=>p.id), inputMs: input.map(p=>p.ms), medianMs: quantile(input.map(p=>p.ms),0.5),
+        p95Ms: quantile(input.map(p=>p.ms),0.95), passDelta: delta,
+        buildDelta: (after.builds||0)-(before.builds||0), diagnostics: after });
+      assert.equal(new Set(report.samples.flatMap(sample => sample.paintedIds)).size, 1, "all backends must paint the same canonical feature");
       if (mode === "raster") {
         assert.equal(after.nativeRefinements,0); assert.equal(delta.nativeBackgroundPasses,0);
         assert.equal(delta.nativeFinePasses,0); assert.equal(delta.nativePartialRepaints,0);
         assert.equal(after.builds,before.builds,"warm palette edits must not rebuild coverage");
         assert.ok(delta.rasterPrimaryPasses>0);
       }
-      report.samples.push({ mode, inputMs: input.map(p=>p.ms), medianMs: quantile(input.map(p=>p.ms),0.5),
-        p95Ms: quantile(input.map(p=>p.ms),0.95), passDelta: delta,
-        buildDelta: (after.builds||0)-(before.builds||0), diagnostics: after });
+
     }
     await setMode(page,"raster");
     const beforeSwitch = await page.evaluate(() => ({ colors: { ...window.__rasterTask.state.visualOverrides }, past: window.__rasterTask.state.historyPast.length }));
