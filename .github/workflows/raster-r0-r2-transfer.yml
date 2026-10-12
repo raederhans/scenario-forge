@@ -1,0 +1,43 @@
+name: Raster R0-R2 source transfer
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-r0-r2-transfer.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Split the existing read-only baseline artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p baseline parts
+          gh run download 38197366911 --repo raederhans/scenario-forge --name raster-r0-r2-pinned-baseline --dir baseline
+          split -b 400M -d baseline/source.tar.gz parts/source.part-
+          cp baseline/source-commit.txt baseline/source.sha256 baseline/node-baseline.log parts/
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: raster-r0-r2-source-part-00
+          path: parts/source.part-00
+          retention-days: 2
+          compression-level: 0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: raster-r0-r2-source-part-01
+          path: parts/source.part-01
+          retention-days: 2
+          compression-level: 0
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: raster-r0-r2-source-part-02
+          path: |
+            parts/source.part-02
+            parts/source-commit.txt
+            parts/source.sha256
+            parts/node-baseline.log
+          retention-days: 2
+          compression-level: 0
