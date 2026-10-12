@@ -1,3 +1,4 @@
+import { createPoliticalIdRasterDisplayCache } from "./political_id_raster_display_cache.js";
 import { createPoliticalIdRasterSource } from "./political_id_raster_source.js";
 import { createPoliticalIdRasterCache, planPoliticalIdRasterView } from "./political_id_raster_cache.js";
 import { createPoliticalIdRasterGpu } from "./political_id_raster_gpu.js";
@@ -27,12 +28,17 @@ export function createPoliticalIdRasterRuntimeOwner({
   state, surface, helpers: h, effects: e,
   client = null, cache = createPoliticalIdRasterCache(),
   createGpu = createPoliticalIdRasterGpu, resourceBudget = null,
+  createDisplayCache = createPoliticalIdRasterDisplayCache,
   assetStore = undefined,
   identityBuilder = createPoliticalIdRasterIdentityBuilder(), canonicalCoordinates = true, gutter = 0,
   assetTimeoutMs = 1500, assetRetryAfterMs = 5000, refineAfterMs = null, displayMode = "hybrid",
 }) {
   if (!["raster", "hybrid"].includes(displayMode)) throw new TypeError("Invalid raster display mode.");
   const persistent = displayMode === "raster";
+  // Diagnostic A/B only; no persisted preference or change to auto eligibility.
+  const displayCache = persistent && new URLSearchParams(globalThis.location?.search || "").get("political_raster_present") !== "full"
+    ? createDisplayCache() : null;
+  let tileDependencies = new WeakMap(), lastTiming = null;
   const worker = client || createPoliticalIdRasterWorkerClient();
   if (assetStore === undefined) assetStore = globalThis.indexedDB
     ? worker.assetStore || createPoliticalIdRasterAssetStore() : null;
@@ -173,16 +179,18 @@ export function createPoliticalIdRasterRuntimeOwner({
     const retained = cache.getStats();
     const graphics = gpu?.getStats();
     const assets = assetStore?.stats();
+    const presentation = displayCache?.getStats();
+    const dependencyBytes = displayCache ? cache.entries().reduce((sum, [, tile]) => sum + (tileDependencies.get(tile)?.byteLength || 0), 0) : 0;
     resourceBudget?.update(resourceOwner, { rasterTiles: retained.cpuBytes + (snapshot?.palette.byteLength || 0)
-        + (assets?.memoryBytes || 0),
+        + (assets?.memoryBytes || 0) + (presentation?.paletteSnapshotBytes || 0) + dependencyBytes,
       gpuTextures: graphics?.gpuTextureBytes || 0,
-      workerSurfaces: (graphics?.outputSurfaceBytesEstimate || 0)
+      workerSurfaces: (graphics?.outputSurfaceBytesEstimate || 0) + (presentation?.retainedSurfaceBytes || 0)
         + (active ? (active.descriptor.width + 2 * gutter) * (active.descriptor.height + 2 * gutter) * 4 : 0),
       workerGeometry: active ? null : 0,
       decodeTransient: assets?.pendingBytes || 0,
       projectedPaths: pathCacheEstimatedBytes });
   }
-  function releaseGpu() { gpu?.dispose(); gpu = null; gpuTiles = []; }
+  function releaseGpu() { gpu?.dispose(); gpu = null; gpuTiles = []; displayCache?.reset(); }
   function cancel() { active?.controller.abort(); active = null; }
   function usable() { return !disposed && !failed && h.isEnabled() && worker.available(); }
   function projectionOptions() {
@@ -196,7 +204,9 @@ export function createPoliticalIdRasterRuntimeOwner({
     const raw = h.getSourceIdentity();
     const options = projectionOptions();
     const nextFitKey = JSON.stringify(options);
-    coordinates = canonicalCoordinates ? createPoliticalIdRasterCoordinateSpace(options) : null;
+    if (fittedProjectionKey !== nextFitKey || (canonicalCoordinates && !coordinates)) {
+      coordinates = canonicalCoordinates ? createPoliticalIdRasterCoordinateSpace(options) : null;
+    }
     const identity = { ...raw, projectionKey: coordinates?.signature || raw.projectionKey };
     const nextNamespace = `${identity.sceneKey}|${identity.projectionKey}|${identity.coverageKey}`;
     const changedNamespace = namespace !== nextNamespace;
@@ -425,6 +435,9 @@ export function createPoliticalIdRasterRuntimeOwner({
         throw new Error("Political ID tile response does not match its requested region.");
       }
       cache.set(descriptor.key, tile, descriptor);
+      // Conservative contributor set from the validated build/asset identity.
+      // It includes fill and stroke contributors, never a second ID namespace.
+      if (displayCache) tileDependencies.set(tile, Uint32Array.from(entries, entry => entry.code));
       if (built) {
         stats.builds++;
         stats.coldBuildMs += Number(tile.stats?.buildMs || 0);
@@ -514,6 +527,7 @@ export function createPoliticalIdRasterRuntimeOwner({
     if (!usable()) { displayState = "fallback"; reason = failed ? "producer-error" : "unavailable"; return null; }
     try {
       syncSource();
+      const sourceDoneAt = performance.now();
       if (!updatePlan()) { stats.fallbacks++; displayState = "fallback"; reason = "view-budget"; return null; }
       updateViewIdentity();
       if (forceNativeRefinement) {
@@ -543,21 +557,35 @@ export function createPoliticalIdRasterRuntimeOwner({
       // estimate bounds one allocation before uploading; no driver-VRAM claim.
       const estimate = tiles.reduce((sum, tile) => sum + tile.codes.byteLength
         + Math.ceil(Math.max(1, tile.edgeIds.length) / 1024) * 1024 * 8, 0)
+        // Base full-GPU estimate; optional retained output is admitted separately
+        // against the unchanged 80 MiB limit before allocation.
         + plan.width * plan.height * 4 + Math.ceil(snapshot.palette.length / 4096) * 4096;
       if (estimate > GPU_LIMIT) { stats.fallbacks++; displayState = "fallback"; reason = "gpu-budget"; return null; }
+      // Keep legacy raster eligibility at large DPR: when the additional
+      // retained surface would exceed the existing cap, use full GPU output.
+      const useRetained = !!displayCache && estimate + plan.width * plan.height * 4 <= GPU_LIMIT;
+      if (!useRetained) displayCache?.reset();
       const startedAt = performance.now();
-      gpu.setPalette(snapshot.palette, `${namespace}:${snapshot.paletteRevision}`);
+      const paletteKey = `${namespace}:${snapshot.paletteRevision}`;
+      gpu.setPalette(snapshot.palette, paletteKey);
+      const paletteDoneAt = performance.now();
       gpu.setTiles(tiles);
       gpuTiles = tiles;
-      gpu.draw(plan);
+      const tilesDoneAt = performance.now();
+      let frame;
+      if (useRetained) frame = displayCache.draw({ gpu, plan, tiles, palette: snapshot.palette,
+        revision: paletteKey, dependencies: tile => tileDependencies.get(tile) });
+      else { gpu.draw(plan); frame = gpu.canvas; }
+      const rasterDoneAt = performance.now();
       const context = surface.getContext();
       context.save();
       try {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.imageSmoothingEnabled = true;
         context.imageSmoothingQuality = "low";
-        context.drawImage(gpu.canvas, plan.outputX, plan.outputY, plan.outputWidth, plan.outputHeight);
+        context.drawImage(frame, plan.outputX, plan.outputY, plan.outputWidth, plan.outputHeight);
       } finally { context.restore(); }
+      const compositeDoneAt = performance.now();
       const renderedIds = new Set(snapshot.entries.filter(entry => intersectsTile(entry.bounds, {
         density: plan.density, originX: plan.originX, originY: plan.originY, width: plan.width, height: plan.height,
       })).map(entry => entry.id));
@@ -571,6 +599,13 @@ export function createPoliticalIdRasterRuntimeOwner({
       stats.lastCommitMs = performance.now() - startedAt;
       account();
       lastDrawTotalMs = performance.now() - drawStartedAt;
+      const presentation = displayCache?.getStats();
+      lastTiming = { sourceMs: sourceDoneAt - drawStartedAt, planningMs: startedAt - sourceDoneAt,
+        paletteUploadMs: paletteDoneAt - startedAt, tileBindingMs: tilesDoneAt - paletteDoneAt,
+        rasterMs: rasterDoneAt - tilesDoneAt, gpuSubmitMs: useRetained ? presentation.lastGpuMs : rasterDoneAt - tilesDoneAt,
+        captureMs: useRetained ? presentation.lastCaptureMs : 0, targetCompositeMs: compositeDoneAt - rasterDoneAt,
+        finishMs: performance.now() - compositeDoneAt, totalMs: lastDrawTotalMs,
+        phase: "CPU wall time including any browser synchronization; not GPU execution or presentation" };
       e.recordMetric?.("politicalIdRasterCommit", stats.lastCommitMs, {
         drawTotalMs: lastDrawTotalMs, firstRasterReadyMs, phase: "cpu-submission-not-presentation",
         tileCount: tiles.length, level: plan.level, renderedCount: renderedIds.size,
@@ -616,6 +651,8 @@ export function createPoliticalIdRasterRuntimeOwner({
     getPendingWorkCount: () => active ? 1 : 0,
     getDiagnostics: () => ({ displayMode, persistent, ...stats, ...cache.getStats(), gpu: gpu?.getStats() || null,
       pending: active ? 1 : 0, failed, selected: h.isEnabled(), displayState, reason,
+      presentation: displayCache?.getStats().retainedSurfaceBytes ? "retained-regions" : "full-gpu",
+      presentationCache: displayCache?.getStats() || null, lastTiming: lastTiming && { ...lastTiming },
       firstRasterReadyMs, lastDrawTotalMs, nativeRefinements, refinementPending: refinementTimer !== null,
       sceneKey: snapshot?.sceneKey || "", level: plan?.level ?? null,
       view: committedPlan ? { ...committedPlan.transform, dpr: committedPlan.dpr } : null,
@@ -643,6 +680,8 @@ export function createPoliticalIdRasterRuntimeOwner({
       manifestController.abort();
       assetStore?.dispose();
       identityBuilder.dispose();
+      displayCache?.dispose();
+      tileDependencies = new WeakMap();
       tileIdentities = new WeakMap();
       committedPlan = null;
       snapshot = null;

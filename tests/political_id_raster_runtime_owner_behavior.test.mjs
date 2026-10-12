@@ -1,3 +1,4 @@
+import { createPoliticalIdRasterDisplayCache } from "../js/core/renderer/political_id_raster_display_cache.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
@@ -121,6 +122,9 @@ function fixture({
     cache,
     createGpu: createGpu || gpuHarness.createGpu,
     resourceBudget, refineAfterMs, displayMode,
+    createDisplayCache: () => createPoliticalIdRasterDisplayCache({ createCanvas: (width, height) => ({
+      width, height, getContext: () => ({ save() {}, restore() {}, setTransform() {}, clearRect() {}, drawImage() {} }),
+    }) }),
   });
   return {
     owner, state, identity, features, setFeatures(next) { features = next; }, h, layout,
@@ -662,4 +666,24 @@ test("persistent owner keeps geometry cancellation and unavailable-output fallba
   assert.equal(f.owner.getDiagnostics().nativeRefinements, 0);
   f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
   assert.equal(f.owner.getDiagnostics().contextLosses, 1);
+});
+
+
+test("resident presentation reuses stable RGBA and accounts its retained surface", async t => {
+  const updates = [];
+  const f = fixture({ displayMode: "raster", resourceBudget: { update: (...args) => updates.push(args), release() {} } });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const before = f.owner.getDiagnostics();
+  assert.ok(before.presentationCache.retainedSurfaceBytes > 0);
+  assert.ok(f.owner.draw());
+  const after = f.owner.getDiagnostics();
+  assert.equal(after.presentationCache.reusedFrames, before.presentationCache.reusedFrames + 1);
+  assert.equal(after.builds, before.builds);
+  assert.equal(after.nativeRefinements, 0);
+  assert.ok(updates.at(-1)[1].workerSurfaces >= after.presentationCache.retainedSurfaceBytes);
+  assert.ok(after.lastTiming.totalMs >= 0);
+  const count = after.presentationCache.fullUpdates;
+  f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().presentationCache.fullUpdates, count + 1);
 });
