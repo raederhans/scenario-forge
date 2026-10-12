@@ -1,0 +1,83 @@
+name: Raster R0-R2 corrected candidate
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-r0-r2-candidate-2.yml]
+permissions:
+  contents: write
+concurrency:
+  group: raster-r0-r2-owned-candidate
+  cancel-in-progress: false
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: codex/raster-r0-r2-20261012
+          fetch-depth: 2
+      - name: Apply exact checked correction to the owned candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 8aab1720e832292511cb83046e414c3a8d951f2e
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          mkdir -p .runtime/reports/generated/raster-r0-r2/browser .runtime/tmp
+          patch=.runtime/tmp/raster-r0-r2-candidate-2.patch.gz
+          : > "$patch"
+          for sha in ece2fff484c6e30991f11d06c98be5e79af8fb49 709570e8ab80dfd2a3d6481253d4fa0680e3f925; do
+            gh api "repos/raederhans/scenario-forge/git/blobs/$sha" --jq .content | base64 --decode >> "$patch"
+          done
+          echo "6a3ef0efae4942e5ede05390b03e447cac51afcf1c480fcea7c1fb00cb168b70  $patch" | sha256sum --check
+          gzip -dc "$patch" > .runtime/tmp/raster-r0-r2-candidate-2.patch
+          git apply --check .runtime/tmp/raster-r0-r2-candidate-2.patch
+          git apply .runtime/tmp/raster-r0-r2-candidate-2.patch
+          git diff --check
+          npm ci --ignore-scripts
+      - name: Focused behavior and unchanged authority boundaries
+        run: |
+          set -euo pipefail
+          node --test tests/political_id_raster_trial_behavior.test.mjs tests/political_id_raster_source_behavior.test.mjs tests/political_id_raster_runtime_owner_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs 2>&1 | tee .runtime/reports/generated/raster-r0-r2/node-candidate.log
+          npm run verify:architecture-boundaries 2>&1 | tee .runtime/reports/generated/raster-r0-r2/architecture.log
+          python -m unittest tests.test_map_renderer_political_pass_orchestrator_boundary_contract -q
+          node --test --test-name-pattern='all remaining declared source-proof families' tests/state_target_private_cache_contract_behavior.test.mjs 2>&1 | tee .runtime/reports/generated/raster-r0-r2/current-source-proofs.log
+          node --check tools/verify_political_raster_resident.mjs
+      - name: Publish only the corrected product branch
+        run: |
+          set -euo pipefail
+          git add -u
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(renderer): admit equivalent immutable display geometry and preserve export diagnostics'
+          git push origin HEAD:refs/heads/codex/raster-r0-r2-20261012
+          git rev-parse HEAD > .runtime/reports/generated/raster-r0-r2/candidate-commit.txt
+          npm run pr:plan > .runtime/reports/generated/raster-r0-r2/pr-plan.log 2>&1
+      - name: Install locked Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build candidate Pages artifact
+        run: python tools/build_pages_dist.py --output-root .runtime/raster-r0-r2-dist
+      - name: Real persistent-raster editing and paired timing
+        run: |
+          set -euo pipefail
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-r0-r2-dist > .runtime/reports/generated/raster-r0-r2/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8008/app/ > /dev/null; then break; fi
+            sleep 1
+          done
+          status=0
+          for scenario in hoi4_1939 hoi4_1936 tno_1962; do
+            timeout 360s node tools/verify_political_raster_resident.mjs --base-url http://127.0.0.1:8008/app/ --scenario "$scenario" --rounds 2 --revision "$(git rev-parse HEAD)" --output .runtime/reports/generated/raster-r0-r2/browser > ".runtime/reports/generated/raster-r0-r2/$scenario.log" 2>&1 || status=1
+            cat ".runtime/reports/generated/raster-r0-r2/$scenario.log"
+          done
+          exit "$status"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-r0-r2-candidate-2-evidence
+          path: .runtime/reports/generated/raster-r0-r2/
+          retention-days: 7
+          if-no-files-found: error
