@@ -30,3 +30,6 @@ Results are recorded separately after execution, pinned to their tested revision
 ## Initial verification receipt
 
 Run 38217354006 committed runtime 250a17e392bec8862a716a828d0ba5ed3a51a166 after 243 focused Node cases, five Python boundaries, architecture and current source-family checks passed. The browser then stopped before any quality/timing sample: the new profiling wrapper passed null to a predicate whose default argument requires undefined. This is a harness bug, not a product or user-environment failure. Its correction changes the invocation and adds a regression; readiness and pixel tolerances remain unchanged. Additional coverage verifies that the optional retained surface cannot shrink the existing raster resource envelope.
+
+
+Presentation identity uses WeakMap tokens rather than retaining tile objects. This prevents the RGBA cache from extending the lifetime of evicted CPU buffers during geometry replacement. An explicit --expose-gc regression verifies that a released tile can be collected while the presentation frame remains cached; ordinary test runs report that GC-specific case as skipped when GC is unavailable, not as passed.

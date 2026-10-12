@@ -106,3 +106,22 @@ test("profiling preserves the readiness function default state argument", async 
   assert.deepEqual(summarize([4,1,3,2]), {count:4,median:2.5,p95:4,max:4});
   assert.throws(() => summarize([]), /samples/);
 });
+
+
+test("presentation tokens do not retain a tile after the authoritative cache releases it", {skip:typeof globalThis.gc!=="function"}, async () => {
+  const context = {save(){},restore(){},setTransform(){},clearRect(){},drawImage(){}};
+  const cache = createPoliticalIdRasterDisplayCache({createCanvas:(width,height)=>({width,height,getContext:()=>context})});
+  let tile = {originX:0,originY:0,width:10,height:10,codes:new Uint32Array(1024)};
+  const reference = new WeakRef(tile);
+  cache.draw({gpu:{canvas:{},draw(){}},plan:{width:10,height:10,originX:0,originY:0,density:1},
+    tiles:[tile],palette:new Uint8Array(8),revision:1,dependencies:()=>Uint32Array.of(1)});
+  tile=null;
+  for(let attempt=0;attempt<20;attempt++) {
+    await new Promise(resolve=>setImmediate(resolve));
+    globalThis.gc();
+    if(reference.deref()===undefined)break;
+  }
+  assert.equal(reference.deref(),undefined,"cached presentation must not own old CPU tile payloads");
+  assert.ok(cache.getStats().retainedSurfaceBytes>0,"the RGBA frame remains independently reusable");
+  cache.dispose();
+});

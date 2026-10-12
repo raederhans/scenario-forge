@@ -5,6 +5,14 @@ export function createPoliticalIdRasterDisplayCache({
   now = () => performance.now(),
 } = {}) {
   let canvas = null, context = null, previous = null, disposed = false;
+  // A presentation snapshot must not retain evicted CPU tile buffers. Tokens
+  // have no backlink to their tile; the original byte-bounded LRU owns payloads.
+  const tileTokens = new WeakMap();
+  function tokenFor(tile) {
+    let token = tileTokens.get(tile);
+    if (!token) { token = {}; tileTokens.set(tile, token); }
+    return token;
+  }
   const stats = { fullUpdates: 0, partialUpdates: 0, reusedFrames: 0, shadedPixels: 0,
     lastUpdatedPixels: 0, lastFullPixels: 0, lastGpuMs: 0, lastCaptureMs: 0 };
 
@@ -26,8 +34,9 @@ export function createPoliticalIdRasterDisplayCache({
     stats.lastUpdatedPixels = 0; stats.lastGpuMs = 0; stats.lastCaptureMs = 0;
     const sameGrid = previous && ["width", "height", "originX", "originY", "density"]
       .every(key => previous.plan[key] === plan[key]);
-    const sameTiles = sameGrid && previous.tiles.length === tiles.length
-      && tiles.every((tile, index) => tile === previous.tiles[index]);
+    const tokens = tiles.map(tokenFor);
+    const sameTiles = sameGrid && previous.tokens.length === tokens.length
+      && tokens.every((token, index) => token === previous.tokens[index]);
     let dirty = tiles;
     if (sameTiles && palette.length === previous.palette.length) {
       const changed = new Set();
@@ -91,7 +100,7 @@ export function createPoliticalIdRasterDisplayCache({
     // Commit only after the region was successfully copied. The byte snapshot
     // detects changes even when a caller updates the palette buffer in place.
     previous = { plan: { width: plan.width, height: plan.height, originX: plan.originX,
-      originY: plan.originY, density: plan.density }, tiles: [...tiles], revision, palette: palette.slice() };
+      originY: plan.originY, density: plan.density }, tokens, revision, palette: palette.slice() };
     return canvas;
   }
 
