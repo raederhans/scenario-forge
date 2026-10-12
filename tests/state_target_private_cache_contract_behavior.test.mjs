@@ -70,6 +70,53 @@ test("all capability retirements prove historical authority and reject restored 
   t.diagnostic(`Verified all ${entries.length} retirement receipts and ${entries.length} restored-source or injected-write rejections; historical pins and read permissions are unchanged.`);
 });
 
+test("capability hook import receipts accept only the exact six import migrations", () => {
+  const receipts = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES;
+  assert.equal(receipts.length, 6);
+  for (const receipt of receipts) {
+    const historical = execFileSync("git", ["show", `${receipt.previousSourceRevision}:${receipt.modulePath}`], { encoding: "utf8" });
+    const current = read(receipt.modulePath);
+    const inspect = (source, readHistoricalSource = () => historical) => contracts.matchesStateCapabilityRetirementSource({
+      modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+      source, readCurrentSource: read, readHistoricalSource,
+    });
+    assert.equal(inspect(current), true, receipt.modulePath);
+    assert.equal(inspect(current.replaceAll("\n", "\r\n")), true, "line endings do not alter source evidence");
+    assert.equal(inspect(historical), false, "the migrated source cannot silently revert");
+    assert.equal(inspect(`${current}\nruntimeState.devScenarioEditor = {};\n`), false, "a restored writer is rejected");
+    assert.equal(inspect(current.replace(receipt.importSource, "../unreviewed_hooks.js")), false, "an unreviewed provider is rejected");
+    assert.equal(inspect(current, () => `${historical}\n// changed anchor\n`), false, "historical source must still match");
+  }
+});
+
+test("capability hook import receipts bind the facade, implementation, bus, and config", () => {
+  const receipt = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES[0];
+  const historical = execFileSync("git", ["show", `${receipt.previousSourceRevision}:${receipt.modulePath}`], { encoding: "utf8" });
+  for (const dependency of contracts.STATE_CAPABILITY_RETIREMENT_HOOK_DEPENDENCY_PROOFS) {
+    for (const replacement of [null, `${read(dependency.modulePath)}\n// changed provider\n`]) {
+      assert.equal(contracts.matchesStateCapabilityRetirementSource({
+        modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+        source: read(receipt.modulePath), readHistoricalSource: () => historical,
+        readCurrentSource: modulePath => modulePath === dependency.modulePath ? replacement : read(modulePath),
+      }), false, dependency.modulePath);
+    }
+  }
+});
+
+test("capability hook import migration preserves the frozen retirement ledger", () => {
+  const revision = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES[0].previousSourceRevision;
+  const previous = JSON.parse(execFileSync("git", ["show", `${revision}:tools/state_writer_policy.json`], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 }));
+  const current = JSON.parse(read("tools/state_writer_policy.json"));
+  const retired = policy => policy.progress.callerToActionLedger.entries.filter(entry => entry.proofPrecision === "explicit-capability-retirement");
+  assert.ok(retired(previous).length > 0);
+  assert.deepEqual(retired(current), retired(previous));
+  for (const entry of retired(current)) {
+    const contract = contracts.findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity);
+    assert.equal(entry.capabilityRetirementContractIdentity, contract.contractIdentity);
+    assert.equal(entry.currentSourceFingerprint, contract.currentSourceFingerprint);
+  }
+});
+
 test("all remaining declared source-proof families pass without repository mutation discovery", t => {
   const failures = [], counts = {};
   const check = (family, entries, inspect) => {

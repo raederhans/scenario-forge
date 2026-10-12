@@ -1,5 +1,5 @@
 import { state as runtimeState } from "../core/state.js";
-import { registerRuntimeHook } from "../core/state/index.js";
+import { registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import {
   addFeatureToDevSelection,
   applyDevMacroFillCurrentCountry,

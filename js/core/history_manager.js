@@ -24,7 +24,7 @@ import {
 import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
-import { callRuntimeHook, callRuntimeHooks } from "./state/index.js";
+import { callRuntimeHook, callRuntimeHooks } from "./state/runtime_hooks.js";
 const state = runtimeState;
 
 function uniqueKeys(values) {

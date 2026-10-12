@@ -46,7 +46,7 @@ import {
   setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
-import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
 import {
   buildPaletteQuickSwatches,

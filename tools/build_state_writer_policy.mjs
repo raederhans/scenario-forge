@@ -44,6 +44,7 @@ import {
   inspectStateActionNonTargetNormalizerSites,
   STATE_CAPABILITY_RETIREMENT_CONTRACT,
   STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
+  matchesStateCapabilityRetirementSource,
   findStateCapabilityRetirementContractEntry,
   inspectStateTargetPureReaderFunctionSource,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
@@ -2372,10 +2373,20 @@ export function inspectStateCapabilityRetirementEvidence({
     if (!currentSourceByPath.has(modulePath)) currentSourceByPath.set(modulePath, readCurrentSource(modulePath));
     return currentSourceByPath.get(modulePath);
   };
+  const sourceMatchByIdentity = new Map();
+  const sourceMatches = (modulePath, sourceFingerprint, source) => {
+    const identity = `${modulePath}:${sourceFingerprint}`;
+    if (!sourceMatchByIdentity.has(identity)) sourceMatchByIdentity.set(identity,
+      matchesStateCapabilityRetirementSource({
+        modulePath, sourceFingerprint, source,
+        readCurrentSource: currentSource, readHistoricalSource,
+      }));
+    return sourceMatchByIdentity.get(identity);
+  };
   for (const proof of STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS) {
     try {
       const source = currentSource(proof.modulePath);
-      if (source === null || fingerprint(source) !== proof.sourceFingerprint
+      if (!sourceMatches(proof.modulePath, proof.sourceFingerprint, source)
         || /scenario_tag_creator_controller|devScenarioTagCreator|devScenarioEditor/.test(source)) {
         violations.push({ code: "state-capability-retirement-proof-invalid", reason: "entry-point-source-drift", modulePath: proof.modulePath });
       }
@@ -2403,7 +2414,7 @@ export function inspectStateCapabilityRetirementEvidence({
     try {
       const source = currentSource(entry.modulePath);
       if (entry.currentSourceFingerprint
-        ? source === null || fingerprint(source) !== entry.currentSourceFingerprint
+        ? !sourceMatches(entry.modulePath, entry.currentSourceFingerprint, source)
           || (entry.allowReadReferences ? hasRetiredDirectMutation(source, entry) : source.includes(entry.key))
         : source !== null) {
         violations.push({ code: "state-capability-retirement-proof-invalid", reason: "current-source-drift", identity: entry.retiredMembershipIdentity });

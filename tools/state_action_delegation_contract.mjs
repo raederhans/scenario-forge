@@ -5835,6 +5835,60 @@ export const STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS = Object.freeze([
   Object.freeze({ modulePath: "js/core/state/dev_state.js", sourceFingerprint: "287c112761893f20b0ca5f11c82aa28eb5912b5216b0058e701503cfb8079a6d" }),
   Object.freeze({ modulePath: "js/core/map_editing_policy.js", sourceFingerprint: "2f55bb91a28da72f7ed2fa843f55d7e32309d4b10511f360d429d59dd464af36" }),
 ]);
+// Retirement identities keep their original whole-source anchors. These six
+// receipts prove only the later facade -> runtime_hooks import migration; they
+// do not refresh retirement membership, historical sites, or writer authority.
+export const STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES = Object.freeze([
+  ["js/core/history_manager.js", "895bb71dade9a1c3ec6d8827255da654e71fa76722bdbba3c34be01ec32891d2", "8a16fe10760048725a7f03e2e306a8355a59521224ce701bdc74b22115219915", ["callRuntimeHook", "callRuntimeHooks"]],
+  ["js/core/interaction_funnel.js", "07c4a97947532f264837c82aaa5aff39f3630213eba9f35f5e5c6387c4ef6850", "742e2c004b8e437154fb78fd3bfd3513ca110bcedfc1f6079865a1ba63328c21", ["callRuntimeHook"]],
+  ["js/core/scenario_rollback.js", "726af223b3c721a3989a79a9841e7b1095c9868380a87a030919b65c4fd7b757", "443d9e8091f73e9944dc5cdf2510704ac5e3a14a148e402e0e1d6b4564785113", ["callRuntimeHook", "readRegisteredRuntimeHookSource"]],
+  ["js/ui/sidebar.js", "1f4ac3fea7a46572daf9bfd3fc6852b1c18bb04532d3638da8e54c2a2849d112", "54ca2d69d1d5d6eb2ea823d612f9fa7f7fb15524600848d40e6bb0a28f192632", ["callRuntimeHook", "registerRuntimeHook"]],
+  ["js/ui/toolbar.js", "a580f7b8b9029454b668eefd794419c1fffe23a5d4c43923ad9fbb2109eea22e", "5922fff8c8f1851aa015d1aac92b7db149ebaa4cfbf05a07a72b48527e434e17", ["callCompatRuntimeHook", "callRuntimeHook", "registerRuntimeHook"]],
+  ["js/ui/dev_workspace.js", "7a7d8b5476632ad719a747f8e5fea3d4a7918adc841c3b14b81e7f616b4c872a", "aa2b530add26e87363fb90e38b530950ddd9111de2c9246fd952998709bf339b", ["registerRuntimeHook"]],
+].map(([modulePath, previousSourceFingerprint, sourceFingerprint, importedNames]) => {
+  const prefix = modulePath.startsWith("js/core/") ? "./state/" : "../core/state/";
+  return Object.freeze({
+    modulePath, previousSourceFingerprint, sourceFingerprint,
+    previousSourceRevision: "52427d3a2b5e786f30ffcfb3491b6733be339f79",
+    previousImportSource: `${prefix}index.js`,
+    importSource: `${prefix}runtime_hooks.js`,
+    importedNames: Object.freeze(importedNames),
+  });
+}));
+export const STATE_CAPABILITY_RETIREMENT_HOOK_DEPENDENCY_PROOFS = Object.freeze([
+  ["js/core/state/index.js", "811223a7c5422b5aca91af5ea9cf58d3e9253afbcb550b467db3bb240914efb4"],
+  ["js/core/state/runtime_hooks.js", "7f9013a236f228c8f4fde9069d6649441a9acd44fd6feb1a9725ff899f5ca1c2"],
+  ["js/core/state/bus.js", "3a7323add0e7c4e87468338d74dc97f54038f86b118c6f1cf1cdc10d9d133bca"],
+  ["js/core/state/config.js", "afa638dfa75616e09538a24ba9491febb7467fe38fb8598f396588e89d8a117b"],
+].map(([modulePath, sourceFingerprint]) => Object.freeze({ modulePath, sourceFingerprint })));
+
+export function matchesStateCapabilityRetirementSource({
+  modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
+}) {
+  if (source === null || source === undefined) return false;
+  const normalize = value => String(value).replace(/\r\n?/g, "\n");
+  const fingerprint = value => createHash("sha256").update(normalize(value)).digest("hex");
+  const receipt = STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.find(entry =>
+    entry.modulePath === modulePath && entry.previousSourceFingerprint === sourceFingerprint);
+  if (!receipt) return fingerprint(source) === sourceFingerprint;
+  if (fingerprint(source) !== receipt.sourceFingerprint) return false;
+  for (const dependency of STATE_CAPABILITY_RETIREMENT_HOOK_DEPENDENCY_PROOFS) {
+    const dependencySource = readCurrentSource(dependency.modulePath);
+    if (dependencySource == null || fingerprint(dependencySource) !== dependency.sourceFingerprint) return false;
+  }
+  const previous = normalize(readHistoricalSource(receipt.previousSourceRevision, modulePath));
+  if (fingerprint(previous) !== receipt.previousSourceFingerprint) return false;
+  const imports = parse(previous, { ecmaVersion: "latest", sourceType: "module" }).body.filter(node =>
+    node.type === "ImportDeclaration" && node.source.value === receipt.previousImportSource);
+  if (imports.length !== 1 || imports[0].specifiers.some(node => node.type !== "ImportSpecifier")
+    || JSON.stringify(imports[0].specifiers.map(node => node.imported.name).sort())
+      !== JSON.stringify([...receipt.importedNames].sort())) return false;
+  const { start, end } = imports[0].source;
+  // The complete prior/current byte pins and exact literal replacement forbid
+  // changes to aliases, calls, exports, comments, or any other module content.
+  return normalize(source) === previous.slice(0, start)
+    + JSON.stringify(receipt.importSource) + previous.slice(end);
+}
 const retiredCapabilityModules = [
   {
     modulePath: "js/ui/dev_workspace/scenario_tag_creator_controller.js",

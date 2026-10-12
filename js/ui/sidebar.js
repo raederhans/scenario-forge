@@ -10,7 +10,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import {

@@ -2180,7 +2180,16 @@ test("reference assignment copying rejects source writes and changed record help
     "assignments.bad = true; " + marker), entry).violations.some(item => item.code === "state-target-pure-reader-source-drift"));
   const helperMarker = "const record = (value) =>";
   assert.ok(source.includes(helperMarker));
-  assert.ok(inspectStateTargetPureReaderFunctionSource(source, entry, {
-    readSource: () => source.replace(helperMarker, "const record = (value) => (value.bad = true); const changedRecord = (value) =>"),
-  }).violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"));
+  assert.ok(Object.hasOwn(entry.dependencyFingerprints, entry.modulePath));
+  const changedHelperSource = source.replace(helperMarker,
+    "const record = (value) => (value.bad = true); const changedRecord = (value) =>");
+  // The helper belongs to this module: mutate the source under inspection.
+  // Stale disk contents must not conceal a changed in-memory dependency.
+  assert.ok(inspectStateTargetPureReaderFunctionSource(changedHelperSource, entry, {
+    readSource: () => source,
+  }).violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"
+    && item.dependencyName === entry.modulePath));
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry, {
+    readSource: () => assert.fail("Self-module receipts must use the supplied source"),
+  }).violations, []);
 });
