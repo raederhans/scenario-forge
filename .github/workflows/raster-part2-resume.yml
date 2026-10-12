@@ -1,0 +1,133 @@
+name: Raster second-delivery validated profiling
+on:
+  push:
+    branches: [codex/raster-r0-r2-bootstrap-20261012]
+    paths: [.github/workflows/raster-part2-resume.yml]
+permissions:
+  contents: write
+concurrency:
+  group: raster-r0-r2-owned-candidate
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      REPORT: .runtime/reports/generated/raster-part2-final
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: codex/raster-r0-r2-20261012
+          fetch-depth: 6
+          show-progress: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+      - name: Correct the profiler argument without changing runtime or quality gates
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 250a17e392bec8862a716a828d0ba5ed3a51a166
+          mkdir -p "$REPORT/browser"
+          git fetch --depth=1 origin main:refs/remotes/origin/main
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('tools/profile_political_raster.mjs')
+          s=p.read_text()
+          assert s.count('page.waitForFunction(residentFrameReady, null,')==1
+          s=s.replace('page.waitForFunction(residentFrameReady, null,', 'page.waitForFunction(residentFrameReady, undefined,')
+          s=s.replace('async function settle(page) {', 'export async function settle(page) {')
+          p.write_text(s)
+          p=Path('tests/political_id_raster_display_cache_behavior.test.mjs')
+          s=p.read_text()+'''
+          
+          test("profiling preserves the readiness function default state argument", async () => {
+            const { settle, summarize } = await import("../tools/profile_political_raster.mjs");
+            let disposed = false;
+            await settle({ waitForFunction: async (predicate, argument) => {
+              assert.equal(typeof predicate, "function");
+              assert.equal(argument, undefined, "null overrides the readiness predicate default state");
+              return { dispose() { disposed = true; } };
+            } });
+            assert.equal(disposed, true);
+            assert.deepEqual(summarize([4,1,3,2]), {count:4,median:2.5,p95:4,max:4});
+            assert.throws(() => summarize([]), /samples/);
+          });
+          '''
+          p.write_text(s)
+          p=Path('tests/political_id_raster_runtime_owner_behavior.test.mjs')
+          s=p.read_text()+'''
+          
+          test("optional presentation budget falls back to full GPU without disabling valid raster", async t => {
+            const f = fixture({ displayMode: "raster", width:3800, height:2200 });
+            t.after(() => f.owner.dispose());
+            f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+            const d = f.owner.getDiagnostics();
+            assert.equal(d.displayState, "accelerated");
+            assert.equal(d.presentation, "full-gpu");
+            assert.equal(d.presentationCache.retainedSurfaceBytes, 0);
+            assert.equal(d.reason, "coverage-ready");
+            assert.ok(d.gpu.outputSurfaceBytesEstimate < 80*1024*1024);
+            assert.equal(d.nativeRefinements,0);
+          });
+          '''
+          p.write_text(s)
+          p=Path('docs/active/political-raster-part2-20261012.md')
+          s=p.read_text()+'''
+          
+          ## Initial verification receipt
+          
+          Run 38217354006 committed runtime 250a17e392bec8862a716a828d0ba5ed3a51a166 after 243 focused Node cases, five Python boundaries, architecture and current source-family checks passed. The browser then stopped before any quality/timing sample: the new profiling wrapper passed null to a predicate whose default argument requires undefined. This is a harness bug, not a product or user-environment failure. Its correction changes the invocation and adds a regression; readiness and pixel tolerances remain unchanged. Additional coverage verifies that the optional retained surface cannot shrink the existing raster resource envelope.
+          '''
+          p.write_text(s)
+          PY
+          npm ci --ignore-scripts > "$REPORT/install.log" 2>&1
+          node --test tests/political_id_raster*.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs > "$REPORT/targeted.log" 2>&1 || { tail -100 "$REPORT/targeted.log"; exit 1; }
+          tail -12 "$REPORT/targeted.log"
+          npm run verify:architecture-boundaries > "$REPORT/architecture.log" 2>&1
+          python -m unittest tests.test_map_renderer_political_pass_orchestrator_boundary_contract -q
+          git diff --check
+          npm run pr:plan > "$REPORT/pr-plan.log" 2>&1
+          git add tools/profile_political_raster.mjs tests/political_id_raster_display_cache_behavior.test.mjs tests/political_id_raster_runtime_owner_behavior.test.mjs docs/active/political-raster-part2-20261012.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'test(renderer): fix profile readiness argument and cover retained-budget fallback'
+          git push origin HEAD:refs/heads/codex/raster-r0-r2-20261012
+          git rev-parse HEAD > "$REPORT/revision.txt"
+      - name: Build exact candidate and install locked browser
+        run: |
+          npx playwright install --with-deps chromium > "$REPORT/browser-install.log" 2>&1
+          python tools/build_pages_dist.py --output-root .runtime/raster-part2-final-dist > "$REPORT/build.log" 2>&1
+          tail -5 "$REPORT/build.log"
+      - name: Run three-scenario visual and performance comparisons
+        run: |
+          set -euo pipefail
+          python -m http.server 8008 --bind 127.0.0.1 --directory .runtime/raster-part2-final-dist > "$REPORT/server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8008/app/ >/dev/null; then break; fi
+            sleep 1
+          done
+          for scenario in hoi4_1939 hoi4_1936 tno_1962; do
+            timeout 420s node tools/profile_political_raster.mjs --base-url http://127.0.0.1:8008/app/ --scenario "$scenario" --revision "$(git rev-parse HEAD)" --output "$REPORT/browser" > "$REPORT/$scenario.log" 2>&1 || { cat "$REPORT/$scenario.log"; exit 1; }
+            cat "$REPORT/$scenario.log"
+          done
+          python - <<'PY'
+          import json, statistics
+          from pathlib import Path
+          root=Path('.runtime/reports/generated/raster-part2-final/browser')
+          for path in sorted(root.glob('*-profile.json')):
+            r=json.loads(path.read_text())
+            modes={}
+            for mode in ['vector','full','retained']:
+              samples=[s for b in r['blocks'] if b['mode']==mode for s in b['samples']]
+              modes[mode]={'n':len(samples),'medianMs':statistics.median(s['ms'] for s in samples),'maxMs':max(s['ms'] for s in samples)}
+            print('SUMMARY',json.dumps({'scenario':r['scenarioId'],'revision':r['revision'],'passed':r['passed'],'gpu':r['gpu'],'quality':r['quality'],'nativeDifference':r['nativeDifference'],'modes':modes,'navigation':[{'zoom':n['zoom'],'elapsedMs':n['elapsedMs'],'frameCount':len(n['frames']),'maxFrameMs':max(n['frames'],default=None)} for n in r['navigation']]}))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: raster-part2-final-evidence
+          path: .runtime/reports/generated/raster-part2-final/
+          retention-days: 7
+          if-no-files-found: error
