@@ -3,7 +3,6 @@ const DEFAULT_MAX_ZOOM_SCALE = 50;
 const CAMERA_TRANSITION_MS = 180;
 
 export function createViewportCommandOwner({
-  state = {},
   constants = {},
   getters = {},
   helpers = {},
@@ -20,10 +19,9 @@ export function createViewportCommandOwner({
   let observedZoomBehavior = null;
 
   function getViewportDimensions() {
-    return {
-      width: Number(state.width || 0),
-      height: Number(state.height || 0),
-    };
+    return typeof getters.getViewportDimensions === "function"
+      ? getters.getViewportDimensions()
+      : { width: 0, height: 0 };
   }
 
   function getZoomBehavior() {

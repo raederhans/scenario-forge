@@ -529,6 +529,63 @@ test("registered owner proofs match current composition and factory sources", ()
   }
 });
 
+test("viewport command receipt keeps fresh numeric inputs and rejects provider or action drift", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ compositionExportName }) => compositionExportName === "getViewportCommandOwner",
+  );
+  const compositionSource = fs.readFileSync(entry.compositionModulePath, "utf8");
+  const factorySource = fs.readFileSync(entry.factoryModulePath, "utf8");
+  const composition = parse(compositionSource, { ecmaVersion: "latest", sourceType: "module" })
+    .body.find((node) => node.id?.name === entry.compositionExportName);
+  const inspect = (overrides = {}) => inspectStateMutationDelegatingOwnerSources({
+    compositionSource, factorySource, entry, ...overrides,
+  });
+  assert.deepEqual(inspect().violations, []);
+  for (const [sourceKey, source, before, after] of [
+    ["compositionSource", compositionSource, "viewportCommandOwner = createViewportCommandOwner({",
+      "viewportCommandOwner = replacementProvider({"],
+    ["compositionSource", compositionSource, "width: Number(runtimeState.width || 0)",
+      "width: (runtimeState.width = 0)"],
+    ["compositionSource", compositionSource, "setZoomTransformState(runtimeState, transform);",
+      "runtimeState.zoomTransform = transform;"],
+    ["compositionSource", compositionSource, 'from "./renderer/viewport_command_owner.js"',
+      'from "./renderer/replacement_viewport_command_owner.js"'],
+    ["factorySource", factorySource, "? getters.getViewportDimensions()",
+      "? (getters.getViewportDimensions().width = 0)"],
+    ["factorySource", factorySource, 'observedZoomBehavior?.on?.("start.viewport-command", null);',
+      "void observedZoomBehavior;"],
+  ]) {
+    assert.ok(source.includes(before), before);
+    const changed = sourceKey === "compositionSource" && !before.startsWith("from ")
+      ? source.slice(0, composition.start)
+        + source.slice(composition.start, composition.end).replace(before, after)
+        + source.slice(composition.end)
+      : source.replace(before, after);
+    assert.notEqual(changed, source, before);
+    assert.ok(inspect({ [sourceKey]: changed }).violations.length, after);
+  }
+});
+
+test("primary index actions retain borrowed inputs but reject writes through their arguments", async () => {
+  const modulePath = "js/core/state/actions/renderer_cache_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const entries = STATE_ACTION_DELEGATION_CONTRACT.filter((entry) => (
+    entry.modulePath === modulePath && /^(set|delete)Primary/.test(entry.exportName)
+  ));
+  assert.equal(entries.length, 8);
+  assert.deepEqual(validateStateActionModuleSource(source, { filePath: modulePath }), []);
+  assert.deepEqual(await validateStateActionNonTargetParameterMutations(modulePath, source, entries), []);
+  for (const [before, after] of [
+    ["target.landIndex.set(featureId, feature);", "feature.properties.name = 'changed'; target.landIndex.set(featureId, feature);"],
+    ["target.countryToFeatureIds.set(country, featureIds);", "featureIds.push('changed'); target.countryToFeatureIds.set(country, featureIds);"],
+    ["target.landIndex.set(featureId, feature);", "publish(feature); target.landIndex.set(featureId, feature);"],
+  ]) {
+    assert.ok(source.includes(before));
+    const violations = await validateStateActionNonTargetParameterMutations(modulePath, source.replace(before, after), entries);
+    assert.ok(violations.some((entry) => entry.code === "state-action-non-target-parameter-mutation"), after);
+  }
+});
+
 test("selection owner proof rejects borrowed getter and facade drift", () => {
   const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
     ({ compositionExportName }) => compositionExportName === "getSelectionOverlayOwner",
@@ -3724,7 +3781,7 @@ function refreshImportedCallOwnerPins(entry, source) {
   };
 }
 
-test("imported activation calls preserve exact paint projection and detached eviction read", async () => {
+test("imported activation calls preserve one canonical paint writer and detached eviction read", async () => {
   const receipts = STATE_ACTION_IMPORTED_CALL_RECEIPTS;
   const readSource = (modulePath) => fs.readFileSync(modulePath, "utf8");
   for (const entry of Object.values(receipts)) {
@@ -3747,23 +3804,6 @@ test("imported activation calls preserve exact paint projection and detached evi
     binding,
     findings,
   }));
-  const projectedPaint = projectPalettePaintActionCandidate(scannedCandidates, { readSource });
-  assert.equal(projectedPaint.delegationOnly, false);
-  assert.equal(projectedPaint.binding.functionName, receipts.paint.exportName);
-  assert.deepEqual(projectedPaint.findings.map(({ operation, key, pathSegments }) => ({
-    operation,
-    key,
-    pathSegments,
-  })), [{
-    operation: "assign",
-    key: "visualOverrides",
-    pathSegments: ["visualOverrides", "*"],
-  }, {
-    operation: "assign",
-    key: "riverPaint",
-    pathSegments: ["riverPaint"],
-  }]);
-
   const actionSource = fs.readFileSync(receipts.eviction.modulePath, "utf8");
   const actionScan = await discoverStateWriterBindingsForSource(
     receipts.eviction.modulePath,
@@ -3771,6 +3811,15 @@ test("imported activation calls preserve exact paint projection and detached evi
     "production",
     { includeInventories: true, scanAllParameters: true },
   );
+  const palette = actionScan.bindingInventories.find(({ binding }) => binding.functionName === receipts.paint.exportName);
+  assert.ok(palette);
+  assert.deepEqual(palette.findings, []);
+  assert.equal(palette.actionDelegations.filter((edge) => edge.actionModulePath === colorPath
+    && edge.actionExportName === "applyFeaturePaintState").length, 1);
+  scannedCandidates.push({ path: receipts.paint.modulePath, surface: "production",
+    binding: palette.binding, findings: palette.findings, delegationOnly: true });
+  assert.equal(projectPalettePaintActionCandidate(scannedCandidates, { readSource }), null,
+    "the validated delegation must not synthesize a duplicate paint writer");
   const trimTarget = actionScan.bindingInventories.find(({ binding }) => (
     binding.functionName === receipts.eviction.exportName
     && binding.parameterIndex === 0
@@ -3795,8 +3844,8 @@ test("imported activation receipts reject refreshed wrong bindings, changed call
   );
 
   const wrongImportSource = actionSource.replace(
-    'import { applyFeaturePaintState } from "../color_state.js";',
-    'import { applyFeaturePaintState as unrelatedPaintWriter } from "../color_state.js";',
+    'import { applyFeaturePaintState } from "./visual_paint_actions.js";',
+    'import { applyFeaturePaintState as unrelatedPaintWriter } from "./visual_paint_actions.js";',
   );
   assert.notEqual(wrongImportSource, actionSource);
   const wrongImportEntry = refreshImportedCallOwnerPins(paint, wrongImportSource);

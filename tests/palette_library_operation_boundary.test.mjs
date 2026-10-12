@@ -100,7 +100,7 @@ test("palette facade delegates canonical colors and selection mode to their stat
   const activationPath = "js/core/state/actions/scenario_activation_actions.js";
   const activationSource = readFileSync(new URL(activationPath, ROOT), "utf8");
   const activationAst = parseModule(activationPath);
-  assert.ok(importedNames(activationAst, "../color_state.js").has("applyFeaturePaintState"));
+  assert.ok(importedNames(activationAst, "./visual_paint_actions.js").has("applyFeaturePaintState"));
   const featureAction = activationAst.body.find((node) =>
     node.declaration?.id?.name === "applyPaletteFeatureColorState").declaration;
   assert.equal(featureAction.body.body.length, 1);
@@ -108,7 +108,7 @@ test("palette facade delegates canonical colors and selection mode to their stat
   assert.equal(delegatedCall.type, "CallExpression");
   assert.equal(delegatedCall.callee.name, "applyFeaturePaintState");
   assert.deepEqual(delegatedCall.arguments.map((argument) => argument.name), ["target", "featureIds", "color"]);
-  const colorPath = "js/core/state/color_state.js";
+  const colorPath = "js/core/state/actions/visual_paint_actions.js";
   const colorSource = readFileSync(new URL(colorPath, ROOT), "utf8");
   const findings = [
     ...scanParameter(activationSource, activationPath, "applyPaletteOwnerColorState", "target"),

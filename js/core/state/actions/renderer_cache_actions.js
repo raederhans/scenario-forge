@@ -174,6 +174,40 @@ export function clearProjectedBoundsCacheEntriesState(target) {
   target.projectedBoundsById.clear();
 }
 
+// The primary index owner determines keys and ordering. Publish into the live
+// Maps in place; feature and unchanged country-array identity remain shared.
+export function setPrimaryLandIndexEntryState(target, featureId, feature) {
+  target.landIndex.set(featureId, feature);
+}
+
+export function deletePrimaryLandIndexEntryState(target, featureId) {
+  target.landIndex.delete(featureId);
+}
+
+export function setPrimaryPickingKeyState(target, featureId, key) {
+  target.idToKey.set(featureId, key);
+}
+
+export function deletePrimaryPickingKeyState(target, featureId) {
+  target.idToKey.delete(featureId);
+}
+
+export function setPrimaryPickingFeatureIdState(target, key, featureId) {
+  target.keyToId.set(key, featureId);
+}
+
+export function deletePrimaryPickingFeatureIdState(target, key) {
+  target.keyToId.delete(key);
+}
+
+export function setPrimaryCountryFeatureIdsState(target, country, featureIds) {
+  target.countryToFeatureIds.set(country, featureIds);
+}
+
+export function deletePrimaryCountryFeatureIdsState(target, country) {
+  target.countryToFeatureIds.delete(country);
+}
+
 export function setDynamicBordersDirtyState(target, dirty, reason) {
   assertStateTarget(target);
   target.dynamicBordersDirty = dirty;

@@ -2969,12 +2969,15 @@ function getViewportCommandOwner() {
     return viewportCommandOwner;
   }
   viewportCommandOwner = createViewportCommandOwner({
-    state: runtimeState,
     constants: {
       minZoomScale: MIN_ZOOM_SCALE,
       maxZoomScale: MAX_ZOOM_SCALE,
     },
     getters: {
+      getViewportDimensions: () => ({
+        width: Number(runtimeState.width || 0),
+        height: Number(runtimeState.height || 0),
+      }),
       getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
       getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
       getD3: () => globalThis.d3,

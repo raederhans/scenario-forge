@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { parse } from "acorn";
+import { VISUAL_PAINT_ACTION_PATH, VISUAL_PAINT_ACTION_SOURCE_FINGERPRINT, inspectVisualPaintInputSites } from "./state_visual_paint_contract.mjs";
+import { inspectBoundedGovernanceSourceRefresh } from "./state_governance_source_refresh.mjs";
 
 import {
   compareP4StateActionPhases,
@@ -389,6 +391,21 @@ const SPECIAL_ZONE_ACTION_EXPORT_NAMES = Object.freeze([
 ]);
 
 const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
+  Object.freeze({
+    modulePath: "js/core/state/actions/visual_paint_actions.js",
+    exportNames: Object.freeze(["applyFeaturePaintState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: RENDERER_CACHE_ACTION_MODULE_PATH,
+    exportNames: Object.freeze([
+      "setPrimaryLandIndexEntryState", "deletePrimaryLandIndexEntryState",
+      "setPrimaryPickingKeyState", "deletePrimaryPickingKeyState",
+      "setPrimaryPickingFeatureIdState", "deletePrimaryPickingFeatureIdState",
+      "setPrimaryCountryFeatureIdsState", "deletePrimaryCountryFeatureIdsState",
+    ]),
+    introducedInPhase: "P4.4",
+  }),
   Object.freeze({
     modulePath: "js/core/state/actions/thematic_wgi_actions.js",
     exportNames: Object.freeze(["setThematicWgiRuntimeState", "resetThematicWgiRuntimeState", "setThematicWgiStyleState"]),
@@ -5866,6 +5883,10 @@ export function matchesStateCapabilityRetirementSource({
   modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
 }) {
   if (source === null || source === undefined) return false;
+  const boundedRefresh = inspectBoundedGovernanceSourceRefresh({
+    modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
+  });
+  if (boundedRefresh !== null) return boundedRefresh;
   const normalize = value => String(value).replace(/\r\n?/g, "\n");
   const fingerprint = value => createHash("sha256").update(normalize(value)).digest("hex");
   const receipt = STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.find(entry =>
@@ -7435,10 +7456,10 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
     "compositionModulePath": "js/core/map_renderer.js",
     "compositionExportName": "getViewportCommandOwner",
-    "compositionSourceFingerprint": "0e6729036f27588c64f8aa28d32387246cc877f6fc924b5e5bcb879c05718e95",
+    "compositionSourceFingerprint": "fbfc08113f9639da40c0c72ccac27d1281d0bab434b3729ce27f848c8e60ab6f",
     "factoryModulePath": "js/core/renderer/viewport_command_owner.js",
     "factoryExportName": "createViewportCommandOwner",
-    "factorySourceFingerprint": "36fef996e96a9e84826ceed03b636de5ba477311a3aaef843ff3db350d3bde2b",
+    "factorySourceFingerprint": "53046ea6580a7a001287ea8bffa685618df88534fe26c2504a9c4f242960a56d",
     "ownerBindingName": "viewportCommandOwner",
     "methods": [
       "updateZoomTranslateExtent",
@@ -9121,6 +9142,13 @@ function normalizeModulePath(value = "") {
 }
 
 const STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID = new Map([
+  ["js/core/state/actions/visual_paint_actions.js#applyFeaturePaintState", Object.freeze([1, 2, 3])],
+  ...["setPrimaryLandIndexEntryState", "setPrimaryPickingKeyState",
+    "setPrimaryPickingFeatureIdState", "setPrimaryCountryFeatureIdsState"]
+    .map((name) => [`${RENDERER_CACHE_ACTION_MODULE_PATH}#${name}`, Object.freeze([1, 2])]),
+  ...["deletePrimaryLandIndexEntryState", "deletePrimaryPickingKeyState",
+    "deletePrimaryPickingFeatureIdState", "deletePrimaryCountryFeatureIdsState"]
+    .map((name) => [`${RENDERER_CACHE_ACTION_MODULE_PATH}#${name}`, Object.freeze([1])]),
   [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([1])],
   [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyScenarioChunkOptionalLayerState`, Object.freeze([2])],
   [`${SCENARIO_CHUNK_PROMOTION_ACTION_MODULE_PATH}#commitScenarioPoliticalChunkPayloadState`, Object.freeze([1])],
@@ -9133,6 +9161,7 @@ const STATE_ACTION_READ_ONLY_ARGUMENT_INDEXES_BY_ID = new Map([
 ]);
 
 const STATE_ACTION_REFERENCE_IDENTITY_ARGUMENT_INDEXES_BY_ID = new Map([
+  ["js/core/state/actions/visual_paint_actions.js#applyFeaturePaintState", Object.freeze([1, 2, 3])],
   [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([1, 2])],
   [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteOwnerColorState`, Object.freeze([1, 2])],
   [`${APPEARANCE_ACTION_MODULE_PATH}#setAppearanceStyleConfigState`, Object.freeze([1])],
@@ -9171,6 +9200,10 @@ const RENDER_PERF_METRIC_DYNAMIC_SITES = Object.freeze([
 ]);
 
 const STATE_ACTION_ALLOWED_DYNAMIC_SITES_BY_ID = new Map([
+  ["js/core/state/actions/visual_paint_actions.js#applyFeaturePaintState", Object.freeze([
+    freezeAllowedDynamicSite({ operation: "assign", key: "visualOverrides", pathPattern: "visualOverrides.*" }),
+    freezeAllowedDynamicSite({ operation: "delete", key: "visualOverrides", pathPattern: "visualOverrides.*" }),
+  ])],
   [`${SCENARIO_ACTIVATION_ACTION_MODULE_PATH}#applyPaletteFeatureColorState`, Object.freeze([
     freezeAllowedDynamicSite({ operation: "assign", key: "visualOverrides", pathPattern: "visualOverrides.*" }),
   ])],
@@ -15428,7 +15461,7 @@ export const STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT = Object.freeze([
     "targetArgumentIndex": 0,
     "argumentCount": 3,
     "readOnlyArgumentIndexes": Object.freeze([1, 2]),
-    "sourceFingerprint": "7f8c97d4a14f27f97b39e0385eabda857204529880b39e807d3d168b42892e59"
+    "sourceFingerprint": "8a3fc8d0320e36dfd31452bb8ea6bb3c7ec3cda9d66a41ce68d19f30c408fa20"
   }),
   Object.freeze({"modulePath":"js/core/state/renderer_runtime_state.js","exportName":"ensureProjectedBoundsCacheState","targetArgumentIndex":0,"argumentCount":1,"sourceFingerprint":"70b3d7ddd1d469b033aea1b516ba8de98928e0d19c4c7c3fdbfe8f3ffb197968"})]);
 
@@ -15439,13 +15472,13 @@ export const STATE_ACTION_IMPORTED_CALL_RECEIPTS = Object.freeze({
   paint: Object.freeze({
     modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
     exportName: "applyPaletteFeatureColorState",
-    sourceFingerprint: "4dda5e6240f1eaaf632f60f8360905fcfcb8d93d2773d0398af0292423c61e0e",
+    sourceFingerprint: "6365c4a5606a990bc4ea58bf719c940bcd9bfdd1766ade2166c493f689a8f4a8",
     functionFingerprint: "4ba736ad6dc85dbc991dc6f4fac23983aa65f8b28a87a33a59d2f468fd9c838b",
-    importSource: "../color_state.js",
+    importSource: "./visual_paint_actions.js",
     importedName: "applyFeaturePaintState",
     localName: "applyFeaturePaintState",
     callFingerprint: "da12efb5373a68c1381256258dac87474d913f28a0cfbbb3a16dbef1a450d7e6",
-    calleeModulePath: "js/core/state/color_state.js",
+    calleeModulePath: "js/core/state/actions/visual_paint_actions.js",
     // Clearing overrides copies the map; the pack and requested parent IDs are read only.
     dependencyFingerprints: Object.freeze({
       "js/core/river_paint/partition_model.js": "3ec6a9e6c13ed80c73fa9baaa324e75b1df678f7cd0ed34191f9ebb1f40fc8f1",
@@ -15454,7 +15487,7 @@ export const STATE_ACTION_IMPORTED_CALL_RECEIPTS = Object.freeze({
   eviction: Object.freeze({
     modulePath: SCENARIO_ACTIVATION_ACTION_MODULE_PATH,
     exportName: "trimScenarioBundleCacheState",
-    sourceFingerprint: "4dda5e6240f1eaaf632f60f8360905fcfcb8d93d2773d0398af0292423c61e0e",
+    sourceFingerprint: "6365c4a5606a990bc4ea58bf719c940bcd9bfdd1766ade2166c493f689a8f4a8",
     functionFingerprint: "d36fe09d785e9eeeb73def7dabae031cff244de19104b50a0a30f9eba3cc1775",
     importSource: "../../scenario/bundle_cache_policy.js",
     importedName: "getScenarioChunkPayloadEvictionIds",
@@ -15537,8 +15570,9 @@ export function inspectStateActionImportedCallReceipt(
   if (shadowed) violations.push(createViolation("state-action-imported-call-binding-drift", { exportName: entry.exportName }));
   if (entry.modulePath === STATE_ACTION_IMPORTED_CALL_RECEIPTS.paint.modulePath
     && entry.exportName === STATE_ACTION_IMPORTED_CALL_RECEIPTS.paint.exportName) {
-    const callee = STATE_TARGET_EFFECTFUL_DELEGATOR_CONTRACT.find(candidate =>
-      candidate.modulePath === entry.calleeModulePath && candidate.exportName === entry.importedName);
+    const callee = entry.calleeModulePath === VISUAL_PAINT_ACTION_PATH
+      && entry.importedName === "applyFeaturePaintState"
+      && findStateActionDelegationContractEntry(entry.calleeModulePath, entry.importedName);
     let paintFunction = null;
     try {
       const calleeAst = parseModuleSource(calleeSource);
@@ -15561,7 +15595,8 @@ export function inspectStateActionImportedCallReceipt(
       && binding.functionName === entry.importedName && binding.parameterIndex === 0
       && binding.parameterPath === "$" && (binding.grants || []).some(grant =>
         (grant.memberships || []).some(membership => membership.operation === "assign" && membership.key === "visualOverrides")));
-    if (!callee || fingerprint(calleeSource) !== callee.sourceFingerprint || !removeDefaultsToFalse
+    if (!callee || fingerprint(calleeSource) !== VISUAL_PAINT_ACTION_SOURCE_FINGERPRINT || !removeDefaultsToFalse
+      || inspectVisualPaintInputSites(calleeSource, { readSource }).violations.length
       || functionNode?.body.body.length !== 1
       || functionNode.body.body[0]?.type !== "ExpressionStatement"
       || functionNode.body.body[0].expression !== call
@@ -15584,4 +15619,85 @@ export function inspectStateActionImportedCallReceipt(
 }
 
 // Exact Map storage effects borrow keys/values without mutating them. Function drift invalidates this proof.
-export const STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT = Object.freeze([{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"setProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"139d116c8614556880da2a440519ec83bc1ebcd7fd9ca072d808473f573e7ae7"},{"modulePath":"js/core/state/actions/renderer_cache_actions.js","exportName":"syncProjectedBoundsCacheEntryState","targetParameterName":"target","containerField":"projectedBoundsById","moduleSourceFingerprint":"4ffe985761e14cba6978de1f529007317063d1ecc9776108b67a5d3cf8a1c739","sourceFingerprint":"d399d0e2920a555fc9041ecef290bcd9c0d899017ef47acfb471f20d496f36da"}].map(Object.freeze));
+export const STATE_ACTION_BORROWED_MAP_STORAGE_CONTRACT = Object.freeze([
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "setProjectedBoundsCacheEntryState",
+    "targetParameterName": "target",
+    "containerField": "projectedBoundsById",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "139d116c8614556880da2a440519ec83bc1ebcd7fd9ca072d808473f573e7ae7"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "syncProjectedBoundsCacheEntryState",
+    "targetParameterName": "target",
+    "containerField": "projectedBoundsById",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "d399d0e2920a555fc9041ecef290bcd9c0d899017ef47acfb471f20d496f36da"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "setPrimaryLandIndexEntryState",
+    "targetParameterName": "target",
+    "containerField": "landIndex",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "1ea29e4dd5f32cb66b76a6ee844a9c33d281c971c37c0d48342aeb1d586d0d06"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "deletePrimaryLandIndexEntryState",
+    "targetParameterName": "target",
+    "containerField": "landIndex",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "861c8dcf77249587b2f7bc262f6504b7b0ca39c6d2bda4c503d30d351d4f8535"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "setPrimaryPickingKeyState",
+    "targetParameterName": "target",
+    "containerField": "idToKey",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "02aa0bd5772cca5e15b0d14f0be18eac7a4ed71db0bec93d31e789f76058f089"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "deletePrimaryPickingKeyState",
+    "targetParameterName": "target",
+    "containerField": "idToKey",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "5a1db806045038c3eefdff53e68113e249607f7f59a9b51097c73ac975c8c5a9"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "setPrimaryPickingFeatureIdState",
+    "targetParameterName": "target",
+    "containerField": "keyToId",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "8beda5428ab02973744b8b4e72c451595af204cbf27830d085a81a1c50df820b"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "deletePrimaryPickingFeatureIdState",
+    "targetParameterName": "target",
+    "containerField": "keyToId",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "1e1fd83ce39a328a5ca4cb29aec0572acac9862415718b3dbfa9f86043101484"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "setPrimaryCountryFeatureIdsState",
+    "targetParameterName": "target",
+    "containerField": "countryToFeatureIds",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "a31a6dd83181bf6d11d8a8894ad41662187888fe532007eb373e3175edcc4856"
+  },
+  {
+    "modulePath": "js/core/state/actions/renderer_cache_actions.js",
+    "exportName": "deletePrimaryCountryFeatureIdsState",
+    "targetParameterName": "target",
+    "containerField": "countryToFeatureIds",
+    "moduleSourceFingerprint": "89a46a3d9df32bc1b75c5fbab81bc2285302bb4bc22f06574940d7f61b0bbadf",
+    "sourceFingerprint": "d3d418e0fb21c4a7c7ae700bdd8a5fa1331ff9a80cc487111e0efd6a82bcb6f3"
+  }
+].map(Object.freeze));

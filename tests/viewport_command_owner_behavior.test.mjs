@@ -123,9 +123,12 @@ function createHarness({
     },
   } : d3;
   const owner = createViewportCommandOwner({
-    state,
     constants,
     getters: {
+      getViewportDimensions: () => ({
+        width: Number(state.width || 0),
+        height: Number(state.height || 0),
+      }),
       getZoomBehavior: () => behavior,
       getInteractionRect: () => ({
         node: () => interactionNode,
@@ -173,6 +176,20 @@ test("updateZoomTranslateExtent noops without zoom behavior or usable dimensions
   const zeroHeight = createHarness({ state: { height: 0 } });
   zeroHeight.owner.updateZoomTranslateExtent();
   assert.deepEqual(zeroHeight.calls.scaleExtent, []);
+});
+
+test("viewport dimensions are read afresh after the command owner is created", () => {
+  const { calls, owner, state } = createHarness();
+  owner.updateZoomTranslateExtent();
+  state.width = "1024";
+  state.height = "768";
+  owner.updateZoomTranslateExtent();
+  state.width = 0;
+  owner.updateZoomTranslateExtent();
+  assert.deepEqual(calls.extent, [
+    [[0, 0], [800, 600]],
+    [[0, 0], [1024, 768]],
+  ]);
 });
 
 test("resetZoomToFit updates extents and records transform before applying d3 zoom transform", () => {
@@ -365,8 +382,11 @@ test("suppressed constraint correction keeps real D3 state without drawing and l
     });
     lifecycle.initZoom();
     const owner = createViewportCommandOwner({
-      state,
       getters: {
+        getViewportDimensions: () => ({
+          width: Number(state.width || 0),
+          height: Number(state.height || 0),
+        }),
         getD3: () => d3,
         getZoomBehavior: () => behavior,
         getInteractionRect: () => ({ node: () => node }),

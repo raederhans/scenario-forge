@@ -97,6 +97,29 @@ test("explicit geometry delta preserves picking keys and published bounds while 
   assert.equal(state.idToKey.get("a"), aKey);
 });
 
+test("primary reconcile publishes feature replacements before bounds callbacks and retains live Map identities", () => {
+  const initial = { id: "a", countryCode: "AA" };
+  const replacement = { id: "a", countryCode: "AA", bounds: bounds(30) };
+  const observed = [];
+  const { owner, state } = createOwnerHarness({
+    landFeatures: [initial],
+    getProjectedFeatureBounds: (feature) => {
+      observed.push(state.landIndex.get(feature.id));
+      return feature.bounds;
+    },
+  });
+  owner.rebuildRuntimePrimaryIndex();
+  const maps = [state.landIndex, state.idToKey, state.keyToId, state.countryToFeatureIds];
+  const countryIds = state.countryToFeatureIds.get("AA");
+  state.landData.features = [replacement];
+  owner.reconcileRuntimePrimaryIndex({ incrementalDelta: { changedIds: ["a"] } });
+  assert.deepEqual(observed, [replacement]);
+  assert.equal(state.landIndex.get("a"), replacement);
+  assert.equal(state.countryToFeatureIds.get("AA"), countryIds);
+  [state.landIndex, state.idToKey, state.keyToId, state.countryToFeatureIds]
+    .forEach((map, index) => assert.equal(map, maps[index]));
+});
+
 test("incremental primary indexes and queried grid match a full rebuild after replacements, reorder, removal and exclusion", () => {
   const a = { id: "a", countryCode: "AA", bounds: bounds(10) };
   const b = { id: "b", countryCode: "BB", bounds: bounds(50) };
