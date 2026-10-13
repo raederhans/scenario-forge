@@ -8,11 +8,33 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from tools.runtime_json_packing import compact_json_bytes, pack_published_runtime_data, portable_gzip_bytes
+from tools.runtime_json_packing import _compact_json_file, compact_json_bytes, pack_published_runtime_data, portable_gzip_bytes
 from tools.political_detail_partition import partition_political_detail_features
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_file_compaction_preserves_the_exact_byte_compactor_contract(self):
+        samples = [
+            b' { "number": 1.234567890123456789, "zero": -0.0, "exp": 1e+03 } \n',
+            b'{"escaped":"a\\\" b\\\\ c\\t d","unicode":"\\u4e2d","inside":" \t\r\n "}',
+            '{ "name": "中文 空格", "array": [1, 2] }'.encode(),
+            b'{"already":"compact string with spaces"}', b'', b' \t\r\n',
+        ]
+        runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            path = Path(temporary) / 'sample.json'
+            for raw in samples:
+                with self.subTest(raw=raw):
+                    path.write_bytes(raw)
+                    expected = compact_json_bytes(raw)
+                    self.assertEqual(_compact_json_file(path), (len(raw), len(expected)))
+                    self.assertEqual(path.read_bytes(), expected)
+            path.write_bytes(samples[3])
+            with patch.object(Path, 'open', side_effect=AssertionError('unchanged file must not be rewritten')):
+                with patch.object(Path, 'read_bytes', return_value=samples[3]):
+                    self.assertEqual(_compact_json_file(path), (len(samples[3]), len(samples[3])))
+
     def test_source_hash_uses_manifest_gzip_runtime_url_and_stored_bytes(self):
         runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
         runtime.mkdir(parents=True, exist_ok=True)

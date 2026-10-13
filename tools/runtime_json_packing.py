@@ -22,6 +22,28 @@ def compact_json_bytes(raw: bytes) -> bytes:
     return _JSON_TOKEN_OR_SPACE.sub(lambda match: match[1] or b"", raw)
 
 
+def _compact_json_file(path: Path) -> tuple[int, int]:
+    """Use the same token rule without building a second whole-file byte string."""
+    raw = path.read_bytes()
+    matches = _JSON_TOKEN_OR_SPACE.finditer(raw)
+    first_space = next((match for match in matches if match.start(1) < 0), None)
+    if first_space is None:
+        return len(raw), len(raw)
+    view = memoryview(raw)
+    removed = first_space.end() - first_space.start()
+    cursor = first_space.end()
+    with path.open("wb") as output:
+        output.write(view[:first_space.start()])
+        for match in matches:
+            if match.start(1) >= 0:
+                continue
+            output.write(view[cursor:match.start()])
+            removed += match.end() - match.start()
+            cursor = match.end()
+        output.write(view[cursor:])
+    return len(raw), len(raw) - removed
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.write_bytes(json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
@@ -178,13 +200,11 @@ def pack_published_runtime_data(app_root: Path, *, byte_exact_paths=()) -> dict:
     for path in sorted(data_root.rglob("*")):
         if not path.is_file() or path.suffix not in _JSON_SUFFIXES or path.resolve() in excluded:
             continue
-        raw = path.read_bytes()
-        source_sizes[path.resolve()] = len(raw)
-        compact = compact_json_bytes(raw)
-        if compact != raw:
-            path.write_bytes(compact)
+        source_size, compact_size = _compact_json_file(path)
+        source_sizes[path.resolve()] = source_size
+        if compact_size != source_size:
             compacted_count += 1
-            whitespace_saved += len(raw) - len(compact)
+            whitespace_saved += source_size - compact_size
 
     chunk_count = 0
     gzip_saved = 0
