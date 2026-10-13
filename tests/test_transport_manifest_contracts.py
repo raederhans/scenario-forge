@@ -7,6 +7,9 @@ import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
+from unittest import mock
+
+from tools import build_data_catalog as catalog_builder
 
 from map_builder.transport_carrier_registry import (
     CARRIER_EXTENSION_METADATA,
@@ -41,6 +44,100 @@ import tools.check_transport_workbench_manifests
 """
         result = subprocess.run([sys.executable, "-c", script], cwd=PROJECT_ROOT, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
+class TransportPathInspectionReuseTests(unittest.TestCase):
+    def inspect(self, root, paths, variants=None):
+        return catalog_builder.collect_transport_path_contract_errors(
+            {"geometry_kind": "line", "paths": paths, "variants": variants or {}},
+            root / "data/manifest.json", project_root=root,
+        )
+
+    def test_duplicate_topology_errors_keep_labels_and_order_with_one_parse(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            (root / "data/roads.topo.json").write_text("[]")
+            paths = {"roads": "data/roads.topo.json"}
+            with mock.patch.object(catalog_builder, "_read_json", wraps=catalog_builder._read_json) as read:
+                errors = self.inspect(root, paths, {"full": {"paths": paths}})
+            self.assertEqual(read.call_count, 1)
+            self.assertEqual(errors, [
+                f"data/manifest.json: `{label}` {message}"
+                for label in ["paths.roads", "variants.full.paths.roads"]
+                for message in ["must decode to a Topology object.", "topology is missing object `roads`."]
+            ])
+
+    def test_malformed_json_keeps_both_failure_labels(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            (root / "data/bad.json").write_text("{bad")
+            paths = {"carrier": "data/bad.json"}
+            with mock.patch.object(catalog_builder, "_read_json", wraps=catalog_builder._read_json) as read:
+                errors = self.inspect(root, paths, {"full": {"paths": paths}})
+            self.assertEqual(read.call_count, 1)
+            self.assertEqual(len(errors), 2)
+            self.assertTrue(errors[0].startswith("data/manifest.json: `paths.carrier` invalid JSON"))
+            self.assertTrue(errors[1].startswith("data/manifest.json: `variants.full.paths.carrier` invalid JSON"))
+            self.assertEqual(errors[0].split("invalid JSON", 1)[1], errors[1].split("invalid JSON", 1)[1])
+
+    def test_same_asset_keeps_distinct_geometry_contracts(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            (root / "data/lines.geojson").write_text(json.dumps({
+                "type": "FeatureCollection", "features": [{"geometry": {"type": "LineString"}}],
+            }))
+            paths = {"roads": "data/lines.geojson", "road_labels": "data/lines.geojson"}
+            with mock.patch.object(catalog_builder, "_read_json", wraps=catalog_builder._read_json) as read:
+                errors = self.inspect(root, paths, {"full": {"paths": paths}})
+            self.assertEqual(read.call_count, 2)
+            self.assertEqual(errors, [
+                f"data/manifest.json: `{label}` geometry kinds ['LineString'] do not match expected ['MultiPoint', 'Point']."
+                for label in ["paths.road_labels", "variants.full.paths.road_labels"]
+            ])
+
+    def test_equivalent_path_spellings_keep_their_original_error_paths(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            (root / "data/bad.json").write_text("{bad")
+            errors = self.inspect(root, {"carrier": "data/bad.json"}, {
+                "full": {"paths": {"carrier": "data/./bad.json"}},
+            })
+            self.assertIn("invalid JSON at data/bad.json:", errors[0])
+            self.assertIn("invalid JSON at data/./bad.json:", errors[1])
+
+    def test_changed_file_is_reparsed_and_cache_does_not_cross_calls(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            asset = root / "data/audit.json"
+            asset.write_text("{}")
+            original_read = catalog_builder._read_json
+            def change_after_read(path):
+                payload = original_read(path)
+                asset.write_text("[1,2,3]")
+                return payload
+            paths = {"build_audit": "data/audit.json"}
+            with mock.patch.object(catalog_builder, "_read_json", side_effect=change_after_read) as read:
+                errors = self.inspect(root, paths, {"full": {"paths": paths}})
+            self.assertEqual(read.call_count, 2)
+            self.assertEqual(errors, ["data/manifest.json: `variants.full.paths.build_audit` must decode to an object."])
+            self.assertEqual(self.inspect(root, paths), ["data/manifest.json: `paths.build_audit` must decode to an object."])
+
+    def test_verdict_cache_is_bounded(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "data").mkdir()
+            for index in range(65):
+                (root / f"data/{index}.json").write_text("{}")
+            paths = {str(index): {"build_audit": f"data/{index}.json"} for index in range(65)}
+            variants = {"full": {"paths": {"build_audit": "data/0.json"}}}
+            with mock.patch.object(catalog_builder, "_read_json", wraps=catalog_builder._read_json) as read:
+                self.assertEqual(self.inspect(root, paths, variants), [])
+            self.assertEqual(read.call_count, 66, "oldest verdict must be evicted after 64 distinct contracts")
 
 
 def _minimal_transport_manifest() -> dict[str, Any]:
