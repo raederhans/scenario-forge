@@ -18,14 +18,8 @@ export function createViewportCommandOwner({
   let pendingCommand = null;
   let observedZoomBehavior = null;
 
-  function getViewportDimensions() {
-    return typeof getters.getViewportDimensions === "function"
-      ? getters.getViewportDimensions()
-      : { width: 0, height: 0 };
-  }
-
-  function getZoomBehavior() {
-    return typeof getters.getZoomBehavior === "function" ? getters.getZoomBehavior() : null;
+  function readGetter(getter, fallback, ...args) {
+    return typeof getter === "function" ? Reflect.apply(getter, getters, args) : fallback;
   }
 
   function getInteractionRectNode() {
@@ -33,34 +27,20 @@ export function createViewportCommandOwner({
     return typeof rect?.node === "function" ? rect.node() : null;
   }
 
-  function getD3() {
-    return typeof getters.getD3 === "function" ? getters.getD3() : null;
-  }
-
   function selectInteractionRect() {
-    const d3 = getD3();
+    const d3 = readGetter(getters.getD3, null);
     const node = getInteractionRectNode();
     if (!d3 || typeof d3.select !== "function" || !node) return null;
     return d3.select(node);
   }
 
-  function calculatePanExtent() {
-    return typeof getters.calculatePanExtent === "function" ? getters.calculatePanExtent() : null;
-  }
-
   function updateZoomTranslateExtent() {
-    const zoomBehavior = getZoomBehavior();
-    const { width, height } = getViewportDimensions();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
+    const { width, height } = readGetter(getters.getViewportDimensions, { width: 0, height: 0 });
     if (!zoomBehavior || width <= 0 || height <= 0) return;
     zoomBehavior.scaleExtent([minZoomScale, maxZoomScale]);
     zoomBehavior.extent([[0, 0], [width, height]]);
-    zoomBehavior.translateExtent(calculatePanExtent());
-  }
-
-  function getCenteredFitZoomTransform(options) {
-    return typeof getters.getCenteredFitZoomTransform === "function"
-      ? getters.getCenteredFitZoomTransform(options)
-      : null;
+    zoomBehavior.translateExtent(readGetter(getters.calculatePanExtent, null));
   }
 
   function canAnimateCamera(selection) {
@@ -103,13 +83,13 @@ export function createViewportCommandOwner({
   }
 
   function resetZoomToFit({ centerContent = false, centerX = true, centerY = false, animate = false } = {}) {
-    const zoomBehavior = getZoomBehavior();
-    const d3 = getD3();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
+    const d3 = readGetter(getters.getD3, null);
     const selection = selectInteractionRect();
     if (!zoomBehavior || !d3 || !selection) return;
     updateZoomTranslateExtent();
     const transform = centerContent
-      ? (getCenteredFitZoomTransform({ centerX, centerY }) || d3.zoomIdentity)
+      ? (readGetter(getters.getCenteredFitZoomTransform, null, { centerX, centerY }) || d3.zoomIdentity)
       : d3.zoomIdentity;
     if (animate && canAnimateCamera(selection)) {
       applyZoomCommand(selection, zoomBehavior, zoomBehavior.transform, [transform], transform.k);
@@ -123,11 +103,11 @@ export function createViewportCommandOwner({
   }
 
   function zoomByStep(direction = 1) {
-    const zoomBehavior = getZoomBehavior();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
     const factor = Number(direction) >= 0 ? 1.2 : 1 / 1.2;
-    const d3 = getD3();
+    const d3 = readGetter(getters.getD3, null);
     const currentScale = d3?.zoomTransform?.(getInteractionRectNode())?.k;
     if (canAnimateCamera(selection) && Number.isFinite(currentScale)) {
       const baseScale = pendingScale ?? currentScale;
@@ -139,7 +119,7 @@ export function createViewportCommandOwner({
   }
 
   function setZoomPercent(percent) {
-    const zoomBehavior = getZoomBehavior();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
     const rawPercent = typeof percent === "string"
@@ -151,14 +131,14 @@ export function createViewportCommandOwner({
   }
 
   function enforceZoomConstraints({ suppressRender = false } = {}) {
-    const zoomBehavior = getZoomBehavior();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
     const selection = selectInteractionRect();
     if (!zoomBehavior || !selection) return;
     selection.interrupt?.();
     pendingScale = null;
     pendingCommand = null;
     if (suppressRender) {
-      const d3 = getD3();
+      const d3 = readGetter(getters.getD3, null);
       const node = getInteractionRectNode();
       const constrained = zoomBehavior.constrain()(
         d3.zoomTransform(node),
@@ -175,7 +155,7 @@ export function createViewportCommandOwner({
   }
 
   function getBookmarkFrame() {
-    const { width, height } = getViewportDimensions();
+    const { width, height } = readGetter(getters.getViewportDimensions, { width: 0, height: 0 });
     const projection = getters.getProjectionSnapshot?.();
     return { width, height, scale: projection?.scale, tx: projection?.translate?.[0], ty: projection?.translate?.[1] };
   }
@@ -191,7 +171,7 @@ export function createViewportCommandOwner({
   }
 
   function captureViewportView() {
-    const d3 = getD3();
+    const d3 = readGetter(getters.getD3, null);
     const node = getInteractionRectNode();
     if (!node || !d3?.zoomTransform) return null;
     const transform = d3.zoomTransform(node);
@@ -207,8 +187,8 @@ export function createViewportCommandOwner({
   }
 
   function restoreViewportView(view) {
-    const zoomBehavior = getZoomBehavior();
-    const d3 = getD3();
+    const zoomBehavior = readGetter(getters.getZoomBehavior, null);
+    const d3 = readGetter(getters.getD3, null);
     const selection = selectInteractionRect();
     const node = getInteractionRectNode();
     const frame = getBookmarkFrame();

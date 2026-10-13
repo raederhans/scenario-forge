@@ -7445,7 +7445,7 @@ freezeMutationDelegatingOwnerEntry({
     "compositionSourceFingerprint": "8a72bd8c5bff9f9470c855c12c256c6a175935692a97a5ebcd9f94f2d9a55844",
     "factoryModulePath": "js/core/renderer/viewport_command_owner.js",
     "factoryExportName": "createViewportCommandOwner",
-    "factorySourceFingerprint": "e09df5950cd4c49fe460757c2196d791bddcb32f63c8b1d95a2f15727f2c3c95",
+    "factorySourceFingerprint": "5819a7cd34b87a4e49547763a963f48cc1ba182985669c25fcb3943ca38ebb56",
     "ownerBindingName": "viewportCommandOwner",
     "methods": [
       "updateZoomTranslateExtent",

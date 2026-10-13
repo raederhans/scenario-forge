@@ -32,7 +32,7 @@ export function inspectBoundedGovernanceSourceRefresh({
     if (receipt.kind === "viewport") {
       const owner = normalize(readCurrentSource("js/core/renderer/viewport_command_owner.js"));
       const factory = topFunction(owner, "createViewportCommandOwner");
-      if (!factory || fingerprint(owner.slice(factory.start, factory.end)) !== "e09df5950cd4c49fe460757c2196d791bddcb32f63c8b1d95a2f15727f2c3c95") return false;
+      if (!factory || fingerprint(owner.slice(factory.start, factory.end)) !== "5819a7cd34b87a4e49547763a963f48cc1ba182985669c25fcb3943ca38ebb56") return false;
       const oldFn = topFunction(previous, "getViewportCommandOwner");
       const newFn = topFunction(current, "getViewportCommandOwner");
       // Only these two viewport forwarders and their exports were added outside
