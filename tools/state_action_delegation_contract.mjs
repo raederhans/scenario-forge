@@ -388,6 +388,8 @@ const SPECIAL_ZONE_ACTION_EXPORT_NAMES = Object.freeze([
   "activateSpecialZoneMembershipToolState",
   "exitSpecialZoneMembershipToolState",
   "registerSpecialZonesWorkbenchRuntimeHooks",
+  "patchSpecialZoneLegendFieldsState",
+  "restoreSpecialZoneLegendSnapshotState",
 ]);
 
 const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
@@ -457,7 +459,7 @@ const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
   }),
   Object.freeze({
     modulePath: "js/core/state/actions/legend_actions.js",
-    exportNames: Object.freeze(["ensureLegendState", "patchLegendState", "setLegendLabelState"]),
+    exportNames: Object.freeze(["ensureLegendState", "patchLegendState", "setLegendLabelState", "restoreLegendLabelSnapshotState"]),
     introducedInPhase: "P4.4",
   }),
   Object.freeze({

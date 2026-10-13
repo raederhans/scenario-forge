@@ -10,7 +10,7 @@ const rendererPath = "js/core/map_renderer.js";
 const sourceFingerprints = Object.freeze({
   [POLITICAL_GPU_RESOURCE_PATH]: "2bd9aff67ea2176bb9a50849305772a87e46a70074b4d2fc592f3206c3bdd7cf",
   [ownerPath]: "9cfbc65be28984a80dd30999d2febf7abcb84d0998901d6e4b9cfb5daeb41f50",
-  [rendererPath]: "2c6268b741ddc394bc9025b6fb35eb43a7dc746351433ef44cdccc2c83bbcded",
+  [rendererPath]: "f8a43c8a280d0e63cfbfeb010747181713534ac3a6230a7a0f806d671e6a4855",
 });
 // Existing computed import providers have finite module sets: deferred UI's
 // literal list and data_service's two-path guard. Pin the complete providers;

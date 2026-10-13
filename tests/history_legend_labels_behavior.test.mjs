@@ -10,8 +10,8 @@ import {
 import { replaceResolvedColorsState } from "../js/core/state/color_state.js";
 import {
   commitSpecialZoneLayersState, patchSpecialZoneLegendFieldsState, restoreSpecialZoneLegendSnapshotState,
-  SPECIAL_ZONE_LEGEND_STYLE_KEYS,
 } from "../js/core/state/actions/special_zone_actions.js";
+import { SPECIAL_ZONE_LEGEND_STYLE_KEYS } from "../js/core/legend_csv_schema.js";
 import {
   readRegisteredRuntimeHookSource, registerRuntimeHook,
 } from "../js/core/state/runtime_hooks.js";

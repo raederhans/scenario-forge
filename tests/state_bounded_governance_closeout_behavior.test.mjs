@@ -112,5 +112,18 @@ test("retirement source refreshes require the exact body transfer and preserve h
     if (modulePath !== rendererPath) assert.equal(inspectBoundedGovernanceSourceRefresh({ ...options,
       readCurrentSource: (path) => path === VISUAL_PAINT_ACTION_PATH ? read(path).replace("target.visualOverrides[id] = color;", "target.featureOverrides[id] = color;") : read(path),
     }), false);
+    else {
+      for (const [before, after] of [
+        ["return getViewportCommandOwner().restoreViewportView(view);", "runtimeState.width = 0; return getViewportCommandOwner().restoreViewportView(view);"],
+        ["width: Number(runtimeState.width || 0)", "width: runtimeState"],
+        ["return getViewportCommandOwner().captureViewportView();", "return runtimeState;"],
+      ]) {
+        assert.ok(options.source.includes(before));
+        assert.equal(inspectBoundedGovernanceSourceRefresh({ ...options, source: options.source.replace(before, after) }), false);
+      }
+      assert.equal(inspectBoundedGovernanceSourceRefresh({ ...options, readCurrentSource: path =>
+        path === "js/core/renderer/viewport_command_owner.js" ? read(path).replace("const frame = getBookmarkFrame();", "view.x = 0; const frame = getBookmarkFrame();") : read(path),
+      }), false);
+    }
   }
 });

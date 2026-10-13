@@ -1569,6 +1569,8 @@ export function createProjectSupportDiagnosticsController({
   let lastLegendKey = null;
   let lastLegendHeaderKey = null;
   let lastLegendScenarioId = null;
+  let lastLegendContextKey = null;
+  let localLegendLabelEdit = null;
   let legendHeader = null;
   let legendResults = null;
   let legendSearch = null;
@@ -1600,8 +1602,19 @@ export function createProjectSupportDiagnosticsController({
     input.value = legendManager.getLabel(color, state);
     input.addEventListener("input", (event) => {
       legendManager.setLabel(color, event.target.value, state);
+      localLegendLabelEdit = {
+        contextKey: lastLegendContextKey,
+        labelsKey: JSON.stringify(legendManager.getLabels(state)),
+      };
       markDirty("legend-label");
       mapRenderer.renderLegend(colors, legendManager.getLabels(state));
+    });
+    input.addEventListener("blur", () => {
+      if (!localLegendLabelEdit) return;
+      localLegendLabelEdit = null;
+      lastLegendKey = null;
+      // Let the next refresh settle search results. Rebuilding here could remove
+      // a pager button between pointerdown (which blurs this input) and click.
     });
 
     row.appendChild(swatch);
@@ -1676,8 +1689,20 @@ export function createProjectSupportDiagnosticsController({
       legendEditorPageIndex = 0;
     }
     const labels = legendManager.getLabels(state);
-    const allItems = buildLegendSearchItems({ colors, labels, specialZones: specialZoneLegendLayers, language: state.currentLanguage });
+    const labelsKey = JSON.stringify(labels);
+    const headerKey = [
+      colors.join("|"),
+      specialZoneLegendKey,
+      JSON.stringify(legendManager.getConfig(state)),
+      state.currentLanguage,
+    ].join("::");
     const filters = legendSearch.getFilters();
+    const contextKey = [headerKey, state.activeScenarioId, filters.query, filters.kind, legendEditorPageIndex].join("::");
+    // A render tick must not detach the input during typing or IME composition.
+    // External label changes and navigation still refresh; local edits settle on blur.
+    if (localLegendLabelEdit?.contextKey === contextKey && localLegendLabelEdit.labelsKey === labelsKey) return;
+    localLegendLabelEdit = null;
+    const allItems = buildLegendSearchItems({ colors, labels, specialZones: specialZoneLegendLayers, language: state.currentLanguage });
     const filteredItems = filterLegendEntries(allItems, filters);
     legendSearch.update({ language: state.currentLanguage, total: allItems.length, matches: filteredItems.length });
     const pageCount = Math.max(1, Math.ceil(filteredItems.length / LEGEND_EDITOR_PAGE_SIZE));
@@ -1689,18 +1714,10 @@ export function createProjectSupportDiagnosticsController({
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
     legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 440 + (visibleLegendRows * 52) + pagerReserve)}px`);
-    const headerKey = [
-      colors.join("|"),
-      specialZoneLegendKey,
-      JSON.stringify(legendManager.getConfig(state)),
-      state.currentLanguage,
-    ].join("::");
+    lastLegendContextKey = [headerKey, state.activeScenarioId, filters.query, filters.kind, legendEditorPageIndex].join("::");
     const key = [
-      headerKey,
-      JSON.stringify(labels),
-      filters.query,
-      filters.kind,
-      legendEditorPageIndex,
+      lastLegendContextKey,
+      labelsKey,
     ].join("::");
     if (key === lastLegendKey && legendList.dataset.ready === "true") return;
     lastLegendKey = key;

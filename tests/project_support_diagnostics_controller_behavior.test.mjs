@@ -788,6 +788,22 @@ test("legend label edits render with current project labels", () => {
     labelInput.listeners.input({ target: labelInput });
 
     assert.deepEqual(renderCalls, [[["#abcdef"], { "#abcdef": "Germany" }]]);
+    controller.refreshLegendEditor();
+    assert.equal(findNode(legendList, node => node.className === "legend-input"), labelInput);
+    labelInput.value = "Germany ";
+    labelInput.listeners.input({ target: labelInput });
+    controller.refreshLegendEditor();
+    assert.equal(findNode(legendList, node => node.className === "legend-input"), labelInput);
+    assert.equal(labelInput.value, "Germany ", "render ticks preserve uncommitted whitespace and selection");
+
+    state.legendLabels = { "#abcdef": "Imported label" };
+    controller.refreshLegendEditor();
+    const importedInput = findNode(legendList, node => node.className === "legend-input");
+    assert.equal(importedInput.value, "Imported label", "external label updates refresh during editing");
+    importedInput.value = "New label";
+    importedInput.listeners.input({ target: importedInput });
+    importedInput.listeners.blur();
+    assert.equal(findNode(legendList, node => node.className === "legend-input").value, "New label");
   } finally {
     state.colors = previousColors;
     state.legendLabels = previousLegendLabels;

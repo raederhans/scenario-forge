@@ -24,8 +24,8 @@ import {
 import {
   restoreSpecialZoneSnapshotState,
   restoreSpecialZoneLegendSnapshotState,
-  SPECIAL_ZONE_LEGEND_STYLE_KEYS,
 } from "./state/actions/special_zone_actions.js";
+import { SPECIAL_ZONE_LEGEND_STYLE_KEYS } from "./legend_csv_schema.js";
 import { restoreLegendLabelSnapshotState } from "./state/actions/legend_actions.js";
 import { normalizeColor } from "./legend_state_normalizers.js";
 import { markDirty } from "./dirty_state.js";

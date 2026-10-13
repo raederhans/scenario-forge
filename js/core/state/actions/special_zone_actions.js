@@ -8,6 +8,7 @@ import {
 } from "../../special_zone_layers.js";
 import { createDefaultSpecialZoneEditorState } from "../strategic_overlay_state.js";
 import { commitUiVisibilityState } from "./ui_visibility_actions.js";
+import { SPECIAL_ZONE_LEGEND_STYLE_KEYS } from "../../legend_csv_schema.js";
 
 export const SPECIAL_ZONE_EDITOR_FIELD_KEYS = Object.freeze([
   "active",
@@ -414,10 +415,6 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "specialZoneLayers")) target.specialZoneLayers = patch.specialZoneLayers;
   if (Object.hasOwn(patch, "specialZoneMembershipBrushMode")) target.specialZoneMembershipBrushMode = patch.specialZoneMembershipBrushMode;
 }
-
-export const SPECIAL_ZONE_LEGEND_STYLE_KEYS = Object.freeze([
-  "fill", "stroke", "pattern", "fillOpacity", "strokeOpacity", "patternOpacity", "strokeWidth", "revision",
-]);
 
 function cloneSpecialZoneLegendSnapshotValue(value) {
   return value !== null && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;

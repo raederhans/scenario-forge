@@ -12,7 +12,7 @@ const geometryPath = "js/core/political_geometry_store.js";
 const collectionOwnerPath = "js/core/renderer/political_collection_owner.js";
 const chunkPayloadsPath = "js/core/scenario/chunk_layer_payloads.js";
 const fingerprints = Object.freeze({
-  [POLITICAL_CACHE_RENDERER_PATH]: "2c6268b741ddc394bc9025b6fb35eb43a7dc746351433ef44cdccc2c83bbcded",
+  [POLITICAL_CACHE_RENDERER_PATH]: "f8a43c8a280d0e63cfbfeb010747181713534ac3a6230a7a0f806d671e6a4855",
   [POLITICAL_DERIVED_CACHE_PATH]: "842e22e35319d6df0bf8c82de98929c43ea7a0ff9f3d97ca6fbf22adc9ce0825",
   [POLITICAL_RASTER_CACHE_PATH]: "86b8bb72701594454238f012f7ca6dee86890cef46f131b33428f9f6f1101569",
   [ownerPath]: "9cfbc65be28984a80dd30999d2febf7abcb84d0998901d6e4b9cfb5daeb41f50",

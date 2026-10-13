@@ -6,7 +6,7 @@ const normalize = (source) => String(source).replace(/\r\n?/g, "\n");
 const fingerprint = (source) => createHash("sha256").update(normalize(source)).digest("hex");
 const sourceRevision = "311e5dfe8f335ec11817aabd7e2fda4f49c1ba52";
 const receipts = Object.freeze([
-  ["js/core/map_renderer.js", "93c5f0e16585f8ff9916c3fe2d884c191aa9aa479b8967256e8be842e2893c81", "2c6268b741ddc394bc9025b6fb35eb43a7dc746351433ef44cdccc2c83bbcded", "viewport"],
+  ["js/core/map_renderer.js", "93c5f0e16585f8ff9916c3fe2d884c191aa9aa479b8967256e8be842e2893c81", "f8a43c8a280d0e63cfbfeb010747181713534ac3a6230a7a0f806d671e6a4855", "viewport"],
   ["js/core/state/color_state.js", "7f8c97d4a14f27f97b39e0385eabda857204529880b39e807d3d168b42892e59", "8a3fc8d0320e36dfd31452bb8ea6bb3c7ec3cda9d66a41ce68d19f30c408fa20", "paint-wrapper"],
   ["js/core/state/actions/scenario_activation_actions.js", "4dda5e6240f1eaaf632f60f8360905fcfcb8d93d2773d0398af0292423c61e0e", "6365c4a5606a990bc4ea58bf719c940bcd9bfdd1766ade2166c493f689a8f4a8", "paint-import"],
 ].map(([modulePath, previousFingerprint, sourceFingerprint, kind]) => Object.freeze({ modulePath, previousFingerprint, sourceFingerprint, kind })));
@@ -32,10 +32,18 @@ export function inspectBoundedGovernanceSourceRefresh({
     if (receipt.kind === "viewport") {
       const owner = normalize(readCurrentSource("js/core/renderer/viewport_command_owner.js"));
       const factory = topFunction(owner, "createViewportCommandOwner");
-      if (!factory || fingerprint(owner.slice(factory.start, factory.end)) !== "53046ea6580a7a001287ea8bffa685618df88534fe26c2504a9c4f242960a56d") return false;
+      if (!factory || fingerprint(owner.slice(factory.start, factory.end)) !== "e09df5950cd4c49fe460757c2196d791bddcb32f63c8b1d95a2f15727f2c3c95") return false;
       const oldFn = topFunction(previous, "getViewportCommandOwner");
       const newFn = topFunction(current, "getViewportCommandOwner");
-      return !!oldFn && !!newFn && current === previous.slice(0, oldFn.start)
+      // Only these two viewport forwarders and their exports were added outside
+      // the composition. Keep every historical source byte and retirement anchor.
+      const forwarders = "function captureViewportView() {\n  return getViewportCommandOwner().captureViewportView();\n}\n\n"
+        + "function restoreViewportView(view) {\n  return getViewportCommandOwner().restoreViewportView(view);\n}\n\n";
+      const exports = "  // Viewport, diagnostics, and render scheduling facade.\n  captureViewportView,\n  restoreViewportView,\n";
+      if (current.split(forwarders).length !== 2 || current.split(exports).length !== 2) return false;
+      const withoutForwarders = current.replace(forwarders, "")
+        .replace(exports, "  // Viewport, diagnostics, and render scheduling facade.\n");
+      return !!oldFn && !!newFn && withoutForwarders === previous.slice(0, oldFn.start)
         + current.slice(newFn.start, newFn.end) + previous.slice(oldFn.end);
     }
     const action = normalize(readCurrentSource(VISUAL_PAINT_ACTION_PATH));

@@ -2,6 +2,11 @@ import { normalizeHexColor } from "./color_hex_utils.js";
 import { createSpecialZoneLayerStyle } from "./special_zone_layers.js";
 import { getUniqueLegendColors } from "./legend_state_normalizers.js";
 
+// Shared CSV/history metadata; canonical action modules export writes only.
+export const SPECIAL_ZONE_LEGEND_STYLE_KEYS = Object.freeze([
+  "fill", "stroke", "pattern", "fillOpacity", "strokeOpacity", "patternOpacity", "strokeWidth", "revision",
+]);
+
 export const LEGEND_CSV_FIELDS = Object.freeze([
   "kind", "label", "color", "pattern", "stroke", "fillOpacity", "strokeOpacity", "patternOpacity",
 ]);
