@@ -276,6 +276,8 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["state-localization-borrow-inventory", "state-ownership", "tools/state_localization_borrow_contract.mjs", "tests/state_localization_borrow_inventory_behavior.test.mjs"],
     ["state-political-cache-borrow-contract", "state-ownership", "tools/state_political_cache_borrow_contract.mjs", "tests/state_political_cache_borrow_contract_behavior.test.mjs"],
     ["state-csv-action-input-contract", "state-ownership", "tools/state_csv_action_input_contract.mjs", "tests/state_csv_action_input_contract_behavior.test.mjs"],
+    ["state-csv-target-effect-contract", "state-ownership", "tools/state_csv_target_effect_contract.mjs", "tests/state_csv_target_effect_contract_behavior.test.mjs"],
+    ["state-water-path-resource-contract", "state-ownership", "tools/state_water_path_resource_contract.mjs", "tests/state_water_path_resource_contract_behavior.test.mjs"],
     ["spatial-index-builders", "renderer-runtime", "js/core/renderer/spatial_index_runtime_builders.js", "tests/spatial_index_runtime_builders_behavior.test.mjs"],
     ["legend-control", "renderer-runtime", "js/core/renderer/legend_control_owner.js", "tests/legend_control_owner_behavior.test.mjs"],
     ["ocean-render", "renderer-runtime", "js/core/renderer/ocean_render_owner.js", "tests/ocean_render_owner_behavior.test.mjs"],

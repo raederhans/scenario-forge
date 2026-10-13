@@ -454,22 +454,41 @@ function applySpecialZoneLegendFieldsState(target, patchesById, restoreMissing) 
   const current = target.specialZoneLayers;
   if (!current || typeof current !== "object" || !Array.isArray(current.layers)) return [];
   const counts = new Map();
-  current.layers.forEach(layer => {
-    if (layer && typeof layer.id === "string" && layer.id) {
-      counts.set(layer.id, (counts.get(layer.id) || 0) + 1);
+  // Preserve holes and inherited indices without invoking array methods or species hooks.
+  const countedLayers = current.layers;
+  const countLength = countedLayers.length;
+  for (let index = 0; index < countLength; index += 1) {
+    if (!(index in countedLayers)) continue;
+    const layer = countedLayers[index];
+    const layerId = layer ? layer.id : undefined;
+    if (typeof layerId === "string" && layerId) {
+      counts.set(layerId, (counts.get(layerId) || 0) + 1);
     }
-  });
+  }
   const updatedIds = [];
-  const layers = current.layers.map(layer => {
-    if (!layer || counts.get(layer.id) !== 1 || !Object.hasOwn(patchesById, layer.id)) return layer;
-    const patch = patchesById[layer.id];
-    if (!patch || typeof patch !== "object" || Array.isArray(patch)) return layer;
+  const inputLayers = current.layers;
+  const mapLength = inputLayers.length;
+  const layers = new Array(mapLength);
+  for (let index = 0; index < mapLength; index += 1) {
+    if (!(index in inputLayers)) continue;
+    const layer = inputLayers[index];
+    const layerId = layer ? layer.id : undefined;
+    if (typeof layerId !== "string" || !layerId || counts.get(layerId) !== 1 || !Object.hasOwn(patchesById, layerId)) {
+      layers[index] = layer;
+      continue;
+    }
+    const patch = patchesById[layerId];
+    if (!patch || typeof patch !== "object" || Array.isArray(patch)) {
+      layers[index] = layer;
+      continue;
+    }
     const presence = patch.presence;
     if (restoreMissing && presence && typeof presence === "object" && !Array.isArray(presence)
       && typeof presence.name === "boolean" && typeof presence.style === "boolean"
       && typeof presence.styleObject === "boolean" && Array.isArray(presence.styleKeys)) {
-      updatedIds.push(layer.id);
-      return restoreSpecialZoneLegendFieldsWithPresence(layer, patch);
+      updatedIds.push(layerId);
+      layers[index] = restoreSpecialZoneLegendFieldsWithPresence(layer, patch);
+      continue;
     }
     let next = null;
     if (Object.hasOwn(patch, "name")
@@ -494,10 +513,13 @@ function applySpecialZoneLegendFieldsState(target, patchesById, restoreMissing) 
       }
       if (style) next = { ...(next || layer), style };
     }
-    if (!next) return layer;
-    updatedIds.push(layer.id);
-    return next;
-  });
+    if (!next) {
+      layers[index] = layer;
+      continue;
+    }
+    updatedIds.push(layerId);
+    layers[index] = next;
+  }
   if (updatedIds.length) {
     target.specialZoneLayers = { ...current, layers };
     target.specialZonesOverlayDirty = true;

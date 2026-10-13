@@ -4506,14 +4506,6 @@ freezeStateTargetPureReaderEntry({
       "count": 1
     },
     {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"getScenarioWaterFeaturePath\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "d80ecbcca1f8812f667c273a85ad27337b7dd89950e3b29f14bfa4c27a45951a",
-      "count": 1
-    },
-    {
       "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterHighlightLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0}]}",
       "reason": "unsupported-call-mutation",
       "operation": "unsupported",
@@ -4559,14 +4551,6 @@ freezeStateTargetPureReaderEntry({
       "operation": "unsupported",
       "key": "styleConfig",
       "sourceFingerprint": "6aec55ff1a78faa6d974e9c1feea1cd2eef66e9d6372f5051fe58fd89f01f09b",
-      "count": 1
-    },
-    {
-      "enclosingFunctionIdentity": "{\"kind\":\"function\",\"ancestry\":[{\"name\":\"createScenarioRegionOverlayRenderOwner\",\"ordinal\":0},{\"name\":\"drawScenarioWaterFillLayer\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":0},{\"name\":\"<anonymous>\",\"ordinal\":2}]}",
-      "reason": "state-alias-escape",
-      "operation": "unsupported",
-      "key": "*",
-      "sourceFingerprint": "d80ecbcca1f8812f667c273a85ad27337b7dd89950e3b29f14bfa4c27a45951a",
       "count": 1
     },
     {

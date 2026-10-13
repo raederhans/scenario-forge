@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import { VISUAL_PAINT_ACTION_PATH, inspectVisualPaintInputSites } from "./state_visual_paint_contract.mjs";
 import { inspectStateCsvActionInputSites, csvActionInputSiteKey } from "./state_csv_action_input_contract.mjs";
+import { filterStateCsvTargetEffectFindings } from "./state_csv_target_effect_contract.mjs";
 import { POLITICAL_GPU_RESOURCE_PATH, inspectPoliticalGpuResourceOrigin } from "./state_resource_origin_contract.mjs";
 import {
   STATE_RIVER_OWNER_SOURCE_RECEIPTS,
@@ -4395,18 +4396,21 @@ function filterStateTargetPureReaderModuleFindings({
 
 export function applyStateWriterBindingFindingContracts({
   relativePath,
+  source,
   binding,
   findings = [],
   enforceCurrentContracts = true,
 } = {}) {
   return withoutRedundantContainerAliasEscapeFindings(
-    enforceCurrentContracts
+    filterStateCsvTargetEffectFindings({ relativePath, source, binding, enforceCurrentContracts,
+      findings: enforceCurrentContracts
       ? filterStateTargetPureReaderModuleFindings({
         relativePath,
         binding,
         findings,
       })
       : findings,
+    }),
   );
 }
 
@@ -4729,7 +4733,13 @@ export async function discoverStateWriterBindingsForSource(
           scanner,
           recognizeCurrentContracts: true,
         },
-      );
+      ).map((inventory) => ({
+        ...inventory,
+        findings: applyStateWriterBindingFindingContracts({
+          relativePath, source, binding: inventory.binding,
+          findings: inventory.findings, enforceCurrentContracts,
+        }),
+      }));
     return includeInventories
       ? { bindings: actionBindings, bindingInventories }
       : actionBindings;
@@ -4856,6 +4866,7 @@ export async function discoverStateWriterBindingsForSource(
       ...inventory,
       findings: applyStateWriterBindingFindingContracts({
         relativePath,
+        source,
         binding: inventory.binding,
         findings: inventory.findings,
         enforceCurrentContracts,

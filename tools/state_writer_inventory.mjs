@@ -5,6 +5,7 @@ import { parse } from "acorn";
 import * as walk from "acorn-walk";
 import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources, resolvePoliticalCacheOperation } from "./state_political_cache_borrow_contract.mjs";
 import { STATE_LOCALIZATION_BORROW_MODULE_PATH, inspectStateLocalizationBorrowSources } from "./state_localization_borrow_contract.mjs";
+import { inspectStateWaterPathResourceSources, resolveStateWaterPathResourceHelper } from "./state_water_path_resource_contract.mjs";
 import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
 import {
@@ -2184,6 +2185,7 @@ function analyzeBindingMutations(
     getSourceBoundOwnerProofPreparationForScan = null,
     getPoliticalCacheProofForScan = null,
     getLocalizationProofForScan = null,
+    getWaterPathResourceProofForScan = null,
   } = {},
 ) {
   const normalizedDerivedAliasTaintMode =
@@ -2430,6 +2432,11 @@ function analyzeBindingMutations(
       const iteration = provenOwnerBorrowedArrayIteration(node, aliasRecords);
       if (iteration) return iteration.result;
       const localOwnerMethod = immutableBorrowedLocalHelperNode(node);
+      const waterPathResource = localOwnerMethod && resolveStateWaterPathResourceHelper(
+        getWaterPathResourceProofForScan?.(), localOwnerMethod, { source, filePath },
+      );
+      // Only the proved return is a Path2D resource; the call and nested effects still run through analysis.
+      if (waterPathResource) return { status: "none", reference: null };
       const localOwnerPaths = localOwnerMethod && !hasProvenInjectedOwnerResultOrigin(localOwnerMethod)
         && provenOwnerBorrowedReturnPaths(localOwnerMethod);
       if (localOwnerPaths) return { status: "maybe", reference: null, borrowedPaths: localOwnerPaths };
@@ -7100,6 +7107,15 @@ export function scanStateMutationInventory(
   let sourceBoundOwnerProofPreparation = null;
   let politicalCacheProof;
   let localizationProof;
+  let waterPathResourceProof;
+  const getWaterPathResourceProofForScan = () => {
+    if (waterPathResourceProof === undefined) {
+      waterPathResourceProof = recognizeCurrentContracts
+        && filePath === "js/core/renderer/scenario_region_overlay_render_owner.js"
+        ? inspectStateWaterPathResourceSources({ source: normalizedSource }).receipt : null;
+    }
+    return waterPathResourceProof;
+  };
   const getLocalizationProofForScan = () => {
     if (localizationProof === undefined) {
       const receipt = recognizeCurrentContracts && filePath === STATE_LOCALIZATION_BORROW_MODULE_PATH
@@ -7168,6 +7184,7 @@ export function scanStateMutationInventory(
           getSourceBoundOwnerProofPreparationForScan,
           getPoliticalCacheProofForScan,
           getLocalizationProofForScan,
+          getWaterPathResourceProofForScan,
         },
       );
     });
