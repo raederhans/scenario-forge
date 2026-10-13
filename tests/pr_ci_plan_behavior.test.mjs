@@ -246,6 +246,9 @@ test("transport changes select transport without forcing browser work", () => {
   const plan = planPullRequest({ changedFiles: ["data/transport_layers/catalog.json"] });
   assert.equal(plan.runTransport, true);
   assert.equal(plan.runSmoke, false);
+  for (const file of ["requirements-transport.lock.txt", "tools/build_data_catalog.py"]) {
+    assert.equal(planPullRequest({ changedFiles: [file] }).runTransport, true, file);
+  }
 });
 
 test("CI intent labels override automatic planning without hiding evidence", () => {

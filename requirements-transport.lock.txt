@@ -1,0 +1,8 @@
+# Python 3.12 read-only transport manifest validator and its two contract modules.
+# Schema versions match requirements-dev.lock.txt; no builders or geospatial IO.
+attrs==26.1.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==2026.5.1
+typing_extensions==4.16.0

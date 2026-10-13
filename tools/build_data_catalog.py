@@ -15,7 +15,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from map_builder.io.writers import write_json_atomic
 from map_builder.json_schema_contracts import validate_json_contract
 from map_builder.runtime_asset_registry import load_runtime_asset_registry
 from map_builder.transport_workbench_contracts import validate_transport_manifest
@@ -743,6 +742,9 @@ def build_catalog_markdown(payload: dict[str, Any]) -> str:
 
 
 def write_catalog(payload: dict[str, Any], *, output_path: Path, markdown_output_path: Path) -> None:
+    # Read-only catalog/transport checks do not need the geospatial writer stack.
+    from map_builder.io.writers import write_json_atomic
+
     markdown = build_catalog_markdown(payload)
     write_json_atomic(output_path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
     markdown_output_path.write_text(markdown, encoding="utf-8")

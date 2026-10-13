@@ -986,6 +986,8 @@ export const UI_WORKBENCH_RECORDS = [
     "id": "infra:transport-manifest-contracts",
     "commandRef": "python tools/check_transport_workbench_manifests.py --root data/transport_layers --report-path .runtime/reports/generated/transport_workbench_manifest_report.json",
     "sourceRefs": [
+      "requirements-transport.lock.txt",
+      "tools/build_data_catalog.py",
       "tools/check_transport_workbench_manifests.py",
       "map_builder/transport_workbench_contracts.py",
       "data/transport_layers"

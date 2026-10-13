@@ -86,10 +86,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: requirements-transport.lock.txt
 
       - name: Install Python test dependencies
         if: needs.plan.outputs.run_transport == 'true'
-        run: python -m pip install -r requirements-dev.lock.txt
+        run: python -m pip install -r requirements-transport.lock.txt
 
       - name: Run transport manifest validator
         if: needs.plan.outputs.run_transport == 'true'

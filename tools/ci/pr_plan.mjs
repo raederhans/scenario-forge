@@ -96,6 +96,8 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
   }
 
   const transportRelevant = matches([
+    "requirements-transport.lock.txt",
+    "tools/build_data_catalog.py",
     "data/transport_layers/**", "tools/check_transport_workbench_manifests.py",
     "tools/build_transport_workbench_*", "tools/build_global_transport_*",
     "tests/test_transport_*", "tests/test_global_transport_builder_contracts.py",

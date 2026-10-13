@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,6 +25,22 @@ PORT_BUILDER = PROJECT_ROOT / "tools" / "build_transport_workbench_japan_ports.p
 INDUSTRIAL_BUILDER = PROJECT_ROOT / "tools" / "build_transport_workbench_japan_industrial_zones.py"
 RUNTIME_ASSET_REGISTRY = PROJECT_ROOT / "data" / "runtime_asset_registry.json"
 CATALOG_JSON = PROJECT_ROOT / "data" / "CATALOG.json"
+
+
+class TransportDependencyBoundaryTests(unittest.TestCase):
+    def test_read_only_validator_does_not_import_geospatial_writers(self):
+        script = """
+import importlib.abc
+import sys
+class RefuseGeospatialImports(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'geopandas', 'numpy', 'rasterio', 'shapely', 'pandas'}:
+            raise AssertionError(f'Read-only transport validator imported {fullname}')
+sys.meta_path.insert(0, RefuseGeospatialImports())
+import tools.check_transport_workbench_manifests
+"""
+        result = subprocess.run([sys.executable, "-c", script], cwd=PROJECT_ROOT, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
 def _minimal_transport_manifest() -> dict[str, Any]:
