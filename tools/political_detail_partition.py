@@ -42,11 +42,15 @@ def geometry_part_count(geometry):
     return int(bool(coordinates)) if kind in {"Point", "LineString", "Polygon"} else 0
 
 
-def feature_costs(feature):
+def _feature_path_cost(feature):
     geometry = feature.get("geometry")
     coords = sum(1 for _ in geometry_coordinates(geometry))
     parts = geometry_part_count(geometry)
-    return coords + 8 * parts + 3, len(json.dumps(feature, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+    return coords + 8 * parts + 3
+
+
+def feature_costs(feature):
+    return _feature_path_cost(feature), len(json.dumps(feature, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
 def feature_bounds(feature):
@@ -57,12 +61,18 @@ def feature_bounds(feature):
             min(180.0, max(c[0] for c in coords)), min(90.0, max(c[1] for c in coords))]
 
 
-def partition_political_detail_features(entries, *, max_compact_bytes=None, max_path_cost=None, feature_compact_sizes=None):
-    """Median spatial bisection; an indivisible oversized feature stays intact."""
+def partition_political_detail_features(entries, *, max_compact_bytes=None, max_path_cost=None, feature_compact_sizes=None, prevalidated_json=False):
+    """Median spatial bisection; an indivisible oversized feature stays intact.
+
+    prevalidated_json is only for a fully decoded JSON payload with exact token
+    sizes. Other callers retain serialization validation even with size overrides.
+    """
     byte_limit = POLITICAL_DETAIL_SHARD_MAX_COMPACT_BYTES if max_compact_bytes is None else int(max_compact_bytes)
     path_limit = POLITICAL_DETAIL_SHARD_MAX_PATH_COST if max_path_cost is None else int(max_path_cost)
     if byte_limit <= 0 or path_limit <= 0:
         raise ValueError("Political detail shard budgets must be positive")
+    if prevalidated_json and feature_compact_sizes is None:
+        raise ValueError("Prevalidated JSON partitioning requires exact feature sizes")
     if not entries:
         return []
 
@@ -82,9 +92,15 @@ def partition_political_detail_features(entries, *, max_compact_bytes=None, max_
 
     items = []
     for entry in entries:
-        path_cost, compact_size = feature_costs(entry[1])
-        if feature_compact_sizes is not None:
+        if prevalidated_json:
+            # Pages already parsed the entire JSON and preserved exact tokens.
+            # Default callers still serialize and reject non-JSON Python values.
+            path_cost = _feature_path_cost(entry[1])
             compact_size = feature_compact_sizes[entry[0]]
+        else:
+            path_cost, compact_size = feature_costs(entry[1])
+            if feature_compact_sizes is not None:
+                compact_size = feature_compact_sizes[entry[0]]
         items.append((entry, path_cost, compact_size))
     shards = split(items)
     shards.sort(key=lambda shard: (min(anchor(item[0], 0) for item in shard),

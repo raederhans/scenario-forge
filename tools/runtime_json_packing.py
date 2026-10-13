@@ -105,7 +105,8 @@ def _partition_published_details(app_root: Path, manifest_path: Path, manifest: 
         if any(not entry[0] for entry in entries) or len({entry[0] for entry in entries}) != len(entries):
             raise ValueError(f"Political detail feature IDs are missing or duplicate: {path}")
         tokens = dict(zip((entry[0] for entry in entries), _raw_feature_tokens(raw), strict=True))
-        shards = partition_political_detail_features(entries, feature_compact_sizes={fid: len(token) for fid, token in tokens.items()})
+        shards = partition_political_detail_features(entries,
+            feature_compact_sizes={fid: len(token) for fid, token in tokens.items()}, prevalidated_json=True)
         if len(shards) <= 1:
             chunks.append(chunk)
             continue
