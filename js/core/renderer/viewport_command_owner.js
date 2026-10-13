@@ -174,11 +174,63 @@ export function createViewportCommandOwner({
     selection.call(zoomBehavior.translateBy, 0, 0);
   }
 
+  function getBookmarkFrame() {
+    const { width, height } = getViewportDimensions();
+    const projection = getters.getProjectionSnapshot?.();
+    return { width, height, scale: projection?.scale, tx: projection?.translate?.[0], ty: projection?.translate?.[1] };
+  }
+
+  function validBookmarkFrame(frame) {
+    return [frame.width, frame.height, frame.scale, frame.tx, frame.ty].every(Number.isFinite)
+      && frame.width > 0 && frame.height > 0 && frame.scale > 0;
+  }
+
+  function validBookmarkView(view) {
+    return view && [view.x, view.y, view.k].every(value => typeof value === "number" && Number.isFinite(value))
+      && Math.abs(view.x) <= 1000000 && Math.abs(view.y) <= 1000000 && view.k >= 0.35 && view.k <= 50;
+  }
+
+  function captureViewportView() {
+    const d3 = getD3();
+    const node = getInteractionRectNode();
+    if (!node || !d3?.zoomTransform) return null;
+    const transform = d3.zoomTransform(node);
+    const frame = getBookmarkFrame();
+    if (!validBookmarkFrame(frame) || ![transform.x, transform.y, transform.k].every(Number.isFinite) || transform.k <= 0) return null;
+    // A fitted-projection center survives changes in viewport size.
+    const view = {
+      x: ((frame.width / 2 - transform.x) / transform.k - frame.tx) / frame.scale,
+      y: ((frame.height / 2 - transform.y) / transform.k - frame.ty) / frame.scale,
+      k: Number(transform.k),
+    };
+    return validBookmarkView(view) ? view : null;
+  }
+
+  function restoreViewportView(view) {
+    const zoomBehavior = getZoomBehavior();
+    const d3 = getD3();
+    const selection = selectInteractionRect();
+    const node = getInteractionRectNode();
+    const frame = getBookmarkFrame();
+    if (!validBookmarkView(view) || !validBookmarkFrame(frame) || !selection || !zoomBehavior || !d3?.zoomIdentity?.translate || !node) return false;
+    updateZoomTranslateExtent();
+    const k = Math.min(maxZoomScale, Math.max(minZoomScale, view.k));
+    const x = frame.width / 2 - (frame.tx + view.x * frame.scale) * k;
+    const y = frame.height / 2 - (frame.ty + view.y * frame.scale) * k;
+    const transform = d3.zoomIdentity.translate(x, y).scale(k);
+    const constrained = zoomBehavior.constrain()(transform,
+      zoomBehavior.extent().call(node, node.__data__, 0, [node]), zoomBehavior.translateExtent());
+    applyZoomCommand(selection, zoomBehavior, zoomBehavior.transform, [constrained], constrained.k);
+    return true;
+  }
+
   return Object.freeze({
     updateZoomTranslateExtent,
     resetZoomToFit,
     zoomByStep,
     setZoomPercent,
     enforceZoomConstraints,
+    captureViewportView,
+    restoreViewportView,
   });
 }

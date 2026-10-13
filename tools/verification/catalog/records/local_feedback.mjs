@@ -269,6 +269,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["projected-bounds-diagnostics", "renderer-runtime", "js/core/renderer/projected_bounds_diagnostics_owner.js", "tests/projected_bounds_diagnostics_owner_behavior.test.mjs"],
     ["spatial-index-runtime", "renderer-runtime", "js/core/renderer/spatial_index_runtime_owner.js", "tests/spatial_index_runtime_owner_behavior.test.mjs", ["js/core/renderer/spatial_index_runtime_derivation.js"]],
     ["viewport-command", "renderer-runtime", "js/core/renderer/viewport_command_owner.js", "tests/viewport_command_owner_behavior.test.mjs"],
+    ["view-bookmarks", "renderer-runtime", "js/core/view_bookmarks.js", "tests/view_bookmarks_behavior.test.mjs", ["js/ui/view_bookmarks.js", "css/view-bookmarks.css"]],
     ["visual-paint", "state-ownership", "js/core/state/actions/visual_paint_actions.js", "tests/map_data_boundary_behavior.test.mjs", ["js/core/state/color_state.js"]],
     ["state-bounded-governance-closeout", "state-ownership", "tools/state_resource_origin_contract.mjs", "tests/state_bounded_governance_closeout_behavior.test.mjs", ["tools/state_visual_paint_contract.mjs", "tools/state_governance_source_refresh.mjs"]],
     ["state-localization-borrow-contract", "state-ownership", "tools/state_localization_borrow_contract.mjs", "tests/state_localization_borrow_contract_behavior.test.mjs"],

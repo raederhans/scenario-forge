@@ -554,6 +554,12 @@ test("viewport command receipt keeps fresh numeric inputs and rejects provider o
       "? (getters.getViewportDimensions().width = 0)"],
     ["factorySource", factorySource, 'observedZoomBehavior?.on?.("start.viewport-command", null);',
       "void observedZoomBehavior;"],
+    ["compositionSource", compositionSource, "scale: Number(projection.scale())",
+      "scale: (runtimeState.width = 0)"],
+    ["factorySource", factorySource, "const frame = getBookmarkFrame();",
+      "const frame = getBookmarkFrame(); getters.getProjectionSnapshot().scale = 0;"],
+    ["factorySource", factorySource, "const x = frame.width / 2 - (frame.tx + view.x * frame.scale) * k;",
+      "view.x = 0; const x = frame.width / 2 - (frame.tx + view.x * frame.scale) * k;"],
   ]) {
     assert.ok(source.includes(before), before);
     const changed = sourceKey === "compositionSource" && !before.startsWith("from ")

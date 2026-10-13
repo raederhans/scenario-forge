@@ -7456,17 +7456,19 @@ freezeMutationDelegatingOwnerEntry({
   freezeMutationDelegatingOwnerEntry({
     "compositionModulePath": "js/core/map_renderer.js",
     "compositionExportName": "getViewportCommandOwner",
-    "compositionSourceFingerprint": "fbfc08113f9639da40c0c72ccac27d1281d0bab434b3729ce27f848c8e60ab6f",
+    "compositionSourceFingerprint": "8a72bd8c5bff9f9470c855c12c256c6a175935692a97a5ebcd9f94f2d9a55844",
     "factoryModulePath": "js/core/renderer/viewport_command_owner.js",
     "factoryExportName": "createViewportCommandOwner",
-    "factorySourceFingerprint": "53046ea6580a7a001287ea8bffa685618df88534fe26c2504a9c4f242960a56d",
+    "factorySourceFingerprint": "e09df5950cd4c49fe460757c2196d791bddcb32f63c8b1d95a2f15727f2c3c95",
     "ownerBindingName": "viewportCommandOwner",
     "methods": [
       "updateZoomTranslateExtent",
       "resetZoomToFit",
       "zoomByStep",
       "setZoomPercent",
-      "enforceZoomConstraints"
+      "enforceZoomConstraints",
+      "captureViewportView",
+      "restoreViewportView"
     ],
     "actionExports": [
       "setZoomTransformState"

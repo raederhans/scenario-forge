@@ -2981,6 +2981,12 @@ function getViewportCommandOwner() {
       getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),
       getInteractionRect: () => rendererSurfaceHost.getInteractionRect(),
       getD3: () => globalThis.d3,
+      getProjectionSnapshot: () => {
+        const projection = rendererSurfaceHost.getProjection();
+        if (!projection?.scale || !projection?.translate) return null;
+        const translate = projection.translate();
+        return { scale: Number(projection.scale()), translate: [Number(translate[0]), Number(translate[1])] };
+      },
       canAnimateCamera: () => !!runtimeState.firstVisibleFramePainted && !!navigationSceneOwner?.isReady(),
       calculatePanExtent,
       getCenteredFitZoomTransform,
@@ -15515,6 +15521,14 @@ function setZoomPercent(percent) {
   return getViewportCommandOwner().setZoomPercent(percent);
 }
 
+function captureViewportView() {
+  return getViewportCommandOwner().captureViewportView();
+}
+
+function restoreViewportView(view) {
+  return getViewportCommandOwner().restoreViewportView(view);
+}
+
 function getZoomPercent() {
   return getViewportReadModelOwner().getZoomPercent();
 }
@@ -16029,6 +16043,8 @@ export {
   captureRenderSnapshot,
 
   // Viewport, diagnostics, and render scheduling facade.
+  captureViewportView,
+  restoreViewportView,
   requestInteractionRender,
   setDebugMode,
   getZoomPercent,
