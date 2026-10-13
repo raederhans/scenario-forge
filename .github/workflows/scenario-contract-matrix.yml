@@ -19,6 +19,7 @@ jobs:
   plan:
     name: Scenario Contract Plan
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       scenario_ids: ${{ steps.plan.outputs.scenario_ids }}
     steps:
@@ -56,8 +57,10 @@ jobs:
             --github-output "$GITHUB_OUTPUT"
 
   strict-scenario-contract-review:
+    if: always()
     needs: [plan]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -72,11 +75,16 @@ jobs:
         id: selected
         shell: bash
         env:
+          PLAN_RESULT: ${{ needs.plan.result }}
           SCENARIO_IDS: ${{ needs.plan.outputs.scenario_ids }}
           SCENARIO_ID: ${{ matrix.scenario_id }}
         run: |
           node <<'NODE' >> "$GITHUB_OUTPUT"
-          const selected = JSON.parse(process.env.SCENARIO_IDS || "[]");
+          const selected = JSON.parse(process.env.SCENARIO_IDS);
+          const known = ["blank_base", "modern_world", "tno_1962", "hoi4_1936", "hoi4_1939"];
+          if (process.env.PLAN_RESULT !== "success" || !Array.isArray(selected)
+            || selected.some(id => !known.includes(id)) || new Set(selected).size !== selected.length
+            || !known.includes(process.env.SCENARIO_ID)) throw new Error("Invalid scenario plan.");
           console.log(`should_run=${selected.includes(process.env.SCENARIO_ID)}`);
           NODE
 

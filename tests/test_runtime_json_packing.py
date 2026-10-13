@@ -8,11 +8,54 @@ import unittest
 from unittest.mock import patch
 from pathlib import Path
 
-from tools.runtime_json_packing import compact_json_bytes, pack_published_runtime_data, portable_gzip_bytes
-from tools.political_detail_partition import partition_political_detail_features
+from tools.runtime_json_packing import _compact_json_file, compact_json_bytes, pack_published_runtime_data, portable_gzip_bytes
+from tools.political_detail_partition import feature_bounds, partition_political_detail_features
 
 
 class RuntimeJsonPackingTests(unittest.TestCase):
+    def test_prevalidated_partition_avoids_unused_serialization_and_keeps_shards(self):
+        features = [{'type': 'Feature', 'properties': {'id': str(i), 'name': '中'},
+                     'geometry': {'type': 'Point', 'coordinates': [i, -0.0]}} for i in range(4)]
+        entries = [(str(i), feature, feature_bounds(feature)) for i, feature in enumerate(features)]
+        sizes = {str(i): len(json.dumps(feature, ensure_ascii=True, separators=(',', ':')).encode()) for i, feature in enumerate(features)}
+        expected = partition_political_detail_features(entries, max_path_cost=24, feature_compact_sizes=sizes)
+        with patch('tools.political_detail_partition.json.dumps', side_effect=AssertionError('already validated JSON must not be serialized for size')):
+            actual = partition_political_detail_features(entries, max_path_cost=24, feature_compact_sizes=sizes, prevalidated_json=True)
+        self.assertEqual(actual, expected)
+        with self.assertRaises(ValueError):
+            partition_political_detail_features(entries, prevalidated_json=True)
+        with self.assertRaises(KeyError):
+            partition_political_detail_features(entries, feature_compact_sizes={}, prevalidated_json=True)
+
+    def test_default_size_override_still_rejects_non_json_python_properties(self):
+        feature = {'properties': {'id': 'bad', 'unsupported': {1, 2}},
+                   'geometry': {'type': 'Point', 'coordinates': [0, 0]}}
+        entries = [('bad', feature, [0, 0, 0, 0])]
+        with self.assertRaises(TypeError):
+            partition_political_detail_features(entries, feature_compact_sizes={'bad': 1})
+
+    def test_file_compaction_preserves_the_exact_byte_compactor_contract(self):
+        samples = [
+            b' { "number": 1.234567890123456789, "zero": -0.0, "exp": 1e+03 } \n',
+            b'{"escaped":"a\\\" b\\\\ c\\t d","unicode":"\\u4e2d","inside":" \t\r\n "}',
+            '{ "name": "中文 空格", "array": [1, 2] }'.encode(),
+            b'{"already":"compact string with spaces"}', b'', b' \t\r\n',
+        ]
+        runtime = Path(__file__).resolve().parents[1] / '.runtime/tmp'
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            path = Path(temporary) / 'sample.json'
+            for raw in samples:
+                with self.subTest(raw=raw):
+                    path.write_bytes(raw)
+                    expected = compact_json_bytes(raw)
+                    self.assertEqual(_compact_json_file(path), (len(raw), len(expected)))
+                    self.assertEqual(path.read_bytes(), expected)
+            path.write_bytes(samples[3])
+            with patch.object(Path, 'open', side_effect=AssertionError('unchanged file must not be rewritten')):
+                with patch.object(Path, 'read_bytes', return_value=samples[3]):
+                    self.assertEqual(_compact_json_file(path), (len(samples[3]), len(samples[3])))
+
     def test_source_hash_uses_manifest_gzip_runtime_url_and_stored_bytes(self):
         runtime = Path(__file__).resolve().parents[1] / ".runtime/tmp"
         runtime.mkdir(parents=True, exist_ok=True)

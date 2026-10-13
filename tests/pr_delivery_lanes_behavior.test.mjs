@@ -33,13 +33,28 @@ test("mixed changes and full intent cannot inherit a UI exemption", () => {
 });
 
 test("delivery inputs, dependencies and policy keep full artifact validation", () => {
-  for (const file of ["index.html", "landing/app.js", "vendor/d3.min.js", "data/manifest.json", "dist/index.html", "package.json", "package-lock.json", "requirements-dev.lock.txt", "tools/build_pages_dist.py", "tools/check_pages_source_graph.py", "tools/pages_artifact_admission.py", "tools/ci/pr_plan.mjs", ".github/workflows/verify-shared.yml"]) {
+  for (const file of ["index.html", "landing/app.js", "vendor/d3.min.js", "data/manifest.json", "dist/index.html", "package.json", "package-lock.json", "requirements-dev.lock.txt", "tools/build_pages_dist.py", "tools/check_pages_source_graph.py", "tools/pages_artifact_admission.py", "tools/ci/new_artifact_tool.mjs", ".github/workflows/verify-shared.yml"]) {
     const plan = planPullRequest({ changedFiles: [file] });
     assert.equal(plan.pagesMode, "full", file);
     assert.equal(plan.runPages, true, file);
     assert.equal(plan.runPagesSource, false, file);
   }
   assert.equal(planPullRequest({ changedFiles: ["js/new_runtime.js"] }).pagesMode, "source");
+});
+
+test("routing-only changes keep behavior checks without rebuilding unchanged Pages inputs", () => {
+  for (const file of ["tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", "tools/ci/pr_delivery_plan.mjs", ".github/workflows/pr-verify.yml"]) {
+    const plan = planPullRequest({ changedFiles: [file] });
+    assert.equal(plan.pagesMode, "none", file);
+    assert.equal(plan.runFast, true, file);
+    assert.equal(plan.runSmoke, true, file);
+    assert.equal(plan.runHgo, true, file);
+    assert.equal(planPullRequest({ changedFiles: [file], labels: ["ci:full"] }).pagesMode, "full", file);
+    for (const artifact of ["data/manifest.json", "tools/build_pages_dist.py", ".github/workflows/verify-shared.yml", "package-lock.json", "js/core/map_renderer.js"]) {
+      assert.equal(planPullRequest({ changedFiles: [file, artifact] }).pagesMode, "full", artifact);
+    }
+    assert.equal(planPullRequest({ changedFiles: [file, "css/editor-workspace.css"] }).pagesMode, "source");
+  }
 });
 
 test("empty, unknown, executable and control-plane scopes are never docs-only skips", () => {
@@ -80,6 +95,10 @@ test("required gate accepts explicit docs exemption but rejects missing or faile
     assert.equal(runRequiredGate({ "pr-verify-smoke": { result } }), 1, result);
     assert.equal(runRequiredGate({ "pr-verify-hgo": { result } }), 1, result);
   }
+  assert.equal(runRequiredGate({
+    "pr-plan": { result: "success", outputs: { run_fast: "true", run_smoke: "false", run_hgo: "true" } },
+    "pr-verify-smoke": { result: "success" },
+  }), 1, "unplanned smoke success must not substitute for a valid plan");
   for (const outputs of [{}, { run_fast: "false", run_hgo: "true" }, { run_fast: "true", run_smoke: "invalid", run_hgo: "true" }]) {
     assert.equal(runRequiredGate({ "pr-plan": { result: "success", outputs } }), 1);
   }
@@ -88,6 +107,40 @@ test("required gate accepts explicit docs exemption but rejects missing or faile
     "pr-verify-fast": { result: "skipped" }, "pr-verify-smoke": { result: "skipped" },
     "pr-verify-hgo": { result: "skipped" },
   }), 1);
+});
+
+function runDataPlanGuard(file, env) {
+  const source = fs.readFileSync(new URL(`../.github/workflows/${file}`, import.meta.url), "utf8");
+  const script = source.split("node <<'NODE'")[1].split("\n          NODE")[0].split("\n").slice(1).join("\n");
+  const output = [];
+  try {
+    vm.runInNewContext(script, { process: { env }, console: { log(value) { output.push(value); } } });
+    return { passed: true, output };
+  } catch {
+    return { passed: false, output };
+  }
+}
+
+test("required data lanes fail closed on failed plans and malformed exemptions", () => {
+  for (const PLAN_RESULT of ["failure", "cancelled", "skipped", undefined]) {
+    assert.equal(runDataPlanGuard("transport-contract-required.yml", { PLAN_RESULT, RUN_TRANSPORT: "false" }).passed, false);
+    assert.equal(runDataPlanGuard("scenario-contract-matrix.yml", { PLAN_RESULT, SCENARIO_IDS: "[]", SCENARIO_ID: "hoi4_1936" }).passed, false);
+  }
+  for (const RUN_TRANSPORT of ["", "invalid", undefined]) {
+    assert.equal(runDataPlanGuard("transport-contract-required.yml", { PLAN_RESULT: "success", RUN_TRANSPORT }).passed, false);
+  }
+  for (const RUN_TRANSPORT of ["true", "false"]) {
+    assert.equal(runDataPlanGuard("transport-contract-required.yml", { PLAN_RESULT: "success", RUN_TRANSPORT }).passed, true);
+  }
+  for (const SCENARIO_IDS of [undefined, "", "null", "{}", "false", '["unknown"]', '["hoi4_1936","hoi4_1936"]']) {
+    assert.equal(runDataPlanGuard("scenario-contract-matrix.yml", { PLAN_RESULT: "success", SCENARIO_IDS, SCENARIO_ID: "hoi4_1936" }).passed, false);
+  }
+  for (const [SCENARIO_IDS, expected] of [["[]", "should_run=false"], ['["hoi4_1936"]', "should_run=true"]]) {
+    const result = runDataPlanGuard("scenario-contract-matrix.yml", { PLAN_RESULT: "success", SCENARIO_IDS, SCENARIO_ID: "hoi4_1936" });
+    assert.equal(result.passed, true);
+    assert.deepEqual(result.output, [expected]);
+  }
+  assert.equal(runDataPlanGuard("scenario-contract-matrix.yml", { PLAN_RESULT: "success", SCENARIO_IDS: "[]", SCENARIO_ID: "unknown" }).passed, false);
 });
 
 test("required gate accepts native-only success and requires explicit HGO plans and results", () => {

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections import Counter
+from collections import Counter, OrderedDict
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -15,7 +15,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from map_builder.io.writers import write_json_atomic
 from map_builder.json_schema_contracts import validate_json_contract
 from map_builder.runtime_asset_registry import load_runtime_asset_registry
 from map_builder.transport_workbench_contracts import validate_transport_manifest
@@ -271,6 +270,81 @@ def _iter_transport_manifest_leaf_paths(container: Any, path_parts: tuple[str, .
     return results
 
 
+def _transport_path_fingerprint(path: Path) -> tuple[int, ...] | None:
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    return (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+
+
+def _inspect_transport_path_payload(
+    target_path: Path, normalized_path: str, leaf_key: str, geometry_kind: str,
+) -> tuple[str, ...]:
+    errors: list[str] = []
+    try:
+        payload = _read_json(target_path)
+    except Exception as exc:  # pragma: no cover - surfaced through CLI
+        errors.append(f"invalid JSON at {normalized_path}: {exc}")
+        return tuple(errors)
+
+    if leaf_key == "build_audit":
+        if not isinstance(payload, dict):
+            errors.append("must decode to an object.")
+        return tuple(errors)
+    if leaf_key == "subtype_catalog":
+        if not isinstance(payload, list):
+            errors.append("must decode to a list.")
+        return tuple(errors)
+    if leaf_key in {"carrier", "provenance"}:
+        if not isinstance(payload, (dict, list)):
+            errors.append("must decode to an object or list.")
+        return tuple(errors)
+
+    if normalized_path.endswith(".topo.json"):
+        if not isinstance(payload, dict) or payload.get("type") != "Topology":
+            errors.append("must decode to a Topology object.")
+        if leaf_key in {"roads", "railways"}:
+            topology_objects = payload.get("objects") if isinstance(payload, dict) else None
+            if not isinstance(topology_objects, dict) or leaf_key not in topology_objects:
+                errors.append(f"topology is missing object `{leaf_key}`.")
+        return tuple(errors)
+
+    if isinstance(payload, dict) and payload.get("type") == "FeatureCollection":
+        features = payload.get("features")
+        if not isinstance(features, list):
+            errors.append("FeatureCollection must contain a list `features`.")
+            return tuple(errors)
+        if not features:
+            return tuple(errors)
+        geometry_types = {
+            str((feature or {}).get("geometry", {}).get("type") or "").strip()
+            for feature in features
+            if isinstance(feature, dict)
+        }
+        expected_kind = geometry_kind
+        if leaf_key in {"road_labels", "rail_stations_major"}:
+            expected_kind = "point"
+        if expected_kind == "point":
+            allowed = {"Point", "MultiPoint"}
+        elif expected_kind == "line":
+            allowed = {"LineString", "MultiLineString"}
+        elif expected_kind == "polygon":
+            allowed = {"Polygon", "MultiPolygon"}
+        else:
+            allowed = set()
+        if allowed and any(geometry_type and geometry_type not in allowed for geometry_type in geometry_types):
+            errors.append(
+                f"geometry kinds {sorted(geometry_types)} "
+                f"do not match expected {sorted(allowed)}."
+            )
+        return tuple(errors)
+
+    if not isinstance(payload, dict):
+        errors.append("must decode to a JSON object or FeatureCollection.")
+    return tuple(errors)
+
+
 def collect_transport_path_contract_errors(
     manifest: dict[str, Any],
     manifest_path: Path,
@@ -291,6 +365,9 @@ def collect_transport_path_contract_errors(
                     )
                 )
 
+    # Retain at most 64 small verdicts, never parsed asset payloads. Cache only
+    # within this manifest call; check file identity before every repeated use.
+    inspection_cache: OrderedDict = OrderedDict()
     geometry_kind = str(manifest.get("geometry_kind") or "").strip()
     for logical_parts, raw_path in leaf_paths:
         normalized_path = _normalize_rel_path(raw_path)
@@ -305,67 +382,21 @@ def collect_transport_path_contract_errors(
         if not _is_json_like(normalized_path):
             errors.append(f"{relative_manifest_path}: `{label}` must point to a JSON/GeoJSON/TopoJSON file.")
             continue
-        try:
-            payload = _read_json(target_path)
-        except Exception as exc:  # pragma: no cover - surfaced through CLI
-            errors.append(f"{relative_manifest_path}: `{label}` invalid JSON at {normalized_path}: {exc}")
-            continue
-
         leaf_key = logical_parts[-1] if logical_parts else ""
-        if leaf_key == "build_audit":
-            if not isinstance(payload, dict):
-                errors.append(f"{relative_manifest_path}: `{label}` must decode to an object.")
-            continue
-        if leaf_key == "subtype_catalog":
-            if not isinstance(payload, list):
-                errors.append(f"{relative_manifest_path}: `{label}` must decode to a list.")
-            continue
-        if leaf_key in {"carrier", "provenance"}:
-            if not isinstance(payload, (dict, list)):
-                errors.append(f"{relative_manifest_path}: `{label}` must decode to an object or list.")
-            continue
-
-        if normalized_path.endswith(".topo.json"):
-            if not isinstance(payload, dict) or payload.get("type") != "Topology":
-                errors.append(f"{relative_manifest_path}: `{label}` must decode to a Topology object.")
-            if leaf_key in {"roads", "railways"}:
-                topology_objects = payload.get("objects") if isinstance(payload, dict) else None
-                if not isinstance(topology_objects, dict) or leaf_key not in topology_objects:
-                    errors.append(f"{relative_manifest_path}: `{label}` topology is missing object `{leaf_key}`.")
-            continue
-
-        if isinstance(payload, dict) and payload.get("type") == "FeatureCollection":
-            features = payload.get("features")
-            if not isinstance(features, list):
-                errors.append(f"{relative_manifest_path}: `{label}` FeatureCollection must contain a list `features`.")
-                continue
-            if not features:
-                continue
-            geometry_types = {
-                str((feature or {}).get("geometry", {}).get("type") or "").strip()
-                for feature in features
-                if isinstance(feature, dict)
-            }
-            expected_kind = geometry_kind
-            if leaf_key in {"road_labels", "rail_stations_major"}:
-                expected_kind = "point"
-            if expected_kind == "point":
-                allowed = {"Point", "MultiPoint"}
-            elif expected_kind == "line":
-                allowed = {"LineString", "MultiLineString"}
-            elif expected_kind == "polygon":
-                allowed = {"Polygon", "MultiPolygon"}
-            else:
-                allowed = set()
-            if allowed and any(geometry_type and geometry_type not in allowed for geometry_type in geometry_types):
-                errors.append(
-                    f"{relative_manifest_path}: `{label}` geometry kinds {sorted(geometry_types)} "
-                    f"do not match expected {sorted(allowed)}."
-                )
-            continue
-
-        if not isinstance(payload, dict):
-            errors.append(f"{relative_manifest_path}: `{label}` must decode to a JSON object or FeatureCollection.")
+        fingerprint = _transport_path_fingerprint(target_path)
+        cache_key = (target_path, normalized_path, leaf_key, geometry_kind)
+        cached = inspection_cache.get(cache_key) if fingerprint is not None else None
+        if cached is not None and cached[0] == fingerprint:
+            path_errors = cached[1]
+            inspection_cache.move_to_end(cache_key)
+        else:
+            path_errors = _inspect_transport_path_payload(target_path, normalized_path, leaf_key, geometry_kind)
+            if fingerprint is not None and _transport_path_fingerprint(target_path) == fingerprint:
+                inspection_cache[cache_key] = (fingerprint, path_errors)
+                inspection_cache.move_to_end(cache_key)
+                if len(inspection_cache) > 64:
+                    inspection_cache.popitem(last=False)
+        errors.extend(f"{relative_manifest_path}: `{label}` {message}" for message in path_errors)
 
     return errors
 
@@ -743,6 +774,9 @@ def build_catalog_markdown(payload: dict[str, Any]) -> str:
 
 
 def write_catalog(payload: dict[str, Any], *, output_path: Path, markdown_output_path: Path) -> None:
+    # Read-only catalog/transport checks do not need the geospatial writer stack.
+    from map_builder.io.writers import write_json_atomic
+
     markdown = build_catalog_markdown(payload)
     write_json_atomic(output_path, payload, ensure_ascii=False, indent=2, trailing_newline=True)
     markdown_output_path.write_text(markdown, encoding="utf-8")

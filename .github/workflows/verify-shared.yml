@@ -38,8 +38,8 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: ${{ (inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo') && 15 || 90 }}
     env:
-      WHEELHOUSE_DIR: .runtime/python/wheels
       PLAYWRIGHT_BROWSERS_PATH: .runtime/browser/ms-playwright
     steps:
       - name: Checkout
@@ -80,6 +80,7 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
+          cache-dependency-path: ${{ inputs.profile == 'deploy-minimal' && 'requirements-ci-min.lock.txt' || 'requirements-dev.lock.txt' }}
 
       - name: Setup Node
         if: inputs.profile == 'full' || inputs.profile == 'pr-fast' || inputs.profile == 'pr-smoke' || inputs.profile == 'demo' || inputs.profile == 'deploy-minimal'
@@ -88,21 +89,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Download Python wheel cache
-        run: |
-          mkdir -p "$WHEELHOUSE_DIR"
-          if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
-            python -m pip download -r requirements-ci-min.lock.txt --dest "$WHEELHOUSE_DIR"
-          else
-            python -m pip download -r requirements-dev.lock.txt --dest "$WHEELHOUSE_DIR"
-          fi
-
       - name: Install Python test dependencies
         run: |
           if [ "${{ inputs.profile }}" = "deploy-minimal" ]; then
-            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-ci-min.lock.txt
+            python -m pip install -r requirements-ci-min.lock.txt
           else
-            python -m pip install --no-index --find-links "$WHEELHOUSE_DIR" -r requirements-dev.lock.txt
+            python -m pip install -r requirements-dev.lock.txt
           fi
 
       - name: Check deploy-minimal dependency guardrails
@@ -309,21 +301,19 @@ jobs:
         if: inputs.profile == 'full'
         run: npm run test:node:physical-layer-contracts
 
-      - name: Verify E2E layer manifest
-        if: inputs.profile == 'pr-fast'
-        run: npm run verify:test:e2e-layers
-
       - name: Verify test infra guardrails
         if: inputs.profile == 'pr-fast'
         run: |
           npm run verify:test-console-allowlist
           npm run verify:test-timeout-guardrails
 
-      - name: Run test infra structural contracts
+      - name: Run PR routing contracts
         if: inputs.profile == 'pr-fast'
         run: |
+          # The affected selector owns structural checks, including the full
+          # Python structural suite. Keep only inexpensive routing policy checks
+          # unconditional; full/nightly verification retains the complete inventory.
           node --test tests/pr_ci_plan_behavior.test.mjs tests/adaptive_routing_policy_behavior.test.mjs
-          python -m unittest tests.test_e2e_structural_tooling -q
 
       - name: Run strict TNO scenario contract gate
         # PR scenario contracts are owned by Scenario Contract Matrix.

@@ -18,6 +18,7 @@ jobs:
   plan:
     name: Transport Contract Plan
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       run_transport: ${{ steps.plan.outputs.run_transport }}
     steps:
@@ -55,9 +56,20 @@ jobs:
             --github-output "$GITHUB_OUTPUT"
 
   transport-contract-required:
+    if: always()
     needs: [plan]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
+      - name: Require a valid transport plan
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          RUN_TRANSPORT: ${{ needs.plan.outputs.run_transport }}
+        run: |
+          node <<'NODE'
+          if (process.env.PLAN_RESULT !== "success"
+            || !["true", "false"].includes(process.env.RUN_TRANSPORT)) throw new Error("Invalid transport plan.");
+          NODE
       - name: Fast success for transport-unrelated changes
         if: needs.plan.outputs.run_transport != 'true'
         run: echo "Transport contract skipped before repository checkout."
@@ -74,10 +86,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+          cache-dependency-path: requirements-transport.lock.txt
 
       - name: Install Python test dependencies
         if: needs.plan.outputs.run_transport == 'true'
-        run: python -m pip install -r requirements-dev.lock.txt
+        run: python -m pip install -r requirements-transport.lock.txt
 
       - name: Run transport manifest validator
         if: needs.plan.outputs.run_transport == 'true'

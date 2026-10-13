@@ -996,13 +996,47 @@ def build_editor_dist(editor_entry: Path) -> None:
         'href="apps/hgo/index.html"', 'href="../hgo/"'))
 
 
+def unreferenced_scenario_chunk_paths(source_dir: Path) -> set[Path]:
+    """Avoid copying generated chunks that artifact packing would later discard.
+
+    Source/offline assets stay intact. Only a scenario with its canonical detail
+    manifest is eligible, and only the immediate generated JSON chunk files are
+    filtered, matching runtime_json_packing's final pruning boundary.
+    """
+    skipped: set[Path] = set()
+    for manifest_path in sorted(source_dir.glob("*/detail_chunks.manifest.json")):
+        if manifest_path.parent.name in PAGES_LOCAL_PREVIEW_SCENARIO_IDS | PAGES_RETIRED_SCENARIO_IDS:
+            continue
+        manifest = json.loads(manifest_path.read_bytes())
+        if not isinstance(manifest, dict) or not isinstance(manifest.get("chunks", []), list):
+            raise ValueError(f"Invalid scenario detail chunk manifest: {manifest_path}")
+        chunks_dir = (manifest_path.parent / "chunks").resolve()
+        referenced: set[Path] = set()
+        for chunk in manifest.get("chunks", []):
+            if not isinstance(chunk, dict):
+                raise ValueError(f"Invalid scenario detail chunk entry: {manifest_path}")
+            url = str(chunk.get("url") or "")
+            path = (ROOT / url).resolve()
+            if not path.is_relative_to(chunks_dir):
+                raise ValueError(f"Chunk URL is outside its scenario chunks directory: {url}")
+            referenced.add(path)
+        for path in chunks_dir.glob("*"):
+            if path.is_file() and path.resolve() not in referenced and (
+                path.suffix in {".json", ".geojson", ".topojson"}
+                or path.name.endswith(".json.gz")
+            ):
+                skipped.add(path.resolve())
+    return skipped
+
+
 def copy_scenario_runtime_data() -> None:
     source_dir = ROOT / "data" / "scenarios"
     destination_dir = APP_DIST_ROOT / "data" / "scenarios"
     publication_policy = build_pages_production_publication_policy(source_dir)
+    skipped_chunks = unreferenced_scenario_chunk_paths(source_dir)
 
     def should_copy_file(_relative_path: Path, source_file: Path) -> bool:
-        return is_pages_production_publication_path(
+        return source_file.resolve() not in skipped_chunks and is_pages_production_publication_path(
             source_file.relative_to(ROOT),
             policy=publication_policy,
         )

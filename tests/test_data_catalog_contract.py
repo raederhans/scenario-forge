@@ -12,6 +12,7 @@ from tools.build_data_catalog import (
     build_catalog_markdown,
     build_catalog_payload,
     collect_transport_path_contract_errors,
+    write_catalog,
 )
 from tools.check_data_catalog import summarize_empty_hash_refs
 from tools.data_health import SCENARIO_REGISTRY_URL, collect_health
@@ -26,6 +27,16 @@ EXPECTED_SCHEMA_REF_COUNT = 34
 
 
 class DataCatalogContractTest(unittest.TestCase):
+    def test_catalog_writer_keeps_json_and_markdown_output(self) -> None:
+        payload = {"entries": [], "counts": {"entries": 0, "roles": {}}}
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "catalog.json"
+            markdown = Path(temp_dir) / "catalog.md"
+            write_catalog(payload, output_path=output, markdown_output_path=markdown)
+            self.assertEqual(json.loads(output.read_text()), payload)
+            self.assertTrue(output.read_text().endswith("\n"))
+            self.assertEqual(markdown.read_text(), build_catalog_markdown(payload))
+
     def _load_catalog(self) -> dict:
         return json.loads(CATALOG_JSON.read_text(encoding="utf-8"))
 

@@ -110,6 +110,101 @@ def import_landing_builder(module_name: str):
 
 
 class PagesDistStartupShellTest(unittest.TestCase):
+    def test_scenario_copy_skips_stale_chunks_with_identical_packed_artifact(self):
+        from unittest.mock import patch
+        from tools.runtime_json_packing import pack_published_runtime_data
+        runtime = REPO_ROOT / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            root = Path(temporary)
+            source = root / "data/scenarios"
+            scenario = source / "sample"
+            chunks = scenario / "chunks"
+            chunks.mkdir(parents=True)
+            raw = b'{ "type": "FeatureCollection", "features": [] }'
+            (chunks / "live.json").write_bytes(raw)
+            (chunks / "encoded.json.gz").write_bytes(gzip.compress(raw, mtime=0))
+            (chunks / "stale.json").write_bytes(raw)
+            (chunks / "stale.json.gz").write_bytes(gzip.compress(raw, mtime=0))
+            (chunks / "license.txt").write_text("keep provenance", encoding="utf-8")
+            (chunks / "nested").mkdir()
+            (chunks / "nested/local.json").write_bytes(raw)
+            offline = source / "offline/chunks"
+            offline.mkdir(parents=True)
+            (offline / "local.json").write_bytes(raw)
+            detail_url = "data/scenarios/sample/detail_chunks.manifest.json"
+            (scenario / "manifest.json").write_text(json.dumps({"detail_chunk_manifest_url": detail_url}), encoding="utf-8")
+            whole_owner_id = "political.detail.country.fra"
+            feature_tokens = [b'{"type":"Feature","properties":{"id":"F' + str(i).encode() + b'"},"geometry":{"type":"Point","coordinates":[' + str(i).encode() + b',1.234567890123456789]}}' for i in [3, 1, 2, 0]]
+            (chunks / (whole_owner_id + ".json")).write_bytes(
+                b'{"type":"FeatureCollection","features":[' + b','.join(feature_tokens) + b']}')
+            (scenario / "detail_chunks.manifest.json").write_text(json.dumps({"chunks": [
+                {"id": "live", "url": "data/scenarios/sample/chunks/live.json"},
+                {"id": "encoded", "url": "data/scenarios/sample/chunks/encoded.json.gz", "encoding": "gzip"},
+                {"id": whole_owner_id, "layer": "political", "lod": "detail", "country_codes": ["FRA"],
+                 "url": f"data/scenarios/sample/chunks/{whole_owner_id}.json"},
+            ]}), encoding="utf-8")
+            (scenario / "context_lod.manifest.json").write_text(json.dumps({"layers": {"political": [{"chunk_ids": [whole_owner_id]}]}}), encoding="utf-8")
+            (scenario / "runtime_meta.json").write_text("{}", encoding="utf-8")
+            original_source = {p.relative_to(source): p.read_bytes() for p in source.rglob("*") if p.is_file()}
+            artifacts = []
+            copied = []
+            real_copy = build_pages_dist.shutil.copy2
+            for optimized in (False, True):
+                app = root / ("new" if optimized else "old")
+                with patch.object(build_pages_dist, "ROOT", root), patch.object(build_pages_dist, "APP_DIST_ROOT", app):
+                    with patch.object(build_pages_dist.shutil, "copy2", wraps=real_copy) as copy:
+                        if optimized:
+                            build_pages_dist.copy_scenario_runtime_data()
+                        else:
+                            policy = build_pages_dist.build_pages_production_publication_policy(source)
+                            build_pages_dist.copy_tree_filtered(source, app / "data/scenarios",
+                                lambda _relative, p: policy.allows(p.relative_to(root)))
+                            build_pages_dist.strip_scenario_publish_audit_urls(app / "data/scenarios")
+                        copied.append([Path(call.args[0]).relative_to(source) for call in copy.call_args_list])
+                    with patch("tools.political_detail_partition.POLITICAL_DETAIL_SHARD_MAX_PATH_COST", 24):
+                        pack_published_runtime_data(app)
+                    manifest = json.loads((app / detail_url).read_bytes())
+                    political_chunks = [chunk for chunk in manifest["chunks"] if chunk.get("layer") == "political"]
+                    self.assertEqual(len(political_chunks), 2)
+                    decoded = [gzip.decompress((app / chunk["url"]).read_bytes()) for chunk in political_chunks]
+                    self.assertEqual(sum(len(json.loads(part)["features"]) for part in decoded), 4)
+                    for token in feature_tokens:
+                        self.assertEqual(sum(token in part for part in decoded), 1)
+                    context = json.loads((app / "data/scenarios/sample/context_lod.manifest.json").read_bytes())
+                    self.assertEqual(context["layers"]["political"][0]["chunk_ids"], [chunk["id"] for chunk in political_chunks])
+                    meta = json.loads((app / "data/scenarios/sample/runtime_meta.json").read_bytes())
+                    self.assertEqual(meta["total_chunk_count"], len(manifest["chunks"]))
+                    self.assertEqual(meta["political_chunk_count"], 2)
+                    self.assertFalse((app / f"data/scenarios/sample/chunks/{whole_owner_id}.json").exists())
+                artifacts.append({p.relative_to(app): p.read_bytes() for p in app.rglob("*") if p.is_file()})
+            self.assertEqual(artifacts[0], artifacts[1])
+            self.assertEqual(set(copied[0]) - set(copied[1]), {Path("sample/chunks/stale.json"), Path("sample/chunks/stale.json.gz")})
+            self.assertEqual(len(copied[0]) - len(copied[1]), 2)
+            for path in ("sample/chunks/license.txt", "sample/chunks/nested/local.json", "offline/chunks/local.json"):
+                self.assertIn(Path(path), copied[1])
+            self.assertEqual(original_source, {p.relative_to(source): p.read_bytes() for p in source.rglob("*") if p.is_file()})
+
+    def test_scenario_chunk_copy_filter_rejects_invalid_or_escaping_manifest(self):
+        from unittest.mock import patch
+        runtime = REPO_ROOT / ".runtime/tmp"
+        runtime.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=runtime) as temporary:
+            root = Path(temporary)
+            source = root / "data/scenarios"
+            scenario = source / "sample"
+            scenario.mkdir(parents=True)
+            manifest = scenario / "detail_chunks.manifest.json"
+            with patch.object(build_pages_dist, "ROOT", root):
+                for payload in ([], {"chunks": {}}, {"chunks": [None]}, {"chunks": [{"url": "data/scenarios/other/chunks/x.json"}]}):
+                    with self.subTest(payload=payload):
+                        manifest.write_text(json.dumps(payload), encoding="utf-8")
+                        with self.assertRaises(ValueError):
+                            build_pages_dist.unreferenced_scenario_chunk_paths(source)
+                manifest.write_text("{broken", encoding="utf-8")
+                with self.assertRaises(json.JSONDecodeError):
+                    build_pages_dist.unreferenced_scenario_chunk_paths(source)
+
     def test_native_hgo_has_closed_assets_and_separate_navigation(self):
         native = PAGES_DIST_ROOT / "hgo"
         self.assertTrue((native / "index.html").is_file())

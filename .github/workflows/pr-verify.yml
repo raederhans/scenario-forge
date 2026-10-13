@@ -1,11 +1,12 @@
 name: pr-verify
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, synchronize, reopened, labeled, unlabeled]
 
 concurrency:
-  group: pr-verify-${{ github.event.pull_request.number }}
+  group: pr-verify-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,6 +17,7 @@ jobs:
   pr-plan:
     name: PR Plan
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       run_fast: ${{ steps.plan.outputs.run_fast }}
       run_hgo: ${{ steps.plan.outputs.run_hgo }}
@@ -46,6 +48,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .runtime/tmp .runtime/reports/generated
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            # Manual reruns exercise all lanes without requiring a PR payload.
+            printf '%s\n' '.github/workflows/pr-verify.yml' > .runtime/tmp/pr-changed-files.txt
+            exit 0
+          fi
           git -c core.quotePath=false diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA" -- > .runtime/tmp/pr-changed-files.txt
           test -s .runtime/tmp/pr-changed-files.txt || { echo "::error::PR planner received an empty changed-file set"; exit 1; }
 
@@ -57,6 +64,7 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then PR_LABELS=ci:full; fi
           # Use the specified event base/head, matching the perf gate classifier.
           # Empty/unreadable manifests retain conservative measurement planning.
           : > .runtime/tmp/pr-base-package.json
@@ -114,6 +122,7 @@ jobs:
     if: always()
     needs: ["pr-plan", "pr-verify-fast", "pr-verify-smoke", "pr-verify-hgo"]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Require planned PR verification results
         env:
@@ -134,7 +143,7 @@ jobs:
           const plannedSmoke = needs["pr-plan"]?.outputs?.run_smoke;
           const smokeAccepted = plannedSmoke === "true"
             ? smokeResult === "success"
-            : plannedSmoke === "false" && (smokeResult === "success" || smokeResult === "skipped");
+            : plannedSmoke === "false" && smokeResult === "skipped";
           const hgoResult = needs["pr-verify-hgo"]?.result;
           const plannedHgo = needs["pr-plan"]?.outputs?.run_hgo;
           const hgoAccepted = plannedHgo === "true"

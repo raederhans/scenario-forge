@@ -31,9 +31,25 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "tests/hgo_project_routing_behavior.test.mjs", "tools/build_pages_dist.py",
   ]);
   const controlPlane = matches(["tools/ci/**", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
-  const dependencyChange = matches(["package.json", "package-lock.json"])
+  // These planners only choose checks; they are not inputs to the Pages artifact.
+  // Unknown CI tools and the workflow that actually builds it remain conservative.
+  const routingOnlyInputs = new Set([
+    "tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", "tools/ci/pr_delivery_plan.mjs",
+    ".github/workflows/pr-verify.yml",
+  ]);
+  const artifactPolicyRelevant = controlPlane && files.some(file => (
+    (file.startsWith("tools/ci/") || file === ".github/workflows/verify-shared.yml")
+    && !routingOnlyInputs.has(file)
+  ));
+  // The shared manifest comparator proves only isolated, unreferenced test:/verify:
+  // script edits. Keep their affected contracts, but avoid artifact setup.
+  // Missing manifests and every dependency, lifecycle or build change stay heavy.
+  const dependencyChange = matches(["package-lock.json"])
+    || (matches(["package.json"]) && packageRequiresPerf)
     || files.some((file) => /^requirements[^/]*\.txt$/u.test(file));
-  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange
+  // A script may be invoked directly by a browser workflow, even when no other
+  // package script references it. The performance exemption is not that proof.
+  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange || matches(["package.json"])
     || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
   // Source-only changes validate their live reference graph. Changes to packaging,
   // public assets or dependencies still exercise the complete built artifact.
@@ -46,7 +62,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "js/core/renderer/cached_pass_compositor_owner.js",
     "tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
   ]);
-  const pagesFull = full || controlPlane || dependencyChange || rendererMirrorRelevant || matches([
+  const pagesFull = full || artifactPolicyRelevant || dependencyChange || rendererMirrorRelevant || matches([
     "data/**", "dist/**", "vendor/**", "landing/**", "index.html", "app.js", "styles.css",
     "tools/build_pages_dist.py", "tools/pages_*", "tools/app_entry_resolver.py",
     "tools/check_pages_source_graph.py", "tools/build_landing_*", "tools/runtime_json_packing.py",
@@ -80,6 +96,8 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
   }
 
   const transportRelevant = matches([
+    "requirements-transport.lock.txt",
+    "tools/build_data_catalog.py",
     "data/transport_layers/**", "tools/check_transport_workbench_manifests.py",
     "tools/build_transport_workbench_*", "tools/build_global_transport_*",
     "tests/test_transport_*", "tests/test_global_transport_builder_contracts.py",

@@ -44,6 +44,25 @@ test("PR planner accepts shared package exemption but defaults conservatively", 
   const exempt = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false });
   assert.equal(exempt.perfMode, "skip");
   assert.equal(exempt.perfRequired, false);
+  assert.equal(exempt.runFast, true);
+  assert.equal(exempt.pagesMode, "none");
+  assert.equal(exempt.runSmoke, true);
+  const browserScriptBase = { scripts: { "test:e2e:smoke": "node tools/e2e_layering.mjs run smoke" } };
+  const browserScriptHead = { scripts: { "test:e2e:smoke": "node tools/e2e_layering.mjs run ui" } };
+  const browserScriptExempt = !packageChangeRequiresPerformance({
+    basePackageText: JSON.stringify(browserScriptBase), headPackageText: JSON.stringify(browserScriptHead),
+  });
+  assert.equal(browserScriptExempt, true);
+  assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: !browserScriptExempt }).runSmoke, true);
+  for (const file of ["package-lock.json", "requirements-dev.lock.txt", "index.html", "js/core/map_renderer.js"]) {
+    const mixed = planPullRequest({ changedFiles: ["package.json", file], packageRequiresPerf: false });
+    assert.equal(mixed.pagesMode, "full", file);
+    assert.equal(mixed.runSmoke, true, file);
+  }
+  const full = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:full"] });
+  assert.equal(full.pagesMode, "full");
+  assert.equal(full.runSmoke, true);
+  assert.equal(planPullRequest({ changedFiles: ["package.json"] }).pagesMode, "full");
   assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:perf-strict"] }).perfMode, "strict");
   assert.equal(planPullRequest({ changedFiles: ["package.json", "package-lock.json"], packageRequiresPerf: false }).perfRequired, true);
 });
@@ -68,7 +87,10 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   };
   const manifestArgs = ["--base-package-file", "base.json", "--head-package-file", "head.json"];
   assert.equal(invoke(manifestArgs).perfMode, "skip");
+  assert.equal(invoke(manifestArgs).pagesMode, "none");
+  assert.equal(invoke(manifestArgs).runSmoke, true);
   assert.equal(invoke().perfRequired, true);
+  assert.equal(invoke().pagesMode, "full");
   assert.equal(invoke(["--base-package-file", "missing.json", "--head-package-file", "head.json"]).perfRequired, true);
   assert.equal(invoke(["--base-package-file", "base.json"]).perfRequired, true);
   fs.writeFileSync(path.join(cwd, "head.json"), "");
@@ -186,7 +208,9 @@ test("PR control-plane changes force browser smoke and Golden Demo", () => {
   const plan = planPullRequest({ changedFiles: [".github/workflows/pr-verify.yml"] });
   assert.equal(plan.runSmoke, true);
   assert.equal(plan.runDemo, true);
-  assert.equal(plan.runPages, true);
+  assert.equal(plan.runPages, false);
+  assert.equal(plan.pagesMode, "none");
+  assert.equal(planPullRequest({ changedFiles: [".github/workflows/verify-shared.yml"] }).runPages, true);
 });
 
 test("one scenario change selects only its strict contract job", () => {
@@ -222,6 +246,9 @@ test("transport changes select transport without forcing browser work", () => {
   const plan = planPullRequest({ changedFiles: ["data/transport_layers/catalog.json"] });
   assert.equal(plan.runTransport, true);
   assert.equal(plan.runSmoke, false);
+  for (const file of ["requirements-transport.lock.txt", "tools/build_data_catalog.py"]) {
+    assert.equal(planPullRequest({ changedFiles: [file] }).runTransport, true, file);
+  }
 });
 
 test("CI intent labels override automatic planning without hiding evidence", () => {
