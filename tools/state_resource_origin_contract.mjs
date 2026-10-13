@@ -83,15 +83,32 @@ export function inspectPoliticalGpuResourceOrigin({
         if (fingerprint(text) !== finiteImportProviders[file]) violations.push({ code: "resource-origin-dynamic-provider-drift", modulePath: file });
         continue;
       }
-      if (!/political_id_raster_(?:gpu|runtime_owner)|createPoliticalIdRaster(?:Gpu|RuntimeOwner)|\bimport\s*\(/.test(text)) continue;
+      // Module specifiers may encode every character of a target name. Inspect
+      // all import/re-export nodes rather than filtering their original bytes.
       full(parseModule(text), (node) => {
         const specifier = node.type === "ImportExpression" ? node.source
           : ["ImportDeclaration", "ExportNamedDeclaration", "ExportAllDeclaration"].includes(node.type) ? node.source : null;
         if (!specifier) return;
         const value = specifier.type === "Literal" ? specifier.value : null;
-        const target = typeof value === "string" && value.startsWith(".")
-          ? posix.normalize(posix.join(posix.dirname(file), value))
-          : typeof value === "string" && value.startsWith("/") ? value.slice(1) : "";
+        if (typeof value !== "string") {
+          if (node.type === "ImportExpression") {
+            violations.push({ code: "resource-origin-dynamic-consumer-unresolved", modulePath: file });
+          }
+          return;
+        }
+        let pathname;
+        try {
+          // Strip URL suffixes before decoding once: encoded ?/# are pathname
+          // data. Backslashes have URL separator semantics that POSIX lacks.
+          pathname = decodeURIComponent(value.split(/[?#]/, 1)[0]);
+          if (/[\\\u0000-\u001f\u007f]/.test(pathname)) throw new Error("Invalid module pathname");
+        } catch (_error) {
+          violations.push({ code: "resource-origin-consumer-path-invalid", modulePath: file });
+          return;
+        }
+        const target = pathname.startsWith(".")
+          ? posix.normalize(posix.join(posix.dirname(file), pathname))
+          : pathname.startsWith("/") ? posix.normalize(pathname).slice(1) : "";
         if ([POLITICAL_GPU_RESOURCE_PATH, ownerPath].includes(target)) {
           const expectedName = target === ownerPath ? "createPoliticalIdRasterRuntimeOwner" : "createPoliticalIdRasterGpu";
           if (node.type !== "ImportDeclaration" || node.specifiers.length !== 1
@@ -100,9 +117,7 @@ export function inspectPoliticalGpuResourceOrigin({
             violations.push({ code: "resource-origin-consumer-shape-invalid", modulePath: file });
           }
           edges.push(`${file}->${target}`);
-        } else if (node.type === "ImportExpression" && value === null) {
-          violations.push({ code: "resource-origin-dynamic-consumer-unresolved", modulePath: file });
-        } else if (typeof value === "string" && /political_id_raster_(?:gpu|runtime_owner)/.test(value)) {
+        } else if (/political_id_raster_(?:gpu|runtime_owner)/.test(pathname)) {
           violations.push({ code: "resource-origin-consumer-path-unresolved", modulePath: file });
         }
       });
