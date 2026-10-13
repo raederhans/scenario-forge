@@ -31,9 +31,15 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "tests/hgo_project_routing_behavior.test.mjs", "tools/build_pages_dist.py",
   ]);
   const controlPlane = matches(["tools/ci/**", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
-  const dependencyChange = matches(["package.json", "package-lock.json"])
+  // The shared manifest comparator proves only isolated, unreferenced test:/verify:
+  // script edits. Keep their affected contracts, but avoid artifact setup.
+  // Missing manifests and every dependency, lifecycle or build change stay heavy.
+  const dependencyChange = matches(["package-lock.json"])
+    || (matches(["package.json"]) && packageRequiresPerf)
     || files.some((file) => /^requirements[^/]*\.txt$/u.test(file));
-  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange
+  // A script may be invoked directly by a browser workflow, even when no other
+  // package script references it. The performance exemption is not that proof.
+  const browserRelevant = runtimeRelevant || controlPlane || dependencyChange || matches(["package.json"])
     || matches(["tests/e2e/**", "playwright.config.cjs", "tools/e2e_layering.mjs"]);
   // Source-only changes validate their live reference graph. Changes to packaging,
   // public assets or dependencies still exercise the complete built artifact.
