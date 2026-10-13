@@ -6,6 +6,10 @@ import { registerRuntimeHook } from "../js/core/state/index.js";
 import { markDirty, clearDirty } from "../js/core/dirty_state.js";
 import { createProjectSupportDiagnosticsController } from "../js/ui/sidebar/project_support_diagnostics_controller.js";
 import { strToU8, zipSync } from "../vendor/fflate.browser.js";
+import { LegendManager } from "../js/core/legend_manager.js";
+import { buildLegendCsvCurrentModel } from "../js/core/legend_csv_schema.js";
+import { buildLegendCsv } from "../js/ui/sidebar/legend_export.js";
+import { undoHistory } from "../js/core/history_manager.js";
 
 function createStatusNode() {
   const node = {
@@ -791,7 +795,7 @@ test("legend label edits render with current project labels", () => {
   }
 });
 
-test("legend editor searches every entry and paginates ten rows without a thirty-item truncation", () => {
+test("legend editor searches every entry, paginates ten rows and preserves the CSV preview", async () => {
   const previousDocument = globalThis.document;
   const legendList = createElementNode("div");
   const colors = Array.from({ length: 35 }, (_, index) => (
@@ -841,12 +845,23 @@ test("legend editor searches every entry and paginates ten rows without a thirty
     assert.equal(legendList.dataset.paged, "true");
     assert.equal(firstPageRows[0].children[1].placeholder, "Category 1");
     assert.equal(firstPageRows[9].children[1].placeholder, "Category 10");
+    const csvPreview = findNode(legendList, node => node.id === "legendCsvImportPreview");
+    assert.ok(csvPreview);
+    csvPreview.open = true;
+    const csvInput = findNode(csvPreview, node => node.id === "legendCsvImportFile");
+    csvInput.files = [{ name: "legend.csv", size: 100,
+      text: async () => "kind,label,color,pattern,stroke,fillOpacity,strokeOpacity,patternOpacity\ncolor,Retained preview,#000001,solid,#64748b,1,1,1" }];
+    await csvInput.listeners.change();
+    assert.ok(findNode(csvPreview, node => node.textContent.includes("Retained preview")));
 
     const nextButton = collectNodes(legendList, (node) =>
       node.className === "legend-editor-page-btn" && node.textContent === "›"
     )[0];
     assert.ok(nextButton);
     nextButton.listeners.click();
+    assert.equal(findNode(legendList, node => node.id === "legendCsvImportPreview"), csvPreview);
+    assert.equal(csvPreview.open, true);
+    assert.ok(findNode(csvPreview, node => node.textContent.includes("Retained preview")));
 
     const secondPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
     assert.equal(secondPageRows.length, 10);
@@ -876,6 +891,7 @@ test("legend editor searches every entry and paginates ten rows without a thirty
     searchInput.value = "#000035";
     searchInput.listeners.input();
     assert.equal(findNode(legendList, node => node.id === "legendSearchInput"), searchInput);
+    assert.equal(findNode(legendList, node => node.id === "legendCsvImportPreview"), csvPreview);
     assert.equal(findNode(legendList, node => node.className === "legend-generator-card"), generator);
     const matches = collectNodes(legendList, (node) => node.className === "legend-row");
     assert.equal(matches.length, 1);
@@ -891,6 +907,40 @@ test("legend editor searches every entry and paginates ten rows without a thirty
   } finally {
     globalThis.document = previousDocument;
   }
+});
+
+test("legend CSV controller wires explicit confirmed selection to actual scoped history", async t => {
+  const previousDocument = globalThis.document;
+  const keys = ["activeScenarioId", "scenarioBaselineHash", "colors", "legendLabels", "legendConfig", "legendColorOrder",
+    "legendControl", "specialZoneLayers", "historyPast", "historyFuture", "isDirty", "dirtyRevision", "lastDirtyReason"];
+  const saved = Object.fromEntries(keys.map(key => [key, state[key]]));
+  t.after(() => { Object.assign(state, saved); globalThis.document = previousDocument; });
+  globalThis.document = { createElement: createElementNode, getElementById: () => null };
+  Object.assign(state, { activeScenarioId: "scenario-csv", scenarioBaselineHash: "baseline-csv", colors: { A: "#abcdef" },
+    legendLabels: { "#abcdef": "Original" }, legendConfig: LegendManager.getDefaultConfig(), legendColorOrder: [],
+    specialZoneLayers: { version: 1, layers: [] }, historyPast: [], historyFuture: [] });
+  const legendList = createElementNode("div");
+  const controller = createController(createStatusNode(), { elements: { legendList }, helpers: { legendManager: LegendManager } });
+  controller.refreshLegendEditor();
+  const panel = findNode(legendList, node => node.id === "legendCsvImportPreview");
+  const model = buildLegendCsvCurrentModel(state);
+  const source = buildLegendCsv(model.entries.map(entry => ({ ...entry, label: "Confirmed CSV name" })), { schemaVersion: 2, ...model });
+  const input = findNode(panel, node => node.id === "legendCsvImportFile");
+  input.files = [{ name: "legend.csv", size: source.length, text: async () => source }];
+  await input.listeners.change();
+  assert.equal(state.legendLabels["#abcdef"], "Original");
+  const choice = findNode(panel, node => node.getAttribute?.("data-record") === "2");
+  assert.ok(choice);
+  choice.checked = true;
+  choice.listeners.change();
+  findNode(panel, node => node.id === "legendCsvImportReviewBtn").listeners.click();
+  assert.equal(state.historyPast.length, 0);
+  await findNode(panel, node => node.id === "legendCsvImportConfirmBtn").listeners.click();
+  assert.equal(state.legendLabels["#abcdef"], "Confirmed CSV name");
+  assert.equal(state.historyPast.length, 1);
+  assert.equal(findNode(legendList, node => node.className === "legend-input").value, "Confirmed CSV name");
+  assert.equal(undoHistory(), true);
+  assert.equal(state.legendLabels["#abcdef"], "Original");
 });
 
 test("project download failure is shown in project status", async () => {

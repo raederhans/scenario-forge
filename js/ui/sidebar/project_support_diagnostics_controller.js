@@ -1,8 +1,12 @@
 import { setScenarioDiagnosticsState } from "../../core/state_catalog.js";
-import { markDirty } from "../../core/dirty_state.js";
+import { markDirty, updateDirtyIndicator } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
 import { normalizeHexColor } from "../../core/color_hex_utils.js";
 import { createLegendExportControls } from "./legend_export.js";
+import { createLegendCsvImportControls } from "./legend_csv_import_controls.js";
+import { buildLegendCsvCurrentModel } from "../../core/legend_csv_schema.js";
+import { applyLegendCsvImport } from "../../core/legend_csv_import_transaction.js";
+import { requestRender } from "../../core/render_boundary.js";
 import { buildLegendSearchItems, createLegendSearchControls, filterLegendEntries } from "./legend_search.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
@@ -1568,6 +1572,8 @@ export function createProjectSupportDiagnosticsController({
   let legendHeader = null;
   let legendResults = null;
   let legendSearch = null;
+  let legendCsvImportControls = null;
+  let legendCsvImportLanguage = null;
 
   const clearLegendList = () => {
     if (typeof legendList.replaceChildren === "function") {
@@ -1682,7 +1688,7 @@ export function createProjectSupportDiagnosticsController({
     const pagerReserve = pageCount > 1 ? 38 : 0;
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
-    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 340 + (visibleLegendRows * 52) + pagerReserve)}px`);
+    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 440 + (visibleLegendRows * 52) + pagerReserve)}px`);
     const headerKey = [
       colors.join("|"),
       specialZoneLegendKey,
@@ -1701,14 +1707,34 @@ export function createProjectSupportDiagnosticsController({
     legendList.dataset.ready = "true";
     if (lastLegendHeaderKey !== headerKey) {
       lastLegendHeaderKey = headerKey;
+      if (!legendCsvImportControls || legendCsvImportLanguage !== state.currentLanguage) {
+        legendCsvImportLanguage = state.currentLanguage;
+        legendCsvImportControls = createLegendCsvImportControls({
+          documentRef,
+          getModel: () => buildLegendCsvCurrentModel(state),
+          onApply: ({ source, records, preview }) => {
+            const result = applyLegendCsvImport({ target: state, source, selectedRecords: records, preview, confirmed: true });
+            try {
+              updateDirtyIndicator();
+              requestRender("legend-csv-import");
+              lastLegendKey = null;
+              refreshLegendEditor();
+            } catch {
+              return { ...result, refreshFailed: true };
+            }
+            return result;
+          },
+        });
+      }
       legendHeader.replaceChildren(createLegendGeneratorControls(), createLegendExportControls({
         documentRef,
         getModel: () => ({ colors: readLegendColors(state), labels: legendManager.getLabels(state),
           specialZones: getVisibleSpecialZoneLegendLayers(), language: state.currentLanguage,
-          fileStem: state.activeScenarioId || "map" }),
+          fileStem: state.activeScenarioId || "map", scenarioId: state.activeScenarioId,
+          scenarioBaselineHash: state.scenarioBaselineHash }),
         download: (blob, filename) => fileManager.writeBlobDownload(blob, filename, { destination: "browser" }),
         showToast,
-      }));
+      }), legendCsvImportControls);
     }
     legendResults.replaceChildren();
 

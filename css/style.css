@@ -10855,6 +10855,26 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
 .legend-export-btn:disabled { opacity: 0.5; cursor: default; }
 .legend-export-status { margin: 6px 0 0; color: var(--text-secondary); font-size: 0.7rem; line-height: 1.5; }
 
+.legend-csv-import-controls { width: 100%; padding: 4px 0 8px; }
+.legend-csv-import-heading { cursor: pointer; font-size: 0.76rem; font-weight: 700; }
+.legend-csv-import-heading:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.legend-csv-import-file { display: block; margin: 8px 0; font-size: 0.76rem; }
+.legend-csv-import-file input { display: block; width: 100%; margin-top: 4px; font: inherit; }
+.legend-csv-import-controls > .legend-export-btn { width: 100%; margin-top: 8px; }
+.legend-csv-import-rows { max-height: 320px; overflow-y: auto; margin: 8px 0; padding: 0; list-style: none; }
+.legend-csv-import-row { padding: 8px 0; border-top: 1px solid var(--border-color); font-size: 0.7rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+.legend-csv-import-row p { margin: 4px 0; color: var(--text-secondary); }
+.legend-csv-import-row .legend-csv-import-invalid { color: var(--text-primary); font-weight: 700; }
+.legend-csv-import-pager { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.legend-csv-import-controls [hidden] { display: none; }
+.legend-csv-import-actions { margin-top: 8px; }
+.legend-csv-import-actions > .legend-export-btn { width: 100%; margin-top: 6px; }
+.legend-csv-import-select-row, .legend-csv-import-select-all { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; }
+.legend-csv-import-select-row input, .legend-csv-import-select-all input { flex: 0 0 auto; }
+.legend-csv-import-confirmation { padding: 8px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.72rem; }
+.legend-csv-import-confirmed-rows { max-height: 280px; overflow-y: auto; padding-left: 18px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.legend-csv-import-confirmation .legend-export-btn { margin: 4px 4px 0 0; }
+
 .legend-generator-apply {
   width: 100%;
   min-height: 38px;
