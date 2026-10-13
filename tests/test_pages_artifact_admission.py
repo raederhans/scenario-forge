@@ -121,11 +121,13 @@ class ArtifactReleaseWorkflowTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("public Pages release gate", result.stdout)
-            self.assertIn("Total: 16 tests", result.stdout)
+            self.assertIn("Total: 19 tests", result.stdout)
             for scenario in ("hoi4_1936", "hoi4_1939", "tno_1962"):
-                for phase in ("cold startup and native references", "timeout recovery and exact zoom", "paint and continuous brush history", "persistent cache revisit"):
+                for phase in ("cold startup and native references", "timeout recovery and exact zoom", "paint and continuous brush history", "normal startup cache baseline", "persistent cache revisit"):
                     self.assertIn(f"public Pages raster {scenario} › {phase}", result.stdout)
             self.assertIn("public Pages raster tno_1962 large native fallback", result.stdout)
+            for phase in ("cold startup and native references", "timeout recovery and exact zoom", "paint and continuous brush history"):
+                self.assertIn(f"public Pages raster tno_1962 large native fallback › {phase}", result.stdout)
             for helper in ("verify_political_id_raster_integration.mjs", "political_id_raster_app_session.mjs"):
                 self.assertTrue((root / "tools" / helper).is_file(), helper)
             self.assertFalse((root / "tools/dev_server.py").exists())
