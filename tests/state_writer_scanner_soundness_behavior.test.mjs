@@ -1143,6 +1143,58 @@ for (const hookModulePath of ["../core/state/index.js", "../core/state/runtime_h
   });
 }
 
+for (const [label, helper, call = "lookup()", resultPath = "properties.bad"] of [
+  ["local const", "function lookup() { const feature = runtimeState.feature; return feature; }"],
+  ["const alias chain", "function lookup() { const first = runtimeState.feature; const second = first; const last = second; return last; }"],
+  ["destructured const", "function lookup() { const { feature: item } = runtimeState; return item; }"],
+  ["branch-local const", "function lookup(flag) { if (flag) { const first = runtimeState.feature; return first; } const second = runtimeState.other; return second; }", "lookup(condition)"],
+  ["parameter const", "function lookup(value) { const feature = value; return feature; }", "lookup(runtimeState.feature)"],
+  ["nested helper const", "function inner(value) { const alias = value; return alias; } function lookup() { const feature = inner(runtimeState.feature); return feature; }"],
+  ["container const", "function lookup() { const feature = runtimeState.feature; const box = { feature }; return box; }", "lookup()", "feature.properties.bad"],
+  ["identity transition", "function lookup() { const feature = runtimeState.feature; if (condition) feature = {}; return feature; }"],
+]) {
+  test(`local helper ${label} result retains the caller assignment site`, () => {
+    for (const beforeDeclaration of [false, true]) {
+      const caller = `const result = ${call};\nresult.${resultPath} = true;`;
+      const source = `import { state as runtimeState } from "./state.js";\n${beforeDeclaration ? `${caller}\n${helper}` : `${helper}\n${caller}`}`;
+      const line = source.split("\n").findIndex(value => value.includes(`result.${resultPath} =`)) + 1;
+      const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+        bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+      assert.ok(findings.some(finding => finding.line === line
+        && (finding.operation === "assign" || finding.reason === "ambiguous-alias-flow")),
+      `${label}, beforeDeclaration=${beforeDeclaration}: ${JSON.stringify(findings)}`);
+    }
+  });
+}
+
+test("local helper result aliases preserve lexical shadowing and per-call arguments", () => {
+  const source = `import { state as runtimeState } from "./state.js";
+function lookup(value) { const feature = value; return feature; }
+function detached() { const runtimeState = { feature: {} }; const feature = runtimeState.feature; return feature; }
+const borrowed = lookup(runtimeState.feature);
+borrowed.bad = true;
+const local = lookup({});
+local.safe = true;
+const shadowed = detached();
+shadowed.safe = true;`;
+  const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+    bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+  assert.ok(findings.some(finding => finding.line === 5 && finding.operation === "assign"));
+  assert.equal(findings.some(finding => [7, 9].includes(finding.line)), false, JSON.stringify(findings));
+});
+
+test("local helper cyclic const and early captured bindings stay conservative without recursion", () => {
+  for (const helper of [
+    "function lookup() { const first = second; const second = first; return first; }",
+    "function lookup() { const feature = later; return feature; }",
+  ]) {
+    const source = `import { state as runtimeState } from "./state.js";\n${helper}\nconst result = lookup();\nconst later = runtimeState.feature;\nresult.bad = true;`;
+    const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+      bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+    assert.ok(findings.some(finding => finding.line === 5 && finding.reason === "ambiguous-alias-flow"), JSON.stringify(findings));
+  }
+});
+
 test("local helper return aliases retain state identity through direct, wrapped, and container results", () => {
   const source = `
     function getState() {

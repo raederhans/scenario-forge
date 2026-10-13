@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { inspectStatePoliticalCacheBorrowSources as inspect, POLITICAL_CACHE_RENDERER_PATH as rendererPath,
-  POLITICAL_DERIVED_CACHE_PATH as derivedPath, POLITICAL_RASTER_CACHE_PATH as rasterPath } from "../tools/state_political_cache_borrow_contract.mjs";
+  POLITICAL_DERIVED_CACHE_PATH as derivedPath, POLITICAL_RASTER_CACHE_PATH as rasterPath,
+  resolvePoliticalCacheOperation } from "../tools/state_political_cache_borrow_contract.mjs";
 import { createPoliticalDerivedStateCache } from "../js/core/renderer/political_derived_state_cache.js";
 import { createPoliticalIdRasterCache } from "../js/core/renderer/political_id_raster_cache.js";
 import { registerPoliticalGeometrySnapshot } from "../js/core/political_geometry_store.js";
@@ -29,9 +30,9 @@ test("political cache receipts distinguish private writes, shared diagnostics an
   const { violations, receipt } = inspect();
   assert.deepEqual(violations, []);
   const operations = Object.values(receipt.operationsByKey);
-  assert.equal(operations.length, 5);
+  assert.equal(operations.length, 10);
   assert.deepEqual(operations.filter(operation => operation.admitCall).map(operation => operation.method).sort(),
-    ["refreshColors", "refreshColors", "reset"]);
+    ["get", "refreshColors", "refreshColors", "reset"]);
   assert.equal(operations.find(operation => operation.method === "commit").admitCall, false);
   assert.equal(operations.find(operation => operation.method === "describe").admitCall, false);
   assert.deepEqual(receipt.methods.raster.get.borrowedResultPaths, [[]]);
@@ -39,6 +40,10 @@ test("political cache receipts distinguish private writes, shared diagnostics an
   assert.deepEqual(receipt.methods.derived.describe.resultStorage.valueBorrowedPaths, [[]]);
   assert.ok(receipt.diagnosticEffect.actions.includes("commitRenderPerfMetricState"));
   assert.equal(receipt.featureLookup.admitCall, false);
+  assert.equal(receipt.featureLookup.consumers.length, 4);
+  assert.equal(receipt.featureLookup.storageUses.length, 4);
+  assert.equal(read(rendererPath).slice(receipt.featureLookup.allocation.start, receipt.featureLookup.allocation.end), "new Map()");
+  assert.deepEqual(receipt.featureLookup.localIndex.map(site => site.method).sort(), ["has", "set"]);
   assert.equal(receipt.geometrySnapshots.consumers.length, 4);
   assert.equal(receipt.geometrySnapshots.producers.length, 3);
   assert.equal(receipt.geometrySnapshots.revisionReadsInvokeGetter, false);
@@ -46,8 +51,79 @@ test("political cache receipts distinguish private writes, shared diagnostics an
   assert.deepEqual(receipt.geometrySnapshots.producers.map(entry => entry.revisionKind).sort(),
     ["allocated-number", "forwarded-data-property", "forwarded-data-property"]);
   for (const operation of operations) {
-    assert.ok(read(rendererPath).slice(operation.start, operation.end).startsWith(`politicalDerivedStateCache.${operation.method}(`));
+    assert.ok(read(rendererPath).slice(operation.start, operation.end).includes(`${operation.method}(`));
     assert.ok(Object.isFrozen(operation));
+  }
+});
+
+test("private feature lookup result receipts bind the canonical source and retain helper effects", () => {
+  const { receipt } = inspect();
+  const binding = { kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" };
+  const borrows = Object.values(receipt.operationsByKey).filter(operation =>
+    ["feature-index-get", "feature-lookup-helper"].includes(operation.kind));
+  assert.equal(borrows.length, 5);
+  for (const operation of borrows) {
+    const node = { type: "CallExpression", start: operation.start, end: operation.end };
+    const options = { binding, filePath: rendererPath };
+    assert.equal(resolvePoliticalCacheOperation(receipt, node, options), operation);
+    assert.deepEqual(operation.borrowedResultPaths, [[]]);
+    assert.equal(operation.admitCall, operation.kind === "feature-index-get");
+    if (operation.kind === "feature-lookup-helper") assert.ok(operation.inputEffects.length && operation.nestedEffects.length);
+    for (const replacement of [
+      { ...binding, name: "state" }, { ...binding, importSource: "./other.js" },
+      { ...binding, importedName: "default" }, { ...binding, kind: "function-parameter" },
+    ]) assert.equal(resolvePoliticalCacheOperation(receipt, node, { ...options, binding: replacement }), null);
+    assert.equal(resolvePoliticalCacheOperation(receipt, node, { ...options, filePath: "js/unproved.js" }), null);
+    assert.equal(resolvePoliticalCacheOperation(null, node, options), null);
+    assert.equal(resolvePoliticalCacheOperation(receipt, { ...node, start: node.start + 1 }, options), null);
+  }
+});
+
+test("production lookup retains original feature identity, private first-match cache and input hooks", () => {
+  const { receipt } = inspect();
+  const source = read(rendererPath);
+  const lookup = source.slice(receipt.featureLookup.start, receipt.featureLookup.end);
+  const first = { id: "same", properties: { color: "old" } };
+  const second = { id: "same", properties: {} };
+  let features = [first, second], calls = 0;
+  const state = { landIndex: new Map(), topologyRevision: 1 };
+  const get = new Function("runtimeState", "getResolvedColorSourceFeatures", "getFeatureId", `
+    let resolvedColorFeatureLookupCache = { features: null, revision: -1, index: null };
+    ${lookup}
+    return findResolvedColorFeatureById;
+  `)(state, () => features, feature => { calls += 1; return feature.id; });
+  assert.equal(get("same"), first);
+  assert.equal(get("same"), first);
+  assert.equal(calls, 2, "a stable geometry revision reuses the private Map");
+  get("same").properties.color = "changed";
+  assert.equal(first.properties.color, "changed", "returned values remain original shared features");
+  const indexed = Object.freeze({ id: "same", properties: Object.freeze({ color: "indexed" }) });
+  state.landIndex.set("same", indexed);
+  assert.equal(get("same"), indexed);
+  assert.throws(() => { get("same").properties.color = "mutation"; }, TypeError);
+  state.landIndex.clear();
+  let hooks = 0;
+  features = [{ get id() { hooks += 1; state.hookWrites = hooks; return "new"; } }];
+  state.topologyRevision += 1;
+  assert.equal(get({ toString() { hooks += 1; return "new"; } }), features[0]);
+  assert.equal(hooks, 2, "argument coercion and feature getters are real effects");
+  assert.equal(state.hookWrites, 2);
+});
+
+test("feature lookup proof rejects cache replacement, helper publication and caller writes", () => {
+  const source = read(rendererPath);
+  for (const [before, after] of [
+    ["const index = new Map();", "const index = runtimeState.landIndex;"],
+    ["return indexedFeature;", "indexedFeature.properties.bad = true; return indexedFeature;"],
+    ["return resolvedColorFeatureLookupCache.index.get(id) || null;", "return replacement(resolvedColorFeatureLookupCache.index.get(id));"],
+    ["const feature = findResolvedColorFeatureById(id);", "const feature = findResolvedColorFeatureById(id); feature.properties.bad = true;"],
+    ["let resolvedColorFeatureLookupCache =", "globalThis.publishedLookup = findResolvedColorFeatureById; let resolvedColorFeatureLookupCache ="],
+    ["return indexedFeature;", "return runtimeState;"],
+  ]) {
+    assert.ok(source.includes(before));
+    const result = inspect({ source: source.replace(before, after) });
+    assert.equal(result.receipt, null, after);
+    assert.ok(result.violations.length);
   }
 });
 

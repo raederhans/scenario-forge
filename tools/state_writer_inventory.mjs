@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { parse } from "acorn";
 import * as walk from "acorn-walk";
-import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources } from "./state_political_cache_borrow_contract.mjs";
+import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources, resolvePoliticalCacheOperation } from "./state_political_cache_borrow_contract.mjs";
 import { STATE_LOCALIZATION_BORROW_MODULE_PATH, inspectStateLocalizationBorrowSources } from "./state_localization_borrow_contract.mjs";
 import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
@@ -2227,6 +2227,7 @@ function analyzeBindingMutations(
     });
   }
   const resolvingLocalCallResultNodes = new Set();
+  const localCallResultContexts = [];
   const provenOwnerBorrowedStorageByRecord = new WeakMap();
   const provenBorrowedOwnerByNode = new WeakMap();
   const consumedBorrowedReturnFunctions = new WeakSet();
@@ -2396,7 +2397,12 @@ function analyzeBindingMutations(
     if (!node) {
       return { status: "none", reference: null };
     }
-    if (provenPoliticalCacheOperation(node)) return { status: "none", reference: null };
+    const cacheOperation = politicalCacheOperation(node);
+    if (cacheOperation?.admitCall || cacheOperation?.kind === "feature-lookup-helper") {
+      return cacheOperation.borrowedResultPaths.length
+        ? { status: "maybe", reference: null, borrowedPaths: cacheOperation.borrowedResultPaths }
+        : { status: "none", reference: null };
+    }
     const localizationResult = provenLocalizationResult(node);
     if (localizationResult) return localizationResult;
     const scopedOperation = provenScopedBorrowedOperation(node);
@@ -2575,12 +2581,18 @@ function analyzeBindingMutations(
           if (key === null || key === undefined) return { status: "maybe", reference: null };
           for (const path of value.borrowedPaths || [[]]) paths.push([String(key), ...path]);
         }
-        if (paths.length && hasProvenBorrowedInput) return { status: "maybe", reference: null, borrowedPaths: paths };
+        // A helper's fresh plain return container can carry a tracked field
+        // without making its unrelated fields state aliases. This also lets a
+        // known receiving helper be analyzed with the exact borrowed path mask.
+        if (paths.length && (hasProvenBorrowedInput || localCallResultContexts.at(-1)?.helperState === aliasRecords)) {
+          return { status: "maybe", reference: null, borrowedPaths: paths };
+        }
       }
       return { status: "maybe", reference: null };
     }
     const rootIdentifier = rawRootIdentifier(node);
     const rootRecord = analysis.resolveIdentifier(rootIdentifier);
+    establishLocalReturnAlias(rootRecord, rootIdentifier, aliasRecords);
     if (isImmutableFunctionRecord(rootRecord)) {
       return { status: "none", reference: null };
     }
@@ -2744,6 +2756,7 @@ function analyzeBindingMutations(
       // Arguments are resolved in the caller; returned values belong to the
       // callee, even when its hoisted declaration follows the caller.
       executionFunctionStack.push(helperNode);
+      localCallResultContexts.push({ helperNode, helperState, resolvingRecords: new Set(), establishedRecords: new Set() });
       enteredCalleeScope = true;
       const returnedExpressions = helperNode.type === "ArrowFunctionExpression"
         && helperNode.body?.type !== "BlockStatement"
@@ -2772,9 +2785,39 @@ function analyzeBindingMutations(
         }),
       );
     } finally {
-      if (enteredCalleeScope) executionFunctionStack.pop();
+      if (enteredCalleeScope) {
+        localCallResultContexts.pop();
+        executionFunctionStack.pop();
+      }
       resolvingLocalCallResultNodes.delete(helperNode);
     }
+  }
+
+  function establishLocalReturnAlias(record, useNode, aliasRecords) {
+    const context = localCallResultContexts.at(-1);
+    if (!context || context.helperState !== aliasRecords || record?.kind !== "variable"
+      || record.declarationKind !== "const" || !record.init
+      || resolution.targetRecords.has(record) || context.establishedRecords.has(record)) return;
+    const helperRecord = functionRecordForNode(context.helperNode);
+    if (!helperRecord || !analysis.isScopeDescendant(record.scope, helperRecord.scope)
+      || record.ownerNode?.start < context.helperNode.start || record.ownerNode?.end > context.helperNode.end) return;
+    // This is a return-value projection, not a second execution of the helper.
+    // Resolve only immutable lexical initializers in the callee's scope. A TDZ,
+    // cycle or identity transition remains unknown rather than becoming detached.
+    if (context.resolvingRecords.has(record) || record.ownerNode.end > useNode.start
+      || isIdentityTransitionRecord(record)) {
+      aliasRecords.set(record, maybeTrackedState());
+      return;
+    }
+    context.resolvingRecords.add(record);
+    try {
+      transferPatternClassification(record.ownerNode.id,
+        referenceClassification(record.init, aliasRecords), record.init, aliasRecords,
+        { preserveConfiguredTargets: true });
+      for (const identifier of collectPatternIdentifiers(record.ownerNode.id)) {
+        context.establishedRecords.add(analysis.resolveIdentifier(identifier));
+      }
+    } finally { context.resolvingRecords.delete(record); }
   }
 
   function identityTransitionMayReachTrackedState(
@@ -4472,13 +4515,18 @@ function analyzeBindingMutations(
       && createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex") === entry.operationSourceFingerprint) || null;
   }
 
-  function provenPoliticalCacheOperation(node) {
+  function politicalCacheOperation(node) {
     if (!recognizeCurrentContracts || filePath !== POLITICAL_CACHE_RENDERER_PATH
       || node?.type !== "CallExpression") return null;
-    const operation = getPoliticalCacheProofForScan()?.operationsByKey[`${node.start}:${node.end}`];
-    // Admit only exact private-baseline writes with scalar/undefined results.
-    // The read methods retain their diagnostics until result borrowers are proved.
-    return operation?.admitCall === true && !operation.borrowedResultPaths.length ? operation : null;
+    return resolvePoliticalCacheOperation(getPoliticalCacheProofForScan(), node, { filePath, binding });
+  }
+
+  function provenPoliticalCacheOperation(node) {
+    const operation = politicalCacheOperation(node);
+    // A returned borrow is independently classified above. In particular the
+    // lookup helper retains its effects and return escapes; only its private
+    // Map get has an admitted operation receipt.
+    return operation?.admitCall === true ? operation : null;
   }
 
   function localizationProof() {

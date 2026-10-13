@@ -111,9 +111,10 @@ function inspectGeometryConsumers(read, sourcePaths, violations) {
   return { consumers, producers, revisionReadsInvokeGetter: false, otherSnapshotFieldsMayBeBorrowed: true };
 }
 
-// Effects and result ownership are distinct. Only refreshColors/reset are
-// admitted by the scanner. Commit's feature-reader callback and borrowing
-// readers remain conservative until input hooks and receiving consumers are proved.
+// Effects and result ownership are distinct. The private feature Map get is
+// admitted only with its complete allocation/use proof below. Its result and
+// every lookup-helper result still borrow the original feature. Commit/describe
+// retain their diagnostics because input hooks and shared effects remain open.
 export const POLITICAL_CACHE_METHOD_EFFECTS = freeze({
   raster: {
     get: { argumentCount: 1, privateMutation: ["LRU.delete", "LRU.set"], retainedArguments: [], borrowedResultPaths: [[]] },
@@ -130,8 +131,109 @@ export const POLITICAL_CACHE_METHOD_EFFECTS = freeze({
       resultStorage: { path: ["features"], kind: "Map", valueBorrowedPaths: [[]] },
       sharedEffects: ["onMiss -> recordRenderPerfMetric -> renderer diagnostics actions"], admitCall: false },
   },
-  featureIndex: { get: { argumentCount: 1, privateMutation: [], borrowedResultPaths: [[]], admitCall: false } },
+  featureIndex: { get: { argumentCount: 1, privateMutation: [], borrowedResultPaths: [[]], admitCall: true } },
 });
+
+function inspectFeatureLookup(renderer, ast, operationsByKey, violations) {
+  const functionName = "findResolvedColorFeatureById";
+  const cacheName = "resolvedColorFeatureLookupCache";
+  const lookup = functionNode(ast, functionName);
+  const site = node => ({ start: node.start, end: node.end,
+    sourceFingerprint: hash(renderer.slice(node.start, node.end)) });
+  if (!lookup) return null;
+  const localIndex = [];
+  const storageUses = [];
+  const consumers = [];
+  const returns = [];
+  let allocation;
+  fullAncestor(ast, (node, _state, ancestors) => {
+    const parent = ancestors.at(-2);
+    const owner = [...ancestors].reverse().find(entry => entry.type === "FunctionDeclaration");
+    if (owner === lookup && node.type === "VariableDeclarator" && node.id.name === "index") {
+      if (node.init?.type !== "NewExpression" || node.init.callee.name !== "Map" || node.init.arguments.length) {
+        violations.push({ code: "political-cache-feature-index-allocation-drift" });
+      } else allocation = { ...site(node.init), declaration: site(node), bindingName: "index" };
+    }
+    if (owner === lookup && node.type === "Identifier" && node.name === "index") {
+      if (parent?.type === "VariableDeclarator" && parent.id === node) return;
+      const call = ancestors.at(-3);
+      if (parent?.type === "MemberExpression" && parent.object === node && !parent.computed
+        && call?.type === "CallExpression" && call.callee === parent
+        && ["has", "set"].includes(parent.property.name)) {
+        localIndex.push({ ...site(call), method: parent.property.name });
+      } else if (parent?.type !== "Property" || !parent.shorthand || parent.key.name !== "index") {
+        violations.push({ code: "political-cache-feature-index-published" });
+      }
+    }
+    if (node.type === "Identifier" && node.name === cacheName) {
+      if (parent?.type === "VariableDeclarator" && parent.id === node) return;
+      if (owner !== lookup) {
+        violations.push({ code: "political-cache-feature-storage-consumer-drift" }); return;
+      }
+      if (parent?.type === "AssignmentExpression" && parent.left === node && parent.operator === "="
+        && parent.right.type === "ObjectExpression"
+        && parent.right.properties.map(item => item.shorthand && item.key.name).join(",") === "features,revision,index") {
+        storageUses.push({ ...site(parent), kind: "private-storage-replacement" }); return;
+      }
+      const enclosing = ancestors.at(-3);
+      if (parent?.type !== "MemberExpression" || parent.object !== node || parent.computed) {
+        violations.push({ code: "political-cache-feature-storage-published" }); return;
+      }
+      if (["features", "revision"].includes(parent.property.name) && enclosing?.type === "BinaryExpression"
+        && enclosing.operator === "!==" && enclosing.left === parent) {
+        storageUses.push({ ...site(parent), kind: "identity-comparison" }); return;
+      }
+      const call = ancestors.at(-4);
+      if (parent.property.name === "index" && enclosing?.type === "MemberExpression" && !enclosing.computed
+        && enclosing.object === parent && enclosing.property.name === "get" && call?.type === "CallExpression"
+        && call.callee === enclosing && !call.optional && call.arguments.length === 1
+        && call.arguments[0].type === "Identifier" && call.arguments[0].name === "id") {
+        const operation = { ...POLITICAL_CACHE_METHOD_EFFECTS.featureIndex.get, ...site(call),
+          modulePath: POLITICAL_CACHE_RENDERER_PATH, functionName, method: "get", kind: "feature-index-get",
+          borrowedArgumentIndexes: [], storageIdentity: `${POLITICAL_CACHE_RENDERER_PATH}/${functionName}/index` };
+        operationsByKey[`${call.start}:${call.end}`] = operation;
+        storageUses.push({ ...site(call), kind: operation.kind });
+      } else violations.push({ code: "political-cache-feature-storage-use-drift" });
+    }
+    if (node.type === "Identifier" && node.name === functionName) {
+      if (parent === lookup && lookup.id === node) return;
+      if (parent?.type !== "CallExpression" || parent.callee !== node || parent.optional
+        || parent.arguments.length !== 1 || parent.arguments[0].type === "SpreadElement") {
+        violations.push({ code: "political-cache-feature-helper-published" }); return;
+      }
+      const operation = { ...site(parent), modulePath: POLITICAL_CACHE_RENDERER_PATH,
+        functionName: owner?.id?.name, kind: "feature-lookup-helper", method: functionName,
+        argumentCount: 1, borrowedArgumentIndexes: [], borrowedResultPaths: [[]], admitCall: false,
+        inputEffects: ["String(featureId): coercion may invoke user code or throw"],
+        nestedEffects: ["state landIndex.get provider", "feature identity getters/coercion", "private index replacement"] };
+      consumers.push(operation);
+      operationsByKey[`${parent.start}:${parent.end}`] = operation;
+    }
+    if (owner === lookup && node.type === "ReturnStatement") returns.push({ ...site(node.argument),
+      borrowedResultPaths: node.argument.type === "Literal" && node.argument.value === null ? [] : [[]] });
+  });
+  if (!allocation || localIndex.map(entry => entry.method).sort().join(",") !== "has,set"
+    || storageUses.length !== 4 || consumers.length !== 4 || returns.length !== 3) {
+    violations.push({ code: "political-cache-feature-lookup-graph-drift" });
+  }
+  return { functionName, ...site(lookup), borrowedResultPaths: [[]], admitCall: false,
+    allocation, localIndex, storageUses, consumers, returns,
+    storageIdentity: `${POLITICAL_CACHE_RENDERER_PATH}/${functionName}/index`,
+    inputFeatureOrigin: "getResolvedColorSourceFeatures() retains original state collection features",
+    lookupResultOrigin: "runtimeState.landIndex or the private Map value; neither is detached" };
+}
+
+// The scanner may consume a result proof without accepting the call's effects.
+// Keep the source state binding exact: these roots do not describe unrelated
+// function-parameter scans, even when the expression happens to be identical.
+export function resolvePoliticalCacheOperation(receipt, node, { filePath, binding } = {}) {
+  if (!receipt || filePath !== POLITICAL_CACHE_RENDERER_PATH || node?.type !== "CallExpression") return null;
+  const operation = receipt.operationsByKey[`${node.start}:${node.end}`];
+  if (!operation) return null;
+  if (operation.borrowedResultPaths.length && !(binding?.kind === "module" && binding.name === "runtimeState"
+    && binding.importSource === "./state.js" && binding.importedName === "state")) return null;
+  return operation;
+}
 
 export function inspectStatePoliticalCacheBorrowSources({
   source,
@@ -198,8 +300,8 @@ export function inspectStatePoliticalCacheBorrowSources({
     }
     const derivedFactory = functionNode(parseModule(read(POLITICAL_DERIVED_CACHE_PATH)), "createPoliticalDerivedStateCache");
     const rasterFactory = functionNode(parseModule(read(POLITICAL_RASTER_CACHE_PATH)), "createPoliticalIdRasterCache");
-    const lookup = functionNode(ast, "findResolvedColorFeatureById");
-    if (!derivedFactory || !rasterFactory || !lookup) violations.push({ code: "political-cache-factory-missing" });
+    const featureLookup = inspectFeatureLookup(renderer, ast, operationsByKey, violations);
+    if (!derivedFactory || !rasterFactory || !featureLookup) violations.push({ code: "political-cache-factory-missing" });
     if (violations.length) return { violations, receipt: null };
     return { violations, receipt: freeze({
       modulePath: POLITICAL_CACHE_RENDERER_PATH, sourceFingerprint: fingerprints[POLITICAL_CACHE_RENDERER_PATH],
@@ -209,10 +311,10 @@ export function inspectStatePoliticalCacheBorrowSources({
         { modulePath: POLITICAL_DERIVED_CACHE_PATH, sourceFingerprint: hash(read(POLITICAL_DERIVED_CACHE_PATH).slice(derivedFactory.start, derivedFactory.end)) },
         { modulePath: POLITICAL_RASTER_CACHE_PATH, sourceFingerprint: hash(read(POLITICAL_RASTER_CACHE_PATH).slice(rasterFactory.start, rasterFactory.end)) },
       ],
-      featureLookup: { functionName: lookup.id.name, sourceFingerprint: hash(renderer.slice(lookup.start, lookup.end)), borrowedResultPaths: [[]], admitCall: false },
+      featureLookup,
       diagnosticEffect: { provider: "recordRenderPerfMetric", factory: "createRenderPerfMetricsRuntimeOwner",
         actions: ["ensureRenderPerfMetricsState", "commitRenderPerfMetricState"], mirror: "mirrorRenderPerfMetricSnapshot" },
-      unadmittedBorrowedConsumers: ["derived.commit", "derived.describe", "raster.get", "raster.peek", "raster.entries", "featureIndex.get"],
+      unadmittedBorrowedConsumers: ["derived.commit", "derived.describe", "raster.get", "raster.peek", "raster.entries", "findResolvedColorFeatureById"],
     }) };
   } catch (error) {
     return { violations: [{ code: "political-cache-proof-unavailable", message: error.message }], receipt: null };
