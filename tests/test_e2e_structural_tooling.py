@@ -2080,16 +2080,15 @@ jobs:
 
     def test_pr_browser_profiles_install_backend_python_dependencies(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "verify-shared.yml").read_text(encoding="utf-8")
-        download_index = workflow.index("- name: Download Python wheel cache")
         install_index = workflow.index("- name: Install Python test dependencies")
         guard_index = workflow.index("- name: Check deploy-minimal dependency guardrails")
-        download_step = workflow[download_index:install_index]
         install_step = workflow[install_index:guard_index]
 
-        self.assertNotIn("\n        if:", download_step)
         self.assertNotIn("\n        if:", install_step)
-        self.assertIn("requirements-dev.lock.txt", download_step)
-        self.assertIn("requirements-dev.lock.txt", install_step)
+        self.assertIn("python -m pip install -r requirements-dev.lock.txt", install_step)
+        self.assertIn("python -m pip install -r requirements-ci-min.lock.txt", install_step)
+        self.assertLess(install_index, workflow.index("- name: Run smoke E2E"))
+        self.assertIn("cache-dependency-path:", workflow)
 
     def test_nightly_uses_platform_shards_exact_p4_evidence_and_final_aggregator(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "nightly-verification.yml").read_text(encoding="utf-8")

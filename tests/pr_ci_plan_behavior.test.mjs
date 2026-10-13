@@ -208,7 +208,9 @@ test("PR control-plane changes force browser smoke and Golden Demo", () => {
   const plan = planPullRequest({ changedFiles: [".github/workflows/pr-verify.yml"] });
   assert.equal(plan.runSmoke, true);
   assert.equal(plan.runDemo, true);
-  assert.equal(plan.runPages, true);
+  assert.equal(plan.runPages, false);
+  assert.equal(plan.pagesMode, "none");
+  assert.equal(planPullRequest({ changedFiles: [".github/workflows/verify-shared.yml"] }).runPages, true);
 });
 
 test("one scenario change selects only its strict contract job", () => {

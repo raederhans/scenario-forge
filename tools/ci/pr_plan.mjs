@@ -31,6 +31,16 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "tests/hgo_project_routing_behavior.test.mjs", "tools/build_pages_dist.py",
   ]);
   const controlPlane = matches(["tools/ci/**", ".github/workflows/pr-verify.yml", ".github/workflows/verify-shared.yml"]);
+  // These planners only choose checks; they are not inputs to the Pages artifact.
+  // Unknown CI tools and the workflow that actually builds it remain conservative.
+  const routingOnlyInputs = new Set([
+    "tools/ci/pr_plan.mjs", "tools/ci/perf_policy.mjs", "tools/ci/pr_delivery_plan.mjs",
+    ".github/workflows/pr-verify.yml",
+  ]);
+  const artifactPolicyRelevant = controlPlane && files.some(file => (
+    (file.startsWith("tools/ci/") || file === ".github/workflows/verify-shared.yml")
+    && !routingOnlyInputs.has(file)
+  ));
   // The shared manifest comparator proves only isolated, unreferenced test:/verify:
   // script edits. Keep their affected contracts, but avoid artifact setup.
   // Missing manifests and every dependency, lifecycle or build change stay heavy.
@@ -52,7 +62,7 @@ export function planPullRequest({ changedFiles = [], labels = [], packageRequire
     "js/core/renderer/cached_pass_compositor_owner.js",
     "tests/renderer_draw_canvas_orchestration_inventory_boundary.test.mjs",
   ]);
-  const pagesFull = full || controlPlane || dependencyChange || rendererMirrorRelevant || matches([
+  const pagesFull = full || artifactPolicyRelevant || dependencyChange || rendererMirrorRelevant || matches([
     "data/**", "dist/**", "vendor/**", "landing/**", "index.html", "app.js", "styles.css",
     "tools/build_pages_dist.py", "tools/pages_*", "tools/app_entry_resolver.py",
     "tools/check_pages_source_graph.py", "tools/build_landing_*", "tools/runtime_json_packing.py",

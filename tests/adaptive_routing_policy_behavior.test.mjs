@@ -8,6 +8,19 @@ import {
   nonBehavioralClassification,
 } from "../tools/select_verification_targets.mjs";
 
+test("infrastructure audits follow affected inputs rather than ordinary editing changes", () => {
+  const commands = (file) => buildRepositoryRecommendation([file]).recommendedCommands.map(entry => entry.commandRef);
+  const structural = "python -m unittest tests.test_e2e_structural_tooling -q";
+  for (const file of ["js/core/history_manager.js", "css/editor-workspace.css"]) {
+    assert.ok(!commands(file).includes(structural), file);
+    assert.ok(!commands(file).includes("verify:local-infra"), file);
+  }
+  assert.ok(commands(".github/workflows/verify-shared.yml").includes(structural));
+  assert.ok(commands("tools/e2e_layering.mjs").includes("verify:test:e2e-layers"));
+  assert.ok(commands("tools/check_console_allowlist_decay.mjs").includes("verify:test-console-allowlist"));
+  assert.ok(commands("tools/check_test_timeout_guardrails.mjs").includes("verify:test-timeout-guardrails"));
+});
+
 test("ordinary project documentation is advisory instead of a hard route gap", () => {
   assert.equal(nonBehavioralClassification("docs/active/new-feature/notes.md"), "documentation-advisory");
   assert.equal(nonBehavioralClassification("README.zh-CN.md"), "documentation-advisory");
