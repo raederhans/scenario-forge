@@ -1,8 +1,18 @@
-import { normalizeCountryCodeAlias as normalizeCountryCode } from "../../core/country_code_aliases.js";
+import { COUNTRY_CODE_ALIASES } from "../../core/country_code_aliases.js";
 
 // Country grouping, ordering and expansion selection read the live sidebar state.
 // No DOM or renderer dependencies: both inspector and preset UI use this model.
 export function createCountryInspectorModel(runtimeState, t) {
+  function primitiveText(value) {
+    if (typeof value === "object" || typeof value === "function") return "";
+    return String(value || "");
+  }
+
+  function normalizeCountryCode(value) {
+    const code = primitiveText(value).trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    return Object.hasOwn(COUNTRY_CODE_ALIASES, code) ? COUNTRY_CODE_ALIASES[code] : code;
+  }
+
   function buildInspectorTopLevelCountryEntries(entries = []) {
     return (Array.isArray(entries) ? entries : []).filter(
       (entry) => !entry?.releasable
@@ -39,9 +49,9 @@ export function createCountryInspectorModel(runtimeState, t) {
   });
 
   function readExplicitInspectorGroupMeta(entry = {}) {
-    const id = String(entry?.inspector_group_id || entry?.inspectorGroupId || "").trim();
-    const label = String(entry?.inspector_group_label || entry?.inspectorGroupLabel || "").trim();
-    const anchorId = String(entry?.inspector_group_anchor_id || entry?.inspectorGroupAnchorId || "").trim();
+    const id = primitiveText(entry?.inspector_group_id || entry?.inspectorGroupId || "").trim();
+    const label = primitiveText(entry?.inspector_group_label || entry?.inspectorGroupLabel || "").trim();
+    const anchorId = primitiveText(entry?.inspector_group_anchor_id || entry?.inspectorGroupAnchorId || "").trim();
     if (!id) {
       return {
         id: "",
@@ -68,7 +78,7 @@ export function createCountryInspectorModel(runtimeState, t) {
         entry.provenance_iso2,
         entry.provenanceIso2,
       ].forEach((value) => {
-        const normalized = String(value || "").trim().toUpperCase();
+        const normalized = primitiveText(value).trim().toUpperCase();
         if (normalized) {
           iso2Codes.add(normalized);
         }
@@ -85,7 +95,7 @@ export function createCountryInspectorModel(runtimeState, t) {
     const explicitEntryGroup = readExplicitInspectorGroupMeta(entry || {});
     if (explicitEntryGroup.id) return explicitEntryGroup;
 
-    if (String(runtimeState.activeScenarioId || "").trim() !== TNO_SCENARIO_ID) {
+    if (primitiveText(runtimeState.activeScenarioId || "").trim() !== TNO_SCENARIO_ID) {
       return explicitEntryGroup;
     }
 
@@ -122,18 +132,18 @@ export function createCountryInspectorModel(runtimeState, t) {
     const scenarioMeta = getScenarioCountryMeta(entryOrCode);
     const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
     const candidates = [
-      scenarioMeta?.preset_lookup_code,
-      scenarioMeta?.presetLookupCode,
-      entry?.preset_lookup_code,
-      entry?.presetLookupCode,
-      scenarioMeta?.lookup_iso2,
-      scenarioMeta?.lookupIso2,
-      entry?.lookup_iso2,
-      entry?.lookupIso2,
-      scenarioMeta?.base_iso2,
-      scenarioMeta?.baseIso2,
-      entry?.base_iso2,
-      entry?.baseIso2,
+      normalizeCountryCode(scenarioMeta?.preset_lookup_code),
+      normalizeCountryCode(scenarioMeta?.presetLookupCode),
+      normalizeCountryCode(entry?.preset_lookup_code),
+      normalizeCountryCode(entry?.presetLookupCode),
+      normalizeCountryCode(scenarioMeta?.lookup_iso2),
+      normalizeCountryCode(scenarioMeta?.lookupIso2),
+      normalizeCountryCode(entry?.lookup_iso2),
+      normalizeCountryCode(entry?.lookupIso2),
+      normalizeCountryCode(scenarioMeta?.base_iso2),
+      normalizeCountryCode(scenarioMeta?.baseIso2),
+      normalizeCountryCode(entry?.base_iso2),
+      normalizeCountryCode(entry?.baseIso2),
       fallbackCode,
     ];
 
@@ -160,18 +170,18 @@ export function createCountryInspectorModel(runtimeState, t) {
     const scenarioMeta = getScenarioCountryMeta(entryOrCode);
     const entry = typeof entryOrCode === "object" && entryOrCode ? entryOrCode : null;
     const candidates = [
-      scenarioMeta?.release_lookup_iso2,
-      scenarioMeta?.releaseLookupIso2,
-      entry?.release_lookup_iso2,
-      entry?.releaseLookupIso2,
-      scenarioMeta?.lookup_iso2,
-      scenarioMeta?.lookupIso2,
-      entry?.lookup_iso2,
-      entry?.lookupIso2,
-      scenarioMeta?.base_iso2,
-      scenarioMeta?.baseIso2,
-      entry?.base_iso2,
-      entry?.baseIso2,
+      normalizeCountryCode(scenarioMeta?.release_lookup_iso2),
+      normalizeCountryCode(scenarioMeta?.releaseLookupIso2),
+      normalizeCountryCode(entry?.release_lookup_iso2),
+      normalizeCountryCode(entry?.releaseLookupIso2),
+      normalizeCountryCode(scenarioMeta?.lookup_iso2),
+      normalizeCountryCode(scenarioMeta?.lookupIso2),
+      normalizeCountryCode(entry?.lookup_iso2),
+      normalizeCountryCode(entry?.lookupIso2),
+      normalizeCountryCode(scenarioMeta?.base_iso2),
+      normalizeCountryCode(scenarioMeta?.baseIso2),
+      normalizeCountryCode(entry?.base_iso2),
+      normalizeCountryCode(entry?.baseIso2),
       fallbackCode,
     ];
 

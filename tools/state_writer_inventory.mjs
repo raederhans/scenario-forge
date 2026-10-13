@@ -6,6 +6,7 @@ import * as walk from "acorn-walk";
 import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources, resolvePoliticalCacheOperation } from "./state_political_cache_borrow_contract.mjs";
 import { STATE_LOCALIZATION_BORROW_MODULE_PATH, inspectStateLocalizationBorrowSources } from "./state_localization_borrow_contract.mjs";
 import { inspectStateWaterPathResourceSources, resolveStateWaterPathResourceHelper } from "./state_water_path_resource_contract.mjs";
+import { inspectStateCountryInspectorProjectionSources, resolveStateCountryInspectorProjectionCall } from "./state_country_inspector_projection_contract.mjs";
 import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
 import {
@@ -2186,6 +2187,7 @@ function analyzeBindingMutations(
     getPoliticalCacheProofForScan = null,
     getLocalizationProofForScan = null,
     getWaterPathResourceProofForScan = null,
+    getCountryInspectorProjectionProofForScan = null,
   } = {},
 ) {
   const normalizedDerivedAliasTaintMode =
@@ -2407,6 +2409,8 @@ function analyzeBindingMutations(
     }
     const localizationResult = provenLocalizationResult(node);
     if (localizationResult) return localizationResult;
+    const countryProjection = provenCountryInspectorProjection(node);
+    if (countryProjection) return { status: "none", reference: null };
     const scopedOperation = provenScopedBorrowedOperation(node);
     if (scopedOperation) return scopedOperation.borrowedResultPaths.length
       ? { status: "maybe", reference: null, borrowedPaths: scopedOperation.borrowedResultPaths }
@@ -4537,6 +4541,18 @@ function analyzeBindingMutations(
     return operation?.admitCall === true ? operation : null;
   }
 
+  function provenCountryInspectorProjection(node) {
+    if (node?.type !== "CallExpression" || !recognizeCurrentContracts
+      || binding.kind !== "function-parameter"
+      || binding.functionName !== "createCountryInspectorModel"
+      || binding.parameterName !== "runtimeState" || binding.parameterIndex !== 0
+      || binding.parameterPath !== "$") return null;
+    const helper = directImmutableLocalHelperNode(node);
+    return helper && resolveStateCountryInspectorProjectionCall(
+      getCountryInspectorProjectionProofForScan?.(), node, helper, { source, filePath },
+    );
+  }
+
   function localizationProof() {
     // The borrowed origin is this exact imported state binding, not every
     // independently scanned parameter in the two helpers.
@@ -5490,6 +5506,7 @@ function analyzeBindingMutations(
     if (node.type === "CallExpression" || node.type === "NewExpression") {
       const politicalCacheOperation = provenPoliticalCacheOperation(node);
       const localizationMapCall = provenLocalizationMapCall(node);
+      const countryProjection = provenCountryInspectorProjection(node);
       const scopedOperation = provenScopedBorrowedOperation(node);
       const scopedMembershipCall = provenScopedMembershipCall(node);
       if ((scopedOperation || politicalCacheOperation || localizationMapCall) && node.callee.type === "MemberExpression") {
@@ -5559,6 +5576,7 @@ function analyzeBindingMutations(
             scopedOperation || provenBorrowedArrayAppend
             || politicalCacheOperation?.borrowedArgumentIndexes.includes(argumentIndex)
             || Boolean(localizationMapCall)
+            || countryProjection?.borrowedArgumentIndexes.includes(argumentIndex)
             || provenDirectBorrowedCallbackInvocation(node)?.invocationBorrowedArgumentIndexes.includes(argumentIndex)
             || (localBorrowedHelper && !executionFunctionStack.includes(localBorrowedHelper)
               && localBorrowedHelper.params?.[argumentIndex]
@@ -5641,6 +5659,7 @@ function analyzeBindingMutations(
       if (scopedMembershipCall) for (const index of scopedMembershipCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (politicalCacheOperation) for (const index of politicalCacheOperation.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (localizationMapCall) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
+      if (countryProjection) for (const index of countryProjection.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (localizationOperation(node)?.kind === "lookup-helper-invocation") delegatedArgumentIndexes.add(1);
       if (provenCapabilityCall) for (const index of provenCapabilityCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (provenBorrowedMapRead) delegatedArgumentIndexes.add(0);
@@ -7108,6 +7127,15 @@ export function scanStateMutationInventory(
   let politicalCacheProof;
   let localizationProof;
   let waterPathResourceProof;
+  let countryInspectorProjectionProof;
+  const getCountryInspectorProjectionProofForScan = () => {
+    if (countryInspectorProjectionProof === undefined) {
+      countryInspectorProjectionProof = recognizeCurrentContracts
+        && filePath === "js/ui/sidebar/country_inspector_model.js"
+        ? inspectStateCountryInspectorProjectionSources({ source: normalizedSource }).receipt : null;
+    }
+    return countryInspectorProjectionProof;
+  };
   const getWaterPathResourceProofForScan = () => {
     if (waterPathResourceProof === undefined) {
       waterPathResourceProof = recognizeCurrentContracts
@@ -7185,6 +7213,7 @@ export function scanStateMutationInventory(
           getPoliticalCacheProofForScan,
           getLocalizationProofForScan,
           getWaterPathResourceProofForScan,
+          getCountryInspectorProjectionProofForScan,
         },
       );
     });
