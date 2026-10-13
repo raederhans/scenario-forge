@@ -1183,6 +1183,22 @@ shadowed.safe = true;`;
   assert.equal(findings.some(finding => [7, 9].includes(finding.line)), false, JSON.stringify(findings));
 });
 
+test("local helper return containers do not treat unclassified fields as detached", () => {
+  for (const body of [
+    "const inner = {}; inner.b = model.feature; return { a: model.feature, inner };",
+    "const inner = {}; Object.assign(inner, { b: model.feature }); return { a: model.feature, inner };",
+    "const feature = model.feature; function capture() { return { b: feature }; } return { a: model.feature, inner: capture() };",
+    "class Wrap { constructor(feature) { this.b = feature; } } return { a: model.feature, inner: new Wrap(model.feature) };",
+    "const inner = {}; inner.b = model.feature; if (condition) return model.feature; return { a: model.feature, inner };",
+  ]) {
+    const source = `import { state as runtimeState } from "./state.js";\nfunction lookup(model) { ${body} }\nconst result = lookup(runtimeState);\nresult.inner.b.bad = true;`;
+    const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+      bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+    assert.ok(findings.some(finding => finding.line === 4
+      && (finding.operation === "assign" || finding.reason === "ambiguous-alias-flow")), JSON.stringify(findings));
+  }
+});
+
 test("local helper cyclic const and early captured bindings stay conservative without recursion", () => {
   for (const helper of [
     "function lookup() { const first = second; const second = first; return first; }",

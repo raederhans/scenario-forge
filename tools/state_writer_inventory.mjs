@@ -2581,10 +2581,7 @@ function analyzeBindingMutations(
           if (key === null || key === undefined) return { status: "maybe", reference: null };
           for (const path of value.borrowedPaths || [[]]) paths.push([String(key), ...path]);
         }
-        // A helper's fresh plain return container can carry a tracked field
-        // without making its unrelated fields state aliases. This also lets a
-        // known receiving helper be analyzed with the exact borrowed path mask.
-        if (paths.length && (hasProvenBorrowedInput || localCallResultContexts.at(-1)?.helperState === aliasRecords)) {
+        if (paths.length && hasProvenBorrowedInput) {
           return { status: "maybe", reference: null, borrowedPaths: paths };
         }
       }
@@ -2756,7 +2753,6 @@ function analyzeBindingMutations(
       // Arguments are resolved in the caller; returned values belong to the
       // callee, even when its hoisted declaration follows the caller.
       executionFunctionStack.push(helperNode);
-      localCallResultContexts.push({ helperNode, helperState, resolvingRecords: new Set(), establishedRecords: new Set() });
       enteredCalleeScope = true;
       const returnedExpressions = helperNode.type === "ArrowFunctionExpression"
         && helperNode.body?.type !== "BlockStatement"
@@ -2769,24 +2765,29 @@ function analyzeBindingMutations(
       }
       return mergeReferenceClassifications(
         returnedExpressions.map((returnedExpression) => {
-          const classification = referenceClassification(
-            returnedExpression,
-            helperState,
-          );
-          if (classification.status !== "none") {
-            return classification;
+          const returnState = cloneAliasRecords(helperState);
+          const returnNode = unwrapChain(returnedExpression);
+          // Extend direct returned aliases only. A generic container field with
+          // no tracked classification is not a proof that the field is detached.
+          // Keep each return's projection isolated from the other return sites.
+          localCallResultContexts.push({ helperNode, helperState: returnState,
+            resolveLocalAliases: !["ObjectExpression", "ArrayExpression"].includes(returnNode?.type),
+            resolvingRecords: new Set(), establishedRecords: new Set() });
+          try {
+            const classification = referenceClassification(returnedExpression, returnState);
+            if (classification.status !== "none") {
+              return classification;
+            }
+            return containerExpressionContainsTrackedReference(returnedExpression, returnState)
+              ? { status: "maybe", reference: null }
+              : classification;
+          } finally {
+            localCallResultContexts.pop();
           }
-          return containerExpressionContainsTrackedReference(
-            returnedExpression,
-            helperState,
-          )
-            ? { status: "maybe", reference: null }
-            : classification;
         }),
       );
     } finally {
       if (enteredCalleeScope) {
-        localCallResultContexts.pop();
         executionFunctionStack.pop();
       }
       resolvingLocalCallResultNodes.delete(helperNode);
@@ -2795,7 +2796,7 @@ function analyzeBindingMutations(
 
   function establishLocalReturnAlias(record, useNode, aliasRecords) {
     const context = localCallResultContexts.at(-1);
-    if (!context || context.helperState !== aliasRecords || record?.kind !== "variable"
+    if (!context?.resolveLocalAliases || context.helperState !== aliasRecords || record?.kind !== "variable"
       || record.declarationKind !== "const" || !record.init
       || resolution.targetRecords.has(record) || context.establishedRecords.has(record)) return;
     const helperRecord = functionRecordForNode(context.helperNode);
