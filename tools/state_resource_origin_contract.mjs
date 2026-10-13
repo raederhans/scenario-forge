@@ -33,7 +33,7 @@ const callsNamed = (node, name) => {
 function productionSourcePaths(directory = "js") {
   return readdirSync(new URL(`../${directory}/`, import.meta.url), { withFileTypes: true })
     .flatMap((entry) => entry.isDirectory() ? productionSourcePaths(`${directory}/${entry.name}`)
-      : /\.(?:m?js)$/.test(entry.name) ? [`${directory}/${entry.name}`] : []);
+      : /\.(?:m?js)$/i.test(entry.name) ? [`${directory}/${entry.name}`] : []);
 }
 
 // A resource origin proof for exactly one factory parameter. This does not
@@ -109,15 +109,19 @@ export function inspectPoliticalGpuResourceOrigin({
         const target = pathname.startsWith(".")
           ? posix.normalize(posix.join(posix.dirname(file), pathname))
           : pathname.startsWith("/") ? posix.normalize(pathname).slice(1) : "";
-        if ([POLITICAL_GPU_RESOURCE_PATH, ownerPath].includes(target)) {
-          const expectedName = target === ownerPath ? "createPoliticalIdRasterRuntimeOwner" : "createPoliticalIdRasterGpu";
+        // Windows can resolve differently cased URLs to the same implementation.
+        // Folding is only for detecting protected consumers; source/provider
+        // fingerprints and the existing edge set still control admission.
+        const protectedTarget = target.toLowerCase();
+        if ([POLITICAL_GPU_RESOURCE_PATH, ownerPath].includes(protectedTarget)) {
+          const expectedName = protectedTarget === ownerPath ? "createPoliticalIdRasterRuntimeOwner" : "createPoliticalIdRasterGpu";
           if (node.type !== "ImportDeclaration" || node.specifiers.length !== 1
             || node.specifiers[0].type !== "ImportSpecifier" || node.specifiers[0].imported?.name !== expectedName
             || node.specifiers[0].local?.name !== expectedName) {
             violations.push({ code: "resource-origin-consumer-shape-invalid", modulePath: file });
           }
-          edges.push(`${file}->${target}`);
-        } else if (/political_id_raster_(?:gpu|runtime_owner)/.test(pathname)) {
+          edges.push(`${file}->${protectedTarget}`);
+        } else if (/political_id_raster_(?:gpu|runtime_owner)/i.test(pathname)) {
           violations.push({ code: "resource-origin-consumer-path-unresolved", modulePath: file });
         }
       });

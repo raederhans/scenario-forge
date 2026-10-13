@@ -63,6 +63,25 @@ test("encoded paths actually import the same GPU and owner factories", async () 
   }
 });
 
+test("resource graph rejects case aliases, including encoded uppercase targets", () => {
+  for (const target of targets) {
+    for (const path of [`./renderer/${target.file.slice(0, -3).toUpperCase()}.js`, `./RENDERER/${target.file.toUpperCase()}`, encodeAll(`./renderer/${target.file.toUpperCase()}`),
+      `https://example.invalid/js/core/renderer/${target.file.toUpperCase()}`]) {
+      for (const createSource of Object.values(consumers)) assertRejected(createSource(path, target.factory));
+    }
+  }
+});
+
+test("Windows case aliases load the protected implementation", { skip: process.platform !== "win32" }, async () => {
+  for (const target of targets) {
+    const original = await import(`../js/core/renderer/${target.file}`);
+    const alias = await import(`../js/core/renderer/${target.file.slice(0, -3).toUpperCase()}.js`);
+    // Node caches different URL spellings separately, so function identity need
+    // not match even though the same source and resource effects are loaded.
+    assert.equal(alias[target.factory].toString(), original[target.factory].toString());
+  }
+});
+
 test("resource graph rejects separator, dot segment, root and URL aliases of both targets", () => {
   for (const target of targets) {
     for (const path of [

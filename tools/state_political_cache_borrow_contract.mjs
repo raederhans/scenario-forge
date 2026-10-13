@@ -54,7 +54,7 @@ const freeze = value => {
 function productionSourcePaths(directory = "js") {
   return readdirSync(new URL(`../${directory}/`, import.meta.url), { withFileTypes: true })
     .flatMap(entry => entry.isDirectory() ? productionSourcePaths(`${directory}/${entry.name}`)
-      : /\.(?:m?js)$/.test(entry.name) ? [`${directory}/${entry.name}`] : []);
+      : /\.(?:m?js)$/i.test(entry.name) ? [`${directory}/${entry.name}`] : []);
 }
 
 function inspectGeometryConsumers(read, sourcePaths, violations) {
@@ -74,7 +74,7 @@ function inspectGeometryConsumers(read, sourcePaths, violations) {
       const target = decodedPath.startsWith(".")
         ? posix.normalize(posix.join(posix.dirname(file), decodedPath))
         : decodedPath.startsWith("/") ? decodedPath.slice(1) : "";
-      if (target === geometryPath) {
+      if (target.toLowerCase() === geometryPath) {
         const expected = geometryConsumerImports[file];
         if (node.type !== "ImportDeclaration" || !expected || node.specifiers.length !== expected.length
           || node.specifiers.some(item => item.type !== "ImportSpecifier" || item.local?.name !== item.imported?.name)
@@ -84,7 +84,7 @@ function inspectGeometryConsumers(read, sourcePaths, violations) {
         consumers.push({ modulePath: file, target, start: node.start, end: node.end, sourceFingerprint: hash(source.slice(node.start, node.end)) });
       } else if (node.type === "ImportExpression" && value === null) {
         violations.push({ code: "political-cache-dynamic-consumer-unresolved", modulePath: file });
-      } else if (/political_geometry_store/.test(decodedPath)) {
+      } else if (/political_geometry_store/i.test(decodedPath)) {
         violations.push({ code: "political-cache-geometry-consumer-path-unresolved", modulePath: file });
       }
     });
