@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readPoliticalIdRasterPreference, getPoliticalIdRasterEligibility } from "../js/core/renderer/political_id_raster_trial.js";
+import { readPoliticalIdRasterPreference, readPoliticalRenderPolicy, writePoliticalRenderMode, writePoliticalIdRasterPreference, getPoliticalIdRasterEligibility } from "../js/core/renderer/political_id_raster_trial.js";
 
 test("URL overrides the saved experiment without requiring storage access", () => {
   const broken = { getItem() { throw new Error("blocked"); } };
@@ -31,7 +31,7 @@ test("trial control persists changes and exposes translatable live status", asyn
   let info = { requested: false, displayState: "off", reason: "off" };
   const changes = [];
   try {
-    const options = { document: { getElementById: id => id === "politicalRasterTrial" ? toggle : status },
+    const options = { document: { getElementById: id => id === "politicalRasterTrial" ? toggle : id === "politicalRasterTrialStatus" ? status : null },
       getDiagnostics: () => info, t: value => value,
       setEnabled: value => { changes.push(value); info = { requested: value, displayState: "preparing" }; } };
     bindPoliticalRasterTrialControl(options);
@@ -45,4 +45,66 @@ test("trial control persists changes and exposes translatable live status", asyn
     assert.equal(status.textContent, "Precise display restored");
     assert.equal(toggle.checked, true);
   } finally { globalThis.addEventListener = original; }
+});
+
+const policyStore = values => ({ getItem: key => values[key] ?? null });
+test("resident policy is explicit and defaults remain native with preserved legacy hybrid semantics", () => {
+  const read = (search = "", values = {}) => readPoliticalRenderPolicy({ search, storage: policyStore(values) });
+  assert.equal(read().effectiveMode, "vector");
+  assert.equal(read().mode, "auto");
+  assert.equal(read().automaticRasterEnabled, false);
+  assert.equal(read("?political_render_mode=raster").persistent, true);
+  assert.equal(read("?political_id_raster=1").effectiveMode, "hybrid");
+  assert.equal(read("?political_render_mode=vector&political_id_raster=1").requested, false);
+  assert.equal(read("?political_id_raster=0", { "scenario-forge-political-render-mode": "raster" }).requested, false);
+  assert.equal(read("", { "scenario-forge-political-id-raster": "0" }).mode, "vector");
+  assert.equal(read("", { "scenario-forge-political-id-raster": "1" }).mode, "hybrid");
+  assert.equal(read("", { "scenario-forge-political-render-mode": "raster" }).persistent, true);
+  const invalid = read("?political_render_mode=typo");
+  assert.equal(invalid.valid, false); assert.equal(invalid.requested, false);
+  const broken = { getItem() { throw Error("blocked"); } };
+  assert.equal(readPoliticalRenderPolicy({ search: "?political_render_mode=raster", storage: broken }).persistent, true);
+  assert.equal(readPoliticalRenderPolicy({ search: "", storage: broken }).requested, false);
+});
+
+test("explicit mode writes and legacy toggles cannot leave a conflicting URL preference", t => {
+  const originals = Object.fromEntries(["localStorage", "location", "history"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  const values = new Map(); let href = "https://example.test/app/?political_id_raster=0&sample=keep";
+  Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { setItem: (k,v) => values.set(k,v), removeItem: k => values.delete(k) } });
+  Object.defineProperty(globalThis, "location", { configurable: true, value: { get href() { return href; } } });
+  Object.defineProperty(globalThis, "history", { configurable: true, value: { state: {}, replaceState: (_,__,url) => { href = String(url); } } });
+  t.after(() => { for (const [key, descriptor] of Object.entries(originals)) {
+    if (descriptor) Object.defineProperty(globalThis,key,descriptor); else delete globalThis[key];
+  } });
+  assert.throws(() => writePoliticalRenderMode("unsafe"), /Unknown/);
+  writePoliticalRenderMode("raster");
+  assert.equal(new URL(href).searchParams.get("political_render_mode"), "raster");
+  assert.equal(new URL(href).searchParams.has("political_id_raster"), false);
+  assert.equal(new URL(href).searchParams.get("sample"), "keep");
+  writePoliticalIdRasterPreference(false);
+  assert.equal(new URL(href).searchParams.has("political_render_mode"), false);
+  assert.equal(values.has("scenario-forge-political-render-mode"), false);
+  assert.equal(new URL(href).searchParams.get("political_id_raster"), "0");
+});
+
+test("resident readiness requires complete raster output and does not accept a native-refined substitute", async () => {
+  const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
+  const s = { renderPhase: "idle", zoomTransform: { x:0,y:0,k:1 } };
+  const d = { effectiveMode:"raster", actualBackend:"raster", displayState:"accelerated", sourceCoverage:"complete-display-v1", view:{x:0,y:0,k:1} };
+  assert.equal(residentFrameReady(s,d),true);
+  for (const patch of [{actualBackend:"vector"},{displayState:"precise"},{sourceCoverage:"fine"},{pending:1},{refinementPending:true},{view:{x:1,y:0,k:1}}]) {
+    assert.equal(residentFrameReady(s,{...d,...patch}),false);
+  }
+});
+
+
+test("paired native and hybrid baselines wait for their real completed political producer", async () => {
+  const { residentFrameReady } = await import("../tools/verify_political_raster_resident.mjs");
+  const s = { renderPhase:"idle", zoomTransform:{x:0,y:0,k:1},
+    renderPerfMetrics:{drawPoliticalBackgroundFillsPass:{progressive:true,deferredFullCacheReady:false}} };
+  assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),false);
+  s.renderPerfMetrics.drawPoliticalBackgroundFillsPass.deferredFullCacheReady=true;
+  assert.equal(residentFrameReady(s,{effectiveMode:"vector"}),true);
+  assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"accelerated"}),false);
+  assert.equal(residentFrameReady(s,{effectiveMode:"hybrid",displayState:"precise"}),true);
 });

@@ -5529,7 +5529,8 @@ function collectFailures() {
         "const identity = resolvePoliticalPassIdentity(k);",
         "const viewport = resolvePoliticalPassViewport(identity);",
         "const featureMetrics = drawPoliticalFineFeatureLoop({ k, identity, viewport });",
-        "return Object.freeze({ drawPoliticalPass });",
+        "return Object.freeze({ drawPoliticalPass,",
+            "getDiagnostics: () => ({ ...counters, lastBackend, lastReason })",
       ],
       ownerForbiddenTokens: [
         "import ",

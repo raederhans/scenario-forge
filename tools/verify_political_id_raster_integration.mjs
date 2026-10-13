@@ -88,7 +88,7 @@ async function compareSettledPixels(page, zoom, { captureReference = false, prec
   try { return await frame.jsonValue(); } finally { await frame.dispose(); }
 }
 
-async function editHistory(page, precise = true) {
+export async function editHistory(page, precise = true, settle = settled) {
   if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
   await page.locator("#paintModeVisualBtn").click();
   await page.locator("#toolFillBtn").click();
@@ -134,16 +134,16 @@ async function editHistory(page, precise = true) {
   await page.waitForFunction(() => window.__rasterInputProbe.correctPixelMs !== null, null, { timeout: 10000 });
   const input = await page.evaluate(() => ({ correctPixelMs: window.__rasterInputProbe.correctPixelMs,
     measurement: "pointer event to expected paint color in canvas pixels at requestAnimationFrame; not display presentation" }));
-  await settled(page, precise);
+  await settle(page, precise);
   const painted = await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides }));
-  await page.locator("#undoBtn").click(); await settled(page, precise);
+  await page.locator("#undoBtn").click(); await settle(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), before);
-  await page.locator("#redoBtn").click(); await settled(page, precise);
+  await page.locator("#redoBtn").click(); await settle(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), painted);
   return { paintedIds: Object.keys(painted).filter(id => painted[id] !== before[id]), undo: true, redo: true, ...input };
 }
 
-async function brushHistory(page, precise = true) {
+export async function brushHistory(page, precise = true, settle = settled) {
   await page.locator('#customColor').fill('#f0a322');
   await page.locator('#brushModeBtn').click();
   const before = await page.evaluate(() => {
@@ -157,7 +157,7 @@ async function brushHistory(page, precise = true) {
   });
   await page.mouse.move(before.points[0].x, before.points[0].y); await page.mouse.down();
   for (const point of before.points.slice(1)) await page.mouse.move(point.x, point.y);
-  await page.mouse.up(); await settled(page, precise);
+  await page.mouse.up(); await settle(page, precise);
   const after = await page.evaluate(() => ({ colors: { ...window.__rasterTask.state.visualOverrides },
     history: window.__rasterTask.state.historyPast.length, kind: window.__rasterTask.state.historyPast.at(-1)?.kind }));
   assert.equal(after.history, before.history + 1, 'one continuous stroke must create one history entry');
@@ -165,9 +165,9 @@ async function brushHistory(page, precise = true) {
   const paintedIds = Object.keys(after.colors).filter(id => after.colors[id] !== before.colors[id]);
   assert.ok(paintedIds.length > 1, 'continuous stroke must paint multiple regions');
   assert.ok(paintedIds.every(id => after.colors[id] === '#f0a322'));
-  await page.locator('#undoBtn').click(); await settled(page, precise);
+  await page.locator('#undoBtn').click(); await settle(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), before.colors);
-  await page.locator('#redoBtn').click(); await settled(page, precise);
+  await page.locator('#redoBtn').click(); await settle(page, precise);
   assert.deepEqual(await page.evaluate(() => ({ ...window.__rasterTask.state.visualOverrides })), after.colors);
   await page.locator('#brushModeBtn').click();
   return { paintedIds, pointerSteps: before.points.length, historyEntries: 1, undo: true, redo: true };

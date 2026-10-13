@@ -19,6 +19,8 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
       "tools/refresh_political_id_raster_snapshot.py",
       "tools/political_id_raster_app_session.mjs",
       "tools/verify_political_id_raster_integration.mjs",
+      "tools/verify_political_raster_resident.mjs",
+      "tools/profile_political_raster.mjs",
     ],
   },
   {
@@ -53,12 +55,14 @@ export const RENDERER_CACHE_PIPELINE_RECORDS = [
   {
     ...politicalIdRasterRoute,
     id: "local:renderer:political-id-raster-runtime", selectorOrder: 5002,
-    commandRef: "node --test tests/political_id_raster_runtime_owner_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs tests/political_id_raster_assets_behavior.test.mjs tests/political_id_raster_pilot_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs",
+    commandRef: "node --test tests/political_id_raster_display_cache_behavior.test.mjs tests/political_id_raster_runtime_owner_behavior.test.mjs tests/political_id_raster_runtime_assets_behavior.test.mjs tests/political_id_raster_assets_behavior.test.mjs tests/political_id_raster_pilot_behavior.test.mjs tests/political_partial_repaint_owner_behavior.test.mjs tests/political_pass_orchestrator_owner_behavior.test.mjs tests/renderer_political_pass_orchestration_preflight.test.mjs",
     sourceRefs: [
       "js/core/map_renderer.js",
       "js/core/renderer/political_partial_repaint_owner.js",
       "js/core/renderer/political_pass_orchestrator_owner.js",
       "js/core/renderer/political_id_raster_runtime_owner.js",
+      "js/core/renderer/political_id_raster_display_cache.js",
+      "tests/political_id_raster_display_cache_behavior.test.mjs",
       "js/core/renderer/political_id_raster_assets.js",
       "js/core/renderer/political_id_raster_gpu.js",
       "tests/political_id_raster_runtime_owner_behavior.test.mjs",

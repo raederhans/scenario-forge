@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createPoliticalIdRasterSource } from "../js/core/renderer/political_id_raster_source.js";
+import { createPoliticalIdRasterSource, collectPoliticalRasterDisplayFeatures } from "../js/core/renderer/political_id_raster_source.js";
 
 function feature(id, color, bounds, geometry = {}) {
   return { id, color, geometry, bounds };
@@ -298,4 +298,72 @@ test("dispose clears the derived snapshot and closes the source", () => {
   assert.equal(h.source.getSnapshot(), null);
   assert.equal(h.source.isFrameCurrent(frame, { width: 10, height: 10, dpr: 1, camera: { x: 0, y: 0, k: 1 } }), false);
   assert.throws(() => h.publish([a]), /disposed/);
+});
+
+test("complete display includes support coverage without copying geometry or changing the interactive collection", () => {
+  const support = { id: "support", geometry: {}, properties: { interactive: false } };
+  const fine = { id: "fine", geometry: {}, properties: {} };
+  const interactiveCollection = Object.freeze({ features: Object.freeze([fine]) });
+  const fullCollection = Object.freeze({ features: Object.freeze([fine, support]) });
+  const result = collectPoliticalRasterDisplayFeatures({ fullCollection, interactiveCollection, getId: f => f.id });
+  assert.deepEqual(result, [support, fine]);
+  assert.equal(result[0], support); assert.equal(result[1].geometry, fine.geometry);
+  assert.deepEqual(interactiveCollection.features, [fine]);
+  assert.equal(support.properties.interactive, false);
+});
+
+test("complete display refuses duplicate or conflicting identity instead of dropping background coverage", () => {
+  const fine = { id: "a", geometry: { type: "Point", coordinates: [0,0] } };
+  const collect = full => collectPoliticalRasterDisplayFeatures({ fullCollection: { features: full }, interactiveCollection: { features: [fine] }, getId: f => f.id });
+  assert.throws(() => collect([fine,fine]), /Duplicate full/);
+  assert.throws(() => collect([{ id: "a", geometry: { type: "Point", coordinates: [1,0] } }]), /Conflicting display geometry/);
+  assert.throws(() => collect([{ geometry: {} }]), /stable feature IDs/);
+  assert.deepEqual(collectPoliticalRasterDisplayFeatures({ interactiveCollection: { features: [fine] }, getId: f => f.id }), [fine]);
+});
+
+test("replacing geometry inside unchanged bounds invalidates coverage while pure palette edits do not", () => {
+  const h = harness(); const bounds = { minX: 0, minY: 0, maxX: 10, maxY: 10 };
+  const a = feature("a", "#010203", bounds, { type: "Polygon", coordinates: [[[0,0],[10,0],[0,10],[0,0]]] });
+  const before = h.publish([a]);
+  const b = { ...a, geometry: { type: "Polygon", coordinates: [[[0,0],[10,0],[5,5],[0,10],[0,0]]] } };
+  const after = h.publish([b]);
+  assert.equal(after.geometryRevision, before.geometryRevision + 1);
+  assert.deepEqual(after.changedIds, ["a"]);
+  b.color = "#445566";
+  const colored = h.source.updateColors(["a"]);
+  assert.equal(colored.geometryRevision, after.geometryRevision);
+  assert.equal(colored.paletteRevision, after.paletteRevision + 1);
+});
+
+
+test("full and interactive wrappers with equal immutable geometry share canonical display identity", () => {
+  const geometry = { type: "Polygon", coordinates: [[[0,0],[2,0],[1,2],[0,0]]] };
+  const full = { id: "a", geometry };
+  const fine = { id: "a", geometry: structuredClone(geometry), properties: { role: "interactive" } };
+  const collect = () => collectPoliticalRasterDisplayFeatures({ fullCollection: { features: [full] }, interactiveCollection: { features: [fine] }, getId: f=>f.id });
+  assert.deepEqual(collect(), [fine]);
+  assert.deepEqual(collect(), [fine]);
+  fine.geometry = { type: "Polygon", coordinates: [[[0,0],[2,0],[1,1],[0,0]]] };
+  assert.throws(collect, /Conflicting display geometry/, "same bounds or ID must not admit changed coverage");
+});
+
+
+test("complete coverage preserves authenticated fragment-pruned background without changing interactive geometry", () => {
+  const polygon = x => [[[x,0],[x,1],[x+1,1],[x,0]]];
+  const full = { type:"Feature", properties:{id:"pruned"}, geometry:{type:"MultiPolygon",coordinates:[polygon(0),polygon(10)]} };
+  const fine = { ...full, properties:{...full.properties,__visualFragmentCamouflage:true,__visualFragmentPrunedCount:1},
+    geometry:{type:"MultiPolygon",coordinates:[structuredClone(full.geometry.coordinates[0])]} };
+  const collect = () => collectPoliticalRasterDisplayFeatures({fullCollection:[full],interactiveCollection:[fine],getId:f=>f.properties.id});
+  const result = collect();
+  assert.equal(result[0].properties.id,"pruned");
+  assert.equal(result[0].geometry,full.geometry);
+  assert.equal(fine.geometry.coordinates.length,1,"interactive geometry remains unchanged");
+  assert.equal(result[0],collect()[0],"derived wrapper is reused for immutable sources");
+  fine.properties = {...fine.properties,__visualFragmentPrunedCount:2};
+  assert.throws(collect,/Conflicting display geometry/);
+  fine.properties = {...fine.properties,__visualFragmentPrunedCount:1,__visualFragmentCamouflage:false};
+  assert.throws(collect,/Conflicting display geometry/);
+  fine.properties = {...fine.properties,__visualFragmentCamouflage:true};
+  fine.geometry = {type:"MultiPolygon",coordinates:[polygon(99)]};
+  assert.throws(collect,/Conflicting display geometry/,"a forged pruning label cannot admit another shape");
 });

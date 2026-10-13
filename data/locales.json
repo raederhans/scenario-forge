@@ -295318,6 +295318,13 @@
     }
   },
   "ui": {
+    "Political display mode": {"en": "Political display mode", "zh": "政治层显示模式"},
+    "Automatic (native during evaluation)": {"en": "Automatic (native during evaluation)", "zh": "自动（评估期使用原生）"},
+    "Persistent raster candidate": {"en": "Persistent raster candidate", "zh": "常驻栅格候选"},
+    "Native vector compatibility": {"en": "Native vector compatibility", "zh": "原生矢量兼容"},
+    "Legacy hybrid comparison": {"en": "Legacy hybrid comparison", "zh": "旧混合模式对照"},
+    "Actual political renderer": {"en": "Actual political renderer", "zh": "实际政治层渲染器"},
+    "Persistent raster stays raster after navigation; legacy hybrid restores native detail.": {"en": "Persistent raster stays raster after navigation; legacy hybrid restores native detail.", "zh": "常驻栅格在导航结束后保持栅格显示；旧混合模式恢复原生细节。"},
     "Rendering experiment": {"en": "Rendering experiment", "zh": "渲染试验"},
     "Raster acceleration (experimental)": {"en": "Raster acceleration (experimental)", "zh": "栅格加速（试用）"},
     "For 1936, 1939 and TNO. Detail is restored after navigation.": {"en": "For 1936, 1939 and TNO. Detail is restored after navigation.", "zh": "适用于 1936、1939 和 TNO，停止导航后恢复精细显示。"},

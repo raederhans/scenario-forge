@@ -1,3 +1,4 @@
+import { createPoliticalIdRasterDisplayCache } from "../js/core/renderer/political_id_raster_display_cache.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPoliticalIdRasterRuntimeOwner } from "../js/core/renderer/political_id_raster_runtime_owner.js";
@@ -87,6 +88,7 @@ function fixture({
   resourceBudget = null,
   resolveColor = item => item.color,
   refineAfterMs = null,
+  displayMode = "hybrid",
 } = {}) {
   const state = { zoomTransform: { ...transform }, dpr: 1 };
   const identity = { sceneKey: "scene-a", projectionKey: "projection-a", coverageKey: "coverage-a", version: 1, colorVersion: 0 };
@@ -119,7 +121,10 @@ function fixture({
     client,
     cache,
     createGpu: createGpu || gpuHarness.createGpu,
-    resourceBudget, refineAfterMs,
+    resourceBudget, refineAfterMs, displayMode,
+    createDisplayCache: () => createPoliticalIdRasterDisplayCache({ createCanvas: (width, height) => ({
+      width, height, getContext: () => ({ save() {}, restore() {}, setTransform() {}, clearRect() {}, drawImage() {} }),
+    }) }),
   });
   return {
     owner, state, identity, features, setFeatures(next) { features = next; }, h, layout,
@@ -630,3 +635,69 @@ for (const [name, change] of [
     assert.equal(f.renders.filter(reason => reason === 'political-id-raster-ready').length, readyRenders + 1);
   });
 }
+
+test("persistent coverage stays raster after idle, palette edits and brush release without native refinement", async t => {
+  const f = fixture({ displayMode: "raster", refineAfterMs: 0 }); t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const builds = f.owner.getDiagnostics().builds;
+  const sequence = ["#aa0000", "#00aa00", "#0000aa", "#00aa00"];
+  for (const color of sequence) {
+    f.features[0].color = color; f.identity.colorVersion++;
+    assert.ok(f.owner.draw());
+    f.owner.noteNativePartialRepaint(); f.owner.finishNativePartialRepaint();
+    await new Promise(resolve => setTimeout(resolve, 5));
+    const d = f.owner.getDiagnostics();
+    assert.equal(d.displayState, "accelerated"); assert.equal(d.nativeRefinements, 0);
+    assert.equal(d.refinementPending, false); assert.equal(d.builds, builds);
+    assert.equal(f.owner.hasNativeFrame(), false);
+  }
+  assert.equal(f.renders.some(reason => /refine/.test(reason)), false);
+});
+
+test("persistent owner keeps geometry cancellation and unavailable-output fallback", async t => {
+  const f = fixture({ displayMode: "raster", refineAfterMs: 0 }); t.after(() => f.owner.dispose());
+  f.owner.draw(); const old = f.requests[0];
+  f.features[0] = { ...f.features[0], geometry: { type: "Polygon", coordinates: [[[0,0],[1,0],[0,1],[0,0]]] } };
+  f.identity.version++;
+  assert.equal(f.owner.draw(), null); assert.equal(old.signal.aborted, true);
+  await resolveAll(f); assert.ok(f.owner.draw());
+  f.state.zoomTransform.x += 20;
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().nativeRefinements, 0);
+  f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().contextLosses, 1);
+});
+
+
+test("resident presentation reuses stable RGBA and accounts its retained surface", async t => {
+  const updates = [];
+  const f = fixture({ displayMode: "raster", resourceBudget: { update: (...args) => updates.push(args), release() {} } });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const before = f.owner.getDiagnostics();
+  assert.ok(before.presentationCache.retainedSurfaceBytes > 0);
+  assert.ok(f.owner.draw());
+  const after = f.owner.getDiagnostics();
+  assert.equal(after.presentationCache.reusedFrames, before.presentationCache.reusedFrames + 1);
+  assert.equal(after.builds, before.builds);
+  assert.equal(after.nativeRefinements, 0);
+  assert.ok(updates.at(-1)[1].workerSurfaces >= after.presentationCache.retainedSurfaceBytes);
+  assert.ok(after.lastTiming.totalMs >= 0);
+  const count = after.presentationCache.fullUpdates;
+  f.owner.loseContextForValidation(); assert.ok(f.owner.draw());
+  assert.equal(f.owner.getDiagnostics().presentationCache.fullUpdates, count + 1);
+});
+
+
+test("optional presentation budget falls back to full GPU without disabling valid raster", async t => {
+  const f = fixture({ displayMode: "raster", width:3800, height:2200 });
+  t.after(() => f.owner.dispose());
+  f.owner.draw(); await resolveAll(f); assert.ok(f.owner.draw());
+  const d = f.owner.getDiagnostics();
+  assert.equal(d.displayState, "accelerated");
+  assert.equal(d.presentation, "full-gpu");
+  assert.equal(d.presentationCache.retainedSurfaceBytes, 0);
+  assert.equal(d.reason, "coverage-ready");
+  assert.ok(d.gpu.outputSurfaceBytesEstimate < 80*1024*1024);
+  assert.equal(d.nativeRefinements,0);
+});

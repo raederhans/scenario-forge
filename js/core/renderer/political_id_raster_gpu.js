@@ -229,6 +229,8 @@ export function createPoliticalIdRasterGpu({
       gl.activeTexture(gl.TEXTURE3);
       gl.bindTexture(gl.TEXTURE_2D, paletteTexture);
       for (const [tile, resource] of resident) {
+        const x = (tile.originX || 0) - originX, y = (tile.originY || 0) - originY;
+        if (x >= width || y >= height || x + tile.width <= 0 || y + tile.height <= 0) continue;
         for (let unit = 0; unit < resource.textures.length; unit++) {
           gl.activeTexture(gl.TEXTURE0 + unit);
           gl.bindTexture(gl.TEXTURE_2D, resource.textures[unit]);

@@ -270,7 +270,7 @@ test("factory validates every dependency and freezes the exact public API", () =
 
   const { owner } = createHarness();
   assert.equal(Object.isFrozen(owner), true);
-  assert.deepEqual(Object.keys(owner), ["drawPoliticalPass"]);
+  assert.deepEqual(Object.keys(owner), ["drawPoliticalPass", "noteNativePartialRepaint", "getDiagnostics"]);
 });
 
 test("worker bitmap success short-circuits before background and preserves snapshot order", () => {
@@ -664,4 +664,55 @@ test("export and inline river passes never invoke the ID raster producer", () =>
     assert.equal(result.reason, "fine-feature-loop");
     assert.equal(h.events.some((event) => eventName(event) === "fine-loop"), true);
   }
+});
+
+test("complete persistent raster never draws native background or fine geometry, and cancels leftover native preparation", () => {
+  let cancelled = 0;
+  const h = createHarness({ idRasterSelected: true, idRasterMetrics: { fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["a"]) },
+    overrides: { getters: { isPoliticalIdRasterPrimary: () => true }, effects: { cancelNativeBackgroundPreparation: () => { cancelled++; } } } });
+  assert.equal(h.owner.drawPoliticalPass(3).reason, "political-id-raster-primary");
+  const names = h.events.map(eventName);
+  for (const forbidden of ["background", "fine-loop", "consume-bitmap", "build-packet", "request-worker"]) assert.equal(names.includes(forbidden), false, forbidden);
+  assert.equal(cancelled, 1);
+  assert.equal(h.owner.getDiagnostics().rasterPrimaryPasses, 1);
+  assert.equal(h.owner.getDiagnostics().nativeBackgroundPasses, 0);
+  const count = h.events.length; const snapshot = h.owner.getDiagnostics(); snapshot.passes = 99;
+  assert.equal(h.owner.getDiagnostics().passes, 1); assert.equal(h.events.length, count, "diagnostics must not schedule or draw");
+});
+
+test("persistent incomplete coverage falls back once without retrying the raster producer in the same pass", () => {
+  for (const idRasterMetrics of [null, {}, { renderedIds: new Set(), fillMs: NaN, strokeMs: 0, renderedCount: 0 }]) {
+    const h = createHarness({ idRasterSelected: true, idRasterMetrics,
+      overrides: { getters: { isPoliticalIdRasterPrimary: () => true } } });
+    assert.equal(h.owner.drawPoliticalPass(3).reason, "fine-feature-loop");
+    const names = h.events.map(eventName);
+    assert.equal(names.filter(name => name === "id-raster-fine").length, 1);
+    assert.equal(names.filter(name => name === "background").length, 1);
+    assert.equal(names.filter(name => name === "fine-loop").length, 1);
+    assert.equal(h.owner.getDiagnostics().nativeFallbackPasses, 1);
+    assert.equal(h.owner.getDiagnostics().lastBackend, "vector");
+  }
+});
+
+test("persistent preference cannot override export, river partitions or missing land gates", () => {
+  for (const patch of [{ isExportRendering: () => true }, { hasInlinePoliticalPartitions: () => true }, { hasPoliticalLandFeatures: () => false }]) {
+    const h = createHarness({ idRasterSelected: true, overrides: { getters: { isPoliticalIdRasterPrimary: () => true, ...patch } } });
+    h.owner.drawPoliticalPass(3);
+    assert.equal(h.events.some(event => eventName(event) === "id-raster-fine"), false);
+    assert.equal(h.owner.getDiagnostics().rasterPrimaryPasses, 0);
+  }
+});
+
+
+test("native export does not replace the last visible resident backend diagnostic", () => {
+  let exporting = false;
+  const h = createHarness({ idRasterSelected: true,
+    idRasterMetrics: { fillMs: 1, strokeMs: 0, renderedCount: 1, renderedIds: new Set(["a"]) },
+    overrides: { getters: { isPoliticalIdRasterPrimary: () => true, isExportRendering: () => exporting } } });
+  h.owner.drawPoliticalPass(3);
+  assert.equal(h.owner.getDiagnostics().lastBackend, "raster");
+  exporting = true;
+  h.owner.drawPoliticalPass(3);
+  assert.equal(h.owner.getDiagnostics().lastBackend, "raster");
+  assert.equal(h.owner.getDiagnostics().nativeFinePasses, 1);
 });
