@@ -345,7 +345,11 @@ test("local owner feedback selects existing behavior without admitting broader r
       assert.deepEqual(local.unmatchedChangedFiles, [], source);
       assert.deepEqual(local.localEntrypointRouteGaps, [], source);
       assert.deepEqual(local.recommendedCommands.map((entry) => entry.commandRef),
-        [...((source === "js/ui/toolbar/workspace_chrome_support_surface_controller.js")
+        [...((source === "js/ui/sidebar/project_support_diagnostics_controller.js")
+          ? ["node --test tests/legend_csv_import_controls_behavior.test.mjs",
+            "node --test tests/legend_export_behavior.test.mjs",
+            "node --test tests/legend_search_behavior.test.mjs"]
+          : (source === "js/ui/toolbar/workspace_chrome_support_surface_controller.js")
           ? ["node --test tests/quick_fill_level_controls.test.mjs tests/workspace_chrome_support_surface_controller_behavior.test.mjs",
             "node --test tests/quick_fill_state_boundary_contract.test.mjs"] : []),
           ...[testFile, ...additionalTests].map((file) => "node --test " + file)], source);
