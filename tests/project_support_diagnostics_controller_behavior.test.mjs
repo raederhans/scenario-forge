@@ -791,7 +791,7 @@ test("legend label edits render with current project labels", () => {
   }
 });
 
-test("legend editor paginates sidebar rows at ten items and caps at thirty", () => {
+test("legend editor searches every entry and paginates ten rows without a thirty-item truncation", () => {
   const previousDocument = globalThis.document;
   const legendList = createElementNode("div");
   const colors = Array.from({ length: 35 }, (_, index) => (
@@ -837,7 +837,7 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
 
     const firstPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
     assert.equal(firstPageRows.length, 10);
-    assert.equal(legendList.dataset.pageCount, "3");
+    assert.equal(legendList.dataset.pageCount, "4");
     assert.equal(legendList.dataset.paged, "true");
     assert.equal(firstPageRows[0].children[1].placeholder, "Category 1");
     assert.equal(firstPageRows[9].children[1].placeholder, "Category 10");
@@ -865,7 +865,29 @@ test("legend editor paginates sidebar rows at ten items and caps at thirty", () 
     assert.equal(thirdPageRows.length, 10);
     assert.equal(thirdPageRows[0].children[1].placeholder, "Category 21");
     assert.equal(thirdPageRows[9].children[1].placeholder, "Category 30");
-    assert.equal(disabledNextButton.disabled, true);
+    assert.equal(disabledNextButton.disabled, false);
+    disabledNextButton.listeners.click();
+    const fourthPageRows = collectNodes(legendList, (node) => node.className === "legend-row");
+    assert.equal(fourthPageRows.length, 5);
+    assert.equal(fourthPageRows.at(-1).children[1].placeholder, "Category 35");
+
+    const searchInput = findNode(legendList, node => node.id === "legendSearchInput");
+    const generator = findNode(legendList, node => node.className === "legend-generator-card");
+    searchInput.value = "#000035";
+    searchInput.listeners.input();
+    assert.equal(findNode(legendList, node => node.id === "legendSearchInput"), searchInput);
+    assert.equal(findNode(legendList, node => node.className === "legend-generator-card"), generator);
+    const matches = collectNodes(legendList, (node) => node.className === "legend-row");
+    assert.equal(matches.length, 1);
+    assert.equal(matches[0].children[1].placeholder, "Category 35");
+    assert.equal(legendList.dataset.pageCount, "1");
+    searchInput.value = "no-match";
+    searchInput.listeners.input();
+    assert.equal(collectNodes(legendList, (node) => node.className === "legend-row").length, 0);
+    assert.ok(findNode(legendList, node => node.className === "legend-empty-state"));
+    findNode(legendList, node => node.id === "legendSearchClearBtn").listeners.click();
+    assert.equal(legendList.dataset.pageCount, "4");
+    assert.equal(collectNodes(legendList, (node) => node.className === "legend-row").length, 10);
   } finally {
     globalThis.document = previousDocument;
   }
