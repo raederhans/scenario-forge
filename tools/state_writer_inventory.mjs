@@ -3,6 +3,10 @@ import path from "node:path";
 
 import { parse } from "acorn";
 import * as walk from "acorn-walk";
+import { POLITICAL_CACHE_RENDERER_PATH, inspectStatePoliticalCacheBorrowSources, resolvePoliticalCacheOperation } from "./state_political_cache_borrow_contract.mjs";
+import { STATE_LOCALIZATION_BORROW_MODULE_PATH, inspectStateLocalizationBorrowSources } from "./state_localization_borrow_contract.mjs";
+import { inspectStateWaterPathResourceSources, resolveStateWaterPathResourceHelper } from "./state_water_path_resource_contract.mjs";
+import { inspectStateCountryInspectorProjectionSources, resolveStateCountryInspectorProjectionCall } from "./state_country_inspector_projection_contract.mjs";
 import { findStateBorrowedEffectContractEntry, findStateBorrowedCallbackInjectionEntry, STATE_BORROWED_RUNTIME_CONTRACT, STATE_BORROWED_OWNER_EFFECT_CONTRACT, STATE_BORROWED_SCOPED_OPERATION_CONTRACT } from "./state_borrowed_effect_contract.mjs";
 
 import {
@@ -2180,6 +2184,10 @@ function analyzeBindingMutations(
     recognizeCurrentContracts = true,
     getBindingMutationAnalysisContextForScan = null,
     getSourceBoundOwnerProofPreparationForScan = null,
+    getPoliticalCacheProofForScan = null,
+    getLocalizationProofForScan = null,
+    getWaterPathResourceProofForScan = null,
+    getCountryInspectorProjectionProofForScan = null,
   } = {},
 ) {
   const normalizedDerivedAliasTaintMode =
@@ -2223,6 +2231,7 @@ function analyzeBindingMutations(
     });
   }
   const resolvingLocalCallResultNodes = new Set();
+  const localCallResultContexts = [];
   const provenOwnerBorrowedStorageByRecord = new WeakMap();
   const provenBorrowedOwnerByNode = new WeakMap();
   const consumedBorrowedReturnFunctions = new WeakSet();
@@ -2392,6 +2401,16 @@ function analyzeBindingMutations(
     if (!node) {
       return { status: "none", reference: null };
     }
+    const cacheOperation = politicalCacheOperation(node);
+    if (cacheOperation?.admitCall || cacheOperation?.kind === "feature-lookup-helper") {
+      return cacheOperation.borrowedResultPaths.length
+        ? { status: "maybe", reference: null, borrowedPaths: cacheOperation.borrowedResultPaths }
+        : { status: "none", reference: null };
+    }
+    const localizationResult = provenLocalizationResult(node);
+    if (localizationResult) return localizationResult;
+    const countryProjection = provenCountryInspectorProjection(node);
+    if (countryProjection) return { status: "none", reference: null };
     const scopedOperation = provenScopedBorrowedOperation(node);
     if (scopedOperation) return scopedOperation.borrowedResultPaths.length
       ? { status: "maybe", reference: null, borrowedPaths: scopedOperation.borrowedResultPaths }
@@ -2417,6 +2436,11 @@ function analyzeBindingMutations(
       const iteration = provenOwnerBorrowedArrayIteration(node, aliasRecords);
       if (iteration) return iteration.result;
       const localOwnerMethod = immutableBorrowedLocalHelperNode(node);
+      const waterPathResource = localOwnerMethod && resolveStateWaterPathResourceHelper(
+        getWaterPathResourceProofForScan?.(), localOwnerMethod, { source, filePath },
+      );
+      // Only the proved return is a Path2D resource; the call and nested effects still run through analysis.
+      if (waterPathResource) return { status: "none", reference: null };
       const localOwnerPaths = localOwnerMethod && !hasProvenInjectedOwnerResultOrigin(localOwnerMethod)
         && provenOwnerBorrowedReturnPaths(localOwnerMethod);
       if (localOwnerPaths) return { status: "maybe", reference: null, borrowedPaths: localOwnerPaths };
@@ -2568,12 +2592,15 @@ function analyzeBindingMutations(
           if (key === null || key === undefined) return { status: "maybe", reference: null };
           for (const path of value.borrowedPaths || [[]]) paths.push([String(key), ...path]);
         }
-        if (paths.length && hasProvenBorrowedInput) return { status: "maybe", reference: null, borrowedPaths: paths };
+        if (paths.length && hasProvenBorrowedInput) {
+          return { status: "maybe", reference: null, borrowedPaths: paths };
+        }
       }
       return { status: "maybe", reference: null };
     }
     const rootIdentifier = rawRootIdentifier(node);
     const rootRecord = analysis.resolveIdentifier(rootIdentifier);
+    establishLocalReturnAlias(rootRecord, rootIdentifier, aliasRecords);
     if (isImmutableFunctionRecord(rootRecord)) {
       return { status: "none", reference: null };
     }
@@ -2749,25 +2776,60 @@ function analyzeBindingMutations(
       }
       return mergeReferenceClassifications(
         returnedExpressions.map((returnedExpression) => {
-          const classification = referenceClassification(
-            returnedExpression,
-            helperState,
-          );
-          if (classification.status !== "none") {
-            return classification;
+          const returnState = cloneAliasRecords(helperState);
+          const returnNode = unwrapChain(returnedExpression);
+          // Extend direct returned aliases only. A generic container field with
+          // no tracked classification is not a proof that the field is detached.
+          // Keep each return's projection isolated from the other return sites.
+          localCallResultContexts.push({ helperNode, helperState: returnState,
+            resolveLocalAliases: !["ObjectExpression", "ArrayExpression"].includes(returnNode?.type),
+            resolvingRecords: new Set(), establishedRecords: new Set() });
+          try {
+            const classification = referenceClassification(returnedExpression, returnState);
+            if (classification.status !== "none") {
+              return classification;
+            }
+            return containerExpressionContainsTrackedReference(returnedExpression, returnState)
+              ? { status: "maybe", reference: null }
+              : classification;
+          } finally {
+            localCallResultContexts.pop();
           }
-          return containerExpressionContainsTrackedReference(
-            returnedExpression,
-            helperState,
-          )
-            ? { status: "maybe", reference: null }
-            : classification;
         }),
       );
     } finally {
-      if (enteredCalleeScope) executionFunctionStack.pop();
+      if (enteredCalleeScope) {
+        executionFunctionStack.pop();
+      }
       resolvingLocalCallResultNodes.delete(helperNode);
     }
+  }
+
+  function establishLocalReturnAlias(record, useNode, aliasRecords) {
+    const context = localCallResultContexts.at(-1);
+    if (!context?.resolveLocalAliases || context.helperState !== aliasRecords || record?.kind !== "variable"
+      || record.declarationKind !== "const" || !record.init
+      || resolution.targetRecords.has(record) || context.establishedRecords.has(record)) return;
+    const helperRecord = functionRecordForNode(context.helperNode);
+    if (!helperRecord || !analysis.isScopeDescendant(record.scope, helperRecord.scope)
+      || record.ownerNode?.start < context.helperNode.start || record.ownerNode?.end > context.helperNode.end) return;
+    // This is a return-value projection, not a second execution of the helper.
+    // Resolve only immutable lexical initializers in the callee's scope. A TDZ,
+    // cycle or identity transition remains unknown rather than becoming detached.
+    if (context.resolvingRecords.has(record) || record.ownerNode.end > useNode.start
+      || isIdentityTransitionRecord(record)) {
+      aliasRecords.set(record, maybeTrackedState());
+      return;
+    }
+    context.resolvingRecords.add(record);
+    try {
+      transferPatternClassification(record.ownerNode.id,
+        referenceClassification(record.init, aliasRecords), record.init, aliasRecords,
+        { preserveConfiguredTargets: true });
+      for (const identifier of collectPatternIdentifiers(record.ownerNode.id)) {
+        context.establishedRecords.add(analysis.resolveIdentifier(identifier));
+      }
+    } finally { context.resolvingRecords.delete(record); }
   }
 
   function identityTransitionMayReachTrackedState(
@@ -3212,6 +3274,8 @@ function analyzeBindingMutations(
   }
 
   function processEvent(event, aliasRecords) {
+    if (provenPoliticalCacheOperation(event)) return;
+    if (provenLocalizationMapCall(event)) return;
     if (event.type === "AssignmentExpression" && event.operator === "="
       && isProvenOwnerBorrowedStorageSlot(event.left)) return;
     if (event.type === "CallExpression" && isProvenOwnerBorrowedArrayAppend(event)) return;
@@ -3676,7 +3740,7 @@ function analyzeBindingMutations(
         importedPureReaderContract,
       };
     }
-    if (source === "js/core/state/index.js") {
+    if (source === "js/core/state/index.js" || source === "js/core/state/runtime_hooks.js") {
       const targetArgumentIndex =
         IMPORTED_COMPAT_TARGET_HELPERS.get(record.importedName);
       return Number.isInteger(targetArgumentIndex)
@@ -4463,6 +4527,88 @@ function analyzeBindingMutations(
       && createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex") === entry.operationSourceFingerprint) || null;
   }
 
+  function politicalCacheOperation(node) {
+    if (!recognizeCurrentContracts || filePath !== POLITICAL_CACHE_RENDERER_PATH
+      || node?.type !== "CallExpression") return null;
+    return resolvePoliticalCacheOperation(getPoliticalCacheProofForScan(), node, { filePath, binding });
+  }
+
+  function provenPoliticalCacheOperation(node) {
+    const operation = politicalCacheOperation(node);
+    // A returned borrow is independently classified above. In particular the
+    // lookup helper retains its effects and return escapes; only its private
+    // Map get has an admitted operation receipt.
+    return operation?.admitCall === true ? operation : null;
+  }
+
+  function provenCountryInspectorProjection(node) {
+    if (node?.type !== "CallExpression" || !recognizeCurrentContracts
+      || binding.kind !== "function-parameter"
+      || binding.functionName !== "createCountryInspectorModel"
+      || binding.parameterName !== "runtimeState" || binding.parameterIndex !== 0
+      || binding.parameterPath !== "$") return null;
+    const helper = directImmutableLocalHelperNode(node);
+    return helper && resolveStateCountryInspectorProjectionCall(
+      getCountryInspectorProjectionProofForScan?.(), node, helper, { source, filePath },
+    );
+  }
+
+  function localizationProof() {
+    // The borrowed origin is this exact imported state binding, not every
+    // independently scanned parameter in the two helpers.
+    return recognizeCurrentContracts && filePath === STATE_LOCALIZATION_BORROW_MODULE_PATH
+      && binding.kind === "module" && binding.name === "runtimeState"
+      && binding.importSource === "./state.js" && binding.importedName === "state"
+      ? getLocalizationProofForScan() : null;
+  }
+
+  function localizationOperation(node) {
+    return node && localizationProof()?.operations.get(`${node.start}:${node.end}`);
+  }
+
+  function localizationResultClassification(result) {
+    if (result?.kind === "private-map-capability") return {
+      status: "maybe", reference: null, borrowedPaths: [],
+      privateBorrowedStorage: result.storageIdentity,
+    };
+    if (result?.borrowedResultPaths) return {
+      status: "maybe", reference: null, borrowedPaths: result.borrowedResultPaths,
+    };
+    return result?.kind === "scalar" ? { status: "none", reference: null } : null;
+  }
+
+  function provenLocalizationResult(node) {
+    const proof = localizationProof();
+    if (!proof) return null;
+    const operation = localizationOperation(node);
+    if (operation) return localizationResultClassification(operation.result);
+    if (node.type !== "Identifier") return null;
+    const record = analysis.resolveIdentifier(node);
+    const local = record?.ownerNode && proof.bindings.get(`${record.ownerNode.start}:${record.ownerNode.end}`);
+    if (!local || local.name !== record.name) return null;
+    // This is an allocation capability, not a detached object or a root-state
+    // alias. Its lazy establishment and the closed lookup argument are source-bound.
+    return localizationResultClassification(local.provenance);
+  }
+
+  function provenLocalizationMapCall(node) {
+    const operation = node?.type === "CallExpression" && localizationOperation(node);
+    return operation && ["private-map-set", "private-map-get", "private-map-has"].includes(operation.kind)
+      ? operation : null;
+  }
+
+  function isProvenLocalizationReturn(expression, aliasRecords) {
+    const proof = localizationProof();
+    const expected = expression && proof?.returns.get(`${expression.start}:${expression.end}`);
+    if (!expected || currentExecutionFunction()?.id?.name !== expected.functionName) return false;
+    const classification = referenceClassification(expression, aliasRecords);
+    if (expected.result.kind === "private-map-capability") {
+      return classification.privateBorrowedStorage === expected.result.storageIdentity;
+    }
+    return Boolean(classification.borrowedPaths?.length
+      && expected.result.borrowedResultPaths?.some(path => path.length === 0));
+  }
+
   function provenScopedMembershipCall(node) {
     const callee = unwrapChain(node?.callee);
     if (node?.type !== "CallExpression" || node.optional || callee?.type !== "MemberExpression" || callee.computed
@@ -4597,6 +4743,7 @@ function analyzeBindingMutations(
   }
 
   function isProvenOwnerBorrowedReturn(expression, aliasRecords) {
+    if (isProvenLocalizationReturn(expression, aliasRecords)) return true;
     if (consumedBorrowedReturnFunctions.has(currentExecutionFunction())) return true;
     const allowed = provenOwnerBorrowedReturnPaths(currentExecutionFunction());
     const classification = referenceClassification(expression, aliasRecords);
@@ -5357,9 +5504,12 @@ function analyzeBindingMutations(
       return aliasRecords;
     }
     if (node.type === "CallExpression" || node.type === "NewExpression") {
+      const politicalCacheOperation = provenPoliticalCacheOperation(node);
+      const localizationMapCall = provenLocalizationMapCall(node);
+      const countryProjection = provenCountryInspectorProjection(node);
       const scopedOperation = provenScopedBorrowedOperation(node);
       const scopedMembershipCall = provenScopedMembershipCall(node);
-      if (scopedOperation && node.callee.type === "MemberExpression") {
+      if ((scopedOperation || politicalCacheOperation || localizationMapCall) && node.callee.type === "MemberExpression") {
         processExpression(node.callee.object, aliasRecords, { suppressContainerEscape: true });
       } else processExpression(node.callee, aliasRecords);
       if (node.type === "CallExpression" && isBorrowedRuntimeHookValue(node.callee)) {
@@ -5424,6 +5574,9 @@ function analyzeBindingMutations(
         } else processExpression(argument, aliasRecords, {
           suppressContainerEscape: Boolean(
             scopedOperation || provenBorrowedArrayAppend
+            || politicalCacheOperation?.borrowedArgumentIndexes.includes(argumentIndex)
+            || Boolean(localizationMapCall)
+            || countryProjection?.borrowedArgumentIndexes.includes(argumentIndex)
             || provenDirectBorrowedCallbackInvocation(node)?.invocationBorrowedArgumentIndexes.includes(argumentIndex)
             || (localBorrowedHelper && !executionFunctionStack.includes(localBorrowedHelper)
               && localBorrowedHelper.params?.[argumentIndex]
@@ -5504,6 +5657,10 @@ function analyzeBindingMutations(
       if (provenBorrowedArrayAppend) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
       if (scopedOperation) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
       if (scopedMembershipCall) for (const index of scopedMembershipCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (politicalCacheOperation) for (const index of politicalCacheOperation.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (localizationMapCall) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
+      if (countryProjection) for (const index of countryProjection.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
+      if (localizationOperation(node)?.kind === "lookup-helper-invocation") delegatedArgumentIndexes.add(1);
       if (provenCapabilityCall) for (const index of provenCapabilityCall.borrowedArgumentIndexes) delegatedArgumentIndexes.add(index);
       if (provenBorrowedMapRead) delegatedArgumentIndexes.add(0);
       if (runtimeMethod) node.arguments.forEach((_, index) => delegatedArgumentIndexes.add(index));
@@ -5521,7 +5678,7 @@ function analyzeBindingMutations(
       ) {
         delegatedArgumentIndexes.add(0);
       }
-      if (node.type === "CallExpression" && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !runtimeMethod && !borrowedArrayIteration) {
+      if (node.type === "CallExpression" && !politicalCacheOperation && !localizationMapCall && !scopedOperation && !scopedMembershipCall && !provenBorrowedArrayAppend && !provenCapabilityCall && !provenBorrowedMapRead && !runtimeMethod && !borrowedArrayIteration) {
         recordUnknownCallMutation(
           node,
           receiverClassification,
@@ -6967,6 +7124,46 @@ export function scanStateMutationInventory(
   }
   let bindingMutationAnalysisContext = null;
   let sourceBoundOwnerProofPreparation = null;
+  let politicalCacheProof;
+  let localizationProof;
+  let waterPathResourceProof;
+  let countryInspectorProjectionProof;
+  const getCountryInspectorProjectionProofForScan = () => {
+    if (countryInspectorProjectionProof === undefined) {
+      countryInspectorProjectionProof = recognizeCurrentContracts
+        && filePath === "js/ui/sidebar/country_inspector_model.js"
+        ? inspectStateCountryInspectorProjectionSources({ source: normalizedSource }).receipt : null;
+    }
+    return countryInspectorProjectionProof;
+  };
+  const getWaterPathResourceProofForScan = () => {
+    if (waterPathResourceProof === undefined) {
+      waterPathResourceProof = recognizeCurrentContracts
+        && filePath === "js/core/renderer/scenario_region_overlay_render_owner.js"
+        ? inspectStateWaterPathResourceSources({ source: normalizedSource }).receipt : null;
+    }
+    return waterPathResourceProof;
+  };
+  const getLocalizationProofForScan = () => {
+    if (localizationProof === undefined) {
+      const receipt = recognizeCurrentContracts && filePath === STATE_LOCALIZATION_BORROW_MODULE_PATH
+        ? inspectStateLocalizationBorrowSources({ source: normalizedSource }).receipt : null;
+      localizationProof = receipt ? {
+        receipt,
+        operations: new Map(Object.values(receipt.operationsByKey).map(operation =>
+          [`${operation.expression.start}:${operation.expression.end}`, operation])),
+        bindings: new Map(receipt.localBindings.map(local => [`${local.declaration.start}:${local.declaration.end}`, local])),
+        returns: new Map(Object.entries(receipt.functions).flatMap(([functionName, entry]) => entry.returns.map(ret =>
+          [`${ret.expression.start}:${ret.expression.end}`, { ...ret, functionName }]))),
+      } : null;
+    }
+    return localizationProof;
+  };
+  const getPoliticalCacheProofForScan = () => {
+    if (politicalCacheProof === undefined) politicalCacheProof = recognizeCurrentContracts && filePath === POLITICAL_CACHE_RENDERER_PATH
+      ? inspectStatePoliticalCacheBorrowSources({ source: normalizedSource }).receipt : null;
+    return politicalCacheProof;
+  };
   const getBindingMutationAnalysisContextForScan = () => {
     if (
       analysisInstrumentation?.bindingMutationAnalysisContextMode
@@ -7013,6 +7210,10 @@ export function scanStateMutationInventory(
           recognizeCurrentContracts,
           getBindingMutationAnalysisContextForScan,
           getSourceBoundOwnerProofPreparationForScan,
+          getPoliticalCacheProofForScan,
+          getLocalizationProofForScan,
+          getWaterPathResourceProofForScan,
+          getCountryInspectorProjectionProofForScan,
         },
       );
     });

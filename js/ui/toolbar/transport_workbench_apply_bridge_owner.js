@@ -3,7 +3,7 @@
 
 import {
   normalizeTransportOverviewStyleConfig,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   applyTransportWorkbenchOverviewState,
 } from "../../core/state/actions/transport_actions.js";

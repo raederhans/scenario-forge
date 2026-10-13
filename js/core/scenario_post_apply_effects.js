@@ -1,7 +1,7 @@
 import {
   STATE_BUS_EVENTS,
   emitStateBusEvent,
-} from "./state/index.js";
+} from "./state/runtime_hooks.js";
 import { state as runtimeState } from "./state.js";
 import {
   setScenarioPerfMetricState,

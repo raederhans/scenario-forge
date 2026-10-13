@@ -1,6 +1,13 @@
-import { setScenarioDiagnosticsState } from "../../core/state.js";
-import { markDirty } from "../../core/dirty_state.js";
+import { setScenarioDiagnosticsState } from "../../core/state_catalog.js";
+import { markDirty, updateDirtyIndicator } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
+import { normalizeHexColor } from "../../core/color_hex_utils.js";
+import { createLegendExportControls } from "./legend_export.js";
+import { createLegendCsvImportControls } from "./legend_csv_import_controls.js";
+import { buildLegendCsvCurrentModel } from "../../core/legend_csv_schema.js";
+import { applyLegendCsvImport } from "../../core/legend_csv_import_transaction.js";
+import { requestRender } from "../../core/render_boundary.js";
+import { buildLegendSearchItems, createLegendSearchControls, filterLegendEntries } from "./legend_search.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -1558,9 +1565,17 @@ export function createProjectSupportDiagnosticsController({
 
 
   const LEGEND_EDITOR_PAGE_SIZE = 10;
-  const LEGEND_EDITOR_MAX_ITEMS = 30;
   let legendEditorPageIndex = 0;
   let lastLegendKey = null;
+  let lastLegendHeaderKey = null;
+  let lastLegendScenarioId = null;
+  let lastLegendContextKey = null;
+  let localLegendLabelEdit = null;
+  let legendHeader = null;
+  let legendResults = null;
+  let legendSearch = null;
+  let legendCsvImportControls = null;
+  let legendCsvImportLanguage = null;
 
   const clearLegendList = () => {
     if (typeof legendList.replaceChildren === "function") {
@@ -1573,6 +1588,7 @@ export function createProjectSupportDiagnosticsController({
   const createLegendLabelRow = (color, index, colors) => {
     const row = document.createElement("div");
     row.className = "legend-row";
+    row.dataset.legendColor = color;
 
     const swatch = document.createElement("span");
     swatch.className = "legend-swatch";
@@ -1586,8 +1602,19 @@ export function createProjectSupportDiagnosticsController({
     input.value = legendManager.getLabel(color, state);
     input.addEventListener("input", (event) => {
       legendManager.setLabel(color, event.target.value, state);
+      localLegendLabelEdit = {
+        contextKey: lastLegendContextKey,
+        labelsKey: JSON.stringify(legendManager.getLabels(state)),
+      };
       markDirty("legend-label");
       mapRenderer.renderLegend(colors, legendManager.getLabels(state));
+    });
+    input.addEventListener("blur", () => {
+      if (!localLegendLabelEdit) return;
+      localLegendLabelEdit = null;
+      lastLegendKey = null;
+      // Let the next refresh settle search results. Rebuilding here could remove
+      // a pager button between pointerdown (which blurs this input) and click.
     });
 
     row.appendChild(swatch);
@@ -1638,50 +1665,141 @@ export function createProjectSupportDiagnosticsController({
     const colors = readLegendColors(state);
     const specialZoneLegendLayers = getVisibleSpecialZoneLegendLayers();
     const specialZoneLegendKey = legendManager.getSpecialZoneSignature(state);
-    const colorItems = colors.map((color, index) => ({ type: "color", color, index }));
-    const specialZoneItems = specialZoneLegendLayers.map((layer) => ({ type: "special-zone", layer }));
-    const cappedItems = [...colorItems, ...specialZoneItems].slice(0, LEGEND_EDITOR_MAX_ITEMS);
-    const pageCount = Math.max(1, Math.ceil(cappedItems.length / LEGEND_EDITOR_PAGE_SIZE));
+    if (!legendSearch) {
+      legendHeader = document.createElement("div");
+      legendHeader.className = "legend-editor-header";
+      legendResults = document.createElement("div");
+      legendResults.id = "legendEditorResults";
+      legendResults.className = "legend-editor-results";
+      legendSearch = createLegendSearchControls({ documentRef,
+        onChange: () => { legendEditorPageIndex = 0; lastLegendKey = null; refreshLegendEditor(); },
+        onEnter: () => {
+          const first = legendResults.querySelector?.(".legend-input, .legend-row-special-zone");
+          if (!first) return;
+          if (first.tagName !== "INPUT") first.tabIndex = -1;
+          first.focus?.();
+        },
+      });
+      clearLegendList();
+      legendList.append(legendHeader, legendSearch.element, legendResults);
+    }
+    if (lastLegendScenarioId !== state.activeScenarioId) {
+      lastLegendScenarioId = state.activeScenarioId;
+      legendSearch.reset({ notify: false });
+      legendEditorPageIndex = 0;
+    }
+    const labels = legendManager.getLabels(state);
+    const labelsKey = JSON.stringify(labels);
+    const headerKey = [
+      colors.join("|"),
+      specialZoneLegendKey,
+      JSON.stringify(legendManager.getConfig(state)),
+      state.currentLanguage,
+    ].join("::");
+    const filters = legendSearch.getFilters();
+    const contextKey = [headerKey, state.activeScenarioId, filters.query, filters.kind, legendEditorPageIndex].join("::");
+    // A render tick must not detach the input during typing or IME composition.
+    // External label changes and navigation still refresh; local edits settle on blur.
+    if (localLegendLabelEdit?.contextKey === contextKey && localLegendLabelEdit.labelsKey === labelsKey) return;
+    localLegendLabelEdit = null;
+    const allItems = buildLegendSearchItems({ colors, labels, specialZones: specialZoneLegendLayers, language: state.currentLanguage });
+    const filteredItems = filterLegendEntries(allItems, filters);
+    legendSearch.update({ language: state.currentLanguage, total: allItems.length, matches: filteredItems.length });
+    const pageCount = Math.max(1, Math.ceil(filteredItems.length / LEGEND_EDITOR_PAGE_SIZE));
     legendEditorPageIndex = Math.min(Math.max(legendEditorPageIndex, 0), pageCount - 1);
     const pageStart = legendEditorPageIndex * LEGEND_EDITOR_PAGE_SIZE;
-    const pageItems = cappedItems.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
+    const pageItems = filteredItems.slice(pageStart, pageStart + LEGEND_EDITOR_PAGE_SIZE);
     const visibleLegendRows = Math.min(Math.max(pageItems.length, 1), LEGEND_EDITOR_PAGE_SIZE);
     const pagerReserve = pageCount > 1 ? 38 : 0;
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
-    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 168 + (visibleLegendRows * 52) + pagerReserve)}px`);
+    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 440 + (visibleLegendRows * 52) + pagerReserve)}px`);
+    lastLegendContextKey = [headerKey, state.activeScenarioId, filters.query, filters.kind, legendEditorPageIndex].join("::");
     const key = [
-      colors.join("|"),
-      specialZoneLegendKey,
-      JSON.stringify(legendManager.getConfig(state)),
-      legendEditorPageIndex,
+      lastLegendContextKey,
+      labelsKey,
     ].join("::");
     if (key === lastLegendKey && legendList.dataset.ready === "true") return;
     lastLegendKey = key;
     legendList.dataset.ready = "true";
-    clearLegendList();
-    legendList.appendChild(createLegendGeneratorControls());
+    if (lastLegendHeaderKey !== headerKey) {
+      lastLegendHeaderKey = headerKey;
+      if (!legendCsvImportControls || legendCsvImportLanguage !== state.currentLanguage) {
+        legendCsvImportLanguage = state.currentLanguage;
+        legendCsvImportControls = createLegendCsvImportControls({
+          documentRef,
+          getModel: () => buildLegendCsvCurrentModel(state),
+          onApply: ({ source, records, preview }) => {
+            const result = applyLegendCsvImport({ target: state, source, selectedRecords: records, preview, confirmed: true });
+            try {
+              updateDirtyIndicator();
+              requestRender("legend-csv-import");
+              lastLegendKey = null;
+              refreshLegendEditor();
+            } catch {
+              return { ...result, refreshFailed: true };
+            }
+            return result;
+          },
+        });
+      }
+      legendHeader.replaceChildren(createLegendGeneratorControls(), createLegendExportControls({
+        documentRef,
+        getModel: () => ({ colors: readLegendColors(state), labels: legendManager.getLabels(state),
+          specialZones: getVisibleSpecialZoneLegendLayers(), language: state.currentLanguage,
+          fileStem: state.activeScenarioId || "map", scenarioId: state.activeScenarioId,
+          scenarioBaselineHash: state.scenarioBaselineHash }),
+        download: (blob, filename) => fileManager.writeBlobDownload(blob, filename, { destination: "browser" }),
+        showToast,
+      }), legendCsvImportControls);
+    }
+    legendResults.replaceChildren();
 
     if (!colors.length && !specialZoneLegendKey) {
       const empty = document.createElement("div");
       empty.className = "legend-empty-state";
       empty.textContent = t("先生成或填充地图颜色，再在这里修改图例名称。", "ui");
-      legendList.appendChild(empty);
+      legendResults.appendChild(empty);
+      return;
+    }
+    if (!filteredItems.length) {
+      const empty = document.createElement("div");
+      empty.className = "legend-empty-state";
+      empty.textContent = legendSearch.getEmptyText();
+      legendResults.appendChild(empty);
       return;
     }
 
     pageItems.filter((item) => item.type === "color").forEach((item) => {
-      legendList.appendChild(createLegendLabelRow(item.color, item.index, colors));
+      legendResults.appendChild(createLegendLabelRow(item.color, item.index, colors));
     });
     const visibleSpecialZoneLayers = pageItems
       .filter((item) => item.type === "special-zone")
       .map((item) => item.layer);
-    appendSpecialZoneLegendRows(visibleSpecialZoneLayers);
+    appendSpecialZoneLegendRows(visibleSpecialZoneLayers, legendResults);
     if (pageCount > 1) {
-      legendList.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
+      legendResults.appendChild(createLegendPagerControls(legendEditorPageIndex, pageCount));
     }
   };
 
+  const focusLegendColor = (rawColor) => {
+    const color = normalizeHexColor(rawColor);
+    if (!color || !legendList) return false;
+    refreshLegendEditor();
+    const index = readLegendColors(state).indexOf(color);
+    if (index < 0) return false;
+    legendSearch.reset({ notify: false });
+    legendEditorPageIndex = Math.floor(index / LEGEND_EDITOR_PAGE_SIZE);
+    lastLegendKey = null;
+    refreshLegendEditor();
+    const row = Array.from(legendResults.querySelectorAll(".legend-row[data-legend-color]"))
+      .find(node => node.dataset.legendColor === color);
+    const input = row?.querySelector(".legend-input");
+    if (!input) return false;
+    row.scrollIntoView({ block: "nearest" });
+    input.focus({ preventScroll: true });
+    return true;
+  };
 
   const bindEvents = () => {
     refreshProjectSaveStatus();
@@ -1967,6 +2085,7 @@ export function createProjectSupportDiagnosticsController({
     refreshProjectAccountLanguage,
     refreshProjectSaveStatus,
     refreshLegendEditor,
+    focusLegendColor,
     renderScenarioAuditPanel,
   };
 }

@@ -1,9 +1,11 @@
 import {
   INTENSITY_FIELD_CHANNEL_IDS,
   INTENSITY_FIELD_GRID,
+} from "../../core/intensity_field.js";
+import {
   normalizeIntensityFieldsState,
   updateIntensityFieldChannel,
-} from "../../core/state.js";
+} from "../../core/state/intensity_field_state.js";
 import { createDefaultIntensityFieldToolState } from "../../core/state/renderer_runtime_state.js";
 import {
   normalizeIntensityFieldsIntoState,

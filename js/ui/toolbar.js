@@ -1,4 +1,6 @@
 import { bindPoliticalRasterTrialControl } from "./toolbar/political_raster_trial_control.js";
+import { initViewBookmarks } from "./view_bookmarks.js";
+import { getViewBookmarkScope } from "../core/view_bookmarks.js";
 import { drawThematicWgiExportLegend } from "../core/renderer/thematic_wgi_export_legend.js";
 import { drawPopulationExportLegend } from "../core/renderer/population_export_legend.js";
 import { ensurePopulationData } from "../core/population_spatial_runtime.js";
@@ -20,6 +22,8 @@ import {
 } from "../core/state.js";
 import {
   getPoliticalIdRasterDiagnostics,
+  captureViewportView,
+  restoreViewportView,
   setPoliticalIdRasterTrialEnabled,
   setPoliticalRenderMode,
   autoFillMap,
@@ -46,7 +50,7 @@ import {
   setMapData,
 } from "../core/map_renderer/public.js";
 import { captureHistoryState, canRedoHistory, canUndoHistory, pushHistoryEntry, redoHistory, undoHistory } from "../core/history_manager.js";
-import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callCompatRuntimeHook, callRuntimeHook, registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import { setExportBakeState } from "../core/state/actions/export_workbench_actions.js";
 import {
   buildPaletteQuickSwatches,
@@ -211,6 +215,7 @@ const EXPORT_MAX_CONCURRENT_JOBS = 1;
 
 
 function initToolbar({ render } = {}) {
+  let viewBookmarks = null;
   bindPoliticalRasterTrialControl({ getDiagnostics: getPoliticalIdRasterDiagnostics, setEnabled: setPoliticalIdRasterTrialEnabled, setMode: setPoliticalRenderMode, t });
   // toolbar.js 保留的是壳层接线职责：集中拿 DOM、拼 controller、注册 runtime hooks。
   // 各个面板自身的业务逻辑应继续留在子 controller，避免再把 owner 逻辑回流到这个大文件。
@@ -1783,7 +1788,10 @@ function initToolbar({ render } = {}) {
   } = oceanLakeControlsController;
   renderOceanCoastalAccentUiForWorkspace = renderOceanCoastalAccentUi;
   renderOceanLakeControlsUi();
-  registerRuntimeHook(state, "updateWorkspaceStatusFn", refreshWorkspaceStatus);
+  registerRuntimeHook(state, "updateWorkspaceStatusFn", () => {
+    refreshWorkspaceStatus();
+    viewBookmarks?.refresh();
+  });
   registerRuntimeHook(state, "updateScenarioContextBarFn", refreshScenarioContextBar);
   registerRuntimeHook(state, "updateActiveSovereignUIFn", refreshActiveSovereignLabel);
   registerRuntimeHook(state, "updatePaintModeUIFn", refreshPaintModeUi);
@@ -1871,6 +1879,7 @@ function initToolbar({ render } = {}) {
   registerRuntimeHook(state, "updateHistoryUIFn", updateHistoryUi);
 
   function updateZoomUi() {
+    viewBookmarks?.refresh();
     const text = getZoomPercent();
     if (zoomPercentInput && zoomPercentInput.dataset.editing !== "true") {
       if (zoomPercentInput.value !== text) {
@@ -1972,6 +1981,18 @@ function initToolbar({ render } = {}) {
     dismissOnboardingHint();
     resetZoomToFit({ animate: true });
   };
+
+  viewBookmarks = initViewBookmarks({
+    host: document.getElementById("zoomUtilityViewportGroup"),
+    getContext: () => ({
+      scope: getViewBookmarkScope({ scenarioId: runtimeState.activeScenarioId, mapMode: runtimeState.mapSemanticMode }),
+      label: runtimeState.activeScenarioManifest?.display_name || runtimeState.activeScenarioId || "",
+      language: runtimeState.currentLanguage,
+      ready: runtimeState.bootPhase === "ready" && !runtimeState.startupReadonly && !runtimeState.scenarioApplyInFlight,
+    }),
+    captureView: captureViewportView,
+    restoreView: restoreViewportView,
+  });
 
   registerRuntimeHook(state, "runToolSelectionFn", runToolSelection);
   registerRuntimeHook(state, "runBrushModeToggleFn", runBrushModeToggle);

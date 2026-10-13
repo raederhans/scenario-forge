@@ -1,5 +1,5 @@
 import { state as runtimeState } from "./state.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 import { clearDirtyState, markDirtyState } from "./state/actions/ui_dirty_actions.js";
 
 function updateDirtyIndicator() {

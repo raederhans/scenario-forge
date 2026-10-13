@@ -1,5 +1,5 @@
 import { state as runtimeState } from "../core/state.js";
-import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/index.js";
+import { callRuntimeHook, registerOwnedRuntimeHook } from "../core/state/runtime_hooks.js";
 import {
   clearActiveScenarioCommand,
   applyScenarioByIdCommand,

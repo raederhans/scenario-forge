@@ -40,11 +40,11 @@ export function getQuickFillLevelModel(state) {
       : "Single-click paints one leaf; double-click uses the selected level. Geographic groups are not historical administration. Missing or unverified groups never expand the fill scope." };
 }
 
-export function createQuickFillLevelControls({ state, container, onChange }) {
+export function createQuickFillLevelControls({ getModel, getSelectLabel, container, onChange }) {
   let select = null;
   let signature = "";
   function refresh() {
-    const model = getQuickFillLevelModel(state);
+    const model = getModel();
     const document = container?.ownerDocument;
     if (!container || typeof document?.createElement !== "function") return model;
     if (!select) {
@@ -54,7 +54,7 @@ export function createQuickFillLevelControls({ state, container, onChange }) {
       select.addEventListener("change", () => onChange(normalizeQuickFillScope(select.value)));
       container.appendChild(select);
     }
-    select.setAttribute("aria-label", String(state.currentLanguage || "en").startsWith("zh") ? "快速填色层级" : "Quick fill level");
+    select.setAttribute("aria-label", getSelectLabel());
     const nextSignature = JSON.stringify(model.options);
     if (signature !== nextSignature) {
       select.replaceChildren();

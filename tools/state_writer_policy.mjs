@@ -2041,7 +2041,7 @@ export function validateStateWriterPolicySchema(policy = {}) {
             ? "test-fixture"
             : writerPath.startsWith("js/core/state/actions/")
               ? "domain-action"
-              : writerPath === "js/core/state/index.js"
+              : (writerPath === "js/core/state/index.js" || writerPath === "js/core/state/runtime_hooks.js")
                 ? "compat-facade"
                 : binding.kind === "module"
                   ? "legacy-direct"

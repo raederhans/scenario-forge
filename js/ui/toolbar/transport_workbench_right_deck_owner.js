@@ -7,7 +7,7 @@ import {
 } from "../transport_workbench_family_preview.js";
 import {
   TRANSPORT_WORKBENCH_EDIT_OVERLAY_FAMILY_IDS,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   TRANSPORT_WORKBENCH_CONTROL_SCHEMAS,
   TRANSPORT_WORKBENCH_DENSITY_FAMILY_IDS,

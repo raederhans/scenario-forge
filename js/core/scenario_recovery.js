@@ -1,6 +1,6 @@
 import { normalizeMapSemanticMode, state as runtimeState } from "./state.js";
 import { t } from "./i18n.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 import { getScenarioEffectiveOwnerCodeByFeatureId } from "./scenario_runtime_queries.js";
 const state = runtimeState;
 

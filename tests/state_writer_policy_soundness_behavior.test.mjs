@@ -1,20 +1,35 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import { parse } from "acorn";
 
 import {
   discoverGlobalStateImportBindings,
   validateDomainActionSourceBoundary,
+  validateStateWriterPolicySchema,
+  buildCanonicalStateKeyAuthorityIndex,
   validateStateWriterPolicySnapshot,
 } from "../tools/state_writer_policy.mjs";
 import {
   buildLegacyStateWriterSemanticAuthority,
+  buildCallerToActionLedger,
+  buildStateWriterBindingGrants,
   discoverStateWriterBindingsForSource,
+  normalizeStateActionDelegations,
   subtractLegacyStateWriterSemanticAuthority,
 } from "../tools/build_state_writer_policy.mjs";
 import {
   scanStateMutations,
 } from "../tools/state_writer_inventory.mjs";
 import * as policyChecker from "../tools/check_state_writer_policy.mjs";
+import {
+  STATE_ACTION_SUCCESSOR_CARRIER_SOURCE_REFRESHES,
+  findStateActionSuccessorProofContractEntry,
+  isStateActionSuccessorCarrierSourceRefresh,
+  validateStateActionModuleSource,
+} from "../tools/state_action_delegation_contract.mjs";
 
 function createLegacyWriter() {
   return {
@@ -1062,4 +1077,174 @@ test("checker transition rejects a 35 of 36 P4.1 to P4.2a ledger backfill", () =
     ),
     JSON.stringify(violations, null, 2),
   );
+});
+
+const readRepositorySource = (modulePath) => readFileSync(
+  new URL(`../${modulePath}`, import.meta.url), "utf8",
+).replace(/\r\n?/g, "\n");
+const readHistoricalSource = (revision, modulePath) => execFileSync(
+  "git", ["show", `${revision}:${modulePath}`],
+  { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 },
+).replace(/\r\n?/g, "\n");
+let successorRefreshFixture;
+function getSuccessorRefreshFixture() {
+  return successorRefreshFixture ||= (async () => {
+    // Pin the committed stale ledger, not whatever HEAD later becomes.
+    const historical = JSON.parse(readHistoricalSource(
+      "abf6a1a6670096459138fcc84cb12fa4ca485f5b",
+      "tools/state_writer_policy.json",
+    ));
+    const entries = historical.progress.callerToActionLedger.entries.filter((entry) =>
+      (entry.successorActionProofs?.length && STATE_ACTION_SUCCESSOR_CARRIER_SOURCE_REFRESHES.some((receipt) =>
+        receipt.modulePath === entry.actionModulePath
+        && receipt.exportName === entry.actionExportName
+      )) || (entry.callerPath === "js/core/map_renderer/map_hover_interaction_owner.js"
+        && entry.actionExportName === "setHoveredFeatureIdsState")
+      || (entry.callerPath === "js/ui/toolbar/appearance_controls_controller.js"
+        && entry.key === "showUrban")
+    );
+    // hoveredId shares the same stale first call as the two hover successors.
+    assert.equal(entries.length, 14);
+    const current = JSON.parse(readRepositorySource("tools/state_writer_policy.json"));
+    const previousPolicy = {
+      ...current,
+      progress: {
+        ...current.progress,
+        retiredLegacySemanticAuthority: {
+          memberships: entries.map((entry) => entry.retiredMembershipIdentity),
+        },
+        callerToActionLedger: { schemaVersion: 3, entries },
+      },
+    };
+    const paths = new Set(entries.flatMap((entry) => [
+      entry.callerPath, entry.actionModulePath,
+      ...(entry.successorActionProofs || []).map((proof) => proof.actionModulePath),
+    ]));
+    const writers = structuredClone(current.writers);
+    const actionDelegations = [];
+    for (const modulePath of paths) {
+      const source = readRepositorySource(modulePath);
+      const isAction = modulePath.includes("/state/actions/");
+      if (isAction) assert.deepEqual(validateStateActionModuleSource(source, { filePath: modulePath }), []);
+      const discovery = await discoverStateWriterBindingsForSource(
+        modulePath, source, "production", { scanAllParameters: true, includeInventories: true },
+      );
+      actionDelegations.push(...discovery.bindingInventories.flatMap((item) => item.actionDelegations));
+      if (isAction) {
+        writers.find((writer) => writer.path === modulePath).bindings = discovery.bindingInventories.map((item) => ({
+          ...item.binding,
+          authority: "domain-action",
+          grants: buildStateWriterBindingGrants(item.findings, modulePath, buildCanonicalStateKeyAuthorityIndex(), "production"),
+        }));
+      }
+    }
+    return {
+      current, previousPolicy, writers, actionDelegations,
+      phase: current.progress.latestPhase,
+      retiredLegacySemanticAuthority: previousPolicy.progress.retiredLegacySemanticAuthority,
+    };
+  })();
+}
+
+test("successor carrier refresh receipts pin actual historical and current function sources", () => {
+  const fingerprint = (source, functionName) => {
+    const ast = parse(source, { ecmaVersion: "latest", sourceType: "module" });
+    const node = ast.body.map((item) => item.declaration || item).find((item) => item.id?.name === functionName);
+    assert.ok(node, functionName);
+    return createHash("sha256").update(source.slice(node.start, node.end).trim()).digest("hex");
+  };
+  for (const receipt of STATE_ACTION_SUCCESSOR_CARRIER_SOURCE_REFRESHES) {
+    assert.equal(fingerprint(readHistoricalSource(receipt.previousSourceRevision, receipt.modulePath), receipt.functionName), receipt.previousSourceFingerprint);
+    const source = readRepositorySource(receipt.modulePath);
+    assert.equal(fingerprint(source, receipt.functionName), receipt.sourceFingerprint);
+    const changed = source.replace(`function ${receipt.functionName}(`, `function ${receipt.functionName}Unreviewed(`);
+    assert.notEqual(changed, source);
+    assert.ok(validateStateActionModuleSource(changed, { filePath: receipt.modulePath })
+      .some(({ code }) => code === "state-action-successor-carrier-source-drift"));
+  }
+});
+
+test("successor carrier refresh repairs stale proofs and their shared hover call without changing retirement history or earlier observations", async () => {
+  const fixture = await getSuccessorRefreshFixture();
+  const before = structuredClone(fixture.previousPolicy);
+  const ledger = buildCallerToActionLedger(fixture);
+  assert.deepEqual(fixture.previousPolicy, before, "the historical input is immutable");
+  const candidate = { ...before, progress: { ...before.progress, callerToActionLedger: ledger } };
+  assert.deepEqual(policyChecker.validateCallerToActionLedgerHistoryTransition({ previousPolicy: before, currentPolicy: candidate }), []);
+  const byIdentity = new Map(ledger.entries.map((entry) => [entry.retiredMembershipIdentity, entry]));
+  const fullCandidate = structuredClone(fixture.current);
+  fullCandidate.progress.callerToActionLedger.entries = fullCandidate.progress.callerToActionLedger.entries.map((entry) => byIdentity.get(entry.retiredMembershipIdentity) || entry);
+  assert.deepEqual(validateStateWriterPolicySchema(fullCandidate), []);
+  const snapshot = validateStateWriterPolicySnapshot({ policy: candidate, actionDelegations: normalizeStateActionDelegations(fixture.actionDelegations) });
+  assert.deepEqual(snapshot.violations.filter(({ code }) => code.startsWith("caller-action-ledger-")), []);
+  for (const previous of before.progress.callerToActionLedger.entries) {
+    const current = byIdentity.get(previous.retiredMembershipIdentity);
+    for (const key of ["retiredMembershipIdentity", "retiredMutationSiteFingerprint", "retiredMutationSiteCount", "retiredInPhase", "recordedInPhase", "backfilled"]) {
+      assert.deepEqual(current[key], previous[key], key);
+    }
+    if (previous.recordedInPhase !== fixture.phase) {
+      assert.deepEqual({ ...current, successorProofContractIdentity: previous.successorProofContractIdentity }, previous);
+    }
+  }
+  const urban = ledger.entries.find((entry) => entry.key === "showUrban");
+  assert.equal(urban.proofPrecision, "explicit-cross-file");
+  assert.ok(urban.enclosingFunctionIdentity.endsWith('"ordinal":6}]}'));
+  assert.ok(urban.retiredEnclosingFunctionIdentity.endsWith('"ordinal":4}]}'));
+});
+
+test("successor carrier refresh rejects unknown identities, changed chains, missing grants and forged history", async () => {
+  const fixture = await getSuccessorRefreshFixture();
+  const ledger = buildCallerToActionLedger(fixture);
+  const oldEntry = fixture.previousPolicy.progress.callerToActionLedger.entries.find((entry) => entry.key === "showCityPoints");
+  const newEntry = ledger.entries.find((entry) => entry.retiredMembershipIdentity === oldEntry.retiredMembershipIdentity);
+  assert.equal(isStateActionSuccessorCarrierSourceRefresh(oldEntry, newEntry), true);
+  for (const mutate of [
+    (entry) => { entry.successorProofContractIdentity = "f".repeat(64); },
+    (entry) => { entry.successorActionProofs[0].terminalMembership = "ui|P4.4|assign|showUrban"; },
+    (entry) => { entry.successorActionProofs[0].sourceFingerprint = "f".repeat(64); },
+    (entry) => { entry.actionExportName = "setScenarioHoverRegionIdsState"; },
+    (entry) => { entry.successorActionProofs[0] = null; },
+  ]) {
+    const forged = structuredClone(newEntry);
+    mutate(forged);
+    assert.equal(isStateActionSuccessorCarrierSourceRefresh(oldEntry, forged), false);
+    const candidate = structuredClone(fixture.current);
+    const index = candidate.progress.callerToActionLedger.entries.findIndex(
+      (entry) => entry.retiredMembershipIdentity === forged.retiredMembershipIdentity,
+    );
+    candidate.progress.callerToActionLedger.entries[index] = forged;
+    assert.ok(validateStateWriterPolicySchema(candidate).some(
+      (error) => error.code === "caller-action-ledger-entry-invalid"
+        && error.retiredMembershipIdentity === forged.retiredMembershipIdentity,
+    ));
+  }
+  for (const mutate of [
+    (entry) => { entry.successorProofContractIdentity = "f".repeat(64); },
+    (entry) => { entry.successorActionProofs[0].sourceFingerprint = "f".repeat(64); },
+  ]) {
+    const previousPolicy = structuredClone(fixture.previousPolicy);
+    mutate(previousPolicy.progress.callerToActionLedger.entries.find((entry) => entry.key === oldEntry.key));
+    assert.throws(() => buildCallerToActionLedger({ ...fixture, previousPolicy }), /proof generation failed/);
+  }
+  const terminal = oldEntry.successorActionProofs[0];
+  assert.throws(() => buildCallerToActionLedger({ ...fixture,
+    actionDelegations: fixture.actionDelegations.filter((edge) => edge.sourceFingerprint !== terminal.sourceFingerprint),
+  }), /proof generation failed/);
+  const writers = structuredClone(fixture.writers);
+  writers.find((writer) => writer.path === terminal.actionModulePath).bindings
+    .find((binding) => binding.functionName === terminal.actionExportName).grants = [];
+  assert.throws(() => buildCallerToActionLedger({ ...fixture, writers }), /proof generation failed/);
+  for (const field of ["retiredInPhase", "recordedInPhase", "retiredMutationSiteFingerprint", "line"]) {
+    const candidate = { ...fixture.previousPolicy, progress: { ...fixture.previousPolicy.progress, callerToActionLedger: structuredClone(ledger) } };
+    candidate.progress.callerToActionLedger.entries.find((entry) => entry.key === oldEntry.key)[field] = "forged";
+    assert.ok(policyChecker.validateCallerToActionLedgerHistoryTransition({ previousPolicy: fixture.previousPolicy, currentPolicy: candidate })
+      .some(({ code }) => code === "caller-action-ledger-history-drift"), field);
+  }
+  const contract = findStateActionSuccessorProofContractEntry(newEntry.actionModulePath, newEntry.actionExportName, "ui|P4.4|assign|showCityPoints");
+  assert.equal(newEntry.successorProofContractIdentity, contract.contractIdentity);
+});
+
+test("committed caller-to-action ledger retains valid current schema proofs", () => {
+  const policy = JSON.parse(readRepositorySource("tools/state_writer_policy.json"));
+  assert.deepEqual(validateStateWriterPolicySchema(policy), []);
 });

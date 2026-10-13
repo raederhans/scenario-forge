@@ -2,7 +2,7 @@ import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
   emitStateBusEvent,
-} from "../core/state/index.js";
+} from "../core/state/runtime_hooks.js";
 import { state as runtimeState } from "../core/state.js";
 import { setSelectedColorState } from "../core/state/actions/appearance_selection_actions.js";
 import { FileManager } from "../core/file_manager.js";

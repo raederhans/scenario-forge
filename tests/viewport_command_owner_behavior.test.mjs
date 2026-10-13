@@ -123,9 +123,12 @@ function createHarness({
     },
   } : d3;
   const owner = createViewportCommandOwner({
-    state,
     constants,
     getters: {
+      getViewportDimensions: () => ({
+        width: Number(state.width || 0),
+        height: Number(state.height || 0),
+      }),
       getZoomBehavior: () => behavior,
       getInteractionRect: () => ({
         node: () => interactionNode,
@@ -173,6 +176,20 @@ test("updateZoomTranslateExtent noops without zoom behavior or usable dimensions
   const zeroHeight = createHarness({ state: { height: 0 } });
   zeroHeight.owner.updateZoomTranslateExtent();
   assert.deepEqual(zeroHeight.calls.scaleExtent, []);
+});
+
+test("viewport dimensions are read afresh after the command owner is created", () => {
+  const { calls, owner, state } = createHarness();
+  owner.updateZoomTranslateExtent();
+  state.width = "1024";
+  state.height = "768";
+  owner.updateZoomTranslateExtent();
+  state.width = 0;
+  owner.updateZoomTranslateExtent();
+  assert.deepEqual(calls.extent, [
+    [[0, 0], [800, 600]],
+    [[0, 0], [1024, 768]],
+  ]);
 });
 
 test("resetZoomToFit updates extents and records transform before applying d3 zoom transform", () => {
@@ -365,8 +382,11 @@ test("suppressed constraint correction keeps real D3 state without drawing and l
     });
     lifecycle.initZoom();
     const owner = createViewportCommandOwner({
-      state,
       getters: {
+        getViewportDimensions: () => ({
+          width: Number(state.width || 0),
+          height: Number(state.height || 0),
+        }),
         getD3: () => d3,
         getZoomBehavior: () => behavior,
         getInteractionRect: () => ({ node: () => node }),
@@ -421,4 +441,53 @@ test("factory freezes its exact public API", () => {
   const { owner } = createHarness();
 
   assert.equal(Object.isFrozen(owner), true);
+});
+
+test("bookmark commands capture detached coordinates and restore through real D3 zoom", () => {
+  const vendor = { navigator: { maxTouchPoints: 0 }, setTimeout, clearTimeout };
+  vm.runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), vendor);
+  const d3 = vendor.d3;
+  const node = { __zoom: d3.zoomIdentity.translate(-1300, -840).scale(4), addEventListener() {}, removeEventListener() {} };
+  let dimensions = { width: 800, height: 600 };
+  let projection = { scale: 150, translate: [400, 300] };
+  const effects = [];
+  const behavior = d3.zoom().on("zoom.bookmark-test", event => effects.push(event.transform));
+  const owner = createViewportCommandOwner({
+    getters: {
+      getViewportDimensions: () => ({ ...dimensions }), getProjectionSnapshot: () => projection,
+      getD3: () => d3, getZoomBehavior: () => behavior, getInteractionRect: () => ({ node: () => node }),
+      calculatePanExtent: () => [[-10000, -10000], [10000, 10000]],
+    },
+    effects: { setZoomTransform: () => assert.fail("restore must follow the D3 event/action path") },
+  });
+  const view = Object.freeze(owner.captureViewportView());
+  const original = node.__zoom;
+  dimensions = { width: 1200, height: 750 }; projection = { scale: 210, translate: [600, 375] };
+  assert.equal(owner.restoreViewportView(view), true);
+  assert.notEqual(node.__zoom, original);
+  assert.equal(effects.length, 1);
+  const recaptured = owner.captureViewportView();
+  for (const key of ["x", "y", "k"]) assert.ok(Math.abs(recaptured[key] - view[key]) < 1e-12);
+  const after = node.__zoom;
+  assert.equal(owner.restoreViewportView({ ...view, k: NaN }), false);
+  assert.equal(node.__zoom, after);
+  assert.equal(effects.length, 1);
+});
+
+test("bookmark restore uses D3 pan constraints and current zoom limits", () => {
+  const vendor = { navigator: { maxTouchPoints: 0 }, setTimeout, clearTimeout };
+  vm.runInNewContext(readFileSync(new URL("../vendor/d3.v7.min.js", import.meta.url), "utf8"), vendor);
+  const d3 = vendor.d3;
+  const node = { __zoom: d3.zoomIdentity, addEventListener() {}, removeEventListener() {} };
+  const behavior = d3.zoom();
+  const owner = createViewportCommandOwner({ constants: { minZoomScale: 0.5, maxZoomScale: 8 }, getters: {
+    getViewportDimensions: () => ({ width: 800, height: 600 }),
+    getProjectionSnapshot: () => ({ scale: 150, translate: [400, 300] }),
+    getD3: () => d3, getZoomBehavior: () => behavior, getInteractionRect: () => ({ node: () => node }),
+    calculatePanExtent: () => [[0, 0], [800, 600]],
+  } });
+  assert.equal(owner.restoreViewportView({ x: 1000, y: 1000, k: 40 }), true);
+  assert.equal(node.__zoom.k, 8);
+  assert.equal(node.__zoom.x, -5600);
+  assert.equal(node.__zoom.y, -4200);
 });

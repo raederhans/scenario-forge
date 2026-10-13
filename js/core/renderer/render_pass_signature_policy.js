@@ -1,11 +1,12 @@
 import { getThematicWgiSignature } from "../thematic_wgi_view_model.js";
 import { getPopulationSignature } from "../population_spatial_view_model.js";
 import { getPopulationHeatmapSnapshot } from "../population_spatial_runtime.js";
+import { normalizeIntensityFieldsState } from '../state/intensity_field_state.js';
 import {
-  normalizeIntensityFieldsState, normalizePhysicalStyleConfig,
-  normalizeTextureStyleConfig, normalizeUrbanStyleConfig,
-  normalizeCityLayerStyleConfig, normalizeTransportOverviewStyleConfig,
-} from '../state.js';
+  normalizePhysicalStyleConfig, normalizeTextureStyleConfig,
+  normalizeUrbanStyleConfig, normalizeCityLayerStyleConfig,
+  normalizeTransportOverviewStyleConfig,
+} from '../state_defaults.js';
 import { getUrbanCityRenderPassSignatureParts } from './urban_city_policy.js';
 import { RENDER_PASS_NAMES, VIEWPORT_STABLE_RENDER_PASS_SIGNATURE_NAMES } from '../map_renderer/render_pass_catalog.js';
 import { resolveContourLodRequest } from './physical_contour_lod_policy.js';

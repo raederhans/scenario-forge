@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
-import { openRasterApp, waitRasterView } from "./political_id_raster_app_session.mjs";
+import { openRasterApp, waitRasterAppReady, waitRasterView } from "./political_id_raster_app_session.mjs";
 
 export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
   const needPrecise = !captureReference && precise;
@@ -200,6 +200,8 @@ async function verifyRecovery(page, scenarioId) {
   await waitRasterView(page, scenarioId); await settled(page, true);
   if (await page.locator("#scenarioGuidePopover").isVisible()) await page.locator("#scenarioGuideCloseBtn").click();
   const recovered = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
+  const injected = await page.evaluate(() => window.__rasterAssetFaults);
+  assert.equal(injected.probeReadsHeld, 1, "the first recovery asset read must be faulted even when it would hit disk");
   assert.ok(recovered.assetTimeouts >= protectedState.assetTimeouts + 1, "the first recovery probe must actually time out");
   assert.ok(recovered.assetProbes >= 2, "the same owner must recover after a failed probe");
   assert.ok(recovered.assetRecoveries >= 1, "a probe must admit a validated asset");
@@ -208,7 +210,7 @@ async function verifyRecovery(page, scenarioId) {
   assert.equal(recovered.assets.failures, 0);
   assert.equal(recovered.assetError, ""); assert.equal(recovered.failed, "");
   assert.equal(recovered.assetRecovery.state, "ready");
-  return { injected: await page.evaluate(() => window.__rasterAssetFaults), protectedState, recovered };
+  return { injected, protectedState, recovered };
 }
 
 export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 1, viewport = { width: 1280, height: 900 },
@@ -347,6 +349,9 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
         ...(await import(new URL('js/core/state.js', document.baseURI))) };
     });
+    // Match cold startup: start the raster wait after boot/unlock completes.
+    // The existing 120-second phase watchdog still bounds the whole reload.
+    await waitRasterAppReady(page);
     await waitRasterView(page, scenarioId); await settled(page, true);
     await page.waitForFunction(() => {
       const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;

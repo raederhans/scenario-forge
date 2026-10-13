@@ -1,5 +1,5 @@
 import { normalizeRiverPaintState } from "../../river_paint/partition_model.js";
-import { applyFeaturePaintState } from "../color_state.js";
+import { applyFeaturePaintState } from "./visual_paint_actions.js";
 import { createReadonlyReferenceAssignments } from "../../map_data_boundary.js";
 // Canonical scenario activation state authority.
 // Rendering, observers, rollback orchestration, and recovery stay outside this module.

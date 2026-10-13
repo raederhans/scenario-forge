@@ -5,7 +5,7 @@ import {
   STATE_BUS_EVENTS,
   callRuntimeHook,
   emitStateBusEvent,
-} from "../state/index.js";
+} from "../state/runtime_hooks.js";
 import { setScenarioImportAudit } from "../state/scenario_runtime_state.js";
 
 export function syncProjectImportUiState({ scenarioImportAudit, hooks, recovery = false }) {

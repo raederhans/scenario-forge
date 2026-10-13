@@ -108,7 +108,7 @@ import {
   getScenarioDefaultCountryCode as getBundleLoaderDefaultCountryCode,
 } from "./scenario/bundle_loader.js";
 import { t } from "./i18n.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 const state = runtimeState;
 
 function showToast(message, options = {}) {

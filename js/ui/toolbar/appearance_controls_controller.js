@@ -6,7 +6,7 @@ import {
   URBAN_ADAPTIVE_TINT_DEFAULT_COLOR,
   URBAN_MANUAL_DEFAULT_COLOR,
   normalizeUrbanStyleConfig,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   patchAppearanceStyleGroupState,
   setAppearanceStyleGroupState,

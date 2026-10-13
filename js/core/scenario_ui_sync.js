@@ -1,8 +1,8 @@
+import { ensureScenarioAuditUiState as ensureScenarioAuditUiStateCatalog } from "./state_catalog.js";
 import {
   STATE_BUS_EVENTS,
-  ensureScenarioAuditUiState as ensureScenarioAuditUiStateCatalog,
   emitStateBusEvent,
-} from "./state/index.js";
+} from "./state/runtime_hooks.js";
 import { state as runtimeState } from "./state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 

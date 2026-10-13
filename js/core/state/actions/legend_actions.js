@@ -1,7 +1,7 @@
 // Canonical legend writes. Pure normalization is shared with LegendManager;
 // palette-owned fields continue to delegate to their existing owner.
 import { patchLegendPaletteState } from "./scenario_palette_actions.js";
-import { normalizeLabels, normalizeLegendConfig, normalizeLegendControl, normalizeColorOrder,
+import { normalizeColor, normalizeLabels, normalizeLegendConfig, normalizeLegendControl, normalizeColorOrder,
   DEFAULT_LEGEND_CONFIG, DEFAULT_LEGEND_CONTROL } from "../../legend_state_normalizers.js";
 
 export function ensureLegendState(target) {
@@ -28,4 +28,29 @@ export function setLegendLabelState(target, color, text) {
   if (text) labels[color] = text;
   else delete labels[color];
   patchLegendState(target, { legendLabels: labels });
+}
+
+export function restoreLegendLabelSnapshotState(target, snapshotLabels, presentKeys) {
+  if (!snapshotLabels || typeof snapshotLabels !== "object" || Array.isArray(snapshotLabels)) return false;
+  const labels = Object.fromEntries(Object.entries(target.legendLabels || {}));
+  // History publishes primitive text, so later hooks cannot attach coercion,
+  // getters, custom array methods or species to this presence information.
+  let present = null;
+  if (presentKeys !== undefined) {
+    if (typeof presentKeys !== "string") return false;
+    let keys;
+    try { keys = JSON.parse(presentKeys); } catch { return false; }
+    if (!Array.isArray(keys) || keys.some(key => typeof key !== "string")) return false;
+    present = new Set(keys.map(normalizeColor).filter(Boolean));
+  }
+  let restored = false;
+  Object.entries(snapshotLabels).forEach(([color, label]) => {
+    const key = normalizeColor(color);
+    if (!key) return;
+    if (present ? !present.has(key) : label === null || label === undefined) delete labels[key];
+    else labels[key] = label;
+    restored = true;
+  });
+  if (restored) patchLegendState(target, { legendLabels: labels });
+  return restored;
 }

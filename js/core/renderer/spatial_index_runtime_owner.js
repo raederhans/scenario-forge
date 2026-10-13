@@ -16,6 +16,16 @@ import {
 import {
   createSpatialIndexPerfPayload,
 } from "./spatial_index_runtime_derivation.js";
+import {
+  deletePrimaryCountryFeatureIdsState,
+  deletePrimaryLandIndexEntryState,
+  deletePrimaryPickingFeatureIdState,
+  deletePrimaryPickingKeyState,
+  setPrimaryCountryFeatureIdsState,
+  setPrimaryLandIndexEntryState,
+  setPrimaryPickingFeatureIdState,
+  setPrimaryPickingKeyState,
+} from "../state/actions/renderer_cache_actions.js";
 
 export function createSpatialIndexRuntimeOwner({
   state,
@@ -168,7 +178,7 @@ export function createSpatialIndexRuntimeOwner({
       const id = getFeatureId(feature) || `feature-${index}`;
       nextIds.add(id);
       const featureChanged = state.landIndex.get(id) !== feature;
-      if (featureChanged) state.landIndex.set(id, feature);
+      if (featureChanged) setPrimaryLandIndexEntryState(state, id, feature);
       if (!changedIds || changedIds.has(id) || featureChanged) {
         projectedBoundsCache?.delete(id);
         const bounds = getProjectedFeatureBounds(feature, { featureId: id, allowCompute: true });
@@ -183,22 +193,22 @@ export function createSpatialIndexRuntimeOwner({
       nextKeys.set(id, incrementalDelta ? (state.idToKey.get(id) || nextPickingKey++) : index + 1);
     }
     for (const id of state.landIndex.keys()) if (!nextIds.has(id)) {
-      state.landIndex.delete(id);
+      deletePrimaryLandIndexEntryState(state, id);
       projectedBoundsCache?.delete(id);
     }
-    for (const id of state.idToKey.keys()) if (!nextKeys.has(id)) state.idToKey.delete(id);
+    for (const id of state.idToKey.keys()) if (!nextKeys.has(id)) deletePrimaryPickingKeyState(state, id);
     const keyIds = new Map();
     for (const [id, key] of nextKeys) {
-      if (state.idToKey.get(id) !== key) state.idToKey.set(id, key);
+      if (state.idToKey.get(id) !== key) setPrimaryPickingKeyState(state, id, key);
       keyIds.set(key, id);
-      if (state.keyToId.get(key) !== id) state.keyToId.set(key, id);
+      if (state.keyToId.get(key) !== id) setPrimaryPickingFeatureIdState(state, key, id);
     }
-    for (const key of state.keyToId.keys()) if (!keyIds.has(key)) state.keyToId.delete(key);
-    for (const country of state.countryToFeatureIds.keys()) if (!countries.has(country)) state.countryToFeatureIds.delete(country);
+    for (const key of state.keyToId.keys()) if (!keyIds.has(key)) deletePrimaryPickingFeatureIdState(state, key);
+    for (const country of state.countryToFeatureIds.keys()) if (!countries.has(country)) deletePrimaryCountryFeatureIdsState(state, country);
     for (const [country, ids] of countries) {
       const previous = state.countryToFeatureIds.get(country);
       if (!previous || previous.length !== ids.length || previous.some((id, index) => id !== ids[index])) {
-        state.countryToFeatureIds.set(country, ids);
+        setPrimaryCountryFeatureIdsState(state, country, ids);
       }
     }
     for (const feature of state.riversData?.features || []) {

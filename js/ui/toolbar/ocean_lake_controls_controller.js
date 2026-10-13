@@ -1,4 +1,4 @@
-import { normalizeLakeStyleConfig } from "../../core/state.js";
+import { normalizeLakeStyleConfig } from "../../core/state_defaults.js";
 import { captureHistoryState, pushHistoryEntry } from "../../core/history_manager.js";
 import {
   SCENARIO_PRESENTATION_FEATURES,

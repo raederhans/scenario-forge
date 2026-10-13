@@ -804,6 +804,7 @@ export const SCENARIO_RECORDS = [
       "js/core/state/strategic_overlay_state.js",
       "js/core/special_zone_layers.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/ui/toolbar/special_zones_workbench_controller.js",
       "js/core/scenario/bundle_loader.js",
       "js/core/scenario_resources.js",
@@ -1170,6 +1171,7 @@ export const SCENARIO_RECORDS = [
       "js/core/scenario_rollback.js",
       "js/core/state.js",
       "js/core/state/index.js",
+      "js/core/state/runtime_hooks.js",
       "js/core/state/scenario_runtime_state.js"
     ],
     "ownerHints": [

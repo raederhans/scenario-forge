@@ -14,6 +14,7 @@ import {
   scanStateMutationInventory,
   scanStateMutations,
 } from "../tools/state_writer_inventory.mjs";
+import { validateStateWriterPolicySchema } from "../tools/state_writer_policy.mjs";
 
 function summarizeBindings(bindings = []) {
   return bindings.map(
@@ -1014,83 +1015,199 @@ test("registered imported actions accept a defaulted full-root state target only
   );
 });
 
-test("runtime hook registration accepts only the exact imported compat target", () => {
-  const binding = {
-    id: "module:runtimeState",
-    kind: "module",
-    name: "runtimeState",
-  };
-  const accepted = scanStateMutations(`
-    import { state as runtimeState } from "../core/state.js";
-    import { registerRuntimeHook as registerHook } from "../core/state/index.js";
-    registerHook(runtimeState, "refreshUiFn", () => true);
-  `, {
-    filePath: "js/ui/runtime_hook_fixture.js",
-    bindings: [binding],
-  });
-  assert.deepEqual(accepted, []);
-
-  const wrongSource = scanStateMutations(`
-    import { state as runtimeState } from "../core/state.js";
-    import { registerRuntimeHook } from "../core/other_helper.js";
-    registerRuntimeHook(runtimeState, "refreshUiFn", () => true);
-  `, {
-    filePath: "js/ui/runtime_hook_fixture.js",
-    bindings: [binding],
-  });
-  assert.ok(wrongSource.some(({ reason }) => reason === "state-alias-escape"));
+test("runtime hook policy authority remains limited to the two exact entries", () => {
+  function fixture(modulePath) {
+    return {
+      schemaVersion: 1, baseline: { baseSha: "fixture", phase: "P4.0" },
+      writers: [{
+        path: modulePath, surface: "production", domain: "boot",
+        authority: "compat-facade", migrationPhase: "P4.1",
+        bindings: [{
+          id: "parameter:update:0:target:1:1", kind: "function-parameter", name: "target",
+          functionName: "update", parameterName: "target", parameterIndex: 0,
+          parameterPath: "$", locator: { line: 1, column: 1 }, authority: "compat-facade",
+          grants: [{
+            domain: "boot", migrationPhase: "P4.1", operations: ["assign"], keys: ["bootPhase"],
+            memberships: [{ operation: "assign", key: "bootPhase" }],
+            aliasSites: [], dynamicSites: [], ambiguousSites: [], unsupportedSites: [],
+          }],
+        }],
+      }],
+    };
+  }
+  for (const modulePath of ["js/core/state/index.js", "js/core/state/runtime_hooks.js"]) {
+    assert.deepEqual(validateStateWriterPolicySchema(fixture(modulePath)), []);
+    const wrongAuthority = fixture(modulePath);
+    wrongAuthority.writers[0].bindings[0].authority = "legacy-target";
+    assert.ok(validateStateWriterPolicySchema(wrongAuthority).some(({ code }) => code === "binding-authority-classification-drift"));
+  }
+  assert.ok(validateStateWriterPolicySchema(fixture("js/core/state/untrusted_hooks.js"))
+    .some(({ code }) => code === "binding-authority-classification-drift"));
 });
 
-test("compat runtime hook calls require the exact canonical imported helper and root target", () => {
-  const binding = {
-    id: "module:runtimeState",
-    kind: "module",
-    name: "runtimeState",
-  };
-  const accepted = scanStateMutations(`
-    import { state as runtimeState } from "../core/state.js";
-    import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
-    invokeCompat(runtimeState, "updatePaletteLibraryUIFn", "palette");
-  `, {
-    filePath: "js/ui/runtime_hook_fixture.js",
-    bindings: [binding],
-  });
-  assert.deepEqual(accepted, []);
-
-  const rejectedSources = [
-    `
+for (const hookModulePath of ["../core/state/index.js", "../core/state/runtime_hooks.js"]) {
+  test(`runtime hook registration accepts only the exact imported compat target (${hookModulePath})`, () => {
+    const binding = {
+      id: "module:runtimeState",
+      kind: "module",
+      name: "runtimeState",
+    };
+    const accepted = scanStateMutations(`
       import { state as runtimeState } from "../core/state.js";
-      import { callCompatRuntimeHook as invokeCompat } from "../core/other_helper.js";
-      invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
-    `,
-    `
-      import { state as runtimeState } from "../core/state.js";
-      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
-      function run(invokeCompat) {
-        invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
-      }
-    `,
-    `
-      import { state as runtimeState } from "../core/state.js";
-      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
-      invokeCompat = () => undefined;
-      invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
-    `,
-    `
-      import { state as runtimeState } from "../core/state.js";
-      import { callCompatRuntimeHook as invokeCompat } from "../core/state/index.js";
-      invokeCompat(runtimeState.ui, "updatePaletteLibraryUIFn");
-    `,
-  ];
-  for (const source of rejectedSources) {
-    const findings = scanStateMutations(source, {
+      import { registerRuntimeHook as registerHook } from "${hookModulePath}";
+      registerHook(runtimeState, "updateRecentUI", () => true);
+      registerHook(runtimeState, "updateRecentUI", null);
+    `, {
       filePath: "js/ui/runtime_hook_fixture.js",
       bindings: [binding],
     });
-    assert.ok(
-      findings.some(({ reason }) => reason === "state-alias-escape"),
-      JSON.stringify(findings),
-    );
+    assert.deepEqual(accepted, []);
+
+    const wrongSource = scanStateMutations(`
+      import { state as runtimeState } from "../core/state.js";
+      import { registerRuntimeHook } from "../core/other_helper.js";
+      registerRuntimeHook(runtimeState, "refreshUiFn", () => true);
+    `, {
+      filePath: "js/ui/runtime_hook_fixture.js",
+      bindings: [binding],
+    });
+    assert.ok(wrongSource.some(({ reason }) => reason === "state-alias-escape"));
+
+    const rejectedCalls = [
+      'registerHook(runtimeState.ui, "updateRecentUI", () => true);',
+      'function run(registerHook) { registerHook(runtimeState, "updateRecentUI", () => true); }',
+      'registerHook = () => undefined; registerHook(runtimeState, "updateRecentUI", () => true);',
+      'registerHook(runtimeState, "updateRecentUI", () => runtimeState);',
+    ];
+    for (const call of rejectedCalls) {
+      const findings = scanStateMutations(`
+        import { state as runtimeState } from "../core/state.js";
+        import { registerRuntimeHook as registerHook } from "${hookModulePath}";
+        ${call}
+      `, { filePath: "js/ui/runtime_hook_fixture.js", bindings: [binding] });
+      assert.ok(findings.some(({ reason }) => reason === "state-alias-escape"), `${call}: ${JSON.stringify(findings)}`);
+    }
+  });
+
+  test(`compat runtime hook calls require the exact canonical imported helper and root target (${hookModulePath})`, () => {
+    const binding = {
+      id: "module:runtimeState",
+      kind: "module",
+      name: "runtimeState",
+    };
+    const accepted = scanStateMutations(`
+      import { state as runtimeState } from "../core/state.js";
+      import { callCompatRuntimeHook as invokeCompat } from "${hookModulePath}";
+      invokeCompat(runtimeState, "updatePaletteLibraryUIFn", "palette");
+    `, {
+      filePath: "js/ui/runtime_hook_fixture.js",
+      bindings: [binding],
+    });
+    assert.deepEqual(accepted, []);
+
+    const rejectedSources = [
+      `
+        import { state as runtimeState } from "../core/state.js";
+        import { callCompatRuntimeHook as invokeCompat } from "../core/other_helper.js";
+        invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+      `,
+      `
+        import { state as runtimeState } from "../core/state.js";
+        import { callCompatRuntimeHook as invokeCompat } from "${hookModulePath}";
+        function run(invokeCompat) {
+          invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+        }
+      `,
+      `
+        import { state as runtimeState } from "../core/state.js";
+        import { callCompatRuntimeHook as invokeCompat } from "${hookModulePath}";
+        invokeCompat = () => undefined;
+        invokeCompat(runtimeState, "updatePaletteLibraryUIFn");
+      `,
+      `
+        import { state as runtimeState } from "../core/state.js";
+        import { callCompatRuntimeHook as invokeCompat } from "${hookModulePath}";
+        invokeCompat(runtimeState.ui, "updatePaletteLibraryUIFn");
+      `,
+    ];
+    for (const source of rejectedSources) {
+      const findings = scanStateMutations(source, {
+        filePath: "js/ui/runtime_hook_fixture.js",
+        bindings: [binding],
+      });
+      assert.ok(
+        findings.some(({ reason }) => reason === "state-alias-escape"),
+        JSON.stringify(findings),
+      );
+    }
+  });
+}
+
+for (const [label, helper, call = "lookup()", resultPath = "properties.bad"] of [
+  ["local const", "function lookup() { const feature = runtimeState.feature; return feature; }"],
+  ["const alias chain", "function lookup() { const first = runtimeState.feature; const second = first; const last = second; return last; }"],
+  ["destructured const", "function lookup() { const { feature: item } = runtimeState; return item; }"],
+  ["branch-local const", "function lookup(flag) { if (flag) { const first = runtimeState.feature; return first; } const second = runtimeState.other; return second; }", "lookup(condition)"],
+  ["parameter const", "function lookup(value) { const feature = value; return feature; }", "lookup(runtimeState.feature)"],
+  ["nested helper const", "function inner(value) { const alias = value; return alias; } function lookup() { const feature = inner(runtimeState.feature); return feature; }"],
+  ["container const", "function lookup() { const feature = runtimeState.feature; const box = { feature }; return box; }", "lookup()", "feature.properties.bad"],
+  ["identity transition", "function lookup() { const feature = runtimeState.feature; if (condition) feature = {}; return feature; }"],
+]) {
+  test(`local helper ${label} result retains the caller assignment site`, () => {
+    for (const beforeDeclaration of [false, true]) {
+      const caller = `const result = ${call};\nresult.${resultPath} = true;`;
+      const source = `import { state as runtimeState } from "./state.js";\n${beforeDeclaration ? `${caller}\n${helper}` : `${helper}\n${caller}`}`;
+      const line = source.split("\n").findIndex(value => value.includes(`result.${resultPath} =`)) + 1;
+      const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+        bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+      assert.ok(findings.some(finding => finding.line === line
+        && (finding.operation === "assign" || finding.reason === "ambiguous-alias-flow")),
+      `${label}, beforeDeclaration=${beforeDeclaration}: ${JSON.stringify(findings)}`);
+    }
+  });
+}
+
+test("local helper result aliases preserve lexical shadowing and per-call arguments", () => {
+  const source = `import { state as runtimeState } from "./state.js";
+function lookup(value) { const feature = value; return feature; }
+function detached() { const runtimeState = { feature: {} }; const feature = runtimeState.feature; return feature; }
+const borrowed = lookup(runtimeState.feature);
+borrowed.bad = true;
+const local = lookup({});
+local.safe = true;
+const shadowed = detached();
+shadowed.safe = true;`;
+  const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+    bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+  assert.ok(findings.some(finding => finding.line === 5 && finding.operation === "assign"));
+  assert.equal(findings.some(finding => [7, 9].includes(finding.line)), false, JSON.stringify(findings));
+});
+
+test("local helper return containers do not treat unclassified fields as detached", () => {
+  for (const body of [
+    "const inner = {}; inner.b = model.feature; return { a: model.feature, inner };",
+    "const inner = {}; Object.assign(inner, { b: model.feature }); return { a: model.feature, inner };",
+    "const feature = model.feature; function capture() { return { b: feature }; } return { a: model.feature, inner: capture() };",
+    "class Wrap { constructor(feature) { this.b = feature; } } return { a: model.feature, inner: new Wrap(model.feature) };",
+    "const inner = {}; inner.b = model.feature; if (condition) return model.feature; return { a: model.feature, inner };",
+  ]) {
+    const source = `import { state as runtimeState } from "./state.js";\nfunction lookup(model) { ${body} }\nconst result = lookup(runtimeState);\nresult.inner.b.bad = true;`;
+    const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+      bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+    assert.ok(findings.some(finding => finding.line === 4
+      && (finding.operation === "assign" || finding.reason === "ambiguous-alias-flow")), JSON.stringify(findings));
+  }
+});
+
+test("local helper cyclic const and early captured bindings stay conservative without recursion", () => {
+  for (const helper of [
+    "function lookup() { const first = second; const second = first; return first; }",
+    "function lookup() { const feature = later; return feature; }",
+  ]) {
+    const source = `import { state as runtimeState } from "./state.js";\n${helper}\nconst result = lookup();\nconst later = runtimeState.feature;\nresult.bad = true;`;
+    const findings = scanStateMutations(source, { filePath: "tests/helper_const_alias.js", derivedAliasTaintMode: "strict",
+      bindings: [{ id: "module:runtimeState", kind: "module", name: "runtimeState", importSource: "./state.js", importedName: "state" }] });
+    assert.ok(findings.some(finding => finding.line === 5 && finding.reason === "ambiguous-alias-flow"), JSON.stringify(findings));
   }
 });
 
@@ -2093,7 +2210,7 @@ test("action binding discovery fails closed when a non-target parameter is mutat
 });
 
 test("paint delegation keeps its target effectful and binds read-only siblings to exact source", async () => {
-  const modulePath = "js/core/state/color_state.js";
+  const modulePath = "js/core/state/actions/visual_paint_actions.js";
   const source = await readFile(new URL("../" + modulePath, import.meta.url), "utf8");
   const binding = parameterBindingFor(source, "applyFeaturePaintState", "target");
   const inventory = scanStateMutationInventory(source, { filePath: modulePath, bindings: [binding] });
@@ -2101,21 +2218,31 @@ test("paint delegation keeps its target effectful and binds read-only siblings t
   for (const statement of ["featureIds.push('bad');", "value.changed = true;"]) {
     const marker = "if (!Array.isArray(featureIds))";
     assert.ok(source.includes(marker));
-    await assert.rejects(discoverStateWriterBindingsForSource(modulePath,
-      source.replace(marker, statement + " " + marker), "production", { scanAllParameters: true }),
-      error => error.code === "state-effectful-delegator-source-mismatch");
+    assert.ok((await validateStateActionNonTargetParameterMutations(modulePath,
+      source.replace(marker, statement + " " + marker))).length > 0);
   }
+  const facadePath = "js/core/state/color_state.js";
+  const facadeSource = await readFile(new URL("../" + facadePath, import.meta.url), "utf8");
+  const facadeBinding = parameterBindingFor(facadeSource, "applyFeaturePaintState", "target");
+  const facadeInventory = scanStateMutationInventory(facadeSource, { filePath: facadePath, bindings: [facadeBinding] });
+  assert.ok(facadeInventory.actionDelegations.some(edge => edge.actionModulePath === modulePath
+    && edge.actionExportName === "applyFeaturePaintState"));
+  const facadeMarker = "return applyVisualFeaturePaintState(target";
+  assert.ok(facadeSource.includes(facadeMarker));
+  await assert.rejects(discoverStateWriterBindingsForSource(facadePath,
+    facadeSource.replace(facadeMarker, "featureIds.push('bad'); " + facadeMarker), "production", { scanAllParameters: true }),
+    error => error.code === "state-effectful-delegator-source-mismatch");
   const actionPath = "js/core/state/actions/scenario_activation_actions.js";
   const actionSource = await readFile(new URL("../" + actionPath, import.meta.url), "utf8");
   for (const replacement of [
-    "applyFeaturePaintState(target, featureIds, color, {});",
+    "applyFeaturePaintState(featureIds, target, color);",
     "unknownPaintState(target, featureIds, color);",
     "featureIds.push('bad'); applyFeaturePaintState(target, featureIds, color);",
   ]) {
     const marker = "applyFeaturePaintState(target, featureIds, color);";
     assert.ok(actionSource.includes(marker));
     assert.ok((await validateStateActionNonTargetParameterMutations(actionPath,
-      actionSource.replace(marker, replacement))).length > 0);
+      actionSource.replace(marker, replacement))).length > 0, replacement);
   }
 });
 
@@ -2131,7 +2258,16 @@ test("reference assignment copying rejects source writes and changed record help
     "assignments.bad = true; " + marker), entry).violations.some(item => item.code === "state-target-pure-reader-source-drift"));
   const helperMarker = "const record = (value) =>";
   assert.ok(source.includes(helperMarker));
-  assert.ok(inspectStateTargetPureReaderFunctionSource(source, entry, {
-    readSource: () => source.replace(helperMarker, "const record = (value) => (value.bad = true); const changedRecord = (value) =>"),
-  }).violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"));
+  assert.ok(Object.hasOwn(entry.dependencyFingerprints, entry.modulePath));
+  const changedHelperSource = source.replace(helperMarker,
+    "const record = (value) => (value.bad = true); const changedRecord = (value) =>");
+  // The helper belongs to this module: mutate the source under inspection.
+  // Stale disk contents must not conceal a changed in-memory dependency.
+  assert.ok(inspectStateTargetPureReaderFunctionSource(changedHelperSource, entry, {
+    readSource: () => source,
+  }).violations.some(item => item.code === "state-target-pure-reader-dependency-source-drift"
+    && item.dependencyName === entry.modulePath));
+  assert.deepEqual(inspectStateTargetPureReaderFunctionSource(source, entry, {
+    readSource: () => assert.fail("Self-module receipts must use the supplied source"),
+  }).violations, []);
 });

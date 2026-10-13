@@ -9,6 +9,12 @@ import { STATE_TARGET_PURE_READER_CONTRACT, STATE_TARGET_EFFECTFUL_DELEGATOR_CON
 import { validateStateWriterPolicySchema, buildCanonicalStateKeyAuthorityIndex } from "../tools/state_writer_policy.mjs";
 import * as contracts from "../tools/state_action_delegation_contract.mjs";
 import * as borrowed from "../tools/state_borrowed_effect_contract.mjs";
+import { inspectStateCsvActionInputSites, CSV_LEGEND_ACTION_PATH, CSV_ZONE_ACTION_PATH } from "../tools/state_csv_action_input_contract.mjs";
+import { inspectStateCsvTargetEffects } from "../tools/state_csv_target_effect_contract.mjs";
+import { inspectStateWaterPathResourceSources, WATER_PATH_RESOURCE_MODULE_PATH } from "../tools/state_water_path_resource_contract.mjs";
+import { inspectStateCountryInspectorProjectionSources, STATE_COUNTRY_INSPECTOR_PROJECTION_MODULE_PATH } from "../tools/state_country_inspector_projection_contract.mjs";
+import { inspectStateCsvHistorySourceRefreshEvidence } from "../tools/state_csv_history_source_contract.mjs";
+import { inspectStateEditorUiSourceRefreshEvidence } from "../tools/state_editor_ui_source_contract.mjs";
 
 const entry = STATE_TARGET_PURE_READER_CONTRACT.find(item => item.functionName === "createPoliticalFeaturePolicy");
 const read = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
@@ -70,6 +76,53 @@ test("all capability retirements prove historical authority and reject restored 
   t.diagnostic(`Verified all ${entries.length} retirement receipts and ${entries.length} restored-source or injected-write rejections; historical pins and read permissions are unchanged.`);
 });
 
+test("capability hook import receipts accept only the exact six import migrations", () => {
+  const receipts = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES;
+  assert.equal(receipts.length, 6);
+  for (const receipt of receipts) {
+    const historical = execFileSync("git", ["show", `${receipt.previousSourceRevision}:${receipt.modulePath}`], { encoding: "utf8" });
+    const current = read(receipt.modulePath);
+    const inspect = (source, readHistoricalSource = () => historical) => contracts.matchesStateCapabilityRetirementSource({
+      modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+      source, readCurrentSource: read, readHistoricalSource,
+    });
+    assert.equal(inspect(current), true, receipt.modulePath);
+    assert.equal(inspect(current.replaceAll("\n", "\r\n")), true, "line endings do not alter source evidence");
+    assert.equal(inspect(historical), false, "the migrated source cannot silently revert");
+    assert.equal(inspect(`${current}\nruntimeState.devScenarioEditor = {};\n`), false, "a restored writer is rejected");
+    assert.equal(inspect(current.replace(receipt.importSource, "../unreviewed_hooks.js")), false, "an unreviewed provider is rejected");
+    assert.equal(inspect(current, () => `${historical}\n// changed anchor\n`), false, "historical source must still match");
+  }
+});
+
+test("capability hook import receipts bind the facade, implementation, bus, and config", () => {
+  const receipt = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES[0];
+  const historical = execFileSync("git", ["show", `${receipt.previousSourceRevision}:${receipt.modulePath}`], { encoding: "utf8" });
+  for (const dependency of contracts.STATE_CAPABILITY_RETIREMENT_HOOK_DEPENDENCY_PROOFS) {
+    for (const replacement of [null, `${read(dependency.modulePath)}\n// changed provider\n`]) {
+      assert.equal(contracts.matchesStateCapabilityRetirementSource({
+        modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+        source: read(receipt.modulePath), readHistoricalSource: () => historical,
+        readCurrentSource: modulePath => modulePath === dependency.modulePath ? replacement : read(modulePath),
+      }), false, dependency.modulePath);
+    }
+  }
+});
+
+test("capability hook import migration preserves the frozen retirement ledger", () => {
+  const revision = contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES[0].previousSourceRevision;
+  const previous = JSON.parse(execFileSync("git", ["show", `${revision}:tools/state_writer_policy.json`], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 }));
+  const current = JSON.parse(read("tools/state_writer_policy.json"));
+  const retired = policy => policy.progress.callerToActionLedger.entries.filter(entry => entry.proofPrecision === "explicit-capability-retirement");
+  assert.ok(retired(previous).length > 0);
+  assert.deepEqual(retired(current), retired(previous));
+  for (const entry of retired(current)) {
+    const contract = contracts.findStateCapabilityRetirementContractEntry(entry.retiredMembershipIdentity);
+    assert.equal(entry.capabilityRetirementContractIdentity, contract.contractIdentity);
+    assert.equal(entry.currentSourceFingerprint, contract.currentSourceFingerprint);
+  }
+});
+
 test("all remaining declared source-proof families pass without repository mutation discovery", t => {
   const failures = [], counts = {};
   const check = (family, entries, inspect) => {
@@ -96,6 +149,17 @@ test("all remaining declared source-proof families pass without repository mutat
   check("crossFileContract", [{}], () => contracts.validateStateActionCrossFileMigrationContract());
   check("successorContract", [{}], () => contracts.validateStateActionSuccessorProofContract());
   check("replacementContract", [{}], () => contracts.validateStateActionLegacyMembershipReplacementContract());
+  check("csvActionInputs", [CSV_LEGEND_ACTION_PATH, CSV_ZONE_ACTION_PATH], path => inspectStateCsvActionInputSites(path, read(path)));
+  check("csvTargetEffects", [CSV_ZONE_ACTION_PATH], path => inspectStateCsvTargetEffects({ source: read(path) }));
+  check("waterPathResources", [WATER_PATH_RESOURCE_MODULE_PATH], path => inspectStateWaterPathResourceSources({ source: read(path) }));
+  check("countryInspectorProjections", [STATE_COUNTRY_INSPECTOR_PROJECTION_MODULE_PATH], path => inspectStateCountryInspectorProjectionSources({ source: read(path) }));
+  const historical = (revision, path) => execFileSync("git", ["show", `${revision}:${path}`], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
+  const sourceRefreshOptions = receipt => ({ modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+    source: read(receipt.modulePath), readCurrentSource: read, readHistoricalSource: historical });
+  check("csvHistorySource", contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.filter(e => e.modulePath === "js/core/history_manager.js"),
+    e => inspectStateCsvHistorySourceRefreshEvidence(sourceRefreshOptions(e)));
+  check("editorUiSource", contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.filter(e => ["js/ui/sidebar.js", "js/ui/toolbar.js"].includes(e.modulePath)),
+    e => inspectStateEditorUiSourceRefreshEvidence(sourceRefreshOptions(e)));
   t.diagnostic(JSON.stringify(counts));
   assert.deepEqual(failures, []);
 });

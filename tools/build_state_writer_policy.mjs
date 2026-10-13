@@ -7,6 +7,10 @@ import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
+import { VISUAL_PAINT_ACTION_PATH, inspectVisualPaintInputSites } from "./state_visual_paint_contract.mjs";
+import { inspectStateCsvActionInputSites, csvActionInputSiteKey } from "./state_csv_action_input_contract.mjs";
+import { filterStateCsvTargetEffectFindings } from "./state_csv_target_effect_contract.mjs";
+import { POLITICAL_GPU_RESOURCE_PATH, inspectPoliticalGpuResourceOrigin } from "./state_resource_origin_contract.mjs";
 import {
   STATE_RIVER_OWNER_SOURCE_RECEIPTS,
   inspectRiverOwnerSourceEvidence,
@@ -35,6 +39,7 @@ import {
   expandStateActionMembershipsWithLegacyReplacements,
   findStateActionCrossFileMigrationContractEntry,
   findStateActionSuccessorProofContractEntry,
+  isStateActionSuccessorCarrierSourceRefresh,
   STATE_IMPORTED_BORROWED_PROJECTION_CONTRACT,
   inspectStateImportedBorrowedProjectionSource,
   getStateTargetPureReaderContractEntriesForModule,
@@ -43,6 +48,7 @@ import {
   inspectStateActionNonTargetNormalizerSites,
   STATE_CAPABILITY_RETIREMENT_CONTRACT,
   STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS,
+  matchesStateCapabilityRetirementSource,
   findStateCapabilityRetirementContractEntry,
   inspectStateTargetPureReaderFunctionSource,
   STATE_ACTION_CROSS_FILE_MIGRATION_CONTRACT,
@@ -2371,10 +2377,20 @@ export function inspectStateCapabilityRetirementEvidence({
     if (!currentSourceByPath.has(modulePath)) currentSourceByPath.set(modulePath, readCurrentSource(modulePath));
     return currentSourceByPath.get(modulePath);
   };
+  const sourceMatchByIdentity = new Map();
+  const sourceMatches = (modulePath, sourceFingerprint, source) => {
+    const identity = `${modulePath}:${sourceFingerprint}`;
+    if (!sourceMatchByIdentity.has(identity)) sourceMatchByIdentity.set(identity,
+      matchesStateCapabilityRetirementSource({
+        modulePath, sourceFingerprint, source,
+        readCurrentSource: currentSource, readHistoricalSource,
+      }));
+    return sourceMatchByIdentity.get(identity);
+  };
   for (const proof of STATE_CAPABILITY_RETIREMENT_SOURCE_PROOFS) {
     try {
       const source = currentSource(proof.modulePath);
-      if (source === null || fingerprint(source) !== proof.sourceFingerprint
+      if (!sourceMatches(proof.modulePath, proof.sourceFingerprint, source)
         || /scenario_tag_creator_controller|devScenarioTagCreator|devScenarioEditor/.test(source)) {
         violations.push({ code: "state-capability-retirement-proof-invalid", reason: "entry-point-source-drift", modulePath: proof.modulePath });
       }
@@ -2402,7 +2418,7 @@ export function inspectStateCapabilityRetirementEvidence({
     try {
       const source = currentSource(entry.modulePath);
       if (entry.currentSourceFingerprint
-        ? source === null || fingerprint(source) !== entry.currentSourceFingerprint
+        ? !sourceMatches(entry.modulePath, entry.currentSourceFingerprint, source)
           || (entry.allowReadReferences ? hasRetiredDirectMutation(source, entry) : source.includes(entry.key))
         : source !== null) {
         violations.push({ code: "state-capability-retirement-proof-invalid", reason: "current-source-drift", identity: entry.retiredMembershipIdentity });
@@ -2449,7 +2465,7 @@ export function inspectStateCapabilityRetirementEvidence({
         .flatMap(binding => binding.grants || []).flatMap(grant => grant.memberships || [])
         .some(membership => membership.operation === entry.operation && membership.key === entry.key);
       if (!terminalIdentityMatches || actionSource === null
-        || fingerprint(actionSource) !== entry.terminalActionSourceFingerprint || terminalWritePresent) {
+        || !sourceMatches(entry.terminalActionModulePath, entry.terminalActionSourceFingerprint, actionSource) || terminalWritePresent) {
         violations.push({ code: "state-capability-retirement-proof-invalid", reason: "terminal-action-authority-drift", identity: entry.retiredMembershipIdentity });
       }
     }
@@ -3080,6 +3096,26 @@ export function buildCallerToActionLedger({
         // first exact call site while distinct action owners remain ambiguous.
         liveEdge = successorEdges[0].edge;
         successorResolution = successorEdges[0].resolution;
+      }
+      if (proof.successorProofContractIdentity
+        && proof.successorProofContractIdentity
+          !== successorResolution.successorProofContractIdentity) {
+        const currentProof = {
+          ...entry,
+          ...proof,
+          successorActionProofs: successorResolution.successorActionProofs,
+          successorProofContractIdentity: successorResolution.successorProofContractIdentity,
+        };
+        if (!isStateActionSuccessorCarrierSourceRefresh({ ...entry, ...proof }, currentProof)) {
+          missingProofs.push({
+            code: "caller-action-successor-contract-refresh-unproven",
+            retiredMembershipIdentity: entry.retiredMembershipIdentity,
+          });
+          continue;
+        }
+        // Only the reviewed carrier identity changes for earlier-phase proofs.
+        // Their observations and all retirement provenance remain frozen.
+        proof.successorProofContractIdentity = currentProof.successorProofContractIdentity;
       }
       const refreshLiveObservation =
         previousPhase !== normalizedPhase
@@ -4117,7 +4153,9 @@ function isActionPath(relativePath) {
 }
 
 function isCompatFacadePath(relativePath) {
-  return normalizeRelativePath(relativePath) === "js/core/state/index.js";
+  const normalized = normalizeRelativePath(relativePath);
+  return normalized === "js/core/state/index.js"
+    || normalized === "js/core/state/runtime_hooks.js";
 }
 
 function borrowedMapStorageArgumentSites(relativePath, source, entry) {
@@ -4160,6 +4198,9 @@ export async function validateStateActionNonTargetParameterMutations(
   const reviewedNormalizerSites = inspectStateActionNonTargetNormalizerSites(
     source, relativePath,
   ).sites;
+  const reviewedPaintSites = relativePath === VISUAL_PAINT_ACTION_PATH
+    ? inspectVisualPaintInputSites(source).sites : new Set();
+  const reviewedCsvInputSites = inspectStateCsvActionInputSites(relativePath, source).sites;
   for (const entry of contractEntries || []) {
     const storageSites = borrowedMapStorageArgumentSites(relativePath, source, entry);
     for (
@@ -4180,6 +4221,10 @@ export async function validateStateActionNonTargetParameterMutations(
         binding,
       );
       for (const finding of mutationFindings) {
+        if (finding.unsupported && finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
+          && reviewedCsvInputSites.has(csvActionInputSiteKey(entry.exportName, candidate.parameterName, candidate.parameterIndex,
+            candidate.parameterPath, finding.line, finding.column))) continue;
+        if (reviewedPaintSites.has(`${candidate.parameterName}:${candidate.parameterIndex}:${finding.reason}:${finding.evidenceKind || ""}:${finding.line}:${finding.column}`)) continue;
         if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
           && storageSites.has(`${finding.line}:${finding.column}:${candidate.parameterName}`)) continue;
         if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
@@ -4351,18 +4396,21 @@ function filterStateTargetPureReaderModuleFindings({
 
 export function applyStateWriterBindingFindingContracts({
   relativePath,
+  source,
   binding,
   findings = [],
   enforceCurrentContracts = true,
 } = {}) {
   return withoutRedundantContainerAliasEscapeFindings(
-    enforceCurrentContracts
+    filterStateCsvTargetEffectFindings({ relativePath, source, binding, enforceCurrentContracts,
+      findings: enforceCurrentContracts
       ? filterStateTargetPureReaderModuleFindings({
         relativePath,
         binding,
         findings,
       })
       : findings,
+    }),
   );
 }
 
@@ -4685,7 +4733,13 @@ export async function discoverStateWriterBindingsForSource(
           scanner,
           recognizeCurrentContracts: true,
         },
-      );
+      ).map((inventory) => ({
+        ...inventory,
+        findings: applyStateWriterBindingFindingContracts({
+          relativePath, source, binding: inventory.binding,
+          findings: inventory.findings, enforceCurrentContracts,
+        }),
+      }));
     return includeInventories
       ? { bindings: actionBindings, bindingInventories }
       : actionBindings;
@@ -4751,7 +4805,12 @@ export async function discoverStateWriterBindingsForSource(
       ),
   );
   const candidateBindings = [];
+  const resourceBinding = enforceCurrentContracts && relativePath === POLITICAL_GPU_RESOURCE_PATH
+    ? inspectPoliticalGpuResourceOrigin({ source }).binding : null;
   for (const candidate of allParameterDiscovery.bindings) {
+    if (resourceBinding && candidate.functionName === resourceBinding.functionName
+      && candidate.parameterIndex === resourceBinding.parameterIndex && candidate.parameterPath === resourceBinding.parameterPath
+      && candidate.parameterName === resourceBinding.parameterName) continue;
     if (
       pureReaderCandidateIdentities.has(
         stateTargetPureReaderCandidateIdentity(candidate),
@@ -4807,6 +4866,7 @@ export async function discoverStateWriterBindingsForSource(
       ...inventory,
       findings: applyStateWriterBindingFindingContracts({
         relativePath,
+        source,
         binding: inventory.binding,
         findings: inventory.findings,
         enforceCurrentContracts,
@@ -5647,13 +5707,9 @@ export function isDelegationOnlyStateWriterCandidate({
     && actionDelegations.length > 0;
 }
 
-// A registered action delegates its paint effects to the exact imported
-// paint implementation. Project the reachable assignments into its logical
-// action binding without adding another runtime write. The river helper's
-// source receipt proves that it copies overrides before deleting child colors;
-// the resulting paint object is assigned only to the target. The deletion branch in
-// the implementation requires remove=true, which this three-argument call
-// never supplies.
+// The paint implementation now has its own canonical action. Verify the
+// recorded direct effects and real palette delegation without synthesizing a
+// second writer. Keep the entry point for focused migration checks.
 export function projectPalettePaintActionCandidate(scannedCandidates, {
   readSource = modulePath => readFileSync(path.join(PROJECT_ROOT, modulePath), "utf8"),
 } = {}) {
@@ -5665,74 +5721,34 @@ export function projectPalettePaintActionCandidate(scannedCandidates, {
     error.violations = evidence.violations;
     throw error;
   }
-  const calleeCandidates = scannedCandidates.filter(candidate =>
+  const callees = scannedCandidates.filter(candidate =>
     candidate.path === receipt.calleeModulePath
     && candidate.binding?.kind === "function-parameter"
     && candidate.binding.functionName === receipt.importedName
-    && candidate.binding.parameterIndex === 0
-    && candidate.binding.parameterPath === "$");
-  const calleeFindings = calleeCandidates[0]?.findings || [];
-  const actualEffects = calleeFindings.map(finding => [
+    && candidate.binding.parameterIndex === 0 && candidate.binding.parameterPath === "$");
+  const effects = (callees[0]?.findings || []).map(finding => [
     finding.operation, finding.key, finding.pathSegments?.join("."),
     finding.unsupported, finding.sourceFingerprint,
   ].join("|")).sort();
-  const expectedEffects = [
-    "unsupported|riverPaint|riverPaint|true|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
+  const expected = [
     "assign|riverPaint|riverPaint|false|56707c19f5d61cefd1df2cde7710275ac48a98654555ca00bf0bcc0ea9db9e70",
     "assign|visualOverrides|visualOverrides|false|480611b47858cfa78e28a67a707381b5650bdb07cc4344ac8c8feb58c2889b88",
     "assign|visualOverrides|visualOverrides.*|false|91883c994dfd68079ce6f9b74f8e9ef0e10a4b08c27d21eeaaa2b663be690cd0",
     "delete|visualOverrides|visualOverrides.*|false|0732c3c19a5f7f84ee8a1d733333d1ccdc637b56ebf3b8ee7a0b2cb123bdba18",
   ].sort();
-  if (calleeCandidates.length !== 1 || !isDeepStrictEqual(actualEffects, expectedEffects)) {
+  if (callees.length !== 1 || !isDeepStrictEqual(effects, expected)) {
     const error = new Error("Palette paint callee target effects changed.");
     error.code = "state-action-imported-target-effects-drift";
     throw error;
   }
-  if (scannedCandidates.some(candidate => candidate.path === receipt.modulePath
-    && candidate.binding?.functionName === receipt.exportName)) {
-    const error = new Error("Palette paint action already has a scanned writer binding.");
-    error.code = "state-action-imported-target-duplicate-binding";
+  const callers = scannedCandidates.filter(candidate => candidate.path === receipt.modulePath
+    && candidate.binding?.functionName === receipt.exportName);
+  if (callers.length !== 1 || callers[0].delegationOnly !== true || callers[0].findings.length !== 0) {
+    const error = new Error("Palette paint action must have one delegation-only binding.");
+    error.code = "state-action-imported-target-delegation-missing";
     throw error;
   }
-  const actionSource = readSource(receipt.modulePath);
-  const targetCandidates = discoverFunctionParameterBindings(actionSource, { parameterNames: null }).bindings
-    .filter(candidate => candidate.functionName === receipt.exportName
-      && candidate.parameterIndex === 0 && candidate.parameterName === "target"
-      && candidate.parameterPath === "$");
-  if (targetCandidates.length !== 1) {
-    const error = new Error("Palette paint action target binding changed.");
-    error.code = "state-action-imported-target-binding-drift";
-    throw error;
-  }
-  const binding = createParameterBinding(targetCandidates[0]);
-  const call = evidence.call;
-  const finding = {
-    filePath: receipt.modulePath,
-    bindingId: binding.id,
-    bindingKind: binding.kind,
-    root: "target",
-    alias: "",
-    aliasChain: [],
-    operation: "assign",
-    key: "visualOverrides",
-    pathSegments: ["visualOverrides", "*"],
-    dynamic: true,
-    unsupported: false,
-    reason: "",
-    evidenceKind: "reviewed-imported-target-effect",
-    start: call.start,
-    end: call.end,
-    line: call.loc.start.line,
-    column: call.loc.start.column,
-    endLine: call.loc.end.line,
-    endColumn: call.loc.end.column,
-    enclosingFunctionIdentity: JSON.stringify({ kind: "function", ancestry: [{ name: receipt.exportName, ordinal: 0 }] }),
-    sourceFingerprint: receipt.callFingerprint,
-  };
-  return {
-    path: receipt.modulePath, surface: "production", binding, delegationOnly: false,
-    findings: [finding, { ...finding, key: "riverPaint", pathSegments: ["riverPaint"], dynamic: false }],
-  };
+  return null;
 }
 
 export async function resolveCachedStateWriterRepositoryScan({
@@ -6248,7 +6264,7 @@ export async function buildStateWriterPolicySnapshot({
     ),
   });
   const scannedCandidates = compareP4StateActionPhases(normalizedPhase, "P4.4") >= 0
-    ? [...cachedScannedCandidates, projectPalettePaintActionCandidate(cachedScannedCandidates)]
+    ? [...cachedScannedCandidates, projectPalettePaintActionCandidate(cachedScannedCandidates)].filter(Boolean)
     : cachedScannedCandidates;
   const unknownStateKeyAuthorityViolations =
     collectUnknownStateKeyAuthorityViolations(

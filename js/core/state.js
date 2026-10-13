@@ -13,7 +13,7 @@ import {
 } from "./state_catalog.js";
 import {
   bindStateCompatSurface,
-} from "./state/index.js";
+} from "./state/runtime_hooks.js";
 import {
   createDefaultHistoryState,
 } from "./state/history_state.js";

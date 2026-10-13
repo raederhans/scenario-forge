@@ -1,6 +1,6 @@
 import { countryNames, defaultCountryPalette, state as runtimeState } from "./state.js";
 import { normalizeMapSemanticMode } from "./state.js";
-import { callRuntimeHook, readRegisteredRuntimeHookSource } from "./state/index.js";
+import { callRuntimeHook, readRegisteredRuntimeHookSource } from "./state/runtime_hooks.js";
 import { syncResolvedDefaultCountryPalette } from "./palette_manager.js";
 import {
   createDefaultActiveScenarioChunksState,

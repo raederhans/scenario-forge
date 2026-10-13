@@ -44,13 +44,14 @@ class MapRendererProjectionViewportContextBoundaryContractTest(unittest.TestCase
         self.assertNotIn("state: runtimeState,", viewport_read_owner)
 
         for token in [
-            "state: runtimeState,",
+            "getViewportDimensions:",
             "minZoomScale: MIN_ZOOM_SCALE,",
             "maxZoomScale: MAX_ZOOM_SCALE,",
             "getZoomBehavior: () => rendererSurfaceHost.getZoomBehavior(),",
             "setZoomTransform: (transform) => {",
         ]:
             self.assertIn(token, viewport_command_owner)
+        self.assertNotIn("state: runtimeState,", viewport_command_owner)
 
     def test_context_migration_does_not_leave_global_or_public_boundaries(self):
         renderer_content = MAP_RENDERER_JS.read_text(encoding="utf-8")

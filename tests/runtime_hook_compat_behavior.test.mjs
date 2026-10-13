@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import * as facade from "../js/core/state/index.js";
+import * as hooks from "../js/core/state/runtime_hooks.js";
 
 import {
   bindStateCompatSurface,
@@ -8,6 +10,46 @@ import {
   readRegisteredRuntimeHookSource,
   registerRuntimeHook,
 } from "../js/core/state/index.js";
+
+test("legacy facade preserves all domain exports and forwards the same lightweight hook API", async () => {
+  const domains = await Promise.all([
+    import("../js/core/state_defaults.js"),
+    import("../js/core/state_catalog.js"),
+    import("../js/core/state/boot_state.js"),
+    import("../js/core/state/content_state.js"),
+    import("../js/core/state/color_state.js"),
+    import("../js/core/state/ui_state.js"),
+  ]);
+  const expected = Object.assign({}, ...domains, hooks);
+  assert.deepEqual(Object.keys(facade).sort(), Object.keys(expected).sort());
+  for (const [name, value] of Object.entries(expected)) {
+    assert.equal(facade[name], value, `${name} keeps its original provider identity`);
+  }
+  const root = await import("../js/core/state.js");
+  assert.equal(root.bindStateCompatSurface, hooks.bindStateCompatSurface);
+  assert.equal(root.callRuntimeHook, hooks.callRuntimeHook);
+});
+
+test("registrations and bus observers interoperate across legacy and lightweight entries", (t) => {
+  const target = bindStateCompatSurface({});
+  const name = "updateRecentUI";
+  const event = hooks.STATE_BUS_EVENTS[name];
+  const observed = [];
+  const listener = facade.on(event, payload => { observed.push(payload); });
+  t.after(() => {
+    facade.off(event, listener);
+    hooks.registerRuntimeHook(target, name, null);
+    facade.registerRuntimeHook(target, "getViewportGeoBoundsFn", null);
+  });
+  facade.registerRuntimeHook(target, name, (...args) => args);
+  assert.deepEqual(hooks.callRuntimeHook(null, name, "recent", 2), [undefined, ["recent", 2]]);
+  assert.deepEqual(observed, [{ __runtimeHookArgs: ["recent", 2] }]);
+  assert.equal(hooks.readRegisteredRuntimeHookSource(null, name), facade.readRegisteredRuntimeHookSource(target, name));
+  hooks.registerRuntimeHook(null, "getViewportGeoBoundsFn", value => value);
+  const result = {};
+  assert.equal(facade.callRuntimeHook(target, "getViewportGeoBoundsFn", result), result);
+  assert.equal(target.getViewportGeoBoundsFn(result), result);
+});
 
 test("captured compatibility callbacks preserve the original bare-call receiver after replacement", () => {
   const result = {};

@@ -7,7 +7,7 @@ import {
   setScenarioDataHealthState,
 } from "./state/actions/scenario_health_actions.js";
 import { t } from "./i18n.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 const state = runtimeState;
 
 function showToast(message, options = {}) {

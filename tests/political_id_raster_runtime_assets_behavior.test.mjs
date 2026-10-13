@@ -7,6 +7,44 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+test("release faults stall the first asset probe before a disk hit and preserve cancellation, writes and later probes", async t => {
+  const { installRasterAssetProbeFault, shouldHoldRasterAssetRequest } = await import("../tools/political_id_raster_app_session.mjs");
+  const priorWindow = globalThis.window, priorWorker = globalThis.Worker;
+  t.after(() => {
+    if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow;
+    if (priorWorker === undefined) delete globalThis.Worker; else globalThis.Worker = priorWorker;
+  });
+  const sent = [];
+  globalThis.Worker = class { postMessage(message, options) { sent.push({ receiver: this, message, options }); } };
+  let diagnostics = { assetProbes: 0, assetTimeouts: 3, assetRecovery: { state: "cooldown" } };
+  const faults = { active: false, recoveryTimeouts: 1, probeReadsHeld: 0, intercepted: 0, protectedState: { assetProbes: 0, assetTimeouts: 3 } };
+  globalThis.window = { __rasterAssetFaults: faults,
+    __rasterTask: { renderer: { getPoliticalIdRasterDiagnostics: () => diagnostics } } };
+  installRasterAssetProbeFault();
+  const worker = new Worker();
+  worker.postMessage({ type: "LOAD_POLITICAL_ID_ASSET", taskId: "prior-read", cacheMode: "normal" });
+  assert.equal(sent.length, 1, "a late initial read must not spend the first recovery fault");
+  assert.equal(faults.recoveryTimeouts, 1);
+  diagnostics = { assetProbes: 1, assetTimeouts: 3, assetRecovery: { state: "probing" } };
+  worker.postMessage({ type: "LOAD_POLITICAL_ID_ASSET", taskId: "cached-probe", cacheMode: "only" });
+  assert.equal(sent.length, 1, "a cached first probe is held without relying on any network request");
+  assert.deepEqual(faults.probeRead, { taskId: "cached-probe", cacheMode: "only" });
+  assert.equal(faults.probeReadsHeld, 1);
+  assert.equal(faults.recoveryTimeouts, 1, "holding a dispatch is not a completed timeout");
+  assert.equal(shouldHoldRasterAssetRequest(), true, "late network requests stay protected until the owner times out");
+  worker.postMessage({ type: "CANCEL_TASK", taskId: "cached-probe" });
+  const transfer = [];
+  worker.postMessage({ type: "SAVE_POLITICAL_ID_ASSET", taskId: "save" }, transfer);
+  diagnostics = { assetProbes: 2, assetTimeouts: 4, assetRecovery: { state: "probing" } };
+  worker.postMessage({ type: "LOAD_POLITICAL_ID_ASSET", taskId: "recovery", cacheMode: "normal" });
+  assert.deepEqual(sent.map(item => item.message.taskId), ["prior-read", "cached-probe", "save", "recovery"]);
+  assert.ok(sent.every(item => item.receiver === worker));
+  assert.equal(sent[2].options, transfer);
+  assert.equal(faults.recoveryTimeouts, 0);
+  assert.equal(shouldHoldRasterAssetRequest(), false, "the verified timeout releases the network path too");
+  assert.equal(faults.probeReadsHeld, 1);
+});
+
 test("cache release gate requires a persisted normal view, the same revisit view and real disk hits", async () => {
   const { assertRasterCacheRevisit } = await import("../tools/verify_political_id_raster_integration.mjs");
   const warm = { storage: { entries: 1, bytes: 1048744 }, diagnostics: { view: { x: 0, y: 0, k: 1, dpr: 2 } } };

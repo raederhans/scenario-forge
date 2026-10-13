@@ -529,6 +529,69 @@ test("registered owner proofs match current composition and factory sources", ()
   }
 });
 
+test("viewport command receipt keeps fresh numeric inputs and rejects provider or action drift", () => {
+  const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
+    ({ compositionExportName }) => compositionExportName === "getViewportCommandOwner",
+  );
+  const compositionSource = fs.readFileSync(entry.compositionModulePath, "utf8");
+  const factorySource = fs.readFileSync(entry.factoryModulePath, "utf8");
+  const composition = parse(compositionSource, { ecmaVersion: "latest", sourceType: "module" })
+    .body.find((node) => node.id?.name === entry.compositionExportName);
+  const inspect = (overrides = {}) => inspectStateMutationDelegatingOwnerSources({
+    compositionSource, factorySource, entry, ...overrides,
+  });
+  assert.deepEqual(inspect().violations, []);
+  for (const [sourceKey, source, before, after] of [
+    ["compositionSource", compositionSource, "viewportCommandOwner = createViewportCommandOwner({",
+      "viewportCommandOwner = replacementProvider({"],
+    ["compositionSource", compositionSource, "width: Number(runtimeState.width || 0)",
+      "width: (runtimeState.width = 0)"],
+    ["compositionSource", compositionSource, "setZoomTransformState(runtimeState, transform);",
+      "runtimeState.zoomTransform = transform;"],
+    ["compositionSource", compositionSource, 'from "./renderer/viewport_command_owner.js"',
+      'from "./renderer/replacement_viewport_command_owner.js"'],
+    ["factorySource", factorySource, "readGetter(getters.getViewportDimensions, { width: 0, height: 0 })",
+      "(readGetter(getters.getViewportDimensions, { width: 0, height: 0 }).width = 0)"],
+    ["factorySource", factorySource, 'observedZoomBehavior?.on?.("start.viewport-command", null);',
+      "void observedZoomBehavior;"],
+    ["compositionSource", compositionSource, "scale: Number(projection.scale())",
+      "scale: (runtimeState.width = 0)"],
+    ["factorySource", factorySource, "const frame = getBookmarkFrame();",
+      "const frame = getBookmarkFrame(); getters.getProjectionSnapshot().scale = 0;"],
+    ["factorySource", factorySource, "const x = frame.width / 2 - (frame.tx + view.x * frame.scale) * k;",
+      "view.x = 0; const x = frame.width / 2 - (frame.tx + view.x * frame.scale) * k;"],
+  ]) {
+    assert.ok(source.includes(before), before);
+    const changed = sourceKey === "compositionSource" && !before.startsWith("from ")
+      ? source.slice(0, composition.start)
+        + source.slice(composition.start, composition.end).replace(before, after)
+        + source.slice(composition.end)
+      : source.replace(before, after);
+    assert.notEqual(changed, source, before);
+    assert.ok(inspect({ [sourceKey]: changed }).violations.length, after);
+  }
+});
+
+test("primary index actions retain borrowed inputs but reject writes through their arguments", async () => {
+  const modulePath = "js/core/state/actions/renderer_cache_actions.js";
+  const source = fs.readFileSync(modulePath, "utf8");
+  const entries = STATE_ACTION_DELEGATION_CONTRACT.filter((entry) => (
+    entry.modulePath === modulePath && /^(set|delete)Primary/.test(entry.exportName)
+  ));
+  assert.equal(entries.length, 8);
+  assert.deepEqual(validateStateActionModuleSource(source, { filePath: modulePath }), []);
+  assert.deepEqual(await validateStateActionNonTargetParameterMutations(modulePath, source, entries), []);
+  for (const [before, after] of [
+    ["target.landIndex.set(featureId, feature);", "feature.properties.name = 'changed'; target.landIndex.set(featureId, feature);"],
+    ["target.countryToFeatureIds.set(country, featureIds);", "featureIds.push('changed'); target.countryToFeatureIds.set(country, featureIds);"],
+    ["target.landIndex.set(featureId, feature);", "publish(feature); target.landIndex.set(featureId, feature);"],
+  ]) {
+    assert.ok(source.includes(before));
+    const violations = await validateStateActionNonTargetParameterMutations(modulePath, source.replace(before, after), entries);
+    assert.ok(violations.some((entry) => entry.code === "state-action-non-target-parameter-mutation"), after);
+  }
+});
+
 test("selection owner proof rejects borrowed getter and facade drift", () => {
   const entry = STATE_MUTATION_DELEGATING_OWNER_CONTRACT.find(
     ({ compositionExportName }) => compositionExportName === "getSelectionOverlayOwner",
@@ -3724,7 +3787,7 @@ function refreshImportedCallOwnerPins(entry, source) {
   };
 }
 
-test("imported activation calls preserve exact paint projection and detached eviction read", async () => {
+test("imported activation calls preserve one canonical paint writer and detached eviction read", async () => {
   const receipts = STATE_ACTION_IMPORTED_CALL_RECEIPTS;
   const readSource = (modulePath) => fs.readFileSync(modulePath, "utf8");
   for (const entry of Object.values(receipts)) {
@@ -3747,23 +3810,6 @@ test("imported activation calls preserve exact paint projection and detached evi
     binding,
     findings,
   }));
-  const projectedPaint = projectPalettePaintActionCandidate(scannedCandidates, { readSource });
-  assert.equal(projectedPaint.delegationOnly, false);
-  assert.equal(projectedPaint.binding.functionName, receipts.paint.exportName);
-  assert.deepEqual(projectedPaint.findings.map(({ operation, key, pathSegments }) => ({
-    operation,
-    key,
-    pathSegments,
-  })), [{
-    operation: "assign",
-    key: "visualOverrides",
-    pathSegments: ["visualOverrides", "*"],
-  }, {
-    operation: "assign",
-    key: "riverPaint",
-    pathSegments: ["riverPaint"],
-  }]);
-
   const actionSource = fs.readFileSync(receipts.eviction.modulePath, "utf8");
   const actionScan = await discoverStateWriterBindingsForSource(
     receipts.eviction.modulePath,
@@ -3771,6 +3817,15 @@ test("imported activation calls preserve exact paint projection and detached evi
     "production",
     { includeInventories: true, scanAllParameters: true },
   );
+  const palette = actionScan.bindingInventories.find(({ binding }) => binding.functionName === receipts.paint.exportName);
+  assert.ok(palette);
+  assert.deepEqual(palette.findings, []);
+  assert.equal(palette.actionDelegations.filter((edge) => edge.actionModulePath === colorPath
+    && edge.actionExportName === "applyFeaturePaintState").length, 1);
+  scannedCandidates.push({ path: receipts.paint.modulePath, surface: "production",
+    binding: palette.binding, findings: palette.findings, delegationOnly: true });
+  assert.equal(projectPalettePaintActionCandidate(scannedCandidates, { readSource }), null,
+    "the validated delegation must not synthesize a duplicate paint writer");
   const trimTarget = actionScan.bindingInventories.find(({ binding }) => (
     binding.functionName === receipts.eviction.exportName
     && binding.parameterIndex === 0
@@ -3795,8 +3850,8 @@ test("imported activation receipts reject refreshed wrong bindings, changed call
   );
 
   const wrongImportSource = actionSource.replace(
-    'import { applyFeaturePaintState } from "../color_state.js";',
-    'import { applyFeaturePaintState as unrelatedPaintWriter } from "../color_state.js";',
+    'import { applyFeaturePaintState } from "./visual_paint_actions.js";',
+    'import { applyFeaturePaintState as unrelatedPaintWriter } from "./visual_paint_actions.js";',
   );
   assert.notEqual(wrongImportSource, actionSource);
   const wrongImportEntry = refreshImportedCallOwnerPins(paint, wrongImportSource);
@@ -4084,4 +4139,155 @@ test("thematic and population read receipts bind dependencies and keep borrowed 
         && violation.dependencyName === dependencyPath), dependencyPath);
     }
   }
+});
+
+async function startupActionBindings(modulePath) {
+  const { buildStateWriterBindingGrants } = await import("../tools/build_state_writer_policy.mjs");
+  const { buildCanonicalStateKeyAuthorityIndex } = await import("../tools/state_writer_policy.mjs");
+  const { bindingInventories } = await discoverStateWriterBindingsForSource(
+    modulePath, fs.readFileSync(modulePath, "utf8"), "production",
+    { scanAllParameters: true, derivedAliasTaintMode: "strict", includeInventories: true },
+  );
+  return bindingInventories.map(({ binding, findings }) => ({
+    ...binding, authority: "domain-action",
+    grants: buildStateWriterBindingGrants(findings, modulePath, buildCanonicalStateKeyAuthorityIndex(), "production"),
+  }));
+}
+
+test("base-city readiness writes stay behind one canonical action without hiding caller writes", async () => {
+  const modulePath = "js/core/state/actions/content_load_actions.js";
+  const actionName = "setBaseCityLocalizationReadyState";
+  const bindings = await startupActionBindings(modulePath);
+  const action = bindings.find(binding => binding.functionName === actionName);
+  assert.ok(action);
+  assert.deepEqual(action.grants.flatMap(grant => grant.memberships), [
+    { operation: "assign", key: "baseCityLocalizationReady" },
+  ]);
+  assert.deepEqual(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings }], {
+    modulePaths: [modulePath],
+  }), []);
+
+  const contentPath = "js/core/state/content_state.js";
+  const contentSource = fs.readFileSync(contentPath, "utf8");
+  const discover = source => discoverStateWriterBindingsForSource(contentPath, source, "production", {
+    scanAllParameters: true, derivedAliasTaintMode: "strict", includeInventories: true,
+  });
+  const inventory = await discover(contentSource);
+  const readinessFindings = result => result.bindingInventories.flatMap(entry => entry.findings)
+    .filter(finding => finding.key === "baseCityLocalizationReady");
+  assert.deepEqual(readinessFindings(inventory), []);
+  const edges = inventory.bindingInventories.flatMap(entry => entry.actionDelegations)
+    .filter(edge => edge.actionExportName === actionName);
+  assert.deepEqual(edges.map(edge => [edge.functionName, edge.actionModulePath, edge.targetArgumentIndex]), [
+    ["commitBaseCitySupportData", modulePath, 0],
+    ["commitBaseCitySupportData", modulePath, 0],
+    ["hydrateStartupBaseContentState", modulePath, 0],
+  ]);
+
+  const bypassed = contentSource.replaceAll(`${actionName}(target, false)`, "target.baseCityLocalizationReady = false")
+    .replaceAll(`${actionName}(target, true)`, "target.baseCityLocalizationReady = true");
+  const writes = readinessFindings(await discover(bypassed));
+  assert.equal(writes.length, 3);
+  assert.ok(writes.every(finding => finding.operation === "assign"));
+});
+
+test("startup action receipts preserve writes and prove the exact borrowed internal sites", async () => {
+  const { inspectStartupActionDiagnosticReceipt } = await import("../tools/state_action_delegation_contract.mjs");
+  for (const [file, names] of [
+    ["thematic_wgi_actions", { setThematicWgiRuntimeState: 1, resetThematicWgiRuntimeState: 2, setThematicWgiStyleState: 2 }],
+    ["population_spatial_actions", { setPopulationRuntimeState: 1, resetPopulationRuntimeState: 2, setPopulationStyleState: 2 }],
+    ["content_load_actions", { commitPhysicalContourDisplayState: 2 }],
+  ]) {
+    const modulePath = `js/core/state/actions/${file}.js`;
+    const bindings = await startupActionBindings(modulePath);
+    assert.deepEqual(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings }], { modulePaths: [modulePath] }), []);
+    for (const [name, count] of Object.entries(names)) {
+      const binding = bindings.find(candidate => candidate.functionName === name);
+      assert.ok(binding.grants.some(grant => grant.memberships.length), name);
+      assert.equal(binding.grants.flatMap(grant => grant.unsupportedSites).length, count, name);
+      assert.deepEqual(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding }), {
+        violations: [], acceptedDiagnosticCount: count,
+      });
+    }
+  }
+});
+
+test("startup action receipts reject source changes, observer writes and forged sites", async () => {
+  const { inspectStartupActionDiagnosticReceipt } = await import("../tools/state_action_delegation_contract.mjs");
+  for (const [file, name, dependencyPath] of [
+    ["thematic_wgi_actions", "setThematicWgiStyleState", "js/core/state/actions/appearance_actions.js"],
+    ["population_spatial_actions", "setPopulationStyleState", "js/core/state/actions/thematic_wgi_actions.js"],
+    ["content_load_actions", "commitPhysicalContourDisplayState", "js/core/state/context_layer_revision.js"],
+  ]) {
+    const modulePath = `js/core/state/actions/${file}.js`;
+    const bindings = await startupActionBindings(modulePath);
+    const binding = bindings.find(candidate => candidate.functionName === name);
+    const source = fs.readFileSync(modulePath, "utf8");
+    const changedSources = file === "content_load_actions" ? [
+      source.replace('../context_layer_revision.js', '../fake_revision.js'),
+      source.replace('const changed = [];', 'const changed = []; const recordContextLayerPublication = unknown;'),
+      source.replace('layer => layer ===', 'layer => (target.physicalContourMajorData.features = [], layer) ==='),
+    ] : [
+      source.replace(/return target\.[A-Za-z]+;/, 'return target;'),
+      source.replace('return style;', 'unknown(target); return style;'),
+      source.replace('./appearance_actions.js', './fake_appearance_actions.js'),
+    ];
+    for (const changed of changedSources) {
+      assert.notEqual(changed, source);
+      assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding,
+        readSource: path => path === modulePath ? changed : fs.readFileSync(path, "utf8"),
+      }).violations.length);
+    }
+    assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, name, { binding,
+      readSource: path => fs.readFileSync(path, "utf8") + (path === dependencyPath ? '\nunknown(target, collections);' : ''),
+    }).violations.length);
+    for (const change of ["drop", "duplicate", "fingerprint", "position", "key", "binding", "alias", "dynamic", "ambiguous"]) {
+      const forged = structuredClone(bindings);
+      const target = forged.find(candidate => candidate.functionName === name);
+      const grant = target.grants.find(candidate => candidate.unsupportedSites.length);
+      if (change === "drop") grant.unsupportedSites.pop();
+      if (change === "duplicate") grant.unsupportedSites.push({ ...grant.unsupportedSites[0] });
+      if (change === "fingerprint") grant.unsupportedSites[0].sourceFingerprint = "0".repeat(64);
+      if (change === "position") grant.unsupportedSites[0].line += 1;
+      if (change === "key") grant.unsupportedSites[0].key = "bootPhase";
+      if (change === "binding") target.parameterName = "other";
+      if (change === "alias") grant.aliasSites.push({ alias: "unknown", key: "bootPhase" });
+      if (change === "dynamic") grant.dynamicSites.push({ operation: "assign", key: "bootPhase", pathPattern: "*" });
+      if (change === "ambiguous") grant.ambiguousSites.push({ reason: "ambiguous-alias-flow" });
+      assert.ok(validateStateActionPolicyBindings([{ path: modulePath, authority: "domain-action", bindings: forged }], { modulePaths: [modulePath] }).length, change);
+    }
+    assert.ok(inspectStartupActionDiagnosticReceipt(modulePath, { id: name }, { binding }).violations.length);
+  }
+});
+
+test("startup action borrowed results keep caller writes and escapes observable", () => {
+  for (const [file, names] of [
+    ["thematic_wgi_actions", ["setThematicWgiRuntimeState", "resetThematicWgiRuntimeState", "setThematicWgiStyleState"]],
+    ["population_spatial_actions", ["setPopulationRuntimeState", "resetPopulationRuntimeState", "setPopulationStyleState"]],
+  ]) {
+    for (const exportName of names) {
+      const modulePath = `js/core/state/actions/${file}.js`;
+      const entry = STATE_ACTION_DELEGATION_CONTRACT.find(candidate => candidate.modulePath === modulePath && candidate.exportName === exportName);
+      assert.deepEqual(entry.borrowedResultPaths, [[]]);
+      for (const borrowedResultPaths of [[], [["data"]]]) {
+        assert.ok(validateStateActionDelegationContract([{ ...entry, borrowedResultPaths }]).length);
+      }
+      const prefix = 'import { state as runtimeState } from "./state.js"; '
+        + `import { ${exportName} as apply } from "./state/actions/${file}.js";`;
+      const call = exportName.startsWith("reset") ? "apply(runtimeState)" : 'apply(runtimeState, { status: "ready" })';
+      const scan = tail => scanStateMutations(prefix + tail, {
+        filePath: "js/core/startup_action_fixture.js",
+        bindings: [{ ...MODULE_BINDING, importSource: "./state.js" }],
+      });
+      assert.deepEqual(scan(`${call};`), []);
+      for (const tail of [
+        `const result = ${call}; result.enabled = true;`,
+        `const result = ${call}; result.data.features[0].geometry = {};`,
+        `const result = ${call}; leak(result);`,
+        `const { data } = ${call}; leak(data);`,
+      ]) assert.ok(scan(tail).length, `${exportName}: ${tail}`);
+    }
+  }
+  const contour = STATE_ACTION_DELEGATION_CONTRACT.find(entry => entry.exportName === "commitPhysicalContourDisplayState");
+  assert.deepEqual(contour.borrowedResultPaths, []);
 });

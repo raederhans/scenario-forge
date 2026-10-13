@@ -3,7 +3,7 @@ import {
   normalizePhysicalPreset,
   normalizePhysicalStyleConfig,
   PHYSICAL_ATLAS_PALETTE,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   patchAppearanceStyleGroupState,
   setAppearanceStyleGroupState,
@@ -432,4 +432,4 @@ export function createAppearancePhysicalOwner({
     syncPhysicalConfig,
   };
 }
-import { callCompatRuntimeHook } from "../../core/state/index.js";
+import { callCompatRuntimeHook } from "../../core/state/runtime_hooks.js";

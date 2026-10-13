@@ -25,7 +25,7 @@ import {
   setSpecialZonePresetCategoryState,
   setSpecialZonesVisibilityState,
 } from "../../core/state/actions/special_zone_actions.js";
-import { callRuntimeHook } from "../../core/state/index.js";
+import { callRuntimeHook } from "../../core/state/runtime_hooks.js";
 import { createLatestRequestQueue } from "./latest_request_queue.js";
 
 function createButton(label, className = "secondary-btn") {

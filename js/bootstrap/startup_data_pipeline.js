@@ -1,5 +1,5 @@
 import {
-  buildCityLocalizationPatch,
+  mergeCityLocalizationData,
   loadCitySupportData,
   loadContextLayerPack,
   loadLocalizationData,
@@ -67,7 +67,7 @@ import {
   STATE_BUS_EVENTS,
   emitStateBusEvent,
   registerRuntimeHook,
-} from "../core/state/index.js";
+} from "../core/state/runtime_hooks.js";
 
 const CONTEXT_LAYER_LOAD_ORDER = [
   "lakes",
@@ -218,30 +218,29 @@ export function createStartupDataPipelineOwner({
     })
       .then((result) => {
         if (!canCommit()) return null;
-        const fullBaseGeoLocales =
-          result.locales?.geo && typeof result.locales.geo === "object"
-            ? { ...result.locales.geo }
-            : {};
         const fullUiLocales =
           result.locales?.ui && typeof result.locales.ui === "object"
             ? { ...result.locales.ui }
             : (state.locales?.ui || {});
-        const fullBaseAliasMap =
-          result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
-            ? { ...result.geoAliases.alias_to_stable_key }
-            : {};
-        if (state.worldCitiesData || state.baseCityAliasesData) {
-          const cityPatch = buildCityLocalizationPatch({
-            cityCollection: state.worldCitiesData || null,
-            cityAliases: state.baseCityAliasesData || null,
-          });
-          Object.assign(fullBaseGeoLocales, cityPatch.geo || {});
-          Object.assign(fullBaseAliasMap, cityPatch.aliasToStableKey || {});
-        }
+        const merged = mergeCityLocalizationData({
+          locales: {
+            geo: result.locales?.geo && typeof result.locales.geo === "object"
+              ? result.locales.geo
+              : {},
+          },
+          geoAliases: {
+            alias_to_stable_key:
+              result.geoAliases?.alias_to_stable_key && typeof result.geoAliases.alias_to_stable_key === "object"
+                ? result.geoAliases.alias_to_stable_key
+                : {},
+          },
+          cityCollection: state.worldCitiesData || null,
+          cityAliases: state.baseCityAliasesData || null,
+        });
         commitFullLocalizationData(state, {
           uiLocales: fullUiLocales,
-          geoLocales: fullBaseGeoLocales,
-          aliasToStableKey: fullBaseAliasMap,
+          geoLocales: merged.locales.geo,
+          aliasToStableKey: merged.geoAliases.alias_to_stable_key,
           scenarioActive: !!state.activeScenarioId,
         });
         if (state.activeScenarioId) {

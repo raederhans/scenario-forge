@@ -7,7 +7,7 @@ import {
   normalizeTransportWorkbenchDisplayConfig,
   normalizeTransportWorkbenchPointDeltas,
   normalizeTransportWorkbenchUiState,
-} from "../../core/state.js";
+} from "../../core/state_defaults.js";
 import {
   commitTransportWorkbenchPointDeltasState,
   commitTransportWorkbenchUiState,

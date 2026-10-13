@@ -25,7 +25,7 @@ import {
   restoreImportedWorkbenchUiState,
   state,
 } from "./state.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 import {
   resetStrategicOverlayEditorState,
 } from "./state/strategic_overlay_state.js";

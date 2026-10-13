@@ -9,6 +9,7 @@ STATE_DEFAULTS_JS = REPO_ROOT / "js" / "core" / "state_defaults.js"
 COUNTRY_FEATURE_POLICIES_JS = REPO_ROOT / "js" / "core" / "country_feature_policies.js"
 STATE_CATALOG_JS = REPO_ROOT / "js" / "core" / "state_catalog.js"
 STATE_INDEX_JS = REPO_ROOT / "js" / "core" / "state" / "index.js"
+STATE_RUNTIME_HOOKS_JS = REPO_ROOT / "js" / "core" / "state" / "runtime_hooks.js"
 STATE_CONFIG_JS = REPO_ROOT / "js" / "core" / "state" / "config.js"
 STATE_BUS_JS = REPO_ROOT / "js" / "core" / "state" / "bus.js"
 STATE_HISTORY_JS = REPO_ROOT / "js" / "core" / "state" / "history_state.js"
@@ -75,7 +76,7 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIn("defaultZoom", defaults_content)
         self.assertIn('} from "./state_defaults.js";', content)
         self.assertIn('} from "./state_catalog.js";', content)
-        self.assertIn('} from "./state/index.js";', content)
+        self.assertIn('} from "./state/runtime_hooks.js";', content)
         self.assertIn('export * from "./state_defaults.js";', content)
         self.assertIn('export * from "./state_catalog.js";', content)
         self.assertIn('export * from "./state/index.js";', content)
@@ -97,11 +98,15 @@ class StateSplitBoundaryContractTest(unittest.TestCase):
         self.assertIsNone(re.search(r"scenarioReleasableIndex:\s*\{\s*byTag:\s*\{\}", donor_content))
         self.assertIsNone(re.search(r"scenarioAuditUi:\s*\{\s*loading:\s*false", donor_content))
 
-    def test_state_index_owns_runtime_hook_compat_helpers(self):
+    def test_state_index_forwards_single_runtime_hook_owner(self):
         donor_content = STATE_JS.read_text(encoding="utf-8")
-        owner_content = STATE_INDEX_JS.read_text(encoding="utf-8")
+        facade_content = STATE_INDEX_JS.read_text(encoding="utf-8")
+        owner_content = STATE_RUNTIME_HOOKS_JS.read_text(encoding="utf-8")
         config_content = STATE_CONFIG_JS.read_text(encoding="utf-8")
 
+        self.assertIn('export * from "./runtime_hooks.js";', facade_content)
+        self.assertNotIn("new Map()", facade_content)
+        self.assertNotIn("new WeakSet()", facade_content)
         self.assertIn("export function registerRuntimeHook(target, hookName, hook) {", owner_content)
         self.assertIn("export function readRuntimeHook(target, hookName) {", owner_content)
         self.assertIn("export function callRuntimeHook(target, hookName, ...args) {", owner_content)

@@ -4,7 +4,7 @@ import {
   SampleProjectLoadError,
 } from "./sample_project_registry.js";
 import { replaceSampleProjectDeeplinkState } from "./state/actions/boot_actions.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 
 function getNow() {
   return Date.now();

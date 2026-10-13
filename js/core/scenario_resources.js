@@ -19,7 +19,7 @@ import {
   patchScenarioChunkLoadState,
 } from "./state/actions/scenario_chunk_runtime_actions.js";
 import { ensureSovereigntyState } from "./sovereignty_manager.js";
-import { normalizeMapSemanticMode } from "./state.js";
+import { normalizeMapSemanticMode } from "./state_defaults.js";
 import {
   createStartupHydrationRefreshPlan,
   invalidateContextLayerVisualStateBatch,
@@ -141,7 +141,7 @@ import {
 } from "./renderer/render_transaction_diagnostics.js";
 import { consumeScenarioTestHook } from "./scenario_recovery.js";
 import { t } from "./i18n.js";
-import { callRuntimeHook } from "./state/index.js";
+import { callRuntimeHook } from "./state/runtime_hooks.js";
 
 // scenario_resources.js 现在是 scenario runtime 的聚合门面：
 // bundle loader、chunk runtime、startup hydration、optional layer、audit facade 都从这里汇合；

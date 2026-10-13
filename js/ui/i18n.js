@@ -1,6 +1,6 @@
 // UI translation runtime hooks and DOM refresh helpers.
 import { state as runtimeState } from "../core/state.js";
-import { callRuntimeHook, callRuntimeHooks } from "../core/state/index.js";
+import { callRuntimeHook, callRuntimeHooks } from "../core/state/runtime_hooks.js";
 import {
   clearStartupSupportKeyUsageAuditReport,
   consumeStartupSupportKeyUsageAuditReport,

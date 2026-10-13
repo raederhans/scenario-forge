@@ -2,7 +2,7 @@ import {
   createDefaultTransportCountryOverlayState,
 } from "../transport_country_overlay.js";
 import { replaceStartupBootCacheState } from "./actions/boot_actions.js";
-import { commitPhysicalContourDisplayState } from "./actions/content_load_actions.js";
+import { commitPhysicalContourDisplayState, setBaseCityLocalizationReadyState } from "./actions/content_load_actions.js";
 import { setDefaultRuntimePoliticalTopologyState } from "./actions/scenario_chunk_promotion_actions.js";
 import { createDefaultThematicWgiRuntimeState } from "./actions/thematic_wgi_actions.js";
 import { createDefaultPopulationRuntimeState } from "./actions/population_spatial_actions.js";
@@ -208,7 +208,7 @@ export function commitBaseCitySupportData(
   target.worldCitiesData = result?.worldCities || null;
   if (result?.localizationReady === false) {
     target.cityLayerRevision = (Number(target.cityLayerRevision) || 0) + 1;
-    target.baseCityLocalizationReady = false;
+    setBaseCityLocalizationReadyState(target, false);
     target.baseCityDataState = "loaded";
     target.baseCityDataError = "";
     target.baseCityDataPromise = null;
@@ -236,7 +236,7 @@ export function commitBaseCitySupportData(
       bumpCityLayerRevision: true,
     });
   }
-  target.baseCityLocalizationReady = true;
+  setBaseCityLocalizationReadyState(target, true);
   target.baseCityDataState = "loaded";
   target.baseCityDataError = "";
   target.baseCityDataPromise = null;
@@ -535,7 +535,7 @@ export function hydrateStartupBaseContentState(
   target.baseGeoAliasToStableKey = { ...target.geoAliasToStableKey };
   target.worldCitiesData = null;
   target.baseCityAliasesData = null;
-  target.baseCityLocalizationReady = false;
+  setBaseCityLocalizationReadyState(target, false);
   target.baseCityDataState = "idle";
   target.baseCityDataError = "";
   target.baseCityDataPromise = null;

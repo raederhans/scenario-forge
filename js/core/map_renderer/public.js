@@ -79,6 +79,8 @@ export {
   RENDER_PASS_NAMES,
 
   // Viewport.
+  captureViewportView,
+  restoreViewportView,
   focusWaterRegionById,
   focusRiverPaintParentById,
   applyRiverPaintCellById,

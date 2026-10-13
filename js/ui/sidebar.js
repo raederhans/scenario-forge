@@ -1,5 +1,6 @@
 import { applyFeaturePaintState } from "../core/state/color_state.js";
 import { initEditorWorkspace } from "./editor_workspace.js";
+import { initPaletteColorCheckEditor } from "./palette_color_check_editor.js";
 import { getMapDataBoundary } from "../core/map_data_boundary.js";
 import { getEffectiveScenarioHierarchy } from "../core/scenario_hierarchy.js";
 // Sidebar UI (Phase 13)
@@ -10,7 +11,7 @@ import {
   normalizeCityLayerStyleConfig,
   normalizeAnnotationView,
 } from "../core/state.js";
-import { callRuntimeHook, registerRuntimeHook } from "../core/state/index.js";
+import { callRuntimeHook, registerRuntimeHook } from "../core/state/runtime_hooks.js";
 import { ensureSidebarPerfState } from "../core/state/renderer_runtime_state.js";
 import { ColorManager } from "../core/color_manager.js";
 import {
@@ -2876,11 +2877,12 @@ function initSidebar({ render } = {}) {
 
   const getResolvedCountryColor = (countryState) => {
     if (!countryState?.code) return "#cccccc";
-    const fallbackColor = ensureCountryPaletteColor(countryState.code, countryState.fallbackIndex || 0);
     return (
       runtimeState.sovereignBaseColors?.[countryState.code] ||
       runtimeState.countryPalette?.[countryState.code] ||
-      fallbackColor
+      defaultCountryPalette[countryState.code] ||
+      ColorManager.getPoliticalFallbackColor(countryState.code, countryState.fallbackIndex || 0) ||
+      "#cccccc"
     );
   };
 
@@ -3154,6 +3156,7 @@ function initSidebar({ render } = {}) {
 
   let bindProjectSupportDiagnosticsEvents = () => {};
   let refreshLegendEditor = () => {};
+  let focusLegendColor = () => false;
   let refreshProjectSaveStatus = () => {};
   let refreshProjectAccountLanguage = () => {};
   let renderScenarioAuditPanel = () => {};
@@ -3638,6 +3641,7 @@ function initSidebar({ render } = {}) {
   ({
     bindEvents: bindProjectSupportDiagnosticsEvents,
     refreshLegendEditor,
+    focusLegendColor,
     refreshProjectSaveStatus,
     refreshProjectAccountLanguage,
     renderScenarioAuditPanel,
@@ -3994,6 +3998,15 @@ function initSidebar({ render } = {}) {
     },
   });
   syncEditorSelection();
+  initPaletteColorCheckEditor({
+    state: runtimeState,
+    getCountries: () => [...latestCountryStatesByCode.values()],
+    defaultPalette: defaultCountryPalette,
+    fallbackColor: (code, index) => ColorManager.getPoliticalFallbackColor(code, index),
+    selectCountry: selectInspectorCountry,
+    focusLegendColor,
+    workspace: editorWorkspace,
+  });
   scheduleAdaptiveInspectorHeights();
 }
 

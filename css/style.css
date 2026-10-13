@@ -10705,6 +10705,32 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   gap: 8px;
 }
 
+.legend-editor-header,
+.legend-editor-results,
+.legend-search-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.legend-search-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+.legend-search-input,
+.legend-search-type,
+.legend-search-clear {
+  min-width: 0;
+  min-height: 34px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 0.74rem;
+}
+.legend-search-clear { cursor: pointer; }
+.legend-search-clear:disabled { opacity: 0.5; cursor: default; }
+.legend-search-input:focus-visible,
+.legend-search-type:focus-visible,
+.legend-search-clear:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.legend-search-summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.legend-search-type { max-width: 55%; }
+.legend-search-status { color: var(--text-secondary); font-size: 0.7rem; text-align: right; }
+
 .legend-editor-pager {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr) 32px;
@@ -10799,6 +10825,55 @@ body.scenario-guide-open #devWorkspaceToggleBtn {
   display: flex;
   justify-content: stretch;
 }
+
+.legend-export-controls {
+  width: 100%;
+  padding: 2px 0 8px;
+}
+
+.legend-export-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.legend-export-btn {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.legend-export-btn:hover:not(:disabled) { border-color: var(--color-accent); }
+.legend-export-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.legend-export-btn:disabled { opacity: 0.5; cursor: default; }
+.legend-export-status { margin: 6px 0 0; color: var(--text-secondary); font-size: 0.7rem; line-height: 1.5; }
+
+.legend-csv-import-controls { width: 100%; padding: 4px 0 8px; }
+.legend-csv-import-heading { cursor: pointer; font-size: 0.76rem; font-weight: 700; }
+.legend-csv-import-heading:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.legend-csv-import-file { display: block; margin: 8px 0; font-size: 0.76rem; }
+.legend-csv-import-file input { display: block; width: 100%; margin-top: 4px; font: inherit; }
+.legend-csv-import-controls > .legend-export-btn { width: 100%; margin-top: 8px; }
+.legend-csv-import-rows { max-height: 320px; overflow-y: auto; margin: 8px 0; padding: 0; list-style: none; }
+.legend-csv-import-row { padding: 8px 0; border-top: 1px solid var(--border-color); font-size: 0.7rem; overflow-wrap: anywhere; white-space: pre-wrap; }
+.legend-csv-import-row p { margin: 4px 0; color: var(--text-secondary); }
+.legend-csv-import-row .legend-csv-import-invalid { color: var(--text-primary); font-weight: 700; }
+.legend-csv-import-pager { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.legend-csv-import-controls [hidden] { display: none; }
+.legend-csv-import-actions { margin-top: 8px; }
+.legend-csv-import-actions > .legend-export-btn { width: 100%; margin-top: 6px; }
+.legend-csv-import-select-row, .legend-csv-import-select-all { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; }
+.legend-csv-import-select-row input, .legend-csv-import-select-all input { flex: 0 0 auto; }
+.legend-csv-import-confirmation { padding: 8px; margin-top: 8px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.72rem; }
+.legend-csv-import-confirmed-rows { max-height: 280px; overflow-y: auto; padding-left: 18px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.legend-csv-import-confirmation .legend-export-btn { margin: 4px 4px 0 0; }
 
 .legend-generator-apply {
   width: 100%;

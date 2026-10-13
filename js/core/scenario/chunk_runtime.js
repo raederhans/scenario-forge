@@ -17,7 +17,7 @@ function composeScenarioChunkPayloadLoader(runtimeState, normalizeScenarioId, ge
   });
   return owner;
 }
-import { registerRuntimeHook } from "../state/index.js";
+import { registerRuntimeHook } from "../state/runtime_hooks.js";
 import { setScenarioRuntimeOptionalLayerState } from "../state/scenario_runtime_state.js";
 import { setRenderPerfMetricEntryState } from "../state/actions/renderer_diagnostics_actions.js";
 import {
@@ -1428,15 +1428,27 @@ function createScenarioChunkRuntimeController({
     if (identifiedPendingPromotion) {
       pendingPromotion = identifiedPendingPromotion;
     }
-    if (!isPendingScenarioChunkPromotionCurrent({
-        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
-        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
-        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
-        runId, promotionCommitRunId,
-        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
-        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
-        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
-      })) {
+    // Publication must re-read live identity at every continuation boundary.
+    // Cleanup only requires ownership of this run; a changed selection can make
+    // publication stale while this execution still owns its render lock.
+    const isPromotionCurrent = () => isPendingScenarioChunkPromotionCurrent({
+      pendingPromotion,
+      loadState,
+      currentLoadState: runtimeState.runtimeChunkLoadState,
+      scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
+      activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
+      runId,
+      promotionCommitRunId,
+      currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
+      latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
+      latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
+    });
+    const ownsPromotionRun = () => (
+      runtimeState.runtimeChunkLoadState === loadState
+      && promotionCommitRunId === runId
+      && Math.max(0, Number(loadState.promotionCommitRunId || 0)) === runId
+    );
+    if (!isPromotionCurrent()) {
       if (loadState.pendingPromotion === pendingPromotion) {
         clearPendingScenarioChunkPromotion(loadState);
       }
@@ -1578,25 +1590,12 @@ function createScenarioChunkRuntimeController({
       // 先把 merged layer / localization / runtime payload 写稳，再让出一帧给渲染系统消化，
       // 返回后还要重新验证 current，防止旧 run 在新 selection 之后继续落地。
       await yieldToFrame();
-      if (!isPendingScenarioChunkPromotionCurrent({
-        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
-        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
-        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
-        runId, promotionCommitRunId,
-        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
-        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
-        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
-      })) {
+      if (!isPromotionCurrent()) {
         if (canRollbackPromotionContinuation()) {
           restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
           restoreScenarioDataGenerationSnapshot();
         }
-        if (
-          runtimeState.runtimeChunkLoadState === loadState
-          && promotionCommitRunId === runId
-          && Math.max(0, Number(loadState.promotionCommitRunId || 0))
-            === runId
-        ) {
+        if (ownsPromotionRun()) {
           setPromotionCommitStatus("promotion-skipped-stale", { inFlight: false, finishedAt: Date.now() });
           recordRenderTransactionSnapshot(runtimeState, {
             phase: "scenario-chunk-promotion-stale-after-infra",
@@ -1690,15 +1689,7 @@ function createScenarioChunkRuntimeController({
       // Keep the render lock across this frame break so a half-applied visual payload
       // cannot be flushed while a newer promotion run is taking ownership.
       await yieldToFrame();
-      if (!isPendingScenarioChunkPromotionCurrent({
-        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
-        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
-        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
-        runId, promotionCommitRunId,
-        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
-        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
-        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
-      })) {
+      if (!isPromotionCurrent()) {
         if (canRollbackPromotionContinuation()) {
           restoreMergedLayerRuntimeSnapshot(mergedLayerSnapshot);
           restoreScenarioChunkPromotionRootState(runtimeState, promotionRootSnapshot);
@@ -1712,12 +1703,7 @@ function createScenarioChunkRuntimeController({
             });
           }
         }
-        if (
-          runtimeState.runtimeChunkLoadState === loadState
-          && promotionCommitRunId === runId
-          && Math.max(0, Number(loadState.promotionCommitRunId || 0))
-            === runId
-        ) {
+        if (ownsPromotionRun()) {
           setPromotionCommitStatus("promotion-skipped-stale", { inFlight: false, finishedAt: Date.now() });
           recordRenderTransactionSnapshot(runtimeState, {
             phase: "scenario-chunk-promotion-stale-after-visual",
@@ -1740,15 +1726,7 @@ function createScenarioChunkRuntimeController({
       if (deferredOptionalVisibleRefresh) {
         refreshScenarioRenderVisibleOptionalChunkPayloadChange(deferredOptionalVisibleRefresh);
       }
-      if (!isPendingScenarioChunkPromotionCurrent({
-        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
-        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
-        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
-        runId, promotionCommitRunId,
-        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
-        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
-        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
-      })) {
+      if (!isPromotionCurrent()) {
         return false;
       }
       // Publish the completed payload before scheduling its frame. A synchronous
@@ -1759,24 +1737,11 @@ function createScenarioChunkRuntimeController({
         // The dispatcher registers its RAF before this continuation. Keep the
         // visible/commit metrics after that draw, with the same ownership guard.
         await yieldToFrame();
-        if (!isPendingScenarioChunkPromotionCurrent({
-        pendingPromotion, loadState, currentLoadState: runtimeState.runtimeChunkLoadState,
-        scenarioId: normalizeScenarioId(scenarioId || pendingPromotion?.scenarioId || runtimeState.activeScenarioId),
-        activeScenarioId: normalizeScenarioId(runtimeState.activeScenarioId),
-        runId, promotionCommitRunId,
-        currentScenarioApplyRequestId: runtimeState.currentScenarioApplyRequestId,
-        latestScenarioApplyRequestId: runtimeState.latestScenarioApplyRequestId,
-        latestScenarioApplyTargetId: String(runtimeState.latestScenarioApplyTargetId || "").trim(),
-      })) {
+        if (!isPromotionCurrent()) {
           return false;
         }
       }
-      if (
-        runtimeState.runtimeChunkLoadState !== loadState
-        || promotionCommitRunId !== runId
-        || Math.max(0, Number(loadState.promotionCommitRunId || 0))
-          !== runId
-      ) {
+      if (!ownsPromotionRun()) {
         return false;
       }
       const visualEndedAt = globalThis.performance?.now ? globalThis.performance.now() : Date.now();
@@ -1856,12 +1821,7 @@ function createScenarioChunkRuntimeController({
         }
         patchScenarioChunkLoadState(runtimeState, { zoomEndChunkVisibleMetric: null });
       }
-      if (
-        runtimeState.runtimeChunkLoadState !== loadState
-        || promotionCommitRunId !== runId
-        || Math.max(0, Number(loadState.promotionCommitRunId || 0))
-          !== runId
-      ) {
+      if (!ownsPromotionRun()) {
         return false;
       }
       setScenarioChunkShellStatus("ready", loadState);
@@ -1919,12 +1879,7 @@ function createScenarioChunkRuntimeController({
       }
       throw error;
     } finally {
-      if (
-        runtimeState.runtimeChunkLoadState === loadState
-        && promotionCommitRunId === runId
-        && Math.max(0, Number(loadState.promotionCommitRunId || 0))
-          === runId
-      ) {
+      if (ownsPromotionRun()) {
         setScenarioChunkPromotionRenderLockState(runtimeState, previousRenderLock);
       }
     }
