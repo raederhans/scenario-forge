@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 import { VISUAL_PAINT_ACTION_PATH, inspectVisualPaintInputSites } from "./state_visual_paint_contract.mjs";
+import { inspectStateCsvActionInputSites, csvActionInputSiteKey } from "./state_csv_action_input_contract.mjs";
 import { POLITICAL_GPU_RESOURCE_PATH, inspectPoliticalGpuResourceOrigin } from "./state_resource_origin_contract.mjs";
 import {
   STATE_RIVER_OWNER_SOURCE_RECEIPTS,
@@ -4198,6 +4199,7 @@ export async function validateStateActionNonTargetParameterMutations(
   ).sites;
   const reviewedPaintSites = relativePath === VISUAL_PAINT_ACTION_PATH
     ? inspectVisualPaintInputSites(source).sites : new Set();
+  const reviewedCsvInputSites = inspectStateCsvActionInputSites(relativePath, source).sites;
   for (const entry of contractEntries || []) {
     const storageSites = borrowedMapStorageArgumentSites(relativePath, source, entry);
     for (
@@ -4218,6 +4220,9 @@ export async function validateStateActionNonTargetParameterMutations(
         binding,
       );
       for (const finding of mutationFindings) {
+        if (finding.unsupported && finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
+          && reviewedCsvInputSites.has(csvActionInputSiteKey(entry.exportName, candidate.parameterName, candidate.parameterIndex,
+            candidate.parameterPath, finding.line, finding.column))) continue;
         if (reviewedPaintSites.has(`${candidate.parameterName}:${candidate.parameterIndex}:${finding.reason}:${finding.evidenceKind || ""}:${finding.line}:${finding.column}`)) continue;
         if (finding.reason === "state-alias-escape" && finding.evidenceKind === "unknown-call-argument"
           && storageSites.has(`${finding.line}:${finding.column}:${candidate.parameterName}`)) continue;

@@ -33,7 +33,16 @@ export function setLegendLabelState(target, color, text) {
 export function restoreLegendLabelSnapshotState(target, snapshotLabels, presentKeys) {
   if (!snapshotLabels || typeof snapshotLabels !== "object" || Array.isArray(snapshotLabels)) return false;
   const labels = Object.fromEntries(Object.entries(target.legendLabels || {}));
-  const present = Array.isArray(presentKeys) ? new Set(presentKeys.map(normalizeColor).filter(Boolean)) : null;
+  // History publishes primitive text, so later hooks cannot attach coercion,
+  // getters, custom array methods or species to this presence information.
+  let present = null;
+  if (presentKeys !== undefined) {
+    if (typeof presentKeys !== "string") return false;
+    let keys;
+    try { keys = JSON.parse(presentKeys); } catch { return false; }
+    if (!Array.isArray(keys) || keys.some(key => typeof key !== "string")) return false;
+    present = new Set(keys.map(normalizeColor).filter(Boolean));
+  }
   let restored = false;
   Object.entries(snapshotLabels).forEach(([color, label]) => {
     const key = normalizeColor(color);

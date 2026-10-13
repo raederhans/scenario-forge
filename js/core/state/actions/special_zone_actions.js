@@ -511,6 +511,10 @@ export function patchSpecialZoneLegendFieldsState(target, patchesById) {
   return applySpecialZoneLegendFieldsState(target, patchesById, false);
 }
 
-export function restoreSpecialZoneLegendSnapshotState(target, snapshotById) {
+export function restoreSpecialZoneLegendSnapshotState(target, snapshotJson) {
+  assertStateTarget(target);
+  if (typeof snapshotJson !== "string") return [];
+  let snapshotById;
+  try { snapshotById = JSON.parse(snapshotJson); } catch { return []; }
   return applySpecialZoneLegendFieldsState(target, snapshotById, true);
 }

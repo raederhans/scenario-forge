@@ -119,7 +119,7 @@ function captureHistoryState({
 
   if (legendKeys.length) {
     snapshot.legendLabels = captureEntries(runtimeState.legendLabels || {}, legendKeys);
-    snapshot.legendLabelKeysPresent = legendKeys.filter(key => Object.hasOwn(runtimeState.legendLabels || {}, key));
+    snapshot.legendLabelKeysPresent = JSON.stringify(legendKeys.filter(key => Object.hasOwn(runtimeState.legendLabels || {}, key)));
   }
 
   const zoneIds = new Set((Array.isArray(legendSpecialZoneIds) ? legendSpecialZoneIds : [])
@@ -146,7 +146,7 @@ function captureHistoryState({
       if (hasStyle && !styleObject) fields.styleContainerValue = cloneStructuredValue(layer.style);
       selected.push([id, fields]);
     }
-    if (selected.length) snapshot.specialZoneLegendFields = Object.fromEntries(selected);
+    if (selected.length) snapshot.specialZoneLegendFields = JSON.stringify(Object.fromEntries(selected));
   }
 
   if (strategicOverlay) {

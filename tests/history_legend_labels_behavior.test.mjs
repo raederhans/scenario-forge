@@ -43,7 +43,7 @@ test("legend history captures only requested normalized keys, including deletion
   patchLegendState(state, { legendLabels: { "#aabbcc": "Existing", "#112233": "Unrelated" } });
   assert.deepEqual(captureHistoryState({ legendColors: [" #ABC ", "#AABBCC", "#fff", "red", "__proto__"] }), {
     legendLabels: { "#aabbcc": "Existing", "#ffffff": null },
-    legendLabelKeysPresent: ["#aabbcc"],
+    legendLabelKeysPresent: JSON.stringify(["#aabbcc"]),
   });
   assert.deepEqual(captureHistoryState(), {});
   assert.deepEqual(captureHistoryState({ legendColors: [] }), {});
@@ -88,9 +88,9 @@ test("real undo and redo restore scoped label values and deletions without touch
   setLegendLabelState(state, "#334455", "Added");
   const after = captureHistoryState(options);
   assert.deepEqual(before, { legendLabels: { "#aabbcc": "Before", "#223344": "Delete me", "#334455": null },
-    legendLabelKeysPresent: ["#aabbcc", "#223344"] });
+    legendLabelKeysPresent: JSON.stringify(["#aabbcc", "#223344"]) });
   assert.deepEqual(after, { legendLabels: { "#aabbcc": "After", "#223344": null, "#334455": "Added" },
-    legendLabelKeysPresent: ["#aabbcc", "#334455"] });
+    legendLabelKeysPresent: JSON.stringify(["#aabbcc", "#334455"]) });
   assert.equal(pushHistoryEntry({ before, after, meta: { kind: "legend-csv-import" } }), true);
   // A later unrelated edit must survive both scoped restorations.
   setLegendLabelState(state, "#112233", "Unrelated latest value");
@@ -134,7 +134,7 @@ test("special-zone legend snapshots use exact unique current IDs and null for ab
   ] }, {}, { preserveIdentity: true, markDirty: false });
   const snapshot = captureHistoryState({ legendSpecialZoneIds: [" zone ", " zone ", "zone", "duplicate", "missing"] });
   assert.deepEqual(Object.keys(snapshot), ["specialZoneLegendFields"]);
-  assert.deepEqual(snapshot.specialZoneLegendFields, { " zone ": { name: null,
+  assert.deepEqual(JSON.parse(snapshot.specialZoneLegendFields), { " zone ": { name: null,
     style: Object.fromEntries(SPECIAL_ZONE_LEGEND_STYLE_KEYS.map(key => [key, key === "fill" ? "#112233" : null])),
     presence: { name: false, style: true, styleObject: true, styleKeys: ["fill"] },
   } });
@@ -168,8 +168,8 @@ test("narrow zone actions ignore unsafe fields, skip absent or duplicate targets
   assert.equal(target.specialZoneLayers.layers[1], duplicateA);
   assert.equal(target.specialZoneLayers.layers[2], duplicateB);
   assert.equal(target.specialZoneLayers.extension, metadata);
-  assert.deepEqual(restoreSpecialZoneLegendSnapshotState(target, { one: { name: null,
-    style: { revision: null, stroke: "#aabbcc", extension: null } } }), ["one"]);
+  assert.deepEqual(restoreSpecialZoneLegendSnapshotState(target, JSON.stringify({ one: { name: null,
+    style: { revision: null, stroke: "#aabbcc", extension: null } } })), ["one"]);
   const restored = target.specialZoneLayers.layers[0];
   assert.equal(Object.hasOwn(restored, "name"), false);
   assert.equal(Object.hasOwn(restored.style, "revision"), false);
@@ -257,8 +257,8 @@ test("zone history restores raw JSON known values exactly and detaches captured 
   {}, { preserveIdentity: true, markDirty: false });
   const scope = { legendSpecialZoneIds: ["raw"] };
   const before = captureHistoryState(scope);
-  assert.notEqual(before.specialZoneLegendFields.raw.style.pattern, rawPattern);
-  assert.deepEqual(before.specialZoneLegendFields.raw.style.pattern, rawPattern);
+  assert.notEqual(JSON.parse(before.specialZoneLegendFields).raw.style.pattern, rawPattern);
+  assert.deepEqual(JSON.parse(before.specialZoneLegendFields).raw.style.pattern, rawPattern);
   assert.deepEqual(patchSpecialZoneLegendFieldsState(state, { raw: { style: { fillOpacity: 0.8, pattern: "dots" } } }), ["raw"]);
   const after = captureHistoryState(scope);
   assert.equal(pushHistoryEntry({ before, after }), true);
@@ -266,12 +266,12 @@ test("zone history restores raw JSON known values exactly and detaches captured 
   const restored = state.specialZoneLayers.layers[0];
   assert.equal(restored.style.fillOpacity, "0.4");
   assert.deepEqual(restored.style.pattern, rawPattern);
-  assert.notEqual(restored.style.pattern, before.specialZoneLegendFields.raw.style.pattern);
+  assert.notEqual(restored.style.pattern, JSON.parse(before.specialZoneLegendFields).raw.style.pattern);
   assert.equal(restored.memberFeatureIds, members);
   assert.equal(restored.extension, metadata);
   assert.equal(restored.style.extension, metadata);
   restored.style.pattern.legacy.push("Later mutation");
-  assert.deepEqual(before.specialZoneLegendFields.raw.style.pattern, { legacy: ["Unusual existing value"] });
+  assert.deepEqual(JSON.parse(before.specialZoneLegendFields).raw.style.pattern, { legacy: ["Unusual existing value"] });
   assert.deepEqual(rawPattern, { legacy: ["Unusual existing value"] });
   assert.equal(redoHistory(), true);
   assert.equal(state.specialZoneLayers.layers[0].style.fillOpacity, 0.8);
@@ -288,9 +288,9 @@ test("an exact __proto__ zone ID has an own safe snapshot entry and real undo/re
     style: { fill: "#112233" } }] }, {}, { preserveIdentity: true, markDirty: false });
   const scope = { legendSpecialZoneIds: ["__proto__"] };
   const before = captureHistoryState(scope);
-  assert.equal(Object.getPrototypeOf(before.specialZoneLegendFields), Object.prototype);
-  assert.equal(Object.hasOwn(before.specialZoneLegendFields, "__proto__"), true);
-  assert.equal(before.specialZoneLegendFields.__proto__.name, "Before");
+  assert.equal(Object.getPrototypeOf(JSON.parse(before.specialZoneLegendFields)), Object.prototype);
+  assert.equal(Object.hasOwn(JSON.parse(before.specialZoneLegendFields), "__proto__"), true);
+  assert.equal(JSON.parse(before.specialZoneLegendFields).__proto__.name, "Before");
   const patches = Object.fromEntries([["__proto__", { name: "After", style: { fill: "#445566" } }]]);
   assert.equal(Object.getPrototypeOf(patches), Object.prototype);
   assert.deepEqual(patchSpecialZoneLegendFieldsState(state, patches), ["__proto__"]);
@@ -406,15 +406,15 @@ test("name-only zone undo and redo preserve explicit nulls and exact container a
   commitSpecialZoneLayersState(state, { layers: originalLayers }, {}, { preserveIdentity: true, markDirty: false });
   const scope = { legendSpecialZoneIds: originalLayers.map(layer => layer.id) };
   const before = captureHistoryState(scope);
-  assert.deepEqual(before.specialZoneLegendFields["own-nulls"].presence,
+  assert.deepEqual(JSON.parse(before.specialZoneLegendFields)["own-nulls"].presence,
     { name: true, style: true, styleObject: true, styleKeys: ["stroke", "fillOpacity"] });
-  assert.deepEqual(before.specialZoneLegendFields["absent-style"].presence,
+  assert.deepEqual(JSON.parse(before.specialZoneLegendFields)["absent-style"].presence,
     { name: true, style: false, styleObject: false, styleKeys: [] });
-  assert.deepEqual(before.specialZoneLegendFields["null-style"].presence,
+  assert.deepEqual(JSON.parse(before.specialZoneLegendFields)["null-style"].presence,
     { name: true, style: true, styleObject: false, styleKeys: [] });
-  assert.equal(before.specialZoneLegendFields["null-style"].styleContainerValue, null);
-  assert.equal(Object.hasOwn(before.specialZoneLegendFields["absent-style"], "styleContainerValue"), false);
-  assert.equal(before.specialZoneLegendFields["empty-style"].presence.name, false);
+  assert.equal(JSON.parse(before.specialZoneLegendFields)["null-style"].styleContainerValue, null);
+  assert.equal(Object.hasOwn(JSON.parse(before.specialZoneLegendFields)["absent-style"], "styleContainerValue"), false);
+  assert.equal(JSON.parse(before.specialZoneLegendFields)["empty-style"].presence.name, false);
   const patches = Object.fromEntries(originalLayers.map(layer => [layer.id, { name: `After ${layer.id}` }]));
   assert.deepEqual(patchSpecialZoneLegendFieldsState(state, patches), scope.legendSpecialZoneIds);
   const after = captureHistoryState(scope);
@@ -435,7 +435,7 @@ test("name-only zone undo and redo preserve explicit nulls and exact container a
   assert.deepEqual(restored.get("empty-style").style, {});
   assert.equal(Object.hasOwn(restored.get("empty-style"), "name"), false);
   assert.deepEqual(restored.get("raw-name").name, { legacy: ["Raw name"] });
-  assert.notEqual(restored.get("raw-name").name, before.specialZoneLegendFields["raw-name"].name);
+  assert.notEqual(restored.get("raw-name").name, JSON.parse(before.specialZoneLegendFields)["raw-name"].name);
   for (const layer of restored.values()) {
     assert.equal(layer.memberFeatureIds, members);
     assert.equal(layer.extension, metadata);
@@ -481,11 +481,11 @@ test("scoped label undo restores an own null exactly while deleting originally a
   const scope = { legendColors: ["#112233", "#445566"] };
   const before = captureHistoryState(scope);
   assert.deepEqual(before, { legendLabels: { "#112233": null, "#445566": null },
-    legendLabelKeysPresent: ["#112233"] });
+    legendLabelKeysPresent: JSON.stringify(["#112233"]) });
   setLegendLabelState(state, "#112233", "Updated");
   setLegendLabelState(state, "#445566", "Added");
   const after = captureHistoryState(scope);
-  assert.deepEqual(after.legendLabelKeysPresent, ["#112233", "#445566"]);
+  assert.deepEqual(JSON.parse(after.legendLabelKeysPresent), ["#112233", "#445566"]);
   assert.equal(pushHistoryEntry({ before, after }), true);
   assert.equal(undoHistory(), true);
   assert.equal(Object.hasOwn(state.legendLabels, "#112233"), true);

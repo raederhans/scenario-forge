@@ -9,6 +9,7 @@ import { STATE_TARGET_PURE_READER_CONTRACT, STATE_TARGET_EFFECTFUL_DELEGATOR_CON
 import { validateStateWriterPolicySchema, buildCanonicalStateKeyAuthorityIndex } from "../tools/state_writer_policy.mjs";
 import * as contracts from "../tools/state_action_delegation_contract.mjs";
 import * as borrowed from "../tools/state_borrowed_effect_contract.mjs";
+import { inspectStateCsvActionInputSites, CSV_LEGEND_ACTION_PATH, CSV_ZONE_ACTION_PATH } from "../tools/state_csv_action_input_contract.mjs";
 
 const entry = STATE_TARGET_PURE_READER_CONTRACT.find(item => item.functionName === "createPoliticalFeaturePolicy");
 const read = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
@@ -143,6 +144,7 @@ test("all remaining declared source-proof families pass without repository mutat
   check("crossFileContract", [{}], () => contracts.validateStateActionCrossFileMigrationContract());
   check("successorContract", [{}], () => contracts.validateStateActionSuccessorProofContract());
   check("replacementContract", [{}], () => contracts.validateStateActionLegacyMembershipReplacementContract());
+  check("csvActionInputs", [CSV_LEGEND_ACTION_PATH, CSV_ZONE_ACTION_PATH], path => inspectStateCsvActionInputSites(path, read(path)));
   t.diagnostic(JSON.stringify(counts));
   assert.deepEqual(failures, []);
 });

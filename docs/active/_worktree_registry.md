@@ -726,3 +726,11 @@ The same managed polar checkout now uses `codex/fix-polar-sample-baselines`, bas
 - Root owns Git operations, localhost:8008 and final verification. Only the three audited layer batches are extracted; unrelated primary-workspace WIP is preserved.
 - Scope: screen-space layer transitions, retained raster/path accounting, bounded navigation reuse and label snapshots. Review repairs include overscan anchors/coverage and immediate regroup accounting.
 - Retain this checkout for ignored build/browser evidence under `.runtime/tmp/layer-render-delivery/` and `.runtime/browser/`. See [task record](layer-render-optimization-20261005/task.md); final CI and merge status are established by the branch PR receipt, not this registry entry.
+
+## Scenario Forge preserved-work draft review 2026-10-13
+
+- Integration owner: the root agent in `C:/Users/raede/Documents/Codex/2026-10-12/task-6/scenario-forge-two-end-candidate`, branch `codex/two-end-integration-candidate-20261012`. Draft backup PR: https://github.com/raederhans/scenario-forge/pull/230 ; initial remote backup head `2a4cdd11`.
+- Separate resident-raster PR: https://github.com/raederhans/scenario-forge/pull/229 ; its normal fast-forward correction is `42cecafc9`. Root owns pushes and exact-head CI checks; draft visibility does not authorize a governance-blocked merge.
+- Preserve Desktop `codex/architecture-simplification-20261010@abf6a1a6` with all 83 dirty files and stopped `codex/raster-fault-probe-20261011@b09a2e8e` with all four dirty files. All 87 protected contents were verified unchanged. Keep prior delivery/proof worktrees for source and ignored evidence; no branch/worktree cleanup is authorized here.
+- Scope: integrate the retained architecture snapshot, opt-in raster, exact borrowed-effect proofs and editor/legend/CSV/bookmark workflows. Closeout is limited to immutable CSV history input boundaries and their exact argument receipts; frozen policy/budgets/retirement IDs and native auto default remain the closeout constraints.
+- Root is the sole full builder/checker owner. Durable stage and live-process handoff use the existing `.runtime/reports/generated/two-end-integration/stage-handoff-20261012.json`; static reviewers do not launch or poll full gates. Exact head, commands, logs and results are recorded there and in PR230. No deployment or irreversible cleanup is included.
