@@ -1,6 +1,7 @@
 import { setScenarioDiagnosticsState } from "../../core/state_catalog.js";
 import { markDirty } from "../../core/dirty_state.js";
 import { createRevisionedLegendColorReader } from "../../core/legend_manager.js";
+import { createLegendExportControls } from "./legend_export.js";
 import {
   SPECIAL_ZONE_LAYER_DIAGNOSTIC_CODES,
   createSpecialZonePatternPreviewStyle,
@@ -1654,6 +1655,7 @@ export function createProjectSupportDiagnosticsController({
       colors.join("|"),
       specialZoneLegendKey,
       JSON.stringify(legendManager.getConfig(state)),
+      state.currentLanguage,
       legendEditorPageIndex,
     ].join("::");
     if (key === lastLegendKey && legendList.dataset.ready === "true") return;
@@ -1661,6 +1663,14 @@ export function createProjectSupportDiagnosticsController({
     legendList.dataset.ready = "true";
     clearLegendList();
     legendList.appendChild(createLegendGeneratorControls());
+    legendList.appendChild(createLegendExportControls({
+      documentRef,
+      getModel: () => ({ colors: readLegendColors(state), labels: legendManager.getLabels(state),
+        specialZones: getVisibleSpecialZoneLegendLayers(), language: state.currentLanguage,
+        fileStem: state.activeScenarioId || "map" }),
+      download: (blob, filename) => fileManager.writeBlobDownload(blob, filename, { destination: "browser" }),
+      showToast,
+    }));
 
     if (!colors.length && !specialZoneLegendKey) {
       const empty = document.createElement("div");

@@ -285,6 +285,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["day-night-mask", "renderer-runtime", "js/core/renderer/day_night_mask.js", "tests/day_night_runtime_owner_behavior.test.mjs"],
     ["city-lights-render", "renderer-runtime", "js/core/renderer/city_lights_render_owner.js", "tests/city_lights_render_owner_behavior.test.mjs"],
     ["project-support-diagnostics", "sidebar-shell", "js/ui/sidebar/project_support_diagnostics_controller.js", "tests/project_support_diagnostics_controller_behavior.test.mjs"],
+    ["legend-export", "sidebar-shell", "js/ui/sidebar/legend_export.js", "tests/legend_export_behavior.test.mjs", ["js/ui/sidebar/project_support_diagnostics_controller.js"]],
     ["commit-runner", "test-routing", "tools/run_commit_verification.mjs", "tests/verify_commit_runner_behavior.test.mjs"],
     ["unit-counter-catalog", "sidebar-shell", "js/ui/sidebar/strategic_overlay/unit_counter_catalog_helper.js", "tests/unit_counter_catalog_behavior.test.mjs"],
     ["workspace-chrome-support", "ui-shell", "js/ui/toolbar/workspace_chrome_support_surface_controller.js", "tests/workspace_chrome_support_surface_controller_behavior.test.mjs"],
