@@ -1283,9 +1283,10 @@ export const STATE_RIVER_OWNER_SOURCE_RECEIPTS = Object.freeze([
     "parameterName": "state",
     "parameterIndex": 0,
     "parameterPath": "$",
-    "findingsFingerprint": "2ff97c6077431ed6ce7b033fd680ad0c81836a82a383b97a267a2137a1aec48e",
+    // Retain every current conservative finding; this grants no writer authority.
+    "findingsFingerprint": "7011481757250eec51bdac1c4c28a6d0c00192ee2ed19192c239d0ee3f2990c7",
     "actionDelegationsFingerprint": "24a693d5505854ff9ae9adea4bec39e527db0893130de6cfbfb6245f8be0abb8",
-    "findingCount": 29,
+    "findingCount": 53,
     "actionDelegationCount": 3
   },
   {
@@ -1294,9 +1295,9 @@ export const STATE_RIVER_OWNER_SOURCE_RECEIPTS = Object.freeze([
     "parameterName": "state",
     "parameterIndex": 0,
     "parameterPath": "$",
-    "findingsFingerprint": "023d30270d0ea1283000616b1c45ce52876c20340ca2622167dc74756d7ca039",
+    "findingsFingerprint": "7debff113b758171ab9c3b7d4970c15885b605e1d9a630ea842546dac2ad9b28",
     "actionDelegationsFingerprint": "ab107ffbc257a97496db700fdda043c02ee7cdfa0ffaa50b4817812448068d51",
-    "findingCount": 32,
+    "findingCount": 56,
     "actionDelegationCount": 3
   }
 ].map(Object.freeze));
