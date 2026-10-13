@@ -1,7 +1,8 @@
 import { findSimilarPaletteColors, DEFAULT_COLOR_CHECK_THRESHOLD } from "./palette_color_check_model.js";
+import { buildPaletteColorCheckCsv } from "./palette_color_check_export.js";
 
 /** A read-only, on-demand review surface. Entry lookup and editor navigation stay with their owners. */
-export function createPaletteColorCheck({ state, host, getEntries, locateEntry }) {
+export function createPaletteColorCheck({ state, host, getEntries, locateEntry, download }) {
   if (!host) return { refresh() {}, refreshIfOpen() {} };
   const doc = host.ownerDocument;
   const make = (tag, className = "", id = "") => {
@@ -23,6 +24,12 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
   const threshold = make("select", "select-input", "paletteColorCheckThreshold");
   const refreshButton = make("button", "btn-secondary", "paletteColorCheckRefresh");
   refreshButton.type = "button";
+  const exportButton = make("button", "btn-secondary", "paletteColorCheckExportCsv");
+  exportButton.type = "button";
+  exportButton.disabled = true;
+  const exportStatus = make("p", "palette-color-check-status", "paletteColorCheckExportStatus");
+  exportStatus.setAttribute("role", "status");
+  exportStatus.setAttribute("aria-live", "polite");
   for (const value of ["all", "country", "legend"]) {
     const option = make("option");
     option.value = value;
@@ -46,8 +53,8 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
   next.textContent = "›";
   const pageStatus = make("span", "", "paletteColorCheckPage");
   pager.append(previous, pageStatus, next);
-  controls.append(scopeLabel, scope, thresholdLabel, threshold, refreshButton);
-  body.append(hint, controls, status, results, pager);
+  controls.append(scopeLabel, scope, thresholdLabel, threshold, refreshButton, exportButton);
+  body.append(hint, controls, exportStatus, status, results, pager);
   panel.append(toggle, body);
   host.prepend(panel);
 
@@ -56,6 +63,7 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
   let report = null;
   let fingerprint = "";
   let language = "";
+  let exporting = false;
   const zh = () => state.currentLanguage === "zh";
   const text = (chinese, english) => zh() ? chinese : english;
 
@@ -75,6 +83,8 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
       threshold.options[index].textContent = zh() ? label : ["Exact duplicates", "Very close (RGB ≤ 18)", "Close (RGB ≤ 30)"][index];
     });
     refreshButton.textContent = text("重新检查", "Refresh check");
+    exportButton.textContent = text("导出检查 CSV", "Export check CSV");
+    exportButton.title = text("导出前重新检查；包含当前范围的全部结果页和摘要", "Refreshes before download; includes all result pages and the summary at the current scope");
     previous.setAttribute("aria-label", text("上一页颜色检查结果", "Previous color-check results"));
     next.setAttribute("aria-label", text("下一页颜色检查结果", "Next color-check results"));
     results.setAttribute("aria-label", text("重复或相近的颜色对", "Duplicate or similar color pairs"));
@@ -110,6 +120,7 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
 
   function renderResults() {
     if (!report) return;
+    exportButton.disabled = exporting;
     const count = report.pairs.length;
     const pageCount = Math.max(1, Math.ceil(count / pageSize));
     pageIndex = Math.min(pageIndex, pageCount - 1);
@@ -146,6 +157,7 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
     if (!force && nextFingerprint === fingerprint) return;
     fingerprint = nextFingerprint;
     pageIndex = 0;
+    if (!exporting) exportStatus.textContent = "";
     localize();
     report = findSimilarPaletteColors(entries, { threshold: Number(threshold.value), scope: scope.value });
     renderResults();
@@ -156,6 +168,30 @@ export function createPaletteColorCheck({ state, host, getEntries, locateEntry }
   }
   panel.addEventListener("toggle", () => { if (panel.open) refresh(); });
   refreshButton.addEventListener("click", () => refresh());
+  exportButton.addEventListener("click", async () => {
+    if (exporting) return;
+    exporting = true;
+    exportButton.disabled = true;
+    exportStatus.textContent = text("正在准备检查结果…", "Preparing check results…");
+    try {
+      // Export the live filtered report, never the current eight-row DOM page.
+      refresh({ force: false });
+      const pairCount = report.pairs.length;
+      const content = buildPaletteColorCheckCsv(report, { scope: scope.value, language: state.currentLanguage });
+      const stem = String(state.activeScenarioId || "map").replace(/[^a-z0-9_-]+/gi, "-").slice(0, 80) || "map";
+      const result = await download(new Blob([content], { type: "text/csv;charset=utf-8" }), `${stem}-color-check.csv`);
+      exportStatus.textContent = result === false
+        ? text("已取消检查结果下载。", "Check result download cancelled.")
+        : pairCount
+          ? text(`已开始下载 ${pairCount} 对检查结果，包含全部页。`, `Download started for all ${pairCount} result pairs.`)
+          : text("未发现匹配项，已开始下载检查摘要。", "No matching pairs; check summary download started.");
+    } catch {
+      exportStatus.textContent = text("检查结果导出失败，请重新检查后重试。", "Check result export failed. Refresh the check and try again.");
+    } finally {
+      exporting = false;
+      exportButton.disabled = !report;
+    }
+  });
   scope.addEventListener("change", () => refresh());
   threshold.addEventListener("change", () => refresh());
   previous.addEventListener("click", () => { pageIndex = Math.max(0, pageIndex - 1); renderResults(); });

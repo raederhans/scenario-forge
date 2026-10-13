@@ -9,3 +9,5 @@
 实现位于 `js/ui/palette_color_check_model.js`（纯读取和配对）、`js/ui/palette_color_check.js`（面板）、`js/ui/palette_color_check_editor.js`（与现有编辑器连接）。公共接线仅涉及 `index.html`、`js/ui/sidebar.js` 和图例 owner 的 `focusLegendColor` 接口，适合单独整合。
 
 目标验证：`node --test tests/palette_color_check_model_behavior.test.mjs`。
+
+点击“导出检查 CSV”可下载当前范围和阈值的全部结果（含所有页）。导出前会重新读取当前配色，文件包含检查摘要、两侧名称/代码/HEX、重复或相近类型、RGB 距离和人工复核提示。没有匹配项时也能导出摘要。文件在本地生成，仅触发浏览器下载，不保存或改写项目，也不向外部发送。

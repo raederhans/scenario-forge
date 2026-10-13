@@ -1,5 +1,6 @@
 import { createPaletteColorCheck } from "./palette_color_check.js";
 import { collectCountryColorCheckEntries, collectLegendColorCheckEntries } from "./palette_color_check_model.js";
+import { FileManager } from "../core/file_manager.js";
 
 /** Binds the review surface to existing owners; it never applies a palette color. */
 export function initPaletteColorCheckEditor({
@@ -12,6 +13,7 @@ export function initPaletteColorCheckEditor({
   const controller = createPaletteColorCheck({
     state,
     host,
+    download: (blob, filename) => FileManager.writeBlobDownload(blob, filename, { destination: "browser" }),
     getEntries: () => [...getCountryEntries(), ...collectLegendColorCheckEntries(state)],
     locateEntry: (entry) => {
       if (entry.kind === "country") {
