@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
-import { openRasterApp, waitRasterView } from "./political_id_raster_app_session.mjs";
+import { openRasterApp, waitRasterAppReady, waitRasterView } from "./political_id_raster_app_session.mjs";
 
 export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
   const needPrecise = !captureReference && precise;
@@ -349,6 +349,9 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
         ...(await import(new URL('js/core/state.js', document.baseURI))) };
     });
+    // Match cold startup: start the raster wait after boot/unlock completes.
+    // The existing 120-second phase watchdog still bounds the whole reload.
+    await waitRasterAppReady(page);
     await waitRasterView(page, scenarioId); await settled(page, true);
     await page.waitForFunction(() => {
       const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;

@@ -1,3 +1,8 @@
+import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
+import { captureScenarioPaletteState, restoreScenarioPaletteState } from "../js/core/state/actions/scenario_palette_actions.js";
+import { restoreProjectImportFields as restoreFixtureSpecialZones, setSpecialZonesOverlayDirtyState } from "../js/core/state/actions/special_zone_actions.js";
+import { restoreHistoryStacksState } from "../js/core/state/actions/history_actions.js";
+import { restoreDirtyMetadataState } from "../js/core/state/actions/ui_dirty_actions.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
@@ -16,6 +21,38 @@ import {
   readRegisteredRuntimeHookSource, registerRuntimeHook,
 } from "../js/core/state/runtime_hooks.js";
 
+
+// Real singleton integration tests prepare/restore through its domain owners.
+function patchFixture(patch) {
+  const activationKeys = ["activeScenarioId", "scenarioBaselineHash", "sovereigntyByFeatureId", "sovereignBaseColors", "visualOverrides", "riverPaint"];
+  const paletteKeys = ["legendLabels", "legendConfig"];
+  const allowed = [...activationKeys, ...paletteKeys, "colors", "specialZoneLayers", "specialZonesOverlayDirty", "historyPast", "historyFuture", "isDirty", "dirtyRevision", "lastDirtyReason"];
+  if (Object.keys(patch).some(key => !allowed.includes(key))) throw new Error("Unknown fixture domain field");
+  const activationUpdates = Object.fromEntries(activationKeys.filter(key => Object.hasOwn(patch, key)).map(key => [key, patch[key]]));
+  if (Object.keys(activationUpdates).length) {
+    const snapshot = captureScenarioActivationState(state);
+    restoreScenarioActivationState(state, { values: { ...snapshot.values, ...activationUpdates },
+      presentKeys: [...new Set([...snapshot.presentKeys, ...Object.keys(activationUpdates)])] });
+  }
+  const paletteUpdates = Object.fromEntries(paletteKeys.filter(key => Object.hasOwn(patch, key)).map(key => [key, patch[key]]));
+  if (Object.keys(paletteUpdates).length) {
+    const snapshot = captureScenarioPaletteState(state);
+    restoreScenarioPaletteState(state, { values: { ...snapshot.values, ...paletteUpdates },
+      presentKeys: [...new Set([...snapshot.presentKeys, ...Object.keys(paletteUpdates)])] });
+  }
+  if (Object.hasOwn(patch, "colors")) replaceResolvedColorsState(state, patch.colors);
+  if (Object.hasOwn(patch, "specialZoneLayers")) restoreFixtureSpecialZones(state, { specialZoneLayers: patch.specialZoneLayers });
+  if (Object.hasOwn(patch, "specialZonesOverlayDirty")) setSpecialZonesOverlayDirtyState(state, patch.specialZonesOverlayDirty);
+  if (Object.hasOwn(patch, "historyPast") || Object.hasOwn(patch, "historyFuture")) restoreHistoryStacksState(state,
+    Object.hasOwn(patch, "historyPast") ? patch.historyPast : state.historyPast,
+    Object.hasOwn(patch, "historyFuture") ? patch.historyFuture : state.historyFuture);
+  if (["isDirty", "dirtyRevision", "lastDirtyReason"].some(key => Object.hasOwn(patch, key))) restoreDirtyMetadataState(state, {
+    isDirty: Object.hasOwn(patch, "isDirty") ? patch.isDirty : state.isDirty,
+    dirtyRevision: Object.hasOwn(patch, "dirtyRevision") ? patch.dirtyRevision : state.dirtyRevision,
+    lastDirtyReason: Object.hasOwn(patch, "lastDirtyReason") ? patch.lastDirtyReason : state.lastDirtyReason,
+  });
+}
+
 function harness(t) {
   const keys = ["legendLabels", "colors", "sovereigntyByFeatureId", "specialZoneLayers", "specialZonesOverlayDirty",
     "historyPast", "historyFuture", "isDirty", "dirtyRevision", "lastDirtyReason", "activeScenarioId", "scenarioBaselineHash"];
@@ -28,10 +65,7 @@ function harness(t) {
   hooks.forEach((_, name) => registerRuntimeHook(state, name, null));
   clearHistory();
   t.after(() => {
-    patchLegendState(state, { legendLabels: original.legendLabels });
-    replaceResolvedColorsState(state, original.colors);
-    commitSpecialZoneLayersState(state, original.specialZoneLayers, {}, { preserveIdentity: true, markDirty: false });
-    for (const key of keys.filter(key => !["legendLabels", "colors", "specialZoneLayers"].includes(key))) state[key] = original[key];
+    patchFixture(original);
     hooks.forEach((hook, name) => registerRuntimeHook(state, name, hook));
     if (hadDocument) globalThis.document = document;
     else delete globalThis.document;
@@ -76,7 +110,7 @@ test("real undo and redo restore scoped label values and deletions without touch
   patchLegendState(state, { legendLabels: { "#aabbcc": "Before", "#223344": "Delete me",
     "#112233": "Unrelated" } });
   replaceResolvedColorsState(state, { countryA: "#aabbcc", countryB: "#112233" });
-  state.sovereigntyByFeatureId = Object.freeze({ countryA: "AA", countryB: "BB" });
+  patchFixture({ sovereigntyByFeatureId: Object.freeze({ countryA: "AA", countryB: "BB" }) });
   const unchangedKeys = ["colors", "visualOverrides", "waterRegionOverrides", "sovereignBaseColors",
     "countryPalette", "sovereigntyByFeatureId", "specialZoneLayers", "legendConfig", "legendControl", "legendColorOrder"];
   const unchanged = Object.fromEntries(unchangedKeys.map(key => [key, state[key]]));
@@ -185,7 +219,7 @@ test("mixed label and zone undo/redo preserve unsorted memberships, unknown meta
   harness(t);
   patchLegendState(state, { legendLabels: { "#aabbcc": "Before label", "#112233": "Unrelated label" } });
   replaceResolvedColorsState(state, { countryA: "#aabbcc", countryB: "#112233" });
-  state.sovereigntyByFeatureId = Object.freeze({ countryA: "AA", countryB: "BB" });
+  patchFixture({ sovereigntyByFeatureId: Object.freeze({ countryA: "AA", countryB: "BB" }) });
   const members = ["B", "A", "B", "unknown"];
   const metadata = { extension: ["Unchanged"] };
   const zone = { id: "zone", name: "Before zone", visible: false, legendVisible: true,
@@ -266,11 +300,18 @@ test("zone history restores raw JSON known values exactly and detaches captured 
   const restored = state.specialZoneLayers.layers[0];
   assert.equal(restored.style.fillOpacity, "0.4");
   assert.deepEqual(restored.style.pattern, rawPattern);
+  assert.notEqual(restored.style.pattern, rawPattern);
+  assert.notEqual(restored.style.pattern.legacy, rawPattern.legacy);
   assert.notEqual(restored.style.pattern, JSON.parse(before.specialZoneLegendFields).raw.style.pattern);
   assert.equal(restored.memberFeatureIds, members);
   assert.equal(restored.extension, metadata);
   assert.equal(restored.style.extension, metadata);
-  restored.style.pattern.legacy.push("Later mutation");
+  const laterPattern = structuredClone(restored.style.pattern);
+  laterPattern.legacy.push("Later mutation");
+  patchFixture({ specialZoneLayers: { ...state.specialZoneLayers,
+    layers: state.specialZoneLayers.layers.map(layer => layer === restored
+      ? { ...layer, style: { ...layer.style, pattern: laterPattern } } : layer) } });
+  assert.deepEqual(state.specialZoneLayers.layers[0].style.pattern.legacy, ["Unusual existing value", "Later mutation"]);
   assert.deepEqual(JSON.parse(before.specialZoneLegendFields).raw.style.pattern, { legacy: ["Unusual existing value"] });
   assert.deepEqual(rawPattern, { legacy: ["Unusual existing value"] });
   assert.equal(redoHistory(), true);
@@ -310,8 +351,8 @@ test("an exact __proto__ zone ID has an own safe snapshot entry and real undo/re
 
 test("CSV import undo and redo require matching nonempty scenario and baseline scope without popping blocked entries", t => {
   harness(t);
-  state.activeScenarioId = "scenario-a";
-  state.scenarioBaselineHash = "baseline-a";
+  patchFixture({ activeScenarioId: "scenario-a" });
+  patchFixture({ scenarioBaselineHash: "baseline-a" });
   patchLegendState(state, { legendLabels: { "#112233": "Before label" } });
   commitSpecialZoneLayersState(state, { layers: [{ id: "shared-zone", name: "Before zone", style: {} }] },
     {}, { preserveIdentity: true, markDirty: false });
@@ -341,23 +382,23 @@ test("CSV import undo and redo require matching nonempty scenario and baseline s
     assert.equal(state.specialZoneLayers, zones);
     assert.equal(state.dirtyRevision, revision);
   };
-  state.activeScenarioId = "scenario-b";
+  patchFixture({ activeScenarioId: "scenario-b" });
   assertBlocked("undo");
-  state.activeScenarioId = "scenario-a";
-  state.scenarioBaselineHash = "baseline-b";
+  patchFixture({ activeScenarioId: "scenario-a" });
+  patchFixture({ scenarioBaselineHash: "baseline-b" });
   assertBlocked("undo");
-  state.scenarioBaselineHash = "baseline-a";
+  patchFixture({ scenarioBaselineHash: "baseline-a" });
   assert.equal(canUndoHistory(), true);
   assert.equal(undoHistory(), true);
   assert.equal(state.legendLabels["#112233"], "Before label");
   assert.equal(state.specialZoneLayers.layers[0].name, "Before zone");
   assert.equal(canRedoHistory(), true);
-  state.activeScenarioId = "scenario-b";
+  patchFixture({ activeScenarioId: "scenario-b" });
   assertBlocked("redo");
-  state.activeScenarioId = "scenario-a";
-  state.scenarioBaselineHash = "baseline-b";
+  patchFixture({ activeScenarioId: "scenario-a" });
+  patchFixture({ scenarioBaselineHash: "baseline-b" });
   assertBlocked("redo");
-  state.scenarioBaselineHash = "baseline-a";
+  patchFixture({ scenarioBaselineHash: "baseline-a" });
   assert.equal(redoHistory(), true);
   assert.equal(state.legendLabels["#112233"], "After label");
   assert.equal(state.specialZoneLayers.layers[0].name, "After zone");
@@ -367,8 +408,8 @@ test("CSV history missing scope stays blocked while unrelated history retains ex
   harness(t);
   const before = { legendLabels: { "#112233": "Before" } };
   const after = { legendLabels: { "#112233": "After" } };
-  state.activeScenarioId = "scenario-a";
-  state.scenarioBaselineHash = "baseline-a";
+  patchFixture({ activeScenarioId: "scenario-a" });
+  patchFixture({ scenarioBaselineHash: "baseline-a" });
   for (const meta of [undefined, {}, { scenarioId: "", scenarioBaselineHash: "baseline-a" },
     { scenarioId: "scenario-a", scenarioBaselineHash: "" }]) {
     clearHistory();
@@ -380,8 +421,8 @@ test("CSV history missing scope stays blocked while unrelated history retains ex
     assert.equal(state.historyFuture.length, 0);
   }
   clearHistory();
-  state.activeScenarioId = "different-scenario";
-  state.scenarioBaselineHash = "different-baseline";
+  patchFixture({ activeScenarioId: "different-scenario" });
+  patchFixture({ scenarioBaselineHash: "different-baseline" });
   assert.equal(pushHistoryEntry({ kind: "legend-edit", before, after }), true);
   assert.equal(canUndoHistory(), true);
   assert.equal(undoHistory(), true);
@@ -466,7 +507,8 @@ test("scoped zone rollback restores absent/null containers after style updates a
   assert.equal(state.specialZoneLayers.layers[1].style, null);
   assert.equal(redoHistory(), true);
   const laterMetadata = { extension: ["Keep new unknown data"] };
-  state.specialZoneLayers.layers[0].style.extra = laterMetadata;
+  patchFixture({ specialZoneLayers: { ...state.specialZoneLayers, layers: state.specialZoneLayers.layers.map((layer, index) =>
+    index === 0 ? { ...layer, style: { ...layer.style, extra: laterMetadata } } : layer) } });
   assert.equal(undoHistory(), true);
   assert.deepEqual(state.specialZoneLayers.layers[0].style, { extra: laterMetadata });
   assert.equal(state.specialZoneLayers.layers[0].style.extra, laterMetadata);

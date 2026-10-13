@@ -19,3 +19,13 @@ export function clearDirtyState(target, reason = "") {
   if (reason) target.lastDirtyReason = String(reason);
   return false;
 }
+
+// Restore captured metadata without manufacturing a new edit revision.
+export function restoreDirtyMetadataState(target, snapshot) {
+  if (!isStateTarget(target) || !snapshot || typeof snapshot !== "object") {
+    throw new TypeError("[ui_dirty_actions] target and snapshot must be objects");
+  }
+  target.isDirty = snapshot.isDirty;
+  target.dirtyRevision = snapshot.dirtyRevision;
+  target.lastDirtyReason = snapshot.lastDirtyReason;
+}

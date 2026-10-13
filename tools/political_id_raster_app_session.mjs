@@ -99,12 +99,16 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       const scenarios = await import(new URL("js/core/scenario_manager.js", document.baseURI));
       window.__rasterTask = { renderer, state, scenarios };
     });
-    await page.waitForFunction(() => {
-      const s = window.__rasterTask.state;
-      return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
-    }, null, { timeout: 60000 });
+    await waitRasterAppReady(page);
     return { browser, context, page, errors, network, warnings };
   } catch (error) { await browser.close(); throw error; }
+}
+
+export async function waitRasterAppReady(page) {
+  await page.waitForFunction(() => {
+    const s = window.__rasterTask.state;
+    return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
+  }, null, { timeout: 60000 });
 }
 
 export async function selectRasterScenario(page, scenarioId) {

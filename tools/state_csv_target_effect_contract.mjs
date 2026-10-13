@@ -8,7 +8,7 @@ const SOURCE_FINGERPRINTS = Object.freeze({
   [CSV_TARGET_ACTION_PATH]: "7954e77106896b586ce1079ba7f41805859875b983474eafa02e8776296881e1",
   "js/core/legend_csv_schema.js": "21199ccd1394d13e55c66e4c7097a791a705ce7dd7ba642c642b462a8872faa4",
   "js/core/history_manager.js": "dd13d491044fbf1195333cb7721c45986e8ab1e6d7b7c4978d7657a6b4acdea5",
-  "js/core/legend_csv_import_transaction.js": "26a79b83e9f42b4764ca98f0539c442bf93eea869aa05e9a0b3ae51fd9443886",
+  "js/core/legend_csv_import_transaction.js": "92784e20f544c44830f57777255d7d4d97487bded7e24c1b9002d418f3cf50b9",
 });
 const EXPORTS = Object.freeze([
   ["patchSpecialZoneLegendFieldsState", 532, 72],

@@ -3,7 +3,8 @@ import { buildLegendCsvCurrentModel } from "./legend_csv_schema.js";
 import { buildLegendCsvImportPreview } from "./legend_csv_import_preview.js";
 import { normalizeHexColor } from "./color_hex_utils.js";
 import { setLegendLabelState, restoreLegendLabelSnapshotState } from "./state/actions/legend_actions.js";
-import { patchSpecialZoneLegendFieldsState, restoreSpecialZoneLegendSnapshotState } from "./state/actions/special_zone_actions.js";
+import { patchSpecialZoneLegendFieldsState, restoreSpecialZoneLegendSnapshotState, setSpecialZonesOverlayDirtyState } from "./state/actions/special_zone_actions.js";
+import { restoreHistoryStacksState } from "./state/actions/history_actions.js";
 import { captureHistoryState, hasHistoryDelta, pushHistoryEntry } from "./history_manager.js";
 import { markDirtyState } from "./state/actions/ui_dirty_actions.js";
 
@@ -74,9 +75,8 @@ export function applyLegendCsvImport({ target = state, source, selectedRecords =
   } catch (error) {
     if (before.legendLabels) restoreLegendLabelSnapshotState(state, before.legendLabels, before.legendLabelKeysPresent);
     if (before.specialZoneLegendFields) restoreSpecialZoneLegendSnapshotState(state, before.specialZoneLegendFields);
-    state.specialZonesOverlayDirty = oldDirty;
-    state.historyPast = past;
-    state.historyFuture = future;
+    setSpecialZonesOverlayDirtyState(state, oldDirty);
+    restoreHistoryStacksState(state, past, future);
     throw error;
   }
   // The history commit succeeded; visual/UI refresh belongs to the caller.

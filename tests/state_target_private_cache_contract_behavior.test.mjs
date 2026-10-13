@@ -13,6 +13,8 @@ import { inspectStateCsvActionInputSites, CSV_LEGEND_ACTION_PATH, CSV_ZONE_ACTIO
 import { inspectStateCsvTargetEffects } from "../tools/state_csv_target_effect_contract.mjs";
 import { inspectStateWaterPathResourceSources, WATER_PATH_RESOURCE_MODULE_PATH } from "../tools/state_water_path_resource_contract.mjs";
 import { inspectStateCountryInspectorProjectionSources, STATE_COUNTRY_INSPECTOR_PROJECTION_MODULE_PATH } from "../tools/state_country_inspector_projection_contract.mjs";
+import { inspectStateCsvHistorySourceRefreshEvidence } from "../tools/state_csv_history_source_contract.mjs";
+import { inspectStateEditorUiSourceRefreshEvidence } from "../tools/state_editor_ui_source_contract.mjs";
 
 const entry = STATE_TARGET_PURE_READER_CONTRACT.find(item => item.functionName === "createPoliticalFeaturePolicy");
 const read = modulePath => readFileSync(new URL(`../${modulePath}`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
@@ -151,6 +153,13 @@ test("all remaining declared source-proof families pass without repository mutat
   check("csvTargetEffects", [CSV_ZONE_ACTION_PATH], path => inspectStateCsvTargetEffects({ source: read(path) }));
   check("waterPathResources", [WATER_PATH_RESOURCE_MODULE_PATH], path => inspectStateWaterPathResourceSources({ source: read(path) }));
   check("countryInspectorProjections", [STATE_COUNTRY_INSPECTOR_PROJECTION_MODULE_PATH], path => inspectStateCountryInspectorProjectionSources({ source: read(path) }));
+  const historical = (revision, path) => execFileSync("git", ["show", `${revision}:${path}`], { encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
+  const sourceRefreshOptions = receipt => ({ modulePath: receipt.modulePath, sourceFingerprint: receipt.previousSourceFingerprint,
+    source: read(receipt.modulePath), readCurrentSource: read, readHistoricalSource: historical });
+  check("csvHistorySource", contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.filter(e => e.modulePath === "js/core/history_manager.js"),
+    e => inspectStateCsvHistorySourceRefreshEvidence(sourceRefreshOptions(e)));
+  check("editorUiSource", contracts.STATE_CAPABILITY_RETIREMENT_HOOK_IMPORT_REFRESHES.filter(e => ["js/ui/sidebar.js", "js/ui/toolbar.js"].includes(e.modulePath)),
+    e => inspectStateEditorUiSourceRefreshEvidence(sourceRefreshOptions(e)));
   t.diagnostic(JSON.stringify(counts));
   assert.deepEqual(failures, []);
 });

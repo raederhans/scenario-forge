@@ -5,6 +5,8 @@ import path from "node:path";
 import { parse } from "acorn";
 import { VISUAL_PAINT_ACTION_PATH, VISUAL_PAINT_ACTION_SOURCE_FINGERPRINT, inspectVisualPaintInputSites } from "./state_visual_paint_contract.mjs";
 import { inspectBoundedGovernanceSourceRefresh } from "./state_governance_source_refresh.mjs";
+import { inspectStateCsvHistorySourceRefresh } from "./state_csv_history_source_contract.mjs";
+import { inspectStateEditorUiSourceRefresh } from "./state_editor_ui_source_contract.mjs";
 
 import {
   compareP4StateActionPhases,
@@ -356,6 +358,7 @@ const UI_CHROME_ACTION_EXPORT_NAMES = Object.freeze([
 const UI_DIRTY_ACTION_EXPORT_NAMES = Object.freeze([
   "markDirtyState",
   "clearDirtyState",
+  "restoreDirtyMetadataState",
 ]);
 
 const UI_VISIBILITY_ACTION_EXPORT_NAMES = Object.freeze([
@@ -460,6 +463,11 @@ const STATE_ACTION_EXPORT_GROUPS = Object.freeze([
   Object.freeze({
     modulePath: "js/core/state/actions/legend_actions.js",
     exportNames: Object.freeze(["ensureLegendState", "patchLegendState", "setLegendLabelState", "restoreLegendLabelSnapshotState"]),
+    introducedInPhase: "P4.4",
+  }),
+  Object.freeze({
+    modulePath: "js/core/state/actions/history_actions.js",
+    exportNames: Object.freeze(["restoreHistoryStacksState"]),
     introducedInPhase: "P4.4",
   }),
   Object.freeze({
@@ -5869,6 +5877,14 @@ export function matchesStateCapabilityRetirementSource({
   modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
 }) {
   if (source === null || source === undefined) return false;
+  const csvHistoryRefresh = inspectStateCsvHistorySourceRefresh({
+    modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
+  });
+  if (csvHistoryRefresh !== null) return csvHistoryRefresh;
+  const editorUiRefresh = inspectStateEditorUiSourceRefresh({
+    modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
+  });
+  if (editorUiRefresh !== null) return editorUiRefresh;
   const boundedRefresh = inspectBoundedGovernanceSourceRefresh({
     modulePath, sourceFingerprint, source, readCurrentSource, readHistoricalSource,
   });

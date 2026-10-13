@@ -9,7 +9,7 @@ const fingerprints = Object.freeze({
   [CSV_LEGEND_ACTION_PATH]: "e82ac9f6585dbdfba302ccc39cdfaa85d97311fa6f5e5a9890bc4427f2002992",
   [CSV_ZONE_ACTION_PATH]: "7954e77106896b586ce1079ba7f41805859875b983474eafa02e8776296881e1",
   "js/core/history_manager.js": "dd13d491044fbf1195333cb7721c45986e8ab1e6d7b7c4978d7657a6b4acdea5",
-  "js/core/legend_csv_import_transaction.js": "26a79b83e9f42b4764ca98f0539c442bf93eea869aa05e9a0b3ae51fd9443886",
+  "js/core/legend_csv_import_transaction.js": "92784e20f544c44830f57777255d7d4d97487bded7e24c1b9002d418f3cf50b9",
   "js/core/legend_csv_schema.js": "21199ccd1394d13e55c66e4c7097a791a705ce7dd7ba642c642b462a8872faa4",
   "js/core/legend_state_normalizers.js": "89f35bd0e8cffb5e599183d4055b4a57fa43dfe8125d39c663f1e33a9087810f",
   "js/core/color_hex_utils.js": "925fe10aa8433ccab2880057e64bdf7407554d893f0409a521229c1f7857a510",

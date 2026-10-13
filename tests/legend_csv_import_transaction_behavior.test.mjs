@@ -1,3 +1,9 @@
+import { captureScenarioActivationState, restoreScenarioActivationState } from "../js/core/state/actions/scenario_activation_actions.js";
+import { captureScenarioPaletteState, restoreScenarioPaletteState } from "../js/core/state/actions/scenario_palette_actions.js";
+import { restoreProjectImportFields as restoreFixtureSpecialZones, setSpecialZonesOverlayDirtyState } from "../js/core/state/actions/special_zone_actions.js";
+import { restoreHistoryStacksState } from "../js/core/state/actions/history_actions.js";
+import { restoreDirtyMetadataState } from "../js/core/state/actions/ui_dirty_actions.js";
+import { replaceResolvedColorsState } from "../js/core/state/color_state.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { state } from "../js/core/state.js";
@@ -8,16 +14,48 @@ import { buildLegendCsv } from "../js/ui/sidebar/legend_export.js";
 import { undoHistory, redoHistory } from "../js/core/history_manager.js";
 import { readRegisteredRuntimeHookSource, registerRuntimeHook } from "../js/core/state/index.js";
 
+
+// Real singleton integration tests prepare/restore through its domain owners.
+function patchFixture(patch) {
+  const activationKeys = ["activeScenarioId", "scenarioBaselineHash", "sovereigntyByFeatureId", "sovereignBaseColors", "visualOverrides", "riverPaint"];
+  const paletteKeys = ["legendLabels", "legendConfig"];
+  const allowed = [...activationKeys, ...paletteKeys, "colors", "specialZoneLayers", "specialZonesOverlayDirty", "historyPast", "historyFuture", "isDirty", "dirtyRevision", "lastDirtyReason"];
+  if (Object.keys(patch).some(key => !allowed.includes(key))) throw new Error("Unknown fixture domain field");
+  const activationUpdates = Object.fromEntries(activationKeys.filter(key => Object.hasOwn(patch, key)).map(key => [key, patch[key]]));
+  if (Object.keys(activationUpdates).length) {
+    const snapshot = captureScenarioActivationState(state);
+    restoreScenarioActivationState(state, { values: { ...snapshot.values, ...activationUpdates },
+      presentKeys: [...new Set([...snapshot.presentKeys, ...Object.keys(activationUpdates)])] });
+  }
+  const paletteUpdates = Object.fromEntries(paletteKeys.filter(key => Object.hasOwn(patch, key)).map(key => [key, patch[key]]));
+  if (Object.keys(paletteUpdates).length) {
+    const snapshot = captureScenarioPaletteState(state);
+    restoreScenarioPaletteState(state, { values: { ...snapshot.values, ...paletteUpdates },
+      presentKeys: [...new Set([...snapshot.presentKeys, ...Object.keys(paletteUpdates)])] });
+  }
+  if (Object.hasOwn(patch, "colors")) replaceResolvedColorsState(state, patch.colors);
+  if (Object.hasOwn(patch, "specialZoneLayers")) restoreFixtureSpecialZones(state, { specialZoneLayers: patch.specialZoneLayers });
+  if (Object.hasOwn(patch, "specialZonesOverlayDirty")) setSpecialZonesOverlayDirtyState(state, patch.specialZonesOverlayDirty);
+  if (Object.hasOwn(patch, "historyPast") || Object.hasOwn(patch, "historyFuture")) restoreHistoryStacksState(state,
+    Object.hasOwn(patch, "historyPast") ? patch.historyPast : state.historyPast,
+    Object.hasOwn(patch, "historyFuture") ? patch.historyFuture : state.historyFuture);
+  if (["isDirty", "dirtyRevision", "lastDirtyReason"].some(key => Object.hasOwn(patch, key))) restoreDirtyMetadataState(state, {
+    isDirty: Object.hasOwn(patch, "isDirty") ? patch.isDirty : state.isDirty,
+    dirtyRevision: Object.hasOwn(patch, "dirtyRevision") ? patch.dirtyRevision : state.dirtyRevision,
+    lastDirtyReason: Object.hasOwn(patch, "lastDirtyReason") ? patch.lastDirtyReason : state.lastDirtyReason,
+  });
+}
+
 function fixture(t) {
-  const keys = ["activeScenarioId", "scenarioBaselineHash", "colors", "legendLabels", "legendConfig", "legendColorOrder",
+  const keys = ["activeScenarioId", "scenarioBaselineHash", "colors", "legendLabels", "legendConfig",
     "specialZoneLayers", "specialZonesOverlayDirty", "historyPast", "historyFuture", "isDirty", "dirtyRevision", "lastDirtyReason",
-    "visualOverrides", "sovereigntyByFeatureId", "sovereignBaseColors", "countryPalette", "riverPaint"];
+    "visualOverrides", "sovereigntyByFeatureId", "sovereignBaseColors", "riverPaint"];
   const saved = Object.fromEntries(keys.map(key => [key, state[key]]));
   const oldDocument = globalThis.document;
   globalThis.document = { getElementById: () => null };
-  Object.assign(state, {
+  patchFixture({
     activeScenarioId: "scenario-a", scenarioBaselineHash: "baseline-a", colors: { A: "#abcdef" },
-    legendLabels: { "#abcdef": "Original", "#123456": "Unrelated" }, legendColorOrder: [], legendConfig: { maxItems: 15 },
+    legendLabels: { "#abcdef": "Original", "#123456": "Unrelated" }, legendConfig: { maxItems: 15 },
     specialZoneLayers: { version: 1, topologyFingerprint: "topology-a", activeLayerId: "zone-a", extra: { untouched: true }, layers: [
       { id: "zone-a", name: "Original zone", source: "project", visible: true, legendVisible: true,
         memberFeatureIds: ["B", "A"], metadata: { untouched: true },
@@ -26,9 +64,9 @@ function fixture(t) {
       { id: "unrelated", name: "Other", memberFeatureIds: ["C"], style: { fill: "#123456", extra: "also preserved" } },
     ] }, historyPast: [], historyFuture: [], isDirty: false, lastDirtyReason: "", specialZonesOverlayDirty: false,
     visualOverrides: { A: "#abcdef" }, sovereigntyByFeatureId: { A: "USA", B: "CAN" },
-    sovereignBaseColors: { USA: "#112233" }, countryPalette: { USA: "#112233" }, riverPaint: null,
+    sovereignBaseColors: { USA: "#112233" }, riverPaint: null,
   });
-  t.after(() => { Object.assign(state, saved); if (oldDocument === undefined) delete globalThis.document; else globalThis.document = oldDocument; });
+  t.after(() => { patchFixture(saved); if (oldDocument === undefined) delete globalThis.document; else globalThis.document = oldDocument; });
   return buildLegendCsvCurrentModel(state);
 }
 function proposedCsv(model, transform = entries => entries) {
@@ -82,7 +120,7 @@ test("missing confirmation, legacy, unknown selection and stale target reject be
   const legacy = buildLegendCsv(model.entries);
   assert.throws(() => applyLegendCsvImport({ source: legacy, selectedRecords: [2], preview: previewOf(legacy, model), confirmed: true }), errorCode("legacy-readonly"));
   assert.equal(JSON.stringify({ labels: state.legendLabels, zones: state.specialZoneLayers, history: state.historyPast }), before);
-  state.legendLabels = { ...state.legendLabels, "#abcdef": "Edited after preview" };
+  patchFixture({ legendLabels: { ...state.legendLabels, "#abcdef": "Edited after preview" } });
   assert.throws(() => applyLegendCsvImport({ source, selectedRecords: [2], preview, confirmed: true }), errorCode("stale-preview"));
   assert.equal(state.legendLabels["#abcdef"], "Edited after preview");
   assert.equal(state.historyPast.length, 0);
@@ -95,9 +133,9 @@ test("scope change or one unsafe selected row aborts the entire batch; unknown r
   const preview = previewOf(source, model);
   assert.throws(() => applyLegendCsvImport({ source, selectedRecords: [2, 5], preview, confirmed: true }), errorCode("stale-preview"));
   assert.equal(state.legendLabels["#abcdef"], "Original");
-  state.scenarioBaselineHash = "another-baseline";
+  patchFixture({ scenarioBaselineHash: "another-baseline" });
   assert.throws(() => applyLegendCsvImport({ source, selectedRecords: [2, 3], preview, confirmed: true }), errorCode("stale-preview"));
-  state.scenarioBaselineHash = model.scenarioBaselineHash;
+  patchFixture({ scenarioBaselineHash: model.scenarioBaselineHash });
   const result = applyLegendCsvImport({ source, selectedRecords: [2], preview, confirmed: true });
   assert.equal(result.appliedCount, 1);
   assert.equal(state.specialZoneLayers.layers.length, 2);
@@ -125,7 +163,7 @@ test("zone name, style or membership changes after preview reject the whole sele
   for (const replacement of [{ ...original, name: "Other editor" },
     { ...original, style: { ...original.style, strokeWidth: 3 } },
     { ...original, memberFeatureIds: ["C"] }]) {
-    state.specialZoneLayers = { ...state.specialZoneLayers, layers: [replacement, state.specialZoneLayers.layers[1]] };
+    patchFixture({ specialZoneLayers: { ...state.specialZoneLayers, layers: [replacement, state.specialZoneLayers.layers[1]] } });
     assert.throws(() => applyLegendCsvImport({ source, selectedRecords: [2, 3], preview, confirmed: true }), errorCode("stale-preview"));
     assert.equal(state.legendLabels["#abcdef"], "Original");
     assert.equal(state.specialZoneLayers.layers[0], replacement);
@@ -138,13 +176,13 @@ test("failed history recording rolls back all edited fields and preserves both h
   const savedHook = readRegisteredRuntimeHookSource(state, "updateHistoryUIFn");
   t.after(() => registerRuntimeHook(state, "updateHistoryUIFn", savedHook));
   registerRuntimeHook(state, "updateHistoryUIFn", () => { throw new Error("history UI failed"); });
-  state.historyPast = [{ kind: "prior", before: {}, after: { labels: "prior" } }];
-  state.historyFuture = [{ kind: "future", before: {}, after: { labels: "future" } }];
+  patchFixture({ historyPast: [{ kind: "prior", before: {}, after: { labels: "prior" } }] });
+  patchFixture({ historyFuture: [{ kind: "future", before: {}, after: { labels: "future" } }] });
   const zone = state.specialZoneLayers.layers[0];
   const noStyle = { ...zone };
   delete noStyle.style;
   for (const raw of [zone, { ...zone, style: { ...zone.style, stroke: null } }, noStyle, { ...zone, style: null }]) {
-    state.specialZoneLayers = { ...state.specialZoneLayers, layers: [raw, state.specialZoneLayers.layers[1]] };
+    patchFixture({ specialZoneLayers: { ...state.specialZoneLayers, layers: [raw, state.specialZoneLayers.layers[1]] } });
     const model = buildLegendCsvCurrentModel(state);
     const before = JSON.stringify({ labels: state.legendLabels, zones: state.specialZoneLayers,
       past: state.historyPast, future: state.historyFuture, dirty: state.isDirty, zoneDirty: state.specialZonesOverlayDirty });
