@@ -69,7 +69,7 @@ jobs:
           npm run verify:script-portfolio
           node tools/select_verification_targets.mjs --check
           node --test tests/precision_scaling_verification_records.test.mjs tests/verification_script_portfolio_behavior.test.mjs 2>&1 | tee .runtime/reports/generated/quick-fill-routing-tests.log
-      - name: Integration contracts and canonical Pages build
+      - name: Integration contracts
         shell: bash
         run: |
           set -euo pipefail
@@ -77,7 +77,9 @@ jobs:
           npm run verify:state-write-allowlist 2>&1 | tee .runtime/reports/generated/quick-fill-state-writes.log
           npm run verify:test-import-graph
           npm run test:node:scenario-lifecycle-runtime-behavior 2>&1 | tee .runtime/reports/generated/quick-fill-lifecycle-tests.log
-          python tools/build_pages_dist.py 2>&1 | tee .runtime/reports/generated/quick-fill-pages-build.log
+          # The localhost smoke below serves source through dev_server.py and
+          # never consumes dist. PR Verify owns source-graph/artifact selection;
+          # release still builds and tests the complete Pages artifact.
           git diff --check
       - name: Live toolbar smoke on localhost
         shell: bash

@@ -44,6 +44,25 @@ test("PR planner accepts shared package exemption but defaults conservatively", 
   const exempt = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false });
   assert.equal(exempt.perfMode, "skip");
   assert.equal(exempt.perfRequired, false);
+  assert.equal(exempt.runFast, true);
+  assert.equal(exempt.pagesMode, "none");
+  assert.equal(exempt.runSmoke, true);
+  const browserScriptBase = { scripts: { "test:e2e:smoke": "node tools/e2e_layering.mjs run smoke" } };
+  const browserScriptHead = { scripts: { "test:e2e:smoke": "node tools/e2e_layering.mjs run ui" } };
+  const browserScriptExempt = !packageChangeRequiresPerformance({
+    basePackageText: JSON.stringify(browserScriptBase), headPackageText: JSON.stringify(browserScriptHead),
+  });
+  assert.equal(browserScriptExempt, true);
+  assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: !browserScriptExempt }).runSmoke, true);
+  for (const file of ["package-lock.json", "requirements-dev.lock.txt", "index.html", "js/core/map_renderer.js"]) {
+    const mixed = planPullRequest({ changedFiles: ["package.json", file], packageRequiresPerf: false });
+    assert.equal(mixed.pagesMode, "full", file);
+    assert.equal(mixed.runSmoke, true, file);
+  }
+  const full = planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:full"] });
+  assert.equal(full.pagesMode, "full");
+  assert.equal(full.runSmoke, true);
+  assert.equal(planPullRequest({ changedFiles: ["package.json"] }).pagesMode, "full");
   assert.equal(planPullRequest({ changedFiles: ["package.json"], packageRequiresPerf: false, labels: ["ci:perf-strict"] }).perfMode, "strict");
   assert.equal(planPullRequest({ changedFiles: ["package.json", "package-lock.json"], packageRequiresPerf: false }).perfRequired, true);
 });
@@ -68,7 +87,10 @@ test("planner CLI shares manifest exemption and missing or invalid files stay co
   };
   const manifestArgs = ["--base-package-file", "base.json", "--head-package-file", "head.json"];
   assert.equal(invoke(manifestArgs).perfMode, "skip");
+  assert.equal(invoke(manifestArgs).pagesMode, "none");
+  assert.equal(invoke(manifestArgs).runSmoke, true);
   assert.equal(invoke().perfRequired, true);
+  assert.equal(invoke().pagesMode, "full");
   assert.equal(invoke(["--base-package-file", "missing.json", "--head-package-file", "head.json"]).perfRequired, true);
   assert.equal(invoke(["--base-package-file", "base.json"]).perfRequired, true);
   fs.writeFileSync(path.join(cwd, "head.json"), "");
