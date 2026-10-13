@@ -1,0 +1,23 @@
+.palette-color-check { margin: 0 0 16px; border-bottom: 1px solid var(--border-subtle, #dce3e8); padding-bottom: 12px; }
+.palette-color-check > summary { cursor: pointer; color: var(--text-primary); font-size: 13px; font-weight: 650; line-height: 1.5; }
+.palette-color-check-body { padding-top: 8px; }
+.palette-color-check-hint, .palette-color-check-status { margin: 0 0 10px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.palette-color-check-status { color: var(--text-primary); }
+.palette-color-check-controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: 5px; margin-bottom: 10px; }
+.palette-color-check-controls label { font-size: 12px; color: var(--text-secondary); }
+.palette-color-check-controls select { width: 100%; min-width: 0; max-width: 100%; }
+.palette-color-check-controls button { margin-top: 4px; }
+.palette-color-check-results { padding: 0; margin: 0; list-style: none; }
+.palette-color-check-pair { margin: 0 0 10px; padding: 7px; border: 1px solid var(--border-subtle, #dce3e8); border-radius: 6px; background: var(--bg-panel, #f8fafc); }
+.palette-color-check-pair.is-duplicate { border-left: 3px solid #b47427; }
+.palette-color-check-pair-label { margin: 0 0 5px; font-size: 11px; color: var(--text-secondary); }
+.palette-color-check-entry { display: flex; align-items: center; gap: 7px; width: 100%; padding: 6px 2px; border: 0; border-radius: 4px; background: transparent; color: var(--text-primary); text-align: left; font: inherit; cursor: pointer; }
+.palette-color-check-entry:hover { background: #e8eef3; }
+.palette-color-check-swatch { flex: 0 0 22px; height: 22px; border: 1px solid #64748b80; border-radius: 4px; }
+.palette-color-check-caption { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.palette-color-check-name { font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+.palette-color-check-detail { font-size: 10px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.palette-color-check-locate { flex-shrink: 0; color: #185f8b; font-size: 10px; }
+.palette-color-check-pager { display: flex; gap: 7px; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); }
+.palette-color-check-pager button { min-width: 32px; }
+.palette-color-check [hidden] { display: none; }
