@@ -1,5 +1,7 @@
 import { normalizeHexColor } from "../../core/color_hex_utils.js";
 import { createSpecialZoneLayerStyle } from "../../core/special_zone_layers.js";
+import { LEGEND_CSV_FIELDS, LEGEND_CSV_V2_FIELDS, encodeLegendCsvValue, getLegendCsvEntryId,
+  getLegendCsvCategorySignature, getLegendCsvZoneSignature } from "../../core/legend_csv_schema.js";
 
 function getText(language) {
   return String(language || "en").startsWith("zh") ? {
@@ -23,30 +25,40 @@ export function buildLegendExportEntries({ colors = [], labels = {}, specialZone
     const color = normalizeHexColor(value);
     if (!color || seen.has(color)) continue;
     seen.add(color);
-    entries.push({ kind: "color", label: String(labels[color] || "").trim() || `${text.category} ${entries.length + 1}`,
+    const labelValue = String(labels[color] || "").trim();
+    entries.push({ kind: "color", label: labelValue || `${text.category} ${entries.length + 1}`,
+      labelValue, entryId: getLegendCsvEntryId("color", color),
+      targetSignature: getLegendCsvCategorySignature(color, labels[color], Object.hasOwn(labels, color)),
       color, stroke: "#64748b", pattern: "solid", fillOpacity: 1, strokeOpacity: 1, patternOpacity: 1, strokeWidth: 1 });
   }
   for (const layer of specialZones) {
     if (!layer || layer.visible === false || layer.legendVisible === false) continue;
     const style = createSpecialZoneLayerStyle(layer.style);
     entries.push({ kind: "special-zone", label: String(layer.name || layer.id || text.zones),
+      entryId: getLegendCsvEntryId("special-zone", layer.id), targetSignature: getLegendCsvZoneSignature(layer),
       color: style.fill, stroke: style.stroke, pattern: style.pattern, fillOpacity: style.fillOpacity,
       strokeOpacity: style.strokeOpacity, patternOpacity: style.patternOpacity, strokeWidth: style.strokeWidth });
   }
   return entries;
 }
 
-function csvCell(value) {
-  let text = String(value ?? "");
+function csvCell(value, reversible = false) {
   // Keep a user-entered label a cell value when opened in a spreadsheet.
-  if (/^[\s\u0000-\u001f]*[=+@-]/u.test(text)) text = `'${text}`;
+  const text = encodeLegendCsvValue(value, reversible);
   return `"${text.replaceAll('"', '""')}"`;
 }
 
-export function buildLegendCsv(entries) {
-  const fields = ["kind", "label", "color", "pattern", "stroke", "fillOpacity", "strokeOpacity", "patternOpacity"];
-  return `\uFEFF${[fields, ...entries.map(entry => fields.map(field => entry[field]))]
-    .map(row => row.map(csvCell).join(",")).join("\r\n")}\r\n`;
+export function buildLegendCsv(entries, { schemaVersion = 1, scenarioId = "", scenarioBaselineHash = "" } = {}) {
+  if (![1, 2].includes(schemaVersion)) throw new Error("unsupported-csv-version");
+  const fields = schemaVersion === 2 ? LEGEND_CSV_V2_FIELDS : LEGEND_CSV_FIELDS;
+  const rows = entries.map(entry => fields.map(field => {
+    if (field === "schemaVersion") return "2";
+    if (field === "scenarioId") return scenarioId;
+    if (field === "scenarioBaselineHash") return scenarioBaselineHash;
+    if (field === "label" && schemaVersion === 2) return entry.labelValue ?? entry.label;
+    return entry[field];
+  }));
+  return `\uFEFF${[fields, ...rows].map(row => row.map(value => csvCell(value, schemaVersion === 2)).join(",")).join("\r\n")}\r\n`;
 }
 
 function xml(value) {
@@ -157,7 +169,8 @@ export function createLegendExportControls({ documentRef, getModel, download, sh
         const current = getModel();
         const entries = buildLegendExportEntries(current);
         if (!entries.length) { status.textContent = text.empty; return; }
-        const content = format === "svg" ? buildLegendSvg(entries, current) : buildLegendCsv(entries);
+        const content = format === "svg" ? buildLegendSvg(entries, current) : buildLegendCsv(entries,
+          { schemaVersion: 2, scenarioId: current.scenarioId, scenarioBaselineHash: current.scenarioBaselineHash });
         const stem = String(current.fileStem || "map").replace(/[^a-z0-9_-]+/gi, "-").slice(0, 80) || "map";
         const blob = new Blob([content], { type: format === "svg" ? "image/svg+xml;charset=utf-8" : "text/csv;charset=utf-8" });
         const downloaded = await download(blob, `${stem}-legend.${format}`);

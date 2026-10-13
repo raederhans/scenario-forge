@@ -21,7 +21,13 @@ import {
   restoreStrategicOverlaySnapshotState,
   setStrategicOverlayDirtyState,
 } from "./state/actions/strategic_overlay_actions.js";
-import { restoreSpecialZoneSnapshotState } from "./state/actions/special_zone_actions.js";
+import {
+  restoreSpecialZoneSnapshotState,
+  restoreSpecialZoneLegendSnapshotState,
+  SPECIAL_ZONE_LEGEND_STYLE_KEYS,
+} from "./state/actions/special_zone_actions.js";
+import { restoreLegendLabelSnapshotState } from "./state/actions/legend_actions.js";
+import { normalizeColor } from "./legend_state_normalizers.js";
 import { markDirty } from "./dirty_state.js";
 import { flushRenderBoundary } from "./render_boundary.js";
 import { callRuntimeHook, callRuntimeHooks } from "./state/runtime_hooks.js";
@@ -75,6 +81,8 @@ function captureHistoryState({
   specialRegionIds = [],
   ownerCodes = [],
   stylePaths = [],
+  legendColors = [],
+  legendSpecialZoneIds = [],
   strategicOverlay = false,
   intensityFieldChannels = [],
   appearancePresets = false,
@@ -87,6 +95,7 @@ function captureHistoryState({
   const waterIds = uniqueKeys(waterRegionIds);
   const ownerKeys = uniqueKeys(ownerCodes);
   const styleKeys = uniqueKeys(stylePaths);
+  const legendKeys = uniqueKeys((Array.isArray(legendColors) ? legendColors : []).map(normalizeColor));
 
   if (ids.length) {
     snapshot.visualOverrides = captureEntries(runtimeState.visualOverrides || {}, ids);
@@ -106,6 +115,38 @@ function captureHistoryState({
 
   if (styleKeys.length) {
     snapshot.styleConfig = captureStylePaths(styleKeys);
+  }
+
+  if (legendKeys.length) {
+    snapshot.legendLabels = captureEntries(runtimeState.legendLabels || {}, legendKeys);
+    snapshot.legendLabelKeysPresent = legendKeys.filter(key => Object.hasOwn(runtimeState.legendLabels || {}, key));
+  }
+
+  const zoneIds = new Set((Array.isArray(legendSpecialZoneIds) ? legendSpecialZoneIds : [])
+    .filter(id => typeof id === "string" && id));
+  if (zoneIds.size) {
+    const layers = Array.isArray(runtimeState.specialZoneLayers?.layers) ? runtimeState.specialZoneLayers.layers : [];
+    const selected = [];
+    for (const id of zoneIds) {
+      const matches = layers.filter(layer => layer?.id === id);
+      if (matches.length !== 1) continue;
+      const layer = matches[0];
+      const hasStyle = Object.hasOwn(layer, "style");
+      const styleObject = !!(hasStyle && layer.style && typeof layer.style === "object" && !Array.isArray(layer.style));
+      const fields = {
+        name: Object.hasOwn(layer, "name") ? cloneStructuredValue(layer.name) : null,
+        style: cloneStructuredValue(captureEntries(styleObject ? layer.style : {}, SPECIAL_ZONE_LEGEND_STYLE_KEYS)),
+        presence: {
+          name: Object.hasOwn(layer, "name"),
+          style: hasStyle,
+          styleObject,
+          styleKeys: styleObject ? SPECIAL_ZONE_LEGEND_STYLE_KEYS.filter(key => Object.hasOwn(layer.style, key)) : [],
+        },
+      };
+      if (hasStyle && !styleObject) fields.styleContainerValue = cloneStructuredValue(layer.style);
+      selected.push([id, fields]);
+    }
+    if (selected.length) snapshot.specialZoneLegendFields = Object.fromEntries(selected);
   }
 
   if (strategicOverlay) {
@@ -336,6 +377,14 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   applyEntries(runtimeState.sovereignBaseColors, snapshot.sovereignBaseColors);
   applyEntries(runtimeState.countryPalette, snapshot.countryPalette);
   applyStyleSnapshot(snapshot.styleConfig);
+  if (Object.hasOwn(snapshot, "legendLabels")
+    && restoreLegendLabelSnapshotState(runtimeState, snapshot.legendLabels, snapshot.legendLabelKeysPresent)) {
+    markDirty("legend-history");
+  }
+  if (Object.hasOwn(snapshot, "specialZoneLegendFields")
+    && restoreSpecialZoneLegendSnapshotState(runtimeState, snapshot.specialZoneLegendFields).length) {
+    markDirty("legend-history");
+  }
   if (hasAnnotationView) {
     runtimeState.annotationView = cloneStructuredValue(snapshot.annotationView);
   }
@@ -383,12 +432,24 @@ function applyHistorySnapshot(snapshot, direction, entry) {
   return true;
 }
 
+function isLegendCsvHistoryScopeCurrent(entry) {
+  if (entry?.kind !== "legend-csv-import") return true;
+  const scenarioId = entry.meta?.scenarioId;
+  const baselineHash = entry.meta?.scenarioBaselineHash;
+  return typeof scenarioId === "string" && scenarioId.length > 0
+    && typeof baselineHash === "string" && baselineHash.length > 0
+    && scenarioId === runtimeState.activeScenarioId
+    && baselineHash === runtimeState.scenarioBaselineHash;
+}
+
 function canUndoHistory() {
-  return Array.isArray(runtimeState.historyPast) && runtimeState.historyPast.length > 0;
+  return Array.isArray(runtimeState.historyPast) && runtimeState.historyPast.length > 0
+    && isLegendCsvHistoryScopeCurrent(runtimeState.historyPast.at(-1));
 }
 
 function canRedoHistory() {
-  return Array.isArray(runtimeState.historyFuture) && runtimeState.historyFuture.length > 0;
+  return Array.isArray(runtimeState.historyFuture) && runtimeState.historyFuture.length > 0
+    && isLegendCsvHistoryScopeCurrent(runtimeState.historyFuture.at(-1));
 }
 
 function undoHistory() {

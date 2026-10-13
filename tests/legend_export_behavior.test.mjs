@@ -69,7 +69,9 @@ test("export controls download current labels and all entries, with an accessibl
   assert.equal(downloads[0].filename, "scenario-1936-legend.svg");
   assert.equal(downloads[1].filename, "scenario-1936-legend.csv");
   assert.ok(downloads.every(file => file.text.includes("Updated after panel render")));
-  assert.ok(downloads.every(file => file.text.includes("Category 35")));
+  assert.ok(downloads[0].text.includes("Category 35"));
+  assert.ok(downloads[1].text.includes(`category:${model.colors[34]}`));
+  assert.ok(downloads[1].text.includes('"schemaVersion","scenarioId","scenarioBaselineHash","entryId"'));
   assert.match(downloads[0].type, /^image\/svg\+xml/u);
   assert.equal(actions.children[0].disabled, false);
 });

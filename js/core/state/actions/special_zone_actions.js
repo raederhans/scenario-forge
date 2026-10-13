@@ -414,3 +414,106 @@ export function restoreProjectImportFields(target, patch) {
   if (Object.hasOwn(patch, "specialZoneLayers")) target.specialZoneLayers = patch.specialZoneLayers;
   if (Object.hasOwn(patch, "specialZoneMembershipBrushMode")) target.specialZoneMembershipBrushMode = patch.specialZoneMembershipBrushMode;
 }
+
+export const SPECIAL_ZONE_LEGEND_STYLE_KEYS = Object.freeze([
+  "fill", "stroke", "pattern", "fillOpacity", "strokeOpacity", "patternOpacity", "strokeWidth", "revision",
+]);
+
+function cloneSpecialZoneLegendSnapshotValue(value) {
+  return value !== null && typeof value === "object" ? JSON.parse(JSON.stringify(value)) : value;
+}
+
+function restoreSpecialZoneLegendFieldsWithPresence(layer, patch) {
+  const presence = patch.presence;
+  const next = { ...layer };
+  if (presence.name) next.name = cloneSpecialZoneLegendSnapshotValue(patch.name);
+  else delete next.name;
+  const currentStyle = layer.style && typeof layer.style === "object" && !Array.isArray(layer.style)
+    ? layer.style : {};
+  if (presence.style && presence.styleObject) {
+    const style = { ...currentStyle };
+    const presentKeys = new Set(presence.styleKeys);
+    for (const key of SPECIAL_ZONE_LEGEND_STYLE_KEYS) {
+      if (presentKeys.has(key)) {
+        const value = patch.style && Object.hasOwn(patch.style, key) ? patch.style[key] : undefined;
+        style[key] = cloneSpecialZoneLegendSnapshotValue(value);
+      } else delete style[key];
+    }
+    next.style = style;
+  } else {
+    // Preserve any later unknown style metadata even when the old container was absent/null.
+    const unknownStyle = Object.fromEntries(Object.entries(currentStyle)
+      .filter(([key]) => !SPECIAL_ZONE_LEGEND_STYLE_KEYS.includes(key)));
+    if (Object.keys(unknownStyle).length) next.style = unknownStyle;
+    else if (presence.style) next.style = cloneSpecialZoneLegendSnapshotValue(patch.styleContainerValue);
+    else delete next.style;
+  }
+  return next;
+}
+
+function applySpecialZoneLegendFieldsState(target, patchesById, restoreMissing) {
+  assertStateTarget(target);
+  if (!patchesById || typeof patchesById !== "object" || Array.isArray(patchesById)) return [];
+  const current = target.specialZoneLayers;
+  if (!current || typeof current !== "object" || !Array.isArray(current.layers)) return [];
+  const counts = new Map();
+  current.layers.forEach(layer => {
+    if (layer && typeof layer.id === "string" && layer.id) {
+      counts.set(layer.id, (counts.get(layer.id) || 0) + 1);
+    }
+  });
+  const updatedIds = [];
+  const layers = current.layers.map(layer => {
+    if (!layer || counts.get(layer.id) !== 1 || !Object.hasOwn(patchesById, layer.id)) return layer;
+    const patch = patchesById[layer.id];
+    if (!patch || typeof patch !== "object" || Array.isArray(patch)) return layer;
+    const presence = patch.presence;
+    if (restoreMissing && presence && typeof presence === "object" && !Array.isArray(presence)
+      && typeof presence.name === "boolean" && typeof presence.style === "boolean"
+      && typeof presence.styleObject === "boolean" && Array.isArray(presence.styleKeys)) {
+      updatedIds.push(layer.id);
+      return restoreSpecialZoneLegendFieldsWithPresence(layer, patch);
+    }
+    let next = null;
+    if (Object.hasOwn(patch, "name")
+      && (typeof patch.name === "string" || (restoreMissing && patch.name == null))) {
+      next = { ...layer };
+      if (restoreMissing && patch.name == null) delete next.name;
+      else next.name = patch.name;
+    }
+    const stylePatch = patch.style;
+    if (stylePatch && typeof stylePatch === "object" && !Array.isArray(stylePatch)) {
+      let style = null;
+      for (const key of SPECIAL_ZONE_LEGEND_STYLE_KEYS) {
+        if (!Object.hasOwn(stylePatch, key)) continue;
+        const value = stylePatch[key];
+        const scalar = ["fill", "stroke", "pattern"].includes(key)
+          ? typeof value === "string"
+          : typeof value === "number" && Number.isFinite(value);
+        if (!restoreMissing && !scalar) continue;
+        style ||= { ...layer.style };
+        if (restoreMissing && value == null) delete style[key];
+        else style[key] = restoreMissing ? cloneSpecialZoneLegendSnapshotValue(value) : value;
+      }
+      if (style) next = { ...(next || layer), style };
+    }
+    if (!next) return layer;
+    updatedIds.push(layer.id);
+    return next;
+  });
+  if (updatedIds.length) {
+    target.specialZoneLayers = { ...current, layers };
+    target.specialZonesOverlayDirty = true;
+  }
+  return updatedIds;
+}
+
+// Callers validate CSV scope, confirmation, and values before applying these fields.
+// No collection normalization: memberships and unknown metadata stay untouched.
+export function patchSpecialZoneLegendFieldsState(target, patchesById) {
+  return applySpecialZoneLegendFieldsState(target, patchesById, false);
+}
+
+export function restoreSpecialZoneLegendSnapshotState(target, snapshotById) {
+  return applySpecialZoneLegendFieldsState(target, snapshotById, true);
+}
