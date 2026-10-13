@@ -287,6 +287,7 @@ export function createLocalFeedbackRecords(baseRecords) {
     ["project-support-diagnostics", "sidebar-shell", "js/ui/sidebar/project_support_diagnostics_controller.js", "tests/project_support_diagnostics_controller_behavior.test.mjs"],
     ["legend-export", "sidebar-shell", "js/ui/sidebar/legend_export.js", "tests/legend_export_behavior.test.mjs", ["js/ui/sidebar/project_support_diagnostics_controller.js"]],
     ["legend-search", "sidebar-shell", "js/ui/sidebar/legend_search.js", "tests/legend_search_behavior.test.mjs", ["js/ui/sidebar/project_support_diagnostics_controller.js"]],
+    ["palette-color-check", "sidebar-shell", "js/ui/palette_color_check_model.js", "tests/palette_color_check_model_behavior.test.mjs", ["js/ui/palette_color_check.js", "js/ui/palette_color_check_editor.js"]],
     ["commit-runner", "test-routing", "tools/run_commit_verification.mjs", "tests/verify_commit_runner_behavior.test.mjs"],
     ["unit-counter-catalog", "sidebar-shell", "js/ui/sidebar/strategic_overlay/unit_counter_catalog_helper.js", "tests/unit_counter_catalog_behavior.test.mjs"],
     ["workspace-chrome-support", "ui-shell", "js/ui/toolbar/workspace_chrome_support_surface_controller.js", "tests/workspace_chrome_support_surface_controller_behavior.test.mjs"],

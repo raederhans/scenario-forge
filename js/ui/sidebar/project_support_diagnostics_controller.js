@@ -1682,7 +1682,7 @@ export function createProjectSupportDiagnosticsController({
     const pagerReserve = pageCount > 1 ? 38 : 0;
     legendList.dataset.pageCount = String(pageCount);
     legendList.dataset.paged = pageCount > 1 ? "true" : "false";
-    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 168 + (visibleLegendRows * 52) + pagerReserve)}px`);
+    legendList.style.setProperty("--legend-editor-dynamic-max-height", `${Math.min(680, 340 + (visibleLegendRows * 52) + pagerReserve)}px`);
     const headerKey = [
       colors.join("|"),
       specialZoneLegendKey,
