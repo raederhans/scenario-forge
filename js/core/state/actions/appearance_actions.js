@@ -61,39 +61,6 @@ function assertOwnDataValueWritable(target, fieldName) {
   return descriptor;
 }
 
-function writeStyleConfigOwnDataValue(target, value) {
-  const descriptor = assertOwnDataValueWritable(target, "styleConfig");
-  if (descriptor && Object.hasOwn(descriptor, "value") && descriptor.writable) {
-    target.styleConfig = value;
-    return value;
-  }
-  Object.defineProperty(target, "styleConfig", {
-    configurable: descriptor?.configurable ?? true,
-    enumerable: descriptor?.enumerable ?? true,
-    value,
-    writable: true,
-  });
-  return value;
-}
-
-function writeParentBorderEnabledMapOwnDataValue(target, value) {
-  const descriptor = assertOwnDataValueWritable(
-    target,
-    "parentBorderEnabledByCountry",
-  );
-  if (descriptor && Object.hasOwn(descriptor, "value") && descriptor.writable) {
-    target.parentBorderEnabledByCountry = value;
-    return value;
-  }
-  Object.defineProperty(target, "parentBorderEnabledByCountry", {
-    configurable: descriptor?.configurable ?? true,
-    enumerable: descriptor?.enumerable ?? true,
-    value,
-    writable: true,
-  });
-  return value;
-}
-
 function setStylePathOwnDataValue(target, fieldName, value) {
   const descriptor = assertOwnDataValueWritable(target, fieldName);
   if (descriptor && Object.hasOwn(descriptor, "value") && descriptor.writable) {
@@ -144,7 +111,7 @@ export function ensureAppearanceStyleConfigState(target) {
     ? descriptor.value
     : getInheritedDataValue(target, "styleConfig");
   const next = isPlainRecord(source) ? cloneDetached(source) : {};
-  return writeStyleConfigOwnDataValue(target, next);
+  return setStylePathOwnDataValue(target, "styleConfig", next);
 }
 
 export function setAppearanceStyleConfigState(
@@ -159,7 +126,7 @@ export function setAppearanceStyleConfigState(
   ) {
     throw new TypeError("[appearance_actions] style config must be an object");
   }
-  return writeStyleConfigOwnDataValue(target, value);
+  return setStylePathOwnDataValue(target, "styleConfig", value);
 }
 
 export function setAppearanceStyleGroupState(target, group, value) {
@@ -240,8 +207,9 @@ export function setAppearanceParentBorderEnabledMapState(
     target.parentBorderEnabledByCountry = value;
     return value;
   }
-  return writeParentBorderEnabledMapOwnDataValue(
+  return setStylePathOwnDataValue(
     target,
+    "parentBorderEnabledByCountry",
     normalizeBooleanRecord(value, "enabled map"),
   );
 }
