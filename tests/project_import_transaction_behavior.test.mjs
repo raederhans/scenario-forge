@@ -233,21 +233,32 @@ test('staged project patch includes unchanged visibility values and leaves live 
     await import('../js/core/map_editing_policy.js'),
     await import('../js/core/river_paint/partition_model.js'),
     { cloneImportedProjectValue: structuredClone, captureProjectImportState });
+  const liveState = { ...state,
+    expandedInspectorContinents: new Set(['Europe', 'Asia']),
+    expandedInspectorReleaseParents: new Set(['GER', 'JAP']),
+  };
+  globals.state = liveState;
   const context = vm.createContext(globals);
   vm.runInContext(source.slice(fn.start, fn.end), context);
-  const oldStyle = structuredClone(state.styleConfig);
-  const oldColors = state.visualOverrides;
+  const oldStyle = structuredClone(liveState.styleConfig);
+  const oldColors = liveState.visualOverrides;
   const data = payload();
-  data.layerVisibility.showRivers = state.showRivers;
+  data.layerVisibility.showRivers = liveState.showRivers;
   const patch = context.stageImportedProjectPatch(data, {
     scenarioState: { activeScenarioId: '' }, importedOwnershipState: { sovereigntyByFeatureId: {} },
     validFeatureIds: null,
   });
   assert.equal(Object.hasOwn(patch, 'showRivers'), true, 'scene activation can change an equal-valued field before project commit');
-  assert.equal(patch.showRivers, state.showRivers);
-  assert.equal(state.visualOverrides, oldColors);
-  assert.deepEqual(state.styleConfig, oldStyle);
-  const admitted = captureProjectImportState(state);
+  assert.equal(patch.showRivers, liveState.showRivers);
+  assert.equal(liveState.visualOverrides, oldColors);
+  assert.deepEqual(liveState.styleConfig, oldStyle);
+  assert.deepEqual([...liveState.expandedInspectorContinents], ['Europe', 'Asia']);
+  assert.deepEqual([...liveState.expandedInspectorReleaseParents], ['GER', 'JAP']);
+  for (const field of ['expandedInspectorContinents', 'expandedInspectorReleaseParents']) {
+    assert.equal(patch[field].size, 0);
+    assert.notEqual(patch[field], liveState[field]);
+  }
+  const admitted = captureProjectImportState(liveState);
   assert.deepEqual(Object.keys(patch).filter(key => !Object.hasOwn(admitted, key)), []);
   const target = {};
   applyProjectImportPatch(target, patch);

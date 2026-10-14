@@ -232,8 +232,8 @@ function stageImportedProjectPatch(data, preparedImport) {
   // scenario activation may change those values before this patch lands.
   const draft = { ...original,
     styleConfig: cloneImportedProjectValue(original.styleConfig),
-    expandedInspectorContinents: new Set(original.expandedInspectorContinents || []),
-    expandedInspectorReleaseParents: new Set(original.expandedInspectorReleaseParents || []),
+    expandedInspectorContinents: new Set(),
+    expandedInspectorReleaseParents: new Set(),
   };
   const { importedOwnershipState } = preparedImport;
   const stagedScenario = preparedImport.preparedScenario?.staged;
@@ -276,12 +276,6 @@ function stageImportedProjectPatch(data, preparedImport) {
     };
   }
   draft.inspectorExpansionInitialized = false;
-  if (draft.expandedInspectorContinents instanceof Set) {
-    draft.expandedInspectorContinents.clear();
-  }
-  if (draft.expandedInspectorReleaseParents instanceof Set) {
-    draft.expandedInspectorReleaseParents.clear();
-  }
   draft.dynamicBordersDirty = !!data.dynamicBordersDirty;
   draft.dynamicBordersDirtyReason = data.dynamicBordersDirtyReason || "";
   resetDevTransientImportState(draft, { previewFormat: "names_with_ids" });
