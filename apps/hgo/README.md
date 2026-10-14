@@ -65,3 +65,9 @@ The native map and names derive from Historic Geographical Overhaul (`hgo_mod_22
 `assets/default/manifest.json` describes `hgo-native-dataset` schema 1, native top-left pixel dimensions, revision and the `ids`, `core` and `places` assets. Each transported asset has a relative URL, encoding, byte length and SHA-256. The ID asset is gzip-compressed, row-major, top-down uint16 little-endian data. Dense code 0 means no data; every other code indexes `core.provinceIds` and `core.provinceStateIds`. Source province ID 0, when defined, has its own nonzero code. Definitions that have no pixels and no state may retain a null state entry; every pixel-present code must resolve to a state.
 
 Core metadata preserves native province IDs, stable state IDs, localized names, reference entities, bounds and member-pixel anchors. Places use source victory-point/capital evidence, never invented modern coordinates. State IDs become string keys in project paint/label objects. Optional places load failures are reported without invalidating core editing.
+
+## Painting controls
+
+Use B for continuous drag painting, I to pick the authoritative stored state color, and H (or Space/middle drag) to pan. A stroke is one undo step; Escape, pointer cancellation or focus loss cancels its uncommitted preview. Paint mode double-click fills the original owner country in one operation. The explicit State/Country scope also controls click, drag and selection fills. Water remains local to the clicked state, never the entire WTR reference.
+
+Selection highlights only boundaries; interior RGB is preserved. Borders and labels still intentionally affect displayed pixels, so use the stored-color picker rather than a screen eyedropper. Country membership uses historical owner entityTag, not controllerTag or coreTags (including unreleased claims). There is no reliable geographic-parent layer in this dataset; no extra geographic tiers are inferred. Painting does not change ownership.

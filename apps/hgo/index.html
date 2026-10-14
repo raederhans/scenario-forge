@@ -28,6 +28,7 @@
       <div class="tool-rail" role="toolbar" aria-label="Map tools">
         <button id="tool-select" data-tool="select" disabled aria-pressed="true" title="选择 (V)"><span aria-hidden="true">↖</span><span class="tool-label" data-i18n="select">选择</span><kbd>V</kbd></button>
         <button id="tool-paint" data-tool="paint" disabled aria-pressed="false" title="绘制 (B)"><span aria-hidden="true">◩</span><span class="tool-label" data-i18n="paint">绘制</span><kbd>B</kbd></button>
+        <button id="tool-pick" data-tool="pick" disabled aria-pressed="false" title="取存储色 (I)"><span aria-hidden="true">⌁</span><span class="tool-label" data-i18n="pick">取色</span><kbd>I</kbd></button>
         <button id="tool-pan" data-tool="pan" disabled aria-pressed="false" title="平移 (H)"><span aria-hidden="true">✥</span><span class="tool-label" data-i18n="pan">平移</span><kbd>H</kbd></button>
         <span class="rail-divider"></span>
         <button id="undo-button" disabled title="撤销 (Ctrl+Z)"><span aria-hidden="true">↶</span><span class="tool-label" data-i18n="undo">撤销</span></button>
@@ -52,6 +53,10 @@
         <div class="section-heading"><h2 data-i18n="colorHeading">绘制颜色</h2><span class="small-index">01</span></div>
         <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled><span class="color-mark">●</span></div>
         <div id="color-swatches" class="swatches" aria-label="Color palette"></div>
+        <p class="field-hint" data-i18n="pickHint">I 取色直接读取州存储色，忽略边界、标签和高亮。</p>
+        <label for="paint-scope" class="field-label" data-i18n="paintScope">填充范围</label>
+        <select id="paint-scope" disabled><option value="state" data-i18n="scopeState">州（可连续拖绘）</option><option value="country" data-i18n="scopeCountry">所属国家（原始归属）</option></select>
+        <p class="field-hint" data-i18n="scopeHint">绘制模式双击填所属国家；水域只填该州。国家范围不含未释放国家的核心声明。</p>
         <button id="paint-selection" class="button-dark full-width" disabled data-i18n="applyColor">为所选州上色</button>
       </section>
       <section class="selection-section">
@@ -60,6 +65,7 @@
         <div id="selection-detail" hidden>
           <div class="selected-title"><span id="selected-swatch"></span><h3 id="selected-name"></h3></div>
           <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">参考实体</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
+          <button id="pick-selection" class="full-width" disabled data-i18n="pickStored">取该州存储色</button>
           <label for="label-input" class="field-label" data-i18n="mapLabel">地图标签</label><div class="label-control"><input id="label-input" maxlength="200" disabled><button id="label-button" disabled data-i18n="apply">应用</button></div>
           <p class="field-hint" data-i18n="labelHint">留空恢复原名。参考实体保持只读。</p>
         </div>

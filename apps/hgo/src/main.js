@@ -17,13 +17,13 @@ function setLanguage(next){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
   $('language-button').textContent=language==='zh'?'EN':'中文';$('language-button').setAttribute('aria-label',language==='zh'?'Switch to English':'切换到中文');
   $('state-search').placeholder=t('searchPlaceholder');$('paint-color').setAttribute('aria-label',t('colorHeading'));$('zoom-in').setAttribute('aria-label',t('zoomIn'));$('zoom-out').setAttribute('aria-label',t('zoomOut'));$('map-canvas').setAttribute('aria-label',t('mapAria'));$('back-link').setAttribute('aria-label',t('back'));
-  for(const [id,key,shortcut]of [['tool-select','select','V'],['tool-paint','paint','B'],['tool-pan','pan','H'],['undo-button','undo','Ctrl/⌘+Z'],['redo-button','redo','Ctrl/⌘+Shift+Z']])$(id).title=`${t(key)} (${shortcut})`;
+  for(const [id,key,shortcut]of [['tool-select','select','V'],['tool-paint','paint','B'],['tool-pick','pick','I'],['tool-pan','pan','H'],['undo-button','undo','Ctrl/⌘+Z'],['redo-button','redo','Ctrl/⌘+Shift+Z']])$(id).title=`${t(key)} (${shortcut})`;
   if(viewModel)render(viewModel);else{$('load-title').textContent=t(loadingController?'loading':'loadCancelled');$('load-detail').textContent=t(loadingController?'loadDetail':'cancelledDetail');}
   search();
 }
 function render(vm){
   viewModel=vm;const ready=vm.ready&&!handoffPending;
-  for(const id of ['open-button','state-search','paint-color','paint-hex','zoom-in','zoom-out','fit-button','tool-select','tool-paint','tool-pan'])$(id).disabled=!ready;
+  for(const id of ['open-button','state-search','paint-color','paint-hex','zoom-in','zoom-out','fit-button','tool-select','tool-paint','tool-pick','tool-pan','paint-scope'])$(id).disabled=!ready;
   $('save-button').disabled=!session||handoffPending;
   $('export-button').disabled=!ready||exporting;$('undo-button').disabled=!ready||!vm.canUndo;$('redo-button').disabled=!ready||!vm.canRedo;
   for(const button of $('color-swatches').children)button.disabled=!ready;
@@ -31,6 +31,8 @@ function render(vm){
   for(const button of document.querySelectorAll('[data-tool]'))button.setAttribute('aria-pressed',String(button.dataset.tool===vm.tool));
   $('map-canvas').style.cursor=vm.tool==='pan'?'grab':vm.tool==='paint'?'cell':'crosshair';
   $('map-canvas').style.pointerEvents=handoffPending?'none':'';
+  $('paint-scope').value=vm.paintScope;
+  $('pick-selection').disabled=!ready||vm.selection.length!==1;
   $('paint-color').value=vm.color;if(document.activeElement!==$('paint-hex'))$('paint-hex').value=vm.color;
   $('zoom-value').textContent=`${Math.round(vm.zoom*100)}%`;$('dirty-indicator').textContent=t(vm.dirty?'unsaved':'clean');
   $('status-led').classList.toggle('ready',ready);
@@ -86,7 +88,8 @@ for(const color of palette){const button=document.createElement('button');button
 $('language-button').addEventListener('click',()=>setLanguage(language==='zh'?'en':'zh'));
 $('cancel-load').addEventListener('click',()=>loadingController?.abort());$('retry-load').addEventListener('click',()=>void start());
 for(const button of document.querySelectorAll('[data-tool]'))button.addEventListener('click',()=>attempt(()=>session.setTool(button.dataset.tool)));
-for(const [id,action]of Object.entries({'undo-button':()=>session.undo(),'redo-button':()=>session.redo(),'fit-button':()=>session.fit(),'zoom-in':()=>session.zoomBy(1.4),'zoom-out':()=>session.zoomBy(1/1.4),'clear-selection':()=>session.resetSelection(),'paint-selection':()=>session.paintSelection()}))$(id).addEventListener('click',()=>attempt(action));
+for(const [id,action]of Object.entries({'undo-button':()=>session.undo(),'redo-button':()=>session.redo(),'fit-button':()=>session.fit(),'zoom-in':()=>session.zoomBy(1.4),'zoom-out':()=>session.zoomBy(1/1.4),'clear-selection':()=>session.resetSelection(),'paint-selection':()=>session.paintSelection(),'pick-selection':()=>session.pickColor(viewModel.selection[0].id)}))$(id).addEventListener('click',()=>attempt(action));
+$('paint-scope').addEventListener('change',event=>attempt(()=>session.setPaintScope(event.target.value)));
 $('paint-color').addEventListener('input',event=>attempt(()=>session.setColor(event.target.value)));
 $('paint-hex').addEventListener('input',event=>{const value=parseHexColor(event.target.value);if(value)attempt(()=>session.setColor(value));});
 $('paint-hex').addEventListener('change',event=>{const value=parseHexColor(event.target.value);if(!value){notify(t('badColor'),true);event.target.value=viewModel.color;return;}attempt(()=>session.setColor(value));});
@@ -104,6 +107,6 @@ document.addEventListener('keydown',event=>{
   const typing=event.target instanceof Element&&event.target.closest('input,textarea,select,[contenteditable="true"]');
   const action=keyboardAction(event);if(!action||(typing&&!['save','open'].includes(action)))return;event.preventDefault();
   if(action==='save'){save();return;}if(!viewModel.ready||handoffPending)return;
-  if(action==='open')$('open-button').click();else attempt(()=>{if(['select','paint','pan'].includes(action))session.setTool(action);else if(action==='zoomIn')session.zoomBy(1.4);else if(action==='zoomOut')session.zoomBy(1/1.4);else if(action==='clear')session.resetSelection();else session[action]();});
+  if(action==='open')$('open-button').click();else attempt(()=>{if(['select','paint','pan','pick'].includes(action))session.setTool(action);else if(action==='zoomIn')session.zoomBy(1.4);else if(action==='zoomOut')session.zoomBy(1/1.4);else if(action==='clear')session.resetSelection();else session[action]();});
 });
 setLanguage('zh');void start();

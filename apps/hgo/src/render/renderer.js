@@ -27,7 +27,8 @@ void main(){
  uint s=stateAt(p);
  bool edge=stateAt(p+ivec2(1,0))!=s||stateAt(p+ivec2(0,1))!=s;
  if(borders&&edge)result.rgb=mix(result.rgb,vec3(.12,.14,.17),.6);
- if(texelFetch(selected,table(code),0).r>.5){result.rgb=mix(result.rgb,vec3(1.,.85,.35),edge?.95:.22);}
+ // Keep document RGB exact inside a selected state; selection is an outline.
+ if(edge&&texelFetch(selected,table(code),0).r>.5){result.rgb=mix(result.rgb,vec3(1.,.85,.35),.95);}
 }`;
 export function createRenderer(canvas, dataset) {
   const gl = canvas.getContext('webgl2', {alpha:false,antialias:false,preserveDrawingBuffer:false});
