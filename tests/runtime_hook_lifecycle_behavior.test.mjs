@@ -140,6 +140,11 @@ test("scenario picker exposes only registered main-editor scenarios", async () =
   await flush();
   assert.deepEqual(f.nodes.scenarioSelect.children.map(option => option.value), ["", "alpha", "beta"]);
   assert.deepEqual(f.nodes.scenarioSelectMenu.children.map(option => option.dataset.value), ["", "alpha", "beta"]);
+  assert.deepEqual(f.nodes.scenarioSelect.children.map(option => option.textContent), ["None", "alpha", "beta"]);
+  assert.deepEqual(
+    f.nodes.scenarioSelectMenu.children.map(option => option.textContent),
+    f.nodes.scenarioSelect.children.map(option => option.textContent),
+  );
   f.state.activeScenarioId = "alpha";
   f.nodes.clearScenarioBtn.dispatchEvent(new Event("click"));
   await flush();

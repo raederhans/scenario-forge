@@ -52,7 +52,7 @@ export function initScenarioControls() {
     scenarioSelectButton.setAttribute("aria-expanded", "false");
   };
 
-  const syncScenarioSelectSurface = ({ entries, currentValue, disabled }) => {
+  const syncScenarioSelectSurface = ({ optionPayloads, currentValue, disabled }) => {
     if (!scenarioSelectButton || !scenarioSelectButtonText || !scenarioSelectMenu) return;
     const normalizedValue = normalizeScenarioId(currentValue);
     const selectedOption = scenarioSelect?.selectedOptions?.[0] || null;
@@ -61,13 +61,6 @@ export function initScenarioControls() {
     scenarioSelectButton.title = scenarioSelect?.title || "";
     scenarioSelectMenu.replaceChildren();
 
-    const optionPayloads = [
-      { value: "", label: t("None", "ui") },
-      ...entries.map((entry) => ({
-        value: normalizeScenarioId(entry.scenario_id),
-        label: getScenarioDisplayName(entry, entry.scenario_id),
-      })),
-    ];
     optionPayloads.forEach(({ value, label }) => {
       const optionButton = document.createElement("button");
       optionButton.type = "button";
@@ -97,19 +90,22 @@ export function initScenarioControls() {
     const isFatalLocked = !!fatalState;
     const fatalMessage = formatScenarioFatalRecoveryMessage(fatalState);
     if (scenarioSelect) {
+      const optionPayloads = [
+        { value: "", label: t("None", "ui") },
+        ...entries.map((entry) => ({
+          value: normalizeScenarioId(entry.scenario_id),
+          label: getScenarioDisplayName(entry, entry.scenario_id),
+        })),
+      ];
       const activeValue = normalizeScenarioId(runtimeState.activeScenarioId);
       const hasPendingOption = !!pendingScenarioId
-        && entries.some((entry) => normalizeScenarioId(entry.scenario_id) === pendingScenarioId);
+        && optionPayloads.some(({ value }) => value === pendingScenarioId);
       const currentValue = (hasPendingOption ? pendingScenarioId : "") || activeValue;
       scenarioSelect.replaceChildren();
-      const emptyOption = document.createElement("option");
-      emptyOption.value = "";
-      emptyOption.textContent = t("None", "ui");
-      scenarioSelect.appendChild(emptyOption);
-      entries.forEach((entry) => {
+      optionPayloads.forEach(({ value, label }) => {
         const option = document.createElement("option");
-        option.value = normalizeScenarioId(entry.scenario_id);
-        option.textContent = getScenarioDisplayName(entry, entry.scenario_id);
+        option.value = value;
+        option.textContent = label;
         scenarioSelect.appendChild(option);
       });
       scenarioSelect.value = currentValue || "";
@@ -117,7 +113,7 @@ export function initScenarioControls() {
       scenarioSelect.title = isFatalLocked ? fatalMessage : "";
       pendingScenarioId = normalizeScenarioId(scenarioSelect.value);
       syncScenarioSelectSurface({
-        entries,
+        optionPayloads,
         currentValue: scenarioSelect.value,
         disabled: scenarioSelect.disabled,
       });
