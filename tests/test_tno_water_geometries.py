@@ -7,8 +7,8 @@ from pathlib import Path
 
 from shapely.geometry import Point, shape
 from shapely.ops import nearest_points, unary_union
-from topojson.utils import serialize_as_geojson
 from map_builder.json_source import json_source_sha256, read_json_source
+from tools.scenario_topology_decode import topology_object_to_geojson
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -373,25 +373,25 @@ def _load_scenario_water_features():
 
 def _load_runtime_water_features():
     payload = read_json_source(RUNTIME_WATER_PATH)
-    feature_collection = serialize_as_geojson(payload, objectname="scenario_water")
+    feature_collection = topology_object_to_geojson(payload, "scenario_water")
     return feature_collection.get("features", [])
 
 
 def _load_runtime_bootstrap_water_features():
     payload = json.loads(RUNTIME_BOOTSTRAP_WATER_PATH.read_text(encoding="utf-8"))
-    feature_collection = serialize_as_geojson(payload, objectname="scenario_water")
+    feature_collection = topology_object_to_geojson(payload, "scenario_water")
     return feature_collection.get("features", [])
 
 
 def _load_runtime_political_features():
     payload = read_json_source(RUNTIME_WATER_PATH)
-    feature_collection = serialize_as_geojson(payload, objectname="political")
+    feature_collection = topology_object_to_geojson(payload, "political")
     return feature_collection.get("features", [])
 
 
 def _load_runtime_topology_feature_collection(object_name):
     payload = read_json_source(RUNTIME_WATER_PATH)
-    return serialize_as_geojson(payload, objectname=object_name)
+    return topology_object_to_geojson(payload, object_name)
 
 
 def _load_runtime_topology_feature_collections_for_d3(object_names):
