@@ -63,10 +63,6 @@ const LEGACY_BOUNDARY_VARIANT_ALIASES = {
 };
 const DEFAULT_ACTIVE_PALETTE_ID = "hoi4_vanilla";
 const MAX_SAVED_RECENT_COLORS = 10;
-const MAX_MANUAL_SPECIAL_ZONE_FEATURES = 200;
-const MAX_MANUAL_SPECIAL_ZONE_COORDINATES_PER_FEATURE = 5000;
-const MAX_MANUAL_SPECIAL_ZONE_RINGS_PER_FEATURE = 32;
-const MAX_MANUAL_SPECIAL_ZONE_POLYGONS_PER_FEATURE = 32;
 const DEFAULT_OPERATION_GRAPHIC_KIND = "attack";
 const DEFAULT_OPERATIONAL_LINE_KIND = "frontline";
 const CLOSED_OPERATION_GRAPHIC_KINDS = new Set(["encirclement", "theater"]);
@@ -318,115 +314,6 @@ function normalizeProjectCoordinatePair(value) {
   const lat = Number(value[1]);
   if (!Number.isFinite(lon) || !Number.isFinite(lat)) return null;
   return [clamp(lon, -180, 180), clamp(lat, -90, 90)];
-}
-
-function normalizeManualSpecialZoneRing(rawRing, coordinateBudget) {
-  if (!Array.isArray(rawRing) || coordinateBudget.remaining < 4) return null;
-  const normalized = [];
-  // coordinateBudget 在整个 feature 维度共享，
-  // 这样导入时会优先保住“每个 ring 都还能闭合并可编辑”，而不是让单个超大 ring 吃掉全部预算。
-  const maxRingVerticesToScan = Math.min(
-    rawRing.length,
-    MAX_MANUAL_SPECIAL_ZONE_COORDINATES_PER_FEATURE,
-  );
-  for (let i = 0; i < maxRingVerticesToScan; i += 1) {
-    if (coordinateBudget.remaining <= 0) break;
-    const coord = normalizeProjectCoordinatePair(rawRing[i]);
-    if (!coord) continue;
-    normalized.push(coord);
-    coordinateBudget.remaining -= 1;
-  }
-  if (normalized.length < 3) return null;
-  const first = normalized[0];
-  const last = normalized[normalized.length - 1];
-  const isClosed = first[0] === last[0] && first[1] === last[1];
-  if (!isClosed) {
-    if (coordinateBudget.remaining <= 0) return null;
-    normalized.push([first[0], first[1]]);
-    coordinateBudget.remaining -= 1;
-  }
-  if (normalized.length < 4) return null;
-  return normalized;
-}
-
-function normalizeManualSpecialZoneGeometry(rawGeometry) {
-  if (!rawGeometry || typeof rawGeometry !== "object") return null;
-  const geometryType = String(rawGeometry.type || "").trim();
-  if (geometryType !== "Polygon" && geometryType !== "MultiPolygon") return null;
-  // 手工 special zone 来自项目文件，必须在导入边界做预算裁剪；
-  // 否则异常大的坐标集合会把问题一路带进运行时编辑链。
-  const coordinateBudget = { remaining: MAX_MANUAL_SPECIAL_ZONE_COORDINATES_PER_FEATURE };
-
-  if (geometryType === "Polygon") {
-    const rings = Array.isArray(rawGeometry.coordinates) ? rawGeometry.coordinates : [];
-    const normalizedRings = rings
-      .slice(0, MAX_MANUAL_SPECIAL_ZONE_RINGS_PER_FEATURE)
-      .map((ring) => normalizeManualSpecialZoneRing(ring, coordinateBudget))
-      .filter(Boolean);
-    if (!normalizedRings.length) return null;
-    return {
-      type: "Polygon",
-      coordinates: normalizedRings,
-    };
-  }
-
-  const polygons = Array.isArray(rawGeometry.coordinates) ? rawGeometry.coordinates : [];
-  const normalizedPolygons = polygons
-    .slice(0, MAX_MANUAL_SPECIAL_ZONE_POLYGONS_PER_FEATURE)
-    .map((polygonRings) => {
-      if (!Array.isArray(polygonRings)) return null;
-      const normalizedRings = polygonRings
-        .slice(0, MAX_MANUAL_SPECIAL_ZONE_RINGS_PER_FEATURE)
-        .map((ring) => normalizeManualSpecialZoneRing(ring, coordinateBudget))
-        .filter(Boolean);
-      if (!normalizedRings.length) return null;
-      return normalizedRings;
-    })
-    .filter(Boolean);
-  if (!normalizedPolygons.length) return null;
-  return {
-    type: "MultiPolygon",
-    coordinates: normalizedPolygons,
-  };
-}
-
-function normalizeManualSpecialZoneFeature(rawFeature, fallbackIndex) {
-  if (!rawFeature || typeof rawFeature !== "object" || String(rawFeature.type || "") !== "Feature") return null;
-  const geometry = normalizeManualSpecialZoneGeometry(rawFeature.geometry);
-  if (!geometry) return null;
-  const rawProperties = rawFeature.properties && typeof rawFeature.properties === "object"
-    ? rawFeature.properties
-    : {};
-  const id = String(rawProperties.id || `manual_sz_${fallbackIndex + 1}`).trim() || `manual_sz_${fallbackIndex + 1}`;
-  const name = String(rawProperties.name || rawProperties.label || "").trim();
-  const zoneType = String(rawProperties.type || "custom").trim().toLowerCase() || "custom";
-  return {
-    type: "Feature",
-    geometry,
-    properties: {
-      ...rawProperties,
-      id,
-      name: name || `${zoneType} zone`,
-      label: String(rawProperties.label || name || `${zoneType} zone`).trim() || `${zoneType} zone`,
-      type: zoneType,
-      __source: "manual",
-    },
-  };
-}
-
-function normalizeManualSpecialZones(rawCollection) {
-  if (!rawCollection || typeof rawCollection !== "object" || rawCollection.type !== "FeatureCollection") {
-    return { type: "FeatureCollection", features: [] };
-  }
-  const rawFeatures = Array.isArray(rawCollection.features) ? rawCollection.features : [];
-  const features = rawFeatures
-    .slice(0, MAX_MANUAL_SPECIAL_ZONE_FEATURES)
-    .map((feature, index) => normalizeManualSpecialZoneFeature(feature, index))
-    .filter(Boolean);
-  return {
-    type: "FeatureCollection",
-    features,
-  };
 }
 
 function normalizeOperationGraphics(rawGraphics) {
@@ -793,7 +680,7 @@ class FileManager {
       data.waterRegionOverrides = {};
     }
     // special zone 的历史项目文件曾分散在 manualSpecialZones / specialRegionOverrides / specialZoneLayers。
-    // 导入时一次性合并回 canonical `specialZoneLayers`，后续运行时只认这一条主状态。
+    // 导入时仅恢复 canonical `specialZoneLayers`，旧字段由 normalizer 诊断并丢弃。
     data.specialZoneLayers = normalizeSpecialZoneLayersState({
       ...(data.specialZoneLayers && typeof data.specialZoneLayers === "object" ? data.specialZoneLayers : {}),
       manualSpecialZones: data.manualSpecialZones,
