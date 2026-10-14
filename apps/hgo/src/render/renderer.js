@@ -42,7 +42,7 @@ void main(){
   float distance=(i==0?f.x:i==1?1.-f.x:i==2?f.y:1.-f.y)*scale/pixelRatio;
   uvec2 neighbour=identityAt(p+direction);
   if(neighbour.r!=current.r){
-   // Country emphasis follows original entityTag, never painted colour/cores.
+   // Country emphasis follows document owner, never painted colour/cores.
    float width=min(2.,borderWidth*(neighbour.g!=current.g?1.25:1.));
    if(width>0.)coverage=max(coverage,clamp((width*.5+.5/pixelRatio-distance)*pixelRatio,0.,1.));
    if(!isSelected&&selectedAt(p+direction))selectionCoverage=max(selectionCoverage,clamp((1.25+.5/pixelRatio-distance)*pixelRatio,0.,1.));
@@ -107,8 +107,13 @@ export function createRenderer(canvas, dataset) {
     const rows=Math.ceil(dataset.core.provinceIds.length/256), stateCodes=new Uint16Array(256*rows*2);
     const stateIndex=new Map(dataset.core.states.map((s,i)=>[String(s.id),i+1]));
     const stateById=dataset.stateById||new Map(dataset.core.states.map(s=>[String(s.id),s]));
-    const ownerIndex=new Map([...new Set(dataset.core.states.map(s=>s.entityTag||''))].map((tag,i)=>[tag,i+1]));
+    // Keep numeric tags stable across ownership edits; only the small province
+    // table changes, never the full native ID raster or its state channel.
+    const ownerTags=new Set([...(dataset.core.entities||[]).map(e=>e.tag),...dataset.core.states.map(s=>s.entityTag||'')]);
+    for(const s of dataset.core.states)for(const tag of s.coreTags||[])if(typeof tag==='string'&&/^[A-Z0-9]{3}$/.test(tag))ownerTags.add(tag);
+    const ownerIndex=new Map([...ownerTags].map((tag,i)=>[tag,i+1]));
     if(stateIndex.size>65535)throw new Error('Too many states for native state table');
+    if(ownerIndex.size>65535)throw new Error('Too many countries for native owner table');
     for(let i=1;i<dataset.core.provinceIds.length;i++){const id=String(dataset.core.provinceStateIds[i]);stateCodes[i*2]=stateIndex.get(id)||0;stateCodes[i*2+1]=ownerIndex.get(stateById.get(id)?.entityTag||'')||0;}
     texture(0,gl.R16UI,width,height,gl.RED_INTEGER,gl.UNSIGNED_SHORT,dataset.ids);
     texture(1,gl.RG16UI,256,rows,gl.RG_INTEGER,gl.UNSIGNED_SHORT,stateCodes);
@@ -117,6 +122,7 @@ export function createRenderer(canvas, dataset) {
     for(const [i,name] of ['ids','states','colors','selected'].entries())gl.uniform1i(gl.getUniformLocation(program,name),i);
     const palette=new Uint8Array(rows*256*4), selection=new Uint8Array(rows*256);
     let selectedStates=[];
+    let ownerDocument=null,ownerRevision;
     const uniforms=Object.fromEntries(['size','viewport','center','scale','borders','borderWidth','borderOpacity','borderColor','pixelRatio'].map(k=>[k,gl.getUniformLocation(program,k)]));
     markerProgram=gl.createProgram();gl.attachShader(markerProgram,shader(gl.VERTEX_SHADER,markerVertex));gl.attachShader(markerProgram,shader(gl.FRAGMENT_SHADER,markerFragment));gl.linkProgram(markerProgram);if(!gl.getProgramParameter(markerProgram,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(markerProgram));
     markerVao=gl.createVertexArray();gl.bindVertexArray(markerVao);markerBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,markerBuffer);const anchor=gl.getAttribLocation(markerProgram,'anchor');gl.enableVertexAttribArray(anchor);gl.vertexAttribPointer(anchor,2,gl.FLOAT,false,0,0);
@@ -127,7 +133,22 @@ export function createRenderer(canvas, dataset) {
     if(gl.getError()!==gl.NO_ERROR)throw new Error('GPU rejected native integer map textures');
     return {
       gl,
-      update(document, selected) { selectedStates=[...selected].map(id=>stateById.get(String(id))).filter(s=>Array.isArray(s?.anchor)&&s.anchor.length===2&&s.anchor.every(Number.isFinite)&&Number.isFinite(s.pixelCount)&&s.pixelCount>0);for(let i=1;i<dataset.core.provinceIds.length;i++){if(dataset.core.provinceStateIds[i]===null)continue;const id=String(dataset.core.provinceStateIds[i]),c=document.color(id);palette[i*4]=parseInt(c.slice(1,3),16);palette[i*4+1]=parseInt(c.slice(3,5),16);palette[i*4+2]=parseInt(c.slice(5,7),16);palette[i*4+3]=255;selection[i]=selected.has(id)?255:0;} gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,textures[2]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,palette);gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,textures[3]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RED,gl.UNSIGNED_BYTE,selection); },
+      update(document, selected) {
+        const hasOwner=typeof document.owner==='function',revision=document.ownerRevision;
+        const refreshOwners=ownerDocument!==document||ownerRevision!==revision||(hasOwner&&!Number.isFinite(revision));
+        if(refreshOwners&&(hasOwner||typeof ownerDocument?.owner==='function')){
+          for(let i=1;i<dataset.core.provinceIds.length;i++){
+            if(dataset.core.provinceStateIds[i]===null)continue;
+            const id=String(dataset.core.provinceStateIds[i]),tag=hasOwner?document.owner(id):stateById.get(id).entityTag;
+            const code=ownerIndex.get(tag);
+            if(!code)throw new Error(`Unknown rendered country: ${tag}`);
+            stateCodes[i*2+1]=code;
+          }
+          gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,textures[1]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RG_INTEGER,gl.UNSIGNED_SHORT,stateCodes);
+        }
+        ownerDocument=document;ownerRevision=revision;
+        selectedStates=[...selected].map(id=>stateById.get(String(id))).filter(s=>Array.isArray(s?.anchor)&&s.anchor.length===2&&s.anchor.every(Number.isFinite)&&Number.isFinite(s.pixelCount)&&s.pixelCount>0);for(let i=1;i<dataset.core.provinceIds.length;i++){if(dataset.core.provinceStateIds[i]===null)continue;const id=String(dataset.core.provinceStateIds[i]),c=document.color(id);palette[i*4]=parseInt(c.slice(1,3),16);palette[i*4+1]=parseInt(c.slice(3,5),16);palette[i*4+2]=parseInt(c.slice(5,7),16);palette[i*4+3]=255;selection[i]=selected.has(id)?255:0;} gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,textures[2]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RGBA,gl.UNSIGNED_BYTE,palette);gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,textures[3]);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,rows,gl.RED,gl.UNSIGNED_BYTE,selection);
+      },
       draw(view,layers,pixelRatio=1) {
         gl.disable(gl.BLEND);gl.useProgram(program);gl.bindVertexArray(vao);gl.viewport(0,0,canvas.width,canvas.height);
         gl.uniform2f(uniforms.size,width,height);gl.uniform2f(uniforms.viewport,canvas.width,canvas.height);gl.uniform2f(uniforms.center,view.x,view.y);gl.uniform1f(uniforms.scale,view.scale*pixelRatio);gl.uniform1f(uniforms.pixelRatio,pixelRatio);gl.uniform1i(uniforms.borders,layers.borders?1:0);

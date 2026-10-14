@@ -13,22 +13,31 @@ function cells(box,size,visit) {
 }
 
 export function createLabelLayout(dataset) {
-  const world = new Map();
+  const world = new Map(),countryWorld = new Map();
   let previous = new Set();
-  function add(kind,id,source,x,y) {
+  let countryDocument=null,countryRevision;
+  function add(index,kind,id,source,x,y) {
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     const key = `${kind}:${id}`, cell = `${Math.floor(x/WORLD_CELL)},${Math.floor(y/WORLD_CELL)}`;
     const entry = {id:key,kind,source,x,y,threshold:.05+.9*hash(key)};
-    if (!world.has(cell)) world.set(cell,[]);
-    world.get(cell).push(entry);
+    if (!index.has(cell)) index.set(cell,[]);
+    index.get(cell).push(entry);
   }
-  for (const state of dataset.core.states) add('state',state.id,state,...state.anchor);
-  for (const entity of dataset.core.entities) {
-    if (entity.anchor && entity.kind !== 'water') add('country',entity.tag,entity,...entity.anchor);
+  for (const state of dataset.core.states) add(world,'state',state.id,state,...state.anchor);
+  function indexCountries(document) {
+    const dynamic=typeof document.countries==='function',revision=document.ownerRevision;
+    if(countryDocument===document&&countryRevision===revision&&(!dynamic||Number.isFinite(revision)))return;
+    countryWorld.clear();
+    const sources=dynamic?document.countries():dataset.core.entities;
+    for(const country of sources){
+      if(country.anchor&&country.kind!=='water'&&country.tag!=='WTR'&&(!dynamic||country.stateCount>0))add(countryWorld,'country',country.tag,country,...country.anchor);
+    }
+    countryDocument=document;countryRevision=revision;
   }
-  for (const [index,place] of (dataset.places || []).entries()) add('city',`${place.stateId}:${place.name}:${index}`,place,place.x,place.y);
+  for (const [index,place] of (dataset.places || []).entries()) add(world,'city',`${place.stateId}:${place.name}:${index}`,place,place.x,place.y);
 
   function layout(document,view,layers,width,height,measureText=(text,size) => text.length*size*.6) {
+    indexCountries(document);
     const budget = BUDGETS[layers.labelDensity] || BUDGETS.medium;
     if (!(view.scale>0) || !(width>0) || !(height>0)) { previous = new Set(); return []; }
     const margin = 32/view.scale;
@@ -63,9 +72,10 @@ export function createLabelLayout(dataset) {
     };
     const cellCount = (Math.floor(bounds[2]/WORLD_CELL)-Math.floor(bounds[0]/WORLD_CELL)+1)
       *(Math.floor(bounds[3]/WORLD_CELL)-Math.floor(bounds[1]/WORLD_CELL)+1);
-    if (cellCount>world.size) {
-      for (const entries of world.values()) consider(entries);
-    } else cells(bounds,WORLD_CELL,key => { const entries=world.get(key); if (entries) consider(entries); });
+    for(const index of [world,countryWorld]){
+      if(cellCount>index.size){for(const entries of index.values())consider(entries);}
+      else cells(bounds,WORLD_CELL,key=>{const entries=index.get(key);if(entries)consider(entries);});
+    }
     candidates.sort((a,b) => a.priority-b.priority || Number(b.retained)-Number(a.retained)
       || a.threshold-b.threshold || (a.id<b.id?-1:a.id>b.id?1:0));
     const occupied = new Map(), accepted = [];

@@ -1,19 +1,26 @@
 import {hitTest} from './hit.js';
 
-// Owner is the dataset's original country, not its controller or core claims.
-export function createPaintScopes(dataset) {
-  const byOwner=new Map();
-  for(const state of dataset.core.states){
-    if(!byOwner.has(state.entityTag))byOwner.set(state.entityTag,[]);
-    byOwner.get(state.entityTag).push(String(state.id));
+// Membership follows current document ownership, never fill colours or claims.
+export function createPaintScopes(dataset,document) {
+  const byOwner=new Map();let revision;
+  const owner=id=>document?.owner?document.owner(id):dataset.stateById.get(String(id)).entityTag;
+  function refresh(){
+    const next=document?.ownerRevision??0;if(revision===next)return;
+    byOwner.clear();
+    for(const state of dataset.core.states){
+      const tag=owner(state.id);
+      if(!byOwner.has(tag))byOwner.set(tag,[]);
+      byOwner.get(tag).push(String(state.id));
+    }
+    revision=next;
   }
   return (id,scope='state')=>{
     const state=dataset.stateById.get(String(id));
     if(!state)throw new Error('Unknown state ID');
     if(!['state','country'].includes(scope))throw new Error('Invalid paint scope');
     // WTR is a shared water reference, not one worldwide country.
-    return scope==='country'&&state.entityTag!=='WTR'
-      ? byOwner.get(state.entityTag) : [String(id)];
+    if(scope==='state'||owner(id)==='WTR')return [String(id)];
+    refresh();return byOwner.get(owner(id)).slice();
   };
 }
 

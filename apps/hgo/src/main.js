@@ -1,11 +1,12 @@
 import {loadDataset} from './data/dataset.js';
 import {createHgoSession} from './session.js';
 import {text,keyboardAction,validateProjectFile,parseHexColor} from './ui/text.js';
+import {createCountryPanel} from './ui/countries.js';
 import {consumeHandoff} from './integration/handoff.js';
 
 const $=id=>document.getElementById(id);
 const palette=['#d17b55','#d6b978','#87977a','#728b98','#9b859e','#e2daca','#3d4951'];
-let language='zh',session=null,loadingController=null,loadGeneration=0,viewModel=null,exporting=false,handoffPending=false,toastTimer=0,destroyed=false,leaveAuthorized=false;
+let language='zh',session=null,countryPanel=null,loadingController=null,loadGeneration=0,viewModel=null,exporting=false,handoffPending=false,toastTimer=0,destroyed=false,leaveAuthorized=false;
 const objectUrls=new Set();
 const t=key=>text[language][key]||key;
 function notify(message,error=false){const el=$('toast');el.textContent=message;el.classList.toggle('error',error);el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{el.hidden=true;},error?9000:4000);}
@@ -23,6 +24,7 @@ function setLanguage(next){
 }
 function render(vm){
   viewModel=vm;const ready=vm.ready&&!handoffPending;
+  countryPanel?.render({...vm,ready});
   for(const id of ['open-button','state-search','paint-color','paint-hex','zoom-in','zoom-out','fit-button','tool-select','tool-paint','tool-pick','tool-pan','paint-scope'])$(id).disabled=!ready;
   $('save-button').disabled=!session||handoffPending;
   $('export-button').disabled=!ready||exporting;$('undo-button').disabled=!ready||!vm.canUndo;$('redo-button').disabled=!ready||!vm.canRedo;
@@ -43,7 +45,7 @@ function render(vm){
   const selected=vm.selection.length>0,first=vm.selection[0];
   $('selection-empty').hidden=selected;$('selection-detail').hidden=!selected;$('paint-selection').disabled=!ready||!selected;$('clear-selection').disabled=!ready||!selected;
   $('label-input').disabled=!ready||vm.selection.length!==1;$('label-button').disabled=!ready||vm.selection.length!==1;
-  if(selected){$('selected-name').textContent=vm.selection.length===1?first.name:`${vm.selection.length} ${t('multiple')}`;$('selected-swatch').style.background=first.color;$('selected-id').textContent=vm.selection.length===1?first.id:'—';$('selected-entity').textContent=[...new Set(vm.selection.map(s=>s.entityTag))].slice(0,4).join(', ');$('selected-count').textContent=String(vm.selection.length);if(document.activeElement!==$('label-input'))$('label-input').value=vm.selection.length===1?first.name:'';}
+  if(selected){$('selected-name').textContent=vm.selection.length===1?first.name:`${vm.selection.length} ${t('multiple')}`;$('selected-swatch').style.background=first.color;$('selected-id').textContent=vm.selection.length===1?first.id:'—';$('selected-entity').textContent=[...new Set(vm.selection.map(s=>s.entityTag))].slice(0,4).join(', ');$('selected-original-entity').textContent=[...new Set(vm.selection.map(s=>s.originalEntityTag))].slice(0,4).join(', ');$('selected-count').textContent=String(vm.selection.length);if(document.activeElement!==$('label-input'))$('label-input').value=vm.selection.length===1?first.name:'';}
 }
 function search(){
   const results=$('search-results');results.replaceChildren();const query=$('state-search').value.trim();if(!session||!query)return;
@@ -52,7 +54,7 @@ function search(){
   for(const state of found){const button=document.createElement('button');button.type='button';button.className='search-result';const name=document.createElement('span'),meta=document.createElement('small');name.textContent=state.name;meta.textContent=`#${state.id} / ${state.entityTag}`;button.append(name,meta);button.addEventListener('click',()=>attempt(()=>{session.focusState(state.id);$('map-canvas').focus({preventScroll:true});}));results.append(button);}
 }
 async function start(){
-  const generation=++loadGeneration;loadingController?.abort();session?.dispose();session=null;viewModel=null;handoffPending=false;
+  const generation=++loadGeneration;loadingController?.abort();countryPanel?.dispose();countryPanel=null;session?.dispose();session=null;viewModel=null;handoffPending=false;
   const controller=new AbortController();loadingController=controller;
   $('load-panel').hidden=false;$('load-title').textContent=t('loading');$('load-detail').textContent=t('loadDetail');$('cancel-load').hidden=false;$('retry-load').hidden=true;$('load-progress').classList.remove('stopped');
   try{
@@ -60,6 +62,7 @@ async function start(){
     if(destroyed||controller.signal.aborted||generation!==loadGeneration)return;
     const url=new URL(location.href),token=url.searchParams.get('handoff');handoffPending=Boolean(token);
     session=createHgoSession({canvas:$('map-canvas'),overlayCanvas:$('overlay-canvas'),dataset,onChange:render,onError:error=>notify(error.message,true)});
+    countryPanel=createCountryPanel({root:$('country-panel'),session,getLanguage:()=>language,onError:error=>notify(error.message,true)});
     loadingController=null;$('load-panel').hidden=!handoffPending;$('cancel-load').hidden=true;$('retry-load').hidden=true;render(session.getViewModel());
     if(dataset.placesWarning)notify(`${t('cityWarning')} ${dataset.placesWarning}`,true);
     if(token){
@@ -103,7 +106,7 @@ $('save-button').addEventListener('click',save);$('open-button').addEventListene
 $('project-file').addEventListener('change',event=>void openFile(event.target.files[0]));$('export-button').addEventListener('click',()=>void exportPng());
 $('back-link').addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||event.button!==0)return;if(!canReplace())event.preventDefault();else leaveAuthorized=true;});
 window.addEventListener('beforeunload',event=>{if(!leaveAuthorized&&session?.getViewModel().dirty){event.preventDefault();event.returnValue='';}});
-window.addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;++loadGeneration;loadingController?.abort();session?.dispose();session=null;clearTimeout(toastTimer);for(const url of objectUrls)URL.revokeObjectURL(url);objectUrls.clear();});
+window.addEventListener('pagehide',event=>{if(event.persisted)return;destroyed=true;++loadGeneration;loadingController?.abort();countryPanel?.dispose();countryPanel=null;session?.dispose();session=null;clearTimeout(toastTimer);for(const url of objectUrls)URL.revokeObjectURL(url);objectUrls.clear();});
 window.addEventListener('pageshow',()=>{leaveAuthorized=false;session?.resize();});
 document.addEventListener('keydown',event=>{
   if(!viewModel||event.repeat)return;

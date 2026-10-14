@@ -49,13 +49,14 @@
         <div class="search-field"><span aria-hidden="true">⌕</span><input id="state-search" type="search" autocomplete="off" disabled placeholder="州名、实体或 ID" aria-controls="search-results"></div>
         <div id="search-results" class="search-results" aria-live="polite"></div>
       </section>
+      <details class="country-section" id="country-management"><summary data-i18n="countryManagement">国家与核心领土</summary><div id="country-panel"></div></details>
       <section class="color-section">
         <div class="section-heading"><h2 data-i18n="colorHeading">绘制颜色</h2><span class="small-index">01</span></div>
         <div class="color-control"><input id="paint-color" type="color" value="#d17b55" disabled aria-label="绘制颜色"><label for="paint-hex" class="sr-only" data-i18n="hexColor">十六进制颜色</label><input id="paint-hex" value="#d17b55" maxlength="7" spellcheck="false" disabled><span class="color-mark">●</span></div>
         <div id="color-swatches" class="swatches" aria-label="Color palette"></div>
         <p class="field-hint" data-i18n="pickHint">I 取色直接读取州存储色，忽略边界、标签和高亮。</p>
         <label for="paint-scope" class="field-label" data-i18n="paintScope">填充范围</label>
-        <select id="paint-scope" disabled><option value="state" data-i18n="scopeState">州（可连续拖绘）</option><option value="country" data-i18n="scopeCountry">所属国家（原始归属）</option></select>
+        <select id="paint-scope" disabled><option value="state" data-i18n="scopeState">州（可连续拖绘）</option><option value="country" data-i18n="scopeCountry">所属国家（当前归属）</option></select>
         <p class="field-hint" data-i18n="scopeHint">绘制模式双击填所属国家；水域只填该州。国家范围不含未释放国家的核心声明。</p>
         <button id="paint-selection" class="button-dark full-width" disabled data-i18n="applyColor">为所选州上色</button>
       </section>
@@ -64,7 +65,7 @@
         <div id="selection-empty" class="selection-empty"><span class="empty-symbol" aria-hidden="true">⊹</span><p data-i18n="selectionEmpty">点击地图，选择一个州。</p><small data-i18n="multiHint">Shift + 点击可多选 · 海域同样可编辑</small></div>
         <div id="selection-detail" hidden>
           <div class="selected-title"><span id="selected-swatch"></span><h3 id="selected-name"></h3></div>
-          <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">参考实体</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
+          <dl class="selection-facts"><div><dt data-i18n="stateId">州 ID</dt><dd id="selected-id"></dd></div><div><dt data-i18n="referenceEntity">当前国家</dt><dd id="selected-entity"></dd></div><div><dt data-i18n="originalEntity">原始归属</dt><dd id="selected-original-entity"></dd></div><div><dt data-i18n="selectedCount">已选州数</dt><dd id="selected-count"></dd></div></dl>
           <button id="pick-selection" class="full-width" disabled data-i18n="pickStored">取该州存储色</button>
           <label for="label-input" class="field-label" data-i18n="mapLabel">地图标签</label><div class="label-control"><input id="label-input" maxlength="200" disabled><button id="label-button" disabled data-i18n="apply">应用</button></div>
           <p class="field-hint" data-i18n="labelHint">留空恢复原名。参考实体保持只读。</p>
@@ -85,7 +86,7 @@
         <select id="label-density" disabled><option value="low" data-i18n="densityLow">低</option><option value="medium" selected data-i18n="densityMedium">中</option><option value="high" data-i18n="densityHigh">高</option></select>
       </section>
       <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · H 平移 · 0 全图。拖动平移，滚轮缩放；Ctrl/⌘ + Z 撤销，Shift + Z 重做；Ctrl/⌘ + S 保存。</p></details>
-      <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span></footer>
+      <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span><p class="field-hint" data-i18n="projectFormatHint">JSON 保存归属与颜色，请在独立 HGO 打开；PNG 为视觉输出。</p></footer>
     </aside>
   </main>
   <footer class="statusbar"><span class="status-led" id="status-led"></span><span id="status-text" role="status" aria-live="polite">正在加载…</span><span id="dataset-stats"></span></footer>

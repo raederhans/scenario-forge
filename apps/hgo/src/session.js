@@ -8,11 +8,11 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
   const document=createDocument(dataset), {width,height}=dataset.manifest.coordinateSpace;
   let renderer=createRenderer(canvas,dataset), disposed=false, ready=true, tool='select',color='#d17b55',selection=new Set(),view={x:width/2,y:height/2,scale:1},layers={...DEFAULT_LAYERS},status=dataset.placesWarning?`Cities unavailable: ${dataset.placesWarning}`:'Ready',raf=0,drag=null;
   const listeners=[],win=canvas.ownerDocument.defaultView;
-  const scopeStates=createPaintScopes(dataset);
+  const scopeStates=createPaintScopes(dataset,document);
   let paintScope='state',pendingClick=null,spacePan=false,brushPoints=[],lastPointerWasDrag=false;
-  let viewDirty=false,exporting=false;
+  let viewDirty=false,exporting=false,projectGeneration=0;
   function listen(target,event,handler,options){target.addEventListener(event,handler,options);listeners.push(()=>target.removeEventListener(event,handler,options));}
-  function model(){return {ready:ready&&!disposed,dirty:document.dirty||viewDirty,tool,color,paintScope,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:document.labels[id]||s.name,entityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
+  function model(){return {ready:ready&&!disposed,dirty:document.dirty||viewDirty,tool,color,paintScope,countryRevision:document.revision,ownerRevision:document.ownerRevision,projectGeneration,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:document.labels[id]||s.name,entityTag:document.owner(id),originalEntityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
   function emit(){if(!disposed)onChange(model());}
   function draw(){raf=0;if(!ready||disposed)return;try{if(flushBrush()){renderer.update(document,selection);emit();}const ratio=canvas.width/(canvas.clientWidth||1);renderer.draw(view,layers,ratio);drawOverlay(overlayCanvas,dataset,document,view,layers,ratio);}catch(e){onError(e);}}
   function schedule(){if(!raf&&!disposed&&ready)raf=win.requestAnimationFrame(draw);}
@@ -31,7 +31,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
     for(const point of brushPoints){
       const hits=tracePaintStates(dataset,drag.mapLast,point);
       for(const id of hits){
-        const state=dataset.stateById.get(id),key=paintScope==='country'&&state.entityTag!=='WTR'?`country:${state.entityTag}`:`state:${id}`;
+        const owner=document.owner(id),key=paintScope==='country'&&owner!=='WTR'?`country:${owner}`:`state:${id}`;
         if(drag.visited.has(key))continue;
         drag.visited.add(key);
         edited=document.paintStrokeStates(scopeStates(id,paintScope))||edited;
@@ -113,8 +113,19 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
   listen(canvas,'webglcontextrestored',()=>{if(disposed)return;try{renderer=createRenderer(canvas,dataset);ready=true;status='Graphics context restored';changed(true);}catch(e){ready=false;status=e.message;onError(e);emit();}});
   const observer=typeof win.ResizeObserver==='function'?new win.ResizeObserver(resize):null;observer?.observe(canvas);if(!observer)listen(win,'resize',resize);
   resize();fit(true);renderer.update(document,selection);
+  function focusGroup(ids,bounds,anchor){
+    selection=new Set(ids.map(String));
+    if(bounds){const [x1,y1,x2,y2]=bounds;view={x:(x1+x2)/2,y:(y1+y2)/2,scale:Math.min(32,Math.max(.015,Math.min(canvas.clientWidth/Math.max(8,x2-x1),canvas.clientHeight/Math.max(8,y2-y1))*.7))};if(ids.length===1&&anchor){view.x=anchor[0];view.y=anchor[1];}viewDirty=true;}
+    changed(true);
+  }
   const api={
     getViewModel:model,
+    listCountries(query='',{includeEmpty=false}={}){check();const q=String(query).trim().toLocaleLowerCase();return document.countries().filter(c=>c.tag!=='WTR'&&(includeEmpty||c.stateCount>0)&&`${c.tag} ${c.name}`.toLocaleLowerCase().includes(q));},
+    selectCountry(tag){check();const c=document.countries().find(c=>c.tag===tag);if(!c||tag==='WTR')throw new Error('Unknown country');finishInteraction();focusGroup(c.stateIds,c.bounds,c.anchor);},
+    setCountryColor(tag,value,options={}){check();if(!validColor(value)||!document.countries().some(c=>c.tag===tag&&tag!=='WTR')||('overridePaint' in options&&typeof options.overridePaint!=='boolean'))throw new Error('Invalid country colour');finishInteraction();document.setCountryColor(tag,value,options);changed(true);},
+    listCoreCandidates(parent,query=''){check();const q=String(query).trim().toLocaleLowerCase();return document.candidates(parent).filter(c=>`${c.tag||c.target} ${c.name}`.toLocaleLowerCase().includes(q));},
+    previewTransfer(parent,target){check();if(!document.candidates(parent).some(c=>(c.target||c.tag)===target))throw new Error('No current core territories for this target');finishInteraction();const preview=document.previewTransfer(parent,target);focusGroup(preview.stateIds,preview.bounds);return preview;},
+    commitTransfer(preview,options={}){check();if(drag||pendingClick)throw new Error('Finish the current stroke and refresh the transfer preview');document.transfer(preview,options);selection=new Set(preview.stateIds);changed(true);},
     setTool(value){check();if(!['select','paint','pan','pick'].includes(value))throw new Error('Invalid tool');finishInteraction();tool=value;changed(true);},
     setColor(value){check();if(!validColor(value))throw new Error('Invalid color');finishInteraction();color=value.toLowerCase();changed(true);},
     setPaintScope(value){check();if(!['state','country'].includes(value))throw new Error('Invalid paint scope');finishInteraction();paintScope=value;changed(true);},
@@ -126,12 +137,12 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
     undo(){check();finishInteraction();document.undo();changed(true);},redo(){check();finishInteraction();document.redo();changed(true);},
     fit(){fit();},zoomBy:zoom,
     focusState(id){check();const s=dataset.stateById.get(String(id));if(!s)throw new Error('Unknown state');finishInteraction();const b=s.bounds||[s.anchor[0]-10,s.anchor[1]-10,s.anchor[0]+10,s.anchor[1]+10];view={x:s.anchor[0],y:s.anchor[1],scale:Math.min(32,Math.max(.1,Math.min(canvas.clientWidth/Math.max(8,b[2]-b[0]),canvas.clientHeight/Math.max(8,b[3]-b[1]))*.55))};viewDirty=true;selection=new Set([String(id)]);changed(true);},
-    search(query,{limit=50}={}){check();const q=String(query).trim().toLocaleLowerCase();if(!q)return [];const max=Math.max(0,Math.min(500,Math.floor(limit)||0)),found=[];for(const s of dataset.core.states){const name=document.labels[s.id]||s.name;if(`${s.id} ${name} ${s.nameKey||''} ${s.entityTag}`.toLocaleLowerCase().includes(q)){found.push({id:s.id,name,entityTag:s.entityTag});if(found.length>=max)break;}}return max?found:[];},
+    search(query,{limit=50}={}){check();const q=String(query).trim().toLocaleLowerCase();if(!q)return [];const max=Math.max(0,Math.min(500,Math.floor(limit)||0)),found=[];for(const s of dataset.core.states){const name=document.labels[s.id]||s.name;if(`${s.id} ${name} ${s.nameKey||''} ${document.owner(s.id)} ${s.entityTag}`.toLocaleLowerCase().includes(q)){found.push({id:s.id,name,entityTag:document.owner(s.id),originalEntityTag:s.entityTag});if(found.length>=max)break;}}return max?found:[];},
     setLayer(name,enabled){check();if(!['borders','labels','cities'].includes(name)||typeof enabled!=='boolean')throw new Error('Invalid layer');finishInteraction();layers[name]=enabled;viewDirty=true;changed();},
     setDisplayOption(name,value){check();if(!validDisplayOption(name,value))throw new Error('Invalid display option');finishInteraction();layers[name]=name==='borderColor'?value.toLowerCase():value;viewDirty=true;changed();},
     setLabel(id,text){check();document.validateIds([id]);if(typeof text!=='string'||text.length>200)throw new Error('Invalid label');finishInteraction();document.label(id,text);changed();},
     serializeDocument(){check();finishInteraction();return document.serialize(view,layers);},
-    loadDocument(payload){check();const next=document.load(payload);finishInteraction(true);view=next.view;layers=next.layers;selection.clear();viewDirty=false;status='Project opened';changed(true);},
+    loadDocument(payload){check();const next=document.load(payload);finishInteraction(true);view=next.view;layers=next.layers;selection.clear();viewDirty=false;projectGeneration++;status='Project opened';changed(true);},
     async exportPng({width:outWidth=width,height:outHeight=height}={}){
       check();if(!Number.isInteger(outWidth)||!Number.isInteger(outHeight)||outWidth<1||outHeight<1||outWidth*outHeight>40e6||Math.max(outWidth,outHeight)>16384)throw new Error('Invalid PNG dimensions');
       if(!ready)throw new Error('Graphics context is not ready');

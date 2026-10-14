@@ -22,3 +22,6 @@ export function parseHexColor(value) {
   const color=value.trim();
   return /^#[0-9a-f]{6}$/i.test(color)?color:null;
 }
+
+Object.assign(text.zh,{countryManagement:'国家与核心领土',referenceEntity:'当前国家',originalEntity:'原始归属',scopeCountry:'所属国家（当前归属）',scopeHint:'绘制按当前国家范围填色，不改变归属；水域只填该州。核心领土转交请打开“国家与核心领土”。',borderHint:'州界较细，当前国家边界更明显。微小州选中后显示定位圈；放大不会增加源图细节。',projectFormatHint:'JSON 保存当前归属与颜色，请在独立 HGO 打开；PNG 仅为视觉输出。',labelHint:'留空恢复原名。归属转交请使用国家面板。'});
+Object.assign(text.en,{countryManagement:'Countries & core territories',referenceEntity:'Current country',originalEntity:'Original owner',scopeCountry:'Country (current ownership)',scopeHint:'Paint follows current ownership without changing it. Water fills only that state. Use Countries & core territories to transfer ownership.',borderHint:'State borders are thinner; current country borders are stronger. Tiny selected states get a locator ring. Zoom cannot add source detail.',projectFormatHint:'JSON preserves ownership and colours; open it directly in HGO. PNG is a visual export only.',labelHint:'Leave blank to restore the name. Use the country panel to transfer ownership.'});
