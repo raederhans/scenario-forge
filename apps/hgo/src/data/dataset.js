@@ -54,7 +54,9 @@ export async function loadDataset(manifestUrl, {signal, onProgress = () => {}, f
       const out = new Uint8Array(a.decodedByteLength); let offset = 0;
       try { while (true) { signal?.throwIfAborted(); const {done, value} = await reader.read(); if (done) break; assert(offset + value.length <= out.length, 'ID decompression exceeds bounds'); out.set(value, offset); offset += value.length; } } finally { await reader.cancel(); }
       assert(offset === out.length, 'Truncated ID raster');
-      const ids = new Uint16Array(width * height), view = new DataView(out.buffer);
+      // Reuse the owned decompression buffer. Read each little-endian word
+      // before rewriting it in native order; this is also safe on big-endian hosts.
+      const ids = new Uint16Array(out.buffer), view = new DataView(out.buffer);
       for (let i = 0; i < ids.length; i++) ids[i] = view.getUint16(i * 2, true);
       return ids;
     }

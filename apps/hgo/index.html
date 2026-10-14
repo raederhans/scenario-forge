@@ -75,6 +75,14 @@
         <label class="layer-toggle"><span data-i18n="borders">州边界</span><input id="layer-borders" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="labels">地名标签</span><input id="layer-labels" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
         <label class="layer-toggle"><span data-i18n="cities">原生城市</span><input id="layer-cities" type="checkbox" checked disabled><span class="switch" aria-hidden="true"></span></label>
+        <label class="field-label" for="border-width" data-i18n="borderWidth">边界宽度（屏幕像素）</label>
+        <div class="display-range"><input id="border-width" type="range" min="0" max="2" step="0.1" value="0.7" disabled><output id="border-width-value" for="border-width">0.7 px</output></div>
+        <label class="field-label" for="border-opacity" data-i18n="borderOpacity">边界不透明度</label>
+        <div class="display-range"><input id="border-opacity" type="range" min="0" max="1" step="0.05" value="0.45" disabled><output id="border-opacity-value" for="border-opacity">45%</output></div>
+        <label class="display-color" for="border-color"><span data-i18n="borderColor">边界颜色</span><input id="border-color" type="color" value="#1f2933" disabled></label>
+        <p class="field-hint" data-i18n="borderHint">州界较淡，原始国家边界较深。微小州选中后显示定位圈；放大不会增加源图细节。</p>
+        <label class="field-label" for="label-density" data-i18n="labelDensity">标签密度</label>
+        <select id="label-density" disabled><option value="low" data-i18n="densityLow">低</option><option value="medium" selected data-i18n="densityMedium">中</option><option value="high" data-i18n="densityHigh">高</option></select>
       </section>
       <details class="keyboard-help"><summary data-i18n="shortcuts">快捷键与操作</summary><p data-i18n="shortcutText">V 选择 · B 绘制 · H 平移 · 0 全图。拖动平移，滚轮缩放；Ctrl/⌘ + Z 撤销，Shift + Z 重做；Ctrl/⌘ + S 保存。</p></details>
       <footer class="inspector-footer"><span class="edition-tag">NATIVE / PIXEL SPACE</span><span data-i18n="footerNote">独立项目 · 自由编辑</span></footer>

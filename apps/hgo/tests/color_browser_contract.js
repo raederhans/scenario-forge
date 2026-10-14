@@ -18,10 +18,10 @@ export function runColorContract() {
     assert(interior.join(',')==='26,43,60,255','unselected interior equals authoritative RGB');
     assert(edge.join(',')===interior.join(','),'unselected border-off edge equals authoritative RGB');
     renderer.update(paintDocument,new Set(['1']));renderer.draw(view,{borders:false});
-    samples.selectedInterior=pixels(1);samples.selectedEdge=pixels(2);
+    samples.selectedInterior=pixels(1);samples.selectedEdge=pixels(3);
     assert(pixels(1).join(',')===interior.join(','),'selection preserves authoritative interior RGB');
     assert(paintDocument.color('1')==='#1a2b3c','rendering selection does not modify the stored color');
-    assert(pixels(2).join(',')!==edge.join(','),'selection remains visible on the boundary');
+    assert(pixels(3).join(',')!=='64,128,160,255','selection remains visible outside the boundary');
     renderer.update(paintDocument,new Set());renderer.draw(view,{borders:true});
     assert(pixels(1).join(',')===interior.join(','),'borders preserve authoritative interior RGB');
     assert(pixels(2).join(',')!==edge.join(','),'borders darken only the boundary');

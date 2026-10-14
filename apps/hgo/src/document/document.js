@@ -1,3 +1,4 @@
+import {readLayers} from '../render/settings.js';
 export const validColor = value => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
 const plain = value => value && typeof value === 'object' && !Array.isArray(value) && (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null);
 export function createDocument(dataset) {
@@ -61,9 +62,10 @@ export function createDocument(dataset) {
       ids(Object.keys(p.paint)); ids(Object.keys(p.labels));
       if (Object.values(p.paint).some(c => !validColor(c)) || Object.values(p.labels).some(t => typeof t !== 'string' || t.length > 200)) throw new Error('Invalid project paint or labels');
       if (!plain(p.view) || !['x','y','scale'].every(k => Number.isFinite(p.view[k])) || p.view.scale <= 0 || p.view.scale > 128 || Math.abs(p.view.x) > dataset.manifest.coordinateSpace.width * 10 || Math.abs(p.view.y) > dataset.manifest.coordinateSpace.height * 10) throw new Error('Invalid project view');
-      if (!plain(p.layers) || !['borders','labels','cities'].every(k => typeof p.layers[k] === 'boolean') || Object.keys(p.layers).some(k => !['borders','labels','cities'].includes(k))) throw new Error('Invalid project layers');
+      if (!plain(p.layers)) throw new Error('Invalid project layers');
+      const layers = readLayers(p.layers);
       stroke = null; paint = {...p.paint}; labels = {...p.labels}; past = []; future = []; saved = signature();
-      return {view:{x:p.view.x,y:p.view.y,scale:p.view.scale},layers:{...p.layers}};
+      return {view:{x:p.view.x,y:p.view.y,scale:p.view.scale},layers};
     }
   };
 }

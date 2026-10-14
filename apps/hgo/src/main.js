@@ -28,6 +28,8 @@ function render(vm){
   $('export-button').disabled=!ready||exporting;$('undo-button').disabled=!ready||!vm.canUndo;$('redo-button').disabled=!ready||!vm.canRedo;
   for(const button of $('color-swatches').children)button.disabled=!ready;
   for(const name of ['borders','labels','cities']){$(`layer-${name}`).disabled=!ready;$(`layer-${name}`).checked=vm.layers[name];}
+  for(const [id,key] of [['border-width','borderWidth'],['border-opacity','borderOpacity'],['border-color','borderColor'],['label-density','labelDensity']]){$(id).disabled=!ready;$(id).value=vm.layers[key];}
+  $('border-width-value').textContent=`${vm.layers.borderWidth} px`;$('border-opacity-value').textContent=`${Math.round(vm.layers.borderOpacity*100)}%`;
   for(const button of document.querySelectorAll('[data-tool]'))button.setAttribute('aria-pressed',String(button.dataset.tool===vm.tool));
   $('map-canvas').style.cursor=vm.tool==='pan'?'grab':vm.tool==='paint'?'cell':'crosshair';
   $('map-canvas').style.pointerEvents=handoffPending?'none':'';
@@ -94,6 +96,7 @@ $('paint-color').addEventListener('input',event=>attempt(()=>session.setColor(ev
 $('paint-hex').addEventListener('input',event=>{const value=parseHexColor(event.target.value);if(value)attempt(()=>session.setColor(value));});
 $('paint-hex').addEventListener('change',event=>{const value=parseHexColor(event.target.value);if(!value){notify(t('badColor'),true);event.target.value=viewModel.color;return;}attempt(()=>session.setColor(value));});
 for(const name of ['borders','labels','cities'])$(`layer-${name}`).addEventListener('change',event=>attempt(()=>session.setLayer(name,event.target.checked)));
+for(const [id,key] of [['border-width','borderWidth'],['border-opacity','borderOpacity'],['border-color','borderColor'],['label-density','labelDensity']])$(id).addEventListener(id==='label-density'?'change':'input',event=>attempt(()=>session.setDisplayOption(key,id==='border-width'||id==='border-opacity'?Number(event.target.value):event.target.value)));
 $('state-search').addEventListener('input',search);$('state-search').addEventListener('keydown',e=>{if(e.key==='Enter')$('search-results').querySelector('button')?.click();});
 $('label-button').addEventListener('click',applyLabel);$('label-input').addEventListener('keydown',e=>{if(e.key==='Enter')applyLabel();});
 $('save-button').addEventListener('click',save);$('open-button').addEventListener('click',()=>{$('project-file').value='';$('project-file').click();});

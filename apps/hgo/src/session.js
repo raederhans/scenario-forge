@@ -2,14 +2,15 @@ import {createDocument,validColor} from './document/document.js';
 import {hitTest} from './interaction/hit.js';
 import {createPaintScopes,tracePaintStates} from './interaction/paint.js';
 import {createRenderer,drawOverlay} from './render/renderer.js';
+import {DEFAULT_LAYERS,validDisplayOption} from './render/settings.js';
 
 export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},onError=()=>{}}) {
   const document=createDocument(dataset), {width,height}=dataset.manifest.coordinateSpace;
-  let renderer=createRenderer(canvas,dataset), disposed=false, ready=true, tool='select',color='#d17b55',selection=new Set(),view={x:width/2,y:height/2,scale:1},layers={borders:true,labels:true,cities:true},status=dataset.placesWarning?`Cities unavailable: ${dataset.placesWarning}`:'Ready',raf=0,drag=null;
+  let renderer=createRenderer(canvas,dataset), disposed=false, ready=true, tool='select',color='#d17b55',selection=new Set(),view={x:width/2,y:height/2,scale:1},layers={...DEFAULT_LAYERS},status=dataset.placesWarning?`Cities unavailable: ${dataset.placesWarning}`:'Ready',raf=0,drag=null;
   const listeners=[],win=canvas.ownerDocument.defaultView;
   const scopeStates=createPaintScopes(dataset);
   let paintScope='state',pendingClick=null,spacePan=false,brushPoints=[],lastPointerWasDrag=false;
-  let viewDirty=false;
+  let viewDirty=false,exporting=false;
   function listen(target,event,handler,options){target.addEventListener(event,handler,options);listeners.push(()=>target.removeEventListener(event,handler,options));}
   function model(){return {ready:ready&&!disposed,dirty:document.dirty||viewDirty,tool,color,paintScope,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:document.labels[id]||s.name,entityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
   function emit(){if(!disposed)onChange(model());}
@@ -126,16 +127,33 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
     fit(){fit();},zoomBy:zoom,
     focusState(id){check();const s=dataset.stateById.get(String(id));if(!s)throw new Error('Unknown state');finishInteraction();const b=s.bounds||[s.anchor[0]-10,s.anchor[1]-10,s.anchor[0]+10,s.anchor[1]+10];view={x:s.anchor[0],y:s.anchor[1],scale:Math.min(32,Math.max(.1,Math.min(canvas.clientWidth/Math.max(8,b[2]-b[0]),canvas.clientHeight/Math.max(8,b[3]-b[1]))*.55))};viewDirty=true;selection=new Set([String(id)]);changed(true);},
     search(query,{limit=50}={}){check();const q=String(query).trim().toLocaleLowerCase();if(!q)return [];const max=Math.max(0,Math.min(500,Math.floor(limit)||0)),found=[];for(const s of dataset.core.states){const name=document.labels[s.id]||s.name;if(`${s.id} ${name} ${s.nameKey||''} ${s.entityTag}`.toLocaleLowerCase().includes(q)){found.push({id:s.id,name,entityTag:s.entityTag});if(found.length>=max)break;}}return max?found:[];},
-    setLayer(name,enabled){check();if(!Object.hasOwn(layers,name)||typeof enabled!=='boolean')throw new Error('Invalid layer');finishInteraction();layers[name]=enabled;viewDirty=true;changed();},
+    setLayer(name,enabled){check();if(!['borders','labels','cities'].includes(name)||typeof enabled!=='boolean')throw new Error('Invalid layer');finishInteraction();layers[name]=enabled;viewDirty=true;changed();},
+    setDisplayOption(name,value){check();if(!validDisplayOption(name,value))throw new Error('Invalid display option');finishInteraction();layers[name]=name==='borderColor'?value.toLowerCase():value;viewDirty=true;changed();},
     setLabel(id,text){check();document.validateIds([id]);if(typeof text!=='string'||text.length>200)throw new Error('Invalid label');finishInteraction();document.label(id,text);changed();},
     serializeDocument(){check();finishInteraction();return document.serialize(view,layers);},
     loadDocument(payload){check();const next=document.load(payload);finishInteraction(true);view=next.view;layers=next.layers;selection.clear();viewDirty=false;status='Project opened';changed(true);},
     async exportPng({width:outWidth=width,height:outHeight=height}={}){
       check();if(!Number.isInteger(outWidth)||!Number.isInteger(outHeight)||outWidth<1||outHeight<1||outWidth*outHeight>40e6||Math.max(outWidth,outHeight)>16384)throw new Error('Invalid PNG dimensions');
+      if(!ready)throw new Error('Graphics context is not ready');
+      if(exporting)throw new Error('PNG export already in progress');
       finishInteraction();
-      const target=canvas.ownerDocument.createElement('canvas'),overlay=canvas.ownerDocument.createElement('canvas'),result=canvas.ownerDocument.createElement('canvas');for(const c of [target,overlay,result]){c.width=outWidth;c.height=outHeight;}
-      let exportRenderer;
-      try{exportRenderer=createRenderer(target,dataset);exportRenderer.update(document,new Set());const exportView={x:width/2,y:height/2,scale:Math.min(outWidth/width,outHeight/height)};exportRenderer.draw(exportView,layers);drawOverlay(overlay,dataset,document,exportView,layers);const ctx=result.getContext('2d');ctx.drawImage(target,0,0);ctx.drawImage(overlay,0,0);const blob=await new Promise((resolve,reject)=>result.toBlob(b=>b?resolve(b):reject(new Error('PNG encoding failed')),'image/png'));check();return blob;}finally{exportRenderer?.dispose();exportRenderer?.gl.getExtension('WEBGL_lose_context')?.loseContext();for(const c of [target,overlay,result]){c.width=1;c.height=1;}}
+      exporting=true;
+      let target,result,exportRenderer;
+      function releaseGpu(){if(exportRenderer){exportRenderer.dispose();exportRenderer.gl.getExtension('WEBGL_lose_context')?.loseContext();exportRenderer=null;}if(target){target.width=1;target.height=1;}}
+      try{
+        target=canvas.ownerDocument.createElement('canvas');result=canvas.ownerDocument.createElement('canvas');
+        for(const c of [target,result]){c.width=outWidth;c.height=outHeight;}
+        exportRenderer=createRenderer(target,dataset);exportRenderer.update(document,new Set());
+        const exportView={x:width/2,y:height/2,scale:Math.min(outWidth/width,outHeight/height)};
+        exportRenderer.draw(exportView,layers);
+        const ctx=result.getContext('2d');if(!ctx)throw new Error('PNG canvas unavailable');
+        ctx.drawImage(target,0,0);
+        // Composite labels into the output directly, avoiding a full-size
+        // transparent overlay. Release temporary GPU storage before encoding.
+        releaseGpu();drawOverlay(result,dataset,document,exportView,layers,1,{clear:false});
+        const blob=await new Promise((resolve,reject)=>result.toBlob(b=>b?resolve(b):reject(new Error('PNG encoding failed')),'image/png'));
+        check();return blob;
+      }finally{releaseGpu();if(result){result.width=1;result.height=1;}exporting=false;}
     },
     markSaved(){check();finishInteraction();document.markSaved();viewDirty=false;emit();},resize,
     dispose(){if(disposed)return;finishInteraction(true);disposed=true;ready=false;if(raf)win.cancelAnimationFrame(raf);for(const off of listeners)off();observer?.disconnect();renderer.dispose();renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();overlayCanvas.getContext('2d').clearRect(0,0,overlayCanvas.width,overlayCanvas.height);selection.clear();}
