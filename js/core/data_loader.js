@@ -62,7 +62,27 @@ const GLOBAL_RIVERS_CONTEXT_PACK_URL = resolveDataAssetUrl("context_layer:rivers
 const GLOBAL_RAIL_CATALOG_URL = resolveDataAssetUrl("transport_catalog:rail");
 const GLOBAL_ROAD_CATALOG_URL = resolveDataAssetUrl("transport_catalog:road");
 let globalRoadContextCollectionsPromise = null;
-let globalRailContextCollectionsPromise = null;
+const globalRailContextCollectionPromises = {};
+const globalRailContextMetadataPromises = new Map();
+let activeRailContextLoads = 0;
+
+function loadRailContextMetadata(d3Client, url) {
+  // Share small catalog/manifest parses across overlapping layer loads. Release
+  // them when the batch settles; geometry never enters this temporary cache.
+  let promise = globalRailContextMetadataPromises.get(url);
+  if (!promise) {
+    promise = Promise.resolve().then(() => d3Client.json(url)).catch((error) => {
+      // Another layer may still be loading. Let a retry refresh failed metadata
+      // immediately without waiting for that unrelated request to settle.
+      if (globalRailContextMetadataPromises.get(url) === promise) {
+        globalRailContextMetadataPromises.delete(url);
+      }
+      throw error;
+    });
+    globalRailContextMetadataPromises.set(url, promise);
+  }
+  return promise;
+}
 const CONTEXT_LAYER_PACKS = {
   lakes: { url: resolveDataAssetUrl("context_layer:lakes"), format: "geojson" },
   airports: { url: resolveDataAssetUrl("context_layer:airports"), format: "geojson" },
@@ -721,47 +741,51 @@ async function loadContextLayerPackInternal(layerName, d3Client) {
     }
   }
   if (layerName === "railways" || layerName === "rail_stations_major") {
-    if (!globalThis.topojson || typeof globalThis.topojson.feature !== "function") {
+    if (layerName === "railways" && (!globalThis.topojson || typeof globalThis.topojson.feature !== "function")) {
       console.warn("[data_loader] topojson-client unavailable. Ignoring railways deferred load.");
       return null;
     }
-    globalRailContextCollectionsPromise ||= (async () => {
-      const catalog = await d3Client.json(GLOBAL_RAIL_CATALOG_URL);
-      const entries = Array.isArray(catalog?.entries) ? catalog.entries : [];
-      const railFeatures = [];
-      const stationFeatures = [];
-      for (const entry of entries) {
-        const manifestPath = String(entry?.manifest_path || "").trim();
-        if (!manifestPath) continue;
-        const manifest = await d3Client.json(manifestPath);
-        const railwaysPath = String(manifest?.paths?.preview?.railways || "").trim();
-        if (railwaysPath && Number(entry?.feature_counts?.preview?.railways || 0) > 0) {
-          const topology = await d3Client.json(railwaysPath);
-          const railwaysObject = topology?.objects?.railways;
-          const railwaysCollection = railwaysObject ? globalThis.topojson.feature(topology, railwaysObject) : null;
-          if (Array.isArray(railwaysCollection?.features) && railwaysCollection.features.length) {
-            railFeatures.push(...railwaysCollection.features);
+    globalRailContextCollectionPromises[layerName] ||= (async () => {
+      activeRailContextLoads += 1;
+      try {
+        const catalog = await loadRailContextMetadata(d3Client, GLOBAL_RAIL_CATALOG_URL);
+        const entries = Array.isArray(catalog?.entries) ? catalog.entries : [];
+        const railFeatures = [];
+        const stationFeatures = [];
+        for (const entry of entries) {
+          const manifestPath = String(entry?.manifest_path || "").trim();
+          if (!manifestPath) continue;
+          const manifest = await loadRailContextMetadata(d3Client, manifestPath);
+          const railwaysPath = String(manifest?.paths?.preview?.railways || "").trim();
+          if (layerName === "railways" && railwaysPath && Number(entry?.feature_counts?.preview?.railways || 0) > 0) {
+            const topology = await d3Client.json(railwaysPath);
+            const railwaysObject = topology?.objects?.railways;
+            const railwaysCollection = railwaysObject ? globalThis.topojson.feature(topology, railwaysObject) : null;
+            if (Array.isArray(railwaysCollection?.features) && railwaysCollection.features.length) {
+              railFeatures.push(...railwaysCollection.features);
+            }
+          }
+          const stationsPath = String(manifest?.paths?.preview?.rail_stations_major || "").trim();
+          if (layerName === "rail_stations_major" && stationsPath) {
+            const stationsCollection = await d3Client.json(stationsPath);
+            if (Array.isArray(stationsCollection?.features) && stationsCollection.features.length) {
+              stationFeatures.push(...stationsCollection.features);
+            }
           }
         }
-        const stationsPath = String(manifest?.paths?.preview?.rail_stations_major || "").trim();
-        if (stationsPath) {
-          const stationsCollection = await d3Client.json(stationsPath);
-          if (Array.isArray(stationsCollection?.features) && stationsCollection.features.length) {
-            stationFeatures.push(...stationsCollection.features);
-          }
-        }
+        return layerName === "railways"
+          ? { type: "FeatureCollection", features: railFeatures }
+          : { type: "FeatureCollection", features: stationFeatures };
+      } finally {
+        activeRailContextLoads -= 1;
+        if (!activeRailContextLoads) globalRailContextMetadataPromises.clear();
       }
-      return {
-        railways: { type: "FeatureCollection", features: railFeatures },
-        rail_stations_major: { type: "FeatureCollection", features: stationFeatures },
-      };
     })().catch((error) => {
-      globalRailContextCollectionsPromise = null;
+      delete globalRailContextCollectionPromises[layerName];
       throw error;
     });
     try {
-      const collections = await globalRailContextCollectionsPromise;
-      return collections?.[layerName] || null;
+      return await globalRailContextCollectionPromises[layerName];
     } catch (err) {
       console.warn("[data_loader] Global rail catalog or shard payload missing/invalid. Ignoring rail runtime pack.", err);
       return null;
