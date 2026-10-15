@@ -18,7 +18,8 @@ function setLanguage(next){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
   $('language-button').textContent=language==='zh'?'EN':'中文';$('language-button').setAttribute('aria-label',language==='zh'?'Switch to English':'切换到中文');
   $('state-search').placeholder=t('searchPlaceholder');$('paint-color').setAttribute('aria-label',t('colorHeading'));$('zoom-in').setAttribute('aria-label',t('zoomIn'));$('zoom-out').setAttribute('aria-label',t('zoomOut'));$('map-canvas').setAttribute('aria-label',t('mapAria'));$('back-link').setAttribute('aria-label',t('back'));
-  for(const [id,key,shortcut]of [['tool-select','select','V'],['tool-paint','paint','B'],['tool-pick','pick','I'],['tool-pan','pan','H'],['undo-button','undo','Ctrl/⌘+Z'],['redo-button','redo','Ctrl/⌘+Shift+Z']])$(id).title=`${t(key)} (${shortcut})`;
+  for(const [id,key,shortcut]of [['tool-select','select','V'],['tool-paint','paint','B'],['tool-pick','pickTitle','I'],['tool-pan','pan','H'],['undo-button','undo','Ctrl/⌘+Z'],['redo-button','redo','Ctrl/⌘+Shift+Z']])$(id).title=`${t(key)} (${shortcut})`;
+  $('tool-pick').setAttribute('aria-label',t('pick'));
   if(viewModel)render(viewModel);else{$('load-title').textContent=t(loadingController?'loading':'loadCancelled');$('load-detail').textContent=t(loadingController?'loadDetail':'cancelledDetail');}
   search();
 }
