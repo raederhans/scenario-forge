@@ -83,3 +83,61 @@ test('hidden layers yield no markers and draw can preserve an existing map canva
   assert.equal(clears,0);
   assert.equal(ctx.globalAlpha,1);
 });
+
+test('zoom redraws reuse text measurements without changing label placement', () => {
+  const dataset=fixture(40), owner=createLabelLayout(dataset), reference=createLabelLayout(dataset);
+  const document={labels:Object.fromEntries(dataset.core.states.map(state=>[state.id,state.name]))};
+  let measurements=0;
+  const measure=(text,size)=>text.length*size*.6;
+  const ctx={setTransform(){},clearRect(){},strokeText(){},fillText(){},
+    measureText(text){measurements++;return {width:measure(text,parseFloat(this.font.split(' ')[1]))};}};
+  const canvas={width:1600,height:400,getContext:()=>ctx};
+  for(let frame=0;frame<20;frame++){
+    const view={x:715+frame,y:90,scale:1+frame*.002};
+    const actual=owner.draw(canvas,document,view,layers);
+    assert.deepEqual(actual,reference.layout(document,view,layers,1600,400,measure));
+  }
+  assert.equal(measurements,40,'each unchanged font/text pair is measured once across zoom frames');
+});
+
+test('text measurement cache stays bounded and respects edits, fonts and canvas contexts', () => {
+  const owner=createLabelLayout(fixture(1)), document={labels:{0:'S0'}};
+  const view={x:50,y:50,scale:1};
+  let measurements=0;
+  const context=width=>({setTransform(){},clearRect(){},strokeText(){},fillText(){},
+    measureText(){measurements++;return {width:width+(this.font.startsWith('600')?10:0)};}});
+  let ctx=context(20);
+  const canvas={width:400,height:200,getContext:()=>ctx};
+  const draw=()=>owner.draw(canvas,document,view,layers)[0];
+  assert.equal(draw().boxes[0][2]-draw().boxes[0][0],36);
+  delete document.labels[0];
+  assert.equal(draw().boxes[0][2]-draw().boxes[0][0],26,'normal and bold widths must not be mixed');
+  for(let i=0;i<1100;i++){
+    document.labels[0]=`Renamed ${i}`;
+    assert.equal(draw().text,document.labels[0]);
+  }
+  document.labels[0]='S0';
+  const before=measurements;
+  draw();
+  assert.equal(measurements,before+1,'old names must be evicted after many edits');
+  ctx=context(70);
+  assert.equal(draw().boxes[0][2]-draw().boxes[0][0],86,'another canvas context must be measured afresh');
+});
+
+test('identical names in country, state and city fonts retain their own widths',()=>{
+  const dataset=fixture(1),document={labels:{0:'S0'}};
+  dataset.core.entities=[{tag:'AAA',name:'S0',anchor:[50,50]}];
+  dataset.places=[{stateId:0,name:'S0',x:50,y:50,isCapital:true}];
+  const owner=createLabelLayout(dataset),view={x:50,y:50,scale:.1};
+  const ctx={setTransform(){},clearRect(){},strokeText(){},fillText(){},beginPath(){},arc(){},fill(){},stroke(){},
+    measureText(){return {width:parseFloat(this.font.split(' ')[1])};}};
+  const canvas={width:400,height:200,getContext:()=>ctx};
+  const check=(options,kind,width)=>{
+    const [entry]=owner.draw(canvas,document,view,options);
+    assert.equal(entry.kind,kind);assert.equal(entry.boxes[0][2]-entry.boxes[0][0],width+6);
+  };
+  check({...layers,cities:false},'state',12);
+  delete document.labels[0];
+  check({...layers,cities:false},'country',13);
+  check({...layers,labels:false},'city',11);
+});
