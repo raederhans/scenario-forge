@@ -136,7 +136,8 @@ export function createDocument(dataset) {
     markSaved() { endPaintStroke(); saved = signature(); },
     serialize(view, layers) { return {format:'scenario-forge-hgo', schemaVersion:2, dataset:{id:dataset.manifest.id, revision:dataset.manifest.revision}, coordinateSpace:'hgo-pixel', ...snapshot(), view:{...view}, layers:{...layers}}; },
     load(payload) {
-      const p = typeof payload === 'string' ? JSON.parse(payload) : payload;
+      const parsed = typeof payload === 'string';
+      const p = parsed ? JSON.parse(payload) : payload;
       if (!plain(p) || p.format !== 'scenario-forge-hgo' || ![1,2].includes(p.schemaVersion) || p.dataset?.id !== dataset.manifest.id || p.dataset?.revision !== dataset.manifest.revision || p.coordinateSpace !== 'hgo-pixel') throw new Error('Project does not match this HGO dataset');
       if (!plain(p.paint) || !plain(p.labels)) throw new Error('Invalid project edits');
       ids(Object.keys(p.paint)); ids(Object.keys(p.labels));
@@ -144,7 +145,8 @@ export function createDocument(dataset) {
       if (!plain(p.view) || !['x','y','scale'].every(k => Number.isFinite(p.view[k])) || p.view.scale <= 0 || p.view.scale > 128 || Math.abs(p.view.x) > dataset.manifest.coordinateSpace.width * 10 || Math.abs(p.view.y) > dataset.manifest.coordinateSpace.height * 10) throw new Error('Invalid project view');
       if (!plain(p.layers)) throw new Error('Invalid project layers');
       const layers = readLayers(p.layers);
-      const next={paint:{...p.paint},labels:{...p.labels},owners:{},palette:{},createdCountries:{}};
+      // Parsed JSON is private to this load; only caller-owned objects need copies.
+      const next={paint:parsed?p.paint:{...p.paint},labels:parsed?p.labels:{...p.labels},owners:{},palette:{},createdCountries:{}};
       if (p.schemaVersion===2) {
         if (!plain(p.owners) || !plain(p.palette) || !plain(p.createdCountries)) throw new Error('Invalid country edits');
         for (const [tag,entry] of Object.entries(p.createdCountries)) {
