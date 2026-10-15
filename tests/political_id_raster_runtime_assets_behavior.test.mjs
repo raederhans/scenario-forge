@@ -7,6 +7,34 @@ import { createPoliticalIdRasterAssetStore, decodePoliticalIdRasterAsset, encode
 const EDGE_FLAG = 0x80000000;
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 
+test("startup boundary waits for every writable-ready condition and preserves wait failure", async t => {
+  const { waitRasterStartup } = await import("../tools/political_id_raster_app_session.mjs");
+  const priorWindow = globalThis.window;
+  t.after(() => { if (priorWindow === undefined) delete globalThis.window; else globalThis.window = priorWindow; });
+  const ready = { bootPhase: "ready", startupReadonly: false, startupReadonlyUnlockInFlight: false, scenarioApplyInFlight: false };
+  let finish;
+  const pending = new Promise(resolve => { finish = resolve; });
+  let returned = false;
+  const waiting = waitRasterStartup({ waitForFunction(predicate, arg, options) {
+    assert.equal(arg, null);
+    assert.deepEqual(options, { timeout: 60000 });
+    for (const blocked of [{ bootPhase: "loading" }, { startupReadonly: true },
+      { startupReadonlyUnlockInFlight: true }, { scenarioApplyInFlight: true }]) {
+      globalThis.window = { __rasterTask: { state: { ...ready, ...blocked } } };
+      assert.equal(predicate(), false);
+    }
+    globalThis.window = { __rasterTask: { state: ready } };
+    assert.equal(predicate(), true);
+    return pending;
+  } }).then(() => { returned = true; });
+  await tick();
+  assert.equal(returned, false, "callers cannot advance before the browser readiness wait");
+  finish(); await waiting;
+  assert.equal(returned, true);
+  const failure = new Error("startup deadline");
+  await assert.rejects(waitRasterStartup({ waitForFunction: async () => { throw failure; } }), error => error === failure);
+});
+
 test("cache release gate requires a persisted normal view, the same revisit view and real disk hits", async () => {
   const { assertRasterCacheRevisit } = await import("../tools/verify_political_id_raster_integration.mjs");
   const warm = { storage: { entries: 1, bytes: 1048744 }, diagnostics: { view: { x: 0, y: 0, k: 1, dpr: 2 } } };

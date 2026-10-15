@@ -344,6 +344,7 @@ export const DELIVERY_RUNTIME_RECORDS = [
       "tools/check_console_allowlist_decay.mjs",
       "tools/check_test_timeout_guardrails.mjs",
       "tools/test_timing_summary.mjs",
+      ".github/workflows/raster-release-regression.yml",
       ".github/workflows/pr-verify.yml",
       ".github/workflows/transport-contract-required.yml",
       ".github/workflows/verify-shared.yml"
@@ -865,7 +866,8 @@ export const DELIVERY_RUNTIME_RECORDS = [
     "commandRef": "test:node:release-smoke-helper",
     "sourceRefs": [
       "tests/release_smoke_retry_behavior.node.test.mjs",
-      "tests/e2e/support/release-smoke.js"
+      "tests/e2e/support/release-smoke.js",
+      ".github/workflows/raster-release-regression.yml"
     ],
     "ownerHints": [
       "release-smoke"

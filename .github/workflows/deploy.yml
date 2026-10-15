@@ -119,6 +119,10 @@ jobs:
             /tests/e2e/support/
             /tools/verify_political_id_raster_integration.mjs
             /tools/political_id_raster_app_session.mjs
+            /apps/hgo/index.html
+            /apps/hgo/styles.css
+            /apps/hgo/src/
+            /apps/hgo/assets/default/
 
       - name: Setup Node for release smoke
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -151,6 +155,67 @@ jobs:
           SCENARIO_FORGE_PAGES_URL: ${{ steps.deployment.outputs.page_url }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ steps.deployment.outputs.page_url }}
         run: npm run test:e2e:pages-public-release-gate
+
+      - name: Verify deployed HGO bytes against source SHA
+        env:
+          PAGES_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {createHash} from 'node:crypto';
+          import {readFile, readdir, realpath} from 'node:fs/promises';
+          import path from 'node:path';
+
+          const sourceSha = process.env.GITHUB_SHA;
+          assert.match(sourceSha || '', /^[0-9a-f]{40}$/i);
+          const base = new URL(process.env.PAGES_URL);
+          assert.equal(base.protocol, 'https:');
+          if (!base.pathname.endsWith('/')) base.pathname += '/';
+          const source = path.resolve('apps/hgo'), dataset = path.join(source, 'assets/default');
+          const files = new Set(['index.html', 'styles.css', 'assets/default/manifest.json']);
+          const within = (root, filename) => {
+            const relative = path.relative(root, filename);
+            assert.ok(relative && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative), 'HGO path escapes its source');
+            return relative.split(path.sep).join('/');
+          };
+          async function collect(directory) {
+            for (const entry of await readdir(directory, {withFileTypes:true})) {
+              const filename = path.join(directory, entry.name);
+              if (entry.isDirectory()) await collect(filename);
+              else if (['.js', '.json', '.css'].includes(path.extname(entry.name))) files.add(within(source, await realpath(filename)));
+            }
+          }
+          await collect(path.join(source, 'src'));
+          const manifest = JSON.parse(await readFile(path.join(dataset, 'manifest.json'), 'utf8'));
+          for (const url of [...Object.values(manifest.assets).map(asset => asset.url), manifest.source.provenanceUrl]) {
+            assert.ok(typeof url === 'string' && url && !/[?#]/.test(url) && !/^[a-z][a-z0-9+.-]*:/i.test(url), 'Expected a relative dataset asset');
+            const decoded = decodeURIComponent(url);
+            assert.ok(!decoded.startsWith('/') && !decoded.includes('\\') && !decoded.includes(':'), 'Invalid dataset asset path');
+            const filename = await realpath(path.resolve(dataset, decoded));
+            within(dataset, filename);
+            files.add(within(source, filename));
+          }
+          const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+          console.log(JSON.stringify({sourceSha, verification:'deployed-hgo-source-bytes', files:files.size}));
+          let totalBytes = 0;
+          for (const filename of [...files].sort()) {
+            let expected = await readFile(path.join(source, filename));
+            if (filename === 'index.html') {
+              const html = expected.toString('utf8');
+              assert.equal(html.split('href="../../index.html"').length - 1, 1);
+              expected = Buffer.from(html.replace('href="../../index.html"', 'href="../app/"'));
+            }
+            const url = new URL(`hgo/${filename.split('/').map(encodeURIComponent).join('/')}`, base);
+            const response = await fetch(url, {cache:'no-store', signal:AbortSignal.timeout(15000)});
+            assert.ok(response.ok, `${filename}: HTTP ${response.status}`);
+            const actual = Buffer.from(await response.arrayBuffer());
+            const expectedHash = digest(expected), actualHash = digest(actual);
+            console.log(JSON.stringify({sourceSha, file:filename, expectedHash, actualHash, bytes:actual.length}));
+            assert.equal(actualHash, expectedHash, `${filename}: deployed HGO bytes differ from source ${sourceSha}`);
+            totalBytes += actual.length;
+          }
+          console.log(JSON.stringify({sourceSha, verifiedFiles:files.size, totalBytes, passed:true}));
+          JS
 
       - name: Upload deployed Pages failure evidence
         if: failure() && steps.pages_smoke.outcome == 'failure'
