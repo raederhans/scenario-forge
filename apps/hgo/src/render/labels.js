@@ -1,5 +1,6 @@
 const WORLD_CELL = 256, SCREEN_CELL = 48;
 const BUDGETS = {low:96, medium:180, high:300};
+const TEXT_WIDTH_LIMIT = 1024;
 const overlaps = (a,b) => a[0]<b[2] && a[2]>b[0] && a[1]<b[3] && a[3]>b[1];
 function hash(value) {
   let result = 2166136261;
@@ -14,6 +15,8 @@ function cells(box,size,visit) {
 
 export function createLabelLayout(dataset) {
   const world = new Map(),countryWorld = new Map();
+  const textWidths = new Map();
+  let measurementContext = null;
   let previous = new Set();
   let countryDocument=null,countryRevision;
   function add(index,kind,id,source,x,y) {
@@ -105,10 +108,20 @@ export function createLabelLayout(dataset) {
 
   function draw(canvas,document,view,layers,pixelRatio=1,{clear=true}={}) {
     const ctx=canvas.getContext('2d'), width=canvas.width/pixelRatio, height=canvas.height/pixelRatio;
+    if (measurementContext!==ctx) { textWidths.clear(); measurementContext=ctx; }
     ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0); if (clear) ctx.clearRect(0,0,width,height);
     const font = (size,bold) => `${bold?'600':'500'} ${size}px system-ui, sans-serif`;
     const entries=layout(document,view,layers,width,height,(text,size,bold) => {
-      ctx.font=font(size,bold); return ctx.measureText(text).width;
+      // Font sizes stay in CSS pixels during zoom; only anchors move. Reuse
+      // widths (including rejected candidates), with bounded storage for edits.
+      const face=font(size,bold), key=`${face}\n${text}`;
+      let textWidth=textWidths.get(key);
+      if (textWidth===undefined) {
+        ctx.font=face; textWidth=ctx.measureText(text).width;
+        if (textWidths.size>=TEXT_WIDTH_LIMIT) textWidths.delete(textWidths.keys().next().value);
+        textWidths.set(key,textWidth);
+      }
+      return textWidth;
     });
     ctx.textAlign='center'; ctx.textBaseline='middle';
     for (const entry of entries) {

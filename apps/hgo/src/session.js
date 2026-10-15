@@ -10,17 +10,19 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
   const listeners=[],win=canvas.ownerDocument.defaultView;
   const scopeStates=createPaintScopes(dataset,document);
   let paintScope='state',pendingClick=null,spacePan=false,brushPoints=[],lastPointerWasDrag=false;
-  let viewDirty=false,exporting=false,projectGeneration=0;
+  let viewDirty=false,exporting=false,projectGeneration=0,viewNotificationPending=false;
   function listen(target,event,handler,options){target.addEventListener(event,handler,options);listeners.push(()=>target.removeEventListener(event,handler,options));}
   function model(){return {ready:ready&&!disposed,dirty:document.dirty||viewDirty,tool,color,paintScope,countryRevision:document.revision,ownerRevision:document.ownerRevision,projectGeneration,selection:[...selection].map(id=>{const s=dataset.stateById.get(id);return {id:s.id,name:document.labels[id]||s.name,entityTag:document.owner(id),originalEntityTag:s.entityTag,color:document.color(id)};}),canUndo:document.canUndo,canRedo:document.canRedo,zoom:view.scale,layers:{...layers},stats:{stateCount:dataset.core.states.length,provinceCount:dataset.core.provinceIds.length-1},status};}
-  function emit(){if(!disposed)onChange(model());}
-  function draw(){raf=0;if(!ready||disposed)return;try{if(flushBrush()){renderer.update(document,selection);emit();}const ratio=canvas.width/(canvas.clientWidth||1);renderer.draw(view,layers,ratio);drawOverlay(overlayCanvas,dataset,document,view,layers,ratio);}catch(e){onError(e);}}
+  function emit(){viewNotificationPending=false;if(!disposed)onChange(model());}
+  function draw(){raf=0;if(!ready||disposed)return;try{if(flushBrush()){renderer.update(document,selection);emit();}if(viewNotificationPending)emit();if(!ready||disposed)return;const ratio=canvas.width/(canvas.clientWidth||1);renderer.draw(view,layers,ratio);drawOverlay(overlayCanvas,dataset,document,view,layers,ratio);}catch(e){onError(e);}}
   function schedule(){if(!raf&&!disposed&&ready)raf=win.requestAnimationFrame(draw);}
-  function changed(palette=false){if(disposed)return;if(palette&&ready)renderer.update(document,selection);schedule();emit();}
+  // Only wheel view notifications wait for paint. A synchronous action publishes
+  // the latest complete model and consumes any pending view notification.
+  function changed(palette=false,deferViewNotification=false){if(disposed)return;if(palette&&ready)renderer.update(document,selection);schedule();if(deferViewNotification&&ready)viewNotificationPending=true;else emit();}
   function resize(){if(disposed)return;const ratio=Math.min(win.devicePixelRatio||1,2);for(const c of [canvas,overlayCanvas]){const w=Math.max(1,Math.round(canvas.clientWidth*ratio)),h=Math.max(1,Math.round(canvas.clientHeight*ratio));if(c.width!==w)c.width=w;if(c.height!==h)c.height=h;}schedule();}
   function fit(initial=false){check();finishInteraction();view={x:width/2,y:height/2,scale:Math.min((canvas.clientWidth||width)/width,(canvas.clientHeight||height)/height)*.96};if(!initial)viewDirty=true;changed();}
   function check(){if(disposed)throw new Error('HGO session has been disposed');}
-  function zoom(factor,anchor){check();if(!Number.isFinite(factor)||factor<=0)throw new Error('Invalid zoom factor');finishInteraction();const previous=view.scale;view.scale=Math.min(128,Math.max(.015,previous*factor));if(anchor){view.x+=anchor[0]/previous-anchor[0]/view.scale;view.y+=anchor[1]/previous-anchor[1]/view.scale;}viewDirty=true;changed();}
+  function zoom(factor,anchor,deferViewNotification=false){check();if(!Number.isFinite(factor)||factor<=0)throw new Error('Invalid zoom factor');finishInteraction();const previous=view.scale;view.scale=Math.min(128,Math.max(.015,previous*factor));if(anchor){view.x+=anchor[0]/previous-anchor[0]/view.scale;view.y+=anchor[1]/previous-anchor[1]/view.scale;}viewDirty=true;changed(false,deferViewNotification);}
   function position(e){const r=canvas.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
   const timeout=(fn,ms)=>(win.setTimeout||setTimeout)(fn,ms);
   const clearTimer=id=>(win.clearTimeout||clearTimeout)(id);
@@ -108,7 +110,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
   });
   const cancel=()=>{finishInteraction(true);changed(true);};
   listen(canvas,'pointercancel',cancel);listen(canvas,'lostpointercapture',()=>{if(drag)cancel();});
-  listen(canvas,'wheel',e=>{e.preventDefault();if(!ready)return;finishInteraction();const [x,y]=position(e);zoom(Math.exp(-Math.max(-100,Math.min(100,e.deltaY))*.003),[x-canvas.clientWidth/2,y-canvas.clientHeight/2]);},{passive:false});
+  listen(canvas,'wheel',e=>{e.preventDefault();if(!ready)return;finishInteraction();const [x,y]=position(e);zoom(Math.exp(-Math.max(-100,Math.min(100,e.deltaY))*.003),[x-canvas.clientWidth/2,y-canvas.clientHeight/2],true);},{passive:false});
   listen(canvas,'webglcontextlost',e=>{e.preventDefault();finishInteraction(true);ready=false;renderer.dispose({contextLost:true});status='Graphics context lost; waiting for recovery';if(raf)win.cancelAnimationFrame(raf);raf=0;emit();});
   listen(canvas,'webglcontextrestored',()=>{if(disposed)return;try{renderer=createRenderer(canvas,dataset);ready=true;status='Graphics context restored';changed(true);}catch(e){ready=false;status=e.message;onError(e);emit();}});
   const observer=typeof win.ResizeObserver==='function'?new win.ResizeObserver(resize):null;observer?.observe(canvas);if(!observer)listen(win,'resize',resize);
@@ -135,7 +137,7 @@ export function createHgoSession({canvas,overlayCanvas,dataset,onChange=()=>{},o
     paintStates(values,value){check();document.validateIds(values);if(!validColor(value))throw new Error('Invalid paint color');finishInteraction();document.paintStates(values,value);changed(true);},
     resetSelection(){check();finishInteraction(true);selection.clear();changed(true);},
     undo(){check();finishInteraction();document.undo();changed(true);},redo(){check();finishInteraction();document.redo();changed(true);},
-    fit(){fit();},zoomBy:zoom,
+    fit(){fit();},zoomBy(factor,anchor){zoom(factor,anchor);},
     focusState(id){check();const s=dataset.stateById.get(String(id));if(!s)throw new Error('Unknown state');finishInteraction();const b=s.bounds||[s.anchor[0]-10,s.anchor[1]-10,s.anchor[0]+10,s.anchor[1]+10];view={x:s.anchor[0],y:s.anchor[1],scale:Math.min(32,Math.max(.1,Math.min(canvas.clientWidth/Math.max(8,b[2]-b[0]),canvas.clientHeight/Math.max(8,b[3]-b[1]))*.55))};viewDirty=true;selection=new Set([String(id)]);changed(true);},
     search(query,{limit=50}={}){check();const q=String(query).trim().toLocaleLowerCase();if(!q)return [];const max=Math.max(0,Math.min(500,Math.floor(limit)||0)),found=[];for(const s of dataset.core.states){const name=document.labels[s.id]||s.name;if(`${s.id} ${name} ${s.nameKey||''} ${document.owner(s.id)} ${s.entityTag}`.toLocaleLowerCase().includes(q)){found.push({id:s.id,name,entityTag:document.owner(s.id),originalEntityTag:s.entityTag});if(found.length>=max)break;}}return max?found:[];},
     setLayer(name,enabled){check();if(!['borders','labels','cities'].includes(name)||typeof enabled!=='boolean')throw new Error('Invalid layer');finishInteraction();layers[name]=enabled;viewDirty=true;changed();},

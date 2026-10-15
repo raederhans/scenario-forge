@@ -13,9 +13,10 @@ function fixture(){
   return {manifest:{id:'test',revision:'1',coordinateSpace:{width:4,height:2}},core,
     ids:new Uint16Array([1,2,2,3,1,2,2,3]),...validateCore(core,4,2)};
 }
-function harness(){
+function harness(onChange=()=>{}){
   const handlers=new Map(),timers=new Map(),frames=new Map(),captures=new Set();let serial=0;
-  const gl=new Proxy({NO_ERROR:0,getParameter:()=>8192,getShaderParameter:()=>true,getProgramParameter:()=>true,getError:()=>0,getExtension:()=>null},
+  const draws=[];
+  const gl=new Proxy({NO_ERROR:0,getParameter:()=>8192,getShaderParameter:()=>true,getProgramParameter:()=>true,getError:()=>0,getExtension:()=>null,drawArrays:(...args)=>draws.push(args)},
     {get:(t,k)=>k in t?t[k]:k.toUpperCase()===k?++serial:()=>({})});
   const win={devicePixelRatio:1,requestAnimationFrame:fn=>{const id=++serial;frames.set(id,fn);return id;},cancelAnimationFrame:id=>frames.delete(id),
     setTimeout:fn=>{const id=++serial;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id),
@@ -26,10 +27,10 @@ function harness(){
     addEventListener:(n,f)=>handlers.set(n,f),removeEventListener:n=>handlers.delete(n)};
   const overlayCanvas={width:400,height:200,getContext:()=>ctx};
   const models=[];
-  const session=createHgoSession({canvas,overlayCanvas,dataset:fixture(),onChange:vm=>models.push(vm)});
+  const session=createHgoSession({canvas,overlayCanvas,dataset:fixture(),onChange:vm=>{models.push(vm);onChange(vm);}});
   const {view}=session.serializeDocument();
   function event(name,x,y,extra={}){handlers.get(name)({button:0,pointerId:1,clientX:200+(x-2)*view.scale,clientY:100+(y-1)*view.scale,preventDefault(){},...extra});}
-  return {session,event,handlers,frames,timers,models,finishClicks(){for(const fn of timers.values())fn();timers.clear();}};
+  return {session,event,handlers,frames,timers,models,draws,finishClicks(){for(const fn of timers.values())fn();timers.clear();}};
 }
 test('scope follows original owner, never cores or worldwide water; trace visits narrow intervening states',()=>{
   const d=fixture(),scope=createPaintScopes(d);
@@ -77,4 +78,70 @@ test('serializing a click preview publishes its committed undo state',()=>{
   assert.equal(h.models.at(-1).canUndo,false);
   assert.equal(Object.keys(h.session.serializeDocument().paint).length,1);
   assert.equal(h.models.at(-1).canUndo,true);h.session.dispose();
+});
+
+function flushFrame(h){const callbacks=[...h.frames.values()];h.frames.clear();for(const fn of callbacks)fn();}
+
+test('wheel bursts publish one latest view per frame while state and anchored zoom stay immediate',()=>{
+  const h=harness(),s=h.session;flushFrame(h);h.models.length=0;
+  const before=s.serializeDocument().view,anchor=[-before.scale,-.5*before.scale];
+  for(let i=0;i<60;i++)h.event('wheel',1,.5,{deltaY:1});
+  assert.equal(h.frames.size,1);
+  const after=s.serializeDocument().view;
+  assert.ok(Math.abs(after.scale-before.scale*Math.exp(-.003*60))<1e-9);
+  assert.ok(Math.abs(after.x+anchor[0]/after.scale-1)<1e-9);
+  assert.ok(Math.abs(after.y+anchor[1]/after.scale-.5)<1e-9);
+  assert.equal(s.getViewModel().dirty,true,'unsaved view must be visible before the next frame');
+  flushFrame(h);
+  assert.equal(h.models.length,1,'60 wheel events must share one UI refresh');
+  assert.equal(h.models[0].zoom,after.scale);
+  assert.equal(h.frames.size,0);
+  s.dispose();
+});
+
+test('synchronous actions consume pending wheel notifications without a duplicate next frame',()=>{
+  const h=harness(),s=h.session;flushFrame(h);
+  for(const action of [()=>s.zoomBy(.9),()=>s.fit(),()=>s.setSelection([1]),
+    ()=>s.setTool('pick'),()=>s.pickColor(1),()=>s.markSaved(),
+    ()=>s.loadDocument(s.serializeDocument())]){
+    h.models.length=0;
+    h.event('wheel',1,.5,{deltaY:1});
+    assert.equal(h.models.length,0,'wheel-only notification waits for paint');
+    action();
+    assert.equal(h.models.length,1,'public action still notifies synchronously');
+    assert.deepEqual(h.models[0],s.getViewModel());
+    flushFrame(h);
+    assert.equal(h.models.length,1);
+  }
+  s.dispose();
+});
+
+test('wheel batching preserves immediate paint commits and context-loss/disposal boundaries',()=>{
+  const h=harness(),s=h.session;
+  s.setTool('paint');h.event('pointerdown',.5,.5);h.event('pointerup',.5,.5);
+  flushFrame(h);h.models.length=0;
+  h.event('wheel',1,.5,{deltaY:1});
+  assert.equal(h.models.length,1,'ending the pending paint edit must notify immediately');
+  assert.equal(h.models[0].canUndo,true);
+  assert.equal(h.timers.size,0);
+  h.handlers.get('webglcontextlost')({preventDefault(){}});
+  assert.equal(h.models.length,2);assert.equal(h.models.at(-1).ready,false);
+  assert.equal(h.frames.size,0);
+  h.handlers.get('webglcontextrestored')();
+  assert.equal(h.models.length,3);assert.equal(h.models.at(-1).ready,true);
+  flushFrame(h);assert.equal(h.models.length,3);
+  h.event('wheel',1,.5,{deltaY:1});
+  const lateFrame=[...h.frames.values()][0];
+  s.dispose();assert.equal(h.frames.size,0);
+  lateFrame();assert.equal(h.models.length,3,'disposed sessions cannot deliver a pending notification');
+});
+
+test('a deferred view callback can dispose the session before rendering',()=>{
+  let disposeOnChange=false;
+  const h=harness(()=>{if(disposeOnChange)h.session.dispose();});
+  flushFrame(h);h.draws.length=0;
+  h.event('wheel',1,.5,{deltaY:1});disposeOnChange=true;
+  flushFrame(h);
+  assert.equal(h.draws.length,0,'notification must not draw using disposed graphics resources');
+  assert.equal(h.session.getViewModel().ready,false);
 });
