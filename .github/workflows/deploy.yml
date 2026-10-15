@@ -229,3 +229,41 @@ jobs:
             .runtime/reports/test-timings.ndjson
             .runtime/reports/generated/failure-context-index.ndjson
             .runtime/tests/playwright/
+
+  timing-summary:
+    name: Deployment timing summary
+    needs: [verify, build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    # Diagnostics only: never change the result or dependencies of release gates.
+    continue-on-error: true
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout timing reporter
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/deploy_timing_summary.py
+
+      - name: Summarize deployment stage durations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .runtime/tmp
+          if curl --fail --silent --show-error --connect-timeout 5 --max-time 20 \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" \
+            > .runtime/tmp/deploy-jobs.json \
+            && python tools/deploy_timing_summary.py < .runtime/tmp/deploy-jobs.json >> "$GITHUB_STEP_SUMMARY"; then
+            echo "Deployment timing summary written."
+          else
+            echo "::warning::Deployment timing data unavailable; see individual job logs."
+            echo "Deployment timing data unavailable; see individual job logs. Release gate results are unchanged." >> "$GITHUB_STEP_SUMMARY"
+          fi
