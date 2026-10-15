@@ -75,3 +75,18 @@ test("verification control-plane files remain fail-closed when unregistered", ()
   assert.deepEqual(report.autoOwnedChangedFiles, []);
   assert.deepEqual(report.unmatchedChangedFiles, [".github/workflows/unregistered.yml"]);
 });
+
+test("raster release workflow keeps release and test-infrastructure routes", () => {
+  const report = buildRepositoryRecommendation([".github/workflows/raster-release-regression.yml"]);
+  assert.deepEqual(report.unmatchedChangedFiles, []);
+  assert.deepEqual(report.autoOwnedChangedFiles, []);
+  const release = report.recommendedCommands.find(entry => entry.commandRef === "test:node:release-smoke-helper");
+  assert.ok(release);
+  assert.ok(release.domains.includes("release-smoke"));
+  assert.ok(release.executionOwners.includes("child-safe"));
+  const infra = report.recommendedCommands.find(entry => entry.commandRef === "python -m unittest tests.test_e2e_structural_tooling -q");
+  assert.ok(infra);
+  assert.ok(infra.ownerHints.includes("test-infra"));
+  assert.ok(infra.executionOwners.includes("child-safe"));
+  assert.deepEqual(buildExecutionPlan(report).routeGaps, []);
+});

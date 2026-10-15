@@ -74,12 +74,17 @@ export async function openRasterApp(baseUrl, { dpr = 1, viewport = { width: 1280
       const scenarios = await import(new URL("js/core/scenario_manager.js", document.baseURI));
       window.__rasterTask = { renderer, state, scenarios };
     });
-    await page.waitForFunction(() => {
-      const s = window.__rasterTask.state;
-      return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
-    }, null, { timeout: 60000 });
+    await waitRasterStartup(page);
     return { browser, context, page, errors, network, warnings };
   } catch (error) { await browser.close(); throw error; }
+}
+
+// Initial navigation and cache reload share the same startup boundary.
+export async function waitRasterStartup(page) {
+  await page.waitForFunction(() => {
+    const s = window.__rasterTask.state;
+    return s.bootPhase === "ready" && !s.startupReadonly && !s.startupReadonlyUnlockInFlight && !s.scenarioApplyInFlight;
+  }, null, { timeout: 60000 });
 }
 
 export async function selectRasterScenario(page, scenarioId) {

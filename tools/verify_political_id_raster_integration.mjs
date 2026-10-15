@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
-import { openRasterApp, waitRasterView } from "./political_id_raster_app_session.mjs";
+import { openRasterApp, waitRasterStartup, waitRasterView } from "./political_id_raster_app_session.mjs";
 
 export function readSettledRasterFrame({ zoom, captureReference = false, precise = true, settleOnly = false } = {}) {
   const needPrecise = !captureReference && precise;
@@ -351,18 +351,34 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     assert.deepEqual(session.errors, []);
     report.passed = true;
   }
-  async function readNormalStartupCache() {
+  async function readNormalStartupCache(stage) {
+    const started = performance.now();
+    const timing = { stage };
+    (report.cacheStartupTimings ||= []).push(timing);
+    const mark = key => { timing[key] = Math.round(performance.now() - started); };
     const url = new URL(page.url()); url.searchParams.set('political_id_raster', '1');
     await page.goto(url.href, { waitUntil: 'domcontentloaded' });
+    mark('navigationCompleteMs');
     await page.evaluate(async () => {
       window.__rasterTask = { renderer: await import(new URL('js/core/map_renderer.js', document.baseURI)),
         ...(await import(new URL('js/core/state.js', document.baseURI))) };
     });
-    await waitRasterView(page, scenarioId); await settled(page, true);
+    mark('importsCompleteMs');
+    timing.bootAtImport = await page.evaluate(() => {
+      const s = window.__rasterTask.state;
+      return { bootPhase: s.bootPhase, readonly: s.startupReadonly,
+        unlocking: s.startupReadonlyUnlockInFlight, applying: s.scenarioApplyInFlight };
+    });
+    // Match initial navigation: coverage gets its own window after startup.
+    // The enclosing phase still has its original 120-second total deadline.
+    await waitRasterStartup(page); mark('startupReadyMs');
+    await waitRasterView(page, scenarioId); mark('rasterReadyMs');
+    await settled(page, true); mark('settledMs');
     await page.waitForFunction(() => {
       const assets = window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics().assets;
       return assets.pendingReads === 0 && assets.pendingWrites === 0;
     }, null, { timeout: 30000 });
+    mark('cacheIdleMs');
     const diagnostics = await page.evaluate(() => window.__rasterTask.renderer.getPoliticalIdRasterDiagnostics());
     assert.equal(diagnostics.failed, ''); assert.equal(diagnostics.assetError, '');
     assert.ok(diagnostics.assetHits > 0, 'normal startup must admit validated coverage');
@@ -385,13 +401,13 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
   async function warmNormalStartupCache() {
     // The faulted recovery view and zoomed/edited coverage are not a normal
     // startup cache baseline. Load that actual view and let its writes finish.
-    report.cacheWarm = await readNormalStartupCache();
+    report.cacheWarm = await readNormalStartupCache('warm');
     assert.ok(report.cacheWarm.storage.entries > 0 && report.cacheWarm.storage.bytes > 0,
       'normal startup must persist real coverage before revisit');
   }
   async function verifyCacheRevisit() {
     assert.ok(report.cacheWarm, 'establish normal startup coverage before the warm revisit');
-    report.revisit = await readNormalStartupCache();
+    report.revisit = await readNormalStartupCache('revisit');
     assertRasterCacheRevisit(report.cacheWarm, report.revisit);
   }
   async function close() {
@@ -401,7 +417,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     await fs.mkdir(output, { recursive: true });
     await fs.writeFile(path.join(output, `${scenarioId}-dpr${dpr}.json`), JSON.stringify(report, null, 2) + "\n");
     console.log(JSON.stringify({ scenarioId, dpr, viewport, expectNativeBudgetFallback, passed: report.passed, error: report.error,
-      failedStage: report.failedStage, failureDiagnostics: report.failureDiagnostics,
+      failedStage: report.failedStage, failureDiagnostics: report.failureDiagnostics, cacheStartupTimings: report.cacheStartupTimings,
       recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
         recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
       views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })),
