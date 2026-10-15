@@ -1,6 +1,18 @@
 // Internal catalog definitions. Consumers use verification_catalog_source.mjs.
 export const DELIVERY_RUNTIME_RECORDS = [
   {
+    id: "pages:deployment-timing-summary",
+    commandRef: "python -m unittest tests.test_deploy_timing_summary -q",
+    sourceRefs: [
+      "tools/deploy_timing_summary.py", "tests/test_deploy_timing_summary.py",
+      ".github/workflows/deploy.yml",
+    ],
+    ownerHints: ["deploy-runtime"], domains: ["pages-dist"], tiers: ["contract"],
+    cost: "fast", resourceLocks: [], executionOwners: ["child-safe"], profiles: ["pr-fast"],
+    platforms: ["all"], entrypointPolicyIndex: 4, verificationOrder: null, selectorOrder: 406,
+    verification: null, selector: {},
+  },
+  {
     id: "pages:artifact-admission-contract",
     commandRef: "python -m unittest tests.test_pages_artifact_admission -q",
     sourceRefs: [
