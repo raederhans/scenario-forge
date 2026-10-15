@@ -235,9 +235,20 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
       report.completedStages.push(name);
     } catch (error) {
       report.passed = false; report.error = String(error.stack || error); report.failedStage = name;
-      try { report.failureDiagnostics = await page.evaluate(() => {
+      try { report.failureDiagnostics = await page.evaluate(expectedScenario => {
         const { renderer, state: s } = window.__rasterTask;
-        return { raster: renderer.getPoliticalIdRasterDiagnostics(), faults: window.__rasterAssetFaults,
+        const raster = renderer.getPoliticalIdRasterDiagnostics();
+        return { raster, faults: window.__rasterAssetFaults,
+          bootPhase: s.bootPhase, startupReadonly: s.startupReadonly,
+          startupReadonlyUnlockInFlight: s.startupReadonlyUnlockInFlight,
+          bootBlocking: s.bootBlocking, firstVisibleFramePainted: s.firstVisibleFramePainted,
+          visibilityState: document.visibilityState, documentReadyState: document.readyState,
+          zoomTransform: { x: s.zoomTransform?.x, y: s.zoomTransform?.y, k: s.zoomTransform?.k },
+          waitConditions: { requestedScenario: s.activeScenarioId === expectedScenario,
+            scenarioIdle: !s.scenarioApplyInFlight, startupWritable: !s.startupReadonly,
+            selected: !!raster.selected, idle: !raster.pending, committed: raster.commits > 0,
+            noFailure: !raster.failed, hasView: !!raster.view,
+            matchingView: !!raster.view && !!s.zoomTransform && ['x', 'y', 'k'].every(key => Math.abs(raster.view[key] - s.zoomTransform[key]) < 1e-7) },
           phase: s.renderPhase, scenario: s.activeScenarioId, isInteracting: s.isInteracting,
           dirty: s.renderPassCache?.dirty, background: s.renderPerfMetrics?.drawPoliticalBackgroundFillsPass,
           deferExactAfterSettle: s.deferExactAfterSettle, exactAfterSettleHandle: s.exactAfterSettleHandle,
@@ -245,7 +256,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
           chunks: Object.fromEntries(["pendingReason", "refreshScheduled", "promotionScheduled", "pendingPromotion",
             "pendingInfraPromotion", "promotionCommitInFlight"].map(key => [key, s.runtimeChunkLoadState?.[key]])),
           status: document.querySelector("#politicalRasterTrialStatus")?.textContent };
-      }); } catch { /* browser watchdog */ }
+      }, scenarioId); } catch { /* browser watchdog */ }
       throw error;
     } finally {
       clearTimeout(watchdog);
@@ -390,6 +401,7 @@ export async function createRasterIntegrationCheck({ baseUrl, scenarioId, dpr = 
     await fs.mkdir(output, { recursive: true });
     await fs.writeFile(path.join(output, `${scenarioId}-dpr${dpr}.json`), JSON.stringify(report, null, 2) + "\n");
     console.log(JSON.stringify({ scenarioId, dpr, viewport, expectNativeBudgetFallback, passed: report.passed, error: report.error,
+      failedStage: report.failedStage, failureDiagnostics: report.failureDiagnostics,
       recovery: report.recovery ? { injected: report.recovery.injected, probes: report.recovery.recovered.assetProbes,
         recoveries: report.recovery.recovered.assetRecoveries, hits: report.recovery.recovered.assetHits } : undefined,
       views: report.views.map(view => ({ zoom: view.zoom, hits: view.diagnostics.assetHits, builds: view.diagnostics.builds, pixels: view.pixels })),
