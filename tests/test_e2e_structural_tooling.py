@@ -2118,7 +2118,8 @@ jobs:
         self.assertNotIn("npm run perf:williams-crossover:run", workflow)
         self.assertNotRegex(workflow, r"--retries(?:=|\s)[1-9]")
         self.assertIn("fail-fast: false", jobs["linux-core"])
-        self.assertIn("shard: [1, 2, 3]", jobs["linux-core"])
+        self.assertIn("shard: [1, 2]", jobs["linux-core"])
+        self.assertEqual(parse_job_scalar(jobs["linux-core"], "name"), "Nightly Linux Core ${{ matrix.shard }}/2")
         self.assertEqual(parse_job_scalar(jobs["linux-core"], "runs-on"), "ubuntu-latest")
         self.assertEqual(parse_job_scalar(jobs["p4-checker-boundaries"], "runs-on"), "windows-latest")
         self.assertEqual(parse_job_scalar(jobs["p4-full-policy"], "runs-on"), "windows-latest")
@@ -2283,6 +2284,7 @@ jobs:
         ))
         self.assertNotIn("pages-dist", linux_core_run)
         self.assertNotIn("p4-", linux_core_run)
+        self.assertIn("--nightly-linux-core --shard-index ${{ matrix.shard }} --shard-count 2 ", linux_core_run)
 
         windows_commands = {
             parse_step_run(step)

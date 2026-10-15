@@ -488,43 +488,55 @@ test("default core rejects missing metadata and restrictive duplicate records", 
   assert.deepEqual(commandRefs(buildCoreVerificationPlan({ ...options, includeReserved: true })), groups[0].commands);
 });
 
-test("Nightly Linux core sharding balances canonical leaves and excludes platform-owned producers", () => {
+test("Nightly Linux core preserves the complete command set across two and three isolated shards", () => {
   const packageScripts = JSON.parse(fs.readFileSync("package.json", "utf8")).scripts;
   const basePlan = buildCoreVerificationPlan({ packageScripts, includeReserved: true });
-  const plan = buildNightlyLinuxCoreShardPlan({
-    basePlan,
-    shardIndex: 1,
-    shardCount: 3,
-  });
-  const assignments = plan.nightlyShard.assignments;
-  const assignedCommandRefs = assignments.flatMap((entry) => entry.commandRefs);
+  const preparedCatalog = prepareRepositoryVerificationCatalog({ platform: "linux" });
   const expectedCommandRefs = basePlan.commandsToRun
     .map((entry) => entry.commandRef)
     .filter((commandRef) => !NIGHTLY_LINUX_CORE_EXCLUDED_COMMAND_REFS.includes(commandRef));
+  const commandSets = [];
 
-  assert.equal(assignments.length, 3);
-  assert.deepEqual([...assignedCommandRefs].sort(), [...expectedCommandRefs].sort());
-  assert.equal(new Set(assignedCommandRefs).size, assignedCommandRefs.length);
-  assert.equal(plan.nightlyShard.totalLeafCount, assignments.reduce(
-    (total, entry) => total + entry.leafCount,
-    0,
-  ));
-  assert.ok(Math.max(...assignments.map((entry) => entry.leafCount))
-    - Math.min(...assignments.map((entry) => entry.leafCount)) <= 1);
-  for (const commandRef of NIGHTLY_LINUX_CORE_EXCLUDED_COMMAND_REFS) {
-    assert.equal(assignedCommandRefs.includes(commandRef), false, commandRef);
+  for (const shardCount of [2, 3]) {
+    const plans = Array.from({ length: shardCount }, (_, index) => buildNightlyLinuxCoreShardPlan({
+      basePlan,
+      preparedCatalog,
+      shardIndex: index + 1,
+      shardCount,
+    }));
+    const assignments = plans[0].nightlyShard.assignments;
+    const assignedCommandRefs = assignments.flatMap((entry) => entry.commandRefs);
+    const executedCommandRefs = plans.flatMap((plan) => commandRefs(plan));
+
+    assert.equal(assignments.length, shardCount);
+    assert.deepEqual([...assignedCommandRefs].sort(), [...expectedCommandRefs].sort());
+    assert.equal(new Set(assignedCommandRefs).size, assignedCommandRefs.length);
+    assert.deepEqual([...executedCommandRefs].sort(), [...expectedCommandRefs].sort());
+    assert.equal(new Set(executedCommandRefs).size, executedCommandRefs.length);
+    assert.ok(Math.max(...assignments.map((entry) => entry.leafCount))
+      - Math.min(...assignments.map((entry) => entry.leafCount)) <= 1);
+    for (const commandRef of NIGHTLY_LINUX_CORE_EXCLUDED_COMMAND_REFS) {
+      assert.equal(assignedCommandRefs.includes(commandRef), false, commandRef);
+    }
+    assert.equal(
+      assignedCommandRefs.some((commandRef) => /^(?:verify|test:node|test:python):p4:/.test(commandRef)),
+      false,
+    );
+    assert.equal(assignedCommandRefs.includes("verify:pages-dist-and-drift"), false);
+    for (const [index, plan] of plans.entries()) {
+      assert.deepEqual(plan.nightlyShard.assignments, assignments);
+      assert.equal(plan.nightlyShard.shardIndex, index + 1);
+      assert.equal(plan.nightlyShard.shardCount, shardCount);
+      assert.equal(plan.nightlyShard.totalLeafCount, assignments.reduce(
+        (total, entry) => total + entry.leafCount,
+        0,
+      ));
+      assert.equal(plan.requiresDistLaneOwner, false);
+      assert.deepEqual(commandRefs(plan), assignments[index].commandRefs);
+    }
+    commandSets.push([...executedCommandRefs].sort());
   }
-  assert.equal(
-    assignedCommandRefs.some((commandRef) => /^(?:verify|test:node|test:python):p4:/.test(commandRef)),
-    false,
-  );
-  assert.equal(assignedCommandRefs.includes("verify:pages-dist-and-drift"), false);
-  assert.equal(plan.requiresDistLaneOwner, false);
-  assert.equal(plan.commandsToRun.length, assignments[0].commandRefs.length);
-  assert.deepEqual(
-    plan.commandsToRun.map((entry) => entry.commandRef),
-    assignments[0].commandRefs,
-  );
+  assert.deepEqual(commandSets[0], commandSets[1]);
 });
 
 test("Nightly Linux core sharding is deterministic and rejects invalid leaf authority", () => {
