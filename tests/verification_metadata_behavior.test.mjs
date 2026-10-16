@@ -552,9 +552,9 @@ test("M5 canonical projections are deterministic, detached, and source-identity 
   const topology = buildCanonicalNightlyTopology().nightlyTopology;
   assert.deepEqual(
     topology.roles.find((role) => role.id === "linux-core").shards,
-    ["1", "2", "3"],
+    ["1", "2"],
   );
-  assert.equal(topology.shards.filter((shard) => shard.roleId === "linux-core").length, 3);
+  assert.equal(topology.shards.filter((shard) => shard.roleId === "linux-core").length, 2);
   assert.deepEqual(topology.finalDependencies, [
     "browser",
     "linux-core",
