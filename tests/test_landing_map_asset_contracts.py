@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest import mock
 
-from shapely.geometry import GeometryCollection, LineString, Point, Polygon, shape
+from shapely.geometry import GeometryCollection, LineString, MultiPolygon, Point, Polygon, shape
 from shapely.ops import unary_union
 from shapely.validation import make_valid
 
@@ -294,6 +294,27 @@ class EuropePoliticalAndLabelContractTests(unittest.TestCase):
 
 
 class WorkMapProjectionTests(unittest.TestCase):
+    def test_polygon_serialization_is_independent_of_interior_ring_order(self) -> None:
+        exterior = [(0, 0), (8, 0), (8, 8), (0, 8)]
+        holes = [[(1, 1), (2, 1), (2, 2), (1, 2)],
+                 [(4, 4), (6, 4), (6, 6), (4, 6)]]
+        island = Polygon([(10, 0), (12, 0), (12, 2), (10, 2)])
+        original = MultiPolygon([Polygon(exterior, holes), island])
+        reordered = MultiPolygon([
+            Polygon(exterior, list(reversed(holes))), island,
+        ])
+        self.assertTrue(original.equals(reordered))
+        canvas = work_maps.Canvas(600, 400, (-1, -1, 13, 9))
+        for include_interiors in (True, False):
+            with self.subTest(include_interiors=include_interiors):
+                self.assertEqual(
+                    work_maps.polygon_paths(original, canvas, include_interiors=include_interiors),
+                    work_maps.polygon_paths(reordered, canvas, include_interiors=include_interiors),
+                )
+
+        changed = MultiPolygon([Polygon(exterior, [holes[0], [(4, 4), (7, 4), (7, 6), (4, 6)]]), island])
+        self.assertNotEqual(work_maps.polygon_paths(original, canvas), work_maps.polygon_paths(changed, canvas))
+
     def test_tno_detail_uses_stable_property_id_for_scenario_owner(self) -> None:
         feature = {"id": 3110, "properties": {"id": "DZA-2143", "cntr_code": "ALC"}}
         self.assertEqual(work_maps.feature_id(feature), "DZA-2143")
