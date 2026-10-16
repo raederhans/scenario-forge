@@ -215,7 +215,11 @@ def polygon_paths(geometry: BaseGeometry, canvas: Canvas, stride: int = 1, *, in
     if geometry.geom_type == "Polygon":
         path = ring_path(geometry.exterior.coords, canvas, stride)
         if include_interiors:
-            path += "".join(" " + ring_path(ring.coords, canvas, stride) for ring in geometry.interiors)
+            # GEOS does not promise a stable order for interior rings. Sort
+            # their serialized paths without rotating/reversing coordinates:
+            # changing ring starts can change SVGO's rounding/simplification.
+            interiors = sorted(ring_path(ring.coords, canvas, stride) for ring in geometry.interiors)
+            path += "".join(" " + interior for interior in interiors)
         return [path] if path else []
     if geometry.geom_type == "MultiPolygon":
         paths: list[str] = []
