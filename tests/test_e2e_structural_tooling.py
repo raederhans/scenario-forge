@@ -1828,6 +1828,7 @@ const page = {
         self.assertIn("--selection-json .runtime/reports/generated/verification-selector-explain.json", workflow)
         self.assertIn("--execute", workflow)
         self.assertIn("--defer-main-thread", workflow)
+        self.assertIn("--concurrency 2", workflow)
         self.assertIn("--profile-out .runtime/reports/generated/verification-selector-execution.profile.json", workflow)
         self.assertIn("verification-selector-execution.json", workflow)
         self.assertIn(".runtime/reports/generated/verification-selector-execution.*", workflow)

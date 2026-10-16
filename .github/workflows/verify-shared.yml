@@ -266,6 +266,7 @@ jobs:
             --selection-json .runtime/reports/generated/verification-selector-explain.json \
             --execute \
             --defer-main-thread \
+            --concurrency 2 \
             --profile-out .runtime/reports/generated/verification-selector-execution.profile.json \
             --json-out .runtime/reports/generated/verification-selector-execution.json \
             --md-out .runtime/reports/generated/verification-selector-execution.md

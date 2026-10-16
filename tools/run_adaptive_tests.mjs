@@ -2,7 +2,7 @@ import fs from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import process from "node:process";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import {
   buildRecommendation,
@@ -85,6 +85,7 @@ export function parseArgs(argv) {
     entrypoint: "",
     includeMainThread: false,
     deferMainThread: false,
+    concurrency: 1,
     selectionJson: "",
     verificationCatalogFixture: "",
     verificationCatalogFixtureSha256: "",
@@ -143,6 +144,12 @@ export function parseArgs(argv) {
     }
     else if (token === "--include-main-thread") args.includeMainThread = true;
     else if (token === "--defer-main-thread") args.deferMainThread = true;
+    else if (token === "--concurrency") {
+      args.concurrency = Number(argv[++index]);
+      if (![1, 2].includes(args.concurrency)) {
+        args.inputErrors.push("adaptive-concurrency-must-be-1-or-2");
+      }
+    }
     else if (token === "--selection-json") args.selectionJson = argv[++index];
     else if (token === "--verification-catalog-fixture") {
       args.verificationCatalogFixture = String(argv[++index] || "").trim();
@@ -2489,6 +2496,54 @@ export function writeAdaptiveOutputs(report, args, executionResults = null, exec
   fs.writeFileSync(args.mdOut, renderMarkdown(report, executionResults, executionPlan), "utf8");
 }
 
+function beginAdaptiveCommand(plannedCommand, executionResults, now, onCheckpoint) {
+  const commandRef = plannedCommand.commandRef;
+  const startedAtDate = now();
+  const entry = {
+    commandRef,
+    groupId: plannedCommand.groupId || null,
+    leafIds: plannedCommand.leafIds || [],
+    sourceCommandRefs: plannedCommand.sourceCommandRefs || [commandRef],
+    resourceLocks: plannedCommand.resourceLocks || [],
+    status: "running",
+    startedAt: startedAtDate.toISOString(),
+    finishedAt: null,
+    durationMs: null,
+    exitCode: null,
+    signal: null,
+    processStarted: false,
+    interrupted: false,
+  };
+  executionResults.push(entry);
+  onCheckpoint(executionResults);
+
+  const command = plannedCommand.process || commandToProcess(commandRef);
+  if (command) {
+    entry.bin = command.bin;
+    entry.args = command.args;
+  }
+  return { entry, command };
+}
+
+function finishAdaptiveCommand(plannedCommand, entry, command, result, now) {
+  entry.processStarted = Boolean(command && result && !result.error);
+  entry.actualFiles = entry.processStarted
+    ? uniqueSorted([
+      ...(plannedCommand.files || []),
+      ...(plannedCommand.modules || []),
+      ...(plannedCommand.specs || []),
+    ])
+    : [];
+  const finishedAtDate = now();
+  entry.finishedAt = finishedAtDate.toISOString();
+  entry.durationMs = Math.max(0, finishedAtDate.getTime() - Date.parse(entry.startedAt));
+  entry.signal = typeof result?.signal === "string" ? result.signal : null;
+  entry.interrupted = entry.signal !== null || result?.error?.code === "EINTR";
+  entry.exitCode = typeof result?.status === "number" ? result.status : 1;
+  entry.status = entry.interrupted ? "interrupted" : entry.exitCode === 0 ? "passed" : "failed";
+  if (result?.error) entry.error = String(result.error);
+}
+
 export function executeAdaptivePlan(executionPlan, {
   runner = spawnSync,
   cwd = REPO_ROOT,
@@ -2502,57 +2557,101 @@ export function executeAdaptivePlan(executionPlan, {
     ? executionPlan.executionCommands
     : [];
   for (const plannedCommand of plannedCommands) {
-    const commandRef = plannedCommand.commandRef;
-    const startedAtDate = now();
-    const entry = {
-      commandRef,
-      groupId: plannedCommand.groupId || null,
-      leafIds: plannedCommand.leafIds || [],
-      sourceCommandRefs: plannedCommand.sourceCommandRefs || [commandRef],
-      resourceLocks: plannedCommand.resourceLocks || [],
-      status: "running",
-      startedAt: startedAtDate.toISOString(),
-      finishedAt: null,
-      durationMs: null,
-      exitCode: null,
-      signal: null,
-      processStarted: false,
-      interrupted: false,
-    };
-    executionResults.push(entry);
-    onCheckpoint(executionResults);
-
-    const command = plannedCommand.process || commandToProcess(commandRef);
-    if (command) {
-      entry.bin = command.bin;
-      entry.args = command.args;
-    }
+    const { entry, command } = beginAdaptiveCommand(plannedCommand, executionResults, now, onCheckpoint);
     const result = command
-      ? runner(command.bin, command.args, {
-        cwd,
-        stdio: "inherit",
-        shell: false,
-        encoding: "utf8",
-      })
+      ? runner(command.bin, command.args, { cwd, stdio: "inherit", shell: false, encoding: "utf8" })
       : { status: 1, error: "Command could not be resolved." };
-    entry.processStarted = Boolean(command && result && !result.error);
-    entry.actualFiles = entry.processStarted
-      ? uniqueSorted([
-        ...(plannedCommand.files || []),
-        ...(plannedCommand.modules || []),
-        ...(plannedCommand.specs || []),
-      ])
-      : [];
-    const finishedAtDate = now();
-    entry.finishedAt = finishedAtDate.toISOString();
-    entry.durationMs = Math.max(0, finishedAtDate.getTime() - startedAtDate.getTime());
-    entry.signal = typeof result?.signal === "string" ? result.signal : null;
-    entry.interrupted = entry.signal !== null || result?.error?.code === "EINTR";
-    entry.exitCode = typeof result?.status === "number" ? result.status : 1;
-    entry.status = entry.interrupted ? "interrupted" : entry.exitCode === 0 ? "passed" : "failed";
-    if (result?.error) entry.error = String(result.error);
+    finishAdaptiveCommand(plannedCommand, entry, command, result, now);
     onCheckpoint(executionResults);
     if (entry.exitCode !== 0 && !continueOnFailure) break;
+  }
+  return executionResults;
+}
+
+function runAdaptiveChild(bin, args, options) {
+  return new Promise((resolve) => {
+    const child = spawn(bin, args, options);
+    child.once("error", (error) => resolve({ status: null, error }));
+    child.once("close", (status, signal) => resolve({ status, signal }));
+  });
+}
+
+export async function executeAdaptivePlanConcurrent(executionPlan, {
+  runner = runAdaptiveChild,
+  cwd = REPO_ROOT,
+  now = () => new Date(),
+  onCheckpoint = () => {},
+} = {}) {
+  if ((executionPlan.routeGaps || []).length > 0) return [];
+  const commands = executionPlan.executionCommands || [];
+  const positions = new Map(commands.map((command, index) => [command.groupId, index]));
+  const predecessors = new Map(commands.map((command) => [command.groupId, new Set()]));
+  // Only the catalog's lock-free child lane may overlap. Validate the entire
+  // graph before spawning; missing and cyclic dependencies fail closed. Shared
+  // leaves can place a prerequisite later in catalog order, so follow the edges.
+  for (const command of commands) {
+    if (!command.groupId || positions.size !== commands.length
+      || command.executionOwner !== "child-safe"
+      || !Array.isArray(command.resourceLocks) || command.resourceLocks.length > 0
+      || !Array.isArray(command.dependencyEdges)) {
+      throw new Error("adaptive-concurrent-plan-not-child-safe");
+    }
+    for (const { from, to } of command.dependencyEdges) {
+      if (!positions.has(from) || !positions.has(to)) {
+        throw new Error("adaptive-concurrent-dependency-invalid");
+      }
+      predecessors.get(to).add(from);
+    }
+  }
+  const visiting = new Set();
+  const visited = new Set();
+  const visit = (id) => {
+    if (visited.has(id)) return;
+    if (visiting.has(id)) throw new Error("adaptive-concurrent-dependency-cycle");
+    visiting.add(id);
+    for (const predecessor of predecessors.get(id)) visit(predecessor);
+    visiting.delete(id);
+    visited.add(id);
+  };
+  for (const id of positions.keys()) visit(id);
+  const pending = [...commands];
+  const running = new Map();
+  const passed = new Set();
+  const executionResults = [];
+  let failed = false;
+  const start = async (plannedCommand) => {
+    const { entry, command } = beginAdaptiveCommand(plannedCommand, executionResults, now, onCheckpoint);
+    let result;
+    try {
+      result = command
+        ? await runner(command.bin, command.args, { cwd, stdio: "inherit", shell: false, encoding: "utf8" })
+        : { status: 1, error: "Command could not be resolved." };
+    } catch (error) {
+      result = { status: 1, error };
+    }
+    finishAdaptiveCommand(plannedCommand, entry, command, result, now);
+    if (entry.status === "passed") passed.add(plannedCommand.groupId);
+    else failed = true;
+    onCheckpoint(executionResults);
+  };
+  while (pending.length > 0 || running.size > 0) {
+    while (!failed && running.size < 2) {
+      const index = pending.findIndex((command) => (
+        [...predecessors.get(command.groupId)].every((id) => passed.has(id))
+      ));
+      if (index === -1) break;
+      const [command] = pending.splice(index, 1);
+      const completion = start(command).finally(() => running.delete(command.groupId));
+      running.set(command.groupId, completion);
+    }
+    if (running.size === 0) break;
+    await Promise.race(running.values());
+    if (failed) {
+      // Keep accurate terminal evidence for already-running work, but never
+      // start a dependent or unrelated pending group after a failure.
+      await Promise.all(running.values());
+      break;
+    }
   }
   return executionResults;
 }
@@ -2661,7 +2760,7 @@ function emptySelectionReport(changedFiles, gap) {
   };
 }
 
-function main() {
+async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.includeMainThread && args.deferMainThread) {
     throw new Error("--include-main-thread and --defer-main-thread are mutually exclusive");
@@ -2814,6 +2913,7 @@ function main() {
   const report = {
     ...selectedReport,
     adaptiveMode: args.dryRun ? "dry-run" : "execute",
+    executionConcurrency: args.concurrency,
     verificationEntrypoint: args.entrypoint || null,
     baseRevision: args.entrypoint === "impact" ? authority.historyBase : null,
     headRevision: args.entrypoint === "impact" ? authority.head : null,
@@ -2927,7 +3027,8 @@ function main() {
     process.exit(2);
   }
 
-  const executionResults = executeAdaptivePlan(executionPlan, {
+  const execute = args.concurrency === 2 ? executeAdaptivePlanConcurrent : executeAdaptivePlan;
+  const executionResults = await execute(executionPlan, {
     onCheckpoint(results) {
       writeAdaptiveOutputs(report, args, results, executionPlan, profileOutputOptions);
     },
@@ -2954,5 +3055,8 @@ function main() {
 
 const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMainModule) {
-  main();
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
 }
